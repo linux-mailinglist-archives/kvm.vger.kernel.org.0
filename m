@@ -2,215 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 56E544EDADF
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 15:48:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48A284EDB0B
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 16:03:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237024AbiCaNuV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 09:50:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47710 "EHLO
+        id S237143AbiCaOEw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 10:04:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237009AbiCaNuR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 09:50:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 593DAC1A
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 06:48:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648734508;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=bBNe6ZwO14A+VdUorhiFqNd6kC6eQKqel5DMkynNcGs=;
-        b=iIu100JSXulfxBaPtSeT8B2Yc345F+8LZ5/y9tl9BRdQIkytE7P2/+YA+bLPpvrcdUpZI1
-        z0noHH8mAjcODPoMZYMmVAQAeHgJAO0WRXBeyliVMWyRYsYplJ4Sj8SSwN6dO6jN3P2qNN
-        wdElG8g0lcEG6wn/MTmwk2LiEL9Pins=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-511-o7PEZCKkNnCwi4cgtbcgAA-1; Thu, 31 Mar 2022 09:48:26 -0400
-X-MC-Unique: o7PEZCKkNnCwi4cgtbcgAA-1
-Received: by mail-ed1-f71.google.com with SMTP id d28-20020a50f69c000000b00419125c67f4so14980074edn.17
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 06:48:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=bBNe6ZwO14A+VdUorhiFqNd6kC6eQKqel5DMkynNcGs=;
-        b=LDpSRrGE44t5dmww+nhVkpwrl8TXSDZcjGhU3ov945tMPbddt7o5oook75kVemcdUZ
-         6V30EzKjhYptW6ZauiZnVdG5KJ8ryCnyGHUSUPoJOwU3YUdvw9NGt9p8M3PGlFxe2R3Y
-         UoDWOyexHZNdNAGt6mcK4ZuU6asawv0JIvjOhz3wieqWBkBGgRSVwbbM79w+GY9h/qTq
-         HgEgRaGPFw6VvohZM4GG9LYhQq1MLPOud6SbzpEY3HNPPZaGifFpBLMr5OBfv/YTy5s8
-         kTgQN++oOFukO/RXU7sqC+fZL7MzqYDYuiaUlp0w/jQM2lWeTT4vePy84FvZTIGj8Lbr
-         d/Lw==
-X-Gm-Message-State: AOAM530pyKPcwmm8jYwrAXV80GJNHRzBUcp0euIKtuGxLyGUdJPm/1+A
-        CyweATa5UDhJibbevjNy/PlZ3aAzsG/LG+b6LtgMtTeeTZ4hqptvjlzn1x7wNXnL961IbvrA4lF
-        sftt9n7mWlLA5
-X-Received: by 2002:a17:906:69d1:b0:6ce:7201:ec26 with SMTP id g17-20020a17090669d100b006ce7201ec26mr5115675ejs.105.1648734501768;
-        Thu, 31 Mar 2022 06:48:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzaOztpuiraqUm6TPegDkLmbLYAkWCcmmS2jBymLmYa/zJNRyuCbXtPFJnMPQ//0YMBauubEw==
-X-Received: by 2002:a17:906:69d1:b0:6ce:7201:ec26 with SMTP id g17-20020a17090669d100b006ce7201ec26mr5115639ejs.105.1648734501541;
-        Thu, 31 Mar 2022 06:48:21 -0700 (PDT)
-Received: from redhat.com ([2.53.153.13])
-        by smtp.gmail.com with ESMTPSA id h8-20020a1709066d8800b006e09a49a713sm8018933ejt.159.2022.03.31.06.48.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Mar 2022 06:48:21 -0700 (PDT)
-Date:   Thu, 31 Mar 2022 09:48:16 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        andrew@daynix.com, david@redhat.com, elic@nvidia.com,
-        gautam.dawar@xilinx.com, gdawar@xilinx.com, gshan@redhat.com,
-        helei.sig11@bytedance.com, jasowang@redhat.com,
-        Jonathan.Cameron@huawei.com, keirf@google.com,
-        lingshan.zhu@intel.com, linmiaohe@huawei.com, lkp@intel.com,
-        longpeng2@huawei.com, mail@anirudhrb.com, maz@kernel.org,
-        mst@redhat.com, nathan@kernel.org, pizhenwei@bytedance.com,
-        qiudayu@archeros.com, sgarzare@redhat.com, trix@redhat.com,
-        willy@infradead.org, xuanzhuo@linux.alibaba.com
-Subject: [GIT PULL] virtio: features, fixes
-Message-ID: <20220331094816-mutt-send-email-mst@kernel.org>
+        with ESMTP id S231631AbiCaOEv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 10:04:51 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9FFF217950;
+        Thu, 31 Mar 2022 07:03:03 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22VDZ7r7017264;
+        Thu, 31 Mar 2022 14:03:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=jjrVnhD4VqHB6NtRxQfyxqzRvr+639BkMDBfqvAwTfY=;
+ b=clLROwaODRg5yg9nX7q97kxbZH5HR6ae3vQE61RYasREQJa8lPpDabAW8n52NY6immqK
+ gD+Ku7aZawBTj9sicqYMRd26RVm+XPK9hnB7qnPVZUW2d095CcgI6YbbxCEzbueV47d4
+ /M0YyQzsa7MMN5YeoYx+NydHogb8dPod6eNFT96wS1dJVHu5lLMlMC3GGPc3usryaT9k
+ h3c8CAl8ObCz4muCVyyN9CEZR8XTrkkOkB5MvNpp0jUWbBJbgf0HutzdyiDucxXzhcj3
+ Fe9NMeVYzF3b/3tw8lLD4Z+N2w99rlZFupkXM8lDSecaH0wMDPqSh4pgjYM+YkEySH1T UQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3f50aer4t2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 31 Mar 2022 14:03:02 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22VDF86D022345;
+        Thu, 31 Mar 2022 14:03:02 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3f50aer4s5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 31 Mar 2022 14:03:01 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22VDvO0w017311;
+        Thu, 31 Mar 2022 14:02:59 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma02fra.de.ibm.com with ESMTP id 3f1tf919x8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 31 Mar 2022 14:02:59 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22VE32YW40698362
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 31 Mar 2022 14:03:02 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3236B11C050;
+        Thu, 31 Mar 2022 14:02:56 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B98B811C04A;
+        Thu, 31 Mar 2022 14:02:55 +0000 (GMT)
+Received: from [9.145.159.108] (unknown [9.145.159.108])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 31 Mar 2022 14:02:55 +0000 (GMT)
+Message-ID: <827cfa86-bad4-8c31-8038-8db9a011fee9@linux.ibm.com>
+Date:   Thu, 31 Mar 2022 16:02:55 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, thuth@redhat.com, pasic@linux.ibm.com,
+        david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
+        mimu@linux.ibm.com, nrb@linux.ibm.com
+References: <20220330122605.247613-1-imbrenda@linux.ibm.com>
+ <20220330122605.247613-14-imbrenda@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v9 13/18] KVM: s390: pv: cleanup leftover protected VMs if
+ needed
+In-Reply-To: <20220330122605.247613-14-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: _JqpWPIbWwpBgGJdN513lKoJGuEZ0Jbj
+X-Proofpoint-GUID: fNDKqZwvMjyBNuhfwmVuPjI7uzVMK6Yx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-31_05,2022-03-31_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ priorityscore=1501 suspectscore=0 mlxscore=0 clxscore=1015 impostorscore=0
+ phishscore=0 mlxlogscore=999 spamscore=0 bulkscore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203310079
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H3,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following changes since commit f443e374ae131c168a065ea1748feac6b2e76613:
+On 3/30/22 14:26, Claudio Imbrenda wrote:
+> In upcoming patches it will be possible to start tearing down a
+> protected VM, and finish the teardown concurrently in a different
+> thread.
+> 
+> Protected VMs that are pending for tear down ("leftover") need to be
+> cleaned properly when the userspace process (e.g. qemu) terminates.
+> 
+> This patch makes sure that all "leftover" protected VMs are always
+> properly torn down.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/kvm_host.h |  2 +
+>   arch/s390/kvm/kvm-s390.c         |  1 +
+>   arch/s390/kvm/pv.c               | 69 ++++++++++++++++++++++++++++++++
+>   3 files changed, 72 insertions(+)
+> 
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index 1bccb8561ba9..50e3516cbc03 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -922,6 +922,8 @@ struct kvm_s390_pv {
+>   	u64 guest_len;
+>   	unsigned long stor_base;
+>   	void *stor_var;
+> +	void *async_deinit;
+> +	struct list_head need_cleanup;
+>   	struct mmu_notifier mmu_notifier;
+>   };
+>   
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 446f89db93a1..3637f556ff33 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2788,6 +2788,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>   	kvm_s390_vsie_init(kvm);
+>   	if (use_gisa)
+>   		kvm_s390_gisa_init(kvm);
+> +	INIT_LIST_HEAD(&kvm->arch.pv.need_cleanup);
 
-  Linux 5.17 (2022-03-20 13:14:17 -0700)
+kvm->arch.pv.sync_deinit = NULL;
 
-are available in the Git repository at:
+>   	KVM_EVENT(3, "vm 0x%pK created by pid %u", kvm, current->pid);
+>   
+>   	return 0;
+> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+> index be3b467f8feb..56412617dd01 100644
+> --- a/arch/s390/kvm/pv.c
+> +++ b/arch/s390/kvm/pv.c
+> @@ -17,6 +17,19 @@
+>   #include <linux/mmu_notifier.h>
+>   #include "kvm-s390.h"
+>   
+> +/**
+> + * @struct deferred_priv
+> + * Represents a "leftover" protected VM that does not correspond to any
+> + * active KVM VM.
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+Maybe something like:
+...that is still registered with the Ultravisor but isn't registered 
+with KVM anymore.
 
-for you to fetch changes up to ad6dc1daaf29f97f23cc810d60ee01c0e83f4c6b:
-
-  vdpa/mlx5: Avoid processing works if workqueue was destroyed (2022-03-28 16:54:30 -0400)
-
-----------------------------------------------------------------
-virtio: features, fixes
-
-vdpa generic device type support
-More virtio hardening for broken devices
-On the same theme, revert some virtio hotplug hardening patches -
-they were misusing some interrupt flags, will have to be reverted.
-RSS support in virtio-net
-max device MTU support in mlx5 vdpa
-akcipher support in virtio-crypto
-shared IRQ support in ifcvf vdpa
-a minor performance improvement in vhost
-Enable virtio mem for ARM64
-beginnings of advance dma support
-
-Cleanups, fixes all over the place.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Andrew Melnychenko (4):
-      drivers/net/virtio_net: Fixed padded vheader to use v1 with hash.
-      drivers/net/virtio_net: Added basic RSS support.
-      drivers/net/virtio_net: Added RSS hash report.
-      drivers/net/virtio_net: Added RSS hash report control.
-
-Anirudh Rayabharam (1):
-      vhost: handle error while adding split ranges to iotlb
-
-Eli Cohen (2):
-      net/mlx5: Add support for configuring max device MTU
-      vdpa/mlx5: Avoid processing works if workqueue was destroyed
-
-Gautam Dawar (1):
-      Add definition of VIRTIO_F_IN_ORDER feature bit
-
-Gavin Shan (1):
-      drivers/virtio: Enable virtio mem for ARM64
-
-Jason Wang (2):
-      Revert "virtio-pci: harden INTX interrupts"
-      Revert "virtio_pci: harden MSI-X interrupts"
-
-Keir Fraser (1):
-      virtio: pci: check bar values read from virtio config space
-
-Longpeng (3):
-      vdpa: support exposing the config size to userspace
-      vdpa: change the type of nvqs to u32
-      vdpa: support exposing the count of vqs to userspace
-
-Miaohe Lin (1):
-      mm/balloon_compaction: make balloon page compaction callbacks static
-
-Michael Qiu (1):
-      vdpa/mlx5: re-create forwarding rules after mac modified
-
-Michael S. Tsirkin (2):
-      tools/virtio: fix after premapped buf support
-      tools/virtio: compile with -pthread
-
-Stefano Garzarella (2):
-      vhost: cache avail index in vhost_enable_notify()
-      virtio: use virtio_device_ready() in virtio_device_restore()
-
-Xuan Zhuo (3):
-      virtio_ring: rename vring_unmap_state_packed() to vring_unmap_extra_packed()
-      virtio_ring: remove flags check for unmap split indirect desc
-      virtio_ring: remove flags check for unmap packed indirect desc
-
-Zhu Lingshan (5):
-      vDPA/ifcvf: make use of virtio pci modern IO helpers in ifcvf
-      vhost_vdpa: don't setup irq offloading when irq_num < 0
-      vDPA/ifcvf: implement device MSIX vector allocator
-      vDPA/ifcvf: implement shared IRQ feature
-      vDPA/ifcvf: cacheline alignment for ifcvf_hw
-
-zhenwei pi (4):
-      virtio_crypto: Introduce VIRTIO_CRYPTO_NOSPC
-      virtio-crypto: introduce akcipher service
-      virtio-crypto: implement RSA algorithm
-      virtio-crypto: rename skcipher algs
-
- drivers/crypto/virtio/Kconfig                      |   3 +
- drivers/crypto/virtio/Makefile                     |   3 +-
- .../crypto/virtio/virtio_crypto_akcipher_algs.c    | 585 +++++++++++++++++++++
- drivers/crypto/virtio/virtio_crypto_common.h       |   7 +-
- drivers/crypto/virtio/virtio_crypto_core.c         |   6 +-
- drivers/crypto/virtio/virtio_crypto_mgr.c          |  17 +-
- ...crypto_algs.c => virtio_crypto_skcipher_algs.c} |   4 +-
- drivers/net/virtio_net.c                           | 389 +++++++++++++-
- drivers/vdpa/ifcvf/ifcvf_base.c                    | 140 ++---
- drivers/vdpa/ifcvf/ifcvf_base.h                    |  24 +-
- drivers/vdpa/ifcvf/ifcvf_main.c                    | 323 ++++++++++--
- drivers/vdpa/mlx5/net/mlx5_vnet.c                  |  84 ++-
- drivers/vdpa/vdpa.c                                |   6 +-
- drivers/vhost/iotlb.c                              |   6 +-
- drivers/vhost/vdpa.c                               |  45 +-
- drivers/vhost/vhost.c                              |   3 +-
- drivers/virtio/Kconfig                             |   7 +-
- drivers/virtio/virtio.c                            |   5 +-
- drivers/virtio/virtio_pci_common.c                 |  48 +-
- drivers/virtio/virtio_pci_common.h                 |   7 +-
- drivers/virtio/virtio_pci_legacy.c                 |   5 +-
- drivers/virtio/virtio_pci_modern.c                 |  18 +-
- drivers/virtio/virtio_pci_modern_dev.c             |   9 +-
- drivers/virtio/virtio_ring.c                       |  53 +-
- include/linux/balloon_compaction.h                 |  22 -
- include/linux/vdpa.h                               |   9 +-
- include/uapi/linux/vhost.h                         |   7 +
- include/uapi/linux/virtio_config.h                 |   6 +
- include/uapi/linux/virtio_crypto.h                 |  82 ++-
- mm/balloon_compaction.c                            |   6 +-
- tools/virtio/Makefile                              |   3 +-
- tools/virtio/linux/dma-mapping.h                   |   4 +-
- 32 files changed, 1639 insertions(+), 297 deletions(-)
- create mode 100644 drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
- rename drivers/crypto/virtio/{virtio_crypto_algs.c => virtio_crypto_skcipher_algs.c} (99%)
+> + */
+> +struct deferred_priv {
+> +	struct list_head list;
+> +	unsigned long old_table;
+> +	u64 handle;
+> +	void *stor_var;
+> +	unsigned long stor_base;
+> +};
+> +
+>   static void kvm_s390_clear_pv_state(struct kvm *kvm)
+>   {
+>   	kvm->arch.pv.handle = 0;
+> @@ -163,6 +176,60 @@ static int kvm_s390_pv_alloc_vm(struct kvm *kvm)
+>   	return -ENOMEM;
+>   }
+>   
+> +/**
+> + * kvm_s390_pv_cleanup_deferred - Clean up one leftover protected VM.
+> + * @kvm the KVM that was associated with this leftover protected VM
+> + * @deferred details about the leftover protected VM that needs a clean up
+> + * Return: 0 in case of success, otherwise 1
+> + */
+> +static int kvm_s390_pv_cleanup_deferred(struct kvm *kvm, struct deferred_priv *deferred)
+> +{
+> +	u16 rc, rrc;
+> +	int cc;
+> +
+> +	cc = uv_cmd_nodata(deferred->handle, UVC_CMD_DESTROY_SEC_CONF, &rc, &rrc);
+> +	KVM_UV_EVENT(kvm, 3, "PROTVIRT DESTROY VM: rc %x rrc %x", rc, rrc);
+> +	WARN_ONCE(cc, "protvirt destroy vm failed rc %x rrc %x", rc, rrc);
+> +	if (cc)
+> +		return cc;
+> +	/*
+> +	 * Intentionally leak unusable memory. If the UVC fails, the memory
+> +	 * used for the VM and its metadata is permanently unusable.
+> +	 * This can only happen in case of a serious KVM or hardware bug; it
+> +	 * is not expected to happen in normal operation.
+> +	 */
+> +	free_pages(deferred->stor_base, get_order(uv_info.guest_base_stor_len));
+> +	free_pages(deferred->old_table, CRST_ALLOC_ORDER);
+> +	vfree(deferred->stor_var);
+> +	return 0;
+> +}
+> +
+> +/**
+> + * kvm_s390_pv_cleanup_leftovers - Clean up all leftover protected VMs.
+> + * @kvm the KVM whose leftover protected VMs are to be cleaned up
+> + * Return: 0 in case of success, otherwise 1
+> + */
+> +static int kvm_s390_pv_cleanup_leftovers(struct kvm *kvm)
+> +{
+> +	struct deferred_priv *deferred;
+> +	int cc = 0;
+> +
+> +	if (kvm->arch.pv.async_deinit)
+> +		list_add(kvm->arch.pv.async_deinit, &kvm->arch.pv.need_cleanup);
+> +
+> +	while (!list_empty(&kvm->arch.pv.need_cleanup)) {
+> +		deferred = list_first_entry(&kvm->arch.pv.need_cleanup, typeof(*deferred), list);
+> +		if (kvm_s390_pv_cleanup_deferred(kvm, deferred))
+> +			cc = 1;
+> +		else
+> +			atomic_dec(&kvm->mm->context.protected_count);
+> +		list_del(&deferred->list);
+> +		kfree(deferred);
+> +	}
+> +	kvm->arch.pv.async_deinit = NULL;
+> +	return cc;
+> +}
+> +
+>   /* this should not fail, but if it does, we must not free the donated memory */
+>   int kvm_s390_pv_deinit_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
+>   {
+> @@ -190,6 +257,8 @@ int kvm_s390_pv_deinit_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
+>   	KVM_UV_EVENT(kvm, 3, "PROTVIRT DESTROY VM: rc %x rrc %x", *rc, *rrc);
+>   	WARN_ONCE(cc, "protvirt destroy vm failed rc %x rrc %x", *rc, *rrc);
+>   
+> +	cc |= kvm_s390_pv_cleanup_leftovers(kvm);
+> +
+>   	return cc ? -EIO : 0;
+>   }
+>   
 
