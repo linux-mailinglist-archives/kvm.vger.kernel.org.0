@@ -2,69 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AB944EE35E
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 23:38:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95FF04EE364
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 23:41:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241891AbiCaVkm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 17:40:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41182 "EHLO
+        id S241912AbiCaVm4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 17:42:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230027AbiCaVkk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 17:40:40 -0400
-Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAE8D2CE2B
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 14:38:51 -0700 (PDT)
-Received: by mail-il1-x149.google.com with SMTP id g5-20020a92dd85000000b002c79aa519f4so615800iln.10
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 14:38:51 -0700 (PDT)
+        with ESMTP id S241945AbiCaVmw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 17:42:52 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D89839BB1
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 14:41:04 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id v12so1524763ljd.3
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 14:41:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=EBvLSPzxeZwoRgmfMBjBkf8t4T2CICbfEAFJBAeKCK0=;
-        b=N1oCH65ejmsf2GfWQpfX392jUH9OvfYS363sYxEwWMmHjXJjiHar2RSx7zoUsw9h1C
-         3JQYsfnRK55SWEmEeCFwU5uSoMCc5HhDBo8STMMNf3fF2uNsuVk1Ze/I5oq70ddPB/mv
-         KbSsqTWnzMmheLREHqpfPHneXzqE4v0MBJ5BgWyOKCwg7OWLquQ0eHfMM0X18RfTRsqy
-         XD9kDTye3NDaPYLMYIkwHM2qtOq33WbTXyCpdxnrBhp7BAfzehYfwmZf8mMW8k8trjCO
-         lp0yWS7Xepe9s9f6KRXhfSVs0LHpMDqE7c8L75d4bwR++OQsOqq1u8RA0dwoBq3Z7JjX
-         /Qxg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Rw60a4C/1buvlADobHgeyPYE1W+JkvNYCFomhSX9C/o=;
+        b=e8LF8Ze6zOwPt6FFnClACWV3Jo+f6do+thni5aGwt3k2enqe+nuyyjgZR38Yppr/YT
+         chMY6K4HfZZogZnG0SNby5Xd3KPWJtaiKDME29/XISJdc/xM37L/LXINl0tOn8ftgf0a
+         8p/G0yOxS/uqQaue2tGvoYPNzXGg0Xg1vsAiM+Y7V7qZTqVwgwqU8DmaceQfIIKHE6ZK
+         XYaw6qF/PswMla7HX7+k6mhIQkzuEyopPjxaCTxrXYbHadlmh4RXPZlq7Wpup4y3IDy+
+         CO46Pqn2+l1c379SxtQtpcvUEVWa1Z3A2K7K8dwzPnLwb8ZOCYuN3uQXgEe7k+hvbm0J
+         C1FA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=EBvLSPzxeZwoRgmfMBjBkf8t4T2CICbfEAFJBAeKCK0=;
-        b=r2rOjIfk8rLKCNOZ39dn1acochK/GvWm0gNo3uYZjGJJpdApdMMIx+5N+8q5vu2l1v
-         sw+ZTbHV5UXF3Cw8LeEGRnkEVbQW6dX/U/tmOHTuW3wcQKu7/DQEWNJMYtWFWM/JjS0y
-         DBP91FkhYZGCTmI4RUKF4rafr8AvHWN6xNyaXuOhpUfdwW+nFpxLW/YQlcEQ8aPuiSYZ
-         EZRAyOKxc06+sWq9MhUyMudRgi9+UP5+N8Kalmo8xxRl+kO5k0bVKcdMl6BtwlUP0/Yd
-         bPt/g4MH9bn3BaNYrzbefG7VA5WtnSx2W0207N6ynlnzL5xp40PmuZIMZThsWZDH55ap
-         CTEA==
-X-Gm-Message-State: AOAM530V+ZmyKxiMkJXrXKilx9khzNqWB0E5q03lYXRqYiIt06aQ3WtM
-        dNvMs3oBoSeKMq6M03KLISZZRODjn1s=
-X-Google-Smtp-Source: ABdhPJyWD5Z8mog1lrNmFeB3Sj9lloObcBlu4DMRGN5AyclNoy+a82Sff9gvBtxPsYrcjqqbU4Xa8wmxPiA=
-X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6602:1494:b0:649:5967:e7c7 with SMTP id
- a20-20020a056602149400b006495967e7c7mr15590609iow.49.1648762731335; Thu, 31
- Mar 2022 14:38:51 -0700 (PDT)
-Date:   Thu, 31 Mar 2022 21:38:44 +0000
-Message-Id: <20220331213844.2894006-1-oupton@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
-Subject: [PATCH] KVM: arm64: Don't split hugepages outside of MMU write lock
-From:   Oliver Upton <oupton@google.com>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Rw60a4C/1buvlADobHgeyPYE1W+JkvNYCFomhSX9C/o=;
+        b=TbiFtQQDX7Ho1KwWOLQnGEq+tZrIuMuC8e5Zn+FlzZoLVcXrPcLTwdCE1fPdS9EeCT
+         LcKsSrJcEHFCQVejyFd7Yw7k9wD0/QubZRMwbAPk4OLV86rXISkxHkkjVafRCUPK0Bmz
+         6LvsZs+bQZ95TA3UTXuJlM78SAMv8UtkBYO6J1uPxWbLSQHVJv6DImirExuaPvbp1VZz
+         P+97hQ6wVyOvwEfRfeZgjUYDnuInSaLVO8g/ZmOh/f+rcFPnTWdznUh57CY0ACog4795
+         VCA/xIfeW4zGyp/eEVErjVmX+Gig/B2791KrtQPRlL7U+y9NS1URs6lxRkibQbvuskSf
+         Nvug==
+X-Gm-Message-State: AOAM5304/+lGEOJRaIfFjlGqoPI/JTASdGRe81vFP8Kmrou37JVVYZNl
+        OGM24y7qnbbEm9V4+Rao0WUzq72yu3iv2FuTYP8Cyw==
+X-Google-Smtp-Source: ABdhPJy1FVLnw5Ep7uY/xe1k2URbIcy58oenF966+ZOMopXj2kVs4i0JqYBjG3cke0TiYjLEYAK4qaG8FpyHQsm1lvQ=
+X-Received: by 2002:a2e:8913:0:b0:24a:fe47:36b with SMTP id
+ d19-20020a2e8913000000b0024afe47036bmr1531024lji.361.1648762862151; Thu, 31
+ Mar 2022 14:41:02 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220311002528.2230172-1-dmatlack@google.com> <20220311002528.2230172-17-dmatlack@google.com>
+ <YjGgjTnP/9sG8L+2@xz-m1.local> <CALzav=fZQYC7YyTbZqbkYTYVUXCq4skc6pkQ2S59BoSxbkKUhw@mail.gmail.com>
+ <YkShwFaRqlQpyL87@xz-m1.local>
+In-Reply-To: <YkShwFaRqlQpyL87@xz-m1.local>
+From:   David Matlack <dmatlack@google.com>
+Date:   Thu, 31 Mar 2022 14:40:35 -0700
+Message-ID: <CALzav=cxm=A31PJOMes3eWpCV8s0zQGgaGZhYiQFJyxY2dNDXg@mail.gmail.com>
+Subject: Re: [PATCH v2 16/26] KVM: x86/mmu: Cache the access bits of shadowed translations
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Sean Christopherson <seanjc@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,145 +85,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It is possible to take a stage-2 permission fault on a page larger than
-PAGE_SIZE. For example, when running a guest backed by 2M HugeTLB, KVM
-eagerly maps at the largest possible block size. When dirty logging is
-enabled on a memslot, KVM does *not* eagerly split these 2M stage-2
-mappings and instead clears the write bit on the pte.
+On Wed, Mar 30, 2022 at 11:30 AM Peter Xu <peterx@redhat.com> wrote:
+>
+> On Tue, Mar 22, 2022 at 03:51:54PM -0700, David Matlack wrote:
+> > On Wed, Mar 16, 2022 at 1:32 AM Peter Xu <peterx@redhat.com> wrote:
+> > >
+> > > On Fri, Mar 11, 2022 at 12:25:18AM +0000, David Matlack wrote:
+> > > > In order to split a huge page we need to know what access bits to assign
+> > > > to the role of the new child page table. This can't be easily derived
+> > > > from the huge page SPTE itself since KVM applies its own access policies
+> > > > on top, such as for HugePage NX.
+> > > >
+> > > > We could walk the guest page tables to determine the correct access
+> > > > bits, but that is difficult to plumb outside of a vCPU fault context.
+> > > > Instead, we can store the original access bits for each leaf SPTE
+> > > > alongside the GFN in the gfns array. The access bits only take up 3
+> > > > bits, which leaves 61 bits left over for gfns, which is more than
+> > > > enough. So this change does not require any additional memory.
+> > >
+> > > I have a pure question on why eager page split needs to worry on hugepage
+> > > nx..
+> > >
+> > > IIUC that was about forbidden huge page being mapped as executable.  So
+> > > afaiu the only missing bit that could happen if we copy over the huge page
+> > > ptes is the executable bit.
+> > >
+> > > But then?  I think we could get a page fault on fault->exec==true on the
+> > > split small page (because when we copy over it's cleared, even though the
+> > > page can actually be executable), but it should be well resolved right
+> > > after that small page fault.
+> > >
+> > > The thing is IIUC this is a very rare case, IOW, it should mostly not
+> > > happen in 99% of the use case?  And there's a slight penalty when it
+> > > happens, but only perf-wise.
+> > >
+> > > As I'm not really fluent with the code base, perhaps I missed something?
+> >
+> > You're right that we could get away with not knowing the shadowed
+> > access permissions to assign to the child SPTEs when splitting a huge
+> > SPTE. We could just copy the huge SPTE access permissions and then let
+> > the execute bit be repaired on fault (although those faults would be a
+> > performance cost).
+> >
+> > But the access permissions are also needed to lookup an existing
+> > shadow page (or create a new shadow page) to use to split the huge
+> > page. For example, let's say we are going to split a huge page that
+> > does not have execute permissions enabled. That could be because NX
+> > HugePages are enabled or because we are shadowing a guest translation
+> > that does not allow execution (or both). We wouldn't want to propagate
+> > the no-execute permission into the child SP role.access if the
+> > shadowed translation really does allow execution (and vice versa).
+>
+> Then the follow up (pure) question is what will happen if we simply
+> propagate the no-exec permission into the child SP?
+>
+> I think that only happens with direct sptes where guest used huge pages
+> because that's where the shadow page will be huge, so IIUC that's checked
+> here when the small page fault triggers:
+>
+> static void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+>                                    unsigned direct_access)
+> {
+>         if (is_shadow_present_pte(*sptep) && !is_large_pte(*sptep)) {
+>                 struct kvm_mmu_page *child;
+>
+>                 /*
+>                  * For the direct sp, if the guest pte's dirty bit
+>                  * changed form clean to dirty, it will corrupt the
+>                  * sp's access: allow writable in the read-only sp,
+>                  * so we should update the spte at this point to get
+>                  * a new sp with the correct access.
+>                  */
+>                 child = to_shadow_page(*sptep & PT64_BASE_ADDR_MASK);
+>                 if (child->role.access == direct_access)
+>                         return;
+>
+>                 drop_parent_pte(child, sptep);
+>                 kvm_flush_remote_tlbs_with_address(vcpu->kvm, child->gfn, 1);
+>         }
+> }
+>
+> Due to missing EXEC the role.access check will not match with direct
+> access, which is the guest pgtable value which has EXEC set.  Then IIUC
+> we'll simply drop the no-exec SP and replace it with a new one with exec
+> perm.  The question is, would that untimately work too?
+>
+> Even if that works, I agree this sounds tricky because we're potentially
+> caching fake sp.role conditionally and it seems we never do that before.
+> It's just that the other option that you proposed here seems to add other
+> way of complexity on caching spte permission information while kvm doesn't
+> do either before.  IMHO we need to see which is the best trade off.
 
-Since dirty logging is always performed at PAGE_SIZE granularity, KVM
-lazily splits these 2M block mappings down to PAGE_SIZE in the stage-2
-fault handler. This operation must be done under the write lock. Since
-commit f783ef1c0e82 ("KVM: arm64: Add fast path to handle permission
-relaxation during dirty logging"), the stage-2 fault handler
-conditionally takes the read lock on permission faults with dirty
-logging enabled. To that end, it is possible to split a 2M block mapping
-while only holding the read lock.
+Clever! I think you're right that it would work correctly.
 
-The problem is demonstrated by running kvm_page_table_test with 2M
-anonymous HugeTLB, which splats like so:
+This approach avoids the need for caching access bits, but comes with downsides:
+ - Performance impact from the extra faults needed to drop the SP and
+repair the execute permission bit.
+ - Some amount of memory overhead from KVM allocating new SPs when it
+could re-use existing SPs.
 
-  WARNING: CPU: 5 PID: 15276 at arch/arm64/kvm/hyp/pgtable.c:153 stage2_map_walk_leaf+0x124/0x158
+Given the relative simplicity of access caching (and the fact that it
+requires no additional memory), I'm inclined to stick with it rather
+than taking the access permissions from the huge page.
 
-  [...]
-
-  Call trace:
-  stage2_map_walk_leaf+0x124/0x158
-  stage2_map_walker+0x5c/0xf0
-  __kvm_pgtable_walk+0x100/0x1d4
-  __kvm_pgtable_walk+0x140/0x1d4
-  __kvm_pgtable_walk+0x140/0x1d4
-  kvm_pgtable_walk+0xa0/0xf8
-  kvm_pgtable_stage2_map+0x15c/0x198
-  user_mem_abort+0x56c/0x838
-  kvm_handle_guest_abort+0x1fc/0x2a4
-  handle_exit+0xa4/0x120
-  kvm_arch_vcpu_ioctl_run+0x200/0x448
-  kvm_vcpu_ioctl+0x588/0x664
-  __arm64_sys_ioctl+0x9c/0xd4
-  invoke_syscall+0x4c/0x144
-  el0_svc_common+0xc4/0x190
-  do_el0_svc+0x30/0x8c
-  el0_svc+0x28/0xcc
-  el0t_64_sync_handler+0x84/0xe4
-  el0t_64_sync+0x1a4/0x1a8
-
-Fix the issue by only acquiring the read lock if the guest faulted on a
-PAGE_SIZE granule w/ dirty logging enabled. Since it is possible for the
-faulting IPA to get collapsed into a larger block mapping until the read
-lock is acquired, retry the faulting instruction any time that the fault
-cannot be fixed by relaxing permissions. In so doing, the fault handler
-will acquire the write lock for the subsequent fault on a larger
-PAGE_SIZE mapping and split the block safely behind the write lock.
-
-Fixes: f783ef1c0e82 ("KVM: arm64: Add fast path to handle permission relaxation during dirty logging")
-Cc: Jing Zhang <jingzhangos@google.com>
-Signed-off-by: Oliver Upton <oupton@google.com>
----
-
-Applies cleanly to kvmarm/fixes at the following commit:
-
-  8872d9b3e35a ("KVM: arm64: Drop unneeded minor version check from PSCI v1.x handler")
-
-Tested the patch by running KVM selftests. Additionally, I did 10
-iterations of the kvm_page_table_test with 2M anon HugeTLB memory.
-
-It is expected that this patch will cause fault serialization in the
-pathological case where all vCPUs are faulting on the same granule of
-memory, as every vCPU will attempt to acquire the write lock. The only
-safe way to cure this contention is to dissolve pages eagerly outside of
-the stage-2 fault handler (like x86).
-
- arch/arm64/kvm/mmu.c | 25 ++++++++++++++++++++-----
- 1 file changed, 20 insertions(+), 5 deletions(-)
-
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 0d19259454d8..9384325bf3df 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1079,7 +1079,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	gfn_t gfn;
- 	kvm_pfn_t pfn;
- 	bool logging_active = memslot_is_logging(memslot);
--	bool logging_perm_fault = false;
-+	bool use_read_lock = false;
- 	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
- 	unsigned long vma_pagesize, fault_granule;
- 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-@@ -1114,7 +1114,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (logging_active) {
- 		force_pte = true;
- 		vma_shift = PAGE_SHIFT;
--		logging_perm_fault = (fault_status == FSC_PERM && write_fault);
-+		use_read_lock = (fault_status == FSC_PERM && write_fault &&
-+				 fault_granule == PAGE_SIZE);
- 	} else {
- 		vma_shift = get_vma_page_shift(vma, hva);
- 	}
-@@ -1218,7 +1219,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * logging dirty logging, only acquire read lock for permission
- 	 * relaxation.
- 	 */
--	if (logging_perm_fault)
-+	if (use_read_lock)
- 		read_lock(&kvm->mmu_lock);
- 	else
- 		write_lock(&kvm->mmu_lock);
-@@ -1267,10 +1268,24 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 */
- 	if (fault_status == FSC_PERM && vma_pagesize == fault_granule) {
- 		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
--	} else {
-+	} else if (!use_read_lock) {
- 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
- 					     __pfn_to_phys(pfn), prot,
- 					     memcache);
-+
-+	/*
-+	 * The read lock is taken if the FSC indicates that the guest faulted on
-+	 * a PAGE_SIZE granule. It is possible that the stage-2 fault raced with
-+	 * a map operation that collapsed the faulted address into a larger
-+	 * block mapping.
-+	 *
-+	 * Since KVM splits mappings down to PAGE_SIZE when dirty logging is
-+	 * enabled, it is necessary to hold the write lock for faults where
-+	 * fault_granule > PAGE_SIZE. Retry the faulting instruction and acquire
-+	 * the write lock on the next exit.
-+	 */
-+	} else {
-+		ret = -EAGAIN;
- 	}
- 
- 	/* Mark the page dirty only if the fault is handled successfully */
-@@ -1280,7 +1295,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	}
- 
- out_unlock:
--	if (logging_perm_fault)
-+	if (use_read_lock)
- 		read_unlock(&kvm->mmu_lock);
- 	else
- 		write_unlock(&kvm->mmu_lock);
--- 
-2.35.1.1094.g7c7d902a7c-goog
-
+>
+> I could have missed something else, though.
+>
+> Thanks,
+>
+> --
+> Peter Xu
+>
