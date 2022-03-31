@@ -2,72 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CC5984EE3DE
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 00:12:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BECD4EE3E0
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 00:14:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231202AbiCaWOB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 18:14:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47486 "EHLO
+        id S242337AbiCaWPw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 18:15:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242163AbiCaWN7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 18:13:59 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D88C448387;
-        Thu, 31 Mar 2022 15:12:11 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id bx5so706729pjb.3;
-        Thu, 31 Mar 2022 15:12:11 -0700 (PDT)
+        with ESMTP id S242163AbiCaWPv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 18:15:51 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E44695D18C
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 15:14:01 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id b18-20020a63d812000000b0037e1aa59c0bso521445pgh.12
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 15:14:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=vCuKnlIkIF1U52URDbeCfdFXzTCZO5yLRnSuRmNZDTg=;
-        b=jLI5fEKywdGVJ8nCSblEuDyw950v5tUkGWvVa7S/9AdZcO2zsVFekf1jLskLdzInt3
-         Nlm4m5ZHpgCzewevLv7Sxep0d3vvYHSrJdKWuV4mJER02bM+xRidWFrDkreKhB7zCQNz
-         oKU+pEBMa5RlgIlAVTP00UqqIqxQd+HMn+ovuj87OJr3m1boMX+yAhCzLVqgxeGJ2QV9
-         s7oA/U95+9JZpf7FgcKHJ0Lg+ldlFQWTNd8Zs9TSSWvzdS9u1dYWueji/1CIyeq0nL3I
-         iYuAAXWTbk+jO3cUzEpJeoY+p99U7B8Gl6y0Obydv03+Q9V97Y04dmPlQ+9HWVfxm2cb
-         BQDA==
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=WqFtWphR/UHLeYzM1oGSvJgyeqw888ZXSOYKR2JBBUI=;
+        b=am0uxU0L8wBDJedtxT9qkkbTUSFBgUty0LD1cYLq8JJi+EbE/65eI9nyL3Jm0q/SLc
+         jddtZXKIpljr9U1jxRRo2qBdVy5LQNAIxV/OU/rLPlONfNoF1tfcmAcFonFtfJiyUM8n
+         wEEs+M+nsyBfTXZFTCuERAgcQQ07YhQj1M+WgNLLWVvAWQbuWFQm0nRtCMo89sIcsPg4
+         hxuPeCxQoGDJ9jyZb9Owb4Ex1CaW18TlUFIkhI71nsmcnGrAi57194BSF5EJkW1Vu0VU
+         2IMmquLkcLqAUu1PH/oBlqPmCpjIurF0TXn7iqEvHe1cEyBT60Dc/mfcUxA94C/eyMaK
+         nyXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=vCuKnlIkIF1U52URDbeCfdFXzTCZO5yLRnSuRmNZDTg=;
-        b=4f8AGlC+KUJIgFDLW5vOLZAv37nDrBhK9CkOeTTVvZQP9BNkTim1zvc4W7yB3MRtcz
-         ByvZvo7kHcppIBY6uTqUmAIK9Qi+ZsJXzCXYfzbWwfE4oBgYTMosoUPspyL9HuHySZJb
-         ebYOd9hCMcC7etYstFQjVMXbSeic+hYjOw8uOWFjIXjfoyMx9SGKQcPQzx0T7hkrEiLR
-         vUSHrNbKzKBrDb3NGWgWxtp24gb9lXyvXkPS5LTet+tDScv8hK4uYDstDw/9FhpuoaHq
-         2na9K9qk0xZU8RRmaNLNXFG/r+NaY/dmTJR+hhdzBp2ErfB0mIBvP58IczR+34kDatiY
-         tBjw==
-X-Gm-Message-State: AOAM533JBBTDXkxx5i7pviasuZwfAAQ8rIC6NC9NKarJe1VJWf+mbeQR
-        FInlelMbbd9NZE1pkZlrQvI=
-X-Google-Smtp-Source: ABdhPJyaloOyeeeO7jInz6cnyL9tEcOEfqsRopwyhmSiTJEYmHtlHVpnxguCb2dkaHkc5SS+IwdYZg==
-X-Received: by 2002:a17:90b:38c7:b0:1c7:6afb:fac6 with SMTP id nn7-20020a17090b38c700b001c76afbfac6mr8326585pjb.198.1648764731073;
-        Thu, 31 Mar 2022 15:12:11 -0700 (PDT)
-Received: from localhost ([192.55.54.52])
-        by smtp.gmail.com with ESMTPSA id f21-20020a056a00239500b004fb02a7a45bsm440664pfc.214.2022.03.31.15.12.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Mar 2022 15:12:09 -0700 (PDT)
-Date:   Thu, 31 Mar 2022 15:12:07 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [RFC PATCH v5 024/104] KVM: TDX: create/destroy VM structure
-Message-ID: <20220331221207.GD2084469@ls.amr.corp.intel.com>
-References: <cover.1646422845.git.isaku.yamahata@intel.com>
- <36805b6b6b668669d5205183c338a4020df584dd.1646422845.git.isaku.yamahata@intel.com>
- <fedfdfbc26965145dcbf4aa893328cce172f2f3b.camel@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <fedfdfbc26965145dcbf4aa893328cce172f2f3b.camel@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=WqFtWphR/UHLeYzM1oGSvJgyeqw888ZXSOYKR2JBBUI=;
+        b=6Z3JTaJUGYfIuXrPeW/dFEkE/j1sJcF8GMRNC5NpVEmwz66xKDoin/yzSOXdPJYwkt
+         Tjg/qkGOz0jEEpHi+uaPo7HW6Vjcw+KL7SpXCKftto4MSI5zlHCjOMYqKCM0HcG24sIm
+         nL3S1NKMCs2b2Awg+FJfceCVJMSkCVEUSDSCN4ejobykBE4s7ukmrufIW1kJoHB+aqSL
+         1X51+uCIga3vf6aU3Ve7kLyWB2H+/HLDXEOwyl0vFRpB+hSmKTdgbcWcmB7nu+JVht1f
+         ZOvbC3vdPJ1jZdC6B3QWwW5AxxVlT4YEBWyhxD+JuBzn8PKffJlASq9FDy1WCJQmprVv
+         SpKA==
+X-Gm-Message-State: AOAM531D+vVbi4Q7KpbJk7OOavoDPntx9n6JHykrENM6vvSRSTSN7jts
+        A4hAJu4xKi72bAh3+efIo5qv7Z8UsUQ=
+X-Google-Smtp-Source: ABdhPJzD7ZMubJruHEu0Kc8DIKiJXX/VvHZ7/irSHnQQoRbTrKrgzD/n5MDJQtNkacipDlzWrGtgVwC8BWE=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a17:903:32c7:b0:154:4156:f384 with SMTP id
+ i7-20020a17090332c700b001544156f384mr7444389plr.34.1648764841447; Thu, 31 Mar
+ 2022 15:14:01 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu, 31 Mar 2022 22:13:59 +0000
+Message-Id: <20220331221359.3912754-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
+Subject: [PATCH] KVM: x86/mmu: Resolve nx_huge_pages when kvm.ko is loaded
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Bruno Goncalves <bgoncalv@redhat.com>,
+        Jan Stancek <jstancek@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,202 +71,158 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 31, 2022 at 05:17:37PM +1300,
-Kai Huang <kai.huang@intel.com> wrote:
+Resolve nx_huge_pages to true/false when kvm.ko is loaded, leaving it as
+-1 is technically undefined behavior when its value is read out by
+param_get_bool(), as boolean values are supposed to be '0' or '1'.
 
-> On Fri, 2022-03-04 at 11:48 -0800, isaku.yamahata@intel.com wrote:
-> > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> > 
+Alternatively, KVM could define a custom getter for the param, but the
+auto value doesn't depend on the vendor module in any way, and printing
+"auto" would be unnecessarily unfriendly to the user.
 
-> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > index 1c8222f54764..702953fd365f 100644
-> > --- a/arch/x86/kvm/vmx/tdx.c
-> > +++ b/arch/x86/kvm/vmx/tdx.c
-> > @@ -31,14 +31,324 @@ struct tdx_capabilities {
-> >  	struct tdx_cpuid_config cpuid_configs[TDX_MAX_NR_CPUID_CONFIGS];
-> >  };
-> >  
-> > +/* KeyID used by TDX module */
-> > +static u32 tdx_global_keyid __read_mostly;
-> > +
-> 
-> It's really not clear why you need to know tdx_global_keyid in the context of
-> creating/destroying a TD.
+In addition to fixing the undefined behavior, resolving the auto value
+also fixes the scenario where the auto value resolves to N and no vendor
+module is loaded.  Previously, -1 would result in Y being printed even
+though KVM would ultimately disable the mitigation.
 
-TDX module mpas TDR with TDX global key id. This page includes key id assigned
-to this TD.  Then, TDX modules maps other TD-related pages with the HKID.
-TDR requires the TDX global key id for cache flush unlike other TD-related
-pages.
-I'll add a comment.
+Rename the existing MMU module init/exit helpers to clarify that they're
+invoked with respect to the vendor module, and add comments to document
+why KVM has two separate "module init" flows.
 
+  =========================================================================
+  UBSAN: invalid-load in kernel/params.c:320:33
+  load of value 255 is not a valid value for type '_Bool'
+  CPU: 6 PID: 892 Comm: tail Not tainted 5.17.0-rc3+ #799
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+  Call Trace:
+   <TASK>
+   dump_stack_lvl+0x34/0x44
+   ubsan_epilogue+0x5/0x40
+   __ubsan_handle_load_invalid_value.cold+0x43/0x48
+   param_get_bool.cold+0xf/0x14
+   param_attr_show+0x55/0x80
+   module_attr_show+0x1c/0x30
+   sysfs_kf_seq_show+0x93/0xc0
+   seq_read_iter+0x11c/0x450
+   new_sync_read+0x11b/0x1a0
+   vfs_read+0xf0/0x190
+   ksys_read+0x5f/0xe0
+   do_syscall_64+0x3b/0xc0
+   entry_SYSCALL_64_after_hwframe+0x44/0xae
+   </TASK>
+  =========================================================================
 
-> >  /* Capabilities of KVM + the TDX module. */
-> >  struct tdx_capabilities tdx_caps;
-> >  
-> > +static DEFINE_MUTEX(tdx_lock);
-> >  static struct mutex *tdx_mng_key_config_lock;
-> >  
-> >  static u64 hkid_mask __ro_after_init;
-> >  static u8 hkid_start_pos __ro_after_init;
-> >  
-> > +static __always_inline hpa_t set_hkid_to_hpa(hpa_t pa, u16 hkid)
-> > +{
-> > +	pa &= ~hkid_mask;
-> > +	pa |= (u64)hkid << hkid_start_pos;
-> > +
-> > +	return pa;
-> > +}
-> > +
-> > +static inline bool is_td_created(struct kvm_tdx *kvm_tdx)
-> > +{
-> > +	return kvm_tdx->tdr.added;
-> > +}
-> > +
-> > +static inline void tdx_hkid_free(struct kvm_tdx *kvm_tdx)
-> > +{
-> > +	tdx_keyid_free(kvm_tdx->hkid);
-> > +	kvm_tdx->hkid = -1;
-> > +}
-> > +
-> > +static inline bool is_hkid_assigned(struct kvm_tdx *kvm_tdx)
-> > +{
-> > +	return kvm_tdx->hkid > 0;
-> > +}
-> > +
-> > +static void tdx_clear_page(unsigned long page)
-> > +{
-> > +	const void *zero_page = (const void *) __va(page_to_phys(ZERO_PAGE(0)));
-> > +	unsigned long i;
-> > +
-> > +	/* Zeroing the page is only necessary for systems with MKTME-i. */
-> 
-> "only necessary for systems  with MKTME-i" because of what?
-> 
-> Please be more clear that on MKTME-i system, when re-assign one page from old
-> keyid to a new keyid, MOVDIR64B is required to clear/write the page with new
-> keyid to prevent integrity error when read on the page with new keyid.
+Fixes: b8e8c8303ff2 ("kvm: mmu: ITLB_MULTIHIT mitigation")
+Cc: stable@vger.kernel.org
+Reported-by: Bruno Goncalves <bgoncalv@redhat.com>
+Reported-by: Jan Stancek <jstancek@redhat.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/kvm_host.h |  5 +++--
+ arch/x86/kvm/mmu/mmu.c          | 20 ++++++++++++++++----
+ arch/x86/kvm/x86.c              | 20 ++++++++++++++++++--
+ 3 files changed, 37 insertions(+), 8 deletions(-)
 
-Let me borrow this sentence as a comment on it.
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 676705ad1e23..e58d630a5c76 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1598,8 +1598,9 @@ static inline int kvm_arch_flush_remote_tlb(struct kvm *kvm)
+ #define kvm_arch_pmi_in_guest(vcpu) \
+ 	((vcpu) && (vcpu)->arch.handling_intr_from_guest)
+ 
+-int kvm_mmu_module_init(void);
+-void kvm_mmu_module_exit(void);
++void kvm_mmu_x86_module_init(void);
++int kvm_mmu_vendor_module_init(void);
++void kvm_mmu_vendor_module_exit(void);
+ 
+ void kvm_mmu_destroy(struct kvm_vcpu *vcpu);
+ int kvm_mmu_create(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index dbf46dd98618..c623019929a7 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -6237,12 +6237,24 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
+ 	return 0;
+ }
+ 
+-int kvm_mmu_module_init(void)
++/*
++ * nx_huge_pages needs to be resolved to true/false when kvm.ko is loaded, as
++ * its default value of -1 is technically undefined behavior for a boolean.
++ */
++void kvm_mmu_x86_module_init(void)
+ {
+-	int ret = -ENOMEM;
+-
+ 	if (nx_huge_pages == -1)
+ 		__set_nx_huge_pages(get_nx_auto_mode());
++}
++
++/*
++ * The bulk of the MMU initialization is deferred until the vendor module is
++ * loaded as many of the masks/values may be modified by VMX or SVM, i.e. need
++ * to be reset when a potentially different vendor module is loaded.
++ */
++int kvm_mmu_vendor_module_init(void)
++{
++	int ret = -ENOMEM;
+ 
+ 	/*
+ 	 * MMU roles use union aliasing which is, generally speaking, an
+@@ -6290,7 +6302,7 @@ void kvm_mmu_destroy(struct kvm_vcpu *vcpu)
+ 	mmu_free_memory_caches(vcpu);
+ }
+ 
+-void kvm_mmu_module_exit(void)
++void kvm_mmu_vendor_module_exit(void)
+ {
+ 	mmu_destroy_caches();
+ 	percpu_counter_destroy(&kvm_total_used_mmu_pages);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7a066cf92692..ad36f08a740d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8954,7 +8954,7 @@ int kvm_arch_init(void *opaque)
+ 	}
+ 	kvm_nr_uret_msrs = 0;
+ 
+-	r = kvm_mmu_module_init();
++	r = kvm_mmu_vendor_module_init();
+ 	if (r)
+ 		goto out_free_percpu;
+ 
+@@ -9002,7 +9002,7 @@ void kvm_arch_exit(void)
+ 	cancel_work_sync(&pvclock_gtod_work);
+ #endif
+ 	kvm_x86_ops.hardware_enable = NULL;
+-	kvm_mmu_module_exit();
++	kvm_mmu_vendor_module_exit();
+ 	free_percpu(user_return_msrs);
+ 	kmem_cache_destroy(x86_emulator_cache);
+ #ifdef CONFIG_KVM_XEN
+@@ -13043,3 +13043,19 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_enter);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_exit);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_enter);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_exit);
++
++static int __init kvm_x86_init(void)
++{
++	kvm_mmu_x86_module_init();
++	return 0;
++}
++module_init(kvm_x86_init);
++
++static void __exit kvm_x86_exit(void)
++{
++	/*
++	 * If module_init() is implemented, module_exit() must also be
++	 * implemented to allow module unload.
++	 */
++}
++module_exit(kvm_x86_exit);
 
-
-> > +static int __tdx_reclaim_page(unsigned long va, hpa_t pa, bool do_wb, u16 hkid)
-> > +{
-> > +	struct tdx_module_output out;
-> > +	u64 err;
-> > +
-> > +	err = tdh_phymem_page_reclaim(pa, &out);
-> > +	if (WARN_ON_ONCE(err)) {
-> > +		pr_tdx_error(TDH_PHYMEM_PAGE_RECLAIM, err, &out);
-> > +		return -EIO;
-> > +	}
-> > +
-> > +	if (do_wb) {
-> 
-> In the callers, please add some comments explaining why do_wb is needed, and why
-> is not needed.
-
-Will do.
-
-> > +static int tdx_do_tdh_mng_key_config(void *param)
-> > +{
-> > +	hpa_t *tdr_p = param;
-> > +	int cpu, cur_pkg;
-> > +	u64 err;
-> > +
-> > +	cpu = raw_smp_processor_id();
-> > +	cur_pkg = topology_physical_package_id(cpu);
-> > +
-> > +	mutex_lock(&tdx_mng_key_config_lock[cur_pkg]);
-> > +	do {
-> > +		err = tdh_mng_key_config(*tdr_p);
-> > +	} while (err == TDX_KEY_GENERATION_FAILED);
-> > +	mutex_unlock(&tdx_mng_key_config_lock[cur_pkg]);
-> 
-> Why not squashing patch 20 ("KVM: TDX: allocate per-package mutex") into this
-> patch?  
-
-Will do.
-
-
-> > +
-> > +	if (WARN_ON_ONCE(err)) {
-> > +		pr_tdx_error(TDH_MNG_KEY_CONFIG, err, NULL);
-> > +		return -EIO;
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +int tdx_vm_init(struct kvm *kvm)
-> > +{
-> > +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> > +	cpumask_var_t packages;
-> > +	int ret, i;
-> > +	u64 err;
-> > +
-> > +	/* vCPUs can't be created until after KVM_TDX_INIT_VM. */
-> > +	kvm->max_vcpus = 0;
-> > +
-> > +	kvm_tdx->hkid = tdx_keyid_alloc();
-> > +	if (kvm_tdx->hkid < 0)
-> > +		return -EBUSY;
-> > +
-> > +	ret = tdx_alloc_td_page(&kvm_tdx->tdr);
-> > +	if (ret)
-> > +		goto free_hkid;
-> > +
-> > +	kvm_tdx->tdcs = kcalloc(tdx_caps.tdcs_nr_pages, sizeof(*kvm_tdx->tdcs),
-> > +				GFP_KERNEL_ACCOUNT);
-> > +	if (!kvm_tdx->tdcs)
-> > +		goto free_tdr;
-> > +	for (i = 0; i < tdx_caps.tdcs_nr_pages; i++) {
-> > +		ret = tdx_alloc_td_page(&kvm_tdx->tdcs[i]);
-> > +		if (ret)
-> > +			goto free_tdcs;
-> > +	}
-> > +
-> > +	mutex_lock(&tdx_lock);
-> > +	err = tdh_mng_create(kvm_tdx->tdr.pa, kvm_tdx->hkid);
-> > +	mutex_unlock(&tdx_lock);
-> 
-> Please add comment explaining why locking is needed.
-
-I'll add a comment on tdx_lock. Not each TDX seamcalls.
-
-
-> > diff --git a/arch/x86/kvm/vmx/tdx_ops.h b/arch/x86/kvm/vmx/tdx_ops.h
-> > index 0bed43879b82..3dd5b4c3f04c 100644
-> > --- a/arch/x86/kvm/vmx/tdx_ops.h
-> > +++ b/arch/x86/kvm/vmx/tdx_ops.h
-> > @@ -6,6 +6,7 @@
-> >  
-> >  #include <linux/compiler.h>
-> >  
-> > +#include <asm/cacheflush.h>
-> >  #include <asm/asm.h>
-> >  #include <asm/kvm_host.h>
-> >  
-> > @@ -15,8 +16,14 @@
-> >  
-> >  #ifdef CONFIG_INTEL_TDX_HOST
-> >  
-> > +static inline void tdx_clflush_page(hpa_t addr)
-> > +{
-> > +	clflush_cache_range(__va(addr), PAGE_SIZE);
-> > +}
-> > +
-> >  static inline u64 tdh_mng_addcx(hpa_t tdr, hpa_t addr)
-> >  {
-> > +	tdx_clflush_page(addr);
-> 
-> Please add comment to explain why clflush is needed.
-> 
-> And you don't need the tdx_clflush_page() wrapper -- it's not a TDX specific
-> ops.  You can just use clflush_cache_range().
-
-Will remove it.
-
-The plan was to enhance tdx_cflush_page(addr, page_level) to support large page
-to avoid repeating page_level_to_size. Defer it to large page support.
+base-commit: 81d50efcff6cf4310aaf6a19806416ffeccf1cdb
 -- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+2.35.1.1094.g7c7d902a7c-goog
+
