@@ -2,71 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 007A24ED9CC
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 14:46:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5ABFA4ED9F3
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 14:56:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234695AbiCaMsG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 08:48:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38356 "EHLO
+        id S236408AbiCaM6I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 08:58:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236269AbiCaMr5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 08:47:57 -0400
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48B2D210471
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 05:46:09 -0700 (PDT)
-Received: by mail-yb1-xb30.google.com with SMTP id j2so42170354ybu.0
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 05:46:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=7oSbnIlDMLV6mSlKXym3qxASIjVDe/FX+PfPc1IezDE=;
-        b=PPRREv5L5fAma5LxA0EXOv+JEtTK1iPK+MPh3OIPRHz/rg8IfACgFN/SgSSXZTkWut
-         Vd5qRxwJ4iSEqVkv1OVVCK4UCXXZiaozOEH7wY1iCVvukejhkz8tan8UfHi7RBRwWpXn
-         gfcNj13CH1AGfsVJML1nqs/GpvC8Z9Uz1Ttd5nAdDEVlSy0Qvjis+bUaTjhyG96jJ+BV
-         nkzsTbUAY/bV7xK9JU9Tnq7vEfBuq6b750m3BmYvRdzb2vS2EpPEw3Kz8eBJ70g6I0A6
-         GBtouaOm+5cicC866ZDFzAmADYfg28tFgegtLRf5qY6vYbTZcQOGpWouuFXkIwGVdFwi
-         N1mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=7oSbnIlDMLV6mSlKXym3qxASIjVDe/FX+PfPc1IezDE=;
-        b=PDh9g3CHIAw5S9ckwC70fENc5SY52I1uKGh3PDvNBRywZUveeFUSlnRRQHbM8ivMgY
-         D1pUnZr7i8OYn19npzEPQnzDIc1OhvN45lrCENJlB1cnVRMKeg+9h468iYE0BWK8wFeM
-         EXXuRap3R7FOAmdAWyxpAJ2zz1G2FlOfl3JUEznoN9/AoMA0EyGoDg85ALFvR6nxIWXH
-         5Wh/LfXJrlLJXVJPJ8K2uhug/VMA588on4MrjT8U+2H23mIvrYnTrnSXDWmunLzoi2sY
-         G94euzQJFh2ZdcC6vBiWUZraUAQlbr+fpwX54kOnEwRrXNcxjpWpBkwO0xgeVWdLgqLv
-         U2WQ==
-X-Gm-Message-State: AOAM531mKZC53kzfzFxP1pbF5Fgx2gRue/EHgtn8twtavSSz604kcV9b
-        nwZmLcfASekQjGpYSgqKozsi+QYjnW0DYo/BKHOBeg==
-X-Google-Smtp-Source: ABdhPJwGKVnhTsdd+AusUNKo/rR9ORGT2Uh2CECAGTbqF33pFQyfuq2Pl6u857Kk6DS9yR87O2kxivPuydHscRHD+y4=
-X-Received: by 2002:a25:9846:0:b0:61a:3deb:4d39 with SMTP id
- k6-20020a259846000000b0061a3deb4d39mr3915516ybo.537.1648730768369; Thu, 31
- Mar 2022 05:46:08 -0700 (PDT)
+        with ESMTP id S236364AbiCaM6H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 08:58:07 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BE7C2128D7;
+        Thu, 31 Mar 2022 05:56:20 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22VBk4UC029391;
+        Thu, 31 Mar 2022 12:56:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=/TuCFDFDSXnAd+7o8XDVhmIm4tFAtZb2hubiIEEXtsg=;
+ b=Dtjoho+OFN9o0NdZAuqFbf9VsLg5r6dBYxfLGJkfKu6jxja/XBEs38pBANf926M5GPob
+ AfGS/95/NrjNLjdPzpHBtIOb9bf9SJluVDUqNZd9vkxHgRxmV92IJ39i0SAXdsaS72q0
+ ysAFQHa5V8g6R3Gy2RiS8YGK3jbFdZFuicfs1tZbxHTdTJqlKQULov+JWckq8fndbOAB
+ Xv9NHiQw9l8PyPSLyTbRKoQjbu/zSKfzEQP9/D6tGIzQ1zgioyys62/XOkvs8Yqm/X5x
+ yYqHCeHgWtuEv8fHbCCLCdngyamQz2ZwFXbF0b8Jr6PRdyCJDS3pnliVYKiWzbI7DVel 1Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f51hvnha8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 31 Mar 2022 12:56:19 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22VCtRP6017937;
+        Thu, 31 Mar 2022 12:56:19 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f51hvnh9j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 31 Mar 2022 12:56:19 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22VCiZWU022837;
+        Thu, 31 Mar 2022 12:56:17 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3f1tf92tbv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 31 Mar 2022 12:56:16 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22VCuEQN39125448
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 31 Mar 2022 12:56:14 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AAF9442041;
+        Thu, 31 Mar 2022 12:56:14 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 100F64203F;
+        Thu, 31 Mar 2022 12:56:14 +0000 (GMT)
+Received: from linux6.. (unknown [9.114.12.104])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 31 Mar 2022 12:56:13 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com
+Subject: [kvm-unit-tests PATCH] s390x: snippets: c: Load initial cr0
+Date:   Thu, 31 Mar 2022 12:55:15 +0000
+Message-Id: <20220331125515.1941-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Thu, 31 Mar 2022 18:15:57 +0530
-Message-ID: <CA+G9fYsaUWL4MfkmFJGyZ5WRjibieSLE1V1R8OPsWNmjeYWyUQ@mail.gmail.com>
-Subject: [next ] x86: Assembler messages: Error: invalid operands (*UND* and
- .data..percpu sections) for `+'
-To:     X86 ML <x86@kernel.org>, kvm list <kvm@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        regressions@lists.linux.dev
-Cc:     Li RongQing <lirongqing@baidu.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Arnd Bergmann <arnd@arndb.de>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: fHjgw0L6vVodvy1uCDOHj8wlcRMWleih
+X-Proofpoint-ORIG-GUID: QQ5Dqfylb5Z0F5n-nPazWdQ7XnSRuoJ2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-31_04,2022-03-31_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 bulkscore=0 spamscore=0 phishscore=0 impostorscore=0
+ adultscore=0 mlxscore=0 suspectscore=0 clxscore=1015 malwarescore=0
+ mlxlogscore=781 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203310070
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,38 +87,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linux next-20220331 x86_64 build failed due to below warnings / errors
-with gcc-11. build log link [1].
+As soon as we use C we need to set the AFP bit in cr0 so we can use
+all fprs.
 
-make --silent --keep-going --jobs=8
-O=/home/tuxbuild/.cache/tuxmake/builds/1/build ARCH=x86_64
-CROSS_COMPILE=x86_64-linux-gnu- 'CC=sccache x86_64-linux-gnu-gcc'
-'HOSTCC=sccache gcc'
-/tmp/ccS5DmVa.s: Assembler messages:
-/tmp/ccS5DmVa.s:59: Error: invalid operands (*UND* and .data..percpu
-sections) for `+'
-make[3]: *** [/builds/linux/scripts/Makefile.build:289:
-arch/x86/kernel/kvm.o] Error 1
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ s390x/snippets/c/cstart.S | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+diff --git a/s390x/snippets/c/cstart.S b/s390x/snippets/c/cstart.S
+index aaa5380c..a7d4cd42 100644
+--- a/s390x/snippets/c/cstart.S
++++ b/s390x/snippets/c/cstart.S
+@@ -12,6 +12,8 @@
+ .section .init
+ 	.globl start
+ start:
++	larl	%r1, initial_cr0
++	lctlg	%c0, %c0, 0(%r1)
+ 	/* XOR all registers with themselves to clear them fully. */
+ 	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+ 	xgr \i,\i
+@@ -34,3 +36,7 @@ exit:
+ 	/* For now let's only use cpu 0 in snippets so this will always work. */
+ 	xgr	%r0, %r0
+ 	sigp    %r2, %r0, SIGP_STOP
++
++initial_cr0:
++	/* enable AFP-register control, so FP regs (+BFP instr) can be used */
++	.quad	0x0000000000040000
+-- 
+2.32.0
 
-metadata:
-  git_ref: master
-  git_repo: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next
-  git_sha: fdcbcd1348f4ef713668bae1b0fa9774e1811205
-  git_describe: next-20220331
-  build link: https://builds.tuxbuild.com/278RMAf1jcRHx7LwzjCMgFSMMLt/
-
-
-# To install tuxmake on your system globally:
-# sudo pip3 install -U tuxmake
-
-tuxmake --runtime podman --target-arch x86_64 --toolchain gcc-11
---kconfig https://builds.tuxbuild.com/278RMAf1jcRHx7LwzjCMgFSMMLt/config
-
-
---
-Linaro LKFT
-https://lkft.linaro.org
-
-[1] https://builds.tuxbuild.com/278RMAf1jcRHx7LwzjCMgFSMMLt/
