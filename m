@@ -2,170 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ACE554EE0D6
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 20:44:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E46C54EE0F0
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 20:45:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234623AbiCaSqI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 14:46:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57320 "EHLO
+        id S236681AbiCaSrf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 14:47:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234572AbiCaSqH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 14:46:07 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAEFB62A1E
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 11:44:18 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id c15so940181ljr.9
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 11:44:18 -0700 (PDT)
+        with ESMTP id S237019AbiCaSra (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 14:47:30 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64E50234560
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 11:45:41 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id x2so382553plm.7
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 11:45:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=diyAQu32SyWgcK78gZv9L87yUVu3j7qP71reODwba1o=;
-        b=UqbgxK9UN83aiwkzqr90FVU+g4GQhO1P9fQdo5SVxgiJS3H4HEpiwRMYTUTrjF8foN
-         mTTPXOoAtgZAtuONfgKHKGNyL1adjPEpUxEMW6gnNHR7wCZg32NLNVoWI2hIm6pJHgGq
-         Iq2bwgfEfuF1sry/T0T5pmWFkwYfsX8uqM5EGIQM6dG/qIpZNXgkY2MMDbKVbujAi203
-         KGyFD0l516w94JwMMPRy/H284u003kpoJmpS8fYdvRnKRsQAjRY05hLLL6TuLLXPWVMQ
-         QMn47ILMRgD6QmHNoynieIkZGtpEHi5pE9LnRJ3kiFzTLKRwaNiTiFY+MfrDJAyzSe+w
-         tHrA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=p0VBDObDoFUONnWI9F1/+zvgmxSX/U3+Op0djrNZ6+Y=;
+        b=tEWlML2VMYg3LF9jB/Et4JGlYfjVS9pVUo/fDlqbCKzTkSkq6GGaHSb/gBxTcIKDQP
+         Sq3xeikKPcVd5Ah2H6UAKluUf7dSi86OTSEBiH9Bes1ELGs2Gshlt6iXyCPW0IGODBkG
+         DEjOHj9KLh9XPUYM+jWrE4CUddNvJW3jE9BTe2bfdfpWaukuUpeyBi4sBHXuEBZpZ7i3
+         rVu/EB/6ivKS8kGNRjnagiO5djB6oRKOCjM/NoUKaI2TsnwAOGJwfic3hQUMrymRNITP
+         6xQF8+WV+LU3Y7R6KxP+GucOIT5zZaDnrSIiszQML1BggJlJw0bAfGHTyNn8n8uVs1/H
+         sSVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=diyAQu32SyWgcK78gZv9L87yUVu3j7qP71reODwba1o=;
-        b=E6OR8D8EcfSS1NUzbTyXhK3Ja9/KBn0+JdqVyIa0k/2ySbc/czfHWITi7KJ+LTdoAK
-         xRAzvmWMqkhfNLDwi7WjUdW/7lAwThNVHuK8HWvivpOpfIDwmDo42JQ6QOWshouBkbxA
-         kjD3XTYdyO7nFOKqIA93hSZv+p6M2tWfvPlKy2V4wu4auNjbISjx0cEDrBorADIF8t4L
-         GUjSjYMh7FqMGB/u0SJfzeZSudFoNnXNBGKj59lCMRVNEGzTkTm9yVYJJ+Ue+1db9MIn
-         Y5+6unto4IL0knJIjDiu81tfFMHsC7HoJeNrh5HJd4NCupSOVYKB8ktqUJp7LJina585
-         NkcA==
-X-Gm-Message-State: AOAM531QMhC76XQKid29a/Ra+En7etCjXC7KFxB0W9XsXVkadBWrp7fq
-        dlqB5nVudkpnZlPXFXosqGbrU+QqPnU3VUfKPLb8Gg==
-X-Google-Smtp-Source: ABdhPJyY74baif8NZD4j5YnlvtauzWdN9TL4wEKLa67DPsIzl7mXAoKYOXhsFmJVLA1vY/sdLNuGWxMAzN8Bkm7oM6M=
-X-Received: by 2002:a2e:6814:0:b0:24a:f422:e953 with SMTP id
- c20-20020a2e6814000000b0024af422e953mr4393064lja.527.1648752254252; Thu, 31
- Mar 2022 11:44:14 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=p0VBDObDoFUONnWI9F1/+zvgmxSX/U3+Op0djrNZ6+Y=;
+        b=DXN/3Shgb8XhG4Os6AwkAldv0gPxY9ZvCyhVQezVFleXrcfVwV1dn68b2tR3KGnS7T
+         vtwcGmOGZsU2tY9zv153+hHfE7W/H++tTlk4/cqsBa0z34Q9dlvjmrGFUK+zR6LOFNK+
+         KaO3KzMYcXSG8/Rc4VJCbmvXJgN7NmpsUQ8G1RyISNLmf5tmDH/Jntmqm+zBFiS+HDQn
+         4l15D7K9liMDBDpyUCb6ugzWeq2idMq02kL0Xw9PjletwjMKItzBa1jwdHc+7kxF1XB5
+         Z4T5JMQCggTWRFBs2cOWOf7KzWCWHk35VPLUHHqfuAnGx4l/ZRzOXzickcr1LQ0YQj9/
+         zl0A==
+X-Gm-Message-State: AOAM532y5cFWVotleziuVDqm1FDqec0dc7i7kKWjL54rFro7/bSaFNP8
+        oBZAYU82IZB9yhESI/i/1XbQCg==
+X-Google-Smtp-Source: ABdhPJw7j6WOuvK4kl+s/hZ1aeTMuDftyemuxNuoMU64veTxp870Hem95njAys6VqCILAsYfpfwgfw==
+X-Received: by 2002:a17:902:f78d:b0:14f:ce61:eaf2 with SMTP id q13-20020a170902f78d00b0014fce61eaf2mr6753898pln.124.1648752340665;
+        Thu, 31 Mar 2022 11:45:40 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id fy9-20020a17090b020900b001c690bc05c4sm96606pjb.0.2022.03.31.11.45.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Mar 2022 11:45:40 -0700 (PDT)
+Date:   Thu, 31 Mar 2022 18:45:36 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jan Stancek <jstancek@redhat.com>
+Cc:     Bruno Goncalves <bgoncalv@redhat.com>, kvm <kvm@vger.kernel.org>,
+        "Bonzini, Paolo" <pbonzini@redhat.com>,
+        lkml <linux-kernel@vger.kernel.org>,
+        CKI Project <cki-project@redhat.com>,
+        Li Wang <liwang@redhat.com>
+Subject: Re: RIP: 0010:param_get_bool.cold+0x0/0x2 - LTP read_all_sys - 5.17.0
+Message-ID: <YkX20LtaENdOOYxi@google.com>
+References: <CA+QYu4q7K-pkAbMt3br_7O-Lu2OWyieLfyiju0PNEiy5YdKYzg@mail.gmail.com>
+ <CAASaF6yhTpXcWhTyg5VSU6czPPws5+sQ3vR7AWC8xxM7Xm_BGg@mail.gmail.com>
+ <YkXv0NoBjLBYBzX8@google.com>
 MIME-Version: 1.0
-References: <20220330182821.2633150-1-pgonda@google.com> <YkXgq7hez9gGcmKt@google.com>
- <CAA03e5EcApE8ZnHEwZdZ3ecxYvh1G3nF-YDU5mhZa-15QZ0tew@mail.gmail.com> <CAA03e5Ghw6rJ82GhGKW+sCDgDRpZPLmhq29Wgmd0H40nvbX+Rg@mail.gmail.com>
-In-Reply-To: <CAA03e5Ghw6rJ82GhGKW+sCDgDRpZPLmhq29Wgmd0H40nvbX+Rg@mail.gmail.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Thu, 31 Mar 2022 12:43:56 -0600
-Message-ID: <CAMkAt6qr7zwy2uG1EaoZyvXnXMZ7Ho-CxQvRpcuUCx8wiA+6UQ@mail.gmail.com>
-Subject: Re: [PATCH v3] KVM, SEV: Add KVM_EXIT_SHUTDOWN metadata for SEV-ES
-To:     Marc Orr <marcorr@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YkXv0NoBjLBYBzX8@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 31, 2022 at 11:48 AM Marc Orr <marcorr@google.com> wrote:
->
-> On Thu, Mar 31, 2022 at 10:40 AM Marc Orr <marcorr@google.com> wrote:
-> >
-> > On Thu, Mar 31, 2022 at 10:11 AM Sean Christopherson <seanjc@google.com=
-> wrote:
-> > >
-> > > +Paolo and Vitaly
-> > >
-> > > In the future, I highly recommend using scripts/get_maintainers.pl.
-> > >
-> > > On Wed, Mar 30, 2022, Peter Gonda wrote:
-> > > > SEV-ES guests can request termination using the GHCB's MSR protocol=
-. See
-> > > > AMD's GHCB spec section '4.1.13 Termination Request'. Currently whe=
-n a
-> > > > guest does this the userspace VMM sees an KVM_EXIT_UNKNOWN (-EVINAL=
-)
-> > > > return code from KVM_RUN. By adding a KVM_EXIT_SHUTDOWN_ENTRY to kv=
-m_run
-> > > > struct the userspace VMM can clearly see the guest has requested a =
-SEV-ES
-> > > > termination including the termination reason code set and reason co=
-de.
-> > > >
-> > > > Signed-off-by: Peter Gonda <pgonda@google.com>
-> > > >
-> > > > ---
-> > > > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > > > index 75fa6dd268f0..5f9d37dd3f6f 100644
-> > > > --- a/arch/x86/kvm/svm/sev.c
-> > > > +++ b/arch/x86/kvm/svm/sev.c
-> > > > @@ -2735,8 +2735,13 @@ static int sev_handle_vmgexit_msr_protocol(s=
-truct vcpu_svm *svm)
-> > > >               pr_info("SEV-ES guest requested termination: %#llx:%#=
-llx\n",
-> > > >                       reason_set, reason_code);
-> > >
-> > > This pr_info() should be removed.  A malicious usersepace could spam =
-the kernel
-> > > by constantly running a vCPU that requests termination.
->
-> Though... this patch makes this pr_info redundant! Since we'll now
-> report this in userspace. Actually, I'd be OK to remove it.
+On Thu, Mar 31, 2022, Sean Christopherson wrote:
+> On Wed, Mar 30, 2022, Jan Stancek wrote:
+> > +CC kvm
+> > 
+> > Issue seems to be that nx_huge_pages is not initialized (-1) and
+> > attempted to be used as boolean when reading
+> > /sys/module/kvm/parameters/nx_huge_pages
+> 
+> Ugh, CONFIG_UBSAN_BOOL=y complains about a bool not being 0 or 1.  What a pain.
 
-I'll make this 2 patches. This current patch and another to rate limit
-this pr_info() I think this patch is doing a lot already so would
-prefer to just add a second. Is that reasonable?
+Side topic, any idea why your traces don't have the UBSAN output?  I verified
+that it's not a panic_on_warn thing.  Having the UBSAN output in future bug reports
+would be very helpful.
 
->
-> > Ah, good catch. But actually, I've found this specific pr_info _very_
-> > useful in debugging. Sean, would you be OK to convert it to a rate
-> > limited print?
-> >
-> > > > -             ret =3D -EINVAL;
-> > > > -             break;
-> > > > +             vcpu->run->exit_reason =3D KVM_EXIT_SHUTDOWN;
-> > > > +             vcpu->run->shutdown.reason =3D KVM_SHUTDOWN_SEV_TERM;
-> > > > +             vcpu->run->shutdown.ndata =3D 2;
-> > > > +             vcpu->run->shutdown.data[0] =3D reason_set;
-> > > > +             vcpu->run->shutdown.data[1] =3D reason_code;
-> > >
-> > > Does KVM really need to split the reason_set and reason_code?  Withou=
-t reading
-> > > the spec, it's not even clear what "set" means.  Assuming it's someth=
-ing like
-> > > "the reason code is valid", then I don't see any reason (lol) to spli=
-t the two.
-> > > If we do split them, then arguably the reason_code should be filled i=
-f and only
-> > > if reason_set is true, and that's just extra work.
-> >
-> > I think KVM should split the reason_set and reason_code. This code is
-> > based on the GHCB spec after all. And reason_set and reason_code are
-> > both a part of the GHCB spec. But I agree, folks shouldn't have to go
-> > to the spec to understand what reason_set and reason_code are. Rather
-> > than not splitting them up, can we add comments in the source to
-> > explain what they mean?
-> >
-> > Also, my understanding from reading the spec is that reason_code
-> > should always be filled, even when reason_set is 0. See below. But
-> > basically, you can have reason_set: 0 and reason_code: non-zero.
-> >
-> > Quoting the spec:
-> > The reason code set is meant to provide hypervisors with their own
-> > termination SEV-ES Guest-Hypervisor Communication Block
-> > Standardization reason codes. This document defines and owns reason
-> > code set 0x0 and the following reason codes (GHCBData[23:16]):
-> > 0x00 =E2=80=93 General termination request
-> > 0x01 =E2=80=93 SEV-ES / GHCB Protocol range is not supported.
-> > 0x02 =E2=80=93 SEV-SNP features not supported
->
-> Reading this again, I now see that "reason_set" sounds like "The
-> reason code is set". I bet that's how Sean read it during his review.
-> So yeah, this needs comments :-)!
-
-I'll add comments but I agree with Marc. These are part of the GHCB
-spec so for the very specific SEV-ES termination reason we should
-include all the data the spec allows. Sounds OK?
+[   13.150244] ================================================================================
+[   13.150780] UBSAN: invalid-load in kernel/params.c:320:33
+[   13.151192] load of value 255 is not a valid value for type '_Bool'
+[   13.152079] ================================================================================
