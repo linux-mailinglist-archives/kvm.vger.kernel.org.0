@@ -2,235 +2,264 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 60E0A4ED261
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 06:35:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0F624ED313
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 06:54:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230287AbiCaE2V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 00:28:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49802 "EHLO
+        id S229511AbiCaEnr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 00:43:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230443AbiCaE1s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 00:27:48 -0400
-Received: from mail-oa1-x2e.google.com (mail-oa1-x2e.google.com [IPv6:2001:4860:4864:20::2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF47C3C4A4
-        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 21:20:40 -0700 (PDT)
-Received: by mail-oa1-x2e.google.com with SMTP id 586e51a60fabf-dacc470e03so24160205fac.5
-        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 21:20:40 -0700 (PDT)
+        with ESMTP id S229441AbiCaEno (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 00:43:44 -0400
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E6496211E
+        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 21:41:57 -0700 (PDT)
+Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
+        id 4KTVyC5hnpz4xLb; Thu, 31 Mar 2022 15:41:55 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fxUSqbZD4bDqt2IZurpQGdngn4HLC8ZiFYEQSVjJIMM=;
-        b=Wrc/CDlv1xLHF11irs3LuLGPcdN12f7S9hTFSYL0mm0TClvdIkGQUGeWfOBWMngZhc
-         DLeUdFVOWjJE8st10arRBMWqGd9iqFfHxY5fEDw2Z6hAuz1yUBYu0Q1Z6VA81p1O/mqn
-         KgUEWW0qfa6Ku2loqsm1vPjoRQ/iHThc35XVjoYgPPMGfgnjUA91oBLTJZd2WYpjSXmw
-         kKIsHmveeZDz54hhi6YtDUJqYQArV+PPSZgEuukeWbjkgHCxhBPK0N6GTiT3ShqMBrku
-         wDTWAkE+FTTfgMzc8ov5byUSg+o3c/ohp6IBRx8G0YdFR5ePwLbiWTaBvXGTTGuxnply
-         O5Ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fxUSqbZD4bDqt2IZurpQGdngn4HLC8ZiFYEQSVjJIMM=;
-        b=VUUBETHu9ZZx5jxO/FTKdDkyLpKLWL7z6NBXurvHkchpBokrm7f6KXPMhFbbI+NRAZ
-         xJg5ERMdQQafE8PrM3IRCcRHix575ItqIvUar8RRjb8srKXc9wX/C6pt5xsjuQuw1drn
-         vXMbexUJrBg2HAMC0vTF16evO0vKssp5DMpg0HwmXwbo/1hIXqrqCdUkuTB2ZJk9/ppW
-         t/q1EHsza5oL+1KPCkJEvEl+8bOfyLSzXEdiMTkPheSPMm/YAApJGiCubdA4raXM3j/l
-         9fZKaks2Ii5dvIg6m72w091xqRpDdMUXuKcJzLikzcmPyJ58RGfxIrubrIBDPXuDp8G6
-         QYKw==
-X-Gm-Message-State: AOAM531yBdl3aSKLQhsESiRbd1lrGQfQLImgK/0koDOpHbXe6/CxX9cM
-        TFLpEt+d0bdpnbWvX1r1I+EBPBnjeSzkjAvnRY+bKcnn0vc=
-X-Google-Smtp-Source: ABdhPJw0HPnJ57wtqnmJ1iVW/Ie8ViWz8oHQJhrqY6BVMYRB6DAaKp35CULargXXFrYJVE401JUXhxeJ5DXym+aHY0E=
-X-Received: by 2002:a05:6870:e611:b0:dd:f6e5:7871 with SMTP id
- q17-20020a056870e61100b000ddf6e57871mr1818955oag.218.1648700439748; Wed, 30
- Mar 2022 21:20:39 -0700 (PDT)
+        d=gibson.dropbear.id.au; s=201602; t=1648701715;
+        bh=PYjTDL7MyWr9MF/EKQzb1+YssBWFGuseGQUQm0EYzOI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=hljvYbKRI0/OVRWMOFkiCOykYE3S+tyl0XaoxCCS0HUVMmZAgStteoI/N2F6RkOCz
+         6u5B3yeo4OryUwU2LRvnrEZ/nkI+axkAaXkcPf5vuMUz4kQRA5gqiJ0osIH0qz0Gf6
+         H4PL5QT/ACfEOtY74diCJImdwDVX+1QFBQ/da2ng=
+Date:   Thu, 31 Mar 2022 15:36:29 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        iommu@lists.linux-foundation.org, Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH RFC 08/12] iommufd: IOCTLs for the io_pagetable
+Message-ID: <YkUvzfHM00FEAemt@yekko>
+References: <0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+ <8-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
 MIME-Version: 1.0
-References: <20220330182821.2633150-1-pgonda@google.com>
-In-Reply-To: <20220330182821.2633150-1-pgonda@google.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Wed, 30 Mar 2022 21:20:28 -0700
-Message-ID: <CAA03e5FKznbcaLc8Ov4BDgD8QMfd-GPBE-oMUaX=2s+9cRPS1Q@mail.gmail.com>
-Subject: Re: [PATCH v3] KVM, SEV: Add KVM_EXIT_SHUTDOWN metadata for SEV-ES
-To:     Peter Gonda <pgonda@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="WfdTxXupCMJl/Tke"
+Content-Disposition: inline
+In-Reply-To: <8-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 30, 2022 at 11:44 AM Peter Gonda <pgonda@google.com> wrote:
->
-> SEV-ES guests can request termination using the GHCB's MSR protocol. See
-> AMD's GHCB spec section '4.1.13 Termination Request'. Currently when a
-> guest does this the userspace VMM sees an KVM_EXIT_UNKNOWN (-EVINAL)
-> return code from KVM_RUN. By adding a KVM_EXIT_SHUTDOWN_ENTRY to kvm_run
-> struct the userspace VMM can clearly see the guest has requested a SEV-ES
-> termination including the termination reason code set and reason code.
->
-> Signed-off-by: Peter Gonda <pgonda@google.com>
->
-> ---
-> V3
->  * Add Documentation/ update.
->  * Updated other KVM_EXIT_SHUTDOWN exits to clear ndata and set reason
->    to KVM_SHUTDOWN_REQ.
->
-> V2
->  * Add KVM_CAP_EXIT_SHUTDOWN_REASON check for KVM_CHECK_EXTENSION.
->
-> Tested by making an SEV-ES guest call sev_es_terminate() with hardcoded
-> reason code set and reason code and then observing the codes from the
-> userspace VMM in the kvm_run.shutdown.data fields.
->
-> Change-Id: I55dcdf0f42bfd70d0e59829ae70c2fb067b60809
-> ---
->  Documentation/virt/kvm/api.rst | 12 ++++++++++++
->  arch/x86/kvm/svm/sev.c         |  9 +++++++--
->  arch/x86/kvm/svm/svm.c         |  2 ++
->  arch/x86/kvm/vmx/vmx.c         |  2 ++
->  arch/x86/kvm/x86.c             |  2 ++
->  include/uapi/linux/kvm.h       | 13 +++++++++++++
->  virt/kvm/kvm_main.c            |  1 +
->  7 files changed, 39 insertions(+), 2 deletions(-)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 2aebb89576d1..d53a66a3760e 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -7834,3 +7834,15 @@ only be invoked on a VM prior to the creation of VCPUs.
->  At this time, KVM_PMU_CAP_DISABLE is the only capability.  Setting
->  this capability will disable PMU virtualization for that VM.  Usermode
->  should adjust CPUID leaf 0xA to reflect that the PMU is disabled.
-> +
-> +8.36 KVM_CAP_EXIT_SHUTDOWN_REASON
-> +---------------------------
-> +
-> +:Capability KVM_CAP_EXIT_SHUTDOWN_REASON
-> +:Architectures: x86
-> +:Type: vm
-> +
-> +This capability means shutdown metadata may be included in
-> +kvm_run.shutdown when a vCPU exits with KVM_EXIT_SHUTDOWN. This
-> +may help userspace determine the guest's reason for termination and
-> +if the guest should be restarted or an error caused the shutdown.
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 75fa6dd268f0..5f9d37dd3f6f 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -2735,8 +2735,13 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
->                 pr_info("SEV-ES guest requested termination: %#llx:%#llx\n",
->                         reason_set, reason_code);
->
-> -               ret = -EINVAL;
-> -               break;
-> +               vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
-> +               vcpu->run->shutdown.reason = KVM_SHUTDOWN_SEV_TERM;
-> +               vcpu->run->shutdown.ndata = 2;
-> +               vcpu->run->shutdown.data[0] = reason_set;
-> +               vcpu->run->shutdown.data[1] = reason_code;
-> +
-> +               return 0;
->         }
->         default:
->                 /* Error, keep GHCB MSR value as-is */
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 6535adee3e9c..c2cc10776517 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1953,6 +1953,8 @@ static int shutdown_interception(struct kvm_vcpu *vcpu)
->         kvm_vcpu_reset(vcpu, true);
->
->         kvm_run->exit_reason = KVM_EXIT_SHUTDOWN;
-> +       vcpu->run->shutdown.reason = KVM_SHUTDOWN_REQ;
-> +       vcpu->run->shutdown.ndata = 0;
->         return 0;
->  }
->
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 84a7500cd80c..85b21fc490e4 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4988,6 +4988,8 @@ static __always_inline int handle_external_interrupt(struct kvm_vcpu *vcpu)
->  static int handle_triple_fault(struct kvm_vcpu *vcpu)
->  {
->         vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
-> +       vcpu->run->shutdown.reason = KVM_SHUTDOWN_REQ;
-> +       vcpu->run->shutdown.ndata = 0;
->         vcpu->mmio_needed = 0;
->         return 0;
->  }
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index d3a9ce07a565..f7cd224a4c32 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9999,6 +9999,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->                                 kvm_x86_ops.nested_ops->triple_fault(vcpu);
->                         } else {
->                                 vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
-> +                               vcpu->run->shutdown.reason = KVM_SHUTDOWN_REQ;
-> +                               vcpu->run->shutdown.ndata = 0;
->                                 vcpu->mmio_needed = 0;
->                                 r = 0;
->                                 goto out;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 8616af85dc5d..017c03421c48 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -271,6 +271,12 @@ struct kvm_xen_exit {
->  #define KVM_EXIT_XEN              34
->  #define KVM_EXIT_RISCV_SBI        35
->
-> +/* For KVM_EXIT_SHUTDOWN */
-> +/* Standard VM shutdown request. No additional metadata provided. */
-> +#define KVM_SHUTDOWN_REQ       0
-> +/* SEV-ES termination request */
-> +#define KVM_SHUTDOWN_SEV_TERM  1
-> +
->  /* For KVM_EXIT_INTERNAL_ERROR */
->  /* Emulate instruction failed. */
->  #define KVM_INTERNAL_ERROR_EMULATION   1
-> @@ -311,6 +317,12 @@ struct kvm_run {
->                 struct {
->                         __u64 hardware_exit_reason;
->                 } hw;
-> +               /* KVM_EXIT_SHUTDOWN */
-> +               struct {
-> +                       __u64 reason;
-> +                       __u32 ndata;
-> +                       __u64 data[16];
-> +               } shutdown;
->                 /* KVM_EXIT_FAIL_ENTRY */
->                 struct {
->                         __u64 hardware_entry_failure_reason;
-> @@ -1145,6 +1157,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_PMU_CAPABILITY 212
->  #define KVM_CAP_DISABLE_QUIRKS2 213
->  #define KVM_CAP_VM_TSC_CONTROL 214
-> +#define KVM_CAP_EXIT_SHUTDOWN_REASON 215
->
->  #ifdef KVM_CAP_IRQ_ROUTING
->
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 70e05af5ebea..03b6e472f32c 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -4299,6 +4299,7 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
->         case KVM_CAP_CHECK_EXTENSION_VM:
->         case KVM_CAP_ENABLE_CAP_VM:
->         case KVM_CAP_HALT_POLL:
-> +       case KVM_CAP_EXIT_SHUTDOWN_REASON:
->                 return 1;
->  #ifdef CONFIG_KVM_MMIO
->         case KVM_CAP_COALESCED_MMIO:
-> --
-> 2.35.1.1094.g7c7d902a7c-goog
->
 
-Reviewed-by: Marc Orr <marcorr@google.com>
+--WfdTxXupCMJl/Tke
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Mar 18, 2022 at 02:27:33PM -0300, Jason Gunthorpe wrote:
+> Connect the IOAS to its IOCTL interface. This exposes most of the
+> functionality in the io_pagetable to userspace.
+>=20
+> This is intended to be the core of the generic interface that IOMMUFD will
+> provide. Every IOMMU driver should be able to implement an iommu_domain
+> that is compatible with this generic mechanism.
+>=20
+> It is also designed to be easy to use for simple non virtual machine
+> monitor users, like DPDK:
+>  - Universal simple support for all IOMMUs (no PPC special path)
+>  - An IOVA allocator that considerds the aperture and the reserved ranges
+>  - io_pagetable allows any number of iommu_domains to be connected to the
+>    IOAS
+>=20
+> Along with room in the design to add non-generic features to cater to
+> specific HW functionality.
+
+
+[snip]
+> +/**
+> + * struct iommu_ioas_alloc - ioctl(IOMMU_IOAS_ALLOC)
+> + * @size: sizeof(struct iommu_ioas_alloc)
+> + * @flags: Must be 0
+> + * @out_ioas_id: Output IOAS ID for the allocated object
+> + *
+> + * Allocate an IO Address Space (IOAS) which holds an IO Virtual Address=
+ (IOVA)
+> + * to memory mapping.
+> + */
+> +struct iommu_ioas_alloc {
+> +	__u32 size;
+> +	__u32 flags;
+> +	__u32 out_ioas_id;
+> +};
+> +#define IOMMU_IOAS_ALLOC _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_ALLOC)
+> +
+> +/**
+> + * struct iommu_ioas_iova_ranges - ioctl(IOMMU_IOAS_IOVA_RANGES)
+> + * @size: sizeof(struct iommu_ioas_iova_ranges)
+> + * @ioas_id: IOAS ID to read ranges from
+> + * @out_num_iovas: Output total number of ranges in the IOAS
+> + * @__reserved: Must be 0
+> + * @out_valid_iovas: Array of valid IOVA ranges. The array length is the=
+ smaller
+> + *                   of out_num_iovas or the length implied by size.
+> + * @out_valid_iovas.start: First IOVA in the allowed range
+> + * @out_valid_iovas.last: Inclusive last IOVA in the allowed range
+> + *
+> + * Query an IOAS for ranges of allowed IOVAs. Operation outside these ra=
+nges is
+> + * not allowed. out_num_iovas will be set to the total number of iovas
+> + * and the out_valid_iovas[] will be filled in as space permits.
+> + * size should include the allocated flex array.
+> + */
+> +struct iommu_ioas_iova_ranges {
+> +	__u32 size;
+> +	__u32 ioas_id;
+> +	__u32 out_num_iovas;
+> +	__u32 __reserved;
+> +	struct iommu_valid_iovas {
+> +		__aligned_u64 start;
+> +		__aligned_u64 last;
+> +	} out_valid_iovas[];
+> +};
+> +#define IOMMU_IOAS_IOVA_RANGES _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_IOVA_R=
+ANGES)
+
+Is the information returned by this valid for the lifeime of the IOAS,
+or can it change?  If it can change, what events can change it?
+
+If it *can't* change, then how do we have enough information to
+determine this at ALLOC time, since we don't necessarily know which
+(if any) hardware IOMMU will be attached to it.
+
+> +/**
+> + * enum iommufd_ioas_map_flags - Flags for map and copy
+> + * @IOMMU_IOAS_MAP_FIXED_IOVA: If clear the kernel will compute an appro=
+priate
+> + *                             IOVA to place the mapping at
+> + * @IOMMU_IOAS_MAP_WRITEABLE: DMA is allowed to write to this mapping
+> + * @IOMMU_IOAS_MAP_READABLE: DMA is allowed to read from this mapping
+> + */
+> +enum iommufd_ioas_map_flags {
+> +	IOMMU_IOAS_MAP_FIXED_IOVA =3D 1 << 0,
+> +	IOMMU_IOAS_MAP_WRITEABLE =3D 1 << 1,
+> +	IOMMU_IOAS_MAP_READABLE =3D 1 << 2,
+> +};
+> +
+> +/**
+> + * struct iommu_ioas_map - ioctl(IOMMU_IOAS_MAP)
+> + * @size: sizeof(struct iommu_ioas_map)
+> + * @flags: Combination of enum iommufd_ioas_map_flags
+> + * @ioas_id: IOAS ID to change the mapping of
+> + * @__reserved: Must be 0
+> + * @user_va: Userspace pointer to start mapping from
+> + * @length: Number of bytes to map
+> + * @iova: IOVA the mapping was placed at. If IOMMU_IOAS_MAP_FIXED_IOVA i=
+s set
+> + *        then this must be provided as input.
+> + *
+> + * Set an IOVA mapping from a user pointer. If FIXED_IOVA is specified t=
+hen the
+> + * mapping will be established at iova, otherwise a suitable location wi=
+ll be
+> + * automatically selected and returned in iova.
+> + */
+> +struct iommu_ioas_map {
+> +	__u32 size;
+> +	__u32 flags;
+> +	__u32 ioas_id;
+> +	__u32 __reserved;
+> +	__aligned_u64 user_va;
+> +	__aligned_u64 length;
+> +	__aligned_u64 iova;
+> +};
+> +#define IOMMU_IOAS_MAP _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_MAP)
+> +
+> +/**
+> + * struct iommu_ioas_copy - ioctl(IOMMU_IOAS_COPY)
+> + * @size: sizeof(struct iommu_ioas_copy)
+> + * @flags: Combination of enum iommufd_ioas_map_flags
+> + * @dst_ioas_id: IOAS ID to change the mapping of
+> + * @src_ioas_id: IOAS ID to copy from
+> + * @length: Number of bytes to copy and map
+> + * @dst_iova: IOVA the mapping was placed at. If IOMMU_IOAS_MAP_FIXED_IO=
+VA is
+> + *            set then this must be provided as input.
+> + * @src_iova: IOVA to start the copy
+> + *
+> + * Copy an already existing mapping from src_ioas_id and establish it in
+> + * dst_ioas_id. The src iova/length must exactly match a range used with
+> + * IOMMU_IOAS_MAP.
+> + */
+> +struct iommu_ioas_copy {
+> +	__u32 size;
+> +	__u32 flags;
+> +	__u32 dst_ioas_id;
+> +	__u32 src_ioas_id;
+> +	__aligned_u64 length;
+> +	__aligned_u64 dst_iova;
+> +	__aligned_u64 src_iova;
+> +};
+> +#define IOMMU_IOAS_COPY _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_COPY)
+
+Since it can only copy a single mapping, what's the benefit of this
+over just repeating an IOAS_MAP in the new IOAS?
+
+> +/**
+> + * struct iommu_ioas_unmap - ioctl(IOMMU_IOAS_UNMAP)
+> + * @size: sizeof(struct iommu_ioas_copy)
+> + * @ioas_id: IOAS ID to change the mapping of
+> + * @iova: IOVA to start the unmapping at
+> + * @length: Number of bytes to unmap
+> + *
+> + * Unmap an IOVA range. The iova/length must exactly match a range
+> + * used with IOMMU_IOAS_PAGETABLE_MAP, or be the values 0 & U64_MAX.
+> + * In the latter case all IOVAs will be unmaped.
+> + */
+> +struct iommu_ioas_unmap {
+> +	__u32 size;
+> +	__u32 ioas_id;
+> +	__aligned_u64 iova;
+> +	__aligned_u64 length;
+> +};
+> +#define IOMMU_IOAS_UNMAP _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_UNMAP)
+>  #endif
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--WfdTxXupCMJl/Tke
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEoULxWu4/Ws0dB+XtgypY4gEwYSIFAmJFL8YACgkQgypY4gEw
+YSJl+w//R6dOO7b4WSMtrZrAlHdvvE/xztVJlWrC1ZrygwI97F/VZWbGEz3YMfTv
+CqIDPUnfP0FRG/thFZqk6IHpZ7kXXZSZTKfjx+5HMCk13hylBWQ5eE4nj9OzqkaU
+hPf5yxY+sERKRCBxDnqv7KaMzJO4eXn8PkAz0lKgq36AhyMk9vnhVZm5h365mfAg
+hqAhE8ytCzV0kZwv86sZRdjV8QGiNajnV1InnfXqGAAK1kJupJZEQ5f/R1Uqc/Bx
+X27xeedN6JVkwo3jEzs6EJF4DWLGwzVYY8deYHBo1iSrgDVex/IVeR4ffFln2N39
+CvCv73uutv8uiYbG18TDjDC98Qa9OgIhYQ6TEca6rkVc4qx5MjrgBS+WFTraK7tY
+H2Q37WcYyDxQtAL1fTObGIgGbDD97pEgDHD/XlhyLwDemhC3PH/f/7uTMayM9TDE
+XF6QQMMF0+oE8UMKjxVt7VK2jW6WpbpncBNCXMFJKdeOkxwPWUnyNn4+e4cIQYie
+Nu/J2oyVIBuvU5dvxP5RMZQXShYSSruKWRftoofB77vAiw2qFKlq/6ylmxh5LBqI
+X20V61mmXIEo1rK2ufkRWegXMd9h5C0dIGlyBAwl1nsv19/OO9ThTzj2l5MZHoNc
+uRguyJjdHde+g7W0c+6lFsakPBigI/m1+IkmaSKIS0YsysjBgwg=
+=zpWz
+-----END PGP SIGNATURE-----
+
+--WfdTxXupCMJl/Tke--
