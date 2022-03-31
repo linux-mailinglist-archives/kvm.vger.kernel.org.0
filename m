@@ -2,117 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1990A4ED5F4
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 10:41:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E1B44ED640
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 10:51:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233115AbiCaInb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 04:43:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33438 "EHLO
+        id S233387AbiCaIx0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 04:53:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232590AbiCaIn3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 04:43:29 -0400
-X-Greylist: delayed 980 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 31 Mar 2022 01:41:42 PDT
-Received: from mail.jywrepuestos.com (mail.jywrepuestos.com [190.119.242.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 640101F6868;
-        Thu, 31 Mar 2022 01:41:42 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.jywrepuestos.com (Postfix) with ESMTP id 53474AE1934;
-        Thu, 31 Mar 2022 02:49:29 -0500 (-05)
-Received: from mail.jywrepuestos.com ([127.0.0.1])
-        by localhost (mail.jywrepuestos.com [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id Cxwqpz-KOnjs; Thu, 31 Mar 2022 02:49:28 -0500 (-05)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.jywrepuestos.com (Postfix) with ESMTP id C8E7CAE18E5;
-        Thu, 31 Mar 2022 02:49:28 -0500 (-05)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.jywrepuestos.com C8E7CAE18E5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jywrepuestos.com;
-        s=F71C435A-5232-11EB-AA07-242A54BEB359; t=1648712968;
-        bh=NvV5XMylaq+D0M/CACFcLwdTxmMEUpgGFxTLj2be8kI=;
-        h=MIME-Version:To:From:Date:Message-Id;
-        b=HPKS97OTdxvMn/6dpfrxff+F8dunXdDlPrqC89eI2XeIo05UftTHEXqHBmcCmcIyg
-         dtwtApK3tdaa7FpsaB/hmYoMMDOH2LceTfmIvUPlnik4PqoiFeLQhmkeP7+dtuOs8v
-         SCkwZ/F6I6Wj350AijUgsnOwtMXVn9TxZ+68UGwQyf1fHPUSz+imYZLDsYOcjbgZds
-         tA+49MRpu8+hVyIIuPYvy9zjzLwuucgXJAh5zNCWwE64lw3xEndLcUDWzaVPxMfTto
-         QDZ7lhoQ0WOYVq1sTUa2RcSI84yFY1LbmdAaNIJwaLOuQmXa3x9fsv4NdTqy37vAhR
-         Sc2w/Iw/LGmVQ==
-X-Virus-Scanned: amavisd-new at jywrepuestos.com
-Received: from mail.jywrepuestos.com ([127.0.0.1])
-        by localhost (mail.jywrepuestos.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id G5oreR9PEnlc; Thu, 31 Mar 2022 02:49:28 -0500 (-05)
-Received: from uk.pffbmbdadveenn2130a1ch5mpd.zx.internal.cloudapp.net (unknown [51.145.89.122])
-        by mail.jywrepuestos.com (Postfix) with ESMTPSA id 001E5AE192F;
-        Thu, 31 Mar 2022 02:49:24 -0500 (-05)
-Content-Type: text/plain; charset="iso-8859-1"
+        with ESMTP id S233382AbiCaIxZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 04:53:25 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25C5562BF5
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 01:51:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1648716697; x=1680252697;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=AJhSb2adOnH4x8zWZD1Xoit68/Zd7wJssWmMSp6l/Ls=;
+  b=gz9r10+XfHCh++kK+3JHkBm/vf6Ko7d3vJeWxt/tCZminZBR17+TXo7O
+   S3gG++9si7Gy61Fr07ntnGkdg2d7hVmq+/dNTRuruOW+GM4WvnCQW4YIp
+   VF4tJ5AAMaWyVs+CuUGn1whU4X+cDX7maHbps1BF+pOepv7aIzdLzlRHW
+   edzZlB310YiOneaxjMe5xj+qdCz2wY1EI3IMNCGPl2WJJrPwKkhP+zm1v
+   D5xUFWNsmeR7aGGqlbHgmF1ZHUIzy2r8QEZZT+Udc0YYNsGwIQeoSL5mt
+   4YZC7YlLApGWGWiWWtGGkxga82fPxq1CfhL6p1RNHCbPrbimDU6YGB4pX
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10302"; a="240357054"
+X-IronPort-AV: E=Sophos;i="5.90,224,1643702400"; 
+   d="scan'208";a="240357054"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2022 01:51:35 -0700
+X-IronPort-AV: E=Sophos;i="5.90,224,1643702400"; 
+   d="scan'208";a="547232848"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.193.1]) ([10.249.193.1])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2022 01:51:29 -0700
+Message-ID: <1d5b0192-75ef-49ad-dc47-cfc0c3c63455@intel.com>
+Date:   Thu, 31 Mar 2022 16:51:27 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: Hello Friend
-To:     Recipients <wilson@jywrepuestos.com>
-From:   wilson@jywrepuestos.com
-Date:   Thu, 31 Mar 2022 08:15:09 +0000
-Reply-To: reemalhashimy309@gmail.com
-Message-Id: <20220331074925.001E5AE192F@mail.jywrepuestos.com>
-X-Spam-Status: Yes, score=7.1 required=5.0 tests=ADVANCE_FEE_4_NEW_MONEY,
-        BAYES_99,BAYES_999,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        FREEMAIL_FORGED_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,LOTS_OF_MONEY,
-        MONEY_FREEMAIL_REPTO,SPF_FAIL,SPF_HELO_NONE,TO_EQ_FM_DOM_SPF_FAIL,
-        TO_EQ_FM_SPF_FAIL,T_SCC_BODY_TEXT_LINE,T_US_DOLLARS_3,XFER_LOTSA_MONEY
-        autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: *  3.5 BAYES_99 BODY: Bayes spam probability is 99 to 100%
-        *      [score: 1.0000]
-        *  0.2 BAYES_999 BODY: Bayes spam probability is 99.9 to 100%
-        *      [score: 1.0000]
-        *  0.0 SPF_FAIL SPF: sender does not match SPF record (fail)
-        *      [SPF failed: Please see http://www.openspf.org/Why?s=mfrom;id=wilson%40jywrepuestos.com;ip=190.119.242.179;r=lindbergh.monkeyblade.net]
-        *  0.2 FREEMAIL_REPLYTO_END_DIGIT Reply-To freemail username ends in
-        *      digit
-        *      [reemalhashimy309[at]gmail.com]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        *  0.0 T_US_DOLLARS_3 BODY: Mentions millions of $ ($NN,NNN,NNN.NN)
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
-        *  0.0 LOTS_OF_MONEY Huge... sums of money
-        *  0.2 MONEY_FREEMAIL_REPTO Lots of money from someone using free
-        *      email?
-        *  2.1 FREEMAIL_FORGED_REPLYTO Freemail in Reply-To, but not From
-        *  0.0 TO_EQ_FM_DOM_SPF_FAIL To domain == From domain and external SPF
-        *       failed
-        *  0.0 TO_EQ_FM_SPF_FAIL To == From and external SPF failed
-        *  1.0 XFER_LOTSA_MONEY Transfer a lot of money
-        *  0.0 ADVANCE_FEE_4_NEW_MONEY Advance Fee fraud and lots of money
-X-Spam-Level: *******
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.6.1
+Subject: Re: [RFC PATCH v3 17/36] pflash_cfi01/tdx: Introduce ram_mode of
+ pflash for TDVF
+Content-Language: en-US
+To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= 
+        <philippe.mathieu.daude@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Connor Kuehl <ckuehl@redhat.com>, isaku.yamahata@intel.com,
+        erdemaktas@google.com, kvm@vger.kernel.org, qemu-devel@nongnu.org,
+        seanjc@google.com
+References: <20220317135913.2166202-1-xiaoyao.li@intel.com>
+ <20220317135913.2166202-18-xiaoyao.li@intel.com>
+ <f418548e-c24c-1bc3-4e16-d7a775298a18@gmail.com>
+ <7a8233e4-0cae-b05a-7931-695a7ee87fc9@intel.com>
+ <YjmWhMVx80/BFY8z@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <YjmWhMVx80/BFY8z@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-My name is Reem Hashimy, the Emirates Minister of State and Managing Direct=
-or of the United Arab Emirates (Dubai) World Expo 2020 Committee which was =
-postponed to October 2021 to March 2022 because of the Covid-19 pandemic.
+On 3/22/2022 5:27 PM, Daniel P. Berrangé wrote:
+...
+> IMHO the AmdSev build for OVMF gets this right by entirely disabling
+> the split OVMF_CODE.fd vs OVMF_VARS.fd, and just having a single
+> OVMF.fd file that is exposed read-only to the guest.
+> 
+> This is further represented in $QEMU.git/docs/interop/firmware.json
+> by marking the firmware as 'stateless', which apps like libvirt will
+> use to figure out what QEMU command line to pick.
 
-I am writing to you to manage the funds I received as financial gratificati=
-on from various foreign companies I assisted to participate in the event th=
-at is taking place as we speak. The amount is $24,762,906.00 United States =
-dollars. But I can not personally manage the fund in my country because of =
-the sensitive nature of my office and the certain restriction on married Mu=
-slim women.
+Hi Daniel,
 
-For this reason, an agreement was reached with a consulting firm to direct =
-the various financial gifts to an account with a financial institution wher=
-e it will be possible for me to instruct the transfer of the fund to a thir=
-d party for investment purpose; which is the reason I am contacting you to =
-receive the fund and manage it as my investment partner. Note that the fund=
- is NOT connected to any criminal or terrorist activity.
+I don't play with AMD SEV and I'm not sure if AMD SEV requires only 
+single OVMF.fd. But IIUC, from edk2
 
-On your indication of interest with your information; I will instruct the c=
-onsulting firm to process the fund to your country for investment purposes.
+commit 437eb3f7a8db ("OvmfPkg/QemuFlashFvbServicesRuntimeDxe: Bypass 
+flash detection with SEV-ES")
 
-Regards.
-Reem Hashimy.
+, AMD SEV(-ES) does support NVRAM via proactive VMGEXIT MMIO 
+QemuFlashWrite(). If so, AMD SEV seems to be able to support split OVMF, 
+right?
+
+> IOW, if you don't want OVMF_VARS.fd to be written to, then follow
+> what AmdSev has done, and get rid of the split files.
+> 
+> 
+> With regards,
+> Daniel
+
