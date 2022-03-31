@@ -2,161 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CA9CB4EE227
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 21:54:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 529A74EE22E
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 21:57:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241079AbiCaT4L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 15:56:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44414 "EHLO
+        id S241112AbiCaT7k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 15:59:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240886AbiCaT4I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 15:56:08 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A12A60A84;
-        Thu, 31 Mar 2022 12:54:21 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id q19so618581pgm.6;
-        Thu, 31 Mar 2022 12:54:21 -0700 (PDT)
+        with ESMTP id S240858AbiCaT7j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 15:59:39 -0400
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 565EE2325D6
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 12:57:51 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id bn33so1199602ljb.6
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 12:57:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=vwYbxEvOFzQZ3DfFjQoUndJHwl8sC80wy2uGif/41uE=;
-        b=QKzz3hwvxOS8I5FsifjjQB7LMh51VWqYRaLXy9QTs8T+LML+JUK/+/HareIvwQusHM
-         PTmuDTi2YUxPUwYCK5Q/uJrxD9QpDn2B39x5Bs+juLPoYsSDBhZ9zUphpvGzTbFDi4vR
-         GYVfcs8VpcmBQcRBFQQdh83gJfYD2JxsJ7ZByfBjhdSYt7hY1TahBmVj+6MkZQvVolE5
-         I3QBUlsVjdEAg/j1IXZ3XP+6A/JURnZJxwGJZwCaklkhfKVVF1XhwOZF1/buOTliUiql
-         7CfBPe9wz9XCXClc21sug9R6hvtb0bcnmGJ5Jw2ZCvV/55jrd+iJTO7bnABy0jj35wdW
-         8few==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=pTe27Qc9aU9mrh9Xska5d8/rYGqxPk37jFPTpeO0UrM=;
+        b=cM+XYBWkQOvd6IpcK95d5PqkmE8Zj/rsE4HM7KyzFR+6DlwGlrOGTFvjtZpdC9Aguj
+         ESLCoJHA6QKBbqz7zUq2+E4v6HH/ZVXTMUYngj6O/43jTiLxBhJi3bfgeUXDEUrKXO08
+         jlLXoMJrlDu0ntHa4lYeB+e2z1Fh9359EEd57bYrB062nhgLtDMXJSITG9Z6Kf3Ed3Fi
+         mthSWhv5B5HSBNA0vYd6c5UqJ/fLBKbFciLMVvj0n4okgDzj36jXxbYKZr9X1J8Auxr+
+         KBfDAEbrqLEltDXdCTGVk7I9BVY+6Ofz+qmkKRTQ2zs3SMS+MOlVbg/b0NYQ27XQppJ0
+         WsuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=vwYbxEvOFzQZ3DfFjQoUndJHwl8sC80wy2uGif/41uE=;
-        b=TVqtIPcd2nk447/CxkhV8Qe+Gb6sKkxqn7SIB/nD9Y4gGsU3pAz1K+nMqa3EEmI+Yk
-         vk96/Av7COxM3FSWPctj4ZyPsbEWBOsGIT3vjYTcsXtJ1qhfZ8D7V4Zq3oVuIlKKJ8Zt
-         11xO/w5seV0hOV/Uwuk6zjJf4Xavv6vom/XUPT+s21w5ZahJ1GCU0r+vZfEvsYy1yP2q
-         6mkXnykIvgyITlcbc7UgviDnbGwn91MhzMEAUcTgkXhmWIfivJZDDahrosGZw8sUQXVK
-         HkgmswvoF4ua2co25jQSbnUGLdc/tojaSZlOfDLdsFlaKXS3Bdl82LO1EYG9d8Jk8ovI
-         JNcA==
-X-Gm-Message-State: AOAM5303AD386QLP9ID7Md6aRslZK9DdsOKpnfXhaVLux3/mU7cL9XDM
-        9kuzFbTD4wcdvGGMBhG5vG4=
-X-Google-Smtp-Source: ABdhPJw053091D9MqO5RSZUJy8UyPWhs/hLZBSYlI5FEYxBaDT8GAo2/s2AmaYMb9sOklX3icFDTdw==
-X-Received: by 2002:a05:6a00:810:b0:4fa:e71f:7e40 with SMTP id m16-20020a056a00081000b004fae71f7e40mr7196865pfk.15.1648756460698;
-        Thu, 31 Mar 2022 12:54:20 -0700 (PDT)
-Received: from localhost ([192.55.54.52])
-        by smtp.gmail.com with ESMTPSA id e19-20020a637453000000b003821bdb8103sm152830pgn.83.2022.03.31.12.54.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Mar 2022 12:54:20 -0700 (PDT)
-Date:   Thu, 31 Mar 2022 12:54:19 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [RFC PATCH v5 021/104] KVM: x86: Introduce hooks to free VM
- callback prezap and vm_free
-Message-ID: <20220331195419.GB2084469@ls.amr.corp.intel.com>
-References: <cover.1646422845.git.isaku.yamahata@intel.com>
- <af18a5c763a78af2b7de6e6e0841d9e61a571dc4.1646422845.git.isaku.yamahata@intel.com>
- <03d3c1ac92cee3b0e8e325da0f703d1dd9657b4b.camel@intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=pTe27Qc9aU9mrh9Xska5d8/rYGqxPk37jFPTpeO0UrM=;
+        b=uRSdJLOOwFVzER+yuMMTewu256CpUCQOjckWo3Y+rSjkT3PWG7RAr7nwysSdV5LYNl
+         HYwFwjTkJYONXvsLPeazeAneQirW/E4l16857aIRmNUXP6WEO+703RGVwc2z7CxjeM66
+         DKJp2IH9yL2Io6yHMNnC0/FUeY1zuxMxkDUk9OaO61eD5gULYuMDj29dcrjiqXNPA3HI
+         V+QrPXlLvNWOINI/Tu+DQ+ex/U4Vor2QwpW2IRR0fqdtMHLA4dONkxe7aMZsZRPJSnKi
+         MLoMZrII9kMRfrMH7bEKkPWivhbae5Qw4GIfx990CyXiKjNPiVQokVE27Lt+6AV8jgUo
+         sW7A==
+X-Gm-Message-State: AOAM5301ljLdTQUtDjwezpLs1RA8l3QPZHYcbsr4czChXVbDO52lgPQ2
+        T0LQ6NPETdXeLH0CJw0EeKyd9nWLxOnQ/Js0oe0mhw==
+X-Google-Smtp-Source: ABdhPJw9+gcr6sgJpKfiIcWS6ZH8RxhxtcabitgSKfJZiaZHQP81kNDhjMCQEcxa3zOxAKVi/mFm6Pv92XT19v/VvHs=
+X-Received: by 2002:a2e:390c:0:b0:248:1b88:d6c4 with SMTP id
+ g12-20020a2e390c000000b002481b88d6c4mr11250384lja.49.1648756669056; Thu, 31
+ Mar 2022 12:57:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <03d3c1ac92cee3b0e8e325da0f703d1dd9657b4b.camel@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20220311002528.2230172-1-dmatlack@google.com> <20220311002528.2230172-21-dmatlack@google.com>
+ <YjG7Zh4zwTDsO3L1@xz-m1.local> <CALzav=fRFzbGEVhdMSwhX1Gs1++DGW6MOWvKzeQ-RTtLsus=SQ@mail.gmail.com>
+ <YkSirYT6s8YtUr4w@xz-m1.local>
+In-Reply-To: <YkSirYT6s8YtUr4w@xz-m1.local>
+From:   David Matlack <dmatlack@google.com>
+Date:   Thu, 31 Mar 2022 12:57:22 -0700
+Message-ID: <CALzav=ceTVGviFzCP0BfUP74DmkBkBnRo5wczGq+2j05MdetMw@mail.gmail.com>
+Subject: Re: [PATCH v2 20/26] KVM: x86/mmu: Extend Eager Page Splitting to the
+ shadow MMU
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Sean Christopherson <seanjc@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 31, 2022 at 04:02:24PM +1300,
-Kai Huang <kai.huang@intel.com> wrote:
+On Wed, Mar 30, 2022 at 11:34 AM Peter Xu <peterx@redhat.com> wrote:
+>
+> On Tue, Mar 22, 2022 at 04:58:08PM -0700, David Matlack wrote:
+> > > > +static int prepare_to_split_huge_page(struct kvm *kvm,
+> > > > +                                   const struct kvm_memory_slot *slot,
+> > > > +                                   u64 *huge_sptep,
+> > > > +                                   struct kvm_mmu_page **spp,
+> > > > +                                   bool *flush,
+> > > > +                                   bool *dropped_lock)
+> > > > +{
+> > > > +     int r = 0;
+> > > > +
+> > > > +     *dropped_lock = false;
+> > > > +
+> > > > +     if (kvm_mmu_available_pages(kvm) <= KVM_MIN_FREE_MMU_PAGES)
+> > > > +             return -ENOSPC;
+> > > > +
+> > > > +     if (need_resched() || rwlock_needbreak(&kvm->mmu_lock))
+> > > > +             goto drop_lock;
+> > > > +
+> > >
+> > > Not immediately clear on whether there'll be case that *spp is set within
+> > > the current function.  Some sanity check might be nice?
+> >
+> > Sorry I'm not sure what you mean here. What kind of sanity check did
+> > you have in mind?
+>
+> Something like "WARN_ON_ONCE(*spp);"?
 
-> On Fri, 2022-03-04 at 11:48 -0800, isaku.yamahata@intel.com wrote:
-> > From: Kai Huang <kai.huang@intel.com>
-> > 
-> > Before tearing down private page tables, TDX requires some resources of the
-> > guest TD to be destroyed (i.e. keyID must have been reclaimed, etc).  Add
-> > prezap callback before tearing down private page tables for it.
-> > 
-> > TDX needs to free some resources after other resources (i.e. vcpu related
-> > resources).  Add vm_free callback at the end of kvm_arch_destroy_vm().
-> > 
-> > Signed-off-by: Kai Huang <kai.huang@intel.com>
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> >  arch/x86/include/asm/kvm-x86-ops.h | 2 ++
-> >  arch/x86/include/asm/kvm_host.h    | 2 ++
-> >  arch/x86/kvm/x86.c                 | 8 ++++++++
-> >  3 files changed, 12 insertions(+)
-> > 
-> > diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> > index 8125d43d3566..ef48dcc98cfc 100644
-> > --- a/arch/x86/include/asm/kvm-x86-ops.h
-> > +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> > @@ -20,7 +20,9 @@ KVM_X86_OP(has_emulated_msr)
-> >  KVM_X86_OP(vcpu_after_set_cpuid)
-> >  KVM_X86_OP(is_vm_type_supported)
-> >  KVM_X86_OP(vm_init)
-> > +KVM_X86_OP_NULL(mmu_prezap)
-> >  KVM_X86_OP_NULL(vm_destroy)
-> > +KVM_X86_OP_NULL(vm_free)
-> >  KVM_X86_OP(vcpu_create)
-> >  KVM_X86_OP(vcpu_free)
-> >  KVM_X86_OP(vcpu_reset)
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 8de357a9ad30..5ff7a0fba311 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1326,7 +1326,9 @@ struct kvm_x86_ops {
-> >  	bool (*is_vm_type_supported)(unsigned long vm_type);
-> >  	unsigned int vm_size;
-> >  	int (*vm_init)(struct kvm *kvm);
-> > +	void (*mmu_prezap)(struct kvm *kvm);
-> >  	void (*vm_destroy)(struct kvm *kvm);
-> > +	void (*vm_free)(struct kvm *kvm);
-> >  
-> >  	/* Create, but do not attach this VCPU */
-> >  	int (*vcpu_create)(struct kvm_vcpu *vcpu);
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index f6438750d190..a48f5c69fadb 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -11779,6 +11779,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
-> >  	kvm_page_track_cleanup(kvm);
-> >  	kvm_xen_destroy_vm(kvm);
-> >  	kvm_hv_destroy_vm(kvm);
-> > +	static_call_cond(kvm_x86_vm_free)(kvm);
-> >  }
-> >  
-> >  static void memslot_rmap_free(struct kvm_memory_slot *slot)
-> > @@ -12036,6 +12037,13 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
-> >  
-> >  void kvm_arch_flush_shadow_all(struct kvm *kvm)
-> >  {
-> > +	/*
-> > +	 * kvm_mmu_zap_all() zaps both private and shared page tables.  Before
-> > +	 * tearing down private page tables, TDX requires some TD resources to
-> > +	 * be destroyed (i.e. keyID must have been reclaimed, etc).  Invoke
-> > +	 * kvm_x86_mmu_prezap() for this.
-> > +	 */
-> > +	static_call_cond(kvm_x86_mmu_prezap)(kvm);
-> >  	kvm_mmu_zap_all(kvm);
-> >  }
-> >  
-> 
-> The two callbacks are introduced here but they are actually implemented in 2
-> patches later (patch 24 KVM: TDX: create/destroy VM structure).  Why not just
-> squash this patch to patch 24?  Or at least you can put this patch right before
-> patch 24.
+Ah I see. I was confused because the previous version of this code
+checked if *spp is already set and, if so, skipped the allocation. But
+I accidentally introduced a memory leak here when I implemented Ben'
+suggestion to defer alloc_memory_for_split() to a subsequent commit.
+I'll fix this in v3.
 
-Ok. I'll squash this patch into it.
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+>
+> >
+> > >
+> > > > +     *spp = kvm_mmu_alloc_direct_sp_for_split(true);
+> > > > +     if (r)
+> > > > +             goto drop_lock;
+> > > > +
+> > > > +     return 0;
+>
+> Thanks,
+>
+> --
+> Peter Xu
+>
