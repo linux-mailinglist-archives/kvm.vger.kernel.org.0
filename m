@@ -2,100 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 471C94EDDA1
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 17:43:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B8CC4EDE58
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 18:06:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237662AbiCaPoW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 11:44:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52566 "EHLO
+        id S239587AbiCaQGW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 12:06:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239246AbiCaPmh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 11:42:37 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 915A5C625F
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 08:37:30 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id p8so22418631pfh.8
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 08:37:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Kj2SlYQeTe0c/VZuVzdXe4XjfgpJ1WwXsE5TNwFDkEM=;
-        b=IjMlm+tdzexEH6QTNCon1We60FdSxrq/q2yHIIyjhtEKcFifzdOfMnZEr1zULpHttT
-         TKc89m8TBFHmEYNTj8zi4SSYo+++rxoB4sw2sMcGD3kb8F6OOAcgI2sSa0y+kiElWXNg
-         QDj8LbHd7bj5QawsFS0w6DjSrWIoO7gt3/zg2lE0ialvNJu7r4q+aJxCor4Qdcfj1/lm
-         hrrg9hSaQtqfpv5cN2/ml4OOTonNVwmLMeb4W1cGFxK+vaaX8tn8XXDySP8n6ACvS1aK
-         opGAhvtNDmLK2av4iREFMPlQxLHs6XoTtmO3Q8zM2VN/WJZwe3zMtqg/V8TRBAtTkEft
-         PeuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Kj2SlYQeTe0c/VZuVzdXe4XjfgpJ1WwXsE5TNwFDkEM=;
-        b=kPwqAV+YmHbTLalXJrkBjMO28UPNZLe+JtqS6FAj56NhFakpkWSG9xJayNvvZTmoA2
-         P94xMvMv/UL5/N5YtFyBT0qD05uK8ZW+BIxofzNp40IK1szTRWc718FhVcQfCIy84oTA
-         zIyOrCWZXxxdcA04H/dH/ffA0RL1R6bDJ6y/euhjB8PVuc8SSTT9mfhzBzk7rHPEm6jH
-         nagrbB3fd6sV/SlGwt2Zv6VFdqzK4VHDFPHdPkhK+O732DQJVqDEJ9uYOsJMyhdU2EdC
-         vz9NHge6usyvR8+r/RroqV7ZPkMbGWrEZlaVuFGRrtUy6gl9mTvp2uawkVPaCmOUC9g6
-         KCTw==
-X-Gm-Message-State: AOAM533Gr74VyzWRgSX9jsXW3Km7AyncUa+zTENljJ/4gPKIkKhzDZWK
-        lHZLOXgiaOXRu8ixoG1+hT3qJQ==
-X-Google-Smtp-Source: ABdhPJyzlveTa0/9WEU5iVzJxjWSfEaJ0Sg7Dj9XtakZXWY9//LXk4rW62HCko9WXHK7xjdxynKHMA==
-X-Received: by 2002:a63:5b63:0:b0:378:5645:90f6 with SMTP id l35-20020a635b63000000b00378564590f6mr11234181pgm.505.1648741048579;
-        Thu, 31 Mar 2022 08:37:28 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id l6-20020a17090a660600b001c985b0cb53sm10209446pjj.26.2022.03.31.08.37.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Mar 2022 08:37:27 -0700 (PDT)
-Date:   Thu, 31 Mar 2022 15:37:24 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Shivam Kumar <shivam.kumar1@nutanix.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        Shaju Abraham <shaju.abraham@nutanix.com>,
-        Manish Mishra <manish.mishra@nutanix.com>,
-        Anurag Madnawat <anurag.madnawat@nutanix.com>
-Subject: Re: [PATCH v3 1/3] KVM: Implement dirty quota-based throttling of
- vcpus
-Message-ID: <YkXKtC8PCfIUMs8D@google.com>
-References: <20220306220849.215358-1-shivam.kumar1@nutanix.com>
- <20220306220849.215358-2-shivam.kumar1@nutanix.com>
- <YkT1kzWidaRFdQQh@google.com>
- <72d72639-bd81-e957-9a7b-aecd2e855b66@nutanix.com>
+        with ESMTP id S236954AbiCaQGW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 12:06:22 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6EB8B879;
+        Thu, 31 Mar 2022 09:04:34 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22VERdBO005291;
+        Thu, 31 Mar 2022 16:04:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=xxWjSJIC5HPxU+s+k4q/7q9CXiXld8PtClwLKCKWZIs=;
+ b=aV6lY9i2W/4wiD6SXXbz71GNNvIYI5o9WGIYs31Fz1c9rKHUQx+oGUTYlauKut1LysPw
+ zC2xfKb3ockTbL55s3t7+6a0Z84CJ+l4sJpw41TALkf4EzrrW5CAcjVO7DjRMQHthT/D
+ Kq1e6tAJDV6KU+Vg7HXFOzRXA0De+2Ju39zHAUBlbsRev3YNSH4M2wSqaFTmGKS7IEdT
+ xKQ84bUldnTxmfpbPdNjhHRF8R8kHPP5wZ96ny6Ns0NWKAIdE07iYxOPiMXwY/6Gq0xa
+ a6AjDWwt0zRPTRK9wFbam8mCqq19hB2WPPDhUIS+DHyOnGUTS0V0ZL0r49JtWlpGvDhs 6Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f54c2y1kg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 31 Mar 2022 16:04:33 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22VFoajp004570;
+        Thu, 31 Mar 2022 16:04:33 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f54c2y1jr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 31 Mar 2022 16:04:33 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22VFxhxO004585;
+        Thu, 31 Mar 2022 16:04:31 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 3f1tf9k52j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 31 Mar 2022 16:04:31 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22VG4ST551511562
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 31 Mar 2022 16:04:28 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1431C11C050;
+        Thu, 31 Mar 2022 16:04:28 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2A3DB11C04A;
+        Thu, 31 Mar 2022 16:04:27 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.13.95])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 31 Mar 2022 16:04:27 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        scgl@linux.ibm.com, borntraeger@de.ibm.com, pmorel@linux.ibm.com,
+        pasic@linux.ibm.com, nrb@linux.ibm.com, thuth@redhat.com,
+        david@redhat.com
+Subject: [kvm-unit-tests PATCH v2 0/5] lib: s390x: Refactor and rename vm.[ch]
+Date:   Thu, 31 Mar 2022 18:04:14 +0200
+Message-Id: <20220331160419.333157-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <72d72639-bd81-e957-9a7b-aecd2e855b66@nutanix.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Zk4z6PHDLFUnTVLmQPBIP9pCCuz-XJbp
+X-Proofpoint-GUID: qHE1SBcLfPyRkEp7rORhhx1fRV7GdrPG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-31_05,2022-03-31_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ lowpriorityscore=0 impostorscore=0 spamscore=0 adultscore=0
+ mlxlogscore=579 malwarescore=0 mlxscore=0 priorityscore=1501 clxscore=1015
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203310089
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 31, 2022, Shivam Kumar wrote:
-> > > +	if (!dirty_quota || (pages_dirtied < dirty_quota))
-> > > +		return 1;
-> > I don't love returning 0/1 from a function that suggests it returns a bool, but
-> > I do agree it's better than actually returning a bool.  I also don't have a better
-> > name, so I'm just whining in the hope that Paolo or someone else has an idea :-)
-> I've seen plenty of check functions returning 0/1 but please do let me know
-> if there's a convention to use a bool in such scenarios.
+Refactor and rename vm.[ch] to hardware.[ch]
 
-The preferred style for KVM is to return a bool for helpers that are obviously
-testing something, e.g. functions with names is "is_valid", "check_request", etc...
-But we also very strongly prefer not returning bools from functions that have
-side effects or can fail, i.e. don't use a bool to indicate success.
+* Remove some uneeded #includes for vm.h
+* Rename vm.[ch] to hardware.[ch]
+* Consolidate all detection functions into detect_host, which returns
+  what host system the test is running on
+* Completely remove obsolete z/VM 6.x check from skey.c
+* Rename vm_is_* functions to host_is_*, which are then just wrappers
+  around detect_host
+* Move machine type macros from arch_def.h to hardware.h
+* Add machine_is_* functions
+* Refactor and rename get_machine_id to be a simple wrapper for stidp
+* Add back get_machine_id using the stidp wrapper
 
-KVM has a third, gross use case of 0/1, where 0 means "exit to userspace" and 1
-means "re-enter the guest".  Unfortunately, it's so ubiquitous that replacing it
-with a proper enum is all but guaranteed to introduce bugs, and the 0/1 behavior
-allows KVM to do things liek "if (!some_function())".
+v1->v2
+* new patch to completely remove obsolete z/VM 6.x check instead of
+  moving it into hardware.h
+* do not add macros and functions for all known machine types, z15 is
+  enough for now
 
-This helper falls into this last category of KVM's special 0/1 handling.  The
-reason I don't love the name is the "check" part, which also puts it into "this
-is a check helper".  But returning a bool would be even worse because the helper
-does more than just check the quota, it also fills in the exit reason.
+Claudio Imbrenda (5):
+  s390x: remove spurious includes
+  s390x: skey: remove check for old z/VM version
+  lib: s390: rename and refactor vm.[ch]
+  lib: s390x: functions for machine models
+  lib: s390x: stidp wrapper and move get_machine_id
+
+ s390x/Makefile           |  2 +-
+ lib/s390x/asm/arch_def.h |  7 +--
+ lib/s390x/hardware.h     | 55 ++++++++++++++++++++++++
+ lib/s390x/vm.h           | 15 -------
+ lib/s390x/hardware.c     | 69 ++++++++++++++++++++++++++++++
+ lib/s390x/vm.c           | 92 ----------------------------------------
+ s390x/cpumodel.c         |  4 +-
+ s390x/mvpg-sie.c         |  1 -
+ s390x/mvpg.c             |  4 +-
+ s390x/pv-diags.c         |  1 -
+ s390x/skey.c             | 37 ++--------------
+ s390x/spec_ex-sie.c      |  1 -
+ s390x/uv-host.c          |  4 +-
+ 13 files changed, 136 insertions(+), 156 deletions(-)
+ create mode 100644 lib/s390x/hardware.h
+ delete mode 100644 lib/s390x/vm.h
+ create mode 100644 lib/s390x/hardware.c
+ delete mode 100644 lib/s390x/vm.c
+
+-- 
+2.34.1
+
