@@ -2,136 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 529A74EE22E
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 21:57:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 27F9E4EE276
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 22:16:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241112AbiCaT7k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 15:59:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49612 "EHLO
+        id S241311AbiCaURo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 16:17:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240858AbiCaT7j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 15:59:39 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 565EE2325D6
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 12:57:51 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id bn33so1199602ljb.6
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 12:57:51 -0700 (PDT)
+        with ESMTP id S241000AbiCaURn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 16:17:43 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 979032405A8;
+        Thu, 31 Mar 2022 13:15:55 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id t4so679650pgc.1;
+        Thu, 31 Mar 2022 13:15:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=pTe27Qc9aU9mrh9Xska5d8/rYGqxPk37jFPTpeO0UrM=;
-        b=cM+XYBWkQOvd6IpcK95d5PqkmE8Zj/rsE4HM7KyzFR+6DlwGlrOGTFvjtZpdC9Aguj
-         ESLCoJHA6QKBbqz7zUq2+E4v6HH/ZVXTMUYngj6O/43jTiLxBhJi3bfgeUXDEUrKXO08
-         jlLXoMJrlDu0ntHa4lYeB+e2z1Fh9359EEd57bYrB062nhgLtDMXJSITG9Z6Kf3Ed3Fi
-         mthSWhv5B5HSBNA0vYd6c5UqJ/fLBKbFciLMVvj0n4okgDzj36jXxbYKZr9X1J8Auxr+
-         KBfDAEbrqLEltDXdCTGVk7I9BVY+6Ofz+qmkKRTQ2zs3SMS+MOlVbg/b0NYQ27XQppJ0
-         WsuA==
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=G3GMOK4NcGeu/Rm7pxZSYI23p/RSyGdy+8yXGjFy7BQ=;
+        b=FvbCqjOPfZjPFbAOGXjM+Ct6mKiwSgG2xGBSoByDrEXPhNfK9gBjvmWy/5TprtIXR4
+         6EYkYaa5U7HKkXv+2Ysgkt+PGxxNBiqd1LLzjgFGXYjA67h97ag0JcsWEgKiWp0xZviR
+         QyrBlKQWC7EOWzxt43deQ07Ds2gKKkGi52Wq9BFJex57VM4tLoe5rAnVS2d9gAJz6oOu
+         5HXp2nEbpLMQ/XuY9EAxH3mPpN0VGUijXC2hUw/MO05xiPHqM18bM/VILlXVhxBcw2uZ
+         axoT9sX3fjtQ99ToQjF/ECVx+y91a8gZYemKNfEKEgO6kgSpgLjRyoKSzo+mqmAr1C3c
+         UjoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=pTe27Qc9aU9mrh9Xska5d8/rYGqxPk37jFPTpeO0UrM=;
-        b=uRSdJLOOwFVzER+yuMMTewu256CpUCQOjckWo3Y+rSjkT3PWG7RAr7nwysSdV5LYNl
-         HYwFwjTkJYONXvsLPeazeAneQirW/E4l16857aIRmNUXP6WEO+703RGVwc2z7CxjeM66
-         DKJp2IH9yL2Io6yHMNnC0/FUeY1zuxMxkDUk9OaO61eD5gULYuMDj29dcrjiqXNPA3HI
-         V+QrPXlLvNWOINI/Tu+DQ+ex/U4Vor2QwpW2IRR0fqdtMHLA4dONkxe7aMZsZRPJSnKi
-         MLoMZrII9kMRfrMH7bEKkPWivhbae5Qw4GIfx990CyXiKjNPiVQokVE27Lt+6AV8jgUo
-         sW7A==
-X-Gm-Message-State: AOAM5301ljLdTQUtDjwezpLs1RA8l3QPZHYcbsr4czChXVbDO52lgPQ2
-        T0LQ6NPETdXeLH0CJw0EeKyd9nWLxOnQ/Js0oe0mhw==
-X-Google-Smtp-Source: ABdhPJw9+gcr6sgJpKfiIcWS6ZH8RxhxtcabitgSKfJZiaZHQP81kNDhjMCQEcxa3zOxAKVi/mFm6Pv92XT19v/VvHs=
-X-Received: by 2002:a2e:390c:0:b0:248:1b88:d6c4 with SMTP id
- g12-20020a2e390c000000b002481b88d6c4mr11250384lja.49.1648756669056; Thu, 31
- Mar 2022 12:57:49 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=G3GMOK4NcGeu/Rm7pxZSYI23p/RSyGdy+8yXGjFy7BQ=;
+        b=se+sdV0My+kEvBtllV49FsoJ2LXk+3elTd8I+EgOcR/EIXx5mvn9/0H2nbgWg1Z23+
+         udFxotahAsYP1CF76lf2lsMwvG0vJm0Bk43OECcFefn3FHS7wrV0mIMjGeAGgfM5DepL
+         0GemCnkBTZZD+5qrykt4l7V0pKRpaJUsbFPsaV9zerPB0Vb+LFC9AeDdJEz5f6qUhcOA
+         BO5rSZBQjEUz3huSA9XAV4SKeXt6WQCLY9HDCae3Mlt4Ys3YPtjm6WuPZp6pMvRV3BSJ
+         Lezwc8lRqBq85//PmTbbPjqEs4F28PiNtqNOAF3iN0cvcBzDKi2TlDvgjfMlsm98sovG
+         EcXA==
+X-Gm-Message-State: AOAM532FnHiK5wO1le0VmjAQfjGhDV8jCops9HHjeFDAPTPU0pLk0Th2
+        1DcgmKf/Ivhng2xdYOA67as=
+X-Google-Smtp-Source: ABdhPJx+MElvTq7xqT6Ah0xsQ/9J0CaUC/E45h+HRia1cTzUYRcJMoVVdO7sN+vE3B3Az1hICugsZw==
+X-Received: by 2002:a65:6753:0:b0:385:fa8a:188f with SMTP id c19-20020a656753000000b00385fa8a188fmr12246379pgu.499.1648757754218;
+        Thu, 31 Mar 2022 13:15:54 -0700 (PDT)
+Received: from localhost ([192.55.54.52])
+        by smtp.gmail.com with ESMTPSA id w129-20020a628287000000b004fdc453b49asm328013pfd.39.2022.03.31.13.15.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Mar 2022 13:15:53 -0700 (PDT)
+Date:   Thu, 31 Mar 2022 13:15:50 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [RFC PATCH v5 023/104] x86/cpu: Add helper functions to
+ allocate/free MKTME keyid
+Message-ID: <20220331201550.GC2084469@ls.amr.corp.intel.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <a1d1e4f26c6ef44a557e873be2818e6a03e12038.1646422845.git.isaku.yamahata@intel.com>
+ <2386151bc0a42b2eda895d85b459bf7930306694.camel@intel.com>
 MIME-Version: 1.0
-References: <20220311002528.2230172-1-dmatlack@google.com> <20220311002528.2230172-21-dmatlack@google.com>
- <YjG7Zh4zwTDsO3L1@xz-m1.local> <CALzav=fRFzbGEVhdMSwhX1Gs1++DGW6MOWvKzeQ-RTtLsus=SQ@mail.gmail.com>
- <YkSirYT6s8YtUr4w@xz-m1.local>
-In-Reply-To: <YkSirYT6s8YtUr4w@xz-m1.local>
-From:   David Matlack <dmatlack@google.com>
-Date:   Thu, 31 Mar 2022 12:57:22 -0700
-Message-ID: <CALzav=ceTVGviFzCP0BfUP74DmkBkBnRo5wczGq+2j05MdetMw@mail.gmail.com>
-Subject: Re: [PATCH v2 20/26] KVM: x86/mmu: Extend Eager Page Splitting to the
- shadow MMU
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2386151bc0a42b2eda895d85b459bf7930306694.camel@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 30, 2022 at 11:34 AM Peter Xu <peterx@redhat.com> wrote:
->
-> On Tue, Mar 22, 2022 at 04:58:08PM -0700, David Matlack wrote:
-> > > > +static int prepare_to_split_huge_page(struct kvm *kvm,
-> > > > +                                   const struct kvm_memory_slot *slot,
-> > > > +                                   u64 *huge_sptep,
-> > > > +                                   struct kvm_mmu_page **spp,
-> > > > +                                   bool *flush,
-> > > > +                                   bool *dropped_lock)
-> > > > +{
-> > > > +     int r = 0;
-> > > > +
-> > > > +     *dropped_lock = false;
-> > > > +
-> > > > +     if (kvm_mmu_available_pages(kvm) <= KVM_MIN_FREE_MMU_PAGES)
-> > > > +             return -ENOSPC;
-> > > > +
-> > > > +     if (need_resched() || rwlock_needbreak(&kvm->mmu_lock))
-> > > > +             goto drop_lock;
-> > > > +
-> > >
-> > > Not immediately clear on whether there'll be case that *spp is set within
-> > > the current function.  Some sanity check might be nice?
-> >
-> > Sorry I'm not sure what you mean here. What kind of sanity check did
-> > you have in mind?
->
-> Something like "WARN_ON_ONCE(*spp);"?
+On Thu, Mar 31, 2022 at 02:21:06PM +1300,
+Kai Huang <kai.huang@intel.com> wrote:
 
-Ah I see. I was confused because the previous version of this code
-checked if *spp is already set and, if so, skipped the allocation. But
-I accidentally introduced a memory leak here when I implemented Ben'
-suggestion to defer alloc_memory_for_split() to a subsequent commit.
-I'll fix this in v3.
+> On Fri, 2022-03-04 at 11:48 -0800, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > MKTME keyid is assigned to guest TD.  The memory controller encrypts guest
+> > TD memory with key id.  Add helper functions to allocate/free MKTME keyid
+> > so that TDX KVM assign keyid.
+> 
+> Using MKTME keyid is wrong, at least not accurate I think.  We should use
+> explicitly use "TDX private KeyID", which is clearly documented in the spec:
+>   
+> https://software.intel.com/content/dam/develop/external/us/en/documents-tps/intel-tdx-cpu-architectural-specification.pdf
+> 
+> Also, description of IA32_MKTME_KEYID_PARTITIONING MSR clearly says TDX private
+> KeyIDs span the range (NUM_MKTME_KIDS+1) through
+> (NUM_MKTME_KIDS+NUM_TDX_PRIV_KIDS).  So please just use TDX private KeyID here.
+> 
+> 
+> > 
+> > Also export MKTME global keyid that is used to encrypt TDX module and its
+> > memory.
+> 
+> This needs explanation why the global keyID needs to be exported.
 
->
-> >
-> > >
-> > > > +     *spp = kvm_mmu_alloc_direct_sp_for_split(true);
-> > > > +     if (r)
-> > > > +             goto drop_lock;
-> > > > +
-> > > > +     return 0;
->
-> Thanks,
->
-> --
-> Peter Xu
->
+How about the followings?
+
+TDX private host key id is assigned to guest TD.  The memory controller
+encrypts guest TD memory with the assigned host key id (HIKD).  Add helper
+functions to allocate/free TDX private host key id so that TDX KVM manage
+it.
+
+Also export the global TDX private host key id that is used to encrypt TDX
+module, its memory and some dynamic data (e.g. TDR).  When VMM releasing
+encrypted page to reuse it, the page needs to be flushed with the used host
+key id.  VMM needs the global TDX private host key id to flush such pages
+TDX module accesses with the global TDX private host key id.
+
+Thanks,
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
