@@ -2,85 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EDC764ED181
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 04:05:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03D624ED265
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 06:35:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352450AbiCaCGa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Mar 2022 22:06:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35752 "EHLO
+        id S229830AbiCaEZE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 00:25:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343905AbiCaCG1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Mar 2022 22:06:27 -0400
-Received: from baidu.com (mx22.baidu.com [220.181.50.185])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6CE9A31519;
-        Wed, 30 Mar 2022 19:04:40 -0700 (PDT)
-Received: from BC-Mail-Ex14.internal.baidu.com (unknown [172.31.51.54])
-        by Forcepoint Email with ESMTPS id 5320F87DF62C4E1BD89F;
-        Thu, 31 Mar 2022 10:04:29 +0800 (CST)
-Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
- BC-Mail-Ex14.internal.baidu.com (172.31.51.54) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.20; Thu, 31 Mar 2022 10:04:29 +0800
-Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
- BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
- 15.01.2308.020; Thu, 31 Mar 2022 10:04:28 +0800
-From:   "Li,Rongqing" <lirongqing@baidu.com>
-To:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-CC:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "Linux Next Mailing List" <linux-next@vger.kernel.org>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>
-Subject: =?gb2312?B?tPC4tDogbGludXgtbmV4dDogbWFudWFsIG1lcmdlIG9mIHRoZSBrdm0gdHJl?=
- =?gb2312?Q?e_with_Linus'_tree?=
-Thread-Topic: linux-next: manual merge of the kvm tree with Linus' tree
-Thread-Index: AQHYRI/WF84Qva+clk2v/qstzx06eqzYun6g
-Date:   Thu, 31 Mar 2022 02:04:28 +0000
-Message-ID: <c1f9b1c98be74b43960de6f4f1dd4c62@baidu.com>
-References: <20220331104224.665e456b@canb.auug.org.au>
-In-Reply-To: <20220331104224.665e456b@canb.auug.org.au>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.22.206.40]
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+        with ESMTP id S229919AbiCaEYt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 00:24:49 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2606C10DA6C;
+        Wed, 30 Mar 2022 21:14:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1648700047; x=1680236047;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Lrf29M1FoQwZkT3rwYPlkkdAMRzetcMAr56weDYEJfw=;
+  b=VXoqaOWaJ+Z1bw2UKOkAMqNjGsOabwgJL1IiFSU2wF9PRWFp6QizkD/2
+   s6lflT3f4QrNWky5ej8bcUYVo/R6CPknQfvdRJpiQQ6EnGRR+qd2LPBxT
+   HRC2lT7MV6ftfDu/ZQF7dSruS7V5MGOLIWb6VE2KMbAhTw6nKlXyJu41x
+   kxpZrv7oKYWXVHPe+cN/0Z76fKBhSydGOC6fOs1iMTMp1MMlKqYn8tcUL
+   Jnz+CCBekyQWLw4TVVDj1RYVp+WrfCeSYG7FLkZTNXU3exTzB3gwNMblY
+   ATQFLhovh2sN2sry8Y5TcWyKeHsV641XTQnz1OGjG0jSpQl9uHmHtWN+N
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10302"; a="240301454"
+X-IronPort-AV: E=Sophos;i="5.90,224,1643702400"; 
+   d="scan'208";a="240301454"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2022 20:02:28 -0700
+X-IronPort-AV: E=Sophos;i="5.90,224,1643702400"; 
+   d="scan'208";a="838892137"
+Received: from dhathawa-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.53.226])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2022 20:02:26 -0700
+Message-ID: <03d3c1ac92cee3b0e8e325da0f703d1dd9657b4b.camel@intel.com>
+Subject: Re: [RFC PATCH v5 021/104] KVM: x86: Introduce hooks to free VM
+ callback prezap and vm_free
+From:   Kai Huang <kai.huang@intel.com>
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Date:   Thu, 31 Mar 2022 16:02:24 +1300
+In-Reply-To: <af18a5c763a78af2b7de6e6e0841d9e61a571dc4.1646422845.git.isaku.yamahata@intel.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+         <af18a5c763a78af2b7de6e6e0841d9e61a571dc4.1646422845.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQo+IEhpIGFsbCwNCj4gDQo+IFRvZGF5J3MgbGludXgtbmV4dCBtZXJnZSBvZiB0aGUga3ZtIHRy
-ZWUgZ290IGEgY29uZmxpY3QgaW46DQo+IA0KPiAgIGFyY2gveDg2L2tlcm5lbC9rdm0uYw0KPiAN
-Cj4gYmV0d2VlbiBjb21taXQ6DQo+IA0KPiAgIGMzYjAzNzkxN2M2YSAoIng4Ni9pYnQscGFyYXZp
-cnQ6IFNwcmlua2xlIEVOREJSIikNCj4gDQo+IGZyb20gTGludXMnIHRyZWUgYW5kIGNvbW1pdDoN
-Cj4gDQo+ICAgOGM1NjQ5ZTAwZTAwICgiS1ZNOiB4ODY6IFN1cHBvcnQgdGhlIHZDUFUgcHJlZW1w
-dGlvbiBjaGVjayB3aXRoDQo+IG5vcHZzcGluIGFuZCByZWFsdGltZSBoaW50IikNCj4gDQo+IGZy
-b20gdGhlIGt2bSB0cmVlLg0KPiANCj4gSSBmaXhlZCBpdCB1cCAoc2VlIGJlbG93KSBhbmQgY2Fu
-IGNhcnJ5IHRoZSBmaXggYXMgbmVjZXNzYXJ5LiBUaGlzIGlzIG5vdyBmaXhlZCBhcyBmYXINCj4g
-YXMgbGludXgtbmV4dCBpcyBjb25jZXJuZWQsIGJ1dCBhbnkgbm9uIHRyaXZpYWwgY29uZmxpY3Rz
-IHNob3VsZCBiZSBtZW50aW9uZWQgdG8NCj4geW91ciB1cHN0cmVhbSBtYWludGFpbmVyIHdoZW4g
-eW91ciB0cmVlIGlzIHN1Ym1pdHRlZCBmb3IgbWVyZ2luZy4gIFlvdSBtYXkNCj4gYWxzbyB3YW50
-IHRvIGNvbnNpZGVyIGNvb3BlcmF0aW5nIHdpdGggdGhlIG1haW50YWluZXIgb2YgdGhlIGNvbmZs
-aWN0aW5nIHRyZWUgdG8NCj4gbWluaW1pc2UgYW55IHBhcnRpY3VsYXJseSBjb21wbGV4IGNvbmZs
-aWN0cy4NCj4gDQo+IC0tDQo+IENoZWVycywNCj4gU3RlcGhlbiBSb3Rod2VsbA0KPiANCj4gZGlm
-ZiAtLWNjIGFyY2gveDg2L2tlcm5lbC9rdm0uYw0KPiBpbmRleCA3OWUwYjhkNjNmZmEsMjE5MzMw
-OTVhMTBlLi4wMDAwMDAwMDAwMDANCj4gLS0tIGEvYXJjaC94ODYva2VybmVsL2t2bS5jDQo+ICsr
-KyBiL2FyY2gveDg2L2tlcm5lbC9rdm0uYw0KPiBAQEAgLTc1Miw2IC03NTIsMzkgKzc1Miw0MCBA
-QEAgc3RhdGljIHZvaWQga3ZtX2NyYXNoX3NodXRkb3duKHN0cnVjdCBwDQo+ICAgfQ0KPiAgICNl
-bmRpZg0KPiANCj4gKyAjaWZkZWYgQ09ORklHX1g4Nl8zMg0KPiArIF9fdmlzaWJsZSBib29sIF9f
-a3ZtX3ZjcHVfaXNfcHJlZW1wdGVkKGxvbmcgY3B1KSB7DQo+ICsgCXN0cnVjdCBrdm1fc3RlYWxf
-dGltZSAqc3JjID0gJnBlcl9jcHUoc3RlYWxfdGltZSwgY3B1KTsNCj4gKw0KPiArIAlyZXR1cm4g
-ISEoc3JjLT5wcmVlbXB0ZWQgJiBLVk1fVkNQVV9QUkVFTVBURUQpOyB9DQo+ICsgUFZfQ0FMTEVF
-X1NBVkVfUkVHU19USFVOSyhfX2t2bV92Y3B1X2lzX3ByZWVtcHRlZCk7DQo+ICsNCj4gKyAjZWxz
-ZQ0KPiArDQoNCkkgYW0gc29ycnk7ICBJIHNlZSB2MyBpcyBtZXJnZWQgaW50byBuZXh0LCB0aGlz
-IHZlcnNpb24gd2lsbCBjYXVzZSBidWlsZGluZyBmYWlsdXJlLCBsaWtlIHJlcG9ydGVkIGluIA0K
-aHR0cHM6Ly93d3cuc3Bpbmljcy5uZXQvbGlzdHMva3ZtL21zZzI3MDYwNy5odG1sDQoNCkkgc2Vu
-ZCBhIG5ldyB2ZXJzaW9uDQpodHRwczovL3BhdGNod29yay5rZXJuZWwub3JnL3Byb2plY3Qva3Zt
-L3BhdGNoLzE2NDY4OTE2ODktNTMzNjgtMS1naXQtc2VuZC1lbWFpbC1saXJvbmdxaW5nQGJhaWR1
-LmNvbS8NCg0KDQotTGkgDQoNCg==
+On Fri, 2022-03-04 at 11:48 -0800, isaku.yamahata@intel.com wrote:
+> From: Kai Huang <kai.huang@intel.com>
+> 
+> Before tearing down private page tables, TDX requires some resources of the
+> guest TD to be destroyed (i.e. keyID must have been reclaimed, etc).  Add
+> prezap callback before tearing down private page tables for it.
+> 
+> TDX needs to free some resources after other resources (i.e. vcpu related
+> resources).  Add vm_free callback at the end of kvm_arch_destroy_vm().
+> 
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/include/asm/kvm-x86-ops.h | 2 ++
+>  arch/x86/include/asm/kvm_host.h    | 2 ++
+>  arch/x86/kvm/x86.c                 | 8 ++++++++
+>  3 files changed, 12 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index 8125d43d3566..ef48dcc98cfc 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -20,7 +20,9 @@ KVM_X86_OP(has_emulated_msr)
+>  KVM_X86_OP(vcpu_after_set_cpuid)
+>  KVM_X86_OP(is_vm_type_supported)
+>  KVM_X86_OP(vm_init)
+> +KVM_X86_OP_NULL(mmu_prezap)
+>  KVM_X86_OP_NULL(vm_destroy)
+> +KVM_X86_OP_NULL(vm_free)
+>  KVM_X86_OP(vcpu_create)
+>  KVM_X86_OP(vcpu_free)
+>  KVM_X86_OP(vcpu_reset)
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 8de357a9ad30..5ff7a0fba311 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1326,7 +1326,9 @@ struct kvm_x86_ops {
+>  	bool (*is_vm_type_supported)(unsigned long vm_type);
+>  	unsigned int vm_size;
+>  	int (*vm_init)(struct kvm *kvm);
+> +	void (*mmu_prezap)(struct kvm *kvm);
+>  	void (*vm_destroy)(struct kvm *kvm);
+> +	void (*vm_free)(struct kvm *kvm);
+>  
+>  	/* Create, but do not attach this VCPU */
+>  	int (*vcpu_create)(struct kvm_vcpu *vcpu);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index f6438750d190..a48f5c69fadb 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -11779,6 +11779,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+>  	kvm_page_track_cleanup(kvm);
+>  	kvm_xen_destroy_vm(kvm);
+>  	kvm_hv_destroy_vm(kvm);
+> +	static_call_cond(kvm_x86_vm_free)(kvm);
+>  }
+>  
+>  static void memslot_rmap_free(struct kvm_memory_slot *slot)
+> @@ -12036,6 +12037,13 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+>  
+>  void kvm_arch_flush_shadow_all(struct kvm *kvm)
+>  {
+> +	/*
+> +	 * kvm_mmu_zap_all() zaps both private and shared page tables.  Before
+> +	 * tearing down private page tables, TDX requires some TD resources to
+> +	 * be destroyed (i.e. keyID must have been reclaimed, etc).  Invoke
+> +	 * kvm_x86_mmu_prezap() for this.
+> +	 */
+> +	static_call_cond(kvm_x86_mmu_prezap)(kvm);
+>  	kvm_mmu_zap_all(kvm);
+>  }
+>  
+
+The two callbacks are introduced here but they are actually implemented in 2
+patches later (patch 24 KVM: TDX: create/destroy VM structure).  Why not just
+squash this patch to patch 24?  Or at least you can put this patch right before
+patch 24.
+
+Please feel free to remove my SoB and From if this bothers you to squash.
+
+
