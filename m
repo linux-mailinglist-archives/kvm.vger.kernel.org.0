@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A64394EE455
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 00:46:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 61FEF4EE477
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 01:07:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242671AbiCaWs1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 18:48:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42738 "EHLO
+        id S242818AbiCaXJa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 19:09:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240258AbiCaWsZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 18:48:25 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78491237FCD
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 15:46:37 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id a16-20020a17090a6d9000b001c7d6c1bb13so795927pjk.4
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 15:46:37 -0700 (PDT)
+        with ESMTP id S242805AbiCaXJ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 19:09:27 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59AA424CED6
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 16:07:35 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id p4-20020a17090ad30400b001c7ca87c05bso3710103pju.1
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 16:07:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=7uOUzZnbDEusnKR8cHWSyHd2FNHBMs+CYiJb4fGuX4g=;
-        b=saclz8jkvtOn9nSRzBPhcHPd3drlaDn9wlVl5p8YFykQOEoBBxA0XJkjgZ8cTCzPK6
-         FMl6af4M26t9yd66jXObaOKA7AYFMkXhp/zQ1E5cjs+Dc23ZC7Nq5jU/PHfe2U3imyNZ
-         hej+lIUS1XBxtRjX/eItimBO0l4FfZFjLqAwIOywtDOhEuP222M5iJalT5wFDvKu5hZM
-         NJmvlEz/gJYLDuI1NB0/xng2DUv7PxMs7r89lLIQpBgUHyhU7N2mCgfCOjxqp5xo5mNe
-         FH3Y02rsAJrnhoBxlMG+13CHQUkcVbCrlj1xEqWkzRqEYLxBDvivu8fTUEJwIxRgkwHy
-         /TMA==
+        bh=qRJmN8JDG7m72p3VxsXuKnTc88XHvYZJpC/RFCon9dM=;
+        b=aMwVbgfWGFLicig1gsSp/2jhSdYkiuTO1sd60UIlMKfjmpZpl5LkWpSarIu7YDUBU3
+         rpmb+z7cl8bVsE19t3bKrk/98bKoakg/taFBzWkzbIDxIrhfdDPDGXS3V+Vxe1xURGWj
+         WvuJItBvoHNgb2dsWSoRjyDQPEqWuMfS+HSKacI4VjKVxZOhbhF5tnw4zTQlVzNT70vu
+         5QhsS41hLl//IjuCrBUqLumqai/xWHvj59KY2P8a6gCRhTmEtmSpKeph2yaiiH/rJ0Dt
+         C7UsXmnOaK5uHBz8v+8ZT3DQyJxB9hIkbE9e/9Blb8rqFnm+zzLheVrYV4gTl5EtIqTU
+         yMDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=7uOUzZnbDEusnKR8cHWSyHd2FNHBMs+CYiJb4fGuX4g=;
-        b=EmRrN5xjvT68rpOSAc05j3KkjU0WyF5gAdMXgUWDsMTm6KRKzd+NVYjvaSn7ZUCWds
-         TIyXyA4pzxdx9B3ANebBdpQyMW9j+1uxF7nAj+HNRR/aP/pgkr5+XGHg0V9BTbS4cpjb
-         l2l5SatM0veCWCrmRASq3ml2gTot5i/R2j8VvvqlPWkV/iDGbsMcANtytqtBUpMLZ/YK
-         v0MAlhEvlyiAa50YXN978JhgDW8gU+V0EOpVXA2gKRnAr1oDcu8IdlqE+kVS9dA/kE5z
-         Bupb/5asMiPXyxsMiJVvkF5A42t+UL7dVl/rv6pGDB0mhKOvmHPKYTcbN7xgkCvMLWD5
-         0USg==
-X-Gm-Message-State: AOAM530NmrWwghIq88Nte/kCCVLXzhf1zunfjpCvOI/WgHkUE5yd+20L
-        kXImceh6OOQA/VVELzkBywmQOA==
-X-Google-Smtp-Source: ABdhPJxhusEmkTGoR7eUlu5A0Ce5fMesefkDFwNmmHwbnSL8TStNtf2UnkB+Vztq7JGocGm/di0LAQ==
-X-Received: by 2002:a17:902:cccb:b0:156:4a0:a2e7 with SMTP id z11-20020a170902cccb00b0015604a0a2e7mr7427200ple.97.1648766796515;
-        Thu, 31 Mar 2022 15:46:36 -0700 (PDT)
+        bh=qRJmN8JDG7m72p3VxsXuKnTc88XHvYZJpC/RFCon9dM=;
+        b=Q5aaiLDejpHFINiurzPARJiLHWkLWdGX7U50d2iar9IVumTy/+gVAg+RXHactXVukN
+         bc36YuyxVQN3T45ja7ymRjXNSOJRFXvr0iHHiH2ql/WIchzyMH9RJ7W/obKDOso3xT+P
+         GRYbyX78GR/OubSksYJGEQW9H6FRaUNA6XnrVJUA3yi24I4cvhKoYt27vZYkcQBNqqxs
+         cL1pg80umSiR1+MT6GbzPJ/83Kt217kqf1eltgSOTX/B72SoH1l2MbdqI0ZX5dI2d0U3
+         QYh1z+aZ0bIK3CyustpdNu1L3cNIPGtVdrNiq2D4+gZm4N9MwkH9ofRmtaMDj5f6EilT
+         DOzw==
+X-Gm-Message-State: AOAM532BZW2uGntyHTJrAjXWwNEef9mcDXR1KD3UKYsERZ1416idNAO2
+        RZllXAxhWLL8/pOocAdhGZrUag==
+X-Google-Smtp-Source: ABdhPJwcvMMyYOYWUXp6ynrxs98Tajw+xE+iCgBuHmT4zvMeroO3/+V6AvYJmeHor1eycxWFbkpIew==
+X-Received: by 2002:a17:903:124a:b0:154:c7a4:9374 with SMTP id u10-20020a170903124a00b00154c7a49374mr7673970plh.68.1648768054442;
+        Thu, 31 Mar 2022 16:07:34 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id p4-20020a637404000000b00375948e63d6sm324113pgc.91.2022.03.31.15.46.35
+        by smtp.gmail.com with ESMTPSA id s10-20020a056a00178a00b004fda49fb25dsm552215pfg.9.2022.03.31.16.07.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Mar 2022 15:46:35 -0700 (PDT)
-Date:   Thu, 31 Mar 2022 22:46:32 +0000
+        Thu, 31 Mar 2022 16:07:33 -0700 (PDT)
+Date:   Thu, 31 Mar 2022 23:07:30 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Zeng Guang <guang.zeng@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -66,93 +66,112 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jethro Beekman <jethro@fortanix.com>,
         Kai Huang <kai.huang@intel.com>, x86@kernel.org,
         linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
-        Gao Chao <chao.gao@intel.com>,
-        Robert Hoo <robert.hu@linux.intel.com>
-Subject: Re: [PATCH v7 4/8] KVM: VMX: dump_vmcs() reports
- tertiary_exec_control field as well
-Message-ID: <YkYvSHcIrhRgU93l@google.com>
+        Gao Chao <chao.gao@intel.com>
+Subject: Re: [PATCH v7 5/8] KVM: x86: Add support for vICR APIC-write
+ VM-Exits in x2APIC mode
+Message-ID: <YkY0MvAIPiISfk4u@google.com>
 References: <20220304080725.18135-1-guang.zeng@intel.com>
- <20220304080725.18135-5-guang.zeng@intel.com>
+ <20220304080725.18135-6-guang.zeng@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220304080725.18135-5-guang.zeng@intel.com>
+In-Reply-To: <20220304080725.18135-6-guang.zeng@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Nit, shortlog is funky, it'd read better as
-
-  KVM: VMX: Report tertiary_exec_control field in dump_vmcs()
-
 On Fri, Mar 04, 2022, Zeng Guang wrote:
-> From: Robert Hoo <robert.hu@linux.intel.com>
+> Upcoming Intel CPUs will support virtual x2APIC MSR writes to the vICR,
+> i.e. will trap and generate an APIC-write VM-Exit instead of intercepting
+> the WRMSR.  Add support for handling "nodecode" x2APIC writes, which
+> were previously impossible.
 > 
-> Add tertiary_exec_control field report in dump_vmcs()
-
-Please call out the shuffling of PinBased and provide a sample dump.  It's not
-mandatory to put that sort of info in the changelog, but it really does help
-reviewers, e.g. I remember discussing the shuffling and seeing the sample output,
-but other reviewers coming into this blind won't have that luxury.
-
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+> Note, x2APIC MSR writes are 64 bits wide.
+> 
 > Signed-off-by: Zeng Guang <guang.zeng@intel.com>
 > ---
->  arch/x86/kvm/vmx/vmx.c | 17 +++++++++++++----
->  1 file changed, 13 insertions(+), 4 deletions(-)
+>  arch/x86/kvm/lapic.c | 22 +++++++++++++++++++---
+>  1 file changed, 19 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 8a5713d49635..7beba7a9f247 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -5891,6 +5891,7 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  	u32 vmentry_ctl, vmexit_ctl;
->  	u32 cpu_based_exec_ctrl, pin_based_exec_ctrl, secondary_exec_control;
-> +	u64 tertiary_exec_control;
->  	unsigned long cr4;
->  	int efer_slot;
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 629c116b0d3e..22929b5b3f9b 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -67,6 +67,7 @@ static bool lapic_timer_advance_dynamic __read_mostly;
+>  #define LAPIC_TIMER_ADVANCE_NS_MAX     5000
+>  /* step-by-step approximation to mitigate fluctuation */
+>  #define LAPIC_TIMER_ADVANCE_ADJUST_STEP 8
+> +static int kvm_lapic_msr_read(struct kvm_lapic *apic, u32 reg, u64 *data);
 >  
-> @@ -5904,9 +5905,16 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
->  	cpu_based_exec_ctrl = vmcs_read32(CPU_BASED_VM_EXEC_CONTROL);
->  	pin_based_exec_ctrl = vmcs_read32(PIN_BASED_VM_EXEC_CONTROL);
->  	cr4 = vmcs_readl(GUEST_CR4);
-> -	secondary_exec_control = 0;
+>  static inline void __kvm_lapic_set_reg(char *regs, int reg_off, u32 val)
+>  {
+> @@ -2227,10 +2228,25 @@ EXPORT_SYMBOL_GPL(kvm_lapic_set_eoi);
+>  /* emulate APIC access in a trap manner */
+>  void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
+>  {
+> -	u32 val = kvm_lapic_get_reg(vcpu->arch.apic, offset);
+> +	struct kvm_lapic *apic = vcpu->arch.apic;
+> +	u64 val;
 > +
->  	if (cpu_has_secondary_exec_ctrls())
->  		secondary_exec_control = vmcs_read32(SECONDARY_VM_EXEC_CONTROL);
-> +	else
-> +		secondary_exec_control = 0;
-> +
-> +	if (cpu_has_tertiary_exec_ctrls())
-> +		tertiary_exec_control = vmcs_read64(TERTIARY_VM_EXEC_CONTROL);
-> +	else
-> +		tertiary_exec_control = 0;
+> +	if (apic_x2apic_mode(apic)) {
+> +		/*
+> +		 * When guest APIC is in x2APIC mode and IPI virtualization
+> +		 * is enabled, accessing APIC_ICR may cause trap-like VM-exit
+> +		 * on Intel hardware. Other offsets are not possible.
+> +		 */
+> +		if (WARN_ON_ONCE(offset != APIC_ICR))
+> +			return;
 >  
->  	pr_err("VMCS %p, last attempted VM-entry on CPU %d\n",
->  	       vmx->loaded_vmcs->vmcs, vcpu->arch.last_vmentry_cpu);
-> @@ -6006,9 +6014,10 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
->  		vmx_dump_msrs("host autoload", &vmx->msr_autoload.host);
+> -	/* TODO: optimize to just emulate side effect w/o one more write */
+> -	kvm_lapic_reg_write(vcpu->arch.apic, offset, val);
+> +		kvm_lapic_msr_read(apic, offset, &val);
+> +		kvm_apic_send_ipi(apic, (u32)val, (u32)(val >> 32));
+
+This needs to clear the APIC_ICR_BUSY bit.  It'd also be nice to trace this write.
+The easiest thing is to use kvm_x2apic_icr_write().  Kinda silly as it'll generate
+an extra write, but on the plus side the TODO comment doesn't have to move :-D
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index c4c3155d98db..58bf296ee313 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2230,6 +2230,7 @@ void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
+        struct kvm_lapic *apic = vcpu->arch.apic;
+        u64 val;
+
++       /* TODO: optimize to just emulate side effect w/o one more write */
+        if (apic_x2apic_mode(apic)) {
+                /*
+                 * When guest APIC is in x2APIC mode and IPI virtualization
+@@ -2240,10 +2241,9 @@ void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
+                        return;
+
+                kvm_lapic_msr_read(apic, offset, &val);
+-               kvm_apic_send_ipi(apic, (u32)val, (u32)(val >> 32));
++               kvm_x2apic_icr_write(apic, val);
+        } else {
+                val = kvm_lapic_get_reg(apic, offset);
+-               /* TODO: optimize to just emulate side effect w/o one more write */
+                kvm_lapic_reg_write(apic, offset, (u32)val);
+        }
+ }
+
+
+> +	} else {
+> +		val = kvm_lapic_get_reg(apic, offset);
+> +		/* TODO: optimize to just emulate side effect w/o one more write */
+> +		kvm_lapic_reg_write(apic, offset, (u32)val);
+> +	}
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_apic_write_nodecode);
 >  
->  	pr_err("*** Control State ***\n");
-> -	pr_err("PinBased=%08x CPUBased=%08x SecondaryExec=%08x\n",
-> -	       pin_based_exec_ctrl, cpu_based_exec_ctrl, secondary_exec_control);
-> -	pr_err("EntryControls=%08x ExitControls=%08x\n", vmentry_ctl, vmexit_ctl);
-> +	pr_err("CPUBased=0x%08x SecondaryExec=0x%08x TertiaryExec=0x%016llx\n",
-> +	       cpu_based_exec_ctrl, secondary_exec_control, tertiary_exec_control);
-> +	pr_err("PinBased=0x%08x EntryControls=%08x ExitControls=%08x\n",
-> +	       pin_based_exec_ctrl, vmentry_ctl, vmexit_ctl);
->  	pr_err("ExceptionBitmap=%08x PFECmask=%08x PFECmatch=%08x\n",
->  	       vmcs_read32(EXCEPTION_BITMAP),
->  	       vmcs_read32(PAGE_FAULT_ERROR_CODE_MASK),
 > -- 
 > 2.27.0
 > 
