@@ -2,201 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BEF614ED36B
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 07:46:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A15954ED386
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 07:53:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229997AbiCaFrm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 01:47:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33826 "EHLO
+        id S230127AbiCaFyl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 01:54:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229987AbiCaFri (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 01:47:38 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8B547044
-        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 22:45:52 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id f10so12110340plr.6
-        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 22:45:51 -0700 (PDT)
+        with ESMTP id S230108AbiCaFyk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 01:54:40 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26C6921267
+        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 22:52:54 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id cm17so3061303pjb.2
+        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 22:52:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3CahhRbHJliYCk8SCDDE9S8QhZBX4JDzO4bMq29WbPA=;
-        b=DU1PRXajt9xwfySAfcfZDJAERfhEW5QUfqxmSWYqAe8ZqnbjXoU7T2y+cgjV03qCMI
-         rOYQYaW0AmJDCDyzXzZEdGViZT3wYZxAp/nKOZ3hxuVIjfjltg5pIBj2CkhbJCRyOubT
-         skipLBveK+Sq1QT60UKZh2/thi+U/sxFIfTTPhExIDyf6+gV07F3rZT16lhchjVO5ALC
-         CFsr+AOZ7A6WKM8WQ+GCO8YM3P2JV3EeAL2zE7q6KcfBn/gno1I5TakOH2tUDCdMuFwY
-         e3yL5g6+UoCGwO9sLnXj/JAQNNtHHbr1h6/uSBNcmKM48ajuRI6gdm4Lm/M+w6fdEV2X
-         Xntw==
+        d=dabbelt-com.20210112.gappssmtp.com; s=20210112;
+        h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
+         :content-transfer-encoding;
+        bh=IBamUaj9YrgQoUbRaPWrU7o5ZQ6M8T/P4ePIRI4QM34=;
+        b=zJcpbuOej6gZTZJPWaEzzkrlN5H7zYi/tfZLPl5QcNA5MOpFxQ5bpfEpOWC19kkDIQ
+         o95XAGxPbCJuut3OL93cgHLImqrj5tQw4RnXTAxrh46dZ0trQ2lQE68dCAV1VD52ChB4
+         6j/+8K5dNuPIHOAJkt0HJCGsrMqbPmjjDRP6QCpg442u0HsCNmVYdzwXV5tmwY/md7gc
+         g2YQvbRpQu3dbCqYg4UpMe5X6DQRTBlO/f+Em8Ju1z2XRC3npyuYaPaKGsA87r+yNUfH
+         q2JhDEoe0d2ALVFSB31HCbqGy+3dAaol5DyNIvhbdvMFnUCijLm8a3WsXVccdmfXLAlw
+         6N4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3CahhRbHJliYCk8SCDDE9S8QhZBX4JDzO4bMq29WbPA=;
-        b=jk14DpM+4A7nXQkpLLCex1jm/7Ngn69l6gsDhczNkgo88X9uNJ5cabAH5Sappe4N5O
-         6ClllFx/h+dJ9AVM5uoPUqqrqQBcKv4GCGV1E1Bp0JfdFoXcfe4PzMkf8qYeS1P3bI7r
-         3gYmv5vLRIOe+3q3wp449S5ZMsJIVSD9OTky5MjhfM+TIcnhUFfGzQ1BTQ/g/JdMA84L
-         TiIWe6fABdTdsnUHgbixvpVHmqArwu3olHcR7kDhiTUGWSBNqltbpVOjYeKOolVA6r2d
-         iBVvxnOg7yMYrtBZZpS9PWHC1G49abNJZgcH0X8AFsmsajfKeAwi/wjtR0iRDxeHobO8
-         +C2A==
-X-Gm-Message-State: AOAM530ZpRzLSvqv9R36jcPGR6Okuvo72vyipnkKvbYbtN7+efxRWejt
-        XY62tPeEn3tOvSDYZP0yEV0eoYIa3IgwZhnL4gHlRnX847WNJDxj
-X-Google-Smtp-Source: ABdhPJwWSAFR9Xjp4XYSMhEU8GleXUItke2DRjJSACYT/izT484PG4Cixo6aO3WMmw4+zkFkm/aKPwA4OBzo/q5yowA=
-X-Received: by 2002:a17:902:da88:b0:156:2b13:81c5 with SMTP id
- j8-20020a170902da8800b001562b1381c5mr3690705plx.138.1648705551272; Wed, 30
- Mar 2022 22:45:51 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220329011301.1166265-1-oupton@google.com> <20220329011301.1166265-2-oupton@google.com>
-In-Reply-To: <20220329011301.1166265-2-oupton@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Wed, 30 Mar 2022 22:45:35 -0700
-Message-ID: <CAAeT=FwR_hy3kYn2SgHELWb4F9mUmRemXWxOoiF=H23q-gzEjw@mail.gmail.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: Wire up CP15 feature registers to their
- AArch64 equivalents
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+         :mime-version:content-transfer-encoding;
+        bh=IBamUaj9YrgQoUbRaPWrU7o5ZQ6M8T/P4ePIRI4QM34=;
+        b=ftiBCtWhSWUvl8VAPPjCYoO0MtXfF+LEpEH41uhxEoquwGTacNZySPX10Gb2rdPXmZ
+         sp64rDk3DCHXvtKwAsY1CEBXiEgHRSx5k1CkhyA530AVwUTmSeZVnHjHhqmw06M2NS1Q
+         Fg9AttUBpUaSdEsVNh1EjlQI9fbaSUHw/33yhJee3O+gmbV2rnyuCsgCiipp+rp+TXlV
+         WX/cF+V/9jInc0irlW3ilmOF53PbKeaZQlo/uh++iafqLMNdJdO5/27xyd/dTI7sULl5
+         N57aVP1wwcy+FCO+x3KnCJ0mOUBskG3ybb7uURI/DSFYVPS8oQmmGfQBwA/YXowpcQs+
+         rwNw==
+X-Gm-Message-State: AOAM531clfAwVQDPAfTuM8WQ/NSRC0zuKwT2oAUFUlWy48U7c+b08/8p
+        gQPwIKjhnBkt4y/hZKQ25lHDyQ==
+X-Google-Smtp-Source: ABdhPJxatwbY0eiFFqqr4kfADTBSUPWRHFUvVXS1GEzij3x70XU/UukTdZF6PlEkpcpm6uH9deBUDw==
+X-Received: by 2002:a17:902:82cc:b0:153:cc6e:fac1 with SMTP id u12-20020a17090282cc00b00153cc6efac1mr3414756plz.138.1648705973585;
+        Wed, 30 Mar 2022 22:52:53 -0700 (PDT)
+Received: from localhost (76-210-143-223.lightspeed.sntcca.sbcglobal.net. [76.210.143.223])
+        by smtp.gmail.com with ESMTPSA id p10-20020a056a0026ca00b004fb44e0cb17sm15616555pfw.116.2022.03.30.22.52.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Mar 2022 22:52:52 -0700 (PDT)
+Date:   Wed, 30 Mar 2022 22:52:52 -0700 (PDT)
+X-Google-Original-Date: Wed, 30 Mar 2022 22:52:09 PDT (-0700)
+Subject:     Re: question about arch/riscv/kvm/mmu.c
+In-Reply-To: <alpine.DEB.2.22.394.2203162205550.3177@hadrien>
+CC:     kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-riscv@lists.infradead.org
+From:   Palmer Dabbelt <palmer@dabbelt.com>
+To:     julia.lawall@inria.fr, anup@brainfault.org,
+        Atish Patra <atishp@rivosinc.com>
+Message-ID: <mhng-9835bc56-8f99-4fd6-bccc-262b642a2ccb@palmer-ri-x1c9>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Oliver,
-
-On Mon, Mar 28, 2022 at 6:13 PM Oliver Upton <oupton@google.com> wrote:
+On Wed, 16 Mar 2022 14:10:06 PDT (-0700), julia.lawall@inria.fr wrote:
+> Hello,
 >
-> KVM currently does not trap ID register accesses from an AArch32 EL1.
-> This is painful for a couple of reasons. Certain unimplemented features
-> are visible to AArch32 EL1, as we limit PMU to version 3 and the debug
-> architecture to v8.0. Additionally, we attempt to paper over
-> heterogeneous systems by using register values that are safe
-> system-wide. All this hard work is completely sidestepped because KVM
-> does not set TID3 for AArch32 guests.
+> The function kvm_riscv_stage2_map contains the code:
 >
-> Fix up handling of CP15 feature registers by simply rerouting to their
-> AArch64 aliases. Punt setting HCR_EL2.TID3 to a later change, as we need
-> to fix up the oddball CP10 feature registers still.
+> mmu_seq = kvm->mmu_notifier_seq;
 >
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 66 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 66 insertions(+)
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index dd34b5ab51d4..30771f950027 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2339,6 +2339,65 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
->         return 1;
->  }
->
-> +static int emulate_sys_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *params);
-> +
-> +/**
-> + * kvm_emulate_cp15_id_reg() - Handles an MRC trap on a guest CP15 access where
-> + *                            CRn=0, which corresponds to the AArch32 feature
-> + *                            registers.
-> + * @vcpu: the vCPU pointer
-> + * @params: the system register access parameters.
-> + *
-> + * Our cp15 system register tables do not enumerate the AArch32 feature
-> + * registers. Conveniently, our AArch64 table does, and the AArch32 system
-> + * register encoding can be trivially remapped into the AArch64 for the feature
-> + * registers: Append op0=3, leaving op1, CRn, CRm, and op2 the same.
-> + *
-> + * According to DDI0487G.b G7.3.1, paragraph "Behavior of VMSAv8-32 32-bit
-> + * System registers with (coproc=0b1111, CRn==c0)", read accesses from this
-> + * range are either UNKNOWN or RES0. Rerouting remains architectural as we
-> + * treat undefined registers in this range as RAZ.
-> + */
-> +static int kvm_emulate_cp15_id_reg(struct kvm_vcpu *vcpu,
-> +                                  struct sys_reg_params *params)
-> +{
-> +       int Rt = kvm_vcpu_sys_get_rt(vcpu);
-> +       int ret = 1;
-> +
-> +       params->Op0 = 3;
+> I noticed that in every other place in the kernel where the
+> mmu_notifier_seq field is read, there is a read barrier after it.  Is
+> there some reason why it is not necessary here?
 
-Nit: Shouldn't we restore the original Op0 after emulate_sys_reg() ?
-(unhandled_cp_access() prints Op0. Restoring the original one
- would be more robust against future changes)
+I guess that's a better question for Atish and Anup, but certainly 
+nothing jumps out at me.  There's a pretty good comment in the arm64 
+port about their barrier:
 
-> +
-> +       /*
-> +        * All registers where CRm > 3 are known to be UNKNOWN/RAZ from AArch32.
-> +        * Avoid conflicting with future expansion of AArch64 feature registers
-> +        * and simply treat them as RAZ here.
-> +        */
-> +       if (params->CRm > 3)
-> +               params->regval = 0;
-> +       else
-> +               ret = emulate_sys_reg(vcpu, params);
-> +
-> +       /* Treat impossible writes to RO registers as UNDEFINED */
-> +       if (params->is_write)
+        mmu_seq = vcpu->kvm->mmu_notifier_seq;
+        /*
+         * Ensure the read of mmu_notifier_seq happens before we call
+         * gfn_to_pfn_prot (which calls get_user_pages), so that we don't risk
+         * the page we just got a reference to gets unmapped before we have a
+         * chance to grab the mmu_lock, which ensure that if the page gets
+         * unmapped afterwards, the call to kvm_unmap_gfn will take it away
+         * from us again properly. This smp_rmb() interacts with the smp_wmb()
+         * in kvm_mmu_notifier_invalidate_<page|range_end>.
+         *
+         * Besides, __gfn_to_pfn_memslot() instead of gfn_to_pfn_prot() is
+         * used to avoid unnecessary overhead introduced to locate the memory
+         * slot because it's always fixed even @gfn is adjusted for huge pages.
+         */
+        smp_rmb();
 
-This checking can be done even before calling emulate_sys_reg().
-BTW, __access_id_reg() also injects UNDEFINED when p->is_write is true.
+I don't see anything that would invalidate that reasoning for us.  My 
+guess is that we should have a similar barrier (and coment, and maybe 
+call __gfn_to_pfn_memslot() too).  There's a handful of other 
+interesting-looking differences between the riscv and arm64 ports around 
+here that might be worth looking into as well.
 
-> +               unhandled_cp_access(vcpu, params);
-> +       else
-> +               vcpu_set_reg(vcpu, Rt, params->regval);
-> +
-> +       return ret;
-> +}
-> +
-> +/**
-> + * kvm_is_cp15_id_reg() - Returns true if the specified CP15 register is an
-> + *                       AArch32 ID register.
-> + * @params: the system register access parameters
-> + *
-> + * Note that CP15 ID registers where CRm=0 are excluded from this check, as they
-> + * are already correctly handled in the CP15 register table.
-
-I don't think this is true for all of the registers:)
-I think at least some of them are not trapped (TCMTR, TLBTR,
-REVIDR, etc), and I don't think they are handled in the CP15
-register table.
-
-Thanks,
-Reiji
-
-
-> + */
-> +static inline bool kvm_is_cp15_id_reg(struct sys_reg_params *params)
-> +{
-> +       return params->CRn == 0 && params->Op1 == 0 && params->CRm != 0;
-> +}
-> +
->  /**
->   * kvm_handle_cp_32 -- handles a mrc/mcr trap on a guest CP14/CP15 access
->   * @vcpu: The VCPU pointer
-> @@ -2360,6 +2419,13 @@ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
->         params.Op1 = (esr >> 14) & 0x7;
->         params.Op2 = (esr >> 17) & 0x7;
->
-> +       /*
-> +        * Certain AArch32 ID registers are handled by rerouting to the AArch64
-> +        * system register table.
-> +        */
-> +       if (ESR_ELx_EC(esr) == ESR_ELx_EC_CP15_32 && kvm_is_cp15_id_reg(&params))
-> +               return kvm_emulate_cp15_id_reg(vcpu, &params);
-> +
->         if (!emulate_cp(vcpu, &params, global, nr_global)) {
->                 if (!params.is_write)
->                         vcpu_set_reg(vcpu, Rt, params.regval);
-> --
-> 2.35.1.1021.g381101b075-goog
->
+Might also be worth updating that comment to indicate that the actual 
+wmb() is in kvm_dec_notifier_count()?  Also, to make it sound less like 
+arm64 is calling gfn_to_pfn_prot()...
