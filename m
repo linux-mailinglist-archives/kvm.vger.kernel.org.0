@@ -2,72 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 969344EDD7E
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 17:41:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 471C94EDDA1
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 17:43:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239160AbiCaPk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 11:40:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50710 "EHLO
+        id S237662AbiCaPoW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 11:44:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240262AbiCaPjM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 11:39:12 -0400
-Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DF7B1C8867
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 08:34:11 -0700 (PDT)
-Received: by mail-io1-xd2f.google.com with SMTP id x4so29019630iop.7
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 08:34:11 -0700 (PDT)
+        with ESMTP id S239246AbiCaPmh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 11:42:37 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 915A5C625F
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 08:37:30 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id p8so22418631pfh.8
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 08:37:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=R6qVglK0FzawAXT0u5ibNFLRdw4AR1UKBBbJVmhDGmw=;
-        b=f12ZZUEl0m4XNN/vangV6Vr6v1IK2xC1y0f78ppu9bR4Qtu/4hbU7bfXFE6KbOoArQ
-         +Mm0CuHBUdpXPTNte/WciKsKtHgb6w+Hj+7531DSKyEuvGGCRxUa+JKZv8FYwExwaG5X
-         9ZPcXpqz9u1Y1KlPXSrsSFFR/YsngCCQzH9SC6PtB/ojuebV9c6LWk7VuM8qGbezBpM4
-         XTv24iderEEW7syCge5Ihsvd+7Yr7pW2qpVV012o84iZ2D70X9Z6Wo/AyI5l13sOBDjP
-         U0e0CqEyG8AO+aIRBSEyHHBdDO56V5rtfM9k+VWIAw0Bz+a3GBH18zLypYweYyUrXnrM
-         Tq2w==
+        bh=Kj2SlYQeTe0c/VZuVzdXe4XjfgpJ1WwXsE5TNwFDkEM=;
+        b=IjMlm+tdzexEH6QTNCon1We60FdSxrq/q2yHIIyjhtEKcFifzdOfMnZEr1zULpHttT
+         TKc89m8TBFHmEYNTj8zi4SSYo+++rxoB4sw2sMcGD3kb8F6OOAcgI2sSa0y+kiElWXNg
+         QDj8LbHd7bj5QawsFS0w6DjSrWIoO7gt3/zg2lE0ialvNJu7r4q+aJxCor4Qdcfj1/lm
+         hrrg9hSaQtqfpv5cN2/ml4OOTonNVwmLMeb4W1cGFxK+vaaX8tn8XXDySP8n6ACvS1aK
+         opGAhvtNDmLK2av4iREFMPlQxLHs6XoTtmO3Q8zM2VN/WJZwe3zMtqg/V8TRBAtTkEft
+         PeuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=R6qVglK0FzawAXT0u5ibNFLRdw4AR1UKBBbJVmhDGmw=;
-        b=AF6FsFz2zia0cJH5iFSngacWabuYXIKvVUT62yM2xRjGLHIGPJfrPa7Cq1T6+JPudj
-         rm1H9P9a1GT97oUBhczoZLDEj3nSqvr6cT2dUWibYQuSn1AWm1yh+sU71DJqhiBAt/R8
-         OWmOy/Qt6UC0lQ+w6IIGPFRwCkPxvTZodmUK2LV6z/0WQYMtKYreuzGnYRlUJNSNmKr2
-         DrX8B3iYs1HYznzYQUpQmeCrtFggX1V374E+3cKE2ah8zpPMNyoFOG19hpZvjDDkK5OD
-         GKfaC5GctgweTjgIa65xe97OZG1nw4Mc/Ikz/d+z9zytlyzg9ZLDPmG74gp/ovJVLOe2
-         sbPw==
-X-Gm-Message-State: AOAM530m706AMgXSz9r2jD4oRMVb+ScNxzP+CWz42YefXDr+fsh4mpyB
-        fP1WeBL+LA435OUksjLpY1a2FA==
-X-Google-Smtp-Source: ABdhPJyDekBrm8Mb4uDZ8bLm4Yo7RYoSABckPoxXi5s6USil5NnmuontTT10XVUc64Tr+EazrPyeFA==
-X-Received: by 2002:a02:aa0b:0:b0:317:c63a:6625 with SMTP id r11-20020a02aa0b000000b00317c63a6625mr3224223jam.222.1648740848931;
-        Thu, 31 Mar 2022 08:34:08 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id j9-20020a926e09000000b002c9f3388cd4sm1732964ilc.21.2022.03.31.08.34.08
+        bh=Kj2SlYQeTe0c/VZuVzdXe4XjfgpJ1WwXsE5TNwFDkEM=;
+        b=kPwqAV+YmHbTLalXJrkBjMO28UPNZLe+JtqS6FAj56NhFakpkWSG9xJayNvvZTmoA2
+         P94xMvMv/UL5/N5YtFyBT0qD05uK8ZW+BIxofzNp40IK1szTRWc718FhVcQfCIy84oTA
+         zIyOrCWZXxxdcA04H/dH/ffA0RL1R6bDJ6y/euhjB8PVuc8SSTT9mfhzBzk7rHPEm6jH
+         nagrbB3fd6sV/SlGwt2Zv6VFdqzK4VHDFPHdPkhK+O732DQJVqDEJ9uYOsJMyhdU2EdC
+         vz9NHge6usyvR8+r/RroqV7ZPkMbGWrEZlaVuFGRrtUy6gl9mTvp2uawkVPaCmOUC9g6
+         KCTw==
+X-Gm-Message-State: AOAM533Gr74VyzWRgSX9jsXW3Km7AyncUa+zTENljJ/4gPKIkKhzDZWK
+        lHZLOXgiaOXRu8ixoG1+hT3qJQ==
+X-Google-Smtp-Source: ABdhPJyzlveTa0/9WEU5iVzJxjWSfEaJ0Sg7Dj9XtakZXWY9//LXk4rW62HCko9WXHK7xjdxynKHMA==
+X-Received: by 2002:a63:5b63:0:b0:378:5645:90f6 with SMTP id l35-20020a635b63000000b00378564590f6mr11234181pgm.505.1648741048579;
+        Thu, 31 Mar 2022 08:37:28 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id l6-20020a17090a660600b001c985b0cb53sm10209446pjj.26.2022.03.31.08.37.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Mar 2022 08:34:08 -0700 (PDT)
-Date:   Thu, 31 Mar 2022 15:34:04 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: Wire up CP15 feature registers to their
- AArch64 equivalents
-Message-ID: <YkXJ7JyycOZyo+Ry@google.com>
-References: <20220329011301.1166265-1-oupton@google.com>
- <20220329011301.1166265-2-oupton@google.com>
- <CAAeT=FwR_hy3kYn2SgHELWb4F9mUmRemXWxOoiF=H23q-gzEjw@mail.gmail.com>
+        Thu, 31 Mar 2022 08:37:27 -0700 (PDT)
+Date:   Thu, 31 Mar 2022 15:37:24 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v3 1/3] KVM: Implement dirty quota-based throttling of
+ vcpus
+Message-ID: <YkXKtC8PCfIUMs8D@google.com>
+References: <20220306220849.215358-1-shivam.kumar1@nutanix.com>
+ <20220306220849.215358-2-shivam.kumar1@nutanix.com>
+ <YkT1kzWidaRFdQQh@google.com>
+ <72d72639-bd81-e957-9a7b-aecd2e855b66@nutanix.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAAeT=FwR_hy3kYn2SgHELWb4F9mUmRemXWxOoiF=H23q-gzEjw@mail.gmail.com>
+In-Reply-To: <72d72639-bd81-e957-9a7b-aecd2e855b66@nutanix.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -79,113 +76,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
+On Thu, Mar 31, 2022, Shivam Kumar wrote:
+> > > +	if (!dirty_quota || (pages_dirtied < dirty_quota))
+> > > +		return 1;
+> > I don't love returning 0/1 from a function that suggests it returns a bool, but
+> > I do agree it's better than actually returning a bool.  I also don't have a better
+> > name, so I'm just whining in the hope that Paolo or someone else has an idea :-)
+> I've seen plenty of check functions returning 0/1 but please do let me know
+> if there's a convention to use a bool in such scenarios.
 
-On Wed, Mar 30, 2022 at 10:45:35PM -0700, Reiji Watanabe wrote:
-> Hi Oliver,
-> 
-> On Mon, Mar 28, 2022 at 6:13 PM Oliver Upton <oupton@google.com> wrote:
-> >
-> > KVM currently does not trap ID register accesses from an AArch32 EL1.
-> > This is painful for a couple of reasons. Certain unimplemented features
-> > are visible to AArch32 EL1, as we limit PMU to version 3 and the debug
-> > architecture to v8.0. Additionally, we attempt to paper over
-> > heterogeneous systems by using register values that are safe
-> > system-wide. All this hard work is completely sidestepped because KVM
-> > does not set TID3 for AArch32 guests.
-> >
-> > Fix up handling of CP15 feature registers by simply rerouting to their
-> > AArch64 aliases. Punt setting HCR_EL2.TID3 to a later change, as we need
-> > to fix up the oddball CP10 feature registers still.
-> >
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> >  arch/arm64/kvm/sys_regs.c | 66 +++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 66 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index dd34b5ab51d4..30771f950027 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -2339,6 +2339,65 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
-> >         return 1;
-> >  }
-> >
-> > +static int emulate_sys_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *params);
-> > +
-> > +/**
-> > + * kvm_emulate_cp15_id_reg() - Handles an MRC trap on a guest CP15 access where
-> > + *                            CRn=0, which corresponds to the AArch32 feature
-> > + *                            registers.
-> > + * @vcpu: the vCPU pointer
-> > + * @params: the system register access parameters.
-> > + *
-> > + * Our cp15 system register tables do not enumerate the AArch32 feature
-> > + * registers. Conveniently, our AArch64 table does, and the AArch32 system
-> > + * register encoding can be trivially remapped into the AArch64 for the feature
-> > + * registers: Append op0=3, leaving op1, CRn, CRm, and op2 the same.
-> > + *
-> > + * According to DDI0487G.b G7.3.1, paragraph "Behavior of VMSAv8-32 32-bit
-> > + * System registers with (coproc=0b1111, CRn==c0)", read accesses from this
-> > + * range are either UNKNOWN or RES0. Rerouting remains architectural as we
-> > + * treat undefined registers in this range as RAZ.
-> > + */
-> > +static int kvm_emulate_cp15_id_reg(struct kvm_vcpu *vcpu,
-> > +                                  struct sys_reg_params *params)
-> > +{
-> > +       int Rt = kvm_vcpu_sys_get_rt(vcpu);
-> > +       int ret = 1;
-> > +
-> > +       params->Op0 = 3;
-> 
-> Nit: Shouldn't we restore the original Op0 after emulate_sys_reg() ?
-> (unhandled_cp_access() prints Op0. Restoring the original one
->  would be more robust against future changes)
-> 
-> > +
-> > +       /*
-> > +        * All registers where CRm > 3 are known to be UNKNOWN/RAZ from AArch32.
-> > +        * Avoid conflicting with future expansion of AArch64 feature registers
-> > +        * and simply treat them as RAZ here.
-> > +        */
-> > +       if (params->CRm > 3)
-> > +               params->regval = 0;
-> > +       else
-> > +               ret = emulate_sys_reg(vcpu, params);
-> > +
-> > +       /* Treat impossible writes to RO registers as UNDEFINED */
-> > +       if (params->is_write)
-> 
-> This checking can be done even before calling emulate_sys_reg().
-> BTW, __access_id_reg() also injects UNDEFINED when p->is_write is true.
-> 
-> > +               unhandled_cp_access(vcpu, params);
-> > +       else
-> > +               vcpu_set_reg(vcpu, Rt, params->regval);
-> > +
-> > +       return ret;
-> > +}
-> > +
-> > +/**
-> > + * kvm_is_cp15_id_reg() - Returns true if the specified CP15 register is an
-> > + *                       AArch32 ID register.
-> > + * @params: the system register access parameters
-> > + *
-> > + * Note that CP15 ID registers where CRm=0 are excluded from this check, as they
-> > + * are already correctly handled in the CP15 register table.
-> 
-> I don't think this is true for all of the registers:)
-> I think at least some of them are not trapped (TCMTR, TLBTR,
-> REVIDR, etc), and I don't think they are handled in the CP15
-> register table.
+The preferred style for KVM is to return a bool for helpers that are obviously
+testing something, e.g. functions with names is "is_valid", "check_request", etc...
+But we also very strongly prefer not returning bools from functions that have
+side effects or can fail, i.e. don't use a bool to indicate success.
 
-Thanks for the review! This patch was a bit sloppy and indeed skipped a
-few steps in the comments. I believe the only register in CRm=0 that is
-trapped is actually CTR, hence the others are not present in the table.
+KVM has a third, gross use case of 0/1, where 0 means "exit to userspace" and 1
+means "re-enter the guest".  Unfortunately, it's so ubiquitous that replacing it
+with a proper enum is all but guaranteed to introduce bugs, and the 0/1 behavior
+allows KVM to do things liek "if (!some_function())".
 
-I'll send out a v2 soon that addresses your feedback and the other
-embarrasing omissions on my end :)
-
---
-Thanks,
-Oliver
+This helper falls into this last category of KVM's special 0/1 handling.  The
+reason I don't love the name is the "check" part, which also puts it into "this
+is a check helper".  But returning a bool would be even worse because the helper
+does more than just check the quota, it also fills in the exit reason.
