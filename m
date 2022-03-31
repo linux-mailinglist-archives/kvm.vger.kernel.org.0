@@ -2,93 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34F4C4EDCBC
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 17:24:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 192AD4EDCBE
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 17:24:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238170AbiCaP0X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 11:26:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49298 "EHLO
+        id S238227AbiCaP0b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 11:26:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238229AbiCaP0U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 11:26:20 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D5611BBF4D;
-        Thu, 31 Mar 2022 08:24:33 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22VFKSca027182;
-        Thu, 31 Mar 2022 15:24:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=VmegGJMxnxdekIkx+TpYi7vCIOW0KjPHiOTcknUYv6M=;
- b=AaEPXlIwl8gFXFyjbaA9QJvLt+2L3jC00m0JDoKAGfOxMKNv8ORDj6jDq0nFYtTCNTFq
- BYOKuM1lKpS4KEpFxCAYetpp2WQLRGfmgWqNfsrAHF/X9xX7l9y97IE6S19LcU6j6NH3
- dEN3Uwn1EUmrwLrTgjdZIk55eGIWkc4AYun8eUCvP8a5q0NUInyjjEtRGCG+8bI9INXd
- fPUMsnlUGVvd2J1gXRdT9tLgSkt4+YC+irlOvOW7Zde5uwFF6mSrzDYNRJJ0lHplput3
- x6+Pp2k5NAKBPVHC8BXB10yUQYXoCBpO2sux/mSGKSjxMoCaxIyLxBE61zf3Fi1CiLe9 ZA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f54epp6ft-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 31 Mar 2022 15:24:32 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22VF93S3024125;
-        Thu, 31 Mar 2022 15:24:32 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f54epp6f1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 31 Mar 2022 15:24:32 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22VFDbUk002688;
-        Thu, 31 Mar 2022 15:24:30 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 3f3rs3p2qq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 31 Mar 2022 15:24:30 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22VFORRZ44958032
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 31 Mar 2022 15:24:27 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F1E0E11C04A;
-        Thu, 31 Mar 2022 15:24:26 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 86FEF11C04C;
-        Thu, 31 Mar 2022 15:24:26 +0000 (GMT)
-Received: from [9.145.159.108] (unknown [9.145.159.108])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 31 Mar 2022 15:24:26 +0000 (GMT)
-Message-ID: <3026196e-7a6f-307b-cf83-cd362ef804f1@linux.ibm.com>
-Date:   Thu, 31 Mar 2022 17:24:26 +0200
+        with ESMTP id S238219AbiCaP0a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 11:26:30 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0064C1BBF42
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 08:24:42 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id n18so23708671plg.5
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 08:24:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=xRax+JRUfYO5DmaeRq6LU0yH9RYNMUvPwNZPXC45DeI=;
+        b=axWqP3J2Tn3FyohgJvAMgcKuw2VAsX032WLRPxNDpq1k+k8zd+dzMwtxp9z3UhLS2B
+         tXkY9NaxYMwrepn9gU8G0lIK10VxIinXGrt4HwfwbH76IBZMJ2OtYJsHnATuD5lVREqm
+         wPiPAHSH58NTnqIiuARkzYjBv2kNNAqBpZkcY6gvHy5kJxRRWBRjt6JvjHcziVt1OiAu
+         I7FOQoJzyyxwMNsGDI4HIUoPpTe02Jl+CX6M4zgQTmNI1kcGKk60C/X01j/SxUxtM4lH
+         AUK7IrpxYcioeZnWaY6KyoATVY0s+viW4wOMLUhG2BjNgiYdS0B4TzuDqy2kKIr7fgR2
+         Q0jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xRax+JRUfYO5DmaeRq6LU0yH9RYNMUvPwNZPXC45DeI=;
+        b=JwF8Sj0f+ZHNAB3tW3uOz8ES6DXJbnABImDR9MzbmayYq+tfavrj99hiPiTH14WOL0
+         A4FiIoLKF6e6Ae3QQ4jADqfdvkXoSSLNxv8ctUPMyuqdDZiwcvD+o0sxFL6WCIytbMIG
+         drMoPdQ83jxDivnGnF5cGuDq/FDmtGrPxOLsg4monwgKg603D7twv1U6T4fxJ5rMTx0O
+         dBUzBtgbng9pRYWNgnyIhmyf8v0iFbCVMyaRr2J8yJt1iVqxGBDptzggPUGtw7zvNx5M
+         gjhR7JATnhj4S9HXEpL/b1wzc5SGdjqXHhol2gFgC0ejYKcMESxoUi0elNkp0QNL+Djj
+         Ct1g==
+X-Gm-Message-State: AOAM532C6oOU6z5AmyPwejyQ9uYqHBgUWhv+FL3T6a23vbEHfhhcQACE
+        8L/a4VjcfXYLceSoV64Z114m0g==
+X-Google-Smtp-Source: ABdhPJxuH5sSVTfs126h4p10bpad3L+gGPpheZfesg4n//Y7LJqdh1pg3PY170yBt4myJ1/EBGyW2A==
+X-Received: by 2002:a17:902:cf08:b0:151:9d28:f46f with SMTP id i8-20020a170902cf0800b001519d28f46fmr5815317plg.53.1648740282071;
+        Thu, 31 Mar 2022 08:24:42 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id k6-20020a056a00134600b004faba67f9d4sm29282336pfu.197.2022.03.31.08.24.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Mar 2022 08:24:41 -0700 (PDT)
+Date:   Thu, 31 Mar 2022 15:24:37 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v3 2/3] KVM: Documentation: Update kvm_run structure for
+ dirty quota
+Message-ID: <YkXHtc2MiwUxpMFU@google.com>
+References: <20220306220849.215358-1-shivam.kumar1@nutanix.com>
+ <20220306220849.215358-3-shivam.kumar1@nutanix.com>
+ <YkT4bvK+tbsVDAvt@google.com>
+ <ae21aee2-41e1-3ad3-41ef-edda67a8449a@nutanix.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [kvm-unit-tests PATCH v1 4/4] lib: s390x: stidp wrapper and move
- get_machine_id
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, scgl@linux.ibm.com,
-        borntraeger@de.ibm.com, pmorel@linux.ibm.com, pasic@linux.ibm.com,
-        nrb@linux.ibm.com, thuth@redhat.com, david@redhat.com
-References: <20220330144339.261419-1-imbrenda@linux.ibm.com>
- <20220330144339.261419-5-imbrenda@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220330144339.261419-5-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: f5sFbVgendPWGBGYm7ZLquYrwRD-zx9k
-X-Proofpoint-ORIG-GUID: 2pEnBbq4f9rPxIZh1kZ3iJGzmwBr2Uin
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-31_05,2022-03-31_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- suspectscore=0 clxscore=1015 mlxlogscore=999 lowpriorityscore=0
- spamscore=0 impostorscore=0 priorityscore=1501 phishscore=0 malwarescore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203310084
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ae21aee2-41e1-3ad3-41ef-edda67a8449a@nutanix.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -96,52 +76,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/30/22 16:43, Claudio Imbrenda wrote:
-> Refactor get_machine_id in arch_def.h into a simple wrapper around
-> stidp, add back get_machine_id in hardware.h using the stidp wrapper.
+On Thu, Mar 31, 2022, Shivam Kumar wrote:
 > 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> On 31/03/22 6:10 am, Sean Christopherson wrote:
+> > On Sun, Mar 06, 2022, Shivam Kumar wrote:
+> > > Update the kvm_run structure with a brief description of dirty
+> > > quota members and how dirty quota throttling works.
+> > This should be squashed with patch 1.  I actually had to look ahead to this patch
+> > because I forgot the details since I last reviewed this :-)
+> Ack. Thanks.
+> > > +	__u64 dirty_quota;
+> > > +Please note that this quota cannot be strictly enforced if PML is enabled, and
+> > > +the VCPU may end up dirtying pages more than its quota. The difference however
+> > > +is bounded by the PML buffer size.
+> > If you want to be pedantic, I doubt KVM can strictly enforce the quota even if PML
+> > is disabled.  E.g. I can all but guarantee that it's possible to dirty multiple
+> > pages during a single exit.  Probably also worth spelling out PML and genericizing
+> > things.  Maybe
+> > 
+> >    Please note that enforcing the quota is best effort, as the guest may dirty
+> >    multiple pages before KVM can recheck the quota.  However, unless KVM is using
+> >    a hardware-based dirty ring buffer, e.g. Intel's Page Modification Logging,
+> >    KVM will detect quota exhaustion within a handful of dirtied page.  If a
+> >    hardware ring buffer is used, the overrun is bounded by the size of the buffer
+> >    (512 entries for PML).
+> Thank you for the blurb. Looks good to me, though I'm curious about the exits
+> that can dirty multiple pages.
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Anything that touches multiple pages.  nested_mark_vmcs12_pages_dirty() is an
+easy example.  Emulating L2 with nested TDP.  An emulated instruction that splits
+a page.  I'm pretty sure FNAME(sync_page) could dirty an entire page worth of
+SPTEs, and that's waaay too deep to bail from.
 
-> ---
->   lib/s390x/asm/arch_def.h | 4 +---
->   lib/s390x/hardware.h     | 5 +++++
->   2 files changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index 8d860ccf..bab3c374 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -219,13 +219,11 @@ static inline unsigned short stap(void)
->   	return cpu_address;
->   }
->   
-> -static inline uint16_t get_machine_id(void)
-> +static inline uint64_t stidp(void)
->   {
->   	uint64_t cpuid;
->   
->   	asm volatile("stidp %0" : "=Q" (cpuid));
-> -	cpuid = cpuid >> 16;
-> -	cpuid &= 0xffff;
->   
->   	return cpuid;
->   }
-> diff --git a/lib/s390x/hardware.h b/lib/s390x/hardware.h
-> index fb6565ad..8783ae9c 100644
-> --- a/lib/s390x/hardware.h
-> +++ b/lib/s390x/hardware.h
-> @@ -43,6 +43,11 @@ enum s390_host {
->   
->   enum s390_host detect_host(void);
->   
-> +static inline uint16_t get_machine_id(void)
-> +{
-> +	return stidp() >> 16;
-> +}
-> +
->   static inline bool host_is_tcg(void)
->   {
->   	return detect_host() == HOST_IS_TCG;
+Oof, loking at sync_page(), that's a bug in patch 1.  make_spte() guards the call
+to mark_page_dirty_in_slot() with kvm_slot_dirty_track_enabled(), which means it
+won't honor the dirty quota unless dirty logging is enabled.  Probably not an issue
+for the intended use case, but it'll result in wrong stats, and technically the
+dirty quota can be enabled without dirty logging being enabled.
 
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 4739b53c9734..df0349be388b 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -182,7 +182,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+                  "spte = 0x%llx, level = %d, rsvd bits = 0x%llx", spte, level,
+                  get_rsvd_bits(&vcpu->arch.mmu->shadow_zero_check, spte, level));
+
+-       if ((spte & PT_WRITABLE_MASK) && kvm_slot_dirty_track_enabled(slot)) {
++       if (spte & PT_WRITABLE_MASK) {
+                /* Enforced by kvm_mmu_hugepage_adjust. */
+                WARN_ON(level > PG_LEVEL_4K);
+                mark_page_dirty_in_slot(vcpu->kvm, slot, gfn);
+
+
+And thinking more about silly edge cases, VMX's big emulation loop for invalid
+guest state when unrestricted guest is disabled should probably explicitly check
+the dirty quota.  Again, I doubt it matters to anyone's use case, but it is treated
+as a full run loop for things like pending signals, it'd be good to be consistent.
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 84a7500cd80c..5e1ae373634c 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5511,6 +5511,9 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
+                 */
+                if (__xfer_to_guest_mode_work_pending())
+                        return 1;
++
++               if (!kvm_vcpu_check_dirty_quota(vcpu))
++                       return 0;
+        }
+
+        return 1;
