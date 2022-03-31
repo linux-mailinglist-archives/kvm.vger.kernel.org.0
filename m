@@ -2,119 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D0024EDC19
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 16:51:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F0124EDC37
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 16:58:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233001AbiCaOw5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 10:52:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37196 "EHLO
+        id S237904AbiCaPAm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 11:00:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237842AbiCaOwz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 10:52:55 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0798756407
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 07:51:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1648738267; x=1680274267;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=IdPVgYv7jMZxTmW8cgKoipO58BY+gpsYPjK9ZurKhEw=;
-  b=XMWLrNN+m9BuhpU3KgmuRqQIttKKwZlS0rFGRSqrL7stkvf0i/82w7WQ
-   /5DHw/WjhlEkUnf3a9kO53QA1Lt1vZY5/g73aM0sTXnoD6/fmn8DhBSZj
-   Q9MWhMZsG3GHhODSfdUJXej0Pq3wHxqU/wYmWs+jLHeCA9cr0pvqqmzAQ
-   XfQNRIgtEOBqMSq0Wx/6exi1xapg37H9lqrzMEPsvlmDE9cFm3Bowm/gI
-   VDf7oNIRlBq55IF5eCzkWxZDdgIj420P1TCjO5OhcOaKfrHwYH8WBf4ZJ
-   c6L3fUHkxe6F34fu8woHM0aJuv8NQkLEjoI+K1p35xOfS/g3f/N82U3FR
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10302"; a="323032784"
-X-IronPort-AV: E=Sophos;i="5.90,225,1643702400"; 
-   d="scan'208";a="323032784"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2022 07:51:06 -0700
-X-IronPort-AV: E=Sophos;i="5.90,225,1643702400"; 
-   d="scan'208";a="547364693"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.193.1]) ([10.249.193.1])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2022 07:51:02 -0700
-Message-ID: <714b7d35-911c-ba68-22a9-86b9edb6fe47@intel.com>
-Date:   Thu, 31 Mar 2022 22:50:59 +0800
+        with ESMTP id S233106AbiCaPAk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 11:00:40 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2D8863EF;
+        Thu, 31 Mar 2022 07:58:51 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22VDhCvg020539;
+        Thu, 31 Mar 2022 14:58:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=P/bWkEzNAuR8D0WyyUpvSeADrnecs9ubvYP2wSEfCZQ=;
+ b=gQiRY4bTaRa+TCnugQuY4OO8rMysN63EH9EL9QN/zU6t5Vlv+9k2AwpG+5mNTaA4Ayuw
+ ztO61548SPIxlQ+f35KIoi2eZO0l+rAILgbTDsK0B7JXemot82YgE3iEOMxmJjtrHwHd
+ SxcJgCZYlM1eMhN3BOLfNJR80uTjfnczs4KEHnC/o8DFOZA+rlZZACyKQwA8p2ktkABz
+ +W2XgLpKZnz+fgKIn5B6F3AUWXKGWeeB5Bv6VTy/8gDcl10pb9c69fa9L2u9Tmii6UNN
+ A1rrYc5rare3yph6wcNhmRXnqSOlTbzNp5YsYvThwy/UGacZXN+iPbX8o+SBjn4lC0AN tg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f562rupe1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 31 Mar 2022 14:58:51 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22VEJFPv025672;
+        Thu, 31 Mar 2022 14:58:51 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f562rupd3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 31 Mar 2022 14:58:50 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22VErQHj006518;
+        Thu, 31 Mar 2022 14:58:47 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04fra.de.ibm.com with ESMTP id 3f1tf91cgq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 31 Mar 2022 14:58:47 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22VEwjhi40567184
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 31 Mar 2022 14:58:45 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 43B76A404D;
+        Thu, 31 Mar 2022 14:58:45 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DA728A4040;
+        Thu, 31 Mar 2022 14:58:44 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.13.95])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 31 Mar 2022 14:58:44 +0000 (GMT)
+Date:   Thu, 31 Mar 2022 16:58:42 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
+        thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH] s390x: snippets: c: Load initial cr0
+Message-ID: <20220331165842.4e79083f@p-imbrenda>
+In-Reply-To: <20220331125515.1941-1-frankja@linux.ibm.com>
+References: <20220331125515.1941-1-frankja@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.6.1
-Subject: Re: [RFC PATCH v3 17/36] pflash_cfi01/tdx: Introduce ram_mode of
- pflash for TDVF
-Content-Language: en-US
-To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= 
-        <philippe.mathieu.daude@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, isaku.yamahata@intel.com,
-        erdemaktas@google.com, kvm@vger.kernel.org, qemu-devel@nongnu.org,
-        seanjc@google.com
-References: <20220317135913.2166202-1-xiaoyao.li@intel.com>
- <20220317135913.2166202-18-xiaoyao.li@intel.com>
- <f418548e-c24c-1bc3-4e16-d7a775298a18@gmail.com>
- <7a8233e4-0cae-b05a-7931-695a7ee87fc9@intel.com>
- <YjmWhMVx80/BFY8z@redhat.com>
- <1d5b0192-75ef-49ad-dc47-cfc0c3c63455@intel.com>
- <YkVtuRNherKV1kJC@redhat.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <YkVtuRNherKV1kJC@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: bB6R-HGN_dDbOmVQEdCTVAPeI3mzmvr4
+X-Proofpoint-ORIG-GUID: MpcO96DEMg-4otgdv8axbOx15jYZPxgD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-31_05,2022-03-31_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 adultscore=0 mlxlogscore=999 impostorscore=0 malwarescore=0
+ priorityscore=1501 clxscore=1015 mlxscore=0 spamscore=0 suspectscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203310081
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/31/2022 5:00 PM, Daniel P. Berrangé wrote:
-> On Thu, Mar 31, 2022 at 04:51:27PM +0800, Xiaoyao Li wrote:
->> On 3/22/2022 5:27 PM, Daniel P. Berrangé wrote:
->> ...
->>> IMHO the AmdSev build for OVMF gets this right by entirely disabling
->>> the split OVMF_CODE.fd vs OVMF_VARS.fd, and just having a single
->>> OVMF.fd file that is exposed read-only to the guest.
->>>
->>> This is further represented in $QEMU.git/docs/interop/firmware.json
->>> by marking the firmware as 'stateless', which apps like libvirt will
->>> use to figure out what QEMU command line to pick.
->>
->> Hi Daniel,
->>
->> I don't play with AMD SEV and I'm not sure if AMD SEV requires only single
->> OVMF.fd. But IIUC, from edk2
->>
->> commit 437eb3f7a8db ("OvmfPkg/QemuFlashFvbServicesRuntimeDxe: Bypass flash
->> detection with SEV-ES")
->>
->> , AMD SEV(-ES) does support NVRAM via proactive VMGEXIT MMIO
->> QemuFlashWrite(). If so, AMD SEV seems to be able to support split OVMF,
->> right?
-> 
-> Note that while the traditional OvmfPkg build can be used with
-> SEV/SEV-ES, this is not viable for measured boot, as it uses
-> the NVRAM whose content is not measured.
-> 
-> I was specifically referring to the OvmfPkg/AmdSev build which
-> doesn't use seprate NVRAM, and has no variables persistence.
+On Thu, 31 Mar 2022 12:55:15 +0000
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-Thanks for the info. It seems I need to learn more about those. It would 
-be very appreciated if you can provide me some links.
+> As soon as we use C we need to set the AFP bit in cr0 so we can use
+> all fprs.
+> 
 
-> With regards,
-> Daniel
+seems like a good idea
+
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> ---
+>  s390x/snippets/c/cstart.S | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/s390x/snippets/c/cstart.S b/s390x/snippets/c/cstart.S
+> index aaa5380c..a7d4cd42 100644
+> --- a/s390x/snippets/c/cstart.S
+> +++ b/s390x/snippets/c/cstart.S
+> @@ -12,6 +12,8 @@
+>  .section .init
+>  	.globl start
+>  start:
+> +	larl	%r1, initial_cr0
+> +	lctlg	%c0, %c0, 0(%r1)
+>  	/* XOR all registers with themselves to clear them fully. */
+>  	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+>  	xgr \i,\i
+> @@ -34,3 +36,7 @@ exit:
+>  	/* For now let's only use cpu 0 in snippets so this will always work. */
+>  	xgr	%r0, %r0
+>  	sigp    %r2, %r0, SIGP_STOP
+> +
+> +initial_cr0:
+> +	/* enable AFP-register control, so FP regs (+BFP instr) can be used */
+> +	.quad	0x0000000000040000
 
