@@ -2,69 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D43674ED098
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 02:03:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96E2D4ED0DD
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 02:30:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349269AbiCaAFN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Mar 2022 20:05:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34326 "EHLO
+        id S1352101AbiCaA34 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Mar 2022 20:29:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231937AbiCaAFK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Mar 2022 20:05:10 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CA3DB22
-        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 17:03:20 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id l4-20020a17090a49c400b001c6840df4a3so1927941pjm.0
-        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 17:03:20 -0700 (PDT)
+        with ESMTP id S1352100AbiCaA3z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Mar 2022 20:29:55 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B012C58384
+        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 17:28:08 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id a16-20020a17090a6d9000b001c7d6c1bb13so1929916pjk.4
+        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 17:28:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=eK3xgJsSbOj4248lrzJGbFEJ5CxyDIG0aIJkQ/5Fx3I=;
-        b=hjmOY7ws3z6W+WChFER7xW75B/O15SGRzs2GdsWRKER/RGDhs2J3uNG0K+gFINWJ0u
-         9eLaS7137Hc12CYSRt2eD0A+htyallhS2P+eh7M7C8a396pvzpEZYKqD9R6+9cvHNcCj
-         LG1wyJp288R7FfwIJsgdlrVSFKb1yk6ydvElVx+O/e/x4DTV8Q3yg76CG1qYzc95mlA4
-         YpTONsqY9K4aDKA8aKYIxaJ6cmKiX6qm9GnPQPCwRHya1xvVrxTtCpYtUxZIutHRf9Nc
-         B31bT/0tDe2j1rx7JLP43kUtpg68prkawVNJomrpgChAhndEv7sGJNrcm9KbrBo/ogjn
-         4CHg==
+        bh=4KxLvW7jjIybeb3cb51oidI26m8u1r4MTPlLIFj4yWo=;
+        b=gBrc5FvQly/ELprjauhKTtCoYDXz2w5QaCqj5p/wwAU74N+Kq1bQtWjNREFAMG+L8z
+         /q8uGZPFwFR+/+BpwEqvxARtrBab0iM7JEb3zI3XT7wVF9La3tlxoH/Mmxy1VESsWoot
+         AHh2TYudfQQW+nfMKLxeG5nMbg8eb1WL4zoDkZ1Brt+M3TDc3a+ZtqS9IzkJD8qjt8iq
+         mBhN/gaeGsrtNWjO+/qiGdZS2Rnnd3YzXBnzg7vT0+3psBbsk1nbotNVCdBoPc6mSPW3
+         QBlfGgFwUekwh7jpn6WYHklwF+HArTZhtJ+mKu+MejJRISO8E00PSrRDF9J2uWbvwBOC
+         EeMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=eK3xgJsSbOj4248lrzJGbFEJ5CxyDIG0aIJkQ/5Fx3I=;
-        b=vpYZo73tSIVlzhv2mSKON43V/mndUhdcBr7cHjjR1hkqx/Hy0Vl5HtEp5bvuPsgGxr
-         NqAyDJf5p/7e76US77NfnuSbqmRLcF/FMKIUGwRoZIPUDKqKvOuk9AL++Q3/+wYrezEg
-         w17PyU0zKft5U5ToNcWL8tfS5jV0M+E5byCjxqwJBKhe3+SMT3SIvs5IW7VcxD2p0BFJ
-         WxHocTT8QrItAENc8lbJhIXMV7cA+BLv4FMipR7ECjMjN+HL5JHFj+KXJaRNIw2ec2ss
-         hpyuhETw0y4gFFu3Uv67u2zCIjVcjBoknsL/mprsGsZEPEC+47s/GMG29LgG1fu9lUga
-         QCRA==
-X-Gm-Message-State: AOAM532MaoUJ+fvKSACk3pHEd8Z8rAyU+bLJ9SFhRJy5bxtkUCSbEYkp
-        wbtqXzhodduh5vQi456Au3AY7rddNBuf1g==
-X-Google-Smtp-Source: ABdhPJwN8lzxcvtEVo0aBOLKhLyP+tIh/WZx3bv4PUw2Mm70wcCv0Dsb3UEsLqtSfYT+U4DQx5bBcQ==
-X-Received: by 2002:a17:902:d88a:b0:156:1609:1e62 with SMTP id b10-20020a170902d88a00b0015616091e62mr16346514plz.143.1648684999806;
-        Wed, 30 Mar 2022 17:03:19 -0700 (PDT)
+        bh=4KxLvW7jjIybeb3cb51oidI26m8u1r4MTPlLIFj4yWo=;
+        b=GJidTnVzYG8l9JxojFoWKgAmluGCnGNyexzCwSwuWbYQvoUpOGRBbYrBn54nSlyxtr
+         jpAwKUa6RJQ/ZrHPw67NPXPnH6dBejWhgClfc9YAf7PIzHwFRMKuG+Owz1U5FiuP2/E6
+         ck/0BG8fhWzPW6zfUTQV5LrVgk/Z41AyggMXaH6EewNGzlGhabRzpUF/MCS4QB+IHCX0
+         f3O5G6ShKT7rL0RWWTkxJkuq1kUk3uKLXsrWaBA+67GP72Cm9/SLz9ze4bzQNLEqBURt
+         jWB04/8VmFV1zznh8CeYC57I1FZE+LQ9RgYfgavaXsoxLRWEuVsaa/um/Oi6fH/gGWOj
+         yYjQ==
+X-Gm-Message-State: AOAM531X5rmzTpmAGYY4ePbyoUGaQ+BmcMK25FbyRaIdbXfQuwfdIBPg
+        6bqxUUvYWYqtYtDjX4QLsJ4xYA==
+X-Google-Smtp-Source: ABdhPJyJ3uVjaGRjBtqFcvBkXGyzbdFKnO37cyShtV9SNuQDPvbIDjHNWVsnC7cIAqAI0SPM1F0L7w==
+X-Received: by 2002:a17:902:e5cc:b0:154:1c96:2e5b with SMTP id u12-20020a170902e5cc00b001541c962e5bmr2545161plf.94.1648686487946;
+        Wed, 30 Mar 2022 17:28:07 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id g3-20020a056a001a0300b004fa65cbbf4esm25563516pfv.63.2022.03.30.17.03.18
+        by smtp.gmail.com with ESMTPSA id i6-20020a633c46000000b003817d623f72sm20467852pgn.24.2022.03.30.17.28.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Mar 2022 17:03:19 -0700 (PDT)
-Date:   Thu, 31 Mar 2022 00:03:15 +0000
+        Wed, 30 Mar 2022 17:28:07 -0700 (PDT)
+Date:   Thu, 31 Mar 2022 00:28:03 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, isaku.yamahata@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>
-Subject: Re: [RFC PATCH v5 008/104] KVM: TDX: Add a function to initialize
- TDX module
-Message-ID: <YkTvw5OXTTFf7j4y@google.com>
-References: <cover.1646422845.git.isaku.yamahata@intel.com>
- <b92217283fa96b85e9a683ca3fcf1b368cf8d1c4.1646422845.git.isaku.yamahata@intel.com>
- <05aecc5a-e8d2-b357-3bf1-3d0cb247c28d@redhat.com>
- <20220314194513.GD1964605@ls.amr.corp.intel.com>
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v3 1/3] KVM: Implement dirty quota-based throttling of
+ vcpus
+Message-ID: <YkT1kzWidaRFdQQh@google.com>
+References: <20220306220849.215358-1-shivam.kumar1@nutanix.com>
+ <20220306220849.215358-2-shivam.kumar1@nutanix.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220314194513.GD1964605@ls.amr.corp.intel.com>
+In-Reply-To: <20220306220849.215358-2-shivam.kumar1@nutanix.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -76,50 +74,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 14, 2022, Isaku Yamahata wrote:
-> On Sun, Mar 13, 2022 at 03:03:40PM +0100,
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
-> > On 3/4/22 20:48, isaku.yamahata@intel.com wrote:
-> > > +
-> > > +	if (!tdx_module_initialized) {
-> > > +		if (enable_tdx) {
-> > > +			ret = __tdx_module_setup();
-> > > +			if (ret)
-> > > +				enable_tdx = false;
-> > 
-> > "enable_tdx = false" isn't great to do only when a VM is created.  Does it
-> > make sense to anticipate this to the point when the kvm_intel.ko module is
-> > loaded?
-> 
-> It's possible.  I have the following two reasons to chose to defer TDX module
-> initialization until creating first TD.  Given those reasons, do you still want
-> the initialization at loading kvm_intel.ko module?  If yes, I'll change it.
+This whole series needs to be Cc'd to the arm64 and s390 folks.  The easiest way
+to that is to use scripts/get_maintainers.pl, which will grab the appropriate
+people.  There are a variety of options you can use to tailor it to your style.
+E.g. for KVM I do
 
-Yes, TDX module setup needs to be done at load time.  The loss of memory is
-unfortunate, e.g. if the host is part of a pool that _might_ run TDX guests, but
-the alternatives are worse.  If TDX fails to initialize, e.g. due to low mem,
-then the host will be unable to run TDX guests despite saying "I support TDX".
-Or this gem :-)
+  --nogit --nogit-fallback --norolestats --nofixes --pattern-depth=1
 
-	/*
-	 * TDH.SYS.KEY.CONFIG may fail with entropy error (which is
-	 * a recoverable error).  Assume this is exceedingly rare and
-	 * just return error if encountered instead of retrying.
-	 */
+for To:, and then add
 
-The CPU overhead of initializing the TDX module is also non-trivial, and it
-doesn't affect just this CPU, e.g. all CPUs need to do certain SEAMCALLs and at
-least one WBINVD.  The can cause noisy neighbor problems.
+  --nom
 
-> - memory over head: The initialization of TDX module requires to allocate
-> physically contiguous memory whose size is about 0.43% of the system memory.
-> If user don't use TD, it will be wasted.
-> 
-> - VMXON on all pCPUs: The TDX module initialization requires to enable VMX
-> (VMXON) on all present pCPUs.  vmx_hardware_enable() which is called on creating
-> guest does it.  It naturally fits with the TDX module initialization at creating
-> first TD.  I wanted to avoid code to enable VMXON on loading the kvm_intel.ko.
+for Cc:.  The --pattern-depth=1 tells it to not recurse up so that it doesn't
+include the x86 maintainers for arch/x86/kvm patches.
 
-That's a solvable problem, though making it work without exporting hardware_enable_all()
-could get messy.
+I'd Cc them manually, but I think it'll be easier to just post v4.
+
+On Sun, Mar 06, 2022, Shivam Kumar wrote:
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index eb4029660bd9..0b35b8cc0274 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10257,6 +10257,10 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.l1tf_flush_l1d = true;
+>  
+>  	for (;;) {
+> +		r = kvm_vcpu_check_dirty_quota(vcpu);
+> +		if (!r)
+> +			break;
+> +
+>  		if (kvm_vcpu_running(vcpu)) {
+>  			r = vcpu_enter_guest(vcpu);
+>  		} else {
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index f11039944c08..b1c599c78c42 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -530,6 +530,21 @@ static inline int kvm_vcpu_exiting_guest_mode(struct kvm_vcpu *vcpu)
+>  	return cmpxchg(&vcpu->mode, IN_GUEST_MODE, EXITING_GUEST_MODE);
+>  }
+>  
+> +static inline int kvm_vcpu_check_dirty_quota(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 dirty_quota = READ_ONCE(vcpu->run->dirty_quota);
+> +	u64 pages_dirtied = vcpu->stat.generic.pages_dirtied;
+> +	struct kvm_run *run = vcpu->run;
+
+Might as well use "run" when reading the dirty quota.
+
+> +
+> +	if (!dirty_quota || (pages_dirtied < dirty_quota))
+> +		return 1;
+
+I don't love returning 0/1 from a function that suggests it returns a bool, but
+I do agree it's better than actually returning a bool.  I also don't have a better
+name, so I'm just whining in the hope that Paolo or someone else has an idea :-)
+
+> +	run->exit_reason = KVM_EXIT_DIRTY_QUOTA_EXHAUSTED;
+> +	run->dirty_quota_exit.count = pages_dirtied;
+> +	run->dirty_quota_exit.quota = dirty_quota;
+> +	return 0;
+> +}
