@@ -2,201 +2,594 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 902A84ED2E1
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 06:35:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E7484ED25C
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 06:35:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230234AbiCaESz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 00:18:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41230 "EHLO
+        id S229654AbiCaEb2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 00:31:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231357AbiCaESX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 00:18:23 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2073.outbound.protection.outlook.com [40.107.94.73])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F81E1834D4;
-        Wed, 30 Mar 2022 21:04:38 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IT5ajtSSDaeXvzOD3yiomCD+djGTQtL+unhno8B0R6BY4yBUwJvN050lvKSl2iYVg53DsoDTyDkeg/m6ewLs/dTwo2azH2dxh4OCVPAzdFxcmBstlP5IxgddXS54QShWvTg8rfVI0w3jGNG5vB3WiqwwoN+CwcM2X9Ut9sdVG+jn1pNWr4RVASx3Ra+jba+mXsY/YMFrAa0cB4vjELu6C7k2RXNXocvd6ATiuhfRXCYf9YAyhkSKW2OgYlBwkGbV3Xsd0RLvSB0LuKxzN3/e55B3jWlsARjCo3GjXstjDmbYyaecPXCMiKfjBie7CosEjMX+eaJ9Ti/VH9v4lfAWww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IhTNiy/2uLS9UqCtPfASgDRCWOwO+YWCSE8NDLA8QXc=;
- b=WV1tNRvDdDUnUmbSEWSGVnsUHqZ3BsioV+kR9c2jcJEa6OR+Sn/aDGLey3vI/QFjBK+aVXyR/DqD34eBtHqZrF423NFrZqmexD90nck0R27Gmi0yBSg0m89Crv8OeJS4yJJyMW+1E3lLO0Qm2GbFYwuzvjluvaiCP5GYyf93J0XwR2xZUDkvLk4GLsDjlaMqOfeDaqeWpHqrl82vM8GuT2VneA5jTTC5zbWS8KMpooTcm6Yl6VvPHCg+vOwZmBqiWOhJv95UmnvVdeU3X/2dNKt7c/HBVNrKw7FgdWod36r9uO0ggePuxwGLM3kmInlDMJkGV7xB80bhWNDQv0ucSw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IhTNiy/2uLS9UqCtPfASgDRCWOwO+YWCSE8NDLA8QXc=;
- b=45/QsZn1VBJ0WqW2fMH3SiZin6kE3lyv2bFt4ZXlp88zNhei5oIPzuXZ+skIan1olSqqLskMrqW6L4sA+V/thi21ZZtDSxLelrx52Eh2bQVyD24H2UlwSAmOsZ/gFHcjkJC6pIzo9obDPzMrhuzzjn7v34qLiwD1PXMT26leTLc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) by
- BN8PR12MB3460.namprd12.prod.outlook.com (2603:10b6:408:48::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5123.19; Thu, 31 Mar 2022 04:04:34 +0000
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::e0d3:d505:3bd6:e79]) by DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::e0d3:d505:3bd6:e79%5]) with mapi id 15.20.5123.020; Thu, 31 Mar 2022
- 04:04:34 +0000
-Message-ID: <ad4c2a2f-9b9c-23c8-b64a-826943c54459@amd.com>
-Date:   Thu, 31 Mar 2022 11:04:24 +0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.7.0
-Subject: Re: [RFCv2 PATCH 09/12] KVM: SVM: Refresh AVIC settings when changing
- APIC mode
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
-        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
-References: <20220308163926.563994-1-suravee.suthikulpanit@amd.com>
- <20220308163926.563994-10-suravee.suthikulpanit@amd.com>
- <91692f799dfa1d064b8f2839789869aebcaa6c5f.camel@redhat.com>
-From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-In-Reply-To: <91692f799dfa1d064b8f2839789869aebcaa6c5f.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI2PR02CA0037.apcprd02.prod.outlook.com
- (2603:1096:4:196::8) To DM8PR12MB5445.namprd12.prod.outlook.com
- (2603:10b6:8:24::7)
+        with ESMTP id S230185AbiCaE0v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 00:26:51 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B39718F206;
+        Wed, 30 Mar 2022 21:17:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1648700267; x=1680236267;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=yiX9Jst12wRHpokEOz+YLEljPaTT0Ks0a8+Jm8oe6/0=;
+  b=kR/u5ftWEKTwiMPw00zRDY3toF3TT2v5dJRSPae6MsnENq+2dbvB9Pus
+   5Ut6beD1h6QeVeHZthIi9DLBEf2nQcJ+DWHeZQ4jrY9n8Y5kPXSUAxa7e
+   TAS7MSvtDLc9LI1DuCs4T2/j8xpJg+Si+lu5xX4nJel9fMd6562c/B9x4
+   FBgU5haZF8hPSjxBSiyRL9wYtkEkNW6swhrg9woS9nd06W7oj0BFs2a2u
+   RFrvJSN3mxofo81rFiCzZnmdGJrbSVk7OxW9F5IWK0NyHZxYxuL0JFCYF
+   8RUM/gMzIrq6GUEuordTYu5HtCg6iWTVlEcWOyruRryTMuWZDiooqf0t8
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10302"; a="240309585"
+X-IronPort-AV: E=Sophos;i="5.90,224,1643702400"; 
+   d="scan'208";a="240309585"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2022 21:17:42 -0700
+X-IronPort-AV: E=Sophos;i="5.90,224,1643702400"; 
+   d="scan'208";a="520187263"
+Received: from dhathawa-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.53.226])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2022 21:17:39 -0700
+Message-ID: <fedfdfbc26965145dcbf4aa893328cce172f2f3b.camel@intel.com>
+Subject: Re: [RFC PATCH v5 024/104] KVM: TDX: create/destroy VM structure
+From:   Kai Huang <kai.huang@intel.com>
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Date:   Thu, 31 Mar 2022 17:17:37 +1300
+In-Reply-To: <36805b6b6b668669d5205183c338a4020df584dd.1646422845.git.isaku.yamahata@intel.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+         <36805b6b6b668669d5205183c338a4020df584dd.1646422845.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3970fccc-309d-4a98-e1e2-08da12cb90c8
-X-MS-TrafficTypeDiagnostic: BN8PR12MB3460:EE_
-X-Microsoft-Antispam-PRVS: <BN8PR12MB3460325E599101878B85B376F3E19@BN8PR12MB3460.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5i+9RPwfr3flA9Bj05xTEmjoefajFGR7t4HIvCXuX8FJa/ELiIZbisAMOoydXewTYwVPYcs2vgQ/hmCn3XxOW5tgVSBDHuvAg5Jm6vzulUOPoIH5Ea1QwVXLirYbobtkFLCHR55QiBs83q4IB1W551/SjXgbJfB9WZuJKNbl3Z5BHWCnhkaFBGe+7DLQXxkz1wk93klCsYsCKosbNzelChhKMAuEvsDsM35o0rGiPjrZRqlK3zchohRo0NPCPqRozbuAPzsNMXa5TKMkY3RrRxpM+xj1WK06erv0wePldJ+HTPFTgcCVqDYHjEq6T9g6+rAmSnyVlTXGnmcflPgeZKoTIQErBs6fLeXBjGv87xSya5caewx3Dc5xHevjHX0UYnYs5/Yszel4I/9SZqhoGlxkQIWjUZKZZtoUR0Km674FKT6/IVnWZ1+ffQFpw9ct0nyvitUZjYYtvTcxdFomussN2ipuZ0cszXo6bnfDnxL3msa5QvWsmjRFHONhmpPOmArATTxKr3ZgKLcXvqKNzeioYKTo7HXF4foadpL1vustl1LTx8oatEVEZEoPbkc3gb9r8/lhRBPbln/JqtZ39HNAwbkaPHexIE4mkzLFSmTXgEbrA5hOrDNK9XY3h+sfIUu+27AAIswZcT/mjoRSwIP9jLIJD2CddPb9HtTm45Kc4j0G/k7o4KngL3CvPsJ2LHX6r3e/3zGcCxgxxpT3jwdDBjutfKn3okNZZj7D4RU=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6512007)(86362001)(186003)(53546011)(26005)(2616005)(31696002)(6506007)(38100700002)(83380400001)(2906002)(8936002)(36756003)(31686004)(66556008)(66946007)(66476007)(5660300002)(8676002)(4326008)(6486002)(44832011)(508600001)(316002)(6666004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VlM4cGdpdnA5NVZyd0JDR1hsSkkxNXlXV2d5RmRSQUZKMG1NRUkvUzBMdVln?=
- =?utf-8?B?OGZxVm1zWDdEVjZ3M3RzM0p2OWIzMlhVRFFPa1RTeGNNMGhCREdITU1jTnUz?=
- =?utf-8?B?STd2dWhpa0lreXgxMjJRUkdRUEtlT3hlRmdMa1drbVZHakIyd21MbFhXaHp4?=
- =?utf-8?B?d2d2R0lNQ1V6Z1ZvczRuN3BoMGtsdllwUFBDa2wxQ0xqTWZqMzBRb2ZvdkdJ?=
- =?utf-8?B?OXpsbGt1QmZTV0VvV3I5RWZ0TU5LQnU4cVpSR2o4d21kdDhDNUluUGJNYy90?=
- =?utf-8?B?ODEvcjRnM0Z2SXp5QjJGRXRNNGRzakp5Vm1EMVhmQmo0RGdwSkd5NlVkTDZN?=
- =?utf-8?B?WWtZaXBPamoweFpsZ2JBd2dYVWR5ekxocG45Vm9SUy9YV0N6UTFuWW5IUEFS?=
- =?utf-8?B?T0JrZzl4Z2I0bUJJS3ZyZ2pOY1JCeHQ2T29QZmkxNy9wS2UydWUvdGw2S0tC?=
- =?utf-8?B?ckdONlNRbElxSytSTXo0YlBpUDNRN3Y3VXpFbHRFUUNHOGwrRDQ0bHpac2N1?=
- =?utf-8?B?TGFIaUdVcWhreTVvOGRDM0xTVmtUSWl5Zi9rRFpCVUJZbkJkRHRCTU5DQWNU?=
- =?utf-8?B?Q2x6SDZsRFpqcElTMnRKc2RjSDRlRk55cnJMbWc2Ykx1bWNNUzdPZlY1Z1Ni?=
- =?utf-8?B?a3ZjaWphQU55Y1VXcUFRdm9XRVlYTVk0Mnl2eVlxdjdFNCtRZk55NFdyYVpp?=
- =?utf-8?B?WVNtVzI4S2pacFltWjRlQlYwc3RmQlZBazJTbHczUDlJaktOWWxYUTdlcWs4?=
- =?utf-8?B?Lytwd0pZdmdpQ3NycExLVXJNWmxLdkVMbHZYcmxaeFJxRlB4ZGlVd3QyNFQr?=
- =?utf-8?B?MG9hQ0tMVGtWWno1U1ozaFQwNFZGWjMwdk9mOEVxSjk5dWZmdlpYL1BuZzZS?=
- =?utf-8?B?enhqcTBXc2p0bm1CRkMwWmxxdkRuay9Pc0puN095MlJxSWQySSsvWlphdWJH?=
- =?utf-8?B?L0JWUlF3ekVsOEVyR29JcFhjaTBuVTV6LzZFazdIa29nYjBkUE1ER3orSUt5?=
- =?utf-8?B?S25DUSs4bnlBNThIOVBNWjJhMEZEckt6VnNpay91SjZTbmU3Wm5LWE9ZeFBr?=
- =?utf-8?B?VU81SE95bDAxQU1pS3RtakxxaWFvTnVIaGttZ2txTmJFUmRpbEpubjJZRmto?=
- =?utf-8?B?cjlWb0xwOFZQUzcwRUNNUDRoZUhDMjkzZHFLWXozSldQcFpwdnlUck9YMWRS?=
- =?utf-8?B?WWhZQmJRWXpkMXVzSERxZGF1d3U5VGhpdTdPTUVGRkdrMGVPZTBWc2ZNRzlF?=
- =?utf-8?B?Y3MrNnBxenlSbDVlcDF1MnNXa0ZWTzdSSkFySS9pNjZCNnJ4WU9SaFRJemhh?=
- =?utf-8?B?SFR4R1huM0UzQkozWmRBZ3RiQldFOUZZdVVDTG9hSUxHbG82dTc5dEdYWVhm?=
- =?utf-8?B?WlJ5QWd5Vm5wSHhDelJXNmJVTHBRYlBKYzBzb2F0Z3VFMlQxMERaczRFNWVa?=
- =?utf-8?B?ZG1qU1djTjhGYldjTzZhT0Mxd09kTzNPR2VzbGtyVlh0S3VPRlZlWUVMSlQy?=
- =?utf-8?B?cEdMa0ZYTWFHQ09FRHZsOW8xL1lNQnZCMjdxSzRlOU9aR1B4bWZpMFZCODFk?=
- =?utf-8?B?RzVCaVdKY0d5dzhHZ0JTOGVNVURhWkJEUUlMRlhzWUZXeFMvSVhOeFFCc3Np?=
- =?utf-8?B?K2EyTG51QW5BQ0Fta2NScWFFa2RDcytmMEpLT21TQkhxUFBZbStjTU11ak9I?=
- =?utf-8?B?eHF1bU9PNnIyNXdzdDlGYXRxMERKZHFyQ0RPSDh3MGVSeXYybEJQZ1FQMkhi?=
- =?utf-8?B?LzRLNDRkaHJkc29MOURaRTRnL05SNVFUdmJtTm81cHJlWTRMWi9sdzFZMDg4?=
- =?utf-8?B?d1JnRHBucjJCUHNIWisyM1JpcWFocHk2R0V2NkRlYWg2SmVTNlRVZnB1Tytw?=
- =?utf-8?B?NE1PSktodzV3SDJaanlpTlhuQUJNYnVOcDRWbDFSdU8xY0ZFRk5HaC91M3JV?=
- =?utf-8?B?S3F6NmZLQ0JFZkFWOC9IL3JXc0kvUGxxR0J4VFlwYW1CNFBNU1hPejM4NHN2?=
- =?utf-8?B?MUNQNnVsVEVVMWlMZGMxMHhXNk9mZ0hGdUJTWmx5OVJISDBXakxBckM1V0Vz?=
- =?utf-8?B?QUdlVXNNVTFpbHFPODB5YXVQL0JnbzhSa05xSFpHcmZOZHV3RUpyc2IwOEhY?=
- =?utf-8?B?VG9YUng1T2hBb0RyOVRBT0pDbjBRZjh1ekg3eS9pcVBtSUtpWmY2SGhNVWls?=
- =?utf-8?B?VHJMUDh1aXVNUnpSY3ozRXk2MHdrUUNDc2wzYU8xVFUwdldhQ3QwN3JDbnhT?=
- =?utf-8?B?Y1M5UkVzQ1JjbFFZbzdwVG9Ic2tWTFJwUlJDdi94K2NyelNuVEkrb3M2TzRs?=
- =?utf-8?B?Q0RyMXRLd0Z1OGk4a0dxNWFEZ3l0K0o1VjMrS2c5SGlXZ1o3OWRCdz09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3970fccc-309d-4a98-e1e2-08da12cb90c8
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR12MB5445.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Mar 2022 04:04:34.6841
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Arh5EJGEDEo0RPC38iMCg9DPRfpMEhWO4l3gXp96MWXo4f4hl/zziQq2GHRIgKSOHavnRZpi1hk7ILxt7aVPdg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR12MB3460
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Maxim,
-
-On 3/24/22 10:35 PM, Maxim Levitsky wrote:
-> On Tue, 2022-03-08 at 10:39 -0600, Suravee Suthikulpanit wrote:
->> When APIC mode is updated (e.g. from xAPIC to x2APIC),
->> KVM needs to update AVIC settings accordingly, whic is
->> handled by svm_refresh_apicv_exec_ctrl().
->>
->> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
->> ---
->>   arch/x86/kvm/svm/avic.c | 19 ++++++++++++++++++-
->>   1 file changed, 18 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
->> index 7e5a39a8e698..53559b8dfa52 100644
->> --- a/arch/x86/kvm/svm/avic.c
->> +++ b/arch/x86/kvm/svm/avic.c
->> @@ -625,7 +625,24 @@ void avic_post_state_restore(struct kvm_vcpu *vcpu)
->>   
->>   void svm_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
->>   {
->> -	return;
->> +	struct vcpu_svm *svm = to_svm(vcpu);
->> +
->> +	if (!lapic_in_kernel(vcpu) || (avic_mode == AVIC_MODE_NONE))
->> +		return;
->> +
->> +	if (kvm_get_apic_mode(vcpu) == LAPIC_MODE_INVALID)
->> +		WARN_ONCE(true, "Invalid local APIC state");
->> +
->> +	svm->vmcb->control.avic_vapic_bar = svm->vcpu.arch.apic_base &
->> +					    VMCB_AVIC_APIC_BAR_MASK;
+On Fri, 2022-03-04 at 11:48 -0800, isaku.yamahata@intel.com wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
 > 
-> No need for that - APIC base relocation doesn't work when AVIC is enabled,
-> since the page which contains it has to be marked R/W in NPT, which we
-> only do for the default APIC base.
+> As the first step to create TDX guest, create/destroy VM struct.  Assign
+> Host Key ID (HKID) to the TDX guest for memory encryption and allocate
+> extra pages for the TDX guest. On destruction, free allocated pages, and
+> HKID.
 > 
-> I recently removed the code from AVIC which still tried to set the
-> 'avic_vapic_bar' like this.
-
-Got it. I'll remove this part.
-
+> Add a second kvm_x86_ops hook in kvm_arch_vm_destroy() to support TDX's
+> destruction path, which needs to first put the VM into a teardown state,
+> then free per-vCPU resources, and finally free per-VM resources.
 > 
->> +	kvm_vcpu_update_apicv(&svm->vcpu);
->> +
->> +	/*
->> +	 * The VM could be running w/ AVIC activated switching from APIC
->> +	 * to x2APIC mode. We need to all refresh to make sure that all
->> +	 * x2AVIC configuration are being done.
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/kvm/vmx/main.c      |  16 +-
+>  arch/x86/kvm/vmx/tdx.c       | 312 +++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/vmx/tdx.h       |   2 +
+>  arch/x86/kvm/vmx/tdx_errno.h |   2 +-
+>  arch/x86/kvm/vmx/tdx_ops.h   |   8 +
+>  arch/x86/kvm/vmx/x86_ops.h   |   8 +
+>  6 files changed, 346 insertions(+), 2 deletions(-)
 > 
-> Why? When AVIC is un-inhibited later then the svm_refresh_apicv_exec_ctrl will be called
-> again and switch to x2avic mode I think.
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index 6111c6485d8e..5c3a904a30e8 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -39,12 +39,24 @@ static int vt_vm_init(struct kvm *kvm)
+>  		ret = tdx_module_setup();
+>  		if (ret)
+>  			return ret;
+> -		return -EOPNOTSUPP;	/* Not ready to create guest TD yet. */
+> +		return tdx_vm_init(kvm);
+>  	}
+>  
+>  	return vmx_vm_init(kvm);
+>  }
+>  
+> +static void vt_mmu_prezap(struct kvm *kvm)
+> +{
+> +	if (is_td(kvm))
+> +		return tdx_mmu_prezap(kvm);
+> +}
+> +
+> +static void vt_vm_free(struct kvm *kvm)
+> +{
+> +	if (is_td(kvm))
+> +		return tdx_vm_free(kvm);
+> +}
+> +
+>  struct kvm_x86_ops vt_x86_ops __initdata = {
+>  	.name = "kvm_intel",
+>  
+> @@ -58,6 +70,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+>  	.is_vm_type_supported = vt_is_vm_type_supported,
+>  	.vm_size = sizeof(struct kvm_vmx),
+>  	.vm_init = vt_vm_init,
+> +	.mmu_prezap = vt_mmu_prezap,
+> +	.vm_free = vt_vm_free,
+>  
+>  	.vcpu_create = vmx_vcpu_create,
+>  	.vcpu_free = vmx_vcpu_free,
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 1c8222f54764..702953fd365f 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -31,14 +31,324 @@ struct tdx_capabilities {
+>  	struct tdx_cpuid_config cpuid_configs[TDX_MAX_NR_CPUID_CONFIGS];
+>  };
+>  
+> +/* KeyID used by TDX module */
+> +static u32 tdx_global_keyid __read_mostly;
+> +
 
-Current version does not disable AVIC when APIC is disabled, which happens during
-APIC mode switching (i.e. xAPIC -> disabled -> x2APIC). This needs to be fixed.
-Then we can remove the force refresh.
+It's really not clear why you need to know tdx_global_keyid in the context of
+creating/destroying a TD.
 
-> When AVIC is inhibited, then regardless of x2apic mode, VMCB must not have
-> any avic bits set, and all x2apic msrs should be read/write intercepted.,
-> thus I don't think that svm_refresh_apicv_exec_ctrl should be force called.
+>  /* Capabilities of KVM + the TDX module. */
+>  struct tdx_capabilities tdx_caps;
+>  
+> +static DEFINE_MUTEX(tdx_lock);
+>  static struct mutex *tdx_mng_key_config_lock;
+>  
+>  static u64 hkid_mask __ro_after_init;
+>  static u8 hkid_start_pos __ro_after_init;
+>  
+> +static __always_inline hpa_t set_hkid_to_hpa(hpa_t pa, u16 hkid)
+> +{
+> +	pa &= ~hkid_mask;
+> +	pa |= (u64)hkid << hkid_start_pos;
+> +
+> +	return pa;
+> +}
+> +
+> +static inline bool is_td_created(struct kvm_tdx *kvm_tdx)
+> +{
+> +	return kvm_tdx->tdr.added;
+> +}
+> +
+> +static inline void tdx_hkid_free(struct kvm_tdx *kvm_tdx)
+> +{
+> +	tdx_keyid_free(kvm_tdx->hkid);
+> +	kvm_tdx->hkid = -1;
+> +}
+> +
+> +static inline bool is_hkid_assigned(struct kvm_tdx *kvm_tdx)
+> +{
+> +	return kvm_tdx->hkid > 0;
+> +}
+> +
+> +static void tdx_clear_page(unsigned long page)
+> +{
+> +	const void *zero_page = (const void *) __va(page_to_phys(ZERO_PAGE(0)));
+> +	unsigned long i;
+> +
+> +	/* Zeroing the page is only necessary for systems with MKTME-i. */
 
-The refresh is normally called only when there is APICV update request (e.g. 
-kvm_request_apicv_update(APICV_INHIBIT_REASON_IRQWIN)), which could happen or not.
+"only necessary for systems  with MKTME-i" because of what?
 
+Please be more clear that on MKTME-i system, when re-assign one page from old
+keyid to a new keyid, MOVDIR64B is required to clear/write the page with new
+keyid to prevent integrity error when read on the page with new keyid.
 
-However, I have reworked this part. The svm_refresh_apicv_exec_ctrl()
-force is no longer needed.
+However, the new keyid is essentially 0, but in practice integrity check for
+keyid 0 is disabled in current generation of MKTME-i, so I guess we are also
+safe even we don't use MOVDIR64B to clear page for TDX here.  But I agree it's
+better to do.
 
-Regards,
-Suravee
+> +	if (!static_cpu_has(X86_FEATURE_MOVDIR64B))
+> +		return;
+> +
+> +	for (i = 0; i < 4096; i += 64)
+> +		/* MOVDIR64B [rdx], es:rdi */
+> +		asm (".byte 0x66, 0x0f, 0x38, 0xf8, 0x3a"
+> +		     : : "d" (zero_page), "D" (page + i) : "memory");
+> +}
+> +
+> +static int __tdx_reclaim_page(unsigned long va, hpa_t pa, bool do_wb, u16 hkid)
+> +{
+> +	struct tdx_module_output out;
+> +	u64 err;
+> +
+> +	err = tdh_phymem_page_reclaim(pa, &out);
+> +	if (WARN_ON_ONCE(err)) {
+> +		pr_tdx_error(TDH_PHYMEM_PAGE_RECLAIM, err, &out);
+> +		return -EIO;
+> +	}
+> +
+> +	if (do_wb) {
+
+In the callers, please add some comments explaining why do_wb is needed, and why
+is not needed.
+
+> +		err = tdh_phymem_page_wbinvd(set_hkid_to_hpa(pa, hkid));
+> +		if (WARN_ON_ONCE(err)) {
+> +			pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err, NULL);
+> +			return -EIO;
+> +		}
+> +	}
+> +
+> +	tdx_clear_page(va);
+> +	return 0;
+> +}
+> +
+> +static int tdx_reclaim_page(unsigned long va, hpa_t pa)
+> +{
+> +	return __tdx_reclaim_page(va, pa, false, 0);
+> +}
+> +
+> +static int tdx_alloc_td_page(struct tdx_td_page *page)
+> +{
+> +	page->va = __get_free_page(GFP_KERNEL_ACCOUNT);
+> +	if (!page->va)
+> +		return -ENOMEM;
+> +
+> +	page->pa = __pa(page->va);
+> +	return 0;
+> +}
+> +
+> +static void tdx_mark_td_page_added(struct tdx_td_page *page)
+> +{
+> +	WARN_ON_ONCE(page->added);
+> +	page->added = true;
+> +}
+> +
+> +static void tdx_reclaim_td_page(struct tdx_td_page *page)
+> +{
+> +	if (page->added) {
+> +		if (tdx_reclaim_page(page->va, page->pa))
+> +			return;
+> +
+> +		page->added = false;
+> +	}
+> +	free_page(page->va);
+> +}
+> +
+> +static int tdx_do_tdh_phymem_cache_wb(void *param)
+> +{
+> +	u64 err = 0;
+> +
+> +	/*
+> +	 * We can destroy multiple the guest TDs simultaneously.  Prevent
+> +	 * tdh_phymem_cache_wb from returning TDX_BUSY by serialization.
+> +	 */
+> +	mutex_lock(&tdx_lock);
+> +	do {
+> +		err = tdh_phymem_cache_wb(!!err);
+> +	} while (err == TDX_INTERRUPTED_RESUMABLE);
+> +	mutex_unlock(&tdx_lock);
+> +
+> +	/* Other thread may have done for us. */
+> +	if (err == TDX_NO_HKID_READY_TO_WBCACHE)
+> +		err = TDX_SUCCESS;
+> +	if (WARN_ON_ONCE(err)) {
+> +		pr_tdx_error(TDH_PHYMEM_CACHE_WB, err, NULL);
+> +		return -EIO;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +void tdx_mmu_prezap(struct kvm *kvm)
+> +{
+> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> +	cpumask_var_t packages;
+> +	bool cpumask_allocated;
+> +	u64 err;
+> +	int ret;
+> +	int i;
+> +
+> +	if (!is_hkid_assigned(kvm_tdx))
+> +		return;
+> +
+> +	if (!is_td_created(kvm_tdx))
+> +		goto free_hkid;
+> +
+> +	mutex_lock(&tdx_lock);
+> +	err = tdh_mng_key_reclaimid(kvm_tdx->tdr.pa);
+> +	mutex_unlock(&tdx_lock);
+
+Please add a comment explaining why the mutex is needed.
+
+> +	if (WARN_ON_ONCE(err)) {
+> +		pr_tdx_error(TDH_MNG_KEY_RECLAIMID, err, NULL);
+> +		return;
+> +	}
+> +
+> +	cpumask_allocated = zalloc_cpumask_var(&packages, GFP_KERNEL);
+> +	for_each_online_cpu(i) {
+> +		if (cpumask_allocated &&
+> +			cpumask_test_and_set_cpu(topology_physical_package_id(i),
+> +						packages))
+> +			continue;
+> +
+> +		ret = smp_call_on_cpu(i, tdx_do_tdh_phymem_cache_wb, NULL, 1);
+> +		if (ret)
+> +			break;
+> +	}
+> +	free_cpumask_var(packages);
+> +
+> +	mutex_lock(&tdx_lock);
+> +	err = tdh_mng_key_freeid(kvm_tdx->tdr.pa);
+> +	mutex_unlock(&tdx_lock);
+> +	if (WARN_ON_ONCE(err)) {
+> +		pr_tdx_error(TDH_MNG_KEY_FREEID, err, NULL);
+> +		return;
+> +	}
+> +
+> +free_hkid:
+> +	tdx_hkid_free(kvm_tdx);
+> +}
+> +
+> +void tdx_vm_free(struct kvm *kvm)
+> +{
+> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> +	int i;
+> +
+> +	/* Can't reclaim or free TD pages if teardown failed. */
+> +	if (is_hkid_assigned(kvm_tdx))
+> +		return;
+> +
+> +	for (i = 0; i < tdx_caps.tdcs_nr_pages; i++)
+> +		tdx_reclaim_td_page(&kvm_tdx->tdcs[i]);
+> +	kfree(kvm_tdx->tdcs);
+> +
+> +	if (kvm_tdx->tdr.added &&
+> +		__tdx_reclaim_page(kvm_tdx->tdr.va, kvm_tdx->tdr.pa, true,
+> +				tdx_global_keyid))
+> +		return;
+> +
+> +	free_page(kvm_tdx->tdr.va);
+> +}
+> +
+> +static int tdx_do_tdh_mng_key_config(void *param)
+> +{
+> +	hpa_t *tdr_p = param;
+> +	int cpu, cur_pkg;
+> +	u64 err;
+> +
+> +	cpu = raw_smp_processor_id();
+> +	cur_pkg = topology_physical_package_id(cpu);
+> +
+> +	mutex_lock(&tdx_mng_key_config_lock[cur_pkg]);
+> +	do {
+> +		err = tdh_mng_key_config(*tdr_p);
+> +	} while (err == TDX_KEY_GENERATION_FAILED);
+> +	mutex_unlock(&tdx_mng_key_config_lock[cur_pkg]);
+
+Why not squashing patch 20 ("KVM: TDX: allocate per-package mutex") into this
+patch?  
+
+> +
+> +	if (WARN_ON_ONCE(err)) {
+> +		pr_tdx_error(TDH_MNG_KEY_CONFIG, err, NULL);
+> +		return -EIO;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +int tdx_vm_init(struct kvm *kvm)
+> +{
+> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> +	cpumask_var_t packages;
+> +	int ret, i;
+> +	u64 err;
+> +
+> +	/* vCPUs can't be created until after KVM_TDX_INIT_VM. */
+> +	kvm->max_vcpus = 0;
+> +
+> +	kvm_tdx->hkid = tdx_keyid_alloc();
+> +	if (kvm_tdx->hkid < 0)
+> +		return -EBUSY;
+> +
+> +	ret = tdx_alloc_td_page(&kvm_tdx->tdr);
+> +	if (ret)
+> +		goto free_hkid;
+> +
+> +	kvm_tdx->tdcs = kcalloc(tdx_caps.tdcs_nr_pages, sizeof(*kvm_tdx->tdcs),
+> +				GFP_KERNEL_ACCOUNT);
+> +	if (!kvm_tdx->tdcs)
+> +		goto free_tdr;
+> +	for (i = 0; i < tdx_caps.tdcs_nr_pages; i++) {
+> +		ret = tdx_alloc_td_page(&kvm_tdx->tdcs[i]);
+> +		if (ret)
+> +			goto free_tdcs;
+> +	}
+> +
+> +	mutex_lock(&tdx_lock);
+> +	err = tdh_mng_create(kvm_tdx->tdr.pa, kvm_tdx->hkid);
+> +	mutex_unlock(&tdx_lock);
+
+Please add comment explaining why locking is needed.
+
+> +	if (WARN_ON_ONCE(err)) {
+> +		pr_tdx_error(TDH_MNG_CREATE, err, NULL);
+> +		ret = -EIO;
+> +		goto free_tdcs;
+> +	}
+> +	tdx_mark_td_page_added(&kvm_tdx->tdr);
+> +
+> +	if (!zalloc_cpumask_var(&packages, GFP_KERNEL)) {
+> +		ret = -ENOMEM;
+> +		goto free_tdcs;
+> +	}
+> +	for_each_online_cpu(i) {
+> +		if (cpumask_test_and_set_cpu(topology_physical_package_id(i),
+> +						packages))
+> +			continue;
+> +
+> +		ret = smp_call_on_cpu(i, tdx_do_tdh_mng_key_config,
+> +				&kvm_tdx->tdr.pa, 1);
+> +		if (ret)
+> +			break;
+> +	}
+> +	free_cpumask_var(packages);
+> +	if (ret)
+> +		goto teardown;
+> +
+> +	for (i = 0; i < tdx_caps.tdcs_nr_pages; i++) {
+> +		err = tdh_mng_addcx(kvm_tdx->tdr.pa, kvm_tdx->tdcs[i].pa);
+> +		if (WARN_ON_ONCE(err)) {
+> +			pr_tdx_error(TDH_MNG_ADDCX, err, NULL);
+> +			ret = -EIO;
+> +			goto teardown;
+> +		}
+> +		tdx_mark_td_page_added(&kvm_tdx->tdcs[i]);
+> +	}
+> +
+> +	/*
+> +	 * Note, TDH_MNG_INIT cannot be invoked here.  TDH_MNG_INIT requires a dedicated
+> +	 * ioctl() to define the configure CPUID values for the TD.
+> +	 */
+> +	return 0;
+> +
+> +	/*
+> +	 * The sequence for freeing resources from a partially initialized TD
+> +	 * varies based on where in the initialization flow failure occurred.
+> +	 * Simply use the full teardown and destroy, which naturally play nice
+> +	 * with partial initialization.
+> +	 */
+> +teardown:
+> +	tdx_mmu_prezap(kvm);
+> +	tdx_vm_free(kvm);
+> +	return ret;
+> +
+> +free_tdcs:
+> +	/* @i points at the TDCS page that failed allocation. */
+> +	for (--i; i >= 0; i--)
+> +		free_page(kvm_tdx->tdcs[i].va);
+> +	kfree(kvm_tdx->tdcs);
+> +free_tdr:
+> +	free_page(kvm_tdx->tdr.va);
+> +free_hkid:
+> +	tdx_hkid_free(kvm_tdx);
+> +	return ret;
+> +}
+> +
+>  static int __tdx_module_setup(void)
+>  {
+>  	const struct tdsysinfo_struct *tdsysinfo;
+> @@ -59,6 +369,8 @@ static int __tdx_module_setup(void)
+>  		return ret;
+>  	}
+>  
+> +	tdx_global_keyid = tdx_get_global_keyid();
+> +
+
+Again, really confusing why this is needed.
+
+>  	tdsysinfo = tdx_get_sysinfo();
+>  	if (tdx_caps.nr_cpuid_configs > TDX_MAX_NR_CPUID_CONFIGS)
+>  		return -EIO;
+> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+> index e4bb8831764e..860136ed70f5 100644
+> --- a/arch/x86/kvm/vmx/tdx.h
+> +++ b/arch/x86/kvm/vmx/tdx.h
+> @@ -19,6 +19,8 @@ struct kvm_tdx {
+>  
+>  	struct tdx_td_page tdr;
+>  	struct tdx_td_page *tdcs;
+> +
+> +	int hkid;
+>  };
+>  
+>  struct vcpu_tdx {
+> diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/kvm/vmx/tdx_errno.h
+> index 5c878488795d..590fcfdd1899 100644
+> --- a/arch/x86/kvm/vmx/tdx_errno.h
+> +++ b/arch/x86/kvm/vmx/tdx_errno.h
+> @@ -12,11 +12,11 @@
+>  #define TDX_SUCCESS				0x0000000000000000ULL
+>  #define TDX_NON_RECOVERABLE_VCPU		0x4000000100000000ULL
+>  #define TDX_INTERRUPTED_RESUMABLE		0x8000000300000000ULL
+> -#define TDX_LIFECYCLE_STATE_INCORRECT		0xC000060700000000ULL
+>  #define TDX_VCPU_NOT_ASSOCIATED			0x8000070200000000ULL
+>  #define TDX_KEY_GENERATION_FAILED		0x8000080000000000ULL
+>  #define TDX_KEY_STATE_INCORRECT			0xC000081100000000ULL
+>  #define TDX_KEY_CONFIGURED			0x0000081500000000ULL
+> +#define TDX_NO_HKID_READY_TO_WBCACHE		0x0000082100000000ULL
+>  #define TDX_EPT_WALK_FAILED			0xC0000B0000000000ULL
+>  
+>  /*
+> diff --git a/arch/x86/kvm/vmx/tdx_ops.h b/arch/x86/kvm/vmx/tdx_ops.h
+> index 0bed43879b82..3dd5b4c3f04c 100644
+> --- a/arch/x86/kvm/vmx/tdx_ops.h
+> +++ b/arch/x86/kvm/vmx/tdx_ops.h
+> @@ -6,6 +6,7 @@
+>  
+>  #include <linux/compiler.h>
+>  
+> +#include <asm/cacheflush.h>
+>  #include <asm/asm.h>
+>  #include <asm/kvm_host.h>
+>  
+> @@ -15,8 +16,14 @@
+>  
+>  #ifdef CONFIG_INTEL_TDX_HOST
+>  
+> +static inline void tdx_clflush_page(hpa_t addr)
+> +{
+> +	clflush_cache_range(__va(addr), PAGE_SIZE);
+> +}
+> +
+>  static inline u64 tdh_mng_addcx(hpa_t tdr, hpa_t addr)
+>  {
+> +	tdx_clflush_page(addr);
+
+Please add comment to explain why clflush is needed.
+
+And you don't need the tdx_clflush_page() wrapper -- it's not a TDX specific
+ops.  You can just use clflush_cache_range().
+
+>  	return kvm_seamcall(TDH_MNG_ADDCX, addr, tdr, 0, 0, 0, NULL);
+>  }
+>  
+> @@ -56,6 +63,7 @@ static inline u64 tdh_mng_key_config(hpa_t tdr)
+>  
+>  static inline u64 tdh_mng_create(hpa_t tdr, int hkid)
+>  {
+> +	tdx_clflush_page(tdr);
+>  	return kvm_seamcall(TDH_MNG_CREATE, tdr, hkid, 0, 0, 0, NULL);
+>  }
+>  
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index da32b4b86b19..2b2738c768d6 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -132,12 +132,20 @@ void __init tdx_pre_kvm_init(unsigned int *vcpu_size,
+>  bool tdx_is_vm_type_supported(unsigned long type);
+>  void __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
+>  void tdx_hardware_unsetup(void);
+> +
+> +int tdx_vm_init(struct kvm *kvm);
+> +void tdx_mmu_prezap(struct kvm *kvm);
+> +void tdx_vm_free(struct kvm *kvm);
+>  #else
+>  static inline void tdx_pre_kvm_init(
+>  	unsigned int *vcpu_size, unsigned int *vcpu_align, unsigned int *vm_size) {}
+>  static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
+>  static inline void tdx_hardware_setup(struct kvm_x86_ops *x86_ops) {}
+>  static inline void tdx_hardware_unsetup(void) {}
+> +
+> +static inline int tdx_vm_init(struct kvm *kvm) { return -EOPNOTSUPP; }
+> +static inline void tdx_mmu_prezap(struct kvm *kvm) {}
+> +static inline void tdx_vm_free(struct kvm *kvm) {}
+>  #endif
+>  
+>  #endif /* __KVM_X86_VMX_X86_OPS_H */
+
