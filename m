@@ -2,69 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 192AD4EDCBE
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 17:24:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 969344EDD7E
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 17:41:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238227AbiCaP0b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 11:26:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49740 "EHLO
+        id S239160AbiCaPk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 11:40:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238219AbiCaP0a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 11:26:30 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0064C1BBF42
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 08:24:42 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id n18so23708671plg.5
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 08:24:42 -0700 (PDT)
+        with ESMTP id S240262AbiCaPjM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 11:39:12 -0400
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DF7B1C8867
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 08:34:11 -0700 (PDT)
+Received: by mail-io1-xd2f.google.com with SMTP id x4so29019630iop.7
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 08:34:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=xRax+JRUfYO5DmaeRq6LU0yH9RYNMUvPwNZPXC45DeI=;
-        b=axWqP3J2Tn3FyohgJvAMgcKuw2VAsX032WLRPxNDpq1k+k8zd+dzMwtxp9z3UhLS2B
-         tXkY9NaxYMwrepn9gU8G0lIK10VxIinXGrt4HwfwbH76IBZMJ2OtYJsHnATuD5lVREqm
-         wPiPAHSH58NTnqIiuARkzYjBv2kNNAqBpZkcY6gvHy5kJxRRWBRjt6JvjHcziVt1OiAu
-         I7FOQoJzyyxwMNsGDI4HIUoPpTe02Jl+CX6M4zgQTmNI1kcGKk60C/X01j/SxUxtM4lH
-         AUK7IrpxYcioeZnWaY6KyoATVY0s+viW4wOMLUhG2BjNgiYdS0B4TzuDqy2kKIr7fgR2
-         Q0jQ==
+        bh=R6qVglK0FzawAXT0u5ibNFLRdw4AR1UKBBbJVmhDGmw=;
+        b=f12ZZUEl0m4XNN/vangV6Vr6v1IK2xC1y0f78ppu9bR4Qtu/4hbU7bfXFE6KbOoArQ
+         +Mm0CuHBUdpXPTNte/WciKsKtHgb6w+Hj+7531DSKyEuvGGCRxUa+JKZv8FYwExwaG5X
+         9ZPcXpqz9u1Y1KlPXSrsSFFR/YsngCCQzH9SC6PtB/ojuebV9c6LWk7VuM8qGbezBpM4
+         XTv24iderEEW7syCge5Ihsvd+7Yr7pW2qpVV012o84iZ2D70X9Z6Wo/AyI5l13sOBDjP
+         U0e0CqEyG8AO+aIRBSEyHHBdDO56V5rtfM9k+VWIAw0Bz+a3GBH18zLypYweYyUrXnrM
+         Tq2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=xRax+JRUfYO5DmaeRq6LU0yH9RYNMUvPwNZPXC45DeI=;
-        b=JwF8Sj0f+ZHNAB3tW3uOz8ES6DXJbnABImDR9MzbmayYq+tfavrj99hiPiTH14WOL0
-         A4FiIoLKF6e6Ae3QQ4jADqfdvkXoSSLNxv8ctUPMyuqdDZiwcvD+o0sxFL6WCIytbMIG
-         drMoPdQ83jxDivnGnF5cGuDq/FDmtGrPxOLsg4monwgKg603D7twv1U6T4fxJ5rMTx0O
-         dBUzBtgbng9pRYWNgnyIhmyf8v0iFbCVMyaRr2J8yJt1iVqxGBDptzggPUGtw7zvNx5M
-         gjhR7JATnhj4S9HXEpL/b1wzc5SGdjqXHhol2gFgC0ejYKcMESxoUi0elNkp0QNL+Djj
-         Ct1g==
-X-Gm-Message-State: AOAM532C6oOU6z5AmyPwejyQ9uYqHBgUWhv+FL3T6a23vbEHfhhcQACE
-        8L/a4VjcfXYLceSoV64Z114m0g==
-X-Google-Smtp-Source: ABdhPJxuH5sSVTfs126h4p10bpad3L+gGPpheZfesg4n//Y7LJqdh1pg3PY170yBt4myJ1/EBGyW2A==
-X-Received: by 2002:a17:902:cf08:b0:151:9d28:f46f with SMTP id i8-20020a170902cf0800b001519d28f46fmr5815317plg.53.1648740282071;
-        Thu, 31 Mar 2022 08:24:42 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k6-20020a056a00134600b004faba67f9d4sm29282336pfu.197.2022.03.31.08.24.41
+        bh=R6qVglK0FzawAXT0u5ibNFLRdw4AR1UKBBbJVmhDGmw=;
+        b=AF6FsFz2zia0cJH5iFSngacWabuYXIKvVUT62yM2xRjGLHIGPJfrPa7Cq1T6+JPudj
+         rm1H9P9a1GT97oUBhczoZLDEj3nSqvr6cT2dUWibYQuSn1AWm1yh+sU71DJqhiBAt/R8
+         OWmOy/Qt6UC0lQ+w6IIGPFRwCkPxvTZodmUK2LV6z/0WQYMtKYreuzGnYRlUJNSNmKr2
+         DrX8B3iYs1HYznzYQUpQmeCrtFggX1V374E+3cKE2ah8zpPMNyoFOG19hpZvjDDkK5OD
+         GKfaC5GctgweTjgIa65xe97OZG1nw4Mc/Ikz/d+z9zytlyzg9ZLDPmG74gp/ovJVLOe2
+         sbPw==
+X-Gm-Message-State: AOAM530m706AMgXSz9r2jD4oRMVb+ScNxzP+CWz42YefXDr+fsh4mpyB
+        fP1WeBL+LA435OUksjLpY1a2FA==
+X-Google-Smtp-Source: ABdhPJyDekBrm8Mb4uDZ8bLm4Yo7RYoSABckPoxXi5s6USil5NnmuontTT10XVUc64Tr+EazrPyeFA==
+X-Received: by 2002:a02:aa0b:0:b0:317:c63a:6625 with SMTP id r11-20020a02aa0b000000b00317c63a6625mr3224223jam.222.1648740848931;
+        Thu, 31 Mar 2022 08:34:08 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id j9-20020a926e09000000b002c9f3388cd4sm1732964ilc.21.2022.03.31.08.34.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Mar 2022 08:24:41 -0700 (PDT)
-Date:   Thu, 31 Mar 2022 15:24:37 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Shivam Kumar <shivam.kumar1@nutanix.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        Shaju Abraham <shaju.abraham@nutanix.com>,
-        Manish Mishra <manish.mishra@nutanix.com>,
-        Anurag Madnawat <anurag.madnawat@nutanix.com>
-Subject: Re: [PATCH v3 2/3] KVM: Documentation: Update kvm_run structure for
- dirty quota
-Message-ID: <YkXHtc2MiwUxpMFU@google.com>
-References: <20220306220849.215358-1-shivam.kumar1@nutanix.com>
- <20220306220849.215358-3-shivam.kumar1@nutanix.com>
- <YkT4bvK+tbsVDAvt@google.com>
- <ae21aee2-41e1-3ad3-41ef-edda67a8449a@nutanix.com>
+        Thu, 31 Mar 2022 08:34:08 -0700 (PDT)
+Date:   Thu, 31 Mar 2022 15:34:04 +0000
+From:   Oliver Upton <oupton@google.com>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: Wire up CP15 feature registers to their
+ AArch64 equivalents
+Message-ID: <YkXJ7JyycOZyo+Ry@google.com>
+References: <20220329011301.1166265-1-oupton@google.com>
+ <20220329011301.1166265-2-oupton@google.com>
+ <CAAeT=FwR_hy3kYn2SgHELWb4F9mUmRemXWxOoiF=H23q-gzEjw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ae21aee2-41e1-3ad3-41ef-edda67a8449a@nutanix.com>
+In-Reply-To: <CAAeT=FwR_hy3kYn2SgHELWb4F9mUmRemXWxOoiF=H23q-gzEjw@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -76,75 +79,113 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 31, 2022, Shivam Kumar wrote:
+Hi Reiji,
+
+On Wed, Mar 30, 2022 at 10:45:35PM -0700, Reiji Watanabe wrote:
+> Hi Oliver,
 > 
-> On 31/03/22 6:10 am, Sean Christopherson wrote:
-> > On Sun, Mar 06, 2022, Shivam Kumar wrote:
-> > > Update the kvm_run structure with a brief description of dirty
-> > > quota members and how dirty quota throttling works.
-> > This should be squashed with patch 1.  I actually had to look ahead to this patch
-> > because I forgot the details since I last reviewed this :-)
-> Ack. Thanks.
-> > > +	__u64 dirty_quota;
-> > > +Please note that this quota cannot be strictly enforced if PML is enabled, and
-> > > +the VCPU may end up dirtying pages more than its quota. The difference however
-> > > +is bounded by the PML buffer size.
-> > If you want to be pedantic, I doubt KVM can strictly enforce the quota even if PML
-> > is disabled.  E.g. I can all but guarantee that it's possible to dirty multiple
-> > pages during a single exit.  Probably also worth spelling out PML and genericizing
-> > things.  Maybe
-> > 
-> >    Please note that enforcing the quota is best effort, as the guest may dirty
-> >    multiple pages before KVM can recheck the quota.  However, unless KVM is using
-> >    a hardware-based dirty ring buffer, e.g. Intel's Page Modification Logging,
-> >    KVM will detect quota exhaustion within a handful of dirtied page.  If a
-> >    hardware ring buffer is used, the overrun is bounded by the size of the buffer
-> >    (512 entries for PML).
-> Thank you for the blurb. Looks good to me, though I'm curious about the exits
-> that can dirty multiple pages.
+> On Mon, Mar 28, 2022 at 6:13 PM Oliver Upton <oupton@google.com> wrote:
+> >
+> > KVM currently does not trap ID register accesses from an AArch32 EL1.
+> > This is painful for a couple of reasons. Certain unimplemented features
+> > are visible to AArch32 EL1, as we limit PMU to version 3 and the debug
+> > architecture to v8.0. Additionally, we attempt to paper over
+> > heterogeneous systems by using register values that are safe
+> > system-wide. All this hard work is completely sidestepped because KVM
+> > does not set TID3 for AArch32 guests.
+> >
+> > Fix up handling of CP15 feature registers by simply rerouting to their
+> > AArch64 aliases. Punt setting HCR_EL2.TID3 to a later change, as we need
+> > to fix up the oddball CP10 feature registers still.
+> >
+> > Signed-off-by: Oliver Upton <oupton@google.com>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 66 +++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 66 insertions(+)
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index dd34b5ab51d4..30771f950027 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -2339,6 +2339,65 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
+> >         return 1;
+> >  }
+> >
+> > +static int emulate_sys_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *params);
+> > +
+> > +/**
+> > + * kvm_emulate_cp15_id_reg() - Handles an MRC trap on a guest CP15 access where
+> > + *                            CRn=0, which corresponds to the AArch32 feature
+> > + *                            registers.
+> > + * @vcpu: the vCPU pointer
+> > + * @params: the system register access parameters.
+> > + *
+> > + * Our cp15 system register tables do not enumerate the AArch32 feature
+> > + * registers. Conveniently, our AArch64 table does, and the AArch32 system
+> > + * register encoding can be trivially remapped into the AArch64 for the feature
+> > + * registers: Append op0=3, leaving op1, CRn, CRm, and op2 the same.
+> > + *
+> > + * According to DDI0487G.b G7.3.1, paragraph "Behavior of VMSAv8-32 32-bit
+> > + * System registers with (coproc=0b1111, CRn==c0)", read accesses from this
+> > + * range are either UNKNOWN or RES0. Rerouting remains architectural as we
+> > + * treat undefined registers in this range as RAZ.
+> > + */
+> > +static int kvm_emulate_cp15_id_reg(struct kvm_vcpu *vcpu,
+> > +                                  struct sys_reg_params *params)
+> > +{
+> > +       int Rt = kvm_vcpu_sys_get_rt(vcpu);
+> > +       int ret = 1;
+> > +
+> > +       params->Op0 = 3;
+> 
+> Nit: Shouldn't we restore the original Op0 after emulate_sys_reg() ?
+> (unhandled_cp_access() prints Op0. Restoring the original one
+>  would be more robust against future changes)
+> 
+> > +
+> > +       /*
+> > +        * All registers where CRm > 3 are known to be UNKNOWN/RAZ from AArch32.
+> > +        * Avoid conflicting with future expansion of AArch64 feature registers
+> > +        * and simply treat them as RAZ here.
+> > +        */
+> > +       if (params->CRm > 3)
+> > +               params->regval = 0;
+> > +       else
+> > +               ret = emulate_sys_reg(vcpu, params);
+> > +
+> > +       /* Treat impossible writes to RO registers as UNDEFINED */
+> > +       if (params->is_write)
+> 
+> This checking can be done even before calling emulate_sys_reg().
+> BTW, __access_id_reg() also injects UNDEFINED when p->is_write is true.
+> 
+> > +               unhandled_cp_access(vcpu, params);
+> > +       else
+> > +               vcpu_set_reg(vcpu, Rt, params->regval);
+> > +
+> > +       return ret;
+> > +}
+> > +
+> > +/**
+> > + * kvm_is_cp15_id_reg() - Returns true if the specified CP15 register is an
+> > + *                       AArch32 ID register.
+> > + * @params: the system register access parameters
+> > + *
+> > + * Note that CP15 ID registers where CRm=0 are excluded from this check, as they
+> > + * are already correctly handled in the CP15 register table.
+> 
+> I don't think this is true for all of the registers:)
+> I think at least some of them are not trapped (TCMTR, TLBTR,
+> REVIDR, etc), and I don't think they are handled in the CP15
+> register table.
 
-Anything that touches multiple pages.  nested_mark_vmcs12_pages_dirty() is an
-easy example.  Emulating L2 with nested TDP.  An emulated instruction that splits
-a page.  I'm pretty sure FNAME(sync_page) could dirty an entire page worth of
-SPTEs, and that's waaay too deep to bail from.
+Thanks for the review! This patch was a bit sloppy and indeed skipped a
+few steps in the comments. I believe the only register in CRm=0 that is
+trapped is actually CTR, hence the others are not present in the table.
 
-Oof, loking at sync_page(), that's a bug in patch 1.  make_spte() guards the call
-to mark_page_dirty_in_slot() with kvm_slot_dirty_track_enabled(), which means it
-won't honor the dirty quota unless dirty logging is enabled.  Probably not an issue
-for the intended use case, but it'll result in wrong stats, and technically the
-dirty quota can be enabled without dirty logging being enabled.
+I'll send out a v2 soon that addresses your feedback and the other
+embarrasing omissions on my end :)
 
-diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index 4739b53c9734..df0349be388b 100644
---- a/arch/x86/kvm/mmu/spte.c
-+++ b/arch/x86/kvm/mmu/spte.c
-@@ -182,7 +182,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
-                  "spte = 0x%llx, level = %d, rsvd bits = 0x%llx", spte, level,
-                  get_rsvd_bits(&vcpu->arch.mmu->shadow_zero_check, spte, level));
-
--       if ((spte & PT_WRITABLE_MASK) && kvm_slot_dirty_track_enabled(slot)) {
-+       if (spte & PT_WRITABLE_MASK) {
-                /* Enforced by kvm_mmu_hugepage_adjust. */
-                WARN_ON(level > PG_LEVEL_4K);
-                mark_page_dirty_in_slot(vcpu->kvm, slot, gfn);
-
-
-And thinking more about silly edge cases, VMX's big emulation loop for invalid
-guest state when unrestricted guest is disabled should probably explicitly check
-the dirty quota.  Again, I doubt it matters to anyone's use case, but it is treated
-as a full run loop for things like pending signals, it'd be good to be consistent.
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 84a7500cd80c..5e1ae373634c 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5511,6 +5511,9 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
-                 */
-                if (__xfer_to_guest_mode_work_pending())
-                        return 1;
-+
-+               if (!kvm_vcpu_check_dirty_quota(vcpu))
-+                       return 0;
-        }
-
-        return 1;
+--
+Thanks,
+Oliver
