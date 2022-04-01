@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 336504EF4C5
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 17:40:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48EB44EF434
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 17:30:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351009AbiDAPGs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 11:06:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52116 "EHLO
+        id S1350597AbiDAPGg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 11:06:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349452AbiDAOzp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 10:55:45 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F795A94CC;
-        Fri,  1 Apr 2022 07:43:58 -0700 (PDT)
+        with ESMTP id S1349970AbiDAO61 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 10:58:27 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DFAF1777E8;
+        Fri,  1 Apr 2022 07:45:45 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 49710B824FD;
-        Fri,  1 Apr 2022 14:43:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2569EC340EE;
-        Fri,  1 Apr 2022 14:43:54 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 31E9E60AC0;
+        Fri,  1 Apr 2022 14:45:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6E11C3410F;
+        Fri,  1 Apr 2022 14:45:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648824235;
-        bh=aocFPkyzseOCNsdg1UrLaHgsgGvcR7I5oaXDD6AYLMw=;
+        s=k20201202; t=1648824344;
+        bh=E2djiHk1LRYlrnMkPv5vbgKoFXBlVL5DTuDzJxyAGEQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=liOa8aoDyp/atrus9KEW+tK0dT3FIsK7lcBRHL2ROwlPECIHrfFJC8eVtB9mjRDq5
-         LAPxSmHtCelW+5BUv5mP1GLjDP3zklnB8BfgH7RQvXZ7LJLO+UAotoI7E1uyq4ufZV
-         Ko5YqH7UZpbUZ7qePARV5mCL2a5dyxqaif1m7qfyN9y0ScJ6vw+0YfmO51mGgVw1cQ
-         gyYaSb/nN2T11bpqRsf1D9Pb0x0yv22B3ZlC83i0g9filY9BQ0F+Aclvt0irKdvp2h
-         cttvaHxr2WNWX/+AyQflI5xxmKVOskDCMoSyUhEBllunMzSVTxXziBrhIrJbyUPLXK
-         yJOAuvelfPPSA==
+        b=RyhbL7cyN8NqMRC8e6vj1uLIeHjXRxaG/qHLyzhroxPq/XCzz96W99WgnEmctxavF
+         /dwgpb6WlOKaG/7fwN+ky5U6kMw0Bqxw1kW+MgeQVc0AyWQhfffai6DPlREwSfpN+M
+         Zr2hec+IbhmpozSM/q4qGTG04D0EPQACx7VLRGxreFNP08PzcPbVNjMqseJBGLUKa7
+         xkwQUMSeivlMM3tC9gPBdtb2x21zPEm8k9X6zWxjGbtVfDGLhr3FRXd62TxHqnmwuH
+         NL8FYUsbJA3rv/9evjtUKAVEQWEQVq7/zjLHm8o/IiEJ60WH9jwfWdU8yE4vVSUP4I
+         2hRb2qd4HDMfw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Harold Huang <baymaxhuang@gmail.com>,
@@ -42,12 +42,12 @@ Cc:     Harold Huang <baymaxhuang@gmail.com>,
         daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
         netdev@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 44/65] tuntap: add sanity checks about msg_controllen in sendmsg
-Date:   Fri,  1 Apr 2022 10:41:45 -0400
-Message-Id: <20220401144206.1953700-44-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 26/37] tuntap: add sanity checks about msg_controllen in sendmsg
+Date:   Fri,  1 Apr 2022 10:44:35 -0400
+Message-Id: <20220401144446.1954694-26-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220401144206.1953700-1-sashal@kernel.org>
-References: <20220401144206.1953700-1-sashal@kernel.org>
+In-Reply-To: <20220401144446.1954694-1-sashal@kernel.org>
+References: <20220401144446.1954694-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -86,10 +86,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  3 files changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-index f549d3a8e59c..8f7bb15206e9 100644
+index f285422a8071..f870d08bb1f8 100644
 --- a/drivers/net/tap.c
 +++ b/drivers/net/tap.c
-@@ -1202,7 +1202,8 @@ static int tap_sendmsg(struct socket *sock, struct msghdr *m,
+@@ -1214,7 +1214,8 @@ static int tap_sendmsg(struct socket *sock, struct msghdr *m,
  	struct xdp_buff *xdp;
  	int i;
  
@@ -100,10 +100,10 @@ index f549d3a8e59c..8f7bb15206e9 100644
  			xdp = &((struct xdp_buff *)ctl->ptr)[i];
  			tap_get_user_xdp(q, xdp);
 diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index ffbc7eda95ee..55ce141c93c7 100644
+index 10211ea60514..d9993884a97d 100644
 --- a/drivers/net/tun.c
 +++ b/drivers/net/tun.c
-@@ -2499,7 +2499,8 @@ static int tun_sendmsg(struct socket *sock, struct msghdr *m, size_t total_len)
+@@ -2561,7 +2561,8 @@ static int tun_sendmsg(struct socket *sock, struct msghdr *m, size_t total_len)
  	if (!tun)
  		return -EBADFD;
  
@@ -114,7 +114,7 @@ index ffbc7eda95ee..55ce141c93c7 100644
  		int n = ctl->num;
  		int flush = 0;
 diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index da02c3e96e7b..e303f6f073d2 100644
+index cec9173aac6f..1058aba8d573 100644
 --- a/drivers/vhost/net.c
 +++ b/drivers/vhost/net.c
 @@ -472,6 +472,7 @@ static void vhost_tx_batch(struct vhost_net *net,
