@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FAEE4EF95B
+	by mail.lfdr.de (Postfix) with ESMTP id 9FD9E4EF95C
 	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 19:56:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350818AbiDAR60 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 13:58:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36412 "EHLO
+        id S1350852AbiDAR63 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 13:58:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350766AbiDAR6V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 13:58:21 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D77F1D7612
-        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 10:56:30 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id ml1-20020a17090b360100b001ca140b56ffso1925988pjb.7
-        for <kvm@vger.kernel.org>; Fri, 01 Apr 2022 10:56:30 -0700 (PDT)
+        with ESMTP id S1350749AbiDAR6W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 13:58:22 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D51F526481A
+        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 10:56:31 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id k7-20020aa79727000000b004fdc86d9b79so1986594pfg.8
+        for <kvm@vger.kernel.org>; Fri, 01 Apr 2022 10:56:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=bPjRdwbrgeaGoRO6D9pIVUv9XL1QVrE/jZ7frr9Y9sk=;
-        b=HKXVYj5bLgLQDNl0Yp3f3Cxk0xEfw/WwCidCusFgYIXZPgwnivI6+Ih1CXvlNY8wv+
-         0SB7IO2lfWqyxHZXsqnHLnT0QBt4/Kn5lk5EW8K9iW1NthwnnpRVMkumhd4k1OQE77wT
-         S2O1Z7AitpIGEox5Qh5FKe0zYHXrRWVT9NJBODMGEgo+t6A06dO9q/xdIDofE1nFLYnl
-         tWGum6qGeGVSd65XaJizCavBESlaKNmwmbP75qcI6R+2txzDbk0mbonxSd1y21Sie2vy
-         W5UgLGjdxmVDqUWGtPF5QIJMbd5Gcb1De7NMCzJgjAuAzu6A7T0xAsFyXc5SNRC5Sf5R
-         j+lg==
+        bh=SFXm2KwniaE00QEj2NzqHgvf1ASQ84rh2AbpNytHfco=;
+        b=qJlGcvodbGXModlH9jGukKmgTNEjWAOITQQu62mFHP6LKDJbwZqskUJsLcP86ZbJU6
+         ci9SF25lZR0byT8KkjvNOzhD5SdjyuAbbl77X2sYflrRrmhCGM3luPp1sOeeEkV+3EAL
+         72SOwJfxzbZxHxeJw0r5hmFUuOz8+1rGkoNZg9n+oGWFvq9KXzbUDF9pwFZSsRX7F7CU
+         QAYlhUtNCoVt4sAs4aFJDgnE2BjvLy8UVhToIBfsNEPPIcfoYrdvQP2Y5Al9np8aW+3Z
+         vZlfv9GdlmFaj4JXon3BM18j1zorzjZSDNDzm7hgwuUh83hha4yb45BqMoS1/CXJ+Jpn
+         +MMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=bPjRdwbrgeaGoRO6D9pIVUv9XL1QVrE/jZ7frr9Y9sk=;
-        b=F/UmkmjxMe8VnNwOL8jCY0pXfhRdQZ9zPFM4q0YrThJl+aduqgcMl4Mkaqd2F2B2Hu
-         LYMsdVpW6UhHXxQiGTxm/r6WPXI+9tqUfNcvJwnqD8YODAA1Ma/elnqPoDScLNwxGD0D
-         lozjH7uVrZlod80tRsHC7Au0crqrTKMqRTq8x19nADKa4cyh5v4XJOOwlIv8c/Vt1YZV
-         GMv5GVGCq92W72hIkOdWjs8mHXtrqKbunM8C2tKppDslTof4Zs1TQ3pTHnmtAjbgypDz
-         NcRymIe9uc14rC0NNIbKki6C8RyKgZaRSB6FOBNc6FFppIouDMHojyeV42fDOhU5BvLw
-         IVFA==
-X-Gm-Message-State: AOAM533aKhLBfBAH+RNqgKxVYJFxCosqzdRgR/7QH1Ty5Z9Dc710zG9Q
-        zalCLeYhVnk22zpuB2XqKo/TEvPwrq6KTg==
-X-Google-Smtp-Source: ABdhPJwAwneAua3CK3hqlxT6AVdmOtu9SNJP0PRrgeiWzgw657lKsS+2gpSEl29HSjZknUEHAGP38CQTV81Y8Q==
+        bh=SFXm2KwniaE00QEj2NzqHgvf1ASQ84rh2AbpNytHfco=;
+        b=qIvf4+93Od+vE9b6Y2OgadFluED2B2Vz1243dHQtupg8peSMJRPi4Sf2DdP7YK+xUT
+         zKTCrz4LEkw2BfaxQFfX26IPG55hTRl/pmwJusAW7/VUJ4kwxIcPwc/XkHE8t4ruO08T
+         d12Dx/esMl9a2nZu3rO98pwNwPcan7ZI13Hspo8XHxWJ+7NTNOBMilHJRbZAuuKYmxiF
+         mBHdKakkZM/RsWbV+OYKatc7xSo48q/EOQ0Hxo47tGAmkIlp9WGlXFHXH/VRWHJSrJ/M
+         ChH78+lO7bi3XYwzqib+QtGtovw/PerfgQpXQZf1w0aklFelJ7G7xMgeXqVPyP+qgmnw
+         +rWg==
+X-Gm-Message-State: AOAM531gy14n5qn2EbEIZUB0gymrhba2iarTaZ6rOXVGmPI3eaRoa5ez
+        RGV9gy1TQrJglRK9qbKNtC7+MzJD6yMtOg==
+X-Google-Smtp-Source: ABdhPJy5g1z/iSbFZBwpj7J/HiTUYMlrOwh+Ud1JO3xyCytgN0gs7EbKQm2V60MVCQpu5tAlITqiMh3TNmIocA==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:902:d888:b0:151:6fe8:6e68 with SMTP
- id b8-20020a170902d88800b001516fe86e68mr11236930plz.158.1648835789747; Fri,
- 01 Apr 2022 10:56:29 -0700 (PDT)
-Date:   Fri,  1 Apr 2022 17:55:49 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:902:e78f:b0:156:3b3b:e4ce with SMTP
+ id cp15-20020a170902e78f00b001563b3be4cemr17310175plb.8.1648835791370; Fri,
+ 01 Apr 2022 10:56:31 -0700 (PDT)
+Date:   Fri,  1 Apr 2022 17:55:50 +0000
 In-Reply-To: <20220401175554.1931568-1-dmatlack@google.com>
-Message-Id: <20220401175554.1931568-19-dmatlack@google.com>
+Message-Id: <20220401175554.1931568-20-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220401175554.1931568-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
-Subject: [PATCH v3 18/23] KVM: x86/mmu: Zap collapsible SPTEs at all levels in
- the shadow MMU
+Subject: [PATCH v3 19/23] KVM: x86/mmu: Refactor drop_large_spte()
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
@@ -78,68 +77,78 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently KVM only zaps collapsible 4KiB SPTEs in the shadow MMU (i.e.
-in the rmap). This is fine for now KVM never creates intermediate huge
-pages during dirty logging, i.e. a 1GiB page is never partially split to
-a 2MiB page.
+drop_large_spte() drops a large SPTE if it exists and then flushes TLBs.
+Its helper function, __drop_large_spte(), does the drop without the
+flush.
 
-However, this will stop being true once the shadow MMU participates in
-eager page splitting, which can in fact leave behind partially split
-huge pages. In preparation for that change, change the shadow MMU to
-iterate over all necessary levels when zapping collapsible SPTEs.
+In preparation for eager page splitting, which will need to sometimes
+flush when dropping large SPTEs (and sometimes not), push the flushing
+logic down into __drop_large_spte() and add a bool parameter to control
+it.
 
 No functional change intended.
 
 Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 29 +++++++++++++++--------------
+ 1 file changed, 15 insertions(+), 14 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 3a425ed80e23..6390b23d286a 100644
+index 6390b23d286a..f058f28909ea 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6172,18 +6172,25 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
- 	return need_tlb_flush;
+@@ -1184,28 +1184,29 @@ static void drop_spte(struct kvm *kvm, u64 *sptep)
+ 		rmap_remove(kvm, sptep);
  }
  
-+static void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
-+					   const struct kvm_memory_slot *slot)
+-
+-static bool __drop_large_spte(struct kvm *kvm, u64 *sptep)
++static void __drop_large_spte(struct kvm *kvm, u64 *sptep, bool flush)
+ {
+-	if (is_large_pte(*sptep)) {
+-		WARN_ON(sptep_to_sp(sptep)->role.level == PG_LEVEL_4K);
+-		drop_spte(kvm, sptep);
+-		return true;
+-	}
++	struct kvm_mmu_page *sp;
+ 
+-	return false;
+-}
++	if (!is_large_pte(*sptep))
++		return;
+ 
+-static void drop_large_spte(struct kvm_vcpu *vcpu, u64 *sptep)
+-{
+-	if (__drop_large_spte(vcpu->kvm, sptep)) {
+-		struct kvm_mmu_page *sp = sptep_to_sp(sptep);
++	sp = sptep_to_sp(sptep);
++	WARN_ON(sp->role.level == PG_LEVEL_4K);
+ 
+-		kvm_flush_remote_tlbs_with_address(vcpu->kvm, sp->gfn,
++	drop_spte(kvm, sptep);
++
++	if (flush) {
++		kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
+ 			KVM_PAGES_PER_HPAGE(sp->role.level));
+ 	}
+ }
+ 
++static void drop_large_spte(struct kvm_vcpu *vcpu, u64 *sptep)
 +{
-+	/*
-+	 * Note, use KVM_MAX_HUGEPAGE_LEVEL - 1 since there's no need to zap
-+	 * pages that are already mapped at the maximum possible level.
-+	 */
-+	if (slot_handle_level(kvm, slot, kvm_mmu_zap_collapsible_spte,
-+			      PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL - 1,
-+			      true))
-+		kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
++	return __drop_large_spte(vcpu->kvm, sptep, true);
 +}
 +
- void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
- 				   const struct kvm_memory_slot *slot)
- {
- 	if (kvm_memslots_have_rmaps(kvm)) {
- 		write_lock(&kvm->mmu_lock);
--		/*
--		 * Zap only 4k SPTEs since the legacy MMU only supports dirty
--		 * logging at a 4k granularity and never creates collapsible
--		 * 2m SPTEs during dirty logging.
--		 */
--		if (slot_handle_level_4k(kvm, slot, kvm_mmu_zap_collapsible_spte, true))
--			kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
-+		kvm_rmap_zap_collapsible_sptes(kvm, slot);
- 		write_unlock(&kvm->mmu_lock);
- 	}
- 
+ /*
+  * Write-protect on the specified @sptep, @pt_protect indicates whether
+  * spte write-protection is caused by protecting shadow page table.
 -- 
 2.35.1.1094.g7c7d902a7c-goog
 
