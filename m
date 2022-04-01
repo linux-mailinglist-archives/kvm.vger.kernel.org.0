@@ -2,93 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C497F4EE983
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 10:09:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A71AB4EE997
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 10:12:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243087AbiDAIL3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 04:11:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42578 "EHLO
+        id S1344198AbiDAINR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 04:13:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbiDAIL1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 04:11:27 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D39E4DF4E;
-        Fri,  1 Apr 2022 01:09:37 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2315hclp016161;
-        Fri, 1 Apr 2022 08:09:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=wqxjiXbqHlGhwh49sbBy18A0WmxSRhtuzYbnJic3B4M=;
- b=QdbcvTOVE1w5ZMF60pq1oCmyebGBfk1b27xZAr7xdJsPOQ9Hkv+vUTYYejygXNQ3Ap+v
- z6646k3ikreGC4lHZZTdPAaKzmKl+L1QX2ZVGhZ7NtCplzNrkjkuvciIDjkK7Yd7qXXc
- /yKd51Nizpuciy+IwHHiJ5g62Aey8lF5uRmLI4l+tFJc/srv8vi166/HWdzAzhQiLoyg
- hdi38GRVbo6daJeDoK0G1IYTtpMR1k9HyqoYR+VsT5wWrzU9DdWZNe4mJ6AAhBx7vPrZ
- z6XQuYwO3mNM49Zuet3yUmZxkUerNec/csgIw4sD8en5C32krtOw6JDmNWHzQyiI/DU2 Dw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3f50afax19-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Apr 2022 08:09:37 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2317vkIu001042;
-        Fri, 1 Apr 2022 08:09:36 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3f50afax09-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Apr 2022 08:09:36 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23188oG6003101;
-        Fri, 1 Apr 2022 08:09:34 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03fra.de.ibm.com with ESMTP id 3f1tf92keq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Apr 2022 08:09:34 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23189VRg38666614
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 1 Apr 2022 08:09:31 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E37514205C;
-        Fri,  1 Apr 2022 08:09:30 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 815FD4204D;
-        Fri,  1 Apr 2022 08:09:30 +0000 (GMT)
-Received: from [9.145.70.97] (unknown [9.145.70.97])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  1 Apr 2022 08:09:30 +0000 (GMT)
-Message-ID: <890bd089-8c38-17b5-b5d5-1cf79f9c41d1@linux.ibm.com>
-Date:   Fri, 1 Apr 2022 10:09:30 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [kvm-unit-tests PATCH v2 2/5] s390x: skey: remove check for old
- z/VM version
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, scgl@linux.ibm.com,
-        borntraeger@de.ibm.com, pmorel@linux.ibm.com, pasic@linux.ibm.com,
-        nrb@linux.ibm.com, thuth@redhat.com, david@redhat.com
-References: <20220331160419.333157-1-imbrenda@linux.ibm.com>
- <20220331160419.333157-3-imbrenda@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220331160419.333157-3-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: jDI_bHcWfxthrgs65v214KFl5sx7AYTd
-X-Proofpoint-GUID: jesBVLaKwGCH123gUGTQsg49Z4lXiQNf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-04-01_02,2022-03-31_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 suspectscore=0 mlxscore=0 clxscore=1015 impostorscore=0
- phishscore=0 mlxlogscore=999 spamscore=0 bulkscore=0 adultscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204010037
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H3,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        with ESMTP id S1344224AbiDAIMt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 04:12:49 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FA71200978;
+        Fri,  1 Apr 2022 01:11:01 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id b130so1818246pga.13;
+        Fri, 01 Apr 2022 01:11:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id;
+        bh=dn5BxsTQLZIed/ZOGuC5oBdhwVSVIio+Ugi368MSy0E=;
+        b=O7dNnxq30pOKB0zq0kMtF8VSatWA+5u6srCmeevs9a5cGy/kwKvFPJ/+gMUWb1cIx+
+         qBmPAtNpPyn8pCGOOYQaHFn3Q+wiE0nlUAhg5CLBFvpZOFoShNXj7NziPTL4X7I9lDjP
+         C0U6eXN13r1gyc4isoYVXwfKRJFiGYE6x+XQdKeWh9zyaztef/d6KkTootPqhFKYvVpe
+         rAfp1yfniRUCHe99y4/Gksm8GW0PCGzxzcdquIj3zP+c0OMCWj/VmvCnivSsa4ZYVlCN
+         mASy627diKvoIAn33QU5POn5c0v9TPBVd/K16YM6Q1PlFhYAzm3X7kIniAm/YpCYOLwo
+         i9mA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=dn5BxsTQLZIed/ZOGuC5oBdhwVSVIio+Ugi368MSy0E=;
+        b=RRI5YVifRsTJwrpOpnt9ZjIG83rDCsczpbzkx9SrP5MbiWDdMqAtPMAumiK88qJMwA
+         a9Hhaq7Jgovk+m5WgsF3cfsxyD98whdwQGsSRqaAnNd9kN/H/T7RRj6VLAql+rR35YfI
+         scb4zviSkxFlXiKiUwIXM1xYqWcou0xtbqf2z+WaO0oEyGbIhvRZIDxcCBsl7oXTqgw4
+         7nwNKQTRlt37tt9aE/sYAeL3CxPGUN3bO2Kzt5Vroqo82Fy0XxHRBKlTRJpCtXsNl9/y
+         5Et89AtFbHAnwK7Kcrs05U6hTl4tNcgh+/aOP+8jmv1xhjN6+fXQqOgWLfNOPaqF1XJk
+         Ic7Q==
+X-Gm-Message-State: AOAM531Ls3W84jXpuL2hB1xOGbTdD97gIB0pGErnWYFx1dU/wFDu+P03
+        ZEUHXlhPrhnnVqmAcUQ5O51V97/DL3o=
+X-Google-Smtp-Source: ABdhPJyp3vYK6rehdobndZMj66sZcAXLGzFK/ZDO8HBW4Ptg4EZJciXiq1f37a72mot9Cjdkh/FMFw==
+X-Received: by 2002:a63:5c5c:0:b0:382:2812:9d9d with SMTP id n28-20020a635c5c000000b0038228129d9dmr14037025pgm.227.1648800660134;
+        Fri, 01 Apr 2022 01:11:00 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.113])
+        by smtp.googlemail.com with ESMTPSA id hg5-20020a17090b300500b001c795eedcffsm11634790pjb.13.2022.04.01.01.10.57
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 01 Apr 2022 01:10:59 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH v2 0/5] KVM: X86: Scaling Guest OS Critical Sections with boosting
+Date:   Fri,  1 Apr 2022 01:10:00 -0700
+Message-Id: <1648800605-18074-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -96,75 +68,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/31/22 18:04, Claudio Imbrenda wrote:
-> Remove the check for z/VM 6.x, since it is not needed anymore.
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+The missing semantic gap that occurs when a guest OS is preempted 
+when executing its own critical section, this leads to degradation 
+of application scalability. We try to bridge this semantic gap in 
+some ways, by passing guest preempt_count to the host and checking 
+guest irq disable state, the hypervisor now knows whether guest 
+OSes are running in the critical section, the hypervisor yield-on-spin 
+heuristics can be more smart this time to boost the vCPU candidate 
+who is in the critical section to mitigate this preemption problem, 
+in addition, it is more likely to be a potential lock holder.
 
-Thanks for taking care of this.
+Testing on 96 HT 2 socket Xeon CLX server, with 96 vCPUs VM 100GB RAM,
+one VM running benchmark, the other(none-2) VMs running cpu-bound 
+workloads, There is no performance regression for other benchmarks 
+like Unixbench etc.
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+1VM
+            vanilla    optimized    improved
 
-> ---
->   s390x/skey.c | 37 ++++---------------------------------
->   1 file changed, 4 insertions(+), 33 deletions(-)
-> 
-> diff --git a/s390x/skey.c b/s390x/skey.c
-> index 58a55436..edad53e9 100644
-> --- a/s390x/skey.c
-> +++ b/s390x/skey.c
-> @@ -65,33 +65,9 @@ static void test_set(void)
->   	       "set key test");
->   }
->   
-> -/* Returns true if we are running under z/VM 6.x */
-> -static bool check_for_zvm6(void)
-> -{
-> -	int dcbt;	/* Descriptor block count */
-> -	int nr;
-> -	static const unsigned char zvm6[] = {
-> -		/* This is "z/VM    6" in EBCDIC */
-> -		0xa9, 0x61, 0xe5, 0xd4, 0x40, 0x40, 0x40, 0x40, 0xf6
-> -	};
-> -
-> -	if (stsi(pagebuf, 3, 2, 2))
-> -		return false;
-> -
-> -	dcbt = pagebuf[31] & 0xf;
-> -
-> -	for (nr = 0; nr < dcbt; nr++) {
-> -		if (!memcmp(&pagebuf[32 + nr * 64 + 24], zvm6, sizeof(zvm6)))
-> -			return true;
-> -	}
-> -
-> -	return false;
-> -}
-> -
->   static void test_priv(void)
->   {
->   	union skey skey;
-> -	bool is_zvm6 = check_for_zvm6();
->   
->   	memset(pagebuf, 0, PAGE_SIZE * 2);
->   	report_prefix_push("privileged");
-> @@ -106,15 +82,10 @@ static void test_priv(void)
->   	report(skey.str.acc != 3, "skey did not change on exception");
->   
->   	report_prefix_push("iske");
-> -	if (is_zvm6) {
-> -		/* There is a known bug with z/VM 6, so skip the test there */
-> -		report_skip("not working on z/VM 6");
-> -	} else {
-> -		expect_pgm_int();
-> -		enter_pstate();
-> -		get_storage_key(pagebuf);
-> -		check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
-> -	}
-> +	expect_pgm_int();
-> +	enter_pstate();
-> +	get_storage_key(pagebuf);
-> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
->   	report_prefix_pop();
->   
->   	report_prefix_pop();
+hackbench -l 50000
+              28         21.45        30.5%
+ebizzy -M
+             12189       12354        1.4%
+dbench
+             712 MB/sec  722 MB/sec   1.4%
+
+2VM:
+            vanilla    optimized    improved
+
+hackbench -l 10000
+              29.4        26          13%
+ebizzy -M
+             3834        4033          5%
+dbench
+           42.3 MB/sec  44.1 MB/sec   4.3%
+
+3VM:
+            vanilla    optimized    improved
+
+hackbench -l 10000
+              47         35.46        33%
+ebizzy -M
+	     3828        4031         5%
+dbench 
+           30.5 MB/sec  31.16 MB/sec  2.3%
+
+v1 -> v2:
+ * add more comments to irq disable state 
+ * renaming irq_disabled to last_guest_irq_disabled
+ * renaming, inverting the return, and also return a bool for kvm_vcpu_non_preemptable
+
+Wanpeng Li (5):
+  KVM: X86: Add MSR_KVM_PREEMPT_COUNT support
+  KVM: X86: Add last guest interrupt disable state support
+  KVM: X86: Boost vCPU which is in critical section
+  x86/kvm: Add MSR_KVM_PREEMPT_COUNT guest support
+  KVM: X86: Expose PREEMT_COUNT CPUID feature bit to guest
+
+ Documentation/virt/kvm/cpuid.rst     |  3 ++
+ arch/x86/include/asm/kvm_host.h      |  8 ++++
+ arch/x86/include/uapi/asm/kvm_para.h |  2 +
+ arch/x86/kernel/kvm.c                | 10 +++++
+ arch/x86/kvm/cpuid.c                 |  3 +-
+ arch/x86/kvm/x86.c                   | 60 ++++++++++++++++++++++++++++
+ include/linux/kvm_host.h             |  1 +
+ virt/kvm/kvm_main.c                  |  7 ++++
+ 8 files changed, 93 insertions(+), 1 deletion(-)
+
+-- 
+2.25.1
 
