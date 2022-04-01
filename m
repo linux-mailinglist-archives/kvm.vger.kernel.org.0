@@ -2,146 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 01D6E4EEEC3
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 16:04:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E4B254EEEC6
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 16:05:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346268AbiDAOGm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 10:06:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48876 "EHLO
+        id S1346480AbiDAOH1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 10:07:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346503AbiDAOGk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 10:06:40 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3E7492D1F
-        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 07:04:49 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id f10so2542939plr.6
-        for <kvm@vger.kernel.org>; Fri, 01 Apr 2022 07:04:49 -0700 (PDT)
+        with ESMTP id S239154AbiDAOH0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 10:07:26 -0400
+Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97721F957A
+        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 07:05:36 -0700 (PDT)
+Received: by mail-il1-x12a.google.com with SMTP id y16so1995492ilc.7
+        for <kvm@vger.kernel.org>; Fri, 01 Apr 2022 07:05:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=Ucv1GhW8n0nffIVAqwQW+4kQjGqiGk4YkR9GX1DvEsc=;
-        b=MIrHnCeFbGOfpivtgisoY5HXpgz6Q5VL9xHBd/dPaYsRwhrs50kmiCRdY89OdvBYRZ
-         F3V8IKQQyIeBrypQXH5M0QoXaTdSSKWUBc++Iy9beGHg807nb9pdvncodhoQBonOhPDb
-         9yIf1S5eW+PrU7/pB+Wt7kjfFKYCCtYFNX6t/tikx0W89iGIsCgwELEU9YPoKMLHuE1U
-         HEQQgMdXcMkmkg79835gk0gaX/ZuFy6zCKw5p7Kz7TxrSeDIz1BUrFfMSlgEkJH1JDYI
-         yiqGVXlaiem5BE2UfJBdAX7NprjiKvBz6/0ZmKfIsotOF2o0SDDhSg+rPA9br5/m/1/c
-         c93Q==
+        bh=uXCsVFWD0w4UXVh3Fm9w12+K/OXplZUFIZtiYekvHOc=;
+        b=OnRuDW1exu8WenVX/hdv7SauOsLKx9F7IbXLwA5bW1DRWnwcvgCQCLyRK1ri6iZlDi
+         eQwsmB8XJ8egNj7UM1643Rt0PfDFFSRhMpNflrh8tRDOYw6w+dbSh0ScSRu95tYOQIq4
+         bmbc6oZtQEMLODJE0iaSN4Pt0Ge1WcXAPwLVQixNil046ixreKkN1UYI4Er2jeeuqCR8
+         Zwwa4zVlf/bV4mnY+T+kqNbNrMvcb2ypeFTOvoqNLWzy8Q9+6OWMxG+rES6zex+cdNnR
+         6e9Zx1ZUkAv9JoJbA7FERY8waWfpDlCcjWjSs2EoCq12eG0deRpR5Vnc/j6AbcPiAhvl
+         F4gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=Ucv1GhW8n0nffIVAqwQW+4kQjGqiGk4YkR9GX1DvEsc=;
-        b=hLRB0AWY4xw3W1anzdBULXRG5lz2ScNs14vhvzQhZ56GQXk1xRK9gIvCO1s5Lb/+Ya
-         kCmhovbyDjXPq8uImQk7wkLtmmSbcUNh1pq0667qeFCmxuE6lzCGJOuIrL/7gEyl187X
-         5omP/d5f44RQAaC4HBmYRKFIo8rsirkICmkgRlYK8jiicoMpeanlKTilPmXeOSJ6mSwt
-         rwy5PoLjwEn572h2Q8sXERap/8nynZ8eNWLsstzu0KFr6xFq83frSzH5/vaf87ejksI3
-         zOYj672iELoWEKVt44VkyMdg+soDdcqKMuYMoKfqzZK/1NyKlC0yTuBPgzd2BrGy0T/W
-         EAEQ==
-X-Gm-Message-State: AOAM531ui7VlP0I6Pri+icG/HPTn2n+ZYvyTToaeastjR82JsQSJYiUw
-        gjpGYhX+cpmzqVND0XOC4wkGKg==
-X-Google-Smtp-Source: ABdhPJwESG5OVr0BG3gSD4dSk1bo0d33fp8l727aMxWsQBm5ROkAmBlmQGdAK9cq3ps2vPOHpYgn3w==
-X-Received: by 2002:a17:90a:628b:b0:1c6:a410:d73f with SMTP id d11-20020a17090a628b00b001c6a410d73fmr12299042pjj.96.1648821888825;
-        Fri, 01 Apr 2022 07:04:48 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y11-20020aa793cb000000b004fb597d85b2sm3225176pff.160.2022.04.01.07.04.47
+        bh=uXCsVFWD0w4UXVh3Fm9w12+K/OXplZUFIZtiYekvHOc=;
+        b=zmKahNkfiui+vCyACM/YpJRnYuqkIS2LnJtDFKfos5Iyw8Ydk/W3gBQ+x0Y8HnBAMl
+         eGDaoaUtzQS+fWvM7VLQ3VsJh60xA2b7aWZ5649j0a51yzAj0ok5Euiq/jNYIEQ9Ukpm
+         Ikv/mTDEpybP+IgvwZCBREtePTPO4x2sQlZtvKhfTtTII0Nc07XB3jvzD+a0GSSR0hkm
+         gOyOpncxhKjjBZHD4de6ml0WPuTf1xFqKOhHh22rHrV54Bi88NYbeXE3sEHe7R6neQrQ
+         dIo8ERo0t3NokTlHQggavIkVFxurCZV+WbKzHyZqN//Ka0fLo2/shnLjrOrshTTYlK28
+         v3FA==
+X-Gm-Message-State: AOAM530AOfazNVXhOHhnj9iF9jmBPclZxSZ8W5dUhiX4J3LFBq9NNLCk
+        pa4XJLiAA5M6UkgQhyYLNkqKIA==
+X-Google-Smtp-Source: ABdhPJwE8ilKQ9QfD3xy/86HeFqHu2rPR9sYvkA0605Z0iQcRtHcmIDbU/M+ee2N5iC+wi8KuITDFA==
+X-Received: by 2002:a05:6e02:1b0f:b0:2c7:9ec2:1503 with SMTP id i15-20020a056e021b0f00b002c79ec21503mr15653859ilv.209.1648821935764;
+        Fri, 01 Apr 2022 07:05:35 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id h5-20020a92c085000000b002c9fcc469c8sm1342037ile.81.2022.04.01.07.05.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Apr 2022 07:04:48 -0700 (PDT)
-Date:   Fri, 1 Apr 2022 14:04:44 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] KVM: MMU: fix an IS_ERR() vs NULL bug
-Message-ID: <YkcGfMNjaayttqtC@google.com>
-References: <20220401100147.GA29786@kili>
+        Fri, 01 Apr 2022 07:05:34 -0700 (PDT)
+Date:   Fri, 1 Apr 2022 14:05:31 +0000
+From:   Oliver Upton <oupton@google.com>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH] KVM: arm64: Don't split hugepages outside of MMU write
+ lock
+Message-ID: <YkcGq5IHx5HUodGd@google.com>
+References: <20220331213844.2894006-1-oupton@google.com>
+ <CAAeT=FzmvwmXoxn41xqYJByNgGMwCRViCUP9yZ0cun13nJ43PQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220401100147.GA29786@kili>
+In-Reply-To: <CAAeT=FzmvwmXoxn41xqYJByNgGMwCRViCUP9yZ0cun13nJ43PQ@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 01, 2022, Dan Carpenter wrote:
-> The alloc_workqueue() function does not return error pointers, it
-> returns NULL on error.  Update the check accordingly.
+Hi Reiji,
+
+Thanks for the review!
+
+On Thu, Mar 31, 2022 at 11:07:23PM -0700, Reiji Watanabe wrote:
+> > @@ -1267,10 +1268,24 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >          */
+> >         if (fault_status == FSC_PERM && vma_pagesize == fault_granule) {
+> >                 ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
 > 
-> Fixes: 1a3320dd2939 ("KVM: MMU: propagate alloc_workqueue failure")
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> ---
+> When use_read_lock is set to true, it appears the above condition will
+> become always true (since fault_granule is PAGE_SIZE and force_pte
+> is true in this case).  So, I don't think the following "else" changes
+> really make any difference.  (Or am I overlooking something?)
+> Looking at the code, I doubt that even the original (before the regression)
+> code detects the case that is described in the comment below in the
+> first place.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Yes, you are right.
 
-> Obviously, I noticed that the patch says "propagate alloc_workqueue
-> failure" so that's a puzzling thing.  Merge issue perhaps?  In
-> linux-next it alloc_workqueue() returns NULL.
+I liked the explicit check against !use_read_lock (even if it is dead)
+to make it abundantly clear what is guarded by the write lock.
+Personally, I'm not a big fan of the conditional locking because it is
+hard to tell exactly what is protected by the read or write lock.
 
-No merge issue, just a goof.  The "propagate" patch was added because KVM neglected
-to check for allocation failure, so at least it was a step in the right direction :-)
+Maybe instead a WARN() could suffice. That way we bark at anyone who
+changes MMU locking again and breaks it. I found the bug with the splat
+above, but warning about replacing an already present PTE is rather far
+removed from the smoking gun in this situation.
 
->  arch/x86/kvm/mmu/tdp_mmu.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index a2f9a34a0168..d71d177ae6b8 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -22,8 +22,8 @@ int kvm_mmu_init_tdp_mmu(struct kvm *kvm)
->  		return 0;
->  
->  	wq = alloc_workqueue("kvm", WQ_UNBOUND|WQ_MEM_RECLAIM|WQ_CPU_INTENSIVE, 0);
-> -	if (IS_ERR(wq))
-> -		return PTR_ERR(wq);
-> +	if (!wq)
-> +		return -ENOMEM;
->  
->  	/* This should not be changed for the lifetime of the VM. */
->  	kvm->arch.tdp_mmu_enabled = true;
-> -- 
+Outside of the regression, I believe there are some subtle races where
+stage-2 is modified before taking the MMU lock. I'm going to think
+further about the implications of these, but perhaps we should pass
+through a page level argument to kvm_pagetable_stage2_relax_perms() and
+only do the operation if the paging structures match what is reported in
+the FSC. If the IPA is not in fact mapped at the specified page level,
+retry the faulting instruction.
 
-Paolo, any objection to also returning '0' in all non-error paths?  There's no
-need to return whether or not the TDP MMU is enabled since that's handled locally,
-and the "return 1" is rather odd.
+I'll get a patch up that addresses your comment and crams a WARN() in to
+assert the write lock is held.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index dbf46dd98618..dec32b4a13aa 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5779,7 +5779,7 @@ int kvm_mmu_init_vm(struct kvm *kvm)
-        spin_lock_init(&kvm->arch.mmu_unsync_pages_lock);
-
-        r = kvm_mmu_init_tdp_mmu(kvm);
--       if (r < 0)
-+       if (r)
-                return r;
-
-        node->track_write = kvm_mmu_pte_write;
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index a2f9a34a0168..3a60b999e1aa 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -31,7 +31,7 @@ int kvm_mmu_init_tdp_mmu(struct kvm *kvm)
-        spin_lock_init(&kvm->arch.tdp_mmu_pages_lock);
-        INIT_LIST_HEAD(&kvm->arch.tdp_mmu_pages);
-        kvm->arch.tdp_mmu_zap_wq = wq;
--       return 1;
-+       return 0;
- }
-
- /* Arbitrarily returns true so that this may be used in if statements. */
+--
+Thanks,
+Oliver
