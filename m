@@ -2,177 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 01C5C4EF8BB
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 19:14:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E1F04EF8F2
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 19:29:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349786AbiDARQT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 13:16:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37490 "EHLO
+        id S1349527AbiDARbC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 13:31:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345581AbiDARQQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 13:16:16 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 599D018116F
-        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 10:14:26 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id j13so2970846plj.8
-        for <kvm@vger.kernel.org>; Fri, 01 Apr 2022 10:14:26 -0700 (PDT)
+        with ESMTP id S1348986AbiDARbA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 13:31:00 -0400
+Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCCF3139AD0
+        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 10:29:10 -0700 (PDT)
+Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-df22f50e0cso3443691fac.3
+        for <kvm@vger.kernel.org>; Fri, 01 Apr 2022 10:29:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=TmJlBi2lOKilVyCE4rEH1RU4SqqxsckJUfBoRuoJ5iA=;
-        b=XswIK2+VM16bs1EyCAixrX89EKH93ezG3dB1CWqPGTee1snfa+If/AZijfKqsxCqtT
-         czAJM7L+aUj6khEGJ6GV9s++PLrO8RH4lZkcJg2KUogkm/dx0FOh6Bdu3+L9kSytbNEF
-         XG0woWBUkeuEHiLxkjZVlGyLcAV8wCqkBCs5NYAogpMbDENpW1paD3SiXOo3FOHbC/BE
-         WYgluaeEO6OycFsdtzk13mJ436B8Tm+WeKW9KRWPo6GkYNWY936IsCliUkUrYOsiKniH
-         rexTSPppoR//hQcB3ze8glrIZD0dmsOyJ/XHIq6k4cBlE7q4ChILUSTyVJwIVcd9BGxN
-         YFAg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=WraNq3noA/oHiDCjdg83h3Em4sODbXuxqxGa7fOH8ng=;
+        b=EsSECRyZjkVgBr1ClmR85DHg4N2nM7LFSOrbUSP+8C949qfg6GkveD5ES9E3SShZyZ
+         l4IPUKyvTHVumFZ9Dx8c2Luhu6rpCOrogAIXZ802DTlPka7u7JKOfjUljz/BAuPdRO0x
+         4Dx+gUlLKfDXSx2xVax3IkWYAy5V/cGSFOTK4dF1U80HifkUuGn0HWjfamK0JDGcBWM3
+         Ba1L3XJpeR0xUZp61b3NslEhzWr+Y+33udJpb8HxjqcIjm2FNp8DihAabvqyCvze7b1N
+         DusTQPre2DAIwUnKPYtCOWP0BS5ej/2M4GLYLKDgvgDq7cuq/+jceqBMy8B2vNCI5Tki
+         IAVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=TmJlBi2lOKilVyCE4rEH1RU4SqqxsckJUfBoRuoJ5iA=;
-        b=BErFBKU1hqFgAWIWxuo4MIKc6w1pVk+UweZ0UjZ1zvBvDrPzCfuTY5/Nao+82UqY0N
-         38mL3CaFFDe/uV1DIPRYpiRp9nR3N4Rjd+Ui9h7RAaBg/sHaRa6lluGFUB1sjyFsmmvV
-         KDb2dZyRenwGCBzMgfRYWgUxMO7NEd9aE5zsHMgJgG/8BRWVMrT9+Ik917EnvQdzwriq
-         8slBAwpG8AfPuqguAqg9bjHLl9q/Qi3jv6nzcWml08WEPKW4AR5mkjQYvri9cCosfHhD
-         I9GSEbv8zMOsCjkM9le9Bdw6fbRyDbey/tu3ZYx7xJa0vfiYbfDZwnotUxXH9BZQCXVf
-         uuNg==
-X-Gm-Message-State: AOAM530V6zht85qlsxsn78tp6QrpZtErP8IWHgEwW/JLzjrRHhoABrnx
-        +I1oBv5G2TqIuzJ1dLMHTU/jgQ==
-X-Google-Smtp-Source: ABdhPJz12AHLKCpitPA4TCd4Qr7wvOzdMzS4bQmVFvgCp7soE2Mp/gjwDqcr67uNH6+9bYjsC7+Dhg==
-X-Received: by 2002:a17:902:ec8c:b0:154:2e86:dd51 with SMTP id x12-20020a170902ec8c00b001542e86dd51mr11082426plg.99.1648833265465;
-        Fri, 01 Apr 2022 10:14:25 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id z5-20020a056a00240500b004e15d39f15fsm3669103pfh.83.2022.04.01.10.14.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Apr 2022 10:14:24 -0700 (PDT)
-Date:   Fri, 1 Apr 2022 17:14:21 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Quentin Perret <qperret@google.com>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=WraNq3noA/oHiDCjdg83h3Em4sODbXuxqxGa7fOH8ng=;
+        b=C2aH+2ThfbMo1/xk/FpCpgPuWfmx7d0yDLby/f2Zo8mBmtYSX05NMOI145ZKtOOURO
+         jvXo7kpp28hAW5cRxOcsurX1gJ0J+T+c6SopKxXMY1K1+qYNqB/hN60+jsucs+DUr0F0
+         DkMS63nDAhWn8Wg2mOfV8txQ6xXZsIcgTt67APp3PN1feSzT+2c9wjlhz9qArxsuXOyR
+         8Yv0J0/Z9aNEKm1qR2Dq7XplrxfNq292Z8yd88LgklKgb+XvcAuY6Uhp+tYv3GQH8niS
+         thIycbVvW7mE9VKxuI5AxFDkClj8ZEsG7Cs/BPlXrAYjTY6CTnA7s+vNpOBWpt3SgdKl
+         PVbA==
+X-Gm-Message-State: AOAM532RoAdJdSzvJQakKfb1vr/8HgowG0D2Sx1qJdqTIg0Z1rVJpfpR
+        VSznjmzyKylUunVREZOQsXIXkOXNM/ROuJP/WeKYjQ==
+X-Google-Smtp-Source: ABdhPJznFK2GQmOfuSdixOKziz2XOo/OGu52BVauEjLHcwnKrfyjITdvyw8UBW3cpa+rXmCw1sWOkZtnIbQUQLaG8SE=
+X-Received: by 2002:a05:6870:40cc:b0:de:15e7:4df0 with SMTP id
+ l12-20020a05687040cc00b000de15e74df0mr5635386oal.110.1648834149772; Fri, 01
+ Apr 2022 10:29:09 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220308043857.13652-1-nikunj@amd.com> <YkIh8zM7XfhsFN8L@google.com>
+ <c4b33753-01d7-684e-23ac-1189bd217761@amd.com> <YkSz1R3YuFszcZrY@google.com>
+ <5567f4ec-bbcf-4caf-16c1-3621b77a1779@amd.com> <CAMkAt6px4A0CyuZ8h7zKzTxQUrZMYEkDXbvZ=3v+kphRTRDjNA@mail.gmail.com>
+ <YkX6aKymqZzD0bwb@google.com>
+In-Reply-To: <YkX6aKymqZzD0bwb@google.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Fri, 1 Apr 2022 10:28:58 -0700
+Message-ID: <CAA03e5GXmo33OOyxb08L5Ztz1dP-OSsPzeo0HK73p9ShvnMmRg@mail.gmail.com>
+Subject: Re: [PATCH RFC v1 0/9] KVM: SVM: Defer page pinning for SEV guests
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Peter Gonda <pgonda@google.com>,
+        "Nikunj A. Dadhania" <nikunj@amd.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Bharata B Rao <bharata@amd.com>,
         "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
+        Mingwei Zhang <mizhang@google.com>,
         David Hildenbrand <david@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <Ykcy7fj/d+f9OUl/@google.com>
-References: <YjyS6A0o4JASQK+B@google.com>
- <YkHspg+YzOsbUaCf@google.com>
- <YkH32nx+YsJuUbmZ@google.com>
- <YkIFW25WgV2WIQHb@google.com>
- <YkM7eHCHEBe5NkNH@google.com>
- <88620519-029e-342b-0a85-ce2a20eaf41b@arm.com>
- <YkQzfjgTQaDd2E2T@google.com>
- <YkSaUQX89ZEojsQb@google.com>
- <80aad2f9-9612-4e87-a27a-755d3fa97c92@www.fastmail.com>
- <YkcTTY4YjQs5BRhE@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YkcTTY4YjQs5BRhE@google.com>
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 01, 2022, Quentin Perret wrote:
-> The typical flow is as follows:
-> 
->  - the host asks the hypervisor to run a guest;
-> 
->  - the hypervisor does the context switch, which includes switching
->    stage-2 page-tables;
-> 
->  - initially the guest has an empty stage-2 (we don't require
->    pre-faulting everything), which means it'll immediately fault;
-> 
->  - the hypervisor switches back to host context to handle the guest
->    fault;
-> 
->  - the host handler finds the corresponding memslot and does the
->    ipa->hva conversion. In our current implementation it uses a longterm
->    GUP pin on the corresponding page;
-> 
->  - once it has a page, the host handler issues a hypercall to donate the
->    page to the guest;
-> 
->  - the hypervisor does a bunch of checks to make sure the host owns the
->    page, and if all is fine it will unmap it from the host stage-2 and
->    map it in the guest stage-2, and do some bookkeeping as it needs to
->    track page ownership, etc;
-> 
->  - the guest can then proceed to run, and possibly faults in many more
->    pages;
-> 
->  - when it wants to, the guest can then issue a hypercall to share a
->    page back with the host;
-> 
->  - the hypervisor checks the request, maps the page back in the host
->    stage-2, does more bookkeeping and returns back to the host to notify
->    it of the share;
-> 
->  - the host kernel at that point can exit back to userspace to relay
->    that information to the VMM;
-> 
->  - rinse and repeat.
+On Thu, Mar 31, 2022 at 12:01 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Mar 31, 2022, Peter Gonda wrote:
+> > On Wed, Mar 30, 2022 at 10:48 PM Nikunj A. Dadhania <nikunj@amd.com> wrote:
+> > > On 3/31/2022 1:17 AM, Sean Christopherson wrote:
+> > > > On Wed, Mar 30, 2022, Nikunj A. Dadhania wrote:
+> > > >> On 3/29/2022 2:30 AM, Sean Christopherson wrote:
+> > > >>> Let me preface this by saying I generally like the idea and especially the
+> > > >>> performance, but...
+> > > >>>
+> > > >>> I think we should abandon this approach in favor of committing all our resources
+> > > >>> to fd-based private memory[*], which (if done right) will provide on-demand pinning
+> > > >>> for "free".
+> > > >>
+> > > >> I will give this a try for SEV, was on my todo list.
+> > > >>
+> > > >>> I would much rather get that support merged sooner than later, and use
+> > > >>> it as a carrot for legacy SEV to get users to move over to its new APIs, with a long
+> > > >>> term goal of deprecating and disallowing SEV/SEV-ES guests without fd-based private
+> > > >>> memory.
+> > > >>
+> > > >>> That would require guest kernel support to communicate private vs. shared,
+> > > >>
+> > > >> Could you explain this in more detail? This is required for punching hole for shared pages?
+> > > >
+> > > > Unlike SEV-SNP, which enumerates private vs. shared in the error code, SEV and SEV-ES
+> > > > don't provide private vs. shared information to the host (KVM) on page fault.  And
+> > > > it's even more fundamental then that, as SEV/SEV-ES won't even fault if the guest
+> > > > accesses the "wrong" GPA variant, they'll silent consume/corrupt data.
+> > > >
+> > > > That means KVM can't support implicit conversions for SEV/SEV-ES, and so an explicit
+> > > > hypercall is mandatory.  SEV doesn't even have a vendor-agnostic guest/host paravirt
+> > > > ABI, and IIRC SEV-ES doesn't provide a conversion/map hypercall in the GHCB spec, so
+> > > > running a SEV/SEV-ES guest under UPM would require the guest firmware+kernel to be
+> > > > properly enlightened beyond what is required architecturally.
+> > > >
+> > >
+> > > So with guest supporting KVM_FEATURE_HC_MAP_GPA_RANGE and host (KVM) supporting
+> > > KVM_HC_MAP_GPA_RANGE hypercall, SEV/SEV-ES guest should communicate private/shared
+> > > pages to the hypervisor, this information can be used to mark page shared/private.
+> >
+> > One concern here may be that the VMM doesn't know which guests have
+> > KVM_FEATURE_HC_MAP_GPA_RANGE support and which don't. Only once the
+> > guest boots does the guest tell KVM that it supports
+> > KVM_FEATURE_HC_MAP_GPA_RANGE. If the guest doesn't we need to pin all
+> > the memory before we run the guest to be safe to be safe.
+>
+> Yep, that's a big reason why I view purging the existing SEV memory management as
+> a long term goal.  The other being that userspace obviously needs to be updated to
+> support UPM[*].   I suspect the only feasible way to enable this for SEV/SEV-ES
+> would be to restrict it to new VM types that have a disclaimer regarding additional
+> requirements.
+>
+> [*] I believe Peter coined the UPM acronym for "Unmapping guest Private Memory".  We've
+>     been using it iternally for discussion and it rolls off the tongue a lot easier than
+>     the full phrase, and is much more precise/descriptive than just "private fd".
 
-I assume there is a scenario where a page can be converted from shared=>private?
-If so, is there a use case where that happens post-boot _and_ the contents of the
-page are preserved?
+Can we really "purge the existing SEV memory management"? This seems
+like a non-starter because it violates userspace API (i.e., the
+ability for the userspace VMM to run a guest without
+KVM_FEATURE_HC_MAP_GPA_RANGE). Or maybe I'm not quite following what
+you mean by purge.
 
-> We currently don't allow the host punching holes in the guest IPA space.
+Assuming that UPM-based lazy pinning comes together via a new VM type
+that only supports new images based on a minimum kernel version with
+KVM_FEATURE_HC_MAP_GPA_RANGE, then I think this would like as follows:
 
-The hole doesn't get punched in guest IPA space, it gets punched in the private
-backing store, which is host PA space.
+1. Userspace VMM: Check SEV VM type. If type is legacy SEV type then
+do upfront pinning. Else, skip up front pinning.
+2. KVM: I'm not sure anything special needs to happen here. For the
+legacy VM types, it can be configured to use legacy memslots,
+presumably the same as non-CVMs will be configured. For the new VM
+type, it should be configured to use UPM.
+3. Control plane (thing creating VMs): Responsible for not allowing
+legacy SEV images (i.e., images without KVM_FEATURE_HC_MAP_GPA_RANGE)
+with the new SEV VM types that use UPM and have support for demand
+pinning.
 
-> Once it has donated a page to a guest, it can't have it back until the
-> guest has been entirely torn down (at which point all of memory is
-> poisoned by the hypervisor obviously).
-
-The guest doesn't have to know that it was handed back a different page.  It will
-require defining the semantics to state that the trusted hypervisor will clear
-that page on conversion, but IMO the trusted hypervisor should be doing that
-anyways.  IMO, forcing on the guest to correctly zero pages on conversion is
-unnecessarily risky because converting private=>shared and preserving the contents
-should be a very, very rare scenario, i.e. it's just one more thing for the guest
-to get wrong.
-
-If there is a use case where the page contents need to be preserved, then that can
-and should be an explicit request from the guest, and can be handled through
-export/import style functions.  Export/import would be slow-ish due to memcpy(),
-which is why I asked if there's a need to do this specific action frequently (or
-at all).
+Sean: Did I get this right?
