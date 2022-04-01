@@ -2,91 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0291E4EE8AD
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 08:58:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 605844EE8DD
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 09:13:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343568AbiDAG6q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 02:58:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35036 "EHLO
+        id S1343760AbiDAHPK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 03:15:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343565AbiDAG6m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 02:58:42 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B243B19F45E;
-        Thu, 31 Mar 2022 23:56:47 -0700 (PDT)
+        with ESMTP id S1343740AbiDAHPJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 03:15:09 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4D0ABAE;
+        Fri,  1 Apr 2022 00:13:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1648796207; x=1680332207;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Wxp4yJ/NukfxY6U5mWq/JBboluF6jxxrl8HF3wv1pMc=;
-  b=eKgaeZs2O26Nin60M62tJcf55tS38SGNyv7Xg65rho9I7cXRxzvxZdOV
-   lVg8aNJEZF2y3yyLjKuIWLOBxZrzMTxKvDWvq8NEZcxOnbPHUyGhRXJHj
-   vtEkZECGe8Ke3xqaEKSvCHumW9QirU2L9I8sHJmkDfX1ZOoiR7JOKRisO
-   ygxoS2KdWxieN69xbmRPKK9KaubAxHUyKgvGZtrwYoBDlROy/tzMphyiv
-   oL0NbM0gBIDKv5rkDJsKrDSOQ4ZMChYzGWCXb+ApG/NluMfoarQPv7H+z
-   NcMh4NlIURuy9eqlDr6OYNlECy5bznV9u1zC8BHiDElGzG/Miy5e3jFTt
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10303"; a="260045758"
+  t=1648797198; x=1680333198;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=v7BxFZS7EqBUMLT0jC44zPK3Hm0zxzgqgjgsmXPUMUw=;
+  b=Ac42CdQetfvW8slyl4NOL6AoLTBR/8A9IIRmo7HIlpSxy16IgCCsMTSo
+   l1IMWjIb28B8RtTdhyi/32Qe4EcZhNUtI2/SuoDd4rJEQ5XdBpDxgbxTb
+   qeChU8nvUfzOOq1lZOLGCFf+T7HXZOnKJ4NbttwIwi+yJteois7xg/tOD
+   qFxxZ61Kyo++AQQuGvT/r7hQle70wahFujccmTadEWRBUoUaUFUm1yr5Y
+   4hzHOC5HEE7RGa+iS5A/Ez0D/lPOwr3csI1b0Ppc6QRmA37f3agEDjfty
+   0Cvi+4ORg2+jloTOCrjpN+XN6GCDeC6xXx8hXX8jwnwDzSKSNPSf1sFrx
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10303"; a="240652800"
 X-IronPort-AV: E=Sophos;i="5.90,226,1643702400"; 
-   d="scan'208";a="260045758"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2022 23:56:46 -0700
+   d="scan'208";a="240652800"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2022 00:13:18 -0700
 X-IronPort-AV: E=Sophos;i="5.90,226,1643702400"; 
-   d="scan'208";a="567217562"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.171.24]) ([10.249.171.24])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2022 23:56:43 -0700
-Message-ID: <d63042a2-91d8-5555-1bac-4d908e03da2b@intel.com>
-Date:   Fri, 1 Apr 2022 14:56:40 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.6.1
-Subject: Re: [RFC PATCH v5 008/104] KVM: TDX: Add a function to initialize TDX
- module
-Content-Language: en-US
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Kai Huang <kai.huang@intel.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+   d="scan'208";a="547686744"
+Received: from jamendoz-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.95.128])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2022 00:13:15 -0700
+Message-ID: <3cfffe9a29e53ae58dc59d0af3d52128babde79f.camel@intel.com>
+Subject: Re: [RFC PATCH v5 037/104] KVM: x86/mmu: Allow non-zero init value
+ for shadow PTE
+From:   Kai Huang <kai.huang@intel.com>
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
         Connor Kuehl <ckuehl@redhat.com>,
         Sean Christopherson <seanjc@google.com>
+Date:   Fri, 01 Apr 2022 20:13:13 +1300
+In-Reply-To: <968de4765e63d8255ae1b3ac7062ffdca64706e4.camel@intel.com>
 References: <cover.1646422845.git.isaku.yamahata@intel.com>
- <b92217283fa96b85e9a683ca3fcf1b368cf8d1c4.1646422845.git.isaku.yamahata@intel.com>
- <36aac3cb7c7447db6454ee396e25eea3bad378e6.camel@intel.com>
- <20220331194144.GA2084469@ls.amr.corp.intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20220331194144.GA2084469@ls.amr.corp.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+         <b74b3660f9d16deafe83f2670539a8287bef988f.1646422845.git.isaku.yamahata@intel.com>
+         <968de4765e63d8255ae1b3ac7062ffdca64706e4.camel@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/1/2022 3:41 AM, Isaku Yamahata wrote:
-> On Thu, Mar 31, 2022 at 04:31:10PM +1300,
-> Kai Huang <kai.huang@intel.com> wrote:
+On Fri, 2022-04-01 at 18:13 +1300, Kai Huang wrote:
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -617,9 +617,9 @@ static int mmu_spte_clear_track_bits(struct kvm *kvm,
+> > u64 *sptep)
+> >   	int level = sptep_to_sp(sptep)->role.level;
+> >   
+> >   	if (!spte_has_volatile_bits(old_spte))
+> > -		__update_clear_spte_fast(sptep, 0ull);
+> > +		__update_clear_spte_fast(sptep, shadow_init_value);
+> >   	else
+> > -		old_spte = __update_clear_spte_slow(sptep, 0ull);
+> > +		old_spte = __update_clear_spte_slow(sptep,
+> > shadow_init_value);
 > 
->> On Fri, 2022-03-04 at 11:48 -0800, isaku.yamahata@intel.com wrote:
->>> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
->>> Add a wrapper function to initialize the TDX module and get system-wide
->>> parameters via those APIs.  Because TDX requires VMX enabled, It will be
->>> called on-demand when the first guest TD is created via x86 KVM init_vm
->>> callback.
->>
->> Why not just merge this patch with the change where you implement the init_vm
->> callback?  Then you can just declare this patch as "detect and initialize TDX
->> module when first VM is created", or something like that..
-> 
-> Ok. Anyway in the next respoin, tdx module initialization will be done when
-> loading kvm_intel.ko.  So the whole part will be changed and will be a part
-> of module loading.
+> I guess it's better to have some comment here.  Allow non-zero init value for
+> shadow PTE doesn't necessarily mean the initial value should be used when one
+> PTE is zapped.  I think mmu_spte_clear_track_bits() is only called for mapping
+> of normal (shared) memory but not MMIO? Then perhaps it's better to have a
+> comment to explain we want "suppress #VE" set to get a real EPT violation for
+> normal memory access from guest?
 
-Will we change the GET_TDX_CAPABILITIES ioctl back to KVM scope?
+Btw, I think the relevant part of TDP MMU change should be included in this
+patch too otherwise TDP MMU is broken with this patch.
+
+Actually in this series legacy MMU is not supported to work with TDX, so above
+change to legacy MMU doesn't matter actually.  Instead, TDP MMU change should be
+here.
+
+-- 
+Thanks,
+-Kai
+
+
