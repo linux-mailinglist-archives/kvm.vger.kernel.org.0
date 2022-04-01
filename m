@@ -2,317 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 966364EF795
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 18:20:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 861D04EF7A2
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 18:20:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235063AbiDAQL2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 12:11:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49800 "EHLO
+        id S1349353AbiDAQQP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 12:16:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349767AbiDAQJA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 12:09:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A5CF5FFB52
-        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 08:33:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648827179;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=em7/fTw6LvQa2Hc0AbekM+wcT42DD4pAvXBp00DF3Zc=;
-        b=gu4psxXDQ8kTA5KE0FmQB32FGfWxv3tJLt70W8/PU3MnB+RbNQ+dySh7z3zy8W4eh2G/OC
-        3gdoNcFxnZrPDmS3wHeEGbFX1aVftgF8DJt+3P/i7JuLsTYvACccDSkLebs7w33PinYV6F
-        VFJOlw03odCxeaMSb3dkId03DDnG/QY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-421-70s7NRLpNRatsLonP2aPLw-1; Fri, 01 Apr 2022 11:32:56 -0400
-X-MC-Unique: 70s7NRLpNRatsLonP2aPLw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 681F78002BF;
-        Fri,  1 Apr 2022 15:32:56 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 46F63C07F5D;
-        Fri,  1 Apr 2022 15:32:56 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] Second batch of KVM changes for Linux 5.18
-Date:   Fri,  1 Apr 2022 11:32:56 -0400
-Message-Id: <20220401153256.103938-1-pbonzini@redhat.com>
+        with ESMTP id S1350510AbiDAQN5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 12:13:57 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2060.outbound.protection.outlook.com [40.107.223.60])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87B16CD303;
+        Fri,  1 Apr 2022 08:39:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bxfaL1NTm+dmgH3TM9Dbw2/kaeOrjHUgCdrk8rhtnRGLE/FlMzfuvFHDviknPS9NU3eSrx+/lVNlO0KvRv9zpKQKhfuT0K+L5ost/zy2S2H4lpQlThyVGNlbAiiZWgWF/LBd0/bK1ODHs99obZ/DuNiRni1XDhTOiBz1aRCw8K0ItWE7QGjlEOhDtT1DYkGlqGk+gQg395P2edYWubCJojvfvpkvlxndJ/EvzO2ougr1m8pXywleCR0dSipv5etFuT7X5rCxBoL7q1NLiP2kR6R+zbWvzhFQAnUbYV4MU4w6Au2VjGK3wP1zjsugtHHQaOJFGRN1wlRvH2/spA4cUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tYYuW2q0FeeSJQNUPL06Tty5wYOslgn5uc4yEpu7swg=;
+ b=g7bEbHNC5/Wt8luMdjSHQfAFM6Bq4ardcbhStvU6781WMTbONWDdDAh2o5c/JnmXur5L15KhlDtxhI1YBHDjPHa66DS3ddYoNqDJbcnihPQ51Mtd5ShUAknUYpSMKqmXLRmpCLCiZvfU4xIG90wtmolJBJ4JdC6SZK+1gfIj+v9jDNsJKqC5/Ga4+MSsfMtuMzkaXFnyMAO7nHTttTVPdUn7ima2gstZCdoB8Ag7+O6y96raHsfneZkXICvxcPuGjkQ7nvRx2SHrj4epFIhoN41Cn8VJMTaQirYVCzkdFbgF23mOygi1BxUSp2NbAXTEYCuHoFGhKmOW2ctXli7MXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tYYuW2q0FeeSJQNUPL06Tty5wYOslgn5uc4yEpu7swg=;
+ b=o0ApAh8+02/PJNnGCWJiZu24yETPAcY3YHjGGIicYOJn3pcIBoP156Gr7Ic50WYaQu9vvnXwmcjb23Lu06srpwfR7uSvWmbyTXv+771aFCIEA2rOj80R/vC3MC7TLhVHhvFuFJHzrDVE+3M/rLA6kJ09Q+umtWMWtIH9riog5XM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB2470.namprd12.prod.outlook.com (2603:10b6:4:b4::39) by
+ BL0PR12MB4755.namprd12.prod.outlook.com (2603:10b6:208:82::26) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5123.29; Fri, 1 Apr 2022 15:39:45 +0000
+Received: from DM5PR12MB2470.namprd12.prod.outlook.com
+ ([fe80::8547:4b1f:9eea:e28b]) by DM5PR12MB2470.namprd12.prod.outlook.com
+ ([fe80::8547:4b1f:9eea:e28b%3]) with mapi id 15.20.5123.028; Fri, 1 Apr 2022
+ 15:39:45 +0000
+Message-ID: <fe90faec-a320-c203-67f9-7de74e50b513@amd.com>
+Date:   Fri, 1 Apr 2022 21:09:31 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.2
+Subject: Re: [PATCH RFC v1 0/9] KVM: SVM: Defer page pinning for SEV guests
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Peter Gonda <pgonda@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Bharata B Rao <bharata@amd.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Mingwei Zhang <mizhang@google.com>,
+        David Hildenbrand <david@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+References: <20220308043857.13652-1-nikunj@amd.com>
+ <YkIh8zM7XfhsFN8L@google.com> <c4b33753-01d7-684e-23ac-1189bd217761@amd.com>
+ <YkSz1R3YuFszcZrY@google.com> <5567f4ec-bbcf-4caf-16c1-3621b77a1779@amd.com>
+ <CAMkAt6px4A0CyuZ8h7zKzTxQUrZMYEkDXbvZ=3v+kphRTRDjNA@mail.gmail.com>
+ <YkX6aKymqZzD0bwb@google.com> <a1fe8fae-6587-e144-3442-93f64fa5263a@amd.com>
+ <YkcSDeJDHOv+MZA7@google.com>
+From:   "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <YkcSDeJDHOv+MZA7@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN3PR01CA0023.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:97::13) To DM5PR12MB2470.namprd12.prod.outlook.com
+ (2603:10b6:4:b4::39)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a0ab4bee-808a-49ae-fad1-08da13f5d8a0
+X-MS-TrafficTypeDiagnostic: BL0PR12MB4755:EE_
+X-Microsoft-Antispam-PRVS: <BL0PR12MB47551F80C1B50FFC799543E1E2E09@BL0PR12MB4755.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: SeglIF9kSlZCmZ4YO1g6HKjvNyDdvYSrNNeKtM/VNO+JBK3mVl1Z+h351I7Htz0StpYTt5Y1gNlzb1XmRf5tzYHUYeSlXBhQeRXtggF6GcHCPUekrEuLg0rcN6gg2Adb+e7Gx/pQ8tCmdtfU+uX7C9TN1k4fevKzKcPyRYZJUiOsQij888FY4yrzvjuhC/vkhDyH4hBpZeaKDmSbBPVpmlXkekVifcJeOccLHBYiZVscdtGIsxJ9oJ+4EpcT8VHx4iMT+zpWSfQG2Dks7/aIAvn1aMQvBBb2Cm6hXiepiXb81IzfeajsDezrjETCrllxmXjhNHdGgJBHsGLnLRJbgeiKC0K6CITzmEb0NsjKb+NuYoIOhxj4EehJ4dChmM+k5T94fSmobFH2szsHWyjVd6OYgcXrlyJVIffCW4wji1bBXI6Xl16A+akx36XF2VkQUVTsx/tJkN6vQHMYsFrAvxDrRWGoIwd1wdnU+73xJCk5tUDTKbPrb9QqGGcS13pwC450wds6kMLWPrxvHI8gH4bIIJn3HM+4wsH3TIdgWKzIicsdixllywQ7u4IlErSwTYmHDFOka/Atc0EvUFT2dwzrTFUJqcdMbKDzPY/0UaNI1fbhfBBQ9vNzmSr64e2QmSBF50mCcc4mEzJm6udBrZLCQKYjWqg/L9PWhNonzy0klfCydotfBnswv/j//fw1xgObmd2L4reStpjlNUbOhWs1OpdYO3U3HthPqgzOfnplFAMjLllxmOPW8r6dWjVd
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB2470.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(4326008)(83380400001)(26005)(186003)(2616005)(66556008)(8936002)(8676002)(66476007)(316002)(6512007)(53546011)(31686004)(31696002)(6506007)(36756003)(66946007)(6666004)(2906002)(38100700002)(6916009)(54906003)(7416002)(508600001)(5660300002)(6486002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Vzlwa0tGZnNRWHgxdFhlQVRhandJUnY1NjhsbUhiOEdsVU0wWFhGQXR5cEFy?=
+ =?utf-8?B?ekhrZFRtSDZNQWx6bVBXVytRUzBMSktKODUzOUplS3ZHWlZrWVFoMm5Mblhn?=
+ =?utf-8?B?MTF4aUxRa0ZTZUsxVk9ZL1g2T3FEVStkeFVHVFhoREpsVlY5QUQybXlKbHMr?=
+ =?utf-8?B?SUdkbkJBQXNmM3Yvd2hPUHd0dDhCNGJvNWNvMVhTTDZORmRXeG1zbGRLSXho?=
+ =?utf-8?B?UG56dUtyT1ZVeXJncDdrZ2Y0Q3dMbExJdE1GMTBUWWp3cDJoNXNmdXZsOUpG?=
+ =?utf-8?B?OFozTy9XQmJ5VDQ4MG5jQ2ZLdUZYLzR2YmY3OUUySm1hZC9ZMHI5SVFmYlhx?=
+ =?utf-8?B?MitFbm5SKzZRQkw0TnhvMlkxdTI3bjFzOU9WaTY1RFc1bTBpdjBObWRiU005?=
+ =?utf-8?B?Unhad290TTFOUGFlZnBTQURkOVBUekRLU3A2T1M0VHdpbVVuaTJ4L3NyUUl5?=
+ =?utf-8?B?bjRvSmlMNGJKdzRUZWxoc2JHWUM4bkVreGZVQW0rVmxIOEZJbldCU2pYei9Z?=
+ =?utf-8?B?M0JNSTlhZ3JBN1JLZlhaWjRUSkRlSGRFeTFLbHNIVDRvbi9nVnlqNlpmVlBU?=
+ =?utf-8?B?b3hZM0tPNnRYekxNaXdLeWRjYVM1VGtzSDV2SDdXc0xsMjRwNlZNTjg1aUtx?=
+ =?utf-8?B?UzgyZ1BOeVZ1KzBpMkxjREFxMjBGVDBJcFB0SXM3Sk5uN0FDUFZWWUJWZUJJ?=
+ =?utf-8?B?YjExRGhuV0EzNDB6QjhIQk1GRUltUGN5eW5vTkNJWGZRTU13MWZPREZ4OUNV?=
+ =?utf-8?B?cWszNFRXaktMRzE0SGdLWFE5RllNaTNqSEpJdEVwTVdNeWM2MitCcGQxaXdU?=
+ =?utf-8?B?cG1TaFFIZ3hqUWQ2MDBvVXk2b1Zobnh4ZlI1Q0NoSDNlQXJva3ZjWC9oY1Zz?=
+ =?utf-8?B?SWh3b1UvSHV5aTVoVzdzUlpSUnF2enE0YWJyT205OUVoMUZyeWFDNUZrNmE3?=
+ =?utf-8?B?a0ZtbGMxV0VGNWxKZVNHQVlFd1Z4cDlTNGltK2tkUXdnczQ2UXNIQU5tandM?=
+ =?utf-8?B?c05IVGV5enIrODM5ZnZqYXpVeU8zUEtNdFlJOVNYd2U2dkR2WUJPdVR0ZE1u?=
+ =?utf-8?B?NUpHVnhTbG9wR1RGcnZNMDlJYzBmUmRRdXNMWkY4OGRucVFQTkgxN0NZMG5j?=
+ =?utf-8?B?WW4zcUJ1YksvUGI0Y29PN3dydmlkUUpBNUtHS3B6YkdrTGZHbFh6cE1abCsz?=
+ =?utf-8?B?NzAvS2psS0twYWswTDhYNFVjQ3cvaEFyV2NBRzVnWEJFd0tuSmhDUEx1ci9P?=
+ =?utf-8?B?Q0I1OGlIeHRvYUlteFBIUFBIMEhnTjdNM1VtVDJhY3RQQ2tmUTFaTWl4QUtP?=
+ =?utf-8?B?ZDl3OVVEOW1FYWVKNDFaQlVZMXh4N2tSR3ZrRXZFTnVCbkN1aFdjMDk4SUkz?=
+ =?utf-8?B?N2NTa014OTFzWHBUTUo5MTRxcmJ5dngvdkRXL3JydEdubTh5cUdvUWhqcE82?=
+ =?utf-8?B?andkN00xYWRSMGJsZ3RrUFQrNFErVGtuOU1lajBtZG9GS0phaHA3SHJUQlY3?=
+ =?utf-8?B?cVdBYWY2K1JZUTJDNC9aUTFKN2pNS3JJU1dRSk1QYTFyT3NFTFFOLzlZL0Zr?=
+ =?utf-8?B?dk1ISmpIZkxHcjRuV0daZFJWMkNnY0RjQjNNU0J4aWdwaW90VUFtMjg2V0VT?=
+ =?utf-8?B?QjgzVFA5M0pvRGRJSVNqQTdXNjZRYjZUQ0VrM3JYWVZQQWs4TGZ5MDdFakFJ?=
+ =?utf-8?B?Yy9Ud0RndHA0TytpWEJ3bW5UeUtNM2JEQ2lsK2J3ZWdpZWRBYjJGTVdFNlB1?=
+ =?utf-8?B?UDdrUm1CMG4vUm84NTNrQ0hxQ2ZTR0JiVTlLU29ScFU2bXNsUlFBNXdsTUxw?=
+ =?utf-8?B?K0ZIUVJGekVYRXJBQkZQcGNTR0J1OVQwUjZxbTFxVFAzc3lWWFdnamxzRDhx?=
+ =?utf-8?B?eVRITU94UFVXQXJWTW5uUnZNQUV2L3NzMThaN0J0UlhSRjRwOHdheDk4cGh5?=
+ =?utf-8?B?eUQ1eTFOUGpqM3FhZ0dqU2dHR2VidWZaYW5vS1FUSk9EK3Noc3QvVHhydnk0?=
+ =?utf-8?B?aDBVaGorMEcyR0xmdTY4UzNDeFREUzVLbkk5ZWEwY2FvWjdSRnNMSWMvazBW?=
+ =?utf-8?B?cHpwRzJ5bU94K1RwZlNBMk9XM1F0am5EcVdqaG9wUUQvZWRyUjRUckdHWjBr?=
+ =?utf-8?B?SFU4ak1YN2dKTVVxNTAyamd1MnhXVlJSY1RQM2lZSGhmMFFobW1HVk16cEV2?=
+ =?utf-8?B?WnVUN0tSajVMSUZRL25CNXlrbzI0RnZteDlTYnNodTVhWkp2d2hkNnRObUlC?=
+ =?utf-8?B?ZWQ2aHMyWnUwMzJxSlArQmNiYjF4bTN3bGk1UWE3TzkxZ3N5WXdYek9nR2ZD?=
+ =?utf-8?B?VkQxOTNrZzFqUTdUeGYzTW5GRXY3MUNvRTVvVGRTWmx4SzQvRjZHdz09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a0ab4bee-808a-49ae-fad1-08da13f5d8a0
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB2470.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2022 15:39:45.6189
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BsMCSLi2JnH1vFBAxEXWi1f8o0L934rOr3R+J32lyBz0/O+kxgtE4D3eifZtxcdo82Co8eU/wNV4/80yw0pNZA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB4755
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
 
-The following changes since commit c9b8fecddb5bb4b67e351bbaeaa648a6f7456912:
 
-  KVM: use kvcalloc for array allocations (2022-03-21 09:28:41 -0400)
+On 4/1/2022 8:24 PM, Sean Christopherson wrote:
+> On Fri, Apr 01, 2022, Nikunj A. Dadhania wrote:
+>>
+>> On 4/1/2022 12:30 AM, Sean Christopherson wrote:
+>>> On Thu, Mar 31, 2022, Peter Gonda wrote:
+>>>> On Wed, Mar 30, 2022 at 10:48 PM Nikunj A. Dadhania <nikunj@amd.com> wrote:
+>>>>> So with guest supporting KVM_FEATURE_HC_MAP_GPA_RANGE and host (KVM) supporting
+>>>>> KVM_HC_MAP_GPA_RANGE hypercall, SEV/SEV-ES guest should communicate private/shared
+>>>>> pages to the hypervisor, this information can be used to mark page shared/private.
+>>>>
+>>>> One concern here may be that the VMM doesn't know which guests have
+>>>> KVM_FEATURE_HC_MAP_GPA_RANGE support and which don't. Only once the
+>>>> guest boots does the guest tell KVM that it supports
+>>>> KVM_FEATURE_HC_MAP_GPA_RANGE. If the guest doesn't we need to pin all
+>>>> the memory before we run the guest to be safe to be safe.
+>>>
+>>> Yep, that's a big reason why I view purging the existing SEV memory management as
+>>> a long term goal.  The other being that userspace obviously needs to be updated to
+>>> support UPM[*].   I suspect the only feasible way to enable this for SEV/SEV-ES
+>>> would be to restrict it to new VM types that have a disclaimer regarding additional
+>>> requirements.
+>>
+>> For SEV/SEV-ES could we base demand pinning on my first RFC[*].
+> 
+> No, because as David pointed out, elevating the refcount is not the same as actually
+> pinning the page.  Things like NUMA balancing will still try to migrate the page,
+> and even go so far as to zap the PTE, before bailing due to the outstanding reference.
+> In other words, not actually pinning makes the mm subsystem less efficient.  Would it
+> functionally work?  Yes.  Is it acceptable KVM behavior?  No.
+> 
+>> Those patches does not touch the core KVM flow.
+> 
+> I don't mind touching core KVM code.  If this goes forward, I actually strongly
+> prefer having the x86 MMU code handle the pinning as opposed to burying it in SEV
+> via kvm_x86_ops.  The reason I don't think it's worth pursuing this approach is
+> because (a) we know that the current SEV/SEV-ES memory management scheme is flawed
+> and is a deadend, and (b) this is not so trivial as we (or at least I) originally
+> thought/hoped it would be.  In other words, it's not that I think demand pinning
+> is a bad idea, nor do I think the issues are unsolvable, it's that I think the
+> cost of getting a workable solution, e.g. code churn, ongoing maintenance, reviewer
+> time, etc..., far outweighs the benefits.
 
-are available in the Git repository at:
+Point noted Sean, will focus on the UPM effort.
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to d1fb6a1ca3e535f89628193ab94203533b264c8c:
-
-  KVM: x86: fix sending PV IPI (2022-04-01 11:15:52 -0400)
-
-----------------------------------------------------------------
-The larger change here is support for in-kernel delivery of Xen events
-and timers, but there are also several other smaller features and fixes,
-consisting of 1-2 patches each.
-
-* New ioctls to get/set TSC frequency for a whole VM
-
-* Only do MSR filtering for MSRs accessed by rdmsr/wrmsr
-
-* Allow userspace to opt out of hypercall patching
-
-* Documentation improvements
-
-Nested virtualization improvements for AMD:
-
-* Support for "nested nested" optimizations (nested vVMLOAD/VMSAVE,
-  nested vGIF)
-
-* Allow AVIC to co-exist with a nested guest running
-
-* Fixes for LBR virtualizations when a nested guest is running,
-  and nested LBR virtualization support
-
-* PAUSE filtering for nested hypervisors
-
-Bugfixes:
-
-* Prevent module exit until all VMs are freed
-
-* PMU Virtualization fixes
-
-* Fix for kvm_irq_delivery_to_apic_fast() NULL-pointer dereferences
-
-* Other miscellaneous bugfixes
-
-Guest support:
-
-* Decoupling of vcpu_is_preempted from PV spinlocks
-
-----------------------------------------------------------------
-Boris Ostrovsky (1):
-      KVM: x86/xen: handle PV spinlocks slowpath
-
-Dan Carpenter (1):
-      KVM: MMU: fix an IS_ERR() vs NULL bug
-
-David Matlack (2):
-      KVM: Prevent module exit until all VMs are freed
-      Revert "KVM: set owner of cpu and vm file operations"
-
-David Woodhouse (16):
-      KVM: avoid double put_page with gfn-to-pfn cache
-      KVM: Remove dirty handling from gfn_to_pfn_cache completely
-      KVM: x86/xen: Use gfn_to_pfn_cache for runstate area
-      KVM: x86: Use gfn_to_pfn_cache for pv_time
-      KVM: x86/xen: Use gfn_to_pfn_cache for vcpu_info
-      KVM: x86/xen: Use gfn_to_pfn_cache for vcpu_time_info
-      KVM: x86/xen: Make kvm_xen_set_evtchn() reusable from other places
-      KVM: x86/xen: Support direct injection of event channel events
-      KVM: x86/xen: Add KVM_XEN_VCPU_ATTR_TYPE_VCPU_ID
-      KVM: x86/xen: Kernel acceleration for XENVER_version
-      KVM: x86/xen: Support per-vCPU event channel upcall via local APIC
-      KVM: x86/xen: Advertise and document KVM_XEN_HVM_CONFIG_EVTCHN_SEND
-      KVM: x86/xen: Add self tests for KVM_XEN_HVM_CONFIG_EVTCHN_SEND
-      KVM: x86/xen: Update self test for Xen PV timers
-      KVM: x86: Accept KVM_[GS]ET_TSC_KHZ as a VM ioctl.
-      KVM: x86: Test case for TSC scaling and offset sync
-
-Hou Wenlong (3):
-      KVM: x86/emulator: Emulate RDPID only if it is enabled in guest
-      KVM: x86: Only do MSR filtering when access MSR by rdmsr/wrmsr
-      KVM: x86/mmu: Don't rebuild page when the page is synced and no tlb flushing is required
-
-Jim Mattson (2):
-      KVM: x86/pmu: Use different raw event masks for AMD and Intel
-      KVM: x86/svm: Clear reserved bits written to PerfEvtSeln MSRs
-
-Joao Martins (3):
-      KVM: x86/xen: intercept EVTCHNOP_send from guests
-      KVM: x86/xen: handle PV IPI vcpu yield
-      KVM: x86/xen: handle PV timers oneshot mode
-
-Jon Kohler (1):
-      KVM: x86: optimize PKU branching in kvm_load_{guest|host}_xsave_state
-
-Lai Jiangshan (4):
-      KVM: X86: Change the type of access u32 to u64
-      KVM: X86: Fix comments in update_permission_bitmask
-      KVM: X86: Rename variable smap to not_smap in permission_fault()
-      KVM: X86: Handle implicit supervisor access with SMAP
-
-Li RongQing (2):
-      KVM: x86: Support the vCPU preemption check with nopvspin and realtime hint
-      KVM: x86: fix sending PV IPI
-
-Like Xu (2):
-      KVM: x86/i8259: Remove a dead store of irq in a conditional block
-      KVM: x86/pmu: Fix and isolate TSX-specific performance event logic
-
-Maxim Levitsky (17):
-      KVM: x86: nSVM: implement nested VMLOAD/VMSAVE
-      KVM: x86: SVM: allow to force AVIC to be enabled
-      KVM: x86: mark synthetic SMM vmexit as SVM_EXIT_SW
-      KVM: x86: mmu: trace kvm_mmu_set_spte after the new SPTE was set
-      KVM: x86: SVM: use vmcb01 in init_vmcb
-      kvm: x86: SVM: use vmcb* instead of svm->vmcb where it makes sense
-      KVM: x86: SVM: fix avic spec based definitions again
-      KVM: x86: SVM: move tsc ratio definitions to svm.h
-      kvm: x86: SVM: remove unused defines
-      KVM: x86: SVM: fix tsc scaling when the host doesn't support it
-      KVM: x86: SVM: remove vgif_enabled()
-      KVM: x86: nSVM: correctly virtualize LBR msrs when L2 is running
-      KVM: x86: nSVM: implement nested LBR virtualization
-      KVM: x86: nSVM: support PAUSE filtering when L0 doesn't intercept PAUSE
-      KVM: x86: nSVM: implement nested vGIF
-      KVM: x86: allow per cpu apicv inhibit reasons
-      KVM: x86: SVM: allow AVIC to co-exist with a nested guest running
-
-Nathan Chancellor (1):
-      KVM: x86: Fix clang -Wimplicit-fallthrough in do_host_cpuid()
-
-Oliver Upton (2):
-      KVM: x86: Allow userspace to opt out of hypercall patching
-      selftests: KVM: Test KVM_X86_QUIRK_FIX_HYPERCALL_INSN
-
-Paolo Bonzini (10):
-      Documentation: kvm: fixes for locking.rst
-      Documentation: kvm: include new locks
-      Documentation: KVM: add separate directories for architecture-specific documentation
-      Documentation: KVM: add virtual CPU errata documentation
-      Documentation: KVM: add API issues section
-      KVM: MMU: propagate alloc_workqueue failure
-      KVM: x86: document limitations of MSR filtering
-      KVM: MIPS: remove reference to trap&emulate virtualization
-      x86, kvm: fix compilation for !CONFIG_PARAVIRT_SPINLOCKS or !CONFIG_SMP
-      KVM: x86/mmu: do compare-and-exchange of gPTE via the user address
-
-Peter Gonda (1):
-      KVM: SVM: Fix kvm_cache_regs.h inclusions for is_guest_mode()
-
-Sean Christopherson (7):
-      KVM: x86/mmu: Zap only TDP MMU leafs in zap range and mmu_notifier unmap
-      KVM: Don't actually set a request when evicting vCPUs for GFN cache invd
-      KVM: Use enum to track if cached PFN will be used in guest and/or host
-      KVM: x86: Make APICv inhibit reasons an enum and cleanup naming
-      KVM: x86: Add wrappers for setting/clearing APICv inhibits
-      KVM: x86: Trace all APICv inhibit changes and capture overall status
-      KVM: x86: Don't snapshot "max" TSC if host TSC is constant
-
-Vitaly Kuznetsov (3):
-      KVM: x86: Check lapic_in_kernel() before attempting to set a SynIC irq
-      KVM: x86: Avoid theoretical NULL pointer dereference in kvm_irq_delivery_to_apic_fast()
-      KVM: x86: Forbid VMM to set SYNIC/STIMER MSRs when SynIC wasn't activated
-
-Yi Wang (1):
-      KVM: SVM: fix panic on out-of-bounds guest IRQ
-
-Zeng Guang (1):
-      KVM: VMX: Prepare VMCS setting for posted interrupt enabling when APICv is available
-
-Zhenzhong Duan (2):
-      KVM: x86: cleanup enter_rmode()
-      KVM: x86: Remove redundant vm_entry_controls_clearbit() call
-
- Documentation/virt/kvm/api.rst                     |  210 +++-
- Documentation/virt/kvm/index.rst                   |   26 +-
- Documentation/virt/kvm/locking.rst                 |   43 +-
- Documentation/virt/kvm/s390/index.rst              |   12 +
- Documentation/virt/kvm/{ => s390}/s390-diag.rst    |    0
- Documentation/virt/kvm/{ => s390}/s390-pv-boot.rst |    0
- Documentation/virt/kvm/{ => s390}/s390-pv.rst      |    0
- Documentation/virt/kvm/vcpu-requests.rst           |   10 +
- .../virt/kvm/{ => x86}/amd-memory-encryption.rst   |    0
- Documentation/virt/kvm/{ => x86}/cpuid.rst         |    0
- Documentation/virt/kvm/x86/errata.rst              |   39 +
- Documentation/virt/kvm/{ => x86}/halt-polling.rst  |    0
- Documentation/virt/kvm/{ => x86}/hypercalls.rst    |    0
- Documentation/virt/kvm/x86/index.rst               |   19 +
- Documentation/virt/kvm/{ => x86}/mmu.rst           |    0
- Documentation/virt/kvm/{ => x86}/msr.rst           |    0
- Documentation/virt/kvm/{ => x86}/nested-vmx.rst    |    0
- .../virt/kvm/{ => x86}/running-nested-guests.rst   |    0
- Documentation/virt/kvm/{ => x86}/timekeeping.rst   |    0
- arch/s390/kvm/kvm-s390.c                           |    2 +-
- arch/x86/include/asm/kvm-x86-ops.h                 |    1 +
- arch/x86/include/asm/kvm_host.h                    |   80 +-
- arch/x86/include/asm/svm.h                         |   14 +-
- arch/x86/include/uapi/asm/kvm.h                    |   11 +-
- arch/x86/kernel/asm-offsets_64.c                   |    4 +-
- arch/x86/kernel/kvm.c                              |   77 +-
- arch/x86/kvm/cpuid.c                               |    1 +
- arch/x86/kvm/emulate.c                             |    8 +-
- arch/x86/kvm/hyperv.c                              |   22 +-
- arch/x86/kvm/i8254.c                               |    6 +-
- arch/x86/kvm/i8259.c                               |    1 -
- arch/x86/kvm/irq.c                                 |   10 +-
- arch/x86/kvm/irq_comm.c                            |    2 +-
- arch/x86/kvm/kvm_emulate.h                         |    3 +
- arch/x86/kvm/lapic.c                               |    4 +
- arch/x86/kvm/mmu.h                                 |   32 +-
- arch/x86/kvm/mmu/mmu.c                             |   45 +-
- arch/x86/kvm/mmu/paging_tmpl.h                     |   82 +-
- arch/x86/kvm/mmu/tdp_mmu.c                         |   72 +-
- arch/x86/kvm/mmu/tdp_mmu.h                         |   12 +-
- arch/x86/kvm/pmu.c                                 |   18 +-
- arch/x86/kvm/svm/avic.c                            |   24 +-
- arch/x86/kvm/svm/nested.c                          |  297 +++--
- arch/x86/kvm/svm/pmu.c                             |    9 +-
- arch/x86/kvm/svm/svm.c                             |  239 ++--
- arch/x86/kvm/svm/svm.h                             |   68 +-
- arch/x86/kvm/svm/svm_onhyperv.c                    |    1 -
- arch/x86/kvm/trace.h                               |   22 +-
- arch/x86/kvm/vmx/pmu_intel.c                       |   14 +-
- arch/x86/kvm/vmx/vmx.c                             |   28 +-
- arch/x86/kvm/x86.c                                 |  372 +++---
- arch/x86/kvm/xen.c                                 | 1253 ++++++++++++++++----
- arch/x86/kvm/xen.h                                 |   62 +-
- include/linux/kvm_host.h                           |   63 +-
- include/linux/kvm_types.h                          |   11 +-
- include/uapi/linux/kvm.h                           |   48 +-
- tools/testing/selftests/kvm/.gitignore             |    1 +
- tools/testing/selftests/kvm/Makefile               |    2 +
- .../selftests/kvm/x86_64/fix_hypercall_test.c      |  170 +++
- .../selftests/kvm/x86_64/tsc_scaling_sync.c        |  119 ++
- .../testing/selftests/kvm/x86_64/xen_shinfo_test.c |  366 +++++-
- virt/kvm/kvm_main.c                                |   22 +-
- virt/kvm/pfncache.c                                |   72 +-
- 63 files changed, 3157 insertions(+), 972 deletions(-)
- create mode 100644 Documentation/virt/kvm/s390/index.rst
- rename Documentation/virt/kvm/{ => s390}/s390-diag.rst (100%)
- rename Documentation/virt/kvm/{ => s390}/s390-pv-boot.rst (100%)
- rename Documentation/virt/kvm/{ => s390}/s390-pv.rst (100%)
- rename Documentation/virt/kvm/{ => x86}/amd-memory-encryption.rst (100%)
- rename Documentation/virt/kvm/{ => x86}/cpuid.rst (100%)
- create mode 100644 Documentation/virt/kvm/x86/errata.rst
- rename Documentation/virt/kvm/{ => x86}/halt-polling.rst (100%)
- rename Documentation/virt/kvm/{ => x86}/hypercalls.rst (100%)
- create mode 100644 Documentation/virt/kvm/x86/index.rst
- rename Documentation/virt/kvm/{ => x86}/mmu.rst (100%)
- rename Documentation/virt/kvm/{ => x86}/msr.rst (100%)
- rename Documentation/virt/kvm/{ => x86}/nested-vmx.rst (100%)
- rename Documentation/virt/kvm/{ => x86}/running-nested-guests.rst (100%)
- rename Documentation/virt/kvm/{ => x86}/timekeeping.rst (100%)
- create mode 100644 tools/testing/selftests/kvm/x86_64/fix_hypercall_test.c
- create mode 100644 tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c
-
+Regards
+Nikunj
