@@ -2,175 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C83A54EF963
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 19:57:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C71144EF974
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 20:02:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350801AbiDAR6g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 13:58:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37172 "EHLO
+        id S1348625AbiDASEk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 14:04:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350837AbiDAR63 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 13:58:29 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAB5E1834D4
-        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 10:56:38 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id t66-20020a625f45000000b004fabd8f5cc1so1999906pfb.11
-        for <kvm@vger.kernel.org>; Fri, 01 Apr 2022 10:56:38 -0700 (PDT)
+        with ESMTP id S243382AbiDASEj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 14:04:39 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B52903BA6F
+        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 11:02:48 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id q142so1208841pgq.9
+        for <kvm@vger.kernel.org>; Fri, 01 Apr 2022 11:02:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=whi7VXODCYStZwZ0yhJ9hj7iu8dCf643usT2exONxAs=;
-        b=fuN0d8N9vFpmGZgcbUnIPl1/u50XpVyZVJS25Zl8sNb/QRw8cVTyJ5dMdqA5+b4+ZF
-         uSZa76VjUdHU0qH1Va5a1zhK0stt4d5uFxMsf6ivJGXpSjoisa6ZlsqPiy1q//ZG6dgK
-         E70U/wr8WlB5MVNjCZS6zluBKURb/ry6bmDWBkudFenFfsRDpzcJwK8g9cWgZalXPg39
-         dhNKu56TjS2VbFJgtFxwT7wFpAedLoTQxO4/+9hOW6Wb4II8CrKPKuliva4BSCXXUE2Q
-         8/Bl+aR/+ltV30PKrHQhHQgNsOJUQvLBay/8SjLanwL99lfTbrvVCd2W7FugWSH6scXf
-         43Pw==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=yBvT/RIL9LHH1Mgf37Nb2nJIQ03TuOvpTivVWxcN1v4=;
+        b=Pv0XV1dHALOkjDJBg1gjNFFCD/fH4tBOKz+NF45/Hf8dNQb6h6XdKcZeXejGysCikr
+         qH14VdW8YXObf+z6ElnoYM3OKnW8HYxQqU8K0Gld7765PiNynn2A7ihxsVW/WvxkXD2Y
+         GTJGLhgFFovSvgvNYtbxttRScVZWG3PK8TPcmUgOUBlY3lq7tkSOzTZG5e2ROsAKsqGi
+         xCB2FiKIeuLlY3FJ8p1G7pxclXEtYTX0bvaTDit8zgLGaBrEaDKxg2Bld52srP0tXr5D
+         P8EXZpUCJtumcZP8CEHVL5rnYLTekmmboBgdhxs5tONCnPYBeamCUsqlji3x/77bFwth
+         8ZXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=whi7VXODCYStZwZ0yhJ9hj7iu8dCf643usT2exONxAs=;
-        b=ksBn5ggxmpvq/PZoATpPYsSWvJhHQ+pVTLQu9wE5a8EdI0GlIbG7SI5DeIqVRzu9P5
-         V5qpYdZ7D4qJ5+EaG/ABJ2CUKoaRWW9S6FkzX2Lhacy8REKhAq71OaJKEffhhQfTdvp4
-         EXjhjqe5+yNJVYD0Y4rw1uftyyaezjA/eKO7tEN018VytGD3yCczx9foSEwuEh18BE0J
-         uBr70896V7PqAe3LElhJypV9NRBx0bapECt49BYfse7G3mTWO8j2yAoPR6YD5oVUcELL
-         mZAvby9FBOgwnjPhZ0bMRRZbU6XJuNkkNzBr1pR7TQ9lqCEijCkbwlctlqAkM3QVj6bu
-         p/fQ==
-X-Gm-Message-State: AOAM532Euynkw5ayh9M6F5tpIhjcnwsN4DMoHascRv/nyJVJZBbtm+Fl
-        R6e71IKqare4cerbdTDpwQagXmT2BnXsbw==
-X-Google-Smtp-Source: ABdhPJzrOoFK0CXfNiBHYff/Ss14MY3SHaY29S4xt2lMgr9gQfCmCewctxWArdepbXNkov7vRSKMSJUb4tjYpQ==
-X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a05:6a00:1ca1:b0:4fa:7e80:6957 with SMTP
- id y33-20020a056a001ca100b004fa7e806957mr12069429pfw.33.1648835798210; Fri,
- 01 Apr 2022 10:56:38 -0700 (PDT)
-Date:   Fri,  1 Apr 2022 17:55:54 +0000
-In-Reply-To: <20220401175554.1931568-1-dmatlack@google.com>
-Message-Id: <20220401175554.1931568-24-dmatlack@google.com>
-Mime-Version: 1.0
-References: <20220401175554.1931568-1-dmatlack@google.com>
-X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
-Subject: [PATCH v3 23/23] KVM: selftests: Map x86_64 guest virtual memory with
- huge pages
-From:   David Matlack <dmatlack@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        maciej.szmigiero@oracle.com,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=yBvT/RIL9LHH1Mgf37Nb2nJIQ03TuOvpTivVWxcN1v4=;
+        b=kSKVJ3xXmKVDaAu7qDYF617Nc8s2EeZnUMH/IY2xTlmJkIXhHCbDBcwVhPoM7tIOiY
+         gObmdC4nf8C8t66PmHZP/ERpjXS6uV3sju5dd/nlL0cpPhbBka65cx6NIOT4xPJIKTjo
+         e81P2iw+sCQFjewpjbX3ddI0szRX2zaaf5uWWZ3tN2fu3fg7f0vTE6gs0x+FqXx7v/Xb
+         AqbCyIg04hmJ2FOtkzw8Yx1RRIl65XpJfJzvJETutvE9CKlJEz1fayhwljaB+ajkwL5d
+         bofJ+Imq7ZjBISf4xhgJvsKlJx8ndPchx0bE0LLiZO60fwnlsAg41RmqQOZ1jiWt9zyo
+         hR1Q==
+X-Gm-Message-State: AOAM530Ws8FN8eCDTmBSNq7hYOTyiDD4S3j9qAN2+I1TbEjZC7Qfwpmy
+        xkocmCnyGLFoV+FQnSWPQQsOvQ==
+X-Google-Smtp-Source: ABdhPJwm3yL50kfR2zpLtlx5tRibJvFK2B4JSh+l1+8WCnDCvxbxlkwbsCvtZW3NlCs8tPNL/eCRew==
+X-Received: by 2002:a05:6a00:1510:b0:4fa:f5fe:ffd5 with SMTP id q16-20020a056a00151000b004faf5feffd5mr12176247pfu.2.1648836167854;
+        Fri, 01 Apr 2022 11:02:47 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id w9-20020a056a0014c900b004fb2ca5f6d7sm3781681pfu.136.2022.04.01.11.02.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Apr 2022 11:02:47 -0700 (PDT)
+Date:   Fri, 1 Apr 2022 18:02:41 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Marc Orr <marcorr@google.com>
+Cc:     Peter Gonda <pgonda@google.com>,
+        "Nikunj A. Dadhania" <nikunj@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Bharata B Rao <bharata@amd.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Mingwei Zhang <mizhang@google.com>,
+        David Hildenbrand <david@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH RFC v1 0/9] KVM: SVM: Defer page pinning for SEV guests
+Message-ID: <Ykc+QapbAdpd41PK@google.com>
+References: <20220308043857.13652-1-nikunj@amd.com>
+ <YkIh8zM7XfhsFN8L@google.com>
+ <c4b33753-01d7-684e-23ac-1189bd217761@amd.com>
+ <YkSz1R3YuFszcZrY@google.com>
+ <5567f4ec-bbcf-4caf-16c1-3621b77a1779@amd.com>
+ <CAMkAt6px4A0CyuZ8h7zKzTxQUrZMYEkDXbvZ=3v+kphRTRDjNA@mail.gmail.com>
+ <YkX6aKymqZzD0bwb@google.com>
+ <CAA03e5GXmo33OOyxb08L5Ztz1dP-OSsPzeo0HK73p9ShvnMmRg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAA03e5GXmo33OOyxb08L5Ztz1dP-OSsPzeo0HK73p9ShvnMmRg@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Override virt_map() in x86_64 selftests to use the largest page size
-possible when mapping guest virtual memory. This enables testing eager
-page splitting with shadow paging (e.g. kvm_intel.ept=N), as it allows
-KVM to shadow guest memory with huge pages.
+On Fri, Apr 01, 2022, Marc Orr wrote:
+> On Thu, Mar 31, 2022 at 12:01 PM Sean Christopherson <seanjc@google.com> wrote:
+> > Yep, that's a big reason why I view purging the existing SEV memory management as
+> > a long term goal.  The other being that userspace obviously needs to be updated to
+> > support UPM[*].   I suspect the only feasible way to enable this for SEV/SEV-ES
+> > would be to restrict it to new VM types that have a disclaimer regarding additional
+> > requirements.
+> >
+> > [*] I believe Peter coined the UPM acronym for "Unmapping guest Private Memory".  We've
+> >     been using it iternally for discussion and it rolls off the tongue a lot easier than
+> >     the full phrase, and is much more precise/descriptive than just "private fd".
+> 
+> Can we really "purge the existing SEV memory management"? This seems
+> like a non-starter because it violates userspace API (i.e., the
+> ability for the userspace VMM to run a guest without
+> KVM_FEATURE_HC_MAP_GPA_RANGE). Or maybe I'm not quite following what
+> you mean by purge.
 
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- .../selftests/kvm/include/x86_64/processor.h  |  6 ++++
- tools/testing/selftests/kvm/lib/kvm_util.c    |  4 +--
- .../selftests/kvm/lib/x86_64/processor.c      | 31 +++++++++++++++++++
- 3 files changed, 39 insertions(+), 2 deletions(-)
+I really do mean purge, but I also really do mean "long term", as in 5+ years
+(probably 10+ if I'm being realistic).
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 37db341d4cc5..efb228d2fbf7 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -470,6 +470,12 @@ enum x86_page_size {
- 	X86_PAGE_SIZE_2M,
- 	X86_PAGE_SIZE_1G,
- };
-+
-+static inline size_t page_size_bytes(enum x86_page_size page_size)
-+{
-+	return 1UL << (page_size * 9 + 12);
-+}
-+
- void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
- 		   enum x86_page_size page_size);
- 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 1665a220abcb..60198587236d 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1432,8 +1432,8 @@ vm_vaddr_t vm_vaddr_alloc_page(struct kvm_vm *vm)
-  * Within the VM given by @vm, creates a virtual translation for
-  * @npages starting at @vaddr to the page range starting at @paddr.
-  */
--void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
--	      unsigned int npages)
-+void __weak virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
-+		     unsigned int npages)
- {
- 	size_t page_size = vm->page_size;
- 	size_t size = npages * page_size;
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 9f000dfb5594..7df84292d5de 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -282,6 +282,37 @@ void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
- 	__virt_pg_map(vm, vaddr, paddr, X86_PAGE_SIZE_4K);
- }
- 
-+void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, unsigned int npages)
-+{
-+	size_t size = (size_t) npages * vm->page_size;
-+	size_t vend = vaddr + size;
-+	enum x86_page_size page_size;
-+	size_t stride;
-+
-+	TEST_ASSERT(vaddr + size > vaddr, "Vaddr overflow");
-+	TEST_ASSERT(paddr + size > paddr, "Paddr overflow");
-+
-+	/*
-+	 * Map the region with all 1G pages if possible, falling back to all
-+	 * 2M pages, and finally all 4K pages. This could be improved to use
-+	 * a mix of page sizes so that more of the region is mapped with large
-+	 * pages.
-+	 */
-+	for (page_size = X86_PAGE_SIZE_1G; page_size >= X86_PAGE_SIZE_4K; page_size--) {
-+		stride = page_size_bytes(page_size);
-+
-+		if (!(vaddr % stride) && !(paddr % stride) && !(size % stride))
-+			break;
-+	}
-+
-+	TEST_ASSERT(page_size >= X86_PAGE_SIZE_4K,
-+		    "Cannot map unaligned region: vaddr 0x%lx paddr 0x%lx npages 0x%x\n",
-+		    vaddr, paddr, npages);
-+
-+	for (; vaddr < vend; vaddr += stride, paddr += stride)
-+		__virt_pg_map(vm, vaddr, paddr, page_size);
-+}
-+
- static struct pageTableEntry *_vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid,
- 						       uint64_t vaddr)
- {
--- 
-2.35.1.1094.g7c7d902a7c-goog
+Removing support is completely ok, as is changing the uABI, the rule is that we
+can't break userspace.  If all users are migrated to private-fd, e.g. by carrots
+and/or sticks such as putting the code into maintenance-only mode, then at some
+point in the future there will be no users left to break and we can drop the
+current code and make use of private-fd mandatory for SEV/SEV-ES guests.
 
+> Assuming that UPM-based lazy pinning comes together via a new VM type
+> that only supports new images based on a minimum kernel version with
+> KVM_FEATURE_HC_MAP_GPA_RANGE, then I think this would like as follows:
+> 
+> 1. Userspace VMM: Check SEV VM type. If type is legacy SEV type then
+> do upfront pinning. Else, skip up front pinning.
+
+Yep, if by legacy "SEV type" you mean "SEV/SEV-ES guest that isn't required to
+use MAP_GPA_RANGE", which I'm pretty sure you do based on #3.
+
+> 2. KVM: I'm not sure anything special needs to happen here. For the
+> legacy VM types, it can be configured to use legacy memslots,
+> presumably the same as non-CVMs will be configured. For the new VM
+> type, it should be configured to use UPM.
+
+Correct, for now, KVM does nothing different for SEV/SEV-ES guests.
+
+> 3. Control plane (thing creating VMs): Responsible for not allowing
+> legacy SEV images (i.e., images without KVM_FEATURE_HC_MAP_GPA_RANGE)
+> with the new SEV VM types that use UPM and have support for demand
+> pinning.
+> 
+> Sean: Did I get this right?
+
+Yep.
