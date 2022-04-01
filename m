@@ -2,141 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C7BC14EFC5E
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 23:51:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00F094EFC73
+	for <lists+kvm@lfdr.de>; Sat,  2 Apr 2022 00:00:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350356AbiDAVx0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 17:53:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54290 "EHLO
+        id S1353170AbiDAWBn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 18:01:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234241AbiDAVxZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 17:53:25 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77E4D200342
-        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 14:51:33 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id l4-20020a17090a49c400b001c6840df4a3so3748291pjm.0
-        for <kvm@vger.kernel.org>; Fri, 01 Apr 2022 14:51:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=tGJBlLkmgZTxVHoFIKbZU2QoQ1f35loIsBzJHpfAMdY=;
-        b=IRuzE1kOG1hxaxxmTzAYMb3FDbCSi+yGguqeIEEkb6PgEkoj8OJw0Wbp1eIB/2Me3p
-         xuGdoi2lhxv9CVVqjbuzF613Zeln3iPfWQbpeqsqnIjocqNg67KqieyA7dgqBsr6SPWw
-         6wrS6Bcn1dzQKZfr8jGNVSlBrpiQex5k5ZZVGbSMbGIQL9BBIVc8t4DjWPryYQMsaDT7
-         sBa+1gGJFgMAJ67j3nixa//B/dzXUciEMBXRawWskMuQq0oEDW6nhlEHbFTTT2BDgxot
-         fiB+GkBX8L5o3ipdqqKD5S9ccxL7FPl6wgCEKzdtwvCa6iUBtuWv0DJ6dsXGF6WD5sFu
-         Jqwg==
+        with ESMTP id S1353243AbiDAWBh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 18:01:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A4D4C1C231C
+        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 14:59:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648850384;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=61wW65IickgTmxTx2khZS+SxGaK0lmd6zMvqkKt3GSY=;
+        b=NY5LCWYLhsHliEE0u6U3x7nqmXm+7WGL7BY4dB6vn+nSMS+VZYtJ2eBCSXUuQ8Luu8KTho
+        mPM7fQChdSO2NaNn3m3xE2ro4pkEstCOdbeBchiyiuu004AxiBnf/7xDCMD4Od9NW3kkU2
+        mDquGrHfXjfJRvkdR7gBQNFD+DNOJOA=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-345-GXQl4Wn7PweV-hPQMIlXug-1; Fri, 01 Apr 2022 17:59:43 -0400
+X-MC-Unique: GXQl4Wn7PweV-hPQMIlXug-1
+Received: by mail-ej1-f70.google.com with SMTP id m12-20020a1709062acc00b006cfc98179e2so2228057eje.6
+        for <kvm@vger.kernel.org>; Fri, 01 Apr 2022 14:59:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=tGJBlLkmgZTxVHoFIKbZU2QoQ1f35loIsBzJHpfAMdY=;
-        b=OdUiMVrXHCpEyv7TXb4YtZh64pXqh0+wtg5V3BzZj1j9lTdfptSIh0zW8sBvJMLrbZ
-         +VrGEVdtfX1KoA8NVWjAaM4D65ufh11jQ60cAialgrcih+Z1gvkNmGK1Qn1oQPypqWOO
-         F8uk2yMbjHEAulGFp8AaGMJaEwLLQ9x6sjk/9UZGL6BdYErjXhdjRcJTmlBbZJUECH9E
-         +OWE2B8sa+zUbarrmQVN/LwaJSLWPOHEJIwfoACWhGdILNYA/0TAfdvGQNbquSAcHtgd
-         ZFXiZNIN3DGXqMIJyWOcPaMcDJM2BB5rARK3AwqbLJGrZPskqYHdBvlEYf3kPFffTcfZ
-         vhBQ==
-X-Gm-Message-State: AOAM530q149uQsQRgrQ2ZM/0/abFFcH+Wgas2la3xsawz1Ndi89phZf+
-        6npKIgVKvJ7KR6Htyo1F1+FFlg==
-X-Google-Smtp-Source: ABdhPJyqYTrcktF2dqvzUqC+PSXKCwUngmQC02h4W4A2CK4ObfO87QOMayd/x3RhS8ZivUZH3XpGcQ==
-X-Received: by 2002:a17:90a:4981:b0:1c6:b6dd:d7a9 with SMTP id d1-20020a17090a498100b001c6b6ddd7a9mr13855937pjh.22.1648849892251;
-        Fri, 01 Apr 2022 14:51:32 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id e10-20020a17090a630a00b001c685cfd9d1sm3392861pjj.20.2022.04.01.14.51.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Apr 2022 14:51:31 -0700 (PDT)
-Date:   Fri, 1 Apr 2022 21:51:28 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Jon Grimm <Jon.Grimm@amd.com>,
-        David Kaplan <David.Kaplan@amd.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Liam Merwick <liam.merwick@oracle.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/5] KVM: nSVM: Sync next_rip field from vmcb12 to vmcb02
-Message-ID: <Ykdz4GVF4C+S/LGg@google.com>
-References: <cover.1646944472.git.maciej.szmigiero@oracle.com>
- <19c757487eeeff5344ff3684fe9c090235b07d05.1646944472.git.maciej.szmigiero@oracle.com>
- <YkdFSuezZ1XNTTfx@google.com>
- <ff29e77c-f16d-d9ef-9089-0a929d3c2fbf@maciej.szmigiero.name>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=61wW65IickgTmxTx2khZS+SxGaK0lmd6zMvqkKt3GSY=;
+        b=DGIPqpKclvp6kbZ6wDoNjavVQz2Qr10/Fj7iG322wUKabdSNUwz390YwpvvD12xTZ7
+         wOR+GO7fIio83Lna6z1DhjiWSEsvfl3E/IeacH8AGDyTB9Q3hwWqqIYqhDheUWuCiPK6
+         TZL6hfoNooryZN/oe092njPPAKXHzXd37gyGAKJIDtQNldfetFQiYAcy532WrRBTgAXp
+         NchF5gXP0Fs9rQizTyqXadpDJ1KCJONkOZHfNSO72gKUA2sx5CTQdr+L7r8FMXpBACGD
+         k94bh3RKF8PLLqIaD9OHIMEjm01IEyPA73IhY8cNR6dDT8L6GINbSsPSGDGKnFxf5Q8A
+         wfGw==
+X-Gm-Message-State: AOAM5314oMfZtAoT3XvUOzSPbBhgpaSpjyM+lOqYOKgTW1oAlWA34JuQ
+        5sRgOBVXswLfQCRirRFcIP2APaoipt9mhBHfddvHY/Oe3wBYu9j369mfdzdgbRRQf9hUZKc4HFR
+        Z4Yal/8lgmlJK
+X-Received: by 2002:a05:6402:5107:b0:419:935d:bb6e with SMTP id m7-20020a056402510700b00419935dbb6emr22861737edd.242.1648850382152;
+        Fri, 01 Apr 2022 14:59:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxyVwN8jLrGhcGscqlNjTLvmUrq0hjTs8PZsenn7ftgxg0OLULJ9IB8wuh6jl4vWUU3f72jdw==
+X-Received: by 2002:a05:6402:5107:b0:419:935d:bb6e with SMTP id m7-20020a056402510700b00419935dbb6emr22861728edd.242.1648850381896;
+        Fri, 01 Apr 2022 14:59:41 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:e3ec:5559:7c5c:1928? ([2001:b07:6468:f312:e3ec:5559:7c5c:1928])
+        by smtp.googlemail.com with ESMTPSA id o3-20020aa7dd43000000b00419db53ae65sm1691942edw.7.2022.04.01.14.59.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Apr 2022 14:59:41 -0700 (PDT)
+Message-ID: <30ffdecc-6ecd-5194-14ec-40e8b818889a@redhat.com>
+Date:   Fri, 1 Apr 2022 23:59:40 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ff29e77c-f16d-d9ef-9089-0a929d3c2fbf@maciej.szmigiero.name>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [GIT PULL] Second batch of KVM changes for Linux 5.18
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>
+References: <20220401153256.103938-1-pbonzini@redhat.com>
+ <CAHk-=wgSqvsP08ox-KwAU4TztVsjx07cMQni-rFEzxZQw6+iiA@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <CAHk-=wgSqvsP08ox-KwAU4TztVsjx07cMQni-rFEzxZQw6+iiA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 01, 2022, Maciej S. Szmigiero wrote:
-> On 1.04.2022 20:32, Sean Christopherson wrote:
-> > On Thu, Mar 10, 2022, Maciej S. Szmigiero wrote:
-> > > +	/* The return address pushed on stack by the CPU for some injected events */
-> > > +	svm->vmcb->control.next_rip            = svm->nested.ctl.next_rip;
-> > 
-> > This needs to be gated by nrips being enabled _and_ exposed to L1, i.e.
-> > 
-> > 	if (svm->nrips_enabled)
-> > 		vmcb02->control.next_rip    = svm->nested.ctl.next_rip;
+On 4/1/22 22:40, Linus Torvalds wrote:
+> I've had enough with the big random kvm pull requests.
 > 
-> It can be done, however what if we run on a nrips-capable CPU,
-> but don't expose this capability to the L1?
-
-Oh, right, because the field will be populated by the CPU on VM-Exit.  Ah, the
-correct behavior is to grab RIP from vmcb12 to emulate nrips=0 hardware simply
-not updating RIP.  E.g. zeroing it out would send L2 into the weeds on IRET due
-the CPU pushing '0' on the stack when vectoring the injected event.
-
-	if (svm->nrips_enabled)
-		vmcb02->control.next_rip    = svm->nested.ctl.next_rip;
-	else if (boot_cpu_has(X86_FEATURE_NRIPS))
-		vmcb02->control.next_rip    = vmcb12_rip;
-
-> The CPU will then push whatever value was left in this field as
-> the return address for some L1 injected events.
+> NONE of this has been in linux-next before the merge window. In fact,
+> None of it was there even the first week of the merge window.
 > 
-> Although without nrips feature the L1 shouldn't even attempt event
-> injection, copying this field anyway will make it work if L1 just
-> expects this capability based on the current CPU model rather than
-> by checking specific CPUID feature bits.
-
-L1 may still inject the exception, it just advances the RIP manually.  As above,
-the really messy thing is that, because there's no flag to say "don't use NextRIP!",
-the CPU will still consume NextRIP and push '0' on the stack for the return RIP
-from the INTn/INT3/INTO.  Yay.
-
-I found that out the hard way (patch in-progress).  The way to handle event
-injection if KVM is loaded with nrips=0 but nrips is supported in hardware is to
-stuff NextRIP on event injection even if nrips=0, otherwise the guest is hosed.
-
-> > > +	u64 next_rip;
-> > >   	u64 nested_cr3;
-> > >   	u64 virt_ext;
-> > >   	u32 clean;
-> > 
-> > I don't know why this struct has
-> > 
-> > 	u8 reserved_sw[32];
-> > 
-> > but presumably it's for padding, i.e. probably should be reduced to 24 bytes.
+> So by all means send me fixes.
 > 
-> Apparently the "reserved_sw" field stores Hyper-V enlightenments state -
-> see commit 66c03a926f18 ("KVM: nSVM: Implement Enlightened MSR-Bitmap feature")
-> and nested_svm_vmrun_msrpm() in nested.c.
+> But no more of this last-minute development stuff, which clearly was
+> not ready to go before the merge window started, and must have been
+> some wild last-minute merging thing.
 
-Argh, that's a terrible name.  Thanks for doing the homework, I was being lazy.
+tl;dr okey dokey, will resend in a few minutes.  But anyway here's a 
+description of how I do things; there's certainly a lot of variability 
+among subsystems, so perhaps it helps to share it.
+
+All this stuff in general has been ready for a few weeks, even though it 
+was not committed to linux-next.  It was not committed because in 
+general I prioritize big merges that affect existing code, as those need 
+a lot more time in linux-next and absolutely go in the first pull 
+request.  These are the larger patch series with higher chance of 
+introducing regressions, often nondeterministic ones with little 
+possibility to bisect, and they take a lot of time for both reviewing 
+and testing.
+
+While I focus on the bigger stuff for the first pull request, others are 
+busy sending and also reviewing smaller series.  I start to grab around 
+-rc6, though this time it was a bit later due to a larger first PR and 
+due to the whole family being sick at the wrong time.  But in general, 
+things that spill into the second week of the merge window are usually:
+
+* covered very well by the testsuites (today's pull request was 30% 
+documentation and tests; those tests only cover new code and even more 
+tests exist outside the selftests framework and outside the Linux tree).
+
+* and/or only activated by userspace bits that only exist in developer 
+trees, or sometimes do not exist at all outside Amazon/Google.
+
+Very often, at the time this code is merged, there are zero chances that 
+any linux-next tester ever hits the code except via selftests or static 
+analysis; even syzkaller needs to be taught the new ioctls.
+
+This is a workflow that I've been using for a few years.  If that's not 
+okay, I can certainly stop doing that and only send one pull request.
+
+> kvm needs to make stability as a priority.
+
+We are, and this includes both selftests for new features and lots of 
+eyes looking at older code.  Some of that crappy code I can definitely 
+blame on my own inexperience or overwork; I am happy that people go 
+through it with a fine-toothed comb and I try to help as well (which 
+takes away time from development, so you could say it also helps stability).
+
+Of the stuff you see from me during -rc, merge-window bugs are 
+relatively rare and merge-window regressions even less so.  Instead 
+you'll see a lot of new selftests, fixes to old bugs, cleaning up 
+lockless code to removes nasty race conditions, etc. (one of these days 
+I want to get some numbers to see if my intuition is correct, though).
+
+Again, if you prefer this kind of work to go through the merge window 
+because it's too large for -rc, that's fine by me.  But overall, rest 
+assured that when I send things late it's not to sneak them into a 
+release; if anything, it's out of abundance of caution, and wanting to 
+keep linux-next.git and linux.git as stable and bisectable as possible.
+
+Thanks,
+
+Paolo
+
