@@ -2,136 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A2F604EF916
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 19:40:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D99344EF92B
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 19:53:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350519AbiDARmb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 13:42:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35148 "EHLO
+        id S1346833AbiDARzA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 13:55:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350482AbiDARm3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 13:42:29 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 769A114B843;
-        Fri,  1 Apr 2022 10:40:39 -0700 (PDT)
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 231GJT4o017900;
-        Fri, 1 Apr 2022 17:40:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=XHoH67PGA72qyhjjgtkwClKk3acuJgRp8YcrEaqS3Pc=;
- b=LAkbIbrWRHRPp/C1oy7GH6GfHjhzgOnsZ7/1hxdfH974+DpGoUDBZPtQ1mB9x9jOEyTK
- ZdTbfV4q3NG56Y6/16UGYgHxYOS2adl53JoGqQ3P0LDaLLya1WoNqPwd42QfwYodWhLP
- q0oA2KdFZ/qe74VNnsWn50m7EWyyDVFQb+SGUvTYUfNHNBw5dfra1gamDcDUS3F0HcZz
- yViNeDYjhvoeuJcOhFpkYtl/XJp5iIf8nloFLocGhkHEcgOjvy4gnYrZYomnAN/0vKHV
- Cek5m+SALCmXXKBWvOQSco/bvlZFUwi0YRBXgue8oYGXlf/MAR2kJjHrxKst7SxLXqfY /g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f64tdhm86-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Apr 2022 17:40:37 +0000
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 231HRvQO010118;
-        Fri, 1 Apr 2022 17:40:36 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f64tdhm7b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Apr 2022 17:40:36 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 231HYAg0001987;
-        Fri, 1 Apr 2022 17:40:34 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03ams.nl.ibm.com with ESMTP id 3f1tf9nfy2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Apr 2022 17:40:34 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 231HeV7i53215640
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 1 Apr 2022 17:40:31 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2945011C04C;
-        Fri,  1 Apr 2022 17:40:31 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9D38C11C04A;
-        Fri,  1 Apr 2022 17:40:30 +0000 (GMT)
-Received: from [9.171.85.89] (unknown [9.171.85.89])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  1 Apr 2022 17:40:30 +0000 (GMT)
-Message-ID: <6f385869-3f3b-d985-6804-02943a8dee07@linux.ibm.com>
-Date:   Fri, 1 Apr 2022 19:40:30 +0200
+        with ESMTP id S244792AbiDARy7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 13:54:59 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 56ED428EA2A
+        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 10:53:09 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8D79E11FB;
+        Fri,  1 Apr 2022 10:53:08 -0700 (PDT)
+Received: from localhost.localdomain (unknown [10.119.36.138])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A60A13F66F;
+        Fri,  1 Apr 2022 10:53:07 -0700 (PDT)
+From:   Chase Conklin <chase.conklin@arm.com>
+To:     maz@kernel.org
+Cc:     alexandru.elisei@arm.com, andre.przywara@arm.com,
+        chase.conklin@arm.com, christoffer.dall@arm.com,
+        gankulkarni@os.amperecomputing.com, haibo.xu@linaro.org,
+        james.morse@arm.com, jintack@cs.columbia.edu,
+        karl.heubaum@oracle.com, kernel-team@android.com,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, linux@armlinux.org.uk,
+        miguel.luis@oracle.com, mihai.carabas@oracle.com,
+        suzuki.poulose@arm.com
+Subject: Re: [PATCH v6 60/64] KVM: arm64: nv: Sync nested timer state with ARMv8.4
+Date:   Fri,  1 Apr 2022 12:51:50 -0500
+Message-Id: <20220401175150.88298-1-chase.conklin@arm.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20220128121912.509006-61-maz@kernel.org>
+References: <20220128121912.509006-61-maz@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH 1/2] KVM: s390: Don't indicate suppression on dirtying,
- failing memop
-Content-Language: en-US
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20220401170247.1287354-1-scgl@linux.ibm.com>
- <20220401170247.1287354-2-scgl@linux.ibm.com>
- <e191fbc0-9471-5cde-7698-cdd32d83051f@linux.ibm.com>
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-In-Reply-To: <e191fbc0-9471-5cde-7698-cdd32d83051f@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 6TEJYwhOAQh6ZcCWjo3z149zDPU4tiCh
-X-Proofpoint-GUID: CgxRsK4QBiTIwikhTuqjAbIBFto1FQWI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-04-01_05,2022-03-31_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 suspectscore=0 priorityscore=1501 mlxscore=0
- mlxlogscore=689 bulkscore=0 spamscore=0 phishscore=0 adultscore=0
- impostorscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2202240000 definitions=main-2204010084
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/1/22 19:13, Christian Borntraeger wrote:
-> 
-> 
-> Am 01.04.22 um 19:02 schrieb Janis Schoetterl-Glausch:
->> If user space uses a memop to emulate an instruction and that
->> memop fails, the execution of the instruction ends.
->> Instruction execution can end in different ways, one of which is
->> suppression, which requires that the instruction execute like a no-op.
->> A writing memop that spans multiple pages and fails due to key
->> protection can modified guest memory. Therefore do not indicate a
->> suppressing instruction ending in this case.
+Hi Marc,
 
-A writing memop that spans multiple pages and fails due to key
-protection can modified guest memory, as a result, the likely
-correct ending is termination. Therefore do not indicate a
-suppressing instruction ending in this case.
+On Fri, 28 Jan 2022 12:19:08 +0000, Marc Zyngier wrote:
+> From: Christoffer Dall <christoffer.dall at arm.com>
+>
+> Emulating the ARMv8.4-NV timers is a bit odd, as the timers can
+> be reconfigured behind our back without the hypervisor even
+> noticing. In the VHE case, that's an actual regression in the
+> architecture...
 
-?
+In addition to that, I belive that the vEL2's view of CNTy_CTL_ELx.ISTATUS can
+get out of sync with the corresponding timer conditions. Currently, the values
+are kept in NVMem and updated only during a put of a vCPU.
 
-It's phrased a bit vaguely, because we don't really know what user space wants
-when emulating an instruction, I guess it could try to revert the changes?
-And the TEID does not indicate termination, it only indicates that
-the guest cannot assume that the instruction was suppressed.
+I'd like to say that this could be fixed by updating the NVMem copies on each
+entry into vEL2, but that doesn't prevent them from getting out of sync while
+the vEL2 is still running. Provided that the host takes a timer interrupt
+whenever a vEL2 timer condition is satisfied, the host should have a chance to
+update the NVMem copy before the vEL2 can see an out of sync value. Even still,
+I think there is still a small window where vEL2 can read the NVMem copy after
+the timer condition is met but before the host timer interrupt fires. In
+practice, that might not not be a huge issue.
 
-> 
-> Make it explicit in the changelog that this is "terminating" instead of
-> "suppressing". z/VM has the same logic and the architecture allows for
-> terminating in those cases (even for ESOP2).
->  >
->> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
->> ---
+The only other option I can see is to trap the accesses (which for the virtual
+timer requires FEAT_ECV). At least that would prevent the timers from being
+configured behind the host's back...
+
+Thanks,
+Chase
+
+>
+> Signed-off-by: Christoffer Dall <christoffer.dall at arm.com>
+> Signed-off-by: Marc Zyngier <maz at kernel.org>
+> ---
+>  arch/arm64/kvm/arch_timer.c  | 37 ++++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/arm.c         |  3 +++
+>  include/kvm/arm_arch_timer.h |  1 +
+>  3 files changed, 41 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 5e4f93605d36..2371796b1ab5 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -785,6 +785,43 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+>  	set_cntvoff(0);
+>  }
+>  
+> +void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
+> +{
+> +	if (!is_hyp_ctxt(vcpu))
+> +		return;
+> +
+> +	/*
+> +	 * Guest hypervisors using ARMv8.4 enhanced nested virt support have
+> +	 * their EL1 timer register accesses redirected to the VNCR page.
+> +	 */
+> +	if (!vcpu_el2_e2h_is_set(vcpu)) {
+> +		/*
+> +		 * For a non-VHE guest hypervisor, we update the hardware
+> +		 * timer registers with the latest value written by the guest
+> +		 * to the VNCR page and let the hardware take care of the
+> +		 * rest.
+> +		 */
+> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CTL_EL0),  SYS_CNTV_CTL);
+> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
+> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CTL_EL0),  SYS_CNTP_CTL);
+> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), SYS_CNTP_CVAL);
+> +	} else {
+> +		/*
+> +		 * For a VHE guest hypervisor, the emulated state (which
+> +		 * is stored in the VNCR page) could have been updated behind
+> +		 * our back, and we must reset the emulation of the timers.
+> +		 */
+> +
+> +		struct timer_map map;
+> +		get_timer_map(vcpu, &map);
+> +
+> +		soft_timer_cancel(&map.emul_vtimer->hrtimer);
+> +		soft_timer_cancel(&map.emul_ptimer->hrtimer);
+> +		timer_emulate(map.emul_vtimer);
+> +		timer_emulate(map.emul_ptimer);
+> +	}
+> +}
+> +
+>  /*
+>   * With a userspace irqchip we have to check if the guest de-asserted the
+>   * timer and if so, unmask the timer irq signal on the host interrupt
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index ac7d89c1e987..4c47a66eac8c 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -936,6 +936,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  		if (static_branch_unlikely(&userspace_irqchip_in_use))
+>  			kvm_timer_sync_user(vcpu);
+>  
+> +		if (vcpu_has_nv2(vcpu))
+> +			kvm_timer_sync_nested(vcpu);
+> +
+>  		kvm_arch_vcpu_ctxsync_fp(vcpu);
+>  
+>  		/*
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index 0a76dac8cb6a..89b08e5b456e 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -68,6 +68,7 @@ int kvm_timer_hyp_init(bool);
+>  int kvm_timer_enable(struct kvm_vcpu *vcpu);
+>  int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu);
+>  void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
+> +void kvm_timer_sync_nested(struct kvm_vcpu *vcpu);
+>  void kvm_timer_sync_user(struct kvm_vcpu *vcpu);
+>  bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu);
+>  void kvm_timer_update_run(struct kvm_vcpu *vcpu);
+> -- 
+> 2.30.2
+
