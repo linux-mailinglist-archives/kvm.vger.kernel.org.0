@@ -2,100 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 605844EE8DD
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 09:13:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DF474EE8CB
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 09:06:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343760AbiDAHPK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 03:15:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57578 "EHLO
+        id S1343695AbiDAHId (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 03:08:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343740AbiDAHPJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 03:15:09 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4D0ABAE;
-        Fri,  1 Apr 2022 00:13:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1648797198; x=1680333198;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=v7BxFZS7EqBUMLT0jC44zPK3Hm0zxzgqgjgsmXPUMUw=;
-  b=Ac42CdQetfvW8slyl4NOL6AoLTBR/8A9IIRmo7HIlpSxy16IgCCsMTSo
-   l1IMWjIb28B8RtTdhyi/32Qe4EcZhNUtI2/SuoDd4rJEQ5XdBpDxgbxTb
-   qeChU8nvUfzOOq1lZOLGCFf+T7HXZOnKJ4NbttwIwi+yJteois7xg/tOD
-   qFxxZ61Kyo++AQQuGvT/r7hQle70wahFujccmTadEWRBUoUaUFUm1yr5Y
-   4hzHOC5HEE7RGa+iS5A/Ez0D/lPOwr3csI1b0Ppc6QRmA37f3agEDjfty
-   0Cvi+4ORg2+jloTOCrjpN+XN6GCDeC6xXx8hXX8jwnwDzSKSNPSf1sFrx
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10303"; a="240652800"
-X-IronPort-AV: E=Sophos;i="5.90,226,1643702400"; 
-   d="scan'208";a="240652800"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2022 00:13:18 -0700
-X-IronPort-AV: E=Sophos;i="5.90,226,1643702400"; 
-   d="scan'208";a="547686744"
-Received: from jamendoz-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.95.128])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2022 00:13:15 -0700
-Message-ID: <3cfffe9a29e53ae58dc59d0af3d52128babde79f.camel@intel.com>
-Subject: Re: [RFC PATCH v5 037/104] KVM: x86/mmu: Allow non-zero init value
- for shadow PTE
-From:   Kai Huang <kai.huang@intel.com>
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Date:   Fri, 01 Apr 2022 20:13:13 +1300
-In-Reply-To: <968de4765e63d8255ae1b3ac7062ffdca64706e4.camel@intel.com>
-References: <cover.1646422845.git.isaku.yamahata@intel.com>
-         <b74b3660f9d16deafe83f2670539a8287bef988f.1646422845.git.isaku.yamahata@intel.com>
-         <968de4765e63d8255ae1b3ac7062ffdca64706e4.camel@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+        with ESMTP id S235140AbiDAHIc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 03:08:32 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 893BD22BD49;
+        Fri,  1 Apr 2022 00:06:43 -0700 (PDT)
+Received: from dggpemm500020.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KVB4s3VZdzgYFZ;
+        Fri,  1 Apr 2022 15:05:01 +0800 (CST)
+Received: from dggpemm500007.china.huawei.com (7.185.36.183) by
+ dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Fri, 1 Apr 2022 15:06:41 +0800
+Received: from huawei.com (10.175.103.91) by dggpemm500007.china.huawei.com
+ (7.185.36.183) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Fri, 1 Apr
+ 2022 15:06:41 +0800
+From:   Yang Yingliang <yangyingliang@huawei.com>
+To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
+CC:     <pbonzini@redhat.com>
+Subject: [PATCH -next] KVM: x86/mmu: Fix return value check in kvm_mmu_init_tdp_mmu()
+Date:   Fri, 1 Apr 2022 15:15:31 +0800
+Message-ID: <20220401071531.1841927-1-yangyingliang@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.103.91]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500007.china.huawei.com (7.185.36.183)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-04-01 at 18:13 +1300, Kai Huang wrote:
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -617,9 +617,9 @@ static int mmu_spte_clear_track_bits(struct kvm *kvm,
-> > u64 *sptep)
-> >   	int level = sptep_to_sp(sptep)->role.level;
-> >   
-> >   	if (!spte_has_volatile_bits(old_spte))
-> > -		__update_clear_spte_fast(sptep, 0ull);
-> > +		__update_clear_spte_fast(sptep, shadow_init_value);
-> >   	else
-> > -		old_spte = __update_clear_spte_slow(sptep, 0ull);
-> > +		old_spte = __update_clear_spte_slow(sptep,
-> > shadow_init_value);
-> 
-> I guess it's better to have some comment here.  Allow non-zero init value for
-> shadow PTE doesn't necessarily mean the initial value should be used when one
-> PTE is zapped.  I think mmu_spte_clear_track_bits() is only called for mapping
-> of normal (shared) memory but not MMIO? Then perhaps it's better to have a
-> comment to explain we want "suppress #VE" set to get a real EPT violation for
-> normal memory access from guest?
+If alloc_workqueue() fails, it returns NULL pointer, replaces
+IS_ERR() check with NULL pointer check.
 
-Btw, I think the relevant part of TDP MMU change should be included in this
-patch too otherwise TDP MMU is broken with this patch.
+Fixes: 1a3320dd2939 ("KVM: MMU: propagate alloc_workqueue failure")
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+---
+ arch/x86/kvm/mmu/tdp_mmu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Actually in this series legacy MMU is not supported to work with TDX, so above
-change to legacy MMU doesn't matter actually.  Instead, TDP MMU change should be
-here.
-
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index a2f9a34a0168..7bddbb51033a 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -22,8 +22,8 @@ int kvm_mmu_init_tdp_mmu(struct kvm *kvm)
+ 		return 0;
+ 
+ 	wq = alloc_workqueue("kvm", WQ_UNBOUND|WQ_MEM_RECLAIM|WQ_CPU_INTENSIVE, 0);
+-	if (IS_ERR(wq))
+-		return PTR_ERR(wq);
++	if (!wq)
++		return -ENOMEM;
+ 
+ 	/* This should not be changed for the lifetime of the VM. */
+ 	kvm->arch.tdp_mmu_enabled = true;
 -- 
-Thanks,
--Kai
-
+2.25.1
 
