@@ -2,261 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FE954EEF2C
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 16:21:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00C274EEF42
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 16:22:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245165AbiDAOXI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 10:23:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47210 "EHLO
+        id S1346805AbiDAOY2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 10:24:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240438AbiDAOWw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 10:22:52 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E27C24D258;
-        Fri,  1 Apr 2022 07:21:02 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 231EDJKB010389;
-        Fri, 1 Apr 2022 14:21:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=QVk9Cb8n2dvKyFWkRBjUNBaq68qJiGxkXzSUBAqMpmQ=;
- b=dMFqXGoLiAfMcC/ybNHl/MWnKeZMjz6QtJDBU5sUSGPrs0hr/SFB56M5/RLrOzfhYFKK
- +YiCzhAwZFazTxirMDU5q3l15NJqnQBQie/IdnP+rx3TYAmoOwM5sM3Xm17RVGKSu/TJ
- kj+tv9GpwljMtkOe0FNakbL9juN4MEwFPzsEh9O0a8bCH4Qc+1chMWdhZv0zSmwO33EL
- hf8PSDJoDCcJB6wYgUbMB6XBBoCsrMKeueSotWIvgw4SfzRyoILUo9OZChlaVD7Y4hu1
- CriYwBtSCX7e81SC09Xao4Z6DefZvsBn90W4ITzRb7haJ8MnKMwKO/zg7nTUQAy4zpkF hQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3f62y905eb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Apr 2022 14:21:01 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 231EL1Oh004070;
-        Fri, 1 Apr 2022 14:21:01 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3f62y905de-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Apr 2022 14:21:01 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 231EF8jx012649;
-        Fri, 1 Apr 2022 14:20:59 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma01fra.de.ibm.com with ESMTP id 3f1tf8u5wu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Apr 2022 14:20:59 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 231EKuBI45351230
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 1 Apr 2022 14:20:56 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 15CE5A404D;
-        Fri,  1 Apr 2022 14:20:56 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 88F79A4051;
-        Fri,  1 Apr 2022 14:20:55 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.3.73])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  1 Apr 2022 14:20:55 +0000 (GMT)
-Date:   Fri, 1 Apr 2022 16:20:53 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
-        mimu@linux.ibm.com, nrb@linux.ibm.com
-Subject: Re: [PATCH v9 01/18] KVM: s390: pv: leak the topmost page table
- when destroy fails
-Message-ID: <20220401162053.5466832d@p-imbrenda>
-In-Reply-To: <6b24e1f6-22ee-c0e4-5bde-9eefdccd3619@linux.ibm.com>
-References: <20220330122605.247613-1-imbrenda@linux.ibm.com>
-        <20220330122605.247613-2-imbrenda@linux.ibm.com>
-        <6b24e1f6-22ee-c0e4-5bde-9eefdccd3619@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        with ESMTP id S233620AbiDAOY1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 10:24:27 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A68D0248792
+        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 07:22:37 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id s72so2522327pgc.5
+        for <kvm@vger.kernel.org>; Fri, 01 Apr 2022 07:22:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=y6NYgD6CmQKrzTR96Y2z4+22G7HGe2HX0/wPly7z848=;
+        b=HA5iffyA3tFUMp6Pxr9Re5GUyp6m4S7asQu/DiHNbPWlTGtD3kbvzQc8KjfiSGhcV/
+         L3MH8J9RPl46+EXVE3u3zNpgtBi3RQ98QM1ptM/G8gRQKiIPjRXy61Mup+Lsk26q9J8E
+         NyXyu9x63QS0DGcp7ouEjo6TOLSh7i0NfUtZhNCKhH4edSCQXunzdRhLPwDwEmN/0bBy
+         KmdF0Ig0R2tsB2P2EletU/Wt0nX8TiMURFjfuARKALF9Vx2M6od/gVsGIy0Zn+ZO41qY
+         sb4Jl7OFc+u/1LlCiwcQKX+gB8afChBs8wkdzB4/BoZQgyfXfaDxe09vGxEZt7+/ex4D
+         /lRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=y6NYgD6CmQKrzTR96Y2z4+22G7HGe2HX0/wPly7z848=;
+        b=JgVRLjCaNYPd65GllSDsrDx9CJhtNOX+G7N6NCW9sgccx513faNkiNLc07PbPF//3p
+         DHGqdqpjx1EMtCvnBgD8GGkjNDrWg9/KUzUhq/GXPWZAqduq4o7Yx1Az/zkMC3I39MTa
+         1ic1YzZUeVor5UCEKETk4igMUhv+Ztn6oARs6+5joTnFR5uZyLINnwMEBJqhzqFwlGSb
+         1dpL57cyiiY6K78OMWJMTC/PlufzgerHXA8Yp8Jni9Lm2SpjedgzRq4v9uz5p1Pzc9On
+         9fybVWR9oyZams3Ue3XEgTMKLU8lxQ9/2j8Csttuk0KS5QyQt5UjR1VwZPxotCH093iL
+         jFLw==
+X-Gm-Message-State: AOAM532BE5kS5GxqlWp6w9pnXIvq4EbwNNSRT4G9GxSA748WvOMYK7iq
+        YAg0AAxUh+KF9OvJdToqcP/8UQ==
+X-Google-Smtp-Source: ABdhPJwjSxNwfxF3iYVakNEEEOp1wum2Psbj1Tr4354n4ZHnBsOhz818mClGfh6VMEXcC4dZMwUszA==
+X-Received: by 2002:a62:7b97:0:b0:4fa:7a9a:6523 with SMTP id w145-20020a627b97000000b004fa7a9a6523mr11182028pfc.80.1648822956936;
+        Fri, 01 Apr 2022 07:22:36 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id u18-20020a056a00125200b004fb112ee9b7sm2933175pfi.75.2022.04.01.07.22.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Apr 2022 07:22:36 -0700 (PDT)
+Date:   Fri, 1 Apr 2022 14:22:32 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Yosry Ahmed <yosryahmed@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH v3 2/6] KVM: x86/mmu: Track the number of TDP MMU pages,
+ but not the actual pages
+Message-ID: <YkcKqAqcKUAS+b7+@google.com>
+References: <20220401063636.2414200-1-mizhang@google.com>
+ <20220401063636.2414200-3-mizhang@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: t7SywXXLLLJ8farJ8moqqH2j8zY-ynDU
-X-Proofpoint-ORIG-GUID: JmsvE-BSa3Cbf4nzg0YR7REfOffvvW22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-04-01_05,2022-03-31_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- impostorscore=0 mlxscore=0 adultscore=0 bulkscore=0 mlxlogscore=999
- priorityscore=1501 clxscore=1015 phishscore=0 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204010066
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: multipart/mixed; boundary="j3c8VscvnAccrGCY"
+Content-Disposition: inline
+In-Reply-To: <20220401063636.2414200-3-mizhang@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 31 Mar 2022 15:13:41 +0200
-Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> On 3/30/22 14:25, Claudio Imbrenda wrote:
-> > Each secure guest must have a unique ASCE (address space control
-> > element); we must avoid that new guests use the same page for their
-> > ASCE, to avoid errors.
-> > 
-> > Since the ASCE mostly consists of the address of the topmost page table
-> > (plus some flags), we must not return that memory to the pool unless
-> > the ASCE is no longer in use.
-> > 
-> > Only a successful Destroy Secure Configuration UVC will make the ASCE
-> > reusable again.
-> > 
-> > If the Destroy Configuration UVC fails, the ASCE cannot be reused for a
-> > secure guest (either for the ASCE or for other memory areas). To avoid
-> > a collision, it must not be used again. This is a permanent error and
-> > the page becomes in practice unusable, so we set it aside and leak it.
-> > On failure we already leak other memory that belongs to the ultravisor
-> > (i.e. the variable and base storage for a guest) and not leaking the
-> > topmost page table was an oversight.
-> > 
-> > This error (and thus the leakage) should not happen unless the hardware
-> > is broken or KVM has some unknown serious bug.
-> > 
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > Fixes: 29b40f105ec8d55 ("KVM: s390: protvirt: Add initial vm and cpu lifecycle handling")
-> > ---
-> >   arch/s390/include/asm/gmap.h |  2 +
-> >   arch/s390/kvm/pv.c           |  9 +++--
-> >   arch/s390/mm/gmap.c          | 71 ++++++++++++++++++++++++++++++++++++
-> >   3 files changed, 79 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/s390/include/asm/gmap.h b/arch/s390/include/asm/gmap.h
-> > index 40264f60b0da..746e18bf8984 100644
-> > --- a/arch/s390/include/asm/gmap.h
-> > +++ b/arch/s390/include/asm/gmap.h
-> > @@ -148,4 +148,6 @@ void gmap_sync_dirty_log_pmd(struct gmap *gmap, unsigned long dirty_bitmap[4],
-> >   			     unsigned long gaddr, unsigned long vmaddr);
-> >   int gmap_mark_unmergeable(void);
-> >   void s390_reset_acc(struct mm_struct *mm);
-> > +void s390_remove_old_asce(struct gmap *gmap);
-> > +int s390_replace_asce(struct gmap *gmap);
-> >   #endif /* _ASM_S390_GMAP_H */
-> > diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-> > index 7f7c0d6af2ce..3c59ef763dde 100644
-> > --- a/arch/s390/kvm/pv.c
-> > +++ b/arch/s390/kvm/pv.c
-> > @@ -166,10 +166,13 @@ int kvm_s390_pv_deinit_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
-> >   	atomic_set(&kvm->mm->context.is_protected, 0);
-> >   	KVM_UV_EVENT(kvm, 3, "PROTVIRT DESTROY VM: rc %x rrc %x", *rc, *rrc);
-> >   	WARN_ONCE(cc, "protvirt destroy vm failed rc %x rrc %x", *rc, *rrc);
-> > -	/* Inteded memory leak on "impossible" error */
-> > -	if (!cc)
-> > +	/* Intended memory leak on "impossible" error */
-> > +	if (!cc) {
-> >   		kvm_s390_pv_dealloc_vm(kvm);
-> > -	return cc ? -EIO : 0;
-> > +		return 0;
-> > +	}
-> > +	s390_replace_asce(kvm->arch.gmap);
-> > +	return -EIO;
-> >   }
-> >   
-> >   int kvm_s390_pv_init_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
-> > diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-> > index dfee0ebb2fac..3b42bf7adb77 100644
-> > --- a/arch/s390/mm/gmap.c
-> > +++ b/arch/s390/mm/gmap.c
-> > @@ -2714,3 +2714,74 @@ void s390_reset_acc(struct mm_struct *mm)
-> >   	mmput(mm);
-> >   }
-> >   EXPORT_SYMBOL_GPL(s390_reset_acc);
-> > +
-> > +/**
-> > + * s390_remove_old_asce - Remove the topmost level of page tables from the
-> > + * list of page tables of the gmap.
-> > + * @gmap the gmap whose table is to be removed
-> > + *
-> > + * This means that it will not be freed when the VM is torn down, and needs
-> > + * to be handled separately by the caller, unless an intentional leak is
-> > + * intended. Notice that this function will only remove the page from the
-> > + * list, the page will still be used as a top level page table (and ASCE).
-> > + */
-> > +void s390_remove_old_asce(struct gmap *gmap)
-> > +{
-> > +	struct page *old;
-> > +
-> > +	old = virt_to_page(gmap->table);
-> > +	spin_lock(&gmap->guest_table_lock);
-> > +	list_del(&old->lru);
-> > +	/*
-> > +	 * in case the ASCE needs to be "removed" multiple times, for example
-> > +	 * if the VM is rebooted into secure mode several times
-> > +	 * concurrently.
-> > +	 */  
-> 
-> How can that happen, what are we protecting against here?
+--j3c8VscvnAccrGCY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-for example if replace_asce fails, and we call it again later. in that
-case we have removed the old asce from the list ( = it won't be freed
-when the VM terminates), but the ASCE is still in use and still pointed
-to. a subsequent call to replace_asce will follow the pointer and try
-to remove the same page from the list _again_.
+On Fri, Apr 01, 2022, Mingwei Zhang wrote:
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index f05423545e6d..5ca78a89d8ed 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -24,7 +24,6 @@ bool kvm_mmu_init_tdp_mmu(struct kvm *kvm)
+>  
+>  	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_roots);
+>  	spin_lock_init(&kvm->arch.tdp_mmu_pages_lock);
+> -	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_pages);
+>  	kvm->arch.tdp_mmu_zap_wq =
+>  		alloc_workqueue("kvm", WQ_UNBOUND|WQ_MEM_RECLAIM|WQ_CPU_INTENSIVE, 0);
 
-Therefore it's necessary that the page of the ASCE has valid pointers,
-so list_del can work (and do nothing) without dereferencing stale or
-invalid pointers.
+This has a minor conflict with kvm/next and kvm/queue, attached a new version since
+you'll need a v3 (foreshadowing...).
 
-Maybe I should improve the comment
+--j3c8VscvnAccrGCY
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-KVM-x86-mmu-Track-the-number-of-TDP-MMU-pages-but-no.patch"
 
-> 
-> > +	INIT_LIST_HEAD(&old->lru);
-> > +	spin_unlock(&gmap->guest_table_lock);
-> > +}
-> > +EXPORT_SYMBOL_GPL(s390_remove_old_asce);
-> > +
-> > +/**
-> > + * s390_replace_asce - Try to replace the current ASCE of a gmap with
-> > + * another equivalent one.
-> > + * @gmap the gmap
-> > + *
-> > + * If the allocation of the new top level page table fails, the ASCE is not
-> > + * replaced.
-> > + * In any case, the old ASCE is always removed from the list. Therefore the
-> > + * caller has to make sure to save a pointer to it beforehands, unless an
-> > + * intentional leak is intended.
-> > + */
-> > +int s390_replace_asce(struct gmap *gmap)
-> > +{
-> > +	unsigned long asce;
-> > +	struct page *page;
-> > +	void *table;
-> > +
-> > +	s390_remove_old_asce(gmap);
-> > +
-> > +	page = alloc_pages(GFP_KERNEL_ACCOUNT, CRST_ALLOC_ORDER);
-> > +	if (!page)
-> > +		return -ENOMEM;
-> > +	table = page_to_virt(page);
-> > +	memcpy(table, gmap->table, 1UL << (CRST_ALLOC_ORDER + PAGE_SHIFT));
-> > +
-> > +	/*
-> > +	 * The caller has to deal with the old ASCE, but here we make sure
-> > +	 * the new one is properly added to the list of page tables, so that
-> > +	 * it will be freed when the VM is torn down.
-> > +	 */
-> > +	spin_lock(&gmap->guest_table_lock);
-> > +	list_add(&page->lru, &gmap->crst_list);
-> > +	spin_unlock(&gmap->guest_table_lock);
-> > +
-> > +	/* Set new table origin while preserving existing ASCE control bits */
-> > +	asce = (gmap->asce & ~_ASCE_ORIGIN) | __pa(table);
-> > +	WRITE_ONCE(gmap->asce, asce);
-> > +	WRITE_ONCE(gmap->mm->context.gmap_asce, asce);
-> > +	WRITE_ONCE(gmap->table, table);
-> > +
-> > +	return 0;
-> > +}
-> > +EXPORT_SYMBOL_GPL(s390_replace_asce);  
-> 
+From 3d0c2796b22c75e3ab279cbcd3036c44500a6744 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Fri, 1 Apr 2022 06:36:32 +0000
+Subject: [PATCH] KVM: x86/mmu: Track the number of TDP MMU pages, but not the
+ actual pages
 
+Track the number of TDP MMU "shadow" pages instead of tracking the pages
+themselves. With the NX huge page list manipulation moved out of the common
+linking flow, elminating the list-based tracking means the happy path of
+adding a shadow page doesn't need to acquire a spinlock and can instead
+inc/dec an atomic.
+
+Keep the tracking as the WARN during TDP MMU teardown on leaked shadow
+pages is very, very useful for detecting KVM bugs.
+
+Tracking the number of pages will also make it trivial to expose the
+counter to userspace as a stat in the future, which may or may not be
+desirable.
+
+Note, the TDP MMU needs to use a separate counter (and stat if that ever
+comes to be) from the existing n_used_mmu_pages. The TDP MMU doesn't bother
+supporting the shrinker nor does it honor KVM_SET_NR_MMU_PAGES (because the
+TDP MMU consumes so few pages relative to shadow paging), and including TDP
+MMU pages in that counter would break both the shrinker and shadow MMUs,
+e.g. if a VM is using nested TDP.
+
+Cc: Yosry Ahmed <yosryahmed@google.com>
+Reviewed-by: Mingwei Zhang <mizhang@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/kvm_host.h | 11 +++--------
+ arch/x86/kvm/mmu/tdp_mmu.c      | 16 ++++++++--------
+ 2 files changed, 11 insertions(+), 16 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 676705ad1e23..8a80056cf841 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1192,6 +1192,9 @@ struct kvm_arch {
+ 	 */
+ 	bool tdp_mmu_enabled;
+ 
++	/* The number of TDP MMU pages across all roots. */
++	atomic64_t tdp_mmu_pages;
++
+ 	/*
+ 	 * List of struct kvm_mmu_pages being used as roots.
+ 	 * All struct kvm_mmu_pages in the list should have
+@@ -1212,18 +1215,10 @@ struct kvm_arch {
+ 	 */
+ 	struct list_head tdp_mmu_roots;
+ 
+-	/*
+-	 * List of struct kvmp_mmu_pages not being used as roots.
+-	 * All struct kvm_mmu_pages in the list should have
+-	 * tdp_mmu_page set and a tdp_mmu_root_count of 0.
+-	 */
+-	struct list_head tdp_mmu_pages;
+-
+ 	/*
+ 	 * Protects accesses to the following fields when the MMU lock
+ 	 * is held in read mode:
+ 	 *  - tdp_mmu_roots (above)
+-	 *  - tdp_mmu_pages (above)
+ 	 *  - the link field of struct kvm_mmu_pages used by the TDP MMU
+ 	 *  - lpage_disallowed_mmu_pages
+ 	 *  - the lpage_disallowed_link field of struct kvm_mmu_pages used
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index d6417740646a..1f44826cf794 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -29,7 +29,6 @@ int kvm_mmu_init_tdp_mmu(struct kvm *kvm)
+ 	kvm->arch.tdp_mmu_enabled = true;
+ 	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_roots);
+ 	spin_lock_init(&kvm->arch.tdp_mmu_pages_lock);
+-	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_pages);
+ 	kvm->arch.tdp_mmu_zap_wq = wq;
+ 	return 1;
+ }
+@@ -54,7 +53,7 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
+ 	flush_workqueue(kvm->arch.tdp_mmu_zap_wq);
+ 	destroy_workqueue(kvm->arch.tdp_mmu_zap_wq);
+ 
+-	WARN_ON(!list_empty(&kvm->arch.tdp_mmu_pages));
++	WARN_ON(atomic64_read(&kvm->arch.tdp_mmu_pages));
+ 	WARN_ON(!list_empty(&kvm->arch.tdp_mmu_roots));
+ 
+ 	/*
+@@ -384,14 +383,17 @@ static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
+ static void tdp_mmu_unlink_sp(struct kvm *kvm, struct kvm_mmu_page *sp,
+ 			      bool shared)
+ {
++	atomic64_dec(&kvm->arch.tdp_mmu_pages);
++
++	if (!sp->lpage_disallowed)
++		return;
++
+ 	if (shared)
+ 		spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+ 	else
+ 		lockdep_assert_held_write(&kvm->mmu_lock);
+ 
+-	list_del(&sp->link);
+-	if (sp->lpage_disallowed)
+-		unaccount_huge_nx_page(kvm, sp);
++	unaccount_huge_nx_page(kvm, sp);
+ 
+ 	if (shared)
+ 		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+@@ -1119,9 +1121,7 @@ static int tdp_mmu_link_sp(struct kvm *kvm, struct tdp_iter *iter,
+ 		tdp_mmu_set_spte(kvm, iter, spte);
+ 	}
+ 
+-	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+-	list_add(&sp->link, &kvm->arch.tdp_mmu_pages);
+-	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
++	atomic64_inc(&kvm->arch.tdp_mmu_pages);
+ 
+ 	return 0;
+ }
+
+base-commit: 88d1a6895b71b580b8fc98c23824aafa49d4948e
+-- 
+2.35.1.1094.g7c7d902a7c-goog
+
+
+--j3c8VscvnAccrGCY--
