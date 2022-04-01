@@ -2,257 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 04EEB4EF74A
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 18:03:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6ED04EF744
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 18:02:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237814AbiDAP4A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 11:56:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37552 "EHLO
+        id S231759AbiDAPzr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 11:55:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349562AbiDAPRY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 11:17:24 -0400
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2180ADDD
-        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 07:59:31 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id yy13so6469459ejb.2
-        for <kvm@vger.kernel.org>; Fri, 01 Apr 2022 07:59:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ebGPtXiu5HUtQyoqNhZdO92KCGPkkOR97ApJgxTMzik=;
-        b=qKMvZ0uz+73PRmlGOgQsh3zTqfJPV2XLOZeRQy0SNRj7ikzNPzjZCE6WDkxxsMLYGl
-         jp1SmVDUE4DnEbIb62wHtywaPHT3KZ81zMqI1KkFPnJiIWqTiqb+9Aysn/Hoy2APHnbX
-         NeGhEaPPoyVrEMI4k+h0+jnAyhQ45WhIX6WGzSBe/boN4a1k4eC3Tc4wa5yaF8HGJJnZ
-         S0nVU9bnQmaEE95KucUq9tXOAXUkWjz0xA5T+ADXrfyErCHCfEJX2DGyEcCfrEM/cg1l
-         FKCBb5p1wg1qFEOtg7z+HuklCdulWyZBAOGrsf/npODiLif4HYaNF7NR9Vs8z7acaTsn
-         ejhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ebGPtXiu5HUtQyoqNhZdO92KCGPkkOR97ApJgxTMzik=;
-        b=6J1puaNjgRnQn/Sh46tmDnh28ExLCM8c+AyfeW/iRkhvEXxQSlnNGquwuyxTjK+IOI
-         KJlfv72Pkj2qweZjO2gnWIx5ZLmVG5J8r+XLNpN+rNmpy9MGnt4vx03X2U87r08gnnGL
-         alldOAdlFkIYUa4UygrReTJqVSYBzwfmcMtVA2o1DjIJUaME39kZToq0bVAMyfcPETNb
-         AqdU7NFc9RGRTvsXx9/aYPgIkm1gFPUUCJBQEk1kEFDOC9eF9tl8vKA4Q5R6h4anWB5z
-         6K1oZ6BbpmhL+Bp5RYeCLVc4tjvyfgRenarmQzHI6fFVp7Stjpkqg8ENCyIaEygdnLhc
-         usOg==
-X-Gm-Message-State: AOAM533R9dShzgOQT0SazBnkpv0hAUG6N/rFWv9X3Xh0YwGc1eShkgbF
-        mJlPXmogOJpNY7uQwcRnQgwWEw==
-X-Google-Smtp-Source: ABdhPJx9bCGvjBSmplrmdcdg9DcsXsnr8KsvPSDkXSQNWOZOvhJWwLziCro/t6700UZZGELjAFzbkw==
-X-Received: by 2002:a17:906:8a6d:b0:6e0:68ac:7197 with SMTP id hy13-20020a1709068a6d00b006e068ac7197mr147150ejc.703.1648825169282;
-        Fri, 01 Apr 2022 07:59:29 -0700 (PDT)
-Received: from google.com (30.171.91.34.bc.googleusercontent.com. [34.91.171.30])
-        by smtp.gmail.com with ESMTPSA id gl2-20020a170906e0c200b006a767d52373sm1090474ejb.182.2022.04.01.07.59.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Apr 2022 07:59:28 -0700 (PDT)
-Date:   Fri, 1 Apr 2022 14:59:25 +0000
-From:   Quentin Perret <qperret@google.com>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Steven Price <steven.price@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <YkcTTY4YjQs5BRhE@google.com>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <YjyS6A0o4JASQK+B@google.com>
- <YkHspg+YzOsbUaCf@google.com>
- <YkH32nx+YsJuUbmZ@google.com>
- <YkIFW25WgV2WIQHb@google.com>
- <YkM7eHCHEBe5NkNH@google.com>
- <88620519-029e-342b-0a85-ce2a20eaf41b@arm.com>
- <YkQzfjgTQaDd2E2T@google.com>
- <YkSaUQX89ZEojsQb@google.com>
- <80aad2f9-9612-4e87-a27a-755d3fa97c92@www.fastmail.com>
+        with ESMTP id S1352324AbiDAPWn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 11:22:43 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC75C3CFC9;
+        Fri,  1 Apr 2022 08:03:33 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 231EDTrd010712;
+        Fri, 1 Apr 2022 15:03:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Wgqc0ZYvnXN4jSICangZboZXwxC+LF/TjMq5lsL1PuM=;
+ b=L1ELKdlJOwXZ5ymPrhGvLV8l6im3b+8JHOvhAMETmT+3KOxxSEszs0Deoi7r+rzRPoTZ
+ zFTI8oE665+kMYKpb8V9c0wIszx321RKDfRNmYiWj2v+/3DvWah7Ayw3VNXxmSmIGZWI
+ uZL6HQNH2yB3VyJhvvi90ZHea/pl5fTHkuXCqkBJUpLxz+og7ePs35RHy3pDx83Hnyzx
+ ZDtcgvzURN2FyYyg/BelQF8Rg58fLOBlUQ24U12a/jxCkdouXqp+EIgA9v27hDzAXX+s
+ wX0ZOeDol4Q6TssBXp6XBuxi8oqs8sEx288i6+h5RLdRmUBmf9rWnlzKRfGPie+AaZeR QA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3f62y91244-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Apr 2022 15:03:32 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 231EIvss029812;
+        Fri, 1 Apr 2022 15:03:32 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3f62y9122r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Apr 2022 15:03:32 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 231EwCUS023958;
+        Fri, 1 Apr 2022 15:03:29 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06ams.nl.ibm.com with ESMTP id 3f3rs3r8k2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Apr 2022 15:03:29 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 231F3QDx31523152
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 1 Apr 2022 15:03:26 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 30AD64203F;
+        Fri,  1 Apr 2022 15:03:26 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9D77E42042;
+        Fri,  1 Apr 2022 15:03:25 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.3.73])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  1 Apr 2022 15:03:25 +0000 (GMT)
+Date:   Fri, 1 Apr 2022 17:03:20 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
+        mimu@linux.ibm.com, nrb@linux.ibm.com
+Subject: Re: [PATCH v9 11/18] s390/mm: KVM: pv: when tearing down, try to
+ destroy protected pages
+Message-ID: <20220401170320.4b985bc9@p-imbrenda>
+In-Reply-To: <a61d614f-df0a-d0a8-c1f1-45a915e26b23@linux.ibm.com>
+References: <20220330122605.247613-1-imbrenda@linux.ibm.com>
+        <20220330122605.247613-12-imbrenda@linux.ibm.com>
+        <a61d614f-df0a-d0a8-c1f1-45a915e26b23@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <80aad2f9-9612-4e87-a27a-755d3fa97c92@www.fastmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: n-Ye25tC6IAgsGzX09Ork2zbvEwOwVBH
+X-Proofpoint-ORIG-GUID: jkkba_k1_of4SFej0kaV6qgkPHpUHSQK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-04-01_05,2022-03-31_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ impostorscore=0 mlxscore=0 adultscore=0 bulkscore=0 mlxlogscore=999
+ priorityscore=1501 clxscore=1015 phishscore=0 suspectscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204010072
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thursday 31 Mar 2022 at 09:04:56 (-0700), Andy Lutomirski wrote:
-> On Wed, Mar 30, 2022, at 10:58 AM, Sean Christopherson wrote:
-> > On Wed, Mar 30, 2022, Quentin Perret wrote:
-> >> On Wednesday 30 Mar 2022 at 09:58:27 (+0100), Steven Price wrote:
-> >> > On 29/03/2022 18:01, Quentin Perret wrote:
-> >> > > Is implicit sharing a thing? E.g., if a guest makes a memory access in
-> >> > > the shared gpa range at an address that doesn't have a backing memslot,
-> >> > > will KVM check whether there is a corresponding private memslot at the
-> >> > > right offset with a hole punched and report a KVM_EXIT_MEMORY_ERROR? Or
-> >> > > would that just generate an MMIO exit as usual?
-> >> > 
-> >> > My understanding is that the guest needs some way of tagging whether a
-> >> > page is expected to be shared or private. On the architectures I'm aware
-> >> > of this is done by effectively stealing a bit from the IPA space and
-> >> > pretending it's a flag bit.
-> >> 
-> >> Right, and that is in fact the main point of divergence we have I think.
-> >> While I understand this might be necessary for TDX and the likes, this
-> >> makes little sense for pKVM. This would effectively embed into the IPA a
-> >> purely software-defined non-architectural property/protocol although we
-> >> don't actually need to: we (pKVM) can reasonably expect the guest to
-> >> explicitly issue hypercalls to share pages in-place. So I'd be really
-> >> keen to avoid baking in assumptions about that model too deep in the
-> >> host mm bits if at all possible.
-> >
-> > There is no assumption about stealing PA bits baked into this API.  Even within
-> > x86 KVM, I consider it a hard requirement that the common flows not assume the
-> > private vs. shared information is communicated through the PA.
+On Thu, 31 Mar 2022 15:34:42 +0200
+Janosch Frank <frankja@linux.ibm.com> wrote:
+
+> On 3/30/22 14:25, Claudio Imbrenda wrote:
+> > When ptep_get_and_clear_full is called for a mm teardown, we will now
+> > attempt to destroy the secure pages. This will be faster than export.
+> > 
+> > In case it was not a teardown, or if for some reason the destroy page
+> > UVC failed, we try with an export page, like before.
+> > 
+> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > Acked-by: Janosch Frank <frankja@linux.ibm.com>
+> > ---
+> >   arch/s390/include/asm/pgtable.h | 18 +++++++++++++++---
+> >   1 file changed, 15 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/arch/s390/include/asm/pgtable.h b/arch/s390/include/asm/pgtable.h
+> > index 23ca0d8e058a..72544a1b4a68 100644
+> > --- a/arch/s390/include/asm/pgtable.h
+> > +++ b/arch/s390/include/asm/pgtable.h
+> > @@ -1118,9 +1118,21 @@ static inline pte_t ptep_get_and_clear_full(struct mm_struct *mm,
+> >   	} else {
+> >   		res = ptep_xchg_lazy(mm, addr, ptep, __pte(_PAGE_INVALID));
+> >   	}
+> > -	/* At this point the reference through the mapping is still present */
+> > -	if (mm_is_protected(mm) && pte_present(res))
+> > -		uv_convert_owned_from_secure(pte_val(res) & PAGE_MASK);
+> > +	/* Nothing to do */
+> > +	if (!mm_is_protected(mm) || !pte_present(res))
+> > +		return res;
+> > +	/*
+> > +	 * At this point the reference through the mapping is still present.  
 > 
-> Quentin, I think we might need a clarification.  The API in this patchset indeed has no requirement that a PA bit distinguish between private and shared, but I think it makes at least a weak assumption that *something*, a priori, distinguishes them.  In particular, there are private memslots and shared memslots, so the logical flow of resolving a guest memory access looks like:
+> That's the case because we zap ptes within a mm that's still existing, 
+> right? The mm will be deleted after we have unmapped the memory.
+
+not exactly, the mm can exist without pages.
+
+the reference is there because when we enter the function,
+there is still a pointer to the page (the PTE itself), the page is still
+reachable, and therefore its reference count cannot be less than 1.
+
+when we leave the function, there is no more mapping for the page
+(that's the point of the function after all), and only then the counter
+can be decremented.
+
+if you look at zap_pte_range in mm/memory.c, you see that we call
+ptep_get_and_clear_full first, and then a few lines below we call
+__tlb_remove_page which in the end calls put_page on that page.
+
 > 
-> 1. guest accesses a GVA
 > 
-> 2. read guest paging structures
+> > +	 * The notifier should have destroyed all protected vCPUs at this
+> > +	 * point, so the destroy should be successful.
+> > +	 */
+> > +	if (full && !uv_destroy_owned_page(pte_val(res) & PAGE_MASK))
+> > +		return res;
+> > +	/*
+> > +	 * But if something went wrong and the pages could not be destroyed,
+> > +	 * the slower export is used as fallback instead.
+> > +	 */
+> > +	uv_convert_owned_from_secure(pte_val(res) & PAGE_MASK);
+> >   	return res;
+> >   }
+> >     
 > 
-> 3. determine whether this is a shared or private access
-> 
-> 4. read host (KVM memslots and anything else, EPT, NPT, RMP, etc) structures accordingly.  In particular, the memslot to reference is different depending on the access type.
-> 
-> For TDX, this maps on to the fd-based model perfectly: the host-side paging structures for the shared and private slots are completely separate.  For SEV, the structures are shared and KVM will need to figure out what to do in case a private and shared memslot overlap.  Presumably it's sufficient to declare that one of them wins, although actually determining which one is active for a given GPA may involve checking whether the backing store for a given page actually exists.
-> 
-> But I don't understand pKVM well enough to understand how it fits in.  Quentin, how is the shared vs private mode of a memory access determined?  How do the paging structures work?  Can a guest switch between shared and private by issuing a hypercall without changing any guest-side paging structures or anything else?
 
-My apologies, I've indeed shared very little details about how pKVM
-works. We'll be posting patches upstream really soon that will hopefully
-help with this, but in the meantime, here is the idea.
-
-pKVM is designed around MMU-based protection as opposed to encryption as
-is the case for many confidential computing solutions. It's probably
-worth mentioning that, although it targets arm64, pKVM is distinct from
-the Arm CC-A stuff and requires no fancy hardware extensions -- it is
-applicable all the way back to Arm v8.0 which makes it an interesting
-solution for mobile.
-
-Another particularity of the pKVM approach is that the code of the
-hypervisor itself lives in the kernel source tree (see
-arch/arm64/kvm/hyp/nvhe/). The hypervisor is built with the rest of the
-kernel but as a self-sufficient object, and ends up in its own dedicated
-ELF section (.hyp.*) in the kernel image. The main requirement for pKVM
-(and KVM on arm64 in general) is to have the bootloader enter the kernel
-at the hypervisor exception level (a.k.a EL2). The boot procedure is a
-bit involved, but eventually the hypervisor object is installed at EL2,
-and the kernel is deprivileged to EL1 and proceeds to boot. From that
-point on the hypervisor no longer trusts the kernel and will enable the
-stage-2 MMU to impose access-control restrictions to all memory accesses
-from the host.
-
-All that to say: the pKVM approach offers a great deal of flexibility
-when it comes to hypervisor behaviour. We have control over the
-hypervisor code and can change it as we see fit. Since both the
-hypervisor and the host kernel are part of the same image, the ABI
-between them is very much *not* stable and can be adjusted to whatever
-makes the most sense. So, I think we'd be quite keen to use that
-flexibility to align some of the pKVM behaviours with other players
-(TDX, SEV, CC-A), especially when it comes to host mm APIs. But that
-flexibility also means we can do some things a bit better (e.g. pKVM can
-handle illegal accesses from the host mostly fine -- the hypervisor can
-re-inject the fault in the host) so I would definitely like to use this
-to our advantage and not be held back by unrelated constraints.
-
-To answer your original question about memory 'conversion', the key
-thing is that the pKVM hypervisor controls the stage-2 page-tables for
-everyone in the system, all guests as well as the host. As such, a page
-'conversion' is nothing more than a permission change in the relevant
-page-tables.
-
-The typical flow is as follows:
-
- - the host asks the hypervisor to run a guest;
-
- - the hypervisor does the context switch, which includes switching
-   stage-2 page-tables;
-
- - initially the guest has an empty stage-2 (we don't require
-   pre-faulting everything), which means it'll immediately fault;
-
- - the hypervisor switches back to host context to handle the guest
-   fault;
-
- - the host handler finds the corresponding memslot and does the
-   ipa->hva conversion. In our current implementation it uses a longterm
-   GUP pin on the corresponding page;
-
- - once it has a page, the host handler issues a hypercall to donate the
-   page to the guest;
-
- - the hypervisor does a bunch of checks to make sure the host owns the
-   page, and if all is fine it will unmap it from the host stage-2 and
-   map it in the guest stage-2, and do some bookkeeping as it needs to
-   track page ownership, etc;
-
- - the guest can then proceed to run, and possibly faults in many more
-   pages;
-
- - when it wants to, the guest can then issue a hypercall to share a
-   page back with the host;
-
- - the hypervisor checks the request, maps the page back in the host
-   stage-2, does more bookkeeping and returns back to the host to notify
-   it of the share;
-
- - the host kernel at that point can exit back to userspace to relay
-   that information to the VMM;
-
- - rinse and repeat.
-
-We currently don't allow the host punching holes in the guest IPA space.
-Once it has donated a page to a guest, it can't have it back until the
-guest has been entirely torn down (at which point all of memory is
-poisoned by the hypervisor obviously). But we could certainly reconsider
-that part. OTOH, I'm still inclined to think that in-place sharing is
-desirable. In our case it's dirt cheap, and could even work on huge
-pages, which would allow very efficient sharing of large amounts of
-data. So, I'm a bit hesitant to use the private-fd approach as-is since
-it's not immediately obvious how we'll ever be able reconcile these
-things if mmap-ing the fd is a firm no. With that said, I don't think
-our *current* use-cases have a strong need for this, so I mostly agree
-with Sean's point earlier. But since we're talking about committing to a
-userspace ABI, I would feel better if there was a clear path towards
-having support for in-place sharing -- I can certainly see it being
-useful. I'll think about it, but if folks have ideas in the meantime
-I'll be happy to discuss.
-
-I hope the above was useful and clears up the confusion.
-
-Thanks,
-Quentin
