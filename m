@@ -2,55 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB4054EF7FC
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 18:32:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC28C4EF88F
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 19:03:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344139AbiDAQeD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 12:34:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60044 "EHLO
+        id S1347913AbiDAREv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 13:04:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350714AbiDAQdq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 12:33:46 -0400
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99E6A2E6A6E;
-        Fri,  1 Apr 2022 09:06:48 -0700 (PDT)
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1naJma-0000Rv-AD; Fri, 01 Apr 2022 18:05:52 +0200
-Message-ID: <8529068e-7d2b-dc54-e259-182ba733105f@maciej.szmigiero.name>
-Date:   Fri, 1 Apr 2022 18:05:46 +0200
+        with ESMTP id S1346870AbiDAREt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 13:04:49 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 517EA15E8AC;
+        Fri,  1 Apr 2022 10:02:59 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 231Ffs3S002054;
+        Fri, 1 Apr 2022 17:02:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=nfHd4a7XAPp5zaEVmLl89M0fu2s7CMLMernxxZ/Tg1w=;
+ b=maBM0eNuiXyTT6DXq3pucGH9ctcdV6KHvfZhmzJskcFgBDuXXQClJfUeS5df3AljGcVI
+ ZRa0JjN+1puqu/nM2K9X9VmvzXXREbm5kglNPmLvuWTR1g7OV+GiEEdKfR11Lzrx3CFN
+ UtYmOJaiR9mcOMh3lHuJWg0CWRNx9QFuwW5LCs9B1YE5FiqqrdMeB73culO+h7p1mOBw
+ wEKUY2KXvvFamwxr2eUyGynTl5cyGSFN78+AoPF3VW52Q+wsgRsX64Nc3X2jhiesGaYU
+ NzOsSVVJQ/Dwnm9BlTVIW+4L2qvEh7XAApUvQwJnb5Que9khJJtYEr6ZznVNwlqs4xXp Iw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3f648s1mcf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Apr 2022 17:02:56 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 231GMNgn008245;
+        Fri, 1 Apr 2022 17:02:55 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3f648s1mbu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Apr 2022 17:02:55 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 231GxVWe003041;
+        Fri, 1 Apr 2022 17:02:53 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06fra.de.ibm.com with ESMTP id 3f1t3j3ea2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Apr 2022 17:02:53 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 231H2oeE48562566
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 1 Apr 2022 17:02:50 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1600B4204D;
+        Fri,  1 Apr 2022 17:02:50 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A627A42059;
+        Fri,  1 Apr 2022 17:02:49 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  1 Apr 2022 17:02:49 +0000 (GMT)
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [PATCH 0/2] Dirtying, failing memop: don't indicate suppression
+Date:   Fri,  1 Apr 2022 19:02:45 +0200
+Message-Id: <20220401170247.1287354-1-scgl@linux.ibm.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Jon Grimm <Jon.Grimm@amd.com>,
-        David Kaplan <David.Kaplan@amd.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Liam Merwick <liam.merwick@oracle.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <cover.1646944472.git.maciej.szmigiero@oracle.com>
- <a28577564a7583c32f0029f2307f63ca8869cf22.1646944472.git.maciej.szmigiero@oracle.com>
- <YkTSul0CbYi/ae0t@google.com>
- <8f9ae64a-dc64-6f46-8cd4-ffd2648a9372@maciej.szmigiero.name>
- <YkTlxCV9wmA3fTlN@google.com>
- <f4cdaf45-c869-f3bb-2ba2-3c0a4da12a6d@maciej.szmigiero.name>
- <YkZCeoDhMg1wOU1f@google.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH 3/5] KVM: nSVM: Don't forget about L1-injected events
-In-Reply-To: <YkZCeoDhMg1wOU1f@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: C9C-BczXw24qCc_h0LswoIqY6_Tmpvs5
+X-Proofpoint-ORIG-GUID: _rvUJXjzm8vbuxpMW8nx0s8W1lgmcnhI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-04-01_05,2022-03-31_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 phishscore=0
+ malwarescore=0 suspectscore=0 lowpriorityscore=0 mlxlogscore=792
+ bulkscore=0 spamscore=0 priorityscore=1501 impostorscore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204010082
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -59,113 +96,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1.04.2022 02:08, Sean Christopherson wrote:
-> On Fri, Apr 01, 2022, Maciej S. Szmigiero wrote:
->> On 31.03.2022 01:20, Sean Christopherson wrote:
->>> Re-executing the INTn is wrong, the instruction has already completed decode and
->>> execution.  E.g. if there's there's a code breakpoint on the INTn, rewinding will
->>> cause a spurious #DB.
->>>
->>> KVM's INT3 shenanigans are bonkers, but I guess there's no better option given
->>> that the APM says "Software interrupts cannot be properly injected if the processor
->>> does not support the NextRIP field.".  What a mess.
->>
->> Note that KVM currently always tries to re-execute the current instruction
->> when asked to re-inject a #BP or a #OF, even when nrips are enabled.
-> 
-> Yep, and my vote is to fix that.
+If a memop fails due to key checked protection, after already having
+written to the guest, don't indicate suppression to the guest, as that
+would imply that memory wasn't modified.
 
-The only issue I have with making SVM re-inject a #BP or a #OF in the
-nrips case is that this might introduce some regression with respect to
-host-side guest debugging.
+This could be considered a fix to the code introducing storage key
+support, however this is a bug in KVM only if we emulate an
+instructions writing to an operand spanning multiple pages, which I
+don't believe we do.
 
-On the other hand, VMX does re-inject these unconditionally so it might
-not be a problem after all.
+Janis Schoetterl-Glausch (2):
+  KVM: s390: Don't indicate suppression on dirtying, failing memop
+  KVM: s390: selftest: Test suppression indication on key prot exception
 
->> Also, #BP (and #OF, too) is returned as type SVM_EXITINTINFO_TYPE_EXEPT,
->> not as SVM_EXITINTINFO_TYPE_SOFT (soft interrupt), so it should be
->> re-injected accordingly.
-> 
-> Ahhh, SVM doesn't differentiate between software exceptions and hardware exceptions.
-> Finally found the relevant section in the APM:
-> 
->    Despite the instruction name, the events raised by the INT1 (also known as ICEBP),
->    INT3 and INTO instructions (opcodes F1h, CCh and CEh) are considered exceptions for
->    the purposes of EXITINTINFO, not software interrupts. Only events raised by the INTn
->    instruction (opcode CDh) are considered software interrupts.
-> 
-> VMX has separate identifiers for software interrupts and for software exceptions,
+ arch/s390/kvm/gaccess.c                   | 47 ++++++++++++++---------
+ tools/testing/selftests/kvm/s390x/memop.c | 43 ++++++++++++++++++++-
+ 2 files changed, 70 insertions(+), 20 deletions(-)
 
-I guess the sentence above was supposed to read "for *hardware exceptions*
-and for software exceptions", just like in the previous paragraph about SVM.
 
-> where as SVM unconditionally treats #BP and #OF as soft:
-> 
->    Injecting an exception (TYPE = 3) with vectors 3 or 4 behaves like a trap raised by
->    INT3 and INTO instructions
-> 
-> Now I'm curious why Intel doesn't do the same...
+base-commit: 1ebdbeb03efe89f01f15df038a589077df3d21f5
+-- 
+2.32.0
 
-Perhaps it's just a result of VMX and SVM being developed independently,
-in parallel.
-
->>> Anyways, for the common nrips=true case, I strongly prefer that we properly fix
->>> the non-nested case and re-inject software interrupts, which should in turn
->>> naturally fix this nested case.
->>
->> This would also need making the #BP or #OF current instruction
->> re-execution conditional on (at least) nrips support.
->>
->> I am not sure, however, whether this won't introduce any regressions.
->> That's why this patch set changed the behavior here only for the
->> L1 -> L2 case.
->>
->> Another issue is whether a L1 hypervisor can legally inject a #VC
->> into its L2 (since these are never re-injected).
-> 
-> I would expect to work, and it's easy to find out.  I know VMX allows injecting
-> non-existent exceptions, but the APM is vague as usual and says VMRUN will fail...
-
-I've done a quick test right now and a VMRUN attempt with #VC event
-injection does seem to fail.
-So we don't need to worry about not re-injecting a #VC.
-
->    If the VMM attempts to inject an event that is impossible for the guest mode
-> 
->> We still need L1 -> L2 event injection detection to restore the NextRIP
->> field when re-injecting an event that uses it.
-> 
-> You lost me on this one.  KVM L0 is only (and always!) responsible for saving the
-> relevant info into vmcb12, why does it need to detect where the vectoring exception
-> came from?
-
-Look at the description of patch 4 of this patch set - after some
-L2 VMEXITs handled by L0 (in other words, which do *not* result in
-a nested VMEXIT to L1) the VMCB02 NextRIP field will be zero
-(APM 15.7.1 "State Saved on Exit" describes when this happens).
-
-If we attempt to re-inject some types of events with the NextRIP field
-being zero the return address pushed on stack will also be zero, which
-will obviously do bad things to the L2 when it returns from
-an (exception|interrupt) handler.
-
->>> And for nrips=false, my vote is to either punt
->>> and document it as a "KVM erratum", or straight up make nested require nrips.
->>
->> A quick Internet search shows that the first CPUs with NextRIP were the
->> second-generation Family 10h CPUs (Phenom II, Athlon II, etc.).
->> They started being released in early 2009, so we probably don't need to
->> worry about the non-nrips case too much.
->>
->> For the nested case, orthodox reading of the aforementioned APM sentence
->> would mean that a L1 hypervisor is not allowed either to make use of such
->> event injection in the non-nrips case.
-> 
-> Heh, my reading of it is that it's not disallowed, it just won't work correctly,
-> i.e. the INTn won't be skipped.
-
-Either way, we probably don't need to worry that this case don't get handled
-100% right.
-
-Thanks,
-Maciej
