@@ -2,92 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E84B4EEF4C
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 16:25:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C7BB4EF2B3
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 17:15:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346820AbiDAO1N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 10:27:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60460 "EHLO
+        id S1350867AbiDAPGl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 11:06:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235713AbiDAO1L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 10:27:11 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDEF613DB4D;
-        Fri,  1 Apr 2022 07:25:21 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 231DjFGM012995;
-        Fri, 1 Apr 2022 14:25:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=Trnly/bmHwEiMuh5ezmXYQ4lhEA0oOaqXu0QeyR00/k=;
- b=BvoWF7CS4nwQbPpGerfxa6g5qG3rtWQCyJtPeYZ5pf3zl4ofu5WX9Q3b704sTbJBVGgj
- 1BcscUrIA6OfClclDnOoBAXMebHSY2GVUqQ/X4WNYyYis9XI/BYXhK+Ue0+kVf/ArH3x
- hc2TsaTLey9PfYMjEFi5ty7gxApjLANkvKkIKTDPN/OBZr6PZB/r6V6TmAg/NTJCaNDT
- rcGD9Vwv0fuzn/PKuKiZBqe5EU9C1J3+kHVnRXRyI8bNmwF07Z88JEPMg6PqHscTmDlG
- im+4w6r89ROPPK3uuF80rkitOjK68KXT2+InIdhYa4K/JOm8MVocAFwmvxWARqDAaL1i Ng== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f62j58vr8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Apr 2022 14:25:20 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 231DtoYk025695;
-        Fri, 1 Apr 2022 14:25:20 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f62j58vqs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Apr 2022 14:25:20 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 231EF4Oh012635;
-        Fri, 1 Apr 2022 14:25:18 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma01fra.de.ibm.com with ESMTP id 3f1tf8u64j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Apr 2022 14:25:18 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 231EPFNn48955682
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 1 Apr 2022 14:25:15 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E4526AE05D;
-        Fri,  1 Apr 2022 14:25:14 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 61BF9AE051;
-        Fri,  1 Apr 2022 14:25:14 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.3.73])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  1 Apr 2022 14:25:14 +0000 (GMT)
-Date:   Fri, 1 Apr 2022 16:25:12 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
-        mimu@linux.ibm.com, nrb@linux.ibm.com
-Subject: Re: [PATCH v9 04/18] KVM: s390: pv: refactor s390_reset_acc
-Message-ID: <20220401162512.0fd528cf@p-imbrenda>
-In-Reply-To: <1fe44cd4-4ea9-ad68-2690-54c78dd4f5ad@linux.ibm.com>
-References: <20220330122605.247613-1-imbrenda@linux.ibm.com>
-        <20220330122605.247613-5-imbrenda@linux.ibm.com>
-        <1fe44cd4-4ea9-ad68-2690-54c78dd4f5ad@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        with ESMTP id S1349157AbiDAOpi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 10:45:38 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24035299A4B;
+        Fri,  1 Apr 2022 07:35:26 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A9C4F60A3D;
+        Fri,  1 Apr 2022 14:34:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83411C340F2;
+        Fri,  1 Apr 2022 14:34:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1648823695;
+        bh=h6tEdTEiLa3QMvSfq+L4/ZRy7SJQezJ633iJ7+1klsM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=EKZP1uH6QieLhU1pKEh5QHV6RWg5Wn4FfbYgBQttlgxK6eVkX1PLtQ4ObTM5lWEbL
+         JiHCFX7swmVdIsAx0XZrVjXCCd+WjM/mdpKK/JTHsDhaNkRLQylKxJYUgcsNskVLdK
+         0e9HKKGNpviJ6+G2ALc/6mN3HiAdGLYD+/3IMDyUBShSzSbqRZNAD4SJPQ5xWWteP3
+         HFWDb7aVeFy80u+duOMleA9xYyzH7aiVk1G/Qe4JPoSGbCOtQlVkKXuSvR2vi8VUoA
+         odI6C/1oPjEPgzewb5L8qMbqmFUdI3bPWu+9VbyLN3Ddc3TCNXdKMkaZ0LNrGl4sOb
+         8eC3XRWGeFbvQ==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Marc Zyngier <maz@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Sasha Levin <sashal@kernel.org>, pbonzini@redhat.com,
+        corbet@lwn.net, catalin.marinas@arm.com, will@kernel.org,
+        oupton@google.com, drjones@redhat.com, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu
+Subject: [PATCH AUTOSEL 5.16 042/109] KVM: arm64: Do not change the PMU event filter after a VCPU has run
+Date:   Fri,  1 Apr 2022 10:31:49 -0400
+Message-Id: <20220401143256.1950537-42-sashal@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220401143256.1950537-1-sashal@kernel.org>
+References: <20220401143256.1950537-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: XW4ko057VnKPJuRtt_yM7OvHbaxERUDj
-X-Proofpoint-ORIG-GUID: bHenevKFalBNDPNkgtUBHoKwLA2AC9i9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-04-01_05,2022-03-31_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 clxscore=1015 spamscore=0 bulkscore=0 mlxlogscore=999
- mlxscore=0 adultscore=0 impostorscore=0 priorityscore=1501 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204010066
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -96,137 +60,162 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 31 Mar 2022 15:25:31 +0200
-Janosch Frank <frankja@linux.ibm.com> wrote:
+From: Marc Zyngier <maz@kernel.org>
 
-> On 3/30/22 14:25, Claudio Imbrenda wrote:
-> > Refactor s390_reset_acc so that it can be reused in upcoming patches.
-> > 
-> > We don't want to hold all the locks used in a walk_page_range for too
-> > long, and the destroy page UVC does take some time to complete.
-> > Therefore we quickly gather the pages to destroy, and then destroy them
-> > without holding all the locks.
-> > 
-> > The new refactored function optionally allows to return early without
-> > completing if a fatal signal is pending (and return and appropriate
-> > error code). Two wrappers are provided to call the new function.
-> > 
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > (dropping Janosch's Ack because of major changes to the patch)  
-> 
-> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-> 
-> [...]
-> > +#define DESTROY_LOOP_THRESHOLD 32  
-> 
-> A question out of curiosity:
-> Is there any particular reason for the number?
-> Have you tested other numbers and experienced a speedup/slowdown?
+[ Upstream commit 5177fe91e4cf78a659aada2c9cf712db4d788481 ]
 
-to be honest no, it just seemed a good tradeoff between size and
-callback overhead
+Userspace can specify which events a guest is allowed to use with the
+KVM_ARM_VCPU_PMU_V3_FILTER attribute. The list of allowed events can be
+identified by a guest from reading the PMCEID{0,1}_EL0 registers.
 
-> 
-> > +
-> > +struct reset_walk_state {
-> > +	unsigned long next;
-> > +	unsigned long count;
-> > +	unsigned long pfns[DESTROY_LOOP_THRESHOLD];
-> > +};
-> > +
-> > +static int s390_gather_pages(pte_t *ptep, unsigned long addr,
-> > +			     unsigned long next, struct mm_walk *walk)
-> >   {
-> > +	struct reset_walk_state *p = walk->private;
-> >   	pte_t pte = READ_ONCE(*ptep);
-> >   
-> > -	/* There is a reference through the mapping */
-> > -	if (pte_present(pte))
-> > -		WARN_ON_ONCE(uv_destroy_owned_page(pte_val(pte) & PAGE_MASK));
-> > -
-> > -	return 0;
-> > +	if (pte_present(pte)) {
-> > +		/* we have a reference from the mapping, take an extra one */
-> > +		get_page(phys_to_page(pte_val(pte)));
-> > +		p->pfns[p->count] = phys_to_pfn(pte_val(pte));
-> > +		p->next = next;
-> > +		p->count++;
-> > +	}
-> > +	return p->count >= DESTROY_LOOP_THRESHOLD;
-> >   }
-> >   
-> > -static const struct mm_walk_ops reset_acc_walk_ops = {
-> > -	.pte_entry		= __s390_reset_acc,
-> > +static const struct mm_walk_ops gather_pages_ops = {
-> > +	.pte_entry = s390_gather_pages,
-> >   };
-> >   
-> > -#include <linux/sched/mm.h>
-> > -void s390_reset_acc(struct mm_struct *mm)
-> > +/*
-> > + * Call the Destroy secure page UVC on each page in the given array of PFNs.
-> > + * Each page needs to have an extra reference, which will be released here.
-> > + */
-> > +void s390_uv_destroy_pfns(unsigned long count, unsigned long *pfns)
-> >   {
-> > -	if (!mm_is_protected(mm))
-> > -		return;
-> > -	/*
-> > -	 * we might be called during
-> > -	 * reset:                             we walk the pages and clear
-> > -	 * close of all kvm file descriptors: we walk the pages and clear
-> > -	 * exit of process on fd closure:     vma already gone, do nothing
-> > -	 */
-> > -	if (!mmget_not_zero(mm))
-> > -		return;
-> > -	mmap_read_lock(mm);
-> > -	walk_page_range(mm, 0, TASK_SIZE, &reset_acc_walk_ops, NULL);
-> > -	mmap_read_unlock(mm);
-> > -	mmput(mm);
-> > +	unsigned long i;
-> > +
-> > +	for (i = 0; i < count; i++) {
-> > +		/* we always have an extra reference */
-> > +		uv_destroy_owned_page(pfn_to_phys(pfns[i]));
-> > +		/* get rid of the extra reference */
-> > +		put_page(pfn_to_page(pfns[i]));
-> > +		cond_resched();
-> > +	}
-> > +}
-> > +EXPORT_SYMBOL_GPL(s390_uv_destroy_pfns);
-> > +
-> > +/**
-> > + * __s390_uv_destroy_range - Walk the given range of the given address
-> > + * space, and call the destroy secure page UVC on each page.
-> > + * Optionally exit early if a fatal signal is pending.
-> > + * @mm the mm to operate on
-> > + * @start the start of the range
-> > + * @end the end of the range
-> > + * @interruptible if not 0, stop when a fatal signal is received
-> > + * Return: 0 on success, -EINTR if the function stopped before completing
-> > + */
-> > +int __s390_uv_destroy_range(struct mm_struct *mm, unsigned long start,
-> > +			    unsigned long end, bool interruptible)
-> > +{
-> > +	struct reset_walk_state state = { .next = start };
-> > +	int r = 1;
-> > +
-> > +	while (r > 0) {
-> > +		state.count = 0;
-> > +		mmap_read_lock(mm);
-> > +		r = walk_page_range(mm, state.next, end, &gather_pages_ops, &state);
-> > +		mmap_read_unlock(mm);
-> > +		cond_resched();
-> > +		s390_uv_destroy_pfns(state.count, state.pfns);
-> > +		if (interruptible && fatal_signal_pending(current))
-> > +			return -EINTR;
-> > +	}
-> > +	return 0;
-> >   }
-> > -EXPORT_SYMBOL_GPL(s390_reset_acc);
-> > +EXPORT_SYMBOL_GPL(__s390_uv_destroy_range);
-> >   
-> >   /**
-> >    * s390_remove_old_asce - Remove the topmost level of page tables from the  
-> 
+Changing the PMU event filter after a VCPU has run can cause reads of the
+registers performed before the filter is changed to return different values
+than reads performed with the new event filter in place. The architecture
+defines the two registers as read-only, and this behaviour contradicts
+that.
+
+Keep track when the first VCPU has run and deny changes to the PMU event
+filter to prevent this from happening.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+[ Alexandru E: Added commit message, updated ioctl documentation ]
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20220127161759.53553-2-alexandru.elisei@arm.com
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ Documentation/virt/kvm/devices/vcpu.rst |  2 +-
+ arch/arm64/include/asm/kvm_host.h       |  1 +
+ arch/arm64/kvm/arm.c                    |  4 +++
+ arch/arm64/kvm/pmu-emul.c               | 33 +++++++++++++++----------
+ 4 files changed, 26 insertions(+), 14 deletions(-)
+
+diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+index 60a29972d3f1..d063aaee5bb7 100644
+--- a/Documentation/virt/kvm/devices/vcpu.rst
++++ b/Documentation/virt/kvm/devices/vcpu.rst
+@@ -70,7 +70,7 @@ irqchip.
+ 	 -ENODEV  PMUv3 not supported or GIC not initialized
+ 	 -ENXIO   PMUv3 not properly configured or in-kernel irqchip not
+ 	 	  configured as required prior to calling this attribute
+-	 -EBUSY   PMUv3 already initialized
++	 -EBUSY   PMUv3 already initialized or a VCPU has already run
+ 	 -EINVAL  Invalid filter range
+ 	 =======  ======================================================
+ 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index d016f27af6da..8c7ba346d713 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -137,6 +137,7 @@ struct kvm_arch {
+ 
+ 	/* Memory Tagging Extension enabled for the guest */
+ 	bool mte_enabled;
++	bool ran_once;
+ };
+ 
+ struct kvm_vcpu_fault_info {
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 1eadf9088880..6f3be4d44abe 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -629,6 +629,10 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+ 	if (kvm_vm_is_protected(kvm))
+ 		kvm_call_hyp_nvhe(__pkvm_vcpu_init_traps, vcpu);
+ 
++	mutex_lock(&kvm->lock);
++	kvm->arch.ran_once = true;
++	mutex_unlock(&kvm->lock);
++
+ 	return ret;
+ }
+ 
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index a5e4bbf5e68f..c996fc562da4 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -921,6 +921,8 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
+ 
+ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ {
++	struct kvm *kvm = vcpu->kvm;
++
+ 	if (!kvm_vcpu_has_pmu(vcpu))
+ 		return -ENODEV;
+ 
+@@ -938,7 +940,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		int __user *uaddr = (int __user *)(long)attr->addr;
+ 		int irq;
+ 
+-		if (!irqchip_in_kernel(vcpu->kvm))
++		if (!irqchip_in_kernel(kvm))
+ 			return -EINVAL;
+ 
+ 		if (get_user(irq, uaddr))
+@@ -948,7 +950,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		if (!(irq_is_ppi(irq) || irq_is_spi(irq)))
+ 			return -EINVAL;
+ 
+-		if (!pmu_irq_is_valid(vcpu->kvm, irq))
++		if (!pmu_irq_is_valid(kvm, irq))
+ 			return -EINVAL;
+ 
+ 		if (kvm_arm_pmu_irq_initialized(vcpu))
+@@ -963,7 +965,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		struct kvm_pmu_event_filter filter;
+ 		int nr_events;
+ 
+-		nr_events = kvm_pmu_event_mask(vcpu->kvm) + 1;
++		nr_events = kvm_pmu_event_mask(kvm) + 1;
+ 
+ 		uaddr = (struct kvm_pmu_event_filter __user *)(long)attr->addr;
+ 
+@@ -975,12 +977,17 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		     filter.action != KVM_PMU_EVENT_DENY))
+ 			return -EINVAL;
+ 
+-		mutex_lock(&vcpu->kvm->lock);
++		mutex_lock(&kvm->lock);
++
++		if (kvm->arch.ran_once) {
++			mutex_unlock(&kvm->lock);
++			return -EBUSY;
++		}
+ 
+-		if (!vcpu->kvm->arch.pmu_filter) {
+-			vcpu->kvm->arch.pmu_filter = bitmap_alloc(nr_events, GFP_KERNEL_ACCOUNT);
+-			if (!vcpu->kvm->arch.pmu_filter) {
+-				mutex_unlock(&vcpu->kvm->lock);
++		if (!kvm->arch.pmu_filter) {
++			kvm->arch.pmu_filter = bitmap_alloc(nr_events, GFP_KERNEL_ACCOUNT);
++			if (!kvm->arch.pmu_filter) {
++				mutex_unlock(&kvm->lock);
+ 				return -ENOMEM;
+ 			}
+ 
+@@ -991,17 +998,17 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 			 * events, the default is to allow.
+ 			 */
+ 			if (filter.action == KVM_PMU_EVENT_ALLOW)
+-				bitmap_zero(vcpu->kvm->arch.pmu_filter, nr_events);
++				bitmap_zero(kvm->arch.pmu_filter, nr_events);
+ 			else
+-				bitmap_fill(vcpu->kvm->arch.pmu_filter, nr_events);
++				bitmap_fill(kvm->arch.pmu_filter, nr_events);
+ 		}
+ 
+ 		if (filter.action == KVM_PMU_EVENT_ALLOW)
+-			bitmap_set(vcpu->kvm->arch.pmu_filter, filter.base_event, filter.nevents);
++			bitmap_set(kvm->arch.pmu_filter, filter.base_event, filter.nevents);
+ 		else
+-			bitmap_clear(vcpu->kvm->arch.pmu_filter, filter.base_event, filter.nevents);
++			bitmap_clear(kvm->arch.pmu_filter, filter.base_event, filter.nevents);
+ 
+-		mutex_unlock(&vcpu->kvm->lock);
++		mutex_unlock(&kvm->lock);
+ 
+ 		return 0;
+ 	}
+-- 
+2.34.1
 
