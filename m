@@ -2,79 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E1F04EF8F2
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 19:29:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2F604EF916
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 19:40:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349527AbiDARbC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 13:31:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48286 "EHLO
+        id S1350519AbiDARmb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 13:42:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348986AbiDARbA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 13:31:00 -0400
-Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCCF3139AD0
-        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 10:29:10 -0700 (PDT)
-Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-df22f50e0cso3443691fac.3
-        for <kvm@vger.kernel.org>; Fri, 01 Apr 2022 10:29:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WraNq3noA/oHiDCjdg83h3Em4sODbXuxqxGa7fOH8ng=;
-        b=EsSECRyZjkVgBr1ClmR85DHg4N2nM7LFSOrbUSP+8C949qfg6GkveD5ES9E3SShZyZ
-         l4IPUKyvTHVumFZ9Dx8c2Luhu6rpCOrogAIXZ802DTlPka7u7JKOfjUljz/BAuPdRO0x
-         4Dx+gUlLKfDXSx2xVax3IkWYAy5V/cGSFOTK4dF1U80HifkUuGn0HWjfamK0JDGcBWM3
-         Ba1L3XJpeR0xUZp61b3NslEhzWr+Y+33udJpb8HxjqcIjm2FNp8DihAabvqyCvze7b1N
-         DusTQPre2DAIwUnKPYtCOWP0BS5ej/2M4GLYLKDgvgDq7cuq/+jceqBMy8B2vNCI5Tki
-         IAVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WraNq3noA/oHiDCjdg83h3Em4sODbXuxqxGa7fOH8ng=;
-        b=C2aH+2ThfbMo1/xk/FpCpgPuWfmx7d0yDLby/f2Zo8mBmtYSX05NMOI145ZKtOOURO
-         jvXo7kpp28hAW5cRxOcsurX1gJ0J+T+c6SopKxXMY1K1+qYNqB/hN60+jsucs+DUr0F0
-         DkMS63nDAhWn8Wg2mOfV8txQ6xXZsIcgTt67APp3PN1feSzT+2c9wjlhz9qArxsuXOyR
-         8Yv0J0/Z9aNEKm1qR2Dq7XplrxfNq292Z8yd88LgklKgb+XvcAuY6Uhp+tYv3GQH8niS
-         thIycbVvW7mE9VKxuI5AxFDkClj8ZEsG7Cs/BPlXrAYjTY6CTnA7s+vNpOBWpt3SgdKl
-         PVbA==
-X-Gm-Message-State: AOAM532RoAdJdSzvJQakKfb1vr/8HgowG0D2Sx1qJdqTIg0Z1rVJpfpR
-        VSznjmzyKylUunVREZOQsXIXkOXNM/ROuJP/WeKYjQ==
-X-Google-Smtp-Source: ABdhPJznFK2GQmOfuSdixOKziz2XOo/OGu52BVauEjLHcwnKrfyjITdvyw8UBW3cpa+rXmCw1sWOkZtnIbQUQLaG8SE=
-X-Received: by 2002:a05:6870:40cc:b0:de:15e7:4df0 with SMTP id
- l12-20020a05687040cc00b000de15e74df0mr5635386oal.110.1648834149772; Fri, 01
- Apr 2022 10:29:09 -0700 (PDT)
+        with ESMTP id S1350482AbiDARm3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 13:42:29 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 769A114B843;
+        Fri,  1 Apr 2022 10:40:39 -0700 (PDT)
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 231GJT4o017900;
+        Fri, 1 Apr 2022 17:40:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=XHoH67PGA72qyhjjgtkwClKk3acuJgRp8YcrEaqS3Pc=;
+ b=LAkbIbrWRHRPp/C1oy7GH6GfHjhzgOnsZ7/1hxdfH974+DpGoUDBZPtQ1mB9x9jOEyTK
+ ZdTbfV4q3NG56Y6/16UGYgHxYOS2adl53JoGqQ3P0LDaLLya1WoNqPwd42QfwYodWhLP
+ q0oA2KdFZ/qe74VNnsWn50m7EWyyDVFQb+SGUvTYUfNHNBw5dfra1gamDcDUS3F0HcZz
+ yViNeDYjhvoeuJcOhFpkYtl/XJp5iIf8nloFLocGhkHEcgOjvy4gnYrZYomnAN/0vKHV
+ Cek5m+SALCmXXKBWvOQSco/bvlZFUwi0YRBXgue8oYGXlf/MAR2kJjHrxKst7SxLXqfY /g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f64tdhm86-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Apr 2022 17:40:37 +0000
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 231HRvQO010118;
+        Fri, 1 Apr 2022 17:40:36 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f64tdhm7b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Apr 2022 17:40:36 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 231HYAg0001987;
+        Fri, 1 Apr 2022 17:40:34 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 3f1tf9nfy2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Apr 2022 17:40:34 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 231HeV7i53215640
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 1 Apr 2022 17:40:31 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2945011C04C;
+        Fri,  1 Apr 2022 17:40:31 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9D38C11C04A;
+        Fri,  1 Apr 2022 17:40:30 +0000 (GMT)
+Received: from [9.171.85.89] (unknown [9.171.85.89])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  1 Apr 2022 17:40:30 +0000 (GMT)
+Message-ID: <6f385869-3f3b-d985-6804-02943a8dee07@linux.ibm.com>
+Date:   Fri, 1 Apr 2022 19:40:30 +0200
 MIME-Version: 1.0
-References: <20220308043857.13652-1-nikunj@amd.com> <YkIh8zM7XfhsFN8L@google.com>
- <c4b33753-01d7-684e-23ac-1189bd217761@amd.com> <YkSz1R3YuFszcZrY@google.com>
- <5567f4ec-bbcf-4caf-16c1-3621b77a1779@amd.com> <CAMkAt6px4A0CyuZ8h7zKzTxQUrZMYEkDXbvZ=3v+kphRTRDjNA@mail.gmail.com>
- <YkX6aKymqZzD0bwb@google.com>
-In-Reply-To: <YkX6aKymqZzD0bwb@google.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Fri, 1 Apr 2022 10:28:58 -0700
-Message-ID: <CAA03e5GXmo33OOyxb08L5Ztz1dP-OSsPzeo0HK73p9ShvnMmRg@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 0/9] KVM: SVM: Defer page pinning for SEV guests
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Peter Gonda <pgonda@google.com>,
-        "Nikunj A. Dadhania" <nikunj@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Bharata B Rao <bharata@amd.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Mingwei Zhang <mizhang@google.com>,
-        David Hildenbrand <david@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH 1/2] KVM: s390: Don't indicate suppression on dirtying,
+ failing memop
+Content-Language: en-US
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20220401170247.1287354-1-scgl@linux.ibm.com>
+ <20220401170247.1287354-2-scgl@linux.ibm.com>
+ <e191fbc0-9471-5cde-7698-cdd32d83051f@linux.ibm.com>
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+In-Reply-To: <e191fbc0-9471-5cde-7698-cdd32d83051f@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 6TEJYwhOAQh6ZcCWjo3z149zDPU4tiCh
+X-Proofpoint-GUID: CgxRsK4QBiTIwikhTuqjAbIBFto1FQWI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-04-01_05,2022-03-31_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ lowpriorityscore=0 suspectscore=0 priorityscore=1501 mlxscore=0
+ mlxlogscore=689 bulkscore=0 spamscore=0 phishscore=0 adultscore=0
+ impostorscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2202240000 definitions=main-2204010084
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,82 +104,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 31, 2022 at 12:01 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Mar 31, 2022, Peter Gonda wrote:
-> > On Wed, Mar 30, 2022 at 10:48 PM Nikunj A. Dadhania <nikunj@amd.com> wrote:
-> > > On 3/31/2022 1:17 AM, Sean Christopherson wrote:
-> > > > On Wed, Mar 30, 2022, Nikunj A. Dadhania wrote:
-> > > >> On 3/29/2022 2:30 AM, Sean Christopherson wrote:
-> > > >>> Let me preface this by saying I generally like the idea and especially the
-> > > >>> performance, but...
-> > > >>>
-> > > >>> I think we should abandon this approach in favor of committing all our resources
-> > > >>> to fd-based private memory[*], which (if done right) will provide on-demand pinning
-> > > >>> for "free".
-> > > >>
-> > > >> I will give this a try for SEV, was on my todo list.
-> > > >>
-> > > >>> I would much rather get that support merged sooner than later, and use
-> > > >>> it as a carrot for legacy SEV to get users to move over to its new APIs, with a long
-> > > >>> term goal of deprecating and disallowing SEV/SEV-ES guests without fd-based private
-> > > >>> memory.
-> > > >>
-> > > >>> That would require guest kernel support to communicate private vs. shared,
-> > > >>
-> > > >> Could you explain this in more detail? This is required for punching hole for shared pages?
-> > > >
-> > > > Unlike SEV-SNP, which enumerates private vs. shared in the error code, SEV and SEV-ES
-> > > > don't provide private vs. shared information to the host (KVM) on page fault.  And
-> > > > it's even more fundamental then that, as SEV/SEV-ES won't even fault if the guest
-> > > > accesses the "wrong" GPA variant, they'll silent consume/corrupt data.
-> > > >
-> > > > That means KVM can't support implicit conversions for SEV/SEV-ES, and so an explicit
-> > > > hypercall is mandatory.  SEV doesn't even have a vendor-agnostic guest/host paravirt
-> > > > ABI, and IIRC SEV-ES doesn't provide a conversion/map hypercall in the GHCB spec, so
-> > > > running a SEV/SEV-ES guest under UPM would require the guest firmware+kernel to be
-> > > > properly enlightened beyond what is required architecturally.
-> > > >
-> > >
-> > > So with guest supporting KVM_FEATURE_HC_MAP_GPA_RANGE and host (KVM) supporting
-> > > KVM_HC_MAP_GPA_RANGE hypercall, SEV/SEV-ES guest should communicate private/shared
-> > > pages to the hypervisor, this information can be used to mark page shared/private.
-> >
-> > One concern here may be that the VMM doesn't know which guests have
-> > KVM_FEATURE_HC_MAP_GPA_RANGE support and which don't. Only once the
-> > guest boots does the guest tell KVM that it supports
-> > KVM_FEATURE_HC_MAP_GPA_RANGE. If the guest doesn't we need to pin all
-> > the memory before we run the guest to be safe to be safe.
->
-> Yep, that's a big reason why I view purging the existing SEV memory management as
-> a long term goal.  The other being that userspace obviously needs to be updated to
-> support UPM[*].   I suspect the only feasible way to enable this for SEV/SEV-ES
-> would be to restrict it to new VM types that have a disclaimer regarding additional
-> requirements.
->
-> [*] I believe Peter coined the UPM acronym for "Unmapping guest Private Memory".  We've
->     been using it iternally for discussion and it rolls off the tongue a lot easier than
->     the full phrase, and is much more precise/descriptive than just "private fd".
+On 4/1/22 19:13, Christian Borntraeger wrote:
+> 
+> 
+> Am 01.04.22 um 19:02 schrieb Janis Schoetterl-Glausch:
+>> If user space uses a memop to emulate an instruction and that
+>> memop fails, the execution of the instruction ends.
+>> Instruction execution can end in different ways, one of which is
+>> suppression, which requires that the instruction execute like a no-op.
+>> A writing memop that spans multiple pages and fails due to key
+>> protection can modified guest memory. Therefore do not indicate a
+>> suppressing instruction ending in this case.
 
-Can we really "purge the existing SEV memory management"? This seems
-like a non-starter because it violates userspace API (i.e., the
-ability for the userspace VMM to run a guest without
-KVM_FEATURE_HC_MAP_GPA_RANGE). Or maybe I'm not quite following what
-you mean by purge.
+A writing memop that spans multiple pages and fails due to key
+protection can modified guest memory, as a result, the likely
+correct ending is termination. Therefore do not indicate a
+suppressing instruction ending in this case.
 
-Assuming that UPM-based lazy pinning comes together via a new VM type
-that only supports new images based on a minimum kernel version with
-KVM_FEATURE_HC_MAP_GPA_RANGE, then I think this would like as follows:
+?
 
-1. Userspace VMM: Check SEV VM type. If type is legacy SEV type then
-do upfront pinning. Else, skip up front pinning.
-2. KVM: I'm not sure anything special needs to happen here. For the
-legacy VM types, it can be configured to use legacy memslots,
-presumably the same as non-CVMs will be configured. For the new VM
-type, it should be configured to use UPM.
-3. Control plane (thing creating VMs): Responsible for not allowing
-legacy SEV images (i.e., images without KVM_FEATURE_HC_MAP_GPA_RANGE)
-with the new SEV VM types that use UPM and have support for demand
-pinning.
+It's phrased a bit vaguely, because we don't really know what user space wants
+when emulating an instruction, I guess it could try to revert the changes?
+And the TEID does not indicate termination, it only indicates that
+the guest cannot assume that the instruction was suppressed.
 
-Sean: Did I get this right?
+> 
+> Make it explicit in the changelog that this is "terminating" instead of
+> "suppressing". z/VM has the same logic and the architecture allows for
+> terminating in those cases (even for ESOP2).
+>  >
+>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>> ---
