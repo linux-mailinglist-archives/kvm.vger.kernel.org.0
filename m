@@ -2,52 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E901C4EE592
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 03:08:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8729D4EE593
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 03:08:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243652AbiDABK3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 21:10:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35142 "EHLO
+        id S243662AbiDABKc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 21:10:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232254AbiDABK2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 21:10:28 -0400
-Received: from mail-il1-x14a.google.com (mail-il1-x14a.google.com [IPv6:2607:f8b0:4864:20::14a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B95FB12ACC
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 18:08:39 -0700 (PDT)
-Received: by mail-il1-x14a.google.com with SMTP id g20-20020a92c7d4000000b002c9ed225d38so889777ilk.4
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 18:08:39 -0700 (PDT)
+        with ESMTP id S243655AbiDABKa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 21:10:30 -0400
+Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FCE612AD8
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 18:08:40 -0700 (PDT)
+Received: by mail-il1-x149.google.com with SMTP id b8-20020a92db08000000b002c9a58332cbso852943iln.16
+        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 18:08:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=kL9d/s0Mnyvvq5xceGf8t2Ku5ZfUJAPmTPk2nXEvlGU=;
-        b=N2eqlZ8z3YFz3XyEkuOB+8wTp8T2vu7nAJ3SBPyPPNG2EXyKjBs2zPReQsCNcgR62/
-         GgomeeOiuFgJj2EaUihw08Xev8ZvqIS3N4tYW2pm2uTP4ru4dIVNrNv8M2pcnDYbMpzi
-         etIJvz6Q1i4ZUe9P85kyqhOCjztZjX0V6innFelwk/ZSnFAQ+QYvl/1KY0OjeRKSp63J
-         ltTOL14JzHH+dM2+1yJFOEFF0jbRCJM8Zocyzj4RDtfpInxk6j49zUy34U0BUd1W4ONP
-         7jehSV8LgeGFLwVEbex+LM9J5KNqZGeK3YkxooMZAKby5lcazJXLQsqQrRcjeKfAh2UT
-         JVhQ==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=tJKETW3xC0BA9np6sF82o0D7VasG3t942AJvWUmRnxU=;
+        b=B/bXvY56GF5eO60/AO8lEUgQFJfWtls40z9XRuLlPmxguRmB8w2/FpZzax/3GNrjRc
+         ukF7d5ZHPQjd6RYHqYHeC7Zjy564byyQSOD5tQPAPxwNmaj7tJsEynwunCEH8Uq0Cjb3
+         Gi6kbafnhqwWOyqHmrwWksRvh8k/6paDxV0cmW2fdyaAk6pdsMTs4Yi48DruyAWjoh5p
+         JNT1RLkBNzady2pf9dFs3BkH3mMVa5OQ5tQR1Gwc1b/sYkudGglqnA7MS+xbBh98FYXb
+         zey3LuEc/Bulv23bs4PPNnqsrdh4QhMHT3qwmbo5QVFDwybrdiyDYP6pLpUc55RSR0UY
+         p4ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=kL9d/s0Mnyvvq5xceGf8t2Ku5ZfUJAPmTPk2nXEvlGU=;
-        b=tM0HtyG3MnBaIFhrLPfiugEgm5aD83d/zQA931qvyivagz68E2RpIAIsPbvD8NUvvo
-         +GtA9QqqiFP3KUZXgUV309IkaS0B8dKdsj56eO63M9D4fVChIdUBhXmS2z/m5+rI8s5P
-         c/pbI4erj2sP/wC+ztXSOsf9luxKx5Tg02aVHaChK/s98Lrhc98Gartu7Mg1sfNU+sX7
-         2bU6CYzLw33Rvv8i+k16EVztG2xYkm58ZjWRKjyWgAyI3z32BXz3ufBCClpYtjjzjiUu
-         T4HIrKP2b5IKffIa4VG4XyH4qyBTtoib0VDi04TOkG+k0EOV2w1ss4SJAjrx979JGB1J
-         9x5w==
-X-Gm-Message-State: AOAM530ZvLVQ0JaqRF8kQ3tim1XaCjwKhZATpax/aY8cAp8ZsiglSoDE
-        MjHJXDM8B1NJYeSkjIJK4My3E+TrWyk=
-X-Google-Smtp-Source: ABdhPJxQnq7pKml6XanwOMnHzHv9EDXFtxgBk58x0mq9HUGV2OjLa88lb/ZOZv8EHc19z+AoKhav5b9MVFE=
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=tJKETW3xC0BA9np6sF82o0D7VasG3t942AJvWUmRnxU=;
+        b=6qT29cJiZlossrbLbByzxM6gpn+5BWqMtXFAvWq+vBK4baUC4dPs52tP5A4unQDcr8
+         FyL1oZWkV2bCwbDPwimbRL56lQNy1mmRETyjfJJ0/OER+Odd/bWeDjoabsjlVIJxqqNQ
+         15sZpEPqMMuLIWFXpx/itdaRhMge0PyFPiK2dRN6SrgpPW9OQU/+CQa+0Jpyu6mgfcVN
+         56fG721kwBYRxicq1FBUJi8eGWgIcNIJe19+uWQB3krkYIWPSevvbxwJieuyCB41npDc
+         PNt1oRubenAYpFMR0EiODggOUowv20ioXC8C4GItYzBTHV3cGje8IqHBIAeGdmVNkFQ8
+         7txA==
+X-Gm-Message-State: AOAM533shvi7y51TUi8ruNnwtuWPSqMu6FCiDu3/d56tI2qRpPpkMMVD
+        1o5fLoW4I4lAa1PadL+M50nvGSMpuVA=
+X-Google-Smtp-Source: ABdhPJxCK1k5vsp5pXgoijRpo+sfq7iPlp4iAm1skz8UP7VT6maiDL0AWUWXA5ZTagCZ+WJJQ+61SWOGI6s=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6e02:1e06:b0:2c8:2707:71d with SMTP id
- g6-20020a056e021e0600b002c82707071dmr14141413ila.39.1648775319144; Thu, 31
- Mar 2022 18:08:39 -0700 (PDT)
-Date:   Fri,  1 Apr 2022 01:08:29 +0000
-Message-Id: <20220401010832.3425787-1-oupton@google.com>
+ (user=oupton job=sendgmr) by 2002:a05:6638:22cd:b0:31a:4e2a:25b9 with SMTP id
+ j13-20020a05663822cd00b0031a4e2a25b9mr4345510jat.57.1648775320066; Thu, 31
+ Mar 2022 18:08:40 -0700 (PDT)
+Date:   Fri,  1 Apr 2022 01:08:30 +0000
+In-Reply-To: <20220401010832.3425787-1-oupton@google.com>
+Message-Id: <20220401010832.3425787-2-oupton@google.com>
 Mime-Version: 1.0
+References: <20220401010832.3425787-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
-Subject: [PATCH v2 0/3] KVM: arm64: Limit feature register reads from AArch32
+Subject: [PATCH v2 1/3] KVM: arm64: Wire up CP15 feature registers to their
+ AArch64 equivalents
 From:   Oliver Upton <oupton@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -70,67 +75,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM/arm64 does not restrict the guest's view of the AArch32 feature
-registers when read from AArch32. HCR_EL2.TID3 is cleared for AArch32
-guests, meaning that register reads come straight from hardware. This is
-problematic as KVM relies on read_sanitised_ftr_reg() to expose a set of
-features consistent for a particular system.
+KVM currently does not trap ID register accesses from an AArch32 EL1.
+This is painful for a couple of reasons. Certain unimplemented features
+are visible to AArch32 EL1, as we limit PMU to version 3 and the debug
+architecture to v8.0. Additionally, we attempt to paper over
+heterogeneous systems by using register values that are safe
+system-wide. All this hard work is completely sidestepped because KVM
+does not set TID3 for AArch32 guests.
 
-Appropriate handlers must first be put in place for CP10 and CP15 ID
-register accesses before setting TID3. Rather than exhaustively
-enumerating each of the encodings for CP10 and CP15 registers, take the
-lazy route and aim the register accesses at the AArch64 system register
-table.
+Fix up handling of CP15 feature registers by simply rerouting to their
+AArch64 aliases. Punt setting HCR_EL2.TID3 to a later change, as we need
+to fix up the oddball CP10 feature registers still.
 
-Patch 1 reroutes the CP15 registers into the AArch64 table, taking care
-to immediately RAZ undefined ranges of registers. This is done to avoid
-possibly conflicting with encodings for future AArch64 registers.
+Signed-off-by: Oliver Upton <oupton@google.com>
+---
+ arch/arm64/kvm/sys_regs.c | 68 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 68 insertions(+)
 
-Patch 2 installs an exit handler for the CP10 ID registers and also
-relies on the general AArch64 register handler to implement reads.
-
-Finally, patch 3 actually sets TID3 for AArch32 guests, providing
-known-safe values for feature register accesses.
-
-Series applies cleanly to kvmarm/fixes at commit:
-
-  8872d9b3e35a ("KVM: arm64: Drop unneeded minor version check from PSCI v1.x handler")
-
-There is an argument that the series is in fact a bug fix for running
-AArch32 VMs on heterogeneous systems. To that end, it could be
-blamed/backported to when we first knew better:
-
-  93390c0a1b20 ("arm64: KVM: Hide unsupported AArch64 CPU features from guests")
-
-But I left that tag off as in the aforementioned change skipping
-AArch32 was intentional.
-
-Tested with AArch32 kvm-unit-tests and booting an AArch32 debian guest
-on a Raspberry Pi 4.
-
-v1: https://lore.kernel.org/kvmarm/20220329011301.1166265-1-oupton@google.com/
-
-v1 -> v2:
- - Actually set TID3! Oops.
- - Refactor kvm_emulate_cp15_id_reg() to check preconditions before
-   proceeding to emulation (Reiji)
- - Tighten up comment on kvm_is_cp15_id_reg() to indicate that the only
-   other trapped ID register (CTR) is already handled in the cp15
-   register table (Reiji)
-
-Oliver Upton (3):
-  KVM: arm64: Wire up CP15 feature registers to their AArch64
-    equivalents
-  KVM: arm64: Plumb cp10 ID traps through the AArch64 sysreg handler
-  KVM: arm64: Start trapping ID registers for 32 bit guests
-
- arch/arm64/include/asm/kvm_arm.h     |   3 +-
- arch/arm64/include/asm/kvm_emulate.h |   8 --
- arch/arm64/include/asm/kvm_host.h    |   1 +
- arch/arm64/kvm/handle_exit.c         |   1 +
- arch/arm64/kvm/sys_regs.c            | 129 +++++++++++++++++++++++++++
- 5 files changed, 133 insertions(+), 9 deletions(-)
-
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index dd34b5ab51d4..8b791256a5b4 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2339,6 +2339,67 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
+ 	return 1;
+ }
+ 
++static int emulate_sys_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *params);
++
++/**
++ * kvm_emulate_cp15_id_reg() - Handles an MRC trap on a guest CP15 access where
++ *			       CRn=0, which corresponds to the AArch32 feature
++ *			       registers.
++ * @vcpu: the vCPU pointer
++ * @params: the system register access parameters.
++ *
++ * Our cp15 system register tables do not enumerate the AArch32 feature
++ * registers. Conveniently, our AArch64 table does, and the AArch32 system
++ * register encoding can be trivially remapped into the AArch64 for the feature
++ * registers: Append op0=3, leaving op1, CRn, CRm, and op2 the same.
++ *
++ * According to DDI0487G.b G7.3.1, paragraph "Behavior of VMSAv8-32 32-bit
++ * System registers with (coproc=0b1111, CRn==c0)", read accesses from this
++ * range are either UNKNOWN or RES0. Rerouting remains architectural as we
++ * treat undefined registers in this range as RAZ.
++ */
++static int kvm_emulate_cp15_id_reg(struct kvm_vcpu *vcpu,
++				   struct sys_reg_params *params)
++{
++	int Rt = kvm_vcpu_sys_get_rt(vcpu);
++	int ret = 1;
++
++	/* Treat impossible writes to RO registers as UNDEFINED */
++	if (params->is_write) {
++		unhandled_cp_access(vcpu, params);
++		return 1;
++	}
++
++	params->Op0 = 3;
++
++	/*
++	 * All registers where CRm > 3 are known to be UNKNOWN/RAZ from AArch32.
++	 * Avoid conflicting with future expansion of AArch64 feature registers
++	 * and simply treat them as RAZ here.
++	 */
++	if (params->CRm > 3)
++		params->regval = 0;
++	else
++		ret = emulate_sys_reg(vcpu, params);
++
++	vcpu_set_reg(vcpu, Rt, params->regval);
++	return ret;
++}
++
++/**
++ * kvm_is_cp15_id_reg() - Returns true if the specified CP15 register is an
++ *			  AArch32 ID register.
++ * @params: the system register access parameters
++ *
++ * Note that CP15 ID registers where CRm=0 are excluded from this check. The
++ * only register trapped in the CRm=0 range is CTR, which is already handled in
++ * the cp15 register table.
++ */
++static inline bool kvm_is_cp15_id_reg(struct sys_reg_params *params)
++{
++	return params->CRn == 0 && params->Op1 == 0 && params->CRm != 0;
++}
++
+ /**
+  * kvm_handle_cp_32 -- handles a mrc/mcr trap on a guest CP14/CP15 access
+  * @vcpu: The VCPU pointer
+@@ -2360,6 +2421,13 @@ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
+ 	params.Op1 = (esr >> 14) & 0x7;
+ 	params.Op2 = (esr >> 17) & 0x7;
+ 
++	/*
++	 * Certain AArch32 ID registers are handled by rerouting to the AArch64
++	 * system register table.
++	 */
++	if (ESR_ELx_EC(esr) == ESR_ELx_EC_CP15_32 && kvm_is_cp15_id_reg(&params))
++		return kvm_emulate_cp15_id_reg(vcpu, &params);
++
+ 	if (!emulate_cp(vcpu, &params, global, nr_global)) {
+ 		if (!params.is_write)
+ 			vcpu_set_reg(vcpu, Rt, params.regval);
 -- 
 2.35.1.1094.g7c7d902a7c-goog
 
