@@ -2,254 +2,317 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 65B1D4EF73E
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 18:02:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 966364EF795
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 18:20:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348582AbiDAPzN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 11:55:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47808 "EHLO
+        id S235063AbiDAQL2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 12:11:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356977AbiDAPiF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 11:38:05 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3876BEA760;
-        Fri,  1 Apr 2022 08:13:11 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 231DCKDN024630;
-        Fri, 1 Apr 2022 15:13:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=OLeow45T6onKVkerq7bmlAegWan314OMLymZR4dRimo=;
- b=oy7xxp6mWHirB2L3WLRW00IaHTlncxS7p7wBMzWnKX/HNACs+32RyfEwM9nDWRjwEpij
- 0ALvTabDvvxePJOOuWY+12HaD3WVWOxWJoFbbGvbHr1HezEB0f7Ll4RfnakxcwcBfD7K
- UklZEi4mgKtiOcV/quPolFR+dDJVjj7tcq60ZF7vrZKapHv2qRJnfLcpAiWaaaVy88H7
- a//TBgiH7qJ7MY7k94Ftr31bhMR9HVdkNlwEYtBAx+kCDnedH9H0lDPmuh4/DOE0LBtu
- EyJ1Gk7W6clQykcPOcriadh0MiU4y0ZpSg+u4bMqWng1DEE81dIoER1LZ7vGnUHOT/13 PA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3f622sak56-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Apr 2022 15:13:10 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 231FBjTV030294;
-        Fri, 1 Apr 2022 15:13:09 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3f622sak4g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Apr 2022 15:13:09 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 231FCZhc025639;
-        Fri, 1 Apr 2022 15:13:07 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03fra.de.ibm.com with ESMTP id 3f1tf937kn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Apr 2022 15:13:07 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 231FD4hF39321964
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 1 Apr 2022 15:13:04 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4BEE711C04C;
-        Fri,  1 Apr 2022 15:13:04 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C02AD11C050;
-        Fri,  1 Apr 2022 15:13:03 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.3.73])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  1 Apr 2022 15:13:03 +0000 (GMT)
-Date:   Fri, 1 Apr 2022 17:13:02 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
-        mimu@linux.ibm.com, nrb@linux.ibm.com
-Subject: Re: [PATCH v9 13/18] KVM: s390: pv: cleanup leftover protected VMs
- if needed
-Message-ID: <20220401171302.60415a07@p-imbrenda>
-In-Reply-To: <827cfa86-bad4-8c31-8038-8db9a011fee9@linux.ibm.com>
-References: <20220330122605.247613-1-imbrenda@linux.ibm.com>
-        <20220330122605.247613-14-imbrenda@linux.ibm.com>
-        <827cfa86-bad4-8c31-8038-8db9a011fee9@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        with ESMTP id S1349767AbiDAQJA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 12:09:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A5CF5FFB52
+        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 08:33:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648827179;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=em7/fTw6LvQa2Hc0AbekM+wcT42DD4pAvXBp00DF3Zc=;
+        b=gu4psxXDQ8kTA5KE0FmQB32FGfWxv3tJLt70W8/PU3MnB+RbNQ+dySh7z3zy8W4eh2G/OC
+        3gdoNcFxnZrPDmS3wHeEGbFX1aVftgF8DJt+3P/i7JuLsTYvACccDSkLebs7w33PinYV6F
+        VFJOlw03odCxeaMSb3dkId03DDnG/QY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-421-70s7NRLpNRatsLonP2aPLw-1; Fri, 01 Apr 2022 11:32:56 -0400
+X-MC-Unique: 70s7NRLpNRatsLonP2aPLw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 681F78002BF;
+        Fri,  1 Apr 2022 15:32:56 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 46F63C07F5D;
+        Fri,  1 Apr 2022 15:32:56 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] Second batch of KVM changes for Linux 5.18
+Date:   Fri,  1 Apr 2022 11:32:56 -0400
+Message-Id: <20220401153256.103938-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: FcJuACXsFvNapsRqhCdp2jBElUXrgXBb
-X-Proofpoint-GUID: v4AIpO-loT_2Hlv1dEP_gxNm0LeWMB1o
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-04-01_05,2022-03-31_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- priorityscore=1501 mlxlogscore=999 suspectscore=0 lowpriorityscore=0
- spamscore=0 malwarescore=0 phishscore=0 mlxscore=0 adultscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204010072
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 31 Mar 2022 16:02:55 +0200
-Janosch Frank <frankja@linux.ibm.com> wrote:
+Linus,
 
-> On 3/30/22 14:26, Claudio Imbrenda wrote:
-> > In upcoming patches it will be possible to start tearing down a
-> > protected VM, and finish the teardown concurrently in a different
-> > thread.
-> > 
-> > Protected VMs that are pending for tear down ("leftover") need to be
-> > cleaned properly when the userspace process (e.g. qemu) terminates.
-> > 
-> > This patch makes sure that all "leftover" protected VMs are always
-> > properly torn down.
-> > 
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > ---
-> >   arch/s390/include/asm/kvm_host.h |  2 +
-> >   arch/s390/kvm/kvm-s390.c         |  1 +
-> >   arch/s390/kvm/pv.c               | 69 ++++++++++++++++++++++++++++++++
-> >   3 files changed, 72 insertions(+)
-> > 
-> > diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> > index 1bccb8561ba9..50e3516cbc03 100644
-> > --- a/arch/s390/include/asm/kvm_host.h
-> > +++ b/arch/s390/include/asm/kvm_host.h
-> > @@ -922,6 +922,8 @@ struct kvm_s390_pv {
-> >   	u64 guest_len;
-> >   	unsigned long stor_base;
-> >   	void *stor_var;
-> > +	void *async_deinit;
-> > +	struct list_head need_cleanup;
-> >   	struct mmu_notifier mmu_notifier;
-> >   };
-> >   
-> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> > index 446f89db93a1..3637f556ff33 100644
-> > --- a/arch/s390/kvm/kvm-s390.c
-> > +++ b/arch/s390/kvm/kvm-s390.c
-> > @@ -2788,6 +2788,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-> >   	kvm_s390_vsie_init(kvm);
-> >   	if (use_gisa)
-> >   		kvm_s390_gisa_init(kvm);
-> > +	INIT_LIST_HEAD(&kvm->arch.pv.need_cleanup);  
-> 
-> kvm->arch.pv.sync_deinit = NULL;
+The following changes since commit c9b8fecddb5bb4b67e351bbaeaa648a6f7456912:
 
-isn't the struct allocated with __GFP_ZERO ?
+  KVM: use kvcalloc for array allocations (2022-03-21 09:28:41 -0400)
 
-> 
-> >   	KVM_EVENT(3, "vm 0x%pK created by pid %u", kvm, current->pid);
-> >   
-> >   	return 0;
-> > diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-> > index be3b467f8feb..56412617dd01 100644
-> > --- a/arch/s390/kvm/pv.c
-> > +++ b/arch/s390/kvm/pv.c
-> > @@ -17,6 +17,19 @@
-> >   #include <linux/mmu_notifier.h>
-> >   #include "kvm-s390.h"
-> >   
-> > +/**
-> > + * @struct deferred_priv
-> > + * Represents a "leftover" protected VM that does not correspond to any
-> > + * active KVM VM.  
-> 
-> Maybe something like:
-> ...that is still registered with the Ultravisor but isn't registered 
-> with KVM anymore.
+are available in the Git repository at:
 
-will fix
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-> 
-> > + */
-> > +struct deferred_priv {
-> > +	struct list_head list;
-> > +	unsigned long old_table;
-> > +	u64 handle;
-> > +	void *stor_var;
-> > +	unsigned long stor_base;
-> > +};
-> > +
-> >   static void kvm_s390_clear_pv_state(struct kvm *kvm)
-> >   {
-> >   	kvm->arch.pv.handle = 0;
-> > @@ -163,6 +176,60 @@ static int kvm_s390_pv_alloc_vm(struct kvm *kvm)
-> >   	return -ENOMEM;
-> >   }
-> >   
-> > +/**
-> > + * kvm_s390_pv_cleanup_deferred - Clean up one leftover protected VM.
-> > + * @kvm the KVM that was associated with this leftover protected VM
-> > + * @deferred details about the leftover protected VM that needs a clean up
-> > + * Return: 0 in case of success, otherwise 1
-> > + */
-> > +static int kvm_s390_pv_cleanup_deferred(struct kvm *kvm, struct deferred_priv *deferred)
-> > +{
-> > +	u16 rc, rrc;
-> > +	int cc;
-> > +
-> > +	cc = uv_cmd_nodata(deferred->handle, UVC_CMD_DESTROY_SEC_CONF, &rc, &rrc);
-> > +	KVM_UV_EVENT(kvm, 3, "PROTVIRT DESTROY VM: rc %x rrc %x", rc, rrc);
-> > +	WARN_ONCE(cc, "protvirt destroy vm failed rc %x rrc %x", rc, rrc);
-> > +	if (cc)
-> > +		return cc;
-> > +	/*
-> > +	 * Intentionally leak unusable memory. If the UVC fails, the memory
-> > +	 * used for the VM and its metadata is permanently unusable.
-> > +	 * This can only happen in case of a serious KVM or hardware bug; it
-> > +	 * is not expected to happen in normal operation.
-> > +	 */
-> > +	free_pages(deferred->stor_base, get_order(uv_info.guest_base_stor_len));
-> > +	free_pages(deferred->old_table, CRST_ALLOC_ORDER);
-> > +	vfree(deferred->stor_var);
-> > +	return 0;
-> > +}
-> > +
-> > +/**
-> > + * kvm_s390_pv_cleanup_leftovers - Clean up all leftover protected VMs.
-> > + * @kvm the KVM whose leftover protected VMs are to be cleaned up
-> > + * Return: 0 in case of success, otherwise 1
-> > + */
-> > +static int kvm_s390_pv_cleanup_leftovers(struct kvm *kvm)
-> > +{
-> > +	struct deferred_priv *deferred;
-> > +	int cc = 0;
-> > +
-> > +	if (kvm->arch.pv.async_deinit)
-> > +		list_add(kvm->arch.pv.async_deinit, &kvm->arch.pv.need_cleanup);
-> > +
-> > +	while (!list_empty(&kvm->arch.pv.need_cleanup)) {
-> > +		deferred = list_first_entry(&kvm->arch.pv.need_cleanup, typeof(*deferred), list);
-> > +		if (kvm_s390_pv_cleanup_deferred(kvm, deferred))
-> > +			cc = 1;
-> > +		else
-> > +			atomic_dec(&kvm->mm->context.protected_count);
-> > +		list_del(&deferred->list);
-> > +		kfree(deferred);
-> > +	}
-> > +	kvm->arch.pv.async_deinit = NULL;
-> > +	return cc;
-> > +}
-> > +
-> >   /* this should not fail, but if it does, we must not free the donated memory */
-> >   int kvm_s390_pv_deinit_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
-> >   {
-> > @@ -190,6 +257,8 @@ int kvm_s390_pv_deinit_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
-> >   	KVM_UV_EVENT(kvm, 3, "PROTVIRT DESTROY VM: rc %x rrc %x", *rc, *rrc);
-> >   	WARN_ONCE(cc, "protvirt destroy vm failed rc %x rrc %x", *rc, *rrc);
-> >   
-> > +	cc |= kvm_s390_pv_cleanup_leftovers(kvm);
-> > +
-> >   	return cc ? -EIO : 0;
-> >   }
-> >     
-> 
+for you to fetch changes up to d1fb6a1ca3e535f89628193ab94203533b264c8c:
+
+  KVM: x86: fix sending PV IPI (2022-04-01 11:15:52 -0400)
+
+----------------------------------------------------------------
+The larger change here is support for in-kernel delivery of Xen events
+and timers, but there are also several other smaller features and fixes,
+consisting of 1-2 patches each.
+
+* New ioctls to get/set TSC frequency for a whole VM
+
+* Only do MSR filtering for MSRs accessed by rdmsr/wrmsr
+
+* Allow userspace to opt out of hypercall patching
+
+* Documentation improvements
+
+Nested virtualization improvements for AMD:
+
+* Support for "nested nested" optimizations (nested vVMLOAD/VMSAVE,
+  nested vGIF)
+
+* Allow AVIC to co-exist with a nested guest running
+
+* Fixes for LBR virtualizations when a nested guest is running,
+  and nested LBR virtualization support
+
+* PAUSE filtering for nested hypervisors
+
+Bugfixes:
+
+* Prevent module exit until all VMs are freed
+
+* PMU Virtualization fixes
+
+* Fix for kvm_irq_delivery_to_apic_fast() NULL-pointer dereferences
+
+* Other miscellaneous bugfixes
+
+Guest support:
+
+* Decoupling of vcpu_is_preempted from PV spinlocks
+
+----------------------------------------------------------------
+Boris Ostrovsky (1):
+      KVM: x86/xen: handle PV spinlocks slowpath
+
+Dan Carpenter (1):
+      KVM: MMU: fix an IS_ERR() vs NULL bug
+
+David Matlack (2):
+      KVM: Prevent module exit until all VMs are freed
+      Revert "KVM: set owner of cpu and vm file operations"
+
+David Woodhouse (16):
+      KVM: avoid double put_page with gfn-to-pfn cache
+      KVM: Remove dirty handling from gfn_to_pfn_cache completely
+      KVM: x86/xen: Use gfn_to_pfn_cache for runstate area
+      KVM: x86: Use gfn_to_pfn_cache for pv_time
+      KVM: x86/xen: Use gfn_to_pfn_cache for vcpu_info
+      KVM: x86/xen: Use gfn_to_pfn_cache for vcpu_time_info
+      KVM: x86/xen: Make kvm_xen_set_evtchn() reusable from other places
+      KVM: x86/xen: Support direct injection of event channel events
+      KVM: x86/xen: Add KVM_XEN_VCPU_ATTR_TYPE_VCPU_ID
+      KVM: x86/xen: Kernel acceleration for XENVER_version
+      KVM: x86/xen: Support per-vCPU event channel upcall via local APIC
+      KVM: x86/xen: Advertise and document KVM_XEN_HVM_CONFIG_EVTCHN_SEND
+      KVM: x86/xen: Add self tests for KVM_XEN_HVM_CONFIG_EVTCHN_SEND
+      KVM: x86/xen: Update self test for Xen PV timers
+      KVM: x86: Accept KVM_[GS]ET_TSC_KHZ as a VM ioctl.
+      KVM: x86: Test case for TSC scaling and offset sync
+
+Hou Wenlong (3):
+      KVM: x86/emulator: Emulate RDPID only if it is enabled in guest
+      KVM: x86: Only do MSR filtering when access MSR by rdmsr/wrmsr
+      KVM: x86/mmu: Don't rebuild page when the page is synced and no tlb flushing is required
+
+Jim Mattson (2):
+      KVM: x86/pmu: Use different raw event masks for AMD and Intel
+      KVM: x86/svm: Clear reserved bits written to PerfEvtSeln MSRs
+
+Joao Martins (3):
+      KVM: x86/xen: intercept EVTCHNOP_send from guests
+      KVM: x86/xen: handle PV IPI vcpu yield
+      KVM: x86/xen: handle PV timers oneshot mode
+
+Jon Kohler (1):
+      KVM: x86: optimize PKU branching in kvm_load_{guest|host}_xsave_state
+
+Lai Jiangshan (4):
+      KVM: X86: Change the type of access u32 to u64
+      KVM: X86: Fix comments in update_permission_bitmask
+      KVM: X86: Rename variable smap to not_smap in permission_fault()
+      KVM: X86: Handle implicit supervisor access with SMAP
+
+Li RongQing (2):
+      KVM: x86: Support the vCPU preemption check with nopvspin and realtime hint
+      KVM: x86: fix sending PV IPI
+
+Like Xu (2):
+      KVM: x86/i8259: Remove a dead store of irq in a conditional block
+      KVM: x86/pmu: Fix and isolate TSX-specific performance event logic
+
+Maxim Levitsky (17):
+      KVM: x86: nSVM: implement nested VMLOAD/VMSAVE
+      KVM: x86: SVM: allow to force AVIC to be enabled
+      KVM: x86: mark synthetic SMM vmexit as SVM_EXIT_SW
+      KVM: x86: mmu: trace kvm_mmu_set_spte after the new SPTE was set
+      KVM: x86: SVM: use vmcb01 in init_vmcb
+      kvm: x86: SVM: use vmcb* instead of svm->vmcb where it makes sense
+      KVM: x86: SVM: fix avic spec based definitions again
+      KVM: x86: SVM: move tsc ratio definitions to svm.h
+      kvm: x86: SVM: remove unused defines
+      KVM: x86: SVM: fix tsc scaling when the host doesn't support it
+      KVM: x86: SVM: remove vgif_enabled()
+      KVM: x86: nSVM: correctly virtualize LBR msrs when L2 is running
+      KVM: x86: nSVM: implement nested LBR virtualization
+      KVM: x86: nSVM: support PAUSE filtering when L0 doesn't intercept PAUSE
+      KVM: x86: nSVM: implement nested vGIF
+      KVM: x86: allow per cpu apicv inhibit reasons
+      KVM: x86: SVM: allow AVIC to co-exist with a nested guest running
+
+Nathan Chancellor (1):
+      KVM: x86: Fix clang -Wimplicit-fallthrough in do_host_cpuid()
+
+Oliver Upton (2):
+      KVM: x86: Allow userspace to opt out of hypercall patching
+      selftests: KVM: Test KVM_X86_QUIRK_FIX_HYPERCALL_INSN
+
+Paolo Bonzini (10):
+      Documentation: kvm: fixes for locking.rst
+      Documentation: kvm: include new locks
+      Documentation: KVM: add separate directories for architecture-specific documentation
+      Documentation: KVM: add virtual CPU errata documentation
+      Documentation: KVM: add API issues section
+      KVM: MMU: propagate alloc_workqueue failure
+      KVM: x86: document limitations of MSR filtering
+      KVM: MIPS: remove reference to trap&emulate virtualization
+      x86, kvm: fix compilation for !CONFIG_PARAVIRT_SPINLOCKS or !CONFIG_SMP
+      KVM: x86/mmu: do compare-and-exchange of gPTE via the user address
+
+Peter Gonda (1):
+      KVM: SVM: Fix kvm_cache_regs.h inclusions for is_guest_mode()
+
+Sean Christopherson (7):
+      KVM: x86/mmu: Zap only TDP MMU leafs in zap range and mmu_notifier unmap
+      KVM: Don't actually set a request when evicting vCPUs for GFN cache invd
+      KVM: Use enum to track if cached PFN will be used in guest and/or host
+      KVM: x86: Make APICv inhibit reasons an enum and cleanup naming
+      KVM: x86: Add wrappers for setting/clearing APICv inhibits
+      KVM: x86: Trace all APICv inhibit changes and capture overall status
+      KVM: x86: Don't snapshot "max" TSC if host TSC is constant
+
+Vitaly Kuznetsov (3):
+      KVM: x86: Check lapic_in_kernel() before attempting to set a SynIC irq
+      KVM: x86: Avoid theoretical NULL pointer dereference in kvm_irq_delivery_to_apic_fast()
+      KVM: x86: Forbid VMM to set SYNIC/STIMER MSRs when SynIC wasn't activated
+
+Yi Wang (1):
+      KVM: SVM: fix panic on out-of-bounds guest IRQ
+
+Zeng Guang (1):
+      KVM: VMX: Prepare VMCS setting for posted interrupt enabling when APICv is available
+
+Zhenzhong Duan (2):
+      KVM: x86: cleanup enter_rmode()
+      KVM: x86: Remove redundant vm_entry_controls_clearbit() call
+
+ Documentation/virt/kvm/api.rst                     |  210 +++-
+ Documentation/virt/kvm/index.rst                   |   26 +-
+ Documentation/virt/kvm/locking.rst                 |   43 +-
+ Documentation/virt/kvm/s390/index.rst              |   12 +
+ Documentation/virt/kvm/{ => s390}/s390-diag.rst    |    0
+ Documentation/virt/kvm/{ => s390}/s390-pv-boot.rst |    0
+ Documentation/virt/kvm/{ => s390}/s390-pv.rst      |    0
+ Documentation/virt/kvm/vcpu-requests.rst           |   10 +
+ .../virt/kvm/{ => x86}/amd-memory-encryption.rst   |    0
+ Documentation/virt/kvm/{ => x86}/cpuid.rst         |    0
+ Documentation/virt/kvm/x86/errata.rst              |   39 +
+ Documentation/virt/kvm/{ => x86}/halt-polling.rst  |    0
+ Documentation/virt/kvm/{ => x86}/hypercalls.rst    |    0
+ Documentation/virt/kvm/x86/index.rst               |   19 +
+ Documentation/virt/kvm/{ => x86}/mmu.rst           |    0
+ Documentation/virt/kvm/{ => x86}/msr.rst           |    0
+ Documentation/virt/kvm/{ => x86}/nested-vmx.rst    |    0
+ .../virt/kvm/{ => x86}/running-nested-guests.rst   |    0
+ Documentation/virt/kvm/{ => x86}/timekeeping.rst   |    0
+ arch/s390/kvm/kvm-s390.c                           |    2 +-
+ arch/x86/include/asm/kvm-x86-ops.h                 |    1 +
+ arch/x86/include/asm/kvm_host.h                    |   80 +-
+ arch/x86/include/asm/svm.h                         |   14 +-
+ arch/x86/include/uapi/asm/kvm.h                    |   11 +-
+ arch/x86/kernel/asm-offsets_64.c                   |    4 +-
+ arch/x86/kernel/kvm.c                              |   77 +-
+ arch/x86/kvm/cpuid.c                               |    1 +
+ arch/x86/kvm/emulate.c                             |    8 +-
+ arch/x86/kvm/hyperv.c                              |   22 +-
+ arch/x86/kvm/i8254.c                               |    6 +-
+ arch/x86/kvm/i8259.c                               |    1 -
+ arch/x86/kvm/irq.c                                 |   10 +-
+ arch/x86/kvm/irq_comm.c                            |    2 +-
+ arch/x86/kvm/kvm_emulate.h                         |    3 +
+ arch/x86/kvm/lapic.c                               |    4 +
+ arch/x86/kvm/mmu.h                                 |   32 +-
+ arch/x86/kvm/mmu/mmu.c                             |   45 +-
+ arch/x86/kvm/mmu/paging_tmpl.h                     |   82 +-
+ arch/x86/kvm/mmu/tdp_mmu.c                         |   72 +-
+ arch/x86/kvm/mmu/tdp_mmu.h                         |   12 +-
+ arch/x86/kvm/pmu.c                                 |   18 +-
+ arch/x86/kvm/svm/avic.c                            |   24 +-
+ arch/x86/kvm/svm/nested.c                          |  297 +++--
+ arch/x86/kvm/svm/pmu.c                             |    9 +-
+ arch/x86/kvm/svm/svm.c                             |  239 ++--
+ arch/x86/kvm/svm/svm.h                             |   68 +-
+ arch/x86/kvm/svm/svm_onhyperv.c                    |    1 -
+ arch/x86/kvm/trace.h                               |   22 +-
+ arch/x86/kvm/vmx/pmu_intel.c                       |   14 +-
+ arch/x86/kvm/vmx/vmx.c                             |   28 +-
+ arch/x86/kvm/x86.c                                 |  372 +++---
+ arch/x86/kvm/xen.c                                 | 1253 ++++++++++++++++----
+ arch/x86/kvm/xen.h                                 |   62 +-
+ include/linux/kvm_host.h                           |   63 +-
+ include/linux/kvm_types.h                          |   11 +-
+ include/uapi/linux/kvm.h                           |   48 +-
+ tools/testing/selftests/kvm/.gitignore             |    1 +
+ tools/testing/selftests/kvm/Makefile               |    2 +
+ .../selftests/kvm/x86_64/fix_hypercall_test.c      |  170 +++
+ .../selftests/kvm/x86_64/tsc_scaling_sync.c        |  119 ++
+ .../testing/selftests/kvm/x86_64/xen_shinfo_test.c |  366 +++++-
+ virt/kvm/kvm_main.c                                |   22 +-
+ virt/kvm/pfncache.c                                |   72 +-
+ 63 files changed, 3157 insertions(+), 972 deletions(-)
+ create mode 100644 Documentation/virt/kvm/s390/index.rst
+ rename Documentation/virt/kvm/{ => s390}/s390-diag.rst (100%)
+ rename Documentation/virt/kvm/{ => s390}/s390-pv-boot.rst (100%)
+ rename Documentation/virt/kvm/{ => s390}/s390-pv.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/amd-memory-encryption.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/cpuid.rst (100%)
+ create mode 100644 Documentation/virt/kvm/x86/errata.rst
+ rename Documentation/virt/kvm/{ => x86}/halt-polling.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/hypercalls.rst (100%)
+ create mode 100644 Documentation/virt/kvm/x86/index.rst
+ rename Documentation/virt/kvm/{ => x86}/mmu.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/msr.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/nested-vmx.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/running-nested-guests.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/timekeeping.rst (100%)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/fix_hypercall_test.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c
 
