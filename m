@@ -2,208 +2,306 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 458264EE5DE
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 04:01:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB3194EE5E4
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 04:10:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243922AbiDACDM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 22:03:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41388 "EHLO
+        id S243944AbiDACMN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 22:12:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233627AbiDACDL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 22:03:11 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E9F71B3709
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 19:01:23 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id q19so1240774pgm.6
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 19:01:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=inp9kuKjhcCLTA1TO6bZG50bHXwwzvGRunHbg0VDKic=;
-        b=SI/wkGZSO7rD48uN4BWXpx6niBQ5n6IQZ0XrvOha2hO9JYf6qnh35WLUCCrN9BoXhG
-         4Pzbqszklq7U+YWi6+uZR/x4kx2Nif9znv3m5N/yDazmW/3ZQP2CpKvgEQQtIDmlldkg
-         fMDB3yOMCVhKpwuu11cRmHpnVvQCk2c87Ta4zgKDP5wqzXbpV/KAHE4yPFl9E3Z2I3uJ
-         kn54xeV+HaS8CfMS+IGBwiK87R7D0ylyf5O5tF6QBEuUqYCPoUPYyU+shQ2gRWdMvUks
-         PuxA/AqVzcsb4YvP1Yz34eGVzoU8+gGEgO0nKu7ZbHxbevGRwM3L9xSaPq6qa3swviSH
-         ItYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=inp9kuKjhcCLTA1TO6bZG50bHXwwzvGRunHbg0VDKic=;
-        b=w5bMONxBDWHjuX5Nx/idV4iCToZlI/TsUVNXB3JJxvixIKEI+PqMWL152v7dp0NPC6
-         NKWl7PAX5wae/4HsSdNCpE43yFoHMEiAu8+YAiYFR1OLkmIlVJ+jNkif1BmapyRAtKhM
-         4YV51tMk0Y52i7hr+W17YpDhfyQxpCgW2joPkJ0z9/jKJywoLEMn5yOAyTHqEcMEsrPt
-         JVRQb3sA618XHPdQkCfaSZxuRHt84KIvYWcnCCDCaFNIO45AeIM7N2v1Tw56X2+h1ZcG
-         EfAmFT0wAl+5crz+1RwLmOzCkaIZNr/LKQHix+hFEtTRAzrCMNTyHzfK5sOwOK/oL9CI
-         O2hw==
-X-Gm-Message-State: AOAM531kXsdJpY26D4FZpovYK94JY8x4xD6M2cXFbI8Atc+eS9XhrMki
-        1D5dWkcsCDbzTuLmC5q7PY8pIg==
-X-Google-Smtp-Source: ABdhPJyLL3SdY6NIy8qFZ4rOg3G6n19qIWtzib0xs31/VSRF6zM7QszMHFllBq9XXMt8yIf+wClntA==
-X-Received: by 2002:a63:384e:0:b0:374:ae28:71fc with SMTP id h14-20020a63384e000000b00374ae2871fcmr13138721pgn.159.1648778482243;
-        Thu, 31 Mar 2022 19:01:22 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id j11-20020a63230b000000b00372a08b584asm604023pgj.47.2022.03.31.19.01.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Mar 2022 19:01:21 -0700 (PDT)
-Date:   Fri, 1 Apr 2022 02:01:17 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Zeng Guang <guang.zeng@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
-        Gao Chao <chao.gao@intel.com>
-Subject: Re: [PATCH v7 7/8] KVM: x86: Allow userspace set maximum VCPU id for
- VM
-Message-ID: <YkZc7cMsDaR5S2hM@google.com>
-References: <20220304080725.18135-1-guang.zeng@intel.com>
- <20220304080725.18135-8-guang.zeng@intel.com>
+        with ESMTP id S234917AbiDACMM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 22:12:12 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B285C1C60D1;
+        Thu, 31 Mar 2022 19:10:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1648779023; x=1680315023;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=84qWD+sVjw+7gL9tA4NoHNvtIquSIjsobGfuCQglOSk=;
+  b=i5Pows7C2X43OsL0WI9e2ABarddV3Jr4NDiISLTQTNMCZ20tcScuJbtX
+   kOIMYBRTfxdSwzODe/S2JxacoBD5LLCbkQIsNDtqCEWOcHYNdToPScgkv
+   O3dN+4I5wMJjEN+CBkgQs2pR0Muja6r0UhGN8F54sFDFcv9NTOzqAE1eC
+   WGtC4G9e3Pd1SWq2/J7EzmHvAZ4ci6+Y22d3l2PF/j6RkNB/WZpvCy6/X
+   a4xZHeZJd2fujszpLHjS9/2ccqt5aQ7BEr0JG02FpOZfdNmoh0nlflb6M
+   QOofZ8PrHZtfdg/ixUPtID21z1PsVK03XuanJbPipsl7oeLso0V3AptFZ
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10303"; a="260202613"
+X-IronPort-AV: E=Sophos;i="5.90,225,1643702400"; 
+   d="scan'208";a="260202613"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2022 19:10:19 -0700
+X-IronPort-AV: E=Sophos;i="5.90,225,1643702400"; 
+   d="scan'208";a="788647447"
+Received: from tswork-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.29.39])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2022 19:10:17 -0700
+Message-ID: <28c858a4b70739d449b91aaccd7f1db4ff573403.camel@intel.com>
+Subject: Re: [RFC PATCH v5 033/104] KVM: x86: Add infrastructure for stolen
+ GPA bits
+From:   Kai Huang <kai.huang@intel.com>
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Date:   Fri, 01 Apr 2022 15:10:15 +1300
+In-Reply-To: <2b8038c17b85658a054191b362840240bd66e46b.camel@intel.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+         <a21c1f9065cf27db54820b2b504db4e507835584.1646422845.git.isaku.yamahata@intel.com>
+         <2b8038c17b85658a054191b362840240bd66e46b.camel@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220304080725.18135-8-guang.zeng@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 04, 2022, Zeng Guang wrote:
-> Introduce new max_vcpu_id in KVM for x86 architecture. Userspace
-> can assign maximum possible vcpu id for current VM session using
-> KVM_CAP_MAX_VCPU_ID of KVM_ENABLE_CAP ioctl().
+On Fri, 2022-04-01 at 00:16 +1300, Kai Huang wrote:
+> On Fri, 2022-03-04 at 11:48 -0800, isaku.yamahata@intel.com wrote:
+> > From: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> > 
+> > Add support in KVM's MMU for aliasing multiple GPAs (from a hardware
+> > perspective) to a single GPA (from a memslot perspective). GPA aliasing
+> > will be used to repurpose GPA bits as attribute bits, e.g. to expose an
+> > execute-only permission bit to the guest. To keep the implementation
+> > simple (relatively speaking), GPA aliasing is only supported via TDP.
+> > 
+> > Today KVM assumes two things that are broken by GPA aliasing.
+> >   1. GPAs coming from hardware can be simply shifted to get the GFNs.
+> >   2. GPA bits 51:MAXPHYADDR are reserved to zero.
+> > 
+> > With GPA aliasing, translating a GPA to GFN requires masking off the
+> > repurposed bit, and a repurposed bit may reside in 51:MAXPHYADDR.
+> > 
+> > To support GPA aliasing, introduce the concept of per-VM GPA stolen bits,
+> > that is, bits stolen from the GPA to act as new virtualized attribute
+> > bits. A bit in the mask will cause the MMU code to create aliases of the
+> > GPA. It can also be used to find the GFN out of a GPA coming from a tdp
+> > fault.
+> > 
+> > To handle case (1) from above, retain any stolen bits when passing a GPA
+> > in KVM's MMU code, but strip them when converting to a GFN so that the
+> > GFN contains only the "real" GFN, i.e. never has repurposed bits set.
+> > 
+> > GFNs (without stolen bits) continue to be used to:
+> >   - Specify physical memory by userspace via memslots
+> >   - Map GPAs to TDP PTEs via RMAP
+> >   - Specify dirty tracking and write protection
+> >   - Look up MTRR types
+> >   - Inject async page faults
+> > 
+> > Since there are now multiple aliases for the same aliased GPA, when
+> > userspace memory backing the memslots is paged out, both aliases need to be
+> > modified. Fortunately, this happens automatically. Since rmap supports
+> > multiple mappings for the same GFN for PTE shadowing based paging, by
+> > adding/removing each alias PTE with its GFN, kvm_handle_hva() based
+> > operations will be applied to both aliases.
+> > 
+> > In the case of the rmap being removed in the future, the needed
+> > information could be recovered by iterating over the stolen bits and
+> > walking the TDP page tables.
+> > 
+> > For TLB flushes that are address based, make sure to flush both aliases
+> > in the case of stolen bits.
+> > 
+> > Only support stolen bits in 64 bit guest paging modes (long, PAE).
+> > Features that use this infrastructure should restrict the stolen bits to
+> > exclude the other paging modes. Don't support stolen bits for shadow EPT.
+> > 
+> > Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h |  2 ++
+> >  arch/x86/kvm/mmu.h              | 51 +++++++++++++++++++++++++++++++++
+> >  arch/x86/kvm/mmu/mmu.c          | 19 ++++++++++--
+> >  arch/x86/kvm/mmu/paging_tmpl.h  | 25 +++++++++-------
+> >  4 files changed, 84 insertions(+), 13 deletions(-)
+> > 
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 208b29b0e637..d8b78d6abc10 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1235,7 +1235,9 @@ struct kvm_arch {
+> >  	spinlock_t hv_root_tdp_lock;
+> >  #endif
+> >  
+> > +#ifdef CONFIG_KVM_MMU_PRIVATE
+> >  	gfn_t gfn_shared_mask;
+> > +#endif
+> >  };
+> >  
+> >  struct kvm_vm_stat {
+> > diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> > index e9fbb2c8bbe2..3fb530359f81 100644
+> > --- a/arch/x86/kvm/mmu.h
+> > +++ b/arch/x86/kvm/mmu.h
+> > @@ -365,4 +365,55 @@ static inline gpa_t kvm_translate_gpa(struct kvm_vcpu *vcpu,
+> >  		return gpa;
+> >  	return translate_nested_gpa(vcpu, gpa, access, exception);
+> >  }
+> > +
+> > +static inline gfn_t kvm_gfn_stolen_mask(struct kvm *kvm)
+> > +{
+> > +#ifdef CONFIG_KVM_MMU_PRIVATE
+> > +	return kvm->arch.gfn_shared_mask;
+> > +#else
+> > +	return 0;
+> > +#endif
+> > +}
+> > +
+> > +static inline gpa_t kvm_gpa_stolen_mask(struct kvm *kvm)
+> > +{
+> > +	return gfn_to_gpa(kvm_gfn_stolen_mask(kvm));
+> > +}
+> > +
+> > +static inline gpa_t kvm_gpa_unalias(struct kvm *kvm, gpa_t gpa)
+> > +{
+> > +	return gpa & ~kvm_gpa_stolen_mask(kvm);
+> > +}
+> > +
+> > +static inline gfn_t kvm_gfn_unalias(struct kvm *kvm, gfn_t gfn)
+> > +{
+> > +	return gfn & ~kvm_gfn_stolen_mask(kvm);
+> > +}
+> > +
+> > +static inline gfn_t kvm_gfn_shared(struct kvm *kvm, gfn_t gfn)
+> > +{
+> > +	return gfn | kvm_gfn_stolen_mask(kvm);
+> > +}
+> > +
+> > +static inline gfn_t kvm_gfn_private(struct kvm *kvm, gfn_t gfn)
+> > +{
+> > +	return gfn & ~kvm_gfn_stolen_mask(kvm);
+> > +}
+> > +
+> > +static inline gpa_t kvm_gpa_private(struct kvm *kvm, gpa_t gpa)
+> > +{
+> > +	return gpa & ~kvm_gpa_stolen_mask(kvm);
+> > +}
+> > +
+> > +static inline bool kvm_is_private_gfn(struct kvm *kvm, gfn_t gfn)
+> > +{
+> > +	gfn_t mask = kvm_gfn_stolen_mask(kvm);
+> > +
+> > +	return mask && !(gfn & mask);
+> > +}
+> > +
+> > +static inline bool kvm_is_private_gpa(struct kvm *kvm, gpa_t gpa)
+> > +{
+> > +	return kvm_is_private_gfn(kvm, gpa_to_gfn(gpa));
+> > +}
 > 
-> This is done for x86 only because the sole use case is to guide
-> memory allocation for PID-pointer table, a structure needed to
-> enable VMX IPI.
+> The patch title and commit message say nothing about private/shared, but only
+> mention stolen bits in general.  It's weird to introduce those *private* related
+> helpers here.
 > 
-> By default, max_vcpu_id set as KVM_MAX_VCPU_IDS.
+> I think you can just ditch the concept of stolen bit infrastructure, but just
+> adopt what TDX needs.
 > 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  6 ++++++
->  arch/x86/kvm/x86.c              | 11 +++++++++++
-
-The new behavior needs to be documented in api.rst.
-
->  2 files changed, 17 insertions(+)
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 6dcccb304775..db16aebd946c 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1233,6 +1233,12 @@ struct kvm_arch {
->  	hpa_t	hv_root_tdp;
->  	spinlock_t hv_root_tdp_lock;
->  #endif
-> +	/*
-> +	 * VM-scope maximum vCPU ID. Used to determine the size of structures
-> +	 * that increase along with the maximum vCPU ID, in which case, using
-> +	 * the global KVM_MAX_VCPU_IDS may lead to significant memory waste.
-> +	 */
-> +	u32 max_vcpu_id;
-
-This should be max_vcpu_ids.  I agree the it _should_ be max_vcpu_id, but KVM's API
-for this is awful and we're stuck with the plural name.
-
->  };
->  
->  struct kvm_vm_stat {
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 4f6fe9974cb5..ca17cc452bd3 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5994,6 +5994,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->  		kvm->arch.exit_on_emulation_error = cap->args[0];
->  		r = 0;
->  		break;
-> +	case KVM_CAP_MAX_VCPU_ID:
-
-I think it makes sense to change kvm_vm_ioctl_check_extension() to return the
-current max, it is a VM-scoped ioctl after all.
-
-Amusingly, I think we also need a capability to enumerate that KVM_CAP_MAX_VCPU_ID
-is writable.  
-
-> +		if (cap->args[0] <= KVM_MAX_VCPU_IDS) {
-> +			kvm->arch.max_vcpu_id = cap->args[0];
-
-This needs to be rejected if kvm->created_vcpus > 0, and that check needs to be
-done under kvm_lock, otherwise userspace can bump the max ID after KVM allocates
-per-VM structures and trigger buffer overflow.
-
-> +			r = 0;
-> +		} else
-
-If-elif-else statements need curly braces for all paths if any path needs braces.
-Probably a moot point for this patch due to the above changes.
-
-> +			r = -E2BIG;
-
-This should be -EINVAL, not -E2BIG.
-
-E.g.
-
-	case KVM_CAP_MAX_VCPU_ID:
-		r = -EINVAL;
-		if (cap->args[0] > KVM_MAX_VCPU_IDS)
-			break;
-
-		mutex_lock(&kvm->lock);
-		if (!kvm->created_vcpus) {
-			kvm->arch.max_vcpu_id = cap->args[0];
-			r = 0;
-		}
-		mutex_unlock(&kvm->lock);
-		break;
-
-
-> +		break;
->  	default:
->  		r = -EINVAL;
->  		break;
-> @@ -11067,6 +11074,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  	struct page *page;
->  	int r;
->  
-> +	if (vcpu->vcpu_id >= vcpu->kvm->arch.max_vcpu_id)
-> +		return -E2BIG;
-
-Same here, it should be -EINVAL.
-
-> +
->  	vcpu->arch.last_vmentry_cpu = -1;
->  	vcpu->arch.regs_avail = ~0;
->  	vcpu->arch.regs_dirty = ~0;
-> @@ -11589,6 +11599,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  	spin_lock_init(&kvm->arch.hv_root_tdp_lock);
->  	kvm->arch.hv_root_tdp = INVALID_PAGE;
->  #endif
-> +	kvm->arch.max_vcpu_id = KVM_MAX_VCPU_IDS;
->  
->  	INIT_DELAYED_WORK(&kvm->arch.kvmclock_update_work, kvmclock_update_fn);
->  	INIT_DELAYED_WORK(&kvm->arch.kvmclock_sync_work, kvmclock_sync_fn);
-> -- 
-> 2.27.0
+> >  #endif
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 8e24f73bf60b..b68191aa39bf 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -276,11 +276,24 @@ static inline bool kvm_available_flush_tlb_with_range(void)
+> >  static void kvm_flush_remote_tlbs_with_range(struct kvm *kvm,
+> >  		struct kvm_tlb_range *range)
+> >  {
+> > -	int ret = -ENOTSUPP;
+> > +	int ret = -EOPNOTSUPP;
 > 
+> Change doesn't belong to this patch.
+> 
+> > +	u64 gfn_stolen_mask;
+> >  
+> > -	if (range && kvm_x86_ops.tlb_remote_flush_with_range)
+> > +	/*
+> > +	 * Fall back to the big hammer flush if there is more than one
+> > +	 * GPA alias that needs to be flushed.
+> > +	 */
+> > +	gfn_stolen_mask = kvm_gfn_stolen_mask(kvm);
+> > +	if (hweight64(gfn_stolen_mask) > 1)
+> > +		goto generic_flush;
+> > +
+> > +	if (range && kvm_available_flush_tlb_with_range()) {
+> > +		/* Callback should flush both private GFN and shared GFN. */
+> > +		range->start_gfn = kvm_gfn_unalias(kvm, range->start_gfn);
+> 
+> This seems wrong.  It seems the intention of this function is to flush TLB for
+> all aliases for a given GFN range.  Here it seems you are unconditionally change
+> to range to always exclude the stolen bits.
+> 
+> >  		ret = static_call(kvm_x86_tlb_remote_flush_with_range)(kvm, range);
+> > +	}
+> 
+> And you always fall through to do big hammer flush, which is obviously not
+> intended.
+> 
+> >  
+> > +generic_flush:
+> >  	if (ret)
+> >  		kvm_flush_remote_tlbs(kvm);
+> >  }
+> > @@ -4010,7 +4023,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+> >  	unsigned long mmu_seq;
+> >  	int r;
+> >  
+> > -	fault->gfn = fault->addr >> PAGE_SHIFT;
+> > +	fault->gfn = kvm_gfn_unalias(vcpu->kvm, gpa_to_gfn(fault->addr));
+> >  	fault->slot = kvm_vcpu_gfn_to_memslot(vcpu, fault->gfn);
+> >  
+> >  	if (page_fault_handle_page_track(vcpu, fault))
+
+Looking at code more, I think this patch is broken.  There are couple of issues
+if I understand correctly:
+
+- Rick's original patch has stolen_bits_mask encoded in 'struct kvm_mmu_page',
+so basically a new page table is allocated for different aliasing GPA.  Sean
+suggested to use role.private instead of stolen_bits_mask so I changed but that
+was lost in this patch too.  Therefore essentially, with this patch, all
+aliasing GFNs share the same page table and the same mapping.  There's slight
+difference between TDP MMU and legacy MMU, that the former purely uses 'fault-
+>gfn' (which doesn't have aliasing bit) to iterate page table and the latter
+uses 'fault->addr' (which contains the aliasing bit), but this makes little
+difference.  With this patch, all aliasing GFNs share page table and the
+mapping.  This is not what we want, and this is wrong.
+
+- The original change to get GFN w/o aliasing for MTRR check (below) is lost. 
+And there are some other changes that are also lost (such as don't support
+aliasing for private (user-invisible, not TDX private) memory slot), but it's
+not immediately apparent to me whether this is an issue.
+
+@@ -3833,7 +3865,7 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa,
+u32 error_code,
+ 	     max_level > PG_LEVEL_4K;
+ 	     max_level--) {
+ 		int page_num = KVM_PAGES_PER_HPAGE(max_level);
+-		gfn_t base = (gpa >> PAGE_SHIFT) & ~(page_num - 1);
++		gfn_t base = vcpu_gpa_to_gfn_unalias(vcpu, gpa) & ~(page_num -
+1);
+
+Another thing is above change to kvm_flush_remote_tlbs_with_range() to make it
+flush TLBs for mappings for all aliasing for a given GFN range doesn't fit for
+TDX.  TDX private mapping and shared mapping cannot co-exist therefore when a
+page that has multiple aliasing mapped to it is taken out, only one mapping is
+valid (not to mention private page cannot be taken out).  This is one of the
+reasons that I think this GPA stolen bits infrastructure isn't that mandatory
+for TDX.  I think it's OK to ditch this infrastructure and adopt what TDX needs
+(the concept of private/shared mapping).
+
+
+-- 
+Thanks,
+-Kai
+
+
