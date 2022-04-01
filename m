@@ -2,109 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B1A764EFB9C
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 22:29:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BBA64EFBB9
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 22:40:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352386AbiDAUaz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 16:30:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35306 "EHLO
+        id S1352558AbiDAUmP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 16:42:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352619AbiDAUaj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 16:30:39 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D133F7E;
-        Fri,  1 Apr 2022 13:28:49 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id jx9so3366668pjb.5;
-        Fri, 01 Apr 2022 13:28:49 -0700 (PDT)
+        with ESMTP id S239896AbiDAUmL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 16:42:11 -0400
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C57C6174BB5
+        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 13:40:20 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id v12so5418745ljd.3
+        for <kvm@vger.kernel.org>; Fri, 01 Apr 2022 13:40:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=dExYZrdHPlls47MxXxfZSIjzNDru/M5ang2+PAimp/w=;
-        b=jjyYnOTLvbIBA2cJ7gM0y6sox/naZnvK5wxDc2Q2NnEVL1+DwFgIVIPTR9tzh3WEro
-         AOQX/EKCiqoAk3hdlF4cImjUk+L3HRfGMlaD1BWcODiJcNDzT2QPuN7tlTqvj+TeiYI2
-         oaYsn2XHAuFTDcpwROBF7ikHSL+OMwFg9VzEiWu+ryT3Xm1DuPsSHIe+2ub8FWVrp9nB
-         UnHILleqr+4zwJUEw2DcJyFGqQrUgDDgyiM7I6mSZt3kaTCNqK5b6dBFEtNfk071f8X/
-         mLNNL5rBDDgQm3mxV4MXf6ZAFCFqe4jnn2SkpPYicuIp291s7iUBixnyzynu1P25A9s7
-         6fMw==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=XoSP3hMLfu85/1JEUuOtPJh8kpd6w7SHg/LZEyV60Ps=;
+        b=BmxvnjiSUtj1QaEfWViPd99IiS4Iovkvs/qZCvlsIYl13dHqNSDTC0hWMuOpMiKHPV
+         kI+Bx1QVp/F0NbIypef3IbNmkvMBfPNwHiR6qRlH0sYUIoo7Kt0hvOrkVUDdf0s2snq9
+         KBplvRS39sVsg7Ih4Ngj4cTRUzJMAJ4y2iGUA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=dExYZrdHPlls47MxXxfZSIjzNDru/M5ang2+PAimp/w=;
-        b=JdB7jkimJsA8m4F7vE63vvZkFTp1FSsmgn5PEz531oTpLoFKVjfjOvtOWWF4ZUvNW7
-         f81pGk3y1w9mqERswWAIIuhl+qj829zSf7Dxqt8zKxspwojdNY9KzXucMsxQa8wGVcsT
-         LmOtyNoIdlUyJ98XqSTCzamaA/aSln2gl2LcUWUePATOVX5xApEtudysmfl1w48FeCHz
-         6guUE3cURzNYGGll1OG220FsGW8Wr0Y3TeewlnmpsdEgDszCauuAFDG6jZ7e3lCuiFSx
-         Sg3/1Xf93eDgysHCB0ZmFPmWTjRbsuVaQtlC/+hWr28wYJb+AA4Gg6VV/bMpU8K1F3NR
-         dVSQ==
-X-Gm-Message-State: AOAM530uvCRM3Qt1k8pk5XTZIUDtNzh4AWQ0awA2fuOnGtRAhpiAWzwu
-        HnuCA/XnmwnCdFgVQCpiKXM=
-X-Google-Smtp-Source: ABdhPJxTyGe79Ncev5YyMB/T95ery9qtEGhFLSlh3CHmnD+rL/A3lJqQuANxRUEHywC81l4bDT1ppw==
-X-Received: by 2002:a17:903:3091:b0:153:9dcf:de71 with SMTP id u17-20020a170903309100b001539dcfde71mr11885918plc.7.1648844928926;
-        Fri, 01 Apr 2022 13:28:48 -0700 (PDT)
-Received: from localhost (c-107-3-154-88.hsd1.ca.comcast.net. [107.3.154.88])
-        by smtp.gmail.com with ESMTPSA id ip1-20020a17090b314100b001c7b10fe359sm14732424pjb.5.2022.04.01.13.28.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Apr 2022 13:28:48 -0700 (PDT)
-Date:   Fri, 1 Apr 2022 13:28:47 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Kai Huang <kai.huang@intel.com>, isaku.yamahata@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>
-Subject: Re: [RFC PATCH v5 038/104] KVM: x86/mmu: Allow per-VM override of
- the TDP max page level
-Message-ID: <20220401202847.GA560021@private.email.ne.jp>
-References: <cover.1646422845.git.isaku.yamahata@intel.com>
- <5cc4b1c90d929b7f4f9829a42c0b63b52af0c1ed.1646422845.git.isaku.yamahata@intel.com>
- <c6fb151ced1675d1c93aa18ad8c57c2ffc4e9fcb.camel@intel.com>
- <YkcHZo3i+rki+9lK@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=XoSP3hMLfu85/1JEUuOtPJh8kpd6w7SHg/LZEyV60Ps=;
+        b=pVACk83Hv7gzt6Gsjhf49VNSDD+16kTibJ7A27Cjlz0BJHO8KKrCb3CdfA+g1JjNsN
+         yyTSK1q06OW3ADeQr61KvjMS3FgeM+q1SUZ66tx2JLl9YtVYWXdDbgGCsi2SpoAkFlYA
+         njMFhnbL8KzeiQs/82d1J3G51aFMwybtl9R3OgkxgKDjwZB74erIZR9uziB+qa+zl/9A
+         nBItodkRnwe9vPYGPoDHT5di6a3z7CaMjUBO1ehPv7OvDWrkpNZjA0F+cC/MEFrz5og0
+         yG2A4jbo4uYGSCv2MUrNhcxgxCZT2leKHjt35uQvAsxSFDKFM9hk4zfcavqUPBnoSTef
+         xgyQ==
+X-Gm-Message-State: AOAM532x2oShldJWkAhrqojEV5o63KWxCVTkG5j7alJ+aVZTK/ILqQFl
+        e+EaaSz3b/wWAtfAWLPwwPNUVE7tAmPGDhVjNHc=
+X-Google-Smtp-Source: ABdhPJykgLl8ochjtAhm1v3iEPLA1CE3NNPBnCNYzVVZzrq7leQt9JBWEFVZzTmq4yx8RoaWeCH43g==
+X-Received: by 2002:a05:651c:243:b0:24a:fb54:31d3 with SMTP id x3-20020a05651c024300b0024afb5431d3mr5419883ljn.242.1648845618797;
+        Fri, 01 Apr 2022 13:40:18 -0700 (PDT)
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com. [209.85.208.178])
+        by smtp.gmail.com with ESMTPSA id p15-20020a19f10f000000b0044a36e3cc33sm336367lfh.298.2022.04.01.13.40.16
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Apr 2022 13:40:17 -0700 (PDT)
+Received: by mail-lj1-f178.google.com with SMTP id g24so5398731lja.7
+        for <kvm@vger.kernel.org>; Fri, 01 Apr 2022 13:40:16 -0700 (PDT)
+X-Received: by 2002:a2e:a549:0:b0:249:9ec3:f2b with SMTP id
+ e9-20020a2ea549000000b002499ec30f2bmr14333618ljn.358.1648845616539; Fri, 01
+ Apr 2022 13:40:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YkcHZo3i+rki+9lK@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+References: <20220401153256.103938-1-pbonzini@redhat.com>
+In-Reply-To: <20220401153256.103938-1-pbonzini@redhat.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 1 Apr 2022 13:40:00 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgSqvsP08ox-KwAU4TztVsjx07cMQni-rFEzxZQw6+iiA@mail.gmail.com>
+Message-ID: <CAHk-=wgSqvsP08ox-KwAU4TztVsjx07cMQni-rFEzxZQw6+iiA@mail.gmail.com>
+Subject: Re: [GIT PULL] Second batch of KVM changes for Linux 5.18
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 01, 2022 at 02:08:38PM +0000,
-Sean Christopherson <seanjc@google.com> wrote:
+On Fri, Apr 1, 2022 at 8:33 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> The larger change here is support for in-kernel delivery of Xen events
+> and timers, but there are also several other smaller features and fixes,
+> consisting of 1-2 patches each.
 
-> On Fri, Apr 01, 2022, Kai Huang wrote:
-> > On Fri, 2022-03-04 at 11:48 -0800, isaku.yamahata@intel.com wrote:
-> > > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > 
-> > > In the existing x86 KVM MMU code, there is already max_level member in
-> > > struct kvm_page_fault with KVM_MAX_HUGEPAGE_LEVEL initial value.  The KVM
-> > > page fault handler denies page size larger than max_level.
-> > > 
-> > > Add per-VM member to indicate the allowed maximum page size with
-> > > KVM_MAX_HUGEPAGE_LEVEL as default value and initialize max_level in struct
-> > > kvm_page_fault with it.
-> > > 
-> > > For the guest TD, the set per-VM value for allows maximum page size to 4K
-> > > page size.  Then only allowed page size is 4K.  It means large page is
-> > > disabled.
-> > 
-> > Do not support large page for TD is the reason that you want this change, but
-> > not the result.  Please refine a little bit.
-> 
-> Not supporting huge pages was fine for the PoC, but I'd prefer not to merge TDX
-> without support for huge pages.  Has any work been put into enabling huge pages?
-> If so, what's the technical blocker?  If not...
+No.
 
-I wanted to get feedback on the approach (always set SPTE to REMOVED_SPTE,
-callback, set the SPTE to the final value instead of relying atomic update SPTE)
-before going further for large page.
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+I've had enough with the big random kvm pull requests.
+
+NONE of this has been in linux-next before the merge window. In fact,
+None of it was there even the first week of the merge window.
+
+So by all means send me fixes.
+
+But no more of this last-minute development stuff, which clearfly was
+not ready to go before the merge window started, and must have been
+some wild last-minute merging thing.
+
+kvm needs to make stability as a priority.
+
+              Linus
