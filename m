@@ -2,138 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D79EF4EFAA1
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 21:57:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAB614EFAFF
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 22:18:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351277AbiDAT7K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 15:59:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59940 "EHLO
+        id S1351882AbiDAUUB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 16:20:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233319AbiDAT7H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 15:59:07 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D232F208245
-        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 12:57:17 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 763D561703
-        for <kvm@vger.kernel.org>; Fri,  1 Apr 2022 19:57:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA01AC3410F;
-        Fri,  1 Apr 2022 19:57:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648843036;
-        bh=g4Or6vlnQ5XPFOlbOvyFGMvehoU1w6Tr33vBEF06cv4=;
-        h=In-Reply-To:References:Date:From:To:Cc:Subject:From;
-        b=kUAF1W6opB6kX4aqHlrwqR4mizGnR/LCCRP2w89k7wNaETPt2sgVJyFtrqbjm3i5S
-         e5XCLsZejvIOaJZJsuCmx2v1E8LpTcZ0q0wecQAdgwFQLn/VJCRsgW/k3ueJUaECsX
-         4OerVqkd94oCxK0suf9ng8r6FFbIneHH99uAy0fLXVkzY+zpT+3DR6Q0JpvX+DBdke
-         1uoUBEr+qj/Yk6Vf0YyBfZopwqQeCr+prjwk9Yx1mu3FLvPuyg+mhWHa0w8mA11WSI
-         s4dzbUfILFfinHBykc2QAbio9JC9mObxejFCM8k4D2b+QlrRwACD6WToFkfZb3L9Z1
-         u1RC2bu92QzxA==
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailauth.nyi.internal (Postfix) with ESMTP id 4990827C0054;
-        Fri,  1 Apr 2022 15:57:14 -0400 (EDT)
-Received: from imap48 ([10.202.2.98])
-  by compute2.internal (MEProxy); Fri, 01 Apr 2022 15:57:14 -0400
-X-ME-Sender: <xms:GFlHYiRokfAQEOXS3JGVQ8fGEt9aARJbPyMM3ymgS2p4KiiRM0LYyA>
-    <xme:GFlHYnzLn5LXF0Y7iJiXJZD1GYvvbWvvTWmoH3r3L8GGKqyKyHXaxNm38fZUMC73C
-    sBCFRvt0e5DrZ7B_zg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvvddrudeiiedgudegfecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefofgggkfgjfhffhffvufgtsehttdertderredtnecuhfhrohhmpedftehn
-    ugihucfnuhhtohhmihhrshhkihdfuceolhhuthhosehkvghrnhgvlhdrohhrgheqnecugg
-    ftrfgrthhtvghrnheptdfhheettddvtedvtedugfeuuefhtddugedvleevleefvdetleff
-    gfefvdekgeefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrh
-    homheprghnugihodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduudeiudek
-    heeifedvqddvieefudeiiedtkedqlhhuthhopeepkhgvrhhnvghlrdhorhhgsehlihhnuh
-    igrdhluhhtohdruhhs
-X-ME-Proxy: <xmx:GFlHYv1jixSdphTgcgBt4k3ApxFLLREmwzVtH2R4FpXJdYAzolT8DQ>
-    <xmx:GFlHYuBMTtOSj8Tvkpa1ZxH5VAnOs_iojIWHPKc2ofrldE_VY-TwKg>
-    <xmx:GFlHYri_K6w69VmxOC5PmjtQo9sfLoKQOJBISmJk3ApiuCpGFiiQXA>
-    <xmx:GllHYkBzqd9lROHtGLpI27JhxgidDn8BgzezBQqjYAPE7wh_2Gh2xg>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 39BD021E0073; Fri,  1 Apr 2022 15:57:12 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-382-g88b93171a9-fm-20220330.001-g88b93171
-Mime-Version: 1.0
-Message-Id: <83fd55f8-cd42-4588-9bf6-199cbce70f33@www.fastmail.com>
-In-Reply-To: <YkcTTY4YjQs5BRhE@google.com>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <YjyS6A0o4JASQK+B@google.com> <YkHspg+YzOsbUaCf@google.com>
- <YkH32nx+YsJuUbmZ@google.com> <YkIFW25WgV2WIQHb@google.com>
- <YkM7eHCHEBe5NkNH@google.com> <88620519-029e-342b-0a85-ce2a20eaf41b@arm.com>
- <YkQzfjgTQaDd2E2T@google.com> <YkSaUQX89ZEojsQb@google.com>
- <80aad2f9-9612-4e87-a27a-755d3fa97c92@www.fastmail.com>
- <YkcTTY4YjQs5BRhE@google.com>
-Date:   Fri, 01 Apr 2022 12:56:50 -0700
-From:   "Andy Lutomirski" <luto@kernel.org>
-To:     "Quentin Perret" <qperret@google.com>
-Cc:     "Sean Christopherson" <seanjc@google.com>,
-        "Steven Price" <steven.price@arm.com>,
-        "Chao Peng" <chao.p.peng@linux.intel.com>,
-        "kvm list" <kvm@vger.kernel.org>,
-        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        "Linux API" <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        "Jonathan Corbet" <corbet@lwn.net>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        "Wanpeng Li" <wanpengli@tencent.com>,
-        "Jim Mattson" <jmattson@google.com>,
-        "Joerg Roedel" <joro@8bytes.org>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Hugh Dickins" <hughd@google.com>,
-        "Jeff Layton" <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        "Mike Rapoport" <rppt@kernel.org>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        "Vlastimil Babka" <vbabka@suse.cz>,
-        "Vishal Annapurve" <vannapurve@google.com>,
-        "Yu Zhang" <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        "Dave Hansen" <dave.hansen@intel.com>,
-        "Andi Kleen" <ak@linux.intel.com>,
-        "David Hildenbrand" <david@redhat.com>,
-        "Marc Zyngier" <maz@kernel.org>, "Will Deacon" <will@kernel.org>
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM guest
- private memory
-Content-Type: text/plain
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S240033AbiDAUUA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 16:20:00 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B83A2706E7;
+        Fri,  1 Apr 2022 13:18:10 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id i11so3382204plr.1;
+        Fri, 01 Apr 2022 13:18:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=kdnSMpiTCRDvRUDbYzRwpTgjmgodk5oaNh3fctE9L/g=;
+        b=H26iFxckDVq+YQVbmm0eqktbwJjqz4DvYVm67KyjEbafrWXdkDYv1EAt+8r/51FL42
+         Q4c8TxkF54vMWDLC+wF1/s/ig4WTU0PtPCClwFl9h9FUZF1UoxNs+v9wVIC7N2YF5GGe
+         QoeMEdJ2Edg18qp+Uq8iJspIKXXSf6BiBOrt9yfW8RMNvsqsJUDSrib5nl8Qgtt5CHHP
+         t/g/gCfpbL6oX+MVXjuBXnSsG9qbT4LxkisUCESOQmTn+wDIWvEh+l6/12a0M8kwpakj
+         Re5vCJ6i0RUtzYwIq0xLVE6JRNmuFBH40PDX3kHf9yyYaHvbtM/PbTt3g3H9+b1Yksfi
+         h09A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=kdnSMpiTCRDvRUDbYzRwpTgjmgodk5oaNh3fctE9L/g=;
+        b=3ofhz+PZFAhFNjvqNEq5ykkJl5FvJf3iWt1Q2xMaqAcDzyqBXjnAKQcEnij6YpRLXf
+         P7neWmTMl9sl4PJLcjvS4ItWpsY03bEhLK2UcUVgZ33xcq/I4NBBk2Ry5M/isb8HGNie
+         yRmuXYDrgvHn2P56cY+1iP+4zWi3X5NLAccS//7DC5ebhdX60vzWH0AkL9vhZO/md43M
+         fTcPzdhO3WilwEzRmCa8/myZkGQ8JWx3uunSM9C8rp3VlSq5t3gntnDy0+DFBVHHui12
+         Vc7Gu2+16E8M02BY6oiLVXhFwOnsOmVlUMYnz4vAbnhhmb015Mr6bCMNwMeTye6yNnXW
+         yRFw==
+X-Gm-Message-State: AOAM532YhKAYIbHt48ccAEDXOB6gSENcxH231/krSserTiSS31Pfq3uH
+        DpwmBVV+fOt2AskVs7zUMME=
+X-Google-Smtp-Source: ABdhPJxdgGqV7vPcSBlNaImstCIy0ZOcEaVBYvEY/qbtR6uKbWO1XRGd/oyDjb8VronlpmJbhP5TYw==
+X-Received: by 2002:a17:902:ced0:b0:153:f78e:c43f with SMTP id d16-20020a170902ced000b00153f78ec43fmr11718153plg.64.1648844289605;
+        Fri, 01 Apr 2022 13:18:09 -0700 (PDT)
+Received: from localhost ([192.55.54.52])
+        by smtp.gmail.com with ESMTPSA id j3-20020a056a00234300b004faabba358fsm3886617pfj.14.2022.04.01.13.18.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Apr 2022 13:18:08 -0700 (PDT)
+Date:   Fri, 1 Apr 2022 13:18:06 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Kai Huang <kai.huang@intel.com>, isaku.yamahata@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [RFC PATCH v5 008/104] KVM: TDX: Add a function to initialize
+ TDX module
+Message-ID: <20220401201806.GA2862421@ls.amr.corp.intel.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <b92217283fa96b85e9a683ca3fcf1b368cf8d1c4.1646422845.git.isaku.yamahata@intel.com>
+ <36aac3cb7c7447db6454ee396e25eea3bad378e6.camel@intel.com>
+ <20220331194144.GA2084469@ls.amr.corp.intel.com>
+ <d63042a2-91d8-5555-1bac-4d908e03da2b@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d63042a2-91d8-5555-1bac-4d908e03da2b@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 1, 2022, at 7:59 AM, Quentin Perret wrote:
-> On Thursday 31 Mar 2022 at 09:04:56 (-0700), Andy Lutomirski wrote:
+On Fri, Apr 01, 2022 at 02:56:40PM +0800,
+Xiaoyao Li <xiaoyao.li@intel.com> wrote:
 
+> On 4/1/2022 3:41 AM, Isaku Yamahata wrote:
+> > On Thu, Mar 31, 2022 at 04:31:10PM +1300,
+> > Kai Huang <kai.huang@intel.com> wrote:
+> > 
+> > > On Fri, 2022-03-04 at 11:48 -0800, isaku.yamahata@intel.com wrote:
+> > > > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > > > Add a wrapper function to initialize the TDX module and get system-wide
+> > > > parameters via those APIs.  Because TDX requires VMX enabled, It will be
+> > > > called on-demand when the first guest TD is created via x86 KVM init_vm
+> > > > callback.
+> > > 
+> > > Why not just merge this patch with the change where you implement the init_vm
+> > > callback?  Then you can just declare this patch as "detect and initialize TDX
+> > > module when first VM is created", or something like that..
+> > 
+> > Ok. Anyway in the next respoin, tdx module initialization will be done when
+> > loading kvm_intel.ko.  So the whole part will be changed and will be a part
+> > of module loading.
+> 
+> Will we change the GET_TDX_CAPABILITIES ioctl back to KVM scope?
 
-> To answer your original question about memory 'conversion', the key
-> thing is that the pKVM hypervisor controls the stage-2 page-tables for
-> everyone in the system, all guests as well as the host. As such, a page
-> 'conversion' is nothing more than a permission change in the relevant
-> page-tables.
->
+No because it system scoped KVM_TDX_CAPABILITIES requires one more callback for
+it.  We can reduce the change.
 
-So I can see two different ways to approach this.
-
-One is that you split the whole address space in half and, just like SEV and TDX, allocate one bit to indicate the shared/private status of a page.  This makes it work a lot like SEV and TDX.
-
-The other is to have shared and private pages be distinguished only by their hypercall history and the (protected) page tables.  This saves some address space and some page table allocations, but it opens some cans of worms too.  In particular, the guest and the hypervisor need to coordinate, in a way that the guest can trust, to ensure that the guest's idea of which pages are private match the host's.  This model seems a bit harder to support nicely with the private memory fd model, but not necessarily impossible.
-
-Also, what are you trying to accomplish by having the host userspace mmap private pages?  Is the idea that multiple guest could share the same page until such time as one of them tries to write to it?  That would be kind of like having a third kind of memory that's visible to host and guests but is read-only for everyone.  TDX and SEV can't support this at all (a private page belongs to one guest and one guest only, at least in SEV and in the current TDX SEAM spec).  I imagine that this could be supported with private memory fds with some care without mmap, though -- the host could still populate the page with memcpy.  Or I suppose a memslot could support using MAP_PRIVATE fds and have approximately the right semantics.
-
---Andy
-
-
+Or do you have any use case for system scoped KVM_TDX_CAPABILITIES?
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
