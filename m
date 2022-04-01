@@ -2,44 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F2A204EF4FA
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 17:41:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80F694EF34D
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 17:17:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350366AbiDAPGN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Apr 2022 11:06:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34350 "EHLO
+        id S1349669AbiDAPGV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Apr 2022 11:06:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349374AbiDAOpy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Apr 2022 10:45:54 -0400
+        with ESMTP id S1350066AbiDAOrI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Apr 2022 10:47:08 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37D3529B7C4;
-        Fri,  1 Apr 2022 07:35:54 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0CFF2A03FC;
+        Fri,  1 Apr 2022 07:37:02 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C845260A53;
-        Fri,  1 Apr 2022 14:35:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B21FC2BBE4;
-        Fri,  1 Apr 2022 14:35:53 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E5B2B60915;
+        Fri,  1 Apr 2022 14:36:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7709AC340F2;
+        Fri,  1 Apr 2022 14:36:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648823754;
-        bh=FqPKhz65cLe+F8JBBk9WgDK9u85F0RIQc3mjbm+xiHI=;
+        s=k20201202; t=1648823791;
+        bh=z2US9SuqGeb8MNBIv52FpTTXwXw4NnMl51Uz1mvkp6E=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=CjrvSHjumA4EOTVz57Je3oQKZUgtHYV2TRcnyDO05HKjEMukkkrxJr6VQKKQA6q8E
-         khb4/DOE7aq76puc93XLmPTujyjK9db6XfEbefSaKUM7grSfk47Ak05t/jFb25qW0a
-         4KU4BNnRWKRQr2XrGN6iyh/fnDDUd/gL1rpsXsCWkzjDLYRqllpwi+M6QmYAnn2ckV
-         MVwGMUp/4dOIJ4F/MfxeVOYn6NrtqyAS92yVR3UIwrWVFJvDFVO0fBuXL5bdHb+iiO
-         n26fZSr8Qe+hE5PHf4GMwvaQ+GkyzEsEYnxKuqHCloWBFgtudplGjrnwy6gpyHTQ0e
-         khp+vNLHz3pcg==
+        b=aXBntU8Y55DhgI2a7cIPEmWFZnyJ9i3ScEE1agmt7Atyy2LwYmJbmz6MDnOmr0p4r
+         2BVaNiareYG+hRCifSCHRjGQpwR01/Du4WzddCXmkxpJPqwRSQahDgrbUPfEfIylIz
+         YRMypehPiqCi/pqCTUXa1iu72+9W+qcq79WomDtjdtoOefSOhR/dkoB/a00NCsnEwO
+         i8y7eFI+HBfpKP2rmIWN5CAAvRaUFPEwx6Ir7cHBRqAuKxiN3qwD7KWBUE+mTqGM4k
+         RNvG6QChdQrlMp3cjvZ/OeEAfEd+o2YdwL7hc3F2N81g2JRoSUH7Jvb+ZgqNAb4R8W
+         n1ONGNDkcKrMw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Sasha Levin <sashal@kernel.org>, yishaih@nvidia.com,
-        mgurtovoy@nvidia.com, jgg@ziepe.ca, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.16 063/109] vfio/pci: Stub vfio_pci_vga_rw when !CONFIG_VFIO_PCI_VGA
-Date:   Fri,  1 Apr 2022 10:32:10 -0400
-Message-Id: <20220401143256.1950537-63-sashal@kernel.org>
+Cc:     Harold Huang <baymaxhuang@gmail.com>,
+        Eric Dumazet <eric.dumazet@gmail.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Sasha Levin <sashal@kernel.org>, davem@davemloft.net,
+        pabeni@redhat.com, mst@redhat.com, ast@kernel.org,
+        daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+        netdev@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.16 079/109] tuntap: add sanity checks about msg_controllen in sendmsg
+Date:   Fri,  1 Apr 2022 10:32:26 -0400
+Message-Id: <20220401143256.1950537-79-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220401143256.1950537-1-sashal@kernel.org>
 References: <20220401143256.1950537-1-sashal@kernel.org>
@@ -57,67 +62,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alex Williamson <alex.williamson@redhat.com>
+From: Harold Huang <baymaxhuang@gmail.com>
 
-[ Upstream commit 6e031ec0e5a2dda53e12e0d2a7e9b15b47a3c502 ]
+[ Upstream commit 74a335a07a17d131b9263bfdbdcb5e40673ca9ca ]
 
-Resolve build errors reported against UML build for undefined
-ioport_map() and ioport_unmap() functions.  Without this config
-option a device cannot have vfio_pci_core_device.has_vga set,
-so the existing function would always return -EINVAL anyway.
+In patch [1], tun_msg_ctl was added to allow pass batched xdp buffers to
+tun_sendmsg. Although we donot use msg_controllen in this path, we should
+check msg_controllen to make sure the caller pass a valid msg_ctl.
 
-Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Link: https://lore.kernel.org/r/20220123125737.2658758-1-geert@linux-m68k.org
-Link: https://lore.kernel.org/r/164306582968.3758255.15192949639574660648.stgit@omen
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+[1]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fe8dd45bb7556246c6b76277b1ba4296c91c2505
+
+Reported-by: Eric Dumazet <eric.dumazet@gmail.com>
+Suggested-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Harold Huang <baymaxhuang@gmail.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+Link: https://lore.kernel.org/r/20220303022441.383865-1-baymaxhuang@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/vfio/pci/vfio_pci_rdwr.c | 2 ++
- include/linux/vfio_pci_core.h    | 9 +++++++++
- 2 files changed, 11 insertions(+)
+ drivers/net/tap.c   | 3 ++-
+ drivers/net/tun.c   | 3 ++-
+ drivers/vhost/net.c | 1 +
+ 3 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
-index 57d3b2cbbd8e..82ac1569deb0 100644
---- a/drivers/vfio/pci/vfio_pci_rdwr.c
-+++ b/drivers/vfio/pci/vfio_pci_rdwr.c
-@@ -288,6 +288,7 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
- 	return done;
- }
+diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+index 8e3a28ba6b28..ba2ef5437e16 100644
+--- a/drivers/net/tap.c
++++ b/drivers/net/tap.c
+@@ -1198,7 +1198,8 @@ static int tap_sendmsg(struct socket *sock, struct msghdr *m,
+ 	struct xdp_buff *xdp;
+ 	int i;
  
-+#ifdef CONFIG_VFIO_PCI_VGA
- ssize_t vfio_pci_vga_rw(struct vfio_pci_core_device *vdev, char __user *buf,
- 			       size_t count, loff_t *ppos, bool iswrite)
- {
-@@ -355,6 +356,7 @@ ssize_t vfio_pci_vga_rw(struct vfio_pci_core_device *vdev, char __user *buf,
+-	if (ctl && (ctl->type == TUN_MSG_PTR)) {
++	if (m->msg_controllen == sizeof(struct tun_msg_ctl) &&
++	    ctl && ctl->type == TUN_MSG_PTR) {
+ 		for (i = 0; i < ctl->num; i++) {
+ 			xdp = &((struct xdp_buff *)ctl->ptr)[i];
+ 			tap_get_user_xdp(q, xdp);
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index 45a67e72a02c..02de8d998bfa 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -2489,7 +2489,8 @@ static int tun_sendmsg(struct socket *sock, struct msghdr *m, size_t total_len)
+ 	if (!tun)
+ 		return -EBADFD;
  
- 	return done;
- }
-+#endif
+-	if (ctl && (ctl->type == TUN_MSG_PTR)) {
++	if (m->msg_controllen == sizeof(struct tun_msg_ctl) &&
++	    ctl && ctl->type == TUN_MSG_PTR) {
+ 		struct tun_page tpage;
+ 		int n = ctl->num;
+ 		int flush = 0;
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index 28ef323882fb..792ab5f23647 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -473,6 +473,7 @@ static void vhost_tx_batch(struct vhost_net *net,
+ 		goto signal_used;
  
- static void vfio_pci_ioeventfd_do_write(struct vfio_pci_ioeventfd *ioeventfd,
- 					bool test_mem)
-diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-index ef9a44b6cf5d..ae6f4838ab75 100644
---- a/include/linux/vfio_pci_core.h
-+++ b/include/linux/vfio_pci_core.h
-@@ -159,8 +159,17 @@ extern ssize_t vfio_pci_config_rw(struct vfio_pci_core_device *vdev,
- extern ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
- 			       size_t count, loff_t *ppos, bool iswrite);
- 
-+#ifdef CONFIG_VFIO_PCI_VGA
- extern ssize_t vfio_pci_vga_rw(struct vfio_pci_core_device *vdev, char __user *buf,
- 			       size_t count, loff_t *ppos, bool iswrite);
-+#else
-+static inline ssize_t vfio_pci_vga_rw(struct vfio_pci_core_device *vdev,
-+				      char __user *buf, size_t count,
-+				      loff_t *ppos, bool iswrite)
-+{
-+	return -EINVAL;
-+}
-+#endif
- 
- extern long vfio_pci_ioeventfd(struct vfio_pci_core_device *vdev, loff_t offset,
- 			       uint64_t data, int count, int fd);
+ 	msghdr->msg_control = &ctl;
++	msghdr->msg_controllen = sizeof(ctl);
+ 	err = sock->ops->sendmsg(sock, msghdr, 0);
+ 	if (unlikely(err < 0)) {
+ 		vq_err(&nvq->vq, "Fail to batch sending packets\n");
 -- 
 2.34.1
 
