@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 23F0F4F053D
-	for <lists+kvm@lfdr.de>; Sat,  2 Apr 2022 19:40:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ECACA4F0540
+	for <lists+kvm@lfdr.de>; Sat,  2 Apr 2022 19:40:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244279AbiDBRmq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 2 Apr 2022 13:42:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59106 "EHLO
+        id S244429AbiDBRms (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 2 Apr 2022 13:42:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241167AbiDBRmm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 2 Apr 2022 13:42:42 -0400
-Received: from mail-il1-x14a.google.com (mail-il1-x14a.google.com [IPv6:2607:f8b0:4864:20::14a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F6F3DFF9
-        for <kvm@vger.kernel.org>; Sat,  2 Apr 2022 10:40:50 -0700 (PDT)
-Received: by mail-il1-x14a.google.com with SMTP id k5-20020a056e02134500b002c9af0334e2so3732377ilr.11
-        for <kvm@vger.kernel.org>; Sat, 02 Apr 2022 10:40:50 -0700 (PDT)
+        with ESMTP id S237131AbiDBRmn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 2 Apr 2022 13:42:43 -0400
+Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 398B2DF82
+        for <kvm@vger.kernel.org>; Sat,  2 Apr 2022 10:40:51 -0700 (PDT)
+Received: by mail-io1-xd4a.google.com with SMTP id b15-20020a05660214cf00b00648a910b964so3599515iow.19
+        for <kvm@vger.kernel.org>; Sat, 02 Apr 2022 10:40:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=gTC6wbFjulJGpnpdlR2cK65pyxNM9FH8zxgBPKIedMA=;
-        b=IWfMP6PPwTJ7suUb8PtMClWLhu9Q7lmuLZmLxHUiZhB7qG4ONiUnCn55RSteRI6Lj5
-         WnEriAXO/P4p+M1csdNAB/x8uJiummx6Y0/TAZvBpSRquz7KG9vvI9Z6+/yhFBG80bUu
-         39n7syXyAT1fsyP29qR+jYISRWRnLync2LwfFqLxLJaprc1qfO6clU6/t+z5WaogkP/5
-         pF2RgGe/XeZ5vptUf4kb+iPKSZrA25QUiVI1NECCavK79JLnaNP1nDRCJ8PGXkQUIXcp
-         9MIuPc1dQkdbiiC/Rw1s3I6v/S07jCmPozzTf7mjzKbEIjMM3oXDFA7NbxxInFHCcbGP
-         OarA==
+        bh=EDhTuekQtNdm8MWzZ4rgwl9Zuy6sown5y5t0K60oNeM=;
+        b=B8kXE1B9TLeU0fkKkRjLEwnu0j64XSm51isipBSezaI+aW4AtZHnIwm8TGZj11qhjH
+         fZQIml2v0tbIQEfE+Rdi8YKENmjgZx3JLnbDQpunt+Lhb02W6Vt4aMuEdjjmWuAMIpU/
+         qpWP9KDaobTe+W3uOxEt+HSwNp7VpmQMyoKm+GSu+CZFLH6hjzjaKFfyU2AcF0kukXvm
+         QDYThdKrd3I540B7S51JbBoxsphYIIH++HAYKwcqXN8Ak3NZOiSQbOk768apsr0G4RTv
+         RVSLI2Pn5gd7HrzXW15CZPCcJCKrOG3MkeCDtxEhDwRuVNo6aCWkbdOKa9xeJ/7BVvad
+         afww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=gTC6wbFjulJGpnpdlR2cK65pyxNM9FH8zxgBPKIedMA=;
-        b=WJVNkIMlfTlqUrltvXn6y1s/x2qRM1Arv3ks6RTaYDn5K/4PHbpgZbIbE7dBLt+xpU
-         KXme77X9N2uKjSYCnkGheE7CXiIdykEmaMYlMJv/8nhxaB+yDpJuyHbpOLFTxv+g6gZU
-         UFgOgB844l2+zfAYh0HeSK8bMrU4CWjHwz1SX6JhaHpHT1di8egfT0/CWev0YLndar0s
-         GAVUli5jGVLC7FrIucT+EBE8MMzYE439mv9FXgtv/Y/Kw2pWz3LY0dt3fsBjmVNYPclu
-         dSgYVL2VPfHuElCyhsq7jLMZyobzg9z7W17c/BE/ZN6wPahEROiKCzZ9bnxnExNd0VF/
-         t/MA==
-X-Gm-Message-State: AOAM533pDUUbjwNhMytBdbqgWXHcZbaNoW2tZphJ1Wrbu/cPs6SgyAwx
-        sBx90h+g7svu8WdnJWP6BLVs6LPel8E=
-X-Google-Smtp-Source: ABdhPJxh22igukLOyB7xjQIkB7xrRakZ5rtTFEJOHvXCH6QTQaKRf4Vev65C2RCw3Khe1CzIiG7PGVWShMA=
+        bh=EDhTuekQtNdm8MWzZ4rgwl9Zuy6sown5y5t0K60oNeM=;
+        b=l8/1yluI3PbNXk4EHMUpXiHEahKFa536G1XyTGBK75b0D3fyPHXR1YGbMRAoMJeyae
+         GQorn8pe3wmbwpwqH4j3AudySpq3WwFbDheOlpfN5DoSzBj67hf6wifCLZPGQv2wxSw/
+         BWMnsKXyl6qhXCaks3+uQ0vOoaeE/2ZRhMUeMerBfMW31ZvhckoteeIPxofwE2/1JvB9
+         0dmWoJISCdvXeiA1dFxCvc0jV91GM7tqS89ST+VooDOwndh9tTExi0ns717OzReLCanp
+         2R9Qfw7NJdLe6PZCkPq4fsxDkNVvkllEYXvf4o7OUjT6c5ABp3BfD3YQetpiP+DUfcyZ
+         IPMg==
+X-Gm-Message-State: AOAM5301fAXtgk8MED6VCymaaEVwivzevJPHwNr1epnqjAExVsY+ruYG
+        tChmKje1481vW0zUE4o33eR/SPORGPQ=
+X-Google-Smtp-Source: ABdhPJwx6B48zoyhRzOI+UWoY4wiun1eWGRgsGjvJOKksNdUx4f7qTvuv/CNaHpOREGjQo9q8Bk2CyZ29n4=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a92:6810:0:b0:2ca:1ff:e32e with SMTP id
- d16-20020a926810000000b002ca01ffe32emr2313380ilc.212.1648921249504; Sat, 02
- Apr 2022 10:40:49 -0700 (PDT)
-Date:   Sat,  2 Apr 2022 17:40:41 +0000
+ (user=oupton job=sendgmr) by 2002:a05:6602:2c8b:b0:649:e67c:9202 with SMTP id
+ i11-20020a0566022c8b00b00649e67c9202mr2148843iow.75.1648921250592; Sat, 02
+ Apr 2022 10:40:50 -0700 (PDT)
+Date:   Sat,  2 Apr 2022 17:40:42 +0000
 In-Reply-To: <20220402174044.2263418-1-oupton@google.com>
-Message-Id: <20220402174044.2263418-2-oupton@google.com>
+Message-Id: <20220402174044.2263418-3-oupton@google.com>
 Mime-Version: 1.0
 References: <20220402174044.2263418-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
-Subject: [PATCH 1/4] KVM: arm64: vgic: Don't assume the VM debugfs directory exists
+Subject: [PATCH 2/4] KVM: Only log about debugfs directory collision once
 From:   Oliver Upton <oupton@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -76,41 +76,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Unfortunately, there is no guarantee that KVM was able to instantiate a
-debugfs directory for a particular VM. To that end, KVM shouldn't even
-attempt to create new debugfs files in this case. If the specified
-parent dentry is NULL, debugfs_create_file() will instantiate files at
-the root of debugfs.
+In all likelihood, a debugfs directory name collision is the result of a
+userspace bug. If userspace closes the VM fd without releasing all
+references to said VM then the debugfs directory is never cleaned.
 
-Since it is possible to create the vgic-state file outside of a VM
-directory, the file is not cleaned up when a VM is destroyed.
-Nonetheless, the corresponding struct kvm is freed when the VM is
-destroyed.
+Even a ratelimited print statement can fill up dmesg, making it
+particularly annoying for the person debugging what exactly went wrong.
+Furthermore, a userspace that wants to be a nuisance could clog up the
+logs by deliberately holding a VM reference after closing the VM fd.
 
-Plug the use-after-free by plainly refusing to create vgic-state when
-KVM fails to create a VM debugfs dir.
+Dial back logging to print at most once, given that userspace is most
+likely to blame. Leave the statement in place for the small chance that
+KVM actually got it wrong.
 
 Cc: stable@kernel.org
-Fixes: 929f45e32499 ("kvm: no need to check return value of debugfs_create functions")
+Fixes: 85cd39af14f4 ("KVM: Do not leak memory for duplicate debugfs directories")
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/arm64/kvm/vgic/vgic-debug.c | 3 +++
- 1 file changed, 3 insertions(+)
+ virt/kvm/kvm_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
-index f38c40a76251..cf1364a6fabc 100644
---- a/arch/arm64/kvm/vgic/vgic-debug.c
-+++ b/arch/arm64/kvm/vgic/vgic-debug.c
-@@ -271,6 +271,9 @@ DEFINE_SEQ_ATTRIBUTE(vgic_debug);
- 
- void vgic_debug_init(struct kvm *kvm)
- {
-+	if (!kvm->debugfs_dentry)
-+		return;
-+
- 	debugfs_create_file("vgic-state", 0444, kvm->debugfs_dentry, kvm,
- 			    &vgic_debug_fops);
- }
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 69c318fdff61..38b30bd60f34 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -959,7 +959,7 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
+ 	mutex_lock(&kvm_debugfs_lock);
+ 	dent = debugfs_lookup(dir_name, kvm_debugfs_dir);
+ 	if (dent) {
+-		pr_warn_ratelimited("KVM: debugfs: duplicate directory %s\n", dir_name);
++		pr_warn_once("KVM: debugfs: duplicate directory %s\n", dir_name);
+ 		dput(dent);
+ 		mutex_unlock(&kvm_debugfs_lock);
+ 		return 0;
 -- 
 2.35.1.1094.g7c7d902a7c-goog
 
