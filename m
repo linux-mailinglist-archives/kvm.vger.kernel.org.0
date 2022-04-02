@@ -2,127 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A0C24EFFA4
-	for <lists+kvm@lfdr.de>; Sat,  2 Apr 2022 10:15:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30D154EFFB0
+	for <lists+kvm@lfdr.de>; Sat,  2 Apr 2022 10:33:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347047AbiDBIQW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 2 Apr 2022 04:16:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47948 "EHLO
+        id S235044AbiDBIe4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 2 Apr 2022 04:34:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233776AbiDBIQU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 2 Apr 2022 04:16:20 -0400
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 501E8FABD1
-        for <kvm@vger.kernel.org>; Sat,  2 Apr 2022 01:14:29 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id yy13so10299433ejb.2
-        for <kvm@vger.kernel.org>; Sat, 02 Apr 2022 01:14:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=ASfglyNGhIYGfLedSdBxygqzN12rw9J2jE3Wf+ebSeY=;
-        b=KREy2OZE6S4TplSLUSxs3PkgcFnFHOLnFr5sq5tioMzormRA6w9NknWHwonxzYGa9e
-         3VMlS63RrcjF7aJcevnwbm4pq4Y5wzN2ORCJ0l8oLqBjYM3h4SkRXOEFWq4quDOQRtX0
-         AXZJL8TXFlTrdCUcQKfrCVbHJACKeZWF8AWdfiDyk4MAgYb2pBhx+x8Q6lqRTWeoLWof
-         bwq9O6e7JHQ1k1s7mMAooKpUDvaVNBxwgTkQr3QwAqNQjOeMvuGQc+5hA474Yb3DWdLv
-         CQZ1a4SlTT15cMHbqtWPWWRyIuXIWBauI3f+yvGiJAr8N+eZOxRy904yf1rj/RVOQAdx
-         osDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=ASfglyNGhIYGfLedSdBxygqzN12rw9J2jE3Wf+ebSeY=;
-        b=Qf8tDlpTzl/+CpAkru5iUUg7s13ybOxz+iBC93iW95XE2gBhczk5ERmuCUzRGn4HqQ
-         ZDHbzizwzejNN86hXLuJSoXFDnGlw8+yjN+2lKN/8nGIA9ULoMEJokBIWTjvW+Mh9RVi
-         8VPs3ruY9i/Wa79LLaw2o0aTnuahHgGQ9dybXKT0YXtTCRNOxJ3tXf2XQ7mjg+/q8+Hz
-         hyNEHMa+2JqBebw+skRG42cm6hlO3lhd1hcgadCZMtv8ejHtnWVc8z0uBYgUWPSw/XeN
-         xLm+Miyyj01BmXBpE7qoybN4ZRhLo54CT0h1E+Wfr9iqmU7s+GRDTf4IS/YEFYhTkxHY
-         Kngw==
-X-Gm-Message-State: AOAM5306KxrvrBgAfQ/TDKUt7hTfPEEXsQoC5ZfasmynCA6cbwHml6ED
-        VnsVw5mqMDbJNcjp61qB+b4=
-X-Google-Smtp-Source: ABdhPJwa/Y6/ZS6J5R8KLnICG+MlvwfHRbDC/emvRc6Pdm13Tw09bj83zp6s934W0BiB/Ei/PKrWAQ==
-X-Received: by 2002:a17:907:960c:b0:6e4:accf:10e3 with SMTP id gb12-20020a170907960c00b006e4accf10e3mr3136741ejc.173.1648887267790;
-        Sat, 02 Apr 2022 01:14:27 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:8ca6:a836:a237:fed1? ([2001:b07:6468:f312:8ca6:a836:a237:fed1])
-        by smtp.googlemail.com with ESMTPSA id bn14-20020a170906c0ce00b006c5ef0494besm1850025ejb.86.2022.04.02.01.14.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 02 Apr 2022 01:14:27 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <e7896b4e-0b29-b735-88b8-34dd3b266d3d@redhat.com>
-Date:   Sat, 2 Apr 2022 10:14:26 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH] KVM: VMX: optimize pi_wakeup_handler
-Content-Language: en-US
-To:     Li RongQing <lirongqing@baidu.com>, kvm@vger.kernel.org,
-        seanjc@google.com, vkuznets@redhat.com
+        with ESMTP id S230062AbiDBIey (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 2 Apr 2022 04:34:54 -0400
+Received: from baidu.com (mx22.baidu.com [220.181.50.185])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 53365158558
+        for <kvm@vger.kernel.org>; Sat,  2 Apr 2022 01:33:02 -0700 (PDT)
+Received: from BJHW-Mail-Ex13.internal.baidu.com (unknown [10.127.64.36])
+        by Forcepoint Email with ESMTPS id 178A18D969F2235F68C3;
+        Sat,  2 Apr 2022 16:32:55 +0800 (CST)
+Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
+ BJHW-Mail-Ex13.internal.baidu.com (10.127.64.36) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.20; Sat, 2 Apr 2022 16:32:54 +0800
+Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
+ BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
+ 15.01.2308.020; Sat, 2 Apr 2022 16:32:54 +0800
+From:   "Li,Rongqing" <lirongqing@baidu.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>
+Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0hdIEtWTTogVk1YOiBvcHRpbWl6ZSBwaV93YWtldXBf?=
+ =?utf-8?Q?handler?=
+Thread-Topic: [PATCH] KVM: VMX: optimize pi_wakeup_handler
+Thread-Index: AQHYRmmqp/FH1eZDIUue+xcJmL0TgKzcSb8g
+Date:   Sat, 2 Apr 2022 08:32:54 +0000
+Message-ID: <d63acc4d9ac24a48b49415a45238e907@baidu.com>
 References: <1648872113-24329-1-git-send-email-lirongqing@baidu.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <1648872113-24329-1-git-send-email-lirongqing@baidu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+ <e7896b4e-0b29-b735-88b8-34dd3b266d3d@redhat.com>
+In-Reply-To: <e7896b4e-0b29-b735-88b8-34dd3b266d3d@redhat.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.22.206.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/2/22 06:01, Li RongQing wrote:
-> pi_wakeup_handler is used to wakeup the sleep vCPUs by posted irq
-> list_for_each_entry is used in it, and whose input is other function
-> per_cpu(), That cause that per_cpu() be invoked at least twice when
-> there is one sleep vCPU
-> 
-> so optimize pi_wakeup_handler it by reading once which is safe in
-> spinlock protection
-> 
-> and same to per CPU spinlock
-
-What's the difference in the generated code?
-
-Paolo
-
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> ---
->   arch/x86/kvm/vmx/posted_intr.c | 12 ++++++++----
->   1 file changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> index 5fdabf3..0dae431 100644
-> --- a/arch/x86/kvm/vmx/posted_intr.c
-> +++ b/arch/x86/kvm/vmx/posted_intr.c
-> @@ -214,17 +214,21 @@ void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
->    */
->   void pi_wakeup_handler(void)
->   {
-> +	struct list_head *wakeup_list;
->   	int cpu = smp_processor_id();
-> +	raw_spinlock_t *spinlock;
->   	struct vcpu_vmx *vmx;
->   
-> -	raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
-> -	list_for_each_entry(vmx, &per_cpu(wakeup_vcpus_on_cpu, cpu),
-> -			    pi_wakeup_list) {
-> +	spinlock = &per_cpu(wakeup_vcpus_on_cpu_lock, cpu);
-> +
-> +	raw_spin_lock(spinlock);
-> +	wakeup_list = &per_cpu(wakeup_vcpus_on_cpu, cpu);
-> +	list_for_each_entry(vmx, wakeup_list, pi_wakeup_list) {
->   
->   		if (pi_test_on(&vmx->pi_desc))
->   			kvm_vcpu_wake_up(&vmx->vcpu);
->   	}
-> -	raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
-> +	raw_spin_unlock(spinlock);
->   }
->   
->   void __init pi_init_cpu(int cpu)
-
+DQoNCj4gLS0tLS3pgq7ku7bljp/ku7YtLS0tLQ0KPiDlj5Hku7bkuro6IFBhb2xvIEJvbnppbmkg
+PHBhb2xvLmJvbnppbmlAZ21haWwuY29tPiDku6PooaggUGFvbG8gQm9uemluaQ0KPiDlj5HpgIHm
+l7bpl7Q6IDIwMjLlubQ05pyIMuaXpSAxNjoxNA0KPiDmlLbku7bkuro6IExpLFJvbmdxaW5nIDxs
+aXJvbmdxaW5nQGJhaWR1LmNvbT47IGt2bUB2Z2VyLmtlcm5lbC5vcmc7DQo+IHNlYW5qY0Bnb29n
+bGUuY29tOyB2a3V6bmV0c0ByZWRoYXQuY29tDQo+IOS4u+mimDogUmU6IFtQQVRDSF0gS1ZNOiBW
+TVg6IG9wdGltaXplIHBpX3dha2V1cF9oYW5kbGVyDQo+IA0KPiBPbiA0LzIvMjIgMDY6MDEsIExp
+IFJvbmdRaW5nIHdyb3RlOg0KPiA+IHBpX3dha2V1cF9oYW5kbGVyIGlzIHVzZWQgdG8gd2FrZXVw
+IHRoZSBzbGVlcCB2Q1BVcyBieSBwb3N0ZWQgaXJxDQo+ID4gbGlzdF9mb3JfZWFjaF9lbnRyeSBp
+cyB1c2VkIGluIGl0LCBhbmQgd2hvc2UgaW5wdXQgaXMgb3RoZXIgZnVuY3Rpb24NCj4gPiBwZXJf
+Y3B1KCksIFRoYXQgY2F1c2UgdGhhdCBwZXJfY3B1KCkgYmUgaW52b2tlZCBhdCBsZWFzdCB0d2lj
+ZSB3aGVuDQo+ID4gdGhlcmUgaXMgb25lIHNsZWVwIHZDUFUNCj4gPg0KPiA+IHNvIG9wdGltaXpl
+IHBpX3dha2V1cF9oYW5kbGVyIGl0IGJ5IHJlYWRpbmcgb25jZSB3aGljaCBpcyBzYWZlIGluDQo+
+ID4gc3BpbmxvY2sgcHJvdGVjdGlvbg0KPiA+DQo+ID4gYW5kIHNhbWUgdG8gcGVyIENQVSBzcGlu
+bG9jaw0KPiANCj4gV2hhdCdzIHRoZSBkaWZmZXJlbmNlIGluIHRoZSBnZW5lcmF0ZWQgY29kZT8N
+Cj4gDQoNClRoaXMgcmVkdWNlcyBvbmUgZmlmdGggYXNtIGNvZGVzDQoNCldpdGhvdXQgdGhpcyBw
+YXRjaDoNCg0KMDAwMDAwMDAwMDAwMDQwMCA8cGlfd2FrZXVwX2hhbmRsZXI+Og0KIDQwMDogICBl
+OCAwMCAwMCAwMCAwMCAgICAgICAgICBjYWxscSAgNDA1IDxwaV93YWtldXBfaGFuZGxlcisweDU+
+DQogNDA1OiAgIDU1ICAgICAgICAgICAgICAgICAgICAgIHB1c2ggICAlcmJwDQogNDA2OiAgIDQ4
+IDg5IGU1ICAgICAgICAgICAgICAgIG1vdiAgICAlcnNwLCVyYnANCiA0MDk6ICAgNDEgNTcgICAg
+ICAgICAgICAgICAgICAgcHVzaCAgICVyMTUNCiA0MGI6ICAgNDEgNTYgICAgICAgICAgICAgICAg
+ICAgcHVzaCAgICVyMTQNCiA0MGQ6ICAgNDEgNTUgICAgICAgICAgICAgICAgICAgcHVzaCAgICVy
+MTMNCiA0MGY6ICAgNDEgNTQgICAgICAgICAgICAgICAgICAgcHVzaCAgICVyMTINCiA0MTE6ICAg
+NDkgYzcgYzQgMDAgMDAgMDAgMDAgICAgbW92ICAgICQweDAsJXIxMg0KIDQxODogICA2NSA0NCA4
+YiAyZCAwMCAwMCAwMCAgICBtb3YgICAgJWdzOjB4MCglcmlwKSwlcjEzZCAgICAgICAgIyA0MjAg
+PHBpX3dha2V1cF9oYW5kbGVyKzB4MjA+DQogNDFmOiAgIDAwDQogNDIwOiAgIDRkIDYzIGVkICAg
+ICAgICAgICAgICAgIG1vdnNscSAlcjEzZCwlcjEzDQogNDIzOiAgIDRjIDg5IGU3ICAgICAgICAg
+ICAgICAgIG1vdiAgICAlcjEyLCVyZGkNCiA0MjY6ICAgNTMgICAgICAgICAgICAgICAgICAgICAg
+cHVzaCAgICVyYngNCiA0Mjc6ICAgNGEgMDMgM2MgZWQgMDAgMDAgMDAgICAgYWRkICAgIDB4MCgs
+JXIxMyw4KSwlcmRpDQogNDJlOiAgIDAwDQogNDJmOiAgIDQ5IGM3IGM2IDAwIDAwIDAwIDAwICAg
+IG1vdiAgICAkMHgwLCVyMTQNCiA0MzY6ICAgZTggMDAgMDAgMDAgMDAgICAgICAgICAgY2FsbHEg
+IDQzYiA8cGlfd2FrZXVwX2hhbmRsZXIrMHgzYj4NCiA0M2I6ICAgNGEgOGIgMGMgZWQgMDAgMDAg
+MDAgICAgbW92ICAgIDB4MCgsJXIxMyw4KSwlcmN4DQogNDQyOiAgIDAwDQogNDQzOiAgIDRjIDg5
+IGYwICAgICAgICAgICAgICAgIG1vdiAgICAlcjE0LCVyYXgNCiA0NDY6ICAgNDggOGIgMTQgMDEg
+ICAgICAgICAgICAgbW92ICAgICglcmN4LCVyYXgsMSksJXJkeA0KIDQ0YTogICA0OCAwMSBjOCAg
+ICAgICAgICAgICAgICBhZGQgICAgJXJjeCwlcmF4DQogNDRkOiAgIDQ4IDM5IGMyICAgICAgICAg
+ICAgICAgIGNtcCAgICAlcmF4LCVyZHgNCiA0NTA6ICAgNzQgM2UgICAgICAgICAgICAgICAgICAg
+amUgICAgIDQ5MCA8cGlfd2FrZXVwX2hhbmRsZXIrMHg5MD4NCiA0NTI6ICAgNDggOGQgOWEgNDAg
+ZDkgZmYgZmYgICAgbGVhICAgIC0weDI2YzAoJXJkeCksJXJieA0KIDQ1OTogICA0OSBjNyBjNyAw
+MCAwMCAwMCAwMCAgICBtb3YgICAgJDB4MCwlcjE1DQogNDYwOiAgIDQ4IDhiIDgzIGEwIDI2IDAw
+IDAwICAgIG1vdiAgICAweDI2YTAoJXJieCksJXJheA0KIDQ2NzogICBhOCAwMSAgICAgICAgICAg
+ICAgICAgICB0ZXN0ICAgJDB4MSwlYWwNCiA0Njk6ICAgNzQgMDggICAgICAgICAgICAgICAgICAg
+amUgICAgIDQ3MyA8cGlfd2FrZXVwX2hhbmRsZXIrMHg3Mz4NCiA0NmI6ICAgNDggODkgZGYgICAg
+ICAgICAgICAgICAgbW92ICAgICVyYngsJXJkaQ0KIDQ2ZTogICBlOCAwMCAwMCAwMCAwMCAgICAg
+ICAgICBjYWxscSAgNDczIDxwaV93YWtldXBfaGFuZGxlcisweDczPg0KIDQ3MzogICA0YiA4YiAw
+YyBlZiAgICAgICAgICAgICBtb3YgICAgKCVyMTUsJXIxMyw4KSwlcmN4DQogNDc3OiAgIDQ4IDhi
+IDkzIGMwIDI2IDAwIDAwICAgIG1vdiAgICAweDI2YzAoJXJieCksJXJkeA0KIDQ3ZTogICA0YyA4
+OSBmMCAgICAgICAgICAgICAgICBtb3YgICAgJXIxNCwlcmF4DQogNDgxOiAgIDQ4IDAxIGM4ICAg
+ICAgICAgICAgICAgIGFkZCAgICAlcmN4LCVyYXgNCiA0ODQ6ICAgNDggOGQgOWEgNDAgZDkgZmYg
+ZmYgICAgbGVhICAgIC0weDI2YzAoJXJkeCksJXJieA0KIDQ4YjogICA0OCAzOSBjMiAgICAgICAg
+ICAgICAgICBjbXAgICAgJXJheCwlcmR4DQogNDhlOiAgIDc1IGQwICAgICAgICAgICAgICAgICAg
+IGpuZSAgICA0NjAgPHBpX3dha2V1cF9oYW5kbGVyKzB4NjA+DQogNDkwOiAgIDQ5IDAxIGNjICAg
+ICAgICAgICAgICAgIGFkZCAgICAlcmN4LCVyMTINCiA0OTM6ICAgNDEgYzYgMDQgMjQgMDAgICAg
+ICAgICAgbW92YiAgICQweDAsKCVyMTIpDQogNDk4OiAgIDViICAgICAgICAgICAgICAgICAgICAg
+IHBvcCAgICAlcmJ4DQogNDk5OiAgIDQxIDVjICAgICAgICAgICAgICAgICAgIHBvcCAgICAlcjEy
+DQogNDliOiAgIDQxIDVkICAgICAgICAgICAgICAgICAgIHBvcCAgICAlcjEzDQogNDlkOiAgIDQx
+IDVlICAgICAgICAgICAgICAgICAgIHBvcCAgICAlcjE0DQogNDlmOiAgIDQxIDVmICAgICAgICAg
+ICAgICAgICAgIHBvcCAgICAlcjE1DQogNGExOiAgIDVkICAgICAgICAgICAgICAgICAgICAgIHBv
+cCAgICAlcmJwDQogNGEyOiAgIGMzICAgICAgICAgICAgICAgICAgICAgIHJldHENCiA0YTM6ICAg
+NjYgMGYgMWYgODQgMDAgMDAgMDAgICAgbm9wdyAgIDB4MCglcmF4LCVyYXgsMSkNCiA0YWE6ICAg
+MDAgMDANCiA0YWM6ICAgNjYgMmUgMGYgMWYgODQgMDAgMDAgICAgbm9wdyAgICVjczoweDAoJXJh
+eCwlcmF4LDEpDQogNGIzOiAgIDAwIDAwIDAwDQogNGI2OiAgIDY2IDJlIDBmIDFmIDg0IDAwIDAw
+ICAgIG5vcHcgICAlY3M6MHgwKCVyYXgsJXJheCwxKQ0KIDRiZDogICAwMCAwMCAwMA0KDQoNCg0K
+V2l0aCB0aGlzIHBhdGNoDQoNCjQwMDogICBlOCAwMCAwMCAwMCAwMCAgICAgICAgICBjYWxscSAg
+NDA1IDxwaV93YWtldXBfaGFuZGxlcisweDU+DQogNDA1OiAgIDU1ICAgICAgICAgICAgICAgICAg
+ICAgIHB1c2ggICAlcmJwDQogNDA2OiAgIDQ4IDg5IGU1ICAgICAgICAgICAgICAgIG1vdiAgICAl
+cnNwLCVyYnANCiA0MDk6ICAgNDEgNTUgICAgICAgICAgICAgICAgICAgcHVzaCAgICVyMTMNCiA0
+MGI6ICAgNDEgNTQgICAgICAgICAgICAgICAgICAgcHVzaCAgICVyMTINCiA0MGQ6ICAgNTMgICAg
+ICAgICAgICAgICAgICAgICAgcHVzaCAgICVyYngNCiA0MGU6ICAgNDkgYzcgYzUgMDAgMDAgMDAg
+MDAgICAgbW92ICAgICQweDAsJXIxMw0KIDQxNTogICA0OSBjNyBjNCAwMCAwMCAwMCAwMCAgICBt
+b3YgICAgJDB4MCwlcjEyDQogNDFjOiAgIDY1IDhiIDFkIDAwIDAwIDAwIDAwICAgIG1vdiAgICAl
+Z3M6MHgwKCVyaXApLCVlYnggICAgICAgICMgNDIzIDxwaV93YWtldXBfaGFuZGxlcisweDIzPg0K
+IDQyMzogICA0OCA2MyBkYiAgICAgICAgICAgICAgICBtb3ZzbHEgJWVieCwlcmJ4DQogNDI2OiAg
+IDRjIDAzIDJjIGRkIDAwIDAwIDAwICAgIGFkZCAgICAweDAoLCVyYngsOCksJXIxMw0KIDQyZDog
+ICAwMA0KIDQyZTogICA0YyA4OSBlZiAgICAgICAgICAgICAgICBtb3YgICAgJXIxMywlcmRpDQog
+NDMxOiAgIGU4IDAwIDAwIDAwIDAwICAgICAgICAgIGNhbGxxICA0MzYgPHBpX3dha2V1cF9oYW5k
+bGVyKzB4MzY+DQogNDM2OiAgIDRjIDAzIDI0IGRkIDAwIDAwIDAwICAgIGFkZCAgICAweDAoLCVy
+YngsOCksJXIxMg0KIDQzZDogICAwMA0KIDQzZTogICA0OSA4YiAwNCAyNCAgICAgICAgICAgICBt
+b3YgICAgKCVyMTIpLCVyYXgNCiA0NDI6ICAgNDkgMzkgYzQgICAgICAgICAgICAgICAgY21wICAg
+ICVyYXgsJXIxMg0KIDQ0NTogICA3NCAyZCAgICAgICAgICAgICAgICAgICBqZSAgICAgNDc0IDxw
+aV93YWtldXBfaGFuZGxlcisweDc0Pg0KIDQ0NzogICA0OCA4ZCA5OCA0MCBkOSBmZiBmZiAgICBs
+ZWEgICAgLTB4MjZjMCglcmF4KSwlcmJ4DQogNDRlOiAgIDQ4IDhiIDgzIGEwIDI2IDAwIDAwICAg
+IG1vdiAgICAweDI2YTAoJXJieCksJXJheA0KIDQ1NTogICBhOCAwMSAgICAgICAgICAgICAgICAg
+ICB0ZXN0ICAgJDB4MSwlYWwNCiA0NTc6ICAgNzQgMDggICAgICAgICAgICAgICAgICAgamUgICAg
+IDQ2MSA8cGlfd2FrZXVwX2hhbmRsZXIrMHg2MT4NCiA0NTk6ICAgNDggODkgZGYgICAgICAgICAg
+ICAgICAgbW92ICAgICVyYngsJXJkaQ0KIDQ1YzogICBlOCAwMCAwMCAwMCAwMCAgICAgICAgICBj
+YWxscSAgNDYxIDxwaV93YWtldXBfaGFuZGxlcisweDYxPg0KIDQ2MTogICA0OCA4YiA4MyBjMCAy
+NiAwMCAwMCAgICBtb3YgICAgMHgyNmMwKCVyYngpLCVyYXgNCiA0Njg6ICAgNDkgMzkgYzQgICAg
+ICAgICAgICAgICAgY21wICAgICVyYXgsJXIxMg0KIDQ2YjogICA0OCA4ZCA5OCA0MCBkOSBmZiBm
+ZiAgICBsZWEgICAgLTB4MjZjMCglcmF4KSwlcmJ4DQogNDcyOiAgIDc1IGRhICAgICAgICAgICAg
+ICAgICAgIGpuZSAgICA0NGUgPHBpX3dha2V1cF9oYW5kbGVyKzB4NGU+DQogNDc0OiAgIDQxIGM2
+IDQ1IDAwIDAwICAgICAgICAgIG1vdmIgICAkMHgwLDB4MCglcjEzKQ0KIDQ3OTogICA1YiAgICAg
+ICAgICAgICAgICAgICAgICBwb3AgICAgJXJieA0KIDQ3YTogICA0MSA1YyAgICAgICAgICAgICAg
+ICAgICBwb3AgICAgJXIxMg0KIDQ3YzogICA0MSA1ZCAgICAgICAgICAgICAgICAgICBwb3AgICAg
+JXIxMw0KIDQ3ZTogICA1ZCAgICAgICAgICAgICAgICAgICAgICBwb3AgICAgJXJicA0KIDQ3Zjog
+ICBjMyAgICAgICAgICAgICAgICAgICAgICByZXRxDQoNCg0KdGhlc2UgaXMgYSBzaW1pbGFyIHBh
+dGNoIDAzMWUzYmQ4OTg2ZmZmZTMxZTFkZGJmNTI2NGNjY2ZlMzBjOWFiZDcNCg0KLUxpDQo=
