@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 558514F019C
-	for <lists+kvm@lfdr.de>; Sat,  2 Apr 2022 14:47:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B10C64F01D0
+	for <lists+kvm@lfdr.de>; Sat,  2 Apr 2022 14:58:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354742AbiDBMt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 2 Apr 2022 08:49:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45174 "EHLO
+        id S1354835AbiDBNAq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 2 Apr 2022 09:00:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344635AbiDBMt1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 2 Apr 2022 08:49:27 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1CD03AA69;
-        Sat,  2 Apr 2022 05:47:35 -0700 (PDT)
+        with ESMTP id S238974AbiDBNAo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 2 Apr 2022 09:00:44 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0B0413DE9;
+        Sat,  2 Apr 2022 05:58:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1648903655; x=1680439655;
+  t=1648904332; x=1680440332;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=VBH8DaxfPRE0Sm3wGsVRsa5H0Vj+YGtrUbWzbb7wQHI=;
-  b=bk0HoOPNIW0pRWX21x6g/RvBFo8Jbi7fND6w/Q3hU3ompAe46hij8WJQ
-   g+LTAJP/jg8HTUbJ8yR/E9FFLf0bfYVDb9C2QodJFoEsbzdpVB/bzIEbX
-   MPk61Dx+wwAkh3TFdvMptTcMYyyUQeYcf+QYaz08X8HB5WhlJnm99RN4Z
-   PWqMzXYXbj/PkdqNXnTSvimY1Ota3F0xQRtiTx64fptCO14LVyzl/olHH
-   y+xUoL8RSTaceiECob/bu6X9Rst72XZiFRwZyem6QqGH53GNQjicZLxPV
-   oNQC2odw7I1SZzUcYMbuElgGkvdEhZDCQdjWQ8FVRZRabcSWAGhL9fIXx
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10304"; a="285237935"
+  bh=1oh9WbktFqlG6EG6X9CN0PCZbltAesQdU2DAWj+J/rg=;
+  b=CKr++QeL2Wdaz4JQnjNr+yh8hR1Y4geLMbdcHxigFxFzNuW6P8PI3nuL
+   VXwIphV6wrv8pYlAxY8vAQOLJTd2n9Qv0nMvvouZCSpUMRGJBJ6xb2bM5
+   E/d89jpy8ox7rwrbw55I4vQ63yplQzY3/j/9UyhBgV1kWFb4LHnFrYN0o
+   en94PqMN+4NuTyqLGPFgL6Bh+xOUtqc0OP2FepTxlujaUF5sebUu+JLOM
+   gHURBOJxHWcA9BccMCANS8s+kHX9duVlpcBc6ER67Pwauun8T097085Rw
+   qYvYPJPF48V0Z4pZTdCOvyYndG8vkFHg90qqNTX7jvIOR0GL65U7lAO2p
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10304"; a="260286864"
 X-IronPort-AV: E=Sophos;i="5.90,230,1643702400"; 
-   d="scan'208";a="285237935"
+   d="scan'208";a="260286864"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2022 05:47:35 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2022 05:58:52 -0700
 X-IronPort-AV: E=Sophos;i="5.90,230,1643702400"; 
-   d="scan'208";a="548131492"
+   d="scan'208";a="548132631"
 Received: from zengguan-mobl1.ccr.corp.intel.com (HELO [10.254.208.38]) ([10.254.208.38])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2022 05:47:29 -0700
-Message-ID: <23fbc97f-05e9-2609-46cc-4320ddc9df12@intel.com>
-Date:   Sat, 2 Apr 2022 20:47:20 +0800
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2022 05:58:45 -0700
+Message-ID: <1c6ad344-299c-bd78-c6e7-79a815e15ef1@intel.com>
+Date:   Sat, 2 Apr 2022 20:58:38 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
  Thunderbird/91.7.0
-Subject: Re: [PATCH v7 2/8] KVM: VMX: Extend BUILD_CONTROLS_SHADOW macro to
- support 64-bit variation
+Subject: Re: [PATCH v7 3/8] KVM: VMX: Detect Tertiary VM-Execution control
+ when setup VMCS config
 Content-Language: en-US
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -67,16 +67,15 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         "Gao, Chao" <chao.gao@intel.com>,
         Robert Hoo <robert.hu@linux.intel.com>
 References: <20220304080725.18135-1-guang.zeng@intel.com>
- <20220304080725.18135-3-guang.zeng@intel.com> <YkYquqLOduNlQntZ@google.com>
+ <20220304080725.18135-4-guang.zeng@intel.com> <YkYuDo3hOmcwA1iF@google.com>
 From:   Zeng Guang <guang.zeng@intel.com>
-In-Reply-To: <YkYquqLOduNlQntZ@google.com>
+In-Reply-To: <YkYuDo3hOmcwA1iF@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -84,60 +83,47 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 4/1/2022 6:27 AM, Sean Christopherson wrote:
+On 4/1/2022 6:41 AM, Sean Christopherson wrote:
 > On Fri, Mar 04, 2022, Zeng Guang wrote:
->> +#define BUILD_CONTROLS_SHADOW(lname, uname, bits)			\
->> +static inline								\
->> +void lname##_controls_set(struct vcpu_vmx *vmx, u##bits val)		\
->> +{									\
->> +	if (vmx->loaded_vmcs->controls_shadow.lname != val) {		\
->> +		vmcs_write##bits(uname, val);				\
->> +		vmx->loaded_vmcs->controls_shadow.lname = val;		\
->> +	}								\
->> +}									\
->> +static inline u##bits __##lname##_controls_get(struct loaded_vmcs *vmcs)\
->> +{									\
->> +	return vmcs->controls_shadow.lname;				\
->> +}									\
->> +static inline u##bits lname##_controls_get(struct vcpu_vmx *vmx)	\
->> +{									\
->> +	return __##lname##_controls_get(vmx->loaded_vmcs);		\
->> +}									\
->> +static inline								\
-> Drop the newline, there's no need to split this across two lines.  Aligning the
-> backslashes will mean they all poke past the 80 char soft limit, but that's totally
-> ok.  The whole point of the line limit is to improve readability, and a trivial
-> runover is much less painful than a split function declaration.  As a bonus, all
-> the backslashes are aligned, have leading whitespace, and still land on a tab stop :-)
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index c569dc2b9192..8a5713d49635 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -2422,6 +2422,21 @@ static __init int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
+>>   	return 0;
+>>   }
+>>   
+>> +static __init int adjust_vmx_controls_64(u64 ctl_min, u64 ctl_opt,
+> I slightly prefer controls64 over controls_64.  As usual, KVM is inconsistent as
+> a whole, but vmcs_read/write64 omit the underscore, so we can at least be somewhat
+> consistent within VMX.
 >
-> #define BUILD_CONTROLS_SHADOW(lname, uname, bits)				\
-> static inline void lname##_controls_set(struct vcpu_vmx *vmx, u##bits val)	\
-> {										\
-> 	if (vmx->loaded_vmcs->controls_shadow.lname != val) {			\
-> 		vmcs_write##bits(uname, val);					\
-> 		vmx->loaded_vmcs->controls_shadow.lname = val;			\
-> 	}									\
-> }										\
-> static inline u##bits __##lname##_controls_get(struct loaded_vmcs *vmcs)	\
-> {										\
-> 	return vmcs->controls_shadow.lname;					\
-> }										\
-> static inline u##bits lname##_controls_get(struct vcpu_vmx *vmx)		\
-> {										\
-> 	return __##lname##_controls_get(vmx->loaded_vmcs);			\
-> }										\
-> static inline void lname##_controls_setbit(struct vcpu_vmx *vmx, u##bits val)	\
-> {										\
-> 	lname##_controls_set(vmx, lname##_controls_get(vmx) | val);		\
-> }										\
-> static inline void lname##_controls_clearbit(struct vcpu_vmx *vmx, u##bits val)	\
-> {										\
-> 	lname##_controls_set(vmx, lname##_controls_get(vmx) & ~val);		\
-> }
+>> +					 u32 msr, u64 *result)
+>> +{
+>> +	u64 allowed1;
+>> +
+>> +	rdmsrl(msr, allowed1);
+>> +
+>> +	/* Ensure minimum (required) set of control bits are supported. */
+>> +	if (ctl_min & ~allowed1)
+> Eh, just drop @ctl_min.  Practically speaking, there is zero chance tertiary
+> controls or any other control of this nature will ever be mandatory.  Secondary
+> controls would fall into the same boat, but specifying min=0 allows it to share
+> helpers, so it's the lesser of evils.
 >
-> With that fixed,
+> With the error return gone, this can be
 >
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
+>    static __init u64 adjust_vmx_controls64(u64 ctl_opt, u32 msr)
+>    {
+> 	u64 allowed;
+>
+> 	rdmsrl(msr, allowed);
+>
+> 	return ctl_opt & allowed;
+>    }
 
-OK. I'll revise it.
+Make sense. I will change it.  Thanks.
 
+
+> Alternatively, we could take the control-to-modify directly and have no return,
+> but I like having the "u64 opt = ..." in the caller.
