@@ -2,52 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30D154EFFB0
-	for <lists+kvm@lfdr.de>; Sat,  2 Apr 2022 10:33:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 828FD4F0047
+	for <lists+kvm@lfdr.de>; Sat,  2 Apr 2022 12:01:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235044AbiDBIe4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 2 Apr 2022 04:34:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45090 "EHLO
+        id S1354236AbiDBKDi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 2 Apr 2022 06:03:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230062AbiDBIey (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 2 Apr 2022 04:34:54 -0400
-Received: from baidu.com (mx22.baidu.com [220.181.50.185])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 53365158558
-        for <kvm@vger.kernel.org>; Sat,  2 Apr 2022 01:33:02 -0700 (PDT)
-Received: from BJHW-Mail-Ex13.internal.baidu.com (unknown [10.127.64.36])
-        by Forcepoint Email with ESMTPS id 178A18D969F2235F68C3;
-        Sat,  2 Apr 2022 16:32:55 +0800 (CST)
-Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
- BJHW-Mail-Ex13.internal.baidu.com (10.127.64.36) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.20; Sat, 2 Apr 2022 16:32:54 +0800
-Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
- BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
- 15.01.2308.020; Sat, 2 Apr 2022 16:32:54 +0800
-From:   "Li,Rongqing" <lirongqing@baidu.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>
-Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0hdIEtWTTogVk1YOiBvcHRpbWl6ZSBwaV93YWtldXBf?=
- =?utf-8?Q?handler?=
-Thread-Topic: [PATCH] KVM: VMX: optimize pi_wakeup_handler
-Thread-Index: AQHYRmmqp/FH1eZDIUue+xcJmL0TgKzcSb8g
-Date:   Sat, 2 Apr 2022 08:32:54 +0000
-Message-ID: <d63acc4d9ac24a48b49415a45238e907@baidu.com>
-References: <1648872113-24329-1-git-send-email-lirongqing@baidu.com>
- <e7896b4e-0b29-b735-88b8-34dd3b266d3d@redhat.com>
-In-Reply-To: <e7896b4e-0b29-b735-88b8-34dd3b266d3d@redhat.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.22.206.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S1354232AbiDBKDg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 2 Apr 2022 06:03:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BE09A154702
+        for <kvm@vger.kernel.org>; Sat,  2 Apr 2022 03:01:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648893703;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=LYm+0CN57sQSjMfbJWHKtXLX0EOoFZkZWVWS7mzLOeA=;
+        b=UYbeZxqG652KIS5klhiu/hPbMnuAoeVrUNeEYrLkOs+o6DVYmxMOVHs0ulku74v4zOGY+B
+        ARj+5Iiblla/A0YN7dasImaKm8HrXjvvVDnrW0I871an8LRrQPXBjjb3Kh9W/m1Uzty2qQ
+        iY456GMmLEfBbC42A1Q0r7JrOxcCMpU=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-108-R6-uAnFGP_GvO8V4GOIgLA-1; Sat, 02 Apr 2022 06:01:40 -0400
+X-MC-Unique: R6-uAnFGP_GvO8V4GOIgLA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2F9FC3806708;
+        Sat,  2 Apr 2022 10:01:40 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 11A94112C063;
+        Sat,  2 Apr 2022 10:01:40 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fixes and docs for Linux 5.18 merge window
+Date:   Sat,  2 Apr 2022 06:01:39 -0400
+Message-Id: <20220402100139.207620-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -55,99 +56,169 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS3pgq7ku7bljp/ku7YtLS0tLQ0KPiDlj5Hku7bkuro6IFBhb2xvIEJvbnppbmkg
-PHBhb2xvLmJvbnppbmlAZ21haWwuY29tPiDku6PooaggUGFvbG8gQm9uemluaQ0KPiDlj5HpgIHm
-l7bpl7Q6IDIwMjLlubQ05pyIMuaXpSAxNjoxNA0KPiDmlLbku7bkuro6IExpLFJvbmdxaW5nIDxs
-aXJvbmdxaW5nQGJhaWR1LmNvbT47IGt2bUB2Z2VyLmtlcm5lbC5vcmc7DQo+IHNlYW5qY0Bnb29n
-bGUuY29tOyB2a3V6bmV0c0ByZWRoYXQuY29tDQo+IOS4u+mimDogUmU6IFtQQVRDSF0gS1ZNOiBW
-TVg6IG9wdGltaXplIHBpX3dha2V1cF9oYW5kbGVyDQo+IA0KPiBPbiA0LzIvMjIgMDY6MDEsIExp
-IFJvbmdRaW5nIHdyb3RlOg0KPiA+IHBpX3dha2V1cF9oYW5kbGVyIGlzIHVzZWQgdG8gd2FrZXVw
-IHRoZSBzbGVlcCB2Q1BVcyBieSBwb3N0ZWQgaXJxDQo+ID4gbGlzdF9mb3JfZWFjaF9lbnRyeSBp
-cyB1c2VkIGluIGl0LCBhbmQgd2hvc2UgaW5wdXQgaXMgb3RoZXIgZnVuY3Rpb24NCj4gPiBwZXJf
-Y3B1KCksIFRoYXQgY2F1c2UgdGhhdCBwZXJfY3B1KCkgYmUgaW52b2tlZCBhdCBsZWFzdCB0d2lj
-ZSB3aGVuDQo+ID4gdGhlcmUgaXMgb25lIHNsZWVwIHZDUFUNCj4gPg0KPiA+IHNvIG9wdGltaXpl
-IHBpX3dha2V1cF9oYW5kbGVyIGl0IGJ5IHJlYWRpbmcgb25jZSB3aGljaCBpcyBzYWZlIGluDQo+
-ID4gc3BpbmxvY2sgcHJvdGVjdGlvbg0KPiA+DQo+ID4gYW5kIHNhbWUgdG8gcGVyIENQVSBzcGlu
-bG9jaw0KPiANCj4gV2hhdCdzIHRoZSBkaWZmZXJlbmNlIGluIHRoZSBnZW5lcmF0ZWQgY29kZT8N
-Cj4gDQoNClRoaXMgcmVkdWNlcyBvbmUgZmlmdGggYXNtIGNvZGVzDQoNCldpdGhvdXQgdGhpcyBw
-YXRjaDoNCg0KMDAwMDAwMDAwMDAwMDQwMCA8cGlfd2FrZXVwX2hhbmRsZXI+Og0KIDQwMDogICBl
-OCAwMCAwMCAwMCAwMCAgICAgICAgICBjYWxscSAgNDA1IDxwaV93YWtldXBfaGFuZGxlcisweDU+
-DQogNDA1OiAgIDU1ICAgICAgICAgICAgICAgICAgICAgIHB1c2ggICAlcmJwDQogNDA2OiAgIDQ4
-IDg5IGU1ICAgICAgICAgICAgICAgIG1vdiAgICAlcnNwLCVyYnANCiA0MDk6ICAgNDEgNTcgICAg
-ICAgICAgICAgICAgICAgcHVzaCAgICVyMTUNCiA0MGI6ICAgNDEgNTYgICAgICAgICAgICAgICAg
-ICAgcHVzaCAgICVyMTQNCiA0MGQ6ICAgNDEgNTUgICAgICAgICAgICAgICAgICAgcHVzaCAgICVy
-MTMNCiA0MGY6ICAgNDEgNTQgICAgICAgICAgICAgICAgICAgcHVzaCAgICVyMTINCiA0MTE6ICAg
-NDkgYzcgYzQgMDAgMDAgMDAgMDAgICAgbW92ICAgICQweDAsJXIxMg0KIDQxODogICA2NSA0NCA4
-YiAyZCAwMCAwMCAwMCAgICBtb3YgICAgJWdzOjB4MCglcmlwKSwlcjEzZCAgICAgICAgIyA0MjAg
-PHBpX3dha2V1cF9oYW5kbGVyKzB4MjA+DQogNDFmOiAgIDAwDQogNDIwOiAgIDRkIDYzIGVkICAg
-ICAgICAgICAgICAgIG1vdnNscSAlcjEzZCwlcjEzDQogNDIzOiAgIDRjIDg5IGU3ICAgICAgICAg
-ICAgICAgIG1vdiAgICAlcjEyLCVyZGkNCiA0MjY6ICAgNTMgICAgICAgICAgICAgICAgICAgICAg
-cHVzaCAgICVyYngNCiA0Mjc6ICAgNGEgMDMgM2MgZWQgMDAgMDAgMDAgICAgYWRkICAgIDB4MCgs
-JXIxMyw4KSwlcmRpDQogNDJlOiAgIDAwDQogNDJmOiAgIDQ5IGM3IGM2IDAwIDAwIDAwIDAwICAg
-IG1vdiAgICAkMHgwLCVyMTQNCiA0MzY6ICAgZTggMDAgMDAgMDAgMDAgICAgICAgICAgY2FsbHEg
-IDQzYiA8cGlfd2FrZXVwX2hhbmRsZXIrMHgzYj4NCiA0M2I6ICAgNGEgOGIgMGMgZWQgMDAgMDAg
-MDAgICAgbW92ICAgIDB4MCgsJXIxMyw4KSwlcmN4DQogNDQyOiAgIDAwDQogNDQzOiAgIDRjIDg5
-IGYwICAgICAgICAgICAgICAgIG1vdiAgICAlcjE0LCVyYXgNCiA0NDY6ICAgNDggOGIgMTQgMDEg
-ICAgICAgICAgICAgbW92ICAgICglcmN4LCVyYXgsMSksJXJkeA0KIDQ0YTogICA0OCAwMSBjOCAg
-ICAgICAgICAgICAgICBhZGQgICAgJXJjeCwlcmF4DQogNDRkOiAgIDQ4IDM5IGMyICAgICAgICAg
-ICAgICAgIGNtcCAgICAlcmF4LCVyZHgNCiA0NTA6ICAgNzQgM2UgICAgICAgICAgICAgICAgICAg
-amUgICAgIDQ5MCA8cGlfd2FrZXVwX2hhbmRsZXIrMHg5MD4NCiA0NTI6ICAgNDggOGQgOWEgNDAg
-ZDkgZmYgZmYgICAgbGVhICAgIC0weDI2YzAoJXJkeCksJXJieA0KIDQ1OTogICA0OSBjNyBjNyAw
-MCAwMCAwMCAwMCAgICBtb3YgICAgJDB4MCwlcjE1DQogNDYwOiAgIDQ4IDhiIDgzIGEwIDI2IDAw
-IDAwICAgIG1vdiAgICAweDI2YTAoJXJieCksJXJheA0KIDQ2NzogICBhOCAwMSAgICAgICAgICAg
-ICAgICAgICB0ZXN0ICAgJDB4MSwlYWwNCiA0Njk6ICAgNzQgMDggICAgICAgICAgICAgICAgICAg
-amUgICAgIDQ3MyA8cGlfd2FrZXVwX2hhbmRsZXIrMHg3Mz4NCiA0NmI6ICAgNDggODkgZGYgICAg
-ICAgICAgICAgICAgbW92ICAgICVyYngsJXJkaQ0KIDQ2ZTogICBlOCAwMCAwMCAwMCAwMCAgICAg
-ICAgICBjYWxscSAgNDczIDxwaV93YWtldXBfaGFuZGxlcisweDczPg0KIDQ3MzogICA0YiA4YiAw
-YyBlZiAgICAgICAgICAgICBtb3YgICAgKCVyMTUsJXIxMyw4KSwlcmN4DQogNDc3OiAgIDQ4IDhi
-IDkzIGMwIDI2IDAwIDAwICAgIG1vdiAgICAweDI2YzAoJXJieCksJXJkeA0KIDQ3ZTogICA0YyA4
-OSBmMCAgICAgICAgICAgICAgICBtb3YgICAgJXIxNCwlcmF4DQogNDgxOiAgIDQ4IDAxIGM4ICAg
-ICAgICAgICAgICAgIGFkZCAgICAlcmN4LCVyYXgNCiA0ODQ6ICAgNDggOGQgOWEgNDAgZDkgZmYg
-ZmYgICAgbGVhICAgIC0weDI2YzAoJXJkeCksJXJieA0KIDQ4YjogICA0OCAzOSBjMiAgICAgICAg
-ICAgICAgICBjbXAgICAgJXJheCwlcmR4DQogNDhlOiAgIDc1IGQwICAgICAgICAgICAgICAgICAg
-IGpuZSAgICA0NjAgPHBpX3dha2V1cF9oYW5kbGVyKzB4NjA+DQogNDkwOiAgIDQ5IDAxIGNjICAg
-ICAgICAgICAgICAgIGFkZCAgICAlcmN4LCVyMTINCiA0OTM6ICAgNDEgYzYgMDQgMjQgMDAgICAg
-ICAgICAgbW92YiAgICQweDAsKCVyMTIpDQogNDk4OiAgIDViICAgICAgICAgICAgICAgICAgICAg
-IHBvcCAgICAlcmJ4DQogNDk5OiAgIDQxIDVjICAgICAgICAgICAgICAgICAgIHBvcCAgICAlcjEy
-DQogNDliOiAgIDQxIDVkICAgICAgICAgICAgICAgICAgIHBvcCAgICAlcjEzDQogNDlkOiAgIDQx
-IDVlICAgICAgICAgICAgICAgICAgIHBvcCAgICAlcjE0DQogNDlmOiAgIDQxIDVmICAgICAgICAg
-ICAgICAgICAgIHBvcCAgICAlcjE1DQogNGExOiAgIDVkICAgICAgICAgICAgICAgICAgICAgIHBv
-cCAgICAlcmJwDQogNGEyOiAgIGMzICAgICAgICAgICAgICAgICAgICAgIHJldHENCiA0YTM6ICAg
-NjYgMGYgMWYgODQgMDAgMDAgMDAgICAgbm9wdyAgIDB4MCglcmF4LCVyYXgsMSkNCiA0YWE6ICAg
-MDAgMDANCiA0YWM6ICAgNjYgMmUgMGYgMWYgODQgMDAgMDAgICAgbm9wdyAgICVjczoweDAoJXJh
-eCwlcmF4LDEpDQogNGIzOiAgIDAwIDAwIDAwDQogNGI2OiAgIDY2IDJlIDBmIDFmIDg0IDAwIDAw
-ICAgIG5vcHcgICAlY3M6MHgwKCVyYXgsJXJheCwxKQ0KIDRiZDogICAwMCAwMCAwMA0KDQoNCg0K
-V2l0aCB0aGlzIHBhdGNoDQoNCjQwMDogICBlOCAwMCAwMCAwMCAwMCAgICAgICAgICBjYWxscSAg
-NDA1IDxwaV93YWtldXBfaGFuZGxlcisweDU+DQogNDA1OiAgIDU1ICAgICAgICAgICAgICAgICAg
-ICAgIHB1c2ggICAlcmJwDQogNDA2OiAgIDQ4IDg5IGU1ICAgICAgICAgICAgICAgIG1vdiAgICAl
-cnNwLCVyYnANCiA0MDk6ICAgNDEgNTUgICAgICAgICAgICAgICAgICAgcHVzaCAgICVyMTMNCiA0
-MGI6ICAgNDEgNTQgICAgICAgICAgICAgICAgICAgcHVzaCAgICVyMTINCiA0MGQ6ICAgNTMgICAg
-ICAgICAgICAgICAgICAgICAgcHVzaCAgICVyYngNCiA0MGU6ICAgNDkgYzcgYzUgMDAgMDAgMDAg
-MDAgICAgbW92ICAgICQweDAsJXIxMw0KIDQxNTogICA0OSBjNyBjNCAwMCAwMCAwMCAwMCAgICBt
-b3YgICAgJDB4MCwlcjEyDQogNDFjOiAgIDY1IDhiIDFkIDAwIDAwIDAwIDAwICAgIG1vdiAgICAl
-Z3M6MHgwKCVyaXApLCVlYnggICAgICAgICMgNDIzIDxwaV93YWtldXBfaGFuZGxlcisweDIzPg0K
-IDQyMzogICA0OCA2MyBkYiAgICAgICAgICAgICAgICBtb3ZzbHEgJWVieCwlcmJ4DQogNDI2OiAg
-IDRjIDAzIDJjIGRkIDAwIDAwIDAwICAgIGFkZCAgICAweDAoLCVyYngsOCksJXIxMw0KIDQyZDog
-ICAwMA0KIDQyZTogICA0YyA4OSBlZiAgICAgICAgICAgICAgICBtb3YgICAgJXIxMywlcmRpDQog
-NDMxOiAgIGU4IDAwIDAwIDAwIDAwICAgICAgICAgIGNhbGxxICA0MzYgPHBpX3dha2V1cF9oYW5k
-bGVyKzB4MzY+DQogNDM2OiAgIDRjIDAzIDI0IGRkIDAwIDAwIDAwICAgIGFkZCAgICAweDAoLCVy
-YngsOCksJXIxMg0KIDQzZDogICAwMA0KIDQzZTogICA0OSA4YiAwNCAyNCAgICAgICAgICAgICBt
-b3YgICAgKCVyMTIpLCVyYXgNCiA0NDI6ICAgNDkgMzkgYzQgICAgICAgICAgICAgICAgY21wICAg
-ICVyYXgsJXIxMg0KIDQ0NTogICA3NCAyZCAgICAgICAgICAgICAgICAgICBqZSAgICAgNDc0IDxw
-aV93YWtldXBfaGFuZGxlcisweDc0Pg0KIDQ0NzogICA0OCA4ZCA5OCA0MCBkOSBmZiBmZiAgICBs
-ZWEgICAgLTB4MjZjMCglcmF4KSwlcmJ4DQogNDRlOiAgIDQ4IDhiIDgzIGEwIDI2IDAwIDAwICAg
-IG1vdiAgICAweDI2YTAoJXJieCksJXJheA0KIDQ1NTogICBhOCAwMSAgICAgICAgICAgICAgICAg
-ICB0ZXN0ICAgJDB4MSwlYWwNCiA0NTc6ICAgNzQgMDggICAgICAgICAgICAgICAgICAgamUgICAg
-IDQ2MSA8cGlfd2FrZXVwX2hhbmRsZXIrMHg2MT4NCiA0NTk6ICAgNDggODkgZGYgICAgICAgICAg
-ICAgICAgbW92ICAgICVyYngsJXJkaQ0KIDQ1YzogICBlOCAwMCAwMCAwMCAwMCAgICAgICAgICBj
-YWxscSAgNDYxIDxwaV93YWtldXBfaGFuZGxlcisweDYxPg0KIDQ2MTogICA0OCA4YiA4MyBjMCAy
-NiAwMCAwMCAgICBtb3YgICAgMHgyNmMwKCVyYngpLCVyYXgNCiA0Njg6ICAgNDkgMzkgYzQgICAg
-ICAgICAgICAgICAgY21wICAgICVyYXgsJXIxMg0KIDQ2YjogICA0OCA4ZCA5OCA0MCBkOSBmZiBm
-ZiAgICBsZWEgICAgLTB4MjZjMCglcmF4KSwlcmJ4DQogNDcyOiAgIDc1IGRhICAgICAgICAgICAg
-ICAgICAgIGpuZSAgICA0NGUgPHBpX3dha2V1cF9oYW5kbGVyKzB4NGU+DQogNDc0OiAgIDQxIGM2
-IDQ1IDAwIDAwICAgICAgICAgIG1vdmIgICAkMHgwLDB4MCglcjEzKQ0KIDQ3OTogICA1YiAgICAg
-ICAgICAgICAgICAgICAgICBwb3AgICAgJXJieA0KIDQ3YTogICA0MSA1YyAgICAgICAgICAgICAg
-ICAgICBwb3AgICAgJXIxMg0KIDQ3YzogICA0MSA1ZCAgICAgICAgICAgICAgICAgICBwb3AgICAg
-JXIxMw0KIDQ3ZTogICA1ZCAgICAgICAgICAgICAgICAgICAgICBwb3AgICAgJXJicA0KIDQ3Zjog
-ICBjMyAgICAgICAgICAgICAgICAgICAgICByZXRxDQoNCg0KdGhlc2UgaXMgYSBzaW1pbGFyIHBh
-dGNoIDAzMWUzYmQ4OTg2ZmZmZTMxZTFkZGJmNTI2NGNjY2ZlMzBjOWFiZDcNCg0KLUxpDQo=
+Linus,
+
+The following changes since commit c9b8fecddb5bb4b67e351bbaeaa648a6f7456912:
+
+  KVM: use kvcalloc for array allocations (2022-03-21 09:28:41 -0400)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to c15e0ae42c8e5a61e9aca8aac920517cf7b3e94e:
+
+  KVM: x86: fix sending PV IPI (2022-04-02 05:37:27 -0400)
+
+----------------------------------------------------------------
+* Only do MSR filtering for MSRs accessed by rdmsr/wrmsr
+
+* Documentation improvements
+
+* Prevent module exit until all VMs are freed
+
+* PMU Virtualization fixes
+
+* Fix for kvm_irq_delivery_to_apic_fast() NULL-pointer dereferences
+
+* Other miscellaneous bugfixes
+
+----------------------------------------------------------------
+David Matlack (2):
+      KVM: Prevent module exit until all VMs are freed
+      Revert "KVM: set owner of cpu and vm file operations"
+
+David Woodhouse (2):
+      KVM: avoid double put_page with gfn-to-pfn cache
+      KVM: Remove dirty handling from gfn_to_pfn_cache completely
+
+Hou Wenlong (2):
+      KVM: x86/emulator: Emulate RDPID only if it is enabled in guest
+      KVM: x86: Only do MSR filtering when access MSR by rdmsr/wrmsr
+
+Jim Mattson (2):
+      KVM: x86/pmu: Use different raw event masks for AMD and Intel
+      KVM: x86/svm: Clear reserved bits written to PerfEvtSeln MSRs
+
+Lai Jiangshan (4):
+      KVM: X86: Change the type of access u32 to u64
+      KVM: X86: Fix comments in update_permission_bitmask
+      KVM: X86: Rename variable smap to not_smap in permission_fault()
+      KVM: X86: Handle implicit supervisor access with SMAP
+
+Li RongQing (1):
+      KVM: x86: fix sending PV IPI
+
+Like Xu (1):
+      KVM: x86/pmu: Fix and isolate TSX-specific performance event logic
+
+Maxim Levitsky (5):
+      KVM: x86: mmu: trace kvm_mmu_set_spte after the new SPTE was set
+      KVM: x86: SVM: fix avic spec based definitions again
+      KVM: x86: SVM: move tsc ratio definitions to svm.h
+      kvm: x86: SVM: remove unused defines
+      KVM: x86: SVM: fix tsc scaling when the host doesn't support it
+
+Nathan Chancellor (1):
+      KVM: x86: Fix clang -Wimplicit-fallthrough in do_host_cpuid()
+
+Paolo Bonzini (9):
+      Documentation: kvm: fixes for locking.rst
+      Documentation: kvm: include new locks
+      Documentation: KVM: add separate directories for architecture-specific documentation
+      Documentation: KVM: add virtual CPU errata documentation
+      Documentation: KVM: add API issues section
+      KVM: MMU: propagate alloc_workqueue failure
+      KVM: x86: document limitations of MSR filtering
+      KVM: MIPS: remove reference to trap&emulate virtualization
+      KVM: x86/mmu: do compare-and-exchange of gPTE via the user address
+
+Peter Gonda (1):
+      KVM: SVM: Fix kvm_cache_regs.h inclusions for is_guest_mode()
+
+Sean Christopherson (6):
+      KVM: x86/mmu: Zap only TDP MMU leafs in zap range and mmu_notifier unmap
+      KVM: Don't actually set a request when evicting vCPUs for GFN cache invd
+      KVM: Use enum to track if cached PFN will be used in guest and/or host
+      KVM: x86: Make APICv inhibit reasons an enum and cleanup naming
+      KVM: x86: Add wrappers for setting/clearing APICv inhibits
+      KVM: x86: Trace all APICv inhibit changes and capture overall status
+
+Vitaly Kuznetsov (3):
+      KVM: x86: Check lapic_in_kernel() before attempting to set a SynIC irq
+      KVM: x86: Avoid theoretical NULL pointer dereference in kvm_irq_delivery_to_apic_fast()
+      KVM: x86: Forbid VMM to set SYNIC/STIMER MSRs when SynIC wasn't activated
+
+Yi Wang (1):
+      KVM: SVM: fix panic on out-of-bounds guest IRQ
+
+Zhenzhong Duan (2):
+      KVM: x86: cleanup enter_rmode()
+      KVM: x86: Remove redundant vm_entry_controls_clearbit() call
+
+ Documentation/virt/kvm/api.rst                     |  61 +++++++-
+ Documentation/virt/kvm/index.rst                   |  26 +---
+ Documentation/virt/kvm/locking.rst                 |  43 ++++--
+ Documentation/virt/kvm/s390/index.rst              |  12 ++
+ Documentation/virt/kvm/{ => s390}/s390-diag.rst    |   0
+ Documentation/virt/kvm/{ => s390}/s390-pv-boot.rst |   0
+ Documentation/virt/kvm/{ => s390}/s390-pv.rst      |   0
+ Documentation/virt/kvm/vcpu-requests.rst           |  10 ++
+ .../virt/kvm/{ => x86}/amd-memory-encryption.rst   |   0
+ Documentation/virt/kvm/{ => x86}/cpuid.rst         |   0
+ Documentation/virt/kvm/x86/errata.rst              |  39 +++++
+ Documentation/virt/kvm/{ => x86}/halt-polling.rst  |   0
+ Documentation/virt/kvm/{ => x86}/hypercalls.rst    |   0
+ Documentation/virt/kvm/x86/index.rst               |  19 +++
+ Documentation/virt/kvm/{ => x86}/mmu.rst           |   0
+ Documentation/virt/kvm/{ => x86}/msr.rst           |   0
+ Documentation/virt/kvm/{ => x86}/nested-vmx.rst    |   0
+ .../virt/kvm/{ => x86}/running-nested-guests.rst   |   0
+ Documentation/virt/kvm/{ => x86}/timekeeping.rst   |   0
+ arch/s390/kvm/kvm-s390.c                           |   2 +-
+ arch/x86/include/asm/kvm_host.h                    |  46 ++++--
+ arch/x86/include/asm/svm.h                         |  14 +-
+ arch/x86/kernel/kvm.c                              |   2 +-
+ arch/x86/kvm/cpuid.c                               |   1 +
+ arch/x86/kvm/emulate.c                             |   8 +-
+ arch/x86/kvm/hyperv.c                              |  22 ++-
+ arch/x86/kvm/i8254.c                               |   6 +-
+ arch/x86/kvm/kvm_emulate.h                         |   3 +
+ arch/x86/kvm/lapic.c                               |   4 +
+ arch/x86/kvm/mmu.h                                 |  32 ++--
+ arch/x86/kvm/mmu/mmu.c                             |  27 ++--
+ arch/x86/kvm/mmu/paging_tmpl.h                     |  82 +++++------
+ arch/x86/kvm/mmu/tdp_mmu.c                         |  72 ++++-----
+ arch/x86/kvm/mmu/tdp_mmu.h                         |  12 +-
+ arch/x86/kvm/pmu.c                                 |  18 +--
+ arch/x86/kvm/svm/avic.c                            |  14 +-
+ arch/x86/kvm/svm/pmu.c                             |   9 +-
+ arch/x86/kvm/svm/svm.c                             |  36 ++---
+ arch/x86/kvm/svm/svm.h                             |  15 +-
+ arch/x86/kvm/svm/svm_onhyperv.c                    |   1 -
+ arch/x86/kvm/trace.h                               |  22 +--
+ arch/x86/kvm/vmx/pmu_intel.c                       |  14 +-
+ arch/x86/kvm/vmx/vmx.c                             |  26 ++--
+ arch/x86/kvm/x86.c                                 | 161 +++++++++++++--------
+ arch/x86/kvm/xen.c                                 |   7 +-
+ include/linux/kvm_host.h                           |  60 +++++---
+ include/linux/kvm_types.h                          |  11 +-
+ virt/kvm/kvm_main.c                                |  22 ++-
+ virt/kvm/pfncache.c                                |  72 ++++-----
+ 49 files changed, 617 insertions(+), 414 deletions(-)
+ create mode 100644 Documentation/virt/kvm/s390/index.rst
+ rename Documentation/virt/kvm/{ => s390}/s390-diag.rst (100%)
+ rename Documentation/virt/kvm/{ => s390}/s390-pv-boot.rst (100%)
+ rename Documentation/virt/kvm/{ => s390}/s390-pv.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/amd-memory-encryption.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/cpuid.rst (100%)
+ create mode 100644 Documentation/virt/kvm/x86/errata.rst
+ rename Documentation/virt/kvm/{ => x86}/halt-polling.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/hypercalls.rst (100%)
+ create mode 100644 Documentation/virt/kvm/x86/index.rst
+ rename Documentation/virt/kvm/{ => x86}/mmu.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/msr.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/nested-vmx.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/running-nested-guests.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/timekeeping.rst (100%)
+
