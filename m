@@ -2,129 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D83774F18C1
-	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 17:44:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C5B54F18D5
+	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 17:49:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378707AbiDDPqL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Apr 2022 11:46:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58796 "EHLO
+        id S1378712AbiDDPvV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Apr 2022 11:51:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378676AbiDDPqD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Apr 2022 11:46:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 11A71DE1
-        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 08:43:59 -0700 (PDT)
+        with ESMTP id S1346326AbiDDPvP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Apr 2022 11:51:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 619E31EC4E
+        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 08:49:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649087039;
+        s=mimecast20190719; t=1649087358;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding;
-        bh=kls4H2EB7YX5rzPR+3xxDKqrS+H7dAZmc8cmBIab2ZE=;
-        b=b5V0hdEQxwr+x+llFnYgMMTDy0lQtx62pl3rSXSjXQ4HECdF5YXPK4BJElQ6tsigsi1tZp
-        5I/+OKW0/CU9cSmQNPNNAQb2/rtBO5iFkwbYKSev/+sU28teBCIAcJ/V6w6aOLyh1/SoeL
-        CD5b/khYgtZNeHJeTCJakPp0LNoZKys=
+        bh=Lih7ptoPycxcOj7GRw8MqHSfHs35MpyiN5qQLV2av7Y=;
+        b=AEPN9MhVAktlzlglnoHQDaipcKUKxvbg2oN6na4YrpsflVj83qQrKDlK8rBUhfnU4vArLh
+        H18Q1lI0OFPUqyF0Q2Zg/R8NXRawefdAXE9cVUoeNN9EuwsDVtBI+SE0ye9ASumzlETUYq
+        f/4Z9qdBCTTlt4Dxcrt07vOAGIScKgE=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-460-uCSgc3m-PLG5Y5xmEJDAbQ-1; Mon, 04 Apr 2022 11:43:58 -0400
-X-MC-Unique: uCSgc3m-PLG5Y5xmEJDAbQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+ us-mta-613-AKySnxs4MWyKR3nKUTIraQ-1; Mon, 04 Apr 2022 11:49:15 -0400
+X-MC-Unique: AKySnxs4MWyKR3nKUTIraQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DBBBD833960;
-        Mon,  4 Apr 2022 15:43:56 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8E753899EC2;
+        Mon,  4 Apr 2022 15:49:14 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DD927145BEE2;
-        Mon,  4 Apr 2022 15:43:55 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E9A8C2166B25;
+        Mon,  4 Apr 2022 15:49:13 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     stable@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: [PATCH 5.4] KVM: x86: Forbid VMM to set SYNIC/STIMER MSRs when SynIC wasn't activated
-Date:   Mon,  4 Apr 2022 11:43:52 -0400
-Message-Id: <20220404154352.477059-4-pbonzini@redhat.com>
+Cc:     stable@vger.kernel.org, Qiuhao Li <qiuhao@sysec.org>,
+        Gaoning Pan <pgn@zju.edu.cn>, Yongkang Jia <kangel@zju.edu.cn>,
+        syzbot+6cde2282daa792c49ab8@syzkaller.appspotmail.com,
+        Tadeusz Struk <tadeusz.struk@linaro.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH 5.4 v2] KVM: x86/mmu: do compare-and-exchange of gPTE via the user address
+Date:   Mon,  4 Apr 2022 11:49:13 -0400
+Message-Id: <20220404154913.482520-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-type: text/plain
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
+commit 2a8859f373b0a86f0ece8ec8312607eacf12485d upstream.
 
-commit b1e34d325397a33d97d845e312d7cf2a8b646b44 upstream.
+FNAME(cmpxchg_gpte) is an inefficient mess.  It is at least decent if it
+can go through get_user_pages_fast(), but if it cannot then it tries to
+use memremap(); that is not just terribly slow, it is also wrong because
+it assumes that the VM_PFNMAP VMA is contiguous.
 
-Setting non-zero values to SYNIC/STIMER MSRs activates certain features,
-this should not happen when KVM_CAP_HYPERV_SYNIC{,2} was not activated.
+The right way to do it would be to do the same thing as
+hva_to_pfn_remapped() does since commit add6a0cd1c5b ("KVM: MMU: try to
+fix up page faults before giving up", 2016-07-05), using follow_pte()
+and fixup_user_fault() to determine the correct address to use for
+memremap().  To do this, one could for example extract hva_to_pfn()
+for use outside virt/kvm/kvm_main.c.  But really there is no reason to
+do that either, because there is already a perfectly valid address to
+do the cmpxchg() on, only it is a userspace address.  That means doing
+user_access_begin()/user_access_end() and writing the code in assembly
+to handle any exception correctly.  Worse, the guest PTE can be 8-byte
+even on i686 so there is the extra complication of using cmpxchg8b to
+account for.  But at least it is an efficient mess.
 
-Note, it would've been better to forbid writing anything to SYNIC/STIMER
-MSRs, including zeroes, however, at least QEMU tries clearing
-HV_X64_MSR_STIMER0_CONFIG without SynIC. HV_X64_MSR_EOM MSR is somewhat
-'special' as writing zero there triggers an action, this also should not
-happen when SynIC wasn't activated.
-
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Message-Id: <20220325132140.25650-4-vkuznets@redhat.com>
+Reported-by: Qiuhao Li <qiuhao@sysec.org>
+Reported-by: Gaoning Pan <pgn@zju.edu.cn>
+Reported-by: Yongkang Jia <kangel@zju.edu.cn>
+Reported-by: syzbot+6cde2282daa792c49ab8@syzkaller.appspotmail.com
+Debugged-by: Tadeusz Struk <tadeusz.struk@linaro.org>
+Tested-by: Maxim Levitsky <mlevitsk@redhat.com>
 Cc: stable@vger.kernel.org
+Fixes: bd53cb35a3e9 ("X86/KVM: Handle PFNs outside of kernel reach when touching GPTEs")
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/hyperv.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ arch/x86/kvm/paging_tmpl.h | 77 ++++++++++++++++++--------------------
+ 1 file changed, 37 insertions(+), 40 deletions(-)
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 23ff65504d7e..cf2a8b086fcd 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -205,7 +205,7 @@ static int synic_set_msr(struct kvm_vcpu_hv_synic *synic,
- 	struct kvm_vcpu *vcpu = synic_to_vcpu(synic);
- 	int ret;
- 
--	if (!synic->active && !host)
-+	if (!synic->active && (!host || data))
- 		return 1;
- 
- 	trace_kvm_hv_synic_set_msr(vcpu->vcpu_id, msr, data, host);
-@@ -251,6 +251,9 @@ static int synic_set_msr(struct kvm_vcpu_hv_synic *synic,
- 	case HV_X64_MSR_EOM: {
- 		int i;
- 
-+		if (!synic->active)
-+			break;
-+
- 		for (i = 0; i < ARRAY_SIZE(synic->sint); i++)
- 			kvm_hv_notify_acked_sint(vcpu, i);
- 		break;
-@@ -514,6 +517,11 @@ static int stimer_set_config(struct kvm_vcpu_hv_stimer *stimer, u64 config,
+diff --git a/arch/x86/kvm/paging_tmpl.h b/arch/x86/kvm/paging_tmpl.h
+index 97b21e7fd013..13b5c424adb2 100644
+--- a/arch/x86/kvm/paging_tmpl.h
++++ b/arch/x86/kvm/paging_tmpl.h
+@@ -34,9 +34,8 @@
+ 	#define PT_HAVE_ACCESSED_DIRTY(mmu) true
+ 	#ifdef CONFIG_X86_64
+ 	#define PT_MAX_FULL_LEVELS PT64_ROOT_MAX_LEVEL
+-	#define CMPXCHG cmpxchg
++	#define CMPXCHG "cmpxchgq"
+ 	#else
+-	#define CMPXCHG cmpxchg64
+ 	#define PT_MAX_FULL_LEVELS 2
+ 	#endif
+ #elif PTTYPE == 32
+@@ -52,7 +51,7 @@
+ 	#define PT_GUEST_DIRTY_SHIFT PT_DIRTY_SHIFT
+ 	#define PT_GUEST_ACCESSED_SHIFT PT_ACCESSED_SHIFT
+ 	#define PT_HAVE_ACCESSED_DIRTY(mmu) true
+-	#define CMPXCHG cmpxchg
++	#define CMPXCHG "cmpxchgl"
+ #elif PTTYPE == PTTYPE_EPT
+ 	#define pt_element_t u64
+ 	#define guest_walker guest_walkerEPT
+@@ -65,8 +64,10 @@
+ 	#define PT_GUEST_DIRTY_SHIFT 9
+ 	#define PT_GUEST_ACCESSED_SHIFT 8
+ 	#define PT_HAVE_ACCESSED_DIRTY(mmu) ((mmu)->ept_ad)
+-	#define CMPXCHG cmpxchg64
+ 	#define PT_MAX_FULL_LEVELS 4
++	#ifdef CONFIG_X86_64
++	#define CMPXCHG "cmpxchgq"
++	#endif
+ #else
+ 	#error Invalid PTTYPE value
+ #endif
+@@ -132,43 +133,39 @@ static int FNAME(cmpxchg_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+ 			       pt_element_t __user *ptep_user, unsigned index,
+ 			       pt_element_t orig_pte, pt_element_t new_pte)
  {
- 	union hv_stimer_config new_config = {.as_uint64 = config},
- 		old_config = {.as_uint64 = stimer->config.as_uint64};
-+	struct kvm_vcpu *vcpu = stimer_to_vcpu(stimer);
-+	struct kvm_vcpu_hv_synic *synic = vcpu_to_synic(vcpu);
+-	int npages;
+-	pt_element_t ret;
+-	pt_element_t *table;
+-	struct page *page;
+-
+-	npages = get_user_pages_fast((unsigned long)ptep_user, 1, FOLL_WRITE, &page);
+-	if (likely(npages == 1)) {
+-		table = kmap_atomic(page);
+-		ret = CMPXCHG(&table[index], orig_pte, new_pte);
+-		kunmap_atomic(table);
+-
+-		kvm_release_page_dirty(page);
+-	} else {
+-		struct vm_area_struct *vma;
+-		unsigned long vaddr = (unsigned long)ptep_user & PAGE_MASK;
+-		unsigned long pfn;
+-		unsigned long paddr;
+-
+-		down_read(&current->mm->mmap_sem);
+-		vma = find_vma_intersection(current->mm, vaddr, vaddr + PAGE_SIZE);
+-		if (!vma || !(vma->vm_flags & VM_PFNMAP)) {
+-			up_read(&current->mm->mmap_sem);
+-			return -EFAULT;
+-		}
+-		pfn = ((vaddr - vma->vm_start) >> PAGE_SHIFT) + vma->vm_pgoff;
+-		paddr = pfn << PAGE_SHIFT;
+-		table = memremap(paddr, PAGE_SIZE, MEMREMAP_WB);
+-		if (!table) {
+-			up_read(&current->mm->mmap_sem);
+-			return -EFAULT;
+-		}
+-		ret = CMPXCHG(&table[index], orig_pte, new_pte);
+-		memunmap(table);
+-		up_read(&current->mm->mmap_sem);
+-	}
++	int r = -EFAULT;
 +
-+	if (!synic->active && (!host || config))
-+		return 1;
++	if (!user_access_begin(ptep_user, sizeof(pt_element_t)))
++		return -EFAULT;
++
++#ifdef CMPXCHG
++	asm volatile("1:" LOCK_PREFIX CMPXCHG " %[new], %[ptr]\n"
++		     "mov $0, %[r]\n"
++		     "setnz %b[r]\n"
++		     "2:"
++		     _ASM_EXTABLE_UA(1b, 2b)
++		     : [ptr] "+m" (*ptep_user),
++		       [old] "+a" (orig_pte),
++		       [r] "+q" (r)
++		     : [new] "r" (new_pte)
++		     : "memory");
++#else
++	asm volatile("1:" LOCK_PREFIX "cmpxchg8b %[ptr]\n"
++		     "movl $0, %[r]\n"
++		     "jz 2f\n"
++		     "incl %[r]\n"
++		     "2:"
++		     _ASM_EXTABLE_UA(1b, 2b)
++		     : [ptr] "+m" (*ptep_user),
++		       [old] "+A" (orig_pte),
++		       [r] "+rm" (r)
++		     : [new_lo] "b" ((u32)new_pte),
++		       [new_hi] "c" ((u32)(new_pte >> 32))
++		     : "memory");
++#endif
  
- 	trace_kvm_hv_stimer_set_config(stimer_to_vcpu(stimer)->vcpu_id,
- 				       stimer->index, config, host);
-@@ -533,6 +541,12 @@ static int stimer_set_config(struct kvm_vcpu_hv_stimer *stimer, u64 config,
- static int stimer_set_count(struct kvm_vcpu_hv_stimer *stimer, u64 count,
- 			    bool host)
- {
-+	struct kvm_vcpu *vcpu = stimer_to_vcpu(stimer);
-+	struct kvm_vcpu_hv_synic *synic = vcpu_to_synic(vcpu);
-+
-+	if (!synic->active && (!host || count))
-+		return 1;
-+
- 	trace_kvm_hv_stimer_set_count(stimer_to_vcpu(stimer)->vcpu_id,
- 				      stimer->index, count, host);
+-	return (ret != orig_pte);
++	user_access_end();
++	return r;
+ }
  
+ static bool FNAME(prefetch_invalid_gpte)(struct kvm_vcpu *vcpu,
 -- 
 2.31.1
 
