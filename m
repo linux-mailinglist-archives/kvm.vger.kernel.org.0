@@ -2,414 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30FAF4F1B9E
-	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 23:23:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B92744F1BB4
+	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 23:25:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380568AbiDDVVt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Apr 2022 17:21:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49982 "EHLO
+        id S1380982AbiDDVWR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Apr 2022 17:22:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379836AbiDDSPs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Apr 2022 14:15:48 -0400
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5ABA11C2D
-        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 11:13:51 -0700 (PDT)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-2eb9412f11dso13547197b3.4
-        for <kvm@vger.kernel.org>; Mon, 04 Apr 2022 11:13:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=GO8BdcENJPYxLAVTYluPsIHeEv8AdCYEWgpCjb6tAp8=;
-        b=K4r0bXADh3rIeLrWqLalwo5193siST+c2aC6W9uuPwPU2xTgLcP51JhshMhafZmfOj
-         /CODaei4+2UFTmy+QPeqR7flZjZVYNY/w0V1g31nvzHx+lUkiJV3K8bBcVzo1QI/GoiF
-         S/BFcIU5sUb+HZddIBRWweZdGNvCtVyenR7roqs+GbK2vXU7S7uTvDb4ymwXR3ixhHMV
-         r+wSUf2dFHizupRBwooCGNbqm+iSzPieIfuO/UY95atwUrfKRGUlRWix9afqQlSZvDUh
-         nWHKRg6mznk7G5YcOIZvtwsxCZk6HUBr8AP2uKrpymnUwrmYLGJUdq3F6Wja0RsGzaLG
-         GrkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GO8BdcENJPYxLAVTYluPsIHeEv8AdCYEWgpCjb6tAp8=;
-        b=VA3epn87+tQz6bA67n86yChm0vaoPPy9bWt+BT6FYaKQuH48dqRGdg10rMlXsNMLCe
-         q7ZgulASVf1o6dARAjUA322tvChA9WAHrUJN/FarehQ7vshtnjvGexxCBFbFaJsxhlp5
-         YRHxMeVf92Cc+L62NwYweVJlfwWBEphHn322Ao7dLKNbnFLzkRlikkzlJmpcPgk4Sr3G
-         EBrHugOM0b3sd3QJQtrzp8XPOcXQmRwaescnnF9g5MwKCmi0Ec3YuMlrRu8120KRZGKs
-         bipLlcjo6UEWBFxb1PIvTs2lJrPEjNak8Dj52sAJBOt1Zn06zT3eFhn42BRTmBAOv+9p
-         zpwQ==
-X-Gm-Message-State: AOAM532qUoUmr6Dz85QFK67yCtDhySIzcGO0vsY95DuCg9fCGuTKTbQ8
-        uFYsvnnvAThNFiYZZbKP3ZvxMq4UAoANBc1UFjXiQw==
-X-Google-Smtp-Source: ABdhPJx1v9ULL2ROBz9XXp+bShMQd/EKQuRvbJn9c39V3dxMkgD8+NTII9ndOhGTwRdoLD9jI6LwKWUa8rkA3njPZDs=
-X-Received: by 2002:a0d:d44e:0:b0:2e5:dc71:c82b with SMTP id
- w75-20020a0dd44e000000b002e5dc71c82bmr1193522ywd.42.1649096030982; Mon, 04
- Apr 2022 11:13:50 -0700 (PDT)
+        with ESMTP id S1379870AbiDDSTj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Apr 2022 14:19:39 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9996B3EA95
+        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 11:17:42 -0700 (PDT)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 234IGLiL006983;
+        Mon, 4 Apr 2022 18:17:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=OYabZZp08I1QTdtDp03ttMh8P1V1SW0jsRIhPssyvmo=;
+ b=aO50AskQaFwjXgpJNBgcPAP6Y8AWrsUUKdoskBXVC3DxsSvQSQHSB3tr04fB3fx7TMd4
+ MJjdSne/25OpJ0wUu5Kgcgft7Z6LnDlOSZ9yJp1vCp4LOvPMDGO08X0wigpptrwvnGgZ
+ abX+fGQ/GCbz/dCW2gJ0AnyWbikeLSlpJhCCNndX/hAobncVVbV2Xj3gJQQQ4RwHCQpV
+ nRxGHRKd72g9CdLjtwAtBKtFxT0KaaSp27RFiu2AqUYYGvRSqYq2UmfL6uF5kZgF50d9
+ 0T65CLuHM1uXv8UA2y1StECVQfhETYOHIvyKlHg0j6WX0o3L0gNonlfisbLiu1tWQ5fv rQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3f85tc00k4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 04 Apr 2022 18:17:36 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 234IHaNR013900;
+        Mon, 4 Apr 2022 18:17:36 GMT
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3f85tc00jv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 04 Apr 2022 18:17:36 +0000
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 234IGvBk017612;
+        Mon, 4 Apr 2022 18:17:35 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma01wdc.us.ibm.com with ESMTP id 3f6tyrwgcx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 04 Apr 2022 18:17:35 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 234IHZUA25362932
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 4 Apr 2022 18:17:35 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E8C45AE05F;
+        Mon,  4 Apr 2022 18:17:34 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 61744AE060;
+        Mon,  4 Apr 2022 18:17:31 +0000 (GMT)
+Received: from li-c92d2ccc-254b-11b2-a85c-a700b5bfb098.ibm.com.com (unknown [9.211.32.125])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon,  4 Apr 2022 18:17:31 +0000 (GMT)
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+To:     qemu-s390x@nongnu.org
+Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
+        cohuck@redhat.com, thuth@redhat.com, farman@linux.ibm.com,
+        pmorel@linux.ibm.com, richard.henderson@linaro.org,
+        david@redhat.com, pasic@linux.ibm.com, borntraeger@linux.ibm.com,
+        mst@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org
+Subject: [PATCH v5 0/9] s390x/pci: zPCI interpretation support                
+Date:   Mon,  4 Apr 2022 14:17:17 -0400
+Message-Id: <20220404181726.60291-1-mjrosato@linux.ibm.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-References: <20220401233737.3021889-1-dmatlack@google.com> <20220401233737.3021889-2-dmatlack@google.com>
-In-Reply-To: <20220401233737.3021889-2-dmatlack@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 4 Apr 2022 11:13:40 -0700
-Message-ID: <CANgfPd9pqE3X9U1sJds7p9frc2n36eK-HJqyLWU7VBXk8h6vEg@mail.gmail.com>
-Subject: Re: [PATCH 1/3] KVM: selftests: Introduce a selftest to measure
- execution performance
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Zhenzhong Duan <zhenzhong.duan@intel.com>,
-        "open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)" 
-        <kvm@vger.kernel.org>, Peter Xu <peterx@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: t8xDadePG4dZ43Ps2cH6icsX54vEr03z
+X-Proofpoint-ORIG-GUID: BW_lHs7ZslFjlHjosWs_OLbVDEmw-AHl
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-04-04_06,2022-03-31_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 phishscore=0 suspectscore=0 lowpriorityscore=0 mlxscore=0
+ impostorscore=0 mlxlogscore=999 bulkscore=0 adultscore=0 clxscore=1011
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204040103
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 1, 2022 at 4:37 PM David Matlack <dmatlack@google.com> wrote:
->
-> Introduce a new selftest, execute_perf_test, that uses the
-> perf_test_util framework to measure the performance of executing code
-> within a VM. This test is similar to the other perf_test_util-based
-> tests in that it spins up a variable number of vCPUs and runs them
-> concurrently, accessing memory.
->
-> In order to support executiong, extend perf_test_util to populate guest
+For QEMU, the majority of the work in enabling instruction interpretation       
+is handled via SHM bit settings (to indicate to firmware whether or not
+interpretive execution facilities are to be used) + a new KVM ioctl is
+used to setup firmware-interpreted forwarding of Adapter Event
+Notifications.                                        
+                                                                                
+This series also adds a new, optional 'interpret' parameter to zpci which       
+can be used to disable interpretation support (interpret=off) as well as        
+an 'forwarding_assist' parameter to determine whether or not the firmware       
+assist will be used for adapter event delivery (default when
+interpretation is in use) or whether the host will be responsible for
+delivering all adapter event notifications (forwarding_assist=off).
+                                                                                
+The ZPCI_INTERP CPU feature is added beginning with the z14 model to            
+enable this support.                                                            
+                                                                                
+As a consequence of implementing zPCI interpretation, ISM devices now           
+become eligible for passthrough (but only when zPCI interpretation is           
+available).                                                                     
+                                                                                
+From the perspective of guest configuration, you passthrough zPCI devices       
+in the same manner as before, with intepretation support being used by          
+default if available in kernel+qemu.                                            
 
-*executing instructions in the data slot,
+Will reply with a link to the associated kernel series.                                                                                
+                       
+Changelog v4->v5:
+- Update to match latest interface from kernel code.  Major changes are:
+  1) we no longer issue any ioctls to set a device to interpreted mode;
+  rather, this will be done automatically if supported by the host kernel
+  at the time the vfio group is associated with the KVM.  Then, the SHM
+  bit setting will indicate whether or not interpretation is actually
+  used.
+  2) the RPCIT enhancments (IOMMU changes) are removed from this series,
+  so the code associated with indicating a desired IOMMU are also
+  removed.  With this series s390x-pci will continue to use only type1
+  IOMMU for now.
+- Refresh the linux headers sync.  Added a patch to tolerate some vfio
+  uapi renames that will happen in 5.18 (this can be discarded if there
+  is something else underway to address this)
 
-> memory with return instructions rather than random garbage. This way
-> memory can be execute simply by calling it.
+Matthew Rosato (9):
+  Update linux headers
+  vfio: tolerate migration protocol v1 uapi renames
+  target/s390x: add zpci-interp to cpu models
+  s390x/pci: add routine to get host function handle from CLP info
+  s390x/pci: enable for load/store intepretation
+  s390x/pci: don't fence interpreted devices without MSI-X
+  s390x/pci: enable adapter event notification for interpreted devices
+  s390x/pci: let intercept devices have separate PCI groups
+  s390x/pci: reflect proper maxstbl for groups of interpreted devices
 
-*executed
+ hw/s390x/meson.build                          |   1 +
+ hw/s390x/s390-pci-bus.c                       | 107 ++++-
+ hw/s390x/s390-pci-inst.c                      |  52 ++-
+ hw/s390x/s390-pci-kvm.c                       |  51 +++
+ hw/s390x/s390-pci-vfio.c                      | 129 +++++-
+ hw/s390x/s390-virtio-ccw.c                    |   1 +
+ hw/vfio/common.c                              |   2 +-
+ hw/vfio/migration.c                           |  19 +-
+ include/hw/s390x/s390-pci-bus.h               |   8 +-
+ include/hw/s390x/s390-pci-kvm.h               |  38 ++
+ include/hw/s390x/s390-pci-vfio.h              |   6 +
+ .../linux/input-event-codes.h                 |   4 +-
+ .../standard-headers/linux/virtio_config.h    |   6 +
+ .../standard-headers/linux/virtio_crypto.h    |  82 +++-
+ linux-headers/asm-arm64/kvm.h                 |  16 +
+ linux-headers/asm-generic/mman-common.h       |   2 +
+ linux-headers/asm-mips/mman.h                 |   2 +
+ linux-headers/asm-s390/kvm.h                  |   1 +
+ linux-headers/linux/kvm.h                     |  50 ++-
+ linux-headers/linux/psci.h                    |   4 +
+ linux-headers/linux/userfaultfd.h             |   8 +-
+ linux-headers/linux/vfio.h                    | 406 +++++++++---------
+ linux-headers/linux/vfio_zdev.h               |   7 +
+ linux-headers/linux/vhost.h                   |   7 +
+ target/s390x/cpu_features_def.h.inc           |   1 +
+ target/s390x/gen-features.c                   |   2 +
+ target/s390x/kvm/kvm.c                        |   8 +
+ target/s390x/kvm/kvm_s390x.h                  |   1 +
+ 28 files changed, 763 insertions(+), 258 deletions(-)
+ create mode 100644 hw/s390x/s390-pci-kvm.c
+ create mode 100644 include/hw/s390x/s390-pci-kvm.h
 
->
-> Currently only x86-64 supports execution, but other architectures can be
-> easily added by providing their return code instruction.
->
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../testing/selftests/kvm/execute_perf_test.c | 188 ++++++++++++++++++
->  .../selftests/kvm/include/perf_test_util.h    |   2 +
->  .../selftests/kvm/lib/perf_test_util.c        |  25 ++-
->  5 files changed, 215 insertions(+), 2 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/execute_perf_test.c
->
-> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> index 1f1b6c978bf7..3647ddacb103 100644
-> --- a/tools/testing/selftests/kvm/.gitignore
-> +++ b/tools/testing/selftests/kvm/.gitignore
-> @@ -56,6 +56,7 @@
->  /demand_paging_test
->  /dirty_log_test
->  /dirty_log_perf_test
-> +/execute_perf_test
->  /hardware_disable_test
->  /kvm_create_max_vcpus
->  /kvm_page_table_test
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index c9cdbd248727..3c67346b0766 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -92,6 +92,7 @@ TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
->  TEST_GEN_PROGS_x86_64 += demand_paging_test
->  TEST_GEN_PROGS_x86_64 += dirty_log_test
->  TEST_GEN_PROGS_x86_64 += dirty_log_perf_test
-> +TEST_GEN_PROGS_x86_64 += execute_perf_test
->  TEST_GEN_PROGS_x86_64 += hardware_disable_test
->  TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
->  TEST_GEN_PROGS_x86_64 += kvm_page_table_test
-> diff --git a/tools/testing/selftests/kvm/execute_perf_test.c b/tools/testing/selftests/kvm/execute_perf_test.c
-> new file mode 100644
-> index 000000000000..fa78facf44e7
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/execute_perf_test.c
-> @@ -0,0 +1,188 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +#include <inttypes.h>
-> +#include <limits.h>
-> +#include <pthread.h>
-> +#include <sys/mman.h>
-> +#include <sys/types.h>
-> +#include <sys/stat.h>
-> +
-> +#include "kvm_util.h"
-> +#include "test_util.h"
-> +#include "perf_test_util.h"
-> +#include "guest_modes.h"
-> +
-> +/* Global variable used to synchronize all of the vCPU threads. */
-> +static int iteration;
+-- 
+2.27.0
 
-Should this be volatile? (same for other globals)
-
-> +
-> +/* Set to true when vCPU threads should exit. */
-> +static bool done;
-> +
-> +/* The iteration that was last completed by each vCPU. */
-> +static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
-> +
-> +/* Whether to overlap the regions of memory vCPUs access. */
-> +static bool overlap_memory_access;
-
-Can this be factored into the perf test util framework / test params?
-
-> +
-> +struct test_params {
-> +       /* The backing source for the region of memory. */
-> +       enum vm_mem_backing_src_type backing_src;
-> +
-> +       /* The amount of memory to allocate for each vCPU. */
-> +       uint64_t vcpu_memory_bytes;
-> +
-> +       /* The number of vCPUs to create in the VM. */
-> +       int vcpus;
-> +};
-> +
-> +static void assert_ucall(struct kvm_vm *vm, uint32_t vcpu_id,
-> +                        uint64_t expected_ucall)
-> +{
-> +       struct ucall uc;
-> +       uint64_t actual_ucall = get_ucall(vm, vcpu_id, &uc);
-> +
-> +       TEST_ASSERT(expected_ucall == actual_ucall,
-> +                   "Guest exited unexpectedly (expected ucall %" PRIu64
-> +                   ", got %" PRIu64 ")",
-> +                   expected_ucall, actual_ucall);
-> +}
-> +
-> +static bool spin_wait_for_next_iteration(int *current_iteration)
-> +{
-> +       int last_iteration = *current_iteration;
-> +
-> +       do {
-> +               if (READ_ONCE(done))
-> +                       return false;
-> +
-> +               *current_iteration = READ_ONCE(iteration);
-> +       } while (last_iteration == *current_iteration);
-> +
-> +       return true;
-> +}
-> +
-> +static void vcpu_thread_main(struct perf_test_vcpu_args *vcpu_args)
-> +{
-> +       struct kvm_vm *vm = perf_test_args.vm;
-> +       int vcpu_id = vcpu_args->vcpu_id;
-> +       int current_iteration = 0;
-> +
-> +       while (spin_wait_for_next_iteration(&current_iteration)) {
-> +               vcpu_run(vm, vcpu_id);
-> +               assert_ucall(vm, vcpu_id, UCALL_SYNC);
-> +               vcpu_last_completed_iteration[vcpu_id] = current_iteration;
-> +       }
-> +}
-> +
-> +static void spin_wait_for_vcpu(int vcpu_id, int target_iteration)
-> +{
-> +       while (READ_ONCE(vcpu_last_completed_iteration[vcpu_id]) !=
-> +              target_iteration) {
-> +               continue;
-> +       }
-> +}
-> +
-> +static void run_iteration(struct kvm_vm *vm, int vcpus, const char *description)
-> +{
-> +       struct timespec ts_start;
-> +       struct timespec ts_elapsed;
-> +       int next_iteration;
-> +       int vcpu_id;
-> +
-> +       /* Kick off the vCPUs by incrementing iteration. */
-> +       next_iteration = ++iteration;
-> +
-> +       clock_gettime(CLOCK_MONOTONIC, &ts_start);
-> +
-> +       /* Wait for all vCPUs to finish the iteration. */
-> +       for (vcpu_id = 0; vcpu_id < vcpus; vcpu_id++)
-> +               spin_wait_for_vcpu(vcpu_id, next_iteration);
-> +
-> +       ts_elapsed = timespec_elapsed(ts_start);
-> +       pr_info("%-30s: %ld.%09lds\n",
-> +               description, ts_elapsed.tv_sec, ts_elapsed.tv_nsec);
-> +}
-> +
-> +static void run_test(enum vm_guest_mode mode, void *arg)
-> +{
-> +       struct test_params *params = arg;
-> +       struct kvm_vm *vm;
-> +       int vcpus = params->vcpus;
-> +
-> +       vm = perf_test_create_vm(mode, vcpus, params->vcpu_memory_bytes, 1,
-> +                                params->backing_src, !overlap_memory_access);
-> +
-> +       perf_test_start_vcpu_threads(vcpus, vcpu_thread_main);
-> +
-> +       pr_info("\n");
-> +
-> +       perf_test_set_wr_fract(vm, 1);
-> +       run_iteration(vm, vcpus, "Populating memory");
-> +
-> +       perf_test_set_execute(vm, true);
-> +       run_iteration(vm, vcpus, "Executing from memory");
-> +
-> +       /* Set done to signal the vCPU threads to exit */
-> +       done = true;
-> +
-> +       perf_test_join_vcpu_threads(vcpus);
-> +       perf_test_destroy_vm(vm);
-> +}
-> +
-> +static void help(char *name)
-> +{
-> +       puts("");
-> +       printf("usage: %s [-h] [-m mode] [-b vcpu_bytes] [-v vcpus] [-o]  [-s mem_type]\n",
-> +              name);
-> +       puts("");
-> +       printf(" -h: Display this help message.");
-> +       guest_modes_help();
-> +       printf(" -b: specify the size of the memory region which should be\n"
-> +              "     dirtied by each vCPU. e.g. 10M or 3G.\n"
-> +              "     (default: 1G)\n");
-> +       printf(" -v: specify the number of vCPUs to run.\n");
-> +       printf(" -o: Overlap guest memory accesses instead of partitioning\n"
-> +              "     them into a separate region of memory for each vCPU.\n");
-> +       backing_src_help("-s");
-> +       puts("");
-> +       exit(0);
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +       struct test_params params = {
-> +               .backing_src = DEFAULT_VM_MEM_SRC,
-> +               .vcpu_memory_bytes = DEFAULT_PER_VCPU_MEM_SIZE,
-> +               .vcpus = 1,
-> +       };
-> +       int opt;
-> +
-> +       guest_modes_append_default();
-> +
-> +       while ((opt = getopt(argc, argv, "hm:b:v:os:")) != -1) {
-> +               switch (opt) {
-> +               case 'm':
-> +                       guest_modes_cmdline(optarg);
-> +                       break;
-> +               case 'b':
-> +                       params.vcpu_memory_bytes = parse_size(optarg);
-> +                       break;
-> +               case 'v':
-> +                       params.vcpus = atoi(optarg);
-> +                       break;
-> +               case 'o':
-> +                       overlap_memory_access = true;
-> +                       break;
-> +               case 's':
-> +                       params.backing_src = parse_backing_src_type(optarg);
-> +                       break;
-> +               case 'h':
-> +               default:
-> +                       help(argv[0]);
-> +                       break;
-> +               }
-> +       }
-> +
-> +       for_each_guest_mode(run_test, &params);
-> +
-> +       return 0;
-> +}
-> diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-> index a86f953d8d36..0a5a56539aff 100644
-> --- a/tools/testing/selftests/kvm/include/perf_test_util.h
-> +++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-> @@ -33,6 +33,7 @@ struct perf_test_args {
->         uint64_t gpa;
->         uint64_t guest_page_size;
->         int wr_fract;
-> +       bool execute;
->
->         struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
->  };
-> @@ -46,6 +47,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
->  void perf_test_destroy_vm(struct kvm_vm *vm);
->
->  void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract);
-> +void perf_test_set_execute(struct kvm_vm *vm, bool execute);
->
->  void perf_test_start_vcpu_threads(int vcpus, void (*vcpu_fn)(struct perf_test_vcpu_args *));
->  void perf_test_join_vcpu_threads(int vcpus);
-> diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> index 722df3a28791..1a5eb60b59da 100644
-> --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-> +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> @@ -36,6 +36,16 @@ static void (*vcpu_thread_fn)(struct perf_test_vcpu_args *);
->  /* Set to true once all vCPU threads are up and running. */
->  static bool all_vcpu_threads_running;
->
-> +/*
-> + * When writing to guest memory, write the opcode for the `ret` instruction so
-> + * that subsequent iteractions can exercise instruction fetch by calling the
-> + * memory.
-> + *
-> + * NOTE: Non-x86 architectures would to use different values here to support
-> + * execute.
-> + */
-> +#define RETURN_OPCODE 0xC3
-> +
-
-This should be defined in an arch-specific header or surrounded by
-ifdefs so that the build would fail for other archs.
-
->  /*
->   * Continuously write to the first 8 bytes of each page in the
->   * specified region.
-> @@ -58,8 +68,10 @@ static void guest_code(uint32_t vcpu_id)
->                 for (i = 0; i < pages; i++) {
->                         uint64_t addr = gva + (i * pta->guest_page_size);
->
-> -                       if (i % pta->wr_fract == 0)
-> -                               *(uint64_t *)addr = 0x0123456789ABCDEF;
-> +                       if (pta->execute)
-> +                               ((void (*)(void)) addr)();
-> +                       else if (i % pta->wr_fract == 0)
-> +                               *(uint64_t *)addr = RETURN_OPCODE;
-
-Oh interesting, you're using a write pass to set up the contents of
-memory. I suppose that probably ends up being faster than memset, but
-it introduces kind of a strange dependency.
-
->                         else
->                                 READ_ONCE(*(uint64_t *)addr);
->                 }
-> @@ -198,6 +210,15 @@ void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract)
->         sync_global_to_guest(vm, perf_test_args);
->  }
->
-> +void perf_test_set_execute(struct kvm_vm *vm, bool execute)
-> +{
-> +#ifndef __x86_64__
-> +       TEST_ASSERT(false, "Execute not supported on this architure; see RETURN_OPCODE.");
-> +#endif
-> +       perf_test_args.execute = execute;
-> +       sync_global_to_guest(vm, perf_test_args);
-> +}
-> +
->  static void *vcpu_thread_main(void *data)
->  {
->         struct vcpu_thread *vcpu = data;
->
-> base-commit: d1fb6a1ca3e535f89628193ab94203533b264c8c
-> --
-> 2.35.1.1094.g7c7d902a7c-goog
->
