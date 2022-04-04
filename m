@@ -2,66 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EBB364F0DC3
-	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 05:46:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7587E4F0DCD
+	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 05:52:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352591AbiDDDsF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 3 Apr 2022 23:48:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59832 "EHLO
+        id S1357072AbiDDDxi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 3 Apr 2022 23:53:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377021AbiDDDsD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 3 Apr 2022 23:48:03 -0400
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC1BD28980
-        for <kvm@vger.kernel.org>; Sun,  3 Apr 2022 20:46:04 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id bi13-20020a05600c3d8d00b0038c2c33d8f3so6909454wmb.4
-        for <kvm@vger.kernel.org>; Sun, 03 Apr 2022 20:46:04 -0700 (PDT)
+        with ESMTP id S244598AbiDDDxe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 3 Apr 2022 23:53:34 -0400
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1146931203
+        for <kvm@vger.kernel.org>; Sun,  3 Apr 2022 20:51:38 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id v30so4661975wra.8
+        for <kvm@vger.kernel.org>; Sun, 03 Apr 2022 20:51:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=brainfault-org.20210112.gappssmtp.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=zIEWjwIftCsbXsyVaKrbxiQ3YI3B53hkXz7cL3Cg4Hk=;
-        b=5NLJ/H5VwJU9/XJjgnCvziAUiVTZmUTWR+QTk5YqSNeNhj6yLp5udBH8IXnkRyqfen
-         7ZMH7/kbxkU3fVc6e7d+20rQRfniY5BwYwRN1bTzqBHuoFPd4gjk6Crt17D/Ksd+WFBN
-         YC24GmWYZZrG59JApll5m8/7lxBs3UV9MWI5+k+Od/BrzhtJ2E2QTr8RuOh+yOpBcvhj
-         /gdekB1g6P+n/7lc7AqNcSR7dVbLUBfkvnw+VANgZor1xLG7MbPj6G32g8aEhsgczqTQ
-         nupBrMvFISqcO3bnR+8PmjHidV4jhgdyjY3yxzgHjJt7aB73xNayUU/HkBphiwCVDdLB
-         8GsA==
+        bh=r5K6b0sc6oOdX9PQxMtrYXV8USG1YlONAxoBoZNU3l4=;
+        b=KK3qDVtl6tM1RC0vWJnjyjAOaBy9HeE8/J3cKTugiWs6TNndA8Vg82MGSJiu79ETZ9
+         X+G314yykqvPYI2h4vxy4qqe0E8bDEu6Pk23l8xjJMUNi4sSsIUwyXUPZb3codKUinnS
+         7eLz56OFMh+1h+AdCdVcpMxwkT0tCike5pComkqD4oMYKXMz8k3wGwwT7UrbveBFjtRV
+         Ql3xXEdAWWyf/cRgLKSfwCvFdjvS0exmaL4XX1iOCKrs/N84Me5KcmEyAJsWdb4YGTs4
+         8yDSipiD22wqji5E7+BXbjOGj1jhfghTr1RjRNbedQ0BdvxbxVt2GRKJULuUKAon/jNy
+         T/Zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=zIEWjwIftCsbXsyVaKrbxiQ3YI3B53hkXz7cL3Cg4Hk=;
-        b=2ny61Z/MBEjO4bGbn5mI7XH+8j7a53+29KaTezKr3oe8py4QJ6PSfpqwkpKsL3GRo4
-         rE/ntkWpg4z1zsiS4mwjYSGsdFfeK/9ur3U/4/UY1HVcVmduD0oZXzZmzFJ3smjVKoud
-         YmKngNYspdcRpbpKUAYl5cmOUkI1FMDn2Isb8iEcKeXxQtKtufqu/9pSc0SnZOgi0MKe
-         Y01LozkS4MV/IkAFXxPhAsuK0VuB9dMnuuNmiJ/9A48G53x8+rGU7Kih3xgC5ogYTZgD
-         DCql4AajwEh+UkYgdWGUAyuGxsiUk+0Enj4pYU4h2Of2Nqqd0MlIqn6lMP7G/VYh3XVW
-         72lw==
-X-Gm-Message-State: AOAM533UBsXj/KTlXdDTVrQjkRJ5Am5tle64SUGZz5AFpOAWbAAycoE4
-        00f/wBy2SWXY3gK2AgkKo59hVWDXqKEHO3Wkoqyq+g==
-X-Google-Smtp-Source: ABdhPJxWy3ASdc1fdzlTkh/icaTSsaUSRXwwU+/7EXnNF1pjk9RZzqkcq+Ab3qtG3iS4I7Z32SL1kMxGGrKs6m5vxIg=
-X-Received: by 2002:a05:600c:6d4:b0:38e:7622:9983 with SMTP id
- b20-20020a05600c06d400b0038e76229983mr450885wmn.93.1649043963147; Sun, 03 Apr
- 2022 20:46:03 -0700 (PDT)
+        bh=r5K6b0sc6oOdX9PQxMtrYXV8USG1YlONAxoBoZNU3l4=;
+        b=zROSA7GRbvyJO3J6OMdb5j87PmGRebUhz0nKIRAzTtdUsIQn0z0oLPjh1SitZiiMRI
+         C0UQPESfd6jErJsI2gT54sslfOiYBdZ5Ez/PsHwTEH8S4QUEGVp7NeKC0VKZ+cPg7uZV
+         1bvDsAFMitcNqPX0UMqxXQoeiWv65NImL2ge3rNguGeK2h25Npd9saPZ2LBR3ADH0m9d
+         n4+lxVJrmyn6kwlbipgMzs8aepINcHvGPwyoKdk06gSNEzXM+bHhF0zyBRXireh+Nd2u
+         //CdadWF4YJdq9ljcG3S13HixMEICi3gHEDdHd6G5DKackstm2dbU5j8n90RTJMD4ixM
+         FcYg==
+X-Gm-Message-State: AOAM5332GEbp9xG5hu2ux/o6PUJ2woibI7+bc36FKx79MkdTLsbWyxfP
+        +dnWiCt3zNP+4g1pW5jIDyl3sLayZxXfMq1utphpig==
+X-Google-Smtp-Source: ABdhPJy03E7/LbI9hh3U5hDa7d5BQW5aEeRI/tPy/1Eq7sLg6T5XYwIswOiGCVJ6FybEoaUugQyf7PY6NWQ6q5tyzFU=
+X-Received: by 2002:a5d:6c6b:0:b0:1ea:77ea:dde8 with SMTP id
+ r11-20020a5d6c6b000000b001ea77eadde8mr15660633wrz.690.1649044297423; Sun, 03
+ Apr 2022 20:51:37 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220403065735.23859-1-bagasdotme@gmail.com>
-In-Reply-To: <20220403065735.23859-1-bagasdotme@gmail.com>
+References: <20220317035521.272486-1-apatel@ventanamicro.com>
+In-Reply-To: <20220317035521.272486-1-apatel@ventanamicro.com>
 From:   Anup Patel <anup@brainfault.org>
-Date:   Mon, 4 Apr 2022 09:14:53 +0530
-Message-ID: <CAAhSdy0G4o16Qdt2ZPDAD5M6Updopdm43La2q4t6xVA540WXdw@mail.gmail.com>
-Subject: Re: [PATCH RESEND] Documentation: kvm: Add missing line break in api.rst
-To:     Bagas Sanjaya <bagasdotme@gmail.com>
-Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
+Date:   Mon, 4 Apr 2022 09:20:27 +0530
+Message-ID: <CAAhSdy35a5PrdSzonK6EeH0nynFxvvUzScaYRPeA=CmG5yuz+Q@mail.gmail.com>
+Subject: Re: [PATCH] RISC-V: KVM: Don't clear hgatp CSR in kvm_arch_vcpu_put()
+To:     Anup Patel <apatel@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
         Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
         Albert Ou <aou@eecs.berkeley.edu>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
         KVM General <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
         "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>
+        stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
@@ -73,51 +75,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Apr 3, 2022 at 12:28 PM Bagas Sanjaya <bagasdotme@gmail.com> wrote:
+On Thu, Mar 17, 2022 at 9:25 AM Anup Patel <apatel@ventanamicro.com> wrote:
 >
-> Add missing line break separator between literal block and description
-> of KVM_EXIT_RISCV_SBI.
+> We might have RISC-V systems (such as QEMU) where VMID is not part
+> of the TLB entry tag so these systems will have to flush all TLB
+> entries upon any change in hgatp.VMID.
 >
-> This fixes:
-> </path/to/linux>/Documentation/virt/kvm/api.rst:6118: WARNING: Literal block ends without a blank line; unexpected unindent.
+> Currently, we zero-out hgatp CSR in kvm_arch_vcpu_put() and we
+> re-program hgatp CSR in kvm_arch_vcpu_load(). For above described
+> systems, this will flush all TLB entries whenever VCPU exits to
+> user-space hence reducing performance.
 >
-> Fixes: da40d85805937d (RISC-V: KVM: Document RISC-V specific parts of KVM API, 2021-09-27)
-> Cc: Anup Patel <anup.patel@wdc.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: Paul Walmsley <paul.walmsley@sifive.com>
-> Cc: Palmer Dabbelt <palmer@dabbelt.com>
-> Cc: Albert Ou <aou@eecs.berkeley.edu>
-> Cc: kvm@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: linux-riscv@lists.infradead.org
-> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+> This patch fixes above described performance issue by not clearing
+> hgatp CSR in kvm_arch_vcpu_put().
+>
+> Fixes: 34bde9d8b9e6 ("RISC-V: KVM: Implement VCPU world-switch")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 
-For KVM RISC-V related patches, please CC kvm-riscv@lists.infradead.org
-
-Otherwise, this looks good to me. I have queued this for RC fixes.
+I have queued this patch for RC fixes.
 
 Thanks,
 Anup
 
 > ---
->  Documentation/virt/kvm/api.rst | 1 +
->  1 file changed, 1 insertion(+)
+>  arch/riscv/kvm/vcpu.c | 2 --
+>  1 file changed, 2 deletions(-)
 >
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 9f3172376ec3a6..a529f94b61edcd 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6115,6 +6115,7 @@ Valid values for 'type' are:
->                         unsigned long args[6];
->                         unsigned long ret[2];
->                 } riscv_sbi;
-> +
->  If exit reason is KVM_EXIT_RISCV_SBI then it indicates that the VCPU has
->  done a SBI call which is not handled by KVM RISC-V kernel module. The details
->  of the SBI call are available in 'riscv_sbi' member of kvm_run structure. The
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index 624166004e36..6785aef4cbd4 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -653,8 +653,6 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>                                      vcpu->arch.isa);
+>         kvm_riscv_vcpu_host_fp_restore(&vcpu->arch.host_context);
 >
-> base-commit: f443e374ae131c168a065ea1748feac6b2e76613
+> -       csr_write(CSR_HGATP, 0);
+> -
+>         csr->vsstatus = csr_read(CSR_VSSTATUS);
+>         csr->vsie = csr_read(CSR_VSIE);
+>         csr->vstvec = csr_read(CSR_VSTVEC);
 > --
-> An old man doll... just what I always wanted! - Clara
+> 2.25.1
 >
