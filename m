@@ -2,209 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C5B54F18D5
-	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 17:49:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E1204F1B8F
+	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 23:23:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378712AbiDDPvV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Apr 2022 11:51:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39266 "EHLO
+        id S1380122AbiDDVV1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Apr 2022 17:21:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346326AbiDDPvP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Apr 2022 11:51:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 619E31EC4E
-        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 08:49:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649087358;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Lih7ptoPycxcOj7GRw8MqHSfHs35MpyiN5qQLV2av7Y=;
-        b=AEPN9MhVAktlzlglnoHQDaipcKUKxvbg2oN6na4YrpsflVj83qQrKDlK8rBUhfnU4vArLh
-        H18Q1lI0OFPUqyF0Q2Zg/R8NXRawefdAXE9cVUoeNN9EuwsDVtBI+SE0ye9ASumzlETUYq
-        f/4Z9qdBCTTlt4Dxcrt07vOAGIScKgE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-613-AKySnxs4MWyKR3nKUTIraQ-1; Mon, 04 Apr 2022 11:49:15 -0400
-X-MC-Unique: AKySnxs4MWyKR3nKUTIraQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8E753899EC2;
-        Mon,  4 Apr 2022 15:49:14 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E9A8C2166B25;
-        Mon,  4 Apr 2022 15:49:13 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     stable@vger.kernel.org, Qiuhao Li <qiuhao@sysec.org>,
-        Gaoning Pan <pgn@zju.edu.cn>, Yongkang Jia <kangel@zju.edu.cn>,
-        syzbot+6cde2282daa792c49ab8@syzkaller.appspotmail.com,
-        Tadeusz Struk <tadeusz.struk@linaro.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH 5.4 v2] KVM: x86/mmu: do compare-and-exchange of gPTE via the user address
-Date:   Mon,  4 Apr 2022 11:49:13 -0400
-Message-Id: <20220404154913.482520-1-pbonzini@redhat.com>
+        with ESMTP id S1378995AbiDDQQ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Apr 2022 12:16:59 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10E87381A7
+        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 09:15:00 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id ku13-20020a17090b218d00b001ca8fcd3adeso3598389pjb.2
+        for <kvm@vger.kernel.org>; Mon, 04 Apr 2022 09:15:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=UDaFc/gCWuOOIEIKSF8jU4oDzdusj5ZcLS5tUBZDl7k=;
+        b=frLsqAzRoYQqPwY+LRr2+HLI4jsKjK8C88V/3rKXepEUVWcXYPUnN5f9Pbs3dFMgDM
+         Fc30h7pCDhpRwEn5077MIjbu8eQViUZ4qp9RmklJtufdy1qVzWiDv1Gf/LObmGzWqjTS
+         HCWymOlS/s7S1a2yT6yWZEAkvMUp+M3Hn8h4fTif3xSBCHn8nTYGCaCA67mey8IOTRKj
+         vgrzwhMT9QUNrAUPk8GLVatbpq5t5kFHea5ElJA4/aZLkOiQZjJu3Isr9yB1FhxvX0wn
+         zipj7LrlHsMAnXmylLn31UO3wAqFnLGS4noeL4O/zzmPw6SE2DvaX+X/D9LvxWpUoqdH
+         nPfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=UDaFc/gCWuOOIEIKSF8jU4oDzdusj5ZcLS5tUBZDl7k=;
+        b=f/gPiXtMr3pj+eU1deYulhlx/IqqgTOL5zBRYkCPDZyfJLxcrxZGkms/nFZiwxHmGb
+         rVIGT40hGxXRbg9ctCvQR/j/GBCqLE9PO8Y1SVrYBmB1F+kcSiIzO/nczdD7y/KcbwWh
+         MhXijYwVmXL93Iy3aGmXhdfPEAoUGYPz7rBqu3mY8mRLA2ErVzEKDOS/7xOeJMPjNlKu
+         8BXHTwF6GCgqkDVthgmyGQB0kzAXArPu0FjoTukSgpRR6CwCQS3srx2IOy091CwbKOwg
+         CIUOPaiW74Xnq/g1yLT3qigIWSDUCt48po844FGqojdpR8j9wCIeRSFD6+IBO/PeVHHs
+         kLwQ==
+X-Gm-Message-State: AOAM531owIlHZhlN9E/xCqOFYvhnhrhQtn7cXpFcxPRf0rAZgE0c03Aw
+        6hqhW7Lh5i8hwrxzH/HDWYoG8Q==
+X-Google-Smtp-Source: ABdhPJxce26+IV6N/hp+MS7aKDXMfZboRNVcH0s2b8IdhwQqCgufgWGYQ6gNex6ufjHM6ZKhk0Gwlg==
+X-Received: by 2002:a17:902:7615:b0:156:1859:2d00 with SMTP id k21-20020a170902761500b0015618592d00mr612139pll.126.1649088898855;
+        Mon, 04 Apr 2022 09:14:58 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id q18-20020aa78432000000b004fb0a5aa2c7sm13195487pfn.183.2022.04.04.09.14.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Apr 2022 09:14:58 -0700 (PDT)
+Date:   Mon, 4 Apr 2022 16:14:54 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>
+Subject: Re: [PATCH 7/8] KVM: x86: Trace re-injected exceptions
+Message-ID: <YksZfqZr4SyEUk6H@google.com>
+References: <20220402010903.727604-1-seanjc@google.com>
+ <20220402010903.727604-8-seanjc@google.com>
+ <df8e53474fb161f83c8cb8b9816995b23798545b.camel@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <df8e53474fb161f83c8cb8b9816995b23798545b.camel@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-commit 2a8859f373b0a86f0ece8ec8312607eacf12485d upstream.
+On Mon, Apr 04, 2022, Maxim Levitsky wrote:
+> On Sat, 2022-04-02 at 01:09 +0000, Sean Christopherson wrote:
+> > Trace exceptions that are re-injected, not just those that KVM is
+> > injecting for the first time.  Debugging re-injection bugs is painful
+> > enough as is, not having visibility into what KVM is doing only makes
+> > things worse.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/kvm/x86.c | 8 ++++----
+> >  1 file changed, 4 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 7a066cf92692..384091600bc2 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -9382,6 +9382,10 @@ int kvm_check_nested_events(struct kvm_vcpu *vcpu)
+> >  
+> >  static void kvm_inject_exception(struct kvm_vcpu *vcpu)
+> >  {
+> > +	trace_kvm_inj_exception(vcpu->arch.exception.nr,
+> > +				vcpu->arch.exception.has_error_code,
+> > +				vcpu->arch.exception.error_code);
+> > +
+> 
+> Can we use a {new tracepoint / new parameter for this tracepoint} for this to
+> avoid confusion?
 
-FNAME(cmpxchg_gpte) is an inefficient mess.  It is at least decent if it
-can go through get_user_pages_fast(), but if it cannot then it tries to
-use memremap(); that is not just terribly slow, it is also wrong because
-it assumes that the VM_PFNMAP VMA is contiguous.
-
-The right way to do it would be to do the same thing as
-hva_to_pfn_remapped() does since commit add6a0cd1c5b ("KVM: MMU: try to
-fix up page faults before giving up", 2016-07-05), using follow_pte()
-and fixup_user_fault() to determine the correct address to use for
-memremap().  To do this, one could for example extract hva_to_pfn()
-for use outside virt/kvm/kvm_main.c.  But really there is no reason to
-do that either, because there is already a perfectly valid address to
-do the cmpxchg() on, only it is a userspace address.  That means doing
-user_access_begin()/user_access_end() and writing the code in assembly
-to handle any exception correctly.  Worse, the guest PTE can be 8-byte
-even on i686 so there is the extra complication of using cmpxchg8b to
-account for.  But at least it is an efficient mess.
-
-Reported-by: Qiuhao Li <qiuhao@sysec.org>
-Reported-by: Gaoning Pan <pgn@zju.edu.cn>
-Reported-by: Yongkang Jia <kangel@zju.edu.cn>
-Reported-by: syzbot+6cde2282daa792c49ab8@syzkaller.appspotmail.com
-Debugged-by: Tadeusz Struk <tadeusz.struk@linaro.org>
-Tested-by: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: stable@vger.kernel.org
-Fixes: bd53cb35a3e9 ("X86/KVM: Handle PFNs outside of kernel reach when touching GPTEs")
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/paging_tmpl.h | 77 ++++++++++++++++++--------------------
- 1 file changed, 37 insertions(+), 40 deletions(-)
-
-diff --git a/arch/x86/kvm/paging_tmpl.h b/arch/x86/kvm/paging_tmpl.h
-index 97b21e7fd013..13b5c424adb2 100644
---- a/arch/x86/kvm/paging_tmpl.h
-+++ b/arch/x86/kvm/paging_tmpl.h
-@@ -34,9 +34,8 @@
- 	#define PT_HAVE_ACCESSED_DIRTY(mmu) true
- 	#ifdef CONFIG_X86_64
- 	#define PT_MAX_FULL_LEVELS PT64_ROOT_MAX_LEVEL
--	#define CMPXCHG cmpxchg
-+	#define CMPXCHG "cmpxchgq"
- 	#else
--	#define CMPXCHG cmpxchg64
- 	#define PT_MAX_FULL_LEVELS 2
- 	#endif
- #elif PTTYPE == 32
-@@ -52,7 +51,7 @@
- 	#define PT_GUEST_DIRTY_SHIFT PT_DIRTY_SHIFT
- 	#define PT_GUEST_ACCESSED_SHIFT PT_ACCESSED_SHIFT
- 	#define PT_HAVE_ACCESSED_DIRTY(mmu) true
--	#define CMPXCHG cmpxchg
-+	#define CMPXCHG "cmpxchgl"
- #elif PTTYPE == PTTYPE_EPT
- 	#define pt_element_t u64
- 	#define guest_walker guest_walkerEPT
-@@ -65,8 +64,10 @@
- 	#define PT_GUEST_DIRTY_SHIFT 9
- 	#define PT_GUEST_ACCESSED_SHIFT 8
- 	#define PT_HAVE_ACCESSED_DIRTY(mmu) ((mmu)->ept_ad)
--	#define CMPXCHG cmpxchg64
- 	#define PT_MAX_FULL_LEVELS 4
-+	#ifdef CONFIG_X86_64
-+	#define CMPXCHG "cmpxchgq"
-+	#endif
- #else
- 	#error Invalid PTTYPE value
- #endif
-@@ -132,43 +133,39 @@ static int FNAME(cmpxchg_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
- 			       pt_element_t __user *ptep_user, unsigned index,
- 			       pt_element_t orig_pte, pt_element_t new_pte)
- {
--	int npages;
--	pt_element_t ret;
--	pt_element_t *table;
--	struct page *page;
--
--	npages = get_user_pages_fast((unsigned long)ptep_user, 1, FOLL_WRITE, &page);
--	if (likely(npages == 1)) {
--		table = kmap_atomic(page);
--		ret = CMPXCHG(&table[index], orig_pte, new_pte);
--		kunmap_atomic(table);
--
--		kvm_release_page_dirty(page);
--	} else {
--		struct vm_area_struct *vma;
--		unsigned long vaddr = (unsigned long)ptep_user & PAGE_MASK;
--		unsigned long pfn;
--		unsigned long paddr;
--
--		down_read(&current->mm->mmap_sem);
--		vma = find_vma_intersection(current->mm, vaddr, vaddr + PAGE_SIZE);
--		if (!vma || !(vma->vm_flags & VM_PFNMAP)) {
--			up_read(&current->mm->mmap_sem);
--			return -EFAULT;
--		}
--		pfn = ((vaddr - vma->vm_start) >> PAGE_SHIFT) + vma->vm_pgoff;
--		paddr = pfn << PAGE_SHIFT;
--		table = memremap(paddr, PAGE_SIZE, MEMREMAP_WB);
--		if (!table) {
--			up_read(&current->mm->mmap_sem);
--			return -EFAULT;
--		}
--		ret = CMPXCHG(&table[index], orig_pte, new_pte);
--		memunmap(table);
--		up_read(&current->mm->mmap_sem);
--	}
-+	int r = -EFAULT;
-+
-+	if (!user_access_begin(ptep_user, sizeof(pt_element_t)))
-+		return -EFAULT;
-+
-+#ifdef CMPXCHG
-+	asm volatile("1:" LOCK_PREFIX CMPXCHG " %[new], %[ptr]\n"
-+		     "mov $0, %[r]\n"
-+		     "setnz %b[r]\n"
-+		     "2:"
-+		     _ASM_EXTABLE_UA(1b, 2b)
-+		     : [ptr] "+m" (*ptep_user),
-+		       [old] "+a" (orig_pte),
-+		       [r] "+q" (r)
-+		     : [new] "r" (new_pte)
-+		     : "memory");
-+#else
-+	asm volatile("1:" LOCK_PREFIX "cmpxchg8b %[ptr]\n"
-+		     "movl $0, %[r]\n"
-+		     "jz 2f\n"
-+		     "incl %[r]\n"
-+		     "2:"
-+		     _ASM_EXTABLE_UA(1b, 2b)
-+		     : [ptr] "+m" (*ptep_user),
-+		       [old] "+A" (orig_pte),
-+		       [r] "+rm" (r)
-+		     : [new_lo] "b" ((u32)new_pte),
-+		       [new_hi] "c" ((u32)(new_pte >> 32))
-+		     : "memory");
-+#endif
- 
--	return (ret != orig_pte);
-+	user_access_end();
-+	return r;
- }
- 
- static bool FNAME(prefetch_invalid_gpte)(struct kvm_vcpu *vcpu,
--- 
-2.31.1
-
+Good idea, a param to capture re-injection would be very helpful.
