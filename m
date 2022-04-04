@@ -2,185 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B64314F17C9
-	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 17:01:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 560214F1810
+	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 17:15:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358260AbiDDPD0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Apr 2022 11:03:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47606 "EHLO
+        id S1377978AbiDDPRQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Apr 2022 11:17:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357236AbiDDPDX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Apr 2022 11:03:23 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD8182F03C
-        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 08:01:26 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id r10so5720627eda.1
-        for <kvm@vger.kernel.org>; Mon, 04 Apr 2022 08:01:26 -0700 (PDT)
+        with ESMTP id S1377924AbiDDPRP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Apr 2022 11:17:15 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95B822C137
+        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 08:15:18 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id k14so8627096pga.0
+        for <kvm@vger.kernel.org>; Mon, 04 Apr 2022 08:15:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=i+zr5M68aloOJzDo2BfmM/AByzuuaBC8sU7HTQ424Ng=;
-        b=P1lRqzuiE1i5AQgVXMAadjQxuZaNvOCmKCWVC7NoAosWtxg6O6uGhV1Fs5d9UThrZ1
-         zNrRtXos2DqCwVW5VD+GKbPk1i42rM9aiUb9yc0F+sIK7PRpivdnddQGLO7YoWG7oZmw
-         1x+zSzZfSodiP6Ntsi6OzrVuazT7b0XFcTsGnlR/cfyiEBMAvlIIi+by8VcRPuSXfbaq
-         jvnXsXf/ijVmNTh2jlG406awsf8vRVsNEmYxTWAk77H/Jd0WSG835ZDrosun+PmVeAme
-         A2bgEVeBBvzo/mxIlfxdxxqbrAD3YyIIefiix/stRu7ICwOCzguPsSvKzSzjE2W+YgM+
-         7sjg==
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=HE2EGesAzfkG+XPG66mRg3LJsnfX0L4pyOaQFv0oeTM=;
+        b=IRO1hrqOZE+ZZPujBKMmBOtb7a9oy3eR+10yqmt1PUXow2DKvqj65SrZkA3s+prhhF
+         ZiL6Js1gPJ0tlTPokLDtlBCA+o56KHCsvcGJkhBQV+8Yon5KMy4pAXvd49TsMLkFzkVv
+         3fEjqA1zKwAQKpxHFOYbmykWaq0lry1zA/QH6UGQv+/ENqWkD3/vz9gcxsIcGISA6MC4
+         CD7pEHei1OErNdftl+HmvogPPfg5ER1oSOAenVEnH98y+N/S3YmB6ztn4SKhtQnZg1yp
+         Sw/Lir49XT1W0ltkvJY5bu0brkQnvQudaLVq5Mw60Bm24Z2t1gvcHO5jQ97NjRK5K/3X
+         5V7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=i+zr5M68aloOJzDo2BfmM/AByzuuaBC8sU7HTQ424Ng=;
-        b=Zd94oFcgtZr9l8mhEuIV30hVv3lgNyTi1x6nZz2gNK2s7BSKk6c6T7ZfXPAJ8+lxvM
-         i78BcSCeL4lBJ+kddWjACqo01eVK9o29symI3ulkBCC+cRFyg0aoFSaatpAJQ5q4DNFb
-         NhQrb1xPFsGaY9OJBlUSsjF+15jYGoMUG4t83VHdGPYAaQURk7aWxJvYC3rQTXSa7B0w
-         MgLND6D45uYymb+W7Hc8CvVfnnAAj7f+GnWR0zjpJGLS6/AEdpKJRzlsZeGxI1tuu8o4
-         yJj5KuJjqEj0BYBJTSJbFkPIiXmnUMkZeUrcRpMWEKTt0ixkaVOSPslcV3uHGLE2ld1p
-         KqMw==
-X-Gm-Message-State: AOAM531gWhYQbeFexq+OZ3Ci8iOxOT0ffq1YuVCVFsDJsuKmwLGmvZmE
-        iSKsvdRk3YjPK5u7hVtbuQn1vQ==
-X-Google-Smtp-Source: ABdhPJwdjQe3XZ1e4GuiLZkjz2XSDy8kccxsDVifb45M/0aMy9MY01MBSRkMjNi/1qqoMOzRLXd9XA==
-X-Received: by 2002:aa7:cdc9:0:b0:419:197e:14d9 with SMTP id h9-20020aa7cdc9000000b00419197e14d9mr498264edw.375.1649084485024;
-        Mon, 04 Apr 2022 08:01:25 -0700 (PDT)
-Received: from google.com (30.171.91.34.bc.googleusercontent.com. [34.91.171.30])
-        by smtp.gmail.com with ESMTPSA id y14-20020a056402440e00b00416046b623csm5690519eda.2.2022.04.04.08.01.24
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=HE2EGesAzfkG+XPG66mRg3LJsnfX0L4pyOaQFv0oeTM=;
+        b=dkdHSElR4ufqMj9oBIiwX0HZp6bSKL4QwptPDEndTiuWCGOm4ZoNLBbA0xi8b56rd5
+         ylD3FXJp1emJhSWuxXCrItAFpWd8ywMuBIadmC0FXvxjsqDS0GTkUS2Fo0JrLrDRq1X1
+         O5Ic36+UZ0pPTjPQGpNkCO0/6ha2zyPTxazTTUKz85wJGl0LLbIaKJSCkjsFYrhL2/1k
+         W9I2mJ3a4uqt/i8UBVx/rp4eaA63dBIxb4wsVfI+ISpXaYdmqgO/71sWJ1oykJvszMw+
+         PUH+vGRtIEPHrnJUQ80uyaF0xXxsvU6e35O5mAKBVnwRjghMWt0Vp/PB9//E4BUjPmbd
+         Jsvw==
+X-Gm-Message-State: AOAM5338xnexYJrdvy9l+nK5jNIFlZwrd6IjviZfTfr20l2jNIrE8W4N
+        Cv1J2A5UJxkjwNPqVf7hg9Qvig==
+X-Google-Smtp-Source: ABdhPJxqTrWvFH4n2ufrMe4V4grxK47YHIqUueBwWYr2mXHZSunxQ1BFUWU3ArqPpXE6vMNPc3GR+w==
+X-Received: by 2002:a63:35c1:0:b0:386:3620:3c80 with SMTP id c184-20020a6335c1000000b0038636203c80mr273939pga.327.1649085317855;
+        Mon, 04 Apr 2022 08:15:17 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id a11-20020a63cd4b000000b00378b9167493sm11029851pgj.52.2022.04.04.08.15.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Apr 2022 08:01:24 -0700 (PDT)
-Date:   Mon, 4 Apr 2022 15:01:21 +0000
-From:   Quentin Perret <qperret@google.com>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Steven Price <steven.price@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <YksIQYdG41v3KWkr@google.com>
-References: <YkHspg+YzOsbUaCf@google.com>
- <YkH32nx+YsJuUbmZ@google.com>
- <YkIFW25WgV2WIQHb@google.com>
- <YkM7eHCHEBe5NkNH@google.com>
- <88620519-029e-342b-0a85-ce2a20eaf41b@arm.com>
- <YkQzfjgTQaDd2E2T@google.com>
- <YkSaUQX89ZEojsQb@google.com>
- <80aad2f9-9612-4e87-a27a-755d3fa97c92@www.fastmail.com>
- <YkcTTY4YjQs5BRhE@google.com>
- <83fd55f8-cd42-4588-9bf6-199cbce70f33@www.fastmail.com>
+        Mon, 04 Apr 2022 08:15:16 -0700 (PDT)
+Date:   Mon, 4 Apr 2022 15:15:13 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Li,Rongqing" <lirongqing@baidu.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>
+Subject: Re: =?utf-8?B?562U5aSN?= =?utf-8?Q?=3A?= [PATCH] KVM: VMX: optimize
+ pi_wakeup_handler
+Message-ID: <YksLgfrKuX78e0ja@google.com>
+References: <1648872113-24329-1-git-send-email-lirongqing@baidu.com>
+ <e7896b4e-0b29-b735-88b8-34dd3b266d3d@redhat.com>
+ <d63acc4d9ac24a48b49415a45238e907@baidu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <83fd55f8-cd42-4588-9bf6-199cbce70f33@www.fastmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d63acc4d9ac24a48b49415a45238e907@baidu.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Friday 01 Apr 2022 at 12:56:50 (-0700), Andy Lutomirski wrote:
-> On Fri, Apr 1, 2022, at 7:59 AM, Quentin Perret wrote:
-> > On Thursday 31 Mar 2022 at 09:04:56 (-0700), Andy Lutomirski wrote:
+On Sat, Apr 02, 2022, Li,Rongqing wrote:
+> > 发件人: Paolo Bonzini <paolo.bonzini@gmail.com> 代表 Paolo Bonzini
+> > On 4/2/22 06:01, Li RongQing wrote:
+> > > pi_wakeup_handler is used to wakeup the sleep vCPUs by posted irq
+> > > list_for_each_entry is used in it, and whose input is other function
+> > > per_cpu(), That cause that per_cpu() be invoked at least twice when
+> > > there is one sleep vCPU
+> > >
+> > > so optimize pi_wakeup_handler it by reading once which is safe in
+> > > spinlock protection
+
+There's no need to protect reading the per-cpu variable with the spinlock, only
+walking the list needs to be protected.  E.g. the code can be compacted to:
+
+	int cpu = smp_processor_id();
+	raw_spinlock_t *spinlock = &per_cpu(wakeup_vcpus_on_cpu_lock, cpu);
+	struct list_head *wakeup_list = &per_cpu(wakeup_vcpus_on_cpu, cpu);
+	struct vcpu_vmx *vmx;
+
+	raw_spin_lock(spinlock);
+	list_for_each_entry(vmx, wakeup_list, pi_wakeup_list) {
+		if (pi_test_on(&vmx->pi_desc))
+			kvm_vcpu_wake_up(&vmx->vcpu);
+	}
+	raw_spin_unlock(spinlock);
+
+> > >
+> > > and same to per CPU spinlock
+> > 
+> > What's the difference in the generated code?
+> > 
 > 
-> 
-> > To answer your original question about memory 'conversion', the key
-> > thing is that the pKVM hypervisor controls the stage-2 page-tables for
-> > everyone in the system, all guests as well as the host. As such, a page
-> > 'conversion' is nothing more than a permission change in the relevant
-> > page-tables.
-> >
-> 
-> So I can see two different ways to approach this.
-> 
-> One is that you split the whole address space in half and, just like SEV and TDX, allocate one bit to indicate the shared/private status of a page.  This makes it work a lot like SEV and TDX.
->
-> The other is to have shared and private pages be distinguished only by their hypercall history and the (protected) page tables.  This saves some address space and some page table allocations, but it opens some cans of worms too.  In particular, the guest and the hypervisor need to coordinate, in a way that the guest can trust, to ensure that the guest's idea of which pages are private match the host's.  This model seems a bit harder to support nicely with the private memory fd model, but not necessarily impossible.
+> This reduces one fifth asm codes
 
-Right. Perhaps one thing I should clarify as well: pKVM (as opposed to
-TDX) has only _one_ page-table per guest, and it is controllex by the
-hypervisor only. So the hypervisor needs to be involved for both shared
-and private mappings. As such, shared pages have relatively similar
-constraints when it comes to host mm stuff --  we can't migrate shared
-pages or swap them out without getting the hypervisor involved.
+...
 
-> Also, what are you trying to accomplish by having the host userspace mmap private pages?
+> these is a similar patch 031e3bd8986fffe31e1ddbf5264cccfe30c9abd7
 
-What I would really like to have is non-destructive in-place conversions
-of pages. mmap-ing the pages that have been shared back felt like a good
-fit for the private=>shared conversion, but in fact I'm not all that
-opinionated about the API as long as the behaviour and the performance
-are there. Happy to look into alternatives.
-
-FWIW, there are a couple of reasons why I'd like to have in-place
-conversions:
-
- - one goal of pKVM is to migrate some things away from the Arm
-   Trustzone environment (e.g. DRM and the likes) and into protected VMs
-   instead. This will give Linux a fighting chance to defend itself
-   against these things -- they currently have access to _all_ memory.
-   And transitioning pages between Linux and Trustzone (donations and
-   shares) is fast and non-destructive, so we really do not want pKVM to
-   regress by requiring the hypervisor to memcpy things;
-
- - it can be very useful for protected VMs to do shared=>private
-   conversions. Think of a VM receiving some data from the host in a
-   shared buffer, and then it wants to operate on that buffer without
-   risking to leak confidential informations in a transient state. In
-   that case the most logical thing to do is to convert the buffer back
-   to private, do whatever needs to be done on that buffer (decrypting a
-   frame, ...), and then share it back with the host to consume it;
-
- - similar to the previous point, a protected VM might want to
-   temporarily turn a buffer private to avoid ToCToU issues;
-
- - once we're able to do device assignment to protected VMs, this might
-   allow DMA-ing to a private buffer, and make it shared later w/o
-   bouncing.
-
-And there is probably more.
-
-IIUC, the private fd proposal as it stands requires shared and private
-pages to come from entirely distinct places. So it's not entirely clear
-to me how any of the above could be supported without having the
-hypervisor memcpy the data during conversions, which I really don't want
-to do for performance reasons.
-
-> Is the idea that multiple guest could share the same page until such time as one of them tries to write to it?
-
-That would certainly be possible to implement in the pKVM
-environment with the right tracking, so I think it is worth considering
-as a future goal.
-
-Thanks,
-Quentin
+Is there a measurable performance improvement though?  I don't dislike the patch,
+but it probably falls into the "technically an optimization but no one will ever
+notice" category.
