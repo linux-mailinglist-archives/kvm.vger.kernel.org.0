@@ -2,94 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B3894F1B83
-	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 23:23:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DF5C4F1BAD
+	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 23:24:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358316AbiDDVUk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Apr 2022 17:20:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54418 "EHLO
+        id S1380869AbiDDVWJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Apr 2022 17:22:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379671AbiDDRqp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Apr 2022 13:46:45 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E73F413EBA;
-        Mon,  4 Apr 2022 10:44:48 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 234Gnt12007587;
-        Mon, 4 Apr 2022 17:44:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=kS54dM+ypQZ8EoJJUIwz4/wZhNCHoSajCdibEApa3zA=;
- b=YqAdirFwM2+SAl1zVenRDp0a9bZHIPDFrQHGx1NXcay1QCROxJb2iY8LmjDMjnB/uoHg
- eL39ibqmJp9lErLBoMhuwvfuHhThbPrj2oCqc5jqm9/YS2nlBTDQ0XePr7gsmuRKp2Fy
- hxpmnmv8QpoIWGrZwsqQhev9P5ZC3YH5UrdS4wE08oQBbPkevw5oEMISdCbGspmCt6NL
- 489pIkhmp/8mPZQod2+jFmIJYpmVwf28L/iIeqmIKMV9T/R9NJJCxvMTHD8khrLZdd4w
- 5wqzGYCHFr6Ghr9rE2cDl00euXbyNxj2NKQtfhhNsSytMvqoXn9Ce93NNcKyHkP6zjJq Gg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3f6yupcxbw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 04 Apr 2022 17:44:47 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 234GFNdg021524;
-        Mon, 4 Apr 2022 17:44:46 GMT
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3f6yupcxbd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 04 Apr 2022 17:44:46 +0000
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 234Hh2Oc006587;
-        Mon, 4 Apr 2022 17:44:45 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
-        by ppma01wdc.us.ibm.com with ESMTP id 3f6tyrw9ug-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 04 Apr 2022 17:44:45 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 234HiiFY34800044
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 4 Apr 2022 17:44:44 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D34DF136059;
-        Mon,  4 Apr 2022 17:44:44 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B995F136051;
-        Mon,  4 Apr 2022 17:44:42 +0000 (GMT)
-Received: from li-c92d2ccc-254b-11b2-a85c-a700b5bfb098.ibm.com.com (unknown [9.211.32.125])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon,  4 Apr 2022 17:44:42 +0000 (GMT)
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-To:     linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Subject: [PATCH v5 21/21] MAINTAINERS: additional files related kvm s390 pci passthrough
-Date:   Mon,  4 Apr 2022 13:43:49 -0400
-Message-Id: <20220404174349.58530-22-mjrosato@linux.ibm.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220404174349.58530-1-mjrosato@linux.ibm.com>
-References: <20220404174349.58530-1-mjrosato@linux.ibm.com>
+        with ESMTP id S1379672AbiDDRsF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Apr 2022 13:48:05 -0400
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 087F92E9CD;
+        Mon,  4 Apr 2022 10:46:07 -0700 (PDT)
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1nbQm6-000327-H6; Mon, 04 Apr 2022 19:45:58 +0200
+Message-ID: <20d050db-78f2-2a78-b319-a84f726a0bf9@maciej.szmigiero.name>
+Date:   Mon, 4 Apr 2022 19:45:52 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: zjUiDLxJ6dpiv1mOn06hRvIOs20Cc2Ha
-X-Proofpoint-ORIG-GUID: 3QDkRrGJnXIGU4qENI3mvtAdVJXsOj72
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-04-04_06,2022-03-31_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
- phishscore=0 adultscore=0 clxscore=1015 mlxlogscore=974 lowpriorityscore=0
- impostorscore=0 suspectscore=0 priorityscore=1501 spamscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2204040099
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220402010903.727604-1-seanjc@google.com>
+ <20220402010903.727604-2-seanjc@google.com>
+ <112c2108-7548-f5bd-493d-19b944701f1b@maciej.szmigiero.name>
+ <YkspIjFMwpMYWV05@google.com>
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: Re: [PATCH 1/8] KVM: nSVM: Sync next_rip field from vmcb12 to vmcb02
+In-Reply-To: <YkspIjFMwpMYWV05@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,NICE_REPLY_A,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -98,26 +50,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add entries from the s390 kvm subdirectory related to pci passthrough.
+On 4.04.2022 19:21, Sean Christopherson wrote:
+> On Mon, Apr 04, 2022, Maciej S. Szmigiero wrote:
+>>> @@ -1606,7 +1622,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+>>>    	nested_copy_vmcb_control_to_cache(svm, ctl);
+>>>    	svm_switch_vmcb(svm, &svm->nested.vmcb02);
+>>> -	nested_vmcb02_prepare_control(svm);
+>>> +	nested_vmcb02_prepare_control(svm, save->rip);
+>>
+>> 					   ^
+>> I guess this should be "svm->vmcb->save.rip", since
+>> KVM_{GET,SET}_NESTED_STATE "save" field contains vmcb01 data,
+>> not vmcb{0,1}2 (in contrast to the "control" field).
+> 
+> Argh, yes.  Is userspace required to set L2 guest state prior to KVM_SET_NESTED_STATE?
+> If not, this will result in garbage being loaded into vmcb02.
 
-Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+I'm not sure about particular KVM API guarantees,
+but looking at the code I guess it is supposed to handle both cases:
+1) VMM loads the usual basic KVM state via KVM_SET_{S,}REGS then immediately
+issues KVM_SET_NESTED_STATE to load the remaining nested data.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index fd768d43e048..0d9e991820a8 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17259,6 +17259,7 @@ M:	Eric Farman <farman@linux.ibm.com>
- L:	linux-s390@vger.kernel.org
- L:	kvm@vger.kernel.org
- S:	Supported
-+F:	arch/s390/kvm/pci*
- F:	drivers/vfio/pci/vfio_pci_zdev.c
- F:	include/uapi/linux/vfio_zdev.h
- 
--- 
-2.27.0
+Assuming that it was the L2 that was running at the save time,
+at first the basic L2 state will be loaded into vmcb01,
+then at KVM_SET_NESTED_STATE time:
+> if (is_guest_mode(vcpu))
+>     svm_leave_nested(vcpu);
+> else
+>     svm->nested.vmcb02.ptr->save = svm->vmcb01.ptr->save;
 
+The !is_guest_mode(vcpu) branch will be taken (since the new VM haven't entered
+the guest mode yet), which will copy the basic L2 state from vmcb01 to vmcb02 and
+then the remaining code will restore vmcb01 save and vmcb{0,1}2 control normally and
+then enter the guest mode.
+
+2) VMM first issues KVM_SET_NESTED_STATE then immediately loads the basic state.
+
+Sane as the above, only some initial VM state will be copied into vmcb02 from vmcb01
+by the code mentioned above, then vmcb01 save and vmcb{0,1}2 control will be restored
+and guest mode will be entered.
+If the VMM then immediately issues KVM_SET_{S,}REGS then it will restore L2 basic state
+straight into vmcb02.
+
+However, this all is my guess work from just looking at the relevant code,
+I haven't run any tests to make sure that I haven't missed something.
+
+Thanks,
+Maciej
