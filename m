@@ -2,114 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 088804F0D47
-	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 02:41:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 860784F0D78
+	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 03:51:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376822AbiDDAnR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 3 Apr 2022 20:43:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36542 "EHLO
+        id S1376884AbiDDBx3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 3 Apr 2022 21:53:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241444AbiDDAnR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 3 Apr 2022 20:43:17 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D81F223150;
-        Sun,  3 Apr 2022 17:41:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649032880; x=1680568880;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=AQY0RgB1apu3f3OnS0H9ItCK1wYR3RZozmXjysWHgPs=;
-  b=QJp0fL+Da3hubl9IgHYFLEIeeJd0N3fpNbHVEln206FMdcN6S+cbE8Zc
-   3LucWdIiz7wXIfiBrHrFHOlh5RekSxafsIgX982ezZqeuz9WTr7pgheRv
-   cmb0K/8iamr9wTh/KJKm2Gt4alnBX2J3w40BV7wvOrEdho9JcMO+AXX+k
-   j+GYr4Q6XfLKKZpnshwlvyMamRYBM6NWxlwPon88iVGkcCcnDWh79lG/3
-   FVQjKCc9XzWXdvOhuDePtJ8vC2Mn1ZBWYeziaNF4izWH92Mxo/RW2JwiO
-   Bzn0y205FkQzd2GqKX4F8Trb7AmL0P/Dwa+3koM+8cZ5Jv2LuJDszQFkH
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10306"; a="285364336"
-X-IronPort-AV: E=Sophos;i="5.90,233,1643702400"; 
-   d="scan'208";a="285364336"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2022 17:41:20 -0700
-X-IronPort-AV: E=Sophos;i="5.90,233,1643702400"; 
-   d="scan'208";a="789338501"
-Received: from bthorroc-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.132.176])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2022 17:41:18 -0700
-Message-ID: <039c9eada49e9eeca48c39c5bea0fac0ab68c673.camel@intel.com>
-Subject: Re: [RFC PATCH v5 038/104] KVM: x86/mmu: Allow per-VM override of
- the TDP max page level
-From:   Kai Huang <kai.huang@intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>
-Date:   Mon, 04 Apr 2022 12:41:16 +1200
-In-Reply-To: <YkeUDJP1AWKU/ixG@google.com>
-References: <cover.1646422845.git.isaku.yamahata@intel.com>
-         <5cc4b1c90d929b7f4f9829a42c0b63b52af0c1ed.1646422845.git.isaku.yamahata@intel.com>
-         <c6fb151ced1675d1c93aa18ad8c57c2ffc4e9fcb.camel@intel.com>
-         <YkcHZo3i+rki+9lK@google.com>
-         <43098446667829fc592b7cc7d5fd463319d37562.camel@intel.com>
-         <YkeUDJP1AWKU/ixG@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+        with ESMTP id S238610AbiDDBx1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 3 Apr 2022 21:53:27 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A04CAAE48
+        for <kvm@vger.kernel.org>; Sun,  3 Apr 2022 18:51:32 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id c23so7008352plo.0
+        for <kvm@vger.kernel.org>; Sun, 03 Apr 2022 18:51:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/HPdEv1u1dHBI9/8ZBUeRoQdCX9qorofNrQMRHwE/GM=;
+        b=TH7dk7njieIgZMTiOMnEIMvq+kdoMWSqtMYSxG5nKkNG4lplBb6nOcZElTyYhgdDrp
+         hR9rgg9oE2w1A7L4evuBKkZ258pqZoWl2wBuPX3QeTUN0fsmzRuh3Mi6Yxn1H37IQqg3
+         X80ZJeF8GbE73f1zPSqOYhkLWEUPe0NE+5q76iLvJZ+4uFD40aOTQ8rkoBvoF0xBvVie
+         CWx92BLBNo6CsWPLZOmC5jsJ/d8/XNmGI+oyuCS8ixp3agIFVepWHZjPhNcTQWmvgMX8
+         GgSAV2Bj+pC7Xv0vAQQJIXIDDv67tLEX4dg644wEjpR/Eq+2cR+xwBxdTEZ3JJLdkvxM
+         sqXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/HPdEv1u1dHBI9/8ZBUeRoQdCX9qorofNrQMRHwE/GM=;
+        b=M+fekxmwofkdIXNT5BWrmHT7agN+qX1fooWhTgAabiMLkp3GHxlEa0hjMQ9VYyd9fo
+         kW6Xva/S5/9mjtRv5yIMhd0iKg89bw/BVmzCPSNuD67UrIxaYYKBSL3y/L5hpj3QKhFW
+         vfmqD7vzp+HTYjVS4Is4JHf79j9BzFww1xp/lyt03qAc99s5+SzGojvIOCNCvseJNCUj
+         IQRor9G7ig8URNKYif3fOhWFhsrkGoSFDAmOpl/X2aSxywQnPJETxzvIL+FFhpGE0vzs
+         1ebczdY2VGI+c4t8k0sQ3arw7eXEUl2GcepimDuBe0QFySyEjIddu7Tv+22egRiDZvT5
+         ESHQ==
+X-Gm-Message-State: AOAM533g7ZMikIIdGEbDPvZkNwHEFAirlWOL+RGhl+qFNWlKyfniIxZg
+        jYE7Ue4tfJMKGWVzDFpZ1+VtAYspXchmw3CQS/RVeA==
+X-Google-Smtp-Source: ABdhPJxyxERsq7XOg9dz4MNtcUQNW88b6cSv75PSoe0iFwSBsyc+IpLz523KkiK7LrRy69grM1vP5GttYQgnmHlw9TY=
+X-Received: by 2002:a17:902:c215:b0:153:8d90:a108 with SMTP id
+ 21-20020a170902c21500b001538d90a108mr21434704pll.172.1649037091972; Sun, 03
+ Apr 2022 18:51:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220401010832.3425787-1-oupton@google.com> <20220401010832.3425787-2-oupton@google.com>
+In-Reply-To: <20220401010832.3425787-2-oupton@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Sun, 3 Apr 2022 18:51:16 -0700
+Message-ID: <CAAeT=Fy=aUNHq7zWYxYOLWvR-nOZr5Gdvu1yNiOisgtJ3SF1pw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] KVM: arm64: Wire up CP15 feature registers to
+ their AArch64 equivalents
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 2022-04-02 at 00:08 +0000, Sean Christopherson wrote:
-> On Sat, Apr 02, 2022, Kai Huang wrote:
-> > On Fri, 2022-04-01 at 14:08 +0000, Sean Christopherson wrote:
-> > > On Fri, Apr 01, 2022, Kai Huang wrote:
-> > > > On Fri, 2022-03-04 at 11:48 -0800, isaku.yamahata@intel.com wrote:
-> > > > > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > > > 
-> > > > > In the existing x86 KVM MMU code, there is already max_level member in
-> > > > > struct kvm_page_fault with KVM_MAX_HUGEPAGE_LEVEL initial value.  The KVM
-> > > > > page fault handler denies page size larger than max_level.
-> > > > > 
-> > > > > Add per-VM member to indicate the allowed maximum page size with
-> > > > > KVM_MAX_HUGEPAGE_LEVEL as default value and initialize max_level in struct
-> > > > > kvm_page_fault with it.
-> > > > > 
-> > > > > For the guest TD, the set per-VM value for allows maximum page size to 4K
-> > > > > page size.  Then only allowed page size is 4K.  It means large page is
-> > > > > disabled.
-> > > > 
-> > > > Do not support large page for TD is the reason that you want this change, but
-> > > > not the result.  Please refine a little bit.
-> > > 
-> > > Not supporting huge pages was fine for the PoC, but I'd prefer not to merge TDX
-> > > without support for huge pages.  Has any work been put into enabling huge pages?
-> > > If so, what's the technical blocker?  If not...
-> > 
-> > Hi Sean,
-> > 
-> > Is there any reason large page support must be included in the initial merge of
-> > TDX?  Large page is more about performance improvement I think.  Given this
-> > series is already very big, perhaps we can do it later.
-> 
-> I'm ok punting 1gb for now, but I want to have a high level of confidence that 2mb
-> pages will work without requiring significant churn in KVM on top of the initial
-> TDX support.  I suspect gaining that level of confidence will mean getting 95%+ of
-> the way to a fully working code base.  IIRC, 2mb wasn't expected to be terrible, it
-> was 1gb support where things started to get messy.
+On Thu, Mar 31, 2022 at 6:08 PM Oliver Upton <oupton@google.com> wrote:
+>
+> KVM currently does not trap ID register accesses from an AArch32 EL1.
+> This is painful for a couple of reasons. Certain unimplemented features
+> are visible to AArch32 EL1, as we limit PMU to version 3 and the debug
+> architecture to v8.0. Additionally, we attempt to paper over
+> heterogeneous systems by using register values that are safe
+> system-wide. All this hard work is completely sidestepped because KVM
+> does not set TID3 for AArch32 guests.
+>
+> Fix up handling of CP15 feature registers by simply rerouting to their
+> AArch64 aliases. Punt setting HCR_EL2.TID3 to a later change, as we need
+> to fix up the oddball CP10 feature registers still.
+>
+> Signed-off-by: Oliver Upton <oupton@google.com>
 
-OK no argument here :)
-
--- 
-Thanks,
--Kai
-
-
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
