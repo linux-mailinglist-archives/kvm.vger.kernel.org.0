@@ -2,123 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 889D24F1F8A
-	for <lists+kvm@lfdr.de>; Tue,  5 Apr 2022 00:52:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 386AB4F2034
+	for <lists+kvm@lfdr.de>; Tue,  5 Apr 2022 01:20:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240869AbiDDWyS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Apr 2022 18:54:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39094 "EHLO
+        id S239436AbiDDXVx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Apr 2022 19:21:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234622AbiDDWxe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Apr 2022 18:53:34 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E60C4BB9C;
-        Mon,  4 Apr 2022 15:12:14 -0700 (PDT)
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 234KdqpB014991;
-        Mon, 4 Apr 2022 22:12:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=3kjsoRjvDKu1C9UwVFFUQn8L7ZFAY2Uoeo9bpzKpFvU=;
- b=puJkS3PwwHs9+a5BbGzMJchmj2QcRlql1glKIMo3smAxn272jPemDmL8Bhq622uX/SGV
- 5MuRGokLMjpvtiVd0OfkOpom+y+Vnns2UbCHm7SYhbsPIbhnkncm9LTrn3s59U6FzyLV
- WVnze312uLWkkpzJBadxCrl2iWsth0A9Z3kGvfPNoDUGrBWd90ud2/6TWJzpdXxJvxLP
- WqowLl/6Pu+rqY56ySINKfLQjUwAfK363EPHlzM/FWI6vtFzbM8XPpviI/YrYjZ9Kj9n
- 8aEdd9WgwCEKLWr/VOMAJ8u5iZYO3SxKexyGRsI98cwi5oScem/KjF3Bm4sa+sT6Ewk8 dw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f7yn9suap-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 04 Apr 2022 22:12:11 +0000
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 234Lso6u008646;
-        Mon, 4 Apr 2022 22:12:11 GMT
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f7yn9sua5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 04 Apr 2022 22:12:11 +0000
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 234Lr7o7022045;
-        Mon, 4 Apr 2022 22:12:09 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma04wdc.us.ibm.com with ESMTP id 3f6e49jna0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 04 Apr 2022 22:12:09 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 234MC8ed20709878
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 4 Apr 2022 22:12:08 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B5C4E7805C;
-        Mon,  4 Apr 2022 22:12:08 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A6DF278064;
-        Mon,  4 Apr 2022 22:12:07 +0000 (GMT)
-Received: from localhost.localdomain.com (unknown [9.65.234.56])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon,  4 Apr 2022 22:12:07 +0000 (GMT)
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jjherne@linux.ibm.com, freude@linux.ibm.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        pasic@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, fiuczy@linux.ibm.com
-Subject: [PATCH v19 20/20] MAINTAINERS: pick up all vfio_ap docs for VFIO AP maintainers
-Date:   Mon,  4 Apr 2022 18:10:39 -0400
-Message-Id: <20220404221039.1272245-21-akrowiak@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220404221039.1272245-1-akrowiak@linux.ibm.com>
-References: <20220404221039.1272245-1-akrowiak@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: woP7XXwf4ME31OJ9cz50tOPGt5H-uEbr
-X-Proofpoint-ORIG-GUID: yV7AEDOTAkoCva4P7b5tEsPb9IUNyDig
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S243125AbiDDXV3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Apr 2022 19:21:29 -0400
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70691DFE7
+        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 16:19:30 -0700 (PDT)
+Received: by mail-io1-xd33.google.com with SMTP id z6so13302503iot.0
+        for <kvm@vger.kernel.org>; Mon, 04 Apr 2022 16:19:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=4HQuxb/8RWMSgNIJitUFJzaBlGJWxUNK7LO21+WkcG4=;
+        b=Et2iWkTnW2r9yego6aq6wuHaWBZ4EPhFdAlYbpl3fySBWEZ2suJ7cmpKbqAZVDEYJV
+         penv5MLm4ibzzjyZiCG+sRGdi8Owm7364yw8WjIBdlTFlfXoBJO7+FNNr9McLPDqsk/+
+         Wk3JJz1J8PkUOamRTT2csAmTyuLOZGX07uWOwgNGZ1je/MbzCba3qb/ZUCyBExVSbyUT
+         pMee689hFU90nSNMhNGDq3sULdZzSgRygc/zJleZXc6y0m6EZ+663aM9zSvn4AgP6AsS
+         4zwbH01jcZUOsOFgfWw1EUdI9wee7r/o5gNsIU9levXCN6L9MQE2pBXPeWowZWRd2Rr2
+         JePA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=4HQuxb/8RWMSgNIJitUFJzaBlGJWxUNK7LO21+WkcG4=;
+        b=6fCY07T5UIO+BPBYM+6PU5ZJ83cRYilQtud35yr8PgL+2P8Hk4dWic5QLXbCt1uNl2
+         9JByZUmKz/EgFfNihcpnOlLpegKJogLVuPxmZrIykxfROcbu9UeqpIA3Y+kYoEL1ZPvu
+         zLqcukH4jp8SHXu1loNzTNFQ5MJgoRL4fWK5eXcHAlMNO1RBDLCxiuNxizFHCFnkXlvk
+         zIfRF1EyrwDk8XIMaEJhc4bEvNvj7z7eCLo/Bmr5EkF+rWVS1KIGDzOJpWU/NL2/yVj6
+         s9xpOuw8f5B+2Uad7pRHt7hrkff4+MgDbnzQDIcSqpMHj/8rKURFMDSm+/vuNrfluLXY
+         gj6Q==
+X-Gm-Message-State: AOAM531sCKq8IdqiT+d0vDMIOUEA17bGBekx3txyGZalxSxWgp6WWAbt
+        BHLuMrbiy+8q6jh8aTQk2MuHmw==
+X-Google-Smtp-Source: ABdhPJybHp4SBT2pqY9bfoXsSLyxE3+imCY7mtDDFkk9g25hqxAWHP1Ohh8UmDjlZHjJtCgPNsazsQ==
+X-Received: by 2002:a05:6602:80a:b0:649:f33:ecb2 with SMTP id z10-20020a056602080a00b006490f33ecb2mr344836iow.150.1649114369644;
+        Mon, 04 Apr 2022 16:19:29 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id s10-20020a6b740a000000b006413d13477dsm7067073iog.33.2022.04.04.16.19.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Apr 2022 16:19:28 -0700 (PDT)
+Date:   Mon, 4 Apr 2022 23:19:25 +0000
+From:   Oliver Upton <oupton@google.com>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v2 2/3] KVM: arm64: Plumb cp10 ID traps through the
+ AArch64 sysreg handler
+Message-ID: <Ykt8/Q5LLpZdgLu5@google.com>
+References: <20220401010832.3425787-1-oupton@google.com>
+ <20220401010832.3425787-3-oupton@google.com>
+ <CAAeT=FxSTL2MEBP-_vcUxJ57+F1X0EshU4R2+kNNEf5k1jJXig@mail.gmail.com>
+ <YkqCAcPCnqYofspa@google.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-04-04_09,2022-03-31_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=943 spamscore=0
- priorityscore=1501 adultscore=0 mlxscore=0 lowpriorityscore=0 phishscore=0
- impostorscore=0 clxscore=1015 malwarescore=0 bulkscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2204040123
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YkqCAcPCnqYofspa@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A new document, Documentation/s390/vfio-ap-locking.rst was added. Make sure
-the new document is picked up for the VFIO AP maintainers by using a
-wildcard: Documentation/s390/vfio-ap*.
+On Mon, Apr 04, 2022 at 05:28:33AM +0000, Oliver Upton wrote:
+> Hi Reiji,
+> 
+> On Sun, Apr 03, 2022 at 08:57:47PM -0700, Reiji Watanabe wrote:
+> > > +int kvm_handle_cp10_id(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +       int Rt = kvm_vcpu_sys_get_rt(vcpu);
+> > > +       u32 esr = kvm_vcpu_get_esr(vcpu);
+> > > +       struct sys_reg_params params;
+> > > +       int ret;
+> > > +
+> > > +       /* UNDEF on any unhandled register or an attempted write */
+> > > +       if (!kvm_esr_cp10_id_to_sys64(esr, &params) || params.is_write) {
+> > > +               kvm_inject_undefined(vcpu);
+> > 
+> > Nit: For debugging, it might be more useful to use unhandled_cp_access()
+> > (, which needs to be changed to support ESR_ELx_EC_CP10_ID though)
+> > rather than directly calling kvm_inject_undefined().
+> 
+> A very worthy nit, you spotted my laziness in shunting straight to
+> kvm_inject_undefined() :)
+> 
+> Thinking about this a bit more deeply, this code should be dead. The
+> only time either of these conditions would happen is on a broken
+> implementation. Probably should still handle it gracefully in case the
+> CP10 handling in KVM becomes (or is in my own patch!) busted.
 
-Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
----
- MAINTAINERS | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Actually, on second thought: any objections to leaving this as-is?
+kvm_esr_cp10_id_to_sys64() spits out sys_reg_params that point at the
+MRS alias for the VMRS register. Even if that call succeeds, the params
+that get printed out by unhandled_cp_access() do not match the actual
+register the guest was accessing. And if the call fails, ->Op2 is
+uninitialized.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index fd768d43e048..c8d8637c184c 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17239,8 +17239,10 @@ M:	Jason Herne <jjherne@linux.ibm.com>
- L:	linux-s390@vger.kernel.org
- S:	Supported
- W:	http://www.ibm.com/developerworks/linux/linux390/
--F:	Documentation/s390/vfio-ap.rst
--F:	drivers/s390/crypto/vfio_ap*
-+F:	Documentation/s390/vfio-ap*
-+F:	drivers/s390/crypto/vfio_ap_drv.c
-+F:	drivers/s390/crypto/vfio_ap_ops.c
-+F:	drivers/s390/crypto/vfio_ap_private.h
- 
- S390 VFIO-CCW DRIVER
- M:	Eric Farman <farman@linux.ibm.com>
--- 
-2.31.1
+Sorry for backtracking here.
 
+--
+Thanks,
+Oliver
