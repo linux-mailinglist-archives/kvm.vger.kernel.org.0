@@ -2,74 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BEBCB4F0CCE
-	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 00:36:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 088804F0D47
+	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 02:41:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235867AbiDCWig (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 3 Apr 2022 18:38:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55720 "EHLO
+        id S1376822AbiDDAnR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 3 Apr 2022 20:43:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235976AbiDCWif (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 3 Apr 2022 18:38:35 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97B05338A9;
-        Sun,  3 Apr 2022 15:36:39 -0700 (PDT)
-Received: from zn.tnic (p2e55dff8.dip0.t-ipconnect.de [46.85.223.248])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2F42A1EC0391;
-        Mon,  4 Apr 2022 00:36:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1649025394;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=eMvdZnfzb84eh5dWY4TzFYh9Frtp7zqamDf5CXupNkM=;
-        b=qLYRjOZFCK73aydb1ooMD6X4B+P98cVazZIfNLdnYyD7gZFRuAbpHOpLeeAM9FEC823+Fh
-        5jZdiwZChRI+Kq3SqLnpSFMdOa9MydIt6EBGltDndX67UbC9WN48YxzmySIKGht2KnZXaR
-        iOJvH6NqgbcHyTTjT+kWS3n+QUTvJ9k=
-Date:   Mon, 4 Apr 2022 00:36:30 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v11 00/45] Add AMD Secure Nested Paging (SEV-SNP) Guest
- Support
-Message-ID: <YkohbveUq3lItqpl@zn.tnic>
-References: <20220224165625.2175020-1-brijesh.singh@amd.com>
- <Yh99pBI/RwZY1yf7@nazgul.tnic>
- <519f5e8e-18d1-43ac-ef90-0320d21c3a55@redhat.com>
- <Yh+YAWu3K4xBillV@nazgul.tnic>
+        with ESMTP id S241444AbiDDAnR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 3 Apr 2022 20:43:17 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D81F223150;
+        Sun,  3 Apr 2022 17:41:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1649032880; x=1680568880;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=AQY0RgB1apu3f3OnS0H9ItCK1wYR3RZozmXjysWHgPs=;
+  b=QJp0fL+Da3hubl9IgHYFLEIeeJd0N3fpNbHVEln206FMdcN6S+cbE8Zc
+   3LucWdIiz7wXIfiBrHrFHOlh5RekSxafsIgX982ezZqeuz9WTr7pgheRv
+   cmb0K/8iamr9wTh/KJKm2Gt4alnBX2J3w40BV7wvOrEdho9JcMO+AXX+k
+   j+GYr4Q6XfLKKZpnshwlvyMamRYBM6NWxlwPon88iVGkcCcnDWh79lG/3
+   FVQjKCc9XzWXdvOhuDePtJ8vC2Mn1ZBWYeziaNF4izWH92Mxo/RW2JwiO
+   Bzn0y205FkQzd2GqKX4F8Trb7AmL0P/Dwa+3koM+8cZ5Jv2LuJDszQFkH
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10306"; a="285364336"
+X-IronPort-AV: E=Sophos;i="5.90,233,1643702400"; 
+   d="scan'208";a="285364336"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2022 17:41:20 -0700
+X-IronPort-AV: E=Sophos;i="5.90,233,1643702400"; 
+   d="scan'208";a="789338501"
+Received: from bthorroc-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.132.176])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2022 17:41:18 -0700
+Message-ID: <039c9eada49e9eeca48c39c5bea0fac0ab68c673.camel@intel.com>
+Subject: Re: [RFC PATCH v5 038/104] KVM: x86/mmu: Allow per-VM override of
+ the TDP max page level
+From:   Kai Huang <kai.huang@intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>
+Date:   Mon, 04 Apr 2022 12:41:16 +1200
+In-Reply-To: <YkeUDJP1AWKU/ixG@google.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+         <5cc4b1c90d929b7f4f9829a42c0b63b52af0c1ed.1646422845.git.isaku.yamahata@intel.com>
+         <c6fb151ced1675d1c93aa18ad8c57c2ffc4e9fcb.camel@intel.com>
+         <YkcHZo3i+rki+9lK@google.com>
+         <43098446667829fc592b7cc7d5fd463319d37562.camel@intel.com>
+         <YkeUDJP1AWKU/ixG@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Yh+YAWu3K4xBillV@nazgul.tnic>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,24 +68,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 02, 2022 at 05:14:57PM +0100, Borislav Petkov wrote:
-> On Wed, Mar 02, 2022 at 05:09:34PM +0100, Paolo Bonzini wrote:
-> > Sure: https://git.kernel.org/pub/scm/virt/kvm/kvm.git, branch svm-for-snp.
+On Sat, 2022-04-02 at 00:08 +0000, Sean Christopherson wrote:
+> On Sat, Apr 02, 2022, Kai Huang wrote:
+> > On Fri, 2022-04-01 at 14:08 +0000, Sean Christopherson wrote:
+> > > On Fri, Apr 01, 2022, Kai Huang wrote:
+> > > > On Fri, 2022-03-04 at 11:48 -0800, isaku.yamahata@intel.com wrote:
+> > > > > From: Sean Christopherson <sean.j.christopherson@intel.com>
+> > > > > 
+> > > > > In the existing x86 KVM MMU code, there is already max_level member in
+> > > > > struct kvm_page_fault with KVM_MAX_HUGEPAGE_LEVEL initial value.  The KVM
+> > > > > page fault handler denies page size larger than max_level.
+> > > > > 
+> > > > > Add per-VM member to indicate the allowed maximum page size with
+> > > > > KVM_MAX_HUGEPAGE_LEVEL as default value and initialize max_level in struct
+> > > > > kvm_page_fault with it.
+> > > > > 
+> > > > > For the guest TD, the set per-VM value for allows maximum page size to 4K
+> > > > > page size.  Then only allowed page size is 4K.  It means large page is
+> > > > > disabled.
+> > > > 
+> > > > Do not support large page for TD is the reason that you want this change, but
+> > > > not the result.  Please refine a little bit.
+> > > 
+> > > Not supporting huge pages was fine for the PoC, but I'd prefer not to merge TDX
+> > > without support for huge pages.  Has any work been put into enabling huge pages?
+> > > If so, what's the technical blocker?  If not...
 > > 
-> > $ git log -4 --oneline --reverse
-> > 3c95d3fab229 KVM: SVM: Define sev_features and vmpl field in the VMSA
-> > 0c86f9cf27f7 KVM: SVM: Create a separate mapping for the SEV-ES save area
-> > c5e0ec4c742d KVM: SVM: Create a separate mapping for the GHCB save area
-> > 88c955d1fc93 (HEAD -> kvm/svm-for-snp) KVM: SVM: Update the SEV-ES save area mapping
+> > Hi Sean,
+> > 
+> > Is there any reason large page support must be included in the initial merge of
+> > TDX?  Large page is more about performance improvement I think.  Given this
+> > series is already very big, perhaps we can do it later.
 > 
-> Thanks!
+> I'm ok punting 1gb for now, but I want to have a high level of confidence that 2mb
+> pages will work without requiring significant churn in KVM on top of the initial
+> TDX support.  I suspect gaining that level of confidence will mean getting 95%+ of
+> the way to a fully working code base.  IIRC, 2mb wasn't expected to be terrible, it
+> was 1gb support where things started to get messy.
 
-Err, wasn't this supposed to go to Linus this merge window?
-
-I don't see it...
+OK no argument here :)
 
 -- 
-Regards/Gruss,
-    Boris.
+Thanks,
+-Kai
 
-https://people.kernel.org/tglx/notes-about-netiquette
+
