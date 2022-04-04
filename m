@@ -2,79 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA9384F1BC2
-	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 23:25:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C5504F1BA2
+	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 23:23:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381201AbiDDVWk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Apr 2022 17:22:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33480 "EHLO
+        id S1380700AbiDDVVy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Apr 2022 17:21:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379923AbiDDSVz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Apr 2022 14:21:55 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76C7822B20
-        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 11:19:59 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id ch16-20020a17090af41000b001ca867ef52bso497144pjb.0
-        for <kvm@vger.kernel.org>; Mon, 04 Apr 2022 11:19:59 -0700 (PDT)
+        with ESMTP id S1379926AbiDDSXZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Apr 2022 14:23:25 -0400
+Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77B8F22B20
+        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 11:21:28 -0700 (PDT)
+Received: by mail-il1-x149.google.com with SMTP id b8-20020a92db08000000b002c9a58332cbso6603024iln.16
+        for <kvm@vger.kernel.org>; Mon, 04 Apr 2022 11:21:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=aiqJZ75/YWr0n8WF7lZiF1Fjak6AGRA7UVKN+yFyHrY=;
-        b=k2z4OSa4+eckdOtXVxKvSW/v87vtp2H6bCdPyILueYWMdwy5RcQGTrthmlyRKI+4OI
-         2sFfoLEEM3FAmnL0mNEXE3Acm9HfuUjcbpfBhScTdVTXF1zwpOR5WLjrb4esOqo8U51c
-         MRO2xOQecJogFv+wHld28UDGdrS+XImpNb3ak+kjgOYgkDY5E1tJpt09k0j/w20JCFKK
-         fdFRL1Qe0n5TOiOxwo1d6PTRJnMTSoAPvIXOkJHukg/0rpqorWhDxFiy+zh2v5gLZISk
-         qER49CE71HkRIrMDUar5JrVHSTWu7YLHjN8YokyseXHkbtfnHjLtjLDiW4z6qlk14Hfi
-         wRQQ==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=8WwwRyCeCeMlIzr9SxYzcSTADq8P7PlbsRggytaLcp4=;
+        b=VQaIdErXUgdjfuVxv831Q/UJ1CWc5wWY7lxH3zvCVtXh16fjW923ZCg+YZuUsWju3h
+         4ILe42584P0T1xmue23EdXWW7PxQVhSS77wXAmPxATMxy/cGsyGIM6bUkch6ZVyRElCQ
+         rYfBdRc5h8GB9QfjxeOjmesVjpoFyeeH8Zu3wSnbSfQxQ3f/BrQJ4KI3CO5dBC0PNy47
+         Yq8oCV8PCHMfzHfZRdiUAWzfhsKGQ1Hpzi816xxYXKutJYAFxMS/T/Z1CZFLs+IWzaVH
+         muqotKois0KT0BZ6aZswP/2F+KHpolFWLj99t2uLkL2he7pDHDC+m/o+W1S/4MwTh6cX
+         aMtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=aiqJZ75/YWr0n8WF7lZiF1Fjak6AGRA7UVKN+yFyHrY=;
-        b=epmHE1Wl/pMCJhMumHPd/gNDyKACdG/KudB+nl2LVNlQ+I0Q4on+U7MrvbNcqudoZp
-         54YG1NvT95/9DJV2PCM2YnlEoQ0+/QcKBTN5m486Gshf0V2DKE/ONCFRTCNJtbljeAa+
-         eG1nEGr7ay7WpIy4IuBIOWszHE/CLOe+FurtPRGROOL0SuzLki+SgyMnIwpo2pQjHJXQ
-         lEjDxFfYW6ARIIbDrafhErkpgi30NDE/LYWwdPfOxPyO1kqtWOKvN53nEdEzDNbWbNcF
-         jGN7DFQS+BFugdKOs1wGnOz29o76hUY92Arr3uhIXeAkFWcOwtN3EKdydyakYhQUUXSv
-         VxMA==
-X-Gm-Message-State: AOAM531lF50Rbpb0ASxSvcMcSnt1xBxIsEpbUyy+1IfGiCTHem5hR06L
-        XcaTpnh7J36Uq625reCkOvMSTQ==
-X-Google-Smtp-Source: ABdhPJyC0EtrClYW2oXUEDPlR/Xd8c/63XIi9S0t0BKD1jqC8/QGFTPrx8Wl2HvoxKb4M4Nha9hADA==
-X-Received: by 2002:a17:90b:4a12:b0:1c7:5aa4:2a72 with SMTP id kk18-20020a17090b4a1200b001c75aa42a72mr453365pjb.201.1649096398654;
-        Mon, 04 Apr 2022 11:19:58 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id e19-20020a637453000000b003821bdb8103sm11067301pgn.83.2022.04.04.11.19.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Apr 2022 11:19:58 -0700 (PDT)
-Date:   Mon, 4 Apr 2022 18:19:54 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Mingwei Zhang <mizhang@google.com>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=8WwwRyCeCeMlIzr9SxYzcSTADq8P7PlbsRggytaLcp4=;
+        b=3SWP+DaiMkknvjHkHRmuPAxUV1fdsD0YMKnaw5kaf8gKBWsZGx6PPmKSdRtnUJJRsc
+         IPCEibLA50Jdc+kjlcWlf+l7rRzVTIwRDOYNh2DdOnAcLVSQj16LVWm0/xaDoRlWs+7D
+         tiIypOXemZCuCFYtydetS5UBV7savHVweR61AfbF+q2bhgdDdyx1JA25XuUydcJfLsAY
+         roLPfNxquqLidpz6rzOfUei8AE1igod/3jdAlca9wuNQ9a0ZdAHlfx8hlmWlFUyQeezm
+         ifTOwIIjo3nida59hQtHuIY8Dsx0ynPumEMM81CzzQrqDkUW+A18jv1ED0InVHJ3MuzD
+         u5+g==
+X-Gm-Message-State: AOAM530z61XMqMoHBpSlxZCihg4UbHsERzf3TK8aGdwjUEHFwSCQwNti
+        b6ARkeUbyWngUeBvQfr9bna8Krrav3Q=
+X-Google-Smtp-Source: ABdhPJwvPmo526HelrAxxb/UEnfhShlEth+Y810soIVt6pAr1nUtlqyUQGi/Lx6WU18UFIH94tuineOFKlE=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a6b:e40a:0:b0:64c:8ce1:3757 with SMTP id
+ u10-20020a6be40a000000b0064c8ce13757mr727788iog.106.1649096487896; Mon, 04
+ Apr 2022 11:21:27 -0700 (PDT)
+Date:   Mon,  4 Apr 2022 18:21:16 +0000
+Message-Id: <20220404182119.3561025-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
+Subject: [PATCH v2 0/3] KVM: Fix use-after-free in debugfs
+From:   Oliver Upton <oupton@google.com>
+To:     kvmarm@lists.cs.columbia.edu
+Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Yosry Ahmed <yosryahmed@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH v3 1/6] KVM: x86/mmu: Set lpage_disallowed in TDP MMU
- before setting SPTE
-Message-ID: <Yks2ymJzY4S9x4zx@google.com>
-References: <20220401063636.2414200-1-mizhang@google.com>
- <20220401063636.2414200-2-mizhang@google.com>
- <CANgfPd9OqV35BGfRCvJZNK_kemgqDWPx8TKKObfyGb0iiC-uxg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANgfPd9OqV35BGfRCvJZNK_kemgqDWPx8TKKObfyGb0iiC-uxg@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        Sean Christopherson <seanjc@google.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,29 +72,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 04, 2022, Ben Gardon wrote:
-> On Thu, Mar 31, 2022 at 11:36 PM Mingwei Zhang <mizhang@google.com> wrote:
-> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> > index 1bff453f7cbe..4a0087efa1e3 100644
-> > --- a/arch/x86/kvm/mmu/mmu_internal.h
-> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> > @@ -168,7 +168,7 @@ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_
-> >
-> >  void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
-> >
-> > -void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
-> > +void __account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
-> 
-> I believe we need to modify the usage of this function in
-> paging_tmpl.h as well, at which point there should be no users of
-> account_huge_nx_page, so we can just modify the function directly
-> instead of adding a __helper.
-> (Disregard if the source I was looking at was out of date. Lots of
-> churn in this code recently.)
+Funny enough, dirty_log_perf_test on arm64 highlights some issues around
+the use of debugfs in KVM. The test leaks a GIC FD across test
+iterations, and as such the associated VM is never destroyed.
+Nonetheless, the VM FD is reused for the next VM, which collides with
+the old debugfs directory.
 
-paging_tmpl.h is shadow paging only, i.e. will always handled page faults with
-mmu_lock held for write and it also needs the check for sp->lpage_disallowed
-already being set.  Only the TDP MMU code is special in that (a) it holds mmu_lock
-for read and (b) never reuses shadow pages when inserting into the page tables.
+Where things get off is when the vgic-state debugfs file is created. KVM
+does not check if the VM directory exists before creating the file,
+which results in the file being added to the root of debugfs when the
+aforementioned collision occurs.
 
-Or did I completely misunderstand what you meant by "need to modify the usage"?
+Since KVM relies on deleting the VM directory to clean up all associated
+files, the errant vgic-state file never gets cleaned up. Poking the file
+after the VM is destroyed is a use-after-free :)
+
+Patch 1 shuts the door on any mistaken debugfs file creations by
+initializing kvm->debugfs_dentry with ERR_PTR() instead of NULL.
+
+The last two patches ensure the GIC FD actually gets closed by the
+selftests that use it. Patch 2 is a genuine bug fix since it will create
+multiple VMs for a single test run. The arch_timer test also happens to
+leak the GIC FD, though it is benign since the test creates a single VM.
+Patch 3 gets the arch_timer test to follow the well-behaved pattern.
+
+Applies cleanly to the second KVM pull (tagged kvm-5.18-2), at commit:
+
+  c15e0ae42c8e ("KVM: x86: fix sending PV IPI")
+
+Tested on an Ampere Altra system in the following combinations:
+
+  - Bad kernel + fixed selftests
+  - Fixed kernel + bad selftests
+
+In both cases there was no vgic-state file at the root of debugfs.
+
+v1: https://lore.kernel.org/kvm/20220402174044.2263418-1-oupton@google.com/
+
+v1 -> v2:
+ - Initialize kvm->debugfs_dentry to ERR_PTR(-ENOENT) to prevent the
+   creation of all VM debug files, not just vgic-state.
+ - Leave logging as-is for now. Consider dropping altogether in a later
+   patch (Sean)
+ - Collect R-b from Jing
+
+Oliver Upton (3):
+  KVM: Don't create VM debugfs files outside of the VM directory
+  selftests: KVM: Don't leak GIC FD across dirty log test iterations
+  selftests: KVM: Free the GIC FD when cleaning up in arch_timer
+
+ .../selftests/kvm/aarch64/arch_timer.c        | 15 +++++---
+ .../selftests/kvm/dirty_log_perf_test.c       | 34 +++++++++++++++++--
+ virt/kvm/kvm_main.c                           | 10 ++++--
+ 3 files changed, 50 insertions(+), 9 deletions(-)
+
+-- 
+2.35.1.1094.g7c7d902a7c-goog
+
