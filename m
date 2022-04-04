@@ -2,103 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F0F314F142F
-	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 14:00:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3582B4F1454
+	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 14:05:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233358AbiDDMCG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Apr 2022 08:02:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51756 "EHLO
+        id S236676AbiDDMHt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Apr 2022 08:07:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiDDMCE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Apr 2022 08:02:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 06EAC2B256
-        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 05:00:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649073607;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=54htBfVJnmMSt6wVfB6Zir8BswtOU/CLvIkm4Md47rQ=;
-        b=YLSMuoDgfv5AGHEvK4xRYGWL2nwLZDo6slVGmL2KKD1nxljVVab0RrCRGlsWUzVik5PBbw
-        mzF2G7sGOFU2LgaSfmsFRL86BH+mFIw4RaIULmFU1GAHlPsTHSUYJskZwLz39M1OSivx54
-        O8JqricIqDaZHvQ1eF8oa2LWTZ/YKIQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-540-SNUcJtbWP2uT5o6NswnBRQ-1; Mon, 04 Apr 2022 08:00:05 -0400
-X-MC-Unique: SNUcJtbWP2uT5o6NswnBRQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S233620AbiDDMHr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Apr 2022 08:07:47 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 557431FA6E
+        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 05:05:51 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0E20783395E;
-        Mon,  4 Apr 2022 12:00:05 +0000 (UTC)
-Received: from starship (unknown [10.40.194.231])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 02CF8464DFC;
-        Mon,  4 Apr 2022 12:00:02 +0000 (UTC)
-Message-ID: <5752e461f5912d4312eb63f1b7f521f54ab40f79.camel@redhat.com>
-Subject: Re: [PATCH 4/8] KVM: SVM: Stuff next_rip on emualted INT3 injection
- if NRIPS is supported
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>
-Date:   Mon, 04 Apr 2022 15:00:01 +0300
-In-Reply-To: <20220402010903.727604-5-seanjc@google.com>
-References: <20220402010903.727604-1-seanjc@google.com>
-         <20220402010903.727604-5-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        by ams.source.kernel.org (Postfix) with ESMTPS id 05DF7B81610
+        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 12:05:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2669DC340EE;
+        Mon,  4 Apr 2022 12:05:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1649073948;
+        bh=d6JRr8U1cpuPPPZ6D2VufWB2hN6lbXNjOAfdpejG4b4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=UvZBqVi+CJJFuwKeLo2xleNwTuDGxKMBQXkJJ3nkoh2tLq4cv+Zp061gpTen5ua2P
+         CooikNERGgUph02rtRo8Go1WPfBsF1BZUtRmOGU1y9lOnXHqB3xq8eOcRfBLTxn15e
+         486afF97FpEh5g8EYZ1/oKLd8ylpe4nal3nuHW9/2aIKF9mSfXN7J94+ort9PDH6yJ
+         Ox4c6hF4gl4Ya1prso15p1xi+aQrhmqeq6BldL23sSHcSiBspLYPQayi+CONZGubXR
+         qUjC61GwrLBxumEjLp1OTJq+JD4Z7epTlsBqEvVDQf5xVj1UgI6XQ18gBdWzbvNM0Y
+         htK9L4ujADWng==
+Date:   Mon, 4 Apr 2022 13:05:43 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        catalin.marinas@arm.com, kvm@vger.kernel.org,
+        vladimir.murzin@arm.com, linux-arm-kernel@lists.infradead.org,
+        julien.thierry.kdev@gmail.com, steven.price@arm.com
+Cc:     kernel-team@android.com
+Subject: Re: [kvmtool PATCH v3 0/2] arm64: Add MTE support
+Message-ID: <20220404120542.GA23473@willie-the-truck>
+References: <20220328103328.18768-1-alexandru.elisei@arm.com>
+ <164906755176.1613722.14442142721730095672.b4-ty@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <164906755176.1613722.14442142721730095672.b4-ty@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 2022-04-02 at 01:08 +0000, Sean Christopherson wrote:
-> If NRIPS is supported in hardware but disabled in KVM, set next_rip to
-> the next RIP when advancing RIP as part of emulating INT3 injection.
-> There is no flag to tell the CPU that KVM isn't using next_rip, and so
-> leaving next_rip is left as is will result in the CPU pushing garbage
-> onto the stack when vectoring the injected event.
+On Mon, Apr 04, 2022 at 11:34:55AM +0100, Will Deacon wrote:
+> On Mon, 28 Mar 2022 11:33:26 +0100, Alexandru Elisei wrote:
+> > Add Memory Tagging Extension (MTE) support in kvmtool.
+> > 
+> > Changes since v2:
+> > 
+> > * Gathered Reviewed-by and Tested-by tags from Vladimir, thank you!
+> > * Slight tweaks to the kvmtool debug and user messages.
+> > * Do not set kvm->arch.cfg.mte_disabled is the MTE capability is not
+> >   available. It is not used anywhere outside of the MTE setup function and
+> >   kvm->arch.cfg is for user config options.
+> > 
+> > [...]
 > 
-> Fixes: 66b7138f9136 ("KVM: SVM: Emulate nRIP feature when reinjecting INT3")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/svm/svm.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> Applied to arm64 (master), thanks!
 > 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 30cef3b10838..6ea8f16e39ac 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -391,6 +391,10 @@ static void svm_queue_exception(struct kvm_vcpu *vcpu)
->  		 */
->  		(void)svm_skip_emulated_instruction(vcpu);
->  		rip = kvm_rip_read(vcpu);
-> +
-> +		if (boot_cpu_has(X86_FEATURE_NRIPS))
-> +			svm->vmcb->control.next_rip = rip;
-> +
->  		svm->int3_rip = rip + svm->vmcb->save.cs.base;
->  		svm->int3_injected = rip - old_rip;
->  	}
+> [1/2] update_headers.sh: Sync ABI headers with Linux v5.17
+>       https://git.kernel.org/arm64/c/af1b793cb616
+> [2/2] aarch64: Add support for MTE
+>       https://git.kernel.org/arm64/c/5657dd3e48b4
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Sorry, b4 got confused by my scripts here. The SHAs are correct, but these
+have obviously been applied to the kvmtool repository, not the arm64 kernel
+tree!
 
-Best regards,
-	Maxim Levitsky
-
+Will
