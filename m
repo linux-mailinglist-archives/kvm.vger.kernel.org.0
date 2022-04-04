@@ -2,73 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCE2F4F1BA5
-	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 23:23:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E0C84F1B92
+	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 23:23:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380746AbiDDVV6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Apr 2022 17:21:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52426 "EHLO
+        id S1380184AbiDDVVe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Apr 2022 17:21:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379723AbiDDR7Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Apr 2022 13:59:16 -0400
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3722B34BB9
-        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 10:57:20 -0700 (PDT)
-Received: by mail-il1-x12a.google.com with SMTP id y16so7444976ilq.6
-        for <kvm@vger.kernel.org>; Mon, 04 Apr 2022 10:57:20 -0700 (PDT)
+        with ESMTP id S1379724AbiDDR7a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Apr 2022 13:59:30 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C66834BBA
+        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 10:57:33 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d15so3437141pll.10
+        for <kvm@vger.kernel.org>; Mon, 04 Apr 2022 10:57:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=GmQMDW9Kl2RXHFpra8Cb+yFdRaCEgtk0WeuxWIun/PE=;
-        b=T/YID3m7jqfMsZdI5yipTxP6mq1tBCIPkkaeRZEOGXJXCRTNAVRLgO6d3oGPKiaIsM
-         hB1IuYXuYvxwGnm/jAntlYOH177EGDJShNXiQsKuSX5zmuTfztgeEwn8fCn3X5foUENF
-         tSPmbGrEqNTLnjaKU1LnFelmOozabOJ/CJhjHjgSpIDgJsIVglglRlphqOF6I5tZB4fN
-         RjXIJozATO4FyKzOy/3PbchB4/uuHz062rsh7sbqfMMWRA2/+03t3OuXgIyBsGiXxQuP
-         s6lHlTJrjRufZd9tiwr5+a8oqSI3d98djdhUvx2xfaAT94UiQ2BSWSf8Or0aJ0TjXzUY
-         Cssw==
+        bh=o6hLZdUb/ReT0m7dHtzUEMCrOQA61jDt0sJYjNLeFrM=;
+        b=bjGFzmKzBzOkEsGB0baOcb7bfray3F9t5FC2XDPDR25MOdKcPAtOKZplJ3FsM9Myko
+         pvDpp5tbpgIb2RTE5S5CLdctjR75ngAbg2862ZMtImR4p5Dm5g/dHuDVoE+W5X4ThfUr
+         x+bSrUBWZtWfGJeSUyWeVJwmucmfsgVn1QCkhnuD19SifeUUzCHtBWa8M7oGW9wyBnSL
+         X85uNUvUkXpoMyy1BhPAdP5QABgg0bWooDgCUrZPW1OKXzuVYi5SSLBx3QRJZgk522Vo
+         Y0bXK4820hvyI+0ks5eoz1oa8mYPmQd8uc96lHBRf86w48NziVyW2Z9bdXfHNCeUW2UQ
+         hwTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=GmQMDW9Kl2RXHFpra8Cb+yFdRaCEgtk0WeuxWIun/PE=;
-        b=pQP1lZzFSbjd00Ei4gFqylUzj1VHncfVUDhzDSCQlrVeOY2UbMQjlbaaeyEezrrT6v
-         RJbdx23H5GstkLB6lvo2DN/7KuW+fC0UAIzNf9gV5TZiCu1kmIx0dpyMOgG7a5FfAhPr
-         USkh2GnmYxOb7h4IHi6m7NUyQ8Bv6/f1NP9tqZEsd1qaFEhgZ9cSV+KxWk7+L/nfVdxA
-         5GLxI+grIhIxDtgVyM1fu5ZYWOmeFLndh4lbPc4SLFKTlH9aaEWPySCCKrTY/qfVRvyO
-         iZER1qydLxf7x2+/pft9S9k2zQdQFOc0/tYd2k7U5aW3FTfFnZR3+X9/9gwNoKvMBFpV
-         SjjA==
-X-Gm-Message-State: AOAM532mM2s6QP4h6TZVeubMF3IQSLKcnL+hW63fCxh1wG/jcwjMrZZa
-        jcRHX96ouQ/G4MqwKgKMG+iDfA==
-X-Google-Smtp-Source: ABdhPJyxcxrXm46aKYYcD84LuHXVzCCX7Rui8hCXMmO19c75bw55+ZX3BLOKGyUKxAuIXD3PlAjPvg==
-X-Received: by 2002:a92:3405:0:b0:2c8:70ad:fa86 with SMTP id b5-20020a923405000000b002c870adfa86mr483750ila.268.1649095039360;
-        Mon, 04 Apr 2022 10:57:19 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id d15-20020a92d78f000000b002ca4c409d1asm1036438iln.83.2022.04.04.10.57.17
+        bh=o6hLZdUb/ReT0m7dHtzUEMCrOQA61jDt0sJYjNLeFrM=;
+        b=SRTX5qCSshl2WyIFhYpaqb07caeKXFkxSKDPMEbBrIlDrFWAZsaXWdCvjSdS1U4qOc
+         BLR4gXMKXOaw+S33uDRnv6R/eFmsvDFjyyNCdejkD9+aX3ho507TMd4Bvkjyr/FKBbr7
+         jeiO9/fXdPXg9b/m26RDHtZItuv4fvyF238C9IwLiYZyGG+GN5ELnPY3w/iUGfkKJSqL
+         B8BmM5ooNi/M8xFkoUjAH/ECjCZhDBvPe80Zdw27Nt4tGm3g07Cx9YUBU0ghlWrbGTXe
+         MIfhH6rUF+vhunlAOAffJp5/HdB60ZzYnmeSnRxuHndoqliOmOO/I1yWSlslmO9xkPUQ
+         yb+Q==
+X-Gm-Message-State: AOAM5331tVmmQUHRbJUzsD4OwNO+d1yZ3j107p7+Qz6WMvI2SIj0fhmk
+        IsVjeMghov4/VTDFaIdBuCq2nQ==
+X-Google-Smtp-Source: ABdhPJxGWxMtvYIkXrWp3S8TgNg54CUcJ7KsRzi4hwRORB9mUYDQrIppA9nyHmO18bePjSyjyq/LQA==
+X-Received: by 2002:a17:90a:4604:b0:1bc:8bdd:4a63 with SMTP id w4-20020a17090a460400b001bc8bdd4a63mr361154pjg.147.1649095052573;
+        Mon, 04 Apr 2022 10:57:32 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id 21-20020a630115000000b00382a0895661sm11019145pgb.11.2022.04.04.10.57.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Apr 2022 10:57:18 -0700 (PDT)
-Date:   Mon, 4 Apr 2022 17:57:14 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, stable@kernel.org
-Subject: Re: [PATCH 2/4] KVM: Only log about debugfs directory collision once
-Message-ID: <Yksxeo7IhzyFS8AM@google.com>
-References: <20220402174044.2263418-1-oupton@google.com>
- <20220402174044.2263418-3-oupton@google.com>
- <Yksr6etwnN0iW8ZH@google.com>
+        Mon, 04 Apr 2022 10:57:31 -0700 (PDT)
+Date:   Mon, 4 Apr 2022 17:57:28 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Zeng Guang <guang.zeng@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        "Huang, Kai" <kai.huang@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Hu, Robert" <robert.hu@intel.com>,
+        "Gao, Chao" <chao.gao@intel.com>
+Subject: Re: [PATCH v7 8/8] KVM: VMX: enable IPI virtualization
+Message-ID: <YksxiAnNmdR2q65S@google.com>
+References: <20220304080725.18135-1-guang.zeng@intel.com>
+ <20220304080725.18135-9-guang.zeng@intel.com>
+ <YkZlhI7nAAqDhT0D@google.com>
+ <54df6da8-ad68-cc75-48db-d18fc87430e9@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yksr6etwnN0iW8ZH@google.com>
+In-Reply-To: <54df6da8-ad68-cc75-48db-d18fc87430e9@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -80,59 +91,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
-
-On Mon, Apr 04, 2022 at 05:33:29PM +0000, Sean Christopherson wrote:
-> On Sat, Apr 02, 2022, Oliver Upton wrote:
-> > In all likelihood, a debugfs directory name collision is the result of a
-> > userspace bug. If userspace closes the VM fd without releasing all
-> > references to said VM then the debugfs directory is never cleaned.
-> > 
-> > Even a ratelimited print statement can fill up dmesg, making it
-> > particularly annoying for the person debugging what exactly went wrong.
-> > Furthermore, a userspace that wants to be a nuisance could clog up the
-> > logs by deliberately holding a VM reference after closing the VM fd.
-> > 
-> > Dial back logging to print at most once, given that userspace is most
-> > likely to blame. Leave the statement in place for the small chance that
-> > KVM actually got it wrong.
-> > 
-> > Cc: stable@kernel.org
-> > Fixes: 85cd39af14f4 ("KVM: Do not leak memory for duplicate debugfs directories")
+On Sun, Apr 03, 2022, Zeng Guang wrote:
 > 
-> I don't think this warrants Cc: stable@, the whole point of ratelimiting printk is
-> to guard against this sort of thing.  If a ratelimited printk can bring down the
-> kernel and/or logging infrastructure, then the kernel is misconfigured for the
-> environment.
-
-Good point.
-
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> >  virt/kvm/kvm_main.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> On 4/1/2022 10:37 AM, Sean Christopherson wrote:
+> > > @@ -4219,14 +4226,21 @@ static void vmx_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
+> > >   	pin_controls_set(vmx, vmx_pin_based_exec_ctrl(vmx));
+> > >   	if (cpu_has_secondary_exec_ctrls()) {
+> > > -		if (kvm_vcpu_apicv_active(vcpu))
+> > > +		if (kvm_vcpu_apicv_active(vcpu)) {
+> > >   			secondary_exec_controls_setbit(vmx,
+> > >   				      SECONDARY_EXEC_APIC_REGISTER_VIRT |
+> > >   				      SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
+> > > -		else
+> > > +			if (enable_ipiv)
+> > > +				tertiary_exec_controls_setbit(vmx,
+> > > +						TERTIARY_EXEC_IPI_VIRT);
+> > > +		} else {
+> > >   			secondary_exec_controls_clearbit(vmx,
+> > >   					SECONDARY_EXEC_APIC_REGISTER_VIRT |
+> > >   					SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
+> > > +			if (enable_ipiv)
+> > > +				tertiary_exec_controls_clearbit(vmx,
+> > > +						TERTIARY_EXEC_IPI_VIRT);
+> > Oof.  The existing code is kludgy.  We should never reach this point without
+> > enable_apicv=true, and enable_apicv should be forced off if APICv isn't supported,
+> > let alone seconary exec being support.
 > > 
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 69c318fdff61..38b30bd60f34 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -959,7 +959,7 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
-> >  	mutex_lock(&kvm_debugfs_lock);
-> >  	dent = debugfs_lookup(dir_name, kvm_debugfs_dir);
-> >  	if (dent) {
-> > -		pr_warn_ratelimited("KVM: debugfs: duplicate directory %s\n", dir_name);
-> > +		pr_warn_once("KVM: debugfs: duplicate directory %s\n", dir_name);
+> > Unless I'm missing something, throw a prep patch earlier in the series to drop
+> > the cpu_has_secondary_exec_ctrls() check, that will clean this code up a smidge.
 > 
-> I don't see how printing once is going to be usefull for a human debugger.  If we
-> want to get rid of the ratelimited print, why not purge it entirely?
+> cpu_has_secondary_exec_ctrls() check can avoid wrong vmcs write in case mistaken
+> invocation.
 
-I'd really like to drop it altogether. I've actually looked at several
-instances of this printk firing internally, and all of it had to do with
-some leak in userspace.
+KVM has far bigger problems on buggy invocation, and in that case the resulting
+printk + WARN from the failed VMWRITE is a good thing.
 
-I'll pull this patch out of the series for v2 and maybe just propose we
-drop it altogether.
+> > > +
+> > > +	if (!pages)
+> > > +		return -ENOMEM;
+> > > +
+> > > +	kvm_vmx->pid_table = (void *)page_address(pages);
+> > > +	kvm_vmx->pid_last_index = kvm_vmx->kvm.arch.max_vcpu_id - 1;
+> > No need to cache pid_last_index, it's only used in one place (initializing the
+> > VMCS field).  The allocation/free paths can use max_vcpu_id directly.  Actually,
+> 
+> In previous design, we don't forbid to change max_vcpu_id after vCPU creation
+> or for other purpose in future. Thus it's safe to decouple them and make ipiv
+> usage independent. If it can be sure that max_vcpu_id won't be modified , we
+> can totally remove pid_last_index and use max_vcpu_id directly even for
+> initializing the VMCD field.
 
---
-Thanks,
-Oliver
+max_vcpu_id asolutely needs to be constant after the first vCPU is created.
+
+> > > @@ -7123,6 +7176,22 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
+> > >   			goto free_vmcs;
+> > >   	}
+> > > +	/*
+> > > +	 * Allocate PID-table and program this vCPU's PID-table
+> > > +	 * entry if IPI virtualization can be enabled.
+> > Please wrap comments at 80 chars.  But I'd just drop this one entirely, the code
+> > is self-explanatory once the allocation and setting of the vCPU's entry are split.
+> > 
+> > > +	 */
+> > > +	if (vmx_can_use_ipiv(vcpu->kvm)) {
+> > > +		struct kvm_vmx *kvm_vmx = to_kvm_vmx(vcpu->kvm);
+> > > +
+> > > +		mutex_lock(&vcpu->kvm->lock);
+> > > +		err = vmx_alloc_pid_table(kvm_vmx);
+> > > +		mutex_unlock(&vcpu->kvm->lock);
+> > This belongs in vmx_vm_init(), doing it in vCPU creation is a remnant of the
+> > dynamic resize approach that's no longer needed.
+> 
+> We cannot allocate pid table in vmx_vm_init() as userspace has no chance to
+> set max_vcpu_ids at this stage. That's the reason we do it in vCPU creation
+> instead.
+
+Ah, right.  Hrm.  And that's going to be a recurring problem if we try to use the
+dynamic kvm->max_vcpu_ids to reduce other kernel allocations.
+
+Argh, and even kvm_arch_vcpu_precreate() isn't protected by kvm->lock.
+
+Taking kvm->lock isn't problematic per se, I just hate doing it so deep in a
+per-vCPU flow like this.
+
+A really gross hack/idea would be to make this 64-bit only and steal the upper
+32 bits of @type in kvm_create_vm() for the max ID.
+
+I think my first choice would be to move kvm_arch_vcpu_precreate() under kvm->lock.
+None of the architectures that have a non-nop implemenation (s390, arm64 and x86)
+do significant work, so holding kvm->lock shouldn't harm performance.  s390 has to
+acquire kvm->lock in its implementation, so we could drop that.  And looking at
+arm64, I believe its logic should also be done under kvm->lock.
+
+It'll mean adding yet another kvm_x86_ops, but I like that more than burying the
+code deep in vCPU creation.
+
+Paolo, any thoughts on this?
