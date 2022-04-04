@@ -2,125 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E3F94F1C0C
-	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 23:26:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA9384F1BC2
+	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 23:25:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380762AbiDDVWC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Apr 2022 17:22:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56166 "EHLO
+        id S1381201AbiDDVWk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Apr 2022 17:22:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379879AbiDDSUL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Apr 2022 14:20:11 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F7BE3EA8F
-        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 11:18:15 -0700 (PDT)
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 234GAGq5004435;
-        Mon, 4 Apr 2022 18:18:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=pYRdXh3PbDeDUaqOACvy2vDPXAnUDIfPUug8ZQFZ7vs=;
- b=RGgHAhSdSYTmI4EM4MZIOuQRQV27CiDQyp9b+0aqCVdqpjSimJgV5gNXQTDSh71LgN1f
- A6eb0dNhfNEOjXoreFJ5ZCH4HC3cXn5x4w8SVrndRB9d30SiBmN+LpszZjZ8kaet6cIc
- Yy/CH04J2hZVjx39iieaUX0G0/fCXYyJXNu8d6iwxCk1Lj722OvX7RPS39VhsILnKUCt
- zXsNG4eHdNaB58jhnFmG7hSrhjuAA9Mjcr7Y+9M83JdAAXbJMSime44q68d4CygwTjxA
- P4yO0IvD/s0WJCPG1pWe48moAeDMKoMF3som1s6/R0xPKcc0DE9nqceNYOjj5zffs+XO IQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f7yn9mrrx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 04 Apr 2022 18:18:08 +0000
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 234I8WfR015687;
-        Mon, 4 Apr 2022 18:18:08 GMT
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f7yn9mrrn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 04 Apr 2022 18:18:08 +0000
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 234IGvap029335;
-        Mon, 4 Apr 2022 18:18:07 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma03dal.us.ibm.com with ESMTP id 3f6e49dq04-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 04 Apr 2022 18:18:07 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 234II6Xw31785436
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 4 Apr 2022 18:18:06 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 33C4BAE060;
-        Mon,  4 Apr 2022 18:18:06 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B2DAFAE05F;
-        Mon,  4 Apr 2022 18:18:02 +0000 (GMT)
-Received: from li-c92d2ccc-254b-11b2-a85c-a700b5bfb098.ibm.com.com (unknown [9.211.32.125])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon,  4 Apr 2022 18:18:02 +0000 (GMT)
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-To:     qemu-s390x@nongnu.org
-Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
-        cohuck@redhat.com, thuth@redhat.com, farman@linux.ibm.com,
-        pmorel@linux.ibm.com, richard.henderson@linaro.org,
-        david@redhat.com, pasic@linux.ibm.com, borntraeger@linux.ibm.com,
-        mst@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org
-Subject: [PATCH v5 9/9] s390x/pci: reflect proper maxstbl for groups of interpreted devices
-Date:   Mon,  4 Apr 2022 14:17:26 -0400
-Message-Id: <20220404181726.60291-10-mjrosato@linux.ibm.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220404181726.60291-1-mjrosato@linux.ibm.com>
-References: <20220404181726.60291-1-mjrosato@linux.ibm.com>
+        with ESMTP id S1379923AbiDDSVz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Apr 2022 14:21:55 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76C7822B20
+        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 11:19:59 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id ch16-20020a17090af41000b001ca867ef52bso497144pjb.0
+        for <kvm@vger.kernel.org>; Mon, 04 Apr 2022 11:19:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=aiqJZ75/YWr0n8WF7lZiF1Fjak6AGRA7UVKN+yFyHrY=;
+        b=k2z4OSa4+eckdOtXVxKvSW/v87vtp2H6bCdPyILueYWMdwy5RcQGTrthmlyRKI+4OI
+         2sFfoLEEM3FAmnL0mNEXE3Acm9HfuUjcbpfBhScTdVTXF1zwpOR5WLjrb4esOqo8U51c
+         MRO2xOQecJogFv+wHld28UDGdrS+XImpNb3ak+kjgOYgkDY5E1tJpt09k0j/w20JCFKK
+         fdFRL1Qe0n5TOiOxwo1d6PTRJnMTSoAPvIXOkJHukg/0rpqorWhDxFiy+zh2v5gLZISk
+         qER49CE71HkRIrMDUar5JrVHSTWu7YLHjN8YokyseXHkbtfnHjLtjLDiW4z6qlk14Hfi
+         wRQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=aiqJZ75/YWr0n8WF7lZiF1Fjak6AGRA7UVKN+yFyHrY=;
+        b=epmHE1Wl/pMCJhMumHPd/gNDyKACdG/KudB+nl2LVNlQ+I0Q4on+U7MrvbNcqudoZp
+         54YG1NvT95/9DJV2PCM2YnlEoQ0+/QcKBTN5m486Gshf0V2DKE/ONCFRTCNJtbljeAa+
+         eG1nEGr7ay7WpIy4IuBIOWszHE/CLOe+FurtPRGROOL0SuzLki+SgyMnIwpo2pQjHJXQ
+         lEjDxFfYW6ARIIbDrafhErkpgi30NDE/LYWwdPfOxPyO1kqtWOKvN53nEdEzDNbWbNcF
+         jGN7DFQS+BFugdKOs1wGnOz29o76hUY92Arr3uhIXeAkFWcOwtN3EKdydyakYhQUUXSv
+         VxMA==
+X-Gm-Message-State: AOAM531lF50Rbpb0ASxSvcMcSnt1xBxIsEpbUyy+1IfGiCTHem5hR06L
+        XcaTpnh7J36Uq625reCkOvMSTQ==
+X-Google-Smtp-Source: ABdhPJyC0EtrClYW2oXUEDPlR/Xd8c/63XIi9S0t0BKD1jqC8/QGFTPrx8Wl2HvoxKb4M4Nha9hADA==
+X-Received: by 2002:a17:90b:4a12:b0:1c7:5aa4:2a72 with SMTP id kk18-20020a17090b4a1200b001c75aa42a72mr453365pjb.201.1649096398654;
+        Mon, 04 Apr 2022 11:19:58 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id e19-20020a637453000000b003821bdb8103sm11067301pgn.83.2022.04.04.11.19.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Apr 2022 11:19:58 -0700 (PDT)
+Date:   Mon, 4 Apr 2022 18:19:54 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     Mingwei Zhang <mizhang@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Yosry Ahmed <yosryahmed@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH v3 1/6] KVM: x86/mmu: Set lpage_disallowed in TDP MMU
+ before setting SPTE
+Message-ID: <Yks2ymJzY4S9x4zx@google.com>
+References: <20220401063636.2414200-1-mizhang@google.com>
+ <20220401063636.2414200-2-mizhang@google.com>
+ <CANgfPd9OqV35BGfRCvJZNK_kemgqDWPx8TKKObfyGb0iiC-uxg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3xN6iYY4gyegze530AXa6CMpFVCRnqq5
-X-Proofpoint-ORIG-GUID: 3bKx1-3MJxgQOgdEPDLQ49to_fbSfmIm
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-04-04_06,2022-03-31_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
- priorityscore=1501 adultscore=0 mlxscore=0 lowpriorityscore=0 phishscore=0
- impostorscore=0 clxscore=1015 malwarescore=0 bulkscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2204040103
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANgfPd9OqV35BGfRCvJZNK_kemgqDWPx8TKKObfyGb0iiC-uxg@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The maximum supported store block length might be different depending
-on whether the instruction is interpretively executed (firmware-reported
-maximum) or handled via userspace intercept (host kernel API maximum).
-Choose the best available value during group creation.
+On Mon, Apr 04, 2022, Ben Gardon wrote:
+> On Thu, Mar 31, 2022 at 11:36 PM Mingwei Zhang <mizhang@google.com> wrote:
+> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> > index 1bff453f7cbe..4a0087efa1e3 100644
+> > --- a/arch/x86/kvm/mmu/mmu_internal.h
+> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> > @@ -168,7 +168,7 @@ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_
+> >
+> >  void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+> >
+> > -void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
+> > +void __account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
+> 
+> I believe we need to modify the usage of this function in
+> paging_tmpl.h as well, at which point there should be no users of
+> account_huge_nx_page, so we can just modify the function directly
+> instead of adding a __helper.
+> (Disregard if the source I was looking at was out of date. Lots of
+> churn in this code recently.)
 
-Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
----
- hw/s390x/s390-pci-vfio.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+paging_tmpl.h is shadow paging only, i.e. will always handled page faults with
+mmu_lock held for write and it also needs the check for sp->lpage_disallowed
+already being set.  Only the TDP MMU code is special in that (a) it holds mmu_lock
+for read and (b) never reuses shadow pages when inserting into the page tables.
 
-diff --git a/hw/s390x/s390-pci-vfio.c b/hw/s390x/s390-pci-vfio.c
-index 985980f021..212dd053f7 100644
---- a/hw/s390x/s390-pci-vfio.c
-+++ b/hw/s390x/s390-pci-vfio.c
-@@ -213,7 +213,11 @@ static void s390_pci_read_group(S390PCIBusDevice *pbdev,
-         resgrp->msia = cap->msi_addr;
-         resgrp->mui = cap->mui;
-         resgrp->i = cap->noi;
--        resgrp->maxstbl = cap->maxstbl;
-+        if (pbdev->interp && hdr->version >= 2) {
-+            resgrp->maxstbl = cap->imaxstbl;
-+        } else {
-+            resgrp->maxstbl = cap->maxstbl;
-+        }
-         resgrp->version = cap->version;
-         resgrp->dtsm = ZPCI_DTSM;
-     }
--- 
-2.27.0
-
+Or did I completely misunderstand what you meant by "need to modify the usage"?
