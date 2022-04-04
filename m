@@ -2,142 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 86F7F4F185F
-	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 17:29:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ADDC84F18BA
+	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 17:44:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358393AbiDDPbS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Apr 2022 11:31:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53424 "EHLO
+        id S1378701AbiDDPqF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Apr 2022 11:46:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348744AbiDDPbQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Apr 2022 11:31:16 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B3E825283
-        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 08:29:19 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id y10so9294407pfa.7
-        for <kvm@vger.kernel.org>; Mon, 04 Apr 2022 08:29:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=WwaoVUBFVj9j7YaVgwWeUQJL/8oOimF01hIs03GSwEs=;
-        b=KZsqHqLKTZjQ/n4pzslaH4ezeqg3fhSolbXjJDiLWpQ/F7MVzuHnt9f78kdKHToQch
-         G70BhWHUbPG0PFNkIq0GPgyX81ktwvl+QHt8S/DabeaSL0+Iwo61HVAvu1HIBIY8S5yp
-         tBulvFhDY/WVo/ktoFXDlHK0vM9E0BPOGCq4frsH67nAc9UFAmZQVYyLIZX1GWYJbVIo
-         Qp9I2Ss9mAvRnWQ0sfLgx6U7mHlf1V5UPYz7zTqeXdXYXYAnZrrD7z8mYc2jz+gy5AQ6
-         9bRf4e6+0bJXpY3TR7YpsYxf50s9DZmxdEuNLIbT70dw6bLeUEjGMqzhAOlx0x3+Rlg5
-         Yn8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=WwaoVUBFVj9j7YaVgwWeUQJL/8oOimF01hIs03GSwEs=;
-        b=0vQgzxCRTLzJrR9KuzZap3g8TFTBUoSc74fhnU783Fg3XS4/bD9gP4pZqyyTTHIiRI
-         nOeW3SzDuWm+c7qbxRgUtbLMIhBVEtEfOWsSE1zpxm8e8lCBvwJXuXDlSjKydmGPL0Wp
-         NXpxoLSHF3PF0LktTu8ihkFHmNguy+XMJA+m2rX41SsJMXHqGtS9UWI6fDG4dpcnBTAb
-         ognBeY5JZa2srdg5CiOhp1uNWxw8wa8sAgUP/XPX/S79gdyAUpi749AHX3Hm6vPjoQn+
-         xmp6pHhJmlc7nMbOiz34LM+IF+/MJBZZvt10IIFM9G/uYAeYg34AJhoaMgoxgeCgD6y4
-         xw9g==
-X-Gm-Message-State: AOAM533ulazyWWlPuKr9XS8U8V+fI5l2xhuTLqLGamnmRQ0SNQYM0Ylf
-        3U5MVbLp4yAdJEX7iLQBoohxoQ==
-X-Google-Smtp-Source: ABdhPJwChen+B+MRC8z3HtJ9ZPqGfIpYJlCB7ilek3qAIXp3MkMC00v5kKiyVolwyc8KYvTSZ9Tagg==
-X-Received: by 2002:a63:d456:0:b0:399:4c5a:2682 with SMTP id i22-20020a63d456000000b003994c5a2682mr308856pgj.573.1649086158737;
-        Mon, 04 Apr 2022 08:29:18 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id u11-20020a056a00158b00b004fb07effe2esm13383793pfk.130.2022.04.04.08.29.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Apr 2022 08:29:17 -0700 (PDT)
-Date:   Mon, 4 Apr 2022 15:29:13 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Zeng Guang <guang.zeng@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Hu, Robert" <robert.hu@intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>
-Subject: Re: [PATCH v7 5/8] KVM: x86: Add support for vICR APIC-write
- VM-Exits in x2APIC mode
-Message-ID: <YksOyUQd3N/inHMo@google.com>
-References: <20220304080725.18135-1-guang.zeng@intel.com>
- <20220304080725.18135-6-guang.zeng@intel.com>
- <YkY0MvAIPiISfk4u@google.com>
- <ce0261c0-a8f2-a9b8-6d99-88a33556d7cb@intel.com>
+        with ESMTP id S1378662AbiDDPqC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Apr 2022 11:46:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7D29BCEA
+        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 08:43:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649087037;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=MFdg+LnJ0TABxRLem5IqgEGzvZGFYgN4hu7GWdYjiLI=;
+        b=VDiStsZFrEsxd5EyFlZQyOY3+bcR2wFNYywN8mie11ssbXBfy4lsJSK1lpIbOh2RsNEcYz
+        ci6zM9CkXGHRW+re+JMBY86AwvS95YTDQE5QgMo0cijxFtjnBQoga4hLo/5xiCSZl2YlF0
+        VCtloUpDlHRSBJhddvflqqqPbgCCVH0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-484-rOrK76ugMiKeVB37w3Intw-1; Mon, 04 Apr 2022 11:43:54 -0400
+X-MC-Unique: rOrK76ugMiKeVB37w3Intw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6A64785A5BE;
+        Mon,  4 Apr 2022 15:43:53 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 718AF145BEF3;
+        Mon,  4 Apr 2022 15:43:52 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     stable@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: [PATCH 4.14] KVM: x86: Forbid VMM to set SYNIC/STIMER MSRs when SynIC wasn't activated
+Date:   Mon,  4 Apr 2022 11:43:49 -0400
+Message-Id: <20220404154352.477059-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ce0261c0-a8f2-a9b8-6d99-88a33556d7cb@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Apr 02, 2022, Zeng Guang wrote:
-> 
-> > > -	/* TODO: optimize to just emulate side effect w/o one more write */
-> > > -	kvm_lapic_reg_write(vcpu->arch.apic, offset, val);
-> > > +		kvm_lapic_msr_read(apic, offset, &val);
-> > > +		kvm_apic_send_ipi(apic, (u32)val, (u32)(val >> 32));
-> > This needs to clear the APIC_ICR_BUSY bit.  It'd also be nice to trace this write.
-> > The easiest thing is to use kvm_x2apic_icr_write().  Kinda silly as it'll generate
-> > an extra write, but on the plus side the TODO comment doesn't have to move :-D
-> > 
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index c4c3155d98db..58bf296ee313 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -2230,6 +2230,7 @@ void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
-> >          struct kvm_lapic *apic = vcpu->arch.apic;
-> >          u64 val;
-> > 
-> > +       /* TODO: optimize to just emulate side effect w/o one more write */
-> >          if (apic_x2apic_mode(apic)) {
-> >                  /*
-> >                   * When guest APIC is in x2APIC mode and IPI virtualization
-> > @@ -2240,10 +2241,9 @@ void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
-> >                          return;
-> > 
-> >                  kvm_lapic_msr_read(apic, offset, &val);
-> > -               kvm_apic_send_ipi(apic, (u32)val, (u32)(val >> 32));
-> > +               kvm_x2apic_icr_write(apic, val);
-> 
-> As SDM section 10.12.9 "ICR Operation in X2APIC mode" says "Delivery status
-> bit is removed since it is not needed in x2APIC mode" , so that's not
-> necessary to clear the APIC_ICR_BUSY bit here. Alternatively we can add trace
-> to this write by hardware.
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-That same section later says 
+commit b1e34d325397a33d97d845e312d7cf2a8b646b44 upstream.
 
-  With the removal of the Delivery Status bit, system software no longer has a
-  reason to read the ICR. It remains readable only to aid in debugging; however,
-  software should not assume the value returned by reading the ICR is the last
-  written value.
+Setting non-zero values to SYNIC/STIMER MSRs activates certain features,
+this should not happen when KVM_CAP_HYPERV_SYNIC{,2} was not activated.
 
-which means that it's at least legal for a hypervisor to clear the busy bit.  That
-might be useful for debugging IPI issues?  Probably a bit of a stretch, e.g. I doubt
-any kernels set the busy bit.  But, I do think the tracing would be helpful, and at
-that point, the extra code should be an AND+MOV.
+Note, it would've been better to forbid writing anything to SYNIC/STIMER
+MSRs, including zeroes, however, at least QEMU tries clearing
+HV_X64_MSR_STIMER0_CONFIG without SynIC. HV_X64_MSR_EOM MSR is somewhat
+'special' as writing zero there triggers an action, this also should not
+happen when SynIC wasn't activated.
 
-I don't have a super strong opinion, and I'm being somewhat hypocritical (see commit
-b51818afdc1d ("KVM: SVM: Don't rewrite guest ICR on AVIC IPI virtualization failure"),
-though that has dedicated tracing), so either approach works for me.
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Message-Id: <20220325132140.25650-4-vkuznets@redhat.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/hyperv.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index dc97f2544b6f..dbe43b9345a6 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -260,6 +260,9 @@ static int synic_set_msr(struct kvm_vcpu_hv_synic *synic,
+ 	case HV_X64_MSR_EOM: {
+ 		int i;
+ 
++		if (!synic->active)
++			break;
++
+ 		for (i = 0; i < ARRAY_SIZE(synic->sint); i++)
+ 			kvm_hv_notify_acked_sint(vcpu, i);
+ 		break;
+@@ -520,6 +523,12 @@ static int stimer_start(struct kvm_vcpu_hv_stimer *stimer)
+ static int stimer_set_config(struct kvm_vcpu_hv_stimer *stimer, u64 config,
+ 			     bool host)
+ {
++	struct kvm_vcpu *vcpu = stimer_to_vcpu(stimer);
++	struct kvm_vcpu_hv_synic *synic = vcpu_to_synic(vcpu);
++
++	if (!synic->active && (!host || config))
++		return 1;
++
+ 	trace_kvm_hv_stimer_set_config(stimer_to_vcpu(stimer)->vcpu_id,
+ 				       stimer->index, config, host);
+ 
+@@ -534,6 +543,12 @@ static int stimer_set_config(struct kvm_vcpu_hv_stimer *stimer, u64 config,
+ static int stimer_set_count(struct kvm_vcpu_hv_stimer *stimer, u64 count,
+ 			    bool host)
+ {
++	struct kvm_vcpu *vcpu = stimer_to_vcpu(stimer);
++	struct kvm_vcpu_hv_synic *synic = vcpu_to_synic(vcpu);
++
++	if (!synic->active && (!host || count))
++		return 1;
++
+ 	trace_kvm_hv_stimer_set_count(stimer_to_vcpu(stimer)->vcpu_id,
+ 				      stimer->index, count, host);
+ 
+-- 
+2.31.1
+
