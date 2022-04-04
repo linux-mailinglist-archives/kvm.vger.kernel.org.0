@@ -2,73 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ACC174F1B98
-	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 23:23:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39D034F1B8A
+	for <lists+kvm@lfdr.de>; Mon,  4 Apr 2022 23:23:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380388AbiDDVVl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Apr 2022 17:21:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35240 "EHLO
+        id S1380047AbiDDVVU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Apr 2022 17:21:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379929AbiDDSX2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Apr 2022 14:23:28 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4D6922B37
-        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 11:21:31 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-2eb645be8dbso30869757b3.11
-        for <kvm@vger.kernel.org>; Mon, 04 Apr 2022 11:21:31 -0700 (PDT)
+        with ESMTP id S1379966AbiDDS3E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Apr 2022 14:29:04 -0400
+Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63B2E13F48
+        for <kvm@vger.kernel.org>; Mon,  4 Apr 2022 11:27:07 -0700 (PDT)
+Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-2e68c95e0f9so110746087b3.0
+        for <kvm@vger.kernel.org>; Mon, 04 Apr 2022 11:27:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=uRmXUJJ9UlZ6s6G2CwiIknxpFh1oZyxCOBIJvLxa8r4=;
-        b=pD4+208dXd+MuHbyfJYWyePRJiEoaz4qSgQF8/hxMsKV0Z77tFRwC9sUU2JZ74zbJN
-         Nlx5Axiw++PDyBNl2HV3VZvug6drX2xzxJfLCeMbpi2IVdhGJTyKXQYDIlOUkOJDaG/U
-         iepheGb2k8zTo54D5xJ4g1d40r92qSQZajd6inFsq2CyMqBwM0sBRQghFW0OCXgcjDEC
-         SR3U2crly/QNYAVdd/EEvyop1nywh9D3m92nz/i8+U1+woMZ9ZvSk5oMGmsLxa/V1Udx
-         TxlfQuZhwK3T9hIAV4TsTqwqva87iJ2lYmlpt23OOpbQJY2u9rHr3uEOleyMUM1aY8I5
-         5Fsg==
+        bh=khyTIUn3m8SPuUMnh7lkp1GRN/S6UpAf1fgYfOLm5Zo=;
+        b=CjK5nB03NrxqKwV15ppNKUu/gA89gKFWsSKGrxIR+Q8NfNjxcGM5r+CPUyIAWZn7xd
+         iQdKV3YF0cNw2HlPIO2rQBjMdzaAaMXV+SNcPdbLSf1SRmtz+meR4AWvzFtUzZKuhQ9i
+         UZXGpUFbGO2TcyRq6PmEfRBD7KCMUcmkFG6A51bKfGXA9BWN4KzhyYdQoSFN8+fUPWn4
+         bDQbGiAAmDEWZt5PCU8b6oNmY05zhcv/E2iyA4y4ZOgi7lPrpHrwNujKB+YUOuKkQZqG
+         N5d3dFIf4irTSTc2BbkLA41cC2RW4m36dJnhP00LVTY9o4ncHzwWkNqBDYBn77/5ekW6
+         /hzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=uRmXUJJ9UlZ6s6G2CwiIknxpFh1oZyxCOBIJvLxa8r4=;
-        b=vuC0/ybMG8cBZeCp1FYNtrQfdeSzjnYfgiUSsf/V3gJNN/aO05TmOmuU+OOA3dIPQd
-         iy+yySY81opPWzf2e2L8ibm2fCkVnEfE8uPkynB1a7P3hEFRE5bGqsHtxCr0badAhuhC
-         /YUkZp9SfKukxz5BYGT9gyTdq7aC5qWFpyCGILnMMGnDiUjXH2wNUUZxIndmGTNkGoO2
-         +cnI8YtJHo/hRblu2krD7PHyGMrvUumpGwNLYcCl/aRvAQFLwgFTnlaktsJ9ljGiOdef
-         H5/PBfny2Z5ACV4Vpog5SPjValaPVIRYri/0AlQeexYTBKh4mDHZ/Mf65l6uwmeIhdbI
-         Fg4w==
-X-Gm-Message-State: AOAM532zvzhpB9UZcSFOuTQuwoS+Qa1Wia8rqZSsG29gPiwi1eh/Z1Xm
-        g//JaDrOol0KDhDDA6g3i+rS0+iAQYw=
-X-Google-Smtp-Source: ABdhPJyae0iAnZ5vVEgpMLzFzDK8g3K2mXaBfdK4hiobTFKYWjRk2EN5sWj512nGNHMjsWgcvI/z556o6Kc=
-X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6902:1082:b0:63e:145c:dc55 with SMTP id
- v2-20020a056902108200b0063e145cdc55mr805811ybu.283.1649096491105; Mon, 04 Apr
- 2022 11:21:31 -0700 (PDT)
-Date:   Mon,  4 Apr 2022 18:21:19 +0000
-In-Reply-To: <20220404182119.3561025-1-oupton@google.com>
-Message-Id: <20220404182119.3561025-4-oupton@google.com>
-Mime-Version: 1.0
-References: <20220404182119.3561025-1-oupton@google.com>
-X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
-Subject: [PATCH v2 3/3] selftests: KVM: Free the GIC FD when cleaning up in arch_timer
-From:   Oliver Upton <oupton@google.com>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=khyTIUn3m8SPuUMnh7lkp1GRN/S6UpAf1fgYfOLm5Zo=;
+        b=juKyFDK1sUmJ8zNWKgVh9Hn+NzUz39NxlSyMIh2uiEqXpdqNY0fF4tFmoLiR9R5viq
+         6gY72Gi0FR1bxPad/Yjx14pSttbE4NZUyfOGvttVWtUQYAgwqSPsc0L4/tim4a5aJyqh
+         +qGgmHeH+bOao4Gz2joaFdPxYC0yhPzvvy7qIoIE/Gh73bNvV2WvrMcqkgguMZoK/cc6
+         PrC7rMygDXJfdOnDCoJHGM2QesQNSHyVSevj4dYgTRLpQpT/1UCJU1RkcFJ2Rxb7zIyR
+         RihBMo8d/26MYSCJSfLsTEOfQCEuvq9UI84hlSJY2Akq3JwBPWK++aHArCZWKMNa9Hp6
+         DJBw==
+X-Gm-Message-State: AOAM533KvKZwG1gSmF0ZgkTWWf6KQjDobXXwB1hA/kuYT5PqeRNVJfTS
+        YEBW8kDZL2XroiSkwI7xM9i0DEwrwt2Om3hOND4InA==
+X-Google-Smtp-Source: ABdhPJymfU0XtQ2OvJxVW04x/wIyLKAhq/QXjM/Tr9SI2s9QRZF4JzI6uM3nVFsMEGd/pzhKO4LC8c5s/XSjTYI50Lk=
+X-Received: by 2002:a0d:d44e:0:b0:2e5:dc71:c82b with SMTP id
+ w75-20020a0dd44e000000b002e5dc71c82bmr1242654ywd.42.1649096826511; Mon, 04
+ Apr 2022 11:27:06 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220401233737.3021889-1-dmatlack@google.com> <20220401233737.3021889-3-dmatlack@google.com>
+In-Reply-To: <20220401233737.3021889-3-dmatlack@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Mon, 4 Apr 2022 11:26:55 -0700
+Message-ID: <CANgfPd-myyfOoBttiLGeHF12_r1GZS-z9-OVzswCk_a9A+vNpg@mail.gmail.com>
+Subject: Re: [PATCH 2/3] KVM: x86/mmu: Pass account_nx to tdp_mmu_split_huge_page()
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Oliver Upton <oupton@google.com>
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Zhenzhong Duan <zhenzhong.duan@intel.com>,
+        "open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)" 
+        <kvm@vger.kernel.org>, Peter Xu <peterx@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,68 +73,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In order to correctly destroy a VM, all references to the VM must be
-freed. The arch_timer selftest creates a VGIC for the guest, which
-itself holds a reference to the VM.
+On Fri, Apr 1, 2022 at 4:37 PM David Matlack <dmatlack@google.com> wrote:
+>
+> In preparation for splitting huge pages during fault, pass account_nx to
+> tdp_mmu_split_huge_page(). Eager page splitting hard-codes account_nx to
+> false because the splitting is being done for dirty-logging rather than
+> vCPU execution faults.
+>
+> No functional change intended.
+>
+> Signed-off-by: David Matlack <dmatlack@google.com>
 
-Close the GIC FD when cleaning up a VM.
+Looks good to me, but this will conflict with some other patches from
+Mingwei and Sean, so someone will have to send out another version.
 
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- tools/testing/selftests/kvm/aarch64/arch_timer.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-index b08d30bf71c5..3b940a101bc0 100644
---- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-+++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-@@ -362,11 +362,12 @@ static void test_init_timer_irq(struct kvm_vm *vm)
- 	pr_debug("ptimer_irq: %d; vtimer_irq: %d\n", ptimer_irq, vtimer_irq);
- }
- 
-+static int gic_fd;
-+
- static struct kvm_vm *test_vm_create(void)
- {
- 	struct kvm_vm *vm;
- 	unsigned int i;
--	int ret;
- 	int nr_vcpus = test_args.nr_vcpus;
- 
- 	vm = vm_create_default_with_vcpus(nr_vcpus, 0, 0, guest_code, NULL);
-@@ -383,8 +384,8 @@ static struct kvm_vm *test_vm_create(void)
- 
- 	ucall_init(vm, NULL);
- 	test_init_timer_irq(vm);
--	ret = vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
--	if (ret < 0) {
-+	gic_fd = vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
-+	if (gic_fd < 0) {
- 		print_skip("Failed to create vgic-v3");
- 		exit(KSFT_SKIP);
- 	}
-@@ -395,6 +396,12 @@ static struct kvm_vm *test_vm_create(void)
- 	return vm;
- }
- 
-+static void test_vm_cleanup(struct kvm_vm *vm)
-+{
-+	close(gic_fd);
-+	kvm_vm_free(vm);
-+}
-+
- static void test_print_help(char *name)
- {
- 	pr_info("Usage: %s [-h] [-n nr_vcpus] [-i iterations] [-p timer_period_ms]\n",
-@@ -478,7 +485,7 @@ int main(int argc, char *argv[])
- 
- 	vm = test_vm_create();
- 	test_run(vm);
--	kvm_vm_free(vm);
-+	test_vm_cleanup(vm);
- 
- 	return 0;
- }
--- 
-2.35.1.1094.g7c7d902a7c-goog
-
+> ---
+>  arch/x86/kvm/mmu/tdp_mmu.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index d71d177ae6b8..9263765c8068 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -1456,7 +1456,8 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
+>  }
+>
+>  static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
+> -                                  struct kvm_mmu_page *sp, bool shared)
+> +                                  struct kvm_mmu_page *sp, bool shared,
+> +                                  bool account_nx)
+>  {
+>         const u64 huge_spte = iter->old_spte;
+>         const int level = iter->level;
+> @@ -1479,7 +1480,7 @@ static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
+>          * correctness standpoint since the translation will be the same either
+>          * way.
+>          */
+> -       ret = tdp_mmu_link_sp(kvm, iter, sp, false, shared);
+> +       ret = tdp_mmu_link_sp(kvm, iter, sp, account_nx, shared);
+>         if (ret)
+>                 goto out;
+>
+> @@ -1539,7 +1540,7 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
+>                                 continue;
+>                 }
+>
+> -               if (tdp_mmu_split_huge_page(kvm, &iter, sp, shared))
+> +               if (tdp_mmu_split_huge_page(kvm, &iter, sp, shared, false))
+>                         goto retry;
+>
+>                 sp = NULL;
+> --
+> 2.35.1.1094.g7c7d902a7c-goog
+>
