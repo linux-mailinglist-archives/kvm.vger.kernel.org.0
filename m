@@ -2,241 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F4FE4F54F3
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 07:30:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A787F4F54F9
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 07:30:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234635AbiDFFWw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 01:22:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42426 "EHLO
+        id S1378936AbiDFFXZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 01:23:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1838569AbiDFAzU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Apr 2022 20:55:20 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2072.outbound.protection.outlook.com [40.107.94.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8EAA19FF40;
-        Tue,  5 Apr 2022 15:57:44 -0700 (PDT)
+        with ESMTP id S1449057AbiDFBQZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Apr 2022 21:16:25 -0400
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam08on2047.outbound.protection.outlook.com [40.107.101.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6E1D4CD43;
+        Tue,  5 Apr 2022 16:09:22 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VkZ/4pBB5toWP6OeiU+1jwhJmWLMu1tH0B2xQFXb3zcBytlqLv8TxA6JuFZZb2ugYgnq3JU3XsHikuEVUcG/zRo8ufYIx/HBH/4OCgGZ5Fy4lmVzNTcsCAedjUVNh0N7/b3YWlTgrPUuoLmOyK56beHAU2cMdRIpJDmjlGQJeW1sbo7PJNSGMEDeHJ57mqOgWEBT6tmBVYzzz8fAmM5RP7tCz8zdUhsD0B7pkl1CNomkMdPY6g2ew7XXCjjrnL9V87QBnS9CkTT4DhVEcmmvNm+xuORk7Y7bxhrvvUeJ1LzFTrFn13RDcSNw5+VDhz9W3K59WZe3Q5+h5fCLebw8xg==
+ b=SvQIiQMkeW3HfEkr5LcrqcBTlQ0ZZ0ixnUm0TDjo4m3dHZ9yJSV3m2aaEZMjaB8H+FLSptJzUefzYyvP48Qb1KePpmcKCXwH1R9/reJEDHrlVuuRyAhsXo9ZizNUtEg4oyyUmdDVc5W0DKpuHLfxf0mCfLlAwYwWJTDBvj8EKgaoIIpjIajtnSGkdT1tuXlwnFJLNOU5xKyH/bRwTRFkE5mhD5IubSOyD+sIDVZXbi78giHsGpm5UrLnnhzHqb2kORNtF8Oe0gzdwZCVGW4VyRywUhBuIH+ZH3rKeXelxHonk3EMlTk/dxLaC7bQXzQdJNnaT7whii0CR8BKo3YCcQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HvnP56WZfmDZ8OOtSptEBTdkllR7kIl0OZ4FSadH0c8=;
- b=CZgreFZa11Ne8+7/I4B6mpb39ZkaX3xHEQMrYpsRsdoAvhJxZ+dFQX2ToQvREAOdyVyQ9TkVgY0yKeF5giNu77+V5mja0Uye00LcS+fJyykKXvtKXXG0kwuFPI7ywrb1Uxh3pHRb17qIk8sm60fuWMMN02ZOT6i416teIQn3HAhHtN6q8C08ZFHS6JDOHAjaPy8gKGYTq88rZgqywGwrElWQ8Qk6ThxEgpX4iKDskdtb99HLNESCzjoYBX+cw5z2OWES8ny0Q7JFNd2lUgTnDKlV6Th1Tlc4vYwZVzoWxPPb5BZpu1gMF+0qDp881F/BAMZpaFiOeTLotMW1LndNBQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=SuRMXmbyLXKaP7ohyz8cLcPKFddGQ6x65bALJVKYpY4=;
+ b=kNskKoWRB7jrZpDTAVH458hTNMPHsvws/d7f9ePCPHulNZ1QBqHKUksPFnjC03gOu3JIPBEpASatQcH0+BJrNCzwHGjCoP+vPwev8H6i4omFmbVBE/cRqErbsmicRB9BXX32mlkqwqBqkm1b/vzW+CA7Qgd9aLHyXKCLWp+TzbCoM1Z09ievaV6yOJppEOJdJ6SnCtU+UAQMxYMCnIlK9nHT6vhxwIfG2+QMBnBZnCjXTFoLcdEEXdAalasvIy7+VQgQ90FbiM4jhtZpINz7BadW1eP1PIlGId5+SlnqAIMzndb6HlZ9Na+Wtxonq4Ph6idO0qR0/1eVH17x3i2SHw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HvnP56WZfmDZ8OOtSptEBTdkllR7kIl0OZ4FSadH0c8=;
- b=S0ceSEyLSP52sUjwpBtOq6OsZ7Fyxn+eVKkONs5q0lfWjdgjjPZMQduVv5sy3Y6BwySj9xZ1oHxWL0Q/UqVe+FqSvCmZFmmHJ0cydbPZV0cwUfhQuKOrtc9V88mXL9mSvYHco1e+N8+2uRna5WSPTLCNRR4f/54A56QRrgyBNOxYPI8SWEfDUWPQijWp7JL00x0kxh85BfNrhYTjjPYevA+3T01Os0lERkVvflz3vCOHWPSJ5HQCHSw7iIU/Xk8eIMEI4UjeN3ffbeFEIzsKwhKe29c1c998dGQlVzI6pUTmfaRBBUgrFpMYUMf1nn/qdYp9fCxUgHn4rjOZiCXgGA==
-Received: from CO6PR12MB5427.namprd12.prod.outlook.com (2603:10b6:5:358::13)
- by MW4PR12MB5666.namprd12.prod.outlook.com (2603:10b6:303:188::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5123.30; Tue, 5 Apr
- 2022 22:57:42 +0000
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by CO6PR12MB5427.namprd12.prod.outlook.com (2603:10b6:5:358::13) with
+ bh=SuRMXmbyLXKaP7ohyz8cLcPKFddGQ6x65bALJVKYpY4=;
+ b=tIC947NUNdbZC6hK7W+MVaqp14YNWNB5fnMDrxXu+AxLon6eLcIMABStNpqAO9G/UkKKUXZcPjzWuPiga9dhwJh0sdcWd3J29px4uUtPCTfuO6sSxoQEvKTD5EtuhilXsxsgn5ZaQ197zTrg1z/b+ZoCXPyionJ0A7vamGGYFQg=
+Received: from MW4PR04CA0084.namprd04.prod.outlook.com (2603:10b6:303:6b::29)
+ by BL1PR12MB5095.namprd12.prod.outlook.com (2603:10b6:208:31b::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5123.31; Tue, 5 Apr
- 2022 22:57:42 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::cdfb:f88e:410b:9374]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::cdfb:f88e:410b:9374%5]) with mapi id 15.20.5123.031; Tue, 5 Apr 2022
- 22:57:41 +0000
-Date:   Tue, 5 Apr 2022 19:57:39 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Christian Benvenuti <benve@cisco.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        iommu@lists.linux-foundation.org, Jason Wang <jasowang@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nelson Escobar <neescoba@cisco.com>, netdev@vger.kernel.org,
-        Rob Clark <robdclark@gmail.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        virtualization@lists.linux-foundation.org,
-        Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 3/5] iommu: Introduce the domain op
- enforce_cache_coherency()
-Message-ID: <20220405225739.GW2120790@nvidia.com>
-References: <0-v1-ef02c60ddb76+12ca2-intel_no_snoop_jgg@nvidia.com>
- <3-v1-ef02c60ddb76+12ca2-intel_no_snoop_jgg@nvidia.com>
- <20220405135036.4812c51e.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220405135036.4812c51e.alex.williamson@redhat.com>
-X-ClientProxiedBy: MN2PR11CA0013.namprd11.prod.outlook.com
- (2603:10b6:208:23b::18) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+ 2022 23:09:19 +0000
+Received: from CO1NAM11FT008.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:6b:cafe::c5) by MW4PR04CA0084.outlook.office365.com
+ (2603:10b6:303:6b::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5123.31 via Frontend
+ Transport; Tue, 5 Apr 2022 23:09:19 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT008.mail.protection.outlook.com (10.13.175.191) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5144.20 via Frontend Transport; Tue, 5 Apr 2022 23:09:19 +0000
+Received: from sp5-759chost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 5 Apr
+ 2022 18:09:17 -0500
+From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <x86@kernel.org>
+CC:     <mlevitsk@redhat.com>, <seanjc@google.com>, <pbonzini@redhat.com>,
+        <joro@8bytes.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+        <bp@alien8.de>, <peterz@infradead.org>, <hpa@zytor.com>,
+        <jon.grimm@amd.com>, <wei.huang2@amd.com>, <terry.bowman@amd.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Subject: [PATCH 00/12] Introducing AMD x2APIC Virtualization (x2AVIC) support.
+Date:   Tue, 5 Apr 2022 18:08:43 -0500
+Message-ID: <20220405230855.15376-1-suravee.suthikulpanit@amd.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1a7aae92-6df2-4873-52f6-08da1757aff6
-X-MS-TrafficTypeDiagnostic: CO6PR12MB5427:EE_|MW4PR12MB5666:EE_
-X-Microsoft-Antispam-PRVS: <CO6PR12MB54271D0E7FB6366155518102C2E49@CO6PR12MB5427.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 4e870e14-3610-4db2-ca05-08da1759504f
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5095:EE_
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5095F46A5335DD8822383A40F3E49@BL1PR12MB5095.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +ix8JeI2N/Ndb9xmCk3NfY6f/gI6n9SLRVP3lEMwBQzmdGRJe4uriGAJDqGrdSiz1wxFSQarPBxlq8wjoUhftyiBGdvxvqwOYEDj81yx2GF9C6qcwt8v3ZP/ypuVEkgcIV/4AcEKb5tgQPL+voL4/Yzm3bQcs6IMv8/Z7bPy2Kbs9Q1PK8RCERgKr/WxPCEj2dXrdjXwtEg7opTT/FxXt9h4yPWoDtf7ygmOzNlwjVFNdA4PzBIRBEjaSdNgzwryVlcVonulYuxSYv5w2FWHz3TZxkf2Ybpav0km5iHwgy2ryS8xE91EJHBRvRLXnTAqhUXriSgaQF7UaUwpWmtDhBhJYVQprO8/qolLR0ekgdHxpyLyKVdFAm+qqfdmyswrVPF0iBz+2zAulZQfPIpWQcr6muo4YOHliYUKiF92tF33igB0odKpneDSvKyPTBwaNVCM/k4vkkbVM8Q5vLu8wgaQ8v9UbQZxarItslWfzL0Dv3pg5FeDNuWgOu8Q3d+npous4c7BUcSrLw/2TUP8rlUOhjhuFUeUM/qiVEhznTYPlOn1PLPJdc1bbB8f7VL44nt2ssQeEPfNwvSY7W1GZiG+FqzsYvrd0CJo4pluy5DtKKZ2KtOQInRTfRiyfSyyLX8j/DjHGcv4cj1RY9dApA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR12MB5427.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(5660300002)(2616005)(7416002)(8936002)(6486002)(1076003)(186003)(26005)(508600001)(6512007)(33656002)(6506007)(2906002)(38100700002)(83380400001)(66946007)(8676002)(86362001)(110136005)(4326008)(54906003)(316002)(66556008)(66476007)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?SBlTyarK3A5tNgPtSxiL4psvEoca/eFzwR2umuyfy+OxlUoW8kJ+yPz5yDy9?=
- =?us-ascii?Q?+4Z9P/nZWKpiOj63iThFK8GPDQxn9uoekE/dks+WQskHugk/m0ygZfx+PL2G?=
- =?us-ascii?Q?Vw6cJbILbHJEgY6Kz03rX403FR9ffiHulaJO5HADwYZYxjKIY3ZM//GZMxyU?=
- =?us-ascii?Q?bRrx1cZMRd5KKzdG9NEwi5w9PotryYxvY8kFZScrlKmiYqjTc4RfdpsSEHuO?=
- =?us-ascii?Q?oXELM7S7HoJQ1UaiVNny0gnhUL1kJHDMOunSbPL9YyGVaRpK9MuUxYw7umnU?=
- =?us-ascii?Q?ZpmQHGi3IxNgurXqcg62Bj0h4xdPJHQXPjh+lhDv+ErxO++/srxVeqzG7379?=
- =?us-ascii?Q?NuROx5rZAvIAxT9QKcsSYwncUWm8sUizC8+FFdoOq4Si5N0k/d/9zIZafEY7?=
- =?us-ascii?Q?BetKQsJ0ywG0zfGIxz8kFiG9PXb3RQ+mqxSifptDQDFYzFtO14c6ZgTAsPxt?=
- =?us-ascii?Q?TsFNY4E2wC1fyIeaVRIYA0Aiy9BU6jhdP3K6XpFuxKfvpoeH9Es9qx+NTNCq?=
- =?us-ascii?Q?GuyIAzzk5jWk0EbaxuoOZUbwE7TI2I6AIE62qi49S9KtzeVyejtFlb1xq2qt?=
- =?us-ascii?Q?wS3T0+2Z7jQopa/dGHRKAIB6zx7WPiO+LoAKGkEe93Q3sriPJ4knQi1qPnxX?=
- =?us-ascii?Q?bsXwAxv09TZczC5u6aDdiF1zB9yYB6ilC9npRATG7cfKO2BSS5dnHaTX6u+G?=
- =?us-ascii?Q?huosj9vDr/1puibqcFfPEGi323DxGAtR7JwEymA0tLhc5liw1kszP1bgR5Iz?=
- =?us-ascii?Q?ba89BDsudJSNUEgcWBqWM5r54tVG9fFjbsfyOYoBViYzMSiqpPVjhcXo4Jj2?=
- =?us-ascii?Q?7S5LU+VvdNgBtkVYvpIotIWzSl+WkTr/8Zdpu0gnZjEuW5BuAi71moyGToj4?=
- =?us-ascii?Q?hPp5S6vEtkGBsq8FQ26wsrD3BSjc/nuAhh+r8j9RI6jqukYSihQ9uz+u2ibL?=
- =?us-ascii?Q?e7vYLUAHuhal6LexDCBJnyLKRZg8tpJgixl6FvjKkRWZT1ugnKbNWBq0y4oV?=
- =?us-ascii?Q?0phWsdqVPAkxCrmPji7Dcvr6AjsNoOufSjFmhq0tzwjwb5aJfi9vvKmSE43z?=
- =?us-ascii?Q?Rjolum0jOwiPTmTTsTtny3xt2zURjsow7F3KLOpmz97Tjc4BIPeLCkXUoA14?=
- =?us-ascii?Q?AKdoKuKGeA+Ni0eXRA+9mzspXM2zgI35HL4ZhC47AOud4Nu3VHV2FGxaOmf3?=
- =?us-ascii?Q?6b97kz5pj/hgH8Dk8kF4H0SU6eI6aj5GawltfcjDcr0wTs4a9FJ/LQJdD3le?=
- =?us-ascii?Q?Np1e78emQI2O270Lw6EqbHdEc1HEFd8zbYakEgj/TTOjXwXwmwqbdVw6Zv+t?=
- =?us-ascii?Q?sfSZZwX8CSSuco1vr6GYCFxtfsHJ+DmkbE+akD4uQoXzyjnZhtADkv0Ocove?=
- =?us-ascii?Q?mWWbHNv5uif0lUg3x55194lyjnmgExt45zES2JFhUDSi5f6Vm0DloMxYZzxl?=
- =?us-ascii?Q?RLW2kRogIxx1wdIBGNgsKIuWvJBgT5p5CULlHmsbyOoz0uvKng17+Dc8NJou?=
- =?us-ascii?Q?A6CDhXkS+1GO0hOjK5XmShh/PB7mvklrDNVIt0ej/qD9el0VWOjGlh+3Kv+v?=
- =?us-ascii?Q?PXCKFt9vQAIJL6sMy3BE9XEFXi7MqY8fY5r3daKJLsebLjsnKiq2KXTmeMvD?=
- =?us-ascii?Q?rd1/8Ji78QKjBoAY6ILDs9s4GtDlNPOizMgy9t7LpMqzRwQPVoTKSKiY2mYp?=
- =?us-ascii?Q?82hfODiHSBWxlf5q3ZYTv8h/4y0wTwsxtAdhz/u2rDFHE+9kmmk/tEhvZRML?=
- =?us-ascii?Q?UqCIxqWHeg=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1a7aae92-6df2-4873-52f6-08da1757aff6
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Apr 2022 22:57:41.0126
+X-Microsoft-Antispam-Message-Info: PmnZkneZjqqqqVzi6HGMW+rrGvhBd+t4EbhT+93Gu0n9+ZRLCFIJNfy0NF832SEH3x5+iHkR5fyp0i2xc02WNnIwbZbOOLzksnypWs8uJhviKfgvyuMqonkPf5C+mKxX+BYRhQ+hBVfk388fVEznocJgSh/2+cxNhw/s6Q6qWxW/yTCLJo/Io+Bvi3meC8/jbdSdt4w/8WLVREz9uCDHVbDpIF0sG1Pa1IKqRAeNlSqn82lsscE5M25YYPnLTJAPk0uEk+uQDG8bq1BKisM/eVzT2GREsumFWV3i0coWVBU4SZNU1GnDAiRojRFq52iBCxeU2nnFnYm7Frkaqc+tLROWNwe6PfYoowl95FCzvsFKZXCi/cO7FIC7lSGle1gmLq6LgilfAsKlLn0OHAW6j9Q2SBkgXHhC54ubyULLMmn7bQcHxJtt9ZaiJaYiS+NXAGy3hcv4c0JzUBrjhgXVrf8fjF3Pq1g1np5OLos25asET5NvqNoNI8ziVcvaqJQs04SARYEeQPRokCMEmgEFv6rvME44Ng91AxBxqlbmD8o1/7YpD3EVLE92KZiCrQxQT2JivrMKEieiH2Hw+2Zvcm8A7jQWI9FJrA5csVyoaRjtdRk6SUZ2dFnOWL1hjD1/0i9pqL+eG8oyLWAFLLhV6aKq8+WU6pPcsmqOUdWgYIw2FGOLd23rJF8O/SZxttkqzWvoMo6HOu7WVC2I5EonieCL/TlbqMmbGK/982s4rNA0UWesonft40BvzaeElZ83bBokQMIbwJkpK1Z53b/EB36nRZWjMUgtmyjmm82sVPY=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(40470700004)(46966006)(36840700001)(36756003)(356005)(36860700001)(8676002)(70586007)(70206006)(47076005)(82310400005)(8936002)(83380400001)(7416002)(5660300002)(44832011)(81166007)(4326008)(86362001)(26005)(6666004)(316002)(2616005)(186003)(16526019)(336012)(110136005)(426003)(54906003)(1076003)(508600001)(2906002)(40460700003)(7696005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Apr 2022 23:09:19.0937
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xxkYDUqfh83dJ3YBNn6EGEO1+fZcMjCY7DNnzmFxWgBSiLVnz8T+kprVf1zkj8Am
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5666
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4e870e14-3610-4db2-ca05-08da1759504f
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT008.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5095
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 05, 2022 at 01:50:36PM -0600, Alex Williamson wrote:
-> >  
-> > +static bool intel_iommu_enforce_cache_coherency(struct iommu_domain *domain)
-> > +{
-> > +	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
-> > +
-> > +	if (!dmar_domain->iommu_snooping)
-> > +		return false;
-> > +	dmar_domain->enforce_no_snoop = true;
-> > +	return true;
-> > +}
-> 
-> Don't we have issues if we try to set DMA_PTE_SNP on DMARs that don't
-> support it, ie. reserved register bit set in pte faults?  
+Previously, with AVIC, guest needs to disable x2APIC capability and
+can only run in APIC mode to activate hardware-accelerated interrupt
+virtualization.  With x2AVIC, guest can run in x2APIC mode.
+This feature is indicated by the CPUID Fn8000_000A EDX[14],
+and it can be activated by setting bit 31 (enable AVIC) and
+bit 30 (x2APIC mode) of VMCB offset 60h.
 
-The way the Intel driver is setup that is not possible. Currently it
-does:
+The mode of interrupt virtualization can dynamically change during runtime.
+For example, when AVIC is enabled, the hypervisor currently keeps track of
+the AVIC activation and set the VMCB bit 31 accordingly. With x2AVIC,
+the guest OS can also switch between APIC and x2APIC modes during runtime.
+The kvm_amd driver needs to also keep track and set the VMCB
+bit 30 accordingly. 
 
- static bool intel_iommu_capable(enum iommu_cap cap)
- {
-	if (cap == IOMMU_CAP_CACHE_COHERENCY)
-		return domain_update_iommu_snooping(NULL);
+Besides, for x2AVIC, kvm_amd driver needs to disable interception for the
+x2APIC MSR range to allow AVIC hardware to virtualize register accesses.
 
-Which is a global property unrelated to any device.
+Testing:
+  * This series has been tested booting a Linux VM with x2APIC physical
+    and logical modes upto 512 vCPUs.
 
-Thus either all devices and all domains support iommu_snooping, or
-none do.
+Regards,
+Suravee
 
-It is unclear because for some reason the driver recalculates this
-almost constant value on every device attach..
+Change from RFCv2 (https://lore.kernel.org/all/5876774a-c188-2026-1328-a4292022832b@amd.com/t/)
+  * Rebase to v5.17
+  * Clean up based on review comments from Maxim (Thank!!)
+  * Patch 6/12: Remove the kvm_get_apic_id() introduced in RFCv2, and
+    simply do not support updating physical and logical ID when in x2APIC mode.
+  * Patch 7/12: Extend the svm_direct_access_msrs to include x2APIC MSR range
+    instead of declaring a new data structure. 
+  * Patch 8/12: Remove force svm_refresh_apicv_exec_ctrl(), and do not
+    update avic_vapic_bar.
+  * Patch 12/12: New to this series.
 
-> There's also a disconnect, maybe just in the naming or documentation,
-> but if I call enforce_cache_coherency for a domain, that seems like the
-> domain should retain those semantics regardless of how it's
-> modified,
+Suravee Suthikulpanit (12):
+  x86/cpufeatures: Introduce x2AVIC CPUID bit
+  KVM: x86: lapic: Rename [GET/SET]_APIC_DEST_FIELD to
+    [GET/SET]_XAPIC_DEST_FIELD
+  KVM: SVM: Detect X2APIC virtualization (x2AVIC) support
+  KVM: SVM: Update max number of vCPUs supported for x2AVIC mode
+  KVM: SVM: Update avic_kick_target_vcpus to support 32-bit APIC ID
+  KVM: SVM: Do not support updating APIC ID when in x2APIC mode
+  KVM: SVM: Adding support for configuring x2APIC MSRs interception
+  KVM: SVM: Update AVIC settings when changing APIC mode
+  KVM: SVM: Introduce helper functions to (de)activate AVIC and x2AVIC
+  KVM: SVM: Do not throw warning when calling avic_vcpu_load on a
+    running vcpu
+  KVM: SVM: Do not inhibit APICv when x2APIC is present
+  kvm/x86: Remove APICV activate mode inconsistency check
 
-Right, this is how I would expect it to work.
+ arch/x86/hyperv/hv_apic.c          |   2 +-
+ arch/x86/include/asm/apicdef.h     |   4 +-
+ arch/x86/include/asm/cpufeatures.h |   1 +
+ arch/x86/include/asm/svm.h         |  16 ++-
+ arch/x86/kernel/apic/apic.c        |   2 +-
+ arch/x86/kernel/apic/ipi.c         |   2 +-
+ arch/x86/kvm/lapic.c               |   2 +-
+ arch/x86/kvm/svm/avic.c            | 151 ++++++++++++++++++++++++++---
+ arch/x86/kvm/svm/svm.c             |  56 ++++++-----
+ arch/x86/kvm/svm/svm.h             |   7 +-
+ arch/x86/kvm/x86.c                 |  13 +--
+ 11 files changed, 202 insertions(+), 54 deletions(-)
 
-> ie. "enforced".  For example, if I tried to perform the above operation,
-> I should get a failure attaching the device that brings in the less
-> capable DMAR because the domain has been set to enforce this
-> feature.
+-- 
+2.25.1
 
-We don't have any code causing a failure like this because no driver
-needs it.
-
-> Maybe this should be something like set_no_snoop_squashing with the
-> above semantics, it needs to be re-applied whenever the domain:device
-> composition changes?  Thanks,
-
-If we get a real driver that needs non-uniformity here we can revisit
-what to do. There are a couple of good options depending on exactly
-what the HW behavior is.
-
-Is it more clear if I fold in the below? It helps show that the
-decision to use DMA_PTE_SNP is a global choice based on
-domain_update_iommu_snooping():
-
-diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-index e5062461ab0640..fc789a9d955645 100644
---- a/drivers/iommu/intel/iommu.c
-+++ b/drivers/iommu/intel/iommu.c
-@@ -641,7 +641,6 @@ static unsigned long domain_super_pgsize_bitmap(struct dmar_domain *domain)
- static void domain_update_iommu_cap(struct dmar_domain *domain)
- {
- 	domain_update_iommu_coherency(domain);
--	domain->iommu_snooping = domain_update_iommu_snooping(NULL);
- 	domain->iommu_superpage = domain_update_iommu_superpage(domain, NULL);
- 
- 	/*
-@@ -4283,7 +4282,6 @@ static int md_domain_init(struct dmar_domain *domain, int guest_width)
- 	domain->agaw = width_to_agaw(adjust_width);
- 
- 	domain->iommu_coherency = false;
--	domain->iommu_snooping = false;
- 	domain->iommu_superpage = 0;
- 	domain->max_addr = 0;
- 
-@@ -4549,7 +4547,7 @@ static bool intel_iommu_enforce_cache_coherency(struct iommu_domain *domain)
- {
- 	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
- 
--	if (!dmar_domain->iommu_snooping)
-+	if (!domain_update_iommu_snooping(NULL))
- 		return false;
- 	dmar_domain->enforce_no_snoop = true;
- 	return true;
-diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
-index 1f930c0c225d94..bc39f633efdf03 100644
---- a/include/linux/intel-iommu.h
-+++ b/include/linux/intel-iommu.h
-@@ -539,7 +539,6 @@ struct dmar_domain {
- 
- 	u8 has_iotlb_device: 1;
- 	u8 iommu_coherency: 1;		/* indicate coherency of iommu access */
--	u8 iommu_snooping: 1;		/* indicate snooping control feature */
- 	u8 enforce_no_snoop : 1;        /* Create IOPTEs with snoop control */
- 
- 	struct list_head devices;	/* all devices' list */
