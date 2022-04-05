@@ -2,282 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B0C9D4F4973
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 02:26:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FD874F4993
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 02:28:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384693AbiDEWQs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Apr 2022 18:16:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56098 "EHLO
+        id S1442836AbiDEWTt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Apr 2022 18:19:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1453023AbiDEPzx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Apr 2022 11:55:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 341A813858C
-        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 07:59:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649170741;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=m2sfKB74gTolYuaOLfzO0CaB/byjGpQyOkAPbwbPHJY=;
-        b=CKRvQ9nae+f9pPC/LcCnQ28IS++GKZ0sZUvOgFFMaFniTTcDpFeiukbvzoAq+2ADLEUbT9
-        GNq+6XsETMoMPOWW7Gk4gUSctNpmIVYwV/RLoQXKtwP1N1IsVfj9CIZdJpNn6ns76MdW5h
-        SdF/D5l7g7aW+UgBuqpOH5OTCxyMUNM=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-425-zt2zn7_rNLuSgUVWnE-cfQ-1; Tue, 05 Apr 2022 10:58:59 -0400
-X-MC-Unique: zt2zn7_rNLuSgUVWnE-cfQ-1
-Received: by mail-qv1-f70.google.com with SMTP id a3-20020a056214062300b00443cd6175c8so7552525qvx.4
-        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 07:58:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=m2sfKB74gTolYuaOLfzO0CaB/byjGpQyOkAPbwbPHJY=;
-        b=sfPQukNbnWpSW3ii1+ukPGdkPEdBllntdAQAXRivY8TfNm1Vaclvo/v2UuujyFeajh
-         zMWsUsXR7b6fFqy/3rdv+yUsx464vZSnFD6QSPVvyky8v3k1Hpc/cqStEiQ/SZPtY6ti
-         wtg6Yu5USQBjIZL8kra1IblthMdZomEOdn5cItx2CygX2K0SC3U949XacGIIZ3Je0iiX
-         tkMehOmPoO5etrusYwu4WDXvWKXdC240zhg7Q7MAqNHJWpldREetWBt5jJ7qM4LgL0T6
-         VV+RM0hTpQCFmSEih7+xyHznvX2UtKPLHNNMOZLkf4bAN846w5dPcjJoonT/MRa5H2QJ
-         X/NA==
-X-Gm-Message-State: AOAM53016iPcsX2GIzkGDNDInLk95cuJY9OVnfucd4T55L1gX+aIlTCV
-        1WlWYnH1AFwIjN/QGLu0wDZVBtT8bYtds6zArpBF42eoTORyf3UzAxwWYDSdfp0y45XptNpr2LC
-        tf5zYKyA+vE0d
-X-Received: by 2002:a05:620a:210f:b0:67b:119d:f32d with SMTP id l15-20020a05620a210f00b0067b119df32dmr2596720qkl.316.1649170739261;
-        Tue, 05 Apr 2022 07:58:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyxrv+hAz704UHG1GvBC1bddnp2MT4csXtUyD6rb0x6BFrLO5qGXa/QxqcDJp3NxZ4dggSgJw==
-X-Received: by 2002:a05:620a:210f:b0:67b:119d:f32d with SMTP id l15-20020a05620a210f00b0067b119df32dmr2596698qkl.316.1649170738832;
-        Tue, 05 Apr 2022 07:58:58 -0700 (PDT)
-Received: from [10.32.181.87] (nat-pool-mxp-t.redhat.com. [149.6.153.186])
-        by smtp.googlemail.com with ESMTPSA id c27-20020a05620a165b00b0067d32238bc8sm8030769qko.125.2022.04.05.07.58.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Apr 2022 07:58:58 -0700 (PDT)
-Message-ID: <fbd5271c-5d6d-ded6-63dc-6ee3a7ccd305@redhat.com>
-Date:   Tue, 5 Apr 2022 16:58:56 +0200
+        with ESMTP id S1454194AbiDEP6B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Apr 2022 11:58:01 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACC2B169B2F;
+        Tue,  5 Apr 2022 08:03:30 -0700 (PDT)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 235DWSsS015100;
+        Tue, 5 Apr 2022 15:03:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=kWjQMYfk1AG+xyWV+LOmEg/Nsxt7nzoqkaOys+fqmaI=;
+ b=Ox2JSU3zeaNG8Q6/LL1VQ58mhM27hRLVD5FXxgT5WgHuXw3ON0ebnQL0Slaygi3GmqiG
+ 6wCJd4FiM6aMrbKRGjvAaB/Apm/l3iJsPJV+27CITNSAqrc2EaCl60b+0bOPvBe/fiFJ
+ AD4/0QZTFpfRzh0hnwvcqEBmMZAdVV4+lEnAEN4IdQksY8RPsShsdRU1MeN2CWpVElyN
+ UA8afs4jnR4Kbl61KG2uzfuDKuEKOienpYBwRBr7TPxxGI5tJ4Cxyun9zWMjjNQqyMgx
+ CLtZd4erinolr5wL0FOajZuIrNLkdKgEmlZztRfBcUvWMGBNXsjU/WCxJ5ADJHm68SJs Gw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f8n6qmeyt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Apr 2022 15:03:29 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 235DWXQc015608;
+        Tue, 5 Apr 2022 15:03:29 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f8n6qmexq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Apr 2022 15:03:29 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 235F3CCP009010;
+        Tue, 5 Apr 2022 15:03:27 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 3f6e48x10y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Apr 2022 15:03:26 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 235F3Nok38207980
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 5 Apr 2022 15:03:23 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6F437A4040;
+        Tue,  5 Apr 2022 15:03:23 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 57A37A404D;
+        Tue,  5 Apr 2022 15:03:22 +0000 (GMT)
+Received: from [9.171.66.169] (unknown [9.171.66.169])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  5 Apr 2022 15:03:22 +0000 (GMT)
+Message-ID: <2978f1c7-e299-a385-9ef3-5ee796b134e4@linux.ibm.com>
+Date:   Tue, 5 Apr 2022 17:06:23 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [RFC PATCH v5 047/104] KVM: x86/mmu: add a private pointer to
- struct kvm_mmu_page
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v5 14/21] KVM: s390: pci: provide routines for
+ enabling/disabling interrupt forwarding
 Content-Language: en-US
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Jim Mattson <jmattson@google.com>,
-        erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-References: <cover.1646422845.git.isaku.yamahata@intel.com>
- <499d1fd01b0d1d9a8b46a55bb863afd0c76f1111.1646422845.git.isaku.yamahata@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <499d1fd01b0d1d9a8b46a55bb863afd0c76f1111.1646422845.git.isaku.yamahata@intel.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        farman@linux.ibm.com, borntraeger@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        agordeev@linux.ibm.com, svens@linux.ibm.com, frankja@linux.ibm.com,
+        david@redhat.com, imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org
+References: <20220404174349.58530-1-mjrosato@linux.ibm.com>
+ <20220404174349.58530-15-mjrosato@linux.ibm.com>
+ <9a551f04c3878ecb3a26fed6aff2834fbfe41f18.camel@linux.ibm.com>
+ <7196af99-fcfa-c9a6-a245-c15268c6851b@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <7196af99-fcfa-c9a6-a245-c15268c6851b@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Ch0IAO81t8SfZ7nOV3dnHL24lRQ8XSIM
+X-Proofpoint-GUID: bAcl5T6iJp8Wwm6dPQSQjmGwA7Wo8-7X
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-04-05_04,2022-04-05_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ lowpriorityscore=0 priorityscore=1501 impostorscore=0 mlxscore=0
+ suspectscore=0 bulkscore=0 adultscore=0 phishscore=0 spamscore=0
+ mlxlogscore=999 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2202240000 definitions=main-2204050084
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/4/22 20:49, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> Add a private pointer to kvm_mmu_page for private EPT.
-> 
-> To resolve KVM page fault on private GPA, it will allocate additional page
-> for Secure EPT in addition to private EPT.  Add memory allocator for it and
-> topup its memory allocator before resolving KVM page fault similar to
-> shared EPT page.  Allocation of those memory will be done for TDP MMU by
-> alloc_tdp_mmu_page().  Freeing those memory will be done for TDP MMU on
-> behalf of kvm_tdp_mmu_zap_all() called by kvm_mmu_zap_all().  Private EPT
-> page needs to carry one more page used for Secure EPT in addition to the
-> private EPT page.  Add private pointer to struct kvm_mmu_page for that
-> purpose and Add helper functions to allocate/free a page for Secure EPT.
-> Also add helper functions to check if a given kvm_mmu_page is private.
-> 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->   arch/x86/include/asm/kvm_host.h |  1 +
->   arch/x86/kvm/mmu/mmu.c          |  9 ++++
->   arch/x86/kvm/mmu/mmu_internal.h | 84 +++++++++++++++++++++++++++++++++
->   arch/x86/kvm/mmu/tdp_mmu.c      |  3 ++
->   4 files changed, 97 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index fcab2337819c..0c8cc7d73371 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -689,6 +689,7 @@ struct kvm_vcpu_arch {
->   	struct kvm_mmu_memory_cache mmu_shadow_page_cache;
->   	struct kvm_mmu_memory_cache mmu_gfn_array_cache;
->   	struct kvm_mmu_memory_cache mmu_page_header_cache;
-> +	struct kvm_mmu_memory_cache mmu_private_sp_cache;
->   
->   	/*
->   	 * QEMU userspace and the guest each have their own FPU state.
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 6e9847b1124b..8def8b97978f 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -758,6 +758,13 @@ static int mmu_topup_shadow_page_cache(struct kvm_vcpu *vcpu)
->   	struct kvm_mmu_memory_cache *mc = &vcpu->arch.mmu_shadow_page_cache;
->   	int start, end, i, r;
->   
-> +	if (kvm_gfn_stolen_mask(vcpu->kvm)) {
-> +		r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_private_sp_cache,
-> +					       PT64_ROOT_MAX_LEVEL);
-> +		if (r)
-> +			return r;
-> +	}
-> +
->   	if (shadow_init_value)
->   		start = kvm_mmu_memory_cache_nr_free_objects(mc);
->   
-> @@ -799,6 +806,7 @@ static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
->   {
->   	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
->   	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadow_page_cache);
-> +	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_private_sp_cache);
->   	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_gfn_array_cache);
->   	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
->   }
-> @@ -1791,6 +1799,7 @@ static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct
->   	if (!direct)
->   		sp->gfns = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
->   	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
-> +	kvm_mmu_init_private_sp(sp);
->   
->   	/*
->   	 * active_mmu_pages must be a FIFO list, as kvm_zap_obsolete_pages()
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index da6166b5c377..80f7a74a71dc 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -53,6 +53,10 @@ struct kvm_mmu_page {
->   	u64 *spt;
->   	/* hold the gfn of each spte inside spt */
->   	gfn_t *gfns;
-> +#ifdef CONFIG_KVM_MMU_PRIVATE
-> +	/* associated private shadow page, e.g. SEPT page */
-> +	void *private_sp;
-> +#endif
->   	/* Currently serving as active root */
->   	union {
->   		int root_count;
-> @@ -104,6 +108,86 @@ static inline int kvm_mmu_page_as_id(struct kvm_mmu_page *sp)
->   	return kvm_mmu_role_as_id(sp->role);
->   }
->   
-> +/*
-> + * TDX vcpu allocates page for root Secure EPT page and assigns to CPU secure
-> + * EPT pointer.  KVM doesn't need to allocate and link to the secure EPT.
-> + * Dummy value to make is_pivate_sp() return true.
-> + */
-> +#define KVM_MMU_PRIVATE_SP_ROOT	((void *)1)
-> +
-> +#ifdef CONFIG_KVM_MMU_PRIVATE
-> +static inline bool is_private_sp(struct kvm_mmu_page *sp)
-> +{
-> +	return !!sp->private_sp;
-> +}
-> +
-> +static inline bool is_private_spte(u64 *sptep)
-> +{
-> +	return is_private_sp(sptep_to_sp(sptep));
-> +}
-> +
-> +static inline void *kvm_mmu_private_sp(struct kvm_mmu_page *sp)
-> +{
-> +	return sp->private_sp;
-> +}
-> +
-> +static inline void kvm_mmu_init_private_sp(struct kvm_mmu_page *sp)
-> +{
-> +	sp->private_sp = NULL;
-> +}
-> +
-> +/* Valid sp->role.level is required. */
-> +static inline void kvm_mmu_alloc_private_sp(struct kvm_vcpu *vcpu,
-> +					struct kvm_mmu_page *sp)
-> +{
-> +	if (vcpu->arch.mmu->shadow_root_level == sp->role.level)
-> +		sp->private_sp = KVM_MMU_PRIVATE_SP_ROOT;
-> +	else
-> +		sp->private_sp =
-> +			kvm_mmu_memory_cache_alloc(
-> +				&vcpu->arch.mmu_private_sp_cache);
-> +	/*
-> +	 * Because mmu_private_sp_cache is topped up before staring kvm page
-> +	 * fault resolving, the allocation above shouldn't fail.
-> +	 */
-> +	WARN_ON_ONCE(!sp->private_sp);
-> +}
-> +
-> +static inline void kvm_mmu_free_private_sp(struct kvm_mmu_page *sp)
-> +{
-> +	if (sp->private_sp != KVM_MMU_PRIVATE_SP_ROOT)
-> +		free_page((unsigned long)sp->private_sp);
-> +}
-> +#else
-> +static inline bool is_private_sp(struct kvm_mmu_page *sp)
-> +{
-> +	return false;
-> +}
-> +
-> +static inline bool is_private_spte(u64 *sptep)
-> +{
-> +	return false;
-> +}
-> +
-> +static inline void *kvm_mmu_private_sp(struct kvm_mmu_page *sp)
-> +{
-> +	return NULL;
-> +}
-> +
-> +static inline void kvm_mmu_init_private_sp(struct kvm_mmu_page *sp)
-> +{
-> +}
-> +
-> +static inline void kvm_mmu_alloc_private_sp(struct kvm_vcpu *vcpu,
-> +					struct kvm_mmu_page *sp)
-> +{
-> +}
-> +
-> +static inline void kvm_mmu_free_private_sp(struct kvm_mmu_page *sp)
-> +{
-> +}
-> +#endif
-> +
->   static inline bool kvm_mmu_page_ad_need_write_protect(struct kvm_mmu_page *sp)
->   {
->   	/*
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 8db262440d5c..a68f3a22836b 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -59,6 +59,8 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
->   
->   static void tdp_mmu_free_sp(struct kvm_mmu_page *sp)
->   {
-> +	if (is_private_sp(sp))
-> +		kvm_mmu_free_private_sp(sp);
->   	free_page((unsigned long)sp->spt);
->   	kmem_cache_free(mmu_page_header_cache, sp);
->   }
-> @@ -184,6 +186,7 @@ static struct kvm_mmu_page *alloc_tdp_mmu_page(struct kvm_vcpu *vcpu, gfn_t gfn,
->   	sp->role.word = page_role_for_level(vcpu, level).word;
->   	sp->gfn = gfn;
->   	sp->tdp_mmu_page = true;
-> +	kvm_mmu_init_private_sp(sp);
->   
->   	trace_kvm_mmu_get_page(sp, true);
->   
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
+On 4/5/22 15:48, Matthew Rosato wrote:
+> On 4/5/22 9:39 AM, Niklas Schnelle wrote:
+>> On Mon, 2022-04-04 at 13:43 -0400, Matthew Rosato wrote:
+>>> These routines will be wired into a kvm ioctl in order to respond to
+>>> requests to enable / disable a device for Adapter Event Notifications /
+>>> Adapter Interuption Forwarding.
+>>>
+>>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>>> ---
+>>>   arch/s390/kvm/pci.c      | 247 +++++++++++++++++++++++++++++++++++++++
+>>>   arch/s390/kvm/pci.h      |   1 +
+>>>   arch/s390/pci/pci_insn.c |   1 +
+>>>   3 files changed, 249 insertions(+)
+>>>
+>>> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
+>>> index 01bd8a2f503b..f0fd68569a9d 100644
+>>> --- a/arch/s390/kvm/pci.c
+>>> +++ b/arch/s390/kvm/pci.c
+>>> @@ -11,6 +11,7 @@
+>>>   #include <linux/pci.h>
+>>>   #include <asm/pci.h>
+>>>   #include <asm/pci_insn.h>
+>>> +#include <asm/pci_io.h>
+>>>   #include "pci.h"
+>>>   struct zpci_aift *aift;
+>>> @@ -152,6 +153,252 @@ int kvm_s390_pci_aen_init(u8 nisc)
+>>>       return rc;
+>>>   }
+>>> +/* Modify PCI: Register floating adapter interruption forwarding */
+>>> +static int kvm_zpci_set_airq(struct zpci_dev *zdev)
+>>> +{
+>>> +    u64 req = ZPCI_CREATE_REQ(zdev->fh, 0, ZPCI_MOD_FC_REG_INT);
+>>> +    struct zpci_fib fib = {};
+>>
+>> Hmm this one uses '{}' as initializer while all current callers of
+>> zpci_mod_fc() use '{0}'. As far as I know the empty braces are a GNU
+>> extension so should work for the kernel but for consistency I'd go with
+>> '{0}' or possibly '{.foo = bar, ...}' where that is more readable.
+>> There too uninitialized fields will be set to 0. Unless of course there
+>> is a conflicting KVM convention that I don't know about.
+> 
+> No convention that I'm aware of, I previously had fib = {0} based on the 
+> same rationale you describe and changed to fib = {} per review request 
+> from Pierre a few versions back.  I don't have a strong preference, but 
+> I did not note any functional difference between the two and see a bunch 
+> of examples of both methods throughout the kernel.
+> 
+
+Was stupid of me to comment that, as you said there are no difference, 
+so do as you want.
+
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
