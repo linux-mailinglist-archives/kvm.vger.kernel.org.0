@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AC484F54F0
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 07:30:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE6204F5514
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 07:31:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235469AbiDFFWl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 01:22:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34352 "EHLO
+        id S1443437AbiDFF14 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 01:27:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1587977AbiDFAK7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Apr 2022 20:10:59 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C794BEF7BF
-        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 15:38:49 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id 7so749611pfu.13
-        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 15:38:49 -0700 (PDT)
+        with ESMTP id S1588314AbiDFAPV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Apr 2022 20:15:21 -0400
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BD5816F6DF
+        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 15:40:05 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id t4so633606pgc.1
+        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 15:40:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=tvwEEEaJ0T4z2PvevJbOdGhGfQrDEV2dT0fepq5dGuQ=;
-        b=lEe+gmGTcplirIWxlpEGhOPTw+tqhFKP1hkGnj48V32PfgzLy+9uFNVrgJShBKk6uJ
-         UPWS8cSg/pUiFDJP5GNdlM4X4uJ/Zt0/xOeHqH6hvSZ6TMJpQjLOxeijZq2ITys0YpPJ
-         2ErM/EuC0fe/TPZPX9KAa7F9xwWCfPxR6lpuPY0qL9RsA4Qlz6BNgYlAfjRYA1Sc4Uij
-         DnfFMxsIbZ4nXOFTeEZbZcwLghgVkK3NgybPD/KyX5C3saJASv+wcJStO6/gTYrarkfk
-         BOU5uwsQe9vhAE+NDBDZu1Pat1fW6qw0U9phcZ0QLH5r/I0NuaBOYkajqdI5QIciaWdC
-         bY5g==
+        bh=mja/7Hv2yue+rVJAx6K5Hvn3mkY+RhBRGz47vlxkKUQ=;
+        b=EkH6rRJ4ouJTgRc1oiSzVnRlg71jkUg3f2CN4kywiE9HLy2OfRI8r+5uutp20X2IXm
+         rx/o6a1D4/Tos+AyAQJQ74thxLA67pi3cAVX+upPp0A73Opew9btQh9r0Zmicpl3Gbs8
+         GWU5JPI/vhZQNO5F11tWgzsMFHqAl+FHQ6WpB5y81CDNCpsB1QNYxW+non1H0tiMUGpo
+         Q8Cd8qVXLVdr5+B+YTgB0QOv5nzu7CelWg+Df8gkDtb14o7yF7sbbQT4G+P0tuBIFDuX
+         qJwN11Jp8y5MyTV9INkUXXejBHNC00qkNyKp0uPXAgBSqHJA8pHig/7AhX9CUkFSSRB4
+         QHlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=tvwEEEaJ0T4z2PvevJbOdGhGfQrDEV2dT0fepq5dGuQ=;
-        b=CZtLygRNMlN4XtmjDSqFbpMZErs8pDzusuosSV36hrvl/SDjO2L7tEMWwea5PnzLmC
-         MpkcY9Us4llghdqIKBUDlSLbReHvgzztJNZ42+7I19chosvhOc453MGvNZyM/KSLI9pv
-         KHqDWJ5qH6fwQfeWI4Ry4cf3e1/aNearRttTZNRjmreWvw+ca27lVkXFpuBwApsIBvic
-         0FKSJ3jP2AJYIqvxgS+SPIJRMo9Un+nVmyJ+NCGZaUq6q/GTzbJJSbfPFkiLCx2ypTin
-         bXt+pfYMcd70AnbT2y2AUebIpGq+gGLOKYoRY/69SWjNz4W1CRdyoiqSBZJRfC0eW356
-         J2zg==
-X-Gm-Message-State: AOAM530rW9eQfNo9VevtSUVgYyRcq5prlVgbGj10OOelmS1U4vRgP50W
-        Aguyi2GNeFfAoxeEml4lwUPAkw==
-X-Google-Smtp-Source: ABdhPJwyhH4huQ3SwFdDGR2/gtQ/ItSdbnW3C1v/PIJEdHOPsitDZ7zYpzPOzs2Zy0467qwj91Yo2Q==
-X-Received: by 2002:a05:6a00:15d6:b0:4fa:f217:e2b2 with SMTP id o22-20020a056a0015d600b004faf217e2b2mr5768539pfu.64.1649198329057;
-        Tue, 05 Apr 2022 15:38:49 -0700 (PDT)
+        bh=mja/7Hv2yue+rVJAx6K5Hvn3mkY+RhBRGz47vlxkKUQ=;
+        b=YmaM9vos/wQwyG9Zt8iFPNwrtXpx5c+Ue+MQM86UdVa58xlAboV66x7q4JcPgcAk0I
+         DN89dW+fhzFU7Buu6hLaQYkZ9kJ56/oi4lVTu4olYATRfgVAyiPhiqGqeAod5oofdMCU
+         oUV5A4dDaIM7tdBXoOiFPiIdMrAGbUyLVZjZMzAT8RfkJYQVIK8NGNR+PeVh4vVF+KFc
+         3096sQZF3Mqcp5E4Htiks9fOZpugGN6/Buk8DUPQuF8cmqQll8t94GRRxWz3ZnuXZl5f
+         8X0yNPyLde93toKWLeQpsGAGEO8iJV8WKEvFaEkz8fOPBQ19agCVpQ447GpmQvD8V2D/
+         IXaw==
+X-Gm-Message-State: AOAM531nBU3Rz7hLHip9fi0tuMIBtbpkGiyi7Y492Nktnue4c97qjMC1
+        ZkzjztOUzI9F85+h34Dp7oA5wA==
+X-Google-Smtp-Source: ABdhPJybMyhTNJNxDqSE/8X856+gFMewDiBCEEDwkiMSEl/dfJJtft8+rQ37c7S10gJJi3tz4MURXQ==
+X-Received: by 2002:a05:6a00:3316:b0:4fa:80fd:f3f6 with SMTP id cq22-20020a056a00331600b004fa80fdf3f6mr5642757pfb.65.1649198404907;
+        Tue, 05 Apr 2022 15:40:04 -0700 (PDT)
 Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id hk16-20020a17090b225000b001ca00b81a95sm3354059pjb.22.2022.04.05.15.38.47
+        by smtp.gmail.com with ESMTPSA id k3-20020a056a00168300b004f7e60da26csm17089109pfc.182.2022.04.05.15.40.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Apr 2022 15:38:48 -0700 (PDT)
-Date:   Tue, 5 Apr 2022 22:38:44 +0000
+        Tue, 05 Apr 2022 15:40:04 -0700 (PDT)
+Date:   Tue, 5 Apr 2022 22:40:00 +0000
 From:   David Matlack <dmatlack@google.com>
 To:     Ben Gardon <bgardon@google.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -58,14 +58,15 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         David Dunn <daviddunn@google.com>,
         Jing Zhang <jingzhangos@google.com>,
         Junaid Shahid <junaids@google.com>
-Subject: Re: [PATCH v3 06/11] KVM: selftests: Add NX huge pages test
-Message-ID: <YkzE9Kf0q6oWUoi5@google.com>
+Subject: Re: [PATCH v3 07/11] KVM: x86/MMU: Factor out updating NX hugepages
+ state for a VM
+Message-ID: <YkzFQBjbt081HhbG@google.com>
 References: <20220330174621.1567317-1-bgardon@google.com>
- <20220330174621.1567317-7-bgardon@google.com>
+ <20220330174621.1567317-8-bgardon@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220330174621.1567317-7-bgardon@google.com>
+In-Reply-To: <20220330174621.1567317-8-bgardon@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,310 +78,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 30, 2022 at 10:46:16AM -0700, Ben Gardon wrote:
-> There's currently no test coverage of NX hugepages in KVM selftests, so
-> add a basic test to ensure that the feature works as intended.
+On Wed, Mar 30, 2022 at 10:46:17AM -0700, Ben Gardon wrote:
+> Factor out the code to update the NX hugepages state for an individual
+> VM. This will be expanded in future commits to allow per-VM control of
+> Nx hugepages.
 > 
-> Reviewed-by: David Dunn <daviddunn@google.com>
+> No functional change intended.
 > 
 > Signed-off-by: Ben Gardon <bgardon@google.com>
+
+Reviewed-by: David Matlack <dmatlack@google.com>
+
 > ---
->  tools/testing/selftests/kvm/Makefile          |   7 +-
->  .../kvm/lib/x86_64/nx_huge_pages_guest.S      |  45 ++++++
->  .../selftests/kvm/x86_64/nx_huge_pages_test.c | 133 ++++++++++++++++++
->  .../kvm/x86_64/nx_huge_pages_test.sh          |  25 ++++
->  4 files changed, 209 insertions(+), 1 deletion(-)
->  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/nx_huge_pages_guest.S
->  create mode 100644 tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
->  create mode 100755 tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh
+>  arch/x86/kvm/mmu/mmu.c | 17 +++++++++++------
+>  1 file changed, 11 insertions(+), 6 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index c9cdbd248727..c671224cf755 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -38,7 +38,7 @@ ifeq ($(ARCH),riscv)
->  endif
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index dbf46dd98618..af428cb65b3f 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -6202,6 +6202,15 @@ static void __set_nx_huge_pages(bool val)
+>  	nx_huge_pages = itlb_multihit_kvm_mitigation = val;
+>  }
 >  
->  LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/rbtree.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
-> -LIBKVM_x86_64 = lib/x86_64/apic.c lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
-> +LIBKVM_x86_64 = lib/x86_64/apic.c lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S lib/x86_64/nx_huge_pages_guest.S
->  LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c lib/aarch64/gic.c lib/aarch64/gic_v3.c lib/aarch64/vgic.c
->  LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
->  LIBKVM_riscv = lib/riscv/processor.c lib/riscv/ucall.c
-> @@ -57,6 +57,8 @@ TEST_GEN_PROGS_x86_64 += x86_64/kvm_clock_test
->  TEST_GEN_PROGS_x86_64 += x86_64/kvm_pv_test
->  TEST_GEN_PROGS_x86_64 += x86_64/mmio_warning_test
->  TEST_GEN_PROGS_x86_64 += x86_64/mmu_role_test
-> +TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
-> +TEST_PROGS_x86_64 += x86_64/nx_huge_pages_test.sh
-
-Suggest brearking TEST_PROGS and TEST_GEN_PROGS_EXTENDED out into their
-own separate blocks with newlines in between. They capture different
-types of files so I think it makes sense to separate them in the
-Makefile. I expect both lists will grow over time so the awkwardness of
-having them off on their lonesome is temporary :).
-
-It'd also be nice to have some comments above each explaining when they
-should be used. A short blurb is fine since the selftest documentation
-is the authority.
-
->  TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
->  TEST_GEN_PROGS_x86_64 += x86_64/pmu_event_filter_test
->  TEST_GEN_PROGS_x86_64 += x86_64/set_boot_cpu_id
-> @@ -141,7 +143,9 @@ TEST_GEN_PROGS_riscv += kvm_page_table_test
->  TEST_GEN_PROGS_riscv += set_memory_region_test
->  TEST_GEN_PROGS_riscv += kvm_binary_stats_test
->  
-> +TEST_PROGS += $(TEST_PROGS_$(UNAME_M))
->  TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
-> +TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(UNAME_M))
->  LIBKVM += $(LIBKVM_$(UNAME_M))
->  
->  INSTALL_HDR_PATH = $(top_srcdir)/usr
-> @@ -192,6 +196,7 @@ $(OUTPUT)/libkvm.a: $(LIBKVM_OBJS)
->  x := $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
->  all: $(STATIC_LIBS)
->  $(TEST_GEN_PROGS): $(STATIC_LIBS)
-> +$(TEST_GEN_PROGS_EXTENDED): $(STATIC_LIBS)
->  
->  cscope: include_paths = $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include lib ..
->  cscope:
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/nx_huge_pages_guest.S b/tools/testing/selftests/kvm/lib/x86_64/nx_huge_pages_guest.S
-> new file mode 100644
-> index 000000000000..09c66b9562a3
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/nx_huge_pages_guest.S
-> @@ -0,0 +1,45 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * tools/testing/selftests/kvm/nx_huge_page_guest.S
-> + *
-> + * Copyright (C) 2022, Google LLC.
-> + */
-> +
-> +.include "kvm_util.h"
-> +
-> +#define HPAGE_SIZE 	(2*1024*1024)
-> +#define PORT_SUCCESS	0x70
-> +
-> +.global guest_code0
-> +.global guest_code1
-> +
-> +.align HPAGE_SIZE
-> +exit_vm:
-> +	mov    $0x1,%edi
-> +	mov    $0x2,%esi
-> +	mov    a_string,%edx
-> +	mov    $0x1,%ecx
-> +	xor    %eax,%eax
-> +	jmp    ucall
-> +
-> +
-> +guest_code0:
-> +	mov data1, %eax
-> +	mov data2, %eax
-> +	jmp exit_vm
-> +
-> +.align HPAGE_SIZE
-> +guest_code1:
-> +	mov data1, %eax
-> +	mov data2, %eax
-> +	jmp exit_vm
-> +data1:
-> +.quad	0
-
-What do you think about my idea in [1] of using ret instructions and
-function pointers to trigger execution on an arbitrary page? That would
-avoid the need for this assembly file and we could probably share the
-code between our tests.
-
-Feel free to take the idea and incorporate it directly if you agree, and
-I'll rebase on top, since you're series is further along than mine.
-
-[1] https://lore.kernel.org/kvm/20220401233737.3021889-2-dmatlack@google.com/
-
-> +
-> +.align HPAGE_SIZE
-> +data2:
-> +.quad	0
-> +a_string:
-> +.string "why does the ucall function take a string argument?"
-> +
-> +
-> diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-> new file mode 100644
-> index 000000000000..2bcbe4efdc6a
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-> @@ -0,0 +1,133 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * tools/testing/selftests/kvm/nx_huge_page_test.c
-> + *
-> + * Usage: to be run via nx_huge_page_test.sh, which does the necessary
-> + * environment setup and teardown
-> + *
-> + * Copyright (C) 2022, Google LLC.
-> + */
-> +
-> +#define _GNU_SOURCE
-> +
-> +#include <fcntl.h>
-> +#include <stdint.h>
-> +#include <time.h>
-> +
-> +#include <test_util.h>
-> +#include "kvm_util.h"
-> +
-> +#define HPAGE_SLOT		10
-> +#define HPAGE_PADDR_START       (10*1024*1024)
-> +#define HPAGE_SLOT_NPAGES	(100*1024*1024/4096)
-> +
-> +/* Defined in nx_huge_page_guest.S */
-> +void guest_code0(void);
-> +void guest_code1(void);
-> +
-> +static void run_guest_code(struct kvm_vm *vm, void (*guest_code)(void))
+> +static void kvm_update_nx_huge_pages(struct kvm *kvm)
 > +{
-> +	struct kvm_regs regs;
+> +	mutex_lock(&kvm->slots_lock);
+> +	kvm_mmu_zap_all_fast(kvm);
+> +	mutex_unlock(&kvm->slots_lock);
 > +
-> +	vcpu_regs_get(vm, 0, &regs);
-> +	regs.rip = (uint64_t)guest_code;
-> +	vcpu_regs_set(vm, 0, &regs);
-> +	vcpu_run(vm, 0);
+> +	wake_up_process(kvm->arch.nx_lpage_recovery_thread);
 > +}
 > +
-> +static void check_2m_page_count(struct kvm_vm *vm, int expected_pages_2m)
-> +{
-> +	int actual_pages_2m;
-> +
-> +	actual_pages_2m = vm_get_single_stat(vm, "pages_2m");
-> +
-> +	TEST_ASSERT(actual_pages_2m == expected_pages_2m,
-> +		    "Unexpected 2m page count. Expected %d, got %d",
-> +		    expected_pages_2m, actual_pages_2m);
-> +}
-> +
-> +static void check_split_count(struct kvm_vm *vm, int expected_splits)
-> +{
-> +	int actual_splits;
-> +
-> +	actual_splits = vm_get_single_stat(vm, "nx_lpage_splits");
-> +
-> +	TEST_ASSERT(actual_splits == expected_splits,
-> +		    "Unexpected nx lpage split count. Expected %d, got %d",
-> +		    expected_splits, actual_splits);
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +	struct kvm_vm *vm;
-> +	struct timespec ts;
-> +
-> +	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
-> +
-> +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS_HUGETLB,
-> +				    HPAGE_PADDR_START, HPAGE_SLOT,
-> +				    HPAGE_SLOT_NPAGES, 0);
-> +
-> +	kvm_vm_elf_load_memslot(vm, program_invocation_name, HPAGE_SLOT);
-> +
-> +	vm_vcpu_add_default(vm, 0, guest_code0);
-> +
-> +	check_2m_page_count(vm, 0);
-> +	check_split_count(vm, 0);
-> +
-> +	/*
-> +	 * Running guest_code0 will access data1 and data2.
-> +	 * This should result in part of the huge page containing guest_code0,
-> +	 * and part of the hugepage containing the ucall function being mapped
-> +	 * at 4K. The huge pages containing data1 and data2 will be mapped
-> +	 * at 2M.
-> +	 */
-> +	run_guest_code(vm, guest_code0);
-> +	check_2m_page_count(vm, 2);
-> +	check_split_count(vm, 2);
-> +
-> +	/*
-> +	 * guest_code1 is in the same huge page as data1, so it will cause
-> +	 * that huge page to be remapped at 4k.
-> +	 */
-> +	run_guest_code(vm, guest_code1);
-> +	check_2m_page_count(vm, 1);
-> +	check_split_count(vm, 3);
-> +
-> +	/* Run guest_code0 again to check that is has no effect. */
-> +	run_guest_code(vm, guest_code0);
-> +	check_2m_page_count(vm, 1);
-> +	check_split_count(vm, 3);
-> +
-> +	/*
-> +	 * Give recovery thread time to run. The wrapper script sets
-> +	 * recovery_period_ms to 100, so wait 1.5x that.
-> +	 */
-
-So we give it an extra 50ms? That should probably be enough but I'm
-paranoid so I'd probably bump it up to 500 ms.
-
-> +	ts.tv_sec = 0;
-> +	ts.tv_nsec = 150000000;
-> +	nanosleep(&ts, NULL);
-> +
-> +	/*
-> +	 * Now that the reclaimer has run, all the split pages should be gone.
-> +	 */
-> +	check_2m_page_count(vm, 1);
-> +	check_split_count(vm, 0);
-> +
-> +	/*
-> +	 * The split 2M pages should have been reclaimed, so run guest_code0
-> +	 * again to check that pages are mapped at 2M again.
-> +	 */
-> +	run_guest_code(vm, guest_code0);
-> +	check_2m_page_count(vm, 2);
-> +	check_split_count(vm, 2);
-> +
-> +	/* Pages are once again split from running guest_code1. */
-> +	run_guest_code(vm, guest_code1);
-> +	check_2m_page_count(vm, 1);
-> +	check_split_count(vm, 3);
-> +
-> +	kvm_vm_free(vm);
-> +
-> +	return 0;
-> +}
-> +
-> diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh
-> new file mode 100755
-> index 000000000000..19fc95723fcb
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh
-> @@ -0,0 +1,25 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0-only */
-> +
-> +# tools/testing/selftests/kvm/nx_huge_page_test.sh
-> +# Copyright (C) 2022, Google LLC.
-> +
-> +NX_HUGE_PAGES=$(cat /sys/module/kvm/parameters/nx_huge_pages)
-> +NX_HUGE_PAGES_RECOVERY_RATIO=$(cat /sys/module/kvm/parameters/nx_huge_pages_recovery_ratio)
-> +NX_HUGE_PAGES_RECOVERY_PERIOD=$(cat /sys/module/kvm/parameters/nx_huge_pages_recovery_period_ms)
-> +HUGE_PAGES=$(cat /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages)
-> +
-> +echo 1 > /sys/module/kvm/parameters/nx_huge_pages
-> +echo 1 > /sys/module/kvm/parameters/nx_huge_pages_recovery_ratio
-> +echo 100 > /sys/module/kvm/parameters/nx_huge_pages_recovery_period_ms
-> +echo 200 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
-> +
-> +./nx_huge_pages_test
-> +RET=$?
-> +
-> +echo $NX_HUGE_PAGES > /sys/module/kvm/parameters/nx_huge_pages
-> +echo $NX_HUGE_PAGES_RECOVERY_RATIO > /sys/module/kvm/parameters/nx_huge_pages_recovery_ratio
-> +echo $NX_HUGE_PAGES_RECOVERY_PERIOD > /sys/module/kvm/parameters/nx_huge_pages_recovery_period_ms
-> +echo $HUGE_PAGES > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
-> +
-> +exit $RET
+>  static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
+>  {
+>  	bool old_val = nx_huge_pages;
+> @@ -6224,13 +6233,9 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
+>  
+>  		mutex_lock(&kvm_lock);
+>  
+> -		list_for_each_entry(kvm, &vm_list, vm_list) {
+> -			mutex_lock(&kvm->slots_lock);
+> -			kvm_mmu_zap_all_fast(kvm);
+> -			mutex_unlock(&kvm->slots_lock);
+> +		list_for_each_entry(kvm, &vm_list, vm_list)
+> +			kvm_update_nx_huge_pages(kvm);
+>  
+> -			wake_up_process(kvm->arch.nx_lpage_recovery_thread);
+> -		}
+>  		mutex_unlock(&kvm_lock);
+>  	}
+>  
 > -- 
 > 2.35.1.1021.g381101b075-goog
 > 
