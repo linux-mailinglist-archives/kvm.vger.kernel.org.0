@@ -2,66 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 339254F3E03
-	for <lists+kvm@lfdr.de>; Tue,  5 Apr 2022 22:40:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C75C4F420D
+	for <lists+kvm@lfdr.de>; Tue,  5 Apr 2022 23:39:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239183AbiDEOsZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Apr 2022 10:48:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45642 "EHLO
+        id S241430AbiDEOvc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Apr 2022 10:51:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1392302AbiDENtq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Apr 2022 09:49:46 -0400
+        with ESMTP id S1344025AbiDEOFz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Apr 2022 10:05:55 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2A4F6111DC0
-        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 05:52:36 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 907021557F0
+        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 05:58:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649163155;
+        s=mimecast20190719; t=1649163489;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iuSjdFs27sBmSFtBNQcfSgEVjf1hmX+hk7DMTekqxb8=;
-        b=VlzU6C+sB/1eKhzYAZPNvLMGjwj29JMdvQQHeE56JAN1pidwUAfGSaRAGfjrJjc1N9WH5j
-        E7mDuktAkpddDoqOZV/ddLA69sSwqYumIvCQpqCuBaaJPoLW6XO+sfwgubzCMEzbgdfGvu
-        jvV9I7+5UID5dfHNYcwiHDNUl9oJf6E=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=I7YDzc0txooe4wDXjoZKV+HdiLgjGSAsT9wsXDKfsIc=;
+        b=GCH3mdPj5P/QCvI6vGv3NA4ffpbmcJ2RekgJMXeh8e2QPpEhVM5lhv3zgsvHFUqf8v8LTV
+        qUETPhgzkuoV825Yp1GXxZ3ch+C4ccErDIdgvpBml21qyQeVCvgo63I2URfSB7FdKPsOke
+        kfutKvoNxOaCfxkVcAv6Y4cic/RPYRo=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-584-FtTkoWc7Md2oCPWuNhwqKw-1; Tue, 05 Apr 2022 08:52:34 -0400
-X-MC-Unique: FtTkoWc7Md2oCPWuNhwqKw-1
-Received: by mail-qt1-f199.google.com with SMTP id k11-20020ac8604b000000b002e1a4109edeso8747073qtm.15
-        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 05:52:34 -0700 (PDT)
+ us-mta-318-_ixsmQSKP3yl4uz4NgGKLw-1; Tue, 05 Apr 2022 08:58:08 -0400
+X-MC-Unique: _ixsmQSKP3yl4uz4NgGKLw-1
+Received: by mail-wm1-f72.google.com with SMTP id l19-20020a05600c1d1300b0038e736f98faso1504060wms.4
+        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 05:58:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=iuSjdFs27sBmSFtBNQcfSgEVjf1hmX+hk7DMTekqxb8=;
-        b=0QL22W1iHhCCiZWCdJB/+oNc8R6ij8RmlDLWCgU53Sp9ETKWuIQ5qkpnSA7Op7eMMj
-         GH42swoJa46tmVptddmyBo9jCZC4trV0GXTe48NqhkzFvlinjhr9oECBYux7M5gtZLi/
-         DqVXjq/Tv/7U2kk9A6gH2IJGtQQuMdH10gJiNXv/Hz+6mHV1hOZi02Wcy8NzM5zlqkxT
-         nv92goZ1sj1VVGogS3FOxPF8gcp+HRTDHa9lvTyu0B8sgvU9YXkLQpgHCFksh4LOAtzf
-         T6Sm66YJYzU+ByFcNgsVEgyyqOX3W6S8GxUhJsVqNCWqjDkOIr4iDW1gIaWth0Vu1yS3
-         PA6Q==
-X-Gm-Message-State: AOAM532czZZ6+RL9D5whnMIXnXv0U9t0VnVpuprVC64ENDQa2B0wumPv
-        DWJ1YU6U1LnXzYzFXfXwEaDqctq/T64Pm2OM4RmKv2tzbFG5Q44/M9N2Avh9kU34HvyGqczfjwZ
-        yZnrzOL/Y+3mI
-X-Received: by 2002:ad4:5aa3:0:b0:443:9ba7:3f27 with SMTP id u3-20020ad45aa3000000b004439ba73f27mr2768351qvg.63.1649163153774;
-        Tue, 05 Apr 2022 05:52:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw+DHckKgCo4PomCz5tT74b9OII0g4hXHShOTcpaeQjClTAlXuwMZZykBkAFfOfWWQXnZb1aQ==
-X-Received: by 2002:ad4:5aa3:0:b0:443:9ba7:3f27 with SMTP id u3-20020ad45aa3000000b004439ba73f27mr2768343qvg.63.1649163153551;
-        Tue, 05 Apr 2022 05:52:33 -0700 (PDT)
+        bh=I7YDzc0txooe4wDXjoZKV+HdiLgjGSAsT9wsXDKfsIc=;
+        b=4sTmiKdO4Papv7vrDA/+d/Co6Z4jjbYlMVrqpP1+XZBZ38YMQq9EqeHv0j/pfvA6om
+         m6s+CWtwS3f+nwqOBvlvEZCJmSpeQv0IzIiGeIdJmyuPMpg3sBIBYCjW3EdWbneKnT7v
+         +buoqaJjZFBeHlD3orO+QAsQxEnyvwRW0cpCLZ3N+qiTwReUCW2pt6kcdmO2Qijc2MEx
+         XTOI/QmslZpUwOSbPXpIU7YNBBuVqD02aGYniPqk2IQVietGQhMm6tcqJARlXaeQRfFj
+         sNb742EH2hET1TIRUBrYz49o9Vu+ZpNH6V75rt+zsQR7k//sVifd1OSBRl+RvFw/gNCt
+         AElg==
+X-Gm-Message-State: AOAM530yYYNwzMScf3W0lf3lTk3CO1Z6UC/kduYDB8EuNfGZo3XtKomx
+        dVDEHhhm3evPCjnxOdEHT5D+aO+zJtAHz4jyF/kFyicpITwdMUtYQpt6PdCPJWpUzy4loGU4sZw
+        N4CCKENKg7Kym
+X-Received: by 2002:a7b:c347:0:b0:37e:68e6:d85c with SMTP id l7-20020a7bc347000000b0037e68e6d85cmr3142057wmj.176.1649163487129;
+        Tue, 05 Apr 2022 05:58:07 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyOngzMtEU2KPnwylW2akB8kPVoiTa6yBmTv34dc8nvDFuKKvuEx56M9l/8R39QBk1A2dB1TQ==
+X-Received: by 2002:a7b:c347:0:b0:37e:68e6:d85c with SMTP id l7-20020a7bc347000000b0037e68e6d85cmr3142030wmj.176.1649163486869;
+        Tue, 05 Apr 2022 05:58:06 -0700 (PDT)
 Received: from [10.32.181.87] (nat-pool-mxp-t.redhat.com. [149.6.153.186])
-        by smtp.googlemail.com with ESMTPSA id 21-20020ac85715000000b002e1ce9605ffsm11295736qtw.65.2022.04.05.05.52.31
+        by smtp.googlemail.com with ESMTPSA id r4-20020a05600c35c400b0038cbd8c41e9sm2096679wmq.12.2022.04.05.05.58.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Apr 2022 05:52:33 -0700 (PDT)
-Message-ID: <586be87a-4f81-ea43-2078-a6004b4aba08@redhat.com>
-Date:   Tue, 5 Apr 2022 14:52:30 +0200
+        Tue, 05 Apr 2022 05:58:05 -0700 (PDT)
+Message-ID: <e392b53a-fbaa-4724-07f4-171424144f70@redhat.com>
+Date:   Tue, 5 Apr 2022 14:58:04 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.7.0
-Subject: Re: [RFC PATCH v5 026/104] KVM: TDX: x86: Add vm ioctl to get TDX
- systemwide parameters
+Subject: Re: [RFC PATCH v5 027/104] KVM: TDX: initialize VM with TDX specific
+ parameters
 Content-Language: en-US
 To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
@@ -69,15 +69,15 @@ Cc:     isaku.yamahata@gmail.com, Jim Mattson <jmattson@google.com>,
         erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>,
         Sean Christopherson <seanjc@google.com>
 References: <cover.1646422845.git.isaku.yamahata@intel.com>
- <5ff08ce32be458581afe59caa05d813d0e4a1ef0.1646422845.git.isaku.yamahata@intel.com>
+ <c3b37cf5c83f92be0e153075d81a80729bf1031e.1646422845.git.isaku.yamahata@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <5ff08ce32be458581afe59caa05d813d0e4a1ef0.1646422845.git.isaku.yamahata@intel.com>
+In-Reply-To: <c3b37cf5c83f92be0e153075d81a80729bf1031e.1646422845.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -86,18 +86,53 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 3/4/22 20:48, isaku.yamahata@intel.com wrote:
-> Implement a VM-scoped subcomment to get system-wide parameters.  Although
-> this is system-wide parameters not per-VM, this subcomand is VM-scoped
-> because
-> - Device model needs TDX system-wide parameters after creating KVM VM.
-> - This subcommands requires to initialize TDX module.  For lazy
->    initialization of the TDX module, vm-scope ioctl is better.
+> +	td_params->attributes = init_vm->attributes;
+> +	if (td_params->attributes & TDX_TD_ATTRIBUTE_PERFMON) {
+> +		pr_warn("TD doesn't support perfmon. KVM needs to save/restore "
+> +			"host perf registers properly.\n");
+> +		return -EOPNOTSUPP;
+> +	}
 
-Since there was agreement to install the TDX module on load, please 
-place this ioctl on the /dev/kvm file descriptor.
+Why does KVM have to hardcode this (and LBR/AMX below)?  Is the level of 
+hardware support available from tdx_caps, for example through the CPUID 
+configs (0xA for this one, 0xD for LBR and AMX)?
 
-At least for SEV, there were cases where the system-wide parameters are 
-needed outside KVM, so it's better to avoid requiring a VM file descriptor.
+> +	/* PT can be exposed to TD guest regardless of KVM's XSS support */
+> +	guest_supported_xss &= (supported_xss | XFEATURE_MASK_PT);
+> +	td_params->xfam = guest_supported_xcr0 | guest_supported_xss;
+> +	if (td_params->xfam & TDX_TD_XFAM_LBR) {
+> +		pr_warn("TD doesn't support LBR. KVM needs to save/restore "
+> +			"IA32_LBR_DEPTH properly.\n");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	if (td_params->xfam & TDX_TD_XFAM_AMX) {
+> +		pr_warn("TD doesn't support AMX. KVM needs to save/restore "
+> +			"IA32_XFD, IA32_XFD_ERR properly.\n");
+> +		return -EOPNOTSUPP;
+> +	}
+
+> 
+> +	if (init_vm->tsc_khz)
+> +		guest_tsc_khz = init_vm->tsc_khz;
+> +	else
+> +		guest_tsc_khz = max_tsc_khz;
+
+You can just use kvm->arch.default_tsc_khz in the latest kvm/queue.
+
+> +#define BUILD_BUG_ON_MEMCPY(dst, src)				\
+> +	do {							\
+> +		BUILD_BUG_ON(sizeof(dst) != sizeof(src));	\
+> +		memcpy((dst), (src), sizeof(dst));		\
+> +	} while (0)
+> +
+> +	BUILD_BUG_ON_MEMCPY(td_params->mrconfigid, init_vm->mrconfigid);
+> +	BUILD_BUG_ON_MEMCPY(td_params->mrowner, init_vm->mrowner);
+> +	BUILD_BUG_ON_MEMCPY(td_params->mrownerconfig, init_vm->mrownerconfig);
+> +
+
+
+Please rename to MEMCPY_SAME_SIZE.
 
 Thanks,
 
