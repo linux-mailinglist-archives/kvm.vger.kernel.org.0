@@ -2,65 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 972D74F44B9
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 00:26:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39AC64F444B
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 00:14:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242587AbiDEOwc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Apr 2022 10:52:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36466 "EHLO
+        id S238997AbiDEOr6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Apr 2022 10:47:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1384621AbiDEOSQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Apr 2022 10:18:16 -0400
+        with ESMTP id S1386144AbiDEOTO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Apr 2022 10:19:14 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 490E811D7BA
-        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 06:04:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4BC472BCC
+        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 06:08:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649163865;
+        s=mimecast20190719; t=1649164115;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+4H3o/lgu3i0pcf5MrN0knfGAGcFyCTknMXedxYHF10=;
-        b=Qk+hScf7jQIir96nc0QLeymUfF5A8ekYuIzw7+0o8ZgdSMqu+rDUYZysdDWuHEZqepo/w8
-        qoe9gpgfMOtJJ4jZL6Z+3lhilG+jx9R1QsBx1YZ7FJMc5K6GFj3j31mIujVRJXtFYm47Rr
-        Eo5efe3LTxiodJGwLE4O04vGDVNoTIY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=8SLg2V/rMLaWaYTpjzTRS0k/QFp5WFOGLvjyUFHrKJY=;
+        b=Vyje00f4vebmWZc9RYkLZ3OC01/OSe0zL9Z8mZP2cIxa+p4AvHykIPwBN0CUjsbgxerMUi
+        QGlLFiYo4sWaZ4/YXDenGJc6ay18Ywq4qtX0u5vf/JYQX8lQOag1d0LKgzRv5M9IQYINRn
+        dDCCGi8+OSzkauBGEOhAj4nfsP89ZFE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-608-xfRAWuFHPEyGPel_ujcVNQ-1; Tue, 05 Apr 2022 09:04:24 -0400
-X-MC-Unique: xfRAWuFHPEyGPel_ujcVNQ-1
-Received: by mail-wr1-f72.google.com with SMTP id k20-20020adfc714000000b001e305cd1597so2439737wrg.19
-        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 06:04:23 -0700 (PDT)
+ us-mta-584-hiDN1o1UNZupCsjXMwN6Kg-1; Tue, 05 Apr 2022 09:08:34 -0400
+X-MC-Unique: hiDN1o1UNZupCsjXMwN6Kg-1
+Received: by mail-wr1-f71.google.com with SMTP id t15-20020adfdc0f000000b001ef93643476so2455839wri.2
+        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 06:08:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=+4H3o/lgu3i0pcf5MrN0knfGAGcFyCTknMXedxYHF10=;
-        b=tGQGHs4RwJhA0I7qhR78y28mf1PB5C5vYlmK6Ne4x/IHguZJOJ5Lpeodgx9YI52mmO
-         vFZBFbid8QFz2I66jirl3OQC8HquVWpfXU4zhSMub6/6unWvSX0BBdQ5zdK+Po0r0jEV
-         Z7oiaYg6BqKqm8G80gD1rcr2OLYK7zF01Xqo/fvuNGY0kN0AmV6ntmI5jLzjiv1VXdG4
-         S/CPY3AcnbXojC2aZMfeHhbBygWA+OF3940/dWjtobL8M8fWgnc+Io7qhHYE7T5ne7NZ
-         re8vVp6jrOkru5kTJM9d7s/Tin14PrvxFZKgdjfnxQQab60qE31kZINAObxcoMDgYRk8
-         r/sQ==
-X-Gm-Message-State: AOAM53225lE5UEMso5LMAYdGn4QQY/fYln+2oE4FyjPx29n/DvaMwKXy
-        2E+eO4V71HByVNXSzzrnpSJgsI244kiRpeUAr868RY7jamYOoGnWNyf5etLbtzO5ME4LOcX/1uY
-        u0VGmCKf1lA++
-X-Received: by 2002:a05:600c:1c0e:b0:38c:ae37:c1d2 with SMTP id j14-20020a05600c1c0e00b0038cae37c1d2mr3022441wms.205.1649163862692;
-        Tue, 05 Apr 2022 06:04:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwTKXWIZeydbVrpApPxpI5TVS/gLhuIP6d8IrLPccqlzN5Ubrjxgzd+R1jeG967OIfKlV6SFg==
-X-Received: by 2002:a1c:7519:0:b0:383:d29b:257 with SMTP id o25-20020a1c7519000000b00383d29b0257mr3095490wmc.172.1649163851954;
-        Tue, 05 Apr 2022 06:04:11 -0700 (PDT)
+        bh=8SLg2V/rMLaWaYTpjzTRS0k/QFp5WFOGLvjyUFHrKJY=;
+        b=8JwjTUzBO3YCyKEUalQuBscsHBpUr6usMHsy9lI8dGarRU15CoMS0o+sGWpRTfXvpc
+         Ij3NjyiHP1xhmQgA9zICPA1Jh13/s5iqYaLFPVI1l59f7ucCXvWBO0qwpDgO6Givo2Xb
+         +AH8mLVUXTln9efSHleoHWNh+vkZAlQBTKsmrS9QvtjsvaK5hn/aTbWYhY7tfFZZG6J4
+         xeruN047yMgo6HAU42Jr7ZxUKOQbTCtSkmRI7UNVS8wjtG4e8QTc2gPfGaoF0SDjCw9m
+         ZhMH9SS0SHklPEnL5SuUaooM3bqo72yqAk1FqqGnnni11FyXuYTC/wr0+7JUs7VWpzdy
+         3urQ==
+X-Gm-Message-State: AOAM533KGpW/a+BlsBtz2aEXEvqBX+WIumzOhhoqd/RKXeVo7b/oNieS
+        hW9Uc+eCucTmB8a0iE2T7Xaxd/+qmb0A9HWTP/grkCPLBtvj0L0gK1f8NLoUxpxUpgTIXK7URjU
+        PJc9uqbU3tEnR
+X-Received: by 2002:a7b:cd03:0:b0:37b:fc83:a4e2 with SMTP id f3-20020a7bcd03000000b0037bfc83a4e2mr3047622wmj.193.1649164112937;
+        Tue, 05 Apr 2022 06:08:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxw4wTRpI39IlAgBO5ZQoXo4KftgHSb5XxaFNxwDYQkGsSuCa17GkEpnsUsvkMa8CN+RPq1fQ==
+X-Received: by 2002:a7b:cd03:0:b0:37b:fc83:a4e2 with SMTP id f3-20020a7bcd03000000b0037bfc83a4e2mr3047597wmj.193.1649164112715;
+        Tue, 05 Apr 2022 06:08:32 -0700 (PDT)
 Received: from [10.32.181.87] (nat-pool-mxp-t.redhat.com. [149.6.153.186])
-        by smtp.googlemail.com with ESMTPSA id o29-20020a05600c511d00b0038e3532b23csm2192280wms.15.2022.04.05.06.04.10
+        by smtp.googlemail.com with ESMTPSA id m127-20020a1ca385000000b0038e6e7ac0b5sm2141613wme.38.2022.04.05.06.08.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Apr 2022 06:04:11 -0700 (PDT)
-Message-ID: <a02a704a-e53d-6f1f-cd7f-a10b773475cc@redhat.com>
-Date:   Tue, 5 Apr 2022 15:04:10 +0200
+        Tue, 05 Apr 2022 06:08:31 -0700 (PDT)
+Message-ID: <5fbf4af9-9e6c-3fc7-c021-869e93662845@redhat.com>
+Date:   Tue, 5 Apr 2022 15:08:30 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.7.0
-Subject: Re: [RFC PATCH v5 029/104] KVM: TDX: allocate/free TDX vcpu structure
+Subject: Re: [RFC PATCH v5 023/104] x86/cpu: Add helper functions to
+ allocate/free MKTME keyid
 Content-Language: en-US
 To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
@@ -68,9 +69,9 @@ Cc:     isaku.yamahata@gmail.com, Jim Mattson <jmattson@google.com>,
         erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>,
         Sean Christopherson <seanjc@google.com>
 References: <cover.1646422845.git.isaku.yamahata@intel.com>
- <e50caba2a40beaaee7fc1ade60d55d414d979d34.1646422845.git.isaku.yamahata@intel.com>
+ <a1d1e4f26c6ef44a557e873be2818e6a03e12038.1646422845.git.isaku.yamahata@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <e50caba2a40beaaee7fc1ade60d55d414d979d34.1646422845.git.isaku.yamahata@intel.com>
+In-Reply-To: <a1d1e4f26c6ef44a557e873be2818e6a03e12038.1646422845.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -85,20 +86,96 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 3/4/22 20:48, isaku.yamahata@intel.com wrote:
-> +	/*
-> +	 * In TDX case, tsc frequency is per-VM and determined by the parameter
-> +	 * tdh_mng_init().  Forcibly set it instead of max_tsc_khz set by
-> +	 * kvm_arch_vcpu_create().
-> +	 *
-> +	 * This function is called after kvm_arch_vcpu_create() calling
-> +	 * kvm_set_tsc_khz().
-> +	 */
-> +	kvm_set_tsc_khz(vcpu, kvm_tdx->tsc_khz);
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> MKTME keyid is assigned to guest TD.  The memory controller encrypts guest
+> TD memory with key id.  Add helper functions to allocate/free MKTME keyid
+> so that TDX KVM assign keyid.
+> 
+> Also export MKTME global keyid that is used to encrypt TDX module and its
+> memory.
+> 
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>   arch/x86/include/asm/tdx.h |  6 ++++++
+>   arch/x86/virt/vmx/tdx.c    | 33 ++++++++++++++++++++++++++++++++-
+>   2 files changed, 38 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
+> index 9a8dc6afcb63..73bb472bd515 100644
+> --- a/arch/x86/include/asm/tdx.h
+> +++ b/arch/x86/include/asm/tdx.h
+> @@ -139,6 +139,9 @@ int tdx_detect(void);
+>   int tdx_init(void);
+>   bool platform_has_tdx(void);
+>   const struct tdsysinfo_struct *tdx_get_sysinfo(void);
+> +u32 tdx_get_global_keyid(void);
+> +int tdx_keyid_alloc(void);
+> +void tdx_keyid_free(int keyid);
+>   #else
+>   static inline void tdx_detect_cpu(struct cpuinfo_x86 *c) { }
+>   static inline int tdx_detect(void) { return -ENODEV; }
+> @@ -146,6 +149,9 @@ static inline int tdx_init(void) { return -ENODEV; }
+>   static inline bool platform_has_tdx(void) { return false; }
+>   struct tdsysinfo_struct;
+>   static inline const struct tdsysinfo_struct *tdx_get_sysinfo(void) { return NULL; }
+> +static inline u32 tdx_get_global_keyid(void) { return 0; };
+> +static inline int tdx_keyid_alloc(void) { return -EOPNOTSUPP; }
+> +static inline void tdx_keyid_free(int keyid) { }
+>   #endif /* CONFIG_INTEL_TDX_HOST */
+>   
+>   #endif /* !__ASSEMBLY__ */
+> diff --git a/arch/x86/virt/vmx/tdx.c b/arch/x86/virt/vmx/tdx.c
+> index e45f188479cb..d714106321d4 100644
+> --- a/arch/x86/virt/vmx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx.c
+> @@ -113,7 +113,13 @@ static int tdx_cmr_num;
+>   static struct tdsysinfo_struct tdx_sysinfo;
+>   
+>   /* TDX global KeyID to protect TDX metadata */
+> -static u32 tdx_global_keyid;
+> +static u32 __read_mostly tdx_global_keyid;
 > +
+> +u32 tdx_get_global_keyid(void)
+> +{
+> +	return tdx_global_keyid;
+> +}
+> +EXPORT_SYMBOL_GPL(tdx_get_global_keyid);
+>   
+>   static bool enable_tdx_host;
+>   
+> @@ -189,6 +195,31 @@ static void detect_seam(struct cpuinfo_x86 *c)
+>   		detect_seam_ap(c);
+>   }
+>   
+> +/* TDX KeyID pool */
+> +static DEFINE_IDA(tdx_keyid_pool);
+> +
+> +int tdx_keyid_alloc(void)
+> +{
+> +	if (WARN_ON_ONCE(!tdx_keyid_start || !tdx_keyid_num))
+> +		return -EINVAL;
+> +
+> +	/* The first keyID is reserved for the global key. */
+> +	return ida_alloc_range(&tdx_keyid_pool, tdx_keyid_start + 1,
+> +			       tdx_keyid_start + tdx_keyid_num - 1,
+> +			       GFP_KERNEL);
+> +}
+> +EXPORT_SYMBOL_GPL(tdx_keyid_alloc);
+> +
+> +void tdx_keyid_free(int keyid)
+> +{
+> +	/* keyid = 0 is reserved. */
+> +	if (!keyid || keyid <= 0)
+> +		return;
+> +
+> +	ida_free(&tdx_keyid_pool, keyid);
+> +}
+> +EXPORT_SYMBOL_GPL(tdx_keyid_free);
+> +
+>   static void detect_tdx_keyids_bsp(struct cpuinfo_x86 *c)
+>   {
+>   	u64 keyid_part;
 
-I think this is not needed anymore, now that there is 
-kvm->arch.default_tsc_khz.  If so, exporting the function is not needed 
-either.
-
-Paolo
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
