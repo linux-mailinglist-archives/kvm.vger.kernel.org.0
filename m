@@ -2,259 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B38FF4F3AE8
-	for <lists+kvm@lfdr.de>; Tue,  5 Apr 2022 17:06:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7FCB4F3AF4
+	for <lists+kvm@lfdr.de>; Tue,  5 Apr 2022 17:06:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244596AbiDELt4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Apr 2022 07:49:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44064 "EHLO
+        id S1344149AbiDELuU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Apr 2022 07:50:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356821AbiDELPp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Apr 2022 07:15:45 -0400
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF719A66F2
-        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 03:36:31 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id d10so9569069edj.0
-        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 03:36:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=M+9t9GPp8kQkcOpf9/1bOVcjxUYWjperAKVBlci1EH0=;
-        b=YoxHIZZ3G33PpP4KmdhCg75x+dpK6knIWVV8om3MTD9ItxOCrXniFFZ+EvxkQJ749N
-         TZNSlhHf4yWYtlJeFdnSgzWzKhMprnLWCYXMXUTjbzKQ4/AX1ZqSMnT1SfxHkylpJTA7
-         TcIjcf/eAxyNT9pvVGShATH+k7UpVvaxHcSaiQOwLh3eYOzlDTpuPyS5UNG1XNCwsFhM
-         md0yH5dJ7w10QqUB206n1HWdLrv0jotHk49fIRHox0SvuqO4dIa/vG90Ckw+UKkNkWMc
-         sq0j21T+LRsTluEbkq+UsOFNTncjQe37S6SdEaPevdA/gEDmNPTD2BCQT7M2E3fUdzaK
-         aNHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=M+9t9GPp8kQkcOpf9/1bOVcjxUYWjperAKVBlci1EH0=;
-        b=4vPDf77bMpM8p7+8YkyNGzYgDaShX0spmiIz92byi0ZoO+k1Ciu/7mG0RAS5pINkJK
-         zS5CJGfTm1DOQoo+UpHrWN5X2cWVMM6AEGW7HRgb+2p+lh259KTX+Nyeg5zv+RKiBqgj
-         SiOaFF+K/vLVuOwbHajZYeAASyJEDhYjTl1Uixopzyvmfsd3K3gcC2ItuVxkjmdo9bpB
-         3/mboKf8h9Ta6Uik0GlgPiL8Izv693646C1l/vAydxv1H+isNVXoFWw3Y6wFbUVDRlON
-         7S0B3iMOcuT+gp9s34foaqb3/oKBMsySfgteKI/dkMvgyI9x2foU0ivE6BkIPfPxJlA0
-         ATKQ==
-X-Gm-Message-State: AOAM531q5u/UiY9HWBTgGIyxYA2S/HWeuvsx0YsYjKPaY4wCxTPI7KTI
-        ebf1L5EaF3mBYP48bVOrsepZUw==
-X-Google-Smtp-Source: ABdhPJzcpd3vW+XvDHpPAXOPJtyGzauj0UiVcmYc+CSIkw4TBey0PHa06nPTqe7WSTtid7CYCX8XcQ==
-X-Received: by 2002:a05:6402:d4c:b0:410:a415:fd95 with SMTP id ec12-20020a0564020d4c00b00410a415fd95mr2848428edb.288.1649154990022;
-        Tue, 05 Apr 2022 03:36:30 -0700 (PDT)
-Received: from google.com (30.171.91.34.bc.googleusercontent.com. [34.91.171.30])
-        by smtp.gmail.com with ESMTPSA id d4-20020a056402000400b00412d60fee38sm6428799edu.11.2022.04.05.03.36.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Apr 2022 03:36:29 -0700 (PDT)
-Date:   Tue, 5 Apr 2022 10:36:26 +0000
-From:   Quentin Perret <qperret@google.com>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Steven Price <steven.price@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <Ykwbqv90C7+8K+Ao@google.com>
-References: <YkM7eHCHEBe5NkNH@google.com>
- <88620519-029e-342b-0a85-ce2a20eaf41b@arm.com>
- <YkQzfjgTQaDd2E2T@google.com>
- <YkSaUQX89ZEojsQb@google.com>
- <80aad2f9-9612-4e87-a27a-755d3fa97c92@www.fastmail.com>
- <YkcTTY4YjQs5BRhE@google.com>
- <83fd55f8-cd42-4588-9bf6-199cbce70f33@www.fastmail.com>
- <YksIQYdG41v3KWkr@google.com>
- <Ykslo2eo2eRXrpFR@google.com>
- <eefc3c74-acca-419c-8947-726ce2458446@www.fastmail.com>
+        with ESMTP id S1380288AbiDELm0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Apr 2022 07:42:26 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08CFE10854E;
+        Tue,  5 Apr 2022 04:06:02 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2358H5I0002424;
+        Tue, 5 Apr 2022 11:06:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=PnHuDp0qoRGofvyUmqOaD/yM/brSQiiILKgqM5AShoM=;
+ b=NpbWlBjShTEJpx/lytk1q3y8wUALLG4S59dQJAflXiL5eYKmsKYxjs+tduIFtQV+OHXW
+ rC2NO9Bm4DuvIfir/B1c1XaT0va8eR/cE8zve1DpTnjnPIwvxOa79PdDhFQPBzzG2NXG
+ yNJqb0mJDw8RA8bZOvMYuHxGx/XFxtpktnvNptwFcmfpTpLsnHZTWixb/mQ83389V5d5
+ QYTHprEshdQOtZYlwww3QxHChGhqS8tUrHxqVp0yRqXu+oju1SCvn8KOCj9vygNszTna
+ mDX84YEp1bVOo3ocDToM6TWeDDC7IyYvr+HvI/+9mZTf6R9IlfThUbk8nhODcrqHI/c5 vA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3f6yv70j9h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Apr 2022 11:06:02 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 235AtRvV014082;
+        Tue, 5 Apr 2022 11:06:01 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3f6yv70j8x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Apr 2022 11:06:01 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 235B3FNL019425;
+        Tue, 5 Apr 2022 11:06:00 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03fra.de.ibm.com with ESMTP id 3f6e48vk99-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Apr 2022 11:05:59 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 235B5unq36241758
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 5 Apr 2022 11:05:56 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9D798A4060;
+        Tue,  5 Apr 2022 11:05:56 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F351CA4054;
+        Tue,  5 Apr 2022 11:05:55 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.14.146])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  5 Apr 2022 11:05:55 +0000 (GMT)
+Date:   Tue, 5 Apr 2022 12:59:58 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
+        thuth@redhat.com, nrb@linux.ibm.com, seiden@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH 1/8] s390x: css: Skip if we're not run by
+ qemu
+Message-ID: <20220405125958.60cbec96@p-imbrenda>
+In-Reply-To: <20220405075225.15903-2-frankja@linux.ibm.com>
+References: <20220405075225.15903-1-frankja@linux.ibm.com>
+        <20220405075225.15903-2-frankja@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eefc3c74-acca-419c-8947-726ce2458446@www.fastmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 4FnF6cjoiEEvvKAit-h7yU9XJbi9ObIC
+X-Proofpoint-GUID: TqfmvOwZ6ZSWbp-f6igD-VZhZn2E2Gz6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-04-05_02,2022-04-05_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ lowpriorityscore=0 clxscore=1015 suspectscore=0 phishscore=0 adultscore=0
+ mlxscore=0 bulkscore=0 malwarescore=0 impostorscore=0 spamscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204050066
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Monday 04 Apr 2022 at 15:04:17 (-0700), Andy Lutomirski wrote:
+On Tue,  5 Apr 2022 07:52:18 +0000
+Janosch Frank <frankja@linux.ibm.com> wrote:
+
+> There's no guarantee that we even find a device at the address we're
+> testing for if we're not running under QEMU.
 > 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  s390x/css.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
 > 
-> On Mon, Apr 4, 2022, at 10:06 AM, Sean Christopherson wrote:
-> > On Mon, Apr 04, 2022, Quentin Perret wrote:
-> >> On Friday 01 Apr 2022 at 12:56:50 (-0700), Andy Lutomirski wrote:
-> >> FWIW, there are a couple of reasons why I'd like to have in-place
-> >> conversions:
-> >> 
-> >>  - one goal of pKVM is to migrate some things away from the Arm
-> >>    Trustzone environment (e.g. DRM and the likes) and into protected VMs
-> >>    instead. This will give Linux a fighting chance to defend itself
-> >>    against these things -- they currently have access to _all_ memory.
-> >>    And transitioning pages between Linux and Trustzone (donations and
-> >>    shares) is fast and non-destructive, so we really do not want pKVM to
-> >>    regress by requiring the hypervisor to memcpy things;
-> >
-> > Is there actually a _need_ for the conversion to be non-destructive?  
-> > E.g. I assume
-> > the "trusted" side of things will need to be reworked to run as a pKVM 
-> > guest, at
-> > which point reworking its logic to understand that conversions are 
-> > destructive and
-> > slow-ish doesn't seem too onerous.
-> >
-> >>  - it can be very useful for protected VMs to do shared=>private
-> >>    conversions. Think of a VM receiving some data from the host in a
-> >>    shared buffer, and then it wants to operate on that buffer without
-> >>    risking to leak confidential informations in a transient state. In
-> >>    that case the most logical thing to do is to convert the buffer back
-> >>    to private, do whatever needs to be done on that buffer (decrypting a
-> >>    frame, ...), and then share it back with the host to consume it;
-> >
-> > If performance is a motivation, why would the guest want to do two 
-> > conversions
-> > instead of just doing internal memcpy() to/from a private page?  I 
-> > would be quite
-> > surprised if multiple exits and TLB shootdowns is actually faster, 
-> > especially at
-> > any kind of scale where zapping stage-2 PTEs will cause lock contention 
-> > and IPIs.
-> 
-> I don't know the numbers or all the details, but this is arm64, which is a rather better architecture than x86 in this regard.  So maybe it's not so bad, at least in very simple cases, ignoring all implementation details.  (But see below.)  Also the systems in question tend to have fewer CPUs than some of the massive x86 systems out there.
+> diff --git a/s390x/css.c b/s390x/css.c
+> index a333e55a..52d35f49 100644
+> --- a/s390x/css.c
+> +++ b/s390x/css.c
+> @@ -15,6 +15,7 @@
+>  #include <interrupt.h>
+>  #include <asm/arch_def.h>
+>  #include <alloc_page.h>
+> +#include <hardware.h>
+>  
+>  #include <malloc_io.h>
+>  #include <css.h>
+> @@ -641,6 +642,12 @@ int main(int argc, char *argv[])
+>  {
+>  	int i;
+>  
+> +	/* There's no guarantee where our devices are without qemu */
+> +	if (detect_host() != HOST_IS_KVM && detect_host() != HOST_IS_TCG) {
 
-Yep. I can try and do some measurements if that's really necessary, but
-I'm really convinced the cost of the TLBI for the shared->private
-conversion is going to be significantly smaller than the cost of memcpy
-the buffer twice in the guest for us. To be fair, although the cost for
-the CPU update is going to be low, the cost for IOMMU updates _might_ be
-higher, but that very much depends on the hardware. On systems that use
-e.g. the Arm SMMU, the IOMMUs can use the CPU page-tables directly, and
-the iotlb invalidation is done on the back of the CPU invalidation. So,
-on systems with sane hardware the overhead is *really* quite small.
+you could also do !host_is_kvm() && !host_is_tcg() , I think it's more
+readable, but I do not have strong opinions regarding that
 
-Also, memcpy requires double the memory, it is pretty bad for power, and
-it causes memory traffic which can't be a good thing for things running
-concurrently.
+> +		report_skip("Not running under QEMU");
+> +		goto done;
+> +	}
+> +
+>  	report_prefix_push("Channel Subsystem");
 
-> If we actually wanted to support transitioning the same page between shared and private, though, we have a bit of an awkward situation.  Private to shared is conceptually easy -- do some bookkeeping, reconstitute the direct map entry, and it's done.  The other direction is a mess: all existing uses of the page need to be torn down.  If the page has been recently used for DMA, this includes IOMMU entries.
->
-> Quentin: let's ignore any API issues for now.  Do you have a concept of how a nondestructive shared -> private transition could work well, even in principle?
+the prefix push should probably go before the if
 
-I had a high level idea for the workflow, but I haven't looked into the
-implementation details.
+>  	enable_io_isc(0x80 >> IO_SCH_ISC);
+>  	for (i = 0; tests[i].name; i++) {
+> @@ -648,7 +655,8 @@ int main(int argc, char *argv[])
+>  		tests[i].func();
+>  		report_prefix_pop();
+>  	}
+> -	report_prefix_pop();
+>  
+> +done:
+> +	report_prefix_pop();
+>  	return report_summary();
+>  }
 
-The idea would be to allow KVM *or* userspace to take a reference
-to a page in the fd in an exclusive manner. KVM could take a reference
-on a page (which would be necessary before to donating it to a guest)
-using some kind of memfile_notifier as proposed in this series, and
-userspace could do the same some other way (mmap presumably?). In both
-cases, the operation might fail.
-
-I would imagine the boot and private->shared flow as follow:
-
- - the VMM uses fallocate on the private fd, and associates the <fd,
-   offset, size> with a memslot;
-
- - the guest boots, and as part of that KVM takes references to all the
-   pages that are donated to the guest. If userspace happens to have a
-   mapping to a page, KVM will fail to take the reference, which would
-   be fatal for the guest.
-
- - once the guest has booted, it issues a hypercall to share a page back
-   with the host;
-
- - KVM is notified, and at that point it drops its reference to the
-   page. It then exits to userspace to notify it of the share;
-
- - host userspace receives the share, and mmaps the shared page with
-   MAP_FIXED to access it, which takes a reference on the fd-backed
-   page.
-
-There are variations of that idea: e.g. allow userspace to mmap the
-entire private fd but w/o taking a reference on pages mapped with
-PROT_NONE. And then the VMM can use mprotect() in response to
-share/unshare requests. I think Marc liked that idea as it keeps the
-userspace API closer to normal KVM -- there actually is a
-straightforward gpa->hva relation. Not sure how much that would impact
-the implementation at this point.
-
-For the shared=>private conversion, this would be something like so:
-
- - the guest issues a hypercall to unshare a page;
-
- - the hypervisor forwards the request to the host;
-
- - the host kernel forwards the request to userspace;
-
- - userspace then munmap()s the shared page;
-
- - KVM then tries to take a reference to the page. If it succeeds, it
-   re-enters the guest with a flag of some sort saying that the share
-   succeeded, and the hypervisor will adjust pgtables accordingly. If
-   KVM failed to take a reference, it flags this and the hypervisor will
-   be responsible for communicating that back to the guest. This means
-   the guest must handle failures (possibly fatal).
-
-(There are probably many ways in which we can optimize this, e.g. by
-having the host proactively munmap() pages it no longer needs so that
-the unshare hypercall from the guest doesn't need to exit all the way
-back to host userspace.)
-
-A nice side-effect of the above is that it allows userspace to dump a
-payload in the private fd before booting the guest. It just needs to
-mmap the fd, copy what it wants in there, munmap, and only then pass the
-fd to KVM which will be happy enough as long as there are no current
-references to the pages. Note: in a previous email I've said that
-Android doesn't need this (which is correct as our guest bootloader
-currently receives the payload over virtio) but this might change some
-day, and there might be other implementations as well, so it's a nice
-bonus if we can make this work.
-
-> The best I can come up with is a special type of shared page that is not GUP-able and maybe not even mmappable, having a clear option for transitions to fail, and generally preventing the nasty cases from happening in the first place.
-
-Right, that sounds reasonable to me.
-
-> Maybe there could be a special mode for the private memory fds in which specific pages are marked as "managed by this fd but actually shared".  pread() and pwrite() would work on those pages, but not mmap().  (Or maybe mmap() but the resulting mappings would not permit GUP.)  And transitioning them would be a special operation on the fd that is specific to pKVM and wouldn't work on TDX or SEV.
-
-Aha, didn't think of pread()/pwrite(). Very interesting.
-
-I'd need to check what our VMM actually does, but as an initial
-reaction it feels like this might require a pretty significant rework in
-userspace. Maybe it's a good thing? Dunno. Maybe more important, those
-shared pages are used for virtio communications, so the cost of issuing
-syscalls every time the VMM needs to access the shared page will need to
-be considered...
-
-Thanks,
-Quentin
