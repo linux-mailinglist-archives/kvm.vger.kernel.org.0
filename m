@@ -2,65 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A8A7F4F3FB9
-	for <lists+kvm@lfdr.de>; Tue,  5 Apr 2022 23:04:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4C6F4F40A2
+	for <lists+kvm@lfdr.de>; Tue,  5 Apr 2022 23:19:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240151AbiDEOte (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Apr 2022 10:49:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58754 "EHLO
+        id S235275AbiDEOuP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Apr 2022 10:50:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1389674AbiDENeG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Apr 2022 09:34:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 386D6137B2E
-        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 05:39:56 -0700 (PDT)
+        with ESMTP id S1379544AbiDENey (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Apr 2022 09:34:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 56C7A13E15E
+        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 05:42:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649162396;
+        s=mimecast20190719; t=1649162529;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ye4ZaW/ItY5DViRmitahbrOWzYkgcy+w01IKjssfwqM=;
-        b=UC7CzFRdqPiVfNP1mBWdachWCSTUtmEHlmiOP9b2Z8n9C19m16QBWgFsQJqTU0meT5GWL9
-        Cd6pHHvW7lDf/FYQ//cwgJkny5JlGD6PpGqv9ovl7W7DYbiebwnD1SCG4hW3IAt0pg2A2K
-        d9y00tzND9PyhK0RbMhLzqEJRmtqTho=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=H0APKANmrEG8YzfakBH1QUxjkhifm2uURbUzbSfC/2c=;
+        b=dl95sNI/DYBgflPJJrIdnfY/iVyWoE5gqgDqOEfIAcZwmV9AHcNbMDsnMvaoWHGLg6u1H+
+        fYUP65or1QHW2qLIw+84qn5OsE+9r4bcZUDLRMrzAvelf5+Lx3ymx+aCAII21kAUjhoLuW
+        Lf68VlDR7j+tFAibFEMAFdkXpxT8y68=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-639-9BOLJxxDM4KSuBaUEAFqqA-1; Tue, 05 Apr 2022 08:39:55 -0400
-X-MC-Unique: 9BOLJxxDM4KSuBaUEAFqqA-1
-Received: by mail-wm1-f70.google.com with SMTP id k16-20020a7bc310000000b0038e6cf00439so1213571wmj.0
-        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 05:39:54 -0700 (PDT)
+ us-mta-658-NIJfi-SzP42UKzs_GANHlQ-1; Tue, 05 Apr 2022 08:42:08 -0400
+X-MC-Unique: NIJfi-SzP42UKzs_GANHlQ-1
+Received: by mail-wr1-f71.google.com with SMTP id z16-20020adff1d0000000b001ef7dc78b23so2430127wro.12
+        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 05:42:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=ye4ZaW/ItY5DViRmitahbrOWzYkgcy+w01IKjssfwqM=;
-        b=J8e6Ap4u3YPYFukePaUuw/pM8XaUajj9n316f4rA4Q+Wu5vR8tXX2vwzBnaj5KzRt4
-         Fqn26tw1ldncVTYNysBPniRmaaJLWXA/FEykPmRm+hkPKQxZUEK1XbxZl7A188syfFrX
-         zOPNbqXbpYmKE7t0jXjXoF4mUppoZqvALDflfkJR9Y7tE/aJpc8BHlXeJ44d7Z4MdVGE
-         MzorDAm0rvIqBKIhn0vCpxaqZa6Ki02eJ0FZ1UxSU2Bh7WYbP+iv6jtbxYMmoRxGhjNd
-         aTzjCOQJmX28Uadjw2jhEFeRsIRMe0oj7F8QE77PsIdF7K98VhyQWbdPpKNbKy3EqDdj
-         cnFw==
-X-Gm-Message-State: AOAM533yHiyTcviZFnVkdY7KfnAUhmy0m26acGuU2+Pxx1NdN2LM0N+T
-        FZozHI910klOkI/xRyM4IZMk+X/gpsBWeLmrj+xl8ca4Ab8bCP+m2KT0RVclfApxTviXu/NEu/j
-        TfksTG1W9N/03
-X-Received: by 2002:adf:e582:0:b0:206:fcf:8eb3 with SMTP id l2-20020adfe582000000b002060fcf8eb3mr2720021wrm.517.1649162393891;
-        Tue, 05 Apr 2022 05:39:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzlo0bj2jutu52YWf8gdKhedE/z/VWmesp/G1YrMVbP8ucNmMKxfYc9MxKHXr/mNZGwYksxog==
-X-Received: by 2002:adf:e582:0:b0:206:fcf:8eb3 with SMTP id l2-20020adfe582000000b002060fcf8eb3mr2720009wrm.517.1649162393651;
-        Tue, 05 Apr 2022 05:39:53 -0700 (PDT)
+        bh=H0APKANmrEG8YzfakBH1QUxjkhifm2uURbUzbSfC/2c=;
+        b=QsyVu1Hw8/ubI9EN8WBhew2hP1GxPbrk0EW1ynHTjA05HX2fFutYy9SwEALNSCMLLz
+         P1F2dDVp8iTI2Nq/xXMV/8m0H8nE56m8nmnu9qxbzZMwRXu3iFe9cI2+WZitvn8szn5J
+         874KvEg7s/w1L9hcMLeHyrVxNLGwl8SZDIPvnsQmA90QPyrZZugKe8DFnUkkvjuGNTQ8
+         T/bVXU11yIDT90aqwHQtQS0Ssn+TSgAYpQDqP2VkbTOKkNUPLZ6JIMpaw+K/9/jKI7jO
+         0uHzZE/mfJQaI16ENSQGIPOp6jNCmzDlRYf01xOunluYqe33fcdBXHrYczxphyzBWfXN
+         1gtw==
+X-Gm-Message-State: AOAM532IndnuXDlKDrDYsqTPATd0AaqNnupqUtvcvpqH3DPCfV0oiplp
+        OTbVGVKnaBOiwqPz4UPf4QP01MvJ8k/vsHn1qpcX1OWQxrVjgVFoEm8FY3FGzPTk2ZhAfKBQFRY
+        9ohXPiJbGSvQD
+X-Received: by 2002:a05:600c:190e:b0:38c:b1ea:f4ac with SMTP id j14-20020a05600c190e00b0038cb1eaf4acmr2938048wmq.70.1649162526868;
+        Tue, 05 Apr 2022 05:42:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzE8lOSJsC1vu9YrVZ8kWphJzexS1UEyH2gUdxXfFYpfE6UWb3J1TmoORH/TfcRQQNlqZoBNw==
+X-Received: by 2002:a05:600c:190e:b0:38c:b1ea:f4ac with SMTP id j14-20020a05600c190e00b0038cb1eaf4acmr2938035wmq.70.1649162526641;
+        Tue, 05 Apr 2022 05:42:06 -0700 (PDT)
 Received: from [10.32.181.87] (nat-pool-mxp-t.redhat.com. [149.6.153.186])
-        by smtp.googlemail.com with ESMTPSA id y7-20020adfdf07000000b0020609f6b386sm8537167wrl.37.2022.04.05.05.39.52
+        by smtp.googlemail.com with ESMTPSA id n20-20020a05600c4f9400b0038cbd13e06esm2196316wmq.2.2022.04.05.05.42.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Apr 2022 05:39:52 -0700 (PDT)
-Message-ID: <25257849-8e1a-17ff-5008-bb2d1efecf80@redhat.com>
-Date:   Tue, 5 Apr 2022 14:39:51 +0200
+        Tue, 05 Apr 2022 05:42:05 -0700 (PDT)
+Message-ID: <80029ed6-a276-16f6-710e-9d9d642a54fd@redhat.com>
+Date:   Tue, 5 Apr 2022 14:42:04 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.7.0
-Subject: Re: [RFC PATCH v5 020/104] KVM: TDX: allocate per-package mutex
+Subject: Re: [RFC PATCH v5 022/104] KVM: Add max_vcpus field in common 'struct
+ kvm'
 Content-Language: en-US
 To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
@@ -68,14 +69,14 @@ Cc:     isaku.yamahata@gmail.com, Jim Mattson <jmattson@google.com>,
         erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>,
         Sean Christopherson <seanjc@google.com>
 References: <cover.1646422845.git.isaku.yamahata@intel.com>
- <f7b44d1d5a61f788294c399b63b505b3ff4d301b.1646422845.git.isaku.yamahata@intel.com>
+ <e53234cdee6a92357d06c80c03d77c19cdefb804.1646422845.git.isaku.yamahata@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <f7b44d1d5a61f788294c399b63b505b3ff4d301b.1646422845.git.isaku.yamahata@intel.com>
+In-Reply-To: <e53234cdee6a92357d06c80c03d77c19cdefb804.1646422845.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
         SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -85,135 +86,127 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 3/4/22 20:48, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
 > 
-> Several TDX SEAMCALLs are per-package scope (concretely per memory
-> controller) and they need to be serialized per-package.  Allocate mutex for
-> it.
+> For TDX guests, the maximum number of vcpus needs to be specified when the
+> TDX guest VM is initialized (creating the TDX data corresponding to TDX
+> guest) before creating vcpu.  It needs to record the maximum number of
+> vcpus on VM creation (KVM_CREATE_VM) and return error if the number of
+> vcpus exceeds it
 > 
+> Because there is already max_vcpu member in arm64 struct kvm_arch, move it
+> to common struct kvm and initialize it to KVM_MAX_VCPUS before
+> kvm_arch_init_vm() instead of adding it to x86 struct kvm_arch.
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > ---
->   arch/x86/kvm/vmx/main.c    |  8 +++++++-
->   arch/x86/kvm/vmx/tdx.c     | 18 ++++++++++++++++++
->   arch/x86/kvm/vmx/x86_ops.h |  2 ++
->   3 files changed, 27 insertions(+), 1 deletion(-)
+>   arch/arm64/include/asm/kvm_host.h | 3 ---
+>   arch/arm64/kvm/arm.c              | 6 +++---
+>   arch/arm64/kvm/vgic/vgic-init.c   | 6 +++---
+>   include/linux/kvm_host.h          | 1 +
+>   virt/kvm/kvm_main.c               | 3 ++-
+>   5 files changed, 9 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 5bc01e62c08a..27249d634605 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -107,9 +107,6 @@ struct kvm_arch {
+>   	/* VTCR_EL2 value for this VM */
+>   	u64    vtcr;
+>   
+> -	/* The maximum number of vCPUs depends on the used GIC model */
+> -	int max_vcpus;
+> -
+>   	/* Interrupt controller */
+>   	struct vgic_dist	vgic;
+>   
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index ecc5958e27fe..defec2cd94bd 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -153,7 +153,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>   	kvm_vgic_early_init(kvm);
+>   
+>   	/* The maximum number of VCPUs is limited by the host's GIC model */
+> -	kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
+> +	kvm->max_vcpus = kvm_arm_default_max_vcpus();
+>   
+>   	set_default_spectre(kvm);
+>   
+> @@ -229,7 +229,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_MAX_VCPUS:
+>   	case KVM_CAP_MAX_VCPU_ID:
+>   		if (kvm)
+> -			r = kvm->arch.max_vcpus;
+> +			r = kvm->max_vcpus;
+>   		else
+>   			r = kvm_arm_default_max_vcpus();
+>   		break;
+> @@ -305,7 +305,7 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+>   	if (irqchip_in_kernel(kvm) && vgic_initialized(kvm))
+>   		return -EBUSY;
+>   
+> -	if (id >= kvm->arch.max_vcpus)
+> +	if (id >= kvm->max_vcpus)
+>   		return -EINVAL;
+>   
+>   	return 0;
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index fc00304fe7d8..77feafd5c0e3 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -98,11 +98,11 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>   	ret = 0;
+>   
+>   	if (type == KVM_DEV_TYPE_ARM_VGIC_V2)
+> -		kvm->arch.max_vcpus = VGIC_V2_MAX_CPUS;
+> +		kvm->max_vcpus = VGIC_V2_MAX_CPUS;
+>   	else
+> -		kvm->arch.max_vcpus = VGIC_V3_MAX_CPUS;
+> +		kvm->max_vcpus = VGIC_V3_MAX_CPUS;
+>   
+> -	if (atomic_read(&kvm->online_vcpus) > kvm->arch.max_vcpus) {
+> +	if (atomic_read(&kvm->online_vcpus) > kvm->max_vcpus) {
+>   		ret = -E2BIG;
+>   		goto out_unlock;
+>   	}
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index f11039944c08..a56044a31bc6 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -715,6 +715,7 @@ struct kvm {
+>   	 * and is accessed atomically.
+>   	 */
+>   	atomic_t online_vcpus;
+> +	int max_vcpus;
+>   	int created_vcpus;
+>   	int last_boosted_vcpu;
+>   	struct list_head vm_list;
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 52f72a366beb..3adee9c6b370 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1075,6 +1075,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
+>   	spin_lock_init(&kvm->gpc_lock);
+>   
+>   	INIT_LIST_HEAD(&kvm->devices);
+> +	kvm->max_vcpus = KVM_MAX_VCPUS;
+>   
+>   	BUILD_BUG_ON(KVM_MEM_SLOTS_NUM > SHRT_MAX);
+>   
+> @@ -3718,7 +3719,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
+>   		return -EINVAL;
+>   
+>   	mutex_lock(&kvm->lock);
+> -	if (kvm->created_vcpus == KVM_MAX_VCPUS) {
+> +	if (kvm->created_vcpus >= kvm->max_vcpus) {
+>   		mutex_unlock(&kvm->lock);
+>   		return -EINVAL;
+>   	}
 
-Please define here the lock/unlock functions as well:
-
-static inline int tdx_mng_key_lock(void)
-{
-	int cpu = get_cpu();
-	cur_pkg = topology_physical_package_id(cpu);
-
-	mutex_lock(&tdx_mng_key_config_lock[cur_pkg]);
-	return cur_pkg;
-}
-
-static inline void tdx_mng_key_unlock(int cur_pkg)
-{
-	mutex_unlock(&tdx_mng_key_config_lock[cur_pkg]);
-	put_cpu();
-}
-
-Thanks,
+Queued this one already, thanks.
 
 Paolo
-
-
-> 
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index 8103d1c32cc9..6111c6485d8e 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -25,6 +25,12 @@ static __init int vt_hardware_setup(void)
->   	return 0;
->   }
->   
-> +static void vt_hardware_unsetup(void)
-> +{
-> +	tdx_hardware_unsetup();
-> +	vmx_hardware_unsetup();
-> +}
-> +
->   static int vt_vm_init(struct kvm *kvm)
->   {
->   	int ret;
-> @@ -42,7 +48,7 @@ static int vt_vm_init(struct kvm *kvm)
->   struct kvm_x86_ops vt_x86_ops __initdata = {
->   	.name = "kvm_intel",
->   
-> -	.hardware_unsetup = vmx_hardware_unsetup,
-> +	.hardware_unsetup = vt_hardware_unsetup,
->   
->   	.hardware_enable = vmx_hardware_enable,
->   	.hardware_disable = vmx_hardware_disable,
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index e8d293a3c11c..1c8222f54764 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -34,6 +34,8 @@ struct tdx_capabilities {
->   /* Capabilities of KVM + the TDX module. */
->   struct tdx_capabilities tdx_caps;
->   
-> +static struct mutex *tdx_mng_key_config_lock;
-> +
->   static u64 hkid_mask __ro_after_init;
->   static u8 hkid_start_pos __ro_after_init;
->   
-> @@ -112,7 +114,9 @@ bool tdx_is_vm_type_supported(unsigned long type)
->   
->   static int __init __tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
->   {
-> +	int max_pkgs;
->   	u32 max_pa;
-> +	int i;
->   
->   	if (!enable_ept) {
->   		pr_warn("Cannot enable TDX with EPT disabled\n");
-> @@ -127,6 +131,14 @@ static int __init __tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
->   	if (WARN_ON_ONCE(x86_ops->tlb_remote_flush))
->   		return -EIO;
->   
-> +	max_pkgs = topology_max_packages();
-> +	tdx_mng_key_config_lock = kcalloc(max_pkgs, sizeof(*tdx_mng_key_config_lock),
-> +				   GFP_KERNEL);
-> +	if (!tdx_mng_key_config_lock)
-> +		return -ENOMEM;
-> +	for (i = 0; i < max_pkgs; i++)
-> +		mutex_init(&tdx_mng_key_config_lock[i]);
-> +
->   	max_pa = cpuid_eax(0x80000008) & 0xff;
->   	hkid_start_pos = boot_cpu_data.x86_phys_bits;
->   	hkid_mask = GENMASK_ULL(max_pa - 1, hkid_start_pos);
-> @@ -147,6 +159,12 @@ void __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
->   		enable_tdx = false;
->   }
->   
-> +void tdx_hardware_unsetup(void)
-> +{
-> +	/* kfree accepts NULL. */
-> +	kfree(tdx_mng_key_config_lock);
-> +}
-> +
->   void __init tdx_pre_kvm_init(unsigned int *vcpu_size,
->   			unsigned int *vcpu_align, unsigned int *vm_size)
->   {
-> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-> index 78331dbc29f7..da32b4b86b19 100644
-> --- a/arch/x86/kvm/vmx/x86_ops.h
-> +++ b/arch/x86/kvm/vmx/x86_ops.h
-> @@ -131,11 +131,13 @@ void __init tdx_pre_kvm_init(unsigned int *vcpu_size,
->   			unsigned int *vcpu_align, unsigned int *vm_size);
->   bool tdx_is_vm_type_supported(unsigned long type);
->   void __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
-> +void tdx_hardware_unsetup(void);
->   #else
->   static inline void tdx_pre_kvm_init(
->   	unsigned int *vcpu_size, unsigned int *vcpu_align, unsigned int *vm_size) {}
->   static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
->   static inline void tdx_hardware_setup(struct kvm_x86_ops *x86_ops) {}
-> +static inline void tdx_hardware_unsetup(void) {}
->   #endif
->   
->   #endif /* __KVM_X86_VMX_X86_OPS_H */
 
