@@ -2,112 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FF7F4F2494
-	for <lists+kvm@lfdr.de>; Tue,  5 Apr 2022 09:20:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B2324F2702
+	for <lists+kvm@lfdr.de>; Tue,  5 Apr 2022 10:06:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231193AbiDEHWt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Apr 2022 03:22:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60002 "EHLO
+        id S232953AbiDEIEt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Apr 2022 04:04:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232146AbiDEHVc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Apr 2022 03:21:32 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 437FB18B14
-        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 00:18:42 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id m30so17896536wrb.1
-        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 00:18:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=SWmIF7kdZQxOjvhVF27iSPZYouYPyeTWvrXCvBCoo6M=;
-        b=0J2XyiFI8hdOaU2qz1ah0ep9G8tAOnRKLZ6ukhI9wkUUo5KnuOQbgSO39MPE+PxSaB
-         9fcCB22vkp4p2Jdpl7epatdu/IwwsG9xRFG2SwyTCN+cpHriPBOGT/AKUPpuWy7fEuiY
-         FzcMI0o+dtoUMfwOq08y1Kw7kpkXYyUZOrIpMNT1feIrO+Rh7tighQYA7aaD6T7QiiSq
-         9DY2OOtK0QP/SEvUIQDPuB8zsSZ0Em0pmi8MMmHCPVlZCGQa75UypwxrnnT+r5toac+U
-         FgCrpJLlWeg1dgw8SkcY9FbRtdnJvx/Upq8B+DHwAntkGhm7NtuJppmAqEy2SBCRcBcZ
-         bHOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=SWmIF7kdZQxOjvhVF27iSPZYouYPyeTWvrXCvBCoo6M=;
-        b=mtOMwiriWOsQKd/W667t8NKAWBThigmOmvhSRvYCtO2cUUcymzgbgaTleLeyMCh6BG
-         wljL57tNkPTXZTi4PtYluMRtAq3pTWyZKELCA/gWLGi2BMEa2YYqhlC0E57ZsQ/ySSg9
-         O1Hi+9/0+6vBD7kfPpmbXZfyyLYV/8poy8cwl+mH/yiVaJt0zIoc0dhj6+ON73iGnTJn
-         p5V/WywWkpDqKKJTvMnJ3oOctJ2v6dayHw8RGZOrjp8E1MndV4UYiGhYzUP9VSe1JnBt
-         8bmEHjDBYLJNsgi2ijdk0DBVZos2I7tRSTMS8Zl9gA3PC8Fdl1aSzFjQk5VriD0VjNv0
-         TGOw==
-X-Gm-Message-State: AOAM530i1slW8V4jo0gL/iZdxZBqusezwA3X6WSVCeJvUcLSBIb2NwgZ
-        6ln+RobJZgPIte+ok3mLTt/UscdSciWC+kltorc5NA==
-X-Google-Smtp-Source: ABdhPJxEY7vXcjMbr9oQrtXXmbTMIbRAKE4OTBjGL+A63xeISLJrnIJ5bBgyZuPVxJhL+9+JmuYgJizmKmiifNf9NNM=
-X-Received: by 2002:adf:f88e:0:b0:206:ce5:af99 with SMTP id
- u14-20020adff88e000000b002060ce5af99mr1455734wrp.313.1649143121363; Tue, 05
- Apr 2022 00:18:41 -0700 (PDT)
+        with ESMTP id S235575AbiDEH7v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Apr 2022 03:59:51 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D66F40A3B;
+        Tue,  5 Apr 2022 00:55:44 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2357eV0G013730;
+        Tue, 5 Apr 2022 07:55:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=lZL+0SMW83hov1roUlfMVDKkR2XFcz/vmIGw8JlJEf4=;
+ b=PxXHYAnZ24pNET1Klx+gOan4HfasiRKhF9rt8g5snEvDmUztxFeYi9kZJGDMJHX88iLA
+ yUjSFdFZb+fLP5XKqyuTwKpdnSbRPm6xZ9M4Hf8aGDDrdThQwKRZPiJ8hOTM6OqVuo1S
+ 2TFfk7uBWDKtCcm5Ghl2+DYajtRXkrKqlfPKVnXz6DK9JMwiqk+leqHGtXubhnsJnKOX
+ MsmzFo2JB74WUNPtHeX8yNPN5Q8zSZqsc91ZzJU4bOqeRnADR7r3EMcg+MHit0bdLaoz
+ VSjg2oV4QJ7U3MfcsuVvB1+eESNXRgvc3fQA/dVBFUJrp3N4ohfUcAaoruS4NWPEljwe Fg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f8cuhn673-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Apr 2022 07:55:43 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2357jf8b027402;
+        Tue, 5 Apr 2022 07:55:43 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f8cuhn66g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Apr 2022 07:55:43 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2357hVmL016391;
+        Tue, 5 Apr 2022 07:55:41 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03fra.de.ibm.com with ESMTP id 3f6e48v9tc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Apr 2022 07:55:40 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2357tiGE34406886
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 5 Apr 2022 07:55:44 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 57FD942041;
+        Tue,  5 Apr 2022 07:55:37 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8C07D4203F;
+        Tue,  5 Apr 2022 07:55:36 +0000 (GMT)
+Received: from linux6.. (unknown [9.114.12.104])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  5 Apr 2022 07:55:36 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com, nrb@linux.ibm.com,
+        seiden@linux.ibm.com
+Subject: [kvm-unit-tests PATCH 0/8] s390x: Cleanup and maintenance 4
+Date:   Tue,  5 Apr 2022 07:52:17 +0000
+Message-Id: <20220405075225.15903-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-References: <20220329072911.1692766-1-apatel@ventanamicro.com> <20220329072911.1692766-3-apatel@ventanamicro.com>
-In-Reply-To: <20220329072911.1692766-3-apatel@ventanamicro.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Tue, 5 Apr 2022 12:48:28 +0530
-Message-ID: <CAAhSdy0ZZAVPr68VK2k+0HQDZHyaCGTv1FgQKHqh2=T1wYzZtg@mail.gmail.com>
-Subject: Re: [PATCH 2/3] KVM: selftests: riscv: Fix alignment of the
- guest_hang() function
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: q20rhmzKGgEYfNT8_OV19pzibEj9wCrd
+X-Proofpoint-ORIG-GUID: 0cYySTInDxGIa4dUVQ03wL-3YOPxxuTI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-04-04_09,2022-03-31_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ priorityscore=1501 suspectscore=0 mlxlogscore=959 bulkscore=0
+ clxscore=1015 impostorscore=0 malwarescore=0 lowpriorityscore=0 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204050044
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 29, 2022 at 12:59 PM Anup Patel <apatel@ventanamicro.com> wrote:
->
-> The guest_hang() function is used as the default exception handler
-> for various KVM selftests applications by setting it's address in
-> the vstvec CSR. The vstvec CSR requires exception handler base address
-> to be at least 4-byte aligned so this patch fixes alignment of the
-> guest_hang() function.
->
-> Fixes: 3e06cdf10520 ("KVM: selftests: Add initial support for RISC-V
-> 64-bit")
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+A few small cleanups and two patches that I forgot to upstream which
+have now been rebased onto the machine.h library functions.
 
-I have queued this patch for RC fixes.
+Janosch Frank (8):
+  s390x: css: Skip if we're not run by qemu
+  s390x: diag308: Only test subcode 2 under QEMU
+  s390x: pfmf: Initialize pfmf_r1 union on declaration
+  s390x: snippets: asm: Add license and copyright headers
+  s390x: pv-diags: Cleanup includes
+  s390x: css: Cleanup includes
+  s390x: iep: Cleanup includes
+  s390x: mvpg: Cleanup includes
 
-Thanks,
-Anup
+ s390x/css.c                                | 17 ++++++----
+ s390x/diag308.c                            | 15 ++++++++-
+ s390x/iep.c                                |  3 +-
+ s390x/mvpg.c                               |  3 --
+ s390x/pfmf.c                               | 39 +++++++++++-----------
+ s390x/pv-diags.c                           | 17 ++--------
+ s390x/snippets/asm/snippet-pv-diag-288.S   |  9 +++++
+ s390x/snippets/asm/snippet-pv-diag-500.S   |  9 +++++
+ s390x/snippets/asm/snippet-pv-diag-yield.S |  9 +++++
+ 9 files changed, 74 insertions(+), 47 deletions(-)
 
-> ---
->  tools/testing/selftests/kvm/lib/riscv/processor.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> index d377f2603d98..3961487a4870 100644
-> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> @@ -268,7 +268,7 @@ void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
->                 core.regs.t3, core.regs.t4, core.regs.t5, core.regs.t6);
->  }
->
-> -static void guest_hang(void)
-> +static void __aligned(16) guest_hang(void)
->  {
->         while (1)
->                 ;
-> --
-> 2.25.1
->
+-- 
+2.32.0
+
