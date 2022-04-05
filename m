@@ -2,87 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0784F4F26F5
-	for <lists+kvm@lfdr.de>; Tue,  5 Apr 2022 10:06:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB1494F26CF
+	for <lists+kvm@lfdr.de>; Tue,  5 Apr 2022 10:05:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232986AbiDEIEx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Apr 2022 04:04:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57660 "EHLO
+        id S232898AbiDEIEj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Apr 2022 04:04:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235573AbiDEH7v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S235574AbiDEH7v (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 5 Apr 2022 03:59:51 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F13A040E7D;
-        Tue,  5 Apr 2022 00:55:44 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2357RYH7021346;
-        Tue, 5 Apr 2022 07:55:44 GMT
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86DCC40E7F;
+        Tue,  5 Apr 2022 00:55:45 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23575vm0029363;
+        Tue, 5 Apr 2022 07:55:45 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=PfnptPpQ7BG3PrwQg2j8SGjdDEm+bSFa0faG4SSKNBg=;
- b=ixn0HsGfIxHNrN4rYoYqZEWWbz4qGDWlfjjekfWnHTK4FZVsBl66/g1AuALL+lC+H8xP
- WjAFSGl+xjcaAzy5SfGOHwjXOftV2HyARCRZYm8aLV0mY9NwXx6tE2alDkBhFRN54Phs
- YG+OXTWtnA0AnrFXgkyXh0t2z5nsGHsGbUom+prEn3IKGsIMQz19YJ+Ut/XvFPwCrkQH
- ElTCoha5+yjpNCWxRA49LNty61VESB7LL/nvNXsGCN+X8hhnH54lRcD2XNhbOU/mpbmX
- f3bTNm775xyvVBVg2db6Nx5mbLaDMQP8gU9CNLEDiFFnDFO8Lbtt2Az5JRmSbWYM/9Ce fA== 
+ bh=Dr6VjIBhLnIVd9CMktJ8F3AQ+OqLtvGZqtc7TJQcmS0=;
+ b=amLmgD5GvgysAEOWJ/40KONA1FlLHAPByQrf2EjiQIcNVkPTjz11JCyx4ENzXCqgtfAh
+ U00JxMHN0EF9BpUKTW8G33lY+T42CikV8B9enHzeUJJg7NQFPLIxE0m+OeSDDAlRg9NN
+ CEkvtl+vWTdWJTJLUjNecnjmU4DjbF1Ons1Xoxe9cYXnmCO6ILxUYF5djeBszFDE8WwS
+ 0CW87Vco1V8CBADz9R0ZqapyibNgpJdlbtOXMOxMAkFFwuctRaZogD7jbnicgBALYqsw
+ LUVEhdhxNFYP0nWIW94NErnekyKnpIM3pM5Pb5P2otZ5pLPD0gVrN8y9UBKno9BAzmWb yQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f8e5dky02-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f86pjx6by-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Apr 2022 07:55:43 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2357Te2s011108;
-        Tue, 5 Apr 2022 07:55:43 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f8e5dkxyr-1
+        Tue, 05 Apr 2022 07:55:45 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2357eaFq016087;
+        Tue, 5 Apr 2022 07:55:44 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f86pjx6bc-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Apr 2022 07:55:43 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2357hJjW020539;
-        Tue, 5 Apr 2022 07:55:41 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04fra.de.ibm.com with ESMTP id 3f6e48v9yp-1
+        Tue, 05 Apr 2022 07:55:44 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2357gtJB000922;
+        Tue, 5 Apr 2022 07:55:42 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03ams.nl.ibm.com with ESMTP id 3f6e48w71a-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Apr 2022 07:55:41 +0000
+        Tue, 05 Apr 2022 07:55:42 +0000
 Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2357hPF752101572
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2357tdt140501596
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 5 Apr 2022 07:43:25 GMT
+        Tue, 5 Apr 2022 07:55:39 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4A30D42042;
+        by IMSVA (Postfix) with ESMTP id 32A084203F;
+        Tue,  5 Apr 2022 07:55:39 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 706E642042;
         Tue,  5 Apr 2022 07:55:38 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7E98F4203F;
-        Tue,  5 Apr 2022 07:55:37 +0000 (GMT)
 Received: from linux6.. (unknown [9.114.12.104])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  5 Apr 2022 07:55:37 +0000 (GMT)
+        Tue,  5 Apr 2022 07:55:38 +0000 (GMT)
 From:   Janosch Frank <frankja@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
         david@redhat.com, thuth@redhat.com, nrb@linux.ibm.com,
         seiden@linux.ibm.com
-Subject: [kvm-unit-tests PATCH 1/8] s390x: css: Skip if we're not run by qemu
-Date:   Tue,  5 Apr 2022 07:52:18 +0000
-Message-Id: <20220405075225.15903-2-frankja@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH 2/8] s390x: diag308: Only test subcode 2 under QEMU
+Date:   Tue,  5 Apr 2022 07:52:19 +0000
+Message-Id: <20220405075225.15903-3-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220405075225.15903-1-frankja@linux.ibm.com>
 References: <20220405075225.15903-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: cOcOpqddLCvj-KeRP0M4lEA6EswUa21y
-X-Proofpoint-GUID: 8XI_r9_EdpNd-fEu7Ufjo3EDGysY-Qaz
+X-Proofpoint-GUID: 0IEmy27L4gH32vi0KAUDI69b3kHvZ2_C
+X-Proofpoint-ORIG-GUID: 0NAK4XcMYecPfB_hqs0MKoPzA7lFU5hR
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
  definitions=2022-04-04_09,2022-03-31_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 spamscore=0 lowpriorityscore=0 suspectscore=0
- adultscore=0 impostorscore=0 phishscore=0 malwarescore=0 mlxlogscore=779
- bulkscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ priorityscore=1501 clxscore=1015 bulkscore=0 lowpriorityscore=0
+ mlxlogscore=821 mlxscore=0 phishscore=0 adultscore=0 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2202240000 definitions=main-2204050044
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -91,49 +91,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There's no guarantee that we even find a device at the address we're
-testing for if we're not running under QEMU.
+Other hypervisors might implement it and therefore not send a
+specification exception.
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- s390x/css.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ s390x/diag308.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/s390x/css.c b/s390x/css.c
-index a333e55a..52d35f49 100644
---- a/s390x/css.c
-+++ b/s390x/css.c
-@@ -15,6 +15,7 @@
- #include <interrupt.h>
- #include <asm/arch_def.h>
- #include <alloc_page.h>
+diff --git a/s390x/diag308.c b/s390x/diag308.c
+index c9d6c499..9614f9a9 100644
+--- a/s390x/diag308.c
++++ b/s390x/diag308.c
+@@ -8,6 +8,7 @@
+ #include <libcflat.h>
+ #include <asm/asm-offsets.h>
+ #include <asm/interrupt.h>
 +#include <hardware.h>
  
- #include <malloc_io.h>
- #include <css.h>
-@@ -641,6 +642,12 @@ int main(int argc, char *argv[])
+ /* The diagnose calls should be blocked in problem state */
+ static void test_priv(void)
+@@ -75,7 +76,7 @@ static void test_subcode6(void)
+ /* Unsupported subcodes should generate a specification exception */
+ static void test_unsupported_subcode(void)
  {
- 	int i;
+-	int subcodes[] = { 2, 0x101, 0xffff, 0x10001, -1 };
++	int subcodes[] = { 0x101, 0xffff, 0x10001, -1 };
+ 	int idx;
  
-+	/* There's no guarantee where our devices are without qemu */
-+	if (detect_host() != HOST_IS_KVM && detect_host() != HOST_IS_TCG) {
-+		report_skip("Not running under QEMU");
-+		goto done;
-+	}
-+
- 	report_prefix_push("Channel Subsystem");
- 	enable_io_isc(0x80 >> IO_SCH_ISC);
- 	for (i = 0; tests[i].name; i++) {
-@@ -648,7 +655,8 @@ int main(int argc, char *argv[])
- 		tests[i].func();
+ 	for (idx = 0; idx < ARRAY_SIZE(subcodes); idx++) {
+@@ -85,6 +86,18 @@ static void test_unsupported_subcode(void)
+ 		check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
  		report_prefix_pop();
  	}
--	report_prefix_pop();
- 
-+done:
-+	report_prefix_pop();
- 	return report_summary();
++
++	/*
++	 * Subcode 2 is not available under QEMU but might be on other
++	 * hypervisors.
++	 */
++	if (detect_host() != HOST_IS_TCG && detect_host() != HOST_IS_KVM) {
++		report_prefix_pushf("0x%04x", 2);
++		expect_pgm_int();
++		asm volatile ("diag %0,%1,0x308" :: "d"(0), "d"(2));
++		check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
++		report_prefix_pop();
++	}
  }
+ 
+ static struct {
 -- 
 2.32.0
 
