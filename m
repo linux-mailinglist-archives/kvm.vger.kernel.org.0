@@ -2,93 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCE714F2278
-	for <lists+kvm@lfdr.de>; Tue,  5 Apr 2022 07:12:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52FED4F2490
+	for <lists+kvm@lfdr.de>; Tue,  5 Apr 2022 09:20:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229657AbiDEFOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Apr 2022 01:14:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52354 "EHLO
+        id S231796AbiDEHWq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Apr 2022 03:22:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbiDEFOA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Apr 2022 01:14:00 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4AD3311;
-        Mon,  4 Apr 2022 22:12:02 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3321E614A9;
-        Tue,  5 Apr 2022 05:12:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 432C9C340F0;
-        Tue,  5 Apr 2022 05:12:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1649135521;
-        bh=iIo+zn0pj52zOFFjMSyQhxTcFA5tdRReaLN/oRTDT28=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=tDXJAzwrF2zWBJHgbCM1pgN6QUq3umuEMADLIz52ETyZwPEDosIUBjvC2b0qm8JEg
-         0gYuX3lcku22/nCUOpy+TimECUFN5V6lWt7UO4RvvsECsVraPrFQvLm0XTvEtMYNfe
-         Lj3RFsPntssa1rsMaXDai74CekKdklQPTT0KjyYs=
-Date:   Tue, 5 Apr 2022 07:11:59 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org, Qiuhao Li <qiuhao@sysec.org>,
-        Gaoning Pan <pgn@zju.edu.cn>, Yongkang Jia <kangel@zju.edu.cn>,
-        syzbot+6cde2282daa792c49ab8@syzkaller.appspotmail.com,
-        Tadeusz Struk <tadeusz.struk@linaro.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH 5.4 v2] KVM: x86/mmu: do compare-and-exchange of gPTE via
- the user address
-Message-ID: <YkvPn6uWte2YEEbF@kroah.com>
-References: <20220404154913.482520-1-pbonzini@redhat.com>
+        with ESMTP id S232118AbiDEHVb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Apr 2022 03:21:31 -0400
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FB416543
+        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 00:18:18 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id bi13-20020a05600c3d8d00b0038c2c33d8f3so948949wmb.4
+        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 00:18:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=j5tZD+8M1iPFQIpWPsYamWZAVUcin+PVrYzA4YmgT9M=;
+        b=fwxyiskvlIWhb4yoz+2d8DfK/fDF9kpIsj1v16e5zIvUjuTsRqhCJOFl05KNjnR1dw
+         oonmm9pVay2hFWOiOFAbJ7dn7AHRarZUB51K/rDMrO52UGnRsj0lSzd2lgRxtb+OxIRl
+         IgpXfxAnPI2wpb+5qJeC0MuWD3RZGoIQEZ+ogFkEYpSYTVQw4ABKMBca0ZXnLKFMvEQz
+         QdhofkXfbLPxcHl4i2KJqdCwUeO5sC1D7G1h/tn68KmMvPa0ZOVhXIkAy7QphAYkTazb
+         USrRPCFfrjAaMOaC2mAVwXLODZM++PjK43MI+M9Q3aTBfmuFw1YJzwLkykwbNCFn9o1+
+         X6WQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=j5tZD+8M1iPFQIpWPsYamWZAVUcin+PVrYzA4YmgT9M=;
+        b=gCQDGeXN+DiUp4MoBhKRixLPzhS4ls1BsYO2hrmIN4d9P0A7E6fIvgcd+FZk0EAysm
+         Iqe/otwkxL6MM+iRyN1LIufiXQEI+pNSRb0KeERFhLq9uqTrWnAXupR24FIQSB9NBojU
+         Pelp5pAlEXtl/kYx3BixKISUKhRnUVzOira+UaOTKpBVH4GgEbKlujJDvc5x/2OvyXKb
+         YCvshkiQSn/qTKnajiRUPBQSKo7ltJ5IU0ozBThh0pbepMpHeKmW6gKZduswAYToOTcc
+         vvJQnXNU6fv0YeiCXiqNuLkavCHrOroPSWYydmcGWHMnWg64A0UnRZShOOFkju35N84G
+         /GCQ==
+X-Gm-Message-State: AOAM531Oj1qcaHy5oDCF5+oL0XVTpEqhcFl9NurVoDnpnJVPNrIoWzr7
+        grdG0SH3oIik7PYCSIwGHn1MT+S39PuxhF8WoOCnag==
+X-Google-Smtp-Source: ABdhPJwdmM8TCHa4eoVn8sKC+Sod0b/E/a9HSoTDWMUxnS9+yZz84ZdrIE85cb44FScPTht6hP0nLp3dojxP605Lpt4=
+X-Received: by 2002:a05:600c:3c9b:b0:38e:4c59:68b9 with SMTP id
+ bg27-20020a05600c3c9b00b0038e4c5968b9mr1754749wmb.105.1649143096491; Tue, 05
+ Apr 2022 00:18:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220404154913.482520-1-pbonzini@redhat.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220329072911.1692766-1-apatel@ventanamicro.com> <20220329072911.1692766-2-apatel@ventanamicro.com>
+In-Reply-To: <20220329072911.1692766-2-apatel@ventanamicro.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Tue, 5 Apr 2022 12:48:03 +0530
+Message-ID: <CAAhSdy2=q4u9UR7zYks5A-3k1q4srOqk14O3+a14sUS5Qa+Ppg@mail.gmail.com>
+Subject: Re: [PATCH 1/3] KVM: selftests: riscv: Set PTE A and D bits in
+ VS-stage page table
+To:     Anup Patel <apatel@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        KVM General <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 04, 2022 at 11:49:13AM -0400, Paolo Bonzini wrote:
-> commit 2a8859f373b0a86f0ece8ec8312607eacf12485d upstream.
-> 
-> FNAME(cmpxchg_gpte) is an inefficient mess.  It is at least decent if it
-> can go through get_user_pages_fast(), but if it cannot then it tries to
-> use memremap(); that is not just terribly slow, it is also wrong because
-> it assumes that the VM_PFNMAP VMA is contiguous.
-> 
-> The right way to do it would be to do the same thing as
-> hva_to_pfn_remapped() does since commit add6a0cd1c5b ("KVM: MMU: try to
-> fix up page faults before giving up", 2016-07-05), using follow_pte()
-> and fixup_user_fault() to determine the correct address to use for
-> memremap().  To do this, one could for example extract hva_to_pfn()
-> for use outside virt/kvm/kvm_main.c.  But really there is no reason to
-> do that either, because there is already a perfectly valid address to
-> do the cmpxchg() on, only it is a userspace address.  That means doing
-> user_access_begin()/user_access_end() and writing the code in assembly
-> to handle any exception correctly.  Worse, the guest PTE can be 8-byte
-> even on i686 so there is the extra complication of using cmpxchg8b to
-> account for.  But at least it is an efficient mess.
-> 
-> Reported-by: Qiuhao Li <qiuhao@sysec.org>
-> Reported-by: Gaoning Pan <pgn@zju.edu.cn>
-> Reported-by: Yongkang Jia <kangel@zju.edu.cn>
-> Reported-by: syzbot+6cde2282daa792c49ab8@syzkaller.appspotmail.com
-> Debugged-by: Tadeusz Struk <tadeusz.struk@linaro.org>
-> Tested-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Cc: stable@vger.kernel.org
-> Fixes: bd53cb35a3e9 ("X86/KVM: Handle PFNs outside of kernel reach when touching GPTEs")
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Tue, Mar 29, 2022 at 12:59 PM Anup Patel <apatel@ventanamicro.com> wrote:
+>
+> Supporting hardware updates of PTE A and D bits is optional for any
+> RISC-V implementation so current software strategy is to always set
+> these bits in both G-stage (hypervisor) and VS-stage (guest kernel).
+>
+> If PTE A and D bits are not set by software (hypervisor or guest)
+> then RISC-V implementations not supporting hardware updates of these
+> bits will cause traps even for perfectly valid PTEs.
+>
+> Based on above explanation, the VS-stage page table created by various
+> KVM selftest applications is not correct because PTE A and D bits are
+> not set. This patch fixes VS-stage page table programming of PTE A and
+> D bits for KVM selftests.
+>
+> Fixes: 3e06cdf10520 ("KVM: selftests: Add initial support for RISC-V
+> 64-bit")
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+
+I have queued this patch for RC fixes.
+
+Thanks,
+Anup
+
 > ---
->  arch/x86/kvm/paging_tmpl.h | 77 ++++++++++++++++++--------------------
->  1 file changed, 37 insertions(+), 40 deletions(-)
-
-Thanks for the fix, now queued up.
-
-greg k-h
+>  tools/testing/selftests/kvm/include/riscv/processor.h | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/tools/testing/selftests/kvm/include/riscv/processor.h
+> index dc284c6bdbc3..eca5c622efd2 100644
+> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
+> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
+> @@ -101,7 +101,9 @@ static inline void set_reg(struct kvm_vm *vm, uint32_t vcpuid, uint64_t id,
+>  #define PGTBL_PTE_WRITE_SHIFT                  2
+>  #define PGTBL_PTE_READ_MASK                    0x0000000000000002ULL
+>  #define PGTBL_PTE_READ_SHIFT                   1
+> -#define PGTBL_PTE_PERM_MASK                    (PGTBL_PTE_EXECUTE_MASK | \
+> +#define PGTBL_PTE_PERM_MASK                    (PGTBL_PTE_ACCESSED_MASK | \
+> +                                                PGTBL_PTE_DIRTY_MASK | \
+> +                                                PGTBL_PTE_EXECUTE_MASK | \
+>                                                  PGTBL_PTE_WRITE_MASK | \
+>                                                  PGTBL_PTE_READ_MASK)
+>  #define PGTBL_PTE_VALID_MASK                   0x0000000000000001ULL
+> --
+> 2.25.1
+>
