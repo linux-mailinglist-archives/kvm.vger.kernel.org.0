@@ -2,207 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A2E54F4995
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 02:28:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B446A4F499B
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 02:28:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442898AbiDEWT7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Apr 2022 18:19:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51196 "EHLO
+        id S1443132AbiDEWUJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Apr 2022 18:20:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1457635AbiDEQWx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Apr 2022 12:22:53 -0400
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2058.outbound.protection.outlook.com [40.107.96.58])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F2C86C90A;
-        Tue,  5 Apr 2022 09:20:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WjF6HRH6dR1+mHmBEq+V7t0DEgEtKGfjPaS7E8q4BGRjJVbtbUDqzovngEzJnsMXhXNUFx7kni0jxEySaigbMlE9LEASlwQ1okTDvNfqD2tsWP3aevS9qPVEaIxAtU4e2dsyZgKbMGgvIDC4vlg14yzdi3mFFDsp67gXkSotMUWfKY+BZqX9PmPiHGVf3vo5Yprw6seJ4czDFEVVnln6rNGukz+CWDtPwKqwU6t5Vri4V7iy9/E7l2hWbBepnjLbRrhnabaQui1D4RslbPoXaTzYzN8A3d/zhpNuBB5FnAYMR4f3uJ0UhL84XLH93vtrkA51fbgO5L/UTMBnmC1S2w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ynhe7eYng/QaKo7iCaJ2WaZ6r2eKliiiKTg3vJqk4gQ=;
- b=HPIcuCo43XaQebFEiNDLlfRA2xMJVm5uNYWlwgL0m4afw21BO6DJImmuKeBOedjLFR8XeEjQ4rDbzMY4/69CBiQ/wDmdXuCLjyLhXQNTzGBwai0nFw3zIYOPCBBPJECihBGcCmK4X/vxrrZbBbZlXyleUfRyiegfRUhRW01vNsvrqKF/obQbBUixX4MvjigSKFLkLaH6UC6dyKXfX9bj9SuMOR6phvfeFGIx8/1qDs/51OfC8T3lZHMeWmZhr0iVInjEFAmvesxGbTBc07l2YxbbtcmFl5H5GUjLr8FAXdoPYT3zTGSxG29KtGyac/BfQrudWs+oFpNc8Ud9T0ofiA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ynhe7eYng/QaKo7iCaJ2WaZ6r2eKliiiKTg3vJqk4gQ=;
- b=dZPfWal+xnw6NA35mh6puAgQL1Nuz3q6oeT5h8CFvYhZZbhv6CaYl65UPKm1GIz85VsB6tkyxaCfQFmcVDV27lNJkKN0PNwtkNq5kWudVdYRg4uU5AaJsiDSYdhDcyjOJJBYVqWyslmyjivVMurs72MuwR+tu8qYmzzhaE9ZaRg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by CY4PR12MB1430.namprd12.prod.outlook.com (2603:10b6:903:3e::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5123.31; Tue, 5 Apr
- 2022 16:20:51 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::449d:764d:4b2a:1c1d]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::449d:764d:4b2a:1c1d%4]) with mapi id 15.20.5123.031; Tue, 5 Apr 2022
- 16:20:51 +0000
-Message-ID: <f4369605-7c8d-1a89-bd0e-b82710d0772a@amd.com>
-Date:   Tue, 5 Apr 2022 11:20:46 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        with ESMTP id S1573045AbiDERsn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Apr 2022 13:48:43 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC8F9D1111
+        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 10:46:41 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id oj16-20020a17090b4d9000b001c7552b7546so2107078pjb.8
+        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 10:46:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=cMTfDoOyyWLXLeBs6Ru7ToFxgfyCJggJkw0OXJMsEV8=;
+        b=nMfcorGlUtXECOW5K6EgdcUsQAcrop5tc3p5tTcoHcmFQiM5G5UW0zRhxr26er4OAr
+         s5v6PQmrcXR71vJMJDEVfVEi6/BGDusf+GDkbu49tMPrbowlSFMgbHig8rD6DZQZmHS/
+         gTgnI4kYoSwt8c9IAifAu8FjUB03lSAsOwDTfv4kzBKiHU0OL9rQtUzoK2zqYD2KA11X
+         nFbw2gOlMW++pZybJgMCWKH5eIObGH2WsSttfM4SljNf6flXef8ppdyyjRZcy6syqETb
+         Qz+OoSYfRbFJuVp2fxQw2x7mz/1KezSRobYkumFfNg+k6O320lkst6vJRzOrzHfYxTYo
+         fojQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=cMTfDoOyyWLXLeBs6Ru7ToFxgfyCJggJkw0OXJMsEV8=;
+        b=fI8HEAdWNjUPejM8sPJYifL2Xpm536/oDLydv7vGkK4yX5KaqRlj/a8EyHigykkH1q
+         +bDRQyRm1N5XCEsMwfshsx5ZAtehvb6MTGbe3t0wTMKtNmizbXFbunHyVT/gK5fbdUJb
+         0MPeuEM94htvqlJ+uYZtWpyD2T6t9Yq82DAx1vXWmmyA06BMyRyZL3A5vsr9cs0uzwFT
+         x6LekbQ3QZpOiAJ7EPIzgSmVaQ77DhSCQVHZWPvwn+wjU0QuCA6W9rhtveXIvLEnadYb
+         oRZDn2j9+d9ArIKiqD/VfhpPYAOow7qdAHI5OZDJ4BZb3Rah/Nt2Eysh0HdnbNpA6Kgx
+         MjgQ==
+X-Gm-Message-State: AOAM533PvLH6VKIllmYIVC/Sgu3t7Z/wf9urXv9cuOdXzD3a8WHay6Tx
+        foEpCyk/UfngyJUNvTjh37AfLfW1n7IFzZMT/LvLw67dcsrXchzYP7SdplLEw4tEujOACz6NDqF
+        8na2kOBg799/D69wvpoKp6quc10xWbMWlu1m6WKARtXJyxk3BEhwCmvrpPQ==
+X-Google-Smtp-Source: ABdhPJyyh/3pCquJqcSiGkL89OJvx9V1mCcnl2ur+7wPBn4VOBCz5evBX3VHphcCk3xlVaHFHjDW5vPwJhk=
+X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:9f5c:353e:771c:7686])
+ (user=pgonda job=sendgmr) by 2002:a05:6a00:8c5:b0:4fe:134d:30d3 with SMTP id
+ s5-20020a056a0008c500b004fe134d30d3mr4801602pfu.3.1649180801244; Tue, 05 Apr
+ 2022 10:46:41 -0700 (PDT)
+Date:   Tue,  5 Apr 2022 10:46:37 -0700
+Message-Id: <20220405174637.2074319-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
+Subject: [PATCH v2] KVM: SEV: Mark nested locking of vcpu->mutex
+From:   Peter Gonda <pgonda@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Peter Gonda <pgonda@google.com>,
+        John Sperbeck <jsperbeck@google.com>,
         David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v12 22/46] x86/sev: Use SEV-SNP AP creation to start
- secondary CPUs
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-References: <20220307213356.2797205-1-brijesh.singh@amd.com>
- <20220307213356.2797205-23-brijesh.singh@amd.com>
- <YkuMTdckSgSB9M6f@google.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-In-Reply-To: <YkuMTdckSgSB9M6f@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BLAPR03CA0119.namprd03.prod.outlook.com
- (2603:10b6:208:32a::34) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 09c1fb79-b199-4e1a-5053-08da17204050
-X-MS-TrafficTypeDiagnostic: CY4PR12MB1430:EE_
-X-Microsoft-Antispam-PRVS: <CY4PR12MB143026E8610656E369B39F68E5E49@CY4PR12MB1430.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: CAAX8uVETB2lQP/KChQEbNPHR8boqlHQzZFoJMxq4ovmT7mFAjphKhp4tbIJw3nh1cIuYXKJilgr+7sqwNdw8YRfWJIT8g/S8C69t8ezHqrIIQOD86CkBbuLush3+GYIAwi4gmcMkD/N4qC7c2sev9Qhz+yM8ooTdOPPEK0QWwLFwaQyr3z7NlvYd8Xa56hhJ7FvAOV0IYEFEjZ+TsCbouvFfi19NkMnnj/PAJ9cUJV4/lAwUlphsCkUBBrXY0tZ+SpWtYESftoKJcdHjZYmsQe/oM/w6Kd6uigvzKTTUVtQOAeEKgl8FThpAfXu2NDa9shIMQd7Fj3Q697GgrQ73SUhFz+OuDtaF8Zsdf1TEV55JOoU/w8mGudK1PbLKWXpH/utzIcvXyg+OP6Zd+7EawWlrpJmKNI7TiklEyU8HDuHT9JXXfQ41dzpbC2YC1bK57IvIdUjc7ZjOtGlI8eGQ/5+4BvR703m2FL7oeYFKaerLzstaecjjNOyEg9kJAjL8qwMV0V/HTpdTd4azW9z0KoH8Eg0m6eaHG732tIe80WisxApi27mWptTqwkE+g7C8Bjj8vHLvNEdSmxC2J7CCtpNDy/mWvmVaGW55OWq/CbwvPqwgnb0BdsRWHpgCVRBViaIOKUHcwikL6PW9e6KzqImm0xilvvh0AAsL3laoxzYdD1cz6bPF6GcvIkPWInl8hThf055m4RvqvPqaaJe1PMb0armL22PbhvpMehZ6NDw20KbBF2tpqs+Z4/2Gb6+MZlXv5wvHApcbv80SvRLn02Ni2yTKfNgXanvWTEbJxo5ogetcfNbzlONZWlmhW3y0cAjGvDM0irNTN0MzNZ9FA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6486002)(508600001)(53546011)(6506007)(31686004)(86362001)(83380400001)(5660300002)(6916009)(966005)(8936002)(38100700002)(2616005)(54906003)(2906002)(36756003)(66946007)(45080400002)(7406005)(31696002)(66556008)(8676002)(316002)(26005)(66476007)(6512007)(6666004)(7416002)(4326008)(44832011)(186003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dXNMWFhjdXNNcS82V3l3QnBzTkkrMXUrMTlMYlRIY0k0ZU96OXFlcVhDSXdR?=
- =?utf-8?B?RFBCck55VGFSOWNPTzdBeHZZMTdFN3pvWGY5UHJxNWZFeGdzSkxXelBldG9W?=
- =?utf-8?B?cUp0S1Bla0owdGpGS3dTYkFqUEc2RUtuVmUvYWRneFJKbFBDSkpOd3Vkc2FT?=
- =?utf-8?B?amhwWnJXb2Jkd1pJSmlWR0RwcGR2cWswb3RjeDdVM0lEdm10bzBSSEdYeFN3?=
- =?utf-8?B?UnZmdEY5M2tnYkcrSFNyc082VUhXcEI5ZUZnbU51d3pTbkNJY1VORGIzZUc3?=
- =?utf-8?B?ZlJxbTdSYWpYUUtaNk1HUE9iL3ErR0o3ZHV4QWRtM1JBZENoWCt5cC9oaE1U?=
- =?utf-8?B?NGZSYWZUS25BWGpHWHFOZDVXVVlVV3BvNUZHem9GREl2YWJKaE1mbTF5Y0E4?=
- =?utf-8?B?S0pCV2NMV2hsWjJVWFJST24wTC8wTnZYUzYvY0NWVVg0YmNTWW8zNDBHckhK?=
- =?utf-8?B?RTY4OFZMSWdoQ3Vadk5uNlE5TE5rUjBMR1lzc3U5eDExNEJZOU9EL1RwU0FV?=
- =?utf-8?B?K3VuaEw2WW40VThFYTVVN0J5anNKQ0hLMmFSTXJiNCtxOE94MExBUWpHMGhx?=
- =?utf-8?B?N0dRS3pGRnlSU1hDL1FzMmdWQkZoSHdOSUlJVFJOZC9aRFp4bDlxNzRWZmlj?=
- =?utf-8?B?OHFhK3FqTGtqSkE2S0pOMDdvMEx0ZVB2aGpHSldnTmpzYWQ4WEt6Yy9uZzYv?=
- =?utf-8?B?Q1NPMld2MTNDalB0MEtuczVpZngraGppRzJFMitpVkVrekhhc1BDRjJvN0dG?=
- =?utf-8?B?WDNoY2pLQkQ1TnJUMVBiRURyazUvbFc3Q3lCQlhtOXhSa2JaYXVhVVA0QlY3?=
- =?utf-8?B?Y25QbHJTV1A4RmQyQkQzazNWc25TV01NQWJuOTdpZmtFR2FGOGhhaUd2cVRN?=
- =?utf-8?B?UEF2UmZTNytMVXZDaFdlWCt0eCtyWGhoYXJBRzdYOEdBREx5NmNhRG94alpZ?=
- =?utf-8?B?dzd0NytvVllaUjI1N29CdlZJTjdtdXUzb2JQclRpak00YVREaUY2TldwWWVa?=
- =?utf-8?B?MERTbFMxVzNjZ2pIRHFKR3czaWhnZ2JVZWNUQTdVajd2SHAyK0pjeXdOM0da?=
- =?utf-8?B?Mis1S3RRV0tFTFF5OXFCd2U5VjNDbGJOU0ZKQyt0TWM1L0ltdHpJdGQwOUtC?=
- =?utf-8?B?KzhIQmwxN3pScU1UQkovNzZRSGE4eHFtanVsbll4WWZWc2ZKbUJOU1BaWHd1?=
- =?utf-8?B?ZEh6aWFvSHR0M2tlUldpb2dEcUQ3d3IwVjFFZk1idlNwQVZYQ0svYW9JWkdS?=
- =?utf-8?B?aXpiZ1VuaW1MeHNUaEg4R0w0TFpKdnlYY2tBbUVKdzh3dWtUTmNQUXB1Y01P?=
- =?utf-8?B?Zkl4TE05dlJrZmlscDd5NEx0a0U5L0xnQUVjZDFRaDFaYVoyM1FIVlNwWDRi?=
- =?utf-8?B?dUVnbmxCWTJwZWQrZTVxdEdOOTRpckJlWjB0ZnhyZ3hCSHVLcVFucmlZMzVi?=
- =?utf-8?B?MmZuS3dsSkJtT0F6cWl3QzZjWmlMMXpQSHdWVlFZY3d6WUhtUHhkUStJVmZp?=
- =?utf-8?B?QXVKOWZ6eWI3MGFvWUxlWXh4NWg5Z3MzNGg3cTF5dmZxNzVXRDdhRURWL21B?=
- =?utf-8?B?S3VSZlB5MkorekFNd2RzbDVRbXI4NnlWZUt1OFAxNGsybEhiTkdYWTBUZDFW?=
- =?utf-8?B?YkhnQ0dmRk14eWVkS2pUZ05Gb1RoSm9hUkEwVVRrWnh3ZHhhRU9wNmkzS0Iw?=
- =?utf-8?B?VFlIbi9wS3VZbUJRQXA1SUR1NGFiS1hPVnNGbjJ6NTcybGl4VVpJcGZINnhl?=
- =?utf-8?B?eUZMdU0wb3F6anpNOHBoaERlVGljNHRLdzBheW5VTmQvRmxtL25lSmdzWC9M?=
- =?utf-8?B?eWRoVmNNUFdiZ3JmNksrNTRaYitvVWVjU2xvcTBXSUtVTGpYMDE5QUVJUmNW?=
- =?utf-8?B?WkNXQW9aNUpnWnR0UmdtUE1LQnFEeURYZWlOeUxEWmovWEdXbTZLeHU3NjI3?=
- =?utf-8?B?Y0RpOEI4OGw0dWt3N0RXc1Byai80bm1kRTRZTEQveGFCUEthZTF0OGlCL0JB?=
- =?utf-8?B?Vk9CTng5SDRuUU0xUTNUdzBkKzFXb3VCb0YrdFExZzVOcXZXcC95VHZtR0FF?=
- =?utf-8?B?cFRHMkVQbVBnUEZjMEU3RmgwQStaMnV5SXdxT3lmQUp0VXMrVVhEa2wxWnNn?=
- =?utf-8?B?SWljL29tSVduZmljUWhRcE0yakIvUHFBWW1YOHVBQXFCMkVTc0YyS2ZEMjY0?=
- =?utf-8?B?UG1QVWhXYWN3Q1JBWlVmbGc3OGg1WmdGMzM5NHh0N2I3MHVSVlI3WG80VjJt?=
- =?utf-8?B?aFdjSzdGcjZTNkFxMVNEMFdyWVlwT2d5d3BKeFRxVUh6K3ZrSzBDQkhoaEJK?=
- =?utf-8?B?QWhGUU1NUzJIZVduTDVUbEMrbFFnVjlzRjgwQ2VJY1RUZkVEWmNJZz09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 09c1fb79-b199-4e1a-5053-08da17204050
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Apr 2022 16:20:51.5962
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JK3puR3O15EGO5WEkML2+HHtM6TMvZ0SovL8tHMKMk009J4Ia2CheeD4h2bndRsvE5o7GzIUy5nfWUDx8DRo6Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1430
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,
-        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
+svm_vm_migrate_from() uses sev_lock_vcpus_for_migration() to lock all
+source and target vcpu->mutex. Mark the nested subclasses to avoid false
+positives from lockdep.
 
-On 4/4/22 19:24, Sean Christopherson wrote:
+Warning example:
+============================================
+WARNING: possible recursive locking detected
+5.17.0-dbg-DEV #15 Tainted: G           O
+--------------------------------------------
+sev_migrate_tes/18859 is trying to acquire lock:
+ffff8d672d484238 (&vcpu->mutex){+.+.}-{3:3}, at: sev_lock_vcpus_for_migration+0x7e/0x150
+but task is already holding lock:
+ffff8d67703f81f8 (&vcpu->mutex){+.+.}-{3:3}, at: sev_lock_vcpus_for_migration+0x7e/0x150
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+       CPU0
+       ----
+  lock(&vcpu->mutex);
+  lock(&vcpu->mutex);
+ *** DEADLOCK ***
+ May be due to missing lock nesting notation
+3 locks held by sev_migrate_tes/18859:
+ #0: ffff9302f91323b8 (&kvm->lock){+.+.}-{3:3}, at: sev_vm_move_enc_context_from+0x96/0x740
+ #1: ffff9302f906a3b8 (&kvm->lock/1){+.+.}-{3:3}, at: sev_vm_move_enc_context_from+0xae/0x740
+ #2: ffff8d67703f81f8 (&vcpu->mutex){+.+.}-{3:3}, at: sev_lock_vcpus_for_migration+0x7e/0x150
 
->> +static void snp_cleanup_vmsa(struct sev_es_save_area *vmsa)
->> +{
->> +	int err;
->> +
->> +	err = snp_set_vmsa(vmsa, false);
-> 
-> Uh, so what happens if a malicious guest does RMPADJUST to convert a VMSA page
-> back to a "normal" page while the host is trying to VMRUN that VMSA?  Does VMRUN
-> fault?
+Fixes: b56639318bb2b ("KVM: SEV: Add support for SEV intra host migration")
+Reported-by: John Sperbeck<jsperbeck@google.com>
+Suggested-by: David Rientjes <rientjes@google.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Peter Gonda <pgonda@google.com>
 
-When SEV-SNP is enabled, the VMRUN instruction performs an additional 
-security checks on various memory pages. In the case of VMSA page, 
-hardware enforce that page is marked as "VMSA" in the RMP table. If not, 
-  VMRUN will fail with VMEXIT_INVALID.
+---
 
-After the VMRUN is successful, the VMSA page is marked IN_USE by the 
-hardware, any attempt to modify the RMP entries will result in 
-FAIL_INUSE error. The IN_USE marking is automatically cleared by the 
-hardware after the #VMEXIT.
+Tested by running sev_migrate_tests with lockdep enabled. Before we see
+a warning from sev_lock_vcpus_for_migration(). After we get no warnings.
 
-Please see the APM vol2 section 15.36.12 for additional information.
+---
+ arch/x86/kvm/svm/sev.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-> 
-> Can Linux refuse to support this madness and instead require the ACPI MP wakeup
-> protocol being proposed/implemented for TDX?  That would allow KVM to have at
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 75fa6dd268f0..673e1ee2cfc9 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1591,14 +1591,21 @@ static void sev_unlock_two_vms(struct kvm *dst_kvm, struct kvm *src_kvm)
+ 	atomic_set_release(&src_sev->migration_in_progress, 0);
+ }
+ 
++#define SEV_MIGRATION_SOURCE 0
++#define SEV_MIGRATION_TARGET 1
+ 
+-static int sev_lock_vcpus_for_migration(struct kvm *kvm)
++/*
++ * To avoid lockdep warnings callers should pass @vm argument with either
++ * SEV_MIGRATION_SOURCE or SEV_MIGRATE_TARGET. This allows subclassing of all
++ * vCPU mutex locks.
++ */
++static int sev_lock_vcpus_for_migration(struct kvm *kvm, int vm)
+ {
+ 	struct kvm_vcpu *vcpu;
+ 	unsigned long i, j;
+ 
+ 	kvm_for_each_vcpu(i, vcpu, kvm) {
+-		if (mutex_lock_killable(&vcpu->mutex))
++		if (mutex_lock_killable_nested(&vcpu->mutex, i * 2 + vm))
+ 			goto out_unlock;
+ 	}
+ 
+@@ -1745,10 +1752,10 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+ 		charged = true;
+ 	}
+ 
+-	ret = sev_lock_vcpus_for_migration(kvm);
++	ret = sev_lock_vcpus_for_migration(kvm, SEV_MIGRATION_SOURCE);
+ 	if (ret)
+ 		goto out_dst_cgroup;
+-	ret = sev_lock_vcpus_for_migration(source_kvm);
++	ret = sev_lock_vcpus_for_migration(source_kvm, SEV_MIGRATION_TARGET);
+ 	if (ret)
+ 		goto out_dst_vcpu;
+ 
+-- 
+2.35.1.1094.g7c7d902a7c-goog
 
-My two cents
-
-In the current architecture, the HV track VMSAs by their SPA and guest 
-controls when they are runnable. It provides flexibility to the guest, 
-which can add and remove the VMSA. This flexibility may come in handy to 
-support the kexec and reboot use cases. The current approach does not 
-depend on ACPI; it will also come in handy to support microvm 
-(minimalist machine type without PCI nor ACPI support).
-
-
-> least a chance of refusing to support AP "creation", which IMO is a CVE or three
-> waiting to happen.  From a KVM perspective, I don't ever want to be running a
-> guest-defined VMSA.
-> 
-> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fall%2FYWnbfCet84Vup6q9%40google.com&amp;data=04%7C01%7Cbrijesh.singh%40amd.com%7Ce6a0199ed3344529241208da169ab52b%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637847150997306218%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000&amp;sdata=w1eo3vza4Txv6tcgB6aO1rCoYOygQvGwKZ1kajgCbpY%3D&amp;reserved=0
-> 
->> +	if (err)
->> +		pr_err("clear VMSA page failed (%u), leaking page\n", err);
->> +	else
->> +		free_page((unsigned long)vmsa);
-> 
