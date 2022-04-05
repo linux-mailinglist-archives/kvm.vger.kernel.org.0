@@ -2,87 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E1BED4F497E
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 02:27:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7075F4F499E
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 02:28:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1391347AbiDEWSK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Apr 2022 18:18:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42570 "EHLO
+        id S1443257AbiDEWUS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Apr 2022 18:20:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1573394AbiDETGP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Apr 2022 15:06:15 -0400
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD50E1706C
-        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 12:04:14 -0700 (PDT)
-Received: by mail-qt1-x834.google.com with SMTP id i4so364278qti.7
-        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 12:04:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=p4sIUWeO6+P4zWNNUhdcwFoqQbff1GSzTj3PyXvmiEQ=;
-        b=nmqu50EBRX36s361/cDtv8BTMjCMfqpX08sQhZFrt8sYSEBPwE1vgZ4nW0w4EdNOZv
-         o+tA8EKhpRSdQR3Dv6ZeNplzb/6/d4P/pYo8hMuSFtnnHbT18NbIqrDKWGWRuzj0sX33
-         NwkCKPzO9uzXxgwt6mzZTzUipt/2LtQXBV9/6/aCHm68I4zhTPhv8T6Xk7CqblW0d9at
-         77T1IBaxtpT6vZINZsj5yY7V5fK3TqnoQBl+RnTQQqZTftcLpRRB8gnwvPgzdCfnGiPk
-         34ATgiHVCSNNKC4vBPleRiNh9Mj27XotB+bI/48+eyL/b5gKJFVKWfht+KhNDWMMBTx/
-         hSzA==
+        with ESMTP id S1573494AbiDETMt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Apr 2022 15:12:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EEA29E8860
+        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 12:10:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649185848;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ufYYfNJ31ZxJiptHxZVI0cJDY245GxkfqBFvOLAxMek=;
+        b=Z9xUuWIFR1s5Ev4w2nyOD2v0z3fHci6g13TOV980JOAop8ZJh1B/KGPbUnOLPzwiod2D5n
+        zR9KVBTDx3Z1Fn096cuMlF3ritv9wL0sh6HY7KAWGny3m03LjZYEBUy5itgGqEsLKTFi79
+        JEkrQ5Axjt92XOV3XQSYNJdJKHT4Qkg=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-350-vwbWVzUZMT2A9qNBBElboA-1; Tue, 05 Apr 2022 15:10:47 -0400
+X-MC-Unique: vwbWVzUZMT2A9qNBBElboA-1
+Received: by mail-io1-f70.google.com with SMTP id g16-20020a05660203d000b005f7b3b0642eso117130iov.16
+        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 12:10:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=p4sIUWeO6+P4zWNNUhdcwFoqQbff1GSzTj3PyXvmiEQ=;
-        b=TtLozT5kNaU+ADBbY/9fAfoChCdR7t6o8s4Eo5V7VVxJO8Fzu5ixm7utcgGqLYiZ42
-         3WcYweKLXAdR00Ryl+Ik13vpf84ij5Et6r4Q2Z+NnYJf/0+NGipIfIAmLWduYATphlmt
-         RjdYh2TKMYpfVQeGDR2EEjhZ+Y3wPfEbBggy60t/aMwHa6RJrqVyyXWzRMXMAgLo96aO
-         Gs6jU1AtRl7Bh18I0/1dlmotNGsF4Q3RWFFlv2Xtl64A64fyTbHwNPSWAAxr/UmsoDXN
-         ADF4UL1c5ie6sZike1u5FUKzKLbB9auDno8CMXcEFymn0l8EzRua1VhWHxFj3eOeDLh3
-         iPzw==
-X-Gm-Message-State: AOAM5307hbY4m8atoFB7uyiU8TDDI/lxSY2R4vz5GRNI47OMX20VyMqV
-        PwbqQDXfplC9xzEsEGxJFdji1g==
-X-Google-Smtp-Source: ABdhPJw89QndTutZv11VxczePEqDQB0+l7F3uU5v+rVSKfMzarjpMx65Se4MSU9B2AhnbihAOWRqBA==
-X-Received: by 2002:a05:620a:2452:b0:699:9df2:665d with SMTP id h18-20020a05620a245200b006999df2665dmr3178998qkn.668.1649185453843;
-        Tue, 05 Apr 2022 12:04:13 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id p16-20020a05620a22b000b0067b7b158985sm8057701qkh.128.2022.04.05.12.04.12
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=ufYYfNJ31ZxJiptHxZVI0cJDY245GxkfqBFvOLAxMek=;
+        b=Py3vxmd5yL5gu4Fj5ZYh6nf8MWvGNG5sybT9A/1/riJVaaUgJCj0kYmGd+glwdEPYI
+         OyNqD15YGs8t6jYswLItZB7ey4YiqnEnv3YVZk+gu6zb0oxbLCG3tprCRCcEUKP3ecIJ
+         uiOk9mQb3pA17u20lAhb/bmUsDDrbhvIdHHr+6SrLivNxGf8+RuuQdp+cmA78r9wOMZ2
+         wRBBK4TJ5F+BpsvK0bZj6Rm1ek4sq9vJR1oppXxzoLKPTssOwvwv1Rc9cHFSBHQ7rG+a
+         mY6t+Ig2uvMXVDGQWbNC8nZ0mjc1d114OpQBODkKbjhU+qrGNqzbMrsrFIrRFns0v7MI
+         MJtA==
+X-Gm-Message-State: AOAM530Xfo8uIW6ig+pTBTdZDwxAWygqJ/6a3Y7kaOFIT2rlKs4lWu5n
+        JRnak6D/2umBj8n3E8RR2k1rIAmDhDcS6U5LHM3J3BNxs0Z/txx1u21m5XtHlwUAleafJoNW0Hc
+        JxksaeoRGaEJn
+X-Received: by 2002:a92:cdad:0:b0:2c6:7b76:a086 with SMTP id g13-20020a92cdad000000b002c67b76a086mr2568133ild.5.1649185846542;
+        Tue, 05 Apr 2022 12:10:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxocs2ZVaXF5YVJwjGBcLRqnK5UBIr3mQlWSQgNmkFdgGBC2rjlpWZLrLl9AI2wrgBUaUJw1w==
+X-Received: by 2002:a92:cdad:0:b0:2c6:7b76:a086 with SMTP id g13-20020a92cdad000000b002c67b76a086mr2568112ild.5.1649185846282;
+        Tue, 05 Apr 2022 12:10:46 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id x2-20020a056602160200b006463c1977f9sm9314961iow.22.2022.04.05.12.10.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Apr 2022 12:04:13 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1nboTL-00DBjA-Ix; Tue, 05 Apr 2022 16:04:11 -0300
-Date:   Tue, 5 Apr 2022 16:04:11 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     alex.williamson@redhat.com, iommu@lists.linux-foundation.org,
-        cohuck@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH] vfio: Stop using iommu_present()
-Message-ID: <20220405190411.GT64706@ziepe.ca>
-References: <537103bbd7246574f37f2c88704d7824a3a889f2.1649160714.git.robin.murphy@arm.com>
+        Tue, 05 Apr 2022 12:10:45 -0700 (PDT)
+Date:   Tue, 5 Apr 2022 13:10:44 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Christian Benvenuti <benve@cisco.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        iommu@lists.linux-foundation.org, Jason Wang <jasowang@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nelson Escobar <neescoba@cisco.com>, netdev@vger.kernel.org,
+        Rob Clark <robdclark@gmail.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        virtualization@lists.linux-foundation.org,
+        Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+Subject: Re: [PATCH 2/5] vfio: Require that devices support DMA cache
+ coherence
+Message-ID: <20220405131044.23910b77.alex.williamson@redhat.com>
+In-Reply-To: <2-v1-ef02c60ddb76+12ca2-intel_no_snoop_jgg@nvidia.com>
+References: <0-v1-ef02c60ddb76+12ca2-intel_no_snoop_jgg@nvidia.com>
+        <2-v1-ef02c60ddb76+12ca2-intel_no_snoop_jgg@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <537103bbd7246574f37f2c88704d7824a3a889f2.1649160714.git.robin.murphy@arm.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 05, 2022 at 01:11:54PM +0100, Robin Murphy wrote:
-> IOMMU groups have been mandatory for some time now, so a device without
-> one is necessarily a device without any usable IOMMU, therefore the
-> iommu_present() check is redundant (or at best unhelpful).
+On Tue,  5 Apr 2022 13:16:01 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> dev_is_dma_coherent() is the control to determine if IOMMU_CACHE can be
+> supported.
 > 
-> Signed-off-by: Robin Murphy <robin.murphy@arm.com>
+> IOMMU_CACHE means that normal DMAs do not require any additional coherency
+> mechanism and is the basic uAPI that VFIO exposes to userspace. For
+> instance VFIO applications like DPDK will not work if additional coherency
+> operations are required.
+> 
+> Therefore check dev_is_dma_coherent() before allowing a device to join a
+> domain. This will block device/platform/iommu combinations from using VFIO
+> that do not support cache coherent DMA.
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 > ---
->  drivers/vfio/vfio.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  drivers/vfio/vfio.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index a4555014bd1e72..2a3aa3e742d943 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -32,6 +32,7 @@
+>  #include <linux/vfio.h>
+>  #include <linux/wait.h>
+>  #include <linux/sched/signal.h>
+> +#include <linux/dma-map-ops.h>
+>  #include "vfio.h"
+>  
+>  #define DRIVER_VERSION	"0.3"
+> @@ -1348,6 +1349,11 @@ static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
+>  	if (IS_ERR(device))
+>  		return PTR_ERR(device);
+>  
+> +	if (group->type == VFIO_IOMMU && !dev_is_dma_coherent(device->dev)) {
+> +		ret = -ENODEV;
+> +		goto err_device_put;
+> +	}
+> +
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Failing at the point where the user is trying to gain access to the
+device seems a little late in the process and opaque, wouldn't we
+rather have vfio bus drivers fail to probe such devices?  I'd expect
+this to occur in the vfio_register_group_dev() path.  Thanks,
 
-Jason
+Alex
+
+>  	if (!try_module_get(device->dev->driver->owner)) {
+>  		ret = -ENODEV;
+>  		goto err_device_put;
+
