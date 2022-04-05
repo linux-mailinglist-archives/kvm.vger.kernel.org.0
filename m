@@ -2,174 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CA9F4F496B
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 02:26:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DE674F49AF
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 02:29:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357155AbiDEWPm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Apr 2022 18:15:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48552 "EHLO
+        id S1443979AbiDEWUv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Apr 2022 18:20:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1573245AbiDEScj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Apr 2022 14:32:39 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDE2B13F6F
-        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 11:30:40 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id n6-20020a17090a670600b001caa71a9c4aso309366pjj.1
-        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 11:30:40 -0700 (PDT)
+        with ESMTP id S1573262AbiDEShI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Apr 2022 14:37:08 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE63817049
+        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 11:35:09 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id x68-20020a623147000000b004fd8d1ed04cso101386pfx.23
+        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 11:35:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=G8+4mXlfXEhZHOhFIRvGTNgBOyulQouXw+I2k4OPfSs=;
-        b=JEAiwwWf8T9LZvKvUJKSgjehqTRQAgWTmIg0Kl3BSYJYTC+v/3bm2x1/9Hy8KfSmg+
-         cHSPWpCpQx/B9uyWSDx7KDa583awqWBLkdvoEKwQ/QBUVRp4lZ6Cj73ZO0l8R1jsuMTu
-         f4CTIP1KefeADG3WAL+m7kzbPsENWR2ewqxk3Vv6zcy974PyQLpH4p1GEvsWlPaOBnDD
-         BG/d5Cparj8Y2vpN7tIW/k4gGVthNC5Ac8769ebux1ZwYDdSobMpJ6R2kheemPJpQheC
-         Hjen7QcB7kjlOMvcpc1sK+TrMXslHzsMWklqEGe8pGwPZ2paBwziGZrdbb+U0gJgoIyn
-         aHEQ==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=K74uTYo0p50+68Eav5hPTlnLwyyYs0SvA0+aQKwvrcM=;
+        b=KQEqtHlUIrCMPDEZNKiPS9MvgfELfDBKde+wsTIq1ryHFf4ypzTaT5ALjkqm0JVA/K
+         97yK54GjAMf/hbNvHEfcLoErQsv6rPoLKHy2OA9GpDLManJ08OL6cBliH1pE8PSbtm7x
+         Egplaa+kzgODwKtSCsT31nZ0UmtGrh8hUA9msDIyH4k5N+aHpal+4rr8KrD7SYUpXE3m
+         nBRZDzeYOKQosGLkqviomA/pOiSPf+ru1BtqjlgFBULpSQyd2phEdgIk9HV/Y5NxCLe8
+         iqooldC/WoJSZZ1Savcf5GCUvvf+FBFSipfwHPk+DR5bRvXG/cGwBk20mzlgOlgGncf3
+         D7Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=G8+4mXlfXEhZHOhFIRvGTNgBOyulQouXw+I2k4OPfSs=;
-        b=LiGQEEnaU9YRQNGYu7zUuXYjeeikUTkEt9a0g1NsgYpXXg/DpusyH5qAK+t+2E4fH7
-         ftE9elTWTghWiHEuReuvutezdR1kvaVkVEShn8iuJesdd31Vuyp/3UfwYZ1b4TsHYdGB
-         B6S7xk84SsduyMIe17Bm9m1b8TFrXL/VG8Vcf1R1nMR2jJ7wDpYX6cM4OZ5KWGC6dezS
-         Crkw92ZEPBRzsP7qUD3HEyl54J0QvCQpOB6bYCILAI7QHwvme7Xtb1eLZgPsda/ony0L
-         tLF9NWA1K4qrMp6qnbxyhWv6NTKqRzxZNDdr9rmXHxJpm51rvscxUg0INEoK3dKsnd4h
-         dVhw==
-X-Gm-Message-State: AOAM530m8NCCCI0QU0JZQGj52/Sr4pfHfjnGJ3PU5nMpMrPHYFuBYpxD
-        Vak9p+1PQ8gtSaJZjHnZXTR3ow==
-X-Google-Smtp-Source: ABdhPJyua072a4AGX8ZFGYAQtmIMqiU1fY+N03i9KlJ21rU1Sdp03j8ltrsaSuySC/JcuYQKVUW/ZQ==
-X-Received: by 2002:a17:902:8217:b0:156:9c4f:90eb with SMTP id x23-20020a170902821700b001569c4f90ebmr4788820pln.121.1649183440130;
-        Tue, 05 Apr 2022 11:30:40 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id i7-20020a628707000000b004fa6eb33b02sm16131023pfe.49.2022.04.05.11.30.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Apr 2022 11:30:39 -0700 (PDT)
-Date:   Tue, 5 Apr 2022 18:30:35 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Quentin Perret <qperret@google.com>,
-        Steven Price <steven.price@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=K74uTYo0p50+68Eav5hPTlnLwyyYs0SvA0+aQKwvrcM=;
+        b=uGnGaFMcM9gTQr9FlTz7KmXCzLQ3MU52lyvwkOG/ZQpNEZCUfAyOD9zRKG8LtD+j49
+         iGHmSsi/CL3tnCvgphbL6QczpzfZwANghaGdVUHcfOC0jkxyRse1J1kPljU9EoPlqEM7
+         abXkd9fZFn3HiRnmNU3KhisIbDOc9gu3hZZe4EfAZM4wfzUm3M9u535KZShe3SQWsYxc
+         bbsOHwWBhRU3ZpD1PNYzA0VLp8TtkO8xoN1ATjTq85tDSHHBg+Ss4wwpdGCHRDU+Jgs5
+         dWwHHoxNKVpfr7V2E4A8V3YbOZK5nCWaX9oO1Q2d3Q3zw/WG9kC5XqTgSVNl15EM+qXY
+         Tl9Q==
+X-Gm-Message-State: AOAM531OhEkV3DunYVFiRX4suWAPfG+E//WOjXQrpqldZtLcGTANuNTU
+        AAADP91dY87lUL2FbYKu7BZkIkfMh+RDmcxoHZV4Qzgw54afpBB4E7hLuQaRcfX483LM398LMLq
+        G2DSXRvnblWcBkyDCNeCc+8VjBRco74P0Z6YNVa+vuRbqys30X3PPrK+1kQ==
+X-Google-Smtp-Source: ABdhPJwWLVGLr/vHL4lq1ATs4OZuBgElqxvfAYIpOrbOfXGyZoR0O+W+IABkWZEAFyqxM0aqFqnkdt8jf2k=
+X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:9f5c:353e:771c:7686])
+ (user=pgonda job=sendgmr) by 2002:a17:902:e545:b0:154:4d5b:2006 with SMTP id
+ n5-20020a170902e54500b001544d5b2006mr4889343plf.94.1649183709169; Tue, 05 Apr
+ 2022 11:35:09 -0700 (PDT)
+Date:   Tue,  5 Apr 2022 11:35:06 -0700
+Message-Id: <20220405183506.2138403-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
+Subject: [PATCH V4] KVM, SEV: Add KVM_EXIT_SYSTEM_EVENT metadata for SEV-ES
+From:   Peter Gonda <pgonda@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Peter Gonda <pgonda@google.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <YkyKywkQYbr9U0CA@google.com>
-References: <YkQzfjgTQaDd2E2T@google.com>
- <YkSaUQX89ZEojsQb@google.com>
- <80aad2f9-9612-4e87-a27a-755d3fa97c92@www.fastmail.com>
- <YkcTTY4YjQs5BRhE@google.com>
- <83fd55f8-cd42-4588-9bf6-199cbce70f33@www.fastmail.com>
- <YksIQYdG41v3KWkr@google.com>
- <Ykslo2eo2eRXrpFR@google.com>
- <eefc3c74-acca-419c-8947-726ce2458446@www.fastmail.com>
- <Ykwbqv90C7+8K+Ao@google.com>
- <54acbba9-f4fd-48c1-9028-d596d9f63069@www.fastmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <54acbba9-f4fd-48c1-9028-d596d9f63069@www.fastmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        Borislav Petkov <bp@alien8.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Joerg Roedel <jroedel@suse.de>, Marc Orr <marcorr@google.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 05, 2022, Andy Lutomirski wrote:
-> On Tue, Apr 5, 2022, at 3:36 AM, Quentin Perret wrote:
-> > On Monday 04 Apr 2022 at 15:04:17 (-0700), Andy Lutomirski wrote:
-> >> The best I can come up with is a special type of shared page that is not
-> >> GUP-able and maybe not even mmappable, having a clear option for
-> >> transitions to fail, and generally preventing the nasty cases from
-> >> happening in the first place.
-> >
-> > Right, that sounds reasonable to me.
-> 
-> At least as a v1, this is probably more straightforward than allowing mmap().
-> Also, there's much to be said for a simpler, limited API, to be expanded if
-> genuinely needed, as opposed to starting out with a very featureful API.
+SEV-ES guests can request termination using the GHCB's MSR protocol. See
+AMD's GHCB spec section '4.1.13 Termination Request'. Currently when a
+guest does this the userspace VMM sees an KVM_EXIT_UNKNOWN (-EVINAL)
+return code from KVM_RUN. By adding a KVM_EXIT_SYSTEM_EVENT to kvm_run
+struct the userspace VMM can clearly see the guest has requested a SEV-ES
+termination including the termination reason code set and reason code.
 
-Regarding "genuinely needed", IMO the same applies to supporting this at all.
-Without numbers from something at least approximating a real use case, we're just
-speculating on which will be the most performant approach.
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: Joerg Roedel <jroedel@suse.de>
+Cc: Marc Orr <marcorr@google.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-> >> Maybe there could be a special mode for the private memory fds in which
-> >> specific pages are marked as "managed by this fd but actually shared".
-> >> pread() and pwrite() would work on those pages, but not mmap().  (Or maybe
-> >> mmap() but the resulting mappings would not permit GUP.)  And
-> >> transitioning them would be a special operation on the fd that is specific
-> >> to pKVM and wouldn't work on TDX or SEV.
-> >
-> > Aha, didn't think of pread()/pwrite(). Very interesting.
-> 
-> There are plenty of use cases for which pread()/pwrite()/splice() will be as
-> fast or even much faster than mmap()+memcpy().
+---
 
-...
+V4
+ * Switch to using KVM_SYSTEM_EVENT exit reason.
 
-> resume guest
-> *** host -> hypervisor -> guest ***
-> Guest unshares the page.
-> *** guest -> hypervisor ***
-> Hypervisor removes PTE.  TLBI.
-> *** hypervisor -> guest ***
-> 
-> Obviously considerable cleverness is needed to make a virt IOMMU like this
-> work well, but still.
-> 
-> Anyway, my suggestion is that the fd backing proposal get slightly modified
-> to get it ready for multiple subtypes of backing object, which should be a
-> pretty minimal change.  Then, if someone actually needs any of this
-> cleverness, it can be added later.  In the mean time, the
-> pread()/pwrite()/splice() scheme is pretty good.
+V3
+ * Add Documentation/ update.
+ * Updated other KVM_EXIT_SHUTDOWN exits to clear ndata and set reason
+   to KVM_SHUTDOWN_REQ.
 
-Tangentially related to getting private-fd ready for multiple things, what about
-implementing the pread()/pwrite()/splice() scheme in pKVM itself?  I.e. read() on
-the VM fd, with the offset corresponding to gfn in some way.
+V2
+ * Add KVM_CAP_EXIT_SHUTDOWN_REASON check for KVM_CHECK_EXTENSION.
 
-Ditto for mmap() on the VM fd, though that would require additional changes outside
-of pKVM.
+Tested by making an SEV-ES guest call sev_es_terminate() with hardcoded
+reason code set and reason code and then observing the codes from the
+userspace VMM in the kvm_run.system_event fields.
 
-That would allow pKVM to support in-place conversions without the private-fd having
-to differentiate between the type of protected VM, and without having to provide
-new APIs from the private-fd.  TDX, SNP, etc... Just Work by not supporting the pKVM
-APIs.
+---
+ arch/x86/kvm/svm/sev.c   | 7 +++++--
+ include/uapi/linux/kvm.h | 1 +
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-And assuming we get multiple consumers down the road, pKVM will need to be able to
-communicate the "true" state of a page to other consumers, because in addition to
-being a consumer, pKVM is also an owner/enforcer analogous to the TDX Module and
-the SEV PSP.
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 75fa6dd268f0..039b241a9fb5 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2735,8 +2735,11 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ 		pr_info("SEV-ES guest requested termination: %#llx:%#llx\n",
+ 			reason_set, reason_code);
+ 
+-		ret = -EINVAL;
+-		break;
++		vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
++		vcpu->run->system_event.type = KVM_SYSTEM_EVENT_SEV_TERM;
++		vcpu->run->system_event.flags = control->ghcb_gpa;
++
++		return 0;
+ 	}
+ 	default:
+ 		/* Error, keep GHCB MSR value as-is */
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 8616af85dc5d..d9d24db12930 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -444,6 +444,7 @@ struct kvm_run {
+ #define KVM_SYSTEM_EVENT_SHUTDOWN       1
+ #define KVM_SYSTEM_EVENT_RESET          2
+ #define KVM_SYSTEM_EVENT_CRASH          3
++#define KVM_SYSTEM_EVENT_SEV_TERM       4
+ 			__u32 type;
+ 			__u64 flags;
+ 		} system_event;
+-- 
+2.35.1.1094.g7c7d902a7c-goog
+
