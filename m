@@ -2,191 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F92B4F620A
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 16:49:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51C5C4F623D
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 16:58:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234984AbiDFOrP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 10:47:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39362 "EHLO
+        id S235237AbiDFOw0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 10:52:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235061AbiDFOrB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 10:47:01 -0400
-Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DD3B4DF6C5
-        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 04:14:48 -0700 (PDT)
-Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-2eb57fd3f56so22050297b3.8
-        for <kvm@vger.kernel.org>; Wed, 06 Apr 2022 04:14:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=MkKxjYAV/v0VMd11SMXqG8EhXPeJQ34GzLrs6aLHBhk=;
-        b=BnkL/xviW3/SATQQBN0J4jLUdrTQRMmZsVp7lEWCOmkmWwekK4I3vVJpW5wY+oaW6o
-         wMWw7poztVXO8dmLd+4dn47QCBX/MLXDvtQ0FtncjF48Ky/apTe5LetGClF9I8xv8hLd
-         39QIq1nCVrCyq+b89tHhY+wy8NDABlDcruy0U3VUH+wy5CC/74PQNoqlWZUGpPI4ktd2
-         2syhOC3nTsaeBG0iofZAEy+fKLdo2YsKyo/Wo++rIt2NrTU9fzPbBH0Ng8KlfS5PTmtk
-         EZZmtp49FjP3cappOUQR7sHOielNZL7XjaQF+GBy228W5SABlrjalbp+fGs0YWTIyb9y
-         NQoQ==
+        with ESMTP id S235071AbiDFOwE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 10:52:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AD2A34E1D1A
+        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 04:27:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649244452;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=czYEG2s79Hy9lOqd5LLDvlb+7Wd1zq0rVYS2W8uDgNg=;
+        b=ChZBS4TJYROx3tC2sSHgWqZDnA/22Tk5WS6NDRJ9+pEft9s6mQ8BK53B8heRvOz7gumppA
+        U3cdL72ueh0LXR6v+nHFDYzOVe+I52c/2McVZGCkcJ+8DOvJaYhNbbUEudBcNlRJ1t4V9p
+        wb3MG08/2x8PQQ3gJKzJzOPgebMRh+0=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-412-OQkGSQoiNCO7jrwhzq1IYQ-1; Wed, 06 Apr 2022 07:27:31 -0400
+X-MC-Unique: OQkGSQoiNCO7jrwhzq1IYQ-1
+Received: by mail-ed1-f72.google.com with SMTP id w8-20020a50d788000000b00418e6810364so1043604edi.13
+        for <kvm@vger.kernel.org>; Wed, 06 Apr 2022 04:27:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=MkKxjYAV/v0VMd11SMXqG8EhXPeJQ34GzLrs6aLHBhk=;
-        b=tX5XZVuy8yoxCPwJxtIO0STFyYVLD/U8mRVpCXTblJI3U1mk8hDgDgZNaLdv5lLK1h
-         PBe+lokRV8piKfsbn9nFjt7PBSCP4Vt1TiQZyQvAF9FJ4TMvC3Zf+98GNkH8D/hvTEdR
-         ajIUoVe14Ad5j/FdvJz/YdyKxwvAuisfbdXbX7YvyUBkNQ0M/e6xEtk1G6qqqWU61xuy
-         nVsbg4Fz62Ol8gYL08fy8J6N27HAfOybcy9QUXq3bgtHkH67wActFU/Bt6HIyndb437J
-         2wsLqFOAzPudqv4Apl7lozbD3f3aWhOBSqzm74FojAQ90cwXeZDedRNhDDV46O524r4o
-         SDvg==
-X-Gm-Message-State: AOAM532t+vO73juUltpK95HZt2X/Ckuu8mVW49hbsVZFUiPlawYjHa6q
-        PiGfho6bQktV3YnpUJckkIgr6mLJyceK536TgzZR3Q==
-X-Google-Smtp-Source: ABdhPJytWaKSjrcKoa2mbzwJv7RhwFSgw11lPqUjgtEaNT3OmaJMCRA7mDMdyjLwii6p/gHggvStzLZXxV0l/YkXcmI=
-X-Received: by 2002:a81:1592:0:b0:2eb:5472:c681 with SMTP id
- 140-20020a811592000000b002eb5472c681mr6491648ywv.10.1649243687745; Wed, 06
- Apr 2022 04:14:47 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=czYEG2s79Hy9lOqd5LLDvlb+7Wd1zq0rVYS2W8uDgNg=;
+        b=Fjhgs8nbKT6cI0mwyGeX+UWwKMiy5s7O+/4dLv0b7XyayDkH4R4u1j2UBxIELdDv3c
+         NBs3bgbOzfwxeQcvucx2NQTogGihUdBf1Htv+aa9+NGg/mFNXqy6Q5ZA/DBSqMbXeqfN
+         UconwPtumxkPd4Zgh/OzbDTo1kbmN7+i5rW1uJSns4qZWf87y2iueTVpzqcmLoJPmKBy
+         RDjfDI7LCxKJcTnCzAhX2p3ZnbBoWnOp2XVaq6ozE1+3B/NWISFY3jgBZr14U+7bIRth
+         domEhUYUlfmPTzUQ0Tw2V1uvJE3OLtD1k4OwDwzN8n3mfqrd3FML64Etk6o8AkBUIK2b
+         Rr/w==
+X-Gm-Message-State: AOAM530mAynx83dGQqJCqaxDWY5kj85U4Bh0yH9VvmYJ+aQMIz5QqiB1
+        a/V0EPKhrmAX+KaJ+FrFZFpWuSIYSEd8rtV3CM31ineXPOxQs0CmDq+MJTjSIzA/So9CjvPUpvw
+        QrN8ZvRbbJp0H
+X-Received: by 2002:a17:907:9812:b0:6da:aaaf:7713 with SMTP id ji18-20020a170907981200b006daaaaf7713mr7711217ejc.163.1649244450529;
+        Wed, 06 Apr 2022 04:27:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy8HAC0KpxmXUr9bLApoRMWeOYc6NTMP+nuUIR4pCaODB25UIn0SgREcn3NFeWM8Zc4/BXArg==
+X-Received: by 2002:a17:907:9812:b0:6da:aaaf:7713 with SMTP id ji18-20020a170907981200b006daaaaf7713mr7711198ejc.163.1649244450308;
+        Wed, 06 Apr 2022 04:27:30 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id s4-20020a170906a18400b006db0a78bde8sm6521509ejy.87.2022.04.06.04.27.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Apr 2022 04:27:29 -0700 (PDT)
+Message-ID: <9cfd5d2f-55e4-f8fc-701b-5917941e0269@redhat.com>
+Date:   Wed, 6 Apr 2022 13:27:27 +0200
 MIME-Version: 1.0
-References: <20220323155743.1585078-1-marcandre.lureau@redhat.com>
- <20220323155743.1585078-33-marcandre.lureau@redhat.com> <CAARzgwzXXKqhvP9CnST3iD_obfqCWn8Z+8WNcs0u-O_UGoM1-w@mail.gmail.com>
- <87o81epk1s.fsf@pond.sub.org>
-In-Reply-To: <87o81epk1s.fsf@pond.sub.org>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Wed, 6 Apr 2022 12:14:36 +0100
-Message-ID: <CAFEAcA9kYweS2zMHjWDuV_y2AxKbgJ5UYNHLK3sASCLVD=yEqg@mail.gmail.com>
-Subject: Re: [PATCH 32/32] Remove qemu-common.h include from most units
-To:     Markus Armbruster <armbru@redhat.com>
-Cc:     Ani Sinha <ani@anisinha.ca>, marcandre.lureau@redhat.com,
-        Aarushi Mehta <mehta.aaru20@gmail.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        Alexander Bulekov <alxndr@bu.edu>,
-        Alexander Graf <agraf@csgraf.de>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Artyom Tarasenko <atar4qemu@gmail.com>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        BALATON Zoltan <balaton@eik.bme.hu>,
-        Bandan Das <bsd@redhat.com>,
-        Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-        Bin Meng <bin.meng@windriver.com>,
-        Cameron Esfahani <dirty@apple.com>,
-        Chris Wulff <crwulff@gmail.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Christian Schoenebeck <qemu_oss@crudebyte.com>,
-        Colin Xu <colin.xu@intel.com>, Corey Minyard <minyard@acm.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
-        Darren Kenny <darren.kenny@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        David Hildenbrand <david@redhat.com>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Fabien Chouteau <chouteau@adacore.com>,
-        Fam Zheng <fam@euphon.net>, Gerd Hoffmann <kraxel@redhat.com>,
-        Greg Kurz <groug@kaod.org>, Halil Pasic <pasic@linux.ibm.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Havard Skinnemoen <hskinnemoen@google.com>,
-        Helge Deller <deller@gmx.de>,
-        =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Jagannathan Raman <jag.raman@oracle.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Joel Stanley <joel@jms.id.au>,
-        John G Johnson <john.g.johnson@oracle.com>,
-        John Snow <jsnow@redhat.com>,
-        Julia Suvorova <jusual@redhat.com>,
-        KONRAD Frederic <frederic.konrad@adacore.com>,
-        Kamil Rytarowski <kamil@netbsd.org>,
-        Kevin Wolf <kwolf@redhat.com>, Kyle Evans <kevans@freebsd.org>,
-        Laurent Vivier <Laurent@vivier.eu>,
-        Li Zhijian <lizhijian@fujitsu.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Marek Vasut <marex@denx.de>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Michael Rolnik <mrolnik@gmail.com>,
-        Michael Roth <michael.roth@amd.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
-        Qiuhao Li <Qiuhao.Li@outlook.com>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        Stefan Berger <stefanb@linux.vnet.ibm.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefan Weil <sw@weilnetz.de>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Subbaraya Sundeep <sundeep.lkml@gmail.com>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Taylor Simpson <tsimpson@quicinc.com>,
-        Thomas Huth <huth@tuxfamily.org>,
-        Tyrone Ting <kfting@nuvoton.com>, Warner Losh <imp@bsdimp.com>,
-        Wenchao Wang <wenchao.wang@intel.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Zhang Chen <chen.zhang@intel.com>,
-        "open list:ARM PrimeCell and..." <qemu-arm@nongnu.org>,
-        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>,
-        "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
-        "open list:S390-ccw boot" <qemu-s390x@nongnu.org>,
-        "open list:X86 HAXM CPUs" <haxm-team@intel.com>,
-        "open list:raw" <qemu-block@nongnu.org>,
-        "open list:sPAPR (pseries)" <qemu-ppc@nongnu.org>,
-        qemu-devel@nongnu.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [RFC PATCH v5 027/104] KVM: TDX: initialize VM with TDX specific
+ parameters
+Content-Language: en-US
+To:     Xiaoyao Li <xiaoyao.li@intel.com>, Kai Huang <kai.huang@intel.com>,
+        isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Jim Mattson <jmattson@google.com>,
+        erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <c3b37cf5c83f92be0e153075d81a80729bf1031e.1646422845.git.isaku.yamahata@intel.com>
+ <509fb6fb5c581e6bf14149dff17d7426a6b061f2.camel@intel.com>
+ <6e370d39-fcb6-c158-e5fb-690cd3802150@redhat.com>
+ <36df723c-4794-69a8-8d12-ea371a7865df@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <36df723c-4794-69a8-8d12-ea371a7865df@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 6 Apr 2022 at 11:45, Markus Armbruster <armbru@redhat.com> wrote:
->
-> First of all: thank you so much for completing the "empty out
-> qemu-common.h" job!
->
-> This is what's left:
->
->     #ifndef QEMU_COMMON_H
->     #define QEMU_COMMON_H
->
->     /* Copyright string for -version arguments, About dialogs, etc */
->     #define QEMU_COPYRIGHT "Copyright (c) 2003-2022 " \
->         "Fabrice Bellard and the QEMU Project developers"
->
->     /* Bug reporting information for --help arguments, About dialogs, etc */
->     #define QEMU_HELP_BOTTOM \
->         "See <https://qemu.org/contribute/report-a-bug> for how to report bugs.\n" \
->         "More information on the QEMU project at <https://qemu.org>."
->
->     #endif
+On 4/6/22 04:06, Xiaoyao Li wrote:
+>>
+>> Indeed, it would be easier to use the existing cpuid data in struct 
+>> kvm_vcpu, because right now there is no way to ensure that they are 
+>> consistent.
+>>
+>> Why is KVM_SET_CPUID2 not enough?  Are there any modifications done by 
+>> KVM that affect the measurement?
+> 
+> Then we get the situation that KVM_TDX_INIT_VM must be called after 1 
+> vcpu is created. It seems illogical that it has chance to fail the VM 
+> scope initialization after 1 vcpu is successfully created.
 
+I see.  Yeah, it makes sense to have the CPUID in KVM_TDX_INIT_VM then.
 
+Paolo
 
-
-> Rename the header?  Or replace the macros by variables, and move their
-> declarations elsewhere?  Not demands; this series is lovely progress as
-> is.
-
-We should put those in a qemu/copyright.h, I think.
-Leaving a "qemu-common.h" around is an open invitation to people
-throwing more random stuff into it again in future.
-
-As you say, we can totally do this as a later followup.
-
-thanks
--- PMM
