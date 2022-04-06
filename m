@@ -2,123 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 617214F6A13
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 21:36:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B4734F6B05
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 22:12:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231800AbiDFTik (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 15:38:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54522 "EHLO
+        id S233890AbiDFUOo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 16:14:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232488AbiDFThg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 15:37:36 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B38281864A7
-        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 11:34:32 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id m12so4416204ljp.8
-        for <kvm@vger.kernel.org>; Wed, 06 Apr 2022 11:34:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=HSwp1BDG0k7X/+K+RwJOW/sVCMMxMSEnJISgNBGi2bg=;
-        b=Ys/1WSnGhYSt2OK9wL+F2ZyDI0KN3bD3nkQ7cSEAfHt1sAJ+3HACDKvwFqmgSO0McZ
-         QFScanM5uUJaQB9Dg7NYmvPo2C65E+TWz5N6SYM8r9Roi/wG86Rh7LzBhbgvInT42DFQ
-         7Qn1qPwmokjVsWFL7xBCD7dR5M2pNWfz9LutvoFMBLrdy9yPU0pbuHgbnhyGep2+PxlF
-         B+WXQTlzC15jmupuOPCyOclnMpoFIGqpDpOFln7aOg1ado+Q4UuO8F1YYm+el0+4BD9G
-         8Afv9mb1mWYGKWv/eaktdDgf0tWjnHCB0QK0RS14sBPVGz+3igXdnZum3nr2wGmSxHnv
-         Op4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HSwp1BDG0k7X/+K+RwJOW/sVCMMxMSEnJISgNBGi2bg=;
-        b=sVVeVOrJi7+zwdOIxzpmmuOsBxC7wCfabMuBt0XHP1tyDmcFkFdWwJg1OkR+2wz3bF
-         ORm3WB4esiNmVLFisyExJH+RjfmyxgRaj2A76Geh3ltP/COipHAuTjhCoe9jmAVKfLqL
-         0W/j6mcmw8uou679GS+0LV6MIbRU+sSkcbfjVPv+CKDcFofwipUfXU1fNC6uPUelZdot
-         p1dvxu+ckYGgY5uzOjK646fJiK0sxFucOUOW2gViws7GxSZPwKrP/FRQP2BzfqFaN/Tg
-         3ckA/EHO3DzhrVtW+M00ik9I/RRig66YkLjOhcpomznRDhc/Cchg3PX075l9sAWiulRp
-         jkbw==
-X-Gm-Message-State: AOAM5305kUdPKSQrHHOpEIwHou8qQc7C3DXNtmrg9A6OF0M1t4p6we0A
-        XTPW2VuJskZ6mReMluI5d0jUmHf0gekDZpE8sLBDcCQl0mpeyQ==
-X-Google-Smtp-Source: ABdhPJwumCsczWpIy24fNgQlHvwaiW2/ShuvoT5gCcoB1T6IdJSpe3MINoXCfDWffgbKbUzSewBdIR9qz3k8q2Uxfpw=
-X-Received: by 2002:a05:651c:b1e:b0:249:95d3:7832 with SMTP id
- b30-20020a05651c0b1e00b0024995d37832mr6253661ljr.426.1649270070676; Wed, 06
- Apr 2022 11:34:30 -0700 (PDT)
+        with ESMTP id S235611AbiDFUNY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 16:13:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ADEB0DCAB5
+        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 10:19:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649265569;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=s7v+/Smwki1rqF8Y2TeWuoafwlE31yyfXOgyMdnzrfM=;
+        b=e1lajqJfJLR8aGscTbXiaCKERjmKcda1AcpLNtEP2M25zigPjJQFGEnqnb2NoPUJh/qkZ4
+        GxlKr/Q5CmuteXhDxMJVOzms+muzINMXExZiZdGSH5z9i8GcndUFWz/0puZ5BQ8zy7FoWD
+        42irN1J0MKsP7lO/7A7SS5ByKMXwU1s=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-647-pCbAu8F3M_OzppVhmOgOSA-1; Wed, 06 Apr 2022 13:19:24 -0400
+X-MC-Unique: pCbAu8F3M_OzppVhmOgOSA-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F28171C01700;
+        Wed,  6 Apr 2022 17:19:23 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 47A33401E77;
+        Wed,  6 Apr 2022 17:19:23 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Qiuhao Li <qiuhao@sysec.org>, Gaoning Pan <pgn@zju.edu.cn>,
+        Yongkang Jia <kangel@zju.edu.cn>, stable@vger.kernel.org
+Subject: [PATCH] KVM: avoid NULL pointer dereference in kvm_dirty_ring_push
+Date:   Wed,  6 Apr 2022 13:19:23 -0400
+Message-Id: <20220406171923.14712-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20220330164306.2376085-1-pgonda@google.com> <CAL715W+S-SJwXBhYO=_T-9uAPLt6cQ-Hn+_+ehefAh6+kQ_zOA@mail.gmail.com>
- <YkYdlfYM/FWlMqMg@google.com> <CAL715WLhy7EkJCyO7vzak3O8iw8GDRHkPF8aRtDedPXO1vx_Qw@mail.gmail.com>
- <Yk3bSmQTspjZHUZf@google.com>
-In-Reply-To: <Yk3bSmQTspjZHUZf@google.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Wed, 6 Apr 2022 12:34:19 -0600
-Message-ID: <CAMkAt6obVDW_LFvQzUYw6v7okiNq1KAbUOMoM3bN6zeJUGg6Xw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: SEV: Add cond_resched() to loop in sev_clflush_pages()
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Mingwei Zhang <mizhang@google.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 6, 2022 at 12:26 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, Apr 06, 2022, Mingwei Zhang wrote:
-> > Hi Sean,
-> >
-> > > > > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > > > > index 75fa6dd268f0..c2fe89ecdb2d 100644
-> > > > > --- a/arch/x86/kvm/svm/sev.c
-> > > > > +++ b/arch/x86/kvm/svm/sev.c
-> > > > > @@ -465,6 +465,7 @@ static void sev_clflush_pages(struct page *pages[], unsigned long npages)
-> > > > >                 page_virtual = kmap_atomic(pages[i]);
-> > > > >                 clflush_cache_range(page_virtual, PAGE_SIZE);
-> > > > >                 kunmap_atomic(page_virtual);
-> > > > > +               cond_resched();
-> > > >
-> > > > If you add cond_resched() here, the frequency (once per 4K) might be
-> > > > too high. You may want to do it once per X pages, where X could be
-> > > > something like 1G/4K?
-> > >
-> > > No, every iteration is perfectly ok.  The "cond"itional part means that this will
-> > > reschedule if and only if it actually needs to be rescheduled, e.g. if the task's
-> > > timeslice as expired.  The check for a needed reschedule is cheap, using
-> > > cond_resched() in tight-ish loops is ok and intended, e.g. KVM does a reched
-> > > check prior to enterring the guest.
-> >
-> > Double check on the code again. I think the point is not about flag
-> > checking. Obviously branch prediction could really help. The point I
-> > think is the 'call' to cond_resched(). Depending on the kernel
-> > configuration, cond_resched() may not always be inlined, at least this
-> > is my understanding so far? So if that is true, then it still might
-> > not always be the best to call cond_resched() that often.
->
-> Eh, compared to the cost of 64 back-to-back CLFLUSHOPTs, the cost of __cond_resched()
-> is peanuts.  Even accounting for the rcu_all_qs() work, it's still dwarfed by the
-> cost of flushing data from the cache.  E.g. based on Agner Fog's wonderful uop
-> latencies[*], the actual flush time for a single page is going to be upwards of
-> 10k cycles, whereas __cond_resched() is going to well under 100 cycles in the happy
-> case of no work.  Even if those throughput numbers are off by an order of magnitude,
-> e.g. CLFLUSHOPT can complete in 15 cycles, that's still ~1k cycles.
->
-> Peter, don't we also theoretically need cond_resched() in the loops in
-> sev_launch_update_data()?  AFAICT, there's no articifical restriction on the size
-> of the payload, i.e. the kernel is effectively relying on userspace to not update
-> large swaths of memory.
+kvm_vcpu_release() will call kvm_dirty_ring_free(), freeing
+ring->dirty_gfns and setting it to NULL.  Afterwards, it calls
+kvm_arch_vcpu_destroy().
 
-Yea we probably do want to cond_resched() in the for loop inside of
-sev_launch_update_data(). Ithink in  sev_dbg_crypt() userspace could
-request a large number of pages to be decrypted/encrypted for
-debugging but se have a call to sev_pin_memory() in the loop so that
-will have a cond_resded() inside of __get_users_pages(). Or should we
-have a cond_resded() inside of the loop in sev_dbg_crypt() too?
+However, if closing the file descriptor races with KVM_RUN in such away
+that vcpu->arch.st.preempted == 0, the following call stack leads to a
+NULL pointer dereference in kvm_dirty_run_push():
 
->
-> [*] https://www.agner.org/optimize/instruction_tables.pdf
+ mark_page_dirty_in_slot+0x192/0x270 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3171
+ kvm_steal_time_set_preempted arch/x86/kvm/x86.c:4600 [inline]
+ kvm_arch_vcpu_put+0x34e/0x5b0 arch/x86/kvm/x86.c:4618
+ vcpu_put+0x1b/0x70 arch/x86/kvm/../../../virt/kvm/kvm_main.c:211
+ vmx_free_vcpu+0xcb/0x130 arch/x86/kvm/vmx/vmx.c:6985
+ kvm_arch_vcpu_destroy+0x76/0x290 arch/x86/kvm/x86.c:11219
+ kvm_vcpu_destroy arch/x86/kvm/../../../virt/kvm/kvm_main.c:441 [inline]
+
+The fix is to release the dirty page ring after kvm_arch_vcpu_destroy
+has run.
+
+Reported-by: Qiuhao Li <qiuhao@sysec.org>
+Reported-by: Gaoning Pan <pgn@zju.edu.cn>
+Reported-by: Yongkang Jia <kangel@zju.edu.cn>
+Cc: stable@vger.kernel.org
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ virt/kvm/kvm_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 70e05af5ebea..b22f380e3347 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -434,8 +434,8 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
+ 
+ static void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
+ {
+-	kvm_dirty_ring_free(&vcpu->dirty_ring);
+ 	kvm_arch_vcpu_destroy(vcpu);
++	kvm_dirty_ring_free(&vcpu->dirty_ring);
+ 
+ 	/*
+ 	 * No need for rcu_read_lock as VCPU_RUN is the only place that changes
+-- 
+2.31.1
+
