@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B22B4F645A
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 18:08:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D19A74F647F
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 18:08:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237103AbiDFQGa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 12:06:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51840 "EHLO
+        id S237151AbiDFQGJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 12:06:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236999AbiDFQGI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 12:06:08 -0400
+        with ESMTP id S236990AbiDFQF5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 12:05:57 -0400
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27DDF44E594;
-        Tue,  5 Apr 2022 21:50:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A7C9451D69;
+        Tue,  5 Apr 2022 21:50:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649220606; x=1680756606;
+  t=1649220633; x=1680756633;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=PjePiKLWyAZTDiIs2MHRUMC+Vn/D8Qwc+vrle+rDM7o=;
-  b=Ih/kESGu+lj70HkdPPE/CwasWTQSa9o4NGMrAqTn5yKxKxkmcBpBV46l
-   VGpyPTOB0+TZUKD46M2Vu9M05rMcrXmsXZhyx7rFnFTM3ITzBRR06/Oyv
-   4yXvrXU6fm9xYoaJ6jlbdgd8u35CVQ+iQaREriVwjkBRs72/I+0Vk/iW7
-   UxOOyJL55sDuSq4AyhPO0hfGeYKgH+ARaE8G1HeO8XPMdkMLvluJFR2Ba
-   Jq7Z4nPCMST20JQQU0omgpQ6jvbuSgWJq0VKayibrXTJJ14zx2Xdk7uUa
-   tmQRCXQi3a6yrI9ZZnpgbgReM/V0Tw58d35CP0gRh4mM/n7/l93XzX8ZV
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10308"; a="243089796"
+  bh=q18Cb2EmfT3fu2+KbEiAYS7sKnhqfdZ2OKCafmYkaEk=;
+  b=l2dRNc7chlronfN3dPjp5wxLjsYR6jF7j6ewY1IWW5I9Y/EO3gjUKoKa
+   DiQGSG2GaG6um+By5k1G/qf84bGdyRrsKYR+x3m4LtGB4VQTsShv2ja/z
+   4VhtPIqxMKPaBzKXeZRMKPd16HpC5PjJr+smWZtH7ogjp+jixAXiMr0DQ
+   o+ybQgaxpQaeLHJa9IhjSp0PdbBHl2vfcbKRqaRriQ9ri8bOtnaYygQGB
+   QvE3O1l34rsshU+wfTryaXodpLO5cyM6G5bHM0PNJizlaUhBARMbTJxjo
+   sKrJqRCj3J1zvkVVHWPV3AFY7eAAa/FbYVASOI+2BA0oscDeW0i4jvb0G
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10308"; a="243089857"
 X-IronPort-AV: E=Sophos;i="5.90,239,1643702400"; 
-   d="scan'208";a="243089796"
+   d="scan'208";a="243089857"
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2022 21:50:05 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2022 21:50:32 -0700
 X-IronPort-AV: E=Sophos;i="5.90,239,1643702400"; 
-   d="scan'208";a="524302169"
+   d="scan'208";a="524302374"
 Received: from dchang1-mobl3.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.29.17])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2022 21:50:01 -0700
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2022 21:50:28 -0700
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
@@ -45,9 +45,9 @@ Cc:     seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
         kirill.shutemov@linux.intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com,
         isaku.yamahata@intel.com, kai.huang@intel.com
-Subject: [PATCH v3 05/21] x86/virt/tdx: Detect P-SEAMLDR and TDX module
-Date:   Wed,  6 Apr 2022 16:49:17 +1200
-Message-Id: <b9f4d4afd244d685182ce9ab5ffdd0bf245be6e2.1649219184.git.kai.huang@intel.com>
+Subject: [PATCH v3 12/21] x86/virt/tdx: Create TDMRs to cover all system RAM
+Date:   Wed,  6 Apr 2022 16:49:24 +1200
+Message-Id: <6cc984d5c23e06c9c87b4c7342758b29f8c8c022.1649219184.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <cover.1649219184.git.kai.huang@intel.com>
 References: <cover.1649219184.git.kai.huang@intel.com>
@@ -63,282 +63,201 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The P-SEAMLDR (persistent SEAM loader) is the first software module that
-runs in SEAM VMX root, responsible for loading and updating the TDX
-module.  Both the P-SEAMLDR and the TDX module are expected to be loaded
-before host kernel boots.
+The kernel configures TDX usable memory regions to the TDX module via
+an array of "TD Memory Region" (TDMR).  Each TDMR entry (TDMR_INFO)
+contains the information of the base/size of a memory region, the
+base/size of the associated Physical Address Metadata Table (PAMT) and
+a list of reserved areas in the region.
 
-There is no CPUID or MSR to detect whether the P-SEAMLDR or the TDX
-module has been loaded.  SEAMCALL instruction fails with VMfailInvalid
-when the target SEAM software module is not loaded, so SEAMCALL can be
-used to detect whether the P-SEAMLDR and the TDX module are loaded.
+Create a number of TDMRs according to the verified e820 RAM entries.
+As the first step only set up the base/size information for each TDMR.
 
-Detect the P-SEAMLDR and the TDX module by calling SEAMLDR.INFO SEAMCALL
-to get the P-SEAMLDR information.  If the SEAMCALL succeeds, the
-P-SEAMLDR information further tells whether the TDX module is loaded or
-not.
+TDMR must be 1G aligned and the size must be in 1G granularity.  This
+implies that one TDMR could cover multiple e820 RAM entries.  If a RAM
+entry spans the 1GB boundary and the former part is already covered by
+the previous TDMR, just create a new TDMR for the latter part.
 
-Also add a wrapper of __seamcall() to make SEAMCALL to the P-SEAMLDR and
-the TDX module with additional defensive check on SEAMRR and CR4.VMXE,
-since both detecting and initializing TDX module require the caller of
-TDX to handle VMXON.
+TDX only supports a limited number of TDMRs (currently 64).  Abort the
+TDMR construction process when the number of TDMRs exceeds this
+limitation.
 
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
- arch/x86/virt/vmx/tdx/tdx.c | 175 +++++++++++++++++++++++++++++++++++-
- arch/x86/virt/vmx/tdx/tdx.h |  31 +++++++
- 2 files changed, 205 insertions(+), 1 deletion(-)
+ arch/x86/virt/vmx/tdx/tdx.c | 138 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 138 insertions(+)
 
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 53093d4ad458..674867bccc14 100644
+index 6b0c51aaa7f2..82534e70df96 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -15,7 +15,9 @@
- #include <asm/msr.h>
- #include <asm/cpufeature.h>
- #include <asm/cpufeatures.h>
-+#include <asm/virtext.h>
- #include <asm/tdx.h>
-+#include "tdx.h"
+@@ -54,6 +54,18 @@
+ 		((u32)(((_keyid_part) & 0xffffffffull) + 1))
+ #define TDX_KEYID_NUM(_keyid_part)	((u32)((_keyid_part) >> 32))
  
- /* Support Intel Secure Arbitration Mode Range Registers (SEAMRR) */
- #define MTRR_CAP_SEAMRR			BIT(15)
-@@ -74,6 +76,8 @@ static enum tdx_module_status_t tdx_module_status;
- /* Prevent concurrent attempts on TDX detection and initialization */
- static DEFINE_MUTEX(tdx_module_lock);
- 
-+static struct p_seamldr_info p_seamldr_info;
++/* TDMR must be 1gb aligned */
++#define TDMR_ALIGNMENT		BIT_ULL(30)
++#define TDMR_PFN_ALIGNMENT	(TDMR_ALIGNMENT >> PAGE_SHIFT)
 +
- static bool __seamrr_enabled(void)
++/* Align up and down the address to TDMR boundary */
++#define TDMR_ALIGN_DOWN(_addr)	ALIGN_DOWN((_addr), TDMR_ALIGNMENT)
++#define TDMR_ALIGN_UP(_addr)	ALIGN((_addr), TDMR_ALIGNMENT)
++
++/* TDMR's start and end address */
++#define TDMR_START(_tdmr)	((_tdmr)->base)
++#define TDMR_END(_tdmr)		((_tdmr)->base + (_tdmr)->size)
++
+ /*
+  * TDX module status during initialization
+  */
+@@ -813,6 +825,44 @@ static int e820_check_against_cmrs(void)
+ 	return 0;
+ }
+ 
++/* The starting offset of reserved areas within TDMR_INFO */
++#define TDMR_RSVD_START		64
++
++static struct tdmr_info *__alloc_tdmr(void)
++{
++	int tdmr_sz;
++
++	/*
++	 * TDMR_INFO's actual size depends on maximum number of reserved
++	 * areas that one TDMR supports.
++	 */
++	tdmr_sz = TDMR_RSVD_START + tdx_sysinfo.max_reserved_per_tdmr *
++		sizeof(struct tdmr_reserved_area);
++
++	/*
++	 * TDX requires TDMR_INFO to be 512 aligned.  Always align up
++	 * TDMR_INFO size to 512 so the memory allocated via kzalloc()
++	 * can meet the alignment requirement.
++	 */
++	tdmr_sz = ALIGN(tdmr_sz, TDMR_INFO_ALIGNMENT);
++
++	return kzalloc(tdmr_sz, GFP_KERNEL);
++}
++
++/* Create a new TDMR at given index in the TDMR array */
++static struct tdmr_info *alloc_tdmr(struct tdmr_info **tdmr_array, int idx)
++{
++	struct tdmr_info *tdmr;
++
++	if (WARN_ON_ONCE(tdmr_array[idx]))
++		return NULL;
++
++	tdmr = __alloc_tdmr();
++	tdmr_array[idx] = tdmr;
++
++	return tdmr;
++}
++
+ static void free_tdmrs(struct tdmr_info **tdmr_array, int tdmr_num)
  {
- 	return (seamrr_mask & SEAMRR_ENABLED_BITS) == SEAMRR_ENABLED_BITS;
-@@ -229,6 +233,160 @@ static bool tdx_keyid_sufficient(void)
- 	return tdx_keyid_num >= 2;
+ 	int i;
+@@ -826,6 +876,89 @@ static void free_tdmrs(struct tdmr_info **tdmr_array, int tdmr_num)
+ 	}
  }
  
 +/*
-+ * All error codes of both the P-SEAMLDR and the TDX module SEAMCALLs
-+ * have bit 63 set if SEAMCALL fails.
++ * Create TDMRs to cover all RAM entries in e820_table.  The created
++ * TDMRs are saved to @tdmr_array and @tdmr_num is set to the actual
++ * number of TDMRs.  All entries in @tdmr_array must be initially NULL.
 + */
-+#define SEAMCALL_LEAF_ERROR(_ret)	((_ret) & BIT_ULL(63))
-+
-+/**
-+ * seamcall - make SEAMCALL to the P-SEAMLDR or the TDX module with
-+ *	      additional check on SEAMRR and CR4.VMXE
-+ *
-+ * @fn:			SEAMCALL leaf number.
-+ * @rcx:		Input operand RCX.
-+ * @rdx:		Input operand RDX.
-+ * @r8:			Input operand R8.
-+ * @r9:			Input operand R9.
-+ * @seamcall_ret:	SEAMCALL completion status (can be NULL).
-+ * @out:		Additional output operands (can be NULL).
-+ *
-+ * Wrapper of __seamcall() to make SEAMCALL to the P-SEAMLDR or the TDX
-+ * module with additional defensive check on SEAMRR and CR4.VMXE.  Caller
-+ * to make sure SEAMRR is enabled and CPU is already in VMX operation
-+ * before calling this function.
-+ *
-+ * Unlike __seamcall(), it returns kernel error code instead of SEAMCALL
-+ * completion status, which is returned via @seamcall_ret if desired.
-+ *
-+ * Return:
-+ *
-+ * * -ENODEV:	SEAMCALL failed with VMfailInvalid, or SEAMRR is not enabled.
-+ * * -EPERM:	CR4.VMXE is not enabled
-+ * * -EFAULT:	SEAMCALL failed
-+ * * -0:	SEAMCALL succeeded
-+ */
-+static int seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
-+		    u64 *seamcall_ret, struct tdx_module_output *out)
++static int create_tdmrs(struct tdmr_info **tdmr_array, int *tdmr_num)
 +{
-+	u64 ret;
++	struct tdmr_info *tdmr;
++	u64 start, end;
++	int i, tdmr_idx;
++	int ret = 0;
 +
-+	if (WARN_ON_ONCE(!seamrr_enabled()))
-+		return -ENODEV;
-+
++	tdmr_idx = 0;
++	tdmr = alloc_tdmr(tdmr_array, 0);
++	if (!tdmr)
++		return -ENOMEM;
 +	/*
-+	 * SEAMCALL instruction requires CPU being already in VMX
-+	 * operation (VMXON has been done), otherwise it causes #UD.
-+	 * Sanity check whether CR4.VMXE has been enabled.
-+	 *
-+	 * Note VMX being enabled in CR4 doesn't mean CPU is already
-+	 * in VMX operation, but unfortunately there's no way to do
-+	 * such check.  However in practice enabling CR4.VMXE and
-+	 * doing VMXON are done together (for now) so in practice it
-+	 * checks whether VMXON has been done.
-+	 *
-+	 * Preemption is disabled during the CR4.VMXE check and the
-+	 * actual SEAMCALL so VMX doesn't get disabled by other threads
-+	 * due to scheduling.
++	 * Loop over all RAM entries in e820 and create TDMRs to cover
++	 * them.  To keep it simple, always try to use one TDMR to cover
++	 * one RAM entry.
 +	 */
-+	preempt_disable();
-+	if (WARN_ON_ONCE(!cpu_vmx_enabled())) {
-+		preempt_enable_no_resched();
-+		return -EPERM;
++	e820_for_each_mem(i, start, end) {
++		start = TDMR_ALIGN_DOWN(start);
++		end = TDMR_ALIGN_UP(end);
++
++		/*
++		 * If the current TDMR's size hasn't been initialized, it
++		 * is a new allocated TDMR to cover the new RAM entry.
++		 * Otherwise the current TDMR already covers the previous
++		 * RAM entry.  In the latter case, check whether the
++		 * current RAM entry has been fully or partially covered
++		 * by the current TDMR, since TDMR is 1G aligned.
++		 */
++		if (tdmr->size) {
++			/*
++			 * Loop to next RAM entry if the current entry
++			 * is already fully covered by the current TDMR.
++			 */
++			if (end <= TDMR_END(tdmr))
++				continue;
++
++			/*
++			 * If part of current RAM entry has already been
++			 * covered by current TDMR, skip the already
++			 * covered part.
++			 */
++			if (start < TDMR_END(tdmr))
++				start = TDMR_END(tdmr);
++
++			/*
++			 * Create a new TDMR to cover the current RAM
++			 * entry, or the remaining part of it.
++			 */
++			tdmr_idx++;
++			if (tdmr_idx >= tdx_sysinfo.max_tdmrs) {
++				ret = -E2BIG;
++				goto err;
++			}
++			tdmr = alloc_tdmr(tdmr_array, tdmr_idx);
++			if (!tdmr) {
++				ret = -ENOMEM;
++				goto err;
++			}
++		}
++
++		tdmr->base = start;
++		tdmr->size = end - start;
 +	}
 +
-+	ret = __seamcall(fn, rcx, rdx, r8, r9, out);
-+
-+	preempt_enable_no_resched();
-+
-+	/*
-+	 * Convert SEAMCALL error code to kernel error code:
-+	 *  - -ENODEV:	VMfailInvalid
-+	 *  - -EFAULT:	SEAMCALL failed
-+	 *  - 0:	SEAMCALL was successful
-+	 */
-+	if (ret == TDX_SEAMCALL_VMFAILINVALID)
-+		return -ENODEV;
-+
-+	/* Save the completion status if caller wants to use it */
-+	if (seamcall_ret)
-+		*seamcall_ret = ret;
-+
-+	/*
-+	 * TDX module SEAMCALLs may also return non-zero completion
-+	 * status codes but w/o bit 63 set.  Those codes are treated
-+	 * as additional information/warning while the SEAMCALL is
-+	 * treated as completed successfully.  Return 0 in this case.
-+	 * Caller can use @seamcall_ret to get the additional code
-+	 * when it is desired.
-+	 */
-+	if (SEAMCALL_LEAF_ERROR(ret)) {
-+		pr_err("SEAMCALL leaf %llu failed: 0x%llx\n", fn, ret);
-+		return -EFAULT;
-+	}
++	/* @tdmr_idx is always the index of last valid TDMR. */
++	*tdmr_num = tdmr_idx + 1;
 +
 +	return 0;
-+}
-+
-+static inline bool p_seamldr_ready(void)
-+{
-+	return !!p_seamldr_info.p_seamldr_ready;
-+}
-+
-+static inline bool tdx_module_ready(void)
-+{
++err:
 +	/*
-+	 * SEAMLDR_INFO.SEAM_READY indicates whether TDX module
-+	 * is (loaded and) ready for SEAMCALL.
++	 * Clean up already allocated TDMRs in case of error.  @tdmr_idx
++	 * indicates the last TDMR that wasn't created successfully,
++	 * therefore only needs to free @tdmr_idx TDMRs.
 +	 */
-+	return p_seamldr_ready() && !!p_seamldr_info.seam_ready;
++	free_tdmrs(tdmr_array, tdmr_idx);
++	return ret;
 +}
 +
-+/*
-+ * Detect whether the P-SEAMLDR has been loaded by calling SEAMLDR.INFO
-+ * SEAMCALL to get the P-SEAMLDR information, which further tells whether
-+ * the TDX module has been loaded and ready for SEAMCALL.  Caller to make
-+ * sure only calling this function when CPU is already in VMX operation.
-+ */
-+static int detect_p_seamldr(void)
-+{
-+	int ret;
-+
-+	/*
-+	 * SEAMCALL fails with VMfailInvalid when SEAM software is not
-+	 * loaded, in which case seamcall() returns -ENODEV.  Use this
-+	 * to detect the P-SEAMLDR.
-+	 *
-+	 * Note the P-SEAMLDR SEAMCALL also fails with VMfailInvalid when
-+	 * the P-SEAMLDR is already busy with another SEAMCALL.  But this
-+	 * won't happen here as this function is only called once.
-+	 */
-+	ret = seamcall(P_SEAMCALL_SEAMLDR_INFO, __pa(&p_seamldr_info),
-+			0, 0, 0, NULL, NULL);
-+	if (ret) {
-+		if (ret == -ENODEV)
-+			pr_info("P-SEAMLDR is not loaded.\n");
-+		else
-+			pr_info("Failed to detect P-SEAMLDR.\n");
-+
-+		return ret;
-+	}
-+
-+	/*
-+	 * If SEAMLDR.INFO was successful, it must be ready for SEAMCALL.
-+	 * Otherwise it's either kernel or firmware bug.
-+	 */
-+	if (WARN_ON_ONCE(!p_seamldr_ready()))
-+		return -ENODEV;
-+
-+	pr_info("P-SEAMLDR: version 0x%x, vendor_id: 0x%x, build_date: %u, build_num %u, major %u, minor %u\n",
-+		p_seamldr_info.version, p_seamldr_info.vendor_id,
-+		p_seamldr_info.build_date, p_seamldr_info.build_num,
-+		p_seamldr_info.major, p_seamldr_info.minor);
-+
-+	return 0;
-+}
-+
- static int __tdx_detect(void)
+ static int construct_tdmrs(struct tdmr_info **tdmr_array, int *tdmr_num)
  {
- 	/* The TDX module is not loaded if SEAMRR is disabled */
-@@ -247,7 +405,22 @@ static int __tdx_detect(void)
- 		goto no_tdx_module;
- 	}
+ 	int ret;
+@@ -834,8 +967,13 @@ static int construct_tdmrs(struct tdmr_info **tdmr_array, int *tdmr_num)
+ 	if (ret)
+ 		goto err;
  
--	/* Return -ENODEV until the TDX module is detected */
-+	/*
-+	 * For simplicity any error during detect_p_seamldr() marks
-+	 * TDX module as not loaded.
-+	 */
-+	if (detect_p_seamldr())
-+		goto no_tdx_module;
++	ret = create_tdmrs(tdmr_array, tdmr_num);
++	if (ret)
++		goto err;
 +
-+	if (!tdx_module_ready()) {
-+		pr_info("TDX module is not loaded.\n");
-+		goto no_tdx_module;
-+	}
-+
-+	pr_info("TDX module detected.\n");
-+	tdx_module_status = TDX_MODULE_LOADED;
-+	return 0;
-+
- no_tdx_module:
- 	tdx_module_status = TDX_MODULE_NONE;
- 	return -ENODEV;
-diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-index 9d5b6f554c20..6990c93198b3 100644
---- a/arch/x86/virt/vmx/tdx/tdx.h
-+++ b/arch/x86/virt/vmx/tdx/tdx.h
-@@ -3,6 +3,37 @@
- #define _X86_VIRT_TDX_H
- 
- #include <linux/types.h>
-+#include <linux/compiler.h>
-+
-+/*
-+ * TDX architectural data structures
-+ */
-+
-+#define P_SEAMLDR_INFO_ALIGNMENT	256
-+
-+struct p_seamldr_info {
-+	u32	version;
-+	u32	attributes;
-+	u32	vendor_id;
-+	u32	build_date;
-+	u16	build_num;
-+	u16	minor;
-+	u16	major;
-+	u8	reserved0[2];
-+	u32	acm_x2apicid;
-+	u8	reserved1[4];
-+	u8	seaminfo[128];
-+	u8	seam_ready;
-+	u8	seam_debug;
-+	u8	p_seamldr_ready;
-+	u8	reserved2[88];
-+} __packed __aligned(P_SEAMLDR_INFO_ALIGNMENT);
-+
-+/*
-+ * P-SEAMLDR SEAMCALL leaf function
-+ */
-+#define P_SEAMLDR_SEAMCALL_BASE		BIT_ULL(63)
-+#define P_SEAMCALL_SEAMLDR_INFO		(P_SEAMLDR_SEAMCALL_BASE | 0x0)
- 
- struct tdx_module_output;
- u64 __seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
+ 	/* Return -EFAULT until constructing TDMRs is done */
+ 	ret = -EFAULT;
++	free_tdmrs(tdmr_array, *tdmr_num);
+ err:
+ 	return ret;
+ }
 -- 
 2.35.1
 
