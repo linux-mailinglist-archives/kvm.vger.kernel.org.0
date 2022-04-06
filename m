@@ -2,110 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 555094F6A33
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 21:43:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF0EF4F69E2
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 21:30:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231979AbiDFTpl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 15:45:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41830 "EHLO
+        id S231576AbiDFTb4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 15:31:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232403AbiDFTp3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 15:45:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B395021CC5E
-        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 10:33:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649266399;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JsflgPsqFmMeboA+E+ObIhwzjD0l7tM2YPcfbgODEK4=;
-        b=Wa+bVKOC/Ik5yHxsGnMLpWs687dsiHBW/heQwTeUjksykHx+RhJBMUk9KLlN+kVcgzS1P+
-        i47aEG84Ulcw+Ov7GmNcRv5ZcglF1eSvZTLZoyCDXbVTdx04GlzQA5v2K1jVLpafK5+9gv
-        Sjwb2zg09lsr24B4sCZqOXV3v9oOOKI=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-185-u12ziaFjP_aNLX0e52UUsg-1; Wed, 06 Apr 2022 13:33:18 -0400
-X-MC-Unique: u12ziaFjP_aNLX0e52UUsg-1
-Received: by mail-ed1-f69.google.com with SMTP id w14-20020aa7d28e000000b0041cd144f3c6so1588865edq.18
-        for <kvm@vger.kernel.org>; Wed, 06 Apr 2022 10:33:18 -0700 (PDT)
+        with ESMTP id S231283AbiDFTbV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 15:31:21 -0400
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B374A1F6216
+        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 10:53:35 -0700 (PDT)
+Received: by mail-qt1-x833.google.com with SMTP id t2so5629055qtw.9
+        for <kvm@vger.kernel.org>; Wed, 06 Apr 2022 10:53:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=UiC0JZZNX3Tmz74Za2QGi0YjgPWaNriTzAia+mIG/oY=;
+        b=C8Z9DYmcvxvJu8NY+MYMQtX06XDHFQ8K7wmWpgt+e7UvuTJ9kBW6rgJ4m96ItAT6bC
+         agSP0mlkb7pnOPpK4P5qXOxdL3bq3763M5W3mQub8hSZw4EHWvaiGixVMKZjjpkduDrG
+         /01OoPFxfig9PKbGV/F3KE1OujzAGwrfqLQiAruhJhtDtf9ijrhVvcQB6SLC0vb+q3qf
+         8Vl9LEL+vckhVErsWsETDcjgIWL4qfXEq9DCiY2YNiB3pdXE+lO4IuMvWvz1EfPk6J/t
+         DV0ZhLSsIxbw3Pqo48d1dCeDRNuY0lzlWrixn45pwenckWRpx7+MZxNkmc5uxMQamJBA
+         Bm8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=JsflgPsqFmMeboA+E+ObIhwzjD0l7tM2YPcfbgODEK4=;
-        b=cQIi7ekac6sMB2FuhWA/sp2sflWq7XVmrgSx17B9cQYI7Is189KD22lLXsriwH9hTr
-         pb4gz6VzOHrYQWK9T6eRn6zrIVun2R/i9e3iR25+jIIZqlT2oRdJ1RzGCaiXY5qfpLrl
-         ORyYrWeRfgiNYwDV1/eY8PHiAz2gauefCHHK4ym9gCNl+G77E4t9l8FFM5d4uMT67bJB
-         kXlvpH1Qy4MKp20rl8M1shmf/RfMWoYIA9rjshYfHsSRuCRRVpKb9lfbYXDqNcuHE3ID
-         D6q00BEg5x0Uh3DgEsGWqDcnC3Hnb9BQVfj4Wf1qm3F7prBcds9m6h0CzDd9RORXsTn1
-         b4fA==
-X-Gm-Message-State: AOAM530BgMkCR81z0drauMl8ayrUQnL5XsOgCi/8hWKycp1cVMTudi5i
-        kE/DyNVIRacKm2bY8J+D/jpDz9gLOGLDh1D03PQdMEIcf8vl1k5X/pV7DUlw4GgN0dnxtaowZyc
-        nP0yL4DEo7Pmh
-X-Received: by 2002:a17:906:2991:b0:6cd:ac19:ce34 with SMTP id x17-20020a170906299100b006cdac19ce34mr9458075eje.746.1649266397443;
-        Wed, 06 Apr 2022 10:33:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJymsJF1UHVP+8vuPjco6L6obKdcfN6lM3rJUdqFr1Q2lEaGhsfxKtM9Tn7BrlIx1igdunVYIw==
-X-Received: by 2002:a17:906:2991:b0:6cd:ac19:ce34 with SMTP id x17-20020a170906299100b006cdac19ce34mr9458047eje.746.1649266397198;
-        Wed, 06 Apr 2022 10:33:17 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id k14-20020a170906128e00b006e4b67514a1sm6871372ejb.179.2022.04.06.10.33.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Apr 2022 10:33:16 -0700 (PDT)
-Message-ID: <7108f263-5cda-d91d-792b-d3f18b63c6d7@redhat.com>
-Date:   Wed, 6 Apr 2022 19:33:15 +0200
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=UiC0JZZNX3Tmz74Za2QGi0YjgPWaNriTzAia+mIG/oY=;
+        b=G6qJAeYs44glQCQcUVUyrtAJINv+JbBnclwUqj1ocjab2aSIdd6fPDK60YYxYHsWUe
+         qD/n7DJSc9zzML2IDKtVxNexurKSXisn5uFCyw6jTDhaUUzgB/OPEN63ih7IcNG/SDas
+         B86M/BV6Cff9cjsps7wVWgxs57TtWavKro7B2QoNPQ2TET0lsAuswMQQGTZ1icUh+d2p
+         li5QYU3rpJv23wb3Kaq2yfYk6wNmzTsh0XKc2dA5x/7F4amd5o+vgZSWvsOYZedtRfpb
+         Zx1rzupEhzATx9enJqE3T+K21yDwKyrmKrPKaitpq1+gqdHwxmI06AggZCUz80gtH4d5
+         wvVw==
+X-Gm-Message-State: AOAM531MrXtPb3CuSv26yMmaDsAXGXvgfsY3srpi1sxKqsuTuA2dnK/F
+        jKp+KTJczlxVYnUPOt1aMNMddvzM7pTPjCdiWmfqIbijj/U=
+X-Google-Smtp-Source: ABdhPJwOnUHmEK3nL1Hw0/iJrblnXqISxL1gjp5QrgobTxIRsSlbBb1hCnBusAh4f2TNJVRB/0hdR0CBT2U4iymcC9w=
+X-Received: by 2002:a05:622a:610:b0:2e2:694:38c6 with SMTP id
+ z16-20020a05622a061000b002e2069438c6mr8559136qta.458.1649267614742; Wed, 06
+ Apr 2022 10:53:34 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [syzbot] upstream build error (17)
-Content-Language: en-US
-To:     syzbot <syzbot+6b36bab98e240873fd5a@syzkaller.appspotmail.com>,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-        mingo@redhat.com, seanjc@google.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
-        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
-References: <000000000000008dae05dbfebd85@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <000000000000008dae05dbfebd85@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SORTED_RECIPS,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220330164306.2376085-1-pgonda@google.com> <CAL715W+S-SJwXBhYO=_T-9uAPLt6cQ-Hn+_+ehefAh6+kQ_zOA@mail.gmail.com>
+ <YkYdlfYM/FWlMqMg@google.com>
+In-Reply-To: <YkYdlfYM/FWlMqMg@google.com>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Wed, 6 Apr 2022 10:53:23 -0700
+Message-ID: <CAL715WLhy7EkJCyO7vzak3O8iw8GDRHkPF8aRtDedPXO1vx_Qw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: SEV: Add cond_resched() to loop in sev_clflush_pages()
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Peter Gonda <pgonda@google.com>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/6/22 18:20, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    3e732ebf7316 Merge tag 'for_linus' of git://git.kernel.org..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=10ca0687700000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=eba855fbe3373b4f
-> dashboard link: https://syzkaller.appspot.com/bug?extid=6b36bab98e240873fd5a
-> compiler:       Debian clang version 13.0.1-++20220126092033+75e33f71c2da-1~exp1~20220126212112.63, GNU ld (GNU Binutils for Debian) 2.35.2
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+6b36bab98e240873fd5a@syzkaller.appspotmail.com
-> 
-> arch/x86/kvm/emulate.c:3332:5: error: stack frame size (2552) exceeds limit (2048) in function 'emulator_task_switch' [-Werror,-Wframe-larger-than]
-> drivers/block/loop.c:1524:12: error: stack frame size (2648) exceeds limit (2048) in function 'lo_ioctl' [-Werror,-Wframe-larger-than]
+Hi Sean,
 
-I spot-checked these two and the stack frame is just 144 and 320 bytes 
-respectively on a normal compile.  This is probably just the effect of 
-some of the sanitizer options.
+> > > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> > > index 75fa6dd268f0..c2fe89ecdb2d 100644
+> > > --- a/arch/x86/kvm/svm/sev.c
+> > > +++ b/arch/x86/kvm/svm/sev.c
+> > > @@ -465,6 +465,7 @@ static void sev_clflush_pages(struct page *pages[], unsigned long npages)
+> > >                 page_virtual = kmap_atomic(pages[i]);
+> > >                 clflush_cache_range(page_virtual, PAGE_SIZE);
+> > >                 kunmap_atomic(page_virtual);
+> > > +               cond_resched();
+> >
+> > If you add cond_resched() here, the frequency (once per 4K) might be
+> > too high. You may want to do it once per X pages, where X could be
+> > something like 1G/4K?
+>
+> No, every iteration is perfectly ok.  The "cond"itional part means that this will
+> reschedule if and only if it actually needs to be rescheduled, e.g. if the task's
+> timeslice as expired.  The check for a needed reschedule is cheap, using
+> cond_resched() in tight-ish loops is ok and intended, e.g. KVM does a reched
+> check prior to enterring the guest.
 
-Paolo
-
+Double check on the code again. I think the point is not about flag
+checking. Obviously branch prediction could really help. The point I
+think is the 'call' to cond_resched(). Depending on the kernel
+configuration, cond_resched() may not always be inlined, at least this
+is my understanding so far? So if that is true, then it still might
+not always be the best to call cond_resched() that often.
