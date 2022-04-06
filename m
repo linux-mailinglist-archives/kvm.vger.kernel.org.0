@@ -2,119 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 662DA4F6AD2
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 22:06:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0004B4F6B4E
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 22:23:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232766AbiDFUIU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 16:08:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49352 "EHLO
+        id S234459AbiDFUZI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 16:25:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232120AbiDFUHO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 16:07:14 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41F0626B0A1
-        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 11:26:23 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id m12-20020a17090b068c00b001cabe30a98dso6582871pjz.4
-        for <kvm@vger.kernel.org>; Wed, 06 Apr 2022 11:26:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=pwVDMj/ZX1WG0fUD7lJ3zryiamzy9jGNovg+lKD/C/M=;
-        b=C6YrU9mYfOcQyhqLWy4lavHHbqdo8FGR9wJFW/4SxXtrorfCltRsee/diqEnAVoiau
-         1/SxeNIcwKvrIfKmpMg8v/7wUedVq85YT0hwjJdbSa75IN0xvkND/ZHoqA+M5t6Q8JiK
-         gUPduAK9F0l4n2O0LC6vbisG61VXkCy7p6hB41NPARLJNEfm4wRol2riIjodg4mSUFjy
-         HB33lIVlkuYgVkFRQWtP5o+fcGVtG0aYtKkxDE1btGSm+QJ6eRAxhrjBV4NNHS5exfGu
-         Xxt4sDDP84MQfr2BhCEYIJ2kYzIF/QjyLw7QWlsmUyTlrdXvqESHBab2zmk8jSI6VTFO
-         2QAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=pwVDMj/ZX1WG0fUD7lJ3zryiamzy9jGNovg+lKD/C/M=;
-        b=eFVmoqw5HaRxXphmeuetAGV0rP79Xx0AeKpc6O3F6T8Su7UguIfmQ7CJ1wl8bwwvyu
-         XP3eajVzuTrSq9vdCEZvyvddSY0DC7PMXade2CnMpVDxqU6NTaZ+YweWXEQAnj50KIVr
-         dEejB4XK08kqRMbOgbM4CS9+3QyA/lccjnfuhHur711uY8sRKtDyMX5klncDUytyHvwV
-         1cJpv1y1Vb0PG/MxJz4jKkUPJFs9km+7JGtS1hvEmdVq4LDzxtPCNyfVhVtFhBwIGyWT
-         aWN/pknlx7lemDMNqZ6P4bSfbOHkuAYQ9k3LvIqbzX1uDSWGns4Si3EcvhRN8gh8Hbm+
-         mgiQ==
-X-Gm-Message-State: AOAM53226Q7/+Q7sl0BUaLi9TeI30/UbV+L4BkJkLV90l1q/Z1+FerlF
-        unfG3M1n/0nd5RT4/mhAEvJpKg==
-X-Google-Smtp-Source: ABdhPJzmrogoa7gduQA1mANYSU+x/UrLrzi0hme/oj0ojF0PBDxjUArC86VBJsLd9qPAawCiLhVkDg==
-X-Received: by 2002:a17:90b:1803:b0:1c7:24c4:ab52 with SMTP id lw3-20020a17090b180300b001c724c4ab52mr11333797pjb.240.1649269582585;
-        Wed, 06 Apr 2022 11:26:22 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v15-20020a637a0f000000b003994e32c368sm6573684pgc.1.2022.04.06.11.26.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Apr 2022 11:26:21 -0700 (PDT)
-Date:   Wed, 6 Apr 2022 18:26:18 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Peter Gonda <pgonda@google.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: SEV: Add cond_resched() to loop in
- sev_clflush_pages()
-Message-ID: <Yk3bSmQTspjZHUZf@google.com>
-References: <20220330164306.2376085-1-pgonda@google.com>
- <CAL715W+S-SJwXBhYO=_T-9uAPLt6cQ-Hn+_+ehefAh6+kQ_zOA@mail.gmail.com>
- <YkYdlfYM/FWlMqMg@google.com>
- <CAL715WLhy7EkJCyO7vzak3O8iw8GDRHkPF8aRtDedPXO1vx_Qw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAL715WLhy7EkJCyO7vzak3O8iw8GDRHkPF8aRtDedPXO1vx_Qw@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S236447AbiDFUYG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 16:24:06 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54D5E217994
+        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 11:42:43 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E270961796
+        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 18:42:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36A48C385A9;
+        Wed,  6 Apr 2022 18:42:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1649270562;
+        bh=sbHbRXEyEAYhEDFwzan7utBqpNK0sjzefEArFgF8uSU=;
+        h=In-Reply-To:References:Date:From:To:Cc:Subject:From;
+        b=eIaWhMw6qdMVoRFxQeR1SfjCYwZy9RX4+1QgPmQTaYkMgXq5EQ0sAVb/ULadR9MI7
+         LH+S/c+4WuHCz9BUADIJglVSfcRcc6WejwYyM8Zb7kxiMxjNjlQQDilGIN/w8F20LF
+         hrAlrpaJiEnF7GwrtgY3GeH3IG43iicZf7iLsWrBPdjz0Xcg62zOdFu6x9zo7xgJk5
+         hq2ap75faI5QFkM7ufk+5PP4JDHKHirOI6tOCxRHtxkvbVauUHCe7lAi4Fdoyzj8y9
+         G3ucqOIFtsChrg/dqSy9ybRF2yetOLigWYzb0CjPhvgDFTZx/nxy8vUOVNf/cZzrqO
+         oArXJrEdmbMlg==
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+        by mailauth.nyi.internal (Postfix) with ESMTP id 0C18527C005B;
+        Wed,  6 Apr 2022 14:42:39 -0400 (EDT)
+Received: from imap48 ([10.202.2.98])
+  by compute2.internal (MEProxy); Wed, 06 Apr 2022 14:42:40 -0400
+X-ME-Sender: <xms:Ht9NYhmq5xzhyiIJCwoSNR5UKnnggxn-w-bA7jJiiVPF0uyVtVnVhQ>
+    <xme:Ht9NYs3-dzZtMQe620UwGT8ssxHBBO-eBkOnyr5HtekaozhZyGx33dQF5TpjmUy85
+    LbHHkaqaYX2JUhBy4I>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvvddrudejiedguddvkecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefofgggkfgjfhffhffvufgtsehttdertderredtnecuhfhrohhmpedftehn
+    ugihucfnuhhtohhmihhrshhkihdfuceolhhuthhosehkvghrnhgvlhdrohhrgheqnecugg
+    ftrfgrthhtvghrnheptdfhheettddvtedvtedugfeuuefhtddugedvleevleefvdetleff
+    gfefvdekgeefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrh
+    homheprghnugihodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduudeiudek
+    heeifedvqddvieefudeiiedtkedqlhhuthhopeepkhgvrhhnvghlrdhorhhgsehlihhnuh
+    igrdhluhhtohdruhhs
+X-ME-Proxy: <xmx:Ht9NYnoDYKLmq3-m68aE4ZmTtDuPp5nNnCT76TQ2-A9bkXUgsPDoLQ>
+    <xmx:Ht9NYhmDXKudHVFzfFNB9vrnlRpFqFnPc15MUqY9W5FRFPjkhgnWOw>
+    <xmx:Ht9NYv0LfNldKQsbPRd1ZzGo2WkQjQkgAIaqEiMoePxTGJRS43r7JA>
+    <xmx:H99NYqX58bpe62swpvglNF4SOMgzeqaX78xe7NzkfeRGX_q08j8zpA>
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 8341B21E006E; Wed,  6 Apr 2022 14:42:38 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.7.0-alpha0-385-g3a17909f9e-fm-20220404.001-g3a17909f
+Mime-Version: 1.0
+Message-Id: <4ae11ddc-0fe6-4644-a30e-006d99dba456@www.fastmail.com>
+In-Reply-To: <YkyKywkQYbr9U0CA@google.com>
+References: <YkQzfjgTQaDd2E2T@google.com> <YkSaUQX89ZEojsQb@google.com>
+ <80aad2f9-9612-4e87-a27a-755d3fa97c92@www.fastmail.com>
+ <YkcTTY4YjQs5BRhE@google.com>
+ <83fd55f8-cd42-4588-9bf6-199cbce70f33@www.fastmail.com>
+ <YksIQYdG41v3KWkr@google.com> <Ykslo2eo2eRXrpFR@google.com>
+ <eefc3c74-acca-419c-8947-726ce2458446@www.fastmail.com>
+ <Ykwbqv90C7+8K+Ao@google.com>
+ <54acbba9-f4fd-48c1-9028-d596d9f63069@www.fastmail.com>
+ <YkyKywkQYbr9U0CA@google.com>
+Date:   Wed, 06 Apr 2022 11:42:17 -0700
+From:   "Andy Lutomirski" <luto@kernel.org>
+To:     "Sean Christopherson" <seanjc@google.com>
+Cc:     "Quentin Perret" <qperret@google.com>,
+        "Steven Price" <steven.price@arm.com>,
+        "Chao Peng" <chao.p.peng@linux.intel.com>,
+        "kvm list" <kvm@vger.kernel.org>,
+        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        "Linux API" <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        "Jonathan Corbet" <corbet@lwn.net>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        "Wanpeng Li" <wanpengli@tencent.com>,
+        "Jim Mattson" <jmattson@google.com>,
+        "Joerg Roedel" <joro@8bytes.org>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Hugh Dickins" <hughd@google.com>,
+        "Jeff Layton" <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        "Mike Rapoport" <rppt@kernel.org>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        "Vlastimil Babka" <vbabka@suse.cz>,
+        "Vishal Annapurve" <vannapurve@google.com>,
+        "Yu Zhang" <yu.c.zhang@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        "Dave Hansen" <dave.hansen@intel.com>,
+        "Andi Kleen" <ak@linux.intel.com>,
+        "David Hildenbrand" <david@redhat.com>,
+        "Marc Zyngier" <maz@kernel.org>, "Will Deacon" <will@kernel.org>
+Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM guest
+ private memory
+Content-Type: text/plain
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 06, 2022, Mingwei Zhang wrote:
-> Hi Sean,
-> 
-> > > > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > > > index 75fa6dd268f0..c2fe89ecdb2d 100644
-> > > > --- a/arch/x86/kvm/svm/sev.c
-> > > > +++ b/arch/x86/kvm/svm/sev.c
-> > > > @@ -465,6 +465,7 @@ static void sev_clflush_pages(struct page *pages[], unsigned long npages)
-> > > >                 page_virtual = kmap_atomic(pages[i]);
-> > > >                 clflush_cache_range(page_virtual, PAGE_SIZE);
-> > > >                 kunmap_atomic(page_virtual);
-> > > > +               cond_resched();
-> > >
-> > > If you add cond_resched() here, the frequency (once per 4K) might be
-> > > too high. You may want to do it once per X pages, where X could be
-> > > something like 1G/4K?
-> >
-> > No, every iteration is perfectly ok.  The "cond"itional part means that this will
-> > reschedule if and only if it actually needs to be rescheduled, e.g. if the task's
-> > timeslice as expired.  The check for a needed reschedule is cheap, using
-> > cond_resched() in tight-ish loops is ok and intended, e.g. KVM does a reched
-> > check prior to enterring the guest.
-> 
-> Double check on the code again. I think the point is not about flag
-> checking. Obviously branch prediction could really help. The point I
-> think is the 'call' to cond_resched(). Depending on the kernel
-> configuration, cond_resched() may not always be inlined, at least this
-> is my understanding so far? So if that is true, then it still might
-> not always be the best to call cond_resched() that often.
 
-Eh, compared to the cost of 64 back-to-back CLFLUSHOPTs, the cost of __cond_resched()
-is peanuts.  Even accounting for the rcu_all_qs() work, it's still dwarfed by the
-cost of flushing data from the cache.  E.g. based on Agner Fog's wonderful uop
-latencies[*], the actual flush time for a single page is going to be upwards of
-10k cycles, whereas __cond_resched() is going to well under 100 cycles in the happy
-case of no work.  Even if those throughput numbers are off by an order of magnitude,
-e.g. CLFLUSHOPT can complete in 15 cycles, that's still ~1k cycles.
 
-Peter, don't we also theoretically need cond_resched() in the loops in
-sev_launch_update_data()?  AFAICT, there's no articifical restriction on the size
-of the payload, i.e. the kernel is effectively relying on userspace to not update
-large swaths of memory.
+On Tue, Apr 5, 2022, at 11:30 AM, Sean Christopherson wrote:
+> On Tue, Apr 05, 2022, Andy Lutomirski wrote:
 
-[*] https://www.agner.org/optimize/instruction_tables.pdf
+>
+>> resume guest
+>> *** host -> hypervisor -> guest ***
+>> Guest unshares the page.
+>> *** guest -> hypervisor ***
+>> Hypervisor removes PTE.  TLBI.
+>> *** hypervisor -> guest ***
+>> 
+>> Obviously considerable cleverness is needed to make a virt IOMMU like this
+>> work well, but still.
+>> 
+>> Anyway, my suggestion is that the fd backing proposal get slightly modified
+>> to get it ready for multiple subtypes of backing object, which should be a
+>> pretty minimal change.  Then, if someone actually needs any of this
+>> cleverness, it can be added later.  In the mean time, the
+>> pread()/pwrite()/splice() scheme is pretty good.
+>
+> Tangentially related to getting private-fd ready for multiple things, 
+> what about
+> implementing the pread()/pwrite()/splice() scheme in pKVM itself?  I.e. 
+> read() on
+> the VM fd, with the offset corresponding to gfn in some way.
+>
+
+Hmm, could make sense.
