@@ -2,173 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A6BD4F5AB7
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 12:39:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B20794F5B6D
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 12:42:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352880AbiDFKX0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 06:23:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48696 "EHLO
+        id S1344937AbiDFKax (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 06:30:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357288AbiDFKWn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 06:22:43 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34C6917AB3;
-        Tue,  5 Apr 2022 23:47:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649227625; x=1680763625;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=JRb3SzOQESj6NEoJIznEzSTJmuuLPgnO38vSPHZXK34=;
-  b=VQNeVav8WhLbRDu6n+sxEPXljbYva9FqwFJOjY54tHMoOHWklA1xJiqI
-   OAwNZZtrYqupTpffVbEUHKppu1Wt3x6J9GP2536B4wt7/MmUKN0V6WWvB
-   8fxHh+TKUycRuD9X6GZRCYoElh3SH054WmgoeCY1VX9wx9l2UIAUzwm0i
-   oTahWijIXigBbrlMHuifG0uE4h3OOS5cLWF5TqAFYu3XVW7PdLS3RrGSw
-   TT5CAGkljg1uS+TKH8jSW900aSpreiIwOCB5LRDpn/spWeKt7/E4Pmgru
-   fGW4NgAnfR7Ym+BUl7czWyNBz8yS8a7UvrnO5WNdbYCt1aZCLmKDeMtJC
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10308"; a="260959912"
-X-IronPort-AV: E=Sophos;i="5.90,239,1643702400"; 
-   d="scan'208";a="260959912"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2022 23:47:04 -0700
-X-IronPort-AV: E=Sophos;i="5.90,239,1643702400"; 
-   d="scan'208";a="549413737"
-Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.249.170.41]) ([10.249.170.41])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2022 23:47:02 -0700
-Message-ID: <9b45d2bc-9bb3-53a1-3eb3-4b1bf6987268@intel.com>
-Date:   Wed, 6 Apr 2022 14:46:59 +0800
+        with ESMTP id S1345203AbiDFK10 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 06:27:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 197D41FC9E6
+        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 23:50:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649227831;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=198kYOnNlSWatjSWDYkZaZqYlqwH7e8Coxt4+err8d4=;
+        b=JhPc3IWdJxqSFLPoFMa3sYcrFSQz62y2hLfB9Wel8RWmNQ+gCr9dDt3NKRcD7woDWZOosb
+        XJ64ml6BjwcgZIsrlKVHu03NJSpZGNbdcrxPrW26hvHCXNUds3fLvRZtBIJgcpfrE10VZb
+        YSRroFdDd+D3s9I9CLhYBJ2eJv/0J/s=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-82-Axd4ckrNNwGQSW0idBuJrg-1; Wed, 06 Apr 2022 02:50:27 -0400
+X-MC-Unique: Axd4ckrNNwGQSW0idBuJrg-1
+Received: by mail-wr1-f69.google.com with SMTP id o26-20020adf8b9a000000b0020617a99c43so159887wra.16
+        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 23:50:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=198kYOnNlSWatjSWDYkZaZqYlqwH7e8Coxt4+err8d4=;
+        b=Aqc1/fWucSG4FHMmyeFfTR5B9m8HPMwH5TbbigZ0EY3UUwLysT0SJ0yfeyQnxOEQaB
+         eZ1EDz9LHKvGMdT7y9/Zv0W40rzx5DPaERRdLpAKQ9UEQoPwtdnLDEazwq0fqd41exqs
+         GLeISFeAQj5BlnVnyveaoxjL/Te4jWM48F8grOD/lWKHC8ipKRe5XNVZCjsCFmkbvx+2
+         2dwD+8ljqbcPQS/fhkocsIFxAk9wXdhqri0Sh4lnNbSRGTk5UB/B3yEhATQTyfQd0h1X
+         s1X4IpA7XCpLqVMIdr/PJv7Kh8vE0cM6gnastSlIscPbzexj3KH8sLcCxgX0FpMv+5Mf
+         ayhQ==
+X-Gm-Message-State: AOAM533FvaQRkvRRKEgqkz6y7I3KhbjWzYwqie2U+VB+FM1OcntwKYew
+        klx+kFeSlENo+DyjR3BSja9pWB5ecw7YrEFVtvjy76q18lu6mgQsIF+DutYgHSn3j3tAkwZF9vz
+        PmicCW5N9686y
+X-Received: by 2002:adf:e104:0:b0:206:109a:c90f with SMTP id t4-20020adfe104000000b00206109ac90fmr5345451wrz.259.1649227826281;
+        Tue, 05 Apr 2022 23:50:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwfOG1UAtZiCdUWJe2kav8TZU14vYZB6bEN6wUGN9uhrYTMYNd2vY7oaKmt5KqiVF2llkm6fA==
+X-Received: by 2002:adf:e104:0:b0:206:109a:c90f with SMTP id t4-20020adfe104000000b00206109ac90fmr5345441wrz.259.1649227826101;
+        Tue, 05 Apr 2022 23:50:26 -0700 (PDT)
+Received: from [10.33.192.183] (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id n10-20020a5d588a000000b002052e4aaf89sm13896444wrf.80.2022.04.05.23.50.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Apr 2022 23:50:25 -0700 (PDT)
+Message-ID: <bf27586e-4eb2-4392-1293-328c743eb8ec@redhat.com>
+Date:   Wed, 6 Apr 2022 08:50:24 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.7.0
-Subject: Re: [PATCH v5 1/3] KVM: X86: Save&restore the triple fault request
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.0
+Subject: Re: [kvm-unit-tests PATCH 5/8] s390x: pv-diags: Cleanup includes
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220318074955.22428-1-chenyi.qiang@intel.com>
- <20220318074955.22428-2-chenyi.qiang@intel.com> <YkzRSHHDMaVBQrxd@google.com>
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-In-Reply-To: <YkzRSHHDMaVBQrxd@google.com>
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, nrb@linux.ibm.com, seiden@linux.ibm.com
+References: <20220405075225.15903-1-frankja@linux.ibm.com>
+ <20220405075225.15903-6-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20220405075225.15903-6-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 05/04/2022 09.52, Janosch Frank wrote:
+> This file has way too much includes. Time to remove some.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>   s390x/pv-diags.c | 17 ++---------------
+>   1 file changed, 2 insertions(+), 15 deletions(-)
+> 
+> diff --git a/s390x/pv-diags.c b/s390x/pv-diags.c
+> index 6899b859..9ced68c7 100644
+> --- a/s390x/pv-diags.c
+> +++ b/s390x/pv-diags.c
+> @@ -8,23 +8,10 @@
+>    *  Janosch Frank <frankja@linux.ibm.com>
+>    */
+>   #include <libcflat.h>
+> -#include <asm/asm-offsets.h>
+> -#include <asm-generic/barrier.h>
+> -#include <asm/interrupt.h>
+> -#include <asm/pgtable.h>
+> -#include <mmu.h>
+> -#include <asm/page.h>
+> -#include <asm/facility.h>
+> -#include <asm/mem.h>
+> -#include <asm/sigp.h>
+> -#include <smp.h>
+> -#include <alloc_page.h>
+> -#include <vmalloc.h>
+> -#include <sclp.h>
+>   #include <snippet.h>
+>   #include <sie.h>
+> -#include <uv.h>
+> -#include <asm/uv.h>
+> +#include <sclp.h>
+> +#include <asm/facility.h>
 
+Wow, how did we end up with that huge list? Copy-n-paste from other files?
 
-On 4/6/2022 7:31 AM, Sean Christopherson wrote:
-> On Fri, Mar 18, 2022, Chenyi Qiang wrote:
->> For the triple fault sythesized by KVM, e.g. the RSM path or
->> nested_vmx_abort(), if KVM exits to userspace before the request is
->> serviced, userspace could migrate the VM and lose the triple fault.
->> Fix this issue by adding a new event KVM_VCPUEVENT_TRIPLE_FAULT in
->> get/set_vcpu_events() to track the triple fault request.
->>
->> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
->> ---
->>   Documentation/virt/kvm/api.rst  | 6 ++++++
->>   arch/x86/include/uapi/asm/kvm.h | 1 +
->>   arch/x86/kvm/x86.c              | 9 ++++++++-
->>   3 files changed, 15 insertions(+), 1 deletion(-)
->>
->> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->> index 691ff84444bd..9682b0a438bd 100644
->> --- a/Documentation/virt/kvm/api.rst
->> +++ b/Documentation/virt/kvm/api.rst
->> @@ -1146,6 +1146,9 @@ The following bits are defined in the flags field:
->>     fields contain a valid state. This bit will be set whenever
->>     KVM_CAP_EXCEPTION_PAYLOAD is enabled.
->>   
->> +- KVM_VCPUEVENT_TRIPLE_FAULT may be set to signal that there's a
->> +  triple fault request waiting to be serviced.
-> 
-> Please avoid "request" in the docs, as before, that's a KVM implemenation detail.
-> For this one, maybe "there's a pending triple fault event"?
-> 
->> +
->>   ARM/ARM64:
->>   ^^^^^^^^^^
->>   
->> @@ -1241,6 +1244,9 @@ can be set in the flags field to signal that the
->>   exception_has_payload, exception_payload, and exception.pending fields
->>   contain a valid state and shall be written into the VCPU.
->>   
->> +KVM_VCPUEVENT_TRIPLE_FAULT can be set in flags field to signal that a
->> +triple fault request should be made.
-> 
-> 
-> And here, "to signal that KVM should synthesize a triple fault for the guest"?
-> 
->> +
->>   ARM/ARM64:
->>   ^^^^^^^^^^
->>   
->> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
->> index bf6e96011dfe..d8ef0d993e86 100644
->> --- a/arch/x86/include/uapi/asm/kvm.h
->> +++ b/arch/x86/include/uapi/asm/kvm.h
->> @@ -325,6 +325,7 @@ struct kvm_reinject_control {
->>   #define KVM_VCPUEVENT_VALID_SHADOW	0x00000004
->>   #define KVM_VCPUEVENT_VALID_SMM		0x00000008
->>   #define KVM_VCPUEVENT_VALID_PAYLOAD	0x00000010
->> +#define KVM_VCPUEVENT_TRIPLE_FAULT	0x00000020
->>   
->>   /* Interrupt shadow states */
->>   #define KVM_X86_SHADOW_INT_MOV_SS	0x01
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 4fa4d8269e5b..fee402a700df 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -4891,6 +4891,9 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
->>   	if (vcpu->kvm->arch.exception_payload_enabled)
->>   		events->flags |= KVM_VCPUEVENT_VALID_PAYLOAD;
->>   
->> +	if (kvm_check_request(KVM_REQ_TRIPLE_FAULT, vcpu))
->> +		events->flags |= KVM_VCPUEVENT_TRIPLE_FAULT;
->> +
->>   	memset(&events->reserved, 0, sizeof(events->reserved));
->>   }
->>   
->> @@ -4903,7 +4906,8 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
->>   			      | KVM_VCPUEVENT_VALID_SIPI_VECTOR
->>   			      | KVM_VCPUEVENT_VALID_SHADOW
->>   			      | KVM_VCPUEVENT_VALID_SMM
->> -			      | KVM_VCPUEVENT_VALID_PAYLOAD))
->> +			      | KVM_VCPUEVENT_VALID_PAYLOAD
->> +			      | KVM_VCPUEVENT_TRIPLE_FAULT))
->>   		return -EINVAL;
->>   
->>   	if (events->flags & KVM_VCPUEVENT_VALID_PAYLOAD) {
->> @@ -4976,6 +4980,9 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
->>   		}
->>   	}
->>   
->> +	if (events->flags & KVM_VCPUEVENT_TRIPLE_FAULT)
->> +		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
->> +
->>   	kvm_make_request(KVM_REQ_EVENT, vcpu);
-> 
-> Looks correct, but this really needs a selftest, at least for the SET path since
-> the intent is to use that for the NOTIFY handling.  Doesn't need to be super fancy,
-> e.g. do port I/O from L2, inject a triple fault, and verify L1 sees the appropriate
-> exit.
-> 
-> Aha!  And for the GET path, abuse KVM_X86_SET_MCE with CR4.MCE=0 to coerce KVM into
-> making a KVM_REQ_TRIPLE_FAULT, that way there's no need to try and hit a timing
-> window to intercept the request.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-OK, will cook a selftest to verify it.
 
