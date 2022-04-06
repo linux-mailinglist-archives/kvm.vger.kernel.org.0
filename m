@@ -2,66 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C1634F619A
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 16:37:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E6E84F6270
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 16:59:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234768AbiDFOYe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 10:24:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50488 "EHLO
+        id S235504AbiDFPBC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 11:01:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234765AbiDFOYN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 10:24:13 -0400
-Received: from out30-42.freemail.mail.aliyun.com (out30-42.freemail.mail.aliyun.com [115.124.30.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC2AF28AC63;
-        Tue,  5 Apr 2022 20:44:53 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04407;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=34;SR=0;TI=SMTPD_---0V9K8Del_1649216687;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0V9K8Del_1649216687)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 06 Apr 2022 11:44:48 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     virtualization@lists.linux-foundation.org
-Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org
-Subject: [PATCH v9 28/32] virtio_net: set the default max ring size by find_vqs()
-Date:   Wed,  6 Apr 2022 11:43:42 +0800
-Message-Id: <20220406034346.74409-29-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.31.0
-In-Reply-To: <20220406034346.74409-1-xuanzhuo@linux.alibaba.com>
-References: <20220406034346.74409-1-xuanzhuo@linux.alibaba.com>
+        with ESMTP id S235458AbiDFPAi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 11:00:38 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DD4E44E5AC;
+        Tue,  5 Apr 2022 21:50:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1649220610; x=1680756610;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=SDYGwWRipsleBRGVaBxblRNs6WOMicKlRx1n0NSrBG8=;
+  b=HA8U+Go9IwQDUe8Dvfs2UjfEJEVYUsMZjsIM3ZVE3gWRMXTnkf8avrob
+   BCI73xn7vEZtvJ4bG+vzdOiugi9qbRrNUTV4GWofae1U5FvwSf4nF6dkS
+   Zo/fGj/0jRMPzCUQLFctFJh8xE3XDsjQh5j+bjshhnNTx5B6RPRJyHTIj
+   eAut1wvpOfEBCpgjo3G5hn2hFuHqaa7sCf/fWbnbVkMM/5pVpJYQF17Sc
+   RLZ/kBBUv1jNA9E6Szzf93MD7Po4DtS3UXQ0M0fi/+KfZ64533t37VsPy
+   nOvGMnk5qOtdcc+J5py1Zd1WfjNvstP+5v70xjrWx0L/YksAklXRp1e3J
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10308"; a="243089801"
+X-IronPort-AV: E=Sophos;i="5.90,239,1643702400"; 
+   d="scan'208";a="243089801"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2022 21:50:08 -0700
+X-IronPort-AV: E=Sophos;i="5.90,239,1643702400"; 
+   d="scan'208";a="524302212"
+Received: from dchang1-mobl3.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.29.17])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2022 21:50:05 -0700
+From:   Kai Huang <kai.huang@intel.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
+        len.brown@intel.com, tony.luck@intel.com,
+        rafael.j.wysocki@intel.com, reinette.chatre@intel.com,
+        dan.j.williams@intel.com, peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com, kai.huang@intel.com
+Subject: [PATCH v3 06/21] x86/virt/tdx: Shut down TDX module in case of error
+Date:   Wed,  6 Apr 2022 16:49:18 +1200
+Message-Id: <3f19ac995d184e52107e7117a82376cb7ecb35e7.1649219184.git.kai.huang@intel.com>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <cover.1649219184.git.kai.huang@intel.com>
+References: <cover.1649219184.git.kai.huang@intel.com>
 MIME-Version: 1.0
-X-Git-Hash: 881cb3483d12
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,122 +63,106 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use virtio_find_vqs_ctx_size() to specify the maximum ring size of tx,
-rx at the same time.
+TDX supports shutting down the TDX module at any time during its
+lifetime.  After TDX module is shut down, no further SEAMCALL can be
+made on any logical cpu.
 
-                         | rx/tx ring size
--------------------------------------------
-speed == UNKNOWN or < 10G| 1024
-speed < 40G              | 4096
-speed >= 40G             | 8192
+Shut down the TDX module in case of any error happened during the
+initialization process.  It's pointless to leave the TDX module in some
+middle state.
 
-Call virtnet_update_settings() once before calling init_vqs() to update
-speed.
+Shutting down the TDX module requires calling TDH.SYS.LP.SHUTDOWN on all
+BIOS-enabled cpus, and the SEMACALL can run concurrently on different
+cpus.  Implement a mechanism to run SEAMCALL concurrently on all online
+cpus.  Logical-cpu scope initialization will use it too.
 
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
- drivers/net/virtio_net.c | 42 ++++++++++++++++++++++++++++++++++++----
- 1 file changed, 38 insertions(+), 4 deletions(-)
+ arch/x86/virt/vmx/tdx/tdx.c | 40 ++++++++++++++++++++++++++++++++++++-
+ arch/x86/virt/vmx/tdx/tdx.h |  5 +++++
+ 2 files changed, 44 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index a801ea40908f..dad497a47b3a 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -2861,6 +2861,29 @@ static unsigned int mergeable_min_buf_len(struct virtnet_info *vi, struct virtqu
- 		   (unsigned int)GOOD_PACKET_LEN);
+diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+index 674867bccc14..faf8355965a5 100644
+--- a/arch/x86/virt/vmx/tdx/tdx.c
++++ b/arch/x86/virt/vmx/tdx/tdx.c
+@@ -11,6 +11,8 @@
+ #include <linux/cpumask.h>
+ #include <linux/mutex.h>
+ #include <linux/cpu.h>
++#include <linux/smp.h>
++#include <linux/atomic.h>
+ #include <asm/msr-index.h>
+ #include <asm/msr.h>
+ #include <asm/cpufeature.h>
+@@ -328,6 +330,39 @@ static int seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
+ 	return 0;
  }
  
-+static void virtnet_config_sizes(struct virtnet_info *vi, u32 *sizes)
++/* Data structure to make SEAMCALL on multiple CPUs concurrently */
++struct seamcall_ctx {
++	u64 fn;
++	u64 rcx;
++	u64 rdx;
++	u64 r8;
++	u64 r9;
++	atomic_t err;
++	u64 seamcall_ret;
++	struct tdx_module_output out;
++};
++
++static void seamcall_smp_call_function(void *data)
 +{
-+	u32 i, rx_size, tx_size;
++	struct seamcall_ctx *sc = data;
++	int ret;
 +
-+	if (vi->speed == SPEED_UNKNOWN || vi->speed < SPEED_10000) {
-+		rx_size = 1024;
-+		tx_size = 1024;
-+
-+	} else if (vi->speed < SPEED_40000) {
-+		rx_size = 1024 * 4;
-+		tx_size = 1024 * 4;
-+
-+	} else {
-+		rx_size = 1024 * 8;
-+		tx_size = 1024 * 8;
-+	}
-+
-+	for (i = 0; i < vi->max_queue_pairs; i++) {
-+		sizes[rxq2vq(i)] = rx_size;
-+		sizes[txq2vq(i)] = tx_size;
-+	}
++	ret = seamcall(sc->fn, sc->rcx, sc->rdx, sc->r8, sc->r9,
++			&sc->seamcall_ret, &sc->out);
++	if (ret)
++		atomic_set(&sc->err, ret);
 +}
 +
- static int virtnet_find_vqs(struct virtnet_info *vi)
++/*
++ * Call the SEAMCALL on all online cpus concurrently.
++ * Return error if SEAMCALL fails on any cpu.
++ */
++static int seamcall_on_each_cpu(struct seamcall_ctx *sc)
++{
++	on_each_cpu(seamcall_smp_call_function, sc, true);
++	return atomic_read(&sc->err);
++}
++
+ static inline bool p_seamldr_ready(void)
  {
- 	vq_callback_t **callbacks;
-@@ -2868,6 +2891,7 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
- 	int ret = -ENOMEM;
- 	int i, total_vqs;
- 	const char **names;
-+	u32 *sizes;
- 	bool *ctx;
+ 	return !!p_seamldr_info.p_seamldr_ready;
+@@ -437,7 +472,10 @@ static int init_tdx_module(void)
  
- 	/* We expect 1 RX virtqueue followed by 1 TX virtqueue, followed by
-@@ -2895,10 +2919,15 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
- 		ctx = NULL;
- 	}
- 
-+	sizes = kmalloc_array(total_vqs, sizeof(*sizes), GFP_KERNEL);
-+	if (!sizes)
-+		goto err_sizes;
+ static void shutdown_tdx_module(void)
+ {
+-	/* TODO: Shut down the TDX module */
++	struct seamcall_ctx sc = { .fn = TDH_SYS_LP_SHUTDOWN };
 +
- 	/* Parameters for control virtqueue, if any */
- 	if (vi->has_cvq) {
- 		callbacks[total_vqs - 1] = NULL;
- 		names[total_vqs - 1] = "control";
-+		sizes[total_vqs - 1] = 64;
- 	}
- 
- 	/* Allocate/initialize parameters for send/receive virtqueues */
-@@ -2913,8 +2942,10 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
- 			ctx[rxq2vq(i)] = true;
- 	}
- 
--	ret = virtio_find_vqs_ctx(vi->vdev, total_vqs, vqs, callbacks,
--				  names, ctx, NULL);
-+	virtnet_config_sizes(vi, sizes);
++	seamcall_on_each_cpu(&sc);
 +
-+	ret = virtio_find_vqs_ctx_size(vi->vdev, total_vqs, vqs, callbacks,
-+				       names, sizes, ctx, NULL);
- 	if (ret)
- 		goto err_find;
+ 	tdx_module_status = TDX_MODULE_SHUTDOWN;
+ }
  
-@@ -2934,6 +2965,8 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
+index 6990c93198b3..dcc1f6dfe378 100644
+--- a/arch/x86/virt/vmx/tdx/tdx.h
++++ b/arch/x86/virt/vmx/tdx/tdx.h
+@@ -35,6 +35,11 @@ struct p_seamldr_info {
+ #define P_SEAMLDR_SEAMCALL_BASE		BIT_ULL(63)
+ #define P_SEAMCALL_SEAMLDR_INFO		(P_SEAMLDR_SEAMCALL_BASE | 0x0)
  
- 
- err_find:
-+	kfree(sizes);
-+err_sizes:
- 	kfree(ctx);
- err_ctx:
- 	kfree(names);
-@@ -3252,6 +3285,9 @@ static int virtnet_probe(struct virtio_device *vdev)
- 		vi->curr_queue_pairs = num_online_cpus();
- 	vi->max_queue_pairs = max_queue_pairs;
- 
-+	virtnet_init_settings(dev);
-+	virtnet_update_settings(vi);
++/*
++ * TDX module SEAMCALL leaf functions
++ */
++#define TDH_SYS_LP_SHUTDOWN	44
 +
- 	/* Allocate/initialize the rx/tx queues, and invoke find_vqs */
- 	err = init_vqs(vi);
- 	if (err)
-@@ -3264,8 +3300,6 @@ static int virtnet_probe(struct virtio_device *vdev)
- 	netif_set_real_num_tx_queues(dev, vi->curr_queue_pairs);
- 	netif_set_real_num_rx_queues(dev, vi->curr_queue_pairs);
- 
--	virtnet_init_settings(dev);
--
- 	if (virtio_has_feature(vdev, VIRTIO_NET_F_STANDBY)) {
- 		vi->failover = net_failover_create(vi->dev);
- 		if (IS_ERR(vi->failover)) {
+ struct tdx_module_output;
+ u64 __seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
+ 	       struct tdx_module_output *out);
 -- 
-2.31.0
+2.35.1
 
