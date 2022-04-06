@@ -2,50 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D8A64F6471
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 18:08:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E23224F64A4
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 18:08:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236606AbiDFPxP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 11:53:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50380 "EHLO
+        id S236795AbiDFP5J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 11:57:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236578AbiDFPw2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 11:52:28 -0400
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C88B139B2A4;
-        Wed,  6 Apr 2022 06:14:32 -0700 (PDT)
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        with ESMTP id S236637AbiDFP4y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 11:56:54 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A85544F686F
+        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 06:21:44 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2579260BA1
+        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 13:21:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 891FBC385A3;
+        Wed,  6 Apr 2022 13:21:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1649251303;
+        bh=9rQTc7L8tJ6xiJFNxneGRixTQCGHIv1jdjoD81C2PjI=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Iz4AtakFBVCp2wk5WjxYcAYLOVYdFdadBlt82bPLsjO8d8fW1dPCigPmxTIgQQng9
+         zsOlCy4db81JAJlprLuJVqZP6CjsxTekv9K3Js3jUGBf6cRX1DWFm5NXZ0SjidccOX
+         0qdW35FVH9/JpfG8hsaKOnOpxaWO9RXI+2+OEOpu82L1rnCD478Ya3JvRVG8gA9z0x
+         W8lKty2tqUDBc9VEcL9If31vrbJ3W2nYhM46/PFRDVLd9HgFkHybilRrIk0ntInAjx
+         xqkQF5EC+cED7luy5reO2x/6N2SSEENlX5xBqHYhvNjzzEecLVtqbFV3Z8eMsbs30y
+         ahMtGxF/iVJ1Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1nc5Ti-0001n7-Cl; Wed, 06 Apr 2022 15:13:42 +0200
-Message-ID: <eed1cea4-409a-f03e-5c31-e82d49bb2101@maciej.szmigiero.name>
-Date:   Wed, 6 Apr 2022 15:13:35 +0200
+        (envelope-from <maz@kernel.org>)
+        id 1nc5bQ-002Ae1-Gm; Wed, 06 Apr 2022 14:21:41 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>, kvmarm@lists.cs.columbia.edu
+Cc:     Andrew Jones <drjones@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Peter Shier <pshier@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Oliver Upton <oupton@google.com>,
+        James Morse <james.morse@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v6 0/2] KVM: arm64: mixed-width check should be skipped for uninitialized vCPUs
+Date:   Wed,  6 Apr 2022 14:21:33 +0100
+Message-Id: <164925121901.3715988.2577538688364822137.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220329031924.619453-1-reijiw@google.com>
+References: <20220329031924.619453-1-reijiw@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220402010903.727604-1-seanjc@google.com>
- <20220402010903.727604-6-seanjc@google.com>
- <a47217da0b6db4f1b6b6c69a9dc38350b13ac17c.camel@redhat.com>
- <YkshgrUaF4+MrrXf@google.com>
- <7caee33a-da0f-00be-3195-82c3d1cd4cb4@maciej.szmigiero.name>
- <YkzxXw1Aznv4zX0a@google.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH 5/8] KVM: SVM: Re-inject INT3/INTO instead of retrying the
- instruction
-In-Reply-To: <YkzxXw1Aznv4zX0a@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu, drjones@redhat.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, alexandru.elisei@arm.com, ricarkol@google.com, pshier@google.com, rananta@google.com, jingzhangos@google.com, suzuki.poulose@arm.com, will@kernel.org, oupton@google.com, james.morse@arm.com, pbonzini@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -54,72 +73,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6.04.2022 03:48, Sean Christopherson wrote:
-> On Mon, Apr 04, 2022, Maciej S. Szmigiero wrote:
-(..)
->> Also, I'm not sure that even the proposed updated code above will
->> actually restore the L1-requested next_rip correctly on L1 -> L2
->> re-injection (will review once the full version is available).
+On Mon, 28 Mar 2022 20:19:22 -0700, Reiji Watanabe wrote:
+> KVM allows userspace to configure either all EL1 32bit or 64bit vCPUs
+> for a guest.  At vCPU reset, vcpu_allowed_register_width() checks
+> if the vcpu's register width is consistent with all other vCPUs'.
+> Since the checking is done even against vCPUs that are not initialized
+> (KVM_ARM_VCPU_INIT has not been done) yet, the uninitialized vCPUs
+> are erroneously treated as 64bit vCPU, which causes the function to
+> incorrectly detect a mixed-width VM.
 > 
-> Spoiler alert, it doesn't.  Save yourself the review time.  :-)
-> 
-> The missing piece is stashing away the injected event on nested VMRUN.  Those
-> events don't get routed through the normal interrupt/exception injection code and
-> so the next_rip info is lost on the subsequent #NPF.
-> 
-> Treating soft interrupts/exceptions like they were injected by KVM (which they
-> are, technically) works and doesn't seem too gross.  E.g. when prepping vmcb02
-> 
-> 	if (svm->nrips_enabled)
-> 		vmcb02->control.next_rip    = svm->nested.ctl.next_rip;
-> 	else if (boot_cpu_has(X86_FEATURE_NRIPS))
-> 		vmcb02->control.next_rip    = vmcb12_rip;
-> 
-> 	if (is_evtinj_soft(vmcb02->control.event_inj)) {
-> 		svm->soft_int_injected = true;
-> 		svm->soft_int_csbase = svm->vmcb->save.cs.base;
-> 		svm->soft_int_old_rip = vmcb12_rip;
-> 		if (svm->nrips_enabled)
-> 			svm->soft_int_next_rip = svm->nested.ctl.next_rip;
-> 		else
-> 			svm->soft_int_next_rip = vmcb12_rip;
-> 	}
-> 
-> And then the VMRUN error path just needs to clear soft_int_injected.
+> [...]
 
-I am also a fan of parsing EVENTINJ from VMCB12 into relevant KVM
-injection structures (much like EXITINTINFO is parsed), as I said to
-Maxim two days ago [1].
-Not only for software {interrupts,exceptions} but for all incoming
-events (again, just like EXITINTINFO).
+Applied to fixes, thanks!
 
-However, there is another issue related to L1 -> L2 event re-injection
-using standard KVM event injection mechanism: it mixes the L1 injection
-state with the L2 one.
+[1/2] KVM: arm64: mixed-width check should be skipped for uninitialized vCPUs
+      commit: 26bf74bd9f6ff0f1545b4f0c92a37c232d076014
+[2/2] KVM: arm64: selftests: Introduce vcpu_width_config
+      commit: 2f5d27e6cf14efe652748bad89ee529ed5a5d577
 
-Specifically for SVM:
-* When re-injecting a NMI into L2 NMI-blocking is enabled in
-vcpu->arch.hflags (shared between L1 and L2) and IRET intercept is
-enabled.
+Note that I have somewhat tweaked the first patch to my own liking.
 
-This is incorrect, since it is L1 that is responsible for enforcing NMI
-blocking for NMIs that it injects into its L2.
-Also, *L2* being the target of such injection definitely should not block
-further NMIs for *L1*.
+Cheers,
 
-* When re-injecting a *hardware* IRQ into L2 GIF is checked (previously
-even on the BUG_ON() level), while L1 should be able to inject even when
-L2 GIF is off,
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
 
-With the code in my previous patch set I planned to use
-exit_during_event_injection() to detect such case, but if we implement
-VMCB12 EVENTINJ parsing we can simply add a flag that the relevant event
-comes from L1, so its normal injection side-effects should be skipped.
 
-By the way, the relevant VMX code also looks rather suspicious,
-especially for the !enable_vnmi case.
-
-Thanks,
-Maciej
-
-[1]: https://lore.kernel.org/kvm/7d67bc6f-00ac-7c07-f6c2-c41b2f0d35a1@maciej.szmigiero.name/
