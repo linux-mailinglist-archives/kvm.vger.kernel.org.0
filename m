@@ -2,80 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F2A64F65DA
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 18:43:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 457534F6596
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 18:43:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237534AbiDFQan (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 12:30:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49970 "EHLO
+        id S237375AbiDFQaK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 12:30:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237784AbiDFQ3x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 12:29:53 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 116E4432489
-        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 18:50:34 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id t13so932040pgn.8
-        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 18:50:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=urDwMH5Kk1KfjrQeaJid9AArbzQ9KreP5Y2aNsYYLvw=;
-        b=Gta44WdpTdySv8KVV/aLRw1jW/AgPqKonNyWSanOe+OgmkSi/hCe5qRLhGuQWTYUNX
-         AfXBZitdIcGxiq/1mwF0mi3E8PKslzoNYWuUQ3fVp1hmvhx14oiu9Og9ldIbaNJZQ4e9
-         p7W5hP0daYbeuB40sAo5e+gm0rJO8RbzqGmdpj+MyHjK+Ka0VirE9XeosOioP9xBMwkg
-         Dl5vx6W+lQ+i7NK72a1vQpjHjadTk1kjsZ4N27n/3NpkRdYHZvySijpIGUpB4BTLhbRE
-         oYvIswH5qm5Ki76FqPszvuEX2V5I9Y5IuyEk5QgOhQJhUzcisak/wSYu9V9LTx7RvgFT
-         4Lew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=urDwMH5Kk1KfjrQeaJid9AArbzQ9KreP5Y2aNsYYLvw=;
-        b=WzqCmaigSEQyDUW9YOKy1NG3QxQgtIfKZTjGbO5/SL2weChn9xFxnhX6uYk3Zsmd9P
-         vWoDUn3NhrGyA/e+tFeX/7j3fEyD8SY33eDTPl3mR1Rhic4vwV1sUnqakP+TaTg5TR+k
-         daYiD9S/0ShJ7UmzyMc7Eq9SOzxuWbMO38X6p8bTCDn41jIP5AEyBNLqJi9N981pSpEe
-         ovgSXLObeBQRBiLMJJ8/mw5GWCwW4bA8nrCw+ENWCK92X+8hJOG/FRcNT2HfDVxMNKcr
-         BLVd9Jk45RNwktOnI+IM81noJxafaR3IBaLl5hzZyP/z0ZfBYYdsW7SIcupgXpQ7IFYH
-         PJrA==
-X-Gm-Message-State: AOAM532ilDpYMmf5gRl77xLpfKu71DRqAwGqr9xBRisWf8pE2HV3CW5X
-        cUjxMOiJiLAyNW44coH4cf3MLQ==
-X-Google-Smtp-Source: ABdhPJwvlaGQuNw+7D+lnn+rDNWamAl+YMLOOcLlLd5ZIfdrpl0akDCq1Qq53Kd+xEE9NjWYQkIwQw==
-X-Received: by 2002:a65:63d9:0:b0:374:6b38:c6b3 with SMTP id n25-20020a6563d9000000b003746b38c6b3mr5234225pgv.195.1649209834303;
-        Tue, 05 Apr 2022 18:50:34 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v13-20020aa799cd000000b004fdaae0a91bsm17056837pfi.20.2022.04.05.18.50.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Apr 2022 18:50:33 -0700 (PDT)
-Date:   Wed, 6 Apr 2022 01:50:29 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Varad Gautam <varad.gautam@suse.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
-        marcorr@google.com, zxwang42@gmail.com, erdemaktas@google.com,
-        rientjes@google.com, brijesh.singh@amd.com,
-        Thomas.Lendacky@amd.com, jroedel@suse.de, bp@suse.de
-Subject: Re: [kvm-unit-tests PATCH v3 11/11] x86: AMD SEV-ES: Handle string
- IO for IOIO #VC
-Message-ID: <Ykzx5f9HucC7ss2i@google.com>
-References: <20220224105451.5035-1-varad.gautam@suse.com>
- <20220224105451.5035-12-varad.gautam@suse.com>
+        with ESMTP id S237706AbiDFQ3h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 12:29:37 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CEA543B83B;
+        Tue,  5 Apr 2022 18:55:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1649210102; x=1680746102;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=S/gcWPbQqOYy2qVePMHR8mvnRPUxCPUqOYRtPIoCTPY=;
+  b=CKOAgXFs/ACH9HTYA8ySNi7vqHNHK87sA9u8Ol8qPZHgLMokFErSI0+l
+   wrT/tevKj5KPJqYI8+qm748luk3Ulg+amDVtbIIlOKOhpg07tk23BjYyD
+   Zwrnb3Z4rpRlj53JOQWSPOWAGUAV9pOpZqZmcx8zkRWdL5ytXhkj+DUpM
+   mEd+I4lJ7hVDvAS002qsCCOS7SDwqF33aw2bZ3R9v1ehAGv4670hrg3jP
+   9+po+yqcRbgIgvRqtopV24A4rHC41t5TD2u6R3a4i6vFYt+kixxhgEj27
+   +nMNN9EhU5XwGR8qyhARvrljLkGEpnL+pHYBZhxiqbCLjdyFwM58NtK0B
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10308"; a="261099515"
+X-IronPort-AV: E=Sophos;i="5.90,238,1643702400"; 
+   d="scan'208";a="261099515"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2022 18:54:59 -0700
+X-IronPort-AV: E=Sophos;i="5.90,238,1643702400"; 
+   d="scan'208";a="570281512"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.175.134]) ([10.249.175.134])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2022 18:54:56 -0700
+Message-ID: <17981a2e-03e3-81df-0654-5ccb29f43546@intel.com>
+Date:   Wed, 6 Apr 2022 09:54:05 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220224105451.5035-12-varad.gautam@suse.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.7.0
+Subject: Re: [RFC PATCH v5 026/104] KVM: TDX: x86: Add vm ioctl to get TDX
+ systemwide parameters
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>, isaku.yamahata@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Jim Mattson <jmattson@google.com>,
+        erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <5ff08ce32be458581afe59caa05d813d0e4a1ef0.1646422845.git.isaku.yamahata@intel.com>
+ <586be87a-4f81-ea43-2078-a6004b4aba08@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <586be87a-4f81-ea43-2078-a6004b4aba08@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 24, 2022, Varad Gautam wrote:
-> Using Linux's IOIO #VC processing logic.
+On 4/5/2022 8:52 PM, Paolo Bonzini wrote:
+> On 3/4/22 20:48, isaku.yamahata@intel.com wrote:
+>> Implement a VM-scoped subcomment to get system-wide parameters.  Although
+>> this is system-wide parameters not per-VM, this subcomand is VM-scoped
+>> because
+>> - Device model needs TDX system-wide parameters after creating KVM VM.
+>> - This subcommands requires to initialize TDX module.  For lazy
+>>    initialization of the TDX module, vm-scope ioctl is better.
+> 
+> Since there was agreement to install the TDX module on load, please 
+> place this ioctl on the /dev/kvm file descriptor.
+> 
+> At least for SEV, there were cases where the system-wide parameters are 
+> needed outside KVM, so it's better to avoid requiring a VM file descriptor.
 
-How much string I/O is there in KUT?  I assume it's rare, i.e. avoiding it entirely
-is probably less work in the long run.
+I don't have strong preference on KVM-scope ioctl or VM-scope.
+
+Initially, we made it KVM-scope and change it to VM-scope in this 
+version. Yes, it returns the info from TDX module, which doesn't vary 
+per VM. However, what if we want to return different capabilities 
+(software controlled capabilities) per VM? Part of the TDX capabilities 
+serves like get_supported_cpuid, making it KVM wide lacks the 
+flexibility to return differentiated capabilities for different TDs.
+
+
+> Thanks,
+> 
+> Paolo
+> 
+
