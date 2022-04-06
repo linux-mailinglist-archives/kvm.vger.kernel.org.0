@@ -2,65 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BFEC44F6CD4
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 23:33:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8357A4F6CDC
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 23:35:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236013AbiDFVfe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 17:35:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59140 "EHLO
+        id S236327AbiDFVhD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 17:37:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236347AbiDFVe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 17:34:28 -0400
-Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27A3316BCD5
-        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 13:49:02 -0700 (PDT)
-Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-2e64a6b20eeso40600477b3.3
-        for <kvm@vger.kernel.org>; Wed, 06 Apr 2022 13:49:02 -0700 (PDT)
+        with ESMTP id S235832AbiDFVgv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 17:36:51 -0400
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A5A51F63E
+        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 13:50:18 -0700 (PDT)
+Received: by mail-yb1-xb36.google.com with SMTP id x21so6148675ybd.6
+        for <kvm@vger.kernel.org>; Wed, 06 Apr 2022 13:50:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=WHuiTVMzOu/G4N5A7/XhEoBcceNzSg+USAXqJ4DGBJM=;
-        b=n4WWQeUZ7DJk10ayZdnFG35bvu6nAHc+bOzCRfEV/MKbk2vKdvpcmjBd8raZfWheiK
-         HGQLtQsXHmWxftu4njnZ5BIfpZ5sNjOjUST6aFDdFKGNbfn0yQjM4v8L+Vs5YRw/DOEs
-         e9Th5d1FoNnfVLznb0Vp3hUr+WfQc8pC2/HDNG0Lcyjy1qeK9EjdljRYNMK+ekBXsBiB
-         TXZyZUyVPgMO/3DBxwjzsBBfa9ULzo+FiWSxuYszkEIxRJJVBzTgDblAaxMnvcGLsIJZ
-         SRzGgUsfDcdS8ELxTRjaz5aFjzzh12mP1UGKNm0MW5rBS8TLOX2ic+eNM+aEkedK7/F6
-         d7ag==
+        bh=sFI0AJVTPwPw0LmwssqZcXake7SjDusjEH1aLxnOGrI=;
+        b=VBxmrMVPtydbsfRqsorjhKDoEdFwlfvFfHl7Qizy+qjuks/24gknLBbySdud//aBSz
+         /VIp99eQYHZthbGrg6IS/L7Tki5m7OmrvgsElS/LSuGKc8EW9EsTts4q2TrjGvC1kpLS
+         F6dWxsYSnhINwB7LUT7IScIlJE9XmXK+MEU/2bVJlTuyTLLNvfleTh9oQatKRCiOFMUC
+         JqeiuHH5nGVcXRsINrzUHb55PX5pAWTat0ZJLO5AZ3CTZTHy3rdXGWy8ZzLhFC6UZ7Uk
+         VxkYet4qNF6XpHSXucb4zSnR++/Ft6GeHGr1qW2JjZGgo8EhW+Ja6XVCIIQfcCCduf0J
+         K4AA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=WHuiTVMzOu/G4N5A7/XhEoBcceNzSg+USAXqJ4DGBJM=;
-        b=ckoBS9CMxHMczdtPQq+QEL+fJhpZ1zzbxVVhlFZ05zop5uJv4YqTVopLtUJyrpvPc8
-         MRt8xkepfyD3feTU2/mfsXNlyqLPE2EpCiTWIkokmdYlYpefZSXp0gBMZld1fmVp9dPz
-         QyVulYhr9cxf4/+xibZVxaq9UNLBAkLOHxaZz85gdGthqd5XcmKy2knznzHWPX8CXACy
-         7+st35dqUCTmxaTLI3mkrJNKH4yoDADK6+1fis/PNDtkKZhLzP8bfCE5U7o9wcq/71SY
-         9ZNoNdJ4SR2pN2ZwI4hVeJDam87TN9BKGe+k1+nJ6jl/HIByk2HVvXk19QLkfawzMZ3d
-         euFA==
-X-Gm-Message-State: AOAM533vnRAMVwY5j2enHtnVm1To7vdeZprLnXaDulrcvc1TKrM0Zhr9
-        uKgXiJwhK6Ez1UjZXkeO+a9/R1BvnxW67A5bYwR7+w==
-X-Google-Smtp-Source: ABdhPJwuJoeIIXWujwLOGjbRRuwN2N7IUM86IvsuFfG+uYj8QUCQPhq3Yklmnw+3BgnlUv+islcTR3mLgAVQ42d1wpA=
-X-Received: by 2002:a0d:d5c3:0:b0:2e5:cc05:1789 with SMTP id
- x186-20020a0dd5c3000000b002e5cc051789mr8513921ywd.472.1649278141176; Wed, 06
- Apr 2022 13:49:01 -0700 (PDT)
+        bh=sFI0AJVTPwPw0LmwssqZcXake7SjDusjEH1aLxnOGrI=;
+        b=CMSAJ1/XGi6WCoW3b2YWJ66Mogia+ngggavada+S3+colQcSSAyTeDdGjbNPQ41IMO
+         9lZ5oi/MyE9OSku5B9Z94Q5RYzJ27e+b8B0rktKEdPAaF/3qI0TjovrNEGkwllJlhMPa
+         /53XQ2ie58LQe85E3CBwWX7C37JBLLwq2IUBJLsno/vtdMMIghJYjPS2QxlhA376A+IL
+         lxQpltjbrC+n/zIjGXT0yP+67OfN0rgNKThoipXVaAUKbTXKDe2q0kQAhtQlxZ4kwFtJ
+         VDOQouGDxh4a1B2F369xcvbw86n0M2DZUZ8hXB1eiWgK0jjYL+Ay75PsYQIoupa4p6q4
+         PgqQ==
+X-Gm-Message-State: AOAM530Ur6NUWVTflntQrEWlf4pABbpfEAVYreH/EOjkBuXt60r6gvyb
+        aNwh1YsFVsuKOqBvo/LeAOjQLriUdA3xy02GGXwydA==
+X-Google-Smtp-Source: ABdhPJwR0QZVr+oFFiA9oRCRtbQSk240zhY0yqvRUudwSR5L5ZfE5RfF+mPIml8RimPr4f6xCim2REhriPS2GPtoRns=
+X-Received: by 2002:a25:d913:0:b0:634:23a5:7f68 with SMTP id
+ q19-20020a25d913000000b0063423a57f68mr8044255ybg.40.1649278217564; Wed, 06
+ Apr 2022 13:50:17 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220330174621.1567317-1-bgardon@google.com> <20220330174621.1567317-4-bgardon@google.com>
- <YkzBjF3NyI9fyZad@google.com>
-In-Reply-To: <YkzBjF3NyI9fyZad@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 6 Apr 2022 13:48:50 -0700
-Message-ID: <CANgfPd8xTpsW-9hZACY74JfyDBU2vLoBVLGUNyABgBsjm0L4Kw@mail.gmail.com>
-Subject: Re: [PATCH v3 03/11] KVM: selftests: Test reading a single stat
-To:     David Matlack <dmatlack@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+References: <cover.1646422845.git.isaku.yamahata@intel.com> <1df5271baa641d9d189edb86f9ee0921ea3a83e0.1646422845.git.isaku.yamahata@intel.com>
+In-Reply-To: <1df5271baa641d9d189edb86f9ee0921ea3a83e0.1646422845.git.isaku.yamahata@intel.com>
+From:   Sagi Shahar <sagis@google.com>
+Date:   Wed, 6 Apr 2022 13:50:06 -0700
+Message-ID: <CAAhR5DEb+jRfGxK0nv4A_XEEnY4yrw1CzCcXU8HNw=CnHW27Gw@mail.gmail.com>
+Subject: Re: [RFC PATCH v5 086/104] KVM: TDX: handle ept violation/misconfig exit
+To:     "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
-        David Dunn <daviddunn@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Junaid Shahid <junaids@google.com>
+        Erdem Aktas <erdemaktas@google.com>,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -73,116 +70,96 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 5, 2022 at 3:24 PM David Matlack <dmatlack@google.com> wrote:
+On Fri, Mar 4, 2022 at 12:23 PM <isaku.yamahata@intel.com> wrote:
 >
-> On Wed, Mar 30, 2022 at 10:46:13AM -0700, Ben Gardon wrote:
-> > Retrieve the value of a single stat by name in the binary stats test to
-> > ensure the kvm_util library functions work.
-> >
-> > CC: Jing Zhang <jingzhangos@google.com>
-> > Signed-off-by: Ben Gardon <bgardon@google.com>
-> > ---
-> >  .../selftests/kvm/include/kvm_util_base.h     |  1 +
-> >  .../selftests/kvm/kvm_binary_stats_test.c     |  3 ++
-> >  tools/testing/selftests/kvm/lib/kvm_util.c    | 53 +++++++++++++++++++
-> >  3 files changed, 57 insertions(+)
-> >
-> > diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> > index 4783fd1cd4cf..78c4407f36b4 100644
-> > --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> > +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> > @@ -402,6 +402,7 @@ void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid);
-> >  int vm_get_stats_fd(struct kvm_vm *vm);
-> >  int vcpu_get_stats_fd(struct kvm_vm *vm, uint32_t vcpuid);
-> >  void dump_vm_stats(struct kvm_vm *vm);
-> > +uint64_t vm_get_single_stat(struct kvm_vm *vm, const char *stat_name);
-> >
-> >  uint32_t guest_get_vcpuid(void);
-> >
-> > diff --git a/tools/testing/selftests/kvm/kvm_binary_stats_test.c b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-> > index afc4701ce8dd..97bde355f105 100644
-> > --- a/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-> > +++ b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-> > @@ -177,6 +177,9 @@ static void vm_stats_test(struct kvm_vm *vm)
-> >
-> >       /* Dump VM stats */
-> >       dump_vm_stats(vm);
-> > +
-> > +     /* Read a single stat. */
-> > +     printf("remote_tlb_flush: %lu\n", vm_get_single_stat(vm, "remote_tlb_flush"));
-> >  }
-> >
-> >  static void vcpu_stats_test(struct kvm_vm *vm, int vcpu_id)
-> > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > index f87df68b150d..9c4574381daa 100644
-> > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > @@ -2705,3 +2705,56 @@ void dump_vm_stats(struct kvm_vm *vm)
-> >       close(stats_fd);
-> >  }
-> >
-> > +static int vm_get_stat_data(struct kvm_vm *vm, const char *stat_name,
-> > +                         uint64_t **data)
-> > +{
-> > +     struct kvm_stats_desc *stats_desc;
-> > +     struct kvm_stats_header *header;
-> > +     struct kvm_stats_desc *desc;
-> > +     size_t size_desc;
-> > +     int stats_fd;
-> > +     int ret = -EINVAL;
-> > +     int i;
-> > +
-> > +     *data = NULL;
-> > +
-> > +     stats_fd = vm_get_stats_fd(vm);
-> > +
-> > +     header = read_vm_stats_header(stats_fd);
-> > +
-> > +     stats_desc = read_vm_stats_desc(stats_fd, header);
-> > +
-> > +     size_desc = stats_desc_size(header);
-> > +
-> > +     /* Read kvm stats data one by one */
-> > +     for (i = 0; i < header->num_desc; ++i) {
-> > +             desc = (void *)stats_desc + (i * size_desc);
-> > +
-> > +             if (strcmp(desc->name, stat_name))
-> > +                     continue;
-> > +
-> > +             ret = read_stat_data(stats_fd, header, desc, data);
-> > +     }
-> > +
-> > +     free(stats_desc);
-> > +     free(header);
-> > +
-> > +     close(stats_fd);
-> > +
-> > +     return ret;
-> > +}
-> > +
-> > +uint64_t vm_get_single_stat(struct kvm_vm *vm, const char *stat_name)
-> > +{
-> > +     uint64_t *data;
-> > +     uint64_t value;
-> > +     int ret;
-> > +
-> > +     ret = vm_get_stat_data(vm, stat_name, &data);
-> > +     TEST_ASSERT(ret == 1, "Stat %s expected to have 1 element, but has %d",
-> > +                 stat_name, ret);
-> > +     value = *data;
-> > +     free(data);
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 >
-> Allocating temporary storage for the data is unnecessary. Just read the
-> stat directly into &value. You'll need to change read_stat_data() to
-> accept another parameter that defines the number of elements the caller
-> wants to read. Otherwise botched stats could trigger a buffer overflow.
+> On EPT violation, call a common function, __vmx_handle_ept_violation() to
+> trigger x86 MMU code.  On EPT misconfiguration, exit to ring 3 with
+> KVM_EXIT_UNKNOWN.  because EPT misconfiguration can't happen as MMIO is
+> trigged by TDG.VP.VMCALL. No point to set a misconfiguration value for the
+> fast path.
+>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/kvm/vmx/tdx.c | 40 ++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 38 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 6fbe89bcfe1e..2c35dcad077e 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -1081,6 +1081,40 @@ void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
+>         __vmx_deliver_posted_interrupt(vcpu, &tdx->pi_desc, vector);
+>  }
+>
+> +#define TDX_SEPT_PFERR (PFERR_WRITE_MASK | PFERR_USER_MASK)
 
-Will do.
+TDX_SEPT_PFERR is defined using PFERR_.* bitmask but
+__vmx_handle_ept_violation is accepting an EPT_VIOLATION_.* bitmask.
+so (PFERR_WRITE_MASK | PFERR_USER_MASK) will get interpreted as
+(EPT_VIOLATION_ACC_WRITE | EPT_VIOLATION_ACC_INSTR) which will get
+translated to (PFERR_WRITE_MASK | PFERR_FETCH_MASK). Was that the
+intention of this code?
 
+> +
+> +static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
+> +{
+> +       unsigned long exit_qual;
+> +
+> +       if (kvm_is_private_gpa(vcpu->kvm, tdexit_gpa(vcpu)))
+> +               exit_qual = TDX_SEPT_PFERR;
+> +       else {
+> +               exit_qual = tdexit_exit_qual(vcpu);
+> +               if (exit_qual & EPT_VIOLATION_ACC_INSTR) {
+> +                       pr_warn("kvm: TDX instr fetch to shared GPA = 0x%lx @ RIP = 0x%lx\n",
+> +                               tdexit_gpa(vcpu), kvm_rip_read(vcpu));
+> +                       vcpu->run->exit_reason = KVM_EXIT_EXCEPTION;
+> +                       vcpu->run->ex.exception = PF_VECTOR;
+> +                       vcpu->run->ex.error_code = exit_qual;
+> +                       return 0;
+> +               }
+> +       }
+> +
+> +       trace_kvm_page_fault(tdexit_gpa(vcpu), exit_qual);
+> +       return __vmx_handle_ept_violation(vcpu, tdexit_gpa(vcpu), exit_qual);
+> +}
+> +
+> +static int tdx_handle_ept_misconfig(struct kvm_vcpu *vcpu)
+> +{
+> +       WARN_ON(1);
+> +
+> +       vcpu->run->exit_reason = KVM_EXIT_UNKNOWN;
+> +       vcpu->run->hw.hardware_exit_reason = EXIT_REASON_EPT_MISCONFIG;
+> +
+> +       return 0;
+> +}
+> +
+>  int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
+>  {
+>         union tdx_exit_reason exit_reason = to_tdx(vcpu)->exit_reason;
+> @@ -1097,6 +1131,10 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
+>         WARN_ON_ONCE(fastpath != EXIT_FASTPATH_NONE);
 >
-> > +     return value;
-> > +}
-> > +
-> > --
-> > 2.35.1.1021.g381101b075-goog
-> >
+>         switch (exit_reason.basic) {
+> +       case EXIT_REASON_EPT_VIOLATION:
+> +               return tdx_handle_ept_violation(vcpu);
+> +       case EXIT_REASON_EPT_MISCONFIG:
+> +               return tdx_handle_ept_misconfig(vcpu);
+>         case EXIT_REASON_OTHER_SMI:
+>                 /*
+>                  * If reach here, it's not a MSMI.
+> @@ -1378,8 +1416,6 @@ void tdx_flush_tlb(struct kvm_vcpu *vcpu)
+>                 cpu_relax();
+>  }
+>
+> -#define TDX_SEPT_PFERR (PFERR_WRITE_MASK | PFERR_USER_MASK)
+> -
+>  static int tdx_init_mem_region(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
+>  {
+>         struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> --
+> 2.25.1
+>
+
+Sagi
