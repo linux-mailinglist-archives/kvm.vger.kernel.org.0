@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 457244F6EDE
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 01:56:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4FC44F6EE3
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 01:56:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238155AbiDFX6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 19:58:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50126 "EHLO
+        id S238165AbiDFX6Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 19:58:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234305AbiDFX6W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 19:58:22 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58B5EBF331
-        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 16:56:24 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id b12-20020a056902030c00b0061d720e274aso2951066ybs.20
-        for <kvm@vger.kernel.org>; Wed, 06 Apr 2022 16:56:24 -0700 (PDT)
+        with ESMTP id S237019AbiDFX6X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 19:58:23 -0400
+Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57BA3C5590
+        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 16:56:25 -0700 (PDT)
+Received: by mail-il1-x149.google.com with SMTP id r16-20020a056e02109000b002ca35f87493so2716230ilj.22
+        for <kvm@vger.kernel.org>; Wed, 06 Apr 2022 16:56:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=UE8U10PWA5ODRXn2/uykVggaoFMEeuBNkjbyKzrUnCc=;
-        b=StweytVoVyZbt90ESUuB2VGZmpz69UiQywLFR+/3fhQYHNUTdQZloEgP4cirg0Kkhd
-         ureLULbzCXKzEuVeyccV7zNNedLEQpO4ayhcybXsVmgxDbgKCBrnsMt4KcoGFXliCiDL
-         p0yS3x603eqH2cuF0Jfgeumy6ZZXE4/Odao00WPCwWYzuYVheUOvU/y7PhYbkklz5J8P
-         spP+ZBEnX4drhVit+1wCy6T9N9UoRJEFMu/pj0F3D0FqfNpLHeAMKkavfelwlloXm8Ki
-         mtOpj9fHSSXtZbEZUujQ5kBOBV5TtTSNk278FllAny6hV6Rytjamf7Z1WSwRNnqUdxFb
-         gBaA==
+        bh=UF2I2mHbDVASrG05DEItZfczKpOZthJZ1m0MB3YjXVY=;
+        b=CxQm71obckQx1ot8ttP2ziACqWcKGK4akKG1COLV+bQWzBRg9Azn3q2fUw6u0mZ4La
+         mlTSehKe88RUN3Cqari2K1UKweOzh7gRY7rvke0Sxra/LR5yabTeWR3pb6gABgpAiFbh
+         3LDUmHjknj3TOpwWLKKUTTr8xa2BRA6ZKHLZWppjCqiXKxKE/+315ZNXsiA0KQ1Himyk
+         YBv93Eof/Lgya4aIH5+cvdaqrqFkT48ZnEXupNIiuuliGu6MX1nMotBFktHb532z7a6I
+         14qW8I7whAReD61AEBQsI04P7UtTOM97tMAbHs6qs1AgQwe85gA4jCx8P8vj1JGqCJWd
+         63PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=UE8U10PWA5ODRXn2/uykVggaoFMEeuBNkjbyKzrUnCc=;
-        b=kYEin2Jb2Uq8N+OpkdmJHyHAZkMAcwXsRO0jMDpk4wce/aL40Vf3BfEc5Dg3zydpaa
-         +hSXY+6cMihRXWYT+pzBZO79epFBCQ/BFSD6O6Q0NtBqOsGTxup/93+H9oBiGGmOWb6e
-         TASj23nd30V0oIAt9cLQC7v04qAQOM36HDUY+cbp6CzAJ9WOdBxezkVQQ8Lq/vofo/0j
-         U82liy0NBIo6tMGd28fgSoB6LD0aLg/R2VSM64eRHOV9pnYxxYAYT9inwq145uU8hJ4S
-         lMUhrG+CqdN0Llkdo2EvZcUyznFmiOe6eHDAarVXsKqWU8OIWmpS7Xkek69EcNt/4zC/
-         B6aA==
-X-Gm-Message-State: AOAM532dXlTeSLg4M/OnYu5MVu6aEqUwTQdbjOG52qELMUEwqAUMxAmA
-        WfQl4yYhba0+C7E29kihXMhItY/ybj8=
-X-Google-Smtp-Source: ABdhPJydvJQ9YWsazIPz0K7K9LDxhja6MJh+d1QgvhsxpSx1I3YpvuashAMC5XHLhA33/FRzcSzrmPBE1A8=
+        bh=UF2I2mHbDVASrG05DEItZfczKpOZthJZ1m0MB3YjXVY=;
+        b=qf7/b4IiuDtjdYRWAzgiYA5WpLpw3QwPX+yKY0fFgIukclIKu2r6i9ToRlpxmNCAQH
+         UCi7Ccv3UYZmXt4BsdCJuZW8wOWp8ee/U8Aia+/N0TWVKBrqdBDuc7O/ABZCfwwrtMGC
+         ohFHJ9g1SSs0CuvK2Q6fiTgvXYKVTolQg1ilU61qtE0MSKRCuyihsfz8valknXT7OpoI
+         tGYQJNFp7jtbuV0kwj+Ubzc6mbi0YpDIVj5Kl0Ujn1AaA0R9lRPkY4KBbwrzxlTdO1Ml
+         i8qcxTJstSYkyNY4/D6yxXTZUDM6qwyJFtPAJrlElu0wdM9/TQYt5VtcZU6St4u2eRwB
+         rW6Q==
+X-Gm-Message-State: AOAM5314+nU+ToZYQGZZ3GBSaFU32il9Ts8daAJpo97IglJBaMQwiHXb
+        SXtclB7AI/ERU3cSy49j+pA/pLqi0ZI=
+X-Google-Smtp-Source: ABdhPJxZYhapYayA71PbkdV1563SUH1JsWUENhomJcQekruoJ8CSaLV4CpWvvqb90+EKwQyAk2ignByhlAY=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6902:100e:b0:637:7536:6582 with SMTP id
- w14-20020a056902100e00b0063775366582mr8357978ybt.355.1649289383593; Wed, 06
- Apr 2022 16:56:23 -0700 (PDT)
-Date:   Wed,  6 Apr 2022 23:56:13 +0000
+ (user=oupton job=sendgmr) by 2002:a92:7513:0:b0:2b9:5b61:e376 with SMTP id
+ q19-20020a927513000000b002b95b61e376mr5694259ilc.193.1649289384698; Wed, 06
+ Apr 2022 16:56:24 -0700 (PDT)
+Date:   Wed,  6 Apr 2022 23:56:14 +0000
 In-Reply-To: <20220406235615.1447180-1-oupton@google.com>
-Message-Id: <20220406235615.1447180-2-oupton@google.com>
+Message-Id: <20220406235615.1447180-3-oupton@google.com>
 Mime-Version: 1.0
 References: <20220406235615.1447180-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
-Subject: [PATCH v3 1/3] KVM: Don't create VM debugfs files outside of the VM directory
+Subject: [PATCH v3 2/3] selftests: KVM: Don't leak GIC FD across dirty log
+ test iterations
 From:   Oliver Upton <oupton@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -64,7 +65,8 @@ Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
         Reiji Watanabe <reijiw@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Oliver Upton <oupton@google.com>, stable@kernel.org
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -76,64 +78,91 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Unfortunately, there is no guarantee that KVM was able to instantiate a
-debugfs directory for a particular VM. To that end, KVM shouldn't even
-attempt to create new debugfs files in this case. If the specified
-parent dentry is NULL, debugfs_create_file() will instantiate files at
-the root of debugfs.
+dirty_log_perf_test instantiates a VGICv3 for the guest (if supported by
+hardware) to reduce the overhead of guest exits. However, the test does
+not actually close the GIC fd when cleaning up the VM between test
+iterations, meaning that the VM is never actually destroyed in the
+kernel.
 
-For arm64, it is possible to create the vgic-state file outside of a
-VM directory, the file is not cleaned up when a VM is destroyed.
-Nonetheless, the corresponding struct kvm is freed when the VM is
-destroyed.
+While this is generally a bad idea, the bug was detected from the kernel
+spewing about duplicate debugfs entries as subsequent VMs happen to
+reuse the same FD even though the debugfs directory is still present.
 
-Nip the problem in the bud for all possible errant debugfs file
-creations by initializing kvm->debugfs_dentry to -ENOENT. In so doing,
-debugfs_create_file() will fail instead of creating the file in the root
-directory.
+Abstract away the notion of setup/cleanup of the GIC FD from the test
+by creating arch-specific helpers for test setup/cleanup. Close the GIC
+FD on VM cleanup and do nothing for the other architectures.
 
-Cc: stable@kernel.org
-Fixes: 929f45e32499 ("kvm: no need to check return value of debugfs_create functions")
+Fixes: c340f7899af6 ("KVM: selftests: Add vgic initialization for dirty log perf test for ARM")
+Reviewed-by: Jing Zhang <jingzhangos@google.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- virt/kvm/kvm_main.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ .../selftests/kvm/dirty_log_perf_test.c       | 34 +++++++++++++++++--
+ 1 file changed, 31 insertions(+), 3 deletions(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 70e05af5ebea..e39a6f56fc47 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -932,7 +932,7 @@ static void kvm_destroy_vm_debugfs(struct kvm *kvm)
- 	int kvm_debugfs_num_entries = kvm_vm_stats_header.num_desc +
- 				      kvm_vcpu_stats_header.num_desc;
- 
--	if (!kvm->debugfs_dentry)
-+	if (IS_ERR(kvm->debugfs_dentry))
- 		return;
- 
- 	debugfs_remove_recursive(kvm->debugfs_dentry);
-@@ -955,6 +955,12 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
- 	int kvm_debugfs_num_entries = kvm_vm_stats_header.num_desc +
- 				      kvm_vcpu_stats_header.num_desc;
- 
-+	/*
-+	 * Force subsequent debugfs file creations to fail if the VM directory
-+	 * is not created.
-+	 */
-+	kvm->debugfs_dentry = ERR_PTR(-ENOENT);
+diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+index c9d9e513ca04..7b47ae4f952e 100644
+--- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+@@ -18,11 +18,40 @@
+ #include "test_util.h"
+ #include "perf_test_util.h"
+ #include "guest_modes.h"
 +
- 	if (!debugfs_initialized())
- 		return 0;
+ #ifdef __aarch64__
+ #include "aarch64/vgic.h"
  
-@@ -5479,7 +5485,7 @@ static void kvm_uevent_notify_change(unsigned int type, struct kvm *kvm)
+ #define GICD_BASE_GPA			0x8000000ULL
+ #define GICR_BASE_GPA			0x80A0000ULL
++
++static int gic_fd;
++
++static void arch_setup_vm(struct kvm_vm *vm, unsigned int nr_vcpus)
++{
++	/*
++	 * The test can still run even if hardware does not support GICv3, as it
++	 * is only an optimization to reduce guest exits.
++	 */
++	gic_fd = vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
++}
++
++static void arch_cleanup_vm(struct kvm_vm *vm)
++{
++	if (gic_fd > 0)
++		close(gic_fd);
++}
++
++#else /* __aarch64__ */
++
++static void arch_setup_vm(struct kvm_vm *vm, unsigned int nr_vcpus)
++{
++}
++
++static void arch_cleanup_vm(struct kvm_vm *vm)
++{
++}
++
+ #endif
+ 
+ /* How many host loops to run by default (one KVM_GET_DIRTY_LOG for each loop)*/
+@@ -206,9 +235,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 		vm_enable_cap(vm, &cap);
  	}
- 	add_uevent_var(env, "PID=%d", kvm->userspace_pid);
  
--	if (kvm->debugfs_dentry) {
-+	if (!IS_ERR(kvm->debugfs_dentry)) {
- 		char *tmp, *p = kmalloc(PATH_MAX, GFP_KERNEL_ACCOUNT);
+-#ifdef __aarch64__
+-	vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
+-#endif
++	arch_setup_vm(vm, nr_vcpus);
  
- 		if (p) {
+ 	/* Start the iterations */
+ 	iteration = 0;
+@@ -302,6 +329,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	}
+ 
+ 	free_bitmaps(bitmaps, p->slots);
++	arch_cleanup_vm(vm);
+ 	perf_test_destroy_vm(vm);
+ }
+ 
 -- 
 2.35.1.1094.g7c7d902a7c-goog
 
