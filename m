@@ -2,176 +2,283 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E9B04F6671
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 19:07:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 341A34F65B4
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 18:43:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238409AbiDFRA5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 13:00:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51012 "EHLO
+        id S237905AbiDFQg7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 12:36:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238421AbiDFRAt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 13:00:49 -0400
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam07on2050.outbound.protection.outlook.com [40.107.212.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 767DA46E606;
-        Wed,  6 Apr 2022 07:24:38 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FPR1uDKmgNXOHJiYi/X0WY+KGSpItskwKY+x+iJfqw/4eNrUCAjgjrQIgdKZc7HKcYrRIqfWHFngZruQst4FKWuKTmsIJJZ9JTEmmM45LL02Ko6h6XCpSfOzcQxZFjF8LOp3jV4VFIHn+qh6SkM01p5HfMrU7Mz9XN+dKqGo53PiZEyUBeGP0i7P9VJ69UfZouW3qFxxtKoTsWRNLfd2l0Rv/XSnV9i3P3ykh4dVxQObQHWSUPLlu9YLCpyFtXFqL5rlAG3axksNE2BqQRIoOo8GgPraKafVXwazeh7H86GvR5omtf+HLgM3/FCT4CSSxCo4b/t94xCdk7Vv+agYWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1uYgX1e2UDd/ai7mblSLjuOtLmcj0q3PDcURNfc0AR8=;
- b=abgZWDRNWEvadotFNh2t6vzrArNqc4bV/lTwWRR5GilcLjTnr+1EG5orGPWPIdv7i1Qod2kvbfq4fUmFmn4m0kCpKp4Ik8VCIlYkjlvHwQj1CQy1aGe5n6EcTPU1mduwUZwJvtXqRYUq1fvqLPt7aoJcsgZOiZ6f8u5UD4Pk3IPBmguKP/bm3bWVzn4qoR5dB1VIMc84lOuiTjE8wEFxN4ugvF7WVzR/G5eLMdIZb6ZVW455nQ1LbTZ+waDA368mO+0PwSkHMjx0DQnb0TKr6bsID+qFjr0M3M64DiTX9G9fSmkRkbZhyROuKNIuO9jsA3vuO4JK0YysewPRW49PNQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1uYgX1e2UDd/ai7mblSLjuOtLmcj0q3PDcURNfc0AR8=;
- b=naLCcToCto6w/Pgu7y6+Ye2fEe7MQPVHIH0wA4pHwZ4DEqyz0XOX8cSO+Owsl9IQ6l9rZZ6MP4XaGKH5EgyX61xo+kW72B/MGG53GVOx68thK7NrGlf+F4Z8rY7BjoZoBr1ASYPYs5DM74Oby8cmhfImFFBVOUUkZnElToNGzaOc99dJW5tItiDLFiKHLL0anXalP/fIXJs+YsVp9W43vFpZM89k54EHo2xs8E2iMOnacp6REMAAIgp0IGJ4TgWQUO+uhj3hmt+jydVpdclnRjf2DG7hDhcXAg4WntgA43l4FxR0k0B6kJP1hCktFNbSu6qRlNIAACwEOBkcWtvgjw==
-Received: from BYAPR12MB3238.namprd12.prod.outlook.com (2603:10b6:a03:13b::20)
- by BYAPR12MB4712.namprd12.prod.outlook.com (2603:10b6:a03:9d::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5144.21; Wed, 6 Apr
- 2022 14:24:36 +0000
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by BYAPR12MB3238.namprd12.prod.outlook.com (2603:10b6:a03:13b::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5123.31; Wed, 6 Apr
- 2022 14:24:34 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::cdfb:f88e:410b:9374]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::cdfb:f88e:410b:9374%6]) with mapi id 15.20.5144.021; Wed, 6 Apr 2022
- 14:24:34 +0000
-Date:   Wed, 6 Apr 2022 11:24:32 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Christian Benvenuti <benve@cisco.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        iommu@lists.linux-foundation.org, Jason Wang <jasowang@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        with ESMTP id S237935AbiDFQgr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 12:36:47 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E32DDB2E9
+        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 08:07:34 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 9AE26B82277
+        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 15:07:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40A13C385A1;
+        Wed,  6 Apr 2022 15:07:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1649257651;
+        bh=OH5Vs2pkCQzyprkWqtv+Y2S5HXpl2IhezXKj5Uwq7w8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=NG2hLdddP0PReWbXTspP6hD/83FPTSDlP4/IIulv9jC0Lb9pnFE1V+jVEgDsM+PJ7
+         +JGEtGWGJpqHc8lkiLidc+IqL5S2RRBFGY4ABClo82VMlr3clJpL4DxlI4yvikcuK2
+         0vuxZla4v18HxGgzuOqKSSZuJ1RRQO3DpIyKoTp+XQtR7wrTO8LIYT90kCQlz87IXC
+         vX9NJCtGvtcHLBQ1SlWt8ws3bkbfniFTxpsatpK9hsIkRxlqYYe/OKctw3QJhJKCVJ
+         Bp7EpnJA8nHyOTEa8MggCVJSSpc1NJqoz0GpwgPgXq88D68Jrw0mbnLYiBjryaUSMh
+         TJz+7OHWwd33Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nc7Fo-002CZl-RG; Wed, 06 Apr 2022 16:07:28 +0100
+Date:   Wed, 06 Apr 2022 16:07:28 +0100
+Message-ID: <87lewib68f.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nelson Escobar <neescoba@cisco.com>, netdev@vger.kernel.org,
-        Rob Clark <robdclark@gmail.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        virtualization@lists.linux-foundation.org,
-        Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Subject: Re: [PATCH 1/5] iommu: Replace uses of IOMMU_CAP_CACHE_COHERENCY
- with dev_is_dma_coherent()
-Message-ID: <20220406142432.GF2120790@nvidia.com>
-References: <1-v1-ef02c60ddb76+12ca2-intel_no_snoop_jgg@nvidia.com>
- <db5a6daa-bfe9-744f-7fc5-d5167858bc3e@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <db5a6daa-bfe9-744f-7fc5-d5167858bc3e@arm.com>
-X-ClientProxiedBy: YT1PR01CA0044.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:2e::13) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1d8ec298-b8a2-45ff-7223-08da17d92c48
-X-MS-TrafficTypeDiagnostic: BYAPR12MB3238:EE_|BYAPR12MB4712:EE_
-X-Microsoft-Antispam-PRVS: <BYAPR12MB323843DA0EE80BA62C77C348C2E79@BYAPR12MB3238.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Gh+tQlZPlXxnEhaCzL0nbAT5mjIvaVe2/T2LCTIdrNJGlTgI++RGa/sYfQWuGy+0q7R++3Ew1e6UVpVD/jaowunpmt1EymIkASAbW+c0WxHfWLvQZNv18NqtLQ/TI81/OYKLV0WBBQn/cTDmE4M9yPSzBvPx7MUOyrNJfO0oOH9DHkLJAJoC9K3DgJ2kwuWng6NC43doPd07PduBFTwh/DPgH5t9UtHJBJEAU2qLwrHlJfDqfU5mddf5EfF2Qf0IEg9HAwAGHAF5vZoJGOSex4SaDKeQYW6ziaqOoBCUqXkSbfmA0A8er1xAVtcJZKHpFDrhCrKydMpWWHBhhrWz+TQQzmMHuDjJL6nzqwZPjUkB18D0wk5irDF867jCX3o5BcdIQ9aFiY5XCbuPgcvplBlFyUblHHUb+oORGoVXtunTQRy/kx9dG9AXvBaTq/eAIGRIpTMtJJ0d2gTBZnUFwnLQrhmKXyk66mcJ/kxALXZyzDQ5rMQVPh63tkxPzIZE2vgBLvT4srozqZI76UPNZjA7Rs2+JvqeMZlRKbiU1SlcSGhScM8LUIXD4R5xdxjErGFCQGmUdO1dgp2xsWhtmtfqjrfU7W0imj8ixXYcepk414abfPWTbypRgmjjcrBKdiNbDFr9yKZIAMUnTKnJ1g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB3238.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(7416002)(8936002)(5660300002)(2906002)(4326008)(8676002)(38100700002)(66476007)(33656002)(86362001)(36756003)(6486002)(508600001)(66556008)(66946007)(6916009)(54906003)(316002)(1076003)(2616005)(6506007)(53546011)(186003)(6512007)(26005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?j1Rdld5Fo38ZTjZ38MIPGAsmMA5NX1SD3+L7zg2BUvUp8zp8gn1uG7GZ7Cqf?=
- =?us-ascii?Q?p1p8L1ganek/N/PF3U+4T08mh+V53cV06IHnpXaOs7iFCZ/Qdg2ejWQ+E0ir?=
- =?us-ascii?Q?A01VuBe9zxrWWChmQxx4RxId1+sNfaLbfFeNR6EcMyT+y4I5civOYXSkb2Av?=
- =?us-ascii?Q?VEXAh+wNXv8nwUCeE2odpKNg8cxusNS38ob8bnxk6DpMWwDVk0EqiGfvu0sE?=
- =?us-ascii?Q?swYmaoClsa2c3+HF2Nc/BkNVYWXIm6uRhRU8IG7xwj2nPbCQzx895CXMfMOs?=
- =?us-ascii?Q?2gyL+Wjlm+KYy9lejPTJscm4QdaaJXP1yO7+Ig9zwJkXJHXU3yWUmGdQcRsM?=
- =?us-ascii?Q?bwEqrqEl8XAadOWnT52FDuKs3WJ5HkSVNoF9e9yHw9bxpZjM64FWTTXxuczq?=
- =?us-ascii?Q?kZj3tOLADpCsP0oZgBz9+bzj8cDQn8cqgfFVkgV+Ez7B1Fmy5lqMnRpbqHsC?=
- =?us-ascii?Q?6HVdOw1Cvn5/6aybMEkgqVBqwOrrJMcYD4jcVPEdpRolmd2K7vDTC1zYTdPa?=
- =?us-ascii?Q?trtd9g1v+jxw62zYgdyKPpUkiXQgkL7qHqzhwLI9dPcG7grA/jUV/l6xQYS/?=
- =?us-ascii?Q?m45VA5OebJeGNapmv4FJ4F+fDQEWP1iQr3nN6czi9JyEnWKaE5JtsW1wiKmB?=
- =?us-ascii?Q?RkHzLAFKJywQnDLI8rJUWl3LjpNpz6/mc3pdItQ8a6b23MUhx2h99W7WMlmZ?=
- =?us-ascii?Q?ofjCUs2j99hZTvPiiqPFFm5UQUo5mGQ6X8Ui59ENeJoRLhKk/Sb93cd//+Yy?=
- =?us-ascii?Q?3K5IJK8+cQQ+P3uoRa8vkTp0eivTo6/WeRxLZil5oCQMxIUdu0L+qZ4RFsJi?=
- =?us-ascii?Q?rp5RbYeNZ0IDvPLcHe9IBw5sTdANsbf2kj4+BBLrqy/5Ke78bwHH/VBWjpL4?=
- =?us-ascii?Q?BtZHm5k/sVtzqGgCCZaCS4CukhjWX5lrxi9QDlythZz/javtfMt5MXBu2XBM?=
- =?us-ascii?Q?Tr1S2wPCaev90Q/SfRQjnvsPa4pk1z8IQHrQAQZ9aLiCBeyolZjBBbJzK9YD?=
- =?us-ascii?Q?y+/KPscj829uDe2go1OXAs+B42V5iDaebBeGDjoBsuzJML+4drpBwWaH7jqt?=
- =?us-ascii?Q?mEBF2Bykqa6gRuoTNlS/f6FoQpF0e1xiZe9DiRmdtf9Vha7kQ55HtpfVRzBL?=
- =?us-ascii?Q?oy+LM5GKOV1OI4r9VqLSVPsbGc9uMufyQ89qSn/z0npzPqmn/CPD+9DEanSp?=
- =?us-ascii?Q?+czvtnsa/2ZaWs39mWjTi0rn0nTfvN0N9MKFZH2l04XkVtS08IJgoOGMDD9y?=
- =?us-ascii?Q?xbNnXlSNWUzVhFfTvZsgWEYCLUmTho5knPA9POPAQfTWbwao/BIsMsGjvYbe?=
- =?us-ascii?Q?siozhacB1VGR3473pHktK07LQH915ou6lAa+P3fpnABYNxdex082vKOU7Dg3?=
- =?us-ascii?Q?/9j2IVvYGL0CzYAY8S2QLQC0KZpUAIiLY2eOipwhYGZjO4tlx3rvopo5rlFX?=
- =?us-ascii?Q?XFLC7QiPAqMwiPYm/S2jeKNNWtBrAoo6hoderQALU6DYAp8YtT4Zo0yS6mEL?=
- =?us-ascii?Q?Imv9KbJfHBj21ol8woLA1nBtwzhO2RUXvBL2rkeIE9c2Jv1Xy24Qu6pagkn6?=
- =?us-ascii?Q?4aCL0GdlpPs8Hc0syEJIChGyQ2H+t6KAzNbdhGIYZT4vwfV2wX7eWZ+1HjK0?=
- =?us-ascii?Q?jfzIypDQEIAImv08bfBZjEMZzQKY5wxQGx9HZeGeFlTPtDLPMZF3RdQ8svmF?=
- =?us-ascii?Q?SGxg9vG6mGsnxmqKDZ3WOz0LjqwmeyztO3JmebxMWL6u+EFE9TvuYKImEhhG?=
- =?us-ascii?Q?7joljw21kA=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1d8ec298-b8a2-45ff-7223-08da17d92c48
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Apr 2022 14:24:34.5883
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: to0YNbI5NCs1iQcSoMToWSaVLgDn9KA2Utie6CPdXXB5PeX8CcZNQ+XkDmn9wvMQ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB4712
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v2 1/3] KVM: arm64: Wire up CP15 feature registers to their AArch64 equivalents
+In-Reply-To: <20220401010832.3425787-2-oupton@google.com>
+References: <20220401010832.3425787-1-oupton@google.com>
+        <20220401010832.3425787-2-oupton@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, pshier@google.com, ricarkol@google.com, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 06, 2022 at 02:56:56PM +0100, Robin Murphy wrote:
-> On 2022-04-05 17:16, Jason Gunthorpe wrote:
-> > vdpa and usnic are trying to test if IOMMU_CACHE is supported. The correct
-> > way to do this is via dev_is_dma_coherent()
+On Fri, 01 Apr 2022 02:08:30 +0100,
+Oliver Upton <oupton@google.com> wrote:
 > 
-> Not necessarily...
+> KVM currently does not trap ID register accesses from an AArch32 EL1.
+> This is painful for a couple of reasons. Certain unimplemented features
+> are visible to AArch32 EL1, as we limit PMU to version 3 and the debug
+> architecture to v8.0. Additionally, we attempt to paper over
+> heterogeneous systems by using register values that are safe
+> system-wide. All this hard work is completely sidestepped because KVM
+> does not set TID3 for AArch32 guests.
 > 
-> Disregarding the complete disaster of PCIe No Snoop on Arm-Based systems,
-> there's the more interesting effectively-opposite scenario where an SMMU
-> bridges non-coherent devices to a coherent interconnect. It's not something
-> we take advantage of yet in Linux, and it can only be properly described in
-> ACPI, but there do exist situations where IOMMU_CACHE is capable of making
-> the device's traffic snoop, but dev_is_dma_coherent() - and
-> device_get_dma_attr() for external users - would still say non-coherent
-> because they can't assume that the SMMU is enabled and programmed in just
-> the right way.
+> Fix up handling of CP15 feature registers by simply rerouting to their
+> AArch64 aliases. Punt setting HCR_EL2.TID3 to a later change, as we need
+> to fix up the oddball CP10 feature registers still.
+> 
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 68 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 68 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index dd34b5ab51d4..8b791256a5b4 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2339,6 +2339,67 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
+>  	return 1;
+>  }
+>  
+> +static int emulate_sys_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *params);
+> +
+> +/**
+> + * kvm_emulate_cp15_id_reg() - Handles an MRC trap on a guest CP15 access where
+> + *			       CRn=0, which corresponds to the AArch32 feature
+> + *			       registers.
+> + * @vcpu: the vCPU pointer
+> + * @params: the system register access parameters.
+> + *
+> + * Our cp15 system register tables do not enumerate the AArch32 feature
+> + * registers. Conveniently, our AArch64 table does, and the AArch32 system
+> + * register encoding can be trivially remapped into the AArch64 for the feature
+> + * registers: Append op0=3, leaving op1, CRn, CRm, and op2 the same.
+> + *
+> + * According to DDI0487G.b G7.3.1, paragraph "Behavior of VMSAv8-32 32-bit
+> + * System registers with (coproc=0b1111, CRn==c0)", read accesses from this
+> + * range are either UNKNOWN or RES0. Rerouting remains architectural as we
+> + * treat undefined registers in this range as RAZ.
+> + */
+> +static int kvm_emulate_cp15_id_reg(struct kvm_vcpu *vcpu,
+> +				   struct sys_reg_params *params)
+> +{
+> +	int Rt = kvm_vcpu_sys_get_rt(vcpu);
+> +	int ret = 1;
+> +
+> +	/* Treat impossible writes to RO registers as UNDEFINED */
+> +	if (params->is_write) {
+> +		unhandled_cp_access(vcpu, params);
+> +		return 1;
+> +	}
+> +
+> +	params->Op0 = 3;
+> +
+> +	/*
+> +	 * All registers where CRm > 3 are known to be UNKNOWN/RAZ from AArch32.
+> +	 * Avoid conflicting with future expansion of AArch64 feature registers
+> +	 * and simply treat them as RAZ here.
+> +	 */
+> +	if (params->CRm > 3)
+> +		params->regval = 0;
+> +	else
+> +		ret = emulate_sys_reg(vcpu, params);
+> +
+> +	vcpu_set_reg(vcpu, Rt, params->regval);
 
-Oh, I didn't know about device_get_dma_attr()..
+It feels odd to update Rt without checking whether the read has
+succeeded. In your case, this is harmless, but would break with the
+approach I'm outlining below.
 
-Considering your future issue, maybe this:
+> +	return ret;
+> +}
+> +
+> +/**
+> + * kvm_is_cp15_id_reg() - Returns true if the specified CP15 register is an
+> + *			  AArch32 ID register.
+> + * @params: the system register access parameters
+> + *
+> + * Note that CP15 ID registers where CRm=0 are excluded from this check. The
+> + * only register trapped in the CRm=0 range is CTR, which is already handled in
+> + * the cp15 register table.
 
-/*
- * true if the given domain supports IOMMU_CACHE and when dev is attached to
- * that domain it will have coherent DMA and require no cache
- * maintenance when IOMMU_CACHE is used.
- */
-bool iommu_domain_supports_coherent_dma(struct iommu_domain *domain, struct device *dev)
-{
-	return device_get_dma_attr(dev) == DEV_DMA_COHERENT;
-}
+There is also the fact that CTR_EL0 has Op1=3 while CTR has Op1=0,
+which prevents it from fitting in your scheme.
 
-? In future it could become a domain op and the SMMU driver could
-figure out the situation you described?
+> + */
+> +static inline bool kvm_is_cp15_id_reg(struct sys_reg_params *params)
+> +{
+> +	return params->CRn == 0 && params->Op1 == 0 && params->CRm != 0;
+> +}
+> +
+>  /**
+>   * kvm_handle_cp_32 -- handles a mrc/mcr trap on a guest CP14/CP15 access
+>   * @vcpu: The VCPU pointer
+> @@ -2360,6 +2421,13 @@ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
+>  	params.Op1 = (esr >> 14) & 0x7;
+>  	params.Op2 = (esr >> 17) & 0x7;
+>  
+> +	/*
+> +	 * Certain AArch32 ID registers are handled by rerouting to the AArch64
+> +	 * system register table.
+> +	 */
+> +	if (ESR_ELx_EC(esr) == ESR_ELx_EC_CP15_32 && kvm_is_cp15_id_reg(&params))
+> +		return kvm_emulate_cp15_id_reg(vcpu, &params);
 
-Jason
+I think this is a bit ugly. We reach this point from a function that
+was cp15-specific, and now we are reconstructing the context. I'd
+rather this is moved to kvm_handle_cp15_32(), and treated there
+(untested):
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 7b45c040cc27..a071d89ace92 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2350,28 +2350,21 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
+  * @run:  The kvm_run struct
+  */
+ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
++			    struct sys_reg_params *params,
+ 			    const struct sys_reg_desc *global,
+ 			    size_t nr_global)
+ {
+-	struct sys_reg_params params;
+-	u32 esr = kvm_vcpu_get_esr(vcpu);
+ 	int Rt  = kvm_vcpu_sys_get_rt(vcpu);
+ 
+-	params.CRm = (esr >> 1) & 0xf;
+-	params.regval = vcpu_get_reg(vcpu, Rt);
+-	params.is_write = ((esr & 1) == 0);
+-	params.CRn = (esr >> 10) & 0xf;
+-	params.Op0 = 0;
+-	params.Op1 = (esr >> 14) & 0x7;
+-	params.Op2 = (esr >> 17) & 0x7;
++	params->regval = vcpu_get_reg(vcpu, Rt);
+ 
+-	if (!emulate_cp(vcpu, &params, global, nr_global)) {
+-		if (!params.is_write)
+-			vcpu_set_reg(vcpu, Rt, params.regval);
++	if (!emulate_cp(vcpu, params, global, nr_global)) {
++		if (!params->is_write)
++			vcpu_set_reg(vcpu, Rt, params->regval);
+ 		return 1;
+ 	}
+ 
+-	unhandled_cp_access(vcpu, &params);
++	unhandled_cp_access(vcpu, params);
+ 	return 1;
+ }
+ 
+@@ -2382,7 +2375,14 @@ int kvm_handle_cp15_64(struct kvm_vcpu *vcpu)
+ 
+ int kvm_handle_cp15_32(struct kvm_vcpu *vcpu)
+ {
+-	return kvm_handle_cp_32(vcpu, cp15_regs, ARRAY_SIZE(cp15_regs));
++	struct sys_reg_params params;
++
++	params = esr_cp1x_32_to_params(kvm_vcpu_get_esr(vcpu));
++
++	if (params.Op1 == 0 && params.CRn == 0 && params.CRm)
++		return kvm_emulate_cp15_id_reg(vcpu, &params);
++
++	return kvm_handle_cp_32(vcpu, &params, cp15_regs, ARRAY_SIZE(cp15_regs));
+ }
+ 
+ int kvm_handle_cp14_64(struct kvm_vcpu *vcpu)
+@@ -2392,7 +2392,11 @@ int kvm_handle_cp14_64(struct kvm_vcpu *vcpu)
+ 
+ int kvm_handle_cp14_32(struct kvm_vcpu *vcpu)
+ {
+-	return kvm_handle_cp_32(vcpu, cp14_regs, ARRAY_SIZE(cp14_regs));
++	struct sys_reg_params params;
++
++	params = esr_cp1x_32_to_params(kvm_vcpu_get_esr(vcpu));
++
++	return kvm_handle_cp_32(vcpu, &params, cp14_regs, ARRAY_SIZE(cp14_regs));
+ }
+ 
+ static bool is_imp_def_sys_reg(struct sys_reg_params *params)
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index cc0cc95a0280..fd4b2bb8c782 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -35,6 +35,13 @@ struct sys_reg_params {
+ 				  .Op2 = ((esr) >> 17) & 0x7,                  \
+ 				  .is_write = !((esr) & 1) })
+ 
++#define esr_cp1x_32_to_params(esr)					       \
++	((struct sys_reg_params){ .Op1 = ((esr) >> 14) & 0x7,                  \
++				  .CRn = ((esr) >> 10) & 0xf,                  \
++				  .CRm = ((esr) >> 1) & 0xf,                   \
++				  .Op2 = ((esr) >> 17) & 0x7,                  \
++				  .is_write = !((esr) & 1) })
++
+ struct sys_reg_desc {
+ 	/* Sysreg string for debug */
+ 	const char *name;
+
+
+What do you think?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
