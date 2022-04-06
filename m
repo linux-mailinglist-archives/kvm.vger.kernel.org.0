@@ -2,156 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3ED464F57E7
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 10:45:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BDE34F57A3
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 10:16:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345012AbiDFIZ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 04:25:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37884 "EHLO
+        id S240958AbiDFHYM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 03:24:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359220AbiDFIY0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 04:24:26 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56FA71FAA2F
-        for <kvm@vger.kernel.org>; Tue,  5 Apr 2022 18:23:00 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id 7so1064993pfu.13
-        for <kvm@vger.kernel.org>; Tue, 05 Apr 2022 18:23:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=het7xQEY6AiunexNVt3R9JrRc+WqABKqnLlFmve94Cc=;
-        b=itRW2E0kExcc0Xbaqr5Rh6BbC+cbZkZDFpK9xbhZMF0juee9my0sm58u9xyFrLsprz
-         ot2kFFHJ1bTgUg/fkR0IR5ACSG3O2kY3wbGZKsfnHPRgqglv6F20nLcOqRJYT6abN+b/
-         XUJnGOA9Pkr8343tkubrNfuBP3p0OT+EyRVXTb43d3x+xb9/TdGS7afMW/Ax8Qo/pUJj
-         /CkF2+7+R+QXIikz7cnO0nvZHX2zpv6hjyWAHgQSjiCrAqBOMM1nv1aRMn4TW+KAl1cm
-         H1HVHdBs+dCQa9JdCslDgZkoOj6P5HsLWe+AkWTDb0ClwzJ5EsIyIwJvQzH8Gy+hoUBN
-         956Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=het7xQEY6AiunexNVt3R9JrRc+WqABKqnLlFmve94Cc=;
-        b=zdJdb51XDlOx3UpMpRgF+piZ/gW+xCa5hGbpSCAWK3FuDjlZeVWNVUuPWwRdecxfuJ
-         aB3YuSe/f2VkbwwVSjjDx1V2fMvZI4qXTZSqNjVFo5uAh/zz+c2xV/PfP6eJDSKPIh+O
-         4bgA6zynJNagjDZQfpRZVHOXCRObzBvEogpt4plv/qcRwlOCHcYl2SCQ4EdeNznYQXDt
-         qr4IEpdrcgef6Pl/JxxrXujywxTAxGvoabbDIzybJMckNFxT48LF562NR8n96J8DQXhy
-         PyoVYjB9/h1EapXWEY2ndEFCMahIu+cT6zhZajI9Yzzlqpyu5ObXXu61vaWELj+UvrZc
-         D7vw==
-X-Gm-Message-State: AOAM530yQ8dH1BwwE1XSmABT/CPZUHad9Bcm06yygzEJlIBLgxjJYh4x
-        Gw2JX/M+5L4l0WVDuUpKpF2vWsSUh/C1rQ==
-X-Google-Smtp-Source: ABdhPJzL8bboghyNu1DtoVv4HWrIhBJdeVZOAv1DNCUs8URWTJG38gLEY45sMuuz7zbtkBkVvRIltg==
-X-Received: by 2002:a05:6a02:28a:b0:385:f767:34f4 with SMTP id bk10-20020a056a02028a00b00385f76734f4mr5163616pgb.299.1649208179490;
-        Tue, 05 Apr 2022 18:22:59 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id m21-20020a17090a7f9500b001c97c6bcaf4sm3663556pjl.39.2022.04.05.18.22.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Apr 2022 18:22:58 -0700 (PDT)
-Date:   Wed, 6 Apr 2022 01:22:55 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vasant Karasulli <vkarasulli@suse.de>
-Cc:     linux-kernel@vger.kernel.org, jroedel@suse.de, kvm@vger.kernel.org,
-        bp@alien8.de, x86@kernel.org, thomas.lendacky@amd.com,
-        varad.gautam@suse.com
-Subject: Re: [PATCH v6 2/4] x86/tests: Add tests for AMD SEV-ES #VC handling
- Add KUnit based tests to validate Linux's VC handling for instructions cpuid
- and wbinvd. These tests: 1. install a kretprobe on the #VC handler
- (sev_es_ghcb_hv_call, to access GHCB before/after the resulting VMGEXIT). 2.
- trigger an NAE by executing either cpuid or wbinvd. 3. check that the
- kretprobe was hit with the right exit_code available in GHCB.
-Message-ID: <Ykzrb1uyPZ2AKWos@google.com>
-References: <20220318094532.7023-1-vkarasulli@suse.de>
- <20220318094532.7023-3-vkarasulli@suse.de>
+        with ESMTP id S1456665AbiDFGon (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 02:44:43 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98F8C1624A2;
+        Tue,  5 Apr 2022 21:50:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1649220659; x=1680756659;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=I+dWPDiE4xf63aSyJo77PiXg+mtIis/JHI1I6V04uBU=;
+  b=VnYeP5a6xZf1ud7WMcSOMT3bckQN5oFJHRqp0knZRRoey2yd7tJON/46
+   SYNkVS7ijNxPTFjvUxPYi6AcOp6FM/zh74VamAPn09iW6GM/Uoykah68S
+   1SCUU5xJphPVAde5UTEEUJnJVNgI1WAwgfoKPwpWnMADfaEY+92MUev+p
+   65FJnx+U8cQE/5wC9ESohiY+UDwXrMXqlAVNQsIJw93KVMLQaMDwBAMo0
+   Qw+2Ubg97fOsJTxpJkG7YQaQj0KM5M7HTGm8Dxc4IcRGMQFgv3/hKa8B+
+   cUTf/Q175MWycEGy+U5PmeujMFMRTf4nIp5gHbu+fVEwGlJCvVlnhZwRC
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10308"; a="243089913"
+X-IronPort-AV: E=Sophos;i="5.90,239,1643702400"; 
+   d="scan'208";a="243089913"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2022 21:50:56 -0700
+X-IronPort-AV: E=Sophos;i="5.90,239,1643702400"; 
+   d="scan'208";a="524302468"
+Received: from dchang1-mobl3.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.29.17])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2022 21:50:52 -0700
+From:   Kai Huang <kai.huang@intel.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
+        len.brown@intel.com, tony.luck@intel.com,
+        rafael.j.wysocki@intel.com, reinette.chatre@intel.com,
+        dan.j.williams@intel.com, peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com, kai.huang@intel.com
+Subject: [PATCH v3 18/21] x86/virt/tdx: Initialize all TDMRs
+Date:   Wed,  6 Apr 2022 16:49:30 +1200
+Message-Id: <9c180b4f34956a5d43bbf7894c423fcbe75fc7a9.1649219184.git.kai.huang@intel.com>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <cover.1649219184.git.kai.huang@intel.com>
+References: <cover.1649219184.git.kai.huang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220318094532.7023-3-vkarasulli@suse.de>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The shortlog and changelog are all messed up.  Ditto for the other patches in this
-series.
+Initialize TDMRs via TDH.SYS.TDMR.INIT as the last step to complete the
+TDX initialization.
 
-On Fri, Mar 18, 2022, Vasant Karasulli wrote:
-> Signed-off-by: Vasant Karasulli <vkarasulli@suse.de>
-> ---
->  arch/x86/tests/Makefile      |   2 +
->  arch/x86/tests/sev-test-vc.c | 114 +++++++++++++++++++++++++++++++++++
->  2 files changed, 116 insertions(+)
->  create mode 100644 arch/x86/tests/sev-test-vc.c
+All TDMRs need to be initialized using TDH.SYS.TDMR.INIT SEAMCALL before
+the TDX memory can be used to run any TD guest.  The SEAMCALL internally
+uses the global KeyID to initialize PAMTs in order to crypto protect
+them from malicious host kernel.  TDH.SYS.TDMR.INIT can be done any cpu.
 
-...
+The time of initializing TDMR is proportional to the size of the TDMR.
+To avoid long latency caused in one SEAMCALL, TDH.SYS.TDMR.INIT only
+initializes an (implementation-specific) subset of PAMT entries of one
+TDMR in one invocation.  The caller is responsible for calling
+TDH.SYS.TDMR.INIT iteratively until all PAMT entries of the requested
+TDMR are initialized.
 
-> +int sev_es_test_vc_init(struct kunit *test)
-> +{
-> +	int ret;
-> +
-> +	if (!cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT)) {
-> +		kunit_info(test, "Not a SEV-ES guest. Skipping.");
-> +		ret = -EINVAL;
-> +		goto out;
-> +	}
-> +
-> +	memset(&hv_call_krp, 0, sizeof(hv_call_krp));
-> +	hv_call_krp.entry_handler = hv_call_krp_entry;
-> +	hv_call_krp.handler = hv_call_krp_ret;
-> +	hv_call_krp.maxactive = 100;
-> +	hv_call_krp.data_size = sizeof(unsigned long);
-> +	hv_call_krp.kp.symbol_name = "sev_es_ghcb_hv_call";
-> +	hv_call_krp.kp.addr = 0;
-> +
-> +	ret = register_kretprobe(&hv_call_krp);
-> +	if (ret) {
-> +		kunit_info(test, "Could not register kretprobe. Skipping.");
-> +		goto out;
-> +	}
-> +
-> +	test->priv = kunit_kzalloc(test, sizeof(u64), GFP_KERNEL);
+Current implementation initializes TDMRs one by one.  It takes ~100ms on
+a 2-socket machine with 2.2GHz CPUs and 64GB memory when the system is
+idle.  Each TDH.SYS.TDMR.INIT takes ~7us on average.
 
-Allocating 8 bytes and storing the pointer an 8-byte field is rather pointless :-)
+TDX does allow different TDMRs to be initialized concurrently on
+multiple CPUs. This parallel scheme could be introduced later when the
+total initialization time becomes a real concern, e.g. on a platform
+with a much bigger memory size.
 
-> +	if (!test->priv) {
-> +		ret = -ENOMEM;
-> +		kunit_info(test, "Could not allocate. Skipping.");
-> +		goto out;
-> +	}
-> +
-> +out:
-> +	return ret;
-> +}
-> +
-> +void sev_es_test_vc_exit(struct kunit *test)
-> +{
-> +	if (test->priv)
-> +		kunit_kfree(test, test->priv);
-> +
-> +	if (hv_call_krp.kp.addr)
-> +		unregister_kretprobe(&hv_call_krp);
-> +}
-> +
-> +#define check_op(kt, ec, op)			\
-> +do {						\
-> +	struct kunit *t = (struct kunit *) kt;	\
-> +	op;					\
-> +	KUNIT_EXPECT_EQ(t, (typeof(ec)) ec,	\
-> +		*((typeof(ec) *)(t->priv)));		\
-> +} while (0)
-> +
-> +static void sev_es_nae_cpuid(struct kunit *test)
-> +{
-> +	unsigned int cpuid_fn = 0x8000001f;
-> +
-> +	check_op(test, SVM_EXIT_CPUID, native_cpuid_eax(cpuid_fn));
+Signed-off-by: Kai Huang <kai.huang@intel.com>
+---
+ arch/x86/virt/vmx/tdx/tdx.c | 75 ++++++++++++++++++++++++++++++++++---
+ arch/x86/virt/vmx/tdx/tdx.h |  1 +
+ 2 files changed, 71 insertions(+), 5 deletions(-)
 
-Are there plans to go beyond basic checks?  Neat idea, but it seems like it will
-be prone to bitrot since it requires a somewhat esoteric setup and an opt-in config.
-And odds are very good that if the kernel can make it this far as an SEV-ES guest,
-it's gotten the basics right.
+diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+index bb15122fb8bd..11bd1daffee3 100644
+--- a/arch/x86/virt/vmx/tdx/tdx.c
++++ b/arch/x86/virt/vmx/tdx/tdx.c
+@@ -1376,6 +1376,65 @@ static int config_global_keyid(void)
+ 	return seamcall_on_each_package_serialized(&sc);
+ }
+ 
++/* Initialize one TDMR */
++static int init_tdmr(struct tdmr_info *tdmr)
++{
++	u64 next;
++
++	/*
++	 * Initializing PAMT entries might be time-consuming (in
++	 * proportion to the size of the requested TDMR).  To avoid long
++	 * latency in one SEAMCALL, TDH.SYS.TDMR.INIT only initializes
++	 * an (implementation-defined) subset of PAMT entries in one
++	 * invocation.
++	 *
++	 * Call TDH.SYS.TDMR.INIT iteratively until all PAMT entries
++	 * of the requested TDMR are initialized (if next-to-initialize
++	 * address matches the end address of the TDMR).
++	 */
++	do {
++		struct tdx_module_output out;
++		int ret;
++
++		ret = seamcall(TDH_SYS_TDMR_INIT, tdmr->base, 0, 0, 0,
++				NULL, &out);
++		if (ret)
++			return ret;
++		/*
++		 * RDX contains 'next-to-initialize' address if
++		 * TDH.SYS.TDMR.INT succeeded.
++		 */
++		next = out.rdx;
++		if (need_resched())
++			cond_resched();
++	} while (next < tdmr->base + tdmr->size);
++
++	return 0;
++}
++
++/* Initialize all TDMRs */
++static int init_tdmrs(struct tdmr_info **tdmr_array, int tdmr_num)
++{
++	int i;
++
++	/*
++	 * Initialize TDMRs one-by-one for simplicity, though the TDX
++	 * architecture does allow different TDMRs to be initialized in
++	 * parallel on multiple CPUs.  Parallel initialization could
++	 * be added later when the time spent in the serialized scheme
++	 * becomes a real concern.
++	 */
++	for (i = 0; i < tdmr_num; i++) {
++		int ret;
++
++		ret = init_tdmr(tdmr_array[i]);
++		if (ret)
++			return ret;
++	}
++
++	return 0;
++}
++
+ static int init_tdx_module(void)
+ {
+ 	struct tdmr_info **tdmr_array;
+@@ -1457,11 +1516,12 @@ static int init_tdx_module(void)
+ 	if (ret)
+ 		goto out_free_pamts;
+ 
+-	/*
+-	 * Return -EFAULT until all steps of TDX module
+-	 * initialization are done.
+-	 */
+-	ret = -EFAULT;
++	/* Initialize TDMRs to complete the TDX module initialization */
++	ret = init_tdmrs(tdmr_array, tdmr_num);
++	if (ret)
++		goto out_free_pamts;
++
++	tdx_module_status = TDX_MODULE_INITIALIZED;
+ out_free_pamts:
+ 	/*
+ 	 * Free PAMTs allocated in construct_tdmrs() when TDX module
+@@ -1484,6 +1544,11 @@ static int init_tdx_module(void)
+ 	free_tdmrs(tdmr_array, tdmr_num);
+ 	kfree(tdmr_array);
+ out:
++	if (ret)
++		pr_info("Failed to initialize TDX module.\n");
++	else
++		pr_info("TDX module initialized.\n");
++
+ 	return ret;
+ }
+ 
+diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
+index bba8cabea4bb..212f83374c0a 100644
+--- a/arch/x86/virt/vmx/tdx/tdx.h
++++ b/arch/x86/virt/vmx/tdx/tdx.h
+@@ -126,6 +126,7 @@ struct tdmr_info {
+ #define TDH_SYS_INFO		32
+ #define TDH_SYS_INIT		33
+ #define TDH_SYS_LP_INIT		35
++#define TDH_SYS_TDMR_INIT	36
+ #define TDH_SYS_LP_SHUTDOWN	44
+ #define TDH_SYS_CONFIG		45
+ 
+-- 
+2.35.1
+
