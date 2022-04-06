@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D19A74F647F
-	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 18:08:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7A424F6459
+	for <lists+kvm@lfdr.de>; Wed,  6 Apr 2022 18:08:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237151AbiDFQGJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 12:06:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55560 "EHLO
+        id S236896AbiDFQGl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 12:06:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236990AbiDFQF5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 12:05:57 -0400
+        with ESMTP id S236994AbiDFQGI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 12:06:08 -0400
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A7C9451D69;
-        Tue,  5 Apr 2022 21:50:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F459451D76;
+        Tue,  5 Apr 2022 21:50:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649220633; x=1680756633;
+  t=1649220636; x=1680756636;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=q18Cb2EmfT3fu2+KbEiAYS7sKnhqfdZ2OKCafmYkaEk=;
-  b=l2dRNc7chlronfN3dPjp5wxLjsYR6jF7j6ewY1IWW5I9Y/EO3gjUKoKa
-   DiQGSG2GaG6um+By5k1G/qf84bGdyRrsKYR+x3m4LtGB4VQTsShv2ja/z
-   4VhtPIqxMKPaBzKXeZRMKPd16HpC5PjJr+smWZtH7ogjp+jixAXiMr0DQ
-   o+ybQgaxpQaeLHJa9IhjSp0PdbBHl2vfcbKRqaRriQ9ri8bOtnaYygQGB
-   QvE3O1l34rsshU+wfTryaXodpLO5cyM6G5bHM0PNJizlaUhBARMbTJxjo
-   sKrJqRCj3J1zvkVVHWPV3AFY7eAAa/FbYVASOI+2BA0oscDeW0i4jvb0G
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10308"; a="243089857"
+  bh=U7JIb6jRGaOT3Ma7lXiC1ZND2BbsDZGoURUyJcHBlHw=;
+  b=eEw4pvWPbXrO+SkDyCvIjELa7ITe0wLJemM30qmeL9ml4LkDBqW0u6/7
+   i/auPoBewbRv7T+LgtTkGv0NFWF9ORnSInFfX4f3RyAhy0bOoEJYFZjQk
+   9B4f7yT7qP/k4xRzH4Fv4gygDKAJOrFv4AtXK1Pagsa2td6mbUeYr8Zdy
+   ZTD2fH3P8YisJa/XcY1vJ8qlaaFosgS0cVRxKqbRqIyELru7wxR24MaFa
+   YN/sQ6dHuX5YOJUhFyCq+8mTmkKI1yf4Ge6o2+/86EvopZ+4Hf/Q/6/Vb
+   18mjTrAVBg4KDFHYaxrFo1+YreLuy0/4DrfkXb46UlVn9ztx7dJ/edzH3
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10308"; a="243089867"
 X-IronPort-AV: E=Sophos;i="5.90,239,1643702400"; 
-   d="scan'208";a="243089857"
+   d="scan'208";a="243089867"
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2022 21:50:32 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2022 21:50:36 -0700
 X-IronPort-AV: E=Sophos;i="5.90,239,1643702400"; 
-   d="scan'208";a="524302374"
+   d="scan'208";a="524302385"
 Received: from dchang1-mobl3.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.29.17])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2022 21:50:28 -0700
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2022 21:50:32 -0700
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
@@ -45,9 +45,9 @@ Cc:     seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
         kirill.shutemov@linux.intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com,
         isaku.yamahata@intel.com, kai.huang@intel.com
-Subject: [PATCH v3 12/21] x86/virt/tdx: Create TDMRs to cover all system RAM
-Date:   Wed,  6 Apr 2022 16:49:24 +1200
-Message-Id: <6cc984d5c23e06c9c87b4c7342758b29f8c8c022.1649219184.git.kai.huang@intel.com>
+Subject: [PATCH v3 13/21] x86/virt/tdx: Allocate and set up PAMTs for TDMRs
+Date:   Wed,  6 Apr 2022 16:49:25 +1200
+Message-Id: <ffc2eefdd212a31278978e8bfccd571355db69b0.1649219184.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <cover.1649219184.git.kai.huang@intel.com>
 References: <cover.1649219184.git.kai.huang@intel.com>
@@ -63,201 +63,260 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The kernel configures TDX usable memory regions to the TDX module via
-an array of "TD Memory Region" (TDMR).  Each TDMR entry (TDMR_INFO)
-contains the information of the base/size of a memory region, the
-base/size of the associated Physical Address Metadata Table (PAMT) and
-a list of reserved areas in the region.
+In order to provide crypto protection to guests, the TDX module uses
+additional metadata to record things like which guest "owns" a given
+page of memory.  This metadata, referred as Physical Address Metadata
+Table (PAMT), essentially serves as the 'struct page' for the TDX
+module.  PAMTs are not reserved by hardware upfront.  They must be
+allocated by the kernel and then given to the TDX module.
 
-Create a number of TDMRs according to the verified e820 RAM entries.
-As the first step only set up the base/size information for each TDMR.
+TDX supports 3 page sizes: 4K, 2M, and 1G.  Each "TD Memory Region"
+(TDMR) has 3 PAMTs to track the 3 supported page sizes respectively.
+Each PAMT must be a physically contiguous area from the Convertible
+Memory Regions (CMR).  However, the PAMTs which track pages in one TDMR
+do not need to reside within that TDMR but can be anywhere in CMRs.
+If one PAMT overlaps with any TDMR, the overlapping part must be
+reported as a reserved area in that particular TDMR.
 
-TDMR must be 1G aligned and the size must be in 1G granularity.  This
-implies that one TDMR could cover multiple e820 RAM entries.  If a RAM
-entry spans the 1GB boundary and the former part is already covered by
-the previous TDMR, just create a new TDMR for the latter part.
+Use alloc_contig_pages() since PAMT must be a physically contiguous area
+and it may be potentially large (~1/256th of the size of the given TDMR).
 
-TDX only supports a limited number of TDMRs (currently 64).  Abort the
-TDMR construction process when the number of TDMRs exceeds this
-limitation.
+The current version of TDX supports at most 16 reserved areas per TDMR
+to cover both PAMTs and potential memory holes within the TDMR.  If many
+PAMTs are allocated within a single TDMR, 16 reserved areas may not be
+sufficient to cover all of them.
+
+Adopt the following policies when allocating PAMTs for a given TDMR:
+
+  - Allocate three PAMTs of the TDMR in one contiguous chunk to minimize
+    the total number of reserved areas consumed for PAMTs.
+  - Try to first allocate PAMT from the local node of the TDMR for better
+    NUMA locality.
 
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
- arch/x86/virt/vmx/tdx/tdx.c | 138 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 138 insertions(+)
+ arch/x86/Kconfig            |   1 +
+ arch/x86/virt/vmx/tdx/tdx.c | 165 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 166 insertions(+)
 
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 7414625b938f..ff68d0829bd7 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -1973,6 +1973,7 @@ config INTEL_TDX_HOST
+ 	depends on CPU_SUP_INTEL
+ 	depends on X86_64
+ 	select NUMA_KEEP_MEMINFO if NUMA
++	depends on CONTIG_ALLOC
+ 	help
+ 	  Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
+ 	  host and certain physical attacks.  This option enables necessary TDX
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 6b0c51aaa7f2..82534e70df96 100644
+index 82534e70df96..1b807dcbc101 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -54,6 +54,18 @@
- 		((u32)(((_keyid_part) & 0xffffffffull) + 1))
- #define TDX_KEYID_NUM(_keyid_part)	((u32)((_keyid_part) >> 32))
+@@ -21,6 +21,7 @@
+ #include <asm/cpufeatures.h>
+ #include <asm/virtext.h>
+ #include <asm/e820/api.h>
++#include <asm/pgtable.h>
+ #include <asm/tdx.h>
+ #include "tdx.h"
  
-+/* TDMR must be 1gb aligned */
-+#define TDMR_ALIGNMENT		BIT_ULL(30)
-+#define TDMR_PFN_ALIGNMENT	(TDMR_ALIGNMENT >> PAGE_SHIFT)
+@@ -66,6 +67,16 @@
+ #define TDMR_START(_tdmr)	((_tdmr)->base)
+ #define TDMR_END(_tdmr)		((_tdmr)->base + (_tdmr)->size)
+ 
++/* Page sizes supported by TDX */
++enum tdx_page_sz {
++	TDX_PG_4K = 0,
++	TDX_PG_2M,
++	TDX_PG_1G,
++	TDX_PG_MAX,
++};
 +
-+/* Align up and down the address to TDMR boundary */
-+#define TDMR_ALIGN_DOWN(_addr)	ALIGN_DOWN((_addr), TDMR_ALIGNMENT)
-+#define TDMR_ALIGN_UP(_addr)	ALIGN((_addr), TDMR_ALIGNMENT)
-+
-+/* TDMR's start and end address */
-+#define TDMR_START(_tdmr)	((_tdmr)->base)
-+#define TDMR_END(_tdmr)		((_tdmr)->base + (_tdmr)->size)
++#define TDX_HPAGE_SHIFT	9
 +
  /*
   * TDX module status during initialization
   */
-@@ -813,6 +825,44 @@ static int e820_check_against_cmrs(void)
- 	return 0;
+@@ -959,6 +970,148 @@ static int create_tdmrs(struct tdmr_info **tdmr_array, int *tdmr_num)
+ 	return ret;
  }
  
-+/* The starting offset of reserved areas within TDMR_INFO */
-+#define TDMR_RSVD_START		64
-+
-+static struct tdmr_info *__alloc_tdmr(void)
++/* Calculate PAMT size given a TDMR and a page size */
++static unsigned long __tdmr_get_pamt_sz(struct tdmr_info *tdmr,
++					enum tdx_page_sz pgsz)
 +{
-+	int tdmr_sz;
++	unsigned long pamt_sz;
 +
-+	/*
-+	 * TDMR_INFO's actual size depends on maximum number of reserved
-+	 * areas that one TDMR supports.
-+	 */
-+	tdmr_sz = TDMR_RSVD_START + tdx_sysinfo.max_reserved_per_tdmr *
-+		sizeof(struct tdmr_reserved_area);
++	pamt_sz = (tdmr->size >> ((TDX_HPAGE_SHIFT * pgsz) + PAGE_SHIFT)) *
++		tdx_sysinfo.pamt_entry_size;
++	/* PAMT size must be 4K aligned */
++	pamt_sz = ALIGN(pamt_sz, PAGE_SIZE);
 +
-+	/*
-+	 * TDX requires TDMR_INFO to be 512 aligned.  Always align up
-+	 * TDMR_INFO size to 512 so the memory allocated via kzalloc()
-+	 * can meet the alignment requirement.
-+	 */
-+	tdmr_sz = ALIGN(tdmr_sz, TDMR_INFO_ALIGNMENT);
-+
-+	return kzalloc(tdmr_sz, GFP_KERNEL);
++	return pamt_sz;
 +}
 +
-+/* Create a new TDMR at given index in the TDMR array */
-+static struct tdmr_info *alloc_tdmr(struct tdmr_info **tdmr_array, int idx)
++/* Calculate the size of all PAMTs for a TDMR */
++static unsigned long tdmr_get_pamt_sz(struct tdmr_info *tdmr)
 +{
-+	struct tdmr_info *tdmr;
++	enum tdx_page_sz pgsz;
++	unsigned long pamt_sz;
 +
-+	if (WARN_ON_ONCE(tdmr_array[idx]))
-+		return NULL;
++	pamt_sz = 0;
++	for (pgsz = TDX_PG_4K; pgsz < TDX_PG_MAX; pgsz++)
++		pamt_sz += __tdmr_get_pamt_sz(tdmr, pgsz);
 +
-+	tdmr = __alloc_tdmr();
-+	tdmr_array[idx] = tdmr;
-+
-+	return tdmr;
++	return pamt_sz;
 +}
 +
- static void free_tdmrs(struct tdmr_info **tdmr_array, int tdmr_num)
- {
- 	int i;
-@@ -826,6 +876,89 @@ static void free_tdmrs(struct tdmr_info **tdmr_array, int tdmr_num)
- 	}
- }
- 
 +/*
-+ * Create TDMRs to cover all RAM entries in e820_table.  The created
-+ * TDMRs are saved to @tdmr_array and @tdmr_num is set to the actual
-+ * number of TDMRs.  All entries in @tdmr_array must be initially NULL.
++ * Locate the NUMA node containing the start of the given TDMR's first
++ * RAM entry.  The given TDMR may also cover memory in other NUMA nodes.
 + */
-+static int create_tdmrs(struct tdmr_info **tdmr_array, int *tdmr_num)
++static int tdmr_get_nid(struct tdmr_info *tdmr)
 +{
-+	struct tdmr_info *tdmr;
 +	u64 start, end;
-+	int i, tdmr_idx;
-+	int ret = 0;
++	int i;
 +
-+	tdmr_idx = 0;
-+	tdmr = alloc_tdmr(tdmr_array, 0);
-+	if (!tdmr)
-+		return -ENOMEM;
++	/* Find the first RAM entry covered by the TDMR */
++	e820_for_each_mem(i, start, end)
++		if (end > TDMR_START(tdmr))
++			break;
++
 +	/*
-+	 * Loop over all RAM entries in e820 and create TDMRs to cover
-+	 * them.  To keep it simple, always try to use one TDMR to cover
-+	 * one RAM entry.
++	 * One TDMR must cover at least one (or partial) RAM entry,
++	 * otherwise it is kernel bug.  WARN_ON() in this case.
 +	 */
-+	e820_for_each_mem(i, start, end) {
-+		start = TDMR_ALIGN_DOWN(start);
-+		end = TDMR_ALIGN_UP(end);
++	if (WARN_ON_ONCE((start >= end) || start >= TDMR_END(tdmr)))
++		return 0;
 +
-+		/*
-+		 * If the current TDMR's size hasn't been initialized, it
-+		 * is a new allocated TDMR to cover the new RAM entry.
-+		 * Otherwise the current TDMR already covers the previous
-+		 * RAM entry.  In the latter case, check whether the
-+		 * current RAM entry has been fully or partially covered
-+		 * by the current TDMR, since TDMR is 1G aligned.
-+		 */
-+		if (tdmr->size) {
-+			/*
-+			 * Loop to next RAM entry if the current entry
-+			 * is already fully covered by the current TDMR.
-+			 */
-+			if (end <= TDMR_END(tdmr))
-+				continue;
++	/*
++	 * The first RAM entry may be partially covered by the previous
++	 * TDMR.  In this case, use TDMR's start to find the NUMA node.
++	 */
++	if (start < TDMR_START(tdmr))
++		start = TDMR_START(tdmr);
 +
-+			/*
-+			 * If part of current RAM entry has already been
-+			 * covered by current TDMR, skip the already
-+			 * covered part.
-+			 */
-+			if (start < TDMR_END(tdmr))
-+				start = TDMR_END(tdmr);
++	return phys_to_target_node(start);
++}
 +
-+			/*
-+			 * Create a new TDMR to cover the current RAM
-+			 * entry, or the remaining part of it.
-+			 */
-+			tdmr_idx++;
-+			if (tdmr_idx >= tdx_sysinfo.max_tdmrs) {
-+				ret = -E2BIG;
-+				goto err;
-+			}
-+			tdmr = alloc_tdmr(tdmr_array, tdmr_idx);
-+			if (!tdmr) {
-+				ret = -ENOMEM;
-+				goto err;
-+			}
-+		}
++static int tdmr_setup_pamt(struct tdmr_info *tdmr)
++{
++	unsigned long tdmr_pamt_base, pamt_base[TDX_PG_MAX];
++	unsigned long pamt_sz[TDX_PG_MAX];
++	unsigned long pamt_npages;
++	struct page *pamt;
++	enum tdx_page_sz pgsz;
++	int nid;
 +
-+		tdmr->base = start;
-+		tdmr->size = end - start;
++	/*
++	 * Allocate one chunk of physically contiguous memory for all
++	 * PAMTs.  This helps minimize the PAMT's use of reserved areas
++	 * in overlapped TDMRs.
++	 */
++	nid = tdmr_get_nid(tdmr);
++	pamt_npages = tdmr_get_pamt_sz(tdmr) >> PAGE_SHIFT;
++	pamt = alloc_contig_pages(pamt_npages, GFP_KERNEL, nid,
++			&node_online_map);
++	if (!pamt)
++		return -ENOMEM;
++
++	/* Calculate PAMT base and size for all supported page sizes. */
++	tdmr_pamt_base = page_to_pfn(pamt) << PAGE_SHIFT;
++	for (pgsz = TDX_PG_4K; pgsz < TDX_PG_MAX; pgsz++) {
++		unsigned long sz = __tdmr_get_pamt_sz(tdmr, pgsz);
++
++		pamt_base[pgsz] = tdmr_pamt_base;
++		pamt_sz[pgsz] = sz;
++
++		tdmr_pamt_base += sz;
 +	}
 +
-+	/* @tdmr_idx is always the index of last valid TDMR. */
-+	*tdmr_num = tdmr_idx + 1;
++	tdmr->pamt_4k_base = pamt_base[TDX_PG_4K];
++	tdmr->pamt_4k_size = pamt_sz[TDX_PG_4K];
++	tdmr->pamt_2m_base = pamt_base[TDX_PG_2M];
++	tdmr->pamt_2m_size = pamt_sz[TDX_PG_2M];
++	tdmr->pamt_1g_base = pamt_base[TDX_PG_1G];
++	tdmr->pamt_1g_size = pamt_sz[TDX_PG_1G];
++
++	return 0;
++}
++
++static void tdmr_free_pamt(struct tdmr_info *tdmr)
++{
++	unsigned long pamt_pfn, pamt_sz;
++
++	pamt_pfn = tdmr->pamt_4k_base >> PAGE_SHIFT;
++	pamt_sz = tdmr->pamt_4k_size + tdmr->pamt_2m_size + tdmr->pamt_1g_size;
++
++	/* Do nothing if PAMT hasn't been allocated for this TDMR */
++	if (!pamt_sz)
++		return;
++
++	if (WARN_ON(!pamt_pfn))
++		return;
++
++	free_contig_range(pamt_pfn, pamt_sz >> PAGE_SHIFT);
++}
++
++static void tdmrs_free_pamt_all(struct tdmr_info **tdmr_array, int tdmr_num)
++{
++	int i;
++
++	for (i = 0; i < tdmr_num; i++)
++		tdmr_free_pamt(tdmr_array[i]);
++}
++
++/* Allocate and set up PAMTs for all TDMRs */
++static int tdmrs_setup_pamt_all(struct tdmr_info **tdmr_array, int tdmr_num)
++{
++	int i, ret;
++
++	for (i = 0; i < tdmr_num; i++) {
++		ret = tdmr_setup_pamt(tdmr_array[i]);
++		if (ret)
++			goto err;
++	}
 +
 +	return 0;
 +err:
-+	/*
-+	 * Clean up already allocated TDMRs in case of error.  @tdmr_idx
-+	 * indicates the last TDMR that wasn't created successfully,
-+	 * therefore only needs to free @tdmr_idx TDMRs.
-+	 */
-+	free_tdmrs(tdmr_array, tdmr_idx);
-+	return ret;
++	tdmrs_free_pamt_all(tdmr_array, tdmr_num);
++	return -ENOMEM;
 +}
 +
  static int construct_tdmrs(struct tdmr_info **tdmr_array, int *tdmr_num)
  {
  	int ret;
-@@ -834,8 +967,13 @@ static int construct_tdmrs(struct tdmr_info **tdmr_array, int *tdmr_num)
+@@ -971,8 +1124,14 @@ static int construct_tdmrs(struct tdmr_info **tdmr_array, int *tdmr_num)
  	if (ret)
  		goto err;
  
-+	ret = create_tdmrs(tdmr_array, tdmr_num);
++	ret = tdmrs_setup_pamt_all(tdmr_array, *tdmr_num);
 +	if (ret)
-+		goto err;
++		goto err_free_tdmrs;
 +
  	/* Return -EFAULT until constructing TDMRs is done */
  	ret = -EFAULT;
-+	free_tdmrs(tdmr_array, *tdmr_num);
++	tdmrs_free_pamt_all(tdmr_array, *tdmr_num);
++err_free_tdmrs:
+ 	free_tdmrs(tdmr_array, *tdmr_num);
  err:
  	return ret;
- }
+@@ -1022,6 +1181,12 @@ static int init_tdx_module(void)
+ 	 * initialization are done.
+ 	 */
+ 	ret = -EFAULT;
++	/*
++	 * Free PAMTs allocated in construct_tdmrs() when TDX module
++	 * initialization fails.
++	 */
++	if (ret)
++		tdmrs_free_pamt_all(tdmr_array, tdmr_num);
+ out_free_tdmrs:
+ 	/*
+ 	 * TDMRs are only used during initializing TDX module.  Always
 -- 
 2.35.1
 
