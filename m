@@ -2,286 +2,237 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1078B4F8863
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 22:33:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB92F4F8898
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 22:33:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229544AbiDGUaS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Apr 2022 16:30:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54074 "EHLO
+        id S229522AbiDGURu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Apr 2022 16:17:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229531AbiDGUaI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Apr 2022 16:30:08 -0400
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B4E0488BD9
-        for <kvm@vger.kernel.org>; Thu,  7 Apr 2022 13:14:22 -0700 (PDT)
-Received: by mail-qv1-f47.google.com with SMTP id i15so5934566qvh.0
-        for <kvm@vger.kernel.org>; Thu, 07 Apr 2022 13:14:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ijbi9VLmxIpB3rDVypqUB1Rsyu6CIGhk9jX/3jBpdZI=;
-        b=VbADzZBB+6dO4EkfHMhze1kQ0m7b4tD/4UpjT45k+gqoxgs/cjbqw8rCAf+rB9Fpwl
-         uPqo++cRXpCJ1GvS6oKGoqbCYI/JnUKkEndVahVINmo/78Ri0CfxBFxI57WvcIhapeh5
-         Tz5w54RjTWd7UgGJ3cRehnTw/uXdFgnS3VmCIWSbFjOOc5oN8aCDQy51IKgr+jiSWO0L
-         v0ervjhTKmfp0ZCpCBdRSZNz2jOmXDhM9FiYh+NwKz356Ja99eXeF97GQrsgQYf+wElh
-         ogjdozOZljev16l579df7j0Gwxph9yrS27N6MgmBKw+q4CDRBPVfemHtJjLik4RRaLKq
-         c3Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ijbi9VLmxIpB3rDVypqUB1Rsyu6CIGhk9jX/3jBpdZI=;
-        b=rzqrmkMQnC4NqmvmxffqaiC8dqBnFLf32DV+lvnxolDOB6G5mEMCfVPL/l+qUkTcuY
-         bCLQNJ5/dT3C28ANs2QwjyTrxLcA5Tb/lJ4wiPkwphhCPvaXIgOYXn7CYtBw2xyeUuez
-         QPj8kkLkQH2d3M/HzENjmEv1456IeCQVM55wM0hUbctuhfMGsklZsUI8S4ePojRdiiDR
-         qlW1Cuz+uBe0dQewTmdUlkQfq1wKkyUTQsTg8xghQofpOeV8bOtMLkEjTvjzjqUVixde
-         xf06sAtLPMlOqCf8BvTq+AOLqKzPy95a0mzrst5yjm7a/mzGpjHzV5oS3gyU5Lgk4TOk
-         9Y+w==
-X-Gm-Message-State: AOAM531qNAVmVlY222iO7GnnNxke1gQsR2SUsABp1fQD7mZAj2WkUKKF
-        zusquPIdoULJbivo5+ECF4D62NM0GlDCQA==
-X-Google-Smtp-Source: ABdhPJz/wJXGaUdKOa0hNzK5nsDU1fSoTxGYr45gS1KnlmX6qxqewFFsOQ43o1kSr83mpLRckKEdxg==
-X-Received: by 2002:a17:902:8e82:b0:151:777b:6d7 with SMTP id bg2-20020a1709028e8200b00151777b06d7mr15547065plb.172.1649360386550;
-        Thu, 07 Apr 2022 12:39:46 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id d23-20020a17090a02d700b001bf6ef9daafsm9790282pjd.38.2022.04.07.12.39.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Apr 2022 12:39:45 -0700 (PDT)
-Date:   Thu, 7 Apr 2022 19:39:42 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        with ESMTP id S229437AbiDGURm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Apr 2022 16:17:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BCDE62D9A3C
+        for <kvm@vger.kernel.org>; Thu,  7 Apr 2022 13:14:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649362407;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=4+0QkoqkebIwgoyAPdYNiKa42b/3LMH5b4hHHgzbLDc=;
+        b=PMzfu6YP7VMUISClhSDTseKpWGlbCLamKEe2+qO8usV7oDNT7/YnfAaMSP/J60Cfbb8TBx
+        f1uTopuJVZ8pye/zTJpYHJulUPK7ukr5SaEmMuAcS0gvIq+haCoroWJfFgTijc+bIZZMv6
+        AvEDqP0TkowgOoeYQdsFBAGbSajgvWU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-517-xl-OpijIPkSy5RTutGvFyA-1; Thu, 07 Apr 2022 16:10:17 -0400
+X-MC-Unique: xl-OpijIPkSy5RTutGvFyA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 83D37101A52C;
+        Thu,  7 Apr 2022 20:10:16 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.40.192.50])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4ED2FC27E83;
+        Thu,  7 Apr 2022 20:10:14 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Ben Gardon <bgardon@google.com>,
-        Zhenzhong Duan <zhenzhong.duan@intel.com>,
-        "open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)" 
-        <kvm@vger.kernel.org>, Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH 3/3] KVM: x86/mmu: Split huge pages mapped by the TDP MMU
- on fault
-Message-ID: <Yk89/g2Unn2exRfz@google.com>
-References: <20220401233737.3021889-1-dmatlack@google.com>
- <20220401233737.3021889-4-dmatlack@google.com>
+        Naresh Kamboju <naresh.kamboju@linaro.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2] KVM: x86: hyper-v: Avoid writing to TSC page without an active vCPU
+Date:   Thu,  7 Apr 2022 22:10:13 +0200
+Message-Id: <20220407201013.963226-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220401233737.3021889-4-dmatlack@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 01, 2022, David Matlack wrote:
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 37 +++++++++++++++++++++++++------------
->  1 file changed, 25 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 9263765c8068..5a2120d85347 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1131,6 +1131,10 @@ static int tdp_mmu_link_sp(struct kvm *kvm, struct tdp_iter *iter,
->  	return 0;
->  }
->  
-> +static int tdp_mmu_split_huge_page_atomic(struct kvm_vcpu *vcpu,
-> +					  struct tdp_iter *iter,
-> +					  bool account_nx);
-> +
->  /*
->   * Handle a TDP page fault (NPT/EPT violation/misconfiguration) by installing
->   * page tables and SPTEs to translate the faulting guest physical address.
-> @@ -1140,6 +1144,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->  	struct kvm_mmu *mmu = vcpu->arch.mmu;
->  	struct tdp_iter iter;
->  	struct kvm_mmu_page *sp;
-> +	bool account_nx;
->  	int ret;
->  
->  	kvm_mmu_hugepage_adjust(vcpu, fault);
-> @@ -1155,28 +1160,22 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->  		if (iter.level == fault->goal_level)
->  			break;
->  
-> +		account_nx = fault->huge_page_disallowed &&
-> +			     fault->req_level >= iter.level;
-> +
->  		/*
->  		 * If there is an SPTE mapping a large page at a higher level
-> -		 * than the target, that SPTE must be cleared and replaced
-> -		 * with a non-leaf SPTE.
-> +		 * than the target, split it down one level.
->  		 */
->  		if (is_shadow_present_pte(iter.old_spte) &&
->  		    is_large_pte(iter.old_spte)) {
-> -			if (tdp_mmu_zap_spte_atomic(vcpu->kvm, &iter))
-> +			if (tdp_mmu_split_huge_page_atomic(vcpu, &iter, account_nx))
+The following WARN is triggered from kvm_vm_ioctl_set_clock():
+ WARNING: CPU: 10 PID: 579353 at arch/x86/kvm/../../../virt/kvm/kvm_main.c:3161 mark_page_dirty_in_slot+0x6c/0x80 [kvm]
+ ...
+ CPU: 10 PID: 579353 Comm: qemu-system-x86 Tainted: G        W  O      5.16.0.stable #20
+ Hardware name: LENOVO 20UF001CUS/20UF001CUS, BIOS R1CET65W(1.34 ) 06/17/2021
+ RIP: 0010:mark_page_dirty_in_slot+0x6c/0x80 [kvm]
+ ...
+ Call Trace:
+  <TASK>
+  ? kvm_write_guest+0x114/0x120 [kvm]
+  kvm_hv_invalidate_tsc_page+0x9e/0xf0 [kvm]
+  kvm_arch_vm_ioctl+0xa26/0xc50 [kvm]
+  ? schedule+0x4e/0xc0
+  ? __cond_resched+0x1a/0x50
+  ? futex_wait+0x166/0x250
+  ? __send_signal+0x1f1/0x3d0
+  kvm_vm_ioctl+0x747/0xda0 [kvm]
+  ...
 
-As Ben brought up in patch 2, this conflicts in nasty ways with Mingwei's series
-to more preciesly check sp->lpage_disallowed.  There's apparently a bug in that
-code when using shadow paging, but assuming said bug isn't a blocking issue, I'd
-prefer to land this on top of Mingwei's series.
+The WARN was introduced by commit 03c0304a86bc ("KVM: Warn if
+mark_page_dirty() is called without an active vCPU") but the change seems
+to be correct (unlike Hyper-V TSC page update mechanism). In fact, there's
+no real need to actually write to guest memory to invalidate TSC page, this
+can be done by the first vCPU which goes through kvm_guest_time_update().
 
-With a bit of massaging, I think we can make the whole thing a bit more
-straightforward.  This is what I ended up with (compile tested only, your patch 2
-dropped, might split moving the "init" to a prep patch).   I'll give it a spin,
-and assuming it works and Mingwei's bug is resolved, I'll post this and Mingwei's
-series as a single thing.
-
+Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 99 ++++++++++++++++++--------------------
- 1 file changed, 48 insertions(+), 51 deletions(-)
+- Changes since v1:
+ Drop HV_TSC_PAGE_KVM_CHANGED and use the existing HV_TSC_PAGE_HOST_CHANGED
+ instead [Sean]
+---
+ arch/x86/include/asm/kvm_host.h |  4 +---
+ arch/x86/kvm/hyperv.c           | 40 +++++++--------------------------
+ arch/x86/kvm/hyperv.h           |  2 +-
+ arch/x86/kvm/x86.c              |  7 +++---
+ 4 files changed, 13 insertions(+), 40 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index f046af20f3d6..b0abf14570ea 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1126,6 +1126,9 @@ static int tdp_mmu_link_sp(struct kvm *kvm, struct tdp_iter *iter,
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 676705ad1e23..19bc362a1cd9 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -977,12 +977,10 @@ enum hv_tsc_page_status {
+ 	HV_TSC_PAGE_UNSET = 0,
+ 	/* TSC page MSR was written by the guest, update pending */
+ 	HV_TSC_PAGE_GUEST_CHANGED,
+-	/* TSC page MSR was written by KVM userspace, update pending */
++	/* TSC page update was triggered from the host side */
+ 	HV_TSC_PAGE_HOST_CHANGED,
+ 	/* TSC page was properly set up and is currently active  */
+ 	HV_TSC_PAGE_SET,
+-	/* TSC page is currently being updated and therefore is inactive */
+-	HV_TSC_PAGE_UPDATING,
+ 	/* TSC page was set up with an inaccessible GPA */
+ 	HV_TSC_PAGE_BROKEN,
+ };
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 123b677111c5..46f9dfb60469 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -1135,11 +1135,13 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
+ 	BUILD_BUG_ON(sizeof(tsc_seq) != sizeof(hv->tsc_ref.tsc_sequence));
+ 	BUILD_BUG_ON(offsetof(struct ms_hyperv_tsc_page, tsc_sequence) != 0);
+ 
++	mutex_lock(&hv->hv_lock);
++
+ 	if (hv->hv_tsc_page_status == HV_TSC_PAGE_BROKEN ||
++	    hv->hv_tsc_page_status == HV_TSC_PAGE_SET ||
+ 	    hv->hv_tsc_page_status == HV_TSC_PAGE_UNSET)
+-		return;
++		goto out_unlock;
+ 
+-	mutex_lock(&hv->hv_lock);
+ 	if (!(hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE))
+ 		goto out_unlock;
+ 
+@@ -1201,45 +1203,19 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
+ 	mutex_unlock(&hv->hv_lock);
+ }
+ 
+-void kvm_hv_invalidate_tsc_page(struct kvm *kvm)
++void kvm_hv_request_tsc_page_update(struct kvm *kvm)
+ {
+ 	struct kvm_hv *hv = to_kvm_hv(kvm);
+-	u64 gfn;
+-	int idx;
+-
+-	if (hv->hv_tsc_page_status == HV_TSC_PAGE_BROKEN ||
+-	    hv->hv_tsc_page_status == HV_TSC_PAGE_UNSET ||
+-	    tsc_page_update_unsafe(hv))
+-		return;
+ 
+ 	mutex_lock(&hv->hv_lock);
+ 
+-	if (!(hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE))
+-		goto out_unlock;
+-
+-	/* Preserve HV_TSC_PAGE_GUEST_CHANGED/HV_TSC_PAGE_HOST_CHANGED states */
+-	if (hv->hv_tsc_page_status == HV_TSC_PAGE_SET)
+-		hv->hv_tsc_page_status = HV_TSC_PAGE_UPDATING;
++	if (hv->hv_tsc_page_status == HV_TSC_PAGE_SET &&
++	    !tsc_page_update_unsafe(hv))
++		hv->hv_tsc_page_status = HV_TSC_PAGE_HOST_CHANGED;
+ 
+-	gfn = hv->hv_tsc_page >> HV_X64_MSR_TSC_REFERENCE_ADDRESS_SHIFT;
+-
+-	hv->tsc_ref.tsc_sequence = 0;
+-
+-	/*
+-	 * Take the srcu lock as memslots will be accessed to check the gfn
+-	 * cache generation against the memslots generation.
+-	 */
+-	idx = srcu_read_lock(&kvm->srcu);
+-	if (kvm_write_guest(kvm, gfn_to_gpa(gfn),
+-			    &hv->tsc_ref, sizeof(hv->tsc_ref.tsc_sequence)))
+-		hv->hv_tsc_page_status = HV_TSC_PAGE_BROKEN;
+-	srcu_read_unlock(&kvm->srcu, idx);
+-
+-out_unlock:
+ 	mutex_unlock(&hv->hv_lock);
+ }
+ 
+-
+ static bool hv_check_msr_access(struct kvm_vcpu_hv *hv_vcpu, u32 msr)
+ {
+ 	if (!hv_vcpu->enforce_cpuid)
+diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
+index e19c00ee9ab3..da2737f2a956 100644
+--- a/arch/x86/kvm/hyperv.h
++++ b/arch/x86/kvm/hyperv.h
+@@ -137,7 +137,7 @@ void kvm_hv_process_stimers(struct kvm_vcpu *vcpu);
+ 
+ void kvm_hv_setup_tsc_page(struct kvm *kvm,
+ 			   struct pvclock_vcpu_time_info *hv_clock);
+-void kvm_hv_invalidate_tsc_page(struct kvm *kvm);
++void kvm_hv_request_tsc_page_update(struct kvm *kvm);
+ 
+ void kvm_hv_init_vm(struct kvm *kvm);
+ void kvm_hv_destroy_vm(struct kvm *kvm);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7a066cf92692..e9647614dc8c 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2904,7 +2904,7 @@ static void kvm_end_pvclock_update(struct kvm *kvm)
+ 
+ static void kvm_update_masterclock(struct kvm *kvm)
+ {
+-	kvm_hv_invalidate_tsc_page(kvm);
++	kvm_hv_request_tsc_page_update(kvm);
+ 	kvm_start_pvclock_update(kvm);
+ 	pvclock_update_vm_gtod_copy(kvm);
+ 	kvm_end_pvclock_update(kvm);
+@@ -3108,8 +3108,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+ 					offsetof(struct compat_vcpu_info, time));
+ 	if (vcpu->xen.vcpu_time_info_cache.active)
+ 		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_time_info_cache, 0);
+-	if (!v->vcpu_idx)
+-		kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
++	kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
  	return 0;
  }
-
-+static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
-+				   struct kvm_mmu_page *sp, bool shared);
-+
- /*
-  * Handle a TDP page fault (NPT/EPT violation/misconfiguration) by installing
-  * page tables and SPTEs to translate the faulting guest physical address.
-@@ -1136,7 +1139,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	struct kvm *kvm = vcpu->kvm;
- 	struct tdp_iter iter;
- 	struct kvm_mmu_page *sp;
--	int ret;
-+	bool account_nx;
-+	int ret, r;
-
- 	kvm_mmu_hugepage_adjust(vcpu, fault);
-
-@@ -1151,57 +1155,50 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		if (iter.level == fault->goal_level)
- 			break;
-
--		/*
--		 * If there is an SPTE mapping a large page at a higher level
--		 * than the target, that SPTE must be cleared and replaced
--		 * with a non-leaf SPTE.
--		 */
-+		/* Nothing to do if there's already a shadow page installed. */
- 		if (is_shadow_present_pte(iter.old_spte) &&
--		    is_large_pte(iter.old_spte)) {
--			if (tdp_mmu_zap_spte_atomic(vcpu->kvm, &iter))
--				break;
--
--			/*
--			 * The iter must explicitly re-read the spte here
--			 * because the new value informs the !present
--			 * path below.
--			 */
--			iter.old_spte = kvm_tdp_mmu_read_spte(iter.sptep);
-+		    !is_large_pte(iter.old_spte))
-+			continue;
-+
-+		/*
-+		 * If the SPTE has been frozen by another thread, just give up
-+		 * and retry to avoid unnecessary page table alloc and free.
-+		 */
-+		if (is_removed_spte(iter.old_spte))
-+			break;
-+
-+		/*
-+		 * The SPTE is either invalid or points at a huge page that
-+		 * needs to be split.
-+		 */
-+		sp = tdp_mmu_alloc_sp(vcpu);
-+		tdp_mmu_init_child_sp(sp, &iter);
-+
-+		account_nx = fault->huge_page_disallowed &&
-+			     fault->req_level >= iter.level;
-+
-+		sp->lpage_disallowed = account_nx;
-+		/*
-+		 * Ensure lpage_disallowed is visible before the SP is marked
-+		 * present (or not-huge), as mmu_lock is held for read.  Pairs
-+		 * with the smp_rmb() in disallowed_hugepage_adjust().
-+		 */
-+		smp_wmb();
-+
-+		if (!is_shadow_present_pte(iter.old_spte))
-+			r = tdp_mmu_link_sp(kvm, &iter, sp, true);
-+		else
-+			r = tdp_mmu_split_huge_page(kvm, &iter, sp, true);
-+
-+		if (r) {
-+			tdp_mmu_free_sp(sp);
-+			break;
- 		}
-
--		if (!is_shadow_present_pte(iter.old_spte)) {
--			bool account_nx = fault->huge_page_disallowed &&
--					  fault->req_level >= iter.level;
--
--			/*
--			 * If SPTE has been frozen by another thread, just
--			 * give up and retry, avoiding unnecessary page table
--			 * allocation and free.
--			 */
--			if (is_removed_spte(iter.old_spte))
--				break;
--
--			sp = tdp_mmu_alloc_sp(vcpu);
--			tdp_mmu_init_child_sp(sp, &iter);
--
--			sp->lpage_disallowed = account_nx;
--			/*
--			 * Ensure lpage_disallowed is visible before the SP is
--			 * marked present, as mmu_lock is held for read.  Pairs
--			 * with the smp_rmb() in disallowed_hugepage_adjust().
--			 */
--			smp_wmb();
--
--			if (tdp_mmu_link_sp(kvm, &iter, sp, true)) {
--				tdp_mmu_free_sp(sp);
--				break;
--			}
--
--			if (account_nx) {
--				spin_lock(&kvm->arch.tdp_mmu_pages_lock);
--				__account_huge_nx_page(kvm, sp);
--				spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
--			}
-+		if (account_nx) {
-+			spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-+			__account_huge_nx_page(kvm, sp);
-+			spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
- 		}
- 	}
-
-@@ -1472,8 +1469,6 @@ static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
- 	const int level = iter->level;
- 	int ret, i;
-
--	tdp_mmu_init_child_sp(sp, iter);
--
- 	/*
- 	 * No need for atomics when writing to sp->spt since the page table has
- 	 * not been linked in yet and thus is not reachable from any other CPU.
-@@ -1549,6 +1544,8 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
- 				continue;
- 		}
-
-+		tdp_mmu_init_child_sp(sp, &iter);
-+
- 		if (tdp_mmu_split_huge_page(kvm, &iter, sp, shared))
- 			goto retry;
-
-
-base-commit: f06d9d4f3d89912c40c57da45d64b9827d8580ac
---
+ 
+@@ -6238,7 +6237,7 @@ static int kvm_vm_ioctl_set_clock(struct kvm *kvm, void __user *argp)
+ 	if (data.flags & ~KVM_CLOCK_VALID_FLAGS)
+ 		return -EINVAL;
+ 
+-	kvm_hv_invalidate_tsc_page(kvm);
++	kvm_hv_request_tsc_page_update(kvm);
+ 	kvm_start_pvclock_update(kvm);
+ 	pvclock_update_vm_gtod_copy(kvm);
+ 
+-- 
+2.35.1
 
