@@ -2,116 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A90CE4F8133
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 16:01:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FD1B4F81FB
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 16:40:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238430AbiDGODt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Apr 2022 10:03:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49124 "EHLO
+        id S1344178AbiDGOmD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Apr 2022 10:42:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231405AbiDGODr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Apr 2022 10:03:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 85B5CBF52D
-        for <kvm@vger.kernel.org>; Thu,  7 Apr 2022 07:01:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649340104;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=iPVjUD4VGANcIQRfm5QWOv0d3iQPwruTr6X8FPFV1Gg=;
-        b=YyxZCZGv4Yvlt42+3nJKYsE/GbbD9SPl4Nkp299RZPRSzPkiXuhrg0cqb8D3jlPhZQScPH
-        pAulYpD5IKyDOllWiaWsS9JORllCDvNF80ItdikRsAj/yrlPSbdask+rBbR939rr09Z6XN
-        wlJCgf5X1GI0CtT5e4MpxedTJaa4TW0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-178-15H9wykCPN6Y7vWWd0jECA-1; Thu, 07 Apr 2022 10:01:42 -0400
-X-MC-Unique: 15H9wykCPN6Y7vWWd0jECA-1
-Received: by mail-wm1-f70.google.com with SMTP id t2-20020a7bc3c2000000b003528fe59cb9so3012155wmj.5
-        for <kvm@vger.kernel.org>; Thu, 07 Apr 2022 07:01:41 -0700 (PDT)
+        with ESMTP id S1344170AbiDGOl7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Apr 2022 10:41:59 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5DD11B48CD
+        for <kvm@vger.kernel.org>; Thu,  7 Apr 2022 07:39:53 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id c2so5096937pga.10
+        for <kvm@vger.kernel.org>; Thu, 07 Apr 2022 07:39:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=cdWHaY0HfTWkdJvVRP0q7ev5obKbIDvxCh0+0jaubQ8=;
+        b=TYTWE6bZQ6Aut3wR3FmNbNA5BAnkpBzE8zzKRiY9Luk6S95BiKiR51Goo7JVDmOP2w
+         apJnvtsfGOQgnWDjOobKVv0rzmz8Ir5u55juvHaEEzS4ZuonH4FCO5P3wkX3VAW6Y7mz
+         K9vAl+LlQgqqJo9YpBnLzljo9Ez25RvasVMYqAnVt2SAqzOI+qqOXu4npSZVxENeyyRI
+         EQSqFEwtohlnO8Lkz6J+00g8B7LX39V4632+Tk+mdfvbeCNcoQO2nn0Gqr1xcZNkWKlq
+         ZUycB5aCaoY5WXkckTg8kBQcnX41SlQSBoekEYHh7SwHYtSyiCul3/ca+uWJttgVZzk7
+         MrAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=iPVjUD4VGANcIQRfm5QWOv0d3iQPwruTr6X8FPFV1Gg=;
-        b=xL/SXJB8J/qhCj04Hy3L00K+acX4CLcyFMyYhbN7Uf/EFBJAlGbnFHpHh5EC/EyiXp
-         jzReuodHIixmJ0xuxk7JozjN3fcdBeny13WVA2KqmXotywy5dfpFmIJOJTFU76XKs/wN
-         zgS7OUCwKVneIm67DSBHPx1k+ikTQMsKdexfP9rr7lChB81kPh0nFpV7x8AzVDCQWPpj
-         NvGF6VIP6UhEVRmZa7SbHejnQPn2W3h2mGU93Zgz1sKC5T9WXypicGtj+c7mxG3G1jN3
-         yJnNudxlA2wExVmpu8me0OoZEr1irftMa6JSNrAELiZmBiH/FNVCQwylp+M/oqOAzH4k
-         OCgg==
-X-Gm-Message-State: AOAM531+Zy3VKclTQRV9MkJQM4FGc21aU8B69XIgRDh20zc2qMJYEssz
-        TqfAzfCdeUBT4NNjxvKbRMH5vCVUwMdbzrNod7vOSM7WQM9SjHMHtB5Z6b1gdRw0J29gB1xhERD
-        KhKMa/R4RvMYm
-X-Received: by 2002:a05:600c:1910:b0:38c:bff7:b9db with SMTP id j16-20020a05600c191000b0038cbff7b9dbmr12633651wmq.182.1649340100898;
-        Thu, 07 Apr 2022 07:01:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxU/dYZtfiATAomIrnRvl8FEyxkNIr3CwJEqCIWLwzLHA8afMCdfS5sdwqZVv6K+GTlXvZw4A==
-X-Received: by 2002:a05:600c:1910:b0:38c:bff7:b9db with SMTP id j16-20020a05600c191000b0038cbff7b9dbmr12633611wmq.182.1649340100678;
-        Thu, 07 Apr 2022 07:01:40 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id v1-20020adf9e41000000b00205c3d212easm17786210wre.51.2022.04.07.07.01.39
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=cdWHaY0HfTWkdJvVRP0q7ev5obKbIDvxCh0+0jaubQ8=;
+        b=x93wArhPBNSiL4QQeWjZnP1We5wRl7aQ/zZfjsQE7Vb/fHuqi5bLSYdp9BMjiz3pdk
+         phjO2x3lqnRAoct2YRwwGyOJMF6wXOih5rcuBLjYXGumvWE9lJ9WLYzJ96d9agQ/I/kr
+         tZWuR9OSlbisMDq5a8TvbA78YRTlFbk0bcxRqe0yKv8YH+r2aN+RKVPbvnsy9+fynVoH
+         eg7kOLDmVZ2+6iKYvl0NEyXMY23VHtveowMD0sWfJHRKg8M+m2aH8YgOYI0CE8lARy/0
+         +Sqg6R01Spshs4+usR6IwQIcOBZSSIFEhy3k2+t1P/4AsMrUz7c/+hB9nnwYnLgkfS82
+         xq8A==
+X-Gm-Message-State: AOAM531X8M7kxMXzi59kAIJ8v2/Xrjix/PbL6XFdumoYJo8P3CjVSL1A
+        e1TA+vbNX91bqLK11la881w0Ew==
+X-Google-Smtp-Source: ABdhPJzddpnKtgIEsEKP3sJDCzAj8LMSusDXvLaI5AqGYGgTcK+gSSdyd0LsCXgDLVnHzab5tJEmMw==
+X-Received: by 2002:a65:48c6:0:b0:398:b858:e332 with SMTP id o6-20020a6548c6000000b00398b858e332mr11388035pgs.291.1649342393030;
+        Thu, 07 Apr 2022 07:39:53 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id u204-20020a6279d5000000b004fa58625a80sm23182829pfc.53.2022.04.07.07.39.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Apr 2022 07:01:40 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>, kvm list <kvm@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        lkft-triage@lists.linaro.org, Shuah Khan <shuah@kernel.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: WARNING: at arch/x86/kvm/../../../virt/kvm/kvm_main.c:3156
- mark_page_dirty_in_slot
-In-Reply-To: <YkMxGLAG0zqEzt1V@google.com>
-References: <CA+G9fYsd+zXJqsxuYkWLQo0aYwmqLVA_YeBu+sr546bGA+1Nfg@mail.gmail.com>
- <YkMxGLAG0zqEzt1V@google.com>
-Date:   Thu, 07 Apr 2022 16:01:39 +0200
-Message-ID: <87tub56lh8.fsf@redhat.com>
+        Thu, 07 Apr 2022 07:39:52 -0700 (PDT)
+Date:   Thu, 7 Apr 2022 14:39:49 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Kai Huang <kai.huang@intel.com>, isaku.yamahata@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Jim Mattson <jmattson@google.com>,
+        erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>
+Subject: Re: [RFC PATCH v5 089/104] KVM: TDX: Add a placeholder for handler
+ of TDX hypercalls (TDG.VP.VMCALL)
+Message-ID: <Yk73ta7nwuI1NnlC@google.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <b84fcd9927e49716de913b0fe910018788aaba46.1646422845.git.isaku.yamahata@intel.com>
+ <3042130fce467c30f07e58581da966fc405a4c6c.camel@intel.com>
+ <23189be4-4410-d47e-820c-a3645d5b9e6d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <23189be4-4410-d47e-820c-a3645d5b9e6d@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On Thu, Apr 07, 2022, Paolo Bonzini wrote:
+> On 4/7/22 06:15, Kai Huang wrote:
+> > > +static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +	struct vcpu_tdx *tdx = to_tdx(vcpu);
+> > > +
+> > > +	if (unlikely(tdx->tdvmcall.xmm_mask))
+> > > +		goto unsupported;
+> > Put a comment explaining this logic?
+> > 
+> 
+> This only seems to be necessary for Hyper-V hypercalls, which however are
+> not supported by this series in TDX guests (because the kvm_hv_hypercall
+> still calls kvm_*_read, likewise for Xen).
+> 
+> So for now this conditional can be dropped.
 
-> On Tue, Mar 29, 2022, Naresh Kamboju wrote:
->> While running kselftest kvm test cases on x86_64 devices the following
->> kernel warning was reported.
->
-> ...
->
->> [   62.510388] ------------[ cut here ]------------
->> [   62.515064] WARNING: CPU: 1 PID: 915 at
->> arch/x86/kvm/../../../virt/kvm/kvm_main.c:3156
->> mark_page_dirty_in_slot+0xba/0xd0
->> [   62.525968] Modules linked in: x86_pkg_temp_thermal fuse
->> [   62.531307] CPU: 1 PID: 915 Comm: hyperv_clock Not tainted 5.17.0 #1
->> [   62.537691] Hardware name: Supermicro SYS-5019S-ML/X11SSH-F, BIOS
->> 2.0b 07/27/2017
->> [   62.545185] RIP: 0010:mark_page_dirty_in_slot+0xba/0xd0
->
-> Long known issue.  I think we're all waiting for someone else to post an actual
-> patch.
->
-> Vitaly, can you formally post the below patch, or do you need feedback first?
->
-> https://lore.kernel.org/all/874k51eddp.fsf@redhat.com/
->
-
-Sorry, missed this. Will do.
-
--- 
-Vitaly
-
+I'd prefer to keep the sanity check, it's a cheap and easy way to detect a clear
+cut guest bug.  E.g. KVM would be within its rights to write garbage the XMM
+registers in this case.  Even though KVM isn't to be trusted, KVM can still be
+nice to the guest.
