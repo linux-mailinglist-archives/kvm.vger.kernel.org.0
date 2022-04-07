@@ -2,77 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 90B264F6F2E
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 02:26:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB4904F6F34
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 02:29:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231775AbiDGA21 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 20:28:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57212 "EHLO
+        id S231944AbiDGAa7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 20:30:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231575AbiDGA2U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 20:28:20 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D93B85BE68
-        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 17:26:21 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id s8so3963950pfk.12
-        for <kvm@vger.kernel.org>; Wed, 06 Apr 2022 17:26:21 -0700 (PDT)
+        with ESMTP id S231917AbiDGAaw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 20:30:52 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 029A66D95F
+        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 17:28:55 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id w7so3972951pfu.11
+        for <kvm@vger.kernel.org>; Wed, 06 Apr 2022 17:28:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=JYxH8Wd4nrXFUKoK27SKynkclPMvg/ZZ7jTNviaLYMM=;
-        b=AKA+KF/aNHe+UWPbxkSkRBY0RNWtrj3Mu0ZcIZIxxQrmjZdH4WPBAOuknu+cdQHFNT
-         PLrciG+s2Qv86qcLJ/4b8R0YZUqNiW6a46rUOM0qdX/YWso/CwnedPv6aOTLc3v/YdD1
-         HIlfrGeSk4slDzAu6ilQGZD0bxYvSCBvlKlSDAI82Tkd41MWn0C7pWjneWYGto6wrAH4
-         ePsSsWAJDOToKSNQfu/Qv7yZvVyIvJALId7/K2l/uizbvouT9fixH/rvHe7Rd3yZWbZy
-         aBriiTyVA31BWOwn3/dsttok8wni5Q/BoWiByBYVhFJsEweJJjziwS+0ZngHylQ3n6yP
-         fOEA==
+        bh=vqS1m/IH9ttZDToEhWuRy6HzBTkV/dxcTphdjhUeXNs=;
+        b=bEx0Ea+QqiL/+iw8tktWp8aLIB++31btJoMFw8KBXszdh85N/EeM0BTlb5RZ9L2j7O
+         I97jAvfh2gtEDnRP17Nh2w3Ol1+AuV0wv2J9ccQEH+DdaKPtYDsqEyy6/ioOkqBfBDeO
+         LErRhqzE85mLpBsQPkXBdZrXi1XUcrMh2gKlGZqmoTHbPOduPIfcuLblopmH7zlXBsWj
+         gIM2kKXcF5z+VBaLWiHRbSpzKGhjwQ3KnZCxEYvH1Ibrf4HrRUDc91fAEykcJsfzmWYw
+         z1FE2JK2luooNK4FPi9ZhJkxMkLqbJN4Fdh+0RBuxIE6hPvPvv3wP7eAEIcpv600D9xn
+         Wejg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=JYxH8Wd4nrXFUKoK27SKynkclPMvg/ZZ7jTNviaLYMM=;
-        b=nbLcGOPlHMBrNFw8I4kh3hrtidzby+hrHSLWElb+bqnNTmuDO/AbR2MwkTT3yry6br
-         XKdJUegOFkaYXehgOJOap+5Se8g8zjGPtM5XU0jQS5ut9IEJrkVELa2NXSR/W+XrxeJ2
-         QQdu/QgsUJXS1H6ag2Ezv6I/2xnry1piF/tQQgfPzRrT4Np0dbl5dEB6l7rs+e+VjwfB
-         OozIxFx8N44/UTo+/9SQEn1QxZOZHkbkdkMHwhuZAyF91KJ/brHCVhcJcD4KX3yhmmhh
-         OjGPBwUwgAkAIM5+k0OdMgX9WS0Ydx/vXrGEhVHVO7SwWdzNmuUZ2KS6g2Zp7FC0x9fL
-         X2QA==
-X-Gm-Message-State: AOAM531hqU4IFAfoUIvi8UEJNUaVSjs+q79hoqoplZxLRuLHmAl3tves
-        3APXdFE0Chst+4zaMDUjPFoczw==
-X-Google-Smtp-Source: ABdhPJy+87fR+JEafumVynFeHjsOql0b40Ua4Ep8O9ThlxJ9EuM625raZEzL5WdfG7f4xrtsRMIX/g==
-X-Received: by 2002:a65:530b:0:b0:382:b21d:82eb with SMTP id m11-20020a65530b000000b00382b21d82ebmr9381617pgq.215.1649291181116;
-        Wed, 06 Apr 2022 17:26:21 -0700 (PDT)
+        bh=vqS1m/IH9ttZDToEhWuRy6HzBTkV/dxcTphdjhUeXNs=;
+        b=j2dhWQPACs4cqtIEnRsGgglNvvrtPGXkhxXeeqwnuTjLFDPAPoFBZ1raeh5PddRR94
+         pRssbrPiDIr28WsKq6efxihTIJdnWIssk36N7QewDsIB4GiNFz1tyoeaR3llfpLAe3E6
+         jbGFg/VCZP/8hZk8eEsb/e77Fwxfxq/2Ov9K+HIErRCm66xVOV/kBD5PBC7m3UcPXaxP
+         F3nR0uBqO2rFIK6FSR1Ik4cDCIWenwKmtY2o68YR7y6bSsEBToyo0e9LO7w7h+rJ3i8b
+         6qXm69jRA+p5iJXqindhxHya1EsM9mXhUQML/UcX0MeH1TwpsH0aQX8RE8Vl9TEeB88N
+         iKSg==
+X-Gm-Message-State: AOAM530F0VDls6CKYKiA6vBCMw6fqzr5hCXpXKRL/5+sbDTTvLv/OA9t
+        flXFUiIHiuVH5APLpWhOqAkzsQ==
+X-Google-Smtp-Source: ABdhPJx0IkyEOOc6Ubdav5XeHiivjOusSXBlgIM5WYUqCbe7zysv0jtVWVz7t6l8zhWAgq5kJEAl4g==
+X-Received: by 2002:a05:6a00:182a:b0:4fd:dee2:6371 with SMTP id y42-20020a056a00182a00b004fddee26371mr11646718pfa.8.1649291334331;
+        Wed, 06 Apr 2022 17:28:54 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id d5-20020a17090acd0500b001b9c05b075dsm6718725pju.44.2022.04.06.17.26.20
+        by smtp.gmail.com with ESMTPSA id b7-20020a056a00114700b004f7be3231d6sm20172609pfm.7.2022.04.06.17.28.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Apr 2022 17:26:20 -0700 (PDT)
-Date:   Thu, 7 Apr 2022 00:26:16 +0000
+        Wed, 06 Apr 2022 17:28:53 -0700 (PDT)
+Date:   Thu, 7 Apr 2022 00:28:50 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>,
-        Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         David Dunn <daviddunn@google.com>
-Subject: Re: [PATCH v4 1/8] KVM: nVMX: Keep KVM updates to BNDCFGS ctrl bits
- across MSR write
-Message-ID: <Yk4vqJ1nT+JxEpKo@google.com>
-References: <b839fa78-c8ec-7996-dba7-685ea48ca33d@redhat.com>
- <Yh/Y3E4NTfSa4I/g@google.com>
- <4d4606f4-dbc9-d3a4-929e-0ea07182054c@redhat.com>
- <Yh/nlOXzIhaMLzdk@google.com>
- <YiAdU+pA/RNeyjRi@google.com>
- <78abcc19-0a79-4f8b-2eaf-c99b96efea42@redhat.com>
- <YiDps0lOKITPn4gv@google.com>
- <CALMp9eRGNfF0Sb6MTt2ueSmxMmHoF2EgT-0XR=ovteBMy6B2+Q@mail.gmail.com>
- <YiFS241NF6oXaHjf@google.com>
- <764d42ec-4658-f483-b6cb-03596fa6c819@redhat.com>
+Subject: Re: [PATCH v4 5/8] KVM: nVMX: Add a quirk for KVM tweaks to VMX
+ control MSRs
+Message-ID: <Yk4wQtThcQl8toyC@google.com>
+References: <20220301060351.442881-1-oupton@google.com>
+ <20220301060351.442881-6-oupton@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <764d42ec-4658-f483-b6cb-03596fa6c819@redhat.com>
+In-Reply-To: <20220301060351.442881-6-oupton@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -84,25 +76,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 04, 2022, Paolo Bonzini wrote:
-> On 3/4/22 00:44, Sean Christopherson wrote:
-> > 
-> > diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-> > index c92cea0b8ccc..46dd1967ec08 100644
-> > --- a/arch/x86/kvm/vmx/nested.h
-> > +++ b/arch/x86/kvm/vmx/nested.h
-> > @@ -285,8 +285,8 @@ static inline bool nested_cr4_valid(struct kvm_vcpu *vcpu, unsigned long val)
-> >  }
-> > 
-> >  /* No difference in the restrictions on guest and host CR4 in VMX operation. */
-> > -#define nested_guest_cr4_valid nested_cr4_valid
-> > -#define nested_host_cr4_valid  nested_cr4_valid
-> > +#define nested_guest_cr4_valid kvm_is_valid_cr4
-> > +#define nested_host_cr4_valid  kvm_is_valid_cr4
-> 
-> This doesn't allow the theoretically possible case of L0 setting some
-> CR4-fixed-0 bits for L1.  I'll send another one.
+On Tue, Mar 01, 2022, Oliver Upton wrote:
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 224ef4c19a5d..21b98bad1319 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7250,6 +7250,9 @@ void nested_vmx_entry_exit_ctls_update(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>  
+> +	if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_TWEAK_VMX_CTRL_MSRS))
+> +		return;
+> +
+>  	if (kvm_mpx_supported()) {
+>  		bool mpx_enabled = guest_cpuid_has(vcpu, X86_FEATURE_MPX);
 
-Are you still planning on sending a proper patch for this?
+Assuming the proposed L2 CR4 checking changes don't throw a wrench in things, I'd
+I'd prefer we include the CR4 fixed1 massaging in the quirk:
 
-And more importantly, have we shifted your view on this patch/series?
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index ce0000202c5e..17b19946d6cc 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7367,7 +7367,8 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+                        ~(FEAT_CTL_VMX_ENABLED_INSIDE_SMX |
+                          FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX);
+
+-       if (nested_vmx_allowed(vcpu)) {
++       if (nested_vmx_allowed(vcpu) &&
++           !kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_TWEAK_VMX_CTRL_MSRS)) {
+                nested_vmx_cr_fixed1_bits_update(vcpu);
+                nested_vmx_entry_exit_ctls_update(vcpu);
+        }
