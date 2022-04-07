@@ -2,122 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F26EC4F7F1F
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 14:34:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE1574F7FF6
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 15:03:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245250AbiDGMfz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Apr 2022 08:35:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52924 "EHLO
+        id S1343500AbiDGNFq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Apr 2022 09:05:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245232AbiDGMfu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Apr 2022 08:35:50 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1BE615EDE5;
-        Thu,  7 Apr 2022 05:33:49 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id q19so4821160pgm.6;
-        Thu, 07 Apr 2022 05:33:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=oHuMdd+Tso54IS24zoaKEo7ZF3a1oq8FNtueInQMuKg=;
-        b=TP5m84milVRvG/vEdfXwdoGsaBa4DtHBo313pRzo5ALpNwKykawRcbsU4JHBwG928X
-         n5jRakad5YjG9eFkh+7QyNsQRSSkBceUG9GxSLvPM9ydqymcYFGa8t+cT16wAFVYtn5E
-         Tm0FxsfLb3ONv418/WLIsSgHsnwWPtYG1P7XhsyJBo1/YupRo+2Y1caU5ReQn2FTD9KR
-         oEfNV/qbGhraydqt6xDfrmotxOVI99RtQARty2IARenhNTZHIJ1pa2l7r4GamI/2KkDq
-         BmlszCrdY1v32v0rEq223xFv4QRc6SK6IN5w3cwfPHdg+hY2B1LoYIdhmzMBJnKAfFdl
-         yM+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=oHuMdd+Tso54IS24zoaKEo7ZF3a1oq8FNtueInQMuKg=;
-        b=bIccdu6pTAJ5HDDEqQ7+/rgLHh3QnrqdfxiO3Y/N/NK1QJ5b2gkqozESyw2MmV9tiA
-         g9THaHKl5unMj4+v4WW81AZNcJwTVIl7rHbnvaZpJuz7sahTGKXkLIPRD69En4dQaTjf
-         KeSKFOtU8mwEj29VszgrV14iVsuuFVoMFJBHj22AcSSNygzAgCZuZ7bephPsquCmO60s
-         0wZ+7D6FAVF+/odjKrYo44/K9u8hbvpJIr1dA1QIVHZ37/vCdmEC7i8P+XPPprgPAt2g
-         bvnTDVpSBaTrYijDqLtKsplifmKGFKBGuED8xukbEME/UQ5L2Y584AQGAs+kyUtuhGtm
-         DQhg==
-X-Gm-Message-State: AOAM533NZjxdT+lpEvz7+Ad5PcFqEXLzjZgQTBwKy3Su03twOtJHJfa/
-        y+qRsIOe/4QRi3I/ynQuj6WyIkeqzGzY7vIj
-X-Google-Smtp-Source: ABdhPJxaB7S5JM7L1Nse63e3q13TrwKZX/zgN6E55DEv72DlYwSESD8Cwg7AsnUwV84IfHCk/CWwgQ==
-X-Received: by 2002:a63:7f50:0:b0:386:2b5c:9d16 with SMTP id p16-20020a637f50000000b003862b5c9d16mr11244153pgn.153.1649334829156;
-        Thu, 07 Apr 2022 05:33:49 -0700 (PDT)
-Received: from ubuntu.mate (subs03-180-214-233-65.three.co.id. [180.214.233.65])
-        by smtp.gmail.com with ESMTPSA id nv11-20020a17090b1b4b00b001c71b0bf18bsm9484966pjb.11.2022.04.07.05.33.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Apr 2022 05:33:48 -0700 (PDT)
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-To:     linux-doc@vger.kernel.org
-Cc:     Stephen Rothwell <sfr@canb.auug.org.au>, KVM <kvm@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
-Subject: [PATCH v2] Documentation: kvm: Add missing line break in api.rst
-Date:   Thu,  7 Apr 2022 19:33:27 +0700
-Message-Id: <20220407123327.159079-1-bagasdotme@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        with ESMTP id S1343625AbiDGNF3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Apr 2022 09:05:29 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF56325C585;
+        Thu,  7 Apr 2022 06:03:08 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 237COl6q022903;
+        Thu, 7 Apr 2022 13:03:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=50XPBYIJIPMdXdNe5V2X8VtGX8E1k9sdipBI7RjpoRc=;
+ b=fVEAa+12KgPOiG+R2654kxm00JNsjcqhGF8lLNjom5+m6EVW1aVHLBBbzaLGMiqxbXci
+ JAPyQJ+qCS6xMbmIGMA7Lmy+a3l07E+4eVpPLwEtO6WkxYrjHewum3ls3WI3L/RD37a+
+ Beep+MsRJ5IAfPdOSnfOB7ONp+7rq87zYT8brFynE8JXDNOp6r7asBUZQoAQNBnqDelE
+ f6CVfDpnvIopaoqvQ4tFbhpVAzJvRviBUwjg84k/2F/4LPX1Nb4hN3/fYv2YVkCbV7b0
+ V8OsblANjwzL3qLMw4DZPiERSEtfGqXUVeLgQ2If0P8iv5rdy/Q7cS+9DswsRxDwR/9v Kg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3f8ya1ygyr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 07 Apr 2022 13:03:07 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 237D1xfF015188;
+        Thu, 7 Apr 2022 13:03:07 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3f8ya1ygxd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 07 Apr 2022 13:03:07 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 237CvdM6020442;
+        Thu, 7 Apr 2022 13:03:04 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 3f6e491x7j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 07 Apr 2022 13:03:03 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 237D30Qt41681154
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 7 Apr 2022 13:03:00 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0685811C04A;
+        Thu,  7 Apr 2022 13:03:00 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3CC1411C058;
+        Thu,  7 Apr 2022 13:02:59 +0000 (GMT)
+Received: from linux6.. (unknown [9.114.12.104])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  7 Apr 2022 13:02:59 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
+        nrb@linux.ibm.com, seiden@linux.ibm.com, imbrenda@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v3] s390x: diag308: Only test subcode 2 under QEMU
+Date:   Thu,  7 Apr 2022 13:02:52 +0000
+Message-Id: <20220407130252.15603-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220407114253.5cb6f2aa@p-imbrenda>
+References: <20220407114253.5cb6f2aa@p-imbrenda>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 6dC-3WwOLcHNL1H879tZm3BAAw9NqNCs
+X-Proofpoint-ORIG-GUID: XwXfno73Hb6mKlDmiR_JzkaHeHJc9q3N
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-04-07_01,2022-04-07_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 adultscore=0 priorityscore=1501 suspectscore=0 bulkscore=0
+ phishscore=0 clxscore=1015 impostorscore=0 spamscore=0 mlxscore=0
+ mlxlogscore=970 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204070064
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add missing line break separator between literal block and description
-of KVM_EXIT_RISCV_SBI.
+Other hypervisors might implement it and therefore not send a
+specification exception.
 
-This fixes:
-</path/to/linux>/Documentation/virt/kvm/api.rst:6118: WARNING: Literal block ends without a blank line; unexpected unindent.
-
-Fixes: da40d85805937d ("RISC-V: KVM: Document RISC-V specific parts of KVM API")
-Cc: Anup Patel <anup.patel@wdc.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>
-Cc: Albert Ou <aou@eecs.berkeley.edu>
-Cc: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-riscv@lists.infradead.org
-Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- Changes since v1 [1]:
-   - Rebased on v5.18-rc1
-   - Address Fixes tag problems reported by Stephen Rothwell [2] by
-     removing date and quote the original commit
+ s390x/diag308.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
- [1]: https://lore.kernel.org/linux-doc/20220403065735.23859-1-bagasdotme@gmail.com/
- [2]: https://lore.kernel.org/linux-next/20220407074844.110f9285@canb.auug.org.au/
-
- Documentation/virt/kvm/api.rst | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index d13fa66004672c..85c7abc51af521 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6190,6 +6190,7 @@ Valid values for 'type' are:
- 			unsigned long args[6];
- 			unsigned long ret[2];
- 		} riscv_sbi;
+diff --git a/s390x/diag308.c b/s390x/diag308.c
+index c9d6c499..ea41b455 100644
+--- a/s390x/diag308.c
++++ b/s390x/diag308.c
+@@ -8,6 +8,7 @@
+ #include <libcflat.h>
+ #include <asm/asm-offsets.h>
+ #include <asm/interrupt.h>
++#include <hardware.h>
+ 
+ /* The diagnose calls should be blocked in problem state */
+ static void test_priv(void)
+@@ -75,7 +76,7 @@ static void test_subcode6(void)
+ /* Unsupported subcodes should generate a specification exception */
+ static void test_unsupported_subcode(void)
+ {
+-	int subcodes[] = { 2, 0x101, 0xffff, 0x10001, -1 };
++	int subcodes[] = { 0x101, 0xffff, 0x10001, -1 };
+ 	int idx;
+ 
+ 	for (idx = 0; idx < ARRAY_SIZE(subcodes); idx++) {
+@@ -85,6 +86,21 @@ static void test_unsupported_subcode(void)
+ 		check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+ 		report_prefix_pop();
+ 	}
 +
- If exit reason is KVM_EXIT_RISCV_SBI then it indicates that the VCPU has
- done a SBI call which is not handled by KVM RISC-V kernel module. The details
- of the SBI call are available in 'riscv_sbi' member of kvm_run structure. The
-
-base-commit: 3123109284176b1532874591f7c81f3837bbdc17
++	/*
++	 * Subcode 2 is not available under QEMU but might be on other
++	 * hypervisors so we only check for the specification
++	 * exception on QEMU.
++	 */
++	report_prefix_pushf("0x%04x", 2);
++	if (host_is_qemu()) {
++		expect_pgm_int();
++		asm volatile ("diag %0,%1,0x308" :: "d"(0), "d"(2));
++		check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
++	} else {
++		report_skip("subcode is supported");
++	}
++	report_prefix_pop();
+ }
+ 
+ static struct {
 -- 
-An old man doll... just what I always wanted! - Clara
+2.32.0
 
