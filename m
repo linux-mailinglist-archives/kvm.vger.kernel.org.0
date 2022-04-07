@@ -2,537 +2,422 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E89C4F8644
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 19:32:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D582C4F8649
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 19:33:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229863AbiDGRe3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Apr 2022 13:34:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41760 "EHLO
+        id S1346098AbiDGRfq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Apr 2022 13:35:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346701AbiDGRcq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Apr 2022 13:32:46 -0400
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F225C377E3
-        for <kvm@vger.kernel.org>; Thu,  7 Apr 2022 10:29:43 -0700 (PDT)
-Received: by mail-yb1-f181.google.com with SMTP id r5so1045479ybd.8
-        for <kvm@vger.kernel.org>; Thu, 07 Apr 2022 10:29:43 -0700 (PDT)
+        with ESMTP id S233096AbiDGRfo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Apr 2022 13:35:44 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB36D13A1FC
+        for <kvm@vger.kernel.org>; Thu,  7 Apr 2022 10:33:37 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id w7so6050093pfu.11
+        for <kvm@vger.kernel.org>; Thu, 07 Apr 2022 10:33:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UxIETUQzLj37YwcaDZgtW+hcuSBKPfQz6PFagx/GWec=;
-        b=jx6hFftNkSDIgg/vhatmPk581BTPgc4Z2bVFL2hZM35yMA/6phrtV3a77jIlt3g9sa
-         HxjpFdidZJCnMaV8FlWpD7GXm0qonhfYapuOX1PFemdqwOaJJz7IJ33onFF4IqFXfUtV
-         r7w1hiLq8WGo33PQHCTmCyFNimADwCkhWZWKmTEoqSp1s0mZfSknBcbOhyslzigIgXtk
-         +J4S9QOb/fm2nx7uH8x8dEDzWWt+CRnKKK83ZGRxmkJjd0zVDtVF6tP/XsFFKLt80S0V
-         Qdps5lhDc9eIFEnkoyPSMcolAFTVowTMc4gfu9vEwDux3rtcM/uGHK1mIZ0B7qBhbZSB
-         BBmA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=xGRbiac9toXXNzU0tyvyrqhQhTOIou7FyrYj+X2weCI=;
+        b=lY+aU6tRq6WsVqLG89jQ+0OCk0PZgRKRmujHlFx61XJNMTnGXk3Lpw0lnFs1WrGE2j
+         48rZT/ruRncJnqcVy9SuWwFoUq4pqZaLPlWCCZpSd2jlB71NhZ8g3vmMYh7STnpZva5O
+         szZ8T42xg0oMTgtQl158gtbc3nj5iZT7vmtu1UI/erEWI/Nr2+ReSxnehCnmuBNw9F2e
+         Ulyh1n/5zBW4DCHLVZAs41fsvgx5tf9sK8tNpMLuJNm5jGJ3YtMY1K4nOD6OGdrhPInd
+         WprHIxjba4Atj4TaryahRFSLxDi+JX72ozYnj/GruaLiXo2qEqGE+w5T7XYv0Wih7SFT
+         E6Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UxIETUQzLj37YwcaDZgtW+hcuSBKPfQz6PFagx/GWec=;
-        b=KrmnB15CjhTmXRiPTfs4OxS9RblCvFT9xGH+LnXdha7y/7Z2GkryCekf1AZtgbQqiE
-         MtbUn3ikBiWigSHE7Txtu5WfFS3PI5npPgfXx5yOrhrgeP/42krc+Hbvpp8fjQ2832a1
-         31piTu0AhcarIULIvai+YdOyQpSdj6wT9ra6ZD0QjIoQHzdgwNfJNLqj7GD3amXrY4y0
-         uk5cVvWcjzPKHDpK8ZV4eq/CyplemNgWFHzfpSQPfL2bGHKgMtUFyPddcwqMPX21Zhet
-         HCULJOJecqm/nol1XRpqcyBNpXPMvJYL/Nm1MMBG0aiYu+CZMY5uOcwTUx47QiSdxEtd
-         mdnw==
-X-Gm-Message-State: AOAM532QjcJWNYdcqyz8FBwDBtsHnYfe9fn6Ik5aXtC02q+GRQ2BpaBV
-        pIqTpDuOybB+53wryXapG/+URrrUQ49MQeh/YY9wxA==
-X-Google-Smtp-Source: ABdhPJzfhzd2NzheiN7g3GpSyicX10ZkSc4FOQDTeaDcZjxlW2Oum8i3jlXwh5rxjLaoD+xGu2M27UnuG3Kz3EIMUu0=
-X-Received: by 2002:a25:8a0c:0:b0:63d:d026:ebaa with SMTP id
- g12-20020a258a0c000000b0063dd026ebaamr10066668ybl.509.1649352265166; Thu, 07
- Apr 2022 10:24:25 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xGRbiac9toXXNzU0tyvyrqhQhTOIou7FyrYj+X2weCI=;
+        b=iafUDcNrUj1y0rtLfIeIgQaOUKzRNaTdCLjWIINUzBefyeTGxGU9t8bPdXBrcJ704a
+         aMXgwVR1qaUSaweEuSDua7/qWP6pMeqcLRvzQTkvoi4rgMaDxdm6cP5k4beOORwYIdGP
+         +eO2bp5CkofJJ33iu/E3l4TUa0vTTiGM9McOoZwhuIIv7GOO9uj0v3atIlzQQajyvN6L
+         8PgeRDHSi7zlSTOQ6yIVymYCJENNU/CMJirZQg/iesPTmd/5TvKGkCnlpD/gpKkLkufI
+         8ZEcPJwQlngE80dzAk3P0RGe5I7ZrdINNgq31BSsQBHXC2J6OkiqFndDgWpjMh+ntfSH
+         iYLA==
+X-Gm-Message-State: AOAM5302XnWJEWgvLKsE20g4WkJ3ggEIt7lnwMOSW6hbhSDmxhBp0WfZ
+        j1eHNkiK7pQJxRTgND9hH5+TYQ==
+X-Google-Smtp-Source: ABdhPJxN6vzyurVuDzMoitz2SvsQTcINBF4WXPD8hLI12+/eQRc8uPVoGJYOL/W5pmZKlCUslM9JyA==
+X-Received: by 2002:aa7:8049:0:b0:4fd:bfde:45eb with SMTP id y9-20020aa78049000000b004fdbfde45ebmr15464085pfm.76.1649352784639;
+        Thu, 07 Apr 2022 10:33:04 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id v8-20020a056a00148800b004fa9bd7ddc9sm23998007pfu.113.2022.04.07.10.33.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Apr 2022 10:33:03 -0700 (PDT)
+Date:   Thu, 7 Apr 2022 17:33:00 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 03/31] KVM: x86: hyper-v: Handle
+ HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} calls gently
+Message-ID: <Yk8gTB+x2UVE34Ds@google.com>
+References: <20220407155645.940890-1-vkuznets@redhat.com>
+ <20220407155645.940890-4-vkuznets@redhat.com>
 MIME-Version: 1.0
-References: <20220407011605.1966778-1-rananta@google.com> <20220407011605.1966778-3-rananta@google.com>
- <87ilrlb6un.wl-maz@kernel.org>
-In-Reply-To: <87ilrlb6un.wl-maz@kernel.org>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Thu, 7 Apr 2022 10:24:14 -0700
-Message-ID: <CAJHc60yFD=osoifUpB4LBNo93eVq9zNV41bnu7uBZ0HsBGbMeA@mail.gmail.com>
-Subject: Re: [PATCH v5 02/10] KVM: arm64: Setup a framework for hypercall
- bitmap firmware registers
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/mixed; boundary="tIecicdRcj+9Bvwz"
+Content-Disposition: inline
+In-Reply-To: <20220407155645.940890-4-vkuznets@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
 
-On Thu, Apr 7, 2022 at 2:07 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> Hi Raghavendra,
->
-> On Thu, 07 Apr 2022 02:15:57 +0100,
-> Raghavendra Rao Ananta <rananta@google.com> wrote:
-> >
-> > KVM regularly introduces new hypercall services to the guests without
-> > any consent from the userspace. This means, the guests can observe
-> > hypercall services in and out as they migrate across various host
-> > kernel versions. This could be a major problem if the guest
-> > discovered a hypercall, started using it, and after getting migrated
-> > to an older kernel realizes that it's no longer available. Depending
-> > on how the guest handles the change, there's a potential chance that
-> > the guest would just panic.
-> >
-> > As a result, there's a need for the userspace to elect the services
-> > that it wishes the guest to discover. It can elect these services
-> > based on the kernels spread across its (migration) fleet. To remedy
-> > this, extend the existing firmware psuedo-registers, such as
->
-> nit: pseudo
->
-> > KVM_REG_ARM_PSCI_VERSION, but by creating a new COPROC register space
-> > for all the hypercall services available.
-> >
-> > These firmware registers are categorized based on the service call
-> > owners, but unlike the existing firmware psuedo-registers, they hold
->
-> nit: pseudo again
->
-> > the features supported in the form of a bitmap.
-> >
-> > During the VM initialization, the registers are set to upper-limit of
-> > the features supported by the corresponding registers. It's expected
-> > that the VMMs discover the features provided by each register via
-> > GET_ONE_REG, and writeback the desired values using SET_ONE_REG.
->
-> nit: write back
->
-> > KVM allows this modification only until the VM has started.
-> >
-> > Some of the standard features are not mapped to any bits of the
-> > registers. But since they can recreate the original problem of
-> > making it available without userspace's consent, they need to
-> > be explicitly added to the hvc_func_default_allowed_list[]. Any
-> > function-id that's not enabled via the bitmap, or not listed in
-> > hvc_func_default_allowed_list[], will be returned as
-> > SMCCC_RET_NOT_SUPPORTED to the guest.
-> >
-> > Older userspace code can simply ignore the feature and the
-> > hypercall services will be exposed unconditionally to the guests,
-> > thus ensuring backward compatibility.
-> >
-> > In this patch, the framework adds the register only for ARM's standard
-> > secure services (owner value 4). Currently, this includes support only
-> > for ARM True Random Number Generator (TRNG) service, with bit-0 of the
-> > register representing mandatory features of v1.0. Other services are
-> > momentarily added in the upcoming patches.
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h |  12 ++++
-> >  arch/arm64/include/uapi/asm/kvm.h |   9 +++
-> >  arch/arm64/kvm/arm.c              |   1 +
-> >  arch/arm64/kvm/guest.c            |   8 ++-
-> >  arch/arm64/kvm/hypercalls.c       | 102 ++++++++++++++++++++++++++++++
-> >  include/kvm/arm_hypercalls.h      |   7 ++
-> >  include/kvm/arm_psci.h            |  12 ++++
-> >  7 files changed, 149 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index e3b25dc6c367..6e663383d7b4 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -101,6 +101,15 @@ struct kvm_s2_mmu {
-> >  struct kvm_arch_memory_slot {
-> >  };
-> >
-> > +/**
-> > + * struct kvm_smccc_features: Descriptor the hypercall services exposed to the guests
-> > + *
-> > + * @std_bmap: Bitmap of standard secure service calls
-> > + */
-> > +struct kvm_smccc_features {
-> > +     u64 std_bmap;
->
-> Consider using 'unsigned long' for bitmaps.
->
-Sure.
+--tIecicdRcj+9Bvwz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> > +};
-> > +
-> >  struct kvm_arch {
-> >       struct kvm_s2_mmu mmu;
-> >
-> > @@ -140,6 +149,9 @@ struct kvm_arch {
-> >
-> >       u8 pfr0_csv2;
-> >       u8 pfr0_csv3;
-> > +
-> > +     /* Hypercall features firmware registers' descriptor */
-> > +     struct kvm_smccc_features smccc_feat;
-> >  };
-> >
-> >  struct kvm_vcpu_fault_info {
-> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> > index c1b6ddc02d2f..56e4bc58a355 100644
-> > --- a/arch/arm64/include/uapi/asm/kvm.h
-> > +++ b/arch/arm64/include/uapi/asm/kvm.h
-> > @@ -332,6 +332,15 @@ struct kvm_arm_copy_mte_tags {
-> >  #define KVM_ARM64_SVE_VLS_WORDS      \
-> >       ((KVM_ARM64_SVE_VQ_MAX - KVM_ARM64_SVE_VQ_MIN) / 64 + 1)
-> >
-> > +/* Bitmap feature firmware registers */
-> > +#define KVM_REG_ARM_FW_FEAT_BMAP             (0x0016 << KVM_REG_ARM_COPROC_SHIFT)
-> > +#define KVM_REG_ARM_FW_FEAT_BMAP_REG(r)              (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
-> > +                                             KVM_REG_ARM_FW_FEAT_BMAP |      \
-> > +                                             ((r) & 0xffff))
-> > +
-> > +#define KVM_REG_ARM_STD_BMAP                 KVM_REG_ARM_FW_FEAT_BMAP_REG(0)
-> > +#define KVM_REG_ARM_STD_BIT_TRNG_V1_0                BIT(0)
->
-> I'm really in two minds about this. Having one bit per service is easy
-> from an implementation perspective, but is also means that this
-> disallow fine grained control over which hypercalls are actually
-> available. If tomorrow TRNG 1.1 adds a new hypercall and that KVM
-> implements both, how does the selection mechanism works? You will
-> need a version selector (a la PSCI), which defeats this API somehow
-> (and renders the name of the #define invalid).
->
-> I wonder if a more correct way to look at this is to enumerate the
-> hypercalls themselves (all 5 of them), though coming up with an
-> encoding is tricky (RNG32 and RNG64 would clash, for example).
->
-> Thoughts?
->
-I was on the fence about this too. The TRNG spec (ARM DEN 0098,
-Table-4) mentions that v1.0 should have VERSION, FEATURES, GET_UUID,
-and RND as mandatory features. Hence, if KVM advertised that it
-supports TRNG v1.0, I thought it would be best to expose all or
-nothing of v1.0 by guarding them with a single bit.
-Broadly, the idea is to have a bit per version. If v1.1 comes along,
-we can have another bit for that. If it's not too ugly to implement,
-we can be a little more aggressive and ensure that userspace doesn't
-enable v1.1 without enabling v1.0.
+On Thu, Apr 07, 2022, Vitaly Kuznetsov wrote:
+> Currently, HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} calls are handled
+> the exact same way as HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE{,EX}: by
+> flushing the whole VPID and this is sub-optimal. Switch to handling
+> these requests with 'flush_tlb_gva()' hooks instead. Use the newly
+> introduced TLB flush ring to queue the requests.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/kvm/hyperv.c | 141 ++++++++++++++++++++++++++++++++++++------
+>  1 file changed, 121 insertions(+), 20 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index 81c44e0eadf9..a54d41656f30 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -1792,6 +1792,35 @@ static u64 kvm_get_sparse_vp_set(struct kvm *kvm, struct kvm_hv_hcall *hc,
+>  			      var_cnt * sizeof(*sparse_banks));
+>  }
+>  
+> +static int kvm_hv_get_tlbflush_entries(struct kvm *kvm, struct kvm_hv_hcall *hc, u64 entries[],
+> +				       u32 data_offset, int consumed_xmm_halves)
 
-> > +
-> >  /* Device Control API: ARM VGIC */
-> >  #define KVM_DEV_ARM_VGIC_GRP_ADDR    0
-> >  #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS       1
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 523bc934fe2f..a37fadbd617e 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -156,6 +156,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-> >       kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
-> >
-> >       set_default_spectre(kvm);
-> > +     kvm_arm_init_hypercalls(kvm);
-> >
-> >       return ret;
-> >  out_free_stage2_pgd:
-> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > index 0d5cca56cbda..8c607199cad1 100644
-> > --- a/arch/arm64/kvm/guest.c
-> > +++ b/arch/arm64/kvm/guest.c
-> > @@ -756,7 +756,9 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >
-> >       switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
-> >       case KVM_REG_ARM_CORE:  return get_core_reg(vcpu, reg);
-> > -     case KVM_REG_ARM_FW:    return kvm_arm_get_fw_reg(vcpu, reg);
-> > +     case KVM_REG_ARM_FW:
-> > +     case KVM_REG_ARM_FW_FEAT_BMAP:
-> > +             return kvm_arm_get_fw_reg(vcpu, reg);
-> >       case KVM_REG_ARM64_SVE: return get_sve_reg(vcpu, reg);
-> >       }
-> >
-> > @@ -774,7 +776,9 @@ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >
-> >       switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
-> >       case KVM_REG_ARM_CORE:  return set_core_reg(vcpu, reg);
-> > -     case KVM_REG_ARM_FW:    return kvm_arm_set_fw_reg(vcpu, reg);
-> > +     case KVM_REG_ARM_FW:
-> > +     case KVM_REG_ARM_FW_FEAT_BMAP:
-> > +             return kvm_arm_set_fw_reg(vcpu, reg);
-> >       case KVM_REG_ARM64_SVE: return set_sve_reg(vcpu, reg);
-> >       }
-> >
-> > diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-> > index fa6d9378d8e7..cf04b5ee5f56 100644
-> > --- a/arch/arm64/kvm/hypercalls.c
-> > +++ b/arch/arm64/kvm/hypercalls.c
-> > @@ -58,6 +58,53 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
-> >       val[3] = lower_32_bits(cycles);
-> >  }
-> >
-> > +/*
-> > + * List of function-ids that are not gated with the bitmapped feature
-> > + * firmware registers, and are to be allowed for servicing the call by default.
-> > + */
-> > +static const u32 hvc_func_default_allowed_list[] = {
-> > +     ARM_SMCCC_VERSION_FUNC_ID,
-> > +     ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
-> > +     ARM_SMCCC_HV_PV_TIME_FEATURES,
-> > +     ARM_SMCCC_HV_PV_TIME_ST,
-> > +     ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID,
-> > +     ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID,
-> > +     ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
-> > +};
-> > +
-> > +static bool kvm_hvc_call_default_allowed(struct kvm_vcpu *vcpu, u32 func_id)
-> > +{
-> > +     unsigned int i;
-> > +
-> > +     for (i = 0; i < ARRAY_SIZE(hvc_func_default_allowed_list); i++)
-> > +             if (func_id == hvc_func_default_allowed_list[i])
-> > +                     return true;
->
-> Huh, this really is ugly. This array is bound to become bigger over
-> time, meaning that the average hypercall time is going to increase. At
-> the very least, this should be turned into a switch/case statement, as
-> the compile is pretty good at building a search tree (better than this
-> naive loop, for a start), and we have those everywhere else.
->
-Makes sense. I'll make it a switch-case.
+data_offset should be gpa_t, and the order of params should be consistent between
+this and kvm_get_sparse_vp_set().
 
-> > +
-> > +     return kvm_psci_func_id_is_valid(vcpu, func_id);
-> > +}
-> > +
-> > +static bool kvm_arm_fw_reg_feat_enabled(u64 reg_bmap, u64 feat_bit)
-> > +{
-> > +     return reg_bmap & feat_bit;
-> > +}
->
-> We really don't need to reimplement test_bit().
->
-Right, I forgot about test_bit() :)
+> +{
+> +	int i;
+> +
+> +	if (hc->fast) {
+> +		/*
+> +		 * Each XMM holds two entries, but do not count halves that
+> +		 * have already been consumed.
+> +		 */
+> +		if (hc->rep_cnt > (2 * HV_HYPERCALL_MAX_XMM_REGISTERS - consumed_xmm_halves))
+> +			return -EINVAL;
+> +
+> +		for (i = 0; i < hc->rep_cnt; i++) {
+> +			int j = i + consumed_xmm_halves;
+> +
+> +			if (j % 2)
+> +				entries[i] = sse128_hi(hc->xmm[j / 2]);
+> +			else
+> +				entries[i] = sse128_lo(hc->xmm[j / 2]);
+> +		}
+> +
+> +		return 0;
+> +	}
+> +
+> +	return kvm_read_guest(kvm, hc->ingpa + data_offset,
+> +			      entries, hc->rep_cnt * sizeof(entries[0]));
 
-> > +
-> > +static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu, u32 func_id)
-> > +{
-> > +     struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
-> > +
-> > +     switch (func_id) {
-> > +     case ARM_SMCCC_TRNG_VERSION:
-> > +     case ARM_SMCCC_TRNG_FEATURES:
-> > +     case ARM_SMCCC_TRNG_GET_UUID:
-> > +     case ARM_SMCCC_TRNG_RND32:
-> > +     case ARM_SMCCC_TRNG_RND64:
-> > +             return kvm_arm_fw_reg_feat_enabled(smccc_feat->std_bmap,
-> > +                                             KVM_REG_ARM_STD_BIT_TRNG_V1_0);
-> > +     default:
-> > +             return kvm_hvc_call_default_allowed(vcpu, func_id);
-> > +     }
-> > +}
-> > +
-> >  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
-> >  {
-> >       u32 func_id = smccc_get_function(vcpu);
-> > @@ -65,6 +112,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
-> >       u32 feature;
-> >       gpa_t gpa;
-> >
-> > +     if (!kvm_hvc_call_allowed(vcpu, func_id))
-> > +             goto out;
-> > +
-> >       switch (func_id) {
-> >       case ARM_SMCCC_VERSION_FUNC_ID:
-> >               val[0] = ARM_SMCCC_VERSION_1_1;
-> > @@ -155,6 +205,7 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
-> >               return kvm_psci_call(vcpu);
-> >       }
-> >
-> > +out:
-> >       smccc_set_retval(vcpu, val[0], val[1], val[2], val[3]);
-> >       return 1;
-> >  }
-> > @@ -164,8 +215,16 @@ static const u64 kvm_arm_fw_reg_ids[] = {
-> >       KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1,
-> >       KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2,
-> >       KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3,
-> > +     KVM_REG_ARM_STD_BMAP,
-> >  };
-> >
-> > +void kvm_arm_init_hypercalls(struct kvm *kvm)
-> > +{
-> > +     struct kvm_smccc_features *smccc_feat = &kvm->arch.smccc_feat;
-> > +
-> > +     smccc_feat->std_bmap = KVM_ARM_SMCCC_STD_FEATURES;
-> > +}
-> > +
-> >  int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
-> >  {
-> >       return ARRAY_SIZE(kvm_arm_fw_reg_ids);
-> > @@ -237,6 +296,7 @@ static int get_kernel_wa_level(u64 regid)
-> >
-> >  int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >  {
-> > +     struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
-> >       void __user *uaddr = (void __user *)(long)reg->addr;
-> >       u64 val;
-> >
-> > @@ -249,6 +309,9 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >       case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3:
-> >               val = get_kernel_wa_level(reg->id) & KVM_REG_FEATURE_LEVEL_MASK;
-> >               break;
-> > +     case KVM_REG_ARM_STD_BMAP:
-> > +             val = READ_ONCE(smccc_feat->std_bmap);
-> > +             break;
-> >       default:
-> >               return -ENOENT;
-> >       }
-> > @@ -259,6 +322,43 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >       return 0;
-> >  }
-> >
-> > +static int kvm_arm_set_fw_reg_bmap(struct kvm_vcpu *vcpu, u64 reg_id, u64 val)
-> > +{
-> > +     int ret = 0;
-> > +     struct kvm *kvm = vcpu->kvm;
-> > +     struct kvm_smccc_features *smccc_feat = &kvm->arch.smccc_feat;
-> > +     u64 *fw_reg_bmap, fw_reg_features;
-> > +
-> > +     switch (reg_id) {
-> > +     case KVM_REG_ARM_STD_BMAP:
-> > +             fw_reg_bmap = &smccc_feat->std_bmap;
-> > +             fw_reg_features = KVM_ARM_SMCCC_STD_FEATURES;
-> > +             break;
-> > +     default:
-> > +             return -ENOENT;
-> > +     }
-> > +
-> > +     /* Check for unsupported bit */
-> > +     if (val & ~fw_reg_features)
-> > +             return -EINVAL;
-> > +
-> > +     mutex_lock(&kvm->lock);
-> > +
-> > +     /*
-> > +      * If the VM (any vCPU) has already started running, return success
-> > +      * if there's no change in the value. Else, return -EBUSY.
->
-> No, this should *always* fail if a vcpu has started. Otherwise, you
-> start allowing hard to spot races.
->
-The idea came from the fact that userspace could spawn multiple
-threads to configure the vCPU registers. Since we don't have the
-VM-scoped registers yet, it may be possible that userspace has issued
-a KVM_RUN on one of the vCPU, while the others are lagging behind and
-still configuring the registers. The slower threads may see -EBUSY and
-could panic. But if you feel that it's an overkill and the userspace
-should deal with it, we can return EBUSY for all writes after KVM_RUN.
+This is almost verbatim copy+pasted from kvm_get_sparse_vp_set().  If you slot in
+the attached patched before this, then this function becomes:
 
-> > +      */
-> > +     if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags)) {
-> > +             ret = *fw_reg_bmap != val ? -EBUSY : 0;
-> > +             goto out;
-> > +     }
-> > +
-> > +     WRITE_ONCE(*fw_reg_bmap, val);
->
-> I'm not sure what this WRITE_ONCE guards against. Do you expect
-> concurrent reads at this stage?
->
-Again, the assumption here is that userspace could have multiple
-threads reading and writing to these registers. Without the VM scoped
-registers in place, we may end up with a read/write to the same memory
-location for all the vCPUs.
+static int kvm_hv_get_tlbflush_entries(struct kvm *kvm, struct kvm_hv_hcall *hc, u64 entries[],
+				       int consumed_xmm_halves, gpa_t offset)
+{
+	return kvm_hv_get_hc_data(kvm, hc, hc->rep_cnt, hc->rep_cnt,
+				  entries, consumed_xmm_halves, offset);
+}
 
-> > +out:
-> > +     mutex_unlock(&kvm->lock);
-> > +     return ret;
-> > +}
-> > +
-> >  int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >  {
-> >       void __user *uaddr = (void __user *)(long)reg->addr;
-> > @@ -337,6 +437,8 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >                       return -EINVAL;
-> >
-> >               return 0;
-> > +     case KVM_REG_ARM_STD_BMAP:
-> > +             return kvm_arm_set_fw_reg_bmap(vcpu, reg->id, val);
-> >       default:
-> >               return -ENOENT;
-> >       }
-> > diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
-> > index 5d38628a8d04..fd3ff350ee9d 100644
-> > --- a/include/kvm/arm_hypercalls.h
-> > +++ b/include/kvm/arm_hypercalls.h
-> > @@ -6,6 +6,12 @@
-> >
-> >  #include <asm/kvm_emulate.h>
-> >
-> > +/* Last valid bits of the bitmapped firmware registers */
-> > +#define KVM_REG_ARM_STD_BMAP_BIT_MAX         0
-> > +
-> > +#define KVM_ARM_SMCCC_STD_FEATURES \
-> > +     GENMASK_ULL(KVM_REG_ARM_STD_BMAP_BIT_MAX, 0)
-> > +
-> >  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
-> >
-> >  static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
-> > @@ -42,6 +48,7 @@ static inline void smccc_set_retval(struct kvm_vcpu *vcpu,
-> >
-> >  struct kvm_one_reg;
-> >
-> > +void kvm_arm_init_hypercalls(struct kvm *kvm);
-> >  int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu);
-> >  int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
-> >  int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
-> > diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-> > index 6e55b9283789..d7a87367de56 100644
-> > --- a/include/kvm/arm_psci.h
-> > +++ b/include/kvm/arm_psci.h
-> > @@ -36,6 +36,18 @@ static inline int kvm_psci_version(struct kvm_vcpu *vcpu)
-> >       return KVM_ARM_PSCI_0_1;
-> >  }
-> >
-> > +static inline bool kvm_psci_func_id_is_valid(struct kvm_vcpu *vcpu, u32 func_id)
-> > +{
-> > +     /* PSCI 0.1 doesn't comply with the standard SMCCC */
-> > +     if (kvm_psci_version(vcpu) == KVM_ARM_PSCI_0_1)
-> > +             return (func_id == KVM_PSCI_FN_CPU_OFF || func_id == KVM_PSCI_FN_CPU_ON);
-> > +
-> > +     if (ARM_SMCCC_OWNER_NUM(func_id) == ARM_SMCCC_OWNER_STANDARD &&
-> > +             ARM_SMCCC_FUNC_NUM(func_id) >= 0 && ARM_SMCCC_FUNC_NUM(func_id) <= 0x1f)
-> > +             return true;
-> > +
-> > +     return false;
-> > +}
->
-> Why the inline function? Do you expect this to be shared with
-> something else? If not, I'd rather you move it into the caller.
->
-Well, no plans to share as of yet. Will move it to psci.c
 
-> >
-> >  int kvm_psci_call(struct kvm_vcpu *vcpu);
-> >
->
+> +}
 
-Thanks for the review, Marc. I'll fix all the other nits.
+...
 
-Regards,
-Raghavendra
+> @@ -1840,15 +1891,47 @@ void kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_vcpu_hv_tlbflush_ring *tlb_flush_ring;
+>  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+> -
+> -	kvm_vcpu_flush_tlb_guest(vcpu);
+> -
+> -	if (!hv_vcpu)
+> +	struct kvm_vcpu_hv_tlbflush_entry *entry;
+> +	int read_idx, write_idx;
+> +	u64 address;
+> +	u32 count;
+> +	int i, j;
+> +
+> +	if (!tdp_enabled || !hv_vcpu) {
+> +		kvm_vcpu_flush_tlb_guest(vcpu);
+>  		return;
+> +	}
+>  
+>  	tlb_flush_ring = &hv_vcpu->tlb_flush_ring;
+> +	read_idx = READ_ONCE(tlb_flush_ring->read_idx);
+> +	write_idx = READ_ONCE(tlb_flush_ring->write_idx);
+> +
+> +	/* Pairs with smp_wmb() in hv_tlb_flush_ring_enqueue() */
+> +	smp_rmb();
+>  
+> -	tlb_flush_ring->read_idx = tlb_flush_ring->write_idx;
+> +	for (i = read_idx; i != write_idx; i = (i + 1) % KVM_HV_TLB_FLUSH_RING_SIZE) {
+> +		entry = &tlb_flush_ring->entries[i];
+> +
+> +		if (entry->flush_all)
+> +			goto out_flush_all;
+> +
+> +		/*
+> +		 * Lower 12 bits of 'address' encode the number of additional
+> +		 * pages to flush.
+> +		 */
+> +		address = entry->addr & PAGE_MASK;
+> +		count = (entry->addr & ~PAGE_MASK) + 1;
+> +		for (j = 0; j < count; j++)
+> +			static_call(kvm_x86_flush_tlb_gva)(vcpu, address + j * PAGE_SIZE);
+> +	}
+> +	++vcpu->stat.tlb_flush;
+> +	goto out_empty_ring;
+> +
+> +out_flush_all:
+> +	kvm_vcpu_flush_tlb_guest(vcpu);
+> +
+> +out_empty_ring:
+> +	tlb_flush_ring->read_idx = write_idx;
+>  }
+>  
+>  static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+> @@ -1857,12 +1940,13 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+>  	struct hv_tlb_flush_ex flush_ex;
+>  	struct hv_tlb_flush flush;
+>  	DECLARE_BITMAP(vcpu_mask, KVM_MAX_VCPUS);
+> +	u64 entries[KVM_HV_TLB_FLUSH_RING_SIZE - 2];
 
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+What's up with the -2?  And given the multitude of things going on in this code,
+I'd strongly prefer this be tlbflush_entries.
+
+Actually, if you do:
+
+	u64 __tlbflush_entries[KVM_HV_TLB_FLUSH_RING_SIZE - 2];
+	u64 *tlbflush_entries;
+
+and drop all_addr, the code to get entries can be
+
+	if (hc->code == HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE ||
+	    hc->code == HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX ||
+	    hc->rep_cnt > ARRAY_SIZE(tlbflush_entries)) {
+		tlbfluish_entries = NULL;
+	} else {
+		if (kvm_hv_get_tlbflush_entries(kvm, hc, __tlbflush_entries,
+						consumed_xmm_halves, data_offset))
+			return HV_STATUS_INVALID_HYPERCALL_INPUT;
+		tlbfluish_entries = __tlbflush_entries;
+	}
+
+and the calls to queue flushes becomes
+
+			hv_tlb_flush_ring_enqueue(v, tlbflush_entries, hc->rep_cnt);
+
+That way a bug will "just" be a NULL pointer dereference and not consumption of
+uninitialized data (though such a bug might be caught be caught by the compiler).
+
+>  	u64 valid_bank_mask;
+>  	u64 sparse_banks[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
+>  	struct kvm_vcpu *v;
+>  	unsigned long i;
+> -	bool all_cpus;
+> -
+> +	bool all_cpus, all_addr;
+> +	int data_offset = 0, consumed_xmm_halves = 0;
+
+data_offset should be a gpa_t.
+
+>  	/*
+>  	 * The Hyper-V TLFS doesn't allow more than 64 sparse banks, e.g. the
+>  	 * valid mask is a u64.  Fail the build if KVM's max allowed number of
+
+...
+
+> +read_flush_entries:
+> +	if (hc->code == HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE ||
+> +	    hc->code == HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX ||
+> +	    hc->rep_cnt > (KVM_HV_TLB_FLUSH_RING_SIZE - 2)) {
+
+Rather than duplicate the -2 magic, it's far better to do:
+
+
+> +		all_addr = true;
+> +	} else {
+> +		if (kvm_hv_get_tlbflush_entries(kvm, hc, entries,
+> +						data_offset, consumed_xmm_halves))
+
+As mentioned, the order for this call should match kvm_get_sparse_vp_set().
+
+>  			return HV_STATUS_INVALID_HYPERCALL_INPUT;
+> +		all_addr = false;
+>  	}
+>  
+> -do_flush:
+> +
+>  	/*
+>  	 * vcpu->arch.cr3 may not be up-to-date for running vCPUs so we can't
+>  	 * analyze it here, flush TLB regardless of the specified address space.
+>  	 */
+>  	if (all_cpus) {
+>  		kvm_for_each_vcpu(i, v, kvm)
+> -			hv_tlb_flush_ring_enqueue(v);
+> +			hv_tlb_flush_ring_enqueue(v, all_addr, entries, hc->rep_cnt);
+>  
+>  		kvm_make_all_cpus_request(kvm, KVM_REQ_HV_TLB_FLUSH);
+>  	} else {
+> @@ -1951,7 +2052,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+>  			v = kvm_get_vcpu(kvm, i);
+>  			if (!v)
+>  				continue;
+> -			hv_tlb_flush_ring_enqueue(v);
+> +			hv_tlb_flush_ring_enqueue(v, all_addr, entries, hc->rep_cnt);
+>  		}
+>  
+>  		kvm_make_vcpus_request_mask(kvm, KVM_REQ_HV_TLB_FLUSH, vcpu_mask);
+> -- 
+> 2.35.1
+> 
+
+--tIecicdRcj+9Bvwz
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-KVM-x86-hyper-v-Add-helper-to-read-hypercall-data-fo.patch"
+
+From ad6033048d498baba7889ae0e14788c92d4baacb Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 7 Apr 2022 09:52:46 -0700
+Subject: [PATCH] KVM: x86: hyper-v: Add helper to read hypercall data for
+ arrary
+
+Move the guts of kvm_get_sparse_vp_set() to a helper so that the code for
+reading a guest-provided array can be reused in the future, e.g. for
+getting a list of virtual addresses whose TLB entries need to be flushed.
+
+Opportunisticaly swap the order of the data and XMM adjustment so that
+the XMM/gpa offsets are bundled together.
+
+No functional change intended.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/hyperv.c | 53 +++++++++++++++++++++++++++----------------
+ 1 file changed, 33 insertions(+), 20 deletions(-)
+
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index e4f381b46a28..58e7aff6057a 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -1782,38 +1782,51 @@ struct kvm_hv_hcall {
+ 	sse128_t xmm[HV_HYPERCALL_MAX_XMM_REGISTERS];
+ };
+ 
+-static u64 kvm_get_sparse_vp_set(struct kvm *kvm, struct kvm_hv_hcall *hc,
+-				 int consumed_xmm_halves,
+-				 u64 *sparse_banks, gpa_t offset)
++
++static int kvm_hv_get_hc_data(struct kvm *kvm, struct kvm_hv_hcall *hc,
++			      u16 orig_cnt, u16 cnt_cap, u64 *data,
++			      int consumed_xmm_halves, gpa_t offset)
+ {
+-	u16 var_cnt;
+-	int i;
+-
+-	if (hc->var_cnt > 64)
+-		return -EINVAL;
+-
+-	/* Ignore banks that cannot possibly contain a legal VP index. */
+-	var_cnt = min_t(u16, hc->var_cnt, KVM_HV_MAX_SPARSE_VCPU_SET_BITS);
++	/*
++	 * Preserve the original count when ignoring entries via a "cap", KVM
++	 * still needs to validate the guest input (though the non-XMM path
++	 * punts on the checks).
++	 */
++	u16 cnt = min(orig_cnt, cnt_cap);
++	int i, j;
+ 
+ 	if (hc->fast) {
+ 		/*
+ 		 * Each XMM holds two sparse banks, but do not count halves that
+ 		 * have already been consumed for hypercall parameters.
+ 		 */
+-		if (hc->var_cnt > 2 * HV_HYPERCALL_MAX_XMM_REGISTERS - consumed_xmm_halves)
++		if (orig_cnt > 2 * HV_HYPERCALL_MAX_XMM_REGISTERS - consumed_xmm_halves)
+ 			return HV_STATUS_INVALID_HYPERCALL_INPUT;
+-		for (i = 0; i < var_cnt; i++) {
+-			int j = i + consumed_xmm_halves;
++
++		for (i = 0; i < cnt; i++) {
++			j = i + consumed_xmm_halves;
+ 			if (j % 2)
+-				sparse_banks[i] = sse128_hi(hc->xmm[j / 2]);
++				data[i] = sse128_hi(hc->xmm[j / 2]);
+ 			else
+-				sparse_banks[i] = sse128_lo(hc->xmm[j / 2]);
++				data[i] = sse128_lo(hc->xmm[j / 2]);
+ 		}
+ 		return 0;
+ 	}
+ 
+-	return kvm_read_guest(kvm, hc->ingpa + offset, sparse_banks,
+-			      var_cnt * sizeof(*sparse_banks));
++	return kvm_read_guest(kvm, hc->ingpa + offset, data,
++			      cnt * sizeof(*data));
++}
++
++static u64 kvm_get_sparse_vp_set(struct kvm *kvm, struct kvm_hv_hcall *hc,
++				 u64 *sparse_banks, int consumed_xmm_halves,
++				 gpa_t offset)
++{
++	if (hc->var_cnt > 64)
++		return -EINVAL;
++
++	/* Cap var_cnt to ignore banks that cannot contain a legal VP index. */
++	return kvm_hv_get_hc_data(kvm, hc, hc->var_cnt, KVM_HV_MAX_SPARSE_VCPU_SET_BITS,
++				  sparse_banks, consumed_xmm_halves, offset);
+ }
+ 
+ static inline int hv_tlb_flush_ring_free(struct kvm_vcpu_hv *hv_vcpu,
+@@ -1952,7 +1965,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ 		if (!hc->var_cnt)
+ 			goto ret_success;
+ 
+-		if (kvm_get_sparse_vp_set(kvm, hc, 2, sparse_banks,
++		if (kvm_get_sparse_vp_set(kvm, hc, sparse_banks, 2,
+ 					  offsetof(struct hv_tlb_flush_ex,
+ 						   hv_vp_set.bank_contents)))
+ 			return HV_STATUS_INVALID_HYPERCALL_INPUT;
+@@ -2063,7 +2076,7 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ 		if (!hc->var_cnt)
+ 			goto ret_success;
+ 
+-		if (kvm_get_sparse_vp_set(kvm, hc, 1, sparse_banks,
++		if (kvm_get_sparse_vp_set(kvm, hc, sparse_banks, 1,
+ 					  offsetof(struct hv_send_ipi_ex,
+ 						   vp_set.bank_contents)))
+ 			return HV_STATUS_INVALID_HYPERCALL_INPUT;
+
+base-commit: 9e28f2680fd1606225ab456bb28d30598110a520
+-- 
+2.35.1.1178.g4f1659d476-goog
+
+
+--tIecicdRcj+9Bvwz--
