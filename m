@@ -2,60 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3FF14F746C
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 06:15:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D2CA4F75CA
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 08:13:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235522AbiDGERH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Apr 2022 00:17:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52268 "EHLO
+        id S240877AbiDGGPE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Apr 2022 02:15:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232256AbiDGERE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Apr 2022 00:17:04 -0400
-Received: from mga06.intel.com (mga06.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 227B01C12A;
-        Wed,  6 Apr 2022 21:15:04 -0700 (PDT)
+        with ESMTP id S240378AbiDGGPD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Apr 2022 02:15:03 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 156851C8DB8;
+        Wed,  6 Apr 2022 23:13:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649304905; x=1680840905;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=qAilRQMB2FumWUQlhMQm7RSIEj9Y/ON2VI39QbNtslI=;
-  b=NMxGO2db5j0iDMCGaJ9ht2WVHV5UwKSlKJpBjklgYGCNTwAAAIarhQvk
-   dyTKVxuEXHyui5NCHu/a0nDzjs9QJWX7EB8NTkWEc+9cojpZeI/PxShWF
-   3+0WjX0W2RkU8iCoP6GoUKU79GHG1iFsoSxl+KwjWHa1PqvGG+rA53fMo
-   BxuO3Vf/5NRHqHzrcA00+rWHEUoqERMlgOmnX9HUkie7K94pBZN2Grhjv
-   xOzh8V0y/4YNfkh0ZyVWbFy9RV5F8ZxHCMrfmmh26oL+UDw64C5aiCXSd
-   eux4yeHXqXHsu+apo+PDYw16nDMajOv+wSOPoJcww51C87bgQr5WZ8Et+
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10309"; a="321917214"
+  t=1649311985; x=1680847985;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=C3nT1yCtjX7kKzPi6gJkoB5VNcsfCgvLH5dyegPN6I0=;
+  b=AZ7Q1KjSjGWovTeacTWtTQTzf9y+6shEcM4s5gwj0jxmzqemI/laNZVf
+   sL1Ly/2qzvJ957nto0X0fQZfCQrtocD+AAtgTMA6dJaDFJ3uckNjJtt+L
+   vGbZYQwmNhvzSGrolDfIw4FaRFNNtEQ0jspnqiI+L6TLZnkC3+M3BOYaZ
+   Ny4QixdwjEl1WT7WszXjmLYJkhY37elpv1tpbQ8Y8RT7bRMZJ/eG62wFW
+   bcdozJYypEYIooO+ixVduf6+0wFHNTJ2pXwYtLo6Odl2D6nzzubb9OqJt
+   XmG2piGTqSZVtJqWc8P9pnijgfbtHdPKnUJv3S7KwoHU3sdcGxfUORIRj
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10309"; a="243373080"
 X-IronPort-AV: E=Sophos;i="5.90,241,1643702400"; 
-   d="scan'208";a="321917214"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2022 21:15:04 -0700
+   d="scan'208";a="243373080"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2022 23:13:04 -0700
 X-IronPort-AV: E=Sophos;i="5.90,241,1643702400"; 
-   d="scan'208";a="792013286"
-Received: from mgailhax-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.55.23])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2022 21:15:02 -0700
-Message-ID: <3042130fce467c30f07e58581da966fc405a4c6c.camel@intel.com>
-Subject: Re: [RFC PATCH v5 089/104] KVM: TDX: Add a placeholder for handler
- of TDX hypercalls (TDG.VP.VMCALL)
-From:   Kai Huang <kai.huang@intel.com>
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Date:   Thu, 07 Apr 2022 16:15:00 +1200
-In-Reply-To: <b84fcd9927e49716de913b0fe910018788aaba46.1646422845.git.isaku.yamahata@intel.com>
-References: <cover.1646422845.git.isaku.yamahata@intel.com>
-         <b84fcd9927e49716de913b0fe910018788aaba46.1646422845.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+   d="scan'208";a="549880694"
+Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.249.174.148]) ([10.249.174.148])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2022 23:13:01 -0700
+Message-ID: <8347e6e3-5b22-c9c9-5e6b-9ea33c614d5a@intel.com>
+Date:   Thu, 7 Apr 2022 14:12:59 +0800
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.7.0
+Subject: Re: [PATCH v5 1/3] KVM: X86: Save&restore the triple fault request
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220318074955.22428-1-chenyi.qiang@intel.com>
+ <20220318074955.22428-2-chenyi.qiang@intel.com> <YkzRSHHDMaVBQrxd@google.com>
+ <YkzUceG4rhw15U3i@google.com> <Yk4C8gA2xVCrzgrG@google.com>
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+In-Reply-To: <Yk4C8gA2xVCrzgrG@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -64,143 +68,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-03-04 at 11:49 -0800, isaku.yamahata@intel.com wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
+
+
+On 4/7/2022 5:15 AM, Sean Christopherson wrote:
+> On Tue, Apr 05, 2022, Sean Christopherson wrote:
+>> On Tue, Apr 05, 2022, Sean Christopherson wrote:
+>>> On Fri, Mar 18, 2022, Chenyi Qiang wrote:
+>>>> @@ -4976,6 +4980,9 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
+>>>>   		}
+>>>>   	}
+>>>>   
+>>>> +	if (events->flags & KVM_VCPUEVENT_TRIPLE_FAULT)
+>>>> +		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
+>>>> +
+>>>>   	kvm_make_request(KVM_REQ_EVENT, vcpu);
+>>>
+>>> Looks correct, but this really needs a selftest, at least for the SET path since
+>>> the intent is to use that for the NOTIFY handling.  Doesn't need to be super fancy,
+>>> e.g. do port I/O from L2, inject a triple fault, and verify L1 sees the appropriate
+>>> exit.
+>>>
+>>> Aha!  And for the GET path, abuse KVM_X86_SET_MCE with CR4.MCE=0 to coerce KVM into
+>>> making a KVM_REQ_TRIPLE_FAULT, that way there's no need to try and hit a timing
+>>> window to intercept the request.
+>>
+>> Drat, I bet that MCE path means the WARN in nested_vmx_vmexit() can be triggered
+>> by userspace.  If so, this patch makes it really, really easy to hit, e.g. queue the
+>> request while L2 is active, then do KVM_SET_NESTED_STATE to force an "exit" without
+>> bouncing through kvm_check_nested_events().
+>>
+>>    WARN_ON_ONCE(kvm_check_request(KVM_REQ_TRIPLE_FAULT, vcpu))
+>>
+>> I don't think SVM has a user-triggerable WARN, but the request should still be
+>> dropped on forced exit from L2, e.g. I believe this is the correct fix:
 > 
-> The TDX module specification defines TDG.VP.VMCALL API (TDVMCALL for short)
-> for the guest TD to call hypercall to VMM.  When the guest TD issues
-> TDG.VP.VMCALL, the guest TD exits to VMM with a new exit reason of
-> TDVMCALL.  The arguments from the guest TD and returned values from the VMM
-> are passed in the guest registers.  The guest RCX registers indicates which
-> registers are used.
+> Confirmed the WARN can be triggered by abusing this patch, I'll get a patch out
+> once I figure out why kvm/queue is broken.
 > 
-> Define the TDVMCALL exit reason, which is carved out from the VMX exit
-> reason namespace as the TDVMCALL exit from TDX guest to TDX-SEAM is really
-> just a VM-Exit.  Add a place holder to handle TDVMCALL exit.
+> diff --git a/tools/testing/selftests/kvm/x86_64/state_test.c b/tools/testing/selftests/kvm/x86_64/state_test.c
+> index 2e0a92da8ff5..b7faeae3dcc4 100644
+> --- a/tools/testing/selftests/kvm/x86_64/state_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/state_test.c
+> @@ -210,6 +210,12 @@ int main(int argc, char *argv[])
+>                  memset(&regs1, 0, sizeof(regs1));
+>                  vcpu_regs_get(vm, VCPU_ID, &regs1);
 > 
-> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  arch/x86/include/uapi/asm/vmx.h |  4 +++-
->  arch/x86/kvm/vmx/tdx.c          | 27 ++++++++++++++++++++++++++-
->  arch/x86/kvm/vmx/tdx.h          | 13 +++++++++++++
->  3 files changed, 42 insertions(+), 2 deletions(-)
+> +               if (stage == 6) {
+> +                       state->events.flags |= 0x20;
+> +                       vcpu_events_set(vm, VCPU_ID, &state->events);
+> +                       vcpu_nested_state_set(vm, VCPU_ID, &state->nested, false);
+> +               }
+> +
+>                  kvm_vm_release(vm);
 > 
-> diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
-> index 3d9b4598e166..cb0a0565219a 100644
-> --- a/arch/x86/include/uapi/asm/vmx.h
-> +++ b/arch/x86/include/uapi/asm/vmx.h
-> @@ -92,6 +92,7 @@
->  #define EXIT_REASON_UMWAIT              67
->  #define EXIT_REASON_TPAUSE              68
->  #define EXIT_REASON_BUS_LOCK            74
-> +#define EXIT_REASON_TDCALL              77
->  
->  #define VMX_EXIT_REASONS \
->  	{ EXIT_REASON_EXCEPTION_NMI,         "EXCEPTION_NMI" }, \
-> @@ -154,7 +155,8 @@
->  	{ EXIT_REASON_XRSTORS,               "XRSTORS" }, \
->  	{ EXIT_REASON_UMWAIT,                "UMWAIT" }, \
->  	{ EXIT_REASON_TPAUSE,                "TPAUSE" }, \
-> -	{ EXIT_REASON_BUS_LOCK,              "BUS_LOCK" }
-> +	{ EXIT_REASON_BUS_LOCK,              "BUS_LOCK" }, \
-> +	{ EXIT_REASON_TDCALL,                "TDCALL" }
->  
->  #define VMX_EXIT_REASON_FLAGS \
->  	{ VMX_EXIT_REASONS_FAILED_VMENTRY,	"FAILED_VMENTRY" }
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 8695836ce796..86daafd9eec0 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -780,7 +780,8 @@ static noinstr void tdx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
->  					struct vcpu_tdx *tdx)
->  {
->  	guest_enter_irqoff();
-> -	tdx->exit_reason.full = __tdx_vcpu_run(tdx->tdvpr.pa, vcpu->arch.regs, 0);
-> +	tdx->exit_reason.full = __tdx_vcpu_run(tdx->tdvpr.pa, vcpu->arch.regs,
-> +					tdx->tdvmcall.regs_mask);
->  	guest_exit_irqoff();
->  }
->  
-> @@ -815,6 +816,11 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
->  
->  	if (tdx->exit_reason.error || tdx->exit_reason.non_recoverable)
->  		return EXIT_FASTPATH_NONE;
-> +
-> +	if (tdx->exit_reason.basic == EXIT_REASON_TDCALL)
-> +		tdx->tdvmcall.rcx = vcpu->arch.regs[VCPU_REGS_RCX];
-> +	else
-> +		tdx->tdvmcall.rcx = 0;
->  	return EXIT_FASTPATH_NONE;
->  }
->  
-> @@ -859,6 +865,23 @@ static int tdx_handle_triple_fault(struct kvm_vcpu *vcpu)
->  	return 0;
->  }
->  
-> +static int handle_tdvmcall(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
-> +
-> +	if (unlikely(tdx->tdvmcall.xmm_mask))
-> +		goto unsupported;
+>                  /* Restore state in a new VM.  */
 
-Put a comment explaining this logic?
+Also verified the WARN with this. Then, is it still necessary to add an 
+individual selftest about the working flow of save/restore triple fault 
+event?
 
-> +
-> +	switch (tdvmcall_exit_reason(vcpu)) {
-
-Could we rename tdxvmcall_exit_reason() to something like tdvmcall_leaf()?
-
-Btw, why couldn't we merge previous patch to this one, so we don't have to look
-back and forth to figure out exactly what do those functions do?
-
-
-> +	default:
-> +		break;
-> +	}
-> +
-> +unsupported:
-> +	tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_INVALID_OPERAND);
-> +	return 1;
-> +}
-> +
->  void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int pgd_level)
->  {
->  	td_vmcs_write64(to_tdx(vcpu), SHARED_EPT_POINTER, root_hpa & PAGE_MASK);
-> @@ -1187,6 +1210,8 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
->  		return tdx_handle_exception(vcpu);
->  	case EXIT_REASON_EXTERNAL_INTERRUPT:
->  		return tdx_handle_external_interrupt(vcpu);
-> +	case EXIT_REASON_TDCALL:
-> +		return handle_tdvmcall(vcpu);
->  	case EXIT_REASON_EPT_VIOLATION:
->  		return tdx_handle_ept_violation(vcpu);
->  	case EXIT_REASON_EPT_MISCONFIG:
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index 7cd81780f3fa..9e8ed9b3119e 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -86,6 +86,19 @@ struct vcpu_tdx {
->  	/* Posted interrupt descriptor */
->  	struct pi_desc pi_desc;
->  
-> +	union {
-> +		struct {
-> +			union {
-> +				struct {
-> +					u16 gpr_mask;
-> +					u16 xmm_mask;
-> +				};
-> +				u32 regs_mask;
-> +			};
-> +			u32 reserved;
-> +		};
-> +		u64 rcx;
-> +	} tdvmcall;
->  	union tdx_exit_reason exit_reason;
->  
->  	bool initialized;
-
+> 
