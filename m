@@ -2,97 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 50D744F8103
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 15:52:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF39B4F8106
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 15:53:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241635AbiDGNyi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Apr 2022 09:54:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41798 "EHLO
+        id S245450AbiDGNzE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Apr 2022 09:55:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234709AbiDGNyg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Apr 2022 09:54:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6DFE2DB2F9
-        for <kvm@vger.kernel.org>; Thu,  7 Apr 2022 06:52:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649339555;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jL9bXerqanJqYa09D53b5usSPv9ZPbbi9nBHaabOGf0=;
-        b=cYsIMtNeilfCDKYaEJPkHxhPdctLEgujiuVervwBNoZ003VKxud7jCVVL9uKmLEvumvFPm
-        7uoOmkL6FUrngZiPvh3NPvTZg+gCI0XGGnikusS0K2XcsG5zRcJdYJlC7LJmaRzZ5L5VSF
-        Ltd8ETxFlrWtY8BrwOaNKXCMAEnqP18=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-205-AX2QYtizPxS7Nou_6Cx7aQ-1; Thu, 07 Apr 2022 09:52:32 -0400
-X-MC-Unique: AX2QYtizPxS7Nou_6Cx7aQ-1
-Received: by mail-ej1-f69.google.com with SMTP id ga31-20020a1709070c1f00b006cec400422fso3094489ejc.22
-        for <kvm@vger.kernel.org>; Thu, 07 Apr 2022 06:52:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+        with ESMTP id S242816AbiDGNzD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Apr 2022 09:55:03 -0400
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6401118665;
+        Thu,  7 Apr 2022 06:53:02 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id d10so6553859edj.0;
+        Thu, 07 Apr 2022 06:53:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=jL9bXerqanJqYa09D53b5usSPv9ZPbbi9nBHaabOGf0=;
-        b=UWKQIydhW0WRI5Pw+Vu3w/gX4OyXMZZFn10sRKOHI002Uhj9OFTvN/hgIKjqjYkF1d
-         8OH6U/rHstdpZjWuXDoytMBUmGAy1S2SMjnzz3nuPMgIDWRWnL2U6WJKs4GsJViyBil/
-         xA37vH5rn4Z6/XeAJUF/MXvYEZmUQD8zQ3fz5ppK1+LM44pfsKal/K+M7lmkk7KH0M0l
-         h73rv+oex0QhuOoQRMyIj/84ocOytOkv7XSyzlNfqPZVtVyY2i/qxpM99qHihxOHgA3n
-         Oxj0SiZ86pCLP2aQAXBPLxDachEM+fYG/3p3sIq243c3jp6TkKLZrjd8DrgqycJ6Bznn
-         xHGQ==
-X-Gm-Message-State: AOAM533MvT6/9PBhzUdZ3R6LlR4RH9QAMOgV87Y2VVX+13q9ADsIPaG8
-        S2UihdRai+CKL9CZikdb7T1NGtti+UAPQZGsfAIkTKlCWNKKEo645mscUTiRqwFN12Z6nwJCBIb
-        4a9egESbK5q8W
-X-Received: by 2002:a17:906:9c8e:b0:6df:f6bf:7902 with SMTP id fj14-20020a1709069c8e00b006dff6bf7902mr13355727ejc.191.1649339551254;
-        Thu, 07 Apr 2022 06:52:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyNoQ4CSwzbLRsARzz7uQFWOARItD+XZF5VJ8pDvdIiL2uFf06aBp56DUc8uT+bnytuRG5OkQ==
-X-Received: by 2002:a17:906:9c8e:b0:6df:f6bf:7902 with SMTP id fj14-20020a1709069c8e00b006dff6bf7902mr13355709ejc.191.1649339550964;
-        Thu, 07 Apr 2022 06:52:30 -0700 (PDT)
+        bh=RtLEHMXofVwSigiZFruK1cViTW610dtmPpogWRx2vYw=;
+        b=Q9vW21lD4OBM6tWcGgFjv4mr1Jlw8Y1HftqW6nKVE/kn8NU5nrtIRuKRZ0kvV5JTDa
+         JUIetz7mC/8jEWgICzJHIl4QnlxBdT+jVEqvtH0UAYgP4jy2vakI7MqoldoILxFAhipM
+         rBZCcxUXu0rIT6myNSOl1RMcCC9Sc6j5VPisJVSEDH54xkT8EXDyOWHL0yscGmpYhjbV
+         KfOwAyduR8/tR1m3PPOg05GbXbxQKDc7iZVqSKQmTrUGeAWAeOkQMCB/kbuuPXp3IlVh
+         UDk3ntcbwvFhkEBMRU57NgsggAtGvAOggUEGqHq8zLqJETfBvEzHsuOa0jkHeVwd4u/+
+         PkuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=RtLEHMXofVwSigiZFruK1cViTW610dtmPpogWRx2vYw=;
+        b=tuvUA6ZWUePU3votAoHpJvbhglY5ne0s7/bSOEqSkhVulzSvHfVi26i9f3rjhyqsRz
+         nut1Wq1KD/RRSjwaQ5MImTn0h7yxLeEgFwjzJwGVh17LsgKhXISpCkfqGKGpQqws6gPj
+         +KedLLNkr/v3Oso7ddua2aNA8RnlobjG1G2BwENkwt14pKEOf7cZlRxARd/sducpWg0o
+         8M3zDAQBlBb5SbQsXjKxY9aQ7cpW8zsk/OpaMm6LkeAAtKKeWa4MICtFUvKChXvtZBHv
+         i8oF5sVx8uCB/u6HF7Sb76dqTRtRD+kxkx6HWCMlreTsSFkmo4u83pPdSDKIe3UL7+34
+         JwBw==
+X-Gm-Message-State: AOAM531OlRS3xTzWQ324nteU4VA9PoP4XPiViAfVE/78ey1usTja1Jwg
+        t+F2f01y9d2d9maKhg7HvK8=
+X-Google-Smtp-Source: ABdhPJzfQSBegI2RHjRgjDsZUux0MM3e853t44jeZ9G6UHrN1tVMWA0IqES/TdKb+emQmclu7SoEyQ==
+X-Received: by 2002:a05:6402:2688:b0:419:5dde:4700 with SMTP id w8-20020a056402268800b004195dde4700mr14644996edd.124.1649339581190;
+        Thu, 07 Apr 2022 06:53:01 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id ky5-20020a170907778500b006d1b2dd8d4csm7697618ejc.99.2022.04.07.06.52.29
+        by smtp.googlemail.com with ESMTPSA id c1-20020a50cf01000000b0041cb7e02a5csm7389585edk.87.2022.04.07.06.52.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Apr 2022 06:52:30 -0700 (PDT)
-Message-ID: <ec5ffd8b-acc6-a529-6241-ad96a6cf2f88@redhat.com>
-Date:   Thu, 7 Apr 2022 15:52:29 +0200
+        Thu, 07 Apr 2022 06:53:00 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <37a736d0-1f25-79be-4c3f-c8e8a5a62528@redhat.com>
+Date:   Thu, 7 Apr 2022 15:52:58 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.7.0
-Subject: Re: [RFC PATCH v5 047/104] KVM: x86/mmu: add a private pointer to
- struct kvm_mmu_page
+Subject: Re: [RFC PATCH v5 045/104] KVM: x86/tdp_mmu: make REMOVED_SPTE
+ include shadow_initial value
 Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, isaku.yamahata@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Jim Mattson <jmattson@google.com>,
-        erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>
 References: <cover.1646422845.git.isaku.yamahata@intel.com>
- <499d1fd01b0d1d9a8b46a55bb863afd0c76f1111.1646422845.git.isaku.yamahata@intel.com>
- <a439dc1542539340e845d177be911c065a4e8d97.camel@intel.com>
+ <6614d2a2bc34441ed598830392b425fdf8e5ca52.1646422845.git.isaku.yamahata@intel.com>
+ <3f93de19-0685-3045-22db-7e05492bb5a4@redhat.com>
+ <Yk4j0cCR5fnQKw1F@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <a439dc1542539340e845d177be911c065a4e8d97.camel@intel.com>
+In-Reply-To: <Yk4j0cCR5fnQKw1F@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/7/22 01:43, Kai Huang wrote:
->> +	if (kvm_gfn_stolen_mask(vcpu->kvm)) {
-> Please get rid of kvm_gfn_stolen_mask().
-> 
+On 4/7/22 01:35, Sean Christopherson wrote:
+>> Please rename the existing REMOVED_SPTE to REMOVED_SPTE_MASK, and call this
+>> simply REMOVED_SPTE.  This also makes the patch smaller.
+> Can we name it either __REMOVE_SPTE or REMOVED_SPTE_VAL?  It's most definitely
+> not a mask, it's a full value, e.g. spte |= REMOVED_SPTE_MASK is completely wrong.
 
-Kai, please follow the other reviews that I have posted in the last few 
-days.
+REMOVED_SPTE_VAL is fine.
 
 Paolo
-
