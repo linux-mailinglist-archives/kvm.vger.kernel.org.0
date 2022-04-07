@@ -2,237 +2,242 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB92F4F8898
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 22:33:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C4A74F8855
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 22:32:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229522AbiDGURu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Apr 2022 16:17:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45344 "EHLO
+        id S229469AbiDGU3y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Apr 2022 16:29:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbiDGURm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Apr 2022 16:17:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BCDE62D9A3C
-        for <kvm@vger.kernel.org>; Thu,  7 Apr 2022 13:14:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649362407;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=4+0QkoqkebIwgoyAPdYNiKa42b/3LMH5b4hHHgzbLDc=;
-        b=PMzfu6YP7VMUISClhSDTseKpWGlbCLamKEe2+qO8usV7oDNT7/YnfAaMSP/J60Cfbb8TBx
-        f1uTopuJVZ8pye/zTJpYHJulUPK7ukr5SaEmMuAcS0gvIq+haCoroWJfFgTijc+bIZZMv6
-        AvEDqP0TkowgOoeYQdsFBAGbSajgvWU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-517-xl-OpijIPkSy5RTutGvFyA-1; Thu, 07 Apr 2022 16:10:17 -0400
-X-MC-Unique: xl-OpijIPkSy5RTutGvFyA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 83D37101A52C;
-        Thu,  7 Apr 2022 20:10:16 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.40.192.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4ED2FC27E83;
-        Thu,  7 Apr 2022 20:10:14 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2] KVM: x86: hyper-v: Avoid writing to TSC page without an active vCPU
-Date:   Thu,  7 Apr 2022 22:10:13 +0200
-Message-Id: <20220407201013.963226-1-vkuznets@redhat.com>
+        with ESMTP id S229459AbiDGU3x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Apr 2022 16:29:53 -0400
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C0E0487827
+        for <kvm@vger.kernel.org>; Thu,  7 Apr 2022 13:13:59 -0700 (PDT)
+Received: by mail-io1-f42.google.com with SMTP id h63so8172747iof.12
+        for <kvm@vger.kernel.org>; Thu, 07 Apr 2022 13:13:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=sJRTozuXZn5+Q6veTiT+vzqfmgVSoHWXITOn1w2myow=;
+        b=RxWOQY6KdgZaMEREMmfvE+CHxxieSSZNnxM2rFqPA0wSomNEou/Wa41qEFdJrCgNBv
+         mZMq+So5tvvc1z8AtFY0XOyYfDfkFyk/ATSy9gVS1xHEs08u2icaao6NvoGdifTFGX2K
+         4aRjMyFoIyU+SpQHQnHNigfrqzsuy/pkifoWHm5T22FWKP6G1zUU0qOztPNrj9xf4eWE
+         MNLwoFjPwjyGXziejWrnvWsS/9RYLAEVsciBrKFO3dtGoj65Li7YCkGt1/583UJVvCNW
+         Ypnx2L+220K4kKmx8apWVq6mw3fupO782neBDOLI74pZAr16sCL5vY2HcDUodmzC9QK5
+         E6/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=sJRTozuXZn5+Q6veTiT+vzqfmgVSoHWXITOn1w2myow=;
+        b=k/QJmGiX4VKdez5o81V/imxUiBiTleAqvi74dpFUtKWCznoY/9jcjWEFVc5WHxNyZJ
+         +uwFj1mdWt89gDw5rkNcWs35AT09U2zZMapAs5QLieU/7cMyw97uimHDvCq3SI2lrKyo
+         wYIJD9k4xrNzwqvM4jT61LrF27rOka72xeXAgkLlel7wnzhuuEHx6pYZAaSq9rIs8cRv
+         sYQVluKLcpg0+XxWGCLtPX8Ut7R6ZhlffNV4FZN0e7p6yuNqzit8YTTMXpbD5BMOj9NB
+         P/HDWdYqN9h/VNsVzpfNtyHRcWxWqSmQdkwfgOJhqx0lBIqPshcLAx+A/EIGfPWjsvsc
+         c1TQ==
+X-Gm-Message-State: AOAM530cgbwLPfT6j51EwkyUfN7pBP4ZD1lAawuTW6uqIhwDkymBNIR3
+        VDadNuOk1tkhxIwUHQBsDvdyWw==
+X-Google-Smtp-Source: ABdhPJyqXm9YX9vTJiNnxSBcA8ph2PFU3mlGYEK10zOmON/8Ld6MPO1USArTjmiQeR6sNjczH9IqqA==
+X-Received: by 2002:a05:6638:358a:b0:323:cbda:73c0 with SMTP id v10-20020a056638358a00b00323cbda73c0mr8182773jal.136.1649362367188;
+        Thu, 07 Apr 2022 13:12:47 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id y17-20020a92d0d1000000b002ca8027016bsm939371ila.45.2022.04.07.13.12.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Apr 2022 13:12:46 -0700 (PDT)
+Date:   Thu, 7 Apr 2022 20:12:43 +0000
+From:   Oliver Upton <oupton@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v2 1/3] KVM: arm64: Wire up CP15 feature registers to
+ their AArch64 equivalents
+Message-ID: <Yk9Fu7+CSeiqGO78@google.com>
+References: <20220401010832.3425787-1-oupton@google.com>
+ <20220401010832.3425787-2-oupton@google.com>
+ <87lewib68f.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87lewib68f.wl-maz@kernel.org>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following WARN is triggered from kvm_vm_ioctl_set_clock():
- WARNING: CPU: 10 PID: 579353 at arch/x86/kvm/../../../virt/kvm/kvm_main.c:3161 mark_page_dirty_in_slot+0x6c/0x80 [kvm]
- ...
- CPU: 10 PID: 579353 Comm: qemu-system-x86 Tainted: G        W  O      5.16.0.stable #20
- Hardware name: LENOVO 20UF001CUS/20UF001CUS, BIOS R1CET65W(1.34 ) 06/17/2021
- RIP: 0010:mark_page_dirty_in_slot+0x6c/0x80 [kvm]
- ...
- Call Trace:
-  <TASK>
-  ? kvm_write_guest+0x114/0x120 [kvm]
-  kvm_hv_invalidate_tsc_page+0x9e/0xf0 [kvm]
-  kvm_arch_vm_ioctl+0xa26/0xc50 [kvm]
-  ? schedule+0x4e/0xc0
-  ? __cond_resched+0x1a/0x50
-  ? futex_wait+0x166/0x250
-  ? __send_signal+0x1f1/0x3d0
-  kvm_vm_ioctl+0x747/0xda0 [kvm]
-  ...
+Hi Marc,
 
-The WARN was introduced by commit 03c0304a86bc ("KVM: Warn if
-mark_page_dirty() is called without an active vCPU") but the change seems
-to be correct (unlike Hyper-V TSC page update mechanism). In fact, there's
-no real need to actually write to guest memory to invalidate TSC page, this
-can be done by the first vCPU which goes through kvm_guest_time_update().
+On Wed, Apr 06, 2022 at 04:07:28PM +0100, Marc Zyngier wrote:
+> > +	/*
+> > +	 * All registers where CRm > 3 are known to be UNKNOWN/RAZ from AArch32.
+> > +	 * Avoid conflicting with future expansion of AArch64 feature registers
+> > +	 * and simply treat them as RAZ here.
+> > +	 */
+> > +	if (params->CRm > 3)
+> > +		params->regval = 0;
+> > +	else
+> > +		ret = emulate_sys_reg(vcpu, params);
+> > +
+> > +	vcpu_set_reg(vcpu, Rt, params->regval);
+> 
+> It feels odd to update Rt without checking whether the read has
+> succeeded. In your case, this is harmless, but would break with the
+> approach I'm outlining below.
+> 
 
-Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
-- Changes since v1:
- Drop HV_TSC_PAGE_KVM_CHANGED and use the existing HV_TSC_PAGE_HOST_CHANGED
- instead [Sean]
----
- arch/x86/include/asm/kvm_host.h |  4 +---
- arch/x86/kvm/hyperv.c           | 40 +++++++--------------------------
- arch/x86/kvm/hyperv.h           |  2 +-
- arch/x86/kvm/x86.c              |  7 +++---
- 4 files changed, 13 insertions(+), 40 deletions(-)
+A total kludge to avoid yet another level of indentation :) I'll go
+about this the right way next spin.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 676705ad1e23..19bc362a1cd9 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -977,12 +977,10 @@ enum hv_tsc_page_status {
- 	HV_TSC_PAGE_UNSET = 0,
- 	/* TSC page MSR was written by the guest, update pending */
- 	HV_TSC_PAGE_GUEST_CHANGED,
--	/* TSC page MSR was written by KVM userspace, update pending */
-+	/* TSC page update was triggered from the host side */
- 	HV_TSC_PAGE_HOST_CHANGED,
- 	/* TSC page was properly set up and is currently active  */
- 	HV_TSC_PAGE_SET,
--	/* TSC page is currently being updated and therefore is inactive */
--	HV_TSC_PAGE_UPDATING,
- 	/* TSC page was set up with an inaccessible GPA */
- 	HV_TSC_PAGE_BROKEN,
- };
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 123b677111c5..46f9dfb60469 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1135,11 +1135,13 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
- 	BUILD_BUG_ON(sizeof(tsc_seq) != sizeof(hv->tsc_ref.tsc_sequence));
- 	BUILD_BUG_ON(offsetof(struct ms_hyperv_tsc_page, tsc_sequence) != 0);
- 
-+	mutex_lock(&hv->hv_lock);
-+
- 	if (hv->hv_tsc_page_status == HV_TSC_PAGE_BROKEN ||
-+	    hv->hv_tsc_page_status == HV_TSC_PAGE_SET ||
- 	    hv->hv_tsc_page_status == HV_TSC_PAGE_UNSET)
--		return;
-+		goto out_unlock;
- 
--	mutex_lock(&hv->hv_lock);
- 	if (!(hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE))
- 		goto out_unlock;
- 
-@@ -1201,45 +1203,19 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
- 	mutex_unlock(&hv->hv_lock);
- }
- 
--void kvm_hv_invalidate_tsc_page(struct kvm *kvm)
-+void kvm_hv_request_tsc_page_update(struct kvm *kvm)
- {
- 	struct kvm_hv *hv = to_kvm_hv(kvm);
--	u64 gfn;
--	int idx;
--
--	if (hv->hv_tsc_page_status == HV_TSC_PAGE_BROKEN ||
--	    hv->hv_tsc_page_status == HV_TSC_PAGE_UNSET ||
--	    tsc_page_update_unsafe(hv))
--		return;
- 
- 	mutex_lock(&hv->hv_lock);
- 
--	if (!(hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE))
--		goto out_unlock;
--
--	/* Preserve HV_TSC_PAGE_GUEST_CHANGED/HV_TSC_PAGE_HOST_CHANGED states */
--	if (hv->hv_tsc_page_status == HV_TSC_PAGE_SET)
--		hv->hv_tsc_page_status = HV_TSC_PAGE_UPDATING;
-+	if (hv->hv_tsc_page_status == HV_TSC_PAGE_SET &&
-+	    !tsc_page_update_unsafe(hv))
-+		hv->hv_tsc_page_status = HV_TSC_PAGE_HOST_CHANGED;
- 
--	gfn = hv->hv_tsc_page >> HV_X64_MSR_TSC_REFERENCE_ADDRESS_SHIFT;
--
--	hv->tsc_ref.tsc_sequence = 0;
--
--	/*
--	 * Take the srcu lock as memslots will be accessed to check the gfn
--	 * cache generation against the memslots generation.
--	 */
--	idx = srcu_read_lock(&kvm->srcu);
--	if (kvm_write_guest(kvm, gfn_to_gpa(gfn),
--			    &hv->tsc_ref, sizeof(hv->tsc_ref.tsc_sequence)))
--		hv->hv_tsc_page_status = HV_TSC_PAGE_BROKEN;
--	srcu_read_unlock(&kvm->srcu, idx);
--
--out_unlock:
- 	mutex_unlock(&hv->hv_lock);
- }
- 
--
- static bool hv_check_msr_access(struct kvm_vcpu_hv *hv_vcpu, u32 msr)
- {
- 	if (!hv_vcpu->enforce_cpuid)
-diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
-index e19c00ee9ab3..da2737f2a956 100644
---- a/arch/x86/kvm/hyperv.h
-+++ b/arch/x86/kvm/hyperv.h
-@@ -137,7 +137,7 @@ void kvm_hv_process_stimers(struct kvm_vcpu *vcpu);
- 
- void kvm_hv_setup_tsc_page(struct kvm *kvm,
- 			   struct pvclock_vcpu_time_info *hv_clock);
--void kvm_hv_invalidate_tsc_page(struct kvm *kvm);
-+void kvm_hv_request_tsc_page_update(struct kvm *kvm);
- 
- void kvm_hv_init_vm(struct kvm *kvm);
- void kvm_hv_destroy_vm(struct kvm *kvm);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 7a066cf92692..e9647614dc8c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2904,7 +2904,7 @@ static void kvm_end_pvclock_update(struct kvm *kvm)
- 
- static void kvm_update_masterclock(struct kvm *kvm)
- {
--	kvm_hv_invalidate_tsc_page(kvm);
-+	kvm_hv_request_tsc_page_update(kvm);
- 	kvm_start_pvclock_update(kvm);
- 	pvclock_update_vm_gtod_copy(kvm);
- 	kvm_end_pvclock_update(kvm);
-@@ -3108,8 +3108,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
- 					offsetof(struct compat_vcpu_info, time));
- 	if (vcpu->xen.vcpu_time_info_cache.active)
- 		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_time_info_cache, 0);
--	if (!v->vcpu_idx)
--		kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
-+	kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
- 	return 0;
- }
- 
-@@ -6238,7 +6237,7 @@ static int kvm_vm_ioctl_set_clock(struct kvm *kvm, void __user *argp)
- 	if (data.flags & ~KVM_CLOCK_VALID_FLAGS)
- 		return -EINVAL;
- 
--	kvm_hv_invalidate_tsc_page(kvm);
-+	kvm_hv_request_tsc_page_update(kvm);
- 	kvm_start_pvclock_update(kvm);
- 	pvclock_update_vm_gtod_copy(kvm);
- 
--- 
-2.35.1
+> > +	return ret;
+> > +}
+> > +
+> > +/**
+> > + * kvm_is_cp15_id_reg() - Returns true if the specified CP15 register is an
+> > + *			  AArch32 ID register.
+> > + * @params: the system register access parameters
+> > + *
+> > + * Note that CP15 ID registers where CRm=0 are excluded from this check. The
+> > + * only register trapped in the CRm=0 range is CTR, which is already handled in
+> > + * the cp15 register table.
+> 
+> There is also the fact that CTR_EL0 has Op1=3 while CTR has Op1=0,
+> which prevents it from fitting in your scheme.
+> 
+> > + */
+> > +static inline bool kvm_is_cp15_id_reg(struct sys_reg_params *params)
+> > +{
+> > +	return params->CRn == 0 && params->Op1 == 0 && params->CRm != 0;
+> > +}
+> > +
+> >  /**
+> >   * kvm_handle_cp_32 -- handles a mrc/mcr trap on a guest CP14/CP15 access
+> >   * @vcpu: The VCPU pointer
+> > @@ -2360,6 +2421,13 @@ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
+> >  	params.Op1 = (esr >> 14) & 0x7;
+> >  	params.Op2 = (esr >> 17) & 0x7;
+> >  
+> > +	/*
+> > +	 * Certain AArch32 ID registers are handled by rerouting to the AArch64
+> > +	 * system register table.
+> > +	 */
+> > +	if (ESR_ELx_EC(esr) == ESR_ELx_EC_CP15_32 && kvm_is_cp15_id_reg(&params))
+> > +		return kvm_emulate_cp15_id_reg(vcpu, &params);
+> 
+> I think this is a bit ugly. We reach this point from a function that
+> was cp15-specific, and now we are reconstructing the context. I'd
+> rather this is moved to kvm_handle_cp15_32(), and treated there
+> (untested):
+>
 
+Completely agree, hoisting this would be much more elegant.
+
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 7b45c040cc27..a071d89ace92 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2350,28 +2350,21 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
+>   * @run:  The kvm_run struct
+>   */
+>  static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
+> +			    struct sys_reg_params *params,
+>  			    const struct sys_reg_desc *global,
+>  			    size_t nr_global)
+>  {
+> -	struct sys_reg_params params;
+> -	u32 esr = kvm_vcpu_get_esr(vcpu);
+>  	int Rt  = kvm_vcpu_sys_get_rt(vcpu);
+>  
+> -	params.CRm = (esr >> 1) & 0xf;
+> -	params.regval = vcpu_get_reg(vcpu, Rt);
+> -	params.is_write = ((esr & 1) == 0);
+> -	params.CRn = (esr >> 10) & 0xf;
+> -	params.Op0 = 0;
+> -	params.Op1 = (esr >> 14) & 0x7;
+> -	params.Op2 = (esr >> 17) & 0x7;
+> +	params->regval = vcpu_get_reg(vcpu, Rt);
+>  
+> -	if (!emulate_cp(vcpu, &params, global, nr_global)) {
+> -		if (!params.is_write)
+> -			vcpu_set_reg(vcpu, Rt, params.regval);
+> +	if (!emulate_cp(vcpu, params, global, nr_global)) {
+> +		if (!params->is_write)
+> +			vcpu_set_reg(vcpu, Rt, params->regval);
+>  		return 1;
+>  	}
+>  
+> -	unhandled_cp_access(vcpu, &params);
+> +	unhandled_cp_access(vcpu, params);
+>  	return 1;
+>  }
+>  
+> @@ -2382,7 +2375,14 @@ int kvm_handle_cp15_64(struct kvm_vcpu *vcpu)
+>  
+>  int kvm_handle_cp15_32(struct kvm_vcpu *vcpu)
+>  {
+> -	return kvm_handle_cp_32(vcpu, cp15_regs, ARRAY_SIZE(cp15_regs));
+> +	struct sys_reg_params params;
+> +
+> +	params = esr_cp1x_32_to_params(kvm_vcpu_get_esr(vcpu));
+> +
+> +	if (params.Op1 == 0 && params.CRn == 0 && params.CRm)
+> +		return kvm_emulate_cp15_id_reg(vcpu, &params);
+> +
+> +	return kvm_handle_cp_32(vcpu, &params, cp15_regs, ARRAY_SIZE(cp15_regs));
+>  }
+>  
+>  int kvm_handle_cp14_64(struct kvm_vcpu *vcpu)
+> @@ -2392,7 +2392,11 @@ int kvm_handle_cp14_64(struct kvm_vcpu *vcpu)
+>  
+>  int kvm_handle_cp14_32(struct kvm_vcpu *vcpu)
+>  {
+> -	return kvm_handle_cp_32(vcpu, cp14_regs, ARRAY_SIZE(cp14_regs));
+> +	struct sys_reg_params params;
+> +
+> +	params = esr_cp1x_32_to_params(kvm_vcpu_get_esr(vcpu));
+> +
+> +	return kvm_handle_cp_32(vcpu, &params, cp14_regs, ARRAY_SIZE(cp14_regs));
+>  }
+>  
+>  static bool is_imp_def_sys_reg(struct sys_reg_params *params)
+> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+> index cc0cc95a0280..fd4b2bb8c782 100644
+> --- a/arch/arm64/kvm/sys_regs.h
+> +++ b/arch/arm64/kvm/sys_regs.h
+> @@ -35,6 +35,13 @@ struct sys_reg_params {
+>  				  .Op2 = ((esr) >> 17) & 0x7,                  \
+>  				  .is_write = !((esr) & 1) })
+>  
+> +#define esr_cp1x_32_to_params(esr)					       \
+> +	((struct sys_reg_params){ .Op1 = ((esr) >> 14) & 0x7,                  \
+> +				  .CRn = ((esr) >> 10) & 0xf,                  \
+> +				  .CRm = ((esr) >> 1) & 0xf,                   \
+> +				  .Op2 = ((esr) >> 17) & 0x7,                  \
+> +				  .is_write = !((esr) & 1) })
+> +
+>  struct sys_reg_desc {
+>  	/* Sysreg string for debug */
+>  	const char *name;
+> 
+> 
+> What do you think?
+
+Way better. Your suggested patch looks correct, I'll fold all of this
+together and test it out. Thanks for the suggestions :)
+
+--
+Best,
+Oliver
