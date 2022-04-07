@@ -2,129 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D2CA4F75CA
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 08:13:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FF094F76CC
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 09:07:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240877AbiDGGPE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Apr 2022 02:15:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43038 "EHLO
+        id S233789AbiDGHJq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Apr 2022 03:09:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240378AbiDGGPD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Apr 2022 02:15:03 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 156851C8DB8;
-        Wed,  6 Apr 2022 23:13:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649311985; x=1680847985;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=C3nT1yCtjX7kKzPi6gJkoB5VNcsfCgvLH5dyegPN6I0=;
-  b=AZ7Q1KjSjGWovTeacTWtTQTzf9y+6shEcM4s5gwj0jxmzqemI/laNZVf
-   sL1Ly/2qzvJ957nto0X0fQZfCQrtocD+AAtgTMA6dJaDFJ3uckNjJtt+L
-   vGbZYQwmNhvzSGrolDfIw4FaRFNNtEQ0jspnqiI+L6TLZnkC3+M3BOYaZ
-   Ny4QixdwjEl1WT7WszXjmLYJkhY37elpv1tpbQ8Y8RT7bRMZJ/eG62wFW
-   bcdozJYypEYIooO+ixVduf6+0wFHNTJ2pXwYtLo6Odl2D6nzzubb9OqJt
-   XmG2piGTqSZVtJqWc8P9pnijgfbtHdPKnUJv3S7KwoHU3sdcGxfUORIRj
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10309"; a="243373080"
-X-IronPort-AV: E=Sophos;i="5.90,241,1643702400"; 
-   d="scan'208";a="243373080"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2022 23:13:04 -0700
-X-IronPort-AV: E=Sophos;i="5.90,241,1643702400"; 
-   d="scan'208";a="549880694"
-Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.249.174.148]) ([10.249.174.148])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2022 23:13:01 -0700
-Message-ID: <8347e6e3-5b22-c9c9-5e6b-9ea33c614d5a@intel.com>
-Date:   Thu, 7 Apr 2022 14:12:59 +0800
+        with ESMTP id S231248AbiDGHJo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Apr 2022 03:09:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 558291209F
+        for <kvm@vger.kernel.org>; Thu,  7 Apr 2022 00:07:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649315263;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=voufsMIqrDdMDWGVcd+MayfyZfSm1283TLUaIoZ6ZqE=;
+        b=LrFuvdBZl+uO5HCKLDP356yNGAgkWYBqP2f+JliaGjc3es+uLmFWSFdUQXsh5ZrQ7BZBZ0
+        X3Glo8p/1QkKKYXXlFJ7X2jxsSDm0FCRUMUqRwgln/3CGKNWIjU5WAqWnIAGUVd2ty7neg
+        vPVsEy9iTWc7jEBDAofqiGNvdsxGfIU=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-631-dYoCdwITPBC42UIRnEGW-A-1; Thu, 07 Apr 2022 03:07:41 -0400
+X-MC-Unique: dYoCdwITPBC42UIRnEGW-A-1
+Received: by mail-ej1-f70.google.com with SMTP id qf10-20020a1709077f0a00b006e83684b9c6so592677ejc.17
+        for <kvm@vger.kernel.org>; Thu, 07 Apr 2022 00:07:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=voufsMIqrDdMDWGVcd+MayfyZfSm1283TLUaIoZ6ZqE=;
+        b=SNAR+g2eHhTVSedcs5T7AvrdRE6CJalygasVgyr5C3LLd4gMwhaDMUbd2lyRZSOsle
+         qri+t4etDa5EZc1rvTU/y3XFYQnhCDjKT2QrHIzktiTsx7aaiOwdVCl0ahkM1nyq/ZJQ
+         UQQXG9bbS7mF9NAjiIzomlJv1/fJHYRudVMcuhpw0CaqJ2FcoepmfU1EIkqaWOITj9WR
+         FCY8RF5afZxOEc55kHKcnTae5U7mlsG4pbaLFPD3HyFRcIeXHfvt80lRJue8FvMXwb4g
+         QTKOFqhxZkSok/Kajh8YN2ycJDCNiSotGdZtM0Vrq90GbVRmsVVpK6urCkqomd9VlvCz
+         lo0A==
+X-Gm-Message-State: AOAM532nzlZd1//oZA2h2YEv/CikYAQVL7WYtW8jSrQXfR0X9+CcPis6
+        2fxYRb44ZGv3jperbL89kGOdUo9Kc0vXwGOkvkhRIVbiBBRxa7CjpHbW5py5ZBUPGEjIWGpWrcL
+        pKrwe8NxVHI57
+X-Received: by 2002:a05:6402:289f:b0:41c:d9af:ce39 with SMTP id eg31-20020a056402289f00b0041cd9afce39mr13021039edb.415.1649315260691;
+        Thu, 07 Apr 2022 00:07:40 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxxP9QGmu2kaiH6qWo/P6yz6O6e9dfYGJFWv3nF0OceRbfFHwL9zQDTpaEvdZh23+2eh/Mn9A==
+X-Received: by 2002:a05:6402:289f:b0:41c:d9af:ce39 with SMTP id eg31-20020a056402289f00b0041cd9afce39mr13021023edb.415.1649315260465;
+        Thu, 07 Apr 2022 00:07:40 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id a18-20020a1709063e9200b006e0527baa77sm7341760ejj.92.2022.04.07.00.07.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Apr 2022 00:07:39 -0700 (PDT)
+Message-ID: <02fd5a73-1120-6e43-cc5f-ecef331fcd8a@redhat.com>
+Date:   Thu, 7 Apr 2022 09:07:35 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.7.0
-Subject: Re: [PATCH v5 1/3] KVM: X86: Save&restore the triple fault request
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH] KVM: x86: Deplete Paolo's brown paper bag supply by one
 Content-Language: en-US
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-References: <20220318074955.22428-1-chenyi.qiang@intel.com>
- <20220318074955.22428-2-chenyi.qiang@intel.com> <YkzRSHHDMaVBQrxd@google.com>
- <YkzUceG4rhw15U3i@google.com> <Yk4C8gA2xVCrzgrG@google.com>
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-In-Reply-To: <Yk4C8gA2xVCrzgrG@google.com>
+References: <20220406225106.55471-1-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220406225106.55471-1-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-5.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 4/7/22 00:51, Sean Christopherson wrote:
+> Fix an inverted check on CR0.PG when computing the cpu_role, the MMU is
+> direct and all CR4 bits ignored if paging is disabled, not enabled.
+> 
+> Fixes: d73678dc11ec ("KVM: x86/mmu: split cpu_role from mmu_role")
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+> 
+> I haven't done much testing on the rest of the MMU role patches, this just
+> popped up in very, very basic testing ;-)  I assume this will be squashed,
+> hence the snarky shortlog.
 
+It certainly got my attention... squashed, thanks. :)
 
-On 4/7/2022 5:15 AM, Sean Christopherson wrote:
-> On Tue, Apr 05, 2022, Sean Christopherson wrote:
->> On Tue, Apr 05, 2022, Sean Christopherson wrote:
->>> On Fri, Mar 18, 2022, Chenyi Qiang wrote:
->>>> @@ -4976,6 +4980,9 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
->>>>   		}
->>>>   	}
->>>>   
->>>> +	if (events->flags & KVM_VCPUEVENT_TRIPLE_FAULT)
->>>> +		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
->>>> +
->>>>   	kvm_make_request(KVM_REQ_EVENT, vcpu);
->>>
->>> Looks correct, but this really needs a selftest, at least for the SET path since
->>> the intent is to use that for the NOTIFY handling.  Doesn't need to be super fancy,
->>> e.g. do port I/O from L2, inject a triple fault, and verify L1 sees the appropriate
->>> exit.
->>>
->>> Aha!  And for the GET path, abuse KVM_X86_SET_MCE with CR4.MCE=0 to coerce KVM into
->>> making a KVM_REQ_TRIPLE_FAULT, that way there's no need to try and hit a timing
->>> window to intercept the request.
->>
->> Drat, I bet that MCE path means the WARN in nested_vmx_vmexit() can be triggered
->> by userspace.  If so, this patch makes it really, really easy to hit, e.g. queue the
->> request while L2 is active, then do KVM_SET_NESTED_STATE to force an "exit" without
->> bouncing through kvm_check_nested_events().
->>
->>    WARN_ON_ONCE(kvm_check_request(KVM_REQ_TRIPLE_FAULT, vcpu))
->>
->> I don't think SVM has a user-triggerable WARN, but the request should still be
->> dropped on forced exit from L2, e.g. I believe this is the correct fix:
-> 
-> Confirmed the WARN can be triggered by abusing this patch, I'll get a patch out
-> once I figure out why kvm/queue is broken.
-> 
-> diff --git a/tools/testing/selftests/kvm/x86_64/state_test.c b/tools/testing/selftests/kvm/x86_64/state_test.c
-> index 2e0a92da8ff5..b7faeae3dcc4 100644
-> --- a/tools/testing/selftests/kvm/x86_64/state_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/state_test.c
-> @@ -210,6 +210,12 @@ int main(int argc, char *argv[])
->                  memset(&regs1, 0, sizeof(regs1));
->                  vcpu_regs_get(vm, VCPU_ID, &regs1);
-> 
-> +               if (stage == 6) {
-> +                       state->events.flags |= 0x20;
-> +                       vcpu_events_set(vm, VCPU_ID, &state->events);
-> +                       vcpu_nested_state_set(vm, VCPU_ID, &state->nested, false);
-> +               }
-> +
->                  kvm_vm_release(vm);
-> 
->                  /* Restore state in a new VM.  */
+Paolo
 
-Also verified the WARN with this. Then, is it still necessary to add an 
-individual selftest about the working flow of save/restore triple fault 
-event?
-
+>   arch/x86/kvm/mmu/mmu.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index e41d7bba7a65..ab24fc161bac 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4699,7 +4699,7 @@ kvm_calc_cpu_role(struct kvm_vcpu *vcpu, const struct kvm_mmu_role_regs *regs)
+>   	role.base.smm = is_smm(vcpu);
+>   	role.base.guest_mode = is_guest_mode(vcpu);
+>   
+> -	if (____is_cr0_pg(regs)) {
+> +	if (!____is_cr0_pg(regs)) {
+>   		role.base.direct = 1;
+>   		return role;
+>   	}
+> 
+> base-commit: 56ba4b488353a8925b30367d72e41d1996c23554
+
