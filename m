@@ -2,215 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5E7A4F7387
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 05:26:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4764D4F71F7
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 04:20:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240310AbiDGD2W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 23:28:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50192 "EHLO
+        id S238455AbiDGCUW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 22:20:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240601AbiDGD2J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 23:28:09 -0400
-Received: from mga06.intel.com (mga06.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A529F112
-        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 20:26:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649301970; x=1680837970;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=0KLacdHcpDEza+nuhOv+ETwE7ZobSa2RvKDkPLy7FdA=;
-  b=OvmpCzZOdZt9LAFVp/wULVW+81fzSmatuiZd4NiIHN8gC4FOBIZyDTur
-   iV2TN/TE+WygLwke/G5lfajD2v9aTsy+M8VULMSOg++buhOtmPNXkF36O
-   UIDh+/HMsS94rO+Iyw+D/TIUE968n7oYMuxOrBf1FrjzU5vAfmfmhOX3W
-   cHTVd66JSlSlhu+FWLoHj0EFjeScgLIQhStSstP4Uzqk+vAb/JfRO5zak
-   v2+H8HUt4jETqphC5MpRYE56cSwFqRQMhdy/NlF6tE3XNLV+LCdHYZrdX
-   VzEAJTQ3fI9Vg9eV86ymJy8HXes8FOIwa7UrFK5is0IbEtVEkQMzrHn6Q
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10309"; a="321911060"
-X-IronPort-AV: E=Sophos;i="5.90,241,1643702400"; 
-   d="scan'208";a="321911060"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2022 20:26:10 -0700
-X-IronPort-AV: E=Sophos;i="5.90,241,1643702400"; 
-   d="scan'208";a="524749020"
-Received: from embargo.jf.intel.com ([10.165.9.183])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2022 20:26:10 -0700
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     pbonzini@redhat.com, kvm@vger.kernel.org
-Cc:     Yang Weijiang <weijiang.yang@intel.com>
-Subject: [kvm-unit-tests PATCH] x86: cet: Fix #DF exception triggered by the application
-Date:   Wed,  6 Apr 2022 09:24:46 -0400
-Message-Id: <20220406132446.32679-1-weijiang.yang@intel.com>
+        with ESMTP id S236780AbiDGCUR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 22:20:17 -0400
+X-Greylist: delayed 2169 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 06 Apr 2022 19:18:13 PDT
+Received: from spam.unicloud.com (smgmail.unic2.com.cn [220.194.70.58])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9932E329B8;
+        Wed,  6 Apr 2022 19:18:11 -0700 (PDT)
+Received: from spam.unicloud.com (localhost [127.0.0.2] (may be forged))
+        by spam.unicloud.com with ESMTP id 2371g3vt034159;
+        Thu, 7 Apr 2022 09:42:03 +0800 (GMT-8)
+        (envelope-from luofei@unicloud.com)
+Received: from eage.unicloud.com ([220.194.70.35])
+        by spam.unicloud.com with ESMTP id 2371eVLN032798;
+        Thu, 7 Apr 2022 09:40:31 +0800 (GMT-8)
+        (envelope-from luofei@unicloud.com)
+Received: from localhost.localdomain (10.10.1.7) by zgys-ex-mb09.Unicloud.com
+ (10.10.0.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2375.17; Thu, 7
+ Apr 2022 09:40:30 +0800
+From:   luofei <luofei@unicloud.com>
+To:     <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <dave.hansen@linux.intel.com>, <x86@kernel.org>
+CC:     <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
+        <hpa@zytor.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, luofei <luofei@unicloud.com>
+Subject: [PATCH] KVM: x86/mmu: remove unnecessary kvm_shadow_root_allocated() check
+Date:   Wed, 6 Apr 2022 21:40:16 -0400
+Message-ID: <20220407014016.1266469-1-luofei@unicloud.com>
 X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DATE_IN_PAST_12_24,
-        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.10.1.7]
+X-ClientProxiedBy: zgys-ex-mb06.Unicloud.com (10.10.0.52) To
+ zgys-ex-mb09.Unicloud.com (10.10.0.24)
+X-DNSRBL: 
+X-MAIL: spam.unicloud.com 2371g3vt034159
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Commit: 8cd86535fb(x86: get rid of ring0stacktop) makes old test
-application trigger #DF. To fix the issue, refactored the code
-using run_in_user() which is adapted to the change well.
+When we reach here, the return value of kvm_shadow_root_allocated()
+has already been checked to false under kvm->slots_arch_lock.
+So remove the unnecessary recheck.
 
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+Signed-off-by: luofei <luofei@unicloud.com>
 ---
- x86/cet.c | 94 +++++--------------------------------------------------
- 1 file changed, 7 insertions(+), 87 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/x86/cet.c b/x86/cet.c
-index a4b79cb..8c09c79 100644
---- a/x86/cet.c
-+++ b/x86/cet.c
-@@ -8,16 +8,8 @@
- #include "alloc_page.h"
- #include "fault_test.h"
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 8f19ea752704..1978ee527298 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3394,7 +3394,7 @@ static int mmu_first_shadow_root_alloc(struct kvm *kvm)
+ 	 * Check if anything actually needs to be allocated, e.g. all metadata
+ 	 * will be allocated upfront if TDP is disabled.
+ 	 */
+-	if (kvm_memslots_have_rmaps(kvm) &&
++	if (!is_tdp_mmu_enabled(kvm) &&
+ 	    kvm_page_track_write_tracking_enabled(kvm))
+ 		goto out_success;
  
--
--static unsigned char user_stack[0x400];
--static unsigned long rbx, rsi, rdi, rsp, rbp, r8, r9,
--		     r10, r11, r12, r13, r14, r15;
--
--static unsigned long expected_rip;
- static int cp_count;
--typedef u64 (*cet_test_func)(void);
--
--cet_test_func func;
-+static unsigned long invalid_offset = 0xffffffffffffff;
- 
- static u64 cet_shstk_func(void)
- {
-@@ -59,77 +51,6 @@ static u64 cet_ibt_func(void)
- 	return 0;
- }
- 
--void test_func(void);
--void test_func(void) {
--	asm volatile (
--			/* IRET into user mode */
--			"pushq %[user_ds]\n\t"
--			"pushq %[user_stack_top]\n\t"
--			"pushfq\n\t"
--			"pushq %[user_cs]\n\t"
--			"lea user_mode(%%rip), %%rax\n\t"
--			"pushq %%rax\n\t"
--			"iretq\n"
--
--			"user_mode:\n\t"
--			"call *%[func]\n\t"
--			::
--			[func]"m"(func),
--			[user_ds]"i"(USER_DS),
--			[user_cs]"i"(USER_CS),
--			[user_stack_top]"r"(user_stack +
--					sizeof(user_stack))
--			: "rax");
--}
--
--#define SAVE_REGS() \
--	asm ("movq %%rbx, %0\t\n"  \
--	     "movq %%rsi, %1\t\n"  \
--	     "movq %%rdi, %2\t\n"  \
--	     "movq %%rsp, %3\t\n"  \
--	     "movq %%rbp, %4\t\n"  \
--	     "movq %%r8, %5\t\n"   \
--	     "movq %%r9, %6\t\n"   \
--	     "movq %%r10, %7\t\n"  \
--	     "movq %%r11, %8\t\n"  \
--	     "movq %%r12, %9\t\n"  \
--	     "movq %%r13, %10\t\n" \
--	     "movq %%r14, %11\t\n" \
--	     "movq %%r15, %12\t\n" :: \
--	     "m"(rbx), "m"(rsi), "m"(rdi), "m"(rsp), "m"(rbp), \
--	     "m"(r8), "m"(r9), "m"(r10),  "m"(r11), "m"(r12),  \
--	     "m"(r13), "m"(r14), "m"(r15));
--
--#define RESTOR_REGS() \
--	asm ("movq %0, %%rbx\t\n"  \
--	     "movq %1, %%rsi\t\n"  \
--	     "movq %2, %%rdi\t\n"  \
--	     "movq %3, %%rsp\t\n"  \
--	     "movq %4, %%rbp\t\n"  \
--	     "movq %5, %%r8\t\n"   \
--	     "movq %6, %%r9\t\n"   \
--	     "movq %7, %%r10\t\n"  \
--	     "movq %8, %%r11\t\n"  \
--	     "movq %9, %%r12\t\n"  \
--	     "movq %10, %%r13\t\n" \
--	     "movq %11, %%r14\t\n" \
--	     "movq %12, %%r15\t\n" ::\
--	     "m"(rbx), "m"(rsi), "m"(rdi), "m"(rsp), "m"(rbp), \
--	     "m"(r8), "m"(r9), "m"(r10), "m"(r11), "m"(r12),   \
--	     "m"(r13), "m"(r14), "m"(r15));
--
--#define RUN_TEST() \
--	do {		\
--		SAVE_REGS();    \
--		asm volatile ("pushq %%rax\t\n"           \
--			      "leaq 1f(%%rip), %%rax\t\n" \
--			      "movq %%rax, %0\t\n"        \
--			      "popq %%rax\t\n"            \
--			      "call test_func\t\n"         \
--			      "1:" ::"m"(expected_rip) : "rax", "rdi"); \
--		RESTOR_REGS(); \
--	} while (0)
--
- #define ENABLE_SHSTK_BIT 0x1
- #define ENABLE_IBT_BIT   0x4
- 
-@@ -138,7 +59,8 @@ static void handle_cp(struct ex_regs *regs)
- 	cp_count++;
- 	printf("In #CP exception handler, error_code = 0x%lx\n",
- 		regs->error_code);
--	asm("jmp *%0" :: "m"(expected_rip));
-+	/* Below jmp is expected to trigger #GP */
-+	asm("jmp %0": :"m"(invalid_offset));
- }
- 
- int main(int ac, char **av)
-@@ -147,6 +69,7 @@ int main(int ac, char **av)
- 	unsigned long shstk_phys;
- 	unsigned long *ptep;
- 	pteval_t pte = 0;
-+	bool rvc;
- 
- 	cp_count = 0;
- 	if (!this_cpu_has(X86_FEATURE_SHSTK)) {
-@@ -160,7 +83,6 @@ int main(int ac, char **av)
- 	}
- 
- 	setup_vm();
--	setup_idt();
- 	handle_exception(21, handle_cp);
- 
- 	/* Allocate one page for shadow-stack. */
-@@ -189,17 +111,15 @@ int main(int ac, char **av)
- 	/* Enable CET master control bit in CR4. */
- 	write_cr4(read_cr4() | X86_CR4_CET);
- 
--	func = cet_shstk_func;
--	RUN_TEST();
-+	printf("Unit test for CET user mode...\n");
-+	run_in_user((usermode_func)cet_shstk_func, GP_VECTOR, 0, 0, 0, 0, &rvc);
- 	report(cp_count == 1, "Completed shadow-stack protection test successfully.");
- 	cp_count = 0;
- 
--	/* Do user-mode indirect-branch-tracking test.*/
--	func = cet_ibt_func;
- 	/* Enable indirect-branch tracking */
- 	wrmsr(MSR_IA32_U_CET, ENABLE_IBT_BIT);
- 
--	RUN_TEST();
-+	run_in_user((usermode_func)cet_ibt_func, GP_VECTOR, 0, 0, 0, 0, &rvc);
- 	report(cp_count == 1, "Completed Indirect-branch tracking test successfully.");
- 
- 	write_cr4(read_cr4() & ~X86_CR4_CET);
 -- 
 2.27.0
 
