@@ -2,232 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 39B114F83FC
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 17:48:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01BEB4F8427
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 17:56:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240573AbiDGPuI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Apr 2022 11:50:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52852 "EHLO
+        id S1345228AbiDGP6K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Apr 2022 11:58:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230001AbiDGPuG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Apr 2022 11:50:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9F4091C932
-        for <kvm@vger.kernel.org>; Thu,  7 Apr 2022 08:48:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649346480;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=stD7Mf+oZU4TLMHPH585+jVy8eCgnF4xtuFUjszATvg=;
-        b=DLBJj1/1Z2rVQ1OHlTmjPhBNNo9Q+MVxPVUg5FvFmeAKB7YKcbHwIlSg1C0xBnD5BTi31N
-        G5ZLIkNP/kYbTdU0ihYkJhFkiXXrULACPHHnfTVf+9vsp30EQwQnwD22Og5F9VgcEJFhlU
-        lLgR5LPxoCPl+S5IvUf0LU/LNhUjNZQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-596-uRQbl0RNOp2JsuVgvNWJCQ-1; Thu, 07 Apr 2022 11:47:57 -0400
-X-MC-Unique: uRQbl0RNOp2JsuVgvNWJCQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 492E738009E5;
-        Thu,  7 Apr 2022 15:47:57 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.40.192.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5922840470E1;
-        Thu,  7 Apr 2022 15:47:55 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86: hyper-v: Avoid writing to TSC page without an active vCPU
-Date:   Thu,  7 Apr 2022 17:47:54 +0200
-Message-Id: <20220407154754.939923-1-vkuznets@redhat.com>
+        with ESMTP id S229955AbiDGP6I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Apr 2022 11:58:08 -0400
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44BF5186C2;
+        Thu,  7 Apr 2022 08:56:08 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id qh7so11710742ejb.11;
+        Thu, 07 Apr 2022 08:56:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=oCLMqmvOfrGHdJ8J/9MpyAUq5T7nSt9PnJCJFfJ9Ovk=;
+        b=Jjdme6TkPQCxRndLVwSWEmXsH+5XV2u2wSD04m/9PtSYUTEIxnH8bdqjxBptswdOsp
+         oxAvvcbc7H2zLtAt21L8MuOwjYBAnen2avSBzWvPbErnOR7m+TYSW/f1cqk46bUbIDg4
+         1at3cXZOxStoj/ryZamYb7saJkKz5YcvF/CRv48rljNPKqMaRI1oxxqmupBYLxNPXaNc
+         IJuIm+Qgy+Lb5sswyGQ1lk//qot5tbLKY6/xS5ku5hIUn0gvQLLoy2BC6bjqmesnnpJ7
+         oWq90Tiq1nEeW+VFKl5p1oTmpme6j01Nrcc1TikdH5tcw9hyb0WAX3Wqmb2SwAcj3k/J
+         pEoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=oCLMqmvOfrGHdJ8J/9MpyAUq5T7nSt9PnJCJFfJ9Ovk=;
+        b=qO9FuAfFWHA/VC9C7Xd7hyqI7J5P0gL54z2YIJKVMzQfVL1D+8nMOMRbMdcDlkLhOX
+         Sx0NLCcucmVJUPjxqrkatO/1JkWLCCPSxW0kjZrq5JAoZa05ZGL3H3rC0/1vkbJ5wD0A
+         As80bfVkGiV2uKYv9ejZyrDU+fEHTgCJDvQ3LnLRizQqxV1w8fTKDUY2CJwQGHD1rxV2
+         OekkWIBnfCdjdiurCRLf2AtXOc8DOxSMXvib78WxoxWTEd9WJQfMgCyMxjcTGg8qZFcW
+         0h9dDcVdaP/nR5rlkm6xyuMGZBe5hSmHvk+0uwayBsY/KTNtNGYUoMEBaYNOcC7ase5z
+         C+dA==
+X-Gm-Message-State: AOAM531iuk4Phab/Jz451uwSmkovuPe07oCSE83RAyMMClQWL2s0B7Jc
+        jP3h5eTNHSUXrEUPg2Wamlk=
+X-Google-Smtp-Source: ABdhPJwmsBMWfmYtE1epMAcbjNmECu4QuUPr2e6Y7Rp+be9nlQcvwEIUjIorCFTMM79og/wYaRSnPg==
+X-Received: by 2002:a17:906:314b:b0:6d6:da31:e545 with SMTP id e11-20020a170906314b00b006d6da31e545mr14619905eje.125.1649346966605;
+        Thu, 07 Apr 2022 08:56:06 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id er22-20020a170907739600b006e7e873ed6csm5228123ejc.53.2022.04.07.08.56.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Apr 2022 08:56:06 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <8e0280ab-c7aa-5d01-a36f-93d0d0d79e25@redhat.com>
+Date:   Thu, 7 Apr 2022 17:56:05 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [RFC PATCH v5 092/104] KVM: TDX: Handle TDX PV HLT hypercall
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <6da55adb2ddb6f287ebd46aad02cfaaac2088415.1646422845.git.isaku.yamahata@intel.com>
+ <282d4cd1-d1f7-663c-a965-af587f77ee5a@redhat.com>
+ <Yk79A4EdiZoVQMsV@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Yk79A4EdiZoVQMsV@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following WARN is triggered from kvm_vm_ioctl_set_clock():
- WARNING: CPU: 10 PID: 579353 at arch/x86/kvm/../../../virt/kvm/kvm_main.c:3161 mark_page_dirty_in_slot+0x6c/0x80 [kvm]
- ...
- CPU: 10 PID: 579353 Comm: qemu-system-x86 Tainted: G        W  O      5.16.0.stable #20
- Hardware name: LENOVO 20UF001CUS/20UF001CUS, BIOS R1CET65W(1.34 ) 06/17/2021
- RIP: 0010:mark_page_dirty_in_slot+0x6c/0x80 [kvm]
- ...
- Call Trace:
-  <TASK>
-  ? kvm_write_guest+0x114/0x120 [kvm]
-  kvm_hv_invalidate_tsc_page+0x9e/0xf0 [kvm]
-  kvm_arch_vm_ioctl+0xa26/0xc50 [kvm]
-  ? schedule+0x4e/0xc0
-  ? __cond_resched+0x1a/0x50
-  ? futex_wait+0x166/0x250
-  ? __send_signal+0x1f1/0x3d0
-  kvm_vm_ioctl+0x747/0xda0 [kvm]
-  ...
+On 4/7/22 17:02, Sean Christopherson wrote:
+> On Thu, Apr 07, 2022, Paolo Bonzini wrote:
+>> On 3/4/22 20:49, isaku.yamahata@intel.com wrote:
+>>> +	bool interrupt_disabled = tdvmcall_p1_read(vcpu);
+>>
+>> Where is R12 documented for TDG.VP.VMCALL<Instruction.HLT>?
+>>
+>>> +		 * Virtual interrupt can arrive after TDG.VM.VMCALL<HLT> during
+>>> +		 * the TDX module executing.  On the other hand, KVM doesn't
+>>> +		 * know if vcpu was executing in the guest TD or the TDX module.
+>>
+>> I don't understand this; why isn't it enough to check PI.ON or something
+>> like that as part of HLT emulation?
+> 
+> Ooh, I think I remember what this is.  This is for the case where the virtual
+> interrupt is recognized, i.e. set in vmcs.RVI, between the STI and "HLT".  KVM
+> doesn't have access to RVI and the interrupt is no longer in the PID (because it
+> was "recognized".  It doesn't get delivered in the guest because the TDCALL
+> completes before interrupts are enabled.
+> 
+> I lobbied to get this fixed in the TDX module by immediately resuming the guest
+> in this case, but obviously that was unsuccessful.
 
-The WARN was introduced by commit 03c0304a86bc ("KVM: Warn if
-mark_page_dirty() is called without an active vCPU") but the change seems
-to be correct (unlike Hyper-V TSC page update mechanism). In fact, there's
-no real need to actually write to guest memory to invalidate TSC page, this
-can be done by the first vCPU which goes through kvm_guest_time_update().
+So the TDX module sets RVI while in an STI interrupt shadow.  So far so 
+good.  Then:
 
-Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/include/asm/kvm_host.h |  4 ++--
- arch/x86/kvm/hyperv.c           | 40 +++++++--------------------------
- arch/x86/kvm/hyperv.h           |  2 +-
- arch/x86/kvm/x86.c              |  7 +++---
- 4 files changed, 14 insertions(+), 39 deletions(-)
+- it receives the HLT TDCALL from the guest.  The interrupt shadow at 
+this point is gone.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 676705ad1e23..3460bcd75bf2 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -979,10 +979,10 @@ enum hv_tsc_page_status {
- 	HV_TSC_PAGE_GUEST_CHANGED,
- 	/* TSC page MSR was written by KVM userspace, update pending */
- 	HV_TSC_PAGE_HOST_CHANGED,
-+	/* TSC page needs to be updated due to internal KVM changes */
-+	HV_TSC_PAGE_KVM_CHANGED,
- 	/* TSC page was properly set up and is currently active  */
- 	HV_TSC_PAGE_SET,
--	/* TSC page is currently being updated and therefore is inactive */
--	HV_TSC_PAGE_UPDATING,
- 	/* TSC page was set up with an inaccessible GPA */
- 	HV_TSC_PAGE_BROKEN,
- };
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 123b677111c5..e235c1d43f83 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1135,11 +1135,13 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
- 	BUILD_BUG_ON(sizeof(tsc_seq) != sizeof(hv->tsc_ref.tsc_sequence));
- 	BUILD_BUG_ON(offsetof(struct ms_hyperv_tsc_page, tsc_sequence) != 0);
- 
-+	mutex_lock(&hv->hv_lock);
-+
- 	if (hv->hv_tsc_page_status == HV_TSC_PAGE_BROKEN ||
-+	    hv->hv_tsc_page_status == HV_TSC_PAGE_SET ||
- 	    hv->hv_tsc_page_status == HV_TSC_PAGE_UNSET)
--		return;
-+		goto out_unlock;
- 
--	mutex_lock(&hv->hv_lock);
- 	if (!(hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE))
- 		goto out_unlock;
- 
-@@ -1201,45 +1203,19 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
- 	mutex_unlock(&hv->hv_lock);
- }
- 
--void kvm_hv_invalidate_tsc_page(struct kvm *kvm)
-+void kvm_hv_request_tsc_page_update(struct kvm *kvm)
- {
- 	struct kvm_hv *hv = to_kvm_hv(kvm);
--	u64 gfn;
--	int idx;
--
--	if (hv->hv_tsc_page_status == HV_TSC_PAGE_BROKEN ||
--	    hv->hv_tsc_page_status == HV_TSC_PAGE_UNSET ||
--	    tsc_page_update_unsafe(hv))
--		return;
- 
- 	mutex_lock(&hv->hv_lock);
- 
--	if (!(hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE))
--		goto out_unlock;
--
--	/* Preserve HV_TSC_PAGE_GUEST_CHANGED/HV_TSC_PAGE_HOST_CHANGED states */
--	if (hv->hv_tsc_page_status == HV_TSC_PAGE_SET)
--		hv->hv_tsc_page_status = HV_TSC_PAGE_UPDATING;
-+	if (hv->hv_tsc_page_status == HV_TSC_PAGE_SET &&
-+	    !tsc_page_update_unsafe(hv))
-+		hv->hv_tsc_page_status = HV_TSC_PAGE_KVM_CHANGED;
- 
--	gfn = hv->hv_tsc_page >> HV_X64_MSR_TSC_REFERENCE_ADDRESS_SHIFT;
--
--	hv->tsc_ref.tsc_sequence = 0;
--
--	/*
--	 * Take the srcu lock as memslots will be accessed to check the gfn
--	 * cache generation against the memslots generation.
--	 */
--	idx = srcu_read_lock(&kvm->srcu);
--	if (kvm_write_guest(kvm, gfn_to_gpa(gfn),
--			    &hv->tsc_ref, sizeof(hv->tsc_ref.tsc_sequence)))
--		hv->hv_tsc_page_status = HV_TSC_PAGE_BROKEN;
--	srcu_read_unlock(&kvm->srcu, idx);
--
--out_unlock:
- 	mutex_unlock(&hv->hv_lock);
- }
- 
--
- static bool hv_check_msr_access(struct kvm_vcpu_hv *hv_vcpu, u32 msr)
- {
- 	if (!hv_vcpu->enforce_cpuid)
-diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
-index e19c00ee9ab3..da2737f2a956 100644
---- a/arch/x86/kvm/hyperv.h
-+++ b/arch/x86/kvm/hyperv.h
-@@ -137,7 +137,7 @@ void kvm_hv_process_stimers(struct kvm_vcpu *vcpu);
- 
- void kvm_hv_setup_tsc_page(struct kvm *kvm,
- 			   struct pvclock_vcpu_time_info *hv_clock);
--void kvm_hv_invalidate_tsc_page(struct kvm *kvm);
-+void kvm_hv_request_tsc_page_update(struct kvm *kvm);
- 
- void kvm_hv_init_vm(struct kvm *kvm);
- void kvm_hv_destroy_vm(struct kvm *kvm);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 7a066cf92692..e9647614dc8c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2904,7 +2904,7 @@ static void kvm_end_pvclock_update(struct kvm *kvm)
- 
- static void kvm_update_masterclock(struct kvm *kvm)
- {
--	kvm_hv_invalidate_tsc_page(kvm);
-+	kvm_hv_request_tsc_page_update(kvm);
- 	kvm_start_pvclock_update(kvm);
- 	pvclock_update_vm_gtod_copy(kvm);
- 	kvm_end_pvclock_update(kvm);
-@@ -3108,8 +3108,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
- 					offsetof(struct compat_vcpu_info, time));
- 	if (vcpu->xen.vcpu_time_info_cache.active)
- 		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_time_info_cache, 0);
--	if (!v->vcpu_idx)
--		kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
-+	kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
- 	return 0;
- }
- 
-@@ -6238,7 +6237,7 @@ static int kvm_vm_ioctl_set_clock(struct kvm *kvm, void __user *argp)
- 	if (data.flags & ~KVM_CLOCK_VALID_FLAGS)
- 		return -EINVAL;
- 
--	kvm_hv_invalidate_tsc_page(kvm);
-+	kvm_hv_request_tsc_page_update(kvm);
- 	kvm_start_pvclock_update(kvm);
- 	pvclock_update_vm_gtod_copy(kvm);
- 
--- 
-2.35.1
+- it knows that there is an interrupt that can be delivered (RVI > PPR 
+&& EFLAGS.IF=1, the other conditions of 29.2.2 don't matter)
 
+- it forwards the HLT TDCALL nevertheless, to a clueless hypervisor that 
+has no way to glean either RVI or PPR?
+
+It's absurd that this be treated as anything but a bug.
+
+
+Until that is fixed, KVM needs to do something like:
+
+- every time a bit is set in PID.PIR, set tdx->buggy_hlt_workaround = 1
+
+- every time TDG.VP.VMCALL<HLT> is received, 
+xchg(&tdx->buggy_hlt_workaround, 0) and return immediately to the guest 
+if it is 1.
+
+Basically an internal version of PID.ON.
+
+>>> +		details.full = td_state_non_arch_read64(
+>>> +			to_tdx(vcpu), TD_VCPU_STATE_DETAILS_NON_ARCH);
+>>
+>> TDX documentation says "the meaning of the field may change with Intel TDX
+>> module version", where is this field documented?  I cannot find any "other
+>> guest state" fields in the TDX documentation.
+> 
+> IMO we should put a stake in the ground and refuse to accept code that consumes
+> "non-architectural" state.  It's all software, having non-architectural APIs is
+> completely ridiculous.
+
+Having them is fine, *using* them to work around undocumented bugs is 
+the ridiculous part.
+
+You didn't answer the other question, which is "Where is R12 documented 
+for TDG.VP.VMCALL<Instruction.HLT>?" though...  Should I be worried? :)
+
+
+Paolo
