@@ -2,110 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E11024F7A78
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 10:53:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B8994F7B02
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 11:07:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243311AbiDGIzt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Apr 2022 04:55:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52952 "EHLO
+        id S238767AbiDGJJs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Apr 2022 05:09:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243294AbiDGIzl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Apr 2022 04:55:41 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A99AF174EA6;
-        Thu,  7 Apr 2022 01:53:41 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2377o8qo019769;
-        Thu, 7 Apr 2022 08:53:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=uyNsE8Ex9YI8S1tXwshKVJTLTCexafBD49QkhLU1s24=;
- b=FIAHZtfeTCueKaFXrFSiIT9mlRhR2N7A9UyZB5RgrAXC+maFHN1717MdP1JqhFOaDibp
- 4+Y2xKI7/hfsiKKVoGCGX6uJC0t0T162ThJkE0Y9zefCIQyEg7zHTZHyDhCUiaIfz6XF
- jCMe41zf57d5Y0xYQsBj7BdgvDfx0SBGvssJQCVNrtt19y5F+9TRk9aCSSRSeNf7M56r
- W3E725XQn1PWg6S8lhDPKeXyziP5whMW23+ig4CAqErOnAgqvf+huPCCiTW0vZaRWTOw
- f0W3EiowdEZxHY8Yffo+8eRLunyL7OiDNkVA3X+HjbtfvUGXWoeOEL0XClWot27ZsroZ 5g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f9uwts6ch-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Apr 2022 08:53:11 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2378ZRZ7031643;
-        Thu, 7 Apr 2022 08:53:11 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f9uwts6br-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Apr 2022 08:53:11 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2378njqQ008880;
-        Thu, 7 Apr 2022 08:53:09 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma05fra.de.ibm.com with ESMTP id 3f6e48qsa8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Apr 2022 08:53:08 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2378r5OY48496960
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 7 Apr 2022 08:53:05 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7A230AE051;
-        Thu,  7 Apr 2022 08:53:05 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 52950AE045;
-        Thu,  7 Apr 2022 08:53:04 +0000 (GMT)
-Received: from sig-9-145-36-59.uk.ibm.com (unknown [9.145.36.59])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  7 Apr 2022 08:53:04 +0000 (GMT)
-Message-ID: <49d40d562dbccdac58597b863c357b32f0798284.camel@linux.ibm.com>
-Subject: Re: [PATCH 1/5] iommu: Replace uses of IOMMU_CAP_CACHE_COHERENCY
- with dev_is_dma_coherent()
-From:   Niklas Schnelle <schnelle@linux.ibm.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>, Christoph Hellwig <hch@lst.de>
-Cc:     Robin Murphy <robin.murphy@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Christian Benvenuti <benve@cisco.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        iommu@lists.linux-foundation.org, Jason Wang <jasowang@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nelson Escobar <neescoba@cisco.com>, netdev@vger.kernel.org,
-        Rob Clark <robdclark@gmail.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        virtualization@lists.linux-foundation.org,
-        Will Deacon <will@kernel.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Date:   Thu, 07 Apr 2022 10:53:03 +0200
-In-Reply-To: <20220406171729.GJ2120790@nvidia.com>
-References: <1-v1-ef02c60ddb76+12ca2-intel_no_snoop_jgg@nvidia.com>
-         <db5a6daa-bfe9-744f-7fc5-d5167858bc3e@arm.com>
-         <20220406142432.GF2120790@nvidia.com> <20220406151823.GG2120790@nvidia.com>
-         <20220406155056.GA30433@lst.de> <20220406160623.GI2120790@nvidia.com>
-         <20220406161031.GA31790@lst.de> <20220406171729.GJ2120790@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: -eI2_i-ijsMVu9WpUqTiTy_ZXGgnAkK_
-X-Proofpoint-GUID: d3-YNui-0WOxSLMzaNCj1z5uxlf9oVYW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-04-06_13,2022-04-06_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
- mlxlogscore=999 lowpriorityscore=0 phishscore=0 priorityscore=1501
- impostorscore=0 suspectscore=0 clxscore=1011 adultscore=0 malwarescore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204070043
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        with ESMTP id S233009AbiDGJJo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Apr 2022 05:09:44 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17212125286;
+        Thu,  7 Apr 2022 02:07:45 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8BC3D61290;
+        Thu,  7 Apr 2022 09:07:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DB64C385A0;
+        Thu,  7 Apr 2022 09:07:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1649322463;
+        bh=bG2TYsDTW3oErumd86KDzrWyIGXSmv5IooSXwDuRV8Q=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=V8JaAGd82J6GTZX3sewHWrZig4x1FaWr6UMSeVXpdjK3RlNopRyu77d0Bnk0jXt93
+         OxrLHkcl3Z+Hprie6CzYH1xlg4rL4QcJK9HlYQUdcCbb2fbrt0IdzzxzBi4dDo1wMv
+         XZStV+ZeMi0ETQ8EUbENiFxZFlYaQxBhd241TteYy/RiAn9WYRtNOLrAISzTVRQ9S+
+         I862CqJVphIfmqanjN98BKsT4sJHe6RKDFIPG9O4xylruI7uqtdgF8p9icaSmtTWlG
+         a6AVdca7IjAoGIMkXmr/HDv2VPbSS7Wo5+cFAqrvIm4OZtG6iSbsfe9rYT3xunYOP8
+         A+COSUbsHNspA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1ncO5x-002QKb-Ab; Thu, 07 Apr 2022 10:07:40 +0100
+Date:   Thu, 07 Apr 2022 10:06:24 +0100
+Message-ID: <87ilrlb6un.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v5 02/10] KVM: arm64: Setup a framework for hypercall bitmap firmware registers
+In-Reply-To: <20220407011605.1966778-3-rananta@google.com>
+References: <20220407011605.1966778-1-rananta@google.com>
+        <20220407011605.1966778-3-rananta@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, drjones@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, catalin.marinas@arm.com, will@kernel.org, pshier@google.com, ricarkol@google.com, oupton@google.com, reijiw@google.com, jingzhangos@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -114,68 +76,419 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-04-06 at 14:17 -0300, Jason Gunthorpe wrote:
-> On Wed, Apr 06, 2022 at 06:10:31PM +0200, Christoph Hellwig wrote:
-> > On Wed, Apr 06, 2022 at 01:06:23PM -0300, Jason Gunthorpe wrote:
-> > > On Wed, Apr 06, 2022 at 05:50:56PM +0200, Christoph Hellwig wrote:
-> > > > On Wed, Apr 06, 2022 at 12:18:23PM -0300, Jason Gunthorpe wrote:
-> > > > > > Oh, I didn't know about device_get_dma_attr()..
-> > > > 
-> > > > Which is completely broken for any non-OF, non-ACPI plaform.
-> > > 
-> > > I saw that, but I spent some time searching and could not find an
-> > > iommu driver that would load independently of OF or ACPI. ie no IOMMU
-> > > platform drivers are created by board files. Things like Intel/AMD
-> > > discover only from ACPI, etc.
-> > 
-> > s390?
-> 
-> Ah, I missed looking in s390, hyperv and virtio.. 
-> 
-> hyperv is not creating iommu_domains, just IRQ remapping
-> 
-> virtio is using OF
-> 
-> And s390 indeed doesn't obviously have OF or ACPI parts..
-> 
-> This seems like it would be consistent with other things:
-> 
-> enum dev_dma_attr device_get_dma_attr(struct device *dev)
-> {
-> 	const struct fwnode_handle *fwnode = dev_fwnode(dev);
-> 	struct acpi_device *adev = to_acpi_device_node(fwnode);
-> 
-> 	if (is_of_node(fwnode)) {
-> 		if (of_dma_is_coherent(to_of_node(fwnode)))
-> 			return DEV_DMA_COHERENT;
-> 		return DEV_DMA_NON_COHERENT;
-> 	} else if (adev) {
-> 		return acpi_get_dma_attr(adev);
-> 	}
-> 
-> 	/* Platform is always DMA coherent */
-> 	if (!IS_ENABLED(CONFIG_ARCH_HAS_SYNC_DMA_FOR_DEVICE) &&
-> 	    !IS_ENABLED(CONFIG_ARCH_HAS_SYNC_DMA_FOR_CPU) &&
-> 	    !IS_ENABLED(CONFIG_ARCH_HAS_SYNC_DMA_FOR_CPU_ALL) &&
-> 	    device_iommu_mapped(dev))
-> 		return DEV_DMA_COHERENT;
-> 	return DEV_DMA_NOT_SUPPORTED;
-> }
-> EXPORT_SYMBOL_GPL(device_get_dma_attr);
-> 
-> ie s390 has no of or acpi but the entire platform is known DMA
-> coherent at config time so allow it. Not sure we need the
-> device_iommu_mapped() or not.
+Hi Raghavendra,
 
-I only took a short look but I think the device_iommu_mapped() call in
-there is wrong. On s390 PCI always goes through IOMMU hardware both
-when using the IOMMU API and when using the DMA API and this hardware
-is always coherent. This is even true for s390 guests in QEMU/KVM and
-under the z/VM hypervisor. As far as I can see device_iommu_mapped()'s
-check for dev->iommu_group would only work while the device is under
-IOMMU API control not DMA API, no?
+On Thu, 07 Apr 2022 02:15:57 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
+> 
+> KVM regularly introduces new hypercall services to the guests without
+> any consent from the userspace. This means, the guests can observe
+> hypercall services in and out as they migrate across various host
+> kernel versions. This could be a major problem if the guest
+> discovered a hypercall, started using it, and after getting migrated
+> to an older kernel realizes that it's no longer available. Depending
+> on how the guest handles the change, there's a potential chance that
+> the guest would just panic.
+> 
+> As a result, there's a need for the userspace to elect the services
+> that it wishes the guest to discover. It can elect these services
+> based on the kernels spread across its (migration) fleet. To remedy
+> this, extend the existing firmware psuedo-registers, such as
 
-Also, while it is true that s390 *hardware* devices are always cache
-coherent there is also the case that SWIOTLB is used for protected
-virtualization and then cache flushing APIs must be used.
+nit: pseudo
 
+> KVM_REG_ARM_PSCI_VERSION, but by creating a new COPROC register space
+> for all the hypercall services available.
+> 
+> These firmware registers are categorized based on the service call
+> owners, but unlike the existing firmware psuedo-registers, they hold
+
+nit: pseudo again
+
+> the features supported in the form of a bitmap.
+> 
+> During the VM initialization, the registers are set to upper-limit of
+> the features supported by the corresponding registers. It's expected
+> that the VMMs discover the features provided by each register via
+> GET_ONE_REG, and writeback the desired values using SET_ONE_REG.
+
+nit: write back
+
+> KVM allows this modification only until the VM has started.
+> 
+> Some of the standard features are not mapped to any bits of the
+> registers. But since they can recreate the original problem of
+> making it available without userspace's consent, they need to
+> be explicitly added to the hvc_func_default_allowed_list[]. Any
+> function-id that's not enabled via the bitmap, or not listed in
+> hvc_func_default_allowed_list[], will be returned as
+> SMCCC_RET_NOT_SUPPORTED to the guest.
+> 
+> Older userspace code can simply ignore the feature and the
+> hypercall services will be exposed unconditionally to the guests,
+> thus ensuring backward compatibility.
+> 
+> In this patch, the framework adds the register only for ARM's standard
+> secure services (owner value 4). Currently, this includes support only
+> for ARM True Random Number Generator (TRNG) service, with bit-0 of the
+> register representing mandatory features of v1.0. Other services are
+> momentarily added in the upcoming patches.
+> 
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  12 ++++
+>  arch/arm64/include/uapi/asm/kvm.h |   9 +++
+>  arch/arm64/kvm/arm.c              |   1 +
+>  arch/arm64/kvm/guest.c            |   8 ++-
+>  arch/arm64/kvm/hypercalls.c       | 102 ++++++++++++++++++++++++++++++
+>  include/kvm/arm_hypercalls.h      |   7 ++
+>  include/kvm/arm_psci.h            |  12 ++++
+>  7 files changed, 149 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index e3b25dc6c367..6e663383d7b4 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -101,6 +101,15 @@ struct kvm_s2_mmu {
+>  struct kvm_arch_memory_slot {
+>  };
+>  
+> +/**
+> + * struct kvm_smccc_features: Descriptor the hypercall services exposed to the guests
+> + *
+> + * @std_bmap: Bitmap of standard secure service calls
+> + */
+> +struct kvm_smccc_features {
+> +	u64 std_bmap;
+
+Consider using 'unsigned long' for bitmaps.
+
+> +};
+> +
+>  struct kvm_arch {
+>  	struct kvm_s2_mmu mmu;
+>  
+> @@ -140,6 +149,9 @@ struct kvm_arch {
+>  
+>  	u8 pfr0_csv2;
+>  	u8 pfr0_csv3;
+> +
+> +	/* Hypercall features firmware registers' descriptor */
+> +	struct kvm_smccc_features smccc_feat;
+>  };
+>  
+>  struct kvm_vcpu_fault_info {
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index c1b6ddc02d2f..56e4bc58a355 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -332,6 +332,15 @@ struct kvm_arm_copy_mte_tags {
+>  #define KVM_ARM64_SVE_VLS_WORDS	\
+>  	((KVM_ARM64_SVE_VQ_MAX - KVM_ARM64_SVE_VQ_MIN) / 64 + 1)
+>  
+> +/* Bitmap feature firmware registers */
+> +#define KVM_REG_ARM_FW_FEAT_BMAP		(0x0016 << KVM_REG_ARM_COPROC_SHIFT)
+> +#define KVM_REG_ARM_FW_FEAT_BMAP_REG(r)		(KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
+> +						KVM_REG_ARM_FW_FEAT_BMAP |	\
+> +						((r) & 0xffff))
+> +
+> +#define KVM_REG_ARM_STD_BMAP			KVM_REG_ARM_FW_FEAT_BMAP_REG(0)
+> +#define KVM_REG_ARM_STD_BIT_TRNG_V1_0		BIT(0)
+
+I'm really in two minds about this. Having one bit per service is easy
+from an implementation perspective, but is also means that this
+disallow fine grained control over which hypercalls are actually
+available. If tomorrow TRNG 1.1 adds a new hypercall and that KVM
+implements both, how does the selection mechanism works? You will
+need a version selector (a la PSCI), which defeats this API somehow
+(and renders the name of the #define invalid).
+
+I wonder if a more correct way to look at this is to enumerate the
+hypercalls themselves (all 5 of them), though coming up with an
+encoding is tricky (RNG32 and RNG64 would clash, for example).
+
+Thoughts?
+
+> +
+>  /* Device Control API: ARM VGIC */
+>  #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
+>  #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS	1
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 523bc934fe2f..a37fadbd617e 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -156,6 +156,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  	kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
+>  
+>  	set_default_spectre(kvm);
+> +	kvm_arm_init_hypercalls(kvm);
+>  
+>  	return ret;
+>  out_free_stage2_pgd:
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 0d5cca56cbda..8c607199cad1 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -756,7 +756,9 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  
+>  	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
+>  	case KVM_REG_ARM_CORE:	return get_core_reg(vcpu, reg);
+> -	case KVM_REG_ARM_FW:	return kvm_arm_get_fw_reg(vcpu, reg);
+> +	case KVM_REG_ARM_FW:
+> +	case KVM_REG_ARM_FW_FEAT_BMAP:
+> +		return kvm_arm_get_fw_reg(vcpu, reg);
+>  	case KVM_REG_ARM64_SVE:	return get_sve_reg(vcpu, reg);
+>  	}
+>  
+> @@ -774,7 +776,9 @@ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  
+>  	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
+>  	case KVM_REG_ARM_CORE:	return set_core_reg(vcpu, reg);
+> -	case KVM_REG_ARM_FW:	return kvm_arm_set_fw_reg(vcpu, reg);
+> +	case KVM_REG_ARM_FW:
+> +	case KVM_REG_ARM_FW_FEAT_BMAP:
+> +		return kvm_arm_set_fw_reg(vcpu, reg);
+>  	case KVM_REG_ARM64_SVE:	return set_sve_reg(vcpu, reg);
+>  	}
+>  
+> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> index fa6d9378d8e7..cf04b5ee5f56 100644
+> --- a/arch/arm64/kvm/hypercalls.c
+> +++ b/arch/arm64/kvm/hypercalls.c
+> @@ -58,6 +58,53 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
+>  	val[3] = lower_32_bits(cycles);
+>  }
+>  
+> +/*
+> + * List of function-ids that are not gated with the bitmapped feature
+> + * firmware registers, and are to be allowed for servicing the call by default.
+> + */
+> +static const u32 hvc_func_default_allowed_list[] = {
+> +	ARM_SMCCC_VERSION_FUNC_ID,
+> +	ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+> +	ARM_SMCCC_HV_PV_TIME_FEATURES,
+> +	ARM_SMCCC_HV_PV_TIME_ST,
+> +	ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID,
+> +	ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID,
+> +	ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
+> +};
+> +
+> +static bool kvm_hvc_call_default_allowed(struct kvm_vcpu *vcpu, u32 func_id)
+> +{
+> +	unsigned int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(hvc_func_default_allowed_list); i++)
+> +		if (func_id == hvc_func_default_allowed_list[i])
+> +			return true;
+
+Huh, this really is ugly. This array is bound to become bigger over
+time, meaning that the average hypercall time is going to increase. At
+the very least, this should be turned into a switch/case statement, as
+the compile is pretty good at building a search tree (better than this
+naive loop, for a start), and we have those everywhere else.
+
+> +
+> +	return kvm_psci_func_id_is_valid(vcpu, func_id);
+> +}
+> +
+> +static bool kvm_arm_fw_reg_feat_enabled(u64 reg_bmap, u64 feat_bit)
+> +{
+> +	return reg_bmap & feat_bit;
+> +}
+
+We really don't need to reimplement test_bit().
+
+> +
+> +static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu, u32 func_id)
+> +{
+> +	struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
+> +
+> +	switch (func_id) {
+> +	case ARM_SMCCC_TRNG_VERSION:
+> +	case ARM_SMCCC_TRNG_FEATURES:
+> +	case ARM_SMCCC_TRNG_GET_UUID:
+> +	case ARM_SMCCC_TRNG_RND32:
+> +	case ARM_SMCCC_TRNG_RND64:
+> +		return kvm_arm_fw_reg_feat_enabled(smccc_feat->std_bmap,
+> +						KVM_REG_ARM_STD_BIT_TRNG_V1_0);
+> +	default:
+> +		return kvm_hvc_call_default_allowed(vcpu, func_id);
+> +	}
+> +}
+> +
+>  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  {
+>  	u32 func_id = smccc_get_function(vcpu);
+> @@ -65,6 +112,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  	u32 feature;
+>  	gpa_t gpa;
+>  
+> +	if (!kvm_hvc_call_allowed(vcpu, func_id))
+> +		goto out;
+> +
+>  	switch (func_id) {
+>  	case ARM_SMCCC_VERSION_FUNC_ID:
+>  		val[0] = ARM_SMCCC_VERSION_1_1;
+> @@ -155,6 +205,7 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  		return kvm_psci_call(vcpu);
+>  	}
+>  
+> +out:
+>  	smccc_set_retval(vcpu, val[0], val[1], val[2], val[3]);
+>  	return 1;
+>  }
+> @@ -164,8 +215,16 @@ static const u64 kvm_arm_fw_reg_ids[] = {
+>  	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1,
+>  	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2,
+>  	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3,
+> +	KVM_REG_ARM_STD_BMAP,
+>  };
+>  
+> +void kvm_arm_init_hypercalls(struct kvm *kvm)
+> +{
+> +	struct kvm_smccc_features *smccc_feat = &kvm->arch.smccc_feat;
+> +
+> +	smccc_feat->std_bmap = KVM_ARM_SMCCC_STD_FEATURES;
+> +}
+> +
+>  int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
+>  {
+>  	return ARRAY_SIZE(kvm_arm_fw_reg_ids);
+> @@ -237,6 +296,7 @@ static int get_kernel_wa_level(u64 regid)
+>  
+>  int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  {
+> +	struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
+>  	void __user *uaddr = (void __user *)(long)reg->addr;
+>  	u64 val;
+>  
+> @@ -249,6 +309,9 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3:
+>  		val = get_kernel_wa_level(reg->id) & KVM_REG_FEATURE_LEVEL_MASK;
+>  		break;
+> +	case KVM_REG_ARM_STD_BMAP:
+> +		val = READ_ONCE(smccc_feat->std_bmap);
+> +		break;
+>  	default:
+>  		return -ENOENT;
+>  	}
+> @@ -259,6 +322,43 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  	return 0;
+>  }
+>  
+> +static int kvm_arm_set_fw_reg_bmap(struct kvm_vcpu *vcpu, u64 reg_id, u64 val)
+> +{
+> +	int ret = 0;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	struct kvm_smccc_features *smccc_feat = &kvm->arch.smccc_feat;
+> +	u64 *fw_reg_bmap, fw_reg_features;
+> +
+> +	switch (reg_id) {
+> +	case KVM_REG_ARM_STD_BMAP:
+> +		fw_reg_bmap = &smccc_feat->std_bmap;
+> +		fw_reg_features = KVM_ARM_SMCCC_STD_FEATURES;
+> +		break;
+> +	default:
+> +		return -ENOENT;
+> +	}
+> +
+> +	/* Check for unsupported bit */
+> +	if (val & ~fw_reg_features)
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&kvm->lock);
+> +
+> +	/*
+> +	 * If the VM (any vCPU) has already started running, return success
+> +	 * if there's no change in the value. Else, return -EBUSY.
+
+No, this should *always* fail if a vcpu has started. Otherwise, you
+start allowing hard to spot races.
+
+> +	 */
+> +	if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags)) {
+> +		ret = *fw_reg_bmap != val ? -EBUSY : 0;
+> +		goto out;
+> +	}
+> +
+> +	WRITE_ONCE(*fw_reg_bmap, val);
+
+I'm not sure what this WRITE_ONCE guards against. Do you expect
+concurrent reads at this stage?
+
+> +out:
+> +	mutex_unlock(&kvm->lock);
+> +	return ret;
+> +}
+> +
+>  int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  {
+>  	void __user *uaddr = (void __user *)(long)reg->addr;
+> @@ -337,6 +437,8 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  			return -EINVAL;
+>  
+>  		return 0;
+> +	case KVM_REG_ARM_STD_BMAP:
+> +		return kvm_arm_set_fw_reg_bmap(vcpu, reg->id, val);
+>  	default:
+>  		return -ENOENT;
+>  	}
+> diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
+> index 5d38628a8d04..fd3ff350ee9d 100644
+> --- a/include/kvm/arm_hypercalls.h
+> +++ b/include/kvm/arm_hypercalls.h
+> @@ -6,6 +6,12 @@
+>  
+>  #include <asm/kvm_emulate.h>
+>  
+> +/* Last valid bits of the bitmapped firmware registers */
+> +#define KVM_REG_ARM_STD_BMAP_BIT_MAX		0
+> +
+> +#define KVM_ARM_SMCCC_STD_FEATURES \
+> +	GENMASK_ULL(KVM_REG_ARM_STD_BMAP_BIT_MAX, 0)
+> +
+>  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
+>  
+>  static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
+> @@ -42,6 +48,7 @@ static inline void smccc_set_retval(struct kvm_vcpu *vcpu,
+>  
+>  struct kvm_one_reg;
+>  
+> +void kvm_arm_init_hypercalls(struct kvm *kvm);
+>  int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu);
+>  int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
+>  int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+> diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
+> index 6e55b9283789..d7a87367de56 100644
+> --- a/include/kvm/arm_psci.h
+> +++ b/include/kvm/arm_psci.h
+> @@ -36,6 +36,18 @@ static inline int kvm_psci_version(struct kvm_vcpu *vcpu)
+>  	return KVM_ARM_PSCI_0_1;
+>  }
+>  
+> +static inline bool kvm_psci_func_id_is_valid(struct kvm_vcpu *vcpu, u32 func_id)
+> +{
+> +	/* PSCI 0.1 doesn't comply with the standard SMCCC */
+> +	if (kvm_psci_version(vcpu) == KVM_ARM_PSCI_0_1)
+> +		return (func_id == KVM_PSCI_FN_CPU_OFF || func_id == KVM_PSCI_FN_CPU_ON);
+> +
+> +	if (ARM_SMCCC_OWNER_NUM(func_id) == ARM_SMCCC_OWNER_STANDARD &&
+> +		ARM_SMCCC_FUNC_NUM(func_id) >= 0 && ARM_SMCCC_FUNC_NUM(func_id) <= 0x1f)
+> +		return true;
+> +
+> +	return false;
+> +}
+
+Why the inline function? Do you expect this to be shared with
+something else? If not, I'd rather you move it into the caller.
+
+>  
+>  int kvm_psci_call(struct kvm_vcpu *vcpu);
+>  
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
