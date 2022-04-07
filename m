@@ -2,44 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B9414F7D91
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 13:07:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8379B4F7D9F
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 13:10:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238195AbiDGLJl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Apr 2022 07:09:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49426 "EHLO
+        id S233784AbiDGLME (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Apr 2022 07:12:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234265AbiDGLJi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Apr 2022 07:09:38 -0400
-X-Greylist: delayed 94491 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 07 Apr 2022 04:07:36 PDT
-Received: from mail.codelabs.ch (mail.codelabs.ch [109.202.192.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5CF75007D;
-        Thu,  7 Apr 2022 04:07:35 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.codelabs.ch (Postfix) with ESMTP id 8AC6B220002;
-        Thu,  7 Apr 2022 13:07:32 +0200 (CEST)
-Received: from mail.codelabs.ch ([127.0.0.1])
-        by localhost (fenrir.codelabs.ch [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id H1ereBzHd7rt; Thu,  7 Apr 2022 13:07:31 +0200 (CEST)
-Received: from skyhawk.codelabs.ch (unknown [IPv6:2a02:168:860f:0:34fa:d8d6:c16a:a546])
-        by mail.codelabs.ch (Postfix) with ESMTPSA id 6A8E3220001;
-        Thu,  7 Apr 2022 13:07:31 +0200 (CEST)
-From:   Reto Buerki <reet@codelabs.ch>
-To:     tglx@linutronix.de, dwmw2@infradead.org
-Cc:     x86@kernel.org, kvm@vger.kernel.org,
-        iommu@lists.linux-foundation.org, joro@8bytes.org,
-        pbonzini@redhat.com, linux-kernel@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, maz@misterjones.org,
-        decui@microsoft.com
-Subject: [PATCH] x86/msi: Fix msi message data shadow struct
-Date:   Thu,  7 Apr 2022 13:06:47 +0200
-Message-Id: <20220407110647.67372-1-reet@codelabs.ch>
-In-Reply-To: <87pmltzwtr.ffs@tglx>
-References: <87pmltzwtr.ffs@tglx>
+        with ESMTP id S244680AbiDGLMB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Apr 2022 07:12:01 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C390D64E8;
+        Thu,  7 Apr 2022 04:09:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1649329793; x=1680865793;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=EQGzKLPkMKM4S+AjnO1qx/YQtzyW0JHeQb2G2zJJxgA=;
+  b=DAUufCwV31fU6M1MrDQHZzhX3+UYl+kKkdv+2OPhTRycEJydlRA9wN7o
+   ziarUu7ao2t06Pyf5+HEzNZKnPzygeqlw7wBKmQxnGTL7LCramO1wVHu5
+   uWUlffYwTkH8LZn5krzQJCehKL0oKsR5agDWwdpWDQ3e+pKBUk2U8K8ji
+   cedfnFS/4EvbWWln4fcqsvAf9oKNJySgjN3lBKA2JI4gqzEJD1DJRYM3P
+   k7pRae0XHnqjCPxKpUMqwoOrcjr5cZOyAeGTUpVnQffMIpS2WtxIZYOF6
+   3bk8SKa4qfk1gWnC5w8PEs0hCdUfNHs7LoXsWrQMiVq81bGdx1MULnzQz
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10309"; a="324455542"
+X-IronPort-AV: E=Sophos;i="5.90,241,1643702400"; 
+   d="scan'208";a="324455542"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2022 04:09:40 -0700
+X-IronPort-AV: E=Sophos;i="5.90,241,1643702400"; 
+   d="scan'208";a="722919033"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.255.28.125]) ([10.255.28.125])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2022 04:09:38 -0700
+Message-ID: <48ab3a81-a353-e6ee-7718-69c260c9ea17@intel.com>
+Date:   Thu, 7 Apr 2022 19:09:36 +0800
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.7.0
+Subject: Re: [RFC PATCH v5 101/104] KVM: TDX: Silently ignore INIT/SIPI
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>, isaku.yamahata@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Jim Mattson <jmattson@google.com>,
+        erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <d0eb8fa53e782a244397168df856f9f904e4d1cd.1646422845.git.isaku.yamahata@intel.com>
+ <efbe06a7-3624-2a5a-c1c4-be86f63951e3@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <efbe06a7-3624-2a5a-c1c4-be86f63951e3@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -47,48 +67,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The x86 MSI message data is 32 bits in total and is either in
-compatibility or remappable format, see Intel Virtualization Technology
-for Directed I/O, section 5.1.2.
+On 4/5/2022 11:48 PM, Paolo Bonzini wrote:
+> On 3/4/22 20:49, isaku.yamahata@intel.com wrote:
+>> +        if (kvm_init_sipi_unsupported(vcpu->kvm))
+>> +            /*
+>> +             * TDX doesn't support INIT.  Ignore INIT event.  In the
+>> +             * case of SIPI, the callback of
+>> +             * vcpu_deliver_sipi_vector ignores it.
+>> +             */
+>>               vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+>> -        else
+>> -            vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
+>> +        else {
+>> +            kvm_vcpu_reset(vcpu, true);
+>> +            if (kvm_vcpu_is_bsp(apic->vcpu))
+>> +                vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+>> +            else
+>> +                vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
+>> +        }
+> 
+> Should you check vcpu->arch.guest_state_protected instead of 
+> special-casing TDX? 
 
-Fixes: 6285aa50736 ("x86/msi: Provide msi message shadow structs")
-Co-developed-by: Adrian-Ken Rueegsegger <ken@codelabs.ch>
-Signed-off-by: Adrian-Ken Rueegsegger <ken@codelabs.ch>
-Signed-off-by: Reto Buerki <reet@codelabs.ch>
----
- arch/x86/include/asm/msi.h | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+We cannot use vcpu->arch.guest_state_protected because TDX supports 
+debug TD, of which the states are not protected.
 
-diff --git a/arch/x86/include/asm/msi.h b/arch/x86/include/asm/msi.h
-index b85147d75626..d71c7e8b738d 100644
---- a/arch/x86/include/asm/msi.h
-+++ b/arch/x86/include/asm/msi.h
-@@ -12,14 +12,17 @@ int pci_msi_prepare(struct irq_domain *domain, struct device *dev, int nvec,
- /* Structs and defines for the X86 specific MSI message format */
- 
- typedef struct x86_msi_data {
--	u32	vector			:  8,
--		delivery_mode		:  3,
--		dest_mode_logical	:  1,
--		reserved		:  2,
--		active_low		:  1,
--		is_level		:  1;
--
--	u32	dmar_subhandle;
-+	union {
-+		struct {
-+			u32	vector			:  8,
-+				delivery_mode		:  3,
-+				dest_mode_logical	:  1,
-+				reserved		:  2,
-+				active_low		:  1,
-+				is_level		:  1;
-+		};
-+		u32	dmar_subhandle;
-+	};
- } __attribute__ ((packed)) arch_msi_msg_data_t;
- #define arch_msi_msg_data	x86_msi_data
- 
--- 
-2.30.2
+At least we need another flag, I think.
+
+> KVM_APIC_INIT is not valid for SEV-ES either, if I 
+> remember correctly.
+> 
+> Paolo
 
