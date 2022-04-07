@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 314D04F7085
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 03:20:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B877E4F7047
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 03:19:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238817AbiDGBVt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 21:21:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32966 "EHLO
+        id S238099AbiDGBUv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 21:20:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240450AbiDGBUA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S240455AbiDGBUA (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 6 Apr 2022 21:20:00 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46266186F96
-        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 18:16:25 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id v11-20020a170902f0cb00b00156b1cc7040so1936784pla.23
-        for <kvm@vger.kernel.org>; Wed, 06 Apr 2022 18:16:25 -0700 (PDT)
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D47A186F9A
+        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 18:16:27 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id w3-20020a17090ac98300b001b8b914e91aso2623517pjt.0
+        for <kvm@vger.kernel.org>; Wed, 06 Apr 2022 18:16:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=fLolZ3MKmXm9X9Q775GuRVN6b96Cj/k4/WgqvJh5/Z8=;
-        b=q59gCp/zo2a1cBFkIw180PfHDuqmYz2AwPh0t1Fyf6sdNy4KRinpK5OwDfZSvcM+0b
-         lf6dQEDd0VwNfv685gw72rd2zdiBuYACJZRhlLGdYP8C4mSPxsH5F7006JTVKzA2ddcj
-         Ok18xjfrMQiB+a/L3vDed4SqMPQCLTpkc9QykDb5Enm4iN73fi7/N4RMBQbTcDWO/fWl
-         m1r2NyEZYDK5Knk6e8vrO/ZQKCpTZ+AzvFZA5pfThr+/3q+YXGCz70FYpyxmZyoo2oQh
-         6to9NoBzAxQQwShlNggKpEHl8jbVF1CN1m+kg4bPLC/7xhW7gPOICV91qg3IL9kQfxPW
-         oeSw==
+        bh=l3viB90yILfzGyCVfXDHThQ+KPiuiXklvJkP4x9pJx8=;
+        b=pMX0GWqtnv0xtofv/q5viC56tCyctBbnFhkFfKPfyZRXMgf3P8Nc0tHvCisnJmHjix
+         EE5zgdWJ0lEhEclvd6YhQvUzxCVpTNZmXtHZoBBSY9fVdIJ3uthhn/S7UuwZfhZrnp0h
+         AYFexL6rtHGiUGZoy/armD9SB06463Av0ouiECQd8Sup69W6rh5mA6UW4KpT15jGPxO7
+         jcp01KmRIhGoza5Ct2mR/7a6ncRK0F4rCsr9qTsjlTuECu4BO6u0jJtHs1Dal49z5rIX
+         J4c+o2QBVTirENC2Cv32zqh9LbiMSw+drfAc49BSrJMxULegTVTZdgfB+W0KnX1R2ShZ
+         k6BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=fLolZ3MKmXm9X9Q775GuRVN6b96Cj/k4/WgqvJh5/Z8=;
-        b=UqV1edBR5Lv8DqjM4eJZLQk0RHre2lRs0/KEKHtx4TNJanRcTENpptITrJ7dflX9kc
-         GZL50bPWULzrk8dazkxYs4mvSJrJvCddeuhHTcgh2jh1f2Kzu86QRLc+tReZu7FWpqA2
-         srR3aXc7Z1lhQGU/WDIUTuuRKgsWTPuJSPefqs1HPzz15l6nYHUr9qm7WPKTwdkr+l+h
-         E6UI2s1U6ZgHkjYy48sbrSWCTaVKqvo9aB//pdStly/BFE8Ovfmu8yPIWlZ+wsGn8WKR
-         Z80QcKhLCt1nsALlHa4/oAlye8qTD+w8WWFMUT41/gpeyWuGL5PxLA5/2SLmsFmT6o7p
-         LBeg==
-X-Gm-Message-State: AOAM5336/mdGo0rrc6DluoslwDcx00OHauwSDCTPQD7cQrDSTKfAAq84
-        IPGmuwlYVWEJKbCgLULjhdpXWZeD4XRz
-X-Google-Smtp-Source: ABdhPJy0ZpdRTX3tsRSr+aW2j/IvL6j5zE1Rg57c7ZwKbKeMN8MezNc6CAIIsHi3+DqorVgb3Iidxu17+2Yf
+        bh=l3viB90yILfzGyCVfXDHThQ+KPiuiXklvJkP4x9pJx8=;
+        b=qnVwCkk4IWrep8DuvGapCHrTbO83a5DW4HavWdGhPkRAEYKiZdhD+x2dlrY/5/t1bh
+         cwdlfB7IOHUWq0e+Ig15iItjSpwOVhjOpP5A7KFXTVHn004xQqRw/xyIkIW2cns6xj9Z
+         WQTE97e3oYvTQi51MFLqKzPWrIqnNAmeXC/P9/ffNCJ3q2xkLVLXyv+LviNrqkc07+Nu
+         xVStyXa2NUMjxBgts9fanZE+feoi+BFesqpuKTaMl5N669CMbQ2X5wMLoZq0DJUer1DT
+         pAa/niP3CyxZD9fg3m+8QpYRWkvB3RFuIH8/AddOKr4cVcVCCJ3iJT2HmaMIhNYiahC1
+         ZwSQ==
+X-Gm-Message-State: AOAM532nMBvkLgcWKmSsgVghxxQvDiIAxmjT+3kttc7pPLD64EfsGH//
+        iGMaLS5Zz++KcMRQlXVtQBbylt9bWTR4
+X-Google-Smtp-Source: ABdhPJwuIzuQaJvJEs4YysK7AXeOeG1uy1Q0LbJveojJNRwQ8i2y/f3Se1x0b/TJshG29bDRh0vnbxanNGsX
 X-Received: from rananta-virt.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
- (user=rananta job=sendgmr) by 2002:a05:6a00:16cd:b0:4e1:366:7ee8 with SMTP id
- l13-20020a056a0016cd00b004e103667ee8mr11573007pfc.9.1649294184732; Wed, 06
- Apr 2022 18:16:24 -0700 (PDT)
-Date:   Thu,  7 Apr 2022 01:16:02 +0000
+ (user=rananta job=sendgmr) by 2002:a63:fb44:0:b0:372:9ec8:745a with SMTP id
+ w4-20020a63fb44000000b003729ec8745amr9224643pgj.551.1649294186534; Wed, 06
+ Apr 2022 18:16:26 -0700 (PDT)
+Date:   Thu,  7 Apr 2022 01:16:03 +0000
 In-Reply-To: <20220407011605.1966778-1-rananta@google.com>
-Message-Id: <20220407011605.1966778-8-rananta@google.com>
+Message-Id: <20220407011605.1966778-9-rananta@google.com>
 Mime-Version: 1.0
 References: <20220407011605.1966778-1-rananta@google.com>
 X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
-Subject: [PATCH v5 07/10] tools: Import ARM SMCCC definitions
+Subject: [PATCH v5 08/10] selftests: KVM: aarch64: Introduce hypercall ABI test
 From:   Raghavendra Rao Ananta <rananta@google.com>
 To:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
         James Morse <james.morse@arm.com>,
@@ -70,222 +70,401 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,UPPERCASE_50_75,
-        URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Import the standard SMCCC definitions from include/linux/arm-smccc.h.
+Introduce a KVM selftest to check the hypercall interface
+for arm64 platforms. The test validates the user-space's
+IOCTL interface to read/write the psuedo-firmware registers
+as well as its effects on the guest upon certain configurations.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- tools/include/linux/arm-smccc.h | 193 ++++++++++++++++++++++++++++++++
- 1 file changed, 193 insertions(+)
- create mode 100644 tools/include/linux/arm-smccc.h
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/hypercalls.c        | 344 ++++++++++++++++++
+ 3 files changed, 346 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/hypercalls.c
 
-diff --git a/tools/include/linux/arm-smccc.h b/tools/include/linux/arm-smccc.h
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index e82b816a6608..7ef52b3b1560 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -2,6 +2,7 @@
+ /aarch64/arch_timer
+ /aarch64/debug-exceptions
+ /aarch64/get-reg-list
++/aarch64/hypercalls
+ /aarch64/psci_test
+ /aarch64/vgic_init
+ /aarch64/vgic_irq
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 2f74f502de65..af4cb88bcf83 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -105,6 +105,7 @@ TEST_GEN_PROGS_x86_64 += system_counter_offset_test
+ TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
+ TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
+ TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
++TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
+ TEST_GEN_PROGS_aarch64 += aarch64/psci_test
+ TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
+ TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
+diff --git a/tools/testing/selftests/kvm/aarch64/hypercalls.c b/tools/testing/selftests/kvm/aarch64/hypercalls.c
 new file mode 100644
-index 000000000000..63ce9bebccd3
+index 000000000000..9941fb75772a
 --- /dev/null
-+++ b/tools/include/linux/arm-smccc.h
-@@ -0,0 +1,193 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (c) 2015, Linaro Limited
-+ */
-+#ifndef __LINUX_ARM_SMCCC_H
-+#define __LINUX_ARM_SMCCC_H
++++ b/tools/testing/selftests/kvm/aarch64/hypercalls.c
+@@ -0,0 +1,344 @@
++// SPDX-License-Identifier: GPL-2.0-only
 +
-+#include <linux/const.h>
-+
-+/*
-+ * This file provides common defines for ARM SMC Calling Convention as
-+ * specified in
-+ * https://developer.arm.com/docs/den0028/latest
++/* hypercalls: Check the ARM64's psuedo-firmware bitmap register interface.
 + *
-+ * This code is up-to-date with version DEN 0028 C
++ * The test validates the basic hypercall functionalities that are exposed
++ * via the psuedo-firmware bitmap register. This includes the registers'
++ * read/write behavior before and after the VM has started, and if the
++ * hypercalls are properly masked or unmasked to the guest when disabled or
++ * enabled from the KVM userspace, respectively.
 + */
 +
-+#define ARM_SMCCC_STD_CALL	        _AC(0,U)
-+#define ARM_SMCCC_FAST_CALL	        _AC(1,U)
-+#define ARM_SMCCC_TYPE_SHIFT		31
++#include <errno.h>
++#include <linux/arm-smccc.h>
++#include <asm/kvm.h>
++#include <kvm_util.h>
 +
-+#define ARM_SMCCC_SMC_32		0
-+#define ARM_SMCCC_SMC_64		1
-+#define ARM_SMCCC_CALL_CONV_SHIFT	30
++#include "processor.h"
 +
-+#define ARM_SMCCC_OWNER_MASK		0x3F
-+#define ARM_SMCCC_OWNER_SHIFT		24
++#define FW_REG_ULIMIT_VAL(max_feat_bit) (GENMASK_ULL(max_feat_bit, 0))
 +
-+#define ARM_SMCCC_FUNC_MASK		0xFFFF
++/* Last valid bits of the bitmapped firmware registers */
++#define KVM_REG_ARM_STD_BMAP_BIT_MAX		0
++#define KVM_REG_ARM_STD_HYP_BMAP_BIT_MAX	0
++#define KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_MAX	1
 +
-+#define ARM_SMCCC_IS_FAST_CALL(smc_val)	\
-+	((smc_val) & (ARM_SMCCC_FAST_CALL << ARM_SMCCC_TYPE_SHIFT))
-+#define ARM_SMCCC_IS_64(smc_val) \
-+	((smc_val) & (ARM_SMCCC_SMC_64 << ARM_SMCCC_CALL_CONV_SHIFT))
-+#define ARM_SMCCC_FUNC_NUM(smc_val)	((smc_val) & ARM_SMCCC_FUNC_MASK)
-+#define ARM_SMCCC_OWNER_NUM(smc_val) \
-+	(((smc_val) >> ARM_SMCCC_OWNER_SHIFT) & ARM_SMCCC_OWNER_MASK)
++struct kvm_fw_reg_info {
++	uint64_t reg;		/* Register definition */
++	uint64_t max_feat_bit;	/* Bit that represents the upper limit of the feature-map */
++};
 +
-+#define ARM_SMCCC_CALL_VAL(type, calling_convention, owner, func_num) \
-+	(((type) << ARM_SMCCC_TYPE_SHIFT) | \
-+	((calling_convention) << ARM_SMCCC_CALL_CONV_SHIFT) | \
-+	(((owner) & ARM_SMCCC_OWNER_MASK) << ARM_SMCCC_OWNER_SHIFT) | \
-+	((func_num) & ARM_SMCCC_FUNC_MASK))
++#define FW_REG_INFO(r, bit_max)			\
++	{					\
++		.reg = r,			\
++		.max_feat_bit = bit_max,	\
++	}
 +
-+#define ARM_SMCCC_OWNER_ARCH		0
-+#define ARM_SMCCC_OWNER_CPU		1
-+#define ARM_SMCCC_OWNER_SIP		2
-+#define ARM_SMCCC_OWNER_OEM		3
-+#define ARM_SMCCC_OWNER_STANDARD	4
-+#define ARM_SMCCC_OWNER_STANDARD_HYP	5
-+#define ARM_SMCCC_OWNER_VENDOR_HYP	6
-+#define ARM_SMCCC_OWNER_TRUSTED_APP	48
-+#define ARM_SMCCC_OWNER_TRUSTED_APP_END	49
-+#define ARM_SMCCC_OWNER_TRUSTED_OS	50
-+#define ARM_SMCCC_OWNER_TRUSTED_OS_END	63
++static const struct kvm_fw_reg_info fw_reg_info[] = {
++	FW_REG_INFO(KVM_REG_ARM_STD_BMAP, KVM_REG_ARM_STD_BMAP_BIT_MAX),
++	FW_REG_INFO(KVM_REG_ARM_STD_HYP_BMAP, KVM_REG_ARM_STD_HYP_BMAP_BIT_MAX),
++	FW_REG_INFO(KVM_REG_ARM_VENDOR_HYP_BMAP, KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_MAX),
++};
 +
-+#define ARM_SMCCC_FUNC_QUERY_CALL_UID  0xff01
++enum test_stage {
++	TEST_STAGE_REG_IFACE,
++	TEST_STAGE_HVC_IFACE_FEAT_DISABLED,
++	TEST_STAGE_HVC_IFACE_FEAT_ENABLED,
++	TEST_STAGE_HVC_IFACE_FALSE_INFO,
++	TEST_STAGE_END,
++};
 +
-+#define ARM_SMCCC_QUIRK_NONE		0
-+#define ARM_SMCCC_QUIRK_QCOM_A6		1 /* Save/restore register a6 */
++static int stage;
 +
-+#define ARM_SMCCC_VERSION_1_0		0x10000
-+#define ARM_SMCCC_VERSION_1_1		0x10001
-+#define ARM_SMCCC_VERSION_1_2		0x10002
-+#define ARM_SMCCC_VERSION_1_3		0x10003
++struct test_hvc_info {
++	uint32_t func_id;
++	int64_t arg0;
++};
 +
-+#define ARM_SMCCC_1_3_SVE_HINT		0x10000
++#define TEST_HVC_INFO(f, a0)	\
++	{			\
++		.func_id = f,	\
++		.arg0 = a0,	\
++	}
 +
-+#define ARM_SMCCC_VERSION_FUNC_ID					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   0, 0)
++static const struct test_hvc_info hvc_info[] = {
++	/* KVM_REG_ARM_STD_BMAP */
++	TEST_HVC_INFO(ARM_SMCCC_TRNG_VERSION, 0),
++	TEST_HVC_INFO(ARM_SMCCC_TRNG_FEATURES, ARM_SMCCC_TRNG_RND64),
++	TEST_HVC_INFO(ARM_SMCCC_TRNG_GET_UUID, 0),
++	TEST_HVC_INFO(ARM_SMCCC_TRNG_RND32, 0),
++	TEST_HVC_INFO(ARM_SMCCC_TRNG_RND64, 0),
 +
-+#define ARM_SMCCC_ARCH_FEATURES_FUNC_ID					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   0, 1)
++	/* KVM_REG_ARM_STD_HYP_BMAP */
++	TEST_HVC_INFO(ARM_SMCCC_ARCH_FEATURES_FUNC_ID, ARM_SMCCC_HV_PV_TIME_FEATURES),
++	TEST_HVC_INFO(ARM_SMCCC_HV_PV_TIME_FEATURES, ARM_SMCCC_HV_PV_TIME_ST),
++	TEST_HVC_INFO(ARM_SMCCC_HV_PV_TIME_ST, 0),
 +
-+#define ARM_SMCCC_ARCH_SOC_ID						\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   0, 2)
++	/* KVM_REG_ARM_VENDOR_HYP_BMAP */
++	TEST_HVC_INFO(ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID,
++			ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID),
++	TEST_HVC_INFO(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID, KVM_PTP_VIRT_COUNTER),
++};
 +
-+#define ARM_SMCCC_ARCH_WORKAROUND_1					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   0, 0x8000)
++/* Feed false hypercall info to test the KVM behavior */
++static const struct test_hvc_info false_hvc_info[] = {
++	/* Feature support check against a different family of hypercalls */
++	TEST_HVC_INFO(ARM_SMCCC_TRNG_FEATURES, ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID),
++	TEST_HVC_INFO(ARM_SMCCC_ARCH_FEATURES_FUNC_ID, ARM_SMCCC_TRNG_RND64),
++	TEST_HVC_INFO(ARM_SMCCC_HV_PV_TIME_FEATURES, ARM_SMCCC_TRNG_RND64),
++};
 +
-+#define ARM_SMCCC_ARCH_WORKAROUND_2					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   0, 0x7fff)
++static void guest_test_hvc(const struct test_hvc_info *hc_info)
++{
++	unsigned int i;
++	struct arm_smccc_res res;
++	unsigned int hvc_info_arr_sz;
 +
-+#define ARM_SMCCC_ARCH_WORKAROUND_3					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   0, 0x3fff)
++	hvc_info_arr_sz =
++	hc_info == hvc_info ? ARRAY_SIZE(hvc_info) : ARRAY_SIZE(false_hvc_info);
 +
-+#define ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID				\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-+			   ARM_SMCCC_FUNC_QUERY_CALL_UID)
++	for (i = 0; i < hvc_info_arr_sz; i++, hc_info++) {
 +
-+/* KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74 */
-+#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
-+#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
-+#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
-+#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
++		memset(&res, 0, sizeof(res));
++		smccc_hvc(hc_info->func_id, hc_info->arg0, 0, 0, 0, 0, 0, 0, &res);
 +
-+/* KVM "vendor specific" services */
-+#define ARM_SMCCC_KVM_FUNC_FEATURES		0
-+#define ARM_SMCCC_KVM_FUNC_PTP			1
-+#define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
-+#define ARM_SMCCC_KVM_NUM_FUNCS			128
++		switch (stage) {
++		case TEST_STAGE_HVC_IFACE_FEAT_DISABLED:
++		case TEST_STAGE_HVC_IFACE_FALSE_INFO:
++			GUEST_ASSERT_3(res.a0 == SMCCC_RET_NOT_SUPPORTED,
++					res.a0, hc_info->func_id, hc_info->arg0);
++			break;
++		case TEST_STAGE_HVC_IFACE_FEAT_ENABLED:
++			GUEST_ASSERT_3(res.a0 != SMCCC_RET_NOT_SUPPORTED,
++					res.a0, hc_info->func_id, hc_info->arg0);
++			break;
++		default:
++			GUEST_ASSERT_1(0, stage);
++		}
++	}
++}
 +
-+#define ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID			\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-+			   ARM_SMCCC_KVM_FUNC_FEATURES)
++static void guest_code(void)
++{
++	while (stage != TEST_STAGE_END) {
++		switch (stage) {
++		case TEST_STAGE_REG_IFACE:
++			break;
++		case TEST_STAGE_HVC_IFACE_FEAT_DISABLED:
++		case TEST_STAGE_HVC_IFACE_FEAT_ENABLED:
++			guest_test_hvc(hvc_info);
++			break;
++		case TEST_STAGE_HVC_IFACE_FALSE_INFO:
++			guest_test_hvc(false_hvc_info);
++			break;
++		default:
++			GUEST_ASSERT_1(0, stage);
++		}
 +
-+#define SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED	1
++		GUEST_SYNC(stage);
++	}
 +
-+/*
-+ * ptp_kvm is a feature used for time sync between vm and host.
-+ * ptp_kvm module in guest kernel will get service from host using
-+ * this hypercall ID.
-+ */
-+#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID				\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-+			   ARM_SMCCC_KVM_FUNC_PTP)
++	GUEST_DONE();
++}
 +
-+/* ptp_kvm counter type ID */
-+#define KVM_PTP_VIRT_COUNTER			0
-+#define KVM_PTP_PHYS_COUNTER			1
++static int set_fw_reg(struct kvm_vm *vm, uint64_t id, uint64_t val)
++{
++	struct kvm_one_reg reg = {
++		.id = id,
++		.addr = (uint64_t)&val,
++	};
 +
-+/* Paravirtualised time calls (defined by ARM DEN0057A) */
-+#define ARM_SMCCC_HV_PV_TIME_FEATURES				\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_64,			\
-+			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
-+			   0x20)
++	return _vcpu_ioctl(vm, 0, KVM_SET_ONE_REG, &reg);
++}
 +
-+#define ARM_SMCCC_HV_PV_TIME_ST					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_64,			\
-+			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
-+			   0x21)
++static void get_fw_reg(struct kvm_vm *vm, uint64_t id, uint64_t *addr)
++{
++	struct kvm_one_reg reg = {
++		.id = id,
++		.addr = (uint64_t)addr,
++	};
 +
-+/* TRNG entropy source calls (defined by ARM DEN0098) */
-+#define ARM_SMCCC_TRNG_VERSION					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_32,			\
-+			   ARM_SMCCC_OWNER_STANDARD,		\
-+			   0x50)
++	vcpu_ioctl(vm, 0, KVM_GET_ONE_REG, &reg);
++}
 +
-+#define ARM_SMCCC_TRNG_FEATURES					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_32,			\
-+			   ARM_SMCCC_OWNER_STANDARD,		\
-+			   0x51)
++struct st_time {
++	uint32_t rev;
++	uint32_t attr;
++	uint64_t st_time;
++};
 +
-+#define ARM_SMCCC_TRNG_GET_UUID					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_32,			\
-+			   ARM_SMCCC_OWNER_STANDARD,		\
-+			   0x52)
++#define STEAL_TIME_SIZE		((sizeof(struct st_time) + 63) & ~63)
++#define ST_GPA_BASE		(1 << 30)
 +
-+#define ARM_SMCCC_TRNG_RND32					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_32,			\
-+			   ARM_SMCCC_OWNER_STANDARD,		\
-+			   0x53)
++static void steal_time_init(struct kvm_vm *vm)
++{
++	uint64_t st_ipa = (ulong)ST_GPA_BASE;
++	unsigned int gpages;
++	struct kvm_device_attr dev = {
++		.group = KVM_ARM_VCPU_PVTIME_CTRL,
++		.attr = KVM_ARM_VCPU_PVTIME_IPA,
++		.addr = (uint64_t)&st_ipa,
++	};
 +
-+#define ARM_SMCCC_TRNG_RND64					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_64,			\
-+			   ARM_SMCCC_OWNER_STANDARD,		\
-+			   0x53)
++	gpages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, STEAL_TIME_SIZE);
++	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, ST_GPA_BASE, 1, gpages, 0);
 +
-+/*
-+ * Return codes defined in ARM DEN 0070A
-+ * ARM DEN 0070A is now merged/consolidated into ARM DEN 0028 C
-+ */
-+#define SMCCC_RET_SUCCESS			0
-+#define SMCCC_RET_NOT_SUPPORTED			-1
-+#define SMCCC_RET_NOT_REQUIRED			-2
-+#define SMCCC_RET_INVALID_PARAMETER		-3
++	vcpu_ioctl(vm, 0, KVM_SET_DEVICE_ATTR, &dev);
++}
 +
-+#endif /*__LINUX_ARM_SMCCC_H*/
++static void test_fw_regs_before_vm_start(struct kvm_vm *vm)
++{
++	uint64_t val;
++	unsigned int i;
++	int ret;
++
++	for (i = 0; i < ARRAY_SIZE(fw_reg_info); i++) {
++		const struct kvm_fw_reg_info *reg_info = &fw_reg_info[i];
++
++		/* First 'read' should be an upper limit of the features supported */
++		get_fw_reg(vm, reg_info->reg, &val);
++		TEST_ASSERT(val == FW_REG_ULIMIT_VAL(reg_info->max_feat_bit),
++			"Expected all the features to be set for reg: 0x%lx; expected: 0x%llx; read: 0x%lx\n",
++			reg_info->reg, GENMASK_ULL(reg_info->max_feat_bit, 0), val);
++
++		/* Test a 'write' by disabling all the features of the register map */
++		ret = set_fw_reg(vm, reg_info->reg, 0);
++		TEST_ASSERT(ret == 0,
++			"Failed to clear all the features of reg: 0x%lx; ret: %d\n",
++			reg_info->reg, errno);
++
++		get_fw_reg(vm, reg_info->reg, &val);
++		TEST_ASSERT(val == 0,
++			"Expected all the features to be cleared for reg: 0x%lx\n", reg_info->reg);
++
++		/*
++		 * Test enabling a feature that's not supported.
++		 * Avoid this check if all the bits are occupied.
++		 */
++		if (reg_info->max_feat_bit < 63) {
++			ret = set_fw_reg(vm, reg_info->reg, BIT(reg_info->max_feat_bit + 1));
++			TEST_ASSERT(ret != 0 && errno == EINVAL,
++			"Unexpected behavior or return value (%d) while setting an unsupported feature for reg: 0x%lx\n",
++			errno, reg_info->reg);
++		}
++	}
++}
++
++static void test_fw_regs_after_vm_start(struct kvm_vm *vm)
++{
++	uint64_t val;
++	unsigned int i;
++	int ret;
++
++	for (i = 0; i < ARRAY_SIZE(fw_reg_info); i++) {
++		const struct kvm_fw_reg_info *reg_info = &fw_reg_info[i];
++
++		/*
++		 * Before starting the VM, the test clears all the bits.
++		 * Check if that's still the case.
++		 */
++		get_fw_reg(vm, reg_info->reg, &val);
++		TEST_ASSERT(val == 0,
++			"Expected all the features to be cleared for reg: 0x%lx\n",
++			reg_info->reg);
++
++		/*
++		 * Test setting the last read value. KVM should allow this
++		 * even if VM has started running.
++		 */
++		ret = set_fw_reg(vm, reg_info->reg, val);
++		TEST_ASSERT(ret == 0,
++			"Failed to set the register with previously read value after Vm start for reg: 0x%lx; ret: %d\n",
++			reg_info->reg, errno);
++
++		/*
++		 * Set all the features for this register again. KVM shouldn't
++		 * allow this as the VM is running.
++		 */
++		ret = set_fw_reg(vm, reg_info->reg, FW_REG_ULIMIT_VAL(reg_info->max_feat_bit));
++		TEST_ASSERT(ret != 0 && errno == EBUSY,
++		"Unexpected behavior or return value (%d) while setting a feature while VM is running for reg: 0x%lx\n",
++		errno, reg_info->reg);
++	}
++}
++
++static struct kvm_vm *test_vm_create(void)
++{
++	struct kvm_vm *vm;
++
++	vm = vm_create_default(0, 0, guest_code);
++
++	ucall_init(vm, NULL);
++	steal_time_init(vm);
++
++	return vm;
++}
++
++static struct kvm_vm *test_guest_stage(struct kvm_vm *vm)
++{
++	struct kvm_vm *ret_vm = vm;
++
++	pr_debug("Stage: %d\n", stage);
++
++	switch (stage) {
++	case TEST_STAGE_REG_IFACE:
++		test_fw_regs_after_vm_start(vm);
++		break;
++	case TEST_STAGE_HVC_IFACE_FEAT_DISABLED:
++		/* Start a new VM so that all the features are now enabled by default */
++		kvm_vm_free(vm);
++		ret_vm = test_vm_create();
++		break;
++	case TEST_STAGE_HVC_IFACE_FEAT_ENABLED:
++	case TEST_STAGE_HVC_IFACE_FALSE_INFO:
++		break;
++	default:
++		TEST_FAIL("Unknown test stage: %d\n", stage);
++	}
++
++	stage++;
++	sync_global_to_guest(vm, stage);
++
++	return ret_vm;
++}
++
++static void test_run(void)
++{
++	struct kvm_vm *vm;
++	struct ucall uc;
++	bool guest_done = false;
++
++	vm = test_vm_create();
++
++	test_fw_regs_before_vm_start(vm);
++
++	while (!guest_done) {
++		vcpu_run(vm, 0);
++
++		switch (get_ucall(vm, 0, &uc)) {
++		case UCALL_SYNC:
++			vm = test_guest_stage(vm);
++			break;
++		case UCALL_DONE:
++			guest_done = true;
++			break;
++		case UCALL_ABORT:
++			TEST_FAIL("%s at %s:%ld\n\tvalues: 0x%lx, 0x%lx; 0x%lx, stage: %u",
++			(const char *)uc.args[0], __FILE__, uc.args[1],
++			uc.args[2], uc.args[3], uc.args[4], stage);
++			break;
++		default:
++			TEST_FAIL("Unexpected guest exit\n");
++		}
++	}
++
++	kvm_vm_free(vm);
++}
++
++int main(void)
++{
++	setbuf(stdout, NULL);
++
++	test_run();
++	return 0;
++}
 -- 
 2.35.1.1094.g7c7d902a7c-goog
 
