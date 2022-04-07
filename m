@@ -2,104 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 701DF4F705C
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 03:19:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D3404F7036
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 03:18:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238372AbiDGBV2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 21:21:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32918 "EHLO
+        id S236626AbiDGBUk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 21:20:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240462AbiDGBUB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 21:20:01 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E1CF182D89
-        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 18:16:30 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id w14-20020a1709027b8e00b0015386056d2bso1965257pll.5
-        for <kvm@vger.kernel.org>; Wed, 06 Apr 2022 18:16:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=bNkFmzFNlQeAcnvu9GC9OTshsJeI+rH6kiFRlwb3YBU=;
-        b=K8Gs9++5sAjjhKmOk+cuBZV91Fgx1F2Mc9/ihaqPTpvvoSDaAbLdCPmuZPTlG68if4
-         P+L4S4dZumJgdSzNaEYVh+GredXixyyYlIw20G4uFBWxPVYkE4B4SKiO/claX7T8fsqZ
-         973YmBn98DfC32Jfkfmhgw6w0dQlXY+5zJIAo0HS7siO1awykxEQcHKvmgE2C7Wulzf+
-         yCe+cXmw+ol7FZCVBquExv//U+Raiq+r8EeVZnh/Gvh67wftRg0AnrEFREcqmr/YtDAx
-         MWqy6tOmw/VyRjst4kEyYRT0NdHa9vj5NDXg6tBeIW1fR0zgikI1q556ZrgXu7cgVb66
-         SJCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=bNkFmzFNlQeAcnvu9GC9OTshsJeI+rH6kiFRlwb3YBU=;
-        b=jtRJg1njh4VQWaPxoOuH76HIYHbB4cJnLmnnMmA+MvdB4Jm65R9TvM4uAOT17bZQD6
-         79nrVKcG4VD+PUXYmssFyivJcnks++8MPMMk5VzDGtoKA/4uKRsFPatn2QukdkQvCBLs
-         p7Euou0w1Z5Mbvh18V3E6O3hMEsSrm4bAnExxz6A0mYk1ZdTIZ4EyartUbWu7b/FemRl
-         AtpxkXdP/aPZzv5VaJmC8Nouk0ngFl4c2gFE+JVPxLBScIfaEg3WjrU2TTvkOTC7pFT+
-         mQfr8UhfOTfaodyrh3QscaQYTOZWt4FaiclkMjwNrifTHGLoAJt5mQwXZMhrqxNMYHDv
-         wYcg==
-X-Gm-Message-State: AOAM531fXUxmOLQKgP/xQgeeQZ7GR6ckzGa58h75U5TxlByuSANNfJjk
-        fdzC5E0ywFM4IWTJMLCaNj1rVzKeTVAO
-X-Google-Smtp-Source: ABdhPJw3H13JfmsLMr/v01PnuQI5IQ6Tom5pq0QlYE+3A76jaQsbAEjlYFdMr4kCXy4hfGM3I3np0WoSyb7z
-X-Received: from rananta-virt.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
- (user=rananta job=sendgmr) by 2002:a17:902:7088:b0:156:1aa9:79eb with SMTP id
- z8-20020a170902708800b001561aa979ebmr11197910plk.71.1649294189989; Wed, 06
- Apr 2022 18:16:29 -0700 (PDT)
-Date:   Thu,  7 Apr 2022 01:16:05 +0000
-In-Reply-To: <20220407011605.1966778-1-rananta@google.com>
-Message-Id: <20220407011605.1966778-11-rananta@google.com>
-Mime-Version: 1.0
-References: <20220407011605.1966778-1-rananta@google.com>
-X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
-Subject: [PATCH v5 10/10] selftests: KVM: aarch64: Add KVM_REG_ARM_FW_REG(3)
- to get-reg-list
-From:   Raghavendra Rao Ananta <rananta@google.com>
-To:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S240527AbiDGBUD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 21:20:03 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13F7EB98;
+        Wed,  6 Apr 2022 18:17:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1649294279; x=1680830279;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=2JbrfSY6uP2wUo1/4/a1W0qsDUA/7Yo093jm6g0+yKI=;
+  b=lzwmhFuyQLK+HOAfj8NPae5JzUBo1sFrAY+KjQIZ3qJyVVzz4XHmqO9d
+   tlKnnGcsG2cpdxvlHh3CvfmpCytHlIXsYCCDS9lmO0QN0vebVRJTSrc1r
+   sD9Z1GHql3NYLW92Inv/CNzDjn1qdL3ZzBDE+DhdcDFgY8Z+/mRRvilE4
+   AZ0CKi0XGWDlSmxOgGIz3kVnIawzLzlZi/ibUbbocVMCabp94eoEK2BSf
+   tkUQt/nzbkmylsPJFQZJbhPLl7idEZ7n5gLbgn9nT6yjqtHhstez9Q949
+   ozRs7ddVUg03iuIUFGb5TUzKWOb/z1hvlRGM6PkMvPb0XOVqo3n07SJSb
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10309"; a="260035421"
+X-IronPort-AV: E=Sophos;i="5.90,241,1643702400"; 
+   d="scan'208";a="260035421"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2022 18:17:58 -0700
+X-IronPort-AV: E=Sophos;i="5.90,241,1643702400"; 
+   d="scan'208";a="722746220"
+Received: from zitianwa-mobl.ccr.corp.intel.com (HELO [10.255.28.125]) ([10.255.28.125])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2022 18:17:54 -0700
+Message-ID: <8aa0cf5b-bfda-bcf8-45f9-dc5113532caa@intel.com>
+Date:   Thu, 7 Apr 2022 09:17:51 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.7.0
+Subject: Re: [RFC PATCH v5 026/104] KVM: TDX: x86: Add vm ioctl to get TDX
+ systemwide parameters
+Content-Language: en-US
+To:     Kai Huang <kai.huang@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, isaku.yamahata@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Jim Mattson <jmattson@google.com>,
+        erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <5ff08ce32be458581afe59caa05d813d0e4a1ef0.1646422845.git.isaku.yamahata@intel.com>
+ <586be87a-4f81-ea43-2078-a6004b4aba08@redhat.com>
+ <17981a2e-03e3-81df-0654-5ccb29f43546@intel.com>
+ <bf3e61bcc2096e72a02f56b70524928e6c3cfa3e.camel@intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <bf3e61bcc2096e72a02f56b70524928e6c3cfa3e.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the register KVM_REG_ARM_FW_REG(3)
-(KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3) to the base_regs[] of
-get-reg-list.
+On 4/7/2022 9:07 AM, Kai Huang wrote:
+> On Wed, 2022-04-06 at 09:54 +0800, Xiaoyao Li wrote:
+>> On 4/5/2022 8:52 PM, Paolo Bonzini wrote:
+>>> On 3/4/22 20:48, isaku.yamahata@intel.com wrote:
+>>>> Implement a VM-scoped subcomment to get system-wide parameters.  Although
+>>>> this is system-wide parameters not per-VM, this subcomand is VM-scoped
+>>>> because
+>>>> - Device model needs TDX system-wide parameters after creating KVM VM.
+>>>> - This subcommands requires to initialize TDX module.  For lazy
+>>>>     initialization of the TDX module, vm-scope ioctl is better.
+>>>
+>>> Since there was agreement to install the TDX module on load, please
+>>> place this ioctl on the /dev/kvm file descriptor.
+>>>
+>>> At least for SEV, there were cases where the system-wide parameters are
+>>> needed outside KVM, so it's better to avoid requiring a VM file descriptor.
+>>
+>> I don't have strong preference on KVM-scope ioctl or VM-scope.
+>>
+>> Initially, we made it KVM-scope and change it to VM-scope in this
+>> version. Yes, it returns the info from TDX module, which doesn't vary
+>> per VM. However, what if we want to return different capabilities
+>> (software controlled capabilities) per VM?
+>>
+> 
+> In this case, you don't return different capabilities, instead, you return the
+> same capabilities but control the capabilities on per-VM basis.
 
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- tools/testing/selftests/kvm/aarch64/get-reg-list.c | 1 +
- 1 file changed, 1 insertion(+)
+yes, so I'm not arguing it or insisting on per-VM.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index 281c08b3fdd2..7049c31aa443 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -691,6 +691,7 @@ static __u64 base_regs[] = {
- 	KVM_REG_ARM_FW_REG(0),
- 	KVM_REG_ARM_FW_REG(1),
- 	KVM_REG_ARM_FW_REG(2),
-+	KVM_REG_ARM_FW_REG(3),
- 	KVM_REG_ARM_FW_FEAT_BMAP_REG(0),	/* KVM_REG_ARM_STD_BMAP */
- 	KVM_REG_ARM_FW_FEAT_BMAP_REG(1),	/* KVM_REG_ARM_STD_HYP_BMAP */
- 	KVM_REG_ARM_FW_FEAT_BMAP_REG(2),	/* KVM_REG_ARM_VENDOR_HYP_BMAP */
--- 
-2.35.1.1094.g7c7d902a7c-goog
+I just speak out my concern since it's user ABI.
+
+>> Part of the TDX capabilities
+>> serves like get_supported_cpuid, making it KVM wide lacks the
+>> flexibility to return differentiated capabilities for different TDs.
+>>
+>>
+>>> Thanks,
+>>>
+>>> Paolo
+>>>
+>>
+> 
 
