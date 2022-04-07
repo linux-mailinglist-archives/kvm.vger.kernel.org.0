@@ -2,59 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 407D74F71B5
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 03:49:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B382A4F71BA
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 03:51:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230441AbiDGBvv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 21:51:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36674 "EHLO
+        id S232084AbiDGBxq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 21:53:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229998AbiDGBvr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 21:51:47 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F6A0171EEA;
-        Wed,  6 Apr 2022 18:49:45 -0700 (PDT)
+        with ESMTP id S229865AbiDGBxn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 21:53:43 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A3C51760CE;
+        Wed,  6 Apr 2022 18:51:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649296187; x=1680832187;
+  t=1649296305; x=1680832305;
   h=message-id:subject:from:to:cc:date:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=WJrLoov+MjDP0lFzu4rpP8BuKdiCEexw6bxW6BUfq9E=;
-  b=Jw0fWuIVJiOM5HqQVQIS0Qp5JBV95emLWYPV+LrNwSvuwTuvP1zOkLb8
-   55uUVa2bzy5kIlydkiQgpozIFaeyfxXTfoPgRTShSvvOyrT5JHtT65uzj
-   jjq4yR5w+DIelrqOr9MIdGSntUMwEifSbGWIQQnWwYBCN8v1fw5aSNlZr
-   XrWyB3L6959CqfF0fYANiDqPNi9k962MPfStnG71NJPb+Yy5rikp8KiZB
-   8K9RCRFo6f/dZDF58Kfbo9YMjGtkh86kZeZL3yoxTb9B9wdjFOQEknkxr
-   5IKQmlAWYv8ljc1uFCXAOhBPEFMrLXG5dqB+E+M35GoZqyxxTz3th/+JR
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10309"; a="286180840"
+  bh=8DtzLU3U8hXDQVnsh7CjvEXB4QGvifxzFkJ+wv29zuU=;
+  b=QR26ioWfJT5ew9sPXA2M7WJn8Uy62KorHKOqXFLtYiKg9qMJ56G0dFbX
+   c6zqZh3QDa3RfNf20BYHkeX1A18bo1ZVB8gJoFIfec4JhzeUqZycDoM+2
+   Iq9L4Qw5P+akM9MxD8bhke5kmWngX+VsU59r0hJsG7uGnpuc+MSxzmCt4
+   ei3G3AV2JrZxJ269ECYffpp19+15janOT0+BOevo8erk8kJPqFIcDIRkc
+   gmIh5mUCL59w0LkmA1WdksdOleeb779ltLHBpudsVJFTUXdLdMjZHOeht
+   dCAHN7l4ndxAz1045Z7RUIPun7ZGAsuRMrnRMK+DdPJOgX4Y60m8aVZt3
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10309"; a="260898870"
 X-IronPort-AV: E=Sophos;i="5.90,241,1643702400"; 
-   d="scan'208";a="286180840"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2022 18:49:45 -0700
+   d="scan'208";a="260898870"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2022 18:51:45 -0700
 X-IronPort-AV: E=Sophos;i="5.90,241,1643702400"; 
-   d="scan'208";a="652619313"
+   d="scan'208";a="524176604"
 Received: from mgailhax-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.55.23])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2022 18:49:43 -0700
-Message-ID: <a975acec7aba5ee383a7112ecd45f51bb2665323.camel@intel.com>
-Subject: Re: [RFC PATCH v5 058/104] KVM: x86/mmu: Focibly use TDP MMU for TDX
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2022 18:51:40 -0700
+Message-ID: <34d773c8d32c8d38033aae7e0fee572d757e242c.camel@intel.com>
+Subject: Re: [RFC PATCH v5 027/104] KVM: TDX: initialize VM with TDX
+ specific parameters
 From:   Kai Huang <kai.huang@intel.com>
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>,
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, isaku.yamahata@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Jim Mattson <jmattson@google.com>,
+        erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>,
         Sean Christopherson <seanjc@google.com>
-Date:   Thu, 07 Apr 2022 13:49:41 +1200
-In-Reply-To: <047e05425ffed2b5de321dba6679cb4d1c388f4e.1646422845.git.isaku.yamahata@intel.com>
+Date:   Thu, 07 Apr 2022 13:51:38 +1200
+In-Reply-To: <a1052ec0-4ea6-d5db-a729-deec08712683@intel.com>
 References: <cover.1646422845.git.isaku.yamahata@intel.com>
-         <047e05425ffed2b5de321dba6679cb4d1c388f4e.1646422845.git.isaku.yamahata@intel.com>
+         <c3b37cf5c83f92be0e153075d81a80729bf1031e.1646422845.git.isaku.yamahata@intel.com>
+         <e392b53a-fbaa-4724-07f4-171424144f70@redhat.com>
+         <a1052ec0-4ea6-d5db-a729-deec08712683@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
         version=3.4.6
@@ -64,44 +67,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-03-04 at 11:49 -0800, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Thu, 2022-04-07 at 09:29 +0800, Xiaoyao Li wrote:
+> On 4/5/2022 8:58 PM, Paolo Bonzini wrote:
+> > On 3/4/22 20:48, isaku.yamahata@intel.com wrote:
+> > > +    td_params->attributes = init_vm->attributes;
+> > > +    if (td_params->attributes & TDX_TD_ATTRIBUTE_PERFMON) {
+> > > +        pr_warn("TD doesn't support perfmon. KVM needs to save/restore "
+> > > +            "host perf registers properly.\n");
+> > > +        return -EOPNOTSUPP;
+> > > +    }
+> > 
+> > Why does KVM have to hardcode this (and LBR/AMX below)?  Is the level of 
+> > hardware support available from tdx_caps, for example through the CPUID 
+> > configs (0xA for this one, 0xD for LBR and AMX)?
 > 
-> At this point, TDX supports TDP MMU and doesn't support legacy MMU.
-> Forcibly use TDP MMU for TDX irrelevant of kernel parameter to disable
-> TDP MMU.
+> It's wrong code. PMU is allowed.
 > 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index b33ace3d4456..9df6aa4da202 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -16,7 +16,12 @@ module_param_named(tdp_mmu, tdp_mmu_enabled, bool, 0644);
->  /* Initializes the TDP MMU for the VM, if enabled. */
->  bool kvm_mmu_init_tdp_mmu(struct kvm *kvm)
->  {
-> -	if (!tdp_enabled || !READ_ONCE(tdp_mmu_enabled))
-> +	/*
-> +	 *  Because TDX supports only TDP MMU, forcibly use TDP MMU in the case
-> +	 *  of TDX.
-> +	 */
-> +	if (kvm->arch.vm_type != KVM_X86_TDX_VM &&
-> +		(!tdp_enabled || !READ_ONCE(tdp_mmu_enabled)))
->  		return false;
->  
->  	/* This should not be changed for the lifetime of the VM. */
+> AMX and LBR are disallowed because and the time we wrote the codes they 
+> are not supported by KVM. Now AMX should be allowed, but (arch-)LBR 
+> should be still blocked until KVM merges arch-LBR support.
 
-Please move this patch forward before introducing any private/shared mapping
-support, otherwise nothing prevents you from creating a TD against legacy MMU,
-which is broken (especially you have allowed userspace to create TD in patch 10
-"KVM: TDX: Make TDX VM type supported").
+I think Isaku's idea is we don't support them in the first submission?
 
--- 
-Thanks,
--Kai
-
+If so as I suggested, we should add a TODO in comment..
 
