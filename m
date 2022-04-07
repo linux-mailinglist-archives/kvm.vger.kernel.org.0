@@ -2,120 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 24C874F7EC2
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 14:12:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F26EC4F7F1F
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 14:34:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238510AbiDGMOg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Apr 2022 08:14:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42318 "EHLO
+        id S245250AbiDGMfz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Apr 2022 08:35:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231755AbiDGMOe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Apr 2022 08:14:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B59F51E95E5
-        for <kvm@vger.kernel.org>; Thu,  7 Apr 2022 05:12:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649333552;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DGcIcM8gJ4Iu3qQi5hlBAso8Rq25Z0euqo8ngas0nfY=;
-        b=QzRiiR3t0pGg9Y9OArnXVw55pTeHjQdL4sEYCq2CZq46B/kXZGP1N6m8FWol45JeQeyjvT
-        adDi3V5rgnrM0KWtF/PXt6yuf3gAwGqXl23zsYj09Txf6ozbAYwHurdHaDwh0ffMQ5MeW7
-        bUE4VO98rFe9lR9Xbr03C47ER5FasAk=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-425-3C2p00QrPIOcbOmwE_owmg-1; Thu, 07 Apr 2022 08:12:31 -0400
-X-MC-Unique: 3C2p00QrPIOcbOmwE_owmg-1
-Received: by mail-ed1-f72.google.com with SMTP id cx4-20020a05640222a400b0041cf617aefdso2576722edb.14
-        for <kvm@vger.kernel.org>; Thu, 07 Apr 2022 05:12:31 -0700 (PDT)
+        with ESMTP id S245232AbiDGMfu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Apr 2022 08:35:50 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1BE615EDE5;
+        Thu,  7 Apr 2022 05:33:49 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id q19so4821160pgm.6;
+        Thu, 07 Apr 2022 05:33:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=oHuMdd+Tso54IS24zoaKEo7ZF3a1oq8FNtueInQMuKg=;
+        b=TP5m84milVRvG/vEdfXwdoGsaBa4DtHBo313pRzo5ALpNwKykawRcbsU4JHBwG928X
+         n5jRakad5YjG9eFkh+7QyNsQRSSkBceUG9GxSLvPM9ydqymcYFGa8t+cT16wAFVYtn5E
+         Tm0FxsfLb3ONv418/WLIsSgHsnwWPtYG1P7XhsyJBo1/YupRo+2Y1caU5ReQn2FTD9KR
+         oEfNV/qbGhraydqt6xDfrmotxOVI99RtQARty2IARenhNTZHIJ1pa2l7r4GamI/2KkDq
+         BmlszCrdY1v32v0rEq223xFv4QRc6SK6IN5w3cwfPHdg+hY2B1LoYIdhmzMBJnKAfFdl
+         yM+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=DGcIcM8gJ4Iu3qQi5hlBAso8Rq25Z0euqo8ngas0nfY=;
-        b=fSS+v244j0TNQvvgc1lBbWCsqIOnigjEqyYO7v1Ux0BcqjsKdkmz55jr8TNvjzoc4P
-         u4UE7tgzIVYk+2YVXPDhRW5c6wkg/EMpTgcPREPSUbR9wrGSCKDrSeOkFwmxTYw0YvHv
-         QYyoSB0dBtbRGQawb6JzfPr4pBpOW1HQTtNvqTO8LfQMborMnfb08RiONKIl1fdlLebv
-         PTjOnTVayjlbvuGE17KDdSubyetg3GSLU5ezo9vy4v/nQYcCSndP2YuT9DC1nEqxGRDx
-         Opv1Pe23qfwuIypcc6BgF7IXiFil4Iihb1Qn+tusXMteILfm8D8pPmfIHM6z9uiRw9NI
-         UmfQ==
-X-Gm-Message-State: AOAM530zzXa2gaPnnWeHSMoIFzTg4eceKZCgPmhOTsxptvCsXXeMlAJQ
-        bwafR8gwmLT1TkBuw/p4UJV8F/6U0mNQb3DlCnxg4XQJnDqGtFngMbFtpcoPXbS5ohskGMLNV5z
-        teTtcdXi167Uq
-X-Received: by 2002:aa7:d311:0:b0:419:443b:6222 with SMTP id p17-20020aa7d311000000b00419443b6222mr13675493edq.161.1649333550543;
-        Thu, 07 Apr 2022 05:12:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxl+xQ1ipUlMGquPKy+T2ZIFLwAwclwboSbty4izLi6yxlztoj7nwo020S5K2gVDdlVcMlaZA==
-X-Received: by 2002:aa7:d311:0:b0:419:443b:6222 with SMTP id p17-20020aa7d311000000b00419443b6222mr13675475edq.161.1649333550365;
-        Thu, 07 Apr 2022 05:12:30 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id k12-20020a170906054c00b006e8289dc23csm1302658eja.9.2022.04.07.05.12.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Apr 2022 05:12:29 -0700 (PDT)
-Message-ID: <f13f2736-626a-267b-db38-70a81872a325@redhat.com>
-Date:   Thu, 7 Apr 2022 14:12:28 +0200
+        bh=oHuMdd+Tso54IS24zoaKEo7ZF3a1oq8FNtueInQMuKg=;
+        b=bIccdu6pTAJ5HDDEqQ7+/rgLHh3QnrqdfxiO3Y/N/NK1QJ5b2gkqozESyw2MmV9tiA
+         g9THaHKl5unMj4+v4WW81AZNcJwTVIl7rHbnvaZpJuz7sahTGKXkLIPRD69En4dQaTjf
+         KeSKFOtU8mwEj29VszgrV14iVsuuFVoMFJBHj22AcSSNygzAgCZuZ7bephPsquCmO60s
+         0wZ+7D6FAVF+/odjKrYo44/K9u8hbvpJIr1dA1QIVHZ37/vCdmEC7i8P+XPPprgPAt2g
+         bvnTDVpSBaTrYijDqLtKsplifmKGFKBGuED8xukbEME/UQ5L2Y584AQGAs+kyUtuhGtm
+         DQhg==
+X-Gm-Message-State: AOAM533NZjxdT+lpEvz7+Ad5PcFqEXLzjZgQTBwKy3Su03twOtJHJfa/
+        y+qRsIOe/4QRi3I/ynQuj6WyIkeqzGzY7vIj
+X-Google-Smtp-Source: ABdhPJxaB7S5JM7L1Nse63e3q13TrwKZX/zgN6E55DEv72DlYwSESD8Cwg7AsnUwV84IfHCk/CWwgQ==
+X-Received: by 2002:a63:7f50:0:b0:386:2b5c:9d16 with SMTP id p16-20020a637f50000000b003862b5c9d16mr11244153pgn.153.1649334829156;
+        Thu, 07 Apr 2022 05:33:49 -0700 (PDT)
+Received: from ubuntu.mate (subs03-180-214-233-65.three.co.id. [180.214.233.65])
+        by smtp.gmail.com with ESMTPSA id nv11-20020a17090b1b4b00b001c71b0bf18bsm9484966pjb.11.2022.04.07.05.33.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Apr 2022 05:33:48 -0700 (PDT)
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+To:     linux-doc@vger.kernel.org
+Cc:     Stephen Rothwell <sfr@canb.auug.org.au>, KVM <kvm@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
+Subject: [PATCH v2] Documentation: kvm: Add missing line break in api.rst
+Date:   Thu,  7 Apr 2022 19:33:27 +0700
+Message-Id: <20220407123327.159079-1-bagasdotme@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [RFC PATCH v5 101/104] KVM: TDX: Silently ignore INIT/SIPI
-Content-Language: en-US
-To:     Xiaoyao Li <xiaoyao.li@intel.com>, isaku.yamahata@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Jim Mattson <jmattson@google.com>,
-        erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-References: <cover.1646422845.git.isaku.yamahata@intel.com>
- <d0eb8fa53e782a244397168df856f9f904e4d1cd.1646422845.git.isaku.yamahata@intel.com>
- <efbe06a7-3624-2a5a-c1c4-be86f63951e3@redhat.com>
- <48ab3a81-a353-e6ee-7718-69c260c9ea17@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <48ab3a81-a353-e6ee-7718-69c260c9ea17@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/7/22 13:09, Xiaoyao Li wrote:
-> On 4/5/2022 11:48 PM, Paolo Bonzini wrote:
->> On 3/4/22 20:49, isaku.yamahata@intel.com wrote:
->>> +        if (kvm_init_sipi_unsupported(vcpu->kvm))
->>> +            /*
->>> +             * TDX doesn't support INIT.  Ignore INIT event.  In the
->>> +             * case of SIPI, the callback of
->>> +             * vcpu_deliver_sipi_vector ignores it.
->>> +             */
->>>               vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
->>> -        else
->>> -            vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
->>> +        else {
->>> +            kvm_vcpu_reset(vcpu, true);
->>> +            if (kvm_vcpu_is_bsp(apic->vcpu))
->>> +                vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
->>> +            else
->>> +                vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
->>> +        }
->>
->> Should you check vcpu->arch.guest_state_protected instead of 
->> special-casing TDX? 
-> 
-> We cannot use vcpu->arch.guest_state_protected because TDX supports 
-> debug TD, of which the states are not protected.
-> 
-> At least we need another flag, I think.
+Add missing line break separator between literal block and description
+of KVM_EXIT_RISCV_SBI.
 
-Let's add .deliver_init to the kvm_x86_ops then.
+This fixes:
+</path/to/linux>/Documentation/virt/kvm/api.rst:6118: WARNING: Literal block ends without a blank line; unexpected unindent.
 
-Paolo
+Fixes: da40d85805937d ("RISC-V: KVM: Document RISC-V specific parts of KVM API")
+Cc: Anup Patel <anup.patel@wdc.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Albert Ou <aou@eecs.berkeley.edu>
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-riscv@lists.infradead.org
+Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+---
+ Changes since v1 [1]:
+   - Rebased on v5.18-rc1
+   - Address Fixes tag problems reported by Stephen Rothwell [2] by
+     removing date and quote the original commit
+
+ [1]: https://lore.kernel.org/linux-doc/20220403065735.23859-1-bagasdotme@gmail.com/
+ [2]: https://lore.kernel.org/linux-next/20220407074844.110f9285@canb.auug.org.au/
+
+ Documentation/virt/kvm/api.rst | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index d13fa66004672c..85c7abc51af521 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6190,6 +6190,7 @@ Valid values for 'type' are:
+ 			unsigned long args[6];
+ 			unsigned long ret[2];
+ 		} riscv_sbi;
++
+ If exit reason is KVM_EXIT_RISCV_SBI then it indicates that the VCPU has
+ done a SBI call which is not handled by KVM RISC-V kernel module. The details
+ of the SBI call are available in 'riscv_sbi' member of kvm_run structure. The
+
+base-commit: 3123109284176b1532874591f7c81f3837bbdc17
+-- 
+An old man doll... just what I always wanted! - Clara
 
