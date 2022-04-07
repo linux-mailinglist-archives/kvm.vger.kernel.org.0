@@ -2,70 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 590C64F6F36
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 02:32:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FDCE4F6F3F
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 02:34:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232424AbiDGAeN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Apr 2022 20:34:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51054 "EHLO
+        id S231976AbiDGAgD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Apr 2022 20:36:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229794AbiDGAeM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Apr 2022 20:34:12 -0400
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92A25C3348
-        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 17:32:14 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id x33so481225lfu.1
-        for <kvm@vger.kernel.org>; Wed, 06 Apr 2022 17:32:14 -0700 (PDT)
+        with ESMTP id S229794AbiDGAgC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Apr 2022 20:36:02 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 027F4BD8B1
+        for <kvm@vger.kernel.org>; Wed,  6 Apr 2022 17:34:05 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id y6so3471052plg.2
+        for <kvm@vger.kernel.org>; Wed, 06 Apr 2022 17:34:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=riJKAE7xRLmvs2ID+ha5y5ZOFJDzvSy2J3viYV2w+mc=;
-        b=q3d1cFnaYkQWAl5xZlUEcFNpvcRNtJ4NEA+fbE2BUQ26uM5N8/qq6GOqiy05lJXyNw
-         4cZk+w5i/glUbhnPtqTRSEsdwDKs3B2q49kEbHstFJY6a5FTAvyR0a9sln5JCPHhoSMP
-         HIydGSf35g3q22OUzg7Kg6bqc04Cv0BnN0BO9+cbw8bxgjb2zSJv/Af2yKisqmSndlAg
-         5eEdO3bR4HWCMpMtYIccWvIE1u69fRi/jzGiCiG5fwXitYXMLjfSOUFP281uE4f9Vxhz
-         pqSZZcORG7HrmEvavccT1ypqwGOgAvIXfzhtpDjF7OynfYH6HE9x8PZlX2x8A+xh1SRf
-         T2aw==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=sL3wuBTw/dwoQlL6RSLgjqdwXx1E82jMdIVhieH2eYI=;
+        b=Uaw2NUiOZa5REByzIVSYeRJPspQ+8GqREi63CaSoCY1lP+4l8zlLUEmN7oz8vTYAer
+         GIwsrOTXQC5IpHvOPqNNmSNfq/Z1BkStZoTeYWHnKmwKWRepSEeci1OhJujgJB8RWFZk
+         p8ofJ8lMklDjKFHc3U3HToj+9/a8W8kCM43bnLGIW36ygLLg8p+aoewV7E3nPsFeUjjA
+         T0OFGQ6/DVT/lAK6a5013sgMfxijFkzbfMOSYkRaLzI+sDqOUaEkXcVdCa9Uru7kUueE
+         uHA7kubLG9uGAivCtfBCl5KHyv6/AFTxRMgklmm6nsJN6SG+foAFFEwYCQ/bYI25oeQg
+         94dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=riJKAE7xRLmvs2ID+ha5y5ZOFJDzvSy2J3viYV2w+mc=;
-        b=rTBaWXDd588ZWj2T64GklmIcd/Vz1D6GZYNfjCAdzf2cBxsp6V1ZgsbK/BNKaCnX/E
-         26Xl1HpfUtIt8rmPx46SvjcBEHTdJE/KijpG0FvUdcjGp8afRZkCnQaFBCYn/pquP85g
-         0RPLJd79Y5IS67F7ASIvsqx4GZId6GdF9YXUtwZeB6RYrkIvGpi+bAr7kVGRXWcq4Jw2
-         9Wg67qpuNq1mvwsSnH6CSYJC+3jUOhc4y09ZaZL8OcIzIYPtokTtoRVnLy+Cyk/n5g2a
-         AkWKAR1s5AQ28lgg0QqJ+1+Db0bnY7h4kdeVBUZc6OygRqSOJL5S3U7IDjHugXZnUT9+
-         9Pjg==
-X-Gm-Message-State: AOAM531jXasKVVGClwrOWFEiatvqLbJlNsBYe3BHsM2CT/eGY8SpYEcZ
-        pVLd2KJ1z5pHYTYnQIaK0MfeevmrxB7qe2PgtjFzeA==
-X-Google-Smtp-Source: ABdhPJwAM8Lu+6GLNp3C1L56HJ0FMQzsMqhZl9udY3/NJBoRCCcMga3mhl50Co9/mGpBS6JAtxOBXFJr7T4SdX39PyM=
-X-Received: by 2002:ac2:510f:0:b0:44a:5ccc:99fb with SMTP id
- q15-20020ac2510f000000b0044a5ccc99fbmr7432556lfb.38.1649291532487; Wed, 06
- Apr 2022 17:32:12 -0700 (PDT)
-MIME-Version: 1.0
-References: <b839fa78-c8ec-7996-dba7-685ea48ca33d@redhat.com>
- <Yh/Y3E4NTfSa4I/g@google.com> <4d4606f4-dbc9-d3a4-929e-0ea07182054c@redhat.com>
- <Yh/nlOXzIhaMLzdk@google.com> <YiAdU+pA/RNeyjRi@google.com>
- <78abcc19-0a79-4f8b-2eaf-c99b96efea42@redhat.com> <YiDps0lOKITPn4gv@google.com>
- <CALMp9eRGNfF0Sb6MTt2ueSmxMmHoF2EgT-0XR=ovteBMy6B2+Q@mail.gmail.com>
- <YiFS241NF6oXaHjf@google.com> <764d42ec-4658-f483-b6cb-03596fa6c819@redhat.com>
- <Yk4vqJ1nT+JxEpKo@google.com> <CAOQ_Qsj6KwV_OjDS-JwOkPs76Z9FiCBVBTGgp-_hZHQ6BAeExg@mail.gmail.com>
-In-Reply-To: <CAOQ_Qsj6KwV_OjDS-JwOkPs76Z9FiCBVBTGgp-_hZHQ6BAeExg@mail.gmail.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Wed, 6 Apr 2022 17:32:01 -0700
-Message-ID: <CAOQ_QsiUtbRYgX5g14wzNzFGNgBeK0uF9ve3GQ1PwBm3bKb+gg@mail.gmail.com>
-Subject: Re: [PATCH v4 1/8] KVM: nVMX: Keep KVM updates to BNDCFGS ctrl bits
- across MSR write
-To:     Sean Christopherson <seanjc@google.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=sL3wuBTw/dwoQlL6RSLgjqdwXx1E82jMdIVhieH2eYI=;
+        b=sW04pmpeUjEsdC8FVUhr82COqHDNNqg3b2qhkgw/+L+slQrPxxHlPnId0lNsSB4a1Y
+         TZWG6yVyR3OH8uNYGsUkR/Fp2s/B2s6GnLMjUdT9qx25ftOqC3TLHi/sMuFbSSU8fr79
+         fXQ4NsY8SVdLyS9Ipzo75qOFwK/akdR9eEchlefdkWNy4XY1yH2j/dr91Lqlt0uvNB2e
+         YsqKTOnwwUb49wZK9KamaHxikDapMNDsnIbG7xaBeWF8TXyFpOLQJOeT0GaWk9gduchs
+         IRDy8tmQ/lVxEow80sik3NdTR5pwrxmXmlTgkbwdn1FVnmPgqmcDNwSg+5PE1zMH7G25
+         uExw==
+X-Gm-Message-State: AOAM533r8ojUsppA7DgPI6AeS0hLvFbNjiD615rTDkUI4R65URhHepiz
+        L4Hm/O9SjBLiM1tB03nUvIfoAg==
+X-Google-Smtp-Source: ABdhPJxFXWG7PxM3SLwqVBVn9J1klEiW5E+6e/XZHrIn9c659Ri+YP3gQ3RV9jUdp9tTyP1y4h6tWw==
+X-Received: by 2002:a17:90b:1c03:b0:1c7:5523:6a27 with SMTP id oc3-20020a17090b1c0300b001c755236a27mr12950777pjb.29.1649291644367;
+        Wed, 06 Apr 2022 17:34:04 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id mu1-20020a17090b388100b001c77e79531bsm6912619pjb.50.2022.04.06.17.34.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Apr 2022 17:34:03 -0700 (PDT)
+Date:   Thu, 7 Apr 2022 00:34:00 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Oliver Upton <oupton@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Joerg Roedel <joro@8bytes.org>,
         David Dunn <daviddunn@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v4 1/8] KVM: nVMX: Keep KVM updates to BNDCFGS ctrl bits
+ across MSR write
+Message-ID: <Yk4xd4hAij3ZQame@google.com>
+References: <4d4606f4-dbc9-d3a4-929e-0ea07182054c@redhat.com>
+ <Yh/nlOXzIhaMLzdk@google.com>
+ <YiAdU+pA/RNeyjRi@google.com>
+ <78abcc19-0a79-4f8b-2eaf-c99b96efea42@redhat.com>
+ <YiDps0lOKITPn4gv@google.com>
+ <CALMp9eRGNfF0Sb6MTt2ueSmxMmHoF2EgT-0XR=ovteBMy6B2+Q@mail.gmail.com>
+ <YiFS241NF6oXaHjf@google.com>
+ <764d42ec-4658-f483-b6cb-03596fa6c819@redhat.com>
+ <Yk4vqJ1nT+JxEpKo@google.com>
+ <CAOQ_Qsj6KwV_OjDS-JwOkPs76Z9FiCBVBTGgp-_hZHQ6BAeExg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOQ_Qsj6KwV_OjDS-JwOkPs76Z9FiCBVBTGgp-_hZHQ6BAeExg@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,10 +84,9 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 6, 2022 at 5:29 PM Oliver Upton <oupton@google.com> wrote:
->
+On Wed, Apr 06, 2022, Oliver Upton wrote:
 > Hey Sean,
->
+> 
 > On Wed, Apr 6, 2022 at 5:26 PM Sean Christopherson <seanjc@google.com> wrote:
 > >
 > > On Fri, Mar 04, 2022, Paolo Bonzini wrote:
@@ -105,15 +111,12 @@ On Wed, Apr 6, 2022 at 5:29 PM Oliver Upton <oupton@google.com> wrote:
 > > Are you still planning on sending a proper patch for this?
 > >
 > > And more importantly, have we shifted your view on this patch/series?
->
+> 
 > Sorry, I should've followed up. If nobody else complains, let's just
 > leave everything as-is and avoid repeating the mistakes of the patches
 > to blame (hey, I authored one of those!)
 
-Well, that is to say we do nothing to plug the half-baked behavior of
-changing MSRs based on CPUID. Quirk the rest of it away if we don't
-want to fudge with these bits any more :)
-
---
-Thanks,
-Oliver
+The problem is that if we leave things as is, someone will inevitably think it's
+the right thing to do and will repeat those mistakes.  I don't see why we wouldn't
+add the quirk, broken userspace gets to keep its broken behavior unless it opts
+into to disabling the quirk.
