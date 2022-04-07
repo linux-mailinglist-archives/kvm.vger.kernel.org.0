@@ -2,120 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FF094F76CC
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 09:07:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F16D4F7735
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 09:18:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233789AbiDGHJq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Apr 2022 03:09:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47678 "EHLO
+        id S233117AbiDGHUv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Apr 2022 03:20:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231248AbiDGHJo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Apr 2022 03:09:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 558291209F
-        for <kvm@vger.kernel.org>; Thu,  7 Apr 2022 00:07:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649315263;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=voufsMIqrDdMDWGVcd+MayfyZfSm1283TLUaIoZ6ZqE=;
-        b=LrFuvdBZl+uO5HCKLDP356yNGAgkWYBqP2f+JliaGjc3es+uLmFWSFdUQXsh5ZrQ7BZBZ0
-        X3Glo8p/1QkKKYXXlFJ7X2jxsSDm0FCRUMUqRwgln/3CGKNWIjU5WAqWnIAGUVd2ty7neg
-        vPVsEy9iTWc7jEBDAofqiGNvdsxGfIU=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-631-dYoCdwITPBC42UIRnEGW-A-1; Thu, 07 Apr 2022 03:07:41 -0400
-X-MC-Unique: dYoCdwITPBC42UIRnEGW-A-1
-Received: by mail-ej1-f70.google.com with SMTP id qf10-20020a1709077f0a00b006e83684b9c6so592677ejc.17
-        for <kvm@vger.kernel.org>; Thu, 07 Apr 2022 00:07:41 -0700 (PDT)
+        with ESMTP id S231144AbiDGHUq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Apr 2022 03:20:46 -0400
+Received: from mail-oa1-x35.google.com (mail-oa1-x35.google.com [IPv6:2001:4860:4864:20::35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D8A618021B
+        for <kvm@vger.kernel.org>; Thu,  7 Apr 2022 00:18:48 -0700 (PDT)
+Received: by mail-oa1-x35.google.com with SMTP id 586e51a60fabf-dacc470e03so5468999fac.5
+        for <kvm@vger.kernel.org>; Thu, 07 Apr 2022 00:18:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=kJgVxXTSGUL5Ml3w5PiaRd14nMB9CIKCrHN3GWr0TqM=;
+        b=oQ1HJeQCQC5n4qCBU2DXCCVkwUX12Rt3xib0qn1D9v+Vr4OJP2gxh2o4gm5R/pGj9f
+         YNvt9HlCxHLgYJLh/EHM6+KGaIBk6MSYamfbSBtIHhzh2goqMEiWIOyyw4DfkwJce0Hf
+         vHhrQk1/hob+b4mYT2BFF+mA5rlDRFuTgF7hB1R7osvQcJpe73AVVzQcFY775BWaLB5Q
+         nknirBp+4Wbc4rtxd9qahyM0e16+x4spXyVW7tKFpn99qWo3K+PS2yb9Y6f0VSnwZW6X
+         hcjv3snZVrQHECdvtqQNfSq1ePlGzIh+xixdGXmaMB4KDihEZhy4A7qyH7i9TOlPMRE/
+         kFzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=voufsMIqrDdMDWGVcd+MayfyZfSm1283TLUaIoZ6ZqE=;
-        b=SNAR+g2eHhTVSedcs5T7AvrdRE6CJalygasVgyr5C3LLd4gMwhaDMUbd2lyRZSOsle
-         qri+t4etDa5EZc1rvTU/y3XFYQnhCDjKT2QrHIzktiTsx7aaiOwdVCl0ahkM1nyq/ZJQ
-         UQQXG9bbS7mF9NAjiIzomlJv1/fJHYRudVMcuhpw0CaqJ2FcoepmfU1EIkqaWOITj9WR
-         FCY8RF5afZxOEc55kHKcnTae5U7mlsG4pbaLFPD3HyFRcIeXHfvt80lRJue8FvMXwb4g
-         QTKOFqhxZkSok/Kajh8YN2ycJDCNiSotGdZtM0Vrq90GbVRmsVVpK6urCkqomd9VlvCz
-         lo0A==
-X-Gm-Message-State: AOAM532nzlZd1//oZA2h2YEv/CikYAQVL7WYtW8jSrQXfR0X9+CcPis6
-        2fxYRb44ZGv3jperbL89kGOdUo9Kc0vXwGOkvkhRIVbiBBRxa7CjpHbW5py5ZBUPGEjIWGpWrcL
-        pKrwe8NxVHI57
-X-Received: by 2002:a05:6402:289f:b0:41c:d9af:ce39 with SMTP id eg31-20020a056402289f00b0041cd9afce39mr13021039edb.415.1649315260691;
-        Thu, 07 Apr 2022 00:07:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxxP9QGmu2kaiH6qWo/P6yz6O6e9dfYGJFWv3nF0OceRbfFHwL9zQDTpaEvdZh23+2eh/Mn9A==
-X-Received: by 2002:a05:6402:289f:b0:41c:d9af:ce39 with SMTP id eg31-20020a056402289f00b0041cd9afce39mr13021023edb.415.1649315260465;
-        Thu, 07 Apr 2022 00:07:40 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id a18-20020a1709063e9200b006e0527baa77sm7341760ejj.92.2022.04.07.00.07.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Apr 2022 00:07:39 -0700 (PDT)
-Message-ID: <02fd5a73-1120-6e43-cc5f-ecef331fcd8a@redhat.com>
-Date:   Thu, 7 Apr 2022 09:07:35 +0200
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=kJgVxXTSGUL5Ml3w5PiaRd14nMB9CIKCrHN3GWr0TqM=;
+        b=3OIXNhR85KIYtQwqItokdd3i4dnssxOzvlIeAtdaER9IwDEy5U/kraab0yxotucSgx
+         EVz5ojhAFdsLGe8hn98D0PsHJr6GluXkHU7DvfbBQ51LhyzJFNN2mYbFgIKQLCtz4cGc
+         P84E8uoQ1F1MpU+++beWuzeBv62OFPo3Ahya2DpHLzton9dv5IXyrM3yHHeRJ4bmO7yY
+         1zHOHA2dBIRZWHeUQuPlIjw6Hyz+yBS2AV+CA/6GWkReTc9c1jqL+0rCF9STLbtV02eY
+         xalU8mpnuC2Fflvq2pPNT71xVQiihPDy1FmorgInJ57TwwSgrWBwunGsh4HYtjHs2t99
+         Aegw==
+X-Gm-Message-State: AOAM5319sfBErbPD8cnWMb8hHpQ5zgtZlZBiB5ER1ctz6/yvlIrJFgIZ
+        VPdEePgwjQCeDegzYXH92AneVgGLuGPLsglnsjTWag==
+X-Google-Smtp-Source: ABdhPJwE5SJa9B0V0BpKDtoeMPTYGxl+ueDIC4EtAGMY2EXeynZBq31t3MsHu4SvzUk6ntBQp+9uCDgpxvmtJSdAuE8=
+X-Received: by 2002:a05:6870:d254:b0:db:12b5:da3 with SMTP id
+ h20-20020a056870d25400b000db12b50da3mr5773981oac.211.1649315927305; Thu, 07
+ Apr 2022 00:18:47 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH] KVM: x86: Deplete Paolo's brown paper bag supply by one
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220406225106.55471-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220406225106.55471-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
-        autolearn_force=no version=3.4.6
+References: <000000000000008dae05dbfebd85@google.com> <7108f263-5cda-d91d-792b-d3f18b63c6d7@redhat.com>
+ <CAKwvOd=-4S1nV=qa3CGNPTAMOv9fGYZsh8hQPXDH1MpowYDX=w@mail.gmail.com>
+In-Reply-To: <CAKwvOd=-4S1nV=qa3CGNPTAMOv9fGYZsh8hQPXDH1MpowYDX=w@mail.gmail.com>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Thu, 7 Apr 2022 09:18:36 +0200
+Message-ID: <CACT4Y+ZB4oBVks7hF5shnW8FDH2c6O6UWoLVtyZ1ccp8AJhmcw@mail.gmail.com>
+Subject: Re: [syzbot] upstream build error (17)
+To:     Nick Desaulniers <ndesaulniers@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Alexander Potapenko <glider@google.com>,
+        Marco Elver <elver@google.com>,
+        syzbot <syzbot+6b36bab98e240873fd5a@syzkaller.appspotmail.com>,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+        mingo@redhat.com, seanjc@google.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/7/22 00:51, Sean Christopherson wrote:
-> Fix an inverted check on CR0.PG when computing the cpu_role, the MMU is
-> direct and all CR4 bits ignored if paging is disabled, not enabled.
-> 
-> Fixes: d73678dc11ec ("KVM: x86/mmu: split cpu_role from mmu_role")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
-> 
-> I haven't done much testing on the rest of the MMU role patches, this just
-> popped up in very, very basic testing ;-)  I assume this will be squashed,
-> hence the snarky shortlog.
+On Wed, 6 Apr 2022 at 20:26, Nick Desaulniers <ndesaulniers@google.com> wrote:
+>
+> On Wed, Apr 6, 2022 at 10:33 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >
+> > On 4/6/22 18:20, syzbot wrote:
+> > > Hello,
+> > >
+> > > syzbot found the following issue on:
+> > >
+> > > HEAD commit:    3e732ebf7316 Merge tag 'for_linus' of git://git.kernel.org..
+> > > git tree:       upstream
+> > > console output: https://syzkaller.appspot.com/x/log.txt?x=10ca0687700000
+> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=eba855fbe3373b4f
+> > > dashboard link: https://syzkaller.appspot.com/bug?extid=6b36bab98e240873fd5a
+> > > compiler:       Debian clang version 13.0.1-++20220126092033+75e33f71c2da-1~exp1~20220126212112.63, GNU ld (GNU Binutils for Debian) 2.35.2
+> > >
+> > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > > Reported-by: syzbot+6b36bab98e240873fd5a@syzkaller.appspotmail.com
+> > >
+> > > arch/x86/kvm/emulate.c:3332:5: error: stack frame size (2552) exceeds limit (2048) in function 'emulator_task_switch' [-Werror,-Wframe-larger-than]
+> > > drivers/block/loop.c:1524:12: error: stack frame size (2648) exceeds limit (2048) in function 'lo_ioctl' [-Werror,-Wframe-larger-than]
+> >
+> > I spot-checked these two and the stack frame is just 144 and 320 bytes
+> > respectively on a normal compile.  This is probably just the effect of
+> > some of the sanitizer options.
+>
+> Yep.
+> $ wget -q https://syzkaller.appspot.com/x/.config\?x\=eba855fbe3373b4f
+> -O - | grep CONFIG_KASAN=y
+> CONFIG_KASAN=y
+> https://github.com/ClangBuiltLinux/linux/issues/39 (our oldest still-open issue)
 
-It certainly got my attention... squashed, thanks. :)
 
-Paolo
+The issue is due to:
 
->   arch/x86/kvm/mmu/mmu.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index e41d7bba7a65..ab24fc161bac 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4699,7 +4699,7 @@ kvm_calc_cpu_role(struct kvm_vcpu *vcpu, const struct kvm_mmu_role_regs *regs)
->   	role.base.smm = is_smm(vcpu);
->   	role.base.guest_mode = is_guest_mode(vcpu);
->   
-> -	if (____is_cr0_pg(regs)) {
-> +	if (!____is_cr0_pg(regs)) {
->   		role.base.direct = 1;
->   		return role;
->   	}
-> 
-> base-commit: 56ba4b488353a8925b30367d72e41d1996c23554
+commit b9080ba4a6ec56447f263082825a4fddb873316b
+Date:   Wed Mar 23 12:21:10 2022 +0100
+    x86/defconfig: Enable WERROR
 
+Marco has disabled it in syzbot configs:
+https://github.com/google/syzkaller/commit/53c67432e69b0df4ff64448b944cbffaecec20f4
+
+#syz invalid
