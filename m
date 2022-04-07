@@ -2,132 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59C224F8217
-	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 16:49:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22EDE4F8219
+	for <lists+kvm@lfdr.de>; Thu,  7 Apr 2022 16:49:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344238AbiDGOtn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Apr 2022 10:49:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43366 "EHLO
+        id S1344244AbiDGOvB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Apr 2022 10:51:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229758AbiDGOtl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Apr 2022 10:49:41 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D501B3DFE;
-        Thu,  7 Apr 2022 07:47:39 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 43689212CA;
-        Thu,  7 Apr 2022 14:47:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1649342858; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mEpOOttjvoUOVasmXAsJpY6Q5iNZbgHNH+XLnQf/mr0=;
-        b=mn3LNRAvq1DPia5c5FhuVf/A2AGoYxSlFq/woldm/j5+8408QUkjCb1rmYaGqfI/hTv+oD
-        e6BAwOJ8bfshnxTA67lerKJ8kIijBQc01D0HPph+lHYRPjBfmpthPdgMdBKmnGlWyGGV67
-        awYGzqweZ/Lv2P2fPvVfVD5Nq8w4WSw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1649342858;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mEpOOttjvoUOVasmXAsJpY6Q5iNZbgHNH+XLnQf/mr0=;
-        b=CtvFw589hGQJBghYO6rW1rTfOAhb69sM87A0i3sS1K3CJVWP1zZfmiBnNsP/Ie5XD+Nme3
-        +f379Iw8YGylT5Cw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3258713485;
-        Thu,  7 Apr 2022 14:47:38 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id f3FBDIr5TmJaXAAAMHmgww
-        (envelope-from <bp@suse.de>); Thu, 07 Apr 2022 14:47:38 +0000
-Date:   Thu, 7 Apr 2022 16:47:36 +0200
-From:   Borislav Petkov <bp@suse.de>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v12 29/46] x86/boot: Add Confidential Computing type to
- setup_data
-Message-ID: <Yk75iF82rMdGHq7W@zn.tnic>
-References: <20220307213356.2797205-1-brijesh.singh@amd.com>
- <20220307213356.2797205-30-brijesh.singh@amd.com>
- <87v8vlzz8x.ffs@tglx>
+        with ESMTP id S229758AbiDGOvA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Apr 2022 10:51:00 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4A1DBD8B1
+        for <kvm@vger.kernel.org>; Thu,  7 Apr 2022 07:48:41 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id e8-20020a17090a118800b001cb13402ea2so1988327pja.0
+        for <kvm@vger.kernel.org>; Thu, 07 Apr 2022 07:48:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=xTAdH7bvajIuFt6h+olEW4JO3CVC81fz3OwWMJAT8VE=;
+        b=DCm5Tc/yyjMbLdElqppH356pwNOj1UjgYHWs8iyAsgdb2oSyHZYCzxV+kxiCxzRtXB
+         5YlQDcRKt07jpmdfkRo0VF2iVjs3+tUrp8ljDDyBYxZvp30e+3ZFONzHa09czmL/IxIW
+         hbIX0LUrA3Vkeqe4RBCNfcrEAd/ljBzCMWJNGFQFZ7jdN75kT5D45LdSQLqG/dimnMh0
+         1neuqsLF7T8cDW8b/QKOrfj6Qm9GthyZh4qwyjlCHWxkn0bmIoZdR8oOG4khhpGw0+Qh
+         OUVN9NcVKBe4ACa9YhCd3+tDgW15zBOsSdEVlsUr4pld2/SpD2euKuragp+l/Zk52p8h
+         s5wQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xTAdH7bvajIuFt6h+olEW4JO3CVC81fz3OwWMJAT8VE=;
+        b=ypigo7Wrm8er67BFT2MfL0XUxab3KnGh0KofvVe9khRLypIZCokY6tmdirdV7lRrLl
+         2QU96AaRyPYUlkjeG1LaJPvUmWDeWLvSOFimGRJgFpWOyVdZ6cn1sLAw5EM6czWeAk0/
+         9GXrD+MrelSrYfJ8P1hx9zMYdx+/lH1qUsYwfi+jB0gIWQoL2iTWHO7kKJQpFgOChyxM
+         IgvuUrAK9jq5dol8zkZJsqx+q1sYaEHL7/YfCqChcTH9Fnyqn4+iy6npytn7A9M/g1O8
+         QNi2egd2FcmHDPVX06i8jL9Ck6KMQRKRpdo27LXZ/WqPhJV/fNG0+lPiNp40h2Nvi9iR
+         kaZw==
+X-Gm-Message-State: AOAM533TosdeT+wsmAGl6OyksV2o5gFqX7BYLSWcO8/pGJAV2FvUJp0q
+        /baKBSAf1K4icAq2o+6jlXSmUg==
+X-Google-Smtp-Source: ABdhPJyksTyJ2T8rwlo6ws0r7KZJUOS4bheICXISshsSc296OQyvPoQDgo6muuyBkRwK4ZNTbQf35g==
+X-Received: by 2002:a17:902:ce82:b0:156:bb3c:3297 with SMTP id f2-20020a170902ce8200b00156bb3c3297mr13889455plg.159.1649342921065;
+        Thu, 07 Apr 2022 07:48:41 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id p4-20020a637404000000b00375948e63d6sm18878717pgc.91.2022.04.07.07.48.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Apr 2022 07:48:40 -0700 (PDT)
+Date:   Thu, 7 Apr 2022 14:48:36 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>
+Subject: Re: [RFC PATCH v5 091/104] KVM: TDX: Handle TDX PV CPUID hypercall
+Message-ID: <Yk75xJjUghPTjTjT@google.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <e3621e9893796d2bd8ea8b1f16c1616ae9df3f37.1646422845.git.isaku.yamahata@intel.com>
+ <adea5393-cbe9-3344-0ef5-461a72321f72@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87v8vlzz8x.ffs@tglx>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <adea5393-cbe9-3344-0ef5-461a72321f72@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 06, 2022 at 11:19:10PM +0200, Thomas Gleixner wrote:
-> On Mon, Mar 07 2022 at 15:33, Brijesh Singh wrote:
-> >  
-> > +/*
-> > + * AMD SEV Confidential computing blob structure. The structure is
-> > + * defined in OVMF UEFI firmware header:
-> > + * https://github.com/tianocore/edk2/blob/master/OvmfPkg/Include/Guid/ConfidentialComputingSevSnpBlob.h
-> > + */
-> > +#define CC_BLOB_SEV_HDR_MAGIC	0x45444d41
-> > +struct cc_blob_sev_info {
-> > +	u32 magic;
-> > +	u16 version;
-> > +	u16 reserved;
-> > +	u64 secrets_phys;
-> > +	u32 secrets_len;
-> > +	u32 rsvd1;
-> > +	u64 cpuid_phys;
-> > +	u32 cpuid_len;
-> > +	u32 rsvd2;
-> > +};
+On Thu, Apr 07, 2022, Paolo Bonzini wrote:
+> On 3/4/22 20:49, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > Wire up TDX PV CPUID hypercall to the KVM backend function.
+> > 
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >   arch/x86/kvm/vmx/tdx.c | 27 +++++++++++++++++++++++++++
+> >   1 file changed, 27 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> > index 53f59fb92dcf..f7c9170d596a 100644
+> > --- a/arch/x86/kvm/vmx/tdx.c
+> > +++ b/arch/x86/kvm/vmx/tdx.c
+> > @@ -893,6 +893,30 @@ static int tdx_emulate_vmcall(struct kvm_vcpu *vcpu)
+> >   	return 1;
+> >   }
+> > +static int tdx_emulate_cpuid(struct kvm_vcpu *vcpu)
+> > +{
+> > +	u32 eax, ebx, ecx, edx;
+> > +
+> > +	/* EAX and ECX for cpuid is stored in R12 and R13. */
+> > +	eax = tdvmcall_p1_read(vcpu);
+> > +	ecx = tdvmcall_p2_read(vcpu);
+> > +
+> > +	kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
+> > +
+> > +	/*
+> > +	 * The returned value for CPUID (EAX, EBX, ECX, and EDX) is stored into
+> > +	 * R12, R13, R14, and R15.
+> > +	 */
+> > +	tdvmcall_p1_write(vcpu, eax);
+> > +	tdvmcall_p2_write(vcpu, ebx);
+> > +	tdvmcall_p3_write(vcpu, ecx);
+> > +	tdvmcall_p4_write(vcpu, edx);
+> > +
+> > +	tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
+> > +
+> > +	return 1;
+> > +}
+> > +
+> >   static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+> >   {
+> >   	struct vcpu_tdx *tdx = to_tdx(vcpu);
+> > @@ -904,6 +928,9 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+> >   		return tdx_emulate_vmcall(vcpu);
+> >   	switch (tdvmcall_exit_reason(vcpu)) {
+> > +	case EXIT_REASON_CPUID:
+> > +		return tdx_emulate_cpuid(vcpu);
+> > +
+
+Spurious whitespace that gets deleted by the HLT patch.
+
+> >   	default:
+> >   		break;
+> >   	}
 > 
-> Shouldn't this be packed?
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> but I don't think tdvmcall_*_{read,write} add much.
 
-Done.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-SUSE Software Solutions Germany GmbH, GF: Ivo Totev, HRB 36809, AG Nürnberg
+They provided a lot more value when the ABI was still in flux, but I still like
+having them.  That said, either the comments about R12..R15 need to go, or the
+wrappers need to go.  Having both is confusing.
