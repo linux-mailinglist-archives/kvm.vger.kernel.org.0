@@ -2,186 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C5FFB4F9B78
-	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 19:17:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A507F4F9BC9
+	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 19:35:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235293AbiDHRT6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 13:19:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50838 "EHLO
+        id S234821AbiDHRhC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 13:37:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232969AbiDHRT4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 13:19:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7B1E6DF1F
-        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 10:17:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649438271;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DVG55BznU4nlgxhVE/x0B/rK4tFuulL7ZDq/n+epMnM=;
-        b=a7WOAViGYMEMJ4gJvB7SGMmFPhUPwZsLZ3n/ndQ0ru3pIiyAog0lWed2Qema9K8Kw6TZuq
-        /cIHtHetdpzfNMLGY8vP59gn3k5ce/HG+K+IHOaR5hpkLJSlKWpPSOugQ88wBP8GUjOd7c
-        78xiajpF11pBvbFadQIQ3bCYImHhk+s=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-553-i-0_RwR5P5azJQUnQBmq9A-1; Fri, 08 Apr 2022 13:17:50 -0400
-X-MC-Unique: i-0_RwR5P5azJQUnQBmq9A-1
-Received: by mail-io1-f71.google.com with SMTP id z23-20020a6b0a17000000b00649f13ea3a7so6103238ioi.23
-        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 10:17:50 -0700 (PDT)
+        with ESMTP id S238224AbiDHRg6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 13:36:58 -0400
+Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48C994C7BE
+        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 10:34:54 -0700 (PDT)
+Received: by mail-yb1-xb2f.google.com with SMTP id f38so16349701ybi.3
+        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 10:34:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Jd42eljeoA7am6iun/EUSb1/8DBUsy7OfKLkpCfQnwI=;
+        b=LCmXkljF/PTt+d5imunqFnne5A0MjGLtTl1xSjGaE0A5FsH+fLknxoJFEWyEWwjgnO
+         /4HSeVhdLNK52NjIYtcP/h0qXSOrEpVM1ysII5gkbbxdG8ideLw0TrAkHoOBPZHeXKus
+         pR1pnrTNIOXO7xPIapV0Hfy2GnHgaRnrhr/wMG1hReEJkvPiChzVc9gzgb7Puz3MRNQm
+         3Cjzu8TaYow5v5QZ/JnvRso6K2M3Uxvgb0yEdEGOV2jEYUdG0tmFsttOJKlVR4P9HgrQ
+         cCZz469HW8rEd5ZXwyQ0P7kgBAUurURAbHxE4ZXbZ9yCYeBKNtze6BsUx4OieqJLGnX4
+         8p0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=DVG55BznU4nlgxhVE/x0B/rK4tFuulL7ZDq/n+epMnM=;
-        b=UAZN+Rqz3+iejTOhPulpJyHbF9HjiotdLkaMuKRiVfJsJ1IP4f7hwkU9EM/MfhT185
-         SoWSd6JeyV8Lu0Za5EihGYUD7S/xTERBagcriqsVQ8D4H8UpONogIYxrB3iTjr0y9e+D
-         d+pEnXIMMixk6KUaJj9KZLHCE7QqJqwncDtaEw/nLxPrCqooZMqpAvkIq3MK6ToKaoR2
-         36jGunZZeowjttYybgDoJKUeSSMk7s95Vz2Th7nwNGerbYsNctrxsoW1zPm5EolsC0ly
-         DjtJ9oJPL1WI9NLgh6sR6D4JNRRYUaeqQmkDIpW7breSpGrYv1BDI2LwPfgaJdgbZtdq
-         O48A==
-X-Gm-Message-State: AOAM532L0qkmy7JP+VNvIOfnEQp11923y+3iBfg8aR9qnHM4VLQasIRH
-        ZPjkl4AE4w77BPZt3Gna857XACzvM2fnCa2GqcKq25GRUcYhqTuEtPCyEbEhCf2dOt4vZUdyvwe
-        Mt01tGQIAEHdi
-X-Received: by 2002:a05:6638:300b:b0:317:a127:53ac with SMTP id r11-20020a056638300b00b00317a12753acmr9530915jak.77.1649438269870;
-        Fri, 08 Apr 2022 10:17:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxrE+UVtdfxBzSGZc0Too2ylUIgfEYbIcjumOCCqN9hKCMg20y84jfEUQGdx5IDQkjY9IODHg==
-X-Received: by 2002:a05:6638:300b:b0:317:a127:53ac with SMTP id r11-20020a056638300b00b00317a12753acmr9530904jak.77.1649438269648;
-        Fri, 08 Apr 2022 10:17:49 -0700 (PDT)
-Received: from redhat.com ([98.55.18.59])
-        by smtp.gmail.com with ESMTPSA id o7-20020a92c047000000b002ca30fcc954sm10598964ilf.36.2022.04.08.10.17.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Apr 2022 10:17:49 -0700 (PDT)
-Date:   Fri, 8 Apr 2022 11:17:47 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH] vfio/pci: Fix vf_token mechanism when device-specific
- VF drivers are used
-Message-ID: <20220408111747.0bb943d4.alex.williamson@redhat.com>
-In-Reply-To: <20220408170839.GA2120790@nvidia.com>
-References: <0-v1-466f18ca49f5+26f-vfio_vf_token_jgg@nvidia.com>
-        <20220408105305.1ee00b44.alex.williamson@redhat.com>
-        <20220408170839.GA2120790@nvidia.com>
-Organization: Red Hat
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Jd42eljeoA7am6iun/EUSb1/8DBUsy7OfKLkpCfQnwI=;
+        b=1gPgHC2rJcCTO3YALuQ0Tt/OiPv4d6zmDB9yENFUiL7xYDzeDnyiL9wZG/XihjNQBh
+         U3Tbqic9ztw4bG6WhCFKVITfpgU8+2K734bmOdsazr55k0vj6wnq7a+BFaW6jz3lQ37o
+         ndaBMtjOG4GsUUnpnCQr0m7hce5unTynkINoBf6UQC3Gtr8JDFDKQLN+xYPtirTuRhzE
+         1h9oW4VNdTK7kGMT1+LTML03GFX/LGBWEELwQAAtHNMWDr9BVxeSjBfmhW6YQ2ymoX4G
+         nyKsnu/lz+fForwvdGSddxNajW+OaumlAgoDOLAfDNtlwe+FemW1Z3MD/76TpDUvfiU7
+         wwdw==
+X-Gm-Message-State: AOAM533wnO8mMwu1wp3e7nvtdysoBpwHeNi6KEVLPyExJAZQFQYd2QhZ
+        QBSwyAY1K0KqpSM6Ia+Qt51W/bLlqgLYyIMYgoAC2Q==
+X-Google-Smtp-Source: ABdhPJyJF/Vu21u1Ybk49qtraB/Ha/OoaBBpU4AzP6a6DQvrKFHEfKt9PFNVhB8Y0En5o6Xn94X9VMasp0/Xh92pKhg=
+X-Received: by 2002:a25:dfc4:0:b0:63d:b28e:93ec with SMTP id
+ w187-20020a25dfc4000000b0063db28e93ecmr15429921ybg.474.1649439293125; Fri, 08
+ Apr 2022 10:34:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220407011605.1966778-1-rananta@google.com> <20220407011605.1966778-3-rananta@google.com>
+ <87ilrlb6un.wl-maz@kernel.org> <CAJHc60yFD=osoifUpB4LBNo93eVq9zNV41bnu7uBZ0HsBGbMeA@mail.gmail.com>
+ <87v8vj1pfl.wl-maz@kernel.org>
+In-Reply-To: <87v8vj1pfl.wl-maz@kernel.org>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Fri, 8 Apr 2022 10:34:42 -0700
+Message-ID: <CAJHc60wwXyC=cgpBHf4XXcpvuN=+HW2hjiOX+NidQ2euRHb-qg@mail.gmail.com>
+Subject: Re: [PATCH v5 02/10] KVM: arm64: Setup a framework for hypercall
+ bitmap firmware registers
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 8 Apr 2022 14:08:39 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Fri, Apr 8, 2022 at 9:59 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Thu, 07 Apr 2022 18:24:14 +0100,
+> Raghavendra Rao Ananta <rananta@google.com> wrote:
+> >
+> > Hi Marc,
+> >
+> > > > +#define KVM_REG_ARM_STD_BIT_TRNG_V1_0                BIT(0)
+> > >
+> > > I'm really in two minds about this. Having one bit per service is easy
+> > > from an implementation perspective, but is also means that this
+> > > disallow fine grained control over which hypercalls are actually
+> > > available. If tomorrow TRNG 1.1 adds a new hypercall and that KVM
+> > > implements both, how does the selection mechanism works? You will
+> > > need a version selector (a la PSCI), which defeats this API somehow
+> > > (and renders the name of the #define invalid).
+> > >
+> > > I wonder if a more correct way to look at this is to enumerate the
+> > > hypercalls themselves (all 5 of them), though coming up with an
+> > > encoding is tricky (RNG32 and RNG64 would clash, for example).
+> > >
+> > > Thoughts?
+> > >
+> > I was on the fence about this too. The TRNG spec (ARM DEN 0098,
+> > Table-4) mentions that v1.0 should have VERSION, FEATURES, GET_UUID,
+> > and RND as mandatory features. Hence, if KVM advertised that it
+> > supports TRNG v1.0, I thought it would be best to expose all or
+> > nothing of v1.0 by guarding them with a single bit.
+> > Broadly, the idea is to have a bit per version. If v1.1 comes along,
+> > we can have another bit for that. If it's not too ugly to implement,
+> > we can be a little more aggressive and ensure that userspace doesn't
+> > enable v1.1 without enabling v1.0.
+>
+> OK, that'd be assuming that we'll never see a service where version A
+> is incompatible with version B and that we have to exclude one or the
+> other. Meh. Let's cross that bridge once it is actually built.
+>
+> [...]
+>
+> > > > +     mutex_lock(&kvm->lock);
+> > > > +
+> > > > +     /*
+> > > > +      * If the VM (any vCPU) has already started running, return success
+> > > > +      * if there's no change in the value. Else, return -EBUSY.
+> > >
+> > > No, this should *always* fail if a vcpu has started. Otherwise, you
+> > > start allowing hard to spot races.
+> > >
+> > The idea came from the fact that userspace could spawn multiple
+> > threads to configure the vCPU registers. Since we don't have the
+> > VM-scoped registers yet, it may be possible that userspace has issued
+> > a KVM_RUN on one of the vCPU, while the others are lagging behind and
+> > still configuring the registers. The slower threads may see -EBUSY and
+> > could panic. But if you feel that it's an overkill and the userspace
+> > should deal with it, we can return EBUSY for all writes after KVM_RUN.
+>
+> I'd rather have that. There already is stuff that rely on things not
+> changing once a vcpu has run, so I'd rather be consistent.
+>
+Sure, I'll return EBUSY if the VM has started regardless of the incoming value.
+> >
+> > > > +      */
+> > > > +     if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags)) {
+> > > > +             ret = *fw_reg_bmap != val ? -EBUSY : 0;
+> > > > +             goto out;
+> > > > +     }
+> > > > +
+> > > > +     WRITE_ONCE(*fw_reg_bmap, val);
+> > >
+> > > I'm not sure what this WRITE_ONCE guards against. Do you expect
+> > > concurrent reads at this stage?
+> > >
+> > Again, the assumption here is that userspace could have multiple
+> > threads reading and writing to these registers. Without the VM scoped
+> > registers in place, we may end up with a read/write to the same memory
+> > location for all the vCPUs.
+>
+> We only have one vcpu updating this at any given time (that's what the
+> lock ensures). A simple write should be OK, as far as I can tell.
+>
+I agree that a write against another write should be fine without the
+WRITE_ONCE. But my little concern was this write against a read
+(unsure how userspace accesses these registers). I'm guessing it
+shouldn't hurt to keep them in place, no? :)
 
-> On Fri, Apr 08, 2022 at 10:53:05AM -0600, Alex Williamson wrote:
-> > On Fri,  8 Apr 2022 12:10:15 -0300
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > get_pf_vdev() tries to check if a PF is a VFIO PF by looking at the driver:
-> > > 
-> > >        if (pci_dev_driver(physfn) != pci_dev_driver(vdev->pdev)) {
-> > > 
-> > > However now that we have multiple VF and PF drivers this is no longer
-> > > reliable.
-> > > 
-> > > This means that security tests realted to vf_token can be skipped by
-> > > mixing and matching different VFIO PCI drivers.
-> > > 
-> > > Instead of trying to use the driver core to find the PF devices maintain a
-> > > linked list of all PF vfio_pci_core_device's that we have called
-> > > pci_enable_sriov() on.
-> > > 
-> > > When registering a VF just search the list to see if the PF is present and
-> > > record the match permanently in the struct. PCI core locking prevents a PF
-> > > from passing pci_disable_sriov() while VF drivers are attached so the VFIO
-> > > owned PF becomes a static property of the VF.
-> > > 
-> > > In common cases where vfio does not own the PF the global list remains
-> > > empty and the VF's pointer is statically NULL.
-> > > 
-> > > This also fixes a lockdep splat from recursive locking of the
-> > > vfio_group::device_lock between vfio_device_get_from_name() and
-> > > vfio_device_get_from_dev(). If the VF and PF share the same group this
-> > > would deadlock.
-> > > 
-> > > Fixes: ff53edf6d6ab ("vfio/pci: Split the pci_driver code out of vfio_pci_core.c")
-> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > >  drivers/vfio/pci/vfio_pci_core.c | 109 ++++++++++++++++---------------
-> > >  include/linux/vfio_pci_core.h    |   2 +
-> > >  2 files changed, 60 insertions(+), 51 deletions(-)
-> > > 
-> > > This is probably for the rc cycle since it only became a problem when the
-> > > migration drivers were merged.  
-> > ...    
-> > > @@ -1942,14 +1935,28 @@ int vfio_pci_core_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
-> > >  	if (!device)
-> > >  		return -ENODEV;
-> > >  
-> > > -	if (nr_virtfn == 0)
-> > > -		pci_disable_sriov(pdev);
-> > > -	else
-> > > +	vdev = container_of(device, struct vfio_pci_core_device, vdev);
-> > > +
-> > > +	if (nr_virtfn) {
-> > > +		mutex_lock(&vfio_pci_sriov_pfs_mutex);
-> > > +		list_add_tail(&vdev->sriov_pfs_item, &vfio_pci_sriov_pfs);
-> > > +		mutex_unlock(&vfio_pci_sriov_pfs_mutex);
-> > >  		ret = pci_enable_sriov(pdev, nr_virtfn);
-> > > +		if (ret)
-> > > +			goto out_del;
-> > > +		ret = nr_virtfn;
-> > > +		goto out_put;
-> > > +	}  
-> > 
-> > If a user were to do:
-> > 
-> > 	# echo 1 > sriov_numvfs
-> > 	# echo 2 > sriov_numvfs
-> > 
-> > Don't we have a problem that we've botched the list and the PF still
-> > exists with 1 VF?  Thanks,  
-> 
-> Yes, that is a mistake. We need to do the list_add before the
-> pci_enable_sriov because the probe() will inspect the
-> vfio_pci_sriov_pfs list.
-> 
-> But since pci_enable_sriov can only be called once we can just gaurd
-> directly against that.
-> 
-> I fixed it like this:
-> 
-> 		mutex_lock(&vfio_pci_sriov_pfs_mutex);
-> 		/*
-> 		 * The thread that adds the vdev to the list is the only thread
-> 		 * that gets to call pci_enable_sriov() and we will only allow
-> 		 * it to be called once without going through
-> 		 * pci_disable_sriov()
-> 		 */
-> 		if (!list_empty(&vdev->sriov_pfs_item)) {
-> 			ret = -EINVAL;
-> 			goto out_unlock;
-> 		}
-> 		list_add_tail(&vdev->sriov_pfs_item, &vfio_pci_sriov_pfs);
-> 		mutex_unlock(&vfio_pci_sriov_pfs_mutex);
-> 		ret = pci_enable_sriov(pdev, nr_virtfn);
-> 		if (ret)
-> 			goto out_del;
-> 
-> Let me know if you have any other notes and I will fix them before
-> resending
+Regards,
+Raghavendra
 
-Nope, that's all I spotted.  Looks like a reasonable fix.  Thanks,
-
-Alex
-
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
