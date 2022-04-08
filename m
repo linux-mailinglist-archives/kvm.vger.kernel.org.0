@@ -2,165 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 280254F9B17
-	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 18:53:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 105E54F9B25
+	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 18:57:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236388AbiDHQz7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 12:55:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45634 "EHLO
+        id S235924AbiDHQ72 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 12:59:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237790AbiDHQzw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 12:55:52 -0400
+        with ESMTP id S234433AbiDHQ70 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 12:59:26 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5FF4BE885E
-        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 09:53:36 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D13092C499C
+        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 09:57:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649436790;
+        s=mimecast20190719; t=1649437041;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=mv3oilYRBqGtqunZ+bcrcqqd9vgsuTYYFZK12kKf+ew=;
-        b=I4oSZom9Kj2a2i3IkKeFO918FVua1pQH9XzVObV1CXnNLsSN5lpVI8Xe6pU7O4yKakv7ro
-        imXQvbtVIHnWxQHLZhn8kXN1smWVaQz4uT+VYfUAM3qNA0hRYmXVzX+0x8pH7fI0wpMhS8
-        HSNxM/fI7dH9em2Wz5sYFrHMm9g/F2E=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Amg0xvXpuwMEuLnGP1PQePHLAINBX6RYSENvzAUWj5o=;
+        b=RQO44xBOKE2XLzHMb0LjTSAkTFjwSEk/V/iA5JIKmHTHDkyE9KdjATxuV49xTVghc3DL35
+        vS+qZjifJroJDCQxZs8qXciK6AWWzHrXDJc5MpVofIpQoITCHdv3ooYrnyp3O8zr2WdFHI
+        fpQW/RPliB2b9I/Pv1t1TiEESVJa4aI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-499-obGGCRKDOLev9jwiJhfkSw-1; Fri, 08 Apr 2022 12:53:09 -0400
-X-MC-Unique: obGGCRKDOLev9jwiJhfkSw-1
-Received: by mail-io1-f70.google.com with SMTP id y3-20020a056602178300b00645d25c30c1so6098680iox.6
-        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 09:53:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=mv3oilYRBqGtqunZ+bcrcqqd9vgsuTYYFZK12kKf+ew=;
-        b=xVUHeM9rRogsMYFWHlXCpsWb8S7kEMmGV4tVyWrunibuNO/HtYJKQtY0BH/6T8pjMu
-         v+tu0mbjZybeGBprx47cD6RLlsyaqExLc4WoFaan4VYUvghcIIbpl8vJGuznU+6aG0cY
-         dJv+DNCM9A7J9Hf4Te2YkoKmDkP6wg1DfFR+6QcCbyDrr4mrmu6hs/43XJm1bWnaOK39
-         v3w7PkcqNZavvq48y809+IxVuMEzRvRgKCc7YLMvmOockcoVgJslAS1mU1McOMc3vBN3
-         I9V7O6vAEhlgUyLv9mTnCCglzjg+t3CnvEzvaLD58r8B2y72SgU+2yqOGjlDkj35ZAlZ
-         PqWw==
-X-Gm-Message-State: AOAM531X6kowyq2CbpAuSZBURQTMSjntRPWvZOF5MMHqJR1/1Wq5h3qB
-        7wb6nC2Am3BU/MVwiStk+MUrFTVCKTrYQevE8YfPQKzu8vPU97myDQ/YygVluT4MPyebDjU66yg
-        0Lhs3p0Ohnriw
-X-Received: by 2002:a05:6e02:1a6d:b0:2c9:f320:470a with SMTP id w13-20020a056e021a6d00b002c9f320470amr9460830ilv.317.1649436788429;
-        Fri, 08 Apr 2022 09:53:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwhaqzc9NIEyXGs75mVuFsoDya+9DvEGOiqiLR9zcNtAbAktGf+4MBXK5j6EHf0lNS3OqCIXQ==
-X-Received: by 2002:a05:6e02:1a6d:b0:2c9:f320:470a with SMTP id w13-20020a056e021a6d00b002c9f320470amr9460819ilv.317.1649436788209;
-        Fri, 08 Apr 2022 09:53:08 -0700 (PDT)
-Received: from redhat.com ([98.55.18.59])
-        by smtp.gmail.com with ESMTPSA id a2-20020a5d9ec2000000b00645ab33390dsm15295681ioe.9.2022.04.08.09.53.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Apr 2022 09:53:07 -0700 (PDT)
-Date:   Fri, 8 Apr 2022 10:53:05 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH] vfio/pci: Fix vf_token mechanism when device-specific
- VF drivers are used
-Message-ID: <20220408105305.1ee00b44.alex.williamson@redhat.com>
-In-Reply-To: <0-v1-466f18ca49f5+26f-vfio_vf_token_jgg@nvidia.com>
-References: <0-v1-466f18ca49f5+26f-vfio_vf_token_jgg@nvidia.com>
-Organization: Red Hat
+ us-mta-201-t770FnMfNQa3ZRNimpXjNA-1; Fri, 08 Apr 2022 12:57:16 -0400
+X-MC-Unique: t770FnMfNQa3ZRNimpXjNA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3C8AD3822207;
+        Fri,  8 Apr 2022 16:57:16 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D701A42D3A6;
+        Fri,  8 Apr 2022 16:57:15 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     Peter Gonda <pgonda@google.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4.1] KVM, SEV: Add KVM_EXIT_SHUTDOWN metadata for SEV-ES
+Date:   Fri,  8 Apr 2022 12:56:42 -0400
+Message-Id: <20220408165641.469961-1-pbonzini@redhat.com>
+In-Reply-To: <20220407210233.782250-1-pgonda@google.com>
+References: 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri,  8 Apr 2022 12:10:15 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+Queued, thanks.  But documentation was missing:
 
-> get_pf_vdev() tries to check if a PF is a VFIO PF by looking at the driver:
-> 
->        if (pci_dev_driver(physfn) != pci_dev_driver(vdev->pdev)) {
-> 
-> However now that we have multiple VF and PF drivers this is no longer
-> reliable.
-> 
-> This means that security tests realted to vf_token can be skipped by
-> mixing and matching different VFIO PCI drivers.
-> 
-> Instead of trying to use the driver core to find the PF devices maintain a
-> linked list of all PF vfio_pci_core_device's that we have called
-> pci_enable_sriov() on.
-> 
-> When registering a VF just search the list to see if the PF is present and
-> record the match permanently in the struct. PCI core locking prevents a PF
-> from passing pci_disable_sriov() while VF drivers are attached so the VFIO
-> owned PF becomes a static property of the VF.
-> 
-> In common cases where vfio does not own the PF the global list remains
-> empty and the VF's pointer is statically NULL.
-> 
-> This also fixes a lockdep splat from recursive locking of the
-> vfio_group::device_lock between vfio_device_get_from_name() and
-> vfio_device_get_from_dev(). If the VF and PF share the same group this
-> would deadlock.
-> 
-> Fixes: ff53edf6d6ab ("vfio/pci: Split the pci_driver code out of vfio_pci_core.c")
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  drivers/vfio/pci/vfio_pci_core.c | 109 ++++++++++++++++---------------
->  include/linux/vfio_pci_core.h    |   2 +
->  2 files changed, 60 insertions(+), 51 deletions(-)
-> 
-> This is probably for the rc cycle since it only became a problem when the
-> migration drivers were merged.
-...  
-> @@ -1942,14 +1935,28 @@ int vfio_pci_core_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
->  	if (!device)
->  		return -ENODEV;
->  
-> -	if (nr_virtfn == 0)
-> -		pci_disable_sriov(pdev);
-> -	else
-> +	vdev = container_of(device, struct vfio_pci_core_device, vdev);
-> +
-> +	if (nr_virtfn) {
-> +		mutex_lock(&vfio_pci_sriov_pfs_mutex);
-> +		list_add_tail(&vdev->sriov_pfs_item, &vfio_pci_sriov_pfs);
-> +		mutex_unlock(&vfio_pci_sriov_pfs_mutex);
->  		ret = pci_enable_sriov(pdev, nr_virtfn);
-> +		if (ret)
-> +			goto out_del;
-> +		ret = nr_virtfn;
-> +		goto out_put;
-> +	}
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index e7a0dfdc0178..72183ae628f7 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6088,8 +6088,12 @@ should put the acknowledged interrupt vector into the 'epr' field.
+   #define KVM_SYSTEM_EVENT_SHUTDOWN       1
+   #define KVM_SYSTEM_EVENT_RESET          2
+   #define KVM_SYSTEM_EVENT_CRASH          3
++  #define KVM_SYSTEM_EVENT_SEV_TERM       4
++  #define KVM_SYSTEM_EVENT_NDATA_VALID    (1u << 31)
+ 			__u32 type;
++                        __u32 ndata;
+ 			__u64 flags;
++                        __u64 data[16];
+ 		} system_event;
 
-If a user were to do:
+ If exit_reason is KVM_EXIT_SYSTEM_EVENT then the vcpu has triggered
+@@ -6099,7 +6103,7 @@ HVC instruction based PSCI call from the vcpu. The 'type' field describes
+ the system-level event type. The 'flags' field describes architecture
+ specific flags for the system-level event.
 
-	# echo 1 > sriov_numvfs
-	# echo 2 > sriov_numvfs
+-Valid values for 'type' are:
++Valid values for bits 30:0 of 'type' are:
 
-Don't we have a problem that we've botched the list and the PF still
-exists with 1 VF?  Thanks,
+  - KVM_SYSTEM_EVENT_SHUTDOWN -- the guest has requested a shutdown of the
+    VM. Userspace is not obliged to honour this, and if it does honour
+@@ -6112,12 +6116,18 @@ Valid values for 'type' are:
+    has requested a crash condition maintenance. Userspace can choose
+    to ignore the request, or to gather VM memory core dump and/or
+    reset/shutdown of the VM.
++ - KVM_SYSTEM_EVENT_SEV_TERM -- an AMD SEV guest requested termination.
++   The guest physical address of the guest's GHCB is stored in `data[0]`.
 
-Alex
+ Valid flags are:
 
->  
-> +	pci_disable_sriov(pdev);
-> +
-> +out_del:
-> +	mutex_lock(&vfio_pci_sriov_pfs_mutex);
-> +	list_del_init(&vdev->sriov_pfs_item);
-> +	mutex_unlock(&vfio_pci_sriov_pfs_mutex);
-> +out_put:
->  	vfio_device_put(device);
-> -
-> -	return ret < 0 ? ret : nr_virtfn;
-> +	return ret;
->  }
->  EXPORT_SYMBOL_GPL(vfio_pci_core_sriov_configure);
+  - KVM_SYSTEM_EVENT_RESET_FLAG_PSCI_RESET2 (arm64 only) -- the guest issued
+    a SYSTEM_RESET2 call according to v1.1 of the PSCI specification.
+
++Extra data for this event is stored in the `data[]` array, up to index
++`ndata-1` included, if bit 31 is set in `type`.  The data depends on the
++`type` field.  There is no extra data if bit 31 is clear or `ndata` is zero.
++
+ ::
+
+ 		/* KVM_EXIT_IOAPIC_EOI */
+
+
+Paolo
+
 
