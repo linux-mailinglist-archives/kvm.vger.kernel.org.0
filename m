@@ -2,64 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DE9234F8EB7
-	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 08:27:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49CC04F8E4F
+	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 08:26:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234286AbiDHEg2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 00:36:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42572 "EHLO
+        id S234437AbiDHFAs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 01:00:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231458AbiDHEgZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 00:36:25 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D352EE72A6;
-        Thu,  7 Apr 2022 21:34:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649392462; x=1680928462;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5tej6b9o6dwvek3pEU2iipjiMORsaX8hNr5dSwFtXG4=;
-  b=SQZjcsHeyhvWO/UmrGJHi6SromN6k1zz8OiSec1R2DKNoTLsRmGOpGcH
-   CwdYb9z0C999ODNw7VzsOf9e7T2rtj50sIuPYfSlVWUmKiGFpi0iGqooc
-   2xrNBJFf53ovLIL6mRJPcQYWWaKIzzU5sEMSBDLuTUxuQS6Pdm0wLrrJ3
-   HFb7rU6ANA2YY0Kn5QvwCuaKt1ChRiivb+yKCTtZ3RyCw5/2n+Og4608e
-   UtSpCPkU4y7Umegik9/EHomkLNPvlTz/jdbTc5uqL/jb9+6BGgKovY3t3
-   z6THG6lJbrJS96NCd0LYboBuQTwb//rMetAAbXdnumjGenbgc1eK8M1QG
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10310"; a="347947537"
-X-IronPort-AV: E=Sophos;i="5.90,244,1643702400"; 
-   d="scan'208";a="347947537"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2022 21:34:22 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,244,1643702400"; 
-   d="scan'208";a="506424579"
-Received: from lkp-server02.sh.intel.com (HELO a44fdfb70b94) ([10.239.97.151])
-  by orsmga003.jf.intel.com with ESMTP; 07 Apr 2022 21:34:20 -0700
-Received: from kbuild by a44fdfb70b94 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1ncgKB-00062B-9B;
-        Fri, 08 Apr 2022 04:34:19 +0000
-Date:   Fri, 8 Apr 2022 12:34:12 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
-        Peter Gonda <pgonda@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4.1] KVM, SEV: Add KVM_EXIT_SHUTDOWN metadata for SEV-ES
-Message-ID: <202204081255.SUNyj4S3-lkp@intel.com>
-References: <20220407210233.782250-1-pgonda@google.com>
+        with ESMTP id S234381AbiDHFAr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 01:00:47 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76B3D19B0AA;
+        Thu,  7 Apr 2022 21:58:45 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id u14so7639245pjj.0;
+        Thu, 07 Apr 2022 21:58:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=557MEUsdgfignjvRd8r34LD9N122H/h+3LidKwdYmBA=;
+        b=HW45i83cuEQXFGe71cN/hhwByTx2d5PFACsT885jfnkY5ycCLdj61hdPN/mZxjfRhX
+         U6IH95qSFJSlicUFlP8cE282fh7HJor13fLWMEyk8/YJzOYIvLAf8f5yrcxC8yE2mlrC
+         eihE+mfkaIvgshlA7KMZNGPnenloP6ESl0OIs5vUQbeejE5ju4GMiuI8i4ILKb4E+Fvc
+         DPU8De1fRupDMxZi9HuD6Nm7QXVMmTxTeZj0I3XjcN/uy35ZAdsMEtF2a7yChshiYcaT
+         +vNWAAoemkT9rezDZNbJ4qistlkVEcAYNsguxTbEK2C/unXyRwrsTrw5zUui8RdRCmpD
+         sGuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=557MEUsdgfignjvRd8r34LD9N122H/h+3LidKwdYmBA=;
+        b=p0s8F0ramWMt46XxH/gNekrf2j8tURXWCDvnSdesPgRouflx7Aex/UkNsoA/j95ObJ
+         zXoDWXdcq4zmiO0n5BKKh1FhuZmaZXwcDm+tnLWyZCYxAvC8jvKvkYTqlMInGWyFT9wH
+         4vV7TaZ+gLC1C63fWwm1jBN4IRgnpWF4+U3lsbRH7ykAJ2m5y/sISKPn1Gtrma5ueRNA
+         rtKoxV2dSCvV5te6cj/Gx6R1I0LRybh3RrSj+/ag4D+CIzlwQCk+AZH633oKbogdKo+9
+         V2JB5eF4RhZgDtjC7xzcbWagdRE4hXSQitUnTMp+v9/0G8EX1nA322SsUMAN7vImLwMh
+         7M0g==
+X-Gm-Message-State: AOAM533PgXvfQILYL7XSq7jGnGG6SQ/2D0IELkQ3HkLqJ+rBjkyxnWkz
+        M64Gd6ZD9He8/dxepxaJa5M=
+X-Google-Smtp-Source: ABdhPJw2t3RRubpgAoE825RBRDhRO/uaG7jCherKev5XCUCNyJpBzJDEdmF0VGfF2e1QyWJWiWrBRA==
+X-Received: by 2002:a17:90b:1bc9:b0:1c7:228a:95ce with SMTP id oa9-20020a17090b1bc900b001c7228a95cemr19668855pjb.3.1649393924829;
+        Thu, 07 Apr 2022 21:58:44 -0700 (PDT)
+Received: from localhost ([192.55.54.52])
+        by smtp.gmail.com with ESMTPSA id r8-20020a17090a0ac800b001c9e35d3a3asm10468887pje.24.2022.04.07.21.58.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Apr 2022 21:58:44 -0700 (PDT)
+Date:   Thu, 7 Apr 2022 21:58:42 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>, isaku.yamahata@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Jim Mattson <jmattson@google.com>,
+        erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>
+Subject: Re: [RFC PATCH v5 092/104] KVM: TDX: Handle TDX PV HLT hypercall
+Message-ID: <20220408045842.GI2864606@ls.amr.corp.intel.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <6da55adb2ddb6f287ebd46aad02cfaaac2088415.1646422845.git.isaku.yamahata@intel.com>
+ <282d4cd1-d1f7-663c-a965-af587f77ee5a@redhat.com>
+ <Yk79A4EdiZoVQMsV@google.com>
+ <8e0280ab-c7aa-5d01-a36f-93d0d0d79e25@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220407210233.782250-1-pgonda@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+In-Reply-To: <8e0280ab-c7aa-5d01-a36f-93d0d0d79e25@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,73 +75,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Peter,
+On Thu, Apr 07, 2022 at 05:56:05PM +0200,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-Thank you for the patch! Yet something to improve:
+> You didn't answer the other question, which is "Where is R12 documented for
+> TDG.VP.VMCALL<Instruction.HLT>?" though...  Should I be worried? :)
 
-[auto build test ERROR on kvm/master]
-[also build test ERROR on v5.18-rc1 next-20220407]
-[cannot apply to v4.1]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+It's publicly documented.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Peter-Gonda/KVM-SEV-Add-KVM_EXIT_SHUTDOWN-metadata-for-SEV-ES/20220408-050628
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git master
-config: arm64-randconfig-r035-20220408 (https://download.01.org/0day-ci/archive/20220408/202204081255.SUNyj4S3-lkp@intel.com/config)
-compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project c29a51b3a257908aebc01cd7c4655665db317d66)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # install arm64 cross compiling tool for clang build
-        # apt-get install binutils-aarch64-linux-gnu
-        # https://github.com/intel-lab-lkp/linux/commit/3b310e5891d172b59042783c128f6efcf5bf6198
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Peter-Gonda/KVM-SEV-Add-KVM_EXIT_SHUTDOWN-metadata-for-SEV-ES/20220408-050628
-        git checkout 3b310e5891d172b59042783c128f6efcf5bf6198
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash arch/arm64/kvm/
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>):
-
->> arch/arm64/kvm/psci.c:184:26: error: no member named 'flags' in 'struct kvm_run::(unnamed at include/uapi/linux/kvm.h:443:3)'
-           vcpu->run->system_event.flags = flags;
-           ~~~~~~~~~~~~~~~~~~~~~~~ ^
-   1 error generated.
-
-
-vim +184 arch/arm64/kvm/psci.c
-
-e6bc13c8a70eab arch/arm/kvm/psci.c   Anup Patel       2014-04-29  163  
-34739fd95fab3a arch/arm64/kvm/psci.c Will Deacon      2022-02-21  164  static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type, u64 flags)
-4b1238269ed340 arch/arm/kvm/psci.c   Anup Patel       2014-04-29  165  {
-46808a4cb89708 arch/arm64/kvm/psci.c Marc Zyngier     2021-11-16  166  	unsigned long i;
-cf5d318865e25f arch/arm/kvm/psci.c   Christoffer Dall 2014-10-16  167  	struct kvm_vcpu *tmp;
-cf5d318865e25f arch/arm/kvm/psci.c   Christoffer Dall 2014-10-16  168  
-cf5d318865e25f arch/arm/kvm/psci.c   Christoffer Dall 2014-10-16  169  	/*
-cf5d318865e25f arch/arm/kvm/psci.c   Christoffer Dall 2014-10-16  170  	 * The KVM ABI specifies that a system event exit may call KVM_RUN
-cf5d318865e25f arch/arm/kvm/psci.c   Christoffer Dall 2014-10-16  171  	 * again and may perform shutdown/reboot at a later time that when the
-cf5d318865e25f arch/arm/kvm/psci.c   Christoffer Dall 2014-10-16  172  	 * actual request is made.  Since we are implementing PSCI and a
-cf5d318865e25f arch/arm/kvm/psci.c   Christoffer Dall 2014-10-16  173  	 * caller of PSCI reboot and shutdown expects that the system shuts
-cf5d318865e25f arch/arm/kvm/psci.c   Christoffer Dall 2014-10-16  174  	 * down or reboots immediately, let's make sure that VCPUs are not run
-cf5d318865e25f arch/arm/kvm/psci.c   Christoffer Dall 2014-10-16  175  	 * after this call is handled and before the VCPUs have been
-cf5d318865e25f arch/arm/kvm/psci.c   Christoffer Dall 2014-10-16  176  	 * re-initialized.
-cf5d318865e25f arch/arm/kvm/psci.c   Christoffer Dall 2014-10-16  177  	 */
-cc9b43f99d5ff4 virt/kvm/arm/psci.c   Andrew Jones     2017-06-04  178  	kvm_for_each_vcpu(i, tmp, vcpu->kvm)
-3781528e3045e7 arch/arm/kvm/psci.c   Eric Auger       2015-09-25  179  		tmp->arch.power_off = true;
-7b244e2be654d9 virt/kvm/arm/psci.c   Andrew Jones     2017-06-04  180  	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
-cf5d318865e25f arch/arm/kvm/psci.c   Christoffer Dall 2014-10-16  181  
-4b1238269ed340 arch/arm/kvm/psci.c   Anup Patel       2014-04-29  182  	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
-4b1238269ed340 arch/arm/kvm/psci.c   Anup Patel       2014-04-29  183  	vcpu->run->system_event.type = type;
-34739fd95fab3a arch/arm64/kvm/psci.c Will Deacon      2022-02-21 @184  	vcpu->run->system_event.flags = flags;
-4b1238269ed340 arch/arm/kvm/psci.c   Anup Patel       2014-04-29  185  	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
-4b1238269ed340 arch/arm/kvm/psci.c   Anup Patel       2014-04-29  186  }
-4b1238269ed340 arch/arm/kvm/psci.c   Anup Patel       2014-04-29  187  
+Guest-Host-Communication Interface(GHCI) spec, 344426-003US Feburary 2022.
+3.8 TDG.VP.VMCALL<Instruction.HLT>
+R12 Interrupt Blocked Flag.
+    The TD is expected to clear this flag iff RFLAGS.IF == 1 or the TDCALL instruction
+    (that invoked TDG.VP.TDVMCALL(Instruction.HLT)) immediately follows an STI
+    instruction, otherwise this flag should be set.
 
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Isaku Yamahata <isaku.yamahata@gmail.com>
