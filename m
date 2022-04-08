@@ -2,111 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A7344F9F3E
-	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 23:35:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62EAB4F9F91
+	for <lists+kvm@lfdr.de>; Sat,  9 Apr 2022 00:24:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239882AbiDHVhX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 17:37:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38870 "EHLO
+        id S231282AbiDHW0w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 18:26:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231607AbiDHVhW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 17:37:22 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A976134667
-        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 14:35:17 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id r66so8842054pgr.3
-        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 14:35:17 -0700 (PDT)
+        with ESMTP id S231455AbiDHW0v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 18:26:51 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB4B465E8
+        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 15:24:45 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id s10so1566334plg.9
+        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 15:24:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1qOh37iLUcxnJDmoGj1A0J8wEY8rbxtdTzE2pYYO2Ks=;
-        b=K7ke0nxKWUWDfr1v0VmW7e7Sj+uaxy5yBp10RU78CNH/g52aooIPr2w/v94GPqq3yt
-         zFQSXrnXOZwWVUdkVrnXqcdRHdIfF/bEXnSJnFQRftzCNuBi1e8Qhjqx8VPGVIHFvCXB
-         2Z8dmxdfIM2m4yiW/h/ciGT0wL20FvLMroNAuoVc3UK7tZGvENlBr1v4Ga4ak5TS0xT7
-         EVCU5/eAZq6lWcTbvTxiMajlg+tAlQpvVvxFpD9bd10ybCnJ2A+a3w5D0mo5UZtae6pZ
-         0Cu/TPA4wIOD9fd48Rf6GMXJ5k7Fa9yM+N6O3DNJ4Y5rx+o8OM4kClD90lO10A1XGyd+
-         MH1Q==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=/0FksbS1i7ulxMgGYnF6XiHnLWr7ePceIKuisSyo3Ak=;
+        b=OEoUPnC5gNQ3dhRmcc481lEfIBc3oIHx3BTjx1mF0xUd4isjeAeBuO3yysBDUBMrK8
+         dTvP/x7d6j/DoOPUazsnvnDi+PwCdZuGldjDFA+eU979RSibIgLLG3iTfKcOD58cc0It
+         3af+Z4MPDsw58f45GNHtcALgC/iQGujdGSnJx/ladRiDrgpuQMaQWsEH7F7OOjo2Weoh
+         1UYqX4zwgUnwR81X+fQpnPnTCvih90oBVeXXqSMfSAogPwl5PRW7czLmhc2VeSv8w8J5
+         J1rxN75Dh8UCbkyLODBrUAFVFABUgTW7DSX56Ea8uPnLfRL7rK1QX4IpYaPLVRfkeCAc
+         ruAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1qOh37iLUcxnJDmoGj1A0J8wEY8rbxtdTzE2pYYO2Ks=;
-        b=QMvhyZlhoYo9ClGb6v5D1rGOcK0Bbt1Z0O2z2nxzFlW4BLGbkiJY3cWqNN7ILksexb
-         fA6N05FB5+Mu91ctIeJEkm1rlaPBJ9yEE8sEpUALX9+QOadLoArkE6Nvh1N+DLWaqMjf
-         5BvCT/SxVjS2/n9/LvLbRmiHLsldUJwWHfzXOHR9RaeEFN3W0hXoTW+MrsSrDGURSXc8
-         h7XBpr7QLVVr8iPjy6msmC6HhmusgAn12muu6ifupEUmqsc6SZaTKUYFxGmEPEByc+ex
-         61Xk/+zYM1zEyoVWw/0bQqd6Lui4Jzi8gsVVFkBIi01bJNtBCnB7OU/4FTd/j8ff91Gs
-         NcvQ==
-X-Gm-Message-State: AOAM5327TaYfwaItA4pdY5ItdMAyreW7LSqV34IgLEPExdBQ3EVjGtZI
-        Aq1IqzxerijH3ghx4ilN+5nLK7NWGktRP4mGBE3whQ==
-X-Google-Smtp-Source: ABdhPJxus4Jbsc/w4aGFY60Ag12TVzRnVuVqzB94CGBFmaLEQk//iA1NOJ2EJlj9NmymKztcqpk5RfgvqqLZIEnC9mU=
-X-Received: by 2002:a65:53cc:0:b0:382:8506:f1a6 with SMTP id
- z12-20020a6553cc000000b003828506f1a6mr17358980pgr.44.1649453716972; Fri, 08
- Apr 2022 14:35:16 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/0FksbS1i7ulxMgGYnF6XiHnLWr7ePceIKuisSyo3Ak=;
+        b=Xwa5owy+f8jtvC8U/kjIhh73bbmAZEIow2Wx+U+ogCZekq9UJ9yZEulnZ8eiJNgdmd
+         p/1LMJ0cbz68HAjt1GziVd8l+Ny06lRlO9osgBB49U+cA0iyIw+BxQEaW8MNNZ9zmGmG
+         akAHjic/Pup3EUnRfhe2FYhWLClYZb0HUPS+mWMI4FhSrPInWjdCcdl3laLI4AaXohSD
+         s32q/Kb5wCSSYLnL0rWgJX/AqI7Xp5jiqjMsZv7zV3umrRsg3KiqM67tlSc5uipPoLu0
+         oicuHS6wC9/UWvg9DnwbEhtgab9C6rrnK5b0A1DwA3Cil+Iuhvb1VlT0sXfH7CEzuL10
+         ZbCg==
+X-Gm-Message-State: AOAM532Pi2CcMzRwwBtlsRiQlliO1jkhvzsEHQ+wTNvCEA9mKXrfUxGP
+        2XkVo2IQ2u2e/7WAlNqW1vd9ZQ==
+X-Google-Smtp-Source: ABdhPJwZBIW4lzlXQsJiyPSV2mQuxg0MIyAyU81/+QDN4UuufbXwKD6BQfMpbFASsMasdDZht/coCA==
+X-Received: by 2002:a17:90b:17ca:b0:1c7:3010:5901 with SMTP id me10-20020a17090b17ca00b001c730105901mr24593680pjb.22.1649456685288;
+        Fri, 08 Apr 2022 15:24:45 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id f6-20020a056a00238600b004fae79a3cbfsm28710274pfc.100.2022.04.08.15.24.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Apr 2022 15:24:44 -0700 (PDT)
+Date:   Fri, 8 Apr 2022 22:24:40 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        maciej.szmigiero@oracle.com,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
+Subject: Re: [PATCH v3 02/23] KVM: x86/mmu: Use a bool for direct
+Message-ID: <YlC2KMSltDRxCi06@google.com>
+References: <20220401175554.1931568-1-dmatlack@google.com>
+ <20220401175554.1931568-3-dmatlack@google.com>
 MIME-Version: 1.0
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com> <CALCETrWk1Y47JQC=V028A7Tmc9776Oo4AjgwqRtd9K=XDh6=TA@mail.gmail.com>
-In-Reply-To: <CALCETrWk1Y47JQC=V028A7Tmc9776Oo4AjgwqRtd9K=XDh6=TA@mail.gmail.com>
-From:   Vishal Annapurve <vannapurve@google.com>
-Date:   Fri, 8 Apr 2022 11:35:05 -1000
-Message-ID: <CAGtprH9DGyxSKSwVhc0Td3x-M4-C6j=+d3DEtkxOty+PPB0V_g@mail.gmail.com>
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Jun Nakajima <jun.nakajima@intel.com>, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220401175554.1931568-3-dmatlack@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 28, 2022 at 10:17 AM Andy Lutomirski <luto@kernel.org> wrote:
->
-> On Thu, Mar 10, 2022 at 6:09 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
-> >
-> > This is the v5 of this series which tries to implement the fd-based KVM
-> > guest private memory. The patches are based on latest kvm/queue branch
-> > commit:
-> >
-> >   d5089416b7fb KVM: x86: Introduce KVM_CAP_DISABLE_QUIRKS2
->
-> Can this series be run and a VM booted without TDX?  A feature like
-> that might help push it forward.
->
-> --Andy
+On Fri, Apr 01, 2022, David Matlack wrote:
+> The parameter "direct" can either be true or false, and all of the
+> callers pass in a bool variable or true/false literal, so just use the
+> type bool.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
 
-I have posted a RFC series with selftests to exercise the UPM feature
-with normal non-confidential VMs via
-https://lore.kernel.org/kvm/20220408210545.3915712-1-vannapurve@google.com/
-
--- Vishal
+Reviewed-by: Sean Christopherson <seanjc@google.com>
