@@ -2,150 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E3E284F9643
-	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 14:58:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC38E4F96F8
+	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 15:39:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236035AbiDHNAP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 09:00:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40820 "EHLO
+        id S236425AbiDHNjf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 09:39:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236027AbiDHNAL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 09:00:11 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2056.outbound.protection.outlook.com [40.107.244.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 784D010E8;
-        Fri,  8 Apr 2022 05:58:07 -0700 (PDT)
+        with ESMTP id S236433AbiDHNjZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 09:39:25 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2083.outbound.protection.outlook.com [40.107.92.83])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54F7023F3E9
+        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 06:37:15 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CfWdGGxKkibHows+OObpcdt2AT3POb+e9MsPMTtsSrID6D1F9hmWdoNqo69aFy26hAtRcaupGkKEDhwPXPaienVt4mAyKo4L43+bPR1G6vMvL76g5a4C8SVp3XiGKFuJURN1P+1QvKuEvVwupa8gJi9YNLL7+Li0gE+IW6C8fMJkl542r4zzCJ/18hj6rRqa4q3TeOm2AcpvtxLo/I2OA+eKdu5PBEX4i2q0KH9IV8ZbzQjYNEaqM1fgaIhC+IE7ZcVE9TDYdZR9PFOdtpxSdTa0hMfe9zpjl6yrTkraCAFhdWEx8+ivBBHD0Y7S67tDmiVcobnCnf9nNxGSlt4zGQ==
+ b=I2kbBm/KEaevsxuyjUoilF8+fuGTKRbT28zyz7TYusVQ/liJMYquAse0qqSa0IpDRgIOlqAEU8yuewvERwsBJ+YnghUkF2K59cruJQgKRMDZUwS+d/9L8dlz0YLngGjbaVxD8Uo6MHJYPnnQr2jRylkZYDUnC2RL5++1/oO6P0VhFJ+VQibHDzL2FdbeYv6QLellie1Cvck/m2iqhQhD7nwGqTM1a/uH1kZj4o/KwuTOP9X8J0XtptWt7dgubIxRtnZwpV3vXwVcrgiqZYycLnLBuGFXkDDXwBSkUqaT3kPQcU5qqNUvXUDnAOBNUGnEJzaiS17Hkzd+fGQ3G4RzQA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DZCL8Mqtzmb1k1dA8bAd8IZrnchykILZD0XL0mJHJtw=;
- b=Np136gKq/M23wqa3widldqPnQB4qh2dzWWGtU1dqhZn8nZQngeWs3Fjfn9cxKhPfG3srPSHYbZ5i+qUxVj/rfmI5i4ew1BzIWy+GrQTD+5zBAEl5/xHF5QmGBE+QrQcSFMpYSE3R4PGSPMmPiesFkeVv6R0BFlVCAp400n0+Y0yeeemXECpfGZXcY8qmE+cVLi+LKstmRAOn4oeX7Zrg4IRvK3pCC2KkdKQJlRnufoUaQHmqLTnsM3NNFvNaZgdSEVXKxPoBQGb+IQlhAKe1/qXCl4cfsl4kwShJpAJKIugpCpAvuRx7Y+OY3lh05e4f8qfQgygi5YjoMl0nSJt7GQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ bh=8jbchsfEvzHVGcK6JRykW+TXRFWssmPmZtBExuWcFq0=;
+ b=bLxBBfL4SH/gKQgwhEw1kRw4E+lpO/mEILW2dzi7/7jXwSMB/o6awEqGFx/4viXsctxHPjJAa4KsOv50gvUxlZCQJwqahmAoiQ5l96E9q/2FYyD6twTkvXgU9rIXOqSKD2Jw6DlhNEQ/HIciGfeAdeXIQBLf3vrTFdyvQHK1tGPcoUmPUUbCeK6GcMDohyettgXFvy2vDHjxAbYSj6ErZhF02VGStkNRvroPxJhoc1vS/VOtM6DD2OcGDoOXLIbJ0A71ey4BIXJQ9MkyfdNQt5QcSugxpyT3+BaEFy+BsMxZm31WsaEJCcEEnjLKfBb2sTQrYwx2Y6f5b7TwFOADsA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DZCL8Mqtzmb1k1dA8bAd8IZrnchykILZD0XL0mJHJtw=;
- b=p9zelp5hEyquH66HooRNVoEwy5U6vbfi+8HHip7sNL+/sxdWpqw9loc5RaN+gIlBnOPfFYSSshe45rDSLOBvQzdNqgKlnlqB+zLNKcaswZe/kSjMiUipTLIRapT1QYhWQDcigEi/BXUhtk8AJ/BRm3h9oKvwpIJss7/dvB7iPqo=
-Received: from MW4PR04CA0069.namprd04.prod.outlook.com (2603:10b6:303:6b::14)
- by DM5PR12MB1643.namprd12.prod.outlook.com (2603:10b6:4:11::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5144.26; Fri, 8 Apr 2022 12:58:05 +0000
-Received: from CO1NAM11FT009.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:6b:cafe::41) by MW4PR04CA0069.outlook.office365.com
- (2603:10b6:303:6b::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5144.25 via Frontend
- Transport; Fri, 8 Apr 2022 12:58:04 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT009.mail.protection.outlook.com (10.13.175.61) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5144.20 via Frontend Transport; Fri, 8 Apr 2022 12:58:04 +0000
-Received: from ethanolx5673host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Fri, 8 Apr
- 2022 07:58:02 -0500
-From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
-CC:     <pbonzini@redhat.com>, <mlevitsk@redhat.com>, <seanjc@google.com>,
-        <jon.grimm@amd.com>, <brijesh.singh@amd.com>,
-        <thomas.lendacky@amd.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Subject: [PATCH v2] KVM: SVM: Do not activate AVIC for SEV-enabled guest
-Date:   Fri, 8 Apr 2022 08:37:10 -0500
-Message-ID: <20220408133710.54275-1-suravee.suthikulpanit@amd.com>
-X-Mailer: git-send-email 2.17.1
+ bh=8jbchsfEvzHVGcK6JRykW+TXRFWssmPmZtBExuWcFq0=;
+ b=n4CXnAoEEzgs8VPw9tJToF4QhK3PQtuh48CgZ3wlHOtUJJVONFVCVtbDFVrIWdsJ3hzLwu+9idkMfBV5U5DXTeP/uoDZ1+YN/LN/4dXpcoKi9xG+4ZQYfZXdHEQh3GXagGIxlkUTWN/TtYxw48U6HuKKVheQZ7WUPQHpCexKxHhPsbQAG7GA6L8SmIw54vL5KkQuDAYFZiHlWoDlVgGPBASrRdjoplwm6k7U7qJEcz7hjG4j7RHVbtdaxdx4mCivdFZd1/lkLOGt0m0sksPLbvm8dQG0rT0jRW3hjprLFQErkHrsiTXqRka7jQUm6Sn70u0ygX9Td7qR484qGIyGlA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by BN6PR1201MB2481.namprd12.prod.outlook.com (2603:10b6:404:a7::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5144.26; Fri, 8 Apr
+ 2022 13:37:13 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::cdfb:f88e:410b:9374]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::cdfb:f88e:410b:9374%6]) with mapi id 15.20.5144.026; Fri, 8 Apr 2022
+ 13:37:13 +0000
+Date:   Fri, 8 Apr 2022 10:37:12 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Robin Murphy <robin.murphy@arm.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v2 4/4] vfio: Require that devices support DMA cache
+ coherence
+Message-ID: <20220408133712.GY2120790@nvidia.com>
+References: <0-v2-f090ae795824+6ad-intel_no_snoop_jgg@nvidia.com>
+ <4-v2-f090ae795824+6ad-intel_no_snoop_jgg@nvidia.com>
+ <BN9PR11MB52764BF8AC747D4B2E2B8BAA8CE99@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20220408122256.GV2120790@nvidia.com>
+ <d6b1c72b-c05e-8bd8-c0cb-38e6c7ccfdb6@arm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d6b1c72b-c05e-8bd8-c0cb-38e6c7ccfdb6@arm.com>
+X-ClientProxiedBy: MN2PR15CA0027.namprd15.prod.outlook.com
+ (2603:10b6:208:1b4::40) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 29973427-8219-4383-eda6-08da195f6bd8
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1643:EE_
-X-Microsoft-Antispam-PRVS: <DM5PR12MB1643BBFC402E99423BDB4B02F3E99@DM5PR12MB1643.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 1c349c36-206f-4d60-87d8-08da1964e36d
+X-MS-TrafficTypeDiagnostic: BN6PR1201MB2481:EE_
+X-Microsoft-Antispam-PRVS: <BN6PR1201MB2481D45DC01F64FCE01B5B1FC2E99@BN6PR1201MB2481.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: JMHgVtCzR/y557fLPQffwqX8s+Cc0CsgszsO03bix2krjR+yK0rqZaX87GUsfyrcFkOs/Qb4YrvT+JSK+xsAxIdsPYl5k8PLzZW4HaH9ap/D49Ed2CT49WKbluVMlTOvy3FKT3lwNRjI+cNHy1dX6Fthr9y9tesnyvFTOJ3fwCjD44Dkjyzr3uas1Wcbn9MJFjO8WPl8dJh6JznuiyfISDZxwseR1Zrsl5OPQM+8fLRBe1qbIiw1K4v2Rie8noEQnePgKaJJWScYdIYtCS+Hz9/4Vewb7EUw+WFnaDjgw4uFRrxFAiaDXx1YEgHDF8Nb2LXhxpOpmnU6oBKXKXa19ggiISZitqzqw1c20JVuIN1HfStP9+NWRBXu7rSqyGNNXsuAIj3qL6/iIjqXaLbgK8FdGomPyVgGu+x2f2xqQI5iW/qT/zeCk0GysoXZll/+pZ4RNiZ7wV6mTHXOTNU1I/+bbQARyzP6pr/RVEXge2l+OfBGj4/yq5q7Zd9mi+9DYHFfEmhP0RLyShuqgi2/abYINW1V8DzcAIgTIgeS0N39HrXn08gzzTXcWN4WRvgS227r285ZcWYpXQXeg1PMrQcQvqK8xIJXRl9D66Qyalv5FRy5sMpLYBCPDqm0oB9z8vHe1sfAw+dMSnvURr35dJAuyxi/8sx6Gt81CMqWf1DUwCXcs/af1C0KrmXNcr5sosN6JKZICfj8901g4E25CQ==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(40470700004)(46966006)(70586007)(70206006)(4326008)(8676002)(2616005)(82310400005)(36756003)(7696005)(1076003)(316002)(81166007)(110136005)(54906003)(16526019)(26005)(186003)(36860700001)(44832011)(8936002)(83380400001)(336012)(6666004)(426003)(356005)(86362001)(5660300002)(40460700003)(508600001)(2906002)(47076005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2022 12:58:04.6281
+X-Microsoft-Antispam-Message-Info: Jjtdb1UBZx43YQlhUXQ7gQXUjliPHR/E725mGDFflH90FbD4VP8JY2tuFBpU7VAxOPkeR9f3MLQsKTmgYW/CQW7kS6tjFWubGbUit0O6hDyJZn+96HZKLYpkPT4rfxyqWBNPeuthm6orisYtBul3D3wt37chJTEOlRJP42nF7VR36De1cYkkgBqJV1R5c5ZLei8mcI0YjKIutBhAXZxj/wPqyge9bE7h8zRdlQUSvSuNd+4oJ8XG54ID/Ph9Isb4lo295ciGS5oR53ufY/yxQpUHLEVtplPoiMdyqKgvjeZNI0FwREW8GW+e2ZNUsJx8oJqFHz+ihNxcgYvbtJrlERZibv9saEH6AYuEUKM+2gD52AkBoWHYRoRoO44nZIlrIFpokJJFi9aE69FTtySA14QL+kGJmgf9l3zZe+QiBNTgFih+YpePe3nxf41cd+VoD6RceVpKVYqbqIX+5ZlDirbsPBzVW2RKsdVwpLYRpcDpvY9emZHa/qVavwqU9UWAXwUsYz4sS79xlnvTsX3dOVOMWljynAcjna/mmw2wFAxTwk5DYDBu/c21Pg0vN6qf7uIvaQXfEvdA3XrNw+Tgiqnp36JsifnJKahMu1fIe5LIDrk70c4yYVS4zShPGMswhyP7SvaUKHbvNl8Lo65w/Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(66556008)(66946007)(8676002)(4326008)(66476007)(5660300002)(6486002)(508600001)(4744005)(83380400001)(38100700002)(6506007)(7416002)(86362001)(2906002)(8936002)(33656002)(2616005)(26005)(186003)(316002)(6512007)(6916009)(54906003)(1076003)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4Fhlb2NkZLVMbBvTEButFOcItzHiJK0M3Ur0HyZQAflgJG7vKEZwQIykW+Cq?=
+ =?us-ascii?Q?TJCqUL3QyF8TcFh9D6K0gCIFoIbZnUnqEgQ+af5dFLDPimXeRAJDsI/AoK1l?=
+ =?us-ascii?Q?UHWNDlu6F1F1Y9QHnKkq3rFm+RNJlSQ7CO7kHpvZyY2fR9YquNSJylyDjrf/?=
+ =?us-ascii?Q?1X6Q2N9ZKrhv8kai+ikSFflt7p4K2Y3izVlUG4v+39KsvLrWtTPcXJC96LMW?=
+ =?us-ascii?Q?VJtPe9wCVUh8d5cGqryOMLRo/HJzErC3ka3CINvy752j7hhermuYFdUeAcMg?=
+ =?us-ascii?Q?7QgZi6bT3OJ73aQoLZyreqngrxwhTqS4SDrdml+Nhal1E+2dkyP97wupG71B?=
+ =?us-ascii?Q?RBE5NoWD3PTp0cLsYPsBap8AXIgjvLBxEx7Nb1etrmMdllIDNGVVtmqT/L0k?=
+ =?us-ascii?Q?yqnGXsy5FIzQTipeDSiWYR5uQbyy/t53LZXjRqYZK76HR1zAviu0Gks+NkKU?=
+ =?us-ascii?Q?0W4cg/cbVkgimHZK1LReqXuU8aL+layRHr5zugiBAJpTCITU3tuCymAMwnpw?=
+ =?us-ascii?Q?zugsK0toxNX+buDCLBf2O4v67XfqekqAB6GN5UOl1dyMmhXEujiVimpNBqRM?=
+ =?us-ascii?Q?k6DnJfrLwsvT1EK6hNytUnO7FdXAvNJEX87zF/a2n2zXbR15rezawRDx9zmF?=
+ =?us-ascii?Q?xN0dXhIxonZNmdUBBQMxPIrFT48BQhxe0RNG32jyUzrUJxNsAVrHcfnYR+zv?=
+ =?us-ascii?Q?1sTtaywQpNg3E7dEDKvJ/Pczn59nIFIy/ChpRjwYfYAyde5sGhhcYPxJLjlN?=
+ =?us-ascii?Q?Y0Y9LEF3Vv7nnX3wjasJsBUSqprTxcpQAWYB+xJcm1jSu1SjSk9//s0Owejh?=
+ =?us-ascii?Q?QFymfSo1/06HPqYs7eO98iFNnoTlCzxNX7hSwhFVZlpZAoKDivEpeeJHBtrn?=
+ =?us-ascii?Q?S7iri1Q0wAhU0zRgTW4czBYUtXhdszZx51ujWAy4yCSMNrDY+nwOmFVFr/kz?=
+ =?us-ascii?Q?jlfIZVfDiE0pFdGrdwgTjAEfVME7bSNtSMDi7El24dHl7PPbboPOmMA/ov5p?=
+ =?us-ascii?Q?CAAU+oUzpx7v88vbZU7f2DCcB6jJ+HqT2oxIkVVo+xy2MiHND2/ZKs98TDYR?=
+ =?us-ascii?Q?3e7n4E/O4KEvyst6M8KGTQmuN2J0xKk8oTlkIQBGggQkQ6ROaD8/MjjrdGuc?=
+ =?us-ascii?Q?XlVbCxj0DoBExJ0UJaAIX61vDGYO8rUut9sbQDZLk8CDZwDV17hnvD299JAu?=
+ =?us-ascii?Q?dYZz3bsOgAweQbxK7TEWHUp1kAFSBtO8gkAJ0tqFu0xv+xau6MGlR/MOlN00?=
+ =?us-ascii?Q?WhzzfLBZgu1bjgLQ+iLVZ8en6k7y/dmsG3fd3NmDIq6j0BbA5HZ0sKMCJ/7l?=
+ =?us-ascii?Q?Kf6Liacq8Z4B+IyIgD1ZU4e6UXAD3a03cfJvl6gMXtuyUruiICpvxHg00vK4?=
+ =?us-ascii?Q?IVebE53vsnWMrTCqaVuDBwsubMT7woMlKD744dCHwDx03EPYrd6vZH+oAuiS?=
+ =?us-ascii?Q?bBpyZ14fPHExyjaLwAiRscoRbDKjGhtWcftdGyzPSOyT46c5OJemaf8QAaF1?=
+ =?us-ascii?Q?r1kAb4iptR+e6P6NC1v64htmr0OQOXitfdK6iFvkVOPx24zChFoHjW3EuOfb?=
+ =?us-ascii?Q?+jU8PX7+AhoZ07aMy4mmN9EV2DPwWnY60a3AZJWQYvIQDtQLA1snW0NlcBDz?=
+ =?us-ascii?Q?+ntVFeadjb96OH45HKk1EjvWgDIZmxgmPtgYCKKwSrmJv+G/DIQcsvcN4U0c?=
+ =?us-ascii?Q?uulp3LpyroIwXuO3sigGQDPOadzmDjObkYHD9tdXcFk75ofr3hvUfx35o86n?=
+ =?us-ascii?Q?MEa4F4wjdw=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c349c36-206f-4d60-87d8-08da1964e36d
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2022 13:37:13.0470
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 29973427-8219-4383-eda6-08da195f6bd8
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT009.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1643
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LvBiMn07iTwJX/OHMswiSrNyOZ6At7Y6FoKuTn9xlWoOlhYqLET0XpTd+UqKPrhe
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR1201MB2481
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since current AVIC implementation cannot support encrypted memory,
-inhibit AVIC for SEV-enabled guest.
+On Fri, Apr 08, 2022 at 02:28:02PM +0100, Robin Murphy wrote:
 
-Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
----
- arch/x86/include/asm/kvm_host.h | 1 +
- arch/x86/kvm/svm/avic.c         | 3 ++-
- arch/x86/kvm/svm/sev.c          | 2 ++
- 3 files changed, 5 insertions(+), 1 deletion(-)
+> > > One nit. Is it logistically more reasonable to put this patch before
+> > > changing VFIO to always set IOMMU_CACHE?
+> > 
+> > For bisectability it has to be after
+> > 
+> >      iommu: Redefine IOMMU_CAP_CACHE_COHERENCY as the cap flag for IOMMU_CACHE
+> > 
+> > Otherwise Intel iommu will stop working with VFIO
+> > 
+> > The ordering is OK as is because no IOMMU that works with VFIO cares
+> > about IOMMU_CACHE.
+> 
+> The Arm SMMU drivers do (without it even coherent traffic would be
+> downgraded to non-cacheable), but then they also handle
+> IOMMU_CAP_CACHE_COHERENCY nonsensically, and it happens to work out since
+> AFAIK there aren't (yet) any Arm-based systems where you can reasonably try
+> to use VFIO that don't also have hardware-coherent PCI. Thus I don't think
+> there's any risk of regression for us here.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index d23e80a56eb8..ee5b0589d2b3 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1052,6 +1052,7 @@ enum kvm_apicv_inhibit {
- 	APICV_INHIBIT_REASON_X2APIC,
- 	APICV_INHIBIT_REASON_BLOCKIRQ,
- 	APICV_INHIBIT_REASON_ABSENT,
-+	APICV_INHIBIT_REASON_SEV,
- };
- 
- struct kvm_arch {
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index a1cf9c31273b..421619540ff9 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -837,7 +837,8 @@ bool avic_check_apicv_inhibit_reasons(enum kvm_apicv_inhibit reason)
- 			  BIT(APICV_INHIBIT_REASON_IRQWIN) |
- 			  BIT(APICV_INHIBIT_REASON_PIT_REINJ) |
- 			  BIT(APICV_INHIBIT_REASON_X2APIC) |
--			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ);
-+			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |
-+			  BIT(APICV_INHIBIT_REASON_SEV);
- 
- 	return supported & BIT(reason);
- }
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 75fa6dd268f0..6524409f8e07 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -260,6 +260,8 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	INIT_LIST_HEAD(&sev->regions_list);
- 	INIT_LIST_HEAD(&sev->mirror_vms);
- 
-+	kvm_set_apicv_inhibit(kvm, APICV_INHIBIT_REASON_SEV);
-+
- 	return 0;
- 
- e_free:
--- 
-2.17.1
+Right, I was unclear, I meant 'requires IOMMU_CACHE to be unset to
+work with VFIO'
 
+Jason
