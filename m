@@ -2,111 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B9B724F98A5
-	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 16:53:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C2F84F9905
+	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 17:08:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237319AbiDHOxt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 10:53:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43448 "EHLO
+        id S237388AbiDHPKD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 11:10:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234749AbiDHOxr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 10:53:47 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1D0010F6D7
-        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 07:51:43 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id j20-20020a17090ae61400b001ca9553d073so9882260pjy.5
-        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 07:51:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=oKpHuTCTVX/9mlJ3fOMLkg+SOJ3B85mD/CGTLhqUYcY=;
-        b=IRlMOocycUdo2ggd59+k/x0mi14OomgysGOMJMR0BXqq9t+rkqur9z6Fm3wtr/nQ1h
-         UJGYtVaU5HtC6Hnr/bQvw8KCOJYNkLEb9wuZ+F9dURfGH7nTatt44rzV3sz2ydGDQboY
-         7csWkDkyZ1RHkYa1vSy1WrAOdBYgArlPOfSFIWy3EItX6vCGFcQckni5n8yqA/lDrvJj
-         QZfsH19T9beBeIjf250Iry5yuLygxD80YH6Qmg8w8Zp2LuPKe4qFxvNUGCNAUEEhYAE/
-         sHuPXER3Jn+RbPRFan5nnWHce+ZcgbBbTjCZYW96a1YIKzML+y2dfBbNCyUhlcuvxVsY
-         plXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=oKpHuTCTVX/9mlJ3fOMLkg+SOJ3B85mD/CGTLhqUYcY=;
-        b=fMBOp9OsZk2OU2m2W9WY2zAIOK22bJbaQF8HpvdbE5NqY9ImrCqUyFBlRarljTkS8P
-         BWQcxUO7wbB0Ut5OzjLReMqZhxCpoh1sjzcmESnRPpcCveNefAhahxm5UTxv0mreY/6w
-         NGdWClQ7kquLh9LedEtz0mGg7Mgj6SjUskQ0RpJeLoHH+CaTErmLxp+r9/vB6z/ewfYB
-         NJPVQZMHsudPgXfOC7eu72B7s3b7u/TzbtOzhvdQ3H2LsRe6D28Xgm1LDDRkuW2OnOZP
-         DPclHtGCng7g813WRBIOvD8UY6gsiXt4AU3zECZC2gaD4riDGDUAsdf+qA6wpAAarsTf
-         F9Dw==
-X-Gm-Message-State: AOAM531eMUTmfsw3ZWrVroTn7++xFsEdz/giyHjVGhi8cCxBeuJV2yum
-        6gk9/3PcU56lPhG2OnDshfaRAA==
-X-Google-Smtp-Source: ABdhPJwK5E91BkazzZhqdilh1wfA2ctl2VJDZBvxKXgErNvw3ypqz09c901AZEW9sa1HYrXRoCPYbg==
-X-Received: by 2002:a17:902:d507:b0:157:1e3b:ee76 with SMTP id b7-20020a170902d50700b001571e3bee76mr5302286plg.67.1649429503155;
-        Fri, 08 Apr 2022 07:51:43 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h20-20020a056a001a5400b004fb1b4b010asm26840043pfv.162.2022.04.08.07.51.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Apr 2022 07:51:42 -0700 (PDT)
-Date:   Fri, 8 Apr 2022 14:51:39 +0000
-From:   Sean Christopherson <seanjc@google.com>
+        with ESMTP id S231715AbiDHPKC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 11:10:02 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB4923010A1
+        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 08:07:56 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4015AB82B38
+        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 15:07:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD969C385A3;
+        Fri,  8 Apr 2022 15:07:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1649430473;
+        bh=5j8bxG+Xf5JcARca/W0PU8fTbYvFa41eJ4g77CdktOU=;
+        h=From:To:Cc:Subject:Date:From;
+        b=OwUH05q+9KXFfOSC4yZMPKORuPjU2H+csDTW56fdTil9Rcr3EV6aFZ81NwQs2NcHw
+         jgUkyvGNLZA/DrjBi3v+MPfPAToU+tXsQxN+D0krBSo31CprBCbej/u5sNdDMz+IRG
+         pmLOnIsm+7z3hB29qdYykcPmUH5UEh1zdXAljBGhp8qewIqpOnj2eRaCcpjDYL4muA
+         xa//E8oFKVOJ9pHjhoIDT8GDblUy5WJ1TPbN709l7HohctsAZNu2FTnLcJZhbwrTHR
+         GeeV2lYcIwAeKX9ky1WOAi0OTJF8Z/ip7SI43EY8esIeUvM8hdQUmgmVt6f4Cs/c7v
+         bjGtVHB7xj/VQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1ncqDH-002o1A-Bu; Fri, 08 Apr 2022 16:07:51 +0100
+From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>
-Subject: Re: [RFC PATCH v5 092/104] KVM: TDX: Handle TDX PV HLT hypercall
-Message-ID: <YlBL+0mDzuTMYGV9@google.com>
-References: <cover.1646422845.git.isaku.yamahata@intel.com>
- <6da55adb2ddb6f287ebd46aad02cfaaac2088415.1646422845.git.isaku.yamahata@intel.com>
- <282d4cd1-d1f7-663c-a965-af587f77ee5a@redhat.com>
- <Yk79A4EdiZoVQMsV@google.com>
- <8e0280ab-c7aa-5d01-a36f-93d0d0d79e25@redhat.com>
- <20220408045842.GI2864606@ls.amr.corp.intel.com>
- <27a59f1a-ea74-2d75-0739-5521e7638c68@redhat.com>
+Cc:     Andrew Jones <drjones@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Will Deacon <will@kernel.org>, Yu Zhe <yuzhe@nfschina.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kernel-team@android.com
+Subject: [GIT PULL] KVM/arm64 fixes for 5.18, take #1
+Date:   Fri,  8 Apr 2022 16:07:46 +0100
+Message-Id: <20220408150746.260017-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <27a59f1a-ea74-2d75-0739-5521e7638c68@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, drjones@redhat.com, jingzhangos@google.com, oupton@google.com, reijiw@google.com, will@kernel.org, yuzhe@nfschina.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 08, 2022, Paolo Bonzini wrote:
-> On 4/8/22 06:58, Isaku Yamahata wrote:
-> > On Thu, Apr 07, 2022 at 05:56:05PM +0200,
-> > Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > 
-> > > You didn't answer the other question, which is "Where is R12 documented for
-> > > TDG.VP.VMCALL<Instruction.HLT>?" though...  Should I be worried? :)
-> > 
-> > It's publicly documented.
-> > 
-> > Guest-Host-Communication Interface(GHCI) spec, 344426-003US Feburary 2022.
-> > 3.8 TDG.VP.VMCALL<Instruction.HLT>
-> > R12 Interrupt Blocked Flag.
-> >      The TD is expected to clear this flag iff RFLAGS.IF == 1 or the TDCALL instruction
-> >      (that invoked TDG.VP.TDVMCALL(Instruction.HLT)) immediately follows an STI
-> >      instruction, otherwise this flag should be set.
-> 
-> Oh, Google doesn't know about this version of the spec...  It can be
-> downloaded from https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html
-> though.
-> 
-> I also found VCPU_STATE_DETAILS in https://www.intel.com/content/dam/develop/external/us/en/documents/tdx-module-1.0-public-spec-v0.931.pdf:
-> 
->   Bit 0: VMXIP, indicates that a virtual interrupt is pending
->   delivery, i.e. VMCS.RVI[7:4] > TDVPS.VAPIC.VPPR[7:4]
-> 
-> It also documents how it has to be used.  So this looks more or less okay,
-> just rename "vmxip" to "interrupt_pending_delivery".
+Hi Paolo,
 
-If we're keeping the call back into SEAM, then this belongs in the path of
-apic_has_interrupt_for_ppr(), not in the HLT-exit path.  To avoid multiple SEAMCALLS
-in a single exit, VCPU_EXREG_RVI can be added.
+Here's the first batches of fixes for 5.18 (most of it courtesy of
+Oliver). The two important items here are a MMU rwlock fix when
+splitting block mappings, and a debugfs registration issue resulting
+in a potentially spectacular outcome.
+
+Please pull,
+
+	M.
+
+The following changes since commit 3123109284176b1532874591f7c81f3837bbdc17:
+
+  Linux 5.18-rc1 (2022-04-03 14:08:21 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.18-1
+
+for you to fetch changes up to 21db83846683d3987666505a3ec38f367708199a:
+
+  selftests: KVM: Free the GIC FD when cleaning up in arch_timer (2022-04-07 08:46:13 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 5.18, take #1
+
+- Some PSCI fixes after introducing PSCIv1.1 and SYSTEM_RESET2
+
+- Fix the MMU write-lock not being taken on THP split
+
+- Fix mixed-width VM handling
+
+- Fix potential UAF when debugfs registration fails
+
+- Various selftest updates for all of the above
+
+----------------------------------------------------------------
+Andrew Jones (1):
+      KVM: selftests: get-reg-list: Add KVM_REG_ARM_FW_REG(3)
+
+Oliver Upton (7):
+      KVM: arm64: Generally disallow SMC64 for AArch32 guests
+      KVM: arm64: Actually prevent SMC64 SYSTEM_RESET2 from AArch32
+      KVM: arm64: Drop unneeded minor version check from PSCI v1.x handler
+      KVM: arm64: Don't split hugepages outside of MMU write lock
+      KVM: Don't create VM debugfs files outside of the VM directory
+      selftests: KVM: Don't leak GIC FD across dirty log test iterations
+      selftests: KVM: Free the GIC FD when cleaning up in arch_timer
+
+Reiji Watanabe (2):
+      KVM: arm64: mixed-width check should be skipped for uninitialized vCPUs
+      KVM: arm64: selftests: Introduce vcpu_width_config
+
+Yu Zhe (1):
+      KVM: arm64: vgic: Remove unnecessary type castings
+
+ arch/arm64/include/asm/kvm_emulate.h               |  27 +++--
+ arch/arm64/include/asm/kvm_host.h                  |  10 ++
+ arch/arm64/kvm/mmu.c                               |  11 +-
+ arch/arm64/kvm/psci.c                              |  31 +++---
+ arch/arm64/kvm/reset.c                             |  65 +++++++----
+ arch/arm64/kvm/vgic/vgic-debug.c                   |  10 +-
+ arch/arm64/kvm/vgic/vgic-its.c                     |   2 +-
+ tools/testing/selftests/kvm/.gitignore             |   1 +
+ tools/testing/selftests/kvm/Makefile               |   1 +
+ tools/testing/selftests/kvm/aarch64/arch_timer.c   |  15 ++-
+ tools/testing/selftests/kvm/aarch64/get-reg-list.c |  14 ++-
+ .../selftests/kvm/aarch64/vcpu_width_config.c      | 122 +++++++++++++++++++++
+ tools/testing/selftests/kvm/dirty_log_perf_test.c  |  34 +++++-
+ virt/kvm/kvm_main.c                                |  10 +-
+ 14 files changed, 285 insertions(+), 68 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/vcpu_width_config.c
