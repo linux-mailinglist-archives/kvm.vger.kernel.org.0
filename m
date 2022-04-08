@@ -2,101 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D6FA64F8FBE
-	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 09:43:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 331A84F8FC2
+	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 09:44:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229862AbiDHHpP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 03:45:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43708 "EHLO
+        id S229913AbiDHHq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 03:46:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229852AbiDHHpM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 03:45:12 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5216B1BD81F
-        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 00:43:08 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id EA1131F861;
-        Fri,  8 Apr 2022 07:43:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1649403786; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=D91alDKSn8qy+HiNCVZ8jqxTZlepaU7yaFo6qWRLmOo=;
-        b=pjZ18QawhJMhp713tkXCF6jT+AMak8pthyVJ7Am3dNJldd5YKaKLxyyHEgOiN8gTpNS6R7
-        pkDfnromsmCca11wM45IkSX3sxXQOtOe8WoIntyv7UcsX2W0aTcY5iXA20phHXb+lObAlD
-        1YAeXljv1eAFvf3LZ6V9mbkUkdJC4Xk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1649403786;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=D91alDKSn8qy+HiNCVZ8jqxTZlepaU7yaFo6qWRLmOo=;
-        b=fXeV/RwzOvny5MXgeHylF13ThHdSNgviI5Sr+pd4AikiZrh243dPXVzvPXud7IBVs0Thb+
-        zaZ/qTfzspmbj8CQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8889013AA9;
-        Fri,  8 Apr 2022 07:43:06 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id DzKXH4rnT2LvFwAAMHmgww
-        (envelope-from <jroedel@suse.de>); Fri, 08 Apr 2022 07:43:06 +0000
-Date:   Fri, 8 Apr 2022 09:43:05 +0200
-From:   Joerg Roedel <jroedel@suse.de>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Varad Gautam <varad.gautam@suse.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com, drjones@redhat.com, marcorr@google.com,
-        zxwang42@gmail.com, erdemaktas@google.com, rientjes@google.com,
-        brijesh.singh@amd.com, Thomas.Lendacky@amd.com, bp@suse.de
-Subject: Re: [kvm-unit-tests PATCH v3 11/11] x86: AMD SEV-ES: Handle string
- IO for IOIO #VC
-Message-ID: <Yk/nid+BndbMBYCx@suse.de>
-References: <20220224105451.5035-1-varad.gautam@suse.com>
- <20220224105451.5035-12-varad.gautam@suse.com>
- <Ykzx5f9HucC7ss2i@google.com>
+        with ESMTP id S229803AbiDHHqZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 03:46:25 -0400
+Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62469133643;
+        Fri,  8 Apr 2022 00:44:23 -0700 (PDT)
+Received: by mail-yb1-xb2a.google.com with SMTP id f23so13688539ybj.7;
+        Fri, 08 Apr 2022 00:44:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=aYBkptFuu1L6fJBG8uYww/w9jLfAXvEZhU9BF3IYbwI=;
+        b=HKeDspxMULemfn4t1aitwEvaiWMdbhpXh/45Y8asfvK3UjwqUW59sBrUXIHcMhjIgz
+         WmgtAOXjlUsRjZ81/bWmD7dQuBDGb7c7V+C5iXGtIkO6I+uYTvno2gkFhW5xcgyjj8Kb
+         GhD68ShqNFGkDlBvPwooQYegP4m6Cgxstps4HQTIMqSetEkbHkhofNsZldtuwC17w9pR
+         qkbqn6qcBqbSKqnsqGg//IS58YIQPtfzBJ8leshVpCPJ1h+iFR19Y1c7/Qj1K8m1Mch1
+         X/1eT/JGCoYZzBU9vRjQGJBWjk3Y5Xg3JN2ZrJ/SAMQqcE/8BTYuULtIJPDyTivyGgLB
+         jtGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=aYBkptFuu1L6fJBG8uYww/w9jLfAXvEZhU9BF3IYbwI=;
+        b=1QJSBY0QHPxH5Tj4CSmSfSMOc8+rnWdEpa+T+Fvwz2QmK2JqT3Ef1hsZz9rJPlPqBj
+         sgTlSP6fga5g/c8pJOb28T30phZ4jVZe+o/7kccKL2rEBGyKtXIy6QwfuPNO1xgLYJVx
+         YEuCtVHIdOgdqYg0zj4znPktf1ZnW5p9Nn+Qp9zxNvIlbHIN/1b+s/IdjT3WaHBiyt8P
+         1m0qAOBX5qIVo6qFj7MXcSjCS0QTtGDul57Kq44a3jtf9Kl4pcoWRqhamnTFS+ZW8P7D
+         +Du4eTXagbbMx02lAh+uHX/gzwpSs2PJrfE7iYQ2Rl7Qhg4Rv8UTPR9KumKzrTFlqhRW
+         i8uA==
+X-Gm-Message-State: AOAM530e3I1zAdnrHC2XXKvisJg/2uUyDnvpYc/PXjNqydZ955js8Otg
+        aTF458HXCaE0MwXPvtPI7bURFF5UI4a+jLE/4zov+lQr
+X-Google-Smtp-Source: ABdhPJx+RtkKNEaXE2TP5P6sQYsNmhufvjTOchmLl/QqIeKsHK8iv2GzLbYQsuwnTv95dG7FPIZFfP7yIyYQa5tnomk=
+X-Received: by 2002:a5b:dcc:0:b0:628:d6d9:d4bc with SMTP id
+ t12-20020a5b0dcc000000b00628d6d9d4bcmr12508904ybr.178.1649403862664; Fri, 08
+ Apr 2022 00:44:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Ykzx5f9HucC7ss2i@google.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <1646727529-11774-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <1646727529-11774-1-git-send-email-wanpengli@tencent.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Fri, 8 Apr 2022 15:44:11 +0800
+Message-ID: <CANRm+Czsj0WiQ5GoQ4gZgBZFPpnOC6or_kULhcz7GQ2vhzpNSQ@mail.gmail.com>
+Subject: Re: [PATCH] x86/kvm: Don't waste kvmclock memory if there is nopv parameter
+To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 06, 2022 at 01:50:29AM +0000, Sean Christopherson wrote:
-> On Thu, Feb 24, 2022, Varad Gautam wrote:
-> > Using Linux's IOIO #VC processing logic.
-> 
-> How much string I/O is there in KUT?  I assume it's rare, i.e. avoiding it entirely
-> is probably less work in the long run.
-
-The problem is that SEV-ES support will silently break if someone adds
-it unnoticed and without testing changes on SEV-ES.
-
-Regards,
-
--- 
-Jörg Rödel
-jroedel@suse.de
-
-SUSE Software Solutions Germany GmbH
-Maxfeldstr. 5
-90409 Nürnberg
-Germany
- 
-(HRB 36809, AG Nürnberg)
-Geschäftsführer: Ivo Totev
-
+ping,
+On Tue, 8 Mar 2022 at 16:19, Wanpeng Li <kernellwp@gmail.com> wrote:
+>
+> From: Wanpeng Li <wanpengli@tencent.com>
+>
+> When the "nopv" command line parameter is used, it should not waste
+> memory for kvmclock.
+>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  arch/x86/kernel/kvmclock.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
+> index c5caa73..16333ba 100644
+> --- a/arch/x86/kernel/kvmclock.c
+> +++ b/arch/x86/kernel/kvmclock.c
+> @@ -239,7 +239,7 @@ static void __init kvmclock_init_mem(void)
+>
+>  static int __init kvm_setup_vsyscall_timeinfo(void)
+>  {
+> -       if (!kvm_para_available() || !kvmclock)
+> +       if (!kvm_para_available() || !kvmclock || nopv)
+>                 return 0;
+>
+>         kvmclock_init_mem();
+> --
+> 2.7.4
+>
