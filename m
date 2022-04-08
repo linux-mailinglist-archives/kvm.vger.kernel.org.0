@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A09724F9302
+	by mail.lfdr.de (Postfix) with ESMTP id 106B94F9300
 	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 12:31:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234534AbiDHKdq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 06:33:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58488 "EHLO
+        id S234497AbiDHKdo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 06:33:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234511AbiDHKdf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 06:33:35 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07E0A1AB9D5
-        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 03:31:31 -0700 (PDT)
+        with ESMTP id S233494AbiDHKdg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 06:33:36 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDED031BBA3
+        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 03:31:32 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 87235215FE;
-        Fri,  8 Apr 2022 10:31:30 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 754E11F865;
+        Fri,  8 Apr 2022 10:31:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1649413890; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1649413891; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=RcMNBiDEpbCdB6EnKBq5LmmdAgQ5AKvWD+JTHTk2UnY=;
-        b=KgrHP/pixOf7ecwE9RWKqVEGrKwf2Eh80QQMearsnz3hklpu0EELwRhy3/WBupsMNW17nn
-        xeedhhES/wPxSxaKKgkmxfnn7nQtSMjja5Nl7WTPv1zxgX7OV8DgOqL0fJizm4DrM3IYV+
-        8+/9XGfJiYbM0R/wX+Lt1pXo36FSMpg=
+        bh=JVT6rMpMS7JTIgVegPzXLBoaBeG/chSVT/MF61xO2cU=;
+        b=Y+l6/GKJJVMZeaSEr0/iCw748INrvmr2LSEg25OvwOU9oTXBjpTT8oit1X7psHzrcy8Ftj
+        TX/EyJpTKr84DWc713VzO+a4gqTHlTkRc+zUAS5d4+V8X2F1oBadAHdYGIz1xt6qTrJ/4H
+        NZ4d9P9RNuYkaUBH28p9vKc3TZncJJs=
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id EDD0E132B9;
-        Fri,  8 Apr 2022 10:31:29 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 94537132B9;
+        Fri,  8 Apr 2022 10:31:30 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id aE6oNwEPUGLIYAAAMHmgww
-        (envelope-from <varad.gautam@suse.com>); Fri, 08 Apr 2022 10:31:29 +0000
+        id YP4BIgIPUGLIYAAAMHmgww
+        (envelope-from <varad.gautam@suse.com>); Fri, 08 Apr 2022 10:31:30 +0000
 From:   Varad Gautam <varad.gautam@suse.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, drjones@redhat.com, marcorr@google.com,
         zxwang42@gmail.com, erdemaktas@google.com, rientjes@google.com,
         seanjc@google.com, brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
         jroedel@suse.de, bp@suse.de, varad.gautam@suse.com
-Subject: [kvm-unit-tests PATCH 8/9] x86: Provide a common 64-bit AP entrypoint for EFI and non-EFI
-Date:   Fri,  8 Apr 2022 12:31:26 +0200
-Message-Id: <20220408103127.19219-9-varad.gautam@suse.com>
+Subject: [kvm-unit-tests PATCH 9/9] x86: setup: Serialize ap_start64 with a spinlock
+Date:   Fri,  8 Apr 2022 12:31:27 +0200
+Message-Id: <20220408103127.19219-10-varad.gautam@suse.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220408103127.19219-1-varad.gautam@suse.com>
 References: <20220408103127.19219-1-varad.gautam@suse.com>
@@ -63,207 +63,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-ap_start64() currently serves as the 64-bit entrypoint for non-EFI
-tests.
+Since apic.c:apic_ops is not guarded against concurrent accesses,
+there exists a race between reset_apic(), enable_apic() and
+enable_x2apic() which results in APs crashing or getting blocked
+in various scenarios (eg, enabling x2apic while disabling xapic).
 
-Having ap_start64() and save_id() written in asm prevents sharing these
-routines between EFI and non-EFI tests.
+The bug is rare with vcpu count < 32, but becomes easier to
+reproduce with vcpus > 64 and the following thunk:
 
-Rewrite them in C and use ap_start64 as the 64-bit entrypoint in the EFI
-boot flow.
+lib/x86/apic.c:
+ void enable_apic(void)
+ {
+-    printf("enabling apic\n");
+     xapic_write(APIC_SPIV, 0x1ff);
+ }
 
-With this, EFI tests support -smp > 1. smptest.efi now passes.
+Serialize the bringup code in ap_start64 to fix this.
 
 Signed-off-by: Varad Gautam <varad.gautam@suse.com>
+Link: https://lore.kernel.org/kvm/20220406124002.13741-1-varad.gautam@suse.com/
 ---
- lib/x86/asm/setup.h  |  3 +++
- lib/x86/setup.c      | 57 +++++++++++++++++++++++++++++++++-----------
- lib/x86/smp.c        |  1 +
- x86/cstart64.S       | 30 -----------------------
- x86/efi/efistart64.S |  5 ----
- 5 files changed, 47 insertions(+), 49 deletions(-)
+Note that this is a C port of 20220406124002.13741-1-varad.gautam@suse.com
+which is not present upstream. I can squash it into the previous patch once
+the asm version is upstream.
 
-diff --git a/lib/x86/asm/setup.h b/lib/x86/asm/setup.h
-index 24d4fa9..8502e7d 100644
---- a/lib/x86/asm/setup.h
-+++ b/lib/x86/asm/setup.h
-@@ -16,4 +16,7 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo);
- void setup_5level_page_table(void);
- #endif /* CONFIG_EFI */
- 
-+void save_id(void);
-+void ap_start64(void);
-+
- #endif /* _X86_ASM_SETUP_H_ */
+ lib/x86/setup.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
 diff --git a/lib/x86/setup.c b/lib/x86/setup.c
-index e5a690a..261fd9b 100644
+index 261fd9b..b08290a 100644
 --- a/lib/x86/setup.c
 +++ b/lib/x86/setup.c
-@@ -14,8 +14,12 @@
- #include "apic.h"
- #include "apic-defs.h"
+@@ -16,6 +16,9 @@
  #include "asm/setup.h"
-+#include "processor.h"
-+#include "atomic.h"
+ #include "processor.h"
+ #include "atomic.h"
++#include "asm/spinlock.h"
++
++struct spinlock ap_lock;
  
  extern char edata;
-+extern unsigned char online_cpus[(MAX_TEST_CPUS + 7) / 8];
-+extern unsigned cpu_online_count;
+ extern unsigned char online_cpus[(MAX_TEST_CPUS + 7) / 8];
+@@ -371,12 +374,14 @@ void save_id(void)
  
- struct mbi_bootinfo {
- 	u32 flags;
-@@ -170,10 +174,27 @@ void setup_multiboot(struct mbi_bootinfo *bi)
- #ifdef CONFIG_EFI
- 
- /* From x86/efi/efistart64.S */
-+
- extern void update_cs(void);
- extern void setup_segments64(u64 gs_base);
- extern u8 stacktop;
-+#endif
-+
-+static void setup_gdt_tss(void)
-+{
-+	size_t tss_offset;
-+
-+	/* 64-bit setup_tss does not use the stacktop argument.  */
-+	tss_offset = setup_tss(NULL);
-+	load_gdt_tss(tss_offset);
-+#ifdef CONFIG_EFI
-+	update_cs();
-+	u64 gs_base = (u64)(&stacktop) - (PAGE_SIZE * (apic_id() + 1));
-+	setup_segments64(gs_base);
-+#endif
-+}
- 
-+#ifdef CONFIG_EFI
- static efi_status_t setup_memory_allocator(efi_bootinfo_t *efi_bootinfo)
+ void ap_start64(void)
  {
- 	int i;
-@@ -270,20 +291,6 @@ static void setup_page_table(void)
- 	write_cr3((ulong)&ptl4);
- }
- 
--static void setup_gdt_tss(void)
--{
--	size_t tss_offset;
--	u64 gs_base;
--
--	/* 64-bit setup_tss does not use the stacktop argument.  */
--	tss_offset = setup_tss(NULL);
--	load_gdt_tss(tss_offset);
--
--	update_cs();
--	gs_base = (u64)(&stacktop) - (PAGE_SIZE * (apic_id() + 1));
--	setup_segments64(gs_base);
--}
--
- efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
- {
- 	efi_status_t status;
-@@ -330,6 +337,7 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
- 	mask_pic_interrupts();
- 	setup_page_table();
++	spin_lock(&ap_lock);
+ 	reset_apic();
+ 	load_idt();
+ 	setup_gdt_tss();
+ 	save_id();
  	enable_apic();
-+	save_id();
- 	ap_init();
  	enable_x2apic();
- 	smp_init();
-@@ -352,3 +360,24 @@ void setup_libcflat(void)
- 			add_setup_arg("bootloader");
- 	}
- }
-+
-+void save_id(void)
-+{
-+	u32 id = apic_id();
-+
-+	/* atomic_fetch_or() emits `lock or %dl, (%eax)` */
-+	atomic_fetch_or(&online_cpus[id / 8], (1 << (id % 8)));
-+}
-+
-+void ap_start64(void)
-+{
-+	reset_apic();
-+	load_idt();
-+	setup_gdt_tss();
-+	save_id();
-+	enable_apic();
-+	enable_x2apic();
-+	sti();
-+	atomic_fetch_inc(&cpu_online_count);
-+	asm volatile("1: hlt; jmp 1b");
-+}
-diff --git a/lib/x86/smp.c b/lib/x86/smp.c
-index 4ddb459..eec8d2b 100644
---- a/lib/x86/smp.c
-+++ b/lib/x86/smp.c
-@@ -22,6 +22,7 @@ static atomic_t active_cpus;
- extern u8 sipi_entry;
- extern u8 sipi_end;
- volatile unsigned cpu_online_count = 1;
-+unsigned char online_cpus[(MAX_TEST_CPUS + 7) / 8];
- 
- static __attribute__((used)) void ipi(void)
- {
-diff --git a/x86/cstart64.S b/x86/cstart64.S
-index 45009d4..e0d4ab5 100644
---- a/x86/cstart64.S
-+++ b/x86/cstart64.S
-@@ -126,33 +126,6 @@ gdt32_descr:
- sipi_end:
- 
- .code64
--save_id:
--	movl $(APIC_DEFAULT_PHYS_BASE + APIC_ID), %eax
--	movl (%rax), %eax
--	shrl $24, %eax
--	lock btsl %eax, online_cpus
--	retq
--
--ap_start64:
--.retry:
--	xor %eax, %eax
--	lock btsl %eax, ap_lock
--	jc .retry
--	call reset_apic
--	call load_idt
--	load_tss
--	call enable_apic
--	call save_id
--	call enable_x2apic
--	sti
--	xor %eax, %eax
--	lock btr %eax, ap_lock
--	nop
--	lock incw cpu_online_count
--
--1:	hlt
--	jmp 1b
--
- start64:
- 	call reset_apic
- 	call load_idt
-@@ -191,6 +164,3 @@ setup_5level_page_table:
- 	lretq
- lvl5:
- 	retq
--
--online_cpus:
--	.fill (max_cpus + 7) / 8, 1, 0
-diff --git a/x86/efi/efistart64.S b/x86/efi/efistart64.S
-index c8fd3a2..99a3802 100644
---- a/x86/efi/efistart64.S
-+++ b/x86/efi/efistart64.S
-@@ -102,8 +102,3 @@ sipi_end:
- .code32
- 
- #include "../start32.S"
--
--.code64:
--
--ap_start64:
--	jmp ap_start64
++	spin_unlock(&ap_lock);
+ 	sti();
+ 	atomic_fetch_inc(&cpu_online_count);
+ 	asm volatile("1: hlt; jmp 1b");
 -- 
 2.32.0
 
