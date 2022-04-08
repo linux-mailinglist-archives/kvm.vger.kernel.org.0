@@ -2,102 +2,286 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32C074F99A2
-	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 17:37:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A21754F99D8
+	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 17:48:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237671AbiDHPj1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 11:39:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42904 "EHLO
+        id S237784AbiDHPuJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 11:50:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232719AbiDHPjY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 11:39:24 -0400
-Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B7B1335E4D;
-        Fri,  8 Apr 2022 08:37:20 -0700 (PDT)
-Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 2C05D1E9; Fri,  8 Apr 2022 17:37:18 +0200 (CEST)
-Date:   Fri, 8 Apr 2022 17:37:16 +0200
-From:   Joerg Roedel <joro@8bytes.org>
+        with ESMTP id S235007AbiDHPuH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 11:50:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A8EE210F8
+        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 08:48:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649432882;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1fNy7kMvRJUEZpOy6RUvT8af/zjCT8c11ZzleUx9H8E=;
+        b=hsxzscLKhU7vNl2sNHAnSczbIBEXmmiCKa/WFO2Iy17+HMEj6she3r1hDLC7w333U3VYb0
+        IGVjD1kkvz3/e0tRlPf3ZLomqK1A63ri6oPq9geoOKLhvk3UOKvRdxWH4CqcFKYHBPRsl6
+        9eEaow//sHnr3GP7KKkbCuExvxaliWw=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-62-GBnZAGNOMlmjNm2ADzqUSQ-1; Fri, 08 Apr 2022 11:48:01 -0400
+X-MC-Unique: GBnZAGNOMlmjNm2ADzqUSQ-1
+Received: by mail-io1-f72.google.com with SMTP id w28-20020a05660205dc00b00645d3cdb0f7so5980499iox.10
+        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 08:48:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=1fNy7kMvRJUEZpOy6RUvT8af/zjCT8c11ZzleUx9H8E=;
+        b=IGOAlPF/FOMkQ5hSiHlHcO6lmMVAAIVKTlH29I+eD8L6+bo8ECgI/vjObUq0lrbWaq
+         j1HC3Wr5wygSjyXRQemsZ/DMNPdJC7UK0YIaoYyqkhUoZi7goOK1MYVHjY6lRToU7jcu
+         QvJmKhc653NQsORPkzrOMms9i0jNeaSNyv/fLZnRIGdPyez1p3g2tsN5kz+l3SyW9krl
+         9p3zFzqTYlY3KP0zwje9HyTzhlUOGb/VWk5rLv9LpxTPfe+RSKScJbzyQ4drN1jtTgF/
+         3ZiLZ/VPTuwpIUKglqjMiQ/U6iXJai7NL8tDNQJi0u1kI0PRkmCXspzZJYIuvIIDziIc
+         U7Hg==
+X-Gm-Message-State: AOAM5329Vcq3+CM7Wa96ixC932nT3TgyKA7edskV4h13wtYLfkmnbQvd
+        mz0ecjVb9lYCmh3WeWEYvWcKxPndH9eu7ezoz8jFrcqN/jZBzbZefoCIEJrUIsRGDWU1sd2yd5H
+        eQ0KyMAcmQEAz
+X-Received: by 2002:a6b:3c08:0:b0:64d:1af2:8ebb with SMTP id k8-20020a6b3c08000000b0064d1af28ebbmr3800130iob.95.1649432880679;
+        Fri, 08 Apr 2022 08:48:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzF5LvhWwH702+DQY0rh5qZCZuznV1E+Lj3o+ML2iD43l4sXNHSX441Op+XgClKeCefpPxmHg==
+X-Received: by 2002:a6b:3c08:0:b0:64d:1af2:8ebb with SMTP id k8-20020a6b3c08000000b0064d1af28ebbmr3800112iob.95.1649432880363;
+        Fri, 08 Apr 2022 08:48:00 -0700 (PDT)
+Received: from redhat.com ([98.55.18.59])
+        by smtp.gmail.com with ESMTPSA id m4-20020a056e020de400b002ca34a50db8sm10026653ilj.33.2022.04.08.08.47.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Apr 2022 08:48:00 -0700 (PDT)
+Date:   Fri, 8 Apr 2022 09:47:57 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Jason Gunthorpe <jgg@nvidia.com>
 Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Stuart Yoder <stuyoder@gmail.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Li Yang <leoyang.li@nxp.com>,
-        Dmitry Osipenko <digetx@gmail.com>,
-        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 00/11] Fix BUG_ON in vfio_iommu_group_notifier()
-Message-ID: <YlBWrE7kxX9vraOD@8bytes.org>
-References: <20220308054421.847385-1-baolu.lu@linux.intel.com>
- <20220315002125.GU11336@nvidia.com>
- <Yk/q1BGN8pC5HVZp@8bytes.org>
- <1033ebe4-fa92-c9bd-a04b-8b28b21e25ea@linux.intel.com>
- <20220408122352.GW2120790@nvidia.com>
- <YlA//+zdOqgaFkUc@8bytes.org>
- <20220408141747.GZ2120790@nvidia.com>
+        David Woodhouse <dwmw2@infradead.org>,
+        iommu@lists.linux-foundation.org, Joerg Roedel <joro@8bytes.org>,
+        kvm@vger.kernel.org,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>
+Subject: Re: [PATCH v2 2/4] vfio: Move the Intel no-snoop control off of
+ IOMMU_CACHE
+Message-ID: <20220408094757.4f5765c8.alex.williamson@redhat.com>
+In-Reply-To: <2-v2-f090ae795824+6ad-intel_no_snoop_jgg@nvidia.com>
+References: <0-v2-f090ae795824+6ad-intel_no_snoop_jgg@nvidia.com>
+        <2-v2-f090ae795824+6ad-intel_no_snoop_jgg@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220408141747.GZ2120790@nvidia.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 08, 2022 at 11:17:47AM -0300, Jason Gunthorpe wrote:
-> You might consider using a linear tree instead of the topic branches,
-> topics are tricky and I'm not sure it helps a small subsystem so much.
-> Conflicts between topics are a PITA for everyone, and it makes
-> handling conflicts with rc much harder than it needs to be.
+On Thu,  7 Apr 2022 12:23:45 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-I like the concept of a branch per driver, because with that I can just
-exclude that branch from my next-merge when there are issues with it.
-Conflicts between branches happen too, but they are quite manageable
-when the branches have the same base.
+> IOMMU_CACHE means "normal DMA to this iommu_domain's IOVA should be cache
+> coherent" and is used by the DMA API. The definition allows for special
+> non-coherent DMA to exist - ie processing of the no-snoop flag in PCIe
+> TLPs - so long as this behavior is opt-in by the device driver.
+> 
+> The flag is mainly used by the DMA API to synchronize the IOMMU setting
+> with the expected cache behavior of the DMA master. eg based on
+> dev_is_dma_coherent() in some case.
+> 
+> For Intel IOMMU IOMMU_CACHE was redefined to mean 'force all DMA to be
+> cache coherent' which has the practical effect of causing the IOMMU to
+> ignore the no-snoop bit in a PCIe TLP.
+> 
+> x86 platforms are always IOMMU_CACHE, so Intel should ignore this flag.
+> 
+> Instead use the new domain op enforce_cache_coherency() which causes every
+> IOPTE created in the domain to have the no-snoop blocking behavior.
+> 
+> Reconfigure VFIO to always use IOMMU_CACHE and call
+> enforce_cache_coherency() to operate the special Intel behavior.
+> 
+> Remove the IOMMU_CACHE test from Intel IOMMU.
+> 
+> Ultimately VFIO plumbs the result of enforce_cache_coherency() back into
+> the x86 platform code through kvm_arch_register_noncoherent_dma() which
+> controls if the WBINVD instruction is available in the guest. No other
+> arch implements kvm_arch_register_noncoherent_dma().
 
-Overall I am thinking of reorganizing the IOMMU tree, but it will likely
-not end up to be a single-branch tree, although the number of patches
-per cycle _could_ just be carried in a single branch.
+I think this last sentence is alluding to it, but I wish the user
+visible change to VFIO_DMA_CC_IOMMU on non-x86 were more explicit.
+Perhaps for the last sentence:
 
-> At least I haven't felt a need for topics while running larger trees,
-> and would find it stressful to try and squeeze the entire patch flow
-> into only 3 weeks out of the 7 week cycle.
+  No other archs implement kvm_arch_register_noncoherent_dma() nor are
+  there any other known consumers of VFIO_DMA_CC_IOMMU that might be
+  affected by the user visible result change on non-x86 archs.
 
-Yeah, so it is 4 weeks in an 9 weeks cycle :) The merge window is 2
-weeks and not a lot happens. The 2 weeks after are for stabilization and
-I usually only pick up fixes. Then come the 4 weeks were new code gets
-into the tree. In the last week everything gets testing in linux-next to
-be ready for the merge window. I will pickup fixes in that week, of
-course.
+Otherwise,
 
-> In any event, I'd like this on a branch so Alex can pull it too, I
-> guess it means Alex has to merge rc3 to VFIO as well?
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
 
-Sure, I can put these patches in a separate branch for Alex to pull into
-the VFIO tree.
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/iommu/intel/iommu.c     |  7 ++-----
+>  drivers/vfio/vfio_iommu_type1.c | 30 +++++++++++++++++++-----------
+>  include/linux/intel-iommu.h     |  1 -
+>  3 files changed, 21 insertions(+), 17 deletions(-)
+> 
+> diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
+> index f08611a6cc4799..8f3674e997df06 100644
+> --- a/drivers/iommu/intel/iommu.c
+> +++ b/drivers/iommu/intel/iommu.c
+> @@ -641,7 +641,6 @@ static unsigned long domain_super_pgsize_bitmap(struct dmar_domain *domain)
+>  static void domain_update_iommu_cap(struct dmar_domain *domain)
+>  {
+>  	domain_update_iommu_coherency(domain);
+> -	domain->iommu_snooping = domain_update_iommu_snooping(NULL);
+>  	domain->iommu_superpage = domain_update_iommu_superpage(domain, NULL);
+>  
+>  	/*
+> @@ -4283,7 +4282,6 @@ static int md_domain_init(struct dmar_domain *domain, int guest_width)
+>  	domain->agaw = width_to_agaw(adjust_width);
+>  
+>  	domain->iommu_coherency = false;
+> -	domain->iommu_snooping = false;
+>  	domain->iommu_superpage = 0;
+>  	domain->max_addr = 0;
+>  
+> @@ -4422,8 +4420,7 @@ static int intel_iommu_map(struct iommu_domain *domain,
+>  		prot |= DMA_PTE_READ;
+>  	if (iommu_prot & IOMMU_WRITE)
+>  		prot |= DMA_PTE_WRITE;
+> -	if (((iommu_prot & IOMMU_CACHE) && dmar_domain->iommu_snooping) ||
+> -	    dmar_domain->enforce_no_snoop)
+> +	if (dmar_domain->enforce_no_snoop)
+>  		prot |= DMA_PTE_SNP;
+>  
+>  	max_addr = iova + size;
+> @@ -4550,7 +4547,7 @@ static bool intel_iommu_enforce_cache_coherency(struct iommu_domain *domain)
+>  {
+>  	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
+>  
+> -	if (!dmar_domain->iommu_snooping)
+> +	if (!domain_update_iommu_snooping(NULL))
+>  		return false;
+>  	dmar_domain->enforce_no_snoop = true;
+>  	return true;
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 9394aa9444c10c..c13b9290e35759 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -84,8 +84,8 @@ struct vfio_domain {
+>  	struct iommu_domain	*domain;
+>  	struct list_head	next;
+>  	struct list_head	group_list;
+> -	int			prot;		/* IOMMU_CACHE */
+> -	bool			fgsp;		/* Fine-grained super pages */
+> +	bool			fgsp : 1;	/* Fine-grained super pages */
+> +	bool			enforce_cache_coherency : 1;
+>  };
+>  
+>  struct vfio_dma {
+> @@ -1461,7 +1461,7 @@ static int vfio_iommu_map(struct vfio_iommu *iommu, dma_addr_t iova,
+>  
+>  	list_for_each_entry(d, &iommu->domain_list, next) {
+>  		ret = iommu_map(d->domain, iova, (phys_addr_t)pfn << PAGE_SHIFT,
+> -				npage << PAGE_SHIFT, prot | d->prot);
+> +				npage << PAGE_SHIFT, prot | IOMMU_CACHE);
+>  		if (ret)
+>  			goto unwind;
+>  
+> @@ -1771,7 +1771,7 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
+>  			}
+>  
+>  			ret = iommu_map(domain->domain, iova, phys,
+> -					size, dma->prot | domain->prot);
+> +					size, dma->prot | IOMMU_CACHE);
+>  			if (ret) {
+>  				if (!dma->iommu_mapped) {
+>  					vfio_unpin_pages_remote(dma, iova,
+> @@ -1859,7 +1859,7 @@ static void vfio_test_domain_fgsp(struct vfio_domain *domain)
+>  		return;
+>  
+>  	ret = iommu_map(domain->domain, 0, page_to_phys(pages), PAGE_SIZE * 2,
+> -			IOMMU_READ | IOMMU_WRITE | domain->prot);
+> +			IOMMU_READ | IOMMU_WRITE | IOMMU_CACHE);
+>  	if (!ret) {
+>  		size_t unmapped = iommu_unmap(domain->domain, 0, PAGE_SIZE);
+>  
+> @@ -2267,8 +2267,15 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  		goto out_detach;
+>  	}
+>  
+> -	if (iommu_capable(bus, IOMMU_CAP_CACHE_COHERENCY))
+> -		domain->prot |= IOMMU_CACHE;
+> +	/*
+> +	 * If the IOMMU can block non-coherent operations (ie PCIe TLPs with
+> +	 * no-snoop set) then VFIO always turns this feature on because on Intel
+> +	 * platforms it optimizes KVM to disable wbinvd emulation.
+> +	 */
+> +	if (domain->domain->ops->enforce_cache_coherency)
+> +		domain->enforce_cache_coherency =
+> +			domain->domain->ops->enforce_cache_coherency(
+> +				domain->domain);
+>  
+>  	/*
+>  	 * Try to match an existing compatible domain.  We don't want to
+> @@ -2279,7 +2286,8 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  	 */
+>  	list_for_each_entry(d, &iommu->domain_list, next) {
+>  		if (d->domain->ops == domain->domain->ops &&
+> -		    d->prot == domain->prot) {
+> +		    d->enforce_cache_coherency ==
+> +			    domain->enforce_cache_coherency) {
+>  			iommu_detach_group(domain->domain, group->iommu_group);
+>  			if (!iommu_attach_group(d->domain,
+>  						group->iommu_group)) {
+> @@ -2611,14 +2619,14 @@ static void vfio_iommu_type1_release(void *iommu_data)
+>  	kfree(iommu);
+>  }
+>  
+> -static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
+> +static int vfio_domains_have_enforce_cache_coherency(struct vfio_iommu *iommu)
+>  {
+>  	struct vfio_domain *domain;
+>  	int ret = 1;
+>  
+>  	mutex_lock(&iommu->lock);
+>  	list_for_each_entry(domain, &iommu->domain_list, next) {
+> -		if (!(domain->prot & IOMMU_CACHE)) {
+> +		if (!(domain->enforce_cache_coherency)) {
+>  			ret = 0;
+>  			break;
+>  		}
+> @@ -2641,7 +2649,7 @@ static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
+>  	case VFIO_DMA_CC_IOMMU:
+>  		if (!iommu)
+>  			return 0;
+> -		return vfio_domains_have_iommu_cache(iommu);
+> +		return vfio_domains_have_enforce_cache_coherency(iommu);
+>  	default:
+>  		return 0;
+>  	}
+> diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
+> index 1f930c0c225d94..bc39f633efdf03 100644
+> --- a/include/linux/intel-iommu.h
+> +++ b/include/linux/intel-iommu.h
+> @@ -539,7 +539,6 @@ struct dmar_domain {
+>  
+>  	u8 has_iotlb_device: 1;
+>  	u8 iommu_coherency: 1;		/* indicate coherency of iommu access */
+> -	u8 iommu_snooping: 1;		/* indicate snooping control feature */
+>  	u8 enforce_no_snoop : 1;        /* Create IOPTEs with snoop control */
+>  
+>  	struct list_head devices;	/* all devices' list */
 
-Regards,
-
-	Joerg
