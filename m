@@ -2,65 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 39F2D4F9E28
-	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 22:29:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35F564F9EA5
+	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 23:06:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239469AbiDHUaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 16:30:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38532 "EHLO
+        id S239670AbiDHVIB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 17:08:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230500AbiDHUaX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 16:30:23 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC9E41D97D5
-        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 13:28:18 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id o8-20020a635a08000000b0039a14a39466so5319618pgb.6
-        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 13:28:18 -0700 (PDT)
+        with ESMTP id S239669AbiDHVH5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 17:07:57 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84A3613C70C
+        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 14:05:52 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id z132-20020a63338a000000b003844e317066so5339905pgz.19
+        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 14:05:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc
-         :content-transfer-encoding;
-        bh=bZxSyBqJebUSPZ6FFYIz1/hOaAJ4eqoMo84YLPbpDGY=;
-        b=KpsoLqgOpyqA2XDJTxIy7nYpMLWH8X9LwqInJIb6m5WTW1f2quad3/1REI4rASKzTn
-         wWg8jC+MG3baWyRyouwD4FoUQ3NEuKCljR6gxzCE2DXUKSZQjcFGmdA1C285q0PRl8fj
-         //rCiuu2jy3LpXl0aXN4hiro1mFrLi7lQ5dtOQw8UVGLqBkJlYOYpeGaBoA+0JL2uS86
-         aVUIIWshxzPHqTAEvhq7SIXhKkKmxZ7xqX95l0kPnp6+A5LMbIQTAZ3lzRB9d0rzgPjs
-         uOg2xalP33Br5BYSBYY3mcqHH+9rQeeVirdMwj2okjvqiRjy+R046YRKqHHZLNuN44xl
-         rpTA==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=S51j5oo3opJvsRJNXI1+hkL5LxbcnR2OyLq+qXnMqiY=;
+        b=anWu23sq3AlcbJM+bTrIjG/wtoRFd3im82SYu+mFMpJO9qZuudYLBDNN7pinnQ0PSM
+         N70BfaXZ7yjraCCJFd3QJHbK39N9+lmHR6ezQmQ1F4Riv33qjWe6OHKqLLAWZw3oMHKH
+         s9WGoYCmw40XXp3mJebllnw05X6UnAxaxnwWp1yPYcREpvz1KMzCw8LAT2VOxfhGeCN9
+         PY6vNazZ+C8SM7L+ti/3Od7XldQy/EuDkvYk+DIwmiQO/2vQMxGDW30RR7icLRa9D/5M
+         L8n7bIJsu/fNBVucA9SQDP/t38M1riWt89Z6R0ZKrRESJyh84SJciIYTc+axtElSX5EW
+         eDBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc:content-transfer-encoding;
-        bh=bZxSyBqJebUSPZ6FFYIz1/hOaAJ4eqoMo84YLPbpDGY=;
-        b=py92+oqZN+RAywxTBLh7Bki2AQ9TtjA/uHVsg2oFjaakVb3SxNmSw4TtZ50+IZHOF1
-         0yj+WXKdKsVX0wgoTiwkJS3dWsoEdzNVt7RxWPEbBlGtKlxP6oAvc5SO1FnF6NSpyeXi
-         Q6Kz3jC0eHUJrdAKrrDYlH6TQtZAkrEy4fdjFLssIbL7A+B8wuJoj+cd4O0VYA/bTIj0
-         BtX2ynpKsWVucN05gN+VgmTcryPBJgL5TtVHqpJebOKBFVnrCvLv0CgdAPpggGLGEalv
-         lBnzTrl+hzS5psaA4syg9Viw/DuYVBhVokPBUC76AsrWIc/BydaqOEf8bUkNT85wwkfR
-         sJhA==
-X-Gm-Message-State: AOAM530Z0cpoWDDOKObh0xrPBN75g8VAthS/gi3G/dwNptRKJRnV+qNP
-        iefFTL0yfJHAMOFH8BmgAWEL5Fy5Q+U=
-X-Google-Smtp-Source: ABdhPJyd+ETmhbhfzBCcBJCZ0+x53O+4bpTcoPQ7JVlFxhJf08oiDQuRDQU3I0/Gep+ONWV+rXn/xdTtHY8=
-X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90b:4a82:b0:1c7:8a44:e0c9 with SMTP id
- lp2-20020a17090b4a8200b001c78a44e0c9mr24014559pjb.102.1649449698237; Fri, 08
- Apr 2022 13:28:18 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  8 Apr 2022 20:28:15 +0000
-Message-Id: <20220408202815.386932-1-seanjc@google.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=S51j5oo3opJvsRJNXI1+hkL5LxbcnR2OyLq+qXnMqiY=;
+        b=68nEhxJZmYinw3+ebDq9rlhAiE8oJzRZVkRKC24XSEPg5+FnNwVyRftXxCpknKq8eR
+         4sX7UzNrYoxMdowMSiZqZsIN8ycBMHIsRFaRHJpEGtjW1FJGYjZE1SI6fFYH3USQtIOQ
+         RhF2n/CiBDaS3iyYJspcIJzTomNNARr9BqupazbtG2vfcFClR7uobwyoVMTiYcouh6Ki
+         eYf3y71ROmQNkAXO+XA0y83iuTb/jZLvEWdzD0f9rdwxo2+4RJeZZIfbwwxfIAqGaL3r
+         kvrAWS55rzNcwjC3wS68HSUybUVROZTv+yt1CIo9+XBaeuUV9nAPqnYa4XvlcC0Agtbl
+         mb9A==
+X-Gm-Message-State: AOAM530vKmXcexwFNWFlayWLl9oCrHnxMxDwD/FMrcuHE4wZKqrZV/rO
+        8GdQxvTs4qNfPul/Au96IYU0S/vthMDNxQhQ
+X-Google-Smtp-Source: ABdhPJwBI62+i1Cn7AwOjIj/QaMxxnX07OYtWyneOi+VOeF3IfJ16nT4vhAOtlvrCVnJcwMsb1ROmtAAUBhAthta
+X-Received: from vannapurve2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:41f8])
+ (user=vannapurve job=sendgmr) by 2002:a17:902:e889:b0:157:dd6:4621 with SMTP
+ id w9-20020a170902e88900b001570dd64621mr9269146plg.17.1649451952012; Fri, 08
+ Apr 2022 14:05:52 -0700 (PDT)
+Date:   Fri,  8 Apr 2022 21:05:40 +0000
+Message-Id: <20220408210545.3915712-1-vannapurve@google.com>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.35.1.1178.g4f1659d476-goog
-Subject: [PATCH] KVM: VMX: More brown paper bags! NOM NOM NOM
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+Subject: [RFC V1 PATCH 0/5] selftests: KVM: selftests for fd-based approach of
+ supporting private memory
+From:   Vishal Annapurve <vannapurve@google.com>
+To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, shauh@kernel.org, yang.zhong@intel.com,
+        drjones@redhat.com, ricarkol@google.com, aaronlewis@google.com,
+        wei.w.wang@intel.com, kirill.shutemov@linux.intel.com,
+        corbet@lwn.net, hughd@google.com, jlayton@kernel.org,
+        bfields@fieldses.org, akpm@linux-foundation.org,
+        chao.p.peng@linux.intel.com, yu.c.zhang@linux.intel.com,
+        jun.nakajima@intel.com, dave.hansen@intel.com,
+        michael.roth@amd.com, qperret@google.com, steven.price@arm.com,
+        ak@linux.intel.com, david@redhat.com, luto@kernel.org,
+        vbabka@suse.cz, marcorr@google.com, erdemaktas@google.com,
+        pgonda@google.com, seanjc@google.com, diviness@google.com,
+        Vishal Annapurve <vannapurve@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
@@ -71,51 +78,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a missing declaration that got dropped between my inline patch[1] and
-what actually got posted[2].
+This series implements selftests targeting the feature floated by Chao
+via:
+https://lore.kernel.org/linux-mm/20220310140911.50924-1-chao.p.peng@linux.intel.com/
 
-In file included from arch/x86/kvm/mmu/mmu.c:4279:
-arch/x86/kvm/mmu/paging_tmpl.h: In function =E2=80=98ept_walk_addr_generic=
-=E2=80=99:
-arch/x86/kvm/mmu/paging_tmpl.h:496:50: error: =E2=80=98EPT_VIOLATION_RWX_SH=
-IFT=E2=80=99 undeclared
- (first use in this function); did you mean =E2=80=98EPT_VIOLATION_RWX_MASK=
-=E2=80=99?
-  496 |                                                  EPT_VIOLATION_RWX_=
-SHIFT;
-      |                                                  ^~~~~~~~~~~~~~~~~~=
-~~~~~
-      |                                                  EPT_VIOLATION_RWX_=
-MASK
+Below changes aim to test the fd based approach for guest private memory
+in context of normal (non-confidential) VMs executing on non-confidential
+platforms.
 
-[1] https://lore.kernel.org/all/Yj0NOQOYEAG+Dz7+@google.com
-[2] https://lore.kernel.org/all/20220329030108.97341-3-darcy.sh@antgroup.co=
-m
+Confidential platforms along with the confidentiality aware software
+stack support a notion of private/shared accesses from the confidential
+VMs.
+Generally, a bit in the GPA conveys the shared/private-ness of the
+access. Non-confidential platforms don't have a notion of private or
+shared accesses from the guest VMs. To support this notion,
+KVM_HC_MAP_GPA_RANGE
+is modified to allow marking an access from a VM within a GPA range as
+always shared or private. Any suggestions regarding implementing this ioctl
+alternatively/cleanly are appreciated.
 
-Fixes: 68ca1f59584e ("KVM: x86/mmu: Derive EPT violation RWX bits from EPTE=
- RWX bits")
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
+priv_memfd_test.c file adds a suite of two basic selftests to access private
+memory from the guest via private/shared access and checking if the contents
+can be leaked to/accessed by vmm via shared memory view.
 
-Please squash, thanks!
+Test results:
+1) PMPAT - PrivateMemoryPrivateAccess test passes
+2) PMSAT - PrivateMemorySharedAccess test fails currently and needs more
+analysis to understand the reason of failure.
 
- arch/x86/include/asm/vmx.h | 1 +
- 1 file changed, 1 insertion(+)
+Important - Below patch is needed to ensure host kernel crash is avoided while
+running these tests:
+https://github.com/vishals4gh/linux/commit/b9adedf777ad84af39042e9c19899600a4add68a
 
-diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index 46bc7072f6a2..6c343c6a1855 100644
---- a/arch/x86/include/asm/vmx.h
-+++ b/arch/x86/include/asm/vmx.h
-@@ -543,6 +543,7 @@ enum vm_entry_failure_code {
- #define EPT_VIOLATION_ACC_READ_BIT	0
- #define EPT_VIOLATION_ACC_WRITE_BIT	1
- #define EPT_VIOLATION_ACC_INSTR_BIT	2
-+#define EPT_VIOLATION_RWX_SHIFT		3
- #define EPT_VIOLATION_GVA_IS_VALID_BIT	7
- #define EPT_VIOLATION_GVA_TRANSLATED_BIT 8
- #define EPT_VIOLATION_ACC_READ		(1 << EPT_VIOLATION_ACC_READ_BIT)
+Github link for the patches posted as part of this series:
+https://github.com/vishals4gh/linux/commits/priv_memfd_selftests_v1
+Note that this series is dependent on Chao's v5 patches mentioned above
+applied on top of 5.17.
 
-base-commit: 59d9e75d641565603e7c293f4cec182d86db8586
---=20
+Vishal Annapurve (5):
+  x86: kvm: HACK: Allow testing of priv memfd approach
+  selftests: kvm: Fix inline assembly for hypercall
+  selftests: kvm: Add a basic selftest test priv memfd
+  selftests: kvm: priv_memfd_test: Add support for memory conversion
+  selftests: kvm: priv_memfd_test: Add shared access test
+
+ arch/x86/include/uapi/asm/kvm_para.h          |   1 +
+ arch/x86/kvm/mmu/mmu.c                        |   9 +-
+ arch/x86/kvm/x86.c                            |  16 +-
+ include/linux/kvm_host.h                      |   3 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/lib/x86_64/processor.c      |   2 +-
+ tools/testing/selftests/kvm/priv_memfd_test.c | 410 ++++++++++++++++++
+ virt/kvm/kvm_main.c                           |   2 +-
+ 8 files changed, 436 insertions(+), 8 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/priv_memfd_test.c
+
+-- 
 2.35.1.1178.g4f1659d476-goog
 
