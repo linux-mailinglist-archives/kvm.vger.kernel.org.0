@@ -2,115 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0CAE4F92A5
-	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 12:12:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74F0B4F92FE
+	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 12:31:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233852AbiDHKNz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 06:13:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37692 "EHLO
+        id S234515AbiDHKdg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 06:33:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233149AbiDHKNv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 06:13:51 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8309AAC042
-        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 03:11:48 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A7DB11FB;
-        Fri,  8 Apr 2022 03:11:48 -0700 (PDT)
-Received: from [10.57.41.19] (unknown [10.57.41.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6C6F53F73B;
-        Fri,  8 Apr 2022 03:11:46 -0700 (PDT)
-Message-ID: <f904979d-35ee-e2b8-5fd3-325d956be0d7@arm.com>
-Date:   Fri, 8 Apr 2022 11:11:41 +0100
+        with ESMTP id S231933AbiDHKdc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 06:33:32 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F04391AB9D5
+        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 03:31:26 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 556BD1FD07;
+        Fri,  8 Apr 2022 10:31:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1649413885; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=30t+leXsBt6I0ScruLT0TK74pCQ5UrRcFm0FAvno2jA=;
+        b=m2sCxe28nZup20kmCuWd1wlEGAOAqZtyhmDr/98Iw9IS4p35Dau7zfYG8taMPZc1HXCi5Q
+        dKhQDzPdPlP/fmoFi9S2JtjjlHSaONLtHNLZZFefSD+BoGfbWVp9UZ1K7xuQzMGfgbH90U
+        u/JEZMyVy+27isBHpN665l4MeEQ6n44=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B3583132B9;
+        Fri,  8 Apr 2022 10:31:24 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id jmi1KfwOUGLIYAAAMHmgww
+        (envelope-from <varad.gautam@suse.com>); Fri, 08 Apr 2022 10:31:24 +0000
+From:   Varad Gautam <varad.gautam@suse.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, drjones@redhat.com, marcorr@google.com,
+        zxwang42@gmail.com, erdemaktas@google.com, rientjes@google.com,
+        seanjc@google.com, brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
+        jroedel@suse.de, bp@suse.de, varad.gautam@suse.com
+Subject: [kvm-unit-tests PATCH 0/9] SMP Support for x86 UEFI Tests
+Date:   Fri,  8 Apr 2022 12:31:18 +0200
+Message-Id: <20220408103127.19219-1-varad.gautam@suse.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v2 0/4] Make the iommu driver no-snoop block feature
- consistent
-Content-Language: en-GB
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>
-References: <0-v2-f090ae795824+6ad-intel_no_snoop_jgg@nvidia.com>
- <f5acf507-b4ef-b393-159c-05ca04feb43d@arm.com>
- <20220407174326.GR2120790@nvidia.com>
- <77482321-2e39-fc7c-09b6-e929a851a80f@arm.com>
- <20220407190824.GS2120790@nvidia.com>
- <BN9PR11MB527648540AA714E988AE92608CE99@BN9PR11MB5276.namprd11.prod.outlook.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <BN9PR11MB527648540AA714E988AE92608CE99@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-9.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-04-08 10:08, Tian, Kevin wrote:
->> From: Jason Gunthorpe <jgg@nvidia.com>
->> Sent: Friday, April 8, 2022 3:08 AM
->> On Thu, Apr 07, 2022 at 07:02:03PM +0100, Robin Murphy wrote:
->>> On 2022-04-07 18:43, Jason Gunthorpe wrote:
->>>> On Thu, Apr 07, 2022 at 06:03:37PM +0100, Robin Murphy wrote:
->>>>> At a glance, this all looks about the right shape to me now, thanks!
->>>>
->>>> Thanks!
->>>>
->>>>> Ideally I'd hope patch #4 could go straight to device_iommu_capable()
->> from
->>>>> my Thunderbolt series, but we can figure that out in a couple of weeks
->> once
->>>>
->>>> Yes, this does helps that because now the only iommu_capable call is
->>>> in a context where a device is available :)
->>>
->>> Derp, of course I have *two* VFIO patches waiting, the other one touching
->>> the iommu_capable() calls (there's still IOMMU_CAP_INTR_REMAP, which,
->> much
->>> as I hate it and would love to boot all that stuff over to
->>> drivers/irqchip,
->>
->> Oh me too...
->>
->>> it's not in my way so I'm leaving it be for now). I'll have to rebase that
->>> anyway, so merging this as-is is absolutely fine!
->>
->> This might help your effort - after this series and this below there
->> are no 'bus' users of iommu_capable left at all.
->>
-> 
-> Out of curiosity, while iommu_capable is being moved to a per-device
-> interface what about irq_domain_check_msi_remap() below (which
-> is also a global check)?
+This series brings multi-vcpu support to UEFI tests on x86.
 
-I suppose it could if anyone cared enough to make the effort - probably 
-a case of resolving specific MSI domains for every device in the group, 
-and potentially having to deal with hotplug later as well. 
-Realistically, though, I wouldn't expect systems to have mixed 
-capabilities in that regard (i.e. where the check would return false 
-even though *some* domains support remapping), so there doesn't seem to 
-be any pressing need to relax it.
+Most of the necessary AP bringup code already exists within kvm-unit-tests'
+cstart64.S, and has now been either rewritten in C or moved to a common location
+to be shared between EFI and non-EFI test builds.
 
-Cheers,
-Robin.
+A call gate is used to transition from 16-bit to 32-bit mode, since EFI may
+not load the 32-bit entrypoint low enough to be reachable from the SIPI vector.
 
->> +static int vfio_iommu_device_ok(void *iommu_data, struct device *device)
->> +{
->> +	bool msi_remap;
->> +
->> +	msi_remap = irq_domain_check_msi_remap() ||
->> +		    iommu_capable(device->bus, IOMMU_CAP_INTR_REMAP);
->> +
-> 
+Git branch: https://github.com/varadgautam/kvm-unit-tests/commits/ap-boot-v1
+
+Varad Gautam (9):
+  x86: Move ap_init() to smp.c
+  x86: Move load_idt() to desc.c
+  x86: desc: Split IDT entry setup into a generic helper
+  x86: efi, smp: Transition APs from 16-bit to 32-bit mode
+  x86: Move 32-bit bringup routines to start32.S
+  x86: efi, smp: Transition APs from 32-bit to 64-bit mode
+  x86: Move load_gdt_tss() to desc.c
+  x86: Provide a common 64-bit AP entrypoint for EFI and non-EFI
+  x86: setup: Serialize ap_start64 with a spinlock
+
+ lib/x86/asm/setup.h       |   3 ++
+ lib/x86/desc.c            |  39 +++++++++++---
+ lib/x86/desc.h            |   3 ++
+ lib/x86/setup.c           |  65 +++++++++++++++++-----
+ lib/x86/smp.c             |  89 +++++++++++++++++++++++++++++-
+ lib/x86/smp.h             |   1 +
+ x86/cstart64.S            | 111 ++------------------------------------
+ x86/efi/crt0-efi-x86_64.S |   3 ++
+ x86/efi/efistart64.S      |  73 ++++++++++++++++++++-----
+ x86/start32.S             | 102 +++++++++++++++++++++++++++++++++++
+ 10 files changed, 348 insertions(+), 141 deletions(-)
+ create mode 100644 x86/start32.S
+
+-- 
+2.32.0
+
