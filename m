@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A21754F99D8
-	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 17:48:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9D484F99DA
+	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 17:48:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237784AbiDHPuJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 11:50:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53104 "EHLO
+        id S237786AbiDHPuS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 11:50:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235007AbiDHPuH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 11:50:07 -0400
+        with ESMTP id S237788AbiDHPuQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 11:50:16 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A8EE210F8
-        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 08:48:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C6AC210F8
+        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 08:48:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649432882;
+        s=mimecast20190719; t=1649432891;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1fNy7kMvRJUEZpOy6RUvT8af/zjCT8c11ZzleUx9H8E=;
-        b=hsxzscLKhU7vNl2sNHAnSczbIBEXmmiCKa/WFO2Iy17+HMEj6she3r1hDLC7w333U3VYb0
-        IGVjD1kkvz3/e0tRlPf3ZLomqK1A63ri6oPq9geoOKLhvk3UOKvRdxWH4CqcFKYHBPRsl6
-        9eEaow//sHnr3GP7KKkbCuExvxaliWw=
+        bh=Z2gRxBOdknfQRB1cfkYgPAkXYqIEl2oL9VEfdnAyBSA=;
+        b=Wk3FXkw0TfA5Wt6zlgVb6YMRwhvURhVH2bv6VL9KsTmOMIkeYzyzh6S4xQlno8e+Rv7J1z
+        5EjJYGCn4vpl/8fw0dtyvlAsIU10TQrjf3rmdIS8c1CMBVkvlnJki/tD43eRmjd9K1xerH
+        +8xd/q7Dq1u139qKLwPkyuzR2fzSBH0=
 Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
  [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-62-GBnZAGNOMlmjNm2ADzqUSQ-1; Fri, 08 Apr 2022 11:48:01 -0400
-X-MC-Unique: GBnZAGNOMlmjNm2ADzqUSQ-1
-Received: by mail-io1-f72.google.com with SMTP id w28-20020a05660205dc00b00645d3cdb0f7so5980499iox.10
-        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 08:48:01 -0700 (PDT)
+ us-mta-160-B1YU4V3MNr2MUJfoHr9rvw-1; Fri, 08 Apr 2022 11:48:10 -0400
+X-MC-Unique: B1YU4V3MNr2MUJfoHr9rvw-1
+Received: by mail-io1-f72.google.com with SMTP id f11-20020a056602070b00b00645d08010fcso5970759iox.15
+        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 08:48:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
          :references:organization:mime-version:content-transfer-encoding;
-        bh=1fNy7kMvRJUEZpOy6RUvT8af/zjCT8c11ZzleUx9H8E=;
-        b=IGOAlPF/FOMkQ5hSiHlHcO6lmMVAAIVKTlH29I+eD8L6+bo8ECgI/vjObUq0lrbWaq
-         j1HC3Wr5wygSjyXRQemsZ/DMNPdJC7UK0YIaoYyqkhUoZi7goOK1MYVHjY6lRToU7jcu
-         QvJmKhc653NQsORPkzrOMms9i0jNeaSNyv/fLZnRIGdPyez1p3g2tsN5kz+l3SyW9krl
-         9p3zFzqTYlY3KP0zwje9HyTzhlUOGb/VWk5rLv9LpxTPfe+RSKScJbzyQ4drN1jtTgF/
-         3ZiLZ/VPTuwpIUKglqjMiQ/U6iXJai7NL8tDNQJi0u1kI0PRkmCXspzZJYIuvIIDziIc
-         U7Hg==
-X-Gm-Message-State: AOAM5329Vcq3+CM7Wa96ixC932nT3TgyKA7edskV4h13wtYLfkmnbQvd
-        mz0ecjVb9lYCmh3WeWEYvWcKxPndH9eu7ezoz8jFrcqN/jZBzbZefoCIEJrUIsRGDWU1sd2yd5H
-        eQ0KyMAcmQEAz
-X-Received: by 2002:a6b:3c08:0:b0:64d:1af2:8ebb with SMTP id k8-20020a6b3c08000000b0064d1af28ebbmr3800130iob.95.1649432880679;
-        Fri, 08 Apr 2022 08:48:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzF5LvhWwH702+DQY0rh5qZCZuznV1E+Lj3o+ML2iD43l4sXNHSX441Op+XgClKeCefpPxmHg==
-X-Received: by 2002:a6b:3c08:0:b0:64d:1af2:8ebb with SMTP id k8-20020a6b3c08000000b0064d1af28ebbmr3800112iob.95.1649432880363;
-        Fri, 08 Apr 2022 08:48:00 -0700 (PDT)
+        bh=Z2gRxBOdknfQRB1cfkYgPAkXYqIEl2oL9VEfdnAyBSA=;
+        b=oqOCYpTIL5IlauwdvXpnt5i1WXyx/1/xuNL/BKD2CDz3a3yIl70X9Mt4RNohn1aeWW
+         dq80xijKzqeWpa24mLVC3uWm5lwkqQYVFLrWveTiL4/eey4iNpc/Vg802syqK62Ici2q
+         jBByvbdAYgqAIXLACf2unXZ/N724cn+xI5HdUTUMbJY9DbKfITwk8mwGMF8wUEbohrqg
+         8S9aZFjdmdkw4sLZIsAOC5Ko23t/c8exe97Ar+UEUCpVHM30uoqk2LQjQG3zOy4cOIDu
+         hoq5Ke3n5WbJcG8q3GZaSBlnmX0vIPMjHE8a42WpTi+1nY9UYxfTmPiiV8H1gkmSdfcq
+         ucrw==
+X-Gm-Message-State: AOAM5328GqhKd4v+BFIrj96dhJZPa8kMQfSS9A0QHtS7J5SmoSmAHyXs
+        gt5smtIH83IsCGcF6FevXN3aoCVWdg+ZTPl72oCW1RW/CKbjMeXlOYi6KcZApP/2BkgfAY4JuU3
+        j4YK8H73kpf5t
+X-Received: by 2002:a5d:83d2:0:b0:64c:fbd3:e792 with SMTP id u18-20020a5d83d2000000b0064cfbd3e792mr8822804ior.59.1649432889329;
+        Fri, 08 Apr 2022 08:48:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxSsMMZZYBKun0PwziD43XZEzOU56NhBOAs7fTRTG7WAh5PRmK8HA5dCAy3y2jLRWrDmaoiZg==
+X-Received: by 2002:a5d:83d2:0:b0:64c:fbd3:e792 with SMTP id u18-20020a5d83d2000000b0064cfbd3e792mr8822794ior.59.1649432889160;
+        Fri, 08 Apr 2022 08:48:09 -0700 (PDT)
 Received: from redhat.com ([98.55.18.59])
-        by smtp.gmail.com with ESMTPSA id m4-20020a056e020de400b002ca34a50db8sm10026653ilj.33.2022.04.08.08.47.59
+        by smtp.gmail.com with ESMTPSA id i12-20020a92c94c000000b002ca56c2cf67sm7104166ilq.28.2022.04.08.08.48.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Apr 2022 08:48:00 -0700 (PDT)
-Date:   Fri, 8 Apr 2022 09:47:57 -0600
+        Fri, 08 Apr 2022 08:48:08 -0700 (PDT)
+Date:   Fri, 8 Apr 2022 09:48:07 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Jason Gunthorpe <jgg@nvidia.com>
 Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
@@ -66,12 +66,12 @@ Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
         Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
         "Tian, Kevin" <kevin.tian@intel.com>,
         Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH v2 2/4] vfio: Move the Intel no-snoop control off of
- IOMMU_CACHE
-Message-ID: <20220408094757.4f5765c8.alex.williamson@redhat.com>
-In-Reply-To: <2-v2-f090ae795824+6ad-intel_no_snoop_jgg@nvidia.com>
+Subject: Re: [PATCH v2 4/4] vfio: Require that devices support DMA cache
+ coherence
+Message-ID: <20220408094807.53f178c5.alex.williamson@redhat.com>
+In-Reply-To: <4-v2-f090ae795824+6ad-intel_no_snoop_jgg@nvidia.com>
 References: <0-v2-f090ae795824+6ad-intel_no_snoop_jgg@nvidia.com>
-        <2-v2-f090ae795824+6ad-intel_no_snoop_jgg@nvidia.com>
+        <4-v2-f090ae795824+6ad-intel_no_snoop_jgg@nvidia.com>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -86,202 +86,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  7 Apr 2022 12:23:45 -0300
+On Thu,  7 Apr 2022 12:23:47 -0300
 Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-> IOMMU_CACHE means "normal DMA to this iommu_domain's IOVA should be cache
-> coherent" and is used by the DMA API. The definition allows for special
-> non-coherent DMA to exist - ie processing of the no-snoop flag in PCIe
-> TLPs - so long as this behavior is opt-in by the device driver.
+> IOMMU_CACHE means that normal DMAs do not require any additional coherency
+> mechanism and is the basic uAPI that VFIO exposes to userspace. For
+> instance VFIO applications like DPDK will not work if additional coherency
+> operations are required.
 > 
-> The flag is mainly used by the DMA API to synchronize the IOMMU setting
-> with the expected cache behavior of the DMA master. eg based on
-> dev_is_dma_coherent() in some case.
-> 
-> For Intel IOMMU IOMMU_CACHE was redefined to mean 'force all DMA to be
-> cache coherent' which has the practical effect of causing the IOMMU to
-> ignore the no-snoop bit in a PCIe TLP.
-> 
-> x86 platforms are always IOMMU_CACHE, so Intel should ignore this flag.
-> 
-> Instead use the new domain op enforce_cache_coherency() which causes every
-> IOPTE created in the domain to have the no-snoop blocking behavior.
-> 
-> Reconfigure VFIO to always use IOMMU_CACHE and call
-> enforce_cache_coherency() to operate the special Intel behavior.
-> 
-> Remove the IOMMU_CACHE test from Intel IOMMU.
-> 
-> Ultimately VFIO plumbs the result of enforce_cache_coherency() back into
-> the x86 platform code through kvm_arch_register_noncoherent_dma() which
-> controls if the WBINVD instruction is available in the guest. No other
-> arch implements kvm_arch_register_noncoherent_dma().
-
-I think this last sentence is alluding to it, but I wish the user
-visible change to VFIO_DMA_CC_IOMMU on non-x86 were more explicit.
-Perhaps for the last sentence:
-
-  No other archs implement kvm_arch_register_noncoherent_dma() nor are
-  there any other known consumers of VFIO_DMA_CC_IOMMU that might be
-  affected by the user visible result change on non-x86 archs.
-
-Otherwise,
-
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
-
+> Therefore check IOMMU_CAP_CACHE_COHERENCY like vdpa & usnic do before
+> allowing an IOMMU backed VFIO device to be created.
 > 
 > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 > ---
->  drivers/iommu/intel/iommu.c     |  7 ++-----
->  drivers/vfio/vfio_iommu_type1.c | 30 +++++++++++++++++++-----------
->  include/linux/intel-iommu.h     |  1 -
->  3 files changed, 21 insertions(+), 17 deletions(-)
+>  drivers/vfio/vfio.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 > 
-> diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-> index f08611a6cc4799..8f3674e997df06 100644
-> --- a/drivers/iommu/intel/iommu.c
-> +++ b/drivers/iommu/intel/iommu.c
-> @@ -641,7 +641,6 @@ static unsigned long domain_super_pgsize_bitmap(struct dmar_domain *domain)
->  static void domain_update_iommu_cap(struct dmar_domain *domain)
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index a4555014bd1e72..9edad767cfdad3 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -815,6 +815,13 @@ static int __vfio_register_dev(struct vfio_device *device,
+>  
+>  int vfio_register_group_dev(struct vfio_device *device)
 >  {
->  	domain_update_iommu_coherency(domain);
-> -	domain->iommu_snooping = domain_update_iommu_snooping(NULL);
->  	domain->iommu_superpage = domain_update_iommu_superpage(domain, NULL);
->  
->  	/*
-> @@ -4283,7 +4282,6 @@ static int md_domain_init(struct dmar_domain *domain, int guest_width)
->  	domain->agaw = width_to_agaw(adjust_width);
->  
->  	domain->iommu_coherency = false;
-> -	domain->iommu_snooping = false;
->  	domain->iommu_superpage = 0;
->  	domain->max_addr = 0;
->  
-> @@ -4422,8 +4420,7 @@ static int intel_iommu_map(struct iommu_domain *domain,
->  		prot |= DMA_PTE_READ;
->  	if (iommu_prot & IOMMU_WRITE)
->  		prot |= DMA_PTE_WRITE;
-> -	if (((iommu_prot & IOMMU_CACHE) && dmar_domain->iommu_snooping) ||
-> -	    dmar_domain->enforce_no_snoop)
-> +	if (dmar_domain->enforce_no_snoop)
->  		prot |= DMA_PTE_SNP;
->  
->  	max_addr = iova + size;
-> @@ -4550,7 +4547,7 @@ static bool intel_iommu_enforce_cache_coherency(struct iommu_domain *domain)
->  {
->  	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
->  
-> -	if (!dmar_domain->iommu_snooping)
-> +	if (!domain_update_iommu_snooping(NULL))
->  		return false;
->  	dmar_domain->enforce_no_snoop = true;
->  	return true;
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 9394aa9444c10c..c13b9290e35759 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -84,8 +84,8 @@ struct vfio_domain {
->  	struct iommu_domain	*domain;
->  	struct list_head	next;
->  	struct list_head	group_list;
-> -	int			prot;		/* IOMMU_CACHE */
-> -	bool			fgsp;		/* Fine-grained super pages */
-> +	bool			fgsp : 1;	/* Fine-grained super pages */
-> +	bool			enforce_cache_coherency : 1;
->  };
->  
->  struct vfio_dma {
-> @@ -1461,7 +1461,7 @@ static int vfio_iommu_map(struct vfio_iommu *iommu, dma_addr_t iova,
->  
->  	list_for_each_entry(d, &iommu->domain_list, next) {
->  		ret = iommu_map(d->domain, iova, (phys_addr_t)pfn << PAGE_SHIFT,
-> -				npage << PAGE_SHIFT, prot | d->prot);
-> +				npage << PAGE_SHIFT, prot | IOMMU_CACHE);
->  		if (ret)
->  			goto unwind;
->  
-> @@ -1771,7 +1771,7 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
->  			}
->  
->  			ret = iommu_map(domain->domain, iova, phys,
-> -					size, dma->prot | domain->prot);
-> +					size, dma->prot | IOMMU_CACHE);
->  			if (ret) {
->  				if (!dma->iommu_mapped) {
->  					vfio_unpin_pages_remote(dma, iova,
-> @@ -1859,7 +1859,7 @@ static void vfio_test_domain_fgsp(struct vfio_domain *domain)
->  		return;
->  
->  	ret = iommu_map(domain->domain, 0, page_to_phys(pages), PAGE_SIZE * 2,
-> -			IOMMU_READ | IOMMU_WRITE | domain->prot);
-> +			IOMMU_READ | IOMMU_WRITE | IOMMU_CACHE);
->  	if (!ret) {
->  		size_t unmapped = iommu_unmap(domain->domain, 0, PAGE_SIZE);
->  
-> @@ -2267,8 +2267,15 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  		goto out_detach;
->  	}
->  
-> -	if (iommu_capable(bus, IOMMU_CAP_CACHE_COHERENCY))
-> -		domain->prot |= IOMMU_CACHE;
 > +	/*
-> +	 * If the IOMMU can block non-coherent operations (ie PCIe TLPs with
-> +	 * no-snoop set) then VFIO always turns this feature on because on Intel
-> +	 * platforms it optimizes KVM to disable wbinvd emulation.
+> +	 * VFIO always sets IOMMU_CACHE because we offer no way for userspace to
+> +	 * restore cache coherency.
 > +	 */
-> +	if (domain->domain->ops->enforce_cache_coherency)
-> +		domain->enforce_cache_coherency =
-> +			domain->domain->ops->enforce_cache_coherency(
-> +				domain->domain);
->  
->  	/*
->  	 * Try to match an existing compatible domain.  We don't want to
-> @@ -2279,7 +2286,8 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  	 */
->  	list_for_each_entry(d, &iommu->domain_list, next) {
->  		if (d->domain->ops == domain->domain->ops &&
-> -		    d->prot == domain->prot) {
-> +		    d->enforce_cache_coherency ==
-> +			    domain->enforce_cache_coherency) {
->  			iommu_detach_group(domain->domain, group->iommu_group);
->  			if (!iommu_attach_group(d->domain,
->  						group->iommu_group)) {
-> @@ -2611,14 +2619,14 @@ static void vfio_iommu_type1_release(void *iommu_data)
->  	kfree(iommu);
+> +	if (!iommu_capable(device->dev->bus, IOMMU_CAP_CACHE_COHERENCY))
+> +		return -EINVAL;
+> +
+>  	return __vfio_register_dev(device,
+>  		vfio_group_find_or_alloc(device->dev));
 >  }
->  
-> -static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
-> +static int vfio_domains_have_enforce_cache_coherency(struct vfio_iommu *iommu)
->  {
->  	struct vfio_domain *domain;
->  	int ret = 1;
->  
->  	mutex_lock(&iommu->lock);
->  	list_for_each_entry(domain, &iommu->domain_list, next) {
-> -		if (!(domain->prot & IOMMU_CACHE)) {
-> +		if (!(domain->enforce_cache_coherency)) {
->  			ret = 0;
->  			break;
->  		}
-> @@ -2641,7 +2649,7 @@ static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
->  	case VFIO_DMA_CC_IOMMU:
->  		if (!iommu)
->  			return 0;
-> -		return vfio_domains_have_iommu_cache(iommu);
-> +		return vfio_domains_have_enforce_cache_coherency(iommu);
->  	default:
->  		return 0;
->  	}
-> diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
-> index 1f930c0c225d94..bc39f633efdf03 100644
-> --- a/include/linux/intel-iommu.h
-> +++ b/include/linux/intel-iommu.h
-> @@ -539,7 +539,6 @@ struct dmar_domain {
->  
->  	u8 has_iotlb_device: 1;
->  	u8 iommu_coherency: 1;		/* indicate coherency of iommu access */
-> -	u8 iommu_snooping: 1;		/* indicate snooping control feature */
->  	u8 enforce_no_snoop : 1;        /* Create IOPTEs with snoop control */
->  
->  	struct list_head devices;	/* all devices' list */
+
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
 
