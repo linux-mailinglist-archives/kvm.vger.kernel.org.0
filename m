@@ -2,162 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DC8D4F9B31
-	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 18:59:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7C8A4F9B3F
+	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 19:01:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236801AbiDHRB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 13:01:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41216 "EHLO
+        id S237485AbiDHRDb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 13:03:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229577AbiDHRB6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 13:01:58 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A4483167F3;
-        Fri,  8 Apr 2022 09:59:54 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CB4146215B;
-        Fri,  8 Apr 2022 16:59:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DA17C385A3;
-        Fri,  8 Apr 2022 16:59:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649437193;
-        bh=hezvIR97K/d6etxHTUv4PJyXJtleS81JAhoNf2K+8hI=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=pJvyoIX8LUcDdClF6OFL1/JUuOZNt2xQp37DthOnlJeEXcZ56oLmJkFbQtZwerNyc
-         OhbWw6+aLK6oGjqw6b25PfyzLj/AER9VlLmiAM+LQ/5i8MhbiDdri4zZWMHRT70gZb
-         beYDmMBo+z6TAuKrplYTcbLyPGZ0hxlxcjjCAv4GZcfa7rmmNE0Tm8ScvVtZiDwK0/
-         HPUz15e3Z+HLPa200pCAwdmPKO8rqplGm8IR0Vt9Qf0SBL+hZjTlKybHoFqlK5ywtl
-         +h7sEDyDqpVv9V7oeXyMTXXtQf9LODvrgCG8l409Qh2jN/UJJskyutVqSOhdcpYZEt
-         bcpiteTImFr1A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=billy-the-mountain.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1ncrxe-002pMe-Kb; Fri, 08 Apr 2022 17:59:50 +0100
-Date:   Fri, 08 Apr 2022 17:59:42 +0100
-Message-ID: <87v8vj1pfl.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        with ESMTP id S234338AbiDHRDa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 13:03:30 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77C6D1A6E61
+        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 10:01:26 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id s8so8839019pfk.12
+        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 10:01:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=eWqSaaArcKpWGewd/PpIagLrNxnVfrX7eeJw2V+0bsU=;
+        b=e/45W54vRn2wXoqJKapVjNEBlsEKPzVALK2ZnAsyFTU2/VLcvfFN2z/PxuDrnf5yYr
+         wzIZFXscKl8tHOtv/5026QUqf5dZEVpW5xXL+BJhaMbKHsMcXaLbg3UDu/MPSYtSCJpD
+         NStDS1RhCtWJEloYe2nnA9d03udZ98pC6ACDsUDlQiTQARKIv5X7uaNW5SFBVwO/MRUA
+         le3GLs6AS9o+aCulMgFQ/uPSlx88/hkf0J7s+PGqEP08qCYcHxEd+xmJzW+0539J/wiV
+         XZmLF7RhSiYxp0yJxVQXu2Fh70FpHZTcMsLNb16H5o5qr/tR61TwEg60MtEePoW/jwCf
+         t7qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=eWqSaaArcKpWGewd/PpIagLrNxnVfrX7eeJw2V+0bsU=;
+        b=WXsk1LXk16/B5RVPwZGblungbqqsLJUDbyh4p3fUxSr63wpWrgVU867AGMGY7+c2kT
+         aWrriQfouvukskhM+67tRxnqiIpDmD/JoziXxe9Vgiajfk5o8C42DYLtdVPmF3xbRvFa
+         FEjy5a8yDkeBStDnMgjGFIPlnxnh6YqPoFunS+zA4nDAki735daqol1QAdVjFb/ZD5Ox
+         8oxxYqg/knl4PMl7yhumKlEO26MUuGJE4TydWU1Fua+9EuK476ICSqaNwVcTKy/8Ecui
+         iLuemkjkwdznLQdJseDaXO4FxUzeb7NqgC6UVT9iN/zYzrUrS2oPnQewqwm2ogaag+d2
+         0UFg==
+X-Gm-Message-State: AOAM530kcHeMcnSc49DAk200PS3oT03/I2nzRW9/+BeEgr43LVdAWU9g
+        s3R/IvgDvOf+jBUiIVkfOkyHBA==
+X-Google-Smtp-Source: ABdhPJx61Cp20UincZxmgyHkjllgAkxu7q8n+OznXbv79pEtVaCAbT28ENVjE8GnNMEUjlgOP6uBfg==
+X-Received: by 2002:a05:6a00:1312:b0:4e1:58c4:ddfd with SMTP id j18-20020a056a00131200b004e158c4ddfdmr20443717pfu.65.1649437285741;
+        Fri, 08 Apr 2022 10:01:25 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id e19-20020a637453000000b003821bdb8103sm22268448pgn.83.2022.04.08.10.01.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Apr 2022 10:01:25 -0700 (PDT)
+Date:   Fri, 8 Apr 2022 17:01:21 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Gonda <pgonda@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v5 02/10] KVM: arm64: Setup a framework for hypercall bitmap firmware registers
-In-Reply-To: <CAJHc60yFD=osoifUpB4LBNo93eVq9zNV41bnu7uBZ0HsBGbMeA@mail.gmail.com>
-References: <20220407011605.1966778-1-rananta@google.com>
-        <20220407011605.1966778-3-rananta@google.com>
-        <87ilrlb6un.wl-maz@kernel.org>
-        <CAJHc60yFD=osoifUpB4LBNo93eVq9zNV41bnu7uBZ0HsBGbMeA@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: rananta@google.com, drjones@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, catalin.marinas@arm.com, will@kernel.org, pshier@google.com, ricarkol@google.com, oupton@google.com, reijiw@google.com, jingzhangos@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        LKML <linux-kernel@vger.kernel.org>,
+        Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v4.1] KVM, SEV: Add KVM_EXIT_SHUTDOWN metadata for SEV-ES
+Message-ID: <YlBqYcXFiwur3zmo@google.com>
+References: <20220407210233.782250-1-pgonda@google.com>
+ <Yk+kNqJjzoJ9TWVH@google.com>
+ <CAMkAt6oc=SOYryXu+_w+WZR+VkMZfLR3_nd=hDvMU_cmOjJ0Xg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMkAt6oc=SOYryXu+_w+WZR+VkMZfLR3_nd=hDvMU_cmOjJ0Xg@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 07 Apr 2022 18:24:14 +0100,
-Raghavendra Rao Ananta <rananta@google.com> wrote:
++Anup and Will
+
+On Fri, Apr 08, 2022, Peter Gonda wrote:
+> On Thu, Apr 7, 2022 at 8:55 PM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Thu, Apr 07, 2022, Peter Gonda wrote:
+> > > If an SEV-ES guest requests termination, exit to userspace with
+> > > KVM_EXIT_SYSTEM_EVENT and a dedicated SEV_TERM type instead of -EINVAL
+> > > so that userspace can take appropriate action.
+> > >
+> > > See AMD's GHCB spec section '4.1.13 Termination Request' for more details.
+> >
+> > Maybe it'll be obvious by the lack of compilation errors, but the changelog should
+> > call out the flags => ndata+data shenanigans, otherwise this looks like ABI breakage.
 > 
-> Hi Marc,
+> Hmm I am not sure we can do this change anymore given that we have two
+> call sites using 'flags'
 > 
-> > > +#define KVM_REG_ARM_STD_BIT_TRNG_V1_0                BIT(0)
-> >
-> > I'm really in two minds about this. Having one bit per service is easy
-> > from an implementation perspective, but is also means that this
-> > disallow fine grained control over which hypercalls are actually
-> > available. If tomorrow TRNG 1.1 adds a new hypercall and that KVM
-> > implements both, how does the selection mechanism works? You will
-> > need a version selector (a la PSCI), which defeats this API somehow
-> > (and renders the name of the #define invalid).
-> >
-> > I wonder if a more correct way to look at this is to enumerate the
-> > hypercalls themselves (all 5 of them), though coming up with an
-> > encoding is tricky (RNG32 and RNG64 would clash, for example).
-> >
-> > Thoughts?
-> >
-> I was on the fence about this too. The TRNG spec (ARM DEN 0098,
-> Table-4) mentions that v1.0 should have VERSION, FEATURES, GET_UUID,
-> and RND as mandatory features. Hence, if KVM advertised that it
-> supports TRNG v1.0, I thought it would be best to expose all or
-> nothing of v1.0 by guarding them with a single bit.
-> Broadly, the idea is to have a bit per version. If v1.1 comes along,
-> we can have another bit for that. If it's not too ugly to implement,
-> we can be a little more aggressive and ensure that userspace doesn't
-> enable v1.1 without enabling v1.0.
+> arch/arm64/kvm/psci.c:184
+> arch/riscv/kvm/vcpu_sbi.c:97
+> 
+> I am not at all familiar with ARM and RISC-V but some quick reading
+> tells me these archs also require 64-bit alignment on their 64-bit
+> accesses. If thats correct, should I fix this call sites up by
+> proceeding with this ndata + data[] change and move whatever they are
+> assigning to flags into data[0] like I am doing here? It looks like
+> both of these changes are not in a kernel release so IIUC we can still
+> fix the ABI here?
 
-OK, that'd be assuming that we'll never see a service where version A
-is incompatible with version B and that we have to exclude one or the
-other. Meh. Let's cross that bridge once it is actually built.
+Yeah, both came in for v5.18.  Given that there will be multiple paths that need
+to set data, it's worth adding a common helper to the dirty work.
 
-[...]
+Anup and Will,
 
-> > > +     mutex_lock(&kvm->lock);
-> > > +
-> > > +     /*
-> > > +      * If the VM (any vCPU) has already started running, return success
-> > > +      * if there's no change in the value. Else, return -EBUSY.
-> >
-> > No, this should *always* fail if a vcpu has started. Otherwise, you
-> > start allowing hard to spot races.
-> >
-> The idea came from the fact that userspace could spawn multiple
-> threads to configure the vCPU registers. Since we don't have the
-> VM-scoped registers yet, it may be possible that userspace has issued
-> a KVM_RUN on one of the vCPU, while the others are lagging behind and
-> still configuring the registers. The slower threads may see -EBUSY and
-> could panic. But if you feel that it's an overkill and the userspace
-> should deal with it, we can return EBUSY for all writes after KVM_RUN.
+system_event.flags is broken (at least on x86) due to the prior 'type' field not
+being propery padded, e.g. userspace will read/write garbage if the userspace
+and kernel compilers pad structs differently.
 
-I'd rather have that. There already is stuff that rely on things not
-changing once a vcpu has run, so I'd rather be consistent.
+		struct {
+			__u32 type;
+			__u64 flags;
+		} system_event;
 
->
-> > > +      */
-> > > +     if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags)) {
-> > > +             ret = *fw_reg_bmap != val ? -EBUSY : 0;
-> > > +             goto out;
-> > > +     }
-> > > +
-> > > +     WRITE_ONCE(*fw_reg_bmap, val);
-> >
-> > I'm not sure what this WRITE_ONCE guards against. Do you expect
-> > concurrent reads at this stage?
-> >
-> Again, the assumption here is that userspace could have multiple
-> threads reading and writing to these registers. Without the VM scoped
-> registers in place, we may end up with a read/write to the same memory
-> location for all the vCPUs.
+Our plan to unhose this is to change the struct as follows and use bit 31 in the
+'type' to indicate that ndata+data are valid.
 
-We only have one vcpu updating this at any given time (that's what the
-lock ensures). A simple write should be OK, as far as I can tell.
+		struct {
+                        __u32 type;
+			__u32 ndata;
+			__u64 data[16];
+                } system_event;
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Any objection to updating your architectures to use a helper to set the bit and
+populate ndata+data accordingly?  It'll require a userspace update, but v5.18
+hasn't officially released yet so it's not kinda sort not ABI breakage.
