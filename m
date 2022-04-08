@@ -2,79 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36A474F9AD9
-	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 18:41:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 209054F9AE8
+	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 18:46:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233470AbiDHQnZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 12:43:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55128 "EHLO
+        id S233578AbiDHQsR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 12:48:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230014AbiDHQnX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 12:43:23 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B652A10E9;
-        Fri,  8 Apr 2022 09:41:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649436079; x=1680972079;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=aAbi/qmKq+r/hL4lQDiEEDWm+BnU3Db3wanrG3/Vskg=;
-  b=RjnOTixhwA9lwoKCBk2+xaerM8hMPcB47cZjmyeOTLzJCbS2JSxn0LBD
-   taT1hPg2zYxrZUo5uddpjvwlZT+fvhzQIEuQeRztUqxT+2kJRsSG6sStz
-   oWUeZzW6Lv95vmEJlLUrBSvCflKl07AKzA5IB6UFhJVrUnhNvNnQUIN9K
-   kVn20bf5SYiMVKl5YHwbtJ7bIk8FWezleaM21bejZDqj6ggzf8gu5S4tQ
-   5CbsM82QnMtWxc+XtatlzH0elCB+rrx5JxERE8l1YEQ7iYEpcVkHzM7eb
-   SGGaifQVyR2UriXi9Kjo9T2BgH+pODCU0ulORxV/FU1hL/sBpQeqXzH2/
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10310"; a="243768602"
-X-IronPort-AV: E=Sophos;i="5.90,245,1643702400"; 
-   d="scan'208";a="243768602"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2022 09:41:19 -0700
-X-IronPort-AV: E=Sophos;i="5.90,245,1643702400"; 
-   d="scan'208";a="571547038"
-Received: from zengguan-mobl1.ccr.corp.intel.com (HELO [10.254.213.22]) ([10.254.213.22])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2022 09:41:14 -0700
-Message-ID: <b8f753b0-1b57-3e42-3516-27cc0359c584@intel.com>
-Date:   Sat, 9 Apr 2022 00:41:03 +0800
+        with ESMTP id S229668AbiDHQsO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 12:48:14 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B19A1DA5E
+        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 09:46:10 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id o5-20020a17090ad20500b001ca8a1dc47aso12411496pju.1
+        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 09:46:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=KjGzlPUuopnzOxDb70wPeYUUzIj9x1BrlBL7vAL3tEU=;
+        b=nMUAsD6DVHxasPy+bHqB5yAyTxDamuiDmy7FuYy+5YCzQjXg5KrVCglUnu2RwZ7wDO
+         VgUgFHdgmXbomd+tDzupYzwVUMcDOVfbohBWX9cbf33EaAI/OEasRPiFIV29b9A/408p
+         2jRsSnMB7pf4mlzcGNKqGnI3PhClL5e7SL0+4o1nYt+weKwj+NG7sKlMDs81oppC4S/E
+         k0camdZClD+mxlZhX4kfxSCiK2oUXQjXyYylESC/QLV8+g+NBBGzKbRkl11spdr/Vv6s
+         DQuKmHtidbNWwSr/KLU7DGMxB64gp1TbS36mA++3AuZGeCdYhVDfkX7yS5eSKLmWgwbG
+         spmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=KjGzlPUuopnzOxDb70wPeYUUzIj9x1BrlBL7vAL3tEU=;
+        b=K8UpKrlxkFA72Q9nU4U5D+yTMsxpP6Hk+Kf9pUG/UMlknozBZYQ4ia1AuqXComL0kp
+         HCYV5+zSLSrUG546q+Jhy3hRHfLP+p6WQsmovuK8+A0kvuO+NsTnS3IMPzn9Se3GgJwH
+         JTCFXv4H3NDhZcuZ3LTBcxb0t8tLLxnyUEus6EYY+Q2wA8EY4tpawng75FZOevko8Y9g
+         wK1LrqnM+GLSHijtcu22R1jXbLMkeZzWA+1IQ+uAlX4YZI/8iiHfFKTVoUeJ8KkRxjYo
+         A9BIxQSskfj4rrncNc5lEzw5gyM41fTud53aV3QYJszc/DPcdn5Vjx9QgMNIeUUvtblx
+         +VBw==
+X-Gm-Message-State: AOAM530vIS7YGhwv+uUv46beKdiIAKVNAA2UzdfNrf2giQC2XvAnQ96q
+        QVuCc2wvLUBbCEt56GL0BgyQDg==
+X-Google-Smtp-Source: ABdhPJz0iwytqOS32LIa00b7FHRew+z1BX9zsSQNqylpLVDQVJoWyNnMedQm0cD5GiqNLfHfoAXT5Q==
+X-Received: by 2002:a17:902:f649:b0:156:1609:79e9 with SMTP id m9-20020a170902f64900b00156160979e9mr20434203plg.69.1649436369344;
+        Fri, 08 Apr 2022 09:46:09 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id d16-20020a056a00245000b004f771b48736sm28031213pfj.194.2022.04.08.09.46.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Apr 2022 09:46:08 -0700 (PDT)
+Date:   Fri, 8 Apr 2022 16:46:04 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>
+Subject: Re: [RFC PATCH v5 003/104] KVM: TDX: Detect CPU feature on kernel
+ module initialization
+Message-ID: <YlBmzDcYdahXzSue@google.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <70201fd686c6cc6e03f5af8a9f59af67bdc81194.1646422845.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v7 8/8] KVM: VMX: enable IPI virtualization
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Hu, Robert" <robert.hu@intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>
-References: <20220304080725.18135-1-guang.zeng@intel.com>
- <20220304080725.18135-9-guang.zeng@intel.com> <YkZlhI7nAAqDhT0D@google.com>
- <54df6da8-ad68-cc75-48db-d18fc87430e9@intel.com>
- <YksxiAnNmdR2q65S@google.com>
-From:   Zeng Guang <guang.zeng@intel.com>
-In-Reply-To: <YksxiAnNmdR2q65S@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <70201fd686c6cc6e03f5af8a9f59af67bdc81194.1646422845.git.isaku.yamahata@intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,133 +74,162 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Mar 04, 2022, isaku.yamahata@intel.com wrote:
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> new file mode 100644
+> index 000000000000..1acf08c310c4
+> --- /dev/null
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -0,0 +1,53 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +#include <linux/cpu.h>
+> +
+> +#include <asm/tdx.h>
+> +
+> +#include "capabilities.h"
+> +#include "x86_ops.h"
+> +
+> +#undef pr_fmt
+> +#define pr_fmt(fmt) "tdx: " fmt
+> +
+> +static bool __read_mostly enable_tdx = true;
+> +module_param_named(tdx, enable_tdx, bool, 0644);
 
-On 4/5/2022 1:57 AM, Sean Christopherson wrote:
-> On Sun, Apr 03, 2022, Zeng Guang wrote:
->> On 4/1/2022 10:37 AM, Sean Christopherson wrote:
->>>> @@ -4219,14 +4226,21 @@ static void vmx_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
->>>>    	pin_controls_set(vmx, vmx_pin_based_exec_ctrl(vmx));
->>>>    	if (cpu_has_secondary_exec_ctrls()) {
->>>> -		if (kvm_vcpu_apicv_active(vcpu))
->>>> +		if (kvm_vcpu_apicv_active(vcpu)) {
->>>>    			secondary_exec_controls_setbit(vmx,
->>>>    				      SECONDARY_EXEC_APIC_REGISTER_VIRT |
->>>>    				      SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
->>>> -		else
->>>> +			if (enable_ipiv)
->>>> +				tertiary_exec_controls_setbit(vmx,
->>>> +						TERTIARY_EXEC_IPI_VIRT);
->>>> +		} else {
->>>>    			secondary_exec_controls_clearbit(vmx,
->>>>    					SECONDARY_EXEC_APIC_REGISTER_VIRT |
->>>>    					SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
->>>> +			if (enable_ipiv)
->>>> +				tertiary_exec_controls_clearbit(vmx,
->>>> +						TERTIARY_EXEC_IPI_VIRT);
->>> Oof.  The existing code is kludgy.  We should never reach this point without
->>> enable_apicv=true, and enable_apicv should be forced off if APICv isn't supported,
->>> let alone seconary exec being support.
->>>
->>> Unless I'm missing something, throw a prep patch earlier in the series to drop
->>> the cpu_has_secondary_exec_ctrls() check, that will clean this code up a smidge.
->> cpu_has_secondary_exec_ctrls() check can avoid wrong vmcs write in case mistaken
->> invocation.
-> KVM has far bigger problems on buggy invocation, and in that case the resulting
-> printk + WARN from the failed VMWRITE is a good thing.
+This is comically unsafe, userspace must not be allowed to toggle enable_tdx
+after KVM is loaded.
 
+> +static u64 hkid_mask __ro_after_init;
+> +static u8 hkid_start_pos __ro_after_init;
+> +
+> +static int __init __tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+> +{
+> +	u32 max_pa;
+> +
+> +	if (!enable_ept) {
+> +		pr_warn("Cannot enable TDX with EPT disabled\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (!platform_has_tdx()) {
+> +		pr_warn("Cannot enable TDX with SEAMRR disabled\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	if (WARN_ON_ONCE(x86_ops->tlb_remote_flush))
+> +		return -EIO;
+> +
+> +	max_pa = cpuid_eax(0x80000008) & 0xff;
+> +	hkid_start_pos = boot_cpu_data.x86_phys_bits;
+> +	hkid_mask = GENMASK_ULL(max_pa - 1, hkid_start_pos);
+> +
+> +	return 0;
+> +}
+> +
+> +void __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+> +{
+> +	/*
+> +	 * This function is called at the initialization.  No need to protect
+> +	 * enable_tdx.
+> +	 */
+> +	if (!enable_tdx)
+> +		return;
+> +
+> +	if (__tdx_hardware_setup(&vt_x86_ops))
+> +		enable_tdx = false;
 
-SDM doesn't define VMWRITE failure for such case. But it says the logical
-processor operates as if all the secondary processor-based VM-execution
-controls were 0 if "activate secondary controls" primary processor-based
-VM-execution control is 0. So we may add WARN() to detect this kind of
-buggy invocation instead.
+Clearing enable_tdx here unnecessarily risks introducing bugs in the caller,
+e.g. acting on enable_tdx before tdx_hardware_setup() is invoked.  I'm guessing
+this was the result of trying to defer module load until VM creation.  With that
+gone, the flag can be moved to vmx/main.c, as there should be zero reason for
+tdx.c to check/modify enable_tdx, i.e. functions in tdx.c should never be called
+if enabled_tdx = false.
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 61e075e16c19..6c370b507b45 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4200,22 +4200,22 @@ static void vmx_refresh_apicv_exec_ctrl(struct 
-kvm_vcpu *vcpu)
-         struct vcpu_vmx *vmx = to_vmx(vcpu);
+An alteranative to 
 
-         pin_controls_set(vmx, vmx_pin_based_exec_ctrl(vmx));
--       if (cpu_has_secondary_exec_ctrls()) {
--               if (kvm_vcpu_apicv_active(vcpu)) {
--                       secondary_exec_controls_setbit(vmx,
-- SECONDARY_EXEC_APIC_REGISTER_VIRT |
-- SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
--                       if (enable_ipiv)
--                               tertiary_exec_controls_setbit(vmx,
-- TERTIARY_EXEC_IPI_VIRT);
--               } else {
--                       secondary_exec_controls_clearbit(vmx,
-- SECONDARY_EXEC_APIC_REGISTER_VIRT |
-- SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
--                       if (enable_ipiv)
-- tertiary_exec_controls_clearbit(vmx,
-- TERTIARY_EXEC_IPI_VIRT);
--               }
+	if (enable_tdx && tdx_hardware_setup(&vt_x86_ops))
+		enable_tdx = false;
+
+would be
+
+	enable_tdx = enable_tdx && !tdx_hardware_setup(&vt_x86_ops);
+
+I actually prefer the latter (no "if"), but I already generated and wiped the below
+diff before thinking of that.
+
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index b79fcc8d81dd..43e13c2a804e 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -6,6 +6,9 @@
+ #include "nested.h"
+ #include "pmu.h"
+
++static bool __read_mostly enable_tdx = IS_ENABLED(CONFIG_INTEL_TDX_HOST);
++module_param_named(tdx, enable_tdx, bool, 0644);
 +
-+       WARN(!cpu_has_secondary_exec_ctrls(),
-+                    "VMX: unexpected vmwrite with inactive secondary 
-exec controls");
-+
-+       if (kvm_vcpu_apicv_active(vcpu)) {
-+               secondary_exec_controls_setbit(vmx,
-+                             SECONDARY_EXEC_APIC_REGISTER_VIRT |
-+ SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
-+               if (enable_ipiv)
-+                       tertiary_exec_controls_setbit(vmx, 
-TERTIARY_EXEC_IPI_VIRT);
-+       } else {
-+               secondary_exec_controls_clearbit(vmx,
-+                             SECONDARY_EXEC_APIC_REGISTER_VIRT |
-+ SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
-+               if (enable_ipiv)
-+                       tertiary_exec_controls_clearbit(vmx, 
-TERTIARY_EXEC_IPI_VIRT);
-         }
+ static __init int vt_hardware_setup(void)
+ {
+        int ret;
+@@ -14,7 +17,8 @@ static __init int vt_hardware_setup(void)
+        if (ret)
+                return ret;
 
-         vmx_update_msr_bitmap_x2apic(vcpu);
+-       tdx_hardware_setup(&vt_x86_ops);
++       if (enable_tdx && tdx_hardware_setup(&vt_x86_ops))
++               enable_tdx = false;
 
->
->>>> +	 */
->>>> +	if (vmx_can_use_ipiv(vcpu->kvm)) {
->>>> +		struct kvm_vmx *kvm_vmx = to_kvm_vmx(vcpu->kvm);
->>>> +
->>>> +		mutex_lock(&vcpu->kvm->lock);
->>>> +		err = vmx_alloc_pid_table(kvm_vmx);
->>>> +		mutex_unlock(&vcpu->kvm->lock);
->>> This belongs in vmx_vm_init(), doing it in vCPU creation is a remnant of the
->>> dynamic resize approach that's no longer needed.
->> We cannot allocate pid table in vmx_vm_init() as userspace has no chance to
->> set max_vcpu_ids at this stage. That's the reason we do it in vCPU creation
->> instead.
-> Ah, right.  Hrm.  And that's going to be a recurring problem if we try to use the
-> dynamic kvm->max_vcpu_ids to reduce other kernel allocations.
->
-> Argh, and even kvm_arch_vcpu_precreate() isn't protected by kvm->lock.
->
-> Taking kvm->lock isn't problematic per se, I just hate doing it so deep in a
-> per-vCPU flow like this.
->
-> A really gross hack/idea would be to make this 64-bit only and steal the upper
-> 32 bits of @type in kvm_create_vm() for the max ID.
->
-> I think my first choice would be to move kvm_arch_vcpu_precreate() under kvm->lock.
-> None of the architectures that have a non-nop implemenation (s390, arm64 and x86)
-> do significant work, so holding kvm->lock shouldn't harm performance.  s390 has to
-> acquire kvm->lock in its implementation, so we could drop that.  And looking at
-> arm64, I believe its logic should also be done under kvm->lock.
->
-> It'll mean adding yet another kvm_x86_ops, but I like that more than burying the
-> code deep in vCPU creation.
->
-> Paolo, any thoughts on this?
+        return 0;
+ }
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 1acf08c310c4..3f660f323426 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -9,13 +9,10 @@
+ #undef pr_fmt
+ #define pr_fmt(fmt) "tdx: " fmt
 
-Sounds reasonable. I will prepare patch to refactor the 
-kvm_arch_vcpu_precreate()
-and make pid table allocation done there.
+-static bool __read_mostly enable_tdx = true;
+-module_param_named(tdx, enable_tdx, bool, 0644);
+-
+ static u64 hkid_mask __ro_after_init;
+ static u8 hkid_start_pos __ro_after_init;
 
-Thanks.
+-static int __init __tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
++static int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+ {
+        u32 max_pa;
+
+@@ -38,16 +35,3 @@ static int __init __tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+
+        return 0;
+ }
+-
+-void __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+-{
+-       /*
+-        * This function is called at the initialization.  No need to protect
+-        * enable_tdx.
+-        */
+-       if (!enable_tdx)
+-               return;
+-
+-       if (__tdx_hardware_setup(&vt_x86_ops))
+-               enable_tdx = false;
+-}
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index ccf98e79d8c3..fd60128eb10a 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -124,9 +124,9 @@ void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu);
+ void vmx_setup_mce(struct kvm_vcpu *vcpu);
+
+ #ifdef CONFIG_INTEL_TDX_HOST
+-void __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
++int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
+ #else
+-static inline void tdx_hardware_setup(struct kvm_x86_ops *x86_ops) {}
++static inline int void tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return 0; }
+ #endif
+
+ #endif /* __KVM_X86_VMX_X86_OPS_H */
 
