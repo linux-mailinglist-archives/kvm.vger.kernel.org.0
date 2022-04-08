@@ -2,162 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C3CB4F9C16
-	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 19:57:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 871EF4F9C3C
+	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 20:06:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229719AbiDHR7J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 13:59:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58996 "EHLO
+        id S229572AbiDHSJA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 14:09:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229693AbiDHR7H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 13:59:07 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF4B310F6E7
-        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 10:57:00 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id g12-20020a17090a640c00b001cb59d7a57cso517932pjj.1
-        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 10:57:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=IudNh/HynxxH+tLoweLS06+fVTpNQOOa59eg8I3l6dE=;
-        b=U2/eA7V9kOv67ug/CEAAH5jJ3bDdjcuxlz1/CKBkgdCZNj0JT/9J3pCPxI/ctDFSbM
-         qK1+Sr9mcyKaUr/H66Pv9yktEidb3BhejDS+0/amDof+SQfyaKA08TzT03iiUsMWJJ3J
-         1MOBs6THAm4fpRtqfO8Z5nRoWMFj9z3GkfuNpKxv/p7ca1UQgBQvuQUPEasblyTQ9RrO
-         yn1hcR+9v3A8/OJPimHYWYuYVMj6vFYN+ei68jGp8D7XrjHDIdyTkfs0MDCZSOMFvB64
-         yHKUCeuwajm7ozlzkxvbDs/GO8MPtR8QBXSY2YgA4lYkeM/deK+/SqRK5LFaoYUgODz1
-         i3nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=IudNh/HynxxH+tLoweLS06+fVTpNQOOa59eg8I3l6dE=;
-        b=x4v4B0LxBUi6b3W27teAfkOpArK2+oAQ0++QWBVJtUs05J4XlMZEsHQ4tQIt++mHvC
-         Di4MjEsSQln7wea7JARAwX41nHxL73gpyB9V9sxrKRK1v2LqhmPX7dWLnkJxMoHfkaGn
-         ke80lnUJT8h+9BsHp1SbMHZoehoVPUiBG65UZWC1K1vaU0vrErfQphqnZ+M62cJfQFqF
-         zDkgM25C0kOpr1ot/9L/HpeERDSaJpy2QKL894DmTfpGK4+trzUXwyP9KDBow5lp+dln
-         tKOqjKhUqnUFMIfRCU92TmazPzyKKOx2nseqpPHys3pQ+45ztS6mcYWBXmsmJuGLxpBd
-         FFtQ==
-X-Gm-Message-State: AOAM530IU8P9TIEOhmlblxSdgKeJ4EgyFymDHMsNVyYWL8Nnp5Piikns
-        QoxNwb6Q1nuCfrl2vACCFPUWvQ==
-X-Google-Smtp-Source: ABdhPJzyqykFhKSNRm78BrrnsD1mOVmGCPlJulii4V8oRfU//P/WLig+dmASk3SzvKPSoD3usOwcWw==
-X-Received: by 2002:a17:903:2346:b0:156:9956:f437 with SMTP id c6-20020a170903234600b001569956f437mr20871133plh.123.1649440620128;
-        Fri, 08 Apr 2022 10:57:00 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id w123-20020a623081000000b005056a4d71e3sm6021624pfw.77.2022.04.08.10.56.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Apr 2022 10:56:59 -0700 (PDT)
-Date:   Fri, 8 Apr 2022 17:56:55 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v5 04/13] mm/shmem: Restrict MFD_INACCESSIBLE memory
- against RLIMIT_MEMLOCK
-Message-ID: <YlB3Z8fqJ+67a2Ck@google.com>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <20220310140911.50924-5-chao.p.peng@linux.intel.com>
- <Yk8L0CwKpTrv3Rg3@google.com>
- <02e18c90-196e-409e-b2ac-822aceea8891@www.fastmail.com>
+        with ESMTP id S229495AbiDHSI7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 14:08:59 -0400
+Received: from mail.efficios.com (mail.efficios.com [167.114.26.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D34A6566
+        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 11:06:55 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.efficios.com (Postfix) with ESMTP id 649B43D7FE1;
+        Fri,  8 Apr 2022 14:06:54 -0400 (EDT)
+Received: from mail.efficios.com ([127.0.0.1])
+        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id O5sFNEQfUXZh; Fri,  8 Apr 2022 14:06:54 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.efficios.com (Postfix) with ESMTP id 08FDB3D7E63;
+        Fri,  8 Apr 2022 14:06:54 -0400 (EDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.efficios.com 08FDB3D7E63
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=efficios.com;
+        s=default; t=1649441214;
+        bh=UgwCTk7/3GgldDuEtXfBf0PFUi8F3qGeDJ5PZgUa7n8=;
+        h=Date:From:To:Message-ID:MIME-Version;
+        b=mykBob5g0R7SQaM3QqyGhavHYMWr0TzfAww6h3UrCFORYBeLX7UcFX1SoZL/wtlYQ
+         avXOSRfdTioPUMLnceAvZT1TmmzldQbtbEQSdAUcXrVUawyzUdMz+1Fzv+HaLlmowS
+         BUoymdpGtBgHuiv7bD6/xYFGtKjmP6STHVpxCOb15yjdw1zzkav7/hfZeI/E1WI7hT
+         qlrYgu8pmj1GA6bnmcLeH/RvYg/qSyJQkDmSZWdIDUq6HQdKSqVM8q9lJyj0sl57JN
+         YsPxOOt7Tw5iM8HaX9fr1MdAJDnkVUkylqPfphkoJVpHntKLgpUuowXCE+0/OuXpjo
+         P8wzj66dEw4wg==
+X-Virus-Scanned: amavisd-new at efficios.com
+Received: from mail.efficios.com ([127.0.0.1])
+        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id CM4rLEGMgK7f; Fri,  8 Apr 2022 14:06:53 -0400 (EDT)
+Received: from mail03.efficios.com (mail03.efficios.com [167.114.26.124])
+        by mail.efficios.com (Postfix) with ESMTP id ECEAB3D8234;
+        Fri,  8 Apr 2022 14:06:53 -0400 (EDT)
+Date:   Fri, 8 Apr 2022 14:06:53 -0400 (EDT)
+From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        KVM list <kvm@vger.kernel.org>, rostedt <rostedt@goodmis.org>,
+        lttng-dev <lttng-dev@lists.lttng.org>,
+        Michael Jeanson <mjeanson@efficios.com>
+Message-ID: <1622857974.11247.1649441213797.JavaMail.zimbra@efficios.com>
+In-Reply-To: <3c11308e-006a-a7e9-8482-c6b341690530@redhat.com>
+References: <1218866473.10909.1649432186473.JavaMail.zimbra@efficios.com> <3c11308e-006a-a7e9-8482-c6b341690530@redhat.com>
+Subject: Re: Unexport of kvm_x86_ops vs tracer modules
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <02e18c90-196e-409e-b2ac-822aceea8891@www.fastmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [167.114.26.124]
+X-Mailer: Zimbra 8.8.15_GA_4257 (ZimbraWebClient - FF99 (Linux)/8.8.15_GA_4257)
+Thread-Topic: Unexport of kvm_x86_ops vs tracer modules
+Thread-Index: HRgc0Gw3F7w+0GLEUzyCTgfg1qIAWw==
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 07, 2022, Andy Lutomirski wrote:
-> 
-> On Thu, Apr 7, 2022, at 9:05 AM, Sean Christopherson wrote:
-> > On Thu, Mar 10, 2022, Chao Peng wrote:
-> >> Since page migration / swapping is not supported yet, MFD_INACCESSIBLE
-> >> memory behave like longterm pinned pages and thus should be accounted to
-> >> mm->pinned_vm and be restricted by RLIMIT_MEMLOCK.
-> >> 
-> >> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> >> ---
-> >>  mm/shmem.c | 25 ++++++++++++++++++++++++-
-> >>  1 file changed, 24 insertions(+), 1 deletion(-)
-> >> 
-> >> diff --git a/mm/shmem.c b/mm/shmem.c
-> >> index 7b43e274c9a2..ae46fb96494b 100644
-> >> --- a/mm/shmem.c
-> >> +++ b/mm/shmem.c
-> >> @@ -915,14 +915,17 @@ static void notify_fallocate(struct inode *inode, pgoff_t start, pgoff_t end)
-> >>  static void notify_invalidate_page(struct inode *inode, struct folio *folio,
-> >>  				   pgoff_t start, pgoff_t end)
-> >>  {
-> >> -#ifdef CONFIG_MEMFILE_NOTIFIER
-> >>  	struct shmem_inode_info *info = SHMEM_I(inode);
-> >>  
-> >> +#ifdef CONFIG_MEMFILE_NOTIFIER
-> >>  	start = max(start, folio->index);
-> >>  	end = min(end, folio->index + folio_nr_pages(folio));
-> >>  
-> >>  	memfile_notifier_invalidate(&info->memfile_notifiers, start, end);
-> >>  #endif
-> >> +
-> >> +	if (info->xflags & SHM_F_INACCESSIBLE)
-> >> +		atomic64_sub(end - start, &current->mm->pinned_vm);
-> >
-> > As Vishal's to-be-posted selftest discovered, this is broken as current->mm
-> > may be NULL.  Or it may be a completely different mm, e.g. AFAICT there's
-> > nothing that prevents a different process from punching hole in the shmem
-> > backing.
-> >
-> 
-> How about just not charging the mm in the first place?  There’s precedent:
-> ramfs and hugetlbfs (at least sometimes — I’ve lost track of the current
-> status).
-> 
-> In any case, for an administrator to try to assemble the various rlimits into
-> a coherent policy is, and always has been, quite messy. ISTM cgroup limits,
-> which can actually add across processes usefully, are much better.
-> 
-> So, aside from the fact that these fds aren’t in a filesystem and are thus
-> available by default, I’m not convinced that this accounting is useful or
-> necessary.
-> 
-> Maybe we could just have some switch require to enable creation of private
-> memory in the first place, and anyone who flips that switch without
-> configuring cgroups is subject to DoS.
+----- On Apr 8, 2022, at 12:24 PM, Paolo Bonzini pbonzini@redhat.com wrote:
 
-I personally have no objection to that, and I'm 99% certain Google doesn't rely
-on RLIMIT_MEMLOCK.
+> On 4/8/22 17:36, Mathieu Desnoyers wrote:
+>> LTTng is an out of tree kernel module, which currently relies on the export.
+>> Indeed, arch/x86/kvm/x86.c exports a set of tracepoints to kernel modules, e.g.:
+>> 
+>> EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_entry)
+>> 
+>> But any probe implementation hooking on that tracepoint would need kvm_x86_ops
+>> to translate the struct kvm_vcpu * into meaningful tracing data.
+>> 
+>> I could work-around this on my side in ugly ways, but I would like to discuss
+>> how kernel module tracers are expected to implement kvm events probes without
+>> the kvm_x86_ops symbol ?
+> 
+> The conversion is done in the TP_fast_assign snippets, which are part of
+> kvm.ko and therefore do not need the export.  As I understand it, the
+> issue is that LTTng cannot use the TP_fast_assign snippets, because they
+> are embedded in the trace_event_raw_event_* symbols?
+
+Indeed, the fact that the TP_fast_assign snippets are embedded in the
+trace_event_raw_event_* symbols is an issue for LTTng. This ties those
+to ftrace.
+
+AFAIK, TP_fast_assign copies directly into ftrace ring buffers, and then
+afterwards things like dynamic filters are applied, which then "uncommits" the
+events if need be (and if possible). Also, TP_fast_assign is tied to the
+ftrace ring buffer event layout. The fact that the TP_STRUCT__entry() (description)
+and TP_fast_assign() (open-coded C) are separate fields really focuses on a
+use-case where all data is serialized to a ring buffer.
+
+In LTTng, the event fields are made available to a filter interpreter prior to
+being copied into LTTng's ring buffer. This is made possible by implementing
+our own LTTNG_TRACEPOINT_EVENT code generation headers. In addition, we have
+recently released an event notification mechanism (lttng 2.13) which captures
+specific event fields to send with an immediate notification (thus bypassing the
+tracer buffering). We are also currently working on a LTTng trace hit counters
+mechanism, which performs aggregation through per-cpu counters, which doesn't
+even allocate a ring buffer.
+
+For those reasons, LTTng reimplements its own tracepoint probe callbacks. All
+those sit within LTTng kernel modules, which means we currently need the exported
+kvm_x86_ops callbacks.
+
+> We cannot do the extraction before calling trace_kvm_exit, because it's
+> expensive.
+
+I suspect that extracting relevant data prior to calling trace_kvm_exit
+is too expensive because it cannot be skipped when the tracepoint is
+disabled. This is because trace_kvm_exit() is a static inline function,
+and the check to figure out if the event is enabled is within that function.
+Unfortunately, even if the tracepoint is disabled, the side-effects of the
+parameters passed to trace_kvm_exit() must happen.
+
+I've solved this in LTTng-UST by implementing a lttng_ust_tracepoint()
+macro, which basically "lifts" the tracepoint enabled check before the
+evaluation of the arguments.
+
+You could achieve something similar by using trace_kvm_exit_enabled() in the
+kernel like so:
+
+  if (trace_kvm_exit_enabled())
+      trace_kvm_exit(....);
+
+Which would skip evaluation of the argument side-effects when the tracepoint is
+disabled.
+
+By doing that, when multiple tracers are attached to a kvm tracepoint, the
+translation from pointer-to-internal-structure to meaningful fields would only
+need to be done once when a tracepoint is hit. And this would remove the need
+for using kvm_x86_ops callbacks from tracer probe functions.
+
+Thoughts ?
+
+Thanks,
+
+Mathieu
+
+-- 
+Mathieu Desnoyers
+EfficiOS Inc.
+http://www.efficios.com
