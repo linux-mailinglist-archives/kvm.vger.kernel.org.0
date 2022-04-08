@@ -2,57 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C1A84F9BEC
-	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 19:44:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A66C4F9BF0
+	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 19:45:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235095AbiDHRqv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 13:46:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39744 "EHLO
+        id S238264AbiDHRr3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 13:47:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231932AbiDHRqu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 13:46:50 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C075EDFF7
-        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 10:44:44 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 78DD71042;
-        Fri,  8 Apr 2022 10:44:44 -0700 (PDT)
-Received: from [10.57.41.19] (unknown [10.57.41.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8FBDF3F5A1;
-        Fri,  8 Apr 2022 10:44:42 -0700 (PDT)
-Message-ID: <a8371724-2864-a316-439d-5aa7a8bb5739@arm.com>
-Date:   Fri, 8 Apr 2022 18:44:37 +0100
+        with ESMTP id S238291AbiDHRr1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 13:47:27 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E83641CFCF
+        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 10:45:23 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id f10so8520296plr.6
+        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 10:45:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=s27MJ117DUPs53Z7xdyXtL5VHtZQFh7zZ/JJA1Nflns=;
+        b=V/XQJHgMs2oCFW1wMCzCu+sTQ+qvof+T4DGcnXyShnLN40r97RvaZgCWqaB78Qch/p
+         hlNQfGpJCLosKzyjptBpAtUlu2msEfNdyb/bGr9IbxmQXxwc8S43cxnLeInmnSeVV5jp
+         mSp5D5zKMUHUgwIeudpGNIrVm9dVL8KrKUOHyioUdZQvPb9QSKGTlZf0zo2HVU14BTvz
+         Evd//HQ+uy7+Bs8J0HiKe/NnDUBy24QcdWdFasR/HpYwnSC078Mf5dwvpsiFC2kYtwZ/
+         SiWNYN+ad5d2SVglSEMGaIUqJhtmjwyYsX1T0x1z9Oqgiao6haG5JSxUyWS297eSqO9E
+         r7bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=s27MJ117DUPs53Z7xdyXtL5VHtZQFh7zZ/JJA1Nflns=;
+        b=mKb+vMQT98X/MPjDJqXA1lU9wNJfV5g7XT8iZFTssy21ESufLP2mMgzsYnULjsTITf
+         Dm6C288ykyldJ3YZoZhSYmQUb5n9QdTLYaTlM1ccROWsr0iFCi2f8BUhf1zcv+vY605X
+         G6kpBXm7KL/ulvrLh5ST6sxI6Tu1YqFVZO+037z1v9Jdz52cktgOK4MMdoamS8FnfDEW
+         1/KOoYTmG+en4rRstj+ooASzuqNEFcQy+6yS8sSXdP7Ye/FUENk+0DE7LKi3X7vFIVFz
+         t6KR1tYBwmSy0IB6YKY8z8BtCF4/qvD/u9IbqpTG3q2TbN9m02ltMeildmVi6pD9dqV2
+         UR2Q==
+X-Gm-Message-State: AOAM531iTpNGAKTrn0QSqxpIyNHE8DJKWsH8mIUVbzIpRuJbZ0qZl4jz
+        fquNQrVCooOkyBtw6lpC4y0goQ==
+X-Google-Smtp-Source: ABdhPJz2PLnM5p3wbYInU8k2mPvxFUdB4gG7Xt0HvGtcuAR9qQdgQ3+6H0J5e/oTUgFcZECrT000HA==
+X-Received: by 2002:a17:90a:f189:b0:1ca:c279:1bdf with SMTP id bv9-20020a17090af18900b001cac2791bdfmr22988444pjb.185.1649439923187;
+        Fri, 08 Apr 2022 10:45:23 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id y3-20020a056a00190300b004fa2411bb92sm28238078pfi.93.2022.04.08.10.45.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Apr 2022 10:45:22 -0700 (PDT)
+Date:   Fri, 8 Apr 2022 17:45:19 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com
+Subject: Re: [PATCH v5 05/13] KVM: Extend the memslot to support fd-based
+ private memory
+Message-ID: <YlB0r4wird8tXDrr@google.com>
+References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
+ <20220310140911.50924-6-chao.p.peng@linux.intel.com>
+ <YkIvEeC3/lgKTLPt@google.com>
+ <20220408134641.GD57095@chaop.bj.intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v2 0/4] Make the iommu driver no-snoop block feature
- consistent
-Content-Language: en-GB
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        iommu@lists.linux-foundation.org, Joerg Roedel <joro@8bytes.org>,
-        kvm@vger.kernel.org,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-References: <0-v2-f090ae795824+6ad-intel_no_snoop_jgg@nvidia.com>
- <f5acf507-b4ef-b393-159c-05ca04feb43d@arm.com>
- <20220407174326.GR2120790@nvidia.com>
- <77482321-2e39-fc7c-09b6-e929a851a80f@arm.com>
- <20220407190824.GS2120790@nvidia.com>
- <4cc084a5-7d25-8e81-bdc1-1501c3346a0c@arm.com>
- <20220408121845.GT2120790@nvidia.com>
- <4f93d16d-9606-bd1c-a82b-e4b00ae2364f@arm.com>
- <20220408133523.GX2120790@nvidia.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <20220408133523.GX2120790@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-9.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220408134641.GD57095@chaop.bj.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -60,93 +97,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-04-08 14:35, Jason Gunthorpe wrote:
-> On Fri, Apr 08, 2022 at 02:11:10PM +0100, Robin Murphy wrote:
+On Fri, Apr 08, 2022, Chao Peng wrote:
+> On Mon, Mar 28, 2022 at 09:56:33PM +0000, Sean Christopherson wrote:
+> > struct kvm_userspace_memory_region_ext {
+> > #ifdef __KERNEL__
 > 
->>> However, this creates an oddball situation where the vfio_device and
->>> it's struct device could become unplugged from the system while the
->>> domain that the struct device spawned continues to exist and remains
->>> attached to other devices in the same group. ie the iommu driver has
->>> to be careful not to retain the struct device input..
->>
->> Oh, I rather assumed that VFIO might automatically tear down the
->> container/domain when the last real user disappears.
-> 
-> It does, that isn't quite what I mean..
-> 
-> Lets say a simple case with two groups and two devices.
-> 
-> Open a VFIO container FD
-> 
-> We open group A and SET_CONTAINER it. This results in an
->     domain_A = iommu_domain_alloc(device_A)
->     iommu_attach_group(domain_A, device_A->group)
-> 
-> We open group B and SET_CONTAINER it. Using the sharing logic we end
-> up doing
->     iommu_attach_group(domain_A, device_B->group)
-> 
-> Now we close group A FD, detatch device_A->group from domain_A and the
-> driver core hot-unplugs device A completely from the system.
-> 
-> However, domain_A remains in the system used by group B's open FD.
-> 
-> It is a bit funny at least.. I think it is just something to document
-> and be aware of for iommu driver writers that they probably shouldn't
-> try to store the allocation device in their domain struct.
-> 
-> IHMO the only purpose of the allocation device is to crystalize the
-> configuration of the iommu_domain at allocation time.
+> Is this #ifndef? As I think anonymous struct is only for kernel?
 
-Oh, for sure. When I implement the API switch, I can certainly try to 
-document it as clearly as possible that the device argument is only for 
-resolving the correct IOMMU ops and target instance, and the resulting 
-domain is still not in any way tied to that specific device.
+Doh, yes, I inverted that.
 
-I hadn't thought about how it might look to future developers who aren't 
-already familiar with all the history here, so thanks for the nudge!
-
->> as long as we take care not to release DMA ownership until that point also.
->> As you say, it just looks a bit funny.
+> Thanks,
+> Chao
 > 
-> The DMA ownership should be OK as we take ownership on each group FD
-> open
->   
->>> I suppose that is inevitable to have sharing of domains across
->>> devices, so the iommu drivers will have to accommodate this.
->>
->> I think domain lifecycle management is already entirely up to the users and
->> not something that IOMMU drivers need to worry about. Drivers should only
->> need to look at per-device data in attach/detach (and, once I've finished,
->> alloc) from the device argument which can be assumed to be valid at that
->> point. Otherwise, all the relevant internal data for domain ops should
->> belong to the domain already.
-> 
-> Making attach/detach take a struct device would be nice - but I would
-> expect the attach/detatch to use a strictly paired struct device and I
-> don't think this trick of selecting an arbitary vfio_device will
-> achieve that.
-> 
-> So, I suppose VFIO would want to attach/detatch on every vfio_device
-> individually and it would iterate over the group instead of doing a
-> list_first_entry() like above. This would not be hard to do in VFIO.
-
-It feels like we've already beaten that discussion to death in other 
-threads; regardless of what exact argument the iommu_attach/detach 
-operations end up taking, they have to operate on the whole (explicit or 
-implicit) iommu_group at once, because doing anything else would defeat 
-the point of isolation groups, and be impossible for alias groups.
-
-> Not sure what the iommu layer would have to do to accommodate this..
-
-If it's significantly easier for VFIO to just run through a whole list 
-of devices and attach each one without having to keep track of whether 
-they might share an iommu_group which has already been attached, then we 
-can probably relax the API a little such that attaching to a domain 
-which is already the current domain becomes a no-op instead of returning 
--EBUSY, but I'd rather not create an expectation that anyone *has* to do 
-that. For any other callers that would be forcing *more* iommu_group 
-implementation details onto them, when we all want less.
-
-Cheers,
-Robin.
+> > 	struct kvm_userspace_memory_region region;
+> > #else
+> > 	struct kvm_userspace_memory_region;
+> > #endif
+> > 	__u64 private_offset;
+> > 	__u32 private_fd;
+> > 	__u32 padding[5];
+> > };
+> > 
+> > #ifdef __KERNEL__
+> > #define kvm_user_mem_region kvm_userspace_memory_region_ext
+> > #endif
+> > 
+> > [*] https://lore.kernel.org/all/20220301145233.3689119-1-arnd@kernel.org
+> > 
+> > > +	__u64 private_offset;
+> > > +	__u32 private_fd;
+> > > +	__u32 padding[5];
+> > > +};
