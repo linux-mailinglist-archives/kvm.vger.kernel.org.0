@@ -2,77 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A507F4F9BC9
-	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 19:35:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C1A84F9BEC
+	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 19:44:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234821AbiDHRhC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 13:37:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59084 "EHLO
+        id S235095AbiDHRqv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 13:46:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238224AbiDHRg6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 13:36:58 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48C994C7BE
-        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 10:34:54 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id f38so16349701ybi.3
-        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 10:34:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Jd42eljeoA7am6iun/EUSb1/8DBUsy7OfKLkpCfQnwI=;
-        b=LCmXkljF/PTt+d5imunqFnne5A0MjGLtTl1xSjGaE0A5FsH+fLknxoJFEWyEWwjgnO
-         /4HSeVhdLNK52NjIYtcP/h0qXSOrEpVM1ysII5gkbbxdG8ideLw0TrAkHoOBPZHeXKus
-         pR1pnrTNIOXO7xPIapV0Hfy2GnHgaRnrhr/wMG1hReEJkvPiChzVc9gzgb7Puz3MRNQm
-         3Cjzu8TaYow5v5QZ/JnvRso6K2M3Uxvgb0yEdEGOV2jEYUdG0tmFsttOJKlVR4P9HgrQ
-         cCZz469HW8rEd5ZXwyQ0P7kgBAUurURAbHxE4ZXbZ9yCYeBKNtze6BsUx4OieqJLGnX4
-         8p0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Jd42eljeoA7am6iun/EUSb1/8DBUsy7OfKLkpCfQnwI=;
-        b=1gPgHC2rJcCTO3YALuQ0Tt/OiPv4d6zmDB9yENFUiL7xYDzeDnyiL9wZG/XihjNQBh
-         U3Tbqic9ztw4bG6WhCFKVITfpgU8+2K734bmOdsazr55k0vj6wnq7a+BFaW6jz3lQ37o
-         ndaBMtjOG4GsUUnpnCQr0m7hce5unTynkINoBf6UQC3Gtr8JDFDKQLN+xYPtirTuRhzE
-         1h9oW4VNdTK7kGMT1+LTML03GFX/LGBWEELwQAAtHNMWDr9BVxeSjBfmhW6YQ2ymoX4G
-         nyKsnu/lz+fForwvdGSddxNajW+OaumlAgoDOLAfDNtlwe+FemW1Z3MD/76TpDUvfiU7
-         wwdw==
-X-Gm-Message-State: AOAM533wnO8mMwu1wp3e7nvtdysoBpwHeNi6KEVLPyExJAZQFQYd2QhZ
-        QBSwyAY1K0KqpSM6Ia+Qt51W/bLlqgLYyIMYgoAC2Q==
-X-Google-Smtp-Source: ABdhPJyJF/Vu21u1Ybk49qtraB/Ha/OoaBBpU4AzP6a6DQvrKFHEfKt9PFNVhB8Y0En5o6Xn94X9VMasp0/Xh92pKhg=
-X-Received: by 2002:a25:dfc4:0:b0:63d:b28e:93ec with SMTP id
- w187-20020a25dfc4000000b0063db28e93ecmr15429921ybg.474.1649439293125; Fri, 08
- Apr 2022 10:34:53 -0700 (PDT)
+        with ESMTP id S231932AbiDHRqu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 13:46:50 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C075EDFF7
+        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 10:44:44 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 78DD71042;
+        Fri,  8 Apr 2022 10:44:44 -0700 (PDT)
+Received: from [10.57.41.19] (unknown [10.57.41.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8FBDF3F5A1;
+        Fri,  8 Apr 2022 10:44:42 -0700 (PDT)
+Message-ID: <a8371724-2864-a316-439d-5aa7a8bb5739@arm.com>
+Date:   Fri, 8 Apr 2022 18:44:37 +0100
 MIME-Version: 1.0
-References: <20220407011605.1966778-1-rananta@google.com> <20220407011605.1966778-3-rananta@google.com>
- <87ilrlb6un.wl-maz@kernel.org> <CAJHc60yFD=osoifUpB4LBNo93eVq9zNV41bnu7uBZ0HsBGbMeA@mail.gmail.com>
- <87v8vj1pfl.wl-maz@kernel.org>
-In-Reply-To: <87v8vj1pfl.wl-maz@kernel.org>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Fri, 8 Apr 2022 10:34:42 -0700
-Message-ID: <CAJHc60wwXyC=cgpBHf4XXcpvuN=+HW2hjiOX+NidQ2euRHb-qg@mail.gmail.com>
-Subject: Re: [PATCH v5 02/10] KVM: arm64: Setup a framework for hypercall
- bitmap firmware registers
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v2 0/4] Make the iommu driver no-snoop block feature
+ consistent
+Content-Language: en-GB
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        iommu@lists.linux-foundation.org, Joerg Roedel <joro@8bytes.org>,
+        kvm@vger.kernel.org,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+References: <0-v2-f090ae795824+6ad-intel_no_snoop_jgg@nvidia.com>
+ <f5acf507-b4ef-b393-159c-05ca04feb43d@arm.com>
+ <20220407174326.GR2120790@nvidia.com>
+ <77482321-2e39-fc7c-09b6-e929a851a80f@arm.com>
+ <20220407190824.GS2120790@nvidia.com>
+ <4cc084a5-7d25-8e81-bdc1-1501c3346a0c@arm.com>
+ <20220408121845.GT2120790@nvidia.com>
+ <4f93d16d-9606-bd1c-a82b-e4b00ae2364f@arm.com>
+ <20220408133523.GX2120790@nvidia.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20220408133523.GX2120790@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-9.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,97 +60,93 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 8, 2022 at 9:59 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Thu, 07 Apr 2022 18:24:14 +0100,
-> Raghavendra Rao Ananta <rananta@google.com> wrote:
-> >
-> > Hi Marc,
-> >
-> > > > +#define KVM_REG_ARM_STD_BIT_TRNG_V1_0                BIT(0)
-> > >
-> > > I'm really in two minds about this. Having one bit per service is easy
-> > > from an implementation perspective, but is also means that this
-> > > disallow fine grained control over which hypercalls are actually
-> > > available. If tomorrow TRNG 1.1 adds a new hypercall and that KVM
-> > > implements both, how does the selection mechanism works? You will
-> > > need a version selector (a la PSCI), which defeats this API somehow
-> > > (and renders the name of the #define invalid).
-> > >
-> > > I wonder if a more correct way to look at this is to enumerate the
-> > > hypercalls themselves (all 5 of them), though coming up with an
-> > > encoding is tricky (RNG32 and RNG64 would clash, for example).
-> > >
-> > > Thoughts?
-> > >
-> > I was on the fence about this too. The TRNG spec (ARM DEN 0098,
-> > Table-4) mentions that v1.0 should have VERSION, FEATURES, GET_UUID,
-> > and RND as mandatory features. Hence, if KVM advertised that it
-> > supports TRNG v1.0, I thought it would be best to expose all or
-> > nothing of v1.0 by guarding them with a single bit.
-> > Broadly, the idea is to have a bit per version. If v1.1 comes along,
-> > we can have another bit for that. If it's not too ugly to implement,
-> > we can be a little more aggressive and ensure that userspace doesn't
-> > enable v1.1 without enabling v1.0.
->
-> OK, that'd be assuming that we'll never see a service where version A
-> is incompatible with version B and that we have to exclude one or the
-> other. Meh. Let's cross that bridge once it is actually built.
->
-> [...]
->
-> > > > +     mutex_lock(&kvm->lock);
-> > > > +
-> > > > +     /*
-> > > > +      * If the VM (any vCPU) has already started running, return success
-> > > > +      * if there's no change in the value. Else, return -EBUSY.
-> > >
-> > > No, this should *always* fail if a vcpu has started. Otherwise, you
-> > > start allowing hard to spot races.
-> > >
-> > The idea came from the fact that userspace could spawn multiple
-> > threads to configure the vCPU registers. Since we don't have the
-> > VM-scoped registers yet, it may be possible that userspace has issued
-> > a KVM_RUN on one of the vCPU, while the others are lagging behind and
-> > still configuring the registers. The slower threads may see -EBUSY and
-> > could panic. But if you feel that it's an overkill and the userspace
-> > should deal with it, we can return EBUSY for all writes after KVM_RUN.
->
-> I'd rather have that. There already is stuff that rely on things not
-> changing once a vcpu has run, so I'd rather be consistent.
->
-Sure, I'll return EBUSY if the VM has started regardless of the incoming value.
-> >
-> > > > +      */
-> > > > +     if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags)) {
-> > > > +             ret = *fw_reg_bmap != val ? -EBUSY : 0;
-> > > > +             goto out;
-> > > > +     }
-> > > > +
-> > > > +     WRITE_ONCE(*fw_reg_bmap, val);
-> > >
-> > > I'm not sure what this WRITE_ONCE guards against. Do you expect
-> > > concurrent reads at this stage?
-> > >
-> > Again, the assumption here is that userspace could have multiple
-> > threads reading and writing to these registers. Without the VM scoped
-> > registers in place, we may end up with a read/write to the same memory
-> > location for all the vCPUs.
->
-> We only have one vcpu updating this at any given time (that's what the
-> lock ensures). A simple write should be OK, as far as I can tell.
->
-I agree that a write against another write should be fine without the
-WRITE_ONCE. But my little concern was this write against a read
-(unsure how userspace accesses these registers). I'm guessing it
-shouldn't hurt to keep them in place, no? :)
+On 2022-04-08 14:35, Jason Gunthorpe wrote:
+> On Fri, Apr 08, 2022 at 02:11:10PM +0100, Robin Murphy wrote:
+> 
+>>> However, this creates an oddball situation where the vfio_device and
+>>> it's struct device could become unplugged from the system while the
+>>> domain that the struct device spawned continues to exist and remains
+>>> attached to other devices in the same group. ie the iommu driver has
+>>> to be careful not to retain the struct device input..
+>>
+>> Oh, I rather assumed that VFIO might automatically tear down the
+>> container/domain when the last real user disappears.
+> 
+> It does, that isn't quite what I mean..
+> 
+> Lets say a simple case with two groups and two devices.
+> 
+> Open a VFIO container FD
+> 
+> We open group A and SET_CONTAINER it. This results in an
+>     domain_A = iommu_domain_alloc(device_A)
+>     iommu_attach_group(domain_A, device_A->group)
+> 
+> We open group B and SET_CONTAINER it. Using the sharing logic we end
+> up doing
+>     iommu_attach_group(domain_A, device_B->group)
+> 
+> Now we close group A FD, detatch device_A->group from domain_A and the
+> driver core hot-unplugs device A completely from the system.
+> 
+> However, domain_A remains in the system used by group B's open FD.
+> 
+> It is a bit funny at least.. I think it is just something to document
+> and be aware of for iommu driver writers that they probably shouldn't
+> try to store the allocation device in their domain struct.
+> 
+> IHMO the only purpose of the allocation device is to crystalize the
+> configuration of the iommu_domain at allocation time.
 
-Regards,
-Raghavendra
+Oh, for sure. When I implement the API switch, I can certainly try to 
+document it as clearly as possible that the device argument is only for 
+resolving the correct IOMMU ops and target instance, and the resulting 
+domain is still not in any way tied to that specific device.
 
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+I hadn't thought about how it might look to future developers who aren't 
+already familiar with all the history here, so thanks for the nudge!
+
+>> as long as we take care not to release DMA ownership until that point also.
+>> As you say, it just looks a bit funny.
+> 
+> The DMA ownership should be OK as we take ownership on each group FD
+> open
+>   
+>>> I suppose that is inevitable to have sharing of domains across
+>>> devices, so the iommu drivers will have to accommodate this.
+>>
+>> I think domain lifecycle management is already entirely up to the users and
+>> not something that IOMMU drivers need to worry about. Drivers should only
+>> need to look at per-device data in attach/detach (and, once I've finished,
+>> alloc) from the device argument which can be assumed to be valid at that
+>> point. Otherwise, all the relevant internal data for domain ops should
+>> belong to the domain already.
+> 
+> Making attach/detach take a struct device would be nice - but I would
+> expect the attach/detatch to use a strictly paired struct device and I
+> don't think this trick of selecting an arbitary vfio_device will
+> achieve that.
+> 
+> So, I suppose VFIO would want to attach/detatch on every vfio_device
+> individually and it would iterate over the group instead of doing a
+> list_first_entry() like above. This would not be hard to do in VFIO.
+
+It feels like we've already beaten that discussion to death in other 
+threads; regardless of what exact argument the iommu_attach/detach 
+operations end up taking, they have to operate on the whole (explicit or 
+implicit) iommu_group at once, because doing anything else would defeat 
+the point of isolation groups, and be impossible for alias groups.
+
+> Not sure what the iommu layer would have to do to accommodate this..
+
+If it's significantly easier for VFIO to just run through a whole list 
+of devices and attach each one without having to keep track of whether 
+they might share an iommu_group which has already been attached, then we 
+can probably relax the API a little such that attaching to a domain 
+which is already the current domain becomes a no-op instead of returning 
+-EBUSY, but I'd rather not create an expectation that anyone *has* to do 
+that. For any other callers that would be forcing *more* iommu_group 
+implementation details onto them, when we all want less.
+
+Cheers,
+Robin.
