@@ -2,113 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 105E54F9B25
-	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 18:57:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DC8D4F9B31
+	for <lists+kvm@lfdr.de>; Fri,  8 Apr 2022 18:59:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235924AbiDHQ72 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 12:59:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60462 "EHLO
+        id S236801AbiDHRB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 13:01:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234433AbiDHQ70 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 12:59:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D13092C499C
-        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 09:57:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649437041;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Amg0xvXpuwMEuLnGP1PQePHLAINBX6RYSENvzAUWj5o=;
-        b=RQO44xBOKE2XLzHMb0LjTSAkTFjwSEk/V/iA5JIKmHTHDkyE9KdjATxuV49xTVghc3DL35
-        vS+qZjifJroJDCQxZs8qXciK6AWWzHrXDJc5MpVofIpQoITCHdv3ooYrnyp3O8zr2WdFHI
-        fpQW/RPliB2b9I/Pv1t1TiEESVJa4aI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-201-t770FnMfNQa3ZRNimpXjNA-1; Fri, 08 Apr 2022 12:57:16 -0400
-X-MC-Unique: t770FnMfNQa3ZRNimpXjNA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S229577AbiDHRB6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 13:01:58 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A4483167F3;
+        Fri,  8 Apr 2022 09:59:54 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3C8AD3822207;
-        Fri,  8 Apr 2022 16:57:16 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D701A42D3A6;
-        Fri,  8 Apr 2022 16:57:15 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Peter Gonda <pgonda@google.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4.1] KVM, SEV: Add KVM_EXIT_SHUTDOWN metadata for SEV-ES
-Date:   Fri,  8 Apr 2022 12:56:42 -0400
-Message-Id: <20220408165641.469961-1-pbonzini@redhat.com>
-In-Reply-To: <20220407210233.782250-1-pgonda@google.com>
-References: 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CB4146215B;
+        Fri,  8 Apr 2022 16:59:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DA17C385A3;
+        Fri,  8 Apr 2022 16:59:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1649437193;
+        bh=hezvIR97K/d6etxHTUv4PJyXJtleS81JAhoNf2K+8hI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=pJvyoIX8LUcDdClF6OFL1/JUuOZNt2xQp37DthOnlJeEXcZ56oLmJkFbQtZwerNyc
+         OhbWw6+aLK6oGjqw6b25PfyzLj/AER9VlLmiAM+LQ/5i8MhbiDdri4zZWMHRT70gZb
+         beYDmMBo+z6TAuKrplYTcbLyPGZ0hxlxcjjCAv4GZcfa7rmmNE0Tm8ScvVtZiDwK0/
+         HPUz15e3Z+HLPa200pCAwdmPKO8rqplGm8IR0Vt9Qf0SBL+hZjTlKybHoFqlK5ywtl
+         +h7sEDyDqpVv9V7oeXyMTXXtQf9LODvrgCG8l409Qh2jN/UJJskyutVqSOhdcpYZEt
+         bcpiteTImFr1A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=billy-the-mountain.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1ncrxe-002pMe-Kb; Fri, 08 Apr 2022 17:59:50 +0100
+Date:   Fri, 08 Apr 2022 17:59:42 +0100
+Message-ID: <87v8vj1pfl.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v5 02/10] KVM: arm64: Setup a framework for hypercall bitmap firmware registers
+In-Reply-To: <CAJHc60yFD=osoifUpB4LBNo93eVq9zNV41bnu7uBZ0HsBGbMeA@mail.gmail.com>
+References: <20220407011605.1966778-1-rananta@google.com>
+        <20220407011605.1966778-3-rananta@google.com>
+        <87ilrlb6un.wl-maz@kernel.org>
+        <CAJHc60yFD=osoifUpB4LBNo93eVq9zNV41bnu7uBZ0HsBGbMeA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, drjones@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, catalin.marinas@arm.com, will@kernel.org, pshier@google.com, ricarkol@google.com, oupton@google.com, reijiw@google.com, jingzhangos@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Queued, thanks.  But documentation was missing:
+On Thu, 07 Apr 2022 18:24:14 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> > > +#define KVM_REG_ARM_STD_BIT_TRNG_V1_0                BIT(0)
+> >
+> > I'm really in two minds about this. Having one bit per service is easy
+> > from an implementation perspective, but is also means that this
+> > disallow fine grained control over which hypercalls are actually
+> > available. If tomorrow TRNG 1.1 adds a new hypercall and that KVM
+> > implements both, how does the selection mechanism works? You will
+> > need a version selector (a la PSCI), which defeats this API somehow
+> > (and renders the name of the #define invalid).
+> >
+> > I wonder if a more correct way to look at this is to enumerate the
+> > hypercalls themselves (all 5 of them), though coming up with an
+> > encoding is tricky (RNG32 and RNG64 would clash, for example).
+> >
+> > Thoughts?
+> >
+> I was on the fence about this too. The TRNG spec (ARM DEN 0098,
+> Table-4) mentions that v1.0 should have VERSION, FEATURES, GET_UUID,
+> and RND as mandatory features. Hence, if KVM advertised that it
+> supports TRNG v1.0, I thought it would be best to expose all or
+> nothing of v1.0 by guarding them with a single bit.
+> Broadly, the idea is to have a bit per version. If v1.1 comes along,
+> we can have another bit for that. If it's not too ugly to implement,
+> we can be a little more aggressive and ensure that userspace doesn't
+> enable v1.1 without enabling v1.0.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index e7a0dfdc0178..72183ae628f7 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6088,8 +6088,12 @@ should put the acknowledged interrupt vector into the 'epr' field.
-   #define KVM_SYSTEM_EVENT_SHUTDOWN       1
-   #define KVM_SYSTEM_EVENT_RESET          2
-   #define KVM_SYSTEM_EVENT_CRASH          3
-+  #define KVM_SYSTEM_EVENT_SEV_TERM       4
-+  #define KVM_SYSTEM_EVENT_NDATA_VALID    (1u << 31)
- 			__u32 type;
-+                        __u32 ndata;
- 			__u64 flags;
-+                        __u64 data[16];
- 		} system_event;
+OK, that'd be assuming that we'll never see a service where version A
+is incompatible with version B and that we have to exclude one or the
+other. Meh. Let's cross that bridge once it is actually built.
 
- If exit_reason is KVM_EXIT_SYSTEM_EVENT then the vcpu has triggered
-@@ -6099,7 +6103,7 @@ HVC instruction based PSCI call from the vcpu. The 'type' field describes
- the system-level event type. The 'flags' field describes architecture
- specific flags for the system-level event.
+[...]
 
--Valid values for 'type' are:
-+Valid values for bits 30:0 of 'type' are:
+> > > +     mutex_lock(&kvm->lock);
+> > > +
+> > > +     /*
+> > > +      * If the VM (any vCPU) has already started running, return success
+> > > +      * if there's no change in the value. Else, return -EBUSY.
+> >
+> > No, this should *always* fail if a vcpu has started. Otherwise, you
+> > start allowing hard to spot races.
+> >
+> The idea came from the fact that userspace could spawn multiple
+> threads to configure the vCPU registers. Since we don't have the
+> VM-scoped registers yet, it may be possible that userspace has issued
+> a KVM_RUN on one of the vCPU, while the others are lagging behind and
+> still configuring the registers. The slower threads may see -EBUSY and
+> could panic. But if you feel that it's an overkill and the userspace
+> should deal with it, we can return EBUSY for all writes after KVM_RUN.
 
-  - KVM_SYSTEM_EVENT_SHUTDOWN -- the guest has requested a shutdown of the
-    VM. Userspace is not obliged to honour this, and if it does honour
-@@ -6112,12 +6116,18 @@ Valid values for 'type' are:
-    has requested a crash condition maintenance. Userspace can choose
-    to ignore the request, or to gather VM memory core dump and/or
-    reset/shutdown of the VM.
-+ - KVM_SYSTEM_EVENT_SEV_TERM -- an AMD SEV guest requested termination.
-+   The guest physical address of the guest's GHCB is stored in `data[0]`.
+I'd rather have that. There already is stuff that rely on things not
+changing once a vcpu has run, so I'd rather be consistent.
 
- Valid flags are:
+>
+> > > +      */
+> > > +     if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags)) {
+> > > +             ret = *fw_reg_bmap != val ? -EBUSY : 0;
+> > > +             goto out;
+> > > +     }
+> > > +
+> > > +     WRITE_ONCE(*fw_reg_bmap, val);
+> >
+> > I'm not sure what this WRITE_ONCE guards against. Do you expect
+> > concurrent reads at this stage?
+> >
+> Again, the assumption here is that userspace could have multiple
+> threads reading and writing to these registers. Without the VM scoped
+> registers in place, we may end up with a read/write to the same memory
+> location for all the vCPUs.
 
-  - KVM_SYSTEM_EVENT_RESET_FLAG_PSCI_RESET2 (arm64 only) -- the guest issued
-    a SYSTEM_RESET2 call according to v1.1 of the PSCI specification.
+We only have one vcpu updating this at any given time (that's what the
+lock ensures). A simple write should be OK, as far as I can tell.
 
-+Extra data for this event is stored in the `data[]` array, up to index
-+`ndata-1` included, if bit 31 is set in `type`.  The data depends on the
-+`type` field.  There is no extra data if bit 31 is clear or `ndata` is zero.
-+
- ::
+Thanks,
 
- 		/* KVM_EXIT_IOAPIC_EOI */
+	M.
 
-
-Paolo
-
-
+-- 
+Without deviation from the norm, progress is not possible.
