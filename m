@@ -2,67 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3070F4FA223
-	for <lists+kvm@lfdr.de>; Sat,  9 Apr 2022 05:51:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B8F44FA2AE
+	for <lists+kvm@lfdr.de>; Sat,  9 Apr 2022 06:31:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240691AbiDIDxd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 23:53:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58226 "EHLO
+        id S236115AbiDIEdn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 Apr 2022 00:33:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231783AbiDIDxb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 23:53:31 -0400
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2EA7332DCB
-        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 20:51:25 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id v64-20020a1cac43000000b0038cfd1b3a6dso8821848wme.5
-        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 20:51:25 -0700 (PDT)
+        with ESMTP id S232197AbiDIEdl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 9 Apr 2022 00:33:41 -0400
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E14A527084C
+        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 21:31:33 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id k23so15637666wrd.8
+        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 21:31:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=hjV85bpMkNJuL8vvhI9IAAgoX1lYtvK7CB2b32NFcGE=;
-        b=2WTmPakhdY7m3RR1J07Q3HKF1lUUw9xYcvbeLmdmCbGu1QsrzEF4yovjQ0w0PTqUP8
-         ttUY4tWy+XJwxrc5eD98+gpJlyvafAhc5eahueerCdGExOWlMyceUC4SSm3BEAWLpoyX
-         bsJdfVmNiSmv38SYHT3dlVZt/EStxBgDHN9WuZ3jj8tElkN2+eLulHgK4z+qjG6AuZEZ
-         JEnEE39kL7T9irPQd/LL8aplExKzX14Ib9lV2E/eIugV2sd+u5TLYpsWJTBiU2ja4mYF
-         UmQNAKfH6PykEeJvOrTXhKGFherqje+MPiA4F74VK9myrEuen1txu7tXO0Iqv2D/XgW3
-         Wmcw==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=QpzV2uFM/aAveTReD80iQJbGn4VzHmCnclShwZNR5UI=;
+        b=b2tM4CVFktZ20J5uk+EB6fEbXSrB7MeT6dPRKSb1VgM1sfEH+AB/q9MLRd9uMoz8H8
+         6dRSPFadK7kaIV+5dDTi9Nck3H+O4dtIeWcDhnJ+rfKevput+dso5tPsxFSktW0X+wh3
+         Qh6uGlgH5CeVj4kIcW23Ta8EM/VCzvnPLxCiyXkJ28ZmbV7PqZEIJDxi8VogCUdGRIVg
+         fTbzaBjgh2+SIr82BPV9hVfAjxcseUm82KwRs6EMQmLsdiKewwx73YLhzqsh4aNlFIBP
+         i+0DWibRfEsz+Y+yMvcclQJwlXU41YAcxJbH1sGdiQeZFWF6mAZ/MzIO3jlzmBrY7s/K
+         GNhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=hjV85bpMkNJuL8vvhI9IAAgoX1lYtvK7CB2b32NFcGE=;
-        b=WDXllMVaBc9C3+y8YtUrOqfUdcICJZQICLMXKQLdlUUO0KSoGkO/mOskQPhJpaOZ/Y
-         U/2lgsyotgpyjrh9xPbvklASg4LZPgy/d8KwPqdX4DUA2cfKlt6oRHZ7vEOBgGa8BDnF
-         J9B+Fv+rzUUzgIZa5XjHsXqmaLzumhZBUEgPjTknMRNQGZXy6smOYvDTjRiL2CmzT86N
-         BXgldLZViGoZ8PKYNZc/DjBTXm2CRwC593gpn1iHAogNSSE9uvewbEHdX1HWiPaXEq3I
-         vwX8YebqawYaPhpUTMQtBLHRM154RQlOVE03dY2N4U294In1KuuRBiJIZ7QPqWQn936q
-         SrEA==
-X-Gm-Message-State: AOAM533E5uRYiyfUTxvCDZ5eaSuiFFmIUH9oH+FC/BtBAK+KbPk4J1MC
-        sDiZeukFo8BQWHjNG0+VfyfZukSzV7BX3avMZCPoxA==
-X-Google-Smtp-Source: ABdhPJyLzclFI9xwJ/UwHbG50eZvcrZ5NNZ72tDpou23WT/C53Yz/iLCM/pefwav/FSn5lluityAclN+tIZJY/VOdss=
-X-Received: by 2002:a05:600c:1d04:b0:38c:ba2f:88ba with SMTP id
- l4-20020a05600c1d0400b0038cba2f88bamr19619710wms.137.1649476284108; Fri, 08
- Apr 2022 20:51:24 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=QpzV2uFM/aAveTReD80iQJbGn4VzHmCnclShwZNR5UI=;
+        b=jCOq/F2Id4ACPVJPMrBn4BgZOtx3jX9KVpcKcyGbYKaL4YwlWXV6Xm9gYUyNYp+GgK
+         eU8psgJiHdxWzUBK9WTo4QjgmOMaD/iWxBxjKDe+2PJ47GcIIsy5kGMguFz59DRtWqdq
+         VqLsE/HvlD/2tKzNP1vI6HKfEgHIfqRzy7oCN3wiAQG9xBpsL0fvHAfwhKuHNjsNBfyH
+         7UUNOPrEKGlPvHupqKXPeHXL7i13foUFJhaXRwSrA9VtbMyT5GlhVwAYun1L0X+11xJ2
+         8gwZFsH6eISLKNAq5ZY16G8WtHurLOsl6kFUtNEvW33qhYzXkOeNRzXz0MnMO6dfHD9F
+         ll3A==
+X-Gm-Message-State: AOAM530m1Dv5BzM/XAPG7wRiacylxaT36BEo1zHCPtgoRoXdgqe39eRK
+        RAEYOom6fjMDw+N+Z9Lxkfl2TXO2wYNkHXa3Y2na1A==
+X-Google-Smtp-Source: ABdhPJx3oQ9/V2ogNWTQKjsKih6Mh7GzCI3OOxiepTNjP/2ClgjHAiJbqrc6dC6wzcb8k3/1qzA2ypR3LhVmRMURzas=
+X-Received: by 2002:a5d:6e84:0:b0:206:147b:1f59 with SMTP id
+ k4-20020a5d6e84000000b00206147b1f59mr16768877wrz.86.1649478692200; Fri, 08
+ Apr 2022 21:31:32 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220408092415.1603661-1-heiko@sntech.de>
-In-Reply-To: <20220408092415.1603661-1-heiko@sntech.de>
 From:   Anup Patel <anup@brainfault.org>
-Date:   Sat, 9 Apr 2022 09:21:11 +0530
-Message-ID: <CAAhSdy0ZPH2a9D0jDNhp5OU2oRdvC-wZcu0Zjtcq9ZhMWcrMng@mail.gmail.com>
-Subject: Re: [PATCH] RISC-V: KVM: include missing hwcap.h into vcpu_fp
-To:     Heiko Stuebner <heiko@sntech.de>
-Cc:     Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
+Date:   Sat, 9 Apr 2022 10:00:29 +0530
+Message-ID: <CAAhSdy3RJpcYNS9NN=hNw=14O9e6=hqoF10fi1vT=No2cT0jWQ@mail.gmail.com>
+Subject: [GIT PULL] KVM/riscv fixes for 5.18, take #1
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Atish Patra <atishp@atishpatra.org>,
         KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
         linux-riscv <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
@@ -72,52 +64,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 8, 2022 at 2:54 PM Heiko Stuebner <heiko@sntech.de> wrote:
->
-> vcpu_fp uses the riscv_isa_extension mechanism which gets
-> defined in hwcap.h but doesn't include that head file.
->
-> While it seems to work in most cases, in certain conditions
-> this can lead to build failures like
->
-> ../arch/riscv/kvm/vcpu_fp.c: In function =E2=80=98kvm_riscv_vcpu_fp_reset=
-=E2=80=99:
-> ../arch/riscv/kvm/vcpu_fp.c:22:13: error: implicit declaration of functio=
-n =E2=80=98riscv_isa_extension_available=E2=80=99 [-Werror=3Dimplicit-funct=
-ion-declaration]
->    22 |         if (riscv_isa_extension_available(&isa, f) ||
->       |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> ../arch/riscv/kvm/vcpu_fp.c:22:49: error: =E2=80=98f=E2=80=99 undeclared =
-(first use in this function)
->    22 |         if (riscv_isa_extension_available(&isa, f) ||
->
-> Fix this by simply including the necessary header.
->
-> Fixes: 0a86512dc113 ("RISC-V: KVM: Factor-out FP virtualization into sepa=
-rate sources")
-> Signed-off-by: Heiko Stuebner <heiko@sntech.de>
+Hi Paolo,
 
-I have queued this for RC fixes.
+This is the first set of fixes for 5.18. There are four fixes:
+a) One fix related to hgatp in kvm_arch_vcpu_put()
+b) Two KVM selftests fixes
+c) Missing #include in vcpu_fp.c
 
-Thanks,
+Please pull.
+
+Regards,
 Anup
 
-> ---
->  arch/riscv/kvm/vcpu_fp.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/arch/riscv/kvm/vcpu_fp.c b/arch/riscv/kvm/vcpu_fp.c
-> index 4449a976e5a6..d4308c512007 100644
-> --- a/arch/riscv/kvm/vcpu_fp.c
-> +++ b/arch/riscv/kvm/vcpu_fp.c
-> @@ -11,6 +11,7 @@
->  #include <linux/err.h>
->  #include <linux/kvm_host.h>
->  #include <linux/uaccess.h>
-> +#include <asm/hwcap.h>
->
->  #ifdef CONFIG_FPU
->  void kvm_riscv_vcpu_fp_reset(struct kvm_vcpu *vcpu)
-> --
-> 2.35.1
->
+The following changes since commit a44e2c207c30a5780c4ad0cc3579b8715cebf52e:
+
+  Merge tag 'kvmarm-fixes-5.18-1' of
+git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
+(2022-04-08 12:30:04 -0400)
+
+are available in the Git repository at:
+
+  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-fixes-5.18-1
+
+for you to fetch changes up to 4054eee9290248bf66c5eacb58879c9aaad37f71:
+
+  RISC-V: KVM: include missing hwcap.h into vcpu_fp (2022-04-09 09:16:00 +0530)
+
+----------------------------------------------------------------
+KVM/riscv fixes for 5.18, take #1
+
+- Remove hgatp zeroing in kvm_arch_vcpu_put()
+
+- Fix alignment of the guest_hang() in KVM selftest
+
+- Fix PTE A and D bits in KVM selftest
+
+- Missing #include in vcpu_fp.c
+
+----------------------------------------------------------------
+Anup Patel (3):
+      RISC-V: KVM: Don't clear hgatp CSR in kvm_arch_vcpu_put()
+      KVM: selftests: riscv: Set PTE A and D bits in VS-stage page table
+      KVM: selftests: riscv: Fix alignment of the guest_hang() function
+
+Heiko Stuebner (1):
+      RISC-V: KVM: include missing hwcap.h into vcpu_fp
+
+ arch/riscv/kvm/vcpu.c                                 | 2 --
+ arch/riscv/kvm/vcpu_fp.c                              | 1 +
+ tools/testing/selftests/kvm/include/riscv/processor.h | 4 +++-
+ tools/testing/selftests/kvm/lib/riscv/processor.c     | 2 +-
+ 4 files changed, 5 insertions(+), 4 deletions(-)
