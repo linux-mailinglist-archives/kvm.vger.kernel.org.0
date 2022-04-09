@@ -2,71 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AEE34FA16A
-	for <lists+kvm@lfdr.de>; Sat,  9 Apr 2022 03:52:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A3134FA192
+	for <lists+kvm@lfdr.de>; Sat,  9 Apr 2022 04:12:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231441AbiDIBym (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 21:54:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51646 "EHLO
+        id S235630AbiDICOb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 22:14:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229490AbiDIByk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 21:54:40 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6697836233C;
-        Fri,  8 Apr 2022 18:52:33 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id f10so9398071plr.6;
-        Fri, 08 Apr 2022 18:52:33 -0700 (PDT)
+        with ESMTP id S231728AbiDICOa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 22:14:30 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F02A0E10;
+        Fri,  8 Apr 2022 19:12:23 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id n18so9423840plg.5;
+        Fri, 08 Apr 2022 19:12:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:organization:in-reply-to
          :content-transfer-encoding;
-        bh=RjihL0uHY+RkFPan2lJsu4yZo9/HaqGSbiMBNVKtTG4=;
-        b=GpskndQDEpfP4T4ZxzoL2TF0xW2Td/y88vlchAQ5Eq2FAnUFqDuvScba9UXf6Dw/DD
-         gbB9tyExh6a2sM4gSCaGxcOyz2Wjb0A5rbgiaKRQ2Z2JfyqSYoEhqOtskMgTP1oGtBh3
-         AJvsxnMkbi3rs05Gffa47SuWlKlwS2v5Oj4pgBTinDIFtpGpclgyrT4VlwbAsSkT3kvD
-         uWZ8YdJdOKjepBtUOV2EEfUF9T6XoQKoduwIVhTEGHw5EuBLt32DRh7WbAoeVmEJhQJ+
-         kCJNwUNNNrzdCegxA84ROE/svU9SRmAbXDRn1ZzoZTEVqNPGmtMdbHaRF25N9AiUQDGv
-         Eq/Q==
+        bh=nK7BuI/Nd8JVLzwpjCS8lCeoKTexehkY0d3WwXKF09w=;
+        b=VF39/a63kLpYR8kdjiE2ZnhyT8TnTcSLmSibW63ciww/YV5D31QEHz4l65kcjh+Qbp
+         KqHFxTlZBRNoIueeez+L2e+bXdWxSpKP9A9tagAli9NwswXKnRCIZgIry5Rpp2Wm3aMj
+         1NKKIISniOgD7/3KlZpr+shnG+MrJrYW8lOIklWJFYyONaN5bjhh+NWiGLjZhqmBlSq+
+         enXi1EnZ3zfkH7B2YfXWW0OuwjLmJYG2uYWJc6NkyhhL3NWfPEaJXT6tF2BxGMY5rRLL
+         r0bFPAG1N+H9OVkyjtytP70VvGcrmKZqwBGlEUni65ZeENP0VvpLsqSdSoXSIbxn/OWx
+         WoXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:organization:in-reply-to
          :content-transfer-encoding;
-        bh=RjihL0uHY+RkFPan2lJsu4yZo9/HaqGSbiMBNVKtTG4=;
-        b=H3wjZlXSAPLitif1ZSxd+Wti4EM7e4wKTIa0TVvEGYQgc7Ouyy17a3bVo15t/2wva4
-         2sT/n5/4L7Ymg346prjri5i3b+DvZcI2JRH2qfur2WvFJmTCp288K2pewof/syxA9Z52
-         PQGPg4o+XdJ+RtL3+e2OsBo5m7EqZvgZUjqlZ3D8qS7uM9UdltlA+JEzba7bzd3LJiPx
-         qhgYg22c/+Z4SNpVm8DqhLfHZOPUeildZBpmUgd+BhQpv36l2KNlSfeSJPSdltM9NrYF
-         JGBXtHw8Vp70QE0f3SGPcGo3j41jYZLOOFTPzU5RcHObDibeNqo53eGl/Fq4SLiEBtPC
-         +Bcg==
-X-Gm-Message-State: AOAM531KescsXgxTg6GH2PaslpxnX4SeYRHj14ZGSsZm1vu+h2DsEdz4
-        EonjTjzaWuh5C1JpHs0pHQI=
-X-Google-Smtp-Source: ABdhPJwV6iG+YcngTQe+cOKTKlzEVRa1//IpPQ+pskMgjGBlnLBI40gQA9tKtNKoMbko6e6mAaMFXw==
-X-Received: by 2002:a17:90b:3889:b0:1c7:a31f:2a50 with SMTP id mu9-20020a17090b388900b001c7a31f2a50mr25031747pjb.193.1649469152888;
-        Fri, 08 Apr 2022 18:52:32 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.115])
-        by smtp.gmail.com with ESMTPSA id f6-20020a056a00238600b004fae79a3cbfsm28946172pfc.100.2022.04.08.18.52.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Apr 2022 18:52:32 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Dongli Cao <caodongli@kingsoft.com>,
-        Eric Hankland <ehankland@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH RESEND] KVM: x86/pmu: Update AMD PMC sample period to fix guest NMI-watchdog
-Date:   Sat,  9 Apr 2022 09:52:26 +0800
-Message-Id: <20220409015226.38619-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.35.1
+        bh=nK7BuI/Nd8JVLzwpjCS8lCeoKTexehkY0d3WwXKF09w=;
+        b=kiP2XI0+IaAxeTvelcf8CMPEt12wMlFqt9f3TGHmHasm5V+rKIVBgqp9V5gHw2c/a7
+         7dbSXlQad5ZCPSS4f4Y2VD6NYfpn8HUMy6G3CfJTBTSR6rIRtwd7rO9D0qSoXa3t+9DP
+         8vnbmyFJ2lwtNkdHIIZl00PVgxEdwS/t3PJDGuio9cjp32t1BGOq6e0CAs41iQict8im
+         qSdF6TNeMT6w/wloYiW9fTGME3tgcs1Sd7iu2pRtXS+0gBgmVrQHcMe60exNIYhN/CcG
+         5cyzhJrsXmNWrsJbZLy+xg4HiREVRMUo8LQmRjsOy1QLWl6qEH4R456d0iLZRAJ9/mmR
+         v+vw==
+X-Gm-Message-State: AOAM532zHE9AyqlVEUBsMJhy0VbztJDEYbMhtTlylL+s6q0AchQx3UGj
+        e+XC+DJ7yPaRtu08eqoyy/UkkT2Wdq4=
+X-Google-Smtp-Source: ABdhPJyzTzH+1nsTahkVGm7Vbx58pkC04PEoExOT1R7dhgcNlYBh/fQmh4uFUvIP2vZkvOlDR0s82g==
+X-Received: by 2002:a17:902:9892:b0:158:1fe6:df65 with SMTP id s18-20020a170902989200b001581fe6df65mr5826342plp.85.1649470343533;
+        Fri, 08 Apr 2022 19:12:23 -0700 (PDT)
+Received: from [192.168.255.10] ([203.205.141.114])
+        by smtp.gmail.com with ESMTPSA id ca16-20020a056a00419000b004fdf8a00b64sm18157217pfb.176.2022.04.08.19.12.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Apr 2022 19:12:23 -0700 (PDT)
+Message-ID: <e6c98dd1-5659-00c4-5567-045e64cb43f7@gmail.com>
+Date:   Sat, 9 Apr 2022 10:12:19 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.7.0
+Subject: Re: [PATCH 0/4] kvm: minor fixes and cleanups
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>, kvm list <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20220408163715.462096-1-pbonzini@redhat.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+Organization: Tencent
+In-Reply-To: <20220408163715.462096-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -75,88 +75,17 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On 9/4/2022 12:37 am, Paolo Bonzini wrote:
+> Queued, thanks.
+> 
+> Paolo
+Sorry, my carelessness may bring the following warning from linux-next:
 
-NMI-watchdog is one of the favorite features of kernel developers,
-but it does not work in AMD guest even with vPMU enabled and worse,
-the system misrepresents this capability via /proc.
+WARNING: From:/Signed-off-by: email address mismatch:
+'From: Like Xu <like.xu.linux@gmail.com>' != 'Signed-off-by: Like Xu 
+<likexu@tencent.com>'
 
-This is a PMC emulation error. KVM does not pass the latest valid
-value to perf_event in time when guest NMI-watchdog is running, thus
-the perf_event corresponding to the watchdog counter will enter the
-old state at some point after the first guest NMI injection, forcing
-the hardware register PMC0 to be constantly written to 0x800000000001.
+Please let me know if we need to tweak out a better new version.
 
-Meanwhile, the running counter should accurately reflect its new value
-based on the latest coordinated pmc->counter (from vPMC's point of view)
-rather than the value written directly by the guest.
-
-Fixes: 168d918f2643 ("KVM: x86: Adjust counter sample period after a wrmsr")
-Reported-by: Dongli Cao <caodongli@kingsoft.com>
-Signed-off-by: Like Xu <likexu@tencent.com>
-Reviewed-by: Yanan Wang <wangyanan55@huawei.com>
-Tested-by: Yanan Wang <wangyanan55@huawei.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
----
- arch/x86/kvm/pmu.h           | 9 +++++++++
- arch/x86/kvm/svm/pmu.c       | 1 +
- arch/x86/kvm/vmx/pmu_intel.c | 8 ++------
- 3 files changed, 12 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 2a53b6c9495c..e745f443b6a8 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -135,6 +135,15 @@ static inline u64 get_sample_period(struct kvm_pmc *pmc, u64 counter_value)
- 	return sample_period;
- }
- 
-+static inline void pmc_update_sample_period(struct kvm_pmc *pmc)
-+{
-+	if (!pmc->perf_event || pmc->is_paused)
-+		return;
-+
-+	perf_event_period(pmc->perf_event,
-+			  get_sample_period(pmc, pmc->counter));
-+}
-+
- void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel);
- void reprogram_fixed_counter(struct kvm_pmc *pmc, u8 ctrl, int fixed_idx);
- void reprogram_counter(struct kvm_pmu *pmu, int pmc_idx);
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index 57ab4739eb19..79af9a93aab7 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -257,6 +257,7 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	pmc = get_gp_pmc_amd(pmu, msr, PMU_TYPE_COUNTER);
- 	if (pmc) {
- 		pmc->counter += data - pmc_read_counter(pmc);
-+		pmc_update_sample_period(pmc);
- 		return 0;
- 	}
- 	/* MSR_EVNTSELn */
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 9db662399487..37e9eb32e3d9 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -431,15 +431,11 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			    !(msr & MSR_PMC_FULL_WIDTH_BIT))
- 				data = (s64)(s32)data;
- 			pmc->counter += data - pmc_read_counter(pmc);
--			if (pmc->perf_event && !pmc->is_paused)
--				perf_event_period(pmc->perf_event,
--						  get_sample_period(pmc, data));
-+			pmc_update_sample_period(pmc);
- 			return 0;
- 		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
- 			pmc->counter += data - pmc_read_counter(pmc);
--			if (pmc->perf_event && !pmc->is_paused)
--				perf_event_period(pmc->perf_event,
--						  get_sample_period(pmc, data));
-+			pmc_update_sample_period(pmc);
- 			return 0;
- 		} else if ((pmc = get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0))) {
- 			if (data == pmc->eventsel)
--- 
-2.35.1
-
+> 
+> 
