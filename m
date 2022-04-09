@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 694DD4FA0C2
-	for <lists+kvm@lfdr.de>; Sat,  9 Apr 2022 02:40:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 94A9C4FA0C6
+	for <lists+kvm@lfdr.de>; Sat,  9 Apr 2022 02:40:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240219AbiDIAlU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Apr 2022 20:41:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60294 "EHLO
+        id S240252AbiDIAlV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Apr 2022 20:41:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240171AbiDIAlC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Apr 2022 20:41:02 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5022C6ECA
-        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 17:38:57 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id x3-20020a17090a6c0300b001cab7230b41so6275377pjj.9
-        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 17:38:57 -0700 (PDT)
+        with ESMTP id S240181AbiDIAlE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Apr 2022 20:41:04 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 845C0C748C
+        for <kvm@vger.kernel.org>; Fri,  8 Apr 2022 17:38:59 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id p187-20020a6229c4000000b004fb57adf76fso5994994pfp.2
+        for <kvm@vger.kernel.org>; Fri, 08 Apr 2022 17:38:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=DzOG1dO8rYMP0yi3T5wLKRfSac9FjtUBvTnGYR4alpQ=;
-        b=WtYztDD216TMxeTmU1+93Vo6j0ypbZQLo/2zSPbj43phg1CTvw3awsFCfI71alMGS9
-         e8kWXpgvmRDrKh6pnVORjsJxwneusGrEBKQfmqpFXgGVejPFBToNquTD/whrAiBlcNRG
-         5fHpYO6wvgcN2j6x9HxFmtPxfK2BQzDcN16jVQlcZtA7psZlaIzB+yIah8F37Swvr9qz
-         pZQHygc0TEEEADDxf5MJJgxqBHiBPKzOSkC5QtKOnciPI80ly61muRqsd6qS6qVBhs+u
-         m9mqkdlRq6Ww5DRdi0a5Gnlf5lUkCR1+xIZnolpVUcRXS/MjCUpYiy14rtbAhgLgIuYY
-         fxRQ==
+        bh=2SzKHtyKCq5Irk3bhcAX/x/kdJ+2+hL79/QeSqxrdXE=;
+        b=F3emy64Cr5PgJT6yiaVC8uyT27yIU2FJVacYLWX5IZLobwDfbN/g7qteYjbCCnPH1G
+         GCSSyXHMCug1JOCVxQMJIszQjXvtrtnApmdbr/+5Wf9WqSCZawrZqdYRqgmvA8jpdAIh
+         HMubElJwL94l66p7xCa4kNl6b/b1523JFTwsbgsZRT9RpswFBUOA1yjGfDkAY/2XaiZw
+         aP/L8Q8O7V8NUKHo89mtpCm2Dmv7H34hynVna8Sxt4EQ2nO4HyisOWRyBH7/A0A70GNp
+         Ptz50ttkiZDXXNWP/gcv5ZuNWSeQ9PE5csdvVkpIq4ycn+CnScrR0Ue8OVZE/3OZbIsG
+         NzAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=DzOG1dO8rYMP0yi3T5wLKRfSac9FjtUBvTnGYR4alpQ=;
-        b=AVOJUTTyKCgtVMUtktnULzToqW70kYJax7EYmjjhrtj37gpHcvhpIx2tthTm22kVGd
-         +eW0b8Bg2XFgwV55TO91jR+AiLEaZxRbH4cT/JDyglCxSEZo5/NSZr3dWuAZKxGDQYl9
-         VG4E7bcRZ+t+UKimjmqkWhKYa075H1Y1Q5SF0LJaEM83mFkR/ViFd0tjGft3z3+D1y61
-         zSpUPuNjGvgzCZvL2gGgc1YcfGcliiVtuL5LsYomgeqjutGts6OdImCtZsIZIazVqYvw
-         TiSzwMrJOkqDiKNIKxXw4fEJNWem+94dWimwrVLKZgrL1W7eCKbMCCeWB4HhYkfDIlLv
-         CaVw==
-X-Gm-Message-State: AOAM532WcWNa+ZqhbT6Tp/9JfvZ4LuZ1MFHZG3lJJv/tIZ0izNnkriz9
-        HTeqhxpWcQMBH9Cqy91C6gLSrOJEJBk=
-X-Google-Smtp-Source: ABdhPJw9csYsc/Q1poUULGW/tqgne+GSOH5TWq8ojK98JToAzK/+EaEdJLeQeOF8h4a1kZ3UCKgSDEWdays=
+        bh=2SzKHtyKCq5Irk3bhcAX/x/kdJ+2+hL79/QeSqxrdXE=;
+        b=G4ooAq+V2RLPioGjZe8/eN72Hz5c1c8bbvSd9S09EiKNqJIwYb76cyQzjx0RfUoPuo
+         rO3BScwyb3+8xuvzpSb1k1fOdvdCrU0Qn6/dZYLWQygkzCCgljNfKq88X/L0gUmT+Gm8
+         /0HOrfYJFMRbsLGnMO4Rk1DLePqrwo4vUkMslFCR7ZjDyWGQyqWyNXrmEG9jqZ7ZW04E
+         TlqXxfdIXBzH4LtBvDksfT99fEQsYpaNkJfg4uWySeIaPuEiHPKySPFCsUkVAopzwjN1
+         5sorp6Yz9ggw1+6ahEWEzpDvFts2Z+5RTTVZHtIiyypwgfMfze9ofNrPe9iGhLkyawja
+         NdWA==
+X-Gm-Message-State: AOAM533JLDBaVapX0U79KB/Gr3VYMKzKy1qeW9exoQt5QxfvUyVQQwop
+        aLEp0x9xtyM2DJCLH/gkPBZn9MWcmw8=
+X-Google-Smtp-Source: ABdhPJwuAy0R35WPnrFnfKlncfg91Jgy4oA66qufdBIM2rRGaMT+MFnDROLBhZEdu5vJpBdWi1G/BtAxcBc=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:d2c3:b0:157:ebe:25c5 with SMTP id
- n3-20020a170902d2c300b001570ebe25c5mr10049047plc.59.1649464737391; Fri, 08
- Apr 2022 17:38:57 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:ce81:b0:156:ad26:78b1 with SMTP id
+ f1-20020a170902ce8100b00156ad2678b1mr22068188plg.144.1649464738950; Fri, 08
+ Apr 2022 17:38:58 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat,  9 Apr 2022 00:38:45 +0000
+Date:   Sat,  9 Apr 2022 00:38:46 +0000
 In-Reply-To: <20220409003847.819686-1-seanjc@google.com>
-Message-Id: <20220409003847.819686-5-seanjc@google.com>
+Message-Id: <20220409003847.819686-6-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220409003847.819686-1-seanjc@google.com>
 X-Mailer: git-send-email 2.35.1.1178.g4f1659d476-goog
-Subject: [PATCH 4/6] KVM: x86/mmu: Track the number of TDP MMU pages, but not
- the actual pages
+Subject: [PATCH 5/6] KVM: x86/mmu: Add helper to convert SPTE value to its
+ shadow page
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -73,122 +73,140 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Track the number of TDP MMU "shadow" pages instead of tracking the pages
-themselves. With the NX huge page list manipulation moved out of the common
-linking flow, elminating the list-based tracking means the happy path of
-adding a shadow page doesn't need to acquire a spinlock and can instead
-inc/dec an atomic.
+Add a helper to convert a SPTE to its shadow page to deduplicate a
+variety of flows and hopefully avoid future bugs, e.g. if KVM attempts to
+get the shadow page for a SPTE without dropping high bits.
 
-Keep the tracking as the WARN during TDP MMU teardown on leaked shadow
-pages is very, very useful for detecting KVM bugs.
+Opportunistically add a comment in mmu_free_root_page() documenting why
+it treats the root HPA as a SPTE.
 
-Tracking the number of pages will also make it trivial to expose the
-counter to userspace as a stat in the future, which may or may not be
-desirable.
+No functional change intended.
 
-Note, the TDP MMU needs to use a separate counter (and stat if that ever
-comes to be) from the existing n_used_mmu_pages. The TDP MMU doesn't bother
-supporting the shrinker nor does it honor KVM_SET_NR_MMU_PAGES (because the
-TDP MMU consumes so few pages relative to shadow paging), and including TDP
-MMU pages in that counter would break both the shrinker and shadow MMUs,
-e.g. if a VM is using nested TDP.
-
-Reviewed-by: Mingwei Zhang <mizhang@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm_host.h | 11 +++--------
- arch/x86/kvm/mmu/tdp_mmu.c      | 19 +++++++++----------
- 2 files changed, 12 insertions(+), 18 deletions(-)
+ arch/x86/kvm/mmu/mmu.c          | 14 +++++++++-----
+ arch/x86/kvm/mmu/mmu_internal.h | 12 ------------
+ arch/x86/kvm/mmu/spte.h         | 17 +++++++++++++++++
+ arch/x86/kvm/mmu/tdp_mmu.h      |  2 ++
+ 4 files changed, 28 insertions(+), 17 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e4f7e7998928..19a352b5750b 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1186,6 +1186,9 @@ struct kvm_arch {
- 	 */
- 	bool tdp_mmu_enabled;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index bc86997f9339..8b4f3550710a 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1823,7 +1823,7 @@ static int __mmu_unsync_walk(struct kvm_mmu_page *sp,
+ 			continue;
+ 		}
  
-+	/* The number of TDP MMU pages across all roots. */
-+	atomic64_t tdp_mmu_pages;
-+
- 	/*
- 	 * List of struct kvm_mmu_pages being used as roots.
- 	 * All struct kvm_mmu_pages in the list should have
-@@ -1206,18 +1209,10 @@ struct kvm_arch {
- 	 */
- 	struct list_head tdp_mmu_roots;
+-		child = to_shadow_page(ent & PT64_BASE_ADDR_MASK);
++		child = spte_to_sp(ent);
  
--	/*
--	 * List of struct kvmp_mmu_pages not being used as roots.
--	 * All struct kvm_mmu_pages in the list should have
--	 * tdp_mmu_page set and a tdp_mmu_root_count of 0.
--	 */
--	struct list_head tdp_mmu_pages;
+ 		if (child->unsync_children) {
+ 			if (mmu_pages_add(pvec, child, i))
+@@ -2237,7 +2237,7 @@ static void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+ 		 * so we should update the spte at this point to get
+ 		 * a new sp with the correct access.
+ 		 */
+-		child = to_shadow_page(*sptep & PT64_BASE_ADDR_MASK);
++		child = spte_to_sp(*sptep);
+ 		if (child->role.access == direct_access)
+ 			return;
+ 
+@@ -2258,7 +2258,7 @@ static int mmu_page_zap_pte(struct kvm *kvm, struct kvm_mmu_page *sp,
+ 		if (is_last_spte(pte, sp->role.level)) {
+ 			drop_spte(kvm, spte);
+ 		} else {
+-			child = to_shadow_page(pte & PT64_BASE_ADDR_MASK);
++			child = spte_to_sp(pte);
+ 			drop_parent_pte(child, spte);
+ 
+ 			/*
+@@ -2696,7 +2696,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+ 			struct kvm_mmu_page *child;
+ 			u64 pte = *sptep;
+ 
+-			child = to_shadow_page(pte & PT64_BASE_ADDR_MASK);
++			child = spte_to_sp(pte);
+ 			drop_parent_pte(child, sptep);
+ 			flush = true;
+ 		} else if (pfn != spte_to_pfn(*sptep)) {
+@@ -3227,7 +3227,11 @@ static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
+ 	if (!VALID_PAGE(*root_hpa))
+ 		return;
+ 
+-	sp = to_shadow_page(*root_hpa & PT64_BASE_ADDR_MASK);
++	/*
++	 * The "root" may be a special root, e.g. a PAE entry, treat it as a
++	 * SPTE to ensure any non-PA bits are dropped.
++	 */
++	sp = spte_to_sp(*root_hpa);
+ 	if (WARN_ON(!sp))
+ 		return;
+ 
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index 75e830c648da..891ef217b877 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -106,18 +106,6 @@ struct kvm_mmu_page {
+ 
+ extern struct kmem_cache *mmu_page_header_cache;
+ 
+-static inline struct kvm_mmu_page *to_shadow_page(hpa_t shadow_page)
+-{
+-	struct page *page = pfn_to_page(shadow_page >> PAGE_SHIFT);
 -
- 	/*
- 	 * Protects accesses to the following fields when the MMU lock
- 	 * is held in read mode:
- 	 *  - tdp_mmu_roots (above)
--	 *  - tdp_mmu_pages (above)
- 	 *  - the link field of struct kvm_mmu_pages used by the TDP MMU
- 	 *  - possible_nx_huge_pages;
- 	 *  - the possible_nx_huge_page_link field of struct kvm_mmu_pages used
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 9966735601a6..d0e6b341652c 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -29,7 +29,6 @@ int kvm_mmu_init_tdp_mmu(struct kvm *kvm)
- 	kvm->arch.tdp_mmu_enabled = true;
- 	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_roots);
- 	spin_lock_init(&kvm->arch.tdp_mmu_pages_lock);
--	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_pages);
- 	kvm->arch.tdp_mmu_zap_wq = wq;
- 	return 1;
- }
-@@ -54,7 +53,7 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
- 	/* Also waits for any queued work items.  */
- 	destroy_workqueue(kvm->arch.tdp_mmu_zap_wq);
- 
--	WARN_ON(!list_empty(&kvm->arch.tdp_mmu_pages));
-+	WARN_ON(atomic64_read(&kvm->arch.tdp_mmu_pages));
- 	WARN_ON(!list_empty(&kvm->arch.tdp_mmu_roots));
- 
- 	/*
-@@ -386,16 +385,18 @@ static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
- static void tdp_mmu_unlink_sp(struct kvm *kvm, struct kvm_mmu_page *sp,
- 			      bool shared)
+-	return (struct kvm_mmu_page *)page_private(page);
+-}
+-
+-static inline struct kvm_mmu_page *sptep_to_sp(u64 *sptep)
+-{
+-	return to_shadow_page(__pa(sptep));
+-}
+-
+ static inline int kvm_mmu_role_as_id(union kvm_mmu_page_role role)
  {
-+	atomic64_dec(&kvm->arch.tdp_mmu_pages);
+ 	return role.smm ? 1 : 0;
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index 73f12615416f..149a23c6e981 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -207,6 +207,23 @@ extern u64 __read_mostly shadow_nonpresent_or_rsvd_lower_gfn_mask;
+  */
+ extern u8 __read_mostly shadow_phys_bits;
+ 
++static inline struct kvm_mmu_page *to_shadow_page(hpa_t shadow_page)
++{
++	struct page *page = pfn_to_page((shadow_page) >> PAGE_SHIFT);
 +
-+	if (!sp->nx_huge_page_disallowed)
-+		return;
++	return (struct kvm_mmu_page *)page_private(page);
++}
 +
- 	if (shared)
- 		spin_lock(&kvm->arch.tdp_mmu_pages_lock);
- 	else
- 		lockdep_assert_held_write(&kvm->mmu_lock);
++static inline struct kvm_mmu_page *spte_to_sp(u64 spte)
++{
++	return to_shadow_page(spte & PT64_BASE_ADDR_MASK);
++}
++
++static inline struct kvm_mmu_page *sptep_to_sp(u64 *sptep)
++{
++	return to_shadow_page(__pa(sptep));
++}
++
+ static inline bool is_mmio_spte(u64 spte)
+ {
+ 	return (spte & shadow_mmio_mask) == shadow_mmio_value &&
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+index c163f7cc23ca..d3714200b932 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.h
++++ b/arch/x86/kvm/mmu/tdp_mmu.h
+@@ -5,6 +5,8 @@
  
--	list_del(&sp->link);
--	if (sp->nx_huge_page_disallowed) {
--		sp->nx_huge_page_disallowed = false;
--		untrack_possible_nx_huge_page(kvm, sp);
--	}
-+	sp->nx_huge_page_disallowed = false;
-+	untrack_possible_nx_huge_page(kvm, sp);
+ #include <linux/kvm_host.h>
  
- 	if (shared)
- 		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-@@ -1123,9 +1124,7 @@ static int tdp_mmu_link_sp(struct kvm *kvm, struct tdp_iter *iter,
- 		tdp_mmu_set_spte(kvm, iter, spte);
- 	}
++#include "spte.h"
++
+ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu);
  
--	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
--	list_add(&sp->link, &kvm->arch.tdp_mmu_pages);
--	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-+	atomic64_inc(&kvm->arch.tdp_mmu_pages);
- 
- 	return 0;
- }
+ __must_check static inline bool kvm_tdp_mmu_get_root(struct kvm_mmu_page *root)
 -- 
 2.35.1.1178.g4f1659d476-goog
 
