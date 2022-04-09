@@ -2,176 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F08304FAA61
-	for <lists+kvm@lfdr.de>; Sat,  9 Apr 2022 20:46:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41EAD4FAA82
+	for <lists+kvm@lfdr.de>; Sat,  9 Apr 2022 21:39:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243125AbiDISs3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 Apr 2022 14:48:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41754 "EHLO
+        id S229560AbiDITlS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 Apr 2022 15:41:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243131AbiDISsW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 9 Apr 2022 14:48:22 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8527E10FC2
-        for <kvm@vger.kernel.org>; Sat,  9 Apr 2022 11:46:13 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-2d2d45c0df7so102417827b3.1
-        for <kvm@vger.kernel.org>; Sat, 09 Apr 2022 11:46:13 -0700 (PDT)
+        with ESMTP id S229455AbiDITlQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 9 Apr 2022 15:41:16 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E084E255167
+        for <kvm@vger.kernel.org>; Sat,  9 Apr 2022 12:39:07 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id r13so23457359ejd.5
+        for <kvm@vger.kernel.org>; Sat, 09 Apr 2022 12:39:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=OjrumNZxEEC9JuFBLDox+92YZe3EIOWUkCcQ/nIRGPY=;
-        b=LZ5+m4r1/6YLipI0gN+Pv5e4GfhlOD5144KXetxI+6WILM1ibWOL2bzGYh7eJYM7v4
-         UsaMw2u6MW9ZKH1GRs8LfqU3rL6RMKc0Vcs1s+72v1b1qLvDaoKkk7p2lF7v4ZbN81nd
-         p9qjopZgxbw+8wXyDx7jIvDTTvHWuduflu0Z9qYn2lWeEqoUoPcs2cFDLKCYyYvIzVmZ
-         V+Dr6045ojYb2r4D2rI4Tsr1rJ3MEwznClc9hwZrI8ILxidC0oDstuE92NUlNrHGgsy9
-         Kr0dJQPWbPWgIvtwKwbSsFQ6RE6jiZ9ofc7J0dOWqyNVcFMnbJIYZEVyGrdJSVOOO4Hy
-         Cg8g==
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=1Qfy/2iZl5Equ6kwyEmLCJfXh+EZ4X64S7GQfK4oQkM=;
+        b=Og1XBWjWNAfZsadTFHc3DZR8X7Ta674zT/xw4W2/G8MCGK9l4VmoSW55+vjzA5wXeo
+         yoy9um6RvSymxFeaM771TkecmdKpkiFfJp6QDkWv3pMS7pRXe7vx6MkKVj+E0W7F3IYy
+         Rwyv/xRBh/LuyMknlh1f9y8ekHvUvi6iJ+BvQxXIclK9y+n2WpuYt2suuuEQA8qCNnuR
+         qF8iUjdROqGtT3qoyBQQUOUoG/GmelTm1xuCNChKtdXZEvSSR0vOVhR3NAEuEyIKtVvb
+         fuaM+2LBECjMt2QdzsbPYtdL8xhFUWUEIq+0lgckKCLLKVb1XUG589AElLbO9ePbuHSt
+         hy6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=OjrumNZxEEC9JuFBLDox+92YZe3EIOWUkCcQ/nIRGPY=;
-        b=Qj8mAvZCMP6YahJQqmSnT+q08/SA/RHJCZY3ZLzPndqCVH8iy8D+/TZxgWzvb50k6X
-         BC5+oOgcPw5FUwvwN7k2xuj1Q9HfFSOD3f73/QI5dwpE3QL9flGrmOO2V+hnMTddvjHV
-         k5DJC9dfPsfrGGuxtJTmFbcuJJBtXVTuRcmA96KBuV1CjypsAvJFIKokL3DPAeX+p+Fx
-         CgJ4e0uSnAKLtPgJ+QNuX/QeG+F/oWXNioo61fIRmsL9YYgZu2OOgAc1odVFaMImyUmp
-         LHE/owVJye9FK1hl+6rVW0s2ML5fODz1D/EFJ034mksbKuiyg5cp99/Lq7ajZSgKb7KE
-         fbWA==
-X-Gm-Message-State: AOAM532S7WyHydycy9ziB7UAgkZnDZLRaTnPzt5/DpGOx3HH7wwf1lNv
-        oPtfLk6Eh38ZgWwwbPp+wBwGsvN52EA=
-X-Google-Smtp-Source: ABdhPJw23470taeCjhyd7oxRIw+PzjKhZH13DOsSObKCyPE5FciaKTT52JBHfWKqYlSKc4u1Dt/oLSuJNCc=
-X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a5b:e8e:0:b0:63d:cbfc:36e9 with SMTP id
- z14-20020a5b0e8e000000b0063dcbfc36e9mr16905813ybr.362.1649529972291; Sat, 09
- Apr 2022 11:46:12 -0700 (PDT)
-Date:   Sat,  9 Apr 2022 18:45:49 +0000
-In-Reply-To: <20220409184549.1681189-1-oupton@google.com>
-Message-Id: <20220409184549.1681189-14-oupton@google.com>
-Mime-Version: 1.0
-References: <20220409184549.1681189-1-oupton@google.com>
-X-Mailer: git-send-email 2.35.1.1178.g4f1659d476-goog
-Subject: [PATCH v5 13/13] selftests: KVM: Test SYSTEM_SUSPEND PSCI call
-From:   Oliver Upton <oupton@google.com>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     alexandru.elisei@arm.com, anup@brainfault.org,
-        atishp@atishpatra.org, james.morse@arm.com, jingzhangos@google.com,
-        jmattson@google.com, joro@8bytes.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, maz@kernel.org,
-        pbonzini@redhat.com, pshier@google.com, rananta@google.com,
-        reijiw@google.com, ricarkol@google.com, seanjc@google.com,
-        suzuki.poulose@arm.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        Oliver Upton <oupton@google.com>
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to:content-transfer-encoding;
+        bh=1Qfy/2iZl5Equ6kwyEmLCJfXh+EZ4X64S7GQfK4oQkM=;
+        b=xvSGHm2cx8PDhQk/yCKGdw4gGuxw73Xykt9Tc3j9ZGP4KwBut3OJvEeWvhJZb45wEJ
+         W/MAX3YDYiQEJT13IlA9aAkRjYJ2ejRIfbNeSnrn8Lwxs9JfdsFv0gZsngeS3Gljwkwz
+         kfg8N8/wmuglHY87ok3zPEv/v+VPm3yG+wFuODo5Vj0gRgQKEXSXb+Rr9Oh4paOnTQtG
+         DlUTzd9gOCdOEIBX/mN+c04uUrnLyd9LAike1vvmLY2J6xwRnyS2+bbwMnxenOXWKB1l
+         0ToB1ScNZdg1lO0fPNVa4MzvBRVIMMO0z+mC7l44I0eWIWE1tigUk8jgUZH+uvDVBjVL
+         aBJA==
+X-Gm-Message-State: AOAM5338IJIBqlnRTB/9xp0exGMPmnjNMVEkZszHmzbyRjR6X6SFaXjo
+        LiCCGFHYKASDIZxszgc7j+4ZAjm0wFGewBINIpk=
+X-Google-Smtp-Source: ABdhPJwUj4uhqGmku+Vs/stA3m278G5tcOWF3usqoL99at/pEScMYPr1Bh+JOqwTPvkMFnDu5RoTnpSimM9sAKDoXVI=
+X-Received: by 2002:a17:906:2991:b0:6cd:ac19:ce34 with SMTP id
+ x17-20020a170906299100b006cdac19ce34mr23803186eje.746.1649533146029; Sat, 09
+ Apr 2022 12:39:06 -0700 (PDT)
+MIME-Version: 1.0
+Received: by 2002:a05:6402:190f:0:0:0:0 with HTTP; Sat, 9 Apr 2022 12:39:05
+ -0700 (PDT)
+Reply-To: douglaselix23@gmail.com
+From:   "Mr. Douglas Felix" <williamcamacho5656@gmail.com>
+Date:   Sat, 9 Apr 2022 19:39:05 +0000
+Message-ID: <CAHTdREO1quFPY9kx7uiTGFqQ9ZWp643_mNA-9_nbJZ+cT36XSg@mail.gmail.com>
+Subject: =?UTF-8?B?SHl2w6TDpCBodW9tZW50YQ==?=
+To:     undisclosed-recipients:;
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_HK_NAME_FM_MR_MRS,
+        T_SCC_BODY_TEXT_LINE,UNDISC_FREEM autolearn=no autolearn_force=no
+        version=3.4.6
+X-Spam-Level: ***
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Assert that the vCPU exits to userspace with KVM_SYSTEM_EVENT_SUSPEND if
-the guest calls PSCI SYSTEM_SUSPEND. Additionally, guarantee that the
-SMC32 and SMC64 flavors of this call are discoverable with the
-PSCI_FEATURES call.
+--=20
+Sinulle l=C3=A4hetettiin joskus viime viikolla viesti, jossa odotettiin
+sain uudelleenvirityspostin sinulta, mutta yll=C3=A4tyksekseni et koskaan
+vaivautunut vastaamaan.
+Vastaa yst=C3=A4v=C3=A4llisesti lis=C3=A4selvityksi=C3=A4 varten.
 
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- .../testing/selftests/kvm/aarch64/psci_test.c | 69 +++++++++++++++++++
- 1 file changed, 69 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/aarch64/psci_test.c b/tools/testing/selftests/kvm/aarch64/psci_test.c
-index 535130d5e97f..88541de21c41 100644
---- a/tools/testing/selftests/kvm/aarch64/psci_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/psci_test.c
-@@ -45,6 +45,25 @@ static uint64_t psci_affinity_info(uint64_t target_affinity,
- 	return res.a0;
- }
- 
-+static uint64_t psci_system_suspend(uint64_t entry_addr, uint64_t context_id)
-+{
-+	struct arm_smccc_res res;
-+
-+	smccc_hvc(PSCI_1_0_FN64_SYSTEM_SUSPEND, entry_addr, context_id,
-+		  0, 0, 0, 0, 0, &res);
-+
-+	return res.a0;
-+}
-+
-+static uint64_t psci_features(uint32_t func_id)
-+{
-+	struct arm_smccc_res res;
-+
-+	smccc_hvc(PSCI_1_0_FN_PSCI_FEATURES, func_id, 0, 0, 0, 0, 0, 0, &res);
-+
-+	return res.a0;
-+}
-+
- static void vcpu_power_off(struct kvm_vm *vm, uint32_t vcpuid)
- {
- 	struct kvm_mp_state mp_state = {
-@@ -137,8 +156,58 @@ static void host_test_cpu_on(void)
- 	kvm_vm_free(vm);
- }
- 
-+static void enable_system_suspend(struct kvm_vm *vm)
-+{
-+	struct kvm_enable_cap cap = {
-+		.cap = KVM_CAP_ARM_SYSTEM_SUSPEND,
-+	};
-+
-+	vm_enable_cap(vm, &cap);
-+}
-+
-+static void guest_test_system_suspend(void)
-+{
-+	uint64_t ret;
-+
-+	/* assert that SYSTEM_SUSPEND is discoverable */
-+	GUEST_ASSERT(!psci_features(PSCI_1_0_FN_SYSTEM_SUSPEND));
-+	GUEST_ASSERT(!psci_features(PSCI_1_0_FN64_SYSTEM_SUSPEND));
-+
-+	ret = psci_system_suspend(CPU_ON_ENTRY_ADDR, CPU_ON_CONTEXT_ID);
-+	GUEST_SYNC(ret);
-+}
-+
-+static void host_test_system_suspend(void)
-+{
-+	struct kvm_run *run;
-+	struct kvm_vm *vm;
-+
-+	vm = setup_vm(guest_test_system_suspend);
-+	enable_system_suspend(vm);
-+
-+	vcpu_power_off(vm, VCPU_ID_TARGET);
-+	run = vcpu_state(vm, VCPU_ID_SOURCE);
-+
-+	enter_guest(vm, VCPU_ID_SOURCE);
-+
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_SYSTEM_EVENT,
-+		    "Unhandled exit reason: %u (%s)",
-+		    run->exit_reason, exit_reason_str(run->exit_reason));
-+	TEST_ASSERT(run->system_event.type == KVM_SYSTEM_EVENT_SUSPEND,
-+		    "Unhandled system event: %u (expected: %u)",
-+		    run->system_event.type, KVM_SYSTEM_EVENT_SUSPEND);
-+
-+	kvm_vm_free(vm);
-+}
-+
- int main(void)
- {
-+	if (!kvm_check_cap(KVM_CAP_ARM_SYSTEM_SUSPEND)) {
-+		print_skip("KVM_CAP_ARM_SYSTEM_SUSPEND not supported");
-+		exit(KSFT_SKIP);
-+	}
-+
- 	host_test_cpu_on();
-+	host_test_system_suspend();
- 	return 0;
- }
--- 
-2.35.1.1178.g4f1659d476-goog
-
+Kunnioittaen,
+Asianajaja. Douglas Felix.
