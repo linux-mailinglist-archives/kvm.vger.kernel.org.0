@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A8B9F4FAA60
-	for <lists+kvm@lfdr.de>; Sat,  9 Apr 2022 20:46:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 580274FAA69
+	for <lists+kvm@lfdr.de>; Sat,  9 Apr 2022 20:46:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242780AbiDISsL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 Apr 2022 14:48:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40826 "EHLO
+        id S243083AbiDISsM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 Apr 2022 14:48:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239655AbiDISsJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S240939AbiDISsJ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sat, 9 Apr 2022 14:48:09 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4352024959
-        for <kvm@vger.kernel.org>; Sat,  9 Apr 2022 11:46:01 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-2ebfdbe01f6so11794177b3.10
-        for <kvm@vger.kernel.org>; Sat, 09 Apr 2022 11:46:01 -0700 (PDT)
+Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D89D22B25
+        for <kvm@vger.kernel.org>; Sat,  9 Apr 2022 11:46:02 -0700 (PDT)
+Received: by mail-il1-x149.google.com with SMTP id l8-20020a056e020dc800b002ca4c433357so7600403ilj.23
+        for <kvm@vger.kernel.org>; Sat, 09 Apr 2022 11:46:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=DMzmQt8j2gXQ34IYdSrbWnWZ1QMlmXcDpNCPmrEOebY=;
-        b=NG4TL6XT7gnV8l/zru+9eN9qrrveBeZGlb+4CWYOSECMBCtX7Hh1T+caa19frZuH1p
-         +EA32ATnD+LOjuqKUOrMj5mole9xDSK7al5vTLca3jkuvUixfPgRmo4zu387CynwlrM0
-         F0aiMvjaakbeWQJoqYsS+ah6NDOlz4UQmiNXUo5rhvPbIf50TR8UcyGVaTTl/MJyA5EW
-         O5SxEhj/ROxyychujtu+2H6CL78ZN6uaJsp7y0QTMLk1lCV7AZr8XZhQwDntBC31x2+X
-         fKYZneniAdLL0ybiDSFJxy86ObDJB9vAmGWp/0FgXANDHeZH1cPkBoEoMfhjuqNJ/pNM
-         GWEw==
+        bh=GrTuEsowgjSLSh5SPFZtOIzYck4sIL1A+AsuQBdb1R4=;
+        b=ZEKDnqh1E68l3QyvAwE5py+QjZMcctkJAsooLeFVX+b3t24hnB1aJN+oIh6gCVrXml
+         cRpXGP3e2CkDJugK+ETgdNu5r/nuHLmgDAvgQxtuc0CY57lba5ChcNaAGtYqB8qBnNeU
+         elaRjDfxj+EW1CVaH0QZnJI+T+xmw69neU3WhJU2JbtPNbrcKPybZgzDRQRwqBd40HU4
+         o82y67LH/WWG77pZSLlcykW607i6/EZYZmXjitv2C1BbjNYLGR0AC+he0cLCSKCebrsv
+         KtroytYnfn8t/GA8eLiIEoV3EHLcGjNsoUPxnge+zp4QQLP0NSYqtAhpZQ3ItwBsCduO
+         56+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=DMzmQt8j2gXQ34IYdSrbWnWZ1QMlmXcDpNCPmrEOebY=;
-        b=6v/z1HJt7I4TClZlYUUJYZM49eMBKvkpLBefmbLI8UlERYIWJPiJCWo+TW3VTUDjrm
-         7qbbxfy6MbMfcYX1df5gMaF6fnI5lHBDaw8KRib7zH9SYICl3D+fgqNpkOQTjkGaeJrL
-         4Q+u9CAC+C9UtF4ikThsxz+jVZFdBjwYGOVG8M2L4ZVeeK+J9Z5RYY2jEwFVFrSs4h80
-         0R6/cHOmiy6P9TjFXGEjHpoDtkek65Yy9nhyRUkH7LBeV4rvj1FOPN3kahwSMf9w6cFG
-         Zxp5oFle785YxCQBqxdpRwYj0TBQid/GYT86GaHePoUsxbapuiwsge7NvhTZ5srJCrFx
-         jE8Q==
-X-Gm-Message-State: AOAM532LQP8p3pY11tFAuPMrEEeTrRKqCqaqGLR65XgsRGvgjGLmWym2
-        Wm5u90uYbaLIBIcfF8P0XZ1nHITm3Aw=
-X-Google-Smtp-Source: ABdhPJwb/utx76+XP84h3iTnGw5IeZy4uquOiqucLInRckn7SQuOn6r08CCG2JkrbHBFJs03Kgcgly9FTkM=
+        bh=GrTuEsowgjSLSh5SPFZtOIzYck4sIL1A+AsuQBdb1R4=;
+        b=yxxK/K2X9fv7mrER74IBhnUBuGxfDHXeBAGKsswLw/7NCUUZ1d3l0OIrL+mZj8lBAj
+         oU3sGhzbsIt4naw5ebmBHCxpmP3h2lsQsBKanxqLXXdZF2kcfoZcxvsVg08TWHNTeUo/
+         MtCPWHlc0zy6VnDFpF1izaG0vStHwqp9KUI3CxAnizj1o2x09Xj4eIYOGOZkrKJW3W8y
+         8seB+rIKZzl+mK8ass0kXuJlOfB/bsi4MhWwk02Fm8MP+qd221iASxfUMkikN+xH3H7a
+         tGnYyyFHZyZQcKMOuUxRVNxu6OrhvbLlOIVxuoMNiydqnk5F1mA3NU5uklRBnQKqpmg0
+         T9qw==
+X-Gm-Message-State: AOAM531CHEI/z5mgN48zassY0rl9ZqkKglis8YoGDX72IjWlibM7EHP6
+        J1+0YXTJ2jEujtVYJ9XSB5qhBxaplPo=
+X-Google-Smtp-Source: ABdhPJwE27yromTM7IHeD35r5yOQuHh5y0AoUWsUzU99gkjTTiS0e8E0ysBofkG6VXxzu+eSD3Fqgn3yTIA=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a25:59c3:0:b0:63d:8ccc:37b0 with SMTP id
- n186-20020a2559c3000000b0063d8ccc37b0mr17865179ybb.612.1649529960409; Sat, 09
- Apr 2022 11:46:00 -0700 (PDT)
-Date:   Sat,  9 Apr 2022 18:45:37 +0000
+ (user=oupton job=sendgmr) by 2002:a05:6e02:174e:b0:2ca:1fda:85b with SMTP id
+ y14-20020a056e02174e00b002ca1fda085bmr11371943ill.85.1649529961465; Sat, 09
+ Apr 2022 11:46:01 -0700 (PDT)
+Date:   Sat,  9 Apr 2022 18:45:38 +0000
 In-Reply-To: <20220409184549.1681189-1-oupton@google.com>
-Message-Id: <20220409184549.1681189-2-oupton@google.com>
+Message-Id: <20220409184549.1681189-3-oupton@google.com>
 Mime-Version: 1.0
 References: <20220409184549.1681189-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.1.1178.g4f1659d476-goog
-Subject: [PATCH v5 01/13] KVM: arm64: Don't depend on fallthrough to hide SYSTEM_RESET2
+Subject: [PATCH v5 02/13] KVM: arm64: Dedupe vCPU power off helpers
 From:   Oliver Upton <oupton@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     alexandru.elisei@arm.com, anup@brainfault.org,
@@ -73,70 +73,97 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Depending on a fallthrough to the default case for hiding SYSTEM_RESET2
-requires that any new case statements clean up the failure path for this
-PSCI call.
-
-Unhitch SYSTEM_RESET2 from the default case by setting val to
-PSCI_RET_NOT_SUPPORTED outside of the switch statement. Apply the
-cleanup to both the PSCI_1_1_FN_SYSTEM_RESET2 and
-PSCI_1_0_FN_PSCI_FEATURES handlers.
+vcpu_power_off() and kvm_psci_vcpu_off() are equivalent; rename the
+former and replace all callsites to the latter.
 
 No functional change intended.
 
 Signed-off-by: Oliver Upton <oupton@google.com>
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/psci.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ arch/arm64/kvm/arm.c              |  6 +++---
+ arch/arm64/kvm/psci.c             | 11 ++---------
+ 3 files changed, 7 insertions(+), 12 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 94a27a7520f4..490cd7f3a905 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -841,4 +841,6 @@ void __init kvm_hyp_reserve(void);
+ static inline void kvm_hyp_reserve(void) { }
+ #endif
+ 
++void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
++
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 523bc934fe2f..28c83c6ddbae 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -432,7 +432,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ 	vcpu->cpu = -1;
+ }
+ 
+-static void vcpu_power_off(struct kvm_vcpu *vcpu)
++void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.power_off = true;
+ 	kvm_make_request(KVM_REQ_SLEEP, vcpu);
+@@ -460,7 +460,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+ 		vcpu->arch.power_off = false;
+ 		break;
+ 	case KVM_MP_STATE_STOPPED:
+-		vcpu_power_off(vcpu);
++		kvm_arm_vcpu_power_off(vcpu);
+ 		break;
+ 	default:
+ 		ret = -EINVAL;
+@@ -1124,7 +1124,7 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+ 	 * Handle the "start in power-off" case.
+ 	 */
+ 	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
+-		vcpu_power_off(vcpu);
++		kvm_arm_vcpu_power_off(vcpu);
+ 	else
+ 		vcpu->arch.power_off = false;
+ 
 diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-index baac2b405f23..3d43350ffb07 100644
+index 3d43350ffb07..cdc0609c1135 100644
 --- a/arch/arm64/kvm/psci.c
 +++ b/arch/arm64/kvm/psci.c
-@@ -304,9 +304,9 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+@@ -51,13 +51,6 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
+ 	return PSCI_RET_SUCCESS;
+ }
  
- static int kvm_psci_1_x_call(struct kvm_vcpu *vcpu, u32 minor)
+-static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
+-{
+-	vcpu->arch.power_off = true;
+-	kvm_make_request(KVM_REQ_SLEEP, vcpu);
+-	kvm_vcpu_kick(vcpu);
+-}
+-
+ static inline bool kvm_psci_valid_affinity(struct kvm_vcpu *vcpu,
+ 					   unsigned long affinity)
  {
-+	unsigned long val = PSCI_RET_NOT_SUPPORTED;
- 	u32 psci_fn = smccc_get_function(vcpu);
- 	u32 arg;
--	unsigned long val;
- 	int ret = 1;
- 
- 	switch(psci_fn) {
-@@ -319,6 +319,8 @@ static int kvm_psci_1_x_call(struct kvm_vcpu *vcpu, u32 minor)
- 		if (val)
- 			break;
- 
-+		val = PSCI_RET_NOT_SUPPORTED;
-+
- 		switch(arg) {
- 		case PSCI_0_2_FN_PSCI_VERSION:
- 		case PSCI_0_2_FN_CPU_SUSPEND:
-@@ -337,13 +339,8 @@ static int kvm_psci_1_x_call(struct kvm_vcpu *vcpu, u32 minor)
- 			break;
- 		case PSCI_1_1_FN_SYSTEM_RESET2:
- 		case PSCI_1_1_FN64_SYSTEM_RESET2:
--			if (minor >= 1) {
-+			if (minor >= 1)
- 				val = 0;
--				break;
--			}
--			fallthrough;
--		default:
--			val = PSCI_RET_NOT_SUPPORTED;
- 			break;
- 		}
+@@ -244,7 +237,7 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+ 		val = kvm_psci_vcpu_suspend(vcpu);
  		break;
-@@ -364,7 +361,7 @@ static int kvm_psci_1_x_call(struct kvm_vcpu *vcpu, u32 minor)
- 			val = PSCI_RET_INVALID_PARAMS;
- 			break;
- 		}
--		fallthrough;
-+		break;
- 	default:
- 		return kvm_psci_0_2_call(vcpu);
- 	}
+ 	case PSCI_0_2_FN_CPU_OFF:
+-		kvm_psci_vcpu_off(vcpu);
++		kvm_arm_vcpu_power_off(vcpu);
+ 		val = PSCI_RET_SUCCESS;
+ 		break;
+ 	case PSCI_0_2_FN_CPU_ON:
+@@ -378,7 +371,7 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+ 
+ 	switch (psci_fn) {
+ 	case KVM_PSCI_FN_CPU_OFF:
+-		kvm_psci_vcpu_off(vcpu);
++		kvm_arm_vcpu_power_off(vcpu);
+ 		val = PSCI_RET_SUCCESS;
+ 		break;
+ 	case KVM_PSCI_FN_CPU_ON:
 -- 
 2.35.1.1178.g4f1659d476-goog
 
