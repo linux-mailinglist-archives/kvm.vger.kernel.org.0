@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B7474FB95D
-	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 12:21:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D13D44FB976
+	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 12:24:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345412AbiDKKX1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Apr 2022 06:23:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46022 "EHLO
+        id S1345386AbiDKKYj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Apr 2022 06:24:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345494AbiDKKWu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Apr 2022 06:22:50 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B29A042A37;
-        Mon, 11 Apr 2022 03:20:35 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id 125so13752562pgc.11;
-        Mon, 11 Apr 2022 03:20:35 -0700 (PDT)
+        with ESMTP id S1345500AbiDKKWw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Apr 2022 06:22:52 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78EE24248D;
+        Mon, 11 Apr 2022 03:20:38 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id j8so13422630pll.11;
+        Mon, 11 Apr 2022 03:20:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=sYmqQhFPUGHJVQOqKQXslK6S7f9FtfqpMFwooJh/+zc=;
-        b=KPQQ9yr+Rws9PyopyERvU4ni8MagOlTzvf4hNesn6k2kexMWvhELTdpMLvygNeAxrv
-         O0sivxcR/strue+lsauaZE8Y5rnSn9WgEk2NN762R4P95nFzXlGmUxeDE4eclqxnzXbJ
-         uqDNp7Su9m08lIlEbbhLBVPDSunHuJxM63LXjKa5hU0a9RH4Tyggn5t6tem98JDh2RZS
-         HtSqQwbuieO2OFX2lcddCZqFwU2hm0fGL6EDLCQwF9AP4d5MyYwmX2jcXNHsp2A/bI12
-         M9b/qBl479ie3KXRw8xuUXt1oO16ZSFN0sxt3jF7IM7PW26AwGe0xyO2V86Cz5LclERb
-         3+fQ==
+        bh=85XR1oy4LBkCtYH9ETAjkpw33nFLxwRRhDVxIMq/Cpw=;
+        b=D75lqgrvLpIwVtC0BaqNj6LIztshHN0pEzpLA2x1w3J/tL462hd7G9T5b4Th11R7TL
+         ZYa9suuRuI/waImK2xxacqfBTGMLn6OHp5sJ1YbcgxrFSO504aCZL6T7OBTx5mp9UwT1
+         eS9DqhHRH1VnQzfFoyO/DS0GOgxl2fbWp3ouChgGzHSAgZR5C0rhQ0EMAI7/JGDIiagC
+         nivL2g/Q76/JZI4kD6QbUaAnIpnZhOBUNRg3K0sTEaIfC9KgvHRGeQta8aCjAR9qZYrm
+         9FKprtYr6FLIkGOzJDwUCjk5lKYIeMWuTPQVrl/Fvp/TXgwIbAsRT3U/+LEw5Uw5scmX
+         8HMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=sYmqQhFPUGHJVQOqKQXslK6S7f9FtfqpMFwooJh/+zc=;
-        b=qMm3dAyTshiPl6Eq5qSFLtNCB7xUZQEFNO/qWazJ04zLqww/1bP1nWYFSjPVneS4Db
-         RYyWAhhggtB2Nv4FKWW0ewHW4w+llmuvBYLKN4FcVL9mP1V8+bpF0IlWhAGwi+B2Kz4I
-         aA/kG1d6XawAKoufU+8MVneFbv8+fTx1gPrSokVOcTI4Pe5R2CRnQq5S5ThOmScLGcjf
-         8RKew+83WPSIPYPKVAr4481szWvWdcfR/xjbuQJE+ptH9koPN3+7RRMo7ySJCBqTqgc+
-         iHxTMjmmC2LFcgNDfo748/eJX/5CPoSFtLsz03voEyFu3RODjW9YH6iWMV6jwjBT5/P9
-         EFtg==
-X-Gm-Message-State: AOAM533E9xLPRSaad8gTtIj2/8eUN2VAQLctNOtQBOsWPr2ztUFzBaJP
-        kZmd2jOuVF/I/rM1c9y6321yNrcagjY=
-X-Google-Smtp-Source: ABdhPJzz3VYRuHrAdJUhsHqIM1IZkbg1pflbYbUuIv8XCtmhgBUX/VDQycOe4C8LygMBRQ9ALvjhRg==
-X-Received: by 2002:a63:fb45:0:b0:39d:40ed:d3fd with SMTP id w5-20020a63fb45000000b0039d40edd3fdmr5273195pgj.328.1649672434958;
-        Mon, 11 Apr 2022 03:20:34 -0700 (PDT)
+        bh=85XR1oy4LBkCtYH9ETAjkpw33nFLxwRRhDVxIMq/Cpw=;
+        b=5ILvwxcRi0D5Zinn+QZVXS6vtfCTQ+p9aFsI2ePf/dZsl8WJLVms3V3QA3v7b5wqJn
+         Dq5XkWa+7AjqU3C3DPX5Dlwppdg25+giAebIz2o4vkcWqGWVMeO1eE7M/ghkgZlrgRaw
+         VVWR0nu1HKNqUJr/AyPGUmoWsTtNmavHMNqsAXjNLsPXlrVDqNfsTUXqNyPpkEHgFXgT
+         v3BCkaTJXxrf5RSHIC8K6dMciuMgYNuANyFWYmsh0a+dMQNzQn9d18VOaYL7D4/T81GH
+         yZw71Ae7o2FkKaJ3jsSMvx9olZePT9dRMIjOF1HURuH89JTnq4nAYCJP+cFtJHGWz2Qx
+         i+RQ==
+X-Gm-Message-State: AOAM5336Cu3oty+YHESqwPaYisRDrmApyVJ4UMpnS//SR1lr5r/OP2MZ
+        4dn6rCkFkXD5ut5+z8rl7AGT83xLJjE=
+X-Google-Smtp-Source: ABdhPJzvvT+7M6KMXh/27FOqO29cwnm66IR4wrAUCVnjMgUV+utpupW/TnEGrJAzn/6EO/OOhmUNAg==
+X-Received: by 2002:a17:902:714d:b0:156:6f38:3323 with SMTP id u13-20020a170902714d00b001566f383323mr31380994plm.173.1649672437977;
+        Mon, 11 Apr 2022 03:20:37 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.112])
-        by smtp.gmail.com with ESMTPSA id h10-20020a056a00230a00b004faa0f67c3esm34012280pfh.23.2022.04.11.03.20.32
+        by smtp.gmail.com with ESMTPSA id h10-20020a056a00230a00b004faa0f67c3esm34012280pfh.23.2022.04.11.03.20.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Apr 2022 03:20:34 -0700 (PDT)
+        Mon, 11 Apr 2022 03:20:37 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -57,9 +57,9 @@ Cc:     Peter Zijlstra <peterz@infradead.org>,
         Wanpeng Li <wanpengli@tencent.com>,
         Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: [PATCH RESEND v12 14/17] KVM: x86/pmu: Disable guest PEBS temporarily in two rare situations
-Date:   Mon, 11 Apr 2022 18:19:43 +0800
-Message-Id: <20220411101946.20262-15-likexu@tencent.com>
+Subject: [PATCH RESEND v12 15/17] KVM: x86/pmu: Add kvm_pmu_cap to optimize perf_get_x86_pmu_capability
+Date:   Mon, 11 Apr 2022 18:19:44 +0800
+Message-Id: <20220411101946.20262-16-likexu@tencent.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220411101946.20262-1-likexu@tencent.com>
 References: <20220411101946.20262-1-likexu@tencent.com>
@@ -75,128 +75,208 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <like.xu@linux.intel.com>
+From: Like Xu <likexu@tencent.com>
 
-The guest PEBS will be disabled when some users try to perf KVM and
-its user-space through the same PEBS facility OR when the host perf
-doesn't schedule the guest PEBS counter in a one-to-one mapping manner
-(neither of these are typical scenarios).
+The information obtained from the interface perf_get_x86_pmu_capability()
+doesn't change, so an exported "struct x86_pmu_capability" is introduced
+for all guests in the KVM, and it's initialized before hardware_setup().
 
-The PEBS records in the guest DS buffer are still accurate and the
-above two restrictions will be checked before each vm-entry only if
-guest PEBS is deemed to be enabled.
-
-Suggested-by: Wei Wang <wei.w.wang@intel.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/events/intel/core.c    | 11 +++++++++--
- arch/x86/include/asm/kvm_host.h |  9 +++++++++
- arch/x86/kvm/vmx/pmu_intel.c    | 20 ++++++++++++++++++++
- arch/x86/kvm/vmx/vmx.c          |  4 ++++
- arch/x86/kvm/vmx/vmx.h          |  1 +
- 5 files changed, 43 insertions(+), 2 deletions(-)
+ arch/x86/kvm/cpuid.c         | 27 ++++++++-------------------
+ arch/x86/kvm/pmu.c           |  3 +++
+ arch/x86/kvm/pmu.h           | 19 +++++++++++++++++++
+ arch/x86/kvm/vmx/pmu_intel.c | 17 ++++++++---------
+ arch/x86/kvm/x86.c           |  9 ++++-----
+ 5 files changed, 42 insertions(+), 33 deletions(-)
 
-diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index f723a24eb29b..f136be17c1e2 100644
---- a/arch/x86/events/intel/core.c
-+++ b/arch/x86/events/intel/core.c
-@@ -4048,8 +4048,15 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
- 		.guest = pebs_mask & ~cpuc->intel_ctrl_host_mask,
- 	};
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index b24ca7f4ed7c..8fbedae87f0e 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -883,34 +883,23 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 	case 9:
+ 		break;
+ 	case 0xa: { /* Architectural Performance Monitoring */
+-		struct x86_pmu_capability cap;
+ 		union cpuid10_eax eax;
+ 		union cpuid10_edx edx;
  
--	/* Set hw GLOBAL_CTRL bits for PEBS counter when it runs for guest */
--	arr[0].guest |= arr[*nr].guest;
-+	if (arr[pebs_enable].host) {
-+		/* Disable guest PEBS if host PEBS is enabled. */
-+		arr[pebs_enable].guest = 0;
-+	} else {
-+		/* Disable guest PEBS for cross-mapped PEBS counters. */
-+		arr[pebs_enable].guest &= ~kvm_pmu->host_cross_mapped_mask;
-+		/* Set hw GLOBAL_CTRL bits for PEBS counter when it runs for guest */
-+		arr[global_ctrl].guest |= arr[pebs_enable].guest;
-+	}
+-		perf_get_x86_pmu_capability(&cap);
++		eax.split.version_id = kvm_pmu_cap.version;
++		eax.split.num_counters = kvm_pmu_cap.num_counters_gp;
++		eax.split.bit_width = kvm_pmu_cap.bit_width_gp;
++		eax.split.mask_length = kvm_pmu_cap.events_mask_len;
++		edx.split.num_counters_fixed = kvm_pmu_cap.num_counters_fixed;
++		edx.split.bit_width_fixed = kvm_pmu_cap.bit_width_fixed;
  
- 	return arr;
- }
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 66057622164d..92b64fef75c1 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -524,6 +524,15 @@ struct kvm_pmu {
- 	u64 pebs_data_cfg;
- 	u64 pebs_data_cfg_mask;
+-		/*
+-		 * The guest architecture pmu is only supported if the architecture
+-		 * pmu exists on the host and the module parameters allow it.
+-		 */
+-		if (!cap.version || !enable_pmu)
+-			memset(&cap, 0, sizeof(cap));
+-
+-		eax.split.version_id = min(cap.version, 2);
+-		eax.split.num_counters = cap.num_counters_gp;
+-		eax.split.bit_width = cap.bit_width_gp;
+-		eax.split.mask_length = cap.events_mask_len;
+-
+-		edx.split.num_counters_fixed =
+-			min(cap.num_counters_fixed, KVM_PMC_MAX_FIXED);
+-		edx.split.bit_width_fixed = cap.bit_width_fixed;
+-		if (cap.version)
++		if (kvm_pmu_cap.version)
+ 			edx.split.anythread_deprecated = 1;
+ 		edx.split.reserved1 = 0;
+ 		edx.split.reserved2 = 0;
  
-+	/*
-+	 * If a guest counter is cross-mapped to host counter with different
-+	 * index, its PEBS capability will be temporarily disabled.
-+	 *
-+	 * The user should make sure that this mask is updated
-+	 * after disabling interrupts and before perf_guest_get_msrs();
-+	 */
-+	u64 host_cross_mapped_mask;
+ 		entry->eax = eax.full;
+-		entry->ebx = cap.events_mask;
++		entry->ebx = kvm_pmu_cap.events_mask;
+ 		entry->ecx = 0;
+ 		entry->edx = edx.full;
+ 		break;
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 122e4bb4fa47..b5d0c36b869b 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -24,6 +24,9 @@
+ /* This is enough to filter the vast majority of currently defined events. */
+ #define KVM_PMU_EVENT_FILTER_MAX_EVENTS 300
+ 
++struct x86_pmu_capability __read_mostly kvm_pmu_cap;
++EXPORT_SYMBOL_GPL(kvm_pmu_cap);
 +
- 	/*
- 	 * The gate to release perf_events not marked in
- 	 * pmc_in_use only once in a vcpu time slice.
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 389f2585f20a..fc3b837448a3 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -790,6 +790,26 @@ static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
- 		intel_pmu_release_guest_lbr_event(vcpu);
+ /* NOTE:
+  * - Each perf counter is defined as "struct kvm_pmc";
+  * - There are two types of perf counters: general purpose (gp) and fixed.
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index b51f804737bd..dbf4c83519a4 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -154,6 +154,24 @@ static inline bool pmc_speculative_in_use(struct kvm_pmc *pmc)
+ 	return pmc->eventsel & ARCH_PERFMON_EVENTSEL_ENABLE;
  }
  
-+void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu)
++extern struct x86_pmu_capability kvm_pmu_cap;
++
++static inline void kvm_init_pmu_capability(void)
 +{
-+	struct kvm_pmc *pmc = NULL;
-+	int bit;
++	perf_get_x86_pmu_capability(&kvm_pmu_cap);
 +
-+	for_each_set_bit(bit, (unsigned long *)&pmu->global_ctrl,
-+			 X86_PMC_IDX_MAX) {
-+		pmc = intel_pmc_idx_to_pmc(pmu, bit);
++	/*
++	 * Only support guest architectural pmu on
++	 * a host with architectural pmu.
++	 */
++	if (!kvm_pmu_cap.version)
++		memset(&kvm_pmu_cap, 0, sizeof(kvm_pmu_cap));
 +
-+		if (!pmc || !pmc_speculative_in_use(pmc) ||
-+		    !intel_pmc_is_enabled(pmc))
-+			continue;
-+
-+		if (pmc->perf_event && pmc->idx != pmc->perf_event->hw.idx) {
-+			pmu->host_cross_mapped_mask |=
-+				BIT_ULL(pmc->perf_event->hw.idx);
-+		}
-+	}
++	kvm_pmu_cap.version = min(kvm_pmu_cap.version, 2);
++	kvm_pmu_cap.num_counters_fixed = min(kvm_pmu_cap.num_counters_fixed,
++					     KVM_PMC_MAX_FIXED);
 +}
 +
- struct kvm_pmu_ops intel_pmu_ops __initdata = {
- 	.pmc_perf_hw_id = intel_pmc_perf_hw_id,
- 	.pmc_is_enabled = intel_pmc_is_enabled,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index ff28a3992427..c8d768592c8c 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6698,6 +6698,10 @@ static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
- 	struct perf_guest_switch_msr *msrs;
- 	struct kvm_pmu *pmu = vcpu_to_pmu(&vmx->vcpu);
+ void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel);
+ void reprogram_fixed_counter(struct kvm_pmc *pmc, u8 ctrl, int fixed_idx);
+ void reprogram_counter(struct kvm_pmu *pmu, int pmc_idx);
+@@ -172,6 +190,7 @@ void kvm_pmu_cleanup(struct kvm_vcpu *vcpu);
+ void kvm_pmu_destroy(struct kvm_vcpu *vcpu);
+ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp);
+ void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 perf_hw_id);
++void kvm_init_pmu_capability(void);
  
-+	pmu->host_cross_mapped_mask = 0;
-+	if (pmu->pebs_enable & pmu->global_ctrl)
-+		intel_pmu_cross_mapped_check(pmu);
+ bool is_vmware_backdoor_pmc(u32 pmc_idx);
+ 
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index fc3b837448a3..f2c94e9dfa4b 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -519,8 +519,6 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+ 	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
+-
+-	struct x86_pmu_capability x86_pmu;
+ 	struct kvm_cpuid_entry2 *entry;
+ 	union cpuid10_eax eax;
+ 	union cpuid10_edx edx;
+@@ -548,13 +546,14 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ 		return;
+ 
+ 	vcpu->arch.ia32_misc_enable_msr |= MSR_IA32_MISC_ENABLE_EMON;
+-	perf_get_x86_pmu_capability(&x86_pmu);
+ 
+ 	pmu->nr_arch_gp_counters = min_t(int, eax.split.num_counters,
+-					 x86_pmu.num_counters_gp);
+-	eax.split.bit_width = min_t(int, eax.split.bit_width, x86_pmu.bit_width_gp);
++					 kvm_pmu_cap.num_counters_gp);
++	eax.split.bit_width = min_t(int, eax.split.bit_width,
++				    kvm_pmu_cap.bit_width_gp);
+ 	pmu->counter_bitmask[KVM_PMC_GP] = ((u64)1 << eax.split.bit_width) - 1;
+-	eax.split.mask_length = min_t(int, eax.split.mask_length, x86_pmu.events_mask_len);
++	eax.split.mask_length = min_t(int, eax.split.mask_length,
++				      kvm_pmu_cap.events_mask_len);
+ 	pmu->available_event_types = ~entry->ebx &
+ 					((1ull << eax.split.mask_length) - 1);
+ 
+@@ -564,9 +563,9 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ 		pmu->nr_arch_fixed_counters =
+ 			min3(ARRAY_SIZE(fixed_pmc_events),
+ 			     (size_t) edx.split.num_counters_fixed,
+-			     (size_t) x86_pmu.num_counters_fixed);
+-		edx.split.bit_width_fixed = min_t(int,
+-			edx.split.bit_width_fixed, x86_pmu.bit_width_fixed);
++			     (size_t)kvm_pmu_cap.num_counters_fixed);
++		edx.split.bit_width_fixed = min_t(int, edx.split.bit_width_fixed,
++						  kvm_pmu_cap.bit_width_fixed);
+ 		pmu->counter_bitmask[KVM_PMC_FIXED] =
+ 			((u64)1 << edx.split.bit_width_fixed) - 1;
+ 		setup_fixed_pmc_eventsel(pmu);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 1887b7146da6..8562debc14ed 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -6645,15 +6645,12 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 
+ static void kvm_init_msr_list(void)
+ {
+-	struct x86_pmu_capability x86_pmu;
+ 	u32 dummy[2];
+ 	unsigned i;
+ 
+ 	BUILD_BUG_ON_MSG(KVM_PMC_MAX_FIXED != 3,
+ 			 "Please update the fixed PMCs in msrs_to_saved_all[]");
+ 
+-	perf_get_x86_pmu_capability(&x86_pmu);
+-
+ 	num_msrs_to_save = 0;
+ 	num_emulated_msrs = 0;
+ 	num_msr_based_features = 0;
+@@ -6705,12 +6702,12 @@ static void kvm_init_msr_list(void)
+ 			break;
+ 		case MSR_ARCH_PERFMON_PERFCTR0 ... MSR_ARCH_PERFMON_PERFCTR0 + 17:
+ 			if (msrs_to_save_all[i] - MSR_ARCH_PERFMON_PERFCTR0 >=
+-			    min(INTEL_PMC_MAX_GENERIC, x86_pmu.num_counters_gp))
++			    min(INTEL_PMC_MAX_GENERIC, kvm_pmu_cap.num_counters_gp))
+ 				continue;
+ 			break;
+ 		case MSR_ARCH_PERFMON_EVENTSEL0 ... MSR_ARCH_PERFMON_EVENTSEL0 + 17:
+ 			if (msrs_to_save_all[i] - MSR_ARCH_PERFMON_EVENTSEL0 >=
+-			    min(INTEL_PMC_MAX_GENERIC, x86_pmu.num_counters_gp))
++			    min(INTEL_PMC_MAX_GENERIC, kvm_pmu_cap.num_counters_gp))
+ 				continue;
+ 			break;
+ 		case MSR_IA32_XFD:
+@@ -11676,6 +11673,8 @@ int kvm_arch_hardware_setup(void *opaque)
+ 	if (boot_cpu_has(X86_FEATURE_XSAVES))
+ 		rdmsrl(MSR_IA32_XSS, host_xss);
+ 
++	kvm_init_pmu_capability();
 +
- 	/* Note, nr_msrs may be garbage if perf_guest_get_msrs() returns NULL. */
- 	msrs = perf_guest_get_msrs(&nr_msrs, (void *)pmu);
- 	if (!msrs)
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 9c6bfcd84008..9d890e600d27 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -94,6 +94,7 @@ union vmx_exit_reason {
- #define vcpu_to_lbr_desc(vcpu) (&to_vmx(vcpu)->lbr_desc)
- #define vcpu_to_lbr_records(vcpu) (&to_vmx(vcpu)->lbr_desc.records)
- 
-+void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu);
- bool intel_pmu_lbr_is_compatible(struct kvm_vcpu *vcpu);
- bool intel_pmu_lbr_is_enabled(struct kvm_vcpu *vcpu);
- 
+ 	r = ops->hardware_setup();
+ 	if (r != 0)
+ 		return r;
 -- 
 2.35.1
 
