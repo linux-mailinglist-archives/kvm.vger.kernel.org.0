@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF2A94FB7B8
-	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 11:37:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E50A94FB7CC
+	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 11:38:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344593AbiDKJjb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Apr 2022 05:39:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37588 "EHLO
+        id S1344604AbiDKJkI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Apr 2022 05:40:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344552AbiDKJjW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Apr 2022 05:39:22 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BA634090F;
-        Mon, 11 Apr 2022 02:37:04 -0700 (PDT)
+        with ESMTP id S1344633AbiDKJjt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Apr 2022 05:39:49 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBCE740923;
+        Mon, 11 Apr 2022 02:37:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649669824; x=1681205824;
+  t=1649669853; x=1681205853;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=j7yxrIW5JHTanE/rqGKH77B25ab5eWBeaxexb2VIdDk=;
-  b=RpLbOXieJnlXFBKLCHkIGiU0K/MXMW/cB6tUYLDF4zquBKyMAEHUO7rU
-   TU+5TVJoNaZdAFucFU4VVrndcxzPXMJ4zzKb98QFYIjvYKHt/dTQqJPjY
-   oZdXtJVa6OOrvRaFBSQdhr0yzNWyaqFbzeEqMZ5PY4uYb5TQI2+fy6RHe
-   eqow5XXErVT1/SLQV89ZwJWtSp1qG/KoPSf5FomqG/4qP5FalvwIBCTr5
-   pGyxG4vlCSfmdhGcIHSYmKNyzXmeZZXnYND7BrrKEysKDaOKfG9W7Y9Gf
-   T18K3nMNfydpqWWCqsLbKbwsZeHBL1ikWrv93dYJFJyzmbhhLTfd0QgoO
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10313"; a="260923505"
+  bh=wVjlORT4Ee/YTCdDKrpjhYEEMJhlDlPVyc5jVtqX37o=;
+  b=IZ6jW7MC2e6S7MLlR1l0KJdC0Xt1PCVweohDP7hW9dBMBhdLRxOGgO2A
+   KPBHdd+qgPIW8CJR+kIbul2s0zQ1kl5/sodNbATZ60PVgTEBqvp6+CiyA
+   JG6v6sEf9Ba8YtdYpGLMWgkob5bIXP28QUYt/w/U89P3EolvULwCxJ3F7
+   Y2prGcHNRohyVTx24LpqomfQ/zpxrBHJuMVgs51ZgknS4PBCNsAyx6u+P
+   ARNSjWCcuf2CtyWXoUaCC6cNTnVWy4j7gWvt3X4oY638GrAE8Qre2RNJW
+   80WaRV9v9wHKNVInnSGRlQsUF7LU5JpWuUZyQf+7G6cn0LO9sfUv3uJEc
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10313"; a="259671479"
 X-IronPort-AV: E=Sophos;i="5.90,251,1643702400"; 
-   d="scan'208";a="260923505"
+   d="scan'208";a="259671479"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2022 02:37:04 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2022 02:37:09 -0700
 X-IronPort-AV: E=Sophos;i="5.90,251,1643702400"; 
-   d="scan'208";a="572050545"
+   d="scan'208";a="572050567"
 Received: from arthur-vostro-3668.sh.intel.com ([10.239.13.120])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2022 02:36:57 -0700
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2022 02:37:03 -0700
 From:   Zeng Guang <guang.zeng@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -55,16 +55,15 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
         Kai Huang <kai.huang@intel.com>
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
         Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>,
-        Zeng Guang <guang.zeng@intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v8 6/9] KVM: x86: lapic: don't allow to change APIC ID unconditionally
-Date:   Mon, 11 Apr 2022 17:04:44 +0800
-Message-Id: <20220411090447.5928-7-guang.zeng@intel.com>
+        Zeng Guang <guang.zeng@intel.com>
+Subject: [PATCH v8 7/9] KVM: Move kvm_arch_vcpu_precreate() under kvm->lock
+Date:   Mon, 11 Apr 2022 17:04:45 +0800
+Message-Id: <20220411090447.5928-8-guang.zeng@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20220411090447.5928-1-guang.zeng@intel.com>
 References: <20220411090447.5928-1-guang.zeng@intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -73,71 +72,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Maxim Levitsky <mlevitsk@redhat.com>
+Arch specific KVM common data may require pre-allocation or other
+preprocess ready before vCPU creation at runtime. It's safe to
+invoke kvm_arch_vcpu_precreate() within the protection of kvm->lock
+directly rather than take into account in the implementation for each
+architecture.
 
-No normal guest has any reason to change physical APIC IDs, and
-allowing this introduces bugs into APIC acceleration code.
-
-And Intel recent hardware just ignores writes to APIC_ID in
-xAPIC mode. More background can be found at:
-https://lore.kernel.org/lkml/Yfw5ddGNOnDqxMLs@google.com/
-
-Looks there is no much value to support writable xAPIC ID in
-guest except supporting some old and crazy use cases which
-probably would fail on real hardware. So, make xAPIC ID
-read-only for KVM guests.
-
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Zeng Guang <guang.zeng@intel.com>
 ---
- arch/x86/kvm/lapic.c | 25 ++++++++++++++++++-------
- 1 file changed, 18 insertions(+), 7 deletions(-)
+ arch/s390/kvm/kvm-s390.c | 2 --
+ virt/kvm/kvm_main.c      | 2 +-
+ 2 files changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 137c3a2f5180..62d5ce4dc0c5 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2047,10 +2047,17 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 156d1c25a3c1..5c795bbcf1ea 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -3042,9 +3042,7 @@ static int sca_can_add_vcpu(struct kvm *kvm, unsigned int id)
+ 	if (!sclp.has_esca || !sclp.has_64bscao)
+ 		return false;
  
- 	switch (reg) {
- 	case APIC_ID:		/* Local APIC ID */
--		if (!apic_x2apic_mode(apic))
--			kvm_apic_set_xapic_id(apic, val >> 24);
--		else
-+		if (apic_x2apic_mode(apic)) {
- 			ret = 1;
-+			break;
-+		}
-+		/* Don't allow changing APIC ID to avoid unexpected issues */
-+		if ((val >> 24) != apic->vcpu->vcpu_id) {
-+			kvm_vm_bugged(apic->vcpu->kvm);
-+			break;
-+		}
-+
-+		kvm_apic_set_xapic_id(apic, val >> 24);
- 		break;
+-	mutex_lock(&kvm->lock);
+ 	rc = kvm->arch.use_esca ? 0 : sca_switch_to_extended(kvm);
+-	mutex_unlock(&kvm->lock);
  
- 	case APIC_TASKPRI:
-@@ -2635,11 +2642,15 @@ int kvm_get_apic_interrupt(struct kvm_vcpu *vcpu)
- static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
- 		struct kvm_lapic_state *s, bool set)
- {
--	if (apic_x2apic_mode(vcpu->arch.apic)) {
--		u32 *id = (u32 *)(s->regs + APIC_ID);
--		u32 *ldr = (u32 *)(s->regs + APIC_LDR);
--		u64 icr;
-+	u32 *id = (u32 *)(s->regs + APIC_ID);
-+	u32 *ldr = (u32 *)(s->regs + APIC_LDR);
-+	u64 icr;
+ 	return rc == 0 && id < KVM_S390_ESCA_CPU_SLOTS;
+ }
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 70e05af5ebea..a452e678a015 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3732,9 +3732,9 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
+ 	}
  
-+	if (!apic_x2apic_mode(vcpu->arch.apic)) {
-+		/* Don't allow changing APIC ID to avoid unexpected issues */
-+		if ((*id >> 24) != vcpu->vcpu_id)
-+			return -EINVAL;
-+	} else {
- 		if (vcpu->kvm->arch.x2apic_format) {
- 			if (*id != vcpu->vcpu_id)
- 				return -EINVAL;
+ 	kvm->created_vcpus++;
++	r = kvm_arch_vcpu_precreate(kvm, id);
+ 	mutex_unlock(&kvm->lock);
+ 
+-	r = kvm_arch_vcpu_precreate(kvm, id);
+ 	if (r)
+ 		goto vcpu_decrement;
+ 
 -- 
 2.27.0
 
