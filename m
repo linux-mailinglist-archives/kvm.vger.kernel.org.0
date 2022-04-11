@@ -2,39 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BDAE4FB7AB
-	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 11:37:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D42834FB7B2
+	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 11:37:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344524AbiDKJiy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Apr 2022 05:38:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36558 "EHLO
+        id S1344519AbiDKJi6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Apr 2022 05:38:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344522AbiDKJit (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Apr 2022 05:38:49 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4795D403DB;
-        Mon, 11 Apr 2022 02:36:29 -0700 (PDT)
+        with ESMTP id S1344530AbiDKJiu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Apr 2022 05:38:50 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4C7B403DD;
+        Mon, 11 Apr 2022 02:36:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649669789; x=1681205789;
-  h=from:to:cc:subject:date:message-id;
-  bh=7RhJtZesVyLenx4Eahdo4+Xnmm8c3cfqDL2RCw/byiw=;
-  b=DqIh4452PG802Iz/wJSza1/8tKxWXEspwaw3SjUbvK4eU3Rd+/tsr7KL
-   4djWd7QX1NQYEzOEuESN/NVs4grpV4ACYoI32b05Z62lt3PM5doZv3Dn2
-   MgBuvTqNeP1cJQLnBeETcmoUkS9QSIetU2Sd2eQmE/mWRLp7ViIM02eQG
-   yM0fxBiH5jNJ1rTGJOl73MtldVOMGseNubcz/Kp7QpuvbMpV9QeVXpzCq
-   fMdHNOXgONxYqAtaYu6T5Ks96b3Dx3ycVheb4fkrbRo2iPOLyk5JAPjyo
-   EbzWJ3GURVJSkbDFSG1Y9Yq3YlUZIMNYMvq8qJA8bHpwtRxQbyEtCl+Zo
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10313"; a="259671359"
+  t=1649669794; x=1681205794;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references;
+  bh=+PEUzauE89816wJ5786DV+v1jrWHJ+deIxMV0Fh2UqM=;
+  b=RhCJ2qF0/DvaSwbiWSVhNMX38QFbc27udaMZNHW7ktwPI3PS6oAuHmVZ
+   rJpgFrw6gxhHt0VN8Y5nwnspAygDYbnj7ZW2sUEckoBBv9gfj5xUJugf3
+   tbE6Ri1Y/obejdInyCSEXia8KoJjfktNc3GxrASnVN33c+rCv3oOAg80d
+   XM/Iv8poekbeoGLzoieTGvMyDpDWHXdHQz6fNL50cMYQ7PnYODLTQ2HQ4
+   X70ot+qX+Ir5abXsbBYVhVHxeamy5V4MEzE6OWRrdt6sNjCcgREIlqZWo
+   /OAAuw1QhcD2QkKw/fF4zP1BqBLFbuZUNadaw18pk0u2tv10CE5TxzaqL
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10313"; a="262255635"
 X-IronPort-AV: E=Sophos;i="5.90,251,1643702400"; 
-   d="scan'208";a="259671359"
+   d="scan'208";a="262255635"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2022 02:36:28 -0700
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2022 02:36:34 -0700
 X-IronPort-AV: E=Sophos;i="5.90,251,1643702400"; 
-   d="scan'208";a="572050370"
+   d="scan'208";a="572050419"
 Received: from arthur-vostro-3668.sh.intel.com ([10.239.13.120])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2022 02:36:23 -0700
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2022 02:36:28 -0700
 From:   Zeng Guang <guang.zeng@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -54,11 +55,14 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
         Kai Huang <kai.huang@intel.com>
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
         Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>,
-        Zeng Guang <guang.zeng@intel.com>
-Subject: [PATCH v8 0/9] IPI virtualization support for VM
-Date:   Mon, 11 Apr 2022 17:04:38 +0800
-Message-Id: <20220411090447.5928-1-guang.zeng@intel.com>
+        Zeng Guang <guang.zeng@intel.com>,
+        Robert Hoo <robert.hu@linux.intel.com>
+Subject: [PATCH v8 1/9] x86/cpu: Add new VMX feature, Tertiary VM-Execution control
+Date:   Mon, 11 Apr 2022 17:04:39 +0800
+Message-Id: <20220411090447.5928-2-guang.zeng@intel.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20220411090447.5928-1-guang.zeng@intel.com>
+References: <20220411090447.5928-1-guang.zeng@intel.com>
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -69,243 +73,103 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, issuing an IPI except self-ipi in guest on Intel CPU
-always causes a VM-exit. It can lead to non-negligible overhead
-to some workloads involving frequent IPIs when running in VMs.
+From: Robert Hoo <robert.hu@linux.intel.com>
 
-IPI virtualization is a new VT-x feature, targeting to eliminate
-VM-exits on source vCPUs when issuing unicast, physical-addressing
-IPIs. Once it is enabled, the processor virtualizes following kinds
-of operations that send IPIs without causing VM-exits:
-- Memory-mapped ICR writes
-- MSR-mapped ICR writes
-- SENDUIPI execution
+A new 64-bit control field "tertiary processor-based VM-execution
+controls", is defined [1]. It's controlled by bit 17 of the primary
+processor-based VM-execution controls.
 
-This patch series implements IPI virtualization support in KVM.
+Different from its brother VM-execution fields, this tertiary VM-
+execution controls field is 64 bit. So it occupies 2 vmx_feature_leafs,
+TERTIARY_CTLS_LOW and TERTIARY_CTLS_HIGH.
 
-Patches 1-4 add tertiary processor-based VM-execution support
-framework, which is used to enumerate IPI virtualization.
+Its companion VMX capability reporting MSR,MSR_IA32_VMX_PROCBASED_CTLS3
+(0x492), is also semantically different from its brothers, whose 64 bits
+consist of all allow-1, rather than 32-bit allow-0 and 32-bit allow-1 [1][2].
+Therefore, its init_vmx_capabilities() is a little different from others.
 
-Patch 5 handles APIC-write VM exit due to writes to ICR MSR when
-guest works in x2APIC mode. This is a new case introduced by
-Intel VT-x.
+[1] ISE 6.2 "VMCS Changes"
+https://www.intel.com/content/www/us/en/develop/download/intel-architecture-instruction-set-extensions-programming-reference.html
 
-Patch 6 disallow the APIC ID change unconditionally.
+[2] SDM Vol3. Appendix A.3
 
-Patch 7 move kvm_arch_vcpu_precreate() under kvm->lock protection.
-This patch is prepared for IPIv PID-table allocation prior to
-the creation of vCPUs.
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+---
+ arch/x86/include/asm/msr-index.h   | 1 +
+ arch/x86/include/asm/vmxfeatures.h | 3 ++-
+ arch/x86/kernel/cpu/feat_ctl.c     | 9 ++++++++-
+ 3 files changed, 11 insertions(+), 2 deletions(-)
 
-Patch 8 provide userspace capability to set maximum possible VCPU
-ID for current VM. IPIv can refer to this value to allocate memory
-for PID-pointer table.
-
-Patch 9 implements IPI virtualization related function including
-feature enabling through tertiary processor-based VM-execution in
-various scenarios of VMCS configuration, PID table setup in vCPU
-creation and vCPU block consideration.
-
-Document for IPI virtualization is now available at the latest "Intel
-Architecture Instruction Set Extensions Programming Reference".
-
-Document Link:
-https://software.intel.com/content/www/us/en/develop/download/intel-architecture-instruction-set-extensions-programming-reference.html
-
-We did experiment to measure average time sending IPI from source vCPU
-to the target vCPU completing the IPI handling by kvm unittest w/ and
-w/o IPI virtualization. When IPI virtualization enabled, it will reduce
-22.21% and 15.98% cycles consuming in xAPIC mode and x2APIC mode
-respectively.
---------------------------------------
-KVM unittest:vmexit/ipi
-
-2 vCPU, AP was modified to run in idle loop instead of halt to ensure
-no VM exit impact on target vCPU.
-
-                Cycles of IPI
-                xAPIC mode              x2APIC mode
-        test    w/o IPIv  w/ IPIv       w/o IPIv  w/ IPIv
-        1       6106      4816          4265      3768
-        2       6244      4656          4404      3546
-        3       6165      4658          4233      3474
-        4       5992      4710          4363      3430
-        5       6083      4741          4215      3551
-        6       6238      4904          4304      3547
-        7       6164      4617          4263      3709
-        8       5984      4763          4518      3779
-        9       5931      4712          4645      3667
-        10      5955      4530          4332      3724
-        11      5897      4673          4283      3569
-        12      6140      4794          4178      3598
-        13      6183      4728          4363      3628
-        14      5991      4994          4509      3842
-        15      5866      4665          4520      3739
-        16      6032      4654          4229      3701
-        17      6050      4653          4185      3726
-        18      6004      4792          4319      3746
-        19      5961      4626          4196      3392
-        20      6194      4576          4433      3760
-
-Average cycles  6059      4713.1        4337.85   3644.8
-%Reduction                -22.21%                 -15.98%
-
---------------------------------------
-IPI microbenchmark:
-(https://lore.kernel.org/kvm/20171219085010.4081-1-ynorov@caviumnetworks.com)
-
-2 vCPUs, 1:1 pin vCPU to pCPU, guest VM runs with idle=poll, x2APIC mode
-
-Result with IPIv enabled:
-
-Dry-run:                         0,             272798 ns
-Self-IPI:                  5094123,           11114037 ns
-Normal IPI:              131697087,          173321200 ns
-Broadcast IPI:                   0,          155649075 ns
-Broadcast lock:                  0,          161518031 ns
-
-Result with IPIv disabled:
-
-Dry-run:                         0,             272766 ns
-Self-IPI:                  5091788,           11123699 ns
-Normal IPI:              145215772,          174558920 ns
-Broadcast IPI:                   0,          175785384 ns
-Broadcast lock:                  0,          149076195 ns
-
-
-As IPIv can benefit unicast IPI to other CPU, Normal IPI test case gain
-about 9.73% time saving on average out of 15 test runs when IPIv is
-enabled.
-
-Normal IPI statistics (unit:ns):
-        test    w/o IPIv        w/ IPIv
-        1       153346049       140907046
-        2       147218648       141660618
-        3       145215772       117890672
-        4       146621682       136430470
-        5       144821472       136199421
-        6       144704378       131676928
-        7       141403224       131697087
-        8       144775766       125476250
-        9       140658192       137263330
-        10      144768626       138593127
-        11      145166679       131946752
-        12      145020451       116852889
-        13      148161353       131406280
-        14      148378655       130174353
-        15      148903652       127969674
-
-Average time    145944306.6     131742993.1 ns
-%Reduction                      -9.73%
-
---------------------------------------
-hackbench:
-
-8 vCPUs, guest VM free run, x2APIC mode
-./hackbench -p -l 100000
-
-                w/o IPIv        w/ IPIv
-Time            91.887          74.605
-%Reduction                      -18.808%
-
-96 vCPUs, guest VM fre run, x2APIC mode
-./hackbench -p -l 1000000
-
-                w/o IPIv        w/ IPIv
-Time            287.504         235.185
-%Reduction                      -18.198%
-
---------------------------------------
-v7->v8:
-1. Add trace in kvm_apic_write_nodecode() to track
-vICR Write in APIC Write VM-exit handling
-2. Move IPIv PID table allocation done in the vCPU
-pre-creation (kvm_arch_vcpu_precreate()) protected
-by kvm->lock.
-3. Misc code refine
-
-v6->v7:
-1. Revise kvm_apic_write_nodecode() on dealing with
-   vICR busy bit in x2apic mode
-2. Merge PID-table memory allocation with max_vcpu_id
-   into IPIv enabling patch
-3. Change to allocate PID-table, setup vCPU's PID-table
-   entry and IPIv related VMCS fields once IPIv can
-   be enabled, which support runtime enabling IPIv.
-
-v5->v6:
-1. Adapt kvm_apic_write_nodecode() implementation based
-   on Sean's fix of x2apic's ICR register process.
-2. Drop the patch handling IPIv table entry setting in
-   case APIC ID changed, instead applying Levitsky's patch
-   to disallow setting APIC ID in any case.
-3. Drop the patch resizing the PID-pointer table on demand.
-   Allow userspace to set maximum vcpu id at runtime that
-   IPIv can refer to the practical value to allocate memory
-   for PID-pointer table.
-
-v4 -> v5:
-1. Deal with enable_ipiv parameter following current
-   vmcs configuration rule.
-2. Allocate memory for PID-pointer table dynamically
-3. Support guest runtime modify APIC ID in xAPIC mode
-4. Helper to judge possibility to take PI block in IPIv case
-
-v3 -> v4:
-1. Refine code style of patch 2
-2. Move tertiary control shadow build into patch 3
-3. Make vmx_tertiary_exec_control to be static function
-
-v2 -> v3:
-1. Misc change on tertiary execution control
-   definition and capability setup
-2. Alternative to get tertiary execution
-   control configuration
-
-v1 -> v2:
-1. Refine the IPIv enabling logic for VM.
-   Remove ipiv_active definition per vCPU.
-
---------------------------------------
-
-Chao Gao (1):
-  KVM: VMX: enable IPI virtualization
-
-Maxim Levitsky (1):
-  KVM: x86: lapic: don't allow to change APIC ID unconditionally
-
-Robert Hoo (4):
-  x86/cpu: Add new VMX feature, Tertiary VM-Execution control
-  KVM: VMX: Extend BUILD_CONTROLS_SHADOW macro to support 64-bit
-    variation
-  KVM: VMX: Detect Tertiary VM-Execution control when setup VMCS config
-  KVM: VMX: Report tertiary_exec_control field in dump_vmcs()
-
-Zeng Guang (3):
-  KVM: x86: Add support for vICR APIC-write VM-Exits in x2APIC mode
-  KVM: Move kvm_arch_vcpu_precreate() under kvm->lock
-  KVM: x86: Allow userspace set maximum VCPU id for VM
-
- Documentation/virt/kvm/api.rst     |  17 ++++
- arch/s390/kvm/kvm-s390.c           |   2 -
- arch/x86/include/asm/kvm-x86-ops.h |   1 +
- arch/x86/include/asm/kvm_host.h    |   7 ++
- arch/x86/include/asm/msr-index.h   |   1 +
- arch/x86/include/asm/vmx.h         |  11 +++
- arch/x86/include/asm/vmxfeatures.h |   5 +-
- arch/x86/kernel/cpu/feat_ctl.c     |   9 +-
- arch/x86/kvm/lapic.c               |  49 ++++++++---
- arch/x86/kvm/vmx/capabilities.h    |  13 +++
- arch/x86/kvm/vmx/evmcs.c           |   2 +
- arch/x86/kvm/vmx/evmcs.h           |   1 +
- arch/x86/kvm/vmx/posted_intr.c     |  15 +++-
- arch/x86/kvm/vmx/posted_intr.h     |   2 +
- arch/x86/kvm/vmx/vmcs.h            |   1 +
- arch/x86/kvm/vmx/vmx.c             | 131 ++++++++++++++++++++++++++---
- arch/x86/kvm/vmx/vmx.h             |  64 ++++++++------
- arch/x86/kvm/x86.c                 |  24 +++++-
- virt/kvm/kvm_main.c                |   2 +-
- 19 files changed, 297 insertions(+), 60 deletions(-)
-
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index 0eb90d21049e..219a97098cf8 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -961,6 +961,7 @@
+ #define MSR_IA32_VMX_TRUE_EXIT_CTLS      0x0000048f
+ #define MSR_IA32_VMX_TRUE_ENTRY_CTLS     0x00000490
+ #define MSR_IA32_VMX_VMFUNC             0x00000491
++#define MSR_IA32_VMX_PROCBASED_CTLS3	0x00000492
+ 
+ /* VMX_BASIC bits and bitmasks */
+ #define VMX_BASIC_VMCS_SIZE_SHIFT	32
+diff --git a/arch/x86/include/asm/vmxfeatures.h b/arch/x86/include/asm/vmxfeatures.h
+index d9a74681a77d..ff20776dc83b 100644
+--- a/arch/x86/include/asm/vmxfeatures.h
++++ b/arch/x86/include/asm/vmxfeatures.h
+@@ -5,7 +5,7 @@
+ /*
+  * Defines VMX CPU feature bits
+  */
+-#define NVMXINTS			3 /* N 32-bit words worth of info */
++#define NVMXINTS			5 /* N 32-bit words worth of info */
+ 
+ /*
+  * Note: If the comment begins with a quoted string, that string is used
+@@ -43,6 +43,7 @@
+ #define VMX_FEATURE_RDTSC_EXITING	( 1*32+ 12) /* "" VM-Exit on RDTSC */
+ #define VMX_FEATURE_CR3_LOAD_EXITING	( 1*32+ 15) /* "" VM-Exit on writes to CR3 */
+ #define VMX_FEATURE_CR3_STORE_EXITING	( 1*32+ 16) /* "" VM-Exit on reads from CR3 */
++#define VMX_FEATURE_TERTIARY_CONTROLS	( 1*32+ 17) /* "" Enable Tertiary VM-Execution Controls */
+ #define VMX_FEATURE_CR8_LOAD_EXITING	( 1*32+ 19) /* "" VM-Exit on writes to CR8 */
+ #define VMX_FEATURE_CR8_STORE_EXITING	( 1*32+ 20) /* "" VM-Exit on reads from CR8 */
+ #define VMX_FEATURE_VIRTUAL_TPR		( 1*32+ 21) /* "vtpr" TPR virtualization, a.k.a. TPR shadow */
+diff --git a/arch/x86/kernel/cpu/feat_ctl.c b/arch/x86/kernel/cpu/feat_ctl.c
+index da696eb4821a..993697e71854 100644
+--- a/arch/x86/kernel/cpu/feat_ctl.c
++++ b/arch/x86/kernel/cpu/feat_ctl.c
+@@ -15,6 +15,8 @@ enum vmx_feature_leafs {
+ 	MISC_FEATURES = 0,
+ 	PRIMARY_CTLS,
+ 	SECONDARY_CTLS,
++	TERTIARY_CTLS_LOW,
++	TERTIARY_CTLS_HIGH,
+ 	NR_VMX_FEATURE_WORDS,
+ };
+ 
+@@ -22,7 +24,7 @@ enum vmx_feature_leafs {
+ 
+ static void init_vmx_capabilities(struct cpuinfo_x86 *c)
+ {
+-	u32 supported, funcs, ept, vpid, ign;
++	u32 supported, funcs, ept, vpid, ign, low, high;
+ 
+ 	BUILD_BUG_ON(NVMXINTS != NR_VMX_FEATURE_WORDS);
+ 
+@@ -42,6 +44,11 @@ static void init_vmx_capabilities(struct cpuinfo_x86 *c)
+ 	rdmsr_safe(MSR_IA32_VMX_PROCBASED_CTLS2, &ign, &supported);
+ 	c->vmx_capability[SECONDARY_CTLS] = supported;
+ 
++	/* All 64 bits of tertiary controls MSR are allowed-1 settings. */
++	rdmsr_safe(MSR_IA32_VMX_PROCBASED_CTLS3, &low, &high);
++	c->vmx_capability[TERTIARY_CTLS_LOW] = low;
++	c->vmx_capability[TERTIARY_CTLS_HIGH] = high;
++
+ 	rdmsr(MSR_IA32_VMX_PINBASED_CTLS, ign, supported);
+ 	rdmsr_safe(MSR_IA32_VMX_VMFUNC, &ign, &funcs);
+ 
 -- 
 2.27.0
 
