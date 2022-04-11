@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0539D4FC7BA
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 00:37:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B8FD4FC7D6
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 00:51:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348869AbiDKWjt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Apr 2022 18:39:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46904 "EHLO
+        id S1348601AbiDKWxT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Apr 2022 18:53:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348815AbiDKWjr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Apr 2022 18:39:47 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B25852E9F5
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 15:37:30 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id q189so5328903ljb.13
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 15:37:30 -0700 (PDT)
+        with ESMTP id S243154AbiDKWxR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Apr 2022 18:53:17 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91BB96576
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 15:51:02 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id q142so15407325pgq.9
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 15:51:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=QrGrjFARyK3ZA9nCZV7h5wEeBeAmrUW/GLDl2oKo2fA=;
-        b=rRVbEE/gyJt83c9WZThZz5+fBdQ4MARLsuyRyjf+xMbIAmTMfFrkLJKe2yJNXW1Grb
-         AVBRve2tLIU+xWeYnOLIF+HJnd4B/7z/C4gD/eZQixX5Z3TGpNIoF/Um2YM3ENqNaPMl
-         DGoGqEl+QVl36k/FEmSpZjyUsOjVfxIZsge2ajcT1KSXJuvAvD7dd/SLUdDQA+TgqQPQ
-         1Pj6Sa6L7R+lib1yEsGQUXhTpTyZwX7uCi8P7tvwCEbTn1r/PG//8skjaunKN+cUUbBJ
-         Ss7J3uY+TPir54okXYABhAbuaIIU3VeymlHiKbDW+7/FqmhZnrcYp+yKETaVd8iL/gSB
-         v6ng==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=FcTYvvhN5dtue7MzX/+Ct7GWZzfdtrfomwfg98GsSrQ=;
+        b=hCcpz68XSqFN0GmAt/laN0bCPIcM3eZc7r4Aoq3sqv1AIAWECh5CAA5MqFbNugpj5a
+         VPUs/CZN7juttqOlZxDo1iHJ4GA1ScWYzKQrJ1GmMhY/2AbJs6RpD4H03ij9R+pD4lYQ
+         ZhJy/t5DYTW7NRrZpiLU+bGMxaTBBd/mnoNgE7rfG/D7bTAEWyeiZykzE7SbYt1RQw5i
+         yK4bg8XNj2tfbtBvUyp4VeU8/T8MlG15kqDb+3DQNWaWcj6XfBsvW+VlYGL88AUCS4WL
+         CQEn5IooNK4QdLnPeiR5OVbdOHpo9Rq8sDWHKTUiYhAb0s6L8ZHpxaPzvgCRoKRdhBrs
+         ACUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=QrGrjFARyK3ZA9nCZV7h5wEeBeAmrUW/GLDl2oKo2fA=;
-        b=f0ULpUVj1XUQ/7LG5FPo9WgeNSUytHdSwAeOsCduAW0LbHGLBJSIR6cQvZTxTLNaEy
-         X1cjU4404qj1UslNf7wpGViKe4NzCfC3E1auPoqyysapDh2dfI8tigkswj8Q33kikQ0x
-         7DNXUD4ECL6i2jGrh7s7XHDW3P7kFh8weY7aCfXt4Zs+Iwmmto7los3p8NilzHBCLTIo
-         LNAqwAS+NXNILtSW+ULCDuJIghRJz3hXFfr5FrYwVjyL4+it3a8hPtRWJS744+QGDI4f
-         qe2XRq7tjvED9gamgLQXlJ2tIPB5Jb7mtQqFFLI/1EbRysNQ466C4u3uuMWShX0a8/6N
-         VWvw==
-X-Gm-Message-State: AOAM5331V/zcz7t03pAPPOODwir/Yjy+ZMt6R3CIUfTS2WWRE6xX82Bx
-        r+bw8YFn1z4zV6wdoXhXvEmXQxWBPLPaLHe7Y2qOuO4PB1I=
-X-Google-Smtp-Source: ABdhPJxEnPNx3y8ibz7gBh5nQQPcSkBNcHIKnyOMAAxMAdgYpjjVIDCGFY7ZPeAxejNQlpldM2gkkDXJCn/+pYIN8ds=
-X-Received: by 2002:a2e:390c:0:b0:248:1b88:d6c4 with SMTP id
- g12-20020a2e390c000000b002481b88d6c4mr21065587lja.49.1649716648790; Mon, 11
- Apr 2022 15:37:28 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220411211015.3091615-1-bgardon@google.com> <20220411211015.3091615-11-bgardon@google.com>
-In-Reply-To: <20220411211015.3091615-11-bgardon@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 11 Apr 2022 15:37:02 -0700
-Message-ID: <CALzav=difpgKq3X1OGiDPF+5z8AY9wB1sLFrEJ_V7VvuA9_fVA@mail.gmail.com>
-Subject: Re: [PATCH v4 10/10] KVM: selftests: Test disabling NX hugepages on a VM
-To:     Ben Gardon <bgardon@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=FcTYvvhN5dtue7MzX/+Ct7GWZzfdtrfomwfg98GsSrQ=;
+        b=64K5IYdL3QZ80UFJQzF6z2U6q9yFqEWAGPGr8dZpsZQsVeBuJidwvKzXced70S0/6l
+         Ds5rBw3OcaGUIFN4OiQvONITaNIBMycYL+874q/SBLkBvqMPwe/ukQMdZmYD3Oznt107
+         pS6Usj9tU6cdA6ibRhC9EXIye8luY9p0lKZ8eJqJf4667ZCFS+tQZvepa0rQp+wYFbI2
+         bJa0InVg6FmKOc6pBr769psIFNpDheglWKkxx6Xb3KDaZi8JRX1dANQV7xmpABxCyLiy
+         30l1sJ3JuCeQKeVqVzI8704vaxOeFjUKL1xWODFoRytTjx5YeIdv3Abmzgtzuu9FUFFI
+         RovQ==
+X-Gm-Message-State: AOAM531ooqauAma/G07FLf9S2LMvrPrIYiJl4eDwM79zbBRsiKu6Y37H
+        jPkTFCyKo2s7AnSbLAe396jyhw==
+X-Google-Smtp-Source: ABdhPJxjHamZfjze6EDpUv2KPHV1RVw6Gyy/Qvc+kNL4xIcjX0N3BIoDtwHAto5L4YIXPC0QHz7OTQ==
+X-Received: by 2002:a05:6a00:a15:b0:4fb:4112:870e with SMTP id p21-20020a056a000a1500b004fb4112870emr34896218pfh.11.1649717461805;
+        Mon, 11 Apr 2022 15:51:01 -0700 (PDT)
+Received: from google.com (226.75.127.34.bc.googleusercontent.com. [34.127.75.226])
+        by smtp.gmail.com with ESMTPSA id nv11-20020a17090b1b4b00b001c71b0bf18bsm510761pjb.11.2022.04.11.15.51.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Apr 2022 15:51:01 -0700 (PDT)
+Date:   Mon, 11 Apr 2022 22:50:57 +0000
+From:   Mingwei Zhang <mizhang@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Ben Gardon <bgardon@google.com>,
+        LKML <linux-kernel@vger.kernel.org>,
         kvm list <kvm@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Peter Xu <peterx@redhat.com>,
@@ -61,9 +60,17 @@ Cc:     LKML <linux-kernel@vger.kernel.org>,
         David Dunn <daviddunn@google.com>,
         Junaid Shahid <junaids@google.com>,
         Jim Mattson <jmattson@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
         Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v4 01/10] KVM: selftests: Remove dynamic memory
+ allocation for stats header
+Message-ID: <YlSw0UXTYqgx4wa3@google.com>
+References: <20220411211015.3091615-1-bgardon@google.com>
+ <20220411211015.3091615-2-bgardon@google.com>
+ <CALzav=d_DB+onkMZmZwEj7yd_gDqg_phqQJpTw0g9ahe3WmvqA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALzav=d_DB+onkMZmZwEj7yd_gDqg_phqQJpTw0g9ahe3WmvqA@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -75,199 +82,156 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 11, 2022 at 2:10 PM Ben Gardon <bgardon@google.com> wrote:
->
-> Add an argument to the NX huge pages test to test disabling the feature
-> on a VM using the new capability.
->
-> Signed-off-by: Ben Gardon <bgardon@google.com>
-> ---
->  .../selftests/kvm/include/kvm_util_base.h     |  2 +
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 19 ++++++-
->  .../selftests/kvm/x86_64/nx_huge_pages_test.c | 53 +++++++++++++++----
->  3 files changed, 64 insertions(+), 10 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> index f9c2ac0a5b97..15f24be6d93f 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -412,4 +412,6 @@ uint64_t vm_get_single_stat(struct kvm_vm *vm, const char *stat_name);
->
->  uint32_t guest_get_vcpuid(void);
->
-> +int vm_disable_nx_huge_pages(struct kvm_vm *vm);
-> +
->  #endif /* SELFTEST_KVM_UTIL_BASE_H */
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 833c7e63d62d..5fa5608eef03 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -112,6 +112,15 @@ int vm_check_cap(struct kvm_vm *vm, long cap)
->         return ret;
->  }
->
-> +static int __vm_enable_cap(struct kvm_vm *vm, struct kvm_enable_cap *cap)
-> +{
-> +       int ret;
-> +
-> +       ret = ioctl(vm->fd, KVM_ENABLE_CAP, cap);
-> +
-> +       return ret;
-> +}
-> +
->  /* VM Enable Capability
->   *
->   * Input Args:
-> @@ -128,7 +137,7 @@ int vm_enable_cap(struct kvm_vm *vm, struct kvm_enable_cap *cap)
->  {
->         int ret;
->
-> -       ret = ioctl(vm->fd, KVM_ENABLE_CAP, cap);
-> +       ret = __vm_enable_cap(vm, cap);
->         TEST_ASSERT(ret == 0, "KVM_ENABLE_CAP IOCTL failed,\n"
->                 "  rc: %i errno: %i", ret, errno);
->
-> @@ -2662,3 +2671,11 @@ uint64_t vm_get_single_stat(struct kvm_vm *vm, const char *stat_name)
->                     stat_name, ret);
->         return data;
->  }
-> +
-> +int vm_disable_nx_huge_pages(struct kvm_vm *vm)
-> +{
-> +       struct kvm_enable_cap cap = { 0 };
-> +
-> +       cap.cap = KVM_CAP_VM_DISABLE_NX_HUGE_PAGES;
-> +       return __vm_enable_cap(vm, &cap);
-> +}
-> diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-> index 3f21726b22c7..f8edf7910950 100644
-> --- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-> @@ -13,6 +13,8 @@
->  #include <fcntl.h>
->  #include <stdint.h>
->  #include <time.h>
-> +#include <linux/reboot.h>
-> +#include <sys/syscall.h>
->
->  #include <test_util.h>
->  #include "kvm_util.h"
-> @@ -77,14 +79,41 @@ static void check_split_count(struct kvm_vm *vm, int expected_splits)
->                     expected_splits, actual_splits);
->  }
->
-> -int main(int argc, char **argv)
-> +void run_test(bool disable_nx)
->  {
->         struct kvm_vm *vm;
->         struct timespec ts;
->         void *hva;
-> +       int r;
->
->         vm = vm_create_default(0, 0, guest_code);
->
-> +       if (disable_nx) {
-> +               kvm_check_cap(KVM_CAP_VM_DISABLE_NX_HUGE_PAGES);
-> +
-> +               /*
-> +                * Check if this process has the reboot permissions needed to
-> +                * disable NX huge pages on a VM.
-> +                *
-> +                * The reboot call below will never have any effect because
-> +                * the magic values are not set correctly, however the
-> +                * permission check is done before the magic value check.
-> +                */
-> +               r = syscall(SYS_reboot, 0, 0, 0, NULL);
-> +               if (errno == EPERM) {
-
-Should this be:
-
-if (r && errno == EPERM) {
-
-?
-
-Otherwise errno might contain a stale value.
-
-> +                       r = vm_disable_nx_huge_pages(vm);
-> +                       TEST_ASSERT(r == EPERM,
-
-TEST_ASSERT(r && errno == EPERM,
-
-> +                                   "This process should not have permission to disable NX huge pages");
-> +                       return;
-> +               }
-> +
-> +               TEST_ASSERT(errno == EINVAL,
-
-r && errno == EINVAL ?
-
-> +                           "Reboot syscall should fail with -EINVAL");
-> +
-> +               r = vm_disable_nx_huge_pages(vm);
-> +               TEST_ASSERT(!r, "Disabling NX huge pages should not fail if process has reboot permissions");
-
-nit: s/not fail/succeed/
-
-> +       }
-> +
->         vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS_HUGETLB,
->                                     HPAGE_GPA, HPAGE_SLOT,
->                                     HPAGE_SLOT_NPAGES, 0);
-> @@ -118,21 +147,21 @@ int main(int argc, char **argv)
->          * to be remapped at 4k.
->          */
->         vcpu_run(vm, 0);
-> -       check_2m_page_count(vm, 1);
-> -       check_split_count(vm, 1);
-> +       check_2m_page_count(vm, disable_nx ? 2 : 1);
-> +       check_split_count(vm, disable_nx ? 0 : 1);
->
->         /*
->          * Executing from the third huge page (previously unaccessed) will
->          * cause part to be mapped at 4k.
->          */
->         vcpu_run(vm, 0);
-> -       check_2m_page_count(vm, 1);
-> -       check_split_count(vm, 2);
-> +       check_2m_page_count(vm, disable_nx ? 3 : 1);
-> +       check_split_count(vm, disable_nx ? 0 : 2);
->
->         /* Reading from the first huge page again should have no effect. */
->         vcpu_run(vm, 0);
-> -       check_2m_page_count(vm, 1);
-> -       check_split_count(vm, 2);
-> +       check_2m_page_count(vm, disable_nx ? 3 : 1);
-> +       check_split_count(vm, disable_nx ? 0 : 2);
->
->         /*
->          * Give recovery thread time to run. The wrapper script sets
-> @@ -145,7 +174,7 @@ int main(int argc, char **argv)
->         /*
->          * Now that the reclaimer has run, all the split pages should be gone.
->          */
-> -       check_2m_page_count(vm, 1);
-> +       check_2m_page_count(vm, disable_nx ? 3 : 1);
->         check_split_count(vm, 0);
->
->         /*
-> @@ -153,10 +182,16 @@ int main(int argc, char **argv)
->          * reading from it causes a huge page mapping to be installed.
->          */
->         vcpu_run(vm, 0);
-> -       check_2m_page_count(vm, 2);
-> +       check_2m_page_count(vm, disable_nx ? 3 : 2);
->         check_split_count(vm, 0);
->
->         kvm_vm_free(vm);
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +       run_test(false);
-> +       run_test(true);
->
->         return 0;
->  }
-> --
-> 2.35.1.1178.g4f1659d476-goog
->
+On Mon, Apr 11, 2022, David Matlack wrote:
+> On Mon, Apr 11, 2022 at 2:10 PM Ben Gardon <bgardon@google.com> wrote:
+> >
+> > There's no need to allocate dynamic memory for the stats header since
+> > its size is known at compile time.
+> >
+> > Signed-off-by: Ben Gardon <bgardon@google.com>
+> 
+> Reviewed-by: David Matlack <dmatlack@google.com>
+> 
+Reviewed-by: Mingwei Zhang <mizhang@google.com>
+> > ---
+> >  .../selftests/kvm/kvm_binary_stats_test.c     | 58 +++++++++----------
+> >  1 file changed, 27 insertions(+), 31 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/kvm_binary_stats_test.c b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+> > index 17f65d514915..dad34d8a41fe 100644
+> > --- a/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+> > +++ b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+> > @@ -26,56 +26,53 @@ static void stats_test(int stats_fd)
+> >         int i;
+> >         size_t size_desc;
+> >         size_t size_data = 0;
+> > -       struct kvm_stats_header *header;
+> > +       struct kvm_stats_header header;
+> >         char *id;
+> >         struct kvm_stats_desc *stats_desc;
+> >         u64 *stats_data;
+> >         struct kvm_stats_desc *pdesc;
+> >
+> >         /* Read kvm stats header */
+> > -       header = malloc(sizeof(*header));
+> > -       TEST_ASSERT(header, "Allocate memory for stats header");
+> > -
+> > -       ret = read(stats_fd, header, sizeof(*header));
+> > -       TEST_ASSERT(ret == sizeof(*header), "Read stats header");
+> > -       size_desc = sizeof(*stats_desc) + header->name_size;
+> > +       ret = read(stats_fd, &header, sizeof(header));
+> > +       TEST_ASSERT(ret == sizeof(header), "Read stats header");
+> > +       size_desc = sizeof(*stats_desc) + header.name_size;
+> >
+> >         /* Read kvm stats id string */
+> > -       id = malloc(header->name_size);
+> > +       id = malloc(header.name_size);
+> >         TEST_ASSERT(id, "Allocate memory for id string");
+> > -       ret = read(stats_fd, id, header->name_size);
+> > -       TEST_ASSERT(ret == header->name_size, "Read id string");
+> > +       ret = read(stats_fd, id, header.name_size);
+> > +       TEST_ASSERT(ret == header.name_size, "Read id string");
+> >
+> >         /* Check id string, that should start with "kvm" */
+> > -       TEST_ASSERT(!strncmp(id, "kvm", 3) && strlen(id) < header->name_size,
+> > +       TEST_ASSERT(!strncmp(id, "kvm", 3) && strlen(id) < header.name_size,
+> >                                 "Invalid KVM stats type, id: %s", id);
+> >
+> >         /* Sanity check for other fields in header */
+> > -       if (header->num_desc == 0) {
+> > +       if (header.num_desc == 0) {
+> >                 printf("No KVM stats defined!");
+> >                 return;
+> >         }
+> >         /* Check overlap */
+> > -       TEST_ASSERT(header->desc_offset > 0 && header->data_offset > 0
+> > -                       && header->desc_offset >= sizeof(*header)
+> > -                       && header->data_offset >= sizeof(*header),
+> > +       TEST_ASSERT(header.desc_offset > 0 && header.data_offset > 0
+> > +                       && header.desc_offset >= sizeof(header)
+> > +                       && header.data_offset >= sizeof(header),
+> >                         "Invalid offset fields in header");
+> > -       TEST_ASSERT(header->desc_offset > header->data_offset ||
+> > -                       (header->desc_offset + size_desc * header->num_desc <=
+> > -                                                       header->data_offset),
+> > +       TEST_ASSERT(header.desc_offset > header.data_offset ||
+> > +                       (header.desc_offset + size_desc * header.num_desc <=
+> > +                                                       header.data_offset),
+> >                         "Descriptor block is overlapped with data block");
+> >
+> >         /* Allocate memory for stats descriptors */
+> > -       stats_desc = calloc(header->num_desc, size_desc);
+> > +       stats_desc = calloc(header.num_desc, size_desc);
+> >         TEST_ASSERT(stats_desc, "Allocate memory for stats descriptors");
+> >         /* Read kvm stats descriptors */
+> >         ret = pread(stats_fd, stats_desc,
+> > -                       size_desc * header->num_desc, header->desc_offset);
+> > -       TEST_ASSERT(ret == size_desc * header->num_desc,
+> > +                       size_desc * header.num_desc, header.desc_offset);
+> > +       TEST_ASSERT(ret == size_desc * header.num_desc,
+> >                         "Read KVM stats descriptors");
+> >
+> >         /* Sanity check for fields in descriptors */
+> > -       for (i = 0; i < header->num_desc; ++i) {
+> > +       for (i = 0; i < header.num_desc; ++i) {
+> >                 pdesc = (void *)stats_desc + i * size_desc;
+> >                 /* Check type,unit,base boundaries */
+> >                 TEST_ASSERT((pdesc->flags & KVM_STATS_TYPE_MASK)
+> > @@ -104,7 +101,7 @@ static void stats_test(int stats_fd)
+> >                         break;
+> >                 }
+> >                 /* Check name string */
+> > -               TEST_ASSERT(strlen(pdesc->name) < header->name_size,
+> > +               TEST_ASSERT(strlen(pdesc->name) < header.name_size,
+> >                                 "KVM stats name(%s) too long", pdesc->name);
+> >                 /* Check size field, which should not be zero */
+> >                 TEST_ASSERT(pdesc->size, "KVM descriptor(%s) with size of 0",
+> > @@ -124,14 +121,14 @@ static void stats_test(int stats_fd)
+> >                 size_data += pdesc->size * sizeof(*stats_data);
+> >         }
+> >         /* Check overlap */
+> > -       TEST_ASSERT(header->data_offset >= header->desc_offset
+> > -               || header->data_offset + size_data <= header->desc_offset,
+> > +       TEST_ASSERT(header.data_offset >= header.desc_offset
+> > +               || header.data_offset + size_data <= header.desc_offset,
+> >                 "Data block is overlapped with Descriptor block");
+> >         /* Check validity of all stats data size */
+> > -       TEST_ASSERT(size_data >= header->num_desc * sizeof(*stats_data),
+> > +       TEST_ASSERT(size_data >= header.num_desc * sizeof(*stats_data),
+> >                         "Data size is not correct");
+> >         /* Check stats offset */
+> > -       for (i = 0; i < header->num_desc; ++i) {
+> > +       for (i = 0; i < header.num_desc; ++i) {
+> >                 pdesc = (void *)stats_desc + i * size_desc;
+> >                 TEST_ASSERT(pdesc->offset < size_data,
+> >                         "Invalid offset (%u) for stats: %s",
+> > @@ -142,15 +139,15 @@ static void stats_test(int stats_fd)
+> >         stats_data = malloc(size_data);
+> >         TEST_ASSERT(stats_data, "Allocate memory for stats data");
+> >         /* Read kvm stats data as a bulk */
+> > -       ret = pread(stats_fd, stats_data, size_data, header->data_offset);
+> > +       ret = pread(stats_fd, stats_data, size_data, header.data_offset);
+> >         TEST_ASSERT(ret == size_data, "Read KVM stats data");
+> >         /* Read kvm stats data one by one */
+> >         size_data = 0;
+> > -       for (i = 0; i < header->num_desc; ++i) {
+> > +       for (i = 0; i < header.num_desc; ++i) {
+> >                 pdesc = (void *)stats_desc + i * size_desc;
+> >                 ret = pread(stats_fd, stats_data,
+> >                                 pdesc->size * sizeof(*stats_data),
+> > -                               header->data_offset + size_data);
+> > +                               header.data_offset + size_data);
+> >                 TEST_ASSERT(ret == pdesc->size * sizeof(*stats_data),
+> >                                 "Read data of KVM stats: %s", pdesc->name);
+> >                 size_data += pdesc->size * sizeof(*stats_data);
+> > @@ -159,7 +156,6 @@ static void stats_test(int stats_fd)
+> >         free(stats_data);
+> >         free(stats_desc);
+> >         free(id);
+> > -       free(header);
+> >  }
+> >
+> >
+> > --
+> > 2.35.1.1178.g4f1659d476-goog
+> >
