@@ -2,117 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 066E14FC750
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 00:05:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB9E64FC76A
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 00:15:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237428AbiDKWHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Apr 2022 18:07:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49214 "EHLO
+        id S1350327AbiDKWRk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Apr 2022 18:17:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350418AbiDKWHg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Apr 2022 18:07:36 -0400
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DFD11FA5A
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 15:05:20 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id 75so9512256qkk.8
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 15:05:20 -0700 (PDT)
+        with ESMTP id S1348793AbiDKWRg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Apr 2022 18:17:36 -0400
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A859419030
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 15:15:20 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id s13so21878556ljd.5
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 15:15:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Mub+V7xFFXRdwh5J41falSS4UullJ6qzBmVcOTDmxgk=;
-        b=egT0WxHMUqej3A8vHlkTMS6AVjxNKvBf6Y1To2j4V/eq0V3F15Z1gz1VdYUe5p2tDD
-         g+7HNELN8XvasTyhABrdYBH428t5oP3Gl1PkoOdscRBajL9C0r7l6HqJ1UkJQUbIY//c
-         8DZpqcQX7PA9vGb5UsEDkUqZm44FXCLmXrU5QWnHyXQqM5n83XFzz77HbtgzwQge/L6K
-         ZzTML2RMfp7YqX434QpEkz1bOaQC0czADaX889KqDqojI05S/6DR0jWipvTnha5MdAdf
-         VC0NFvviRjL/+zYhL5u5HMep13eg9LjgfHZxln/RcJg91Oh8WIVMwNXoS86TE04PZxlb
-         xXtw==
+        bh=bUJXQhFUIN7iCsj9QS5jIjGRNk+z+TdH4UZzpSxdCm4=;
+        b=RV/micvGsZe9mZ8Hgcs7Y5/k/VpZqPkSFY9zXkPpDEr9tcgeW8eWFBzd1f0+r4k5b2
+         N+Qvt9c2zBrO8T4mdohRydU1bT1n+NID9YwvUsYGWgQ1nrgNLVYNhDVxNHEXtgHSRSlp
+         LsMVSXHAZVAPhJRV/XSulcUDl5A5GS/Jjk/eEu6w3I29s/enzaet88wKF2ziHk8j/XwB
+         7F2Mjjngkfe8b8q8CBwHsDxw2oGefncdNKdWSn5qBAIEqRitrYsW6uC0iyumiYkTPAF/
+         +bz/TnRbM8rqQZW49yUg5+zbOjGbwPwCO4kGomjTwV+hTEMAR5PeItnQ/JsKIbAbDkm6
+         iTQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Mub+V7xFFXRdwh5J41falSS4UullJ6qzBmVcOTDmxgk=;
-        b=xzM35p89sjZwtNjjAanxdExhtTjNi/ltdGbNB24wcDRiN6QBlhmdY6DLCUdj2+wQF5
-         gQKY5XCgXzLU1rJmhZnwMOnWsOR8eAZJcKyk7/O+jNQnn+0x7RLNo8HWJwn9LpM4ZvC3
-         DdvQOXkRADPDjlMp5M7uVddZmIklvDAHDPnwvg5ZSXbQHc7V7IWuXtr+9oxHjNBGkNDx
-         XbnBv3jeCtG5z1egUmhL3QpJrIJxMa9WFXIa6fcE5JqcHUAmJHGuOsCYwJANYEW6jnav
-         LBirFam8LRYwSP5brGcFSS6Ek60aGftrMH6DRVc9bDDb8unM1DZsOZb7S6XSmrbLASO+
-         JJZw==
-X-Gm-Message-State: AOAM531NVR6yVXbe4R//eJFR8ZZ+yoNCh7vV3DU8jYThXaAMnV7Ctmyb
-        8sspwVgjmyJW8cxFYMs4shYYSszrS0Z0YDBcR1MC6g==
-X-Google-Smtp-Source: ABdhPJxcmDQu+qNfZ6YKxOWUrvyXbXfbcHHU+1f8W+SrYJM0YDz/aCKCEh8LI+RA4P/WqT3wIO8LeJ9U7ZBZDexkpew=
-X-Received: by 2002:a37:aec2:0:b0:69a:4a5:925 with SMTP id x185-20020a37aec2000000b0069a04a50925mr1112459qke.292.1649714719525;
- Mon, 11 Apr 2022 15:05:19 -0700 (PDT)
+        bh=bUJXQhFUIN7iCsj9QS5jIjGRNk+z+TdH4UZzpSxdCm4=;
+        b=1gBa5qFjnmfbOvpqLk30RtrF5ePZgTR6EL6enJQizWPoWAlL8k35xeEH4w/nGYdf4+
+         HM8n7dhf5eldn1QE9RnspVQjvJpa/CYY1jIUTyPt7nKmb4L7oMgJscbP2xDa+or1mCzE
+         p7lWaDifrTFFfC9/qWD898qjjMjnOU0/0nbs7Rt3efLn2hMowjo4sZH+t0ydt+sNPC+e
+         vwmBTjeSwkvWsa0rdUydoj0P8R/gt6mjlTSMUrtF1Wa8uhQak39qvS0KQIRF51COrsYp
+         PH5OE1GdIn4MPfYV40B1m5S/bZfwzAw9A31v2lfoGDi4B1vUVCSYwrze+Xnzy4V/VQFL
+         OO+A==
+X-Gm-Message-State: AOAM532Dn8ipl6/AuBWGRK2fhq1f8OXPF9zBEtmnPcftAwlLtQ4hI9a4
+        3iDJw5GXBy0GpM9NxVwgGKXqsPpvquFcifZbsqen4A==
+X-Google-Smtp-Source: ABdhPJxHm2gkf3/2gRmHVdxJHdV/qOMQszeZjvP243YyKawT1vGPDZrKQZgHVscnRhkeI3BWITudiXRPRM/zsnKNpYA=
+X-Received: by 2002:a05:651c:54c:b0:249:9d06:24ef with SMTP id
+ q12-20020a05651c054c00b002499d0624efmr21807549ljp.331.1649715318743; Mon, 11
+ Apr 2022 15:15:18 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220409003847.819686-1-seanjc@google.com> <20220409003847.819686-3-seanjc@google.com>
- <YlRn+8bYsHqNIbTU@google.com> <YlR0a4PG5xzweeMZ@google.com>
-In-Reply-To: <YlR0a4PG5xzweeMZ@google.com>
-From:   Mingwei Zhang <mizhang@google.com>
-Date:   Mon, 11 Apr 2022 15:05:08 -0700
-Message-ID: <CAL715WL-ji6V8BdCGsjLQ80V658_P0ccymtJgsmXGh+x-wM2Yw@mail.gmail.com>
-Subject: Re: [PATCH 2/6] KVM: x86/mmu: Properly account NX huge page
- workaround for nonpaging MMUs
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+References: <20220411211015.3091615-1-bgardon@google.com> <20220411211015.3091615-5-bgardon@google.com>
+In-Reply-To: <20220411211015.3091615-5-bgardon@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Mon, 11 Apr 2022 15:14:52 -0700
+Message-ID: <CALzav=fCnRX=JZ-knxf9_Aq_A_JOVjTq34ACe5JOmVr5Ms=vVw@mail.gmail.com>
+Subject: Re: [PATCH v4 04/10] KVM: selftests: Read binary stat data in lib
+To:     Ben Gardon <bgardon@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Junaid Shahid <junaids@google.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        Mingwei Zhang <mizhang@google.com>,
+        Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 11, 2022 at 11:33 AM Sean Christopherson <seanjc@google.com> wrote:
+On Mon, Apr 11, 2022 at 2:10 PM Ben Gardon <bgardon@google.com> wrote:
 >
-> On Mon, Apr 11, 2022, Mingwei Zhang wrote:
-> > On Sat, Apr 09, 2022, Sean Christopherson wrote:
-> > > diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> > > index 671cfeccf04e..89df062d5921 100644
-> > > --- a/arch/x86/kvm/mmu.h
-> > > +++ b/arch/x86/kvm/mmu.h
-> > > @@ -191,6 +191,15 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-> > >             .user = err & PFERR_USER_MASK,
-> > >             .prefetch = prefetch,
-> > >             .is_tdp = likely(vcpu->arch.mmu->page_fault == kvm_tdp_page_fault),
-> > > +
-> > > +           /*
-> > > +            * Note, enforcing the NX huge page mitigation for nonpaging
-> > > +            * MMUs (shadow paging, CR0.PG=0 in the guest) is completely
-> > > +            * unnecessary.  The guest doesn't have any page tables to
-> > > +            * abuse and is guaranteed to switch to a different MMU when
-> > > +            * CR0.PG is toggled on (may not always be guaranteed when KVM
-> > > +            * is using TDP).  See make_spte() for details.
-> > > +            */
-> > >             .nx_huge_page_workaround_enabled = is_nx_huge_page_enabled(),
-> >
-> > hmm. I think there could be a minor issue here (even in original code).
-> > The nx_huge_page_workaround_enabled is attached here with page fault.
-> > However, at the time of make_spte(), we call is_nx_huge_page_enabled()
-> > again. Since this function will directly check the module parameter,
-> > there might be a race condition here. eg., at the time of page fault,
-> > the workround was 'true', while by the time we reach make_spte(), the
-> > parameter was set to 'false'.
+> Move the code to read the binary stats data to the KVM selftests
+> library. It will be re-used by other tests to check KVM behavior.
 >
-> Toggling the mitigation invalidates and zaps all roots.  Any page fault acquires
-> mmu_lock after the toggling is guaranteed to see the correct value, any page fault
-> that completed before kvm_mmu_zap_all_fast() is guaranteed to be zapped.
+> No functional change intended.
+>
+> Signed-off-by: Ben Gardon <bgardon@google.com>
+> ---
+>  .../selftests/kvm/include/kvm_util_base.h     |  3 +++
+>  .../selftests/kvm/kvm_binary_stats_test.c     | 20 +++++-------------
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 21 +++++++++++++++++++
+>  3 files changed, 29 insertions(+), 15 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index c5f34551ff76..b2684cfc2cb1 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -405,6 +405,9 @@ struct kvm_stats_desc *alloc_vm_stats_desc(int stats_fd,
+>                                           struct kvm_stats_header *header);
+>  void read_vm_stats_desc(int stats_fd, struct kvm_stats_header *header,
+>                         struct kvm_stats_desc *stats_desc);
+> +int read_stat_data(int stats_fd, struct kvm_stats_header *header,
+> +                  struct kvm_stats_desc *desc, uint64_t *data,
+> +                  ssize_t max_elements);
+>
+>  uint32_t guest_get_vcpuid(void);
+>
+> diff --git a/tools/testing/selftests/kvm/kvm_binary_stats_test.c b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+> index e4795bad7db6..97b180249ba0 100644
+> --- a/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+> +++ b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+> @@ -20,6 +20,8 @@
+>  #include "asm/kvm.h"
+>  #include "linux/kvm.h"
+>
+> +#define STAT_MAX_ELEMENTS 1000
+> +
+>  static void stats_test(int stats_fd)
+>  {
+>         ssize_t ret;
+> @@ -29,7 +31,7 @@ static void stats_test(int stats_fd)
+>         struct kvm_stats_header header;
+>         char *id;
+>         struct kvm_stats_desc *stats_desc;
+> -       u64 *stats_data;
+> +       u64 stats_data[STAT_MAX_ELEMENTS];
 
-hmm. ok.
->
-> > I have not figured out what the side effect is. But I feel like the
-> > make_spte() should just follow the information in kvm_page_fault instead
-> > of directly querying the global config.
->
-> I started down this exact path :-)  The problem is that, even without Ben's series,
-> KVM uses make_spte() for things other than page faults.
+What is the benefit of changing stats_data to a stack allocation with
+a fixed limit?
 
-Reviewed-by: Mingwei Zhang <mizhang@google.com>
+>         struct kvm_stats_desc *pdesc;
+>
+>         /* Read kvm stats header */
+> @@ -130,25 +132,13 @@ static void stats_test(int stats_fd)
+>                         pdesc->offset, pdesc->name);
+>         }
+>
+> -       /* Allocate memory for stats data */
+> -       stats_data = malloc(size_data);
+> -       TEST_ASSERT(stats_data, "Allocate memory for stats data");
+> -       /* Read kvm stats data as a bulk */
+> -       ret = pread(stats_fd, stats_data, size_data, header.data_offset);
+> -       TEST_ASSERT(ret == size_data, "Read KVM stats data");
+>         /* Read kvm stats data one by one */
+> -       size_data = 0;
+>         for (i = 0; i < header.num_desc; ++i) {
+>                 pdesc = (void *)stats_desc + i * size_desc;
+> -               ret = pread(stats_fd, stats_data,
+> -                               pdesc->size * sizeof(*stats_data),
+> -                               header.data_offset + size_data);
+> -               TEST_ASSERT(ret == pdesc->size * sizeof(*stats_data),
+> -                               "Read data of KVM stats: %s", pdesc->name);
+> -               size_data += pdesc->size * sizeof(*stats_data);
+> +               read_stat_data(stats_fd, &header, pdesc, stats_data,
+> +                              ARRAY_SIZE(stats_data));
+>         }
+>
+> -       free(stats_data);
+>         free(stats_desc);
+>         free(id);
+>  }
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index e3ae26fbef03..64e2085f1129 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -2593,3 +2593,24 @@ void read_vm_stats_desc(int stats_fd, struct kvm_stats_header *header,
+>         TEST_ASSERT(ret == stats_descs_size(header),
+>                     "Read KVM stats descriptors");
+>  }
+> +
+> +int read_stat_data(int stats_fd, struct kvm_stats_header *header,
+
+I would like to keep up the practice of adding docstrings to functions
+in kvm_util. Can you add docstring comments for this function and the
+other kvm_util functions introduced by this series?
+
+> +                  struct kvm_stats_desc *desc, uint64_t *data,
+> +                  ssize_t max_elements)
+> +{
+> +       ssize_t ret;
+> +
+> +       TEST_ASSERT(desc->size <= max_elements,
+> +                   "Max data elements should be at least as large as stat data");
+
+What is the reason for this assertion? Callers are required to read
+all the data elements of a given stat?
+
+> +
+> +       ret = pread(stats_fd, data, desc->size * sizeof(*data),
+> +                   header->data_offset + desc->offset);
+> +
+> +       /* ret from pread is in bytes. */
+> +       ret = ret / sizeof(*data);
+> +
+> +       TEST_ASSERT(ret == desc->size,
+> +                   "Read data of KVM stats: %s", desc->name);
+
+Won't this assertion fail when called from kvm_binary_stats_test.c?
+kvm_binary_stats_test.c looks like it reads all the stat data at once,
+which means ret will be the total number of stat data points, and
+desc->size will be the number of stat data points in the first stat.
+
+> +
+> +       return ret;
+> +}
+> --
+> 2.35.1.1178.g4f1659d476-goog
+>
