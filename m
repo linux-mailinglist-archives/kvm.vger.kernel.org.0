@@ -2,134 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BD5E4FB71C
-	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 11:13:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3624A4FB745
+	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 11:21:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344267AbiDKJOk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Apr 2022 05:14:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54558 "EHLO
+        id S1344339AbiDKJYE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Apr 2022 05:24:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344275AbiDKJOi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Apr 2022 05:14:38 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 056933FBD2;
-        Mon, 11 Apr 2022 02:12:21 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 97DAFB8112D;
-        Mon, 11 Apr 2022 09:12:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB315C385A4;
-        Mon, 11 Apr 2022 09:12:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649668339;
-        bh=gHtJO44c4D/gohjY60yF1myOEq2+2TFmuEq1mIQdKs8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=jlO1rJC0L2Sco80vrOPrUtn/qGvFa4maFijqjeQQySAugORVnJGPbD4SUipWEuDzz
-         FzYJAniBKI8qbDZVrcxfNYhmvz7iywYzVSsLm29HmogQZvz/OAbRKL1NohJC6JueLd
-         MJDB9mDGYrZL9sdarC0O1F6aYDF8XzD5Fu1PJLAy1BwgPMCqyM9X4T/6CaPAmR9eo2
-         cDAA0EGwdicvF0/dJaUxLEdPYy4Wv1PQBL2x9YWypf5G3BbgNPP9fYXDQ2IKoArwbb
-         ANkBarNOm00mMet0/3WzKUgsAv27RY1WvqipI1XEmXBOHBIe0XUO+UVlGij21AvaEG
-         3BRhTAzh/ZB1g==
-Date:   Mon, 11 Apr 2022 10:12:13 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Peter Gonda <pgonda@google.com>, kvm list <kvm@vger.kernel.org>,
+        with ESMTP id S229781AbiDKJYD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Apr 2022 05:24:03 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A00C3337C;
+        Mon, 11 Apr 2022 02:21:50 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1649668908;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to; bh=/ol4+bGrNb+QqTb72FmI1L958kV08K37LurxqmrD6Yo=;
+        b=DmpkuI4pHY1D6VU6y+UA9OgCACafnECWy3Sc2pKXtOW0YohcuS3IHkhxqAmrKLPgPaEr5Z
+        rbc1HN/+jNY4Zw9cSTd6Qv5m7s8gMJzjz02wkpgXZDQKfU6euGm28cEN4Txkf83sQFjg/3
+        7GgvF2DgV4BBz2rYzCbww8k0jpW27hx1Bs1LWeaYgN6+VxtK6OQ56J/wG/CmTIGYqAAc4+
+        DuTnZV6uPyWRUl6Cb/+7JlauS0JJf1p0//3GjtwaFs56DLXn+lccFvDLLwMs/sR6e8U13+
+        vyg6edSBNiqQzZ9/5u4gu92TBxIZuOpjSdsr1R/MdTfojPNc5xyed1B+pAI6sg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1649668908;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to; bh=/ol4+bGrNb+QqTb72FmI1L958kV08K37LurxqmrD6Yo=;
+        b=kMv4rAmeaYGAenvlqVXEiiwJgYg9wybGLF5ejSeezyLKEeRBqo2tAHnROmSIVFpgADNUFl
+        jBYt3+NZ3z00NCDA==
+To:     Pete Swain <swine@google.com>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org
+Cc:     "H. Peter Anvin" <hpa@zytor.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Anup Patel <anup@brainfault.org>, maz@kernel.org,
-        alexandru.elisei@arm.com
-Subject: Re: [PATCH v4.1] KVM, SEV: Add KVM_EXIT_SHUTDOWN metadata for SEV-ES
-Message-ID: <20220411091213.GA2120@willie-the-truck>
-References: <20220407210233.782250-1-pgonda@google.com>
- <Yk+kNqJjzoJ9TWVH@google.com>
- <CAMkAt6oc=SOYryXu+_w+WZR+VkMZfLR3_nd=hDvMU_cmOjJ0Xg@mail.gmail.com>
- <YlBqYcXFiwur3zmo@google.com>
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        "Maciej W. Rozycki" <macro@orcam.me.uk>,
+        Johan Hovold <johan@kernel.org>,
+        Feng Tang <feng.tang@intel.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Pete Swain <swine@google.com>
+Subject: Re: [PATCH 2/2] timers: retpoline mitigation for time funcs
+In-Reply-To: <87r165gmoz.ffs@tglx>
+Date:   Mon, 11 Apr 2022 11:21:47 +0200
+Message-ID: <87pmlof00k.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YlBqYcXFiwur3zmo@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
+Pete,
 
-Cheers for the heads-up.
+On Sun, Apr 10 2022 at 14:14, Thomas Gleixner wrote:
+> On Fri, Feb 18 2022 at 14:18, Pete Swain wrote:
+>> diff --git a/kernel/time/clockevents.c b/kernel/time/clockevents.c
+>> index 003ccf338d20..ac15412e87c4 100644
+>> --- a/kernel/time/clockevents.c
+>> +++ b/kernel/time/clockevents.c
+>> @@ -245,7 +245,8 @@ static int clockevents_program_min_delta(struct clock_event_device *dev)
+>>  
+>>  		dev->retries++;
+>>  		clc = ((unsigned long long) delta * dev->mult) >> dev->shift;
+>> -		if (dev->set_next_event((unsigned long) clc, dev) == 0)
+>> +		if (INDIRECT_CALL_1(dev->set_next_event, lapic_next_deadline,
+>> +				  (unsigned long) clc, dev) == 0)
+>
+> No. We are not sprinkling x86'isms into generic code.
+>
+>> --- a/kernel/time/timekeeping.c
+>> +++ b/kernel/time/timekeeping.c
+>> @@ -190,7 +190,7 @@ static inline u64 tk_clock_read(const struct tk_read_base *tkr)
+>>  {
+>>  	struct clocksource *clock = READ_ONCE(tkr->clock);
+>>  
+>> -	return clock->read(clock);
+>> +	return INDIRECT_CALL_1(clock->read, read_tsc, clock);
+>
+> Again. No X86 muck here.
 
-[+Marc and Alex as this looks similar to [1]]
+Just for clarification. I have absolutely no interest in opening this
+can of worms. The indirect call is in general more expensive on some
+architectures, so when we grant this for x86, then the next architecture
+comes around the corner and wants the same treatment. Guess how well
+that works and how maintainable this is.
 
-On Fri, Apr 08, 2022 at 05:01:21PM +0000, Sean Christopherson wrote:
-> On Fri, Apr 08, 2022, Peter Gonda wrote:
-> > On Thu, Apr 7, 2022 at 8:55 PM Sean Christopherson <seanjc@google.com> wrote:
-> > > On Thu, Apr 07, 2022, Peter Gonda wrote:
-> > > > If an SEV-ES guest requests termination, exit to userspace with
-> > > > KVM_EXIT_SYSTEM_EVENT and a dedicated SEV_TERM type instead of -EINVAL
-> > > > so that userspace can take appropriate action.
-> > > >
-> > > > See AMD's GHCB spec section '4.1.13 Termination Request' for more details.
-> > >
-> > > Maybe it'll be obvious by the lack of compilation errors, but the changelog should
-> > > call out the flags => ndata+data shenanigans, otherwise this looks like ABI breakage.
-> > 
-> > Hmm I am not sure we can do this change anymore given that we have two
-> > call sites using 'flags'
-> > 
-> > arch/arm64/kvm/psci.c:184
-> > arch/riscv/kvm/vcpu_sbi.c:97
-> > 
-> > I am not at all familiar with ARM and RISC-V but some quick reading
-> > tells me these archs also require 64-bit alignment on their 64-bit
-> > accesses. If thats correct, should I fix this call sites up by
-> > proceeding with this ndata + data[] change and move whatever they are
-> > assigning to flags into data[0] like I am doing here? It looks like
-> > both of these changes are not in a kernel release so IIUC we can still
-> > fix the ABI here?
-> 
-> Yeah, both came in for v5.18.  Given that there will be multiple paths that need
-> to set data, it's worth adding a common helper to the dirty work.
-> 
-> Anup and Will,
-> 
-> system_event.flags is broken (at least on x86) due to the prior 'type' field not
-> being propery padded, e.g. userspace will read/write garbage if the userspace
-> and kernel compilers pad structs differently.
-> 
-> 		struct {
-> 			__u32 type;
-> 			__u64 flags;
-> 		} system_event;
+And no, you can't just go there and have a
 
-On arm64, I think the compiler is required to put the padding between type
-and flags so that both the struct and 'flags' are 64-bit aligned [2]. Does
-x86 not offer any guarantees on the overall structure alignment?
+ #define arch_read_favourite_clocksource		read_foo
 
-> Our plan to unhose this is to change the struct as follows and use bit 31 in the
-> 'type' to indicate that ndata+data are valid.
-> 
-> 		struct {
->                         __u32 type;
-> 			__u32 ndata;
-> 			__u64 data[16];
->                 } system_event;
-> 
-> Any objection to updating your architectures to use a helper to set the bit and
-> populate ndata+data accordingly?  It'll require a userspace update, but v5.18
-> hasn't officially released yet so it's not kinda sort not ABI breakage.
+because we have multiplatform kernels where the clocksource is selected
+at runtime which means every platform wants to be the one defining this.
 
-It's a bit annoying, as we're using the current structure in Android 13 :/
-Obviously, if there's no choice then upstream shouldn't worry, but it means
-we'll have to carry a delta in crosvm. Specifically, the new 'ndata' field
-is going to be unusable for us because it coincides with the padding.
+You can do that in your own frankenkernels, but for mainline this is not
+going to fly. You have to come up with something smarter than just
+taking your profiling results and slapping INDIRECT_CALL_*() all over
+the place. INDIRECT_CALL is a hack as it leaves the conditional around
+even if retpoline gets patched out.
 
-Will
+The kernel has mechanisms to do better than that.
 
-[1] https://lore.kernel.org/r/20220407162327.396183-6-alexandru.elisei@arm.com
-[2] https://github.com/ARM-software/abi-aa/blob/60a8eb8c55e999d74dac5e368fc9d7e36e38dda4/aapcs64/aapcs64.rst#composite-types
+Let's look at tk_clock_read(). tkr->clock changes usually once maybe
+twice during boot. Until shutdown it might change when e.g. TSC becomes
+unstable and there are a few other cases like suspend/resume. But none
+of these events are hotpath.
+
+While we have several instances of tk_read_base, all of them have the
+same clock pointer, except for the rare case of suspend/resume. It's
+redundant storage for various reasons.
+
+So with some thought this can be implemented with static_call() which is
+currently supported by x86 and powerpc32, but there is no reason why
+it can't be supported by other architectures. INDIRECT_CALL is a x86'ism
+with a dependency on RETPOLINE, which will never gain traction outside
+of x86.
+
+Thanks,
+
+        tglx
+
