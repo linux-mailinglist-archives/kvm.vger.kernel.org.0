@@ -2,180 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D0E2D4FC394
-	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 19:40:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FE174FC395
+	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 19:40:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348964AbiDKRm5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Apr 2022 13:42:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42814 "EHLO
+        id S1348961AbiDKRm6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Apr 2022 13:42:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243215AbiDKRmc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Apr 2022 13:42:32 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FF09220FE
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 10:40:17 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id o5-20020a17090ad20500b001ca8a1dc47aso19099237pju.1
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 10:40:17 -0700 (PDT)
+        with ESMTP id S1348974AbiDKRmn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Apr 2022 13:42:43 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECCDF23168;
+        Mon, 11 Apr 2022 10:40:27 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id t1so6414438wra.4;
+        Mon, 11 Apr 2022 10:40:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=sQCHq0FJCQCb202jCqiBkk2qEW8qbj3cAAejjt3ZhIw=;
-        b=YNUDkwzrRRqMsBPmWzwwyvclqsWZPjwu/jvI+6MuOHOXGNWhar37TDEgpRsU8TzaDa
-         5Ao11aLCPxvj/nrN0ymTJGfTa1e08H9ejWLbyU9zD5mvtLyxG7bKKfNlhtGt1geCxVop
-         79XCKePjpuNzPuVxA98+sMF9pnCcrH0mddBq6tfbkLp5AWh0ZFKLscZKU5ULHxbcg07n
-         OnSVBtZj0c97O6CpY9wie/kDKgB5tgdnl2y8dMnV/6APk3vj3QF/CoSEBIPxYKt+e11Q
-         d0fpmkUsKneUkd0LNzQGuMEBcWoRvwt0S8n7HVgQhLBypr9H1VXcXPLQoF0ZqjLPyVLQ
-         4I9w==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=4ivQhWEzq6X6JM0iImOYzzpeGiLK4rWSbQZzZkOjImc=;
+        b=bI1xid7tiQrX4zd5Nj73bxPYQAG/YY2NOIje3xFLTs+QnT4L1GY2rATZ+FGFPMvX4+
+         Q8FKeps2sPEO1yekXoE5nZrnkvaqN8pp+NM8dttXUVZRsoWPNSw7UEJXVV/sfmCKd6MV
+         b0a+xxIIImoko1fAR8ucP20NQVk21/bjCRzZkSkuI1DPd3KNli6vscJdi2HgVEA1OCSp
+         Fb7pmQJfgrRYKOaswgd9SDg6W5Pf7vRhylQoFaGQU1P8ZQV14yKO/ZoU9a7tK40S5yT5
+         qYWGbkz/kvDl8x+3P4IOAMUuBZVtW6BhMyqIlKt8zv4NV+eHt/EYzqDVTHvqWPO8SOxn
+         Qumw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=sQCHq0FJCQCb202jCqiBkk2qEW8qbj3cAAejjt3ZhIw=;
-        b=jZoHahbo40XpwtA/VWwEmhuYWI+d4UdldlgCTQpwv8nkDISTYnPsHJC1V9dOBJzyhA
-         LCNGJKx8LqOS56xCo98+dYz0datF1Bxd+Tnn3oavMAOmrIT7sPoQQOlvvty3eSYx+2eW
-         j3FfQ2ygxE8X7tS4HYms1C8UhNcHipcq/LrrG9YO+RvRXvmMgfiUC5hdpX34oZeFdBGm
-         CrXAr+ZU5hXDelG+xhbr+7LG19DO/s0KtixjxF72vh2vO7Dqga9YxklWbEEeI6/G2SKw
-         l1SCdUZqNvuHquZG2HDEzw1im5XI7Q1SXaCGOrrltWDkGj3EkUmd65+0M1N4Z0w5s490
-         ubww==
-X-Gm-Message-State: AOAM531JIEOydFCgK8y4oepyDWLeTTS0vZbV9lVw5lgdCS176jBEDG1Y
-        /qs3rCn+Sy4hmKuOjYu1Ib8iqA==
-X-Google-Smtp-Source: ABdhPJyXR6Mz/4IA9vUqZoo5b52e+z00+XiGJBigvXvxZz4N7sJwtKX3j6nn9XkHEcz6fNsorvdRsA==
-X-Received: by 2002:a17:902:a613:b0:156:b53d:c137 with SMTP id u19-20020a170902a61300b00156b53dc137mr33808219plq.73.1649698816643;
-        Mon, 11 Apr 2022 10:40:16 -0700 (PDT)
-Received: from google.com (226.75.127.34.bc.googleusercontent.com. [34.127.75.226])
-        by smtp.gmail.com with ESMTPSA id be11-20020a056a001f0b00b004fb29215dd9sm33801120pfb.30.2022.04.11.10.40.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Apr 2022 10:40:15 -0700 (PDT)
-Date:   Mon, 11 Apr 2022 17:40:11 +0000
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/6] KVM: x86/mmu: Properly account NX huge page
- workaround for nonpaging MMUs
-Message-ID: <YlRn+8bYsHqNIbTU@google.com>
-References: <20220409003847.819686-1-seanjc@google.com>
- <20220409003847.819686-3-seanjc@google.com>
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=4ivQhWEzq6X6JM0iImOYzzpeGiLK4rWSbQZzZkOjImc=;
+        b=nc1/77uwk8tvAAQXioQLUnJRFCmnAGBEivxIfCDm8OOvgmfbD3n9Xubvk5H3psUxJb
+         /dgkoDqmWUpSkxjW7XWu7wa87loImgYbRUxy/qcBZ9xSeRNLroLfbOiuqldACDglZJOR
+         EWRHXsrz2nXrpm3mRilz3xE0tVfoNmLe9q+qA+lJjpqvvFR8saaydkckSYjOuXIzxSBM
+         kj0GCNQ/zNZ8s9GHsh6r3TNsU7IOQ0+cgMH6ixggEoEqyN5Hzoth86alE6tFAdRmoI9b
+         Bq2uNfjKI5g8n4SkCdLwkkyucvJkIBrmBZDV8gUYviDJcRfXTtylSoQdyb6cnIPNWcHB
+         1cAg==
+X-Gm-Message-State: AOAM530WmYd3oyc/4oWwqDPMrtSGJkXskAHEmh609nZ8sHvvU83wSZe6
+        9rBYc3v8NzV1mXrW2W6f4KU=
+X-Google-Smtp-Source: ABdhPJxs2IGhtxSJfey8fh4t8P7MmC/11nqyVMpiEKpkRDi2bx+8V2KP+doLY1n4O5yPgFLbfq7wBA==
+X-Received: by 2002:a5d:47a1:0:b0:204:9f5:e72f with SMTP id 1-20020a5d47a1000000b0020409f5e72fmr26919305wrb.656.1649698826395;
+        Mon, 11 Apr 2022 10:40:26 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id e9-20020a5d6d09000000b00203ecdca5b7sm30055582wrq.33.2022.04.11.10.40.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Apr 2022 10:40:26 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <a7d28775-2dbe-7d97-7053-e182bd5be51c@redhat.com>
+Date:   Mon, 11 Apr 2022 19:40:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220409003847.819686-3-seanjc@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [RFC PATCH v5 092/104] KVM: TDX: Handle TDX PV HLT hypercall
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
+        isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <6da55adb2ddb6f287ebd46aad02cfaaac2088415.1646422845.git.isaku.yamahata@intel.com>
+ <282d4cd1-d1f7-663c-a965-af587f77ee5a@redhat.com>
+ <Yk79A4EdiZoVQMsV@google.com>
+ <8e0280ab-c7aa-5d01-a36f-93d0d0d79e25@redhat.com>
+ <20220408045842.GI2864606@ls.amr.corp.intel.com>
+ <27a59f1a-ea74-2d75-0739-5521e7638c68@redhat.com>
+ <YlBL+0mDzuTMYGV9@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YlBL+0mDzuTMYGV9@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Apr 09, 2022, Sean Christopherson wrote:
-> Account and track NX huge pages for nonpaging MMUs so that a future
-> enhancement to precisely check if shadow page cannot be replaced by a NX
-> huge page doesn't get false positives.  Without correct tracking, KVM can
-> get stuck in a loop if an instruction is fetching and writing data on the
-> same huge page, e.g. KVM installs a small executable page on the fetch
-> fault, replaces it with an NX huge page on the write fault, and faults
-> again on the fetch.
+On 4/8/22 16:51, Sean Christopherson wrote:
+>> It also documents how it has to be used.  So this looks more or less okay,
+>> just rename "vmxip" to "interrupt_pending_delivery".
 > 
-> Alternatively, and perhaps ideally, KVM would simply not enforce the
-> workaround for nonpaging MMUs.  The guest has no page tables to abuse
-> and KVM is guaranteed to switch to a different MMU on CR0.PG being
-> toggled so there're no security or performance concerns.  But getting
-> make_spte() to play nice now and in the future is unnecessarily complex.
-> In the current code base, make_spte() can enforce the mitigation if TDP
-> is enabled or the MMU is indirect, but other in-flight patches aim to
-> drop the @vcpu param[*].  Without a @vcpu, KVM could either pass in the
-> correct information and/or derive it from the shadow page, but the former
-> is ugly and the latter subtly non-trivial due to the possitibility of
-> direct shadow pages in indirect MMUs.  Given that using shadow paging
-> with an unpaged guest is far from top priority in terms of performance,
-> _and_ has been subjected to the workaround since its inception, keep it
-> simple and just fix the accounting glitch.
-> 
-> [*] https://lore.kernel.org/all/20220321224358.1305530-5-bgardon@google.com
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/mmu.h      |  9 +++++++++
->  arch/x86/kvm/mmu/mmu.c  |  2 +-
->  arch/x86/kvm/mmu/spte.c | 11 +++++++++++
->  3 files changed, 21 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index 671cfeccf04e..89df062d5921 100644
-> --- a/arch/x86/kvm/mmu.h
-> +++ b/arch/x86/kvm/mmu.h
-> @@ -191,6 +191,15 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  		.user = err & PFERR_USER_MASK,
->  		.prefetch = prefetch,
->  		.is_tdp = likely(vcpu->arch.mmu->page_fault == kvm_tdp_page_fault),
-> +
-> +		/*
-> +		 * Note, enforcing the NX huge page mitigation for nonpaging
-> +		 * MMUs (shadow paging, CR0.PG=0 in the guest) is completely
-> +		 * unnecessary.  The guest doesn't have any page tables to
-> +		 * abuse and is guaranteed to switch to a different MMU when
-> +		 * CR0.PG is toggled on (may not always be guaranteed when KVM
-> +		 * is using TDP).  See make_spte() for details.
-> +		 */
->  		.nx_huge_page_workaround_enabled = is_nx_huge_page_enabled(),
+> If we're keeping the call back into SEAM, then this belongs in the path of
+> apic_has_interrupt_for_ppr(), not in the HLT-exit path.  To avoid multiple SEAMCALLS
+> in a single exit, VCPU_EXREG_RVI can be added.
 
-hmm. I think there could be a minor issue here (even in original code).
-The nx_huge_page_workaround_enabled is attached here with page fault.
-However, at the time of make_spte(), we call is_nx_huge_page_enabled()
-again. Since this function will directly check the module parameter,
-there might be a race condition here. eg., at the time of page fault,
-the workround was 'true', while by the time we reach make_spte(), the
-parameter was set to 'false'.
+But apic_has_interrupt_for_ppr takes a PPR argument and that is not 
+available.
 
-I have not figured out what the side effect is. But I feel like the
-make_spte() should just follow the information in kvm_page_fault instead
-of directly querying the global config.
->
->  		.max_level = KVM_MAX_HUGEPAGE_LEVEL,
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index d230d2d78ace..9416445afa3e 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2954,7 +2954,7 @@ static int __direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->  				      it.level - 1, true, ACC_ALL);
->  
->  		link_shadow_page(vcpu, it.sptep, sp);
-> -		if (fault->is_tdp && fault->huge_page_disallowed)
-> +		if (fault->huge_page_disallowed)
->  			account_nx_huge_page(vcpu->kvm, sp,
->  					     fault->req_level >= it.level);
->  	}
-> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-> index 4739b53c9734..14ad821cb0c7 100644
-> --- a/arch/x86/kvm/mmu/spte.c
-> +++ b/arch/x86/kvm/mmu/spte.c
-> @@ -115,6 +115,17 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
->  	if (!prefetch)
->  		spte |= spte_shadow_accessed_mask(spte);
->  
-> +	/*
-> +	 * For simplicity, enforce the NX huge page mitigation even if not
-> +	 * strictly necessary.  KVM could ignore if the mitigation if paging is
-> +	 * disabled in the guest, but KVM would then have to ensure a new MMU
-> +	 * is loaded (or all shadow pages zapped) when CR0.PG is toggled on,
-> +	 * and that's a net negative for performance when TDP is enabled.  KVM
-> +	 * could ignore the mitigation if TDP is disabled and CR0.PG=0, as KVM
-> +	 * will always switch to a new MMU if paging is enabled in the guest,
-> +	 * but that adds complexity just to optimize a mode that is anything
-> +	 * but performance critical.
-> +	 */
->  	if (level > PG_LEVEL_4K && (pte_access & ACC_EXEC_MASK) &&
->  	    is_nx_huge_page_enabled()) {
->  		pte_access &= ~ACC_EXEC_MASK;
-> -- 
-> 2.35.1.1178.g4f1659d476-goog
-> 
+So I suppose you mean kvm_apic_has_interrupt?  You would change that to 
+a callback, like
+
+         if (!kvm_apic_present(vcpu))
+                 return -1;
+
+	return static_call(kvm_x86_apic_has_interrupt)(vcpu);
+}
+
+and the default version would also be inlined in kvm_get_apic_interrupt, 
+like
+
+-       int vector = kvm_apic_has_interrupt(vcpu);
+         struct kvm_lapic *apic = vcpu->arch.apic;
+         u32 ppr;
+
+-       if (vector == -1)
++       if (!kvm_apic_present(vcpu))
+                 return -1;
++       __apic_update_ppr(apic, &ppr);
++	vector = apic_has_interrupt_for_ppr(apic, ppr);
+
+Checking the SEAM state (which would likewise not be VCPU_EXREG_RVI, but 
+more like VCPU_EXREG_INTR_PENDING) would be done in the tdx case of 
+kvm_x86_apic_has_interrupt.
+
+Paolo
