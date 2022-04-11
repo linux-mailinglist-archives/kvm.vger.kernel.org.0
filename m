@@ -2,152 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A9F0A4FC5EC
-	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 22:37:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1943B4FC655
+	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 23:10:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349922AbiDKUjo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Apr 2022 16:39:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36384 "EHLO
+        id S1350017AbiDKVMz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Apr 2022 17:12:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349900AbiDKUjm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Apr 2022 16:39:42 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2909C1BEA3
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 13:37:27 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id a42so9064257pfx.7
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 13:37:27 -0700 (PDT)
+        with ESMTP id S230074AbiDKVMx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Apr 2022 17:12:53 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E691415822
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 14:10:36 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id j17-20020a62b611000000b004fa6338bd77so10243474pff.10
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 14:10:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=AYKc8ZeDRNtBCWJwQpHr7JcieMpfMfOkAMNDb3v8MjY=;
-        b=hWfvTE+5RKFSbpiLlmi4b5/iTRF1eQULyL8xZLRHFm/u7l3Rwd4oaMM4vBtwvH50/k
-         Rfbpsu+k4nTnFXBMH8k1khmANVJhl97UDy89rTpe+kU+G8brFoXwN2GDFh66yJIEa7ck
-         YIySXZvImVcfXLw6QOukQllDrCv0GF9RZ3uOrD9fFcE4AqJvZ4Z2ow7aIeEeDfCl6ZJe
-         0/F+KgoA7GWxPW4Of9ImDmNwgX4rvnLAquVYP2o4DKwx8UHlS89VOeCAjdPlb1TXUSSd
-         0p3CLTXgdOmzPrXX38+m5G5kLFldgONBUfWxwC6td0eDBUq+BccnCu/0m4WPZ+GAL4Tw
-         u/NQ==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=7qBaTJN2H+g/K/DS2lTxTRvLIX27mizCmUOglWLHolA=;
+        b=JW7DNpPBC9cjt7/GIl6CWQZ2uG8WI7MOXojylaEdw2qWgK0g5u4UIfErnd/i3N5ZCx
+         xiEIgP8+nHN0zVYQWKhIRObeLpq4UNPEWen8c8mUwCZpVkW0rAi1TMDC3qOLePsWiauB
+         oCk/HS3Oil1MmU98re9HIP0zaDF5lEa+xIRBdCCEytjX1tEjbAX1H3mLFTShBiG1QQ1v
+         2NmeHng8cWZtPsqLwdAojX/pKXPy1ikWLYL0W/3utB9JmNylFruKyIUvpqXVYpglaTIt
+         gORD3GgvVW4YOnWPOugdSdCUXgOL89lxkqgBPvpN9+SzCMGLl1lRkN9VkQQC6p2z2IZ/
+         3zPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=AYKc8ZeDRNtBCWJwQpHr7JcieMpfMfOkAMNDb3v8MjY=;
-        b=AKDtlG3869+PQjERt5k4NYick8nXnW5yq8bYKZvydwamCSq9xrnW9IDT21pZ/sK9SY
-         kv5sQooMArfIrmJ1uo9p7EcI4m6dnD5nQZ0vhgDjcwfl7gh44MepeSwawKJ3rQ8dxJc7
-         Lthsa2BhQXRRaLBpNmw9+DMbP+q3kvcqFQqFyb2Ti2iGejWTHQo85TJCwl3Pv/hE9+WT
-         cX2MQzFSFP9k10LoXA+FNTq3VT0WosR+HFrqc1SGDyKa0DEbx+kM2uOjN5J6aGlUFw77
-         A2Tuw8l9w5zwsU46mlUyHheWQdc034PBUUprcEhP2dod+qoNXjgWBBXNJf49j2lJO3AN
-         mRuQ==
-X-Gm-Message-State: AOAM530ssNZVoLgMH2HyQcwn3e2s/mTCBFgi5VVIP7oecVttH8cxjN0P
-        bMLgNCUFzNCD1m84vYqfF4jt7A==
-X-Google-Smtp-Source: ABdhPJzZ64CwOXnrawiJRiNmvAMK3O1eLGBgCgolpctZJ4DZKuhTsSiJwt0g7J+Rh+QifwXJbj/jXQ==
-X-Received: by 2002:a63:2263:0:b0:399:561e:810b with SMTP id t35-20020a632263000000b00399561e810bmr27472837pgm.615.1649709446436;
-        Mon, 11 Apr 2022 13:37:26 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id gt14-20020a17090af2ce00b001c701e0a129sm327234pjb.38.2022.04.11.13.37.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Apr 2022 13:37:25 -0700 (PDT)
-Date:   Mon, 11 Apr 2022 20:37:22 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=7qBaTJN2H+g/K/DS2lTxTRvLIX27mizCmUOglWLHolA=;
+        b=f7Vk6X8YdxYGI2PYw722otKBhpMenB6EIbIDwwYMLyKyPQCusrvMl92AnBDWtPvS1n
+         mD3M6z3INMyvoKes1DsoXGKtWG3SHPDlG5vm2YTImxrn+e0kRFMQvYmy+G4DF3Z1ylMs
+         kaQ3s01+6kczwbfIx4YkN262rzBT+39UgPorwyBkLA4VRom9SOYnQwUD2bAGuHyRTRlb
+         9QXblrtieWa/tz5U3FN8O3kbGiHxuE1bAGSV4rKDCLh5Qbt6UFKG6S7bs8PEhbs6h0Tp
+         5dc/Y2AymoGZ3ZaVZLLOKaTdovvdfrGvM+0LdKpfcNlU859fAnjtNQwEcH6TqPij1tJu
+         AHgA==
+X-Gm-Message-State: AOAM530I7eaeEvSZC/ilC7w6XR0czFPAVeo58LTukNpdQ2Hi0dVCZ7i7
+        BFLSgJA0qjyw5Mfax6fTkZNU2g+4rh/P
+X-Google-Smtp-Source: ABdhPJzppFEe6VuNVq2cF+WZ1BCsPDQ1oyrsyYTVmJUmNOa+IV+fQJ3IXjUhsGRpGyXc1MHRmTlFywRKaGLN
+X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:a2d0:faec:7d8b:2e0b])
+ (user=bgardon job=sendgmr) by 2002:a17:90b:3650:b0:1ca:a667:b17c with SMTP id
+ nh16-20020a17090b365000b001caa667b17cmr1215356pjb.180.1649711436331; Mon, 11
+ Apr 2022 14:10:36 -0700 (PDT)
+Date:   Mon, 11 Apr 2022 14:10:05 -0700
+Message-Id: <20220411211015.3091615-1-bgardon@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.1178.g4f1659d476-goog
+Subject: [PATCH v4 00/10] KVM: x86: Add a cap to disable NX hugepages on a VM
+From:   Ben Gardon <bgardon@google.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Junaid Shahid <junaids@google.com>,
         Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 03/31] KVM: x86: hyper-v: Handle
- HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} calls gently
-Message-ID: <YlSRgiKPkNZTBpl+@google.com>
-References: <20220407155645.940890-1-vkuznets@redhat.com>
- <20220407155645.940890-4-vkuznets@redhat.com>
- <Yk8i+A3E9/JL96A2@google.com>
- <87a6cr7t5k.fsf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87a6cr7t5k.fsf@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        David Matlack <dmatlack@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 11, 2022, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> 
-> > On Thu, Apr 07, 2022, Vitaly Kuznetsov wrote:
-> >> @@ -1840,15 +1891,47 @@ void kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu)
-> >>  {
-> >>  	struct kvm_vcpu_hv_tlbflush_ring *tlb_flush_ring;
-> >>  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
-> >> -
-> >> -	kvm_vcpu_flush_tlb_guest(vcpu);
-> >> -
-> >> -	if (!hv_vcpu)
-> >> +	struct kvm_vcpu_hv_tlbflush_entry *entry;
-> >> +	int read_idx, write_idx;
-> >> +	u64 address;
-> >> +	u32 count;
-> >> +	int i, j;
-> >> +
-> >> +	if (!tdp_enabled || !hv_vcpu) {
-> >> +		kvm_vcpu_flush_tlb_guest(vcpu);
-> >>  		return;
-> >> +	}
-> >>  
-> >>  	tlb_flush_ring = &hv_vcpu->tlb_flush_ring;
-> >> +	read_idx = READ_ONCE(tlb_flush_ring->read_idx);
-> >> +	write_idx = READ_ONCE(tlb_flush_ring->write_idx);
-> >> +
-> >> +	/* Pairs with smp_wmb() in hv_tlb_flush_ring_enqueue() */
-> >> +	smp_rmb();
-> >>  
-> >> -	tlb_flush_ring->read_idx = tlb_flush_ring->write_idx;
-> >> +	for (i = read_idx; i != write_idx; i = (i + 1) % KVM_HV_TLB_FLUSH_RING_SIZE) {
-> >> +		entry = &tlb_flush_ring->entries[i];
-> >> +
-> >> +		if (entry->flush_all)
-> >> +			goto out_flush_all;
-> >> +
-> >> +		/*
-> >> +		 * Lower 12 bits of 'address' encode the number of additional
-> >> +		 * pages to flush.
-> >> +		 */
-> >> +		address = entry->addr & PAGE_MASK;
-> >> +		count = (entry->addr & ~PAGE_MASK) + 1;
-> >> +		for (j = 0; j < count; j++)
-> >> +			static_call(kvm_x86_flush_tlb_gva)(vcpu, address + j * PAGE_SIZE);
-> >> +	}
-> >> +	++vcpu->stat.tlb_flush;
-> >> +	goto out_empty_ring;
-> >> +
-> >> +out_flush_all:
-> >> +	kvm_vcpu_flush_tlb_guest(vcpu);
-> >> +
-> >> +out_empty_ring:
-> >> +	tlb_flush_ring->read_idx = write_idx;
-> >
-> > Does this need WRITE_ONCE?  My usual "I suck at memory ordering" disclaimer applies.
-> >
-> 
-> Same here) I *think* we're fine for 'read_idx' as it shouldn't matter at
-> which point in this function 'tlb_flush_ring->read_idx' gets modified
-> (relative to other things, e.g. actual TLB flushes) and there's no
-> concurency as we only have one reader (the vCPU which needs its TLB
-> flushed). On the other hand, I'm not against adding WRITE_ONCE() here
-> even if just to aid an unprepared reader (thinking myself couple years
-> in the future).
+Given the high cost of NX hugepages in terms of TLB performance, it may
+be desirable to disable the mitigation on a per-VM basis. In the case of public
+cloud providers with many VMs on a single host, some VMs may be more trusted
+than others. In order to maximize performance on critical VMs, while still
+providing some protection to the host from iTLB Multihit, allow the mitigation
+to be selectively disabled.
 
-Ah, read_idx == tail and write_idx == head.  I didn't look at the structure very
-closely, or maybe not at all :-)  And IIUC, only the vCPU itself ever writes to
-tail?  In that case, I would omit the READ_ONCE() from both the write to tail here
-and the read above, and probably add a brief comment stating that the flush must
-be performed on the target vCPU, i.e. must hold vcpu->mutex, and so it's safe for
-the compiler to re-read tlb_flush_ring->read_idx in the loop because it cannot
-change.
+Disabling NX hugepages on a VM is relatively straightforward, but I took this
+as an opportunity to add some NX hugepages test coverage and clean up selftests
+infrastructure a bit.
+
+This series was tested with the new selftest and the rest of the KVM selftests
+on an Intel Haswell machine.
+
+The following tests failed, but I do not believe that has anything to do with
+this series:
+	userspace_io_test
+	vmx_nested_tsc_scaling_test
+	vmx_preemption_timer_test
+
+Changelog:
+v1->v2:
+	Dropped the complicated memslot refactor in favor of Ricardo Koller's
+	patch with a similar effect.
+	Incorporated David Dunn's feedback and reviewed by tag: shortened waits
+	to speed up test.
+v2->v3:
+	Incorporated a suggestion from David on how to build the NX huge pages
+	test.
+	Fixed a build breakage identified by David.
+	Dropped the per-vm nx_huge_pages field in favor of simply checking the
+	global + per-VM disable override.
+	Documented the new capability
+	Separated out the commit to test disabling NX huge pages
+	Removed permission check when checking if the disable NX capability is
+	supported.
+	Added test coverage for the permission check.
+v3->v4:
+	Collected RB's from Jing and David
+	Modified stat collection to reduce a memory allocation [David]
+	Incorporated various improvments to the NX test [David]
+	Changed the NX disable test to run by default [David]
+	Removed some now unnecessary commits
+	Dropped the code to dump KVM stats from the binary stats test, and
+	factor out parts of the existing test to library functions instead.
+	[David, Jing, Sean]
+	Dropped the improvement to a debugging log message as it's no longer
+	relevant to this series.
+
+Ben Gardon (10):
+  KVM: selftests: Remove dynamic memory allocation for stats header
+  KVM: selftests: Read binary stats header in lib
+  KVM: selftests: Read binary stats desc in lib
+  KVM: selftests: Read binary stat data in lib
+  KVM: selftests: Add NX huge pages test
+  KVM: x86/MMU: Factor out updating NX hugepages state for a VM
+  KVM: x86/MMU: Allow NX huge pages to be disabled on a per-vm basis
+  KVM: x86: Fix errant brace in KVM capability handling
+  KVM: x86/MMU: Require reboot permission to disable NX hugepages
+  KVM: selftests: Test disabling NX hugepages on a VM
+
+ Documentation/virt/kvm/api.rst                |  13 ++
+ arch/x86/include/asm/kvm_host.h               |   2 +
+ arch/x86/kvm/mmu.h                            |  10 +-
+ arch/x86/kvm/mmu/mmu.c                        |  17 +-
+ arch/x86/kvm/mmu/spte.c                       |   7 +-
+ arch/x86/kvm/mmu/spte.h                       |   3 +-
+ arch/x86/kvm/mmu/tdp_mmu.c                    |   3 +-
+ arch/x86/kvm/x86.c                            |  17 +-
+ include/uapi/linux/kvm.h                      |   1 +
+ tools/testing/selftests/kvm/Makefile          |  10 +
+ .../selftests/kvm/include/kvm_util_base.h     |  11 +
+ .../selftests/kvm/kvm_binary_stats_test.c     |  75 +++----
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 125 ++++++++++-
+ .../selftests/kvm/x86_64/nx_huge_pages_test.c | 198 ++++++++++++++++++
+ .../kvm/x86_64/nx_huge_pages_test.sh          |  25 +++
+ 15 files changed, 453 insertions(+), 64 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+ create mode 100755 tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh
+
+-- 
+2.35.1.1178.g4f1659d476-goog
+
