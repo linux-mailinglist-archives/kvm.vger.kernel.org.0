@@ -2,92 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D55E74FC0A5
-	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 17:26:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C1FA4FC0C0
+	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 17:32:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348045AbiDKP2T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Apr 2022 11:28:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47264 "EHLO
+        id S1347772AbiDKPeQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Apr 2022 11:34:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348431AbiDKP2E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Apr 2022 11:28:04 -0400
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA3281A3AC
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 08:25:17 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id q14so20538173ljc.12
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 08:25:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=rFr6s0nrZU/l/rYSbRMVpOLqR853sTAxGnl/eB7rqRM=;
-        b=vqJYdIQWv8WkNNNn9dPXtN92UFDTRrKywzC32jqHUXQPd0+vkYBmnq9rZ4NZXVIxFT
-         qFZtKKzAXyLtgRUtZW0cMECXBtK3dk3Wyx0Mmsh8UZ/OzlNIFCM15Boa0s9MFTZnFSN3
-         8zObizgXQHcCLVp6LDk/Jzo1jR2NDPvFFPY4ogEXWUB70897ie3SGoK0vWAAx5unyy9n
-         6j5A9PCMQnyGGwVeSCqGXUcxMULTqx2b4wpel2RMEuBXrpI2Je1yyPDmgKNutqRQhKPF
-         E3eAJ4YsBCcURT61ntTfs2vYmJhK1nZzXt1rqLkINEtuod8EjW60nrtXooL3LRDyK+/7
-         0TjQ==
+        with ESMTP id S1348124AbiDKPdG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Apr 2022 11:33:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2AD5D32EF7
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 08:30:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649691051;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hV5Dyv1C11+higGhHQ1ZLcKGjBUwcNJfErNJD+t36JU=;
+        b=Q8HRfLorwmlc9+Egac7qs8INM1OsZA62ABGSvccF0yekNsd+KiHgtEYAh0sXv/0KTQYEGM
+        BMy9ZX9wo3598N+OM6sDvnSPGDOj8pV8xe/zJasm54176EVxFErR9eXgWLmYH+sq7qIjdG
+        uRiFzI4OjbqZqTRrRf6wwTKhC7CQouE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-376-coUiz-l1MW25R9A3xBnV1Q-1; Mon, 11 Apr 2022 11:30:50 -0400
+X-MC-Unique: coUiz-l1MW25R9A3xBnV1Q-1
+Received: by mail-wm1-f70.google.com with SMTP id c62-20020a1c3541000000b0038ec265155fso403674wma.6
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 08:30:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=rFr6s0nrZU/l/rYSbRMVpOLqR853sTAxGnl/eB7rqRM=;
-        b=SYRdaj78djqkWBJy35HStyGJkj3IOBWoDMCxljqtcQn7LQAhhzZiIfC/NpsIcVb0ZH
-         wa6Ocuqm6gQmGRxpTVV6OMAqJRgdsrlQ4iOL7SLiZebEPbuIkGEAlhWD8KBc6iiHH0oR
-         eun/q2NFUyCPurrWPk50/MMuoUwwV0t4eRQrQrzk9Z6l0ne88pvkIQX489djDeQDv6Wm
-         0ULd3Iyk+TDWJ7yF12+s/hu52wtnqe1YM0Hl+POkuO80xphHkCBGp2CxwmCaBuKsw4qY
-         2kgEt+x/Sqb57ObnCEHF3lK/F3e/pB1cOE3071Pppuqkri/WbI2f/DGjvANX4poGWwKE
-         hufA==
-X-Gm-Message-State: AOAM531MXe11vvIQ+mVo+Ono3UJcxc3uZBvhltTlnUVr+fzchSD2nMqo
-        ZjcHgaHu1XrNQgern09lRPVIwg==
-X-Google-Smtp-Source: ABdhPJxUo+KOo46oZZC8/G3tHjCARN4FX+eDd1+/GBegGd9jDdlQ537rMvPHZViYY23J0dOhGwiqZg==
-X-Received: by 2002:a2e:80d7:0:b0:24b:bd8:b89e with SMTP id r23-20020a2e80d7000000b0024b0bd8b89emr20019551ljg.174.1649690715205;
-        Mon, 11 Apr 2022 08:25:15 -0700 (PDT)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id z6-20020a056512308600b0044af5ea2be1sm2837295lfd.274.2022.04.11.08.25.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Apr 2022 08:25:14 -0700 (PDT)
-Received: by box.localdomain (Postfix, from userid 1000)
-        id 189A9103CE0; Mon, 11 Apr 2022 18:26:47 +0300 (+03)
-Date:   Mon, 11 Apr 2022 18:26:47 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, qemu-devel@nongnu.org,
-        Wanpeng Li <wanpengli@tencent.com>, jun.nakajima@intel.com,
-        david@redhat.com, "J . Bruce Fields" <bfields@fieldses.org>,
-        dave.hansen@intel.com, "H . Peter Anvin" <hpa@zytor.com>,
-        ak@linux.intel.com, Jonathan Corbet <corbet@lwn.net>,
-        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        Hugh Dickins <hughd@google.com>,
-        Steven Price <steven.price@arm.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Borislav Petkov <bp@alien8.de>, luto@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Mike Rapoport <rppt@kernel.org>
-Subject: Re: [PATCH v5 03/13] mm/shmem: Support memfile_notifier
-Message-ID: <20220411152647.uvl2ukuwishsckys@box.shutemov.name>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <20220310140911.50924-4-chao.p.peng@linux.intel.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=hV5Dyv1C11+higGhHQ1ZLcKGjBUwcNJfErNJD+t36JU=;
+        b=NpwQoET8T4ppEYzSmpkczGCtvbmKaSzWsbHIo+TK9Yj8NWbk6ZCGn85viiWKLPnpbw
+         M468Z2qb4U5BfA3I4L2aXv3blE6LBLa0YnfAkFzspeXDAdk9L5C8JsXzuwqVgvW8E/Lv
+         BtFG6NqUSV0G2ZqrHziUu2YcIafdLmXXv0Zar7P7y+25ffd+8+9rdpBXVm7/Il8pf//9
+         HXpU0s46yfPtscEdKPD/sQrENcH+35l5AO02J9jxQCz5fhLwp1ptR3AGdVueMQWz1meE
+         4MruKw4N6GJwrbZaZHXgw8x+RVfuAUUryup/dDLbX7239+B0Mh+X1GniIgm79UflLvaF
+         uz+w==
+X-Gm-Message-State: AOAM530XAbMLIps7SUVZWDVLeuNoOk435PccbOOp/zlsbTuLe0vL5m6Y
+        1WCN4yRvAvbS8KRcHjfFcJ2yUvzq0psleV0twGmUdR1VNzSxlCsWayXsrmZO6XqBzEPf5W9PNPZ
+        6Y0wEF1boFEsz
+X-Received: by 2002:a5d:6d0d:0:b0:207:8b9b:e38 with SMTP id e13-20020a5d6d0d000000b002078b9b0e38mr15986245wrq.166.1649691048875;
+        Mon, 11 Apr 2022 08:30:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyUFQGby0QUPjBNszAuAeDrQZiOPCv95kxxG89l+OJftEWcZRW1RlMAnSnyoNbwseB0RKglxg==
+X-Received: by 2002:a5d:6d0d:0:b0:207:8b9b:e38 with SMTP id e13-20020a5d6d0d000000b002078b9b0e38mr15986235wrq.166.1649691048646;
+        Mon, 11 Apr 2022 08:30:48 -0700 (PDT)
+Received: from [192.168.8.100] (tmo-080-174.customers.d1-online.com. [80.187.80.174])
+        by smtp.gmail.com with ESMTPSA id m20-20020a05600c3b1400b0038ebbbb2ad2sm3183159wms.44.2022.04.11.08.30.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Apr 2022 08:30:48 -0700 (PDT)
+Message-ID: <5073d0fc-1017-5be6-2ec5-2709be14c93c@redhat.com>
+Date:   Mon, 11 Apr 2022 17:30:46 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220310140911.50924-4-chao.p.peng@linux.intel.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.0
+Subject: Re: [kvm-unit-tests PATCH v1 4/4] s390x: add selftest for migration
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com
+References: <20220411100750.2868587-1-nrb@linux.ibm.com>
+ <20220411100750.2868587-5-nrb@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20220411100750.2868587-5-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -95,25 +82,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 10, 2022 at 10:09:01PM +0800, Chao Peng wrote:
-> diff --git a/mm/shmem.c b/mm/shmem.c
-> index 9b31a7056009..7b43e274c9a2 100644
-> --- a/mm/shmem.c
-> +++ b/mm/shmem.c
-> @@ -903,6 +903,28 @@ static struct folio *shmem_get_partial_folio(struct inode *inode, pgoff_t index)
->  	return page ? page_folio(page) : NULL;
->  }
->  
-> +static void notify_fallocate(struct inode *inode, pgoff_t start, pgoff_t end)
-> +{
-> +#ifdef CONFIG_MEMFILE_NOTIFIER
-> +	struct shmem_inode_info *info = SHMEM_I(inode);
+On 11/04/2022 12.07, Nico Boehr wrote:
+> Add a selftest to check we can do migration tests.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>   s390x/Makefile             |  1 +
+>   s390x/selftest-migration.c | 27 +++++++++++++++++++++++++++
+>   s390x/unittests.cfg        |  4 ++++
+>   3 files changed, 32 insertions(+)
+>   create mode 100644 s390x/selftest-migration.c
+> 
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 62e197cb93d7..2e43e323bcb5 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -26,6 +26,7 @@ tests += $(TEST_DIR)/edat.elf
+>   tests += $(TEST_DIR)/mvpg-sie.elf
+>   tests += $(TEST_DIR)/spec_ex-sie.elf
+>   tests += $(TEST_DIR)/firq.elf
+> +tests += $(TEST_DIR)/selftest-migration.elf
+>   
+>   pv-tests += $(TEST_DIR)/pv-diags.elf
+>   
+> diff --git a/s390x/selftest-migration.c b/s390x/selftest-migration.c
+> new file mode 100644
+> index 000000000000..8884322a84ca
+> --- /dev/null
+> +++ b/s390x/selftest-migration.c
+> @@ -0,0 +1,27 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Migration Selftest
+> + *
+> + * Copyright IBM Corp. 2022
+> + *
+> + * Authors:
+> + *  Nico Boehr <nrb@linux.ibm.com>
+> + */
+> +#include <libcflat.h>
 > +
-> +	memfile_notifier_fallocate(&info->memfile_notifiers, start, end);
-> +#endif
+> +int main(void)
+> +{
+> +	/* don't say migrate here otherwise we will migrate right away */
+> +	report_prefix_push("selftest migration");
+> +
+> +	/* ask migrate_cmd to migrate (it listens for 'migrate') */
+> +	puts("Please migrate me\n");
+> +
+> +	/* wait for migration to finish, we will read a newline */
+> +	(void)getchar();
+> +
+> +	report_pass("Migrated");
+> +
+> +	report_prefix_pop();
+> +	return report_summary();
+> +}
 
-All these #ifdefs look ugly. Could you provide dummy memfile_* for
-!MEMFILE_NOTIFIER case?
+Thanks for tackling this!
 
--- 
- Kirill A. Shutemov
+Having written powerpc/sprs.c in the past, I've got one question / request:
+
+Could we turn this into a "real" test immediately? E.g. write a sane value 
+to all control registers that are currently not in use by the k-u-t before 
+migration, and then check whether the values are still in there after 
+migration? Maybe also some vector registers and the "guarded storage control"?
+... or is this rather something for a later update?
+
+  Thomas
+
