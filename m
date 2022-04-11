@@ -2,92 +2,261 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 452FD4FC81D
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 01:33:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 102954FC8E7
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 01:42:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233336AbiDKXfm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Apr 2022 19:35:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41430 "EHLO
+        id S237899AbiDKXos (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Apr 2022 19:44:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232482AbiDKXfl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Apr 2022 19:35:41 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EBEEB1E3
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 16:33:25 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id mm4-20020a17090b358400b001cb93d8b137so847441pjb.2
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 16:33:25 -0700 (PDT)
+        with ESMTP id S236676AbiDKXn6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Apr 2022 19:43:58 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0B1528E32
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 16:41:41 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id b21so2551283ljf.4
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 16:41:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=h4EBQ5KtFlqne/7MW5/+slVo7rGBhDrSQX6gK0Dbmfw=;
-        b=OFG0b8pqdu8n5sNFdpHS3laQvJ0s5Iqib3uiDEjYGeKkJW3Rc4FXt81gaRg5aU50eO
-         2PGcGQwd1nMQn0L6xNx9SH5wQGgC2FxPGEmxoAX9jLa5CXcAQdo1g4nnE+74K70L0Cbp
-         PbE+DJEd8QyEmtxB7UoLeDe8GqziUfcNd8r6VDsd2qeA+dXOqyZ8DtlCeaXSq7GlzR7s
-         ZFwVXTJ8vDhx9buZ/RQ7bnpHzl7+D7l0rW0MbV0/++2/WqrljUjimReAo1mP+ueguVvv
-         EWiLUHu+C6i/SQb7oHQj8WDimM1Ae7F3e4V6+KyBNG1B0/gcVVdTIX/CSQffp/Uh30uA
-         zNyg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=q17E+fHKk5Th+BI8Tj0S78AdPyNKUlnW29K14ISNtBQ=;
+        b=K40jOpUlphvQ1cZf+e6cBGIBVFGLKJ32IXPMsUg6Rud+5raoGXjJePu9S+gTTXt6v7
+         /2Wlva2b9ZfJ9DvZ1GBzZ6IQAtAg5Hrqlz9BfcQ/6TgJPw3F4GS1tcEN4SL31y2MWglr
+         4YhIx9f2ECjJjuKdFnLJmJb1+nLyfpRutN+BaCAHdUisS2MjReeVv4zgH1m4XsuV+Aab
+         tuQzoLW8vVTpGloaHRidtvcPBfFEV3LAwG7hoJQYRpFKBSIgAjYcJ/c5rFgC90V1LHtq
+         Rqy57u+h/U5mlPQmy35ygdhnBhQMZAVguU2DxuHInAwgvT/uoVKCDo2VTZcJZn+CrvQf
+         +tCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=h4EBQ5KtFlqne/7MW5/+slVo7rGBhDrSQX6gK0Dbmfw=;
-        b=J/icmyhpgFTjPeee9qJCSJwFb3EGyMem1wnT4BiYRDyurOYfGJeP+qK/U9q70P3V8g
-         +C1fj73prR7HWHlhgcOn5Vrwcucp/anmWraGvH51uQ/Iu8kvTGhvg/HHU1RWcRvuPMMg
-         W1X4bwt+j23aQx/hVtQ7QzBJC6Am8N6YrXJaz2UvdcCHewQ8tf+AI5ROwoZjlZLNrPTk
-         w39zQX15zo30yiyuOnmZhR14FmeOTzaLvDlXfA4WNPzSsHHV9wEveIZDrAjMeSy7G6Gf
-         v2026WgC09lXqAoSthwfKPBe9va112fXlb1dLDxKvm77tzQI0MkQq2Ma/pEL8Gxp8bpd
-         bOsg==
-X-Gm-Message-State: AOAM533/jyc+mlYkG//NwEiBujuQTXyU0CzZzq+roCLaPFRfwu3/VhZm
-        jZ2HSWrhWqLvbdqjkcsWcuPs9Q==
-X-Google-Smtp-Source: ABdhPJxUb72VQrc6Q0tLG6gjaQ0T0BQktbFzQoM/KU0RsnoNeCoGqQE3D36+K/Szo0GXCy1VSn3BJw==
-X-Received: by 2002:a17:902:e791:b0:151:dbbd:aeae with SMTP id cp17-20020a170902e79100b00151dbbdaeaemr35004697plb.171.1649720004721;
-        Mon, 11 Apr 2022 16:33:24 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id my18-20020a17090b4c9200b001c75aeac7fdsm531954pjb.27.2022.04.11.16.33.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Apr 2022 16:33:24 -0700 (PDT)
-Date:   Mon, 11 Apr 2022 23:33:20 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Dunn <daviddunn@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Junaid Shahid <junaids@google.com>
-Subject: Re: [PATCH v2 7/9] KVM: x86/mmu: Add try_get_mt_mask to x86_ops
-Message-ID: <YlS6wG5szNPPEFcs@google.com>
-References: <20220321224358.1305530-1-bgardon@google.com>
- <20220321224358.1305530-8-bgardon@google.com>
- <YlSzI9ZfzPQZhPqj@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=q17E+fHKk5Th+BI8Tj0S78AdPyNKUlnW29K14ISNtBQ=;
+        b=lDpS678YueMsez/k7TcSxZPIougAo62Z5Pff1h2/4X98IIsi8AA67lmUjx5XROhXiD
+         o7pdBqc75eh39/aT9T16f9xO0UBdZo8CYK2tojFcq4xOA0q07fh49AoFqOyM8kNmymuu
+         oEQLOUVUaKZ6B/zVz27WQAX+vHGGN7lUTXctpSePV9BZGPjyKXi2QXpLisxvOru95m23
+         MnPxrp2Ryr+6pLqRyboQdsl2bsMJraA0MplLDS8FpZnrGpPkIkQLGwOY5Tp/ygkefUwS
+         /8VFQxyeyPmMBoLiV3PFScV247k8sgg4Q7mjoPEOU5lJv0fh1XLfv04reQyf5T7l4ovL
+         bn/Q==
+X-Gm-Message-State: AOAM533Xn+kjvoUHMo20YNyfHmVPjXqdLzVIv8kVcjXRQxeSsKwrlmEa
+        sI43bfaaXYFEthrbmQoCswOb83unCKWFdCFskXYLkA==
+X-Google-Smtp-Source: ABdhPJxYGp7OwrMeWKTpxOiX1rp3z1eskcZp4s0ucsF/ixzgk8f54RP2AiNfWLG9/o9mz9UGBiWkKsUwgELcxFw2weQ=
+X-Received: by 2002:a05:651c:54c:b0:249:9d06:24ef with SMTP id
+ q12-20020a05651c054c00b002499d0624efmr21986148ljp.331.1649720499710; Mon, 11
+ Apr 2022 16:41:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YlSzI9ZfzPQZhPqj@google.com>
+References: <20220401175554.1931568-1-dmatlack@google.com> <YlRhiF1O71TWQr5r@google.com>
+ <CALzav=f_WY7xH_MV8-gJPAVmj1KjE_LvXupL7aA5n-vCjTETNw@mail.gmail.com> <YlSLuZphElMyF2sG@google.com>
+In-Reply-To: <YlSLuZphElMyF2sG@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Mon, 11 Apr 2022 16:41:12 -0700
+Message-ID: <CALzav=fGucZOZjbVE2+9PZVf1p+jP7GBYDpPph5PoU552LELsw@mail.gmail.com>
+Subject: Re: [PATCH v3 00/23] KVM: Extend Eager Page Splitting to the shadow MMU
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 11, 2022, Sean Christopherson wrote:
-> And as a bonus, if we use 0/-errno, then we can use KVM_X86_OP_OPTIONAL_RET0()
-> and SVM doesn't need to provide an implementation.
+On Mon, Apr 11, 2022 at 1:12 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Apr 11, 2022, David Matlack wrote:
+> > On Mon, Apr 11, 2022 at 10:12 AM Sean Christopherson <seanjc@google.com> wrote:
+> > > Circling back to eager page splitting, this series could be reworked to take the
+> > > first step of forking FNAME(page_fault), FNAME(fetch) and kvm_mmu_get_page() in
+> > > order to provide the necessary path for reworking nested MMU page faults.  Then it
+> > > can remove unsync and shrinker support for nested MMUs.  With those gone,
+> > > dissecting the nested MMU variant of kvm_mmu_get_page() should be simpler/cleaner
+> > > than dealing with the existing kvm_mmu_get_page(), i.e. should eliminate at least
+> > > some of the complexity/churn.
+> >
+> > These sound like useful improvements but I am not really seeing the
+> > value of sequencing them before this series:
+> >
+> >  - IMO the "churn" in patches 1-14 are a net improvement to the
+> > existing code. They improve readability by decomposing the shadow page
+> > creation path into smaller functions with better names, reduce the
+> > amount of redundant calculations, and reduce the dependence on struct
+> > kvm_vcpu where it is not needed. Even if eager page splitting is
+> > completely dropped I think they would be useful to merge.
+>
+> I definitely like some of patches 1-14, probably most after a few read throughs.
+> But there are key parts that I do not like that are motivated almost entirely by
+> the desire to support page splitting.  Specifically, I don't like splitting the
+> logic of finding a page, and I don't like having a separate alloc vs. initializer
+> (though I'm guessing this will be needed somewhere to split huge pages for nested
+> MMUs).
+>
+> E.g. I'd prefer the "get" flow look like the below (completely untested, for
+> discussion purposes only).  There's still churn, but the core loop is almost
+> entirely unchanged.
+>
+> And it's not just this series, I don't want future improvements nested TDP to have
+> to deal with the legacy baggage.
 
-Gah, got ahead of myself.  If we go this route, the caller would need to ensure
-it initializes mt_mask.  Probabably not worth it, so scratch that idea.  I also
-though about overloading the return type, e.g.
+One thing that would be helpful is if you can explain in a bit more
+specifically what you'd like to see. Part of the reason why I prefer
+to sequence your proposal after eager page splitting is that I do not
+fully understand what you're proposing, and how complex it would be.
+e.g. Forking FNAME(fetch), FNAME(page_fault), and kvm_mmu_get_page()
+for nested MMUs does not sound like less churn.
 
-	mt_mask = ...
-	if (mt_mask < 0)
-		return false;
+From my perspective, this series is a net improvement to the
+readability and maintainability of existing code, while adding a
+performance improvement (eager page splitting). All of the changes you
+are proposing can still be implemented on top if and when they become
+a priority (including merging {,__}kvm_find_shadow_page()). And if we
+limit eager page splitting to nested MMUs, we don't have to worry
+about maintaining eager page splitting with TDP shadow MMU or legacy
+shadow paging over time.
 
-But again, probably not a net positive.
+
+>
+> Waaaay off topic, why do we still bother with stat.max_mmu_page_hash_collision?
+> I assume it was originally added to tune the hashing logic?  At this point is it
+> anything but wasted cycles?
+>
+> static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm_vcpu *vcpu,
+>                                                      gfn_t gfn,
+>                                                      unsigned int gfn_hash,
+>                                                      union kvm_mmu_page_role role)
+> {
+>         struct hlist_head *sp_list = &kvm->arch.mmu_page_hash[gfn_hash];
+>         struct kvm_mmu_page *sp;
+>         LIST_HEAD(invalid_list);
+>
+>         int collisions = 0;
+>
+>         for_each_valid_sp(kvm, sp, sp_list) {
+>                 if (sp->gfn != gfn) {
+>                         collisions++;
+>                         continue;
+>                 }
+>
+>                 if (sp->role.word != role.word) {
+>                         /*
+>                          * If the guest is creating an upper-level page, zap
+>                          * unsync pages for the same gfn.  While it's possible
+>                          * the guest is using recursive page tables, in all
+>                          * likelihood the guest has stopped using the unsync
+>                          * page and is installing a completely unrelated page.
+>                          * Unsync pages must not be left as is, because the new
+>                          * upper-level page will be write-protected.
+>                          */
+>                         if (role.level > PG_LEVEL_4K && sp->unsync)
+>                                 kvm_mmu_prepare_zap_page(vcpu->kvm, sp, invalid_list);
+>
+>                         continue;
+>                 }
+>
+>                 /* unsync and write-flooding only apply to indirect SPs. */
+>                 if (sp->role.direct)
+>                         goto out;
+>
+>                 if (sp->unsync) {
+>                         /*
+>                          * The page is good, but is stale.  kvm_sync_page does
+>                          * get the latest guest state, but (unlike mmu_unsync_children)
+>                          * it doesn't write-protect the page or mark it synchronized!
+>                          * This way the validity of the mapping is ensured, but the
+>                          * overhead of write protection is not incurred until the
+>                          * guest invalidates the TLB mapping.  This allows multiple
+>                          * SPs for a single gfn to be unsync.
+>                          *
+>                          * If the sync fails, the page is zapped.  If so, break
+>                          * in order to rebuild it.
+>                          */
+>                         if (!kvm_sync_page(vcpu, sp, &invalid_list))
+>                                 break;
+>
+>                         WARN_ON(!list_empty(&invalid_list));
+>                         kvm_flush_remote_tlbs(vcpu->kvm);
+>                 }
+>
+>                 __clear_sp_write_flooding_count(sp);
+>                 goto out;
+>         }
+>
+>         sp = NULL;
+>
+> out:
+>         if (collisions > kvm->stat.max_mmu_page_hash_collisions)
+>                 kvm->stat.max_mmu_page_hash_collisions = collisions;
+>
+>         kvm_mmu_commit_zap_page(vcpu->kvm, &invalid_list);
+>         return sp;
+> }
+>
+> static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm_vcpu *vcpu,
+>                                                       gfn_t gfn,
+>                                                       unsigned int gfn_hash,
+>                                                       union kvm_mmu_page_role role)
+> {
+>         struct kvm_mmu_page *sp = __kvm_mmu_alloc_shadow_page(vcpu, role.direct);
+>         struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+>         struct hlist_head *sp_list = &kvm->arch.mmu_page_hash[gfn_hash];
+>
+>         ++kvm->stat.mmu_cache_miss;
+>
+>         sp->gfn = gfn;
+>         sp->role = role;
+>         sp->mmu_valid_gen = kvm->arch.mmu_valid_gen;
+>
+>         /*
+>          * active_mmu_pages must be a FIFO list, as kvm_zap_obsolete_pages()
+>          * depends on valid pages being added to the head of the list.  See
+>          * comments in kvm_zap_obsolete_pages().
+>          */
+>         list_add(&sp->link, &kvm->arch.active_mmu_pages);
+>         kvm_mod_used_mmu_pages(kvm, 1);
+>
+>         sp_list = &kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
+>         hlist_add_head(&sp->hash_link, sp_list);
+>
+>         if (!role.direct)
+>                 account_shadowed(kvm, slot, sp);
+> }
+>
+>
+> static struct kvm_mmu_page *kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
+>                                                     gfn_t gfn,
+>                                                     union kvm_mmu_page_role role)
+> {
+>         unsigned int gfn_hash = kvm_page_table_hashfn(gfn);
+>         struct kvm_mmu_page *sp;
+>         bool created = false;
+>
+>         sp = kvm_mmu_find_shadow_page(vcpu, gfn, gfn_hash, role);
+>         if (!sp) {
+>                 created = true;
+>                 sp = kvm_mmu_alloc_shadow_page(vcpu, gfn, gfn_hash, role);
+>         }
+>
+>         trace_kvm_mmu_get_page(sp, created);
+>         return sp;
+> }
