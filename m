@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD9C94FB95F
-	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 12:21:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE50B4FB955
+	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 12:21:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345363AbiDKKX3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Apr 2022 06:23:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45816 "EHLO
+        id S1345318AbiDKKXM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Apr 2022 06:23:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345406AbiDKKWk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Apr 2022 06:22:40 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A2A4433AD;
-        Mon, 11 Apr 2022 03:20:20 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id c2so13767095pga.10;
-        Mon, 11 Apr 2022 03:20:20 -0700 (PDT)
+        with ESMTP id S1345445AbiDKKWn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Apr 2022 06:22:43 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D3EE4348D;
+        Mon, 11 Apr 2022 03:20:23 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id t13so13778762pgn.8;
+        Mon, 11 Apr 2022 03:20:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=L0MhK9PPLx2ef+AAuUU4lyKe3grecX7ljWd/YJK+ko4=;
-        b=aBxoxMqACF7mABq4CmwecwDKPTJ8Nm7m07H0t1XpEW0qnvxvo7lrlC51BCm7j1D4Vw
-         XEvLOsfnDUKaaCTz4UB8DEtiO5f0gdOV07X1op03tTrHi2X0Gi21bZCam1uev+LHy9H7
-         7Mi2ajmTmXUqgUgCpFKfIjjN64uMIGE1GBdoTTebK2y8vRLhEG+ujRYGjZxxDvU2vZ2z
-         Tr3QGhAtnDyrkmKJ12/iTwq6m4qY0EQMG57OtOVcbyTiW9dVjrB5KKnRgRJsa8fWSvYS
-         MAlBdvuorUV7tPyVML7tuIIOVMRdHDjg1NH9cYGCjEDCdOjQaQ5oVxWt2fC0CPcb+dL0
-         2UZg==
+        bh=FSpmsUq+Y0Iwab+lZW8aA39I+ZTROv80Mw7pEjKq1fI=;
+        b=cPFKuaXT6myW+5ckk19GoIdFFahyzJlpwMMpdXhwvwY0zNfBQwivY4lwKAaXwYsx8V
+         hXkvip/+gr5tEq7qxREFCjachFr3MdxUnNejtGtUIQj5286gvMvSGQFGi9guUVhukCBW
+         cISkqcZRuZ9q5+zFZecbqiOM/rbxlSBaVEzwYFMezDM1ywU6zwxKa9lNkUax1MOS0o8d
+         AWxrnCkb6PQA2WAd4jefp6C+5aCaRdNAa6PNQDuv2Ek/Yyl0PijMe2RFuzSBWcllVz0X
+         NL7Z8NxruACR1cqIYASfGrb9XgTHeYf/SP1pHBztVvW9gf5wdt4M/J/ZawLySEhqjFYw
+         AmMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=L0MhK9PPLx2ef+AAuUU4lyKe3grecX7ljWd/YJK+ko4=;
-        b=0a3Z7l4qd2Ma1UXwVfe+urNHNEoTyDZiwDMzkt62djbdO0nXAJoRNtjg8j2a2j1Odg
-         SmeTKGYW9OwHoxRLiSSt/LLui8ti06pNwNjjzzsTlLvL9BPkaaP0iZWNTDy5C8/PL2xT
-         VqjN7naGIJsWTnlXeiZsOhpGuAytnojwgZj7iv1Z5qBjMvLO9xwQgFAMCFInbeMVaeSh
-         3+u/LqXACnRQ67JkBEMOhjtjmgt13vuc+8UXmcPc6WIPmCE7fH+fW6VxkRGOPn6BbmPO
-         sX2fxqjohYXN4A5uJoGVETyU66kDkFCV2XJXagZI20jttRCROJqtkKjDyI0De9M5Dwkh
-         ViCA==
-X-Gm-Message-State: AOAM533gNFJ4TwxkhX3o0aFLKHxs8WCierXUQnkCQHAepYehObc7RdPV
-        /dQlNasAkEm0CxP8wJvhVesjXK8oVhc=
-X-Google-Smtp-Source: ABdhPJyMVmD8BV0ERMT4XZC76RDq6DToaHMV3Ux3qlvvT8zLymKA5Zybj1yJ78W/wCtzlAznGBc77w==
-X-Received: by 2002:a65:4185:0:b0:399:4c59:e3b1 with SMTP id a5-20020a654185000000b003994c59e3b1mr25372115pgq.154.1649672419910;
-        Mon, 11 Apr 2022 03:20:19 -0700 (PDT)
+        bh=FSpmsUq+Y0Iwab+lZW8aA39I+ZTROv80Mw7pEjKq1fI=;
+        b=LzwgZEI2ElOd90YN4fTPzAwye2/fZBQoj81AWMfWVot1VYOHxwsHGStaN7Lh98cRjt
+         MmBOJrFUSr3tO1bkmzx/c/AkFFZQEXz0tSKv6kHq5TW/nLR+bD91YJ8T0rlIDf0KjVH+
+         r5UXg0mf8IAQsgM+owYP3w4GK7FXC81zT/cLYlwkTsle3ti0DxNDOUUm/11TBFIzmEbm
+         JFUxW3NY8t0vCd002BXIYTv+yL+n1pC0lKsvef5GzLm+LKvoYzWjeuZzmKi3EJc64FfJ
+         1EPsnd4A4Z7YphXzV/MVcsJi5f83dCiPnbZirqx0AGHd7azztgCwXkM1PO/tUV9sl3Xu
+         HblQ==
+X-Gm-Message-State: AOAM530ajXHZepwLLkoufQ8/KMek9LYK8RiGP8EPc5J6jtc49/9VSv/Q
+        qHcPT6cKcCYq0GcvC6WdgtMsTHL+VcE=
+X-Google-Smtp-Source: ABdhPJyUhjHOlKbl0JR8qHZzTPnLksP/DLfHWz9qZ8rj5uHZRjOxVn7mrmdVHj8BtF3poI/7yehpjw==
+X-Received: by 2002:a05:6a00:1a4a:b0:4f7:be32:3184 with SMTP id h10-20020a056a001a4a00b004f7be323184mr32181115pfv.65.1649672423065;
+        Mon, 11 Apr 2022 03:20:23 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.112])
-        by smtp.gmail.com with ESMTPSA id h10-20020a056a00230a00b004faa0f67c3esm34012280pfh.23.2022.04.11.03.20.17
+        by smtp.gmail.com with ESMTPSA id h10-20020a056a00230a00b004faa0f67c3esm34012280pfh.23.2022.04.11.03.20.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Apr 2022 03:20:19 -0700 (PDT)
+        Mon, 11 Apr 2022 03:20:22 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -57,9 +57,9 @@ Cc:     Peter Zijlstra <peterz@infradead.org>,
         Wanpeng Li <wanpengli@tencent.com>,
         Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: [PATCH RESEND v12 09/17] KVM: x86/pmu: Adjust precise_ip to emulate Ice Lake guest PDIR counter
-Date:   Mon, 11 Apr 2022 18:19:38 +0800
-Message-Id: <20220411101946.20262-10-likexu@tencent.com>
+Subject: [PATCH RESEND v12 10/17] KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to support guest DS
+Date:   Mon, 11 Apr 2022 18:19:39 +0800
+Message-Id: <20220411101946.20262-11-likexu@tencent.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220411101946.20262-1-likexu@tencent.com>
 References: <20220411101946.20262-1-likexu@tencent.com>
@@ -77,75 +77,125 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <like.xu@linux.intel.com>
 
-The PEBS-PDIR facility on Ice Lake server is supported on IA31_FIXED0 only.
-If the guest configures counter 32 and PEBS is enabled, the PEBS-PDIR
-facility is supposed to be used, in which case KVM adjusts attr.precise_ip
-to 3 and request host perf to assign the exactly requested counter or fail.
+When CPUID.01H:EDX.DS[21] is set, the IA32_DS_AREA MSR exists and points
+to the linear address of the first byte of the DS buffer management area,
+which is used to manage the PEBS records.
 
-The CPU model check is also required since some platforms may place the
-PEBS-PDIR facility in another counter index.
+When guest PEBS is enabled, the MSR_IA32_DS_AREA MSR will be added to the
+perf_guest_switch_msr() and switched during the VMX transitions just like
+CORE_PERF_GLOBAL_CTRL MSR. The WRMSR to IA32_DS_AREA MSR brings a #GP(0)
+if the source register contains a non-canonical address.
 
+Originally-by: Andi Kleen <ak@linux.intel.com>
+Co-developed-by: Kan Liang <kan.liang@linux.intel.com>
+Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- arch/x86/events/intel/core.c | 2 +-
- arch/x86/kvm/pmu.c           | 2 ++
- arch/x86/kvm/pmu.h           | 8 ++++++++
- 3 files changed, 11 insertions(+), 1 deletion(-)
+ arch/x86/events/intel/core.c    | 10 +++++++++-
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/vmx/pmu_intel.c    | 11 +++++++++++
+ arch/x86/kvm/x86.c              |  2 +-
+ 4 files changed, 22 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index 270356df4add..45f3bab5d423 100644
+index 45f3bab5d423..07df5e7f444c 100644
 --- a/arch/x86/events/intel/core.c
 +++ b/arch/x86/events/intel/core.c
-@@ -4024,8 +4024,8 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
+@@ -14,6 +14,7 @@
+ #include <linux/slab.h>
+ #include <linux/export.h>
+ #include <linux/nmi.h>
++#include <linux/kvm_host.h>
  
- 	if (!x86_pmu.pebs_ept)
+ #include <asm/cpufeature.h>
+ #include <asm/hardirq.h>
+@@ -3990,6 +3991,7 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
+ {
+ 	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
+ 	struct perf_guest_switch_msr *arr = cpuc->guest_switch_msrs;
++	struct kvm_pmu *kvm_pmu = (struct kvm_pmu *)data;
+ 	u64 intel_ctrl = hybrid(cpuc->pmu, intel_ctrl);
+ 	u64 pebs_mask = cpuc->pebs_enabled & x86_pmu.pebs_capable;
+ 	int global_ctrl, pebs_enable;
+@@ -4022,9 +4024,15 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
  		return arr;
--	pebs_enable = (*nr)++;
- 
-+	pebs_enable = (*nr)++;
- 	arr[pebs_enable] = (struct perf_guest_switch_msr){
- 		.msr = MSR_IA32_PEBS_ENABLE,
- 		.host = cpuc->pebs_enabled & ~cpuc->intel_ctrl_guest_mask,
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 36487088f72c..c1312cd32237 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -175,6 +175,8 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
- 		 * could possibly care here is unsupported and needs changes.
- 		 */
- 		attr.precise_ip = 1;
-+		if (x86_match_cpu(vmx_icl_pebs_cpu) && pmc->idx == 32)
-+			attr.precise_ip = 3;
  	}
  
- 	event = perf_event_create_kernel_counter(&attr, -1, current,
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 2a53b6c9495c..06e750824da1 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -4,6 +4,8 @@
+-	if (!x86_pmu.pebs_ept)
++	if (!kvm_pmu || !x86_pmu.pebs_ept)
+ 		return arr;
  
- #include <linux/nospec.h>
- 
-+#include <asm/cpu_device_id.h>
++	arr[(*nr)++] = (struct perf_guest_switch_msr){
++		.msr = MSR_IA32_DS_AREA,
++		.host = (unsigned long)cpuc->ds,
++		.guest = kvm_pmu->ds_area,
++	};
 +
- #define vcpu_to_pmu(vcpu) (&(vcpu)->arch.pmu)
- #define pmu_to_vcpu(pmu)  (container_of((pmu), struct kvm_vcpu, arch.pmu))
- #define pmc_to_pmu(pmc)   (&(pmc)->vcpu->arch.pmu)
-@@ -15,6 +17,12 @@
- #define VMWARE_BACKDOOR_PMC_REAL_TIME		0x10001
- #define VMWARE_BACKDOOR_PMC_APPARENT_TIME	0x10002
+ 	pebs_enable = (*nr)++;
+ 	arr[pebs_enable] = (struct perf_guest_switch_msr){
+ 		.msr = MSR_IA32_PEBS_ENABLE,
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index be65c6527a8b..f4152e85eca8 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -518,6 +518,7 @@ struct kvm_pmu {
+ 	DECLARE_BITMAP(all_valid_pmc_idx, X86_PMC_IDX_MAX);
+ 	DECLARE_BITMAP(pmc_in_use, X86_PMC_IDX_MAX);
  
-+static const struct x86_cpu_id vmx_icl_pebs_cpu[] = {
-+	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_D, NULL),
-+	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_X, NULL),
-+	{}
-+};
-+
- struct kvm_event_hw_type_mapping {
- 	u8 eventsel;
- 	u8 unit_mask;
++	u64 ds_area;
+ 	u64 pebs_enable;
+ 	u64 pebs_enable_mask;
+ 
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index c7de5bc985c2..54379fcbf803 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -217,6 +217,9 @@ static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+ 	case MSR_IA32_PEBS_ENABLE:
+ 		ret = vcpu->arch.perf_capabilities & PERF_CAP_PEBS_FORMAT;
+ 		break;
++	case MSR_IA32_DS_AREA:
++		ret = guest_cpuid_has(vcpu, X86_FEATURE_DS);
++		break;
+ 	default:
+ 		ret = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0) ||
+ 			get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0) ||
+@@ -367,6 +370,9 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_IA32_PEBS_ENABLE:
+ 		msr_info->data = pmu->pebs_enable;
+ 		return 0;
++	case MSR_IA32_DS_AREA:
++		msr_info->data = pmu->ds_area;
++		return 0;
+ 	default:
+ 		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
+ 		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
+@@ -435,6 +441,11 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			return 0;
+ 		}
+ 		break;
++	case MSR_IA32_DS_AREA:
++		if (is_noncanonical_address(data, vcpu))
++			return 1;
++		pmu->ds_area = data;
++		return 0;
+ 	default:
+ 		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
+ 		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 14902288cbb8..1f2e402d05bd 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1443,7 +1443,7 @@ static const u32 msrs_to_save_all[] = {
+ 	MSR_ARCH_PERFMON_EVENTSEL0 + 12, MSR_ARCH_PERFMON_EVENTSEL0 + 13,
+ 	MSR_ARCH_PERFMON_EVENTSEL0 + 14, MSR_ARCH_PERFMON_EVENTSEL0 + 15,
+ 	MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 + 17,
+-	MSR_IA32_PEBS_ENABLE,
++	MSR_IA32_PEBS_ENABLE, MSR_IA32_DS_AREA,
+ 
+ 	MSR_K7_EVNTSEL0, MSR_K7_EVNTSEL1, MSR_K7_EVNTSEL2, MSR_K7_EVNTSEL3,
+ 	MSR_K7_PERFCTR0, MSR_K7_PERFCTR1, MSR_K7_PERFCTR2, MSR_K7_PERFCTR3,
 -- 
 2.35.1
 
