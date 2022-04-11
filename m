@@ -2,142 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 664714FBFD5
-	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 17:07:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 782F04FBFDF
+	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 17:09:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347623AbiDKPJU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Apr 2022 11:09:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34252 "EHLO
+        id S1347640AbiDKPLL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Apr 2022 11:11:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242472AbiDKPJT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Apr 2022 11:09:19 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCC9E626D
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 08:07:03 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id bg24so3135060pjb.1
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 08:07:03 -0700 (PDT)
+        with ESMTP id S241839AbiDKPLJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Apr 2022 11:11:09 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31DF72AE11
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 08:08:53 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id p10so27128579lfa.12
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 08:08:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=shutemov-name.20210112.gappssmtp.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=dPdu8Eiipa0SimY9s3UtwwUyWmEESIKixwaOvVsXgGk=;
-        b=fPoN4PzXw5Nx0S16GH9zAA+N8qLMX77QH+IQL+Zro+uR5vWA6DYNpt+eA/Uykb4APB
-         WvP+K888IGg5bWeBYo6xzTQUKqqbVBwoJjbblyalY/8FU2uumMLDW8eZA4DNwiGrkcYp
-         iq7Vxnwr81oH96Y2xMlPpU+ssf9D9N8k900dgevGPB1KYn8kjhx0falLkyj/lzxmvgoc
-         i3gBzCLTJeK+qdWEh1ISMXL+z3Vq3FFQM5qu3fYLKHoQ5zj4BCfAcZGDIFUvQT4VerGo
-         54eAV4pI3R1ZM+kOS04YHmgAPR16sp8rrRKH1sxuY+UWhexKq7ksyNxSGhPNLKglRrxP
-         ZKDg==
+        bh=SZ3/Vx+1Q7uH45Ete1zY0f2BZJWVMOSE6BEs5zWCYbs=;
+        b=7DIUdDw1bDVY/1pX9CrYKqoUnxn4Af2165TByD3u5HZ0iXmIdkyeDLerqJVS4ILYb2
+         sr8EaHNWEoVQlow3SdmLYTkP5xN8dgvPftKQlE2GzWppJ9Nm1Jc8ZkbxJeZp/XQcv+bm
+         CkITSbBdcYbYkEIbRjUo+wMmeMYCl/ckl8Eyh5jpmDByZr90ijXMmjL2GuwmjJqoSc6X
+         41HpTTObRQn2DziTHtTZKAPeR3G4oO4JnMRiHaWm+nxgPN2SgqBjtuDslRAMsgbobCqJ
+         zrEUAd863LfUu4IdojsoK+HRzJ1QfBeJabFS3cJ9rTqFAAPFDxSzIUbnYMV1zoLxx+KI
+         BBkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=dPdu8Eiipa0SimY9s3UtwwUyWmEESIKixwaOvVsXgGk=;
-        b=oKm/3b45cRKIbBQagKzMnE5Qg8GqfHTNUQkx71kvtKNCnM8BU1BmtuA+GxLtWe3X0b
-         5gDBMIOz8qKJl5fWRJ7BhlR9hjotKTodpzVol9gCrfdO+/hTrBj/n7bsHnxd3Tagn4+a
-         WFLp7GQhLJn18WNyzf8zIfHbui1Xy0407y4GM3Np9wuJ9kMt0yeVafzqQ0rmmfXHakez
-         Qhb4U3gOH0ZFgwnyJpoTqU6dQSLIb5h1MD9Y+3qHeqld2Ir/nmo7alyNAhI4s1PvCAhz
-         QFQdywQloUrUR8AncGM5QZ5nFHmUuDbvVv4eF+3H/vtZQR7wnfrn/x92keWcAZSx8uSI
-         89eg==
-X-Gm-Message-State: AOAM530NE2CNH42nmkz661I4nUOkFj31qjeDXw8jpOxO6+UILJu194zQ
-        vjAd+F2VY6Y8pRivAxGNyyJLqA==
-X-Google-Smtp-Source: ABdhPJwWxloJ5ZjN13tMopqeMsu31rcmrfB0Bx9G2376e9G0Y6ZGn5Fd+LcgqDo3n2MDJMXUzAYw6A==
-X-Received: by 2002:a17:90a:7004:b0:1cb:55d6:9f23 with SMTP id f4-20020a17090a700400b001cb55d69f23mr16547316pjk.187.1649689622903;
-        Mon, 11 Apr 2022 08:07:02 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id a9-20020aa78649000000b004fe3d6c1731sm22743924pfo.175.2022.04.11.08.07.02
+        bh=SZ3/Vx+1Q7uH45Ete1zY0f2BZJWVMOSE6BEs5zWCYbs=;
+        b=PgU7ePfMqAvBxqsuVIsr5a/FqrFTEnlxup+xmVGHViALx6Z0JQKDPTXhZ/ZHBm4kEf
+         nW802MNJCUfYlgLiKeGQZZTbO+sIWSS3B0XGMesu8jXV4F4tY5Ngy+24E/ep/F35eITR
+         4g3A6inefDjQTwgErUNLamrSdJypuqCFO9E0Jv9wqT3iwSYXLYi6wIPE31gqdcKHl/qx
+         2JBlXIssxZw7as0uGc6cvZKVexVjdhhosiaWl7D/Mz88A4oLa/iePF8hWyweyJvbhBWy
+         UcDK0kMwi1MWTe3+0Sc6esYwsJmuVaGgCC//Kb3SMLvKdEn9T4P3KRwiyQTCSDiortnR
+         2OTg==
+X-Gm-Message-State: AOAM531y6uonrDFk3wHrf3BFoDx3MYzHDegEf9xxE4pWC5dzcNGM0BSw
+        wr5dxkfsk3hXw0Xp3rH5SsyLcw==
+X-Google-Smtp-Source: ABdhPJwVzRe0aqmUWVOSiTlNptfcMMnBCa3LaWdYU4CM/MHAyK3juuV+XEpH4cZF1tu2LetUDByrEw==
+X-Received: by 2002:a05:6512:3f29:b0:450:ac79:77dd with SMTP id y41-20020a0565123f2900b00450ac7977ddmr21705662lfa.301.1649689731304;
+        Mon, 11 Apr 2022 08:08:51 -0700 (PDT)
+Received: from box.localdomain ([86.57.175.117])
+        by smtp.gmail.com with ESMTPSA id t2-20020a05651c204200b0024b4bc5d324sm1197193ljo.79.2022.04.11.08.08.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Apr 2022 08:07:02 -0700 (PDT)
-Date:   Mon, 11 Apr 2022 15:06:58 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     Will Deacon <will@kernel.org>, Peter Gonda <pgonda@google.com>,
-        kvm list <kvm@vger.kernel.org>,
+        Mon, 11 Apr 2022 08:08:50 -0700 (PDT)
+Received: by box.localdomain (Postfix, from userid 1000)
+        id 41CC4103CE0; Mon, 11 Apr 2022 18:10:23 +0300 (+03)
+Date:   Mon, 11 Apr 2022 18:10:23 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, qemu-devel@nongnu.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Anup Patel <anup@brainfault.org>, maz@kernel.org
-Subject: Re: [PATCH v4.1] KVM, SEV: Add KVM_EXIT_SHUTDOWN metadata for SEV-ES
-Message-ID: <YlREEillLRjevKA2@google.com>
-References: <20220407210233.782250-1-pgonda@google.com>
- <Yk+kNqJjzoJ9TWVH@google.com>
- <CAMkAt6oc=SOYryXu+_w+WZR+VkMZfLR3_nd=hDvMU_cmOjJ0Xg@mail.gmail.com>
- <YlBqYcXFiwur3zmo@google.com>
- <20220411091213.GA2120@willie-the-truck>
- <YlQ0LZyAgjGr7qX7@e121798.cambridge.arm.com>
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com
+Subject: Re: [PATCH v5 01/13] mm/memfd: Introduce MFD_INACCESSIBLE flag
+Message-ID: <20220411151023.4nx34pxyg5amj44m@box.shutemov.name>
+References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
+ <20220310140911.50924-2-chao.p.peng@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YlQ0LZyAgjGr7qX7@e121798.cambridge.arm.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220310140911.50924-2-chao.p.peng@linux.intel.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 11, 2022, Alexandru Elisei wrote:
-> Hi,
->
-> On Mon, Apr 11, 2022 at 10:12:13AM +0100, Will Deacon wrote:
-> > Hi Sean,
-> >
-> > Cheers for the heads-up.
-> >
-> > [+Marc and Alex as this looks similar to [1]]
-> >
-> > On Fri, Apr 08, 2022 at 05:01:21PM +0000, Sean Christopherson wrote:
-> > > system_event.flags is broken (at least on x86) due to the prior 'type' field not
-> > > being propery padded, e.g. userspace will read/write garbage if the userspace
-> > > and kernel compilers pad structs differently.
-> > >
-> > >           struct {
-> > >                   __u32 type;
-> > >                   __u64 flags;
-> > >           } system_event;
-> >
-> > On arm64, I think the compiler is required to put the padding between type
-> > and flags so that both the struct and 'flags' are 64-bit aligned [2]. Does
-> > x86 not offer any guarantees on the overall structure alignment?
->
-> This is also my understanding. The "Procedure Call Standard for the Arm
-> 64-bit Architecture" [1] has these rules for structs (called "aggregates"):
+On Thu, Mar 10, 2022 at 10:08:59PM +0800, Chao Peng wrote:
+> From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+> 
+> Introduce a new memfd_create() flag indicating the content of the
+> created memfd is inaccessible from userspace through ordinary MMU
+> access (e.g., read/write/mmap). However, the file content can be
+> accessed via a different mechanism (e.g. KVM MMU) indirectly.
+> 
+> It provides semantics required for KVM guest private memory support
+> that a file descriptor with this flag set is going to be used as the
+> source of guest memory in confidential computing environments such
+> as Intel TDX/AMD SEV but may not be accessible from host userspace.
+> 
+> Since page migration/swapping is not yet supported for such usages
+> so these pages are currently marked as UNMOVABLE and UNEVICTABLE
+> which makes them behave like long-term pinned pages.
+> 
+> The flag can not coexist with MFD_ALLOW_SEALING, future sealing is
+> also impossible for a memfd created with this flag.
+> 
+> At this time only shmem implements this flag.
+> 
+> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> ---
+>  include/linux/shmem_fs.h   |  7 +++++
+>  include/uapi/linux/memfd.h |  1 +
+>  mm/memfd.c                 | 26 +++++++++++++++--
+>  mm/shmem.c                 | 57 ++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 88 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/linux/shmem_fs.h b/include/linux/shmem_fs.h
+> index e65b80ed09e7..2dde843f28ef 100644
+> --- a/include/linux/shmem_fs.h
+> +++ b/include/linux/shmem_fs.h
+> @@ -12,6 +12,9 @@
+>  
+>  /* inode in-kernel data */
+>  
+> +/* shmem extended flags */
+> +#define SHM_F_INACCESSIBLE	0x0001  /* prevent ordinary MMU access (e.g. read/write/mmap) to file content */
+> +
+>  struct shmem_inode_info {
+>  	spinlock_t		lock;
+>  	unsigned int		seals;		/* shmem seals */
+> @@ -24,6 +27,7 @@ struct shmem_inode_info {
+>  	struct shared_policy	policy;		/* NUMA memory alloc policy */
+>  	struct simple_xattrs	xattrs;		/* list of xattrs */
+>  	atomic_t		stop_eviction;	/* hold when working on inode */
+> +	unsigned int		xflags;		/* shmem extended flags */
+>  	struct inode		vfs_inode;
+>  };
+>  
 
-AFAIK, all x86 compilers will pad structures accordingly, but a 32-bit userspace
-running against a 64-bit kernel will have different alignment requirements, i.e.
-won't pad, and x86 supports CONFIG_KVM_COMPAT=y.  And I have no idea what x86's
-bizarre x32 ABI does.
+AFAICS, only two bits of 'flags' are used. And that's very strange that
+VM_ flags are used for the purpose. My guess that someone was lazy to
+introduce new constants for this.
 
-> > > Our plan to unhose this is to change the struct as follows and use bit 31 in the
-> > > 'type' to indicate that ndata+data are valid.
-> > >
-> > >           struct {
-> > >                         __u32 type;
-> > >                   __u32 ndata;
-> > >                   __u64 data[16];
-> > >                 } system_event;
-> > >
-> > > Any objection to updating your architectures to use a helper to set the bit and
-> > > populate ndata+data accordingly?  It'll require a userspace update, but v5.18
-> > > hasn't officially released yet so it's not kinda sort not ABI breakage.
-> >
-> > It's a bit annoying, as we're using the current structure in Android 13 :/
-> > Obviously, if there's no choice then upstream shouldn't worry, but it means
-> > we'll have to carry a delta in crosvm. Specifically, the new 'ndata' field
-> > is going to be unusable for us because it coincides with the padding.
+I think we should fix this: introduce SHM_F_LOCKED and SHM_F_NORESERVE
+alongside with SHM_F_INACCESSIBLE and stuff them all into info->flags.
+It also makes shmem_file_setup_xflags() go away.
 
-Yeah, it'd be unusuable for existing types.  One idea is that we could define the
-ABI to be that the RESET and SHUTDOWN types have an implicit ndata=1 on arm64 and
-RISC-V.  That would allow keeping the flags interpretation and so long as crosvm
-doesn't do something stupid like compile with "pragma pack" (does clang even support
-that?), there's no delta necessary for Android.
-
-> Just a thought, but wouldn't such a drastical change be better implemented
-> as a new exit_reason and a new associated struct?
-
-Maybe?  I wasn't aware that arm64/RISC-V picked up usage of "flags" when I
-suggested this, but I'm not sure it would have changed anything.  We could add
-SYSTEM_EVENT2 or whatever, but since there's no official usage of flags, it seems
-a bit gratutious.
+-- 
+ Kirill A. Shutemov
