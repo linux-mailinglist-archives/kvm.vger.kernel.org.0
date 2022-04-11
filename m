@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 43FCB4FC658
-	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 23:10:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 90BB34FC663
+	for <lists+kvm@lfdr.de>; Mon, 11 Apr 2022 23:11:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350030AbiDKVM5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Apr 2022 17:12:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38006 "EHLO
+        id S1350038AbiDKVM7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Apr 2022 17:12:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350015AbiDKVMz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Apr 2022 17:12:55 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C37715822
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 14:10:40 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id l3-20020a170903244300b001570540beb6so5012260pls.16
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 14:10:40 -0700 (PDT)
+        with ESMTP id S1350014AbiDKVM5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Apr 2022 17:12:57 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 838D315822
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 14:10:42 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 78-20020a630551000000b0039958c05e70so9454362pgf.8
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 14:10:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=6WTud4t2/o0hsvjWQOQfdmuf5Jf6mvrUa1JIGUzDHLI=;
-        b=VHuO5hifqls6sBiOFF5trRISTudPJeSwLA69oUCU92UK7hmXgQ3INRQpOKeXurszhH
-         EDVKKYo5KOuKzaHnVJfH22q6tXxy+3wf3b+YDD40dAt1q2vuG18/51poqqXCto931V/n
-         gP7pZY6UPTcqwOeqUPzi+IQAZne0jzBjhUbZE+qNGzBkT/TuS7m1NMlSZ/ruGj/aWvXQ
-         Fly45ZuxfYEGtm15GgL0luQMUfYss1s3Bao9xsB5D/Wkb9pgR4C++cy6sRx6dlbfZFij
-         AuOL6YT/sCdXkE9G/r3cSEpeSB3fJ3ayZ5QUgjExwRLjnlYd+SlX/ddQ6sktXzv8zTtg
-         EPPg==
+        bh=jowVcPeazSi67SHgtKHyWBS9ErkTHd94DAj2Ts0QL0M=;
+        b=Fkyh/qBc5dAbHEPYor9iqLZ2edWjPV7qo03ufqQAJHs5D95oaD8g1hbsktBpWjPvd8
+         Tj9GgivDJotqnPauWNFysO5DvaLksOyFYeq0WEOq9k+BXexF9ZK5YA7j27I9YinVQRuq
+         YYo8VRSpCeYCmwERrYYwq1qXnVf7h47eFGcKneLkLYymrLIVwooPor/E3ApLLjyp0+VC
+         ASaaFV8CVJClt7aQtjPiw7HsMJERACVWfm/BoluRf+O1D0t2GM+vb/IZEgO+SO0K+IgB
+         mFIPumy9JwhOMQtO3nHrUZLgCcirwK7VfF4EWnCjEf6WGiPnNXtTf0jtX1s8uhh3oIL8
+         X7HQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=6WTud4t2/o0hsvjWQOQfdmuf5Jf6mvrUa1JIGUzDHLI=;
-        b=rFGOPH+RetQ2M+MwvWjzjw5RBaLR1saKbXLiOLsH5YjyroM6iIjXAq8P2wqeXUZtrg
-         Xud+kyl1PEfKz9wzWz7TQC/ZcKoo5Q8vufyTq9NrG4BxeehUsYMNEza6sZz8PB6t6NHP
-         +xR6sJGFNLKzAP5W31B4OkMYYxHXzdh+rW0AJ2y2IJHTZtEkhxK+A0ULWcQBggKzcHLM
-         wYPGPQWrSH2vmQFeoD9hvxHLoMNQzvADuc8lMCzj1Z2OdI7+FdZyuZ9lJXJ8h5pzSLU7
-         IvpdYbXLDnmrGIcTNsBQPuO7fb87Yuw1rqfZCOG0T+V+4P+DglLQE2Nm3iWvidOZVB5h
-         1qlg==
-X-Gm-Message-State: AOAM530IBduvg5PPVeLI/tPmJj7Rf4PwSBbT5P0JpLR6e7phGhxtBMLW
-        V1smtZaKbws8ZP58cXRjn6ELPkgDoskE
-X-Google-Smtp-Source: ABdhPJzijb1tEhtGCiz626QqQz2oBsdS4t++17JOsaPUm80osckqSdyQGNl8CQiPE3Gl+j2KfvnOxc2Gz00D
+        bh=jowVcPeazSi67SHgtKHyWBS9ErkTHd94DAj2Ts0QL0M=;
+        b=U/KaxIfsZKJgQebAsp0lUsQojflrLQk/cWZLNNjR0oKNauZb9pP81Dz/vLUTryqxLo
+         dQFNIxao00m5NEW2dWRfuVVTWPqiuQqA4xbyn4DycrWv/4p17DQE50w3LKzzV/N2bztR
+         3AcoGrLl7fdpgNeuGG9GsiIj4meIHWaD3hH/2+zqJQPJ6hCPs8YwtKeRm7vvd8rMDcZa
+         WsX4jZq5l65rpGWb8K6rk5jf9Pvqmgc+bSkd6R5Vn1cffsQXBD8WPT9a1nF+6kJE02TL
+         0SP9QGCZUfY/496yjQvPz1nXnfp/3KWJJsTtGniXvF/CXweTMG3BU78jZKV1PsYo1SWH
+         YTjQ==
+X-Gm-Message-State: AOAM530/t3rq4qKL4yb4Lk9zQjvOXa/TjWuctWErBsldFrbT1zx15jew
+        6DGw1iuD1lFOKZhFOew+CbVi7HiNyCkV
+X-Google-Smtp-Source: ABdhPJw5goVNxXsGn1XxWfE1rh4zn1jaQ5MJFUoJlaymhAL+7IoXVGg0+wZdui9Zaj+6jHwCcufa++gDmrrn
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:a2d0:faec:7d8b:2e0b])
- (user=bgardon job=sendgmr) by 2002:a17:903:2488:b0:156:1e8d:a82 with SMTP id
- p8-20020a170903248800b001561e8d0a82mr34228889plw.51.1649711439874; Mon, 11
- Apr 2022 14:10:39 -0700 (PDT)
-Date:   Mon, 11 Apr 2022 14:10:07 -0700
+ (user=bgardon job=sendgmr) by 2002:a17:90b:2384:b0:1cb:5223:9dc4 with SMTP id
+ mr4-20020a17090b238400b001cb52239dc4mr116087pjb.1.1649711441713; Mon, 11 Apr
+ 2022 14:10:41 -0700 (PDT)
+Date:   Mon, 11 Apr 2022 14:10:08 -0700
 In-Reply-To: <20220411211015.3091615-1-bgardon@google.com>
-Message-Id: <20220411211015.3091615-3-bgardon@google.com>
+Message-Id: <20220411211015.3091615-4-bgardon@google.com>
 Mime-Version: 1.0
 References: <20220411211015.3091615-1-bgardon@google.com>
 X-Mailer: git-send-email 2.35.1.1178.g4f1659d476-goog
-Subject: [PATCH v4 02/10] KVM: selftests: Read binary stats header in lib
+Subject: [PATCH v4 03/10] KVM: selftests: Read binary stats desc in lib
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -75,60 +75,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the code to read the binary stats header to the KVM selftests
+Move the code to read the binary stats descriptors to the KVM selftests
 library. It will be re-used by other tests to check KVM behavior.
 
 No functional change intended.
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- tools/testing/selftests/kvm/include/kvm_util_base.h | 1 +
- tools/testing/selftests/kvm/kvm_binary_stats_test.c | 4 ++--
- tools/testing/selftests/kvm/lib/kvm_util.c          | 8 ++++++++
- 3 files changed, 11 insertions(+), 2 deletions(-)
+ .../selftests/kvm/include/kvm_util_base.h     |  4 +++
+ .../selftests/kvm/kvm_binary_stats_test.c     |  9 ++----
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 29 +++++++++++++++++++
+ 3 files changed, 35 insertions(+), 7 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index 92cef0ffb19e..5ba3132f3110 100644
+index 5ba3132f3110..c5f34551ff76 100644
 --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
 +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -400,6 +400,7 @@ void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid);
- 
+@@ -401,6 +401,10 @@ void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid);
  int vm_get_stats_fd(struct kvm_vm *vm);
  int vcpu_get_stats_fd(struct kvm_vm *vm, uint32_t vcpuid);
-+void read_vm_stats_header(int stats_fd, struct kvm_stats_header *header);
+ void read_vm_stats_header(int stats_fd, struct kvm_stats_header *header);
++struct kvm_stats_desc *alloc_vm_stats_desc(int stats_fd,
++					  struct kvm_stats_header *header);
++void read_vm_stats_desc(int stats_fd, struct kvm_stats_header *header,
++			struct kvm_stats_desc *stats_desc);
  
  uint32_t guest_get_vcpuid(void);
  
 diff --git a/tools/testing/selftests/kvm/kvm_binary_stats_test.c b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-index dad34d8a41fe..22c22a90f15a 100644
+index 22c22a90f15a..e4795bad7db6 100644
 --- a/tools/testing/selftests/kvm/kvm_binary_stats_test.c
 +++ b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-@@ -33,8 +33,8 @@ static void stats_test(int stats_fd)
- 	struct kvm_stats_desc *pdesc;
+@@ -62,14 +62,9 @@ static void stats_test(int stats_fd)
+ 							header.data_offset),
+ 			"Descriptor block is overlapped with data block");
  
- 	/* Read kvm stats header */
--	ret = read(stats_fd, &header, sizeof(header));
--	TEST_ASSERT(ret == sizeof(header), "Read stats header");
-+	read_vm_stats_header(stats_fd, &header);
-+
- 	size_desc = sizeof(*stats_desc) + header.name_size;
+-	/* Allocate memory for stats descriptors */
+-	stats_desc = calloc(header.num_desc, size_desc);
+-	TEST_ASSERT(stats_desc, "Allocate memory for stats descriptors");
+ 	/* Read kvm stats descriptors */
+-	ret = pread(stats_fd, stats_desc,
+-			size_desc * header.num_desc, header.desc_offset);
+-	TEST_ASSERT(ret == size_desc * header.num_desc,
+-			"Read KVM stats descriptors");
++	stats_desc = alloc_vm_stats_desc(stats_fd, &header);
++	read_vm_stats_desc(stats_fd, &header, stats_desc);
  
- 	/* Read kvm stats id string */
+ 	/* Sanity check for fields in descriptors */
+ 	for (i = 0; i < header.num_desc; ++i) {
 diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 1665a220abcb..0caf28e324ed 100644
+index 0caf28e324ed..e3ae26fbef03 100644
 --- a/tools/testing/selftests/kvm/lib/kvm_util.c
 +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -2556,3 +2556,11 @@ int vcpu_get_stats_fd(struct kvm_vm *vm, uint32_t vcpuid)
- 
- 	return ioctl(vcpu->fd, KVM_GET_STATS_FD, NULL);
+@@ -2564,3 +2564,32 @@ void read_vm_stats_header(int stats_fd, struct kvm_stats_header *header)
+ 	ret = read(stats_fd, header, sizeof(*header));
+ 	TEST_ASSERT(ret == sizeof(*header), "Read stats header");
  }
 +
-+void read_vm_stats_header(int stats_fd, struct kvm_stats_header *header)
++static ssize_t stats_descs_size(struct kvm_stats_header *header)
++{
++	return header->num_desc *
++	       (sizeof(struct kvm_stats_desc) + header->name_size);
++}
++
++/* Caller is responsible for freeing the returned kvm_stats_desc. */
++struct kvm_stats_desc *alloc_vm_stats_desc(int stats_fd,
++					  struct kvm_stats_header *header)
++{
++	struct kvm_stats_desc *stats_desc;
++
++	stats_desc = malloc(stats_descs_size(header));
++	TEST_ASSERT(stats_desc, "Allocate memory for stats descriptors");
++
++	return stats_desc;
++}
++
++void read_vm_stats_desc(int stats_fd, struct kvm_stats_header *header,
++			struct kvm_stats_desc *stats_desc)
 +{
 +	ssize_t ret;
 +
-+	ret = read(stats_fd, header, sizeof(*header));
-+	TEST_ASSERT(ret == sizeof(*header), "Read stats header");
++	ret = pread(stats_fd, stats_desc, stats_descs_size(header),
++		    header->desc_offset);
++	TEST_ASSERT(ret == stats_descs_size(header),
++		    "Read KVM stats descriptors");
 +}
 -- 
 2.35.1.1178.g4f1659d476-goog
