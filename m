@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A27CE4FE255
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 15:22:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3A274FE2A8
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 15:30:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355373AbiDLNYI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 09:24:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56708 "EHLO
+        id S1355854AbiDLNYj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 09:24:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356323AbiDLNXH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1356330AbiDLNXH (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 12 Apr 2022 09:23:07 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AA4B218B
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C8E225E9
         for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 06:13:56 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D650AB81D76
+        by ams.source.kernel.org (Postfix) with ESMTPS id DA805B81D77
         for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 13:13:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 766A5C385A5;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8139FC385A6;
         Tue, 12 Apr 2022 13:13:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1649769233;
-        bh=3RoMGxcoj6ldO5clo4J4GuibpjgvSYGpjgzHSrg9Xfk=;
-        h=From:To:Cc:Subject:Date:From;
-        b=Lnh5aQWvNYQHxAKP1r6WsxA9f0WBWqBHazaF1W6rRIuIKGqYgcIICYIYL8DDoKjJA
-         tOFmaVpsmHxoPYni3VCox96Dt7wkieKyGMPHIlFyUZRaSEwyfctKMYctbj3DNreZmL
-         32b7YzLZtNhPGSo67xt6vkAvsHhjYJtqw5MY2bNUeDjrWaUvVzV2V5YKjFSaoYX7fm
-         IW2lgRUEXiuPBILRE74o9VjafLEx24//QrNoUDbpZHP3vQnG80d/A01WHIY1qHZiNO
-         +lRC2M5Bnd3cD0d660fqs/lgTChMhxikEV4tbVlwGhrFcNZuWgqsjaDNVzfgyo1PLb
-         3HFj9UoNktOzw==
+        bh=SpKp3TCBsOBkzmGD30AlbWzu/c5WczQQXE0rta2jfmY=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=pDDrQf7AiYZQslPFKSED5wqcAyN1pNVPNYZl6UrznnRPS1460iecM9izlYi39L1wB
+         s5B9ZRWHuoKmcPYqZnV2TYXpPU0qxRAa+2IvkXSfJOtZuN8aLXQBPXW+1xe9MYY5r/
+         5byiBblzk0/Bjj8W3hydnihzaD2/bSucsq19gYaAO7svPQ9NX5ikflPbP0aQ3s1XLs
+         HGaLiJ+EZqJjL2HWCxzGVsapq1zGmMF7YifJ4aZSxBWmmQXKg5OzP5X/lJLMr7LDXb
+         q08NQP49c4NuQLGg8yJbZaT9Vll/a/ebXlmMsadnNFQz+OxeqTtrhXsoUs8FxJEBoQ
+         wpflEv4CtI8FQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1neGL9-003mvX-2I; Tue, 12 Apr 2022 14:13:51 +0100
+        id 1neGL9-003mvX-DR; Tue, 12 Apr 2022 14:13:51 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -46,10 +46,12 @@ Cc:     Catalin Marinas <catalin.marinas@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: [PATCH 00/10] arm64: Add initial support for FEAT_WFxT
-Date:   Tue, 12 Apr 2022 14:12:53 +0100
-Message-Id: <20220412131303.504690-1-maz@kernel.org>
+Subject: [PATCH 01/10] arm64: Expand ESR_ELx_WFx_ISS_TI to match its ARMv8.7 definition
+Date:   Tue, 12 Apr 2022 14:12:54 +0100
+Message-Id: <20220412131303.504690-2-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220412131303.504690-1-maz@kernel.org>
+References: <20220412131303.504690-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
@@ -66,49 +68,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The ARMv8.7 WFxT feature is a new take on the good old WFI/WFE
-instructions as they behave the same way, only taking an extra timeout
-parameter.
+Starting with FEAT_WFXT in ARMv8.7, the TI field in the ISS
+that is reported on a WFx trap is expanded by one bit to
+allow the description of WFET and WFIT.
 
-This small series aims at adding the minimal support for this feature,
-enabling it for both the kernel and KVM.
+Special care is taken to exclude the WFxT bit from the mask
+used to match WFI so that it also matches WFIT when trapped from
+EL0.
 
-A potential addition to this series would be to remove the event
-generation from the counters, and rely on the timeout where it
-matters (spinlocks?). Feedback welcome.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/esr.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Patches on top of 5.18-rc2, tested of the FVP AEM.
-
-Marc Zyngier (10):
-  arm64: Expand ESR_ELx_WFx_ISS_TI to match its ARMv8.7 definition
-  arm64: Add RV and RN fields for ESR_ELx_WFx_ISS
-  KVM: arm64: Simplify kvm_cpu_has_pending_timer()
-  KVM: arm64: Introduce kvm_counter_compute_delta() helper
-  KVM: arm64: Handle blocking WFIT instruction
-  KVM: arm64: Offer early resume for non-blocking WFxT instructions
-  KVM: arm64: Expose the WFXT feature to guests
-  arm64: Add HWCAP advertising FEAT_WFXT
-  arm64: Add wfet()/wfit() helpers
-  arm64: Use WFxT for __delay() when possible
-
- Documentation/arm64/cpu-feature-registers.rst |  2 +
- Documentation/arm64/elf_hwcaps.rst            |  4 ++
- arch/arm64/include/asm/barrier.h              |  4 ++
- arch/arm64/include/asm/esr.h                  |  8 +++-
- arch/arm64/include/asm/hwcap.h                |  1 +
- arch/arm64/include/asm/kvm_host.h             |  1 +
- arch/arm64/include/uapi/asm/hwcap.h           |  1 +
- arch/arm64/kernel/cpufeature.c                | 13 +++++
- arch/arm64/kernel/cpuinfo.c                   |  1 +
- arch/arm64/kvm/arch_timer.c                   | 47 ++++++++++++-------
- arch/arm64/kvm/arm.c                          |  6 +--
- arch/arm64/kvm/handle_exit.c                  | 30 ++++++++++--
- arch/arm64/kvm/sys_regs.c                     |  2 +
- arch/arm64/lib/delay.c                        | 12 ++++-
- arch/arm64/tools/cpucaps                      |  1 +
- include/kvm/arm_arch_timer.h                  |  2 -
- 16 files changed, 106 insertions(+), 29 deletions(-)
-
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index d52a0b269ee8..65c2201b11b2 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -133,7 +133,8 @@
+ #define ESR_ELx_CV		(UL(1) << 24)
+ #define ESR_ELx_COND_SHIFT	(20)
+ #define ESR_ELx_COND_MASK	(UL(0xF) << ESR_ELx_COND_SHIFT)
+-#define ESR_ELx_WFx_ISS_TI	(UL(1) << 0)
++#define ESR_ELx_WFx_ISS_TI	(UL(3) << 0)
++#define ESR_ELx_WFx_ISS_WFxT	(UL(2) << 0)
+ #define ESR_ELx_WFx_ISS_WFI	(UL(0) << 0)
+ #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
+ #define ESR_ELx_xVC_IMM_MASK	((1UL << 16) - 1)
+@@ -146,7 +147,8 @@
+ #define DISR_EL1_ESR_MASK	(ESR_ELx_AET | ESR_ELx_EA | ESR_ELx_FSC)
+ 
+ /* ESR value templates for specific events */
+-#define ESR_ELx_WFx_MASK	(ESR_ELx_EC_MASK | ESR_ELx_WFx_ISS_TI)
++#define ESR_ELx_WFx_MASK	(ESR_ELx_EC_MASK |			\
++				 (ESR_ELx_WFx_ISS_TI & ~ESR_ELx_WFx_ISS_WFxT))
+ #define ESR_ELx_WFx_WFI_VAL	((ESR_ELx_EC_WFx << ESR_ELx_EC_SHIFT) |	\
+ 				 ESR_ELx_WFx_ISS_WFI)
+ 
 -- 
 2.34.1
 
