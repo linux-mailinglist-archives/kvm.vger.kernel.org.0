@@ -2,97 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 017E64FD1EC
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 09:08:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A9AD4FD3D5
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 11:59:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351190AbiDLHJk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 03:09:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46222 "EHLO
+        id S1352471AbiDLHgW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 03:36:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353186AbiDLHHU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 03:07:20 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B54949CB6;
-        Mon, 11 Apr 2022 23:49:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649746177; x=1681282177;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=6Vrf9v/aelxqJtAMQ3CWYcL1rqDUMznv81Ys5xCr/Hg=;
-  b=QaeWB0b6U8PxPsmgkiEe8yPlu7A1KNOyjXAx6NwcTh5aai5xnY0qLIMY
-   e+oTfIiALftW4ei02RkUfH/7GdYxybtCyJKhyUAfJ4akEZjkKOwA+Q5Ct
-   5i/rYuhE1zxYKMKcndo4dGLc6bXQ7w/MznSydNqsW+YkFRvB/jw+1FFxf
-   MwSDM9hWvtDYFhKbRFPQJ5ETXW43MLdrwcRX0YLpT6ZyPku4JbuCv3xZn
-   iByeYZBIpo59MVDcr7OhJLMWS5x03v63VU+B5mw4Mz96hVbr6UTlybwrD
-   mmL29l5gMcedxxQS8GuNXKoOmfs70uIT+S99PrvaYlYUN2Hm6OuF53Fsd
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10314"; a="242231184"
-X-IronPort-AV: E=Sophos;i="5.90,253,1643702400"; 
-   d="scan'208";a="242231184"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2022 23:49:25 -0700
-X-IronPort-AV: E=Sophos;i="5.90,253,1643702400"; 
-   d="scan'208";a="551563763"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.255.31.239]) ([10.255.31.239])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2022 23:49:22 -0700
-Message-ID: <ec60ba8e-3ed9-1d06-d8c2-4db9529daf93@intel.com>
-Date:   Tue, 12 Apr 2022 14:49:20 +0800
+        with ESMTP id S1354285AbiDLHR1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 03:17:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 016B74B869
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 23:58:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649746723;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4c8Vusl4oEKcTcKekpVxwLN012dQSzoK0Qxc5GtiyU0=;
+        b=hyFgESZ3dR3yiJCZuDeBb1Px/x76Z2LmsDYJ/OqN3Hq9CZceoXWEja4XycZlLH+B0Oxxl8
+        0pnf5r6bt5H83K7HkRA/yJTGbrjEGQhmNUokoNnfJriJBUpiBKIH/z4QghiJHZ1/iTCos1
+        BHYvGlJJJ7AfrWIywke/TRk0Msg3cV0=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-546-T16O2WR1NwmRUc59QZ66Ag-1; Tue, 12 Apr 2022 02:58:33 -0400
+X-MC-Unique: T16O2WR1NwmRUc59QZ66Ag-1
+Received: by mail-pl1-f198.google.com with SMTP id w14-20020a1709027b8e00b0015386056d2bso7393053pll.5
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 23:58:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=4c8Vusl4oEKcTcKekpVxwLN012dQSzoK0Qxc5GtiyU0=;
+        b=vzrn4oB5XwJoXhBDOPFjCHBiXDZHtTnYPbFs65rKvJD2G5iQ6xg2PODC6GOl2w4Rhf
+         cTGg7XsZ0No92JNBZ6+XuQP1bMFViP61mbMUZw5RFOTsEZp97RLyfCsshUuBNkFy7anS
+         PIWLSFJmx6AvRtBcQ38E7Jc1SnrXQD49iiLGhvH/2tpOUkKPnNf5dhvtqe+yOThxSPwC
+         kPhglF2Bp2puHEEiiAy/QXahAnSeEJmMs6z4dNuwiPcFF7N9+QKsIVheUzpOSGdi1yep
+         aJYUgj/2FavTgV211B5B14VeU1g7MQHi7takZhwFi/u3dAvlYuB80q9M0TTOMOXXdOh0
+         6NOg==
+X-Gm-Message-State: AOAM531Vyj8K5hTPHpJzof7uYuDBBn57VbnSef8/GbjHXje4dx7X4nPb
+        I1x8XbuVRTegS5aFVKyLt46ThqAEZczol0a0O8hpMOPr8EHjPtbXoPvWZV+NOL/sY69AS2k2Z+F
+        XDLzaU+FXfws0
+X-Received: by 2002:a17:902:ce0a:b0:156:72e2:f191 with SMTP id k10-20020a170902ce0a00b0015672e2f191mr35096124plg.76.1649746712095;
+        Mon, 11 Apr 2022 23:58:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxuJbdOoWZZRPEbzGsC4VuDhXJvgnJjxW0TEadVGxwoEvQb6fSAp5kYQnQ/9zpsf7VqHx4Bsg==
+X-Received: by 2002:a17:902:ce0a:b0:156:72e2:f191 with SMTP id k10-20020a170902ce0a00b0015672e2f191mr35096092plg.76.1649746711844;
+        Mon, 11 Apr 2022 23:58:31 -0700 (PDT)
+Received: from [10.72.14.5] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id b25-20020a637159000000b00381fda49d15sm1765570pgn.39.2022.04.11.23.58.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Apr 2022 23:58:31 -0700 (PDT)
+Message-ID: <d228a41f-a3a1-029d-f259-d4fbab822e78@redhat.com>
+Date:   Tue, 12 Apr 2022 14:58:19 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.7.0
-Subject: Re: [RFC PATCH v5 102/104] KVM: TDX: Add methods to ignore accesses
- to CPU state
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.7.0
+Subject: Re: [PATCH v9 22/32] virtio_pci: queue_reset: extract the logic of
+ active vq for modern pci
 Content-Language: en-US
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-References: <cover.1646422845.git.isaku.yamahata@intel.com>
- <3a278829a8617b86b36c32b68a82bc727013ace8.1646422845.git.isaku.yamahata@intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <3a278829a8617b86b36c32b68a82bc727013ace8.1646422845.git.isaku.yamahata@intel.com>
+To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        virtualization@lists.linux-foundation.org
+Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, netdev@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, bpf@vger.kernel.org
+References: <20220406034346.74409-1-xuanzhuo@linux.alibaba.com>
+ <20220406034346.74409-23-xuanzhuo@linux.alibaba.com>
+From:   Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20220406034346.74409-23-xuanzhuo@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/5/2022 3:49 AM, isaku.yamahata@intel.com wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
-> 
-> TDX protects TDX guest state from VMM.  Implements to access methods for
-> TDX guest state to ignore them or return zero.
-> 
 
-...
-
-> +void tdx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
+在 2022/4/6 上午11:43, Xuan Zhuo 写道:
+> Introduce vp_active_vq() to configure vring to backend after vq attach
+> vring. And configure vq vector if necessary.
+>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>   drivers/virtio/virtio_pci_modern.c | 46 ++++++++++++++++++------------
+>   1 file changed, 28 insertions(+), 18 deletions(-)
+>
+> diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
+> index 86d301f272b8..49a4493732cf 100644
+> --- a/drivers/virtio/virtio_pci_modern.c
+> +++ b/drivers/virtio/virtio_pci_modern.c
+> @@ -176,6 +176,29 @@ static void vp_reset(struct virtio_device *vdev)
+>   	vp_disable_cbs(vdev);
+>   }
+>   
+> +static int vp_active_vq(struct virtqueue *vq, u16 msix_vec)
 > +{
-> +	kvm_register_mark_available(vcpu, reg);
-> +	switch (reg) {
-> +	case VCPU_REGS_RSP:
-> +	case VCPU_REGS_RIP:
-> +	case VCPU_EXREG_PDPTR:
-> +	case VCPU_EXREG_CR0:
-> +	case VCPU_EXREG_CR3:
-> +	case VCPU_EXREG_CR4:
-> +		break;
-> +	default:
-> +		KVM_BUG_ON(1, vcpu->kvm);
-> +		break;
+> +	struct virtio_pci_device *vp_dev = to_vp_device(vq->vdev);
+> +	struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
+> +	unsigned long index;
+> +
+> +	index = vq->index;
+> +
+> +	/* activate the queue */
+> +	vp_modern_set_queue_size(mdev, index, virtqueue_get_vring_size(vq));
+> +	vp_modern_queue_address(mdev, index, virtqueue_get_desc_addr(vq),
+> +				virtqueue_get_avail_addr(vq),
+> +				virtqueue_get_used_addr(vq));
+> +
+> +	if (msix_vec != VIRTIO_MSI_NO_VECTOR) {
+> +		msix_vec = vp_modern_queue_vector(mdev, index, msix_vec);
+> +		if (msix_vec == VIRTIO_MSI_NO_VECTOR)
+> +			return -EBUSY;
 > +	}
+> +
+> +	return 0;
 > +}
+> +
+>   static u16 vp_config_vector(struct virtio_pci_device *vp_dev, u16 vector)
+>   {
+>   	return vp_modern_config_vector(&vp_dev->mdev, vector);
+> @@ -220,32 +243,19 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+>   
+>   	vq->num_max = num;
+>   
+> -	/* activate the queue */
+> -	vp_modern_set_queue_size(mdev, index, virtqueue_get_vring_size(vq));
+> -	vp_modern_queue_address(mdev, index, virtqueue_get_desc_addr(vq),
+> -				virtqueue_get_avail_addr(vq),
+> -				virtqueue_get_used_addr(vq));
+> +	err = vp_active_vq(vq, msix_vec);
+> +	if (err)
+> +		goto err;
+>   
+>   	vq->priv = (void __force *)vp_modern_map_vq_notify(mdev, index, NULL);
+>   	if (!vq->priv) {
+>   		err = -ENOMEM;
+> -		goto err_map_notify;
+> -	}
+> -
+> -	if (msix_vec != VIRTIO_MSI_NO_VECTOR) {
+> -		msix_vec = vp_modern_queue_vector(mdev, index, msix_vec);
+> -		if (msix_vec == VIRTIO_MSI_NO_VECTOR) {
+> -			err = -EBUSY;
+> -			goto err_assign_vector;
+> -		}
+> +		goto err;
+>   	}
+>   
+>   	return vq;
+>   
+> -err_assign_vector:
+> -	if (!mdev->notify_base)
+> -		pci_iounmap(mdev->pci_dev, (void __iomem __force *)vq->priv);
 
-Isaku,
 
-We missed one case that some GPRs are accessible by KVM/userspace for 
-TDVMCALL exit.
+We need keep this or anything I missed?
+
+Thanks
+
+
+> -err_map_notify:
+> +err:
+>   	vring_del_virtqueue(vq);
+>   	return ERR_PTR(err);
+>   }
+
