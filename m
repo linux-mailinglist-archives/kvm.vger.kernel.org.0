@@ -2,197 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D06D4FE92D
+	by mail.lfdr.de (Postfix) with ESMTP id 85A934FE92E
 	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 21:59:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232480AbiDLUAY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 16:00:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36540 "EHLO
+        id S232004AbiDLUAl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 16:00:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234419AbiDLT76 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 15:59:58 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2055.outbound.protection.outlook.com [40.107.236.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 029EA6D861
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 12:52:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MgKqFtP6Hb9wnNSSowhn8qsp2pRJY54YoJyhKzxtt79WJfg+Ak9naE8GRySdcgVBC8TaBJB5ShAFoXa55DXy+YEPCyXWlv0CEjvG/ECl+z+vxUP91EG1pQEAg6QuwuvGxGiRVbh0+A+OQPpcYgw0wtdvrAs7d2nANzY+jSYSrmTZqts4TM9pJBRerNyAfNon6mHR38mcE9883o2YsIwZ0/Mt5OaNk3G0MrbBZDtdBvbE/t80QTMQ27tW2LlImJBvZT4vlnovGZvonxQPVdfOcD3/vQ+Tk92J0VsYlVhrC01IDWNyjjMTSWm8rXJ3Neje8bfTPa456CLs+CzdnOs91w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xObiOvHyDu2MRiVbm4ABRq7LXQX8vdTAcNEW6ev3gZc=;
- b=jI+Ej8n0SLGyNXRkQCgx89r3b3vW79q8+fsvTrQwjgMKjXIHOaMpyH8nhqsc1O88EWLtmBea7aIEJwZlSq3bEbbcsqrrQQEZkmMJQDiyuOM/WdFbvPnlQDV8UiWASOiSAv0e0OU0iWkrvlCxlRM6vkUkTJlaN7XczSuTP+dIK4sntF75NjzwslNZHFuBgNYdhjB/qjPma8GGxr6umxshOqyNa6VT2V7VAg3VWJGMqVMSH0EHQ5YeVRQgaiOADJvoUcVpdTvp3BZ735X9PKlHzjQa0vZnELIlOTucmkgwzYjneTdXrTbpSsqSstH/L0/VsC38v+7Pc/YXcgRKVxcj6Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xObiOvHyDu2MRiVbm4ABRq7LXQX8vdTAcNEW6ev3gZc=;
- b=Sti3Oe5CCLFAcp/p4ZgDkS9iNugq+WlSXFu3SIhgy2m8nYNHcMt3jOyCfkGIbUgeLryM1S/FhqJps0h2inWY8HG0i36ulLTrm+f08DzsaSJppN4N8ixj3WKopsyQdUyQcJ6zNWrVxZQT4PlbyI/T/mEC8a0cSx9tNHw/3zLYGfHIArc9gYbfEXuDHzUMPcNgbcd/IvuAmcMB4hcv6KD+hkxKgxNADWwU3rK4xLtnogmPHXOO43xQq1mfYIEHvuXZ3J2kJ1sQbdC85TAjbTewW/7vIfNI3hMrAzv6YIVIKmMX1zCoDI6EdzeCxOZZJ7Yn5npF+b+kHAR3lqR7WPJZbg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH2PR12MB4181.namprd12.prod.outlook.com (2603:10b6:610:a8::16)
- by MW4PR12MB5602.namprd12.prod.outlook.com (2603:10b6:303:169::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.18; Tue, 12 Apr
- 2022 19:52:46 +0000
-Received: from CH2PR12MB4181.namprd12.prod.outlook.com
- ([fe80::c911:71b5:78e6:3a38]) by CH2PR12MB4181.namprd12.prod.outlook.com
- ([fe80::c911:71b5:78e6:3a38%8]) with mapi id 15.20.5144.029; Tue, 12 Apr 2022
- 19:52:46 +0000
-Date:   Tue, 12 Apr 2022 16:52:44 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH v2] vfio/pci: Fix vf_token mechanism when device-specific
- VF drivers are used
-Message-ID: <20220412195244.GK2120790@nvidia.com>
-References: <0-v2-fe53fe3adce2+265-vfio_vf_token_jgg@nvidia.com>
- <20220412122544.4a56f20a.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220412122544.4a56f20a.alex.williamson@redhat.com>
-X-ClientProxiedBy: BL1PR13CA0403.namprd13.prod.outlook.com
- (2603:10b6:208:2c2::18) To CH2PR12MB4181.namprd12.prod.outlook.com
- (2603:10b6:610:a8::16)
+        with ESMTP id S230324AbiDLUAI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 16:00:08 -0400
+Received: from mail-vk1-xa2d.google.com (mail-vk1-xa2d.google.com [IPv6:2607:f8b0:4864:20::a2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B1F97004B
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 12:53:08 -0700 (PDT)
+Received: by mail-vk1-xa2d.google.com with SMTP id w128so9546727vkd.3
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 12:53:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=XNjj2es3e35xyCGEKo5+M+bxb4jnxzy0zCjwt6jEQo4=;
+        b=bpsoErcvQq04JtqXPWJtBAZu1Xv9/HpycDfZsotYxvxH+b0pgeclA3s+dGxwtPjFt5
+         ABGBsHNxRFTN4IoNkhn2muJkVNyS+UWWALYVk9ZaQAWlxdwfuvtVo5+LRGLPz5NJVkjU
+         4ejXs1p5hwfBb0zr2tzCkXfsZ+2jQtq7jTA88jMlq9TG+6m1e9twiVXhzHVXIQ5Lr1pL
+         8KNNRAePiMN4YjngaPQ6Z7sToUGAezVb+JTfNnhmyDnC9fwu8CO2TnwrSwiiki7KucGY
+         GhsXdbIFHc7JhesXWd7Bts4G6/AWT1j7D8Pcm2pApsilLrQ8ldWq2yEwWWgB6LcV2lei
+         qftw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=XNjj2es3e35xyCGEKo5+M+bxb4jnxzy0zCjwt6jEQo4=;
+        b=qO+eRAw4/G5Bd8qeWbiR8weq6wKHFXBejB/O+D9Y6YKSgQSPLGuTycBdA+I0KlUxeH
+         7fup5HZWjUFIfCA/GAQxkcEFDMu98LkWK7dMiZQanEJkodH6E9DcEyqwBFjr3/2VqG3o
+         tP8I1o5Xr4abnkAHhdAKYG60u8jF7mQWU4W30vEaZOeLzSlaQYno1N7gdIQp8PKfwP2d
+         rx6DJ4wqh9TMvkC2NKWUWgDIOqQTto0zu+HmTc3tQID/j30BZlbeWiNJNH3OxNmqsIrw
+         QCokOPu+El8QgIf5W7Ig24KqtOKf0bf2/D8VQshkafTofphOR+QbKpJ3R2w00nLvJf0c
+         VsAw==
+X-Gm-Message-State: AOAM532Qpiv8EpTR3qjwel1zyBk1II2m0H3IUBOF0uNHIBrdp5yaefh0
+        9INCOpLwzJr2o00evK4EXaP+cg1/II43oL8UGMsnnA==
+X-Google-Smtp-Source: ABdhPJyNrqWIJ2j60ZlbjK0gMwwcDwo2pPX/3N3Jl9//MFNvngaRwF1n2I+6pV6d7wyCpn7EeKMKd/1GXaN78BmUC2Q=
+X-Received: by 2002:a1f:ac95:0:b0:345:2ade:e54b with SMTP id
+ v143-20020a1fac95000000b003452adee54bmr7146295vke.3.1649793187239; Tue, 12
+ Apr 2022 12:53:07 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cf0dbc63-e8c4-4ffe-10ea-08da1cbe03c3
-X-MS-TrafficTypeDiagnostic: MW4PR12MB5602:EE_
-X-Microsoft-Antispam-PRVS: <MW4PR12MB56023A857AFE9CD910B1D09DC2ED9@MW4PR12MB5602.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jRg2NAfCQIQX3U/mCTo+zCUtpjvuTKm/KnqVr48l0Scz0yLNAryMIaAZo/6gSyWCiknUIoHS2y7EJpabCYhOpPC3MyQ5xlTlOXm0LMigt+RZYjBIiXfEIwizBr62RUOuyViw2nllx5vPneCnqP5prYT24FGnjyaOkChlQRAVgaI4GuHm9xFJD6uJtRP2JDo0YrBJdjDTtcm8eDL+Pw4noGkqhgpc6lzFQmuYX/BcM4GgBFA2Py99mNu3VfPEpo+pQ8AYIISIxIi8nT4lrRFXB0od9Dt+VRAxORGSrqu8/Y21KeKwvOxqytw4oMzYWVsceLh5ta/3I3lgVuuXW4gHte16+Vn3GEtJWoaHzp7fp73uDOAOPnwoNo7HdHYUX6VbUMKtSswRexK03Bcp3aBWdSG9pDhdZl26LjacYR71vI2J5bFmxYcodsqdfJYkF8DqVCUvjDIYe6ShZu5dlTM1fprzzE7Ii6qEPKbGwq64ms/JCRBxBwYgMq/Q73fonw0jXeJ9j3s3x/cS0H33wD1h/SSG749IcFZlMs3SQrrCQX6jujjHJL/7CTeU/FDhUgroPnsjHb9ZseBlbySm01JH2mIXQmW0mpeQ0WiOCNgF30x6zBTORWSBXshr0sn7M5KBLw3GLmhn0scffqsrsxLe7w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4181.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(1076003)(2616005)(6506007)(6512007)(107886003)(26005)(186003)(83380400001)(2906002)(8936002)(5660300002)(6916009)(54906003)(508600001)(6486002)(4326008)(316002)(66946007)(8676002)(66476007)(66556008)(33656002)(38100700002)(86362001)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?0ASsBdVI5LcqKbONtYccPwwSpdazFOkhkDn1LmRXP0ukd+m+APWiMO4n7m3U?=
- =?us-ascii?Q?phEdBLfckugyEa7jvd5KcsA4tQGn+mgTzjGWw3hzmYLuJ3O9nbmcuHoQfARV?=
- =?us-ascii?Q?TDLSfzsrhK3O2q8C1gQzkR0gMsh8s4/ZdbrEUwbE1o1qnLpNVrdvpZyc0t3a?=
- =?us-ascii?Q?clYnLRqyZpj2Io6kJS1O0RT5t4myUaC5nTqh9sK1YBXwCjpcMFFtrwRNnOKg?=
- =?us-ascii?Q?WCQIoUgHlK1vx+qaNMkW33MfCA2+KcxZJxHJzAUjBjhLE6qasbHFEauEGlPq?=
- =?us-ascii?Q?AzoHy0ph8GxVkdfMfT7xXekkw1ljF0+iRWlBR7ozIAjCqYylvKmiInVIk1py?=
- =?us-ascii?Q?8eFCHR4lZTt7zcfqOfWA8h2vCWTUfZ0aQcZmGdpUhqDXGVWQr6xMSmgYvNBM?=
- =?us-ascii?Q?Y6NWFlM0vsjgWF6qGdiaXDmUyTVPGPQjzrgkQqu2/3N4hRdENW+/dxqJFkD3?=
- =?us-ascii?Q?RlK2fOt06lskm1vLXKnsRfM7uC1Ljo1RFTZUO+snV4vh0VSCd0449oQSlNfR?=
- =?us-ascii?Q?kFgSamwqAd03+YOjvWrQqb9te0tsTcmcyhTiADv8N0gQ2n6X3JaZQUporrDC?=
- =?us-ascii?Q?cHOpoZi4Vakj+3tRzC5eyApyaxTy6xUj4h6/eP7QvjmUVsarkHY1B1w/5h1Y?=
- =?us-ascii?Q?MeqZuL1hjdomvx9eDnPRiX4kcIp+cDw4FOmXm7GoBygrwWtgNVYfIAOd+Rb6?=
- =?us-ascii?Q?OtaD3BzJ2+OI40GuVkjVnXeRsJCCvihDrWIBf0tcp6vMO58XiE4XfzUX3r5x?=
- =?us-ascii?Q?y/Tv1UmoPT4XDXrbn/LO7dFi8NC8wiIpxKjfnw+eiMikNZU0l4H1mb6BeaEb?=
- =?us-ascii?Q?OLsXL/G7bEeVNLw76OdPBvatzRzBiH7HJZeX1cJtCgfs7lyMnjw8YIF0pfWy?=
- =?us-ascii?Q?vKr5yxhGiBSybgAZroaURmVuJpLW5sZB5XvDo2CtDFarjO4nyuajZbftYAY0?=
- =?us-ascii?Q?Z2gcVk+DpOFZfnq66Fye2NJz7501YaVvZTehMw6qcerCzze1FFb5/ig20jKD?=
- =?us-ascii?Q?pHwEzSPxuRfqQVHF0WH0JkW9mX9FpCM6wuiiwq02VHOk6GhgIETib8JQsPyT?=
- =?us-ascii?Q?UPZc58s3VL5Eth+FHefDF+2Px7LvOePP5B472+6JxeYA02gScGPKYwTWw3nn?=
- =?us-ascii?Q?vSzbnoBRhzbzVl9Wvlu74/QL3cNxQOtoCH/ckAiahstDhsNthM7HukBiqNAK?=
- =?us-ascii?Q?Hvew8FfBr2dpd1btJrzydOifrkEwCmvOJ7FrkeQnVYIBvPTXPl8ymyPLa7lq?=
- =?us-ascii?Q?rD3Erh1gEQ9+xs5O5SJn+8BUFhrCmjLqrFYPd/WSRZw/knjmjHv0sN3EoFEb?=
- =?us-ascii?Q?uLB/dsIntLsIVj+gMFqCKl++m2yS7g7n/cyHLR0v8m81LBoYhWhQeDwqvmVN?=
- =?us-ascii?Q?zR7cNEAnbME1KoE97YOrIjz07NJqPVt6er7C7Oh5GM9GTxLHjhxNzvL4TJ/H?=
- =?us-ascii?Q?geRmKek2gJdzpBfGJ1muyzIs6b72JjcUXWMMlY8/JMcTGvc0/t1t0XaNS2De?=
- =?us-ascii?Q?lmWsLnC7MftP9Pk2ln8+p5q7JUcUOD11ay8JvoYZmkao7mSPfhQkUPNNqLlS?=
- =?us-ascii?Q?eEtBUjjDHfurhcrWIpzWKQTMKmznam6NXH6c9vKR+Pf0VAeUGt9TcKLTWSaf?=
- =?us-ascii?Q?+9RLYSdGaST/+eFNFh+MSho/NqaaVqa0aIPN1dEA8iu7Bolmw9jnvBTnz9dF?=
- =?us-ascii?Q?7JOEHEnvTpgwtsKRDDuiRS7WKOHeucPZl08Wxi5x8u5nGVPCahJg//lASpLo?=
- =?us-ascii?Q?mYoZUModPQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cf0dbc63-e8c4-4ffe-10ea-08da1cbe03c3
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4181.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Apr 2022 19:52:46.0700
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: T2892xS/01ItGJwvb9v4L1UruTv17MsC9Q4hJqCQcMHhLCxIHYuNGgr6I1DTRcYm
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5602
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+References: <20220323182816.2179533-1-juew@google.com> <YlR8l7aAYCwqaXEs@google.com>
+ <390f6cd9-1757-b83c-ab97-5a991559e998@redhat.com> <YlXCvEevoCZPj9Ba@google.com>
+In-Reply-To: <YlXCvEevoCZPj9Ba@google.com>
+From:   Jue Wang <juew@google.com>
+Date:   Tue, 12 Apr 2022 12:52:55 -0700
+Message-ID: <CAPcxDJ6+Dn=+0=0MzWtfk83KBObMQTnFL0=p3St-Yytcn4019g@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Add support for CMCI and UCNA.
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 12, 2022 at 12:25:44PM -0600, Alex Williamson wrote:
-> On Mon, 11 Apr 2022 10:56:31 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > @@ -1732,10 +1705,28 @@ static int vfio_pci_bus_notifier(struct notifier_block *nb,
-> >  static int vfio_pci_vf_init(struct vfio_pci_core_device *vdev)
-> >  {
-> >  	struct pci_dev *pdev = vdev->pdev;
-> > +	struct vfio_pci_core_device *cur;
-> > +	struct pci_dev *physfn;
-> >  	int ret;
-> >  
-> > -	if (!pdev->is_physfn)
-> > +	if (!pdev->is_physfn) {
-> > +		/*
-> > +		 * If this VF was created by our vfio_pci_core_sriov_configure()
-> > +		 * then we can find the PF vfio_pci_core_device now, and due to
-> > +		 * the locking in pci_disable_sriov() it cannot change until
-> > +		 * this VF device driver is removed.
-> > +		 */
-> > +		physfn = pci_physfn(vdev->pdev);
-> > +		mutex_lock(&vfio_pci_sriov_pfs_mutex);
-> > +		list_for_each_entry (cur, &vfio_pci_sriov_pfs, sriov_pfs_item) {
-> > +			if (cur->pdev == physfn) {
-> > +				vdev->sriov_pf_core_dev = cur;
-> > +				break;
-> > +			}
-> > +		}
-> > +		mutex_unlock(&vfio_pci_sriov_pfs_mutex);
-> >  		return 0;
-> > +	}
-> >  
-> >  	vdev->vf_token = kzalloc(sizeof(*vdev->vf_token), GFP_KERNEL);
-> >  	if (!vdev->vf_token)
-> 
-> One more comment on final review; are we equating !is_physfn to
-> is_virtfn above?  This branch was originally meant to kick out both VFs
-> and non-SRIOV PFs.  Calling pci_physfn() on a !is_virtfn device will
-> return itself, so we should never find a list match, but we also don't
-> need to look for a match for !is_virtfn, so it's a bit confusing and
-> slightly inefficient.  Should the new code be added in a separate
-> is_virtfn branch above the existing !is_physfn test?  Thanks,
+On Tue, Apr 12, 2022 at 11:19 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Tue, Apr 12, 2022, Paolo Bonzini wrote:
+> > On 4/11/22 21:08, Sean Christopherson wrote:
+> > > > +                 if (!(mcg_cap & MCG_CMCI_P) &&
+> > > > +                     (data || !msr_info->host_initiated))
+> > > This looks wrong, userspace should either be able to write the MSR or not, '0'
+> > > isn't special.  Unless there's a danger to KVM, which I don't think there is,
+> > > userspace should be allowed to ignore architectural restrictions, i.e. bypass
+> > > the MCG_CMCI_P check, so that KVM doesn't create an unnecessary dependency between
+> > > ioctls.  I.e. this should be:
+> > >
+> > >             if (!(mcg_cap & MCG_CMCI_P) && !msr_info->host_initiated)
+> > >                     return 1;
+> > >
+> >
+> > This is somewhat dangerous as it complicates (or removes) the invariants
+> > that other code can rely on.  Thus, usually, only the default value is
+> > allowed for KVM_SET_MSR.
+>
+> Heh, I don't know if "usually" is the right word, that implies KVM is consistent
+> enough to have a simple majority for any behavior, whatever that behavior may be :-)
+>
+> Anyways, on second look, I agree that KVM should require that userspace first enable
+> CMCI via mcg_cap.  I thought that vcpu->arch.mcg_cap could be written via the MSR
+> interface, i.e. via userspace writes to MSR_IA32_MCG_CAP, and could create dependencies
+> within KVM_SET_MSRS.  But KVM only allows reading the MSR.
 
-I started at it for a while and came the same conclusion, I
-misunderstood that is_physfn is really trying to be
-is_sriov_physfn.. So not a bug, but not really clear code.
+vcpu->arch.mcg_cap is written via kvm_vcpu_ioctl_x86_setup_mce and it
+requires explicit enablement in kvm_mce_cap_supported for MCG_CMCI_P.
 
-I added this, I'll repost it.
+The pattern of KVM_SET/GET_MSRS depending on bits in
+vcpu->arch.mcg_cap seems common so I will keep the check of MCG_CMCI_P
+in V2.
 
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 8bf0f18e668a32..3c6493957abe19 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -1709,7 +1709,7 @@ static int vfio_pci_vf_init(struct vfio_pci_core_device *vdev)
- 	struct pci_dev *physfn;
- 	int ret;
- 
--	if (!pdev->is_physfn) {
-+	if (pdev->is_virtfn) {
- 		/*
- 		 * If this VF was created by our vfio_pci_core_sriov_configure()
- 		 * then we can find the PF vfio_pci_core_device now, and due to
-@@ -1728,6 +1728,10 @@ static int vfio_pci_vf_init(struct vfio_pci_core_device *vdev)
- 		return 0;
- 	}
- 
-+	/* Not a SRIOV PF */
-+	if (!pdev->is_physfn)
-+		return 0;
-+
- 	vdev->vf_token = kzalloc(sizeof(*vdev->vf_token), GFP_KERNEL);
- 	if (!vdev->vf_token)
- 		return -ENOMEM;
-
+As only allowing 0 to be set to MCi_CTL2 in set_msr_mce, it is more
+consistent to hardware behavior and the invariants that other code
+depends on as Paolo pointed out. I will keep this implementation in V2
+as well.
 
 Thanks,
-Jason
+-Jue
