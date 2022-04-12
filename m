@@ -2,90 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 71E6A4FE665
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 18:57:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 605714FE6CD
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 19:27:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357883AbiDLQ72 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 12:59:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32882 "EHLO
+        id S1358106AbiDLR3S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 13:29:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231942AbiDLQ71 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 12:59:27 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B1555F4DA
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 09:57:09 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id h15-20020a17090a054f00b001cb7cd2b11dso3650118pjf.5
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 09:57:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Yr7tTIqvdQEdgguyCeZ5NPGFEfx6YJUOR7r+7xfLEos=;
-        b=ft1f9O0xWxl+XERRl50bUXGuCTkcpeNHvfs2Xd9zXfMKQQHin2adrFAVgsssvV5c8o
-         EWt/OqN+bJsX08ywBG7Wxj0s0UIqvpfadFpaRw6Gr9zmGR0ZJE0JbRujhohWX9iqAyXF
-         hylMiHWEHpPwc5kjEixKeoNH6xdwPtloIpDWN6eEICwJhRB1LgBl5SHFrjoZ/XUhF2MJ
-         A29vc6oGfjMcZJJLLnc57a6GcPVvb3lDJ+hOxfbYc5Rv5YGVlkbhW6CJPWFyNtzYV2Kc
-         5Zmn+sbHdEfAUm1MDmKj+UbxnKhn6AygBryYlpkVs2sDPpSbnblm5mZSdRa6pl+xI9CK
-         2NFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Yr7tTIqvdQEdgguyCeZ5NPGFEfx6YJUOR7r+7xfLEos=;
-        b=brR5as8kYdn4q0ASGVL2nOeHvQJYg3Z+0hOdgkJLK1OaN5ORmEgq3uXuPnonAy6rHb
-         XBCwnJp30yvAvnXL5qM/SamaJ+JWi8eFaLqEAdnhLfQOXbWgPtrKy4Ojh3w2EwGksRRa
-         vrEhxxMgEsCQcKB6v35K+xnzqfHHjRq4CoiJ1fj81k7d4H0ZBK/yEAryJ/0vdvzvPrSR
-         Svcw7W85xrfo5zHKhjQzyxhq2LIzMu2nOaIb8YgpyLNFDO2Cqe8/8xZJdiCWfAkTzaj4
-         VqOIokgXV+a7c0gc+EktKjxboZav5JORhlG7xZmOcnpIsSh+jPMWMMO5gT30dbmFuEjc
-         yMcg==
-X-Gm-Message-State: AOAM530xqc+72qzR3EgDntge8I0GpdlBQsRPnP1sCeiGYanWhQ5ZalLL
-        b/AL//Z15+CH7bG8+oyHdJEBU7eGElNndw==
-X-Google-Smtp-Source: ABdhPJz9MfZ4kYDdUxCq+1wwwqr6bhq5tzOhOI5Z+/klqizhkQ2zn2yuqsS3TDHr6ZTsqAr/oVkXng==
-X-Received: by 2002:a17:903:281:b0:14c:f3b3:209b with SMTP id j1-20020a170903028100b0014cf3b3209bmr38522483plr.87.1649782628346;
-        Tue, 12 Apr 2022 09:57:08 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h14-20020a63384e000000b00366ba5335e7sm3341071pgn.72.2022.04.12.09.57.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Apr 2022 09:57:07 -0700 (PDT)
-Date:   Tue, 12 Apr 2022 16:57:03 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jue Wang <juew@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: Add support for CMCI and UCNA.
-Message-ID: <YlWvX9JakRD7IzcD@google.com>
-References: <20220323182816.2179533-1-juew@google.com>
- <YlR8l7aAYCwqaXEs@google.com>
- <CAPcxDJ4iXwSRK9nRTemkMvhjE5WePeLuc0-60eRCOq5bRRHX0A@mail.gmail.com>
- <CAPcxDJ7gJD-iC0usZj5U88V4JGUdQ=Bwt-DSgVWwSt7yTTz1AA@mail.gmail.com>
+        with ESMTP id S1358093AbiDLR3N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 13:29:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 216DC532D0
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 10:26:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649784414;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=s4Lt1xewNBZXG5/FcRdJnajbH6pCOsyU2JZpMOz87cw=;
+        b=gG3PkEmt1i/ce95cDtm5qPS4aGhuSMStE9uV80/WspddVLhamM7vB3uYcPLRAkVN3D4DrA
+        ypci2MrWyzHJsIKEAq4s18Dc5YswV2Ru1zlrm5a//9/IkIyRYHoINNdIKuirgZwHRAcmzG
+        D7imjTZMJ6W8EUWqhCVzWARNTC4mirM=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-94-mgW3sfY1NaOkHJZKbxySFA-1; Tue, 12 Apr 2022 13:26:49 -0400
+X-MC-Unique: mgW3sfY1NaOkHJZKbxySFA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B7B303C01B90;
+        Tue, 12 Apr 2022 17:26:48 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9AB6E40D0160;
+        Tue, 12 Apr 2022 17:26:48 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fixes for 5.18-rc3
+Date:   Tue, 12 Apr 2022 13:26:48 -0400
+Message-Id: <20220412172648.1060942-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPcxDJ7gJD-iC0usZj5U88V4JGUdQ=Bwt-DSgVWwSt7yTTz1AA@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 12, 2022, Jue Wang wrote:
-> On Tue, Apr 12, 2022 at 7:22 AM Jue Wang <juew@google.com> wrote:
-> > > > +             return 0;
-> > > > +
-> > > > +     if (lapic_in_kernel(vcpu))
-> > >
-> > > Any reason to support UNCA injection without an in-kernel APIC?
-> 
-> Even without a viable path for CMCI signaling, the UCNA errors should
-> still be logged in registers so it gives consistent semantics to
-> hardware for e.g., MCE overflow checks on an MCE signaled later.
+Linus,
 
-Right, what I was suggesting is that KVM reject the ioctl() if the VM doesn't
-have an in-kernel APIC, i.e. force userspace to use KVM's local APIC if userspace
-wants to also support UNCA injection.
+The following changes since commit 3123109284176b1532874591f7c81f3837bbdc17:
 
-Side topic, please trim your replies, i.e. delete all the unnecessary quoted context.
+  Linux 5.18-rc1 (2022-04-03 14:08:21 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to 42dcbe7d8bac997eef4c379e61d9121a15ed4e36:
+
+  KVM: x86: hyper-v: Avoid writing to TSC page without an active vCPU (2022-04-11 13:29:51 -0400)
+
+----------------------------------------------------------------
+x86:
+
+* Miscellaneous bugfixes
+
+* A small cleanup for the new workqueue code
+
+* Documentation syntax fix
+
+RISC-V:
+
+* Remove hgatp zeroing in kvm_arch_vcpu_put()
+
+* Fix alignment of the guest_hang() in KVM selftest
+
+* Fix PTE A and D bits in KVM selftest
+
+* Missing #include in vcpu_fp.c
+
+ARM:
+
+* Some PSCI fixes after introducing PSCIv1.1 and SYSTEM_RESET2
+
+* Fix the MMU write-lock not being taken on THP split
+
+* Fix mixed-width VM handling
+
+* Fix potential UAF when debugfs registration fails
+
+* Various selftest updates for all of the above
+
+----------------------------------------------------------------
+Andrew Jones (1):
+      KVM: selftests: get-reg-list: Add KVM_REG_ARM_FW_REG(3)
+
+Anup Patel (3):
+      RISC-V: KVM: Don't clear hgatp CSR in kvm_arch_vcpu_put()
+      KVM: selftests: riscv: Set PTE A and D bits in VS-stage page table
+      KVM: selftests: riscv: Fix alignment of the guest_hang() function
+
+Bagas Sanjaya (1):
+      Documentation: kvm: Add missing line break in api.rst
+
+Heiko Stuebner (1):
+      RISC-V: KVM: include missing hwcap.h into vcpu_fp
+
+Like Xu (2):
+      selftests: kvm: add tsc_scaling_sync to .gitignore
+      Documentation: KVM: Add SPDX-License-Identifier tag
+
+Lv Ruyi (1):
+      KVM: x86/mmu: remove unnecessary flush_workqueue()
+
+Oliver Upton (7):
+      KVM: arm64: Generally disallow SMC64 for AArch32 guests
+      KVM: arm64: Actually prevent SMC64 SYSTEM_RESET2 from AArch32
+      KVM: arm64: Drop unneeded minor version check from PSCI v1.x handler
+      KVM: arm64: Don't split hugepages outside of MMU write lock
+      KVM: Don't create VM debugfs files outside of the VM directory
+      selftests: KVM: Don't leak GIC FD across dirty log test iterations
+      selftests: KVM: Free the GIC FD when cleaning up in arch_timer
+
+Paolo Bonzini (3):
+      KVM: avoid NULL pointer dereference in kvm_dirty_ring_push
+      Merge tag 'kvmarm-fixes-5.18-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
+      Merge tag 'kvm-riscv-fixes-5.18-1' of https://github.com/kvm-riscv/linux into HEAD
+
+Peter Gonda (1):
+      KVM: SEV: Add cond_resched() to loop in sev_clflush_pages()
+
+Reiji Watanabe (2):
+      KVM: arm64: mixed-width check should be skipped for uninitialized vCPUs
+      KVM: arm64: selftests: Introduce vcpu_width_config
+
+Sean Christopherson (1):
+      KVM: x86/mmu: Resolve nx_huge_pages when kvm.ko is loaded
+
+Suravee Suthikulpanit (1):
+      KVM: SVM: Do not activate AVIC for SEV-enabled guest
+
+Vitaly Kuznetsov (1):
+      KVM: x86: hyper-v: Avoid writing to TSC page without an active vCPU
+
+Yu Zhe (1):
+      KVM: arm64: vgic: Remove unnecessary type castings
+
+ Documentation/virt/kvm/api.rst                     |   1 +
+ Documentation/virt/kvm/vcpu-requests.rst           |   2 +
+ .../virt/kvm/x86/amd-memory-encryption.rst         |   2 +
+ Documentation/virt/kvm/x86/errata.rst              |   2 +-
+ .../virt/kvm/x86/running-nested-guests.rst         |   2 +
+ arch/arm64/include/asm/kvm_emulate.h               |  27 +++--
+ arch/arm64/include/asm/kvm_host.h                  |  10 ++
+ arch/arm64/kvm/mmu.c                               |  11 +-
+ arch/arm64/kvm/psci.c                              |  31 +++---
+ arch/arm64/kvm/reset.c                             |  65 +++++++----
+ arch/arm64/kvm/vgic/vgic-debug.c                   |  10 +-
+ arch/arm64/kvm/vgic/vgic-its.c                     |   2 +-
+ arch/riscv/kvm/vcpu.c                              |   2 -
+ arch/riscv/kvm/vcpu_fp.c                           |   1 +
+ arch/x86/include/asm/kvm_host.h                    |  10 +-
+ arch/x86/kvm/hyperv.c                              |  40 ++-----
+ arch/x86/kvm/hyperv.h                              |   2 +-
+ arch/x86/kvm/mmu/mmu.c                             |  20 +++-
+ arch/x86/kvm/mmu/tdp_mmu.c                         |   2 +-
+ arch/x86/kvm/svm/avic.c                            |   3 +-
+ arch/x86/kvm/svm/sev.c                             |   3 +
+ arch/x86/kvm/x86.c                                 |  27 ++++-
+ tools/testing/selftests/kvm/.gitignore             |   2 +
+ tools/testing/selftests/kvm/Makefile               |   1 +
+ tools/testing/selftests/kvm/aarch64/arch_timer.c   |  15 ++-
+ tools/testing/selftests/kvm/aarch64/get-reg-list.c |  14 ++-
+ .../selftests/kvm/aarch64/vcpu_width_config.c      | 122 +++++++++++++++++++++
+ tools/testing/selftests/kvm/dirty_log_perf_test.c  |  34 +++++-
+ .../selftests/kvm/include/riscv/processor.h        |   4 +-
+ tools/testing/selftests/kvm/lib/riscv/processor.c  |   2 +-
+ virt/kvm/kvm_main.c                                |  12 +-
+ 31 files changed, 357 insertions(+), 124 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/vcpu_width_config.c
+
