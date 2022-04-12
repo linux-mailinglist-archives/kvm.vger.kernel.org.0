@@ -2,196 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A05A4FE516
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 17:47:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 441024FE52A
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 17:52:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243121AbiDLPtf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 11:49:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40332 "EHLO
+        id S1357372AbiDLPy1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 11:54:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357301AbiDLPta (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 11:49:30 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 552746007A
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 08:47:06 -0700 (PDT)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23CEn54D001448;
-        Tue, 12 Apr 2022 15:46:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=T2Ws5PgZX5raorDXeaLiKfdhmY1u998lmdiJog88/6Q=;
- b=YquQJXbTJHbYZIwDuyUhFQjy7dmWcicbG+qLlmhM07E3br4WItKTvWIoWmhcQiFlA0Dk
- UqNiQc8sQjYsh85BCoDFE4WDL563eI+HLplKmJna0hrAAZQBwBNE4kW5eQyKI01FoJHa
- s2UPFyx/4EPkEdFHz2KXnqdPkVkbJW/a8Bp23TATih9q20rTCjWGm+XEzyeWPeWr9+9u
- kOjzUGeQRrviAaCPuWVbHGggLNO7bUKw9slaW+TSAoRr3yg7yWwYGP9cGuPbnt8NjxV4
- ytBAu+KkGhYzn5k0XXQNaSUoBu/7SPAWBjbSvUsceVhYUS55kgBqJNUv+XcrswNRCR60 rA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3fd7k97hyw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 Apr 2022 15:46:59 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23CFUqIU025491;
-        Tue, 12 Apr 2022 15:46:58 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3fd7k97hy3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 Apr 2022 15:46:58 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23CFi4bH002894;
-        Tue, 12 Apr 2022 15:46:56 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3fb1s8w54c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 Apr 2022 15:46:56 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23CFl2nq47448390
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 12 Apr 2022 15:47:02 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BC0A15204E;
-        Tue, 12 Apr 2022 15:46:53 +0000 (GMT)
-Received: from [9.171.62.13] (unknown [9.171.62.13])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 1414352052;
-        Tue, 12 Apr 2022 15:46:52 +0000 (GMT)
-Message-ID: <ed4889b8-28c4-a3ed-b5ef-add3999023d4@linux.ibm.com>
-Date:   Tue, 12 Apr 2022 17:50:02 +0200
+        with ESMTP id S245499AbiDLPy0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 11:54:26 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE4106005C
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 08:52:08 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id n18so17148336plg.5
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 08:52:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=jdoVTAOzsUTmRWyRrILsCe/CPtH8yNrfzN0Er5FKiB4=;
+        b=cpL0mFgLvc3284MRWQEYU2TjNIbJGza3TAbzfvjUJ9VLpaaeluPAPdHFE9I1D+t0c9
+         R83GKfmQgrvnqVFiQxcTtMu1nVUpEMlnXXkTyezN4RjQv5z5MRHloVn2HriGkz7EyCMS
+         XpKcTu8985NoirZnN54J360s7r5uUM036LQPmdgNEZn+yo8ecoIl/lOKgWqQ46+MBkaM
+         tBkrnZJj39wCcfblxn92dScKQSD2BiJGwn/BdQR90Oe+0DviLwb9J5D19Zo+lVZatl1X
+         oovQcwlyoE0JUHknbjaq7tTlO9SIIUhV5vDbiZb/tOaowOcEoZidSvz3W4pkL+OFduMg
+         OqgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=jdoVTAOzsUTmRWyRrILsCe/CPtH8yNrfzN0Er5FKiB4=;
+        b=MIemF9LuAmEkjaSD1fQ/tZZsU7xcmdz9szolTXNruc7B3x+pkGItWL8kfOnr45vi1y
+         FsZpepcCfB/M1bmir16RP/VRWxwm8CRr/4JYAuIRK58y24yt5y42V43/BxmnXY117awZ
+         ZnZHRVXqcgHjz/E+nkJbafaY9mqRu8RY9nf4nGkGUrB4+AmPF59sVb81/TJe/m9K5vB2
+         WGgteKXAVMGrJRdWNcy7DkHkXUwq5mGswtSMfuPHRUzVYkDhOqnZD+pv1FHc4XKreUDn
+         VE1jHJpVnEi/Vhz+kGwpC8TF8pjpzDaPXMGvPnRGwwSUGap4jEnz3rUOddhXxRnv7aml
+         nP2w==
+X-Gm-Message-State: AOAM531wBZjTKIkIZ2JEF3g8wWal6J6DmIIgXui1C/2j7/LG2oRWRiI1
+        2hSfnX+vBdRZHjSlCp+j/4vb0A==
+X-Google-Smtp-Source: ABdhPJzKVAQ06G3dUaI/EVJi7iNndxpnOP4buUqlAiv50c9kNyF+6CfXNEIClv6w1pbMrnUCrtssmw==
+X-Received: by 2002:a17:90b:3b4d:b0:1cd:3ce7:aaec with SMTP id ot13-20020a17090b3b4d00b001cd3ce7aaecmr1784143pjb.32.1649778728270;
+        Tue, 12 Apr 2022 08:52:08 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id f14-20020a63380e000000b0038253c4d5casm3176405pga.36.2022.04.12.08.52.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Apr 2022 08:52:07 -0700 (PDT)
+Date:   Tue, 12 Apr 2022 15:52:03 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Junaid Shahid <junaids@google.com>
+Subject: Re: [PATCH v2 3/9] KVM: x86/mmu: Factor shadow_zero_check out of
+ __make_spte
+Message-ID: <YlWgIw/0v+G+G8za@google.com>
+References: <20220321224358.1305530-1-bgardon@google.com>
+ <20220321224358.1305530-4-bgardon@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v5 2/9] vfio: tolerate migration protocol v1 uapi renames
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
-        cohuck@redhat.com, thuth@redhat.com, farman@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com,
-        pasic@linux.ibm.com, borntraeger@linux.ibm.com, mst@redhat.com,
-        pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <20220404181726.60291-1-mjrosato@linux.ibm.com>
- <20220404181726.60291-3-mjrosato@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <20220404181726.60291-3-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: an2STujO20sEgvAoL-qKlYDlZW5AA2wo
-X-Proofpoint-GUID: _zAKbGeyMxCKOV6gh1HTa635ekT8Lx3e
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-12_06,2022-04-12_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- mlxlogscore=999 bulkscore=0 adultscore=0 lowpriorityscore=0
- priorityscore=1501 mlxscore=0 impostorscore=0 spamscore=0 clxscore=1015
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204120074
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H3,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220321224358.1305530-4-bgardon@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 4/4/22 20:17, Matthew Rosato wrote:
-> The v1 uapi is deprecated and will be replaced by v2 at some point;
-> this patch just tolerates the renaming of uapi fields to reflect
-> v1 / deprecated status.
+On Mon, Mar 21, 2022, Ben Gardon wrote:
+> In the interest of devloping a version of __make_spte that can function
+> without a vCPU pointer, factor out the shadow_zero_mask to be an
+> additional argument to the function.
 > 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> No functional change intended.
+> 
+> Signed-off-by: Ben Gardon <bgardon@google.com>
 > ---
->   hw/vfio/common.c    |  2 +-
->   hw/vfio/migration.c | 19 +++++++++++--------
->   2 files changed, 12 insertions(+), 9 deletions(-)
-
-
-I do not understand why you need this patch in this series.
-Shouldn't it be separate?
-
+>  arch/x86/kvm/mmu/spte.c | 10 ++++++----
+>  arch/x86/kvm/mmu/spte.h |  2 +-
+>  2 files changed, 7 insertions(+), 5 deletions(-)
 > 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 080046e3f5..7b1e12fb69 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -380,7 +380,7 @@ static bool vfio_devices_all_running_and_saving(VFIOContainer *container)
->                   return false;
->               }
->   
-> -            if ((migration->device_state & VFIO_DEVICE_STATE_SAVING) &&
-> +            if ((migration->device_state & VFIO_DEVICE_STATE_V1_SAVING) &&
->                   (migration->device_state & VFIO_DEVICE_STATE_RUNNING)) {
->                   continue;
->               } else {
-> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> index ff6b45de6b..e109cee551 100644
-> --- a/hw/vfio/migration.c
-> +++ b/hw/vfio/migration.c
-> @@ -432,7 +432,7 @@ static int vfio_save_setup(QEMUFile *f, void *opaque)
->       }
->   
->       ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_MASK,
-> -                                   VFIO_DEVICE_STATE_SAVING);
-> +                                   VFIO_DEVICE_STATE_V1_SAVING);
->       if (ret) {
->           error_report("%s: Failed to set state SAVING", vbasedev->name);
->           return ret;
-> @@ -532,7 +532,7 @@ static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
->       int ret;
->   
->       ret = vfio_migration_set_state(vbasedev, ~VFIO_DEVICE_STATE_RUNNING,
-> -                                   VFIO_DEVICE_STATE_SAVING);
-> +                                   VFIO_DEVICE_STATE_V1_SAVING);
->       if (ret) {
->           error_report("%s: Failed to set state STOP and SAVING",
->                        vbasedev->name);
-> @@ -569,7 +569,7 @@ static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
->           return ret;
->       }
->   
-> -    ret = vfio_migration_set_state(vbasedev, ~VFIO_DEVICE_STATE_SAVING, 0);
-> +    ret = vfio_migration_set_state(vbasedev, ~VFIO_DEVICE_STATE_V1_SAVING, 0);
->       if (ret) {
->           error_report("%s: Failed to set state STOPPED", vbasedev->name);
->           return ret;
-> @@ -730,7 +730,7 @@ static void vfio_vmstate_change(void *opaque, bool running, RunState state)
->            * start saving data.
->            */
->           if (state == RUN_STATE_SAVE_VM) {
-> -            value = VFIO_DEVICE_STATE_SAVING;
-> +            value = VFIO_DEVICE_STATE_V1_SAVING;
->           } else {
->               value = 0;
->           }
-> @@ -768,8 +768,9 @@ static void vfio_migration_state_notifier(Notifier *notifier, void *data)
->       case MIGRATION_STATUS_FAILED:
->           bytes_transferred = 0;
->           ret = vfio_migration_set_state(vbasedev,
-> -                      ~(VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RESUMING),
-> -                      VFIO_DEVICE_STATE_RUNNING);
-> +                                       ~(VFIO_DEVICE_STATE_V1_SAVING |
-> +                                         VFIO_DEVICE_STATE_RESUMING),
-> +                                       VFIO_DEVICE_STATE_RUNNING);
->           if (ret) {
->               error_report("%s: Failed to set state RUNNING", vbasedev->name);
->           }
-> @@ -864,8 +865,10 @@ int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
->           goto add_blocker;
->       }
->   
-> -    ret = vfio_get_dev_region_info(vbasedev, VFIO_REGION_TYPE_MIGRATION,
-> -                                   VFIO_REGION_SUBTYPE_MIGRATION, &info);
-> +    ret = vfio_get_dev_region_info(vbasedev,
-> +                                   VFIO_REGION_TYPE_MIGRATION_DEPRECATED,
-> +                                   VFIO_REGION_SUBTYPE_MIGRATION_DEPRECATED,
-> +                                   &info);
->       if (ret) {
->           goto add_blocker;
->       }
-> 
+> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+> index 931cf93c3b7e..ef2d85577abb 100644
+> --- a/arch/x86/kvm/mmu/spte.c
+> +++ b/arch/x86/kvm/mmu/spte.c
+> @@ -94,7 +94,7 @@ bool __make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+>  		 const struct kvm_memory_slot *slot, unsigned int pte_access,
+>  		 gfn_t gfn, kvm_pfn_t pfn, u64 old_spte, bool prefetch,
+>  		 bool can_unsync, bool host_writable, u64 mt_mask,
+> -		 u64 *new_spte)
+> +		 struct rsvd_bits_validate *shadow_zero_check, u64 *new_spte)
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+Can we name the new param "rsvd_bits"?  As mentioned in the other patch, it's not
+a pure "are these bits zero" check.
+
+>  {
+>  	int level = sp->role.level;
+>  	u64 spte = SPTE_MMU_PRESENT_MASK;
+> @@ -177,9 +177,9 @@ bool __make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+>  	if (prefetch)
+>  		spte = mark_spte_for_access_track(spte);
+>  
+> -	WARN_ONCE(is_rsvd_spte(&vcpu->arch.mmu->shadow_zero_check, spte, level),
+> +	WARN_ONCE(is_rsvd_spte(shadow_zero_check, spte, level),
+>  		  "spte = 0x%llx, level = %d, rsvd bits = 0x%llx", spte, level,
+> -		  get_rsvd_bits(&vcpu->arch.mmu->shadow_zero_check, spte, level));
+> +		  get_rsvd_bits(shadow_zero_check, spte, level));
+>  
+>  	if ((spte & PT_WRITABLE_MASK) && kvm_slot_dirty_track_enabled(slot)) {
+>  		/* Enforced by kvm_mmu_hugepage_adjust. */
+> @@ -199,10 +199,12 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+>  {
+>  	u64 mt_mask = static_call(kvm_x86_get_mt_mask)(vcpu, gfn,
+>  						       kvm_is_mmio_pfn(pfn));
+> +	struct rsvd_bits_validate *shadow_zero_check =
+> +			&vcpu->arch.mmu->shadow_zero_check;
+>  
+>  	return __make_spte(vcpu, sp, slot, pte_access, gfn, pfn, old_spte,
+>  			   prefetch, can_unsync, host_writable, mt_mask,
+> -			   new_spte);
+> +			   shadow_zero_check, new_spte);
+
+I don't see any reason to snapshot the reserved bits, IMO this is much more
+readable overall:
+
+	u64 mt_mask = static_call(kvm_x86_get_mt_mask)(vcpu, gfn,
+						       kvm_is_mmio_pfn(pfn));
+
+	return __make_spte(vcpu->kvm, sp, slot, pte_access, gfn, pfn, old_spte,
+			   prefetch, can_unsync, host_writable, mt_mask,
+			   &vcpu->arch.mmu->shadow_zero_check, new_spte);
+
+And it avoids propagating the shadow_zero_check naming.
+
+> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+> index d051f955699e..e8a051188eb6 100644
+> --- a/arch/x86/kvm/mmu/spte.h
+> +++ b/arch/x86/kvm/mmu/spte.h
+> @@ -414,7 +414,7 @@ bool __make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+>  		 const struct kvm_memory_slot *slot, unsigned int pte_access,
+>  		 gfn_t gfn, kvm_pfn_t pfn, u64 old_spte, bool prefetch,
+>  		 bool can_unsync, bool host_writable, u64 mt_mask,
+> -		 u64 *new_spte);
+> +		 struct rsvd_bits_validate *shadow_zero_check, u64 *new_spte);
+>  bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+>  	       const struct kvm_memory_slot *slot,
+>  	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+> -- 
+> 2.35.1.894.gb6a874cedc-goog
+> 
