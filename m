@@ -2,88 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A93D84FE28B
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 15:30:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 721ED4FE28D
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 15:30:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355956AbiDLN3c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 09:29:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40340 "EHLO
+        id S239311AbiDLNbz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 09:31:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357697AbiDLN3G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 09:29:06 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F7DD1168;
-        Tue, 12 Apr 2022 06:25:47 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23CBBt4x029775;
-        Tue, 12 Apr 2022 13:25:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=AW8kwVPCS9/wRl4iOLeyMMq2debXEm5LVydGMSILoXU=;
- b=UsEM8sjXGLtwddI02//Go8ofFU8YOGntUM+l/2381XJuqHQAk4+qqPp7a/sP8TpqBXN6
- YrNtFfeZdybX4yWsW4W9MkfNiU7gYEyF8mSc0e8by5OgSs1ZDSrGOhPqF5BiTORiCPX4
- LPoFdArPbLjZ0FDf7E18KKA7I4sT7EiQbcXZno4/sgZ3yKBX1rlprOxl8P+GwOmOlRFK
- kXi3SGT4Kn8o/aPGyt1B73nUQWcRunU9GwgANRI7idIkDp+qmxlGSDpTx41lg42XdIAw
- 2UIFf9SBWOUnBlzkymwrQLwur7ioX/GsT/q6M5r7MnT+Mamh6Yq0ayk2Jq/2VKFjs0pC KQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fd8b5k3xq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 Apr 2022 13:25:46 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23CCk7mv002844;
-        Tue, 12 Apr 2022 13:25:46 GMT
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fd8b5k3x9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 Apr 2022 13:25:46 +0000
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23CDHTIw027965;
-        Tue, 12 Apr 2022 13:25:45 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma05wdc.us.ibm.com with ESMTP id 3fb1s9g71c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 Apr 2022 13:25:45 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23CDPi1e25297344
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 12 Apr 2022 13:25:44 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 64D96B206C;
-        Tue, 12 Apr 2022 13:25:44 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D03D7B205F;
-        Tue, 12 Apr 2022 13:25:42 +0000 (GMT)
-Received: from farman-thinkpad-t470p (unknown [9.163.28.157])
-        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 12 Apr 2022 13:25:42 +0000 (GMT)
-Message-ID: <f1c02fc33429403fa17bfaa21d9c551310fb968c.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v1 3/3] s390x: smp: make stop stopped cpu
- look the same as the running case
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
-Date:   Tue, 12 Apr 2022 09:25:41 -0400
-In-Reply-To: <20220412093022.21378-1-nrb@linux.ibm.com>
-References: <20220412093022.21378-1-nrb@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: gHhSBni3zb6EqmdgPKuUGxksBlpq4Yfu
-X-Proofpoint-GUID: B1KkdeCiqLUCyftuYlxyF8TXVllDWxvr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-12_04,2022-04-12_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- bulkscore=0 spamscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- priorityscore=1501 lowpriorityscore=0 clxscore=1011 malwarescore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204120062
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        with ESMTP id S233422AbiDLNbv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 09:31:51 -0400
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57C12E0FF
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 06:29:32 -0700 (PDT)
+Received: by mail-qt1-x82e.google.com with SMTP id ay4so3204320qtb.11
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 06:29:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=utHfHRuEPsFSz+t+xVfjXy9ka6MMfgaIZASNpR7InEI=;
+        b=SxlfMPQPhz+k04tLf1e3BiEJDZeTeSTHtmTmHpU/IotpKeudy7b1diCTvh0ntAbJmg
+         +AHt6cJnIoJiag2v2tCfGYjXHyS5MMQFahb4J4exdhP+HvXug+HGUrqhFW74n4LXWGCu
+         8JOpmoawvLnfHkdQneaEVx5KiqZ+gdSlZGfg/O018VShj4JdRwdflY/sPFMN0+0NHwKR
+         8E+A6g3UnmsZoQG1EMLXQaoIlKNPycu4cyR+RVvWJ4Uqu+ZfHBJLF95ckXrfwm1yc6+9
+         YPqAZ8NWvwoEW10PTJm2+WVwyfXBiaPh1RI/YAe1aWtg+jYvUMq0n4WvxIM9FV4rpTCn
+         LOMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=utHfHRuEPsFSz+t+xVfjXy9ka6MMfgaIZASNpR7InEI=;
+        b=L2ckRDE0bzXATEf+iH9ptTeT+NZRILvCJ9GumJsM9ITs47sgAEvOzpcExVme/a1hFi
+         D2X65eis7frL6IHNoZoUQgk5MePFKuTEw3CQWhP9YxOxqAPJMWYMYrAJXKo6yJGUc+G9
+         7zyQNraHL28Xt95S3b5kHp3d2rBUEVOABRlO2xcMMOwy4p1/6oQTfLHqYdkgTcg6jrOu
+         xMqPkpza2wz92uaBNTPODdVidC+dCPPTvYx5xoMbSuHfCoErdgsGulHN8lgwhBmkHSw6
+         HStSmAchqu64KZchlNhlN4v/FueKCXTKzxsGiSe4/Gs7bHglz95SpCuZ19CXnRtJVmY/
+         01mw==
+X-Gm-Message-State: AOAM530AmNFD/8HgR4o7QnqWsTRZ8yDqdrnOZMCH5ryy+zYowUBYAtqn
+        /fOmzSkv+9XYsGC7S/4B0vgwgg==
+X-Google-Smtp-Source: ABdhPJzR1/3qgAB9udxtprYbf3EHazhFycozkIuHDQce9GFcvxEpv9Sv2My0uQTgIIcCUEot20+ozg==
+X-Received: by 2002:ac8:7ca2:0:b0:2eb:db4c:1b53 with SMTP id z2-20020ac87ca2000000b002ebdb4c1b53mr3155060qtv.307.1649770171417;
+        Tue, 12 Apr 2022 06:29:31 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id a4-20020a37b104000000b0069c2ba88bdasm2820895qkf.85.2022.04.12.06.29.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Apr 2022 06:29:30 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1neGaH-000nVL-7x; Tue, 12 Apr 2022 10:29:29 -0300
+Date:   Tue, 12 Apr 2022 10:29:29 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, alex.williamson@redhat.com,
+        cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        agordeev@linux.ibm.com, svens@linux.ibm.com, frankja@linux.ibm.com,
+        david@redhat.com, imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org
+Subject: Re: [PATCH v5 15/21] KVM: s390: pci: add routines to start/stop
+ interpretive execution
+Message-ID: <20220412132929.GC64706@ziepe.ca>
+References: <20220404174349.58530-1-mjrosato@linux.ibm.com>
+ <20220404174349.58530-16-mjrosato@linux.ibm.com>
+ <20220408124707.GY64706@ziepe.ca>
+ <b143e333-0add-8042-12de-7e9e8b275ec0@linux.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b143e333-0add-8042-12de-7e9e8b275ec0@linux.ibm.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -92,35 +84,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-04-12 at 11:30 +0200, Nico Boehr wrote:
-> Adjust the stop stopped CPU case such that it looks the same as the
-> stop running
-> CPU case: use the nowait variant, handle the error code in the same
-> way and make
-> the report messages look the same.
+On Tue, Apr 12, 2022 at 09:14:36AM -0400, Matthew Rosato wrote:
+> On 4/8/22 8:47 AM, Jason Gunthorpe wrote:
+> > On Mon, Apr 04, 2022 at 01:43:43PM -0400, Matthew Rosato wrote:
+> > > +int kvm_s390_pci_register_kvm(struct device *dev, void *data)
+> > > +{
+> > > +	struct zpci_dev *zdev = NULL;
+> > > +	struct kvm *kvm = data;
+> > > +
+> > > +	/* Only proceed for zPCI devices, quietly ignore others */
+> > > +	if (dev_is_pci(dev))
+> > > +		zdev = to_zpci_dev(dev);
+> > > +	if (!zdev)
+> > > +		return 0;
+> > 
+> > Especially since this only works if we have zpci device
+> > 
+> > So having the zpci code hook the kvm notifier and then call the arch
+> > code from the zpci area seems pretty OK
+> > 
+> > Also why is a struct kvm * being passed as a void *?
 > 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> Only because the function is intended to be called via
+> iommu_group_for_each_dev (next patch) which requires int (*fn)(struct device
+> *, void *)
 
-Reviewed-by: Eric Farman <farman@linux.ibm.com>
+I think this further says this should be called from vfio on the
+actual struct device that is assigned to the KVM, not try to deduce it
+from the gorup..
 
-> ---
->  s390x/smp.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/s390x/smp.c b/s390x/smp.c
-> index 5257852c35a7..de3aba71c956 100644
-> --- a/s390x/smp.c
-> +++ b/s390x/smp.c
-> @@ -144,8 +144,9 @@ static void test_stop(void)
->  	report(smp_cpu_stopped(1), "cpu stopped");
->  
->  	report_prefix_push("stop stopped CPU");
-> -	report(!smp_cpu_stop(1), "STOP succeeds");
-> -	report(smp_cpu_stopped(1), "CPU is stopped");
-> +	rc = smp_cpu_stop_nowait(1);
-> +	report(!rc, "return code");
-> +	report(smp_cpu_stopped(1), "cpu stopped");
->  	report_prefix_pop();
->  
->  	report_prefix_pop();
-
+Jason
