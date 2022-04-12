@@ -2,155 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6255D4FEAFF
-	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 01:47:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FC284FEA8A
+	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 01:46:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230495AbiDLXcM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 19:32:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51628 "EHLO
+        id S229989AbiDLX2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 19:28:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230410AbiDLXb5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 19:31:57 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53D9A90247;
-        Tue, 12 Apr 2022 15:17:48 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1A6C7B82053;
-        Tue, 12 Apr 2022 21:28:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0F4CC385A1;
-        Tue, 12 Apr 2022 21:28:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649798896;
-        bh=7S+oixBL7sX4olcPvEogXh1CnNUMKSWXUwyI+LxpXRE=;
-        h=In-Reply-To:References:Date:From:To:Cc:Subject:From;
-        b=VeaZBY812RM8tTVwEPyJ9MBmgJnUTNE3sOrPD+M+bRRQd4EXv4xZNTVDRWsnHQnwQ
-         nuEGf6ZS9C+ddtULVHoelJ+Sys31+fgbgfzbPl7GYMkrHkx+KbamhWBM51zUmpa7uC
-         Nz3+aaac1rGMVm9tdy/qnGNhTl0Owq87IWjWQ2D1s4XMov8f45oX8L5UFp5j14fKB1
-         fUi8j32KOY9GS5oSTtfMNRglZuQ3KRzJIVrSoHc2j3VWCyxbo7QDEh3cyg9pjOTG/b
-         pJpnm81PNU1smIdqbJ2fvppy3P5h96qGmyCkUvdLdvoFWbMMEm49cfILB22CFnvhk1
-         qy5OI5cnCaJyQ==
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailauth.nyi.internal (Postfix) with ESMTP id 7946527C0054;
-        Tue, 12 Apr 2022 17:28:14 -0400 (EDT)
-Received: from imap48 ([10.202.2.98])
-  by compute2.internal (MEProxy); Tue, 12 Apr 2022 17:28:14 -0400
-X-ME-Sender: <xms:7O5VYs8lwj5MdavzExLyZhrEgbyrMiXO1_DykQcKY2g__StryccvLg>
-    <xme:7O5VYksvbMuraQrcmnb8o2HTVmPudvAs7MmppnApRRSbRQMEWGcVhYJ_I038GcBsW
-    oGC0DG9AcdNarZgApI>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvvddrudekkedgudeitdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefofgggkfgjfhffhffvufgtsehttdertderredtnecuhfhrohhmpedftehn
-    ugihucfnuhhtohhmihhrshhkihdfuceolhhuthhosehkvghrnhgvlhdrohhrgheqnecugg
-    ftrfgrthhtvghrnheptdfhheettddvtedvtedugfeuuefhtddugedvleevleefvdetleff
-    gfefvdekgeefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrh
-    homheprghnugihodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduudeiudek
-    heeifedvqddvieefudeiiedtkedqlhhuthhopeepkhgvrhhnvghlrdhorhhgsehlihhnuh
-    igrdhluhhtohdruhhs
-X-ME-Proxy: <xmx:7O5VYiDdEWrfajiYcqB6p9FGUWaxorJ-LkXsFLirb2kvXcFcs9_BxA>
-    <xmx:7O5VYsdSqRSo04iR81u4yMDTPrY70kYHKZ8P32NVv-cia2RpB69IFQ>
-    <xmx:7O5VYhPNLgqdnPVunYupFyg9opu97sHVHE74yrryNGsN3ZjS8OKsMA>
-    <xmx:7u5VYouNmHo5xGvWKYHuRhvQVKHXleE35LAx2SW8yLyHvIsfA3MUUA>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 8882521E0073; Tue, 12 Apr 2022 17:28:12 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-386-g4174665229-fm-20220406.001-g41746652
-Mime-Version: 1.0
-Message-Id: <6f44ddf9-6755-4120-be8b-7a62f0abc0e0@www.fastmail.com>
-In-Reply-To: <20220412143636.GG64706@ziepe.ca>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <20220310140911.50924-5-chao.p.peng@linux.intel.com>
- <Yk8L0CwKpTrv3Rg3@google.com>
- <02e18c90-196e-409e-b2ac-822aceea8891@www.fastmail.com>
- <YlB3Z8fqJ+67a2Ck@google.com>
- <7ab689e7-e04d-5693-f899-d2d785b09892@redhat.com>
- <20220412143636.GG64706@ziepe.ca>
-Date:   Tue, 12 Apr 2022 14:27:52 -0700
-From:   "Andy Lutomirski" <luto@kernel.org>
-To:     "Jason Gunthorpe" <jgg@ziepe.ca>,
-        "David Hildenbrand" <david@redhat.com>
-Cc:     "Sean Christopherson" <seanjc@google.com>,
-        "Chao Peng" <chao.p.peng@linux.intel.com>,
-        "kvm list" <kvm@vger.kernel.org>,
-        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        "Linux API" <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        "Jonathan Corbet" <corbet@lwn.net>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        "Wanpeng Li" <wanpengli@tencent.com>,
-        "Jim Mattson" <jmattson@google.com>,
-        "Joerg Roedel" <joro@8bytes.org>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Hugh Dickins" <hughd@google.com>,
-        "Jeff Layton" <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        "Mike Rapoport" <rppt@kernel.org>,
-        "Steven Price" <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        "Vlastimil Babka" <vbabka@suse.cz>,
-        "Vishal Annapurve" <vannapurve@google.com>,
-        "Yu Zhang" <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        "Dave Hansen" <dave.hansen@intel.com>,
-        "Andi Kleen" <ak@linux.intel.com>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Linux API" <linux-api@vger.kernel.org>
-Subject: Re: [PATCH v5 04/13] mm/shmem: Restrict MFD_INACCESSIBLE memory against
- RLIMIT_MEMLOCK
-Content-Type: text/plain
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S230304AbiDLX1r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 19:27:47 -0400
+Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B371D113A
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 15:13:00 -0700 (PDT)
+Received: by mail-oi1-x22d.google.com with SMTP id r8so196425oib.5
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 15:13:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=NowsSEuQJIZua7/716N+9P9bKTm9KkV6U8XDawgBVQE=;
+        b=UIYv/D4877vchmD36c250N280pyX9NJSXwVvBFW2zFw637UNsQr8rbk54nJVwgG4/p
+         gg74h6IyN74e+jRYpL84GkYVlNrDuk7ElKsUwYip7jQro1zQf5Zs+X+RHyLJrIIttoh2
+         zXL9EALXQF/E2WvOoV5UG8/+CmzSYinIVC5crACR/XwGjB3ktu8OXSzd/YUhIaKIrfAD
+         WQjFHFFWw3NP8zx7xIkWPmynyo/8esYZ31lr1NrVrEhpJ0vF2jGcrLi/9JVnjbShMHZH
+         Q/NV5VR/vXBg3ToJX5l33KOml4OkRQunpzZ5vUjuOSbW/qIwqhr/ZWtKzXPu05auPYxq
+         HAag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=NowsSEuQJIZua7/716N+9P9bKTm9KkV6U8XDawgBVQE=;
+        b=WxBUCq6LTlSck7uKcuL976thPGht9Q1JRRN15MKaYP6hiBTdCagTwsgh2qdy2KbhgO
+         lfSjcnyqyHb2lgzaG98vYO8wwkQAAcd8hKWxh3cr74S6F72M2Tw2T51kSxqBLm9GUsHv
+         XCNyfxvCxbDKZUErQf6JC++z/vqfzltwDUrCjqbdiR91ZHU/P8DDsf731zWVRrImpCL0
+         rk6diETf9eTSdPZBjnvgcRWBP2bI8bpHvy8IqCqwnkw3RrQ67VnFSVr0DkfyGxhThnsu
+         eBSNEQLpemLsqzNghi7d4Z08emP3gSoyQNgRIx+V63KOp5gsXGEpGQ4wAWgLtKWYS2Qh
+         QlNw==
+X-Gm-Message-State: AOAM531lK2ccoTU+fGQM/ibxxfTbmhLzCdQ5czgwnoGdKGo6Kf7Wfewu
+        WuuRfqz33jAhjpKyiH3uTHf86VvMTarnMA==
+X-Google-Smtp-Source: ABdhPJy3r+oVme8d4eH28hz36G3liW90OQkeDuh9SsuKbSxUpbmxkrB4M7+PMd1WrrNt1quENaPYxw==
+X-Received: by 2002:a17:90a:4d0d:b0:1cb:9dac:7ed0 with SMTP id c13-20020a17090a4d0d00b001cb9dac7ed0mr7228521pjg.198.1649799097115;
+        Tue, 12 Apr 2022 14:31:37 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id p3-20020a056a000b4300b004faee36ea56sm40502527pfo.155.2022.04.12.14.31.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Apr 2022 14:31:36 -0700 (PDT)
+Date:   Tue, 12 Apr 2022 21:31:32 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-doc@vger.kernel.org
+Subject: Re: [RFC PATCH V3 2/4] KVM: X86: Introduce role.glevel for level
+ expanded pagetable
+Message-ID: <YlXvtMqWpyM9Bjox@google.com>
+References: <20220330132152.4568-1-jiangshanlai@gmail.com>
+ <20220330132152.4568-3-jiangshanlai@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220330132152.4568-3-jiangshanlai@gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 12, 2022, at 7:36 AM, Jason Gunthorpe wrote:
-> On Fri, Apr 08, 2022 at 08:54:02PM +0200, David Hildenbrand wrote:
->
->> RLIMIT_MEMLOCK was the obvious candidate, but as we discovered int he
->> past already with secretmem, it's not 100% that good of a fit (unmovable
->> is worth than mlocked). But it gets the job done for now at least.
->
-> No, it doesn't. There are too many different interpretations how
-> MELOCK is supposed to work
->
-> eg VFIO accounts per-process so hostile users can just fork to go past
-> it.
->
-> RDMA is per-process but uses a different counter, so you can double up
->
-> iouring is per-user and users a 3rd counter, so it can triple up on
-> the above two
->
->> So I'm open for alternative to limit the amount of unmovable memory we
->> might allocate for user space, and then we could convert seretmem as well.
->
-> I think it has to be cgroup based considering where we are now :\
->
+On Wed, Mar 30, 2022, Lai Jiangshan wrote:
+> +  role.glevel:
+> +    The level in guest pagetable if the sp is indirect.  Is 0 if the sp
+> +    is direct without corresponding guest pagetable, like TDP or !CR0.PG.
+> +    When role.level > guest paging level, indirect sp is created on the
+> +    top with role.glevel = guest paging level and acks as passthrough sp
 
-So this is another situation where the actual backend (TDX, SEV, pKVM, pure software) makes a difference -- depending on exactly what backend we're using, the memory may not be unmoveable.  It might even be swappable (in the potentially distant future).
+s/acks/acts
 
-Anyway, here's a concrete proposal, with a bit of handwaving:
+> +    and its contents are specially installed rather than the translations
+> +    of the corresponding guest pagetable.
+>    gfn:
+>      Either the guest page table containing the translations shadowed by this
+>      page, or the base page frame for linear translations.  See role.direct.
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 9694dd5e6ccc..67e1bccaf472 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -314,7 +314,7 @@ struct kvm_kernel_irq_routing_entry;
+>   *     cr0_wp=0, therefore these three bits only give rise to 5 possibilities.
+>   *
+>   * Therefore, the maximum number of possible upper-level shadow pages for a
+> - * single gfn is a bit less than 2^13.
+> + * single gfn is a bit less than 2^15.
+>   */
+>  union kvm_mmu_page_role {
+>  	u32 word;
+> @@ -331,7 +331,8 @@ union kvm_mmu_page_role {
+>  		unsigned smap_andnot_wp:1;
+>  		unsigned ad_disabled:1;
+>  		unsigned guest_mode:1;
+> -		unsigned :6;
+> +		unsigned glevel:4;
 
-We add new cgroup limits:
+We don't need 4 bits for this.  Crossing our fingers that we never had to shadow
+a 2-level guest with a 6-level host, we can do:
 
-memory.unmoveable
-memory.locked
+		unsigned passthrough_delta:2;
 
-These can be set to an actual number or they can be set to the special value ROOT_CAP.  If they're set to ROOT_CAP, then anyone in the cgroup with capable(CAP_SYS_RESOURCE) (i.e. the global capability) can allocate movable or locked memory with this (and potentially other) new APIs.  If it's 0, then they can't.  If it's another value, then the memory can be allocated, charged to the cgroup, up to the limit, with no particular capability needed.  The default at boot is ROOT_CAP.  Anyone who wants to configure it differently is free to do so.  This avoids introducing a DoS, makes it easy to run tests without configuring cgroup, and lets serious users set up their cgroups.
+Where the field is ignored if direct=1, '0' for non-passthrough, and 1-3 to handle
+shadow_root_level - guest_root_level.  Basically the same idea as Paolo's smushing
+of direct+passthrough into mapping_level, just dressed up differently.
 
-Nothing is charge per mm.
+Side topic, we should steal a bit back from "level", or at least document that we
+can steal a bit if necessary.
 
-To make this fully sensible, we need to know what the backend is for the private memory before allocating any so that we can charge it accordingly.
+> +		unsigned :2;
+>  
+>  		/*
+>  		 * This is left at the top of the word so that
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 02eae110cbe1..d53037df8177 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -737,8 +737,12 @@ static void mmu_free_pte_list_desc(struct pte_list_desc *pte_list_desc)
+>  
+>  static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
+>  {
+> -	if (!sp->role.direct)
+> +	if (!sp->role.direct) {
+> +		if (unlikely(sp->role.glevel < sp->role.level))
+
+Regardless of whatever magic we end up using, there should be an is_passthrough_sp()
+helper to wrap the magic.
+
+> +			return sp->gfn;
+> +
+>  		return sp->gfns[index];
+> +	}
+>  
+>  	return sp->gfn + (index << ((sp->role.level - 1) * PT64_LEVEL_BITS));
+>  }
