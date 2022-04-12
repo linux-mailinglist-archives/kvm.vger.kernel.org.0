@@ -2,144 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 293324FDB46
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 12:56:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A49F4FDC9B
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 13:05:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344946AbiDLJ5T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 05:57:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34838 "EHLO
+        id S1344379AbiDLKgr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 06:36:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355838AbiDLJT2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 05:19:28 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3BDA237EA;
-        Tue, 12 Apr 2022 01:25:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649751919; x=1681287919;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=wa0dgOa2bUIhS6s5MOqyz5XHWr88Riy5FGtqVsg0X1c=;
-  b=X0DHIx6KhYh7SORGo/j/iTV+5MUNI4Pk/R6WjU9QHndUKMrtpaqRxdYd
-   7gu4Crbk2bQ0ZAgJoj2FE9Dr1JFx/8+Zu4CNi7Jora4goadkyzoV+EtQx
-   8H0pUzrN3i6+swButjW2gmmxgiyQttOW2wITU3a+ZTJ8kJJ9Fi6S+vVT1
-   oeX0TDZ5sx4B3g/+eiQF9mLWK67UcgipMdk4JjOc7YSvBQCUyWar8P7xo
-   +ngnAHAG4BbEReAUdkyOjcdEpA+VASjar4XoY6HT7jKdOfNlZKo6kS18w
-   WvLVCc7ekjUP8QvIzJiKsYzIDVG9e2If8kEMiDsCy/L31DNFmQM/EyHLu
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10314"; a="262495645"
-X-IronPort-AV: E=Sophos;i="5.90,253,1643702400"; 
-   d="scan'208";a="262495645"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2022 01:25:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,253,1643702400"; 
-   d="scan'208";a="699728288"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by fmsmga001.fm.intel.com with ESMTP; 12 Apr 2022 01:25:10 -0700
-Date:   Tue, 12 Apr 2022 16:25:00 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     "Nikunj A. Dadhania" <nikunj@amd.com>
-Cc:     Vishal Annapurve <vannapurve@google.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        shauh@kernel.org, yang.zhong@intel.com, drjones@redhat.com,
-        ricarkol@google.com, aaronlewis@google.com, wei.w.wang@intel.com,
-        kirill.shutemov@linux.intel.com, corbet@lwn.net, hughd@google.com,
-        jlayton@kernel.org, bfields@fieldses.org,
-        akpm@linux-foundation.org, yu.c.zhang@linux.intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com,
-        michael.roth@amd.com, qperret@google.com, steven.price@arm.com,
-        ak@linux.intel.com, david@redhat.com, luto@kernel.org,
-        vbabka@suse.cz, marcorr@google.com, erdemaktas@google.com,
-        pgonda@google.com, seanjc@google.com, diviness@google.com
-Subject: Re: [RFC V1 PATCH 0/5] selftests: KVM: selftests for fd-based
- approach of supporting private memory
-Message-ID: <20220412082500.GA7309@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220408210545.3915712-1-vannapurve@google.com>
- <0790131c-95af-676f-c475-addd1191eacd@amd.com>
+        with ESMTP id S1381003AbiDLK0A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 06:26:00 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B790E54BD1;
+        Tue, 12 Apr 2022 02:29:48 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23C8BrgY012804;
+        Tue, 12 Apr 2022 09:29:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=n0N8LxyFzTgRl4eQsM8PZ39uWTWdh0NanMX95mTnDPE=;
+ b=TFxs5u1w1pobIWd/T1oHTqNK6fXJvFsah5uBKdE5XMWAc2/FMHW+vs5QSZVh/75fUe9A
+ VSmUjsofSGfANm/U81XsCPHWPOd9QYtcZnXJMTWCtaiTGeAT2XLMkySIdhwdmixIq3Av
+ QTOMxN2ZmGOogJAlDvahO93GiCDx8lUM8fz5/Y7XSQ/r89UrlxBK94N53du7H75ULlsz
+ ETrP8QW9JeZFzFV2MXBk0y61dd+cqlR8U0tDs//6VdOwC6p9vAznbUR0sPp10UjPvCKH
+ ErhViuibH4IkgiRfhDGHlT9hgoKi8jsPQPTUZvwZ9fZsMIsQkZg/jTKudj+IGsxupQK2 tA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fd5puhkup-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Apr 2022 09:29:48 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23C99u5S003084;
+        Tue, 12 Apr 2022 09:29:47 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fd5puhku4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Apr 2022 09:29:47 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23C9BmZ3020039;
+        Tue, 12 Apr 2022 09:29:45 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04fra.de.ibm.com with ESMTP id 3fb1s8unv2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Apr 2022 09:29:45 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23C9TgMT38928866
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Apr 2022 09:29:42 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 07593AE045;
+        Tue, 12 Apr 2022 09:29:42 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B8250AE04D;
+        Tue, 12 Apr 2022 09:29:41 +0000 (GMT)
+Received: from t46lp57.lnxne.boe (unknown [9.152.108.100])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 12 Apr 2022 09:29:41 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Subject: [kvm-unit-tests PATCH v1 1/3] s390x: epsw: fix report_pop_prefix() when running under non-QEMU
+Date:   Tue, 12 Apr 2022 11:29:40 +0200
+Message-Id: <20220412092941.20742-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0790131c-95af-676f-c475-addd1191eacd@amd.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: GI1b6Mzn6PW_BdQ0kp1KvIP5ZzEyQDpX
+X-Proofpoint-GUID: 3861WgmHBG1xtGVo7Lk_hC_qJZ7wyVuA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-04-12_02,2022-04-11_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=999 phishscore=0 spamscore=0 malwarescore=0 adultscore=0
+ bulkscore=0 impostorscore=0 priorityscore=1501 clxscore=1015
+ suspectscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204120042
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 11, 2022 at 05:31:09PM +0530, Nikunj A. Dadhania wrote:
-> On 4/9/2022 2:35 AM, Vishal Annapurve wrote:
-> > This series implements selftests targeting the feature floated by Chao
-> > via:
-> > https://lore.kernel.org/linux-mm/20220310140911.50924-1-chao.p.peng@linux.intel.com/
-> > 
-> 
-> Thanks for working on this.
-> 
-> > Below changes aim to test the fd based approach for guest private memory
-> > in context of normal (non-confidential) VMs executing on non-confidential
-> > platforms.
-> > 
-> > Confidential platforms along with the confidentiality aware software
-> > stack support a notion of private/shared accesses from the confidential
-> > VMs.
-> > Generally, a bit in the GPA conveys the shared/private-ness of the
-> > access. Non-confidential platforms don't have a notion of private or
-> > shared accesses from the guest VMs. To support this notion,
-> > KVM_HC_MAP_GPA_RANGE
-> > is modified to allow marking an access from a VM within a GPA range as
-> > always shared or private. Any suggestions regarding implementing this ioctl
-> > alternatively/cleanly are appreciated.
-> > 
-> > priv_memfd_test.c file adds a suite of two basic selftests to access private
-> > memory from the guest via private/shared access and checking if the contents
-> > can be leaked to/accessed by vmm via shared memory view.
-> > 
-> > Test results:
-> > 1) PMPAT - PrivateMemoryPrivateAccess test passes
-> > 2) PMSAT - PrivateMemorySharedAccess test fails currently and needs more
-> > analysis to understand the reason of failure.
-> 
-> That could be because of the return code (*r = -1) from the KVM_EXIT_MEMORY_ERROR. 
-> This gets interpreted as -EPERM in the VMM when the vcpu_run exits.
-> 
-> 	+	vcpu->run->exit_reason = KVM_EXIT_MEMORY_ERROR;
-> 	+	vcpu->run->memory.flags = flags;
-> 	+	vcpu->run->memory.padding = 0;
-> 	+	vcpu->run->memory.gpa = fault->gfn << PAGE_SHIFT;
-> 	+	vcpu->run->memory.size = PAGE_SIZE;
-> 	+	fault->pfn = -1;
-> 	+	*r = -1;
-> 	+	return true;
+When we don't run in QEMU, we didn't push a prefix, hence pop won't work. Fix
+this by pushing the prefix before the QEMU check.
 
-That's true. The current private mem patch treats KVM_EXIT_MEMORY_ERROR as error
-for KVM_RUN. That behavior needs to be discussed, but right now (v5) it hits the
-ASSERT in tools/testing/selftests/kvm/lib/kvm_util.c before you have chance to
-handle KVM_EXIT_MEMORY_ERROR in this patch series.
+Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+---
+ s390x/epsw.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-void vcpu_run(struct kvm_vm *vm, uint32_t vcpuid)
-{
-        int ret = _vcpu_run(vm, vcpuid);
-        TEST_ASSERT(ret == 0, "KVM_RUN IOCTL failed, "
-                "rc: %i errno: %i", ret, errno);
-}
+diff --git a/s390x/epsw.c b/s390x/epsw.c
+index 5b73f4b3db6c..d8090d95a486 100644
+--- a/s390x/epsw.c
++++ b/s390x/epsw.c
+@@ -97,13 +97,13 @@ static void test_epsw(void)
+ 
+ int main(int argc, char **argv)
+ {
++	report_prefix_push("epsw");
++
+ 	if (!host_is_kvm() && !host_is_tcg()) {
+ 		report_skip("Not running under QEMU");
+ 		goto done;
+ 	}
+ 
+-	report_prefix_push("epsw");
+-
+ 	test_epsw();
+ 
+ done:
+-- 
+2.31.1
 
-Thanks,
-Chao
-
-> 
-> 
-> Regards
-> Nikunj
-> 
-> [1] https://lore.kernel.org/all/20220310140911.50924-10-chao.p.peng@linux.intel.com/#t
