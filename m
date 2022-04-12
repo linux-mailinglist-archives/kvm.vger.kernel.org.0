@@ -2,69 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C2AE4FD658
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 12:21:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3B584FD9B3
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 12:44:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351010AbiDLHgK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 03:36:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42842 "EHLO
+        id S245608AbiDLHcG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 03:32:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355159AbiDLH1M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 03:27:12 -0400
+        with ESMTP id S1355757AbiDLH3U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 03:29:20 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 09D8F483AB
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 00:07:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 48FAF4F9C0
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 00:08:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649747234;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
+        s=mimecast20190719; t=1649747296;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Iv8EN5IeVpjTBF6dGa6wH6Ws/ShvBXq53KxLIiB+R3g=;
-        b=I/42Ii97c+J34Ds9P1/4Xx9yRODTSCeMfwBtEyNRe/TYUvSfLgL2rlHg0PgpxudwSVHtGy
-        80HLrv1q/xTMVW4xcCR0hmNhkwkXFuDxkiifaqACdNa4Rr2mTetDHED58u71iir0heXefx
-        KlD15m3WeO21QJWcUMJ/iNZUhrDeo3o=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=rO0UiIR0RaZp+eJrqPEuwbF/F4u5EFxiYFSQC2lhpMQ=;
+        b=TCpArwnnE6y8HPgC1eawpP9OICfLInKYgdeTDUwdNKp+BztGZPCjfkk+rOq950jupTjB2N
+        ugVB/dvkwYeqEObflNDM+Gxd+FZENT5hbTxuyodht0WC4kKC1qfaUdFkepz1i7FxGgI7ib
+        w99ZP5lT4b2PZRzeiOiHh3+lIJO78Rk=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-64-Fxi2o8wXNrKDL4tc-wVHzQ-1; Tue, 12 Apr 2022 03:07:11 -0400
-X-MC-Unique: Fxi2o8wXNrKDL4tc-wVHzQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 64385299E74D;
-        Tue, 12 Apr 2022 07:07:10 +0000 (UTC)
-Received: from [10.72.12.73] (ovpn-12-73.pek2.redhat.com [10.72.12.73])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A2B3754AC8C;
-        Tue, 12 Apr 2022 07:06:59 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v5 01/10] KVM: arm64: Factor out firmware register
- handling from psci.c
-To:     Raghavendra Rao Ananta <rananta@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
-        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-References: <20220407011605.1966778-1-rananta@google.com>
- <20220407011605.1966778-2-rananta@google.com>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <6797f003-85f2-d1af-c106-c17091268a55@redhat.com>
-Date:   Tue, 12 Apr 2022 15:06:51 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ us-mta-600-5_bJnlE5NCa8iG4SfQI2LA-1; Tue, 12 Apr 2022 03:08:14 -0400
+X-MC-Unique: 5_bJnlE5NCa8iG4SfQI2LA-1
+Received: by mail-pj1-f72.google.com with SMTP id u1-20020a17090a2b8100b001cba1905e25so1083290pjd.7
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 00:08:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=rO0UiIR0RaZp+eJrqPEuwbF/F4u5EFxiYFSQC2lhpMQ=;
+        b=zB1+155XzuY200EUOTfTopwSNduAKkgpNAxunl+BGrzQYvu63qOaDwBJak4tX0Qrb1
+         DDviHR3t1GfLb5XO9huDv/gQqnPgtZHVNLcRaC0/55CKUm43NEOmm9LgLDhzgNjIkNAg
+         XEOOK6UnqpzLv2Uqiau6jraH/DMi3j1bGCcTSop7GUj8Nu9DKf39gDQvDiPkbLJa6x/v
+         Z7hQh8kWrmKQH11B+63oOh3S28ab44ZtChItt3b0JND83h+J9sB5mmKLnhd5IyKNSOin
+         PfCsBkk+UXH1DzmDcWvx6ow2EZ+amLDBhr93E4Iq6v7n+K55xQz8udELQPX8fmUfUVwO
+         0nIg==
+X-Gm-Message-State: AOAM531YQDfWwVyAjpAvp92EwiQ1jEWDGK/Ol3JBEZN9uUYwIa0WN+lS
+        63zCmOJKEPBtlb1IlguVF3qTKg0zNsLLNSbqUrhP7C9kj8QKezm+QfPm3dekruiCGAsiUTqC8QW
+        sDDXgyEUlq3Jm
+X-Received: by 2002:a17:902:d4c1:b0:154:1273:6ec9 with SMTP id o1-20020a170902d4c100b0015412736ec9mr36389019plg.148.1649747293393;
+        Tue, 12 Apr 2022 00:08:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxmBYQVhBgkM83IAVsIXuW8wi4G3nuNupPsrp7sYEa8TLNXxILPfIRwjGxeuvOgRL1kO9utqQ==
+X-Received: by 2002:a17:902:d4c1:b0:154:1273:6ec9 with SMTP id o1-20020a170902d4c100b0015412736ec9mr36388997plg.148.1649747293111;
+        Tue, 12 Apr 2022 00:08:13 -0700 (PDT)
+Received: from [10.72.14.5] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id u3-20020a17090add4300b001ca56ea162bsm1611301pjv.33.2022.04.12.00.08.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Apr 2022 00:08:12 -0700 (PDT)
+Message-ID: <d040a3fe-765e-93d6-cef9-603f23a0fd1e@redhat.com>
+Date:   Tue, 12 Apr 2022 15:07:58 +0800
 MIME-Version: 1.0
-In-Reply-To: <20220407011605.1966778-2-rananta@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.7.0
+Subject: Re: [PATCH v9 23/32] virtio_pci: queue_reset: support
+ VIRTIO_F_RING_RESET
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        virtualization@lists.linux-foundation.org
+Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, netdev@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, bpf@vger.kernel.org
+References: <20220406034346.74409-1-xuanzhuo@linux.alibaba.com>
+ <20220406034346.74409-24-xuanzhuo@linux.alibaba.com>
+From:   Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20220406034346.74409-24-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
@@ -76,476 +109,216 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Raghavendra,
 
-On 4/7/22 9:15 AM, Raghavendra Rao Ananta wrote:
-> Common hypercall firmware register handing is currently employed
-> by psci.c. Since the upcoming patches add more of these registers,
-> it's better to move the generic handling to hypercall.c for a
-> cleaner presentation.
-> 
-> While we are at it, collect all the firmware registers under
-> fw_reg_ids[] to help implement kvm_arm_get_fw_num_regs() and
-> kvm_arm_copy_fw_reg_indices() in a generic way. Also, define
-> KVM_REG_FEATURE_LEVEL_MASK using a GENMASK instead.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> Reviewed-by: Oliver Upton <oupton@google.com>
+在 2022/4/6 上午11:43, Xuan Zhuo 写道:
+> This patch implements virtio pci support for QUEUE RESET.
+>
+> Performing reset on a queue is divided into these steps:
+>
+>   1. notify the device to reset the queue
+>   2. recycle the buffer submitted
+>   3. reset the vring (may re-alloc)
+>   4. mmap vring to device, and enable the queue
+>
+> This patch implements virtio_reset_vq(), virtio_enable_resetq() in the
+> pci scenario.
+>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 > ---
->   arch/arm64/kvm/guest.c       |   2 +-
->   arch/arm64/kvm/hypercalls.c  | 185 +++++++++++++++++++++++++++++++++++
->   arch/arm64/kvm/psci.c        | 183 ----------------------------------
->   include/kvm/arm_hypercalls.h |   7 ++
->   include/kvm/arm_psci.h       |   7 --
->   5 files changed, 193 insertions(+), 191 deletions(-)
-> 
+>   drivers/virtio/virtio_pci_common.c |  8 +--
+>   drivers/virtio/virtio_pci_modern.c | 84 ++++++++++++++++++++++++++++++
+>   drivers/virtio/virtio_ring.c       |  2 +
+>   include/linux/virtio.h             |  1 +
+>   4 files changed, 92 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
+> index fdbde1db5ec5..863d3a8a0956 100644
+> --- a/drivers/virtio/virtio_pci_common.c
+> +++ b/drivers/virtio/virtio_pci_common.c
+> @@ -248,9 +248,11 @@ static void vp_del_vq(struct virtqueue *vq)
+>   	struct virtio_pci_vq_info *info = vp_dev->vqs[vq->index];
+>   	unsigned long flags;
+>   
+> -	spin_lock_irqsave(&vp_dev->lock, flags);
+> -	list_del(&info->node);
+> -	spin_unlock_irqrestore(&vp_dev->lock, flags);
+> +	if (!vq->reset) {
 
-Apart from the below nits:
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+On which condition that we may hit this path?
 
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 7e15b03fbdf8..0d5cca56cbda 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -18,7 +18,7 @@
->   #include <linux/string.h>
->   #include <linux/vmalloc.h>
->   #include <linux/fs.h>
-> -#include <kvm/arm_psci.h>
-> +#include <kvm/arm_hypercalls.h>
->   #include <asm/cputype.h>
->   #include <linux/uaccess.h>
->   #include <asm/fpsimd.h>
-> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-> index 202b8c455724..fa6d9378d8e7 100644
-> --- a/arch/arm64/kvm/hypercalls.c
-> +++ b/arch/arm64/kvm/hypercalls.c
-> @@ -158,3 +158,188 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->   	smccc_set_retval(vcpu, val[0], val[1], val[2], val[3]);
->   	return 1;
->   }
-> +
-> +static const u64 kvm_arm_fw_reg_ids[] = {
-> +	KVM_REG_ARM_PSCI_VERSION,
-> +	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1,
-> +	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2,
-> +	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3,
-> +};
-> +
-> +int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
-> +{
-> +	return ARRAY_SIZE(kvm_arm_fw_reg_ids);
-> +}
-> +
-> +int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(kvm_arm_fw_reg_ids); i++) {
-> +		if (put_user(kvm_arm_fw_reg_ids[i], uindices++))
-> +			return -EFAULT;
+
+> +		spin_lock_irqsave(&vp_dev->lock, flags);
+> +		list_del(&info->node);
+> +		spin_unlock_irqrestore(&vp_dev->lock, flags);
 > +	}
+>   
+>   	vp_dev->del_vq(info);
+>   	kfree(info);
+> diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
+> index 49a4493732cf..cb5d38f1c9c8 100644
+> --- a/drivers/virtio/virtio_pci_modern.c
+> +++ b/drivers/virtio/virtio_pci_modern.c
+> @@ -34,6 +34,9 @@ static void vp_transport_features(struct virtio_device *vdev, u64 features)
+>   	if ((features & BIT_ULL(VIRTIO_F_SR_IOV)) &&
+>   			pci_find_ext_capability(pci_dev, PCI_EXT_CAP_ID_SRIOV))
+>   		__virtio_set_bit(vdev, VIRTIO_F_SR_IOV);
+> +
+> +	if (features & BIT_ULL(VIRTIO_F_RING_RESET))
+> +		__virtio_set_bit(vdev, VIRTIO_F_RING_RESET);
+>   }
+>   
+>   /* virtio config->finalize_features() implementation */
+> @@ -199,6 +202,83 @@ static int vp_active_vq(struct virtqueue *vq, u16 msix_vec)
+>   	return 0;
+>   }
+>   
+> +static int vp_modern_reset_vq(struct virtqueue *vq)
+> +{
+> +	struct virtio_pci_device *vp_dev = to_vp_device(vq->vdev);
+> +	struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
+> +	struct virtio_pci_vq_info *info;
+> +	unsigned long flags;
+> +
+> +	if (!virtio_has_feature(vq->vdev, VIRTIO_F_RING_RESET))
+> +		return -ENOENT;
+> +
+> +	vp_modern_set_queue_reset(mdev, vq->index);
+> +
+> +	info = vp_dev->vqs[vq->index];
+> +
+> +	/* delete vq from irq handler */
+> +	spin_lock_irqsave(&vp_dev->lock, flags);
+> +	list_del(&info->node);
+> +	spin_unlock_irqrestore(&vp_dev->lock, flags);
+> +
+> +	INIT_LIST_HEAD(&info->node);
+> +
+> +	/* For the case where vq has an exclusive irq, to prevent the irq from
+> +	 * being received again and the pending irq, call disable_irq().
+> +	 *
+> +	 * In the scenario based on shared interrupts, vq will be searched from
+> +	 * the queue virtqueues. Since the previous list_del() has been deleted
+> +	 * from the queue, it is impossible for vq to be called in this case.
+> +	 * There is no need to close the corresponding interrupt.
+> +	 */
+> +	if (vp_dev->per_vq_vectors && info->msix_vector != VIRTIO_MSI_NO_VECTOR)
+> +		disable_irq(pci_irq_vector(vp_dev->pci_dev, info->msix_vector));
+
+
+See the previous discussion and the revert of the first try to harden 
+the interrupt. We probably can't use disable_irq() since it conflicts 
+with the affinity managed IRQ that is used by some drivers.
+
+We need to use synchonize_irq() and per virtqueue flag instead. As 
+mentioned in previous patches, this could be done on top of my rework on 
+the IRQ hardening .
+
+
+> +
+> +	vq->reset = true;
 > +
 > +	return 0;
 > +}
 > +
-
-Since we're here, I think we can make this function to return 'ARRAY_SIZE(kvm_arm_fw_reg_ids)',
-to be consistent with copy_{core, sve}_reg_indices(). With the return value fixed, additional
-patch can use @ret in kvm_arm_copy_reg_indices().
-
-> +#define KVM_REG_FEATURE_LEVEL_WIDTH	4
-> +#define KVM_REG_FEATURE_LEVEL_MASK	GENMASK(KVM_REG_FEATURE_LEVEL_WIDTH, 0)
-> +
-
-It seems 'BIT()' is replaced with 'GENMASK' in the movement, but it's not mentioned
-in the commit log. I guess it'd better to mention it if you agree.
-
-> +/*
-> + * Convert the workaround level into an easy-to-compare number, where higher
-> + * values mean better protection.
-> + */
-> +static int get_kernel_wa_level(u64 regid)
+> +static int vp_modern_enable_reset_vq(struct virtqueue *vq)
 > +{
-> +	switch (regid) {
-> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
-> +		switch (arm64_get_spectre_v2_state()) {
-> +		case SPECTRE_VULNERABLE:
-> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL;
-> +		case SPECTRE_MITIGATED:
-> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL;
-> +		case SPECTRE_UNAFFECTED:
-> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_REQUIRED;
-> +		}
-> +		return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL;
-> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
-> +		switch (arm64_get_spectre_v4_state()) {
-> +		case SPECTRE_MITIGATED:
-> +			/*
-> +			 * As for the hypercall discovery, we pretend we
-> +			 * don't have any FW mitigation if SSBS is there at
-> +			 * all times.
-> +			 */
-> +			if (cpus_have_final_cap(ARM64_SSBS))
-> +				return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL;
-> +			fallthrough;
-> +		case SPECTRE_UNAFFECTED:
-> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED;
-> +		case SPECTRE_VULNERABLE:
-> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL;
-> +		}
-> +		break;
-> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3:
-> +		switch (arm64_get_spectre_bhb_state()) {
-> +		case SPECTRE_VULNERABLE:
-> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_NOT_AVAIL;
-> +		case SPECTRE_MITIGATED:
-> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_AVAIL;
-> +		case SPECTRE_UNAFFECTED:
-> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_NOT_REQUIRED;
-> +		}
-> +		return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_NOT_AVAIL;
+> +	struct virtio_pci_device *vp_dev = to_vp_device(vq->vdev);
+> +	struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
+> +	struct virtio_pci_vq_info *info;
+> +	unsigned long flags, index;
+> +	int err;
+> +
+> +	if (!vq->reset)
+> +		return -EBUSY;
+> +
+> +	index = vq->index;
+> +	info = vp_dev->vqs[index];
+> +
+> +	/* check queue reset status */
+> +	if (vp_modern_get_queue_reset(mdev, index) != 1)
+> +		return -EBUSY;
+> +
+> +	err = vp_active_vq(vq, info->msix_vector);
+> +	if (err)
+> +		return err;
+> +
+> +	if (vq->callback) {
+> +		spin_lock_irqsave(&vp_dev->lock, flags);
+> +		list_add(&info->node, &vp_dev->virtqueues);
+> +		spin_unlock_irqrestore(&vp_dev->lock, flags);
+> +	} else {
+> +		INIT_LIST_HEAD(&info->node);
 > +	}
 > +
-> +	return -EINVAL;
-> +}
+> +	vp_modern_set_queue_enable(&vp_dev->mdev, index, true);
 > +
-> +int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> +{
-> +	void __user *uaddr = (void __user *)(long)reg->addr;
-> +	u64 val;
+> +	if (vp_dev->per_vq_vectors && info->msix_vector != VIRTIO_MSI_NO_VECTOR)
+> +		enable_irq(pci_irq_vector(vp_dev->pci_dev, info->msix_vector));
+
+
+We had the same issue as disable_irq().
+
+Thanks
+
+
 > +
-> +	switch (reg->id) {
-> +	case KVM_REG_ARM_PSCI_VERSION:
-> +		val = kvm_psci_version(vcpu);
-> +		break;
-> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
-> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
-> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3:
-> +		val = get_kernel_wa_level(reg->id) & KVM_REG_FEATURE_LEVEL_MASK;
-> +		break;
-> +	default:
-> +		return -ENOENT;
-> +	}
-> +
-> +	if (copy_to_user(uaddr, &val, KVM_REG_SIZE(reg->id)))
-> +		return -EFAULT;
+> +	vq->reset = false;
 > +
 > +	return 0;
 > +}
 > +
-> +int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> +{
-> +	void __user *uaddr = (void __user *)(long)reg->addr;
-> +	u64 val;
-> +	int wa_level;
-> +
-> +	if (copy_from_user(&val, uaddr, KVM_REG_SIZE(reg->id)))
-> +		return -EFAULT;
-> +
-> +	switch (reg->id) {
-> +	case KVM_REG_ARM_PSCI_VERSION:
-> +	{
-> +		bool wants_02;
-> +
-> +		wants_02 = test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features);
-> +
-> +		switch (val) {
-> +		case KVM_ARM_PSCI_0_1:
-> +			if (wants_02)
-> +				return -EINVAL;
-> +			vcpu->kvm->arch.psci_version = val;
-> +			return 0;
-> +		case KVM_ARM_PSCI_0_2:
-> +		case KVM_ARM_PSCI_1_0:
-> +		case KVM_ARM_PSCI_1_1:
-> +			if (!wants_02)
-> +				return -EINVAL;
-> +			vcpu->kvm->arch.psci_version = val;
-> +			return 0;
-> +		}
-> +		break;
-> +	}
-> +
-> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
-> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3:
-> +		if (val & ~KVM_REG_FEATURE_LEVEL_MASK)
-> +			return -EINVAL;
-> +
-> +		if (get_kernel_wa_level(reg->id) < val)
-> +			return -EINVAL;
-> +
-> +		return 0;
-> +
-> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
-> +		if (val & ~(KVM_REG_FEATURE_LEVEL_MASK |
-> +			    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED))
-> +			return -EINVAL;
-> +
-> +		/* The enabled bit must not be set unless the level is AVAIL. */
-> +		if ((val & KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED) &&
-> +		    (val & KVM_REG_FEATURE_LEVEL_MASK) != KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL)
-> +			return -EINVAL;
-> +
-> +		/*
-> +		 * Map all the possible incoming states to the only two we
-> +		 * really want to deal with.
-> +		 */
-> +		switch (val & KVM_REG_FEATURE_LEVEL_MASK) {
-> +		case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL:
-> +		case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN:
-> +			wa_level = KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL;
-> +			break;
-> +		case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL:
-> +		case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED:
-> +			wa_level = KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED;
-> +			break;
-> +		default:
-> +			return -EINVAL;
-> +		}
-> +
-> +		/*
-> +		 * We can deal with NOT_AVAIL on NOT_REQUIRED, but not the
-> +		 * other way around.
-> +		 */
-> +		if (get_kernel_wa_level(reg->id) < wa_level)
-> +			return -EINVAL;
-> +
-> +		return 0;
-> +	default:
-> +		return -ENOENT;
-> +	}
-> +
-> +	return -EINVAL;
-> +}
-> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> index 372da09a2fab..bdfa93ca57d1 100644
-> --- a/arch/arm64/kvm/psci.c
-> +++ b/arch/arm64/kvm/psci.c
-> @@ -439,186 +439,3 @@ int kvm_psci_call(struct kvm_vcpu *vcpu)
->   		return -EINVAL;
->   	}
->   }
-> -
-> -int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
-> -{
-> -	return 4;		/* PSCI version and three workaround registers */
-> -}
-> -
-> -int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
-> -{
-> -	if (put_user(KVM_REG_ARM_PSCI_VERSION, uindices++))
-> -		return -EFAULT;
-> -
-> -	if (put_user(KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1, uindices++))
-> -		return -EFAULT;
-> -
-> -	if (put_user(KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2, uindices++))
-> -		return -EFAULT;
-> -
-> -	if (put_user(KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3, uindices++))
-> -		return -EFAULT;
-> -
-> -	return 0;
-> -}
-> -
-> -#define KVM_REG_FEATURE_LEVEL_WIDTH	4
-> -#define KVM_REG_FEATURE_LEVEL_MASK	(BIT(KVM_REG_FEATURE_LEVEL_WIDTH) - 1)
-> -
-> -/*
-> - * Convert the workaround level into an easy-to-compare number, where higher
-> - * values mean better protection.
-> - */
-> -static int get_kernel_wa_level(u64 regid)
-> -{
-> -	switch (regid) {
-> -	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
-> -		switch (arm64_get_spectre_v2_state()) {
-> -		case SPECTRE_VULNERABLE:
-> -			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL;
-> -		case SPECTRE_MITIGATED:
-> -			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL;
-> -		case SPECTRE_UNAFFECTED:
-> -			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_REQUIRED;
-> -		}
-> -		return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL;
-> -	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
-> -		switch (arm64_get_spectre_v4_state()) {
-> -		case SPECTRE_MITIGATED:
-> -			/*
-> -			 * As for the hypercall discovery, we pretend we
-> -			 * don't have any FW mitigation if SSBS is there at
-> -			 * all times.
-> -			 */
-> -			if (cpus_have_final_cap(ARM64_SSBS))
-> -				return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL;
-> -			fallthrough;
-> -		case SPECTRE_UNAFFECTED:
-> -			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED;
-> -		case SPECTRE_VULNERABLE:
-> -			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL;
-> -		}
-> -		break;
-> -	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3:
-> -		switch (arm64_get_spectre_bhb_state()) {
-> -		case SPECTRE_VULNERABLE:
-> -			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_NOT_AVAIL;
-> -		case SPECTRE_MITIGATED:
-> -			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_AVAIL;
-> -		case SPECTRE_UNAFFECTED:
-> -			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_NOT_REQUIRED;
-> -		}
-> -		return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_NOT_AVAIL;
-> -	}
-> -
-> -	return -EINVAL;
-> -}
-> -
-> -int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> -{
-> -	void __user *uaddr = (void __user *)(long)reg->addr;
-> -	u64 val;
-> -
-> -	switch (reg->id) {
-> -	case KVM_REG_ARM_PSCI_VERSION:
-> -		val = kvm_psci_version(vcpu);
-> -		break;
-> -	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
-> -	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
-> -	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3:
-> -		val = get_kernel_wa_level(reg->id) & KVM_REG_FEATURE_LEVEL_MASK;
-> -		break;
-> -	default:
-> -		return -ENOENT;
-> -	}
-> -
-> -	if (copy_to_user(uaddr, &val, KVM_REG_SIZE(reg->id)))
-> -		return -EFAULT;
-> -
-> -	return 0;
-> -}
-> -
-> -int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> -{
-> -	void __user *uaddr = (void __user *)(long)reg->addr;
-> -	u64 val;
-> -	int wa_level;
-> -
-> -	if (copy_from_user(&val, uaddr, KVM_REG_SIZE(reg->id)))
-> -		return -EFAULT;
-> -
-> -	switch (reg->id) {
-> -	case KVM_REG_ARM_PSCI_VERSION:
-> -	{
-> -		bool wants_02;
-> -
-> -		wants_02 = test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features);
-> -
-> -		switch (val) {
-> -		case KVM_ARM_PSCI_0_1:
-> -			if (wants_02)
-> -				return -EINVAL;
-> -			vcpu->kvm->arch.psci_version = val;
-> -			return 0;
-> -		case KVM_ARM_PSCI_0_2:
-> -		case KVM_ARM_PSCI_1_0:
-> -		case KVM_ARM_PSCI_1_1:
-> -			if (!wants_02)
-> -				return -EINVAL;
-> -			vcpu->kvm->arch.psci_version = val;
-> -			return 0;
-> -		}
-> -		break;
-> -	}
-> -
-> -	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
-> -	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3:
-> -		if (val & ~KVM_REG_FEATURE_LEVEL_MASK)
-> -			return -EINVAL;
-> -
-> -		if (get_kernel_wa_level(reg->id) < val)
-> -			return -EINVAL;
-> -
-> -		return 0;
-> -
-> -	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
-> -		if (val & ~(KVM_REG_FEATURE_LEVEL_MASK |
-> -			    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED))
-> -			return -EINVAL;
-> -
-> -		/* The enabled bit must not be set unless the level is AVAIL. */
-> -		if ((val & KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED) &&
-> -		    (val & KVM_REG_FEATURE_LEVEL_MASK) != KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL)
-> -			return -EINVAL;
-> -
-> -		/*
-> -		 * Map all the possible incoming states to the only two we
-> -		 * really want to deal with.
-> -		 */
-> -		switch (val & KVM_REG_FEATURE_LEVEL_MASK) {
-> -		case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL:
-> -		case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN:
-> -			wa_level = KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL;
-> -			break;
-> -		case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL:
-> -		case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED:
-> -			wa_level = KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED;
-> -			break;
-> -		default:
-> -			return -EINVAL;
-> -		}
-> -
-> -		/*
-> -		 * We can deal with NOT_AVAIL on NOT_REQUIRED, but not the
-> -		 * other way around.
-> -		 */
-> -		if (get_kernel_wa_level(reg->id) < wa_level)
-> -			return -EINVAL;
-> -
-> -		return 0;
-> -	default:
-> -		return -ENOENT;
-> -	}
-> -
-> -	return -EINVAL;
-> -}
-> diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
-> index 0e2509d27910..5d38628a8d04 100644
-> --- a/include/kvm/arm_hypercalls.h
-> +++ b/include/kvm/arm_hypercalls.h
-> @@ -40,4 +40,11 @@ static inline void smccc_set_retval(struct kvm_vcpu *vcpu,
->   	vcpu_set_reg(vcpu, 3, a3);
->   }
+>   static u16 vp_config_vector(struct virtio_pci_device *vp_dev, u16 vector)
+>   {
+>   	return vp_modern_config_vector(&vp_dev->mdev, vector);
+> @@ -407,6 +487,8 @@ static const struct virtio_config_ops virtio_pci_config_nodev_ops = {
+>   	.set_vq_affinity = vp_set_vq_affinity,
+>   	.get_vq_affinity = vp_get_vq_affinity,
+>   	.get_shm_region  = vp_get_shm_region,
+> +	.reset_vq	 = vp_modern_reset_vq,
+> +	.enable_reset_vq = vp_modern_enable_reset_vq,
+>   };
 >   
-> +struct kvm_one_reg;
-> +
-> +int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu);
-> +int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
-> +int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
-> +int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
-> +
->   #endif
-> diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-> index 68b96c3826c3..6e55b9283789 100644
-> --- a/include/kvm/arm_psci.h
-> +++ b/include/kvm/arm_psci.h
-> @@ -39,11 +39,4 @@ static inline int kvm_psci_version(struct kvm_vcpu *vcpu)
+>   static const struct virtio_config_ops virtio_pci_config_ops = {
+> @@ -425,6 +507,8 @@ static const struct virtio_config_ops virtio_pci_config_ops = {
+>   	.set_vq_affinity = vp_set_vq_affinity,
+>   	.get_vq_affinity = vp_get_vq_affinity,
+>   	.get_shm_region  = vp_get_shm_region,
+> +	.reset_vq	 = vp_modern_reset_vq,
+> +	.enable_reset_vq = vp_modern_enable_reset_vq,
+>   };
 >   
->   int kvm_psci_call(struct kvm_vcpu *vcpu);
+>   /* the PCI probing function */
+> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> index 6250e19fc5bf..91937e21edca 100644
+> --- a/drivers/virtio/virtio_ring.c
+> +++ b/drivers/virtio/virtio_ring.c
+> @@ -2028,6 +2028,7 @@ static struct virtqueue *vring_create_virtqueue_packed(
+>   	vq->vq.vdev = vdev;
+>   	vq->vq.name = name;
+>   	vq->vq.index = index;
+> +	vq->vq.reset = false;
+>   	vq->notify = notify;
+>   	vq->weak_barriers = weak_barriers;
 >   
-> -struct kvm_one_reg;
-> -
-> -int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu);
-> -int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
-> -int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
-> -int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
-> -
->   #endif /* __KVM_ARM_PSCI_H__ */
-> 
-
-Thanks,
-Gavin
+> @@ -2508,6 +2509,7 @@ struct virtqueue *__vring_new_virtqueue(unsigned int index,
+>   	vq->vq.vdev = vdev;
+>   	vq->vq.name = name;
+>   	vq->vq.index = index;
+> +	vq->vq.reset = false;
+>   	vq->notify = notify;
+>   	vq->weak_barriers = weak_barriers;
+>   
+> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
+> index c86ff02e0ca0..33ab003c5100 100644
+> --- a/include/linux/virtio.h
+> +++ b/include/linux/virtio.h
+> @@ -33,6 +33,7 @@ struct virtqueue {
+>   	unsigned int num_free;
+>   	unsigned int num_max;
+>   	void *priv;
+> +	bool reset;
+>   };
+>   
+>   int virtqueue_add_outbuf(struct virtqueue *vq,
 
