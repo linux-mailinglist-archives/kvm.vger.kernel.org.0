@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 531E14FD773
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 12:29:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0D684FD7A7
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 12:30:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352517AbiDLHg0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 03:36:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42902 "EHLO
+        id S1352078AbiDLHgQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 03:36:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351575AbiDLH2L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 03:28:11 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 283C84EF6E;
-        Tue, 12 Apr 2022 00:08:07 -0700 (PDT)
+        with ESMTP id S1352755AbiDLHOV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 03:14:21 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC9AC3057B;
+        Mon, 11 Apr 2022 23:55:07 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 31F14B81B57;
-        Tue, 12 Apr 2022 07:08:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96246C385A1;
-        Tue, 12 Apr 2022 07:08:00 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 0FB1EB81B58;
+        Tue, 12 Apr 2022 06:55:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 640CEC385A8;
+        Tue, 12 Apr 2022 06:55:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1649747281;
-        bh=0N2yIwdSXee9F6hKtUsnEzk1Wpq6MQKPHa6BD8iYw5E=;
+        s=korg; t=1649746504;
+        bh=vybQH3WAbxLgOAVrLtEeY+o9UeXLxHV9W7C9J12Q6Sk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UaQP3jMSNrpHjWB4YIevRhsfrc74Hy4xzCyh+MpIoqHl9uj+GRfJghFHgJKL6kRS6
-         x0h57lW8a5Xa9jCZf5NVP5i8aZuSqG/rlY3iNZyBGuehD5x9Yl4KFfN1YDTxhq2jjH
-         KK4+8Cd3eBsa8+TjOSDv5iBNfBK+E8vLySqBMAWI=
+        b=d34eIitu/6UdqSlkN/fXbl+gEusAJ88MURYl0K67/2UXIqfchrsjVYDfawHxIQCrq
+         RGtRYwnt4IvTl9RoJNNIwKcxFfCs122Ojy7lI8ELmUzFOqPeGEhXMkOqejK7zpUfOy
+         qtyU6Xmtz/jD5hxkajT8ypgRO3puGxHyx6cr2H00=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -35,12 +35,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
         Peter Gonda <pgonda@google.com>,
         Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.17 007/343] KVM: SVM: Fix kvm_cache_regs.h inclusions for is_guest_mode()
-Date:   Tue, 12 Apr 2022 08:27:05 +0200
-Message-Id: <20220412062951.315041793@linuxfoundation.org>
+Subject: [PATCH 5.16 005/285] KVM: SVM: Fix kvm_cache_regs.h inclusions for is_guest_mode()
+Date:   Tue, 12 Apr 2022 08:27:42 +0200
+Message-Id: <20220412062943.829667081@linuxfoundation.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220412062951.095765152@linuxfoundation.org>
-References: <20220412062951.095765152@linuxfoundation.org>
+In-Reply-To: <20220412062943.670770901@linuxfoundation.org>
+References: <20220412062943.670770901@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -79,7 +79,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index fa98d6844728..86bcfed6599e 100644
+index 1b460e539926..01d35efaa646 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
 @@ -22,6 +22,8 @@
