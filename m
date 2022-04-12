@@ -2,220 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2069B4FE945
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 22:06:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76D484FE943
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 22:06:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231229AbiDLUID (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 16:08:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45328 "EHLO
+        id S230294AbiDLUH7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 16:07:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233191AbiDLUHR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 16:07:17 -0400
-Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 525206E547
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 12:58:56 -0700 (PDT)
-Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-2db2add4516so151797b3.1
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 12:58:56 -0700 (PDT)
+        with ESMTP id S229948AbiDLUHW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 16:07:22 -0400
+Received: from mail-wr1-x44a.google.com (mail-wr1-x44a.google.com [IPv6:2a00:1450:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E0BFCEE
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 12:59:12 -0700 (PDT)
+Received: by mail-wr1-x44a.google.com with SMTP id f9-20020adf9f49000000b00207a6d8b67cso1616788wrg.8
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 12:59:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=B3ga8T1BVksBW86oxX13MqeD+x6oU8FVXwvSUDvYDBQ=;
-        b=YPr1RdLIP7bTY6XUKBQSySM4Rv/0t7HNFwJzpzY4zyX9xXfTGL1jXy7x93FGjNiwR5
-         TLebuFdaNxpShRXOM7VNMp0APmCYnSF7SriAZnar0wOXEre6710qyN3hMQx4AbZ5Dspe
-         Riq9kbC0YqhousbW8rfOGRaZdRnDdGE6gZ6Z445PF/mgUV2ATvxIIKpCeix/KfPSTC7Y
-         ivbA1riSDyxg34JzZr80KfxYGh7cJ8rNSI0WBc37zB1ux6z4ZJoGdE4jlFn7AfjX+CMI
-         MlCvZdci8RU84YIexrG2WYo6pEW5E2K2JcCnFjHczzWt+jqh8wV/5VuNdHyfFKM4OzTD
-         iNSA==
+        h=reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:cc;
+        bh=syoYrG4G6wc/D9QpXxmJ5xqKPPyBOCzpGpn970RrPGk=;
+        b=AzIAUSbC0HT1iPMFN81vdTHOeJ5CmdCGjCiwRGHENOURvCjSrPoZVBFIa00KT0UXk+
+         Or3fgc9coJ7lNzQAc0ddVYnjGwFjDclwLFYllf98AUzuBWt16G57jAs/N8M0J7g9LPUu
+         mWMeztpx/ZjRmxCCF2R3ibegnY9anVUyLrSu7m+rwcfbr/hSyS4CVx/LPGNjYUvrDkjh
+         q6wpWRociYBSPlAKBwcqnhAPA1SqU57/6CZxe1mG1jX+IsybNjU21kfS6xE4al9aUgV1
+         mBbGLI4OxFdiSGcFcC8DwVKCSALMD7SWm0N39L/VRN6IySmXhldp2j0kk/owvCDLgcL8
+         mEOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=B3ga8T1BVksBW86oxX13MqeD+x6oU8FVXwvSUDvYDBQ=;
-        b=qopDi49lBKiOCFsmvBPWb9qyLiyPS73nk+1qvp/xrWzUQP3J2sxt4tHZgMAOwngdvK
-         P49y5PH0S6DWGdPNSm+nv9cpwJWf76CZRHL5ANjq7WIH78/V/vIG5FH+r90mFXb20cM3
-         88iJI+P1STURaHE1ziq1aY9ipaURdS7ySDpOptg2kY5E+iKhZZzEVkqPHo0Sdcr22pbG
-         I01eyasZC4Bwep5UwrEIoGN0ta7iSb5PyWT3ezocaZ6lga4VV+1pmBodPC9SraDH+vnM
-         UDZmWk1UiG8E6noGhXEDBnjZegDfMWfFmeLcaAtgyLwqxGevb0RoLhsvq1cFFpHJeuWx
-         1/yA==
-X-Gm-Message-State: AOAM531cRzj9eg/SN0OfZ7KzHsvr8HSNt6TpUlEkf+diCmRLbnbAUenz
-        IOTaRwWjSWRUf5646IymWbplvxaXY1lPbkQdhgiNKQ==
-X-Google-Smtp-Source: ABdhPJyuNwur1w0y6gzKizHttMJRIhppAR4eRe3SNp/Vg07m8lNuEdrDzm0kp0R+FbFslXdomdr7xSBaaNhRdE63E04=
-X-Received: by 2002:a81:a1c1:0:b0:2eb:fb9c:c4e5 with SMTP id
- y184-20020a81a1c1000000b002ebfb9cc4e5mr13204144ywg.156.1649793535229; Tue, 12
- Apr 2022 12:58:55 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220411211015.3091615-1-bgardon@google.com> <20220411211015.3091615-5-bgardon@google.com>
- <CALzav=fCnRX=JZ-knxf9_Aq_A_JOVjTq34ACe5JOmVr5Ms=vVw@mail.gmail.com>
-In-Reply-To: <CALzav=fCnRX=JZ-knxf9_Aq_A_JOVjTq34ACe5JOmVr5Ms=vVw@mail.gmail.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Tue, 12 Apr 2022 12:58:44 -0700
-Message-ID: <CANgfPd8EVe6wmKh02=chp3uO38CyUA0mG3hHU8MOQJZa1vXKiQ@mail.gmail.com>
-Subject: Re: [PATCH v4 04/10] KVM: selftests: Read binary stat data in lib
-To:     David Matlack <dmatlack@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
+        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:cc;
+        bh=syoYrG4G6wc/D9QpXxmJ5xqKPPyBOCzpGpn970RrPGk=;
+        b=471OKh/Zwt38It5rMHqfX7kVaCnqRgzjpfTFpvGkQ4G7r0ROqplFLpJwLjibNp6qne
+         rCFBZ4O7KxRFMhQJQOy4EG8kbyBpREmTK4MRPMLGCa4gi3iZlc4zKtJW5GKDjKjAo8sL
+         tp8epJ797c61cHi7Qfc7bmVMUiBVXJumNB+sOI0WaIlC+tKbo3znQuYYE+RNiZewB63+
+         sUE17BBJ9N0LIB61/adNq99raRUMxe4qdGAVR8mWmLrWEqL/D9Qmo2LqmoW7elHlX9Dv
+         KLcsV8nSsEsdYRRPeTAI0NZWSH/1CvxlrrU6sObGNGxS6IXut3XW4N50CwZDHmA9pNVc
+         lBNQ==
+X-Gm-Message-State: AOAM532YQj1eVKwr1EGll/ob3uCOwUXDVdgDqsYQfnN0HpdW4HeYfx/K
+        tJfQbdf8xIrDIOc74eO2YO5f6kYOpgAo
+X-Google-Smtp-Source: ABdhPJz4RtEBFxR8dOWxNhwT5sJYg2f8+ScFUMpOLlbygiH0VMVqy9v9t961e6WlRx11zKc7fmqhPYqLSwZT
+X-Received: from zhanwei.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:2da8])
+ (user=zhanwei job=sendgmr) by 2002:a7b:c186:0:b0:38e:c0de:36b6 with SMTP id
+ y6-20020a7bc186000000b0038ec0de36b6mr5724019wmi.53.1649793545148; Tue, 12 Apr
+ 2022 12:59:05 -0700 (PDT)
+Reply-To: Wei Zhang <zhanwei@google.com>
+Date:   Tue, 12 Apr 2022 19:58:45 +0000
+In-Reply-To: <20220412195846.3692374-1-zhanwei@google.com>
+Message-Id: <20220412195846.3692374-2-zhanwei@google.com>
+Mime-Version: 1.0
+References: <20220412195846.3692374-1-zhanwei@google.com>
+X-Mailer: git-send-email 2.35.1.1178.g4f1659d476-goog
+Subject: [PATCH 1/2] KVM: x86: allow guest to send its _stext for kvm profiling
+From:   Wei Zhang <zhanwei@google.com>
+Cc:     Wei Zhang <zhanwei@google.com>,
+        Suleiman Souhlal <suleiman@google.com>,
+        Sangwhan Moon <sxm@google.com>, Ingo Molnar <mingo@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        David Dunn <daviddunn@google.com>,
-        Junaid Shahid <junaids@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Jing Zhang <jingzhangos@google.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-8.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MISSING_HEADERS,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 11, 2022 at 3:15 PM David Matlack <dmatlack@google.com> wrote:
->
-> On Mon, Apr 11, 2022 at 2:10 PM Ben Gardon <bgardon@google.com> wrote:
-> >
-> > Move the code to read the binary stats data to the KVM selftests
-> > library. It will be re-used by other tests to check KVM behavior.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Ben Gardon <bgardon@google.com>
-> > ---
-> >  .../selftests/kvm/include/kvm_util_base.h     |  3 +++
-> >  .../selftests/kvm/kvm_binary_stats_test.c     | 20 +++++-------------
-> >  tools/testing/selftests/kvm/lib/kvm_util.c    | 21 +++++++++++++++++++
-> >  3 files changed, 29 insertions(+), 15 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> > index c5f34551ff76..b2684cfc2cb1 100644
-> > --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> > +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> > @@ -405,6 +405,9 @@ struct kvm_stats_desc *alloc_vm_stats_desc(int stats_fd,
-> >                                           struct kvm_stats_header *header);
-> >  void read_vm_stats_desc(int stats_fd, struct kvm_stats_header *header,
-> >                         struct kvm_stats_desc *stats_desc);
-> > +int read_stat_data(int stats_fd, struct kvm_stats_header *header,
-> > +                  struct kvm_stats_desc *desc, uint64_t *data,
-> > +                  ssize_t max_elements);
-> >
-> >  uint32_t guest_get_vcpuid(void);
-> >
-> > diff --git a/tools/testing/selftests/kvm/kvm_binary_stats_test.c b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-> > index e4795bad7db6..97b180249ba0 100644
-> > --- a/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-> > +++ b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-> > @@ -20,6 +20,8 @@
-> >  #include "asm/kvm.h"
-> >  #include "linux/kvm.h"
-> >
-> > +#define STAT_MAX_ELEMENTS 1000
-> > +
-> >  static void stats_test(int stats_fd)
-> >  {
-> >         ssize_t ret;
-> > @@ -29,7 +31,7 @@ static void stats_test(int stats_fd)
-> >         struct kvm_stats_header header;
-> >         char *id;
-> >         struct kvm_stats_desc *stats_desc;
-> > -       u64 *stats_data;
-> > +       u64 stats_data[STAT_MAX_ELEMENTS];
->
-> What is the benefit of changing stats_data to a stack allocation with
-> a fixed limit?
+The profiling buffer is indexed by (pc - _stext) in do_profile_hits(),
+which doesn't work for KVM profiling because the pc represents an address
+in the guest kernel. readprofile is broken in this case, unless the guest
+kernel happens to have the same _stext as the host kernel.
 
-There isn't really a benefit. Will remove.
+This patch adds a new hypercall so guests could send its _stext to the
+host, which will then be used to adjust the calculation for KVM profiling.
 
->
-> >         struct kvm_stats_desc *pdesc;
-> >
-> >         /* Read kvm stats header */
-> > @@ -130,25 +132,13 @@ static void stats_test(int stats_fd)
-> >                         pdesc->offset, pdesc->name);
-> >         }
-> >
-> > -       /* Allocate memory for stats data */
-> > -       stats_data = malloc(size_data);
-> > -       TEST_ASSERT(stats_data, "Allocate memory for stats data");
-> > -       /* Read kvm stats data as a bulk */
-> > -       ret = pread(stats_fd, stats_data, size_data, header.data_offset);
-> > -       TEST_ASSERT(ret == size_data, "Read KVM stats data");
-> >         /* Read kvm stats data one by one */
-> > -       size_data = 0;
-> >         for (i = 0; i < header.num_desc; ++i) {
-> >                 pdesc = (void *)stats_desc + i * size_desc;
-> > -               ret = pread(stats_fd, stats_data,
-> > -                               pdesc->size * sizeof(*stats_data),
-> > -                               header.data_offset + size_data);
-> > -               TEST_ASSERT(ret == pdesc->size * sizeof(*stats_data),
-> > -                               "Read data of KVM stats: %s", pdesc->name);
-> > -               size_data += pdesc->size * sizeof(*stats_data);
-> > +               read_stat_data(stats_fd, &header, pdesc, stats_data,
-> > +                              ARRAY_SIZE(stats_data));
-> >         }
-> >
-> > -       free(stats_data);
-> >         free(stats_desc);
-> >         free(id);
-> >  }
-> > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > index e3ae26fbef03..64e2085f1129 100644
-> > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > @@ -2593,3 +2593,24 @@ void read_vm_stats_desc(int stats_fd, struct kvm_stats_header *header,
-> >         TEST_ASSERT(ret == stats_descs_size(header),
-> >                     "Read KVM stats descriptors");
-> >  }
-> > +
-> > +int read_stat_data(int stats_fd, struct kvm_stats_header *header,
->
-> I would like to keep up the practice of adding docstrings to functions
-> in kvm_util. Can you add docstring comments for this function and the
-> other kvm_util functions introduced by this series?
+Signed-off-by: Wei Zhang <zhanwei@google.com>
+---
+ arch/x86/kvm/x86.c            | 15 +++++++++++++++
+ include/linux/kvm_host.h      |  4 ++++
+ include/uapi/linux/kvm_para.h |  1 +
+ virt/kvm/Kconfig              |  5 +++++
+ 4 files changed, 25 insertions(+)
 
-Will do.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 547ba00ef64f..abeacdd5d362 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9246,6 +9246,12 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.complete_userspace_io = complete_hypercall_exit;
+ 		return 0;
+ 	}
++#ifdef CONFIG_ACCURATE_KVM_PROFILING
++	case KVM_HC_GUEST_STEXT:
++		vcpu->kvm->guest_stext = a0;
++		ret = 0;
++		break;
++#endif
+ 	default:
+ 		ret = -KVM_ENOSYS;
+ 		break;
+@@ -10261,6 +10267,15 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	 */
+ 	if (unlikely(prof_on == KVM_PROFILING)) {
+ 		unsigned long rip = kvm_rip_read(vcpu);
++#ifdef CONFIG_ACCURATE_KVM_PROFILING
++		/*
++		 * Profiling buffer is indexed by (rip - _stext), but it's
++		 * supposed to be indexed by (rip - guest_stext) instead.
++		 * Therefore apply an offest in advance to get correct results.
++		 */
++		if (vcpu->kvm->guest_stext)
++			rip += (unsigned long)_stext - vcpu->kvm->guest_stext;
++#endif
+ 		profile_hit(KVM_PROFILING, (void *)rip);
+ 	}
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 3f9b22c4983a..65caaa4d87c4 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -781,6 +781,10 @@ struct kvm {
+ 	struct notifier_block pm_notifier;
+ #endif
+ 	char stats_id[KVM_STATS_NAME_SIZE];
++
++#ifdef CONFIG_ACCURATE_KVM_PROFILING
++	unsigned long guest_stext;
++#endif
+ };
+ 
+ #define kvm_err(fmt, ...) \
+diff --git a/include/uapi/linux/kvm_para.h b/include/uapi/linux/kvm_para.h
+index 960c7e93d1a9..dcb4ba1f033c 100644
+--- a/include/uapi/linux/kvm_para.h
++++ b/include/uapi/linux/kvm_para.h
+@@ -30,6 +30,7 @@
+ #define KVM_HC_SEND_IPI		10
+ #define KVM_HC_SCHED_YIELD		11
+ #define KVM_HC_MAP_GPA_RANGE		12
++#define KVM_HC_GUEST_STEXT		13
+ 
+ /*
+  * hypercalls use architecture specific
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index a8c5c9f06b3c..8798f75ddade 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -72,3 +72,8 @@ config KVM_XFER_TO_GUEST_WORK
+ 
+ config HAVE_KVM_PM_NOTIFIER
+        bool
++
++# Offer an additional hypercall to a guest so it could pass value of _stext to
++# host, which will be used to adjust the calculation of KVM profiling.
++config ACCURATE_KVM_PROFILING
++       bool
+-- 
+2.35.1.1178.g4f1659d476-goog
 
->
-> > +                  struct kvm_stats_desc *desc, uint64_t *data,
-> > +                  ssize_t max_elements)
-> > +{
-> > +       ssize_t ret;
-> > +
-> > +       TEST_ASSERT(desc->size <= max_elements,
-> > +                   "Max data elements should be at least as large as stat data");
->
-> What is the reason for this assertion? Callers are required to read
-> all the data elements of a given stat?
-
-Yeah, that was the idea, but it doesn't seem very useful. I'll remove it.
-
->
-> > +
-> > +       ret = pread(stats_fd, data, desc->size * sizeof(*data),
-> > +                   header->data_offset + desc->offset);
-> > +
-> > +       /* ret from pread is in bytes. */
-> > +       ret = ret / sizeof(*data);
-> > +
-> > +       TEST_ASSERT(ret == desc->size,
-> > +                   "Read data of KVM stats: %s", desc->name);
->
-> Won't this assertion fail when called from kvm_binary_stats_test.c?
-> kvm_binary_stats_test.c looks like it reads all the stat data at once,
-> which means ret will be the total number of stat data points, and
-> desc->size will be the number of stat data points in the first stat.
-
-Hmmm it shouldn't. I think we're just reading one stat at at time.
-
->
-> > +
-> > +       return ret;
-> > +}
-> > --
-> > 2.35.1.1178.g4f1659d476-goog
-> >
