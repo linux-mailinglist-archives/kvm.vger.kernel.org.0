@@ -2,106 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A9AD4FD3D5
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 11:59:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D01834FD402
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 12:00:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352471AbiDLHgW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 03:36:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46030 "EHLO
+        id S1343812AbiDLJ5D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 05:57:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354285AbiDLHR1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 03:17:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 016B74B869
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 23:58:43 -0700 (PDT)
+        with ESMTP id S233454AbiDLIkQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 04:40:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 30A4494
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 01:07:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649746723;
+        s=mimecast20190719; t=1649750819;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=4c8Vusl4oEKcTcKekpVxwLN012dQSzoK0Qxc5GtiyU0=;
-        b=hyFgESZ3dR3yiJCZuDeBb1Px/x76Z2LmsDYJ/OqN3Hq9CZceoXWEja4XycZlLH+B0Oxxl8
-        0pnf5r6bt5H83K7HkRA/yJTGbrjEGQhmNUokoNnfJriJBUpiBKIH/z4QghiJHZ1/iTCos1
-        BHYvGlJJJ7AfrWIywke/TRk0Msg3cV0=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=DBLeI4YaJokPAygbCEyNRovV9qI9o815SAPbEDuub1s=;
+        b=VP9HZnPHLYUq6O48lYJyPj0sRZTUzOvDq5xC1hh2gT1KfiJqTh9mXjWAQTznaI6q49ZEup
+        vi1vGSEhve5OJ77U+K8s93ar34n609+dX6xeRAy0ivS96kiQg/9klXitrG+EgqSI8ITU5o
+        f9fTTMHfVJYyszfl5ACV6rJY7J4Ba+c=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-546-T16O2WR1NwmRUc59QZ66Ag-1; Tue, 12 Apr 2022 02:58:33 -0400
-X-MC-Unique: T16O2WR1NwmRUc59QZ66Ag-1
-Received: by mail-pl1-f198.google.com with SMTP id w14-20020a1709027b8e00b0015386056d2bso7393053pll.5
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 23:58:32 -0700 (PDT)
+ us-mta-639-C3hpc4jtP1eGUHBeh7AKXg-1; Tue, 12 Apr 2022 04:06:57 -0400
+X-MC-Unique: C3hpc4jtP1eGUHBeh7AKXg-1
+Received: by mail-wr1-f69.google.com with SMTP id p18-20020adfba92000000b001e8f7697cc7so3790291wrg.20
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 01:06:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=4c8Vusl4oEKcTcKekpVxwLN012dQSzoK0Qxc5GtiyU0=;
-        b=vzrn4oB5XwJoXhBDOPFjCHBiXDZHtTnYPbFs65rKvJD2G5iQ6xg2PODC6GOl2w4Rhf
-         cTGg7XsZ0No92JNBZ6+XuQP1bMFViP61mbMUZw5RFOTsEZp97RLyfCsshUuBNkFy7anS
-         PIWLSFJmx6AvRtBcQ38E7Jc1SnrXQD49iiLGhvH/2tpOUkKPnNf5dhvtqe+yOThxSPwC
-         kPhglF2Bp2puHEEiiAy/QXahAnSeEJmMs6z4dNuwiPcFF7N9+QKsIVheUzpOSGdi1yep
-         aJYUgj/2FavTgV211B5B14VeU1g7MQHi7takZhwFi/u3dAvlYuB80q9M0TTOMOXXdOh0
-         6NOg==
-X-Gm-Message-State: AOAM531Vyj8K5hTPHpJzof7uYuDBBn57VbnSef8/GbjHXje4dx7X4nPb
-        I1x8XbuVRTegS5aFVKyLt46ThqAEZczol0a0O8hpMOPr8EHjPtbXoPvWZV+NOL/sY69AS2k2Z+F
-        XDLzaU+FXfws0
-X-Received: by 2002:a17:902:ce0a:b0:156:72e2:f191 with SMTP id k10-20020a170902ce0a00b0015672e2f191mr35096124plg.76.1649746712095;
-        Mon, 11 Apr 2022 23:58:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxuJbdOoWZZRPEbzGsC4VuDhXJvgnJjxW0TEadVGxwoEvQb6fSAp5kYQnQ/9zpsf7VqHx4Bsg==
-X-Received: by 2002:a17:902:ce0a:b0:156:72e2:f191 with SMTP id k10-20020a170902ce0a00b0015672e2f191mr35096092plg.76.1649746711844;
-        Mon, 11 Apr 2022 23:58:31 -0700 (PDT)
-Received: from [10.72.14.5] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id b25-20020a637159000000b00381fda49d15sm1765570pgn.39.2022.04.11.23.58.21
+        bh=DBLeI4YaJokPAygbCEyNRovV9qI9o815SAPbEDuub1s=;
+        b=vvwh3mUvHo1tQLffFlpAF7BrfNhjUY/Jj4ehuot/DiEEZ4uFDOeMaeIK6IyehfLSlw
+         pedxPRKlIz8etOSWVbrb7L1g6E4l1lTTquR5Q4i2MdjR70tLy5AOqbXbc9PTyavU39uZ
+         5Neq4KFz5pDRejt3rGFbdLij8P9Q+hE4ZUvangSxvNdGYCB1jbToZgNH7NwJbWdjVCvt
+         YqdRL/czC0SkmdAzvmGiSlX97LtgElUlwk0qr3Q7ZmsracHS4KDL2kPR06D+6r7FaiQY
+         /FwHUBnlT/PEuK+SKHz2d5VxuqAdE1cb2nElvxP7lQEW6LUFsp59T7Dr2pqPM1kKNzXc
+         B96g==
+X-Gm-Message-State: AOAM531hXVqDjgOaiIM6RkAksKbJzBCL7uYUjNNJUWqalrlWWz5yzEov
+        93eDVwbdqEsl3Em1B21xVZE+vvpUcJRB9GycB5WzVEI2VBVoSxuzYKu6WdK+3fbQRuv5A3TmtUD
+        jjtZoU1ogf1We
+X-Received: by 2002:a05:600c:1990:b0:38c:c0a2:c0ab with SMTP id t16-20020a05600c199000b0038cc0a2c0abmr2917262wmq.72.1649750816568;
+        Tue, 12 Apr 2022 01:06:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyirCPyskdO5e2sY0gyTYmwZZqPERZLETq+FzC5u7mRnrRXPXUpZycQcZI40q4HP90YIRcMxQ==
+X-Received: by 2002:a05:600c:1990:b0:38c:c0a2:c0ab with SMTP id t16-20020a05600c199000b0038cc0a2c0abmr2917245wmq.72.1649750816394;
+        Tue, 12 Apr 2022 01:06:56 -0700 (PDT)
+Received: from [10.33.192.183] (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id i19-20020a05600c355300b0038e1d69af52sm1660404wmq.7.2022.04.12.01.06.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Apr 2022 23:58:31 -0700 (PDT)
-Message-ID: <d228a41f-a3a1-029d-f259-d4fbab822e78@redhat.com>
-Date:   Tue, 12 Apr 2022 14:58:19 +0800
+        Tue, 12 Apr 2022 01:06:55 -0700 (PDT)
+Message-ID: <e3574fa6-c69f-deb2-397f-ef1f6f6c59f0@redhat.com>
+Date:   Tue, 12 Apr 2022 10:06:54 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.7.0
-Subject: Re: [PATCH v9 22/32] virtio_pci: queue_reset: extract the logic of
- active vq for modern pci
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.0
+Subject: Re: [kvm-unit-tests PATCH v1 3/4] s390x: don't run migration tests
+ under PV
 Content-Language: en-US
-To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        virtualization@lists.linux-foundation.org
-Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org
-References: <20220406034346.74409-1-xuanzhuo@linux.alibaba.com>
- <20220406034346.74409-23-xuanzhuo@linux.alibaba.com>
-From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <20220406034346.74409-23-xuanzhuo@linux.alibaba.com>
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com
+References: <20220411100750.2868587-1-nrb@linux.ibm.com>
+ <20220411100750.2868587-4-nrb@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20220411100750.2868587-4-nrb@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -109,93 +83,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-在 2022/4/6 上午11:43, Xuan Zhuo 写道:
-> Introduce vp_active_vq() to configure vring to backend after vq attach
-> vring. And configure vq vector if necessary.
->
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+On 11/04/2022 12.07, Nico Boehr wrote:
+> PV doesn't support migration, so don't run the migration tests there.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 > ---
->   drivers/virtio/virtio_pci_modern.c | 46 ++++++++++++++++++------------
->   1 file changed, 28 insertions(+), 18 deletions(-)
->
-> diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
-> index 86d301f272b8..49a4493732cf 100644
-> --- a/drivers/virtio/virtio_pci_modern.c
-> +++ b/drivers/virtio/virtio_pci_modern.c
-> @@ -176,6 +176,29 @@ static void vp_reset(struct virtio_device *vdev)
->   	vp_disable_cbs(vdev);
->   }
+>   s390x/run               | 5 +++++
+>   scripts/s390x/func.bash | 2 +-
+>   2 files changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/s390x/run b/s390x/run
+> index 2bcdabbaa14f..24138f6803be 100755
+> --- a/s390x/run
+> +++ b/s390x/run
+> @@ -20,6 +20,11 @@ if [ "${1: -7}" = ".pv.bin" ] || [ "${TESTNAME: -3}" = "_PV" ] && [ "$ACCEL" = "
+>   	exit 2
+>   fi
 >   
-> +static int vp_active_vq(struct virtqueue *vq, u16 msix_vec)
-> +{
-> +	struct virtio_pci_device *vp_dev = to_vp_device(vq->vdev);
-> +	struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
-> +	unsigned long index;
+> +if [ "${1: -7}" = ".pv.bin" ] || [ "${TESTNAME: -3}" = "_PV" ] && [ "$MIGRATION" = "yes" ]; then
+> +	echo "Migration isn't supported under Protected Virtualization"
+> +	exit 2
+> +fi
 > +
-> +	index = vq->index;
-> +
-> +	/* activate the queue */
-> +	vp_modern_set_queue_size(mdev, index, virtqueue_get_vring_size(vq));
-> +	vp_modern_queue_address(mdev, index, virtqueue_get_desc_addr(vq),
-> +				virtqueue_get_avail_addr(vq),
-> +				virtqueue_get_used_addr(vq));
-> +
-> +	if (msix_vec != VIRTIO_MSI_NO_VECTOR) {
-> +		msix_vec = vp_modern_queue_vector(mdev, index, msix_vec);
-> +		if (msix_vec == VIRTIO_MSI_NO_VECTOR)
-> +			return -EBUSY;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->   static u16 vp_config_vector(struct virtio_pci_device *vp_dev, u16 vector)
->   {
->   	return vp_modern_config_vector(&vp_dev->mdev, vector);
-> @@ -220,32 +243,19 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+>   M='-machine s390-ccw-virtio'
+>   M+=",accel=$ACCEL"
+>   command="$qemu -nodefaults -nographic $M"
+> diff --git a/scripts/s390x/func.bash b/scripts/s390x/func.bash
+> index bf799a567c3b..2a941bbb0794 100644
+> --- a/scripts/s390x/func.bash
+> +++ b/scripts/s390x/func.bash
+> @@ -21,7 +21,7 @@ function arch_cmd_s390x()
+>   	"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
 >   
->   	vq->num_max = num;
->   
-> -	/* activate the queue */
-> -	vp_modern_set_queue_size(mdev, index, virtqueue_get_vring_size(vq));
-> -	vp_modern_queue_address(mdev, index, virtqueue_get_desc_addr(vq),
-> -				virtqueue_get_avail_addr(vq),
-> -				virtqueue_get_used_addr(vq));
-> +	err = vp_active_vq(vq, msix_vec);
-> +	if (err)
-> +		goto err;
->   
->   	vq->priv = (void __force *)vp_modern_map_vq_notify(mdev, index, NULL);
->   	if (!vq->priv) {
->   		err = -ENOMEM;
-> -		goto err_map_notify;
-> -	}
-> -
-> -	if (msix_vec != VIRTIO_MSI_NO_VECTOR) {
-> -		msix_vec = vp_modern_queue_vector(mdev, index, msix_vec);
-> -		if (msix_vec == VIRTIO_MSI_NO_VECTOR) {
-> -			err = -EBUSY;
-> -			goto err_assign_vector;
-> -		}
-> +		goto err;
->   	}
->   
->   	return vq;
->   
-> -err_assign_vector:
-> -	if (!mdev->notify_base)
-> -		pci_iounmap(mdev->pci_dev, (void __iomem __force *)vq->priv);
+>   	# run PV test case
+> -	if [ "$ACCEL" = 'tcg' ]; then
+> +	if [ "$ACCEL" = 'tcg' ] || find_word "migration" "$groups"; then
+>   		return
+>   	fi
+>   	kernel=${kernel%.elf}.pv.bin
 
-
-We need keep this or anything I missed?
-
-Thanks
-
-
-> -err_map_notify:
-> +err:
->   	vring_del_virtqueue(vq);
->   	return ERR_PTR(err);
->   }
+Acked-by: Thomas Huth <thuth@redhat.com>
 
