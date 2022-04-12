@@ -2,109 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3A274FE2A8
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 15:30:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E3224FE244
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 15:21:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355854AbiDLNYj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 09:24:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59016 "EHLO
+        id S1355138AbiDLNYD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 09:24:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356330AbiDLNXH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 09:23:07 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C8E225E9
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 06:13:56 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id DA805B81D77
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 13:13:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8139FC385A6;
-        Tue, 12 Apr 2022 13:13:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649769233;
-        bh=SpKp3TCBsOBkzmGD30AlbWzu/c5WczQQXE0rta2jfmY=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pDDrQf7AiYZQslPFKSED5wqcAyN1pNVPNYZl6UrznnRPS1460iecM9izlYi39L1wB
-         s5B9ZRWHuoKmcPYqZnV2TYXpPU0qxRAa+2IvkXSfJOtZuN8aLXQBPXW+1xe9MYY5r/
-         5byiBblzk0/Bjj8W3hydnihzaD2/bSucsq19gYaAO7svPQ9NX5ikflPbP0aQ3s1XLs
-         HGaLiJ+EZqJjL2HWCxzGVsapq1zGmMF7YifJ4aZSxBWmmQXKg5OzP5X/lJLMr7LDXb
-         q08NQP49c4NuQLGg8yJbZaT9Vll/a/ebXlmMsadnNFQz+OxeqTtrhXsoUs8FxJEBoQ
-         wpflEv4CtI8FQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1neGL9-003mvX-DR; Tue, 12 Apr 2022 14:13:51 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com
-Subject: [PATCH 01/10] arm64: Expand ESR_ELx_WFx_ISS_TI to match its ARMv8.7 definition
-Date:   Tue, 12 Apr 2022 14:12:54 +0100
-Message-Id: <20220412131303.504690-2-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220412131303.504690-1-maz@kernel.org>
-References: <20220412131303.504690-1-maz@kernel.org>
+        with ESMTP id S1356021AbiDLNWY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 09:22:24 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53340D6D;
+        Tue, 12 Apr 2022 06:13:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1649769192; x=1681305192;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=THXNbE6uwc6VmEva3UG39/ka2/jfkbL0RmRgTIEQt8M=;
+  b=fCmZykE24AWdHyuYnbHbQjNmK3JasMMSy1iz72xn/BCaWcAeky3CT4dT
+   XtGXnXgagHs6cPge+VGDAPOFS9MggTd68WJ6jpRKeVhM4sEiew7fHNbT9
+   y3H+PQ9lC6ImGFXOOpWgbKbEQ49T6Fw/spHDK0wbbb1KHK2ezmQ4IkyGS
+   nsgfrx0WDMpqfJkvuu1kL10uKmS9m/w24hbPk0wKWaaRRJ/C0JPZiegQC
+   MOgYINf9rzDI3e6WlKBvcgCCdR70uWtjknODOzseEg0bLP84XdBAq+OmU
+   bAWooNWUdBHNRUeSxMS+XeRnuv7C9fiqImRlnrA2dW+ImFGJAIgOUbOLX
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10314"; a="262550916"
+X-IronPort-AV: E=Sophos;i="5.90,253,1643702400"; 
+   d="scan'208";a="262550916"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2022 06:13:12 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,253,1643702400"; 
+   d="scan'208";a="699828966"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
+  by fmsmga001.fm.intel.com with ESMTP; 12 Apr 2022 06:13:04 -0700
+Date:   Tue, 12 Apr 2022 21:12:54 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, qemu-devel@nongnu.org,
+        Wanpeng Li <wanpengli@tencent.com>, jun.nakajima@intel.com,
+        david@redhat.com, "J . Bruce Fields" <bfields@fieldses.org>,
+        dave.hansen@intel.com, "H . Peter Anvin" <hpa@zytor.com>,
+        ak@linux.intel.com, Jonathan Corbet <corbet@lwn.net>,
+        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        Hugh Dickins <hughd@google.com>,
+        Steven Price <steven.price@arm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Borislav Petkov <bp@alien8.de>, luto@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Mike Rapoport <rppt@kernel.org>
+Subject: Re: [PATCH v5 03/13] mm/shmem: Support memfile_notifier
+Message-ID: <20220412131254.GF8013@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
+ <20220310140911.50924-4-chao.p.peng@linux.intel.com>
+ <20220411152647.uvl2ukuwishsckys@box.shutemov.name>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220411152647.uvl2ukuwishsckys@box.shutemov.name>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Starting with FEAT_WFXT in ARMv8.7, the TI field in the ISS
-that is reported on a WFx trap is expanded by one bit to
-allow the description of WFET and WFIT.
+On Mon, Apr 11, 2022 at 06:26:47PM +0300, Kirill A. Shutemov wrote:
+> On Thu, Mar 10, 2022 at 10:09:01PM +0800, Chao Peng wrote:
+> > diff --git a/mm/shmem.c b/mm/shmem.c
+> > index 9b31a7056009..7b43e274c9a2 100644
+> > --- a/mm/shmem.c
+> > +++ b/mm/shmem.c
+> > @@ -903,6 +903,28 @@ static struct folio *shmem_get_partial_folio(struct inode *inode, pgoff_t index)
+> >  	return page ? page_folio(page) : NULL;
+> >  }
+> >  
+> > +static void notify_fallocate(struct inode *inode, pgoff_t start, pgoff_t end)
+> > +{
+> > +#ifdef CONFIG_MEMFILE_NOTIFIER
+> > +	struct shmem_inode_info *info = SHMEM_I(inode);
+> > +
+> > +	memfile_notifier_fallocate(&info->memfile_notifiers, start, end);
+> > +#endif
+> 
+> All these #ifdefs look ugly. Could you provide dummy memfile_* for
+> !MEMFILE_NOTIFIER case?
+Sure.
 
-Special care is taken to exclude the WFxT bit from the mask
-used to match WFI so that it also matches WFIT when trapped from
-EL0.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/esr.h | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index d52a0b269ee8..65c2201b11b2 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -133,7 +133,8 @@
- #define ESR_ELx_CV		(UL(1) << 24)
- #define ESR_ELx_COND_SHIFT	(20)
- #define ESR_ELx_COND_MASK	(UL(0xF) << ESR_ELx_COND_SHIFT)
--#define ESR_ELx_WFx_ISS_TI	(UL(1) << 0)
-+#define ESR_ELx_WFx_ISS_TI	(UL(3) << 0)
-+#define ESR_ELx_WFx_ISS_WFxT	(UL(2) << 0)
- #define ESR_ELx_WFx_ISS_WFI	(UL(0) << 0)
- #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
- #define ESR_ELx_xVC_IMM_MASK	((1UL << 16) - 1)
-@@ -146,7 +147,8 @@
- #define DISR_EL1_ESR_MASK	(ESR_ELx_AET | ESR_ELx_EA | ESR_ELx_FSC)
- 
- /* ESR value templates for specific events */
--#define ESR_ELx_WFx_MASK	(ESR_ELx_EC_MASK | ESR_ELx_WFx_ISS_TI)
-+#define ESR_ELx_WFx_MASK	(ESR_ELx_EC_MASK |			\
-+				 (ESR_ELx_WFx_ISS_TI & ~ESR_ELx_WFx_ISS_WFxT))
- #define ESR_ELx_WFx_WFI_VAL	((ESR_ELx_EC_WFx << ESR_ELx_EC_SHIFT) |	\
- 				 ESR_ELx_WFx_ISS_WFI)
- 
--- 
-2.34.1
-
+Chao
+> 
+> -- 
+>  Kirill A. Shutemov
