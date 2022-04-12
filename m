@@ -2,87 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 153D74FE938
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 22:03:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B49E54FE947
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 22:06:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231183AbiDLUFe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 16:05:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35358 "EHLO
+        id S229650AbiDLUII (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 16:08:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232916AbiDLUFZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 16:05:25 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A373D4EDE1;
-        Tue, 12 Apr 2022 12:55:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649793351; x=1681329351;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=qpmveqwO7SyvzvBsb9MExzJEADb5MiyVxp91O/5Gxf8=;
-  b=EdFe8w8CoPxH9UAJRPDTU4Q91omFzZ4MNvklV485ddSVOIviahl03nJJ
-   HBp0V8JVr9sXaxIb5BxAU+E0sQ9Rb2RuVclttLxboNLPkP9lQ6/qqFhH9
-   HhZKtT6feYGIBYSmbmGAZXV7ESoKLQsrjT8UPfsaf5r7iZBqIXEuSwySZ
-   gp+R2c91h5rGz1nEO87hYIXfA8JTLEukR9Wnu6YtQ5mUXNyYRBbVKRad6
-   qzhdQrf565xLLamjZSVg9B/2cmVfODbw2jZbwpjYXrEEdFc9WuE911rdv
-   sVowzl7ieF9LZggDloTpRsxF3LOinaG7/9ufYdNB59CA9xpJa41iPF3KF
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10315"; a="325397924"
-X-IronPort-AV: E=Sophos;i="5.90,254,1643702400"; 
-   d="scan'208";a="325397924"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2022 12:55:29 -0700
-X-IronPort-AV: E=Sophos;i="5.90,254,1643702400"; 
-   d="scan'208";a="526640026"
-Received: from lpfafma-mobl.amr.corp.intel.com (HELO guptapa-desk) ([10.209.17.36])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2022 12:55:29 -0700
-Date:   Tue, 12 Apr 2022 12:55:27 -0700
-From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To:     Jon Kohler <jon@nutanix.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>, linux-kernel@vger.kernel.org,
-        dave.hansen@intel.com, Borislav Petkov <bp@suse.de>,
-        Neelima Krishnan <neelima.krishnan@intel.com>,
-        "kvm @ vger . kernel . org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v2] x86/tsx: fix KVM guest live migration for tsx=on
-Message-ID: <20220412195527.xwpgk4mzyqccpqmo@guptapa-desk>
-References: <20220411180131.5054-1-jon@nutanix.com>
- <20220411200703.48654-1-jon@nutanix.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20220411200703.48654-1-jon@nutanix.com>
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S231939AbiDLUHV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 16:07:21 -0400
+Received: from mail-wr1-x44a.google.com (mail-wr1-x44a.google.com [IPv6:2a00:1450:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4CF4138
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 12:59:10 -0700 (PDT)
+Received: by mail-wr1-x44a.google.com with SMTP id a12-20020a5d6cac000000b002079e81d09eso1847054wra.4
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 12:59:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:cc;
+        bh=MENr6JaFQrvHMeFq6sKLlOwf0hec/wgSr+mPRwQN+l0=;
+        b=My+M5BYSA+gXTB91tN4X1vERu3Z09Qivgl3WTvb6ePAQkulgyUSvxYka18IjQJ7/t2
+         Cq3sU1nQYaJpHFTSlkXVKJ8UUMQ1ubXpUcCQ9kLG6/jA2FVXaNtjfAEeMO8x+8553/Nf
+         Ais3vLlINs5YtZRDph09DA+j5IOvETna5R3sGs0kMF3MZFytYhogncyb8g511D/SZFi+
+         1wzdybWE20l1obqfnCfyfvIO7Ci9nqbDcij6KIFyIh8gYwxyBOdw6TqFaBkR9yCygOQZ
+         5yuy6vQGqNN2MCH7lruIJHLVfjz7iwgs0kNkdc3VejPACXrgG3SpCjWHclk+HHp5nxOc
+         fvUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:cc;
+        bh=MENr6JaFQrvHMeFq6sKLlOwf0hec/wgSr+mPRwQN+l0=;
+        b=rF0i9sYuOUA5VBc/tf7Z/3K4okXScBO4eoe+NfiuTsP96C8Chc44C8iF0X+0mC6p2v
+         bmzBYtJz1QXk9Eh69XE9+Y/T7JNUX2ipt9mfRKiHZ/tKp9CtIZzG1ZFRir4COnzj9NFV
+         Jc5LV7bxjV1I527Ig1RpWuFA3tPIj1Ho6CaRLPvWXxiASRy1g7D13BgiSZxYoAsR6RuW
+         qaNHkQjVyIY+5Bl7JSctl0UnI+AzHQcHJKdAHBcx8UAfOcXejOlZBRvaw7BrmLEi0WA5
+         dT4V0CEEKKMFnhVz3jhSZ55XyI5TAVGRyF1Zxpy6ziqJTe09OSLae0YQEsy6XczF/PPj
+         iZbA==
+X-Gm-Message-State: AOAM533o7TSARPSXZPUx4/DPhQMtiq4XmgLwm9Rc+rju99rYWLPN6YAz
+        0ASJAC1MG67MHKW+7F8RhC28rn9yKnG+
+X-Google-Smtp-Source: ABdhPJw2Al6hykQfZi1/dlidzpxWGtE3f4gUI8/c4WffSBjE7JfuGSFasTK/dm0mH0/G/0qN1nlYXc81X4cb
+X-Received: from zhanwei.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:2da8])
+ (user=zhanwei job=sendgmr) by 2002:a7b:c5d1:0:b0:37f:a8a3:9e17 with SMTP id
+ n17-20020a7bc5d1000000b0037fa8a39e17mr5371013wmk.109.1649793543167; Tue, 12
+ Apr 2022 12:59:03 -0700 (PDT)
+Reply-To: Wei Zhang <zhanwei@google.com>
+Date:   Tue, 12 Apr 2022 19:58:44 +0000
+Message-Id: <20220412195846.3692374-1-zhanwei@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.1178.g4f1659d476-goog
+Subject: [PATCH 0/2] KVM: x86: Fix incorrect VM-exit profiling
+From:   Wei Zhang <zhanwei@google.com>
+Cc:     Wei Zhang <zhanwei@google.com>,
+        Suleiman Souhlal <suleiman@google.com>,
+        Sangwhan Moon <sxm@google.com>, Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-8.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MISSING_HEADERS,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 11, 2022 at 04:07:01PM -0400, Jon Kohler wrote:
->Move automatic disablement for TSX microcode deprecation from tsx_init() to
->x86_get_tsx_auto_mode(), such that systems with tsx=on will continue to
->see the TSX CPU features (HLE, RTM) even on updated microcode.
+The profile=kvm boot option has been useful because it provides a
+convenient approach to profile VM exits. However, it's problematic because
+the profiling buffer is indexed by (pc - _stext), and a guest's pc minus a
+host's _stext doesn't make sense in most cases.
 
-This patch needs to be based on recent changes in TSX handling (due to
-Feb 2022 microcode update). These patches were recently merged in tip
-tree:
+When running another linux kernel in the guest, we could work around the
+problem by disabling KASLR in both the host and the guest so they have the
+same _stext. However, this is inconvenient and not always possible.
 
-   https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git x86/urgent
+We're looking for a solution to this problem. A straightforward idea is to
+pass the guest's _stext to the host so the profiling buffer can be indexed
+correctly. This approach is quite brute, as you can see in the prototype
+patches.
 
-Specifically these patches:
+We had some initial discussions and here is a short summary:
+1. The VM-exit profiling is already hacky. It's collecting stats about all
+   KVM guests bunched together into a single global buffer without any
+   separation.
+2. Even if we pass _stext from the guest, there are still a lot of
+   limitations: There can be only one running guest, and the size of its
+   text region shouldn't exceed the size of the profiling buffer,
+   which is (_etext - _stext) in the host.
+3. There are other methods for profiling VM exits, but it would be really
+   convenient if readprofile just works out of box for KVM profiling.
 
-   x86/tsx: Use MSR_TSX_CTRL to clear CPUID bits [1]
-   x86/tsx: Disable TSX development mode at boot [2]
+It would be awesome to hear more thoughts on this. Should we try to fix the
+existing VM-exit profiling functionility? Or should we avoid adding more
+hacks there? If it should be fixed, what's the preferred way? Thanks in
+advance for any suggestions.
 
-Thanks,
-Pawan
+Wei Zhang (2):
+  KVM: x86: allow guest to send its _stext for kvm profiling
+  KVM: x86: illustrative example for sending guest _stext with a
+    hypercall
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/commit/?id=258f3b8c3210b03386e4ad92b4bd8652b5c1beb3
-[2] https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/commit/?id=400331f8ffa3bec5c561417e5eec6848464e9160
+ arch/x86/kernel/setup.c       |  6 ++++++
+ arch/x86/kvm/x86.c            | 15 +++++++++++++++
+ include/linux/kvm_host.h      |  4 ++++
+ include/uapi/linux/kvm_para.h |  1 +
+ virt/kvm/Kconfig              |  5 +++++
+ 5 files changed, 31 insertions(+)
+
+base-commit: 42dcbe7d8bac997eef4c379e61d9121a15ed4e36
+-- 
+2.35.1.1178.g4f1659d476-goog
+
