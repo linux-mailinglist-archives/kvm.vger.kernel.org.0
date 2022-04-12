@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F2DD4FE71A
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 19:33:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 233794FE716
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 19:33:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352417AbiDLRfW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 13:35:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43766 "EHLO
+        id S1352784AbiDLRfZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 13:35:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358296AbiDLRfE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 13:35:04 -0400
+        with ESMTP id S1358303AbiDLRfF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 13:35:05 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3479859390
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D78ED5BE49
         for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 10:32:29 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id E6CBC210EE;
-        Tue, 12 Apr 2022 17:32:27 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 89715215FE;
+        Tue, 12 Apr 2022 17:32:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1649784747; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1649784748; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Io2XlkanWMGUITfmzhn32guih3M+Uf4bisZWPwHYYuA=;
-        b=odePKD478uu4p+utKJJHJuVs+yiE52N7H8wcG8VKo16XHLkvK7hb9o3E5kC0/dEIHSXDtN
-        mmBeB1OmiWM74xVcXn61AuHBDbpIQHg5Q3yq+Za9Feief9cUTl3olPGyhfuYpkXPn20YCk
-        QLgWBBR7ShbnvQ9PGRAIe+geyNlyISw=
+        bh=JOznw2/rVQNwAfti2sXZsErpfAdmx9iEccd5lEv0c4g=;
+        b=GS130OoDhZ5eEZMJgbziGbn3dZSJjWKOwNwSYmzJ4+Fl635zbvcdmku2R4AKvuk0VdocQM
+        +APXc+CY3eoL/RVvyWNcp0BjxCWJFBxUKO1GcYFyTsF+aSauBswh3cxY+QGcY5RhvfkLEb
+        XX4y/wc0D99ag/dP/sk61z5cziKNqMw=
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 57FE313780;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 009B113780;
         Tue, 12 Apr 2022 17:32:27 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id cL6BE6u3VWJJewAAMHmgww
+        id 2DPOOau3VWJJewAAMHmgww
         (envelope-from <varad.gautam@suse.com>); Tue, 12 Apr 2022 17:32:27 +0000
 From:   Varad Gautam <varad.gautam@suse.com>
 To:     kvm@vger.kernel.org
@@ -45,9 +45,9 @@ Cc:     pbonzini@redhat.com, drjones@redhat.com, marcorr@google.com,
         zxwang42@gmail.com, erdemaktas@google.com, rientjes@google.com,
         seanjc@google.com, brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
         jroedel@suse.de, bp@suse.de, varad.gautam@suse.com
-Subject: [PATCH 07/10] x86: efi, smp: Transition APs from 16-bit to 32-bit mode
-Date:   Tue, 12 Apr 2022 19:32:18 +0200
-Message-Id: <20220412173221.13315-7-varad.gautam@suse.com>
+Subject: [PATCH 08/10] x86: Move 32-bit bringup routines to start32.S
+Date:   Tue, 12 Apr 2022 19:32:19 +0200
+Message-Id: <20220412173221.13315-8-varad.gautam@suse.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220412173221.13315-1-varad.gautam@suse.com>
 References: <20220412173221.13315-1-varad.gautam@suse.com>
@@ -63,164 +63,174 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sending INIT/SIPI to APs from ap_init() resets them into 16-bit mode
-to loop into sipi_entry().
-
-To drive the APs into 32-bit mode, the SIPI vector needs:
-1. A GDT descriptor reachable from 16-bit code (gdt32_descr).
-2. A 32-bit entrypoint reachable from 16-bit code (ap_start32).
-3. The locations of GDT and the 32-bit entrypoint.
-
-Setting these up at compile time (like on non-EFI builds) is not
-possible since EFI builds with -shared -fPIC and efistart64.S cannot
-reference any absolute addresses.
-
-Relative addressing is unavailable on 16-bit mode.
-
-Moreover, EFI may not load the 32-bit entrypoint to be reachable from
-16-bit mode.
-
-To overcome these problems,
-1. Fill the GDT descriptor at runtime after relocating
-   [sipi_entry-sipi_end] to lowmem. Since sipi_entry does not know the
-   address of this descriptor, use the last two bytes of SIPI page to
-   communicate it.
-2. Place a call gate in the GDT to point to ap_start32.
-3. Popluate sipi_entry() to lcall to ap_start32.
-
-With this, the APs can transition to 32-bit mode and loop at a known
-location.
+These can be shared across EFI and non-EFI builds.
 
 Signed-off-by: Varad Gautam <varad.gautam@suse.com>
 ---
- lib/x86/smp.c        | 56 ++++++++++++++++++++++++++++++++++++++++++++
- x86/efi/efistart64.S | 29 ++++++++++++++++++++++-
- 2 files changed, 84 insertions(+), 1 deletion(-)
+ x86/cstart64.S | 60 +-----------------------------------------------
+ x86/start32.S  | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 63 insertions(+), 59 deletions(-)
+ create mode 100644 x86/start32.S
 
-diff --git a/lib/x86/smp.c b/lib/x86/smp.c
-index d7f5aba..5cc1648 100644
---- a/lib/x86/smp.c
-+++ b/lib/x86/smp.c
-@@ -6,6 +6,7 @@
- #include "apic.h"
- #include "fwcfg.h"
- #include "desc.h"
-+#include "asm/page.h"
+diff --git a/x86/cstart64.S b/x86/cstart64.S
+index 30012ca..6eb109d 100644
+--- a/x86/cstart64.S
++++ b/x86/cstart64.S
+@@ -56,35 +56,13 @@ mb_flags = 0x0
+ 	.long mb_magic, mb_flags, 0 - (mb_magic + mb_flags)
+ mb_cmdline = 16
  
- #define IPI_VECTOR 0x20
+-MSR_GS_BASE = 0xc0000101
+-
+-.macro setup_percpu_area
+-	lea -4096(%esp), %eax
+-	mov $0, %edx
+-	mov $MSR_GS_BASE, %ecx
+-	wrmsr
+-.endm
+-
+ .macro load_tss
+ 	movq %rsp, %rdi
+ 	call setup_tss
+ 	ltr %ax
+ .endm
  
-@@ -144,16 +145,71 @@ void smp_reset_apic(void)
- 	atomic_inc(&active_cpus);
- }
+-.macro setup_segments
+-	mov $MSR_GS_BASE, %ecx
+-	rdmsr
+-
+-	mov $0x10, %bx
+-	mov %bx, %ds
+-	mov %bx, %es
+-	mov %bx, %fs
+-	mov %bx, %gs
+-	mov %bx, %ss
+-
+-	/* restore MSR_GS_BASE */
+-	wrmsr
+-.endm
++#include "start32.S"
  
-+#ifdef CONFIG_EFI
-+extern u8 gdt32_descr, gdt32, gdt32_end;
-+extern u8 ap_start32;
-+#endif
-+
- void ap_init(void)
- {
- 	u8 *dst_addr = 0;
- 	size_t sipi_sz = (&sipi_end - &sipi_entry) + 1;
+ .globl start
+ start:
+@@ -118,33 +96,6 @@ switch_to_5level:
+ 	call enter_long_mode
+ 	jmpl $8, $lvl5
  
-+	assert(sipi_sz < PAGE_SIZE);
-+
- 	asm volatile("cld");
+-prepare_64:
+-	lgdt gdt_descr
+-	setup_segments
+-
+-	xor %eax, %eax
+-	mov %eax, %cr4
+-
+-enter_long_mode:
+-	mov %cr4, %eax
+-	bts $5, %eax  // pae
+-	mov %eax, %cr4
+-
+-	mov pt_root, %eax
+-	mov %eax, %cr3
+-
+-efer = 0xc0000080
+-	mov $efer, %ecx
+-	rdmsr
+-	bts $8, %eax
+-	wrmsr
+-
+-	mov %cr0, %eax
+-	bts $0, %eax
+-	bts $31, %eax
+-	mov %eax, %cr0
+-	ret
+-
+ smp_stacktop:	.long stacktop - 4096
  
- 	/* Relocate SIPI vector to dst_addr so it can run in 16-bit mode. */
-+	memset(dst_addr, 0, PAGE_SIZE);
- 	memcpy(dst_addr, &sipi_entry, sipi_sz);
- 
-+#ifdef CONFIG_EFI
-+	volatile struct descriptor_table_ptr *gdt32_descr_rel;
-+	idt_entry_t *gate_descr;
-+	u16 *gdt32_descr_reladdr = (u16 *) (PAGE_SIZE - sizeof(u16));
-+
-+	/*
-+	 * gdt32_descr for CONFIG_EFI needs to be filled here dynamically
-+	 * since compile time calculation of offsets is not allowed when
-+	 * building with -shared, and rip-relative addressing is not supported
-+	 * in 16-bit mode.
-+	 *
-+	 * Use the last two bytes of SIPI page to store relocated gdt32_descr
-+	 * addr.
-+	 */
-+	*gdt32_descr_reladdr = (&gdt32_descr - &sipi_entry);
-+
-+	gdt32_descr_rel = (struct descriptor_table_ptr *) ((u64) *gdt32_descr_reladdr);
-+	gdt32_descr_rel->limit = (u16) (&gdt32_end - &gdt32 - 1);
-+	gdt32_descr_rel->base = (ulong) ((u32) (&gdt32 - &sipi_entry));
-+
-+	/*
-+	 * EFI may not load the 32-bit AP entrypoint (ap_start32) low enough
-+	 * to be reachable from the SIPI vector. Since we build with -shared, this
-+	 * location needs to be fetched at runtime, and rip-relative addressing is
-+	 * not supported in 16-bit mode.
-+	 * To perform 16-bit -> 32-bit far jump, our options are:
-+	 * - ljmpl $cs, $label : unusable since $label is not known at build time.
-+	 * - push $cs; push $label; lret : requires an intermediate trampoline since
-+	 *	 $label must still be within 0 - 0xFFFF for 16-bit far return to work.
-+	 * - lcall into a call-gate : best suited.
-+	 *
-+	 * Set up call gate to ap_start32 within GDT.
-+	 *
-+	 * gdt32 layout:
-+	 *
-+	 * Entry | Segment
-+	 * 0	 | NULL descr
-+	 * 1	 | Code segment descr
-+	 * 2	 | Data segment descr
-+	 * 3	 | Call gate descr
-+	 */
-+	gate_descr = (idt_entry_t *) ((u8 *)(&gdt32 - &sipi_entry)
-+		+ 3 * sizeof(gdt_entry_t));
-+	set_idt_entry_t(gate_descr, sizeof(gdt_entry_t), (void *) &ap_start32,
-+		0x8 /* sel */, 0xc /* type */, 0 /* dpl */);
-+#endif
-+
- 	/* INIT */
- 	apic_icr_write(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT, 0);
- 
-diff --git a/x86/efi/efistart64.S b/x86/efi/efistart64.S
-index 1c38355..00279b8 100644
---- a/x86/efi/efistart64.S
-+++ b/x86/efi/efistart64.S
-@@ -65,7 +65,34 @@ setup_segments64:
- 
- .globl sipi_entry
- sipi_entry:
--	jmp sipi_entry
-+	mov %cr0, %eax
-+	or $1, %eax
-+	mov %eax, %cr0
-+
-+	/* Retrieve relocated gdt32_descr address at (PAGE_SIZE - 2). */
-+	mov (PAGE_SIZE - 2), %ebx
-+	lgdtl (%ebx)
-+
-+	lcall $0x18, $0x0
-+
-+.globl gdt32
-+gdt32:
-+	.quad 0
-+	.quad 0x00cf9b000000ffff // flat 32-bit code segment
-+	.quad 0x00cf93000000ffff // flat 32-bit data segment
-+	.quad 0                  // call gate to 32-bit AP entrypoint
-+.globl gdt32_end
-+gdt32_end:
-+
-+.globl gdt32_descr
-+gdt32_descr:
-+	.word 0
-+	.long 0
- 
+ .align 16
+@@ -171,15 +122,6 @@ gdt32_descr:
  .globl sipi_end
  sipi_end:
+ 
+-.code32
+-ap_start32:
+-	setup_segments
+-	mov $-4096, %esp
+-	lock xaddl %esp, smp_stacktop
+-	setup_percpu_area
+-	call prepare_64
+-	ljmpl $8, $ap_start64
+-
+ .code64
+ save_id:
+ 	movl $(APIC_DEFAULT_PHYS_BASE + APIC_ID), %eax
+diff --git a/x86/start32.S b/x86/start32.S
+new file mode 100644
+index 0000000..9e00474
+--- /dev/null
++++ b/x86/start32.S
+@@ -0,0 +1,62 @@
++/* Common 32-bit code between EFI and non-EFI bootstrapping. */
 +
 +.code32
-+.globl ap_start32
++
++MSR_GS_BASE = 0xc0000101
++
++.macro setup_percpu_area
++	lea -4096(%esp), %eax
++	mov $0, %edx
++	mov $MSR_GS_BASE, %ecx
++	wrmsr
++.endm
++
++.macro setup_segments
++	mov $MSR_GS_BASE, %ecx
++	rdmsr
++
++	mov $0x10, %bx
++	mov %bx, %ds
++	mov %bx, %es
++	mov %bx, %fs
++	mov %bx, %gs
++	mov %bx, %ss
++
++	/* restore MSR_GS_BASE */
++	wrmsr
++.endm
++
++prepare_64:
++	lgdt gdt_descr
++	setup_segments
++
++	xor %eax, %eax
++	mov %eax, %cr4
++
++enter_long_mode:
++	mov %cr4, %eax
++	bts $5, %eax  // pae
++	mov %eax, %cr4
++
++	mov pt_root, %eax
++	mov %eax, %cr3
++
++efer = 0xc0000080
++	mov $efer, %ecx
++	rdmsr
++	bts $8, %eax
++	wrmsr
++
++	mov %cr0, %eax
++	bts $0, %eax
++	bts $31, %eax
++	mov %eax, %cr0
++	ret
++
 +ap_start32:
-+	jmp ap_start32
++	setup_segments
++	mov $-4096, %esp
++	lock xaddl %esp, smp_stacktop
++	setup_percpu_area
++	call prepare_64
++	ljmpl $8, $ap_start64
 -- 
 2.35.1
 
