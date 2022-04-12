@@ -2,107 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C1DE4FE2E3
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 15:40:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 351754FE2E8
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 15:40:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355745AbiDLNmF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 09:42:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49934 "EHLO
+        id S1356001AbiDLNm0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 09:42:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234919AbiDLNmC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 09:42:02 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 998BE31528;
-        Tue, 12 Apr 2022 06:39:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649770784; x=1681306784;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=imgoy6oXMIaQRH/0xG58po19cKwE7PGh6Cx68gmrnn8=;
-  b=iBZgiXieIFqn0fX32cZGIlRZKFP5INhyCeNq/Q8ymNSW0mH+WdycG4FU
-   vcavCDeouziBj6M55TGlMdHePMH3jKalAP9qBS3Hhr2musuAXY0TCwyEn
-   imXRdnSsia/BfKrCbk3MWA05nkw0ox52hOBe52/v3z7vv2shdNVb+oX59
-   dnerFSBn91BLek74n7njX84RHuvnCpTsDmDyqRi2aiSD9M41xW7X57Eue
-   rkzNFaQRexm+2fygmto27bGd8U9L9YeSz99u0cWLgvPhTmk0Lg/F0hZzi
-   8HRUKQ/Cs8hKSgmar3xk4bUXcXYP5xhTqLnihwFrQ0k0YTC76hH4daMxv
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10314"; a="242317030"
-X-IronPort-AV: E=Sophos;i="5.90,253,1643702400"; 
-   d="scan'208";a="242317030"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2022 06:39:44 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,254,1643702400"; 
-   d="scan'208";a="590329640"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by orsmga001.jf.intel.com with ESMTP; 12 Apr 2022 06:39:36 -0700
-Date:   Tue, 12 Apr 2022 21:39:25 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com
-Subject: Re: [PATCH v5 04/13] mm/shmem: Restrict MFD_INACCESSIBLE memory
- against RLIMIT_MEMLOCK
-Message-ID: <20220412133925.GG8013@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <20220310140911.50924-5-chao.p.peng@linux.intel.com>
- <Yk8L0CwKpTrv3Rg3@google.com>
- <20220411153233.54ljmi7zgqovhgsn@box.shutemov.name>
+        with ESMTP id S1355793AbiDLNmX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 09:42:23 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F72E3B3D2;
+        Tue, 12 Apr 2022 06:40:04 -0700 (PDT)
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23CC577J029275;
+        Tue, 12 Apr 2022 13:40:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=cOVYegPjiv3RdOHzsMdPZvYgsBf1ye6y28TtxfUXTHc=;
+ b=Nf6Qi0POZn9ZGgRexhDEo3EMLXKRuk6Z9PQJmU09OGnSUyvftokZqVkBwiiyHHZXhsGQ
+ sTj9VwCEeCzJzgpH6vHs9YbenOeStK5H/y2WATFQL/EX59+UpXxOu/r/7BhuQ6Xt/wQQ
+ RBTJytCYdUSWnsppdePh2+QaBZ5hlJl+BTxeP1qzqevh6Pz9y335lKY0Pk+5UKxTCf/O
+ dW51dD1tBT3NFqPF5yUx8g4AFgYFeMg/JYoazjkRbIMFJdZ8uKJwRMVdNLWi+Ib1fw3z
+ Oa5KLEoBUMTmV1/V87ZWH2/nGYdeQzGUNqnRzTgUrk5gQ/Kw5+KNcSa6Gho45GGSZp9V VA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3fd6k8wrvp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Apr 2022 13:40:02 +0000
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23CDNYeW007610;
+        Tue, 12 Apr 2022 13:39:59 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3fd6k8wrsx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Apr 2022 13:39:59 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23CDbSwl003452;
+        Tue, 12 Apr 2022 13:39:51 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
+        by ppma01dal.us.ibm.com with ESMTP id 3fb1s9ebuy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Apr 2022 13:39:51 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23CDdofm19661066
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Apr 2022 13:39:50 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 514CEB2067;
+        Tue, 12 Apr 2022 13:39:50 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6B695B2064;
+        Tue, 12 Apr 2022 13:39:45 +0000 (GMT)
+Received: from [9.211.106.50] (unknown [9.211.106.50])
+        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue, 12 Apr 2022 13:39:45 +0000 (GMT)
+Message-ID: <3639d5fb-ff71-d42e-ef09-0b297f7e1a45@linux.ibm.com>
+Date:   Tue, 12 Apr 2022 09:39:44 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220411153233.54ljmi7zgqovhgsn@box.shutemov.name>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v5 16/21] KVM: vfio: add s390x hook to register KVM guest
+ designation
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@ziepe.ca>, alex.williamson@redhat.com
+Cc:     linux-s390@vger.kernel.org, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org
+References: <20220404174349.58530-1-mjrosato@linux.ibm.com>
+ <20220404174349.58530-17-mjrosato@linux.ibm.com>
+ <20220408124536.GX64706@ziepe.ca>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <20220408124536.GX64706@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: XPeeyS7rz8ny4sWJ-H0-XJp2f7MwwO6p
+X-Proofpoint-GUID: fbRz5MIefwG7QFbrYjDldtoyduZBFiFL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-12_04,2022-04-12_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 clxscore=1015 mlxscore=0 adultscore=0 suspectscore=0
+ mlxlogscore=999 bulkscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204120065
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H3,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 11, 2022 at 06:32:33PM +0300, Kirill A. Shutemov wrote:
-> On Thu, Apr 07, 2022 at 04:05:36PM +0000, Sean Christopherson wrote:
-> > Hmm, shmem_writepage() already handles SHM_F_INACCESSIBLE by rejecting the swap, so
-> > maybe it's just the page migration path that needs to be updated?
+On 4/8/22 8:45 AM, Jason Gunthorpe wrote:
+> On Mon, Apr 04, 2022 at 01:43:44PM -0400, Matthew Rosato wrote:
+>> At the time a KVM is associated with a vfio group, s390x zPCI devices
+>> must register a special guest indication (GISA designation) to allow
+>> for the use of interpretive execution facilities.  This indication is
+>> used to ensure that only the specified KVM can interact with the device.
+>> Similarly, the indication must be removed once the KVM is no longer
+>> associated with the device.
+>>
+>> This patch adds an s390-specific hook to invoke a KVM registration routine
+>> for each device associated with the iommu group; in reality, it will be a
+>> NOP for all but zPCI devices on s390x.
+>>
+>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>> ---
+>>   virt/kvm/vfio.c | 35 ++++++++++++++++++++++++++++++++++-
+>>   1 file changed, 34 insertions(+), 1 deletion(-)
 > 
-> My early version prevented migration with -ENOTSUPP for
-> address_space_operations::migratepage().
+> I wonder if this should be done in the vfio_pci side from the existing
+> kvm notifier
 > 
-> What's wrong with that approach?
 
-I previously thought migratepage will not be called since we already
-marked the pages as UNMOVABLE, sounds not correct?
+So you mean rather than hooking into virt as I do here, drive something 
+out of drivers/vfio/vfio.c:vfio_group_set_kvm?  Note, the kvm notifier 
+is handled in vfio, not vfio_pci, so if you want to handle it in 
+vfio_pci I think we'd need to add a new routine to vfio_device_ops and 
+only define it vfio_pci for s390
 
-Thanks,
-Chao
-> 
-> -- 
->  Kirill A. Shutemov
+e.g.
+
+static const struct vfio_device_ops vfio_pci_ops = {
+	.name		= "vfio-pci",
+[...]
+#ifdef CONFIG_S390
+	.set_kvm = vfio_pci_zdev_set_kvm,
+#endif
+};
+
+and something like...
+
+void vfio_group_set_kvm(struct vfio_group *group, struct kvm *kvm)
+{
+	struct vfio_device *vdev;
+	group->kvm = kvm;
+
+	mutex_lock(&group->device_lock);
+	list_for_each_entry(vdev, &group->device_list, group_next) {
+		if (vdev->ops->set_kvm)
+			it->ops->set_kvm(vdev, kvm);
+	}
+	mutex_unlock(&group->device_lock);
+
+	blocking_notifier_call_chain(&group->notifier,
+				VFIO_GROUP_NOTIFY_SET_KVM, kvm);
+}
+
+
+
