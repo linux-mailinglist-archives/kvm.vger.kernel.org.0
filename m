@@ -2,84 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C02B94FC959
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 02:39:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 439994FCB92
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 03:09:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231991AbiDLAly (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Apr 2022 20:41:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57794 "EHLO
+        id S236267AbiDLBGJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Apr 2022 21:06:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231300AbiDLAlw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Apr 2022 20:41:52 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FCF5AE71
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 17:39:36 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id d15so15302347pll.10
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 17:39:36 -0700 (PDT)
+        with ESMTP id S1351037AbiDLBAo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Apr 2022 21:00:44 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B62BD2E9D8
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 17:55:00 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id u2so402268pgq.10
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 17:55:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=mmFuKKRZ4tQMbPoZWaUuE8327F93ewiEqGBPPN/nLVY=;
-        b=EMK7j5B7n5pQHK3FyLq7YyWGgFSlF/QN2gKNib8LuwqV3H4CHnr5HLDvawUg7hl1bO
-         3lhhsipQkMOOg88/x28n8Ia1RpTQt87HWUEub4QEuibgxNcDg77jWWyMJbq/oWtC3Pzq
-         PRxdzrsSHQIOlJIqDzs/bKuDqxQ5mxHp39ipW8TlIxU1FLZ3fUbW70VPU5f44hnBX9CR
-         cENzfMnSTGI69mpYN/6QhAXp+rI/WxHbbhvnBlZA8xx1MvWBDbgbtW37sqjKIRlNz6j/
-         9uJhitJnbSEcuwanOxujCj6COUEKis5TbuRhG45vq2tEyDbII9YJrCRLJFG0q7kEE5hs
-         fwZg==
+        bh=ZnYjR11gbYLeKCBoJXE7n0dD6k1+ZaVWjqJC494l/qo=;
+        b=OxtnOilsm55GHwDHO1IO1CmDR6liEyJYEsYxqSRci+INpvWA+EBrPe+DTaMSBC2m1z
+         nn770volbCNOSZAupt9b9igPVtXZXO58XljAHzuwRg3JCQ2fxQO2gDB87nGD4Si14mOA
+         5hT5g8RhTy8LneiuVYgZPdOEDP4hR+qh9HB47Bx54pNQqrgC2hQOtI1C7WudE7yOpHU/
+         KUX/G9Oo+OVYJJI//ScdHObW0sLduecpgNocjvMbPkcRe8omnuGeo0sAmQWENEWA+8Iu
+         YCMMnnO7QM5J7mQ2FgOitQlrxGmNxwZI2y1Hmf+bYh/3aLzvSe/Kr0wK3JOIi02rpCcv
+         CHrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=mmFuKKRZ4tQMbPoZWaUuE8327F93ewiEqGBPPN/nLVY=;
-        b=Ytlx/ZcjYC11ljtVEJX+szmgpHqCrzuWh+tKX8qc5gun70DBcY0EnOQ24t2qDzsExf
-         LF/a/u/lzObESD6cme/mSmTfDgPfH1V9sy8v96e31IbwUT7d1hWYcr4Vsdpj6MKqmWHu
-         dVy/g+FkwBcTkA0YkCvpDi1PhdD3ma3myvPIPIAE7nkr38k72XhOtE8vz2r8FqHEdirj
-         xR4DMbhpN+L93eX+ngJsKT/6MjuKHQQT0wSIzfd5EIYxKSoAvyD9pQmfXyfMjSjPUOOz
-         cAusHq3+ne34dY9NmXtSEnQzZTErDJpJg0KO0NTEeKpEPnY/+EjF73i9LMiBbFN3kkIG
-         MHxQ==
-X-Gm-Message-State: AOAM530iOOXnlSxkLL2RuvYOuxeIoC+8s1cBTxL3nLB08nLzJ/GT8E/P
-        Z+HO+5ihOAz2aDkjKaxsGggIkw==
-X-Google-Smtp-Source: ABdhPJzVnnK+Llaw/lDsRSwluGntj0Ck+RPpEEoRbDuil9Q/E1ruBpSOsEq6vjD4X/iago6TZSmWVA==
-X-Received: by 2002:a17:902:ccd0:b0:156:7ac2:5600 with SMTP id z16-20020a170902ccd000b001567ac25600mr35257168ple.156.1649723975653;
-        Mon, 11 Apr 2022 17:39:35 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id z24-20020aa79f98000000b0050564c90916sm16756466pfr.200.2022.04.11.17.39.34
+        bh=ZnYjR11gbYLeKCBoJXE7n0dD6k1+ZaVWjqJC494l/qo=;
+        b=khBVSuo3YEmWbhHixpaOxdbohqabq5/Sp0TnNiPrmcd1CxockgNKVhu4YWZ3qoxunS
+         Rl/gWm2D7iG6tESBwM2+OHuWwIzqvxpQMvpFgDH5O9mhC4xdhWMboIkeQtfOMwxjkwkd
+         L8z6khWkbsldQn3kPphnbVmvlU6Lig/WcVWFthhgOKU8VhVLW7EDhzeo2m1EbZuCGLP+
+         6Xv3la5f97rQ5hU/pEIMrb5lcigRTMzNbzM5fsDWcWVG3AWKK83YDRTk5wRzZr3eHxas
+         iq/BDHHTJKiojCfUNgGGMoz95p3WE+ogTUGYnmtFCuLJRh+/Suo/fROReTmGhCt7zMXL
+         2iNw==
+X-Gm-Message-State: AOAM5336zjmvfLM1wgYzQ9+j2lUaay0ubMBPGGvBhNnDsodzAgdrgxe8
+        9dYtbUeFVUEI0m64MtMe6A6hPg==
+X-Google-Smtp-Source: ABdhPJzkUmD+KWnftYfsZyMv1CBfjNATM4YuEjzljSDhhekkc45DTU+jONr/2LieWgImFbtSd4VvFw==
+X-Received: by 2002:a05:6a00:f92:b0:505:c53b:2668 with SMTP id ct18-20020a056a000f9200b00505c53b2668mr7314066pfb.64.1649724899437;
+        Mon, 11 Apr 2022 17:54:59 -0700 (PDT)
+Received: from google.com (226.75.127.34.bc.googleusercontent.com. [34.127.75.226])
+        by smtp.gmail.com with ESMTPSA id n2-20020aa79042000000b005057336554bsm5863557pfo.128.2022.04.11.17.54.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Apr 2022 17:39:34 -0700 (PDT)
-Date:   Tue, 12 Apr 2022 00:39:31 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
-Subject: Re: [PATCH v3 00/23] KVM: Extend Eager Page Splitting to the shadow
- MMU
-Message-ID: <YlTKQz8HVPtyfwKe@google.com>
-References: <20220401175554.1931568-1-dmatlack@google.com>
- <YlRhiF1O71TWQr5r@google.com>
- <CALzav=f_WY7xH_MV8-gJPAVmj1KjE_LvXupL7aA5n-vCjTETNw@mail.gmail.com>
- <YlSLuZphElMyF2sG@google.com>
- <CALzav=fGucZOZjbVE2+9PZVf1p+jP7GBYDpPph5PoU552LELsw@mail.gmail.com>
+        Mon, 11 Apr 2022 17:54:58 -0700 (PDT)
+Date:   Tue, 12 Apr 2022 00:54:55 +0000
+From:   Mingwei Zhang <mizhang@google.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v4 03/10] KVM: selftests: Read binary stats desc in lib
+Message-ID: <YlTN3yq1iBPkw6Aa@google.com>
+References: <20220411211015.3091615-1-bgardon@google.com>
+ <20220411211015.3091615-4-bgardon@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALzav=fGucZOZjbVE2+9PZVf1p+jP7GBYDpPph5PoU552LELsw@mail.gmail.com>
+In-Reply-To: <20220411211015.3091615-4-bgardon@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -91,104 +79,100 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 11, 2022, David Matlack wrote:
-> On Mon, Apr 11, 2022 at 1:12 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Mon, Apr 11, 2022, David Matlack wrote:
-> > > On Mon, Apr 11, 2022 at 10:12 AM Sean Christopherson <seanjc@google.com> wrote:
-> > > > Circling back to eager page splitting, this series could be reworked to take the
-> > > > first step of forking FNAME(page_fault), FNAME(fetch) and kvm_mmu_get_page() in
-> > > > order to provide the necessary path for reworking nested MMU page faults.  Then it
-> > > > can remove unsync and shrinker support for nested MMUs.  With those gone,
-> > > > dissecting the nested MMU variant of kvm_mmu_get_page() should be simpler/cleaner
-> > > > than dealing with the existing kvm_mmu_get_page(), i.e. should eliminate at least
-> > > > some of the complexity/churn.
-> > >
-> > > These sound like useful improvements but I am not really seeing the
-> > > value of sequencing them before this series:
-> > >
-> > >  - IMO the "churn" in patches 1-14 are a net improvement to the
-> > > existing code. They improve readability by decomposing the shadow page
-> > > creation path into smaller functions with better names, reduce the
-> > > amount of redundant calculations, and reduce the dependence on struct
-> > > kvm_vcpu where it is not needed. Even if eager page splitting is
-> > > completely dropped I think they would be useful to merge.
-> >
-> > I definitely like some of patches 1-14, probably most after a few read throughs.
-> > But there are key parts that I do not like that are motivated almost entirely by
-> > the desire to support page splitting.  Specifically, I don't like splitting the
-> > logic of finding a page, and I don't like having a separate alloc vs. initializer
-> > (though I'm guessing this will be needed somewhere to split huge pages for nested
-> > MMUs).
-> >
-> > E.g. I'd prefer the "get" flow look like the below (completely untested, for
-> > discussion purposes only).  There's still churn, but the core loop is almost
-> > entirely unchanged.
-> >
-> > And it's not just this series, I don't want future improvements nested TDP to have
-> > to deal with the legacy baggage.
+On Mon, Apr 11, 2022, Ben Gardon wrote:
+> Move the code to read the binary stats descriptors to the KVM selftests
+> library. It will be re-used by other tests to check KVM behavior.
 > 
-> One thing that would be helpful is if you can explain in a bit more
-> specifically what you'd like to see. Part of the reason why I prefer
-> to sequence your proposal after eager page splitting is that I do not
-> fully understand what you're proposing, and how complex it would be.
-> e.g. Forking FNAME(fetch), FNAME(page_fault), and kvm_mmu_get_page()
-> for nested MMUs does not sound like less churn.
+> No functional change intended.
+> 
+> Signed-off-by: Ben Gardon <bgardon@google.com>
+> ---
+>  .../selftests/kvm/include/kvm_util_base.h     |  4 +++
+>  .../selftests/kvm/kvm_binary_stats_test.c     |  9 ++----
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 29 +++++++++++++++++++
+>  3 files changed, 35 insertions(+), 7 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index 5ba3132f3110..c5f34551ff76 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -401,6 +401,10 @@ void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid);
+>  int vm_get_stats_fd(struct kvm_vm *vm);
+>  int vcpu_get_stats_fd(struct kvm_vm *vm, uint32_t vcpuid);
+>  void read_vm_stats_header(int stats_fd, struct kvm_stats_header *header);
+> +struct kvm_stats_desc *alloc_vm_stats_desc(int stats_fd,
+> +					  struct kvm_stats_header *header);
+> +void read_vm_stats_desc(int stats_fd, struct kvm_stats_header *header,
+> +			struct kvm_stats_desc *stats_desc);
+>  
+>  uint32_t guest_get_vcpuid(void);
+>  
+> diff --git a/tools/testing/selftests/kvm/kvm_binary_stats_test.c b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+> index 22c22a90f15a..e4795bad7db6 100644
+> --- a/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+> +++ b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+> @@ -62,14 +62,9 @@ static void stats_test(int stats_fd)
+>  							header.data_offset),
+>  			"Descriptor block is overlapped with data block");
+>  
+> -	/* Allocate memory for stats descriptors */
+> -	stats_desc = calloc(header.num_desc, size_desc);
+> -	TEST_ASSERT(stats_desc, "Allocate memory for stats descriptors");
+>  	/* Read kvm stats descriptors */
+> -	ret = pread(stats_fd, stats_desc,
+> -			size_desc * header.num_desc, header.desc_offset);
+> -	TEST_ASSERT(ret == size_desc * header.num_desc,
+> -			"Read KVM stats descriptors");
+> +	stats_desc = alloc_vm_stats_desc(stats_fd, &header);
+> +	read_vm_stats_desc(stats_fd, &header, stats_desc);
+>  
+>  	/* Sanity check for fields in descriptors */
+>  	for (i = 0; i < header.num_desc; ++i) {
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 0caf28e324ed..e3ae26fbef03 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -2564,3 +2564,32 @@ void read_vm_stats_header(int stats_fd, struct kvm_stats_header *header)
+>  	ret = read(stats_fd, header, sizeof(*header));
+>  	TEST_ASSERT(ret == sizeof(*header), "Read stats header");
+>  }
+> +
+> +static ssize_t stats_descs_size(struct kvm_stats_header *header)
+> +{
+> +	return header->num_desc *
+> +	       (sizeof(struct kvm_stats_desc) + header->name_size);
+> +}
+I was very confused on header->name_size. So this field means the
+maximum string size of a stats name, right? Can we update the comments
+in the kvm.h to specify that? By reading the comments, I don't really
+feel this is how we should use this field.
 
-Oh, it's most definitely not less code, and probably more churn.  But, it's churn
-that pushes us in a more favorable direction and that is desirable long term.  I
-don't mind churning code, but I want the churn to make future life easier, not
-harder.  Details below.
+hmm, if that is true, isn't this field a compile time value? Why do we
+have to get it at runtime?
 
-> From my perspective, this series is a net improvement to the
-> readability and maintainability of existing code, while adding a
-> performance improvement (eager page splitting). All of the changes you
-> are proposing can still be implemented on top if
-
-They can be implemented on top, but I want to avoid inhireting complexity we
-don't actually want/need, unsync support being the most notable.
-
-What I mean by "fork" is that after the cleanups that make sense irrespective of
-eager page splitting, we make a copy of FNAME(page_fault) and add FNAME(get_shadow_page),
-extracting common logic where we can and probably doing something fancy to avoid
-having multiple copies of FNAME(get_shadow_page).  Looking again at the code, it's
-probably best to keep FNAME(fetch), at least for now, as it's only the single unsync
-check that we can purge at this point.
-
-That gives us e.g. FNAME(nested_page_fault) that support EPT and 64-bit NPT, and
-a nested TDP specific get_shadow_page().
-
-Then we rip out the unsync stuff for nested MMUs, which is quite clean because we
-can key off of tdp_enabled.  It'll leave dead code for 32-bit hosts running nested
-VMs, but I highly doubt anyone will notice the perf hit.
-
-At that point, dissect kvm_nested_mmu_get_page() for eager page splitting and
-continue on.
-
-It's not drastically different than what you have now, but it avoids the nastiness
-around unsync pages, e.g. I'm pretty sure kvm_mmu_alloc_shadow_page() can be reused
-as I proposed and the "find" becomes something like:
-
-static struct kvm_mmu_page *kvm_mmu_nested_tdp_find_sp(struct kvm_vcpu *vcpu,
-						       gfn_t gfn,
-						       unsigned int gfn_hash,
-						       union kvm_mmu_page_role role)
-{
-	struct hlist_head *sp_list = &kvm->arch.mmu_page_hash[gfn_hash];
-	struct kvm_mmu_page *sp;
-
-	for_each_valid_sp(kvm, sp, sp_list) {
-		if (sp->gfn != gfn || sp->role.word != role.word)
-			continue;
-
-		__clear_sp_write_flooding_count(sp);
-		return sp;
-	}
-
-	return NULL;
-}
-
-Having the separate page fault and get_shadow_page(), without the baggage of unsync
-in particular, sets us up for switching to taking mmu_lock for read, and in the
-distant future, implementing whatever new scheme someone concocts for shadowing
-nested TDP.
+> +
+> +/* Caller is responsible for freeing the returned kvm_stats_desc. */
+> +struct kvm_stats_desc *alloc_vm_stats_desc(int stats_fd,
+> +					  struct kvm_stats_header *header)
+> +{
+> +	struct kvm_stats_desc *stats_desc;
+> +
+> +	stats_desc = malloc(stats_descs_size(header));
+> +	TEST_ASSERT(stats_desc, "Allocate memory for stats descriptors");
+> +
+> +	return stats_desc;
+> +}
+> +
+> +void read_vm_stats_desc(int stats_fd, struct kvm_stats_header *header,
+> +			struct kvm_stats_desc *stats_desc)
+> +{
+> +	ssize_t ret;
+> +
+> +	ret = pread(stats_fd, stats_desc, stats_descs_size(header),
+> +		    header->desc_offset);
+> +	TEST_ASSERT(ret == stats_descs_size(header),
+> +		    "Read KVM stats descriptors");
+> +}
+> -- 
+> 2.35.1.1178.g4f1659d476-goog
+> 
