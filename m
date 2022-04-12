@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 641E24FE0C1
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 14:47:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E5A54FE179
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 15:03:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354202AbiDLMr3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 08:47:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34102 "EHLO
+        id S1349333AbiDLNFQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 09:05:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353876AbiDLMrN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 08:47:13 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBFCF7EA1C;
-        Tue, 12 Apr 2022 05:10:55 -0700 (PDT)
+        with ESMTP id S1354975AbiDLNCN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 09:02:13 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80C53198;
+        Tue, 12 Apr 2022 05:41:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649765456; x=1681301456;
+  t=1649767275; x=1681303275;
   h=date:from:to:cc:subject:message-id:reply-to:references:
    mime-version:in-reply-to;
-  bh=H3y2PO8iP1I2VKt5VHY/5jS3296P+ova6WPUU37ZDYU=;
-  b=LCwSRPoD9b2KFpawNEJKy3JDmx4uDi81yNqhaHN3Gbi39hIcl12KEzr5
-   kWTSxy4bspvRwhoTa3qMoS+gY9j9AbP1rdzLipno/mdGEa5xtCH+f3jw7
-   4Ej1dsP7Uu5zkkXxHHGJ8qSf5gXHFel2I1yqPfFJdP2race8ZzhrEQubZ
-   6S8JwSso2kwQO/UcJleqqRQ5oLVqFgt6jvNzwYpXyekiwNQrgs4BqfSfY
-   KcLpmO2vW8cCg9O5dLz3kxpWM5vF/RZW1izgkWuyR+FHrhf/9BZL6/Z0v
-   rz7WulDQ6afLkl96B4gqIPq6lze4skEyxvg9aD5Hhf1iTm7PAlvEdMnKg
+  bh=eyXblfG/A5HWVja7fFUb4HNY/ZRRmFMXW6QIdjEei/o=;
+  b=Bf3bPc/YraGzPZAJmicdhLm+9cFkKE5cPUl/VANxPQgA3hCbaw/aB6ll
+   ZD7EkPG0pScmuSl8bC1F/ByShPpMM5XywO9YoXWFp9zvfIXxcyzSgWS4F
+   qyxkp/zKVIC/3GmZqUCgB7x+qYFGLluSh74zlGjxj6f1lrXnDJs5fwJWs
+   5XMLNJ5A1UHAYOu09dSrrcUuAzkdCavt3rCuJ5+iu+V/Zs1x/pSxcNTc7
+   QBDUWmUqLMDeznZPqx+8xmnEMikNLBFpndwHseJ6yV+jbb2BOrkUgaE83
+   CaVJNhneaOY8Y78bV1D5+4WR+eGxcJE6vIAMuaXV+5NjpdL8+R8BPMl6w
    w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10314"; a="261798001"
+X-IronPort-AV: E=McAfee;i="6400,9594,10314"; a="262112433"
 X-IronPort-AV: E=Sophos;i="5.90,253,1643702400"; 
-   d="scan'208";a="261798001"
+   d="scan'208";a="262112433"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2022 05:10:25 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2022 05:41:15 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.90,253,1643702400"; 
-   d="scan'208";a="526015878"
+   d="scan'208";a="526023841"
 Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by orsmga002.jf.intel.com with ESMTP; 12 Apr 2022 05:10:16 -0700
-Date:   Tue, 12 Apr 2022 20:10:05 +0800
+  by orsmga002.jf.intel.com with ESMTP; 12 Apr 2022 05:41:06 -0700
+Date:   Tue, 12 Apr 2022 20:40:56 +0800
 From:   Chao Peng <chao.p.peng@linux.intel.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -65,212 +65,282 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
         luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
         ak@linux.intel.com, david@redhat.com
-Subject: Re: [PATCH v5 09/13] KVM: Handle page fault for private memory
-Message-ID: <20220412121005.GC7309@chaop.bj.intel.com>
+Subject: Re: [PATCH v5 10/13] KVM: Register private memslot to memory backing
+ store
+Message-ID: <20220412124056.GA8013@chaop.bj.intel.com>
 Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
 References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <20220310140911.50924-10-chao.p.peng@linux.intel.com>
- <YkJbxiL/Az7olWlq@google.com>
+ <20220310140911.50924-11-chao.p.peng@linux.intel.com>
+ <YkNXoCBjfpfI67QF@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YkJbxiL/Az7olWlq@google.com>
+In-Reply-To: <YkNXoCBjfpfI67QF@google.com>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 29, 2022 at 01:07:18AM +0000, Sean Christopherson wrote:
+On Tue, Mar 29, 2022 at 07:01:52PM +0000, Sean Christopherson wrote:
 > On Thu, Mar 10, 2022, Chao Peng wrote:
-> > @@ -3890,7 +3893,59 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-> >  				  kvm_vcpu_gfn_to_hva(vcpu, gfn), &arch);
-> >  }
+> > Add 'notifier' to memslot to make it a memfile_notifier node and then
+> > register it to memory backing store via memfile_register_notifier() when
+> > memslot gets created. When memslot is deleted, do the reverse with
+> > memfile_unregister_notifier(). Note each KVM memslot can be registered
+> > to different memory backing stores (or the same backing store but at
+> > different offset) independently.
+> > 
+> > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > ---
+> >  include/linux/kvm_host.h |  1 +
+> >  virt/kvm/kvm_main.c      | 75 ++++++++++++++++++++++++++++++++++++----
+> >  2 files changed, 70 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 6e1d770d6bf8..9b175aeca63f 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -567,6 +567,7 @@ struct kvm_memory_slot {
+> >  	struct file *private_file;
+> >  	loff_t private_offset;
+> >  	struct memfile_pfn_ops *pfn_ops;
+> > +	struct memfile_notifier notifier;
+> >  };
 > >  
-> > -static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault, int *r)
-> > +static bool kvm_vcpu_is_private_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
+> >  static inline bool kvm_slot_is_private(const struct kvm_memory_slot *slot)
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index d11a2628b548..67349421eae3 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -840,6 +840,37 @@ static int kvm_init_mmu_notifier(struct kvm *kvm)
+> >  
+> >  #endif /* CONFIG_MMU_NOTIFIER && KVM_ARCH_WANT_MMU_NOTIFIER */
+> >  
+> > +#ifdef CONFIG_MEMFILE_NOTIFIER
+> > +static inline int kvm_memfile_register(struct kvm_memory_slot *slot)
+> 
+> This is a good oppurtunity to hide away the memfile details a bit.  Maybe
+> kvm_private_mem_{,un}register()?
+
+Happy to change.
+
+> 
 > > +{
-> > +	/*
-> > +	 * At this time private gfn has not been supported yet. Other patch
-> > +	 * that enables it should change this.
-> > +	 */
-> > +	return false;
+> > +	return memfile_register_notifier(file_inode(slot->private_file),
+> > +					 &slot->notifier,
+> > +					 &slot->pfn_ops);
 > > +}
 > > +
-> > +static bool kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> > +				    struct kvm_page_fault *fault,
-> > +				    bool *is_private_pfn, int *r)
-> 
-> @is_private_pfn should be a field in @fault, not a separate parameter, and it
-> should be a const property set by the original caller.  I would also name it
-> "is_private", because if KVM proceeds past this point, it will be a property of
-> the fault/access _and_ the pfn
-> 
-> I say it's a property of the fault because the below kvm_vcpu_is_private_gfn()
-> should instead be:
-> 
-> 	if (fault->is_private)
-> 
-> The kvm_vcpu_is_private_gfn() check is TDX centric.  For SNP, private vs. shared
-> is communicated via error code.  For software-only (I'm being optimistic ;-) ),
-> we'd probably need to track private vs. shared internally in KVM, I don't think
-> we'd want to force it to be a property of the gfn.
-
-Make sense.
-
-> 
-> Then you can also move the fault->is_private waiver into is_page_fault_stale(),
-> and drop the local is_private_pfn in direct_page_fault().
-> 
+> > +static inline void kvm_memfile_unregister(struct kvm_memory_slot *slot)
 > > +{
-> > +	int order;
-> > +	unsigned int flags = 0;
-> > +	struct kvm_memory_slot *slot = fault->slot;
-> > +	long pfn = kvm_memfile_get_pfn(slot, fault->gfn, &order);
+> > +	if (slot->private_file) {
+> > +		memfile_unregister_notifier(file_inode(slot->private_file),
+> > +					    &slot->notifier);
+> > +		fput(slot->private_file);
 > 
-> If get_lock_pfn() and thus kvm_memfile_get_pfn() returns a pure error code instead
-> of multiplexing the pfn, then this can be:
-> 
-> 	bool is_private_pfn;
-> 
-> 	is_private_pfn = !!kvm_memfile_get_pfn(slot, fault->gfn, &fault->pfn, &order);
-> 
-> That self-documents the "pfn < 0" == shared logic.
+> This should not do fput(), it makes the helper imbalanced with respect to the
+> register path and will likely lead to double fput().  Indeed, if preparing the
+> region fails, __kvm_set_memory_region() will double up on fput() due to checking
+> its local "file" for null, not slot->private for null.
 
-Yes, agreed.
+Right.
 
 > 
+> > +		slot->private_file = NULL;
+> > +	}
+> > +}
 > > +
-> > +	if (kvm_vcpu_is_private_gfn(vcpu, fault->addr >> PAGE_SHIFT)) {
-> > +		if (pfn < 0)
-> > +			flags |= KVM_MEMORY_EXIT_FLAG_PRIVATE;
-> > +		else {
-> > +			fault->pfn = pfn;
-> > +			if (slot->flags & KVM_MEM_READONLY)
-> > +				fault->map_writable = false;
-> > +			else
-> > +				fault->map_writable = true;
+> > +#else /* !CONFIG_MEMFILE_NOTIFIER */
 > > +
-> > +			if (order == 0)
-> > +				fault->max_level = PG_LEVEL_4K;
+> > +static inline int kvm_memfile_register(struct kvm_memory_slot *slot)
+> > +{
 > 
-> This doesn't correctly handle order > 0, but less than the next page size, in which
-> case max_level needs to be PG_LEVEL_4k.  It also doesn't handle the case where
-> max_level > PG_LEVEL_2M.
+> This should WARN_ON_ONCE().  Ditto for unregister.
 > 
-> That said, I think the proper fix is to have the get_lock_pfn() API return the max
-> mapping level, not the order.  KVM, and presumably any other secondary MMU that might
-> use these APIs, doesn't care about the order of the struct page, KVM cares about the
-> max size/level of page it can map into the guest.  And similar to the previous patch,
-> "order" is specific to struct page, which we are trying to avoid.
-
-I remembered I suggested return max mapping level instead of order but
-Kirill reminded me that PG_LEVEL_* is x86 specific, then changed back
-to 'order'. It's just a matter of backing store or KVM to convert
-'order' to mapping level.
-
-> 
-> > +			*is_private_pfn = true;
-> 
-> This is where KVM guarantees that is_private_pfn == fault->is_private.
-> 
-> > +			*r = RET_PF_FIXED;
-> > +			return true;
-> 
-> Ewww.  This is super confusing.  Ditto for the "*r = -1" magic number.  I totally
-> understand why you took this approach, it's just hard to follow because it kinda
-> follows the kvm_faultin_pfn() semantics, but then inverts true and false in this
-> one case.
-> 
-> I think the least awful option is to forego the helper and open code everything.
-> If we ever refactor kvm_faultin_pfn() to be less weird then we can maybe move this
-> to a helper.
-> 
-> Open coding isn't too bad if you reorganize things so that the exit-to-userspace
-> path is a dedicated, early check.  IMO, it's a lot easier to read this way, open
-> coded or not.
-
-Yes the existing way of handling this is really awful, including the handling for 'r'
-that will be finally return to KVM_RUN as part of the uAPI. Let me try your above
-suggestion.
-
-> 
-> I think this is correct?  "is_private_pfn" and "level" are locals, everything else
-> is in @fault.
-> 
-> 	if (kvm_slot_is_private(slot)) {
-> 		is_private_pfn = !!kvm_memfile_get_pfn(slot, fault->gfn,
-> 						       &fault->pfn, &level);
-> 
-> 		if (fault->is_private != is_private_pfn) {
-> 			if (is_private_pfn)
-> 				kvm_memfile_put_pfn(slot, fault->pfn);
-> 
-> 			vcpu->run->exit_reason = KVM_EXIT_MEMORY_ERROR;
-> 			if (fault->is_private)
-> 				vcpu->run->memory.flags = KVM_MEMORY_EXIT_FLAG_PRIVATE;
-> 			else
-> 				vcpu->run->memory.flags = 0;
-> 			vcpu->run->memory.padding = 0;
-> 			vcpu->run->memory.gpa = fault->gfn << PAGE_SHIFT;
-> 			vcpu->run->memory.size = PAGE_SIZE;
-> 			*r = 0;
-> 			return true;
-> 		}
-> 
-> 		/*
-> 		 * fault->pfn is all set if the fault is for a private pfn, just
-> 		 * need to update other metadata.
-> 		 */
-> 		if (fault->is_private) {
-> 			fault->max_level = min(fault->max_level, level);
-> 			fault->map_writable = !(slot->flags & KVM_MEM_READONLY);
-> 			return false;
-> 		}
-> 
-> 		/* Fault is shared, fallthrough to the standard path. */
-> 	}
-> 
-> 	async = false;
-> 
-> > @@ -4016,7 +4076,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
-> >  	else
-> >  		write_lock(&vcpu->kvm->mmu_lock);
-> >  
-> > -	if (is_page_fault_stale(vcpu, fault, mmu_seq))
-> > +	if (!is_private_pfn && is_page_fault_stale(vcpu, fault, mmu_seq))
-> 
-> As above, I'd prefer this check go in is_page_fault_stale().  It means shadow MMUs
-> will suffer a pointless check, but I don't think that's a big issue.  Oooh, unless
-> we support software-only, which would play nice with nested and probably even legacy
-> shadow paging.  Fun :-)
-
-Sounds good.
-
-> 
-> >  		goto out_unlock;
-> >  
-> >  	r = make_mmu_pages_available(vcpu);
-> > @@ -4033,7 +4093,12 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
-> >  		read_unlock(&vcpu->kvm->mmu_lock);
-> >  	else
-> >  		write_unlock(&vcpu->kvm->mmu_lock);
-> > -	kvm_release_pfn_clean(fault->pfn);
+> > +	return -EOPNOTSUPP;
+> > +}
 > > +
-> > +	if (is_private_pfn)
+> > +static inline void kvm_memfile_unregister(struct kvm_memory_slot *slot)
+> > +{
+> > +}
+> > +
+> > +#endif /* CONFIG_MEMFILE_NOTIFIER */
+> > +
+> >  #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
+> >  static int kvm_pm_notifier_call(struct notifier_block *bl,
+> >  				unsigned long state,
+> > @@ -884,6 +915,9 @@ static void kvm_destroy_dirty_bitmap(struct kvm_memory_slot *memslot)
+> >  /* This does not remove the slot from struct kvm_memslots data structures */
+> >  static void kvm_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
+> >  {
+> > +	if (slot->flags & KVM_MEM_PRIVATE)
+> > +		kvm_memfile_unregister(slot);
 > 
-> And this can be
-> 
-> 	if (fault->is_private)
-> 
-> Same feedback for paging_tmpl.h.
+> With fput() move out of unregister, this needs to be:
 
 Agreed.
 
-Thanks,
+> 
+> 	if (slot->flags & KVM_MEM_PRIVATE) {
+> 		kvm_private_mem_unregister(slot);
+> 		fput(slot->private_file);
+> 	}
+> > +
+> >  	kvm_destroy_dirty_bitmap(slot);
+> >  
+> >  	kvm_arch_free_memslot(kvm, slot);
+> > @@ -1738,6 +1772,12 @@ static int kvm_set_memslot(struct kvm *kvm,
+> >  		kvm_invalidate_memslot(kvm, old, invalid_slot);
+> >  	}
+> >  
+> > +	if (new->flags & KVM_MEM_PRIVATE && change == KVM_MR_CREATE) {
+> > +		r = kvm_memfile_register(new);
+> > +		if (r)
+> > +			return r;
+> > +	}
+> 
+> This belongs in kvm_prepare_memory_region().  The shenanigans for DELETE and MOVE
+> are special.
+
+Sure.
+
+> 
+> > +
+> >  	r = kvm_prepare_memory_region(kvm, old, new, change);
+> >  	if (r) {
+> >  		/*
+> > @@ -1752,6 +1792,10 @@ static int kvm_set_memslot(struct kvm *kvm,
+> >  		} else {
+> >  			mutex_unlock(&kvm->slots_arch_lock);
+> >  		}
+> > +
+> > +		if (new->flags & KVM_MEM_PRIVATE && change == KVM_MR_CREATE)
+> > +			kvm_memfile_unregister(new);
+> > +
+> >  		return r;
+> >  	}
+> >  
+> > @@ -1817,6 +1861,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+> >  	enum kvm_mr_change change;
+> >  	unsigned long npages;
+> >  	gfn_t base_gfn;
+> > +	struct file *file = NULL;
+> 
+> Nit, naming this private_file would help understand its use.  Though I think it's
+> easier to not have a local variable.  More below.
+> 
+> >  	int as_id, id;
+> >  	int r;
+> >  
+> > @@ -1890,14 +1935,24 @@ int __kvm_set_memory_region(struct kvm *kvm,
+> >  			return 0;
+> >  	}
+> >  
+> > +	if (mem->flags & KVM_MEM_PRIVATE) {
+> > +		file = fdget(region_ext->private_fd).file;
+> 
+> This can use fget() instead of fdget().
+> 
+> > +		if (!file)
+> > +			return -EINVAL;
+> > +	}
+> > +
+> >  	if ((change == KVM_MR_CREATE || change == KVM_MR_MOVE) &&
+> > -	    kvm_check_memslot_overlap(slots, id, base_gfn, base_gfn + npages))
+> > -		return -EEXIST;
+> > +	    kvm_check_memslot_overlap(slots, id, base_gfn, base_gfn + npages)) {
+> > +		r = -EEXIST;
+> > +		goto out;
+> > +	}
+> >  
+> >  	/* Allocate a slot that will persist in the memslot. */
+> >  	new = kzalloc(sizeof(*new), GFP_KERNEL_ACCOUNT);
+> > -	if (!new)
+> > -		return -ENOMEM;
+> > +	if (!new) {
+> > +		r = -ENOMEM;
+> > +		goto out;
+> > +	}
+> >  
+> >  	new->as_id = as_id;
+> >  	new->id = id;
+> > @@ -1905,10 +1960,18 @@ int __kvm_set_memory_region(struct kvm *kvm,
+> >  	new->npages = npages;
+> >  	new->flags = mem->flags;
+> >  	new->userspace_addr = mem->userspace_addr;
+> > +	new->private_file = file;
+> > +	new->private_offset = mem->flags & KVM_MEM_PRIVATE ?
+> > +			      region_ext->private_offset : 0;
+> 
+> "new" is zero-allocated, so all the private stuff, including the fget(), can be
+> wrapped in a single KVM_MEM_PRIVATE check.  Moving fget() eliminates the number
+> of gotos needed (the above -EEXIST and -ENOMEM paths don't need to be modified).
+> 
+> >  	r = kvm_set_memslot(kvm, old, new, change);
+> > -	if (r)
+> > -		kfree(new);
+> > +	if (!r)
+> > +		return r;
+> 
+> Use goto, e.g.
+> 
+> 	if (r)
+> 		goto out;
+> 
+> 	return 0;
+> 
+> Burying the happy path in a taken if-statement is confusing and error prone,
+> mostly because it breaks well-established kernel patterns.  Note, there's no need
+> for a separate out_free since new->private_file will be NULL in either case.  I
+> don't have a strong preference, I just find it easier to read code that's more
+> explicit, but I'm a-ok collapsing them into a single label.
+
+Will follow this, thanks for the detailed suggestion.
+
 Chao
+> 
+> 	if ((change == KVM_MR_CREATE || change == KVM_MR_MOVE) &&
+> 	    kvm_check_memslot_overlap(slots, id, base_gfn, base_gfn + npages))
+> 		return -EEXIST;
+> 
+> 	/* Allocate a slot that will persist in the memslot. */
+> 	new = kzalloc(sizeof(*new), GFP_KERNEL_ACCOUNT);
+> 	if (!new)
+> 		return -ENOMEM;
+> 
+> 	new->as_id = as_id;
+> 	new->id = id;
+> 	new->base_gfn = base_gfn;
+> 	new->npages = npages;
+> 	new->flags = mem->flags;
+> 	new->userspace_addr = mem->userspace_addr;
+> 
+> 	if (mem->flags & KVM_MEM_PRIVATE) {
+> 		new->private_file = fget(mem->private_fd);
+> 		if (!new->private_file) {
+> 			r = -EINVAL;
+> 			goto out_free;
+> 		}
+> 		new->private_offset = mem->private_offset;
+> 	}
+> 
+> 	r = kvm_set_memslot(kvm, old, new, change);
+> 	if (r)
+> 		goto out;
+> 
+> 	return 0;
+> 
+> out:
+> 	if (new->private_file)
+> 		fput(new->private_file);
+> 
+> out_free:
+> 	kfree(new);
+> 	return r;
