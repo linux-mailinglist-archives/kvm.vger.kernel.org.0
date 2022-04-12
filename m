@@ -2,107 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E45614FE76D
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 19:44:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 235694FE77F
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 19:54:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244494AbiDLRqt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 13:46:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41516 "EHLO
+        id S1354985AbiDLR4j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 13:56:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237821AbiDLRqp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 13:46:45 -0400
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE6A4B861
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 10:44:26 -0700 (PDT)
-Received: by mail-wr1-x432.google.com with SMTP id c10so7691488wrb.1
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 10:44:26 -0700 (PDT)
+        with ESMTP id S229684AbiDLR4h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 13:56:37 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 274F66465
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 10:54:19 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id t4so17942832pgc.1
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 10:54:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=MesTeAQiR5MsWz1PF2h9v/br1yfvh2N2OY7/RCqRFXA=;
-        b=jNsEKvb+PTg445VqdjpvWYBaVSQO7P7DXUvWvuTUHYY6YP+3hRT+yEuOlO7Y6ih5Lp
-         FFaku5RN7Mtwb8h1Brrz2H/uETMnh5RMow1Y3RGJ1DncW8u56GFvrZ06iK05OfmmFQnO
-         MVxP8hrd9wnNO7EZvrYHbBx0RSbmAGqZZP957iQHUz+ApJw/OZKZDGZ7ZO2IB3RdfVoY
-         ka92o3R+6z1kVq5gGCXkslj1BME5bwvHxPBGYf+IvcTrad1xQ7uatiZHfzBZuoshv0kM
-         GM+gIJF+E38BIjoTtukLfpD7nGQA0zp52X86u16wtHNt9qXyl8RjjQZdV5nxDdYlzkYp
-         fpKw==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=g/wkfqACAO1R6swGFiX5nmXcMTqZOKO9AQAJHkwa6Yw=;
+        b=Wyi6GlmOv6SCb15h1hHMmawDej03rLQGj8tm+MM1gNExlxevz5zy3nG6NqtSX5dMLY
+         o0GPLv/gNUI+uypOTtJ4v3mkbxiAaj0hIe2FpOhQ5v33iFzbWz9bCXoMYDiD0+rv8inD
+         7zwE5VbVWzq5NBIAQ5hvXRZombD21rM4yBf+AzpcXtxheWJqC1iQTgbIYC/XamQQW3ci
+         IX+t4jSob5vv4PPadlRhsGh9Tt3R3ViEDqgerLcGMx5v/bUjnUb/t6rzh77S0LGliyS2
+         HEVvhKOhWQ/t9hWCQLhtV8AjRYtmixTBfhHNGJQi8nuDqOkGPU7zB92m+4DT9x6UPkCD
+         UGkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=MesTeAQiR5MsWz1PF2h9v/br1yfvh2N2OY7/RCqRFXA=;
-        b=Us4ED5bbfWZvMfVaohKrPbLxfp/HYg6lAh52DTipQXqALnmyXHeHJcIde0+Do/dcqf
-         cMs2A7qFEHxkRZ21rPxGW9ZfU8Bhva57+3Q5GnBadG5YBQDzCCUkKA1Sz88VWnR/N37o
-         TdXaiFS9ttlOa1werT8t6d4bA/R2nEtSe+QA5zR5QH5UDJfKcwwbxZaG8RYgEb0pOlK2
-         Rv6NXNXig8bZMk9pCWuJwvQr8QvLqdvPFaBO17znUFY69ZdTYNBwICqiEJDlNhSX0q72
-         Dg3adxrJK6207oLYfAMpV/9TU4h3HsaUwN1fR2fOOFsavY+od4h2snnF6mDKcTAv/v+C
-         TZLA==
-X-Gm-Message-State: AOAM532VXu8qL6+KQ81o9CuM4H1azL1w4899pRV0AxN06Ux4YZLHJedN
-        YEmZsI5846Z/7CPTXSMsbYwHOHYNr31lAg==
-X-Google-Smtp-Source: ABdhPJzDo+gqxEpGSLYj1qMznDxo/h4SBvRdl8FRFbJSWDI7o9GyMeNDTAwovy3AjsRWlAK3Wth4Nw==
-X-Received: by 2002:a05:6000:1882:b0:205:e697:b51d with SMTP id a2-20020a056000188200b00205e697b51dmr28966216wri.643.1649785465135;
-        Tue, 12 Apr 2022 10:44:25 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id ay41-20020a05600c1e2900b0038e75fda4edsm98355wmb.47.2022.04.12.10.44.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Apr 2022 10:44:24 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <390f6cd9-1757-b83c-ab97-5a991559e998@redhat.com>
-Date:   Tue, 12 Apr 2022 19:44:23 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=g/wkfqACAO1R6swGFiX5nmXcMTqZOKO9AQAJHkwa6Yw=;
+        b=3lq4OLGbXvciUqjUmIsbYuddYtuCKPsN9NKEUeWAIYUKF7NxC26wR2TL6dr2GiC6hN
+         QiItt2kbvoG7FIrZl53xRpn8xZwAPuabcslSwCB6nm+ijlulz1JCfUAw/+zggAuGp8nU
+         GrMYeFPDspu6971qHsntsZDicVXuFwb7HR6UDSZNrMqEez16kjRX7hfu3ZWZFOQSYiKK
+         saZjkEJjsXbMmjfEoqp7DKKNGkahGluu2J75kgV/UpzE62udymnFcV4QiVLLVu0PV0m9
+         KaodmERIEFU6IluN4AkY02zsXkkhqZtgXfxj0DSf4g4eNiKRNiejUel7DPNXO3XSjdDR
+         Cpqg==
+X-Gm-Message-State: AOAM532D7zgD/L4DLWwKmek0U3c3ViogFOHJX0bfrt3HzcCL2VBztDFO
+        gvblKnrqDdln9BEJFAFYHw6tgg==
+X-Google-Smtp-Source: ABdhPJxC3qAvnQwz7E+luTSIs+vtI3r9OV9g+oYs3RNcQcviCeKYBgNXNo/OdMyXBVCyHNajsJZVOA==
+X-Received: by 2002:a63:c51:0:b0:39c:c5ac:9f3b with SMTP id 17-20020a630c51000000b0039cc5ac9f3bmr23602561pgm.257.1649786058500;
+        Tue, 12 Apr 2022 10:54:18 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id h13-20020a056a00230d00b004f427ffd485sm43049232pfh.143.2022.04.12.10.54.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Apr 2022 10:54:17 -0700 (PDT)
+Date:   Tue, 12 Apr 2022 17:54:14 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v4 07/10] KVM: x86/MMU: Allow NX huge pages to be
+ disabled on a per-vm basis
+Message-ID: <YlW8xkay+EuM/c3M@google.com>
+References: <20220411211015.3091615-1-bgardon@google.com>
+ <20220411211015.3091615-8-bgardon@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH] KVM: x86: Add support for CMCI and UCNA.
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>, Jue Wang <juew@google.com>
-Cc:     kvm@vger.kernel.org
-References: <20220323182816.2179533-1-juew@google.com>
- <YlR8l7aAYCwqaXEs@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YlR8l7aAYCwqaXEs@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220411211015.3091615-8-bgardon@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/11/22 21:08, Sean Christopherson wrote:
->> +			if (!(mcg_cap & MCG_CMCI_P) &&
->> +			    (data || !msr_info->host_initiated))
-> This looks wrong, userspace should either be able to write the MSR or not, '0'
-> isn't special.  Unless there's a danger to KVM, which I don't think there is,
-> userspace should be allowed to ignore architectural restrictions, i.e. bypass
-> the MCG_CMCI_P check, so that KVM doesn't create an unnecessary dependency between
-> ioctls.  I.e. this should be:
-> 
-> 		if (!(mcg_cap & MCG_CMCI_P) && !msr_info->host_initiated)
-> 			return 1;
-> 
+On Mon, Apr 11, 2022, Ben Gardon wrote:
+> @@ -6079,6 +6080,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  		}
+>  		mutex_unlock(&kvm->lock);
+>  		break;
+> +	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
+> +		kvm->arch.disable_nx_huge_pages = true;
 
-This is somewhat dangerous as it complicates (or removes) the invariants 
-that other code can rely on.  Thus, usually, only the default value is 
-allowed for KVM_SET_MSR.
+It's probably worth requiring cap->args[0] to be zero, KVM has been burned too many
+times by lack of extensibility.
 
-See commit b1e34d325397 ("KVM: x86: Forbid VMM to set SYNIC/STIMER MSRs 
-when SynIC wasn't activated", 2022-03-29) for a case where this practice 
-avoids a NULL pointer dereference.  Though in there, Vitaly wrote:
+> +		kvm_update_nx_huge_pages(kvm);
 
-     Note, it would've been better to forbid writing anything to
-     SYNIC/STIMER MSRs, including zeroes, however, at least QEMU tries
-     clearing HV_X64_MSR_STIMER0_CONFIG without SynIC.
+Is there actually a use case to do this while the VM is running?  Given that this
+is a one-way control, i.e. userspace can't re-enable the mitigation, me thinks the
+answer is no.  And logically, I don't see why userspace would suddenly decide to
+trust the guest at some random point in time.
 
-and I don't really agree with him, in that writing the default value of 
-an MSR is safe and should always be allowed for userspace.
+So, require this to be done before vCPUs are created, then there's no need to
+zap SPTEs because there can't be any SPTEs to zap.  Then the previous patch also
+goes away.  Or to be really draconian, disallow the cap if memslots have been
+created, though I think created_vcpus will be sufficient now and in the future.
 
-
-Paolo
+We can always lift the restriction if someone has a use case for toggling this
+while the VM is running, but we can't do the reverse.
