@@ -2,75 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 90E1F4FDC9E
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 13:05:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CE0A4FDE45
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 13:44:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351885AbiDLKhA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 06:37:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56538 "EHLO
+        id S232960AbiDLL0O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 07:26:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356408AbiDLKeD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 06:34:03 -0400
-Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8320C5BD34;
-        Tue, 12 Apr 2022 02:35:43 -0700 (PDT)
-Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-2ebf3746f87so99833127b3.6;
-        Tue, 12 Apr 2022 02:35:43 -0700 (PDT)
+        with ESMTP id S1352763AbiDLLZl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 07:25:41 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4553026AC4
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 03:08:27 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id 12so4557805pll.12
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 03:08:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=DsYQ5fyB5xZrRk5QDbuXfzqJsxc8K8LLjkUhASiItKI=;
-        b=aUy/cjCNC2BdHzWFTK6IxJtc4SD1bEwFn4+qa7La119l8bgmSAZ1SJeX4t8d6OLOrm
-         5RIp4nawA1q2ARRbIkhWsZWQ5O4gQqSFDdnyIr62CEqQlOKIr/r2A+6UuLgRM/qx39qF
-         Ide1rCpW3keFEzrdSce7ju0lJF4sHoDYLC1ps8nk3P1PEYl/SCMi8paCyl0O/R/S69q9
-         kWACBlsxudFNspCyxx4HJNQmga9cAdCs8M3D3oDbH4onqw7ydz6iRH41Q7Jb/sSqRe2Z
-         GLvlCHAcPiA2b74EqZLFy42PHiz694sVcQiUe5WElKlg8WEO5Xolsr+g7j/2/p8l+hb3
-         d8xg==
+        d=ventanamicro.com; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=y8/JYtLwGTr+r9WhKddIHXBLC5TCTeFp3FTZ8BAk6HA=;
+        b=BWQF6hyEhV41fw/Vfjf8js/WHVuO3KDWVkQ8iaSse8fQWRUMxww5Qo6CNykQ17EiqJ
+         R9plY4ivF9hhzBQTg1z4+y6mKIq64h787PG2tMSkM21BHRwuDGku3NMVlkP3l2pUgZOr
+         0uS52KvkqEcGka6JR8QD5Suprc65T9w/aFdLzxiyKHmZYNHvqkwYPzD3ZC1QXAMSuioi
+         oxCseOUn1dQARtF/OdcH0P1WWbsgSOSymXv1WylLOHKcVTOM1K+1+5zNFRKwXh3K8CHw
+         P2lU4Oksd7J26mj5hEnZmKUemEGP293GCRcM9Ix94AXPVy8w6j8ZGMy7mTjFDfuo4kOt
+         j01w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DsYQ5fyB5xZrRk5QDbuXfzqJsxc8K8LLjkUhASiItKI=;
-        b=Q8BdAtH7ckLB/shu7BVhJBSdCqqf9nmS8vqsj2rzAQtL8KS/q/p7N6KXhNyoWuBN0i
-         eg73Z4u3/LCoGciBtFlVy1nfejA5VQ8medH8ii8cmNU3XxaY67nftoTGMibfuh29VqEb
-         6s0YHe0YNkPyWpJJXWHvy4T/BgqZdt1h+ov5khju+q4zEzBJN/3iaHX3qMLirU2dTgeL
-         8liBw0ujRAHnfwN/HkF0QqzTkbfhmwOmMnOTC8Y+p/7K8M0bTN68jtoKOpUINoL2FiNM
-         VyURlP6/aUJ+GS6rYWRlrcKk+YSKAnODZK1+akcOrOM50ZjKlsWYR3dyfu8O+fVgAByW
-         Xn3w==
-X-Gm-Message-State: AOAM532Q9AnuHSUYHp/3a+FIhnYAZAGbIxTQn+CHycZLZWuWQOBcKIAN
-        mN5NmGYNZH1iecewgllLzLuQeBEFfaHn4a91TjOUuLUg
-X-Google-Smtp-Source: ABdhPJzBaJOtS79qX2LNTnSbSqK9dWYtW3w3LojguBKE3CR/wCMxBClRORXRq4c1y8ATlaxmmyRNfTKaaluv1w/CZss=
-X-Received: by 2002:a81:1e86:0:b0:2eb:66b9:3a93 with SMTP id
- e128-20020a811e86000000b002eb66b93a93mr28000522ywe.411.1649756142635; Tue, 12
- Apr 2022 02:35:42 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=y8/JYtLwGTr+r9WhKddIHXBLC5TCTeFp3FTZ8BAk6HA=;
+        b=ocIsrua0nE1jKgRsQbX05cR7Q3vssMHL3LmZAJieCE70KZYR1Q2/BsWYp3rrOCd+DD
+         yKcO45Kh5GTUBHMsHCyxj5kmqchF9sGfc+AYC9l6Ly3MyWztPa3yjgLNISPwGPOuKRae
+         GcPkYWYLPSeIfsHvASJx8v1AbVqADIB0IKUoeWkgeeOfxqhCy2w9Eba0bQCYLhj6wkC0
+         NCEbrRe5B2fcpYujd3DKgOPIHGZxNltmEscWXBbRKwwfGdPfGIpfRJlfXejZfppVu5jh
+         JPNUD/QAox27mP5MC9CRVfE4Vahw5Z1/YfQLFWpqX6CFepAfi4XMI2+T1GLDoih27bAu
+         3A0w==
+X-Gm-Message-State: AOAM533381KNPw7uBzNBAqFgZBVU/spDAE+3j4YEwmfka0d7F1Q28un7
+        E8fb5PTfJJR8znR2JDe6TnENxw==
+X-Google-Smtp-Source: ABdhPJz9BsX5BLP589MLDfJnGsKt1qLr3mtq0HfL/T8EgEobf38Mq+9s+26t59TCgZOSJxq3Z6xS9g==
+X-Received: by 2002:a17:902:8684:b0:154:af35:82ce with SMTP id g4-20020a170902868400b00154af3582cemr37178055plo.137.1649758106758;
+        Tue, 12 Apr 2022 03:08:26 -0700 (PDT)
+Received: from localhost.localdomain ([122.182.197.47])
+        by smtp.gmail.com with ESMTPSA id j9-20020a056a00130900b004f73df40914sm37515088pfu.82.2022.04.12.03.08.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Apr 2022 03:08:25 -0700 (PDT)
+From:   Anup Patel <apatel@ventanamicro.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Anup Patel <apatel@ventanamicro.com>
+Subject: [PATCH 0/6] KVM RISC-V Sv57x4 support and HFENCE improvements
+Date:   Tue, 12 Apr 2022 15:37:07 +0530
+Message-Id: <20220412100713.1415094-1-apatel@ventanamicro.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20220330132152.4568-1-jiangshanlai@gmail.com>
-In-Reply-To: <20220330132152.4568-1-jiangshanlai@gmail.com>
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Tue, 12 Apr 2022 17:35:31 +0800
-Message-ID: <CAJhGHyAAekjVGpvUNQ25gspDfif2DW=QdW3eFA1h9hOBtw4uzw@mail.gmail.com>
-Subject: Re: [RFC PATCH V3 0/4] KVM: X86: Add and use shadow page with level
- expanded or acting as pae_root
-To:     LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 30, 2022 at 9:21 PM Lai Jiangshan <jiangshanlai@gmail.com> wrote:
->
-> From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
->
+This series adds Sv57x4 support for KVM RISC-V G-stage and various
+HFENCE related improvements.
 
+These patches can also be found in riscv_kvm_sv57_plus_v1 branch at:
+https://github.com/avpatel/linux.git
 
-Ping
+Anup Patel (6):
+  RISC-V: KVM: Use G-stage name for hypervisor page table
+  RISC-V: KVM: Add Sv57x4 mode support for G-stage
+  RISC-V: KVM: Treat SBI HFENCE calls as NOPs
+  RISC-V: KVM: Introduce range based local HFENCE functions
+  RISC-V: KVM: Reduce KVM_MAX_VCPUS value
+  RISC-V: KVM: Add remote HFENCE functions based on VCPU requests
+
+ arch/riscv/include/asm/csr.h      |   1 +
+ arch/riscv/include/asm/kvm_host.h | 119 ++++++--
+ arch/riscv/kvm/main.c             |  11 +-
+ arch/riscv/kvm/mmu.c              | 264 ++++++++---------
+ arch/riscv/kvm/tlb.S              |  74 -----
+ arch/riscv/kvm/tlb.c              | 456 ++++++++++++++++++++++++++++++
+ arch/riscv/kvm/vcpu.c             |  34 ++-
+ arch/riscv/kvm/vcpu_exit.c        |   6 +-
+ arch/riscv/kvm/vcpu_sbi_replace.c |  40 ++-
+ arch/riscv/kvm/vcpu_sbi_v01.c     |  35 ++-
+ arch/riscv/kvm/vm.c               |   8 +-
+ arch/riscv/kvm/vmid.c             |  30 +-
+ 12 files changed, 791 insertions(+), 287 deletions(-)
+ delete mode 100644 arch/riscv/kvm/tlb.S
+ create mode 100644 arch/riscv/kvm/tlb.c
+
+-- 
+2.25.1
+
