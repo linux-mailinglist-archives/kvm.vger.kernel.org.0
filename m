@@ -2,282 +2,301 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCD8F4FE950
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 22:08:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E88CA4FEA09
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 23:57:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231853AbiDLUJa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 16:09:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60918 "EHLO
+        id S229578AbiDLV7N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 17:59:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233136AbiDLUJT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 16:09:19 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 420E592D05
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 13:03:19 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id md20-20020a17090b23d400b001cb70ef790dso4064592pjb.5
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 13:03:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=8KkgfUadDs/hkl85C1FLCMdEQpgE7qKS4mK1asC94oc=;
-        b=AY3gI6P8RZ+BzfKfXKXW/j47+of/eBKAgtbOH1lPiHb7qSHvAJrsIDqaTTWXHNbNw1
-         RnRaEX260i8MHMtQuKgHrIitqEs1uqwOqsg0GXlhyMiYryUXZRQmTiCBax5uXeUM3r+Y
-         OdxFLy4qznJ3kkCxsZMdy2dX5NRolP/Q5/JxiiIq1prK19H2Al+BO5nQDqwMzyvDQb/+
-         ZKKiPW9QX7EJRp+u7bHf9OgJ0qd7tVqpHygSF9IAC/zGllqT+oyB8SSHLTeCBGuCuS0P
-         JodhcE0/IUz92AkJipW9kcqyBTsBb/8PV2mTllYfsjeUuUQ73Eb09NqChqkR8qD98Mav
-         Ageg==
+        with ESMTP id S229496AbiDLV7M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 17:59:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 45E221D916A
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 14:40:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649799015;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EoTkodGmTU1+tJZgbXkA3tP7XKzNOjOQ2bLCDimVkQA=;
+        b=OoGiwz1ceAAUd4TsfC6zX3YA4D8kVSKz0R2Zhi2u/+0er3f7KE5mwSSPFHblmrWd6lmR/p
+        wGkPa/bEV4gAhbx/XUPHMApTLWAhr83H6Xd6waIf/RlBYJdoW1SApaM5R9nJx52m1H6bD5
+        OWDFM6dXU9lARf0Deuu2d1cWTR7U6Oc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-673-Jzv5tlCYNh6WImUNQBmDXg-1; Tue, 12 Apr 2022 16:13:37 -0400
+X-MC-Unique: Jzv5tlCYNh6WImUNQBmDXg-1
+Received: by mail-wm1-f71.google.com with SMTP id bg8-20020a05600c3c8800b0038e6a989925so6227573wmb.3
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 13:13:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=8KkgfUadDs/hkl85C1FLCMdEQpgE7qKS4mK1asC94oc=;
-        b=veEgbZoD3vM189QwoHdcDc2FGzyuh8QG5obGRhjqNZ5IBavdk0OJWKUxxuVcwfn2dQ
-         d15jyh7PYUd9UWimsgZDnk6FFpFgVtk/TOVvDT2MmbBekvIeq1Alhapo2Ap+Je6Q52t+
-         IaeuQKN7S6IrUunWSZmCEZLMB1Fsw8mcmbVadBdoTs5hWkhR+QRk0ZWiWPahJ3KMrsWO
-         CFIccmt3esu+Nzt4M6eS/2GQiqo2Dd7NE/2EZ9fyF6w8pOJiaJzLLcPjxznCEUHzvnyE
-         fgj2AERjUWfkRgs7AgG3gv+V+VFdv3Tzq082uWRvQhlWybDcpj+ue4RxuFxilSo1KIRf
-         41Dw==
-X-Gm-Message-State: AOAM531TLMYOTIfNpigVFn5zzm51scvuDqcmsltnCKhnOapDaQh1u6yj
-        5QbKnosCeSoh6w0i8x/hRsV2Cg==
-X-Google-Smtp-Source: ABdhPJyKKKglvWjNfbdtbYMY09vA5H1gIuwuNSQ8SlFG8X+Tu0BTtihPUdUIGlRjsBlzwhZ1nCkhUg==
-X-Received: by 2002:a17:902:ccc6:b0:156:a94a:9db4 with SMTP id z6-20020a170902ccc600b00156a94a9db4mr38310087ple.45.1649793779966;
-        Tue, 12 Apr 2022 13:02:59 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id q17-20020aa79831000000b0050566040330sm21289476pfl.126.2022.04.12.13.02.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Apr 2022 13:02:59 -0700 (PDT)
-Date:   Tue, 12 Apr 2022 20:02:55 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Mingwei Zhang <mizhang@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        David Dunn <daviddunn@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v4 03/10] KVM: selftests: Read binary stats desc in lib
-Message-ID: <YlXa7+mOQOV26XUH@google.com>
-References: <20220411211015.3091615-1-bgardon@google.com>
- <20220411211015.3091615-4-bgardon@google.com>
- <YlTN3yq1iBPkw6Aa@google.com>
- <CANgfPd8mZ9-zQBvK=OASQ+n7eq_FpvpStMc_yD-UsmFdQ3OCvA@mail.gmail.com>
- <YlXMxcKVgWxHtiGR@google.com>
+        h=x-gm-message-state:reply-to:subject:to:cc:references:from
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-transfer-encoding:content-language;
+        bh=EoTkodGmTU1+tJZgbXkA3tP7XKzNOjOQ2bLCDimVkQA=;
+        b=Q0DhmAQdloNn/5bOps8ftCldDzuGDMdZfuPSDST8/XlJFYb0vOa/67Rk2gOAvvXB8s
+         hrw2xQR8RJ0kwCrMUnNpljZvwnrFzj+/dHmqaAK0ikGF7A12AfurdniEPekpxUfkacAH
+         Jj0wrpSKlZd2GjDZQnm73cADnYwK0qNaUoZ9WWmMnDgPs1RwhusC57mF7CZJAqzM0qDd
+         vyEmyE3nJcorbagcqWBZTRmYCSNAPvjhMg+8ULuYGkOvfAM25qpmxntRQ+m5LaOa6acB
+         Q6xVJQNWrdbPUX+ofxcfodm5LSnenVflJiq0EU2cInE2Wm7OTPYbk0zFSS5MtnQouL3k
+         jbbQ==
+X-Gm-Message-State: AOAM530C5uzPViKBA7XcBn5BTvpYBuGpwbKOWqZm6u2M0JV9Z99FQ1Fd
+        h4AxynkgSPoPHc1y5sUB8uRqTLUiSUkMmFrZxvFnJUeA3SyLM85R5JasEuScSC8Nza1pg+W5Wkr
+        wYQbOEa/vALgC
+X-Received: by 2002:a05:600c:1e17:b0:38e:ba41:2465 with SMTP id ay23-20020a05600c1e1700b0038eba412465mr5500754wmb.132.1649794415686;
+        Tue, 12 Apr 2022 13:13:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzuvpIudWqzfkPLFtrREp/V1SPbwn+OxDh3VdDXo20THEqWm9qcIEf5Ptz3Ekw3WUtH4dHkGw==
+X-Received: by 2002:a05:600c:1e17:b0:38e:ba41:2465 with SMTP id ay23-20020a05600c1e1700b0038eba412465mr5500722wmb.132.1649794415455;
+        Tue, 12 Apr 2022 13:13:35 -0700 (PDT)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id m18-20020a05600c4f5200b0038e8f9d7b57sm395024wmq.42.2022.04.12.13.13.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Apr 2022 13:13:34 -0700 (PDT)
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH RFC 00/12] IOMMUFD Generic interface
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        iommu@lists.linux-foundation.org, Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+References: <0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+From:   Eric Auger <eric.auger@redhat.com>
+Message-ID: <17084696-4b85-8fe7-47e0-b15d4c56d403@redhat.com>
+Date:   Tue, 12 Apr 2022 22:13:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YlXMxcKVgWxHtiGR@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 12, 2022, Sean Christopherson wrote:
-> On Tue, Apr 12, 2022, Ben Gardon wrote:
-> > On Mon, Apr 11, 2022 at 5:55 PM Mingwei Zhang <mizhang@google.com> wrote:
-> > > I was very confused on header->name_size. So this field means the
-> > > maximum string size of a stats name, right? Can we update the comments
-> > > in the kvm.h to specify that? By reading the comments, I don't really
-> > > feel this is how we should use this field.
-> > 
-> > I believe that's right. I agree the documentation on that was a little
-> > confusing.
-> 
-> Heh, a little.  I got tripped up looking at this too.  Give me a few minutes and
-> I'll attach a cleanup patch to add comments and fix the myriad style issues.
-> 
-> This whole file is painful to look at.  Aside from violating preferred kernel
-> style, it's horribly consistent with itself.  Well, except for the 80 char limit,
-> to which it has a fanatical devotion.
+Hi,
 
-If you send a new version of this series, can you add this on top?
+On 3/18/22 6:27 PM, Jason Gunthorpe wrote:
+> iommufd is the user API to control the IOMMU subsystem as it relates to
+> managing IO page tables that point at user space memory.
+>
+> It takes over from drivers/vfio/vfio_iommu_type1.c (aka the VFIO
+> container) which is the VFIO specific interface for a similar idea.
+>
+> We see a broad need for extended features, some being highly IOMMU device
+> specific:
+>  - Binding iommu_domain's to PASID/SSID
+>  - Userspace page tables, for ARM, x86 and S390
+>  - Kernel bypass'd invalidation of user page tables
+>  - Re-use of the KVM page table in the IOMMU
+>  - Dirty page tracking in the IOMMU
+>  - Runtime Increase/Decrease of IOPTE size
+>  - PRI support with faults resolved in userspace
 
-From: Sean Christopherson <seanjc@google.com>
-Date: Tue, 12 Apr 2022 11:49:59 -0700
-Subject: [PATCH] KVM: selftests: Clean up coding style in binary stats test
+This series does not have any concept of group fds anymore and the API
+is device oriented.
+I have a question wrt pci bus reset capability.
 
-Fix a variety of code style violations and/or inconsistencies in the
-binary stats test.  The 80 char limit is a soft limit and can and should
-be ignored/violated if doing so improves the overall code readability.
+8b27ee60bfd6 ("vfio-pci: PCI hot reset interface")
+introduced VFIO_DEVICE_PCI_GET_HOT_RESET_INFO and VFIO_DEVICE_PCI_HOT_RESET
 
-Specifically, provide consistent indentation and don't split expressions
-at arbitrary points just to honor the 80 char limit.
+Maybe we can reuse VFIO_DEVICE_GET_PCI_HOT_RESET_INFO to retrieve the devices and iommu groups that need to be checked and involved in the bus reset. If I understand correctly we now need to make sure the devices are handled in the same security context (bound to the same iommufd)
 
-Opportunistically expand/add comments to call out the more subtle aspects
-of the code.
+however VFIO_DEVICE_PCI_HOT_RESET operate on a collection of group fds.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- .../selftests/kvm/kvm_binary_stats_test.c     | 91 ++++++++++++-------
- 1 file changed, 56 insertions(+), 35 deletions(-)
+How do you see the porting of this functionality onto /dev/iommu?
 
-diff --git a/tools/testing/selftests/kvm/kvm_binary_stats_test.c b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-index 97b180249ba0..944ed52e3f07 100644
---- a/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-+++ b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-@@ -37,32 +37,42 @@ static void stats_test(int stats_fd)
- 	/* Read kvm stats header */
- 	read_vm_stats_header(stats_fd, &header);
+Thanks
 
-+	/*
-+	 * The base size of the descriptor is defined by KVM's ABI, but the
-+	 * size of the name field is variable as far as KVM's ABI is concerned.
-+	 * But, the size of name is constant for a given instance of KVM and
-+	 * is provided by KVM in the overall stats header.
-+	 */
- 	size_desc = sizeof(*stats_desc) + header.name_size;
+Eric
 
- 	/* Read kvm stats id string */
- 	id = malloc(header.name_size);
- 	TEST_ASSERT(id, "Allocate memory for id string");
-+
- 	ret = read(stats_fd, id, header.name_size);
- 	TEST_ASSERT(ret == header.name_size, "Read id string");
 
- 	/* Check id string, that should start with "kvm" */
- 	TEST_ASSERT(!strncmp(id, "kvm", 3) && strlen(id) < header.name_size,
--				"Invalid KVM stats type, id: %s", id);
-+		    "Invalid KVM stats type, id: %s", id);
 
- 	/* Sanity check for other fields in header */
- 	if (header.num_desc == 0) {
- 		printf("No KVM stats defined!");
- 		return;
- 	}
--	/* Check overlap */
--	TEST_ASSERT(header.desc_offset > 0 && header.data_offset > 0
--			&& header.desc_offset >= sizeof(header)
--			&& header.data_offset >= sizeof(header),
--			"Invalid offset fields in header");
-+	/*
-+	 * The descriptor and data offsets must be valid, they must not overlap
-+	 * the header, and the descriptor and data blocks must not overlap each
-+	 * other.  Note, the data block is rechecked after its size is known.
-+	 */
-+	TEST_ASSERT(header.desc_offset && header.desc_offset >= sizeof(header) &&
-+		    header.data_offset && header.data_offset >= sizeof(header),
-+		    "Invalid offset fields in header");
-+
- 	TEST_ASSERT(header.desc_offset > header.data_offset ||
--			(header.desc_offset + size_desc * header.num_desc <=
--							header.data_offset),
--			"Descriptor block is overlapped with data block");
-+		    (header.desc_offset + size_desc * header.num_desc <= header.data_offset),
-+		    "Descriptor block is overlapped with data block");
 
- 	/* Read kvm stats descriptors */
- 	stats_desc = alloc_vm_stats_desc(stats_fd, &header);
-@@ -70,15 +80,22 @@ static void stats_test(int stats_fd)
-
- 	/* Sanity check for fields in descriptors */
- 	for (i = 0; i < header.num_desc; ++i) {
-+		/*
-+		 * Note, size_desc includes the of the name field, which is
-+		 * variable, i.e. this is NOT equivalent to &stats_desc[i].
-+		 */
- 		pdesc = (void *)stats_desc + i * size_desc;
--		/* Check type,unit,base boundaries */
--		TEST_ASSERT((pdesc->flags & KVM_STATS_TYPE_MASK)
--				<= KVM_STATS_TYPE_MAX, "Unknown KVM stats type");
--		TEST_ASSERT((pdesc->flags & KVM_STATS_UNIT_MASK)
--				<= KVM_STATS_UNIT_MAX, "Unknown KVM stats unit");
--		TEST_ASSERT((pdesc->flags & KVM_STATS_BASE_MASK)
--				<= KVM_STATS_BASE_MAX, "Unknown KVM stats base");
--		/* Check exponent for stats unit
-+
-+		/* Check type, unit, and base boundaries */
-+		TEST_ASSERT((pdesc->flags & KVM_STATS_TYPE_MASK) <= KVM_STATS_TYPE_MAX,
-+			    "Unknown KVM stats type");
-+		TEST_ASSERT((pdesc->flags & KVM_STATS_UNIT_MASK) <= KVM_STATS_UNIT_MAX,
-+			    "Unknown KVM stats unit");
-+		TEST_ASSERT((pdesc->flags & KVM_STATS_BASE_MASK) <= KVM_STATS_BASE_MAX,
-+			    "Unknown KVM stats base");
-+
-+		/*
-+		 * Check exponent for stats unit
- 		 * Exponent for counter should be greater than or equal to 0
- 		 * Exponent for unit bytes should be greater than or equal to 0
- 		 * Exponent for unit seconds should be less than or equal to 0
-@@ -89,47 +106,51 @@ static void stats_test(int stats_fd)
- 		case KVM_STATS_UNIT_NONE:
- 		case KVM_STATS_UNIT_BYTES:
- 		case KVM_STATS_UNIT_CYCLES:
--			TEST_ASSERT(pdesc->exponent >= 0,
--					"Unsupported KVM stats unit");
-+			TEST_ASSERT(pdesc->exponent >= 0, "Unsupported KVM stats unit");
- 			break;
- 		case KVM_STATS_UNIT_SECONDS:
--			TEST_ASSERT(pdesc->exponent <= 0,
--					"Unsupported KVM stats unit");
-+			TEST_ASSERT(pdesc->exponent <= 0, "Unsupported KVM stats unit");
- 			break;
- 		}
- 		/* Check name string */
- 		TEST_ASSERT(strlen(pdesc->name) < header.name_size,
--				"KVM stats name(%s) too long", pdesc->name);
-+			    "KVM stats name(%s) too long", pdesc->name);
- 		/* Check size field, which should not be zero */
--		TEST_ASSERT(pdesc->size, "KVM descriptor(%s) with size of 0",
--				pdesc->name);
-+		TEST_ASSERT(pdesc->size,
-+			    "KVM descriptor(%s) with size of 0", pdesc->name);
- 		/* Check bucket_size field */
- 		switch (pdesc->flags & KVM_STATS_TYPE_MASK) {
- 		case KVM_STATS_TYPE_LINEAR_HIST:
- 			TEST_ASSERT(pdesc->bucket_size,
--			    "Bucket size of Linear Histogram stats (%s) is zero",
--			    pdesc->name);
-+				    "Bucket size of Linear Histogram stats (%s) is zero",
-+				    pdesc->name);
- 			break;
- 		default:
- 			TEST_ASSERT(!pdesc->bucket_size,
--			    "Bucket size of stats (%s) is not zero",
--			    pdesc->name);
-+				    "Bucket size of stats (%s) is not zero",
-+				    pdesc->name);
- 		}
- 		size_data += pdesc->size * sizeof(*stats_data);
- 	}
--	/* Check overlap */
--	TEST_ASSERT(header.data_offset >= header.desc_offset
--		|| header.data_offset + size_data <= header.desc_offset,
--		"Data block is overlapped with Descriptor block");
-+
-+	/*
-+	 * Now that the size of the data block is known, verify the data block
-+	 * doesn't overlap the descriptor block.
-+	 */
-+	TEST_ASSERT(header.data_offset >= header.desc_offset ||
-+		    header.data_offset + size_data <= header.desc_offset,
-+		    "Data block is overlapped with Descriptor block");
-+
- 	/* Check validity of all stats data size */
- 	TEST_ASSERT(size_data >= header.num_desc * sizeof(*stats_data),
--			"Data size is not correct");
-+		    "Data size is not correct");
-+
- 	/* Check stats offset */
- 	for (i = 0; i < header.num_desc; ++i) {
- 		pdesc = (void *)stats_desc + i * size_desc;
- 		TEST_ASSERT(pdesc->offset < size_data,
--			"Invalid offset (%u) for stats: %s",
--			pdesc->offset, pdesc->name);
-+			    "Invalid offset (%u) for stats: %s",
-+			    pdesc->offset, pdesc->name);
- 	}
-
- 	/* Read kvm stats data one by one */
-
-base-commit: f9955a6aaa037a7a8198a817b9d272efcf10961a
---
+>
+> As well as a need to access these features beyond just VFIO, VDPA for
+> instance, but other classes of accelerator HW are touching on these areas
+> now too.
+>
+> The v1 series proposed re-using the VFIO type 1 data structure, however it
+> was suggested that if we are doing this big update then we should also
+> come with a data structure that solves the limitations that VFIO type1
+> has. Notably this addresses:
+>
+>  - Multiple IOAS/'containers' and multiple domains inside a single FD
+>
+>  - Single-pin operation no matter how many domains and containers use
+>    a page
+>
+>  - A fine grained locking scheme supporting user managed concurrency for
+>    multi-threaded map/unmap
+>
+>  - A pre-registration mechanism to optimize vIOMMU use cases by
+>    pre-pinning pages
+>
+>  - Extended ioctl API that can manage these new objects and exposes
+>    domains directly to user space
+>
+>  - domains are sharable between subsystems, eg VFIO and VDPA
+>
+> The bulk of this code is a new data structure design to track how the
+> IOVAs are mapped to PFNs.
+>
+> iommufd intends to be general and consumable by any driver that wants to
+> DMA to userspace. From a driver perspective it can largely be dropped in
+> in-place of iommu_attach_device() and provides a uniform full feature set
+> to all consumers.
+>
+> As this is a larger project this series is the first step. This series
+> provides the iommfd "generic interface" which is designed to be suitable
+> for applications like DPDK and VMM flows that are not optimized to
+> specific HW scenarios. It is close to being a drop in replacement for the
+> existing VFIO type 1.
+>
+> This is part two of three for an initial sequence:
+>  - Move IOMMU Group security into the iommu layer
+>    https://lore.kernel.org/linux-iommu/20220218005521.172832-1-baolu.lu@linux.intel.com/
+>  * Generic IOMMUFD implementation
+>  - VFIO ability to consume IOMMUFD
+>    An early exploration of this is available here:
+>     https://github.com/luxis1999/iommufd/commits/iommufd-v5.17-rc6
+>
+> Various parts of the above extended features are in WIP stages currently
+> to define how their IOCTL interface should work.
+>
+> At this point, using the draft VFIO series, unmodified qemu has been
+> tested to operate using iommufd on x86 and ARM systems.
+>
+> Several people have contributed directly to this work: Eric Auger, Kevin
+> Tian, Lu Baolu, Nicolin Chen, Yi L Liu. Many more have participated in the
+> discussions that lead here, and provided ideas. Thanks to all!
+>
+> This is on github: https://github.com/jgunthorpe/linux/commits/iommufd
+>
+> # S390 in-kernel page table walker
+> Cc: Niklas Schnelle <schnelle@linux.ibm.com>
+> Cc: Matthew Rosato <mjrosato@linux.ibm.com>
+> # AMD Dirty page tracking
+> Cc: Joao Martins <joao.m.martins@oracle.com>
+> # ARM SMMU Dirty page tracking
+> Cc: Keqian Zhu <zhukeqian1@huawei.com>
+> Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> # ARM SMMU nesting
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> # Map/unmap performance
+> Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
+> # VDPA
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> # Power
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> # vfio
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: kvm@vger.kernel.org
+> # iommu
+> Cc: iommu@lists.linux-foundation.org
+> # Collaborators
+> Cc: "Chaitanya Kulkarni" <chaitanyak@nvidia.com>
+> Cc: Nicolin Chen <nicolinc@nvidia.com>
+> Cc: Lu Baolu <baolu.lu@linux.intel.com>
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Yi Liu <yi.l.liu@intel.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+>
+> Jason Gunthorpe (11):
+>   interval-tree: Add a utility to iterate over spans in an interval tree
+>   iommufd: File descriptor, context, kconfig and makefiles
+>   kernel/user: Allow user::locked_vm to be usable for iommufd
+>   iommufd: PFN handling for iopt_pages
+>   iommufd: Algorithms for PFN storage
+>   iommufd: Data structure to provide IOVA to PFN mapping
+>   iommufd: IOCTLs for the io_pagetable
+>   iommufd: Add a HW pagetable object
+>   iommufd: Add kAPI toward external drivers
+>   iommufd: vfio container FD ioctl compatibility
+>   iommufd: Add a selftest
+>
+> Kevin Tian (1):
+>   iommufd: Overview documentation
+>
+>  Documentation/userspace-api/index.rst         |    1 +
+>  .../userspace-api/ioctl/ioctl-number.rst      |    1 +
+>  Documentation/userspace-api/iommufd.rst       |  224 +++
+>  MAINTAINERS                                   |   10 +
+>  drivers/iommu/Kconfig                         |    1 +
+>  drivers/iommu/Makefile                        |    2 +-
+>  drivers/iommu/iommufd/Kconfig                 |   22 +
+>  drivers/iommu/iommufd/Makefile                |   13 +
+>  drivers/iommu/iommufd/device.c                |  274 ++++
+>  drivers/iommu/iommufd/hw_pagetable.c          |  142 ++
+>  drivers/iommu/iommufd/io_pagetable.c          |  890 +++++++++++
+>  drivers/iommu/iommufd/io_pagetable.h          |  170 +++
+>  drivers/iommu/iommufd/ioas.c                  |  252 ++++
+>  drivers/iommu/iommufd/iommufd_private.h       |  231 +++
+>  drivers/iommu/iommufd/iommufd_test.h          |   65 +
+>  drivers/iommu/iommufd/main.c                  |  346 +++++
+>  drivers/iommu/iommufd/pages.c                 | 1321 +++++++++++++++++
+>  drivers/iommu/iommufd/selftest.c              |  495 ++++++
+>  drivers/iommu/iommufd/vfio_compat.c           |  401 +++++
+>  include/linux/interval_tree.h                 |   41 +
+>  include/linux/iommufd.h                       |   50 +
+>  include/linux/sched/user.h                    |    2 +-
+>  include/uapi/linux/iommufd.h                  |  223 +++
+>  kernel/user.c                                 |    1 +
+>  lib/interval_tree.c                           |   98 ++
+>  tools/testing/selftests/Makefile              |    1 +
+>  tools/testing/selftests/iommu/.gitignore      |    2 +
+>  tools/testing/selftests/iommu/Makefile        |   11 +
+>  tools/testing/selftests/iommu/config          |    2 +
+>  tools/testing/selftests/iommu/iommufd.c       | 1225 +++++++++++++++
+>  30 files changed, 6515 insertions(+), 2 deletions(-)
+>  create mode 100644 Documentation/userspace-api/iommufd.rst
+>  create mode 100644 drivers/iommu/iommufd/Kconfig
+>  create mode 100644 drivers/iommu/iommufd/Makefile
+>  create mode 100644 drivers/iommu/iommufd/device.c
+>  create mode 100644 drivers/iommu/iommufd/hw_pagetable.c
+>  create mode 100644 drivers/iommu/iommufd/io_pagetable.c
+>  create mode 100644 drivers/iommu/iommufd/io_pagetable.h
+>  create mode 100644 drivers/iommu/iommufd/ioas.c
+>  create mode 100644 drivers/iommu/iommufd/iommufd_private.h
+>  create mode 100644 drivers/iommu/iommufd/iommufd_test.h
+>  create mode 100644 drivers/iommu/iommufd/main.c
+>  create mode 100644 drivers/iommu/iommufd/pages.c
+>  create mode 100644 drivers/iommu/iommufd/selftest.c
+>  create mode 100644 drivers/iommu/iommufd/vfio_compat.c
+>  create mode 100644 include/linux/iommufd.h
+>  create mode 100644 include/uapi/linux/iommufd.h
+>  create mode 100644 tools/testing/selftests/iommu/.gitignore
+>  create mode 100644 tools/testing/selftests/iommu/Makefile
+>  create mode 100644 tools/testing/selftests/iommu/config
+>  create mode 100644 tools/testing/selftests/iommu/iommufd.c
+>
+>
+> base-commit: d1c716ed82a6bf4c35ba7be3741b9362e84cd722
 
