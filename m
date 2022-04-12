@@ -2,97 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67A734FE868
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 21:02:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B42EC4FE89C
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 21:27:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346311AbiDLTEx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 15:04:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42086 "EHLO
+        id S1345882AbiDLT3M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 15:29:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236431AbiDLTEw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 15:04:52 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51652167CB
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 12:02:34 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id bx5so19339132pjb.3
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 12:02:34 -0700 (PDT)
+        with ESMTP id S238905AbiDLT3L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 15:29:11 -0400
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1DE03466B
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 12:26:51 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id s13so25366342ljd.5
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 12:26:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=shutemov-name.20210112.gappssmtp.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=BbHgo1BZwJ1d78lKODjktD+uyii6+g1yexgvQqoo+mw=;
-        b=LnxHWLnUc8Yhyif0BM+jfioD7Ro6oz0kP4KlMNi8nfO4tq+gXlDdyA0dqS9g9X8A2O
-         DBIAw7SsBQyITHPxOLts+Vq5berRQru9wzh4wQD8g0xFZ8Tjf9Tfaz3fXkGU1WN+T2je
-         YA8CzmkbNbjbKus532NPnUss4lxJGoA9Fxx9Hhjm3KXzlQCwUHMmSZOiWthNOgoxVD5R
-         n+K8hP1useTogOdMOB+8siQREYoZAG1a7VqjbCvxorOYNPRrCsM9uayrSJ3mTMsDF4KD
-         m0gVQV7rNRwJ22KBVPyj4xyVdn5ShjUUbtAKri765i0IgrhIVFXdBHPF7TZSb6AZ4r72
-         6l7A==
+        bh=uhp2gyxJXafqQhufiyepsQB0fVUjcBdyLXTovCl6zhk=;
+        b=5r3BqAvHHqrB2sxGTnYHVAS69nI4KU7prcQCYLC+0giVYjXTuDzbhcWunmrmixMgiI
+         l6KAoj+O6vndDV8nCt3/S5YfZKl20CFaNrJbcc41X99anlIpoxpW/y7x7Y1M8Moxl+/V
+         1/swlz2HX63Q+NBEhUfmJQEpWAJDocdiEL2YUckMfpe3C8nZcla3i0xFsf7D/9DkQ9ru
+         eAJG41WiqDv83Av6IuPIHFgdRnfdlNyaK+rskTFa67tR2m82ZCspiqGtd/RBP6s+qYm3
+         8gfkf6bS7/JwsfLxy6EmCDw65cudX7DLbyf2e7vFavB5H90QMXcKGJMnj7FuirippGU7
+         eNJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=BbHgo1BZwJ1d78lKODjktD+uyii6+g1yexgvQqoo+mw=;
-        b=b1B+rP0xS4Fjbpn+ysDIQftpk/f+8FT4JZXOAaHdkL/e2E9rJo8E8CdnvRXrbReZLJ
-         bdt55ceGrkT1vk3qRdjPNlnF1ASE9rtWTjUekDBkXVbXLAezF95S82tg7crgv1tHHqXY
-         P71jZUWK2oeg6/QJ9aI0NwyDf4xoSAnamdVTVaWvFgqqll6kFGudXrcOr7PT6yBvxJ9W
-         ZV4r/r/yWcOjiJ8kM+naMNzAN7OHXQ22tU+IZO6/fXHKrR+WX43Lw94atskV0MqCJgR8
-         Dbq2SI2B/o6HbemqoY4ehQPmOVp7u0zHnb6hVo2rCIqv8/BfQk425a0kSTtxHxQVSanc
-         ktYQ==
-X-Gm-Message-State: AOAM530cBUKpjzEmZhz20FOuxgzipxv2sE2lp9QrSe7BObFoQx8CrMIy
-        ADkmgbNiL3XDWcoqsfVfhXzRvw==
-X-Google-Smtp-Source: ABdhPJw1oDbAvMMNfwaTX2BNI0FFFny/7f3b+EZZShAnrtJlUItXsnb/I0hSpg5w0dihHn8r4i/wJA==
-X-Received: by 2002:a17:902:cf02:b0:14f:e0c2:1514 with SMTP id i2-20020a170902cf0200b0014fe0c21514mr38680349plg.90.1649790153659;
-        Tue, 12 Apr 2022 12:02:33 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y4-20020a056a00190400b004fac0896e35sm39513562pfi.42.2022.04.12.12.02.32
+        bh=uhp2gyxJXafqQhufiyepsQB0fVUjcBdyLXTovCl6zhk=;
+        b=14Gy6wMPL5rJGDgEapNJLtYypoCXP+rTOHiwmDd0LYn1wN7nuckpjs2ZhFRSW81sgY
+         p0raLkhaRWFZJppi+9enoy6Jem5ihuxU7QRNiO9fAlYSmidlIOctVvuHfuNwm11f2aOs
+         X1tlAPkyTJldaANB+KQ65MLBBZIETga9Xsf2wwHJvUaagTYDNDRYlG09g2rTi5jkWxZ3
+         7RDhMia2Odwatk9RiYho6YI7+cQ3nZHO15piTRuTNndJ6TldU4qKY4cdfOMwPVa+McwZ
+         JG4AeOo6awr5Ax9tsbcPgNbgOoOTSngOmEl4LyKHuPYlUyWXCFSsa/hcDqE624ZRsOUD
+         821A==
+X-Gm-Message-State: AOAM531IAutiSla9FHfC9yJQAahdg5o1pxb8ldVEIxssjV+vlKqyeUcG
+        aW6llCeOkVmHyNn0DRP5otXyCw==
+X-Google-Smtp-Source: ABdhPJzNqQFsr22ki1Pj8rD15MClx6e4/Y9XgiO6Rr06pMklFiRq4YmMNE+KUcyBNh7zLIW+Z44IOA==
+X-Received: by 2002:a05:651c:1a09:b0:24a:c7df:339c with SMTP id by9-20020a05651c1a0900b0024ac7df339cmr25219403ljb.298.1649791610046;
+        Tue, 12 Apr 2022 12:26:50 -0700 (PDT)
+Received: from box.localdomain ([86.57.175.117])
+        by smtp.gmail.com with ESMTPSA id h19-20020a056512055300b0046bb9a59e13sm309392lfl.56.2022.04.12.12.26.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Apr 2022 12:02:33 -0700 (PDT)
-Date:   Tue, 12 Apr 2022 19:02:29 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Mingwei Zhang <mizhang@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        David Dunn <daviddunn@google.com>,
-        Junaid Shahid <junaids@google.com>,
+        Tue, 12 Apr 2022 12:26:49 -0700 (PDT)
+Received: by box.localdomain (Postfix, from userid 1000)
+        id 72EEB1030D2; Tue, 12 Apr 2022 22:28:21 +0300 (+03)
+Date:   Tue, 12 Apr 2022 22:28:21 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v4 03/10] KVM: selftests: Read binary stats desc in lib
-Message-ID: <YlXMxcKVgWxHtiGR@google.com>
-References: <20220411211015.3091615-1-bgardon@google.com>
- <20220411211015.3091615-4-bgardon@google.com>
- <YlTN3yq1iBPkw6Aa@google.com>
- <CANgfPd8mZ9-zQBvK=OASQ+n7eq_FpvpStMc_yD-UsmFdQ3OCvA@mail.gmail.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com
+Subject: Re: [PATCH v5 04/13] mm/shmem: Restrict MFD_INACCESSIBLE memory
+ against RLIMIT_MEMLOCK
+Message-ID: <20220412192821.xliop57sblvjx4t4@box.shutemov.name>
+References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
+ <20220310140911.50924-5-chao.p.peng@linux.intel.com>
+ <Yk8L0CwKpTrv3Rg3@google.com>
+ <20220411153233.54ljmi7zgqovhgsn@box.shutemov.name>
+ <20220412133925.GG8013@chaop.bj.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANgfPd8mZ9-zQBvK=OASQ+n7eq_FpvpStMc_yD-UsmFdQ3OCvA@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <20220412133925.GG8013@chaop.bj.intel.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 12, 2022, Ben Gardon wrote:
-> On Mon, Apr 11, 2022 at 5:55 PM Mingwei Zhang <mizhang@google.com> wrote:
-> > I was very confused on header->name_size. So this field means the
-> > maximum string size of a stats name, right? Can we update the comments
-> > in the kvm.h to specify that? By reading the comments, I don't really
-> > feel this is how we should use this field.
+On Tue, Apr 12, 2022 at 09:39:25PM +0800, Chao Peng wrote:
+> On Mon, Apr 11, 2022 at 06:32:33PM +0300, Kirill A. Shutemov wrote:
+> > On Thu, Apr 07, 2022 at 04:05:36PM +0000, Sean Christopherson wrote:
+> > > Hmm, shmem_writepage() already handles SHM_F_INACCESSIBLE by rejecting the swap, so
+> > > maybe it's just the page migration path that needs to be updated?
+> > 
+> > My early version prevented migration with -ENOTSUPP for
+> > address_space_operations::migratepage().
+> > 
+> > What's wrong with that approach?
 > 
-> I believe that's right. I agree the documentation on that was a little
-> confusing.
+> I previously thought migratepage will not be called since we already
+> marked the pages as UNMOVABLE, sounds not correct?
 
-Heh, a little.  I got tripped up looking at this too.  Give me a few minutes and
-I'll attach a cleanup patch to add comments and fix the myriad style issues.
+Do you mean missing __GFP_MOVABLE? I can be wrong, but I don't see that it
+direclty affects if the page is migratable. It is a hint to page allocator
+to group unmovable pages to separate page block and impove availablity of
+higher order pages this way. Page allocator tries to allocate unmovable
+pages from pages blocks that already have unmovable pages.
 
-This whole file is painful to look at.  Aside from violating preferred kernel
-style, it's horribly consistent with itself.  Well, except for the 80 char limit,
-to which it has a fanatical devotion.
+-- 
+ Kirill A. Shutemov
