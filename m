@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 493134FCBDD
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 03:25:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C7CE4FCBE6
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 03:32:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238991AbiDLB11 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Apr 2022 21:27:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48760 "EHLO
+        id S245484AbiDLBeh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Apr 2022 21:34:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230259AbiDLB10 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Apr 2022 21:27:26 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35CF51A814
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 18:25:10 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id z16so16119940pfh.3
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 18:25:10 -0700 (PDT)
+        with ESMTP id S230372AbiDLBeg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Apr 2022 21:34:36 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48DCC19C1C
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 18:32:20 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id be5so9429752plb.13
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 18:32:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=qLkG0TlTkLtkn7/YDi2Nz0t09sVP5EaquDCxlZc7iVE=;
-        b=qtFpfnhXLPAMO82Aps6yxmMJSr67hbNkkZXmdGS/KL8Y8KczxORah8E8wSDUtYFOZd
-         IAJGjfeySrEbHSuM15fwAqUB02UhRrzMTbEZ0JNup0o0cPQ5whA0/l6r5uJlqLUMJYG1
-         su6lWltTtv6nf/kmK6rT0z4bg8JrODCn8066McpWbQnVVMOopX5xV0KjOoFOSbd9aXMS
-         2TFmU4KP31uZqaluiZ2MYgg48UrBYipcv5WPua4VJF3j3wu4AERnN4paFhyAdATlZGCz
-         ypoFhTAwNJELuKspm1q/0GWfl/+jIDq8bJ9Dq4YDo3SJhJno/7NT5xCM1JTM62op7pDa
-         UG7A==
+        bh=IdsjBouuaUAW6YtbrhnQK3jJQXWjKyeuOltrdWDIDuU=;
+        b=UMqvigVmKFJwWf8Lib1NDIK9iPZSBWT/d/lWPkKM3NJpmqygLpg6vUxTDXND1/sHNU
+         luphuZljGR9fCInOxRiTidhHOI2AbOIx/qyZJh4glgDO/Tv1KysQK4esvYeJ24R+AN40
+         rT0GpJn0AYprqFS1Lv0sjOyeRW2aN0hZWuoOISdkBaeLxyesPyLC0eWtH0ZFTSizqwyL
+         tkTeXUobpCLB6gTdn2JzseOXQ5FPFGXkLBunEx8S/eushDPNSK9KLHAoTDiXCMRmN24z
+         foxXoPTg/dv4psoWLQrypFG5HFIIXzyT57kRhqYB/0YVv5XKfHR+0Sj6n8b46LdFBU+Z
+         ObAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=qLkG0TlTkLtkn7/YDi2Nz0t09sVP5EaquDCxlZc7iVE=;
-        b=e+ZAj8FWFbvo3hhmpscWNfa9ZKjqNULHS5nbypmkRA8CEWMv5pmAsfIw6sZiLdLzGW
-         AG+SatqJt3PAcxkK8/V+XXKvBP+iDx89upwVpd9lYkolsxqFYj43OWYK6i/NbtyfAZ46
-         qaxgxrrgYyYt5sRhzsTVOb5a6J5Ba6RfjOM72dYvKbR3ipoGm+yCcdUhqcI+o5H3+tgg
-         GqnF7MnGIJdz2uus7tTasfZbl41Jw8ifg8Moi/c6J/qzbB8I3vbwHiG9eEgRGHSnpe6J
-         8ThkrsHBZAUJ5bqA/qYiqCXTHy5aFiqk/F7sE8nJnoLuGDaN8C7VQuMFrvKUgM3pObWz
-         lzQw==
-X-Gm-Message-State: AOAM531Dibz2Dvk4HidRvFzJuLi0KS5loiEhFdILd7kkPeYaSYfJye1l
-        Y0zKwFGt6Vn4XujGOGhtwavhLAaNMA3UI5Qh
-X-Google-Smtp-Source: ABdhPJx7pt1bxVJmlx1dwnHe4fO6l3jJivv3igbrMW3nFY6RPvJVoTAnmhVy0/cSdpzFZAh2BeRonA==
-X-Received: by 2002:a63:1543:0:b0:39d:9729:1992 with SMTP id 3-20020a631543000000b0039d97291992mr536239pgv.155.1649726709466;
-        Mon, 11 Apr 2022 18:25:09 -0700 (PDT)
+        bh=IdsjBouuaUAW6YtbrhnQK3jJQXWjKyeuOltrdWDIDuU=;
+        b=DvD2V4wq+DPIwtwqnI5sLlctKF1hOmFtWv377e7xTGpDCfKuYDbEoS3zah4W3vTKbi
+         hl22RLkfezPHVvKBdGD0eBof614TEgVtm8d3knx1cWEhRrsWW0YT67pilSgc03+kvjTc
+         9UyXFFpcr8x/zwxrIPK76kDwERbxvuih6MgEkkup7enKzyUR6ATeCOqGQUEydMPiopvV
+         kj9PLY90G3KwmqmKEZwCxVRghY96Z/XFq+YtvVx4SUM4gX5G3ZTNLF54FfVpfi3juG/x
+         4jNRXQhsrydfFVsX5CIxpsYnb04eZIN0Hp8703w0mwP+LDaqElR6k9G3BaESO0B3HcxE
+         /cNg==
+X-Gm-Message-State: AOAM5335weCLwrOvqrFTrz3Q63KcIzNqFpm1RF2te+HJVf64qTgypgcq
+        IJeIQySBevbB+mt6B2wCBxL9CA==
+X-Google-Smtp-Source: ABdhPJw/90zh2RN+4GX3T1hJZxG9/zWfvgUJz9RJQj3Pi4Q1IOkssI4cOlGClXQUYclY7d6wWBFZcw==
+X-Received: by 2002:a17:903:22cc:b0:158:52d6:1b0b with SMTP id y12-20020a17090322cc00b0015852d61b0bmr10057064plg.47.1649727139452;
+        Mon, 11 Apr 2022 18:32:19 -0700 (PDT)
 Received: from google.com (226.75.127.34.bc.googleusercontent.com. [34.127.75.226])
-        by smtp.gmail.com with ESMTPSA id e14-20020a62aa0e000000b00505c05545f8sm4916521pff.108.2022.04.11.18.25.08
+        by smtp.gmail.com with ESMTPSA id d18-20020a056a0010d200b004fa2e13ce80sm37406301pfu.76.2022.04.11.18.32.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Apr 2022 18:25:08 -0700 (PDT)
-Date:   Tue, 12 Apr 2022 01:25:05 +0000
+        Mon, 11 Apr 2022 18:32:18 -0700 (PDT)
+Date:   Tue, 12 Apr 2022 01:32:15 +0000
 From:   Mingwei Zhang <mizhang@google.com>
 To:     Ben Gardon <bgardon@google.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -60,14 +60,14 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Jim Mattson <jmattson@google.com>,
         David Matlack <dmatlack@google.com>,
         Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v4 04/10] KVM: selftests: Read binary stat data in lib
-Message-ID: <YlTU8YXmoLED1VHC@google.com>
+Subject: Re: [PATCH v4 05/10] KVM: selftests: Add NX huge pages test
+Message-ID: <YlTWn6pEKRMaG4gY@google.com>
 References: <20220411211015.3091615-1-bgardon@google.com>
- <20220411211015.3091615-5-bgardon@google.com>
+ <20220411211015.3091615-6-bgardon@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220411211015.3091615-5-bgardon@google.com>
+In-Reply-To: <20220411211015.3091615-6-bgardon@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -80,169 +80,334 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, Apr 11, 2022, Ben Gardon wrote:
-> Move the code to read the binary stats data to the KVM selftests
-> library. It will be re-used by other tests to check KVM behavior.
-> 
-> No functional change intended.
+> There's currently no test coverage of NX hugepages in KVM selftests, so
+> add a basic test to ensure that the feature works as intended.
 > 
 > Signed-off-by: Ben Gardon <bgardon@google.com>
-
-Reviewed-by: Mingwei Zhang <mizhang@google.com>
 > ---
->  .../selftests/kvm/include/kvm_util_base.h     |  3 +++
->  .../selftests/kvm/kvm_binary_stats_test.c     | 20 +++++-------------
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 21 +++++++++++++++++++
->  3 files changed, 29 insertions(+), 15 deletions(-)
+>  tools/testing/selftests/kvm/Makefile          |  10 ++
+>  .../selftests/kvm/include/kvm_util_base.h     |   1 +
+>  tools/testing/selftests/kvm/lib/kvm_util.c    |  48 ++++++
+>  .../selftests/kvm/x86_64/nx_huge_pages_test.c | 163 ++++++++++++++++++
+>  .../kvm/x86_64/nx_huge_pages_test.sh          |  25 +++
+>  5 files changed, 247 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+>  create mode 100755 tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh
 > 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index af582d168621..9bb9bce4df37 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -43,6 +43,10 @@ LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handler
+>  LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
+>  LIBKVM_riscv = lib/riscv/processor.c lib/riscv/ucall.c
+>  
+> +# Non-compiled test targets
+> +TEST_PROGS_x86_64 += x86_64/nx_huge_pages_test.sh
+> +
+> +# Compiled test targets
+>  TEST_GEN_PROGS_x86_64 = x86_64/cpuid_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/get_msr_index_features
+> @@ -104,6 +108,9 @@ TEST_GEN_PROGS_x86_64 += steal_time
+>  TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
+>  TEST_GEN_PROGS_x86_64 += system_counter_offset_test
+>  
+> +# Compiled outputs used by test targets
+> +TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
+> +
+>  TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
+>  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
+>  TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
+> @@ -142,7 +149,9 @@ TEST_GEN_PROGS_riscv += kvm_page_table_test
+>  TEST_GEN_PROGS_riscv += set_memory_region_test
+>  TEST_GEN_PROGS_riscv += kvm_binary_stats_test
+>  
+> +TEST_PROGS += $(TEST_PROGS_$(UNAME_M))
+>  TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
+> +TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(UNAME_M))
+>  LIBKVM += $(LIBKVM_$(UNAME_M))
+>  
+>  INSTALL_HDR_PATH = $(top_srcdir)/usr
+> @@ -193,6 +202,7 @@ $(OUTPUT)/libkvm.a: $(LIBKVM_OBJS)
+>  x := $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
+>  all: $(STATIC_LIBS)
+>  $(TEST_GEN_PROGS): $(STATIC_LIBS)
+> +$(TEST_GEN_PROGS_EXTENDED): $(STATIC_LIBS)
+>  
+>  cscope: include_paths = $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include lib ..
+>  cscope:
 > diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> index c5f34551ff76..b2684cfc2cb1 100644
+> index b2684cfc2cb1..f9c2ac0a5b97 100644
 > --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
 > +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -405,6 +405,9 @@ struct kvm_stats_desc *alloc_vm_stats_desc(int stats_fd,
->  					  struct kvm_stats_header *header);
->  void read_vm_stats_desc(int stats_fd, struct kvm_stats_header *header,
->  			struct kvm_stats_desc *stats_desc);
-> +int read_stat_data(int stats_fd, struct kvm_stats_header *header,
-> +		   struct kvm_stats_desc *desc, uint64_t *data,
-> +		   ssize_t max_elements);
+> @@ -408,6 +408,7 @@ void read_vm_stats_desc(int stats_fd, struct kvm_stats_header *header,
+>  int read_stat_data(int stats_fd, struct kvm_stats_header *header,
+>  		   struct kvm_stats_desc *desc, uint64_t *data,
+>  		   ssize_t max_elements);
+> +uint64_t vm_get_single_stat(struct kvm_vm *vm, const char *stat_name);
 >  
 >  uint32_t guest_get_vcpuid(void);
 >  
-> diff --git a/tools/testing/selftests/kvm/kvm_binary_stats_test.c b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-> index e4795bad7db6..97b180249ba0 100644
-> --- a/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-> +++ b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-> @@ -20,6 +20,8 @@
->  #include "asm/kvm.h"
->  #include "linux/kvm.h"
->  
-> +#define STAT_MAX_ELEMENTS 1000
-> +
->  static void stats_test(int stats_fd)
->  {
->  	ssize_t ret;
-> @@ -29,7 +31,7 @@ static void stats_test(int stats_fd)
->  	struct kvm_stats_header header;
->  	char *id;
->  	struct kvm_stats_desc *stats_desc;
-> -	u64 *stats_data;
-> +	u64 stats_data[STAT_MAX_ELEMENTS];
->  	struct kvm_stats_desc *pdesc;
->  
->  	/* Read kvm stats header */
-> @@ -130,25 +132,13 @@ static void stats_test(int stats_fd)
->  			pdesc->offset, pdesc->name);
->  	}
->  
-> -	/* Allocate memory for stats data */
-> -	stats_data = malloc(size_data);
-> -	TEST_ASSERT(stats_data, "Allocate memory for stats data");
-> -	/* Read kvm stats data as a bulk */
-> -	ret = pread(stats_fd, stats_data, size_data, header.data_offset);
-> -	TEST_ASSERT(ret == size_data, "Read KVM stats data");
->  	/* Read kvm stats data one by one */
-> -	size_data = 0;
->  	for (i = 0; i < header.num_desc; ++i) {
->  		pdesc = (void *)stats_desc + i * size_desc;
-> -		ret = pread(stats_fd, stats_data,
-> -				pdesc->size * sizeof(*stats_data),
-> -				header.data_offset + size_data);
-> -		TEST_ASSERT(ret == pdesc->size * sizeof(*stats_data),
-> -				"Read data of KVM stats: %s", pdesc->name);
-> -		size_data += pdesc->size * sizeof(*stats_data);
-> +		read_stat_data(stats_fd, &header, pdesc, stats_data,
-> +			       ARRAY_SIZE(stats_data));
->  	}
->  
-> -	free(stats_data);
->  	free(stats_desc);
->  	free(id);
->  }
 > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index e3ae26fbef03..64e2085f1129 100644
+> index 64e2085f1129..833c7e63d62d 100644
 > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
 > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -2593,3 +2593,24 @@ void read_vm_stats_desc(int stats_fd, struct kvm_stats_header *header,
->  	TEST_ASSERT(ret == stats_descs_size(header),
->  		    "Read KVM stats descriptors");
+> @@ -2614,3 +2614,51 @@ int read_stat_data(int stats_fd, struct kvm_stats_header *header,
+>  
+>  	return ret;
 >  }
 > +
-> +int read_stat_data(int stats_fd, struct kvm_stats_header *header,
-> +		   struct kvm_stats_desc *desc, uint64_t *data,
-> +		   ssize_t max_elements)
+> +static int vm_get_stat_data(struct kvm_vm *vm, const char *stat_name,
+> +			    uint64_t *data, ssize_t max_elements)
 > +{
-> +	ssize_t ret;
+> +	struct kvm_stats_desc *stats_desc;
+> +	struct kvm_stats_header header;
+> +	struct kvm_stats_desc *desc;
+> +	size_t size_desc;
+> +	int stats_fd;
+> +	int ret = -EINVAL;
+> +	int i;
 > +
-> +	TEST_ASSERT(desc->size <= max_elements,
-> +		    "Max data elements should be at least as large as stat data");
+> +	stats_fd = vm_get_stats_fd(vm);
 > +
-> +	ret = pread(stats_fd, data, desc->size * sizeof(*data),
-> +		    header->data_offset + desc->offset);
-
-hmm, by checking the comments in kvm.h, I cannot infer desc->offset
-should be added with header->data_offset. So, could you add the
-following commit into your series. I feel that we need to improve
-readability a little bit. Existing comments for kvm_stats_desc is not
-quite helpful for users.
-
-From: Mingwei Zhang <mizhang@google.com>
-Date: Tue, 12 Apr 2022 01:09:10 +0000
-Subject: [PATCH] KVM: stats: improve readability of kvm_stats_header and
- kvm_stats_desc
-
-Some comments on these data structures are not quite helpful from user
-perspective. For instance, kvm_stats_header->name_size was shared across
-all stats. This might be a little bit counter-intuitive, since each stat
-should have a different name length. So it has to be the maximum length of
-the stats string. We cannot infer that by just reading the comments without
-going through the implementation. In addition, kvm_stat_desc->offset is a
-relative offset base on kvm_stats_header->data_offset. It is better to call
-it out clearly in comments.
-
-Update the comments of the fields in these two data structures.
-
-Cc: Jing Zhang <zhangjingos@google.com>
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
----
- include/uapi/linux/kvm.h | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 5c0d7c77e9bd..986728b5b3fb 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1987,7 +1987,7 @@ struct kvm_dirty_gfn {
- /**
-  * struct kvm_stats_header - Header of per vm/vcpu binary statistics data.
-  * @flags: Some extra information for header, always 0 for now.
-- * @name_size: The size in bytes of the memory which contains statistics
-+ * @name_size: The maximum size in bytes of the memory which contains statistics
-  *             name string including trailing '\0'. The memory is allocated
-  *             at the send of statistics descriptor.
-  * @num_desc: The number of statistics the vm or vcpu has.
-@@ -2042,7 +2042,8 @@ struct kvm_stats_header {
-  * @size: The number of data items for this stats.
-  *        Every data item is of type __u64.
-  * @offset: The offset of the stats to the start of stat structure in
-- *          structure kvm or kvm_vcpu.
-+ *          structure kvm or kvm_vcpu. When using it, add its value with
-+ *          kvm_stats_header->data_offset.
-  * @bucket_size: A parameter value used for histogram stats. It is only used
-  *		for linear histogram stats, specifying the size of the bucket;
-  * @name: The name string for the stats. Its size is indicated by the
-
-base-commit: ce522ba9ef7e2d9fb22a39eb3371c0c64e2a433e
---
-2.35.1.1178.g4f1659d476-goog
+> +	read_vm_stats_header(stats_fd, &header);
 > +
-> +	/* ret from pread is in bytes. */
-> +	ret = ret / sizeof(*data);
+> +	stats_desc = alloc_vm_stats_desc(stats_fd, &header);
+> +	read_vm_stats_desc(stats_fd, &header, stats_desc);
 > +
-> +	TEST_ASSERT(ret == desc->size,
-> +		    "Read data of KVM stats: %s", desc->name);
+> +	size_desc = sizeof(struct kvm_stats_desc) + header.name_size;
 > +
+> +	/* Read kvm stats data one by one */
+> +	for (i = 0; i < header.num_desc; ++i) {
+> +		desc = (void *)stats_desc + (i * size_desc);
+> +
+> +		if (strcmp(desc->name, stat_name))
+> +			continue;
+> +
+> +		ret = read_stat_data(stats_fd, &header, desc, data,
+> +				     max_elements);
+> +	}
+> +
+> +	free(stats_desc);
+> +	close(stats_fd);
 > +	return ret;
 > +}
+
+I could be wrong, but it seems this function is quite generic. Why not
+putting it into kvm_util.c?
+> +
+> +uint64_t vm_get_single_stat(struct kvm_vm *vm, const char *stat_name)
+> +{
+> +	uint64_t data;
+> +	int ret;
+> +
+> +	ret = vm_get_stat_data(vm, stat_name, &data, 1);
+> +	TEST_ASSERT(ret == 1,
+> +		    "Stat %s expected to have 1 element, but %d returned",
+> +		    stat_name, ret);
+> +	return data;
+> +}
+> diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+> new file mode 100644
+> index 000000000000..3f21726b22c7
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+> @@ -0,0 +1,163 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * tools/testing/selftests/kvm/nx_huge_page_test.c
+> + *
+> + * Usage: to be run via nx_huge_page_test.sh, which does the necessary
+> + * environment setup and teardown
+> + *
+> + * Copyright (C) 2022, Google LLC.
+> + */
+> +
+> +#define _GNU_SOURCE
+> +
+> +#include <fcntl.h>
+> +#include <stdint.h>
+> +#include <time.h>
+> +
+> +#include <test_util.h>
+> +#include "kvm_util.h"
+> +
+> +#define HPAGE_SLOT		10
+> +#define HPAGE_GVA		(23*1024*1024)
+> +#define HPAGE_GPA		(10*1024*1024)
+> +#define HPAGE_SLOT_NPAGES	(512 * 3)
+> +#define PAGE_SIZE		4096
+> +
+> +/*
+> + * When writing to guest memory, write the opcode for the `ret` instruction so
+> + * that subsequent iteractions can exercise instruction fetch by calling the
+> + * memory.
+> + */
+> +#define RETURN_OPCODE 0xC3
+> +
+> +void guest_code(void)
+> +{
+> +	uint64_t hpage_1 = HPAGE_GVA;
+> +	uint64_t hpage_2 = hpage_1 + (PAGE_SIZE * 512);
+> +	uint64_t hpage_3 = hpage_2 + (PAGE_SIZE * 512);
+> +
+> +	READ_ONCE(*(uint64_t *)hpage_1);
+> +	GUEST_SYNC(1);
+> +
+> +	READ_ONCE(*(uint64_t *)hpage_2);
+> +	GUEST_SYNC(2);
+> +
+> +	((void (*)(void)) hpage_1)();
+> +	GUEST_SYNC(3);
+> +
+> +	((void (*)(void)) hpage_3)();
+> +	GUEST_SYNC(4);
+> +
+> +	READ_ONCE(*(uint64_t *)hpage_1);
+> +	GUEST_SYNC(5);
+> +
+> +	READ_ONCE(*(uint64_t *)hpage_3);
+> +	GUEST_SYNC(6);
+> +}
+> +
+> +static void check_2m_page_count(struct kvm_vm *vm, int expected_pages_2m)
+> +{
+> +	int actual_pages_2m;
+> +
+> +	actual_pages_2m = vm_get_single_stat(vm, "pages_2m");
+> +
+> +	TEST_ASSERT(actual_pages_2m == expected_pages_2m,
+> +		    "Unexpected 2m page count. Expected %d, got %d",
+> +		    expected_pages_2m, actual_pages_2m);
+> +}
+> +
+> +static void check_split_count(struct kvm_vm *vm, int expected_splits)
+> +{
+> +	int actual_splits;
+> +
+> +	actual_splits = vm_get_single_stat(vm, "nx_lpage_splits");
+> +
+> +	TEST_ASSERT(actual_splits == expected_splits,
+> +		    "Unexpected nx lpage split count. Expected %d, got %d",
+> +		    expected_splits, actual_splits);
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +	struct kvm_vm *vm;
+> +	struct timespec ts;
+> +	void *hva;
+> +
+> +	vm = vm_create_default(0, 0, guest_code);
+> +
+> +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS_HUGETLB,
+> +				    HPAGE_GPA, HPAGE_SLOT,
+> +				    HPAGE_SLOT_NPAGES, 0);
+> +
+> +	virt_map(vm, HPAGE_GVA, HPAGE_GPA, HPAGE_SLOT_NPAGES);
+> +
+> +	hva = addr_gpa2hva(vm, HPAGE_GPA);
+> +	memset(hva, RETURN_OPCODE, HPAGE_SLOT_NPAGES * PAGE_SIZE);
+> +
+> +	check_2m_page_count(vm, 0);
+> +	check_split_count(vm, 0);
+> +
+> +	/*
+> +	 * The guest code will first read from the first hugepage, resulting
+> +	 * in a huge page mapping being created.
+> +	 */
+> +	vcpu_run(vm, 0);
+> +	check_2m_page_count(vm, 1);
+> +	check_split_count(vm, 0);
+> +
+> +	/*
+> +	 * Then the guest code will read from the second hugepage, resulting
+> +	 * in another huge page mapping being created.
+> +	 */
+> +	vcpu_run(vm, 0);
+> +	check_2m_page_count(vm, 2);
+> +	check_split_count(vm, 0);
+> +
+> +	/*
+> +	 * Next, the guest will execute from the first huge page, causing it
+> +	 * to be remapped at 4k.
+> +	 */
+> +	vcpu_run(vm, 0);
+> +	check_2m_page_count(vm, 1);
+> +	check_split_count(vm, 1);
+> +
+> +	/*
+> +	 * Executing from the third huge page (previously unaccessed) will
+> +	 * cause part to be mapped at 4k.
+> +	 */
+> +	vcpu_run(vm, 0);
+> +	check_2m_page_count(vm, 1);
+> +	check_split_count(vm, 2);
+> +
+> +	/* Reading from the first huge page again should have no effect. */
+> +	vcpu_run(vm, 0);
+> +	check_2m_page_count(vm, 1);
+> +	check_split_count(vm, 2);
+> +
+> +	/*
+> +	 * Give recovery thread time to run. The wrapper script sets
+> +	 * recovery_period_ms to 100, so wait 5x that.
+> +	 */
+> +	ts.tv_sec = 0;
+> +	ts.tv_nsec = 500000000;
+> +	nanosleep(&ts, NULL);
+> +
+> +	/*
+> +	 * Now that the reclaimer has run, all the split pages should be gone.
+> +	 */
+> +	check_2m_page_count(vm, 1);
+> +	check_split_count(vm, 0);
+> +
+> +	/*
+> +	 * The 4k mapping on hpage 3 should have been removed, so check that
+> +	 * reading from it causes a huge page mapping to be installed.
+> +	 */
+> +	vcpu_run(vm, 0);
+> +	check_2m_page_count(vm, 2);
+> +	check_split_count(vm, 0);
+> +
+> +	kvm_vm_free(vm);
+> +
+> +	return 0;
+> +}
+> +
+> diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh
+> new file mode 100755
+> index 000000000000..19fc95723fcb
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh
+> @@ -0,0 +1,25 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0-only */
+> +
+> +# tools/testing/selftests/kvm/nx_huge_page_test.sh
+> +# Copyright (C) 2022, Google LLC.
+> +
+> +NX_HUGE_PAGES=$(cat /sys/module/kvm/parameters/nx_huge_pages)
+> +NX_HUGE_PAGES_RECOVERY_RATIO=$(cat /sys/module/kvm/parameters/nx_huge_pages_recovery_ratio)
+> +NX_HUGE_PAGES_RECOVERY_PERIOD=$(cat /sys/module/kvm/parameters/nx_huge_pages_recovery_period_ms)
+> +HUGE_PAGES=$(cat /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages)
+> +
+> +echo 1 > /sys/module/kvm/parameters/nx_huge_pages
+> +echo 1 > /sys/module/kvm/parameters/nx_huge_pages_recovery_ratio
+> +echo 100 > /sys/module/kvm/parameters/nx_huge_pages_recovery_period_ms
+> +echo 200 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+> +
+> +./nx_huge_pages_test
+> +RET=$?
+> +
+> +echo $NX_HUGE_PAGES > /sys/module/kvm/parameters/nx_huge_pages
+> +echo $NX_HUGE_PAGES_RECOVERY_RATIO > /sys/module/kvm/parameters/nx_huge_pages_recovery_ratio
+> +echo $NX_HUGE_PAGES_RECOVERY_PERIOD > /sys/module/kvm/parameters/nx_huge_pages_recovery_period_ms
+> +echo $HUGE_PAGES > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+> +
+> +exit $RET
 > -- 
 > 2.35.1.1178.g4f1659d476-goog
 > 
