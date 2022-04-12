@@ -2,122 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B42EC4FE89C
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 21:27:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF9324FE8A2
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 21:30:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345882AbiDLT3M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 15:29:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58256 "EHLO
+        id S1355344AbiDLTcl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 15:32:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238905AbiDLT3L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 15:29:11 -0400
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1DE03466B
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 12:26:51 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id s13so25366342ljd.5
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 12:26:51 -0700 (PDT)
+        with ESMTP id S244968AbiDLTck (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 15:32:40 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 781063CFDF
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 12:30:22 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id s14so8072054plk.8
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 12:30:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20210112.gappssmtp.com; s=20210112;
+        d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=uhp2gyxJXafqQhufiyepsQB0fVUjcBdyLXTovCl6zhk=;
-        b=5r3BqAvHHqrB2sxGTnYHVAS69nI4KU7prcQCYLC+0giVYjXTuDzbhcWunmrmixMgiI
-         l6KAoj+O6vndDV8nCt3/S5YfZKl20CFaNrJbcc41X99anlIpoxpW/y7x7Y1M8Moxl+/V
-         1/swlz2HX63Q+NBEhUfmJQEpWAJDocdiEL2YUckMfpe3C8nZcla3i0xFsf7D/9DkQ9ru
-         eAJG41WiqDv83Av6IuPIHFgdRnfdlNyaK+rskTFa67tR2m82ZCspiqGtd/RBP6s+qYm3
-         8gfkf6bS7/JwsfLxy6EmCDw65cudX7DLbyf2e7vFavB5H90QMXcKGJMnj7FuirippGU7
-         eNJQ==
+        bh=sKmZh3PaYY26BR+B2dRs/R9LlgovoIyv4Z/3LkpHaas=;
+        b=JUDPn7fn8Rx3FHzUo35cOmXSzjdDkCl5t6mkLSekhksynwyH45KuNzU4S/KEOecSK4
+         EckijBrri7O1pTEPsDbxyPvQ1CN3SvrN65GC3o3ta+u7E0IkE/pSqbk4pf+tKmmHcUmo
+         Jj6eBrapJ9GQGnSraNNGpgG8OyZeLzZZBzb/UcQYLDSZYAWXU8+VTjqsWoBfyYIPuFCd
+         BPA6pQFyB6WluM0f1YcCaxEzvdzUYuGR3y8mfK6fyt8VuvP07i9h/X5kHLeE7xcCpniZ
+         m3NvAY2ui3PGprmqlQGwxGxlOsfA0TxvuFtbimhYg8uLGB7c2B4jLjGyAE+bFK60sZ0O
+         noWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=uhp2gyxJXafqQhufiyepsQB0fVUjcBdyLXTovCl6zhk=;
-        b=14Gy6wMPL5rJGDgEapNJLtYypoCXP+rTOHiwmDd0LYn1wN7nuckpjs2ZhFRSW81sgY
-         p0raLkhaRWFZJppi+9enoy6Jem5ihuxU7QRNiO9fAlYSmidlIOctVvuHfuNwm11f2aOs
-         X1tlAPkyTJldaANB+KQ65MLBBZIETga9Xsf2wwHJvUaagTYDNDRYlG09g2rTi5jkWxZ3
-         7RDhMia2Odwatk9RiYho6YI7+cQ3nZHO15piTRuTNndJ6TldU4qKY4cdfOMwPVa+McwZ
-         JG4AeOo6awr5Ax9tsbcPgNbgOoOTSngOmEl4LyKHuPYlUyWXCFSsa/hcDqE624ZRsOUD
-         821A==
-X-Gm-Message-State: AOAM531IAutiSla9FHfC9yJQAahdg5o1pxb8ldVEIxssjV+vlKqyeUcG
-        aW6llCeOkVmHyNn0DRP5otXyCw==
-X-Google-Smtp-Source: ABdhPJzNqQFsr22ki1Pj8rD15MClx6e4/Y9XgiO6Rr06pMklFiRq4YmMNE+KUcyBNh7zLIW+Z44IOA==
-X-Received: by 2002:a05:651c:1a09:b0:24a:c7df:339c with SMTP id by9-20020a05651c1a0900b0024ac7df339cmr25219403ljb.298.1649791610046;
-        Tue, 12 Apr 2022 12:26:50 -0700 (PDT)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id h19-20020a056512055300b0046bb9a59e13sm309392lfl.56.2022.04.12.12.26.49
+        bh=sKmZh3PaYY26BR+B2dRs/R9LlgovoIyv4Z/3LkpHaas=;
+        b=oA1ZtjIKTMJBVf8mTgKwSPHXueexAaUB1WexY4+5p2NM1aWHk7oAtdELwejJCOP2EH
+         Rld6BNvvdSMjJD2w/ZLQC4tCImb+97SwyGZ4OMiB2PZfi6n73oZkluoozksicd5YfDvS
+         xLYhu2jerr6PUm3m93aadv6A6BnWrDcSEVnk5c5bF8kk9n8UoaFvVPFyU3gvOsyns4ef
+         myjcWKcBeeCEyOrjb/42IDsE+FXx1VKMvhJ0DHwkxNPrXZPtOMlBFZ+i8E8MvGQbGieU
+         DB9irqPEQd0Cp61haNmAYE9P7d93p2DKnK5djY1E8RmnFnsmSK6DXeEY+77oBp4wNYvI
+         ArrQ==
+X-Gm-Message-State: AOAM532OZoCZ0EfS4O6B3H3b6EY1UlgCSUq9Ukz5tElZqDa3Bixt+P1+
+        I8Fo1QUbZ8AkeiusDoM9A1NPXw==
+X-Google-Smtp-Source: ABdhPJwl6pkdTRcJsFbNtPiE30Ma4FQuKKrig5lrk4zdsMcyG/04WVvZS5avSOgnQf2aam4QHX4kYA==
+X-Received: by 2002:a17:90a:4fa6:b0:1cb:1b77:c931 with SMTP id q35-20020a17090a4fa600b001cb1b77c931mr6773525pjh.63.1649791821808;
+        Tue, 12 Apr 2022 12:30:21 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id q9-20020a056a00088900b004fe1a045e97sm28735604pfj.118.2022.04.12.12.30.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Apr 2022 12:26:49 -0700 (PDT)
-Received: by box.localdomain (Postfix, from userid 1000)
-        id 72EEB1030D2; Tue, 12 Apr 2022 22:28:21 +0300 (+03)
-Date:   Tue, 12 Apr 2022 22:28:21 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        Tue, 12 Apr 2022 12:30:21 -0700 (PDT)
+Date:   Tue, 12 Apr 2022 19:30:17 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        David Matlack <dmatlack@google.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com
-Subject: Re: [PATCH v5 04/13] mm/shmem: Restrict MFD_INACCESSIBLE memory
- against RLIMIT_MEMLOCK
-Message-ID: <20220412192821.xliop57sblvjx4t4@box.shutemov.name>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <20220310140911.50924-5-chao.p.peng@linux.intel.com>
- <Yk8L0CwKpTrv3Rg3@google.com>
- <20220411153233.54ljmi7zgqovhgsn@box.shutemov.name>
- <20220412133925.GG8013@chaop.bj.intel.com>
+        David Dunn <daviddunn@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Junaid Shahid <junaids@google.com>
+Subject: Re: [PATCH v2 7/9] KVM: x86/mmu: Add try_get_mt_mask to x86_ops
+Message-ID: <YlXTSQ1k+glvT83K@google.com>
+References: <20220321224358.1305530-1-bgardon@google.com>
+ <20220321224358.1305530-8-bgardon@google.com>
+ <YlSzI9ZfzPQZhPqj@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220412133925.GG8013@chaop.bj.intel.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+In-Reply-To: <YlSzI9ZfzPQZhPqj@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 12, 2022 at 09:39:25PM +0800, Chao Peng wrote:
-> On Mon, Apr 11, 2022 at 06:32:33PM +0300, Kirill A. Shutemov wrote:
-> > On Thu, Apr 07, 2022 at 04:05:36PM +0000, Sean Christopherson wrote:
-> > > Hmm, shmem_writepage() already handles SHM_F_INACCESSIBLE by rejecting the swap, so
-> > > maybe it's just the page migration path that needs to be updated?
-> > 
-> > My early version prevented migration with -ENOTSUPP for
-> > address_space_operations::migratepage().
-> > 
-> > What's wrong with that approach?
+On Mon, Apr 11, 2022, Sean Christopherson wrote:
+> It's obviously not a hard dependency, but using a u64 for the mask here and then
+> undoing the whole thing is rather silly.  Compile tested only at this point, I'll
+> test on an actual system ASAP and let you know if I did something stupid.
 > 
-> I previously thought migratepage will not be called since we already
-> marked the pages as UNMOVABLE, sounds not correct?
+> From: Sean Christopherson <seanjc@google.com>
+> Date: Mon, 11 Apr 2022 15:12:16 -0700
+> Subject: [PATCH] KVM: x86: Restrict get_mt_mask() to a u8, use
+>  KVM_X86_OP_OPTIONAL_RET0
 
-Do you mean missing __GFP_MOVABLE? I can be wrong, but I don't see that it
-direclty affects if the page is migratable. It is a hint to page allocator
-to group unmovable pages to separate page block and impove availablity of
-higher order pages this way. Page allocator tries to allocate unmovable
-pages from pages blocks that already have unmovable pages.
-
--- 
- Kirill A. Shutemov
+Verified this works as expected when patching in RET0 on a 32-bit kernel (returning
+a u64 results in reserved bits in the upper half being set due to EDX not being cleared).
