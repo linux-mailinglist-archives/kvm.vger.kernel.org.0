@@ -2,51 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 162294FE72C
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 19:34:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4942E4FE72A
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 19:34:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358333AbiDLRg3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 13:36:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46090 "EHLO
+        id S1358298AbiDLRgc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 13:36:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358224AbiDLRgZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 13:36:25 -0400
+        with ESMTP id S1358304AbiDLRg2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 13:36:28 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F31D110F
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98A1D273C
         for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 10:34:06 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 0093B212C2;
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 8D111212B7;
         Tue, 12 Apr 2022 17:34:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
         t=1649784845; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=8IHuYKDjFmFsgVvZcSaFlGZmvYzo1JkAy+2BEq2zpQU=;
-        b=pbbThmCznmi4swc8SSaKAXR1jaQrNV3iszHNM2lVUCydO1XWZp1yDSkqgXVGuazhGydSNt
-        ul07nSyoZAGoLM97V3mhs99wEHDQU2R1sLdixEP8TENi/WlXkHBXz29JtJcrd4k+EtQQUV
-        tE+39Rznuevs8T7pczug1zlXO7V+Yaw=
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tahramd7G+EQwr9uYHdc0OJK7wLZdQbilnfXRc3q8dc=;
+        b=QWCMtfuCpzAXz80GHaHjXFgx0aKJeqG6JrDY1Dl3SfJyZdliRzwwQ3XGY1okYudRc9g5zC
+        SG+kw+YXT/9qVYZWYOXcn+QA3enwUiK5IF09sP5Z/czhttgVzwbVNyrP5Mu2CD3c3+6Qjy
+        AFTEBd8U52htiw/7m4UMtSkkTH8liO8=
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7349913780;
-        Tue, 12 Apr 2022 17:34:04 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0D41913780;
+        Tue, 12 Apr 2022 17:34:05 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id RFFBGgy4VWLAewAAMHmgww
-        (envelope-from <varad.gautam@suse.com>); Tue, 12 Apr 2022 17:34:04 +0000
+        id uPY7AQ24VWLAewAAMHmgww
+        (envelope-from <varad.gautam@suse.com>); Tue, 12 Apr 2022 17:34:05 +0000
 From:   Varad Gautam <varad.gautam@suse.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, drjones@redhat.com, marcorr@google.com,
         zxwang42@gmail.com, erdemaktas@google.com, rientjes@google.com,
         seanjc@google.com, brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
         jroedel@suse.de, bp@suse.de, varad.gautam@suse.com
-Subject: [kvm-unit-tests PATCH v2 00/10] SMP Support for x86 UEFI Tests
-Date:   Tue, 12 Apr 2022 19:33:57 +0200
-Message-Id: <20220412173407.13637-1-varad.gautam@suse.com>
+Subject: [kvm-unit-tests PATCH v2 01/10] x86: Move ap_init() to smp.c
+Date:   Tue, 12 Apr 2022 19:33:58 +0200
+Message-Id: <20220412173407.13637-2-varad.gautam@suse.com>
 X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220412173407.13637-1-varad.gautam@suse.com>
+References: <20220412173407.13637-1-varad.gautam@suse.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -59,51 +63,156 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series brings multi-vcpu support to UEFI tests on x86.
+ap_init() copies the SIPI vector to lowmem, sends INIT/SIPI to APs
+and waits on the APs to come up.
 
-Most of the necessary AP bringup code already exists within kvm-unit-tests'
-cstart64.S, and has now been either rewritten in C or moved to a common location
-to be shared between EFI and non-EFI test builds.
+Port this routine to C from asm and move it to smp.c to allow sharing
+this functionality between the EFI (-fPIC) and non-EFI builds.
 
-A call gate is used to transition from 16-bit to 32-bit mode, since EFI may
-not load the 32-bit entrypoint low enough to be reachable from the SIPI vector.
+Call ap_init() from the EFI setup path to reset the APs to a known
+location.
 
-Changes in v2:
-- rebase onto kvm-unit-tests@1a4529ce83 + seanjc's percpu apic_ops series [1].
-- split some commits for readability.
+Signed-off-by: Varad Gautam <varad.gautam@suse.com>
+---
+ lib/x86/setup.c      |  1 +
+ lib/x86/smp.c        | 28 ++++++++++++++++++++++++++--
+ lib/x86/smp.h        |  1 +
+ x86/cstart64.S       | 20 ++------------------
+ x86/efi/efistart64.S |  9 +++++++++
+ 5 files changed, 39 insertions(+), 20 deletions(-)
 
-The series has been tested with this patch [2] which fixes EFI pagetable setup.
-
-Git branch: https://github.com/varadgautam/kvm-unit-tests/commits/ap-boot-v2/
-[1] https://lore.kernel.org/all/20220121231852.1439917-1-seanjc@google.com/
-[2] https://lore.kernel.org/kvm/20220406123312.12986-1-varad.gautam@suse.com/
-v1: https://lore.kernel.org/all/20220408103127.19219-1-varad.gautam@suse.com/
-
-Varad Gautam (10):
-  x86: Move ap_init() to smp.c
-  x86: Move load_idt() to desc.c
-  x86: desc: Split IDT entry setup into a generic helper
-  x86: Move load_gdt_tss() to desc.c
-  x86: efi: Stop using UEFI-provided stack
-  x86: efi: Stop using UEFI-provided %gs for percpu storage
-  x86: efi, smp: Transition APs from 16-bit to 32-bit mode
-  x86: Move 32-bit bringup routines to start32.S
-  x86: efi, smp: Transition APs from 32-bit to 64-bit mode
-  x86: Move ap_start64 and save_id to setup.c
-
- lib/x86/asm/setup.h       |   3 ++
- lib/x86/desc.c            |  39 +++++++++++---
- lib/x86/desc.h            |   3 ++
- lib/x86/setup.c           |  59 ++++++++++++++++-----
- lib/x86/smp.c             |  88 +++++++++++++++++++++++++++++++-
- lib/x86/smp.h             |   1 +
- x86/cstart64.S            | 105 ++------------------------------------
- x86/efi/crt0-efi-x86_64.S |   3 ++
- x86/efi/efistart64.S      |  69 ++++++++++++++++++++-----
- x86/start32.S             | 102 ++++++++++++++++++++++++++++++++++++
- 10 files changed, 336 insertions(+), 136 deletions(-)
- create mode 100644 x86/start32.S
-
+diff --git a/lib/x86/setup.c b/lib/x86/setup.c
+index 2d63a44..86ba6de 100644
+--- a/lib/x86/setup.c
++++ b/lib/x86/setup.c
+@@ -323,6 +323,7 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
+ 	load_idt();
+ 	mask_pic_interrupts();
+ 	enable_apic();
++	ap_init();
+ 	enable_x2apic();
+ 	smp_init();
+ 	setup_page_table();
+diff --git a/lib/x86/smp.c b/lib/x86/smp.c
+index 683b25d..d7f5aba 100644
+--- a/lib/x86/smp.c
++++ b/lib/x86/smp.c
+@@ -18,6 +18,9 @@ static volatile int ipi_done;
+ static volatile bool ipi_wait;
+ static int _cpu_count;
+ static atomic_t active_cpus;
++extern u8 sipi_entry;
++extern u8 sipi_end;
++volatile unsigned cpu_online_count = 1;
+ 
+ static __attribute__((used)) void ipi(void)
+ {
+@@ -114,8 +117,6 @@ void smp_init(void)
+ 	int i;
+ 	void ipi_entry(void);
+ 
+-	_cpu_count = fwcfg_get_nb_cpus();
+-
+ 	setup_idt();
+ 	init_apic_map();
+ 	set_idt_entry(IPI_VECTOR, ipi_entry, 0);
+@@ -142,3 +143,26 @@ void smp_reset_apic(void)
+ 
+ 	atomic_inc(&active_cpus);
+ }
++
++void ap_init(void)
++{
++	u8 *dst_addr = 0;
++	size_t sipi_sz = (&sipi_end - &sipi_entry) + 1;
++
++	asm volatile("cld");
++
++	/* Relocate SIPI vector to dst_addr so it can run in 16-bit mode. */
++	memcpy(dst_addr, &sipi_entry, sipi_sz);
++
++	/* INIT */
++	apic_icr_write(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT, 0);
++
++	/* SIPI */
++	apic_icr_write(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_STARTUP, 0);
++
++	_cpu_count = fwcfg_get_nb_cpus();
++
++	while (_cpu_count != cpu_online_count) {
++		;
++	}
++}
+diff --git a/lib/x86/smp.h b/lib/x86/smp.h
+index bd303c2..9c92853 100644
+--- a/lib/x86/smp.h
++++ b/lib/x86/smp.h
+@@ -78,5 +78,6 @@ void on_cpu(int cpu, void (*function)(void *data), void *data);
+ void on_cpu_async(int cpu, void (*function)(void *data), void *data);
+ void on_cpus(void (*function)(void *data), void *data);
+ void smp_reset_apic(void);
++void ap_init(void);
+ 
+ #endif
+diff --git a/x86/cstart64.S b/x86/cstart64.S
+index 7272452..f371d06 100644
+--- a/x86/cstart64.S
++++ b/x86/cstart64.S
+@@ -157,6 +157,7 @@ gdt32:
+ gdt32_end:
+ 
+ .code16
++.globl sipi_entry
+ sipi_entry:
+ 	mov %cr0, %eax
+ 	or $1, %eax
+@@ -168,6 +169,7 @@ gdt32_descr:
+ 	.word gdt32_end - gdt32 - 1
+ 	.long gdt32
+ 
++.globl sipi_end
+ sipi_end:
+ 
+ .code32
+@@ -240,21 +242,3 @@ lvl5:
+ 
+ online_cpus:
+ 	.fill (max_cpus + 7) / 8, 1, 0
+-
+-ap_init:
+-	cld
+-	lea sipi_entry, %rsi
+-	xor %rdi, %rdi
+-	mov $(sipi_end - sipi_entry), %rcx
+-	rep movsb
+-	mov $APIC_DEFAULT_PHYS_BASE, %eax
+-	movl $(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT), APIC_ICR(%rax)
+-	movl $(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_STARTUP), APIC_ICR(%rax)
+-	call fwcfg_get_nb_cpus
+-1:	pause
+-	cmpw %ax, cpu_online_count
+-	jne 1b
+-	ret
+-
+-.align 2
+-cpu_online_count:	.word 1
+diff --git a/x86/efi/efistart64.S b/x86/efi/efistart64.S
+index 017abba..0425153 100644
+--- a/x86/efi/efistart64.S
++++ b/x86/efi/efistart64.S
+@@ -57,3 +57,12 @@ load_gdt_tss:
+ 	pushq $0x08 /* 2nd entry in gdt64: 64-bit code segment */
+ 	pushq %rdi
+ 	lretq
++
++.code16
++
++.globl sipi_entry
++sipi_entry:
++	jmp sipi_entry
++
++.globl sipi_end
++sipi_end:
 -- 
 2.32.0
 
