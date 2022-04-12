@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B5634FE731
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 19:34:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D26034FE729
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 19:34:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358304AbiDLRgd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 13:36:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46804 "EHLO
+        id S1358352AbiDLRgn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 13:36:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358331AbiDLRg3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1358338AbiDLRg3 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 12 Apr 2022 13:36:29 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 332F4625A
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16C626400
         for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 10:34:10 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 9BBD621600;
-        Tue, 12 Apr 2022 17:34:08 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 45CA4215FE;
+        Tue, 12 Apr 2022 17:34:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1649784848; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1649784849; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=eW2BjWl/kb4XQvFrwyULus6iYR8zzdZddNX3DMjdWnU=;
-        b=Ye0zw4MPwYikrzazpr48plaJPP1h19JZIg/tYamcS2OP3IqEVVylA8JVTCscRIMDXuUUAw
-        wQNKJnm+ocSBxJUVCuyYEyTqb2hatXeNt4skOlYt7hjlpJA+HEskZlAw8NM8Agp/3ZJ72I
-        pfbrC9zV86mAlVcb/Jl8wHDmXS1T210=
+        bh=q4PRv9+ImH8TQbJxAxi3US041m63h4v7n9rw1HODXXU=;
+        b=IX0oIlPJ6E/O9C+UgNYq5WnUM2xm6OjsB0vv+I3Sq4wVQ8144a5C3OINpwFzxQ5slcjx9i
+        RW2N44nM8rRKQXL3r2ibsGNUqwop/SXvdInX0mr/7OJWwNx27ymSayjhSyc97Y1WHxiNzY
+        UPi/fPVlLAZhQBo7NhP4JUCJcoyEAZ0=
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0E94513780;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AD20313780;
         Tue, 12 Apr 2022 17:34:08 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id YOmMARC4VWLAewAAMHmgww
+        id MMn8JxC4VWLAewAAMHmgww
         (envelope-from <varad.gautam@suse.com>); Tue, 12 Apr 2022 17:34:08 +0000
 From:   Varad Gautam <varad.gautam@suse.com>
 To:     kvm@vger.kernel.org
@@ -45,9 +45,9 @@ Cc:     pbonzini@redhat.com, drjones@redhat.com, marcorr@google.com,
         zxwang42@gmail.com, erdemaktas@google.com, rientjes@google.com,
         seanjc@google.com, brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
         jroedel@suse.de, bp@suse.de, varad.gautam@suse.com
-Subject: [kvm-unit-tests PATCH v2 06/10] x86: efi: Stop using UEFI-provided %gs for percpu storage
-Date:   Tue, 12 Apr 2022 19:34:03 +0200
-Message-Id: <20220412173407.13637-7-varad.gautam@suse.com>
+Subject: [kvm-unit-tests PATCH v2 07/10] x86: efi, smp: Transition APs from 16-bit to 32-bit mode
+Date:   Tue, 12 Apr 2022 19:34:04 +0200
+Message-Id: <20220412173407.13637-8-varad.gautam@suse.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220412173407.13637-1-varad.gautam@suse.com>
 References: <20220412173407.13637-1-varad.gautam@suse.com>
@@ -63,79 +63,164 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UEFI tests do not update MSR_GS_BASE during bringup, and continue
-using the GS_BASE set up by the UEFI implementation for percpu
-storage.
+Sending INIT/SIPI to APs from ap_init() resets them into 16-bit mode
+to loop into sipi_entry().
 
-Update this MSR during setup_segments64() to allow storing percpu
-data at a sane location reserved by the testcase, and ensure that
-this happens before any operation that ends up storing to the percpu
-space.
+To drive the APs into 32-bit mode, the SIPI vector needs:
+1. A GDT descriptor reachable from 16-bit code (gdt32_descr).
+2. A 32-bit entrypoint reachable from 16-bit code (ap_start32).
+3. The locations of GDT and the 32-bit entrypoint.
+
+Setting these up at compile time (like on non-EFI builds) is not
+possible since EFI builds with -shared -fPIC and efistart64.S cannot
+reference any absolute addresses.
+
+Relative addressing is unavailable on 16-bit mode.
+
+Moreover, EFI may not load the 32-bit entrypoint to be reachable from
+16-bit mode.
+
+To overcome these problems,
+1. Fill the GDT descriptor at runtime after relocating
+   [sipi_entry-sipi_end] to lowmem. Since sipi_entry does not know the
+   address of this descriptor, use the last two bytes of SIPI page to
+   communicate it.
+2. Place a call gate in the GDT to point to ap_start32.
+3. Popluate sipi_entry() to lcall to ap_start32.
+
+With this, the APs can transition to 32-bit mode and loop at a known
+location.
 
 Signed-off-by: Varad Gautam <varad.gautam@suse.com>
 ---
- lib/x86/setup.c      | 9 ++++++---
- x86/efi/efistart64.S | 7 +++++++
- 2 files changed, 13 insertions(+), 3 deletions(-)
+ lib/x86/smp.c        | 56 ++++++++++++++++++++++++++++++++++++++++++++
+ x86/efi/efistart64.S | 29 ++++++++++++++++++++++-
+ 2 files changed, 84 insertions(+), 1 deletion(-)
 
-diff --git a/lib/x86/setup.c b/lib/x86/setup.c
-index 7dd6677..5d32d3f 100644
---- a/lib/x86/setup.c
-+++ b/lib/x86/setup.c
-@@ -170,7 +170,8 @@ void setup_multiboot(struct mbi_bootinfo *bi)
- #ifdef CONFIG_EFI
+diff --git a/lib/x86/smp.c b/lib/x86/smp.c
+index d7f5aba..5cc1648 100644
+--- a/lib/x86/smp.c
++++ b/lib/x86/smp.c
+@@ -6,6 +6,7 @@
+ #include "apic.h"
+ #include "fwcfg.h"
+ #include "desc.h"
++#include "asm/page.h"
  
- /* From x86/efi/efistart64.S */
--extern void setup_segments64(void);
-+extern void setup_segments64(u64 gs_base);
-+extern u8 stacktop;
+ #define IPI_VECTOR 0x20
  
- static efi_status_t setup_memory_allocator(efi_bootinfo_t *efi_bootinfo)
- {
-@@ -271,12 +272,14 @@ static void setup_page_table(void)
- static void setup_gdt_tss(void)
- {
- 	size_t tss_offset;
-+	u64 gs_base;
- 
- 	/* 64-bit setup_tss does not use the stacktop argument.  */
- 	tss_offset = setup_tss(NULL);
- 	load_gdt_tss(tss_offset);
- 
--	setup_segments64();
-+	gs_base = (u64)(&stacktop) - (PAGE_SIZE * (pre_boot_apic_id() + 1));
-+	setup_segments64(gs_base);
+@@ -144,16 +145,71 @@ void smp_reset_apic(void)
+ 	atomic_inc(&active_cpus);
  }
  
- efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
-@@ -318,8 +321,8 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
- 		return status;
- 	}
++#ifdef CONFIG_EFI
++extern u8 gdt32_descr, gdt32, gdt32_end;
++extern u8 ap_start32;
++#endif
++
+ void ap_init(void)
+ {
+ 	u8 *dst_addr = 0;
+ 	size_t sipi_sz = (&sipi_end - &sipi_entry) + 1;
  
--	reset_apic();
- 	setup_gdt_tss();
-+	reset_apic();
- 	setup_idt();
- 	load_idt();
- 	mask_pic_interrupts();
++	assert(sipi_sz < PAGE_SIZE);
++
+ 	asm volatile("cld");
+ 
+ 	/* Relocate SIPI vector to dst_addr so it can run in 16-bit mode. */
++	memset(dst_addr, 0, PAGE_SIZE);
+ 	memcpy(dst_addr, &sipi_entry, sipi_sz);
+ 
++#ifdef CONFIG_EFI
++	volatile struct descriptor_table_ptr *gdt32_descr_rel;
++	idt_entry_t *gate_descr;
++	u16 *gdt32_descr_reladdr = (u16 *) (PAGE_SIZE - sizeof(u16));
++
++	/*
++	 * gdt32_descr for CONFIG_EFI needs to be filled here dynamically
++	 * since compile time calculation of offsets is not allowed when
++	 * building with -shared, and rip-relative addressing is not supported
++	 * in 16-bit mode.
++	 *
++	 * Use the last two bytes of SIPI page to store relocated gdt32_descr
++	 * addr.
++	 */
++	*gdt32_descr_reladdr = (&gdt32_descr - &sipi_entry);
++
++	gdt32_descr_rel = (struct descriptor_table_ptr *) ((u64) *gdt32_descr_reladdr);
++	gdt32_descr_rel->limit = (u16) (&gdt32_end - &gdt32 - 1);
++	gdt32_descr_rel->base = (ulong) ((u32) (&gdt32 - &sipi_entry));
++
++	/*
++	 * EFI may not load the 32-bit AP entrypoint (ap_start32) low enough
++	 * to be reachable from the SIPI vector. Since we build with -shared, this
++	 * location needs to be fetched at runtime, and rip-relative addressing is
++	 * not supported in 16-bit mode.
++	 * To perform 16-bit -> 32-bit far jump, our options are:
++	 * - ljmpl $cs, $label : unusable since $label is not known at build time.
++	 * - push $cs; push $label; lret : requires an intermediate trampoline since
++	 *	 $label must still be within 0 - 0xFFFF for 16-bit far return to work.
++	 * - lcall into a call-gate : best suited.
++	 *
++	 * Set up call gate to ap_start32 within GDT.
++	 *
++	 * gdt32 layout:
++	 *
++	 * Entry | Segment
++	 * 0	 | NULL descr
++	 * 1	 | Code segment descr
++	 * 2	 | Data segment descr
++	 * 3	 | Call gate descr
++	 */
++	gate_descr = (idt_entry_t *) ((u8 *)(&gdt32 - &sipi_entry)
++		+ 3 * sizeof(gdt_entry_t));
++	set_idt_entry_t(gate_descr, sizeof(gdt_entry_t), (void *) &ap_start32,
++		0x8 /* sel */, 0xc /* type */, 0 /* dpl */);
++#endif
++
+ 	/* INIT */
+ 	apic_icr_write(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT, 0);
+ 
 diff --git a/x86/efi/efistart64.S b/x86/efi/efistart64.S
-index cb08230..1c38355 100644
+index 1c38355..00279b8 100644
 --- a/x86/efi/efistart64.S
 +++ b/x86/efi/efistart64.S
-@@ -44,6 +44,13 @@ setup_segments64:
- 	mov %ax, %gs
- 	mov %ax, %ss
+@@ -65,7 +65,34 @@ setup_segments64:
  
-+	/* Setup percpu base */
-+	MSR_GS_BASE = 0xc0000101
-+	mov %rdi, %rax
-+	mov $0, %edx
-+	mov $MSR_GS_BASE, %ecx
-+	wrmsr
+ .globl sipi_entry
+ sipi_entry:
+-	jmp sipi_entry
++	mov %cr0, %eax
++	or $1, %eax
++	mov %eax, %cr0
 +
- 	/*
- 	 * Update the code segment by putting it on the stack before the return
- 	 * address, then doing a far return: this will use the new code segment
++	/* Retrieve relocated gdt32_descr address at (PAGE_SIZE - 2). */
++	mov (PAGE_SIZE - 2), %ebx
++	lgdtl (%ebx)
++
++	lcall $0x18, $0x0
++
++.globl gdt32
++gdt32:
++	.quad 0
++	.quad 0x00cf9b000000ffff // flat 32-bit code segment
++	.quad 0x00cf93000000ffff // flat 32-bit data segment
++	.quad 0                  // call gate to 32-bit AP entrypoint
++.globl gdt32_end
++gdt32_end:
++
++.globl gdt32_descr
++gdt32_descr:
++	.word 0
++	.long 0
+ 
+ .globl sipi_end
+ sipi_end:
++
++.code32
++.globl ap_start32
++ap_start32:
++	jmp ap_start32
 -- 
 2.32.0
 
