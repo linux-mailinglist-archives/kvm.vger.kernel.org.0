@@ -2,62 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C5034FE9EB
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 23:26:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96BDE4FEB6F
+	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 01:47:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229634AbiDLVYi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 17:24:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57826 "EHLO
+        id S230091AbiDLX0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 19:26:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229455AbiDLVYf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 17:24:35 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23D0218114F;
-        Tue, 12 Apr 2022 14:05:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649797537; x=1681333537;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=BHLbe/RoUopliJXw7PZpTsR/hL9ogzQTYddN+kx+atU=;
-  b=KSDBD8iYzCqN0x5BreM7rl7BmaJucB/khEuSIT0O2+sKfLIOtNURroMp
-   bQHgDtDdXl42OAMFtkpdMGbpEbl03hzlKod9hWZ8ltuPBRgaVkjtVrzd3
-   morhyAleYJ+A3lNyxYaY7ia0rHEgrK0aRxQClhLaW2LUQY4TQUOtCOZ3/
-   XldR5ldXOKdBMiE6AJWBsJ8gEY+tjt0wyZurIRCD3/fZ6mGF72zT3euSz
-   T+KozsHjkg1i9y5uDnqLcFQobc7xog19ZtoWSK/cR4yRZD7/2PzaLixPH
-   9ZhzaSV6JLrRRW52HQwhdJCUp5e9hnS9fjiRtZ/J1kqZePT/5UURnFAoP
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10315"; a="260098619"
-X-IronPort-AV: E=Sophos;i="5.90,254,1643702400"; 
-   d="scan'208";a="260098619"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2022 13:54:14 -0700
-X-IronPort-AV: E=Sophos;i="5.90,254,1643702400"; 
-   d="scan'208";a="644899572"
-Received: from lpfafma-mobl.amr.corp.intel.com (HELO guptapa-desk) ([10.209.17.36])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2022 13:54:13 -0700
-Date:   Tue, 12 Apr 2022 13:54:11 -0700
-From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To:     Jon Kohler <jon@nutanix.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>, linux-kernel@vger.kernel.org,
-        dave.hansen@intel.com, Borislav Petkov <bp@suse.de>,
-        Neelima Krishnan <neelima.krishnan@intel.com>,
-        "kvm @ vger . kernel . org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v2] x86/tsx: fix KVM guest live migration for tsx=on
-Message-ID: <20220412205411.m7n2gnon3ai7wobm@guptapa-desk>
-References: <20220411180131.5054-1-jon@nutanix.com>
- <20220411200703.48654-1-jon@nutanix.com>
+        with ESMTP id S230040AbiDLX0W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 19:26:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7A538E995D
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 15:40:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649803221;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EoTkodGmTU1+tJZgbXkA3tP7XKzNOjOQ2bLCDimVkQA=;
+        b=cNA7ZlqRRsi5OSOwHUioaA9sRr8m3jv1yn7qsdtxaaZCHXvQ8fhwUrQlVPuUCYFQ/+tYQI
+        T3rAMe2dn9o2R4zVNPkU3Tl5eo0hzevEvZsCHC4U56ALlHGyCQug4dhoSxja6q+gDTENF9
+        JBjzUL4MhVuSw8L8xt6gPSzD21Xnpgk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-673-Jzv5tlCYNh6WImUNQBmDXg-1; Tue, 12 Apr 2022 16:13:37 -0400
+X-MC-Unique: Jzv5tlCYNh6WImUNQBmDXg-1
+Received: by mail-wm1-f71.google.com with SMTP id bg8-20020a05600c3c8800b0038e6a989925so6227573wmb.3
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 13:13:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:subject:to:cc:references:from
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-transfer-encoding:content-language;
+        bh=EoTkodGmTU1+tJZgbXkA3tP7XKzNOjOQ2bLCDimVkQA=;
+        b=Q0DhmAQdloNn/5bOps8ftCldDzuGDMdZfuPSDST8/XlJFYb0vOa/67Rk2gOAvvXB8s
+         hrw2xQR8RJ0kwCrMUnNpljZvwnrFzj+/dHmqaAK0ikGF7A12AfurdniEPekpxUfkacAH
+         Jj0wrpSKlZd2GjDZQnm73cADnYwK0qNaUoZ9WWmMnDgPs1RwhusC57mF7CZJAqzM0qDd
+         vyEmyE3nJcorbagcqWBZTRmYCSNAPvjhMg+8ULuYGkOvfAM25qpmxntRQ+m5LaOa6acB
+         Q6xVJQNWrdbPUX+ofxcfodm5LSnenVflJiq0EU2cInE2Wm7OTPYbk0zFSS5MtnQouL3k
+         jbbQ==
+X-Gm-Message-State: AOAM530C5uzPViKBA7XcBn5BTvpYBuGpwbKOWqZm6u2M0JV9Z99FQ1Fd
+        h4AxynkgSPoPHc1y5sUB8uRqTLUiSUkMmFrZxvFnJUeA3SyLM85R5JasEuScSC8Nza1pg+W5Wkr
+        wYQbOEa/vALgC
+X-Received: by 2002:a05:600c:1e17:b0:38e:ba41:2465 with SMTP id ay23-20020a05600c1e1700b0038eba412465mr5500754wmb.132.1649794415686;
+        Tue, 12 Apr 2022 13:13:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzuvpIudWqzfkPLFtrREp/V1SPbwn+OxDh3VdDXo20THEqWm9qcIEf5Ptz3Ekw3WUtH4dHkGw==
+X-Received: by 2002:a05:600c:1e17:b0:38e:ba41:2465 with SMTP id ay23-20020a05600c1e1700b0038eba412465mr5500722wmb.132.1649794415455;
+        Tue, 12 Apr 2022 13:13:35 -0700 (PDT)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id m18-20020a05600c4f5200b0038e8f9d7b57sm395024wmq.42.2022.04.12.13.13.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Apr 2022 13:13:34 -0700 (PDT)
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH RFC 00/12] IOMMUFD Generic interface
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        iommu@lists.linux-foundation.org, Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+References: <0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+From:   Eric Auger <eric.auger@redhat.com>
+Message-ID: <17084696-4b85-8fe7-47e0-b15d4c56d403@redhat.com>
+Date:   Tue, 12 Apr 2022 22:13:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20220411200703.48654-1-jon@nutanix.com>
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+In-Reply-To: <0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,30 +98,205 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 11, 2022 at 04:07:01PM -0400, Jon Kohler wrote:
->Move automatic disablement for TSX microcode deprecation from tsx_init() to
->x86_get_tsx_auto_mode(), such that systems with tsx=on will continue to
->see the TSX CPU features (HLE, RTM) even on updated microcode.
->
->KVM live migration could be possibly be broken in 5.14+ commit 293649307ef9
->("x86/tsx: Clear CPUID bits when TSX always force aborts"). Consider the
->following scenario:
->
->1. KVM hosts clustered in a live migration capable setup.
->2. KVM guests have TSX CPU features HLE and/or RTM presented.
->3. One of the three maintenance events occur:
->3a. An existing host running kernel >= 5.14 in the pool updated with the
->    new microcode.
->3b. A new host running kernel >= 5.14 is commissioned that already has the
->    microcode update preloaded.
->3c. All hosts are running kernel < 5.14 with microcode update already
->    loaded and one existing host gets updated to kernel >= 5.14.
->4. After maintenance event, the impacted host will not have HLE and RTM
->   exposed, and live migrations with guests with TSX features might not
->   migrate.
+Hi,
 
-Which part was this reproduced on? AFAIK server parts(except for some
-Intel Xeon E3s) did not get such microcode update.
+On 3/18/22 6:27 PM, Jason Gunthorpe wrote:
+> iommufd is the user API to control the IOMMU subsystem as it relates to
+> managing IO page tables that point at user space memory.
+>
+> It takes over from drivers/vfio/vfio_iommu_type1.c (aka the VFIO
+> container) which is the VFIO specific interface for a similar idea.
+>
+> We see a broad need for extended features, some being highly IOMMU device
+> specific:
+>  - Binding iommu_domain's to PASID/SSID
+>  - Userspace page tables, for ARM, x86 and S390
+>  - Kernel bypass'd invalidation of user page tables
+>  - Re-use of the KVM page table in the IOMMU
+>  - Dirty page tracking in the IOMMU
+>  - Runtime Increase/Decrease of IOPTE size
+>  - PRI support with faults resolved in userspace
 
-Thanks,
-Pawan
+This series does not have any concept of group fds anymore and the API
+is device oriented.
+I have a question wrt pci bus reset capability.
+
+8b27ee60bfd6 ("vfio-pci: PCI hot reset interface")
+introduced VFIO_DEVICE_PCI_GET_HOT_RESET_INFO and VFIO_DEVICE_PCI_HOT_RESET
+
+Maybe we can reuse VFIO_DEVICE_GET_PCI_HOT_RESET_INFO to retrieve the devices and iommu groups that need to be checked and involved in the bus reset. If I understand correctly we now need to make sure the devices are handled in the same security context (bound to the same iommufd)
+
+however VFIO_DEVICE_PCI_HOT_RESET operate on a collection of group fds.
+
+How do you see the porting of this functionality onto /dev/iommu?
+
+Thanks
+
+Eric
+
+
+
+
+>
+> As well as a need to access these features beyond just VFIO, VDPA for
+> instance, but other classes of accelerator HW are touching on these areas
+> now too.
+>
+> The v1 series proposed re-using the VFIO type 1 data structure, however it
+> was suggested that if we are doing this big update then we should also
+> come with a data structure that solves the limitations that VFIO type1
+> has. Notably this addresses:
+>
+>  - Multiple IOAS/'containers' and multiple domains inside a single FD
+>
+>  - Single-pin operation no matter how many domains and containers use
+>    a page
+>
+>  - A fine grained locking scheme supporting user managed concurrency for
+>    multi-threaded map/unmap
+>
+>  - A pre-registration mechanism to optimize vIOMMU use cases by
+>    pre-pinning pages
+>
+>  - Extended ioctl API that can manage these new objects and exposes
+>    domains directly to user space
+>
+>  - domains are sharable between subsystems, eg VFIO and VDPA
+>
+> The bulk of this code is a new data structure design to track how the
+> IOVAs are mapped to PFNs.
+>
+> iommufd intends to be general and consumable by any driver that wants to
+> DMA to userspace. From a driver perspective it can largely be dropped in
+> in-place of iommu_attach_device() and provides a uniform full feature set
+> to all consumers.
+>
+> As this is a larger project this series is the first step. This series
+> provides the iommfd "generic interface" which is designed to be suitable
+> for applications like DPDK and VMM flows that are not optimized to
+> specific HW scenarios. It is close to being a drop in replacement for the
+> existing VFIO type 1.
+>
+> This is part two of three for an initial sequence:
+>  - Move IOMMU Group security into the iommu layer
+>    https://lore.kernel.org/linux-iommu/20220218005521.172832-1-baolu.lu@linux.intel.com/
+>  * Generic IOMMUFD implementation
+>  - VFIO ability to consume IOMMUFD
+>    An early exploration of this is available here:
+>     https://github.com/luxis1999/iommufd/commits/iommufd-v5.17-rc6
+>
+> Various parts of the above extended features are in WIP stages currently
+> to define how their IOCTL interface should work.
+>
+> At this point, using the draft VFIO series, unmodified qemu has been
+> tested to operate using iommufd on x86 and ARM systems.
+>
+> Several people have contributed directly to this work: Eric Auger, Kevin
+> Tian, Lu Baolu, Nicolin Chen, Yi L Liu. Many more have participated in the
+> discussions that lead here, and provided ideas. Thanks to all!
+>
+> This is on github: https://github.com/jgunthorpe/linux/commits/iommufd
+>
+> # S390 in-kernel page table walker
+> Cc: Niklas Schnelle <schnelle@linux.ibm.com>
+> Cc: Matthew Rosato <mjrosato@linux.ibm.com>
+> # AMD Dirty page tracking
+> Cc: Joao Martins <joao.m.martins@oracle.com>
+> # ARM SMMU Dirty page tracking
+> Cc: Keqian Zhu <zhukeqian1@huawei.com>
+> Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> # ARM SMMU nesting
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> # Map/unmap performance
+> Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
+> # VDPA
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> # Power
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> # vfio
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: kvm@vger.kernel.org
+> # iommu
+> Cc: iommu@lists.linux-foundation.org
+> # Collaborators
+> Cc: "Chaitanya Kulkarni" <chaitanyak@nvidia.com>
+> Cc: Nicolin Chen <nicolinc@nvidia.com>
+> Cc: Lu Baolu <baolu.lu@linux.intel.com>
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Yi Liu <yi.l.liu@intel.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+>
+> Jason Gunthorpe (11):
+>   interval-tree: Add a utility to iterate over spans in an interval tree
+>   iommufd: File descriptor, context, kconfig and makefiles
+>   kernel/user: Allow user::locked_vm to be usable for iommufd
+>   iommufd: PFN handling for iopt_pages
+>   iommufd: Algorithms for PFN storage
+>   iommufd: Data structure to provide IOVA to PFN mapping
+>   iommufd: IOCTLs for the io_pagetable
+>   iommufd: Add a HW pagetable object
+>   iommufd: Add kAPI toward external drivers
+>   iommufd: vfio container FD ioctl compatibility
+>   iommufd: Add a selftest
+>
+> Kevin Tian (1):
+>   iommufd: Overview documentation
+>
+>  Documentation/userspace-api/index.rst         |    1 +
+>  .../userspace-api/ioctl/ioctl-number.rst      |    1 +
+>  Documentation/userspace-api/iommufd.rst       |  224 +++
+>  MAINTAINERS                                   |   10 +
+>  drivers/iommu/Kconfig                         |    1 +
+>  drivers/iommu/Makefile                        |    2 +-
+>  drivers/iommu/iommufd/Kconfig                 |   22 +
+>  drivers/iommu/iommufd/Makefile                |   13 +
+>  drivers/iommu/iommufd/device.c                |  274 ++++
+>  drivers/iommu/iommufd/hw_pagetable.c          |  142 ++
+>  drivers/iommu/iommufd/io_pagetable.c          |  890 +++++++++++
+>  drivers/iommu/iommufd/io_pagetable.h          |  170 +++
+>  drivers/iommu/iommufd/ioas.c                  |  252 ++++
+>  drivers/iommu/iommufd/iommufd_private.h       |  231 +++
+>  drivers/iommu/iommufd/iommufd_test.h          |   65 +
+>  drivers/iommu/iommufd/main.c                  |  346 +++++
+>  drivers/iommu/iommufd/pages.c                 | 1321 +++++++++++++++++
+>  drivers/iommu/iommufd/selftest.c              |  495 ++++++
+>  drivers/iommu/iommufd/vfio_compat.c           |  401 +++++
+>  include/linux/interval_tree.h                 |   41 +
+>  include/linux/iommufd.h                       |   50 +
+>  include/linux/sched/user.h                    |    2 +-
+>  include/uapi/linux/iommufd.h                  |  223 +++
+>  kernel/user.c                                 |    1 +
+>  lib/interval_tree.c                           |   98 ++
+>  tools/testing/selftests/Makefile              |    1 +
+>  tools/testing/selftests/iommu/.gitignore      |    2 +
+>  tools/testing/selftests/iommu/Makefile        |   11 +
+>  tools/testing/selftests/iommu/config          |    2 +
+>  tools/testing/selftests/iommu/iommufd.c       | 1225 +++++++++++++++
+>  30 files changed, 6515 insertions(+), 2 deletions(-)
+>  create mode 100644 Documentation/userspace-api/iommufd.rst
+>  create mode 100644 drivers/iommu/iommufd/Kconfig
+>  create mode 100644 drivers/iommu/iommufd/Makefile
+>  create mode 100644 drivers/iommu/iommufd/device.c
+>  create mode 100644 drivers/iommu/iommufd/hw_pagetable.c
+>  create mode 100644 drivers/iommu/iommufd/io_pagetable.c
+>  create mode 100644 drivers/iommu/iommufd/io_pagetable.h
+>  create mode 100644 drivers/iommu/iommufd/ioas.c
+>  create mode 100644 drivers/iommu/iommufd/iommufd_private.h
+>  create mode 100644 drivers/iommu/iommufd/iommufd_test.h
+>  create mode 100644 drivers/iommu/iommufd/main.c
+>  create mode 100644 drivers/iommu/iommufd/pages.c
+>  create mode 100644 drivers/iommu/iommufd/selftest.c
+>  create mode 100644 drivers/iommu/iommufd/vfio_compat.c
+>  create mode 100644 include/linux/iommufd.h
+>  create mode 100644 include/uapi/linux/iommufd.h
+>  create mode 100644 tools/testing/selftests/iommu/.gitignore
+>  create mode 100644 tools/testing/selftests/iommu/Makefile
+>  create mode 100644 tools/testing/selftests/iommu/config
+>  create mode 100644 tools/testing/selftests/iommu/iommufd.c
+>
+>
+> base-commit: d1c716ed82a6bf4c35ba7be3741b9362e84cd722
+
