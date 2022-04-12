@@ -2,412 +2,316 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C7CE4FCBE6
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 03:32:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D51F4FCC8F
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 04:41:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245484AbiDLBeh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Apr 2022 21:34:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59234 "EHLO
+        id S243848AbiDLCnk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Apr 2022 22:43:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230372AbiDLBeg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Apr 2022 21:34:36 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48DCC19C1C
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 18:32:20 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id be5so9429752plb.13
-        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 18:32:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=IdsjBouuaUAW6YtbrhnQK3jJQXWjKyeuOltrdWDIDuU=;
-        b=UMqvigVmKFJwWf8Lib1NDIK9iPZSBWT/d/lWPkKM3NJpmqygLpg6vUxTDXND1/sHNU
-         luphuZljGR9fCInOxRiTidhHOI2AbOIx/qyZJh4glgDO/Tv1KysQK4esvYeJ24R+AN40
-         rT0GpJn0AYprqFS1Lv0sjOyeRW2aN0hZWuoOISdkBaeLxyesPyLC0eWtH0ZFTSizqwyL
-         tkTeXUobpCLB6gTdn2JzseOXQ5FPFGXkLBunEx8S/eushDPNSK9KLHAoTDiXCMRmN24z
-         foxXoPTg/dv4psoWLQrypFG5HFIIXzyT57kRhqYB/0YVv5XKfHR+0Sj6n8b46LdFBU+Z
-         ObAA==
+        with ESMTP id S233653AbiDLCnh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Apr 2022 22:43:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BB0CC6405
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 19:41:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649731280;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=n9AHGuoWN5DEsfFR6+n4EfGTHU/AybM73SzeXCbd8ow=;
+        b=ACe0R2OUN9l7uNXS6WRuGFkqkpm7wlwczAh0Fi5kskZ8Q2EH/LFVP9vZD5TE2Q3RwUFy6s
+        TA0G3BxVlfNpeWByzC1iXB5lxrK8yttmQUd6XehuAehnDAE/tNBCdF6btQNpZN1h7/rF9T
+        66tG0U+G/ljM+DtgANnJQwwDSqpfevg=
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-232-tZhxVyvEPD2yerbg6SMzuQ-1; Mon, 11 Apr 2022 22:41:19 -0400
+X-MC-Unique: tZhxVyvEPD2yerbg6SMzuQ-1
+Received: by mail-pf1-f200.google.com with SMTP id a16-20020a62d410000000b00505734b752aso7384428pfh.4
+        for <kvm@vger.kernel.org>; Mon, 11 Apr 2022 19:41:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=IdsjBouuaUAW6YtbrhnQK3jJQXWjKyeuOltrdWDIDuU=;
-        b=DvD2V4wq+DPIwtwqnI5sLlctKF1hOmFtWv377e7xTGpDCfKuYDbEoS3zah4W3vTKbi
-         hl22RLkfezPHVvKBdGD0eBof614TEgVtm8d3knx1cWEhRrsWW0YT67pilSgc03+kvjTc
-         9UyXFFpcr8x/zwxrIPK76kDwERbxvuih6MgEkkup7enKzyUR6ATeCOqGQUEydMPiopvV
-         kj9PLY90G3KwmqmKEZwCxVRghY96Z/XFq+YtvVx4SUM4gX5G3ZTNLF54FfVpfi3juG/x
-         4jNRXQhsrydfFVsX5CIxpsYnb04eZIN0Hp8703w0mwP+LDaqElR6k9G3BaESO0B3HcxE
-         /cNg==
-X-Gm-Message-State: AOAM5335weCLwrOvqrFTrz3Q63KcIzNqFpm1RF2te+HJVf64qTgypgcq
-        IJeIQySBevbB+mt6B2wCBxL9CA==
-X-Google-Smtp-Source: ABdhPJw/90zh2RN+4GX3T1hJZxG9/zWfvgUJz9RJQj3Pi4Q1IOkssI4cOlGClXQUYclY7d6wWBFZcw==
-X-Received: by 2002:a17:903:22cc:b0:158:52d6:1b0b with SMTP id y12-20020a17090322cc00b0015852d61b0bmr10057064plg.47.1649727139452;
-        Mon, 11 Apr 2022 18:32:19 -0700 (PDT)
-Received: from google.com (226.75.127.34.bc.googleusercontent.com. [34.127.75.226])
-        by smtp.gmail.com with ESMTPSA id d18-20020a056a0010d200b004fa2e13ce80sm37406301pfu.76.2022.04.11.18.32.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Apr 2022 18:32:18 -0700 (PDT)
-Date:   Tue, 12 Apr 2022 01:32:15 +0000
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        David Dunn <daviddunn@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v4 05/10] KVM: selftests: Add NX huge pages test
-Message-ID: <YlTWn6pEKRMaG4gY@google.com>
-References: <20220411211015.3091615-1-bgardon@google.com>
- <20220411211015.3091615-6-bgardon@google.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=n9AHGuoWN5DEsfFR6+n4EfGTHU/AybM73SzeXCbd8ow=;
+        b=A7wc/+K5oi8He1yxbeqh/frswSMUpzmHqCkUDwkTZrMMtyqVn6GpuqIvsRN4gamJLJ
+         LooiCGqR9XggLOxJ1Pc+KgkAJQT7RND5EjZ7kT4VL08cVubec2yGPmtkLeh/xPMwtrk6
+         DkdG+VsteWRrgdNdQCn5nb0HRdtHTG5gUxFujTUYV173iQjDv3XG8QhjPI68d619Fe/8
+         jRlULsAUW8r//CFUG2sIqxXTGubVHjI5ax1/j7Aodn1NwhgY0jD+1mjyp6xPaChFjr5Z
+         6i0cIT+YoGLWEJq1YRUZGZTN/mSAjjySJ8drcCexA15oos3yUnZ59QqQhhZ1oRTXlPl/
+         VQEw==
+X-Gm-Message-State: AOAM531M7IRKzYw34UGapTh3ik8OfFg6njLeB+m9gWrW6DHhtqgNb24M
+        wwYABhSbGqFinF9Qn2FXMGdzVpOZDVb21UowgfuEPnWX+x5r4xfUNliITQKwYfNccEKsYv3rhW9
+        ZI9QLJmJDZM1Z
+X-Received: by 2002:a62:6c6:0:b0:505:6713:d584 with SMTP id 189-20020a6206c6000000b005056713d584mr24781210pfg.24.1649731278350;
+        Mon, 11 Apr 2022 19:41:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyu8dJKKRcfWvkZcrPOwXnT9oC6pEqkxORnHFmtqyXX3kWAnTX/n0o1+l48eCQVygLz/+MBtA==
+X-Received: by 2002:a62:6c6:0:b0:505:6713:d584 with SMTP id 189-20020a6206c6000000b005056713d584mr24781195pfg.24.1649731278023;
+        Mon, 11 Apr 2022 19:41:18 -0700 (PDT)
+Received: from [10.72.14.5] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id oa16-20020a17090b1bd000b001c72b632222sm795721pjb.32.2022.04.11.19.41.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Apr 2022 19:41:17 -0700 (PDT)
+Message-ID: <71fbd7fc-20db-024b-ec66-b875216be4bd@redhat.com>
+Date:   Tue, 12 Apr 2022 10:41:03 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220411211015.3091615-6-bgardon@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.7.0
+Subject: Re: [PATCH v9 01/32] virtio: add helper
+ virtqueue_get_vring_max_size()
+Content-Language: en-US
+To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        virtualization@lists.linux-foundation.org
+Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, netdev@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, bpf@vger.kernel.org
+References: <20220406034346.74409-1-xuanzhuo@linux.alibaba.com>
+ <20220406034346.74409-2-xuanzhuo@linux.alibaba.com>
+From:   Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20220406034346.74409-2-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 11, 2022, Ben Gardon wrote:
-> There's currently no test coverage of NX hugepages in KVM selftests, so
-> add a basic test to ensure that the feature works as intended.
-> 
-> Signed-off-by: Ben Gardon <bgardon@google.com>
-> ---
->  tools/testing/selftests/kvm/Makefile          |  10 ++
->  .../selftests/kvm/include/kvm_util_base.h     |   1 +
->  tools/testing/selftests/kvm/lib/kvm_util.c    |  48 ++++++
->  .../selftests/kvm/x86_64/nx_huge_pages_test.c | 163 ++++++++++++++++++
->  .../kvm/x86_64/nx_huge_pages_test.sh          |  25 +++
->  5 files changed, 247 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
->  create mode 100755 tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index af582d168621..9bb9bce4df37 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -43,6 +43,10 @@ LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handler
->  LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
->  LIBKVM_riscv = lib/riscv/processor.c lib/riscv/ucall.c
->  
-> +# Non-compiled test targets
-> +TEST_PROGS_x86_64 += x86_64/nx_huge_pages_test.sh
-> +
-> +# Compiled test targets
->  TEST_GEN_PROGS_x86_64 = x86_64/cpuid_test
->  TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
->  TEST_GEN_PROGS_x86_64 += x86_64/get_msr_index_features
-> @@ -104,6 +108,9 @@ TEST_GEN_PROGS_x86_64 += steal_time
->  TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
->  TEST_GEN_PROGS_x86_64 += system_counter_offset_test
->  
-> +# Compiled outputs used by test targets
-> +TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
-> +
->  TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
->  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
->  TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
-> @@ -142,7 +149,9 @@ TEST_GEN_PROGS_riscv += kvm_page_table_test
->  TEST_GEN_PROGS_riscv += set_memory_region_test
->  TEST_GEN_PROGS_riscv += kvm_binary_stats_test
->  
-> +TEST_PROGS += $(TEST_PROGS_$(UNAME_M))
->  TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
-> +TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(UNAME_M))
->  LIBKVM += $(LIBKVM_$(UNAME_M))
->  
->  INSTALL_HDR_PATH = $(top_srcdir)/usr
-> @@ -193,6 +202,7 @@ $(OUTPUT)/libkvm.a: $(LIBKVM_OBJS)
->  x := $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
->  all: $(STATIC_LIBS)
->  $(TEST_GEN_PROGS): $(STATIC_LIBS)
-> +$(TEST_GEN_PROGS_EXTENDED): $(STATIC_LIBS)
->  
->  cscope: include_paths = $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include lib ..
->  cscope:
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> index b2684cfc2cb1..f9c2ac0a5b97 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -408,6 +408,7 @@ void read_vm_stats_desc(int stats_fd, struct kvm_stats_header *header,
->  int read_stat_data(int stats_fd, struct kvm_stats_header *header,
->  		   struct kvm_stats_desc *desc, uint64_t *data,
->  		   ssize_t max_elements);
-> +uint64_t vm_get_single_stat(struct kvm_vm *vm, const char *stat_name);
->  
->  uint32_t guest_get_vcpuid(void);
->  
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 64e2085f1129..833c7e63d62d 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -2614,3 +2614,51 @@ int read_stat_data(int stats_fd, struct kvm_stats_header *header,
->  
->  	return ret;
->  }
-> +
-> +static int vm_get_stat_data(struct kvm_vm *vm, const char *stat_name,
-> +			    uint64_t *data, ssize_t max_elements)
-> +{
-> +	struct kvm_stats_desc *stats_desc;
-> +	struct kvm_stats_header header;
-> +	struct kvm_stats_desc *desc;
-> +	size_t size_desc;
-> +	int stats_fd;
-> +	int ret = -EINVAL;
-> +	int i;
-> +
-> +	stats_fd = vm_get_stats_fd(vm);
-> +
-> +	read_vm_stats_header(stats_fd, &header);
-> +
-> +	stats_desc = alloc_vm_stats_desc(stats_fd, &header);
-> +	read_vm_stats_desc(stats_fd, &header, stats_desc);
-> +
-> +	size_desc = sizeof(struct kvm_stats_desc) + header.name_size;
-> +
-> +	/* Read kvm stats data one by one */
-> +	for (i = 0; i < header.num_desc; ++i) {
-> +		desc = (void *)stats_desc + (i * size_desc);
-> +
-> +		if (strcmp(desc->name, stat_name))
-> +			continue;
-> +
-> +		ret = read_stat_data(stats_fd, &header, desc, data,
-> +				     max_elements);
-> +	}
-> +
-> +	free(stats_desc);
-> +	close(stats_fd);
-> +	return ret;
-> +}
 
-I could be wrong, but it seems this function is quite generic. Why not
-putting it into kvm_util.c?
+在 2022/4/6 上午11:43, Xuan Zhuo 写道:
+> Record the maximum queue num supported by the device.
+>
+> virtio-net can display the maximum (supported by hardware) ring size in
+> ethtool -g eth0.
+>
+> When the subsequent patch implements vring reset, it can judge whether
+> the ring size passed by the driver is legal based on this.
+>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>   arch/um/drivers/virtio_uml.c             |  1 +
+>   drivers/platform/mellanox/mlxbf-tmfifo.c |  2 ++
+>   drivers/remoteproc/remoteproc_virtio.c   |  2 ++
+>   drivers/s390/virtio/virtio_ccw.c         |  3 +++
+>   drivers/virtio/virtio_mmio.c             |  2 ++
+>   drivers/virtio/virtio_pci_legacy.c       |  2 ++
+>   drivers/virtio/virtio_pci_modern.c       |  2 ++
+>   drivers/virtio/virtio_ring.c             | 14 ++++++++++++++
+>   drivers/virtio/virtio_vdpa.c             |  2 ++
+>   include/linux/virtio.h                   |  2 ++
+>   10 files changed, 32 insertions(+)
+>
+> diff --git a/arch/um/drivers/virtio_uml.c b/arch/um/drivers/virtio_uml.c
+> index ba562d68dc04..904993d15a85 100644
+> --- a/arch/um/drivers/virtio_uml.c
+> +++ b/arch/um/drivers/virtio_uml.c
+> @@ -945,6 +945,7 @@ static struct virtqueue *vu_setup_vq(struct virtio_device *vdev,
+>   		goto error_create;
+>   	}
+>   	vq->priv = info;
+> +	vq->num_max = num;
+>   	num = virtqueue_get_vring_size(vq);
+>   
+>   	if (vu_dev->protocol_features &
+> diff --git a/drivers/platform/mellanox/mlxbf-tmfifo.c b/drivers/platform/mellanox/mlxbf-tmfifo.c
+> index 38800e86ed8a..1ae3c56b66b0 100644
+> --- a/drivers/platform/mellanox/mlxbf-tmfifo.c
+> +++ b/drivers/platform/mellanox/mlxbf-tmfifo.c
+> @@ -959,6 +959,8 @@ static int mlxbf_tmfifo_virtio_find_vqs(struct virtio_device *vdev,
+>   			goto error;
+>   		}
+>   
+> +		vq->num_max = vring->num;
 > +
-> +uint64_t vm_get_single_stat(struct kvm_vm *vm, const char *stat_name)
-> +{
-> +	uint64_t data;
-> +	int ret;
+>   		vqs[i] = vq;
+>   		vring->vq = vq;
+>   		vq->priv = vring;
+> diff --git a/drivers/remoteproc/remoteproc_virtio.c b/drivers/remoteproc/remoteproc_virtio.c
+> index 70ab496d0431..7611755d0ae2 100644
+> --- a/drivers/remoteproc/remoteproc_virtio.c
+> +++ b/drivers/remoteproc/remoteproc_virtio.c
+> @@ -125,6 +125,8 @@ static struct virtqueue *rp_find_vq(struct virtio_device *vdev,
+>   		return ERR_PTR(-ENOMEM);
+>   	}
+>   
+> +	vq->num_max = len;
+
+
+I wonder if this is correct.
+
+It looks to me len is counted in bytes:
+
+/**
+  * struct rproc_vring - remoteproc vring state
+  * @va: virtual address
+  * @len: length, in bytes
+  * @da: device address
+  * @align: vring alignment
+  * @notifyid: rproc-specific unique vring index
+  * @rvdev: remote vdev
+  * @vq: the virtqueue of this vring
+  */
+struct rproc_vring {
+         void *va;
+         int len;
+         u32 da;
+         u32 align;
+         int notifyid;
+         struct rproc_vdev *rvdev;
+         struct virtqueue *vq;
+};
+
+
+Other looks good.
+
+Thanks
+
+
 > +
-> +	ret = vm_get_stat_data(vm, stat_name, &data, 1);
-> +	TEST_ASSERT(ret == 1,
-> +		    "Stat %s expected to have 1 element, but %d returned",
-> +		    stat_name, ret);
-> +	return data;
-> +}
-> diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-> new file mode 100644
-> index 000000000000..3f21726b22c7
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-> @@ -0,0 +1,163 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * tools/testing/selftests/kvm/nx_huge_page_test.c
+>   	rvring->vq = vq;
+>   	vq->priv = rvring;
+>   
+> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> index d35e7a3f7067..468da60b56c5 100644
+> --- a/drivers/s390/virtio/virtio_ccw.c
+> +++ b/drivers/s390/virtio/virtio_ccw.c
+> @@ -529,6 +529,9 @@ static struct virtqueue *virtio_ccw_setup_vq(struct virtio_device *vdev,
+>   		err = -ENOMEM;
+>   		goto out_err;
+>   	}
+> +
+> +	vq->num_max = info->num;
+> +
+>   	/* it may have been reduced */
+>   	info->num = virtqueue_get_vring_size(vq);
+>   
+> diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+> index 56128b9c46eb..a41abc8051b9 100644
+> --- a/drivers/virtio/virtio_mmio.c
+> +++ b/drivers/virtio/virtio_mmio.c
+> @@ -390,6 +390,8 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned index,
+>   		goto error_new_virtqueue;
+>   	}
+>   
+> +	vq->num_max = num;
+> +
+>   	/* Activate the queue */
+>   	writel(virtqueue_get_vring_size(vq), vm_dev->base + VIRTIO_MMIO_QUEUE_NUM);
+>   	if (vm_dev->version == 1) {
+> diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
+> index 34141b9abe27..b68934fe6b5d 100644
+> --- a/drivers/virtio/virtio_pci_legacy.c
+> +++ b/drivers/virtio/virtio_pci_legacy.c
+> @@ -135,6 +135,8 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+>   	if (!vq)
+>   		return ERR_PTR(-ENOMEM);
+>   
+> +	vq->num_max = num;
+> +
+>   	q_pfn = virtqueue_get_desc_addr(vq) >> VIRTIO_PCI_QUEUE_ADDR_SHIFT;
+>   	if (q_pfn >> 32) {
+>   		dev_err(&vp_dev->pci_dev->dev,
+> diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
+> index 5455bc041fb6..86d301f272b8 100644
+> --- a/drivers/virtio/virtio_pci_modern.c
+> +++ b/drivers/virtio/virtio_pci_modern.c
+> @@ -218,6 +218,8 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+>   	if (!vq)
+>   		return ERR_PTR(-ENOMEM);
+>   
+> +	vq->num_max = num;
+> +
+>   	/* activate the queue */
+>   	vp_modern_set_queue_size(mdev, index, virtqueue_get_vring_size(vq));
+>   	vp_modern_queue_address(mdev, index, virtqueue_get_desc_addr(vq),
+> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> index 962f1477b1fa..b87130c8f312 100644
+> --- a/drivers/virtio/virtio_ring.c
+> +++ b/drivers/virtio/virtio_ring.c
+> @@ -2371,6 +2371,20 @@ void vring_transport_features(struct virtio_device *vdev)
+>   }
+>   EXPORT_SYMBOL_GPL(vring_transport_features);
+>   
+> +/**
+> + * virtqueue_get_vring_max_size - return the max size of the virtqueue's vring
+> + * @_vq: the struct virtqueue containing the vring of interest.
 > + *
-> + * Usage: to be run via nx_huge_page_test.sh, which does the necessary
-> + * environment setup and teardown
+> + * Returns the max size of the vring.
 > + *
-> + * Copyright (C) 2022, Google LLC.
+> + * Unlike other operations, this need not be serialized.
 > + */
-> +
-> +#define _GNU_SOURCE
-> +
-> +#include <fcntl.h>
-> +#include <stdint.h>
-> +#include <time.h>
-> +
-> +#include <test_util.h>
-> +#include "kvm_util.h"
-> +
-> +#define HPAGE_SLOT		10
-> +#define HPAGE_GVA		(23*1024*1024)
-> +#define HPAGE_GPA		(10*1024*1024)
-> +#define HPAGE_SLOT_NPAGES	(512 * 3)
-> +#define PAGE_SIZE		4096
-> +
-> +/*
-> + * When writing to guest memory, write the opcode for the `ret` instruction so
-> + * that subsequent iteractions can exercise instruction fetch by calling the
-> + * memory.
-> + */
-> +#define RETURN_OPCODE 0xC3
-> +
-> +void guest_code(void)
+> +unsigned int virtqueue_get_vring_max_size(struct virtqueue *_vq)
 > +{
-> +	uint64_t hpage_1 = HPAGE_GVA;
-> +	uint64_t hpage_2 = hpage_1 + (PAGE_SIZE * 512);
-> +	uint64_t hpage_3 = hpage_2 + (PAGE_SIZE * 512);
-> +
-> +	READ_ONCE(*(uint64_t *)hpage_1);
-> +	GUEST_SYNC(1);
-> +
-> +	READ_ONCE(*(uint64_t *)hpage_2);
-> +	GUEST_SYNC(2);
-> +
-> +	((void (*)(void)) hpage_1)();
-> +	GUEST_SYNC(3);
-> +
-> +	((void (*)(void)) hpage_3)();
-> +	GUEST_SYNC(4);
-> +
-> +	READ_ONCE(*(uint64_t *)hpage_1);
-> +	GUEST_SYNC(5);
-> +
-> +	READ_ONCE(*(uint64_t *)hpage_3);
-> +	GUEST_SYNC(6);
+> +	return _vq->num_max;
 > +}
+> +EXPORT_SYMBOL_GPL(virtqueue_get_vring_max_size);
 > +
-> +static void check_2m_page_count(struct kvm_vm *vm, int expected_pages_2m)
-> +{
-> +	int actual_pages_2m;
+>   /**
+>    * virtqueue_get_vring_size - return the size of the virtqueue's vring
+>    * @_vq: the struct virtqueue containing the vring of interest.
+> diff --git a/drivers/virtio/virtio_vdpa.c b/drivers/virtio/virtio_vdpa.c
+> index 7767a7f0119b..39e4c08eb0f2 100644
+> --- a/drivers/virtio/virtio_vdpa.c
+> +++ b/drivers/virtio/virtio_vdpa.c
+> @@ -183,6 +183,8 @@ virtio_vdpa_setup_vq(struct virtio_device *vdev, unsigned int index,
+>   		goto error_new_virtqueue;
+>   	}
+>   
+> +	vq->num_max = max_num;
 > +
-> +	actual_pages_2m = vm_get_single_stat(vm, "pages_2m");
-> +
-> +	TEST_ASSERT(actual_pages_2m == expected_pages_2m,
-> +		    "Unexpected 2m page count. Expected %d, got %d",
-> +		    expected_pages_2m, actual_pages_2m);
-> +}
-> +
-> +static void check_split_count(struct kvm_vm *vm, int expected_splits)
-> +{
-> +	int actual_splits;
-> +
-> +	actual_splits = vm_get_single_stat(vm, "nx_lpage_splits");
-> +
-> +	TEST_ASSERT(actual_splits == expected_splits,
-> +		    "Unexpected nx lpage split count. Expected %d, got %d",
-> +		    expected_splits, actual_splits);
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +	struct kvm_vm *vm;
-> +	struct timespec ts;
-> +	void *hva;
-> +
-> +	vm = vm_create_default(0, 0, guest_code);
-> +
-> +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS_HUGETLB,
-> +				    HPAGE_GPA, HPAGE_SLOT,
-> +				    HPAGE_SLOT_NPAGES, 0);
-> +
-> +	virt_map(vm, HPAGE_GVA, HPAGE_GPA, HPAGE_SLOT_NPAGES);
-> +
-> +	hva = addr_gpa2hva(vm, HPAGE_GPA);
-> +	memset(hva, RETURN_OPCODE, HPAGE_SLOT_NPAGES * PAGE_SIZE);
-> +
-> +	check_2m_page_count(vm, 0);
-> +	check_split_count(vm, 0);
-> +
-> +	/*
-> +	 * The guest code will first read from the first hugepage, resulting
-> +	 * in a huge page mapping being created.
-> +	 */
-> +	vcpu_run(vm, 0);
-> +	check_2m_page_count(vm, 1);
-> +	check_split_count(vm, 0);
-> +
-> +	/*
-> +	 * Then the guest code will read from the second hugepage, resulting
-> +	 * in another huge page mapping being created.
-> +	 */
-> +	vcpu_run(vm, 0);
-> +	check_2m_page_count(vm, 2);
-> +	check_split_count(vm, 0);
-> +
-> +	/*
-> +	 * Next, the guest will execute from the first huge page, causing it
-> +	 * to be remapped at 4k.
-> +	 */
-> +	vcpu_run(vm, 0);
-> +	check_2m_page_count(vm, 1);
-> +	check_split_count(vm, 1);
-> +
-> +	/*
-> +	 * Executing from the third huge page (previously unaccessed) will
-> +	 * cause part to be mapped at 4k.
-> +	 */
-> +	vcpu_run(vm, 0);
-> +	check_2m_page_count(vm, 1);
-> +	check_split_count(vm, 2);
-> +
-> +	/* Reading from the first huge page again should have no effect. */
-> +	vcpu_run(vm, 0);
-> +	check_2m_page_count(vm, 1);
-> +	check_split_count(vm, 2);
-> +
-> +	/*
-> +	 * Give recovery thread time to run. The wrapper script sets
-> +	 * recovery_period_ms to 100, so wait 5x that.
-> +	 */
-> +	ts.tv_sec = 0;
-> +	ts.tv_nsec = 500000000;
-> +	nanosleep(&ts, NULL);
-> +
-> +	/*
-> +	 * Now that the reclaimer has run, all the split pages should be gone.
-> +	 */
-> +	check_2m_page_count(vm, 1);
-> +	check_split_count(vm, 0);
-> +
-> +	/*
-> +	 * The 4k mapping on hpage 3 should have been removed, so check that
-> +	 * reading from it causes a huge page mapping to be installed.
-> +	 */
-> +	vcpu_run(vm, 0);
-> +	check_2m_page_count(vm, 2);
-> +	check_split_count(vm, 0);
-> +
-> +	kvm_vm_free(vm);
-> +
-> +	return 0;
-> +}
-> +
-> diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh
-> new file mode 100755
-> index 000000000000..19fc95723fcb
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh
-> @@ -0,0 +1,25 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0-only */
-> +
-> +# tools/testing/selftests/kvm/nx_huge_page_test.sh
-> +# Copyright (C) 2022, Google LLC.
-> +
-> +NX_HUGE_PAGES=$(cat /sys/module/kvm/parameters/nx_huge_pages)
-> +NX_HUGE_PAGES_RECOVERY_RATIO=$(cat /sys/module/kvm/parameters/nx_huge_pages_recovery_ratio)
-> +NX_HUGE_PAGES_RECOVERY_PERIOD=$(cat /sys/module/kvm/parameters/nx_huge_pages_recovery_period_ms)
-> +HUGE_PAGES=$(cat /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages)
-> +
-> +echo 1 > /sys/module/kvm/parameters/nx_huge_pages
-> +echo 1 > /sys/module/kvm/parameters/nx_huge_pages_recovery_ratio
-> +echo 100 > /sys/module/kvm/parameters/nx_huge_pages_recovery_period_ms
-> +echo 200 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
-> +
-> +./nx_huge_pages_test
-> +RET=$?
-> +
-> +echo $NX_HUGE_PAGES > /sys/module/kvm/parameters/nx_huge_pages
-> +echo $NX_HUGE_PAGES_RECOVERY_RATIO > /sys/module/kvm/parameters/nx_huge_pages_recovery_ratio
-> +echo $NX_HUGE_PAGES_RECOVERY_PERIOD > /sys/module/kvm/parameters/nx_huge_pages_recovery_period_ms
-> +echo $HUGE_PAGES > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
-> +
-> +exit $RET
-> -- 
-> 2.35.1.1178.g4f1659d476-goog
-> 
+>   	/* Setup virtqueue callback */
+>   	cb.callback = virtio_vdpa_virtqueue_cb;
+>   	cb.private = info;
+> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
+> index 72292a62cd90..d59adc4be068 100644
+> --- a/include/linux/virtio.h
+> +++ b/include/linux/virtio.h
+> @@ -31,6 +31,7 @@ struct virtqueue {
+>   	struct virtio_device *vdev;
+>   	unsigned int index;
+>   	unsigned int num_free;
+> +	unsigned int num_max;
+>   	void *priv;
+>   };
+>   
+> @@ -80,6 +81,7 @@ bool virtqueue_enable_cb_delayed(struct virtqueue *vq);
+>   
+>   void *virtqueue_detach_unused_buf(struct virtqueue *vq);
+>   
+> +unsigned int virtqueue_get_vring_max_size(struct virtqueue *vq);
+>   unsigned int virtqueue_get_vring_size(struct virtqueue *vq);
+>   
+>   bool virtqueue_is_broken(struct virtqueue *vq);
+
