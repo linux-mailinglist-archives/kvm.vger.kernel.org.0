@@ -2,103 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D9E54FE3F5
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 16:36:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D841B4FE499
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 17:21:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353120AbiDLOi6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 10:38:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51468 "EHLO
+        id S1357030AbiDLPX2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 11:23:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351607AbiDLOi4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 10:38:56 -0400
-Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59B875F263
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 07:36:38 -0700 (PDT)
-Received: by mail-qk1-x72c.google.com with SMTP id c1so2499645qkf.13
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 07:36:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=evNj2CNMoMsw5e7L6RfPQYGJFzo3TZYC7FsieHWZ5Ls=;
-        b=P4KDTA4ChNl8eFo5TaRAl/5FnI/hVHjJzJBo1xbfO6E6tcQCaqBfnBN1z5fv3DfE1u
-         iQILgHtSz7DDusNSlvJP3Z1yMP4+yKAQ2Eyz628hQVcLvQ+BxsdlwhsUbE6fvWB/Q2is
-         KJFMZcpNQuQ1kXRm/7dZww/aXDBDg6Qg87XJBXqMNal9QHP5YcfHOuo4039oAPwifclm
-         Ni6jxAqEXJAsTg1vDWd5O4322/PPXZOhWqI7cTTZAicevA8+5AkWYEBaFSAdm27ELa3S
-         niv0qlWzCgCFeZ31VkUUBPNxRCHtURSjk4RK/eF6eqwh/psh+4pwILguC3l2W1BosUlI
-         tCIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=evNj2CNMoMsw5e7L6RfPQYGJFzo3TZYC7FsieHWZ5Ls=;
-        b=4mqMx2UD3/jOxikPm2xIMPqyaXMNlJZ7Q524kLVzgolcvztuJyO94B/Eq5qtpA/VBM
-         FAM7mFo69glz/6tDB5w9exp+flmPExDcce9Ht32laS/Y44unU+sHMpexXhncq1/fvDlz
-         tD96WP6ctWybRBx2ISDQOxemI+UBxeRP6RGcY6/K51ZYJMO1iNz0BxCxKusTZio21PsZ
-         kwxmvSX0PKZMkEh7Qof7AD5f6+R6zclw2+8G4x+SUC0hoNQFJcq+b51+7B9xTpFNJY3U
-         QLj+hzsTo3kQfmgijOf8oPB+obiquCl/dAyZ/fkqsdJBSq9GbsVmh1KO6FzXYi4mJlqI
-         V34w==
-X-Gm-Message-State: AOAM533X3V2043O/eSgLSLaiu3o+bW6R7Kezqln+y6zk7LbnnwV+i7ee
-        KhXeXF6Wg+tYcXWOd/D/nA9RZQ==
-X-Google-Smtp-Source: ABdhPJySHPHmQqifS2wea+F5V8gixdYIV//Jv7wOTevmOQGVNlVLMxWAFhJpJjukoZ7Xd9/fbgNIYA==
-X-Received: by 2002:a37:990:0:b0:69a:976:be4e with SMTP id 138-20020a370990000000b0069a0976be4emr3264529qkj.321.1649774197434;
-        Tue, 12 Apr 2022 07:36:37 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id n7-20020ac85a07000000b002f1421dac8csm324215qta.80.2022.04.12.07.36.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Apr 2022 07:36:36 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1neHdE-000uGn-C6; Tue, 12 Apr 2022 11:36:36 -0300
-Date:   Tue, 12 Apr 2022 11:36:36 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>
-Subject: Re: [PATCH v5 04/13] mm/shmem: Restrict MFD_INACCESSIBLE memory
- against RLIMIT_MEMLOCK
-Message-ID: <20220412143636.GG64706@ziepe.ca>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <20220310140911.50924-5-chao.p.peng@linux.intel.com>
- <Yk8L0CwKpTrv3Rg3@google.com>
- <02e18c90-196e-409e-b2ac-822aceea8891@www.fastmail.com>
- <YlB3Z8fqJ+67a2Ck@google.com>
- <7ab689e7-e04d-5693-f899-d2d785b09892@redhat.com>
+        with ESMTP id S1356998AbiDLPXY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 11:23:24 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 149DF1B797;
+        Tue, 12 Apr 2022 08:21:07 -0700 (PDT)
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23CEnaLQ012609;
+        Tue, 12 Apr 2022 15:21:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=dsxqLb2Mk/1BCqT7Gh/NuM34+pCbF6cZSHEFyVTkrgc=;
+ b=pt4Ai/0JEwMXCgRSjqdaJ188mmCC/IwrCU8RW3lEHum8g67wnZDRaJhBbvWh7n8wEYCj
+ /FH0Nnm4FbGrsL8UWNzQKumSFyzk9+FTlpP6IhZ4xqo+RnImNxIeJg5BI+3u0DYMfVMb
+ KvX0U4jeoin5njodMhzgeuK8LKJH+/cZmzFy+UCXWPn8/VOsyl7epxe/Ya+/rvk0MyHa
+ gamtmj3aeu88iCUO5W4vNxlP2icxOqsFY71j/bhVR4Uji/AgIwg3Kgv03IjZopOE00QR
+ v1tojzuZfFSrNQWI6faI1tiKiHT0HuDUMFWUfxfvGQEIBEASCO3vIvOAykP/guvjsLSZ lQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fd8b65xvc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Apr 2022 15:21:06 +0000
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23CFJJVC029246;
+        Tue, 12 Apr 2022 15:21:06 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fd8b65xsn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Apr 2022 15:21:06 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23CFHoQx010344;
+        Tue, 12 Apr 2022 15:20:58 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04fra.de.ibm.com with ESMTP id 3fb1s8v57x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Apr 2022 15:20:58 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23CFKtMf50921956
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Apr 2022 15:20:55 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2B0AB42042;
+        Tue, 12 Apr 2022 15:20:55 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CB4BB42049;
+        Tue, 12 Apr 2022 15:20:54 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.1.140])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 12 Apr 2022 15:20:54 +0000 (GMT)
+Date:   Tue, 12 Apr 2022 17:20:53 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, thuth@redhat.com, david@redhat.com,
+        farman@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH 0/2] s390x: Add tests for SIGP store adtl
+ status
+Message-ID: <20220412172053.0208445e@p-imbrenda>
+In-Reply-To: <20220401123321.1714489-1-nrb@linux.ibm.com>
+References: <20220401123321.1714489-1-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7ab689e7-e04d-5693-f899-d2d785b09892@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: BypjyuaJmOzcDvLq365XWlN3XPASOXXs
+X-Proofpoint-ORIG-GUID: ITrdphvD9s8k1JUe0f27nxyjnZpbb1ij
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-12_05,2022-04-12_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
+ priorityscore=1501 mlxlogscore=999 adultscore=0 spamscore=0 phishscore=0
+ clxscore=1015 malwarescore=0 bulkscore=0 lowpriorityscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2204120073
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -106,26 +94,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 08, 2022 at 08:54:02PM +0200, David Hildenbrand wrote:
+On Fri,  1 Apr 2022 14:33:19 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-> RLIMIT_MEMLOCK was the obvious candidate, but as we discovered int he
-> past already with secretmem, it's not 100% that good of a fit (unmovable
-> is worth than mlocked). But it gets the job done for now at least.
+> Changelog from v1:
+> ----
+> - Move vector related defines to own header
+> - Write restart_write_vector in assembler to avoid undesired use of floating
+>   point registers by the compiler.
+> - Minor naming fixes
+> 
 
-No, it doesn't. There are too many different interpretations how
-MELOCK is supposed to work
+queued, thanks
 
-eg VFIO accounts per-process so hostile users can just fork to go past
-it.
+> As suggested by Claudio, move the store adtl status I sent previously
+> ("[kvm-unit-tests PATCH v2 0/9] s390x: Further extend instruction interception
+>  tests") into its own file.
+> 
+> Nico Boehr (2):
+>   s390x: gs: move to new header file
+>   s390x: add test for SIGP STORE_ADTL_STATUS order
+> 
+>  lib/s390x/asm/vector.h |  16 ++
+>  lib/s390x/gs.h         |  69 +++++++
+>  s390x/Makefile         |   1 +
+>  s390x/adtl-status.c    | 411 +++++++++++++++++++++++++++++++++++++++++
+>  s390x/gs.c             |  54 +-----
+>  s390x/unittests.cfg    |  25 +++
+>  6 files changed, 523 insertions(+), 53 deletions(-)
+>  create mode 100644 lib/s390x/asm/vector.h
+>  create mode 100644 lib/s390x/gs.h
+>  create mode 100644 s390x/adtl-status.c
+> 
 
-RDMA is per-process but uses a different counter, so you can double up
-
-iouring is per-user and users a 3rd counter, so it can triple up on
-the above two
-
-> So I'm open for alternative to limit the amount of unmovable memory we
-> might allocate for user space, and then we could convert seretmem as well.
-
-I think it has to be cgroup based considering where we are now :\
-
-Jason
