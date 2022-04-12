@@ -2,97 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AFB34FE7C8
-	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 20:19:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 391FA4FE7E9
+	for <lists+kvm@lfdr.de>; Tue, 12 Apr 2022 20:25:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356974AbiDLSWH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 14:22:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51264 "EHLO
+        id S1358492AbiDLS2L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 14:28:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358681AbiDLSWE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 14:22:04 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B799831528
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 11:19:45 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id cj5so2457371pfb.13
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 11:19:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=X8mJ2ojcIe20g/huptYO9qfRt1S1C1vtiT7bWUcTZ3Q=;
-        b=leH/Qwl5H1Y7XXLFtPPMYEnzfeaIH8QIF0J+gpIJHCwJpre2uZZc62aPiewTzDBBcy
-         JY9pS5TZ9EzEt6MGJJON1sJYfwU68sj7EHy8wlUqKInlU00uwpEU3msjQTUeK8/aEJ4g
-         yfQSTnAdTbCf+PGblKqn5gLuh2EbjSRHh0yPJD9U8nK1zOeTbnCt3VGuz27aZgMA/PLj
-         CM5HXJp/ggDvDYNKw9xFQd4/+kvaH2/X1jVbvwJTG/oTT+/YloeDkokkIdRv05TU/LiL
-         +K7zBOrZ5dlf+I47NESFEkkrm6Wr0EKQE+Utya835/dvU6de8SLeB0T+AAy6LAZMjZbZ
-         +WJA==
+        with ESMTP id S1352388AbiDLS2I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 14:28:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 34D0F5132D
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 11:25:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649787949;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Zr6bTAu62Yc6ACXuxK5YiD1+cRvjwLYTb92CvqVD1MY=;
+        b=R04jo9yggoIYo+72aYYuNI+O8xbqe9UirS+bo2BDD1deMpgBrix/ELBR9SxxfuXrz8RBmO
+        uE5Cg2ttVC2RXQDDrROuONkcJrzsrGNurr0+AQN155ohBeAMRGXPQNPZN1xDZW5U3Bcuyu
+        MkPpgnWrca0AMePcNPLg/2Tnn9TxR+Y=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-350-Q_VbgTzmOrqFYrp1Z2mGHg-1; Tue, 12 Apr 2022 14:25:47 -0400
+X-MC-Unique: Q_VbgTzmOrqFYrp1Z2mGHg-1
+Received: by mail-io1-f70.google.com with SMTP id f11-20020a056602070b00b00645d08010fcso12060830iox.15
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 11:25:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=X8mJ2ojcIe20g/huptYO9qfRt1S1C1vtiT7bWUcTZ3Q=;
-        b=dnMR1Un09osXs5GYcide9ztrsoLFFcL0HlgfubJX/ISMgKSFvriUm9nDiN3b3HyuIP
-         BI0HCnUtkW+SpcaJ7wax0T4no5DhlUqXRwjLIck3xPEEjegMVCZDm6YRZYn+sOpNxFGU
-         mO2ZNIW5+AjMn67Mojbho1Ghlde+40JWYLPYxEuYTwxYlurKEgR5CHxsQxrT65WTDu4r
-         qWfGhoZL3OCEWVZMQLmXkeOxXLxQHBaTYT/negvqig8mygySe0wzxFCMG/azBcwpIyg1
-         yOvbpma/ryMxccGb10Ig9VYGqkyy6mIgd5EOMubh/bGULh+7fYqZ6ZHK1zSpvnjizO8o
-         E1Ng==
-X-Gm-Message-State: AOAM531tkxnCQvE9w7yEcmtUJLLEX2jA06YFr65lqXKeL9iBsCD0fwP3
-        WqkH6TXKCnIOQK+T3ApS/9YbwLjDfT3h5A==
-X-Google-Smtp-Source: ABdhPJzbeWw9e8fnoxeV4yZVYuSqRzeP72JoDpYopmyS4PDHKsfhv543wj3nzNZTVIxoFswrRZwciQ==
-X-Received: by 2002:a63:931e:0:b0:39d:9d36:545d with SMTP id b30-20020a63931e000000b0039d9d36545dmr2744848pge.511.1649787585067;
-        Tue, 12 Apr 2022 11:19:45 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b5-20020a056a0002c500b0050600032179sm2925084pft.130.2022.04.12.11.19.44
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=Zr6bTAu62Yc6ACXuxK5YiD1+cRvjwLYTb92CvqVD1MY=;
+        b=j6Ve129a4U322cQ9Go5wBvN04gqvoIjWC0KR7eMC1u6ZkvE7I2hQYHwXHrhdwhdJBz
+         mUBYoE58pZ2bRw+e9sXG4LK6as7L4VOawkQrMDEY33OCNmsndkOhWC/HCg7oigvPQGJT
+         82iuHkSfb4zppZhkdtxx2VyUDM4oKJBTownjfROTCwOKF+GVa5JWmmIVlPxiZNRBsEiG
+         X5HuR4MvkuV1/qRX/Yj0j/oZ4WsS1yBkBh1AonV/imzLHb83WNW3BCMbBJ81Ms9W5uVU
+         47GTIquTBZ/8/Mb4JMOB+cijyN0RQL11Y77Q0/jHbwP94W+pLKTU5YQP7g3hukomi7es
+         n/0A==
+X-Gm-Message-State: AOAM531f97IjhiTx/HTA99CVymjEocbLPm7RbNZ747e2s5+5BEYlPLlY
+        jZqMG3tF45wY3NHNCkjOmA+V5SKrQVqbHSsgdTmYmSHddtEGOfaUyctBPllnuiBFQBUgN1QdFI3
+        cXQRbva6S4QyT
+X-Received: by 2002:a92:c244:0:b0:2ca:1a82:2364 with SMTP id k4-20020a92c244000000b002ca1a822364mr16490158ilo.69.1649787946955;
+        Tue, 12 Apr 2022 11:25:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwTQxUE6Ize8kxqQrF9l4JSdWmEVNZcycwRY+KSfmF51JWDkdy2fJkwYPjlneQQe3ChLMwiog==
+X-Received: by 2002:a92:c244:0:b0:2ca:1a82:2364 with SMTP id k4-20020a92c244000000b002ca1a822364mr16490151ilo.69.1649787946755;
+        Tue, 12 Apr 2022 11:25:46 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id v18-20020a6b5b12000000b00645bd8bd288sm22519849ioh.47.2022.04.12.11.25.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Apr 2022 11:19:44 -0700 (PDT)
-Date:   Tue, 12 Apr 2022 18:19:40 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jue Wang <juew@google.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: Add support for CMCI and UCNA.
-Message-ID: <YlXCvEevoCZPj9Ba@google.com>
-References: <20220323182816.2179533-1-juew@google.com>
- <YlR8l7aAYCwqaXEs@google.com>
- <390f6cd9-1757-b83c-ab97-5a991559e998@redhat.com>
+        Tue, 12 Apr 2022 11:25:46 -0700 (PDT)
+Date:   Tue, 12 Apr 2022 12:25:44 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH v2] vfio/pci: Fix vf_token mechanism when
+ device-specific VF drivers are used
+Message-ID: <20220412122544.4a56f20a.alex.williamson@redhat.com>
+In-Reply-To: <0-v2-fe53fe3adce2+265-vfio_vf_token_jgg@nvidia.com>
+References: <0-v2-fe53fe3adce2+265-vfio_vf_token_jgg@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <390f6cd9-1757-b83c-ab97-5a991559e998@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 12, 2022, Paolo Bonzini wrote:
-> On 4/11/22 21:08, Sean Christopherson wrote:
-> > > +			if (!(mcg_cap & MCG_CMCI_P) &&
-> > > +			    (data || !msr_info->host_initiated))
-> > This looks wrong, userspace should either be able to write the MSR or not, '0'
-> > isn't special.  Unless there's a danger to KVM, which I don't think there is,
-> > userspace should be allowed to ignore architectural restrictions, i.e. bypass
-> > the MCG_CMCI_P check, so that KVM doesn't create an unnecessary dependency between
-> > ioctls.  I.e. this should be:
-> > 
-> > 		if (!(mcg_cap & MCG_CMCI_P) && !msr_info->host_initiated)
-> > 			return 1;
-> > 
-> 
-> This is somewhat dangerous as it complicates (or removes) the invariants
-> that other code can rely on.  Thus, usually, only the default value is
-> allowed for KVM_SET_MSR.
+On Mon, 11 Apr 2022 10:56:31 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Heh, I don't know if "usually" is the right word, that implies KVM is consistent
-enough to have a simple majority for any behavior, whatever that behavior may be :-)
+> @@ -1732,10 +1705,28 @@ static int vfio_pci_bus_notifier(struct notifier_block *nb,
+>  static int vfio_pci_vf_init(struct vfio_pci_core_device *vdev)
+>  {
+>  	struct pci_dev *pdev = vdev->pdev;
+> +	struct vfio_pci_core_device *cur;
+> +	struct pci_dev *physfn;
+>  	int ret;
+>  
+> -	if (!pdev->is_physfn)
+> +	if (!pdev->is_physfn) {
+> +		/*
+> +		 * If this VF was created by our vfio_pci_core_sriov_configure()
+> +		 * then we can find the PF vfio_pci_core_device now, and due to
+> +		 * the locking in pci_disable_sriov() it cannot change until
+> +		 * this VF device driver is removed.
+> +		 */
+> +		physfn = pci_physfn(vdev->pdev);
+> +		mutex_lock(&vfio_pci_sriov_pfs_mutex);
+> +		list_for_each_entry (cur, &vfio_pci_sriov_pfs, sriov_pfs_item) {
+> +			if (cur->pdev == physfn) {
+> +				vdev->sriov_pf_core_dev = cur;
+> +				break;
+> +			}
+> +		}
+> +		mutex_unlock(&vfio_pci_sriov_pfs_mutex);
+>  		return 0;
+> +	}
+>  
+>  	vdev->vf_token = kzalloc(sizeof(*vdev->vf_token), GFP_KERNEL);
+>  	if (!vdev->vf_token)
 
-Anyways, on second look, I agree that KVM should require that userspace first enable
-CMCI via mcg_cap.  I thought that vcpu->arch.mcg_cap could be written via the MSR
-interface, i.e. via userspace writes to MSR_IA32_MCG_CAP, and could create dependencies
-within KVM_SET_MSRS.  But KVM only allows reading the MSR.
+One more comment on final review; are we equating !is_physfn to
+is_virtfn above?  This branch was originally meant to kick out both VFs
+and non-SRIOV PFs.  Calling pci_physfn() on a !is_virtfn device will
+return itself, so we should never find a list match, but we also don't
+need to look for a match for !is_virtfn, so it's a bit confusing and
+slightly inefficient.  Should the new code be added in a separate
+is_virtfn branch above the existing !is_physfn test?  Thanks,
+
+Alex
+
