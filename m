@@ -2,94 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C70B4FFADB
-	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 18:04:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 919F24FFAEB
+	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 18:06:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236751AbiDMQGV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Apr 2022 12:06:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33722 "EHLO
+        id S236777AbiDMQI2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Apr 2022 12:08:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233583AbiDMQGT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Apr 2022 12:06:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5D8635D66F
-        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 09:03:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649865837;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qaes6GsZIWmYMSJxhYz4nyZc0I8zaCDHxt97W/Tu4Ck=;
-        b=cpEb/0hEyK61Jb/YeB3oMbYQ/0z7nTv43rLmB8i8ScnwFqhPbssCznKnXn0coGsLTEFXvl
-        fCM2PSippbjhieM2f2kebQYQDdrgKzoISZyquVBxh7xA7528IYC4Pz8xpefXbzyWKivusk
-        IA0Ke+tx7AqGvS7IHOsgzbFltejCpyM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-393-vAvLhUOqPS6_sU__Cn9KNQ-1; Wed, 13 Apr 2022 12:03:55 -0400
-X-MC-Unique: vAvLhUOqPS6_sU__Cn9KNQ-1
-Received: by mail-wr1-f69.google.com with SMTP id f2-20020a056000036200b00207a14a1f96so499688wrf.3
-        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 09:03:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=qaes6GsZIWmYMSJxhYz4nyZc0I8zaCDHxt97W/Tu4Ck=;
-        b=wihbYrvYaMawwpvtNEA2AoMGgNBFJuP6GdmRW2JB4dM3xC5Ee5DsDiBKSMGFRc2wvu
-         7hLYafAuYikNVhbdHv0TqxsEx7QwbFaE/b75Nqfo8ApyFALfJqT2GL6B4I3EypFSJ7i2
-         3Plch//G0wULq644G/iZSOBxp90IIXCW2zamPeyVFCToFe/RqI93I2asWiUuAUo1wwX5
-         0+x8RyrK+dkUGDhQw4oXfYtIEbrV0IdBRa2wDdh7Spd5+30QhJEglaZcKEFIpZUCMeyQ
-         i2/0Z3jnBr784ykc5AxF61dHaq9dRFKcR5yrJLmkhZgEPHGiZ/vbAaARVJesFfjNZALJ
-         7JwQ==
-X-Gm-Message-State: AOAM533CgdO/+i+0gEyF3yHFDXWHZpbJnClBRGoIP2pRlxk7f5BMMUIv
-        l7SAMoRyVOxOHWp+xVKNWwkHniUK9QcMsqJ3aw02Pvi998FTqES3DUVEmzXVfrHRgp57KhRYVYX
-        EJwZleg625oTT
-X-Received: by 2002:a5d:684b:0:b0:207:b978:1a51 with SMTP id o11-20020a5d684b000000b00207b9781a51mr2135099wrw.189.1649865833668;
-        Wed, 13 Apr 2022 09:03:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwr8eDe+uZec98zyFAbHiVBo/INth+bOteQZ2k4WxUL0QZvCYOhQblO8Y9OngstuW8Kb5UMbg==
-X-Received: by 2002:a5d:684b:0:b0:207:b978:1a51 with SMTP id o11-20020a5d684b000000b00207b9781a51mr2135076wrw.189.1649865833408;
-        Wed, 13 Apr 2022 09:03:53 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id n1-20020a5d5981000000b00207a0853460sm11755147wri.14.2022.04.13.09.03.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Apr 2022 09:03:52 -0700 (PDT)
-Message-ID: <e549d4c4-ca56-da1d-cc50-1a73621ba487@redhat.com>
-Date:   Wed, 13 Apr 2022 18:03:51 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [RFC PATCH V3 2/4] KVM: X86: Introduce role.glevel for level
- expanded pagetable
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Lai Jiangshan <jiangshanlai@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        with ESMTP id S235176AbiDMQI1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Apr 2022 12:08:27 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D09F96472D;
+        Wed, 13 Apr 2022 09:06:05 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 720B768BEB; Wed, 13 Apr 2022 18:06:01 +0200 (CEST)
+Date:   Wed, 13 Apr 2022 18:06:01 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
         Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-doc@vger.kernel.org
-References: <20220330132152.4568-1-jiangshanlai@gmail.com>
- <20220330132152.4568-3-jiangshanlai@gmail.com> <YlXvtMqWpyM9Bjox@google.com>
- <caffa434-5644-ee73-1636-45a87517bae2@redhat.com>
- <YlbhVov4cvM26FnC@google.com>
- <d2122fb0-7327-0490-9077-c69bbfba4830@redhat.com>
- <YlbtEorfabzkRucF@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YlbtEorfabzkRucF@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH 1/9] vfio: Make vfio_(un)register_notifier accept a
+ vfio_device
+Message-ID: <20220413160601.GA29631@lst.de>
+References: <0-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com> <1-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com> <20220413055524.GB32092@lst.de> <20220413113952.GN2120790@nvidia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220413113952.GN2120790@nvidia.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -97,43 +69,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/13/22 17:32, Sean Christopherson wrote:
->>> Are we planning on removing direct?
->>
->> I think so, it's redundant and the code almost always checks
->> direct||passthrough (which would be passthrough_delta > 0 with your scheme).
-> 
-> I'm ok dropping direct and rolling it into target_level, just so long as we add
-> helpers, e.g. IIUC they would be
-> 
-> static inline bool is_sp_direct(...)
-> {
-> 	return !sp->role.target_level;
-> }
-> 
-> static inline bool is_sp_direct_or_passthrough(...)
-> {
-> 	return sp->role.target_level != sp->role.level;
-> }
+On Wed, Apr 13, 2022 at 08:39:52AM -0300, Jason Gunthorpe wrote:
+> I already looked into that for a while, it is a real mess too because
+> of how the notifiers are used by the current drivers, eg gvt assumes
+> the notifier is called during its open_device callback to setup its
+> kvm.
 
-Yes of course.  Or respectively:
+gvt very much expects kvm to be set before open and thus get the
+cachup notifier, yes.  And given that this is how qemu uses
+the ioctl I think we can actually simplify this further and require
+vfio_group_set_kvm to be called before open for s390/ap as well and
+do away with this whole mess.
 
-	return sp->role.passthrough_levels == s->role.level;
+> For this series I prefer to leave it alone
 
-	return sp->role.passthrough_levels > 0;
-
-I'm not sure about a more concise name for the latter.  Maybe 
-sp_has_gpt(...) but I haven't thought it through very much.
-
->>> Hmm, it's not a raw level though.
->>
->> Hence the plural. :)
-> 
-> LOL, I honestly thought that was a typo.  Making it plural sounds like it's passing
-> through to multiple levels.
-
-I meant it as number of levels being passed through.  I'll leave that to 
-Jiangshan, either target_level or passthrough_levels will do for me.
-
-Paolo
+Ok, let's do it one step at a time.
 
