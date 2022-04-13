@@ -2,185 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D48184FF9A1
-	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 17:01:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0254C4FF9D4
+	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 17:16:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234572AbiDMPD3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Apr 2022 11:03:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51716 "EHLO
+        id S234821AbiDMPSe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Apr 2022 11:18:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233236AbiDMPD0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Apr 2022 11:03:26 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E165113E29;
-        Wed, 13 Apr 2022 08:01:01 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23DEhZlc038191;
-        Wed, 13 Apr 2022 15:01:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=cogtTAbZWTf0bpTU8ZNZl3ye8szBWAB35pK9lz1RNbA=;
- b=RqaGAY7fLfEkhug/sRz9gB9NVXaxUtw3wwvuWFrXCsH49ViHE9tjqaa+ahBr4qU/Dhef
- npSCaqDSsiYlRXYkFIWHzd5Gi4bQZ9wN34n+NihETy5yZgyw3M8HAjSRfwYXldHyCNEm
- mNN+jN3MJGwUH+YpPqzAb/eLiRPW1k90/8F9yPhqBE7gLkF90mIywhjqPDARsuAAjAoB
- 83YAbpWIr1aPhEZuoMPuTF9RuQHA9n5Gx5CGRgSviKbtTHCzhLVYU7h9OFH3goHmvnQ/
- fiouexojOUi2RDwIKoUAzia5C7vO6QMZ/CrdH8b5HkkJLC2pfxXq2E2Xw7vxALKZCasT 7g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fe0hb8dhu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Apr 2022 15:01:00 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23DEvFW1007301;
-        Wed, 13 Apr 2022 15:01:00 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fe0hb8dh1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Apr 2022 15:01:00 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23DEvp7K020635;
-        Wed, 13 Apr 2022 15:00:58 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03fra.de.ibm.com with ESMTP id 3fb1s8nnhy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Apr 2022 15:00:58 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23DEmNhb38797734
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Apr 2022 14:48:23 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5F89342047;
-        Wed, 13 Apr 2022 15:00:55 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 215A142045;
-        Wed, 13 Apr 2022 15:00:55 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.44.32])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 13 Apr 2022 15:00:55 +0000 (GMT)
-Message-ID: <0f21ad244492d1b26d2091fa7189b9967be31f22.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v1 1/4] lib: s390x: add support for SCLP
- console read
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc:     imbrenda@linux.ibm.com, thuth@redhat.com
-Date:   Wed, 13 Apr 2022 17:00:54 +0200
-In-Reply-To: <19e481fb-9804-b42c-7554-8388889dbf73@linux.ibm.com>
-References: <20220411100750.2868587-1-nrb@linux.ibm.com>
-         <20220411100750.2868587-2-nrb@linux.ibm.com>
-         <19e481fb-9804-b42c-7554-8388889dbf73@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+        with ESMTP id S233894AbiDMPSd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Apr 2022 11:18:33 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5131252AE
+        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 08:16:11 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id b15so2286849pfm.5
+        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 08:16:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=S81mWUde7ok/ZvydRRuIkKRgizdYvd+HNuP8EPEGAtE=;
+        b=VIbc//BFlxRx9m9GIEUTevsa2hUZMwdyzSVBAU1fz2CZAw+OAllVn07QyIqCpqg64e
+         6eqBLkz+zB14T/ZHKdHrh/IIx9NtscksJmvcZCebI6LwsWg3xl5ak/8SdgXk4LvANXGB
+         3kbKhKKTQviMj9H/PaVe8sJpRsBt0x88nTQXzuRfQOdfZqoQnjUZy82PpIWwINfMJ3ZS
+         yukyu6WME5hlT5xMGWKmlC/ObL8zEcoUkKl88tE9QGFumOWYk7oXVaaKxIKYLoWnwxsD
+         b07I6avULqfHRUOmflZGNb5KbsPip7JLQI7sXYDh3GVv/bOsMIUxDszo7WZW2SPQiESP
+         qUBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=S81mWUde7ok/ZvydRRuIkKRgizdYvd+HNuP8EPEGAtE=;
+        b=DMp1pV4aEXJirzo81jUL3hSoeeGBPX+tYX+g7BVHK6Q3v1xYCGo4wLzVl7BhJxGTTx
+         T9RrljojzOCfKt+ngApUAPMCFCbKbWrA+AM/C3LuY1cUzQi2Xrpwyrp/BbYY2X526xBi
+         FFI36IWYQ0ocw3P+e2PsbWAdm3V6cNngA2vvJX7KY9eowE184YE5qbN8pieOBOS7+ubW
+         jmekrMwxNdFG5JBPGs2VDFHnX1My7h1hYgTBPZIaMMFj5qGxSjT1SyDZoy2/aecB9jR+
+         CIEAK8Liy0wkur1i0Z7LO+PQ/hiZaePHCNP4iET4kNeKklHWndMZd3wvOj4Nxf0Evrsn
+         z1mA==
+X-Gm-Message-State: AOAM533Qu6LcO79C1YzI7ZMn4Ikpmgwh7ZeWkvwub/PwPHL69Lt2SKpc
+        Iuw81gVb6GSatIlop8+zw0Rsug==
+X-Google-Smtp-Source: ABdhPJxupG61it2jlZAlOBz+oTQwjNn1T9jipRDaYDBz+Z/lVqvC44WrTh2oSFvKwxmjqto8kdcBGg==
+X-Received: by 2002:a05:6a00:10cc:b0:4fe:3f1c:2d1 with SMTP id d12-20020a056a0010cc00b004fe3f1c02d1mr44262475pfu.0.1649862971070;
+        Wed, 13 Apr 2022 08:16:11 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id 16-20020a17090a005000b001c7511dc31esm3224092pjb.41.2022.04.13.08.16.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Apr 2022 08:16:10 -0700 (PDT)
+Date:   Wed, 13 Apr 2022 15:16:06 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Varad Gautam <varad.gautam@suse.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
+        marcorr@google.com, zxwang42@gmail.com, erdemaktas@google.com,
+        rientjes@google.com, brijesh.singh@amd.com,
+        Thomas.Lendacky@amd.com, jroedel@suse.de, bp@suse.de
+Subject: Re: [kvm-unit-tests PATCH v2 01/10] x86: Move ap_init() to smp.c
+Message-ID: <YlbpNtx66lVaZlAD@google.com>
+References: <20220412173407.13637-1-varad.gautam@suse.com>
+ <20220412173407.13637-2-varad.gautam@suse.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 6cy-__V12dwOi39rI78pladdFjYtRxlu
-X-Proofpoint-ORIG-GUID: E7MbGXhRBRZejwSkcs6jf63n6UMa-WvC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-13_02,2022-04-13_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 mlxlogscore=999 priorityscore=1501 malwarescore=0
- suspectscore=0 spamscore=0 phishscore=0 clxscore=1015 adultscore=0
- mlxscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204130080
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220412173407.13637-2-varad.gautam@suse.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-04-12 at 17:32 +0200, Janosch Frank wrote:
-> On 4/11/22 12:07, Nico Boehr wrote:
-> > Add a basic implementation for reading from the SCLP ACII console.
-> > The goal of
-> > this is to support migration tests on s390x. To know when the
-> > migration has been
-> > finished, we need to listen for a newline on our console.
-> > 
-> > Hence, this implementation is focused on the SCLP ASCII console of
-> > QEMU and
-> > currently won't work under e.g. LPAR.
+On Tue, Apr 12, 2022, Varad Gautam wrote:
+> ap_init() copies the SIPI vector to lowmem, sends INIT/SIPI to APs
+> and waits on the APs to come up.
 > 
-> How much pain would it be to add the line mode read?
-
-I am not terribly familiar with the line mode, but I can say it would
-make the implementation of the ASCII console more complex. Right now we
-can just assume there will just be events from the ASCII console when
-we read event data.
-
-Not impossible to do, but I thought we don't need it so I kept things
-simple. Is there some benefit we would have from the line mode console?
-
-[...]
-> >   
-> > +static void sclp_console_enable_read(void)
-> > +{
-> > +       sclp_write_event_mask(SCLP_EVENT_MASK_MSG_ASCII,
-> > SCLP_EVENT_MASK_MSG_ASCII | SCLP_EVENT_MASK_MSG);
-> > +}
-> > +
-> > +static void sclp_console_disable_read(void)
-> > +{
-> > +       sclp_write_event_mask(0, SCLP_EVENT_MASK_MSG_ASCII |
-> > SCLP_EVENT_MASK_MSG);
-> > +}
-> > +
-> >   void sclp_console_setup(void)
-> >   {
-> > -       sclp_set_write_mask();
-> > +       /* We send ASCII and line mode. */
-> > +       sclp_write_event_mask(0, SCLP_EVENT_MASK_MSG_ASCII |
-> > SCLP_EVENT_MASK_MSG);
-> >   }
-> >   
-> >   void sclp_print(const char *str)
-> > @@ -227,3 +240,59 @@ void sclp_print(const char *str)
-> >         sclp_print_ascii(str);
-> >         sclp_print_lm(str);
-> >   }
-> > +
-> > +#define SCLP_EVENT_ASCII_DATA_STREAM_FOLLOWS 0
+> Port this routine to C from asm and move it to smp.c to allow sharing
+> this functionality between the EFI (-fPIC) and non-EFI builds.
 > 
-> -> sclp.h
-
-Yes, thanks.
-
+> Call ap_init() from the EFI setup path to reset the APs to a known
+> location.
 > 
-> > +
-> > +static int console_refill_read_buffer(void)
-> > +{
-> > +       const int MAX_EVENT_BUFFER_LEN = SCCB_SIZE -
-> > offsetof(ReadEventDataAsciiConsole, ebh);
-> > +       ReadEventDataAsciiConsole *sccb = (void *)_sccb;
-> > +       const int EVENT_BUFFER_ASCII_RECV_HEADER_LEN = sizeof(sccb-
-> > >ebh) + sizeof(sccb->type);
-> > +       int ret = -1;
+> Signed-off-by: Varad Gautam <varad.gautam@suse.com>
+> ---
+>  lib/x86/setup.c      |  1 +
+>  lib/x86/smp.c        | 28 ++++++++++++++++++++++++++--
+>  lib/x86/smp.h        |  1 +
+>  x86/cstart64.S       | 20 ++------------------
+
+x86/cstart.S needs to join the party, without being kept in the loop KUT fails to
+build on 32-bit targets.
+
+	x86/vmexit.o x86/cstart.o lib/libcflat.a
+lib/libcflat.a(smp.o): In function `ap_init':
+/home/sean/go/src/kernel.org/kvm-unit-tests/lib/x86/smp.c:150: undefined reference to `sipi_end'
+/home/sean/go/src/kernel.org/kvm-unit-tests/lib/x86/smp.c:150: undefined reference to `sipi_entry'
+/home/sean/go/src/kernel.org/kvm-unit-tests/lib/x86/smp.c:155: undefined reference to `sipi_entry'
+collect2: error: ld returned 1 exit status
+/home/sean/go/src/kernel.org/kvm-unit-tests/x86/Makefile.common:65: recipe for target 'x86/vmexit.elf' failed
+
+>  x86/efi/efistart64.S |  9 +++++++++
+>  5 files changed, 39 insertions(+), 20 deletions(-)
 > 
-> Reverse Christmas tree
+> diff --git a/lib/x86/setup.c b/lib/x86/setup.c
+> index 2d63a44..86ba6de 100644
+> --- a/lib/x86/setup.c
+> +++ b/lib/x86/setup.c
+> @@ -323,6 +323,7 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
+>  	load_idt();
+>  	mask_pic_interrupts();
+>  	enable_apic();
+> +	ap_init();
+>  	enable_x2apic();
+>  	smp_init();
+>  	setup_page_table();
+> diff --git a/lib/x86/smp.c b/lib/x86/smp.c
+> index 683b25d..d7f5aba 100644
+> --- a/lib/x86/smp.c
+> +++ b/lib/x86/smp.c
+> @@ -18,6 +18,9 @@ static volatile int ipi_done;
+>  static volatile bool ipi_wait;
+>  static int _cpu_count;
+>  static atomic_t active_cpus;
+> +extern u8 sipi_entry;
+> +extern u8 sipi_end;
+> +volatile unsigned cpu_online_count = 1;
 
-Hm, I think it's not possible for EVENT_BUFFER_ASCII_RECV_HEADER_LEN
-because it needs sccb first. I would want to leave as-is except if you
-have a better idea on how to do this?
+Please no bare "unsigned".  But that's a moot point because it actually needs to
+be a u16, the asm code does incw.  That's also sort of a moot point because there's
+zero chance any of this will work with 65536+ vCPUs, but it's still odd to see.
 
-> The const int variables are all caps because they are essentially
-> constants?
+There's also a declaration in x86/svm_tests.c that needs to get deleted.
 
-Yes, that was my reasoning. But it is uncommon in kvm-unit-test to have
-it uppercase, all const ints in the codebase are lowercase, so I will
-lowercase it.
+	extern u16 cpu_online_count;
 
-> > +
-> > +       sclp_console_enable_read();
-> > +
-> > +       sclp_mark_busy();
-> > +       memset(sccb, 0, 4096);
-> 
-> sizeof(*sccb)
+Ooh, actually, an even better idea.  Make cpu_online_count a proper atomic_t,
+same as active_cpus.  Then the volatile goes away.  Ugh, but atomic_t uses a
+volatile.  *sigh*  At least that's contained in one spot that we can fix all at
+once if someone gets motivated in the future.
 
-If you are OK with it, I would prefer to use SCCB_SIZE, s.t. the entire
-buffer is cleared.
+And then rather than leave the
+
+	lock incw cpu_online_count
+
+in asm code, move that to C code to, e.g. ap_call_in() or something (there's gotta
+be a standard-ish name for this).  The shortlog can be something like "Move AP
+wakeup and rendezvous to smp.c.
+
+And as a bonus, add a printf() in the C helper (assuming that doesn't cause
+explosions) to state which AP came online.  That would be super helpful for debug
+when someone breaks SMP boot.
+
+>  static __attribute__((used)) void ipi(void)
+>  {
+> @@ -114,8 +117,6 @@ void smp_init(void)
+>  	int i;
+>  	void ipi_entry(void);
+>  
+> -	_cpu_count = fwcfg_get_nb_cpus();
+> -
+>  	setup_idt();
+>  	init_apic_map();
+>  	set_idt_entry(IPI_VECTOR, ipi_entry, 0);
+> @@ -142,3 +143,26 @@ void smp_reset_apic(void)
+>  
+>  	atomic_inc(&active_cpus);
+>  }
+> +
+> +void ap_init(void)
+> +{
+> +	u8 *dst_addr = 0;
+> +	size_t sipi_sz = (&sipi_end - &sipi_entry) + 1;
+> +
+> +	asm volatile("cld");
+> +
+> +	/* Relocate SIPI vector to dst_addr so it can run in 16-bit mode. */
+> +	memcpy(dst_addr, &sipi_entry, sipi_sz);
+> +
+> +	/* INIT */
+> +	apic_icr_write(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT, 0);
+> +
+> +	/* SIPI */
+> +	apic_icr_write(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_STARTUP, 0);
+> +
+> +	_cpu_count = fwcfg_get_nb_cpus();
+> +
+
+Similar to above, I would be in favor of opportunitically adding a printf to state
+that the BSP is about to wait for N number of APs to come online, 
+.
+> +	while (_cpu_count != cpu_online_count) {
+> +		;
+> +	}
+
+Curly braces technically aren't needed.
+
+> +}
+> diff --git a/lib/x86/smp.h b/lib/x86/smp.h
+> index bd303c2..9c92853 100644
