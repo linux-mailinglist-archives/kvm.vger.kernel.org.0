@@ -2,162 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30A224FFB56
-	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 18:31:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D8324FFB68
+	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 18:35:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236876AbiDMQdS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Apr 2022 12:33:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56182 "EHLO
+        id S236884AbiDMQiH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Apr 2022 12:38:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236871AbiDMQdQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Apr 2022 12:33:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DE07E58E7B
-        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 09:30:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649867454;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JpsTDUjpmmHkgiKCF75tJ9Qb2QqmtHwjLJW7Lijr6Ec=;
-        b=D2SnrNCKiTa1JS0rYYQDcOGF80pSS4KiX5Gqks49E+9oPr4w51x7Y6u/rFsz+FvKnV3z7Q
-        FwMpJpyWYhiWdSIF7lpAuZy5GkrP8szrWSVF7vkMyhXnjXx7gRzR2evPzUQOsyYV5Fmr5e
-        FLVnkjysybxjDKraHYJ/TX6UrfxNM2E=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-299-CbqlxoPzPOKweGMNjGXOLg-1; Wed, 13 Apr 2022 12:30:51 -0400
-X-MC-Unique: CbqlxoPzPOKweGMNjGXOLg-1
-Received: by mail-wm1-f71.google.com with SMTP id l19-20020a05600c1d1300b0038e736f98faso1101117wms.4
-        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 09:30:51 -0700 (PDT)
+        with ESMTP id S235303AbiDMQha (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Apr 2022 12:37:30 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0899F31902
+        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 09:35:08 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id j17so2457463pfi.9
+        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 09:35:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5CEo552b6NXzHsMFOszFajVNNstxWGdOFCyGRD61lTc=;
+        b=naYu/blHaWLlHXFfI7r1sh+XBfGamatLmPHRqvzLVo2KcOzqyaGkSgY+SnN2tCYQY5
+         dnuN3MTkWU88yfKD1sFs0BAYeYM1ObLXmJjTzsbpk4SwVGHF91TvPaGmmpbnpu00udse
+         4fx5EUWR3irR0rulV10rlwKEDJh9rsrC6NM0AdFmB3sDN6ksojPfI/w8ky8f4mRQ4pb3
+         BuJkgrw3lM81alLxJ21T9eD7SWEsYnjPV6Lus71b21a2NScY4woFhdGzWoEZYXzxEuCv
+         wXf4KlGJ07W8/7tnF0tuF3bPtyF509KUI4GPlpD2uYu3c2SpzvuXgJXb/SZRotNaUHPr
+         BFFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:organization:subject
-         :in-reply-to:content-transfer-encoding;
-        bh=JpsTDUjpmmHkgiKCF75tJ9Qb2QqmtHwjLJW7Lijr6Ec=;
-        b=2kxsGKvEq6FEXfOwclxQbs4BAIgUD3AKiwSwIOUBi1Uh1xT/wIxhCLpy23ZK7KTM4D
-         WNVfskRn0A6mrzSgEAyEnqTSD4zUQyYMS173SQWzuzrnRZXLnWIoU2xPNnvMsDLBL4jW
-         CpCVqjyXOG/x0cEA/gCts3TQ7dIwVMJl1EEncyPHtCJ1M7LmQxjjprJ6mn7P+5uu3wxP
-         LK4Z/RqQLj8mifh1L4CPfVac5syeKUTK8BnfILTNu3wq7aizcL91oFSMWsiSUa7hBwiS
-         uJHl+21WbNZ+O4qKqWjRcM1+7czGdomML8dZxnGBC074rprev3IUDQ5SL98P+mV+z7iW
-         nMCQ==
-X-Gm-Message-State: AOAM532K/4rzOlgOr6TdfylJVI8QuB5w4gJpqo0gIgTYo14R2kXZLafe
-        Y7F+TZ13K0QD8sWLLWjZ3ZbUTDBctp5xLRVG6uHPz3Mz47VkJrlYhe2ivROaCkP6y4aNtnsrNsv
-        kGI5am9TU8YgP
-X-Received: by 2002:a05:600c:3512:b0:38c:be56:fc9c with SMTP id h18-20020a05600c351200b0038cbe56fc9cmr9458225wmq.197.1649867450682;
-        Wed, 13 Apr 2022 09:30:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwkytZT68ibSBKNJoHlOqbNjWnA9Zh1oDwEE8SJcMIkEgIwTu5PARnU1fLD1KJu/KXuQqJYmA==
-X-Received: by 2002:a05:600c:3512:b0:38c:be56:fc9c with SMTP id h18-20020a05600c351200b0038cbe56fc9cmr9458202wmq.197.1649867450341;
-        Wed, 13 Apr 2022 09:30:50 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c704:5800:1078:ebb9:e2c3:ea8c? (p200300cbc70458001078ebb9e2c3ea8c.dip0.t-ipconnect.de. [2003:cb:c704:5800:1078:ebb9:e2c3:ea8c])
-        by smtp.gmail.com with ESMTPSA id f9-20020a05600c154900b0038cb98076d6sm3269751wmg.10.2022.04.13.09.30.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Apr 2022 09:30:49 -0700 (PDT)
-Message-ID: <3b9effd9-4aba-e7ca-b3ca-6a474fd6469f@redhat.com>
-Date:   Wed, 13 Apr 2022 18:30:47 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5CEo552b6NXzHsMFOszFajVNNstxWGdOFCyGRD61lTc=;
+        b=pu6K6kDZNJkmnW1ti+29pjC2KgibVxohYu0eCD6vD0rOghpPJJEDLCOqAQ1YQY4HaL
+         H6B/MdHcYU452FOcyWBW2+Ks7Q2dIeFT9Eu9iO6sLkC100ZNmn/0uTwoyrFeh7/hsn7P
+         tfJpT/enXpkOPKz2VnpCA6LIlZRJHrvXxTwbn/M7gyKmaGeS88NtJ23IVljKyXuYYfk6
+         4dXftJweptH5yoznTSpV0XzmKYhbFstSpNzGmGjck2EhjXX8QF7gpuk/elUvI2jzJZmG
+         VUMuxFux/xO3tImqa9OCoNHfm1lk/qXICB+lSZggFqBZCOddVeXJ8XozuZL1h6mXrWVL
+         +FPw==
+X-Gm-Message-State: AOAM530aIANK/GTwTYxZLYo6ytNb+KLuovOCw1AgAQol3g0dk26Yfjt2
+        7QW3FEZWXS64XhYMiJezIctF7A==
+X-Google-Smtp-Source: ABdhPJxRv5NNfHDVNnjd1w2KlWa6TOGH28FypbxMZXrNLe2XtpuF1LbzYRgG8kis32RCIunu4yrHWw==
+X-Received: by 2002:a63:4516:0:b0:39d:98c8:b5cc with SMTP id s22-20020a634516000000b0039d98c8b5ccmr7420810pga.366.1649867707260;
+        Wed, 13 Apr 2022 09:35:07 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id k4-20020a17090a3e8400b001cd37f6c0b7sm3458218pjc.46.2022.04.13.09.35.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Apr 2022 09:35:06 -0700 (PDT)
+Date:   Wed, 13 Apr 2022 16:35:02 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Varad Gautam <varad.gautam@suse.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
+        marcorr@google.com, zxwang42@gmail.com, erdemaktas@google.com,
+        rientjes@google.com, brijesh.singh@amd.com,
+        Thomas.Lendacky@amd.com, jroedel@suse.de, bp@suse.de
+Subject: Re: [kvm-unit-tests PATCH v2 03/10] x86: desc: Split IDT entry setup
+ into a generic helper
+Message-ID: <Ylb7tpWVIBcAFrw0@google.com>
+References: <20220412173407.13637-1-varad.gautam@suse.com>
+ <20220412173407.13637-4-varad.gautam@suse.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.2
-Content-Language: en-US
-To:     Andy Lutomirski <luto@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Eric W. Biederman" <ebiederm@xmission.com>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <20220310140911.50924-5-chao.p.peng@linux.intel.com>
- <Yk8L0CwKpTrv3Rg3@google.com>
- <02e18c90-196e-409e-b2ac-822aceea8891@www.fastmail.com>
- <YlB3Z8fqJ+67a2Ck@google.com>
- <7ab689e7-e04d-5693-f899-d2d785b09892@redhat.com>
- <20220412143636.GG64706@ziepe.ca>
- <6f44ddf9-6755-4120-be8b-7a62f0abc0e0@www.fastmail.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: [PATCH v5 04/13] mm/shmem: Restrict MFD_INACCESSIBLE memory
- against RLIMIT_MEMLOCK
-In-Reply-To: <6f44ddf9-6755-4120-be8b-7a62f0abc0e0@www.fastmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220412173407.13637-4-varad.gautam@suse.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Apr 12, 2022, Varad Gautam wrote:
+> EFI bootstrapping code configures a call gate in a later commit to jump
+> from 16-bit to 32-bit code.
 > 
-> So this is another situation where the actual backend (TDX, SEV, pKVM, pure software) makes a difference -- depending on exactly what backend we're using, the memory may not be unmoveable.  It might even be swappable (in the potentially distant future).
-
-Right. And on a system without swap we don't particularly care about
-mlock, but we might (in most cases) care about fragmentation with
-unmovable memory.
-
+> Introduce a set_idt_entry_t() routine which can be used to fill both
+> an interrupt descriptor and a call gate descriptor on x86.
 > 
-> Anyway, here's a concrete proposal, with a bit of handwaving:
-
-Thanks for investing some brainpower.
-
+> Signed-off-by: Varad Gautam <varad.gautam@suse.com>
+> ---
+>  lib/x86/desc.c | 28 ++++++++++++++++++++++------
+>  lib/x86/desc.h |  1 +
+>  2 files changed, 23 insertions(+), 6 deletions(-)
 > 
-> We add new cgroup limits:
+> diff --git a/lib/x86/desc.c b/lib/x86/desc.c
+> index 087e85c..049adeb 100644
+> --- a/lib/x86/desc.c
+> +++ b/lib/x86/desc.c
+> @@ -57,22 +57,38 @@ __attribute__((regparm(1)))
+>  #endif
+>  void do_handle_exception(struct ex_regs *regs);
+>  
+> -void set_idt_entry(int vec, void *addr, int dpl)
+> +/*
+> + * Fill an idt_entry_t, clearing e_sz bytes first.
+> + *
+> + * This can also be used to set up x86 call gates, since the gate
+> + * descriptor layout is identical to idt_entry_t, except for the
+> + * absence of .offset2 and .reserved fields. To do so, pass in e_sz
+> + * according to the gate descriptor size.
+> + */
+> +void set_idt_entry_t(idt_entry_t *e, size_t e_sz, void *addr,
+> +		u16 sel, u16 type, u16 dpl)
+
+The usage in patch 7, "Transition APs from 16-bit to 32-bit mode" is really confusing
+because it's calling an IDT helper to setup the GDT.  Also, the "_t" postfix usually
+indicates a typedef, not a function
+
+Rather than set_idt_entry_t, maybe set_oversized_desc_entry()?  That's not very good
+either, but it's at least not outright confusing.  Definitely open to other suggestions...
+
+>  {
+> -	idt_entry_t *e = &boot_idt[vec];
+> -	memset(e, 0, sizeof *e);
+> +	memset(e, 0, e_sz);
+>  	e->offset0 = (unsigned long)addr;
+> -	e->selector = read_cs();
+> +	e->selector = sel;
+>  	e->ist = 0;
+> -	e->type = 14;
+> +	e->type = type;
+>  	e->dpl = dpl;
+>  	e->p = 1;
+>  	e->offset1 = (unsigned long)addr >> 16;
+>  #ifdef __x86_64__
+> -	e->offset2 = (unsigned long)addr >> 32;
+> +	if (e_sz == sizeof(*e)) {
+> +		e->offset2 = (unsigned long)addr >> 32;
+> +	}
+>  #endif
+>  }
+>  
+> +void set_idt_entry(int vec, void *addr, int dpl)
+> +{
+> +	idt_entry_t *e = &boot_idt[vec];
+> +	set_idt_entry_t(e, sizeof *e, addr, read_cs(), 14, dpl);
+> +}
+> +
+>  void set_idt_dpl(int vec, u16 dpl)
+>  {
+>  	idt_entry_t *e = &boot_idt[vec];
+> diff --git a/lib/x86/desc.h b/lib/x86/desc.h
+> index 3044409..ae0928f 100644
+> --- a/lib/x86/desc.h
+> +++ b/lib/x86/desc.h
+> @@ -217,6 +217,7 @@ unsigned exception_vector(void);
+>  int write_cr4_checking(unsigned long val);
+>  unsigned exception_error_code(void);
+>  bool exception_rflags_rf(void);
+> +void set_idt_entry_t(idt_entry_t *e, size_t e_sz, void *addr, u16 sel, u16 type, u16 dpl);
+>  void set_idt_entry(int vec, void *addr, int dpl);
+>  void set_idt_sel(int vec, u16 sel);
+>  void set_idt_dpl(int vec, u16 dpl);
+> -- 
+> 2.32.0
 > 
-> memory.unmoveable
-> memory.locked
-> 
-> These can be set to an actual number or they can be set to the special value ROOT_CAP.  If they're set to ROOT_CAP, then anyone in the cgroup with capable(CAP_SYS_RESOURCE) (i.e. the global capability) can allocate movable or locked memory with this (and potentially other) new APIs.  If it's 0, then they can't.  If it's another value, then the memory can be allocated, charged to the cgroup, up to the limit, with no particular capability needed.  The default at boot is ROOT_CAP.  Anyone who wants to configure it differently is free to do so.  This avoids introducing a DoS, makes it easy to run tests without configuring cgroup, and lets serious users set up their cgroups.
-
-I wonder what the implications are for existing user space.
-
-Assume we want to move page pinning (rdma, vfio, io_uring, ...) to the
-new model. How can we be sure
-
-a) We don't break existing user space
-b) We don't open the doors unnoticed for the admin to go crazy on
-   unmovable memory.
-
-Any ideas?
-
-> 
-> Nothing is charge per mm.
-> 
-> To make this fully sensible, we need to know what the backend is for the private memory before allocating any so that we can charge it accordingly.
-
-Right, the support for migration and/or swap defines how to account.
-
--- 
-Thanks,
-
-David / dhildenb
-
