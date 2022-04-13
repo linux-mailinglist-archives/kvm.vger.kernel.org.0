@@ -2,145 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 620794FEBDD
-	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 02:16:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BEAF4FEC05
+	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 03:03:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230341AbiDMATI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Apr 2022 20:19:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46864 "EHLO
+        id S229935AbiDMBFQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Apr 2022 21:05:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230303AbiDMATH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Apr 2022 20:19:07 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAB8513DEE
-        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 17:16:48 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3E0B7617FB
-        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 00:16:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20F2CC385A1;
-        Wed, 13 Apr 2022 00:16:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649809007;
-        bh=LsvXF38xQCO8La91LyrjAYgL05TyufkNgdo7W09hGzs=;
-        h=In-Reply-To:References:Date:From:To:Cc:Subject:From;
-        b=NdrpcPRgttmDEIiOULxAq9RkR1xc9VEIlHGlU+wlc7m2cIZWGpSsriaVGjiN/vrxA
-         jxPFjXVwxfomL8ApsC9+QOioNWfqU4CpBDdNEy8kQALfrisKfaoOSWQVneXpPzkQU3
-         P4YnOJiio1ZoLzke47TtI1H9aiKeJ5DxhmaqLXkHdrCKYjKdES2dhPiWEsVYOEDKGa
-         pi4rZFPKWZMlBi/bZ4RDIQ8oSGdDikHwhsddFsq7Lt9qLR6A77/q3MVwjjfftPvLeT
-         TdPISKiITkbWEvDH1VXIkrXxb3Om0CO5AfHr9X26OOUAx0OdeYTuBDSKibxWBjcEW3
-         Fs0ApMD6P+k1Q==
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailauth.nyi.internal (Postfix) with ESMTP id E8E8F27C0054;
-        Tue, 12 Apr 2022 20:16:44 -0400 (EDT)
-Received: from imap48 ([10.202.2.98])
-  by compute2.internal (MEProxy); Tue, 12 Apr 2022 20:16:44 -0400
-X-ME-Sender: <xms:axZWYnj7OqhgrOuOQb_focEAH603gVwsLo_WRAuxfDFax7u1YhbeBQ>
-    <xme:axZWYkD-oMlxF5GxLS44QEvF9BxVwdGeWdpXCPK_waJbhym2JaKHm78DZ1hB5LkEK
-    VFYdEn6ICChCECf7ao>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvvddrudekledgfeefucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvffutgesthdtredtreertdenucfhrhhomhepfdetnhgu
-    hicunfhuthhomhhirhhskhhifdcuoehluhhtoheskhgvrhhnvghlrdhorhhgqeenucggtf
-    frrghtthgvrhhnpefhlefhudegtedvhfefueevvedtgeeukefhffehtefftdelvedthedt
-    iedvueevudenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuih
-    iivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghnugihodhmvghsmhhtphgruhht
-    hhhpvghrshhonhgrlhhithihqdduudeiudekheeifedvqddvieefudeiiedtkedqlhhuth
-    hopeepkhgvrhhnvghlrdhorhhgsehlihhnuhigrdhluhhtohdruhhs
-X-ME-Proxy: <xmx:axZWYnEZWliGFAb1pW0k2PJcDOBmZsYieDxqmtjGypyPm0YlKQ5Jmg>
-    <xmx:axZWYkTHR0jprS1nrl00uoM44v3jI2o3zbBb6K7v9woqiDDNbwrphA>
-    <xmx:axZWYky0iioqaGWKASkdTZwq22cAp01cfHCtUzDIWsFlWwXkAPq3BQ>
-    <xmx:bBZWYsjOXuatluKYk95sJdmdseOl9MtVFotRTKte1juf0_HZpZuLKpSSR28>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 92CEB21E006E; Tue, 12 Apr 2022 20:16:43 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-386-g4174665229-fm-20220406.001-g41746652
-Mime-Version: 1.0
-Message-Id: <e8a4cac5-bc5a-4483-9443-c0e5b9f707d1@www.fastmail.com>
-In-Reply-To: <20220408210545.3915712-1-vannapurve@google.com>
-References: <20220408210545.3915712-1-vannapurve@google.com>
-Date:   Tue, 12 Apr 2022 17:16:22 -0700
-From:   "Andy Lutomirski" <luto@kernel.org>
-To:     "Vishal Annapurve" <vannapurve@google.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        "kvm list" <kvm@vger.kernel.org>,
-        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
-        linux-kselftest@vger.kernel.org
-Cc:     "Paolo Bonzini" <pbonzini@redhat.com>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        "Wanpeng Li" <wanpengli@tencent.com>,
-        "Jim Mattson" <jmattson@google.com>,
-        "Joerg Roedel" <joro@8bytes.org>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
-        "Dave Hansen" <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, shauh@kernel.org,
-        yang.zhong@intel.com, drjones@redhat.com, ricarkol@google.com,
-        aaronlewis@google.com, wei.w.wang@intel.com,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Jonathan Corbet" <corbet@lwn.net>,
-        "Hugh Dickins" <hughd@google.com>,
-        "Jeff Layton" <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        "Chao Peng" <chao.p.peng@linux.intel.com>,
-        "Yu Zhang" <yu.c.zhang@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        "Dave Hansen" <dave.hansen@intel.com>,
-        "Michael Roth" <michael.roth@amd.com>,
-        "Quentin Perret" <qperret@google.com>,
-        "Steven Price" <steven.price@arm.com>,
-        "Andi Kleen" <ak@linux.intel.com>,
-        "David Hildenbrand" <david@redhat.com>,
-        "Vlastimil Babka" <vbabka@suse.cz>,
-        "Marc Orr" <marcorr@google.com>,
-        "Erdem Aktas" <erdemaktas@google.com>,
-        "Peter Gonda" <pgonda@google.com>,
-        "Sean Christopherson" <seanjc@google.com>, diviness@google.com,
-        "Quentin Perret" <qperret@google.com>
-Subject: Re: [RFC V1 PATCH 0/5] selftests: KVM: selftests for fd-based approach of
- supporting private memory
-Content-Type: text/plain
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S230094AbiDMBFP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Apr 2022 21:05:15 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47B8F22530
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 18:02:56 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id g12-20020a17090a640c00b001cb59d7a57cso2913758pjj.1
+        for <kvm@vger.kernel.org>; Tue, 12 Apr 2022 18:02:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=KpI1kD5PS40ibZjM0D35TPH/+b7l2YUJ66VT/gr7+3I=;
+        b=WvEr5jNVtGCO3BZPBqZt3WRaH+qJWPUJ+rs93IIEG+K2bJ3Wt/blAxXxD+jg+m5RUd
+         TKEh9acGqoMAwNFo/iZwvIT5HN4JBY8N+7CjG7PADEvLKuwA8OkFZizB3FEZf7bSUB9c
+         pDy6TeJW1lmjYQVuQgzprHZjF33F23Uxgf7eet+9mnWnnNU+07ay7Xt0N2XugKQicXBn
+         0oRF6f4P7vgwCQUFUaISNiAsixKYit0+u3RnL3LPTCuqshubEKBTALKRCw1KW2xXv6q5
+         MOcm9G3pHpI14zHTQSGUsvZX7EdvBv3Jtt+s0+q/WG6iUlZy5LWzj1/478x87JFi9F3b
+         S0Gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=KpI1kD5PS40ibZjM0D35TPH/+b7l2YUJ66VT/gr7+3I=;
+        b=me7yLQfSwuzB/IDAfPy2jKAeMm6nkPG3MwdoyWvCTIalF1Zdi0qUsKeuWdGdkS/oQ3
+         ZaZsGZCZ4hjGyxsUcSHLpzuEzBn879KDHZIRnx51tRhwhibW+YqJYx7dIWKoBFTBFLJi
+         JEgXGol24T3y+yPkucvxVEAjDDfvQaoWYfrKFmezCyV8+yVUQr4BtpKEWrNSyobxGbOT
+         1fmO/q4DXZcP2Web4Xo+ODiAd0pxyV8bqBhZy057cn1nGi8hTQZF+ek59qtRqBJy9Ldz
+         GR66X14EKAvgMxi1kKn10R9LuQy3J9aun3vO5fQW9L4NOBDaTSl330ZwQ+6wkQH5H1Sa
+         U5VQ==
+X-Gm-Message-State: AOAM532zXz443z8Xqso3nohki1BK4GIi39ri1aHJRykHJBHS5dmz8hcy
+        Y+6saEQrVn3VuUtnnOYqi/h2fw==
+X-Google-Smtp-Source: ABdhPJxqWTBWdRVUHoEHytrydpTb+wgHLkf9yECQ7JPXA9VzNZCYKDHBFO/AL7hpNzLdXs6Wd+6Akw==
+X-Received: by 2002:a17:90a:a509:b0:1ca:c48e:a795 with SMTP id a9-20020a17090aa50900b001cac48ea795mr7872866pjq.165.1649811775498;
+        Tue, 12 Apr 2022 18:02:55 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id h19-20020a632113000000b0039d9c5be7c8sm3135296pgh.21.2022.04.12.18.02.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Apr 2022 18:02:54 -0700 (PDT)
+Date:   Wed, 13 Apr 2022 01:02:51 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
+Subject: Re: [PATCH v3 00/23] KVM: Extend Eager Page Splitting to the shadow
+ MMU
+Message-ID: <YlYhO7GvjKY1cwHr@google.com>
+References: <20220401175554.1931568-1-dmatlack@google.com>
+ <YlRhiF1O71TWQr5r@google.com>
+ <CALzav=f_WY7xH_MV8-gJPAVmj1KjE_LvXupL7aA5n-vCjTETNw@mail.gmail.com>
+ <YlSLuZphElMyF2sG@google.com>
+ <CALzav=fGucZOZjbVE2+9PZVf1p+jP7GBYDpPph5PoU552LELsw@mail.gmail.com>
+ <YlTKQz8HVPtyfwKe@google.com>
+ <CALzav=dz8rSK6bs8pJ9Vv02Z7aWO+yZ5jAA8+nmLAtJe3SMAsA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALzav=dz8rSK6bs8pJ9Vv02Z7aWO+yZ5jAA8+nmLAtJe3SMAsA@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 8, 2022, at 2:05 PM, Vishal Annapurve wrote:
-> This series implements selftests targeting the feature floated by Chao
-> via:
-> https://lore.kernel.org/linux-mm/20220310140911.50924-1-chao.p.peng@linux.intel.com/
->
-> Below changes aim to test the fd based approach for guest private memory
-> in context of normal (non-confidential) VMs executing on non-confidential
-> platforms.
->
-> Confidential platforms along with the confidentiality aware software
-> stack support a notion of private/shared accesses from the confidential
-> VMs.
-> Generally, a bit in the GPA conveys the shared/private-ness of the
-> access. Non-confidential platforms don't have a notion of private or
-> shared accesses from the guest VMs. To support this notion,
-> KVM_HC_MAP_GPA_RANGE
-> is modified to allow marking an access from a VM within a GPA range as
-> always shared or private. Any suggestions regarding implementing this ioctl
-> alternatively/cleanly are appreciated.
+On Tue, Apr 12, 2022, David Matlack wrote:
+> On Mon, Apr 11, 2022 at 5:39 PM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Mon, Apr 11, 2022, David Matlack wrote:
+> > >
+> > > One thing that would be helpful is if you can explain in a bit more
+> > > specifically what you'd like to see. Part of the reason why I prefer
+> > > to sequence your proposal after eager page splitting is that I do not
+> > > fully understand what you're proposing, and how complex it would be.
+> > > e.g. Forking FNAME(fetch), FNAME(page_fault), and kvm_mmu_get_page()
+> > > for nested MMUs does not sound like less churn.
+> >
+> > Oh, it's most definitely not less code, and probably more churn.  But, it's churn
+> > that pushes us in a more favorable direction and that is desirable long term.  I
+> > don't mind churning code, but I want the churn to make future life easier, not
+> > harder.  Details below.
+> 
+> Of course. Let's make sure we're on the same page about what churn
+> introduced by this series will make future life harder that we hope to
+> avoid. If I understand you correctly, it's the following 2 changes:
+> 
+>  (a.) Using separate functions to allocate SPs and initialize SPs.
+>  (b.) Separating kvm_mmu_find_shadow_page() from __kvm_mmu_find_shadow_page().
+> 
+> (a.) stems from the fact that SP allocation during eager page
+> splitting is made directly rather than through kvm_mmu_memory_caches,
+> which was what you pushed for in the TDP MMU implementation. We could
+> instead use kvm_mmu_memory_caches for the shadow MMU eager page
 
-This is fantastic.  I do think we need to decide how this should work in general.  We have a few platforms with somewhat different properties:
+...
 
-TDX: The guest decides, per memory access (using a GPA bit), whether an access is private or shared.  In principle, the same address could be *both* and be distinguished by only that bit, and the two addresses would refer to different pages.
+> So even if we did everything you proposed (which seems like an awful
+> lot just to avoid __kvm_mmu_find_shadow_page()), there's a chance we
+> would still end up with the exact same code. i.e.
+> kvm_mmu_nested_tdp_find_sp() would be implemented by calling
+> __kvm_mmu_find_shadow_page(), because it would be a waste to
+> re-implement an almost identical function?
 
-SEV: The guest decides, per memory access (using a GPA bit), whether an access is private or shared.  At any given time, a physical address (with that bit masked off) can be private, shared, or invalid, but it can't be valid as private and shared at the same time.
+I went far enough down this path to know that my idea isn't completely awful,
+and wouldn't actually need to fork FNAME(page_fault) at this time, but sadly I
+still dislike the end result.
 
-pKVM (currently, as I understand it): the guest decides by hypercall, in advance of an access, which addresses are private and which are shared.
+Your assessment that the we'd still end up with very similar (if not quite exact)
+code is spot on.  Ditto for your other assertion in (a) about using the caches.
 
-This series, if I understood it correctly, is like TDX except with no hardware security.
+My vote for this series is to go the cache route, e.g. wrap kvm_mmu_memory_caches
+in a struct and pass that into kvm_mmu_get_page().  I still think it was the right
+call to ignore the caches for the TDP MMU, it gives the TDP MMU more flexibility
+and it was trivial to bypass the caches since the TDP MMU was doing its own thing
+anyways.
 
-Sean or Chao, do you have a clear sense of whether the current fd-based private memory proposal can cleanly support SEV and pKVM?  What, if anything, needs to be done on the API side to get that working well?  I don't think we need to support SEV or pKVM right away to get this merged, but I do think we should understand how the API can map to them.
+But for the shadow MMU, IMO the cons outweigh the pros.  E.g. in addition to
+ending up with two similar but subtly different "get page" flows, passing around
+"struct kvm_mmu_page **spp" is a bit unpleasant.  Ditto for having a partially
+initialized kvm_mmu_page.  The split code also ends up in a wierd state where it
+uses the caches for the pte_list, but not the other allocations.
+
+There will be one wart due to unsync pages needing @vcpu, but we can pass in NULL
+for the split case and assert that @vcpu is non-null since all of the children
+should be direct.
+
+		if (sp->unsync) {
+			if (WARN_ON_ONCE(!vcpu)) {
+				kvm_mmu_prepare_zap_page(kvm, sp,
+							 &invalid_list);
+				continue;
+			}
+
+			/*
+			 * The page is good, but is stale.  kvm_sync_page does
+			 * get the latest guest state, but (unlike mmu_unsync_children)
+			 * it doesn't write-protect the page or mark it synchronized!
+			 * This way the validity of the mapping is ensured, but the
+			 * overhead of write protection is not incurred until the
+			 * guest invalidates the TLB mapping.  This allows multiple
+			 * SPs for a single gfn to be unsync.
+			 *
+			 * If the sync fails, the page is zapped.  If so, break
+			 * in order to rebuild it.
+			 */
+			if (!kvm_sync_page(vcpu, sp, &invalid_list))
+				break;
+
+			WARN_ON(!list_empty(&invalid_list));
+			kvm_flush_remote_tlbs(kvm);
+		}
