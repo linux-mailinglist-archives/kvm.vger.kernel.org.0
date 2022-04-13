@@ -2,166 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B69A64FF5F2
-	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 13:42:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A6514FF610
+	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 13:51:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235244AbiDMLn0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Apr 2022 07:43:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40582 "EHLO
+        id S235311AbiDMLxJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Apr 2022 07:53:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235260AbiDMLnY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Apr 2022 07:43:24 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2083.outbound.protection.outlook.com [40.107.220.83])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BD035B3F2;
-        Wed, 13 Apr 2022 04:41:03 -0700 (PDT)
+        with ESMTP id S235366AbiDMLxE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Apr 2022 07:53:04 -0400
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2071.outbound.protection.outlook.com [40.107.22.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AB845C64A
+        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 04:50:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gsPvlcC+5j8l4rziRCNJ6nlY+Gmc3h5xVytnWj7szJI=;
+ b=xN0v1vFzIv3fJOAVQPbKocLFgkoAdGftctgiYl+N9XHI6HxJHT9MSzy+mT1MF2jR7jdvR8SnQRe2+JeCIg8kZOOxDLrfNjd/hLJvYVd6iQQOYCbnezG6qqAd5QverOzOM2fH0i6VY0KY9d91NK010DOvX9Lzhjk2A3PTXhxCiOE=
+Received: from DB6PR0601CA0019.eurprd06.prod.outlook.com (2603:10a6:4:7b::29)
+ by DB9PR08MB7083.eurprd08.prod.outlook.com (2603:10a6:10:2c3::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5144.29; Wed, 13 Apr
+ 2022 11:50:39 +0000
+Received: from DB5EUR03FT052.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:4:7b:cafe::f7) by DB6PR0601CA0019.outlook.office365.com
+ (2603:10a6:4:7b::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.18 via Frontend
+ Transport; Wed, 13 Apr 2022 11:50:39 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
+ client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
+Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
+ DB5EUR03FT052.mail.protection.outlook.com (10.152.21.82) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5164.19 via Frontend Transport; Wed, 13 Apr 2022 11:50:39 +0000
+Received: ("Tessian outbound ac9bb5dd84f6:v118"); Wed, 13 Apr 2022 11:50:39 +0000
+X-CheckRecipientChecked: true
+X-CR-MTA-CID: 48fd30e4f71945dc
+X-CR-MTA-TID: 64aa7808
+Received: from 70047b4ffa55.1
+        by 64aa7808-outbound-1.mta.getcheckrecipient.com id 6AA30E2C-1C0A-42F7-8A6A-ECCBAA7281A4.1;
+        Wed, 13 Apr 2022 11:50:32 +0000
+Received: from EUR02-HE1-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 70047b4ffa55.1
+    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+    Wed, 13 Apr 2022 11:50:32 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KZ0ORsRjaa6fMTLIu8/VcqC0X9TFvYMaDQIogOhcNv7sdwZQjYVYRzhyJ4UnegARTDtU5MB6OqCbrwL8FzSDUvnYxaSpVaUlS4B2zMym5t3xVdaafxfPuHTD+W8o4aIfJoUDac/hxgP3LTEJnJvkK8IL/yFdzMz82msJW/DfL21KtVY/hy/dqI5FljA4zem6KLJnnfaG2/FbpkNGMkwoi2y4yS7TUFJwyC2GqDkZSHX0LiCBTouPR3cv0BYzoRU+sUZaYju8raGiPG5WUF+X3VkvqRUijpTLgcObjlIJyANx6Zl9R27qRYOv13QCcaczlc432aJYBthCbGMjPqoncQ==
+ b=m+5/KYTLh8npKvKBQC79yRKANhXys3kEYHmA0fWb6AakvWFV8oU16dBIi5HUGUg1NMhYUg+DNYf8Hq7DVHpG7zNKFNANE/V6gMloL5kmvnclqcqWFffOzF2uf004BNkNb9V7ie/kM+RoZRInylGAUwuTxznYQrP6g95t10W13/7UCox7RH0wtU/beViVO6XIrRJW9ThUaZNcOh02jokPA99y3ToqV9E3jn8if0rmoN9nmdpk9NLWYdPo/HhmZvRfa0r0KEfBR/0vO7iFtdfUIm/CcX2dcMg7k/pMCNKOYf+RxW2oWPt0tF+lkhwbs6uotH58UvWQKCd+9QQqIayo2g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hJNbQ28sPo5tjisOrmTEa3+wkmoFQnhGLIkvObyIGjU=;
- b=aV+95oUmEH3ZQTI8yz0fvlnNvpPapJp+qQLNY017d7+nGlunXvqwawqqLzY+BOfJ1f/3DQxsJkVwB6A+Qizo4jYuUG9YsszlExvo2U4S3VZ0b21HzmAaPDLqccATH0XqgSfUs2uL78ZVLMR5vjkOSwzL1xVb36VgpBdRupLoaqVALQtP7wkUEjcBatEi19qzpDQSmdNM7NQjppESieo+SvKxCud+TqavfSPqGnDxkbjDEvuKUvDeLe/SsHkWBnfwVRA2uoRZ3KP9Aee1u+T+PrYRfeECcfqIaokDEYDBWFYrogptajAv4CvXzzoq27yzWfoKlutzUyeZxKixBPHtfw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=gsPvlcC+5j8l4rziRCNJ6nlY+Gmc3h5xVytnWj7szJI=;
+ b=gUys7YnGu3SG7DQFLSD2I8Pne5bBJuMYErCOu/vZdKJRf4eM2rsQUES3nBRnPMgRP4tTOrBzpfaeRNjHEYjIa68svfN3ekyxwd2zIH6Std4caSsnuEH5F7I7UsEYdeUxuqbn7JVGsYMxu8GMZ+9f3gvrTb8iz0P6gC+xqPBot1SJXR+bOI7+uqV7rKDOG9J3yGbttSd3dhdVcZ700qZAuQzsFUrtuAMzNi96aKZ3QteY1YSoZPE7JOy5d2GnAZqP0W0o1Xa7Fs5rMpkK79lklKQxE6J9h/RAqwk49VlAAOW4TQGszHSIWQu14j3/UpbrSFkMLQivP3HWJexClBxXmQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 40.67.248.234) smtp.rcpttodomain=kernel.org smtp.mailfrom=arm.com; dmarc=pass
+ (p=none sp=none pct=100) action=none header.from=arm.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hJNbQ28sPo5tjisOrmTEa3+wkmoFQnhGLIkvObyIGjU=;
- b=eob2hbWcdbuWFxvnaiMriQxuoE0KlPZsP3WPpYikRdGse/4J/MlnMM8DUgTz8Sk24afS1Z08ureI+/gEZvLC8xkDQ90Yf2o+fKr3VsuhKFoe2Rv2J704P7f3YgLbHanplEuV16/2O1WR1huOrct7ceyBbOA9hi4wDmlaahVn1+FUpuCfx5GMuWsZ5AIJGib0eBY4XrkZT//GNmIIs2GOc1otIG7wqcol2n2ChzV9MILT3Ocqq7may8afiN7REymeYsm6kWaQ9C5vwWc7IlPc6Kqz6jGrn0St9Bmg+pXG0OebzymZJGcv3KdihV9MosV4eA8r0uzGI24J1m9aM3ox/g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by BN6PR12MB1666.namprd12.prod.outlook.com (2603:10b6:405:3::13) with
- Microsoft SMTP Server (version=TLS1_2,
+ bh=gsPvlcC+5j8l4rziRCNJ6nlY+Gmc3h5xVytnWj7szJI=;
+ b=xN0v1vFzIv3fJOAVQPbKocLFgkoAdGftctgiYl+N9XHI6HxJHT9MSzy+mT1MF2jR7jdvR8SnQRe2+JeCIg8kZOOxDLrfNjd/hLJvYVd6iQQOYCbnezG6qqAd5QverOzOM2fH0i6VY0KY9d91NK010DOvX9Lzhjk2A3PTXhxCiOE=
+Received: from AS9PR0301CA0027.eurprd03.prod.outlook.com
+ (2603:10a6:20b:468::14) by AM6PR08MB4551.eurprd08.prod.outlook.com
+ (2603:10a6:20b:70::22) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5144.29; Wed, 13 Apr
- 2022 11:41:00 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2%5]) with mapi id 15.20.5164.018; Wed, 13 Apr 2022
- 11:41:00 +0000
-Date:   Wed, 13 Apr 2022 08:40:59 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [PATCH 3/9] vfio/mdev: Pass in a struct vfio_device * to
- vfio_pin/unpin_pages()
-Message-ID: <20220413114059.GO2120790@nvidia.com>
-References: <0-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
- <3-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
- <20220413055717.GC32092@lst.de>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220413055717.GC32092@lst.de>
-X-ClientProxiedBy: BL1PR13CA0107.namprd13.prod.outlook.com
- (2603:10b6:208:2b9::22) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+ 2022 11:50:30 +0000
+Received: from AM5EUR03FT024.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:20b:468:cafe::dc) by AS9PR0301CA0027.outlook.office365.com
+ (2603:10a6:20b:468::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.20 via Frontend
+ Transport; Wed, 13 Apr 2022 11:50:30 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 40.67.248.234)
+ smtp.mailfrom=arm.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 40.67.248.234 as permitted sender) receiver=protection.outlook.com;
+ client-ip=40.67.248.234; helo=nebula.arm.com;
+Received: from nebula.arm.com (40.67.248.234) by
+ AM5EUR03FT024.mail.protection.outlook.com (10.152.16.175) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5164.19 via Frontend Transport; Wed, 13 Apr 2022 11:50:30 +0000
+Received: from AZ-NEU-EX01.Emea.Arm.com (10.251.26.4) by AZ-NEU-EX03.Arm.com
+ (10.251.24.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.2308.27; Wed, 13 Apr
+ 2022 11:50:37 +0000
+Received: from AZ-NEU-EX03.Arm.com (10.251.24.31) by AZ-NEU-EX01.Emea.Arm.com
+ (10.251.26.4) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.27; Wed, 13
+ Apr 2022 11:50:29 +0000
+Received: from e124191.cambridge.arm.com (10.1.197.45) by mail.arm.com
+ (10.251.24.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.27 via Frontend
+ Transport; Wed, 13 Apr 2022 11:50:36 +0000
+Date:   Wed, 13 Apr 2022 12:50:27 +0100
+From:   Joey Gouly <joey.gouly@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+CC:     <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        "Alexandru Elisei" <alexandru.elisei@arm.com>,
+        <kernel-team@android.com>, <nd@arm.com>
+Subject: Re: [PATCH 01/10] arm64: Expand ESR_ELx_WFx_ISS_TI to match its
+ ARMv8.7 definition
+Message-ID: <20220413115027.GB35565@e124191.cambridge.arm.com>
+References: <20220412131303.504690-1-maz@kernel.org>
+ <20220412131303.504690-2-maz@kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fd4915c8-78e0-4961-ccb0-08da1d427b8c
-X-MS-TrafficTypeDiagnostic: BN6PR12MB1666:EE_
-X-Microsoft-Antispam-PRVS: <BN6PR12MB166663BC603CA5EBB13E30ADC2EC9@BN6PR12MB1666.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20220412131303.504690-2-maz@kernel.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-EOPAttributedMessage: 1
+X-MS-Office365-Filtering-Correlation-Id: 589dfa75-448b-4d12-977e-08da1d43d4a2
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4551:EE_|DB5EUR03FT052:EE_|DB9PR08MB7083:EE_
+X-Microsoft-Antispam-PRVS: <DB9PR08MB7083E7CAF8F66E196933C3F094EC9@DB9PR08MB7083.eurprd08.prod.outlook.com>
+x-checkrecipientrouted: true
+NoDisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original: jMD7gmcenaBQdoa+1xXSa0oo5iKb5xgv/air2cmJPKe3j+kt7GNcEKYhuhzhyIm2HuYdD650JJRqbsCyQ38oUUD1GDknY2eVtaKAzl5+LBscoobpWpFwUe1KuDRLj82COFd36u9bwPoXpC4jLdSf6n5o4QJv3K8/FruVpI8uSjES3dqE4PPSINGcfHhQ0sGfRgZm12t3O0K6eHflw1hvSJMpWlZK6nKDnnTPB/jj33nAHU/FgN7G6quKNVkLHkNIyc2VOiYAc6E60I/Oi3GyOmJ2m2yx0bnV1JAvThhkOkNHg9BizAUBwDObr7bNiABb79wZOR8E/xTfM2i7JbOQXLRatlrS8qkBX1u3KqaQqNbcNa0sitbBuSCM2CRTtBq/gKYAgcDW6Oi4Pkmpnbdwk4BtGaFXEujVsdnBo0G07B8EVQWFtfvX+MtKtEg60xY0EMahtFI9B/A+a6bQOsdIpNVAL3AJmiH7png3KY2gh5s2KAuj63LTfLeiI+sWyCOHu+roSq0z8y7Ey8ilFHBIncEfSoMxi559cOGc1t5MxFEajwyH12hndjmKPMMJk6AM98cEiyZUOiTEGs/lyH4OVW1ztETqDPcleDv+WmNEBNcWerSSD/+YAI+CUI9v14IO+puwhlDsue27WkPKFlVNn9JDywZdaIArGVOq7mnRgwLduqAueyt8Hih1g7ewPk71MMay8pXZGOzBQicYrapYKQ==
+X-Forefront-Antispam-Report-Untrusted: CIP:40.67.248.234;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:nebula.arm.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(40470700004)(46966006)(36840700001)(4326008)(7696005)(356005)(83380400001)(55016003)(33656002)(316002)(44832011)(81166007)(54906003)(6916009)(40460700003)(8936002)(5660300002)(508600001)(36860700001)(8676002)(70206006)(70586007)(2906002)(82310400005)(336012)(26005)(186003)(6666004)(426003)(1076003)(47076005)(86362001)(36900700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4551
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: DB5EUR03FT052.eop-EUR03.prod.protection.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs: 627f030b-bd77-441c-a717-08da1d43cf51
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1mTwHARH1FcqoyPbiMdLQpvPGLH9suHi0Eo1zqXHhz+UDNkTEXKEgN3XlllHvgJCFQQoG+TVeZgZDzIBAeQ0ZFJKRG3TpCEMIRASwqyJhh+PKOd/cG1BZaaCfjuhIsoq/DDjksX1xPjA8VzfvoSlT/XNTdAAJ0n5n0WKu6dDg5OuWWs6S3zwn4qhgP7TuxoQ7qq53laq2pgaLLpC8pyCZY1/E8sB0K4aP++tDhlHJkLwnykVCK23QaqpM7sShBym++Lyj2O/sQPJN2Tz7JmfTHdmtRNvLROGcYowbrVXTrvudbqXW0DWh/K3XPp+MEMIY3KnvZK1058Uq5BPVJgfhIj3STRRcekI0vnDOgUqIdB+AGIejAD+UV4QBl69SqgLOeb194pb6TYXUS8ukaFTocKOs5fa48f7bBmj0EweNL5kuvnC45z9QmLo5LRUEECulRCY8Y0l4m9RFcpZe59KuZAGK/zqHIRsntvCv+6hjsYPERQR2mtN9wx3O9M+cRfBhCTK19zbRMzoIJ9yEYbqOo6oAP1q4+IpBU96dSGId4DkrgYca2tOPeOcx8mkh7u7RoeBDw2oeZskaOmdJTzzH+Ns2EIbP+MUXWoc8row9wr2nvZi+x/pC/JNg4EXbAAJWwKVUM8ZodKKfIoO7yofuQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(2906002)(86362001)(38100700002)(6486002)(66946007)(66556008)(5660300002)(8936002)(6506007)(7406005)(4744005)(33656002)(36756003)(186003)(508600001)(6512007)(1076003)(7416002)(26005)(316002)(6916009)(66476007)(54906003)(2616005)(8676002)(4326008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qCrBGUVazHAlmighQteay7YCew6U+dVtgr90ig3SuZ2sOZ30AMRgsgHK29H1?=
- =?us-ascii?Q?QqYJMfw+Hn0RZtpeCX1eHmPLnOIsziZg+jYaSWQaj8W3qYuJrkYQpybm5jJX?=
- =?us-ascii?Q?uO8AMI2VCAUi2aQistm8biBxW+FLClFGXJae313oEf2HU9ZeToT7e//puL7G?=
- =?us-ascii?Q?mwDe1QcQf06d94eMqT75fWG2HS4Ys1b52vaEfiEvtXYrO11teWo8SMWeHWP7?=
- =?us-ascii?Q?mkwc0ixCCW4+BaqpTCFLvZAO+da01XTTah7gVkkGq75bAbzueQWJtwbl5oLO?=
- =?us-ascii?Q?NWlYrDY0CCPbu1HLb+MUlmSL4aRsnssOpdhLT0YUc0xxzVye0/3phm3xA/ZK?=
- =?us-ascii?Q?X9U0/XiR+zuE5/71pNdmRlg6xjmmfT5U7grVk8PHq1rLlBX95l4I7WHBq3Cg?=
- =?us-ascii?Q?DUnMBo2qbqTuHTwxFI+q14NBVr3QHCrDlYmK3KzGCIlwk4M+4KM5QcdawHZn?=
- =?us-ascii?Q?F1QhRTS0e5uQZyZFHayx4VI1xgMB8uoP883/VcKVeoT4ABP+x+EWzqB91zKK?=
- =?us-ascii?Q?qJ4zz7dFHaPIiJ3bsHaVXiZ3z8nTuE0XHafvLJVVqz/Mfo01ks3dUKEleH3b?=
- =?us-ascii?Q?CdTgli170o1yXfPGOmhu+yPP1Rknw40MUA6qRpmZtTDq2u+gx4+RAPEZNQpg?=
- =?us-ascii?Q?7GsimNmsTykx74ONzwdzgMqRWh3nhOictctoOrSmMSbxwZOGtQUnlX6xvvHV?=
- =?us-ascii?Q?BszTMBj3Ug6fEL+1pXfmKLfKQdxCjl/ueQ7fPlolMdBw+OngTUhu8cEgz2bK?=
- =?us-ascii?Q?pNwbXWrwKUYkiRSxZfVacAo2rtUmYyENa0eHTwdE0bFL2eIPG/8VnWh1917k?=
- =?us-ascii?Q?EDtyfbgBLdEVHiFXOspaiPqkyPJdE8Ce0ZPj27I4FjEGETKCD6SVaXq2qDNp?=
- =?us-ascii?Q?/005IVplwaP1QQVf82f23YoTgZs16cWjnPnLnav+T9bx0bDahzRfotCqFQDq?=
- =?us-ascii?Q?0iE9LTLchxIEzeJwWMUYnRlY+HooDf9b25rmHSxXUagdGulaQCkF1MqWxr5n?=
- =?us-ascii?Q?XcxYZsYrBnrQdz+z1gsTWtUCm2eQ09zcDNCJpRsb0qDNe/8AUzSQaU53kmop?=
- =?us-ascii?Q?qCTK9qCx1dDDJHZsBT9Nc1KrsSMlIpt0wcqbCFHAaGMNR0BMleMA324BexcT?=
- =?us-ascii?Q?D73so2YNVZS1s9kS4qFU+ja1DoWMazNQfCN+kh9hYWRbZc30q6iWYI+zJu8D?=
- =?us-ascii?Q?Lp9AyxhSwCkkpBRWoDCjVdcMt4xzc7ZZUGze/JwSjw06Z0onGi28k+NP6rw1?=
- =?us-ascii?Q?KMAIttubwuct4yM7M/+sgrSQ8jNUhhwnoRCI6zLmLygNAZHjGZdsiU1nvsxs?=
- =?us-ascii?Q?KY7V7sXE0EVbh7X4tE3N8HEYhf/xlUEU/zhmscuugaTBPAWg8MYRQNFWd5mM?=
- =?us-ascii?Q?K+g4T+eZy4zD2yX9TaVKZOqvxyvadFOxMpSHFjABHKaIawJuTRpKoEeee0z2?=
- =?us-ascii?Q?2f1MY77n+mNAiVpY1TiAy4MA1dxGcoV9Dg5D7gfgle61LZ56Jf87PcRA01b5?=
- =?us-ascii?Q?eqk1hLWKPAyLsLdMBijsEFXr1dqCkFzGm8uUnp9IzQETEtCjlsGNLWcOLns1?=
- =?us-ascii?Q?fL4zOQAf19pmRRQdgAB6hVWxz4lQ8sv/TwEspdVAn0ELNFS7VaG8KL/QHrWs?=
- =?us-ascii?Q?ULf8Y0tSYlRItkuC2stsruKn6JXukQOmpF2+lj8ro7BnXOUGuSLnGvb/GXiW?=
- =?us-ascii?Q?yT3oS3gA5p42y8omef/LSqd0u1A5omJaBk1lYLEcfOYFGTJqpU+/AtL98Oc9?=
- =?us-ascii?Q?iE3JeFGvIw=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd4915c8-78e0-4961-ccb0-08da1d427b8c
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Apr 2022 11:41:00.6093
+X-Microsoft-Antispam-Message-Info: rGjJk+EK295HYLVo/ekxPv291m+CdD7eRy+JqSjuc9QRFHujsZL0nRiEGKQd3LznM+vDq7hNToOnEdrz4+Dli6ioSkEf+jO6m9RFnvwHtkeNUfmABUIdTMldxW9c4ZSFwrGaJyd5jUiZjI8BO07M8KjWZ5qU996XqwXNnXkHb3MJcgrk/kBsSB3WvMB6b/1vafWsbzgxByn1xMq8mdk3Qka3c80lPspU130XC80fI3TCYnn3q1dk8mybrUES3AfsQzj/nKGWEP0r+LzV4nkka3iQqDplGRFMmtQaRLODR2NCW5OJXZTcdxGJnM5A4hcgn+lIj5tIjfFBQVVitVPvNLfX4Kw1hE8EDTg/JHhzRII0ew/aA008PQnzKPmxOJpoLhrsd661ZTyDTwGd0XTcWnTQW2JmHs53aJmyvbHCOH6IP8wNaWNQK1OV6Y590EDyOUWyu2O9KYmg427edyL9PpxZWmiJ1YsbCcbu5pAkFWRDeJkPc9+gmUQaWmSa1Un2L97v9erGJ1FMm73qtKg35jICu5pgb5wZfHalBY+GkoWLAOkPAzJMop/gKAmImYrEUgXMAAoH2HN4A8u6PDA/bOHgRpcMZGLk7r2GcNmqc/umF8sAv9Qa24BJ8+IqDLnJaPL/DNSa0Ss4HegVu0hJ7s2YEc0CVkDxbgjXlssfr5O+GfuUgYKyOHvnszNLWwBM
+X-Forefront-Antispam-Report: CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(40470700004)(46966006)(33656002)(83380400001)(508600001)(86362001)(47076005)(186003)(36860700001)(6666004)(26005)(54906003)(4326008)(70206006)(7696005)(1076003)(426003)(336012)(8676002)(6862004)(55016003)(44832011)(5660300002)(70586007)(82310400005)(40460700003)(8936002)(2906002)(81166007)(316002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Apr 2022 11:50:39.3786
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: avvVGuIiEW285FmYc2o20KQoBrtqca0coXOWxiqeXOjKIRmQCw8UXaQCoAxwqXSN
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR12MB1666
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 589dfa75-448b-4d12-977e-08da1d43d4a2
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
+X-MS-Exchange-CrossTenant-AuthSource: DB5EUR03FT052.eop-EUR03.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR08MB7083
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 13, 2022 at 07:57:17AM +0200, Christoph Hellwig wrote:
-> > -	extern int vfio_pin_pages(struct device *dev, unsigned long *user_pfn,
-> > +	extern int vfio_pin_pages(struct vfio_device *vdev, unsigned long *user_pfn,
-> >  				  int npage, int prot, unsigned long *phys_pfn);
-> >  
-> > -	extern int vfio_unpin_pages(struct device *dev, unsigned long *user_pfn,
-> > +	extern int vfio_unpin_pages(struct vfio_device *vdev, unsigned long *user_pfn,
+On Tue, Apr 12, 2022 at 02:12:54PM +0100, Marc Zyngier wrote:
+> Starting with FEAT_WFXT in ARMv8.7, the TI field in the ISS
+> that is reported on a WFx trap is expanded by one bit to
+> allow the description of WFET and WFIT.
 > 
-> Please drop the externs when you touch this (also for the actual
-> header).
+> Special care is taken to exclude the WFxT bit from the mask
+> used to match WFI so that it also matches WFIT when trapped from
+> EL0.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/esr.h | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+> index d52a0b269ee8..65c2201b11b2 100644
+> --- a/arch/arm64/include/asm/esr.h
+> +++ b/arch/arm64/include/asm/esr.h
+> @@ -133,7 +133,8 @@
+>  #define ESR_ELx_CV		(UL(1) << 24)
+>  #define ESR_ELx_COND_SHIFT	(20)
+>  #define ESR_ELx_COND_MASK	(UL(0xF) << ESR_ELx_COND_SHIFT)
+> -#define ESR_ELx_WFx_ISS_TI	(UL(1) << 0)
+> +#define ESR_ELx_WFx_ISS_TI	(UL(3) << 0)
+> +#define ESR_ELx_WFx_ISS_WFxT	(UL(2) << 0)
+>  #define ESR_ELx_WFx_ISS_WFI	(UL(0) << 0)
+>  #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
+>  #define ESR_ELx_xVC_IMM_MASK	((1UL << 16) - 1)
+> @@ -146,7 +147,8 @@
+>  #define DISR_EL1_ESR_MASK	(ESR_ELx_AET | ESR_ELx_EA | ESR_ELx_FSC)
+>  
+>  /* ESR value templates for specific events */
+> -#define ESR_ELx_WFx_MASK	(ESR_ELx_EC_MASK | ESR_ELx_WFx_ISS_TI)
+> +#define ESR_ELx_WFx_MASK	(ESR_ELx_EC_MASK |			\
+> +				 (ESR_ELx_WFx_ISS_TI & ~ESR_ELx_WFx_ISS_WFxT))
+>  #define ESR_ELx_WFx_WFI_VAL	((ESR_ELx_EC_WFx << ESR_ELx_EC_SHIFT) |	\
+>  				 ESR_ELx_WFx_ISS_WFI)
+>  
 
-Alex has been asking to keep them in the H files for consistency
-
-Removing from the docs should be fine though
-
-Thanks,
-Jason
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
