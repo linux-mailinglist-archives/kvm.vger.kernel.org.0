@@ -2,108 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 865BB4FF5CD
-	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 13:37:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 91AF84FF5DE
+	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 13:40:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229667AbiDMLkB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Apr 2022 07:40:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36132 "EHLO
+        id S232877AbiDMLmS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Apr 2022 07:42:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232266AbiDMLkA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Apr 2022 07:40:00 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B9CA5677F
-        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 04:37:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649849860; x=1681385860;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=/ag9oz6OrTFhgh1L3jctSIOPjT1GAUan2yOt1VeoaJc=;
-  b=T853EL1MbOrHzuGVP209YQlAcAUkiiMxKnnEiWkQC5HJbBtUWEedWYzE
-   guAzX80yacTtODX4zoPnDSa6eUYhuP4mLaTu0H7qNKf1owW1eUENyxvFA
-   0jmpDyyJeLBZEVkDTu/tiOb1m/Wli2LaXzoSkqGMD2nkTvhbHaUyLB4qk
-   GGyR8kLAO2LI67FUo1cvHHoIQVJDLZHMOdDGRsCvC0bOyVmIVqWr7Jt2b
-   TZ+0ZNK+pL2zgFv4g/Z3iL26slqudtCNqFaN3j7TDs2tV3zIr6Rz9UsvM
-   jCX5k2cLpRJaFEj9wK29CBoj2Cb/EBkBFSnhscCOZLuyDAk4UMn7StWVS
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10315"; a="244528480"
-X-IronPort-AV: E=Sophos;i="5.90,256,1643702400"; 
-   d="scan'208";a="244528480"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2022 04:37:39 -0700
-X-IronPort-AV: E=Sophos;i="5.90,256,1643702400"; 
-   d="scan'208";a="573232232"
-Received: from blu2-mobl3.ccr.corp.intel.com (HELO [10.254.215.67]) ([10.254.215.67])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2022 04:37:36 -0700
-Message-ID: <de2c7dff-0591-aab0-79cb-9858b978c3fa@linux.intel.com>
-Date:   Wed, 13 Apr 2022 19:37:34 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Cc:     baolu.lu@linux.intel.com,
+        with ESMTP id S229971AbiDMLmQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Apr 2022 07:42:16 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2046.outbound.protection.outlook.com [40.107.93.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EC751F9;
+        Wed, 13 Apr 2022 04:39:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=e3HZ6bOBIaUZ2w8ponh8vfOdkbkf2xvAXqpSigBYQ+wdTpc4W7ZRnCaq472l7A9KGRxBuj3uTa1jrtJRVq8YPtZ6+wyOo3a/oK3LbsmnpBoDWl/MAE8ckWVLy9ZzkciD+qL8dbkjFePR4KMV0J5Ljbla+drB3DlGQ6xCcUmGjbvtc/xc1490BJ7Mt6L3C7jcbPThplt7XAm3iNfY8cRcgi/cDk2lZKnbXU01J0Dlxf2Iq0RJIul6zQ04+TwDPasLRCPSkgeQ2R4iscj3hkSJMd3zegNRCEK4WcUexEWksgoObMHKUmNTlffgO8z0AibRIigiZxeH2fiC60upnwQp9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=H5Q0j+aLiqhDmQaXXvceM/RAGyCvT1VUIwSoSQqtz3A=;
+ b=BkB2uLr9nfxUyChgqIjYIShp74+JcvPUV1LlAPjtmeFkI12o0AOd1BiJWyW7Oj2IuptP7aJrkhppF6rbzPWBv2UJ9VwbMlXxWAYKtCudii7p+2wFmsKYW5i2oLirZKPqF8e6cPBwOFXs6VJFOA4Px6Ax28QDsxCxpO+VRRC7GW57mZuxW2tzUWZIZxw4JV10rjLba3MllwbataH5N/SoV0eb1LD5/hwlIQ8yqKUI+OeuDx83hKUBVMJI8acUZWgG9IBc9HGpHhYJRn1haZkBnMGj+JmCWskPpozgPHZCauEjnb6c/qqH1soe+sW5A9X5zDiZ/GOzg2dwLqDcRSITLQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H5Q0j+aLiqhDmQaXXvceM/RAGyCvT1VUIwSoSQqtz3A=;
+ b=XRy9XZ9bHiJCp+ByDmrt7PV4ysdTgvSRkO+1nNQMFpH4pBkbHY86DCqq1wxWZS4mgYBSGZqTU+fA+EUR9wFS3pC0H/R5DXs15rZfB8meN+iTXmMwI4g05FITV3uo5vOIBQ/wiZwLemm5zl755EsFM3MH6QDwuzwdFCGxfkDIIB3Zi8II7+ssBMICawHgCjzDN1c6Sg9ZpKRXCy/w4NivIxwdrLGnE5wic7pNc8uIrNYicEoEe99p3ciBwX0QwW8+VmT+HrFmtcnqCqSxMtGoua/3oR3huncjLuW7KisWt5PlYm4TkvtlGTQY4HorbmjaLm5k0TWjmKoFhsYljXbnQw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by BN9PR12MB5148.namprd12.prod.outlook.com (2603:10b6:408:119::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5144.29; Wed, 13 Apr
+ 2022 11:39:54 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2%5]) with mapi id 15.20.5164.018; Wed, 13 Apr 2022
+ 11:39:54 +0000
+Date:   Wed, 13 Apr 2022 08:39:52 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
         Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
-        Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH v2 2/4] vfio: Move the Intel no-snoop control off of
- IOMMU_CACHE
-Content-Language: en-US
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-References: <0-v2-f090ae795824+6ad-intel_no_snoop_jgg@nvidia.com>
- <2-v2-f090ae795824+6ad-intel_no_snoop_jgg@nvidia.com>
- <BN9PR11MB5276796235136C1E6C50A5AF8CE99@BN9PR11MB5276.namprd11.prod.outlook.com>
- <8df77a0f-55ee-bbc3-8ada-ab109d9323eb@linux.intel.com>
- <BN9PR11MB5276FD53286C0181B4987C958CED9@BN9PR11MB5276.namprd11.prod.outlook.com>
- <a3b9d7f0-b7b9-ffdf-90c3-b216e1e19b35@linux.intel.com>
- <20220412132059.GG2120790@nvidia.com>
- <BN9PR11MB527667C637E3CFDDB611697E8CED9@BN9PR11MB5276.namprd11.prod.outlook.com>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-In-Reply-To: <BN9PR11MB527667C637E3CFDDB611697E8CED9@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH 1/9] vfio: Make vfio_(un)register_notifier accept a
+ vfio_device
+Message-ID: <20220413113952.GN2120790@nvidia.com>
+References: <0-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
+ <1-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
+ <20220413055524.GB32092@lst.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220413055524.GB32092@lst.de>
+X-ClientProxiedBy: MN2PR15CA0046.namprd15.prod.outlook.com
+ (2603:10b6:208:237::15) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 79ccda88-a36d-4160-d828-08da1d4253c9
+X-MS-TrafficTypeDiagnostic: BN9PR12MB5148:EE_
+X-Microsoft-Antispam-PRVS: <BN9PR12MB51488E8AF3DC57F08C08D233C2EC9@BN9PR12MB5148.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: R4hXUUIy9ivPSNdkhYqFxRtLGDwVlhn/ugh0DrgItmVLDmfm+Kd2pFQ59nZBv8ZiRq1JIF/Sb2FO++40GcijNl2x5dqAU/MDXgcu9cceMOw0DNui2EoGhi2i73i5qhPniqBPHjV/fcSDJaF3re9vgz25QxDukZC7K/IRwJHAh9PhFLnsdC/P1L7CUb/hdQSkU7IccPg3gu0C0FF3QwtHQ83kVUqE6RyjdkwCYWvODC6JKNRPw0zAHMXSD5uYP/5Y5QLPNJhCHWFCeeoJTVfNuX2z6kZ8C1XNMhj0u33Z+nsS/UA67oQSdoWWkKbYHAnBSlKTH+upJpBEz14Xu7G29a0+TztdM8VuxzRdoS3Hvte+ZE9xMc1HM9eAPCgqfONbyWZqssFmgNs9ThfHHksa1aK9rUeC5w93T4Nvp6qu9b19S5N8DFjQS+GHQVp/3YvAVLuVNOr/zeuxTiGp8yUpNGvaJhf32k0BxEMAqXyopiFWewBWm2ssTXr4ak9gp6pHXFV7iiaSLh+M3fUlOxfUvjqcnYU2BN0KnAhf5nBitHfIr3a2l8Cuz7hzwumZRO+2bPjlqZOaO58XB/1ZoZi1wj9/8GyNQCI4TPUKV5RnlS/i5x6VadiGevqIqRebX0Neal/qcdz5FVTCQlH7pwYAWA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(66556008)(83380400001)(4326008)(6486002)(66476007)(8676002)(316002)(6916009)(54906003)(1076003)(2616005)(38100700002)(508600001)(66946007)(26005)(86362001)(186003)(6506007)(36756003)(6512007)(5660300002)(4744005)(33656002)(7406005)(7416002)(8936002)(2906002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?+n8UpI0BA7ukBCmVFyWHTpsR35zqWQX8XwU5nxOm34NRoNAqMpDEHu9Sb+bA?=
+ =?us-ascii?Q?kYcOubnSRmMfB7A3xtiiwaS9oVNOGmZoyWzJQBGGDsqE4/lEeB7IwzVKMAnR?=
+ =?us-ascii?Q?BiDeFeEeCs713251F65WHZ5cJxaAH+8xHn4xIoVCEy2fTPzCZ0Z4iE3/rTsw?=
+ =?us-ascii?Q?sv8fLzsYMVngFwDiUUoVksUmbzXBw4h43gBDDzoI8Z3QFDPWLNq9qolyXIUV?=
+ =?us-ascii?Q?GqNJyIxMaOVH8WUWAlU6puW4vQv5nEtXBA+tjm82elXhINJavtr4tyawLMqZ?=
+ =?us-ascii?Q?l0VG0ze64XCoVMDqdb5fbFtdc9P3stVdK0fsuhjhhnM1ci1hdudymdGECn97?=
+ =?us-ascii?Q?rL8nwjI6MTNGZhReF0tSfzqdb1GFawHXwsRC2saf42U9U3CLuxnWiAMtGe5R?=
+ =?us-ascii?Q?y63S6nPdqZ9ickygApGnjvX+2PkFkdy1SUz8NW6gwRe36+7X0tWqvOHwyX9I?=
+ =?us-ascii?Q?3NWtn+csq3exgr6vu6v0NhOAruQwFKapUyKXFDeCu+l6cfGxzbtaX2RY1hvx?=
+ =?us-ascii?Q?aJFHPguBBdynLmCwRchS/t2D85Icxms6folenRG5xfeC/kIjJkGKN1+x2mhU?=
+ =?us-ascii?Q?EbBYw/hQ+NjL9fJYLmXRd2bkYCm/KJqnU0ufc7KyMKY3oCnt66QFYy9IMOQE?=
+ =?us-ascii?Q?jjcV+yonM8Dyk3XoCVxTzzHMxek9gZl9veLzerAzgMBk7ybgz97YQae1oNdQ?=
+ =?us-ascii?Q?Y1/HnNkIgmF8/jtIPi57CQFY7SAC0uMxhOi20LVcIA4EadulyeZXuU/CVAFf?=
+ =?us-ascii?Q?l4CwQdS1EPmGZnmsUgYhyDHoPfgzLGL1kmlHNMHEzfKnadnkGfmxlN+qIYZ9?=
+ =?us-ascii?Q?yVvfYFnQwmVpVmBbVza64DMLTyEnlhhm4m/eT3UNtwLzLx6JQGgTX+g7Y+Lp?=
+ =?us-ascii?Q?2poZ9mgGKGZBOD+o0TrsKn7AC+VqZ91ocBTYBGr/KNWN+WyIPXztLW/4exwb?=
+ =?us-ascii?Q?W3g9GtoDLaeQWLQ5yUaFGczaecBmwOvpIp/pc2MwuTN47vi+p67gAxJlbdzN?=
+ =?us-ascii?Q?j/MkumA87r0vJHKR2Qe40eM5JYMYlcfFMeTjqMWrOLeyKcA4+CetFwqlaSqj?=
+ =?us-ascii?Q?7we3pVaauFCXpeSt+fw/cWcu06dqzz5nAu2XWUBtGWep49EA3gtyAHWYYfCe?=
+ =?us-ascii?Q?grTVoMbA0gpMxkqY4f1kPugqXzv2/7dpclbffiBpNOyiBpf0pEhXDEd4s/xN?=
+ =?us-ascii?Q?hcCHbTTobExHlorMfHqPaXVpWTR+Oo/ChJxr4o63QkM0lZrbHIt+G5kfwUAX?=
+ =?us-ascii?Q?zybo9v8WlD2a/ymqF7v4aZXbRBlhkRIcJeTuQeP77aea4g8syDgKiptUe7nJ?=
+ =?us-ascii?Q?qhL4m1j2m6JA+NGkT3+cRrYAL9NtaULjx7fs0k+/p8XTxO91M8x8s/mj9Wcc?=
+ =?us-ascii?Q?BglnudBypUbBuryMXIoiyW+G5sobpQkzB148ecKKx6zqUTwJkVW7h7gu4i6H?=
+ =?us-ascii?Q?htIO2lXfz4ynWsKJeAA6h289cCL32WruWFgupyFogbdtx8zMUI0FznK7xC+e?=
+ =?us-ascii?Q?YFDTBQY2Mq+x+ywP3B/4/faW7gTR78nmi+7KkjpSeh1Pna+FvDHi3yYA3sFo?=
+ =?us-ascii?Q?qI4YGZFSzpRYbEGJopKJ0/HBLPw7kGPjz4LRERPBjymUZkZfw+x2CJ6ZlNZd?=
+ =?us-ascii?Q?aRAve9GPypjxKSyGfV11hNGFQM6il7h8AMJ02Wchcp3GB2IU6tbZxgx+tYWz?=
+ =?us-ascii?Q?Oa7YEmLxQ2rdhWt5fIrPFAb1/n/A4NS0aqzF0NlS8Yx5+fxlZmRzEat9VyiX?=
+ =?us-ascii?Q?LWUi2J2+CQ=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 79ccda88-a36d-4160-d828-08da1d4253c9
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Apr 2022 11:39:53.9786
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: n9wQGQ5qytmzG1MBuQAg7iDfwbe7rVzVDE3HCF1UVPh8rBVDlSdanL2oCvlVuJXE
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5148
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022/4/13 7:04, Tian, Kevin wrote:
->> From: Jason Gunthorpe<jgg@nvidia.com>
->> Sent: Tuesday, April 12, 2022 9:21 PM
->>
->> On Tue, Apr 12, 2022 at 09:13:27PM +0800, Lu Baolu wrote:
->>
->>>>>> btw as discussed in last version it is not necessarily to recalculate
->>>>>> snoop control globally with this new approach. Will follow up to
->>>>>> clean it up after this series is merged.
->>>>> Agreed. But it also requires the enforce_cache_coherency() to be called
->>>>> only after domain being attached to a device just as VFIO is doing.
->>>> that actually makes sense, right? w/o device attached it's pointless to
->>>> call that interface on a domain...
->>> Agreed. Return -EOPNOTSUPP or -EINVAL to tell the caller that this
->>> operation is invalid before any device attachment.
->> That is backwards. enforce_cache_coherency() succeeds on an empty
->> domain and attach of an incompatible device must fail.
-> seems it's just a matter of the default policy on an empty domain. No
-> matter we by default allow enforce_cache_coherency succeed or not
-> the compatibility check against the default policy must be done anyway
-> when attaching a device.
+On Wed, Apr 13, 2022 at 07:55:24AM +0200, Christoph Hellwig wrote:
+> On Tue, Apr 12, 2022 at 12:53:28PM -0300, Jason Gunthorpe wrote:
+> > All callers have a struct vfio_device trivially available, pass it in
+> > directly and avoid calling the expensive vfio_group_get_from_dev().
 > 
-> given most IOMMUs supports force-snooping, allowing it succeed by
-> default certainly makes more sense.
+> Instead of bothering the drivers with the notifiers at all, the two
+> notifier_blocks should move into struct vfio_device, and the
+> vfio_ops should just grow two new dma_unmap and set_kvm methods.
+> 
+> This will isolate the drives from the whole notifiers mess and it's
+> boilerplate code.
 
-Make sense. I will come up with the patches after this series is merged.
+I already looked into that for a while, it is a real mess too because
+of how the notifiers are used by the current drivers, eg gvt assumes
+the notifier is called during its open_device callback to setup its
+kvm.
 
-Best regards,
-baolu
+The unmap is less convoluted and I might still try to do that..
+
+For this series I prefer to leave it alone
+
+Jason
