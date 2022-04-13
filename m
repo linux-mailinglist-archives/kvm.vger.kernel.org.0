@@ -2,65 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E0352500120
-	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 23:24:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B9EF50011C
+	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 23:24:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239029AbiDMVY1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Apr 2022 17:24:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53754 "EHLO
+        id S236060AbiDMVZg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Apr 2022 17:25:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237916AbiDMVYY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Apr 2022 17:24:24 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7696765480
-        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 14:22:01 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id u19so5815415lff.4
-        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 14:22:01 -0700 (PDT)
+        with ESMTP id S236972AbiDMVZf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Apr 2022 17:25:35 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42CE16A077
+        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 14:23:12 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id u7so5783725lfs.8
+        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 14:23:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=x3TRA+tCXTK9mEbYg5Lv9cf1dVXAsaYzfr1HSpri9bo=;
-        b=Gum9AzxCYASIREo20sZ1IQ9O5ZpaxXIIagK7QqxRutdoyqR2BBCY11MUMUMmYjTRj4
-         thx+yErEGSugL1d2ClBHGhxnzg7/ALijZ/gSuI9+QQTv8zTIcghc4vJsgKcb3Qb8AvNc
-         AwMJaS3fnSLd8MCtT0DRrRr3nf5lwqdhTbSpFGAR1JREEGftB2GlpZ3841mZjOwmHjj8
-         AFSrn/QovTMqwKcmMT0JL7VIENFtk1rQmJ9TLXTpeXGyTQevDgSMnDTAtVVkXjlyFumm
-         qpy8bouH2p8PqK8e4t8ZpfdGN4Z3oZJrXF7EpJBQDspbkDLbpxdQ0+iXEP6GTk6+W15g
-         cmUQ==
+        bh=dYAKe9Fpp2p080RFNVrX8nvH48ftci+REg/42hZxgoc=;
+        b=nwDnkOa38P1VoIYbkttIE0rGKyT3F3PN9ICR23k5xZJPv7udw9nzhaXDpU2MeS+Q6R
+         G7n4BMgGJrU+SgepxYg2qU/L3zAcZp/BR8O7GBZue2XuSjQWbNC5WpD71CukDXO7VS47
+         slPyPyCa6ui4Ed2YfQAaCRKSHrWb9O2FF4Ct0wgIMqLCkC9AB0qfeiqL5UIBu1n1nP9g
+         2gQgXKMoBYcAVFhLVRXIM8v4hv/fuIDBB7gKVHnxZOuRPz9Xz7i1RNFgQf2/Y824xVNP
+         WuIhkLkB31k0g5V7iKS+GKCreRt5g5K0vSauR8kYpYufkFG+dbjlKaP/BJLDeM2L0ZIf
+         uBoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=x3TRA+tCXTK9mEbYg5Lv9cf1dVXAsaYzfr1HSpri9bo=;
-        b=w5FxilW3sPr8ZBX4c4BrG0zYLzXIFWQ4TC7Gr3A2Sm3ekHLBj+7TLyGIuZadNFb2JU
-         eL96mef9gP66pZ0f4JFd2wJKTP6CkHwwmre/Lnq9ZAnfpQPg/1DzKiMfhbCLQuM+k2jG
-         qks9L/icycOu/CBzA0YQ57UjDV/lVlXMNMbRSbsLxvPuNCgSS0ZQokxSQFnXNiZfAyFX
-         Y6UP0PqLrgQyc74bxzgIepTs3ri35EROrlj96j0g2Oq7fwk2FJUdHPdw08Weo1BsH0DM
-         +q/BxVpea+BuVMMDdlkNSb8y8giG1sKK46EzIBGOA0pYnJQcIlzg6vBo0hUxw7DuRw06
-         6vaA==
-X-Gm-Message-State: AOAM531G/jzKdQNGW3ZNtRn5PXMiGhappofz45Nt2YXckREqZuJzj+jq
-        lVO+vZtUva2v3ZtbiIT6LjRsfGv923/PPnmWAi00bQ==
-X-Google-Smtp-Source: ABdhPJw+pAmjcokB//78jbBBaBQ/fl9bpcHNKk03eIo8kGG4njNRCrn6YdUqdyKEP+FwwIazpZYKiCMMbKzyt93HPao=
-X-Received: by 2002:ac2:484c:0:b0:46d:28f:cc03 with SMTP id
- 12-20020ac2484c000000b0046d028fcc03mr2989844lfy.235.1649884919479; Wed, 13
- Apr 2022 14:21:59 -0700 (PDT)
+        bh=dYAKe9Fpp2p080RFNVrX8nvH48ftci+REg/42hZxgoc=;
+        b=tsbuGMG+SngOyNwK35ACVES34R06swnGXGcLfwHtqfGM0RPgfy7k1mYLQ+pPHeX+Mg
+         y9pG8Ilj5S1f/om4S0laRgvzU2rHewdFc4EUlXh8dD4XeSmK0T+mAJdxFj0AffJSI64O
+         fzHCUimErBjIHMLw9WFZ4KDZDlplfbNwhEYJyncxmB13eCGRjnrHPO6x8PtMxpUGbkdQ
+         N7mXVBYI4pLV3NeuvP17RMLcrw4Mv4uJudNYEadLBNhC0SvPGE2H67QnbmoTqBbJ475C
+         mW7vkkNLlCQYTWKetPm7Gf2TBYeEnnIpNRnor0POxmH+96PYhH1iYGOsgBF/PSUuFsxF
+         /zkw==
+X-Gm-Message-State: AOAM530Zmznsq2tFYB9RCHt99s0FXMIII67+T/uSXgJWDo4CelaR/Qn2
+        olhY2OAC6+bC8ex2jSm9q8Nxncf5Er9Nk+dDBzhHOg==
+X-Google-Smtp-Source: ABdhPJzr3FVsm7oEAVBg9PQFhteEP/ns+lhODUER5Jh8hvabbPpL5e0XXIARvqMywuPMVxDtDEKCm0Sos0EVpgJ0wu4=
+X-Received: by 2002:a05:6512:21cd:b0:46b:b89e:186c with SMTP id
+ d13-20020a05651221cd00b0046bb89e186cmr7223606lft.250.1649884990280; Wed, 13
+ Apr 2022 14:23:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220413175944.71705-1-bgardon@google.com>
-In-Reply-To: <20220413175944.71705-1-bgardon@google.com>
+References: <20220401175554.1931568-1-dmatlack@google.com> <YlRhiF1O71TWQr5r@google.com>
+ <CALzav=f_WY7xH_MV8-gJPAVmj1KjE_LvXupL7aA5n-vCjTETNw@mail.gmail.com>
+ <YlSLuZphElMyF2sG@google.com> <CALzav=fGucZOZjbVE2+9PZVf1p+jP7GBYDpPph5PoU552LELsw@mail.gmail.com>
+ <YlTKQz8HVPtyfwKe@google.com> <CALzav=dz8rSK6bs8pJ9Vv02Z7aWO+yZ5jAA8+nmLAtJe3SMAsA@mail.gmail.com>
+ <YlYhO7GvjKY1cwHr@google.com> <YlcPIYJ0CB2qnfpT@google.com> <YlcWP5Z3osvUg0Ia@google.com>
+In-Reply-To: <YlcWP5Z3osvUg0Ia@google.com>
 From:   David Matlack <dmatlack@google.com>
-Date:   Wed, 13 Apr 2022 14:21:32 -0700
-Message-ID: <CALzav=cikLaM1a3jB5DbUH_nFnGNUyrnL03ZQE_dAAiD1Tq+bg@mail.gmail.com>
-Subject: Re: [PATCH v5 00/10] KVM: x86: Add a cap to disable NX hugepages on a VM
-To:     Ben Gardon <bgardon@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Dunn <daviddunn@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Junaid Shahid <junaids@google.com>
+Date:   Wed, 13 Apr 2022 14:22:43 -0700
+Message-ID: <CALzav=cg32bxLwCJKG0vBfgKRSXoHmeRnA-NOYC0Px7BsMgfGw@mail.gmail.com>
+Subject: Re: [PATCH v3 00/23] KVM: Extend Eager Page Splitting to the shadow MMU
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -73,99 +86,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 13, 2022 at 10:59 AM Ben Gardon <bgardon@google.com> wrote:
+On Wed, Apr 13, 2022 at 11:28 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> Given the high cost of NX hugepages in terms of TLB performance, it may
-> be desirable to disable the mitigation on a per-VM basis. In the case of public
-> cloud providers with many VMs on a single host, some VMs may be more trusted
-> than others. In order to maximize performance on critical VMs, while still
-> providing some protection to the host from iTLB Multihit, allow the mitigation
-> to be selectively disabled.
+> On Wed, Apr 13, 2022, David Matlack wrote:
+> > On Wed, Apr 13, 2022 at 01:02:51AM +0000, Sean Christopherson wrote:
+> > > There will be one wart due to unsync pages needing @vcpu, but we can pass in NULL
+> > > for the split case and assert that @vcpu is non-null since all of the children
+> > > should be direct.
+> >
+> > The NULL vcpu check will be a little gross,
+>
+> Yeah, I would even call it a lot gross :-)
+>
+> > but it should never trigger in practice since eager page splitting always
+> > requests direct SPs. My preference has been to enforce that in code by
+> > splitting out
+>
+> It still is enforced in code, just at different points.  The split version WARNs
+> and continues after finding a page, the below WARNs and rejects _while_ finding
+> the page.
+>
+> Speaking of WARNs, that reminds me... it might be worth adding a WARN in
+> kvm_mmu_get_child_sp() to document (and detect, but more to document) that @direct
+> should never encounter an page with unsync or unsync_children, e.g.
+>
+>         union kvm_mmu_page_role role;
+>         struct kvm_mmu_page *sp;
+>
+>         role = kvm_mmu_child_role(sptep, direct, access);
+>         sp = kvm_mmu_get_page(vcpu, gfn, role);
+>
+>         /* Comment goes here about direct pages in shadow MMUs? */
+>         WARN_ON(direct && (sp->unsync || sp->unsync_children));
+>         return sp;
+>
+> The indirect walk of FNAME(fetch)() handles unsync_children, but none of the other
+> callers do.  Obviously shouldn't happen, but especially in the huge page split
+> case it took me a second to understand exactly why it can't happen.
 
-For the series:
-
-Reviewed-by: David Matlack <dmatlack@google.com>
+Will do.
 
 >
-> Disabling NX hugepages on a VM is relatively straightforward, but I took this
-> as an opportunity to add some NX hugepages test coverage and clean up selftests
-> infrastructure a bit.
->
-> This series was tested with the new selftest and the rest of the KVM selftests
-> on an Intel Haswell machine.
->
-> The following tests failed, but I do not believe that has anything to do with
-> this series:
->         userspace_io_test
->         vmx_nested_tsc_scaling_test
->         vmx_preemption_timer_test
->
-> Changelog:
-> v1->v2:
->         Dropped the complicated memslot refactor in favor of Ricardo Koller's
->         patch with a similar effect.
->         Incorporated David Dunn's feedback and reviewed by tag: shortened waits
->         to speed up test.
-> v2->v3:
->         Incorporated a suggestion from David on how to build the NX huge pages
->         test.
->         Fixed a build breakage identified by David.
->         Dropped the per-vm nx_huge_pages field in favor of simply checking the
->         global + per-VM disable override.
->         Documented the new capability
->         Separated out the commit to test disabling NX huge pages
->         Removed permission check when checking if the disable NX capability is
->         supported.
->         Added test coverage for the permission check.
-> v3->v4:
->         Collected RB's from Jing and David
->         Modified stat collection to reduce a memory allocation [David]
->         Incorporated various improvments to the NX test [David]
->         Changed the NX disable test to run by default [David]
->         Removed some now unnecessary commits
->         Dropped the code to dump KVM stats from the binary stats test, and
->         factor out parts of the existing test to library functions instead.
->         [David, Jing, Sean]
->         Dropped the improvement to a debugging log message as it's no longer
->         relevant to this series.
-> v4->v5:
->         Incorporated cleanup suggestions from David and Sean
->         Added a patch with style fixes for the binary stats test from Sean
->         Added a restriction that NX huge pages can only be disabled before
->         vCPUs are created [Sean]
->
-> Ben Gardon (9):
->   KVM: selftests: Remove dynamic memory allocation for stats header
->   KVM: selftests: Read binary stats header in lib
->   KVM: selftests: Read binary stats desc in lib
->   KVM: selftests: Read binary stat data in lib
->   KVM: selftests: Add NX huge pages test
->   KVM: x86: Fix errant brace in KVM capability handling
->   KVM: x86/MMU: Allow NX huge pages to be disabled on a per-vm basis
->   KVM: selftests: Factor out calculation of pages needed for a VM
->   KVM: selftests: Test disabling NX hugepages on a VM
->
-> Sean Christopherson (1):
->   KVM: selftests: Clean up coding style in binary stats test
->
->  Documentation/virt/kvm/api.rst                |  13 +
->  arch/x86/include/asm/kvm_host.h               |   2 +
->  arch/x86/kvm/mmu.h                            |   9 +-
->  arch/x86/kvm/mmu/spte.c                       |   7 +-
->  arch/x86/kvm/mmu/spte.h                       |   3 +-
->  arch/x86/kvm/mmu/tdp_mmu.c                    |   3 +-
->  arch/x86/kvm/x86.c                            |  25 +-
->  include/uapi/linux/kvm.h                      |   1 +
->  tools/testing/selftests/kvm/Makefile          |  10 +
->  .../selftests/kvm/include/kvm_util_base.h     |  13 +
->  .../selftests/kvm/kvm_binary_stats_test.c     | 142 ++++++-----
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 232 ++++++++++++++++--
->  .../selftests/kvm/x86_64/nx_huge_pages_test.c | 206 ++++++++++++++++
->  .../kvm/x86_64/nx_huge_pages_test.sh          |  25 ++
->  14 files changed, 597 insertions(+), 94 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
->  create mode 100755 tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh
->
-> --
-> 2.35.1.1178.g4f1659d476-goog
->
+> > but I can see the advantage of your proposal is that eager page splitting and
+> > faults will go through the exact same code path to get a kvm_mmu_page.
+> > __kvm_mmu_find_shadow_page(), but I can see the advantage of your
+> > proposal is that eager page splitting and faults will go through the
+> > exact same code path to get a kvm_mmu_page.
+> >
+> > >
+> > >             if (sp->unsync) {
+> > >                     if (WARN_ON_ONCE(!vcpu)) {
+> > >                             kvm_mmu_prepare_zap_page(kvm, sp,
+> > >                                                      &invalid_list);
+> > >                             continue;
+> > >                     }
+> > >
+> > >                     /*
+> > >                      * The page is good, but is stale.  kvm_sync_page does
+> > >                      * get the latest guest state, but (unlike mmu_unsync_children)
+> > >                      * it doesn't write-protect the page or mark it synchronized!
+> > >                      * This way the validity of the mapping is ensured, but the
+> > >                      * overhead of write protection is not incurred until the
+> > >                      * guest invalidates the TLB mapping.  This allows multiple
+> > >                      * SPs for a single gfn to be unsync.
+> > >                      *
+> > >                      * If the sync fails, the page is zapped.  If so, break
+> > >                      * in order to rebuild it.
+> > >                      */
+> > >                     if (!kvm_sync_page(vcpu, sp, &invalid_list))
+> > >                             break;
+> > >
+> > >                     WARN_ON(!list_empty(&invalid_list));
+> > >                     kvm_flush_remote_tlbs(kvm);
+> > >             }
