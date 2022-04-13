@@ -2,207 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C169A4FF052
-	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 09:05:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 849BD4FF09A
+	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 09:33:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232459AbiDMHHT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Apr 2022 03:07:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52852 "EHLO
+        id S233361AbiDMHfu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Apr 2022 03:35:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232134AbiDMHHR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Apr 2022 03:07:17 -0400
-Received: from out30-44.freemail.mail.aliyun.com (out30-44.freemail.mail.aliyun.com [115.124.30.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97EB21C901;
-        Wed, 13 Apr 2022 00:04:56 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R391e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=33;SR=0;TI=SMTPD_---0V9yF4q8_1649833489;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0V9yF4q8_1649833489)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 13 Apr 2022 15:04:50 +0800
-Message-ID: <1649833450.9482608-9-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v9 09/32] virtio_ring: split: extract the logic of vq init
-Date:   Wed, 13 Apr 2022 15:04:10 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-References: <20220406034346.74409-1-xuanzhuo@linux.alibaba.com>
- <20220406034346.74409-10-xuanzhuo@linux.alibaba.com>
- <f91435e4-6559-c0c9-2b37-92084c88dee2@redhat.com>
-In-Reply-To: <f91435e4-6559-c0c9-2b37-92084c88dee2@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S229794AbiDMHfp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Apr 2022 03:35:45 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E940313F3F;
+        Wed, 13 Apr 2022 00:33:25 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 83BB261298;
+        Wed, 13 Apr 2022 07:33:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8ED4DC385A3;
+        Wed, 13 Apr 2022 07:33:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1649835204;
+        bh=Eth9R1jVxiIpBjWdOSRBL4N9xcIJCp4d4G7NUjOd5jo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=1PNsbVhKl0Pz2TNrKSRGuGYsBuUBxpI7hZKwOXR+sDJyP5ZGsA27q05hGoW8YSp0G
+         H+TyEs1ZbkLnMymfx9E/9lwZBEgpO6yOsRCNV/8nti/iksdCoHdP6pu358ZAXF8wvo
+         a4C3eH+n9TAHDT3N36Rryk51t2CdM/ZqzSbYxRXo=
+Date:   Wed, 13 Apr 2022 09:33:17 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Yao Hongbo <yaohongbo@linux.alibaba.com>
+Cc:     mst@redhat.com, alikernel-developer@linux.alibaba.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] uio/uio_pci_generic: Introduce refcnt on open/release
+Message-ID: <YlZ8vZ9RX5i7mWNk@kroah.com>
+References: <1649833302-27299-1-git-send-email-yaohongbo@linux.alibaba.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1649833302-27299-1-git-send-email-yaohongbo@linux.alibaba.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 12 Apr 2022 11:42:25 +0800, Jason Wang <jasowang@redhat.com> wrote:
->
-> =E5=9C=A8 2022/4/6 =E4=B8=8A=E5=8D=8811:43, Xuan Zhuo =E5=86=99=E9=81=93:
-> > Separate the logic of initializing vq, and subsequent patches will call
-> > it separately.
-> >
-> > The feature of this part is that it does not depend on the information
-> > passed by the upper layer and can be called repeatedly.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >   drivers/virtio/virtio_ring.c | 68 ++++++++++++++++++++----------------
-> >   1 file changed, 38 insertions(+), 30 deletions(-)
-> >
-> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> > index 083f2992ba0d..874f878087a3 100644
-> > --- a/drivers/virtio/virtio_ring.c
-> > +++ b/drivers/virtio/virtio_ring.c
-> > @@ -916,6 +916,43 @@ static void *virtqueue_detach_unused_buf_split(str=
-uct virtqueue *_vq)
-> >   	return NULL;
-> >   }
-> >
-> > +static void vring_virtqueue_init_split(struct vring_virtqueue *vq,
-> > +				       struct virtio_device *vdev,
-> > +				       bool own_ring)
-> > +{
-> > +	vq->packed_ring =3D false;
-> > +	vq->vq.num_free =3D vq->split.vring.num;
-> > +	vq->we_own_ring =3D own_ring;
-> > +	vq->broken =3D false;
-> > +	vq->last_used_idx =3D 0;
-> > +	vq->event_triggered =3D false;
-> > +	vq->num_added =3D 0;
-> > +	vq->use_dma_api =3D vring_use_dma_api(vdev);
-> > +#ifdef DEBUG
-> > +	vq->in_use =3D false;
-> > +	vq->last_add_time_valid =3D false;
-> > +#endif
-> > +
-> > +	vq->event =3D virtio_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX);
-> > +
-> > +	if (virtio_has_feature(vdev, VIRTIO_F_ORDER_PLATFORM))
-> > +		vq->weak_barriers =3D false;
-> > +
-> > +	vq->split.avail_flags_shadow =3D 0;
-> > +	vq->split.avail_idx_shadow =3D 0;
-> > +
-> > +	/* No callback?  Tell other side not to bother us. */
-> > +	if (!vq->vq.callback) {
-> > +		vq->split.avail_flags_shadow |=3D VRING_AVAIL_F_NO_INTERRUPT;
-> > +		if (!vq->event)
-> > +			vq->split.vring.avail->flags =3D cpu_to_virtio16(vdev,
-> > +					vq->split.avail_flags_shadow);
-> > +	}
-> > +
-> > +	/* Put everything in free lists. */
-> > +	vq->free_head =3D 0;
->
->
-> It's not clear what kind of initialization that we want to do here. E.g
-> it mixes split specific setups with some general setups which is kind of
-> duplication of vring_virtqueue_init_packed().
->
-> I wonder if it's better to only do split specific setups here and have a
-> common helper to do the setup that is irrelevant to ring layout.
+On Wed, Apr 13, 2022 at 03:01:42PM +0800, Yao Hongbo wrote:
+> If two userspace programs both open the PCI UIO fd, when one
+> of the program exits uncleanly, the other will cause IO hang
+> due to bus-mastering disabled.
+> 
+> It's a common usage for spdk/dpdk to use UIO. So, introduce refcnt
+> to avoid such problems.
 
-Yes, you are right, I didn't notice this situation before.
+Why do you have multiple userspace programs opening the same device?
+Shouldn't they coordinate?
 
-Thanks.
+> 
+> Fixes: 865a11f987ab("uio/uio_pci_generic: Disable bus-mastering on release")
+> Reported-by: Xiu Yang <yangxiu.yx@alibaba-inc.com>
+> Signed-off-by: Yao Hongbo <yaohongbo@linux.alibaba.com>
+> ---
+> Changes for v2:
+> 	Use refcount_t instead of atomic_t to catch overflow/underflows.
+> ---
+>  drivers/uio/uio_pci_generic.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/uio/uio_pci_generic.c b/drivers/uio/uio_pci_generic.c
+> index e03f9b5..1a5e1fd 100644
+> --- a/drivers/uio/uio_pci_generic.c
+> +++ b/drivers/uio/uio_pci_generic.c
+> @@ -31,6 +31,7 @@
+>  struct uio_pci_generic_dev {
+>  	struct uio_info info;
+>  	struct pci_dev *pdev;
+> +	refcount_t refcnt;
+>  };
+>  
+>  static inline struct uio_pci_generic_dev *
+> @@ -39,6 +40,14 @@ struct uio_pci_generic_dev {
+>  	return container_of(info, struct uio_pci_generic_dev, info);
+>  }
+>  
+> +static int open(struct uio_info *info, struct inode *inode)
+> +{
+> +	struct uio_pci_generic_dev *gdev = to_uio_pci_generic_dev(info);
+> +
+> +	refcount_inc(&gdev->refcnt);
+> +	return 0;
+> +}
+> +
+>  static int release(struct uio_info *info, struct inode *inode)
+>  {
+>  	struct uio_pci_generic_dev *gdev = to_uio_pci_generic_dev(info);
+> @@ -51,7 +60,9 @@ static int release(struct uio_info *info, struct inode *inode)
+>  	 * Note that there's a non-zero chance doing this will wedge the device
+>  	 * at least until reset.
+>  	 */
+> -	pci_clear_master(gdev->pdev);
+> +	if (refcount_dec_and_test(&gdev->refcnt))
+> +		pci_clear_master(gdev->pdev);
 
->
-> Thanks
->
->
-> > +}
-> > +
-> >   static void vring_virtqueue_attach_split(struct vring_virtqueue *vq,
-> >   					 struct vring vring,
-> >   					 struct vring_desc_state_split *desc_state,
-> > @@ -2249,42 +2286,15 @@ struct virtqueue *__vring_new_virtqueue(unsigne=
-d int index,
-> >   	if (!vq)
-> >   		return NULL;
-> >
-> > -	vq->packed_ring =3D false;
-> >   	vq->vq.callback =3D callback;
-> >   	vq->vq.vdev =3D vdev;
-> >   	vq->vq.name =3D name;
-> > -	vq->vq.num_free =3D vring.num;
-> >   	vq->vq.index =3D index;
-> > -	vq->we_own_ring =3D false;
-> >   	vq->notify =3D notify;
-> >   	vq->weak_barriers =3D weak_barriers;
-> > -	vq->broken =3D false;
-> > -	vq->last_used_idx =3D 0;
-> > -	vq->event_triggered =3D false;
-> > -	vq->num_added =3D 0;
-> > -	vq->use_dma_api =3D vring_use_dma_api(vdev);
-> > -#ifdef DEBUG
-> > -	vq->in_use =3D false;
-> > -	vq->last_add_time_valid =3D false;
-> > -#endif
-> >
-> >   	vq->indirect =3D virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_DES=
-C) &&
-> >   		!context;
-> > -	vq->event =3D virtio_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX);
-> > -
-> > -	if (virtio_has_feature(vdev, VIRTIO_F_ORDER_PLATFORM))
-> > -		vq->weak_barriers =3D false;
-> > -
-> > -	vq->split.avail_flags_shadow =3D 0;
-> > -	vq->split.avail_idx_shadow =3D 0;
-> > -
-> > -	/* No callback?  Tell other side not to bother us. */
-> > -	if (!callback) {
-> > -		vq->split.avail_flags_shadow |=3D VRING_AVAIL_F_NO_INTERRUPT;
-> > -		if (!vq->event)
-> > -			vq->split.vring.avail->flags =3D cpu_to_virtio16(vdev,
-> > -					vq->split.avail_flags_shadow);
-> > -	}
-> >
-> >   	err =3D vring_alloc_state_extra_split(vring.num, &state, &extra);
-> >   	if (err) {
-> > @@ -2293,9 +2303,7 @@ struct virtqueue *__vring_new_virtqueue(unsigned =
-int index,
-> >   	}
-> >
-> >   	vring_virtqueue_attach_split(vq, vring, state, extra);
-> > -
-> > -	/* Put everything in free lists. */
-> > -	vq->free_head =3D 0;
-> > +	vring_virtqueue_init_split(vq, vdev, false);
-> >
-> >   	spin_lock(&vdev->vqs_list_lock);
-> >   	list_add_tail(&vq->vq.list, &vdev->vqs);
->
+The goal here is to flush things when userspace closes the device, as
+the comment says.  So don't you want that to happen for when userspace
+closes the file handle no matter who opened it?
+
+As this is a functional change, how is userspace going to "know" this
+functionality is now changed or not?
+
+And if userspace really wants to open this multiple times, then properly
+switch the code to only create the device-specific structures when open
+is called.  Otherwise you are sharing structures here that are not
+intended to be shared, shouldn't you have your own private one?
+
+this feels odd.
+
+thanks,
+
+greg k-h
