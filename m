@@ -2,118 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FE644FF228
-	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 10:41:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD2E44FF260
+	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 10:43:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233907AbiDMIle (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Apr 2022 04:41:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51422 "EHLO
+        id S233309AbiDMIpb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Apr 2022 04:45:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233931AbiDMIk7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Apr 2022 04:40:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A8DF84EDDA
-        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 01:38:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649839111;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FoMMC2LMJaH+wT3SQsP3VkYrWPiF7nKkDApGo/gOh/Y=;
-        b=APiRH5OgfhMB+ZAGufL02NrhBgbbS2Q3pBioJha639sp8IAvdiMA9/FNnRH3BzYPR5/UMi
-        giApsmmCOC8UgcwF8pG1NS2aKYc7PQSzL0fF487vyTmcYYkk+EYTa6kcJ7E1sI47A2IIn5
-        9WoUtZA/xnKEmsnemDBjspViwdscibI=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-324-Ah4wxK-1MF-0e4ejwf6b8g-1; Wed, 13 Apr 2022 04:38:30 -0400
-X-MC-Unique: Ah4wxK-1MF-0e4ejwf6b8g-1
-Received: by mail-wm1-f70.google.com with SMTP id n17-20020a05600c501100b0038e731cf5e1so558810wmr.2
-        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 01:38:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=FoMMC2LMJaH+wT3SQsP3VkYrWPiF7nKkDApGo/gOh/Y=;
-        b=pgvUzDVq1QXy4jRl6OnJOIRJ0YiO8xGri4mH9ThWWojio+YMsnPkqTrsWbvovpei9p
-         g5cqbI62Pi0G2h+9O4QOiY75P74U3TWzV4tIsXV2FtzvQorV212QV/N6z5iQu9OwN2nF
-         EVjZbBP0lno215mY8wOtYHAk/WKeI2aDtZ6S+P9AUPjtTtnHqKgQm9mX2Twn4YK3PVie
-         QxsCflV7AdpwZKWqmuwreALkRQK7xcEI4nnfhGmNEpeiqP2Q93I9MhjX94GZAmY9auPu
-         p/m7rqkOcXgyJDdsuvDEpCNPBgqjpJMrIexFZYY2hXtKDqj5Xt3O5BISqmBMykELz2Cl
-         LRiQ==
-X-Gm-Message-State: AOAM5302fy6y12RMrKggCmAQ9pkBCE9mLpAcxcTLQF3LcQuYBj8Ij4Yq
-        G4c64Khzx76BrVZXQ2JH2yk2twMWVS658G3RF1f06BbIET08iadgH/nkLI6LMhLQnel35sn/m+r
-        EIpDrtkPJYvOD
-X-Received: by 2002:a05:6000:1549:b0:207:aadd:87ae with SMTP id 9-20020a056000154900b00207aadd87aemr8781986wry.282.1649839109211;
-        Wed, 13 Apr 2022 01:38:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzVgucUFVic2dUsqqIHD+2DGQQJnfgxTbKjYB7CmhPL/uRKi1K0epJjliff4gFJ1qw5xdURjA==
-X-Received: by 2002:a05:6000:1549:b0:207:aadd:87ae with SMTP id 9-20020a056000154900b00207aadd87aemr8781969wry.282.1649839108965;
-        Wed, 13 Apr 2022 01:38:28 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id x4-20020adfdd84000000b00207b60ed68esm1474940wrl.100.2022.04.13.01.38.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Apr 2022 01:38:28 -0700 (PDT)
-Message-ID: <caffa434-5644-ee73-1636-45a87517bae2@redhat.com>
-Date:   Wed, 13 Apr 2022 10:38:26 +0200
+        with ESMTP id S230518AbiDMIp3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Apr 2022 04:45:29 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ECA34EA25;
+        Wed, 13 Apr 2022 01:43:09 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23D7UiFQ022745;
+        Wed, 13 Apr 2022 08:43:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=+ynYSt7fhnh9Jemh2uoB5LHRICHtdQIhMtbWjO3umhg=;
+ b=rePP4AxPrrpb/0R1DlhNpgtZCW3Fd8vKnXZMksgOUDi6TgEI1c3opPOtF7GB2vzxldty
+ q6a9B50x7gDQtqH7jeeqQWzydNCTnifwJI91Glf6vJc2MeEWWx30Zzp0TTbU1ygLg771
+ nCm1GQTE6HW/O36yRB0dGOVHT8o0Y4AjEglLFML/BcR+frW8ugPk3GgpYR2UXwU95GLl
+ QoI2wbArN2ElSv1zcCxjsnAHzJ3xZUqya5DOetSRvJVqy4Om+GTAmXEbTHlgJHxR0Nbr
+ CXsD8xLOP2S43cHGG0BZY4iPYq74rZx5vzNThking5zU1JgVIinRSiLAIcLHFS8UyvGu LA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fdpjhdg6x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Apr 2022 08:43:08 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23D8Y7P9011011;
+        Wed, 13 Apr 2022 08:43:07 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fdpjhdg6m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Apr 2022 08:43:07 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23D8Y8X5007897;
+        Wed, 13 Apr 2022 08:43:05 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 3fb1s8xd2j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Apr 2022 08:43:05 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23D8UVfs44106114
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 13 Apr 2022 08:30:31 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 62A2BAE053;
+        Wed, 13 Apr 2022 08:43:02 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 164A0AE051;
+        Wed, 13 Apr 2022 08:43:02 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.1.140])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 13 Apr 2022 08:43:02 +0000 (GMT)
+Date:   Wed, 13 Apr 2022 10:42:59 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v1 4/4] s390x: add selftest for migration
+Message-ID: <20220413104259.21553d56@p-imbrenda>
+In-Reply-To: <627b95549636e5fb4bae5ba792298eee0a689b13.camel@linux.ibm.com>
+References: <20220411100750.2868587-1-nrb@linux.ibm.com>
+        <20220411100750.2868587-5-nrb@linux.ibm.com>
+        <20220411144944.690d19f5@p-imbrenda>
+        <627b95549636e5fb4bae5ba792298eee0a689b13.camel@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [RFC PATCH V3 2/4] KVM: X86: Introduce role.glevel for level
- expanded pagetable
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-doc@vger.kernel.org
-References: <20220330132152.4568-1-jiangshanlai@gmail.com>
- <20220330132152.4568-3-jiangshanlai@gmail.com> <YlXvtMqWpyM9Bjox@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YlXvtMqWpyM9Bjox@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: XvftImeOoHoZEsN4dccCWOM-4SmCk31D
+X-Proofpoint-ORIG-GUID: iXDMrxN2z59rvjIKIaRo-spx5MfJ-uer
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-12_08,2022-04-12_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 impostorscore=0 priorityscore=1501 clxscore=1015 mlxscore=0
+ phishscore=0 spamscore=0 adultscore=0 mlxlogscore=867 suspectscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204130048
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/12/22 23:31, Sean Christopherson wrote:
->> +		unsigned glevel:4;
-> We don't need 4 bits for this.  Crossing our fingers that we never had to shadow
-> a 2-level guest with a 6-level host, we can do:
-> 
-> 		unsigned passthrough_delta:2;
-> 
-> Where the field is ignored if direct=1, '0' for non-passthrough, and 1-3 to handle
-> shadow_root_level - guest_root_level.  Basically the same idea as Paolo's smushing
-> of direct+passthrough into mapping_level, just dressed up differently.
+On Tue, 12 Apr 2022 13:49:21 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-Basically, your passthrough_delta is level - glevel in Jiangshan's 
-patches.  You'll need 3 bits anyway when we remove direct later (that 
-would be passthrough_delta == level).
+> On Mon, 2022-04-11 at 14:49 +0200, Claudio Imbrenda wrote:
+> [...]
+> > > diff --git a/s390x/selftest-migration.c b/s390x/selftest-
+> > > migration.c =20
+> [...]
+> > > +int main(void)
+> > > +{
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* don't say migrate here =
+otherwise we will migrate right
+> > > away */
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0report_prefix_push("selfte=
+st migration");
+> > > +
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* ask migrate_cmd to migr=
+ate (it listens for 'migrate') */
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0puts("Please migrate me\n"=
+);
+> > > +
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* wait for migration to f=
+inish, we will read a newline */
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(void)getchar(); =20
+> >=20
+> > how hard would it be to actually check that you got the newline? =20
+>=20
+> It would be simple. I decided for ignoring what we actually read
+> because that's what ARM and PPC do.
 
-Regarding the naming:
+oh, then it's fine as it is
 
-* If we keep Jiangshan's logic, I don't like the glevel name very much, 
-any of mapping_level, target_level or direct_level would be clearer?
+>=20
+> But I am also OK checking we really read a newline. What would you
+> suggest to do if we read something that's not a newline? Read again
+> until we actually do get a newline?
 
-* If we go with yours, I would call the field "passthrough_levels".
-
-Paolo
-
+I was more thinking that it's a failure, but see the comment above
