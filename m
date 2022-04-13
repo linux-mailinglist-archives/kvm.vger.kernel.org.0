@@ -2,172 +2,520 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE7294FF2B2
-	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 10:51:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B82504FF2F7
+	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 11:07:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234102AbiDMIxr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Apr 2022 04:53:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35404 "EHLO
+        id S234238AbiDMJJ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Apr 2022 05:09:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232997AbiDMIxp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Apr 2022 04:53:45 -0400
+        with ESMTP id S233632AbiDMJJ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Apr 2022 05:09:57 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A002636B4D
-        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 01:51:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 57EAD4D9E5
+        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 02:07:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649839883;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1649840849;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CXaBut5TtVX/5x8criaiy+9HCqtO5Zc1LaQGUaRBMEA=;
-        b=WiI8PHrDgqEQzepEdzXaImZIebF0xzTHUD6WFhDwDQtHRBZGPauFkRW9JJlU0CoRy6q4f5
-        WFux6I8g3oDKW+SGvmslR+gyQSeGfLF6ul0Z9D9WkZU1fQesejDbGKYN0sQnJhOn5Kb+sw
-        6Mzta+m1gi8gxNhkAZWV9ludyYbc63I=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=SDlJEhU1w1NiuS64juxKCj8lRqkoD4sH0jwdEczay8A=;
+        b=DHaaDopem5s5vQ4fnDl7T/oaLdVby3Ot0aaqEUV7pGA13J+6xWLIg+hcXS1jvUuf3vvZs2
+        KmXcXT5P7owaQRkKTfrVCbzHROWmqFhnazJnf4SpqVtlbER7/jdoCT4wufM32X0nB0KmO4
+        lUkBKwBEgUBsgiQKK3An9QgBdLrSR+g=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-186-Sxv8HhbGNweWJvZXjlNpLw-1; Wed, 13 Apr 2022 04:51:22 -0400
-X-MC-Unique: Sxv8HhbGNweWJvZXjlNpLw-1
-Received: by mail-wm1-f70.google.com with SMTP id v191-20020a1cacc8000000b0038ce818d2efso614916wme.1
-        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 01:51:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=CXaBut5TtVX/5x8criaiy+9HCqtO5Zc1LaQGUaRBMEA=;
-        b=LRvsMdB75Z6BA+IezBf9R+Dr1FM6v9OjehnTPiOYc2Eh5+1HsQJhIddvozSiTcOTNS
-         WRsiDWi2mA7IvpO4bBWjTJcD7wPcBPC4SZeZcj0C0UKzpGsqiP6byEvhSN6SuGj28mPP
-         MUUISr/nKvv6bU0bHyquSum5pTjl2e6mfoItABjn+aYXf8mn53pUJjfJoepODAF7+BYv
-         KDJIsWw+htgrfsmDMpRYN201/cLoSYHXfbKxgKE4mr7PPGxnwZoLEL/XooIOenK0weNv
-         9gJ7j3CzqHbb3WBFjIkd6CeU08mU9zLqmgA1PTFsGF7yxQuw4PI6xfSxOylMrekzcIxG
-         jtzA==
-X-Gm-Message-State: AOAM533uL6OUYp24r2iz3QfxVlvDWB4HvJDA6VMxs+DWiVxH+l0g4yPB
-        vJmQT5HA6ipJngbzXLvWNzjvHVVtY5pHeffb5dztefJ7Z5LnkIqBgvnpAXfgl9LpF2R9AW1ISZi
-        oLkHaEHKrG3q8
-X-Received: by 2002:a7b:c844:0:b0:37b:b986:7726 with SMTP id c4-20020a7bc844000000b0037bb9867726mr8007996wml.160.1649839881425;
-        Wed, 13 Apr 2022 01:51:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxn5qtF2uQ6pUNxFjxEXQhAZa5yNorXoA/krDl871AVJA2ATWMJLEmGmsp6F9Svpp/KYF0D+w==
-X-Received: by 2002:a7b:c844:0:b0:37b:b986:7726 with SMTP id c4-20020a7bc844000000b0037bb9867726mr8007973wml.160.1649839881115;
-        Wed, 13 Apr 2022 01:51:21 -0700 (PDT)
-Received: from redhat.com ([2.55.135.33])
-        by smtp.gmail.com with ESMTPSA id m20-20020a05600c3b1400b0038ebbbb2ad2sm1723628wms.44.2022.04.13.01.51.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Apr 2022 01:51:20 -0700 (PDT)
-Date:   Wed, 13 Apr 2022 04:51:16 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Yao Hongbo <yaohongbo@linux.alibaba.com>,
-        alikernel-developer@linux.alibaba.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] uio/uio_pci_generic: Introduce refcnt on open/release
-Message-ID: <20220413044246-mutt-send-email-mst@kernel.org>
-References: <1649833302-27299-1-git-send-email-yaohongbo@linux.alibaba.com>
- <YlZ8vZ9RX5i7mWNk@kroah.com>
+ us-mta-534-cJzR_M33P-mFRSURkftHYA-1; Wed, 13 Apr 2022 05:07:25 -0400
+X-MC-Unique: cJzR_M33P-mFRSURkftHYA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B0B5F185A7A4;
+        Wed, 13 Apr 2022 09:07:24 +0000 (UTC)
+Received: from [10.72.13.171] (ovpn-13-171.pek2.redhat.com [10.72.13.171])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F30731400B18;
+        Wed, 13 Apr 2022 09:07:17 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v5 08/10] selftests: KVM: aarch64: Introduce hypercall ABI
+ test
+To:     Raghavendra Rao Ananta <rananta@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc:     kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+References: <20220407011605.1966778-1-rananta@google.com>
+ <20220407011605.1966778-9-rananta@google.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <7da91aa4-4fa9-13e6-5561-036cfce3e3e0@redhat.com>
+Date:   Wed, 13 Apr 2022 17:07:14 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YlZ8vZ9RX5i7mWNk@kroah.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220407011605.1966778-9-rananta@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 13, 2022 at 09:33:17AM +0200, Greg KH wrote:
-> On Wed, Apr 13, 2022 at 03:01:42PM +0800, Yao Hongbo wrote:
-> > If two userspace programs both open the PCI UIO fd, when one
-> > of the program exits uncleanly, the other will cause IO hang
-> > due to bus-mastering disabled.
-> > 
-> > It's a common usage for spdk/dpdk to use UIO. So, introduce refcnt
-> > to avoid such problems.
+Hi Raghavendra,
+
+On 4/7/22 9:16 AM, Raghavendra Rao Ananta wrote:
+> Introduce a KVM selftest to check the hypercall interface
+> for arm64 platforms. The test validates the user-space's
+> IOCTL interface to read/write the psuedo-firmware registers
+> as well as its effects on the guest upon certain configurations.
 > 
-> Why do you have multiple userspace programs opening the same device?
-> Shouldn't they coordinate?
-
-Or to restate, I think the question is, why not open the device
-once and pass the FD around?
-
-
-> > 
-> > Fixes: 865a11f987ab("uio/uio_pci_generic: Disable bus-mastering on release")
-
-
-space missing before ( here .
-
-> > Reported-by: Xiu Yang <yangxiu.yx@alibaba-inc.com>
-> > Signed-off-by: Yao Hongbo <yaohongbo@linux.alibaba.com>
-> > ---
-> > Changes for v2:
-> > 	Use refcount_t instead of atomic_t to catch overflow/underflows.
-> > ---
-> >  drivers/uio/uio_pci_generic.c | 16 +++++++++++++++-
-> >  1 file changed, 15 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/uio/uio_pci_generic.c b/drivers/uio/uio_pci_generic.c
-> > index e03f9b5..1a5e1fd 100644
-> > --- a/drivers/uio/uio_pci_generic.c
-> > +++ b/drivers/uio/uio_pci_generic.c
-> > @@ -31,6 +31,7 @@
-> >  struct uio_pci_generic_dev {
-> >  	struct uio_info info;
-> >  	struct pci_dev *pdev;
-> > +	refcount_t refcnt;
-> >  };
-> >  
-> >  static inline struct uio_pci_generic_dev *
-> > @@ -39,6 +40,14 @@ struct uio_pci_generic_dev {
-> >  	return container_of(info, struct uio_pci_generic_dev, info);
-> >  }
-> >  
-> > +static int open(struct uio_info *info, struct inode *inode)
-> > +{
-> > +	struct uio_pci_generic_dev *gdev = to_uio_pci_generic_dev(info);
-> > +
-> > +	refcount_inc(&gdev->refcnt);
-> > +	return 0;
-> > +}
-> > +
-> >  static int release(struct uio_info *info, struct inode *inode)
-> >  {
-> >  	struct uio_pci_generic_dev *gdev = to_uio_pci_generic_dev(info);
-> > @@ -51,7 +60,9 @@ static int release(struct uio_info *info, struct inode *inode)
-> >  	 * Note that there's a non-zero chance doing this will wedge the device
-> >  	 * at least until reset.
-> >  	 */
-> > -	pci_clear_master(gdev->pdev);
-> > +	if (refcount_dec_and_test(&gdev->refcnt))
-> > +		pci_clear_master(gdev->pdev);
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>   tools/testing/selftests/kvm/.gitignore        |   1 +
+>   tools/testing/selftests/kvm/Makefile          |   1 +
+>   .../selftests/kvm/aarch64/hypercalls.c        | 344 ++++++++++++++++++
+>   3 files changed, 346 insertions(+)
+>   create mode 100644 tools/testing/selftests/kvm/aarch64/hypercalls.c
 > 
-> The goal here is to flush things when userspace closes the device, as
-> the comment says.  So don't you want that to happen for when userspace
-> closes the file handle no matter who opened it?
-> 
-> As this is a functional change, how is userspace going to "know" this
-> functionality is now changed or not?
-> 
-> And if userspace really wants to open this multiple times, then properly
-> switch the code to only create the device-specific structures when open
-> is called.  Otherwise you are sharing structures here that are not
-> intended to be shared, shouldn't you have your own private one?
-> 
-> this feels odd.
-> 
-> thanks,
-> 
-> greg k-h
 
-Sigh. Maybe it was a mistake to do 865a11f987ab to begin with.
-Anyone doing DMA with UIO is already on very thin ice.
-But oh well.
+To be more precise, s/IOCTL/{GET,SET}_ONE_REG ?
 
--- 
-MST
+> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> index e82b816a6608..7ef52b3b1560 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -2,6 +2,7 @@
+>   /aarch64/arch_timer
+>   /aarch64/debug-exceptions
+>   /aarch64/get-reg-list
+> +/aarch64/hypercalls
+>   /aarch64/psci_test
+>   /aarch64/vgic_init
+>   /aarch64/vgic_irq
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index 2f74f502de65..af4cb88bcf83 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -105,6 +105,7 @@ TEST_GEN_PROGS_x86_64 += system_counter_offset_test
+>   TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
+>   TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
+>   TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
+> +TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
+>   TEST_GEN_PROGS_aarch64 += aarch64/psci_test
+>   TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
+>   TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
+> diff --git a/tools/testing/selftests/kvm/aarch64/hypercalls.c b/tools/testing/selftests/kvm/aarch64/hypercalls.c
+> new file mode 100644
+> index 000000000000..9941fb75772a
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/aarch64/hypercalls.c
+> @@ -0,0 +1,344 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +
+> +/* hypercalls: Check the ARM64's psuedo-firmware bitmap register interface.
+> + *
+> + * The test validates the basic hypercall functionalities that are exposed
+> + * via the psuedo-firmware bitmap register. This includes the registers'
+> + * read/write behavior before and after the VM has started, and if the
+> + * hypercalls are properly masked or unmasked to the guest when disabled or
+> + * enabled from the KVM userspace, respectively.
+> + */
+> +
+> +#include <errno.h>
+> +#include <linux/arm-smccc.h>
+> +#include <asm/kvm.h>
+> +#include <kvm_util.h>
+> +
+> +#include "processor.h"
+> +
+> +#define FW_REG_ULIMIT_VAL(max_feat_bit) (GENMASK_ULL(max_feat_bit, 0))
+> +
+> +/* Last valid bits of the bitmapped firmware registers */
+> +#define KVM_REG_ARM_STD_BMAP_BIT_MAX		0
+> +#define KVM_REG_ARM_STD_HYP_BMAP_BIT_MAX	0
+> +#define KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_MAX	1
+> +
+> +struct kvm_fw_reg_info {
+> +	uint64_t reg;		/* Register definition */
+> +	uint64_t max_feat_bit;	/* Bit that represents the upper limit of the feature-map */
+> +};
+> +
+> +#define FW_REG_INFO(r, bit_max)			\
+> +	{					\
+> +		.reg = r,			\
+> +		.max_feat_bit = bit_max,	\
+> +	}
+> +
+> +static const struct kvm_fw_reg_info fw_reg_info[] = {
+> +	FW_REG_INFO(KVM_REG_ARM_STD_BMAP, KVM_REG_ARM_STD_BMAP_BIT_MAX),
+> +	FW_REG_INFO(KVM_REG_ARM_STD_HYP_BMAP, KVM_REG_ARM_STD_HYP_BMAP_BIT_MAX),
+> +	FW_REG_INFO(KVM_REG_ARM_VENDOR_HYP_BMAP, KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_MAX),
+> +};
+> +
+
+This can be simplifed by:
+
+#define FW_REG_INFO(r)			\
+	{ .reg = r,			\
+	  .max_feat_bit = r_##BIT_MAX,	\
+	}
+
+static const struct kvm_fw_reg_info fw_reg_info[] = {
+	FW_REG_INFO(KVM_REG_ARM_STD_BMAP),
+	FW_REG_INFO(KVM_REG_ARM_STD_HYP_BMAP),
+	FW_REG_INFO(KVM_REG_ARM_VENDOR_HYP_BMAP),
+};
+
+> +enum test_stage {
+> +	TEST_STAGE_REG_IFACE,
+> +	TEST_STAGE_HVC_IFACE_FEAT_DISABLED,
+> +	TEST_STAGE_HVC_IFACE_FEAT_ENABLED,
+> +	TEST_STAGE_HVC_IFACE_FALSE_INFO,
+> +	TEST_STAGE_END,
+> +};
+> +
+> +static int stage;
+> +
+
+I think it'd better to initialize @stage to TEST_STAGE_REG_IFACE.
+
+> +struct test_hvc_info {
+> +	uint32_t func_id;
+> +	int64_t arg0;
+> +};
+> +
+> +#define TEST_HVC_INFO(f, a0)	\
+> +	{			\
+> +		.func_id = f,	\
+> +		.arg0 = a0,	\
+> +	}
+> +
+
+According to those functions (smccc_get_{function, argx}()) defined
+in include/kvm/arm_hypercalls.h, @arg0 would have type of "uint64_t"
+if I'm correct. Besides, @func_id is arg0 and arg0 should be arg1?
+So if I'm correct, this would be:
+
+struct test_hvc_info {
+	uint32_t func_id;
+	uint64_t arg1
+};
+
+> +static const struct test_hvc_info hvc_info[] = {
+> +	/* KVM_REG_ARM_STD_BMAP */
+> +	TEST_HVC_INFO(ARM_SMCCC_TRNG_VERSION, 0),
+> +	TEST_HVC_INFO(ARM_SMCCC_TRNG_FEATURES, ARM_SMCCC_TRNG_RND64),
+> +	TEST_HVC_INFO(ARM_SMCCC_TRNG_GET_UUID, 0),
+> +	TEST_HVC_INFO(ARM_SMCCC_TRNG_RND32, 0),
+> +	TEST_HVC_INFO(ARM_SMCCC_TRNG_RND64, 0),
+> +
+> +	/* KVM_REG_ARM_STD_HYP_BMAP */
+> +	TEST_HVC_INFO(ARM_SMCCC_ARCH_FEATURES_FUNC_ID, ARM_SMCCC_HV_PV_TIME_FEATURES),
+> +	TEST_HVC_INFO(ARM_SMCCC_HV_PV_TIME_FEATURES, ARM_SMCCC_HV_PV_TIME_ST),
+> +	TEST_HVC_INFO(ARM_SMCCC_HV_PV_TIME_ST, 0),
+> +
+> +	/* KVM_REG_ARM_VENDOR_HYP_BMAP */
+> +	TEST_HVC_INFO(ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID,
+> +			ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID),
+> +	TEST_HVC_INFO(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID, KVM_PTP_VIRT_COUNTER),
+> +};
+> +
+> +/* Feed false hypercall info to test the KVM behavior */
+> +static const struct test_hvc_info false_hvc_info[] = {
+> +	/* Feature support check against a different family of hypercalls */
+> +	TEST_HVC_INFO(ARM_SMCCC_TRNG_FEATURES, ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID),
+> +	TEST_HVC_INFO(ARM_SMCCC_ARCH_FEATURES_FUNC_ID, ARM_SMCCC_TRNG_RND64),
+> +	TEST_HVC_INFO(ARM_SMCCC_HV_PV_TIME_FEATURES, ARM_SMCCC_TRNG_RND64),
+> +};
+> +
+> +static void guest_test_hvc(const struct test_hvc_info *hc_info)
+> +{
+> +	unsigned int i;
+> +	struct arm_smccc_res res;
+> +	unsigned int hvc_info_arr_sz;
+> +
+> +	hvc_info_arr_sz =
+> +	hc_info == hvc_info ? ARRAY_SIZE(hvc_info) : ARRAY_SIZE(false_hvc_info);
+> +
+> +	for (i = 0; i < hvc_info_arr_sz; i++, hc_info++) {
+> +
+> +		memset(&res, 0, sizeof(res));
+> +		smccc_hvc(hc_info->func_id, hc_info->arg0, 0, 0, 0, 0, 0, 0, &res);
+> +
+
+Unnecessary empty line before memset(). I don't find where smccc_hvc()
+is defined.
+
+> +		switch (stage) {
+> +		case TEST_STAGE_HVC_IFACE_FEAT_DISABLED:
+> +		case TEST_STAGE_HVC_IFACE_FALSE_INFO:
+> +			GUEST_ASSERT_3(res.a0 == SMCCC_RET_NOT_SUPPORTED,
+> +					res.a0, hc_info->func_id, hc_info->arg0);
+                                        ^^
+
+It seems the code here isn't properly aligned. Maybe it's your
+preference :)
+
+> +			break;
+> +		case TEST_STAGE_HVC_IFACE_FEAT_ENABLED:
+> +			GUEST_ASSERT_3(res.a0 != SMCCC_RET_NOT_SUPPORTED,
+> +					res.a0, hc_info->func_id, hc_info->arg0);
+> +			break;
+> +		default:
+> +			GUEST_ASSERT_1(0, stage);
+> +		}
+> +	}
+> +}
+> +
+> +static void guest_code(void)
+> +{
+> +	while (stage != TEST_STAGE_END) {
+> +		switch (stage) {
+> +		case TEST_STAGE_REG_IFACE:
+> +			break;
+> +		case TEST_STAGE_HVC_IFACE_FEAT_DISABLED:
+> +		case TEST_STAGE_HVC_IFACE_FEAT_ENABLED:
+> +			guest_test_hvc(hvc_info);
+> +			break;
+> +		case TEST_STAGE_HVC_IFACE_FALSE_INFO:
+> +			guest_test_hvc(false_hvc_info);
+> +			break;
+> +		default:
+> +			GUEST_ASSERT_1(0, stage);
+> +		}
+> +
+> +		GUEST_SYNC(stage);
+> +	}
+> +
+> +	GUEST_DONE();
+> +}
+> +
+> +static int set_fw_reg(struct kvm_vm *vm, uint64_t id, uint64_t val)
+> +{
+> +	struct kvm_one_reg reg = {
+> +		.id = id,
+> +		.addr = (uint64_t)&val,
+> +	};
+> +
+> +	return _vcpu_ioctl(vm, 0, KVM_SET_ONE_REG, &reg);
+> +}
+> +
+> +static void get_fw_reg(struct kvm_vm *vm, uint64_t id, uint64_t *addr)
+> +{
+> +	struct kvm_one_reg reg = {
+> +		.id = id,
+> +		.addr = (uint64_t)addr,
+> +	};
+> +
+> +	vcpu_ioctl(vm, 0, KVM_GET_ONE_REG, &reg);
+> +}
+> +
+> +struct st_time {
+> +	uint32_t rev;
+> +	uint32_t attr;
+> +	uint64_t st_time;
+> +};
+> +
+> +#define STEAL_TIME_SIZE		((sizeof(struct st_time) + 63) & ~63)
+> +#define ST_GPA_BASE		(1 << 30)
+> +
+> +static void steal_time_init(struct kvm_vm *vm)
+> +{
+> +	uint64_t st_ipa = (ulong)ST_GPA_BASE;
+> +	unsigned int gpages;
+> +	struct kvm_device_attr dev = {
+> +		.group = KVM_ARM_VCPU_PVTIME_CTRL,
+> +		.attr = KVM_ARM_VCPU_PVTIME_IPA,
+> +		.addr = (uint64_t)&st_ipa,
+> +	};
+> +
+> +	gpages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, STEAL_TIME_SIZE);
+> +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, ST_GPA_BASE, 1, gpages, 0);
+> +
+> +	vcpu_ioctl(vm, 0, KVM_SET_DEVICE_ATTR, &dev);
+> +}
+> +
+
+It might be helpful to do TEST_FAIL() on error returned from
+this vcpu_ioctl(), or skip those PVTIME SMCCC calls accordingly
+if the attribute isn't set successfully.
+
+> +static void test_fw_regs_before_vm_start(struct kvm_vm *vm)
+> +{
+> +	uint64_t val;
+> +	unsigned int i;
+> +	int ret;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(fw_reg_info); i++) {
+> +		const struct kvm_fw_reg_info *reg_info = &fw_reg_info[i];
+> +
+> +		/* First 'read' should be an upper limit of the features supported */
+> +		get_fw_reg(vm, reg_info->reg, &val);
+> +		TEST_ASSERT(val == FW_REG_ULIMIT_VAL(reg_info->max_feat_bit),
+> +			"Expected all the features to be set for reg: 0x%lx; expected: 0x%llx; read: 0x%lx\n",
+> +			reg_info->reg, GENMASK_ULL(reg_info->max_feat_bit, 0), val);
+> +
+
+s/GENMASK_ULL(...)/FW_REG_ULIMIT_VAL(...)
+
+> +		/* Test a 'write' by disabling all the features of the register map */
+> +		ret = set_fw_reg(vm, reg_info->reg, 0);
+> +		TEST_ASSERT(ret == 0,
+> +			"Failed to clear all the features of reg: 0x%lx; ret: %d\n",
+> +			reg_info->reg, errno);
+> +
+> +		get_fw_reg(vm, reg_info->reg, &val);
+> +		TEST_ASSERT(val == 0,
+> +			"Expected all the features to be cleared for reg: 0x%lx\n", reg_info->reg);
+> +
+> +		/*
+> +		 * Test enabling a feature that's not supported.
+> +		 * Avoid this check if all the bits are occupied.
+> +		 */
+> +		if (reg_info->max_feat_bit < 63) {
+> +			ret = set_fw_reg(vm, reg_info->reg, BIT(reg_info->max_feat_bit + 1));
+> +			TEST_ASSERT(ret != 0 && errno == EINVAL,
+> +			"Unexpected behavior or return value (%d) while setting an unsupported feature for reg: 0x%lx\n",
+> +			errno, reg_info->reg);
+> +		}
+> +	}
+> +}
+> +
+> +static void test_fw_regs_after_vm_start(struct kvm_vm *vm)
+> +{
+> +	uint64_t val;
+> +	unsigned int i;
+> +	int ret;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(fw_reg_info); i++) {
+> +		const struct kvm_fw_reg_info *reg_info = &fw_reg_info[i];
+> +
+> +		/*
+> +		 * Before starting the VM, the test clears all the bits.
+> +		 * Check if that's still the case.
+> +		 */
+> +		get_fw_reg(vm, reg_info->reg, &val);
+> +		TEST_ASSERT(val == 0,
+> +			"Expected all the features to be cleared for reg: 0x%lx\n",
+> +			reg_info->reg);
+> +
+> +		/*
+> +		 * Test setting the last read value. KVM should allow this
+> +		 * even if VM has started running.
+> +		 */
+> +		ret = set_fw_reg(vm, reg_info->reg, val);
+> +		TEST_ASSERT(ret == 0,
+> +			"Failed to set the register with previously read value after Vm start for reg: 0x%lx; ret: %d\n",
+> +			reg_info->reg, errno);
+> +
+> +		/*
+> +		 * Set all the features for this register again. KVM shouldn't
+> +		 * allow this as the VM is running.
+> +		 */
+> +		ret = set_fw_reg(vm, reg_info->reg, FW_REG_ULIMIT_VAL(reg_info->max_feat_bit));
+> +		TEST_ASSERT(ret != 0 && errno == EBUSY,
+> +		"Unexpected behavior or return value (%d) while setting a feature while VM is running for reg: 0x%lx\n",
+> +		errno, reg_info->reg);
+> +	}
+> +}
+> +
+> +static struct kvm_vm *test_vm_create(void)
+> +{
+> +	struct kvm_vm *vm;
+> +
+> +	vm = vm_create_default(0, 0, guest_code);
+> +
+> +	ucall_init(vm, NULL);
+> +	steal_time_init(vm);
+> +
+> +	return vm;
+> +}
+> +
+> +static struct kvm_vm *test_guest_stage(struct kvm_vm *vm)
+> +{
+> +	struct kvm_vm *ret_vm = vm;
+> +
+> +	pr_debug("Stage: %d\n", stage);
+> +
+> +	switch (stage) {
+> +	case TEST_STAGE_REG_IFACE:
+> +		test_fw_regs_after_vm_start(vm);
+> +		break;
+> +	case TEST_STAGE_HVC_IFACE_FEAT_DISABLED:
+> +		/* Start a new VM so that all the features are now enabled by default */
+> +		kvm_vm_free(vm);
+> +		ret_vm = test_vm_create();
+> +		break;
+> +	case TEST_STAGE_HVC_IFACE_FEAT_ENABLED:
+> +	case TEST_STAGE_HVC_IFACE_FALSE_INFO:
+> +		break;
+> +	default:
+> +		TEST_FAIL("Unknown test stage: %d\n", stage);
+> +	}
+> +
+> +	stage++;
+> +	sync_global_to_guest(vm, stage);
+> +
+> +	return ret_vm;
+> +}
+> +
+> +static void test_run(void)
+> +{
+> +	struct kvm_vm *vm;
+> +	struct ucall uc;
+> +	bool guest_done = false;
+> +
+> +	vm = test_vm_create();
+> +
+> +	test_fw_regs_before_vm_start(vm);
+> +
+> +	while (!guest_done) {
+> +		vcpu_run(vm, 0);
+> +
+> +		switch (get_ucall(vm, 0, &uc)) {
+> +		case UCALL_SYNC:
+> +			vm = test_guest_stage(vm);
+> +			break;
+> +		case UCALL_DONE:
+> +			guest_done = true;
+> +			break;
+> +		case UCALL_ABORT:
+> +			TEST_FAIL("%s at %s:%ld\n\tvalues: 0x%lx, 0x%lx; 0x%lx, stage: %u",
+> +			(const char *)uc.args[0], __FILE__, uc.args[1],
+> +			uc.args[2], uc.args[3], uc.args[4], stage);
+> +			break;
+> +		default:
+> +			TEST_FAIL("Unexpected guest exit\n");
+> +		}
+> +	}
+> +
+> +	kvm_vm_free(vm);
+> +}
+> +
+> +int main(void)
+> +{
+> +	setbuf(stdout, NULL);
+> +
+> +	test_run();
+> +	return 0;
+> +}
+> 
+
+Thanks,
+Gavin
 
