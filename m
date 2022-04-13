@@ -2,233 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E8484FF968
-	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 16:49:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D48184FF9A1
+	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 17:01:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232816AbiDMOv6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Apr 2022 10:51:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42328 "EHLO
+        id S234572AbiDMPD3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Apr 2022 11:03:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235719AbiDMOvy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Apr 2022 10:51:54 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E13E162FB
-        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 07:49:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649861371; x=1681397371;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=5tUWvY5wx83qgPWDLMYmB95ltyTG/n0uPhWh1X+W59w=;
-  b=Sw7ooqGIWo2wq9mA05ZE5mTNnzlLzevhJWUyaWQqhZk1R/RIFhEW1ooJ
-   l0FGjOC57WTBrs+b2lbvLf2vYHtwWDvUiDVKmFJ5JVFpRNlC3L5zkWkxW
-   clUlBUqU3Qq1YVqcvRjMqCdWoOaOF8HAgzTa2WsQjut3k/kZG7zcWdI2u
-   rMauahJstma2ubbLJk+YgK74ur2jFblbsrAAVV+oIXqtcPA4WOE7mD0cq
-   WU7n3a+4spakhZ3bTbXaTF1PunH2NBKS1RAW0U4lyIhDLXPxOnGQx/wAr
-   BvNu1EVTdXcmfl0Ufa8cNCOgjs5hAsZLxszldhdx0FhL6cOm1LS9MeB67
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10315"; a="262128265"
-X-IronPort-AV: E=Sophos;i="5.90,257,1643702400"; 
-   d="scan'208";a="262128265"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2022 07:49:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,257,1643702400"; 
-   d="scan'208";a="700275904"
-Received: from orsmsx606.amr.corp.intel.com ([10.22.229.19])
-  by fmsmga001.fm.intel.com with ESMTP; 13 Apr 2022 07:49:30 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27; Wed, 13 Apr 2022 07:49:30 -0700
-Received: from orsmsx604.amr.corp.intel.com (10.22.229.17) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27; Wed, 13 Apr 2022 07:49:29 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27 via Frontend Transport; Wed, 13 Apr 2022 07:49:29 -0700
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.177)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2308.27; Wed, 13 Apr 2022 07:49:28 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bVUMsZiJioFgf5ry1qYIri7XePyxYxXEEcjwegaf+HLtXtn+5Q/r+DOkx41qhzlmaO1Kx5eDtG4yROZ8zTZM7cYtQphGHGGA9hjp/F4bQsD5lGikadCzNdifa2jggv04vSo/UlwY1a/0KGRv7eo1Yee+BV4tBImkCok42xoUnZLgScZMe64BGqo1AmTCQpqEb5f5yp3zWfaYknqizNQnPkrlFAewsta0gGt9lPhBkZngop/Arol1YulRiC0RbbUsJYLY6/XQ/yJOG2a/R+cbruw4K+vtTxk3PRwpYLFEl/L6LPWfbeB4H0sF91n8MN7NcHWLWAPq8u8zKsPDIsnScg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Dd5MpaWmLvYY91EVW6AfhLRft6j26Izcz/3wk7aKaoM=;
- b=VO+mphBvyVzxlIIdetECK19Y9iojqVPebeyk2bypF1DL/aFSrsYtS0toy4v9kgASdvCBOqMmn5xbHqrKcY4uMj/AwtHqcQaZ6CpTmwJIG+TA7rcrwlsGQm67gQ0P+nKOqHMeVOBi9jSqajnuVXehCO8y1xQ+Tnl69L9x4wsBpflfZRX45NrVAArvIerz0UDCoOvW9kdiIgBxmFIkDJJE7u5pN0hxYoforilNjbKmW2W5YD3VpONRu3U7e8IWxKP+U1OBgnEmLjUOUD3YejTWxd88hVBYYwcN5IwOTWH95jkL+F0EzJH44QwXeBdq761R/nVagzf8J/8+UnhpLtPGaw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB5658.namprd11.prod.outlook.com (2603:10b6:510:e2::23)
- by MN2PR11MB4095.namprd11.prod.outlook.com (2603:10b6:208:150::31) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5144.29; Wed, 13 Apr
- 2022 14:49:26 +0000
-Received: from PH0PR11MB5658.namprd11.prod.outlook.com
- ([fe80::71d2:84f6:64e1:4024]) by PH0PR11MB5658.namprd11.prod.outlook.com
- ([fe80::71d2:84f6:64e1:4024%6]) with mapi id 15.20.5144.030; Wed, 13 Apr 2022
- 14:49:26 +0000
-Message-ID: <42f6e2ac-8abf-8275-01fd-9b0c5dd53b4a@intel.com>
-Date:   Wed, 13 Apr 2022 22:49:01 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.7.0
-Subject: Re: [PATCH RFC 07/12] iommufd: Data structure to provide IOVA to PFN
- mapping
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        <iommu@lists.linux-foundation.org>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        "Kevin Tian" <kevin.tian@intel.com>, <kvm@vger.kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        "Shameerali Kolothum Thodi" <shameerali.kolothum.thodi@huawei.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>
-References: <7-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
- <17c0e7f2-77ee-0837-4d81-ee6254455ab7@intel.com>
- <20220413143646.GQ2120790@nvidia.com>
-From:   Yi Liu <yi.l.liu@intel.com>
-In-Reply-To: <20220413143646.GQ2120790@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: HK2PR03CA0062.apcprd03.prod.outlook.com
- (2603:1096:202:17::32) To PH0PR11MB5658.namprd11.prod.outlook.com
- (2603:10b6:510:e2::23)
+        with ESMTP id S233236AbiDMPD0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Apr 2022 11:03:26 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E165113E29;
+        Wed, 13 Apr 2022 08:01:01 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23DEhZlc038191;
+        Wed, 13 Apr 2022 15:01:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=cogtTAbZWTf0bpTU8ZNZl3ye8szBWAB35pK9lz1RNbA=;
+ b=RqaGAY7fLfEkhug/sRz9gB9NVXaxUtw3wwvuWFrXCsH49ViHE9tjqaa+ahBr4qU/Dhef
+ npSCaqDSsiYlRXYkFIWHzd5Gi4bQZ9wN34n+NihETy5yZgyw3M8HAjSRfwYXldHyCNEm
+ mNN+jN3MJGwUH+YpPqzAb/eLiRPW1k90/8F9yPhqBE7gLkF90mIywhjqPDARsuAAjAoB
+ 83YAbpWIr1aPhEZuoMPuTF9RuQHA9n5Gx5CGRgSviKbtTHCzhLVYU7h9OFH3goHmvnQ/
+ fiouexojOUi2RDwIKoUAzia5C7vO6QMZ/CrdH8b5HkkJLC2pfxXq2E2Xw7vxALKZCasT 7g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fe0hb8dhu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Apr 2022 15:01:00 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23DEvFW1007301;
+        Wed, 13 Apr 2022 15:01:00 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fe0hb8dh1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Apr 2022 15:01:00 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23DEvp7K020635;
+        Wed, 13 Apr 2022 15:00:58 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03fra.de.ibm.com with ESMTP id 3fb1s8nnhy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Apr 2022 15:00:58 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23DEmNhb38797734
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 13 Apr 2022 14:48:23 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5F89342047;
+        Wed, 13 Apr 2022 15:00:55 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 215A142045;
+        Wed, 13 Apr 2022 15:00:55 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.44.32])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 13 Apr 2022 15:00:55 +0000 (GMT)
+Message-ID: <0f21ad244492d1b26d2091fa7189b9967be31f22.camel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v1 1/4] lib: s390x: add support for SCLP
+ console read
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc:     imbrenda@linux.ibm.com, thuth@redhat.com
+Date:   Wed, 13 Apr 2022 17:00:54 +0200
+In-Reply-To: <19e481fb-9804-b42c-7554-8388889dbf73@linux.ibm.com>
+References: <20220411100750.2868587-1-nrb@linux.ibm.com>
+         <20220411100750.2868587-2-nrb@linux.ibm.com>
+         <19e481fb-9804-b42c-7554-8388889dbf73@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7d0cd454-da53-4223-ce00-08da1d5cce07
-X-MS-TrafficTypeDiagnostic: MN2PR11MB4095:EE_
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-Microsoft-Antispam-PRVS: <MN2PR11MB4095B1FA82D73A6AE520AE9CC3EC9@MN2PR11MB4095.namprd11.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: J+VYKXDS3g3M97sYV93u5cIirvX+bdQrniEswMHi9sbJuL/EwR9xQelu/YiCH0SRG4OsJ4hmYuS2p72DyW1dOejDSeJyRGhXJddJpQvR1ScJoEH8r8t6CP3Q1tIqn9/+QgvfH/ibIUdGAtktbF+1pujte2A3xhK1yQphSrRDTHT+n18Pa/gbe33H6QAC9NkoYM6CV6HZU185FFBd3KhDrr2U1zkVYeceWdpx9rkP63diy3hIGup/vqzEit+TkICuTmNbUqTnw5gjPezNVWzFRLRmBrKVvP21x6sXgoeA1+dfDLUihevkihh6vorKFZj/JzhQSbjvoryiHBgA68xQL+ghcVGHJD3ndT5wJ0XqQc2u3mVoNy1tzt8aVe9dLN9o6emK0hhqwpg2/4G88B9dK+27OS9rT3/ACNfr4LHfHsT/gyTBv8p+M1ggrsippSTflqfdiUsO+uyqFJyHvQWA7AUNzz3Bp3i3Rc2SMHuJnoV6sXEelxNfYre8pXm/NHQdurY8JUnfWHPdXptA2sVkigKyNlAHEnG2StOS+FnDdcrf/yGSeDC2VAraHPHT1x+PeULfqfqxVB0M1XDCFl8T0OJjfT0spKaKI7R7CUPrib2izLJexbStpFBSAwo/GSegAG5f5eMxXq2hoXxmFm9PX0h9IOYgfc+eZvZtdlGnFYASz2O7ZYpqlupR8qLN1farHmKTskHIu8H1e68BWU74ajqRnZl5gNfHrwz3bh3MbCcRdo+80j3WgUBoq8o6LqeC
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5658.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(2616005)(2906002)(7416002)(8676002)(5660300002)(86362001)(26005)(53546011)(38100700002)(316002)(8936002)(83380400001)(6666004)(66946007)(31696002)(6512007)(4326008)(6506007)(66556008)(66476007)(82960400001)(186003)(54906003)(6916009)(6486002)(508600001)(36756003)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MXQ1cjhPbmNydlgzeEw3SDhJbjFNaEltWWlzNFRtZ0ttYnhxakNBN2o2dkVV?=
- =?utf-8?B?ZllMeGRYeDRhMFBKRWRmUjFIanFxcEI5dEh1RGFuOU1tb0NHTjZSektTdzJS?=
- =?utf-8?B?Y2FkTWJvemJhL0c0aU1lWHBScmVnMDlwczFycWhKSHBhNng0U3VoTStJa3Jy?=
- =?utf-8?B?MGNZZGU1YjZjdFNVOWZYMU93ME1mQ1A0S2t4YkRwRm5UOHRBeWtlZmdkSUZP?=
- =?utf-8?B?T01CZVlzWVpRVTYwWTlGc1hFbjlsMnVGTXdSMEE5Uk1OWlpYaTY2Tkh5aFQ4?=
- =?utf-8?B?QXFUUHV5N3oxZ0pSRyt1Z09SWGpjek5BTHlMMzNXOXNvTk95aVNkNFlkSnh4?=
- =?utf-8?B?RmJ3d05NRER4Qm4ySnNTMGxrdkk1bzZPRy9vVFpyQ2ljMDZEeEMwY3YzekF0?=
- =?utf-8?B?M2M5Q2hPMmtUdGRHZWRmRkpQOEtQWjZDUEs0djE4dXlGUWdpM1ZITlIvaEEx?=
- =?utf-8?B?QnpYYXZaM3U4M3h0dFBvUzE0ZExRUXlTYWZLM3RwTmJkdU5TalNlNXdRcldk?=
- =?utf-8?B?M1NBN0tocFpBL3dlNGMzSXJXUkgwdnk2bXFBTTFhVUtIbWlWVWt4bmxaRStP?=
- =?utf-8?B?SnBJN3lXSHJuS3BsWU80eTFzWkk0eURNd2lJVmZpOGt4SVZTNjQ1SE5pajU0?=
- =?utf-8?B?NVRjOGduSm9hdHFpamtocUZvUGRBbGtWeStNam8zU2wzYUY3bUYvUmY2NEJB?=
- =?utf-8?B?T1dxRTNhTVJrM0lvcUNGQUdTREhJSlhQVlR4cDVLVjNzSVd6dXZqakhPVjhh?=
- =?utf-8?B?L0o1NTVLZ2RjQm5PSkdhUXhHTW1ISlVxWDcwNWZsSnFaVzE0Sk53TnBOUG1q?=
- =?utf-8?B?Ym5BMlJrVEtMK1VEeFlSVS9ZSmt5TVVydWlHcXk2WW0wdE0vNm1VQ3I4blgz?=
- =?utf-8?B?UDJXRTM0cHBHZ21jWHRqUmxkd3NrTUt6SDJrclB5RHE0RXpqQWF2YU95VEha?=
- =?utf-8?B?U3YvL1YrYzNIS3NmY3ZFd05MOTFjTFR4eHpkMmlaUlZMUFU0ZnU4T2hORFcx?=
- =?utf-8?B?MTR1OHg2RDJnQnB5OW9wR1UxT3h6NlRLOXJsWmtEeFdxM2x1eEV0OTZTVEhu?=
- =?utf-8?B?dUl0a3M5ZkhjRURvY2hvSXRlYVJvWEJKY2hkemg5MkZXem1jNEdtbi9HelJq?=
- =?utf-8?B?R2d4MXpnQVdGNFRCMFlNTDhrTi9VSDZORGp1UXJwTmpmMWJpdHhtQVZZRk9j?=
- =?utf-8?B?SkJ5VStFZi9SUjFRL2tZOTRXRzN1NXEwWW53a3c3alNqNkVHWUpMRTd6VEVD?=
- =?utf-8?B?VFZyTU9LTkM1VjdIR2ZGeDBCTVpCMm8vMkpBUlNNR2FBYjlBZ3kyaVJ3RG9Y?=
- =?utf-8?B?b1RpOU9DZ21JcEkvRTlSOHAzNmNhU2g4eitNSFh3Z000Nkx0Y1Y5VkcvV1FD?=
- =?utf-8?B?aHlRZ3NxZVdkc2V2Uk5KRjhtUVRrM0lpUTZZMDFoazVOYVg5WEZMUnV1K3U3?=
- =?utf-8?B?aGR6aUprcEhPVEFvdVVDWEN3UFptcEdsVm8vS2ZhU3E2dWxKSEJXS09aUFJS?=
- =?utf-8?B?T3VaR2lhZ3ltcHdqSmtvRE5GOXB5QXJaaUordms2b08zWXJleHFXaFpoZlRW?=
- =?utf-8?B?dHlsWDA0Uzl6bHR4MDJmMGlwcDhmRW1ja3hTdHdkcms5ZHQwb0tJTlJHSElT?=
- =?utf-8?B?QjMzWTZJWWVtck1lOTBJNkNGbEJzcTZxY3Y3RWxBL2hQV2syb09IWlFEZmNx?=
- =?utf-8?B?TEVDZTFPUGJRK3YxaE80UTNMZFp3bVJZazk2c294Mys5dGtVUUxqOEViQzhR?=
- =?utf-8?B?ZUl5dFBSQW9yNEdTaWx4VGRLelNxUDZXcFNxMkpjZmdHSEFxY2duME0yT2Y1?=
- =?utf-8?B?L2Era1I2cDh1VmtSUEt6cmJqY09xdjJnenAxNmNPMVF2WklYTXB3cjdKV1hB?=
- =?utf-8?B?REJvT1YzN2piU2ZWU2F5am1wUFFXUUhkTmZkWi9oc0lZUmloTTh5dWptSWNC?=
- =?utf-8?B?OEpYOGszTk94bnpwcjZVT00zSE9iK0pmVXRvaVFPWDhUaVovTkRiNUpnRVVP?=
- =?utf-8?B?NktyWmNxb1JVUjFTcGtPQzBvWjViYWhvVlN5WWFFSTIrOVFOTVUyZVMyNWQv?=
- =?utf-8?B?VXFJempYQ2FXWGdEOXBvTE5PRVJpeXhnTFM1Si9NZW1VajJTSTdkWjg4MWRX?=
- =?utf-8?B?UFB6UnpZbmZBTkIyR1V1M3hSQmpOdTM0bGhPbUx0L29FNlNQbzhKM1JSSkYz?=
- =?utf-8?B?MnhDMHUrOFU3cVZWWjB0SW1yMytSelhmSjczRDRITDRFL2Y4ajFDaGR4dG1C?=
- =?utf-8?B?WERBVlVlK2J1ZGhYR3FncDhqQS90VVpzbm43dHlJR2MxWkZmdzhoWHUzL0I3?=
- =?utf-8?B?clBRRHpaWjdKY1pBaFNiSDN6U1hiMGNkbXc1UHgwcEk3cEwvaUdUeE1OVTBt?=
- =?utf-8?Q?ZaNqQHjuyrKvPAVA=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7d0cd454-da53-4223-ce00-08da1d5cce07
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5658.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Apr 2022 14:49:26.0285
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FdtbW3QF0fUH5BsYgBdqmxFjvQcE9fQ6TeWQ0SWGrZYo6rICgnW+N2psi/NLrUX6T6gebLYt3aTb8+mGC23Chg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4095
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 6cy-__V12dwOi39rI78pladdFjYtRxlu
+X-Proofpoint-ORIG-GUID: E7MbGXhRBRZejwSkcs6jf63n6UMa-WvC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-13_02,2022-04-13_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ impostorscore=0 mlxlogscore=999 priorityscore=1501 malwarescore=0
+ suspectscore=0 spamscore=0 phishscore=0 clxscore=1015 adultscore=0
+ mlxscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204130080
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022/4/13 22:36, Jason Gunthorpe wrote:
-> On Wed, Apr 13, 2022 at 10:02:58PM +0800, Yi Liu wrote:
->>> +/**
->>> + * iopt_unmap_iova() - Remove a range of iova
->>> + * @iopt: io_pagetable to act on
->>> + * @iova: Starting iova to unmap
->>> + * @length: Number of bytes to unmap
->>> + *
->>> + * The requested range must exactly match an existing range.
->>> + * Splitting/truncating IOVA mappings is not allowed.
->>> + */
->>> +int iopt_unmap_iova(struct io_pagetable *iopt, unsigned long iova,
->>> +		    unsigned long length)
->>> +{
->>> +	struct iopt_pages *pages;
->>> +	struct iopt_area *area;
->>> +	unsigned long iova_end;
->>> +	int rc;
->>> +
->>> +	if (!length)
->>> +		return -EINVAL;
->>> +
->>> +	if (check_add_overflow(iova, length - 1, &iova_end))
->>> +		return -EOVERFLOW;
->>> +
->>> +	down_read(&iopt->domains_rwsem);
->>> +	down_write(&iopt->iova_rwsem);
->>> +	area = iopt_find_exact_area(iopt, iova, iova_end);
->>
->> when testing vIOMMU with Qemu using iommufd, I hit a problem as log #3
->> shows. Qemu failed when trying to do map due to an IOVA still in use.
->> After debugging, the 0xfffff000 IOVA is mapped but not unmapped. But per log
->> #2, Qemu has issued unmap with a larger range (0xff000000 -
->> 0x100000000) which includes the 0xfffff000. But iopt_find_exact_area()
->> doesn't find any area. So 0xfffff000 is not unmapped. Is this correct? Same
->> test passed with vfio iommu type1 driver. any idea?
+On Tue, 2022-04-12 at 17:32 +0200, Janosch Frank wrote:
+> On 4/11/22 12:07, Nico Boehr wrote:
+> > Add a basic implementation for reading from the SCLP ACII console.
+> > The goal of
+> > this is to support migration tests on s390x. To know when the
+> > migration has been
+> > finished, we need to listen for a newline on our console.
+> > 
+> > Hence, this implementation is focused on the SCLP ASCII console of
+> > QEMU and
+> > currently won't work under e.g. LPAR.
 > 
-> There are a couple of good reasons why the iopt_unmap_iova() should
-> proccess any contiguous range of fully contained areas, so I would
-> consider this something worth fixing. can you send a small patch and
-> test case and I'll fold it in?
+> How much pain would it be to add the line mode read?
 
-sure. just spotted it, so haven't got fix patch yet. I may work on
-it tomorrow.
+I am not terribly familiar with the line mode, but I can say it would
+make the implementation of the ASCII console more complex. Right now we
+can just assume there will just be events from the ASCII console when
+we read event data.
 
--- 
-Regards,
-Yi Liu
+Not impossible to do, but I thought we don't need it so I kept things
+simple. Is there some benefit we would have from the line mode console?
+
+[...]
+> >   
+> > +static void sclp_console_enable_read(void)
+> > +{
+> > +       sclp_write_event_mask(SCLP_EVENT_MASK_MSG_ASCII,
+> > SCLP_EVENT_MASK_MSG_ASCII | SCLP_EVENT_MASK_MSG);
+> > +}
+> > +
+> > +static void sclp_console_disable_read(void)
+> > +{
+> > +       sclp_write_event_mask(0, SCLP_EVENT_MASK_MSG_ASCII |
+> > SCLP_EVENT_MASK_MSG);
+> > +}
+> > +
+> >   void sclp_console_setup(void)
+> >   {
+> > -       sclp_set_write_mask();
+> > +       /* We send ASCII and line mode. */
+> > +       sclp_write_event_mask(0, SCLP_EVENT_MASK_MSG_ASCII |
+> > SCLP_EVENT_MASK_MSG);
+> >   }
+> >   
+> >   void sclp_print(const char *str)
+> > @@ -227,3 +240,59 @@ void sclp_print(const char *str)
+> >         sclp_print_ascii(str);
+> >         sclp_print_lm(str);
+> >   }
+> > +
+> > +#define SCLP_EVENT_ASCII_DATA_STREAM_FOLLOWS 0
+> 
+> -> sclp.h
+
+Yes, thanks.
+
+> 
+> > +
+> > +static int console_refill_read_buffer(void)
+> > +{
+> > +       const int MAX_EVENT_BUFFER_LEN = SCCB_SIZE -
+> > offsetof(ReadEventDataAsciiConsole, ebh);
+> > +       ReadEventDataAsciiConsole *sccb = (void *)_sccb;
+> > +       const int EVENT_BUFFER_ASCII_RECV_HEADER_LEN = sizeof(sccb-
+> > >ebh) + sizeof(sccb->type);
+> > +       int ret = -1;
+> 
+> Reverse Christmas tree
+
+Hm, I think it's not possible for EVENT_BUFFER_ASCII_RECV_HEADER_LEN
+because it needs sccb first. I would want to leave as-is except if you
+have a better idea on how to do this?
+
+> The const int variables are all caps because they are essentially
+> constants?
+
+Yes, that was my reasoning. But it is uncommon in kvm-unit-test to have
+it uppercase, all const ints in the codebase are lowercase, so I will
+lowercase it.
+
+> > +
+> > +       sclp_console_enable_read();
+> > +
+> > +       sclp_mark_busy();
+> > +       memset(sccb, 0, 4096);
+> 
+> sizeof(*sccb)
+
+If you are OK with it, I would prefer to use SCCB_SIZE, s.t. the entire
+buffer is cleared.
