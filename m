@@ -2,67 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C8D64FFF61
-	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 21:33:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DE56F4FFFA5
+	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 21:56:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237018AbiDMTfq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Apr 2022 15:35:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41526 "EHLO
+        id S232868AbiDMT6W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Apr 2022 15:58:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237731AbiDMTfp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Apr 2022 15:35:45 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52103765BF
-        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 12:33:23 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id o5so3035799pjr.0
-        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 12:33:23 -0700 (PDT)
+        with ESMTP id S232067AbiDMT6T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Apr 2022 15:58:19 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 718AE5D64D
+        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 12:55:57 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id mp16-20020a17090b191000b001cb5efbcab6so7224833pjb.4
+        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 12:55:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=hV/H8KXb1u1bVyvfqTqt+bNKq1N6P+ZCAZk76VK4gPQ=;
-        b=F7hKOLDt0ouUufGPuxfRuLkpaMOjt3CE4E33P7gWfSFAfaGetyKJGhJE9q9E1QP/A4
-         qGYKzkb7CV1tgoxgW4KDDSQs90Spb2/JxXTkihHGF73L40NIBmq5FYk7kusl6UFJrxY6
-         /YAVi0muyJO5wB4a1sK81foRvgoKTG0DnBa9r+GIK4Fmn1mEQxuP0y/5PM0QBBYTwnBr
-         XExwl+t5R4ZaOICi6DNeSg9xp6mCUhf2IeU8YFJ4L2JcghLRhzq96P71j89y1+CPbyi+
-         LTvEy7s+BQQoHXxxjd0a9bBbNIqWUeJGvgPj2g86b34ABFm0NtTH5fQhxgTeycwM+SiT
-         drSg==
+        bh=vUBh+OLUNajJiIokVD1iNf3ZtZSL9ixkF7y86iwj2Ic=;
+        b=anWdZBwYhczgXpwP44yXbydEmi8A9eQGD9lvZd0LIe/0ilOLqfChIxwlxeu3/miL8J
+         VwKga2tG7/4evI/kSciDgOiND4E6nCLGetPqa22sMl7kVVvCWmMIPORDNjXP92TIF7h5
+         ZtJOfWIgSDvbBbpQ0kSss4Ri+y+GkYQuSziiMDxy8OD0r38eGIa9zlosaQtfVb53RjPQ
+         qcvceb6YtJf/3sPDKmKuQ7qkWIvjIInP5Z2gLrkyk5fCiUYB3S89pB0dDqWo40aOXGY4
+         PdTUpCQnx378AGDHNrmjsNIg0Ya7fNzHc2vkHYYdBk1+WZ0TZaihsbTL5W3uIUqFl6zY
+         f8SA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=hV/H8KXb1u1bVyvfqTqt+bNKq1N6P+ZCAZk76VK4gPQ=;
-        b=podEnyBIvuS2UFii/LpCEBnL+Pvxg0WMIf9IOIyAPEleykzBwCr6f2OD6hNJIzy2/d
-         cYVCbkoUbYOgFDi0Dh6iOop9I5ZS71kJaXtzakZwwPFr2KcSlpvlplgcs1Yp1Daeuimf
-         o2a91gw+5Yy5N9jjalEyLjtU2pnDwkNg5nV4S4a6LdHac3+VQVF4F/IyYtDVRc1YzOiY
-         ZOSYWnwVtefU999CtnPCk9ZOgIIJuQQvQQ8z5DqQ/QXwSnKg/hBTeFjpwYRKQshDYiVL
-         5S91xQ4xB88w6fzTfP45YZoaJl/ZOMKy49O+x+u9C1ex24B+i3h5218j++/9rKK75Dcn
-         4RMQ==
-X-Gm-Message-State: AOAM532IWZGyqb5bzjyQiUB3DIxZI+9m/dIrbbVQkA5+aIqKdFKJj22+
-        MJu0hv7MTxJHtIFXTewdEipVwA==
-X-Google-Smtp-Source: ABdhPJyQT2FNV5chkEcXbsh7Q2nu2kP73Csp40WIuXteGCelDsct/Mv/5Y7qLCwvAKEA+V4LqDrNtA==
-X-Received: by 2002:a17:90a:8595:b0:1bf:4592:a819 with SMTP id m21-20020a17090a859500b001bf4592a819mr275744pjn.183.1649878402625;
-        Wed, 13 Apr 2022 12:33:22 -0700 (PDT)
+        bh=vUBh+OLUNajJiIokVD1iNf3ZtZSL9ixkF7y86iwj2Ic=;
+        b=droSFEBpIvG75lL/s6osHnCoqX1VuEpOHQIbOcCJrD/pgaozxDRJRSCDFNFDWUizPx
+         m4zJLhetEnoY1f8viwZyLgWKUyJuVYsdY66GXhXm/E80/o7gmxzQFAPydHMOz8h/J/DI
+         OLQNxE8ri1taBh0JdVAVA/PSjPdeAEyG7mwfnN6DaM84JeKIAo5pGXs93b13+hgoCnsY
+         dgAIB2nW5FGLcf3k+1+ERQmR2ESxM4hxn7MvNHMXXOImxiXAgIoq+gzw7nrbGw7+2OhI
+         FQaNwTclaG6wMccS+BAEi6AnMo0E8n0AgRy+BeMVJSUI/08hUkjCxeUUku/Qd8Ed/+9r
+         RExw==
+X-Gm-Message-State: AOAM530YJB1eYC/wB3W3/2D8VxGn/G8Hwz83w2nL9GNkT7Nnaejt5Es+
+        TLx9GtXfIs+qzkVpUZ8VLjLWvw==
+X-Google-Smtp-Source: ABdhPJwScNfaS4h92V5hPQvUOWvaUn27kSB4TynodJ0YKBaWXDycXTHRX9HbhYx4v8Y63vYO9u33+g==
+X-Received: by 2002:a17:90b:1d04:b0:1c7:b10f:e33d with SMTP id on4-20020a17090b1d0400b001c7b10fe33dmr355299pjb.165.1649879756789;
+        Wed, 13 Apr 2022 12:55:56 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id x20-20020aa79574000000b005061f4782c5sm3316360pfq.183.2022.04.13.12.33.21
+        by smtp.gmail.com with ESMTPSA id o123-20020a634181000000b0039d300c417dsm6746907pga.64.2022.04.13.12.55.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Apr 2022 12:33:21 -0700 (PDT)
-Date:   Wed, 13 Apr 2022 19:33:18 +0000
+        Wed, 13 Apr 2022 12:55:56 -0700 (PDT)
+Date:   Wed, 13 Apr 2022 19:55:52 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Varad Gautam <varad.gautam@suse.com>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
         marcorr@google.com, zxwang42@gmail.com, erdemaktas@google.com,
         rientjes@google.com, brijesh.singh@amd.com,
         Thomas.Lendacky@amd.com, jroedel@suse.de, bp@suse.de
-Subject: Re: [kvm-unit-tests PATCH v2 08/10] x86: Move 32-bit bringup
- routines to start32.S
-Message-ID: <YlclfjU6BMN72hUm@google.com>
+Subject: Re: [kvm-unit-tests PATCH v2 10/10] x86: Provide a common 64-bit AP
+ entrypoint for EFI and non-EFI
+Message-ID: <YlcqyGrXbvN/sufj@google.com>
 References: <20220412173407.13637-1-varad.gautam@suse.com>
- <20220412173407.13637-9-varad.gautam@suse.com>
+ <20220412173407.13637-11-varad.gautam@suse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220412173407.13637-9-varad.gautam@suse.com>
+In-Reply-To: <20220412173407.13637-11-varad.gautam@suse.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -75,86 +75,119 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, Apr 12, 2022, Varad Gautam wrote:
-> These can be shared across EFI and non-EFI builds.
+> ap_start64() currently serves as the 64-bit entrypoint for non-EFI
+> tests.
+> 
+> Having ap_start64() and save_id() written in asm prevents sharing these
+> routines between EFI and non-EFI tests.
+> 
+> Rewrite them in C and use ap_start64 as the 64-bit entrypoint in the EFI
+> boot flow.
+> 
+> With this, EFI tests support -smp > 1. smptest.efi now passes.
 > 
 > Signed-off-by: Varad Gautam <varad.gautam@suse.com>
 > ---
-> diff --git a/x86/start32.S b/x86/start32.S
-> new file mode 100644
-> index 0000000..9e00474
-> --- /dev/null
-> +++ b/x86/start32.S
-> @@ -0,0 +1,62 @@
-> +/* Common 32-bit code between EFI and non-EFI bootstrapping. */
-> +
-> +.code32
-> +
-> +MSR_GS_BASE = 0xc0000101
-> +
-> +.macro setup_percpu_area
-> +	lea -4096(%esp), %eax
-> +	mov $0, %edx
-> +	mov $MSR_GS_BASE, %ecx
-> +	wrmsr
-> +.endm
-> +
-> +.macro setup_segments
-> +	mov $MSR_GS_BASE, %ecx
-> +	rdmsr
-> +
-> +	mov $0x10, %bx
-> +	mov %bx, %ds
-> +	mov %bx, %es
-> +	mov %bx, %fs
-> +	mov %bx, %gs
-> +	mov %bx, %ss
-> +
-> +	/* restore MSR_GS_BASE */
-> +	wrmsr
-> +.endm
-> +
-> +prepare_64:
-> +	lgdt gdt_descr
-> +	setup_segments
-> +
-> +	xor %eax, %eax
-> +	mov %eax, %cr4
-> +
-> +enter_long_mode:
-> +	mov %cr4, %eax
-> +	bts $5, %eax  // pae
-> +	mov %eax, %cr4
-> +
-> +	mov pt_root, %eax
-> +	mov %eax, %cr3
-> +
-> +efer = 0xc0000080
-> +	mov $efer, %ecx
-> +	rdmsr
-> +	bts $8, %eax
-> +	wrmsr
-> +
-> +	mov %cr0, %eax
-> +	bts $0, %eax
-> +	bts $31, %eax
-> +	mov %eax, %cr0
-> +	ret
-> +
-> +ap_start32:
-> +	setup_segments
-> +	mov $-4096, %esp
-> +	lock xaddl %esp, smp_stacktop
-> +	setup_percpu_area
-> +	call prepare_64
-
-I suspect this will conflict with my idea of using a dedicated percpu area.  But
-can't that be remedied by adding a prep patch to drop setup_percpu_area and add a
-C helper to the setup (using the dedicated area), called from ap_start64()?  I don't
-see any instances of gs: being used before reset_apic().
-
-Then the funky save/restore of MSR_GS_BASE also disappears.
-
-> +	ljmpl $8, $ap_start64
-> -- 
-> 2.32.0
+>  lib/x86/asm/setup.h  |  3 +++
+>  lib/x86/setup.c      | 54 +++++++++++++++++++++++++++++++++-----------
+>  lib/x86/smp.c        |  1 +
+>  x86/cstart64.S       | 24 --------------------
+>  x86/efi/efistart64.S |  5 ----
+>  5 files changed, 45 insertions(+), 42 deletions(-)
 > 
+> diff --git a/lib/x86/asm/setup.h b/lib/x86/asm/setup.h
+> index 24d4fa9..8502e7d 100644
+> --- a/lib/x86/asm/setup.h
+> +++ b/lib/x86/asm/setup.h
+> @@ -16,4 +16,7 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo);
+>  void setup_5level_page_table(void);
+>  #endif /* CONFIG_EFI */
+>  
+> +void save_id(void);
+> +void ap_start64(void);
+> +
+>  #endif /* _X86_ASM_SETUP_H_ */
+> diff --git a/lib/x86/setup.c b/lib/x86/setup.c
+> index e2f7967..a0e0b0c 100644
+> --- a/lib/x86/setup.c
+> +++ b/lib/x86/setup.c
+> @@ -14,8 +14,12 @@
+>  #include "apic.h"
+>  #include "apic-defs.h"
+>  #include "asm/setup.h"
+> +#include "processor.h"
+> +#include "atomic.h"
+>  
+>  extern char edata;
+> +extern unsigned char online_cpus[(MAX_TEST_CPUS + 7) / 8];
+
+This is also in lib/x86/apic.c, I think it makes sense to move the declaration
+to smp.h.  And opportunistically tweak the open coded size to:
+
+  extern unsigned char online_cpus[DIV_ROUND_UP(MAX_TEST_CPUS), BITS_PER_BYTE)];
+
+> +extern unsigned cpu_online_count;
+
+This should probably go into smp.h too, e.g. svm_tests.c also declares it.
+
+> @@ -328,6 +334,7 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
+>  	mask_pic_interrupts();
+>  	setup_page_table();
+>  	enable_apic();
+> +	save_id();
+>  	ap_init();
+>  	enable_x2apic();
+>  	smp_init();
+> @@ -350,3 +357,24 @@ void setup_libcflat(void)
+>  			add_setup_arg("bootloader");
+>  	}
+>  }
+> +
+> +void save_id(void)
+
+save_id() is a very odd name for what this is doing.  Maybe mark_cpu_online()?
+Or am I overlooking something?
+
+> +{
+> +	u32 id = apic_id();
+> +
+> +	/* atomic_fetch_or() emits `lock or %dl, (%eax)` */
+> +	atomic_fetch_or(&online_cpus[id / 8], (1 << (id % 8)));
+
+Heh, this makes my brain go "what!?!".  I strongly prefer we add^Wcopy the kernel's
+arch_set_bit() into lib/x86/atomic.h as atomic_set_bit(), then this becomes
+
+	atomic_set_bit(&online_cpus, apic_id());
+
+which is waaay easier to understand.
+
+> +}
+> +
+> +void ap_start64(void)
+> +{
+> +	setup_gdt_tss();
+> +	reset_apic();
+> +	load_idt();
+> +	save_id();
+> +	enable_apic();
+> +	enable_x2apic();
+> +	sti();
+
+Hmm, so ap_start64 has a nop after the sti, presumably to consume the STI blocking
+shadow.  _Why_ it needed to that, I have no idea, any pending IRQs should be
+serviced prior to actually executing HLT.  Purely to be stupidly cautious, can
+you drop the "nop" from ap_start64 in a prep patch?  Just so that if there's some
+magic we're missing, it shows up in a more obvious bisect.
+
+> +	atomic_fetch_inc(&cpu_online_count);
+> +	asm volatile("1: hlt; jmp 1b");
+
+Unless I'm missing something, this should work and makes it more obvious that
+the vCPU is being put into a loop:
+
+	for (;;)
+		asm volatile("hlt");
+
+or while(1) if that's your preference.
+
+> +}
