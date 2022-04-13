@@ -2,246 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F04B4FFF06
-	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 21:18:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8779C4FFF09
+	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 21:18:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238229AbiDMTUU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Apr 2022 15:20:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48750 "EHLO
+        id S238231AbiDMTUZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Apr 2022 15:20:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231877AbiDMTUS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Apr 2022 15:20:18 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE04A49F12;
-        Wed, 13 Apr 2022 12:17:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649877476; x=1681413476;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=/U4YLAIgxPRAWnFnFw7RvEx+/nVxpKYrd0mSXD5+CJQ=;
-  b=InSucgoPZ/cdfwrQzDRbFBK+7BXILFJ01RLH+aiuX6gAt56v0RumZRkV
-   AbJi6IBtYhhdTkT7hK8Ga6k6SEZBzLOtZ3pm3kVjoEkNQ2ovNKUaASxWB
-   wsu+sgv3Vs2BBPnvu/ND2ews/JRvOzOe4S9mQyRlB5ZGSjY+AU/lmZcLI
-   jHX9hz4lJjHSooSi9fDzZqGqGTgCpSas9crHQUZs26IUs27K6UCW9RuaG
-   G8AKgbp2DPak5uwTXnynSb2J9Dj8hHo/ElQplb35XiuBNP0yw1n3Z43BA
-   G9z7SS2VUrFJmdisyDkcCXQB+n5gYKgwhHd0OdnYzbTv8PYJiv1UsGG5w
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10316"; a="244639930"
-X-IronPort-AV: E=Sophos;i="5.90,257,1643702400"; 
-   d="scan'208";a="244639930"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2022 12:17:56 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,257,1643702400"; 
-   d="scan'208";a="700367794"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga001.fm.intel.com with ESMTP; 13 Apr 2022 12:17:56 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27; Wed, 13 Apr 2022 12:17:55 -0700
-Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27; Wed, 13 Apr 2022 12:17:55 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27 via Frontend Transport; Wed, 13 Apr 2022 12:17:55 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.172)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2308.27; Wed, 13 Apr 2022 12:17:54 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YW0ZfGfeIWi5Vaf9xZQdA/I9vNp9kbVcKNwRjLbgw8GTVOruwbdSh1sf6udE6cuPR75Q4ynhXfbd4Cej+SZggOk9KI+PNkgTYyameXSAq8oY/5xApbj2Gu6jvEIRoKhKev7SWJhsVby3xIDNAd/n1x6OEJVvl0EP4/lD4XP6Qi5rvarZLEmT6SYK0o0HK49CizW0SiQDt/5Vm9eBnxY+3IDe7FRFcG46Rn0OV8S1cqQu7G0emgvv1HR2m0HO9lWL16hilupVweXp3UQ7aiJeW/1T6ypXwBxH/9XO5lfhjjBg6kybxR2Iqrk7Zh+V/CrjhBF1qLuxiUDDtvSnRmXlqg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LQQbje48wRBvEUHy2lS265SydZ8Xg2q4cq3KIX+CFjQ=;
- b=eA+WwD1RLwz92BCfFpBY8I7Yp3comU+Y44i5w4WmKMBQM8RmNCdqtcAhJ975jXa6RJa2vNgt6pj9gpcPZJzNjpKeJXepXhATawct6PzYXvNEinI2qaKNEBnD/1POE3BbLCVKsnSjLQ5tg5LPC3Q1i5pPzcukCQD1K6iF/towPfdzue+UKZ8ayr0YvLvXUibFgs5A6HUSDLC81oPdfW8mhrILfXcHsGQBLCUjgNa7jQ7OEbx4q5HaYR36VQAHMF9GceuPgCJqkgA+2dKpCVMrC6WJjOGUvGT1SHOTMSKIq4FQAUJnwgM76tMSKruZm933LQY/kntxGYHU3eW5QU8qjQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM4PR11MB5549.namprd11.prod.outlook.com (2603:10b6:5:388::7) by
- BYAPR11MB2679.namprd11.prod.outlook.com (2603:10b6:a02:c7::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5144.30; Wed, 13 Apr 2022 19:17:52 +0000
-Received: from DM4PR11MB5549.namprd11.prod.outlook.com
- ([fe80::e5b8:93eb:e06b:f1ab]) by DM4PR11MB5549.namprd11.prod.outlook.com
- ([fe80::e5b8:93eb:e06b:f1ab%6]) with mapi id 15.20.5144.030; Wed, 13 Apr 2022
- 19:17:52 +0000
-From:   "Wang, Zhi A" <zhi.a.wang@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>, Christoph Hellwig <hch@lst.de>
-CC:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "Jonathan Corbet" <corbet@lwn.net>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "Eric Farman" <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Peter Oberparleiter" <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [PATCH 1/9] vfio: Make vfio_(un)register_notifier accept a
- vfio_device
-Thread-Topic: [PATCH 1/9] vfio: Make vfio_(un)register_notifier accept a
- vfio_device
-Thread-Index: AQHYToWBxoFJZjoJdESeYYuxVyKPnqztWRcAgABgPgCAAEpdgIAAA2kAgAADOQCAABLpgIAAHA6A
-Date:   Wed, 13 Apr 2022 19:17:52 +0000
-Message-ID: <661447fd-b041-c08d-cedc-341b31c405f8@intel.com>
-References: <0-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
- <1-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
- <20220413055524.GB32092@lst.de> <20220413113952.GN2120790@nvidia.com>
- <20220413160601.GA29631@lst.de> <20220413161814.GS2120790@nvidia.com>
- <20220413162946.GB31053@lst.de> <20220413173727.GU2120790@nvidia.com>
-In-Reply-To: <20220413173727.GU2120790@nvidia.com>
-Accept-Language: en-FI, en-US
-Content-Language: aa
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a3fa64ad-a247-4384-f0fd-08da1d824e98
-x-ms-traffictypediagnostic: BYAPR11MB2679:EE_
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-microsoft-antispam-prvs: <BYAPR11MB2679AD22745AFBE712B811B1CAEC9@BYAPR11MB2679.namprd11.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: yGOR7Da8V0QR/PPCwg+VfFxXz1w9wPYh9nJbDQKxnB7mhMX6qdkO0bGfbSz8Nbl52E/OONJmbWXS22/egK+1cDJ17hf3KASbqI7qC1chZRSdFgC96MDVYOX1KMvQVRcOeiAJeA6tNE0BwLrNlXM07BM3n76rK3ABd0AGCvJDBCjY9uJsMLR3AcW+/lYXQCI40JHbAbtGgQ+JEcRiayNouS888WYJ4THH+TfOyEXceRJPvcQkWxyVgnyLe3jtMmUfOQAlAEM82bRmfbJEQPy49LUsPAOckG/+R4lzpV7bnlD9vwO2YOy6i564+XBImdLvTblfX/xUrkmja3Rbzqaqs6AHNkh80iIQfu19YGFC9yNrrMUxihuHZqzh08rbuD1VvmY3vtBz5CGibaFBJi39PIsobWx9no1CvDVy5HNZAr6B9KVfzLc9czDAbUcoKuamtEnKyn7WnyklmgxUQ3LzHBNWBJyTXgMGW9NgIpB/LItvAVyNBbQOLacmhTP4nwBx9OfI4wKMgu/cf8Q9HxuVaFOg7AgkvOjKv40au6+RG5ScU9xPDT4xhp8IzPhjOR9UEitLnlXyQkPffqtmpCEZIgnvcV8uOFr5nWXCT5BufjZnUfw+c+6Y/yaVoIg+g+Sd3NWPWf0Idox3vyBBgY9qZj1cCi3S9aQj60uawsK8sLK9g6cOYSh3DJx0XmFDbS8K38r8F2jDxWRZ6cWZHzm4PbHg9wI4U+1jxoWyVmm5KHaNHcc4OsYIPIp4jaohUVBD2vkse9Lt8K2MwF6/SE7Beg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5549.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(8676002)(31686004)(186003)(508600001)(38100700002)(38070700005)(82960400001)(5660300002)(7416002)(7406005)(8936002)(6486002)(66476007)(66946007)(66556008)(76116006)(91956017)(36756003)(110136005)(316002)(54906003)(86362001)(6512007)(64756008)(66446008)(31696002)(26005)(4326008)(83380400001)(71200400001)(2616005)(122000001)(53546011)(2906002)(6506007)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?Windows-1252?Q?urBVENndAH9znd2uZ9rNBcceV2xWQW9qdmSqJFex8LqjDP85G7uCo0Vd?=
- =?Windows-1252?Q?vFIRps8gNGsjawOjtiv4wapLkcvpExaYQtmTsG6fDqASEk6Dyk8HDjIc?=
- =?Windows-1252?Q?6i1RdkPylEMOUd9kLAZrNUImWz/U6Yuh5osG2mjZZaKOip/Ivhu7kseu?=
- =?Windows-1252?Q?lRqKr76+8kQ/nM/TqapHvorDeDHiUa1NDP+3Xeew8TbE1BfScZ2kX71i?=
- =?Windows-1252?Q?2aA/59xPrifhS42rj1cDaE8M8QF4F+WKkXNLYqyqa0NyiF4jbGLMR5DA?=
- =?Windows-1252?Q?p2h/RhuJM4Pw8f2I3vQkU7TOq6GD6Cm1d36ODgXwrFoAITzXBOLGm7L5?=
- =?Windows-1252?Q?NxBU88gWyXf4junG+Z+RpggnFLOLtdc+9NMze5VQpOsBUJHxt8VJDu+D?=
- =?Windows-1252?Q?zD80rwaAN+xGlyKrihjSCuumRKT3o5SmxuCGyz9LOY3yb9hGarVb8Qjb?=
- =?Windows-1252?Q?pWgjHINOLNcxcERxiN6/HOJEMbLChvKHleWQRXgmjk+Y2hYUMnOjMiOm?=
- =?Windows-1252?Q?nP/HnJR5dxIoO7adY6IuRBdLH7TYvYgahmfcSCg5dqiRIgsBZI/5sk3O?=
- =?Windows-1252?Q?O6+WfbJ8c7+bgBHZdFjPkry/lXXvjJGpDviwlSQ/thfwcQ0GxTvaNwgP?=
- =?Windows-1252?Q?QUqhxqr+TPUTgL9FxaGP9GxVde8Ev9eJKlkdEWwUtB9+czQBJIgkDiLr?=
- =?Windows-1252?Q?T8fXeCvNg0UMKDBS8EE6d8dTsORrLyjwEwMUpIT4S2rQiaT0lTXJkD38?=
- =?Windows-1252?Q?iY62yTuyIBOAXTxSoCWh29racR9kRfJ1iyXClWLN4Gr7pbdWYZMRSav/?=
- =?Windows-1252?Q?kIyZU/3kGSRvTu1CAHUCe4U2jRtJH7Th2Xgpgwm/Ko0+DLLA0xqSJJRl?=
- =?Windows-1252?Q?hY8OrIyWnXCBWV0AqpFqQfQoqJD35VqssJv1A9jjpsSnS27/k+K5jyE6?=
- =?Windows-1252?Q?pHFA3UvLcV4DqbFDuSQ4KNMv5ZSUbRtu91LNVWXULuM6Teh1hrJuaO0R?=
- =?Windows-1252?Q?WK5QLKN61eoEzWGzEvEli254IbV8gBVX7Oq5aWLAHrmkbl4kRzcbupAd?=
- =?Windows-1252?Q?+XepsQiBqCyT3/6bO3tz39xGbRpTjRCQAu+huWNK5w4k9ibk//XKoxer?=
- =?Windows-1252?Q?Qwj7PVQj1baa0o+oaSnhzOpmv9aHFw2YogOOPLOyg8a6HwcGKkQOjxRE?=
- =?Windows-1252?Q?wPjRmlq2kcy4Rgw10WcsrvFLPKw4coIW9omL4rmtSggc8xVInsjDmPZ6?=
- =?Windows-1252?Q?KrcwjdgfiVyAkQFFGfxav+xoZOsYS6B/z2pRiO70RzUcah+VoNX0MMWb?=
- =?Windows-1252?Q?e6UHTSZYKhfTXSZ0Mrs7VjmLWgewCrrjpKgp0BquHFFH1iOGl6My4WRt?=
- =?Windows-1252?Q?1Kt0r8HRikggJF8AMxD138/ROZP/3esJtbSi6egZTuhYdtEcyFpftITg?=
- =?Windows-1252?Q?spixMSfvK3JxBNL0SGkHLmWcOf/fkdNj9vO9EJ/wSotsYli20hAd9EDq?=
- =?Windows-1252?Q?IUZEcnq7ZO1eRF4bTGJk5on5x7mIERUFzddLt0PQrqMHVicusKNRzqpP?=
- =?Windows-1252?Q?sqDEZf75ilCkGk4q+bfNNEvzB1vIfJPnQDJ4Y8mp5nbMVob8hCXZdErt?=
- =?Windows-1252?Q?hI4hF8gW0rizH8lWoJL7aPwWTwBFQhJ+wPzMYHivW1dN5U8WYvrV8XYI?=
- =?Windows-1252?Q?3VbUe3oZWnuWfHIWtBwkMnFrXp81PvtMJ1cK4v4HZuYFoz7Oe+Jfyk8Y?=
- =?Windows-1252?Q?YhdXAB0qK2Xa23uYVyqUKxnmmfdc75YZbf+i+SlPCk0sWRinUFVkuWw/?=
- =?Windows-1252?Q?mBjqr9b7jI4/UTsczQwonciH5bqU4PDjxG8wRG9DTCQGlNk4CSZRlCxg?=
- =?Windows-1252?Q?GS2HwKBfrdfKSw=3D=3D?=
-Content-Type: text/plain; charset="Windows-1252"
-Content-ID: <EDB64C059D11C543A5C817B051AC42D0@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S233128AbiDMTUY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Apr 2022 15:20:24 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0C5C49F03
+        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 12:18:02 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id md20-20020a17090b23d400b001cb70ef790dso7131526pjb.5
+        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 12:18:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=OqHI2IzoxtLI50aj9lIYmoNMamWH2lv8zRFcfkysIrE=;
+        b=Y4wxIRHNUmPoXg+k4tOGzRE1j4zMXKAQtqMZ2odJlui+Fe8fOALN7MeMK/0ivnAwGK
+         yUUMXXvrmk16qmn0+afOoW9rSPXQNECA4tvQJGLlRHMUxBM6jquDbm4oq72dahF4zPYq
+         pCXwWZ7AnWDMahKztvdDrygc5l6ku4p32IEmVbUsxA3yzt7cAcwr9ogB3Yd1/YCSfu9j
+         Xt5PIf25YulxY63VuOS2iP3wY6PuqXYGobz/gANka6/WhX0Xq85ofwRihGHUgnJUBDaI
+         k1kZCuz5LukqVwDg515t+zt2QCud3H0ONbIKohDqZOyTFY6ohHsK+m0U5RS0YV3aeF6p
+         Qdrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=OqHI2IzoxtLI50aj9lIYmoNMamWH2lv8zRFcfkysIrE=;
+        b=nYeHmiHbVcBAQ3Ay33tt6fTdJ5pyEYQJKyIsxlFBjWg9/ZHXYlJ/1zEvdIMp1L0ltM
+         Bgw5bC+bnLz/ObYtx+K3P+Px1vetCTyvR3mi6id/sJes0x0gD0mLTjo/J/Fq1MeCYXRU
+         LOwb5viPgKo7K6egjezZ+rbVeAWycch8yL4ec0Ef4oD8Imloy4e1xiHJdDnrPHMX7zIg
+         +lubTeyhDLRkfrP2Lu/4orQLDQC3IpsWGbUzxq/BfFrroudtGlbp15boLuSeOW//OPsY
+         Sv3LE5ck6YrMjgB19Boj09Uo4HQF4q4+9Xghr8JlBkE4ioyP3dqHEEby2YbnvDkDrBne
+         jJLw==
+X-Gm-Message-State: AOAM530KBR4ya/kgNClOogeVk9n4MbwDLf1/RbbeOA0sQHWP2j8kKkWx
+        AOe/mitwCbTaRBJC4hgbelvJPlCT2Uu+mA==
+X-Google-Smtp-Source: ABdhPJxl105l1EHCioBBxZyNjveK3XmR2c8qz92Dyj5I8oh3ITXKMaCfV4tQy94viMWJsk0uxsgmww==
+X-Received: by 2002:a17:90b:4f44:b0:1cb:c539:5acc with SMTP id pj4-20020a17090b4f4400b001cbc5395accmr265004pjb.152.1649877482173;
+        Wed, 13 Apr 2022 12:18:02 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id v126-20020a622f84000000b004fa666a1327sm31704227pfv.102.2022.04.13.12.18.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Apr 2022 12:18:01 -0700 (PDT)
+Date:   Wed, 13 Apr 2022 19:17:57 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Varad Gautam <varad.gautam@suse.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
+        marcorr@google.com, zxwang42@gmail.com, erdemaktas@google.com,
+        rientjes@google.com, brijesh.singh@amd.com,
+        Thomas.Lendacky@amd.com, jroedel@suse.de, bp@suse.de
+Subject: Re: [kvm-unit-tests PATCH v2 07/10] x86: efi, smp: Transition APs
+ from 16-bit to 32-bit mode
+Message-ID: <Ylch5XK3MKGfCRxr@google.com>
+References: <20220412173407.13637-1-varad.gautam@suse.com>
+ <20220412173407.13637-8-varad.gautam@suse.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5549.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a3fa64ad-a247-4384-f0fd-08da1d824e98
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Apr 2022 19:17:52.6852
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: +SEA4luc3QFvVg+CZbF58GFdqANTCtfcaMmCljKKR3UtHYhbTm5VHPanlEFj5vldl7yEXyGp0JskaFLQrLwB5A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR11MB2679
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220412173407.13637-8-varad.gautam@suse.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/13/22 5:37 PM, Jason Gunthorpe wrote:
-> On Wed, Apr 13, 2022 at 06:29:46PM +0200, Christoph Hellwig wrote:
->> On Wed, Apr 13, 2022 at 01:18:14PM -0300, Jason Gunthorpe wrote:
->>> Yeah, I was thinking about that too, but on the other hand I think it
->>> is completely wrong that gvt requires kvm at all. A vfio_device is not
->>> supposed to be tightly linked to KVM - the only exception possibly
->>> being s390..
->>
->> So i915/gvt uses it for:
->>
->>  - poking into the KVM GFN translations
->>  - using the KVM page track notifier
->>
->> No idea how these could be solved in a more generic way.
->=20
-> TBH I'm not sure how any of this works fully correctly..
->=20
-> I see this code getting something it calls a GFN and then passing
-> them to vfio - which makes no sense. Either a value is a GFN - the
-> physical memory address of the VM, or it is an IOVA. VFIO only takes
-> in IOVA and kvm only takes in GFN. So these are probably IOVAs really..
->=20
-Can you let me know the place? So that I can take a look.
+On Tue, Apr 12, 2022, Varad Gautam wrote:
+> Sending INIT/SIPI to APs from ap_init() resets them into 16-bit mode
+> to loop into sipi_entry().
+> 
+> To drive the APs into 32-bit mode, the SIPI vector needs:
+> 1. A GDT descriptor reachable from 16-bit code (gdt32_descr).
+> 2. A 32-bit entrypoint reachable from 16-bit code (ap_start32).
+> 3. The locations of GDT and the 32-bit entrypoint.
+> 
+> Setting these up at compile time (like on non-EFI builds) is not
+> possible since EFI builds with -shared -fPIC and efistart64.S cannot
+> reference any absolute addresses.
+> 
+> Relative addressing is unavailable on 16-bit mode.
+> 
+> Moreover, EFI may not load the 32-bit entrypoint to be reachable from
+> 16-bit mode.
+> 
+> To overcome these problems,
+> 1. Fill the GDT descriptor at runtime after relocating
+>    [sipi_entry-sipi_end] to lowmem. Since sipi_entry does not know the
+>    address of this descriptor, use the last two bytes of SIPI page to
+>    communicate it.
+> 2. Place a call gate in the GDT to point to ap_start32.
+> 3. Popluate sipi_entry() to lcall to ap_start32.
+> 
+> With this, the APs can transition to 32-bit mode and loop at a known
+> location.
+> 
+> Signed-off-by: Varad Gautam <varad.gautam@suse.com>
+> ---
+>  lib/x86/smp.c        | 56 ++++++++++++++++++++++++++++++++++++++++++++
+>  x86/efi/efistart64.S | 29 ++++++++++++++++++++++-
+>  2 files changed, 84 insertions(+), 1 deletion(-)
+> 
+> diff --git a/lib/x86/smp.c b/lib/x86/smp.c
+> index d7f5aba..5cc1648 100644
+> --- a/lib/x86/smp.c
+> +++ b/lib/x86/smp.c
+> @@ -6,6 +6,7 @@
+>  #include "apic.h"
+>  #include "fwcfg.h"
+>  #include "desc.h"
+> +#include "asm/page.h"
+>  
+>  #define IPI_VECTOR 0x20
+>  
+> @@ -144,16 +145,71 @@ void smp_reset_apic(void)
+>  	atomic_inc(&active_cpus);
+>  }
+>  
+> +#ifdef CONFIG_EFI
+> +extern u8 gdt32_descr, gdt32, gdt32_end;
+> +extern u8 ap_start32;
+> +#endif
+> +
+>  void ap_init(void)
+>  {
+>  	u8 *dst_addr = 0;
+>  	size_t sipi_sz = (&sipi_end - &sipi_entry) + 1;
+>  
+> +	assert(sipi_sz < PAGE_SIZE);
+> +
+>  	asm volatile("cld");
+>  
+>  	/* Relocate SIPI vector to dst_addr so it can run in 16-bit mode. */
+> +	memset(dst_addr, 0, PAGE_SIZE);
+>  	memcpy(dst_addr, &sipi_entry, sipi_sz);
+>  
+> +#ifdef CONFIG_EFI
+> +	volatile struct descriptor_table_ptr *gdt32_descr_rel;
+> +	idt_entry_t *gate_descr;
+> +	u16 *gdt32_descr_reladdr = (u16 *) (PAGE_SIZE - sizeof(u16));
 
-> But then, I see this code taking GFNs (which are probably IOVAs?) and
-> passing them to the kvm page track notifier? That can't be right, VFIO
-> needs to translate the IOVA to a GFN, not assume 1:1...
->=20
-GFNs are from the guest page table. It takes the GFN from a entry belongs
-to a guest page table and request the kvm_page_track to track it, so that
-the shadow page table can be updated accordingly.
+Ah, the gdt32 name confused me for a bit.  Can we use something more unique?
+Maybe efi_rm_trampoline_gdt?  Or just efi_trampoline_gdt since the "rm" part is
+technically wrong (though consistent).
 
-> It seems the purpose is to shadow a page table, and it is capturing
-> user space CPU writes to this page table memory I guess?
->=20
-Yes.The shadow page will be built according to the guest GPU page table.
-When a guest workload is executed in the GPU, the root pointer of the
-shadow page table in the shadow GPU context is used. If the host enables
-the IOMMU, the pages used by the shadow page table needs to be mapped as
-IOVA, and the PFNs in the shadow entries are IOVAs.
+Oooh, and the "PAGE_SIZE - sizeof(u16)" is another instance of open coding
+"PAGE_SIZE - 2".  Definitely need a #define for that.
 
-> GFN's seems to come from gen8_gtt_get_pfn which seems to be parsing
-> some guest page table?
->=20
-Yes. It's to extract the PFNs from a page table entry.
+> +
+> +	/*
+> +	 * gdt32_descr for CONFIG_EFI needs to be filled here dynamically
+> +	 * since compile time calculation of offsets is not allowed when
+> +	 * building with -shared, and rip-relative addressing is not supported
+> +	 * in 16-bit mode.
+> +	 *
+> +	 * Use the last two bytes of SIPI page to store relocated gdt32_descr
+> +	 * addr.
 
-> Jason
->=20
+Ooh, I see, it's a double indirection.  Load the address to the descriptor, then
+load the descriptor which holds the address to the GDT.  I kept thinking that 
+2 bytes were the limit chunk of the descriptor.
 
+Maybe instead of "relocated gdt32_descr addr", "a pointer to the relocated
+descriptor used by the trampoline to load the GDT"?
+
+> +	 */
+> +	*gdt32_descr_reladdr = (&gdt32_descr - &sipi_entry);
+> +
+> +	gdt32_descr_rel = (struct descriptor_table_ptr *) ((u64) *gdt32_descr_reladdr);
+> +	gdt32_descr_rel->limit = (u16) (&gdt32_end - &gdt32 - 1);
+> +	gdt32_descr_rel->base = (ulong) ((u32) (&gdt32 - &sipi_entry));
+> +
+> +	/*
+> +	 * EFI may not load the 32-bit AP entrypoint (ap_start32) low enough
+> +	 * to be reachable from the SIPI vector. Since we build with -shared, this
+
+Nit, please avoid "we" and other pronous, e.g. "Since KVM-unit-tests is built with..."
+avoids any ambiguity.
+
+> +	 * location needs to be fetched at runtime, and rip-relative addressing is
+> +	 * not supported in 16-bit mode.
+> +	 * To perform 16-bit -> 32-bit far jump, our options are:
+
+"our options" can be tweaked to something like "Alternatives to a CALL GATE are".
+
+> +	 * - ljmpl $cs, $label : unusable since $label is not known at build time.
+> +	 * - push $cs; push $label; lret : requires an intermediate trampoline since
+> +	 *	 $label must still be within 0 - 0xFFFF for 16-bit far return to work.
+> +	 * - lcall into a call-gate : best suited.
+
+I very much appreciate the comment, but it's backwards in the sense that I had no
+idea what I was reading until the very end.  I.e. lead with the below "Set up a
+call gate ..." blurb, then dive into the alternatives.  First and forement, help
+the reader understand what is actually implemented, then call out the alternatives
+and why they're inferior.
+
+> +	 *
+> +	 * Set up call gate to ap_start32 within GDT.
+> +	 *
+> +	 * gdt32 layout:
+> +	 *
+> +	 * Entry | Segment
+> +	 * 0	 | NULL descr
+> +	 * 1	 | Code segment descr
+> +	 * 2	 | Data segment descr
+> +	 * 3	 | Call gate descr
+> +	 */
+> +	gate_descr = (idt_entry_t *) ((u8 *)(&gdt32 - &sipi_entry)
+> +		+ 3 * sizeof(gdt_entry_t));
+
+Ah, it's just a coincidence that this GDT has the same layout as the "real" GDT,
+e.g. has the same KERNEL_DS and KERNEL_CS.  It took me a while to suss out that
+the APs do indeed reload a different GDT during ap_start64().
+
+In the comment above, can you add a blurb to call out that it's purely coincidental
+and not strictly required that this matches the initial part of the final GDT, and
+that APs will load the final GDT in ap_start64()?  I kept trying to figure out how
+this didn't break tests that use other selectors :-)
+
+> +	set_idt_entry_t(gate_descr, sizeof(gdt_entry_t), (void *) &ap_start32,
+> +		0x8 /* sel */, 0xc /* type */, 0 /* dpl */);
+> +#endif
+> +
+>  	/* INIT */
+>  	apic_icr_write(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT, 0);
+>  
