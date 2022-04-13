@@ -2,145 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A14994FF927
-	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 16:41:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32E344FF930
+	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 16:42:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236187AbiDMOoA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Apr 2022 10:44:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32978 "EHLO
+        id S236230AbiDMOpC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Apr 2022 10:45:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236194AbiDMOnx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Apr 2022 10:43:53 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AD1E50063;
-        Wed, 13 Apr 2022 07:41:32 -0700 (PDT)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23DDg1EJ026187;
-        Wed, 13 Apr 2022 14:41:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=JI0QhSUDOU9ItxwJFtntqhZanXjqRH5K2V34DsoKGT0=;
- b=ZmDidAgKi/wvmBPhuxQpMK2EE4z/+FIQ2C8yYxkjtxRniVD8PRkvv3wtJf1NVlSGBxAw
- ylOMc0pSZR9lJRT0Gg7TvJht76U5cIadgpq5+4iXKAh7GL1bNQv6laeeF0ncWrjMOq99
- x9GAv0lMq/SLM1UFHVPo3b9NmbqExzEWcxphH7utHtUmbN88RiGmuwS4Rp0q383fEaR9
- /bxiM/5zIpHtmemXHzMnODYAC+czvUe5YMLIj+6pbhXMiPvs6nthSVVkGuGQwONNPrxe
- VKzi8eQItK7VCeIxZJVMN1g2DcV1li4R8JKCtBdOmszOn0ai1Ots3wHDnZSgLMy0Er4Z Og== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fdymf9f6k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Apr 2022 14:41:31 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23DEDWmI020987;
-        Wed, 13 Apr 2022 14:41:31 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fdymf9f62-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Apr 2022 14:41:31 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23DEYIZQ030817;
-        Wed, 13 Apr 2022 14:41:28 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03fra.de.ibm.com with ESMTP id 3fb1s8nmxy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Apr 2022 14:41:28 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23DEfPUx39125264
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Apr 2022 14:41:25 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 844E6A4060;
-        Wed, 13 Apr 2022 14:41:25 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 43844A4054;
-        Wed, 13 Apr 2022 14:41:25 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.44.32])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 13 Apr 2022 14:41:25 +0000 (GMT)
-Message-ID: <bc1f4b507234702e662a4fa19c6875d95d5591b1.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v1 1/4] lib: s390x: add support for SCLP
- console read
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com
-Date:   Wed, 13 Apr 2022 16:41:25 +0200
-In-Reply-To: <3cac38d6-41f1-1c5e-1af1-c19f3f68aab2@redhat.com>
-References: <20220411100750.2868587-1-nrb@linux.ibm.com>
-         <20220411100750.2868587-2-nrb@linux.ibm.com>
-         <3cac38d6-41f1-1c5e-1af1-c19f3f68aab2@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+        with ESMTP id S236221AbiDMOo7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Apr 2022 10:44:59 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5289562C8B
+        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 07:42:35 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id w7so2169056pfu.11
+        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 07:42:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=/JYEDIWYyCmXfCvpDqWCkJLdtO8UQhf0VFm9gLSvtws=;
+        b=pceu2zUDQVxybZHIpx8ZRmoZzDQIwrGKZgmWOMMzB7VAntXi50Pl0f8pqyxIEWPI+5
+         pL8meqwPaGS963019NumUkybXx5CAsYMfc9veKm5KQ+oJV7CHLpP0E2YE2ceNlg24Awv
+         Xiemy6d/d+QzFJP4AyTUBvn9E10N6yw7xHZAlMF5b+RdO7301qDFVWFwUPYHcOEZEQst
+         hdyDSfjQBEYHj3aM7s6VfQjTsXUs7pBHuWqIWAdpu45F1CvjpGaMW4cUXBfpwME0fQNW
+         ATa+Av8J7FZi20cBDzMQDd2QAB2m/kLbg2cdN+dvirzLbuU7eYsx1Ld8zBtlLaLNLR02
+         zZ9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/JYEDIWYyCmXfCvpDqWCkJLdtO8UQhf0VFm9gLSvtws=;
+        b=Bc5LwXY2Tbt5qXIMRucokBoPgt0J/1K5P4mtUqQfnYyzqSALZrUt1RqkoEJO50x7AM
+         6/jtqPbrUAWCcCs04hnVfdyBjthDyA+ap9ekMtgFXfqPw5XwNRZf6df72SHHvLpCG22R
+         /0kbknrhwQthAP0jYGPEH08SNG9hfpUQZRTfo/WSLJwPmJVmlyV2sudMvIKQrgD9/GZx
+         EIT8g8WOgJvfZvsQfphhLqGNHDu+3v/IlhPf4U3eMJdfuAZODbXR/UTOgCasiPnJ4tZN
+         jCSP/r3ylRjj6ztQf/K3kGUhUbBTJ0jnuw8jura07bPtnH12E5khJYSkKXRwrJZlWj4c
+         W7YA==
+X-Gm-Message-State: AOAM530tPIIM8ncvHrPdzwiCNUkJfwPtmPDAWt+0DqfOI/7LSExlUluN
+        iyFzaEBp0dW9UnNtf1YatGyONg==
+X-Google-Smtp-Source: ABdhPJyND0vLloxs8A3tKDdJhHhujGT9+mvw3w0rxORb0WCXA5Nj8ZZclC8so/j+m0ds/Ow5E6mDWg==
+X-Received: by 2002:a63:1024:0:b0:39d:1172:b8e0 with SMTP id f36-20020a631024000000b0039d1172b8e0mr20123646pgl.423.1649860954468;
+        Wed, 13 Apr 2022 07:42:34 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id i15-20020a17090a058f00b001cd50a6ec5csm2934080pji.16.2022.04.13.07.42.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Apr 2022 07:42:33 -0700 (PDT)
+Date:   Wed, 13 Apr 2022 14:42:30 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-doc@vger.kernel.org
+Subject: Re: [RFC PATCH V3 2/4] KVM: X86: Introduce role.glevel for level
+ expanded pagetable
+Message-ID: <YlbhVov4cvM26FnC@google.com>
+References: <20220330132152.4568-1-jiangshanlai@gmail.com>
+ <20220330132152.4568-3-jiangshanlai@gmail.com>
+ <YlXvtMqWpyM9Bjox@google.com>
+ <caffa434-5644-ee73-1636-45a87517bae2@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: vPePS4UU9FNTUWYMU9XHgrWxiC0H_baa
-X-Proofpoint-GUID: nI8T3WYeFw5nLdGRAS46eDRbMuvMIfVN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-13_02,2022-04-13_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 spamscore=0 mlxlogscore=880 mlxscore=0 clxscore=1015
- adultscore=0 phishscore=0 lowpriorityscore=0 bulkscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204130077
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <caffa434-5644-ee73-1636-45a87517bae2@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-04-12 at 10:02 +0200, Thomas Huth wrote:
-> On 11/04/2022 12.07, Nico Boehr wrote:
-> > Add a basic implementation for reading from the SCLP ACII console.
-> > The goal of
+On Wed, Apr 13, 2022, Paolo Bonzini wrote:
+> On 4/12/22 23:31, Sean Christopherson wrote:
+> > > +		unsigned glevel:4;
+> > We don't need 4 bits for this.  Crossing our fingers that we never had to shadow
+> > a 2-level guest with a 6-level host, we can do:
+> > 
+> > 		unsigned passthrough_delta:2;
+> > 
+> > Where the field is ignored if direct=1, '0' for non-passthrough, and 1-3 to handle
+> > shadow_root_level - guest_root_level.  Basically the same idea as Paolo's smushing
+> > of direct+passthrough into mapping_level, just dressed up differently.
 > 
-> s/ACII/ASCII/
+> Basically, your passthrough_delta is level - glevel in Jiangshan's patches.
+> You'll need 3 bits anyway when we remove direct later (that would be
+> passthrough_delta == level).
 
-Thanks, fixed.
+Are we planning on removing direct?
 
-[...]
-> > diff --git a/lib/s390x/sclp-console.c b/lib/s390x/sclp-console.c
-> > index fa36a6a42381..8e22660bf25d 100644
-[...]
-> > +static int console_refill_read_buffer(void)
-> > +{
-> > +       const int MAX_EVENT_BUFFER_LEN = SCCB_SIZE -
-> > offsetof(ReadEventDataAsciiConsole, ebh);
-> > +       ReadEventDataAsciiConsole *sccb = (void *)_sccb;
-> > +       const int EVENT_BUFFER_ASCII_RECV_HEADER_LEN = sizeof(sccb-
-> > >ebh) + sizeof(sccb->type);
-> > +       int ret = -1;
-> > +
-> > +       sclp_console_enable_read();
-> > +
-> > +       sclp_mark_busy();
-> > +       memset(sccb, 0, 4096);
-> > +       sccb->h.length = PAGE_SIZE;
-> > +       sccb->h.function_code = SCLP_UNCONDITIONAL_READ;
-> > +       sccb->h.control_mask[2] = 0x80;
+> Regarding the naming:
 > 
-> Add at least a comment about what the 0x80 means, please?
+> * If we keep Jiangshan's logic, I don't like the glevel name very much, any
+> of mapping_level, target_level or direct_level would be clearer?
 
-Oh yes, thanks. We already have a define for it which I will use
-instead of the comment: SCLP_CM2_VARIABLE_LENGTH_RESPONSE
+I don't love any of these names, especially glevel, because the field doesn't
+strictly track the guest/mapping/target/direct level.  That could obviously be
+remedied by making it valid at all times, but then the role would truly need 3
+bits (on top of direct) to track 5-level guest paging.
 
+> * If we go with yours, I would call the field "passthrough_levels".
 
-[...]
-> > +
-> > +       read_buf_end = sccb->ebh.length -
-> > EVENT_BUFFER_ASCII_RECV_HEADER_LEN;
-> > +
-> > +       assert(read_buf_end <= sizeof(read_buf));
-> > +       memcpy(read_buf, sccb->data, read_buf_end);
-> > +
-> > +       read_index = 0;
-> 
-> Set "ret = 0" here?
-
-Oooops, excellent catch. Thanks, fixed.
-
+Hmm, it's not a raw level though.
