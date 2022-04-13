@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A4F04FF692
-	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 14:19:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F1824FF6A7
+	for <lists+kvm@lfdr.de>; Wed, 13 Apr 2022 14:22:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232207AbiDMMV1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Apr 2022 08:21:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51424 "EHLO
+        id S234948AbiDMMZP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Apr 2022 08:25:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbiDMMV0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Apr 2022 08:21:26 -0400
-Received: from out30-45.freemail.mail.aliyun.com (out30-45.freemail.mail.aliyun.com [115.124.30.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFCE85881F;
-        Wed, 13 Apr 2022 05:19:02 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R911e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04357;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=33;SR=0;TI=SMTPD_---0V9zZ.hy_1649852336;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0V9zZ.hy_1649852336)
+        with ESMTP id S229714AbiDMMZM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Apr 2022 08:25:12 -0400
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4D295AEE6;
+        Wed, 13 Apr 2022 05:22:50 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=33;SR=0;TI=SMTPD_---0V9zbh3._1649852563;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0V9zbh3._1649852563)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 13 Apr 2022 20:18:57 +0800
-Message-ID: <1649852080.6360478-1-xuanzhuo@linux.alibaba.com>
+          Wed, 13 Apr 2022 20:22:44 +0800
+Message-ID: <1649852469.9980721-2-xuanzhuo@linux.alibaba.com>
 Subject: Re: [PATCH v9 18/32] virtio_ring: introduce virtqueue_resize()
-Date:   Wed, 13 Apr 2022 20:14:40 +0800
+Date:   Wed, 13 Apr 2022 20:21:09 +0800
 From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 To:     Jason Wang <jasowang@redhat.com>
 Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
@@ -58,7 +58,7 @@ In-Reply-To: <92622553-e02d-47bd-06f9-0ce24c22650c@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,
         RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
         UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
         version=3.4.6
@@ -123,9 +123,6 @@ ns
 > Should we document that the virtqueue is kept unchanged (still
 > available) on (specific) failure?
 >
-
-OK.
-
 >
 > > + */
 > > +int virtqueue_resize(struct virtqueue *_vq, u32 num,
@@ -172,6 +169,13 @@ lse;
 >
 >
 > Calling reinit here seems a little bit odd, it looks more like a reset
+
+
+I also feel that this is a bit odd, I will put virtqueue_reinit_* into
+virtqueue_resize_*.
+
+Thanks.
+
 > of the virtqueue. Consider we may re-use virtqueue reset for more
 > purpose, I wonder if we need a helper like:
 >
@@ -182,30 +186,6 @@ lse;
 >  =C2=A0=C2=A0=C2=A0 else
 >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 virtqueue_reinit_split(_vq)
 > }
-
-Yes, currently we are implementing resize. This is used to implement
-set_ringparam()
-
-Later, when we implement virtio_net + AF_XDP, what we want is reset not res=
-ize,
-so we need to implement a helper:
-
- virtqueue_reset() {
-  =C2=A0=C2=A0=C2=A0 vdev->config->reset_vq(_vq);
-  =C2=A0=C2=A0=C2=A0 if (packed)
-  =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 virtqueue_reinit_packed(_vq)
-  =C2=A0=C2=A0=C2=A0 else
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 virtqueue_reinit_split(_vq)
- }
-
-So I use virtqueue_reinit_* as a separate function not only to deal with the
-case of resize failure, but also to consider the subsequent implementation =
-of
-virtqueue_reset()
-
-Thanks.
-
-
 >
 > Thanks
 >
