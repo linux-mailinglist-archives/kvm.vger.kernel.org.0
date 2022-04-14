@@ -2,193 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A36E500E46
-	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 15:01:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1380250139E
+	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 17:21:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243694AbiDNNDf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 09:03:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57606 "EHLO
+        id S244752AbiDNNfu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 09:35:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242163AbiDNNDd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Apr 2022 09:03:33 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F65885BD0;
-        Thu, 14 Apr 2022 06:01:08 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23EC3wZB019753;
-        Thu, 14 Apr 2022 13:01:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=7Ni552NCpJN+iMVbAphLxX+Thjf0FLlKqeU+Nzjvh5s=;
- b=g/7TQofXQJc0dgjSLaD+ijZdQ1BVZKJY+2oGBSORRJnK+wBfQl62s3cZJd+Ez9TIld5q
- vl1SiuRqqwNSag/4xa75WkKj/79CdCS1Pm0C9Xn4UDkBiP6n/6k/+IDdS2gJ76Fsal2Z
- LHS71OktoEUdaPNACXqOrXYN3w7HFJ9bfOh1wEmbXBLv1GF8NrHAe7FNcb2H7lmxIcJq
- 5gfWAiLXQxPtYmSvR0dG0a5gYKOUgv1L6Te2OpVRZ4HvLsPU0OZFTD3C/62KQbtJBqkA
- T5hINP+OJYpfLPd34BnaV4Tbuf0ekgh/7a7G5Z16Ld9FOycyGbGzGGDfpDDxm5HSrvXb Qw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fegbrvs6w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Apr 2022 13:01:07 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23ECnUUp007685;
-        Thu, 14 Apr 2022 13:01:06 GMT
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fegbrvs67-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Apr 2022 13:01:06 +0000
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23ECwDNw017659;
-        Thu, 14 Apr 2022 13:01:05 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma03dal.us.ibm.com with ESMTP id 3fb1sah37x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Apr 2022 13:01:05 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23ED14QL11993596
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 14 Apr 2022 13:01:04 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 759E0AE05F;
-        Thu, 14 Apr 2022 13:01:04 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D37ABAE091;
-        Thu, 14 Apr 2022 13:00:59 +0000 (GMT)
-Received: from [9.211.76.45] (unknown [9.211.76.45])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 14 Apr 2022 13:00:59 +0000 (GMT)
-Message-ID: <59db2baa-02ba-e438-db3b-ee06ed6c2fbc@linux.ibm.com>
-Date:   Thu, 14 Apr 2022 09:00:58 -0400
+        with ESMTP id S244522AbiDNN1g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Apr 2022 09:27:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 90667A0BD8
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 06:20:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649942421;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=kd6yprk4VlEg5xosbW/30KWUxD+GYa+hGTxr9KOLLms=;
+        b=SiH4I/i/URHLsBn4k20JLXHenJ+MAmWfJCEP6RSzX9ihl84/sjGn0vfFhuHHZDh/uHEVw8
+        J2jT+IbiFdMxtTB/ul8Xydg9en46SKNEAclIyKq+8LM1rN002l8rQYOf7y027gQAFbN8wH
+        Xg/qIQGwVi/VmGy5N6j9HqQs5Fi1i8I=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-548-EXkFvnH2PfCglnShalZ-Ew-1; Thu, 14 Apr 2022 09:20:17 -0400
+X-MC-Unique: EXkFvnH2PfCglnShalZ-Ew-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5FFA9805A30;
+        Thu, 14 Apr 2022 13:20:16 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.40.195.11])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2F6957C28;
+        Thu, 14 Apr 2022 13:20:14 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v3 00/34] KVM: x86: hyper-v: Fine-grained TLB flush + L2 TLB flush feature
+Date:   Thu, 14 Apr 2022 15:19:39 +0200
+Message-Id: <20220414132013.1588929-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v5 11/21] KVM: s390: pci: do initial setup for AEN
- interpretation
-Content-Language: en-US
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org
-References: <20220404174349.58530-1-mjrosato@linux.ibm.com>
- <20220404174349.58530-12-mjrosato@linux.ibm.com>
- <95e46303-931c-ec90-94f3-67ed34383650@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <95e46303-931c-ec90-94f3-67ed34383650@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: TCo_0jnSNqrqUfFMovp90vItAnPLQhl0
-X-Proofpoint-ORIG-GUID: rV-rkPXcfrcUjITBpRYAtndrsmflrBuI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-14_04,2022-04-14_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- priorityscore=1501 clxscore=1015 lowpriorityscore=0 spamscore=0
- malwarescore=0 bulkscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204140072
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/14/22 3:20 AM, Christian Borntraeger wrote:
-> 
-> 
-> Am 04.04.22 um 19:43 schrieb Matthew Rosato:
->> Initial setup for Adapter Event Notification Interpretation for zPCI
->> passthrough devices.  Specifically, allocate a structure for 
->> forwarding of
->> adapter events and pass the address of this structure to firmware.
->>
->> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> [...]
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index 156d1c25a3c1..9db6f8080f71 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -47,6 +47,7 @@
->>   #include <asm/fpu/api.h>
->>   #include "kvm-s390.h"
->>   #include "gaccess.h"
->> +#include "pci.h"
->>   #define CREATE_TRACE_POINTS
->>   #include "trace.h"
->> @@ -502,6 +503,14 @@ int kvm_arch_init(void *opaque)
->>           goto out;
->>       }
->> +    if (kvm_s390_pci_interp_allowed()) {
->> +        rc = kvm_s390_pci_init();
->> +        if (rc) {
->> +            pr_err("Unable to allocate AIFT for PCI\n");
->> +            goto out;
->> +        }
->> +    }
->> +
->>       rc = kvm_s390_gib_init(GAL_ISC);
->>       if (rc)
->>           goto out;
-> 
-> We would not free the aift that was allocated by kvm_s390_pci_init
-> in kvm_arch_exit.
-> Wouldnt we re-allocate a new aift when we unload/reload kvm forgetting 
-> about the old one?
+Changes since v1:
+To address Sean's review comments:
+- s,Direct,L2, everywhere.
+- s,tlbflush,tlb_flush, everywhere.
+- "KVM: x86: hyper-v: Add helper to read hypercall data for array" patch
+  added.
+- "x86/hyperv: Introduce HV_MAX_SPARSE_VCPU_BANKS/HV_VCPUS_PER_SPARSE_BANK
+  constants" patch added.
+- "KVM: x86: hyper-v: Use HV_MAX_SPARSE_VCPU_BANKS/HV_VCPUS_PER_SPARSE_BANK
+  instead of raw '64'" patch added.
+- Other code improvements.
 
-Oops, yes it looks like that's the case.  We must back-pocket a certain 
-subset of firmware-shared structures (e.g. zpci_aipb and zpci_aif_sbv) 
-as these cannot change for the life of the system once registered with 
-firmware; but the aift is a kernel-only structure that should be safe to 
-free until next module load.  I think this can be done at the end of 
-kvm_s390_pci_aen_exit (with some caller adjustments re: the aift mutex)
-> 
-> 
->> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
-> [...]
->> +static int zpci_setup_aipb(u8 nisc)
-> [...]
->> +    size = get_order(PAGE_ALIGN(ZPCI_NR_DEVICES *
->> +                        sizeof(struct zpci_gaite)));
-> [...]
->> +    if (zpci_set_irq_ctrl(SIC_SET_AENI_CONTROLS, 0, zpci_aipb)) {
->> +        rc = -EIO;
->> +        goto free_gait;
->> +    }
->> +
->> +    return 0;
->> +
->> +free_gait:
->> +    size = get_order(PAGE_ALIGN(ZPCI_NR_DEVICES *
->> +                    sizeof(struct zpci_gaite)));
-> 
-> size should still be valid here?
+Other changes:
+- Rebase to the latest kvm/queue.
+- "KVM: selftests: add hyperv_svm_test to .gitignore" patch dropped
+ (already fixed).
+- "KVM: x86: Rename 'enable_direct_tlbflush' to 'enable_l2_tlb_flush'" 
+ patch added.
+- Fix a race in the newly introduced Hyper-V IPI test.
 
-Good point
+Original description:
 
-> 
->> +    free_pages((unsigned long)aift->gait, size);
->> +free_sbv:
->> +    airq_iv_release(aift->sbv);
->> +    zpci_aif_sbv = 0;
->> +free_aipb:
->> +    kfree(zpci_aipb);
->> +    zpci_aipb = 0;
->> +
->> +    return rc;
->> +}
->> +
-> 
-> The remaining parts look sane.
+Currently, KVM handles HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} requests
+by flushing the whole VPID and this is sub-optimal. This series introduces
+the required mechanism to make handling of these requests more 
+fine-grained by flushing individual GVAs only (when requested). On this
+foundation, "Direct Virtual Flush" Hyper-V feature is implemented. The 
+feature allows L0 to handle Hyper-V TLB flush hypercalls directly at
+L0 without the need to reflect the exit to L1. This has at least two
+benefits: reflecting vmexit and the consequent vmenter are avoided + L0
+has precise information whether the target vCPU is actually running (and
+thus requires a kick).
+
+Sean Christopherson (1):
+  KVM: x86: hyper-v: Add helper to read hypercall data for array
+
+Vitaly Kuznetsov (33):
+  KVM: x86: hyper-v: Resurrect dedicated KVM_REQ_HV_TLB_FLUSH flag
+  KVM: x86: hyper-v: Introduce TLB flush ring
+  KVM: x86: hyper-v: Handle HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} calls
+    gently
+  KVM: x86: hyper-v: Expose support for extended gva ranges for flush
+    hypercalls
+  KVM: x86: Prepare kvm_hv_flush_tlb() to handle L2's GPAs
+  x86/hyperv: Introduce
+    HV_MAX_SPARSE_VCPU_BANKS/HV_VCPUS_PER_SPARSE_BANK constants
+  KVM: x86: hyper-v: Use
+    HV_MAX_SPARSE_VCPU_BANKS/HV_VCPUS_PER_SPARSE_BANK instead of raw
+    '64'
+  KVM: x86: hyper-v: Don't use sparse_set_to_vcpu_mask() in
+    kvm_hv_send_ipi()
+  KVM: x86: hyper-v: Create a separate ring for L2 TLB flush
+  KVM: x86: hyper-v: Use preallocated buffer in 'struct kvm_vcpu_hv'
+    instead of on-stack 'sparse_banks'
+  KVM: nVMX: Keep track of hv_vm_id/hv_vp_id when eVMCS is in use
+  KVM: nSVM: Keep track of Hyper-V hv_vm_id/hv_vp_id
+  KVM: x86: Introduce .post_hv_l2_tlb_flush() nested hook
+  KVM: x86: hyper-v: Introduce kvm_hv_is_tlb_flush_hcall()
+  KVM: x86: hyper-v: L2 TLB flush
+  KVM: x86: hyper-v: Introduce fast kvm_hv_l2_tlb_flush_exposed() check
+  x86/hyperv: Fix 'struct hv_enlightened_vmcs' definition
+  KVM: nVMX: hyper-v: Enable L2 TLB flush
+  KVM: x86: KVM_REQ_TLB_FLUSH_CURRENT is a superset of
+    KVM_REQ_HV_TLB_FLUSH too
+  KVM: nSVM: hyper-v: Enable L2 TLB flush
+  KVM: x86: Expose Hyper-V L2 TLB flush feature
+  KVM: selftests: Better XMM read/write helpers
+  KVM: selftests: Hyper-V PV IPI selftest
+  KVM: selftests: Make it possible to replace PTEs with __virt_pg_map()
+  KVM: selftests: Hyper-V PV TLB flush selftest
+  KVM: selftests: Sync 'struct hv_enlightened_vmcs' definition with
+    hyperv-tlfs.h
+  KVM: selftests: nVMX: Allocate Hyper-V partition assist page
+  KVM: selftests: nSVM: Allocate Hyper-V partition assist and VP assist
+    pages
+  KVM: selftests: Sync 'struct hv_vp_assist_page' definition with
+    hyperv-tlfs.h
+  KVM: selftests: evmcs_test: Introduce L2 TLB flush test
+  KVM: selftests: Move Hyper-V VP assist page enablement out of evmcs.h
+  KVM: selftests: hyperv_svm_test: Introduce L2 TLB flush test
+  KVM: x86: Rename 'enable_direct_tlbflush' to 'enable_l2_tlb_flush'
+
+ arch/x86/include/asm/hyperv-tlfs.h            |   6 +-
+ arch/x86/include/asm/kvm-x86-ops.h            |   2 +-
+ arch/x86/include/asm/kvm_host.h               |  37 +-
+ arch/x86/kvm/Makefile                         |   3 +-
+ arch/x86/kvm/hyperv.c                         | 376 ++++++++--
+ arch/x86/kvm/hyperv.h                         |  48 ++
+ arch/x86/kvm/svm/hyperv.c                     |  18 +
+ arch/x86/kvm/svm/hyperv.h                     |  37 +
+ arch/x86/kvm/svm/nested.c                     |  25 +-
+ arch/x86/kvm/svm/svm_onhyperv.c               |   2 +-
+ arch/x86/kvm/svm/svm_onhyperv.h               |   6 +-
+ arch/x86/kvm/trace.h                          |  21 +-
+ arch/x86/kvm/vmx/evmcs.c                      |  24 +
+ arch/x86/kvm/vmx/evmcs.h                      |  11 +
+ arch/x86/kvm/vmx/nested.c                     |  32 +
+ arch/x86/kvm/vmx/vmx.c                        |   6 +-
+ arch/x86/kvm/x86.c                            |  20 +-
+ arch/x86/kvm/x86.h                            |   1 +
+ include/asm-generic/hyperv-tlfs.h             |   5 +
+ include/asm-generic/mshyperv.h                |  11 +-
+ tools/testing/selftests/kvm/.gitignore        |   2 +
+ tools/testing/selftests/kvm/Makefile          |   4 +-
+ .../selftests/kvm/include/x86_64/evmcs.h      |  40 +-
+ .../selftests/kvm/include/x86_64/hyperv.h     |  35 +
+ .../selftests/kvm/include/x86_64/processor.h  |  72 +-
+ .../selftests/kvm/include/x86_64/svm_util.h   |  10 +
+ .../selftests/kvm/include/x86_64/vmx.h        |   4 +
+ .../testing/selftests/kvm/lib/x86_64/hyperv.c |  21 +
+ .../selftests/kvm/lib/x86_64/processor.c      |   6 +-
+ tools/testing/selftests/kvm/lib/x86_64/svm.c  |  10 +
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c  |   7 +
+ .../selftests/kvm/max_guest_memory_test.c     |   2 +-
+ .../testing/selftests/kvm/x86_64/evmcs_test.c |  53 +-
+ .../selftests/kvm/x86_64/hyperv_features.c    |   5 +-
+ .../testing/selftests/kvm/x86_64/hyperv_ipi.c | 374 ++++++++++
+ .../selftests/kvm/x86_64/hyperv_svm_test.c    |  60 +-
+ .../selftests/kvm/x86_64/hyperv_tlb_flush.c   | 647 ++++++++++++++++++
+ .../selftests/kvm/x86_64/mmu_role_test.c      |   2 +-
+ 38 files changed, 1883 insertions(+), 162 deletions(-)
+ create mode 100644 arch/x86/kvm/svm/hyperv.c
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/hyperv.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/hyperv_ipi.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
+
+-- 
+2.35.1
 
