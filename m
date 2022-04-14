@@ -2,96 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BC2D501C3E
-	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 21:56:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5621501C42
+	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 21:58:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345995AbiDNT6h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 15:58:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46004 "EHLO
+        id S1345997AbiDNUAf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 16:00:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234846AbiDNT6f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Apr 2022 15:58:35 -0400
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 259B4DAFC8
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 12:56:10 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id i20so8293960wrb.13
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 12:56:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+ymjjz59DixwCtoy7eDt1x+noEH6uLb5n4Ly+aBwY0A=;
-        b=K88EA9+dLfyj4EmJs7HZ+xcL0pw8mn+w3jlVG3pqJhc+fVrHyC3ovD/lacs/4SImcA
-         3UFNXLVj0LCZimid0/UCXe1jih6um+GNTM//qVDgSLDxIUESv2E8YKkmJLIPgMPVe8Tl
-         olJolXIgjsJn2lNxOG6RSpb487riM997V0Y5Iew4wd8Rqfo0YYg+8NiRE0Li1Dy+Kq+l
-         LkhQBO4alkq+R2VCiWx+aa9nTF+5Yl4L1uvG4Ku0/andGw7Apk0UgG6EcBtNZhRzBUDC
-         l4snXjcZyyRA8Ar6JxCC8+xyPxpzSl3fjQNCBXl5hGO4YKlfHRAqmKRxKl5NatoFk/F2
-         W5vg==
+        with ESMTP id S233410AbiDNUAc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Apr 2022 16:00:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 69122DAFCB
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 12:58:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649966286;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=AE6ziqzRc2dhrjIjlkzQM+upeliMWRHPoIvV5hVYL48=;
+        b=aw2F20EUMsUai1MZtEDHIwFgANVTZ1Vwj89JKS9PmO2aRG0GiTVAQzq1kSiLcVuoKbHu+P
+        J223FHGrFW2r9rbNRXbdyGbPF/uqPb7+1V2Bc6L2S1QQdcBy96H5zNIHjutZQzzV+XXRyH
+        TwN2tyWeQGcPY6toDn1LuTz95BUYbnM=
+Received: from mail-oa1-f71.google.com (mail-oa1-f71.google.com
+ [209.85.160.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-623-ZyrdHFDtNHORf_dY9NjAWg-1; Thu, 14 Apr 2022 15:58:05 -0400
+X-MC-Unique: ZyrdHFDtNHORf_dY9NjAWg-1
+Received: by mail-oa1-f71.google.com with SMTP id 586e51a60fabf-e3163250c1so2427455fac.2
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 12:58:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+ymjjz59DixwCtoy7eDt1x+noEH6uLb5n4Ly+aBwY0A=;
-        b=mgvwBZswAZsUjMPX9bVhqPBFzy1Xj5+bbKYEnKKYfmVmUKYoMiV6Njt4Lmo1/Mn8PI
-         zeFb8IhFtFRDiZ/2r+CNQBxSCD5YwhgpYGyJCoPzPAOmOXhlergumaobrLWvEh3U/e8/
-         NmOe1SEfjNiOCaI4SQats8MeksrpEoWy9Dcmcz3D8NcwEbQZ88+f97ra7J2Ss1jLyJCY
-         YZ93/K/vGOMZptSIvHzunJvZ8gyScz43KK+gE49WLPpiEfIXreuzx+W66sUlA+CzZoRo
-         B4qbkXB6E03Hdugq1sE2V02f4BSwk47lpUbMqHTEKc07v2u42q1+T4CzVDFBWnJ4DVW8
-         z3bQ==
-X-Gm-Message-State: AOAM53374JKMmjQhzhdRvEXmGBsbgB1aZtAj6a58HQrr7CFM3FohF9Qf
-        PpSj9/RpXqa+qw5JlpNHb5Y3ReTwUAaQDypOyzI2K+Swlqg=
-X-Google-Smtp-Source: ABdhPJyfrbbI7siswOIKJriK1awd3u1wUdjxsUZqLcHqokmLUjKIxOJ/akNfmGosYWtc/FxXaxcdpfDTB3AT6tmSvkA=
-X-Received: by 2002:a5d:4cc1:0:b0:207:a269:c572 with SMTP id
- c1-20020a5d4cc1000000b00207a269c572mr3179222wrt.209.1649966168135; Thu, 14
- Apr 2022 12:56:08 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:organization
+         :mime-version:content-transfer-encoding;
+        bh=AE6ziqzRc2dhrjIjlkzQM+upeliMWRHPoIvV5hVYL48=;
+        b=h/78USdTiUr40e+I+0BrGrX3Fj4McqVh18uFftR2D3LoB83xifclulj2+UEMECCBba
+         PccD9u9iKkHlA2JaM9dtDYSIKaoqR25et6YahVNfC9nMyCYsGNypvo62afqhP8aJBPtI
+         TThBeydjZ8dmWciM5KhbxoaD2FacLpOR2eVFtunZulQsXYTxVr2qe+lCktfSb+29OhLr
+         XAxAmpNBTBaqzwH3Ec+UaBRMx74fS+vC6mXPX3XFmXtLE46QCGI1DzmGUG50CKgFtMii
+         XGR36pOEHivUxF0Q90HxwSMeaNnWEjwIYVeXgfg6srpdAKiKkIOvOT/4I7xrIS4K/o5L
+         ExYA==
+X-Gm-Message-State: AOAM533QJc4hWCuKI4d8BA6nGUTbLXsYlf4jPQ0jwpKZDm+T1/nga3ja
+        vTqSNC4HKda1jySQC/h93BwiPGzjtDzNAEZ672W/u9lEF2gIqWvp2+gN5YIYusxZmuuQcn7h/WW
+        4DQ7FcPm5ZQGQ
+X-Received: by 2002:a05:6808:1384:b0:322:2bcc:42c0 with SMTP id c4-20020a056808138400b003222bcc42c0mr109655oiw.11.1649966284303;
+        Thu, 14 Apr 2022 12:58:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwlq+M8kVUY+y/WxhC3Noj7QLeNYSzazjp1aXJ5+G0+DkrFoIZIkKPXMlgomFVi58BL5erFyQ==
+X-Received: by 2002:a05:6808:1384:b0:322:2bcc:42c0 with SMTP id c4-20020a056808138400b003222bcc42c0mr109648oiw.11.1649966284072;
+        Thu, 14 Apr 2022 12:58:04 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id s4-20020a0568301e0400b006015bafee43sm402266otr.46.2022.04.14.12.58.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Apr 2022 12:58:03 -0700 (PDT)
+Date:   Thu, 14 Apr 2022 13:58:01 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Subject: [GIT PULL] VFIO fixes for v5.18-rc3
+Message-ID: <20220414135801.306f33dd.alex.williamson@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20220414185853.342787-1-jmattson@google.com>
-In-Reply-To: <20220414185853.342787-1-jmattson@google.com>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Thu, 14 Apr 2022 19:55:56 +0000
-Message-ID: <CAAAPnDHFho4UmrcyJ-8W7DOSqwfS_hxbqW8HwXADN9WdjFpKVw@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: VMX: Require 16-byte alignment for
- struct vmx_msr_entry
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 14, 2022 at 6:59 PM Jim Mattson <jmattson@google.com> wrote:
->
-> The MSR-store area and the MSR-load areas must be 16-byte aligned, per
-> the hardware specification.
->
-> Fixes: bd1bf2d6af77a ("VMX: Test MSR load/store feature")
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> ---
->  x86/vmx_tests.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index df931985ec46..4d98b7cb08dd 100644
-> --- a/x86/vmx_tests.c
-> +++ b/x86/vmx_tests.c
-> @@ -1959,7 +1959,7 @@ struct vmx_msr_entry {
->         u32 index;
->         u32 reserved;
->         u64 value;
-> -} __attribute__((packed));
-> +} __attribute__((packed, aligned(16)));
->
->  #define MSR_MAGIC 0x31415926
->  struct vmx_msr_entry *exit_msr_store, *entry_msr_load, *exit_msr_load;
-> --
-> 2.36.0.rc0.470.gd361397f0d-goog
->
+Hi Linus,
 
-Reviewed-by: Aaron Lewis <aaronlewis@google.com>
+The following changes since commit ce522ba9ef7e2d9fb22a39eb3371c0c64e2a433e:
+
+  Linux 5.18-rc2 (2022-04-10 14:21:36 -1000)
+
+are available in the Git repository at:
+
+  https://github.com/awilliam/linux-vfio.git tags/vfio-v5.18-rc3
+
+for you to fetch changes up to 1ef3342a934e235aca72b4bcc0d6854d80a65077:
+
+  vfio/pci: Fix vf_token mechanism when device-specific VF drivers are used (2022-04-13 11:37:44 -0600)
+
+----------------------------------------------------------------
+VFIO fixes for v5.18-rc3
+
+ - Fix VF token checking for vfio-pci variant drivers (Jason Gunthorpe)
+
+----------------------------------------------------------------
+Jason Gunthorpe (1):
+      vfio/pci: Fix vf_token mechanism when device-specific VF drivers are used
+
+ drivers/vfio/pci/vfio_pci_core.c | 124 +++++++++++++++++++++++----------------
+ include/linux/vfio_pci_core.h    |   2 +
+ 2 files changed, 76 insertions(+), 50 deletions(-)
+
