@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C3D5D501B35
-	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 20:47:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79F6A501B3E
+	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 20:47:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344765AbiDNSsx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 14:48:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52798 "EHLO
+        id S1344758AbiDNSsq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 14:48:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236852AbiDNSsl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S243792AbiDNSsl (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 14 Apr 2022 14:48:41 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2087.outbound.protection.outlook.com [40.107.220.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD28CDB498
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 11:46:16 -0700 (PDT)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2086.outbound.protection.outlook.com [40.107.220.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F037DDBD19
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 11:46:15 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h4zoa6/th40iCi7eYivr7a8dEdSNTp6b5NlIlmL1dyMeh94hS3KOanys1oNvTYX7Fa8oMFxo01aqSMhrs9dd51FgbWDku1gStrdtHy3tZdAsGF3mhLgDd+Oml+0DttAijWS5Nnh8iyKazDbTZ2ciUayUF3SUzPOtd9WPv2kM3BCPB4M3UlLev69jXRnEZNZ1dVzE+AK+1EFzNaWfYriDrrti3sY6iLXjXsrIC6IhIgy7xv+x7WyLE4tvixdwTp2D1A6gPqaUOFgD97FnIfjWwrg7Fu6Iq4qAcJjmlNHKw99ywHDzBMkz0C19G3TgoFlR8/Kx+kTErY/mCbuKyilkNg==
+ b=hL8vN1IVVx2I/iMwr5Mjfk83OuRQsQRHFCJM2wUVa5kjnvgxazEx637dbJt2npAgGyuUduaSYpYt+YT0lORIl1Fb3V8yiRkxgc8Dab14UhF15w8oeiFIdprGGRFwmRi0h6FJCmIAm+JHWdBCG+DWf2X0D0HAtNbqfaZPUCUYi92h+SoHWYqac0mmbBUONry4B7aCffNkS0Saijm7JghbFJTghivn0dmdLeSrrA4BPn45igBFaGt316lnDcgMEOVlwTZP2m4ZjYNbnFlYjGxEiVfRrmY27dGGNMFaqOgYd0IJFGdfPZB+O7mjvnxKH2Jz65o2zfbr0aR77m/qWhFgPQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7CLxETMMldOr4VkojCs1afE53FK2CKd42RuE+PWxnUU=;
- b=hGVLlfvSAVCa4eubmmOSqMZf49qR2xhzQu0hk+gv7Wud4C5t1w7RXZC/uF5Ar0qKdkY4JxsopyemEELNjI+w9CEfy1ezk6TV5QoNY/DOw4eDVzsm03lOtZk0zeWdYJOukb13J0O7fDpsAb0gfKP41O26K1hUFA7DqtBq1u+w/xKxi/NY9NrENmN2QhmBTq+YXQiwrmUln2b4xf2EnltCitEkABQ5ERgJS15NtlrxHV82PB1VS+Aqq4VEixxDgHld0YvAmvr/CkAvZsIhMoeVPHTR7ubpiStN4qICT1rufkllizbf9O1oQCAw9/ccTBr9mAo7IHg3VwDtljxuA7ksMg==
+ bh=wD3PR8nXG8xboi9+HtgVwnkCapHVD1Z+eBp6VEY7N8Y=;
+ b=ZeH/b1VJm7JGwVfMUvIhoSJ2PXMT/o5kmHjIGYTBxYmoaJiXJzj+Xi9cAME3h6EHnVgZeIYqIsR0HpVE/ZtgUyeFCiwtytV6xH1UrtqByyK9qLVSPF6dpOWKmYlf9GonPxuvA9GxjSR4DsqpCeE7upO916uOBWZeBL30LxSURNjo1O55gp/P2R5HqcQEd1fbdpDre1GONNZCmMkt4pqxPuUvP0DDkmFImcAOQ9vOrJ1m/+PuVULqsg/sEs2L4JsfktCgJxyOczMu3LrhO4W44TDyd+gaQH0tD+MrvuQcRw9+Dj/A/y/FTmUa9lpQSOLceU1KG5tej8LHorBb0qGvNQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7CLxETMMldOr4VkojCs1afE53FK2CKd42RuE+PWxnUU=;
- b=tPXtrxf1pVp4c69uZc2JWbbgu1sUoLJk/KToIUqF47jTcwel2PSLaroIpDN9mv2l2NclT0dboC9v+l1Q+06iu+IESRUWgSPnRTxbubrepItG3hqjsr9aG9fLgJXuqZpj5y2dCcVv0G8MBgkQxmKw8kDNiWCHg4Mvlmq3TUc2ES/m2rHcFnoBd+92LhlBzTVi4nnasPO4DXyKX3aPzrJSIiSD4aLIbZ4zHsb/hGjCU5fEphpa1wyVjvSOXXlUbfssZ4Nm9cGV+3yravYi58CZ0Jhi6x5J3m4un5wgfUUEIUSuhSOvaTaXkJSETuQs7JnCtQpbsf/MMsqhw088PecwpA==
+ bh=wD3PR8nXG8xboi9+HtgVwnkCapHVD1Z+eBp6VEY7N8Y=;
+ b=iLL0XdofCncukcO4OimxIhDmVtfz5fP6KIdgp/NH4zxvLl5zjJFlWMPdpoxyghRbmAP69zCpAor4o/drzCeFh0OhKlGT1EbC3qZeMaR+hFY5rQGqNu5MFx0yDN5ykRJUBpXhQuFxcUDyjVlMqGQGvwOBUnOaSjTr9dmPQ8TI1Vr4E9lpn8zm4f4pkWyhwM1Wyqk7IaaFWDDQCjnBgRBnIPP6VRAiSFHw3v38wWOYbeelYCoibdT+KVeOYeBogCE4x0TE6/44Yk1rHoy+55hLRrz2jItoYb93HsrIPOnFFeiYn/JNpUU9IyqFrtBbUCj4Albb36yane21oq/lK6Tq4A==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
@@ -46,67 +46,67 @@ To:     Alex Williamson <alex.williamson@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Eric Auger <eric.auger@redhat.com>, Christoph Hellwig <hch@lst.de>,
         Yi Liu <yi.l.liu@intel.com>
-Subject: [PATCH 04/10] vfio: Use a struct of function pointers instead of a many symbol_get()'s
-Date:   Thu, 14 Apr 2022 15:46:03 -0300
-Message-Id: <4-v1-33906a626da1+16b0-vfio_kvm_no_group_jgg@nvidia.com>
+Subject: [PATCH 05/10] vfio: Move vfio_external_user_iommu_id() to vfio_file_ops
+Date:   Thu, 14 Apr 2022 15:46:04 -0300
+Message-Id: <5-v1-33906a626da1+16b0-vfio_kvm_no_group_jgg@nvidia.com>
 In-Reply-To: <0-v1-33906a626da1+16b0-vfio_kvm_no_group_jgg@nvidia.com>
 References: 
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: BL1P221CA0020.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:208:2c5::7) To MN2PR12MB4192.namprd12.prod.outlook.com
+X-ClientProxiedBy: BL0PR02CA0055.namprd02.prod.outlook.com
+ (2603:10b6:207:3d::32) To MN2PR12MB4192.namprd12.prod.outlook.com
  (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 30394e9a-690b-47b1-ed23-08da1e470bef
+X-MS-Office365-Filtering-Correlation-Id: e9018770-4872-45d5-433d-08da1e470ba1
 X-MS-TrafficTypeDiagnostic: BL1PR12MB5350:EE_
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5350B23B4420623DCB0C271FC2EF9@BL1PR12MB5350.namprd12.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <BL1PR12MB535031C7AA66F35D26FF68D4C2EF9@BL1PR12MB5350.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6dHusWEm7uSe7FcVkbzXY6v1/Mt//eQtS6+aqkaPxL5Rax7wKHrArO9Gx7zf8NaTokw6EGddtwXyGaGH0Kiihd+QybLs3XtocyVmZNVnnbFywufvGkfdoRp20wMC2Mwkz9rf2aMbjlwYwvlswey1V52epYrI5DzO/Ot8WXYQpnmaTuskHciHARTlpEPDZBgGWolUYgnf/MEWkP3romd0dRLNZvWlQyMWcGqj1sHjQXboVoXs+6/KZFASpae/wxlIP8VYRXkw6CFB7b+FD/ngmxfWfY0dpYWUS5RPgQGdodLcAK/4wvJDLq3LtARj5DU6V5Gq2f4btZu1WkutFLxCJnhnukln8cDHdt9U429Uw6kZQcvpvBVA65/8wX9asfjNZSkF36NUZ3csZt9kS3EB3axBTAY68GAIpTsqKOHbYiDCiVkb53sKvWb70UCw9y60deqz+uI2Z5uxcjEdrKny5Kg0BqH58u1hlcUMt0/3h1cOZF1z9gufwoaRwrXfdynkA7RYd4b0qP9myDBozAAqKn1wBqSOBbuMrUyUr2iWC2kzJC/NXaS3e6XRaps9XEIIZrI3LwKn1MAdSm9xPzCQDDzicgfgGyMZmC9dDV0qaXY7ksMuPiKth3XoBcO5DkibRhKK2f8rPIArs0TzWWQnOQ0TJIMCIrt1LAAUBY+LbPVywzUlr9CHW1yTYIKvTlad
+X-Microsoft-Antispam-Message-Info: cAx5X8qz8VzGo6B6LA62+0bpAqsBBe425auHYdoZqYqIUykm8KPNoaoyLfVYzlrnWJRSFAWiy1YYTHb5UUY+2W4G6vCUiWIbkhs+QwZr2n5+aupfDiI99fZDn9iXe+kI9Q68ugtWst/thf+hoQ0RipfPm7TxNr1Pw2aJ47Vzwq+LuS3d+4eFGuNFYujFtGoaZFZq5NewkoRNFEO28+fpj3vZ7p1fvse+s21xixVK5g1sHH0c1ACdr8qLU+flsGhpvzNZTJrmK0TPX/gC0pKK31nwFIlkbpaeXeT+raPB7w6q2qfztiz6bFo9wt3Z2mH9MNhhc1QjCXseQGtbFS9ccNCFF5uzbzHLoD85Jw/aOTmYI1/xKhtSzRjRGoVaTIbIk+rbRRQX5or2+LOpl/b/4y+tc+gX9wMQewu0UJOFM1Sr96pkan8mZ3rgcK83YVFUx3EGrTKEmlUPjXBVwkqmwoLtsGC6dpmv3c9DrRgKVHbwKTAygBOV0vlFmU8wWHqZoZ77uJkhfUSln5xB7UmlFKiMe7p3Os2P8eiV5ePhh86DJIc/P9QtPsmyXNMOfafxAW8coJ6faL/DpKmgzIeSCABk+UteUtDdafi3md1BzmUt8VjIPubnyy7GhDPRxkvYLUJvlXIflXIduFTwYmdUBLsPaAXXkisCytaQNjP0le2sztbYOzrFYhZkViRBe8Sk
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(2616005)(86362001)(186003)(38100700002)(83380400001)(110136005)(66946007)(66476007)(66556008)(8936002)(4326008)(8676002)(316002)(5660300002)(54906003)(26005)(6506007)(6512007)(6666004)(36756003)(2906002)(508600001)(6486002)(4216001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?TGaZdQU6s2p+n2jvCqPMWjEtYZu4BpbMKH5D9Uy7+rWF4K2fKvbj577W4Rtd?=
- =?us-ascii?Q?M3oYQCg4JpbDTq3TFa+lnmZfqgl2/2cOrNP0FmN4RcThJJMxO0qE20JAuv0E?=
- =?us-ascii?Q?b6Z47Tsjxgt3XcfNeJo888qWyCjEEZxYZqId1GgRL+3TQ6R8E2W1Nsj7WUi8?=
- =?us-ascii?Q?5d+CS9lhK39T2CdeEOAhzWx8GFGVMd+oPjJuqQtxebArqvWDLquEXmu0BM/w?=
- =?us-ascii?Q?GkFs4u67TYjiK3NkcTYagvXWFIVxhsNb8zrpJ6Uy61eIdPtTS/cA/PY51Bjr?=
- =?us-ascii?Q?zs+yuOiL2O8QDl/MQdQnPLna+v1Y7KGCBIg7hyKNNiiQHig4O8+6x1withDG?=
- =?us-ascii?Q?9w8dMLVifNIbx3nGQVoftUUiIHJztKfhYVvbhqiMts0msoFUWyR2LqVOgq7x?=
- =?us-ascii?Q?uhqRy3SgrZj5EEE8prwj79/ZlnPAExpW6xDG6xJNqrhI7xHQJJxMN3CZpuIR?=
- =?us-ascii?Q?ubOMzqF4iFBBS7wa0uxuJhabKutv9MpHbdX4z75ha7RwScxF5N35jNDgUnlX?=
- =?us-ascii?Q?QqA+OXIRg8WcbvzYsNI9FSHR25/4V04Dvzu9Ag015eWrXs+vDmLaGL8wzERD?=
- =?us-ascii?Q?dDhR4Ybz0efhdGagbDyPwEoy1ojzds1rfm9SQm6mVmE5u4uU4g27vqXyO8xM?=
- =?us-ascii?Q?Y9iA5Gn/I3Z/7Dx/a5qY0IdGa+FwkpMtxfsKiwU/o/pPGCwNk1R20kNbi95Z?=
- =?us-ascii?Q?6B6ahYwjCpnPhYjuwOpaG0vjRDQvBDm8y/L6EtLdb213/kSxjzs4GsjQE9b6?=
- =?us-ascii?Q?w7EhVc26B/KzsA6srjKsb1VeDTlcOeKA4aNyCkMad1ZwWoHhSiOAj7peNNIq?=
- =?us-ascii?Q?rysdAD4+6Ln2U5ervOtS5yGpEQgWJUdla75fXVBKCLWLgLqr+QBHiOX1SzYp?=
- =?us-ascii?Q?EqF9F6YWb+bMO5rvRJSjPiPEDjemJH6AbQTPsnf6ldPRApQINVJ3hS1A7RKb?=
- =?us-ascii?Q?gBNnHxiYAdPAkZWmpXKWHefE1R3QgA2Z4qIrpczmWNtw+AvDXMC5w1Vptl8t?=
- =?us-ascii?Q?9AhKDl+uwWg1PPGUlYGY1aFqPYPkrPL0NaaSQdfdvvvC9yNkrcn4cczLge6u?=
- =?us-ascii?Q?vntODPD6fTuwnUEdOcrhkg0p1/Svl5ENLBWTUnX2xfGRmFe4QwJSwupv95ad?=
- =?us-ascii?Q?iBO7PAyts+bL4GVHA9YARtipQxC/w5hnYspb80/4OBZT/VKKlSOLlMtl9vNH?=
- =?us-ascii?Q?S0+k04z/oqYdhd2MdcYh9JD7kgEBuyEOgYoNrXzS3haQRIk5O5poREKhTFus?=
- =?us-ascii?Q?uXIu2E0P1Yk2JwqzCyFjina1cz88jKjR4zqZNdIk6YEJ/pQY+xUumRuf4qoG?=
- =?us-ascii?Q?MY/Qr5A/OKgvEIh1NiIqPSzHZFfR0N4F8sQ8iWt+m1Rk3LTlb19llttTsfqE?=
- =?us-ascii?Q?Td5jW36/1FsMkRBLEa3+yCUyGK2VQOFUAn80KxwPabuwCR5F5m7kEHTq26yj?=
- =?us-ascii?Q?1KfvOvOG08Rv/Vw4XWYsr5vgkkAHfGJciEw1Q+7iRJpO1vIP2N2phLv/1AlW?=
- =?us-ascii?Q?MqnQ0ZOugklKl+9Eku+thLGK95CJryKhT8Rnq/G0648NhOKiP0GP5ClMqARZ?=
- =?us-ascii?Q?12E/INW3bTt0zj3XABmc/90GbMrQHKBlzDhjs/VYpnn5CdU6BVHr+rRKvNLT?=
- =?us-ascii?Q?mPQEhlArpb5I0Ism2Idgl73ugY6NNXob5UXqMq80RSTaQErgcT7DDA0Kwb9L?=
- =?us-ascii?Q?gbXYQmLDyxL42ydSxIAWB/hNMu15hPnzcHIMY9ZRiQjiyQnGNplczWzZwHkH?=
- =?us-ascii?Q?uouNcV+Z1g=3D=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?bByDAfBRB/wQOLVLHtwSqzyuT+A/ltSIDENZFyi2Fj8mB/8dJYOXQ+CFDwHq?=
+ =?us-ascii?Q?8AHt+NXPg46A3/Hoqq5OWcm45vZ7TkdUSVKzneOhCugjn063c6NxCXQGdcfY?=
+ =?us-ascii?Q?V/7I1Fb3lrce//kxzPtHNwZMdSU2tsMHRBMixLX5fUqAfgt43oia2JyFEb5R?=
+ =?us-ascii?Q?/+DvjbkW5xUla1D+i82XpEJhksoK+5V9ZFSp/HOOYTpZMRX4SgTfNjVgmx6T?=
+ =?us-ascii?Q?BcjqEo3pz6zwTo17HyKQajSfepbZQxo9ghVA6BZJHF4Wsz8d/bU1mr8M0T/k?=
+ =?us-ascii?Q?YJ2XdDPhpgcFXmQPvBvZKnWOR+0eV3pukJCDHxtZpqHmuBw5DiyFB8p/IckZ?=
+ =?us-ascii?Q?p57jtU3dy9VjKHcI4bRv1gsNDl1vAQ1gp5KVNtKo/UXWHm1d6xeyUgOHiTBT?=
+ =?us-ascii?Q?6/fuXHlgKCCOSbT3Pah7Y0g50kciA+YEvFJ1xfX6gG3uNsvAiKb3YWVGgk/p?=
+ =?us-ascii?Q?oLM5owk1HBEq8CLEMRwun2CrMExT1bQsC1u6z3T8mbQdfB982OTn+BLZZ1MS?=
+ =?us-ascii?Q?f3/UWguCzjQtr6zE4wwqZqCcChFvoGuebGAjmIvml14Bks/nphCA66rYa/LS?=
+ =?us-ascii?Q?vUsC923N53QkrGApsySoh7an+JTrqc87+vwdRp5u2a+tLBHp/kY7hEm07tI9?=
+ =?us-ascii?Q?LnjZH34WURf7zf9iWhmGG80sN7oYMdWpVTd1T+L2C0nmCVso+AN00l7fxZgg?=
+ =?us-ascii?Q?QTyGiJ2NfpghgmVqHGLmb0gkM8F69byqEY2TwBtW4FsRsAmxPHopZZx3+KBl?=
+ =?us-ascii?Q?i3rHNmU9wSLg6U+B3THD864Dd16ym2GlJLmBLt3HW7u5o8e6iDU8gutC3Cnw?=
+ =?us-ascii?Q?9JyA5En45Pb+YQZ5COusHy0UMBe7zBFsgJ8CAna+QFN6+EhY1U7V6/sJadfB?=
+ =?us-ascii?Q?w4FXAiis+FpeOGJa83apkVzzZrM/DfngZPOUc3JhUxltRWnLd+nEsT6xOXIw?=
+ =?us-ascii?Q?iZ+HVD3Hy7kmXk2VTNooin9QGXmAkqSiRT5T39eXpC9ifyhYHWMUQzZt8SRj?=
+ =?us-ascii?Q?d2gYFRLbZUuGMQeAOmyuxGYZ1UhAo8WOJGdGe6ZdGem2zSStoHwAZr1uyTQ4?=
+ =?us-ascii?Q?R5ikF3k7zIZ3aacltTJGWzAwleoDOO9ftbpIGQq4MjFTnPnxAyWtRJqzB6GW?=
+ =?us-ascii?Q?fCAD8ulTk9Ez0mXwX4Gt6u+6xclFHaOcg4+oNrJL9gqcpvcogYJYmL2nl6TU?=
+ =?us-ascii?Q?TOzhAt7Ldv6xf4BYtDHCaublarVoWTN1wGrKhN0Q+Zui4mp6LHDsZclSandp?=
+ =?us-ascii?Q?iqG2MIkJTOA4mEG9F+HvM2HLp/mkqc5xU2IqXm/NqZ+Pcr6nFm8R0+V4jcjt?=
+ =?us-ascii?Q?LwjCBkQpNqY8EnyFsxX1IN0w6MElZ5VEbjSgg6eN4E0vZlBbzwip5S07wEMK?=
+ =?us-ascii?Q?1VNLpJ25GfrZ71HS2h6YLVDv90aTwpEYr5WCjVKpJCsLdMBiXHdG4zFoAIJJ?=
+ =?us-ascii?Q?Zc9NyM91DyIbIhsr83aW7f4xSaIqdfKm3mVSFbKTo7h2SNWRazDfFDQQE6iD?=
+ =?us-ascii?Q?iyeJxnNsPBrgOh4KOMHQFY0Fi12nGVggf2QVhgrMjU94/yiFJJmF9dz7tXmm?=
+ =?us-ascii?Q?RE5H/L36rUWlyfZH++YgLpsw9fRSJLDPDzzi1CW170c3yffY801liel6Fc0s?=
+ =?us-ascii?Q?xcQwuiEupHuOO0WGIKoYRryYrKCNge7c1wPfGclPgY6wVLkzc0ynHtxYqSoN?=
+ =?us-ascii?Q?P/cCgk7pd2p0G9ptCvqvmU+O9EghOu/jY/G0EiXURMRsD6T3qcpULPNhIPK5?=
+ =?us-ascii?Q?mxuL4h5NXg=3D=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 30394e9a-690b-47b1-ed23-08da1e470bef
+X-MS-Exchange-CrossTenant-Network-Message-Id: e9018770-4872-45d5-433d-08da1e470ba1
 X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2022 18:46:12.0318
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2022 18:46:11.5787
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: K5mtGNm3iXhHnMdQzvis1mJZBmoPCPDIo0yBvffDOOsOkCwUK7s9nZNFYfFh2H1y
+X-MS-Exchange-CrossTenant-UserPrincipalName: qSjkzDpmMzWBehOV6Ok/n3JtuVi5luAHvpgLFJndTCovdpGa8HFaRXF5Z/2TLHW0
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5350
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
@@ -118,113 +118,212 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm and VFIO need to be coupled together however neither is willing to
-tolerate a direct module dependency. Instead when kvm is given a VFIO FD
-it uses many symbol_get()'s to access VFIO.
+The only user wants to get a pointer to the struct iommu_group associated
+with the VFIO file being used. Instead of returning the group ID then
+searching sysfs for that string just directly return the iommu_group
+pointer already held by the vfio_group struct.
 
-Provide a single VFIO function vfio_file_get_ops() which validates the
-given struct file * is a VFIO file and then returns a struct of ops.
-
-Following patches will redo each of the symbol_get() calls into an
-indirection through this ops struct.
+It already has a safe lifetime due to the struct file kref.
 
 Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 ---
- drivers/vfio/vfio.c  | 19 +++++++++++++++++++
- include/linux/vfio.h |  3 +++
- virt/kvm/vfio.c      | 14 ++++++++++++++
- 3 files changed, 36 insertions(+)
+ drivers/vfio/vfio.c  | 20 ++++++++-----
+ include/linux/vfio.h |  2 +-
+ virt/kvm/vfio.c      | 68 ++++++--------------------------------------
+ 3 files changed, 22 insertions(+), 68 deletions(-)
 
 diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index a4555014bd1e72..93508f6a8beda5 100644
+index 93508f6a8beda5..4d62de69705573 100644
 --- a/drivers/vfio/vfio.c
 +++ b/drivers/vfio/vfio.c
-@@ -2013,6 +2013,25 @@ long vfio_external_check_extension(struct vfio_group *group, unsigned long arg)
+@@ -1919,10 +1919,7 @@ static const struct file_operations vfio_device_fops = {
+  * increments the container user counter to prevent
+  * the VFIO group from disposal before KVM exits.
+  *
+- * 3. The external user calls vfio_external_user_iommu_id()
+- * to know an IOMMU ID.
+- *
+- * 4. When the external KVM finishes, it calls
++ * 3. When the external KVM finishes, it calls
+  * vfio_group_put_external_user() to release the VFIO group.
+  * This call decrements the container user counter.
+  */
+@@ -2001,11 +1998,19 @@ bool vfio_external_group_match_file(struct vfio_group *test_group,
  }
+ EXPORT_SYMBOL_GPL(vfio_external_group_match_file);
+ 
+-int vfio_external_user_iommu_id(struct vfio_group *group)
++/**
++ * vfio_file_iommu_group - Return the struct iommu_group for the vfio file
++ * @filep: VFIO file
++ *
++ * The returned iommu_group is valid as long as a ref is held on the filep.
++ * VFIO files always have an iommu_group, so this cannot fail.
++ */
++static struct iommu_group *vfio_file_iommu_group(struct file *filep)
+ {
+-	return iommu_group_id(group->iommu_group);
++	struct vfio_group *group = filep->private_data;
++
++	return group->iommu_group;
+ }
+-EXPORT_SYMBOL_GPL(vfio_external_user_iommu_id);
+ 
+ long vfio_external_check_extension(struct vfio_group *group, unsigned long arg)
+ {
+@@ -2014,6 +2019,7 @@ long vfio_external_check_extension(struct vfio_group *group, unsigned long arg)
  EXPORT_SYMBOL_GPL(vfio_external_check_extension);
  
-+static const struct vfio_file_ops vfio_file_group_ops = {
-+};
-+
-+/**
-+ * vfio_file_get_ops - Return a struct of function pointers to use with the file
-+ * @filep: VFIO file to return pointers for
-+ *
-+ * This API exists to allow KVM to call into VFIO without tightly coupling the
-+ * VFIO and KVM modules together. KVM will call this using symbol_get() and from
-+ * then on will call VFIO through the returned function pointers.
-+ */
-+const struct vfio_file_ops *vfio_file_get_ops(struct file *filep)
-+{
-+	if (filep->f_op != &vfio_group_fops)
-+		return ERR_PTR(-EINVAL);
-+	return &vfio_file_group_ops;
-+}
-+EXPORT_SYMBOL_GPL(vfio_file_get_ops);
-+
- /*
-  * Sub-module support
-  */
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index 66dda06ec42d1b..409bbf817206cc 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -138,6 +138,8 @@ int vfio_mig_get_next_state(struct vfio_device *device,
- /*
-  * External user API
-  */
-+struct vfio_file_ops {
-+};
- extern struct vfio_group *vfio_group_get_external_user(struct file *filep);
- extern void vfio_group_put_external_user(struct vfio_group *group);
- extern struct vfio_group *vfio_group_get_external_user_from_dev(struct device
-@@ -147,6 +149,7 @@ extern bool vfio_external_group_match_file(struct vfio_group *group,
- extern int vfio_external_user_iommu_id(struct vfio_group *group);
- extern long vfio_external_check_extension(struct vfio_group *group,
- 					  unsigned long arg);
-+const struct vfio_file_ops *vfio_file_get_ops(struct file *filep);
- 
- #define VFIO_PIN_PAGES_MAX_ENTRIES	(PAGE_SIZE/sizeof(unsigned long))
- 
-diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
-index 7e1793a1f5f1fd..254d8c18378163 100644
---- a/virt/kvm/vfio.c
-+++ b/virt/kvm/vfio.c
-@@ -34,6 +34,7 @@ static void kvm_spapr_tce_release_iommu_group(struct kvm *kvm,
- struct kvm_vfio_group {
- 	struct list_head node;
- 	struct file *filp;
-+	const struct vfio_file_ops *ops;
- 	struct vfio_group *vfio_group;
+ static const struct vfio_file_ops vfio_file_group_ops = {
++	.get_iommu_group = vfio_file_iommu_group,
  };
  
-@@ -196,6 +197,7 @@ static void kvm_vfio_update_coherency(struct kvm_device *dev)
+ /**
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index 409bbf817206cc..e5ca7d5a0f1584 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -139,6 +139,7 @@ int vfio_mig_get_next_state(struct vfio_device *device,
+  * External user API
+  */
+ struct vfio_file_ops {
++	struct iommu_group *(*get_iommu_group)(struct file *filep);
+ };
+ extern struct vfio_group *vfio_group_get_external_user(struct file *filep);
+ extern void vfio_group_put_external_user(struct vfio_group *group);
+@@ -146,7 +147,6 @@ extern struct vfio_group *vfio_group_get_external_user_from_dev(struct device
+ 								*dev);
+ extern bool vfio_external_group_match_file(struct vfio_group *group,
+ 					   struct file *filep);
+-extern int vfio_external_user_iommu_id(struct vfio_group *group);
+ extern long vfio_external_check_extension(struct vfio_group *group,
+ 					  unsigned long arg);
+ const struct vfio_file_ops *vfio_file_get_ops(struct file *filep);
+diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
+index 254d8c18378163..743e4870fa1825 100644
+--- a/virt/kvm/vfio.c
++++ b/virt/kvm/vfio.c
+@@ -118,47 +118,14 @@ static bool kvm_vfio_group_is_coherent(struct vfio_group *vfio_group)
+ 	return ret > 0;
+ }
  
- static int kvm_vfio_group_add(struct kvm_device *dev, unsigned int fd)
+-static int kvm_vfio_external_user_iommu_id(struct vfio_group *vfio_group)
+-{
+-	int (*fn)(struct vfio_group *);
+-	int ret = -EINVAL;
+-
+-	fn = symbol_get(vfio_external_user_iommu_id);
+-	if (!fn)
+-		return ret;
+-
+-	ret = fn(vfio_group);
+-
+-	symbol_put(vfio_external_user_iommu_id);
+-
+-	return ret;
+-}
+-
+-static struct iommu_group *kvm_vfio_group_get_iommu_group(
+-		struct vfio_group *group)
+-{
+-	int group_id = kvm_vfio_external_user_iommu_id(group);
+-
+-	if (group_id < 0)
+-		return NULL;
+-
+-	return iommu_group_get_by_id(group_id);
+-}
+-
+ static void kvm_spapr_tce_release_vfio_group(struct kvm *kvm,
+-		struct vfio_group *vfio_group)
++					     struct kvm_vfio_group *kvg)
  {
-+	const struct vfio_file_ops *(*fn)(struct file *filep);
+-	struct iommu_group *grp;
+-
+ 	if (!IS_ENABLED(CONFIG_SPAPR_TCE_IOMMU))
+ 		return;
+ 
+-	grp = kvm_vfio_group_get_iommu_group(vfio_group);
+-	if (WARN_ON_ONCE(!grp))
+-		return;
+-
+-	kvm_spapr_tce_release_iommu_group(kvm, grp);
+-	iommu_group_put(grp);
++	kvm_spapr_tce_release_iommu_group(kvm,
++					  kvg->ops->get_iommu_group(kvg->filp));
+ }
+ 
+ /*
+@@ -283,7 +250,7 @@ static int kvm_vfio_group_del(struct kvm_device *dev, unsigned int fd)
+ 
+ 		list_del(&kvg->node);
+ 		kvm_arch_end_assignment(dev->kvm);
+-		kvm_spapr_tce_release_vfio_group(dev->kvm, kvg->vfio_group);
++		kvm_spapr_tce_release_vfio_group(dev->kvm, kvg);
+ 		kvm_vfio_group_set_kvm(kvg->vfio_group, NULL);
+ 		kvm_vfio_group_put_external_user(kvg->vfio_group);
+ 		fput(kvg->filp);
+@@ -306,10 +273,8 @@ static int kvm_vfio_group_set_spapr_tce(struct kvm_device *dev,
+ {
+ 	struct kvm_vfio_spapr_tce param;
  	struct kvm_vfio *kv = dev->private;
- 	struct vfio_group *vfio_group;
+-	struct vfio_group *vfio_group;
  	struct kvm_vfio_group *kvg;
-@@ -221,6 +223,18 @@ static int kvm_vfio_group_add(struct kvm_device *dev, unsigned int fd)
- 		goto err_unlock;
+ 	struct fd f;
+-	struct iommu_group *grp;
+ 	int ret;
+ 
+ 	if (!IS_ENABLED(CONFIG_SPAPR_TCE_IOMMU))
+@@ -322,18 +287,6 @@ static int kvm_vfio_group_set_spapr_tce(struct kvm_device *dev,
+ 	if (!f.file)
+ 		return -EBADF;
+ 
+-	vfio_group = kvm_vfio_group_get_external_user(f.file);
+-	if (IS_ERR(vfio_group)) {
+-		ret = PTR_ERR(vfio_group);
+-		goto err_fdput;
+-	}
+-
+-	grp = kvm_vfio_group_get_iommu_group(vfio_group);
+-	if (WARN_ON_ONCE(!grp)) {
+-		ret = -EIO;
+-		goto err_put_external;
+-	}
+-
+ 	ret = -ENOENT;
+ 
+ 	mutex_lock(&kv->lock);
+@@ -341,18 +294,13 @@ static int kvm_vfio_group_set_spapr_tce(struct kvm_device *dev,
+ 	list_for_each_entry(kvg, &kv->group_list, node) {
+ 		if (kvg->filp != f.file)
+ 			continue;
+-
+-		ret = kvm_spapr_tce_attach_iommu_group(dev->kvm, param.tablefd,
+-						       grp);
++		ret = kvm_spapr_tce_attach_iommu_group(
++			dev->kvm, param.tablefd,
++			kvg->ops->get_iommu_group(kvg->filp));
+ 		break;
  	}
  
-+	fn = symbol_get(vfio_file_get_ops);
-+	if (!fn) {
-+		ret = -EINVAL;
-+		goto err_free;
-+	}
-+	kvg->ops = fn(filp);
-+	symbol_put(vfio_file_get_ops);
-+	if (IS_ERR(kvg->ops)) {
-+		ret = PTR_ERR(kvg->ops);
-+		goto err_free;
-+	}
-+
- 	vfio_group = kvm_vfio_group_get_external_user(filp);
- 	if (IS_ERR(vfio_group)) {
- 		ret = PTR_ERR(vfio_group);
+ 	mutex_unlock(&kv->lock);
+-
+-	iommu_group_put(grp);
+-err_put_external:
+-	kvm_vfio_group_put_external_user(vfio_group);
+-err_fdput:
+ 	fdput(f);
+ 	return ret;
+ }
+@@ -418,7 +366,7 @@ static void kvm_vfio_destroy(struct kvm_device *dev)
+ 	struct kvm_vfio_group *kvg, *tmp;
+ 
+ 	list_for_each_entry_safe(kvg, tmp, &kv->group_list, node) {
+-		kvm_spapr_tce_release_vfio_group(dev->kvm, kvg->vfio_group);
++		kvm_spapr_tce_release_vfio_group(dev->kvm, kvg);
+ 		kvm_vfio_group_set_kvm(kvg->vfio_group, NULL);
+ 		kvm_vfio_group_put_external_user(kvg->vfio_group);
+ 		fput(kvg->filp);
 -- 
 2.35.1
 
