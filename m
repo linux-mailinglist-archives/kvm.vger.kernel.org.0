@@ -2,112 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CACC5009ED
-	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 11:32:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7475500A0B
+	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 11:38:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241818AbiDNJet (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 05:34:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60672 "EHLO
+        id S241851AbiDNJkh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 05:40:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241096AbiDNJer (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Apr 2022 05:34:47 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B269F70F48;
-        Thu, 14 Apr 2022 02:32:23 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id x200so8308866ybe.13;
-        Thu, 14 Apr 2022 02:32:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=18iN7isOnbwaCP/A+6P5FUZa7tPpEP9mZVkoMTWqVbk=;
-        b=TaiSOkeG0C4eCouXZg0Cyq9AzWHpM+023cwzNOxyLUeMgaHNwgys3LzUfQSa+8lcyk
-         tc0wP3ET5ZCnxwFPmu874Ex5pQ0hAm2LrgwJdhvNXVvSX7kQLQgacueikDMxqwAjiaf6
-         CTg/9CQ3tfr/lSaW9M9Dlv+CAZxQpu/u5F8SXHyDRXCEFzfUpnlfqlArAiVeLrBiPnlC
-         IZlEu5dmRiC5hlpYtFE16mXx0n+JCyz/LVf55wFifLy2SZ8tf7JAmeXWhuGaSZR2GFYr
-         /mEdk+bF0X4vKkkS17+h4yscsq1DHS3G8VYuqaqiI9Jkowu7zNMXKyetJ6NHiiHsf0AQ
-         J02w==
+        with ESMTP id S241870AbiDNJke (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Apr 2022 05:40:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AB5E8710E8
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 02:38:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649929084;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kAYBz4doVQTzyQ+XbmAkl9XBH5XLaB98KdCbNRQGiq4=;
+        b=LntbUP7SFJH/zQ7kPTF5x42lw1+Texq4xdKoj+NynhWV1I9l3HcsIL4vZmtOv5kAyd2jqD
+        wkKdhoWL05KrTeZU7WFcQ1iG6u317x638eRxxQXEJlAY/7x9G4v+1JDm1kCYwyKooC8ySS
+        9mwcdsMYL1h4iLZibbm3k4ml8ipfujs=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-442-9mo7J4UkNjSkEfMPq9EB5w-1; Thu, 14 Apr 2022 05:38:03 -0400
+X-MC-Unique: 9mo7J4UkNjSkEfMPq9EB5w-1
+Received: by mail-lf1-f69.google.com with SMTP id j18-20020a056512109200b0046bb096899cso2089638lfg.20
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 02:38:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=18iN7isOnbwaCP/A+6P5FUZa7tPpEP9mZVkoMTWqVbk=;
-        b=RDTNLlBOld9ONIXGzvzDT208ZS4bHhBEOqEw2PwFlmPNmRZepW7J7L8A690SaNpxk+
-         PGw+dFg2ggdjRfDUwXhwRdHQSg2+F9OMk4XqHR6JkHRr4JbaAcb4jEdrmMzxKraI6Ac7
-         c/HyRuLv3sQzNwjb068+dDJ0YY0GA3ViqSHDcOCxT0qWp9D1AnGQeIjFB0jQCm7gb8Eb
-         Hz13n1XI2cr2IRNgHa7zLNZB4Ax9mlSNGL06OXtda/HqQIyh5icBv3qxOZcpVGDbS89d
-         RXJMdi6a5/O7Hainhg1oZi060EQfapRSYG2VjSL1Nt//FU14RT2rwbp/PLomlA/q68nr
-         3tzQ==
-X-Gm-Message-State: AOAM5306bsSZsAM5moKAZ35QhRMnz6UVHQeTNOvmX9svXnyxHv6qbkeP
-        QIu41con4kIyxq4P3QFW5clYpW4iIFuTUi3zbpU=
-X-Google-Smtp-Source: ABdhPJzgK9aC518klHOSSzwcux3CKiMlGdS3vuNoXXMM7KFp3sHe6L7qBScGGrXRgCJrCFXtsycXOEsGhbOrTGlARtM=
-X-Received: by 2002:a05:6902:124a:b0:641:c7b8:9833 with SMTP id
- t10-20020a056902124a00b00641c7b89833mr1017162ybu.428.1649928742386; Thu, 14
- Apr 2022 02:32:22 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=kAYBz4doVQTzyQ+XbmAkl9XBH5XLaB98KdCbNRQGiq4=;
+        b=Wilrw0rJrCBTZhE+XCLqUFMtjlLpXWsCzK3NrZFwBarjczqpUp2Cg7biRJGekmB1YL
+         jH5CxYI0wKwbPGEOlapcDkTrHH82/HdftHZPr0mOcwsAJKdl5OBF1CAJp/XzMxH9zw+6
+         X/kU5lpWM9u9/ImA6kQ2JlBLYTolLB57cklOl0LztY6ovG8dwsO6ANk31cePCytI/SMR
+         1X2BaFMlPf3KYRcX4aV3Se+VUyZv04ekmHVXxDvd/iBQyDpjPkAHQnkOOd43wY8J0O8O
+         4650ZaqpxVzsm01OuLGlX9/R4fDxIZIvL6zGIAh/pDjOMpDW7KWnSl7afW8iDmMjeAOE
+         x57g==
+X-Gm-Message-State: AOAM530NW/dZQUxsWOqcKtrfqQxCpB8c4ztDN6ubmuBsIXyL9tPw8t6G
+        ZC6obbIHaFnoEzkkeZHgphCnkfQPualZDUPfB93nBkQ1bXpApHCgpAv5NJmffq0RCZyRjs6zuHE
+        kWHGl+IkLMnQ+U6mtOW4+qGJaoNHB
+X-Received: by 2002:a05:6512:b81:b0:448:b342:513c with SMTP id b1-20020a0565120b8100b00448b342513cmr1374395lfv.257.1649929081537;
+        Thu, 14 Apr 2022 02:38:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyT+hQL3ayUr4yHsMFIRrMraYLhBZ1J0Bf6UbhSWT+Hf8Hn8S4DOLDQKv3/usDOYYaKjPbe8DoFTVvjkWCTmg0=
+X-Received: by 2002:a05:6512:b81:b0:448:b342:513c with SMTP id
+ b1-20020a0565120b8100b00448b342513cmr1374387lfv.257.1649929081317; Thu, 14
+ Apr 2022 02:38:01 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220330132152.4568-1-jiangshanlai@gmail.com> <20220330132152.4568-4-jiangshanlai@gmail.com>
- <YlXrshJa2Sd1WQ0P@google.com> <CAJhGHyD-4YFDhkxk2SQFmKe3ooqw_0wE+9u3+sZ8zOdSUfbnxw@mail.gmail.com>
- <683974e7-5801-e289-8fa4-c8a8d21ec1b2@redhat.com>
-In-Reply-To: <683974e7-5801-e289-8fa4-c8a8d21ec1b2@redhat.com>
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Thu, 14 Apr 2022 17:32:11 +0800
-Message-ID: <CAJhGHyCgo-FEgvuRfuLZikgJSyo7HGm1OfU3gme35-WBmqo7yQ@mail.gmail.com>
-Subject: Re: [RFC PATCH V3 3/4] KVM: X86: Alloc role.pae_root shadow page
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        linux-doc@vger.kernel.org
+References: <20220406034346.74409-1-xuanzhuo@linux.alibaba.com>
+ <20220406034346.74409-23-xuanzhuo@linux.alibaba.com> <d228a41f-a3a1-029d-f259-d4fbab822e78@redhat.com>
+ <1649917349.6242197-1-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1649917349.6242197-1-xuanzhuo@linux.alibaba.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Thu, 14 Apr 2022 17:37:50 +0800
+Message-ID: <CACGkMEuk24R8Y-H2=cuG4VkQhTNf6CSEMJbxe7jvHFEusa815g@mail.gmail.com>
+Subject: Re: [PATCH v9 22/32] virtio_pci: queue_reset: extract the logic of
+ active vq for modern pci
+To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, netdev <netdev@vger.kernel.org>,
+        platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm <kvm@vger.kernel.org>,
+        "open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 14, 2022 at 5:08 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Thu, Apr 14, 2022 at 2:25 PM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrot=
+e:
 >
-> On 4/14/22 11:07, Lai Jiangshan wrote:
-> >> I don't think this will work for shadow paging.  CR3 only has to be 32-byte aligned
-> >> for PAE paging.  Unless I'm missing something subtle in the code, KVM will incorrectly
-> >> reuse a pae_root if the guest puts multiple PAE CR3s on a single page because KVM's
-> >> gfn calculation will drop bits 11:5.
+> On Tue, 12 Apr 2022 14:58:19 +0800, Jason Wang <jasowang@redhat.com> wrot=
+e:
 > >
-> > I forgot about it.
+> > =E5=9C=A8 2022/4/6 =E4=B8=8A=E5=8D=8811:43, Xuan Zhuo =E5=86=99=E9=81=
+=93:
+> > > Introduce vp_active_vq() to configure vring to backend after vq attac=
+h
+> > > vring. And configure vq vector if necessary.
+> > >
+> > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > ---
+> > >   drivers/virtio/virtio_pci_modern.c | 46 ++++++++++++++++++---------=
+---
+> > >   1 file changed, 28 insertions(+), 18 deletions(-)
+> > >
+> > > diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virt=
+io_pci_modern.c
+> > > index 86d301f272b8..49a4493732cf 100644
+> > > --- a/drivers/virtio/virtio_pci_modern.c
+> > > +++ b/drivers/virtio/virtio_pci_modern.c
+> > > @@ -176,6 +176,29 @@ static void vp_reset(struct virtio_device *vdev)
+> > >     vp_disable_cbs(vdev);
+> > >   }
+> > >
+> > > +static int vp_active_vq(struct virtqueue *vq, u16 msix_vec)
+> > > +{
+> > > +   struct virtio_pci_device *vp_dev =3D to_vp_device(vq->vdev);
+> > > +   struct virtio_pci_modern_device *mdev =3D &vp_dev->mdev;
+> > > +   unsigned long index;
+> > > +
+> > > +   index =3D vq->index;
+> > > +
+> > > +   /* activate the queue */
+> > > +   vp_modern_set_queue_size(mdev, index, virtqueue_get_vring_size(vq=
+));
+> > > +   vp_modern_queue_address(mdev, index, virtqueue_get_desc_addr(vq),
+> > > +                           virtqueue_get_avail_addr(vq),
+> > > +                           virtqueue_get_used_addr(vq));
+> > > +
+> > > +   if (msix_vec !=3D VIRTIO_MSI_NO_VECTOR) {
+> > > +           msix_vec =3D vp_modern_queue_vector(mdev, index, msix_vec=
+);
+> > > +           if (msix_vec =3D=3D VIRTIO_MSI_NO_VECTOR)
+> > > +                   return -EBUSY;
+> > > +   }
+> > > +
+> > > +   return 0;
+> > > +}
+> > > +
+> > >   static u16 vp_config_vector(struct virtio_pci_device *vp_dev, u16 v=
+ector)
+> > >   {
+> > >     return vp_modern_config_vector(&vp_dev->mdev, vector);
+> > > @@ -220,32 +243,19 @@ static struct virtqueue *setup_vq(struct virtio=
+_pci_device *vp_dev,
+> > >
+> > >     vq->num_max =3D num;
+> > >
+> > > -   /* activate the queue */
+> > > -   vp_modern_set_queue_size(mdev, index, virtqueue_get_vring_size(vq=
+));
+> > > -   vp_modern_queue_address(mdev, index, virtqueue_get_desc_addr(vq),
+> > > -                           virtqueue_get_avail_addr(vq),
+> > > -                           virtqueue_get_used_addr(vq));
+> > > +   err =3D vp_active_vq(vq, msix_vec);
+> > > +   if (err)
+> > > +           goto err;
+> > >
+> > >     vq->priv =3D (void __force *)vp_modern_map_vq_notify(mdev, index,=
+ NULL);
+> > >     if (!vq->priv) {
+> > >             err =3D -ENOMEM;
+> > > -           goto err_map_notify;
+> > > -   }
+> > > -
+> > > -   if (msix_vec !=3D VIRTIO_MSI_NO_VECTOR) {
+> > > -           msix_vec =3D vp_modern_queue_vector(mdev, index, msix_vec=
+);
+> > > -           if (msix_vec =3D=3D VIRTIO_MSI_NO_VECTOR) {
+> > > -                   err =3D -EBUSY;
+> > > -                   goto err_assign_vector;
+> > > -           }
+> > > +           goto err;
+> > >     }
+> > >
+> > >     return vq;
+> > >
+> > > -err_assign_vector:
+> > > -   if (!mdev->notify_base)
+> > > -           pci_iounmap(mdev->pci_dev, (void __iomem __force *)vq->pr=
+iv);
+> >
+> >
+> > We need keep this or anything I missed?
 >
+> I think so, after modification, vp_modern_map_vq_notify is the last step =
+before
+> returning vq. If it fails, then vq->priv is equal to NULL, so there is no=
+ need
+> to execute pci_iounmap.
 >
-> Isn't the pae_root always rebuilt by
+> Did I miss something?
+
+Nope I miss that the vector is configured before the mapping.
+
+So
+
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+Thanks
+
 >
->          if (!tdp_enabled && memcmp(mmu->pdptrs, pdpte, sizeof(mmu->pdptrs)))
->                  kvm_mmu_free_roots(vcpu->kvm, mmu, KVM_MMU_ROOT_CURRENT);
+> Thanks.
 >
-> in load_pdptrs?  I think reuse cannot happen.
+> >
+> > Thanks
+> >
+> >
+> > > -err_map_notify:
+> > > +err:
+> > >     vring_del_virtqueue(vq);
+> > >     return ERR_PTR(err);
+> > >   }
+> >
 >
 
-In this patchset, root sp can be reused if it is found from the hash,
-including new pae root.
-
-All new kinds of sp added in this patchset are in the hash too.
-
-No more special root pages.
-
-kvm_mmu_free_roots() can not free those new types of sp if they are still
-valid.  And different vcpu can use the same pae root sp if the guest cr3
-of the vcpus are the same.
-
-And new pae root can be put in prev_root too (not implemented yet)
-because they are not too special anymore.  As long as sp->gfn, sp->pae_off,
-sp->role are matched, they can be reused.
