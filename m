@@ -2,73 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A7B3501E53
-	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 00:30:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FE8F501EF7
+	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 01:21:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347030AbiDNWbu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 18:31:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58306 "EHLO
+        id S1347513AbiDNXYR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 19:24:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347011AbiDNWbs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Apr 2022 18:31:48 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC523C19
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 15:29:19 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id d15so5832211pll.10
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 15:29:19 -0700 (PDT)
+        with ESMTP id S242046AbiDNXYP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Apr 2022 19:24:15 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12486B8985
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 16:21:49 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id u29so2418613pfg.7
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 16:21:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=UxPoFf2t5u+s0uISceiuQkf792IJ+jbIydpuaGQO9DQ=;
-        b=nP/6SQFXpMUu3tuK0mnNqZ7AmYkQ/GFRolTz3PgEzzgxGxVz9uESKrDSzSoo/vO8eP
-         S3JnL6U12W9U5r4HsjqwoCdO1WiGEHqJghC1KHK4TcjDrWSk/1SLi7b+0gPBO6Wj3Ey5
-         LXmgazCVs+J6Jm5ZKeyxuxstFaMDNeG996WwvYmd/Va8FToGNiqPuT4lDTypoFNpX/oC
-         PpmtUDxY7BNZIHoxHqsqp6kA9pR96i0+DPhYTM8zRBPp2zpx45fX8Ov2m72INCCmiEBe
-         sVy7ysPZZInuwMnyKc2r17EB9gI8ZGM9ETdUkV/i56pXeMG719MUKeGav3lxlSJGhlBw
-         KUPA==
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=eZSMaHVoqT9ySfaPjWWUxErMqhnAV6RP7Xt22+7qSpE=;
+        b=GwTHI0whS+GudzUXxDlT7R/rxGG7MLjsPzDcXeVAAbRy2Ov99jrtHy8huKZ78fb6M4
+         bZlbprkalqPEAcBACLxDC561QYmrqVH/dCWoynsAnm7TaXLwf4eby5RKleM2Gx1zAF5v
+         8aoNoypEVrWmTSLDR1ezsJXzMVo5pcKiI1m8i0jV6l4dqJ9PuphPTp/5fMROBOD8Z8Sh
+         7OonSlkOf2P/kDcZMP2rQr3kbg06Km8Hl0KmBAlPIG91i7G+caRpGeTsb2PEFOV08D/H
+         uWXz16B6NkEO9YulnnRdyBbxvyw/9Gq2oYtLZIX/Y+DBrwREoKDcAJiM5iJY0iqfLmCc
+         MVeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=UxPoFf2t5u+s0uISceiuQkf792IJ+jbIydpuaGQO9DQ=;
-        b=FpkyoC/cXY5DlF77nSLnyE4Y4GGw3MR2jwzs/amgbkzRhQrUwdEB4zRFN9qnRm9WeF
-         lJIZAxEWe7rAfLFJU5XpKQlw+a2jVfvIZaGjlaN4ltNG6GIFHiI2XF1naj5dh4d0lP5l
-         uTLr5UISSOi3TGW5GjWIKkkvlXSNLB4Q3O+AgIK3ScRo410s3nptAJoQpjLF5SV4W861
-         KqPT42JNfYmg/zal/0fxDi9c+TOlL9Wj44As6I8d818hDyjFLjwXKhXErFKND1dLnnr5
-         Rz8ShZC0WlltIBp6wcdbPT72HXDucwfnlBxmMf0+UT/N9WVKSPmbr2QrMvOp8QQS45IJ
-         iLoA==
-X-Gm-Message-State: AOAM532lAmsK4atWmKrggVKnruzcGwB9ojDu9E2pWFhg9G37AN8MC84n
-        CBUNFY8Dv2YjLWMz1qOw/6RtHZIKEhPaTA==
-X-Google-Smtp-Source: ABdhPJyimW5C+2lcyN6muRkrOOsyobCxgwfnT89oBCkWXVd+0MJ2XoKF57NjfZNDe1UEwqpwjyBxzw==
-X-Received: by 2002:a17:903:18c:b0:158:7255:4bc6 with SMTP id z12-20020a170903018c00b0015872554bc6mr19562029plg.106.1649975359257;
-        Thu, 14 Apr 2022 15:29:19 -0700 (PDT)
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=eZSMaHVoqT9ySfaPjWWUxErMqhnAV6RP7Xt22+7qSpE=;
+        b=HQ6jS4Qb3d8pXgg4Xx6/IJ4+RATGsxkrIbTB2Bbs7LpZC1oWQ30rI9Lh7cSLTL2urK
+         K5fbDbdRLhern++1uwsiEM5SnIwjIncHMFaEVaymQsq0MEQGbfVCeMj9f9NV6gKqMAzU
+         JtVN8Qkgw/Ar2V7sE78+sglsssYAjuqvy5xG1vnWK0KWr8Dv0cmfGoDEPoNP2IhGHO3P
+         Iw9XYa23FuNHYSNtz0lTU1xWpD9inFtgrK2cJDqNwQ5/9+zuOhDslYxizVZcRVmM8VxX
+         zRHQE7VtGsvQvIPBr6vyBS4iW+0vb8FBZm1CX4PKyrBpH3J4wjQIFQ9Cd6pYPl/z7Igr
+         tvIw==
+X-Gm-Message-State: AOAM531H0fNd3pI1MzfIBUQ6DOytB958r59PMyJBbAGr/UcBSztT0FTz
+        A/yCRkm8CvSc0ChE6yfeGSaFTQ==
+X-Google-Smtp-Source: ABdhPJz2SQdvJSpca+DnY5qvEoTN2B3E4/fHSw7/pl7LTz8w1R5u7xjJ5gFdJDh8LbkpXlvqd6C+ow==
+X-Received: by 2002:a63:c144:0:b0:399:3e75:1d55 with SMTP id p4-20020a63c144000000b003993e751d55mr4121743pgi.199.1649978508429;
+        Thu, 14 Apr 2022 16:21:48 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k8-20020aa790c8000000b00505d6016097sm850896pfk.94.2022.04.14.15.29.18
+        by smtp.gmail.com with ESMTPSA id d139-20020a621d91000000b00505aa0d10desm921742pfd.0.2022.04.14.16.21.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Apr 2022 15:29:18 -0700 (PDT)
-Date:   Thu, 14 Apr 2022 22:29:14 +0000
+        Thu, 14 Apr 2022 16:21:47 -0700 (PDT)
+Date:   Thu, 14 Apr 2022 23:21:44 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Dunn <daviddunn@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Junaid Shahid <junaids@google.com>
-Subject: Re: [PATCH v5 10/10] KVM: selftests: Test disabling NX hugepages on
- a VM
-Message-ID: <YligOuhn9HG0/uGO@google.com>
-References: <20220413175944.71705-1-bgardon@google.com>
- <20220413175944.71705-11-bgardon@google.com>
- <YldTMfNEzsweKi1V@google.com>
- <CANgfPd85MST8Lf_LhQ++JjxwJRvBoYk8FpOwzYbOhBL1zz157w@mail.gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Will Deacon <will@kernel.org>, Peter Gonda <pgonda@google.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Anup Patel <anup@brainfault.org>, maz@kernel.org,
+        Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v4.1] KVM, SEV: Add KVM_EXIT_SHUTDOWN metadata for SEV-ES
+Message-ID: <YlisiF4BU6Uxe+iU@google.com>
+References: <20220407210233.782250-1-pgonda@google.com>
+ <Yk+kNqJjzoJ9TWVH@google.com>
+ <CAMkAt6oc=SOYryXu+_w+WZR+VkMZfLR3_nd=hDvMU_cmOjJ0Xg@mail.gmail.com>
+ <YlBqYcXFiwur3zmo@google.com>
+ <20220411091213.GA2120@willie-the-truck>
+ <YlQ0LZyAgjGr7qX7@e121798.cambridge.arm.com>
+ <YlREEillLRjevKA2@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CANgfPd85MST8Lf_LhQ++JjxwJRvBoYk8FpOwzYbOhBL1zz157w@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YlREEillLRjevKA2@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -80,48 +81,82 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 14, 2022, Ben Gardon wrote:
-> On Wed, Apr 13, 2022 at 3:48 PM Sean Christopherson <seanjc@google.com> wrote:
-> > First off, huge kudos for negative testing!  But, it's going to provide poor coverage
-> > if we teach everyone to use the runner script, because that'll likely require root on
-> > most hosts, e.g. to futz with the module param.
+PAOLO!!!!!!
+
+Or maybe I need to try the Beetlejuice trick...
+
+Paolo, Paolo, Paolo.
+
+This is now sitting in kvm/next, which makes RISC-V and arm64 unhappy.  Thoughts
+on how to proceed?
+
+arch/riscv/kvm/vcpu_sbi.c: In function ‘kvm_riscv_vcpu_sbi_system_reset’:
+arch/riscv/kvm/vcpu_sbi.c:97:26: error: ‘struct <anonymous>’ has no member named ‘flags’
+   97 |         run->system_event.flags = flags;
+      |                          ^
+
+
+On Mon, Apr 11, 2022, Sean Christopherson wrote:
+> On Mon, Apr 11, 2022, Alexandru Elisei wrote:
+> > Hi,
 > >
-> > Aha!  Idea.  And it should eliminate the SYS_reboot shenanigans, which while hilarious,
-> > are mildy scary.
+> > On Mon, Apr 11, 2022 at 10:12:13AM +0100, Will Deacon wrote:
+> > > Hi Sean,
+> > >
+> > > Cheers for the heads-up.
+> > >
+> > > [+Marc and Alex as this looks similar to [1]]
+> > >
+> > > On Fri, Apr 08, 2022 at 05:01:21PM +0000, Sean Christopherson wrote:
+> > > > system_event.flags is broken (at least on x86) due to the prior 'type' field not
+> > > > being propery padded, e.g. userspace will read/write garbage if the userspace
+> > > > and kernel compilers pad structs differently.
+> > > >
+> > > >           struct {
+> > > >                   __u32 type;
+> > > >                   __u64 flags;
+> > > >           } system_event;
+> > >
+> > > On arm64, I think the compiler is required to put the padding between type
+> > > and flags so that both the struct and 'flags' are 64-bit aligned [2]. Does
+> > > x86 not offer any guarantees on the overall structure alignment?
 > >
-> > In the runner script, wrap all the modification of sysfs knobs with sudo, and then
-> > (again with sudo) do:
-> >
-> >         setcap cap_sys_boot+ep path/to/nx_huge_pages_test
-> >         path/to/nx_huge_pages_test MAGIC_NUMBER -b
-> >
-> > where "-b" means "has CAP_SYS_BOOT".  And then
-> >
-> >         setcap cap_sys_boot-ep path/to/nx_huge_pages_test
-> >         path/to/nx_huge_pages_test MAGIC_NUMBER
-> >
-> > Hmm, and I guess if the script is run as root, just skip the second invocation.
+> > This is also my understanding. The "Procedure Call Standard for the Arm
+> > 64-bit Architecture" [1] has these rules for structs (called "aggregates"):
 > 
-> Wouldn't it be easier to just run the test binary twice and just have
-> the second time run without root permissions? I don't know if there's
-> an easy way to do that.
-
-I don't think so, e.g. what if there is no other user account to switch to?  On
-the other hand, I doubt I'm the only person that typically runs selftests with a
-user account.
-
-Using setcap isn't hard, e.g.
-
-	# If the test isn't running as root, verify KVM correctly rejects the
-	# per-VM override if the process doesn't have CAP_SYS_BOOT.
-	if [[ $(id -u) -ne 0 ]]; then
-		sudo setcap cap_sys_boot-ep path/to/nx_huge_pages_test
-		path/to/nx_huge_pages_test MAGIC_NUMBER
-
-		sudo setcap cap_sys_boot+ep path/to/nx_huge_pages_test
-	fi
-
-	# The test now has CAP_SYS_BOOT, or is running as root.
-	path/to/nx_huge_pages_test MAGIC_NUMBER -b
-
-Bonus points if you want to save/restore the capability. 
+> AFAIK, all x86 compilers will pad structures accordingly, but a 32-bit userspace
+> running against a 64-bit kernel will have different alignment requirements, i.e.
+> won't pad, and x86 supports CONFIG_KVM_COMPAT=y.  And I have no idea what x86's
+> bizarre x32 ABI does.
+> 
+> > > > Our plan to unhose this is to change the struct as follows and use bit 31 in the
+> > > > 'type' to indicate that ndata+data are valid.
+> > > >
+> > > >           struct {
+> > > >                         __u32 type;
+> > > >                   __u32 ndata;
+> > > >                   __u64 data[16];
+> > > >                 } system_event;
+> > > >
+> > > > Any objection to updating your architectures to use a helper to set the bit and
+> > > > populate ndata+data accordingly?  It'll require a userspace update, but v5.18
+> > > > hasn't officially released yet so it's not kinda sort not ABI breakage.
+> > >
+> > > It's a bit annoying, as we're using the current structure in Android 13 :/
+> > > Obviously, if there's no choice then upstream shouldn't worry, but it means
+> > > we'll have to carry a delta in crosvm. Specifically, the new 'ndata' field
+> > > is going to be unusable for us because it coincides with the padding.
+> 
+> Yeah, it'd be unusuable for existing types.  One idea is that we could define the
+> ABI to be that the RESET and SHUTDOWN types have an implicit ndata=1 on arm64 and
+> RISC-V.  That would allow keeping the flags interpretation and so long as crosvm
+> doesn't do something stupid like compile with "pragma pack" (does clang even support
+> that?), there's no delta necessary for Android.
+> 
+> > Just a thought, but wouldn't such a drastical change be better implemented
+> > as a new exit_reason and a new associated struct?
+> 
+> Maybe?  I wasn't aware that arm64/RISC-V picked up usage of "flags" when I
+> suggested this, but I'm not sure it would have changed anything.  We could add
+> SYSTEM_EVENT2 or whatever, but since there's no official usage of flags, it seems
+> a bit gratutious.
