@@ -2,147 +2,288 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AAF2B50038A
-	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 03:19:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0F425003FC
+	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 04:05:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239384AbiDNBWB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Apr 2022 21:22:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54166 "EHLO
+        id S239524AbiDNCHd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Apr 2022 22:07:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236543AbiDNBWA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Apr 2022 21:22:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C0E81B7DE
-        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 18:19:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649899175;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=v72fBiHQf/8zhWUKxWfFXSTDVmBo353pLbH5+QeYjP0=;
-        b=gi1WkM9I5t8IFasz2nYA4F83TDWCgKWSElMTlRc8BjRa+S3EUT1T6H1baawToC/RYmqs2s
-        UtKD3vIHhsw3OUf4jPJD5edlpu0yJUcDXz9I0m/cWq9msN9bW/W4A8QS+DgiAMdp0gBIkZ
-        NXXE1Gmx0di+Ew9f3pm0ZzpXNZFlbm0=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-306-bhZ8-vnFNUeFmJmLMgiPbA-1; Wed, 13 Apr 2022 21:19:34 -0400
-X-MC-Unique: bhZ8-vnFNUeFmJmLMgiPbA-1
-Received: by mail-il1-f197.google.com with SMTP id j16-20020a056e02219000b002cbe5b76195so114489ila.9
-        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 18:19:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=v72fBiHQf/8zhWUKxWfFXSTDVmBo353pLbH5+QeYjP0=;
-        b=Fxb54KNCBRBZHVgY3FPgkSrhN2lgGyFc5Vh1eTJ94Ziii8wNL5v98oA7uK4EYykl9A
-         TjbD7mvu+0tmSCZlRodpNplLw0iqAJO//Ced2xinDqTWJ6kmt3uFO0nw8QjyIXrKv+HN
-         1FLVtbbFH5FN3UbCJgAWr/UsF6Nj1E9g7eP9Xi85HzHfuasqWXVYj0ZRJ8lRTf6moLoo
-         pGayTAni9YvyEGeuN41tBW/U383QJiQzz+9qr3godxSjvCnVC/XPNtYzWc4jFRSGsi1U
-         hsIrfJrYkUs9GOHdN/A1OUoADBbqjT2krD375MKMsb85gb230r/S6sX4M8MpOROfFHL6
-         qbMw==
-X-Gm-Message-State: AOAM531MZSeRFy8EPgPJlBnVjpk8fg1K7yKZ7MGrkfjjanAzbm7coPMg
-        /Y/SzRhYhNumRQzbnWoeS96rV3uY3j5ZThSZv55kzQ+uZwEQC2IhidXHi9TmZLjJd7iZjpkS3Ff
-        doQHMzOkN909Ce/DQsBh4f/JRbicGpae1iBEuMkiG5PxvHXhEXrbeTzz1hN5grw==
-X-Received: by 2002:a02:224d:0:b0:321:370b:6d59 with SMTP id o74-20020a02224d000000b00321370b6d59mr144514jao.104.1649899173739;
-        Wed, 13 Apr 2022 18:19:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxREn9EJUMa5YNi7ZdHxBmXInmBmriVMoBCjGPUL51SMpa8tCOLf8aruSagFkhoUpIQbMP8HQ==
-X-Received: by 2002:a02:224d:0:b0:321:370b:6d59 with SMTP id o74-20020a02224d000000b00321370b6d59mr144497jao.104.1649899173438;
-        Wed, 13 Apr 2022 18:19:33 -0700 (PDT)
-Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id e4-20020a056e020b2400b002ca9ffbb8fesm335323ilu.72.2022.04.13.18.19.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Apr 2022 18:19:33 -0700 (PDT)
-Date:   Wed, 13 Apr 2022 21:19:31 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Ben Gardon <bgardon@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH] kvm: selftests: Fix cut-off of addr_gva2gpa lookup
-Message-ID: <Yld2o23GafZobGZy@xz-m1.local>
-References: <20220414010703.72683-1-peterx@redhat.com>
+        with ESMTP id S229821AbiDNCHa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Apr 2022 22:07:30 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E39A3CA5F;
+        Wed, 13 Apr 2022 19:05:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1649901907; x=1681437907;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=nIcri2FxFkSOSeG5IwE3mHtvaVsiEQhogUZHpjwkqjU=;
+  b=LOkK7dZO7EE/XjXyzgNa5n5eRSKZdBlZwi1wA7flOYBcGGCHbpVVpITw
+   k6V+02k7lzrst/1o5XT1qnXbrmBSRyGT0p/Vme7RffxkzqcIYJ8tYLESe
+   OtM858/Jrs/hBpb20T3OfIdexCu7jFXVcu72QyHZRyO5OlgBA2gc0nsQt
+   W1CX72d3pfQq1XghccYDJztpT7hf/QEELWp0m1yIpT8f77pS1LLCpPE9w
+   5W4PU0c0z6yly/AjSAZiu13QxV3552XgKSuO5iwSzZF7pkbAsMhsYLd52
+   u8DrGa8/CdNd3odaRf8B4Z2NdGaSG+Az7YfcXkWkT1x4snQooVJrGuP7I
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10316"; a="263001230"
+X-IronPort-AV: E=Sophos;i="5.90,258,1643702400"; 
+   d="scan'208";a="263001230"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2022 19:05:06 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,258,1643702400"; 
+   d="scan'208";a="527191720"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga006.jf.intel.com with ESMTP; 13 Apr 2022 19:05:05 -0700
+Received: from fmsmsx605.amr.corp.intel.com (10.18.126.85) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Wed, 13 Apr 2022 19:05:04 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27 via Frontend Transport; Wed, 13 Apr 2022 19:05:04 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.107)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.27; Wed, 13 Apr 2022 19:05:04 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T7oSSnEYoYM6YJc5NGURovlqth4ijNRFVnUPDS4GTsPbUsEbXZOZ3b/sMPYLEFWTlxkX1RQgsDSO9sahxxXUfkk6SXVQxRIa/TMeOc7Z6Ec2NGTT2hc6I0KkbbLOydqhsFpBYU09162B2kiN9z9dSe/NHjsI+aaa5MxeEY3BfcOuPDFLgshwK16FHY87Nv/RadxFlMtnSzr4gah3bhufv9NwKxVG0WPWhRhySS6QoNvkXUMkTwkngNbikKMAIhLvNcRmoHGFZZVjVGaO8bErEpWKP/DP1MvnWzYWtysSgVt5+LuOUFyXKUxPi4iGvOxlO3OYDxf3WSV/n095+8W3MA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=94WtJTu0EW/9crdAa0Sa4dDylcp7DTTV7YtvPYXzNz0=;
+ b=Pf/wlC83lgzQ46i64Af4Cw5L6udPKNjSIxG0ASbw3qcuvlapzwGUTtzCO1p/1g2PfpdzPYwHcGH4D4moWbtEJ/1yUxTC6qvSMfjLZ2/7GcioYwezpw1uOeLgUGxTLiywZS8/tik0eyfUCW9vwpMiOCuBR6DfVsT7vR38YxlzXlNZkkIV8PU3gMPNPueVCkTqiH71A28GzPu5OEk4sL2+p/TZA68AyQhJx3nrLZOMUK0hDWgefDwgBX+aiT2RQyRrNScslwLcOkIIKe8AM9j1mg6z/44fh8GSLWvrXXEVQeDTWgEEav+kB2DW04gYRNtlyjx81m6OegyW2Xo9DvNTOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by BN7PR11MB2643.namprd11.prod.outlook.com (2603:10b6:406:b2::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5144.29; Thu, 14 Apr
+ 2022 02:04:57 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::c4ea:a404:b70b:e54e]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::c4ea:a404:b70b:e54e%8]) with mapi id 15.20.5164.018; Thu, 14 Apr 2022
+ 02:04:57 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        David Airlie <airlied@linux.ie>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Jonathan Corbet" <corbet@lwn.net>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        "Christian Borntraeger" <borntraeger@linux.ibm.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        "Eric Farman" <farman@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        "Heiko Carstens" <hca@linux.ibm.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        "Sven Schnelle" <svens@linux.ibm.com>,
+        Daniel Vetter <daniel@ffwll.ch>
+Subject: RE: [PATCH 1/9] vfio: Make vfio_(un)register_notifier accept a
+ vfio_device
+Thread-Topic: [PATCH 1/9] vfio: Make vfio_(un)register_notifier accept a
+ vfio_device
+Thread-Index: AQHYToWBFlgA1ZPpLEu2nNEUaY3qF6ztWRcAgABgPgCAAEpdgIAAA2kAgAADOQCAABLpgIAAHA8AgAAM+QCAABH8AIAAIoeAgAAn7sA=
+Date:   Thu, 14 Apr 2022 02:04:57 +0000
+Message-ID: <BN9PR11MB5276F5451828B752378F24408CEF9@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <1-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
+ <20220413055524.GB32092@lst.de> <20220413113952.GN2120790@nvidia.com>
+ <20220413160601.GA29631@lst.de> <20220413161814.GS2120790@nvidia.com>
+ <20220413162946.GB31053@lst.de> <20220413173727.GU2120790@nvidia.com>
+ <661447fd-b041-c08d-cedc-341b31c405f8@intel.com>
+ <20220413200418.GX2120790@nvidia.com>
+ <bc3f32ee-0dd5-d525-0536-dc18ade338a6@intel.com>
+ <20220413231215.GY2120790@nvidia.com>
+In-Reply-To: <20220413231215.GY2120790@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 142b0495-9aeb-498a-be31-08da1dbb2cc3
+x-ms-traffictypediagnostic: BN7PR11MB2643:EE_
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-microsoft-antispam-prvs: <BN7PR11MB2643CA3DCEB692903963DE348CEF9@BN7PR11MB2643.namprd11.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Nb1M0sTyCvEEj4CSblDpMq+56XPUv2qXKh+ipSRUTAxBN8VuagsNm6OE64nQZqtJ/DoYX4OF0TxVHMzX+mGXJHlsC8Or22hyT1+bL3ok5Sq5JcLQdp90Mz51lXadcs5nzIy0dleknciIJDuStLHQuI2NPld3XMxI4v6xw7+lHj4vnkxeAwMUPGqJ/CLGljWB37cP38oYzTzn4OOUcH9idTOsXVFz5gs5oP6Ltb5CvKibdoGnOLl6NzcU88AnIKhXyqyuIRyRPX4w/tniFIDhvJl3avljPsVWmsEJww49Fb2DfVXy3fSVOFGw0N2o36rH++WyVeqf6YFxBvQo0h670Qm0M0raJNC5ReF3zRBKuE+x5VRZd0SInUvCtLIcYNhE5hbTPavtOAbUwAndwiyiJ2kcY9r8OH/m0VmJk/6ZyPphYdSZJ5ClXWGB8f3Q2h5W52+TteAq0EwPw8D/aIPNGRA1Y/FpwVBRMPy+MJMmFCVljswmiLCyMmhUEAJt1jaoOTcEIPTSls8kBfSA6zkFi8qrzJva5jR5otmkZwZrjL2s4odedMM8R0u7/pjNgjXpPA0CjWISPbEwT0YR1ylELOX4coxeBKWU4G/e+7Ad6yu/tc6VQsJjmkoT58I68g/iw3/kZ1/JaOBSGAro2c7k49R8Va29KZIIr5pGvIWzS0opm7nZO1HgayMJmZ0Dum5ryQYx931pxHl3sYVyG+ukEw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(64756008)(4326008)(66946007)(66556008)(86362001)(8676002)(7406005)(122000001)(54906003)(6636002)(110136005)(76116006)(5660300002)(7416002)(66446008)(8936002)(2906002)(38100700002)(33656002)(316002)(83380400001)(52536014)(82960400001)(38070700005)(66476007)(186003)(71200400001)(6506007)(26005)(55016003)(53546011)(7696005)(9686003)(508600001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?/kUT74yItOf2pfQ/42CrmnzeBwPjNMKzOhQwz1g9y4G1xZ7zKk2t0wZw2GcI?=
+ =?us-ascii?Q?ZPQw8rxkT0c5BE8k8p6ucQtyv9NvAvwTo82BokOeHfWHB7lDS+M6k7MjGa1j?=
+ =?us-ascii?Q?ReOK9YuFCIefWuhmmVBiKlnSancjzE/oYUfBEWdb2jfVTMVdRRKZohq7Qkme?=
+ =?us-ascii?Q?H+hwC+q0tJuvVbIaR4hZLmfAVi54QSnBZq77Kc5Ry/MEsHa2w0mZUzzNL+hz?=
+ =?us-ascii?Q?VX7TAy6JqJpCvMNWd8S+Dj1uKk9n7JSydp218+AgJDXiqZqsRZhTifyXFnmq?=
+ =?us-ascii?Q?K5al46Y7ABKkV1g69mNuMeaX1nKbcb9GlGUOPs6989jQTQXojAFX0f1vkYce?=
+ =?us-ascii?Q?Vw2G1a8mUvl4zdC9sQwbbQoCVyRVTLqJVvd74oaymi4Ij/B/NaOXf9UOnBKa?=
+ =?us-ascii?Q?l3HMhBGakJNO6grVuC8IBG609sAaL9wi/A2VeTROBjQ6F/re7UVk2L1qcKGR?=
+ =?us-ascii?Q?g7p90a6jqjZszQwM4GA5sGiCMvbZ174avze67HlyVW4QW07rGhlc5Orrltud?=
+ =?us-ascii?Q?hVqmuG8i9pCM0hT7jhhF6a8xBXXhx/NsiWv+nl+koh0MLiTrHf9+Yfyl3HKd?=
+ =?us-ascii?Q?K6tKpY4oGoiFLsn1a77bbVUl3AR63EnhtkJA6fWPMo7hQ5qBZjNOlw2iEFes?=
+ =?us-ascii?Q?p6WDXvHpxWjta/WvSUGyhvLR/xUvNL+0eMt1N8DERorD/hVEgez9XGhM54od?=
+ =?us-ascii?Q?4kCX1Ji9wWVGSaegAG26wygudp286HWilAx5A74m+t9nS//XzFFMFk2VXffD?=
+ =?us-ascii?Q?9fsps/a23SS1aLpA7x5p8HHi+6r6k9Tey9VkW5vxKPLehVwUZo7Btxcv9/Ux?=
+ =?us-ascii?Q?2YAXdTvYpMzjTvyI1mwdFq1LyuzwcH7dmrGMX4vh6EsJSIv4lIlN9rJPnyEF?=
+ =?us-ascii?Q?s6Vtj5KLI8kLeszhyFzniWN6PiaBjoT1/Yr4EzB1DycxQp1EHn7Od3IrEP+P?=
+ =?us-ascii?Q?H6mgtZ1HssQGCf1/PGCBgIRFUg7ftPfHkk6R/4fJZLI/1YXD03kz7C4qNDRy?=
+ =?us-ascii?Q?JiXB8ceRfDgRHfMaq8Hnxad+PaOkdQUdoMGQhiru//qFTpn3tkwkDwUySbpD?=
+ =?us-ascii?Q?revhQpRcmgHMx4hfbSceX+WYFUFP6byzbzl+fNDUjamwe/NS5KfRehc6zv+B?=
+ =?us-ascii?Q?InxfXLyZndvw9qBDqAq3sdAmB6saSPF0A1f8SoIDB+GTjV3EVmuUzX6DFLZI?=
+ =?us-ascii?Q?C/d6Yrw8r6NQrXS2PWqaA1d/2ooV6XEJbH5RYt5GVNxJhzdmnMrWsEs21h40?=
+ =?us-ascii?Q?6jJlDQYSl9Im45VvSMCmTFVIBto9/yOCu6NSjigPx1NGdLD6PnxgOYSOLvyN?=
+ =?us-ascii?Q?2i/Q2J99Ys96M0VRSnGbwQ+Bp8cFKiRsrA0YpkRMd2kwTj1lJV1p99dtMiFb?=
+ =?us-ascii?Q?Np2K7XHgzm0xchhAFyS/XG8SDNJ3vWv91u/klnH/niIeFPdJKJIjTCBcY3Yi?=
+ =?us-ascii?Q?vAB2JJRtYVfKYlLM5z2QbcnaeF2EdxIL92X9qae+isocSlhEuTL35L3IAnxD?=
+ =?us-ascii?Q?B2keC4IV/gAH+2h9yhbpz1q/1/o5NK2Zk2bMkMdmAthI8ri8z5RvsF9TmMnB?=
+ =?us-ascii?Q?HwtFhpCUZb6Do8916UindXrkzUyi6n08vzfJAGqzCWMX4bZruBwQYkI7KT0y?=
+ =?us-ascii?Q?qld8XjmhPgVsFm0T5kLTSjYjvvXs4BL8PhuTKWLhOZ1Kz8P+nO3BrMsGDM0J?=
+ =?us-ascii?Q?YWhHZbdZnMPfC4QbcpW8ZhQAHqog3TRZf5pJdPWZE2n80RU3/Lsn9vuH0FQu?=
+ =?us-ascii?Q?GrgxgD86mA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220414010703.72683-1-peterx@redhat.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 142b0495-9aeb-498a-be31-08da1dbb2cc3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Apr 2022 02:04:57.1274
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: CitOCL09RbwwOD1C0qX7NNpvyYI0xBUIC2zjOQfAnugX1ZK+EXcwiey+C6E9qTcbGZ5TE9kIstH4yiSI4ShieQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR11MB2643
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 13, 2022 at 09:07:03PM -0400, Peter Xu wrote:
-> Our QE team reported test failure on access_tracking_perf_test:
-> 
-> Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
-> guest physical test memory offset: 0x3fffbffff000
-> 
-> Populating memory             : 0.684014577s
-> Writing to populated memory   : 0.006230175s
-> Reading from populated memory : 0.004557805s
-> ==== Test Assertion Failure ====
->   lib/kvm_util.c:1411: false
->   pid=125806 tid=125809 errno=4 - Interrupted system call
->      1  0x0000000000402f7c: addr_gpa2hva at kvm_util.c:1411
->      2   (inlined by) addr_gpa2hva at kvm_util.c:1405
->      3  0x0000000000401f52: lookup_pfn at access_tracking_perf_test.c:98
->      4   (inlined by) mark_vcpu_memory_idle at access_tracking_perf_test.c:152
->      5   (inlined by) vcpu_thread_main at access_tracking_perf_test.c:232
->      6  0x00007fefe9ff81ce: ?? ??:0
->      7  0x00007fefe9c64d82: ?? ??:0
->   No vm physical memory at 0xffbffff000
-> 
-> And I can easily reproduce it with a Intel(R) Xeon(R) CPU E5-2630 with 46
-> bits PA.
-> 
-> It turns out that the address translation for clearing idle page tracking
-> returned wrong result, in which addr_gva2gpa()'s last step should have
-> treated "pte[index[0]].pfn" to be a 32bit value.  In above case the GPA
-> address 0x3fffbffff000 got cut-off into 0xffbffff000, then it caused
-> further lookup failure in the gpa2hva mapping.
-> 
-> I didn't yet check any other test that may fail too on some hosts, but
-> logically any test using addr_gva2gpa() could suffer.
-> 
-> Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=2075036
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Thursday, April 14, 2022 7:12 AM
+>=20
+> On Wed, Apr 13, 2022 at 09:08:40PM +0000, Wang, Zhi A wrote:
+> > On 4/13/22 8:04 PM, Jason Gunthorpe wrote:
+> > > On Wed, Apr 13, 2022 at 07:17:52PM +0000, Wang, Zhi A wrote:
+> > >> On 4/13/22 5:37 PM, Jason Gunthorpe wrote:
+> > >>> On Wed, Apr 13, 2022 at 06:29:46PM +0200, Christoph Hellwig wrote:
+> > >>>> On Wed, Apr 13, 2022 at 01:18:14PM -0300, Jason Gunthorpe wrote:
+> > >>>>> Yeah, I was thinking about that too, but on the other hand I thin=
+k it
+> > >>>>> is completely wrong that gvt requires kvm at all. A vfio_device i=
+s not
+> > >>>>> supposed to be tightly linked to KVM - the only exception possibl=
+y
+> > >>>>> being s390..
+> > >>>>
+> > >>>> So i915/gvt uses it for:
+> > >>>>
+> > >>>>  - poking into the KVM GFN translations
 
-Ah sorry I forgot to add:
+The only user of this is is_2MB_gtt_possible() which I suppose should
+go through vfio instead of kvm as it actually means IOVA here.
 
-Reported-by: nanliu@redhat.com
+> > >>>>  - using the KVM page track notifier
 
-Btw, I didn't dig the history for stable trees (yet..), but the bug seems
-to be there for a while, hence I didn't attach Fixes so far.
+This is the real reason which causes the mess as write-protecting
+CPU access to certain guest memory has to go through KVM.
 
-> ---
->  tools/testing/selftests/kvm/lib/x86_64/processor.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index 9f000dfb5594..6c356fb4a9bf 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -587,7 +587,7 @@ vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
->  	if (!pte[index[0]].present)
->  		goto unmapped_gva;
->  
-> -	return (pte[index[0]].pfn * vm->page_size) + (gva & 0xfffu);
-> +	return ((vm_paddr_t)pte[index[0]].pfn * vm->page_size) + (gva & 0xfffu);
->  
->  unmapped_gva:
->  	TEST_FAIL("No mapping for vm virtual address, gva: 0x%lx", gva);
-> -- 
-> 2.32.0
-> 
+> > >>>>
+> > >>>> No idea how these could be solved in a more generic way.
+> > >>>
+> > >>> TBH I'm not sure how any of this works fully correctly..
+> > >>>
+> > >>> I see this code getting something it calls a GFN and then passing
+> > >>> them to vfio - which makes no sense. Either a value is a GFN - the
+> > >>> physical memory address of the VM, or it is an IOVA. VFIO only take=
+s
+> > >>> in IOVA and kvm only takes in GFN. So these are probably IOVAs real=
+ly..
+> > >>>
+> > >> Can you let me know the place? So that I can take a look.
+> > >
+> > > Well, for instance:
+> > >
+> > > static int gvt_pin_guest_page(struct intel_vgpu *vgpu, unsigned long =
+gfn,
+> > > 		unsigned long size, struct page **page)
+> > >
+> > > There is no way that is a GFN, it is an IOVA.
+> > >
+> > I see. The name is vague. There is an promised 1:1 mapping between gues=
+t
+> GFN
+> > and host IOVA when a PCI device is passed to a VM, I guess mdev is just
+> > leveraging it as they are sharing the same code path in QEMU.
+>=20
+> That has never been true. It happens to be the case in some common
+> scenarios.
+>=20
+> > > So if the page table in the guest has IOVA addreses then why can you
+> > > use them as GFNs?
+> >
+> > That's another problem. We don't support a guess enabling the guest
+> IOMMU
+> > (aka virtual IOMMU). The guest/virtual IOMMU is implemented in QEMU,
+> so
+> > does the translation between guest IOVA and GFN. For a mdev model
+> > implemented in the kernel, there isn't any mechanism so far to reach th=
+ere.
+>=20
+> And this is the uncommon scenario, there is no way for the mdev driver
+> to know if viommu is turned on, and AFAIK, no way to block it from VFIO.
+>=20
+> > People were discussing it before. But none agreement was achieved. Is i=
+t
+> > possible to implement it in the kernel? Would like to discuss more abou=
+t it
+> > if there is any good idea.
+>=20
+> I don't know of anything, VFIO and kvm are not intended to be tightly
+> linked like this, they don't have the same view of the world.
+>=20
 
--- 
-Peter Xu
+Yes this is the main problem. VFIO only cares about IOVA and KVM
+only cares about GPA. GVT as a mdev driver should follow VFIO
+in concept but due to the requirement of gpu page table shadowing
+it needs call into KVM for write-protecting CPU access to GPA.
+
+What about extending KVM page tracking interface to accept HVA?
+This is probably the only common denominator between VFIO and
+KVM to allow dissolve this conceptual disconnection...
+
+Thanks
+Kevin
 
