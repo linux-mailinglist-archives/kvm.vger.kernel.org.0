@@ -2,63 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1835D501DEA
-	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 00:02:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BBA4D501E33
+	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 00:22:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244202AbiDNWDo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 18:03:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46982 "EHLO
+        id S234977AbiDNWZQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 18:25:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243420AbiDNWDm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Apr 2022 18:03:42 -0400
-Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D115986C9
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 15:01:16 -0700 (PDT)
-Received: by mail-ot1-x32b.google.com with SMTP id c24-20020a9d6c98000000b005e6b7c0a8a8so4319723otr.2
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 15:01:16 -0700 (PDT)
+        with ESMTP id S229769AbiDNWZO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Apr 2022 18:25:14 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 820C1B6E56
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 15:22:48 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id ll10so6315104pjb.5
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 15:22:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6v2JIcnO74S/p5+dirBbOGSaV+ed6VcSDjiH/u/D+aI=;
-        b=ZdWf8c6V/Syu7A3HkxAQFa/Bgv5Qbwbrt6vdDRNRWkJL7ZPkFVcoSkpQJimgIKwt6U
-         t2vvPcGYn/9DRRPbcaL2Vgs95NE0398gIwKWVAYgCxSpJI2P5SNXSSRkkVIBcboR4K4Q
-         iebdiKEDddEtKCnig7/Z8+KzV3Gj5Fw+aNSrQRMtiE1y44jXguho42vmfGGIUG00yh6d
-         8B8RHtzrr67BQdc+NhEkxjRQXaV7AU1jQHDo2GJ+JgWj5A8DSmA86BkekOhfjEwVFYxo
-         zGhjCFVKatUioNh1i1RFgSmc5T9dYVgKKri87aCOHsYwS5Y+n5aal79M0w/h+JDBOSKL
-         2mEw==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=1xa1ESBDSGyY8UU/qWjOzGPkAfpQhGYww95crIFFhNY=;
+        b=IVUMC9lb1svE5Tw8hyaLGHwkuwA7fdLycjSCgs+AWEmUtQZenl7Qzuak0s9q66Cb5a
+         xEp/t6vPItaijnlLQKssysDfm5J+OlfoeFz+j1Yycn8ye6yZ/UzHR9hT4ocDgnznuqeu
+         iiJruovja3Usd+RzAOfD2AcCH6B/sIFa/+JBV4QgN9LE84nIUC90I6P5ZnwtvuWOzT1A
+         nLnMrMrWaglqr/a2egUm0E8Ed6cG0Rkw027+VBNItakIVq5uEoNpvc5FL2zINryNPtS6
+         2Ep50k6nWeLycIGhMkDr3kE83HL7IVMI4x8o97zG26vBcsIQsmsSeRq+TS3u9VWxpAlW
+         OqBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6v2JIcnO74S/p5+dirBbOGSaV+ed6VcSDjiH/u/D+aI=;
-        b=UZej0foEsN4xtjGaPrJ7slAfx/qicFQuEwiQtvTXjRwtHlSjuzQchzib8ol8MWtODc
-         JyqNjXpGLk/wDUHIj1Hf+l3x/pPn80te18SqN7txd92uf4XzZC1O2RqYVXnLNk4thbwk
-         FVOO2MLD14c3monFgwvqoem5eqjZUtf+BoTqSl6sCVQc0nOEZMWGtbO2Pde5LVhwmbh2
-         wF41x5qr7NCiJHjCWqxgAeETICmGLVBx5bPinJ513ABOnCzmyH3cnHY7LRt/Z28UJF2D
-         U4gcWwNI3xaIedYlRDUwQ8Mep3QgtBnYMcY/ZPrKxPs5NZuEfGUWlc1hvTVThp8vVYVH
-         MwwQ==
-X-Gm-Message-State: AOAM532WDnKrytsG+FCp5263J6JPmy1knerBffgO7xqbENbrOgs5VcrE
-        yXeASbiPl7EDVsMR5iSWP4GjmRyksIqZtkLi4i56Ng==
-X-Google-Smtp-Source: ABdhPJyqrcwqArrcLRNNcSEbE2YukhZ6PQK+xbbqWzkAXEL9KKXaFiylu5SQb94jq2n8a+UclADYeWviMm/r3bgy7Zs=
-X-Received: by 2002:a05:6830:240f:b0:5ce:60e8:294a with SMTP id
- j15-20020a056830240f00b005ce60e8294amr1638687ots.14.1649973675627; Thu, 14
- Apr 2022 15:01:15 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=1xa1ESBDSGyY8UU/qWjOzGPkAfpQhGYww95crIFFhNY=;
+        b=EFVNQqwmXV3Cx2sG6vze6AVjdfed1Wob3y8kijWgWcZ0Kzlgv4gwM2kxCHEpsiZk+m
+         OaZIMspjCWlAgIg3gpd1eH22b7+bEzXZmORszq+zdCSWr4OfneUYQvyQYSDjMmc8evTj
+         nGhWr4Imvm4GY4+u9pY66YUCxMnVLXEFyIUt50WURaXHmsJMk+o718DchKNM6vMWA7+U
+         ZqQasJ6I7oBlWsOw46PoSx7Jf0iHQNOsiryJToXqCHDRpwt/fpN9JN+2EA1on8pj8qUs
+         wVm3BvVoPxA4cMhVqtqR/TAtKwHItMWVsHWDupE1PY7TS78Rzm4eC5eHw70Jp8JJKUDA
+         yuGg==
+X-Gm-Message-State: AOAM530mxQjqloACVXkX2J1Q/KUzi6Dxl9c7Qu+F9Da3cYwnI2q/nGrR
+        Aag8icXq9QuekQxQa0OmTnISyQ==
+X-Google-Smtp-Source: ABdhPJzYCSbPc54jK7KfEz8+YtotBqRuxRvWz87K/s48F7eth012LaSR/BtMJ/5apTfh4uT+TojgmQ==
+X-Received: by 2002:a17:902:6b8b:b0:14d:66c4:f704 with SMTP id p11-20020a1709026b8b00b0014d66c4f704mr49974054plk.53.1649974967844;
+        Thu, 14 Apr 2022 15:22:47 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id c138-20020a624e90000000b005081f92826dsm849249pfb.99.2022.04.14.15.22.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Apr 2022 15:22:47 -0700 (PDT)
+Date:   Thu, 14 Apr 2022 22:22:43 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Anton Romanov <romanton@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH] KVM: x86: Use current rather than snapshotted TSC
+ frequency if it is constant
+Message-ID: <Ylies1A6K2zVpoM6@google.com>
+References: <20220414183127.4080873-1-romanton@google.com>
+ <Ylh3HNlcJd8+P+em@google.com>
+ <CAHFSQMhwsMEOFeMuMrvvveeN=skqA-DLM_r3EqU+dei-jXUkUA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20220414010703.72683-1-peterx@redhat.com> <Ylgn/Jw+FMIFqqc0@google.com>
- <bf15209d-2c50-9957-af24-c4f428f213b1@redhat.com> <YliTdb1LjfJoIcFc@xz-m1.local>
-In-Reply-To: <YliTdb1LjfJoIcFc@xz-m1.local>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 14 Apr 2022 15:01:04 -0700
-Message-ID: <CALMp9eRjNd5_VFOsAoANkoaCTkKSHp3awrABZ5LR20+VoXZuAA@mail.gmail.com>
-Subject: Re: [PATCH] kvm: selftests: Fix cut-off of addr_gva2gpa lookup
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Andrew Jones <drjones@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHFSQMhwsMEOFeMuMrvvveeN=skqA-DLM_r3EqU+dei-jXUkUA@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -70,29 +73,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 14, 2022 at 2:36 PM Peter Xu <peterx@redhat.com> wrote:
->
-> On Thu, Apr 14, 2022 at 04:14:22PM +0200, Paolo Bonzini wrote:
-> > On 4/14/22 15:56, Sean Christopherson wrote:
-> > > > - return (pte[index[0]].pfn * vm->page_size) + (gva & 0xfffu);
-> > > > + return ((vm_paddr_t)pte[index[0]].pfn * vm->page_size) + (gva & 0xfffu);
-> > > This is but one of many paths that can get burned by pfn being 40 bits.  The
-> > > most backport friendly fix is probably to add a pfn=>gpa helper and use that to
-> > > place the myriad "pfn * vm->page_size" instances.
+On Thu, Apr 14, 2022, Anton Romanov wrote:
+> On Thu, Apr 14, 2022 at 12:33 PM Sean Christopherson <seanjc@google.com> wrote:
+> > On Thu, Apr 14, 2022, Anton Romanov wrote:
+> > >  /* Called within read_seqcount_begin/retry for kvm->pvclock_sc.  */
+> > >  static void __get_kvmclock(struct kvm *kvm, struct kvm_clock_data *data)
+> > >  {
+> > > @@ -2917,7 +2930,7 @@ static void __get_kvmclock(struct kvm *kvm, struct kvm_clock_data *data)
+> > >       get_cpu();
 > > >
-> > > For a true long term solution, my vote is to do away with the bit field struct
-> > > and use #define'd masks and whatnot.
+> > >       data->flags = 0;
+> > > -     if (ka->use_master_clock && __this_cpu_read(cpu_tsc_khz)) {
+> > > +     if (ka->use_master_clock && get_cpu_tsc_khz()) {
 > >
-> > Yes, bitfields larger than 32 bits are a mess.
->
-> It's very interesting to know this..
+> > It might make sense to open code this to make it more obvious why the "else" path
+> > exists.  That'd also eliminate a condition branch on CPUs with a constant TSC,
+> > though I don't know if we care that much about the performance here.
+> >
+> >         if (ka->use_master_clock &&
+> >             (static_cpu_has(X86_FEATURE_CONSTANT_TSC) || __this_cpu_read(cpu_tsc_khz)))
+> >
+> > And/or add a comment about cpu_tsc_khz being zero when the CPU is being offlined?
+> 
+> It looks like cpu_tsc_khz being zero is used as an indicator of CPU
+> being unplugged here.
 
-I don't think the undefined behavior is restricted to extended
-bit-fields. Even for regular bit-fields, the C99 spec says, "A
-bit-field shall have a type that is a qualified or unqualified version
-of _Bool, signed
-int, unsigned int, or some other implementation-defined type." One
-might assume that even the permissive final clause refers to
-fundamental language types, but I suppose "n-bit integer" meets the
-strict definition of a "type,"
-for arbitrary values of n.
+That's ok, the unplug issue was that kvm_get_time_scale() got stuck in an infinite
+loop due to cpu_tsc_khz being zero.  Using tsc_khz is ok even though the CPU is
+about to go offline, the CPU going offline doesn't make the calculation wrong.
+
+> I don't think your proposed change is right in this case either.
+> How about we still keep tsc_khz_changed untouched as well as this line?
+> Potentially adding here a comment that on this line we only read it to
+> see if CPU is not being unplugged yet
