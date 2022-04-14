@@ -2,77 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A2962500786
-	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 09:47:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 995385007BF
+	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 10:03:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238387AbiDNHuD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 03:50:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48724 "EHLO
+        id S240700AbiDNIFt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 04:05:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236590AbiDNHuB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Apr 2022 03:50:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 163FDF3
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 00:47:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649922457;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hLR76CNlBvCn367FjMy29XVyfR2fU9onpgPKm9lbY1c=;
-        b=c0rSiyZ0ME/HiilHlbtK5rFQ6vq7PexU0xxWEkQyHOc8JyzTTUCYBEF0GqPaVYXn4o5voZ
-        I7sHHh9xqKDNOeBwFQfBZMRvqfFUQ1YfXOmvRTep+JjntzenpzXPXkCe7wy2AkupRncb4W
-        LAdx2ibVYUo5QP3QhjxbwUqdvHbdB0g=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-658-HnhzIOE0OZG52jhu8kpTVA-1; Thu, 14 Apr 2022 03:47:33 -0400
-X-MC-Unique: HnhzIOE0OZG52jhu8kpTVA-1
-Received: by mail-wm1-f71.google.com with SMTP id az27-20020a05600c601b00b0038ff021c8a4so1466055wmb.1
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 00:47:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:from:to:cc:references:in-reply-to
-         :content-transfer-encoding;
-        bh=hLR76CNlBvCn367FjMy29XVyfR2fU9onpgPKm9lbY1c=;
-        b=EGzPdKbByvVGSUuXIOTnOZ6MXoSmw1AC858CXCRvIQf1USZEHiRwG5R63ved4gbPID
-         lOahKhmuO6LnBaThYMAaOY20enQ8fSs19ZUiyxZHq/F+DwXNwFj1hdHQY0JQFvEa02Re
-         CJpFXeGjvZjCXyGixnL2s1s4cJpR+EFUDnYhKKhK0Z9PGkGEYnoR8d0bxUUDagNQptyQ
-         SCIIR7PjFm+2nSEEALw7L703XMNgSzrLexpGC9PZFQZeyTGYQ+GlNMxyWCz1snwoywW1
-         Tu4Nru5i+I07TL7OXvl44yQASVd7y8llqbKPHflQkuSoDL18m5UuWfAdXzDwK/RFatbK
-         LCoA==
-X-Gm-Message-State: AOAM531xzvTAnoqYek1prEk4MlMRHY2nbnRDW5pt50dhPT0/SaLUXj9I
-        y48qxgufQ+OorGIwqNjft/Uene9rykFKkc8Dj6CnB/OeZocyIpd9+fqd2Q87s+kAxwGUbPd2OfT
-        yGNiZRoiu8Hqh
-X-Received: by 2002:a05:6000:1684:b0:209:7fda:e3a with SMTP id y4-20020a056000168400b002097fda0e3amr996958wrd.709.1649922452678;
-        Thu, 14 Apr 2022 00:47:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyEJVPZguqe+57EiWbrcBRp0bTCz82V4YapmfmKU9u/wpnFSTs9cs8DetLk5K/Yq5vV4Bkr4Q==
-X-Received: by 2002:a05:6000:1684:b0:209:7fda:e3a with SMTP id y4-20020a056000168400b002097fda0e3amr996947wrd.709.1649922452438;
-        Thu, 14 Apr 2022 00:47:32 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id n42-20020a05600c3baa00b0038ffadd6e4asm169831wms.30.2022.04.14.00.47.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Apr 2022 00:47:31 -0700 (PDT)
-Message-ID: <2939c0cb-8e0c-7de4-7143-2df303bbb542@redhat.com>
-Date:   Thu, 14 Apr 2022 09:47:31 +0200
+        with ESMTP id S229911AbiDNIFr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Apr 2022 04:05:47 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B22014C7A2;
+        Thu, 14 Apr 2022 01:03:23 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23E81jfQ019872;
+        Thu, 14 Apr 2022 08:03:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=UfSsVSH/XbyaQgXIudfw2xx/cGQsp2ek6QQQcCCbzRs=;
+ b=YhEhfRU6gdvK/vB92FqI0NfjNnTBn/91fShtbssSZBkDDLH3NVT59/Ns2uS45H5o8IiQ
+ BIWIXRM43pYhpDqkBl1oN1Fml18gGXDK2xiqkO7mJhUqFFBfFLiHrVK9XqZu5IAYbnXb
+ gAcnBzXgVOmSsUbx0wNRlLTyHnBFRqHj2XPDU0gUFPr3sW2q1/vT6X9o/ygDdGfqb7A8
+ 0Woe6bpCgab2IEcrR5ecv0ei8sns04fSf/Dqq2AJPsD/ORE8ZP14cl0eZnh1ai+MXjwc
+ X34AYxuOEAwP6TEvvUWuE3CdZ4yj+nNRlXtEXQXugTP4we/Ri8cZolWfaxRIWlsklK6P Cw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fefr9g0x3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Apr 2022 08:03:23 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23E82pvP026241;
+        Thu, 14 Apr 2022 08:03:22 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fefr9g0wh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Apr 2022 08:03:22 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23E7m2A1011844;
+        Thu, 14 Apr 2022 08:03:20 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04fra.de.ibm.com with ESMTP id 3fb1s8xfv4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Apr 2022 08:03:20 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23E83QoH26935790
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 14 Apr 2022 08:03:26 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3A22DAE055;
+        Thu, 14 Apr 2022 08:03:17 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A769DAE053;
+        Thu, 14 Apr 2022 08:03:16 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.1.140])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 14 Apr 2022 08:03:16 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
+        mimu@linux.ibm.com, nrb@linux.ibm.com
+Subject: [PATCH v10 00/19] KVM: s390: pv: implement lazy destroy for reboot
+Date:   Thu, 14 Apr 2022 10:02:51 +0200
+Message-Id: <20220414080311.1084834-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v3 00/22] https://www.spinics.net/lists/kvm/msg267878.html
-Content-Language: en-US
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     seanjc@google.com
-References: <20220414074000.31438-1-pbonzini@redhat.com>
-In-Reply-To: <20220414074000.31438-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLACK autolearn=unavailable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: IBeNWsp4oj2DqpiP8VrOPGKRIaDBmBNY
+X-Proofpoint-GUID: JcWKZmzKKxHvUBRpaGIH5gPQXN7gq4gh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-14_02,2022-04-13_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 mlxscore=0 phishscore=0 adultscore=0 lowpriorityscore=0
+ clxscore=1015 spamscore=0 mlxlogscore=999 impostorscore=0 malwarescore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204140040
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,68 +89,167 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Uh-oh, wrong subject.  Should be "KVM MMU refactoring part 2: role changes".
+Previously, when a protected VM was rebooted or when it was shut down,
+its memory was made unprotected, and then the protected VM itself was
+destroyed. Looping over the whole address space can take some time,
+considering the overhead of the various Ultravisor Calls (UVCs). This
+means that a reboot or a shutdown would take a potentially long amount
+of time, depending on the amount of used memory.
 
-Supersedes: <20220221162243.683208-1-pbonzini@redhat.com>
+This patchseries implements a deferred destroy mechanism for protected
+guests. When a protected guest is destroyed, its memory can be cleared
+in background, allowing the guest to restart or terminate significantly
+faster than before.
 
-Paolo
+There are 2 possibilities when a protected VM is torn down:
+* it still has an address space associated (reboot case)
+* it does not have an address space anymore (shutdown case)
 
-On 4/14/22 09:39, Paolo Bonzini wrote:
-> Right now the "MMU role" is a messy mix of the shadow page table format
-> and the CPU paging mode (CR0/CR4/EFER, SMM, guest mode, etc).  Whenever
-> something is different between the MMU and the CPU, it is stored as an
-> extra field in struct kvm_mmu; for extra bonus complication, sometimes
-> the same thing is stored in both the role and an extra field.
-> 
-> This series cleans up things by putting the two in separate fields,
-> so that the "MMU role" represents exactly the role of the root page.
-> This in turn makes it possible to eliminate various fields that are
-> now redundant with either the CPU or te MMU role.
-> 
-> These patches have mostly been posted and reviewed already[1], and I
-> have now retested them on top of kvm/next.
-> 
-> Paolo
-> 
-> [1] https://patchew.org/linux/20220221162243.683208-1-pbonzini@redhat.com/
-> 
-> Paolo Bonzini (21):
->    KVM: x86/mmu: nested EPT cannot be used in SMM
->    KVM: x86/mmu: constify uses of struct kvm_mmu_role_regs
->    KVM: x86/mmu: pull computation of kvm_mmu_role_regs to kvm_init_mmu
->    KVM: x86/mmu: rephrase unclear comment
->    KVM: x86/mmu: remove "bool base_only" arguments
->    KVM: x86/mmu: split cpu_role from mmu_role
->    KVM: x86/mmu: do not recompute root level from kvm_mmu_role_regs
->    KVM: x86/mmu: remove ept_ad field
->    KVM: x86/mmu: remove kvm_calc_shadow_root_page_role_common
->    KVM: x86/mmu: cleanup computation of MMU roles for two-dimensional
->      paging
->    KVM: x86/mmu: cleanup computation of MMU roles for shadow paging
->    KVM: x86/mmu: store shadow EFER.NX in the MMU role
->    KVM: x86/mmu: remove extended bits from mmu_role, rename field
->    KVM: x86/mmu: rename kvm_mmu_role union
->    KVM: x86/mmu: remove redundant bits from extended role
->    KVM: x86/mmu: remove valid from extended role
->    KVM: x86/mmu: simplify and/or inline computation of shadow MMU roles
->    KVM: x86/mmu: pull CPU mode computation to kvm_init_mmu
->    KVM: x86/mmu: replace shadow_root_level with root_role.level
->    KVM: x86/mmu: replace root_level with cpu_role.base.level
->    KVM: x86/mmu: replace direct_map with root_role.direct
-> 
-> Sean Christopherson (1):
->    KVM: x86: Clean up and document nested #PF workaround
-> 
->   arch/x86/include/asm/kvm_host.h |  19 +-
->   arch/x86/kvm/mmu.h              |   2 +-
->   arch/x86/kvm/mmu/mmu.c          | 376 ++++++++++++++------------------
->   arch/x86/kvm/mmu/paging_tmpl.h  |  14 +-
->   arch/x86/kvm/mmu/tdp_mmu.c      |   4 +-
->   arch/x86/kvm/svm/nested.c       |  18 +-
->   arch/x86/kvm/svm/svm.c          |   2 +-
->   arch/x86/kvm/vmx/nested.c       |  15 +-
->   arch/x86/kvm/vmx/vmx.c          |   2 +-
->   arch/x86/kvm/x86.c              |  33 ++-
->   10 files changed, 219 insertions(+), 266 deletions(-)
-> 
+For the reboot case, two new commands are available for the
+KVM_S390_PV_COMMAND:
+
+KVM_PV_ASYNC_DISABLE_PREPARE: prepares the current protected VM for
+asynchronous teardown. The current VM will then continue immediately
+as non-protected. If a protected VM had already been set aside without
+starting the teardown process, this call will fail. In this case the
+userspace process should issue a normal KVM_PV_DISABLE
+
+KVM_PV_ASYNC_DISABLE: tears down the protected VM previously set aside
+for asychronous teardown. This PV command should ideally be issued by
+userspace from a separate thread. If a fatal signal is received (or
+the process terminates naturally), the command will terminate
+immediately without completing.
+
+The idea is that userspace should first issue the
+KVM_PV_ASYNC_DISABLE_PREPARE command, and in case of success, create a
+new thread and issue KVM_PV_ASYNC_DISABLE from there. This also allows
+for proper accounting of the CPU time needed for the asynchronous
+teardown.
+
+This means that the same address space can have memory belonging to
+more than one protected guest, although only one will be running, the
+others will in fact not even have any CPUs.
+
+The shutdown case should be dealt with in userspace (e.g. using
+clone(CLONE_VM)).
+
+A module parameter is also provided to disable the new functionality,
+which is otherwise enabled by default. This should not be an issue
+since the new functionality is opt-in anyway. This is mainly thought to
+aid debugging.
+
+v9->v10
+* improved and expanded comments, fix typos
+* add new patch: perform destroy configuration UVC before clearing
+  memory for unconditional deinit_vm (instead of afterwards)
+* explicitly initialize kvm->arch.pv.async_deinit in kvm_arch_init_vm
+* do not try to call the destroy fast UVC in the MMU notifier if it is
+  not available
+
+v8->v9
+* rebased
+* added dependency on MMU_NOTIFIER for KVM in arch/s390/kvm/Kconfig
+* add support for the Destroy Secure Configuration Fast UVC
+* minor fixes
+
+v7->v8
+* switched patches 8 and 9
+* improved comments, documentation and patch descriptions
+* remove mm notifier when the struct kvm is torn down
+* removed useless locks in the mm notifier
+* use _ASCE_ORIGIN instead of PAGE_MASK for ASCEs
+* cleanup of some compiler warnings
+* remove some harmless but useless duplicate code
+* the last parameter of __s390_uv_destroy_range is now bool
+* rename the KVM capability to KVM_CAP_S390_PROTECTED_ASYNC_DISABLE
+
+v6->v7
+* moved INIT_LIST_HEAD inside spinlock in patch 1
+* improved commit messages in patch 2
+* added missing locks in patch 3
+* added and expanded some comments in patch 11
+* rebased
+
+v5->v6
+* completely reworked the series
+* removed kernel thread for asynchronous teardown
+* added new commands to KVM_S390_PV_COMMAND ioctl
+
+v4->v5
+* fixed and improved some patch descriptions
+* added some comments to better explain what's going on
+* use vma_lookup instead of find_vma
+* rename is_protected to protected_count since now it's used as a counter
+
+v3->v4
+* added patch 2
+* split patch 3
+* removed the shutdown part -- will be a separate patchseries
+* moved the patch introducing the module parameter
+
+v2->v3
+* added definitions for CC return codes for the UVC instruction
+* improved make_secure_pte:
+  - renamed rc to cc
+  - added comments to explain why returning -EAGAIN is ok
+* fixed kvm_s390_pv_replace_asce and kvm_s390_pv_remove_old_asce:
+  - renamed
+  - added locking
+  - moved to gmap.c
+* do proper error management in do_secure_storage_access instead of
+  trying again hoping to get a different exception
+* fix outdated patch descriptions
+
+v1->v2
+* rebased on a more recent kernel
+* improved/expanded some patch descriptions
+* improves/expanded some comments
+* added patch 1, which prevents stall notification when the system is
+  under heavy load.
+* rename some members of struct deferred_priv to improve readability
+* avoid an use-after-free bug of the struct mm in case of shutdown
+* add missing return when lazy destroy is disabled
+* add support for OOM notifier
+
+Claudio Imbrenda (19):
+  KVM: s390: pv: leak the topmost page table when destroy fails
+  KVM: s390: pv: handle secure storage violations for protected guests
+  KVM: s390: pv: handle secure storage exceptions for normal guests
+  KVM: s390: pv: refactor s390_reset_acc
+  KVM: s390: pv: usage counter instead of flag
+  KVM: s390: pv: add export before import
+  KVM: s390: pv: module parameter to fence lazy destroy
+  KVM: s390: pv: clear the state without memset
+  KVM: s390: pv: Add kvm_s390_cpus_from_pv to kvm-s390.h and add
+    documentation
+  KVM: s390: pv: add mmu_notifier
+  s390/mm: KVM: pv: when tearing down, try to destroy protected pages
+  KVM: s390: pv: refactoring of kvm_s390_pv_deinit_vm
+  KVM: s390: pv: destroy the configuration before its memory
+  KVM: s390: pv: cleanup leftover protected VMs if needed
+  KVM: s390: pv: asynchronous destroy for reboot
+  KVM: s390: pv: api documentation for asynchronous destroy
+  KVM: s390: pv: add KVM_CAP_S390_PROTECTED_ASYNC_DISABLE
+  KVM: s390: pv: avoid export before import if possible
+  KVM: s390: pv: support for Destroy fast UVC
+
+ Documentation/virt/kvm/api.rst      |  25 ++-
+ arch/s390/include/asm/gmap.h        |  39 +++-
+ arch/s390/include/asm/kvm_host.h    |   4 +
+ arch/s390/include/asm/mmu.h         |   2 +-
+ arch/s390/include/asm/mmu_context.h |   2 +-
+ arch/s390/include/asm/pgtable.h     |  20 +-
+ arch/s390/include/asm/uv.h          |  11 +
+ arch/s390/kernel/uv.c               |  64 ++++++
+ arch/s390/kvm/Kconfig               |   1 +
+ arch/s390/kvm/kvm-s390.c            |  65 +++++-
+ arch/s390/kvm/kvm-s390.h            |   3 +
+ arch/s390/kvm/pv.c                  | 299 +++++++++++++++++++++++++++-
+ arch/s390/mm/fault.c                |  23 ++-
+ arch/s390/mm/gmap.c                 | 167 +++++++++++++---
+ include/uapi/linux/kvm.h            |   3 +
+ 15 files changed, 681 insertions(+), 47 deletions(-)
+
+-- 
+2.34.1
 
