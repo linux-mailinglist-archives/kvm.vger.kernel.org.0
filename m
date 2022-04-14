@@ -2,218 +2,304 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D721500256
-	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 01:12:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31A3950036B
+	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 03:05:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238696AbiDMXOq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Apr 2022 19:14:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33470 "EHLO
+        id S239333AbiDNBHU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Apr 2022 21:07:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232204AbiDMXOo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Apr 2022 19:14:44 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2070.outbound.protection.outlook.com [40.107.220.70])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02F991FCDA;
-        Wed, 13 Apr 2022 16:12:21 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SCJm5qY/lJ1tf5H41zbsrwF+HqI5oWrTRtYYEvnKUNW9j98fec37V4Nt8b4xCuRB7w06tfnYTIOfqVIA75hrNH9uixoTssvkvhLpoMdU7Vme66zpHXH0wpcMph91QB3ngDpwdi9NDcHa92uOusV/CQsmXBUDuHe0cYeYnEDLF77lUMp5hfc9xu/PHqCS8FD1tybKU3G0ygMsSA7rlD4/KoGwj8PjhQ/WoaPWBaqa+qMUQSA5NYbjkvRT1ckWyewWnT8HS+oTZZyYXBXDS7Gr6HrujVN3+fYev+veB3/Lm9GrhKYwsBKTBq2YCmkkr/PI4LXzlXl9kbSfHM3hEYKGQw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8avWc8Fer/c9DIewAgxJjdmzGv7qIdQIOoZgEiYfutU=;
- b=CXlQZ152oYq+LePHCaa/zSCb1m2cbOInjrTCNeM+WPbmWG2P3bmqHJbUwU4OWuS/XDQe8pVxx54WsliS6CGtwLh/XUKte3cFOHDIau0fC3izGyzXlcvPfvt7aU7holPt/P4Px9C0zmnrnzYA4KXMTh3eE1wGsXtfTCRhYfTpE0p/OdA9Cv+AHmLLVSbg9M6b+4Vyfesp7jfmYGsEvaZg1eJMhh93dm64yLc+PQ9liFVF3HUub+cElypBRtZ9eMALzEqOAxixJ7NXSsVX7koohCpVcxYjIIaXAtVtb0rcnJn79eWTuKZ6PD4P/J45vdSnkBb+fPyNDEyObUF+P246UA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8avWc8Fer/c9DIewAgxJjdmzGv7qIdQIOoZgEiYfutU=;
- b=Q0rTuU9I5U4Op2aCTBITPWJTr1SEw2UGzPOn4HYnjmelCx5zUwaSinPpmeW+jbSDPgEc8PO89pV4OCo74B3jTnAx3MBNQPI7+ZA1/fHAf/69T9EFj00TBEI3lH2SITGsLGWpvTqcbfvwePVYogbndTx8/n/wNIycbbiZq2CSXFpQj3WoaUpHqN9GD24POA0l3eLHU1waMO87mJyaiPXYueZD8m4jtNL3y9XbJGJjR3icj1g10nRu19wMP0w3CR+6gyhgtOM6s2ySR2RZxHirHySanzBAm37q6Qw2ycG47OWDGcMRSqTxZZJN3aNRcHU2ZbJcfdteAe4gVBjp1RwcSA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH2PR12MB4181.namprd12.prod.outlook.com (2603:10b6:610:a8::16)
- by MW4PR12MB5643.namprd12.prod.outlook.com (2603:10b6:303:188::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.18; Wed, 13 Apr
- 2022 23:12:17 +0000
-Received: from CH2PR12MB4181.namprd12.prod.outlook.com
- ([fe80::c911:71b5:78e6:3a38]) by CH2PR12MB4181.namprd12.prod.outlook.com
- ([fe80::c911:71b5:78e6:3a38%8]) with mapi id 15.20.5144.030; Wed, 13 Apr 2022
- 23:12:17 +0000
-Date:   Wed, 13 Apr 2022 20:12:15 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Wang, Zhi A" <zhi.a.wang@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        David Airlie <airlied@linux.ie>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Daniel Vetter <daniel@ffwll.ch>
-Subject: Re: [PATCH 1/9] vfio: Make vfio_(un)register_notifier accept a
- vfio_device
-Message-ID: <20220413231215.GY2120790@nvidia.com>
-References: <1-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
- <20220413055524.GB32092@lst.de>
- <20220413113952.GN2120790@nvidia.com>
- <20220413160601.GA29631@lst.de>
- <20220413161814.GS2120790@nvidia.com>
- <20220413162946.GB31053@lst.de>
- <20220413173727.GU2120790@nvidia.com>
- <661447fd-b041-c08d-cedc-341b31c405f8@intel.com>
- <20220413200418.GX2120790@nvidia.com>
- <bc3f32ee-0dd5-d525-0536-dc18ade338a6@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bc3f32ee-0dd5-d525-0536-dc18ade338a6@intel.com>
-X-ClientProxiedBy: MN2PR07CA0022.namprd07.prod.outlook.com
- (2603:10b6:208:1a0::32) To CH2PR12MB4181.namprd12.prod.outlook.com
- (2603:10b6:610:a8::16)
+        with ESMTP id S229795AbiDNBHT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Apr 2022 21:07:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B63E551E41
+        for <kvm@vger.kernel.org>; Wed, 13 Apr 2022 18:04:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649898293;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ANp2P5bEFx2XSZ+yYTRPpJFRTgPP/b0IHJ9rRHlT2O4=;
+        b=BN/25cztdbyQxH9GosxiWKdl8CkAO2zQAnxuinRhaH4Cd95qQMhzS4alEgcX+gijGeRJvY
+        psu/V1zsZChRmE7C2oucxoCTwVsgFYGtQcBAleNvLam+sko19kfHLcT/jvu2/xa7b7Twc+
+        D3QIh6cUeohs9iNxVAtxMqueAjm7KvU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-663-p314QbhjMeu6T4R0EDbyKw-1; Wed, 13 Apr 2022 21:04:48 -0400
+X-MC-Unique: p314QbhjMeu6T4R0EDbyKw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3C980185A79C;
+        Thu, 14 Apr 2022 01:04:47 +0000 (UTC)
+Received: from [10.72.13.171] (ovpn-13-171.pek2.redhat.com [10.72.13.171])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 598FA1457F13;
+        Thu, 14 Apr 2022 01:04:39 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v5 04/10] KVM: arm64: Add vendor hypervisor firmware
+ register
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+References: <20220407011605.1966778-1-rananta@google.com>
+ <20220407011605.1966778-5-rananta@google.com>
+ <06b7539f-c5c0-843d-7617-a35a9f1d0e60@redhat.com>
+ <CAJHc60y_rbTd4uX6aZCkt_P46EgM4QKXg5YXGzit3oweSzh8Sg@mail.gmail.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <b01164d2-4c2a-0c7b-3837-35e95fb1b14c@redhat.com>
+Date:   Thu, 14 Apr 2022 09:04:36 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 820daf41-7a2e-4c92-dfdd-08da1da30d58
-X-MS-TrafficTypeDiagnostic: MW4PR12MB5643:EE_
-X-Microsoft-Antispam-PRVS: <MW4PR12MB5643F45EC8DD0517218AC3DDC2EC9@MW4PR12MB5643.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fnYRWLKloBrinGnrRtVwa8i1Jjr+qxp+VhhPFmzY1UUdftTgqu10ALv4cin5UeaN3YPY88Bb3iXc/YeRorv6z9pD1yjqD+rY+KwZbJPVgKRcjnDJgzadbXrlS1bX9y8z/qTXsi9g50rD/1P1dnwBr8n+rv9UUd6DRnhFjvn6oZFZdKY6BRJth4I3wwB7R3+l6DPSCqdLercDeivRBNZ5+aAR5dF2l4nSn1pLP31URwNNTkJGYv2t4jG0FYznJTjZf2zfHHz53sjUj0MNupYgTVrCcXEEvLxi7E0UbiSK9qfuqUHTOV+t+SWSvwSHCXJP+VQjY1+IxoS2KT7J+h5HPgDDfPiCQGtzkpgt8mXT59ZKMOhJAdl8+BKEnEfbEshvleeMu2GFI9/kFduLYI8hYWdaorUWp8nsEuaGMGH7CFJAcNCj+hlI4jP95nMJkotLi7KKIfo0RKw9kgihg2xIrjPQ6UIWabJAufULjLwh5ivaj4xxnkggAsEGjxpXI4KZa0yVOPVDER7r4qikIs5+y3hEyFYE5djbO4g3oQFlqyHUhOGKZ9iqUy7Zr24EFhwYUx4X+UrW5Kt4wcGeFY/8CPfjkWSkScZgnQqay/mB7zZLpwrRYLeUjHblNRqiei0V5BT1HtVJqtXi9bnGDIkmaw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4181.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6916009)(54906003)(8676002)(66946007)(66556008)(66476007)(53546011)(5660300002)(86362001)(4326008)(8936002)(2616005)(1076003)(508600001)(38100700002)(83380400001)(186003)(7406005)(26005)(316002)(7416002)(6486002)(6506007)(6512007)(2906002)(33656002)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?yOlbiW1Av4RDGJEdJUdG1g0Mq+UgNPmfusKCsO8flGmuYO3KCkgErAMsRfEi?=
- =?us-ascii?Q?AE5AjE5fr1v8Aksfz4CliPi0S0aGuF7EXsU8JWHLsZOVHzYdvLcBs5oR5T74?=
- =?us-ascii?Q?bfIMBeXF67jma/htHY2hcksjiKw+6VwOeAcDVUxC6sHkgw+iKbZVorxW8F42?=
- =?us-ascii?Q?f6mRrPks8kP1jsmfN5pRM9+AvRg3rocC7BDcIEF8N1OWOmYghU21DyiYtSeO?=
- =?us-ascii?Q?yR8rli7FODs5l4/kpOCIUXWndJCFOnNZwh7/ZhM8HWNWxtuqrHYMOq4M8JIN?=
- =?us-ascii?Q?O0DHq1gw8xXw8cRE2OFsEROhnh4a1brrXPcWqdQXfGqcBL7uXE6IJYrMPS7z?=
- =?us-ascii?Q?u67Ta0LF6yT56vCKbMx0o0VbHjn/mEQeHjpYNvNPiswdRGbRV3H5UySjBE87?=
- =?us-ascii?Q?qcztaXPMKxbt0Wmdd1S9AYfmgB/hh2qQ+z1YnmQ8bTXDbdMhe7xOIttLzlFl?=
- =?us-ascii?Q?iepIdlWbiFE6+eSK2GkCNL1wlrcZNEp0jPK4kpPvBLugPHnxYnOy06YcclsI?=
- =?us-ascii?Q?QkBZtiJdtxX9Fzb8ZWI5+rvI+FbcteSGp0zkgsXR4R0FvkF05baF5WdZ9t6m?=
- =?us-ascii?Q?MabWQ4mU4m50joGQmCwvJerwmtKvxsZxpk63adL1Hbsib4RzFU6aj2q9HLwX?=
- =?us-ascii?Q?KOf7HcyNtEqf1+0fsGjR6QE2qo6ZgzYuZbM9DyjHxmYhwlPnVleKhJ68FV+V?=
- =?us-ascii?Q?zM1mFWxZXWMrfjU2eX8TVDS2WGAg9pYi7zR0Yv+9ava4h5m2DeTvxLTVLH4t?=
- =?us-ascii?Q?SdrCZiDtOBKZzWXSqOTESl1rsrNu1g8VNTKtEKnT2uU4fCWzzK+5FgS+xfVa?=
- =?us-ascii?Q?PqGSAiXOvUPCojox8l/IztDWWLxiaiijZjlAMA935mBvPMrenExuIfCYDR/z?=
- =?us-ascii?Q?AbwVfyU/jf+tQ7h0zmZ/vy6QMzkLBvSIX0g3POUdFl6X1eomA62raDH1XNvH?=
- =?us-ascii?Q?LkzY0rw9gnTWAh4k4y94TJOLSdRROnOD1f2jRlabXvR/S8BkA3IjiNYYqsWY?=
- =?us-ascii?Q?m/25Rlxvuoaj/5IX5ZmqAI0ETwdJqLIs/WF89Tu3KxY0XBBP7KJ8vUNEzYAN?=
- =?us-ascii?Q?ChmcVe/pJjh7Frl1gIm0AXkU0k3Hx5dHMfWZeLISVwflLQKtx/RXNS0RjUgY?=
- =?us-ascii?Q?4VmaYm8SM8g0Xgembua9q9A8UEXfJdis+hsnHkWBhNEpSWdJHPYTSUYlF+Ig?=
- =?us-ascii?Q?wzfOKXlM/0s+ChsFr8y8K/3nVtloh2r+w8R5+ZHy8UW6QA6Kf4XBXwo6EHWH?=
- =?us-ascii?Q?7FuPCg4KrRd+T1vb8Swh6f5RqQzkqefIkxNZKlW3BIFMM2/FI7uVgDKt/WhD?=
- =?us-ascii?Q?UB/h4pUSQbD/5/5qhWRyx4ZxJwRIap3d3oOX7dyjnAh1LHunLcWLxBbRhBZI?=
- =?us-ascii?Q?AuC4vGwvpvfuOz5v8HA74A6jlw+aZFrmZrIogFSDQ/beqoWdgGEmbF7bjtvf?=
- =?us-ascii?Q?2QbJDZy83O8N9OXV06jkaXzF9aROwy5/8R1CVqSthQl9Lv4IPKPwL4m4uTu9?=
- =?us-ascii?Q?NwB5l5Qk+hNz3DfWuPTjam/N6QXwPQyIRWEQmVJmOpHC0LXDXo7tnLJsb9ws?=
- =?us-ascii?Q?SLSU6ikkR3VAExCFt4/2lYiGKZfSnO1hkw5BXD2m9A6iwn5LfDg3rFswWnM+?=
- =?us-ascii?Q?zA3VcWPzqI+vXDvZExmPLm36D6YRD/dFXGab1hKrQRGclOfaqzOmnN+8wRjl?=
- =?us-ascii?Q?CC3rCKaFVyNN4eiqQH66doL1aEhgA0rFfK9gVLeUJbCBuNID+sUzuDn0qATC?=
- =?us-ascii?Q?TzLzhU46xw=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 820daf41-7a2e-4c92-dfdd-08da1da30d58
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4181.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Apr 2022 23:12:16.9180
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Gc9TWdqlymT1c6KaNi+s9jEkIYeBYPhfB9wxPz+n69J2Fo0Laea7suIHnmxtrkvy
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5643
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <CAJHc60y_rbTd4uX6aZCkt_P46EgM4QKXg5YXGzit3oweSzh8Sg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 13, 2022 at 09:08:40PM +0000, Wang, Zhi A wrote:
-> On 4/13/22 8:04 PM, Jason Gunthorpe wrote:
-> > On Wed, Apr 13, 2022 at 07:17:52PM +0000, Wang, Zhi A wrote:
-> >> On 4/13/22 5:37 PM, Jason Gunthorpe wrote:
-> >>> On Wed, Apr 13, 2022 at 06:29:46PM +0200, Christoph Hellwig wrote:
-> >>>> On Wed, Apr 13, 2022 at 01:18:14PM -0300, Jason Gunthorpe wrote:
-> >>>>> Yeah, I was thinking about that too, but on the other hand I think it
-> >>>>> is completely wrong that gvt requires kvm at all. A vfio_device is not
-> >>>>> supposed to be tightly linked to KVM - the only exception possibly
-> >>>>> being s390..
-> >>>>
-> >>>> So i915/gvt uses it for:
-> >>>>
-> >>>>  - poking into the KVM GFN translations
-> >>>>  - using the KVM page track notifier
-> >>>>
-> >>>> No idea how these could be solved in a more generic way.
-> >>>
-> >>> TBH I'm not sure how any of this works fully correctly..
-> >>>
-> >>> I see this code getting something it calls a GFN and then passing
-> >>> them to vfio - which makes no sense. Either a value is a GFN - the
-> >>> physical memory address of the VM, or it is an IOVA. VFIO only takes
-> >>> in IOVA and kvm only takes in GFN. So these are probably IOVAs really..
-> >>>
-> >> Can you let me know the place? So that I can take a look.
-> > 
-> > Well, for instance:
-> > 
-> > static int gvt_pin_guest_page(struct intel_vgpu *vgpu, unsigned long gfn,
-> > 		unsigned long size, struct page **page)
-> > 
-> > There is no way that is a GFN, it is an IOVA.
-> > 
-> I see. The name is vague. There is an promised 1:1 mapping between guest GFN
-> and host IOVA when a PCI device is passed to a VM, I guess mdev is just
-> leveraging it as they are sharing the same code path in QEMU.
+Hi Raghavendra,
 
-That has never been true. It happens to be the case in some common scenarios.
-
-> > So if the page table in the guest has IOVA addreses then why can you
-> > use them as GFNs?
+On 4/14/22 12:59 AM, Raghavendra Rao Ananta wrote:
+> On Tue, Apr 12, 2022 at 8:59 PM Gavin Shan <gshan@redhat.com> wrote:
+>> On 4/7/22 9:15 AM, Raghavendra Rao Ananta wrote:
+>>> Introduce the firmware register to hold the vendor specific
+>>> hypervisor service calls (owner value 6) as a bitmap. The
+>>> bitmap represents the features that'll be enabled for the
+>>> guest, as configured by the user-space. Currently, this
+>>> includes support for KVM-vendor features, and Precision Time
+>>> Protocol (PTP), represented by bit-0 and bit-1 respectively.
+>>>
+>>> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+>>> ---
+>>>    arch/arm64/include/asm/kvm_host.h |  2 ++
+>>>    arch/arm64/include/uapi/asm/kvm.h |  4 ++++
+>>>    arch/arm64/kvm/hypercalls.c       | 21 +++++++++++++++++----
+>>>    include/kvm/arm_hypercalls.h      |  4 ++++
+>>>    4 files changed, 27 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>> index 20165242ebd9..b79161bad69a 100644
+>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>> @@ -106,10 +106,12 @@ struct kvm_arch_memory_slot {
+>>>     *
+>>>     * @std_bmap: Bitmap of standard secure service calls
+>>>     * @std_hyp_bmap: Bitmap of standard hypervisor service calls
+>>> + * @vendor_hyp_bmap: Bitmap of vendor specific hypervisor service calls
+>>>     */
+>>>    struct kvm_smccc_features {
+>>>        u64 std_bmap;
+>>>        u64 std_hyp_bmap;
+>>> +     u64 vendor_hyp_bmap;
+>>>    };
+>>>
+>>>    struct kvm_arch {
+>>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+>>> index 67353bf4e69d..9a5ac0ed4113 100644
+>>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>>> @@ -344,6 +344,10 @@ struct kvm_arm_copy_mte_tags {
+>>>    #define KVM_REG_ARM_STD_HYP_BMAP            KVM_REG_ARM_FW_FEAT_BMAP_REG(1)
+>>>    #define KVM_REG_ARM_STD_HYP_BIT_PV_TIME             BIT(0)
+>>>
+>>> +#define KVM_REG_ARM_VENDOR_HYP_BMAP          KVM_REG_ARM_FW_FEAT_BMAP_REG(2)
+>>> +#define KVM_REG_ARM_VENDOR_HYP_BIT_FUNC_FEAT BIT(0)
+>>> +#define KVM_REG_ARM_VENDOR_HYP_BIT_PTP               BIT(1)
+>>> +
+>>>    /* Device Control API: ARM VGIC */
+>>>    #define KVM_DEV_ARM_VGIC_GRP_ADDR   0
+>>>    #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS      1
+>>> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+>>> index 64ae6c7e7145..80836c341fd3 100644
+>>> --- a/arch/arm64/kvm/hypercalls.c
+>>> +++ b/arch/arm64/kvm/hypercalls.c
+>>> @@ -66,8 +66,6 @@ static const u32 hvc_func_default_allowed_list[] = {
+>>>        ARM_SMCCC_VERSION_FUNC_ID,
+>>>        ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+>>>        ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID,
+>>> -     ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID,
+>>> -     ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
+>>>    };
+>>>
+>>>    static bool kvm_hvc_call_default_allowed(struct kvm_vcpu *vcpu, u32 func_id)
+>>> @@ -102,6 +100,12 @@ static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu, u32 func_id)
+>>>        case ARM_SMCCC_HV_PV_TIME_ST:
+>>>                return kvm_arm_fw_reg_feat_enabled(smccc_feat->std_hyp_bmap,
+>>>                                        KVM_REG_ARM_STD_HYP_BIT_PV_TIME);
+>>> +     case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+>>> +             return kvm_arm_fw_reg_feat_enabled(smccc_feat->vendor_hyp_bmap,
+>>> +                                     KVM_REG_ARM_VENDOR_HYP_BIT_FUNC_FEAT);
+>>> +     case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
+>>> +             return kvm_arm_fw_reg_feat_enabled(smccc_feat->vendor_hyp_bmap,
+>>> +                                     KVM_REG_ARM_VENDOR_HYP_BIT_PTP);
+>>>        default:
+>>>                return kvm_hvc_call_default_allowed(vcpu, func_id);
+>>>        }
+>>
+>> I guess we may return SMCCC_RET_NOT_SUPPORTED for ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID
+>> if KVM_REG_ARM_VENDOR_HYP_BIT_FUNC_FEAT isn't set? Otherwise, we need explain it
+>> in the commit log.
+>>
+> ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID is a part of the hvc
+> allowed-list (hvc_func_default_allowed_list[]), which means it's not
+> associated with any feature bit and is always enabled. If the guest
+> were to issue ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, we'd end up in
+> the 'default' case and the kvm_hvc_call_default_allowed() would return
+> 'true'. This is documented in patch 2/10.
 > 
-> That's another problem. We don't support a guess enabling the guest IOMMU
-> (aka virtual IOMMU). The guest/virtual IOMMU is implemented in QEMU, so
-> does the translation between guest IOVA and GFN. For a mdev model
-> implemented in the kernel, there isn't any mechanism so far to reach there.
 
-And this is the uncommon scenario, there is no way for the mdev driver
-to know if viommu is turned on, and AFAIK, no way to block it from VFIO.
+I think I might not make myself clear and sorry for that. The point is
+the following hvc calls should be belonging to 'Vendor Specific Hypervisor
+Service', or I'm wrong. If I'm correct, VENDOR_HYP_CALL_UID_FUNC_ID
+should be disallowed if bit#0 isn't set in @vendor_hyp_bmap.
 
-> People were discussing it before. But none agreement was achieved. Is it
-> possible to implement it in the kernel? Would like to discuss more about it
-> if there is any good idea.
+     ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID
+     ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID
+     ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID
 
-I don't know of anything, VFIO and kvm are not intended to be tightly
-linked like this, they don't have the same view of the world.
+ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID was introduced by commit 6e085e0ac9cf
+("arm/arm64: Probe for the presence of KVM hypervisor"). According to the
+commit log, the identifier and supported (vendor specific) feature list
+is returned by this call and ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID.
+So the users depend on both calls to probe the supported features or
+services. So it seems incorrect to allow ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID
+even the 'Vendor Specific Hypervisor Service' is disabled and bit#0
+is cleared in @vendor_hyp_bmap by users.
 
-Jason
+>> KVM_REG_ARM_VENDOR_HYP_BIT_{FUNC_FEAT, PTP} aren't parallel to each other.
+>> I think PTP can't be on if KVM_REG_ARM_VENDOR_HYP_BIT_FUNC_FEAT is off.
+>>
+> Actually we went through this scenario [1]. Of course, we can build
+> some logic around it to make sure that the userspace does the right
+> thing, but at this point the consensus is that, unless it's an issue
+> for KVM, it's treated as a userspace bug.
+> 
+
+Thanks for the pointer. I chime in late and I didn't check the reviewing
+history on this series. Hopefully I didn't bring too much confusing comments
+to you.
+
+I think it's fine by treating it as a userspace bug, but it would be nice
+to add comments somewhere if you agree.
+
+>>> @@ -194,8 +198,7 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>>>                val[3] = ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3;
+>>>                break;
+>>>        case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+>>> -             val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
+>>> -             val[0] |= BIT(ARM_SMCCC_KVM_FUNC_PTP);
+>>> +             val[0] = smccc_feat->vendor_hyp_bmap;
+>>>                break;
+>>>        case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
+>>>                kvm_ptp_get_time(vcpu, val);
+>>> @@ -222,6 +225,7 @@ static const u64 kvm_arm_fw_reg_ids[] = {
+>>>        KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3,
+>>>        KVM_REG_ARM_STD_BMAP,
+>>>        KVM_REG_ARM_STD_HYP_BMAP,
+>>> +     KVM_REG_ARM_VENDOR_HYP_BMAP,
+>>>    };
+>>>
+>>>    void kvm_arm_init_hypercalls(struct kvm *kvm)
+>>> @@ -230,6 +234,7 @@ void kvm_arm_init_hypercalls(struct kvm *kvm)
+>>>
+>>>        smccc_feat->std_bmap = KVM_ARM_SMCCC_STD_FEATURES;
+>>>        smccc_feat->std_hyp_bmap = KVM_ARM_SMCCC_STD_HYP_FEATURES;
+>>> +     smccc_feat->vendor_hyp_bmap = KVM_ARM_SMCCC_VENDOR_HYP_FEATURES;
+>>>    }
+>>>
+>>>    int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
+>>> @@ -322,6 +327,9 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>>>        case KVM_REG_ARM_STD_HYP_BMAP:
+>>>                val = READ_ONCE(smccc_feat->std_hyp_bmap);
+>>>                break;
+>>> +     case KVM_REG_ARM_VENDOR_HYP_BMAP:
+>>> +             val = READ_ONCE(smccc_feat->vendor_hyp_bmap);
+>>> +             break;
+>>>        default:
+>>>                return -ENOENT;
+>>>        }
+>>> @@ -348,6 +356,10 @@ static int kvm_arm_set_fw_reg_bmap(struct kvm_vcpu *vcpu, u64 reg_id, u64 val)
+>>>                fw_reg_bmap = &smccc_feat->std_hyp_bmap;
+>>>                fw_reg_features = KVM_ARM_SMCCC_STD_HYP_FEATURES;
+>>>                break;
+>>> +     case KVM_REG_ARM_VENDOR_HYP_BMAP:
+>>> +             fw_reg_bmap = &smccc_feat->vendor_hyp_bmap;
+>>> +             fw_reg_features = KVM_ARM_SMCCC_VENDOR_HYP_FEATURES;
+>>> +             break;
+>>>        default:
+>>>                return -ENOENT;
+>>>        }
+>>
+>> If KVM_REG_ARM_VENDOR_HYP_BIT_{FUNC_FEAT, PTP} aren't parallel to each other,
+>> special code is needed to gurantee PTP is cleared if VENDOR_HYP is disabled.
+>>
+> Please see the above comment :)
+> 
+
+Thanks for the pointer and explanation :)
+
+>>> @@ -453,6 +465,7 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>>>                return 0;
+>>>        case KVM_REG_ARM_STD_BMAP:
+>>>        case KVM_REG_ARM_STD_HYP_BMAP:
+>>> +     case KVM_REG_ARM_VENDOR_HYP_BMAP:
+>>>                return kvm_arm_set_fw_reg_bmap(vcpu, reg->id, val);
+>>>        default:
+>>>                return -ENOENT;
+>>> diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
+>>> index b0915d8c5b81..eaf4f6b318a8 100644
+>>> --- a/include/kvm/arm_hypercalls.h
+>>> +++ b/include/kvm/arm_hypercalls.h
+>>> @@ -9,6 +9,7 @@
+>>>    /* Last valid bits of the bitmapped firmware registers */
+>>>    #define KVM_REG_ARM_STD_BMAP_BIT_MAX                0
+>>>    #define KVM_REG_ARM_STD_HYP_BMAP_BIT_MAX    0
+>>> +#define KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_MAX  1
+>>>
+>>>    #define KVM_ARM_SMCCC_STD_FEATURES \
+>>>        GENMASK_ULL(KVM_REG_ARM_STD_BMAP_BIT_MAX, 0)
+>>> @@ -16,6 +17,9 @@
+>>>    #define KVM_ARM_SMCCC_STD_HYP_FEATURES \
+>>>        GENMASK_ULL(KVM_REG_ARM_STD_HYP_BMAP_BIT_MAX, 0)
+>>>
+>>> +#define KVM_ARM_SMCCC_VENDOR_HYP_FEATURES \
+>>> +     GENMASK_ULL(KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_MAX, 0)
+>>> +
+>>>    int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
+>>>
+>>>    static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
+>>>
+>>
+> 
+> Thanks for the review.
+> 
+
+No worries and sorry for the late chime-in :)
+
+> 
+> [1]: https://lore.kernel.org/lkml/YjA1AzZPlPV20kMj@google.com/
+> 
+
+Thanks,
+Gavin
+
