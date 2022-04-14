@@ -2,175 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 473DD500611
-	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 08:25:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 015F45006D1
+	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 09:20:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238320AbiDNG1Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 02:27:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50566 "EHLO
+        id S240301AbiDNHXK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 03:23:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231788AbiDNG1Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Apr 2022 02:27:24 -0400
-Received: from out30-56.freemail.mail.aliyun.com (out30-56.freemail.mail.aliyun.com [115.124.30.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C97631FA6F;
-        Wed, 13 Apr 2022 23:24:56 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=33;SR=0;TI=SMTPD_---0VA0zc-G_1649917489;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VA0zc-G_1649917489)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 14 Apr 2022 14:24:51 +0800
-Message-ID: <1649917349.6242197-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v9 22/32] virtio_pci: queue_reset: extract the logic of active vq for modern pci
-Date:   Thu, 14 Apr 2022 14:22:29 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-References: <20220406034346.74409-1-xuanzhuo@linux.alibaba.com>
- <20220406034346.74409-23-xuanzhuo@linux.alibaba.com>
- <d228a41f-a3a1-029d-f259-d4fbab822e78@redhat.com>
-In-Reply-To: <d228a41f-a3a1-029d-f259-d4fbab822e78@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S240218AbiDNHXH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Apr 2022 03:23:07 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA2E455BE3;
+        Thu, 14 Apr 2022 00:20:43 -0700 (PDT)
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23E6ulXq029810;
+        Thu, 14 Apr 2022 07:20:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=M7qdITGxKMZflqtUEJitwS22RS7/VW8O4gC7lkHX6aE=;
+ b=G45Hr2OlusJpUCsbehcPMM8yaS8GNgqUAeRfZlJWZaH3yxySfICNo89cb57zXaWLsX0k
+ W1RMssE/8McYAETLYzU77k7mYdR3AKZuUPS36lA10gileH7WR8LSv1E3ePGagplW7mfx
+ zZWfpzTUyLMDJ1osPer3HhsZfa7Vf9Hp8Fq69PM1A5ovZnLtl3iwV3fooy98m9nzO325
+ iCWYP9udTdpy12rjTxhu1l/XA74lD2NuXtj3PlC7Ex31DA+mSTIW9SBK3MV6r6C4Jif1
+ bzw6ozB1dnKJTdViP1QbEP0rsK6hIg6PUiHYBgTGJZVrO79j8OG+sQHWUp4oYY4h3xjk 8g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3feesu0e38-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Apr 2022 07:20:41 +0000
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23E7FQuw032322;
+        Thu, 14 Apr 2022 07:20:41 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3feesu0e2v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Apr 2022 07:20:41 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23E78375003025;
+        Thu, 14 Apr 2022 07:20:39 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma02fra.de.ibm.com with ESMTP id 3fb1s8peq1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Apr 2022 07:20:39 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23E782ol46858612
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 14 Apr 2022 07:08:02 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 298C8A4054;
+        Thu, 14 Apr 2022 07:20:36 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0D900A405B;
+        Thu, 14 Apr 2022 07:20:35 +0000 (GMT)
+Received: from [9.171.7.59] (unknown [9.171.7.59])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 14 Apr 2022 07:20:34 +0000 (GMT)
+Message-ID: <95e46303-931c-ec90-94f3-67ed34383650@linux.ibm.com>
+Date:   Thu, 14 Apr 2022 09:20:34 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v5 11/21] KVM: s390: pci: do initial setup for AEN
+ interpretation
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org
+References: <20220404174349.58530-1-mjrosato@linux.ibm.com>
+ <20220404174349.58530-12-mjrosato@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20220404174349.58530-12-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: W8aJ_56TwyEef8MQtx5uqh8024usFQ7B
+X-Proofpoint-ORIG-GUID: yihznpiYOr22q6IIqJIXq14-4f90b2RP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-14_01,2022-04-13_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ adultscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0 clxscore=1015
+ impostorscore=0 phishscore=0 bulkscore=0 priorityscore=1501
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204140038
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H3,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 12 Apr 2022 14:58:19 +0800, Jason Wang <jasowang@redhat.com> wrote:
->
-> =E5=9C=A8 2022/4/6 =E4=B8=8A=E5=8D=8811:43, Xuan Zhuo =E5=86=99=E9=81=93:
-> > Introduce vp_active_vq() to configure vring to backend after vq attach
-> > vring. And configure vq vector if necessary.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >   drivers/virtio/virtio_pci_modern.c | 46 ++++++++++++++++++------------
-> >   1 file changed, 28 insertions(+), 18 deletions(-)
-> >
-> > diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio=
-_pci_modern.c
-> > index 86d301f272b8..49a4493732cf 100644
-> > --- a/drivers/virtio/virtio_pci_modern.c
-> > +++ b/drivers/virtio/virtio_pci_modern.c
-> > @@ -176,6 +176,29 @@ static void vp_reset(struct virtio_device *vdev)
-> >   	vp_disable_cbs(vdev);
-> >   }
-> >
-> > +static int vp_active_vq(struct virtqueue *vq, u16 msix_vec)
-> > +{
-> > +	struct virtio_pci_device *vp_dev =3D to_vp_device(vq->vdev);
-> > +	struct virtio_pci_modern_device *mdev =3D &vp_dev->mdev;
-> > +	unsigned long index;
-> > +
-> > +	index =3D vq->index;
-> > +
-> > +	/* activate the queue */
-> > +	vp_modern_set_queue_size(mdev, index, virtqueue_get_vring_size(vq));
-> > +	vp_modern_queue_address(mdev, index, virtqueue_get_desc_addr(vq),
-> > +				virtqueue_get_avail_addr(vq),
-> > +				virtqueue_get_used_addr(vq));
-> > +
-> > +	if (msix_vec !=3D VIRTIO_MSI_NO_VECTOR) {
-> > +		msix_vec =3D vp_modern_queue_vector(mdev, index, msix_vec);
-> > +		if (msix_vec =3D=3D VIRTIO_MSI_NO_VECTOR)
-> > +			return -EBUSY;
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >   static u16 vp_config_vector(struct virtio_pci_device *vp_dev, u16 vec=
-tor)
-> >   {
-> >   	return vp_modern_config_vector(&vp_dev->mdev, vector);
-> > @@ -220,32 +243,19 @@ static struct virtqueue *setup_vq(struct virtio_p=
-ci_device *vp_dev,
-> >
-> >   	vq->num_max =3D num;
-> >
-> > -	/* activate the queue */
-> > -	vp_modern_set_queue_size(mdev, index, virtqueue_get_vring_size(vq));
-> > -	vp_modern_queue_address(mdev, index, virtqueue_get_desc_addr(vq),
-> > -				virtqueue_get_avail_addr(vq),
-> > -				virtqueue_get_used_addr(vq));
-> > +	err =3D vp_active_vq(vq, msix_vec);
-> > +	if (err)
-> > +		goto err;
-> >
-> >   	vq->priv =3D (void __force *)vp_modern_map_vq_notify(mdev, index, NU=
-LL);
-> >   	if (!vq->priv) {
-> >   		err =3D -ENOMEM;
-> > -		goto err_map_notify;
-> > -	}
-> > -
-> > -	if (msix_vec !=3D VIRTIO_MSI_NO_VECTOR) {
-> > -		msix_vec =3D vp_modern_queue_vector(mdev, index, msix_vec);
-> > -		if (msix_vec =3D=3D VIRTIO_MSI_NO_VECTOR) {
-> > -			err =3D -EBUSY;
-> > -			goto err_assign_vector;
-> > -		}
-> > +		goto err;
-> >   	}
-> >
-> >   	return vq;
-> >
-> > -err_assign_vector:
-> > -	if (!mdev->notify_base)
-> > -		pci_iounmap(mdev->pci_dev, (void __iomem __force *)vq->priv);
->
->
-> We need keep this or anything I missed?
 
-I think so, after modification, vp_modern_map_vq_notify is the last step be=
-fore
-returning vq. If it fails, then vq->priv is equal to NULL, so there is no n=
-eed
-to execute pci_iounmap.
 
-Did I miss something?
+Am 04.04.22 um 19:43 schrieb Matthew Rosato:
+> Initial setup for Adapter Event Notification Interpretation for zPCI
+> passthrough devices.  Specifically, allocate a structure for forwarding of
+> adapter events and pass the address of this structure to firmware.
+> 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+[...]
+>   
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 156d1c25a3c1..9db6f8080f71 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -47,6 +47,7 @@
+>   #include <asm/fpu/api.h>
+>   #include "kvm-s390.h"
+>   #include "gaccess.h"
+> +#include "pci.h"
+>   
+>   #define CREATE_TRACE_POINTS
+>   #include "trace.h"
+> @@ -502,6 +503,14 @@ int kvm_arch_init(void *opaque)
+>   		goto out;
+>   	}
+>   
+> +	if (kvm_s390_pci_interp_allowed()) {
+> +		rc = kvm_s390_pci_init();
+> +		if (rc) {
+> +			pr_err("Unable to allocate AIFT for PCI\n");
+> +			goto out;
+> +		}
+> +	}
+> +
+>   	rc = kvm_s390_gib_init(GAL_ISC);
+>   	if (rc)
+>   		goto out;
 
-Thanks.
+We would not free the aift that was allocated by kvm_s390_pci_init
+in kvm_arch_exit.
+Wouldnt we re-allocate a new aift when we unload/reload kvm forgetting about the old one?
 
->
-> Thanks
->
->
-> > -err_map_notify:
-> > +err:
-> >   	vring_del_virtqueue(vq);
-> >   	return ERR_PTR(err);
-> >   }
->
+
+> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
+[...]
+> +static int zpci_setup_aipb(u8 nisc)
+[...]
+> +	size = get_order(PAGE_ALIGN(ZPCI_NR_DEVICES *
+> +						sizeof(struct zpci_gaite)));
+[...]
+> +	if (zpci_set_irq_ctrl(SIC_SET_AENI_CONTROLS, 0, zpci_aipb)) {
+> +		rc = -EIO;
+> +		goto free_gait;
+> +	}
+> +
+> +	return 0;
+> +
+> +free_gait:
+> +	size = get_order(PAGE_ALIGN(ZPCI_NR_DEVICES *
+> +				    sizeof(struct zpci_gaite)));
+
+size should still be valid here?
+
+> +	free_pages((unsigned long)aift->gait, size);
+> +free_sbv:
+> +	airq_iv_release(aift->sbv);
+> +	zpci_aif_sbv = 0;
+> +free_aipb:
+> +	kfree(zpci_aipb);
+> +	zpci_aipb = 0;
+> +
+> +	return rc;
+> +}
+> +
+
+The remaining parts look sane.
