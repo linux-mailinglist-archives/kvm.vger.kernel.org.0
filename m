@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B5605011FC
-	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 17:06:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 410345012A1
+	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 17:09:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242787AbiDNNfn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 09:35:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47652 "EHLO
+        id S230122AbiDNNfh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 09:35:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244538AbiDNN1h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Apr 2022 09:27:37 -0400
+        with ESMTP id S244610AbiDNN1u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Apr 2022 09:27:50 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E3949A0BF9
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 06:20:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1073EA1469
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 06:20:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649942428;
+        s=mimecast20190719; t=1649942432;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=JsNnlC4y7P/vpE0xDeBLZNUoZ387++jz5xn6fyKPXY0=;
-        b=eyUr9wZdIoe+vtvZ7KsiTTpsMBqvLFQdL/K2hMcHCwQthDqF2yJ9HFUxunPRYEBFpBhBi1
-        VYUp9BoSEAbqkfDdnpUXVyRKvvrGvEVIbdvidS4AGBDVRxWxjUPR1jTycftyMgRy/gSpIc
-        9OISnK0sHBkr4s/f0HFXcTuQ+X1LHhI=
+        bh=guPhHfLWQaBPsCmuIyaAa+212gzE/QcUkyjWekHqQX4=;
+        b=ZOYTelyqu6SvhNPPu6ixvY7z3GYtF/UO/xvCdFIBF6Zs22+FxhP3aKCDvKbnKCWoqzlk1Q
+        fuf+9dY2R7Fe0nLc7C29f69DgDonDt359NBqKU72P+p2z+Mf61tLt8REsOG4/M60eKKo+s
+        ukUun06LclitZUKL0BdG5SSWNVluaB4=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-284-53Dr_1THPoeY7HodHojW1g-1; Thu, 14 Apr 2022 09:20:27 -0400
-X-MC-Unique: 53Dr_1THPoeY7HodHojW1g-1
+ us-mta-424-3jbKgnbbPeSaioWPbhlXGA-1; Thu, 14 Apr 2022 09:20:29 -0400
+X-MC-Unique: 3jbKgnbbPeSaioWPbhlXGA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6026D800B21;
-        Thu, 14 Apr 2022 13:20:26 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 62071100BABE;
+        Thu, 14 Apr 2022 13:20:28 +0000 (UTC)
 Received: from fedora.redhat.com (unknown [10.40.195.11])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BFAAB53CD;
-        Thu, 14 Apr 2022 13:20:24 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BD4A07C28;
+        Thu, 14 Apr 2022 13:20:26 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -45,9 +45,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Michael Kelley <mikelley@microsoft.com>,
         Siddharth Chandrasekaran <sidcha@amazon.de>,
         linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3 05/34] KVM: x86: hyper-v: Expose support for extended gva ranges for flush hypercalls
-Date:   Thu, 14 Apr 2022 15:19:44 +0200
-Message-Id: <20220414132013.1588929-6-vkuznets@redhat.com>
+Subject: [PATCH v3 06/34] KVM: x86: Prepare kvm_hv_flush_tlb() to handle L2's GPAs
+Date:   Thu, 14 Apr 2022 15:19:45 +0200
+Message-Id: <20220414132013.1588929-7-vkuznets@redhat.com>
 In-Reply-To: <20220414132013.1588929-1-vkuznets@redhat.com>
 References: <20220414132013.1588929-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -64,47 +64,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Extended GVA ranges support bit seems to indicate whether lower 12
-bits of GVA can be used to specify up to 4095 additional consequent
-GVAs to flush. This is somewhat described in TLFS.
+To handle L2 TLB flush requests, KVM needs to translate the specified
+L2 GPA to L1 GPA to read hypercall arguments from there.
 
-Previously, KVM was handling HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX}
-requests by flushing the whole VPID so technically, extended GVA
-ranges were already supported. As such requests are handled more
-gently now, advertizing support for extended ranges starts making
-sense to reduce the size of TLB flush requests.
+No fucntional change as KVM doesn't handle VMCALL/VMMCALL from L2 yet.
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/x86/include/asm/hyperv-tlfs.h | 2 ++
- arch/x86/kvm/hyperv.c              | 1 +
- 2 files changed, 3 insertions(+)
+ arch/x86/kvm/hyperv.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
-index 0a9407dc0859..5225a85c08c3 100644
---- a/arch/x86/include/asm/hyperv-tlfs.h
-+++ b/arch/x86/include/asm/hyperv-tlfs.h
-@@ -61,6 +61,8 @@
- #define HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE		BIT(10)
- /* Support for debug MSRs available */
- #define HV_FEATURE_DEBUG_MSRS_AVAILABLE			BIT(11)
-+/* Support for extended gva ranges for flush hypercalls available */
-+#define HV_FEATURE_EXT_GVA_RANGES_FLUSH			BIT(14)
- /*
-  * Support for returning hypercall output block via XMM
-  * registers is available
 diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 759e1a16e5c3..1a6f9628cee9 100644
+index 1a6f9628cee9..fc4bb0ead9fa 100644
 --- a/arch/x86/kvm/hyperv.c
 +++ b/arch/x86/kvm/hyperv.c
-@@ -2702,6 +2702,7 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 			ent->ebx |= HV_DEBUGGING;
- 			ent->edx |= HV_X64_GUEST_DEBUGGING_AVAILABLE;
- 			ent->edx |= HV_FEATURE_DEBUG_MSRS_AVAILABLE;
-+			ent->edx |= HV_FEATURE_EXT_GVA_RANGES_FLUSH;
+@@ -23,6 +23,7 @@
+ #include "ioapic.h"
+ #include "cpuid.h"
+ #include "hyperv.h"
++#include "mmu.h"
+ #include "xen.h"
  
- 			/*
- 			 * Direct Synthetic timers only make sense with in-kernel
+ #include <linux/cpu.h>
+@@ -1975,6 +1976,12 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ 	 */
+ 	BUILD_BUG_ON(KVM_HV_MAX_SPARSE_VCPU_SET_BITS > 64);
+ 
++	if (!hc->fast && is_guest_mode(vcpu)) {
++		hc->ingpa = translate_nested_gpa(vcpu, hc->ingpa, 0, NULL);
++		if (unlikely(hc->ingpa == UNMAPPED_GVA))
++			return HV_STATUS_INVALID_HYPERCALL_INPUT;
++	}
++
+ 	if (hc->code == HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST ||
+ 	    hc->code == HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE) {
+ 		if (hc->fast) {
 -- 
 2.35.1
 
