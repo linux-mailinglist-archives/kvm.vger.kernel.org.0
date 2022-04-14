@@ -2,111 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AD31F500AB8
-	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 12:04:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0F20500ABE
+	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 12:07:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241303AbiDNKG4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 06:06:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58988 "EHLO
+        id S241303AbiDNKJt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 06:09:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241033AbiDNKGy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Apr 2022 06:06:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 19C8724BE9
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 03:04:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649930669;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yuBcaeBniy5n5/L8X5921bwDC++5b8Xw6Z88KRpE9bQ=;
-        b=H6ThkuHQRkp0+KobMoIe4k1h+ICTCF7M03QuUQVfPghUjePcRurMyzgFUwPCCSMo4Fy/Ey
-        Xnybm/UL6i6HY/U4brYH9R0SUP+6HXyDU2xE2lqa7R5mQfwNN5P6izDpRphFF81V4+JVBZ
-        uqGwofKnqyI7XkwBUcYcLRf8pP84xps=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-244-mVdyOTFBPy2vtBCOZNyR9A-1; Thu, 14 Apr 2022 06:04:26 -0400
-X-MC-Unique: mVdyOTFBPy2vtBCOZNyR9A-1
-Received: by mail-wm1-f72.google.com with SMTP id f12-20020a05600c154c00b0038ea9ed0a4aso2014043wmg.1
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 03:04:25 -0700 (PDT)
+        with ESMTP id S229634AbiDNKJr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Apr 2022 06:09:47 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8FE770924;
+        Thu, 14 Apr 2022 03:07:22 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id r13so6186001wrr.9;
+        Thu, 14 Apr 2022 03:07:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=FFoJHVfLIsD3E+on3fTDKrttYh+nASwnL70uWLoYl9Q=;
+        b=VscGeHgYpmqeZ24KSQ/hrzLntZvcTorl7hNN8mWj2wVp30uAyGkYNMQKP5pAepk+Un
+         fNtFCRZwDfFHcKQwosalJ5McUw/MADo+ebT8PWfvovN8VSCSqBKMSOW1np+kXuePcXna
+         49NUH9NxDn2VbsWyBzOycnqrPo2Y0a9zlQiXlFizwLte3fS+claG54t0m4apRKQj0mvU
+         HKHvpLFJ9cAUuthpQNFjY5hSHW9txaW25djdd3mMjbfP6uHCzjJBZepwJHkGx8+jCYQK
+         tjzhX0TJwAJsW6jKFJDRL96bIHEmFXBsBZYcH0LunRq3Irg9Gh16yKiAEfWVar4GDwun
+         AQHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=yuBcaeBniy5n5/L8X5921bwDC++5b8Xw6Z88KRpE9bQ=;
-        b=t7FcyfQgNu+cPa2l8Q8hTyr0BkgzYW9KDHf9Olu/VJohbWwAWnHSFSjIvhxKyYLSui
-         EWfg4ivij8lOMaD3JuXiG+0oHhN80E2TjZBk11N0WR3fwKOInKHpS2n+D0sR+xt4eM8m
-         ZI519cG7JoKKgtiiIZryaTwyA6U6Smz2EpdvtqFbbSfIQoZEsxL6chu2ccDal9AkQQ5r
-         byhC81utoqdTpJ59oPJS4zvay/B/b62aTuuBMpb5k7rA7//AFrMFwIBSyHmmCfWs2QKG
-         zo/lVsGR/iwZC/Oj3tS9KYQU1EUnWV+LxRa43RuFi+hDIJMnJKMMBJJ56pnCTpSalk3W
-         th0g==
-X-Gm-Message-State: AOAM531MzoWx/hJK498f2BzmU8AbYbJjyOYzpriDUsPpgkbx0XIxORRn
-        /ansJ0ueVooOSlh4RCGFxivJ9Tc4x0l1ytOMA73gGLIfCheK345nIGfdQ5Xa8f005nX2GjPb/wl
-        29nUmuhYtQlry
-X-Received: by 2002:a05:600c:3ba9:b0:38e:c8c6:ae0d with SMTP id n41-20020a05600c3ba900b0038ec8c6ae0dmr2410314wms.120.1649930664846;
-        Thu, 14 Apr 2022 03:04:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyWW/CBrPwe+sYaoZNvV9T6UgMbQHF1faFSZFy0/f2vgkvI5kJx/Q5UzWAjnkbtTzqBMnumbg==
-X-Received: by 2002:a05:600c:3ba9:b0:38e:c8c6:ae0d with SMTP id n41-20020a05600c3ba900b0038ec8c6ae0dmr2410293wms.120.1649930664610;
-        Thu, 14 Apr 2022 03:04:24 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id r14-20020a0560001b8e00b00205918bd86esm1395196wru.78.2022.04.14.03.04.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Apr 2022 03:04:24 -0700 (PDT)
-Message-ID: <658729a1-a4a1-a353-50d6-ef71e83a4375@redhat.com>
-Date:   Thu, 14 Apr 2022 12:04:20 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [RFC PATCH V3 3/4] KVM: X86: Alloc role.pae_root shadow page
-Content-Language: en-US
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+        bh=FFoJHVfLIsD3E+on3fTDKrttYh+nASwnL70uWLoYl9Q=;
+        b=EGMFb1g9mPAi0hKxWrNfe7k3nvc8NawQ9JEO9qs59MLKi/POswVGz4FV++YhhPUO4i
+         EtPhSmJKUIlpaBAlYcIUuwZQB0MMfcj37IyEh4Kckxe5089tDJYp60fAo+sc3mGiMuAS
+         oat2yOsxnTcJyjXtgXqXXhKf712UTaLUFodq7fPW4JgOIwLypNv60sfdKAJa5Jlwt4CX
+         aOBriAi7FI8SmJ8+7GGDcT2A8mqzLknCdBh/2x7ZMiwomgObZzD0aHIkfszY/KWIu1Z8
+         wv1EvJLOlNsih8FQ0d1hDXcI7grxptEh4unbhEaGxrBCYsMEr02LGWKe7ZL/Yspivk7i
+         euyg==
+X-Gm-Message-State: AOAM532i3ozPVYiQnzkT4Izl0UnX09GmKxV+QM0tvWr0A6hUebMhP8XZ
+        Mls4mRHdo1HfdeaJXi2p3ws=
+X-Google-Smtp-Source: ABdhPJyH8xWu3hK9Rp5rWB/cER0XqvTzFgaHtKIxauOasle6toXEo+fVD2SGosOUt/9LjDccndSFHQ==
+X-Received: by 2002:a5d:4d02:0:b0:207:a6e8:ef4a with SMTP id z2-20020a5d4d02000000b00207a6e8ef4amr1501714wrt.245.1649930841574;
+        Thu, 14 Apr 2022 03:07:21 -0700 (PDT)
+Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
+        by smtp.gmail.com with ESMTPSA id r7-20020a05600c2c4700b0038eb7d8df69sm1580412wmg.11.2022.04.14.03.07.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Apr 2022 03:07:21 -0700 (PDT)
+From:   Colin Ian King <colin.i.king@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        linux-doc@vger.kernel.org
-References: <20220330132152.4568-1-jiangshanlai@gmail.com>
- <20220330132152.4568-4-jiangshanlai@gmail.com> <YlXrshJa2Sd1WQ0P@google.com>
- <CAJhGHyD-4YFDhkxk2SQFmKe3ooqw_0wE+9u3+sZ8zOdSUfbnxw@mail.gmail.com>
- <683974e7-5801-e289-8fa4-c8a8d21ec1b2@redhat.com>
- <CAJhGHyCgo-FEgvuRfuLZikgJSyo7HGm1OfU3gme35-WBmqo7yQ@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CAJhGHyCgo-FEgvuRfuLZikgJSyo7HGm1OfU3gme35-WBmqo7yQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: VMX: make read-only const array vmx_uret_msrs_list static
+Date:   Thu, 14 Apr 2022 11:07:20 +0100
+Message-Id: <20220414100720.295502-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.35.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/14/22 11:32, Lai Jiangshan wrote:
-> kvm_mmu_free_roots() can not free those new types of sp if they are still
-> valid.  And different vcpu can use the same pae root sp if the guest cr3
-> of the vcpus are the same.
+Don't populate the read-only array vmx_uret_msrs_list on the stack
+but instead make it static. Also makes the object code a little smaller.
 
-Right, but then load_pdptrs only needs to zap the page before (or 
-instead of) calling kvm_mmu_free_roots().
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Paolo
-
-> And new pae root can be put in prev_root too (not implemented yet)
-> because they are not too special anymore.  As long as sp->gfn, sp->pae_off,
-> sp->role are matched, they can be reused.
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index c654c9d76e09..36429e2bb918 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7871,7 +7871,7 @@ static __init void vmx_setup_user_return_msrs(void)
+ 	 * but is never loaded into hardware.  MSR_CSTAR is also never loaded
+ 	 * into hardware and is here purely for emulation purposes.
+ 	 */
+-	const u32 vmx_uret_msrs_list[] = {
++	static const u32 vmx_uret_msrs_list[] = {
+ 	#ifdef CONFIG_X86_64
+ 		MSR_SYSCALL_MASK, MSR_LSTAR, MSR_CSTAR,
+ 	#endif
+-- 
+2.35.1
 
