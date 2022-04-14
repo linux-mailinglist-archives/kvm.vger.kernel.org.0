@@ -2,123 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 94C8C50196F
-	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 19:01:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCA4250197E
+	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 19:03:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242842AbiDNREB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 13:04:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51428 "EHLO
+        id S243318AbiDNRFQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 13:05:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243053AbiDNRDS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Apr 2022 13:03:18 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2057.outbound.protection.outlook.com [40.107.220.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4065AC55
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 09:39:36 -0700 (PDT)
+        with ESMTP id S244877AbiDNREZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Apr 2022 13:04:25 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2083.outbound.protection.outlook.com [40.107.243.83])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38C91FDE1C
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 09:42:37 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=f499udE/S/N2n+6SzWJ9slvS+aFf4sS1fDxUUCKjEhuhJ7Xy78LGLVrZ+hyZguvaLcnTqG+MaHN9EzL8gyiI6OxFl1bAC3cMaUZmqxenI2Pvu5vAz1cxTiXIS7fSINAhfIKEGd2ue9dmbZBLht8QbLxNULICVSC1Db27OG3W4ZSRLgCAOKhoC4EgXEWL6ufQk/9AE7R6lPAj9j0t8JK7fHFcacXgSHz/8wX0vWiIMKHEgtFKDTYWXlLwz+VFfgalkmADsjEc7jRzv4332acXReZzn9fLZpqAEDKHbyQ03jDFye6AkzUtMIF48pIzsWlh5nAdVnd0+Fy3nb2rCGOQFg==
+ b=UeVBJk3Li4VXODhab8jFwAkMJERHQLIKWApPJAXB5/5ZSRIYlYml6yt8QPHDS3BRHU7iXGphHK6Axkto8SRrBQu1U+oGrX9Z7OAEMkhz4ICIESVMg75TVgR/vED7b/F59133euWDt6S9tV4J3HLRIIyahUn0X/WA9y7R+oCdgThxKdHo14by9aP6O2RThBhiZE/ofNAoZN8zniAjckzfM0fXlIoCK5P8a8F0vjX41HfAZnSXj64MqDIyQ8BlcK/lT3D2S1aZoLWXfL5/65l5dMgkGDFByxBg2mNu+BUrFYDPYPVBS/W6PMNxnLd8UolEn6xiYjp5VJjfwmDAh9khPA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ycpcqLqTr+/D92FnRaq5U3+4YL9IHFl5q8aGz5s2l/A=;
- b=mlShe5fTZeh9aiqcPBygNBqvqxkkNJg4TviXrmWq5BnTczeUkz8Q6yixUW6GTWK28HdEaERMq+YrQVtxZKlQp4D1q0cbLpb33qyQhGKS5gqcarxI9ySq51UeERGwNrxv2JHnppB67d7leSppp4bjTY7KAaEAZBSiM+GSccmA3Vk1yNc2Fhlvlj5MPfehE7JxwIMQdLwAPSSqONbVdiyVBdVkZJHPNVVMdrys6K2nNRyC3gUvDuM67XFHLv2ky9zRezwmktjChgDbIiGHyIFrNinhd8JfLc/vzc/dzbe7XhQYrHb693kADAWl6Jb2lDMj4LZupviY5Xj0A2obDezbDQ==
+ bh=RNaNQeguq7Wf4M2qooPlbmK+W0vG56meR8QznjDKqP0=;
+ b=Jj6rWlZastJ45Uu/yl2PJOOyfkrP/uo4viCkWTEHb8jp19J2lfydHPcRVCDc6wdyM8stjzlPoxS9WEwEN6I1ntuRoC3Asrygxp1LQoPYXIzT8D/d6cr9BL2HIjGXV0mnDKraiFqG1sME0UG29PpOGdvLeOCVbazxoYzubeyvpFp8ik133jNzJu7LWEUBUM6H8D/V/1JmrojRSgZ6UsproCPR4iCCOXwPh35jRK9OB3cARkJwUua0INlZceKmb/ug+XGiqPAr9q87vUp/YRkZZJn3iaNbMca7IDdOoTY1duMd1T5886+6xZ1DMXzP+38WawrUahPhx11wF1ePYgrf/w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ycpcqLqTr+/D92FnRaq5U3+4YL9IHFl5q8aGz5s2l/A=;
- b=AeffXGSQYlCw6hTIdgPwe8IihiYWxaWCYplZKXg9yVCbqgEuJhVDWMtUhKtdfwrzO+IB1+AWAELdnXMqGbH0quX1sl+csO2DRhgoB0Eb6QEW5XxiDzzD7kiRy9iZ7OQE723yvaWlxess2TiQMpg6/B0E0BiV3HN/Osm6XEqASzc=
+ bh=RNaNQeguq7Wf4M2qooPlbmK+W0vG56meR8QznjDKqP0=;
+ b=dGyQmIzvTWTr75V2udxzfaF6lfCVpUwGA2Q50PcS3GwE6ylhDMSL694GDg75R8LZvCZuL7wwOPuda7TAZIcAKVLvCNfQICpQnNRDvZCAGvZgtaL319Mp32nga6JjBiuXByztSCq6E02waiAb97bxX8zCjRngi8PMcwtN6ZE3zGo=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from BN9PR12MB5179.namprd12.prod.outlook.com (2603:10b6:408:11c::18)
- by BL1PR12MB5350.namprd12.prod.outlook.com (2603:10b6:208:31d::23) with
+ by BYAPR12MB3415.namprd12.prod.outlook.com (2603:10b6:a03:d5::25) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.20; Thu, 14 Apr
- 2022 16:39:34 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5144.29; Thu, 14 Apr
+ 2022 16:42:34 +0000
 Received: from BN9PR12MB5179.namprd12.prod.outlook.com
  ([fe80::acb0:6f4c:639d:705f]) by BN9PR12MB5179.namprd12.prod.outlook.com
  ([fe80::acb0:6f4c:639d:705f%7]) with mapi id 15.20.5164.018; Thu, 14 Apr 2022
- 16:39:34 +0000
-Message-ID: <c14f3ed6-a205-082c-3ab2-033174739536@amd.com>
-Date:   Thu, 14 Apr 2022 22:09:22 +0530
+ 16:42:34 +0000
+Message-ID: <99f48dcb-7424-519b-e9b3-a606f8c99f57@amd.com>
+Date:   Thu, 14 Apr 2022 22:12:23 +0530
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
  Thunderbird/91.6.1
-Subject: Re: [kvm-unit-tests PATCH v2 4/4] x86: nSVM: Build up the nested page
- table dynamically
+Subject: Re: [kvm-unit-tests PATCH v2 1/4] x86: nSVM: Move common
+ functionality of the main() to helper run_svm_tests
 Content-Language: en-US
 To:     Sean Christopherson <seanjc@google.com>,
         Manali Shukla <manali.shukla@amd.com>
 Cc:     pbonzini@redhat.com, kvm@vger.kernel.org
 References: <20220324053046.200556-1-manali.shukla@amd.com>
- <20220324053046.200556-5-manali.shukla@amd.com> <YldBmpd3k0sO3IEH@google.com>
+ <20220324053046.200556-2-manali.shukla@amd.com> <Ylcyghve/NZ2jlwx@google.com>
 From:   "Shukla, Manali" <mashukla@amd.com>
-In-Reply-To: <YldBmpd3k0sO3IEH@google.com>
+In-Reply-To: <Ylcyghve/NZ2jlwx@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN2PR01CA0084.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:23::29) To BN9PR12MB5179.namprd12.prod.outlook.com
+X-ClientProxiedBy: PN3PR01CA0076.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:9a::11) To BN9PR12MB5179.namprd12.prod.outlook.com
  (2603:10b6:408:11c::18)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f7c77d64-139b-44d1-ac3e-08da1e355b48
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5350:EE_
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5350654E30B3D793906A15DBFDEF9@BL1PR12MB5350.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 8913b7e0-529a-440e-5918-08da1e35c6a5
+X-MS-TrafficTypeDiagnostic: BYAPR12MB3415:EE_
+X-Microsoft-Antispam-PRVS: <BYAPR12MB3415D6917E625F81957F9A4DFDEF9@BYAPR12MB3415.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: M4AKgVdXe3U9dpRVGNUT416kIF2jZWRPONAXhsd8c9KFSY4j+PCALtB1Fc8kMlPsWXEfGie05dHJebe/oXAo9cJXXYhrMh4StPetB+prHRDS5QQg9UUkju+8UmqAZbzCWqyxwPQQkeZQ0XlaRYkOyeSgD/S5nyPxTXCOByO1qTwbmIoFNbUbzlLQ7g9Hg8U09/1KYZyNtiY231SAA1+uM7GVmKU3V4GUPOePqesnOENWb1ngWoalehN1PLNIulOeRhVQkzQ30+/qTNxqudv4wVVRdfTfW0prNTYWY1lYERS350F1Y7lxM2zK7/ZAtfeAbsgQmNrwRS7uFn+sV3+VbryhTzWzv8cvn0ZfcH8lsOqmxQaVGAK3wC1rRtMO1LAd3Dbsgqz2ly/DCYY9Q/QS+4+U2+8u4iBX1DGYT8wIf2M/lwehDiQB3ca+2hT35E52aPBRirtqBF1Wbo6aqH7kGg0TF9eAklatwsmeydgN/ouyIRpTi83iks9msxQ6uOKB2gXXxomf7s52s4kicJA6x8kbgewseR6kI3C6Bi2+p2pzIN6kjEpVeRiUlP2UYdgAiHcKzDJXBGKgXkcjRI/ZcfyRmIVKvcK5zS0Y9b5soy/9ZoOjXYWNjpYetHJbyjuyztV6MhTRwSDqYgLTwMXXNBAvl3DLkCN93sk8KXpolI3COQpqev6mVfkDlS2C9Xm8ZT9LVS4/i0P0iQKgkmEnCIPsOl0PYKvnurcx+1lCEi0=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR12MB5179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(8676002)(316002)(66946007)(4326008)(5660300002)(66476007)(66556008)(6486002)(8936002)(6636002)(508600001)(2906002)(26005)(6506007)(36756003)(31686004)(6666004)(53546011)(6512007)(31696002)(186003)(2616005)(83380400001)(110136005)(38100700002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: DRr1S7koeRhwewYlVQzEmSYrBpigxr501MZTPvhiOQDlQhuzRUXDWFOprq2pzSPEbifh5s78G6EUZDOWBhMPPoHh3JPeaXCGpYH+8UC5MFef1t/P7HRcWAWiUXUbuCXFug1J8jPO7PvEUvpEDws/SHVxDSQgbVTIXK5nyipDFS2E7oLp36ORFcz0Y/UhHBhQYZK7n/+nhH0/rJ+W3smlPdJk1hoeishgqJnUMaWNZ9Sd3EQJGzW4TmETVFge/Jm/SeWR2v77IU2ujZFVPu8EkkqXTh71pNkCZYiRyluD6vM6yRPduPD4YE71HeGv3KIU/fspF2dC0Io6S64XRGLc8wJX7mHHc13RJYoBQ+mQcw4OJiwWuEkMGFfMH8ZGSs7KZyKfTfs03RVKkHrFFQ/GCW7eCWjvPefEgceahEGXCYo4Hu35MqWwuMLGpa3xfQDKB9ZHt+IySGJvoAUm+QJYmfzfbB8hnMpLbVLxUUacUGscEH2UK+hALs1B/YXUBOfJ85tojt/oLHJSyRfIgL2qHR3ZnhGG9toCN/pkbZIdhvRlKt6Djf0RuLMAXdH8PozTV1epYriKibEvJ7hr9Y12ON4uYoOa3fiaK+XsozeO/TlYBdwtNTP/vCiDPCfUG5fnnBxAOzlWNfDxHFsoC/UGu5kZcBPTR1mPXiuZzp/XQm5zDxxBj4hp+IyA0Yq/eLgYRg2qMOZPDVADxHgWAm4G/8/jkIY2Iu080YOEaUwD9SM=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR12MB5179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(66476007)(36756003)(6512007)(110136005)(31686004)(316002)(53546011)(66556008)(508600001)(6666004)(186003)(83380400001)(6486002)(6636002)(2616005)(6506007)(66946007)(8676002)(26005)(4326008)(38100700002)(2906002)(8936002)(5660300002)(31696002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?b3VDUFdrNmJrYzM0aTJ4dWRpdFoyVnhoTHBuWVJPdGRRd0NURnF6U2NLSjdP?=
- =?utf-8?B?Z3d2dWlHZW94dU9OTGF4VUJkTHJPc3JCNHg4dXRCWExRNS94M0JBQzF1ZG1N?=
- =?utf-8?B?dDRQS0RCWHdLL25JYUdaeWJ4dVNDYTdlRUZiMlFZR3EvN28rM1ZVZzV4d2pv?=
- =?utf-8?B?RmNtTDRRbDM4dEhGdTRTeGZMODZiTzlWWTZidFpKbU5hMGs4b3Y5UmZ2TVdY?=
- =?utf-8?B?ZTFzM0EyUDV3QXI2RjNyNTNEdldicHF6UEp6NkJrcFB5ckZGYThHZ3UvMUll?=
- =?utf-8?B?eWZZV1ZNVlNnTVEwb0o2aUV3MUZKeU42ZDhyV0paNGV0K1dJNFVOYThoZVJL?=
- =?utf-8?B?ai9QbzFNN0wweDZ2SDNtZE44MDVSU244YmU2R1dKYmxsRnVRaVhzdCt6Y0ZE?=
- =?utf-8?B?czdURWNTVWxsNEhRYy9NZ0tmbFd3WUFuWE5yZlVjWGdOd2JlTUJXUytlZkZX?=
- =?utf-8?B?eFl0QnV1bkloVFh0NUpSTlIvY0xSMitMV2NrVHJMYXNnMUtYVEhBMXN2WFVW?=
- =?utf-8?B?cHgybDgzR3FjWlJLd1FGNTRNRmhnWS9PbUZDK2ZWSEUxNDJLWHJOcnlSYUdC?=
- =?utf-8?B?b0RSbGJaM3V0ei9oZWZvdEc1QWc3cmxJZWpWTitxSUVMTFgvYkI2cGJrMzN1?=
- =?utf-8?B?VW9JbnFrK3NRRFU0Q2JYTzlCUm52WVo3dFJINFpTTGxrOFAxd3RxRzMyN2x5?=
- =?utf-8?B?SC9ldGJHbDRVcEpsclBkOUUxU1BDcE1WZmdTTkdPNWt1aXVIWU1TZU5RQ2hB?=
- =?utf-8?B?THRabnA2NDVScTlmdTJJT3AwR1BYVWg2RTR6UWMzWk9Cc2xjYjJEVG1pRWty?=
- =?utf-8?B?R2pKR0V5c3pWL2w2OWRSUlVockxiWlJkWmRaSFlmb0pNZWNRYkVBK1ZacVVl?=
- =?utf-8?B?ZnMrOVJlY3BhUlNEa3orWjZrMU9XelhQYWdxZVc4ZFpmT0NpRStEMDRuOEFs?=
- =?utf-8?B?K1Erd3NKUnRsODZPdmlhbEhlYU1qWTBBTE1xR0hvaHYyWllOc3RzeXozY1lK?=
- =?utf-8?B?QnpjQWErSU1UOEJGVzJYUkZBVXplMUNweU5LOW5WSE91TG5YRnlWcmUxN29H?=
- =?utf-8?B?UlprNjRFOFdlcW9uS1gwRk9zRHFBaHM5UHNBbUN0VDhCZXFGRS90ZGlaa1Bi?=
- =?utf-8?B?RVNiRzlOZTlMbW00SWcrRlVJeEJqMS9HaW5HVXlRVDAxK1NEa2RCTHdnd1h1?=
- =?utf-8?B?Nm5JZzliR1Nub2NyM0M0U0lENnZ2bXhWYm1FTFUxc0U1d2RLb1Bzbm9EU29R?=
- =?utf-8?B?R3JsWTkwWnZSWFRzQU15eVpKSSsvSDArWi90dzZIazdTN1pjQVJOV1NSek83?=
- =?utf-8?B?UEg2UlMvYkVoU2tDRWxxOWtHNVpoUnRhLzNzcTdZS0lYMXhraWx0RjRCN1hB?=
- =?utf-8?B?MERmM1VadTNCK2RJVEVKeSt1YUVOQUZQQ3JnM1pVaHR6cytpWlB6a2pWK3Fo?=
- =?utf-8?B?RlVPQUhmeVUxQzI5Z2tzVEVjK0JYMmpHQ1RNMjZkWnBnRmZaemJQU2lmNmFx?=
- =?utf-8?B?MW80SXRXZVdvNUp1elV1KzlNU2RZZnFzcWVZeVdRcllXRU5sb0JvTkh2VTM2?=
- =?utf-8?B?eGhUMDNuaHNxTXl6UVNhc0s1dVhHNk5qdjJJQkFaMXE0bnRNamxGaG16VTl2?=
- =?utf-8?B?Zitrb3lTTGZUcHpDREdCN1Y4TmFESDBKMDlOUE5wVS8rNVArRlBya2lvNk84?=
- =?utf-8?B?Ynp6SmtNaHRIOGRjVTBOcmJCc1dEMzkyaUlIc3pIdzZTSk9VRkgyS3MxVXBD?=
- =?utf-8?B?bjBlMjhlRWRqYjdDN1hMY0xNdERMY3NxOVM0WDIwOGJaV05hSUI4TThUaHpB?=
- =?utf-8?B?TTNFNm9hK2pBTWJjWXhCcGprZTFERlYrNVBKRUxnQVdHVjV6M1FYYUoweXVP?=
- =?utf-8?B?UHBkV1VValZTVEh5MTNsazJ4aHRFaHZpU3lyMm8yUTdnUU1NQ0FPUzFhRTRH?=
- =?utf-8?B?N29SeEk2L3FjSGZsdU8vK1UyR0ZmMVl3K3lmUXBPUk9mREdtazhiVjFiUFk4?=
- =?utf-8?B?SmR4MlIrcG9KcGF5T05JUVVqb1hqRHR4YS9MZ0NwNERxUHA1VDdxL3Z4NHBm?=
- =?utf-8?B?U3pITThNc1pYNTByb0xyTHUyRitMd21QN1lESFVOcklxYUluRFMvaFJ3VWlv?=
- =?utf-8?B?UW9BUWUvNDNQcSttWWtZK3VpWG5EM1pYc2tSK05tODhualh1a3EwOVZFamc3?=
- =?utf-8?B?UE1qY2ZBTVgyQk5hbXpKRlFPQTNlb1RxVVlTYUdGMjY1VVB6TVI0RTk4WmYx?=
- =?utf-8?B?QmQ3T05SSlBZZTM3MkZ0a0U1NlJrK09VdVBEc2VGd29ZWktQYzQwWnM3UHFH?=
- =?utf-8?B?YzU4L0IvNk84ZkVTTVBjbWl0SFcwUFl3UU9rTlVqM1ArUk93S012QT09?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?THZuQzRPMVZmdWtQb0FjR3cyVlA5eEQxbThYeThDZ2VJWko5QkxkcHkyUDlr?=
+ =?utf-8?B?Y1dWUWF2TTM1NTZJc2pDU1FaWUdralVOdGs0OVlqYmkzZ25GVnJoa016UHFN?=
+ =?utf-8?B?eVJEVXVZdzF4MG8yNDhhNnl3dk83amZpSXJySEY0L2RHR0c4OUpYcTVhMis3?=
+ =?utf-8?B?TWRBT3BrQ1FjTnhiTXJkTEtrMWlBMUxzcnVJQ3ZPZjU0Z2F2ckJyUmx5azFo?=
+ =?utf-8?B?TDVyRXl6cTJ1TllreHkvSkF4YmRpQ1NHTm9qQkYzRGVxb0QrcjBjV3NUaWlX?=
+ =?utf-8?B?cjFYdjRYbVV1R1Q5ZmRoWEF6NHkwZlJXejlkREFpaUt5L3RvSklLcUFYajJs?=
+ =?utf-8?B?OW5sVmlsZlpWK094akR1V1FxM29DQmxtemZCRVkwYWtzbDF6OEZKZUFSbkI0?=
+ =?utf-8?B?R0dFL212TUNqS01Lbyt6RVNJRHBqNjAveVo2NVlzQjZ6ME9GRDUrdm1TT3VX?=
+ =?utf-8?B?clJPVXFXSTNxd2NhWUE3V2ZGSUN1KzRQS2ZhQUc1ZWlYcm5uUUdIbmdlV3Nh?=
+ =?utf-8?B?SjdBbXNTYXArOENlblJULzdSbkVWVHNjZmNZL3dja0s4eWNyTFFHMmZmUlJC?=
+ =?utf-8?B?a2RQaFFKMzFqVDBMM1l0eUZIbmc0SXNWNVFqUDVVOWdtWXpLWDVqSGpzaVln?=
+ =?utf-8?B?bWplKytMVFRSRFhMM1U5STRjWUh2YURqVFlvekVoVXNNNDVRU1RjaTJKRXJ3?=
+ =?utf-8?B?RUduZkJCQU4zZlZrWlBFMUVIakl6TVBoRkFycnU2bXdISm1JRUxQNXNpQ3hw?=
+ =?utf-8?B?Q1BHSGpaNjhTblpOTjVzeGU2djFpZFc5ZEROTitXMVJjVm5SNlZ4Wi9CSmRw?=
+ =?utf-8?B?cGVGRSszMDRIR2RKNHhIdFo5bGo0YTVvUjUzdkYxMlZ0MG13emhSL2l6Q2FM?=
+ =?utf-8?B?YXFqUWVCLzlzS21CejdJYnY4VWlxMHhGeXE3clRKSExrL0ppV1h3L21abVVQ?=
+ =?utf-8?B?RGlRM1JrWnQ1LzROeXRkYWsybUhha2hQT2plSWNuUUQ2dEhUREdzZDE1SEd3?=
+ =?utf-8?B?WVFPSEF3bVlDQStCYk5RRW85SXVMYUdVSmtSUFZVS1BSbzFNLyt5N1JuWkUw?=
+ =?utf-8?B?Ui8rZ0pBYUFKTWg3blp6UnB4Tmk1VXBZUGgvOUxrOXBEdk55THFsT3NwRnU2?=
+ =?utf-8?B?SER5MUR1dFZBeCtkelNUWS9WL3RrK2d0c2VVL29sUFk4TFRUaEZlYXk5ZkVz?=
+ =?utf-8?B?cU9GRU5sNkRhdEhQZnNuWWVlYmxFUEZ4SFFscmlJWmtSM1FpcDRKVHBSQVJZ?=
+ =?utf-8?B?TWNvU2EwYmE4VUpmODMxUE5lYk4wQnFmUFNRRSt1WWNmakJka3NjQWRlTzY3?=
+ =?utf-8?B?M0UrWmtWUHA5cnF0YzNQMy9hV1k4ZHZCSTFOVG11SWJoV0grKzc3elcraUtv?=
+ =?utf-8?B?RnJHZWozaldQMzBydGt6UE1sTSs5NXVRSVNRdjF3SUF3cVhWMG9HS29pSUtm?=
+ =?utf-8?B?RWFHV3N1UUpsVUFNc05uUmRLemg5OWtCTTIvSEcrOXFOWEk0TkdMdGJOZFZC?=
+ =?utf-8?B?VVc0WDQ4R3V1bUNkem1aU3Y1Y0hScTUrVG9wUzVweU1kSHYwNWtXd1dHTzF4?=
+ =?utf-8?B?VW1BQUJ4MUdleVhGRmszQ3BBRVFxTmEwM01Fa01PbHR1RnQ1Z1RZRnRtUWZD?=
+ =?utf-8?B?Tjd4QzVjODJJbWVIVTNZZTVVZW9MR0pNMTdKWnpmVU9UUjNIYVJCb1hPQ2M4?=
+ =?utf-8?B?enkzVkQyZmxtQk1pRXgvN2VkQ3B5bXhiVW5NWjhzOTVUZkNvczRPdkZJbWlC?=
+ =?utf-8?B?RUt2UEhmSWZCSnJCL1hTYzZIWFNjTHZFY0E0cCs5QjR1YmxGclBLNFVZTTNy?=
+ =?utf-8?B?VHp4V3MrMGd5blg2UlVQbzZhaEZnOHdaSC9FWFlRVzVqbGN6dzdxMGt3V0sr?=
+ =?utf-8?B?MUlVWEhFUzdYTXlsWXh2WmtzMWFQYmNicGlGM1NYeDRCeTRGQkpRYkxiandv?=
+ =?utf-8?B?Wm1RUzE0RWZyMlRpTVJBQm5pRVhnU3AyV2lEQnVodEk5WDNPMnVndWhrSi9z?=
+ =?utf-8?B?WnFBMDMwT1M5OFhnVXdFZlZZSkRDcmcwVlNYV21BbHBNdEhIQVIrd3FwZGh5?=
+ =?utf-8?B?UUpBdTJPSTlyZi95aWhuSnNxTVliNkZjbG5DOTZYY1p5Z2lmamZleFZjN1o1?=
+ =?utf-8?B?SXNkVEp4VzcyNnJnSHNCaUlxTUFKanBjU1JoT0xmUlpQdEdud2NSbHlpRGI0?=
+ =?utf-8?B?OUlKMFRqNDhySmp4R3pGRlRMYjREZ215amZac3AvU1ducVorbFJIKy9uc09o?=
+ =?utf-8?B?MmNXSldIRVpyME5qZTFXREloTFBSb1FvZlVDdTJPU3U5emhsOHVtOVlnMkNm?=
+ =?utf-8?B?UzhzcEx6V29KckorQnFkd0FRcFcyWUhaa2ZvWkRWTDdYeUJHREpRQT09?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f7c77d64-139b-44d1-ac3e-08da1e355b48
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8913b7e0-529a-440e-5918-08da1e35c6a5
 X-MS-Exchange-CrossTenant-AuthSource: BN9PR12MB5179.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2022 16:39:34.3997
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2022 16:42:34.4295
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Pht12GS9iTDeKieodM9ptqnq2/umSsCIWDRY16Tg5Or0zcUTVST3DYMkPkUFV6j2hfqsY3SyzfhvQ6gYKCzmiQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5350
+X-MS-Exchange-CrossTenant-UserPrincipalName: XEN4TCiTeV8cbQekRDgi+Oxcbu542pNO63CQT8nrAWquwsMlzcmtD1yN/rhB6plEjo2iUM/4OgPT69rYBeM3Lg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB3415
 X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -131,149 +131,91 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 4/14/2022 3:03 AM, Sean Christopherson wrote:
+On 4/14/2022 1:58 AM, Sean Christopherson wrote:
 > On Thu, Mar 24, 2022, Manali Shukla wrote:
->> Current implementation of nested page table does the page
->> table build up statistically with 2048 PTEs and one pml4 entry.
->> That is why current implementation is not extensible.
+>> nSVM tests are "incompatible" with usermode due to __setup_vm()
+>> call in main function.
 >>
->> New implementation does page table build up dynamically based
->> on the RAM size of the VM which enables us to have separate
->> memory range to test various npt test cases.
+>> If __setup_vm() is replaced with setup_vm() in main function, KUT
+>> will build the test with PT_USER_MASK set on all PTEs.
 >>
+>> nNPT tests will be moved to their own file so that the tests
+>> don't need to fiddle with page tables midway through.
+>>
+>> The quick and dirty approach would be to turn the current main()
+>> into a small helper, minus its call to __setup_vm() and call the
+>> helper function run_svm_tests() from main() function.
+>>
+>> No functional change intended.
+>>
+>> Suggested-by: Sean Christopherson <seanjc@google.com>
 >> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
 >> ---
->>  x86/svm.c     | 163 ++++++++++++++++++++++++++++++++++----------------
-> 
-> Ok, so I got fairly far into reviewing this (see below, but it can be ignored)
-> before realizing that all this new code is nearly identical to what's in lib/x86/vm.c.
-> E.g. find_pte_level() and install_pte() can probably used almost verbatim.
-> 
-> Instead of duplicating code, can you extend vm.c to as necessary?  It might not
-> even require any changes.  I'll happily clean up vm.c in the future, e.g. to fix
-> the misleading nomenclature and open coded horrors, but for your purposes I think
-> you should be able to get away with a bare minimum of changes.
-> 
->>  x86/svm.h     |  17 +++++-
->>  x86/svm_npt.c |   4 +-
->>  3 files changed, 130 insertions(+), 54 deletions(-)
+>>  x86/svm.c | 14 +++++++++-----
+>>  x86/svm.h |  1 +
+>>  2 files changed, 10 insertions(+), 5 deletions(-)
 >>
 >> diff --git a/x86/svm.c b/x86/svm.c
->> index d0d523a..67dbe31 100644
+>> index 3f94b2a..e93e780 100644
 >> --- a/x86/svm.c
 >> +++ b/x86/svm.c
->> @@ -8,6 +8,7 @@
->>  #include "desc.h"
->>  #include "msr.h"
->>  #include "vm.h"
->> +#include "fwcfg.h"
->>  #include "smp.h"
->>  #include "types.h"
->>  #include "alloc_page.h"
->> @@ -16,38 +17,67 @@
->>  #include "vmalloc.h"
+>> @@ -406,17 +406,13 @@ test_wanted(const char *name, char *filters[], int filter_count)
+>>          }
+>>  }
 >>  
->>  /* for the nested page table*/
->> -u64 *pte[2048];
->> -u64 *pde[4];
->> -u64 *pdpe;
->>  u64 *pml4e;
->>  
->>  struct vmcb *vmcb;
->>  
->> -u64 *npt_get_pte(u64 address)
->> +u64* get_npt_pte(u64 *pml4,
-> 
-> Heh, the usual way to handle wrappers is to add underscores, i.e.
-> 
-> u64 *npt_get_pte(u64 address)
-> {
->     return __npt_get_pte(npt_get_pml4e(), address, 1);
-> }
-> 
-> swapping the order just results in namespacing wierdness and doesn't convey to the
-> reader that this is an "inner" helper.
-> 
->> u64 guest_addr, int level)
-> 
-> Assuming guest_addr is a gpa, call it gpa to avoid ambiguity over virtual vs.
-> physical.
-> 
+>> -int main(int ac, char **av)
+>> +int run_svm_tests(int ac, char **av)
 >>  {
->> -	int i1, i2;
->> +    int l;
->> +    u64 *pt = pml4, iter_pte;
-> 
-> Please point pointers and non-pointers on separate lines.  And just "pte" for
-> the tmp, it's not actually used as an iterator.  And with that, I have a slight
-> preference for page_table over pt so that it's not mistaken for pte.
-> 
->> +    unsigned offset;
-> 
-> No bare unsigned please.  And "offset" is the wrong terminology, "index" or "idx"
-> is preferable.  An offset is usually an offset in bytes, this indexes into a u64
-> array.
-> 
-> Ugh, looks like that awful name comes from PGDIR_OFFSET in lib/x86/asm/page.h.
-> The offset, at least in Intel SDM terminology, it specifically the last N:0 bits
-> of the virtual address (or guest physical) that are the offset into the physical
-> page, e.g. 11:0 for a 4kb page, 20:0 for a 2mb page.
-> 
+>> -	/* Omit PT_USER_MASK to allow tested host.CR4.SMEP=1. */
+>> -	pteval_t opt_mask = 0;
+>>  	int i = 0;
+>>  
+>>  	ac--;
+>>  	av++;
+>>  
+>> -	__setup_vm(&opt_mask);
+>> -
+>>  	if (!this_cpu_has(X86_FEATURE_SVM)) {
+>>  		printf("SVM not availble\n");
+>>  		return report_summary();
+>> @@ -453,3 +449,11 @@ int main(int ac, char **av)
+>>  
+>>  	return report_summary();
+>>  }
 >> +
->> +    assert(level >= 1 && level <= 4);
+>> +int main(int ac, char **av)
+>> +{
+>> +    pteval_t opt_mask = 0;
 > 
-> The upper bound should be NPT_PAGE_LEVEL, or root_level (see below).
-> 
->> +    for(l = NPT_PAGE_LEVEL; ; --l) {
-> 
-> Nit, need a space after "for".
-> 
-> Also, can you plumb in the root level?  E.g. have npt_get_pte() hardcode the
-> root in this case.  At some point this will hopefully support 5-level NPT, at
-> which point hardcoding the root will require updating more code than should be
-> necessary.
-> 
->> +        offset = (guest_addr >> (((l - 1) * NPT_PGDIR_WIDTH) + 12))
->> +                 & NPT_PGDIR_MASK;
-> 
-> Not your code (I think), but NPT_PGDIR_MASK is an odd name since it's common to
-> all.  The easiest thing would be to loosely follow KVM.  Actually, I think it
-> makes sense to grab the PT64_ stuff from KVM
-> 
-> #define PT64_BASE_ADDR_MASK (((1ULL << 52) - 1) & ~(u64)(PAGE_SIZE-1))
-> #define PT64_LEVEL_BITS 9
-> #define PT64_LEVEL_SHIFT(level) \
-> 		(PAGE_SHIFT + (level - 1) * PT64_LEVEL_BITS)
-> #define PT64_INDEX(address, level)\
-> 	(((address) >> PT64_LEVEL_SHIFT(level)) & ((1 << PT64_LEVEL_BITS) - 1))
-> 
-> 
-> and then use those instead of having dedicated NPT_* defines.  That makes it more
-> obvious that (a) SVM/NPT tests are 64-bit only and (b) there's nothing special
-> about NPT with respect to "legacy" 64-bit paging.
-> 
-> That will provide a nice macro, PT64_INDEX, to replace the open coded calcuations.
-> 
->> +        if (l == level)
->> +            break;
->> +        if (!(iter_pte & NPT_PRESENT))
->> +            return false;
-> 
-> Return "false" works, but it's all kinds of wrong.  This should either assert or
-> return NULL.
-> 
->> +        pt = (u64*)(iter_pte & PT_ADDR_MASK);
->> +    }
->> +    offset = (guest_addr >> (((l - 1) * NPT_PGDIR_WIDTH) + 12))
->> +             & NPT_PGDIR_MASK;
-> 
-> Hmm, this is unnecessary because the for-loop can't terminate on its own, it
-> can only exit on "l == level", and offset is already correct in that case.
-
+> Please use tabs, not spaces.  Looks like this file is an unholy mess of tabs and
+> spaces.  And since we're riping this file apart, let's take the opportunity to
+> clean it up.  How about after moving code to svm_npt.c, go through and replace
+> all spaces with tabs and fixup indentation as appropriate in this file?
 Hey Sean,
 
-Thank you so much for reviewing the code.
+Thank you for reviewing the code.
 
-I will work on the comments.
+I will work on the comments and fixing up the indentation.
 
-- Manali
+-Manali
+
+> 
+>> +
+>> +    __setup_vm(&opt_mask);
+>> +    return run_svm_tests(ac, av);
+>> +}
+>> diff --git a/x86/svm.h b/x86/svm.h
+>> index f74b13a..9ab3aa5 100644
+>> --- a/x86/svm.h
+>> +++ b/x86/svm.h
+>> @@ -398,6 +398,7 @@ struct regs {
+>>  
+>>  typedef void (*test_guest_func)(struct svm_test *);
+>>  
+>> +int run_svm_tests(int ac, char **av);
+>>  u64 *npt_get_pte(u64 address);
+>>  u64 *npt_get_pde(u64 address);
+>>  u64 *npt_get_pdpe(void);
+>> -- 
+>> 2.30.2
+>>
