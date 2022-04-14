@@ -2,100 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F49A50169D
-	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 17:50:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD4125016A0
+	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 17:50:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235734AbiDNPIW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 11:08:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34858 "EHLO
+        id S242957AbiDNPIe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 11:08:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350515AbiDNOW0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Apr 2022 10:22:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E8E6E1C131
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 07:14:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649945667;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uR52VEUgdLuIE+LY3/QpjNTmgRHtWU8OzOHA0XF4HA0=;
-        b=T1jTixnol/svmA3W+ew5lE5MBEJ6NT4DZ2jaB9xUJKoxbG0kNIYyFokPxlN1qykF4BKPpz
-        jQKOqaMIY/Q54l6a6CgcAZw/DL/VJOU8j5SkRRZenBIHbbMXQYjSb+YRRRIframkt1QRhl
-        DkGC0JbDNYwxud4z02uzQwvkUaGAT5A=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-42-OLyxlm68NXu5ItxVBQFgjQ-1; Thu, 14 Apr 2022 10:14:25 -0400
-X-MC-Unique: OLyxlm68NXu5ItxVBQFgjQ-1
-Received: by mail-ed1-f70.google.com with SMTP id cz22-20020a0564021cb600b0041d7e11fbfeso3107313edb.18
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 07:14:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=uR52VEUgdLuIE+LY3/QpjNTmgRHtWU8OzOHA0XF4HA0=;
-        b=Q7Atms7hWhqFGtS9ARZUnjn+n2m5qV5SM+RWnwG3tc5JJcCISA57Zf5YbgiBzix+BR
-         YEMVnXfrjkXuux7aguul3NpRo4M5xOx1GyTLnNrWiFuIUo1tizGodKp5Jrygfg/8VBFG
-         NPntOH++uQz8eptpLEY9hFP35AZGU7pk24cuJY0AopWk6KK6YnNcmKlLSkstLS5e7MvF
-         D7dTCn5Wi5Uxt6p3i16G+14giCD49Uv824Oja3zgsO3ReGsL8xfR7WPJlH0pzuoOdfP1
-         XjkF5VqRMnK+OUxICoMWXp5i71JREXAEa8hP0cdcLbrN1NlBkodzWGe6zUNbP4L3f073
-         JkNQ==
-X-Gm-Message-State: AOAM531BPK4Kq8eh24QVcRR2H76jTBF3sNyWdnJughHVXD37aMmJsKt4
-        zp1n0EwwaR8ZWHBYXKsY2IOQAU8+KqsoRYQbSRrqwvmVqsXPyEEXJDc7QFPlqnLERdP57Ji+Rqe
-        3Z5HHm493IP6F
-X-Received: by 2002:a17:907:60d4:b0:6e8:7121:3c80 with SMTP id hv20-20020a17090760d400b006e871213c80mr2524221ejc.352.1649945664680;
-        Thu, 14 Apr 2022 07:14:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxgVLYzoVDiUfeqSoyRwO1FqdqEBRnjqijOHeNVeW+ly2ZzZPVOmYJjIYonFaZCShzsE51Lfg==
-X-Received: by 2002:a17:907:60d4:b0:6e8:7121:3c80 with SMTP id hv20-20020a17090760d400b006e871213c80mr2524198ejc.352.1649945664413;
-        Thu, 14 Apr 2022 07:14:24 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id o17-20020a056402439100b0041938757232sm1125687edc.17.2022.04.14.07.14.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Apr 2022 07:14:23 -0700 (PDT)
-Message-ID: <bf15209d-2c50-9957-af24-c4f428f213b1@redhat.com>
-Date:   Thu, 14 Apr 2022 16:14:22 +0200
+        with ESMTP id S1351789AbiDNObe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Apr 2022 10:31:34 -0400
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam07on2082.outbound.protection.outlook.com [40.107.212.82])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E424BBD2D9;
+        Thu, 14 Apr 2022 07:22:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=B9HF1QSrQrAWvK1rbDFden1Lvtni6a40IHGbIBnNM72TSQr23ZhAsHKYM+gRbPI9s48N3mnVZFgirMJ4rqRkthPAdKeLg1rNGRmADfVA2LHfGz8LQrPIN6yVHY5Igq09rYznNNnNl7GZaVYUZQnLqXjPVLW3tX//McXxUR1/YNkEduLWFi6iVlvyC+/YtbMRfDd90ngANQCR1BETMMLOLjUSEqk1kuwUslWYkzqIkWehgWu2UBR1uNkTKK9cdO6mJaOU1nCSAxK3XPg4esvDmgLnjxI4UYCX/PVIZiNHEiv9mrB2QdgeoBkKJJ9XlSudLMmdD/dQug2NT5ApQBzKOg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NBtE58AiItvf5ISGf18XoZaN7Sl1IptLNoQwwc15Y1Q=;
+ b=UaOkqtKzId+N4jO3keSpmZKrN2pHtRWvy1uXcO057OcVqgyNLZlzRXky1T5MHV+Oe4gL5PwL3anHo1OOucT2EUHltMKj5XorTjIg7+V7v9tSbUzBjfN47jsHz5+Trg8+dPRsCpG2bBDFqxyPZJcPa3oUaaLC5I/hSGaWlFTS4swGHCe0VPjLVqBDe6zh6mvOlnIw3rG373YjQXQGIezA/NLT0AVCWXFhLxoHhtHTA3uYtLyFDnD8n/JC9Avn6DJa2hH06dijkwnQBofTfIeo22/CGhs5w85rWVL/IMD3p6pKuzqk8Zz27AXGKJYzDf8L/r/kowpQioy+MqsrN8j1wg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NBtE58AiItvf5ISGf18XoZaN7Sl1IptLNoQwwc15Y1Q=;
+ b=d1ttDyT0Drxzd1MhBKxTzbxlPc/n6zUCe9Y5/gpaCtAcGlPDKPQuU4DQYBzp0+umt2pL9LT6Vr+xHTFfj4cMfGfmweuLg6vyR+3S0ooJoYQao4PlsrNhtFH5s2UShzxln5t7uWGDlG+8xkRpyRbJZSAmWqUK/+R1yf3EBEwmgqCL8vZ9pTpMwuPTJ6V2dZJZBcs2aKX/2Fd3DypGMmneXDNZrBxdppvzCwns6prdJX18qc5EX5HwsHBwcuIoh+wRL+/OkAu+ztUoncyEC1gmxKWSwqkiFmPv34On4P0lZbVFEjsBx7ouuf4turknfLE6J0VUAKnx169AkhpZEKUVNg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by DM6PR12MB3963.namprd12.prod.outlook.com (2603:10b6:5:1cd::29) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5144.29; Thu, 14 Apr
+ 2022 14:22:12 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2%5]) with mapi id 15.20.5164.020; Thu, 14 Apr 2022
+ 14:22:11 +0000
+Date:   Thu, 14 Apr 2022 11:22:10 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH 9/9] vfio: Remove calls to vfio_group_add_container_user()
+Message-ID: <20220414142210.GE2120790@nvidia.com>
+References: <9-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
+ <d6e2778a-01e4-6468-2c2b-3b718d924e65@linux.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d6e2778a-01e4-6468-2c2b-3b718d924e65@linux.ibm.com>
+X-ClientProxiedBy: BL1PR13CA0299.namprd13.prod.outlook.com
+ (2603:10b6:208:2bc::34) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH] kvm: selftests: Fix cut-off of addr_gva2gpa lookup
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Peter Xu <peterx@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Andrew Jones <drjones@redhat.com>
-References: <20220414010703.72683-1-peterx@redhat.com>
- <Ylgn/Jw+FMIFqqc0@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Ylgn/Jw+FMIFqqc0@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d0e7c7ef-4c73-4f2f-1251-08da1e222a6e
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3963:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR12MB39632998BA9FAC233FBBB78BC2EF9@DM6PR12MB3963.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: NnSw3xtuxx8zY/pZfbCsgJ3JQylsmvmaVKrLBj8Wf1lBKiNd7S8hjR5CJXK7D7oUgrm11wb+ta4Fji0GOfjrYoc16Y1rlC5OoY1fyIugpXl+cH9V4y4Y4u3XpNJ7GYUroTYr7l7gdRt8BEUX3XVTGgrOB7jD9jlOizrSTyAfx1YPXJka+4FFDVZhakobWrY+LWf3weLpPT8eyAcVzapDdpTtAMTFpeMGNAX0QKeJNS8Y5UB7pD9FGodkEvbkgsKHpKidkOv3Aa73MFwUcNHh4jV5tMKXN1Kuzb/NeR5dP9RoIqSKbzsJoh4hb47O3l/ABo4FligPcl3vvZWU8uEA4HEiLAYaGP39wD+PZUhBjTWk8lk432P2wHduhTk+HVC9dj0noiWkFh/kVByeP+wpE0URchHbAzxqS3mUyT7cb9SFGITxjJx0PTc1PfSPZ4e8fVzihi4b5Cin6OERoB1syYo3qlZRvzd6ndQbgk4VMMQGRp965RobDQNjDyvT8baE0C8fXzgtA2BVpRJdXVC+nXQMbFpmBVA2j8Xz5PjJBUgbDqnYLVHwoxhw5gYo5PdbkFvqWxuEkD64r1lNKUy0DooXBrLSn77dLnT+l7mtNArcyLVTsO34pVTVAfzoFNk2Z814J2oNxyBxSs0j8fHXCQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(4326008)(1076003)(316002)(6486002)(53546011)(8936002)(7406005)(38100700002)(86362001)(36756003)(33656002)(508600001)(6916009)(54906003)(2616005)(26005)(186003)(66556008)(66476007)(66946007)(8676002)(83380400001)(6512007)(6506007)(2906002)(5660300002)(7416002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?cY5TA5GkdVCLfMfxCsGcU/B1frm/RvN2VD8lNlHBaYiKTVnzyeoQ6ymjgEUj?=
+ =?us-ascii?Q?FfaaZ2Vg9tlceok7vOJs4nG7b1gokZusD2LL+vOxk1yfQzU/bJAmMmpA+z1K?=
+ =?us-ascii?Q?Cpko/f829HeRqYAWg9DWI74+mzld9f8jzwk1hvkvTRXyb5tUVU3SnZQfZKr1?=
+ =?us-ascii?Q?vJLVG4YEr1noCnYaFWiwKLZAggQynKKBq8ixUBKkOvNU/26VMjJ0lw2s7yJ5?=
+ =?us-ascii?Q?PqKrrEidPyR+SmnNRr/ydrv9Djo56sHXCXY9NTHipyowSzO5n1QM6I9GQF9G?=
+ =?us-ascii?Q?cWKthPV43tvApYGTX9wkpcNSQBSGrrIubkfnRGa5Q8hnpXw8dkWr7N2scYVW?=
+ =?us-ascii?Q?qWbPnh91ODU4StwY5L3/a53Lz2G0HD40dwfWWxUnRVe5xXmWra1yvW3zpZoJ?=
+ =?us-ascii?Q?W1zllVj7ddzXEvSdHopL+YGyPix8LQp0UrEjh8obt62m1+6L1kVrW6OYEBbc?=
+ =?us-ascii?Q?pAhqad7909QrwpzpgIzIIVyCGRxMPiPV3RDWnkflwL8vpBSSNuO4eJnsD2zE?=
+ =?us-ascii?Q?NDMom4nfPtEAzVEr9g6D/YdPjgIpN/6Kl2elKnqOJ4L+2Na4brTRJ/fAf5u2?=
+ =?us-ascii?Q?lW4CUGjUL6ET6pO7RvyuAiRLAvkU2+m0ikEJgjT7D9n+6dbWFlMyeZ66tUnF?=
+ =?us-ascii?Q?z4R3n2OeMnBYub8Wcnh6JxNjUzprTANASTNO/6Sp+M7S5jtzLWgbJ8iekuNQ?=
+ =?us-ascii?Q?QnGrregbcQ+4TWALXyt/5MGY8JopN90Cnzsq+cmccwGC23y6dAGt/Xo2Lvlu?=
+ =?us-ascii?Q?k+48qRfffy72C8jDngg5f2k4qUA110xIpONneFMq1EJlUr2UrW1TUHV7jJ1k?=
+ =?us-ascii?Q?pNccxqLjD2eXL6Aq+KrDmsHzg2fb4iSmgaeejZzu9/GFKkjO2x8MuSPxefjt?=
+ =?us-ascii?Q?WJxdqzsLV5pVb0b5ptTVqN8ksBzXUtiQJs5kXg2SuY29Vq4lKsoBThVmFv91?=
+ =?us-ascii?Q?HbFPQnSz91bStZJk07mgxEaKfoRTs6gZ3kpIzEsZVH8+CqV7x+2oWahrOq8+?=
+ =?us-ascii?Q?Q/djHk7rTyMmz7v5vUjI8YSjgSUstJXwfxtROm1kMP5K1qW6NEuqVtBnDr9x?=
+ =?us-ascii?Q?VfRRc9CZxID0l9etJp7SW3qU2zXgW3DWgLWFbqsCef1fb2Yz9onAvWMwmCnF?=
+ =?us-ascii?Q?SOw/SFy5Ci2hRqgMLuMa7mUey2j0/8sv2tPK0jUMN+rawxfpXygvcW3IYVwn?=
+ =?us-ascii?Q?v9ND56/9cvXVzkmHzWTWWwrzj7njAL3ek0UHSoodWiqUyfwBxj/tm1Pvnzl4?=
+ =?us-ascii?Q?K+7aNWPc5gLquxkfoibAcMHK7Bpc0mVPu7t5Ejm4px9a7OyLxAGm15IUKPGr?=
+ =?us-ascii?Q?qvlR0JAxi17rrUf3D42a847uFenqYnf4Rs5r+Mc8WyU8z/sPY1+CtjfBwJhm?=
+ =?us-ascii?Q?nqLfGVcNrvXLFuJXqo8cTEJb5oCRadCd94f6T/D8vVvqqUH/VA+wChIkdNXn?=
+ =?us-ascii?Q?tNSAodo7U6D9tBzPihiby+ybNwAAswfsUak/LKbwn/VwZJy+1QxQpxfJyhfK?=
+ =?us-ascii?Q?+8fjqZkeILBP5XE2kBFwldlQlUONZFFm/Bn7J0KSeUm2b+jBL1bQ2SmaqANc?=
+ =?us-ascii?Q?uVBhhPlIzcj6C/NnyTecAATVUlc+fydV7UpAcQbMDpqUsg5Gt0n1ftqcF/0H?=
+ =?us-ascii?Q?2BAvtfzwCkCBcvZytQomX7UtxQGdjg+NsLOr/u2LykvKEX+2+k7ydNpueeDM?=
+ =?us-ascii?Q?KRKrKirq1eNQHUva+kCLevbTJ0f6h33fOoAGHHb3lMoF522csCmkVsagUogO?=
+ =?us-ascii?Q?VFzJiqLoSg=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d0e7c7ef-4c73-4f2f-1251-08da1e222a6e
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2022 14:22:11.7174
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gNfsiYsQbosfbbxGrSgR1kP5TETWqFyozEONrarC5wk80wbixkT6z7n7qgguR4zC
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3963
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/14/22 15:56, Sean Christopherson wrote:
->> -	return (pte[index[0]].pfn * vm->page_size) + (gva & 0xfffu);
->> +	return ((vm_paddr_t)pte[index[0]].pfn * vm->page_size) + (gva & 0xfffu);
-> This is but one of many paths that can get burned by pfn being 40 bits.  The
-> most backport friendly fix is probably to add a pfn=>gpa helper and use that to
-> place the myriad "pfn * vm->page_size" instances.
+On Thu, Apr 14, 2022 at 09:51:49AM -0400, Matthew Rosato wrote:
+> On 4/12/22 11:53 AM, Jason Gunthorpe wrote:
+> > When the open_device() op is called the container_users is incremented and
+> > held incremented until close_device(). Thus, so long as drivers call
+> > functions within their open_device()/close_device() region they do not
+> > need to worry about the container_users.
+> > 
+> > These functions can all only be called between
+> > open_device()/close_device():
+> > 
+> >    vfio_pin_pages()
+> >    vfio_unpin_pages()
+> >    vfio_dma_rw()
+> >    vfio_register_notifier()
+> >    vfio_unregister_notifier()
+> > 
+> > So eliminate the calls to vfio_group_add_container_user() and add a simple
+> > WARN_ON to detect mis-use by drivers.
+> > 
 > 
-> For a true long term solution, my vote is to do away with the bit field struct
-> and use #define'd masks and whatnot.
+> vfio_device_fops_release decrements dev->open_count immediately before
+> calling dev->ops->close_device, which means we could enter close_device with
+> a dev_count of 0.
+> 
+> Maybe vfio_device_fops_release should handle the same way as
+> vfio_group_get_device_fd?
+> 
+> 	if (device->open_count == 1 && device->ops->close_device)
+> 		device->ops->close_device(device);
+> 	device->open_count--;
 
-Yes, bitfields larger than 32 bits are a mess.
+Yes, thanks alot! I have nothing to test these flows on...
 
-Paolo
+It matches the ordering in the only other place to call close_device.
 
+I folded this into the patch:
+
+diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+index 0f735f9f206002..29761f0cf0a227 100644
+--- a/drivers/vfio/vfio.c
++++ b/drivers/vfio/vfio.c
+@@ -1551,8 +1551,9 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
+ 
+ 	mutex_lock(&device->dev_set->lock);
+ 	vfio_assert_device_open(device);
+-	if (!--device->open_count && device->ops->close_device)
++	if (device->open_count == 1 && device->ops->close_device)
+ 		device->ops->close_device(device);
++	device->open_count--;
+ 	mutex_unlock(&device->dev_set->lock);
+ 
+ 	module_put(device->dev->driver->owner);
+
+Jason
