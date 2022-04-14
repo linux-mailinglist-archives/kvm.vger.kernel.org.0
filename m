@@ -2,111 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A1C6A5016A3
+	by mail.lfdr.de (Postfix) with ESMTP id 1103B5016A1
 	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 17:50:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244871AbiDNPI6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 11:08:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39676 "EHLO
+        id S240818AbiDNPIz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 11:08:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354784AbiDNOmh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Apr 2022 10:42:37 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00F3FBF75
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 07:39:36 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id h15-20020a17090a054f00b001cb7cd2b11dso5840528pjf.5
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 07:39:36 -0700 (PDT)
+        with ESMTP id S1354223AbiDNOzI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Apr 2022 10:55:08 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99F11DBD28
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 07:42:59 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id mp16-20020a17090b191000b001cb5efbcab6so9477722pjb.4
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 07:42:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=gJ8pcz3Yaw1gKMnr6f7nkiOA+qMs14RS4sjJplU0gjM=;
-        b=R4JJPAxBiFl6PYRwZGRkCFzqF4VwdjE3sCH/tcEdYlbUlKE40ftv4JdLWisRcFdYD+
-         ZLPXO8yK68lWcdip9fPvd539XPVr0LDMwcHJYld7xq+NTMqK4zO/fBnRDPY4ReezcpiT
-         JdwrQMgNMvGbpSuS30JR74qg3aQuKtF2S2RQYN1PhbM0k3BNLsaBiv45OV5UWZagEa4u
-         Jr/VESJVUOAcZAQr/ZCswkJRgxe1UdqlQiNNfmilwIZIwDOp5tfmoIHRHxAvjoNxXnN+
-         EQ1InC2XexhkzFjVnN9GiHdeciEeyR+KRFdB1lWMlL1esYJgtlNQfvZN9wS2wH7Tk5On
-         Io6w==
+        bh=qwcuBgImCmXIPh4KovD6yz7yJbjBcIk++srxxrgHoVk=;
+        b=PqcPSgK5KCFX0ypEAiiuQ48djSg+e6hRlUoxyQKm5+csfnsgcYel8pbIACDPKdIjKR
+         iHjm7BMJeqGyI/nEfPUqUFojs9W5pKDLHiOS5tTpfTgnzcLHRbQoPplRp4MSG2FubYVv
+         KJ/sOzMF9j6eDYKI9fm40PvgwjEB8UXsEx0pOCKujwLNY528/tgdDAs2+HcUzJ46A7Mk
+         b9kflZvhS0PZbSS+HVeVy4/Zjud0oNXTtCGCdZ8zs7rXuSahBGjWZIxMibg0vEHnJxav
+         6HrSLaAsH5Cugsnm62jDxshYpQ46yXTkT2wfGTJk4FYp3Tsukla7/SlJG3Ud0J9oGyjG
+         PSPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=gJ8pcz3Yaw1gKMnr6f7nkiOA+qMs14RS4sjJplU0gjM=;
-        b=olGC5ombSv2X+Jh+3+1EhV+x7nlguuMox652s8FOsuDiU9K3LeUqvd/62k50JGxU5u
-         NhSON3ldclosoW5qu6x2pbJ3rUPGINKmT0UL4rzmEpRLUa+iCzZXPsVl9ByO8yAOFHAE
-         edYFHUOeTXqKeLGJb6/ZZ3Yf26ECWtaRiVBPf6xgj7oESFpWyfz9dPI7U7bmrtgs1Quk
-         CHybMJIbecHPzrD4dBK3hd2KG0OIi2sX7oiSjtyF+DHF9ExIZaco9Tgu6CYGMpYnI7Uw
-         AyMTNQTeXnys2gNojo0a3gPmy5JWtvICZlhe+F117/22b5XhMEkeTCx+VzMDLM9zG+li
-         ZW/w==
-X-Gm-Message-State: AOAM532UQOpyHoIAj5dnWPMr7Gd7wtcGmqhPtyXWXWRtx8K7orZy+4MB
-        TR7r1wtWxrJaIT91foeOa3vUienGn8R77w==
-X-Google-Smtp-Source: ABdhPJyQhgIYo4iouGyYUQ+Q7Nt/zlHN4/wmdz2jjSvmkYXLB9lHmvXGarXlMm7Az348QWDplNeaIw==
-X-Received: by 2002:a17:903:110c:b0:14d:8859:5c8 with SMTP id n12-20020a170903110c00b0014d885905c8mr47115691plh.156.1649947176324;
-        Thu, 14 Apr 2022 07:39:36 -0700 (PDT)
+        bh=qwcuBgImCmXIPh4KovD6yz7yJbjBcIk++srxxrgHoVk=;
+        b=1vHc3gZ+fk63vUgDx9ZjrqgkyHEDofgKCzrTDNY6AusFL5303pGTYffj0SC1lxB259
+         ggPd5NGmi/XdTxNwRfbGDzZV9nnnw6kFg7l/aBqP0mGP2aLkufAUCkHg/rhTZJkVXT1C
+         xe2wPEYeD7YPXvm9C9rWmrUGeJtWHVj9sTD71v90/fTGT4mHMspu744fp96XiAnq7Zb2
+         Av7LNxdDpTfysL4r65+hNCVPn6wx1xQevOvUKKM4xxLbx+rHuloZH2lAzmJEENxMeGyB
+         No7dKGpySq0E2N2wvtgu45ex8eyqNupxhxDNwcL+Z0lVLY3wiD89QUIxPsDk405uyN1S
+         LtBA==
+X-Gm-Message-State: AOAM532PjTyhwOIfRktEihMQ3jdjhwGrn7pAAT6qRjBiC2KSFNdRrgFf
+        fDyOLV7BDP1DZNQkJnK3x1DOX/Mu6+nwrA==
+X-Google-Smtp-Source: ABdhPJy2PeIS61cClFOl7u9zD2LzLkl4mWHXZ+aCyR9ZnSEJKTwasVdmpha8K+eK6URzneRvPCXonQ==
+X-Received: by 2002:a17:902:ecc1:b0:158:6e96:83a7 with SMTP id a1-20020a170902ecc100b001586e9683a7mr18008752plh.79.1649947378972;
+        Thu, 14 Apr 2022 07:42:58 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id p10-20020a056a0026ca00b004fb44e0cb17sm178299pfw.116.2022.04.14.07.39.35
+        by smtp.gmail.com with ESMTPSA id e12-20020a056a0000cc00b00508343a6f9esm194233pfj.5.2022.04.14.07.42.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Apr 2022 07:39:35 -0700 (PDT)
-Date:   Thu, 14 Apr 2022 14:39:32 +0000
+        Thu, 14 Apr 2022 07:42:58 -0700 (PDT)
+Date:   Thu, 14 Apr 2022 14:42:54 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Colin Ian King <colin.i.king@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Lai Jiangshan <jiangshanlai@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        Jonathan Corbet <corbet@lwn.net>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: VMX: make read-only const array vmx_uret_msrs_list
- static
-Message-ID: <YlgyJPRVNCe4w8q3@google.com>
-References: <20220414100720.295502-1-colin.i.king@gmail.com>
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        linux-doc@vger.kernel.org
+Subject: Re: [RFC PATCH V3 3/4] KVM: X86: Alloc role.pae_root shadow page
+Message-ID: <Ylgy7tnQAKqyV22K@google.com>
+References: <20220330132152.4568-1-jiangshanlai@gmail.com>
+ <20220330132152.4568-4-jiangshanlai@gmail.com>
+ <YlXrshJa2Sd1WQ0P@google.com>
+ <CAJhGHyD-4YFDhkxk2SQFmKe3ooqw_0wE+9u3+sZ8zOdSUfbnxw@mail.gmail.com>
+ <683974e7-5801-e289-8fa4-c8a8d21ec1b2@redhat.com>
+ <CAJhGHyCgo-FEgvuRfuLZikgJSyo7HGm1OfU3gme35-WBmqo7yQ@mail.gmail.com>
+ <658729a1-a4a1-a353-50d6-ef71e83a4375@redhat.com>
+ <CAJhGHyDYeQGUWmco=c4TA1uu=33ccW7z0fDLuYjvkGFW5WnDSQ@mail.gmail.com>
+ <77699a19-65bd-5088-2f25-1be59364f5ee@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220414100720.295502-1-colin.i.king@gmail.com>
+In-Reply-To: <77699a19-65bd-5088-2f25-1be59364f5ee@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 14, 2022, Colin Ian King wrote:
-> Don't populate the read-only array vmx_uret_msrs_list on the stack
-> but instead make it static. Also makes the object code a little smaller.
-
-Why not put it on the stack?  It's an __init function, i.e. called once in the
-lifetime of kvm-intel.ko, isn't all that big, and is certainly not performance
-critical.  And making it static begs the question of whether or not the data gets
-thrown away after init, i.e. this might consume _more_ memory once KVM has reached
-steady state.
-
-> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, Apr 14, 2022, Paolo Bonzini wrote:
+> On 4/14/22 13:06, Lai Jiangshan wrote:
+> > > Right, but then load_pdptrs only needs to zap the page before (or
+> > > instead of) calling kvm_mmu_free_roots().
+> > > 
+> > 
+> > Guest PAE page is write-protected instead now (see patch4) and
+> > kvm_mmu_pte_write() needs to handle this special write operation
+> > with respect to sp->pae_off (todo).
+> > And load_pdptrs() doesn't need to check if the pdptrs are changed.
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index c654c9d76e09..36429e2bb918 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7871,7 +7871,7 @@ static __init void vmx_setup_user_return_msrs(void)
->  	 * but is never loaded into hardware.  MSR_CSTAR is also never loaded
->  	 * into hardware and is here purely for emulation purposes.
->  	 */
-> -	const u32 vmx_uret_msrs_list[] = {
-> +	static const u32 vmx_uret_msrs_list[] = {
->  	#ifdef CONFIG_X86_64
->  		MSR_SYSCALL_MASK, MSR_LSTAR, MSR_CSTAR,
->  	#endif
-> -- 
-> 2.35.1
-> 
+> Write-protecting the PDPTR page is unnecessary, the PDPTRs cannot change
+> without another CR3.  That should be easy to do in account_shadowed and
+> unaccount_shadowed
+
+Technically that's not true under SVM?
+
+  Under SVM, however, when the processor is in guest mode with PAE enabled, the
+  guest PDPT entries are not cached or validated at this point, but instead are
+  loaded and checked on demand in the normal course of address translation, just
+  like page directory and page table entries
