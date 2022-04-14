@@ -2,382 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BDBE1501BE7
-	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 21:27:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 088E1501BFF
+	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 21:34:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345571AbiDNT3H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 15:29:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37216 "EHLO
+        id S1345678AbiDNTgU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 15:36:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234975AbiDNT3A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Apr 2022 15:29:00 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9549E338E;
-        Thu, 14 Apr 2022 12:26:34 -0700 (PDT)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23EH8IU8015720;
-        Thu, 14 Apr 2022 19:26:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=ozm7ObVk9+dmufRZapWVOwMVGMWLWKlEXppBnJWoflE=;
- b=MGLO55jPGvwihfaFDaSwwejN6qf//k0YAChtN6/8N4qE04nhdYSP9y31Qj4rfcRz/CMg
- 0BEahHC9Fjb4RfTdMix3h5DhRd4/eqJOAS8wOfGfp+dvOAk/4BH81i0wrVNkfcFg4PTt
- lcnHK0bjoHtwXgjDS99tBcmquO6L1G3pUuBOarlWWVK4/Q0m+U3mWU5cGm7+MVx+5MnQ
- AglPibbAlgETll38WNKozchQt4Kjk+Vyek96CC4EuiO/+0LUNF3ljLSm7ojoEK1Py2B6
- jHK+qDr8m8ofhI9drdFzMXnNWfTFVvQbWmzh1kofvIE6/XAP7da2sPFnozf2bu/TJxvn rg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fefydd057-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Apr 2022 19:26:22 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23EJH0lv007797;
-        Thu, 14 Apr 2022 19:26:22 GMT
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fefydd051-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Apr 2022 19:26:22 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23EJIChX024952;
-        Thu, 14 Apr 2022 19:26:21 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
-        by ppma02dal.us.ibm.com with ESMTP id 3fb1sabjp7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Apr 2022 19:26:21 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23EJQKoQ25100588
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 14 Apr 2022 19:26:20 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 02C89AE060;
-        Thu, 14 Apr 2022 19:26:20 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 25C80AE05C;
-        Thu, 14 Apr 2022 19:26:13 +0000 (GMT)
-Received: from farman-thinkpad-t470p (unknown [9.211.52.116])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 14 Apr 2022 19:26:12 +0000 (GMT)
-Message-ID: <f9d4fb48ccee8ffa70caadf88f143bd91fcfc05e.camel@linux.ibm.com>
-Subject: Re: [PATCH 3/9] vfio/mdev: Pass in a struct vfio_device * to
- vfio_pin/unpin_pages()
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Date:   Thu, 14 Apr 2022 15:26:11 -0400
-In-Reply-To: <3-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
-References: <3-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: uZq8aBCvvRiYB0aEQrrVOKYqDxG7Xk9n
-X-Proofpoint-ORIG-GUID: 93JfTwHUje5lundOnEzqRFuD3bDlU-bs
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-14_05,2022-04-14_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- mlxscore=0 malwarescore=0 spamscore=0 priorityscore=1501 suspectscore=0
- impostorscore=0 mlxlogscore=999 clxscore=1015 phishscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204140100
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S1345497AbiDNTgT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Apr 2022 15:36:19 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8578ECD81
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 12:33:53 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id i184so5143934pgc.2
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 12:33:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=mP5Aa4ykeeVU9mNG8VJvuNMmCyx3vEV7eSR03zqaS3k=;
+        b=GzR4JqRK7UXrefwCbzGPvShKTWz2eVIUpKLZjHfRR5O9h+f7aHy51Vb910lWts0Eaj
+         aOl3uPUWhOgG98suuMP0AESfChP7wlEVmJkKFfCJREpWap6PDdNgdsFB8yQ9MECYUx6F
+         JTUMcBEeQ4pIBLGinr2tTAI0qj5P5ErV6Y52Z/jE8/iaiT+zWOYjXKKhFTSyQW3MAbbp
+         X/a807R1Z1gSsjmn+jfGLYuYszF+BElidCZhh0mwtpvZ/0GsK+ra9PNuhQ7K6L+cEwwh
+         KasHojtzDCNhgeW2qJILuEdDkHcbynjyLVpQ7vqA+ylY/BvzoSuZDyVoBdijN274QIkd
+         gHbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=mP5Aa4ykeeVU9mNG8VJvuNMmCyx3vEV7eSR03zqaS3k=;
+        b=dxagRL3xwhojpNPttNVADOCmIyn63sTX2X3xUmZi/Z3x+GcRjoUHl2KvDNzziGHII6
+         7Ux4SUAf9Uws3m7OE5I+GPkLvddS/9lvVmRKpUBRWHJm10Akw+wK4b5lpeZg9HgmuSAK
+         iQzJpqXF9h7H45pYQA0fcBSRrB0mOpHNKBQ7UF2DMQY0lhysrNqbNVtuc/b4j5Fp3NXF
+         PAlqsOYt4wa8JUgupF6lFs9WBoBkX6lTf4Gkvbo/R6Eeg45AnVj98OVGzDnSQolNrAkW
+         aYnLTuLjNrod02aGKjTeYd3t6RZctwyOpuGdJNJTay7BA3Q/GkZA9jkSVoqAbOABjCUE
+         ysjw==
+X-Gm-Message-State: AOAM530SG7NDogo37jHmPwArtm4SXLSDYSW+gVtJZXGTFs9zwEIHgS04
+        YH58OQsPp4SUH1w9a1ojEYCJ7w==
+X-Google-Smtp-Source: ABdhPJxtMNQD7SBVfDF4PQFvP16KBmcXDYKZTTnwtfIZ8IP/TTSeV+RPTKmQguF019UYofBSgvRYvg==
+X-Received: by 2002:a05:6a00:2290:b0:4fa:a99e:2e21 with SMTP id f16-20020a056a00229000b004faa99e2e21mr5415796pfe.20.1649964833145;
+        Thu, 14 Apr 2022 12:33:53 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id a15-20020a62e20f000000b00508363eee44sm593216pfi.219.2022.04.14.12.33.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Apr 2022 12:33:52 -0700 (PDT)
+Date:   Thu, 14 Apr 2022 19:33:48 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Anton Romanov <romanton@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH] KVM: x86: Use current rather than snapshotted TSC
+ frequency if it is constant
+Message-ID: <Ylh3HNlcJd8+P+em@google.com>
+References: <20220414183127.4080873-1-romanton@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220414183127.4080873-1-romanton@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-04-12 at 12:53 -0300, Jason Gunthorpe wrote:
-> Every caller has a readily available vfio_device pointer, use that
-> instead
-> of passing in a generic struct device. The struct vfio_device already
-> contains the group we need so this avoids complexity, extra
-> refcountings,
-> and a confusing lifecycle model.
-> 
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  .../driver-api/vfio-mediated-device.rst       |  4 +-
->  drivers/s390/cio/vfio_ccw_cp.c                |  6 +--
->  drivers/s390/crypto/vfio_ap_ops.c             |  8 ++--
->  drivers/vfio/vfio.c                           | 40 ++++++-----------
-> --
->  include/linux/vfio.h                          |  4 +-
->  5 files changed, 24 insertions(+), 38 deletions(-)
++Vitaly
 
-For the -ccw bits:
+On Thu, Apr 14, 2022, Anton Romanov wrote:
+> Don't snapshot tsc_khz into per-cpu cpu_tsc_khz if the
+> host TSC is constant, in which case the actual TSC frequency will never
+> change and thus capturing TSC during initialization is
+> unnecessary, KVM can simply use tsc_khz.
+> This value is snapshotted from
+> kvm_timer_init->kvmclock_cpu_online->tsc_khz_changed(NULL)
 
-Acked-by: Eric Farman <farman@linux.ibm.com>
+Nit, please wrap changelogs at ~75 chars.  It's not a hard rule, e.g. if running
+over or cutting early improves readability, then by all means.  But wrapping
+somewhat randomly makes reading the changelog unnecessarily difficult.
 
-> 
-> diff --git a/Documentation/driver-api/vfio-mediated-device.rst
-> b/Documentation/driver-api/vfio-mediated-device.rst
-> index 9f26079cacae35..6aeca741dc9be1 100644
-> --- a/Documentation/driver-api/vfio-mediated-device.rst
-> +++ b/Documentation/driver-api/vfio-mediated-device.rst
-> @@ -279,10 +279,10 @@ Translation APIs for Mediated Devices
->  The following APIs are provided for translating user pfn to host pfn
-> in a VFIO
->  driver::
->  
-> -	extern int vfio_pin_pages(struct device *dev, unsigned long
-> *user_pfn,
-> +	extern int vfio_pin_pages(struct vfio_device *vdev, unsigned
-> long *user_pfn,
->  				  int npage, int prot, unsigned long
-> *phys_pfn);
->  
-> -	extern int vfio_unpin_pages(struct device *dev, unsigned long
-> *user_pfn,
-> +	extern int vfio_unpin_pages(struct vfio_device *vdev, unsigned
-> long *user_pfn,
->  				    int npage);
->  
->  These functions call back into the back-end IOMMU module by using
-> the pin_pages
-> diff --git a/drivers/s390/cio/vfio_ccw_cp.c
-> b/drivers/s390/cio/vfio_ccw_cp.c
-> index af5048a1ba8894..e362cb962a7234 100644
-> --- a/drivers/s390/cio/vfio_ccw_cp.c
-> +++ b/drivers/s390/cio/vfio_ccw_cp.c
-> @@ -103,13 +103,13 @@ static int pfn_array_pin(struct pfn_array *pa,
-> struct vfio_device *vdev)
->  {
->  	int ret = 0;
->  
-> -	ret = vfio_pin_pages(vdev->dev, pa->pa_iova_pfn, pa->pa_nr,
-> +	ret = vfio_pin_pages(vdev, pa->pa_iova_pfn, pa->pa_nr,
->  			     IOMMU_READ | IOMMU_WRITE, pa->pa_pfn);
->  
->  	if (ret < 0) {
->  		goto err_out;
->  	} else if (ret > 0 && ret != pa->pa_nr) {
-> -		vfio_unpin_pages(vdev->dev, pa->pa_iova_pfn, ret);
-> +		vfio_unpin_pages(vdev, pa->pa_iova_pfn, ret);
->  		ret = -EINVAL;
->  		goto err_out;
->  	}
-> @@ -127,7 +127,7 @@ static void pfn_array_unpin_free(struct pfn_array
-> *pa, struct vfio_device *vdev)
->  {
->  	/* Only unpin if any pages were pinned to begin with */
->  	if (pa->pa_nr)
-> -		vfio_unpin_pages(vdev->dev, pa->pa_iova_pfn, pa-
-> >pa_nr);
-> +		vfio_unpin_pages(vdev, pa->pa_iova_pfn, pa->pa_nr);
->  	pa->pa_nr = 0;
->  	kfree(pa->pa_iova_pfn);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 547ba00ef64f..4ae9a03f549d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -2907,6 +2907,19 @@ static void kvm_update_masterclock(struct kvm *kvm)
+>  	kvm_end_pvclock_update(kvm);
 >  }
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c
-> b/drivers/s390/crypto/vfio_ap_ops.c
-> index 69768061cd7bd9..a10b3369d76c41 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -124,7 +124,7 @@ static void vfio_ap_free_aqic_resources(struct
-> vfio_ap_queue *q)
->  		q->saved_isc = VFIO_AP_ISC_INVALID;
->  	}
->  	if (q->saved_pfn && !WARN_ON(!q->matrix_mdev)) {
-> -		vfio_unpin_pages(mdev_dev(q->matrix_mdev->mdev),
-> +		vfio_unpin_pages(&q->matrix_mdev->vdev,
->  				 &q->saved_pfn, 1);
->  		q->saved_pfn = 0;
->  	}
-> @@ -258,7 +258,7 @@ static struct ap_queue_status
-> vfio_ap_irq_enable(struct vfio_ap_queue *q,
->  		return status;
->  	}
 >  
-> -	ret = vfio_pin_pages(mdev_dev(q->matrix_mdev->mdev), &g_pfn, 1,
-> +	ret = vfio_pin_pages(&q->matrix_mdev->vdev, &g_pfn, 1,
->  			     IOMMU_READ | IOMMU_WRITE, &h_pfn);
->  	switch (ret) {
->  	case 1:
-> @@ -301,7 +301,7 @@ static struct ap_queue_status
-> vfio_ap_irq_enable(struct vfio_ap_queue *q,
->  		break;
->  	case AP_RESPONSE_OTHERWISE_CHANGED:
->  		/* We could not modify IRQ setings: clear new
-> configuration */
-> -		vfio_unpin_pages(mdev_dev(q->matrix_mdev->mdev),
-> &g_pfn, 1);
-> +		vfio_unpin_pages(&q->matrix_mdev->vdev, &g_pfn, 1);
->  		kvm_s390_gisc_unregister(kvm, isc);
->  		break;
->  	default:
-> @@ -1250,7 +1250,7 @@ static int vfio_ap_mdev_iommu_notifier(struct
-> notifier_block *nb,
->  		struct vfio_iommu_type1_dma_unmap *unmap = data;
->  		unsigned long g_pfn = unmap->iova >> PAGE_SHIFT;
->  
-> -		vfio_unpin_pages(mdev_dev(matrix_mdev->mdev), &g_pfn,
-> 1);
-> +		vfio_unpin_pages(&matrix_mdev->vdev, &g_pfn, 1);
->  		return NOTIFY_OK;
->  	}
->  
-> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> index 8a5c46aa2bef61..24b92a45cfc8f1 100644
-> --- a/drivers/vfio/vfio.c
-> +++ b/drivers/vfio/vfio.c
-> @@ -2142,32 +2142,26 @@
-> EXPORT_SYMBOL(vfio_set_irqs_validate_and_prepare);
->   * @phys_pfn[out]: array of host PFNs
->   * Return error or number of pages pinned.
->   */
-> -int vfio_pin_pages(struct device *dev, unsigned long *user_pfn, int
-> npage,
-> +int vfio_pin_pages(struct vfio_device *vdev, unsigned long
-> *user_pfn, int npage,
->  		   int prot, unsigned long *phys_pfn)
+> +/*
+> + * If kvm is built into kernel it is possible that tsc_khz saved into
+> + * per-cpu cpu_tsc_khz was yet unrefined value. If CPU provides CONSTANT_TSC it
+> + * doesn't make sense to snapshot it anyway so just return tsc_khz
+> + */
+> +static unsigned long get_cpu_tsc_khz(void)
+> +{
+> +	if (static_cpu_has(X86_FEATURE_CONSTANT_TSC))
+> +		return tsc_khz;
+> +	else
+> +		return __this_cpu_read(cpu_tsc_khz);
+> +}
+> +
+>  /* Called within read_seqcount_begin/retry for kvm->pvclock_sc.  */
+>  static void __get_kvmclock(struct kvm *kvm, struct kvm_clock_data *data)
 >  {
->  	struct vfio_container *container;
-> -	struct vfio_group *group;
-> +	struct vfio_group *group = vdev->group;
->  	struct vfio_iommu_driver *driver;
->  	int ret;
+> @@ -2917,7 +2930,7 @@ static void __get_kvmclock(struct kvm *kvm, struct kvm_clock_data *data)
+>  	get_cpu();
 >  
-> -	if (!dev || !user_pfn || !phys_pfn || !npage)
-> +	if (!user_pfn || !phys_pfn || !npage)
->  		return -EINVAL;
->  
->  	if (npage > VFIO_PIN_PAGES_MAX_ENTRIES)
->  		return -E2BIG;
->  
-> -	group = vfio_group_get_from_dev(dev);
-> -	if (!group)
-> -		return -ENODEV;
-> -
-> -	if (group->dev_counter > 1) {
-> -		ret = -EINVAL;
-> -		goto err_pin_pages;
-> -	}
-> +	if (group->dev_counter > 1)
-> +		return -EINVAL;
->  
->  	ret = vfio_group_add_container_user(group);
->  	if (ret)
-> -		goto err_pin_pages;
-> +		return ret;
->  
->  	container = group->container;
->  	driver = container->iommu_driver;
-> @@ -2180,8 +2174,6 @@ int vfio_pin_pages(struct device *dev, unsigned
-> long *user_pfn, int npage,
->  
->  	vfio_group_try_dissolve_container(group);
->  
-> -err_pin_pages:
-> -	vfio_group_put(group);
->  	return ret;
->  }
->  EXPORT_SYMBOL(vfio_pin_pages);
-> @@ -2195,28 +2187,24 @@ EXPORT_SYMBOL(vfio_pin_pages);
->   *                 be greater than VFIO_PIN_PAGES_MAX_ENTRIES.
->   * Return error or number of pages unpinned.
->   */
-> -int vfio_unpin_pages(struct device *dev, unsigned long *user_pfn,
-> int npage)
-> +int vfio_unpin_pages(struct vfio_device *vdev, unsigned long
-> *user_pfn,
-> +		     int npage)
->  {
->  	struct vfio_container *container;
-> -	struct vfio_group *group;
->  	struct vfio_iommu_driver *driver;
->  	int ret;
->  
-> -	if (!dev || !user_pfn || !npage)
-> +	if (!user_pfn || !npage)
->  		return -EINVAL;
->  
->  	if (npage > VFIO_PIN_PAGES_MAX_ENTRIES)
->  		return -E2BIG;
->  
-> -	group = vfio_group_get_from_dev(dev);
-> -	if (!group)
-> -		return -ENODEV;
-> -
-> -	ret = vfio_group_add_container_user(group);
-> +	ret = vfio_group_add_container_user(vdev->group);
->  	if (ret)
-> -		goto err_unpin_pages;
-> +		return ret;
->  
-> -	container = group->container;
-> +	container = vdev->group->container;
->  	driver = container->iommu_driver;
->  	if (likely(driver && driver->ops->unpin_pages))
->  		ret = driver->ops->unpin_pages(container->iommu_data,
-> user_pfn,
-> @@ -2224,10 +2212,8 @@ int vfio_unpin_pages(struct device *dev,
-> unsigned long *user_pfn, int npage)
->  	else
->  		ret = -ENOTTY;
->  
-> -	vfio_group_try_dissolve_container(group);
-> +	vfio_group_try_dissolve_container(vdev->group);
->  
-> -err_unpin_pages:
-> -	vfio_group_put(group);
->  	return ret;
->  }
->  EXPORT_SYMBOL(vfio_unpin_pages);
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index 748ec0e0293aea..8f2a09801a660b 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -150,9 +150,9 @@ extern long vfio_external_check_extension(struct
-> vfio_group *group,
->  
->  #define VFIO_PIN_PAGES_MAX_ENTRIES	(PAGE_SIZE/sizeof(unsigned
-> long))
->  
-> -extern int vfio_pin_pages(struct device *dev, unsigned long
-> *user_pfn,
-> +extern int vfio_pin_pages(struct vfio_device *vdev, unsigned long
-> *user_pfn,
->  			  int npage, int prot, unsigned long
-> *phys_pfn);
-> -extern int vfio_unpin_pages(struct device *dev, unsigned long
-> *user_pfn,
-> +extern int vfio_unpin_pages(struct vfio_device *vdev, unsigned long
-> *user_pfn,
->  			    int npage);
->  
->  extern int vfio_group_pin_pages(struct vfio_group *group,
+>  	data->flags = 0;
+> -	if (ka->use_master_clock && __this_cpu_read(cpu_tsc_khz)) {
+> +	if (ka->use_master_clock && get_cpu_tsc_khz()) {
 
+It might make sense to open code this to make it more obvious why the "else" path
+exists.  That'd also eliminate a condition branch on CPUs with a constant TSC,
+though I don't know if we care that much about the performance here.
+
+	if (ka->use_master_clock &&
+	    (static_cpu_has(X86_FEATURE_CONSTANT_TSC) || __this_cpu_read(cpu_tsc_khz)))
+
+And/or add a comment about cpu_tsc_khz being zero when the CPU is being offlined?
+
+>  #ifdef CONFIG_X86_64
+>  		struct timespec64 ts;
+>  
+
+...
+
+> @@ -8646,9 +8659,12 @@ static void tsc_khz_changed(void *data)
+>  	struct cpufreq_freqs *freq = data;
+>  	unsigned long khz = 0;
+>  
+> +	if (boot_cpu_has(X86_FEATURE_CONSTANT_TSC))
+> +		return;
+
+Vitaly,
+
+The Hyper-V guest code also sets cpu_tsc_khz, should we WARN if that notifier is
+invoked and Hyper-V told us there's a constant TSC?
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ab336f7c82e4..ca8e20f5ffc0 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8701,6 +8701,8 @@ static void kvm_hyperv_tsc_notifier(void)
+        struct kvm *kvm;
+        int cpu;
+
++       WARN_ON_ONCE(boot_cpu_has(X86_FEATURE_CONSTANT_TSC));
++
+        mutex_lock(&kvm_lock);
+        list_for_each_entry(kvm, &vm_list, vm_list)
+                kvm_make_mclock_inprogress_request(kvm);
