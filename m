@@ -2,66 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BBA4D501E33
-	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 00:22:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A7B3501E53
+	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 00:30:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234977AbiDNWZQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 18:25:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54072 "EHLO
+        id S1347030AbiDNWbu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 18:31:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229769AbiDNWZO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Apr 2022 18:25:14 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 820C1B6E56
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 15:22:48 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id ll10so6315104pjb.5
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 15:22:48 -0700 (PDT)
+        with ESMTP id S1347011AbiDNWbs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Apr 2022 18:31:48 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC523C19
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 15:29:19 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d15so5832211pll.10
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 15:29:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=1xa1ESBDSGyY8UU/qWjOzGPkAfpQhGYww95crIFFhNY=;
-        b=IVUMC9lb1svE5Tw8hyaLGHwkuwA7fdLycjSCgs+AWEmUtQZenl7Qzuak0s9q66Cb5a
-         xEp/t6vPItaijnlLQKssysDfm5J+OlfoeFz+j1Yycn8ye6yZ/UzHR9hT4ocDgnznuqeu
-         iiJruovja3Usd+RzAOfD2AcCH6B/sIFa/+JBV4QgN9LE84nIUC90I6P5ZnwtvuWOzT1A
-         nLnMrMrWaglqr/a2egUm0E8Ed6cG0Rkw027+VBNItakIVq5uEoNpvc5FL2zINryNPtS6
-         2Ep50k6nWeLycIGhMkDr3kE83HL7IVMI4x8o97zG26vBcsIQsmsSeRq+TS3u9VWxpAlW
-         OqBQ==
+        bh=UxPoFf2t5u+s0uISceiuQkf792IJ+jbIydpuaGQO9DQ=;
+        b=nP/6SQFXpMUu3tuK0mnNqZ7AmYkQ/GFRolTz3PgEzzgxGxVz9uESKrDSzSoo/vO8eP
+         S3JnL6U12W9U5r4HsjqwoCdO1WiGEHqJghC1KHK4TcjDrWSk/1SLi7b+0gPBO6Wj3Ey5
+         LXmgazCVs+J6Jm5ZKeyxuxstFaMDNeG996WwvYmd/Va8FToGNiqPuT4lDTypoFNpX/oC
+         PpmtUDxY7BNZIHoxHqsqp6kA9pR96i0+DPhYTM8zRBPp2zpx45fX8Ov2m72INCCmiEBe
+         sVy7ysPZZInuwMnyKc2r17EB9gI8ZGM9ETdUkV/i56pXeMG719MUKeGav3lxlSJGhlBw
+         KUPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=1xa1ESBDSGyY8UU/qWjOzGPkAfpQhGYww95crIFFhNY=;
-        b=EFVNQqwmXV3Cx2sG6vze6AVjdfed1Wob3y8kijWgWcZ0Kzlgv4gwM2kxCHEpsiZk+m
-         OaZIMspjCWlAgIg3gpd1eH22b7+bEzXZmORszq+zdCSWr4OfneUYQvyQYSDjMmc8evTj
-         nGhWr4Imvm4GY4+u9pY66YUCxMnVLXEFyIUt50WURaXHmsJMk+o718DchKNM6vMWA7+U
-         ZqQasJ6I7oBlWsOw46PoSx7Jf0iHQNOsiryJToXqCHDRpwt/fpN9JN+2EA1on8pj8qUs
-         wVm3BvVoPxA4cMhVqtqR/TAtKwHItMWVsHWDupE1PY7TS78Rzm4eC5eHw70Jp8JJKUDA
-         yuGg==
-X-Gm-Message-State: AOAM530mxQjqloACVXkX2J1Q/KUzi6Dxl9c7Qu+F9Da3cYwnI2q/nGrR
-        Aag8icXq9QuekQxQa0OmTnISyQ==
-X-Google-Smtp-Source: ABdhPJzYCSbPc54jK7KfEz8+YtotBqRuxRvWz87K/s48F7eth012LaSR/BtMJ/5apTfh4uT+TojgmQ==
-X-Received: by 2002:a17:902:6b8b:b0:14d:66c4:f704 with SMTP id p11-20020a1709026b8b00b0014d66c4f704mr49974054plk.53.1649974967844;
-        Thu, 14 Apr 2022 15:22:47 -0700 (PDT)
+        bh=UxPoFf2t5u+s0uISceiuQkf792IJ+jbIydpuaGQO9DQ=;
+        b=FpkyoC/cXY5DlF77nSLnyE4Y4GGw3MR2jwzs/amgbkzRhQrUwdEB4zRFN9qnRm9WeF
+         lJIZAxEWe7rAfLFJU5XpKQlw+a2jVfvIZaGjlaN4ltNG6GIFHiI2XF1naj5dh4d0lP5l
+         uTLr5UISSOi3TGW5GjWIKkkvlXSNLB4Q3O+AgIK3ScRo410s3nptAJoQpjLF5SV4W861
+         KqPT42JNfYmg/zal/0fxDi9c+TOlL9Wj44As6I8d818hDyjFLjwXKhXErFKND1dLnnr5
+         Rz8ShZC0WlltIBp6wcdbPT72HXDucwfnlBxmMf0+UT/N9WVKSPmbr2QrMvOp8QQS45IJ
+         iLoA==
+X-Gm-Message-State: AOAM532lAmsK4atWmKrggVKnruzcGwB9ojDu9E2pWFhg9G37AN8MC84n
+        CBUNFY8Dv2YjLWMz1qOw/6RtHZIKEhPaTA==
+X-Google-Smtp-Source: ABdhPJyimW5C+2lcyN6muRkrOOsyobCxgwfnT89oBCkWXVd+0MJ2XoKF57NjfZNDe1UEwqpwjyBxzw==
+X-Received: by 2002:a17:903:18c:b0:158:7255:4bc6 with SMTP id z12-20020a170903018c00b0015872554bc6mr19562029plg.106.1649975359257;
+        Thu, 14 Apr 2022 15:29:19 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id c138-20020a624e90000000b005081f92826dsm849249pfb.99.2022.04.14.15.22.47
+        by smtp.gmail.com with ESMTPSA id k8-20020aa790c8000000b00505d6016097sm850896pfk.94.2022.04.14.15.29.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Apr 2022 15:22:47 -0700 (PDT)
-Date:   Thu, 14 Apr 2022 22:22:43 +0000
+        Thu, 14 Apr 2022 15:29:18 -0700 (PDT)
+Date:   Thu, 14 Apr 2022 22:29:14 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Anton Romanov <romanton@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH] KVM: x86: Use current rather than snapshotted TSC
- frequency if it is constant
-Message-ID: <Ylies1A6K2zVpoM6@google.com>
-References: <20220414183127.4080873-1-romanton@google.com>
- <Ylh3HNlcJd8+P+em@google.com>
- <CAHFSQMhwsMEOFeMuMrvvveeN=skqA-DLM_r3EqU+dei-jXUkUA@mail.gmail.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Junaid Shahid <junaids@google.com>
+Subject: Re: [PATCH v5 10/10] KVM: selftests: Test disabling NX hugepages on
+ a VM
+Message-ID: <YligOuhn9HG0/uGO@google.com>
+References: <20220413175944.71705-1-bgardon@google.com>
+ <20220413175944.71705-11-bgardon@google.com>
+ <YldTMfNEzsweKi1V@google.com>
+ <CANgfPd85MST8Lf_LhQ++JjxwJRvBoYk8FpOwzYbOhBL1zz157w@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHFSQMhwsMEOFeMuMrvvveeN=skqA-DLM_r3EqU+dei-jXUkUA@mail.gmail.com>
+In-Reply-To: <CANgfPd85MST8Lf_LhQ++JjxwJRvBoYk8FpOwzYbOhBL1zz157w@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,36 +80,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 14, 2022, Anton Romanov wrote:
-> On Thu, Apr 14, 2022 at 12:33 PM Sean Christopherson <seanjc@google.com> wrote:
-> > On Thu, Apr 14, 2022, Anton Romanov wrote:
-> > >  /* Called within read_seqcount_begin/retry for kvm->pvclock_sc.  */
-> > >  static void __get_kvmclock(struct kvm *kvm, struct kvm_clock_data *data)
-> > >  {
-> > > @@ -2917,7 +2930,7 @@ static void __get_kvmclock(struct kvm *kvm, struct kvm_clock_data *data)
-> > >       get_cpu();
-> > >
-> > >       data->flags = 0;
-> > > -     if (ka->use_master_clock && __this_cpu_read(cpu_tsc_khz)) {
-> > > +     if (ka->use_master_clock && get_cpu_tsc_khz()) {
+On Thu, Apr 14, 2022, Ben Gardon wrote:
+> On Wed, Apr 13, 2022 at 3:48 PM Sean Christopherson <seanjc@google.com> wrote:
+> > First off, huge kudos for negative testing!  But, it's going to provide poor coverage
+> > if we teach everyone to use the runner script, because that'll likely require root on
+> > most hosts, e.g. to futz with the module param.
 > >
-> > It might make sense to open code this to make it more obvious why the "else" path
-> > exists.  That'd also eliminate a condition branch on CPUs with a constant TSC,
-> > though I don't know if we care that much about the performance here.
+> > Aha!  Idea.  And it should eliminate the SYS_reboot shenanigans, which while hilarious,
+> > are mildy scary.
 > >
-> >         if (ka->use_master_clock &&
-> >             (static_cpu_has(X86_FEATURE_CONSTANT_TSC) || __this_cpu_read(cpu_tsc_khz)))
+> > In the runner script, wrap all the modification of sysfs knobs with sudo, and then
+> > (again with sudo) do:
 > >
-> > And/or add a comment about cpu_tsc_khz being zero when the CPU is being offlined?
+> >         setcap cap_sys_boot+ep path/to/nx_huge_pages_test
+> >         path/to/nx_huge_pages_test MAGIC_NUMBER -b
+> >
+> > where "-b" means "has CAP_SYS_BOOT".  And then
+> >
+> >         setcap cap_sys_boot-ep path/to/nx_huge_pages_test
+> >         path/to/nx_huge_pages_test MAGIC_NUMBER
+> >
+> > Hmm, and I guess if the script is run as root, just skip the second invocation.
 > 
-> It looks like cpu_tsc_khz being zero is used as an indicator of CPU
-> being unplugged here.
+> Wouldn't it be easier to just run the test binary twice and just have
+> the second time run without root permissions? I don't know if there's
+> an easy way to do that.
 
-That's ok, the unplug issue was that kvm_get_time_scale() got stuck in an infinite
-loop due to cpu_tsc_khz being zero.  Using tsc_khz is ok even though the CPU is
-about to go offline, the CPU going offline doesn't make the calculation wrong.
+I don't think so, e.g. what if there is no other user account to switch to?  On
+the other hand, I doubt I'm the only person that typically runs selftests with a
+user account.
 
-> I don't think your proposed change is right in this case either.
-> How about we still keep tsc_khz_changed untouched as well as this line?
-> Potentially adding here a comment that on this line we only read it to
-> see if CPU is not being unplugged yet
+Using setcap isn't hard, e.g.
+
+	# If the test isn't running as root, verify KVM correctly rejects the
+	# per-VM override if the process doesn't have CAP_SYS_BOOT.
+	if [[ $(id -u) -ne 0 ]]; then
+		sudo setcap cap_sys_boot-ep path/to/nx_huge_pages_test
+		path/to/nx_huge_pages_test MAGIC_NUMBER
+
+		sudo setcap cap_sys_boot+ep path/to/nx_huge_pages_test
+	fi
+
+	# The test now has CAP_SYS_BOOT, or is running as root.
+	path/to/nx_huge_pages_test MAGIC_NUMBER -b
+
+Bonus points if you want to save/restore the capability. 
