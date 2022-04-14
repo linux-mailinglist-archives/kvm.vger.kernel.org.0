@@ -2,17 +2,17 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 39E8150156A
-	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 17:41:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 82E035013E5
+	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 17:23:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233315AbiDNNgx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 09:36:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56732 "EHLO
+        id S244774AbiDNNf6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 09:35:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244916AbiDNN2S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S244927AbiDNN2S (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 14 Apr 2022 09:28:18 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EDFB4A8889
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ED12CA777C
         for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 06:21:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1649942478;
@@ -20,23 +20,23 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IJ2Vgk74sDWyEWQ+SIKJGSpw8vilP+eCSCMx/I4v0m0=;
-        b=OqtFCCP1xRqJm9khZsSWv08oyAD+/ZZZP8qoltnP9hMeAPgDcCSdnuhvvEOe2cBPGYZLQ6
-        YBii6gO12ORmZ1V1imimLOKxIQNp7JdIaO1wVAl1V6GDP1umUMx9MCd476VLg+W5FWuoSk
-        22b3LDwFZ8on2u+JdckRsBi4HPd0aq8=
+        bh=NNU8+N3QEm3ONxfrBZdGtyoiL6xy54eD6yOz8aNf1KM=;
+        b=X+/NSmsnqWJfRWzGn1HAsoOo8cp/HG9c4e4VHR2wgSLC1wegQhMT0uy576h2cajpOoUE2a
+        6eqdjR9/IJAZN2S4WRnmkdaVvjqMh6EmYX3g8YFb/yS4AZ6cxyRhReoSau3FyuyoUPFlcN
+        Fyd1R+TGgD+nEfOkd9in5wh+1bDpgnY=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-486-ILnEP6bIMnGyUEI8hcZwBg-1; Thu, 14 Apr 2022 09:21:14 -0400
-X-MC-Unique: ILnEP6bIMnGyUEI8hcZwBg-1
+ us-mta-2-QRiBKY5UOwKerEVJqgLR7A-1; Thu, 14 Apr 2022 09:21:15 -0400
+X-MC-Unique: QRiBKY5UOwKerEVJqgLR7A-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D26F9805F6F;
-        Thu, 14 Apr 2022 13:21:03 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 188A918013AF;
+        Thu, 14 Apr 2022 13:21:06 +0000 (UTC)
 Received: from fedora.redhat.com (unknown [10.40.195.11])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F1FBC53CD;
-        Thu, 14 Apr 2022 13:21:01 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1DA777C28;
+        Thu, 14 Apr 2022 13:21:03 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -45,9 +45,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Michael Kelley <mikelley@microsoft.com>,
         Siddharth Chandrasekaran <sidcha@amazon.de>,
         linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3 23/34] KVM: selftests: Better XMM read/write helpers
-Date:   Thu, 14 Apr 2022 15:20:02 +0200
-Message-Id: <20220414132013.1588929-24-vkuznets@redhat.com>
+Subject: [PATCH v3 24/34] KVM: selftests: Hyper-V PV IPI selftest
+Date:   Thu, 14 Apr 2022 15:20:03 +0200
+Message-Id: <20220414132013.1588929-25-vkuznets@redhat.com>
 In-Reply-To: <20220414132013.1588929-1-vkuznets@redhat.com>
 References: <20220414132013.1588929-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -65,128 +65,471 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-set_xmm()/get_xmm() helpers are fairly useless as they only read 64 bits
-from 128-bit registers. Moreover, these helpers are not used. Borrow
-_kvm_read_sse_reg()/_kvm_write_sse_reg() from KVM limiting them to
-XMM0-XMM8 for now.
+Introduce a selftest for Hyper-V PV IPI hypercalls
+(HvCallSendSyntheticClusterIpi, HvCallSendSyntheticClusterIpiEx).
+
+The test creates one 'sender' vCPU and two 'receiver' vCPU and then
+issues various combinations of send IPI hypercalls in both 'normal'
+and 'fast' (with XMM input where necessary) mode. Later, the test
+checks whether IPIs were delivered to the expected destination vCPU[s].
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- .../selftests/kvm/include/x86_64/processor.h  | 70 ++++++++++---------
- 1 file changed, 36 insertions(+), 34 deletions(-)
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/x86_64/hyperv.h     |   3 +
+ .../selftests/kvm/x86_64/hyperv_features.c    |   5 +-
+ .../testing/selftests/kvm/x86_64/hyperv_ipi.c | 374 ++++++++++++++++++
+ 5 files changed, 381 insertions(+), 3 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/hyperv_ipi.c
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 37db341d4cc5..9ad7602a257b 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -296,71 +296,73 @@ static inline void cpuid(uint32_t *eax, uint32_t *ebx,
- 	    : "memory");
- }
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 56140068b763..5d5fbb161d56 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -23,6 +23,7 @@
+ /x86_64/hyperv_clock
+ /x86_64/hyperv_cpuid
+ /x86_64/hyperv_features
++/x86_64/hyperv_ipi
+ /x86_64/hyperv_svm_test
+ /x86_64/mmio_warning_test
+ /x86_64/mmu_role_test
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index af582d168621..44889f897fe7 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -52,6 +52,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/fix_hypercall_test
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_clock
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_features
++TEST_GEN_PROGS_x86_64 += x86_64/hyperv_ipi
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_svm_test
+ TEST_GEN_PROGS_x86_64 += x86_64/kvm_clock_test
+ TEST_GEN_PROGS_x86_64 += x86_64/kvm_pv_test
+diff --git a/tools/testing/selftests/kvm/include/x86_64/hyperv.h b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
+index b66910702c0a..f51d6fab8e93 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/hyperv.h
++++ b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
+@@ -184,5 +184,8 @@
  
--#define SET_XMM(__var, __xmm) \
--	asm volatile("movq %0, %%"#__xmm : : "r"(__var) : #__xmm)
-+typedef u32		__attribute__((vector_size(16))) sse128_t;
-+#define __sse128_u	union { sse128_t vec; u64 as_u64[2]; u32 as_u32[4]; }
-+#define sse128_lo(x)	({ __sse128_u t; t.vec = x; t.as_u64[0]; })
-+#define sse128_hi(x)	({ __sse128_u t; t.vec = x; t.as_u64[1]; })
+ /* hypercall options */
+ #define HV_HYPERCALL_FAST_BIT		BIT(16)
++#define HV_HYPERCALL_VARHEAD_OFFSET	17
++
++#define HYPERV_LINUX_OS_ID ((u64)0x8100 << 48)
  
--static inline void set_xmm(int n, unsigned long val)
-+static inline void read_sse_reg(int reg, sse128_t *data)
- {
--	switch (n) {
-+	switch (reg) {
- 	case 0:
--		SET_XMM(val, xmm0);
-+		asm("movdqa %%xmm0, %0" : "=m"(*data));
- 		break;
- 	case 1:
--		SET_XMM(val, xmm1);
-+		asm("movdqa %%xmm1, %0" : "=m"(*data));
- 		break;
- 	case 2:
--		SET_XMM(val, xmm2);
-+		asm("movdqa %%xmm2, %0" : "=m"(*data));
- 		break;
- 	case 3:
--		SET_XMM(val, xmm3);
-+		asm("movdqa %%xmm3, %0" : "=m"(*data));
- 		break;
- 	case 4:
--		SET_XMM(val, xmm4);
-+		asm("movdqa %%xmm4, %0" : "=m"(*data));
- 		break;
- 	case 5:
--		SET_XMM(val, xmm5);
-+		asm("movdqa %%xmm5, %0" : "=m"(*data));
- 		break;
- 	case 6:
--		SET_XMM(val, xmm6);
-+		asm("movdqa %%xmm6, %0" : "=m"(*data));
- 		break;
- 	case 7:
--		SET_XMM(val, xmm7);
-+		asm("movdqa %%xmm7, %0" : "=m"(*data));
- 		break;
-+	default:
-+		BUG();
- 	}
- }
+ #endif /* !SELFTEST_KVM_HYPERV_H */
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+index 672915ce73d8..98c020356925 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+@@ -14,7 +14,6 @@
+ #include "hyperv.h"
  
--#define GET_XMM(__xmm)							\
--({									\
--	unsigned long __val;						\
--	asm volatile("movq %%"#__xmm", %0" : "=r"(__val));		\
--	__val;								\
--})
--
--static inline unsigned long get_xmm(int n)
-+static inline void write_sse_reg(int reg, const sse128_t *data)
- {
--	assert(n >= 0 && n <= 7);
--
--	switch (n) {
-+	switch (reg) {
- 	case 0:
--		return GET_XMM(xmm0);
-+		asm("movdqa %0, %%xmm0" : : "m"(*data));
-+		break;
- 	case 1:
--		return GET_XMM(xmm1);
-+		asm("movdqa %0, %%xmm1" : : "m"(*data));
-+		break;
- 	case 2:
--		return GET_XMM(xmm2);
-+		asm("movdqa %0, %%xmm2" : : "m"(*data));
-+		break;
- 	case 3:
--		return GET_XMM(xmm3);
-+		asm("movdqa %0, %%xmm3" : : "m"(*data));
-+		break;
- 	case 4:
--		return GET_XMM(xmm4);
-+		asm("movdqa %0, %%xmm4" : : "m"(*data));
-+		break;
- 	case 5:
--		return GET_XMM(xmm5);
-+		asm("movdqa %0, %%xmm5" : : "m"(*data));
-+		break;
- 	case 6:
--		return GET_XMM(xmm6);
-+		asm("movdqa %0, %%xmm6" : : "m"(*data));
-+		break;
- 	case 7:
--		return GET_XMM(xmm7);
-+		asm("movdqa %0, %%xmm7" : : "m"(*data));
-+		break;
-+	default:
-+		BUG();
- 	}
--
--	/* never reached */
--	return 0;
- }
+ #define VCPU_ID 0
+-#define LINUX_OS_ID ((u64)0x8100 << 48)
  
- static inline void cpu_relax(void)
+ extern unsigned char rdmsr_start;
+ extern unsigned char rdmsr_end;
+@@ -127,7 +126,7 @@ static void guest_hcall(vm_vaddr_t pgs_gpa, struct hcall_data *hcall)
+ 	int i = 0;
+ 	u64 res, input, output;
+ 
+-	wrmsr(HV_X64_MSR_GUEST_OS_ID, LINUX_OS_ID);
++	wrmsr(HV_X64_MSR_GUEST_OS_ID, HYPERV_LINUX_OS_ID);
+ 	wrmsr(HV_X64_MSR_HYPERCALL, pgs_gpa);
+ 
+ 	while (hcall->control) {
+@@ -230,7 +229,7 @@ static void guest_test_msrs_access(void)
+ 			 */
+ 			msr->idx = HV_X64_MSR_GUEST_OS_ID;
+ 			msr->write = 1;
+-			msr->write_val = LINUX_OS_ID;
++			msr->write_val = HYPERV_LINUX_OS_ID;
+ 			msr->available = 1;
+ 			break;
+ 		case 3:
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c b/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c
+new file mode 100644
+index 000000000000..075963c32d45
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c
+@@ -0,0 +1,374 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Hyper-V HvCallSendSyntheticClusterIpi{,Ex} tests
++ *
++ * Copyright (C) 2022, Red Hat, Inc.
++ *
++ */
++
++#define _GNU_SOURCE /* for program_invocation_short_name */
++#include <pthread.h>
++#include <inttypes.h>
++
++#include "kvm_util.h"
++#include "hyperv.h"
++#include "processor.h"
++#include "test_util.h"
++#include "vmx.h"
++
++#define SENDER_VCPU_ID   1
++#define RECEIVER_VCPU_ID_1 2
++#define RECEIVER_VCPU_ID_2 65
++
++#define IPI_VECTOR	 0xfe
++
++static volatile uint64_t ipis_rcvd[RECEIVER_VCPU_ID_2 + 1];
++
++struct thread_params {
++	struct kvm_vm *vm;
++	uint32_t vcpu_id;
++};
++
++struct hv_vpset {
++	u64 format;
++	u64 valid_bank_mask;
++	u64 bank_contents[2];
++};
++
++enum HV_GENERIC_SET_FORMAT {
++	HV_GENERIC_SET_SPARSE_4K,
++	HV_GENERIC_SET_ALL,
++};
++
++/* HvCallSendSyntheticClusterIpi hypercall */
++struct hv_send_ipi {
++	u32 vector;
++	u32 reserved;
++	u64 cpu_mask;
++};
++
++/* HvCallSendSyntheticClusterIpiEx hypercall */
++struct hv_send_ipi_ex {
++	u32 vector;
++	u32 reserved;
++	struct hv_vpset vp_set;
++};
++
++static inline void hv_init(vm_vaddr_t pgs_gpa)
++{
++	wrmsr(HV_X64_MSR_GUEST_OS_ID, HYPERV_LINUX_OS_ID);
++	wrmsr(HV_X64_MSR_HYPERCALL, pgs_gpa);
++}
++
++static void receiver_code(void *hcall_page, vm_vaddr_t pgs_gpa)
++{
++	u32 vcpu_id;
++
++	x2apic_enable();
++	hv_init(pgs_gpa);
++
++	vcpu_id = rdmsr(HV_X64_MSR_VP_INDEX);
++
++	/* Signal sender vCPU we're ready */
++	ipis_rcvd[vcpu_id] = (u64)-1;
++
++	for (;;)
++		asm volatile("sti; hlt; cli");
++}
++
++static void guest_ipi_handler(struct ex_regs *regs)
++{
++	u32 vcpu_id = rdmsr(HV_X64_MSR_VP_INDEX);
++
++	ipis_rcvd[vcpu_id]++;
++	wrmsr(HV_X64_MSR_EOI, 1);
++}
++
++static inline u64 hypercall(u64 control, vm_vaddr_t arg1, vm_vaddr_t arg2)
++{
++	u64 hv_status;
++
++	asm volatile("mov %3, %%r8\n"
++		     "vmcall"
++		     : "=a" (hv_status),
++		       "+c" (control), "+d" (arg1)
++		     :  "r" (arg2)
++		     : "cc", "memory", "r8", "r9", "r10", "r11");
++
++	return hv_status;
++}
++
++static inline void nop_loop(void)
++{
++	int i;
++
++	for (i = 0; i < 100000000; i++)
++		asm volatile("nop");
++}
++
++static inline void sync_to_xmm(void *data)
++{
++	int i;
++
++	for (i = 0; i < 8; i++)
++		write_sse_reg(i, (sse128_t *)(data + sizeof(sse128_t) * i));
++}
++
++static void sender_guest_code(void *hcall_page, vm_vaddr_t pgs_gpa)
++{
++	struct hv_send_ipi *ipi = (struct hv_send_ipi *)hcall_page;
++	struct hv_send_ipi_ex *ipi_ex = (struct hv_send_ipi_ex *)hcall_page;
++	int stage = 1, ipis_expected[2] = {0};
++	u64 res;
++
++	hv_init(pgs_gpa);
++	GUEST_SYNC(stage++);
++
++	/* Wait for receiver vCPUs to come up */
++	while (!ipis_rcvd[RECEIVER_VCPU_ID_1] || !ipis_rcvd[RECEIVER_VCPU_ID_2])
++		nop_loop();
++	ipis_rcvd[RECEIVER_VCPU_ID_1] = ipis_rcvd[RECEIVER_VCPU_ID_2] = 0;
++
++	/* 'Slow' HvCallSendSyntheticClusterIpi to RECEIVER_VCPU_ID_1 */
++	ipi->vector = IPI_VECTOR;
++	ipi->cpu_mask = 1 << RECEIVER_VCPU_ID_1;
++	res = hypercall(HVCALL_SEND_IPI, pgs_gpa, pgs_gpa + 4096);
++	GUEST_ASSERT((res & 0xffff) == 0);
++	nop_loop();
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_1] == ++ipis_expected[0]);
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_2] == ipis_expected[1]);
++	GUEST_SYNC(stage++);
++	/* 'Fast' HvCallSendSyntheticClusterIpi to RECEIVER_VCPU_ID_1 */
++	res = hypercall(HVCALL_SEND_IPI | HV_HYPERCALL_FAST_BIT,
++			IPI_VECTOR, 1 << RECEIVER_VCPU_ID_1);
++	GUEST_ASSERT((res & 0xffff) == 0);
++	nop_loop();
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_1] == ++ipis_expected[0]);
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_2] == ipis_expected[1]);
++	GUEST_SYNC(stage++);
++
++	/* 'Slow' HvCallSendSyntheticClusterIpiEx to RECEIVER_VCPU_ID_1 */
++	memset(hcall_page, 0, 4096);
++	ipi_ex->vector = IPI_VECTOR;
++	ipi_ex->vp_set.format = HV_GENERIC_SET_SPARSE_4K;
++	ipi_ex->vp_set.valid_bank_mask = 1 << 0;
++	ipi_ex->vp_set.bank_contents[0] = BIT(RECEIVER_VCPU_ID_1);
++	res = hypercall(HVCALL_SEND_IPI_EX | (1 << HV_HYPERCALL_VARHEAD_OFFSET),
++			pgs_gpa, pgs_gpa + 4096);
++	GUEST_ASSERT((res & 0xffff) == 0);
++	nop_loop();
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_1] == ++ipis_expected[0]);
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_2] == ipis_expected[1]);
++	GUEST_SYNC(stage++);
++	/* 'XMM Fast' HvCallSendSyntheticClusterIpiEx to RECEIVER_VCPU_ID_1 */
++	sync_to_xmm(&ipi_ex->vp_set.valid_bank_mask);
++	res = hypercall(HVCALL_SEND_IPI_EX | HV_HYPERCALL_FAST_BIT |
++			(1 << HV_HYPERCALL_VARHEAD_OFFSET),
++			IPI_VECTOR, HV_GENERIC_SET_SPARSE_4K);
++	GUEST_ASSERT((res & 0xffff) == 0);
++	nop_loop();
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_1] == ++ipis_expected[0]);
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_2] == ipis_expected[1]);
++	GUEST_SYNC(stage++);
++
++	/* 'Slow' HvCallSendSyntheticClusterIpiEx to RECEIVER_VCPU_ID_2 */
++	memset(hcall_page, 0, 4096);
++	ipi_ex->vector = IPI_VECTOR;
++	ipi_ex->vp_set.format = HV_GENERIC_SET_SPARSE_4K;
++	ipi_ex->vp_set.valid_bank_mask = 1 << 1;
++	ipi_ex->vp_set.bank_contents[0] = BIT(RECEIVER_VCPU_ID_2 - 64);
++	res = hypercall(HVCALL_SEND_IPI_EX | (1 << HV_HYPERCALL_VARHEAD_OFFSET),
++			pgs_gpa, pgs_gpa + 4096);
++	GUEST_ASSERT((res & 0xffff) == 0);
++	nop_loop();
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_1] == ipis_expected[0]);
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_2] == ++ipis_expected[1]);
++	GUEST_SYNC(stage++);
++	/* 'XMM Fast' HvCallSendSyntheticClusterIpiEx to RECEIVER_VCPU_ID_2 */
++	sync_to_xmm(&ipi_ex->vp_set.valid_bank_mask);
++	res = hypercall(HVCALL_SEND_IPI_EX | HV_HYPERCALL_FAST_BIT |
++			(1 << HV_HYPERCALL_VARHEAD_OFFSET),
++			IPI_VECTOR, HV_GENERIC_SET_SPARSE_4K);
++	GUEST_ASSERT((res & 0xffff) == 0);
++	nop_loop();
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_1] == ipis_expected[0]);
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_2] == ++ipis_expected[1]);
++	GUEST_SYNC(stage++);
++
++	/* 'Slow' HvCallSendSyntheticClusterIpiEx to both RECEIVER_VCPU_ID_{1,2} */
++	memset(hcall_page, 0, 4096);
++	ipi_ex->vector = IPI_VECTOR;
++	ipi_ex->vp_set.format = HV_GENERIC_SET_SPARSE_4K;
++	ipi_ex->vp_set.valid_bank_mask = 1 << 1 | 1;
++	ipi_ex->vp_set.bank_contents[0] = BIT(RECEIVER_VCPU_ID_1);
++	ipi_ex->vp_set.bank_contents[1] = BIT(RECEIVER_VCPU_ID_2 - 64);
++	res = hypercall(HVCALL_SEND_IPI_EX | (2 << HV_HYPERCALL_VARHEAD_OFFSET),
++			pgs_gpa, pgs_gpa + 4096);
++	GUEST_ASSERT((res & 0xffff) == 0);
++	nop_loop();
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_1] == ++ipis_expected[0]);
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_2] == ++ipis_expected[1]);
++	GUEST_SYNC(stage++);
++	/* 'XMM Fast' HvCallSendSyntheticClusterIpiEx to both RECEIVER_VCPU_ID_{1, 2} */
++	sync_to_xmm(&ipi_ex->vp_set.valid_bank_mask);
++	res = hypercall(HVCALL_SEND_IPI_EX | HV_HYPERCALL_FAST_BIT |
++			(2 << HV_HYPERCALL_VARHEAD_OFFSET),
++			IPI_VECTOR, HV_GENERIC_SET_SPARSE_4K);
++	GUEST_ASSERT((res & 0xffff) == 0);
++	nop_loop();
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_1] == ++ipis_expected[0]);
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_2] == ++ipis_expected[1]);
++	GUEST_SYNC(stage++);
++
++	/* 'Slow' HvCallSendSyntheticClusterIpiEx to HV_GENERIC_SET_ALL */
++	memset(hcall_page, 0, 4096);
++	ipi_ex->vector = IPI_VECTOR;
++	ipi_ex->vp_set.format = HV_GENERIC_SET_ALL;
++	res = hypercall(HVCALL_SEND_IPI_EX,
++			pgs_gpa, pgs_gpa + 4096);
++	GUEST_ASSERT((res & 0xffff) == 0);
++	nop_loop();
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_1] == ++ipis_expected[0]);
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_2] == ++ipis_expected[1]);
++	GUEST_SYNC(stage++);
++	/* 'XMM Fast' HvCallSendSyntheticClusterIpiEx to HV_GENERIC_SET_ALL */
++	sync_to_xmm(&ipi_ex->vp_set.valid_bank_mask);
++	res = hypercall(HVCALL_SEND_IPI_EX | HV_HYPERCALL_FAST_BIT,
++			IPI_VECTOR, HV_GENERIC_SET_ALL);
++	GUEST_ASSERT((res & 0xffff) == 0);
++	nop_loop();
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_1] == ++ipis_expected[0]);
++	GUEST_ASSERT(ipis_rcvd[RECEIVER_VCPU_ID_2] == ++ipis_expected[1]);
++	GUEST_SYNC(stage++);
++
++	GUEST_DONE();
++}
++
++static void *vcpu_thread(void *arg)
++{
++	struct thread_params *params = (struct thread_params *)arg;
++	struct ucall uc;
++	int old;
++	int r;
++	unsigned int exit_reason;
++
++	r = pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &old);
++	TEST_ASSERT(r == 0,
++		    "pthread_setcanceltype failed on vcpu_id=%u with errno=%d",
++		    params->vcpu_id, r);
++
++	vcpu_run(params->vm, params->vcpu_id);
++	exit_reason = vcpu_state(params->vm, params->vcpu_id)->exit_reason;
++
++	TEST_ASSERT(exit_reason == KVM_EXIT_IO,
++		    "vCPU %u exited with unexpected exit reason %u-%s, expected KVM_EXIT_IO",
++		    params->vcpu_id, exit_reason, exit_reason_str(exit_reason));
++
++	if (get_ucall(params->vm, params->vcpu_id, &uc) == UCALL_ABORT) {
++		TEST_ASSERT(false,
++			    "vCPU %u exited with error: %s.\n",
++			    params->vcpu_id, (const char *)uc.args[0]);
++	}
++
++	return NULL;
++}
++
++static void cancel_join_vcpu_thread(pthread_t thread, uint32_t vcpu_id)
++{
++	void *retval;
++	int r;
++
++	r = pthread_cancel(thread);
++	TEST_ASSERT(r == 0,
++		    "pthread_cancel on vcpu_id=%d failed with errno=%d",
++		    vcpu_id, r);
++
++	r = pthread_join(thread, &retval);
++	TEST_ASSERT(r == 0,
++		    "pthread_join on vcpu_id=%d failed with errno=%d",
++		    vcpu_id, r);
++	TEST_ASSERT(retval == PTHREAD_CANCELED,
++		    "expected retval=%p, got %p", PTHREAD_CANCELED,
++		    retval);
++}
++
++int main(int argc, char *argv[])
++{
++	int r;
++	pthread_t threads[2];
++	struct thread_params params[2];
++	struct kvm_vm *vm;
++	struct kvm_run *run;
++	vm_vaddr_t hcall_page;
++	struct ucall uc;
++	int stage = 1;
++
++	vm = vm_create_default(SENDER_VCPU_ID, 0, sender_guest_code);
++	params[0].vm = vm;
++	params[1].vm = vm;
++
++	/* Hypercall input/output */
++	hcall_page = vm_vaddr_alloc_pages(vm, 2);
++	memset(addr_gva2hva(vm, hcall_page), 0x0, 2 * getpagesize());
++
++	vm_init_descriptor_tables(vm);
++
++	vm_vcpu_add_default(vm, RECEIVER_VCPU_ID_1, receiver_code);
++	vcpu_init_descriptor_tables(vm, RECEIVER_VCPU_ID_1);
++	vcpu_args_set(vm, RECEIVER_VCPU_ID_1, 2, hcall_page, addr_gva2gpa(vm, hcall_page));
++	vcpu_set_msr(vm, RECEIVER_VCPU_ID_1, HV_X64_MSR_VP_INDEX, RECEIVER_VCPU_ID_1);
++	vcpu_set_hv_cpuid(vm, RECEIVER_VCPU_ID_1);
++
++	vm_vcpu_add_default(vm, RECEIVER_VCPU_ID_2, receiver_code);
++	vcpu_init_descriptor_tables(vm, RECEIVER_VCPU_ID_2);
++	vcpu_args_set(vm, RECEIVER_VCPU_ID_2, 2, hcall_page, addr_gva2gpa(vm, hcall_page));
++	vcpu_set_msr(vm, RECEIVER_VCPU_ID_2, HV_X64_MSR_VP_INDEX, RECEIVER_VCPU_ID_2);
++	vcpu_set_hv_cpuid(vm, RECEIVER_VCPU_ID_2);
++
++	vm_install_exception_handler(vm, IPI_VECTOR, guest_ipi_handler);
++
++	vcpu_args_set(vm, SENDER_VCPU_ID, 2, hcall_page, addr_gva2gpa(vm, hcall_page));
++	vcpu_set_hv_cpuid(vm, SENDER_VCPU_ID);
++
++	params[0].vcpu_id = RECEIVER_VCPU_ID_1;
++	r = pthread_create(&threads[0], NULL, vcpu_thread, &params[0]);
++	TEST_ASSERT(r == 0,
++		    "pthread_create halter failed errno=%d", errno);
++
++	params[1].vcpu_id = RECEIVER_VCPU_ID_2;
++	r = pthread_create(&threads[1], NULL, vcpu_thread, &params[1]);
++	TEST_ASSERT(r == 0,
++		    "pthread_create halter failed errno=%d", errno);
++
++	run = vcpu_state(vm, SENDER_VCPU_ID);
++
++	while (true) {
++		r = _vcpu_run(vm, SENDER_VCPU_ID);
++		TEST_ASSERT(!r, "vcpu_run failed: %d\n", r);
++		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
++			    "unexpected exit reason: %u (%s)",
++			    run->exit_reason, exit_reason_str(run->exit_reason));
++
++		switch (get_ucall(vm, SENDER_VCPU_ID, &uc)) {
++		case UCALL_SYNC:
++			TEST_ASSERT(uc.args[1] == stage,
++				    "Unexpected stage: %ld (%d expected)\n",
++				    uc.args[1], stage);
++			break;
++		case UCALL_ABORT:
++			TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0],
++				  __FILE__, uc.args[1]);
++			return 1;
++		case UCALL_DONE:
++			return 0;
++		}
++
++		stage++;
++	}
++
++	cancel_join_vcpu_thread(threads[0], RECEIVER_VCPU_ID_1);
++	cancel_join_vcpu_thread(threads[1], RECEIVER_VCPU_ID_2);
++	kvm_vm_free(vm);
++
++	return 0;
++}
 -- 
 2.35.1
 
