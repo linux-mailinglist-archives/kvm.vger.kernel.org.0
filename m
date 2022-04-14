@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5083500B9B
-	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 12:54:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6187500BA1
+	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 12:54:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242373AbiDNK4J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 06:56:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58098 "EHLO
+        id S242591AbiDNK4T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 06:56:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241943AbiDNK4C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Apr 2022 06:56:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 30910793BE
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 03:53:34 -0700 (PDT)
+        with ESMTP id S242517AbiDNK4D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Apr 2022 06:56:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E6AC381191
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 03:53:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649933613;
+        s=mimecast20190719; t=1649933616;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qezaIFsTkLoWKaonJSnIU/m+cPX3t3dpi0YKUuYR714=;
-        b=ijvH7o0Duuqlxr6Rfzh9gSsY2cDsvM75SJNtE5tc7Cxt5RNsIb9/5lhFovEpAgLzGAz6xE
-        ozK+ZZFRmXKeKyJdh5SUY2dFaubwsAcu4aoQl0LCZQ2K33qx0dlo2YpCc4AAn5WuFw2hQc
-        pmklIJlt9TvMRaG2YmRYhR6QHcgkCh0=
+        bh=dFH0T0pXpNETbaNFYRkeQO7JMN8WlaRMY9DPSUKwh6Q=;
+        b=hdyB5R3P4PAEIfK+eCrCVVPFQDy7D2KwdPThLqJTXqYMfsA/ULtzvMNV6sUkfDAdeLKmkH
+        7FseQdLDED4ERbe9Y3Vw37nV/wuxW04mbJqTgjZnr/YaTKfUEPMoBy06ImuOw1sGpfAIpO
+        vFmKjoa1XVG2/hQqflMEemf35ZmYuSc=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-93-nt_ZLx7LN_edxJW2oG7ggg-1; Thu, 14 Apr 2022 06:53:30 -0400
-X-MC-Unique: nt_ZLx7LN_edxJW2oG7ggg-1
+ us-mta-2-bHh2RHDWNxiHYvnjSIJkqA-1; Thu, 14 Apr 2022 06:53:31 -0400
+X-MC-Unique: bHh2RHDWNxiHYvnjSIJkqA-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B3134801E95;
-        Thu, 14 Apr 2022 10:53:29 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 30EC180B71C;
+        Thu, 14 Apr 2022 10:53:31 +0000 (UTC)
 Received: from thuth.com (dhcp-192-232.str.redhat.com [10.33.192.232])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 708ABC28114;
-        Thu, 14 Apr 2022 10:53:28 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E31D6C28119;
+        Thu, 14 Apr 2022 10:53:29 +0000 (UTC)
 From:   Thomas Huth <thuth@redhat.com>
 To:     kvm@vger.kernel.org,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
@@ -47,9 +47,9 @@ Cc:     linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Shuah Khan <shuah@kernel.org>,
         Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Subject: [PATCH 3/4] KVM: s390: selftests: Use TAP interface in the tprot test
-Date:   Thu, 14 Apr 2022 12:53:21 +0200
-Message-Id: <20220414105322.577439-4-thuth@redhat.com>
+Subject: [PATCH 4/4] KVM: s390: selftests: Use TAP interface in the reset test
+Date:   Thu, 14 Apr 2022 12:53:22 +0200
+Message-Id: <20220414105322.577439-5-thuth@redhat.com>
 In-Reply-To: <20220414105322.577439-1-thuth@redhat.com>
 References: <20220414105322.577439-1-thuth@redhat.com>
 MIME-Version: 1.0
@@ -58,7 +58,7 @@ Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -67,70 +67,91 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The tprot test currently does not have any output (unless one of
-the TEST_ASSERT statement fails), so it's hard to say for a user
-whether a certain new sub-test has been included in the binary or
-not. Let's make this a little bit more user-friendly and include
-some TAP output via the kselftests.h interface.
+Let's standardize the s390x KVM selftest output to the TAP output
+generated via the kselftests.h interface.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tools/testing/selftests/kvm/s390x/tprot.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ tools/testing/selftests/kvm/s390x/resets.c | 38 +++++++++++++++++-----
+ 1 file changed, 30 insertions(+), 8 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/s390x/tprot.c b/tools/testing/selftests/kvm/s390x/tprot.c
-index c097b9db495e..a714b4206e95 100644
---- a/tools/testing/selftests/kvm/s390x/tprot.c
-+++ b/tools/testing/selftests/kvm/s390x/tprot.c
-@@ -8,6 +8,7 @@
- #include <sys/mman.h>
+diff --git a/tools/testing/selftests/kvm/s390x/resets.c b/tools/testing/selftests/kvm/s390x/resets.c
+index b143db6d8693..1d649ec77260 100644
+--- a/tools/testing/selftests/kvm/s390x/resets.c
++++ b/tools/testing/selftests/kvm/s390x/resets.c
+@@ -12,6 +12,7 @@
+ 
  #include "test_util.h"
  #include "kvm_util.h"
 +#include "kselftest.h"
  
- #define PAGE_SHIFT 12
- #define PAGE_SIZE (1 << PAGE_SHIFT)
-@@ -69,6 +70,7 @@ enum stage {
- 	STAGE_INIT_FETCH_PROT_OVERRIDE,
- 	TEST_FETCH_PROT_OVERRIDE,
- 	TEST_STORAGE_PROT_OVERRIDE,
-+	NUM_STAGES			/* this must be the last entry */
- };
+ #define VCPU_ID 3
+ #define LOCAL_IRQS 32
+@@ -202,7 +203,7 @@ static void inject_irq(int cpu_id)
  
- struct test {
-@@ -196,6 +198,7 @@ static void guest_code(void)
- 	}									\
- 	ASSERT_EQ(uc.cmd, UCALL_SYNC);						\
- 	ASSERT_EQ(uc.args[1], __stage);						\
-+	ksft_test_result_pass("" #stage "\n");					\
- })
- 
- int main(int argc, char *argv[])
-@@ -204,6 +207,9 @@ int main(int argc, char *argv[])
- 	struct kvm_run *run;
- 	vm_vaddr_t guest_0_page;
- 
-+	ksft_print_header();
-+	ksft_set_plan(NUM_STAGES - 1);	/* STAGE_END is not counted, thus - 1 */
-+
- 	vm = vm_create_default(VCPU_ID, 0, guest_code);
+ static void test_normal(void)
+ {
+-	pr_info("Testing normal reset\n");
++	ksft_print_msg("Testing normal reset\n");
+ 	/* Create VM */
+ 	vm = vm_create_default(VCPU_ID, 0, guest_code_initial);
  	run = vcpu_state(vm, VCPU_ID);
+@@ -225,7 +226,7 @@ static void test_normal(void)
  
-@@ -213,7 +219,7 @@ int main(int argc, char *argv[])
+ static void test_initial(void)
+ {
+-	pr_info("Testing initial reset\n");
++	ksft_print_msg("Testing initial reset\n");
+ 	vm = vm_create_default(VCPU_ID, 0, guest_code_initial);
+ 	run = vcpu_state(vm, VCPU_ID);
+ 	sync_regs = &run->s.regs;
+@@ -247,7 +248,7 @@ static void test_initial(void)
  
- 	guest_0_page = vm_vaddr_alloc(vm, PAGE_SIZE, 0);
- 	if (guest_0_page != 0)
--		print_skip("Did not allocate page at 0 for fetch protection override tests");
-+		ksft_print_msg("Did not allocate page at 0 for fetch protection override tests\n");
- 	HOST_SYNC(vm, STAGE_INIT_FETCH_PROT_OVERRIDE);
- 	if (guest_0_page == 0)
- 		mprotect(addr_gva2hva(vm, (vm_vaddr_t)0), PAGE_SIZE, PROT_READ);
-@@ -224,4 +230,8 @@ int main(int argc, char *argv[])
- 	run->s.regs.crs[0] |= CR0_STORAGE_PROTECTION_OVERRIDE;
- 	run->kvm_dirty_regs = KVM_SYNC_CRS;
- 	HOST_SYNC(vm, TEST_STORAGE_PROT_OVERRIDE);
+ static void test_clear(void)
+ {
+-	pr_info("Testing clear reset\n");
++	ksft_print_msg("Testing clear reset\n");
+ 	vm = vm_create_default(VCPU_ID, 0, guest_code_initial);
+ 	run = vcpu_state(vm, VCPU_ID);
+ 	sync_regs = &run->s.regs;
+@@ -266,14 +267,35 @@ static void test_clear(void)
+ 	kvm_vm_free(vm);
+ }
+ 
++struct testdef {
++	const char *name;
++	void (*test)(void);
++	bool needs_cap;
++} testlist[] = {
++	{ "initial", test_initial, false },
++	{ "normal", test_normal, true },
++	{ "clear", test_clear, true },
++};
 +
-+	kvm_vm_free(vm);
+ int main(int argc, char *argv[])
+ {
++	bool has_s390_vcpu_resets = kvm_check_cap(KVM_CAP_S390_VCPU_RESETS);
++	int idx;
++
+ 	setbuf(stdout, NULL);	/* Tell stdout not to buffer its content */
+ 
+-	test_initial();
+-	if (kvm_check_cap(KVM_CAP_S390_VCPU_RESETS)) {
+-		test_normal();
+-		test_clear();
++	ksft_print_header();
++	ksft_set_plan(ARRAY_SIZE(testlist));
++
++	for (idx = 0; idx < ARRAY_SIZE(testlist); idx++) {
++		if (!testlist[idx].needs_cap || has_s390_vcpu_resets) {
++			testlist[idx].test();
++			ksft_test_result_pass("%s\n", testlist[idx].name);
++		} else {
++			ksft_test_result_skip("%s - no VCPU_RESETS capability\n",
++					      testlist[idx].name);
++		}
+ 	}
+-	return 0;
 +
 +	ksft_finished();
  }
