@@ -2,63 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 40D60501BDA
-	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 21:27:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BDBE1501BE7
+	for <lists+kvm@lfdr.de>; Thu, 14 Apr 2022 21:27:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345486AbiDNT3C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 15:29:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36118 "EHLO
+        id S1345571AbiDNT3H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 15:29:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345719AbiDNT2s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Apr 2022 15:28:48 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AC57ECD91;
-        Thu, 14 Apr 2022 12:26:19 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23EH2Z4V006352;
-        Thu, 14 Apr 2022 19:26:09 GMT
+        with ESMTP id S234975AbiDNT3A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Apr 2022 15:29:00 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9549E338E;
+        Thu, 14 Apr 2022 12:26:34 -0700 (PDT)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23EH8IU8015720;
+        Thu, 14 Apr 2022 19:26:23 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
  from : to : cc : date : in-reply-to : references : content-type :
  mime-version : content-transfer-encoding; s=pp1;
- bh=9QA7/sZPD1x5u4bcVPRl5NgznyWuA2fG8lFuCu/FEtA=;
- b=AfLER0iihob19+3yB9NqFupzGeU7vAEsBxp+WPjanryA0nQu2UdRJo3WHerGjRAcwCYC
- oBACFrRb93zIpCw68I6PNxxmcKA2d6Omhv5b/sN0gDP8SfKLYmKCzCsWMvCnL6CrWO87
- rhsQ0W1K0oDFYtzuCww2KlGZFOdTG1Y4bMh99XhTyFRFLIoceVznbYJX/B89mpB2akRE
- JlgHeRxEcngIZ/n6RemGORkwJiuFb8nKAGtaBdQZMhu7LdK9v1deBBFdZDv0Ellh3W4z
- 4PbN67PBM+RWjzq8BCALS6DlB8M2Rd8XIKAOyyMvXrGYiViGsSvYF7CL6/gdBDoSqt8B mQ== 
+ bh=ozm7ObVk9+dmufRZapWVOwMVGMWLWKlEXppBnJWoflE=;
+ b=MGLO55jPGvwihfaFDaSwwejN6qf//k0YAChtN6/8N4qE04nhdYSP9y31Qj4rfcRz/CMg
+ 0BEahHC9Fjb4RfTdMix3h5DhRd4/eqJOAS8wOfGfp+dvOAk/4BH81i0wrVNkfcFg4PTt
+ lcnHK0bjoHtwXgjDS99tBcmquO6L1G3pUuBOarlWWVK4/Q0m+U3mWU5cGm7+MVx+5MnQ
+ AglPibbAlgETll38WNKozchQt4Kjk+Vyek96CC4EuiO/+0LUNF3ljLSm7ojoEK1Py2B6
+ jHK+qDr8m8ofhI9drdFzMXnNWfTFVvQbWmzh1kofvIE6/XAP7da2sPFnozf2bu/TJxvn rg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fedxsyhxw-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fefydd057-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Apr 2022 19:26:09 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23EJPqbD026151;
-        Thu, 14 Apr 2022 19:26:08 GMT
+        Thu, 14 Apr 2022 19:26:22 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23EJH0lv007797;
+        Thu, 14 Apr 2022 19:26:22 GMT
 Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fedxsyhxd-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fefydd051-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Apr 2022 19:26:08 +0000
+        Thu, 14 Apr 2022 19:26:22 +0000
 Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23EJICiK024955;
-        Thu, 14 Apr 2022 19:26:07 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma02dal.us.ibm.com with ESMTP id 3fb1sabjn4-1
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23EJIChX024952;
+        Thu, 14 Apr 2022 19:26:21 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
+        by ppma02dal.us.ibm.com with ESMTP id 3fb1sabjp7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Apr 2022 19:26:07 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23EJQ6av21102856
+        Thu, 14 Apr 2022 19:26:21 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23EJQKoQ25100588
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 14 Apr 2022 19:26:06 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5E80AB206E;
-        Thu, 14 Apr 2022 19:26:06 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8EB21B205F;
-        Thu, 14 Apr 2022 19:25:57 +0000 (GMT)
+        Thu, 14 Apr 2022 19:26:20 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 02C89AE060;
+        Thu, 14 Apr 2022 19:26:20 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 25C80AE05C;
+        Thu, 14 Apr 2022 19:26:13 +0000 (GMT)
 Received: from farman-thinkpad-t470p (unknown [9.211.52.116])
-        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 14 Apr 2022 19:25:57 +0000 (GMT)
-Message-ID: <7a43985f1e6190c72278805a780058ea8221a22f.camel@linux.ibm.com>
-Subject: Re: [PATCH 2/9] vfio/ccw: Remove mdev from struct channel_program
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+        Thu, 14 Apr 2022 19:26:12 +0000 (GMT)
+Message-ID: <f9d4fb48ccee8ffa70caadf88f143bd91fcfc05e.camel@linux.ibm.com>
+Subject: Re: [PATCH 3/9] vfio/mdev: Pass in a struct vfio_device * to
+ vfio_pin/unpin_pages()
 From:   Eric Farman <farman@linux.ibm.com>
 To:     Jason Gunthorpe <jgg@nvidia.com>,
         Alexander Gordeev <agordeev@linux.ibm.com>,
@@ -92,26 +93,26 @@ To:     Jason Gunthorpe <jgg@nvidia.com>,
 Cc:     Christoph Hellwig <hch@lst.de>,
         "Tian, Kevin" <kevin.tian@intel.com>,
         "Liu, Yi L" <yi.l.liu@intel.com>
-Date:   Thu, 14 Apr 2022 15:25:56 -0400
-In-Reply-To: <2-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
-References: <2-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
+Date:   Thu, 14 Apr 2022 15:26:11 -0400
+In-Reply-To: <3-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
+References: <3-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: kHKfb5CUbRYLCpE-NdPBaR7AMZBtA2Os
-X-Proofpoint-GUID: 47ldbTq4DcE3Hg7_sAry76a0WipCq-YT
+X-Proofpoint-GUID: uZq8aBCvvRiYB0aEQrrVOKYqDxG7Xk9n
+X-Proofpoint-ORIG-GUID: 93JfTwHUje5lundOnEzqRFuD3bDlU-bs
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-04-14_05,2022-04-14_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 phishscore=0 malwarescore=0
- adultscore=0 mlxlogscore=999 priorityscore=1501 bulkscore=0 spamscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ mlxscore=0 malwarescore=0 spamscore=0 priorityscore=1501 suspectscore=0
+ impostorscore=0 mlxlogscore=999 clxscore=1015 phishscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2202240000 definitions=main-2204140100
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -121,267 +122,262 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, 2022-04-12 at 12:53 -0300, Jason Gunthorpe wrote:
-> The next patch wants the vfio_device instead. There is no reason to
-> store
-> a pointer here since we can container_of back to the vfio_device.
+> Every caller has a readily available vfio_device pointer, use that
+> instead
+> of passing in a generic struct device. The struct vfio_device already
+> contains the group we need so this avoids complexity, extra
+> refcountings,
+> and a confusing lifecycle model.
 > 
 > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 > ---
->  drivers/s390/cio/vfio_ccw_cp.c  | 44 +++++++++++++++++++----------
-> ----
->  drivers/s390/cio/vfio_ccw_cp.h  |  4 +--
->  drivers/s390/cio/vfio_ccw_fsm.c |  3 +--
->  3 files changed, 28 insertions(+), 23 deletions(-)
+>  .../driver-api/vfio-mediated-device.rst       |  4 +-
+>  drivers/s390/cio/vfio_ccw_cp.c                |  6 +--
+>  drivers/s390/crypto/vfio_ap_ops.c             |  8 ++--
+>  drivers/vfio/vfio.c                           | 40 ++++++-----------
+> --
+>  include/linux/vfio.h                          |  4 +-
+>  5 files changed, 24 insertions(+), 38 deletions(-)
 
-There's opportunity for simplification here, but I'll handle that when
-I get to some other work in this space. For this series, this is fine.
+For the -ccw bits:
 
-Reviewed-by: Eric Farman <farman@linux.ibm.com>
+Acked-by: Eric Farman <farman@linux.ibm.com>
 
 > 
+> diff --git a/Documentation/driver-api/vfio-mediated-device.rst
+> b/Documentation/driver-api/vfio-mediated-device.rst
+> index 9f26079cacae35..6aeca741dc9be1 100644
+> --- a/Documentation/driver-api/vfio-mediated-device.rst
+> +++ b/Documentation/driver-api/vfio-mediated-device.rst
+> @@ -279,10 +279,10 @@ Translation APIs for Mediated Devices
+>  The following APIs are provided for translating user pfn to host pfn
+> in a VFIO
+>  driver::
+>  
+> -	extern int vfio_pin_pages(struct device *dev, unsigned long
+> *user_pfn,
+> +	extern int vfio_pin_pages(struct vfio_device *vdev, unsigned
+> long *user_pfn,
+>  				  int npage, int prot, unsigned long
+> *phys_pfn);
+>  
+> -	extern int vfio_unpin_pages(struct device *dev, unsigned long
+> *user_pfn,
+> +	extern int vfio_unpin_pages(struct vfio_device *vdev, unsigned
+> long *user_pfn,
+>  				    int npage);
+>  
+>  These functions call back into the back-end IOMMU module by using
+> the pin_pages
 > diff --git a/drivers/s390/cio/vfio_ccw_cp.c
 > b/drivers/s390/cio/vfio_ccw_cp.c
-> index 8d1b2771c1aa02..af5048a1ba8894 100644
+> index af5048a1ba8894..e362cb962a7234 100644
 > --- a/drivers/s390/cio/vfio_ccw_cp.c
 > +++ b/drivers/s390/cio/vfio_ccw_cp.c
-> @@ -16,6 +16,7 @@
->  #include <asm/idals.h>
->  
->  #include "vfio_ccw_cp.h"
-> +#include "vfio_ccw_private.h"
->  
->  struct pfn_array {
->  	/* Starting guest physical I/O address. */
-> @@ -98,17 +99,17 @@ static int pfn_array_alloc(struct pfn_array *pa,
-> u64 iova, unsigned int len)
->   * If the pin request partially succeeds, or fails completely,
->   * all pages are left unpinned and a negative error value is
-> returned.
->   */
-> -static int pfn_array_pin(struct pfn_array *pa, struct device *mdev)
-> +static int pfn_array_pin(struct pfn_array *pa, struct vfio_device
-> *vdev)
+> @@ -103,13 +103,13 @@ static int pfn_array_pin(struct pfn_array *pa,
+> struct vfio_device *vdev)
 >  {
 >  	int ret = 0;
 >  
-> -	ret = vfio_pin_pages(mdev, pa->pa_iova_pfn, pa->pa_nr,
-> +	ret = vfio_pin_pages(vdev->dev, pa->pa_iova_pfn, pa->pa_nr,
+> -	ret = vfio_pin_pages(vdev->dev, pa->pa_iova_pfn, pa->pa_nr,
+> +	ret = vfio_pin_pages(vdev, pa->pa_iova_pfn, pa->pa_nr,
 >  			     IOMMU_READ | IOMMU_WRITE, pa->pa_pfn);
 >  
 >  	if (ret < 0) {
 >  		goto err_out;
 >  	} else if (ret > 0 && ret != pa->pa_nr) {
-> -		vfio_unpin_pages(mdev, pa->pa_iova_pfn, ret);
-> +		vfio_unpin_pages(vdev->dev, pa->pa_iova_pfn, ret);
+> -		vfio_unpin_pages(vdev->dev, pa->pa_iova_pfn, ret);
+> +		vfio_unpin_pages(vdev, pa->pa_iova_pfn, ret);
 >  		ret = -EINVAL;
 >  		goto err_out;
 >  	}
-> @@ -122,11 +123,11 @@ static int pfn_array_pin(struct pfn_array *pa,
-> struct device *mdev)
->  }
->  
->  /* Unpin the pages before releasing the memory. */
-> -static void pfn_array_unpin_free(struct pfn_array *pa, struct device
-> *mdev)
-> +static void pfn_array_unpin_free(struct pfn_array *pa, struct
-> vfio_device *vdev)
+> @@ -127,7 +127,7 @@ static void pfn_array_unpin_free(struct pfn_array
+> *pa, struct vfio_device *vdev)
 >  {
 >  	/* Only unpin if any pages were pinned to begin with */
 >  	if (pa->pa_nr)
-> -		vfio_unpin_pages(mdev, pa->pa_iova_pfn, pa->pa_nr);
-> +		vfio_unpin_pages(vdev->dev, pa->pa_iova_pfn, pa-
+> -		vfio_unpin_pages(vdev->dev, pa->pa_iova_pfn, pa-
 > >pa_nr);
+> +		vfio_unpin_pages(vdev, pa->pa_iova_pfn, pa->pa_nr);
 >  	pa->pa_nr = 0;
 >  	kfree(pa->pa_iova_pfn);
 >  }
-> @@ -190,7 +191,7 @@ static void convert_ccw0_to_ccw1(struct ccw1
-> *source, unsigned long len)
->   * Within the domain (@mdev), copy @n bytes from a guest physical
->   * address (@iova) to a host physical address (@to).
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c
+> b/drivers/s390/crypto/vfio_ap_ops.c
+> index 69768061cd7bd9..a10b3369d76c41 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -124,7 +124,7 @@ static void vfio_ap_free_aqic_resources(struct
+> vfio_ap_queue *q)
+>  		q->saved_isc = VFIO_AP_ISC_INVALID;
+>  	}
+>  	if (q->saved_pfn && !WARN_ON(!q->matrix_mdev)) {
+> -		vfio_unpin_pages(mdev_dev(q->matrix_mdev->mdev),
+> +		vfio_unpin_pages(&q->matrix_mdev->vdev,
+>  				 &q->saved_pfn, 1);
+>  		q->saved_pfn = 0;
+>  	}
+> @@ -258,7 +258,7 @@ static struct ap_queue_status
+> vfio_ap_irq_enable(struct vfio_ap_queue *q,
+>  		return status;
+>  	}
+>  
+> -	ret = vfio_pin_pages(mdev_dev(q->matrix_mdev->mdev), &g_pfn, 1,
+> +	ret = vfio_pin_pages(&q->matrix_mdev->vdev, &g_pfn, 1,
+>  			     IOMMU_READ | IOMMU_WRITE, &h_pfn);
+>  	switch (ret) {
+>  	case 1:
+> @@ -301,7 +301,7 @@ static struct ap_queue_status
+> vfio_ap_irq_enable(struct vfio_ap_queue *q,
+>  		break;
+>  	case AP_RESPONSE_OTHERWISE_CHANGED:
+>  		/* We could not modify IRQ setings: clear new
+> configuration */
+> -		vfio_unpin_pages(mdev_dev(q->matrix_mdev->mdev),
+> &g_pfn, 1);
+> +		vfio_unpin_pages(&q->matrix_mdev->vdev, &g_pfn, 1);
+>  		kvm_s390_gisc_unregister(kvm, isc);
+>  		break;
+>  	default:
+> @@ -1250,7 +1250,7 @@ static int vfio_ap_mdev_iommu_notifier(struct
+> notifier_block *nb,
+>  		struct vfio_iommu_type1_dma_unmap *unmap = data;
+>  		unsigned long g_pfn = unmap->iova >> PAGE_SHIFT;
+>  
+> -		vfio_unpin_pages(mdev_dev(matrix_mdev->mdev), &g_pfn,
+> 1);
+> +		vfio_unpin_pages(&matrix_mdev->vdev, &g_pfn, 1);
+>  		return NOTIFY_OK;
+>  	}
+>  
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index 8a5c46aa2bef61..24b92a45cfc8f1 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -2142,32 +2142,26 @@
+> EXPORT_SYMBOL(vfio_set_irqs_validate_and_prepare);
+>   * @phys_pfn[out]: array of host PFNs
+>   * Return error or number of pages pinned.
 >   */
-> -static long copy_from_iova(struct device *mdev,
-> +static long copy_from_iova(struct vfio_device *vdev,
->  			   void *to, u64 iova,
->  			   unsigned long n)
+> -int vfio_pin_pages(struct device *dev, unsigned long *user_pfn, int
+> npage,
+> +int vfio_pin_pages(struct vfio_device *vdev, unsigned long
+> *user_pfn, int npage,
+>  		   int prot, unsigned long *phys_pfn)
 >  {
-> @@ -203,9 +204,9 @@ static long copy_from_iova(struct device *mdev,
->  	if (ret < 0)
->  		return ret;
->  
-> -	ret = pfn_array_pin(&pa, mdev);
-> +	ret = pfn_array_pin(&pa, vdev);
->  	if (ret < 0) {
-> -		pfn_array_unpin_free(&pa, mdev);
-> +		pfn_array_unpin_free(&pa, vdev);
->  		return ret;
->  	}
->  
-> @@ -226,7 +227,7 @@ static long copy_from_iova(struct device *mdev,
->  			break;
->  	}
->  
-> -	pfn_array_unpin_free(&pa, mdev);
-> +	pfn_array_unpin_free(&pa, vdev);
->  
->  	return l;
->  }
-> @@ -423,11 +424,13 @@ static int ccwchain_loop_tic(struct ccwchain
-> *chain,
->  
->  static int ccwchain_handle_ccw(u32 cda, struct channel_program *cp)
->  {
-> +	struct vfio_device *vdev =
-> +		&container_of(cp, struct vfio_ccw_private, cp)->vdev;
->  	struct ccwchain *chain;
->  	int len, ret;
->  
->  	/* Copy 2K (the most we support today) of possible CCWs */
-> -	len = copy_from_iova(cp->mdev, cp->guest_cp, cda,
-> +	len = copy_from_iova(vdev, cp->guest_cp, cda,
->  			     CCWCHAIN_LEN_MAX * sizeof(struct ccw1));
->  	if (len)
->  		return len;
-> @@ -508,6 +511,8 @@ static int ccwchain_fetch_direct(struct ccwchain
-> *chain,
->  				 int idx,
->  				 struct channel_program *cp)
->  {
-> +	struct vfio_device *vdev =
-> +		&container_of(cp, struct vfio_ccw_private, cp)->vdev;
->  	struct ccw1 *ccw;
->  	struct pfn_array *pa;
->  	u64 iova;
-> @@ -526,7 +531,7 @@ static int ccwchain_fetch_direct(struct ccwchain
-> *chain,
->  	if (ccw_is_idal(ccw)) {
->  		/* Read first IDAW to see if it's 4K-aligned or not. */
->  		/* All subsequent IDAws will be 4K-aligned. */
-> -		ret = copy_from_iova(cp->mdev, &iova, ccw->cda,
-> sizeof(iova));
-> +		ret = copy_from_iova(vdev, &iova, ccw->cda,
-> sizeof(iova));
->  		if (ret)
->  			return ret;
->  	} else {
-> @@ -555,7 +560,7 @@ static int ccwchain_fetch_direct(struct ccwchain
-> *chain,
->  
->  	if (ccw_is_idal(ccw)) {
->  		/* Copy guest IDAL into host IDAL */
-> -		ret = copy_from_iova(cp->mdev, idaws, ccw->cda,
-> idal_len);
-> +		ret = copy_from_iova(vdev, idaws, ccw->cda, idal_len);
->  		if (ret)
->  			goto out_unpin;
->  
-> @@ -574,7 +579,7 @@ static int ccwchain_fetch_direct(struct ccwchain
-> *chain,
->  	}
->  
->  	if (ccw_does_data_transfer(ccw)) {
-> -		ret = pfn_array_pin(pa, cp->mdev);
-> +		ret = pfn_array_pin(pa, vdev);
->  		if (ret < 0)
->  			goto out_unpin;
->  	} else {
-> @@ -590,7 +595,7 @@ static int ccwchain_fetch_direct(struct ccwchain
-> *chain,
->  	return 0;
->  
->  out_unpin:
-> -	pfn_array_unpin_free(pa, cp->mdev);
-> +	pfn_array_unpin_free(pa, vdev);
->  out_free_idaws:
->  	kfree(idaws);
->  out_init:
-> @@ -632,8 +637,10 @@ static int ccwchain_fetch_one(struct ccwchain
-> *chain,
->   * Returns:
->   *   %0 on success and a negative error value on failure.
->   */
-> -int cp_init(struct channel_program *cp, struct device *mdev, union
-> orb *orb)
-> +int cp_init(struct channel_program *cp, union orb *orb)
->  {
-> +	struct vfio_device *vdev =
-> +		&container_of(cp, struct vfio_ccw_private, cp)->vdev;
->  	/* custom ratelimit used to avoid flood during guest IPL */
->  	static DEFINE_RATELIMIT_STATE(ratelimit_state, 5 * HZ, 1);
+>  	struct vfio_container *container;
+> -	struct vfio_group *group;
+> +	struct vfio_group *group = vdev->group;
+>  	struct vfio_iommu_driver *driver;
 >  	int ret;
-> @@ -650,11 +657,10 @@ int cp_init(struct channel_program *cp, struct
-> device *mdev, union orb *orb)
->  	 * the problem if something does break.
->  	 */
->  	if (!orb->cmd.pfch && __ratelimit(&ratelimit_state))
-> -		dev_warn(mdev, "Prefetching channel program even though
-> prefetch not specified in ORB");
-> +		dev_warn(vdev->dev, "Prefetching channel program even
-> though prefetch not specified in ORB");
 >  
->  	INIT_LIST_HEAD(&cp->ccwchain_list);
->  	memcpy(&cp->orb, orb, sizeof(*orb));
-> -	cp->mdev = mdev;
+> -	if (!dev || !user_pfn || !phys_pfn || !npage)
+> +	if (!user_pfn || !phys_pfn || !npage)
+>  		return -EINVAL;
 >  
->  	/* Build a ccwchain for the first CCW segment */
->  	ret = ccwchain_handle_ccw(orb->cmd.cpa, cp);
-> @@ -682,6 +688,8 @@ int cp_init(struct channel_program *cp, struct
-> device *mdev, union orb *orb)
+>  	if (npage > VFIO_PIN_PAGES_MAX_ENTRIES)
+>  		return -E2BIG;
+>  
+> -	group = vfio_group_get_from_dev(dev);
+> -	if (!group)
+> -		return -ENODEV;
+> -
+> -	if (group->dev_counter > 1) {
+> -		ret = -EINVAL;
+> -		goto err_pin_pages;
+> -	}
+> +	if (group->dev_counter > 1)
+> +		return -EINVAL;
+>  
+>  	ret = vfio_group_add_container_user(group);
+>  	if (ret)
+> -		goto err_pin_pages;
+> +		return ret;
+>  
+>  	container = group->container;
+>  	driver = container->iommu_driver;
+> @@ -2180,8 +2174,6 @@ int vfio_pin_pages(struct device *dev, unsigned
+> long *user_pfn, int npage,
+>  
+>  	vfio_group_try_dissolve_container(group);
+>  
+> -err_pin_pages:
+> -	vfio_group_put(group);
+>  	return ret;
+>  }
+>  EXPORT_SYMBOL(vfio_pin_pages);
+> @@ -2195,28 +2187,24 @@ EXPORT_SYMBOL(vfio_pin_pages);
+>   *                 be greater than VFIO_PIN_PAGES_MAX_ENTRIES.
+>   * Return error or number of pages unpinned.
 >   */
->  void cp_free(struct channel_program *cp)
+> -int vfio_unpin_pages(struct device *dev, unsigned long *user_pfn,
+> int npage)
+> +int vfio_unpin_pages(struct vfio_device *vdev, unsigned long
+> *user_pfn,
+> +		     int npage)
 >  {
-> +	struct vfio_device *vdev =
-> +		&container_of(cp, struct vfio_ccw_private, cp)->vdev;
->  	struct ccwchain *chain, *temp;
->  	int i;
+>  	struct vfio_container *container;
+> -	struct vfio_group *group;
+>  	struct vfio_iommu_driver *driver;
+>  	int ret;
 >  
-> @@ -691,7 +699,7 @@ void cp_free(struct channel_program *cp)
->  	cp->initialized = false;
->  	list_for_each_entry_safe(chain, temp, &cp->ccwchain_list, next)
-> {
->  		for (i = 0; i < chain->ch_len; i++) {
-> -			pfn_array_unpin_free(chain->ch_pa + i, cp-
-> >mdev);
-> +			pfn_array_unpin_free(chain->ch_pa + i, vdev);
->  			ccwchain_cda_free(chain, i);
->  		}
->  		ccwchain_free(chain);
-> diff --git a/drivers/s390/cio/vfio_ccw_cp.h
-> b/drivers/s390/cio/vfio_ccw_cp.h
-> index ba31240ce96594..e4c436199b4cda 100644
-> --- a/drivers/s390/cio/vfio_ccw_cp.h
-> +++ b/drivers/s390/cio/vfio_ccw_cp.h
-> @@ -37,13 +37,11 @@
->  struct channel_program {
->  	struct list_head ccwchain_list;
->  	union orb orb;
-> -	struct device *mdev;
->  	bool initialized;
->  	struct ccw1 *guest_cp;
->  };
+> -	if (!dev || !user_pfn || !npage)
+> +	if (!user_pfn || !npage)
+>  		return -EINVAL;
 >  
-> -extern int cp_init(struct channel_program *cp, struct device *mdev,
-> -		   union orb *orb);
-> +extern int cp_init(struct channel_program *cp, union orb *orb);
->  extern void cp_free(struct channel_program *cp);
->  extern int cp_prefetch(struct channel_program *cp);
->  extern union orb *cp_get_orb(struct channel_program *cp, u32
-> intparm, u8 lpm);
-> diff --git a/drivers/s390/cio/vfio_ccw_fsm.c
-> b/drivers/s390/cio/vfio_ccw_fsm.c
-> index e435a9cd92dacf..8483a266051c21 100644
-> --- a/drivers/s390/cio/vfio_ccw_fsm.c
-> +++ b/drivers/s390/cio/vfio_ccw_fsm.c
-> @@ -262,8 +262,7 @@ static void fsm_io_request(struct
-> vfio_ccw_private *private,
->  			errstr = "transport mode";
->  			goto err_out;
->  		}
-> -		io_region->ret_code = cp_init(&private->cp,
-> mdev_dev(mdev),
-> -					      orb);
-> +		io_region->ret_code = cp_init(&private->cp, orb);
->  		if (io_region->ret_code) {
->  			VFIO_CCW_MSG_EVENT(2,
->  					   "%pUl (%x.%x.%04x):
-> cp_init=%d\n",
+>  	if (npage > VFIO_PIN_PAGES_MAX_ENTRIES)
+>  		return -E2BIG;
+>  
+> -	group = vfio_group_get_from_dev(dev);
+> -	if (!group)
+> -		return -ENODEV;
+> -
+> -	ret = vfio_group_add_container_user(group);
+> +	ret = vfio_group_add_container_user(vdev->group);
+>  	if (ret)
+> -		goto err_unpin_pages;
+> +		return ret;
+>  
+> -	container = group->container;
+> +	container = vdev->group->container;
+>  	driver = container->iommu_driver;
+>  	if (likely(driver && driver->ops->unpin_pages))
+>  		ret = driver->ops->unpin_pages(container->iommu_data,
+> user_pfn,
+> @@ -2224,10 +2212,8 @@ int vfio_unpin_pages(struct device *dev,
+> unsigned long *user_pfn, int npage)
+>  	else
+>  		ret = -ENOTTY;
+>  
+> -	vfio_group_try_dissolve_container(group);
+> +	vfio_group_try_dissolve_container(vdev->group);
+>  
+> -err_unpin_pages:
+> -	vfio_group_put(group);
+>  	return ret;
+>  }
+>  EXPORT_SYMBOL(vfio_unpin_pages);
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index 748ec0e0293aea..8f2a09801a660b 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -150,9 +150,9 @@ extern long vfio_external_check_extension(struct
+> vfio_group *group,
+>  
+>  #define VFIO_PIN_PAGES_MAX_ENTRIES	(PAGE_SIZE/sizeof(unsigned
+> long))
+>  
+> -extern int vfio_pin_pages(struct device *dev, unsigned long
+> *user_pfn,
+> +extern int vfio_pin_pages(struct vfio_device *vdev, unsigned long
+> *user_pfn,
+>  			  int npage, int prot, unsigned long
+> *phys_pfn);
+> -extern int vfio_unpin_pages(struct device *dev, unsigned long
+> *user_pfn,
+> +extern int vfio_unpin_pages(struct vfio_device *vdev, unsigned long
+> *user_pfn,
+>  			    int npage);
+>  
+>  extern int vfio_group_pin_pages(struct vfio_group *group,
 
