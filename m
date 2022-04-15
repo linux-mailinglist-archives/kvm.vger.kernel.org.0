@@ -2,244 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4077502D42
-	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 17:45:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84E55502E0B
+	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 18:55:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355559AbiDOPsR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Apr 2022 11:48:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57458 "EHLO
+        id S1355994AbiDOQ5H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Apr 2022 12:57:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355690AbiDOPrm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Apr 2022 11:47:42 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CEB14B406
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 08:45:13 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id n22so7224380pfa.0
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 08:45:13 -0700 (PDT)
+        with ESMTP id S1355982AbiDOQ5F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Apr 2022 12:57:05 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23FD59FC6;
+        Fri, 15 Apr 2022 09:54:36 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 123-20020a1c1981000000b0038b3616a71aso5343041wmz.4;
+        Fri, 15 Apr 2022 09:54:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=DJz+XdQX6UOkOE3lKu1oWsGDvtCwRAimwntgJttMBLE=;
-        b=oppB+HyCvnH3tBpbTlbZ4AMfp6ljQc4etcrFC9MRXTOahK6FFJngtCBaJ3QFhuOA3g
-         NC9S7CZLy66GfWLVkxKBdbF5lBdRWaA7/T7MGPVnBF09DXT9VVhpzs3bOc6wZAi9Q4i2
-         ulV1oszqEwkZsu3GAhjEhm3jujhxJhb4einiFxhsl3+hWMkKDwKU9qvnYEhYdrgNw/FJ
-         XELoIDRwtdJ6/DrPFdRK2VJ9g1P2x+ocJIsXdBE02eXFeg2+fjIlE1de+cxtxpUKqJjp
-         UC60Qt5zyZTvW7ObQGZA3B/ssV6wcYFTPYqLKr8fPaBWoC8pq6hglvaMP0bpcxvhnLFW
-         CpvQ==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=m2WR8HeVZxDMPBsJ2wi+S56OzUuDecjD2lzSbt+tO8w=;
+        b=VpDcNv+xkhUuiD56GQAFJE4kWQUHnRxn/E0B5nRoT6txv3OM8MbEsJzh/Peu7zhHA0
+         QfUmruhvzc0cgHLn9fClRghbsmuxW8Fqvr2vJYBOEZn3AfUd64WSe2pjDXocyVyXDsI+
+         jYNGSeFzUOpGbTAfmZ9CRc4EVmDM0AfKViOwctjYIVl1o3fqfhHKeZrcM18RiONa1MWg
+         Wg4H6ILuWaQA2o8VIm6hgmybNJmeJdP0tPXHAn7OvrB2wjp2Lc8sXq806kuDxwGXz+aa
+         5kWKhJIO3IzAT96eDAJYsMTJtgn8B0k6rmBB3eo4fXYxWfFE32irfxMqmFxFMIgEAN1H
+         8U3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=DJz+XdQX6UOkOE3lKu1oWsGDvtCwRAimwntgJttMBLE=;
-        b=vUQPLSPFg0SqKaxO3Vkh7h0RvH30FgnmfhvUCB/sl6B6mTinqu1QFPpUXZeJ6tgUeA
-         eBnLnaYQeG7x+oV0v7fcWG7sKG64uTG9wIx5Iph63iJVqwRuC8x81PYZQey2+9gUtjT0
-         67olDD6/TYC+za4HzTS/BcbkX6uCiaIfVFP3LYv74Mnx9mw6zd0nc6K/nwuKoqKFu2qL
-         cVsO15KDiYPTZjGmCbNMOYElP8SP45dWKyrWJkIDuN4/eFtAnwXUgK9UNuCjx4WmNebl
-         Ff9UVIw0d6w3b77Gaw7LUJukSkyNhHaff8mpY7x2K02mgvD355wKh9uMAu3Hzadzv6ye
-         0JEg==
-X-Gm-Message-State: AOAM531b6qswTUYpBG3GJQgFzumT8XcJ2ysljAYD3IJCK4jUQi8OAwr+
-        gwGT+frPUdQlCWk6R0afMmTx8Q==
-X-Google-Smtp-Source: ABdhPJzxjtTR/DW3cLHRpWSHUd3RZNI4k3uboDnKftMkCRl1+UNhNszsPOaRWfQk0kAGrAsdRqYylA==
-X-Received: by 2002:a05:6a00:2284:b0:50a:40b8:28ff with SMTP id f4-20020a056a00228400b0050a40b828ffmr3431349pfe.17.1650037512890;
-        Fri, 15 Apr 2022 08:45:12 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id x22-20020aa784d6000000b005082b06cc58sm3113058pfn.215.2022.04.15.08.45.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Apr 2022 08:45:12 -0700 (PDT)
-Date:   Fri, 15 Apr 2022 15:45:08 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Zeng Guang <guang.zeng@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
-        Gao Chao <chao.gao@intel.com>
-Subject: Re: [PATCH v8 9/9] KVM: VMX: enable IPI virtualization
-Message-ID: <YlmTBJ9KU8JxVFN2@google.com>
-References: <20220411090447.5928-1-guang.zeng@intel.com>
- <20220411090447.5928-10-guang.zeng@intel.com>
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=m2WR8HeVZxDMPBsJ2wi+S56OzUuDecjD2lzSbt+tO8w=;
+        b=rgUEZ+R35Nwl7j0R2NUHCQF7nsyXU73MWZOj0p5jrFMf+m9H6d3132i/oyxQR7BKsM
+         itCxqWRyDJKQD4pl1MTOwXmd9KTtASsNtxH4MYj2enB9/w+KbYYjSG8so3IFmgleokXX
+         YXwkxg7HgXsoCGVfLdfizrDH7kEaS7lWuJYiqKWHH4GXR1FTcE5YFaWA6iMzC/yfG+rX
+         IEpIMQN06P0+S2bWX9vjwlvWUTlrCIQCyMR0acnWN7ar/sVSW0XKZmHwGMHpydtd9rTl
+         goysFatgtH7q/4ZHBfW0fx6ntI4cN3KErIlAhmdOR7vc70TGjXQVrIo3APON6jrNduPl
+         QqjQ==
+X-Gm-Message-State: AOAM530RYDUY3Y8XpaYfRrIpjH/ikoChogQQVH95Uw7N0tX70EFRGJOn
+        kPgmOy9s9yD6b/AAdgdFXqA=
+X-Google-Smtp-Source: ABdhPJwOhR+ihYnd0JcIhDD0h1nkAp7TumgzKKg+StEsNj+Xbp7B+PvUsidGOx/u4dEqslH2IO/+5A==
+X-Received: by 2002:a05:600c:511b:b0:392:36fd:6728 with SMTP id o27-20020a05600c511b00b0039236fd6728mr1323882wms.93.1650041674598;
+        Fri, 15 Apr 2022 09:54:34 -0700 (PDT)
+Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
+        by smtp.googlemail.com with ESMTPSA id f7-20020a1c3807000000b0038ffac6f752sm4681294wma.45.2022.04.15.09.54.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Apr 2022 09:54:34 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <26d74179-55fb-b70b-8a29-67e26a032abe@redhat.com>
+Date:   Fri, 15 Apr 2022 18:54:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220411090447.5928-10-guang.zeng@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [RFC PATCH v5 017/104] KVM: TDX: Add helper functions to print
+ TDX SEAMCALL error
+Content-Language: en-US
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Jim Mattson <jmattson@google.com>,
+        erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <7d89296e776b125b75762c040879c16afa7b6da6.1646422845.git.isaku.yamahata@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <7d89296e776b125b75762c040879c16afa7b6da6.1646422845.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 11, 2022, Zeng Guang wrote:
-> @@ -4194,15 +4199,19 @@ static void vmx_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  
->  	pin_controls_set(vmx, vmx_pin_based_exec_ctrl(vmx));
-> -	if (cpu_has_secondary_exec_ctrls()) {
-> -		if (kvm_vcpu_apicv_active(vcpu))
-> -			secondary_exec_controls_setbit(vmx,
-> -				      SECONDARY_EXEC_APIC_REGISTER_VIRT |
-> -				      SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
-> -		else
-> -			secondary_exec_controls_clearbit(vmx,
-> -					SECONDARY_EXEC_APIC_REGISTER_VIRT |
-> -					SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
-> +
-> +	if (kvm_vcpu_apicv_active(vcpu)) {
-> +		secondary_exec_controls_setbit(vmx,
-> +			      SECONDARY_EXEC_APIC_REGISTER_VIRT |
-> +			      SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
-> +		if (enable_ipiv)
-> +			tertiary_exec_controls_setbit(vmx, TERTIARY_EXEC_IPI_VIRT);
-> +	} else {
-> +		secondary_exec_controls_clearbit(vmx,
-> +			      SECONDARY_EXEC_APIC_REGISTER_VIRT |
-> +			      SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
+On 3/4/22 20:48, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> Add helper functions to print out errors from the TDX module in a uniform
+> manner.
+> 
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>   arch/x86/kvm/Makefile        |  2 +-
+>   arch/x86/kvm/vmx/seamcall.h  |  2 ++
+>   arch/x86/kvm/vmx/tdx_error.c | 22 ++++++++++++++++++++++
+>   3 files changed, 25 insertions(+), 1 deletion(-)
+>   create mode 100644 arch/x86/kvm/vmx/tdx_error.c
 
-Thanks for doing this, but can you move it to a separate patch?  Just in case
-we're missing something and this somehow explodes.
+When rebasing against tip/x86/tdx,  the new .c file needs to include 
+asm/tdx.h.
 
-> +		if (enable_ipiv)
-> +			tertiary_exec_controls_clearbit(vmx, TERTIARY_EXEC_IPI_VIRT);
->  	}
->  
->  	vmx_update_msr_bitmap_x2apic(vcpu);
-> @@ -4236,7 +4245,16 @@ static u32 vmx_exec_control(struct vcpu_vmx *vmx)
->  
->  static u64 vmx_tertiary_exec_control(struct vcpu_vmx *vmx)
->  {
-> -	return vmcs_config.cpu_based_3rd_exec_ctrl;
-> +	u64 exec_control = vmcs_config.cpu_based_3rd_exec_ctrl;
+Paolo
+
+> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+> index e8f83a7d0dc3..3d6550c73fb5 100644
+> --- a/arch/x86/kvm/Makefile
+> +++ b/arch/x86/kvm/Makefile
+> @@ -24,7 +24,7 @@ kvm-$(CONFIG_KVM_XEN)	+= xen.o
+>   kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+>   			   vmx/evmcs.o vmx/nested.o vmx/posted_intr.o vmx/main.o
+>   kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
+> -kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o vmx/seamcall.o
+> +kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o vmx/seamcall.o vmx/tdx_error.o
+>   
+>   kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o svm/sev.o
+>   
+> diff --git a/arch/x86/kvm/vmx/seamcall.h b/arch/x86/kvm/vmx/seamcall.h
+> index 604792e9a59f..5ac419cd8e27 100644
+> --- a/arch/x86/kvm/vmx/seamcall.h
+> +++ b/arch/x86/kvm/vmx/seamcall.h
+> @@ -16,6 +16,8 @@ struct tdx_module_output;
+>   u64 kvm_seamcall(u64 op, u64 rcx, u64 rdx, u64 r8, u64 r9, u64 r10,
+>   		struct tdx_module_output *out);
+>   
+> +void pr_tdx_error(u64 op, u64 error_code, const struct tdx_module_output *out);
 > +
-> +	/*
-> +	 * IPI virtualization relies on APICv. Disable IPI virtualization if
-> +	 * APICv is inhibited.
-> +	 */
-> +	if (!enable_ipiv || !kvm_vcpu_apicv_active(&vmx->vcpu))
-> +		exec_control &= ~TERTIARY_EXEC_IPI_VIRT;
+>   #endif /* !__ASSEMBLY__ */
+>   
+>   #endif	/* CONFIG_INTEL_TDX_HOST */
+> diff --git a/arch/x86/kvm/vmx/tdx_error.c b/arch/x86/kvm/vmx/tdx_error.c
+> new file mode 100644
+> index 000000000000..61ed855d1188
+> --- /dev/null
+> +++ b/arch/x86/kvm/vmx/tdx_error.c
+> @@ -0,0 +1,22 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* functions to record TDX SEAMCALL error */
 > +
-> +	return exec_control;
->  }
->  
->  /*
-> @@ -4384,10 +4402,37 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
->  	return exec_control;
->  }
->  
-> +int vmx_get_pid_table_order(struct kvm_vmx *kvm_vmx)
+> +#include <linux/kernel.h>
+> +#include <linux/bug.h>
+> +
+> +#include "tdx_ops.h"
+> +
+> +void pr_tdx_error(u64 op, u64 error_code, const struct tdx_module_output *out)
 > +{
-> +	return get_order(kvm_vmx->kvm.arch.max_vcpu_ids * sizeof(*kvm_vmx->pid_table));
-
-I think it's slightly less gross to take @kvm and then:
-
-	return get_order(kvm->arch.max_vcpu_ids * sizeof(*to_kvm_vmx(kvm)->pid_table));
-
-> +}
-> +
-> +static int vmx_alloc_ipiv_pid_table(struct kvm *kvm)
-> +{
-> +	struct page *pages;
-> +	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
-> +
-> +	if (!irqchip_in_kernel(kvm) || !enable_ipiv)
-> +		return 0;
-
-Newline here please.
-
-> +	if (kvm_vmx->pid_table)
-
-Note, this check goes away if this ends up being called from a dedicated ioctl.
-
-> +		return 0;
-> +
-> +	pages = alloc_pages(GFP_KERNEL | __GFP_ZERO,
-> +			    vmx_get_pid_table_order(kvm_vmx));
-> +
-
-But no newline here please :-)
-
-> +	if (!pages)
-> +		return -ENOMEM;
-> +
-> +	kvm_vmx->pid_table = (void *)page_address(pages);
-> +	return 0;
-> +}
-> +
->  #define VMX_XSS_EXIT_BITMAP 0
->  
->  static void init_vmcs(struct vcpu_vmx *vmx)
->  {
-> +	struct kvm_vmx *kvm_vmx = to_kvm_vmx(vmx->vcpu.kvm);
-
-Might be worth doing:
-
-	struct kvm *kvm = vmx->vcpu.kvm;
-	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
-
-The kvm_vmx->kvm.arch below is kinda funky.
-
-Ah yeah, do that, then e.g. the kvm_pause_in_guest() call doesn't need to get
-'kvm' itself.
-
-> +
->  	if (nested)
->  		nested_vmx_set_vmcs_shadowing_bitmap();
->  
-> @@ -4419,6 +4464,11 @@ static void init_vmcs(struct vcpu_vmx *vmx)
->  		vmcs_write64(POSTED_INTR_DESC_ADDR, __pa((&vmx->pi_desc)));
->  	}
->  
-> +	if (vmx_can_use_ipiv(&vmx->vcpu)) {
-> +		vmcs_write64(PID_POINTER_TABLE, __pa(kvm_vmx->pid_table));
-> +		vmcs_write16(LAST_PID_POINTER_INDEX, kvm_vmx->kvm.arch.max_vcpu_ids - 1);
+> +	if (!out) {
+> +		pr_err_ratelimited("SEAMCALL[%lld] failed: 0x%llx\n",
+> +				op, error_code);
+> +		return;
 > +	}
 > +
->  	if (!kvm_pause_in_guest(vmx->vcpu.kvm)) {
->  		vmcs_write32(PLE_GAP, ple_gap);
->  		vmx->ple_window = ple_window;
-> @@ -7112,6 +7162,10 @@ static int vmx_vcpu_create(struct kvm_vcpu *vcpu)
->  			goto free_vmcs;
->  	}
->  
-> +	if (vmx_can_use_ipiv(vcpu))
-> +		WRITE_ONCE(to_kvm_vmx(vcpu->kvm)->pid_table[vcpu->vcpu_id],
-> +			   __pa(&vmx->pi_desc) | PID_TABLE_ENTRY_VALID);
-> +
->  	return 0;
->  
->  free_vmcs:
-> @@ -7746,6 +7800,14 @@ static bool vmx_check_apicv_inhibit_reasons(enum kvm_apicv_inhibit reason)
->  	return supported & BIT(reason);
->  }
->  
-> +static void vmx_vm_destroy(struct kvm *kvm)
-> +{
-> +	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
-> +
-> +	if (kvm_vmx->pid_table)
-> +		free_pages((unsigned long)kvm_vmx->pid_table, vmx_get_pid_table_order(kvm_vmx));
-
-free_pages() does the != 0 check, no need to handle that here.  I agree it feels
-wierd, but it's well established behavior.
-
+> +	pr_err_ratelimited(
+> +		"SEAMCALL[%lld] failed: 0x%llx "
+> +		"RCX 0x%llx, RDX 0x%llx, R8 0x%llx, R9 0x%llx, R10 0x%llx, R11 0x%llx\n",
+> +		op, error_code,
+> +		out->rcx, out->rdx, out->r8, out->r9, out->r10, out->r11);
 > +}
-> +
->  static struct kvm_x86_ops vmx_x86_ops __initdata = {
->  	.name = "kvm_intel",
->  
+
