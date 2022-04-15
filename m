@@ -2,59 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C9C12502ED0
-	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 20:49:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D750E502F26
+	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 21:13:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346999AbiDOSry (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Apr 2022 14:47:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53718 "EHLO
+        id S1348551AbiDOTOY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Apr 2022 15:14:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346947AbiDOSrw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Apr 2022 14:47:52 -0400
-Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 621214EF77
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 11:45:23 -0700 (PDT)
-Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-ddfa38f1c1so8722693fac.11
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 11:45:23 -0700 (PDT)
+        with ESMTP id S242436AbiDOTOW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Apr 2022 15:14:22 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81E9621E35
+        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 12:11:51 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id n8so7799321plh.1
+        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 12:11:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=b5Uzp0RLa089q2P6LXUgB4v6/9r0Kd94Pa7ruaUq9mY=;
-        b=AUpk/W/9OfA2b1qWd66tJgJGcVj7rCoTFcEsjtv9RpkPdnj3TfFwtJDdtjAevR1iHe
-         5kK5VlIR8bTKBSfGyW5Fejy2l7zyVj/MQvvz//yzkwLZm7ZfIkFpfNiGXGHK21GV6Ycs
-         IxTLzagGQjc7LnwPPBCQmkudYK31yMzA8AYGho9LKchivBxtMOewYstscT2pWA/yrgho
-         oruwg06p76gKwqX/jkAkrnaxNzJ7NvaXOx27kvPrxAwx0jr7Q2jEE8hwZAiBzL4HoXlD
-         tgTGP6yO8RmdJPnWxBJELmn/U3ZIaLhzDrAfFBMqYLdZcJH0N2bwJZqMpA1FDiD7q//p
-         Gl6g==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=3MpQlOCyEaCLCDWkZ0FlQMv1gBe/PS1/FfJBbH/tHgI=;
+        b=jqqDcCSeB+bShlFes1hXOtXZMkYftCC3zYaxhnDV7ErWoyt3UmAr2X0o094Pt0fXUp
+         MHnX4PMuw1dgzDKIVn8w70KtcZFjwTHAl8M373GMZdSvbkuSxQmZkEKXSyZW/GTsZBJ7
+         qCfkqqKAGgeqLiOfI+E9gCQDV3KjrWhLcLr39h4IQsapq6CD1Qnj+0plJ1cx0bm1BRQM
+         vUct7Bg5uaZy/AtVuLM53bE1fPivYSoyfeq/uI9kWoavhaKp5s+iQXKJk88jnxa+ft0m
+         s+KAi4f9fEG//THMPd2BM6TzwoudkkBCQvp/4R5wqDwG6xzcTxVZ5CbrXq0NUbgXzsfQ
+         UYFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=b5Uzp0RLa089q2P6LXUgB4v6/9r0Kd94Pa7ruaUq9mY=;
-        b=4zTXoO+TJavdKUPs59wt4p22EiiCr+spX2RNrAfLUMLDDrkgCUr84uuSIGe4/MtNKk
-         sEprVtdtyCC/+Q3JlpM5vGvX2UAW+xGtmI4U/TJek5a61iZ/yfcbS/JOza3/4VXRW3bC
-         ohBGTiuHTSxNq1tHLTgqEufhpMATPnr1FqYbSJqRxVV3XcfEeUY/jkwREPnY1gAFMJdM
-         H7dO20ZB3Hp2MzU6qYZUzF8gbwUKa2pNzc1XmrkQIx6knecTAeUurauPYNePtC7OrEXs
-         Lag7HLYZIJJ2dNLbIyNnoLeSANnhVLMo66gN4C1Vj7bgUCczGgvMnAYCzaKOEJusXmWO
-         n/5Q==
-X-Gm-Message-State: AOAM532ybhlJ4CO9QMhq+iC5AuTLd7oVd8zmuHGnkHNhBHm6mTuRnJV6
-        J834HryM0vqefscR/cw/z/5CJ6fsNniDX6MCrJVzMw==
-X-Google-Smtp-Source: ABdhPJwnz8rObz2OK/mD2zX7+J1kAV3Efl78kgSVqr6fbfbMgv668+kxopj6GNBU9pfCER6Z2ut2YPaVSpEurnSgFGo=
-X-Received: by 2002:a05:6870:b616:b0:e2:f8bb:5eb with SMTP id
- cm22-20020a056870b61600b000e2f8bb05ebmr1916201oab.218.1650048322492; Fri, 15
- Apr 2022 11:45:22 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220224105451.5035-1-varad.gautam@suse.com> <20220224105451.5035-12-varad.gautam@suse.com>
- <Ykzx5f9HucC7ss2i@google.com> <Yk/nid+BndbMBYCx@suse.de> <YlmkBLz4udVfdpeQ@google.com>
- <CAA03e5ETN6dhjSpPYTAGicCuKGjaTe-kVvAaMDC1=_EONfL=Sw@mail.gmail.com> <Ylm51s5c2t60G5sy@google.com>
-In-Reply-To: <Ylm51s5c2t60G5sy@google.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Fri, 15 Apr 2022 11:45:11 -0700
-Message-ID: <CAA03e5FVTizMzWeO2CDS_d7ym6eoaqn1tAOe+2C=OUOPLoHz3Q@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v3 11/11] x86: AMD SEV-ES: Handle string IO
- for IOIO #VC
-To:     Sean Christopherson <seanjc@google.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=3MpQlOCyEaCLCDWkZ0FlQMv1gBe/PS1/FfJBbH/tHgI=;
+        b=5Qxg9QvMOtd13YqP2H9aPz2drjHTCkxGWneJWj9pmnQFxugG95THk3hGIcmuFmf1TH
+         UEJL4Y86JB2WOXPJQUCag9yIHlJyGj/GBKAdPYln6mBeXzgaNfK7d/G2G+4Tb2HeL2b1
+         C14+PnKZPUeOH2vrb0SsUqQNFGl/BfFtvr/oBQ22btsgt8TcmgCfdRS0aZRduBDSnzLj
+         3wHqKRDc1zKk6agSynI09uWRzT7+IbsvDKSF1LvmqG4QSsP2lrR4golJwIWdDwTWSWUd
+         kR4g+YdMr+YWWJIU7gJaG0oD8VUg9Y8VNZwgSsgLBpjzQEXJCSjS8C9e+o6yCxhlJ7Dm
+         XgmQ==
+X-Gm-Message-State: AOAM533yyT8a7mwZM0VSNLwrKf+AT92rvV7EyJXcAoBzwyZC5znKK+mu
+        ONEm1b7h80q6avhvES9Go7hfiA==
+X-Google-Smtp-Source: ABdhPJz0xSC1WoQ2Kv7Xs4edtmSi9WX8aqurHsfVnQ0TKRIY4L5K0HHra2wFrjyN75r3lFFNbWGCCA==
+X-Received: by 2002:a17:902:bcc5:b0:158:d637:8330 with SMTP id o5-20020a170902bcc500b00158d6378330mr542386pls.134.1650049910824;
+        Fri, 15 Apr 2022 12:11:50 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id x36-20020a056a000be400b0050a40b8290dsm2639095pfu.54.2022.04.15.12.11.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Apr 2022 12:11:50 -0700 (PDT)
+Date:   Fri, 15 Apr 2022 19:11:46 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Marc Orr <marcorr@google.com>
 Cc:     Joerg Roedel <jroedel@suse.de>,
         Varad Gautam <varad.gautam@suse.com>,
         kvm list <kvm@vger.kernel.org>,
@@ -65,7 +60,21 @@ Cc:     Joerg Roedel <jroedel@suse.de>,
         David Rientjes <rientjes@google.com>,
         "Singh, Brijesh" <brijesh.singh@amd.com>,
         "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, bp@suse.de
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [kvm-unit-tests PATCH v3 11/11] x86: AMD SEV-ES: Handle string
+ IO for IOIO #VC
+Message-ID: <YlnDclyQmmaISvAZ@google.com>
+References: <20220224105451.5035-1-varad.gautam@suse.com>
+ <20220224105451.5035-12-varad.gautam@suse.com>
+ <Ykzx5f9HucC7ss2i@google.com>
+ <Yk/nid+BndbMBYCx@suse.de>
+ <YlmkBLz4udVfdpeQ@google.com>
+ <CAA03e5ETN6dhjSpPYTAGicCuKGjaTe-kVvAaMDC1=_EONfL=Sw@mail.gmail.com>
+ <Ylm51s5c2t60G5sy@google.com>
+ <CAA03e5FVTizMzWeO2CDS_d7ym6eoaqn1tAOe+2C=OUOPLoHz3Q@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAA03e5FVTizMzWeO2CDS_d7ym6eoaqn1tAOe+2C=OUOPLoHz3Q@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,149 +86,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 15, 2022 at 11:30 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Apr 15, 2022, Marc Orr wrote:
-> > On Fri, Apr 15, 2022 at 9:57 AM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > On Fri, Apr 08, 2022, Joerg Roedel wrote:
-> > > > On Wed, Apr 06, 2022 at 01:50:29AM +0000, Sean Christopherson wrote:
-> > > > > On Thu, Feb 24, 2022, Varad Gautam wrote:
-> > > > > > Using Linux's IOIO #VC processing logic.
-> > > > >
-> > > > > How much string I/O is there in KUT?  I assume it's rare, i.e. avoiding it entirely
-> > > > > is probably less work in the long run.
-> > > >
-> > > > The problem is that SEV-ES support will silently break if someone adds
-> > > > it unnoticed and without testing changes on SEV-ES.
-> > >
-> > > But IMO that is extremely unlikely to happen.  objdump + grep shows that the only
-> > > string I/O in KUT comes from the explicit asm in emulator.c and amd_sev.c.  And
-> > > the existence of amd_sev.c's version suggests that emulator.c isn't supported.
-> > > I.e. this is being added purely for an SEV specific test, which is silly.
-> > >
-> > > And it's not like we're getting validation coverage of the exit_info, that also
-> > > comes from software in vc_ioio_exitinfo().
-> > >
-> > > Burying this in the #VC handler makes it so much harder to understand what is
-> > > actually be tested, and will make it difficult to test the more interesting edge
-> > > cases.  E.g. I'd really like to see a test that requests string I/O emulation for
-> > > a buffer that's beyond the allowed size, straddles multiple pages, walks into
-> > > non-existent memory, etc.., and doing those with a direct #VMGEXIT will be a lot
-> > > easier to write and read then bouncing through the #VC handler.
-> >
-> > For the record, I like the current approach of implementing a #VC
-> > handler within kvm-unit-tests itself for the string IO.
-> >
-> > Rationale:
-> > - Makes writing string IO tests easy.
->
-> (a) that's debatable, (b) it's a moot point because we can and should add a helper
-> to do the dirty work.  E.g.
->
->   static void sev_es_do_string_io(..., int port, int size, int count, void *data);
->
-> I say it's debatable because it's not like this is the most pleasant code to read:
->
->         asm volatile("cld \n\t"
->                      "movw %0, %%dx \n\t"
->                      "rep outsb \n\t"
->                      : : "i"((short)TESTDEV_IO_PORT),
->                        "S"(st1), "c"(sizeof(st1) - 1));
+On Fri, Apr 15, 2022, Marc Orr wrote:
+> On Fri, Apr 15, 2022 at 11:30 AM Sean Christopherson <seanjc@google.com> wrote:
+> > Yes, we can and probably should add wrappers for the raw string I/O tests too.
+> > But, no matter what, somehwere there has to be a helper to translate raw string
+> > I/O into SEV-ES string I/O.  I don't see why doing that in the #VC handler is any
+> > easier than doing it in a helper.
+> 
+> Hmmm... yeah, if this patch really does get vetoed then rather than
+> throw it away maybe we can convert it to be loaded with a helper now.
+> 
+> Note: I hear your arguments, but I still don't agree with throwing
+> away this patch. At least not based on the arguments made in this
+> email thread. I think having a default #VC handler to handle string IO
+> is better than not having one. Individual tests can always override
+> it.
 
-Yeah, if we have a helper that resolves most of my concerns. (More on
-this below.)
+What test is ever going to do its own string port I/O?  String MMIO is a different
+beast because REP MOVS and REP STOS can be generated by the compiler almost at will,
+e.g. memcpy(), memset(), struct initialization, random for-loops, etc...
 
-> > - We get some level of testing of the #VC handler in the guest kernel
-> > in the sense that this #VC handler is based on that one. So if we find
-> > an issue in this handler we know we probably need to fix that same
-> > issue in the guest kernel #VC handler.
-> > - I don't follow the argument that having a direct #VMGEXIT in the
-> > test itself makes the test easerit to write and read. It's going to
-> > add a lot of extra code to the test that makes it hard to parse the
-> > actual string IO operations and expectations IMHO.
->
-> I strongly disagree.  This
->
->         static char st1[] = "abcdefghijklmnop";
->
->         static void test_stringio(void)
->         {
->                 unsigned char r = 0;
->                 asm volatile("cld \n\t"
->                         "movw %0, %%dx \n\t"
->                         "rep outsb \n\t"
->                         : : "i"((short)TESTDEV_IO_PORT),
->                         "S"(st1), "c"(sizeof(st1) - 1));
->                 asm volatile("inb %1, %0\n\t" : "=a"(r) : "i"((short)TESTDEV_IO_PORT));
->                 report(r == st1[sizeof(st1) - 2], "outsb up"); /* last char */
->
->                 asm volatile("std \n\t"
->                         "movw %0, %%dx \n\t"
->                         "rep outsb \n\t"
->                         : : "i"((short)TESTDEV_IO_PORT),
->                         "S"(st1 + sizeof(st1) - 2), "c"(sizeof(st1) - 1));
->                 asm volatile("cld \n\t" : : );
->                 asm volatile("in %1, %0\n\t" : "=a"(r) : "i"((short)TESTDEV_IO_PORT));
->                 report(r == st1[0], "outsb down");
->         }
->
-> is not easy to write or read.
+Port I/O on the other requires very deliberate code.  I doubt it's even possible
+to generate string port I/O without resorting to assembly.
 
-Agreed. But having to also "Bring Your Own #VC Handler" makes it even
-harder. Which is my point.
+Outside of emulator.c, the next closest instance is the use of KVM's "force emulation
+prefix", which happens to sometimes decode as INSL due to using byte 0x6d :-)
 
-If we have helpers to load a #VC handler, then that resolves most of
-my concerns. Though, I still think having a default #VC handler for
-string IO is better than not having one. (More on that below.)
+realmode.c's print_serial() has string I/O, but (a) it's #ifdef'd out by default
+and (b) would be trivial to convert to a common helper.
 
-> I'm envisioning SEV-ES string I/O tests will be things like:
->
->         sev_es_outsb(..., TESTDEV_IO_PORT, sizeof(st1) - 1, st1);
->
->         sev_es_outsb_backwards(..., TESTDEV_IO_PORT, sizeof(st1) - 1,
->                                st1 + sizeof(st1) - 2));
->
-> where sev_es_outsb() is a wrapper to sev_es_do_string_io() or whatever and fills
-> in all the appropriate SEV-ES IOIO_* constants.
->
-> Yes, we can and probably should add wrappers for the raw string I/O tests too.
-> But, no matter what, somehwere there has to be a helper to translate raw string
-> I/O into SEV-ES string I/O.  I don't see why doing that in the #VC handler is any
-> easier than doing it in a helper.
+In other words, any test that does string I/O is going to have to either open code
+it in inline asm or call a helper.  I'd much prefer we enable the latter.
 
-Hmmm... yeah, if this patch really does get vetoed then rather than
-throw it away maybe we can convert it to be loaded with a helper now.
+> From reading the other email thread on the decoder, I get the
+> sense that the real reason you're opposed to this patch is because
+> you're opposed to pulling in the Linux decoder. I don't follow that
+> patch as well as this one. So that may or may not be a valid reason to
+> nuke this patch. I'll leave that for others to discuss.
 
-Note: I hear your arguments, but I still don't agree with throwing
-away this patch. At least not based on the arguments made in this
-email thread. I think having a default #VC handler to handle string IO
-is better than not having one. Individual tests can always override
-it. From reading the other email thread on the decoder, I get the
-sense that the real reason you're opposed to this patch is because
-you're opposed to pulling in the Linux decoder. I don't follow that
-patch as well as this one. So that may or may not be a valid reason to
-nuke this patch. I'll leave that for others to discuss.
-
-> > - I agree that writing test cases to straddle multiple pages, walk
-> > into non-existent memory, etc. is an excellent idea. But I don't
-> > follow how exposing the test itself to the #VC exit makes this easier.
->
-> The #VC handler does things like:
->
->         ghcb_count = sizeof(ghcb->shared_buffer) / io_bytes;
->
-> to explicitly not mess up the _guest_ kernel.  The proposed #VC handler literally
-> cannot generate:
->
->   - a string I/O request larger than 2032 bytes
->   - does not reside inside the GHCB's internal buffer
->   - spans multiple pages
->   - points at illegal memory
->
-> And so on an so forth.  And if we add helpers to allow that, then what value does
-> the #VC handler provide since adding a wrapper to follow the Linux guest approach
-> would be trivial?
-
-Fair point. But having the #VC handler doesn't prevent tests from
-pivoting to their own handler when needed.
+Yeah, they're very intertwined, not having to pull in a massive decoder is a big
+motivation for not wanting string I/O support in the #VC handler.  But, even were
+that not the case, IMO bouncing through the #VC handler for string I/O is asinine
+because the source of the #VC _knows_ that it wants to do string I/O.  Just call
+a helper.
