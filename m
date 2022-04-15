@@ -2,417 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E27A25024FB
-	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 07:54:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 670935025C5
+	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 08:45:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350176AbiDOF4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Apr 2022 01:56:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39528 "EHLO
+        id S244166AbiDOGrp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Apr 2022 02:47:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242245AbiDOF4g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Apr 2022 01:56:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2474B5DA2E
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 22:54:09 -0700 (PDT)
+        with ESMTP id S1350737AbiDOGrm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Apr 2022 02:47:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 16FC998F7D
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 23:45:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650002048;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1650005110;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=4DUpQQRjllWeKgwaikEH9+Zg1RdjLEbvQ8m8vSLOXgo=;
-        b=JYDcM6icb+UjJ5dzA+fDv0+QD3YMy5jtDDmnCS2Gp2U9uvKTrzZb368I+Q2VDzPPLslzSr
-        FCtYFzFVMd5pWY5SDQw6Swds49XZni1lEPUVGYmLbp/bqT35bIya+oIGHF5VWAtI7HYjDv
-        ClGj+45cXs0WpX6KlwsUSQ6pLSGpimM=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=mVx9cF7b07Hlw+Jyd93aqAlgfIPY+0nd7PYc9dSwC+U=;
+        b=KG8P7ExWthyUEape9kfIBuhWrFT1ZzQ8WThdVbXbc9uDFhpA/fWc2UMW2IIoBnHE58Bgxs
+        Yvvllnu7Sh1VabsQT3OUxw7FS7tPC1uMTaC7JWUsly1rLVpOybQ1gT18yOzoe/bCwhg+Xl
+        O7e6+zsWjrtznVhW1KvhSTWvTXtU+kk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-519-uF_DTO1bNgWDj1cIm9EMbA-1; Fri, 15 Apr 2022 01:54:07 -0400
-X-MC-Unique: uF_DTO1bNgWDj1cIm9EMbA-1
-Received: by mail-lf1-f72.google.com with SMTP id i32-20020a0565123e2000b0046d092e6bffso2422625lfv.2
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 22:54:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=4DUpQQRjllWeKgwaikEH9+Zg1RdjLEbvQ8m8vSLOXgo=;
-        b=E5ivpy0B4Ux4+IgHYN9BXHU36FYUXf1ZSusuDcq/xcIfCzp8zu1QEuBqJzuT7Gwx0Y
-         VFCXdk9d8+sxxWsyEZpVrWFhqcSIbR00pzmEimVBccZUR2AVeUzi4GmNJPMZPjKdC1jF
-         aoK7B6d9QsqrT/tqLT7J3v2ij4I/oJ2kC80j+iZwkZDcJes4scmDBQbzOKD40YrWYZEA
-         MsOR2AgUaN8K7VOvYhACLIlYY5JWzthrbAyNtzn35Pjqoei09HtmSZmQywyiU2CqfBE0
-         t+zDxRhUoD3Z/C2JAPelhpZConFbYpHGEbIjkuT5phT2jEZUT7xymquA03DcBDZHDP+C
-         FqUA==
-X-Gm-Message-State: AOAM531AihZjd6y4sdCTuOc+1YrPgY+7EUMNqr2ALvexK8UIBdjnUaKf
-        KMAvXVPGUueoIDRbdZH1Bv7uJIKyNDYLMk89csxe/+mlPCWZgGwfDS/0GVLHuyInZTwR7aTuAfV
-        6jVwTW8WPk7HHerk1IdEiNQ5H0jCm
-X-Received: by 2002:a05:6512:1285:b0:46b:a899:1111 with SMTP id u5-20020a056512128500b0046ba8991111mr4242487lfs.190.1650002045363;
-        Thu, 14 Apr 2022 22:54:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxMjPqFCCnsam4Gad1pwnmaN1PVSlqjX3b129ONCrCyE1AW6MdYUcqBDKuUQc4SGRNnhmWVZl0obuYmi/qz+og=
-X-Received: by 2002:a05:6512:1285:b0:46b:a899:1111 with SMTP id
- u5-20020a056512128500b0046ba8991111mr4242472lfs.190.1650002045138; Thu, 14
- Apr 2022 22:54:05 -0700 (PDT)
+ us-mta-164-4Am9g_ddMfCYYooyATDL9w-1; Fri, 15 Apr 2022 02:45:05 -0400
+X-MC-Unique: 4Am9g_ddMfCYYooyATDL9w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 283DB801E67;
+        Fri, 15 Apr 2022 06:45:05 +0000 (UTC)
+Received: from [10.72.13.171] (ovpn-13-171.pek2.redhat.com [10.72.13.171])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C7E040CF8F6;
+        Fri, 15 Apr 2022 06:44:58 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v5 00/10] KVM: arm64: Add support for hypercall services
+ selection
+To:     Raghavendra Rao Ananta <rananta@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc:     kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+References: <20220407011605.1966778-1-rananta@google.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <92eb2304-9259-0461-247f-d3a4e5eb4fd5@redhat.com>
+Date:   Fri, 15 Apr 2022 14:44:55 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-References: <20220406034346.74409-1-xuanzhuo@linux.alibaba.com>
- <20220406034346.74409-32-xuanzhuo@linux.alibaba.com> <122008a6-1e79-14d3-1478-59f96464afc9@redhat.com>
- <1649838917.6726515-10-xuanzhuo@linux.alibaba.com> <CACGkMEvPH1k76xB_cHq_S9hvMXgGruoXpKLfoMZvJZ-L7wM9iw@mail.gmail.com>
- <1649989126.5433838-1-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1649989126.5433838-1-xuanzhuo@linux.alibaba.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Fri, 15 Apr 2022 13:53:54 +0800
-Message-ID: <CACGkMEuju+kdapRbnx6OxsmAbD=JZin67xGBLEqLrMeuPPw0Fg@mail.gmail.com>
-Subject: Re: [PATCH v9 31/32] virtio_net: support rx/tx queue resize
-To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev <netdev@vger.kernel.org>,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm <kvm@vger.kernel.org>,
-        "open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220407011605.1966778-1-rananta@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 15, 2022 at 10:23 AM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wro=
-te:
->
-> On Thu, 14 Apr 2022 17:30:02 +0800, Jason Wang <jasowang@redhat.com> wrot=
-e:
-> > On Wed, Apr 13, 2022 at 4:47 PM Xuan Zhuo <xuanzhuo@linux.alibaba.com> =
-wrote:
-> > >
-> > > On Wed, 13 Apr 2022 16:00:18 +0800, Jason Wang <jasowang@redhat.com> =
-wrote:
-> > > >
-> > > > =E5=9C=A8 2022/4/6 =E4=B8=8A=E5=8D=8811:43, Xuan Zhuo =E5=86=99=E9=
-=81=93:
-> > > > > This patch implements the resize function of the rx, tx queues.
-> > > > > Based on this function, it is possible to modify the ring num of =
-the
-> > > > > queue.
-> > > > >
-> > > > > There may be an exception during the resize process, the resize m=
-ay
-> > > > > fail, or the vq can no longer be used. Either way, we must execut=
-e
-> > > > > napi_enable(). Because napi_disable is similar to a lock, napi_en=
-able
-> > > > > must be called after calling napi_disable.
-> > > > >
-> > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > > ---
-> > > > >   drivers/net/virtio_net.c | 81 +++++++++++++++++++++++++++++++++=
-+++++++
-> > > > >   1 file changed, 81 insertions(+)
-> > > > >
-> > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > > index b8bf00525177..ba6859f305f7 100644
-> > > > > --- a/drivers/net/virtio_net.c
-> > > > > +++ b/drivers/net/virtio_net.c
-> > > > > @@ -251,6 +251,9 @@ struct padded_vnet_hdr {
-> > > > >     char padding[4];
-> > > > >   };
-> > > > >
-> > > > > +static void virtnet_sq_free_unused_buf(struct virtqueue *vq, voi=
-d *buf);
-> > > > > +static void virtnet_rq_free_unused_buf(struct virtqueue *vq, voi=
-d *buf);
-> > > > > +
-> > > > >   static bool is_xdp_frame(void *ptr)
-> > > > >   {
-> > > > >     return (unsigned long)ptr & VIRTIO_XDP_FLAG;
-> > > > > @@ -1369,6 +1372,15 @@ static void virtnet_napi_enable(struct vir=
-tqueue *vq, struct napi_struct *napi)
-> > > > >   {
-> > > > >     napi_enable(napi);
-> > > > >
-> > > > > +   /* Check if vq is in reset state. The normal reset/resize pro=
-cess will
-> > > > > +    * be protected by napi. However, the protection of napi is o=
-nly enabled
-> > > > > +    * during the operation, and the protection of napi will end =
-after the
-> > > > > +    * operation is completed. If re-enable fails during the proc=
-ess, vq
-> > > > > +    * will remain unavailable with reset state.
-> > > > > +    */
-> > > > > +   if (vq->reset)
-> > > > > +           return;
-> > > >
-> > > >
-> > > > I don't get when could we hit this condition.
-> > >
-> > >
-> > > In patch 23, the code to implement re-enable vq is as follows:
-> > >
-> > > +static int vp_modern_enable_reset_vq(struct virtqueue *vq)
-> > > +{
-> > > +       struct virtio_pci_device *vp_dev =3D to_vp_device(vq->vdev);
-> > > +       struct virtio_pci_modern_device *mdev =3D &vp_dev->mdev;
-> > > +       struct virtio_pci_vq_info *info;
-> > > +       unsigned long flags, index;
-> > > +       int err;
-> > > +
-> > > +       if (!vq->reset)
-> > > +               return -EBUSY;
-> > > +
-> > > +       index =3D vq->index;
-> > > +       info =3D vp_dev->vqs[index];
-> > > +
-> > > +       /* check queue reset status */
-> > > +       if (vp_modern_get_queue_reset(mdev, index) !=3D 1)
-> > > +               return -EBUSY;
-> > > +
-> > > +       err =3D vp_active_vq(vq, info->msix_vector);
-> > > +       if (err)
-> > > +               return err;
-> > > +
-> > > +       if (vq->callback) {
-> > > +               spin_lock_irqsave(&vp_dev->lock, flags);
-> > > +               list_add(&info->node, &vp_dev->virtqueues);
-> > > +               spin_unlock_irqrestore(&vp_dev->lock, flags);
-> > > +       } else {
-> > > +               INIT_LIST_HEAD(&info->node);
-> > > +       }
-> > > +
-> > > +       vp_modern_set_queue_enable(&vp_dev->mdev, index, true);
-> > > +
-> > > +       if (vp_dev->per_vq_vectors && info->msix_vector !=3D VIRTIO_M=
-SI_NO_VECTOR)
-> > > +               enable_irq(pci_irq_vector(vp_dev->pci_dev, info->msix=
-_vector));
-> > > +
-> > > +       vq->reset =3D false;
-> > > +
-> > > +       return 0;
-> > > +}
-> > >
-> > >
-> > > There are three situations where an error will be returned. These are=
- the
-> > > situations I want to handle.
-> >
-> > Right, but it looks harmless if we just schedule the NAPI without the c=
-heck.
->
-> Yes.
->
-> > >
-> > > But I'm rethinking the question, and I feel like you're right, althou=
-gh the
-> > > hardware setup may fail. We can no longer sync with the hardware. But=
- using it
-> > > as a normal vq doesn't have any problems.
-> >
-> > Note that we should make sure the buggy(malicous) device won't crash
-> > the codes by changing the queue_reset value at its will.
->
-> I will keep an eye on this situation.
->
-> >
-> > >
-> > > >
-> > > >
-> > > > > +
-> > > > >     /* If all buffers were filled by other side before we napi_en=
-abled, we
-> > > > >      * won't get another interrupt, so process any outstanding pa=
-ckets now.
-> > > > >      * Call local_bh_enable after to trigger softIRQ processing.
-> > > > > @@ -1413,6 +1425,15 @@ static void refill_work(struct work_struct=
- *work)
-> > > > >             struct receive_queue *rq =3D &vi->rq[i];
-> > > > >
-> > > > >             napi_disable(&rq->napi);
-> > > > > +
-> > > > > +           /* Check if vq is in reset state. See more in
-> > > > > +            * virtnet_napi_enable()
-> > > > > +            */
-> > > > > +           if (rq->vq->reset) {
-> > > > > +                   virtnet_napi_enable(rq->vq, &rq->napi);
-> > > > > +                   continue;
-> > > > > +           }
-> > > >
-> > > >
-> > > > Can we do something similar in virtnet_close() by canceling the wor=
-k?
-> > >
-> > > I think there is no need to cancel the work here, because napi_disabl=
-e will wait
-> > > for the napi_enable of the resize. So if the re-enable failed vq is u=
-sed as a normal
-> > > vq, this logic can be removed.
-> >
-> > Actually I meant the part of virtnet_rx_resize().
-> >
-> > If we don't synchronize with the refill work, it might enable NAPI unex=
-pectedly?
->
-> I don't think this situation will be encountered, because napi_disable is
-> mutually exclusive, so there will be no unexpected napi enable.
->
-> Is there something I misunderstood?
+Hi Raghavendra,
 
-So in virtnet_rx_resize() we do:
+On 4/7/22 9:15 AM, Raghavendra Rao Ananta wrote:
+> Continuing the discussion from [1], the series tries to add support
+> for the userspace to elect the hypercall services that it wishes
+> to expose to the guest, rather than the guest discovering them
+> unconditionally. The idea employed by the series was taken from
+> [1] as suggested by Marc Z.
+> 
+> In a broad sense, the concept is similar to the current implementation
+> of PSCI interface- create a 'firmware psuedo-register' to handle the
+> firmware revisions. The series extends this idea to all the other
+> hypercalls such as TRNG (True Random Number Generator), PV_TIME
+> (Paravirtualized Time), and PTP (Precision Time protocol).
+> 
+> For better categorization and future scaling, these firmware registers
+> are categorized based on the service call owners. Also, unlike the
+> existing firmware psuedo-registers, they hold the features supported
+> in the form of a bitmap.
+> 
+> During the VM initialization, the registers holds an upper-limit of
+> the features supported by each one of them. It's expected that the
+> userspace discover the features provided by each register via GET_ONE_REG,
+> and writeback the desired values using SET_ONE_REG. KVM allows this
+> modification only until the VM has started.
+> 
+> Some of the standard function-ids, such as ARM_SMCCC_VERSION_FUNC_ID,
+> need not be associated with a feature bit. For such ids, the series
+> introduced an allowed-list, hvc_func_default_allowed_list[], that holds
+> all such ids. As a result, the functions that are not elected by userspace,
+> or if they are not a part of this allowed-list, will be denied for when
+> the guests invoke them.
+> 
+> Older VMMs can simply ignore this interface and the hypercall services
+> will be exposed unconditionally to the guests, thus ensuring backward
+> compatibility.
+> 
 
-napi_disable()
-...
-resize()
-...
-napi_enalbe()
+[...]
 
-How can we guarantee that the work is not run after the napi_disable()?
+I rethinking about the design again and just get one question. Hopefully,
+someone have the answer for us. The newly added 3 pseudo registers and
+the existing ones like KVM_REG_ARM_PSCI_VERSION are all tied up with
+vcpu, instead of VM. I don't think it's correct. I'm not sure if VM-scoped
+pseudo registers aren't allowed by ARM architecture or the effort isn't
+worthy to support it.
 
-Thanks
+These pseudo registers are introduced to present the available hypercalls,
+and then they can be disabled from userspace. In the implementation, these 3
+registers are vcpu scoped. It means that multiple vcpus can be asymmetric
+in terms of usable hypercalls. For example, ARM_SMCCC_TRNG hypercalls
+can be enabled on vcpu0, but disabled on vcpu1. I don't think it's expected.
 
->
-> Thanks.
->
-> >
-> > Thanks
-> >
-> > >
-> > >
-> > > >
-> > > >
-> > > > > +
-> > > > >             still_empty =3D !try_fill_recv(vi, rq, GFP_KERNEL);
-> > > > >             virtnet_napi_enable(rq->vq, &rq->napi);
-> > > > >
-> > > > > @@ -1523,6 +1544,10 @@ static void virtnet_poll_cleantx(struct re=
-ceive_queue *rq)
-> > > > >     if (!sq->napi.weight || is_xdp_raw_buffer_queue(vi, index))
-> > > > >             return;
-> > > > >
-> > > > > +   /* Check if vq is in reset state. See more in virtnet_napi_en=
-able() */
-> > > > > +   if (sq->vq->reset)
-> > > > > +           return;
-> > > >
-> > > >
-> > > > We've disabled TX napi, any chance we can still hit this?
-> > >
-> > > Same as above.
-> > >
-> > > >
-> > > >
-> > > > > +
-> > > > >     if (__netif_tx_trylock(txq)) {
-> > > > >             do {
-> > > > >                     virtqueue_disable_cb(sq->vq);
-> > > > > @@ -1769,6 +1794,62 @@ static netdev_tx_t start_xmit(struct sk_bu=
-ff *skb, struct net_device *dev)
-> > > > >     return NETDEV_TX_OK;
-> > > > >   }
-> > > > >
-> > > > > +static int virtnet_rx_resize(struct virtnet_info *vi,
-> > > > > +                        struct receive_queue *rq, u32 ring_num)
-> > > > > +{
-> > > > > +   int err;
-> > > > > +
-> > > > > +   napi_disable(&rq->napi);
-> > > > > +
-> > > > > +   err =3D virtqueue_resize(rq->vq, ring_num, virtnet_rq_free_un=
-used_buf);
-> > > > > +   if (err)
-> > > > > +           goto err;
-> > > > > +
-> > > > > +   if (!try_fill_recv(vi, rq, GFP_KERNEL))
-> > > > > +           schedule_delayed_work(&vi->refill, 0);
-> > > > > +
-> > > > > +   virtnet_napi_enable(rq->vq, &rq->napi);
-> > > > > +   return 0;
-> > > > > +
-> > > > > +err:
-> > > > > +   netdev_err(vi->dev,
-> > > > > +              "reset rx reset vq fail: rx queue index: %td err: =
-%d\n",
-> > > > > +              rq - vi->rq, err);
-> > > > > +   virtnet_napi_enable(rq->vq, &rq->napi);
-> > > > > +   return err;
-> > > > > +}
-> > > > > +
-> > > > > +static int virtnet_tx_resize(struct virtnet_info *vi,
-> > > > > +                        struct send_queue *sq, u32 ring_num)
-> > > > > +{
-> > > > > +   struct netdev_queue *txq;
-> > > > > +   int err, qindex;
-> > > > > +
-> > > > > +   qindex =3D sq - vi->sq;
-> > > > > +
-> > > > > +   virtnet_napi_tx_disable(&sq->napi);
-> > > > > +
-> > > > > +   txq =3D netdev_get_tx_queue(vi->dev, qindex);
-> > > > > +   __netif_tx_lock_bh(txq);
-> > > > > +   netif_stop_subqueue(vi->dev, qindex);
-> > > > > +   __netif_tx_unlock_bh(txq);
-> > > > > +
-> > > > > +   err =3D virtqueue_resize(sq->vq, ring_num, virtnet_sq_free_un=
-used_buf);
-> > > > > +   if (err)
-> > > > > +           goto err;
-> > > > > +
-> > > > > +   netif_start_subqueue(vi->dev, qindex);
-> > > > > +   virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
-> > > > > +   return 0;
-> > > > > +
-> > > > > +err:
-> > > >
-> > > >
-> > > > I guess we can still start the queue in this case? (Since we don't
-> > > > change the queue if resize fails).
-> > >
-> > > Yes, you are right.
-> > >
-> > > Thanks.
-> > >
-> > > >
-> > > >
-> > > > > +   netdev_err(vi->dev,
-> > > > > +              "reset tx reset vq fail: tx queue index: %td err: =
-%d\n",
-> > > > > +              sq - vi->sq, err);
-> > > > > +   virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
-> > > > > +   return err;
-> > > > > +}
-> > > > > +
-> > > > >   /*
-> > > > >    * Send command via the control virtqueue and check status.  Co=
-mmands
-> > > > >    * supported by the hypervisor, as indicated by feature bits, s=
-hould
-> > > >
-> > >
-> >
->
+On the other hand, the information stored in these 3 registers needs to
+be migrated through {GET,SET}_ONE_REG by VMM (QEMU). all the information
+stored in these 3 registers are all same on all vcpus, which is exactly
+as we expect. In migration circumstance, we're transporting identical
+information for all vcpus and it's unnecessary.
+
+Thanks,
+Gavin
+
+
 
