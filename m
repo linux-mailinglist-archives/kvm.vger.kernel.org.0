@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1431C5030D8
-	for <lists+kvm@lfdr.de>; Sat, 16 Apr 2022 01:09:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AEC725030F4
+	for <lists+kvm@lfdr.de>; Sat, 16 Apr 2022 01:09:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230008AbiDOWCC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Apr 2022 18:02:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38040 "EHLO
+        id S1356159AbiDOWCE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Apr 2022 18:02:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356159AbiDOWBx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Apr 2022 18:01:53 -0400
-Received: from mail-io1-xd49.google.com (mail-io1-xd49.google.com [IPv6:2607:f8b0:4864:20::d49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BB77DE88
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 14:59:24 -0700 (PDT)
-Received: by mail-io1-xd49.google.com with SMTP id d19-20020a0566022bf300b00645eba5c992so5453372ioy.4
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 14:59:24 -0700 (PDT)
+        with ESMTP id S1355788AbiDOWBy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Apr 2022 18:01:54 -0400
+Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FB7DFD3B
+        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 14:59:25 -0700 (PDT)
+Received: by mail-il1-x149.google.com with SMTP id p10-20020a056e02104a00b002caa828f7b1so5432447ilj.7
+        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 14:59:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=we5tUcZWUFX29TKi0tS/Yi5sEjxnPk5PaYrhMJdNw1U=;
-        b=O1SErvMM/5NizynFN7dxIWF/wAOfb8Mq9ZfTSGeW0QBIGQpcAPGMZiYPK5b+AIE+yj
-         08zA/OxjxYQfyzgWCjGX98P8LIEuoV19f+IbszwnCQUQtevPI3XYw1re2k4fZZe6/vAf
-         Qpexkx6ehQQAsh1RxGlFf+N5b4EPHjVdZkItOeRiv/yIkybMfQ6rKCCTjah2MjXE8ysA
-         UfJUeFHEmDdjsqYhKAbeH01CdWClTD/JQdzWn2NRgu/MbALmGjnCzElEQCYlDtSQfUul
-         EPbBWfGohELG4mrVx0BVrh06dZ/wmMGcdkJN6MSYmZEdZM8jKw5KOVWNj7WfK3JyNrde
-         ComQ==
+        bh=jzvc81PBGj4bV/jHUjtzPtFNqWylMffaehwRBxD6iIE=;
+        b=aWkRKsBqnouPuu0iRgQFmbdZNwM6u65S9STgd8WzLazymunDNq+F/2LV041lFacxkX
+         sH2au5CIL4U6btbR36TcgERHcBL5JA8T93pnN1zy/vCBpJyTdEx4s8aDOU+JwJD7FEgH
+         EDuCMiJ2lKlmqCfo2HCyFA8YBpzh+0As1Im7YSg7MivXDgsyltO1HdVbeLv+yGFmNIPi
+         O5p8sXbUH14m1SBo2J0fuW1TDCouol/p3zaCmN7Pb1tclO6RjKEsMyqqJ0eOLp38uD1h
+         AbzgBBIOOsbBeQk1WFRiKNO/0k6ugAlDvMy5k+FqVLVzTLXvQl7QmS1J6MjDvDSfP9W4
+         9n1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=we5tUcZWUFX29TKi0tS/Yi5sEjxnPk5PaYrhMJdNw1U=;
-        b=o0XHWhKsaiztLT/N9YB2FpaQeS1g5xuPk0Arbb22Oj9Ow3EkiU3gXH3zLPF4LUOMVe
-         OvBsN0+ce+pn6X1ACpSE0nuwG0UDW+x3argJXttIYHolf11S2pplyKsuOkdlMGqITPRZ
-         9betibpBMY4fT+1XadVQ/vwtqgCSNEgvcGtjhiFS/xHr8VbrMT6iXh3Oj0ULcJB9aGKQ
-         ktnNaGeQdkBVpOCafrvsxrDMbH1f/E0Fy7pp8kA587mOScgng6NNeKlb9PnqJfQNgcIU
-         0PQS8m4nPks5Y6HCX4fRurakeeYL1TT0SqFJBlhvp9m7pNXQ4DPQ5Kjz+sUBO/+wRsoV
-         TCwQ==
-X-Gm-Message-State: AOAM532FAXzi0vnNNB+g0VFTmLgrhVlncrAz+nA4PJN2o6qSz8fZo5nj
-        Y3xiU67Xe3xx2rqX43jKyALRIju7+mQ=
-X-Google-Smtp-Source: ABdhPJzFhPu6MxIliWrYx7BlAqWDvC1LTp6uI8FxSJyQJeYO+JKxmOQwyxXOX0XwY8FpVX7WQSGMEYCJYH0=
+        bh=jzvc81PBGj4bV/jHUjtzPtFNqWylMffaehwRBxD6iIE=;
+        b=2kYp3lXJQnCS/TUV5BYxYxtdLECtPFj4/a03o/57xYQd7oRAIfsB+o1hOohd8/2nwj
+         c/n6FKpK0a2Isz4bNe8hySob7GVzzH2JhMDCJX+EeSQdY8SiCrDcQRADfv1uaAfxszri
+         eX25F6OeuBxM3ht5H16Qu5Usj2gU0/IF2qXY7NxVpgxHNeecFrG4jVwyNu4Jl863Slln
+         JJNRH04eNWsk0MmCLVdqx/befZqIfZUgRvYggDTCqNyRrERKZOuSuctpcnHRpMRosamW
+         nINWz0RQS7tkDh2clabjaH2zqhpVEJorfQbORbH7NdtBYQvGb94RopivnsTwxtLD4pLX
+         lKfw==
+X-Gm-Message-State: AOAM530WZaYoNfso+nnQm/jvMK6Q5uOmnkF3cHBWXJ6CPwvqXK9GrDEb
+        IRV6RXA87OEaCn7tt831Cqmp7XTFoDo=
+X-Google-Smtp-Source: ABdhPJy0T0D9tPSOS2fkDjAWGdXFAsgYKiBOBw6Vv9SkS2qbIf2KOV78tziChH3+cjdCnnpihxhBubRLicI=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6e02:1807:b0:2ca:4b88:1a42 with SMTP id
- a7-20020a056e02180700b002ca4b881a42mr312136ilv.258.1650059963514; Fri, 15 Apr
- 2022 14:59:23 -0700 (PDT)
-Date:   Fri, 15 Apr 2022 21:59:00 +0000
+ (user=oupton job=sendgmr) by 2002:a05:6e02:1b0f:b0:2c7:9a3f:6e84 with SMTP id
+ i15-20020a056e021b0f00b002c79a3f6e84mr312271ilv.32.1650059964470; Fri, 15 Apr
+ 2022 14:59:24 -0700 (PDT)
+Date:   Fri, 15 Apr 2022 21:59:01 +0000
 In-Reply-To: <20220415215901.1737897-1-oupton@google.com>
-Message-Id: <20220415215901.1737897-17-oupton@google.com>
+Message-Id: <20220415215901.1737897-18-oupton@google.com>
 Mime-Version: 1.0
 References: <20220415215901.1737897-1-oupton@google.com>
 X-Mailer: git-send-email 2.36.0.rc0.470.gd361397f0d-goog
-Subject: [RFC PATCH 16/17] KVM: arm64: Enable parallel stage 2 MMU faults
+Subject: [RFC PATCH 17/17] TESTONLY: KVM: arm64: Add super lazy accounting of
+ stage 2 table pages
 From:   Oliver Upton <oupton@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -78,75 +79,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Voila! Since the map walkers are able to work in parallel there is no
-need to take the write lock on a stage 2 memory abort. Relax locking
-on map operations and cross fingers we got it right.
+Don't use this please. I was just being lazy but wanted to make sure
+tables are all accounted for.
+
+There's a race here too, do you see it? :)
 
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/arm64/kvm/mmu.c | 21 +++------------------
- 1 file changed, 3 insertions(+), 18 deletions(-)
+ arch/arm64/kvm/mmu.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 63cf18cdb978..2881051c3743 100644
+index 2881051c3743..68ea7f0244fe 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1127,7 +1127,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	gfn_t gfn;
- 	kvm_pfn_t pfn;
- 	bool logging_active = memslot_is_logging(memslot);
--	bool use_read_lock = false;
- 	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
- 	unsigned long vma_pagesize, fault_granule;
- 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-@@ -1162,8 +1161,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (logging_active) {
- 		force_pte = true;
- 		vma_shift = PAGE_SHIFT;
--		use_read_lock = (fault_status == FSC_PERM && write_fault &&
--				 fault_granule == PAGE_SIZE);
- 	} else {
- 		vma_shift = get_vma_page_shift(vma, hva);
- 	}
-@@ -1267,15 +1264,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (exec_fault && device)
- 		return -ENOEXEC;
+@@ -95,6 +95,8 @@ static bool kvm_is_device_pfn(unsigned long pfn)
+ 	return !pfn_is_map_memory(pfn);
+ }
  
--	/*
--	 * To reduce MMU contentions and enhance concurrency during dirty
--	 * logging dirty logging, only acquire read lock for permission
--	 * relaxation.
--	 */
--	if (use_read_lock)
--		read_lock(&kvm->mmu_lock);
--	else
--		write_lock(&kvm->mmu_lock);
-+	read_lock(&kvm->mmu_lock);
++static atomic_t stage2_pages = ATOMIC_INIT(0);
 +
- 	pgt = vcpu->arch.hw_mmu->pgt;
- 	if (mmu_notifier_retry(kvm, mmu_seq))
- 		goto out_unlock;
-@@ -1322,8 +1312,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (fault_status == FSC_PERM && vma_pagesize == fault_granule) {
- 		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
- 	} else {
--		WARN_ONCE(use_read_lock, "Attempted stage-2 map outside of write lock\n");
--
- 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
- 					     __pfn_to_phys(pfn), prot,
- 					     mmu_caches, true);
-@@ -1336,10 +1324,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ static void *stage2_memcache_zalloc_page(void *arg)
+ {
+ 	struct kvm_mmu_caches *mmu_caches = arg;
+@@ -112,6 +114,8 @@ static void *stage2_memcache_zalloc_page(void *arg)
+ 		return NULL;
  	}
  
- out_unlock:
--	if (use_read_lock)
--		read_unlock(&kvm->mmu_lock);
--	else
--		write_unlock(&kvm->mmu_lock);
-+	read_unlock(&kvm->mmu_lock);
- 	kvm_set_pfn_accessed(pfn);
- 	kvm_release_pfn_clean(pfn);
- 	return ret != -EAGAIN ? ret : 0;
++	atomic_inc(&stage2_pages);
++
+ 	hdr->page = virt_to_page(addr);
+ 	set_page_private(hdr->page, (unsigned long)hdr);
+ 	return addr;
+@@ -121,6 +125,8 @@ static void stage2_free_page_now(struct stage2_page_header *hdr)
+ {
+ 	WARN_ON(page_ref_count(hdr->page) != 1);
+ 
++	atomic_dec(&stage2_pages);
++
+ 	__free_page(hdr->page);
+ 	kmem_cache_free(stage2_page_header_cache, hdr);
+ }
+@@ -662,6 +668,8 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
+ 	.icache_inval_pou	= invalidate_icache_guest_page,
+ };
+ 
++static atomic_t stage2_mmus = ATOMIC_INIT(0);
++
+ /**
+  * kvm_init_stage2_mmu - Initialise a S2 MMU structure
+  * @kvm:	The pointer to the KVM structure
+@@ -699,6 +707,8 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
+ 	for_each_possible_cpu(cpu)
+ 		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
+ 
++	atomic_inc(&stage2_mmus);
++
+ 	mmu->pgt = pgt;
+ 	mmu->pgd_phys = __pa(pgt->pgd);
+ 	return 0;
+@@ -796,6 +806,9 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+ 		kvm_pgtable_stage2_destroy(pgt);
+ 		kfree(pgt);
+ 	}
++
++	if (atomic_dec_and_test(&stage2_mmus))
++		WARN_ON(atomic_read(&stage2_pages));
+ }
+ 
+ /**
 -- 
 2.36.0.rc0.470.gd361397f0d-goog
 
