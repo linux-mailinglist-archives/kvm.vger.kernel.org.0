@@ -2,73 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 094D5503168
-	for <lists+kvm@lfdr.de>; Sat, 16 Apr 2022 01:10:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76F9850314C
+	for <lists+kvm@lfdr.de>; Sat, 16 Apr 2022 01:10:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352961AbiDOVMi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Apr 2022 17:12:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45456 "EHLO
+        id S1353792AbiDOVWz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Apr 2022 17:22:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352224AbiDOVMV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Apr 2022 17:12:21 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2207A2D1E7
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 14:09:49 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id p10so7956565plf.9
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 14:09:49 -0700 (PDT)
+        with ESMTP id S1354043AbiDOVWd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Apr 2022 17:22:33 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A227F3C703;
+        Fri, 15 Apr 2022 14:19:54 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id i24-20020a17090adc1800b001cd5529465aso7934903pjv.0;
+        Fri, 15 Apr 2022 14:19:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=gmail.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=LPajdb3g+LFqEb7zxx+mJ8Pp5q38lO4WZRS//6zsW5A=;
-        b=lTOVQQ3RWsbuiCaMKk4EX37aPHUG34dV8qYGLALne7qhFw4eypIAiHmQNLMlP2aeyo
-         542QyNA+aU52WNn37MYbWRnej60xiV/Dn/hkfHa1lTQiS27uNJRfGkFnuUgtBkwh7l/d
-         uDjPUmM5aDsU0+Xh2voHb/yGZ9WArIiRlgURdQHBfCLvHQ/B6qKQ84ZLQvTa4c410nGa
-         pSCbMc36ZF/bJy3z+ww6hLpwaaaIpwwOuUlB51Z8n7d2qiCgKCNc1z6s+mc+FL1/h6PG
-         FQucgbCix0gMrpNbW2OP/iVRQVC1KcUd+wqzZDqodm/fecOSnMVfaZxXc3PJWn9dE+LY
-         wuYQ==
+         :content-disposition:in-reply-to:user-agent;
+        bh=gQjMse/tU1IHt4tZkhdWjeMaB5otgPpvVS0b4/z5Ptw=;
+        b=FSxfRkR+oDX+rgDN9EG6Ss8iEba237QXZMX7KKHOtvtXZuNn66HR2x5xCM2y1VI4+R
+         mBKBc+PVJQYi5Pj602EW5ymCIR8WHWSCBQG0Y7ivopjbyzmooHhy2U8NfJRxPO2TsqQ7
+         eEtghjJiP0hFBefRThKYPukYArPaM8jNnzJ0G4yjf9X02PgwvQaqUJQAm7R5Yi+zcEpu
+         v9qf0awsOhjNPWq41QhghUFEMf0na5WzbdYF4R0UUjEe6xT0PhzJ4AKf9dXnRziIaa0T
+         XRGTUiLvwiLsy/7S8ghwYGJxt5Nsu1UBBJNBZd/yAYaBEJwCGNFAm/uaOjjWek25cR81
+         7XPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=LPajdb3g+LFqEb7zxx+mJ8Pp5q38lO4WZRS//6zsW5A=;
-        b=A+SId6b3VINOKM1Uf8f7f+ZFtMnr5ZvvbvIsum5jOmpjqiMC7wFW8occTaQsp81Ohd
-         TUmyagveuWup6XZg1Xnhpcu8vQcNorrHajN+e/m4vb3fmGmkAktq7lVbpD4JdaMmH+cY
-         LEKCSfGWxRMDvQxabqIBumVZBcCUVW4ZO3X0Rm5aeJLiWm0oHOtEGJrNBOFAbtdZ7qjr
-         7iiloLaR6Dk1CEdG4vfZR/zyVJw6a1AJc5ouBOiTKa1E6XXYQjozcluKlnogW+d+Vk1K
-         eXN5xDt10aPvYx+7K2tB2UsOUiXQ6gv0QfzyKqsR+yKRMzjX11FGa6oGfjtwlHObYJMc
-         GWOg==
-X-Gm-Message-State: AOAM531fVdiC9Qxika6HudtrBxYme64MrK2MgGtMTMEi+ZKwJ2CoHjad
-        DxglGxYxVeL9U6SKy0HPsBR69A==
-X-Google-Smtp-Source: ABdhPJwflp/hO2AJCFbRTgnQmnJUY2rmHxmi5NZ8H02JW44VJF+GwN0yBuW3QmlpEzyTHXzlJj+nPA==
-X-Received: by 2002:a17:90a:b890:b0:1cb:7ef2:8577 with SMTP id o16-20020a17090ab89000b001cb7ef28577mr754635pjr.45.1650056989193;
-        Fri, 15 Apr 2022 14:09:49 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k20-20020aa788d4000000b004fb07f819c1sm3944370pff.50.2022.04.15.14.09.48
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=gQjMse/tU1IHt4tZkhdWjeMaB5otgPpvVS0b4/z5Ptw=;
+        b=5HVv6tKmvmeEb2AKbMDTqejR1w4wRl00PjLqX6X0FfPMwKzhj3IG2uVnmDcz0izuJF
+         rbmi31dUil1FrZ1eXq9AgDYGSA1fDgc3BPcbKDuD5Lktq+AkircZrIz/1KWn4PLt9vH4
+         rNkLlzaS9V9/vj3L6JJXF1Wvmb/VOltw7i+LnckWbkf+7qFXglKAjPpoQqFOLBclrRGE
+         MDjgjGEF90e6PQ2ZXKjeFPHNu1Df8Kn3u6dqXWXUcEpEq9EGiZZRTIwZmNXBZXsd8O6b
+         eZ5CGlpPGCcf9D20JLs5Avpjxtg0bbl6aNOpmu7K5Mb3VaeofqgAprZJRUCf6MKELQEV
+         Szzw==
+X-Gm-Message-State: AOAM531t/jD+aBQ8C7AVKJRPv8ooLYwlJu17GjklPJ6/NVkeTjlMZQ7u
+        ArNV84gL3O3GuNMD2lcIMYY=
+X-Google-Smtp-Source: ABdhPJyVdyfobNaoLYq0/yrSeS21r3R4JIrrKGURs6GCDVbQZa/3+rOhLvjvgk7i0An+QhVcppEuVg==
+X-Received: by 2002:a17:90a:6402:b0:1c9:9377:dd0e with SMTP id g2-20020a17090a640200b001c99377dd0emr753895pjj.211.1650057593993;
+        Fri, 15 Apr 2022 14:19:53 -0700 (PDT)
+Received: from localhost (c-107-3-154-88.hsd1.ca.comcast.net. [107.3.154.88])
+        by smtp.gmail.com with ESMTPSA id d16-20020a17090ad99000b001bcbc4247a0sm5363455pjv.57.2022.04.15.14.19.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Apr 2022 14:09:48 -0700 (PDT)
-Date:   Fri, 15 Apr 2022 21:09:44 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     =?utf-8?B?5r2Y6auY5a6B?= <pgn@zju.edu.cn>
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, jarkko@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-sgx@vger.kernel.org,
-        secalert@redhat.com, syzkaller@googlegroups.com, kangel@zju.edu.cn
-Subject: Re: 'WARNING in vcpu_enter_guest' bug in arch/x86/kvm/x86.c:9877
-Message-ID: <YlnfGOGQPCxkAb03@google.com>
-References: <ca5aa7c.e8ca9.17f71bde91a.Coremail.pgn@zju.edu.cn>
+        Fri, 15 Apr 2022 14:19:53 -0700 (PDT)
+Date:   Fri, 15 Apr 2022 14:19:47 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [RFC PATCH v5 000/104] KVM TDX basic feature support
+Message-ID: <20220415211947.GA1182280@private.email.ne.jp>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <4a508ded-8554-2e54-8b61-50481e536854@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ca5aa7c.e8ca9.17f71bde91a.Coremail.pgn@zju.edu.cn>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+In-Reply-To: <4a508ded-8554-2e54-8b61-50481e536854@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,27 +74,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 10, 2022, 潘高宁 wrote:
-> Hello, This is Gaoning Pan and Yongkang Jia from Zhejiang University. We
-> found a 'WARNING in vcpu_enter_guest' bug by syzkaller. This flaw allows a
-> malicious user in a Local DOS condition. The following program triggers Local
-> DOS in vcpu_enter_guest in arch/x86/kvm/x86.c:9877 in latest release
-> linux-5.16.13, this bug can be reproducible stably by the C reproducer:
+On Fri, Apr 15, 2022 at 05:18:42PM +0200,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+
+> On 3/4/22 20:48, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > Hi.  Now TDX host kernel patch series was posted, I've rebased this patch
+> > series to it and make it work.
+> > 
+> >    https://lore.kernel.org/lkml/cover.1646007267.git.kai.huang@intel.com/
+> > 
+> > Changes from v4:
+> > - rebased to TDX host kernel patch series.
+> > - include all the patches to make this patch series working.
+> > - add [MARKER] patches to mark the patch layer clear.
 > 
-> ------------[ cut here ]------------
+> I think I have reviewed everything except the TDP MMU parts (48, 54-57).  I
+> will do those next week, but in the meanwhile feel free to send v6 if you
+> have it ready.  A lot of the requests have been cosmetic.
 
-...
+Thank you so much. I'm updating patches now.
 
-> Syzkaller reproducer:
-> # {Threaded:true Repeat:true RepeatTimes:0 Procs:16 Slowdown:1 Sandbox:
-> r0 = openat$kvm(0xffffffffffffff9c, &(0x7f0000000000), 0x0, 0x0)
-> r1 = ioctl$KVM_CREATE_VM(r0, 0xae01, 0x0)
-> ioctl$KVM_CAP_SPLIT_IRQCHIP(r1, 0x4068aea3, &(0x7f0000000000)) (async)
-> r2 = ioctl$KVM_CREATE_VCPU(r1, 0xae41, 0x0) (async)
-> r3 = ioctl$KVM_CREATE_VCPU(r1, 0xae41, 0x400000000000002)
-> ioctl$KVM_SET_GUEST_DEBUG(r3, 0x4048ae9b, &(0x7f00000000c0)={0x5dda9c14aa95f5c5})
-> ioctl$KVM_RUN(r2, 0xae80, 0x0)
-> 
-> C repro and kernel config are attached.
 
-Reproduced, should have a fix posted shortly, thanks!
+> If you would like to use something like Trello to track all the changes, and
+> submit before you have done all of them, that's fine by me.
+
+Sure. I've created public trello board.
+If you want to edit it, please let me know. I'll add you to the project member.
+
+https://trello.com/kvmtdxreview
+
+thanks,
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
