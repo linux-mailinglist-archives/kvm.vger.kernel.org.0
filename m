@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 231C7502172
-	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 06:45:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B06F502173
+	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 06:47:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349438AbiDOEsI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Apr 2022 00:48:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60708 "EHLO
+        id S1349442AbiDOEuD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Apr 2022 00:50:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232067AbiDOEsH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Apr 2022 00:48:07 -0400
+        with ESMTP id S232067AbiDOEuC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Apr 2022 00:50:02 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C65554FBF
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 21:45:38 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BBA2674CB
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 21:47:35 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 8BD0C68B05; Fri, 15 Apr 2022 06:45:34 +0200 (CEST)
-Date:   Fri, 15 Apr 2022 06:45:34 +0200
+        id E28C868BFE; Fri, 15 Apr 2022 06:47:31 +0200 (CEST)
+Date:   Fri, 15 Apr 2022 06:47:31 +0200
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jason Gunthorpe <jgg@nvidia.com>
 Cc:     Alex Williamson <alex.williamson@redhat.com>,
@@ -24,14 +24,13 @@ Cc:     Alex Williamson <alex.williamson@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Eric Auger <eric.auger@redhat.com>,
         Christoph Hellwig <hch@lst.de>, Yi Liu <yi.l.liu@intel.com>
-Subject: Re: [PATCH 04/10] vfio: Use a struct of function pointers instead
- of a many symbol_get()'s
-Message-ID: <20220415044533.GA22209@lst.de>
-References: <0-v1-33906a626da1+16b0-vfio_kvm_no_group_jgg@nvidia.com> <4-v1-33906a626da1+16b0-vfio_kvm_no_group_jgg@nvidia.com>
+Subject: Re: [PATCH 02/10] kvm/vfio: Reduce the scope of PPC #ifdefs
+Message-ID: <20220415044731.GB22209@lst.de>
+References: <0-v1-33906a626da1+16b0-vfio_kvm_no_group_jgg@nvidia.com> <2-v1-33906a626da1+16b0-vfio_kvm_no_group_jgg@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4-v1-33906a626da1+16b0-vfio_kvm_no_group_jgg@nvidia.com>
+In-Reply-To: <2-v1-33906a626da1+16b0-vfio_kvm_no_group_jgg@nvidia.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
         SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
@@ -42,21 +41,12 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 14, 2022 at 03:46:03PM -0300, Jason Gunthorpe wrote:
-> kvm and VFIO need to be coupled together however neither is willing to
-> tolerate a direct module dependency. Instead when kvm is given a VFIO FD
-> it uses many symbol_get()'s to access VFIO.
-> 
-> Provide a single VFIO function vfio_file_get_ops() which validates the
-> given struct file * is a VFIO file and then returns a struct of ops.
-> 
-> Following patches will redo each of the symbol_get() calls into an
-> indirection through this ops struct.
+On Thu, Apr 14, 2022 at 03:46:01PM -0300, Jason Gunthorpe wrote:
+> Use IS_ENABLED and static inlines instead of just ifdef'ing away all the
+> PPC code. This allows it to be compile tested on all platforms and makes
+> it easier to maintain.
 
-So I got anoyed at this as well a while ago and I still think this
-is the wrong way around.
-
-I'd much rather EXPORT_SYMBOL_GPL kvm_register_device_ops and
-just let kvm_vfio_ops live in a module than all the symbol_get
-crazyness.  We'll need to be careful to deal with unload races
-or just not allow unloading, though.
+That's even uglier than what we had.  I'd rather have a new vfio_ppc.c
+to implement it, then you can stubs for it in the header (or IS_ENABLED
+if you really want) but we don't need stubs for ppc-specific arch
+functionality in a consumer of it.
