@@ -2,115 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 02843502FB8
-	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 22:19:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97F9D502FCA
+	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 22:30:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352042AbiDOUVu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Apr 2022 16:21:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55790 "EHLO
+        id S1351147AbiDOUcH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Apr 2022 16:32:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351984AbiDOUVs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Apr 2022 16:21:48 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5CE4DE911
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 13:19:18 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id n17so5618242ljc.11
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 13:19:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Cr58g6CfShtXO0vPAwUW4nrK3WFLlKprChO+5HKe11I=;
-        b=pTQCdrK4nxKkRj5ZtnKlRQMEdwyiG4IxvjveFI+rN+RlG9us7lR4w3qho+5DXLr8YE
-         4k5XDSqOYwkEHvEyokqgTPRA5Uo19tN2y3SIs8CTw62wMHAlr9X+pakIqMqsrEaBMtNJ
-         PLq0jBQ0MPUGOHpGv6ylkeFpMPdyESc8sFmJCgWM/YcG1TBzostMsQd4S14vFj5mYwhh
-         6ri3ijo80wBGP+Y7PMQs9e/vEKhW+pF1jxz2CUwQMZov/huko3a1A3JNyCVE0FL1vPF9
-         eCUt0iFpIMZGGGvNtfcTOEAn+gMgQrVn5faLTtDTj5OkwOvEJSwVGkYBzrqZXATBIj58
-         gbtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Cr58g6CfShtXO0vPAwUW4nrK3WFLlKprChO+5HKe11I=;
-        b=08U7AfsIL+7gaP5gmTONHCvq3OU8GDpBFyYp7R12Nj+YmsEjmlZTj6Quua80C8EhRX
-         IyKbkQfWFnRf1E7vegNPp89IGFAjKoxiYqqUZ5jPnVsGVW0XhHzWLmNSi6TKGzFrFRZT
-         uV8qY+OknIW7vZEz/UArnPUnZ7Xfj1+kUci9x6E3+3AyfDHqpw4MdFBNYuDgaH2uW2x+
-         ja+4hDgaXL1h1e2vgUXfI3iT4jJb7PQZzMKVquUE/13QEO3plWZCZLYKDhiH6NrT9AAD
-         QgeHTYwgW1VF1Efy0l2oGAcNG6H4kvg0lH0Ay5uzDQlWa5nkuZqNpcROetk5GO39x/IK
-         bUSw==
-X-Gm-Message-State: AOAM530ySRxepLPMcYOy9Ldck0gN7kCISVCJM3QNQofh4EQx4fzQHDX7
-        8/s3ISMVnWhOkSGThDbeVNgCzk1He5e2StuTZBEPFwT9wus=
-X-Google-Smtp-Source: ABdhPJxJiO85Bos5bUVj8dUf57mGhlYFxUljrowrHyO+zNoS7Z3hSAeRAnEnr/34bYX+3RQ00o2tlVFUXYQMummUeg4=
-X-Received: by 2002:a2e:998b:0:b0:24d:a08d:8933 with SMTP id
- w11-20020a2e998b000000b0024da08d8933mr409178lji.170.1650053956782; Fri, 15
- Apr 2022 13:19:16 -0700 (PDT)
+        with ESMTP id S233989AbiDOUcF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Apr 2022 16:32:05 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B30613D2B
+        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 13:29:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1650054575; x=1681590575;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=RUwt1uKFZJBWr5c6P/yatujumHDfzn8uGPVQng5YafE=;
+  b=f6rRrXMtRhJTG0gLr0pmXDszP00Hdm2KTHzluLUeIkFdQDnff8SpBNu3
+   4O7kQfeOPUkkwvjBbJEwq8g3AiXNoAE4NvxNJzZlAa5wk45mhHvaKrU29
+   p3VEZVsJM8XL/yjUrwkxU7KQc+fU3p0HdBEj0Fr7Dxw1/SIWLeFaYB5TG
+   G6oSgD+sfpox5jyXPBNnsJtNKSzXjoqtqilne1ULT+j93kjh6BMef+6z5
+   t5SynJXPJvxakbuVMszAWGm4rYaDKhDmPjRUrH0k/mcv8xNwTDkEqxIpU
+   nLlEoFsrNHfPAaWVNohw0z9Tk3XrN4j0Ou3Uh2fezH122Uf16Ow3S+2QG
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10318"; a="250522523"
+X-IronPort-AV: E=Sophos;i="5.90,263,1643702400"; 
+   d="scan'208";a="250522523"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2022 13:29:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,263,1643702400"; 
+   d="scan'208";a="856368353"
+Received: from lkp-server01.sh.intel.com (HELO 3abc53900bec) ([10.239.97.150])
+  by fmsmga005.fm.intel.com with ESMTP; 15 Apr 2022 13:29:32 -0700
+Received: from kbuild by 3abc53900bec with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1nfSZQ-0002Nj-2e;
+        Fri, 15 Apr 2022 20:29:32 +0000
+Date:   Sat, 16 Apr 2022 04:29:26 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>,
+        Farrah Chen <farrah.chen@intel.com>,
+        Danmei Wei <danmei.wei@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [kvm:kvm-tdx-5.17 23/141] arch/x86/kernel/process.c:785:49: error:
+ implicit declaration of function 'platform_has_tdx'
+Message-ID: <202204160429.53nZyD9a-lkp@intel.com>
 MIME-Version: 1.0
-References: <20220415201542.1496582-1-oupton@google.com>
-In-Reply-To: <20220415201542.1496582-1-oupton@google.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Fri, 15 Apr 2022 13:19:05 -0700
-Message-ID: <CAOQ_Qsj+Zq5J=ox9PT8qBeyzgLap9=a451FdDHr6p41LhcyzeA@mail.gmail.com>
-Subject: Re: [PATCH 0/5] KVM: Clean up debugfs+stats init/destroy
-To:     kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, maz@kernel.org,
-        KVM ARM <kvmarm@lists.cs.columbia.edu>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+cc the actual kvmarm mailing list, what I had before was wishful
-thinking that we moved off of the list that always goes to my spam :-)
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm-tdx-5.17
+head:   a50e4531e92e36f185ea32843c149c4703451109
+commit: bf2274dac8e8671ae89971ae8c89f4f2f8f13095 [23/141] x86: Flush cache of TDX private memory during kexec()
+config: i386-tinyconfig (https://download.01.org/0day-ci/archive/20220416/202204160429.53nZyD9a-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.2.0-19) 11.2.0
+reproduce (this is a W=1 build):
+        # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=bf2274dac8e8671ae89971ae8c89f4f2f8f13095
+        git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
+        git fetch --no-tags kvm kvm-tdx-5.17
+        git checkout bf2274dac8e8671ae89971ae8c89f4f2f8f13095
+        # save the config file to linux build tree
+        mkdir build_dir
+        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash arch/x86/kernel/
 
-On Fri, Apr 15, 2022 at 1:15 PM Oliver Upton <oupton@google.com> wrote:
->
-> The way KVM handles debugfs initialization and destruction is somewhat
-> sloppy. Although the debugfs + stats bits get initialized *after*
-> kvm_create_vm(), they are torn down from kvm_destroy_vm(). And yes,
-> there is a window where we could theoretically destroy a VM before
-> debugfs is ever instantiated.
->
-> This series does away with the mess by coupling debugfs+stats to the
-> overall VM create/destroy pattern. We already fail the VM creation if
-> kvm_create_vm_debugfs() fails, so there really isn't a need to do these
-> separately in the first place.
->
-> The first two patches hoist some unrelated tidbits of stats state into
-> the debugfs constructors just so its all handled under one roof.
->
-> The second two patches realize the the intention of the series, changing
-> the initialization order so we can get an FD for the vm early.
->
-> Lastly, patch 5 is essentially a revert of Sean's proposed fix [1], but
-> I deliberately am not proposing a revert outright, in case alarm bells
-> go off that a stable patch got reverted (it is correct).
->
-> Applies to the following commit w/ the addition of Sean's patch:
->
->   fb649bda6f56 ("Merge tag 'block-5.18-2022-04-15' of git://git.kernel.dk/linux-block")
->
-> Tested (I promise) on an Intel Skylake machine with KVM selftests. I
-> poked around in debugfs to make sure there were no stragglers, and I ran
-> the reproducer for [1] to confirm the null ptr deref wasn't introduced
-> yet again.
->
-> Oliver Upton (5):
->   KVM: Shove vm stats_id init into kvm_create_vm_debugfs()
->   KVM: Shove vcpu stats_id init into kvm_vcpu_create_debugfs()
->   KVM: Get an fd before creating the VM
->   KVM: Actually create debugfs in kvm_create_vm()
->   KVM: Hoist debugfs_dentry init to kvm_create_vm_debugfs() (again)
->
->  virt/kvm/kvm_main.c | 92 ++++++++++++++++++++++-----------------------
->  1 file changed, 46 insertions(+), 46 deletions(-)
->
-> --
-> 2.36.0.rc0.470.gd361397f0d-goog
->
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+   arch/x86/kernel/process.c: In function 'stop_this_cpu':
+>> arch/x86/kernel/process.c:785:49: error: implicit declaration of function 'platform_has_tdx' [-Werror=implicit-function-declaration]
+     785 |         if ((cpuid_eax(0x8000001f) & BIT(0)) || platform_has_tdx())
+         |                                                 ^~~~~~~~~~~~~~~~
+   arch/x86/kernel/process.c: At top level:
+   arch/x86/kernel/process.c:903:13: warning: no previous prototype for 'arch_post_acpi_subsys_init' [-Wmissing-prototypes]
+     903 | void __init arch_post_acpi_subsys_init(void)
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+   cc1: some warnings being treated as errors
+
+
+vim +/platform_has_tdx +785 arch/x86/kernel/process.c
+
+   749	
+   750	void stop_this_cpu(void *dummy)
+   751	{
+   752		local_irq_disable();
+   753		/*
+   754		 * Remove this CPU:
+   755		 */
+   756		set_cpu_online(smp_processor_id(), false);
+   757		disable_local_APIC();
+   758		mcheck_cpu_clear(this_cpu_ptr(&cpu_info));
+   759	
+   760		/*
+   761		 * Use wbinvd on processors that support SME. This provides support
+   762		 * for performing a successful kexec when going from SME inactive
+   763		 * to SME active (or vice-versa). The cache must be cleared so that
+   764		 * if there are entries with the same physical address, both with and
+   765		 * without the encryption bit, they don't race each other when flushed
+   766		 * and potentially end up with the wrong entry being committed to
+   767		 * memory.
+   768		 *
+   769		 * Test the CPUID bit directly because the machine might've cleared
+   770		 * X86_FEATURE_SME due to cmdline options.
+   771		 *
+   772		 * In case of kexec, similar to SME, if TDX is ever enabled, the
+   773		 * cachelines of TDX private memory (including PAMTs) used by TDX
+   774		 * module need to be flushed before transiting to the new kernel,
+   775		 * otherwise they may silently corrupt the new kernel.
+   776		 *
+   777		 * Note TDX is enabled on demand at runtime, and enabling TDX has a
+   778		 * state machine protected with a mutex to prevent concurrent calls
+   779		 * from multiple callers.  Holding the mutex is required to get the
+   780		 * TDX enabling status, but this function runs in interrupt context.
+   781		 * So to make it simple, always flush cache when platform supports
+   782		 * TDX (detected at boot time), regardless whether TDX is truly
+   783		 * enabled by kernel.
+   784		 */
+ > 785		if ((cpuid_eax(0x8000001f) & BIT(0)) || platform_has_tdx())
+   786			native_wbinvd();
+   787		for (;;) {
+   788			/*
+   789			 * Use native_halt() so that memory contents don't change
+   790			 * (stack usage and variables) after possibly issuing the
+   791			 * native_wbinvd() above.
+   792			 */
+   793			native_halt();
+   794		}
+   795	}
+   796	
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
