@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D4B4A5030BA
-	for <lists+kvm@lfdr.de>; Sat, 16 Apr 2022 01:09:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD5A0503185
+	for <lists+kvm@lfdr.de>; Sat, 16 Apr 2022 01:10:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356179AbiDOWBz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Apr 2022 18:01:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37666 "EHLO
+        id S232321AbiDOWB5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Apr 2022 18:01:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356171AbiDOWBs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Apr 2022 18:01:48 -0400
-Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89D5A3BBE0
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 14:59:19 -0700 (PDT)
-Received: by mail-il1-x149.google.com with SMTP id i14-20020a056e020ece00b002ca198245e6so5445965ilk.4
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 14:59:19 -0700 (PDT)
+        with ESMTP id S1356162AbiDOWBt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Apr 2022 18:01:49 -0400
+Received: from mail-oo1-xc4a.google.com (mail-oo1-xc4a.google.com [IPv6:2607:f8b0:4864:20::c4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7479C60F2
+        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 14:59:20 -0700 (PDT)
+Received: by mail-oo1-xc4a.google.com with SMTP id l2-20020a4ab0c2000000b00334cb56f0a5so2342553oon.17
+        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 14:59:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=ukSikfLZPySq7lKrWdQC3W4tZRZDdV+TXwwmzbO5VKE=;
-        b=UFQNViFm5ywOL6fUUgUmBF2pMIllmvYSsEmxRVNh1gzD1izmJ3LtYUTbQoVRVd6R7/
-         jqzms2/UXzy9A1cKXaPCa6uGhs2jB4kYpL25R2bC00CDonStKGhvdJ4YVdoFWKmexTi/
-         QkfTtuq7/OrDuIAAqPw+yUALYUDmuCCrGRxB9F24yb275VyW2/5r9d7nu5//Jrfs1gyU
-         bBbceIMSX7GVKPd/CqxGaga7ODuF8yOc8fr/uf+kbuofz35ev3lh9BLs/jGFbUXJ/kkj
-         2mjW+x4bwKEomG8LlUwv7ZO+oESMs9ddaaWpZvG/caTzJIQruvv70SZXMOewJ76h8qCh
-         w+3w==
+        bh=22i24DLcyXUieSnW3PAwQCkjoUnvyMWdp2sKJnAUF64=;
+        b=VPtHgLB2eymVJQjQSElXFQ0Zv2gLUgxLry175CS0FCPH1QdUk/jXMMBoPOrHmGBwoq
+         eWdmwHWefSkyKrTkoNNUmWeZAwfQOesyHQ/c4F+nNUh1RnLeH6LvowZHB8nX3nwQ6l3L
+         GEUKEunrQWJsjT9PH9meExTOYNHH3hU7S6IfE1PLsiTpOqRRkTbel/mLpuqamcBbNfG9
+         GoFAe3BQFqD1GHm76/Rdvr36nNdmSstr6rfNRpwHof4KzfU+AjgBiLREY1NzMY207hNQ
+         sxhnRfFngtq2kuNUX0v2DKU0e2znK8YIUUSoecH7YVoHWITRrIMv7LGu6/DrG+fBMRUD
+         Iqsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=ukSikfLZPySq7lKrWdQC3W4tZRZDdV+TXwwmzbO5VKE=;
-        b=RK8Yx1vQEoMYH7sBZnAKkHLXxQAPJj9yt6EuHP0xN/6uGXUFZQX9FRzQbJUu/f3lP4
-         Utl1E+cxXKuVz2cstHnf2oW1QY1+wDbzm2I+e+x+vuo8EOe8BOgVRZhDvffhAShmlhbw
-         a+Yu9LVFZLSUnIZME2XrfmzAkl0T2q3LQnVAwILjLJLXZw2cwF1DeWUEk6VhQ+3bM5D8
-         mMmYTR5eiT60KpM3SMt/pIETXPXToyfE5HS8rlW/C5WZ6vIszIelx51dEAhs2p4jjjel
-         39VQrPUzWBPVyB+lsvBiivkvovO9EUN9vev/SBNNRLZuJJaiRFsK8Z3ZPVm54GVer0Ml
-         Sgog==
-X-Gm-Message-State: AOAM53299hyYSQROZDJkjUSZM9thqk+CSYAcNRgL1GwQJmB3SYGH1ZRC
-        vANKYDXw2jBME86YAVCs3gaE2PZleJw=
-X-Google-Smtp-Source: ABdhPJw3+rg28SXpnYzElP/Fh1mOEN5FS2KtRHWJcXruhJlFqtNNF+kNgwwNT/3GJfepUrZ+VWNiihmiJLs=
+        bh=22i24DLcyXUieSnW3PAwQCkjoUnvyMWdp2sKJnAUF64=;
+        b=egHPP79YGki9fwyBuRAT/he9wqjgQmsjyI/NQ0eYksI4c+uI3JuC9gubKPdv7xxV+k
+         fqf/3HSG2CZ6gqHZN0LZTBQKJYmWvqbPxrfifti14/tHlzhT4xCkz/MFCAf6hj1ho9jN
+         giYnWPx8h7hHK4O89OnDh7zkT91eSBm74HbyqEubseLpUthY5gmLzqDyNM/2P7Nig5lT
+         2v3o4Ue5ys7hDMEOGIBSjnZPwlQMTPAa3iWAhCsCgf7GvWmiWL/J7mP5eR5EQ8AZzOzw
+         417CRCJjJAEZApl6JYPUq2+dC0+tsjbwtIUPYBG+Ia3p/rqAQ3Ix3vvUbS0zm4rCdSrU
+         9/3A==
+X-Gm-Message-State: AOAM5330xfzgCpf/Kl1GB74fZNfo3zJ+Yb3/F75Pl1xRXXnsoasGLwDB
+        U/rm60vXcrOvbfykGmy4m2vwDNLcRec=
+X-Google-Smtp-Source: ABdhPJya0hEPL3+v3IGSw82KDihmFFDLjFiBSt27i0G11hzjmjLYmOhkEY2+c79aK0bz4MZlGmwNEBfJ24k=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6e02:1a4f:b0:2c7:a4c8:25f5 with SMTP id
- u15-20020a056e021a4f00b002c7a4c825f5mr334502ilv.64.1650059958943; Fri, 15 Apr
- 2022 14:59:18 -0700 (PDT)
-Date:   Fri, 15 Apr 2022 21:58:55 +0000
+ (user=oupton job=sendgmr) by 2002:a05:6870:639e:b0:e2:ab7c:d868 with SMTP id
+ t30-20020a056870639e00b000e2ab7cd868mr373366oap.108.1650059959809; Fri, 15
+ Apr 2022 14:59:19 -0700 (PDT)
+Date:   Fri, 15 Apr 2022 21:58:56 +0000
 In-Reply-To: <20220415215901.1737897-1-oupton@google.com>
-Message-Id: <20220415215901.1737897-12-oupton@google.com>
+Message-Id: <20220415215901.1737897-13-oupton@google.com>
 Mime-Version: 1.0
 References: <20220415215901.1737897-1-oupton@google.com>
 X-Mailer: git-send-email 2.36.0.rc0.470.gd361397f0d-goog
-Subject: [RFC PATCH 11/17] KVM: arm64: Move MMU cache init/destroy into helpers
+Subject: [RFC PATCH 12/17] KVM: arm64: Stuff mmu page cache in sub struct
 From:   Oliver Upton <oupton@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -78,71 +78,91 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+We're about to add another mmu cache. Stuff the current one in a sub
+struct so its easier to pass them all to ->zalloc_page().
+
 No functional change intended.
 
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h |  2 ++
- arch/arm64/kvm/arm.c             |  4 ++--
- arch/arm64/kvm/mmu.c             | 10 ++++++++++
- 3 files changed, 14 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  4 +++-
+ arch/arm64/kvm/mmu.c              | 14 +++++++-------
+ 2 files changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 74735a864eee..3bb7b678a7e7 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -172,6 +172,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
- phys_addr_t kvm_mmu_get_httbr(void);
- phys_addr_t kvm_get_idmap_vector(void);
- int kvm_mmu_init(u32 *hyp_va_bits);
-+void kvm_mmu_vcpu_init(struct kvm_vcpu *vcpu);
-+void kvm_mmu_vcpu_destroy(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 94a27a7520f4..c8947597a619 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -372,7 +372,9 @@ struct kvm_vcpu_arch {
+ 	bool pause;
  
- static inline void *__kvm_vector_slot2addr(void *base,
- 					   enum arm64_hyp_spectre_vector slot)
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 523bc934fe2f..f7862fec1595 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -320,7 +320,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	vcpu->arch.target = -1;
- 	bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
+ 	/* Cache some mmu pages needed inside spinlock regions */
+-	struct kvm_mmu_memory_cache mmu_page_cache;
++	struct kvm_mmu_caches {
++		struct kvm_mmu_memory_cache page_cache;
++	} mmu_caches;
  
--	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
-+	kvm_mmu_vcpu_init(vcpu);
- 
- 	/* Set up the timer */
- 	kvm_timer_vcpu_init(vcpu);
-@@ -349,7 +349,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	if (vcpu_has_run_once(vcpu) && unlikely(!irqchip_in_kernel(vcpu->kvm)))
- 		static_branch_dec(&userspace_irqchip_in_use);
- 
--	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
-+	kvm_mmu_vcpu_destroy(vcpu);
- 	kvm_timer_vcpu_terminate(vcpu);
- 	kvm_pmu_vcpu_destroy(vcpu);
- 
+ 	/* Target CPU and feature flags */
+ 	int target;
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 53ae2c0640bc..f29d5179196b 100644
+index f29d5179196b..7a588928740a 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1601,6 +1601,16 @@ int kvm_mmu_init(u32 *hyp_va_bits)
- 	return err;
+@@ -91,10 +91,10 @@ static bool kvm_is_device_pfn(unsigned long pfn)
+ 
+ static void *stage2_memcache_zalloc_page(void *arg)
+ {
+-	struct kvm_mmu_memory_cache *mc = arg;
++	struct kvm_mmu_caches *mmu_caches = arg;
+ 
+ 	/* Allocated with __GFP_ZERO, so no need to zero */
+-	return kvm_mmu_memory_cache_alloc(mc);
++	return kvm_mmu_memory_cache_alloc(&mmu_caches->page_cache);
  }
  
-+void kvm_mmu_vcpu_init(struct kvm_vcpu *vcpu)
-+{
-+	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
-+}
-+
-+void kvm_mmu_vcpu_destroy(struct kvm_vcpu *vcpu)
-+{
-+	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
-+}
-+
+ static void *kvm_host_zalloc_pages_exact(size_t size)
+@@ -1073,7 +1073,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	bool shared;
+ 	unsigned long mmu_seq;
+ 	struct kvm *kvm = vcpu->kvm;
+-	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
++	struct kvm_mmu_caches *mmu_caches = &vcpu->arch.mmu_caches;
+ 	struct vm_area_struct *vma;
+ 	short vma_shift;
+ 	gfn_t gfn;
+@@ -1160,7 +1160,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	 * and a write fault needs to collapse a block entry into a table.
+ 	 */
+ 	if (fault_status != FSC_PERM || (logging_active && write_fault)) {
+-		ret = kvm_mmu_topup_memory_cache(memcache,
++		ret = kvm_mmu_topup_memory_cache(&mmu_caches->page_cache,
+ 						 kvm_mmu_cache_min_pages(kvm));
+ 		if (ret)
+ 			return ret;
+@@ -1273,7 +1273,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 
+ 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
+ 					     __pfn_to_phys(pfn), prot,
+-					     memcache);
++					     mmu_caches);
+ 	}
+ 
+ 	/* Mark the page dirty only if the fault is handled successfully */
+@@ -1603,12 +1603,12 @@ int kvm_mmu_init(u32 *hyp_va_bits)
+ 
+ void kvm_mmu_vcpu_init(struct kvm_vcpu *vcpu)
+ {
+-	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
++	vcpu->arch.mmu_caches.page_cache.gfp_zero = __GFP_ZERO;
+ }
+ 
+ void kvm_mmu_vcpu_destroy(struct kvm_vcpu *vcpu)
+ {
+-	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
++	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_caches.page_cache);
+ }
+ 
  void kvm_arch_commit_memory_region(struct kvm *kvm,
- 				   struct kvm_memory_slot *old,
- 				   const struct kvm_memory_slot *new,
 -- 
 2.36.0.rc0.470.gd361397f0d-goog
 
