@@ -2,129 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1340B501FA2
-	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 02:30:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F9B7501FB5
+	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 02:43:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348016AbiDOAcz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 20:32:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53176 "EHLO
+        id S1348096AbiDOAqP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 20:46:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348044AbiDOAch (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Apr 2022 20:32:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EE080AC932
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 17:30:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649982609;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VSz+7o9rzVeLYCMoLF6o14+CdRpAu25XhazHWiW1Ekw=;
-        b=jMXx7rifmfrPPDvo/Ssrxtlpkr/Yhy1gc5+jL+Op/ToIaOwJP88RB3jGvU/3HdHvM3kR2G
-        JI/wRA++K9mUMOWRfj4c+jHokbKbTV5oSh4754c4uh4MdnGwZEQGkrTKlUK5ZOXdgiahGl
-        dFKlTKXB6WEj6uDOQm6jPEougwTN1LQ=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-281-XESKjC3CMcigKS8YohWeGw-1; Thu, 14 Apr 2022 20:30:07 -0400
-X-MC-Unique: XESKjC3CMcigKS8YohWeGw-1
-Received: by mail-il1-f200.google.com with SMTP id v11-20020a056e0213cb00b002cbcd972206so3957324ilj.11
-        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 17:30:07 -0700 (PDT)
+        with ESMTP id S240902AbiDOAqO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Apr 2022 20:46:14 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A14B1D0CA
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 17:43:47 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id e14-20020a17090301ce00b00158bfba2295so1446204plh.3
+        for <kvm@vger.kernel.org>; Thu, 14 Apr 2022 17:43:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=7OMi2RIEzFlzmxnmlN9xX+Hiuvy0euETloS8ByI5IaE=;
+        b=MeCa2hpH2EDOFAv86dWfFxEDhUCoVgtYtspWsZspfLv8qId3NORSe7rf03wn86oylz
+         +XJ0GcdqQRybf6xncuTBeePmfFN4InpFQ41P9BSR3Syo01zZHvGZ9zQr4T4EE1WEIloe
+         reG4s0K2VYD7FLIjoouyOUE3otCfnre0GNbLyJfTBPWb2DV4bee0Kn/uLaXDFLxrNX/x
+         UbZV6ELm90R1ITrDKiVMDDPojI8aJ036Iusf7S6xFX02aeLgG7OCHcrKOwsYwLbInWX3
+         PegPDslVaW429FO+Y+K2OsH/9FIvKxrhlxBKuaQed7QGbk7x/m+I+YhWAP5nEspT3bi9
+         F2eA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=VSz+7o9rzVeLYCMoLF6o14+CdRpAu25XhazHWiW1Ekw=;
-        b=N+L6F8tB5vegbWBBZA9HY1/39IN4EJGeStRpqlpW2ItAiGPpxRW+AU7eidYttH17AW
-         7elhwVQcYcNzVpOvwOltmkwgo/3ecbJq88yixonBxOnpSzBAO87p9cI8uezBxji6Ki60
-         iCbeOgA73VtG6ynduojt6m1oSDObB0EsBOHMZy0aFNxCB67PrQS8l3K+zafy6y1exE7r
-         xF3lj6U3eiiWksATAjboi/d3kytE2E8CvT7aegC9OT0+0jNBOksCsB9kSbqv+PSE0b8v
-         +vbolYinQ5VQb3dm6NdME0SNLKv+oSAe7Oo/suAdrKL42WZI2gIN/jHdjIBlk9eVxzg1
-         8uNQ==
-X-Gm-Message-State: AOAM533YI2YtnqbqtHgahBPjAfSiv1SxN07XUSi0orcK13EyFULBE3PF
-        0XBM3V99HbQTK7GCYWH3y0b6cL+sKO656F+h7U8xJmVKTcHV97UcjMLiqcU8mdiynkUdIncJMy6
-        KolrtpqqnQleu
-X-Received: by 2002:a05:6638:1356:b0:323:aa22:8cc9 with SMTP id u22-20020a056638135600b00323aa228cc9mr2421522jad.72.1649982606830;
-        Thu, 14 Apr 2022 17:30:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwNmZUtU6A/iPiMIQDhMr2fY/CjMD+funMZD15Mw8RhUBPYn1edOjFRd96NsCdDm7QzuLA0Rg==
-X-Received: by 2002:a05:6638:1356:b0:323:aa22:8cc9 with SMTP id u22-20020a056638135600b00323aa228cc9mr2421510jad.72.1649982606634;
-        Thu, 14 Apr 2022 17:30:06 -0700 (PDT)
-Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id c22-20020a5ea816000000b00649d360663asm1994437ioa.40.2022.04.14.17.30.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Apr 2022 17:30:06 -0700 (PDT)
-Date:   Thu, 14 Apr 2022 20:30:04 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH] kvm: selftests: Fix cut-off of addr_gva2gpa lookup
-Message-ID: <Yli8jJWmOt9Qqjbi@xz-m1.local>
-References: <20220414010703.72683-1-peterx@redhat.com>
- <Ylgn/Jw+FMIFqqc0@google.com>
- <bf15209d-2c50-9957-af24-c4f428f213b1@redhat.com>
- <YliTdb1LjfJoIcFc@xz-m1.local>
- <CALMp9eRjNd5_VFOsAoANkoaCTkKSHp3awrABZ5LR20+VoXZuAA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CALMp9eRjNd5_VFOsAoANkoaCTkKSHp3awrABZ5LR20+VoXZuAA@mail.gmail.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=7OMi2RIEzFlzmxnmlN9xX+Hiuvy0euETloS8ByI5IaE=;
+        b=aADR+n1XKyAXXMt3ltujFPB8EidWpXbiWosPTpT+VbLiJ+KlP84lbmzBMDWE07A2jn
+         CgdqL7zfmbqi6Wbh7ySg1TDGcCvE96j0LIOLrxoAOSYWqGxSWOUvzX4pbr7qYKqPTULP
+         CH7XvXrZyxgln/ha/FOUvg51oXpIOXZZtc9ybP0+Mcy0Jv+msiSpN0J8arVUQlaG6TTB
+         c9Lfoq7rGoh8SuwB7bAkZ1NM9YP+Wm80qga6wTuumt3dEnwsmM+Zv3elnI8KvjixDmPJ
+         WbZ5Fq67cIP167zyXNEcV7MICR/7AzscTcuHX/rOg8rewX5cwdLMku1ssctRvwZorff3
+         bSyQ==
+X-Gm-Message-State: AOAM530GM+sEIbH1IDQK6ekpE3cB+qPbKOGBVCQIDJuF9ACx6oMQX3Jt
+        OmV1u79OK0r38YEJpXsg0XKrW2nkrLQ=
+X-Google-Smtp-Source: ABdhPJx6JOuyqIVZMdQQ1Mawo8G7YZO4giLYHAwOTFBDw/d0CTLHvznAoZ7hbCtCNcCnHHDws4949mgI1FE=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1490:b0:4fb:1544:bc60 with SMTP id
+ v16-20020a056a00149000b004fb1544bc60mr17317476pfu.73.1649983426720; Thu, 14
+ Apr 2022 17:43:46 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 15 Apr 2022 00:43:40 +0000
+Message-Id: <20220415004343.2203171-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.rc0.470.gd361397f0d-goog
+Subject: [PATCH 0/3] KVM: x86 SRCU bug fix and SRCU hardening
+From:   Sean Christopherson <seanjc@google.com>
+To:     Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Atish Patra <atishp@atishpatra.org>,
+        David Hildenbrand <david@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 14, 2022 at 03:01:04PM -0700, Jim Mattson wrote:
-> On Thu, Apr 14, 2022 at 2:36 PM Peter Xu <peterx@redhat.com> wrote:
-> >
-> > On Thu, Apr 14, 2022 at 04:14:22PM +0200, Paolo Bonzini wrote:
-> > > On 4/14/22 15:56, Sean Christopherson wrote:
-> > > > > - return (pte[index[0]].pfn * vm->page_size) + (gva & 0xfffu);
-> > > > > + return ((vm_paddr_t)pte[index[0]].pfn * vm->page_size) + (gva & 0xfffu);
-> > > > This is but one of many paths that can get burned by pfn being 40 bits.  The
-> > > > most backport friendly fix is probably to add a pfn=>gpa helper and use that to
-> > > > place the myriad "pfn * vm->page_size" instances.
-> > > >
-> > > > For a true long term solution, my vote is to do away with the bit field struct
-> > > > and use #define'd masks and whatnot.
-> > >
-> > > Yes, bitfields larger than 32 bits are a mess.
-> >
-> > It's very interesting to know this..
-> 
-> I don't think the undefined behavior is restricted to extended
-> bit-fields. Even for regular bit-fields, the C99 spec says, "A
-> bit-field shall have a type that is a qualified or unqualified version
-> of _Bool, signed
-> int, unsigned int, or some other implementation-defined type." One
-> might assume that even the permissive final clause refers to
-> fundamental language types, but I suppose "n-bit integer" meets the
-> strict definition of a "type,"
-> for arbitrary values of n.
+Fix an x86 bug where KVM overwrites vcpu->srcu_idx and can leak an SRCU
+lock due to unlocking the wrong index, ultimately causing a hang if/when
+KVM attempts to synchronize.
 
-Fair enough.
+Switch RISC-V to the generic vcpu->srcu_idx, for reasons unknown it has
+its own copy and ignores the generic one.
 
-I just noticed it actually make sense to have such a behavior, because in
-the case of A*B where A is the bitfield (<32 bits) and when B is an int
-(=32bits, page_size in the test case or a default constant value which will
-also be treated as int/uint).
+Add helpers with rudimentary detection of illegal vcpu->srcu_idx usage,
+the x86 bug would have been incredibly painful to debug had I not known
+what to look for (found by a selftest with very specific behavior...
+that we recently modified with respect to SRCU).
 
-Then it's simply extending the smaller field into the same size as the
-bigger one, as 40bits*32bits goes into a 40bits output which needs some
-proper masking if calculated with RAX, while a e.g. 20bits*32bits goes into
-32bits, in which case no further masking needed.
+Non-x86 changes are compile tested only.
 
-Thanks,
+Sean Christopherson (3):
+  KVM: x86: Don't re-acquire SRCU lock in complete_emulated_io()
+  KVM: RISC-V: Use kvm_vcpu.srcu_idx, drop RISC-V's unnecessary copy
+  KVM: Add helpers to wrap vcpu->srcu_idx and yell if it's abused
 
+ arch/powerpc/kvm/book3s_64_mmu_radix.c |  9 ++++---
+ arch/powerpc/kvm/book3s_hv_nested.c    | 16 ++++++------
+ arch/powerpc/kvm/book3s_rtas.c         |  4 +--
+ arch/powerpc/kvm/powerpc.c             |  4 +--
+ arch/riscv/include/asm/kvm_host.h      |  3 ---
+ arch/riscv/kvm/vcpu.c                  | 16 ++++++------
+ arch/riscv/kvm/vcpu_exit.c             |  4 +--
+ arch/s390/kvm/interrupt.c              |  4 +--
+ arch/s390/kvm/kvm-s390.c               |  8 +++---
+ arch/s390/kvm/vsie.c                   |  4 +--
+ arch/x86/kvm/x86.c                     | 35 +++++++++++---------------
+ include/linux/kvm_host.h               | 24 +++++++++++++++++-
+ 12 files changed, 72 insertions(+), 59 deletions(-)
+
+
+base-commit: 150866cd0ec871c765181d145aa0912628289c8a
 -- 
-Peter Xu
+2.36.0.rc0.470.gd361397f0d-goog
 
