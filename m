@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA3325031AC
-	for <lists+kvm@lfdr.de>; Sat, 16 Apr 2022 01:10:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 942AF5030E0
+	for <lists+kvm@lfdr.de>; Sat, 16 Apr 2022 01:09:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356188AbiDOWBx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Apr 2022 18:01:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37558 "EHLO
+        id S1356100AbiDOWBy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Apr 2022 18:01:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355788AbiDOWBp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Apr 2022 18:01:45 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 936BC396BF
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 14:59:16 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id i5-20020a258b05000000b006347131d40bso7580147ybl.17
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 14:59:16 -0700 (PDT)
+        with ESMTP id S1356124AbiDOWBr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Apr 2022 18:01:47 -0400
+Received: from mail-io1-xd49.google.com (mail-io1-xd49.google.com [IPv6:2607:f8b0:4864:20::d49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80EA8396BF
+        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 14:59:17 -0700 (PDT)
+Received: by mail-io1-xd49.google.com with SMTP id v9-20020a5ed709000000b006530841a32cso1129582iom.21
+        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 14:59:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=B6406tYui+5lJgRvZIHJ2dZYS6AUdUd0eyrsU1t7VRI=;
-        b=RzttCkqDWkMAl2afGr2S9DJJm5Ry89zm9fK8vSWXxjh+Br5xy5GQOart2FDuwkrzu8
-         +3Iq4y2goOAEc/FMm6DlVztE2ytFr3oiz9PTrVTxIm5m3Agm5OTfDy0Zs4ZMjS6SjcTP
-         Zb1tTD9KujpWLSKkx4Mqs5RJ6LI4Z/u/gq513Flk/dllCKb2U4eZ8URwcntAGL1GuOmq
-         ufWltbnns/Dj/9u47iW81VO53GtXf0bBfExXn11hVKS6QGf6GMMShHapP0dxeuiycC4J
-         XphrZoAoqeoctTsXEHQSr5ZLlJzNIHeMt45VK8ODHWJivQe27pVAh1K+W85kwYhJyLS2
-         rKpg==
+        bh=0g9zJiooWDeKugRAQw4FN5FN0/UzyXcPgqHvAqWzKag=;
+        b=oLCH+GSdJvXkd0Gi9+H7vA79g6hjv3mWJ8f1Ky8MSz9VGrXihtRm2Q2mQk94XB6R1V
+         rI0BdGd8LpAzMP3bNbGXHpcJwONP3gy5q638j75OkVYuPzBzMikI3B/GpnP4ZHi6WYgC
+         1NnjFM6MAYPTaJtge/P7t3M0AOj4J/HW1tzhhrT32UjnHREO3sHO9Q6aRYB6eSSaw14y
+         1XJYEXTFyIROlajcWQONhn8qbXtAQymvl+UmDZ5XpOcMbLVur2O69+FsbWoSTYPTr05p
+         24KmSiJ75xiAF16xI5zuCM76equOlcpV45VjmXOI3Dw1o6nycZZCyMKAyu7F35txmRD/
+         JODA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=B6406tYui+5lJgRvZIHJ2dZYS6AUdUd0eyrsU1t7VRI=;
-        b=UPa/hTV0Ihms7NJLIBHvg/RtWlxpY4RS+6cD9eamNB6B8BhwpZsxRRzFYKi6lW+7+U
-         YTmdaNXdKefW5CARI/73PC54Tw8MKaGIVAkx70jLeoL+JTu8F+HW1lg2N6hZF/vhELoo
-         iA7k0igPvoFuEdXLQzUCsvfzn544J2aLChR61mNAirxzWlBKC8wGs6NzUMNNlwqFT18C
-         b9tRkwzjf0hnCrAixmyGuCZf0T9JXn7RI6tGxPG4WbIHkss6zqh7/Bxaqn1XAuYYVorB
-         RT7WOfuliTz8SZBvTgwqmTidG2UidtJkPO1zhEMPGafEhQLdQfNIOgXgyW99X+m/HSgf
-         XxFQ==
-X-Gm-Message-State: AOAM532D7/sCqsYh8cErC0akcgNn4qltz9YWKrGa1tWVBG19AgFeQGyc
-        vFXscqIb0FuWWiGTQAk+Spejf6O5vxI=
-X-Google-Smtp-Source: ABdhPJyC6al0eeORHQcVaP84DLwWwiUHL9eCDBoXdDwFa7r/iAh2U4p6UOyrCV4QCls9mT6W0yMv3xIYId8=
+        bh=0g9zJiooWDeKugRAQw4FN5FN0/UzyXcPgqHvAqWzKag=;
+        b=BdPO0T38oKl73SkxrY8/XWoxFpiGBy/ZQK0f4dbx3P3iTf5WDcnh5wjcT6fvPnnT6i
+         edOGbuG8Q4kPblQth9qI4LWi8FuNp8Snb4ESTaS6n1R/WxZzd0cL/ORd0I52qYgm1Ol/
+         O7y95edtXMjS+A9+WMeOZtgcs/U62F/13RzeoacbeY7J8hmVUWyUQUTrbBl4AlsDDTdQ
+         2JEEjZr5d2Q4iDMqF3lFd5CApIDVoHDQY1oXth1fvLRQV6kE87dqZInPhSvN6tVifQzk
+         tzZRX+fliwOgYuoez85dCZSEZE3xkgGZ9Z1i58pzdG3bWByDKy68KZjT7mwgGHJGtH4M
+         SPgw==
+X-Gm-Message-State: AOAM532HPWjVtxayUMxalu21BQdmzpc7gxZwkK5XPrpzittksQ6/GyXJ
+        YAYq9D384GtXGLT0M0ctYagyywqg/4Q=
+X-Google-Smtp-Source: ABdhPJy38Wy2JIODUbPjdCPdcAqin2kc7u187gx+PAUVY0P1F7nHnp3qVfiaCtdGLADk1YLKoWq+Y853FYQ=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a81:4989:0:b0:2f1:47b9:8ac2 with SMTP id
- w131-20020a814989000000b002f147b98ac2mr935486ywa.346.1650059955713; Fri, 15
- Apr 2022 14:59:15 -0700 (PDT)
-Date:   Fri, 15 Apr 2022 21:58:52 +0000
+ (user=oupton job=sendgmr) by 2002:a05:6638:218a:b0:326:6ed7:c011 with SMTP id
+ s10-20020a056638218a00b003266ed7c011mr473714jaj.242.1650059956892; Fri, 15
+ Apr 2022 14:59:16 -0700 (PDT)
+Date:   Fri, 15 Apr 2022 21:58:53 +0000
 In-Reply-To: <20220415215901.1737897-1-oupton@google.com>
-Message-Id: <20220415215901.1737897-9-oupton@google.com>
+Message-Id: <20220415215901.1737897-10-oupton@google.com>
 Mime-Version: 1.0
 References: <20220415215901.1737897-1-oupton@google.com>
 X-Mailer: git-send-email 2.36.0.rc0.470.gd361397f0d-goog
-Subject: [RFC PATCH 08/17] KVM: arm64: Spin off helper for initializing table pte
+Subject: [RFC PATCH 09/17] KVM: arm64: Tear down unlinked page tables in
+ parallel walk
 From:   Oliver Upton <oupton@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -78,68 +79,103 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With parallel table walks there is no guarantee that KVM reads back the
-same pte that was written. Spin off a helper that creates a pte value,
-thereby allowing the visitor callback to return the next table without
-reading the ptep again.
+Breaking a table pte is insufficient to guarantee ownership of an
+unlinked subtree. Parallel software walkers could be traversing
+substructures and changing their mappings.
+
+Recurse through the unlinked subtree and lock all descendent ptes
+to take ownership of the subtree. Since the ptes are actually being
+evicted, return table ptes back to the table walker to ensure child
+tables are also traversed. Note that this is done both in both the
+pre-order and leaf visitors as the underlying pte remains volatile until
+it is unlinked.
 
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/arm64/kvm/hyp/pgtable.c | 23 ++++++++++++++++-------
- 1 file changed, 16 insertions(+), 7 deletions(-)
+ arch/arm64/kvm/hyp/pgtable.c | 56 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 52 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index ff6f14755d0c..ffdfd5ee9642 100644
+index ffdfd5ee9642..146fc44acf31 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -167,14 +167,23 @@ static void kvm_clear_pte(kvm_pte_t *ptep)
- 	WRITE_ONCE(*ptep, 0);
+@@ -838,6 +838,54 @@ static void stage2_make_pte(kvm_pte_t *ptep, kvm_pte_t new, struct kvm_pgtable_m
+ 	}
  }
  
--static void kvm_set_table_pte(kvm_pte_t *ptep, kvm_pte_t *childp,
--			      struct kvm_pgtable_mm_ops *mm_ops)
-+static kvm_pte_t kvm_init_table_pte(kvm_pte_t *childp, struct kvm_pgtable_mm_ops *mm_ops)
- {
--	kvm_pte_t old = *ptep, pte = kvm_phys_to_pte(mm_ops->virt_to_phys(childp));
-+	kvm_pte_t pte = kvm_phys_to_pte(mm_ops->virt_to_phys(childp));
- 
- 	pte |= FIELD_PREP(KVM_PTE_TYPE, KVM_PTE_TYPE_TABLE);
- 	pte |= KVM_PTE_VALID;
- 
-+	return pte;
++static kvm_pte_t stage2_unlink_pte_shared(kvm_pte_t *ptep)
++{
++	kvm_pte_t old;
++
++	while (true) {
++		old = xchg(ptep, KVM_INVALID_PTE_LOCKED);
++		if (old != KVM_INVALID_PTE_LOCKED)
++			return old;
++
++		cpu_relax();
++	}
 +}
 +
-+static void kvm_set_table_pte(kvm_pte_t *ptep, kvm_pte_t *childp,
-+			      struct kvm_pgtable_mm_ops *mm_ops)
++
++/**
++ * stage2_unlink_pte() - Tears down an unreachable pte, returning the next pte
++ *			 to visit (if any).
++ *
++ * @ptep: pointer to the pte to unlink
++ * @level: page table level of the pte
++ * @shared: true if the tables are shared by multiple software walkers
++ * @mm_ops: pointer to the mm ops table
++ *
++ * Return: a table pte if another level of recursion is necessary, 0 otherwise.
++ */
++static kvm_pte_t stage2_unlink_pte(kvm_pte_t *ptep, u32 level, bool shared,
++				   struct kvm_pgtable_mm_ops *mm_ops)
 +{
-+	kvm_pte_t pte, old = *ptep;
++	kvm_pte_t old;
 +
-+	pte = kvm_init_table_pte(childp, mm_ops);
++	if (shared) {
++		old = stage2_unlink_pte_shared(ptep);
++	} else {
++		old = *ptep;
++		WRITE_ONCE(*ptep, KVM_INVALID_PTE_LOCKED);
++	}
 +
- 	WARN_ON(kvm_pte_valid(old));
- 	smp_store_release(ptep, pte);
- }
-@@ -931,7 +940,7 @@ static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
- 				kvm_pte_t *old, struct stage2_map_data *data, bool shared)
++	WARN_ON(stage2_pte_is_locked(old));
++
++	if (kvm_pte_table(old, level))
++		return old;
++
++	if (stage2_pte_is_counted(old))
++		mm_ops->put_page(ptep);
++
++	return 0;
++}
++
+ static void stage2_put_pte(kvm_pte_t *ptep, struct kvm_s2_mmu *mmu, u64 addr,
+ 			   u32 level, struct kvm_pgtable_mm_ops *mm_ops)
  {
- 	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
--	kvm_pte_t *childp;
-+	kvm_pte_t *childp, pte;
+@@ -922,8 +970,10 @@ static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
+ 				     struct stage2_map_data *data,
+ 				     bool shared)
+ {
+-	if (data->anchor)
++	if (data->anchor) {
++		*old = stage2_unlink_pte(ptep, level, shared, data->mm_ops);
+ 		return 0;
++	}
+ 
+ 	if (!stage2_leaf_mapping_allowed(addr, end, level, data))
+ 		return 0;
+@@ -944,9 +994,7 @@ static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
  	int ret;
  
  	if (data->anchor) {
-@@ -969,9 +978,9 @@ static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
- 	 * a table. Accesses beyond 'end' that fall within the new table
- 	 * will be mapped lazily.
- 	 */
--	kvm_set_table_pte(ptep, childp, mm_ops);
--	mm_ops->get_page(ptep);
--	*old = *ptep;
-+	pte = kvm_init_table_pte(childp, mm_ops);
-+	stage2_make_pte(ptep, pte, data->mm_ops);
-+	*old = pte;
- 	return 0;
- }
+-		if (stage2_pte_is_counted(*old))
+-			mm_ops->put_page(ptep);
+-
++		*old = stage2_unlink_pte(ptep, level, shared, data->mm_ops);
+ 		return 0;
+ 	}
  
 -- 
 2.36.0.rc0.470.gd361397f0d-goog
