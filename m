@@ -2,102 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 663B8502C41
-	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 17:02:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 90877502C55
+	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 17:07:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354792AbiDOPE2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Apr 2022 11:04:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49546 "EHLO
+        id S1354825AbiDOPJY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Apr 2022 11:09:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354795AbiDOPEZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Apr 2022 11:04:25 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24DF8B8236
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 08:01:57 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id o5so7851964pjr.0
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 08:01:57 -0700 (PDT)
+        with ESMTP id S1348301AbiDOPJX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Apr 2022 11:09:23 -0400
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D73BBD7E8;
+        Fri, 15 Apr 2022 08:06:54 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id 123-20020a1c1981000000b0038b3616a71aso5181843wmz.4;
+        Fri, 15 Apr 2022 08:06:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Az4fGj41zOdvkfI9EKM24+0aqWRfUg0i44LnNLGYmEM=;
-        b=n/ITxv/qMhJcXJbybE8llTliBfr1k8JJIzO2zL/ZNTGbt7v3hjI7fWhhJSpIUOVn8o
-         cdpZ7SRiz3M7qD56Hi5kGz9SkKdxY/KMLZCJ8j67oaob5VkwDiq2VOxG3cFQ+7Ch/HgV
-         hjgtWwVDObmDvtJS1lgGc3HBH2SQcHLt5+TArE9Rp9VHezDXcP60FMj902nhDtQZbK+M
-         OuHowPFzQaF1UZT0qECi+VRyyR4Rap2D+F3YMxwT3HUQtmEAYMR2BPJ5TJgeYAFX9qx1
-         W3q5OUtLUZcL2lj0yylPC2tJZ2hJZt4XrDP6mjpFxhvUg3ZrEA1s6bJbvISQixv1MGNO
-         T+Qg==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Z+ZzteNL1B5uNdnnAQT3e/XkUjVBtdobVF4d1HQJH34=;
+        b=Da0m8fA8NA4Hk4Zzb+pT4m1VE6XRuDvRG5I4hMz+LbJFRS5N15e/mmdHJKT1h7tOYs
+         kQfDqSTVlWQWu9dvaZTlYZ+xbgunrhfcPa2XgnkB4hlF3I7NjSizdylpjslQuBGuTVv/
+         09IBOG89HozaoPwa7NNFBGLW1o/NhFN9/SOOF40Luk37huFuzFZ1OkPc0TR16QlXXXl4
+         n6i9iUN4PBt8xYebpGTyKk5vNm/vtgTxa0Ldgk5ivj9pm7DA4gyt0CF4x19CueBeGcV3
+         JaMZU3QhgcmsGiBzKMJ5pA9oagMQKYFZhgM2MMQQaFi9OdLjeAOIPHDt+UQz9PMuU9aP
+         Rtag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Az4fGj41zOdvkfI9EKM24+0aqWRfUg0i44LnNLGYmEM=;
-        b=G3qLBJex0IhXqmlcFogv5os2zA3Qb5nxRUpjcmdy1hKsRUQduifj+CI0oIwJ6akJvd
-         HrCoeUFLvURRv/apFuppuYYtZbuvxFkhZkuZwfdIW1S4tLY7RiP8kbN9N2uoOwvI/hFe
-         rKVU6S2uHA/lj+84l8qRENuyZKjccDuX2oFOgpWkS7XfWu3Kq5AuyKKyv49s8Iv7LAuo
-         B4ZsjXhxmwkP/AFju/q7q1SN0Tzmk+8jnh+ix3WgRXSiTNyGzNxVIg4GUN9nLK/xTo5G
-         xgHezje2ORjwJpDcBoGytbYpXI5i9Z/l8dhyCKlWkw3Hl1YxkiyvI3nQpHpnKS55fDAg
-         l1Iw==
-X-Gm-Message-State: AOAM532R/b1z7Fs0FvbvPrIcHPIpIGmhHdeWGO3YADFtdzL5bbNP+nu9
-        YT22zN7Yuumli7dQHXRRv8EgOQ==
-X-Google-Smtp-Source: ABdhPJymh7kAEgYCaObPRMje0xl3Oiwg/sQm394mC6KLFbzt8LkrelPDymNdNsDi4naPj3WzojXOIQ==
-X-Received: by 2002:a17:90b:3a82:b0:1cb:9ba8:56a5 with SMTP id om2-20020a17090b3a8200b001cb9ba856a5mr4641840pjb.16.1650034916361;
-        Fri, 15 Apr 2022 08:01:56 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v4-20020a622f04000000b005057a24d478sm3162719pfv.121.2022.04.15.08.01.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Apr 2022 08:01:55 -0700 (PDT)
-Date:   Fri, 15 Apr 2022 15:01:52 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Zeng Guang <guang.zeng@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
-        Gao Chao <chao.gao@intel.com>
-Subject: Re: [PATCH v8 8/9] KVM: x86: Allow userspace set maximum VCPU id for
- VM
-Message-ID: <YlmI4N1erENL9HyV@google.com>
-References: <20220411090447.5928-1-guang.zeng@intel.com>
- <20220411090447.5928-9-guang.zeng@intel.com>
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Z+ZzteNL1B5uNdnnAQT3e/XkUjVBtdobVF4d1HQJH34=;
+        b=zMN02NPAzAPUgnwYDgOZOOdzfmD2pRfuDcHmR31BEFZpupfiXo4sr7fUPMUtMyTNRP
+         0Bs12At8iATVYxUYvhhByx0j2oiSAU+pOdrKyYTJqajy9xIstG/BEdHCnJUL9kClcDyl
+         6GLaV9ODwT7L/hyjJGDkPJPKSVsiXb3cCP+dwpqrB75+YKh7d+x9uIE8aR9PqCmPwTwO
+         ERVFy6v7s7hjDT7P+QTmFhEoz66jYAaF+yqSQ3WLxf2oVtd/4MODhuA4inHxQP+z8obI
+         nODNeB8O1G/ZELhgYnSXpvP9tkqfTwjtDfRViJFPabsZAzMt6AB6em1jYZbLdFhe+SUJ
+         qspw==
+X-Gm-Message-State: AOAM5321DHiofWlgozILrG9WLI6wQ7qxq48T3yWNpRAIGTkBdC3M88iZ
+        L/S1/BM+2nU36RD8WYzV9LNcUQNAk7WEjA==
+X-Google-Smtp-Source: ABdhPJz8FaMbQoRRaFwVq5H7k+alQh9LURSn6O2lnjtGsFgzXRyOrLrHypKkJorATMo+BHJd1e5U+g==
+X-Received: by 2002:a05:600c:a45:b0:346:5e67:cd54 with SMTP id c5-20020a05600c0a4500b003465e67cd54mr3755891wmq.127.1650035212870;
+        Fri, 15 Apr 2022 08:06:52 -0700 (PDT)
+Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
+        by smtp.googlemail.com with ESMTPSA id c186-20020a1c35c3000000b0038e6c6fc860sm5176738wma.37.2022.04.15.08.06.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Apr 2022 08:06:52 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <f520643c-76e6-36f3-604f-601a66d6272a@redhat.com>
+Date:   Fri, 15 Apr 2022 17:05:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220411090447.5928-9-guang.zeng@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [RFC PATCH v5 094/104] KVM: TDX: Handle TDX PV MMIO hypercall
+Content-Language: en-US
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Jim Mattson <jmattson@google.com>,
+        erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <2600955a0bd445bff17eb2bb43edbb71035ae2f5.1646422845.git.isaku.yamahata@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <2600955a0bd445bff17eb2bb43edbb71035ae2f5.1646422845.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 11, 2022, Zeng Guang wrote:
-> @@ -11180,6 +11192,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  	struct page *page;
->  	int r;
->  
-> +	if (vcpu->vcpu_id >= vcpu->kvm->arch.max_vcpu_ids)
-
-This belongs in pre-create.
-
-> +		return -EINVAL;
+On 3/4/22 20:49, isaku.yamahata@intel.com wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+> 
+> Export kvm_io_bus_read and kvm_mmio tracepoint and wire up TDX PV MMIO
+> hypercall to the KVM backend functions.
+> 
+> kvm_io_bus_read/write() searches KVM device emulated in kernel of the given
+> MMIO address and emulates the MMIO.  As TDX PV MMIO also needs it, export
+> kvm_io_bus_read().  kvm_io_bus_write() is already exported.  TDX PV MMIO
+> emulates some of MMIO itself.  To add trace point consistently with x86
+> kvm, export kvm_mmio tracepoint.
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>   arch/x86/kvm/vmx/tdx.c | 114 +++++++++++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/x86.c     |   1 +
+>   virt/kvm/kvm_main.c    |   2 +
+>   3 files changed, 117 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index c900347d0bc7..914af5da4805 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -1012,6 +1012,118 @@ static int tdx_emulate_io(struct kvm_vcpu *vcpu)
+>   	return ret;
+>   }
+>   
+> +static int tdx_complete_mmio(struct kvm_vcpu *vcpu)
+> +{
+> +	unsigned long val = 0;
+> +	gpa_t gpa;
+> +	int size;
 > +
->  	vcpu->arch.last_vmentry_cpu = -1;
->  	vcpu->arch.regs_avail = ~0;
->  	vcpu->arch.regs_dirty = ~0;
+> +	WARN_ON(vcpu->mmio_needed != 1);
+> +	vcpu->mmio_needed = 0;
+> +
+> +	if (!vcpu->mmio_is_write) {
+> +		gpa = vcpu->mmio_fragments[0].gpa;
+> +		size = vcpu->mmio_fragments[0].len;
+> +
+> +		memcpy(&val, vcpu->run->mmio.data, size);
+> +		tdvmcall_set_return_val(vcpu, val);
+> +		trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
+> +	}
+> +	return 1;
+> +}
+> +
+> +static inline int tdx_mmio_write(struct kvm_vcpu *vcpu, gpa_t gpa, int size,
+> +				 unsigned long val)
+> +{
+> +	if (kvm_iodevice_write(vcpu, &vcpu->arch.apic->dev, gpa, size, &val) &&
+> +	    kvm_io_bus_write(vcpu, KVM_MMIO_BUS, gpa, size, &val))
+> +		return -EOPNOTSUPP;
+> +
+> +	trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, size, gpa, &val);
+> +	return 0;
+> +}
+> +
+> +static inline int tdx_mmio_read(struct kvm_vcpu *vcpu, gpa_t gpa, int size)
+> +{
+> +	unsigned long val;
+> +
+> +	if (kvm_iodevice_read(vcpu, &vcpu->arch.apic->dev, gpa, size, &val) &&
+> +	    kvm_io_bus_read(vcpu, KVM_MMIO_BUS, gpa, size, &val))
+> +		return -EOPNOTSUPP;
+> +
+> +	tdvmcall_set_return_val(vcpu, val);
+> +	trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
+> +	return 0;
+> +}
+> +
+> +static int tdx_emulate_mmio(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_memory_slot *slot;
+> +	int size, write, r;
+> +	unsigned long val;
+> +	gpa_t gpa;
+> +
+> +	WARN_ON(vcpu->mmio_needed);
+> +
+> +	size = tdvmcall_p1_read(vcpu);
+> +	write = tdvmcall_p2_read(vcpu);
+> +	gpa = tdvmcall_p3_read(vcpu);
+> +	val = write ? tdvmcall_p4_read(vcpu) : 0;
+> +
+> +	if (size != 1 && size != 2 && size != 4 && size != 8)
+> +		goto error;
+> +	if (write != 0 && write != 1)
+> +		goto error;
+> +
+> +	/* Strip the shared bit, allow MMIO with and without it set. */
+> +	gpa = kvm_gpa_unalias(vcpu->kvm, gpa);
+> +
+> +	if (size > 8u || ((gpa + size - 1) ^ gpa) & PAGE_MASK)
+> +		goto error;
+> +
+> +	slot = kvm_vcpu_gfn_to_memslot(vcpu, gpa_to_gfn(gpa));
+> +	if (slot && !(slot->flags & KVM_MEMSLOT_INVALID))
+> +		goto error;
+> +
+> +	if (!kvm_io_bus_write(vcpu, KVM_FAST_MMIO_BUS, gpa, 0, NULL)) {
+> +		trace_kvm_fast_mmio(gpa);
+> +		return 1;
+> +	}
+> +
+> +	if (write)
+> +		r = tdx_mmio_write(vcpu, gpa, size, val);
+> +	else
+> +		r = tdx_mmio_read(vcpu, gpa, size);
+> +	if (!r) {
+> +		/* Kernel completed device emulation. */
+> +		tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
+> +		return 1;
+> +	}
+> +
+> +	/* Request the device emulation to userspace device model. */
+> +	vcpu->mmio_needed = 1;
+> +	vcpu->mmio_is_write = write;
+> +	vcpu->arch.complete_userspace_io = tdx_complete_mmio;
+> +
+> +	vcpu->run->mmio.phys_addr = gpa;
+> +	vcpu->run->mmio.len = size;
+> +	vcpu->run->mmio.is_write = write;
+> +	vcpu->run->exit_reason = KVM_EXIT_MMIO;
+> +
+> +	if (write) {
+> +		memcpy(vcpu->run->mmio.data, &val, size);
+> +	} else {
+> +		vcpu->mmio_fragments[0].gpa = gpa;
+> +		vcpu->mmio_fragments[0].len = size;
+> +		trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, size, gpa, NULL);
+> +	}
+> +	return 0;
+> +
+> +error:
+> +	tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
+> +	return 1;
+> +}
+> +
+>   static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+>   {
+>   	struct vcpu_tdx *tdx = to_tdx(vcpu);
+> @@ -1029,6 +1141,8 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+>   		return tdx_emulate_hlt(vcpu);
+>   	case EXIT_REASON_IO_INSTRUCTION:
+>   		return tdx_emulate_io(vcpu);
+> +	case EXIT_REASON_EPT_VIOLATION:
+> +		return tdx_emulate_mmio(vcpu);
+>   	default:
+>   		break;
+>   	}
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 9acb33a17445..483fa46b1be7 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12915,6 +12915,7 @@ bool kvm_arch_dirty_log_supported(struct kvm *kvm)
+>   
+>   EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_entry);
+>   EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
+> +EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_mmio);
+>   EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
+>   EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_inj_virq);
+>   EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_page_fault);
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index d4e117f5b5b9..6db075db6098 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2259,6 +2259,7 @@ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn
+>   
+>   	return NULL;
+>   }
+> +EXPORT_SYMBOL_GPL(kvm_vcpu_gfn_to_memslot);
+>   
+>   bool kvm_is_visible_gfn(struct kvm *kvm, gfn_t gfn)
+>   {
+> @@ -5126,6 +5127,7 @@ int kvm_io_bus_read(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
+>   	r = __kvm_io_bus_read(vcpu, bus, &range, val);
+>   	return r < 0 ? r : 0;
+>   }
+> +EXPORT_SYMBOL_GPL(kvm_io_bus_read);
+>   
+>   /* Caller must hold slots_lock. */
+>   int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
+
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
