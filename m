@@ -2,152 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AEC725030F4
-	for <lists+kvm@lfdr.de>; Sat, 16 Apr 2022 01:09:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DE475030AD
+	for <lists+kvm@lfdr.de>; Sat, 16 Apr 2022 01:09:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356159AbiDOWCE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Apr 2022 18:02:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38070 "EHLO
+        id S1356288AbiDOW1L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Apr 2022 18:27:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355788AbiDOWBy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Apr 2022 18:01:54 -0400
-Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FB7DFD3B
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 14:59:25 -0700 (PDT)
-Received: by mail-il1-x149.google.com with SMTP id p10-20020a056e02104a00b002caa828f7b1so5432447ilj.7
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 14:59:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=jzvc81PBGj4bV/jHUjtzPtFNqWylMffaehwRBxD6iIE=;
-        b=aWkRKsBqnouPuu0iRgQFmbdZNwM6u65S9STgd8WzLazymunDNq+F/2LV041lFacxkX
-         sH2au5CIL4U6btbR36TcgERHcBL5JA8T93pnN1zy/vCBpJyTdEx4s8aDOU+JwJD7FEgH
-         EDuCMiJ2lKlmqCfo2HCyFA8YBpzh+0As1Im7YSg7MivXDgsyltO1HdVbeLv+yGFmNIPi
-         O5p8sXbUH14m1SBo2J0fuW1TDCouol/p3zaCmN7Pb1tclO6RjKEsMyqqJ0eOLp38uD1h
-         AbzgBBIOOsbBeQk1WFRiKNO/0k6ugAlDvMy5k+FqVLVzTLXvQl7QmS1J6MjDvDSfP9W4
-         9n1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=jzvc81PBGj4bV/jHUjtzPtFNqWylMffaehwRBxD6iIE=;
-        b=2kYp3lXJQnCS/TUV5BYxYxtdLECtPFj4/a03o/57xYQd7oRAIfsB+o1hOohd8/2nwj
-         c/n6FKpK0a2Isz4bNe8hySob7GVzzH2JhMDCJX+EeSQdY8SiCrDcQRADfv1uaAfxszri
-         eX25F6OeuBxM3ht5H16Qu5Usj2gU0/IF2qXY7NxVpgxHNeecFrG4jVwyNu4Jl863Slln
-         JJNRH04eNWsk0MmCLVdqx/befZqIfZUgRvYggDTCqNyRrERKZOuSuctpcnHRpMRosamW
-         nINWz0RQS7tkDh2clabjaH2zqhpVEJorfQbORbH7NdtBYQvGb94RopivnsTwxtLD4pLX
-         lKfw==
-X-Gm-Message-State: AOAM530WZaYoNfso+nnQm/jvMK6Q5uOmnkF3cHBWXJ6CPwvqXK9GrDEb
-        IRV6RXA87OEaCn7tt831Cqmp7XTFoDo=
-X-Google-Smtp-Source: ABdhPJy0T0D9tPSOS2fkDjAWGdXFAsgYKiBOBw6Vv9SkS2qbIf2KOV78tziChH3+cjdCnnpihxhBubRLicI=
-X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6e02:1b0f:b0:2c7:9a3f:6e84 with SMTP id
- i15-20020a056e021b0f00b002c79a3f6e84mr312271ilv.32.1650059964470; Fri, 15 Apr
- 2022 14:59:24 -0700 (PDT)
-Date:   Fri, 15 Apr 2022 21:59:01 +0000
-In-Reply-To: <20220415215901.1737897-1-oupton@google.com>
-Message-Id: <20220415215901.1737897-18-oupton@google.com>
-Mime-Version: 1.0
-References: <20220415215901.1737897-1-oupton@google.com>
-X-Mailer: git-send-email 2.36.0.rc0.470.gd361397f0d-goog
-Subject: [RFC PATCH 17/17] TESTONLY: KVM: arm64: Add super lazy accounting of
- stage 2 table pages
-From:   Oliver Upton <oupton@google.com>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
+        with ESMTP id S231145AbiDOW1I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Apr 2022 18:27:08 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2051.outbound.protection.outlook.com [40.107.220.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD8D32ED67
+        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 15:24:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QynSjXkdPal9EE4facWwPz269BEptLUIbg13Wq2F0g239ieJOe/eHZoKIpLhv0oYYuimketKSkbLGaa60ROXPcpvMfR6djHQ83hqJR9pVQI0Au7l6fQFJsX3D+VvbKZuhZrOYjZfQk5aO27B3YBSrjzjuEsUvTNFhXcqScnJW6bDQAg/twMLfpiOo2uOp82CW4fKYQnMv28B2N1RiVMa0tMQc8c88F4vXg5sPR7fRArzMjOSTjy6scufyGBL/lIi5dbDlX6lD01GIp/9G+uZE4TlgVKtEQJ5IL4x3YmtQ7gvkpNyvBDKKdxl+7RHibFxqGcldxfTqRq4LHt0DanGpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/3won54WXcFxnyZlUkEf2y8znGjy4ZU7J5X2xVKH8KI=;
+ b=XGuwVGriPJyd3P6BFLOOvaXfqvYwlmjkVbjuWZo3zDJ5KZkEm5Ot+SLy4rVIPfb/xc+vgRANwZ/SpuQH7mX3fUf9FUXvvYzLvifO1eOm/OCUSyiLgDRMncbwqseyb1kh3yoZtrUpG6SHqY7rF8VQUuMt/J/Vw1VGTTnWrYRusUa60JzmlxsbHKkm60NdpyCjcOPC/MFwuoy53Zeevul1zs+I0JBCPxLyx1xxAnPHSWU0U3IInVZreerokjZ0FoONz0Hl3FdPmgh0iXZuDlzVi+B6NDeR1ehhKX9tEFgFvqJCkw1muLFKH16A0kUxJIhJQom0OAjyEm0Piip2jN3bww==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/3won54WXcFxnyZlUkEf2y8znGjy4ZU7J5X2xVKH8KI=;
+ b=AFxGdtR6HjwQTmiEH6mcNA3WjLj7lkhVBMXPZqUPbe2AQkQq/zIZV2oOdIuA9qvcVM9vY5cwWiyFb5dp20fJAjTnR3+2TUqVJ7mPjsRzkAsGwYQIqnzKMg90FZveG47YxaeNm7r4biXm6mOR2PW/0NBMFMuXdp3uxQWToixu5dFU1H9zZOv2jc0SDvgMvxMq+W0GJaBUTrA7uHOOdl5JZecWs4MSLNk+6DCrIMFMEZONLueuwm6GyAMGbLoqmOyteSv0/ZHVqIq64hylvahGvNXdwFFXmcDwH+aM7mg2hEXetzHdUKDxXNvZIvZHr7Dz1bq6EqcypvcGsD7IbJB7Kg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by DM5PR12MB1130.namprd12.prod.outlook.com (2603:10b6:3:75::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.20; Fri, 15 Apr
+ 2022 22:24:32 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2%5]) with mapi id 15.20.5164.020; Fri, 15 Apr 2022
+ 22:24:32 +0000
+Date:   Fri, 15 Apr 2022 19:24:30 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        Eric Auger <eric.auger@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH 03/10] kvm/vfio: Store the struct file in the
+ kvm_vfio_group
+Message-ID: <20220415222430.GO2120790@nvidia.com>
+References: <0-v1-33906a626da1+16b0-vfio_kvm_no_group_jgg@nvidia.com>
+ <3-v1-33906a626da1+16b0-vfio_kvm_no_group_jgg@nvidia.com>
+ <BN9PR11MB5276A8591FD649A1C42E520A8CEE9@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB5276A8591FD649A1C42E520A8CEE9@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BL0PR02CA0083.namprd02.prod.outlook.com
+ (2603:10b6:208:51::24) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 062251dd-6bbc-4d01-521d-08da1f2eb6b1
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1130:EE_
+X-Microsoft-Antispam-PRVS: <DM5PR12MB1130A2B1F7039DE1CDC90EA8C2EE9@DM5PR12MB1130.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 1tPpWpiDDdeo+HKHFYF3jgqRePZzNCeImJ1g6FlMCW9jaWEhqe0T+nxKEcvxFGwG6TmmpXJvRcPmXYouHXsrIvqoiJJAx1q4Rhbo97K7K1g0ApnRzP7OEQFR8KRvt1cZ0tv+kDxJ7D0ok+x1n+DpnMFb8GXIlM2z7TAxh7sywxB3bM7ZS6GHEc1TNJRjJfPGoBjhqWShJdVjSy4043NIKy0er7Zo6IwFIdMAAd+I8YgvgcW/Sgdo5vy0qsHSWQgXL9mG3d/nmgxJwDSMepDNHCHZNNYI20tB0zupf+yrGUjxSO9orxyWmf0qSEqmIUfMc2pBpbxlIZCemLxUdsxosPrgN13neOFxmjW18kiTIYnQWK26++dek4gqlxOoBDr8SuCJXlPh6a7WMuEd9yJUO08aX6Ge/Dl1yjlEWYAc64XSdxIVp4afUaYRKzcAEbvBypjf8xO+X9QZnLIn0dg/7X63h0j7iiulGJpnYdUPSYb8cZw73CgMsQqVDpBkxOD7uf2A+LGorKcu20CiKIU2kcrfwTEuOfYGL0jzzgmLJ/Y+2Y+JIJy1+/j+kQiQb5BIWDf11vCBBx7NstPXpABCUm0WCmEw99Y0hWOVqy9c0fLBAxE4jOOOO+aMOC1mzAuW6MuZaaax/fHx/T9FUT0ClQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6916009)(5660300002)(54906003)(33656002)(83380400001)(1076003)(2616005)(36756003)(38100700002)(316002)(86362001)(6486002)(508600001)(8676002)(4326008)(2906002)(66946007)(66476007)(66556008)(8936002)(186003)(26005)(6506007)(6512007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?VZc83ascH9tm1pTzNn5QPl5NEk6D8Z2WYupZPMM3ROamFjFpUwAQCJw50u9I?=
+ =?us-ascii?Q?GjKLKckU5BUJrAJrEeqOjOr+RRWp78S9uCOoYMoQIpZa4DfX24KtfA1MsADr?=
+ =?us-ascii?Q?0Lhs2g7/G1KI0RfqEnInFbJsV++zNr1ypSaCKfO+xVfZRExYb1i6c4YfPJro?=
+ =?us-ascii?Q?YLVbIJ/K8X/cHs/C7trjR4du/Onz8KtjVGKuKZ8XKShRI9RmzQT7P8Ma8qe1?=
+ =?us-ascii?Q?gKwXduIiW7OwY/bDzHywkon2yQU8MSZwbbzSaG1sY6b9Eb7c5tWLw8tIFUEd?=
+ =?us-ascii?Q?Y0hT8ekMSzuANRfp8/rE1T206zp14InaeLa5pqNWpyY5M3yC2fBTkjjdflAK?=
+ =?us-ascii?Q?2IIJVfIeT88xJ3CmnG8kAICmUrEw0jJtMUfxHJSf2bHfYjk1X/voi2BBJqli?=
+ =?us-ascii?Q?/mZqJrUMpw3g367671ePA2PTxfZx37UNsVG4a33qJSejtxjIjU5/PgUNvtUQ?=
+ =?us-ascii?Q?HQVDMcR7MeiXo4jXXew7eFFuiu27gkeiRfSXhWDZygCrB50KDeHmW1QChAIX?=
+ =?us-ascii?Q?WvsLh0r6Rt23uedcdTekfN2Pzbx6pTsoaM3Lkk4EJadpFfvNJAndAj9pHabw?=
+ =?us-ascii?Q?xEiJc0NQI8ymBjd0hhcm2nLHOXCq7Px+HYaxMmUYlr/kOh2DHopFA/SuzMXv?=
+ =?us-ascii?Q?cPY2HqGvGSnV7l1QoZQ3M/sGZziohBCR72hSxXWftmamK+c5zAZOyA/mqgol?=
+ =?us-ascii?Q?dYv2oHMZgbIHJZRrGt6MgSvBIwJ6XRQfNdMHN3lZmaqKhIPy+tWuCVbmvE++?=
+ =?us-ascii?Q?iQg6sJvs9FTy6qzqO7bciKqSCDK/qfeT3Hk+crPgc8Lgt1NcssyNGcZGkTAY?=
+ =?us-ascii?Q?ChIaGPOGwC9Z6VcI3Kbfzp9aTOHQWj6vGw9xRX5ZYnAVwBE+zw1KuzhJ15oB?=
+ =?us-ascii?Q?90K+2RTLw0mJVt+ytAXqD98hsLNAhT8Lh9IXIkZVCeSFb8IzReCnBGi9r42k?=
+ =?us-ascii?Q?KuKVlSJP8VnYaveKFeykt7l73dhOQCz7PRTfeJmhRZsRC1BqJoJ2S0xoZqh0?=
+ =?us-ascii?Q?Ltc8MHJzv+5/JLxKcmvWN9auXnqsSkr7aSiVWuwgT//o8n+vNc3ZmN4fCX4A?=
+ =?us-ascii?Q?LNjLuih0/dhKCXO+4lIU22GqcNYQFryFa7XQCKDMLJ29GqEVKPC9QRT39O1b?=
+ =?us-ascii?Q?u3XgAV4bTftmVZOx/4PwKCNtxtOL7nHolNd7v0aUvYlumEeuTxbj1Zrxe4Hq?=
+ =?us-ascii?Q?h4l75EPSoBM9RLr1qTsWYOS4dARZ9O9vpeCbtyyok11GEsKpbxiuK1eUtpJN?=
+ =?us-ascii?Q?H1DxzrERrD7N3doQN7Nuiex9ah0HKiIkARxzozNCFAuBAKfik5EHa24hIa4f?=
+ =?us-ascii?Q?Jkps2v23JkvX66TYEspUYP+CQ9uVyYyofwfEJydlp2JqTsK4PpI7Y/fQvWRx?=
+ =?us-ascii?Q?wB4XigU7poCq1VPEs15eTVc6OoR04FViCMHRpNy+qIINE1u0qVSXva0+Ez6E?=
+ =?us-ascii?Q?ldwy4evzJVD8vJrLFjxUymz7e7q2MxCXYlNjOAa9qIRR2e8j5a3GNFs8IbHP?=
+ =?us-ascii?Q?sB24gG6CHud3wg7WOIji3lN6wrHYkBNbS6GY5jm/EAtcpVLd9T6fZKnkuGyY?=
+ =?us-ascii?Q?/1s0d9PZm7R4DbCU7zWLjM0uapTEPmR8Op9NaYHFvoyPed1aPU+sAgUAEsKq?=
+ =?us-ascii?Q?m3+uOVa1uH3gt1oWdKGsim/n4rSEbQDvNK5W//aeWelISI/ty/B+FzdETZqW?=
+ =?us-ascii?Q?0ystEll1qz4ZvU1rzbQRRcXRVrglncMs4X90ehOfNV0E/dZMzEcMD4tlR95r?=
+ =?us-ascii?Q?SLnbpvU1ow=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 062251dd-6bbc-4d01-521d-08da1f2eb6b1
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2022 22:24:32.2096
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YOo4dV9jh0FuyphwRXHHH/fBtEJ9q/FcnBJCh0FODZdkUF94HR/0FRKnCgkWhMmc
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1130
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Don't use this please. I was just being lazy but wanted to make sure
-tables are all accounted for.
+On Fri, Apr 15, 2022 at 03:44:56AM +0000, Tian, Kevin wrote:
+> > @@ -304,10 +309,10 @@ static int kvm_vfio_group_set_spapr_tce(struct
+> > kvm_device *dev,
+> >  		return -EBADF;
+> > 
+> >  	vfio_group = kvm_vfio_group_get_external_user(f.file);
+> > -	fdput(f);
+> > -
+> > -	if (IS_ERR(vfio_group))
+> > -		return PTR_ERR(vfio_group);
+> > +	if (IS_ERR(vfio_group)) {
+> > +		ret = PTR_ERR(vfio_group);
+> > +		goto err_fdput;
+> > +	}
+> > 
+> >  	grp = kvm_vfio_group_get_iommu_group(vfio_group);
+> >  	if (WARN_ON_ONCE(!grp)) {
+> 
+> move above two external calls into below loop after file is
+> matched...
 
-There's a race here too, do you see it? :)
+Actually we can delete the kvm_vfio_group_get_external_user() since it
+is the same as kvg->vfio_group and we no longer need the group to
+match the kvg.
 
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- arch/arm64/kvm/mmu.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+> > @@ -320,7 +325,7 @@ static int kvm_vfio_group_set_spapr_tce(struct
+> > kvm_device *dev,
+> >  	mutex_lock(&kv->lock);
+> > 
+> >  	list_for_each_entry(kvg, &kv->group_list, node) {
+> > -		if (kvg->vfio_group != vfio_group)
+> > +		if (kvg->filp != f.file)
+> >  			continue;
+> 
+> ... here. Though they will be removed in later patch doing so at
+> this patch is slightly more reasonable.
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 2881051c3743..68ea7f0244fe 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -95,6 +95,8 @@ static bool kvm_is_device_pfn(unsigned long pfn)
- 	return !pfn_is_map_memory(pfn);
- }
- 
-+static atomic_t stage2_pages = ATOMIC_INIT(0);
-+
- static void *stage2_memcache_zalloc_page(void *arg)
- {
- 	struct kvm_mmu_caches *mmu_caches = arg;
-@@ -112,6 +114,8 @@ static void *stage2_memcache_zalloc_page(void *arg)
- 		return NULL;
- 	}
- 
-+	atomic_inc(&stage2_pages);
-+
- 	hdr->page = virt_to_page(addr);
- 	set_page_private(hdr->page, (unsigned long)hdr);
- 	return addr;
-@@ -121,6 +125,8 @@ static void stage2_free_page_now(struct stage2_page_header *hdr)
- {
- 	WARN_ON(page_ref_count(hdr->page) != 1);
- 
-+	atomic_dec(&stage2_pages);
-+
- 	__free_page(hdr->page);
- 	kmem_cache_free(stage2_page_header_cache, hdr);
- }
-@@ -662,6 +668,8 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
- 	.icache_inval_pou	= invalidate_icache_guest_page,
- };
- 
-+static atomic_t stage2_mmus = ATOMIC_INIT(0);
-+
- /**
-  * kvm_init_stage2_mmu - Initialise a S2 MMU structure
-  * @kvm:	The pointer to the KVM structure
-@@ -699,6 +707,8 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
- 	for_each_possible_cpu(cpu)
- 		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
- 
-+	atomic_inc(&stage2_mmus);
-+
- 	mmu->pgt = pgt;
- 	mmu->pgd_phys = __pa(pgt->pgd);
- 	return 0;
-@@ -796,6 +806,9 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
- 		kvm_pgtable_stage2_destroy(pgt);
- 		kfree(pgt);
- 	}
-+
-+	if (atomic_dec_and_test(&stage2_mmus))
-+		WARN_ON(atomic_read(&stage2_pages));
- }
- 
- /**
--- 
-2.36.0.rc0.470.gd361397f0d-goog
+Sure, it is nicer
 
+Thanks,
+Jason
