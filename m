@@ -2,166 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DE475030AD
-	for <lists+kvm@lfdr.de>; Sat, 16 Apr 2022 01:09:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E76585030FB
+	for <lists+kvm@lfdr.de>; Sat, 16 Apr 2022 01:09:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356288AbiDOW1L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Apr 2022 18:27:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40632 "EHLO
+        id S245668AbiDOW4Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Apr 2022 18:56:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231145AbiDOW1I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Apr 2022 18:27:08 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2051.outbound.protection.outlook.com [40.107.220.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD8D32ED67
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 15:24:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QynSjXkdPal9EE4facWwPz269BEptLUIbg13Wq2F0g239ieJOe/eHZoKIpLhv0oYYuimketKSkbLGaa60ROXPcpvMfR6djHQ83hqJR9pVQI0Au7l6fQFJsX3D+VvbKZuhZrOYjZfQk5aO27B3YBSrjzjuEsUvTNFhXcqScnJW6bDQAg/twMLfpiOo2uOp82CW4fKYQnMv28B2N1RiVMa0tMQc8c88F4vXg5sPR7fRArzMjOSTjy6scufyGBL/lIi5dbDlX6lD01GIp/9G+uZE4TlgVKtEQJ5IL4x3YmtQ7gvkpNyvBDKKdxl+7RHibFxqGcldxfTqRq4LHt0DanGpQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/3won54WXcFxnyZlUkEf2y8znGjy4ZU7J5X2xVKH8KI=;
- b=XGuwVGriPJyd3P6BFLOOvaXfqvYwlmjkVbjuWZo3zDJ5KZkEm5Ot+SLy4rVIPfb/xc+vgRANwZ/SpuQH7mX3fUf9FUXvvYzLvifO1eOm/OCUSyiLgDRMncbwqseyb1kh3yoZtrUpG6SHqY7rF8VQUuMt/J/Vw1VGTTnWrYRusUa60JzmlxsbHKkm60NdpyCjcOPC/MFwuoy53Zeevul1zs+I0JBCPxLyx1xxAnPHSWU0U3IInVZreerokjZ0FoONz0Hl3FdPmgh0iXZuDlzVi+B6NDeR1ehhKX9tEFgFvqJCkw1muLFKH16A0kUxJIhJQom0OAjyEm0Piip2jN3bww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/3won54WXcFxnyZlUkEf2y8znGjy4ZU7J5X2xVKH8KI=;
- b=AFxGdtR6HjwQTmiEH6mcNA3WjLj7lkhVBMXPZqUPbe2AQkQq/zIZV2oOdIuA9qvcVM9vY5cwWiyFb5dp20fJAjTnR3+2TUqVJ7mPjsRzkAsGwYQIqnzKMg90FZveG47YxaeNm7r4biXm6mOR2PW/0NBMFMuXdp3uxQWToixu5dFU1H9zZOv2jc0SDvgMvxMq+W0GJaBUTrA7uHOOdl5JZecWs4MSLNk+6DCrIMFMEZONLueuwm6GyAMGbLoqmOyteSv0/ZHVqIq64hylvahGvNXdwFFXmcDwH+aM7mg2hEXetzHdUKDxXNvZIvZHr7Dz1bq6EqcypvcGsD7IbJB7Kg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by DM5PR12MB1130.namprd12.prod.outlook.com (2603:10b6:3:75::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.20; Fri, 15 Apr
- 2022 22:24:32 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2%5]) with mapi id 15.20.5164.020; Fri, 15 Apr 2022
- 22:24:32 +0000
-Date:   Fri, 15 Apr 2022 19:24:30 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [PATCH 03/10] kvm/vfio: Store the struct file in the
- kvm_vfio_group
-Message-ID: <20220415222430.GO2120790@nvidia.com>
-References: <0-v1-33906a626da1+16b0-vfio_kvm_no_group_jgg@nvidia.com>
- <3-v1-33906a626da1+16b0-vfio_kvm_no_group_jgg@nvidia.com>
- <BN9PR11MB5276A8591FD649A1C42E520A8CEE9@BN9PR11MB5276.namprd11.prod.outlook.com>
+        with ESMTP id S231388AbiDOW4O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Apr 2022 18:56:14 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 461AD443F8
+        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 15:53:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1650063225; x=1681599225;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=W9gfzpqXHjMO207De/Tr0o7ydsrZvK9ohYQYzlsbiyk=;
+  b=TUwEDmtuHxAIHidtsUqNw5OlZ29webuX6WWPBXpSbHIAciLlK1lMx5HU
+   nZH9CymB0+q2uCp1qndtCKt9GKYnCzr5EKSRjqNhqj6IONpN2qu3M111q
+   vOk0gYSqYkirhMOFq4XjoLnjR/FrzEsyxnyY0uM77tnKxoPqRKLHMisdm
+   4JGizQkkwAGR2s7bTfSZgUhmVlsOm+qJ/PVmafHLayM5NwPgbOAz317of
+   iXHwG4LjDDGfTIOMADzwFtpVavGjFiJwfeEY4lD4TQNRrnjwqXo0yJOSq
+   o+KQlby+vpjEouIdi+LZGCb5IjBqex08ZTCKnUmoiQ9QIVegWsX0akZb7
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10318"; a="326145828"
+X-IronPort-AV: E=Sophos;i="5.90,264,1643702400"; 
+   d="scan'208";a="326145828"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2022 15:53:44 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,264,1643702400"; 
+   d="scan'208";a="646207879"
+Received: from lkp-server01.sh.intel.com (HELO 3abc53900bec) ([10.239.97.150])
+  by FMSMGA003.fm.intel.com with ESMTP; 15 Apr 2022 15:53:37 -0700
+Received: from kbuild by 3abc53900bec with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1nfUor-0002VK-2i;
+        Fri, 15 Apr 2022 22:53:37 +0000
+Date:   Sat, 16 Apr 2022 06:52:45 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, kvm@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>,
+        Farrah Chen <farrah.chen@intel.com>,
+        Danmei Wei <danmei.wei@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [kvm:kvm-tdx-5.17 23/141] arch/x86/kernel/process.c:785:42: error:
+ implicit declaration of function 'platform_has_tdx'
+Message-ID: <202204160600.8e4g9QZR-lkp@intel.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276A8591FD649A1C42E520A8CEE9@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BL0PR02CA0083.namprd02.prod.outlook.com
- (2603:10b6:208:51::24) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 062251dd-6bbc-4d01-521d-08da1f2eb6b1
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1130:EE_
-X-Microsoft-Antispam-PRVS: <DM5PR12MB1130A2B1F7039DE1CDC90EA8C2EE9@DM5PR12MB1130.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1tPpWpiDDdeo+HKHFYF3jgqRePZzNCeImJ1g6FlMCW9jaWEhqe0T+nxKEcvxFGwG6TmmpXJvRcPmXYouHXsrIvqoiJJAx1q4Rhbo97K7K1g0ApnRzP7OEQFR8KRvt1cZ0tv+kDxJ7D0ok+x1n+DpnMFb8GXIlM2z7TAxh7sywxB3bM7ZS6GHEc1TNJRjJfPGoBjhqWShJdVjSy4043NIKy0er7Zo6IwFIdMAAd+I8YgvgcW/Sgdo5vy0qsHSWQgXL9mG3d/nmgxJwDSMepDNHCHZNNYI20tB0zupf+yrGUjxSO9orxyWmf0qSEqmIUfMc2pBpbxlIZCemLxUdsxosPrgN13neOFxmjW18kiTIYnQWK26++dek4gqlxOoBDr8SuCJXlPh6a7WMuEd9yJUO08aX6Ge/Dl1yjlEWYAc64XSdxIVp4afUaYRKzcAEbvBypjf8xO+X9QZnLIn0dg/7X63h0j7iiulGJpnYdUPSYb8cZw73CgMsQqVDpBkxOD7uf2A+LGorKcu20CiKIU2kcrfwTEuOfYGL0jzzgmLJ/Y+2Y+JIJy1+/j+kQiQb5BIWDf11vCBBx7NstPXpABCUm0WCmEw99Y0hWOVqy9c0fLBAxE4jOOOO+aMOC1mzAuW6MuZaaax/fHx/T9FUT0ClQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6916009)(5660300002)(54906003)(33656002)(83380400001)(1076003)(2616005)(36756003)(38100700002)(316002)(86362001)(6486002)(508600001)(8676002)(4326008)(2906002)(66946007)(66476007)(66556008)(8936002)(186003)(26005)(6506007)(6512007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?VZc83ascH9tm1pTzNn5QPl5NEk6D8Z2WYupZPMM3ROamFjFpUwAQCJw50u9I?=
- =?us-ascii?Q?GjKLKckU5BUJrAJrEeqOjOr+RRWp78S9uCOoYMoQIpZa4DfX24KtfA1MsADr?=
- =?us-ascii?Q?0Lhs2g7/G1KI0RfqEnInFbJsV++zNr1ypSaCKfO+xVfZRExYb1i6c4YfPJro?=
- =?us-ascii?Q?YLVbIJ/K8X/cHs/C7trjR4du/Onz8KtjVGKuKZ8XKShRI9RmzQT7P8Ma8qe1?=
- =?us-ascii?Q?gKwXduIiW7OwY/bDzHywkon2yQU8MSZwbbzSaG1sY6b9Eb7c5tWLw8tIFUEd?=
- =?us-ascii?Q?Y0hT8ekMSzuANRfp8/rE1T206zp14InaeLa5pqNWpyY5M3yC2fBTkjjdflAK?=
- =?us-ascii?Q?2IIJVfIeT88xJ3CmnG8kAICmUrEw0jJtMUfxHJSf2bHfYjk1X/voi2BBJqli?=
- =?us-ascii?Q?/mZqJrUMpw3g367671ePA2PTxfZx37UNsVG4a33qJSejtxjIjU5/PgUNvtUQ?=
- =?us-ascii?Q?HQVDMcR7MeiXo4jXXew7eFFuiu27gkeiRfSXhWDZygCrB50KDeHmW1QChAIX?=
- =?us-ascii?Q?WvsLh0r6Rt23uedcdTekfN2Pzbx6pTsoaM3Lkk4EJadpFfvNJAndAj9pHabw?=
- =?us-ascii?Q?xEiJc0NQI8ymBjd0hhcm2nLHOXCq7Px+HYaxMmUYlr/kOh2DHopFA/SuzMXv?=
- =?us-ascii?Q?cPY2HqGvGSnV7l1QoZQ3M/sGZziohBCR72hSxXWftmamK+c5zAZOyA/mqgol?=
- =?us-ascii?Q?dYv2oHMZgbIHJZRrGt6MgSvBIwJ6XRQfNdMHN3lZmaqKhIPy+tWuCVbmvE++?=
- =?us-ascii?Q?iQg6sJvs9FTy6qzqO7bciKqSCDK/qfeT3Hk+crPgc8Lgt1NcssyNGcZGkTAY?=
- =?us-ascii?Q?ChIaGPOGwC9Z6VcI3Kbfzp9aTOHQWj6vGw9xRX5ZYnAVwBE+zw1KuzhJ15oB?=
- =?us-ascii?Q?90K+2RTLw0mJVt+ytAXqD98hsLNAhT8Lh9IXIkZVCeSFb8IzReCnBGi9r42k?=
- =?us-ascii?Q?KuKVlSJP8VnYaveKFeykt7l73dhOQCz7PRTfeJmhRZsRC1BqJoJ2S0xoZqh0?=
- =?us-ascii?Q?Ltc8MHJzv+5/JLxKcmvWN9auXnqsSkr7aSiVWuwgT//o8n+vNc3ZmN4fCX4A?=
- =?us-ascii?Q?LNjLuih0/dhKCXO+4lIU22GqcNYQFryFa7XQCKDMLJ29GqEVKPC9QRT39O1b?=
- =?us-ascii?Q?u3XgAV4bTftmVZOx/4PwKCNtxtOL7nHolNd7v0aUvYlumEeuTxbj1Zrxe4Hq?=
- =?us-ascii?Q?h4l75EPSoBM9RLr1qTsWYOS4dARZ9O9vpeCbtyyok11GEsKpbxiuK1eUtpJN?=
- =?us-ascii?Q?H1DxzrERrD7N3doQN7Nuiex9ah0HKiIkARxzozNCFAuBAKfik5EHa24hIa4f?=
- =?us-ascii?Q?Jkps2v23JkvX66TYEspUYP+CQ9uVyYyofwfEJydlp2JqTsK4PpI7Y/fQvWRx?=
- =?us-ascii?Q?wB4XigU7poCq1VPEs15eTVc6OoR04FViCMHRpNy+qIINE1u0qVSXva0+Ez6E?=
- =?us-ascii?Q?ldwy4evzJVD8vJrLFjxUymz7e7q2MxCXYlNjOAa9qIRR2e8j5a3GNFs8IbHP?=
- =?us-ascii?Q?sB24gG6CHud3wg7WOIji3lN6wrHYkBNbS6GY5jm/EAtcpVLd9T6fZKnkuGyY?=
- =?us-ascii?Q?/1s0d9PZm7R4DbCU7zWLjM0uapTEPmR8Op9NaYHFvoyPed1aPU+sAgUAEsKq?=
- =?us-ascii?Q?m3+uOVa1uH3gt1oWdKGsim/n4rSEbQDvNK5W//aeWelISI/ty/B+FzdETZqW?=
- =?us-ascii?Q?0ystEll1qz4ZvU1rzbQRRcXRVrglncMs4X90ehOfNV0E/dZMzEcMD4tlR95r?=
- =?us-ascii?Q?SLnbpvU1ow=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 062251dd-6bbc-4d01-521d-08da1f2eb6b1
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2022 22:24:32.2096
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YOo4dV9jh0FuyphwRXHHH/fBtEJ9q/FcnBJCh0FODZdkUF94HR/0FRKnCgkWhMmc
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1130
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 15, 2022 at 03:44:56AM +0000, Tian, Kevin wrote:
-> > @@ -304,10 +309,10 @@ static int kvm_vfio_group_set_spapr_tce(struct
-> > kvm_device *dev,
-> >  		return -EBADF;
-> > 
-> >  	vfio_group = kvm_vfio_group_get_external_user(f.file);
-> > -	fdput(f);
-> > -
-> > -	if (IS_ERR(vfio_group))
-> > -		return PTR_ERR(vfio_group);
-> > +	if (IS_ERR(vfio_group)) {
-> > +		ret = PTR_ERR(vfio_group);
-> > +		goto err_fdput;
-> > +	}
-> > 
-> >  	grp = kvm_vfio_group_get_iommu_group(vfio_group);
-> >  	if (WARN_ON_ONCE(!grp)) {
-> 
-> move above two external calls into below loop after file is
-> matched...
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm-tdx-5.17
+head:   a50e4531e92e36f185ea32843c149c4703451109
+commit: bf2274dac8e8671ae89971ae8c89f4f2f8f13095 [23/141] x86: Flush cache of TDX private memory during kexec()
+config: x86_64-randconfig-a016 (https://download.01.org/0day-ci/archive/20220416/202204160600.8e4g9QZR-lkp@intel.com/config)
+compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project 8e43cbab33765c476337571e5ed11b005199dd0d)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=bf2274dac8e8671ae89971ae8c89f4f2f8f13095
+        git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
+        git fetch --no-tags kvm kvm-tdx-5.17
+        git checkout bf2274dac8e8671ae89971ae8c89f4f2f8f13095
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
 
-Actually we can delete the kvm_vfio_group_get_external_user() since it
-is the same as kvg->vfio_group and we no longer need the group to
-match the kvg.
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
-> > @@ -320,7 +325,7 @@ static int kvm_vfio_group_set_spapr_tce(struct
-> > kvm_device *dev,
-> >  	mutex_lock(&kv->lock);
-> > 
-> >  	list_for_each_entry(kvg, &kv->group_list, node) {
-> > -		if (kvg->vfio_group != vfio_group)
-> > +		if (kvg->filp != f.file)
-> >  			continue;
-> 
-> ... here. Though they will be removed in later patch doing so at
-> this patch is slightly more reasonable.
+All errors (new ones prefixed by >>):
 
-Sure, it is nicer
+>> arch/x86/kernel/process.c:785:42: error: implicit declaration of function 'platform_has_tdx' [-Werror,-Wimplicit-function-declaration]
+           if ((cpuid_eax(0x8000001f) & BIT(0)) || platform_has_tdx())
+                                                   ^
+   1 error generated.
 
-Thanks,
-Jason
+
+vim +/platform_has_tdx +785 arch/x86/kernel/process.c
+
+   749	
+   750	void stop_this_cpu(void *dummy)
+   751	{
+   752		local_irq_disable();
+   753		/*
+   754		 * Remove this CPU:
+   755		 */
+   756		set_cpu_online(smp_processor_id(), false);
+   757		disable_local_APIC();
+   758		mcheck_cpu_clear(this_cpu_ptr(&cpu_info));
+   759	
+   760		/*
+   761		 * Use wbinvd on processors that support SME. This provides support
+   762		 * for performing a successful kexec when going from SME inactive
+   763		 * to SME active (or vice-versa). The cache must be cleared so that
+   764		 * if there are entries with the same physical address, both with and
+   765		 * without the encryption bit, they don't race each other when flushed
+   766		 * and potentially end up with the wrong entry being committed to
+   767		 * memory.
+   768		 *
+   769		 * Test the CPUID bit directly because the machine might've cleared
+   770		 * X86_FEATURE_SME due to cmdline options.
+   771		 *
+   772		 * In case of kexec, similar to SME, if TDX is ever enabled, the
+   773		 * cachelines of TDX private memory (including PAMTs) used by TDX
+   774		 * module need to be flushed before transiting to the new kernel,
+   775		 * otherwise they may silently corrupt the new kernel.
+   776		 *
+   777		 * Note TDX is enabled on demand at runtime, and enabling TDX has a
+   778		 * state machine protected with a mutex to prevent concurrent calls
+   779		 * from multiple callers.  Holding the mutex is required to get the
+   780		 * TDX enabling status, but this function runs in interrupt context.
+   781		 * So to make it simple, always flush cache when platform supports
+   782		 * TDX (detected at boot time), regardless whether TDX is truly
+   783		 * enabled by kernel.
+   784		 */
+ > 785		if ((cpuid_eax(0x8000001f) & BIT(0)) || platform_has_tdx())
+   786			native_wbinvd();
+   787		for (;;) {
+   788			/*
+   789			 * Use native_halt() so that memory contents don't change
+   790			 * (stack usage and variables) after possibly issuing the
+   791			 * native_wbinvd() above.
+   792			 */
+   793			native_halt();
+   794		}
+   795	}
+   796	
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
