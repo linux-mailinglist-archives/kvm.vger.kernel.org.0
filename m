@@ -2,68 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED6D6502068
-	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 04:23:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6549650208D
+	for <lists+kvm@lfdr.de>; Fri, 15 Apr 2022 04:33:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244522AbiDOC0K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Apr 2022 22:26:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57326 "EHLO
+        id S235027AbiDOCen (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Apr 2022 22:34:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239639AbiDOC0J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Apr 2022 22:26:09 -0400
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C78E844742;
-        Thu, 14 Apr 2022 19:23:40 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R951e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=33;SR=0;TI=SMTPD_---0VA5EU1i_1649989414;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VA5EU1i_1649989414)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 15 Apr 2022 10:23:35 +0800
-Message-ID: <1649989126.5433838-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v9 31/32] virtio_net: support rx/tx queue resize
-Date:   Fri, 15 Apr 2022 10:18:46 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
+        with ESMTP id S240254AbiDOCem (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Apr 2022 22:34:42 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56D5838BE5;
+        Thu, 14 Apr 2022 19:32:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1649989935; x=1681525935;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Ztm2X6lXqHlRfeTmLJypS+M6IXCx6nk4rNHkM8CWr4M=;
+  b=D+2gjc8sNY1d6DplRulYPApg7LCzbrBM6Y79gGyX3iuKIDOTAElA6njg
+   ocyOVGZcaTl/gZXVq6naL1005RVv4MxsmpaBZYW98+5aWZltGyWFvD1fz
+   9jH0L55qWOPVBpbCzFeEhM/RItIprEsfz7ScK4XCB8v3i1qdgekk3CB03
+   9JllIgzuL8Lx+18TmmsnqqOyN4dSasCTjbN8uUQ6n1ANty3PEt0SEFVO9
+   uqDULtEun3ARd7BGhLmfcsLIK1f/p8FMNU8155LNrObUxd9wcm5xkzycL
+   koNP6yif3Zm5EhAf2B7lxzfTAduaZ6axvSMo5n5MrAtdJSEY70nEJw2gw
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10317"; a="244964482"
+X-IronPort-AV: E=Sophos;i="5.90,261,1643702400"; 
+   d="scan'208";a="244964482"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2022 19:32:12 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,261,1643702400"; 
+   d="scan'208";a="645850720"
+Received: from fmsmsx604.amr.corp.intel.com ([10.18.126.84])
+  by FMSMGA003.fm.intel.com with ESMTP; 14 Apr 2022 19:32:11 -0700
+Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Thu, 14 Apr 2022 19:32:11 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Thu, 14 Apr 2022 19:32:10 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27 via Frontend Transport; Thu, 14 Apr 2022 19:32:10 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.27; Thu, 14 Apr 2022 19:32:10 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=d1c8frIe9MwOj8YaKqRg0qtPX1i+4WZX0r1jCDqXPxU5AaGq7b63tGZtCAlQKYS3uEAhrdK7Z6npTQpHjPXWKuUZ15sKGutdx5nCxJZF8shJITnltpVsVf5NhtvsTUI3ADn9/+0j90L/j34nHZNkIfZ9ruzsm3hMTaUxL7KRoTvoxbuqAkrxJgUN1n+t11zIKWL2oojxcTmozBtcfsUbDU8inSxgOROPbSaafVMaK2SgV6h+DD6EC1OdJhYP6njoI8hvE5VHwHvisuNyOIhbdyWuYIr8nY/sHJn4//yvujp65yktyJsxYeKldMd6fZVVPVcAeu4qHvA34sTnorI4qQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ERYwitSJXcpFQLJ3H9rCGhzB8sQZcHn0QH9fJ8z7C+A=;
+ b=C1Dw/QYNsbQWd+6HW1IcHDBE7wAeZqkNE9H0h4KmycCq7PwgtTN3RdNn6LOADmoqfO9sASGbnAD5CkBzFiXa1uhr4vf33yvrRoUKNxqC2Woz/OnIpXNJehkRYGiAFGxq/XeePmDj4QXIpRKW+Gw/9IpxFMwGQ6StSZygrmYboxfnUyubATQsdMI7RQ+jKWwDkuVAaqCZVzvk6nHEbxrP00i56dJEG6AelgogUq+gR9xHze5h/TBv264UjkC9OAqpAtbj87a38oIFTH7/2/xrI8IyuQ+bxosie8oMnTkStK/JrQi8iQpMPFDm5BGT2JGc9qjixdvEo5wb+39tqfP+Nw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by DM6PR11MB4219.namprd11.prod.outlook.com (2603:10b6:5:14e::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.20; Fri, 15 Apr
+ 2022 02:32:09 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::c4ea:a404:b70b:e54e]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::c4ea:a404:b70b:e54e%8]) with mapi id 15.20.5164.018; Fri, 15 Apr 2022
+ 02:32:09 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>
+CC:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "Jonathan Corbet" <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "Eric Farman" <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
         Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev <netdev@vger.kernel.org>,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm <kvm@vger.kernel.org>,
-        "open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>
-References: <20220406034346.74409-1-xuanzhuo@linux.alibaba.com>
- <20220406034346.74409-32-xuanzhuo@linux.alibaba.com>
- <122008a6-1e79-14d3-1478-59f96464afc9@redhat.com>
- <1649838917.6726515-10-xuanzhuo@linux.alibaba.com>
- <CACGkMEvPH1k76xB_cHq_S9hvMXgGruoXpKLfoMZvJZ-L7wM9iw@mail.gmail.com>
-In-Reply-To: <CACGkMEvPH1k76xB_cHq_S9hvMXgGruoXpKLfoMZvJZ-L7wM9iw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: RE: [PATCH 9/9] vfio: Remove calls to vfio_group_add_container_user()
+Thread-Topic: [PATCH 9/9] vfio: Remove calls to
+ vfio_group_add_container_user()
+Thread-Index: AQHYToWALOjmn4an1kSZ0RkA8dFDlKzvcIiAgAAIewCAAMWwEA==
+Date:   Fri, 15 Apr 2022 02:32:08 +0000
+Message-ID: <BN9PR11MB527672B82DCFAD2C9B28E8CC8CEE9@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <9-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
+ <d6e2778a-01e4-6468-2c2b-3b718d924e65@linux.ibm.com>
+ <20220414142210.GE2120790@nvidia.com>
+In-Reply-To: <20220414142210.GE2120790@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: ed736cd2-c4bd-4768-ac14-08da1e8823bc
+x-ms-traffictypediagnostic: DM6PR11MB4219:EE_
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-microsoft-antispam-prvs: <DM6PR11MB42197AC158578827CD3DED928CEE9@DM6PR11MB4219.namprd11.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: IuE8jSX1mgerRRp3Od08bkYAfr79qtoiHIpFeiPTPykSKxd4SQ8JHbU9h+IYntq5DbbI59qFwAFIUKEey4n1govNvDbUiH2MrvDIsGr0SqojIPkNAzfXj6V4aIVth0SpxsQza5VQOI3qW+zIgjKVU8vkrFC/bqcQ9n3boZ3mMq1qxlGMddoKhhOCPEJnyzcp5ic20TJ6rCpsrWZHPlUMU9kKdnpZfcndeHJGq9fQyD2SRWh5MVfCQIXQhU9zaj9uk8XLx4hBkSfcSTKCYssc5yt12Ljbg25lR9+lzZ5mMd1naqzFgOQk/wkPfQS+vv/+sX/YXi86yZDMNoceJ9slQIyX2BldfEFfPV5ZAcCvcdn6y6Uw6UivAgfUGOQJsauZ6zD6uwhp7MRGrjq5Pkzo+TUBSYZfJo+orWYVrtIz6qhga99Srow5g/69myjXcelu8nu+xtuaanOoCrSeWNTMC+EUf8xAjtEoAJZ2yxS/grgmbehESrOUZ8nxAKCPJoZHMuWbIZMBOJF8CDYLOcFxzcg676oxXS8L6+NdZSzUiSJQIfgLQiGcdyZvgXLax0nLsltnRdkiTSIktOxIXG689zkPbav23yiu09dGsCYBWpnnaoSUmcAOXhpq3vUBhrK2XRzG8zpf1Rh3ZYB5FIURX55x9NLMZhgWgGoETRMI/M93Mz8ZGH8lfOvQD1ftSxJI2rP/XDbjNTnzpzkL2isZvg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(83380400001)(6506007)(7696005)(71200400001)(9686003)(5660300002)(53546011)(33656002)(7406005)(26005)(508600001)(186003)(8936002)(38070700005)(2906002)(52536014)(122000001)(66946007)(66556008)(66446008)(55016003)(7416002)(38100700002)(76116006)(82960400001)(86362001)(66476007)(316002)(54906003)(110136005)(64756008)(4326008)(8676002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?qIgyzoS1s+MmkXzbDXEOm/AVChFbhJiLtOAzW6URNzX/32hf5qlBhqsquDNj?=
+ =?us-ascii?Q?YSmapyhJp1MV7oZOSfknquI1KfkHELN68ev26McvXKY5B8fjtIiHTm5Ih5KF?=
+ =?us-ascii?Q?s9IoG18gIrXJpIaSbIvLVSvWid0dKE9deWoZmdcFpF/LDAMpilIA6AByvcsd?=
+ =?us-ascii?Q?xuEbkH7HFc8y9Oc+GAHMLY6x4ucA6yllAgTkfMOXgR62y3VkKth/n5OgrZyM?=
+ =?us-ascii?Q?obOit37TXSsyNtXH8OpHyZ+pEwaoCgoIQDvXkqbITZWIKUHAjAu+PHyFy3LI?=
+ =?us-ascii?Q?kCMDN0W1HEKZKpqAdJRcpTjyk60ZFB8fPkVMFbvWfCOG+6NHy4Ic2w4jCZOC?=
+ =?us-ascii?Q?09IUKlaSRO+ayUkcc29l4VyfDI4AyxE98Vfwcv2epC2DUBWLvLn/M0hD4Ggv?=
+ =?us-ascii?Q?NhO+S1oPLJm1YyfIMEHWNrc+WXdUmal+uJXTmEBMY31WVrO8LTwcX4kY99kw?=
+ =?us-ascii?Q?1E1hzHZ5Sco7/XO7nmYYqfx6cXFpGXYF5kTzfU0QLpM4Qx34PXHH6qM7/LD6?=
+ =?us-ascii?Q?Hhpg84lm+YGUa0LXlmGimhSjcsSC10Lpj6V9AbzTGXr3SgPMSze88jcJWmyD?=
+ =?us-ascii?Q?2dpcREVpAJKN8ag8YPYtL7qcCMdTlMr5nNZJNqfhsSUCjTEaRmHQSjn0IJcV?=
+ =?us-ascii?Q?4MTiLkgAm+uN2zw2I3DFGcw2DtzMuRkEpcK0tdDyKXA8m2uBnjqh+seRW21w?=
+ =?us-ascii?Q?r/7QeuEdhr6PPUepXbZCPGkoEWHattGk69HcuhwE3ig1LcRm+CV33QXABoqk?=
+ =?us-ascii?Q?fMUcFxIAJVjAa8rTSD8gGxJX7Jsr6CF3qJuDBuNrs86oP8j+0H5/THiGEuB5?=
+ =?us-ascii?Q?Li+iKW2wBRClVBBkjE6m3nCe8Eew8hP+atRv8bQoQhjCHOZxuYDtj2KOfKGe?=
+ =?us-ascii?Q?HIhi2ue065icqkyJyKZQ8LbwfZRlFNzOXHfIwUEu5AJKh7aQBLxwG6Kaspnz?=
+ =?us-ascii?Q?UMJQ9dod7Ss+y9v0X2zO0zvULQ8A94wn4AOfqmfq7q7SLMRAEv1gJ42jzUIU?=
+ =?us-ascii?Q?0/L+9UFiRfmzHhe9htVCZVBGvScdo5pHO2TDyw2vC3RHQZyK1RtNLMk05Pyd?=
+ =?us-ascii?Q?EG7zV7eBS+ncDiC1Zh2hkltUNE/2usABC7uvT0mswzC5TL1tnVK+GEfHzS6L?=
+ =?us-ascii?Q?fi4yXSq0cELKM/nooW19doZFeAEaKLcEUKpeiCggNncfHK7QVRyjIIWK0kv+?=
+ =?us-ascii?Q?ZfQFxXo4r8iCz7yYtZrDSHOOKNW1imGfUcdLqBvPKRhgmsbPzlsGVQXBvrT+?=
+ =?us-ascii?Q?r45P/XXh1GHK/ymNMhI06aBY06KKHO5FXlOwUpJ5JxPz1Fn77yCK62o9Yn2I?=
+ =?us-ascii?Q?MWR8jpz+TrT8Wh8iGNY5nrVzDFfgf/8M/hwQcfaX36aI3jTY+7hw/pu16QIO?=
+ =?us-ascii?Q?fti1toxttLvXL5KN6vuxJCGEJlSlNHcc0+uiTYfl7Jtq9MOQ1tnaMc/cF9N2?=
+ =?us-ascii?Q?mKowEIhQTNQSkiCc6ZIjsUXCrQoSOTVoPTvNi7z9D8ZsZ8JccaD52+j0FMuP?=
+ =?us-ascii?Q?SB52RjFYyqiRWPnLqpSE//bKAg5+eI7BN+Mv7ByaI4kmEHZDbhd8n4Hyrena?=
+ =?us-ascii?Q?+JdId7hbc0BHKmzMmVceXIBK5qSe1EVa61kd94xxUz0xaxm4uK+sug3mjt6n?=
+ =?us-ascii?Q?tqPi5RFEG/a74N9RwsVTzM1z+yGqW9SYA8gf6YEVzWRrFyZNgPWFtSSHhjE6?=
+ =?us-ascii?Q?/aaWQzwb7qQrkTE8OYHBZFm89De2uUG+1DYaf4aVviOptEy2uoNs6DmwPMJ7?=
+ =?us-ascii?Q?oMsqeLFkdQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ed736cd2-c4bd-4768-ac14-08da1e8823bc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Apr 2022 02:32:08.8423
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yWrSTEAItul31Vv6r0wihD1r+WiSurYGYzcU9F52RDUUinYu1pIvC4E+X6WlTeOxWqtga0WCMZQMSCWm9ox37w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4219
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,293 +189,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 14 Apr 2022 17:30:02 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Wed, Apr 13, 2022 at 4:47 PM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wr=
-ote:
-> >
-> > On Wed, 13 Apr 2022 16:00:18 +0800, Jason Wang <jasowang@redhat.com> wr=
-ote:
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Thursday, April 14, 2022 10:22 PM
+>=20
+> On Thu, Apr 14, 2022 at 09:51:49AM -0400, Matthew Rosato wrote:
+> > On 4/12/22 11:53 AM, Jason Gunthorpe wrote:
+> > > When the open_device() op is called the container_users is incremente=
+d
+> and
+> > > held incremented until close_device(). Thus, so long as drivers call
+> > > functions within their open_device()/close_device() region they do no=
+t
+> > > need to worry about the container_users.
 > > >
-> > > =E5=9C=A8 2022/4/6 =E4=B8=8A=E5=8D=8811:43, Xuan Zhuo =E5=86=99=E9=81=
-=93:
-> > > > This patch implements the resize function of the rx, tx queues.
-> > > > Based on this function, it is possible to modify the ring num of the
-> > > > queue.
-> > > >
-> > > > There may be an exception during the resize process, the resize may
-> > > > fail, or the vq can no longer be used. Either way, we must execute
-> > > > napi_enable(). Because napi_disable is similar to a lock, napi_enab=
-le
-> > > > must be called after calling napi_disable.
-> > > >
-> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > ---
-> > > >   drivers/net/virtio_net.c | 81 +++++++++++++++++++++++++++++++++++=
-+++++
-> > > >   1 file changed, 81 insertions(+)
-> > > >
-> > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > index b8bf00525177..ba6859f305f7 100644
-> > > > --- a/drivers/net/virtio_net.c
-> > > > +++ b/drivers/net/virtio_net.c
-> > > > @@ -251,6 +251,9 @@ struct padded_vnet_hdr {
-> > > >     char padding[4];
-> > > >   };
-> > > >
-> > > > +static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void =
-*buf);
-> > > > +static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void =
-*buf);
-> > > > +
-> > > >   static bool is_xdp_frame(void *ptr)
-> > > >   {
-> > > >     return (unsigned long)ptr & VIRTIO_XDP_FLAG;
-> > > > @@ -1369,6 +1372,15 @@ static void virtnet_napi_enable(struct virtq=
-ueue *vq, struct napi_struct *napi)
-> > > >   {
-> > > >     napi_enable(napi);
-> > > >
-> > > > +   /* Check if vq is in reset state. The normal reset/resize proce=
-ss will
-> > > > +    * be protected by napi. However, the protection of napi is onl=
-y enabled
-> > > > +    * during the operation, and the protection of napi will end af=
-ter the
-> > > > +    * operation is completed. If re-enable fails during the proces=
-s, vq
-> > > > +    * will remain unavailable with reset state.
-> > > > +    */
-> > > > +   if (vq->reset)
-> > > > +           return;
+> > > These functions can all only be called between
+> > > open_device()/close_device():
 > > >
+> > >    vfio_pin_pages()
+> > >    vfio_unpin_pages()
+> > >    vfio_dma_rw()
+> > >    vfio_register_notifier()
+> > >    vfio_unregister_notifier()
 > > >
-> > > I don't get when could we hit this condition.
+> > > So eliminate the calls to vfio_group_add_container_user() and add a
+> simple
+> > > WARN_ON to detect mis-use by drivers.
+> > >
 > >
+> > vfio_device_fops_release decrements dev->open_count immediately
+> before
+> > calling dev->ops->close_device, which means we could enter close_device
+> with
+> > a dev_count of 0.
 > >
-> > In patch 23, the code to implement re-enable vq is as follows:
+> > Maybe vfio_device_fops_release should handle the same way as
+> > vfio_group_get_device_fd?
 > >
-> > +static int vp_modern_enable_reset_vq(struct virtqueue *vq)
-> > +{
-> > +       struct virtio_pci_device *vp_dev =3D to_vp_device(vq->vdev);
-> > +       struct virtio_pci_modern_device *mdev =3D &vp_dev->mdev;
-> > +       struct virtio_pci_vq_info *info;
-> > +       unsigned long flags, index;
-> > +       int err;
-> > +
-> > +       if (!vq->reset)
-> > +               return -EBUSY;
-> > +
-> > +       index =3D vq->index;
-> > +       info =3D vp_dev->vqs[index];
-> > +
-> > +       /* check queue reset status */
-> > +       if (vp_modern_get_queue_reset(mdev, index) !=3D 1)
-> > +               return -EBUSY;
-> > +
-> > +       err =3D vp_active_vq(vq, info->msix_vector);
-> > +       if (err)
-> > +               return err;
-> > +
-> > +       if (vq->callback) {
-> > +               spin_lock_irqsave(&vp_dev->lock, flags);
-> > +               list_add(&info->node, &vp_dev->virtqueues);
-> > +               spin_unlock_irqrestore(&vp_dev->lock, flags);
-> > +       } else {
-> > +               INIT_LIST_HEAD(&info->node);
-> > +       }
-> > +
-> > +       vp_modern_set_queue_enable(&vp_dev->mdev, index, true);
-> > +
-> > +       if (vp_dev->per_vq_vectors && info->msix_vector !=3D VIRTIO_MSI=
-_NO_VECTOR)
-> > +               enable_irq(pci_irq_vector(vp_dev->pci_dev, info->msix_v=
-ector));
-> > +
-> > +       vq->reset =3D false;
-> > +
-> > +       return 0;
-> > +}
-> >
-> >
-> > There are three situations where an error will be returned. These are t=
-he
-> > situations I want to handle.
->
-> Right, but it looks harmless if we just schedule the NAPI without the che=
-ck.
+> > 	if (device->open_count =3D=3D 1 && device->ops->close_device)
+> > 		device->ops->close_device(device);
+> > 	device->open_count--;
+>=20
+> Yes, thanks alot! I have nothing to test these flows on...
+>=20
+> It matches the ordering in the only other place to call close_device.
+>=20
+> I folded this into the patch:
 
-Yes.
+While it's a welcomed fix is it actually related to this series? The point
+of this patch is that those functions are called when container_users
+is non-zero. This is true even without this fix given container_users
+is decremented after calling device->ops->close_device().
 
-> >
-> > But I'm rethinking the question, and I feel like you're right, although=
- the
-> > hardware setup may fail. We can no longer sync with the hardware. But u=
-sing it
-> > as a normal vq doesn't have any problems.
->
-> Note that we should make sure the buggy(malicous) device won't crash
-> the codes by changing the queue_reset value at its will.
+iiuc this might be better sent out as a separate fix out of this series?
+Or at least add a comment in the commit msg about taking chance
+to fix an unrelated issue to not cause confusion...
 
-I will keep an eye on this situation.
-
->
-> >
-> > >
-> > >
-> > > > +
-> > > >     /* If all buffers were filled by other side before we napi_enab=
-led, we
-> > > >      * won't get another interrupt, so process any outstanding pack=
-ets now.
-> > > >      * Call local_bh_enable after to trigger softIRQ processing.
-> > > > @@ -1413,6 +1425,15 @@ static void refill_work(struct work_struct *=
-work)
-> > > >             struct receive_queue *rq =3D &vi->rq[i];
-> > > >
-> > > >             napi_disable(&rq->napi);
-> > > > +
-> > > > +           /* Check if vq is in reset state. See more in
-> > > > +            * virtnet_napi_enable()
-> > > > +            */
-> > > > +           if (rq->vq->reset) {
-> > > > +                   virtnet_napi_enable(rq->vq, &rq->napi);
-> > > > +                   continue;
-> > > > +           }
-> > >
-> > >
-> > > Can we do something similar in virtnet_close() by canceling the work?
-> >
-> > I think there is no need to cancel the work here, because napi_disable =
-will wait
-> > for the napi_enable of the resize. So if the re-enable failed vq is use=
-d as a normal
-> > vq, this logic can be removed.
->
-> Actually I meant the part of virtnet_rx_resize().
->
-> If we don't synchronize with the refill work, it might enable NAPI unexpe=
-ctedly?
-
-I don't think this situation will be encountered, because napi_disable is
-mutually exclusive, so there will be no unexpected napi enable.
-
-Is there something I misunderstood?
-
-Thanks.
-
->
-> Thanks
->
-> >
-> >
-> > >
-> > >
-> > > > +
-> > > >             still_empty =3D !try_fill_recv(vi, rq, GFP_KERNEL);
-> > > >             virtnet_napi_enable(rq->vq, &rq->napi);
-> > > >
-> > > > @@ -1523,6 +1544,10 @@ static void virtnet_poll_cleantx(struct rece=
-ive_queue *rq)
-> > > >     if (!sq->napi.weight || is_xdp_raw_buffer_queue(vi, index))
-> > > >             return;
-> > > >
-> > > > +   /* Check if vq is in reset state. See more in virtnet_napi_enab=
-le() */
-> > > > +   if (sq->vq->reset)
-> > > > +           return;
-> > >
-> > >
-> > > We've disabled TX napi, any chance we can still hit this?
-> >
-> > Same as above.
-> >
-> > >
-> > >
-> > > > +
-> > > >     if (__netif_tx_trylock(txq)) {
-> > > >             do {
-> > > >                     virtqueue_disable_cb(sq->vq);
-> > > > @@ -1769,6 +1794,62 @@ static netdev_tx_t start_xmit(struct sk_buff=
- *skb, struct net_device *dev)
-> > > >     return NETDEV_TX_OK;
-> > > >   }
-> > > >
-> > > > +static int virtnet_rx_resize(struct virtnet_info *vi,
-> > > > +                        struct receive_queue *rq, u32 ring_num)
-> > > > +{
-> > > > +   int err;
-> > > > +
-> > > > +   napi_disable(&rq->napi);
-> > > > +
-> > > > +   err =3D virtqueue_resize(rq->vq, ring_num, virtnet_rq_free_unus=
-ed_buf);
-> > > > +   if (err)
-> > > > +           goto err;
-> > > > +
-> > > > +   if (!try_fill_recv(vi, rq, GFP_KERNEL))
-> > > > +           schedule_delayed_work(&vi->refill, 0);
-> > > > +
-> > > > +   virtnet_napi_enable(rq->vq, &rq->napi);
-> > > > +   return 0;
-> > > > +
-> > > > +err:
-> > > > +   netdev_err(vi->dev,
-> > > > +              "reset rx reset vq fail: rx queue index: %td err: %d=
-\n",
-> > > > +              rq - vi->rq, err);
-> > > > +   virtnet_napi_enable(rq->vq, &rq->napi);
-> > > > +   return err;
-> > > > +}
-> > > > +
-> > > > +static int virtnet_tx_resize(struct virtnet_info *vi,
-> > > > +                        struct send_queue *sq, u32 ring_num)
-> > > > +{
-> > > > +   struct netdev_queue *txq;
-> > > > +   int err, qindex;
-> > > > +
-> > > > +   qindex =3D sq - vi->sq;
-> > > > +
-> > > > +   virtnet_napi_tx_disable(&sq->napi);
-> > > > +
-> > > > +   txq =3D netdev_get_tx_queue(vi->dev, qindex);
-> > > > +   __netif_tx_lock_bh(txq);
-> > > > +   netif_stop_subqueue(vi->dev, qindex);
-> > > > +   __netif_tx_unlock_bh(txq);
-> > > > +
-> > > > +   err =3D virtqueue_resize(sq->vq, ring_num, virtnet_sq_free_unus=
-ed_buf);
-> > > > +   if (err)
-> > > > +           goto err;
-> > > > +
-> > > > +   netif_start_subqueue(vi->dev, qindex);
-> > > > +   virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
-> > > > +   return 0;
-> > > > +
-> > > > +err:
-> > >
-> > >
-> > > I guess we can still start the queue in this case? (Since we don't
-> > > change the queue if resize fails).
-> >
-> > Yes, you are right.
-> >
-> > Thanks.
-> >
-> > >
-> > >
-> > > > +   netdev_err(vi->dev,
-> > > > +              "reset tx reset vq fail: tx queue index: %td err: %d=
-\n",
-> > > > +              sq - vi->sq, err);
-> > > > +   virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
-> > > > +   return err;
-> > > > +}
-> > > > +
-> > > >   /*
-> > > >    * Send command via the control virtqueue and check status.  Comm=
-ands
-> > > >    * supported by the hypervisor, as indicated by feature bits, sho=
-uld
-> > >
-> >
->
+Thanks
+Kevin
