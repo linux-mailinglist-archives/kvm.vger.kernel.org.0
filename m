@@ -2,225 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D5275032F0
-	for <lists+kvm@lfdr.de>; Sat, 16 Apr 2022 07:48:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2AB85032E5
+	for <lists+kvm@lfdr.de>; Sat, 16 Apr 2022 07:48:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232616AbiDOXiY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Apr 2022 19:38:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42472 "EHLO
+        id S1356582AbiDOXsC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Apr 2022 19:48:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234987AbiDOXiX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Apr 2022 19:38:23 -0400
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EB5B4D608
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 16:35:53 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id bj36so5003983ljb.13
-        for <kvm@vger.kernel.org>; Fri, 15 Apr 2022 16:35:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zYpJfqJx7d2DxTmeeTs+ZELB+v0k+j7qa41wmKEfKm8=;
-        b=aoNecNfazUQ5134uApw0neMDbp1NXEfEPzly1IRzewTBXD7Vwjsy502V4Z4aYMz//k
-         x0pTxEQV+ZXR8or+WZYvhy0YNEoqs0vpxkN7Tior9AU2V8lI6+ZPhm1WqTZfFuhqaq3H
-         8KK0tPENoezQkx02qVXWQLFKDwfproboTCwZt5ieVpXxQjNYejuFohswv3sjXU4VC/qu
-         K9ZO9J9Dqa+9WBymz2MrOLQ+MLHLNInH+88+n7DOmxcq6N0nBOUANZNW8G6aNJBUE6cP
-         hNrw5yVfRDEpsa6GzdWDQCmlLVONgTzAZ/ufu7xSTVag9CzUrl+XnMvjBii/gPEMCSmR
-         ZUWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zYpJfqJx7d2DxTmeeTs+ZELB+v0k+j7qa41wmKEfKm8=;
-        b=ESIyMwbgUiFzrVhds6oUsxYPwEBiyxDFVwzV/pzi0QrTlF7yvpK42wa+CbQaRr+qo7
-         epdQgte7NFJV80GOhOrQEOiww/AguIT0A7XySw+NwsdtoWMy0Sd1x0Vw/hurlkdHRTEI
-         QDrZqE2DwSi9/fPy0/tMn9WYe1EVeQFwUu+VFF/Hi0c90Rt1WO2iWnjWu4nJPGcAsg0s
-         3C8OV+cPDLqVQNUGbkuVaPbJMQv6j/XCB0fvGvVP/BpVOxfJL3bHjuUgDkgx8w/Odk34
-         vN3jIuECaInZi+5xoHSLeRfc94l4XW33m1A9ySuOse8UBjRRZ4Sge8oHKEY1QD1O+f05
-         27zg==
-X-Gm-Message-State: AOAM530ReGvQmIqNandEy1RtaYyxjEYybph0xJA4jGn7pJaU/v6bx4KX
-        g4ni/YpKrm4cE/o6PZyPQs8hTVrkuI27H45xKrQb1g==
-X-Google-Smtp-Source: ABdhPJzttRIHPAm85L+ywCTI9gtoFQQ9orr9JaLUs7ZlPkwgkiihGblTNr8Csv/qy/WzICTS1ipzGaW1zUtuHswHYWw=
-X-Received: by 2002:a05:651c:179f:b0:24b:1406:5f55 with SMTP id
- bn31-20020a05651c179f00b0024b14065f55mr730237ljb.361.1650065751025; Fri, 15
- Apr 2022 16:35:51 -0700 (PDT)
+        with ESMTP id S1345318AbiDOXsB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Apr 2022 19:48:01 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3DDD82D20;
+        Fri, 15 Apr 2022 16:45:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1650066331; x=1681602331;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Lvza6qB84Gm+/e3tSzNIrxnq4zKuQRxIz5xk/AZ9bB8=;
+  b=mPwMnp7CIstANdfRF11LsYowcpaSFdlS6AMDKlpErDi0dUuORXTTAAXQ
+   pn7reC08eaAOPGYtp7SdBYnbLOuWTFcMudjWXdnOiO+c48mSiyUcC3NYf
+   JcrYwy/94qYJhILSIWJyMh8MCm1QlbnYkHmqH6cHSyCpDRAbyfzfR0+t6
+   4xKW6eOXvg0/Ws9mVHvukB+t8s0OZS1z39tgqUgJrH70xqTXuWvaf2qtl
+   93zTcawSl9w1bP1cZiJaQbGxE6by5CERxZwm+GS8UbbEung5pVI6uXqXb
+   gvM88vSgqpvSoMYU0vCJ0Z3ODJGzln164Gsx/JHrpx72rNIRHBE12hkUR
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10318"; a="263004030"
+X-IronPort-AV: E=Sophos;i="5.90,264,1643702400"; 
+   d="scan'208";a="263004030"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2022 16:45:17 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,264,1643702400"; 
+   d="scan'208";a="509110204"
+Received: from orsmsx605.amr.corp.intel.com ([10.22.229.18])
+  by orsmga003.jf.intel.com with ESMTP; 15 Apr 2022 16:45:17 -0700
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Fri, 15 Apr 2022 16:45:16 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27 via Frontend Transport; Fri, 15 Apr 2022 16:45:16 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.175)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.27; Fri, 15 Apr 2022 16:45:16 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EQ3hCpVzUmY6AUctN6igpABaRFIimxq9uSrB12VCYxN6mCm1G44gwxE3fLaM88Sv1Zbom4UGG8QGfs/ZCEo5XTZgqvEJ2rP3Xd+lcmnv0LmSZxH1tAmJi/r9IVk6Lz8EsSAmS4pDlB6mTiUq6tfSm1h+PBL9Cu5rLbtuXV/duNzcmEH/S8DEycVbqc4DuTzduOTbEFxuoWX4A//RfFC2P4SgsyNOk+PAortAW4XvAWBHu4WdRfcGWs686XPQKAGkc+nuO887izbLLLbS57RK3zgyIVWsZC1HLx1TBj8jJ09zKLyC5FV+JPbJFfKZnviPPY8hrtFjI39fVTAD8NahrA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Lvza6qB84Gm+/e3tSzNIrxnq4zKuQRxIz5xk/AZ9bB8=;
+ b=dXUsAWFLHajzjXk7u8qZ56LXmVEv2lCF2mWzdBRvpnem13tfPDrEYsq8dFUyo3n4Dk53VpUaN/dML72fCOiJcmV7mPZTR0c/dX/0TdjEg4remVJxGA6Ea0ZXwTdwMNLGhBBLXOtanCHvOJN8o26RC+G8pDvV+bImqnyyww6bTdXh1qFjuobncYQMxgNTQ1wNM785S11jSQmBuEC8zbY6q89YvbjYSf/TnesVfdYlWU/SuPNpu5/IYhiLzIEVoioa6JC7GW73NIU/JJqWiboQEYDf4bBJCVSibW4DCXmVewMpst5OdTcBM1Mu6F4BwmODvRue3BkMTx82MZ3kgxWNqg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by CY4PR11MB0007.namprd11.prod.outlook.com (2603:10b6:910:79::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5144.29; Fri, 15 Apr
+ 2022 23:45:14 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::c4ea:a404:b70b:e54e]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::c4ea:a404:b70b:e54e%8]) with mapi id 15.20.5164.020; Fri, 15 Apr 2022
+ 23:45:14 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: RE: [PATCH 9/9] vfio: Remove calls to vfio_group_add_container_user()
+Thread-Topic: [PATCH 9/9] vfio: Remove calls to
+ vfio_group_add_container_user()
+Thread-Index: AQHYToWALOjmn4an1kSZ0RkA8dFDlKzvcIiAgAAIewCAAMWwEIAApwIAgADCL2A=
+Date:   Fri, 15 Apr 2022 23:45:14 +0000
+Message-ID: <BN9PR11MB527668FA6B65E4B18D7AB7E28CEE9@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <9-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
+ <d6e2778a-01e4-6468-2c2b-3b718d924e65@linux.ibm.com>
+ <20220414142210.GE2120790@nvidia.com>
+ <BN9PR11MB527672B82DCFAD2C9B28E8CC8CEE9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20220415120728.GG2120790@nvidia.com>
+In-Reply-To: <20220415120728.GG2120790@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: ea8923c3-32b8-4fc1-179e-08da1f39fd37
+x-ms-traffictypediagnostic: CY4PR11MB0007:EE_
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-microsoft-antispam-prvs: <CY4PR11MB00075B9F350960ACF2482DBC8CEE9@CY4PR11MB0007.namprd11.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: +sypawHZtNKNaa8c4SNS9zn5JazXH/LufCOIMEuZUyPBNQIjK09GzqfvpcQqDFf+O4RAX1TIZ+4VJA9CaoSOt63fVqI5Sj40ukKfqwV8/VMUj8K0cmQxVJ2j+7a3o9AbQADtavQ0qUA9k82S/CRIRaUxCkQULKknolLmXFHpJa7qMw2i9jZCOCd68SvlkzXBsdw3gqa11qCAN4WUjT/U9FOPmhWnSdWg7l7/PRCdeKqFDC5CRYOFxa/TBZlSQV7BYvCYDT7ZDWtGVPrh1DXoUeUHhaV1ElDi7ffCZwAwWYdm8vTs+wnyzbAUNhX+2arp82xq24+GwjaDiGlerOUYatw9qR9QPGkealZaxTB/lPsgPwVR3dGTokWsi0dFtF5ij/pa0BHDx57wiEPqswpQU0MDfp2HwknFhPh0UNN9F7VOIkWtvqAwkyEztnsdjkyjLMxWvnlJSxWkmuysQOnr22/Z1qqF6C0NKSQB9CkIkSy4CtoFMjIPr8ylvachHum1h3pOokt9YOFINRRpAYPZ/tdt5ynRsBS5azidbOf9qpEeVwnnTJzC4ZWKEUO+qvW9PIgnJUqV1edtOKNG85lX+HtX2dhD1kwFcAUrxaQk8MaB7h8MkxrmNBOfI3z2RS0VUIomEaoBOL0u1/548XyU9E+2aLuDQri+Yr5ALCW24qin+P7zjZRLLQYq73xrjw0eams4zZU1fkg4GdgtbUHu0Q==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(66476007)(5660300002)(7416002)(66556008)(82960400001)(122000001)(83380400001)(38100700002)(38070700005)(66946007)(52536014)(4326008)(2906002)(8936002)(9686003)(86362001)(33656002)(76116006)(8676002)(55016003)(186003)(26005)(64756008)(7696005)(4744005)(7406005)(6916009)(54906003)(71200400001)(508600001)(316002)(6506007)(66446008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?SpHMIAUqEmcztcsmsXaD0ZmHaPjFuEa95WzXvSNKPRrO3mgNnxXTd0yQmqUR?=
+ =?us-ascii?Q?ZN3wh/n74jp7Y0WZNWSh1lKh8dRznk1HJCeN7t5kN+xPcaJnYTKpsSRHdon+?=
+ =?us-ascii?Q?7aBsRs+Ydizd6Jx7icGcTxGs+vTnODU971Fa5uaAStQUhGPemPPmJIZ5KrtO?=
+ =?us-ascii?Q?DYrdinQDy7Y3lW8OQDJ3y1chA8tTUsOZkwIYWHIVRzn8nusiCRGT/XKOqfLP?=
+ =?us-ascii?Q?wisDVSRQAuCpsagypTVE/DHEK5leY9vuM9KeZ3tmtVbakVGRWY7ElfEXTgca?=
+ =?us-ascii?Q?C6HGv0ca2a1M98uBBn0p8pGLs4Mrta1t6MgD/x+yYH7yFHmkp9TFmsrLj91j?=
+ =?us-ascii?Q?qjVmf/o1rF1KqEwGYwqL6tvlN7a7EbWY7CHhNPq5EmLmDnpeOmnXg+fVd5eF?=
+ =?us-ascii?Q?jwc5q16Lt92gqC/3vvbj05mlY/q4Kjl0+98ieO4yacsWWBDDzWpnMou7fBzM?=
+ =?us-ascii?Q?NH6rA9y8yTrVFYA4Vdtl6K9dvv5QjrijmLI6iZ1m1oQuD/V7jPtUbQPg4BW0?=
+ =?us-ascii?Q?Wak81GCKlVAPO2pNYVvObQt4wE1AVJQR23npnoSOs1Ybh3qtTiok1TKURaKI?=
+ =?us-ascii?Q?5gYgXdgue3/cvjhDxBwzILavsPFa+MGCvp/KYYLBMt83ObDswp3tklV6xEKy?=
+ =?us-ascii?Q?93tBKszAW9vVOBdlyBkYWiHCq5rjNjbDxsMuSBtMYjd9fvfF3suL3L6OTen3?=
+ =?us-ascii?Q?0eQCL09Wh36o1+UCze36hQeLIrRpp3qUzzKwRbxrqFqOEIoVYHmrAU3qLs8J?=
+ =?us-ascii?Q?QqvDE5Z1/Mxz/3JC0ith1linivEBN3Fz4UWiApG6NFVBg9t0ZUyKXz+zCO6+?=
+ =?us-ascii?Q?f78FnJJRuGfEZCsgA1m5QPoCNGb5RXyWOw+zdknYIkcF7omM2NowKXyiHnFY?=
+ =?us-ascii?Q?A3TH13b1tV7sRFjzvGFrHDHp7nxSRAvP6z1Sns/KDT8+VrMmG+30mRekmtj3?=
+ =?us-ascii?Q?IMg3jw8esWKDflpb7418PPya7huJIOIPxIpvTzS3NVb8BhjsS2vQEe82lBjC?=
+ =?us-ascii?Q?Uf02n/wbSm6VZfDm0rBYI1297o3W4cXJkLT6rAtxTTUBjV8LHCXQgxpfW5xT?=
+ =?us-ascii?Q?nq2x5huA7PCmw6KKNWzq7cC7lJINxw/mTohw1VMysXsWl7J2BIaa2XCyxR86?=
+ =?us-ascii?Q?Ptu5fl0WdtrCajUqQG4L1oFaXv69mIQOtOcxctGVW6HpTFLwTI3el59DQYxE?=
+ =?us-ascii?Q?6zZQersyduc3nvuACdNgG/QBeOk0vvsOuAIx15bPgipyDo1wK874xUS/8Stk?=
+ =?us-ascii?Q?UOfWu9guggDgx+pIvi4Bjoc8z0Zqo3NGAo/BmrI96n/xxFpOCn3E4Uw9tuBT?=
+ =?us-ascii?Q?ipqWlhWsA/GkFSAPB/Ywfrc0ZhvqH/Nf5odzcBATcOhR/uoDirLjurPbdAJm?=
+ =?us-ascii?Q?GKT40zPLnCoDKoSyv14Cg7Gvn+W6vy6kGjxqPMK5p5cZ99Z/abChlal+NfR6?=
+ =?us-ascii?Q?7St+X0mqyAR+li/rU/lMnW+uBxn4uj27D//hvYIS9c5NVPKviyA5VPr5hlag?=
+ =?us-ascii?Q?emEARH4UIMCPrMMfoTfuTb4uc8k2ObdZctTq/ejgX3BD7wSgZv0NuS3/Gcr+?=
+ =?us-ascii?Q?FynRNIOWKRS8nZ4nJ7MxqWytwinXVHiGsgnvTSWrZ2A2i8D0ksCss8Y59sJ/?=
+ =?us-ascii?Q?Aon0j4/k5HFD9L6OnGDNLFpdL+fYxqRWmpLAb3gDOo9b7gDC2gGWl+Nokxfd?=
+ =?us-ascii?Q?dSJkVfvttFHRyPP3FcKUuQEdkX50uSWx6PX6bdthJrcgXLNAbp/g8eAA+aVY?=
+ =?us-ascii?Q?OzDMoGxc+g=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20220415215901.1737897-1-oupton@google.com>
-In-Reply-To: <20220415215901.1737897-1-oupton@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Fri, 15 Apr 2022 16:35:24 -0700
-Message-ID: <CALzav=c6jQ53G-2gEZYasH_b4_hLYtNAD5pW1TXSfPWxLf3_qw@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/17] KVM: arm64: Parallelize stage 2 fault handling
-To:     Oliver Upton <oupton@google.com>
-Cc:     KVMARM <kvmarm@lists.cs.columbia.edu>,
-        kvm list <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ea8923c3-32b8-4fc1-179e-08da1f39fd37
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Apr 2022 23:45:14.6002
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: E07bIQVu2TZzhfhkvF168d4Wzqscz785CfyWotfr50onYg5XjcPdty04NewnItEQ2liCEGAnLCsKkFW8fOLMPw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR11MB0007
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 15, 2022 at 2:59 PM Oliver Upton <oupton@google.com> wrote:
->
-> Presently KVM only takes a read lock for stage 2 faults if it believes
-> the fault can be fixed by relaxing permissions on a PTE (write unprotect
-> for dirty logging). Otherwise, stage 2 faults grab the write lock, which
-> predictably can pile up all the vCPUs in a sufficiently large VM.
->
-> The x86 port of KVM has what it calls the TDP MMU. Basically, it is an
-> MMU protected by the combination of a read-write lock and RCU, allowing
-> page walkers to traverse in parallel.
->
-> This series is strongly inspired by the mechanics of the TDP MMU,
-> making use of RCU to protect parallel walks. Note that the TLB
-> invalidation mechanics are a bit different between x86 and ARM, so we
-> need to use the 'break-before-make' sequence to split/collapse a
-> block/table mapping, respectively.
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Friday, April 15, 2022 8:07 PM
+>=20
+> On Fri, Apr 15, 2022 at 02:32:08AM +0000, Tian, Kevin wrote:
+>=20
+> > While it's a welcomed fix is it actually related to this series? The po=
+int
+> > of this patch is that those functions are called when container_users
+> > is non-zero. This is true even without this fix given container_users
+> > is decremented after calling device->ops->close_device().
+>=20
+> It isn't, it is decremented before which causes it to be 0 when the
+> assertions are called.
+>=20
 
-An alternative (or perhaps "v2" [1]) is to make x86's TDP MMU
-arch-neutral and port it to support ARM's stage-2 MMU. This is based
-on a few observations:
-
-- The problems that motivated the development of the TDP MMU are not
-x86-specific (e.g. parallelizing faults during the post-copy phase of
-Live Migration).
-- The synchronization in the TDP MMU (read/write lock, RCU for PT
-freeing, atomic compare-exchanges for modifying PTEs) is complex, but
-would be equivalent across architectures.
-- Eventually RISC-V is going to want similar performance (my
-understanding is RISC-V MMU is already a copy-paste of the ARM MMU),
-and it'd be a shame to re-implement TDP MMU synchronization a third
-time.
-- The TDP MMU includes support for various performance features that
-would benefit other architectures, such as eager page splitting,
-deferred zapping, lockless write-protection resolution, and (coming
-soon) in-place huge page promotion.
-- And then there's the obvious wins from less code duplication in KVM
-(e.g. get rid of the RISC-V MMU copy, increased code test coverage,
-...).
-
-The side of this I haven't really looked into yet is ARM's stage-2
-MMU, and how amenable it would be to being managed by the TDP MMU. But
-I assume it's a conventional page table structure mapping GPAs to
-HPAs, which is the most important overlap.
-
-That all being said, an arch-neutral TDP MMU would be a larger, more
-complex code change than something like this series (hence my "v2"
-caveat above). But I wanted to get this idea out there since the
-rubber is starting to hit the road on improving ARM MMU scalability.
-
-[1] "v2" as in the "next evolution" sense, not the "PATCH v2" sense :)
-
-
-
-
-
->
-> Nonetheless, using atomics on the break side allows fault handlers to
-> acquire exclusive access to a PTE (lets just call it locked). Once the
-> PTE lock is acquired it is then safe to assume exclusive access.
->
-> Special consideration is required when pruning the page tables in
-> parallel. Suppose we are collapsing a table into a block. Allowing
-> parallel faults means that a software walker could be in the middle of
-> a lower level traversal when the table is unlinked. Table
-> walkers that prune the paging structures must now 'lock' all descendent
-> PTEs, effectively asserting exclusive ownership of the substructure
-> (no other walker can install something to an already locked pte).
->
-> Additionally, for parallel walks we need to punt the freeing of table
-> pages to the next RCU sync, as there could be multiple observers of the
-> table until all walkers exit the RCU critical section. For this I
-> decided to cram an rcu_head into page private data for every table page.
-> We wind up spending a bit more on table pages now, but lazily allocating
-> for rcu callbacks probably doesn't make a lot of sense. Not only would
-> we need a large cache of them (think about installing a level 1 block)
-> to wire up callbacks on all descendent tables, but we also then need to
-> spend memory to actually free memory.
->
-> I tried to organize these patches as best I could w/o introducing
-> intermediate breakage.
->
-> The first 5 patches are meant mostly as prepatory reworks, and, in the
-> case of RCU a nop.
->
-> Patch 6 is quite large, but I had a hard time deciding how to change the
-> way we link/unlink tables to use atomics without breaking things along
-> the way.
->
-> Patch 7 probably should come before patch 6, as it informs the other
-> read-side fault (perm relax) about when a map is in progress so it'll
-> back off.
->
-> Patches 8-10 take care of the pruning case, actually locking the child ptes
-> instead of simply dropping table page references along the way. Note
-> that we cannot assume a pte points to a table/page at this point, hence
-> the same helper is called for pre- and leaf-traversal. Guide the
-> recursion based on what got yanked from the PTE.
->
-> Patches 11-14 wire up everything to schedule rcu callbacks on
-> to-be-freed table pages. rcu_barrier() is called on the way out from
-> tearing down a stage 2 page table to guarantee all memory associated
-> with the VM has actually been cleaned up.
->
-> Patches 15-16 loop in the fault handler to the new table traversal game.
->
-> Lastly, patch 17 is a nasty bit of debugging residue to spot possible
-> table page leaks. Please don't laugh ;-)
->
-> Smoke tested with KVM selftests + kvm_page_table_test w/ 2M hugetlb to
-> exercise the table pruning code. Haven't done anything beyond this,
-> sending as an RFC now to get eyes on the code.
->
-> Applies to commit fb649bda6f56 ("Merge tag 'block-5.18-2022-04-15' of
-> git://git.kernel.dk/linux-block")
->
-> Oliver Upton (17):
->   KVM: arm64: Directly read owner id field in stage2_pte_is_counted()
->   KVM: arm64: Only read the pte once per visit
->   KVM: arm64: Return the next table from map callbacks
->   KVM: arm64: Protect page table traversal with RCU
->   KVM: arm64: Take an argument to indicate parallel walk
->   KVM: arm64: Implement break-before-make sequence for parallel walks
->   KVM: arm64: Enlighten perm relax path about parallel walks
->   KVM: arm64: Spin off helper for initializing table pte
->   KVM: arm64: Tear down unlinked page tables in parallel walk
->   KVM: arm64: Assume a table pte is already owned in post-order
->     traversal
->   KVM: arm64: Move MMU cache init/destroy into helpers
->   KVM: arm64: Stuff mmu page cache in sub struct
->   KVM: arm64: Setup cache for stage2 page headers
->   KVM: arm64: Punt last page reference to rcu callback for parallel walk
->   KVM: arm64: Allow parallel calls to kvm_pgtable_stage2_map()
->   KVM: arm64: Enable parallel stage 2 MMU faults
->   TESTONLY: KVM: arm64: Add super lazy accounting of stage 2 table pages
->
->  arch/arm64/include/asm/kvm_host.h     |   5 +-
->  arch/arm64/include/asm/kvm_mmu.h      |   2 +
->  arch/arm64/include/asm/kvm_pgtable.h  |  14 +-
->  arch/arm64/kvm/arm.c                  |   4 +-
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c |  13 +-
->  arch/arm64/kvm/hyp/nvhe/setup.c       |  13 +-
->  arch/arm64/kvm/hyp/pgtable.c          | 518 +++++++++++++++++++-------
->  arch/arm64/kvm/mmu.c                  | 120 ++++--
->  8 files changed, 503 insertions(+), 186 deletions(-)
->
-> --
-> 2.36.0.rc0.470.gd361397f0d-goog
->
+right, it's quite obvious when I read it the second time.=20
