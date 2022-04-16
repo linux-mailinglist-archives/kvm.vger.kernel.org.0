@@ -2,106 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 084D65034B7
-	for <lists+kvm@lfdr.de>; Sat, 16 Apr 2022 09:46:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 47658503656
+	for <lists+kvm@lfdr.de>; Sat, 16 Apr 2022 13:30:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230105AbiDPHst (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 16 Apr 2022 03:48:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35570 "EHLO
+        id S231775AbiDPLdC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 16 Apr 2022 07:33:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229845AbiDPHss (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 16 Apr 2022 03:48:48 -0400
-Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F110EDFC5
-        for <kvm@vger.kernel.org>; Sat, 16 Apr 2022 00:46:14 -0700 (PDT)
-Received: by mail-il1-x142.google.com with SMTP id i8so895035ila.5
-        for <kvm@vger.kernel.org>; Sat, 16 Apr 2022 00:46:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=KeMi8W+p20zdR41YZoRj2EapY7imNsLYkAgQIQsIzqY=;
-        b=E35sNx8tZZDEbOXrgnkUSeo1GJpev5TxR4g//B8bPVsQsKXicXOqTey4KPKxjgdNt2
-         3Ke9ym1vbhQRo7eVvgbF10Xb7jGr+hXovh9kh3Ic6YSOh63sJ0cU5YPECMMMIo4qOsfO
-         ZBWvQ0bS3SR9UtTNLXllwxPHRQorZ+G917NGHPwa0m5TaGo1omzKP09ui2+CPkTgKrkw
-         2CUCcvWqikllbF3wsCh3B2wOa9i/ttXxWwvdL1lyPXJTvUM/4bHXkjOQ+A7z8jwDC+cI
-         Ow8rMSmq9aewZbrWQigmKqJg+r4/rGZWxM9LSe8HYI9lnu50yFh4DK4nWYcZRQfYF1+3
-         6XwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=KeMi8W+p20zdR41YZoRj2EapY7imNsLYkAgQIQsIzqY=;
-        b=qBZCDnt/BbuvSrbZheClk2S+X3hobc0dSCzp0VAsGHTZ//ikehV1AVAWk0/9Gy5fyS
-         QZTzGXjXgMP3UKpAZl3CvUdZX0LQMQk4L+9UpWd18Hun4r/u+dCeykDwnwixWZbtUQIw
-         vTkDSOtGttBCkUE4Cd4j4TMU32EcNigFnQzEQ4QGUHbvzE9QuipsGh8SggYxqjvLhqmo
-         jrJ44lRXQu8fAvnV/svYbanh8xnxjojPUY7HbCwxaN7i1ddmzzbfV8047oyPAucsw2yh
-         Txv+lGZfx3Xd2SaJWb1OeU9IX5tMZ5/sjCJQfxgbskyleL65HDh0b+a+6q46yJIiX7Lu
-         lD6Q==
-X-Gm-Message-State: AOAM531VYOpaSptS4P2K6EDnBn0u0yHAriQOtpRMQ96RxZnWUVhkpxiH
-        n+DcR8WtO8jkCszTvsuf7pRAE+Qel8f+02inrP0=
-X-Google-Smtp-Source: ABdhPJwpz/m7WLcG1uweLeCcJreW/An06JSrpXizIXLPhNbfDYG7xCYR8yXvhv+DgFaE1QCWCOqYfJ3Qzr9bg64A10w=
-X-Received: by 2002:a92:c567:0:b0:2ca:fd1a:3976 with SMTP id
- b7-20020a92c567000000b002cafd1a3976mr913155ilj.301.1650095173954; Sat, 16 Apr
- 2022 00:46:13 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:a05:6638:1309:0:0:0:0 with HTTP; Sat, 16 Apr 2022 00:46:13
- -0700 (PDT)
-Reply-To: daniel.seyba@yahoo.com
-From:   Seyba Daniel <royhalton13@gmail.com>
-Date:   Sat, 16 Apr 2022 09:46:13 +0200
-Message-ID: <CALSxb2yNWsrOA5ggPtbmAWa3riifJkrqf0S1G_kc-Wg-5dJ-aA@mail.gmail.com>
-Subject: Hello,
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: Yes, score=5.5 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,FREEMAIL_REPLYTO,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,UNDISC_FREEM autolearn=no
+        with ESMTP id S231191AbiDPLdB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 16 Apr 2022 07:33:01 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C83EE2C
+        for <kvm@vger.kernel.org>; Sat, 16 Apr 2022 04:30:29 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2DFCCB82413
+        for <kvm@vger.kernel.org>; Sat, 16 Apr 2022 11:30:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF81DC385A3;
+        Sat, 16 Apr 2022 11:30:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1650108626;
+        bh=qFp/jDmKbavYo5kvIAF6zOjufRczwtY9uV2Lo1n0R8Q=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=up8hV9wQ2DbdqxRluJXKd64E5tOUEEStn51OVv6TZp7Exy2vDMiR4gMcoo5l0BTbm
+         KJONmHONbM9fKerrYE6R8i3Uxdc/IRcHLDURkI+Km+rCSQSq5pRlwUC0KGhzbRHAsk
+         aAuJXuL/Rgs7YcTy07Wr/f34gLewLESaMchghHyrqYrEgevUDlpjvLyiDUfYCPzDv9
+         2qTXEAZ9T2JUJAXno9jibaKaxgijwjhflBntZmILcNL5poGU2CNDC5Pp8tw57r3HId
+         GiIlIOyuI/56MslqOGAAKXbtKwlLHfAVhiP8fY8wTmka4knTpOuqTOQ2fQ+KFVYNfV
+         u+sZW9OuBRi6g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nfgdE-004joA-8S; Sat, 16 Apr 2022 12:30:25 +0100
+Date:   Sat, 16 Apr 2022 12:30:23 +0100
+Message-ID: <871qxxb700.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>
+Subject: Re: [RFC PATCH 05/17] KVM: arm64: Take an argument to indicate parallel walk
+In-Reply-To: <20220415215901.1737897-6-oupton@google.com>
+References: <20220415215901.1737897-1-oupton@google.com>
+        <20220415215901.1737897-6-oupton@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, pshier@google.com, ricarkol@google.com, reijiw@google.com, pbonzini@redhat.com, seanjc@google.com, bgardon@google.com, dmatlack@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2607:f8b0:4864:20:0:0:0:142 listed in]
-        [list.dnswl.org]
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.5004]
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [royhalton13[at]gmail.com]
-        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
-        *       in digit
-        *      [royhalton13[at]gmail.com]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
-        *  3.7 UNDISC_FREEM Undisclosed recipients + freemail reply-to
-        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
-        *      different freemails
-X-Spam-Level: *****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+Hi Oliver,
 
-I am so sorry contacting you in this means especially when we have never
-met before. I urgently seek your service to represent me in investing in
-your region / country and you will be rewarded for your service without
-affecting your present job with very little time invested in it.
+On Fri, 15 Apr 2022 22:58:49 +0100,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> It is desirable to reuse the same page walkers for serial and parallel
+> faults. Take an argument to kvm_pgtable_walk() (and throughout) to
+> indicate whether or not a walk might happen in parallel with another.
+>
+> No functional change intended.
+> 
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h  |  5 +-
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c |  4 +-
+>  arch/arm64/kvm/hyp/nvhe/setup.c       |  4 +-
+>  arch/arm64/kvm/hyp/pgtable.c          | 91 ++++++++++++++-------------
+>  4 files changed, 54 insertions(+), 50 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index ea818a5f7408..74955aba5918 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -194,7 +194,7 @@ enum kvm_pgtable_walk_flags {
+>  typedef int (*kvm_pgtable_visitor_fn_t)(u64 addr, u64 end, u32 level,
+>  					kvm_pte_t *ptep, kvm_pte_t *old,
+>  					enum kvm_pgtable_walk_flags flag,
+> -					void * const arg);
+> +					void * const arg, bool shared);
 
-My interest is in buying real estate, private schools or companies with
-potentials for rapid growth in long terms.
+Am I the only one who find this really ugly? Sprinkling this all over
+the shop makes the code rather unreadable. It seems to me that having
+some sort of more general context would make more sense.
 
-So please confirm interest by responding back.
+For example, I would fully expect the walk context to tell us whether
+this walker is willing to share its walk. Add a predicate to that,
+which would conveniently expand to 'false' for contexts where we don't
+have RCU (such as the pKVM HYP PT management, and you should get
+something that is more manageable.
 
-My dearest regards
+Thanks,
 
-Seyba Daniel
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
