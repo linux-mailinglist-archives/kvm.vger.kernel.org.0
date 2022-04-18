@@ -2,84 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CAE65505C6E
-	for <lists+kvm@lfdr.de>; Mon, 18 Apr 2022 18:28:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30756505C78
+	for <lists+kvm@lfdr.de>; Mon, 18 Apr 2022 18:31:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346150AbiDRQbO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Apr 2022 12:31:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58806 "EHLO
+        id S1346215AbiDRQco (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Apr 2022 12:32:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346151AbiDRQbC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Apr 2022 12:31:02 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF55730550
-        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 09:28:17 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id s14-20020a17090a880e00b001caaf6d3dd1so17659323pjn.3
-        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 09:28:17 -0700 (PDT)
+        with ESMTP id S1346356AbiDRQcf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Apr 2022 12:32:35 -0400
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34E5B1ADB4
+        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 09:29:55 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id w5so4168880lji.4
+        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 09:29:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=8nM2jf1CGGE3DnIMs28D4owMdrw5+WAhxQlmYFlxEUo=;
-        b=LIsvbw5CEY1J9npdI1tl7WGCdJZ/B1blBL4mGnU7RJXbTyPsNX8dxmZtufohcZ6zq9
-         uCRs8Mcf5bwuPj+OzL4hL4OofEt3VbCH6GbmFFvd4nWIPu6A6CWkZB42kz+sKUb9qwUo
-         Ht40LR0xZ6IctJWQzNEbpTCuPWU4SGYUnK0Yc+FD++y/EguF7yAEjF19uo9vVAEMCP7P
-         IV/AJ/gQl0mriUIKEjZUFyIuIc0oIP0TRON5mQOWeAho1tmqCiRZXGrycyKpHQdAEiMz
-         vHastx1F3caFPpfmV0MShUQiEg7Ojg4eu4yYUuN1Rx4KZkuVMoNa2h9GHrBOf8fU57ss
-         Tu8Q==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ACTXoCAAPWGoVloJ2EChe4T7s6GZlY4X8j8GihvZ3tM=;
+        b=HF3T4mfkjpsmLehz1/tS7TVpSB651oSEXAy9LFxM4Cc9sKtBkSNUWdU5q9rLIK9OCA
+         ftRLlsNgVBJ1J5Arabq5Ye+bmKzq8fA12+fAebj2cN/HTx7C8gpPtTmJgQud/DKw02TJ
+         3s327PHRVZNqD3QT158Yh44wswuruCrG4HB8xB+xig2UmEYPDaxpvzeeFmmBIJ1nk5qZ
+         1n7htO0T+PdZiuX87JGBYvKlnH4mmhtm2oMwwFJZI23zVzqNcGog9KbrCjOa+Uhteb+b
+         KPzV8lX4IAfbFxA9f0F5+7FDG1tP+aPixIwk2fVHETOQqDTXjQ9Eg7Te6yN9eIQkNf1e
+         wf7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=8nM2jf1CGGE3DnIMs28D4owMdrw5+WAhxQlmYFlxEUo=;
-        b=fMnDzBWpP2+GObpZffd6Cjp49N5QojdS17K9w9XRL6b1ezT3hNPqadgqgqxVRMTCWF
-         oym86kqUxymeyNz1tQKbtxc989QXGEBjikCUiSAI3zCbMAIkhPjGBgJ2KiCz73FdrRY8
-         99A45UWPtUT4hVN9j9h0MQBJJdInH0jMaqeFNDF6pUhpYFbAClswf2xtY9i+aVjfr5Go
-         RUSkhKnL6oeG48C5slUd8/7krDYQuimejIku+wH2BzCUevLo5Al7OPkXQVCRTZRZmPyd
-         Ej2WYhkFwPKF/Hp/jAai1Ykr0d3IAc4iCn5ngdoke3bO65nf08WDWAus71yg1WfBxLCm
-         AYaw==
-X-Gm-Message-State: AOAM530wD4518EACMhloj09plzBvv2IOZETBYwrwYrbt7zR5lA/WNuAN
-        C/dffrAI3/CoRCww0X2APgoyag==
-X-Google-Smtp-Source: ABdhPJylHT3chWGSWgex6OgAP6qN8Gp0Fu8KhEW1O1/RbqFHj9NnKD+k+SluDXx4cMdl29AxH0CUPQ==
-X-Received: by 2002:a17:902:f24b:b0:158:f5c3:a210 with SMTP id j11-20020a170902f24b00b00158f5c3a210mr8316728plc.65.1650299297191;
-        Mon, 18 Apr 2022 09:28:17 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k11-20020a056a00168b00b004f7e1555538sm13685626pfc.190.2022.04.18.09.28.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Apr 2022 09:28:16 -0700 (PDT)
-Date:   Mon, 18 Apr 2022 16:28:12 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jon Kohler <jon@nutanix.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ACTXoCAAPWGoVloJ2EChe4T7s6GZlY4X8j8GihvZ3tM=;
+        b=WrWadOoGM5gIZBoCRT54MtMp9YhUKZ8fYeEyO8qu4bfT0VDnEV1POH0j8xZ7yp3dWh
+         dttUxG1jXv9q1Np+7QRZL1yBL5T0rYXTPrisBe9uQe9S+HjY8ReZFq3xrEbX9MSyAHun
+         zPK0wiLvBY8b626d1kbBYQKy/m5WbPTTco6Pw8vNStfjkVgvroR0+gJziehkc97oV6Iq
+         oIDSLttomgS0FZutOfvGgcDZWuDE5tvQqCRAORJRIbV6JwBxHP2TQs62GU5kQzwSJCYT
+         MiojuPosT55sAMylYSbWDEsi1HR7qhjMR3I0qwJkQGnshXlngbCErTUP+ZfNvz/2bvEF
+         MkIA==
+X-Gm-Message-State: AOAM530PGd946oPrRy+Aebq4Xtti+d5+pV2/eZYB6Q+ua1unDA98SUzz
+        AyhqB2qGxr9OHY9wtRvEcpEgzU/Re8BlD8tWZ9lmuQ==
+X-Google-Smtp-Source: ABdhPJyvuiGgXGN0OEytNZ0J/MDCq8oEDCWzgeniVmVsLwc3DBFKVnJYqd47PNLkmyfkgyMU4S5hwbn9gH67w6uScyE=
+X-Received: by 2002:a2e:8e93:0:b0:24d:ab45:4053 with SMTP id
+ z19-20020a2e8e93000000b0024dab454053mr7630884ljk.231.1650299393165; Mon, 18
+ Apr 2022 09:29:53 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220325233125.413634-1-vipinsh@google.com> <CALzav=e6W2VSp=btmqTpQJ=3bH+Bw3D8sLApkTTvMMKAnw_LAw@mail.gmail.com>
+ <CAHVum0dOfJ5HuscNq0tA6BnUJK34v4CPCTkD4piHc7FObZOsng@mail.gmail.com>
+ <b754fa0a-4f9e-1ea5-6c77-f2410b7f8456@redhat.com> <CAHVum0d=WoqxZ4vUYY37jeQL1yLdiwbYjPSPFAa1meM5LUBDQQ@mail.gmail.com>
+In-Reply-To: <CAHVum0d=WoqxZ4vUYY37jeQL1yLdiwbYjPSPFAa1meM5LUBDQQ@mail.gmail.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Mon, 18 Apr 2022 09:29:16 -0700
+Message-ID: <CAHVum0eF=CmqXabrJS7rsVxhQLKA7v8iG1SjThcEJ=_zAUhRsg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Speed up slot_rmap_walk_next for sparsely
+ populated rmaps
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Matlack <dmatlack@google.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Balbir Singh <sblbir@amazon.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "kvm @ vger . kernel . org" <kvm@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Waiman Long <longman@redhat.com>,
-        Bijan Mottahedeh <bijan.mottahedeh@nutanix.com>
-Subject: Re: [PATCH] x86/speculation, KVM: respect user IBPB configuration
-Message-ID: <Yl2RnIjUTfQ0Avc9@google.com>
-References: <20220411164636.74866-1-jon@nutanix.com>
- <YlmBC6gaGRrAZm3L@google.com>
- <0AB658FD-FA01-4D27-BA17-C3001EC6EA00@nutanix.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0AB658FD-FA01-4D27-BA17-C3001EC6EA00@nutanix.com>
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -91,49 +74,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 15, 2022, Jon Kohler wrote:
-> 
-> > On Apr 15, 2022, at 10:28 AM, Sean Christopherson <seanjc@google.com> wrote:
-> > But stepping back, why does KVM do its own IBPB in the first place?  The goal is
-> > to prevent one vCPU from attacking the next vCPU run on the same pCPU.  But unless
-> > userspace is running multiple VMs in the same process/mm_struct, switching vCPUs,
-> > i.e. switching tasks, will also switch mm_structs and thus do IPBP via cond_mitigation.
-> 
-> Good question, I couldn’t figure out the answer to this by walking the code and looking
-> at git history/blame for this area. Are there VMMs that even run multiple VMs within
-> the same process? The only case I could think of is a nested situation?
+On Fri, Apr 8, 2022 at 12:31 PM Vipin Sharma <vipinsh@google.com> wrote:
+>
+> On Sun, Mar 27, 2022 at 3:41 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >
+> > On 3/26/22 01:31, Vipin Sharma wrote:
+> > >>> -static void slot_rmap_walk_next(struct slot_rmap_walk_iterator *iterator)
+> > >>> +static noinline void
+> > >>
+> > >> What is the reason to add noinline?
+> > >
+> > > My understanding is that since this method is called from
+> > > __always_inline methods, noinline will avoid gcc inlining the
+> > > slot_rmap_walk_next in those functions and generate smaller code.
+> > >
+> >
+> > Iterators are written in such a way that it's way more beneficial to
+> > inline them.  After inlining, compilers replace the aggregates (in this
+> > case, struct slot_rmap_walk_iterator) with one variable per field and
+> > that in turn enables a lot of optimizations, so the iterators should
+> > actually be always_inline if anything.
+> >
+> > For the same reason I'd guess the effect on the generated code should be
+> > small (next time please include the output of "size mmu.o"), but should
+> > still be there.  I'll do a quick check of the generated code and apply
+> > the patch.
+> >
+> > Paolo
+> >
+>
+> Let me know if you are still planning to modify the current patch by
+> removing "noinline" and merge or if you prefer a v2 without noinline.
 
-Selftests? :-)
+Hi Paolo,
 
-> > If userspace runs multiple VMs in the same process, enables cond_ipbp, _and_ sets
-> > TIF_SPEC_IB, then it's being stupid and isn't getting full protection in any case,
-> > e.g. if userspace is handling an exit-to-userspace condition for two vCPUs from
-> > different VMs, then the kernel could switch between those two vCPUs' tasks without
-> > bouncing through KVM and thus without doing KVM's IBPB.
-> 
-> Exactly, so meaning that the only time this would make sense is for some sort of nested
-> situation or some other funky VMM tomfoolery, but that nested hypervisor might not be 
-> KVM, so it's a farce, yea? Meaning that even in that case, there is zero guarantee
-> from the host kernel perspective that barriers within that process are being issued on
-> switch, which would make this security posture just window dressing?
-> 
-> > 
-> > I can kinda see doing this for always_ibpb, e.g. if userspace is unaware of spectre
-> > and is naively running multiple VMs in the same process.
-> 
-> Agreed. I’ve thought of always_ibpb as "paranoid mode" and if a user signs up for that,
-> they rarely care about the fast path / performance implications, even if some of the
-> security surface area is just complete window dressing :( 
-> 
-> Looking forward, what if we simplified this to have KVM issue barriers IFF always_ibpb?
-> 
-> And drop the cond’s, since the switching mm_structs should take care of that?
-> 
-> The nice part is that then the cond_mitigation() path handles the going to thread
-> with flag or going from a thread with flag situation gracefully, and we don’t need to
-> try to duplicate that smarts in kvm code or somewhere else.
+Any update on this patch?
 
-Unless there's an edge case we're overlooking, that has my vote.  And if the
-above is captured in a comment, then there shouldn't be any confusion as to why
-the kernel/KVM is consuming a flag named "switch_mm" when switching vCPUs, i.e.
-when there may or may not have been a change in mm structs.
+Thanks
+Vipin
