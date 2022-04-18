@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CE30504F46
-	for <lists+kvm@lfdr.de>; Mon, 18 Apr 2022 13:09:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99220504F4F
+	for <lists+kvm@lfdr.de>; Mon, 18 Apr 2022 13:17:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229656AbiDRLMB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Apr 2022 07:12:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42262 "EHLO
+        id S231143AbiDRLUE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Apr 2022 07:20:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229454AbiDRLMA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Apr 2022 07:12:00 -0400
+        with ESMTP id S229695AbiDRLUC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Apr 2022 07:20:02 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 41E181A072
-        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 04:09:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B6815BE36
+        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 04:17:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650280159;
+        s=mimecast20190719; t=1650280642;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=gQ5I1K+ZmaJUXOQE28CgU+0HLTQ8wWEKYgkOaeYQd00=;
-        b=jMXa//wCpNt7HjAOtT77f2w5qsvnZQ6aioG31V1n85pbqVbO6tF5EI9+ETt6rUoXJueZB0
-        33v6vbYiZyt8rWtW9peJfOJxTQQGUZr2SYhH0i1yERSqm6+En1IIJP8CZmlYwXMWkM/Vrs
-        SzS0Xkp/KQb91OMbUgWr42xBE5bDG04=
+        bh=44kdO0O6qMKLwL+JUGZd9+81cd+e3YbuHIPiaqy8ItU=;
+        b=F/kaZHbSHtrRZ1K9tJ8rEAhVDKMUG4JU+Jhb7JhvmeETAoonJ7O3kIZ1+tb8OHtQdgLGlH
+        u8EcERCvqI1Z8uo3lEaZo00NSfqGrsmDbEDuwYcAbsmCHK8w+QvUf/XxYaq06pJFsLzrO8
+        i/Ie/5ZZR4dhVhwCnSPKsLQY+v+VLu0=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-639-a6NjJP4lNR-26d2T0ycYVA-1; Mon, 18 Apr 2022 07:09:16 -0400
-X-MC-Unique: a6NjJP4lNR-26d2T0ycYVA-1
+ us-mta-179-KOd_YMOcPUio8lV30C32bw-1; Mon, 18 Apr 2022 07:17:19 -0400
+X-MC-Unique: KOd_YMOcPUio8lV30C32bw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A425F80159B;
-        Mon, 18 Apr 2022 11:09:15 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 178B0185A7A4;
+        Mon, 18 Apr 2022 11:17:19 +0000 (UTC)
 Received: from starship (unknown [10.40.194.231])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8AE2AC5097F;
-        Mon, 18 Apr 2022 11:09:13 +0000 (UTC)
-Message-ID: <26b02f98e88b1097ce5823007a7bc06b25678252.camel@redhat.com>
-Subject: Re: [PATCH v2 06/12] KVM: SVM: Do not support updating APIC ID when
- in x2APIC mode
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F1A2AC50975;
+        Mon, 18 Apr 2022 11:17:16 +0000 (UTC)
+Message-ID: <4ba971ad8df11732ab5da7a65166ac349427fbec.camel@redhat.com>
+Subject: Re: [PATCH v2 07/12] KVM: SVM: Adding support for configuring
+ x2APIC MSRs interception
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
         jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
-Date:   Mon, 18 Apr 2022 14:09:12 +0300
-In-Reply-To: <20220412115822.14351-7-suravee.suthikulpanit@amd.com>
+Date:   Mon, 18 Apr 2022 14:17:15 +0300
+In-Reply-To: <20220412115822.14351-8-suravee.suthikulpanit@amd.com>
 References: <20220412115822.14351-1-suravee.suthikulpanit@amd.com>
-         <20220412115822.14351-7-suravee.suthikulpanit@amd.com>
+         <20220412115822.14351-8-suravee.suthikulpanit@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
@@ -65,83 +65,109 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, 2022-04-12 at 06:58 -0500, Suravee Suthikulpanit wrote:
-> In X2APIC mode, the Logical Destination Register is read-only,
-> which provides a fixed mapping between the logical and physical
-> APIC IDs. Therefore, there is no Logical APIC ID table in X2AVIC
-> and the processor uses the X2APIC ID in the backing page to create
-> a vCPU’s logical ID.
+> When enabling x2APIC virtualization (x2AVIC), the interception of
+> x2APIC MSRs must be disabled to let the hardware virtualize guest
+> MSR accesses.
 > 
-> In addition, KVM does not support updating APIC ID in x2APIC mode,
-> which means AVIC does not need to handle this case.
+> Current implementation keeps track of list of MSR interception state
+> in the svm_direct_access_msrs array. Therefore, extends the array to
+> include x2APIC MSRs.
 > 
-> Therefore, check x2APIC mode when handling physical and logical
-> APIC ID update, and when invalidating logical APIC ID table.
-> 
-> Suggested-by: Maxim Levitsky <mlevitsk@redhat.com>
 > Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 > ---
->  arch/x86/kvm/svm/avic.c | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
+>  arch/x86/kvm/svm/svm.c | 29 ++++++++++++++++++++++++++++-
+>  arch/x86/kvm/svm/svm.h |  5 +++--
+>  2 files changed, 31 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 609dcbe52a86..22ee1098e2a5 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -424,8 +424,13 @@ static void avic_invalidate_logical_id_entry(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  	bool flat = svm->dfr_reg == APIC_DFR_FLAT;
-> -	u32 *entry = avic_get_logical_id_entry(vcpu, svm->ldr_reg, flat);
-> +	u32 *entry;
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 5ec770a1b4e8..c85663b62d4e 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -76,7 +76,7 @@ static uint64_t osvw_len = 4, osvw_status;
 >  
-> +	/* Note: x2AVIC does not use logical APIC ID table */
-> +	if (apic_x2apic_mode(vcpu->arch.apic))
-> +		return;
-> +
-> +	entry = avic_get_logical_id_entry(vcpu, svm->ldr_reg, flat);
->  	if (entry)
->  		clear_bit(AVIC_LOGICAL_ID_ENTRY_VALID_BIT, (unsigned long *)entry);
+>  static DEFINE_PER_CPU(u64, current_tsc_ratio);
+>  
+> -static const struct svm_direct_access_msrs {
+> +static struct svm_direct_access_msrs {
+>  	u32 index;   /* Index of the MSR */
+>  	bool always; /* True if intercept is initially cleared */
+>  } direct_access_msrs[MAX_DIRECT_ACCESS_MSRS] = {
+> @@ -774,6 +774,32 @@ static void add_msr_offset(u32 offset)
+>  	BUG();
 >  }
-> @@ -437,6 +442,10 @@ static int avic_handle_ldr_update(struct kvm_vcpu *vcpu)
->  	u32 ldr = kvm_lapic_get_reg(vcpu->arch.apic, APIC_LDR);
->  	u32 id = kvm_xapic_id(vcpu->arch.apic);
 >  
-> +	/* AVIC does not support LDR update for x2APIC */
-> +	if (apic_x2apic_mode(vcpu->arch.apic))
-> +		return 0;
+> +static void init_direct_access_msrs(void)
+> +{
+> +	int i, j;
 > +
->  	if (ldr == svm->ldr_reg)
->  		return 0;
->  
-> @@ -457,6 +466,14 @@ static int avic_handle_apic_id_update(struct kvm_vcpu *vcpu)
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  	u32 id = kvm_xapic_id(vcpu->arch.apic);
->  
+> +	/* Find first MSR_INVALID */
+> +	for (i = 0; i < MAX_DIRECT_ACCESS_MSRS; i++) {
+> +		if (direct_access_msrs[i].index == MSR_INVALID)
+> +			break;
+> +	}
+> +	BUG_ON(i >= MAX_DIRECT_ACCESS_MSRS);
+> +
 > +	/*
-> +	 * KVM does not support apic ID update for x2APIC.
-> +	 * Also, need to check if the APIC ID exceed 254.
+> +	 * Initialize direct_access_msrs entries to intercept X2APIC MSRs
+> +	 * (range 0x800 to 0x8ff)
 > +	 */
-> +	if (apic_x2apic_mode(vcpu->arch.apic) ||
-> +	    (vcpu->vcpu_id >= APIC_BROADCAST))
-> +		return 0;
-> +
->  	if (vcpu->vcpu_id == id)
->  		return 0;
->  
+> +	for (j = 0; j < 0x100; j++) {
+> +		direct_access_msrs[i + j].index = APIC_BASE_MSR + j;
+> +		direct_access_msrs[i + j].always = false;
+> +	}
 
-Honestly I won't even bother with this - avic_handle_apic_id_update
-zeros the initial apic id entry, after it moves it contents to new location.
+That looks *much cleaner* code wise even though it is slower 
+because now we have 256 more msrs in this list.
 
-If it is called again (and it will be called next time there is avic inhibition),
-it will just fail as the initial entry will be zero, or copy wrong entry
-if something else was written there meanwhile.
+So the best of the two worlds I think would be to add only APIC msrs that AVIC
+actually handles to the list.
 
-That code just needs to be removed, and AVIC be conditional on read-only apic id.
+SDM has a table of these registers in 
 
-But overall this patch doesn't make things worse, so
+"15.29.3.1 Virtual APIC Register Accesses"
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+I would add the registers that are either read/write allowed 
+or at least cause traps.
+
+Besides this, the patch looks fine.
 
 Best regards,
 	Maxim Levitsky
+
+
+> +	BUG_ON(i + j >= MAX_DIRECT_ACCESS_MSRS);
+> +
+> +	/* Initialize last entry */
+> +	direct_access_msrs[i + j].index = MSR_INVALID;
+> +	direct_access_msrs[i + j].always = true;
+> +}
+> +
+>  static void init_msrpm_offsets(void)
+>  {
+>  	int i;
+> @@ -4739,6 +4765,7 @@ static __init int svm_hardware_setup(void)
+>  	memset(iopm_va, 0xff, PAGE_SIZE * (1 << order));
+>  	iopm_base = page_to_pfn(iopm_pages) << PAGE_SHIFT;
+>  
+> +	init_direct_access_msrs();
+>  	init_msrpm_offsets();
+>  
+>  	supported_xcr0 &= ~(XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR);
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index c44326eeb3f2..e340c86941be 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -29,8 +29,9 @@
+>  #define	IOPM_SIZE PAGE_SIZE * 3
+>  #define	MSRPM_SIZE PAGE_SIZE * 2
+>  
+> -#define MAX_DIRECT_ACCESS_MSRS	20
+> -#define MSRPM_OFFSETS	16
+> +#define MAX_DIRECT_ACCESS_MSRS	(20 + 0x100)
+> +#define MSRPM_OFFSETS	30
+> +
+>  extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
+>  extern bool npt_enabled;
+>  extern bool intercept_smi;
+
 
