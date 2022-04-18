@@ -2,120 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EA278505C22
-	for <lists+kvm@lfdr.de>; Mon, 18 Apr 2022 17:57:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4F39505C52
+	for <lists+kvm@lfdr.de>; Mon, 18 Apr 2022 18:17:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346010AbiDRQAH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Apr 2022 12:00:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54002 "EHLO
+        id S1346055AbiDRQUH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Apr 2022 12:20:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345981AbiDRP7v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Apr 2022 11:59:51 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3927325DE;
-        Mon, 18 Apr 2022 08:56:33 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23IDZS9f023024;
-        Mon, 18 Apr 2022 15:56:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=HqQciTar/dr6XQaGag4BrX8X9OeIsbpgI5h9o2qOgg8=;
- b=Ubmf8doaXyPNt6S90i748iQ1lCbVXFJ/DyAJ8bf8HWZeBumVNjxXP3m+523H3dS64AV0
- ctCFNnErBnaHk27UWIhyCWoOqhTqqgtipp3blEJIlXn0bDl5beScrOq4H+Ek0XaanKgs
- XyiTcYVinH9dGJqsKXB7kTI9aBmuLbKnISFGcb9kdY+8k9D+dKInnCEy6YHDGy0++1hr
- v8O/o4bUBwYd9LnspnykyQP23YNzVRBYUuV7s6H3V7lEaWAE+NBF1JsNExO9gX9MnSe2
- 4Jkax4xukPbp6HTZxKdmx+HnrUYa0cqWyaTmKJ/lmJwYgG6SQesGc0LlQ0w7u9+bEXy9 fw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fg79e0f0f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 18 Apr 2022 15:56:24 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23IFpBdH003472;
-        Mon, 18 Apr 2022 15:56:23 GMT
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fg79e0f02-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 18 Apr 2022 15:56:23 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23IFqmlb023970;
-        Mon, 18 Apr 2022 15:56:22 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma02dal.us.ibm.com with ESMTP id 3ffne9tpb7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 18 Apr 2022 15:56:22 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23IFuLLI33227178
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 18 Apr 2022 15:56:21 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 22968BE05A;
-        Mon, 18 Apr 2022 15:56:21 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7ABB1BE04F;
-        Mon, 18 Apr 2022 15:56:18 +0000 (GMT)
-Received: from [9.65.204.148] (unknown [9.65.204.148])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon, 18 Apr 2022 15:56:18 +0000 (GMT)
-Message-ID: <3231af63-4d36-f8bd-e8d7-426222a883d9@linux.ibm.com>
-Date:   Mon, 18 Apr 2022 11:56:18 -0400
+        with ESMTP id S235239AbiDRQUF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Apr 2022 12:20:05 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30BA42CE11
+        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 09:17:26 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id j71so6190442pge.11
+        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 09:17:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=/1uUNVci0qIn0YYzjZTRHTLzpktyiWsbrO4Jd0320Kw=;
+        b=YNlYOX8OZrFE1EX2zjkrcu7/Xk3yn9mq4h3KA/NkCdgYZOBhj+aHBBUh5w++lFTQib
+         dPwTHqwzihdFtn3CdHKjzn9XsGuj3u4iVQLue5sDNSrM/CP0ktjuEXElRXMkPN7aLerP
+         3vltDaFh/8xfNuKXtL6sXitBPg4Dgx3AhlSXJkkTOxOuwrxJLbGfMIK0H2ELv8acUFdZ
+         tzmAcytUfnlQ9MPa/FQWmhamw2T0hyfQdiqvuWAwksA9vlJq0GT+4eOJxHIKEeXu7Fx1
+         HI7wF8SHxgM8x9wBwKDZg2C6L6zdp1l90vP4EnNdSc4N4B2K3FmfP3o8R1nekmS9/sDM
+         ogPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=/1uUNVci0qIn0YYzjZTRHTLzpktyiWsbrO4Jd0320Kw=;
+        b=A0hUCE2tW8UWKx06o8oFGdpds75lN1HDqeXna2eW/RHjxniGwtljzgQwv68v96NMWn
+         zIymumS4ajId/92LACqjus7C44yGGOqr8UAJPSNTFEdOsSAtdAch9inUU0UD3akdw5he
+         roS/nTBZbCDgWjTVLFw1RNr4lY4VV0fsjB7F0OLaB4nb8TOJ5VSch/1MJGrkPx8lNtis
+         Jbir3TrGvKAromAgRoDk9bvcoRU3LtRzngruwoMII0Y8McQDQSSpeKtlPVx6iIPOqB+E
+         u2kQH+aHnEhLz/aA6erKW7ljsypzU25Pf78AEV4w9bCVmFDA8ZM4GYcDtL0fvooAYjqS
+         9+VQ==
+X-Gm-Message-State: AOAM533gpRjSrqo1mi8og85Uzq9F1KT29se746m34YTCJuUhbZ2ONtA1
+        9S/m7HTwyieiAfAOtwz2/qxVHNHeXNmxhQ==
+X-Google-Smtp-Source: ABdhPJx3wdpuwNFjtcc37qlw/QgYQAPo+0oPb4GNCdgYeXRlZ5iNwJproNy68jSx5XZaj7Us7QtClQ==
+X-Received: by 2002:a63:ad45:0:b0:382:2459:5bc6 with SMTP id y5-20020a63ad45000000b0038224595bc6mr11102015pgo.474.1650298645458;
+        Mon, 18 Apr 2022 09:17:25 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id j10-20020a17090a31ca00b001cb87502e32sm13349456pjf.23.2022.04.18.09.17.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Apr 2022 09:17:24 -0700 (PDT)
+Date:   Mon, 18 Apr 2022 16:17:21 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v3 3/3] KVM: selftests: Add selftests for dirty quota
+ throttling
+Message-ID: <Yl2PEXqHswOc2j0L@google.com>
+References: <20220306220849.215358-1-shivam.kumar1@nutanix.com>
+ <20220306220849.215358-4-shivam.kumar1@nutanix.com>
+ <3bd9825e-311f-1d33-08d4-04f3d22f9239@nutanix.com>
+ <6c5ee7d1-63bb-a0a7-fb0c-78ffcfd97bc5@nutanix.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH 3/9] vfio/mdev: Pass in a struct vfio_device * to
- vfio_pin/unpin_pages()
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Airlie <airlied@linux.ie>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-References: <3-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-In-Reply-To: <3-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: KCIN7UZDZuCEvtHigmg5n1CB9zndGDrN
-X-Proofpoint-ORIG-GUID: qjhturDoRjoL-gez5Wt0TNIVHwtnmzm6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-18_02,2022-04-15_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- bulkscore=0 phishscore=0 clxscore=1015 malwarescore=0 spamscore=0
- priorityscore=1501 mlxscore=0 impostorscore=0 lowpriorityscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204180091
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6c5ee7d1-63bb-a0a7-fb0c-78ffcfd97bc5@nutanix.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -123,84 +78,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Apr 18, 2022, Shivam Kumar wrote:
+> > > +void vcpu_handle_dirty_quota_exit(struct kvm_run *run,
+> > > +            uint64_t test_dirty_quota_increment)
+> > > +{
+> > > +    uint64_t quota = run->dirty_quota_exit.quota;
+> > > +    uint64_t count = run->dirty_quota_exit.count;
+> > > +
+> > > +    /*
+> > > +     * Due to PML, number of pages dirtied by the vcpu can exceed its dirty
+> > > +     * quota by PML buffer size.
+> > > +     */
+> > > +    TEST_ASSERT(count <= quota + PML_BUFFER_SIZE, "Invalid number of pages
+> > > +        dirtied: count=%"PRIu64", quota=%"PRIu64"\n", count, quota);
+> Sean, I don't think this would be valid anymore because as you mentioned, the
+> vcpu can dirty multiple pages in one vmexit. I could use your help here.
 
+TL;DR: Should be fine, but s390 likely needs an exception.
 
-On 4/12/22 11:53 AM, Jason Gunthorpe wrote:
-> Every caller has a readily available vfio_device pointer, use that instead
-> of passing in a generic struct device. The struct vfio_device already
-> contains the group we need so this avoids complexity, extra refcountings,
-> and a confusing lifecycle model.
->
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->   .../driver-api/vfio-mediated-device.rst       |  4 +-
->   drivers/s390/cio/vfio_ccw_cp.c                |  6 +--
->   drivers/s390/crypto/vfio_ap_ops.c             |  8 ++--
->   drivers/vfio/vfio.c                           | 40 ++++++-------------
->   include/linux/vfio.h                          |  4 +-
->   5 files changed, 24 insertions(+), 38 deletions(-)
->
-> diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Documentation/driver-api/vfio-mediated-device.rst
-> index 9f26079cacae35..6aeca741dc9be1 100644
-> --- a/Documentation/driver-api/vfio-mediated-device.rst
-> +++ b/Documentation/driver-api/vfio-mediated-device.rst
-> @@ -279,10 +279,10 @@ Translation APIs for Mediated Devices
->   The following APIs are provided for translating user pfn to host pfn in a VFIO
->   driver::
->   
-> -	extern int vfio_pin_pages(struct device *dev, unsigned long *user_pfn,
-> +	extern int vfio_pin_pages(struct vfio_device *vdev, unsigned long *user_pfn,
->   				  int npage, int prot, unsigned long *phys_pfn);
->   
-> -	extern int vfio_unpin_pages(struct device *dev, unsigned long *user_pfn,
-> +	extern int vfio_unpin_pages(struct vfio_device *vdev, unsigned long *user_pfn,
->   				    int npage);
->   
->   These functions call back into the back-end IOMMU module by using the pin_pages
->
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index 69768061cd7bd9..a10b3369d76c41 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -124,7 +124,7 @@ static void vfio_ap_free_aqic_resources(struct vfio_ap_queue *q)
->   		q->saved_isc = VFIO_AP_ISC_INVALID;
->   	}
->   	if (q->saved_pfn && !WARN_ON(!q->matrix_mdev)) {
-> -		vfio_unpin_pages(mdev_dev(q->matrix_mdev->mdev),
-> +		vfio_unpin_pages(&q->matrix_mdev->vdev,
->   				 &q->saved_pfn, 1);
->   		q->saved_pfn = 0;
->   	}
-> @@ -258,7 +258,7 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
->   		return status;
->   	}
->   
-> -	ret = vfio_pin_pages(mdev_dev(q->matrix_mdev->mdev), &g_pfn, 1,
-> +	ret = vfio_pin_pages(&q->matrix_mdev->vdev, &g_pfn, 1,
->   			     IOMMU_READ | IOMMU_WRITE, &h_pfn);
->   	switch (ret) {
->   	case 1:
-> @@ -301,7 +301,7 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
->   		break;
->   	case AP_RESPONSE_OTHERWISE_CHANGED:
->   		/* We could not modify IRQ setings: clear new configuration */
-> -		vfio_unpin_pages(mdev_dev(q->matrix_mdev->mdev), &g_pfn, 1);
-> +		vfio_unpin_pages(&q->matrix_mdev->vdev, &g_pfn, 1);
->   		kvm_s390_gisc_unregister(kvm, isc);
->   		break;
->   	default:
-> @@ -1250,7 +1250,7 @@ static int vfio_ap_mdev_iommu_notifier(struct notifier_block *nb,
->   		struct vfio_iommu_type1_dma_unmap *unmap = data;
->   		unsigned long g_pfn = unmap->iova >> PAGE_SHIFT;
->   
-> -		vfio_unpin_pages(mdev_dev(matrix_mdev->mdev), &g_pfn, 1);
-> +		vfio_unpin_pages(&matrix_mdev->vdev, &g_pfn, 1);
->   		return NOTIFY_OK;
->   	}
+Practically speaking the 512 entry fuzziness is all but guaranteed to prevent
+false failures.
 
-The vfio_ap snippet:
-Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
+But, unconditionally allowing for overflow of 512 entries also means the test is
+unlikely to ever detect violations.  So to provide meaningful coverage, this needs
+to allow overflow if and only if PML is enabled.
 
->   
->
+And that brings us back to false failures due to _legitimate_ scenarios where a vCPU
+can dirty multiple pages.  Emphasis on legitimate, because except for an s390 edge
+case, I don't think this test's guest code does anything that would dirty multiple
+pages in a single instruction, e.g. there's no emulation, shouldn't be any descriptor
+table side effects, etc...  So unless I'm missing something, KVM should be able to
+precisely handle the core run loop.
 
+s390 does appear to have a caveat:
+
+	/*
+	 * On s390x, all pages of a 1M segment are initially marked as dirty
+	 * when a page of the segment is written to for the very first time.
+	 * To compensate this specialty in this test, we need to touch all
+	 * pages during the first iteration.
+	 */
+	for (i = 0; i < guest_num_pages; i++) {
+		addr = guest_test_virt_mem + i * guest_page_size;
+		*(uint64_t *)addr = READ_ONCE(iteration);
+	}
+
+IIUC, subsequent iterations will be ok, but the first iteration needs to allow
+for overflow of 256 (AFAIK the test only uses 4kb pages on s390).
