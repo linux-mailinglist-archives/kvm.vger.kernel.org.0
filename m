@@ -2,94 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BE68504D89
-	for <lists+kvm@lfdr.de>; Mon, 18 Apr 2022 10:05:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B05F1504DF6
+	for <lists+kvm@lfdr.de>; Mon, 18 Apr 2022 10:38:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237094AbiDRIIG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Apr 2022 04:08:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38996 "EHLO
+        id S237311AbiDRIkt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Apr 2022 04:40:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236333AbiDRIH7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Apr 2022 04:07:59 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 215A3DFC3
-        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 01:05:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650269120; x=1681805120;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=l+ZIgFdQsXBKeJf59UTUHee9+HfC6bwKCRbjy0ketfM=;
-  b=kFDV8+Wo1rRmC6/aAWCk5kmZjTPCo56Sy82wCXblMoWrnPyCDBo/y5P5
-   +Vuews7lPJ+/32RH7ffLlUXbuQrpz5xBdw26y6zdwPCC7pLcxYnqsDvS2
-   blF60P78aEoYWM50iLXDgODfQrcyH1SolZ2wG3od7rE6CAw7gKQIqqQXU
-   cOP2w8clzVUX5G05H4buP2yJPJ5ajs0FxACWR8tVA9/0dw6LXTP3WWsLK
-   mTZhVrbjqO2dtOMCMFiVhcP0m6ZU0rS9yo+tQhewBNAugCv9yJxDJVAlm
-   xQuIWRgy7DAzL9UD5SrIpCUVZFHWevK8CRI2hTsz45VFuoLUbpOEFyCvN
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10320"; a="263650579"
-X-IronPort-AV: E=Sophos;i="5.90,269,1643702400"; 
-   d="scan'208";a="263650579"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2022 01:05:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,269,1643702400"; 
-   d="scan'208";a="726559022"
-Received: from lkp-server01.sh.intel.com (HELO 3abc53900bec) ([10.239.97.150])
-  by orsmga005.jf.intel.com with ESMTP; 18 Apr 2022 01:05:17 -0700
-Received: from kbuild by 3abc53900bec with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1ngMNp-0004Sp-5J;
-        Mon, 18 Apr 2022 08:05:17 +0000
-Date:   Mon, 18 Apr 2022 16:05:02 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Isaku Yamahata <isaku.yamahata@intel.com>
-Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
-        Robert Hu <robert.hu@intel.com>,
-        Farrah Chen <farrah.chen@intel.com>,
-        Danmei Wei <danmei.wei@intel.com>,
+        with ESMTP id S237296AbiDRIks (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Apr 2022 04:40:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F1EC9193FC
+        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 01:38:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650271089;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LdbvqaVaOQQPzji0XpZH7xN+F7oFT2JmFZMage+5BKI=;
+        b=EoYM7o5jiwnanELXscUnlps3relb6MK7EYwySYo3tdQ11aSq0+pObTzxIKPtfYTiFq7w87
+        c+XjzEYvNIa6+R2Dsoj/JLBspPM7evY3F2wWjKfCFq+HdLVWjAVy88pev07MPZOOED9zE0
+        kRfH9X5PoSQHRu8xVUTRJStxH5eS5yA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-614-UeOd6_AiPpuzzfvLJa-NTw-1; Mon, 18 Apr 2022 04:38:06 -0400
+X-MC-Unique: UeOd6_AiPpuzzfvLJa-NTw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 45BA380005D;
+        Mon, 18 Apr 2022 08:37:55 +0000 (UTC)
+Received: from starship (unknown [10.40.194.231])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 89C71C5094E;
+        Mon, 18 Apr 2022 08:37:49 +0000 (UTC)
+Message-ID: <d2820bafeea6e908108bac863269a7ff7f519999.camel@redhat.com>
+Subject: Re: [PATCH 1/4] KVM: x86: Tag APICv DISABLE inhibit, not ABSENT, if
+ APICv is disabled
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: [kvm:kvm-tdx-5.17 100/141] arch/x86/kvm/vmx/vmenter.o: warning:
- objtool: __tdx_vcpu_run()+0xdc: missing int3 after ret
-Message-ID: <202204181614.gF9HYsmD-lkp@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Gaoning Pan <pgn@zju.edu.cn>,
+        Yongkang Jia <kangel@zju.edu.cn>
+Date:   Mon, 18 Apr 2022 11:37:48 +0300
+In-Reply-To: <20220416034249.2609491-2-seanjc@google.com>
+References: <20220416034249.2609491-1-seanjc@google.com>
+         <20220416034249.2609491-2-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Isaku,
+On Sat, 2022-04-16 at 03:42 +0000, Sean Christopherson wrote:
+> Set the DISABLE inhibit, not the ABSENT inhibit, if APICv is disabled via
+> module param.  A recent refactoring to add a wrapper for setting/clearing
+> inhibits unintentionally changed the flag, probably due to a copy+paste
+> goof.
+> 
+> Fixes: 4f4c4a3ee53c ("KVM: x86: Trace all APICv inhibit changes and capture overall status")
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/x86.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index ab336f7c82e4..753296902535 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9159,7 +9159,7 @@ static void kvm_apicv_init(struct kvm *kvm)
+>  
+>  	if (!enable_apicv)
+>  		set_or_clear_apicv_inhibit(inhibits,
+> -					   APICV_INHIBIT_REASON_ABSENT, true);
+> +					   APICV_INHIBIT_REASON_DISABLE, true);
+>  }
+>  
+>  static void kvm_sched_yield(struct kvm_vcpu *vcpu, unsigned long dest_id)
 
-First bad commit (maybe != root cause):
+So ABSENT means that userspace didn't enable, it and DISABLE means kernel module param disabled it.
+I didn't follow patches that touched those but it feels like we can use a single inhibit reason for both,
+or at least make better names for this. APICV_INHIBIT_REASON_ABSENT doesn't sound good to me.
 
-tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm-tdx-5.17
-head:   a50e4531e92e36f185ea32843c149c4703451109
-commit: 48690d2ec7328b9a1f128cbc6c6d6655a76ca2cf [100/141] KVM: TDX: Add helper assembly function to TDX vcpu
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20220418/202204181614.gF9HYsmD-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.2.0-19) 11.2.0
-reproduce (this is a W=1 build):
-        # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=48690d2ec7328b9a1f128cbc6c6d6655a76ca2cf
-        git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
-        git fetch --no-tags kvm kvm-tdx-5.17
-        git checkout 48690d2ec7328b9a1f128cbc6c6d6655a76ca2cf
-        # save the config file to linux build tree
-        mkdir build_dir
-        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
+Having said that, the patch is OK.
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-All warnings (new ones prefixed by >>):
+Best regards,
+	Maxim Levitsky
 
->> arch/x86/kvm/vmx/vmenter.o: warning: objtool: __tdx_vcpu_run()+0xdc: missing int3 after ret
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
