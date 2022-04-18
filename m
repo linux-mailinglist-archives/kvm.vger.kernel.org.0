@@ -2,144 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 917BD504C14
-	for <lists+kvm@lfdr.de>; Mon, 18 Apr 2022 07:00:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BD73504C78
+	for <lists+kvm@lfdr.de>; Mon, 18 Apr 2022 08:10:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233848AbiDRFCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Apr 2022 01:02:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33552 "EHLO
+        id S236713AbiDRGMS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Apr 2022 02:12:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229962AbiDRFCT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Apr 2022 01:02:19 -0400
-Received: from mx0a-002c1b01.pphosted.com (mx0a-002c1b01.pphosted.com [148.163.151.68])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DADDB7F5
-        for <kvm@vger.kernel.org>; Sun, 17 Apr 2022 21:59:40 -0700 (PDT)
-Received: from pps.filterd (m0127838.ppops.net [127.0.0.1])
-        by mx0a-002c1b01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23I4VKJb001307;
-        Sun, 17 Apr 2022 21:59:36 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=message-id : date :
- subject : from : to : cc : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=proofpoint20171006;
- bh=S/HApIc1+Y2bPdD5BcI+IU/pwGlY1tUa9jisu/6oAGM=;
- b=MkRrVQeMuAdybeff0qjvuXksBPBVtQ7D/acQI5vB23DaDX0GDFnn3TSVVM5DqPIs+9d6
- /bZnyj6jm51W/gt6Dvkzlo34/rlfG3Y13TrlH3Jpm5CP/PBhVTEb4hdrkHhhZQpxUldI
- CNFrlfBR66zJyw0/hmounclYTq8K34vRsjyElS/07TnZz+gbL2sSvkoQ7ZUahY7AWJPu
- Aiv7kohFixSqX8U7YGgvblTPjcZ6NQBdUmto3epeqMSfGEUr6qjTMhJwFtpFfZB6s1K2
- G3Ai3RI8VNaONaj18eHgqqeqZINZoxGVwnKP630gkrSxE+o1cFwl5EJqwDWhKsekQFXb lw== 
-Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2103.outbound.protection.outlook.com [104.47.70.103])
-        by mx0a-002c1b01.pphosted.com (PPS) with ESMTPS id 3ffwbxj9ds-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 17 Apr 2022 21:59:36 -0700
+        with ESMTP id S234031AbiDRGMO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Apr 2022 02:12:14 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC59D17AB7
+        for <kvm@vger.kernel.org>; Sun, 17 Apr 2022 23:09:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1650262174; x=1681798174;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=i1hBZ3dNlW6nACUsRP35GnUVk669+XD892u03+dcx+E=;
+  b=mQ/0rvmhtL0LvZB6RA/y30PCTPL3oNAswRA3KzzCKqBWmydilc7edYcQ
+   VGBkidfvKqLETPZTWTZZTXFhmuEWsHWf7PUbW/iGk2q2N9eE1uitvBf1X
+   FD37KalTdGUVL3pJLAct9o6vN6JXyX58VTzcNw9EvZhtsMrbi9nDzpkKQ
+   xslo2cn+VoDjYv6pIJD+/ISm4b8GzpKTKpWEarngAegqWI31Oehop8iBN
+   pWbVs+fxWZEzJysJ4aTVWtn1S6ZeGn2LDZRsUYlmJBiOlbO7gfLICtCd3
+   2jcpUBhmAJVwDz+ZKDXv1uUmBA+zsRFXlIldB/ppu4FrpEAj4/zJR7DlM
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10320"; a="323901392"
+X-IronPort-AV: E=Sophos;i="5.90,267,1643702400"; 
+   d="scan'208";a="323901392"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2022 23:09:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,267,1643702400"; 
+   d="scan'208";a="664990964"
+Received: from orsmsx605.amr.corp.intel.com ([10.22.229.18])
+  by orsmga004.jf.intel.com with ESMTP; 17 Apr 2022 23:09:34 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Sun, 17 Apr 2022 23:09:33 -0700
+Received: from orsmsx606.amr.corp.intel.com (10.22.229.19) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Sun, 17 Apr 2022 23:09:33 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27 via Frontend Transport; Sun, 17 Apr 2022 23:09:33 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.175)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.27; Sun, 17 Apr 2022 23:09:33 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OKE56ZUCOyGyy2HWAvLVQr4g08N3UDU9dBFMMnrjErlcaEKuk+yY3As2rNSTwfg3uGgCd3y7XsaBN2KXQCxcXpXLJEs8IVU1g6wm6sVjaZmnBCbXFvy97VtiUICSF2SE5Hv6ExUEYKpcaux88LdRTK+nbw44OV8iiyo1I5xpebSYSU/VNlm3i/Vp1O4gdu4hlGiXnYzj5lI6B76TV2zPZ3xG0B6+sQHtc0gJV99BgHUvnTuXucxducbr++rGMFRffkquIvVRFMR41Ekbsb89CgrAYfQdHtd76oWD2VodQgRkhKy4fEaKvtGvjxDfAQWjjtF+FaPmRCFCoDIJYdzwNg==
+ b=ExhLCsTp4dR0RrBbBlnwJg8y1MS+M5RAKR580Qe+LKt8YxKwo0UkrRttwr7C5Y9VKIddDFQ7G8FGTvn8xPySlv3VA2azX4Q9uzt9czgZktXOYruFuAKGZ4944wWEsL1GrqQWEpUImRxSuPy/ls8WqmW+oYe9hAQeAH/5Rp4OT/55xU3Yxb39c9VTx6EAOETXw9kZo73FKEw1VBbKqXZ+d11RedDPveoHitL8SCxWJ6lOTzO/zOW1xHzUEmy6dI5YDDV6qE8nCk0IfteURvM00FuBliahKUvva4HgNcpZiT4rVa66hCz5h8rNBuH/nyzya4lB42FGgtzHasm7e5P1sw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=S/HApIc1+Y2bPdD5BcI+IU/pwGlY1tUa9jisu/6oAGM=;
- b=OQVoYAgKU1Dd+bDuvRPiUGSrEz7m/3UE1bBq5aop22gftlt9x7RVABBKDANjsernaeHb3T+/mvrCoVTQ3S7eaptQ19jO7IIMfSztLCtTfjMPXOtTVRpzRFeDeCi7btUBDJ1J0HBZW52MttokfBqCiJWphIqDILZT81VgjCHjREdwxTktZdeDBq0uDBjDuXyImy0Z/HKlZCJSTiAcpJ5pCreSVxnjZPGZj2SdY4qFfZbxKxTx5AhfsBjPay86kvVg9SwXDxsH0K4srLaEBxR3uVuY7qhdd10ruL4AvbwE+gSYEZW2qr9vvqxRoGXidlM6b6uppM7QV/G9xyeOKaexcw==
+ bh=i1hBZ3dNlW6nACUsRP35GnUVk669+XD892u03+dcx+E=;
+ b=MqLc4NqCU/aEPInGRRMx2k6jZEO7K8BNlVWGfELY61mJIQx274YGiPqiyyAarfjID1splazpw/B/4LAmQ1wKy/eOr+C5JVQ+SKVddFPZ3zSATzO9rXxW81BqN2DatRfUGl7sCCQD1CYg/T+4w7nTg/x9Xx/hQ+6F65lqTr6RHYMD0IxHFPIZQrpf2V7CgxGIeXUwOvVFwHO/hkwWmERc2NbdPzgzgKLd4pAa4AmPs5mShjYD5eCP+MeWx6/71o/g0zN1ZGWqwiKY1IAJsLX414j07DY5NsRwuK9a2zKZPMC1LDMfokBPsmC98oef+aszcWiv3hsr+5yITT6R+Jl0zg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from CO6PR02MB7555.namprd02.prod.outlook.com (2603:10b6:303:b3::20)
- by MW2PR02MB3786.namprd02.prod.outlook.com (2603:10b6:907:4::21) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by DM5PR1101MB2346.namprd11.prod.outlook.com (2603:10b6:3:a6::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.25; Mon, 18 Apr
- 2022 04:59:32 +0000
-Received: from CO6PR02MB7555.namprd02.prod.outlook.com
- ([fe80::d9e1:228f:6385:a107]) by CO6PR02MB7555.namprd02.prod.outlook.com
- ([fe80::d9e1:228f:6385:a107%6]) with mapi id 15.20.5164.025; Mon, 18 Apr 2022
- 04:59:32 +0000
-Message-ID: <6c5ee7d1-63bb-a0a7-fb0c-78ffcfd97bc5@nutanix.com>
-Date:   Mon, 18 Apr 2022 10:29:21 +0530
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.8.0
-Subject: Re: [PATCH v3 3/3] KVM: selftests: Add selftests for dirty quota
- throttling
-From:   Shivam Kumar <shivam.kumar1@nutanix.com>
-To:     pbonzini@redhat.com, seanjc@google.com
-Cc:     kvm@vger.kernel.org, Shaju Abraham <shaju.abraham@nutanix.com>,
-        Manish Mishra <manish.mishra@nutanix.com>,
-        Anurag Madnawat <anurag.madnawat@nutanix.com>
-References: <20220306220849.215358-1-shivam.kumar1@nutanix.com>
- <20220306220849.215358-4-shivam.kumar1@nutanix.com>
- <3bd9825e-311f-1d33-08d4-04f3d22f9239@nutanix.com>
-In-Reply-To: <3bd9825e-311f-1d33-08d4-04f3d22f9239@nutanix.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MA1PR01CA0147.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a00:71::17) To CO6PR02MB7555.namprd02.prod.outlook.com
- (2603:10b6:303:b3::20)
+ 2022 06:09:31 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::c4ea:a404:b70b:e54e]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::c4ea:a404:b70b:e54e%8]) with mapi id 15.20.5164.025; Mon, 18 Apr 2022
+ 06:09:30 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Christoph Hellwig" <hch@lst.de>, "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: RE: [PATCH 09/10] kvm/vfio: Remove vfio_group from kvm
+Thread-Topic: [PATCH 09/10] kvm/vfio: Remove vfio_group from kvm
+Thread-Index: AQHYUC/7oxrMq/lk40i2DwOU5MPLw6zwX1UwgAEnfwCAACeJ8IAAFW2AgANM/2A=
+Date:   Mon, 18 Apr 2022 06:09:30 +0000
+Message-ID: <BN9PR11MB5276C1822152AA34717B7A578CF39@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <0-v1-33906a626da1+16b0-vfio_kvm_no_group_jgg@nvidia.com>
+ <9-v1-33906a626da1+16b0-vfio_kvm_no_group_jgg@nvidia.com>
+ <BN9PR11MB5276994F15C8A13C33C600118CEE9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20220415215604.GN2120790@nvidia.com>
+ <BN9PR11MB5276894C5E020B8925BB6C238CF19@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20220416013415.GQ2120790@nvidia.com>
+In-Reply-To: <20220416013415.GQ2120790@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.6.401.20
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: e4fa94d6-4eb3-4217-488a-08da21020089
+x-ms-traffictypediagnostic: DM5PR1101MB2346:EE_
+x-microsoft-antispam-prvs: <DM5PR1101MB2346F08204712B9237EE0E948CF39@DM5PR1101MB2346.namprd11.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 6nk/ir9QiuyDKWsvbZko0DNb19ONpczS39iZFCOy6wV9mRGRgNB1HHJ8fPkGrbzfjppzR5NbqPs9RiOz4Kae9BfYSIVq6iYYcAdLdIjpX9HrIMI3IOOXkYXJrBeu7/HZZyukGDjQsaqPg/ENxPa7wyjhUBeRsasgRWxL1rCwUEnuyLw9hjsb3nO0W5JUg7Mhzk5Jje+O4/oQo7DfD8bWOzjyX60Gj1TjOLP8UfwJXDqVomml9odm3ccZo7sue7OhDuVq1CGRUtcgGxx5bHxCsVpwVWhMA7q/DDdwohhtrUjUhvjPve+WFsX8d8IIcoO+U9U36BnjB0ES2XNnH7sMHGz1MI/LRNibXO7oY5UTcFnnSuATxUlhMjmjuQcbPQcxV22MGhxrpqtqnj+JIHN5TpT24PLz+E0nzi+5Rr5kPZjdDwEDsGe6sAzUcxImIqKjoLf3cV9k397wTiYeUGPwvDT7qOuGDg8AwbJeXrV7+d/E8hmHqnQxda0gAICDAM3GUprqSU9ra/8Ay0SwqYyeMRx0YutClPCSs+HAeeLkKqFddligjnAyqY5byXjcqvJaHoasOcFfmf2Hi2JI3QK+CNgbYZwcClXDljEN9yVKWIm3xxizVi5v6KlBm7s4qO5kCl80on6dCYBoVN2ZGq5w+nSjmRcXA8uaHjWqZnAlKTIfZehrixdRn7kmgvzLI5vQhayUEKqMJzSs5B+oD0T8hQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(4326008)(83380400001)(55016003)(9686003)(33656002)(76116006)(8676002)(66946007)(316002)(6506007)(66476007)(66556008)(186003)(64756008)(71200400001)(66446008)(26005)(86362001)(54906003)(5660300002)(6916009)(2906002)(508600001)(38100700002)(38070700005)(82960400001)(52536014)(8936002)(107886003)(7696005)(122000001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?nk1RyiCLc33+c1HECL3bnzqzs+lLxjM8NzPvHDKnXu3vkiy3/WGtfAKwlonN?=
+ =?us-ascii?Q?q8c+J43njJS0voyDrl4fF3GDcBkN8UaGB8qczBad49W6O4xQpDMxXQuICeba?=
+ =?us-ascii?Q?68aC3w0XMyko9LXW0ZbGyvoT3Vivu+pULELeXqX1jSrMIoJjjxvbeaGGI6E+?=
+ =?us-ascii?Q?Xyupmth13Gga68T3wSc132Eix/adg7fBuNqIdHlvHTGKVWfyeV7bqHpuwxM6?=
+ =?us-ascii?Q?p9wxzhHBI3Wa1O2v4bkud7Zq2qEVDU7dnxANNmE7TvAaSeQrzhp8OrS1eLbx?=
+ =?us-ascii?Q?Xaja3UFOru4CHmmsucfkeskqr0Kuykdngp//2odkonl3irHJap9MGxyVSp9a?=
+ =?us-ascii?Q?IPQG5k4qaZK3GwCjsgmD5+sDWS+SUOlPvirB/b8OZXSOYDv1RZ65l2UNxWLM?=
+ =?us-ascii?Q?B6UCMUZt8p2rYtLnLJfWnm0Xd3FFkuU14wlFHrGHw7zywKhSlNRtfvf/RT+N?=
+ =?us-ascii?Q?BvvITqQQrk7exSZjWwTnIuMjcfNVBomVc2eNgoHrmYpI6bveM+VcypbKAP1c?=
+ =?us-ascii?Q?rjUUTULuwM9DDPdoo4jIDAT0VZ3UGYQAK9xarPcaqhymMT+KlQGw9wWgDoQ3?=
+ =?us-ascii?Q?4b2z803Fsp5X7Mxs1V8unxpWwUa/nQWgp6NndKN5dJHXzkvoOgK8krJKsBNC?=
+ =?us-ascii?Q?a7sKzt86vr5xmdhXkVVbtjsThZcDvVvPPCGs07XJPCua0BjdXaXqMm97REbD?=
+ =?us-ascii?Q?UBgzpbIs3OxO+zMhWapUW/+Uo0IzI2iavFmkygP+eKob55ARLadwFNvSKsWd?=
+ =?us-ascii?Q?pEQ0YzsBt7ESUBI9grQ6beDSEBN2Mu/WIof39lgAjrjTRGtM6AViaRfDBwP0?=
+ =?us-ascii?Q?C8ajbMjOs0V/eWQOThv+FfY+7k0Hz0bniezwmQsnyOHLOiS6YEdMnogcDLmY?=
+ =?us-ascii?Q?/aqcAUySfSDs5II3eyNKDUiQmq/fXthT8siRMkwQQ86uCaHgZ13kCizXecJj?=
+ =?us-ascii?Q?IeLmwfqD5ZZM40CsZRVgnVtM6wZ9pBglP2Afz/08kgCcUHv+1qhgM2QxZFou?=
+ =?us-ascii?Q?14JqCCDzl6UTWxQ0q+URqIOnpNuXfy5U3HnPLiDpSu01q1zTaVNuEgzK/KVt?=
+ =?us-ascii?Q?gMgiocQuIOxVxTC7/smHoHID0IgJ+MWwEs7iQiaKZkMJf6sluP1/f9y2QxfN?=
+ =?us-ascii?Q?I2EgwDnRHNwAf199hD71bvpfWMcFCxhXGXVO9aOeHgnB4nlA9cNIEB562OrX?=
+ =?us-ascii?Q?5rdwWt3uOS5vcVeDP3y8JHFg2KH6e2aiYqKqE0xFvsmdIxHvA+78bJtMRS3L?=
+ =?us-ascii?Q?xQYJ87WWjcJHMrOweSL1iZ8wYgMgVJ4iQafWOotbcxl9b5ZZzwBsQhGDILGV?=
+ =?us-ascii?Q?RM9N0jSb76uvU7sgwwrKKhsCfxF+tuowz0e6PI31vJ3c47OX6T43hHS9mNO2?=
+ =?us-ascii?Q?E+FvHLhPxC1//0ZRkhA27Gl5BtL+PTIqVVtBaLVB/cyu0uJrNdzf7BzA/BY3?=
+ =?us-ascii?Q?E4r55WGwDulyYyKk+iwzM5SB3Deo1W8JuoFTlexEupgH3jdirVO5jhlxsqlv?=
+ =?us-ascii?Q?dhfmgO8HhcOdEDdC3MjmWw9+eGgy9GXFLVtQlaUeDHEFa6YEDckSMte5waKl?=
+ =?us-ascii?Q?JfagK+MTeZnER7tQKLDUeT2XhJ2GHnjY5DRqrMU1H/T7yG0FF7EVT2b/qcy9?=
+ =?us-ascii?Q?czeGqwnOIxscWcG3AomwqeWPGv56/deENWf1hCOe1KfilyKhMvoN8KOcAqR9?=
+ =?us-ascii?Q?kSnpTRG0RIgGu9wvkMBdX6Jr4lddiafmOoDqfd/3Ul/i7p7SbZL29FKijgoQ?=
+ =?us-ascii?Q?Ke/ZPlToRw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 23244a1b-7fbf-4f42-f92f-08da20f839c3
-X-MS-TrafficTypeDiagnostic: MW2PR02MB3786:EE_
-X-Microsoft-Antispam-PRVS: <MW2PR02MB37869B717B7A79F1DCD15520B3F39@MW2PR02MB3786.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YGCp8KYfwBzyQu+jgpYtaDGatkd2Oo50Eh2Q4QFKwcrd7x2lTj/TIctj5DvhGDRFbcciOoSZXB/DnovhgGgFotv1v12R4UoPjzrND+8VIoUCFVWxoOsYqwCeIWd5kre7Wjw7jDa+c5liHGoORLHdQDoKtmBJfE0p1lDxz1akP5WX0eViJxqmLgVfEPawejyd5H9AUH4WJwflz5gugXIz9yIo1gOx02Ne3ch2yldd/PO4rBtqkf3ez42iFfoojtddF/v4dfQTeU8JUwmVqlhdzNq6gYW+nW2Dn8zC4ei3/kzcc0+YI6pnVU+8ZilpM9xPu1+1c3/5XvX8PP/0LlNshmZ0V6vIOjZmt+JquUnLJFGFUpTl38LSaS5ZlG5/RBCd4GqVmAyaBOg4QBN+MfQ12DUcpRP4XyvacmQ2JXDyw3C83CsbrI8bFTe5rgWGb56MQoTGCtwHTVmToPIrgYjKyn9kxCgjrgKdIEwt+9xFs9GnBRbJ5pLiI462b55oiYaGVQJ3nbwfMiFP93vM0FXVOmjbyhsLsxPam4PuwNxkaTnausYBeZKmBfcEOJDtvFM8XKp9vRz0tYQMBX08/2gfVdGgiiYq4a3LlPwf2DSjMwisDksCEuZB1OljemtS1ynNp1ItKVBIkT7eb08nM3wYutPfQxUbD8EUcvffiuOSNxGN7GbCkv5omp6+VxyrFV93OnjqjrBaicGVEObyc2DTqkdaSaNqrJVn7rAaexh1mVFXXCEa3jxlQFoH1Oe2L1DMRzlceHroN3OexIF6ORIVEA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR02MB7555.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(26005)(107886003)(2616005)(6512007)(8936002)(6486002)(186003)(86362001)(83380400001)(15650500001)(6666004)(2906002)(45080400002)(6506007)(55236004)(53546011)(508600001)(31696002)(5660300002)(316002)(4326008)(66556008)(31686004)(66946007)(8676002)(66476007)(38100700002)(36756003)(54906003)(14143004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UHYvakZFZHNwT2djMS9vZndHWUpkLzJ5NVJ3aC9pVDJ1ZktvUkMrYzRQQ2t2?=
- =?utf-8?B?dUhJS2grQTZyODZ3YXd4d05qcHAvYlkwVC9MVkNZK2pGMVJYUjJEZkk4WHVH?=
- =?utf-8?B?c1NFRmNzU3FpeE9OdDZsMVFRWVZLcVlsbHZ2NXVockJIUkJqbUpUWkR5ZEcw?=
- =?utf-8?B?Z1VMcmdIRVNPQUZqVWh2dmtwaHJOdThLOE5MRGR5OXhYZEVyOXcvT2xsR1pv?=
- =?utf-8?B?UWI4WGlmSnlkU0lmSzRwRmN5UHRXL3MvN3lDbWRIUGdldytCUHlGTXVnb1Rr?=
- =?utf-8?B?am5rMWM5TVh3Q3J3dU03NmZTNlM0WHA0cGg0TGoyWHo3MWQwY3ZHK2xsTGFJ?=
- =?utf-8?B?UGpyZXBYMjBaWnJEYVBvTnY2cDZ3SjJwcHBoR0tyK2EwYlpVd0ZaNEhQa1Rq?=
- =?utf-8?B?V3hkaTJtSmJveEJpVjQrc3lPM0JabUdZK2lFem5tMDVRTm51OGEyRnlDeHh5?=
- =?utf-8?B?Zk40ZzZCZVdHU0pmNUUvd2FwanExeERoMGpRcUMzU3NDempSaUxNRnFVWWlp?=
- =?utf-8?B?Y0Nxa2JaSFBEOG1mM2kyTTBwZlE5N0R4RFhJRExGWTlENDVWSkZBek83YVpw?=
- =?utf-8?B?bGRSN3pnamJNNzdsV3IybzYrcE8rbzlPajA2bWZjU0VTazF5M09VR09aZGVm?=
- =?utf-8?B?WGYxWS81bG53VDJaVFpialplS2U0VFpPZXFPdVRkdmRtNXRUSGkxcmNvakVV?=
- =?utf-8?B?ODZabUNHVTVvOWdUNE5tbVdqWTlUbTZIT2Yxd2xna0tuL2NkbnpxNWZldEJt?=
- =?utf-8?B?V3lYQXhXWERRemFoLzJmdWVjU1NJTm1vd3VoLzhRUEFXd2t0ZW5QWU1XamZx?=
- =?utf-8?B?cDJJZ3lOSUx6aGJNU1NNakpja05QYkpHcUViQTFCZERIU1ZmTlkrd0lmR0FY?=
- =?utf-8?B?ajIwOGZURmM3Ly9zUWZqV0tkY1Zyb2FSWTgwSFM5L2E2cFYrYVlSU1R6a3ly?=
- =?utf-8?B?aW51UDhxN0R1MzNlTkora3RzVHVpelFvb1dmbk9NREFJeklpOHJueVlKSzd3?=
- =?utf-8?B?eGwra21DTU5BSElaTkYrZ1NwRmVtaGIwcGc0c0RLdnN6bGpEbmo0YXFvb3Z0?=
- =?utf-8?B?TnE4RkcwQ1kvaHRUdHpWcUxLR1BJNXNkdWtPT0NTUCtLdFhBeEliNGZQRk8r?=
- =?utf-8?B?R3FqOUgwNk9IRWY1VzNxQkFySGFQSVZDeWxHWVlVa3Y3aVRWUVlPNW93aUtJ?=
- =?utf-8?B?NUNGZUt1WUlDWDF2c1Z1UUFRM3RYcWs3RVhweVA1Mi9YRnVadG9TL280cm1H?=
- =?utf-8?B?MFpBUi9KUThXb1ErMWJUUlNqbFBJZWlJSlVoenJKYVdOcDlkeGFOaE92Z3c4?=
- =?utf-8?B?OWprLzkzMWRNRUQ0Ly84dU1OZDF2T2t6MnNhV0J0MlllL2pteTFZdjBMVWV0?=
- =?utf-8?B?OHBMYmIzTG1kckRpZmwzMFUyMWhFMDN0OHNXY1lhMFljZWhkTkhxRGlzT2ho?=
- =?utf-8?B?MXJxSTc3cXFsN2x5dkdVMVQrL3JLYi9sSkp3YVhCYjF5VGpRRmJBSEVMZi9I?=
- =?utf-8?B?b05HVURlaDByVy9wTmVsMWU0NDRjL3RZdWgxTk1MUTJmUDEvRnQyYWtxbEJw?=
- =?utf-8?B?Rnppa3k2WXVyVHgzTmxOUnRBbEMyT3pKTW9FTHNwbmEzZTNaN0FNekdXZHpC?=
- =?utf-8?B?Z2c0VDhmNFhldUU1UCtmaWtJbjFrYTdtb1poQ0tpM0hwZ1c1eTdPRzJ3WFJ3?=
- =?utf-8?B?UER0M2REcmxRcTVTdndSUGNTYldHT3ZQRzBxQ0Vhbmhlcmd1dDUwRUhoQ0lr?=
- =?utf-8?B?RE4vSXhQdEx4TXEzb3BDdDVxaDVkcDJxQUxzMldWcWZYWUJuYTlBeTlRRU1T?=
- =?utf-8?B?Tk5kTllYVXFYSTJxMEdpTHJiRi82T0RoaGRpUXhBaXJqRnp1YTNmcEVHMm1Z?=
- =?utf-8?B?VXpPY3FieWJuTnd5QmhUdE5rVlhlOHNjYUFWUUR5U3Z5QTlvYmdSa3VWbkgz?=
- =?utf-8?B?bzFNeDhOSTVES1NRQ0JGRThNZ2NyOEVVNm80ejRWeWlhRnNDaWczTW42TnI5?=
- =?utf-8?B?Y053aWh5YjZSUDdlcnVDSFBtZUNZTUU4cE5wSDl5eGdRZGNvbGxpUHBKQUxa?=
- =?utf-8?B?QkxwaTdNUnNjSzA1TEdmTnJLQVBGcFc2dXE5azZFVDQ1ZVdLSVZibXBHbnFu?=
- =?utf-8?B?dkNYNW9Qb1E3OG5aR3g1cmlkZnBWRjNkK2RxeDVMbmlZWUdBb20zWFRyanBB?=
- =?utf-8?B?OGU3d0hBd2dxQzdIcnlDazhuZ3R0ZnFpU1JtY3prQVhCS0xHZnJzQVdFSlVX?=
- =?utf-8?B?V3BkUTZXdUVldlhBR0NjN2hrMlphVmp4a1dKSHcrY2p6ajFrWXRRQmc3ello?=
- =?utf-8?B?KzZaWlRhMFViYU8xWU9CcTFlU00yZ1kyb2lSNkhaK3BBL0c4VFVxS3lQU3FW?=
- =?utf-8?Q?02w89R0ciAiguBL8=3D?=
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 23244a1b-7fbf-4f42-f92f-08da20f839c3
-X-MS-Exchange-CrossTenant-AuthSource: CO6PR02MB7555.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2022 04:59:32.3687
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e4fa94d6-4eb3-4217-488a-08da21020089
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Apr 2022 06:09:30.7901
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mhP/gR+7hDRIftD33fG/HGxToKdlSJRr6GrJDKV6W49u4MluWkSKgl7DiXzH031RB4Ol3uq5dXwSPu4g7XKSZeRPt9X35AsYINDnkcARPl0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR02MB3786
-X-Proofpoint-GUID: -Dzlz5E-M39n_u1EOkZFhngzGoP8qwfL
-X-Proofpoint-ORIG-GUID: -Dzlz5E-M39n_u1EOkZFhngzGoP8qwfL
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-18_02,2022-04-15_01,2022-02-23_01
-X-Proofpoint-Spam-Reason: safe
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ePGls5oMKH7nM/LQb2WB33VA4klLf/vwKJKnlG/bCd2UGSLrSjpUcUj4XwxUHp3JSAud/NbnZU77ERiAL1IVlQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1101MB2346
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -148,212 +165,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Saturday, April 16, 2022 9:34 AM
+>=20
+> On Sat, Apr 16, 2022 at 12:42:50AM +0000, Tian, Kevin wrote:
+>=20
+> > Then what about PPC? w/o holding a reference to container is there
+> > any impact on spapr_tce_table which is attached to the group?
+> > I don't know the relationship between this table and vfio container
+> > and whether there is a lifetime dependency in between.
+>=20
+> table seems to have its own FD so it should be refcounted
+> independently and not indirectly rely on the vfio container. It seemed
+> like there was enough protection there..
+>=20
 
-On 18/04/22 10:25 am, Shivam Kumar wrote:
->
-> On 07/03/22 3:38 am, Shivam Kumar wrote:
->> Add selftests for dirty quota throttling with an optional -d parameter
->> to configure by what value dirty quota should be incremented after
->> each dirty quota exit. With very small intervals, a smaller value of
->> dirty quota can ensure that the dirty quota exit code is tested. A zero
->> value disables dirty quota throttling and thus dirty logging, without
->> dirty quota throttling, can be tested.
->>
->> Suggested-by: Shaju Abraham <shaju.abraham@nutanix.com>
->> Suggested-by: Manish Mishra <manish.mishra@nutanix.com>
->> Co-developed-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
->> Signed-off-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
->> Signed-off-by: Shivam Kumar <shivam.kumar1@nutanix.com>
->> ---
->>   tools/testing/selftests/kvm/dirty_log_test.c  | 37 +++++++++++++++++--
->>   .../selftests/kvm/include/kvm_util_base.h     |  4 ++
->>   tools/testing/selftests/kvm/lib/kvm_util.c    | 36 ++++++++++++++++++
->>   3 files changed, 73 insertions(+), 4 deletions(-)
->>
->> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c 
->> b/tools/testing/selftests/kvm/dirty_log_test.c
->> index 3fcd89e195c7..e75d826e21fb 100644
->> --- a/tools/testing/selftests/kvm/dirty_log_test.c
->> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
->> @@ -65,6 +65,8 @@
->>     #define SIG_IPI SIGUSR1
->>   +#define TEST_DIRTY_QUOTA_INCREMENT        8
->> +
->>   /*
->>    * Guest/Host shared variables. Ensure addr_gva2hva() and/or
->>    * sync_global_to/from_guest() are used when accessing from
->> @@ -191,6 +193,7 @@ static enum log_mode_t host_log_mode_option = 
->> LOG_MODE_ALL;
->>   static enum log_mode_t host_log_mode;
->>   static pthread_t vcpu_thread;
->>   static uint32_t test_dirty_ring_count = TEST_DIRTY_RING_COUNT;
->> +static uint64_t test_dirty_quota_increment = 
->> TEST_DIRTY_QUOTA_INCREMENT;
->>     static void vcpu_kick(void)
->>   {
->> @@ -210,6 +213,13 @@ static void sem_wait_until(sem_t *sem)
->>       while (ret == -1 && errno == EINTR);
->>   }
->>   +static void set_dirty_quota(struct kvm_vm *vm, uint64_t dirty_quota)
->> +{
->> +    struct kvm_run *run = vcpu_state(vm, VCPU_ID);
->> +
->> +    vcpu_set_dirty_quota(run, dirty_quota);
->> +}
->> +
->>   static bool clear_log_supported(void)
->>   {
->>       return kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
->> @@ -260,9 +270,13 @@ static void default_after_vcpu_run(struct kvm_vm 
->> *vm, int ret, int err)
->>       TEST_ASSERT(ret == 0 || (ret == -1 && err == EINTR),
->>               "vcpu run failed: errno=%d", err);
->>   -    TEST_ASSERT(get_ucall(vm, VCPU_ID, NULL) == UCALL_SYNC,
->> -            "Invalid guest sync status: exit_reason=%s\n",
->> -            exit_reason_str(run->exit_reason));
->> +    if (test_dirty_quota_increment &&
->> +        run->exit_reason == KVM_EXIT_DIRTY_QUOTA_EXHAUSTED)
->> +        vcpu_handle_dirty_quota_exit(run, test_dirty_quota_increment);
->> +    else
->> +        TEST_ASSERT(get_ucall(vm, VCPU_ID, NULL) == UCALL_SYNC,
->> +            "Invalid guest sync status: exit_reason=%s\n",
->> +            exit_reason_str(run->exit_reason));
->>         vcpu_handle_sync_stop();
->>   }
->> @@ -377,6 +391,9 @@ static void dirty_ring_after_vcpu_run(struct 
->> kvm_vm *vm, int ret, int err)
->>       if (get_ucall(vm, VCPU_ID, NULL) == UCALL_SYNC) {
->>           /* We should allow this to continue */
->>           ;
->> +    } else if (test_dirty_quota_increment &&
->> +        run->exit_reason == KVM_EXIT_DIRTY_QUOTA_EXHAUSTED) {
->> +        vcpu_handle_dirty_quota_exit(run, test_dirty_quota_increment);
->>       } else if (run->exit_reason == KVM_EXIT_DIRTY_RING_FULL ||
->>              (ret == -1 && err == EINTR)) {
->>           /* Update the flag first before pause */
->> @@ -773,6 +790,10 @@ static void run_test(enum vm_guest_mode mode, 
->> void *arg)
->>       sync_global_to_guest(vm, guest_test_virt_mem);
->>       sync_global_to_guest(vm, guest_num_pages);
->>   +    /* Initialise dirty quota */
->> +    if (test_dirty_quota_increment)
->> +        set_dirty_quota(vm, test_dirty_quota_increment);
->> +
->>       /* Start the iterations */
->>       iteration = 1;
->>       sync_global_to_guest(vm, iteration);
->> @@ -814,6 +835,9 @@ static void run_test(enum vm_guest_mode mode, 
->> void *arg)
->>       /* Tell the vcpu thread to quit */
->>       host_quit = true;
->>       log_mode_before_vcpu_join();
->> +    /* Terminate dirty quota throttling */
->> +    if (test_dirty_quota_increment)
->> +        set_dirty_quota(vm, 0);
->>       pthread_join(vcpu_thread, NULL);
->>         pr_info("Total bits checked: dirty (%"PRIu64"), clear 
->> (%"PRIu64"), "
->> @@ -835,6 +859,8 @@ static void help(char *name)
->>       printf(" -c: specify dirty ring size, in number of entries\n");
->>       printf("     (only useful for dirty-ring test; default: 
->> %"PRIu32")\n",
->>              TEST_DIRTY_RING_COUNT);
->> +    printf(" -q: specify incemental dirty quota (default: 
->> %"PRIu32")\n",
->> +           TEST_DIRTY_QUOTA_INCREMENT);
->>       printf(" -i: specify iteration counts (default: %"PRIu64")\n",
->>              TEST_HOST_LOOP_N);
->>       printf(" -I: specify interval in ms (default: %"PRIu64" ms)\n",
->> @@ -863,11 +889,14 @@ int main(int argc, char *argv[])
->>         guest_modes_append_default();
->>   -    while ((opt = getopt(argc, argv, "c:hi:I:p:m:M:")) != -1) {
->> +    while ((opt = getopt(argc, argv, "c:q:hi:I:p:m:M:")) != -1) {
->>           switch (opt) {
->>           case 'c':
->>               test_dirty_ring_count = strtol(optarg, NULL, 10);
->>               break;
->> +        case 'q':
->> +            test_dirty_quota_increment = strtol(optarg, NULL, 10);
->> +            break;
->>           case 'i':
->>               p.iterations = strtol(optarg, NULL, 10);
->>               break;
->> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h 
->> b/tools/testing/selftests/kvm/include/kvm_util_base.h
->> index 4ed6aa049a91..b70732998329 100644
->> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
->> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
->> @@ -395,4 +395,8 @@ int vcpu_get_stats_fd(struct kvm_vm *vm, uint32_t 
->> vcpuid);
->>     uint32_t guest_get_vcpuid(void);
->>   +void vcpu_set_dirty_quota(struct kvm_run *run, uint64_t dirty_quota);
->> +void vcpu_handle_dirty_quota_exit(struct kvm_run *run,
->> +            uint64_t test_dirty_quota_increment);
->> +
->>   #endif /* SELFTEST_KVM_UTIL_BASE_H */
->> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c 
->> b/tools/testing/selftests/kvm/lib/kvm_util.c
->> index d8cf851ab119..fa77558d745e 100644
->> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
->> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
->> @@ -19,6 +19,7 @@
->>   #include <linux/kernel.h>
->>     #define KVM_UTIL_MIN_PFN    2
->> +#define PML_BUFFER_SIZE    512
->>     static int vcpu_mmap_sz(void);
->>   @@ -2286,6 +2287,7 @@ static struct exit_reason {
->>       {KVM_EXIT_X86_RDMSR, "RDMSR"},
->>       {KVM_EXIT_X86_WRMSR, "WRMSR"},
->>       {KVM_EXIT_XEN, "XEN"},
->> +    {KVM_EXIT_DIRTY_QUOTA_EXHAUSTED, "DIRTY_QUOTA_EXHAUSTED"},
->>   #ifdef KVM_EXIT_MEMORY_NOT_PRESENT
->>       {KVM_EXIT_MEMORY_NOT_PRESENT, "MEMORY_NOT_PRESENT"},
->>   #endif
->> @@ -2517,3 +2519,37 @@ int vcpu_get_stats_fd(struct kvm_vm *vm, 
->> uint32_t vcpuid)
->>         return ioctl(vcpu->fd, KVM_GET_STATS_FD, NULL);
->>   }
->> +
->> +void vcpu_set_dirty_quota(struct kvm_run *run, uint64_t dirty_quota)
->> +{
->> +    run->dirty_quota = dirty_quota;
->> +
->> +    if (dirty_quota)
->> +        pr_info("Dirty quota throttling enabled with initial quota 
->> %"PRIu64"\n",
->> +            dirty_quota);
->> +    else
->> +        pr_info("Dirty quota throttling disabled\n");
->> +}
->> +
->> +void vcpu_handle_dirty_quota_exit(struct kvm_run *run,
->> +            uint64_t test_dirty_quota_increment)
->> +{
->> +    uint64_t quota = run->dirty_quota_exit.quota;
->> +    uint64_t count = run->dirty_quota_exit.count;
->> +
->> +    /*
->> +     * Due to PML, number of pages dirtied by the vcpu can exceed 
->> its dirty
->> +     * quota by PML buffer size.
->> +     */
->> +    TEST_ASSERT(count <= quota + PML_BUFFER_SIZE, "Invalid number of 
->> pages
->> +        dirtied: count=%"PRIu64", quota=%"PRIu64"\n", count, quota);
-Sean, I don't think this would be valid anymore because as you 
-mentioned, the vcpu
-can dirty multiple pages in one vmexit. I could use your help here.
->> +
->> +    TEST_ASSERT(count >= quota, "Dirty quota exit happened with 
->> quota yet to
->> +        be exhausted: count=%"PRIu64", quota=%"PRIu64"\n", count, 
->> quota);
->> +
->> +    if (count > quota)
->> +        pr_info("Dirty quota exit with unequal quota and count:
->> +            count=%"PRIu64", quota=%"PRIu64"\n", count, quota);
->> +
->> +    run->dirty_quota = count + test_dirty_quota_increment;
->> +}
-> I'll be grateful if I could get some reviews on this patch. Will help 
-> me move forward. Thanks.
+the table in PPC context refers to a window in the global iova address
+space. From this angle the reference should be torn down when the
+group is detached from the container which represents the address
+space. But given the detach operation also prevents the user from
+accessing the device, having the reference held by KVM for a while
+until KVM_DEV_VFIO_GROUP_DEL is called is probably not harmful.
+
+In any case this is also worth an explanation similar to what you
+did for cache coherency.
+
+Thanks
+Kevin
