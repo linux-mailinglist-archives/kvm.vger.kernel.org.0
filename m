@@ -2,290 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FB67505A40
-	for <lists+kvm@lfdr.de>; Mon, 18 Apr 2022 16:47:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DE63505B08
+	for <lists+kvm@lfdr.de>; Mon, 18 Apr 2022 17:29:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345142AbiDROt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Apr 2022 10:49:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47246 "EHLO
+        id S236012AbiDRPbf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Apr 2022 11:31:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345314AbiDROtA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Apr 2022 10:49:00 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C997527B37;
-        Mon, 18 Apr 2022 06:36:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650288981; x=1681824981;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=8ULkbQDoXZKawL2vxp2JE0iQIBCqxX/7hJVpdFisWAg=;
-  b=KG/ybS6eFdrA+d1pIxY87H4QpVueaJ2K+FxBZjluAEklhDOE8X+NVzCQ
-   iGLJD+YOo4Yyn98FBdxWJ18mH65JaP0FcqKit8W3TiWboxY6m3zWLifMz
-   DT0O4l0f5NT6huEcuTEJ/8BADHgaNLpyv67Wnk0PhwX1YZ0+xi9sHEdfa
-   vpt9nvG6PvVc1sfX2jhe0N6IEOkA8NARciQHtB+kfKD++Vf8ElixquzqU
-   6jQjxZr9PmJ0Yq3xWTTU8RmIHbGXwMRtPr2YrdJ54BUWSuUKQSXhWGEuB
-   jR6L4jxUcEZmGFbfplRVBo0wrflBRBYAqpefBBXcFXIVkYRHMid8QQmyy
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10320"; a="323960696"
-X-IronPort-AV: E=Sophos;i="5.90,269,1643702400"; 
-   d="scan'208";a="323960696"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2022 06:36:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,269,1643702400"; 
-   d="scan'208";a="726643966"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by orsmga005.jf.intel.com with ESMTP; 18 Apr 2022 06:36:19 -0700
-Date:   Mon, 18 Apr 2022 21:36:09 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Add RET_PF_CONTINUE to eliminate bool+int*
- "returns"
-Message-ID: <20220418133609.GA31671@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220415005107.2221672-1-seanjc@google.com>
+        with ESMTP id S242914AbiDRPav (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Apr 2022 11:30:51 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2054.outbound.protection.outlook.com [40.107.93.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEFB23466B;
+        Mon, 18 Apr 2022 07:39:58 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Wtngw/u1NggT0IjVlaqHQeyU+PRH+WQqoSZ9tLNkFVVnEi9j0YhTjTinpgTgbM6+ltas2bBMeWlr0sdJcO6PGp5RcuZGpBasA+m5fX6QbAw+VrnMFAOOMDRADuVopHBDZuRl6c++fSvC10gBWDWNVt0fqkR3y/MkapzXSfjBBy15gWrFk3gjNXmgWpNb06hPbdIl/tKUOlJ/sFV6fLh4WqfxlxQBw5wC/TP9DDR1SeoAEhVglfYHljAf9kXngIS/4rTFJJRPp85PgpTBJ+fS5DwNa+LDKuy0x9bfB8gO0QHVVXx+k+K8/tKsglhLIOi9TpgR8i+1V5XCzJU8aFM+MA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DQehnl0ZrADtmS8+nQkFVZXQ1+gd2p/CIdADWtvZPgc=;
+ b=SUNdrNZK2Fuda0DnK0DgXDpqVxa8Qvw8er2D3NCXwd7G2+l76fURnHsqYuTGK/e/YEAHlnz3VdtV2pCSy6STwIx9ITqgLAvGb8qQeFid5Dr+eg/nKKlD+mhArKcXnLxqNwXn25oqaoXO19hWRAfn90dYYfTWElyHzGTJ4d4N4eWwCg2IoyBv8OlonxsrywOkW5rJ/XEnf7n7EKou53RJfArozetHF4Tr7CGW+ZefG7HhcXgbXynDQGUGQ/B2E7XoAejk/a9ZlG8GQu8CakZ9ujw1z17YxMk39L56YKKIkKcMMvphaH5gAYfwetiyxFTVkl9doIDbTYvTa1Ur+S8y0g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DQehnl0ZrADtmS8+nQkFVZXQ1+gd2p/CIdADWtvZPgc=;
+ b=lrYAUTsCCkCFZYIaDSPm7S4xdGicjLpROIZRZZqdouM8cWYRJhAv6EnRTQ5uuOzyE5tXJwfRNTEIWK8x4aasGyV0Xfn6aw6EL7kC8i9d4H1xch4iG+UzxW7KjdcjKtXnwr0IORJw57vw/PSVBKCr7ZlhQeUcE9w6+6kv4Cnmy34=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) by
+ BYAPR12MB2888.namprd12.prod.outlook.com (2603:10b6:a03:137::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.20; Mon, 18 Apr
+ 2022 14:39:53 +0000
+Received: from DM8PR12MB5445.namprd12.prod.outlook.com
+ ([fe80::9894:c8:c612:ba6b]) by DM8PR12MB5445.namprd12.prod.outlook.com
+ ([fe80::9894:c8:c612:ba6b%4]) with mapi id 15.20.5164.025; Mon, 18 Apr 2022
+ 14:39:53 +0000
+Message-ID: <81bb5fd1-2241-3ea4-dd52-a1eaa2101997@amd.com>
+Date:   Mon, 18 Apr 2022 21:39:29 +0700
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.8.0
+Subject: Re: [PATCH 0/2] KVM: SVM: Optimize AVIC incomplete IPI #vmexit
+ handling
+Content-Language: en-US
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, mlevitsk@redhat.com, seanjc@google.com,
+        joro@8bytes.org, jon.grimm@amd.com, wei.huang2@amd.com,
+        terry.bowman@amd.com
+References: <20220414051151.77710-1-suravee.suthikulpanit@amd.com>
+From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+In-Reply-To: <20220414051151.77710-1-suravee.suthikulpanit@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: HK2PR03CA0049.apcprd03.prod.outlook.com
+ (2603:1096:202:17::19) To DM8PR12MB5445.namprd12.prod.outlook.com
+ (2603:10b6:8:24::7)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220415005107.2221672-1-seanjc@google.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f08156e9-f2ca-4424-cede-08da21494cd2
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2888:EE_
+X-Microsoft-Antispam-PRVS: <BYAPR12MB2888341F2DBBC8ADE5E6C22EF3F39@BYAPR12MB2888.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9FtqS5W773m1+Zox97LilUftz/vllcyvgEnnQwin5gMRCG/r+8MtsWQmeK/feAQSSonCIyIyZUhLoxJV/DspmLsYB8P2DY7tGi3DULCSEc1RbtlOT3Q2YwIcJxwC0UV7Gj7T60NX5WH6GQV66DpreZOYxFPzfrspfZ8anJUM91yQwz1QFmzR4F/wMnRp9aK1o6pidetwMbTP7Y52eOjuW6ffp6ZmLieEVrR9JjzjGEYU7Y+I3ShxqoectbMVYi+bFd5Fvl9KgJRJmy679Dm9p/NaERAnTATuBVLeeNU6xx0DPgoaSlfdUXbcF4EFxoI+2YaM29OE51LAin1aZiOiMgiP/536PCbRav12+3emdXmmwu5ceq9AVLgi4iT7DrIl0rmMvQ9bGHZ+/EPauQtmYiTg+f9Yb+4NkcsssukE7+/dzyrKLLo8RlpF0YL8RphTKe7r3m4XdJ3wa71tEO+Z8R8Vjv7NYcIPk3B+AvnybWq60hEbf5KGc3aiLDlyEEPdIz/khSc3hTF/+SRgNvkP3doW++cjf0q8yBIir6ZqAj0c6rOJC4BQ9RjcGSjD5weH0Q63W9eTn1OJOzQH8CUB1xusbvmqWyUju969N0fY5q2wCDcpnAKQwsNsqXAPzUTUDPGHirf7Cy1+Ms8kvetSlov+HzSg2bKu+rPsIF9J2erQCxU1EToK757Ie7kn35pnqMcBDDQ5lNi+/Ea8dPzHlC8ik/EFQ28bD28koDSmRvUAIDpnIaTq46CnUCPcx25r3K6nhv3dsz/IQnnl39pBdIO3ZpA5TFtxFxzChHiZ4fzmPFy2ZkoFlcBIv2dK49yd
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6506007)(38100700002)(26005)(6512007)(31686004)(66556008)(66476007)(66946007)(508600001)(6486002)(8676002)(86362001)(36756003)(4326008)(2906002)(6666004)(4744005)(53546011)(44832011)(8936002)(5660300002)(316002)(2616005)(186003)(31696002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dWpyR0JDWCtUTlNDa1Z5SFRSTnQxT3pTaUhOMjd5Rk1qM2R0c0Z2L3R4UEZp?=
+ =?utf-8?B?bUhxTHlpNjFvc3N4OGhsQm5TWTB4a1BlYm5XVUU3Y2xZMnk4VGdEakEvVy9z?=
+ =?utf-8?B?VmM0UUo0UlBJKzlQMThjeFdNWEowZjJtTm95R2R5OWRVTnNiYm43QWVZQzRj?=
+ =?utf-8?B?dG5oOEp2eElSUW5meWduZnFHc2liRlZZdzlQL2F1b0ZheVorazMwbFRlVkZS?=
+ =?utf-8?B?R0tDU25VblIrbVdBdzBCbElYa09GdlEvaWlFZHdmN0k0b05IVjhweUFvaFlp?=
+ =?utf-8?B?MER2WFR3ZTBpZW9lVERGVzl2QWRaODlhTGZvWm1xTURFME1OOGJCd1FqQXIw?=
+ =?utf-8?B?S1oxWDcvcjBRNzVpblM1TXV3UlZaZS9aQklaUExOajNUS1hIWi9GamdoeFQw?=
+ =?utf-8?B?OXZ4anVjUHNEdGg3TlVPWVl5eWlza1IyT3FZZlIzU2ExWERzWjRIenlyN3hs?=
+ =?utf-8?B?UHRWMHErTWpwbENDZ0lPc3VhaDNoQ0NlMXAwS2ZESzVZV09nd0VZbEJ0QVFr?=
+ =?utf-8?B?a2RIb3dHOUNDR085a2FDSTdGWkM4SjdOenY5TnZJRjRFTkZxaVBYUjNVYTVW?=
+ =?utf-8?B?NG1FaTdPc0pROXNJV2ZjR2NwTk5JZFd5UGp0YmRja21kcnVTRmQ2S0dpREtn?=
+ =?utf-8?B?VEVrYlNlaEZGVDZ5cko0ZDhoTE8vWC9pOTMxVlFsdXgwUGdCWkpHTDRWeGwv?=
+ =?utf-8?B?aGNQSndoQnlPRWRUWWJpMFpvS3kyNkpOYTlTOVA3cEtWOXpRNXh2R0dLVEVz?=
+ =?utf-8?B?bWdtcVEwQjJ5cllUMTg5U3IzTmNxQncwRGdMR0N3c2ZmbEZUTUV3eGUrcmhZ?=
+ =?utf-8?B?M2pMek4xWG5oc0IxUXYwUVBsdUJxL2VGaFJGTjhWY2ZOckd4SW1hRTZmYlEx?=
+ =?utf-8?B?eDR4VVM0a1VMLzR2dVpvTWtTNUwxRm5KaWpvbXhWZ1lsTXFWYlpOa21UeU5x?=
+ =?utf-8?B?TWUvZitVQ3lTalI0a0lpN3VsbFBxQXFGbFpvbDFqbTAwaVcwdExidDRhcERS?=
+ =?utf-8?B?VjRtTHpNNjlMRlV5WkNQQ3dvR2dSSzZ1cGtTYVp3dWFpOUg5TXhkYXk0bk9z?=
+ =?utf-8?B?MlVEaGUxWmc2Z2c5Z2xPWWc1RFN3ZFJsSGRoUm9LSlkyNVpacmhqK0EzVVBy?=
+ =?utf-8?B?VjFWZWlGRkxiUUF3K3l3Z1UrNFE0dU5TRUxWc0Qzbmx0azhhbk1LZmZOSndk?=
+ =?utf-8?B?VGtrdUl3WkQ0d2VZeDFnRWVJT3o4YXJuWHVHSnMvcmNXSmFnbVZ6dWVPdUwz?=
+ =?utf-8?B?bklvNzVxREtQTmJPQ01sNXZ6dHRSTnErMlljcXljNFdtdVBBOXFZS0pWbms0?=
+ =?utf-8?B?WGRZNGg2M2lycHRIckYvZXNvM3ZreGFWeEVEZTF1WWp0bk8xeWxMSVNJOUZV?=
+ =?utf-8?B?Z2luQ1J5V1FZVkVWYUZXMjcrTlRWd2JYUEJwZVpkcE9nZEtQQ1BTZDkyM2Vz?=
+ =?utf-8?B?dmcxU1Z0Z296V3ZLL2plNk13TDFpVCtTODBvdGhxR0c4MmFtUExHUWo3a2RB?=
+ =?utf-8?B?NlBaZTh4MTZ5MjBzSlRESGJhWVJxSnQ0YjJWbzZpRThLVHgvRmlGc0pNSHEw?=
+ =?utf-8?B?WVkzdnFGeWVXZFNYVkw5U2doNCs4d2NwZVNtMlYxN0xlb3lpSHVXbHg2SzFw?=
+ =?utf-8?B?dTh6eW9EdnlXVmZnSTIzMy95c2xRZW8rV3hDWHVJeUZ5ZnVVdjNVa0ZKdjdK?=
+ =?utf-8?B?eGNTSGRqZmlVN3k1RkFqQ3k5bm5BU3NDWWJXYmxSKzJQNlZ6czJDN2lLWHFh?=
+ =?utf-8?B?cy8yVS9JNGlzSFo3VXpBVzAvUWVTM2lPVk41UitPZXlVTkQ1R3M1VUNMeUEz?=
+ =?utf-8?B?eHlNR2p0TWIwRktvNlZWME9TL3RES1l0M283UEhTd3VxcCtjY3FaZ1FwbDJJ?=
+ =?utf-8?B?WUtNaktGVWZOdHVVd3daUVRncXgwUFphVmlUOEZSL0dYUDVndGxRdmVVR3FO?=
+ =?utf-8?B?VFhId3ZFRDlYMTZFdm4rMjQzMmR3anEzZ3RGcUE1d0kramhqLzNYbFpTRVhQ?=
+ =?utf-8?B?Z0tCZFF5dFd2ZXA1RlRZcmVPMmVGanZEdFR0ZHBmMnZ4dHFtRFMyZlF5bEgz?=
+ =?utf-8?B?K0N1OUpId0FPMGQrb0UxaElBazYvaW1taXB4SUV6MmE1cUkvSURjYlVyYm9a?=
+ =?utf-8?B?YWU2dDg3Vk5zdVVwMmNieVRnNVdvb3JGSFpIQUgreXJ5bEJhWis0VWVXN1Jt?=
+ =?utf-8?B?dWVYWEhSdEQ5K1E4bHpmelprOHFxRzJZUmpyWUVNb1A3bDc5TzR3MzJ6MEFN?=
+ =?utf-8?B?emVmNDFQekRLYzRmOGxvRWJsOFV0MERObFljU1p6cFlvcTBvT081VlNreDBV?=
+ =?utf-8?B?RGd0WVdYQXlZRFZTemJha2ppbExtZzRIUklWY0FJaU5iRWc0VEVwQT09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f08156e9-f2ca-4424-cede-08da21494cd2
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR12MB5445.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2022 14:39:53.5133
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: pt59/87JGNgpjwXzYQ5xNU19buI7qO8kMK+wDzjJC2sofqFKdaqAAZMMtgFHbcX7PDL2leuBPotA1ZSLLIXmZg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB2888
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 15, 2022 at 12:51:07AM +0000, Sean Christopherson wrote:
-> Add RET_PF_CONTINUE and use it in handle_abnormal_pfn() and
-> kvm_faultin_pfn() to signal that the page fault handler should continue
-> doing its thing.  Aside from being gross and inefficient, using a boolean
-> return to signal continue vs. stop makes it extremely difficult to add
-> more helpers and/or move existing code to a helper.
-> 
-> E.g. hypothetically, if nested MMUs were to gain a separate page fault
-> handler in the future, everything up to the "is self-modifying PTE" check
-> can be shared by all shadow MMUs, but communicating up the stack whether
-> to continue on or stop becomes a nightmare.
-> 
-> More concretely, proposed support for private guest memory ran into a
-> similar issue, where it'll be forced to forego a helper in order to yield
-> sane code: https://lore.kernel.org/all/YkJbxiL%2FAz7olWlq@google.com.
 
-Thanks for cooking this patch, it makes private memory patch much
-easier.
 
+On 4/14/22 12:11 PM, Suravee Suthikulpanit wrote:
+> This series introduce a fast-path when handling AVIC incomplete IPI #vmexit
+> for AVIC and x2AVIC, and introduce a new tracepoint for the slow-path
+> processing.
 > 
-> No functional change intended.
+> Please note that the prereq of this series is:
+>    [PATCH v2 00/12] Introducing AMD x2APIC Virtualization (x2AVIC) support
+>    (https://lore.kernel.org/lkml/20220412115822.14351-2-suravee.suthikulpanit@amd.com/T/)
 > 
-> Cc: David Matlack <dmatlack@google.com>
-> Cc: Chao Peng <chao.p.peng@linux.intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c          | 51 ++++++++++++++-------------------
->  arch/x86/kvm/mmu/mmu_internal.h |  9 +++++-
->  arch/x86/kvm/mmu/paging_tmpl.h  |  6 ++--
->  3 files changed, 34 insertions(+), 32 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 69a30d6d1e2b..cb2982c6b513 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2972,14 +2972,12 @@ static int kvm_handle_bad_page(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
->  	return -EFAULT;
->  }
->  
-> -static bool handle_abnormal_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
-> -				unsigned int access, int *ret_val)
-> +static int handle_abnormal_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
-> +			       unsigned int access)
->  {
->  	/* The pfn is invalid, report the error! */
-> -	if (unlikely(is_error_pfn(fault->pfn))) {
-> -		*ret_val = kvm_handle_bad_page(vcpu, fault->gfn, fault->pfn);
-> -		return true;
-> -	}
-> +	if (unlikely(is_error_pfn(fault->pfn)))
-> +		return kvm_handle_bad_page(vcpu, fault->gfn, fault->pfn);
->  
->  	if (unlikely(!fault->slot)) {
->  		gva_t gva = fault->is_tdp ? 0 : fault->addr;
-> @@ -2991,13 +2989,11 @@ static bool handle_abnormal_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
->  		 * touching the shadow page tables as attempting to install an
->  		 * MMIO SPTE will just be an expensive nop.
->  		 */
-> -		if (unlikely(!shadow_mmio_value)) {
-> -			*ret_val = RET_PF_EMULATE;
-> -			return true;
-> -		}
-> +		if (unlikely(!shadow_mmio_value))
-> +			return RET_PF_EMULATE;
->  	}
->  
-> -	return false;
-> +	return RET_PF_CONTINUE;
->  }
->  
->  static bool page_fault_can_be_fast(struct kvm_page_fault *fault)
-> @@ -3888,7 +3884,7 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  				  kvm_vcpu_gfn_to_hva(vcpu, gfn), &arch);
->  }
->  
-> -static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault, int *r)
-> +static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->  {
->  	struct kvm_memory_slot *slot = fault->slot;
->  	bool async;
-> @@ -3899,7 +3895,7 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
->  	 * be zapped before KVM inserts a new MMIO SPTE for the gfn.
->  	 */
->  	if (slot && (slot->flags & KVM_MEMSLOT_INVALID))
-> -		goto out_retry;
-> +		return RET_PF_RETRY;
->  
->  	if (!kvm_is_visible_memslot(slot)) {
->  		/* Don't expose private memslots to L2. */
-> @@ -3907,7 +3903,7 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
->  			fault->slot = NULL;
->  			fault->pfn = KVM_PFN_NOSLOT;
->  			fault->map_writable = false;
-> -			return false;
-> +			return RET_PF_CONTINUE;
->  		}
->  		/*
->  		 * If the APIC access page exists but is disabled, go directly
-> @@ -3916,10 +3912,8 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
->  		 * when the AVIC is re-enabled.
->  		 */
->  		if (slot && slot->id == APIC_ACCESS_PAGE_PRIVATE_MEMSLOT &&
-> -		    !kvm_apicv_activated(vcpu->kvm)) {
-> -			*r = RET_PF_EMULATE;
-> -			return true;
-> -		}
-> +		    !kvm_apicv_activated(vcpu->kvm))
-> +			return RET_PF_EMULATE;
->  	}
->  
->  	async = false;
-> @@ -3927,26 +3921,23 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
->  					  fault->write, &fault->map_writable,
->  					  &fault->hva);
->  	if (!async)
-> -		return false; /* *pfn has correct page already */
-> +		return RET_PF_CONTINUE; /* *pfn has correct page already */
->  
->  	if (!fault->prefetch && kvm_can_do_async_pf(vcpu)) {
->  		trace_kvm_try_async_get_page(fault->addr, fault->gfn);
->  		if (kvm_find_async_pf_gfn(vcpu, fault->gfn)) {
->  			trace_kvm_async_pf_doublefault(fault->addr, fault->gfn);
->  			kvm_make_request(KVM_REQ_APF_HALT, vcpu);
-> -			goto out_retry;
-> -		} else if (kvm_arch_setup_async_pf(vcpu, fault->addr, fault->gfn))
-> -			goto out_retry;
-> +			return RET_PF_RETRY;
-> +		} else if (kvm_arch_setup_async_pf(vcpu, fault->addr, fault->gfn)) {
-> +			return RET_PF_RETRY;
-> +		}
->  	}
->  
->  	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, NULL,
->  					  fault->write, &fault->map_writable,
->  					  &fault->hva);
-> -	return false;
-> -
-> -out_retry:
-> -	*r = RET_PF_RETRY;
-> -	return true;
-> +	return RET_PF_CONTINUE;
->  }
->  
->  /*
-> @@ -4001,10 +3992,12 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
->  	smp_rmb();
->  
-> -	if (kvm_faultin_pfn(vcpu, fault, &r))
-> +	r = kvm_faultin_pfn(vcpu, fault);
-> +	if (r != RET_PF_CONTINUE)
->  		return r;
->  
-> -	if (handle_abnormal_pfn(vcpu, fault, ACC_ALL, &r))
-> +	r = handle_abnormal_pfn(vcpu, fault, ACC_ALL);
-> +	if (r != RET_PF_CONTINUE)
->  		return r;
->  
->  	r = RET_PF_RETRY;
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index 1bff453f7cbe..c0e502b17ef7 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -143,6 +143,7 @@ unsigned int pte_list_count(struct kvm_rmap_head *rmap_head);
->  /*
->   * Return values of handle_mmio_page_fault, mmu.page_fault, and fast_page_fault().
->   *
-> + * RET_PF_CONTINUE: So far, so good, keep handling the page fault.
->   * RET_PF_RETRY: let CPU fault again on the address.
->   * RET_PF_EMULATE: mmio page fault, emulate the instruction directly.
->   * RET_PF_INVALID: the spte is invalid, let the real page fault path update it.
-> @@ -151,9 +152,15 @@ unsigned int pte_list_count(struct kvm_rmap_head *rmap_head);
->   *
->   * Any names added to this enum should be exported to userspace for use in
->   * tracepoints via TRACE_DEFINE_ENUM() in mmutrace.h
-> + *
-> + * Note, all values must be greater than or equal to zero so as not to encroach
-> + * on -errno return values.  Somewhat arbitrarily use '0' for CONTINUE, which
-> + * will allow for efficient machine code when checking for CONTINUE, e.g.
-> + * "TEST %rax, %rax, JNZ", as all "stop!" values are non-zero.
->   */
->  enum {
-> -	RET_PF_RETRY = 0,
-> +	RET_PF_CONTINUE = 0,
-> +	RET_PF_RETRY,
->  	RET_PF_EMULATE,
->  	RET_PF_INVALID,
->  	RET_PF_FIXED,
 
-Unrelated to this patch but related to private memory patch, when
-implicit conversion happens, I'm thinking which return value I should
-use. Current -1 does not make much sense since it causes KVM_RUN
-returns an error while it's expected to be 0. None of the above
-including RET_PF_CONTINUE seems appropriate. Maybe we should go further
-to introduce another RET_PF_USER indicating we should exit to
-userspace for handling with a return value of 0 instead of -error in
-kvm_mmu_page_fault().
+Since x2AVIC stuff is still under development, and likely will need v3,
+I will extract the logic for x2AVIC, and send out V2 of this series.
+The support for x2AVIC will be send separately.
 
-Thanks,
-Chao
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index 66f1acf153c4..7038273d04ab 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -838,10 +838,12 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
->  	smp_rmb();
->  
-> -	if (kvm_faultin_pfn(vcpu, fault, &r))
-> +	r = kvm_faultin_pfn(vcpu, fault);
-> +	if (r != RET_PF_CONTINUE)
->  		return r;
->  
-> -	if (handle_abnormal_pfn(vcpu, fault, walker.pte_access, &r))
-> +	r = handle_abnormal_pfn(vcpu, fault, walker.pte_access);
-> +	if (r != RET_PF_CONTINUE)
->  		return r;
->  
->  	/*
-> 
-> base-commit: 150866cd0ec871c765181d145aa0912628289c8a
-> -- 
-> 2.36.0.rc0.470.gd361397f0d-goog
+Regards,
+Suravee
