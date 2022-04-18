@@ -2,126 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DE63505B08
-	for <lists+kvm@lfdr.de>; Mon, 18 Apr 2022 17:29:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E0E8505BBE
+	for <lists+kvm@lfdr.de>; Mon, 18 Apr 2022 17:45:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236012AbiDRPbf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Apr 2022 11:31:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37408 "EHLO
+        id S1345698AbiDRPs3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Apr 2022 11:48:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242914AbiDRPav (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Apr 2022 11:30:51 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2054.outbound.protection.outlook.com [40.107.93.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEFB23466B;
-        Mon, 18 Apr 2022 07:39:58 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Wtngw/u1NggT0IjVlaqHQeyU+PRH+WQqoSZ9tLNkFVVnEi9j0YhTjTinpgTgbM6+ltas2bBMeWlr0sdJcO6PGp5RcuZGpBasA+m5fX6QbAw+VrnMFAOOMDRADuVopHBDZuRl6c++fSvC10gBWDWNVt0fqkR3y/MkapzXSfjBBy15gWrFk3gjNXmgWpNb06hPbdIl/tKUOlJ/sFV6fLh4WqfxlxQBw5wC/TP9DDR1SeoAEhVglfYHljAf9kXngIS/4rTFJJRPp85PgpTBJ+fS5DwNa+LDKuy0x9bfB8gO0QHVVXx+k+K8/tKsglhLIOi9TpgR8i+1V5XCzJU8aFM+MA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DQehnl0ZrADtmS8+nQkFVZXQ1+gd2p/CIdADWtvZPgc=;
- b=SUNdrNZK2Fuda0DnK0DgXDpqVxa8Qvw8er2D3NCXwd7G2+l76fURnHsqYuTGK/e/YEAHlnz3VdtV2pCSy6STwIx9ITqgLAvGb8qQeFid5Dr+eg/nKKlD+mhArKcXnLxqNwXn25oqaoXO19hWRAfn90dYYfTWElyHzGTJ4d4N4eWwCg2IoyBv8OlonxsrywOkW5rJ/XEnf7n7EKou53RJfArozetHF4Tr7CGW+ZefG7HhcXgbXynDQGUGQ/B2E7XoAejk/a9ZlG8GQu8CakZ9ujw1z17YxMk39L56YKKIkKcMMvphaH5gAYfwetiyxFTVkl9doIDbTYvTa1Ur+S8y0g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DQehnl0ZrADtmS8+nQkFVZXQ1+gd2p/CIdADWtvZPgc=;
- b=lrYAUTsCCkCFZYIaDSPm7S4xdGicjLpROIZRZZqdouM8cWYRJhAv6EnRTQ5uuOzyE5tXJwfRNTEIWK8x4aasGyV0Xfn6aw6EL7kC8i9d4H1xch4iG+UzxW7KjdcjKtXnwr0IORJw57vw/PSVBKCr7ZlhQeUcE9w6+6kv4Cnmy34=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) by
- BYAPR12MB2888.namprd12.prod.outlook.com (2603:10b6:a03:137::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.20; Mon, 18 Apr
- 2022 14:39:53 +0000
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::9894:c8:c612:ba6b]) by DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::9894:c8:c612:ba6b%4]) with mapi id 15.20.5164.025; Mon, 18 Apr 2022
- 14:39:53 +0000
-Message-ID: <81bb5fd1-2241-3ea4-dd52-a1eaa2101997@amd.com>
-Date:   Mon, 18 Apr 2022 21:39:29 +0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.8.0
-Subject: Re: [PATCH 0/2] KVM: SVM: Optimize AVIC incomplete IPI #vmexit
- handling
-Content-Language: en-US
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, mlevitsk@redhat.com, seanjc@google.com,
-        joro@8bytes.org, jon.grimm@amd.com, wei.huang2@amd.com,
-        terry.bowman@amd.com
-References: <20220414051151.77710-1-suravee.suthikulpanit@amd.com>
-From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-In-Reply-To: <20220414051151.77710-1-suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: HK2PR03CA0049.apcprd03.prod.outlook.com
- (2603:1096:202:17::19) To DM8PR12MB5445.namprd12.prod.outlook.com
- (2603:10b6:8:24::7)
+        with ESMTP id S1345846AbiDRPrc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Apr 2022 11:47:32 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AC9C2C118
+        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 08:14:56 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id n18so12582022plg.5
+        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 08:14:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=B53fka1F3qxqQdxFr9SFgaJ7tbAOPZYraoihVoIiog0=;
+        b=lU9I3+KSYNMyQdy1jahGZNiQONptfa7XVZSpq6ccWkud1YanLo2MnxmbwjUu7xPtey
+         sHES3gLFWy29nz2uKm1FgqIPzRQmMbFp3uxQJ561Dt5+4dKfsIDdpeuKGt4WsnPGDNVq
+         hngDN2TI+UKJNGqI6zICbKSEO1ctCKiiz0bnNV5+pfPDHD5wBObw7CDLG+4xbMR7QUTn
+         elDurf84ml/MAFJIwJvg8NBA1JJTcWIJM/oyd69nwXUep2ju6DvdlFTFdShz9FfbWKrw
+         Ki4oyYGKQb0RD+lY8U+istt85FQ7tI/7ji7RoyLzxyMXBScOD03syEolLZx2Kpw4fLOU
+         aR6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=B53fka1F3qxqQdxFr9SFgaJ7tbAOPZYraoihVoIiog0=;
+        b=oLvP26HQU92/QfeJufC27gp51sX9WlnZkeft4sbz5ps/nR/ARfWGgvC8Ad52PHAv/t
+         omCdriWi6oanTkb+XnafUYt9xGW12UoTcMoYZe4dhwZkeL/EDhMBlvi3aFw7j+dxA4Sd
+         efuRq/sg8pL1dgHQGoihxDMRdSuuT7v4DfvxKlhsJB1/26cbDniaexqSJzS7qEMR42Nn
+         VxK5jC00bBj+7kRvlwom55Te7iKF05TPSl8KcPH4+A1IFxt9lv0di/C6U8Ei/cZ3VETm
+         Fm2XgcxDNsAqzc3fTPSHPXlZU6zGkz/MK6WyNsrI5bG4EXhkSpAjmj23sauP88+fhuFK
+         g7DA==
+X-Gm-Message-State: AOAM530xhlAS+xA1nLmyv3dGxhjMkZMqwveYVLgTlMoVmVZHZteQvsqJ
+        5TPLIeM2npgkg+YfAGDzBaqZDQ==
+X-Google-Smtp-Source: ABdhPJwZ8N3FhPhpLHRas8PFdxxK3sGwC8rzRSRTSNYXeIDF8PM79p7kg+Plnw1pNvxBpvGU6f28ig==
+X-Received: by 2002:a17:902:9b87:b0:156:bf3e:9ab5 with SMTP id y7-20020a1709029b8700b00156bf3e9ab5mr11225355plp.119.1650294895863;
+        Mon, 18 Apr 2022 08:14:55 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id j24-20020aa78d18000000b0050564584660sm12482867pfe.32.2022.04.18.08.14.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Apr 2022 08:14:55 -0700 (PDT)
+Date:   Mon, 18 Apr 2022 15:14:51 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     Zeng Guang <guang.zeng@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>
+Subject: Re: [PATCH v8 9/9] KVM: VMX: enable IPI virtualization
+Message-ID: <Yl2AaxXFh7UfvpFx@google.com>
+References: <20220411090447.5928-1-guang.zeng@intel.com>
+ <20220411090447.5928-10-guang.zeng@intel.com>
+ <YlmOUtXgIdQcUTO1@google.com>
+ <20220418092500.GA14409@gao-cwp>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f08156e9-f2ca-4424-cede-08da21494cd2
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2888:EE_
-X-Microsoft-Antispam-PRVS: <BYAPR12MB2888341F2DBBC8ADE5E6C22EF3F39@BYAPR12MB2888.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 9FtqS5W773m1+Zox97LilUftz/vllcyvgEnnQwin5gMRCG/r+8MtsWQmeK/feAQSSonCIyIyZUhLoxJV/DspmLsYB8P2DY7tGi3DULCSEc1RbtlOT3Q2YwIcJxwC0UV7Gj7T60NX5WH6GQV66DpreZOYxFPzfrspfZ8anJUM91yQwz1QFmzR4F/wMnRp9aK1o6pidetwMbTP7Y52eOjuW6ffp6ZmLieEVrR9JjzjGEYU7Y+I3ShxqoectbMVYi+bFd5Fvl9KgJRJmy679Dm9p/NaERAnTATuBVLeeNU6xx0DPgoaSlfdUXbcF4EFxoI+2YaM29OE51LAin1aZiOiMgiP/536PCbRav12+3emdXmmwu5ceq9AVLgi4iT7DrIl0rmMvQ9bGHZ+/EPauQtmYiTg+f9Yb+4NkcsssukE7+/dzyrKLLo8RlpF0YL8RphTKe7r3m4XdJ3wa71tEO+Z8R8Vjv7NYcIPk3B+AvnybWq60hEbf5KGc3aiLDlyEEPdIz/khSc3hTF/+SRgNvkP3doW++cjf0q8yBIir6ZqAj0c6rOJC4BQ9RjcGSjD5weH0Q63W9eTn1OJOzQH8CUB1xusbvmqWyUju969N0fY5q2wCDcpnAKQwsNsqXAPzUTUDPGHirf7Cy1+Ms8kvetSlov+HzSg2bKu+rPsIF9J2erQCxU1EToK757Ie7kn35pnqMcBDDQ5lNi+/Ea8dPzHlC8ik/EFQ28bD28koDSmRvUAIDpnIaTq46CnUCPcx25r3K6nhv3dsz/IQnnl39pBdIO3ZpA5TFtxFxzChHiZ4fzmPFy2ZkoFlcBIv2dK49yd
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6506007)(38100700002)(26005)(6512007)(31686004)(66556008)(66476007)(66946007)(508600001)(6486002)(8676002)(86362001)(36756003)(4326008)(2906002)(6666004)(4744005)(53546011)(44832011)(8936002)(5660300002)(316002)(2616005)(186003)(31696002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dWpyR0JDWCtUTlNDa1Z5SFRSTnQxT3pTaUhOMjd5Rk1qM2R0c0Z2L3R4UEZp?=
- =?utf-8?B?bUhxTHlpNjFvc3N4OGhsQm5TWTB4a1BlYm5XVUU3Y2xZMnk4VGdEakEvVy9z?=
- =?utf-8?B?VmM0UUo0UlBJKzlQMThjeFdNWEowZjJtTm95R2R5OWRVTnNiYm43QWVZQzRj?=
- =?utf-8?B?dG5oOEp2eElSUW5meWduZnFHc2liRlZZdzlQL2F1b0ZheVorazMwbFRlVkZS?=
- =?utf-8?B?R0tDU25VblIrbVdBdzBCbElYa09GdlEvaWlFZHdmN0k0b05IVjhweUFvaFlp?=
- =?utf-8?B?MER2WFR3ZTBpZW9lVERGVzl2QWRaODlhTGZvWm1xTURFME1OOGJCd1FqQXIw?=
- =?utf-8?B?S1oxWDcvcjBRNzVpblM1TXV3UlZaZS9aQklaUExOajNUS1hIWi9GamdoeFQw?=
- =?utf-8?B?OXZ4anVjUHNEdGg3TlVPWVl5eWlza1IyT3FZZlIzU2ExWERzWjRIenlyN3hs?=
- =?utf-8?B?UHRWMHErTWpwbENDZ0lPc3VhaDNoQ0NlMXAwS2ZESzVZV09nd0VZbEJ0QVFr?=
- =?utf-8?B?a2RIb3dHOUNDR085a2FDSTdGWkM4SjdOenY5TnZJRjRFTkZxaVBYUjNVYTVW?=
- =?utf-8?B?NG1FaTdPc0pROXNJV2ZjR2NwTk5JZFd5UGp0YmRja21kcnVTRmQ2S0dpREtn?=
- =?utf-8?B?VEVrYlNlaEZGVDZ5cko0ZDhoTE8vWC9pOTMxVlFsdXgwUGdCWkpHTDRWeGwv?=
- =?utf-8?B?aGNQSndoQnlPRWRUWWJpMFpvS3kyNkpOYTlTOVA3cEtWOXpRNXh2R0dLVEVz?=
- =?utf-8?B?bWdtcVEwQjJ5cllUMTg5U3IzTmNxQncwRGdMR0N3c2ZmbEZUTUV3eGUrcmhZ?=
- =?utf-8?B?M2pMek4xWG5oc0IxUXYwUVBsdUJxL2VGaFJGTjhWY2ZOckd4SW1hRTZmYlEx?=
- =?utf-8?B?eDR4VVM0a1VMLzR2dVpvTWtTNUwxRm5KaWpvbXhWZ1lsTXFWYlpOa21UeU5x?=
- =?utf-8?B?TWUvZitVQ3lTalI0a0lpN3VsbFBxQXFGbFpvbDFqbTAwaVcwdExidDRhcERS?=
- =?utf-8?B?VjRtTHpNNjlMRlV5WkNQQ3dvR2dSSzZ1cGtTYVp3dWFpOUg5TXhkYXk0bk9z?=
- =?utf-8?B?MlVEaGUxWmc2Z2c5Z2xPWWc1RFN3ZFJsSGRoUm9LSlkyNVpacmhqK0EzVVBy?=
- =?utf-8?B?VjFWZWlGRkxiUUF3K3l3Z1UrNFE0dU5TRUxWc0Qzbmx0azhhbk1LZmZOSndk?=
- =?utf-8?B?VGtrdUl3WkQ0d2VZeDFnRWVJT3o4YXJuWHVHSnMvcmNXSmFnbVZ6dWVPdUwz?=
- =?utf-8?B?bklvNzVxREtQTmJPQ01sNXZ6dHRSTnErMlljcXljNFdtdVBBOXFZS0pWbms0?=
- =?utf-8?B?WGRZNGg2M2lycHRIckYvZXNvM3ZreGFWeEVEZTF1WWp0bk8xeWxMSVNJOUZV?=
- =?utf-8?B?Z2luQ1J5V1FZVkVWYUZXMjcrTlRWd2JYUEJwZVpkcE9nZEtQQ1BTZDkyM2Vz?=
- =?utf-8?B?dmcxU1Z0Z296V3ZLL2plNk13TDFpVCtTODBvdGhxR0c4MmFtUExHUWo3a2RB?=
- =?utf-8?B?NlBaZTh4MTZ5MjBzSlRESGJhWVJxSnQ0YjJWbzZpRThLVHgvRmlGc0pNSHEw?=
- =?utf-8?B?WVkzdnFGeWVXZFNYVkw5U2doNCs4d2NwZVNtMlYxN0xlb3lpSHVXbHg2SzFw?=
- =?utf-8?B?dTh6eW9EdnlXVmZnSTIzMy95c2xRZW8rV3hDWHVJeUZ5ZnVVdjNVa0ZKdjdK?=
- =?utf-8?B?eGNTSGRqZmlVN3k1RkFqQ3k5bm5BU3NDWWJXYmxSKzJQNlZ6czJDN2lLWHFh?=
- =?utf-8?B?cy8yVS9JNGlzSFo3VXpBVzAvUWVTM2lPVk41UitPZXlVTkQ1R3M1VUNMeUEz?=
- =?utf-8?B?eHlNR2p0TWIwRktvNlZWME9TL3RES1l0M283UEhTd3VxcCtjY3FaZ1FwbDJJ?=
- =?utf-8?B?WUtNaktGVWZOdHVVd3daUVRncXgwUFphVmlUOEZSL0dYUDVndGxRdmVVR3FO?=
- =?utf-8?B?VFhId3ZFRDlYMTZFdm4rMjQzMmR3anEzZ3RGcUE1d0kramhqLzNYbFpTRVhQ?=
- =?utf-8?B?Z0tCZFF5dFd2ZXA1RlRZcmVPMmVGanZEdFR0ZHBmMnZ4dHFtRFMyZlF5bEgz?=
- =?utf-8?B?K0N1OUpId0FPMGQrb0UxaElBazYvaW1taXB4SUV6MmE1cUkvSURjYlVyYm9a?=
- =?utf-8?B?YWU2dDg3Vk5zdVVwMmNieVRnNVdvb3JGSFpIQUgreXJ5bEJhWis0VWVXN1Jt?=
- =?utf-8?B?dWVYWEhSdEQ5K1E4bHpmelprOHFxRzJZUmpyWUVNb1A3bDc5TzR3MzJ6MEFN?=
- =?utf-8?B?emVmNDFQekRLYzRmOGxvRWJsOFV0MERObFljU1p6cFlvcTBvT081VlNreDBV?=
- =?utf-8?B?RGd0WVdYQXlZRFZTemJha2ppbExtZzRIUklWY0FJaU5iRWc0VEVwQT09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f08156e9-f2ca-4424-cede-08da21494cd2
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR12MB5445.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2022 14:39:53.5133
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pt59/87JGNgpjwXzYQ5xNU19buI7qO8kMK+wDzjJC2sofqFKdaqAAZMMtgFHbcX7PDL2leuBPotA1ZSLLIXmZg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB2888
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220418092500.GA14409@gao-cwp>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -129,21 +88,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 4/14/22 12:11 PM, Suravee Suthikulpanit wrote:
-> This series introduce a fast-path when handling AVIC incomplete IPI #vmexit
-> for AVIC and x2AVIC, and introduce a new tracepoint for the slow-path
-> processing.
+On Mon, Apr 18, 2022, Chao Gao wrote:
+> On Fri, Apr 15, 2022 at 03:25:06PM +0000, Sean Christopherson wrote:
+> >On Mon, Apr 11, 2022, Zeng Guang wrote:
+> >> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> >> index d1a39285deab..23fbf52f7bea 100644
+> >> --- a/arch/x86/kvm/x86.c
+> >> +++ b/arch/x86/kvm/x86.c
+> >> @@ -11180,11 +11180,15 @@ static int sync_regs(struct kvm_vcpu *vcpu)
+> >>  
+> >>  int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+> >>  {
+> >> +	int ret = 0;
+> >> +
+> >>  	if (kvm_check_tsc_unstable() && atomic_read(&kvm->online_vcpus) != 0)
+> >>  		pr_warn_once("kvm: SMP vm created on host with unstable TSC; "
+> >>  			     "guest TSC will not be reliable\n");
+> >>  
+> >> -	return 0;
+> >> +	if (kvm_x86_ops.alloc_ipiv_pid_table)
+> >> +		ret = static_call(kvm_x86_alloc_ipiv_pid_table)(kvm);
+> >
+> >Add a generic kvm_x86_ops.vcpu_precreate, no reason to make this so specific.
+> >And use KVM_X86_OP_RET0 instead of KVM_X86_OP_OPTIONAL, then this can simply be
+> >
+> >	return static_call(kvm_x86_vcpu_precreate);
+> >
+> >That said, there's a flaw in my genius plan.
+> >
+> >  1. KVM_CREATE_VM
+> >  2. KVM_CAP_MAX_VCPU_ID, set max_vcpu_ids=1
+> >  3. KVM_CREATE_VCPU, create IPIv table but ultimately fails
+> >  4. KVM decrements created_vcpus back to '0'
+> >  5. KVM_CAP_MAX_VCPU_ID, set max_vcpu_ids=4096
+> >  6. KVM_CREATE_VCPU w/ ID out of range
+> >
+> >In other words, malicious userspace could trigger buffer overflow.
 > 
-> Please note that the prereq of this series is:
->    [PATCH v2 00/12] Introducing AMD x2APIC Virtualization (x2AVIC) support
->    (https://lore.kernel.org/lkml/20220412115822.14351-2-suravee.suthikulpanit@amd.com/T/)
+> can we simply return an error (e.g., -EEXIST) on step 5 (i.e.,
+> max_vcpu_ids cannot be changed after being set once)?
 > 
+> or
+> 
+> can we detect the change of max_vcpu_ids in step 6 and re-allocate PID
+> table?
 
-Since x2AVIC stuff is still under development, and likely will need v3,
-I will extract the logic for x2AVIC, and send out V2 of this series.
-The support for x2AVIC will be send separately.
+Returning an error is viable, but would be a rather odd ABI.  Re-allocating isn't
+a good option because the PID table could be in active use by other vCPUs, e.g.
+KVM would need to send a request and kick all vCPUs to have all vCPUs update their
+VMCS.
 
-Regards,
-Suravee
+And with both of those alternatives, I still don't like that every feature that
+acts on max_vcpu_ids would need to handle this same edge case.
+
+An alternative to another new ioctl() would be to to make KVM_CAP_MAX_VCPU_ID
+write-once, i.e. reject attempts to change the max once set (though we could allow
+re-writing the same value).  I think I like that idea better than adding an ioctl().
+
+It can even be done without an extra flag by zero-initializing the field and instead
+waiting until vCPU pre-create to lock in the value.  That would also help detect
+bad usage of max_vcpu_ids, especially if we added a wrapper to get the value, e.g.
+the wrapper could WARN_ON(!kvm->arch.max_vcpu_ids).
+
+E.g.
+
+int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+{
+	if (kvm_check_tsc_unstable() && atomic_read(&kvm->online_vcpus) != 0)
+		pr_warn_once("kvm: SMP vm created on host with unstable TSC; "
+			     "guest TSC will not be reliable\n");
+
+	if (!kvm->arch.max_vcpu_ids)
+		kvm->arch.max_vcpu_ids = KVM_MAX_VCPU_IDS;
+
+	return 0;
+}
+
+
+	case KVM_CAP_MAX_VCPU_ID:
+		r = -EINVAL;
+		if (cap->args[0] > KVM_MAX_VCPU_IDS)
+			break;
+
+		mutex_lock(&kvm->lock);
+                if (kvm->arch.max_vcpu_ids == cap->args[0]) {
+                        r = 0;
+                } else if (!kvm->arch.max_vcpu_ids) {
+			kvm->arch.max_vcpu_ids = cap->args[0];
+			r = 0;
+		}
+		mutex_unlock(&kvm->lock);
+		break;
