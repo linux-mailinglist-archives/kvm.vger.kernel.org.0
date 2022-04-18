@@ -2,117 +2,290 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 648605055FF
-	for <lists+kvm@lfdr.de>; Mon, 18 Apr 2022 15:29:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FB67505A40
+	for <lists+kvm@lfdr.de>; Mon, 18 Apr 2022 16:47:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241697AbiDRNbd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Apr 2022 09:31:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41294 "EHLO
+        id S1345142AbiDROt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Apr 2022 10:49:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244833AbiDRNa5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Apr 2022 09:30:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4ACEB1EC50
-        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 05:55:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650286541;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qFJ3DlKb+eUPu+S4bA6qaKNO41i7hF7RhsehUeP4a78=;
-        b=CiS/5yCWSHLu1WZRmQgbP0geShkAJ7ACi1icWDoonTQ+hUl7b/MH6SJqKRBDRSottghp4b
-        Wkd9P/zZAZ5xm79nHEjMWNKoGCAU2HvZv3xcV3ABnz4LhhGkS5S3YXGL7lFb29WreJgSE9
-        8NxqvucOWDGQXvqB8ZFUvy3f5j4WyfQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-655-ZAkUvhHMMkGL2Y6gwUNtQQ-1; Mon, 18 Apr 2022 08:55:38 -0400
-X-MC-Unique: ZAkUvhHMMkGL2Y6gwUNtQQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C309438149A3;
-        Mon, 18 Apr 2022 12:55:37 +0000 (UTC)
-Received: from starship (unknown [10.40.194.231])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A995340FD371;
-        Mon, 18 Apr 2022 12:55:35 +0000 (UTC)
-Message-ID: <dff229a39e30f84dcf8cc8caffc41f83bd5ece73.camel@redhat.com>
-Subject: Re: [PATCH v2 12/12] kvm/x86: Remove APICV activate mode
- inconsistency check
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
-        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
-Date:   Mon, 18 Apr 2022 15:55:34 +0300
-In-Reply-To: <20220412115822.14351-13-suravee.suthikulpanit@amd.com>
-References: <20220412115822.14351-1-suravee.suthikulpanit@amd.com>
-         <20220412115822.14351-13-suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S1345314AbiDROtA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Apr 2022 10:49:00 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C997527B37;
+        Mon, 18 Apr 2022 06:36:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1650288981; x=1681824981;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=8ULkbQDoXZKawL2vxp2JE0iQIBCqxX/7hJVpdFisWAg=;
+  b=KG/ybS6eFdrA+d1pIxY87H4QpVueaJ2K+FxBZjluAEklhDOE8X+NVzCQ
+   iGLJD+YOo4Yyn98FBdxWJ18mH65JaP0FcqKit8W3TiWboxY6m3zWLifMz
+   DT0O4l0f5NT6huEcuTEJ/8BADHgaNLpyv67Wnk0PhwX1YZ0+xi9sHEdfa
+   vpt9nvG6PvVc1sfX2jhe0N6IEOkA8NARciQHtB+kfKD++Vf8ElixquzqU
+   6jQjxZr9PmJ0Yq3xWTTU8RmIHbGXwMRtPr2YrdJ54BUWSuUKQSXhWGEuB
+   jR6L4jxUcEZmGFbfplRVBo0wrflBRBYAqpefBBXcFXIVkYRHMid8QQmyy
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10320"; a="323960696"
+X-IronPort-AV: E=Sophos;i="5.90,269,1643702400"; 
+   d="scan'208";a="323960696"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2022 06:36:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,269,1643702400"; 
+   d="scan'208";a="726643966"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
+  by orsmga005.jf.intel.com with ESMTP; 18 Apr 2022 06:36:19 -0700
+Date:   Mon, 18 Apr 2022 21:36:09 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Add RET_PF_CONTINUE to eliminate bool+int*
+ "returns"
+Message-ID: <20220418133609.GA31671@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20220415005107.2221672-1-seanjc@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220415005107.2221672-1-seanjc@google.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-04-12 at 06:58 -0500, Suravee Suthikulpanit wrote:
-> When launching a VM with x2APIC and specify more than 255 vCPUs,
-> the guest kernel can disable x2APIC (e.g. specify nox2apic kernel option).
-> The VM fallbacks to xAPIC mode, and disable the vCPU ID 255.
+On Fri, Apr 15, 2022 at 12:51:07AM +0000, Sean Christopherson wrote:
+> Add RET_PF_CONTINUE and use it in handle_abnormal_pfn() and
+> kvm_faultin_pfn() to signal that the page fault handler should continue
+> doing its thing.  Aside from being gross and inefficient, using a boolean
+> return to signal continue vs. stop makes it extremely difficult to add
+> more helpers and/or move existing code to a helper.
 > 
-> In this case, APICV should be disabled for the vCPU ID 255.
-> Therefore, the APICV mode consisency check is no longer valid.
+> E.g. hypothetically, if nested MMUs were to gain a separate page fault
+> handler in the future, everything up to the "is self-modifying PTE" check
+> can be shared by all shadow MMUs, but communicating up the stack whether
+> to continue on or stop becomes a nightmare.
 > 
-> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> More concretely, proposed support for private guest memory ran into a
+> similar issue, where it'll be forced to forego a helper in order to yield
+> sane code: https://lore.kernel.org/all/YkJbxiL%2FAz7olWlq@google.com.
+
+Thanks for cooking this patch, it makes private memory patch much
+easier.
+
+> 
+> No functional change intended.
+> 
+> Cc: David Matlack <dmatlack@google.com>
+> Cc: Chao Peng <chao.p.peng@linux.intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/kvm/x86.c | 13 +++++--------
->  1 file changed, 5 insertions(+), 8 deletions(-)
+>  arch/x86/kvm/mmu/mmu.c          | 51 ++++++++++++++-------------------
+>  arch/x86/kvm/mmu/mmu_internal.h |  9 +++++-
+>  arch/x86/kvm/mmu/paging_tmpl.h  |  6 ++--
+>  3 files changed, 34 insertions(+), 32 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 0c0ca599a353..d0fac57e9996 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9765,6 +9765,11 @@ void kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
->  	down_read(&vcpu->kvm->arch.apicv_update_lock);
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 69a30d6d1e2b..cb2982c6b513 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2972,14 +2972,12 @@ static int kvm_handle_bad_page(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
+>  	return -EFAULT;
+>  }
 >  
->  	activate = kvm_apicv_activated(vcpu->kvm);
-> +
-> +	/* Do not activate AVIC when APIC is disabled */
-> +	if (kvm_get_apic_mode(vcpu) == LAPIC_MODE_DISABLED)
-> +		activate = false;
-> +
->  	if (vcpu->arch.apicv_active == activate)
->  		goto out;
+> -static bool handle_abnormal_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+> -				unsigned int access, int *ret_val)
+> +static int handle_abnormal_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+> +			       unsigned int access)
+>  {
+>  	/* The pfn is invalid, report the error! */
+> -	if (unlikely(is_error_pfn(fault->pfn))) {
+> -		*ret_val = kvm_handle_bad_page(vcpu, fault->gfn, fault->pfn);
+> -		return true;
+> -	}
+> +	if (unlikely(is_error_pfn(fault->pfn)))
+> +		return kvm_handle_bad_page(vcpu, fault->gfn, fault->pfn);
 >  
-> @@ -10159,14 +10164,6 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  	guest_timing_enter_irqoff();
+>  	if (unlikely(!fault->slot)) {
+>  		gva_t gva = fault->is_tdp ? 0 : fault->addr;
+> @@ -2991,13 +2989,11 @@ static bool handle_abnormal_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
+>  		 * touching the shadow page tables as attempting to install an
+>  		 * MMIO SPTE will just be an expensive nop.
+>  		 */
+> -		if (unlikely(!shadow_mmio_value)) {
+> -			*ret_val = RET_PF_EMULATE;
+> -			return true;
+> -		}
+> +		if (unlikely(!shadow_mmio_value))
+> +			return RET_PF_EMULATE;
+>  	}
 >  
->  	for (;;) {
-> -		/*
-> -		 * Assert that vCPU vs. VM APICv state is consistent.  An APICv
-> -		 * update must kick and wait for all vCPUs before toggling the
-> -		 * per-VM state, and responsing vCPUs must wait for the update
-> -		 * to complete before servicing KVM_REQ_APICV_UPDATE.
-> -		 */
-> -		WARN_ON_ONCE(kvm_apicv_activated(vcpu->kvm) != kvm_vcpu_apicv_active(vcpu));
+> -	return false;
+> +	return RET_PF_CONTINUE;
+>  }
+>  
+>  static bool page_fault_can_be_fast(struct kvm_page_fault *fault)
+> @@ -3888,7 +3884,7 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  				  kvm_vcpu_gfn_to_hva(vcpu, gfn), &arch);
+>  }
+>  
+> -static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault, int *r)
+> +static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>  {
+>  	struct kvm_memory_slot *slot = fault->slot;
+>  	bool async;
+> @@ -3899,7 +3895,7 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+>  	 * be zapped before KVM inserts a new MMIO SPTE for the gfn.
+>  	 */
+>  	if (slot && (slot->flags & KVM_MEMSLOT_INVALID))
+> -		goto out_retry;
+> +		return RET_PF_RETRY;
+>  
+>  	if (!kvm_is_visible_memslot(slot)) {
+>  		/* Don't expose private memslots to L2. */
+> @@ -3907,7 +3903,7 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+>  			fault->slot = NULL;
+>  			fault->pfn = KVM_PFN_NOSLOT;
+>  			fault->map_writable = false;
+> -			return false;
+> +			return RET_PF_CONTINUE;
+>  		}
+>  		/*
+>  		 * If the APIC access page exists but is disabled, go directly
+> @@ -3916,10 +3912,8 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+>  		 * when the AVIC is re-enabled.
+>  		 */
+>  		if (slot && slot->id == APIC_ACCESS_PAGE_PRIVATE_MEMSLOT &&
+> -		    !kvm_apicv_activated(vcpu->kvm)) {
+> -			*r = RET_PF_EMULATE;
+> -			return true;
+> -		}
+> +		    !kvm_apicv_activated(vcpu->kvm))
+> +			return RET_PF_EMULATE;
+>  	}
+>  
+>  	async = false;
+> @@ -3927,26 +3921,23 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+>  					  fault->write, &fault->map_writable,
+>  					  &fault->hva);
+>  	if (!async)
+> -		return false; /* *pfn has correct page already */
+> +		return RET_PF_CONTINUE; /* *pfn has correct page already */
+>  
+>  	if (!fault->prefetch && kvm_can_do_async_pf(vcpu)) {
+>  		trace_kvm_try_async_get_page(fault->addr, fault->gfn);
+>  		if (kvm_find_async_pf_gfn(vcpu, fault->gfn)) {
+>  			trace_kvm_async_pf_doublefault(fault->addr, fault->gfn);
+>  			kvm_make_request(KVM_REQ_APF_HALT, vcpu);
+> -			goto out_retry;
+> -		} else if (kvm_arch_setup_async_pf(vcpu, fault->addr, fault->gfn))
+> -			goto out_retry;
+> +			return RET_PF_RETRY;
+> +		} else if (kvm_arch_setup_async_pf(vcpu, fault->addr, fault->gfn)) {
+> +			return RET_PF_RETRY;
+> +		}
+>  	}
+>  
+>  	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, NULL,
+>  					  fault->write, &fault->map_writable,
+>  					  &fault->hva);
+> -	return false;
 > -
->  		exit_fastpath = static_call(kvm_x86_vcpu_run)(vcpu);
->  		if (likely(exit_fastpath != EXIT_FASTPATH_REENTER_GUEST))
->  			break;
+> -out_retry:
+> -	*r = RET_PF_RETRY;
+> -	return true;
+> +	return RET_PF_CONTINUE;
+>  }
+>  
+>  /*
+> @@ -4001,10 +3992,12 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
+>  	smp_rmb();
+>  
+> -	if (kvm_faultin_pfn(vcpu, fault, &r))
+> +	r = kvm_faultin_pfn(vcpu, fault);
+> +	if (r != RET_PF_CONTINUE)
+>  		return r;
+>  
+> -	if (handle_abnormal_pfn(vcpu, fault, ACC_ALL, &r))
+> +	r = handle_abnormal_pfn(vcpu, fault, ACC_ALL);
+> +	if (r != RET_PF_CONTINUE)
+>  		return r;
+>  
+>  	r = RET_PF_RETRY;
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index 1bff453f7cbe..c0e502b17ef7 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -143,6 +143,7 @@ unsigned int pte_list_count(struct kvm_rmap_head *rmap_head);
+>  /*
+>   * Return values of handle_mmio_page_fault, mmu.page_fault, and fast_page_fault().
+>   *
+> + * RET_PF_CONTINUE: So far, so good, keep handling the page fault.
+>   * RET_PF_RETRY: let CPU fault again on the address.
+>   * RET_PF_EMULATE: mmio page fault, emulate the instruction directly.
+>   * RET_PF_INVALID: the spte is invalid, let the real page fault path update it.
+> @@ -151,9 +152,15 @@ unsigned int pte_list_count(struct kvm_rmap_head *rmap_head);
+>   *
+>   * Any names added to this enum should be exported to userspace for use in
+>   * tracepoints via TRACE_DEFINE_ENUM() in mmutrace.h
+> + *
+> + * Note, all values must be greater than or equal to zero so as not to encroach
+> + * on -errno return values.  Somewhat arbitrarily use '0' for CONTINUE, which
+> + * will allow for efficient machine code when checking for CONTINUE, e.g.
+> + * "TEST %rax, %rax, JNZ", as all "stop!" values are non-zero.
+>   */
+>  enum {
+> -	RET_PF_RETRY = 0,
+> +	RET_PF_CONTINUE = 0,
+> +	RET_PF_RETRY,
+>  	RET_PF_EMULATE,
+>  	RET_PF_INVALID,
+>  	RET_PF_FIXED,
 
-That warning catches bugs, please don't remove it.
+Unrelated to this patch but related to private memory patch, when
+implicit conversion happens, I'm thinking which return value I should
+use. Current -1 does not make much sense since it causes KVM_RUN
+returns an error while it's expected to be 0. None of the above
+including RET_PF_CONTINUE seems appropriate. Maybe we should go further
+to introduce another RET_PF_USER indicating we should exit to
+userspace for handling with a return value of 0 instead of -error in
+kvm_mmu_page_fault().
 
-It can be made conditional on this vCPU having APIC enabled instead.
-
-Best regards,
-	Maxim Levitsky
-
+Thanks,
+Chao
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index 66f1acf153c4..7038273d04ab 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -838,10 +838,12 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
+>  	smp_rmb();
+>  
+> -	if (kvm_faultin_pfn(vcpu, fault, &r))
+> +	r = kvm_faultin_pfn(vcpu, fault);
+> +	if (r != RET_PF_CONTINUE)
+>  		return r;
+>  
+> -	if (handle_abnormal_pfn(vcpu, fault, walker.pte_access, &r))
+> +	r = handle_abnormal_pfn(vcpu, fault, walker.pte_access);
+> +	if (r != RET_PF_CONTINUE)
+>  		return r;
+>  
+>  	/*
+> 
+> base-commit: 150866cd0ec871c765181d145aa0912628289c8a
+> -- 
+> 2.36.0.rc0.470.gd361397f0d-goog
