@@ -2,85 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DB8B95076B4
-	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 19:40:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AB375076BC
+	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 19:45:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353999AbiDSRng (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Apr 2022 13:43:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51858 "EHLO
+        id S236067AbiDSRr4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Apr 2022 13:47:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241756AbiDSRnc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Apr 2022 13:43:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 20E8B21266
-        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 10:40:49 -0700 (PDT)
+        with ESMTP id S242179AbiDSRry (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Apr 2022 13:47:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A7E8A62F5
+        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 10:45:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650390048;
+        s=mimecast20190719; t=1650390310;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Qnonzc6fh8TJnpE7gaNyUxgdtOHFsR6ybsN1q248jMI=;
-        b=X6Tvn6VnIaIFtuISjzE1K2ziDE77IHnNMLZLErc7XmPp73ZFd5uEa1is/92pwr6xOM+Hse
-        GwzUzXk84QmGjR5w9fR5FhFMDqU3JVz9ANzFJqj5iUCzYMLCZ+vtkcq0imuCCzqgsSy9zh
-        hBuscUe8WufueiRp9pmqnuRmMtdnevE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=CIbd+9/ujIgy/587mPK12BUlw+gv3FwEVww95EhOZhc=;
+        b=FzfgusaTP3uupX5j2CrjekK6BKwYqzSr/UnvpSS+2595wbr8rXgH1SrUhrIludgdJKJra5
+        t3T6jN0+CiuYHExv7EEq0ziyHI5U2brNYbVgvjR3WnBcHmLziuNxOC1KpUZ7z6G51XggUa
+        /o9L9jinPWAZbBC49t24KgzGRWlE5Ho=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-122-FN0BlGJdOL2Qj3VL31ZM9w-1; Tue, 19 Apr 2022 13:40:46 -0400
-X-MC-Unique: FN0BlGJdOL2Qj3VL31ZM9w-1
-Received: by mail-wm1-f71.google.com with SMTP id m125-20020a1c2683000000b00391893a2febso6526391wmm.4
-        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 10:40:46 -0700 (PDT)
+ us-mta-137-KnimXwUrN0SNBNY8U6zDJA-1; Tue, 19 Apr 2022 13:45:09 -0400
+X-MC-Unique: KnimXwUrN0SNBNY8U6zDJA-1
+Received: by mail-wm1-f72.google.com with SMTP id i66-20020a1c3b45000000b0038eab4e0feaso9600565wma.9
+        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 10:45:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=Qnonzc6fh8TJnpE7gaNyUxgdtOHFsR6ybsN1q248jMI=;
-        b=Dd05GJztj7FvzlGRKEIVUhTOag02lRwdhDkPZhwEHU5DHXjgmTZjY9M5riflX/Ze/I
-         rX8cplq1hNaFtoDuutnNLR3DxlBY/3OGF2uhAzTkEQETRQIfy7D9GeMuGObJblLUphVI
-         L0+rzPeMFljCdujo8YM1CrrMcwn4knBBwpUjPRc9OiVKM47L9xd2G52Bo4fSijAMQ6Db
-         66A7ukHcLHDMhSntVSZw37Unc9d9I1S2RxhVIWPFpVSNyMw0QpytD6bCHJvH7FNrRNNH
-         DnDKLnkIt7h90x38oNm6iDqlzwwIuCdGDGxGBJ4jrLTNqXQ5Vw+60kUgRoyGE/rFaq5g
-         uzng==
-X-Gm-Message-State: AOAM5335hYCRj7ax9LnRsXNtG3STSjwik/aLRSmyEs8ApwsDK2nonmdL
-        Uw9BXPYcNgudZXF2aTbQ6DOUP7sMBngaV/bnrvsRWgKkfL8oz9EbgDZRN7WZeeC/28OO0Y0wZzm
-        f77pZGfvSJQxf
-X-Received: by 2002:a7b:cc17:0:b0:38d:af7:3848 with SMTP id f23-20020a7bcc17000000b0038d0af73848mr17231886wmh.41.1650390045844;
-        Tue, 19 Apr 2022 10:40:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxxUPHblxgqkkDRtIk+7piT1JWk/8UYZYpIWMN0Md1sGmtegk1Go/5gMBC2w/pEAh6nPUzCZA==
-X-Received: by 2002:a7b:cc17:0:b0:38d:af7:3848 with SMTP id f23-20020a7bcc17000000b0038d0af73848mr17231868wmh.41.1650390045650;
-        Tue, 19 Apr 2022 10:40:45 -0700 (PDT)
+        bh=CIbd+9/ujIgy/587mPK12BUlw+gv3FwEVww95EhOZhc=;
+        b=ViLqkvOGWquRNM3yBu0dCskttBkBBqahyucxYaNRoiiNbLsudac35kxu7VKRrreHjk
+         PRoCw7WtMSWWyYcTVeVxxvm2WSNi5Am5lupcPxI/Iiqt3chGXpp1j2Q0PLAz1bQK/re1
+         7/BTKZfkfbC0IlwH+v+q2yguXI4q7LY9cAVg55r9/J/ZogwYiQQWMyqfWfsPqhZWWFiG
+         fVG5CsuNoA1UGp/PK2kdMhpOw79mbDSawRuz968MY2CKFhAEDmtPTOdj+6glr+9NjcNg
+         +UpO3zSlt/nFtoEI9BqH4HEI6DoIoWv2wKA4j4oP1i4ea9uyefdars4t7Rcehn4t3rv5
+         wvMg==
+X-Gm-Message-State: AOAM530gB0a6ZDQChLMGbbBhk01ozQI7v/OTPzvpVoRN8jCsSgdAMbAz
+        MksmGJYMLOq8owOwKjohw1X7N9tJZr1n6Y/EOro0UvsZf5VQH80bITJCkBLiFH8OYB8vznijI4H
+        10sweIsPCK09x
+X-Received: by 2002:a1c:a185:0:b0:392:206d:209d with SMTP id k127-20020a1ca185000000b00392206d209dmr16849533wme.168.1650390308383;
+        Tue, 19 Apr 2022 10:45:08 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz/q6xzI4l79WNqJp4QrxQovesx47Z6kxd94l2NB9OHznkozrBCR/2cZw/3pLy6rdL1bbtQkw==
+X-Received: by 2002:a1c:a185:0:b0:392:206d:209d with SMTP id k127-20020a1ca185000000b00392206d209dmr16849514wme.168.1650390308129;
+        Tue, 19 Apr 2022 10:45:08 -0700 (PDT)
 Received: from [192.168.8.102] (dynamic-046-114-170-162.46.114.pool.telefonica.de. [46.114.170.162])
-        by smtp.gmail.com with ESMTPSA id 20-20020a05600c22d400b0038c8dbdc1a3sm16472044wmg.38.2022.04.19.10.40.44
+        by smtp.gmail.com with ESMTPSA id v188-20020a1cacc5000000b0038e9c60f0e7sm16397144wme.28.2022.04.19.10.45.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Apr 2022 10:40:45 -0700 (PDT)
-Message-ID: <07903c7d-5afc-ce95-0f51-3c643eab8b37@redhat.com>
-Date:   Tue, 19 Apr 2022 19:40:43 +0200
+        Tue, 19 Apr 2022 10:45:07 -0700 (PDT)
+Message-ID: <c44de70a-60e3-65b6-14a7-3e4400f3084b@redhat.com>
+Date:   Tue, 19 Apr 2022 19:45:05 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.8.0
-Subject: Re: [PATCH 1/4] KVM: s390: selftests: Use TAP interface in the memop
+Subject: Re: [PATCH 3/4] KVM: s390: selftests: Use TAP interface in the tprot
  test
 Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>, kvm@vger.kernel.org,
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
         David Hildenbrand <david@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Shuah Khan <shuah@kernel.org>
 References: <20220414105322.577439-1-thuth@redhat.com>
- <20220414105322.577439-2-thuth@redhat.com>
- <3c627856-5e66-3cbe-adab-464ae573e23d@linux.ibm.com>
+ <20220414105322.577439-4-thuth@redhat.com>
+ <20220414135110.6b2baead@p-imbrenda>
+ <03f62ec7-2f7f-1f90-3029-d93713ab5afc@redhat.com>
+ <baa53445-b4de-7a05-24f5-46fa38e61666@linux.ibm.com>
 From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <3c627856-5e66-3cbe-adab-464ae573e23d@linux.ibm.com>
+In-Reply-To: <baa53445-b4de-7a05-24f5-46fa38e61666@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-6.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
         SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -89,54 +92,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/04/2022 14.48, Janis Schoetterl-Glausch wrote:
-> On 4/14/22 12:53, Thomas Huth wrote:
->> The memop test currently does not have any output (unless one of the
->> TEST_ASSERT statement fails), so it's hard to say for a user whether
->> a certain new sub-test has been included in the binary or not. Let's
->> make this a little bit more user-friendly and include some TAP output
->> via the kselftests.h interface.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>   tools/testing/selftests/kvm/s390x/memop.c | 90 ++++++++++++++++++-----
->>   1 file changed, 73 insertions(+), 17 deletions(-)
->>
->> diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
->> index b04c2c1b3c30..a2783d9afcac 100644
->> --- a/tools/testing/selftests/kvm/s390x/memop.c
->> +++ b/tools/testing/selftests/kvm/s390x/memop.c
->> @@ -12,6 +12,7 @@
->>   
->>   #include "test_util.h"
->>   #include "kvm_util.h"
->> +#include "kselftest.h"
->>   
->>   enum mop_target {
->>   	LOGICAL,
->> @@ -648,33 +649,88 @@ static void test_errors(void)
->>   	kvm_vm_free(t.kvm_vm);
->>   }
->>   
->> +struct testdef {
->> +	const char *name;
->> +	void (*test)(void);
->> +	bool needs_extension;
+On 14/04/2022 14.33, Janis Schoetterl-Glausch wrote:
+> On 4/14/22 14:08, Thomas Huth wrote:
+>> On 14/04/2022 13.51, Claudio Imbrenda wrote:
+>>> On Thu, 14 Apr 2022 12:53:21 +0200
+>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>
+>>>> The tprot test currently does not have any output (unless one of
+>>>> the TEST_ASSERT statement fails), so it's hard to say for a user
+>>>> whether a certain new sub-test has been included in the binary or
+>>>> not. Let's make this a little bit more user-friendly and include
+>>>> some TAP output via the kselftests.h interface.
+>>>>
+>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>> ---
+>>>>    tools/testing/selftests/kvm/s390x/tprot.c | 12 +++++++++++-
+>>>>    1 file changed, 11 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/tools/testing/selftests/kvm/s390x/tprot.c b/tools/testing/selftests/kvm/s390x/tprot.c
+>>>> index c097b9db495e..a714b4206e95 100644
+>>>> --- a/tools/testing/selftests/kvm/s390x/tprot.c
+>>>> +++ b/tools/testing/selftests/kvm/s390x/tprot.c
+>>>> @@ -8,6 +8,7 @@
+>>>>    #include <sys/mman.h>
+>>>>    #include "test_util.h"
+>>>>    #include "kvm_util.h"
+>>>> +#include "kselftest.h"
+>>>>      #define PAGE_SHIFT 12
+>>>>    #define PAGE_SIZE (1 << PAGE_SHIFT)
+>>>> @@ -69,6 +70,7 @@ enum stage {
+>>>>        STAGE_INIT_FETCH_PROT_OVERRIDE,
+>>>>        TEST_FETCH_PROT_OVERRIDE,
+>>>>        TEST_STORAGE_PROT_OVERRIDE,
+>>>> +    NUM_STAGES            /* this must be the last entry */
 > 
-> Please make this numeric. You could also rename it to required_extension or similar.
-[...]
->> +
->> +	for (idx = 0; idx < ARRAY_SIZE(testlist); idx++) {
->> +		if (!testlist[idx].needs_extension || extension_cap) {
+> You could move STAGE_END down and use that instead.
 > 
-> Then check here that extension_cap >= the required extension.
-> This way the test can easily be adapted in case of future extensions.
+>>>>    };
+>>>>      struct test {
+>>>> @@ -196,6 +198,7 @@ static void guest_code(void)
+>>>>        }                                    \
+>>>>        ASSERT_EQ(uc.cmd, UCALL_SYNC);                        \
+>>>>        ASSERT_EQ(uc.args[1], __stage);                        \
+>>>> +    ksft_test_result_pass("" #stage "\n");                    \
+>>>>    })
+>>>>      int main(int argc, char *argv[])
+>>>> @@ -204,6 +207,9 @@ int main(int argc, char *argv[])
+>>>>        struct kvm_run *run;
+>>>>        vm_vaddr_t guest_0_page;
+>>>>    +    ksft_print_header();
+>>>> +    ksft_set_plan(NUM_STAGES - 1);    /* STAGE_END is not counted, thus - 1 */
+>>>> +
+>>>>        vm = vm_create_default(VCPU_ID, 0, guest_code);
+>>>>        run = vcpu_state(vm, VCPU_ID);
+>>>>    @@ -213,7 +219,7 @@ int main(int argc, char *argv[])
+>>>>          guest_0_page = vm_vaddr_alloc(vm, PAGE_SIZE, 0);
+>>>>        if (guest_0_page != 0)
+>>>> -        print_skip("Did not allocate page at 0 for fetch protection override tests");
+>>>> +        ksft_print_msg("Did not allocate page at 0 for fetch protection override tests\n");
+>>>
+>>> will this print a skip, though?
+>>
+>> No, it's now only a message.
+>>
+>>> or you don't want to print a skip because then the numbering in the
+>>> planning doesn't match anymore?
+>>
+>> Right.
+>>
+>>> in which case, is there an easy way to fix it?
+>>
+>> Honestly, this part of the code is a little bit of a riddle to me - I wonder why this was using "print_skip()" at all, since the HOST_SYNC below is executed anyway... so this sounds rather like a warning message to me that says that the following test might not work as expected, instead of a real test-is-skipped message?
+>>
+>> Janis, could you please clarify the intention here?
+> 
+> Both the host and the guest check the same condition independently, the host just to print the message,
+> then the guest is run and skips those stages.
 
-Not sure whether a ">=" will really be safe, since a future extension does 
-not necessarily assert that previous extensions are available at the same time.
+Ok.
 
-But I can still turn the bool into a numeric to make it a little bit more 
-flexible for future use.
+However, I'm not sure how to make this use ksft_test_result_skip() in a nice 
+way now, though, without makeing the macro way uglier ...
+I'll have a try, but if that does not work out I'd suggest to simply keep 
+the ksft_print_msg() here instead.
 
   Thomas
 
