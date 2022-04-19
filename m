@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B7AFE50650C
-	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 08:57:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BCC050650D
+	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 08:57:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349082AbiDSHAR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Apr 2022 03:00:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41988 "EHLO
+        id S1349033AbiDSHAS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Apr 2022 03:00:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349074AbiDSHAO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Apr 2022 03:00:14 -0400
+        with ESMTP id S1349063AbiDSHAQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Apr 2022 03:00:16 -0400
 Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25F3031204
-        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 23:57:29 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id f6-20020a170902ab8600b0015895212d23so9243445plr.6
-        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 23:57:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D89D72AE2D
+        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 23:57:30 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id q6-20020a170902eb8600b001588e49dcaaso9253661plg.9
+        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 23:57:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=/yJ16Mt8opbnIyJryWZlW/i1DVrAZ8RKhaEoLi7HeB0=;
-        b=Oe/2r91Emsx2E5PbEGyFON5CMQ7peKXfIkYXEf+Dvwk+h+u7bTcu0sBc4gLyoKxIqe
-         XGSuzcD9KtYTafz5OTh3OFd/1t82KCEb84vU1lrEnz5sUBjGDEJiHlmIzgnkEjxLzbjf
-         zTMQApVrXK3YKvRyA7Y8Yp0SQVzCjUw7DpQU+E5bKq2oBBkWW4nJZMxqQiusH6/3IuUB
-         fsYEmmr90eKI3K02a2qWau+duznVKS49GPzwEeza6t4nlhGMnErtXr1QueZ4lYBhOPHl
-         mtsPvHa3LrDGjLkYt68ESClCa+EAhZqkacUniOd41o4QKzbc7KqgesHgLcbM0lCZbMU9
-         J/sQ==
+        bh=YXalEvL5V6OCiUslrdBdC3x5nYT2WOf4a/IV/CCw06k=;
+        b=PBolxCNPqF/rYwCSGkME7PiAyjXXHuCvjT0iZNEZCb4UsNO/plPhzccwgGr3BMSa8c
+         qYIv3k9YmvEm0jnHH8aOEfDd+Jz3wW8Pal3dbZm9Zr89ptohuxfunoyyo690KChdXylr
+         BAnxcpKTeQqbIxZeQsKehjYF/qG93pGRQEtb3wEri0PgRyej+PlRhFlyhZhU1VMM25FG
+         2XNAvsn6BDxTp6+Ol1AO6/cMdXZMNHkoiHvX1S+zju41nFgQs7zJ6P+1qxSqqFMeeyPb
+         8wU07LHBjIKEM+a0DsU8p638g7ca57j5iBENAizVjw6KVT8brSDjAjq4sQnRneTW4F9r
+         LlRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=/yJ16Mt8opbnIyJryWZlW/i1DVrAZ8RKhaEoLi7HeB0=;
-        b=skTWd4Sqdj/VgrMK1C7dPbbZ/xVKCRU5TLAcxv+2R7R70nYkKs/zh4E7yznadXtX3U
-         cXz4G5UfUsUy3yOAIk8jkf7A46xrxyroLvn6RTmVzQ3//Mroypr0tcu65kqcCAZkwb+x
-         KjgiRJtivmNuAb6BJdlyPE82rd+gMw8OXFYRqlhgxlcVWeHyGa3Ul/JbtpCcAH1DFcmy
-         iN3GeXCJxFCtccdnVUdXkdMJh5KmIxsEVXonAxefYQv+mxtvsKweYcBQ1xsh43+Gzys0
-         VgFZdN6vLMqZ2ojPHNFf1sKslShfJ37ncsPyK51qawkBll1x5qVfsW+k+yUkEQ+6m8vz
-         MaRg==
-X-Gm-Message-State: AOAM532ACmEW213f/4DMxnQOR4FeS+TB9MHcwy9hMs8MdMssZ3dFJhcP
-        o4Ul73h4wwutXBW9f6nAI4mkWoYSuT0=
-X-Google-Smtp-Source: ABdhPJzpVHE/Hi3uFTH3s8KCL9eFCGTPtBsk8Cj93lThGw5OG+gm74bF/4mO6VJ4yjWrPGmPVAnQI23BLZ4=
+        bh=YXalEvL5V6OCiUslrdBdC3x5nYT2WOf4a/IV/CCw06k=;
+        b=xh9NPE8FJNtrlw0ajRHYI0ONUpYjpLypAp70dwiWbowJ9Z8EiU7e5ihyaSHzWv9jUx
+         Kp/N/LU3x7IXzCqZ49BdS+3BzbpMQzF6IWRM8SJf2VuV15vyHmiX5xj8hH9L3PPpLU4Q
+         DhFxoVRXBxuVjF+UpgMRGVCT8GwBJ5DfpRatwEnYgzyWMsXVvRE542YQLru/9lkFCs2s
+         4ijYBOe38VuKxlHmbDt2S8QfJJTsMVzGjzbgFoT1JwtCuEYD8rh7LVNogbrvRxcueYgH
+         UjQF/RlvYDWS8KItbHp56pNVbc8AstfyzpMgV4LFJaXgir+tAHtoWh3LkgFci42M5UW4
+         Yw4A==
+X-Gm-Message-State: AOAM530jlPbWGWXGWgW7RQQQU3Lk7EQfs7yaIHHO40lafjdbtSTftC/Q
+        HLZy2u4hIzPgNIzYZqiyUvM//neUOJA=
+X-Google-Smtp-Source: ABdhPJwNeyv4uuU7jneD4R263Q3CDhNQoNxJyLlw5PFrvBvjhbMrkb5ffdVyboN5y95J7aLLHm8T4JnHZ9A=
 X-Received: from reiji-vws-sp.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:a17:90a:8a90:b0:1d2:a931:3a03 with SMTP id
- x16-20020a17090a8a9000b001d2a9313a03mr7597147pjn.69.1650351448687; Mon, 18
- Apr 2022 23:57:28 -0700 (PDT)
-Date:   Mon, 18 Apr 2022 23:55:20 -0700
+ (user=reijiw job=sendgmr) by 2002:a05:6a00:1f0b:b0:50a:8181:fecb with SMTP id
+ be11-20020a056a001f0b00b0050a8181fecbmr6190053pfb.12.1650351450390; Mon, 18
+ Apr 2022 23:57:30 -0700 (PDT)
+Date:   Mon, 18 Apr 2022 23:55:21 -0700
 In-Reply-To: <20220419065544.3616948-1-reijiw@google.com>
-Message-Id: <20220419065544.3616948-15-reijiw@google.com>
+Message-Id: <20220419065544.3616948-16-reijiw@google.com>
 Mime-Version: 1.0
 References: <20220419065544.3616948-1-reijiw@google.com>
 X-Mailer: git-send-email 2.36.0.rc0.470.gd361397f0d-goog
-Subject: [PATCH v7 14/38] KVM: arm64: Emulate dbgwcr accesses
+Subject: [PATCH v7 15/38] KVM: arm64: Make ID_AA64DFR0_EL1/ID_DFR0_EL1 writable
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -80,207 +80,260 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When the number of non-context aware breakpoints for the guest is
-decreased by userspace, KVM will map vCPU's context-aware breakpoints
-(from the guest point of view) to pCPU's context aware breakpoints.
-Since dbgwcr.lbn holds a linked breakpoint number, emulate dbgwcr
-accesses to do conversion of virtual/physical dbgwcr.lbn as needed.
+This patch adds id_reg_desc for ID_AA64DFR0_EL1 and ID_DFR0_EL1
+to make them writable by userspace.
 
+Return an error if userspace tries to set PMUVER/PerfMon field
+of ID_AA64DFR0_EL1/ID_DFR0_EL1 to a value that conflicts with the
+PMU configuration.
+
+When a value of ID_AA64DFR0_EL1.PMUVER or ID_DFR0_EL1.PERFMON on the
+host is 0xf, which means IMPLEMENTATION DEFINED PMU supported, KVM
+erroneously expose the value for the guest as it is even though KVM
+doesn't support it for the guest. In that case, since KVM should
+expose 0x0 (PMU is not implemented), change the initial value of
+ID_AA64DFR0_EL1.PMUVER and ID_DFR0_EL1.PERFMON for the guest to 0x0.
+If userspace requests KVM to set them to 0xf, which shouldn't be
+allowed as KVM doesn't support IMPLEMENTATION DEFINED PMU for the
+guest, ignore the request (set the fields to 0x0 instead) so that
+a live migration from the older kernel works fine.
+
+Since number of context-aware breakpoints must be no more than number
+of supported breakpoints according to Arm ARM, return an error
+if userspace tries to set CTX_CMPS field to such value.
+
+Fixes: 8e35aa642ee4 ("arm64: cpufeature: Extract capped perfmon fields")
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 110 ++++++++++++++++++++++++++++++++------
- 1 file changed, 95 insertions(+), 15 deletions(-)
+ arch/arm64/include/asm/cpufeature.h |   2 +-
+ arch/arm64/kvm/sys_regs.c           | 164 ++++++++++++++++++++++++----
+ 2 files changed, 143 insertions(+), 23 deletions(-)
 
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 7a009d4e18a6..7ed2d32b3854 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -554,7 +554,7 @@ cpuid_feature_cap_perfmon_field(u64 features, int field, u64 cap)
+ 
+ 	/* Treat IMPLEMENTATION DEFINED functionality as unimplemented */
+ 	if (val == ID_AA64DFR0_PMUVER_IMP_DEF)
+-		val = 0;
++		return (features & ~mask);
+ 
+ 	if (val > cap) {
+ 		features &= ~mask;
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2ee1e0b6c4ce..400fa7ff582f 100644
+index 400fa7ff582f..9eca085886f5 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -846,20 +846,28 @@ static bool trap_dbgauthstatus_el1(struct kvm_vcpu *vcpu,
- 
- #define AA64DFR0_BRPS(v)	\
- 	((u8)cpuid_feature_extract_unsigned_field(v, ID_AA64DFR0_BRPS_SHIFT))
-+#define AA64DFR0_WRPS(v)	\
-+	((u8)cpuid_feature_extract_unsigned_field(v, ID_AA64DFR0_WRPS_SHIFT))
- #define AA64DFR0_CTX_CMPS(v)	\
- 	((u8)cpuid_feature_extract_unsigned_field(v, ID_AA64DFR0_CTX_CMPS_SHIFT))
- 
- #define INVALID_BRPN	((u8)-1)
- 
--static u8 get_bcr_lbn(u64 val)
-+static u8 get_bwcr_lbn(u64 val)
- {
-+	WARN_ON_ONCE(SYS_DBGBCR_EL1_LBN_SHIFT != SYS_DBGWCR_EL1_LBN_SHIFT);
-+	WARN_ON_ONCE(SYS_DBGBCR_EL1_LBN_MASK != SYS_DBGWCR_EL1_LBN_MASK);
-+
- 	return ((val >> SYS_DBGBCR_EL1_LBN_SHIFT) & SYS_DBGBCR_EL1_LBN_MASK);
- }
- 
--static u64 update_bcr_lbn(u64 val, u8 lbn)
-+static u64 update_bwcr_lbn(u64 val, u8 lbn)
- {
- 	u64 new;
- 
-+	WARN_ON_ONCE(SYS_DBGBCR_EL1_LBN_SHIFT != SYS_DBGWCR_EL1_LBN_SHIFT);
-+	WARN_ON_ONCE(SYS_DBGBCR_EL1_LBN_MASK != SYS_DBGWCR_EL1_LBN_MASK);
-+
- 	new = val & ~(SYS_DBGBCR_EL1_LBN_MASK << SYS_DBGBCR_EL1_LBN_SHIFT);
- 	new |= ((u64)lbn & SYS_DBGBCR_EL1_LBN_MASK) << SYS_DBGBCR_EL1_LBN_SHIFT;
- 	return new;
-@@ -1029,29 +1037,51 @@ static u8 get_unused_p_bpn(struct kvm_vcpu *vcpu)
-  * context aware breakpoint. In such cases, KVM will return 0 to reads of
-  * bcr.lbn, and have the breakpoint behaves as if it is disabled by
-  * setting the lbn to unused (disabled) breakpoint.
-+ *
-+ * virt_to_phys_wcr()/phys_to_virt_wcr() does the same thing for wcr.
-  */
--static u64 virt_to_phys_bcr(struct kvm_vcpu *vcpu, u64 v_bcr)
-+static u64 virt_to_phys_bwcr(struct kvm_vcpu *vcpu, u64 v_bwcr)
- {
- 	u8 v_lbn, p_lbn;
- 
--	v_lbn = get_bcr_lbn(v_bcr);
-+	v_lbn = get_bwcr_lbn(v_bwcr);
- 	p_lbn = virt_to_phys_bpn(vcpu, v_lbn);
- 	if (p_lbn == INVALID_BRPN)
- 		p_lbn = get_unused_p_bpn(vcpu);
- 
--	return update_bcr_lbn(v_bcr, p_lbn);
-+	return update_bwcr_lbn(v_bwcr, p_lbn);
- }
- 
--static u64 phys_to_virt_bcr(struct kvm_vcpu *vcpu, u64 p_bcr)
-+static u64 phys_to_virt_bwcr(struct kvm_vcpu *vcpu, u64 p_bwcr)
- {
- 	u8 v_lbn, p_lbn;
- 
--	p_lbn = get_bcr_lbn(p_bcr);
-+	p_lbn = get_bwcr_lbn(p_bwcr);
- 	v_lbn = phys_to_virt_bpn(vcpu, p_lbn);
- 	if (v_lbn == INVALID_BRPN)
- 		v_lbn = 0;
- 
--	return update_bcr_lbn(p_bcr, v_lbn);
-+	return update_bwcr_lbn(p_bwcr, v_lbn);
-+}
-+
-+static u64 virt_to_phys_bcr(struct kvm_vcpu *vcpu, u64 v_bcr)
-+{
-+	return virt_to_phys_bwcr(vcpu, v_bcr);
-+}
-+
-+static u64 virt_to_phys_wcr(struct kvm_vcpu *vcpu, u64 v_wcr)
-+{
-+	return virt_to_phys_bwcr(vcpu, v_wcr);
-+}
-+
-+static u64 phys_to_virt_bcr(struct kvm_vcpu *vcpu, u64 p_bcr)
-+{
-+	return phys_to_virt_bwcr(vcpu, p_bcr);
-+}
-+
-+static u64 phys_to_virt_wcr(struct kvm_vcpu *vcpu, u64 p_wcr)
-+{
-+	return phys_to_virt_bwcr(vcpu, p_wcr);
- }
- 
- /*
-@@ -1116,6 +1146,12 @@ void kvm_vcpu_breakpoint_config(struct kvm_vcpu *vcpu)
- 			dbg->dbg_bcr[v] = 0;
- 			dbg->dbg_bvr[v] = 0;
- 		}
-+
-+		/*
-+		 * There is no distinction between physical and virtual
-+		 * watchpoint numbers. So, the index stays the same.
-+		 */
-+		dbg->dbg_wcr[v] = virt_to_phys_wcr(vcpu, dbg->dbg_wcr[v]);
- 	}
- }
- 
-@@ -1461,12 +1497,26 @@ static bool trap_wcr(struct kvm_vcpu *vcpu,
- 		     struct sys_reg_params *p,
- 		     const struct sys_reg_desc *rd)
- {
--	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm];
-+	u8 wpn = rd->CRm;
-+	u64 *dbg_reg;
-+	u64 v_dfr0 = read_id_reg_with_encoding(vcpu, SYS_ID_AA64DFR0_EL1);
- 
--	if (p->is_write)
-+	if (wpn > AA64DFR0_WRPS(v_dfr0)) {
-+		/* Invalid watchpoint number for the guest */
-+		kvm_inject_undefined(vcpu);
-+		return false;
-+	}
-+
-+	dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_wcr[wpn];
-+	if (p->is_write) {
-+		/* Convert virtual wcr to physical wcr and update debug_reg */
-+		p->regval = virt_to_phys_wcr(vcpu, p->regval);
- 		reg_to_dbg(vcpu, p, rd, dbg_reg);
--	else
-+	} else {
- 		dbg_to_reg(vcpu, p, rd, dbg_reg);
-+		/* Convert physical wcr to virtual wcr */
-+		p->regval = phys_to_virt_wcr(vcpu, p->regval);
-+	}
- 
- 	trace_trap_reg(__func__, rd->CRm, p->is_write, *dbg_reg);
- 
-@@ -1476,19 +1526,49 @@ static bool trap_wcr(struct kvm_vcpu *vcpu,
- static int set_wcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 		const struct kvm_one_reg *reg, void __user *uaddr)
- {
--	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm];
-+	u8 wpn = rd->CRm;
-+	u64 v_wcr, p_wcr;
- 
--	if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) != 0)
-+	if (copy_from_user(&v_wcr, uaddr, KVM_REG_SIZE(reg->id)) != 0)
- 		return -EFAULT;
-+
-+	/*
-+	 * Until the first KVM_RUN, vcpu_debug_state holds the virtual wcr.
-+	 * After that, vcpu_debug_state holds the physical wcr.
-+	 */
-+	if (vcpu_has_run_once(vcpu)) {
-+		/* Convert virtual wcr to physical wcr, and save it */
-+		p_wcr = virt_to_phys_wcr(vcpu, v_wcr);
-+		vcpu->arch.vcpu_debug_state.dbg_wcr[wpn] = p_wcr;
-+	} else {
-+		vcpu->arch.vcpu_debug_state.dbg_wcr[wpn] = v_wcr;
-+		return 0;
-+	}
-+
+@@ -654,6 +654,75 @@ static int validate_id_aa64mmfr0_el1(struct kvm_vcpu *vcpu,
  	return 0;
  }
  
- static int get_wcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 	const struct kvm_one_reg *reg, void __user *uaddr)
- {
--	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm];
-+	u8 wpn = rd->CRm;
-+	u64 p_wcr, v_wcr;
- 
--	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) != 0)
++static int validate_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
++				    const struct id_reg_desc *id_reg, u64 val)
++{
++	unsigned int brps, ctx_cmps;
++	u64 pmu, lim_pmu;
++	u64 lim = id_reg->vcpu_limit_val;
++
++	brps = cpuid_feature_extract_unsigned_field(val, ID_AA64DFR0_BRPS_SHIFT);
++	ctx_cmps = cpuid_feature_extract_unsigned_field(val, ID_AA64DFR0_CTX_CMPS_SHIFT);
++
 +	/*
-+	 * Until the first KVM_RUN, vcpu_debug_state holds the virtual wcr.
-+	 * After that, vcpu_debug_state holds the physical wcr.
++	 * Number of context-aware breakpoints can be no more than number of
++	 * supported breakpoints.
 +	 */
-+	if (vcpu_has_run_once(vcpu)) {
-+		/* Get the physical wcr value */
-+		p_wcr = vcpu->arch.vcpu_debug_state.dbg_wcr[wpn];
++	if (ctx_cmps > brps)
++		return -EINVAL;
 +
-+		/* Convert physical wcr to virtual wcr */
-+		v_wcr = phys_to_virt_wcr(vcpu, p_wcr);
-+	} else {
-+		v_wcr = vcpu->arch.vcpu_debug_state.dbg_wcr[wpn];
-+	}
++	/*
++	 * KVM will not set PMUVER to 0xf (IMPLEMENTATION DEFINED PMU)
++	 * for the guest because KVM doesn't support it.
++	 * If userspace requests KVM to set the field to 0xf, KVM will treat
++	 * that as 0 instead of returning an error since userspace might do
++	 * that when the guest is migrated from a host with older KVM,
++	 * which sets the field to 0xf when the host value is 0xf.
++	 */
++	pmu = cpuid_feature_extract_unsigned_field(val, ID_AA64DFR0_PMUVER_SHIFT);
++	pmu = (pmu == 0xf) ? 0 : pmu;
++	lim_pmu = cpuid_feature_extract_unsigned_field(lim, ID_AA64DFR0_PMUVER_SHIFT);
++	if (pmu > lim_pmu)
++		return -E2BIG;
 +
-+	if (copy_to_user(uaddr, &v_wcr, KVM_REG_SIZE(reg->id)) != 0)
- 		return -EFAULT;
- 	return 0;
++	/* Check if there is a conflict with a request via KVM_ARM_VCPU_INIT */
++	if (kvm_vcpu_has_pmu(vcpu) ^ (pmu >= ID_AA64DFR0_PMUVER_8_0))
++		return -EPERM;
++
++	return 0;
++}
++
++static int validate_id_dfr0_el1(struct kvm_vcpu *vcpu,
++				const struct id_reg_desc *id_reg, u64 val)
++{
++	u64 pmon, lim_pmon;
++	u64 lim = id_reg->vcpu_limit_val;
++
++	/*
++	 * KVM will not set PERFMON to 0xf (IMPLEMENTATION DEFINED PERFMON)
++	 * for the guest because KVM doesn't support it.
++	 * If userspace requests KVM to set the field to 0xf, KVM will treat
++	 * that as 0 instead of returning an error since userspace might do
++	 * that when the guest is migrated from a host with older KVM,
++	 * which sets the field to 0xf when the host value is 0xf.
++	 */
++	pmon = cpuid_feature_extract_unsigned_field(val, ID_DFR0_PERFMON_SHIFT);
++	pmon = (pmon == 0xf) ? 0 : pmon;
++	lim_pmon = cpuid_feature_extract_unsigned_field(lim, ID_DFR0_PERFMON_SHIFT);
++	if (pmon > lim_pmon)
++		return -E2BIG;
++
++	if (pmon == 1 || pmon == 2)
++		/* PMUv1 or PMUv2 is not allowed on ARMv8. */
++		return -EINVAL;
++
++	/* Check if there is a conflict with a request via KVM_ARM_VCPU_INIT */
++	if (kvm_vcpu_has_pmu(vcpu) ^ (pmon >= ID_DFR0_PERFMON_8_0))
++		return -EPERM;
++
++	return 0;
++}
++
+ static void init_id_aa64pfr0_el1_desc(struct id_reg_desc *id_reg)
+ {
+ 	u64 limit = id_reg->vcpu_limit_val;
+@@ -703,6 +772,31 @@ static void init_id_aa64isar2_el1_desc(struct id_reg_desc *id_reg)
+ 		id_reg->vcpu_limit_val &= ~ISAR2_PTRAUTH_MASK;
  }
+ 
++static void init_id_aa64dfr0_el1_desc(struct id_reg_desc *id_reg)
++{
++	u64 limit = id_reg->vcpu_limit_val;
++
++	/* Limit guests to PMUv3 for ARMv8.4 */
++	limit = cpuid_feature_cap_perfmon_field(limit, ID_AA64DFR0_PMUVER_SHIFT,
++						ID_AA64DFR0_PMUVER_8_4);
++	/* Limit debug to ARMv8.0 */
++	limit &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER);
++	limit |= (FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), 6));
++
++	/* Hide SPE from guests */
++	limit &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_PMSVER);
++
++	id_reg->vcpu_limit_val = limit;
++}
++
++static void init_id_dfr0_el1_desc(struct id_reg_desc *id_reg)
++{
++	/* Limit guests to PMUv3 for ARMv8.4 */
++	id_reg->vcpu_limit_val =
++		cpuid_feature_cap_perfmon_field(id_reg->vcpu_limit_val,
++						ID_DFR0_PERFMON_SHIFT,
++						ID_DFR0_PERFMON_8_4);
++}
+ 
+ static u64 vcpu_mask_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu,
+ 					 const struct id_reg_desc *idr)
+@@ -729,6 +823,18 @@ static u64 vcpu_mask_id_aa64isar2_el1(const struct kvm_vcpu *vcpu,
+ }
+ 
+ 
++static u64 vcpu_mask_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu,
++					 const struct id_reg_desc *idr)
++{
++	return kvm_vcpu_has_pmu(vcpu) ? 0 : ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER);
++}
++
++static u64 vcpu_mask_id_dfr0_el1(const struct kvm_vcpu *vcpu,
++				     const struct id_reg_desc *idr)
++{
++	return kvm_vcpu_has_pmu(vcpu) ? 0 : ARM64_FEATURE_MASK(ID_DFR0_PERFMON);
++}
++
+ static int validate_id_reg(struct kvm_vcpu *vcpu,
+ 			   const struct id_reg_desc *id_reg, u64 val)
+ {
+@@ -2186,28 +2292,9 @@ static u64 read_id_reg_with_encoding(const struct kvm_vcpu *vcpu, u32 id)
+ 	const struct id_reg_desc *id_reg = get_id_reg_desc(id);
+ 
+ 	if (id_reg)
+-		return __read_id_reg(vcpu, id_reg);
+-
+-	val = read_kvm_id_reg(vcpu->kvm, id);
+-	switch (id) {
+-	case SYS_ID_AA64DFR0_EL1:
+-		/* Limit debug to ARMv8.0 */
+-		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER);
+-		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), 6);
+-		/* Limit guests to PMUv3 for ARMv8.4 */
+-		val = cpuid_feature_cap_perfmon_field(val,
+-						      ID_AA64DFR0_PMUVER_SHIFT,
+-						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
+-		/* Hide SPE from guests */
+-		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_PMSVER);
+-		break;
+-	case SYS_ID_DFR0_EL1:
+-		/* Limit guests to PMUv3 for ARMv8.4 */
+-		val = cpuid_feature_cap_perfmon_field(val,
+-						      ID_DFR0_PERFMON_SHIFT,
+-						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
+-		break;
+-	}
++		val = __read_id_reg(vcpu, id_reg);
++	else
++		val = read_kvm_id_reg(vcpu->kvm, id);
+ 
+ 	return val;
+ }
+@@ -4028,15 +4115,48 @@ static struct id_reg_desc id_aa64mmfr0_el1_desc = {
+ 	},
+ };
+ 
++static struct id_reg_desc id_aa64dfr0_el1_desc = {
++	.reg_desc = ID_SANITISED(ID_AA64DFR0_EL1),
++	/*
++	 * PMUVER doesn't follow the ID scheme for fields in ID registers.
++	 * So, it will be validated by validate_id_aa64dfr0_el1.
++	 */
++	.ignore_mask = ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER),
++	.init = init_id_aa64dfr0_el1_desc,
++	.validate = validate_id_aa64dfr0_el1,
++	.vcpu_mask = vcpu_mask_id_aa64dfr0_el1,
++	.ftr_bits = {
++		S_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_DOUBLELOCK_SHIFT, 0xf),
++	},
++};
++
++static struct id_reg_desc id_dfr0_el1_desc = {
++	.reg_desc = ID_SANITISED(ID_DFR0_EL1),
++	/*
++	 * PERFMON doesn't follow the ID scheme for fields in ID registers.
++	 * So, it will be validated by validate_id_dfr0_el1.
++	 */
++	.ignore_mask = ARM64_FEATURE_MASK(ID_DFR0_PERFMON),
++	.init = init_id_dfr0_el1_desc,
++	.validate = validate_id_dfr0_el1,
++	.vcpu_mask = vcpu_mask_id_dfr0_el1,
++};
++
+ #define ID_DESC(id_reg_name, id_reg_desc)	\
+ 	[IDREG_IDX(SYS_##id_reg_name)] = (id_reg_desc)
+ 
+ /* A table for ID registers's information. */
+ static struct id_reg_desc *id_reg_desc_table[KVM_ARM_ID_REG_MAX_NUM] = {
++	/* CRm=1 */
++	ID_DESC(ID_DFR0_EL1, &id_dfr0_el1_desc),
++
+ 	/* CRm=4 */
+ 	ID_DESC(ID_AA64PFR0_EL1, &id_aa64pfr0_el1_desc),
+ 	ID_DESC(ID_AA64PFR1_EL1, &id_aa64pfr1_el1_desc),
+ 
++	/* CRm=5 */
++	ID_DESC(ID_AA64DFR0_EL1, &id_aa64dfr0_el1_desc),
++
+ 	/* CRm=6 */
+ 	ID_DESC(ID_AA64ISAR0_EL1, &id_aa64isar0_el1_desc),
+ 	ID_DESC(ID_AA64ISAR1_EL1, &id_aa64isar1_el1_desc),
 -- 
 2.36.0.rc0.470.gd361397f0d-goog
 
