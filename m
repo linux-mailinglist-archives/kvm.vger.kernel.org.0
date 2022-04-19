@@ -2,185 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BDF7F50653A
-	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 08:58:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BCEA506634
+	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 09:46:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349214AbiDSHB1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Apr 2022 03:01:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43630 "EHLO
+        id S243286AbiDSHtR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Apr 2022 03:49:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349170AbiDSHBS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Apr 2022 03:01:18 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E74233355
-        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 23:58:19 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id mm2-20020a17090b358200b001bf529127dfso1040923pjb.6
-        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 23:58:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=mjj9/ZURjjtGQaz2LLl2krlBnNho3fyEfvR2R+fnkyk=;
-        b=Cx/niwv6W7Y06XURKByUCxiOI2JS42u8ZRsB4Jd/xNk9tuJcTxkf6DGO2ozYf4I2US
-         ZU5gnlaHf3BOrOeCv/etuwgapIvL2bqk3oDXaueadh0neyRo+SRUNGL8votl7vplAKIM
-         sHEcbNzdEG1JDsorZDIsYKh0benCQF67aJbA83qbMyT0rAqvaaie74ccZbn2UKz7aKPj
-         rdih6zJ2hBj5+wcu/NsMPytHpAWF1ZDLiIr+vMhcou+4/o0JwtMNZ0uLdoKh4FJr+/Aw
-         2l9wU0ZAeDtDkWgA6X6SW5F7yr+BUmvcruGK7QcRMj4E99qkjqwTBZGm703z1PFKPYWV
-         fU1Q==
+        with ESMTP id S1349553AbiDSHtJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Apr 2022 03:49:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CBACC2E0BD
+        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 00:46:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650354387;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Gn/QQHDd1WMkLVfZyI1nYZ7LAtHIpd/JrDkDW5rnOy4=;
+        b=bzgSur5HGMuN+cIPfmRq7z5l0a2+VKnYv0TXbHd1KsDewsJS/otGhiEBqfpkIAUIRdK0Yi
+        od/hC1LtCAWDQHt30KIX+2cZT3yzsrlE6IthRgvo2/Ly6s5FiFPZOrdn6ooPe0WDfl05Cf
+        +CUmioJe2EQtX37lKC3Z6Wi+gqnYm9Y=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-526-7JpbGNh8NKe581yLITr2nQ-1; Tue, 19 Apr 2022 03:46:25 -0400
+X-MC-Unique: 7JpbGNh8NKe581yLITr2nQ-1
+Received: by mail-ej1-f70.google.com with SMTP id qa31-20020a170907869f00b006ef7a20fdc6so2079995ejc.5
+        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 00:46:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=mjj9/ZURjjtGQaz2LLl2krlBnNho3fyEfvR2R+fnkyk=;
-        b=Q7ZrsYsSv8nFNGO+FkoJJmveYzJvxSYw0M8n9bOZEGo+XMRPkdhq2KVfTe+ta0rayk
-         Cz+YkHnC6JtDd+UVV98CVFdUu5/Bh7Nngr1gKY5vGQ2xvy5H70sCMbIacCBALvWmFPUh
-         8XOZTMj7OlQy7zUT0SKwWgCNqFicxU1908RO13iuoU8v9sGTH1jL0vW7kMLyu9DZquHl
-         Vfm6PZkgzLIhp5P8FUiIo/DJi1RzKh6M/awXCrHDYWlQdYVCMcNt2osgkak9JSf452ky
-         7xSQUxHE4Mrk6w+vB+tYGHVd01XfBKokjX+uiw5DGtC1V8d+mw26ZlVoH0nRp16tlm/k
-         7oJw==
-X-Gm-Message-State: AOAM532+3Z5BiS25xQNfRCq5cyFpdzXwK8SY41fcsVb1l9Sp1uwLyocF
-        Jxyto60r5OEvMdS5ow6GfbIYXp1QZC8=
-X-Google-Smtp-Source: ABdhPJxetHGB4V+UPVW7WLQKsn2PTcz1+SOcEmT+cqxyd2F8wg7N+PKJyvCJRL8FQa0pqjwk4Zbwsa8b0eQ=
-X-Received: from reiji-vws-sp.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:a17:90b:2384:b0:1cb:5223:9dc4 with SMTP id
- mr4-20020a17090b238400b001cb52239dc4mr276931pjb.1.1650351487187; Mon, 18 Apr
- 2022 23:58:07 -0700 (PDT)
-Date:   Mon, 18 Apr 2022 23:55:44 -0700
-In-Reply-To: <20220419065544.3616948-1-reijiw@google.com>
-Message-Id: <20220419065544.3616948-39-reijiw@google.com>
-Mime-Version: 1.0
-References: <20220419065544.3616948-1-reijiw@google.com>
-X-Mailer: git-send-email 2.36.0.rc0.470.gd361397f0d-goog
-Subject: [PATCH v7 38/38] KVM: arm64: selftests: Test breakpoint/watchpoint
- changing ID_AA64DFR0_EL1
-From:   Reiji Watanabe <reijiw@google.com>
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Fuad Tabba <tabba@google.com>,
-        Peng Liang <liangpeng10@huawei.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        Reiji Watanabe <reijiw@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=Gn/QQHDd1WMkLVfZyI1nYZ7LAtHIpd/JrDkDW5rnOy4=;
+        b=M0O93zSc3yuyh6kkfvOQdEPPKSY5lkK/QwrmE8KNPQE3ATOqaZAjUhVCrWaRx1ifHX
+         ubbxjZ7d7GoUC328UCr4oej3fHduQixuKQ8HNi4Dn6elS2W1FGPgncBIVJWPfetT9RnD
+         QzPMsPuHbMblLp/yGZzi2I75HIPXUF1+ERrDOGTMItIn1gJtV3VQZWYsOufoJ1ILjzYX
+         +hqs3O5qQh/86hXPNp5AWN6QzZyjEXlNNW13llDqr0UnbkVBvlioruaPLda6Nr3YGpi/
+         SbvPTxhI9dqvpRCaqOHajib0AcixtvKK9X+TKcUPBq+D2oQUV12yL03y9H6Var7jSqWz
+         jB9A==
+X-Gm-Message-State: AOAM533ebbjYs2CUHZDVfVUiNJJjeeLdgFes1Q3zq2fblI/ccrVP6G/O
+        2tyRgDJfuPyJK2tJRLpvSPefoh47bxYq0++ak/Dmt32v1X8DsYxml/qjAtnF4BUZtJTrB2uO1sh
+        NpENsqhieWxC+
+X-Received: by 2002:a17:907:d90:b0:6eb:557e:91e6 with SMTP id go16-20020a1709070d9000b006eb557e91e6mr12138593ejc.376.1650354384408;
+        Tue, 19 Apr 2022 00:46:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzLnRfOzlVdWfc2WzaZG+0vGSVJigsAqJVIie4FNXYj3x7jHKUoImfSoKneidyOusSzH594sA==
+X-Received: by 2002:a17:907:d90:b0:6eb:557e:91e6 with SMTP id go16-20020a1709070d9000b006eb557e91e6mr12138578ejc.376.1650354384200;
+        Tue, 19 Apr 2022 00:46:24 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id p17-20020a17090635d100b006efcc06218dsm1204686ejb.18.2022.04.19.00.46.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Apr 2022 00:46:23 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Anton Romanov <romanton@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [PATCH] KVM: x86: Use current rather than snapshotted TSC
+ frequency if it is constant
+In-Reply-To: <Ylh3HNlcJd8+P+em@google.com>
+References: <20220414183127.4080873-1-romanton@google.com>
+ <Ylh3HNlcJd8+P+em@google.com>
+Date:   Tue, 19 Apr 2022 09:46:23 +0200
+Message-ID: <877d7l5xdc.fsf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add test cases that uses every breakpoint/watchpoint with various
-combination of ID_AA64DFR0_EL1.BRPs, WRPs, and CTX_CMPs
-configuration to the debug-exceptions test.
+Sean Christopherson <seanjc@google.com> writes:
 
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
----
- .../selftests/kvm/aarch64/debug-exceptions.c  | 52 ++++++++++++++++---
- 1 file changed, 46 insertions(+), 6 deletions(-)
+> +Vitaly
+>
+> On Thu, Apr 14, 2022, Anton Romanov wrote:
 
-diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-index 829fad6c7d58..d8ebbb7985da 100644
---- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-+++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-@@ -701,18 +701,19 @@ static void check_debug_regs(struct kvm_vm *vm, uint32_t vcpu,
- 	}
- }
- 
--void run_test(uint8_t bpn, uint8_t wpn, uint8_t ctx_bpn)
-+void run_test(uint64_t aa64dfr0, uint8_t bpn, uint8_t wpn, uint8_t ctx_bpn)
- {
- 	struct kvm_vm *vm;
- 	struct ucall uc;
- 	int stage;
--	uint64_t aa64dfr0;
- 	uint8_t nbps, nwps;
- 	bool debug_reg_test = false;
- 
--	pr_debug("%s bpn:%d, wpn:%d, ctx_bpn:%d\n", __func__, bpn, wpn, ctx_bpn);
--
-+	pr_debug("%s aa64dfr0:0x%lx, bpn:%d, wpn:%d, ctx_bpn:%d\n", __func__,
-+		 aa64dfr0, bpn, wpn, ctx_bpn);
- 	vm = vm_create_default(VCPU_ID, 0, guest_code);
-+	set_reg(vm, VCPU_ID, KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), aa64dfr0);
-+
- 	ucall_init(vm, NULL);
- 
- 	vm_init_descriptor_tables(vm);
-@@ -810,15 +811,33 @@ void test_debug(uint64_t aa64dfr0)
- 	for (c = ctx_brp_base; c < ctx_brp_base + ctx_brp_num; c++) {
- 		for (b = 0; b < normal_brp_num; b++) {
- 			for (w = 0; w < wrp_num; w++)
--				run_test(b, w, c);
-+				run_test(aa64dfr0, b, w, c);
- 		}
- 	}
- }
- 
-+uint64_t update_aa64dfr0_bwrp(uint64_t dfr0, uint8_t brps, uint8_t wrps,
-+			      uint8_t ctx_brps)
-+{
-+	/* Clear brps/wrps/ctx_cmps fields */
-+	dfr0 &= ~(ARM64_FEATURE_MASK(ID_AA64DFR0_BRPS) |
-+		  ARM64_FEATURE_MASK(ID_AA64DFR0_WRPS) |
-+		  ARM64_FEATURE_MASK(ID_AA64DFR0_CTX_CMPS));
-+
-+	/* Set new brps/wrps/ctx_cmps fields */
-+	dfr0 |= ((uint64_t)brps << ID_AA64DFR0_BRPS_SHIFT) |
-+		((uint64_t)wrps << ID_AA64DFR0_WRPS_SHIFT) |
-+		((uint64_t)ctx_brps << ID_AA64DFR0_CTX_CMPS_SHIFT);
-+
-+	return dfr0;
-+}
-+
- int main(int argc, char *argv[])
- {
- 	struct kvm_vm *vm;
--	uint64_t aa64dfr0;
-+	uint64_t aa64dfr0, test_aa64dfr0;
-+	uint8_t max_brps, max_wrps, max_ctx_brps;
-+	int bs, ws, cs;
- 
- 	vm = vm_create_default(VCPU_ID, 0, guest_code);
- 	get_reg(vm, VCPU_ID, KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &aa64dfr0);
-@@ -831,5 +850,26 @@ int main(int argc, char *argv[])
- 
- 	/* Run debug tests with the default configuration */
- 	test_debug(aa64dfr0);
-+
-+	if (!kvm_check_cap(KVM_CAP_ARM_ID_REG_CONFIGURABLE))
-+		return 0;
-+
-+	/*
-+	 * Run debug tests with various number of breakpoints/watchpoints
-+	 * configuration.
-+	 */
-+	max_brps = cpuid_extract_uftr(aa64dfr0, ID_AA64DFR0_BRPS_SHIFT);
-+	max_wrps = cpuid_extract_uftr(aa64dfr0, ID_AA64DFR0_WRPS_SHIFT);
-+	max_ctx_brps = cpuid_extract_uftr(aa64dfr0, ID_AA64DFR0_CTX_CMPS_SHIFT);
-+	for (cs = 0; cs <= max_ctx_brps; cs++) {
-+		for (bs = cs + 1; bs <= max_brps; bs++) {
-+			for (ws = 1; ws <= max_wrps; ws++) {
-+				test_aa64dfr0 = update_aa64dfr0_bwrp(aa64dfr0,
-+								    bs, ws, cs);
-+				test_debug(test_aa64dfr0);
-+			}
-+		}
-+	}
-+
- 	return 0;
- }
+...
+
+>> @@ -8646,9 +8659,12 @@ static void tsc_khz_changed(void *data)
+>>  	struct cpufreq_freqs *freq = data;
+>>  	unsigned long khz = 0;
+>>  
+>> +	if (boot_cpu_has(X86_FEATURE_CONSTANT_TSC))
+>> +		return;
+>
+> Vitaly,
+>
+> The Hyper-V guest code also sets cpu_tsc_khz, should we WARN if that notifier is
+> invoked and Hyper-V told us there's a constant TSC?
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index ab336f7c82e4..ca8e20f5ffc0 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8701,6 +8701,8 @@ static void kvm_hyperv_tsc_notifier(void)
+>         struct kvm *kvm;
+>         int cpu;
+>
+> +       WARN_ON_ONCE(boot_cpu_has(X86_FEATURE_CONSTANT_TSC));
+> +
+>         mutex_lock(&kvm_lock);
+>         list_for_each_entry(kvm, &vm_list, vm_list)
+>                 kvm_make_mclock_inprogress_request(kvm);
+>
+
+(apologies for the delayed reply)
+
+No, I think Hyper-V's "Reenlightenment" feature overrides (re-defines?)
+X86_FEATURE_CONSTANT_TSC. E.g. I've checked a VM on E5-2667 v4
+(Broadwell) CPU with no TSC scaling. This VM has 'constant_tsc' and will
+certainly get reenlightenment irq on migration.
+
+Note, Hyper-V has its own 'Invariant TSC control', see commit
+dce7cd62754b5 ("x86/hyperv: Allow guests to enable InvariantTSC"). When
+enabled, X86_FEATURE_TSC_RELIABLE is forced. I *think* (haven't checked
+as I don't have two suitable hosts to test migration handy) this will
+suppress reenlightenment so the check should be
+
+       WARN_ON_ONCE(boot_cpu_has(X86_FEATURE_TSC_RELIABLE));
+
+instead. There is a chance that reenlightenment notifications still
+arrive but the reported 'new' TSC frequency remains unchanged (silly,
+but possible), I'll need to check.
+
 -- 
-2.36.0.rc0.470.gd361397f0d-goog
+Vitaly
 
