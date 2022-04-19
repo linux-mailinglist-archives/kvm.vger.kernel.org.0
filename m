@@ -2,125 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B3B445072BD
-	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 18:14:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 65F45507538
+	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 18:49:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354456AbiDSQQh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Apr 2022 12:16:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50368 "EHLO
+        id S1355384AbiDSQtg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Apr 2022 12:49:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234864AbiDSQQg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Apr 2022 12:16:36 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C55B9344F3
-        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 09:13:53 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id t12so16215134pll.7
-        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 09:13:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=qecgchbQpkC8VFWLfXJz9CabOj/wn5VuftBSrEpwYy0=;
-        b=kkxzMeagB+WC1288SzkQy989axvDanR/Sqn1kQdtL+KdDCeMZe6BBsF1gRHW0XFzhz
-         NKnwm0ce+rrTETEc34sJDtgEf+R0dekqx8cB1JGXidtJ4SABvYsMvWl9kY1ew2nA48D4
-         3n8+DCmzMiU45Zs4pAQ3+8JfJGBAFcgyVzHjf4IILvl/453+EwS4+A3YCLE6W64VA/x/
-         LlpLSUFG7AWWGJEgL0iid3JBuksYpQrm2UHtbYEI3GvDXYXupKyyxcXM08qm9JCKvBdY
-         LTpnZgH483Tawy5rzY5dGps1hocBLY0AjhqgKdF7sYIEL3PwtRvot/oFuiw6pmBtXWpd
-         +A9w==
+        with ESMTP id S243057AbiDSQp5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Apr 2022 12:45:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8CEBA3A1B4
+        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 09:43:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650386592;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=V3ODNWfMW+rRhSokZu86v1GXhJjBricpy30YxedvS1g=;
+        b=GGC/aKc6epjyb8qz33WDzkz7vdHatLFmsDOSeJq77hCEJ6oyzCiZ0EFdOm52+mMK1ay6Ju
+        xXNCJDNzjRJ4OimnpdrBcIX9/M6OpCf18OiLh84LH/skKgzZQbYlJ55COX7O6F6g12hcBD
+        T3Tpah57XcNPKzT6ZXuaTyaIiH1NCsQ=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-326-Wac1c0jLMMCmcgh5LCJh6A-1; Tue, 19 Apr 2022 12:43:10 -0400
+X-MC-Unique: Wac1c0jLMMCmcgh5LCJh6A-1
+Received: by mail-wm1-f69.google.com with SMTP id t2-20020a7bc3c2000000b003528fe59cb9so1464081wmj.5
+        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 09:43:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=qecgchbQpkC8VFWLfXJz9CabOj/wn5VuftBSrEpwYy0=;
-        b=3mow5SIkdYQvd1P0chXgeIHVZTc8a97Rpt4ndZSvvTvM/Xn7JHaNkYAtPyNyGIvBu7
-         aHiD9SBj4aeOXTraSd82YYKhxY8Je7UlqTzxnB8LohJ/IiBGxk1o6l9hJxy/FS0UwMr0
-         iI2r36z5Nx62CShxt03REMGuyqIn0zqXiSQowABUmSnfKqrkTviCzn/9dplm4nVPc9zr
-         p83O71CoDgKfBxEEwx8a0+vGoY0/km+Fr6uq7Z62dG1kdGXEt6ffoXOoLJEKJiIbTEj1
-         tHg9Om6LW8LmvvLj4qnpt7viZ8ttvLq1Y1NdDleSLGbCBZ6NuPpV5fZGWI96rXL+c+r4
-         NLCQ==
-X-Gm-Message-State: AOAM533P3oGIyyjkmMa0jadA34IjAB65lpXCuoPjfuRtowvE+Vek8cgG
-        cCimyJXCeAmKlZz6VTh8JlIZv1RVEpTr9Q==
-X-Google-Smtp-Source: ABdhPJzfoR59jYWSSDA1ZskwmKf856pFmJ5wZXsaTyTgkBG82Z/RG/CwPo/haNI2IzjDq3nqETUiIQ==
-X-Received: by 2002:a17:90a:a4e:b0:1cb:58a9:af2a with SMTP id o72-20020a17090a0a4e00b001cb58a9af2amr19553023pjo.101.1650384833110;
-        Tue, 19 Apr 2022 09:13:53 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y21-20020a631815000000b0039fcedd7bedsm17596567pgl.41.2022.04.19.09.13.52
+        bh=V3ODNWfMW+rRhSokZu86v1GXhJjBricpy30YxedvS1g=;
+        b=7jpl0xILpNDiL6lTVCCYNR0Rjz+YiJ6o/6caINACBobkGQbm9ZDWC7eJyoTrxHzBxm
+         RQcF86q3KaFWG76mmZMw+9KXxfxiT4bCC10D1XHUDUlbHRAyeuuYqOW3aoLgW/mywjPj
+         RiXY1KmFeu/xJxuWXtFA7cjN9VaZ2Al/kbfxNo1LPhSBlRTXHbZAAGyU7fAVoA1BPQsp
+         Inj5ldePTBHW8OwUtJLNQ+WVfhR7LdiQbbnU1bH+qyVCTDH/Ay2EUGH2/g7Cty2SRH3d
+         Gn0EOO+CMr6PevYUQS1L016AwuHQEenT+1e96HK7x9ZAH5vfd6q50WWa7D/3LkI9LIIH
+         iOpg==
+X-Gm-Message-State: AOAM532Szt45NtErJNeg83j+rAmywlSR0BSg1CA5rcyZFhrDJc9TIpSc
+        0WkP1XIEq1qdrOtf6FZjFFPkB8kvclbtQ7j7On1xJ+C/k3OB63UWeaifwZ7EuizsfAcx3zaBHLV
+        J+df8AIrvWMeL
+X-Received: by 2002:adf:f981:0:b0:205:c3e1:9eba with SMTP id f1-20020adff981000000b00205c3e19ebamr12387503wrr.244.1650386589520;
+        Tue, 19 Apr 2022 09:43:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz/sBvEGx6+IXc/dmS3LEsLdRrH83M0si6np7xgLC//YEu1El92MuYL5XEmIp9phspX0ZKpFQ==
+X-Received: by 2002:adf:f981:0:b0:205:c3e1:9eba with SMTP id f1-20020adff981000000b00205c3e19ebamr12387485wrr.244.1650386589266;
+        Tue, 19 Apr 2022 09:43:09 -0700 (PDT)
+Received: from redhat.com ([2.53.17.80])
+        by smtp.gmail.com with ESMTPSA id v14-20020a7bcb4e000000b0034492fa24c6sm16631515wmj.34.2022.04.19.09.43.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Apr 2022 09:13:52 -0700 (PDT)
-Date:   Tue, 19 Apr 2022 16:13:49 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Anton Romanov <romanton@google.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com
-Subject: Re: [PATCH] KVM: x86: Use current rather than snapshotted TSC
- frequency if it is constant
-Message-ID: <Yl7fvbDz+ckj/psQ@google.com>
-References: <20220414183127.4080873-1-romanton@google.com>
- <Ylh3HNlcJd8+P+em@google.com>
- <877d7l5xdc.fsf@redhat.com>
- <Yl7XmmmuAZzNYiKq@google.com>
- <87o80x3vkx.fsf@redhat.com>
+        Tue, 19 Apr 2022 09:43:07 -0700 (PDT)
+Date:   Tue, 19 Apr 2022 12:43:03 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Alexander Graf <graf@amazon.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        linux-hyperv@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        adrian@parity.io, Laszlo Ersek <lersek@redhat.com>,
+        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Jann Horn <jannh@google.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        "Brown, Len" <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Theodore Ts'o <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>
+Subject: Re: propagating vmgenid outward and upward
+Message-ID: <20220419124245-mutt-send-email-mst@kernel.org>
+References: <Yh4+9+UpanJWAIyZ@zx2c4.com>
+ <c5181fb5-38fb-f261-9de5-24655be1c749@amazon.com>
+ <CAHmME9rTMDkE7UA3_wg87mrDVYps+YaHw+dZwF0EbM0zC4pQQw@mail.gmail.com>
+ <47137806-9162-0f60-e830-1a3731595c8c@amazon.com>
+ <CAHmME9pwfKfKp_qqbmAO5tEaQSZ5srCO5COThK3vWZR4avRF1g@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87o80x3vkx.fsf@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <CAHmME9pwfKfKp_qqbmAO5tEaQSZ5srCO5COThK3vWZR4avRF1g@mail.gmail.com>
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 19, 2022, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
+On Tue, Apr 19, 2022 at 05:12:36PM +0200, Jason A. Donenfeld wrote:
+> Hey Alex,
 > 
-> > On Tue, Apr 19, 2022, Vitaly Kuznetsov wrote:
-> >> Sean Christopherson <seanjc@google.com> writes:
-> >> > The Hyper-V guest code also sets cpu_tsc_khz, should we WARN if that notifier is
-> >> > invoked and Hyper-V told us there's a constant TSC?
-
-...
-
-> >> (apologies for the delayed reply)
-> >> 
-> >> No, I think Hyper-V's "Reenlightenment" feature overrides (re-defines?)
-> >> X86_FEATURE_CONSTANT_TSC. E.g. I've checked a VM on E5-2667 v4
-> >> (Broadwell) CPU with no TSC scaling. This VM has 'constant_tsc' and will
-> >> certainly get reenlightenment irq on migration.
-> >
-> > Ooh, so that a VM with a constant TSC be live migrated to another system with a
-> > constant, but different, TSC.  Does the below look correct as fixup for this patch?
-> >
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index ab336f7c82e4..a944e4ba5532 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -8708,10 +8708,18 @@ static void kvm_hyperv_tsc_notifier(void)
-> >         /* no guest entries from this point */
-> >         hyperv_stop_tsc_emulation();
-> >
-> > -       /* TSC frequency always matches when on Hyper-V */
-> > -       for_each_present_cpu(cpu)
-> > -               per_cpu(cpu_tsc_khz, cpu) = tsc_khz;
-> > -       kvm_max_guest_tsc_khz = tsc_khz;
-> > +       /*
-> > +        * TSC frequency always matches when on Hyper-V.  Skip the updates if
-> > +        * the TSC is "officially" constant, in which case KVM doesn't use the
-> > +        * per-CPU and max variables.  Note, the notifier can still fire with
-> > +        * a constant TSC, e.g. if this VM (KVM is a Hyper-V guest) is migrated
-> > +        * to a system with a different TSC frequency.
-> > +        */
-> > +       if (!boot_cpu_has(X86_FEATURE_CONSTANT_TSC)) {
-> > +               for_each_present_cpu(cpu)
-> > +                       per_cpu(cpu_tsc_khz, cpu) = tsc_khz;
-> > +               kvm_max_guest_tsc_khz = tsc_khz;
-> > +       }
+> On Thu, Mar 10, 2022 at 12:18 PM Alexander Graf <graf@amazon.com> wrote:
+> > I agree on the slightly racy compromise and that it's a step into the
+> > right direction. Doing this is a no brainer IMHO and I like the proc
+> > based poll approach.
 > 
-> Looks good for cpu_tsc_khz but I'm not particularly sure about
-> kvm_max_guest_tsc_khz.
+> Alright. I'm going to email a more serious patch for that in the next
+> few hours and you can have a look. Let's do that for 5.19.
+> 
+> > I have an additional problem you might have an idea for with the poll
+> > based path. In addition to the clone notification, I'd need to know at
+> > which point everyone who was listening to a clone notification is
+> > finished acting up it. If I spawn a tiny VM to do "work", I want to know
+> > when it's safe to hand requests into it. How do I find out when that
+> > point in time is?
+> 
+> Seems tricky to solve. Even a count of current waiters and a
+> generation number won't be sufficient, since it wouldn't take into
+> account users who haven't _yet_ gotten to waiting. But maybe it's not
+> the right problem to solve? Or somehow not necessary? For example, if
+> the problem is a bit more constrained a solution becomes easier: you
+> have a fixed/known set of readers that you know about, and you
+> guarantee that they're all waiting before the fork. Then after the
+> fork, they all do something to alert you in their poll()er, and you
+> count up how many alerts you get until it matches the number of
+> expected waiters. Would that work? It seems like anything more general
+> than that is just butting heads with the racy compromise we're already
+> making.
+> 
+> Jason
 
-Doh, ignore that, I got kvm_max_guest_tsc_khz confused with max_tsc_khz.
+I have some ideas here ... but can you explain the use-case a bit more?
+
+-- 
+MST
+
