@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 150B6507B57
-	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 22:54:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A3A9507B5A
+	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 22:55:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357831AbiDSU4y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Apr 2022 16:56:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44070 "EHLO
+        id S1355235AbiDSU5s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Apr 2022 16:57:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241627AbiDSU4w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Apr 2022 16:56:52 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2061.outbound.protection.outlook.com [40.107.94.61])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EDD44198A;
-        Tue, 19 Apr 2022 13:54:08 -0700 (PDT)
+        with ESMTP id S1357853AbiDSU5g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Apr 2022 16:57:36 -0400
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam07on2069.outbound.protection.outlook.com [40.107.212.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFDF65F9B;
+        Tue, 19 Apr 2022 13:54:51 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TZ2rUBZ1ZRak/ogLvPCHq3APmceWnTinQbeAJigJeG9J0dEN3VSvCpyc0ntHF9W9cKhy3OWg9XyGs9gsz01xcSFz+Z8cZSIhY/O/R7xJQmazmPIvk3xVSLf5fh4JIg4gaC2u9SI8tj8rB6+gCPeeyVy5+hcRamfPzSg3UW1jO5HDtJ8J023ZKoZCWq6EWoMm9V/BBKXQE5o4AlBC2W4ePX7oqWA6227YoSHc1qCqIpHg1ygzWHtVrORHOFZNNh5kwfPe8+8Be7QgRbb0DkM+5OKa48TbzRvlv2KKfNdKUgVx8PBgM+veUcGzc7i4NA3LD2+BdAFsafncQKzZulLc5Q==
+ b=C52651VRG7LyoVxJIi0utzpfsSu/ezu9QEYSE5laVl1F5igEr4BWoTEImd7bLQ2KTT8yUFYXo5oJ91SQrPo+beMd74W+tT+vFBr34pGwjm55jN6mWAU2GBAxYMY4XHCjs3J6rAQIlo74BYCRyzy22BO9cJyspIbKD0uD4RrUE0H4ni2pUtGOqfQHeHsEEyhphjxyNAhUC0hL12fsNJm1jKApcUC/IBfQSNTlU+LbPT/Jh9w826SxqH3iMaGxVnkH1yWFEdcSFJ6O42XQfF3aisF/8ZV2VQ06a3sJ3rGlzd8rSeEOy3QhT9xzWNDdRqyQvYWTv2jr51+hETM4U0UCfA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0I5T1TI3oFeG2Yi+EYE1B/41ZEmefBBkZ/mExY/ufqc=;
- b=E+1jJv/661m40Hm4XLYACINqI7M/F9FCe1og6Vxkbej/2TueJkdG4TMQYhJNC3G32M4CdJk2fRxvTCuZpG9FqOS0/PPEAy4kMhC9Jz0yOfXaMoEA+gRB9V9Rz4zbFgm/GFOeWkPoG6ERsrrfCNlGvsjZA9qWFuZ7DlRFIPvyj2J+JjnKV5XD5ootAMvIoF+yVwMWNVyvCctkJ3PlcYEY/w3kMCkIjYJ+04BX7qHQBho0pswWfpVferr6NAbrpHgPaohtEchIcPW5h55BWd7F8lmkiJcQeBivyOVyIcCJAg7Rgzci3YlYy1uavPUYReXOcyw7NssX18eoEp/0hN+c2g==
+ bh=W8zI4wck8peKxsE69gJdhhoNhlWkBaLxnd0ET/ZtB/g=;
+ b=D86XSwuVNV4ir+sXZ9qt6qBndiwxJ9GHOHwvlAL8kPpq5RLJx2gUjWtLis+qQ2eSX8KivgRjhEVFo1DZTwh8Up18DpETf0bADsV3CDLkZ6AKh4uLmsa/hgwvj4TYU8J2mojH9evmpd0VTnNurjNbXGgdMVeCMhbcyO5W1xCcrbsFjZ5mr4Gl4ullW2UkhTzYgfBMXe8aFdqv9jq3NgTidWUMCLYHRxjwOeyA2R7sJ7b8VyExoeWomj5XH/nwR9Tz71KWba3ye8uoPyDsknlHULK30MeT36WfWaVBYL4iJf/mrUALyxQbDBWp8n106pC2jfousrhPZOJHXvUJmU7hnQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=tencent.com smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0I5T1TI3oFeG2Yi+EYE1B/41ZEmefBBkZ/mExY/ufqc=;
- b=h5y3MNXBNNAzK2yUonM4ff8gD0pfeyzaVGH4dYP2xI/QBDISQm3+T/CTX4G4s3WOPX0g+KR70M8TC11dLRGulgAGh1np9xr3HAlNpbugNzW9LbUlJv6pQTUzPmp1TIN7+F4GM4/QO/gdoKBRuK1zGtUxOszdeBCDoFKfLqDukoc=
-Received: from BN8PR12CA0017.namprd12.prod.outlook.com (2603:10b6:408:60::30)
- by BL1PR12MB5825.namprd12.prod.outlook.com (2603:10b6:208:394::20) with
+ bh=W8zI4wck8peKxsE69gJdhhoNhlWkBaLxnd0ET/ZtB/g=;
+ b=3y8sz4XhsP3rZTyRXdGLncRgPk2gN0bCm4EVCTzMgDoCiHWdNi1s1hIhkExyU00Vg40AARb6R8pujgB+wlqtoD1c/bhLsIAgmfabuVtsOFuBoirh64ruxsEaS+xM8wnaGAaXE+Kn5cq1E+G8IxrFFvzf7cThHAH6nBLhlrrgLVc=
+Received: from BN0PR04CA0118.namprd04.prod.outlook.com (2603:10b6:408:ec::33)
+ by DM5PR1201MB0092.namprd12.prod.outlook.com (2603:10b6:4:54::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.20; Tue, 19 Apr
- 2022 20:54:07 +0000
-Received: from BN8NAM11FT043.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:60:cafe::7b) by BN8PR12CA0017.outlook.office365.com
- (2603:10b6:408:60::30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.18 via Frontend
- Transport; Tue, 19 Apr 2022 20:54:06 +0000
+ 2022 20:54:48 +0000
+Received: from BN8NAM11FT038.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:ec:cafe::73) by BN0PR04CA0118.outlook.office365.com
+ (2603:10b6:408:ec::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.13 via Frontend
+ Transport; Tue, 19 Apr 2022 20:54:47 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,14 +46,15 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN8NAM11FT043.mail.protection.outlook.com (10.13.177.218) with Microsoft SMTP
+ BN8NAM11FT038.mail.protection.outlook.com (10.13.176.246) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5164.19 via Frontend Transport; Tue, 19 Apr 2022 20:54:05 +0000
+ 15.20.5164.19 via Frontend Transport; Tue, 19 Apr 2022 20:54:46 +0000
 Received: from [127.0.1.1] (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 19 Apr
- 2022 15:53:58 -0500
-Subject: [PATCH v2 1/2] x86/cpufeatures: Add virtual TSC_AUX feature bit
+ 2022 15:54:44 -0500
+Subject: [PATCH v2 2/2] KVM: SVM: Disable RDTSCP and TSC_AUX MSR intercepts
+ when V_TSC_AUX is present
 From:   Babu Moger <babu.moger@amd.com>
 To:     <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
         <dave.hansen@linux.intel.com>, <hpa@zytor.com>,
@@ -62,8 +63,10 @@ CC:     <vkuznets@redhat.com>, <jmattson@google.com>, <joro@8bytes.org>,
         <wanpengli@tencent.com>, <joro@8bytes.org>, <babu.moger@amd.com>,
         <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
         <x86@kernel.org>
-Date:   Tue, 19 Apr 2022 15:53:52 -0500
-Message-ID: <165040157111.1399644.6123821125319995316.stgit@bmoger-ubuntu>
+Date:   Tue, 19 Apr 2022 15:54:44 -0500
+Message-ID: <165040164424.1399644.13833277687385156344.stgit@bmoger-ubuntu>
+In-Reply-To: <165040157111.1399644.6123821125319995316.stgit@bmoger-ubuntu>
+References: <165040157111.1399644.6123821125319995316.stgit@bmoger-ubuntu>
 User-Agent: StGit/1.1.dev103+g5369f4c
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -73,24 +76,24 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: acd5406d-185f-4049-fd91-08da2246be12
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5825:EE_
-X-Microsoft-Antispam-PRVS: <BL1PR12MB58257AF7BF61C6ADCAE371C495F29@BL1PR12MB5825.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 27d69068-ea0b-4172-9b6a-08da2246d66c
+X-MS-TrafficTypeDiagnostic: DM5PR1201MB0092:EE_
+X-Microsoft-Antispam-PRVS: <DM5PR1201MB009255CC110590C6F035A9DD95F29@DM5PR1201MB0092.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: GehxOuZmrhNcnaYT8U58rVUz32QkBBWnyLbOYMPS2aUUaz7FMVk8EPOVzyGHJVRxjg+FhxTia6DyWPsWkEzcAwTOE6ph2hJnCYz+XrI6JofWquQzA9X97jm7zfUvNmKgO0HQjLN5hUzKuIrSbtUmyBlwF30SIWyfeOSSChw+DP6tdJSF5I2G1CBi4hd5RPjFsh9LUQcqWcSulVhVtaxFBSq82DZ6DTVMqsF6jqblGFmExn7NOv8ZoWWuzt6+IrFifMdKOlh2Oli0xqSKRny9dgTwCkrmWwBI+CMJE3MxGcBmYiev2O9GfHqJFkGbVMy371vkMgNt3N6VaeNqTpoCTwq0P2g5cf/h7yooHrinL6fGq8XU2Pc5NsZBU0KYUJS9EdSASLzCX1SmrGY7jGiEfSzNO/BIQ7vfgjQMKQ27i6q6gUxTwUgbjZd1YNT973PRfZUOTEcaE4gOV/ilKG/1e6o1y/glPBDpazZk2kzO7qh9WEjS9Hl4by2KgGaAqVnxZyU7qqMQRmUCyf4koCGHOexBcBb3sDz38Yiim4gEtYQdY+3nGs03kdSP12MFui6NGdi6qR4yqr7n/Sa3kMl62DEBMPcV3l/yFOt5N4c9MUVevSy2k6zkkH36QnPHm8oEcrA/xxpTHFkAnuLF2fVpxEAz2YqlzxI/Kd1wztwNLu1D7Z5bQIqchIdfxeaqRbKTUySdr/gQLssiWIqp9gzbWPzmX6ydiFfoU4z1QCx5w+whRs3D/G7Qhy3yZ5ydH5sE9z1cy1+OxbdglUi81F9fBmOZZLbEWcOt91DW9+AU4rZrk3hqQJscW83ZoKYSYWQu
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(7916004)(40470700004)(36840700001)(46966006)(86362001)(16576012)(356005)(4326008)(6666004)(54906003)(966005)(8936002)(47076005)(70586007)(70206006)(9686003)(36860700001)(33716001)(7416002)(8676002)(110136005)(44832011)(103116003)(81166007)(2906002)(82310400005)(16526019)(316002)(508600001)(83380400001)(426003)(186003)(336012)(40460700003)(5660300002)(26005)(71626007)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: UL+RkrhGS+8TbumJscwdKVA+P+KIzwR2TCdORggslEiLBmJuBIIg4AJvXKf4LUtW3+mZ4G1OGpfdEqPhoqF/E7DiYM6AunJDJ/dA6hBU1Kf0yOMXnbCraOj44hIUGKWvnX8UvSSXzI9K+fnktq7waB4f4x50OhpCEU4voUnaE//OgltJNPVfIdT2Ywn5wOtx1X0uAJxBfz6IK18Fa13bW+f4xIjdGKJUha9DLMpaXach4uyJArtDAQiPAZKsoE6/zDmEpwaTVIulAolM/6zAKH1EP7xeY0l6av4OYZFVnB3NEnmLb4zn4cUYOpv3otLiudTO8M9oU6SIP6btLPmFoHCP/bNt6K4VgGZBMYA2a8//GoQhcSJmUMwX+j889WJrx6zKSmIqVuCfHtSa+6cN2IhAeNrWrK8DWgyPJEdTVUIJUYJIFf74gbkit55Xsa3h2Zk6M0VyOjgvm4sxU/ROzuEwW6ulxwOCphX/VZKyd1u0wv2x8CaAbILZdxHBJxKKWRCD4+VC+SOlkxb/+KcfUn46iZ2OwNXMsUAZDwTtlKOs9rNjXHbws3XtRUMQ9Eh4XDTox0lOfw0+AFsT8n/dqtCJ40irpxo0grxYGfpTM9bZlHMsh9vtz+8VoognMPdex21hRlF9aPI2B87vr/aB+vc/cr0FaeGlZMYbt6rrpUDeJ0GBtRlbBD4KU9p2+6qkrza5malvLvywCUlHSACW3U07eakaw8INIgo//yLbPg9qSNngaimI7yRJCPBZg+hvIq+KXWg1VYMXyLtR/+BbbpndN8zvKVhchYmHInRSbp5XXK2ro+r/7CYo8IjLBsp1
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(7916004)(46966006)(40470700004)(36840700001)(40460700003)(33716001)(2906002)(36860700001)(966005)(47076005)(426003)(103116003)(508600001)(336012)(83380400001)(16526019)(26005)(186003)(9686003)(5660300002)(86362001)(82310400005)(7416002)(70586007)(8936002)(4326008)(8676002)(316002)(70206006)(81166007)(356005)(110136005)(44832011)(16576012)(54906003)(71626007)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Apr 2022 20:54:05.7848
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Apr 2022 20:54:46.6374
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: acd5406d-185f-4049-fd91-08da2246be12
+X-MS-Exchange-CrossTenant-Network-Message-Id: 27d69068-ea0b-4172-9b6a-08da2246d66c
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT043.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT038.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5825
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1201MB0092
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -101,61 +104,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The TSC_AUX Virtualization feature allows AMD SEV-ES guests to securely use=
+The TSC_AUX virtualization feature allows AMD SEV-ES guests to securely use=
 =0A=
-TSC_AUX (auxiliary time stamp counter data) MSR in RDTSCP and RDPID=0A=
-instructions.=0A=
+TSC_AUX (auxiliary time stamp counter data) in the RDTSCP and RDPID=0A=
+instructions. The TSC_AUX value is set using the WRMSR instruction to the=
 =0A=
-The TSC_AUX MSR is typically initialized to APIC ID or another unique=0A=
-identifier so that software can quickly associate returned TSC value=0A=
-with the logical processor.=0A=
+TSC_AUX MSR (0xC0000103). It is read by the RDMSR, RDTSCP and RDPID=0A=
+instructions. If the read/write of the TSC_AUX MSR is intercepted, then=0A=
+RDTSCP and RDPID must also be intercepted when TSC_AUX virtualization=0A=
+is present. However, the RDPID instruction can't be intercepted. This means=
 =0A=
-Add the feature bit and also include it in the kvm for detection.=0A=
+that when TSC_AUX virtualization is present, RDTSCP and TSC_AUX MSR=0A=
+read/write must not be intercepted for SEV-ES (or SEV-SNP) guests.=0A=
 =0A=
 Signed-off-by: Babu Moger <babu.moger@amd.com>=0A=
-Acked-by: Borislav Petkov <bp@suse.de>=0A=
 ---=0A=
 v2:=0A=
-Fixed the text(commented by Boris).=0A=
-Added Acked-by from Boris.=0A=
+No changes from v1.=0A=
 =0A=
 v1:=0A=
-https://lore.kernel.org/kvm/164937947020.1047063.14919887750944564032.stgit=
-@bmoger-ubuntu/=0A=
+https://lore.kernel.org/kvm/164937947781.1047063.9230786680311460912.stgit@=
+bmoger-ubuntu/=0A=
 =0A=
- arch/x86/include/asm/cpufeatures.h |    1 +=0A=
- arch/x86/kvm/cpuid.c               |    2 +-=0A=
- 2 files changed, 2 insertions(+), 1 deletion(-)=0A=
+ arch/x86/kvm/svm/sev.c |    8 ++++++++=0A=
+ arch/x86/kvm/svm/svm.c |    1 +=0A=
+ arch/x86/kvm/svm/svm.h |    2 +-=0A=
+ 3 files changed, 10 insertions(+), 1 deletion(-)=0A=
 =0A=
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpuf=
-eatures.h=0A=
-index 73e643ae94b6..1bc66a17a95a 100644=0A=
---- a/arch/x86/include/asm/cpufeatures.h=0A=
-+++ b/arch/x86/include/asm/cpufeatures.h=0A=
-@@ -405,6 +405,7 @@=0A=
- #define X86_FEATURE_SEV			(19*32+ 1) /* AMD Secure Encrypted Virtualizatio=
-n */=0A=
- #define X86_FEATURE_VM_PAGE_FLUSH	(19*32+ 2) /* "" VM Page Flush MSR is su=
-pported */=0A=
- #define X86_FEATURE_SEV_ES		(19*32+ 3) /* AMD Secure Encrypted Virtualizat=
-ion - Encrypted State */=0A=
-+#define X86_FEATURE_V_TSC_AUX		(19*32+ 9) /* Virtual TSC_AUX */=0A=
- #define X86_FEATURE_SME_COHERENT	(19*32+10) /* "" AMD hardware-enforced ca=
-che coherency */=0A=
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c=0A=
+index 537aaddc852f..b0ead47c85e5 100644=0A=
+--- a/arch/x86/kvm/svm/sev.c=0A=
++++ b/arch/x86/kvm/svm/sev.c=0A=
+@@ -2922,6 +2922,14 @@ void sev_es_init_vmcb(struct vcpu_svm *svm)=0A=
+ 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_LASTBRANCHTOIP, 1, 1);=0A=
+ 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_LASTINTFROMIP, 1, 1);=0A=
+ 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_LASTINTTOIP, 1, 1);=0A=
++=0A=
++	if (boot_cpu_has(X86_FEATURE_V_TSC_AUX) &&=0A=
++	    (guest_cpuid_has(&svm->vcpu, X86_FEATURE_RDTSCP) ||=0A=
++	     guest_cpuid_has(&svm->vcpu, X86_FEATURE_RDPID))) {=0A=
++		set_msr_interception(vcpu, svm->msrpm, MSR_TSC_AUX, 1, 1);=0A=
++		if (guest_cpuid_has(&svm->vcpu, X86_FEATURE_RDTSCP))=0A=
++			svm_clr_intercept(svm, INTERCEPT_RDTSCP);=0A=
++	}=0A=
+ }=0A=
  =0A=
- /*=0A=
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c=0A=
-index b24ca7f4ed7c..99a4c078b397 100644=0A=
---- a/arch/x86/kvm/cpuid.c=0A=
-+++ b/arch/x86/kvm/cpuid.c=0A=
-@@ -674,7 +674,7 @@ void kvm_set_cpu_caps(void)=0A=
+ void sev_es_vcpu_reset(struct vcpu_svm *svm)=0A=
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c=0A=
+index bd4c64b362d2..526dc1be1c3c 100644=0A=
+--- a/arch/x86/kvm/svm/svm.c=0A=
++++ b/arch/x86/kvm/svm/svm.c=0A=
+@@ -101,6 +101,7 @@ static const struct svm_direct_access_msrs {=0A=
+ 	{ .index =3D MSR_EFER,				.always =3D false },=0A=
+ 	{ .index =3D MSR_IA32_CR_PAT,			.always =3D false },=0A=
+ 	{ .index =3D MSR_AMD64_SEV_ES_GHCB,		.always =3D true  },=0A=
++	{ .index =3D MSR_TSC_AUX,				.always =3D false },=0A=
+ 	{ .index =3D MSR_INVALID,				.always =3D false },=0A=
+ };=0A=
  =0A=
- 	kvm_cpu_cap_mask(CPUID_8000_001F_EAX,=0A=
- 		0 /* SME */ | F(SEV) | 0 /* VM_PAGE_FLUSH */ | F(SEV_ES) |=0A=
--		F(SME_COHERENT));=0A=
-+		F(V_TSC_AUX) | F(SME_COHERENT));=0A=
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h=0A=
+index f77a7d2d39dd..da701edec93b 100644=0A=
+--- a/arch/x86/kvm/svm/svm.h=0A=
++++ b/arch/x86/kvm/svm/svm.h=0A=
+@@ -29,7 +29,7 @@=0A=
+ #define	IOPM_SIZE PAGE_SIZE * 3=0A=
+ #define	MSRPM_SIZE PAGE_SIZE * 2=0A=
  =0A=
- 	kvm_cpu_cap_mask(CPUID_C000_0001_EDX,=0A=
- 		F(XSTORE) | F(XSTORE_EN) | F(XCRYPT) | F(XCRYPT_EN) |=0A=
+-#define MAX_DIRECT_ACCESS_MSRS	20=0A=
++#define MAX_DIRECT_ACCESS_MSRS	21=0A=
+ #define MSRPM_OFFSETS	16=0A=
+ extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;=0A=
+ extern bool npt_enabled;=0A=
 =0A=
 
