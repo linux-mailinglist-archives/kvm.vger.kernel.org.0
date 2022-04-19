@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E6E9F50791E
-	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 20:42:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 973EF50796B
+	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 20:50:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354140AbiDSShF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Apr 2022 14:37:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39190 "EHLO
+        id S1355615AbiDSSwy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Apr 2022 14:52:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357352AbiDSSgu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Apr 2022 14:36:50 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03BDE3F31F
-        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 11:28:10 -0700 (PDT)
+        with ESMTP id S1357388AbiDSSwk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Apr 2022 14:52:40 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD6FA11C31
+        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 11:49:55 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6112B6143D
-        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 18:28:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6887C385AB;
-        Tue, 19 Apr 2022 18:28:09 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8B73AB819A3
+        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 18:49:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AE55C385A7;
+        Tue, 19 Apr 2022 18:49:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1650392889;
-        bh=eBQlI0l4NUr7azBz5ZU4vyP7W5yicZ/ar1oBwnAgjSk=;
+        s=k20201202; t=1650394193;
+        bh=NsQzBnqyQikJz4t5vv6/pIfEg6KlxVdCJGyHvursnek=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=vJJDQPvuL753Y4QuIdMO/YqzQy9L9jJV2iJHD7neJ/KT9x/5YuLWdDrxjjoTfIdla
-         WRaetdaciSf2alw9EGUb8OHk7uv1e8F+Q3e9onOQTIF6LFytO9X3qVgl9yLBWEPnuK
-         GfrL0lDf0MfhARbrFWzdtG1u1uptKkZcaye9IfclJYuQwHlLTM7JoxjGDsEIE+yZos
-         Gvu+h4PnftE7H2sWhqo2+xE8x4newfxIPGAuTTBdDFzMkerSb0cWAroJzL1k+3VVox
-         L2ZwUMCbPXplf9lpVWfIzD9R9aFtXuclPU7SP4f3KoO08+W/z/Dvj1xsMwXa/cz20/
-         1rhjnN0ssQmJA==
+        b=PsLZPyeR7NEosrxFAH6xo9aVOEo6xXUnhE0ADprj/RG8wklR6ikAnBz7hQ+9OLSXl
+         HHgdTY7IfFkZUoVq2EeG/HvVtxxvENLGsyOewpM8GPBxlGo4q1wfJ9zI8vWAChkfKu
+         3YBW4VpWYO2vqgSyIM/S8lNvXcX+ibogecHS/l4Fo+pEgPRpC04qWELX/lIunJFHv/
+         YbzkjzijOxaOU55uM3q5P2bvFuned33fzZoacKbSHw/bntB/pytKsNkzAygbOpFH73
+         QZbR4KQiY2YMF98jIHplltBySjBtq7QXoI4L1k7t8aCoKDFcoIxF2Toq3wYchN978F
+         /O9RSgkhYi2Rg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1ngsa7-005QYF-He; Tue, 19 Apr 2022 19:28:07 +0100
+        id 1ngsa7-005QYF-Vt; Tue, 19 Apr 2022 19:28:08 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -46,9 +46,9 @@ Cc:     Catalin Marinas <catalin.marinas@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Joey Gouly <joey.gouly@arm.com>, kernel-team@android.com
-Subject: [PATCH v2 09/10] arm64: Add wfet()/wfit() helpers
-Date:   Tue, 19 Apr 2022 19:27:54 +0100
-Message-Id: <20220419182755.601427-10-maz@kernel.org>
+Subject: [PATCH v2 10/10] arm64: Use WFxT for __delay() when possible
+Date:   Tue, 19 Apr 2022 19:27:55 +0100
+Message-Id: <20220419182755.601427-11-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220419182755.601427-1-maz@kernel.org>
 References: <20220419182755.601427-1-maz@kernel.org>
@@ -68,31 +68,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Just like we have helpers for WFI and WFE, add the WFxT versions.
-Note that the encoding is that reported by objdump, as no currrent
-toolchain knows about these instructions yet.
+Marginally optimise __delay() by using a WFIT/WFET sequence.
+It probably is a win if no interrupt fires during the delay.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/barrier.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/arm64/lib/delay.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/barrier.h b/arch/arm64/include/asm/barrier.h
-index 62217be36217..9f3e2c3d2ca0 100644
---- a/arch/arm64/include/asm/barrier.h
-+++ b/arch/arm64/include/asm/barrier.h
-@@ -16,7 +16,11 @@
+diff --git a/arch/arm64/lib/delay.c b/arch/arm64/lib/delay.c
+index 1688af0a4c97..5b7890139bc2 100644
+--- a/arch/arm64/lib/delay.c
++++ b/arch/arm64/lib/delay.c
+@@ -27,7 +27,17 @@ void __delay(unsigned long cycles)
+ {
+ 	cycles_t start = get_cycles();
  
- #define sev()		asm volatile("sev" : : : "memory")
- #define wfe()		asm volatile("wfe" : : : "memory")
-+#define wfet(val)	asm volatile("msr s0_3_c1_c0_0, %0"	\
-+				     : : "r" (val) : "memory")
- #define wfi()		asm volatile("wfi" : : : "memory")
-+#define wfit(val)	asm volatile("msr s0_3_c1_c0_1, %0"	\
-+				     : : "r" (val) : "memory")
+-	if (arch_timer_evtstrm_available()) {
++	if (cpus_have_const_cap(ARM64_HAS_WFXT)) {
++		u64 end = start + cycles;
++
++		/*
++		 * Start with WFIT. If an interrupt makes us resume
++		 * early, use a WFET loop to complete the delay.
++		 */
++		wfit(end);
++		while ((get_cycles() - start) < cycles)
++			wfet(end);
++	} else 	if (arch_timer_evtstrm_available()) {
+ 		const cycles_t timer_evt_period =
+ 			USECS_TO_CYCLES(ARCH_TIMER_EVT_STREAM_PERIOD_US);
  
- #define isb()		asm volatile("isb" : : : "memory")
- #define dmb(opt)	asm volatile("dmb " #opt : : : "memory")
 -- 
 2.34.1
 
