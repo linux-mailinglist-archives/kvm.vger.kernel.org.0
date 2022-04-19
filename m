@@ -2,197 +2,578 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9ABC55075FE
-	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 19:06:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D16CF507664
+	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 19:20:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352578AbiDSRIW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Apr 2022 13:08:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53934 "EHLO
+        id S1344949AbiDSRXH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Apr 2022 13:23:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355627AbiDSRHo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Apr 2022 13:07:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0A04612098
-        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 10:04:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650387896;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=jyS3S/OuVOGopfcMbZcoACsR9LqN55BST7IaWHrVFtY=;
-        b=X3df6MZ8l1AsZy+z8up8SBvWuY7bFHsWIETOp9h0ptoSrXLXFw5muNuk5TOc1nojHt348R
-        jhmZFu6alQR7iZfS+Nx60MpLuwWzfF26NwOIortZJb/uu6+3iqGAzDEt85a40qsQymHfRS
-        nZUn8yPaRkUU2bnn7YpICdpq8p2ujEs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-132-TrnO4P0iODOcW83pj5ZhzA-1; Tue, 19 Apr 2022 13:04:52 -0400
-X-MC-Unique: TrnO4P0iODOcW83pj5ZhzA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7F79A802803;
-        Tue, 19 Apr 2022 17:04:52 +0000 (UTC)
-Received: from redhat.com (unknown [10.33.36.155])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1091340CF8FA;
-        Tue, 19 Apr 2022 17:04:50 +0000 (UTC)
-Date:   Tue, 19 Apr 2022 18:04:48 +0100
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Cole Robinson <crobinso@redhat.com>
-Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        qemu-devel <qemu-devel@nongnu.org>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
+        with ESMTP id S1351780AbiDSRWi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Apr 2022 13:22:38 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1994BF67;
+        Tue, 19 Apr 2022 10:19:54 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23JG7JZS005868;
+        Tue, 19 Apr 2022 17:18:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=pp1; bh=AH55P/8XERYIIXGtN4bIRiE0oSeKK5B+EtS8816VDeE=;
+ b=gRdynu32VusSPAr2yCIiUF1ugYo0o/512AfE4JHn6dxt+mMRGnjMComD+kKpBcgHCz52
+ gHcTHhYLUpLqNGzDBSgy1YkJTtE0HXPk/qXWf8vzDo9Ci1u9bPGqFZ5u791A6VLF/Jjg
+ zEpeTUV9tFftK3A0y4j5SnUYebknwDXlXDQNXHp8IeyY2q2vjoXPJB1MEj+PsYRVC3JQ
+ pMIpqRR2663uyigab4KeAixbZgfAq3KjAOu+BUjd6KPh0QgsVMpP3pfVeOMew/2gaKav
+ DEeldXBUYFL6sQ7Pc3BoGXJ0l9D2cybt+AFXORhclsRphO48VslpSqR/e4VxlFHJVCSD jQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fg7rfdyq1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Apr 2022 17:18:10 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23JGurbG023217;
+        Tue, 19 Apr 2022 17:18:10 GMT
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fg7rfdypn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Apr 2022 17:18:10 +0000
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23JHCwK3005709;
+        Tue, 19 Apr 2022 17:18:09 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma03dal.us.ibm.com with ESMTP id 3ffne9v46y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Apr 2022 17:18:09 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23JHI8Gt45154566
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Apr 2022 17:18:08 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2A9E1AE063;
+        Tue, 19 Apr 2022 17:18:08 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4FDACAE05F;
+        Tue, 19 Apr 2022 17:18:07 +0000 (GMT)
+Received: from localhost (unknown [9.160.180.3])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Tue, 19 Apr 2022 17:18:07 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: adding 'official' way to dump SEV VMSA
-Message-ID: <Yl7rsJvqiUE+IbuF@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <a713533d-c4c5-2237-58d0-57b812a56ba4@redhat.com>
- <462cbf77-432a-c09c-6ec9-91556dc0f887@linux.ibm.com>
- <YlfakQfkZFOpKWeU@work-vm>
- <ac2bc657-947b-e528-791b-101447e074d8@redhat.com>
+Cc:     Atish Patra <atishp@atishpatra.org>,
+        David Hildenbrand <david@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/3] KVM: Add helpers to wrap vcpu->srcu_idx and yell if
+ it's abused
+In-Reply-To: <20220415004343.2203171-4-seanjc@google.com>
+References: <20220415004343.2203171-1-seanjc@google.com>
+ <20220415004343.2203171-4-seanjc@google.com>
+Date:   Tue, 19 Apr 2022 14:18:05 -0300
+Message-ID: <87h76pouuq.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ac2bc657-947b-e528-791b-101447e074d8@redhat.com>
-User-Agent: Mutt/2.1.5 (2021-12-30)
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: GjmFJa-NfCn7e8p28nGfsPkFCCRbWqWF
+X-Proofpoint-ORIG-GUID: 2npZ42Je0J-pWE9ma7OmBcpjESIDGcpZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-19_05,2022-04-15_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 malwarescore=0 phishscore=0 clxscore=1011 bulkscore=0
+ spamscore=0 adultscore=0 mlxlogscore=981 mlxscore=0 suspectscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204190098
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 19, 2022 at 09:33:21AM -0400, Cole Robinson wrote:
-> On 4/14/22 4:25 AM, Dr. David Alan Gilbert wrote:
-> > * Dov Murik (dovmurik@linux.ibm.com) wrote:
-> >> I plan to add SEV-ES and SEV measurements calculation to this 
-> >> library/program as well.
-> > 
-> > Everyone seems to be writing one; you, Dan etc!
-> > 
-> 
-> Yeah, I should have mentioned Dan's demo tool here:
-> https://gitlab.com/berrange/libvirt/-/blob/lgtm/tools/virt-dom-sev-vmsa-tool.py
+Sean Christopherson <seanjc@google.com> writes:
 
-FYI a bit of explanation of that tool...
+> Add wrappers to acquire/release KVM's SRCU lock when stashing the index
+> in vcpu->src_idx, along with rudimentary detection of illegal usage,
+> e.g. re-acquiring SRCU and thus overwriting vcpu->src_idx.  Because the
+> SRCU index is (currently) either 0 or 1, illegal nesting bugs can go
+> unnoticed for quite some time and only cause problems when the nested
+> lock happens to get a different index.
+>
+> Wrap the WARNs in PROVE_RCU=y, and make them ONCE, otherwise KVM will
+> likely yell so loudly that it will bring the kernel to its knees.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Some complications wrt VMSA contents in no particular order
+For the powerpc part:
 
-  - VMSA contents can vary across firmwares due to reset address
-  - No current supportable way to extract VMSA from kernel
-  - VMSA varies across userspace QEMU vs libkrun
-  - VMSA varies across CPU due to include model/family/stepping
+Tested-by: Fabiano Rosas <farosas@linux.ibm.com>
 
-The last point in particular is a big pain, becasue it means that there
-are going to be a great many valid VMSA blobs.
-
-Thus I put some time into working on the above tool to build VMSA from
-first principles. ie populating register defaults based on the AMD tech
-specs for x86/sev, along with examination on what KVM/QEMU does to override
-the defaults in places.
-
-The tool does three simple things...
-
-Create a generic VMSA for CPU 0 for QEMU:
-
-  $ virt-dom-sev-vmsa-tool.py build --cpu 0 --userspace qemu  cpu0.bin
-
-Update the generic VMSA with firmware and CPU details
-  $ virt-dom-sev-vmsa-tool.py update \
-       --firmware OVMF.amdsev.fd \
-       --model 49 --family 23 --stepping 0  cpu0.bin
-
-
-Note, I split this as I felt it might be interesting for a cloud provider
-to publish a known "generic" VMSA, and then let it be customized per boot
-depending on what CPU model/family the VM ran on, and/or what firmware
-it was booted with. The 'build' command can directly set the firmware
-and cpu model/family though, if all-in-one is sufficient.
-
-Display the VMSA register info, skipping fields which are all zero
-
-  $ virt-dom-sev-vmsa-tool.py show --zeroes skip cpu0.bin
-es_attrib           : 0x0093 (10010011 00000000)
-es_limit            : 0x0000ffff
-cs_selector         : 0xf000
-cs_attrib           : 0x009b (10011011 00000000)
-cs_limit            : 0x0000ffff
-cs_base             : 0x00000000ffff0000
-ss_attrib           : 0x0093 (10010011 00000000)
-ss_limit            : 0x0000ffff
-ds_attrib           : 0x0093 (10010011 00000000)
-ds_limit            : 0x0000ffff
-fs_attrib           : 0x0093 (10010011 00000000)
-fs_limit            : 0x0000ffff
-gs_attrib           : 0x0093 (10010011 00000000)
-gs_limit            : 0x0000ffff
-gdtr_limit          : 0x0000ffff
-ldtr_attrib         : 0x0082 (10000010 00000000)
-ldtr_limit          : 0x0000ffff
-idtr_limit          : 0x0000ffff
-tr_attrib           : 0x008b (10001011 00000000)
-tr_limit            : 0x0000ffff
-efer                : 0x0000000000001000
-cr4                 : 0x0000000000000040
-cr0                 : 0x0000000000000010
-dr7                 : 0x0000000000000400
-dr6                 : 0x00000000ffff0ff0
-rflags              : 0x0000000000000002
-rip                 : 0x000000000000fff0
-g_pat               : 0x0007040600070406
-rdx                 : 0x0000000000830f10 (00010000 00001111 10000011 00000000 00000000 00000000 00000000 00000000)
-xcr0                : 0x0000000000000001
-
-
-The 'show' command is largely a debugging tool, so you can understand what
-unexpectedly changed if you're failing to get a valid match.
-
-If you look at the code, you can see comments on where I found the various
-default values. I'm fairly confident about the QEMU source, but I am not
-happy with my info sources for libkrun but then I didn't spend much time
-exploring its code. Anyway, it can at least spit out a vmsa that matches
-what is committed in libkrun's git repo.
-
-I'm not in love with this particular impl of the tool. I wrote it to be
-quick & easy, to prove the viability of a 'build from specs' approach
-to VMSA. I find this the most satisfactory way out of all the options
-we've considered so far. The need for a different VMSA per cpu
-family/model/stepping in particular, makes me feel we need a tool like
-this, as just publishing known good VMSA is not viable with so many
-combinations possible.
-
-> Tyler Fanelli is looking at adding that functionality to sevctl too FWIW
-
-Yes, I think this functionality belongs in sev / sevctl, rather than
-my python script, so I'm not intended to submit my python program as
-an official solution for anything. It is just there as a historical
-curiosity at this point, until sevctl can do the same.
-
-> > I think I'd like to see a new ioctl to read the initial VMSA, primarily
-> > as a way of debugging so you can see what VMSA you have when something
-> > goes wrong.
-> > 
-> 
-> debugfs seems simpler for the dev user (accessing a file per CPU vs code
-> to call ioctl), but beyond that I don't have any insight. Is there a
-> reason you think ioctl and not debugfs?
-
-A debugfs entry could be useful for automated data collection tools.
-eg sosreport could capture a debugfs file easily for a running VM,
-where as using an ioctl will require special code to be written for
-sosreport.
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+> ---
+>  arch/powerpc/kvm/book3s_64_mmu_radix.c |  9 +++++----
+>  arch/powerpc/kvm/book3s_hv_nested.c    | 16 +++++++--------
+>  arch/powerpc/kvm/book3s_rtas.c         |  4 ++--
+>  arch/powerpc/kvm/powerpc.c             |  4 ++--
+>  arch/riscv/kvm/vcpu.c                  | 16 +++++++--------
+>  arch/riscv/kvm/vcpu_exit.c             |  4 ++--
+>  arch/s390/kvm/interrupt.c              |  4 ++--
+>  arch/s390/kvm/kvm-s390.c               |  8 ++++----
+>  arch/s390/kvm/vsie.c                   |  4 ++--
+>  arch/x86/kvm/x86.c                     | 28 ++++++++++++--------------
+>  include/linux/kvm_host.h               | 24 +++++++++++++++++++++-
+>  11 files changed, 71 insertions(+), 50 deletions(-)
+>
+> diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+> index e4ce2a35483f..42851c32ff3b 100644
+> --- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
+> +++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+> @@ -168,9 +168,10 @@ int kvmppc_mmu_walk_radix_tree(struct kvm_vcpu *vcpu, gva_t eaddr,
+>  			return -EINVAL;
+>  		/* Read the entry from guest memory */
+>  		addr = base + (index * sizeof(rpte));
+> -		vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
+> +
+> +		kvm_vcpu_srcu_read_lock(vcpu);
+>  		ret = kvm_read_guest(kvm, addr, &rpte, sizeof(rpte));
+> -		srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
+> +		kvm_vcpu_srcu_read_unlock(vcpu);
+>  		if (ret) {
+>  			if (pte_ret_p)
+>  				*pte_ret_p = addr;
+> @@ -246,9 +247,9 @@ int kvmppc_mmu_radix_translate_table(struct kvm_vcpu *vcpu, gva_t eaddr,
+>  
+>  	/* Read the table to find the root of the radix tree */
+>  	ptbl = (table & PRTB_MASK) + (table_index * sizeof(entry));
+> -	vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
+> +	kvm_vcpu_srcu_read_lock(vcpu);
+>  	ret = kvm_read_guest(kvm, ptbl, &entry, sizeof(entry));
+> -	srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
+> +	kvm_vcpu_srcu_read_unlock(vcpu);
+>  	if (ret)
+>  		return ret;
+>  
+> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
+> index 9d373f8963ee..c943a051c6e7 100644
+> --- a/arch/powerpc/kvm/book3s_hv_nested.c
+> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
+> @@ -306,10 +306,10 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+>  	/* copy parameters in */
+>  	hv_ptr = kvmppc_get_gpr(vcpu, 4);
+>  	regs_ptr = kvmppc_get_gpr(vcpu, 5);
+> -	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +	kvm_vcpu_srcu_read_lock(vcpu);
+>  	err = kvmhv_read_guest_state_and_regs(vcpu, &l2_hv, &l2_regs,
+>  					      hv_ptr, regs_ptr);
+> -	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+> +	kvm_vcpu_srcu_read_unlock(vcpu);
+>  	if (err)
+>  		return H_PARAMETER;
+>  
+> @@ -410,10 +410,10 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+>  		byteswap_hv_regs(&l2_hv);
+>  		byteswap_pt_regs(&l2_regs);
+>  	}
+> -	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +	kvm_vcpu_srcu_read_lock(vcpu);
+>  	err = kvmhv_write_guest_state_and_regs(vcpu, &l2_hv, &l2_regs,
+>  					       hv_ptr, regs_ptr);
+> -	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+> +	kvm_vcpu_srcu_read_unlock(vcpu);
+>  	if (err)
+>  		return H_AUTHORITY;
+>  
+> @@ -600,16 +600,16 @@ long kvmhv_copy_tofrom_guest_nested(struct kvm_vcpu *vcpu)
+>  			goto not_found;
+>  
+>  		/* Write what was loaded into our buffer back to the L1 guest */
+> -		vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +		kvm_vcpu_srcu_read_lock(vcpu);
+>  		rc = kvm_vcpu_write_guest(vcpu, gp_to, buf, n);
+> -		srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+> +		kvm_vcpu_srcu_read_unlock(vcpu);
+>  		if (rc)
+>  			goto not_found;
+>  	} else {
+>  		/* Load the data to be stored from the L1 guest into our buf */
+> -		vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +		kvm_vcpu_srcu_read_lock(vcpu);
+>  		rc = kvm_vcpu_read_guest(vcpu, gp_from, buf, n);
+> -		srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+> +		kvm_vcpu_srcu_read_unlock(vcpu);
+>  		if (rc)
+>  			goto not_found;
+>  
+> diff --git a/arch/powerpc/kvm/book3s_rtas.c b/arch/powerpc/kvm/book3s_rtas.c
+> index 0f847f1e5ddd..6808bda0dbc1 100644
+> --- a/arch/powerpc/kvm/book3s_rtas.c
+> +++ b/arch/powerpc/kvm/book3s_rtas.c
+> @@ -229,9 +229,9 @@ int kvmppc_rtas_hcall(struct kvm_vcpu *vcpu)
+>  	 */
+>  	args_phys = kvmppc_get_gpr(vcpu, 4) & KVM_PAM;
+>  
+> -	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +	kvm_vcpu_srcu_read_lock(vcpu);
+>  	rc = kvm_read_guest(vcpu->kvm, args_phys, &args, sizeof(args));
+> -	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+> +	kvm_vcpu_srcu_read_unlock(vcpu);
+>  	if (rc)
+>  		goto fail;
+>  
+> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+> index 9772b176e406..fd88c2412e83 100644
+> --- a/arch/powerpc/kvm/powerpc.c
+> +++ b/arch/powerpc/kvm/powerpc.c
+> @@ -425,9 +425,9 @@ int kvmppc_ld(struct kvm_vcpu *vcpu, ulong *eaddr, int size, void *ptr,
+>  		return EMULATE_DONE;
+>  	}
+>  
+> -	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +	kvm_vcpu_srcu_read_lock(vcpu);
+>  	rc = kvm_read_guest(vcpu->kvm, pte.raddr, ptr, size);
+> -	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+> +	kvm_vcpu_srcu_read_unlock(vcpu);
+>  	if (rc)
+>  		return EMULATE_DO_MMIO;
+>  
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index 2f1caf23eed4..256cf04ec01e 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -724,13 +724,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  	/* Mark this VCPU ran at least once */
+>  	vcpu->arch.ran_atleast_once = true;
+>  
+> -	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +	kvm_vcpu_srcu_read_lock(vcpu);
+>  
+>  	/* Process MMIO value returned from user-space */
+>  	if (run->exit_reason == KVM_EXIT_MMIO) {
+>  		ret = kvm_riscv_vcpu_mmio_return(vcpu, vcpu->run);
+>  		if (ret) {
+> -			srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+> +			kvm_vcpu_srcu_read_unlock(vcpu);
+>  			return ret;
+>  		}
+>  	}
+> @@ -739,13 +739,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  	if (run->exit_reason == KVM_EXIT_RISCV_SBI) {
+>  		ret = kvm_riscv_vcpu_sbi_return(vcpu, vcpu->run);
+>  		if (ret) {
+> -			srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+> +			kvm_vcpu_srcu_read_unlock(vcpu);
+>  			return ret;
+>  		}
+>  	}
+>  
+>  	if (run->immediate_exit) {
+> -		srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+> +		kvm_vcpu_srcu_read_unlock(vcpu);
+>  		return -EINTR;
+>  	}
+>  
+> @@ -784,7 +784,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  		 */
+>  		vcpu->mode = IN_GUEST_MODE;
+>  
+> -		srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+> +		kvm_vcpu_srcu_read_unlock(vcpu);
+>  		smp_mb__after_srcu_read_unlock();
+>  
+>  		/*
+> @@ -802,7 +802,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  			vcpu->mode = OUTSIDE_GUEST_MODE;
+>  			local_irq_enable();
+>  			preempt_enable();
+> -			vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +			kvm_vcpu_srcu_read_lock(vcpu);
+>  			continue;
+>  		}
+>  
+> @@ -846,7 +846,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  
+>  		preempt_enable();
+>  
+> -		vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +		kvm_vcpu_srcu_read_lock(vcpu);
+>  
+>  		ret = kvm_riscv_vcpu_exit(vcpu, run, &trap);
+>  	}
+> @@ -855,7 +855,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  
+>  	vcpu_put(vcpu);
+>  
+> -	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+> +	kvm_vcpu_srcu_read_unlock(vcpu);
+>  
+>  	return ret;
+>  }
+> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
+> index 2d56faddb9d1..a72c15d4b42a 100644
+> --- a/arch/riscv/kvm/vcpu_exit.c
+> +++ b/arch/riscv/kvm/vcpu_exit.c
+> @@ -456,9 +456,9 @@ static int stage2_page_fault(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>  void kvm_riscv_vcpu_wfi(struct kvm_vcpu *vcpu)
+>  {
+>  	if (!kvm_arch_vcpu_runnable(vcpu)) {
+> -		srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+> +		kvm_vcpu_srcu_read_unlock(vcpu);
+>  		kvm_vcpu_halt(vcpu);
+> -		vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +		kvm_vcpu_srcu_read_lock(vcpu);
+>  		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+>  	}
+>  }
+> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+> index 9b30beac904d..af96dc0549a4 100644
+> --- a/arch/s390/kvm/interrupt.c
+> +++ b/arch/s390/kvm/interrupt.c
+> @@ -1334,11 +1334,11 @@ int kvm_s390_handle_wait(struct kvm_vcpu *vcpu)
+>  	hrtimer_start(&vcpu->arch.ckc_timer, sltime, HRTIMER_MODE_REL);
+>  	VCPU_EVENT(vcpu, 4, "enabled wait: %llu ns", sltime);
+>  no_timer:
+> -	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+> +	kvm_vcpu_srcu_read_unlock(vcpu);
+>  	kvm_vcpu_halt(vcpu);
+>  	vcpu->valid_wakeup = false;
+>  	__unset_cpu_idle(vcpu);
+> -	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +	kvm_vcpu_srcu_read_lock(vcpu);
+>  
+>  	hrtimer_cancel(&vcpu->arch.ckc_timer);
+>  	return 0;
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 156d1c25a3c1..da3dabda1a12 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -4237,14 +4237,14 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
+>  	 * We try to hold kvm->srcu during most of vcpu_run (except when run-
+>  	 * ning the guest), so that memslots (and other stuff) are protected
+>  	 */
+> -	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +	kvm_vcpu_srcu_read_lock(vcpu);
+>  
+>  	do {
+>  		rc = vcpu_pre_run(vcpu);
+>  		if (rc)
+>  			break;
+>  
+> -		srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+> +		kvm_vcpu_srcu_read_unlock(vcpu);
+>  		/*
+>  		 * As PF_VCPU will be used in fault handler, between
+>  		 * guest_enter and guest_exit should be no uaccess.
+> @@ -4281,12 +4281,12 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
+>  		__enable_cpu_timer_accounting(vcpu);
+>  		guest_exit_irqoff();
+>  		local_irq_enable();
+> -		vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +		kvm_vcpu_srcu_read_lock(vcpu);
+>  
+>  		rc = vcpu_post_run(vcpu, exit_reason);
+>  	} while (!signal_pending(current) && !guestdbg_exit_pending(vcpu) && !rc);
+>  
+> -	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+> +	kvm_vcpu_srcu_read_unlock(vcpu);
+>  	return rc;
+>  }
+>  
+> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+> index acda4b6fc851..dada78b92691 100644
+> --- a/arch/s390/kvm/vsie.c
+> +++ b/arch/s390/kvm/vsie.c
+> @@ -1091,7 +1091,7 @@ static int do_vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+>  
+>  	handle_last_fault(vcpu, vsie_page);
+>  
+> -	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+> +	kvm_vcpu_srcu_read_unlock(vcpu);
+>  
+>  	/* save current guest state of bp isolation override */
+>  	guest_bp_isolation = test_thread_flag(TIF_ISOLATE_BP_GUEST);
+> @@ -1133,7 +1133,7 @@ static int do_vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+>  	if (!guest_bp_isolation)
+>  		clear_thread_flag(TIF_ISOLATE_BP_GUEST);
+>  
+> -	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +	kvm_vcpu_srcu_read_lock(vcpu);
+>  
+>  	if (rc == -EINTR) {
+>  		VCPU_EVENT(vcpu, 3, "%s", "machine check");
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index f35fe09de59d..bc24b35c4e80 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10157,7 +10157,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  	/* Store vcpu->apicv_active before vcpu->mode.  */
+>  	smp_store_release(&vcpu->mode, IN_GUEST_MODE);
+>  
+> -	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+> +	kvm_vcpu_srcu_read_unlock(vcpu);
+>  
+>  	/*
+>  	 * 1) We should set ->mode before checking ->requests.  Please see
+> @@ -10188,7 +10188,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  		smp_wmb();
+>  		local_irq_enable();
+>  		preempt_enable();
+> -		vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +		kvm_vcpu_srcu_read_lock(vcpu);
+>  		r = 1;
+>  		goto cancel_injection;
+>  	}
+> @@ -10314,7 +10314,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  	local_irq_enable();
+>  	preempt_enable();
+>  
+> -	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +	kvm_vcpu_srcu_read_lock(vcpu);
+>  
+>  	/*
+>  	 * Profile KVM exit RIPs:
+> @@ -10344,7 +10344,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  }
+>  
+>  /* Called within kvm->srcu read side.  */
+> -static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
+> +static inline int vcpu_block(struct kvm_vcpu *vcpu)
+>  {
+>  	bool hv_timer;
+>  
+> @@ -10360,12 +10360,12 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
+>  		if (hv_timer)
+>  			kvm_lapic_switch_to_sw_timer(vcpu);
+>  
+> -		srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
+> +		kvm_vcpu_srcu_read_unlock(vcpu);
+>  		if (vcpu->arch.mp_state == KVM_MP_STATE_HALTED)
+>  			kvm_vcpu_halt(vcpu);
+>  		else
+>  			kvm_vcpu_block(vcpu);
+> -		vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
+> +		kvm_vcpu_srcu_read_lock(vcpu);
+>  
+>  		if (hv_timer)
+>  			kvm_lapic_switch_to_hv_timer(vcpu);
+> @@ -10407,7 +10407,6 @@ static inline bool kvm_vcpu_running(struct kvm_vcpu *vcpu)
+>  static int vcpu_run(struct kvm_vcpu *vcpu)
+>  {
+>  	int r;
+> -	struct kvm *kvm = vcpu->kvm;
+>  
+>  	vcpu->arch.l1tf_flush_l1d = true;
+>  
+> @@ -10415,7 +10414,7 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
+>  		if (kvm_vcpu_running(vcpu)) {
+>  			r = vcpu_enter_guest(vcpu);
+>  		} else {
+> -			r = vcpu_block(kvm, vcpu);
+> +			r = vcpu_block(vcpu);
+>  		}
+>  
+>  		if (r <= 0)
+> @@ -10437,9 +10436,9 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
+>  		}
+>  
+>  		if (__xfer_to_guest_mode_work_pending()) {
+> -			srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
+> +			kvm_vcpu_srcu_read_unlock(vcpu);
+>  			r = xfer_to_guest_mode_handle_work(vcpu);
+> -			vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
+> +			kvm_vcpu_srcu_read_lock(vcpu);
+>  			if (r)
+>  				return r;
+>  		}
+> @@ -10542,7 +10541,6 @@ static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu)
+>  int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_run *kvm_run = vcpu->run;
+> -	struct kvm *kvm = vcpu->kvm;
+>  	int r;
+>  
+>  	vcpu_load(vcpu);
+> @@ -10550,7 +10548,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  	kvm_run->flags = 0;
+>  	kvm_load_guest_fpu(vcpu);
+>  
+> -	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +	kvm_vcpu_srcu_read_lock(vcpu);
+>  	if (unlikely(vcpu->arch.mp_state == KVM_MP_STATE_UNINITIALIZED)) {
+>  		if (kvm_run->immediate_exit) {
+>  			r = -EINTR;
+> @@ -10562,9 +10560,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  		 */
+>  		WARN_ON_ONCE(kvm_lapic_hv_timer_in_use(vcpu));
+>  
+> -		srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
+> +		kvm_vcpu_srcu_read_unlock(vcpu);
+>  		kvm_vcpu_block(vcpu);
+> -		vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
+> +		kvm_vcpu_srcu_read_lock(vcpu);
+>  
+>  		if (kvm_apic_accept_events(vcpu) < 0) {
+>  			r = 0;
+> @@ -10625,7 +10623,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  	if (kvm_run->kvm_valid_regs)
+>  		store_regs(vcpu);
+>  	post_kvm_run_save(vcpu);
+> -	srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
+> +	kvm_vcpu_srcu_read_unlock(vcpu);
+>  
+>  	kvm_sigset_deactivate(vcpu);
+>  	vcpu_put(vcpu);
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 252ee4a61b58..76fc7233bd6a 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -315,7 +315,10 @@ struct kvm_vcpu {
+>  	int cpu;
+>  	int vcpu_id; /* id given by userspace at creation */
+>  	int vcpu_idx; /* index in kvm->vcpus array */
+> -	int srcu_idx;
+> +	int ____srcu_idx; /* Don't use this directly.  You've been warned. */
+> +#ifdef CONFIG_PROVE_RCU
+> +	int srcu_depth;
+> +#endif
+>  	int mode;
+>  	u64 requests;
+>  	unsigned long guest_debug;
+> @@ -841,6 +844,25 @@ static inline void kvm_vm_bugged(struct kvm *kvm)
+>  	unlikely(__ret);					\
+>  })
+>  
+> +static inline void kvm_vcpu_srcu_read_lock(struct kvm_vcpu *vcpu)
+> +{
+> +#ifdef CONFIG_PROVE_RCU
+> +	WARN_ONCE(vcpu->srcu_depth++,
+> +		  "KVM: Illegal vCPU srcu_idx LOCK, depth=%d", vcpu->srcu_depth - 1);
+> +#endif
+> +	vcpu->____srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +}
+> +
+> +static inline void kvm_vcpu_srcu_read_unlock(struct kvm_vcpu *vcpu)
+> +{
+> +	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->____srcu_idx);
+> +
+> +#ifdef CONFIG_PROVE_RCU
+> +	WARN_ONCE(--vcpu->srcu_depth,
+> +		  "KVM: Illegal vCPU srcu_idx UNLOCK, depth=%d", vcpu->srcu_depth);
+> +#endif
+> +}
+> +
+>  static inline bool kvm_dirty_log_manual_protect_and_init_set(struct kvm *kvm)
+>  {
+>  	return !!(kvm->manual_dirty_log_protect & KVM_DIRTY_LOG_INITIALLY_SET);
