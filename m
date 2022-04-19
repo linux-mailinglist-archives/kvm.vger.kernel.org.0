@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D6AFF506512
-	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 08:57:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A7E9506515
+	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 08:57:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349105AbiDSHAY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Apr 2022 03:00:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42242 "EHLO
+        id S1349106AbiDSHA0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Apr 2022 03:00:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349096AbiDSHAV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Apr 2022 03:00:21 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11FAA3123A
-        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 23:57:36 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id l6-20020a170903120600b0014f43ba55f3so9261895plh.11
-        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 23:57:36 -0700 (PDT)
+        with ESMTP id S1349103AbiDSHAX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Apr 2022 03:00:23 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6156B31500
+        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 23:57:37 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id u10-20020a17090adb4a00b001cb7b5a79e8so1176195pjx.5
+        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 23:57:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=k1aHxZoAaiwp9IBNDG6Sd3gJpxfpCorD51sV50ZX1Is=;
-        b=Jli11xd8mqtWlIpeSa3R9uzukrE3588Wd4QhntxW82Bu/d8zHdDqy5Vnvhjai2huOG
-         ctO1oRjeEaWQimFertWBqamfLaap9CKRToZztNwFW6AE5f77/xW9p6paFim7Eh7qvzSO
-         ebE76Z2+yGh8wGatmYbFF/t13Q+dURYNiYoKJpRw2q7/OEK020kfrOfRxaTFtD8m1pBL
-         ktAWStxHUd0QTBBINHesSzJ4IiTrb13R5/APAq0j6EGDHxYbYy5APaRw13Y0xyseo7hY
-         rD7XzK+d9NrLLA43JNxU1nQ1vNk3faa9dqHy9TI1prJnH+RtsxwhlLg2kiKVaTaiNKH/
-         mlng==
+        bh=XAe9o8/7QtvwA7T4kzsz7p8aDgk6j+Di6GgUS4L29XQ=;
+        b=bjp6ZxrGAh7052Gw6Xdmrg+7KZKA2uAnPjBgjXkIw2dFvt7G7LE/TTe8/W3Oj57ExI
+         cZYBHWsYxkJIQ7lHFYgAKKcsok3iLVBUXssHXQQQ655fJ2DAs1rIPQ936ssjYaDW5leP
+         74OrsDeIahHKz5IKhc/qqk97SKOd4YF0gSsM2oRzjAKfleXT3nu/pB8ojlS0R+IA2MFb
+         oN9GtMZPUdiMTKCBf2adntBJFKoPdzlR+R0bKWByFsr3b4kJw9P/zVfmY19IQAQJ+qut
+         DV2weGfw90L/YB66aNJH8bfLF+/l6o4j7hpIPYdJMMBKUSgC5sOMHQ0BYi1Zjo5kIT7c
+         BZrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=k1aHxZoAaiwp9IBNDG6Sd3gJpxfpCorD51sV50ZX1Is=;
-        b=dQQ3xuY6xS2x3+svlSYQ+LhyNMZYyejji0KmdWIiBA/EvSVOhWQjr59wOpOV4HlqEH
-         9le+jlFT+N6eViZeKOCSjggZyIEO94WeT+PwjNggTGQsDo90tO7ZUmSvcshliCi0fpna
-         7zjUb9ym4494QcKvF8Xpb7AJe3WRuooO2yx1BGj3SHsGTqWSoOp/z51DJewQo5K5WzD+
-         iumzvM2ZkHAtsxB8mTS44rDzl6ZRqizG/nAlEzNQw/0Fun6bZohYkHdJWiJgZ0Pohq6Y
-         GredUI1EPxUUfsjvyo5FnFKXsUa0wNW3e6r9Pju4Sx1y4qmtO4td/OWJA0ot/FXuv/xI
-         QOrw==
-X-Gm-Message-State: AOAM530iZbgt74fS4Jel9OXAMT0XjKhyCk5V2PQ8D5oE1Ycw56ByVf42
-        xTK/l/7W6vnKUIMVuvFyPQB8hjemv6I=
-X-Google-Smtp-Source: ABdhPJw4BjqWGKNFLnPZMZUC1+9yLnqihHWKtPmY8zD8R5Ja1UK3sVAaay5AnyQvY9iXieVJivmijHyA5sg=
+        bh=XAe9o8/7QtvwA7T4kzsz7p8aDgk6j+Di6GgUS4L29XQ=;
+        b=DZflqRrt4i3vErLE3PJIH/f/Gc3qXFTuLyzNP1BrqJGnvVPrr7Tiukr/JEILQ14QAy
+         S8L8O0JBy8nS8F9CtVp6zY0HFfxy0S6Vs0A1HkRVa2xkqdMaVJvNFyNlKxNoEcrOJsct
+         N2QK11EJDGwxCBH5En30TRujWqYW9gfB0gOGN1AmHRghORZGax2WS+iuBiM5v/wXt9CE
+         gV92M9nQjw2uJ1IoYIFaPnWoAH0oeNWNVloPiR5PeLKy08J6Lv+KC59vJIhnDr6UBT1G
+         spmJzcbstxRuBattOWXJjQ4pqELdtccTOajNtjHjeFvaqCBrDv9izn+UmHOb35IRR2fx
+         /9cA==
+X-Gm-Message-State: AOAM530d8woXLMw++x6sGmKd8us1zGsioUse/Q4Ql/i1dSVVpLxBD1xR
+        /zgXnxJzzYcfZwvkyNaL0ijofzzBRNY=
+X-Google-Smtp-Source: ABdhPJxlcowD6T6yPgHuseBL0ofs+MsqwJykl/a/FrUlFopUkhnFg/TqdMwK8KVyg1eylJC4AC624op+zHg=
 X-Received: from reiji-vws-sp.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:a05:6a00:2349:b0:4fa:934f:f6db with SMTP id
- j9-20020a056a00234900b004fa934ff6dbmr16170589pfj.44.1650351455448; Mon, 18
- Apr 2022 23:57:35 -0700 (PDT)
-Date:   Mon, 18 Apr 2022 23:55:24 -0700
+ (user=reijiw job=sendgmr) by 2002:a05:6a00:b89:b0:505:dead:db1d with SMTP id
+ g9-20020a056a000b8900b00505deaddb1dmr16566920pfj.74.1650351456883; Mon, 18
+ Apr 2022 23:57:36 -0700 (PDT)
+Date:   Mon, 18 Apr 2022 23:55:25 -0700
 In-Reply-To: <20220419065544.3616948-1-reijiw@google.com>
-Message-Id: <20220419065544.3616948-19-reijiw@google.com>
+Message-Id: <20220419065544.3616948-20-reijiw@google.com>
 Mime-Version: 1.0
 References: <20220419065544.3616948-1-reijiw@google.com>
 X-Mailer: git-send-email 2.36.0.rc0.470.gd361397f0d-goog
-Subject: [PATCH v7 18/38] KVM: arm64: Make MVFR1_EL1 writable
+Subject: [PATCH v7 19/38] KVM: arm64: Add remaining ID registers to id_reg_desc_table
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -80,80 +80,153 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch adds id_reg_desc for MVFR1_EL1 to make it writable
-by userspace.
-
-There are only a few valid combinations of values that can be set
-for FPHP and SIMDHP fields according to Arm ARM.  Return an error
-when userspace tries to set those fields to values that don't match
-any of the valid combinations.
+Add hidden or reserved ID registers, and remaining ID registers,
+which don't require special handling, to id_reg_desc_table.
+Add 'flags' field to id_reg_desc, which is used to indicates hiddden
+or reserved registers. Since now id_reg_desc_init() is called even
+for hidden/reserved registers, change it to not do anything for them.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 84 ++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 82 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index dfcf95eee139..9e090441057a 100644
+index 9e090441057a..479208dedd79 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -723,6 +723,36 @@ static int validate_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 	return 0;
- }
+@@ -331,6 +331,11 @@ struct id_reg_desc {
+ 	/* Fields that are not validated by arm64_check_features. */
+ 	u64	ignore_mask;
  
-+static int validate_mvfr1_el1(struct kvm_vcpu *vcpu,
-+			      const struct id_reg_desc *id_reg, u64 val)
-+{
-+	unsigned int fphp, simdhp;
-+	struct fphp_simdhp {
-+		unsigned int fphp;
-+		unsigned int simdhp;
-+	};
-+	/* Permitted fphp/simdhp value combinations according to Arm ARM */
-+	struct fphp_simdhp valid_fphp_simdhp[3] = {{0, 0}, {2, 1}, {3, 2}};
-+	int i;
-+	bool is_valid_fphp_simdhp = false;
++	/* Miscellaneous flags */
++#define ID_DESC_REG_UNALLOC	(1UL << 0)
++#define ID_DESC_REG_HIDDEN	(1UL << 1)
++	u64	flags;
 +
-+	fphp = cpuid_feature_extract_unsigned_field(val, MVFR1_FPHP_SHIFT);
-+	simdhp = cpuid_feature_extract_unsigned_field(val, MVFR1_SIMDHP_SHIFT);
-+
-+	for (i = 0; i < ARRAY_SIZE(valid_fphp_simdhp); i++) {
-+		if (valid_fphp_simdhp[i].fphp == fphp &&
-+		    valid_fphp_simdhp[i].simdhp == simdhp) {
-+			is_valid_fphp_simdhp = true;
-+			break;
-+		}
-+	}
-+
-+	if (!is_valid_fphp_simdhp)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
- static void init_id_aa64pfr0_el1_desc(struct id_reg_desc *id_reg)
+ 	/* An optional initialization function of the id_reg_desc */
+ 	void (*init)(struct id_reg_desc *id_reg);
+ 
+@@ -376,8 +381,13 @@ struct id_reg_desc {
+ static void id_reg_desc_init(struct id_reg_desc *id_reg)
  {
- 	u64 limit = id_reg->vcpu_limit_val;
-@@ -4157,6 +4187,11 @@ static struct id_reg_desc id_mmfr0_el1_desc = {
- 	},
+ 	u32 id = reg_to_encoding(&id_reg->reg_desc);
+-	u64 val = read_sanitised_ftr_reg(id);
++	u64 val;
++
++	if (id_reg->flags & (ID_DESC_REG_HIDDEN | ID_DESC_REG_UNALLOC))
++		/* Nothing to do for a hidden/unalloc ID register */
++		return;
+ 
++	val = read_sanitised_ftr_reg(id);
+ 	id_reg->vcpu_limit_val = val;
+ 
+ 	id_reg_desc_init_ftr(id_reg);
+@@ -4192,33 +4202,103 @@ static struct id_reg_desc mvfr1_el1_desc = {
+ 	.validate = validate_mvfr1_el1,
  };
  
-+static struct id_reg_desc mvfr1_el1_desc = {
-+	.reg_desc = ID_SANITISED(MVFR1_EL1),
-+	.validate = validate_mvfr1_el1,
-+};
++#define ID_DESC_DEFAULT(name)					\
++	[IDREG_IDX(SYS_##name)] = &(struct id_reg_desc) {	\
++		.reg_desc = ID_SANITISED(name),			\
++	}
++
++#define ID_DESC_HIDDEN(name)					\
++	[IDREG_IDX(SYS_##name)] = &(struct id_reg_desc) {	\
++		.reg_desc = ID_HIDDEN(name),			\
++		.flags = ID_DESC_REG_HIDDEN,			\
++	}
++
++#define ID_DESC_UNALLOC(crm, op2)				\
++	[(crm - 1) << 3 | op2] = &(struct id_reg_desc) {	\
++		.reg_desc = ID_UNALLOCATED(crm, op2),		\
++		.flags = ID_DESC_REG_UNALLOC,			\
++	}
 +
  #define ID_DESC(id_reg_name, id_reg_desc)	\
  	[IDREG_IDX(SYS_##id_reg_name)] = (id_reg_desc)
  
-@@ -4167,6 +4202,7 @@ static struct id_reg_desc *id_reg_desc_table[KVM_ARM_ID_REG_MAX_NUM] = {
+-/* A table for ID registers's information. */
++/*
++ * A table for ID registers's information.
++ * All entries in the table except ID_DESC_HIDDEN and ID_DESC_UNALLOC
++ * must have corresponding entries in arm64_ftr_regs[] in
++ * arch/arm64/kernel/cpufeature.c because read_sanitised_ftr_reg() is
++ * called for each of the ID registers.
++ */
+ static struct id_reg_desc *id_reg_desc_table[KVM_ARM_ID_REG_MAX_NUM] = {
+ 	/* CRm=1 */
++	ID_DESC_DEFAULT(ID_PFR0_EL1),
++	ID_DESC_DEFAULT(ID_PFR1_EL1),
+ 	ID_DESC(ID_DFR0_EL1, &id_dfr0_el1_desc),
++	ID_DESC_HIDDEN(ID_AFR0_EL1),
  	ID_DESC(ID_MMFR0_EL1, &id_mmfr0_el1_desc),
++	ID_DESC_DEFAULT(ID_MMFR1_EL1),
++	ID_DESC_DEFAULT(ID_MMFR2_EL1),
++	ID_DESC_DEFAULT(ID_MMFR3_EL1),
++
++	/* CRm=2 */
++	ID_DESC_DEFAULT(ID_ISAR0_EL1),
++	ID_DESC_DEFAULT(ID_ISAR1_EL1),
++	ID_DESC_DEFAULT(ID_ISAR2_EL1),
++	ID_DESC_DEFAULT(ID_ISAR3_EL1),
++	ID_DESC_DEFAULT(ID_ISAR4_EL1),
++	ID_DESC_DEFAULT(ID_ISAR5_EL1),
++	ID_DESC_DEFAULT(ID_MMFR4_EL1),
++	ID_DESC_DEFAULT(ID_ISAR6_EL1),
  
  	/* CRm=3 */
-+	ID_DESC(MVFR1_EL1, &mvfr1_el1_desc),
++	ID_DESC_DEFAULT(MVFR0_EL1),
+ 	ID_DESC(MVFR1_EL1, &mvfr1_el1_desc),
++	ID_DESC_DEFAULT(MVFR2_EL1),
++	ID_DESC_UNALLOC(3, 3),
++	ID_DESC_DEFAULT(ID_PFR2_EL1),
  	ID_DESC(ID_DFR1_EL1, &id_dfr1_el1_desc),
++	ID_DESC_DEFAULT(ID_MMFR5_EL1),
++	ID_DESC_UNALLOC(3, 7),
  
  	/* CRm=4 */
+ 	ID_DESC(ID_AA64PFR0_EL1, &id_aa64pfr0_el1_desc),
+ 	ID_DESC(ID_AA64PFR1_EL1, &id_aa64pfr1_el1_desc),
++	ID_DESC_UNALLOC(4, 2),
++	ID_DESC_UNALLOC(4, 3),
++	ID_DESC_DEFAULT(ID_AA64ZFR0_EL1),
++	ID_DESC_UNALLOC(4, 5),
++	ID_DESC_UNALLOC(4, 6),
++	ID_DESC_UNALLOC(4, 7),
+ 
+ 	/* CRm=5 */
+ 	ID_DESC(ID_AA64DFR0_EL1, &id_aa64dfr0_el1_desc),
++	ID_DESC_DEFAULT(ID_AA64DFR1_EL1),
++	ID_DESC_UNALLOC(5, 2),
++	ID_DESC_UNALLOC(5, 3),
++	ID_DESC_HIDDEN(ID_AA64AFR0_EL1),
++	ID_DESC_HIDDEN(ID_AA64AFR1_EL1),
++	ID_DESC_UNALLOC(5, 6),
++	ID_DESC_UNALLOC(5, 7),
+ 
+ 	/* CRm=6 */
+ 	ID_DESC(ID_AA64ISAR0_EL1, &id_aa64isar0_el1_desc),
+ 	ID_DESC(ID_AA64ISAR1_EL1, &id_aa64isar1_el1_desc),
+ 	ID_DESC(ID_AA64ISAR2_EL1, &id_aa64isar2_el1_desc),
++	ID_DESC_UNALLOC(6, 3),
++	ID_DESC_UNALLOC(6, 4),
++	ID_DESC_UNALLOC(6, 5),
++	ID_DESC_UNALLOC(6, 6),
++	ID_DESC_UNALLOC(6, 7),
+ 
+ 	/* CRm=7 */
+ 	ID_DESC(ID_AA64MMFR0_EL1, &id_aa64mmfr0_el1_desc),
++	ID_DESC_DEFAULT(ID_AA64MMFR1_EL1),
++	ID_DESC_DEFAULT(ID_AA64MMFR2_EL1),
++	ID_DESC_UNALLOC(7, 3),
++	ID_DESC_UNALLOC(7, 4),
++	ID_DESC_UNALLOC(7, 5),
++	ID_DESC_UNALLOC(7, 6),
++	ID_DESC_UNALLOC(7, 7),
+ };
+ 
+ static inline struct id_reg_desc *get_id_reg_desc(u32 id)
 -- 
 2.36.0.rc0.470.gd361397f0d-goog
 
