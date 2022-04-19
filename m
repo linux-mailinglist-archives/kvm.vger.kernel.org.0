@@ -2,88 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 74713506FC7
-	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 16:09:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5A0D507046
+	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 16:28:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353004AbiDSOKf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Apr 2022 10:10:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53262 "EHLO
+        id S1353308AbiDSO0Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Apr 2022 10:26:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352983AbiDSOKd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Apr 2022 10:10:33 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 664DB2AC4F;
-        Tue, 19 Apr 2022 07:07:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650377271; x=1681913271;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=+7O+UQ3D7o5J+XgvqciNrRwiHvMtxbrVEPEXk4mInmY=;
-  b=KuIwo9e/1kjD1YBMrAO+CdXUI90kNQxPsJz1gfll/isVLECn13I7baoW
-   VG/UaizlkH/BTlpU7QLpONnEGJKPAwwMtn0i8Ak0RFFWyTLZCtmJzcKGB
-   F5WzeD0VGCVYJVz7HxanwgTWhTp56WhX5biHmfewYiZxDBKpc/aMaYsO1
-   mf9ev3txTin0xbva/LuzKbJ1q23W0i5IZ41bffPn5ENRjYAH/sXp9ioXW
-   lIZuq49sb9y2UsCoOFn7qs/Fs4f/1DobTrFg6uZoMNdb9jEulSADKWLPp
-   zDvP8Wwm1ODZA/APMKnXIVoyfFx3Z2ULToqX3eqvERLY0qPH/aTnxeOwV
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10322"; a="243705047"
-X-IronPort-AV: E=Sophos;i="5.90,272,1643702400"; 
-   d="scan'208";a="243705047"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2022 07:07:51 -0700
-X-IronPort-AV: E=Sophos;i="5.90,272,1643702400"; 
-   d="scan'208";a="554743115"
-Received: from chferrer-mobl.amr.corp.intel.com (HELO [10.209.37.31]) ([10.209.37.31])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2022 07:07:50 -0700
-Message-ID: <dd9d6f7d-5cec-e6b7-2fa0-5bf1fdcb79b5@linux.intel.com>
-Date:   Tue, 19 Apr 2022 07:07:50 -0700
+        with ESMTP id S1351036AbiDSO0X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Apr 2022 10:26:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C57D125E8E
+        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 07:23:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650378219;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=pgYoda6jxeg1UkBVWOZGijo6tDurwISefvcfRWo9yGA=;
+        b=fSrmWn7mWb9FbRaJOh6Jt/Yi48Sxt9wJiFg36nF6zWwmvefYBeZZktbOYQ5JqlNCUM8H0Y
+        azlPJ7cUUzoUyG/mxAGXwPwSfFS1ZbfRYtWRBeBbZjyFRDk8EZL/+r6arAkbR5lzNxob9w
+        xqIh0cptGYKkktgB/RLAs9PKXPk2cZI=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-606-prJ42yEsPRmlMemh2D2Ovg-1; Tue, 19 Apr 2022 10:23:38 -0400
+X-MC-Unique: prJ42yEsPRmlMemh2D2Ovg-1
+Received: by mail-wr1-f69.google.com with SMTP id 46-20020adf8031000000b00207ad3febaeso1960153wrk.6
+        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 07:23:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=pgYoda6jxeg1UkBVWOZGijo6tDurwISefvcfRWo9yGA=;
+        b=oIcONQheuqz0q1Q33rKz1jZgsLUPiQ6NjPhKCXuFmBwVjApxyU35a3ln4o+/32auVe
+         4SeBYVw31Q5GiMRdfARPqevT+6zFJG7yZCWlhI6di/hLtTBY33CbAfsTkhTlxTa1GCp+
+         eA1v9XWgaX19gWwD9NrSbgu7gxjdLxghkFHtdzY7UIDKzfQTRr7iKQUsVUTgaIhmJrzn
+         Qh/Mol+pOGeAQ2kcfKWEtDwvskW1+cTvMcJSfI8lBzQdnhVLHXj/1oN3M6ZcE6ZGjS4B
+         Av+wWONH0iolyIajT7EJ+bSeGbz1m1h5VIRJ43+ITFrYKbe8WA8UTKvRCG7Xmaxao3Jw
+         1fCA==
+X-Gm-Message-State: AOAM5305sDIospxsf3aBfUB4uFGUcplmmL7lCMQnejc8mRLucagbXZmV
+        9NnvtR7Hahe9fuLetyLfJmZro69IucBuS2SXGmBwUD8F6q5UDQBgVlUD6zHE/Xw/oPMMTmmARs0
+        rONawwUpDJdkZ
+X-Received: by 2002:adf:e0ce:0:b0:1ef:706d:d6b9 with SMTP id m14-20020adfe0ce000000b001ef706dd6b9mr12023648wri.71.1650378217466;
+        Tue, 19 Apr 2022 07:23:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyeH06zyVEvRzR25XqZfs6P6WlcYVWa3Pnx9E8TjyeSMb+poPRbkmrWccNm+5XAKLTet+MGFA==
+X-Received: by 2002:adf:e0ce:0:b0:1ef:706d:d6b9 with SMTP id m14-20020adfe0ce000000b001ef706dd6b9mr12023635wri.71.1650378217272;
+        Tue, 19 Apr 2022 07:23:37 -0700 (PDT)
+Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
+        by smtp.gmail.com with ESMTPSA id h10-20020a05600c414a00b0038ebb6884d8sm23660891wmm.0.2022.04.19.07.23.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Apr 2022 07:23:36 -0700 (PDT)
+Date:   Tue, 19 Apr 2022 15:23:34 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Cole Robinson <crobinso@redhat.com>
+Cc:     Dov Murik <dovmurik@linux.ibm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        qemu-devel <qemu-devel@nongnu.org>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "Daniel P. Berrange" <berrange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: adding 'official' way to dump SEV VMSA
+Message-ID: <Yl7F5o5egojJ09EB@work-vm>
+References: <a713533d-c4c5-2237-58d0-57b812a56ba4@redhat.com>
+ <462cbf77-432a-c09c-6ec9-91556dc0f887@linux.ibm.com>
+ <YlfakQfkZFOpKWeU@work-vm>
+ <ac2bc657-947b-e528-791b-101447e074d8@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.7.0
-Subject: Re: [PATCH v3 03/21] x86/virt/tdx: Implement the SEAMCALL base
- function
-Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
-        len.brown@intel.com, tony.luck@intel.com,
-        rafael.j.wysocki@intel.com, reinette.chatre@intel.com,
-        dan.j.williams@intel.com, peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com, isaku.yamahata@intel.com
-References: <cover.1649219184.git.kai.huang@intel.com>
- <1c3f555934c73301a9cbf10232500f3d15efe3cc.1649219184.git.kai.huang@intel.com>
-From:   Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-In-Reply-To: <1c3f555934c73301a9cbf10232500f3d15efe3cc.1649219184.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-8.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ac2bc657-947b-e528-791b-101447e074d8@redhat.com>
+User-Agent: Mutt/2.2.1 (2022-02-19)
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+* Cole Robinson (crobinso@redhat.com) wrote:
+> On 4/14/22 4:25 AM, Dr. David Alan Gilbert wrote:
+> > * Dov Murik (dovmurik@linux.ibm.com) wrote:
+> >> Hi Cole,
+> >>
+> >> On 13/04/2022 16:36, Cole Robinson wrote:
+> >>> Hi all,
+> >>>
+> >>> SEV-ES and SEV-SNP attestation require a copy of the initial VMSA to
+> >>> validate the launch measurement. For developers dipping their toe into
+> >>> SEV-* work, the easiest way to get sample VMSA data for their machine is
+> >>> to grab it from a running VM.
+> >>>
+> >>> There's two techniques I've seen for that: patch some printing into
+> >>> kernel __sev_launch_update_vmsa, or use systemtap like danpb's script
+> >>> here: https://gitlab.com/berrange/libvirt/-/blob/lgtm/scripts/sev-vmsa.stp
+> >>>
+> >>> Seems like this could be friendlier though. I'd like to work on this if
+> >>> others agree.
+> >>>
+> >>> Some ideas I've seen mentioned in passing:
+> >>>
+> >>> - debugfs entry in /sys/kernel/debug/kvm/.../vcpuX/
+> >>> - new KVM ioctl
+> >>> - something with tracepoints
+> >>> - some kind of dump in dmesg that doesn't require a patch
+> >>>
+> >>> Thoughts?
+> >>
+> >>
+> >> Brijesh suggested to me to construct the VMSA without getting any info from
+> >> the host (except number of vcpus), because the initial state of the vcpus
+> >> is standard and known if you use QEMU and OVMF (but that's open for discussion).
+> >>
+> >> I took his approach (thanks Brijesh!) and now it's how we calculate expected
+> >> SNP measurements in sev-snp-measure [1].  The relevant part for VMSA construction
+> >> is in [2].
+> >>
+> >> I plan to add SEV-ES and SEV measurements calculation to this 
+> >> library/program as well.
+> > 
+> > Everyone seems to be writing one; you, Dan etc!
+> > 
+> 
+> Yeah, I should have mentioned Dan's demo tool here:
+> https://gitlab.com/berrange/libvirt/-/blob/lgtm/tools/virt-dom-sev-vmsa-tool.py
+> 
+> Tyler Fanelli is looking at adding that functionality to sevctl too FWIW
+> 
+> > I think I agree the right way is to build it programmatically rather
+> > than taking a copy from the kernel;  it's fairly simple, although the
+> > scripts get increasingly hairy as you deal with more and more VMM's and
+> > firmwares.
+> > 
+> 
+> Agreed. A nice way to dump VMSA from the kernel will be useful for
+> debugging, or extending these scripts to support different VMMs.
+> 
+> > I think I'd like to see a new ioctl to read the initial VMSA, primarily
+> > as a way of debugging so you can see what VMSA you have when something
+> > goes wrong.
+> > 
+> 
+> debugfs seems simpler for the dev user (accessing a file per CPU vs code
+> to call ioctl), but beyond that I don't have any insight. Is there a
+> reason you think ioctl and not debugfs?
 
+I'm not sure how easy it is to cook up a VMSA when you ask for it;
+where as following the normal route for vCPU creation and then
+taking a copy of the VMSA it was about to use sounds easy.
+(Although I've tried neither).
 
-On 4/5/22 9:49 PM, Kai Huang wrote:
-> SEAMCALL leaf functions use an ABI different from the x86-64 system-v
-> ABI.  Instead, they share the same ABI with the TDCALL leaf functions.
+Dave
 
-TDCALL is a new term for this patch set. Maybe add some detail about
-it in ()?.
-
-> %rax is used to carry both the SEAMCALL leaf function number (input) and
-> the completion status code (output).  Additional GPRs (%rcx, %rdx,
-> %r8->%r11) may be further used as both input and output operands in
-> individual leaf functions.
-
-
-
+> Thanks,
+> Cole
+> 
 -- 
-Sathyanarayanan Kuppuswamy
-Linux Kernel Developer
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
