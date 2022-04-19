@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF720506524
-	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 08:58:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 36153506528
+	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 08:58:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349136AbiDSHAm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Apr 2022 03:00:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43092 "EHLO
+        id S1345046AbiDSHAn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Apr 2022 03:00:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349134AbiDSHAk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1349118AbiDSHAk (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 19 Apr 2022 03:00:40 -0400
 Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC58F3204C
-        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 23:57:50 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id d15-20020a17090a3b0f00b001cd5528627eso928995pjc.1
-        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 23:57:50 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1894832056
+        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 23:57:52 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id e12-20020a17090a7c4c00b001cb1b3274c9so1042722pjl.4
+        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 23:57:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=xydmrQbn6xBF8/ePfVL7th+l3rERvkG3uvSek2g29PM=;
-        b=B3aAhbDXLtzCKoc11fDKloW896IaGDdEbmBBz/bkUK5ainOaSynxr95k4hqmcFDIOm
-         XSX5BxR7DJS4pmGIm1pdkb9wUUT09tkOPCwpv3fW8NiTBWCkhm65qgJiC3a4BPQ+Ri0M
-         +TPtopVHEVTAWl0UHuYBlZ/vjq4jdcvyIhVhZ1m6yXzS391nw+F+oBa+8z+Dwc0qjuBQ
-         x0v2ScmIGPiHC/L7Gsw0wddnIzIPzFOMEvq+10S1VQ5N8DeDpwYRbaXHRXSTMQh8JkAm
-         ye6N97rv5CM+hd43K7Hqn3bZZrNwsgFp+CA/u0fL/WatKT3gaILa4hshuBhr+8b4j7iL
-         ZW1A==
+        bh=11aokqGJX88zjYco/n0ZubDfebB61Zyyzannu13jVUU=;
+        b=KGkjLi1nc3eXEFUtTXU9CrYnMm5oE1zb1JyJJ5B7usLojN2sR4jMVUo4tdKam79pra
+         OVVDdODyp0s3nG2ZJo8xAbdCAAdfINz0DvmkTYgcDoJPyjrFRzEMbWEhr3S17VgMcZzD
+         nM3JFqyi9usgPOH9nh6yHH3K9EhDv+VHrkC9rBBlvfOu2MszL4Hs+DDC22Em2O6ZKNxl
+         5AeVCwzg50biwYCMn8UmZJ1+S+oPSbmtdfJ4IcoWZFIIysV0uXT2l+BZurMipMNhaudj
+         6H2envE5Qpe3dAMXTa3BuELSOXXVwTJH4rpI5ANhGr44gOvC13Npdua3r4pKU8cmUmQJ
+         8T2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=xydmrQbn6xBF8/ePfVL7th+l3rERvkG3uvSek2g29PM=;
-        b=fgQeUXldxX0OQ3yYdKCMj+jQYB1Hcz2iYGLXJF2BG6DLFTxSJIZdtjnTzOayqdDeBJ
-         URZCl6rrU1olIrvW28+yugSz9qgeFH0ZveWaC4Z0DbxBlFsg+IAuJ8jc8Lx/dW7o4Vci
-         3Hth71f3lQBA/UdAyaqbEYvtjeBpmfACM3awww6zgsZERXZIIX7NpMrZUjsHBog9E3zC
-         BLOxIQG7UvT8XxIIwMLM/mopKBZK8tYR28jZm46K3mNNgwbp1BxgB2nNoCGkU3bK9Hdn
-         vhZIhTdNxx4BkAAJerMS5MaEmOrbKd87vfPPIswmL1kxzKN/5Uok2WdZ65mDGifz58+t
-         vSFQ==
-X-Gm-Message-State: AOAM531Wpvsec2j0K/S0G9XppeJ+KxC3uWiLSw3IZNEA1LiXEMzPmzbv
-        iwhB3z9uhz5dOXrAgvArHYc99uTalbA=
-X-Google-Smtp-Source: ABdhPJymWpo78icljcdDrBVhbQitXud9ofh1LnhHGu4eZMLV5WZFlPKgYwB0b6QD2F2Vs2FOm+A56WLFg34=
+        bh=11aokqGJX88zjYco/n0ZubDfebB61Zyyzannu13jVUU=;
+        b=aJrmNNEFJjOAwOgzXl2gveoh4rnk66jZatwkAo6g02mswL/6X3y4duBIIAVpvdyZd6
+         GIoRmKDpyI14//+ldS2f82WFeSwAxYz4lHWs3RSp6/5DNtk2tywgf/KL0uH+2xH1IiwO
+         tqtQtD1Bog/WtY/PuehR4s+IboQ8Sj/nCz3cA7Q66x/9j8QaJL0SR1F7jAsHeFhzMNx0
+         TWQSvXphqyrZLA3yxZN7p8bCaOQ6v1/B3Y2lGN738SL+HQ56+3S1+q6xA2PpwvDDq3zG
+         wvydrzA4+J0k+qk7I1Fz8mUnu900d6ruaM4matyL6pYllGKeDIpvcbjgRfEYiS1PEXN0
+         USBA==
+X-Gm-Message-State: AOAM530HV2hjC/sex+OgOHatWWxnjQjAVZ9V9RoDGbq9He3w6ZGMeO5Z
+        KjaAnKF2zSJktYv09DPl63LZ43aqBxU=
+X-Google-Smtp-Source: ABdhPJxTNMo4W/KfFAQ3BdCNc/v2d2neST1XZcUkDoxRPAerssfdLoDu8lxxEk0L7o4yB7dQku5s92k37v0=
 X-Received: from reiji-vws-sp.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:a17:90a:dd45:b0:1bc:9466:9b64 with SMTP id
- u5-20020a17090add4500b001bc94669b64mr22322996pjv.23.1650351469934; Mon, 18
- Apr 2022 23:57:49 -0700 (PDT)
-Date:   Mon, 18 Apr 2022 23:55:33 -0700
+ (user=reijiw job=sendgmr) by 2002:a17:902:c792:b0:158:ba0c:cf6d with SMTP id
+ w18-20020a170902c79200b00158ba0ccf6dmr14555949pla.131.1650351471625; Mon, 18
+ Apr 2022 23:57:51 -0700 (PDT)
+Date:   Mon, 18 Apr 2022 23:55:34 -0700
 In-Reply-To: <20220419065544.3616948-1-reijiw@google.com>
-Message-Id: <20220419065544.3616948-28-reijiw@google.com>
+Message-Id: <20220419065544.3616948-29-reijiw@google.com>
 Mime-Version: 1.0
 References: <20220419065544.3616948-1-reijiw@google.com>
 X-Mailer: git-send-email 2.36.0.rc0.470.gd361397f0d-goog
-Subject: [PATCH v7 27/38] KVM: arm64: Trap disabled features of ID_AA64PFR0_EL1
+Subject: [PATCH v7 28/38] KVM: arm64: Trap disabled features of ID_AA64PFR1_EL1
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -80,147 +80,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add feature_config_ctrl for RAS and AMU, which are indicated in
-ID_AA64PFR0_EL1, to program configuration registers to trap
-guest's using those features when they are not exposed to the guest.
-
-Introduce trap_ras_regs() to change a behavior of guest's access to
-the registers, which is currently raz/wi, depending on the feature's
-availability for the guest (and inject undefined instruction
-exception when guest's RAS register access are trapped and RAS is
-not exposed to the guest).  In order to keep the current visibility
-of the RAS registers from userspace (always visible), a visibility
-function for RAS registers is not added.
+Add feature_config_ctrl for MTE, which is indicated in
+ID_AA64PFR1_EL1, to program configuration register to trap the
+guest's using the feature when it is not exposed to the guest.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 92 +++++++++++++++++++++++++++++++++++----
- 1 file changed, 83 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 7fe44dec11fd..fecd54a58d34 100644
+index fecd54a58d34..10f366957ce9 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -320,6 +320,63 @@ struct feature_config_ctrl {
- 	void	(*trap_activate)(struct kvm_vcpu *vcpu);
+@@ -360,6 +360,11 @@ static void feature_amu_trap_activate(struct kvm_vcpu *vcpu)
+ 	feature_trap_activate(vcpu, VCPU_CPTR_EL2, CPTR_EL2_TAM, 0);
+ }
+ 
++static void feature_mte_trap_activate(struct kvm_vcpu *vcpu)
++{
++	feature_trap_activate(vcpu, VCPU_HCR_EL2, HCR_TID5, HCR_DCT | HCR_ATA);
++}
++
+ /* For ID_AA64PFR0_EL1 */
+ static struct feature_config_ctrl ftr_ctrl_ras = {
+ 	.ftr_reg = SYS_ID_AA64PFR0_EL1,
+@@ -377,6 +382,15 @@ static struct feature_config_ctrl ftr_ctrl_amu = {
+ 	.trap_activate = feature_amu_trap_activate,
  };
  
-+enum vcpu_config_reg {
-+	VCPU_HCR_EL2 = 1,
-+	VCPU_MDCR_EL2,
-+	VCPU_CPTR_EL2,
-+};
-+
-+static void feature_trap_activate(struct kvm_vcpu *vcpu,
-+				  enum vcpu_config_reg cfg_reg,
-+				  u64 cfg_set, u64 cfg_clear)
-+{
-+	u64 *reg_ptr, reg_val;
-+
-+	switch (cfg_reg) {
-+	case VCPU_HCR_EL2:
-+		reg_ptr = &vcpu->arch.hcr_el2;
-+		break;
-+	case VCPU_MDCR_EL2:
-+		reg_ptr = &vcpu->arch.mdcr_el2;
-+		break;
-+	case VCPU_CPTR_EL2:
-+		reg_ptr = &vcpu->arch.cptr_el2;
-+		break;
-+	}
-+
-+	/* Clear/Set fields that are indicated by cfg_clear/cfg_set. */
-+	reg_val = (*reg_ptr & ~cfg_clear);
-+	reg_val |= cfg_set;
-+	*reg_ptr = reg_val;
-+}
-+
-+static void feature_ras_trap_activate(struct kvm_vcpu *vcpu)
-+{
-+	feature_trap_activate(vcpu, VCPU_HCR_EL2, HCR_TERR | HCR_TEA, HCR_FIEN);
-+}
-+
-+static void feature_amu_trap_activate(struct kvm_vcpu *vcpu)
-+{
-+	feature_trap_activate(vcpu, VCPU_CPTR_EL2, CPTR_EL2_TAM, 0);
-+}
-+
-+/* For ID_AA64PFR0_EL1 */
-+static struct feature_config_ctrl ftr_ctrl_ras = {
-+	.ftr_reg = SYS_ID_AA64PFR0_EL1,
-+	.ftr_shift = ID_AA64PFR0_RAS_SHIFT,
-+	.ftr_min = ID_AA64PFR0_RAS_V1,
++/* For ID_AA64PFR1_EL1 */
++static struct feature_config_ctrl ftr_ctrl_mte = {
++	.ftr_reg = SYS_ID_AA64PFR1_EL1,
++	.ftr_shift = ID_AA64PFR1_MTE_SHIFT,
++	.ftr_min = ID_AA64PFR1_MTE_EL0,
 +	.ftr_signed = FTR_UNSIGNED,
-+	.trap_activate = feature_ras_trap_activate,
-+};
-+
-+static struct feature_config_ctrl ftr_ctrl_amu = {
-+	.ftr_reg = SYS_ID_AA64PFR0_EL1,
-+	.ftr_shift = ID_AA64PFR0_AMU_SHIFT,
-+	.ftr_min = ID_AA64PFR0_AMU,
-+	.ftr_signed = FTR_UNSIGNED,
-+	.trap_activate = feature_amu_trap_activate,
++	.trap_activate = feature_mte_trap_activate,
 +};
 +
  #define __FTR_BITS(ftr_sign, ftr_type, bit_pos, safe) {		\
  	.sign = ftr_sign,					\
  	.type = ftr_type,					\
-@@ -954,6 +1011,18 @@ static inline bool vcpu_feature_is_available(struct kvm_vcpu *vcpu,
- 	return feature_avail(ctrl, val);
- }
- 
-+static bool trap_ras_regs(struct kvm_vcpu *vcpu,
-+			  struct sys_reg_params *p,
-+			  const struct sys_reg_desc *r)
-+{
-+	if (!vcpu_feature_is_available(vcpu, &ftr_ctrl_ras)) {
-+		kvm_inject_undefined(vcpu);
-+		return false;
-+	}
-+
-+	return trap_raz_wi(vcpu, p, r);
-+}
-+
- /*
-  * ARMv8.1 mandates at least a trivial LORegion implementation, where all the
-  * RW registers are RES0 (which we can implement as RAZ/WI). On an ARMv8.0
-@@ -2786,14 +2855,14 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
- 	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
- 
--	{ SYS_DESC(SYS_ERRIDR_EL1), trap_raz_wi },
--	{ SYS_DESC(SYS_ERRSELR_EL1), trap_raz_wi },
--	{ SYS_DESC(SYS_ERXFR_EL1), trap_raz_wi },
--	{ SYS_DESC(SYS_ERXCTLR_EL1), trap_raz_wi },
--	{ SYS_DESC(SYS_ERXSTATUS_EL1), trap_raz_wi },
--	{ SYS_DESC(SYS_ERXADDR_EL1), trap_raz_wi },
--	{ SYS_DESC(SYS_ERXMISC0_EL1), trap_raz_wi },
--	{ SYS_DESC(SYS_ERXMISC1_EL1), trap_raz_wi },
-+	{ SYS_DESC(SYS_ERRIDR_EL1), trap_ras_regs },
-+	{ SYS_DESC(SYS_ERRSELR_EL1), trap_ras_regs },
-+	{ SYS_DESC(SYS_ERXFR_EL1), trap_ras_regs },
-+	{ SYS_DESC(SYS_ERXCTLR_EL1), trap_ras_regs },
-+	{ SYS_DESC(SYS_ERXSTATUS_EL1), trap_ras_regs },
-+	{ SYS_DESC(SYS_ERXADDR_EL1), trap_ras_regs },
-+	{ SYS_DESC(SYS_ERXMISC0_EL1), trap_ras_regs },
-+	{ SYS_DESC(SYS_ERXMISC1_EL1), trap_ras_regs },
- 
- 	MTE_REG(TFSR_EL1),
- 	MTE_REG(TFSRE0_EL1),
-@@ -4230,7 +4299,12 @@ static struct id_reg_desc id_aa64pfr0_el1_desc = {
- 	.ftr_bits = {
- 		S_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_FP_SHIFT, ID_AA64PFR0_FP_NI),
- 		S_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_ASIMD_SHIFT, ID_AA64PFR0_ASIMD_NI),
--	}
-+	},
+@@ -4312,6 +4326,10 @@ static struct id_reg_desc id_aa64pfr1_el1_desc = {
+ 	.init = init_id_aa64pfr1_el1_desc,
+ 	.validate = validate_id_aa64pfr1_el1,
+ 	.vcpu_mask = vcpu_mask_id_aa64pfr1_el1,
 +	.trap_features = &(const struct feature_config_ctrl *[]) {
-+		&ftr_ctrl_ras,
-+		&ftr_ctrl_amu,
++		&ftr_ctrl_mte,
 +		NULL,
 +	},
  };
  
- static struct id_reg_desc id_aa64pfr1_el1_desc = {
+ static struct id_reg_desc id_aa64isar0_el1_desc = {
 -- 
 2.36.0.rc0.470.gd361397f0d-goog
 
