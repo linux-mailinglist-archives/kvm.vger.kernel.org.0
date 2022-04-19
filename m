@@ -2,95 +2,314 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 95334507272
-	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 18:02:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C35DD50727B
+	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 18:04:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354274AbiDSQER (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Apr 2022 12:04:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35956 "EHLO
+        id S1352616AbiDSQGg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Apr 2022 12:06:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354210AbiDSQEM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Apr 2022 12:04:12 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9463E329B9
-        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 09:01:28 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id n33-20020a17090a5aa400b001d28f5ee3f9so2307395pji.4
-        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 09:01:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=yFkFjqpOiICUZKBBXqsv6xYMwtD9akgoqB/oPFVYH6s=;
-        b=XUI8d/MUyS+Z6t573L3e0zuWKytIV2vZPTKhN/jpInIJdtPnyFpa3mkD2THyk7ulh+
-         Kqkl8braNAE9j+cVqi7h+zsguIoHKpwdt1ulMzRFn9XAtlCXgEOceJ/X9P8kPhdyy6RS
-         OVkWATHLx+hgWUtYYauSZ6X5JObL8xWSV6fUicas6A0xH3fX0hdPhsb3TMwEmzIgh/Gy
-         I4vZggAjTylrVzA/eostCtJqoIKLdgQQ3CRHVlNXJeM70gzFnU/wRP+jUh75enA0xueE
-         183IFLFuwju1wx0+xzjYChKiiozVGiLMpIX+hd8ZM54/iy97hS3wlE0UGmPbHw99186R
-         82Hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=yFkFjqpOiICUZKBBXqsv6xYMwtD9akgoqB/oPFVYH6s=;
-        b=DeJhnGPOReO7OW4u51PtKfMd4MmeZ4JrV/etP3vcMko9g+eX8b/0vs33S0gzkHKfCz
-         qGfGpvdqJmfNA/oUbbJXjzzMNyhC3rM6iL6tnCqjYkP4EZoatmo/RYwch8QMWGnZUXPo
-         TYRosgsVbJa4xe2ZFn9/SbCJqYpm5TYaPgkISsAQtDVAg7OLwehBc94RK7Ujz7uLg3IT
-         p2KMCTZXjr7/rv7tcf1DhXcs7IoqTksQJ3ctjKY7CYdTpsQ4BMahyCXHNBuJL2b9z+Bu
-         7Uqaq1KgpiOBYMDL7n3uD8mvrL02b95mD8YNLJF0mj5TTB+hpnWEu4lVyghT5aSnWL2o
-         rx/g==
-X-Gm-Message-State: AOAM53061XsGRf6RPaAW3Tzz7a5C2Flb7fkwFsxjUdidz717eF8WOGqt
-        H1N38L9DFcPTsDqlpn8Um1Petdotdx/wRw==
-X-Google-Smtp-Source: ABdhPJz7yUN7JdXLKZI7zWnZgfsDj/Q4UEhY0oOMe0d/DOdZqQMBqZRMVdNAYhpKxscDLCxPy8+FKA==
-X-Received: by 2002:a17:90a:2983:b0:1cb:8d6e:e10b with SMTP id h3-20020a17090a298300b001cb8d6ee10bmr19430845pjd.208.1650384087908;
-        Tue, 19 Apr 2022 09:01:27 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id i6-20020a17090a718600b001d27a7d1715sm8704344pjk.21.2022.04.19.09.01.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Apr 2022 09:01:27 -0700 (PDT)
-Date:   Tue, 19 Apr 2022 16:01:23 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
-        Peter Gonda <pgonda@google.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: build failure after merge of the kvm tree
-Message-ID: <Yl7c06VX5Pf4ZKsa@google.com>
-References: <20220419153423.644c0fa1@canb.auug.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220419153423.644c0fa1@canb.auug.org.au>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S244370AbiDSQGf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Apr 2022 12:06:35 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A89282E9F5;
+        Tue, 19 Apr 2022 09:03:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1650384232; x=1681920232;
+  h=from:to:cc:subject:date:message-id;
+  bh=5H0ADa7knrAzY7lcnaHovwrz0D8sNpbzQ1sE8UkEXIU=;
+  b=IMxJltUckTuIFVaKOB+ZpbF8AMfHHqKsnNbIctCNSi36Nk64OyuHmgKS
+   Q2z9zCLIdEdScVmCAKfBz+eSHQQ53lFKku8JrIlZ3hACWgdL1h8KIXO2+
+   H6BBspAR246c7fgzY7dt/hlHZvNISyqslwasjsukq76GvLfsUqwecSh6C
+   Idy2HJ3h0qbZM2x9ok13/CP3keBfGtW3PSEL0tYCEWInQol1JZIzU6185
+   S5C5sDGLnSOGE+AEezCWfTydaInbOS9YoNDRyVP0sWa8f8DgEpHmWlq4c
+   TcAVwOV8wmhOD1iBNH7WhZcAUiR5kIvipmAq72y3OBqoMqxMmdvCpraJT
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10322"; a="263975048"
+X-IronPort-AV: E=Sophos;i="5.90,273,1643702400"; 
+   d="scan'208";a="263975048"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2022 09:03:52 -0700
+X-IronPort-AV: E=Sophos;i="5.90,273,1643702400"; 
+   d="scan'208";a="727121335"
+Received: from arthur-vostro-3668.sh.intel.com ([10.239.13.120])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2022 09:03:46 -0700
+From:   Zeng Guang <guang.zeng@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>,
+        Zeng Guang <guang.zeng@intel.com>
+Subject: [PATCH v9 0/9] IPI virtualization support for VM
+Date:   Tue, 19 Apr 2022 23:31:55 +0800
+Message-Id: <20220419153155.11504-1-guang.zeng@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 19, 2022, Stephen Rothwell wrote:
-> Hi all,
-> 
-> After merging the kvm tree, today's linux-next build (arm64 defconfig)
-> failed like this:
-> 
-> arch/arm64/kvm/psci.c: In function 'kvm_prepare_system_event':
-> arch/arm64/kvm/psci.c:184:32: error: 'struct <anonymous>' has no member named 'flags'
->   184 |         vcpu->run->system_event.flags = flags;
->       |                                ^
-> 
-> Caused by commit
-> 
->   c24a950ec7d6 ("KVM, SEV: Add KVM_EXIT_SHUTDOWN metadata for SEV-ES")
-> 
-> In this commit, the uapi structure changes do not match the documentation
-> changes :-(  Does it matter that the ABI may be changed by this commit
-> (depending on the alignment of the structure members)?
+Currently, issuing an IPI except self-ipi in guest on Intel CPU
+always causes a VM-exit. It can lead to non-negligible overhead
+to some workloads involving frequent IPIs when running in VMs.
 
-Yeah, it's a bit of mess.  I believe we have a way out, waiting on Paolo to weigh in.
+IPI virtualization is a new VT-x feature, targeting to eliminate
+VM-exits on source vCPUs when issuing unicast, physical-addressing
+IPIs. Once it is enabled, the processor virtualizes following kinds
+of operations that send IPIs without causing VM-exits:
+- Memory-mapped ICR writes
+- MSR-mapped ICR writes
+- SENDUIPI execution
 
-https://lore.kernel.org/all/YlisiF4BU6Uxe+iU@google.com
+This patch series implements IPI virtualization support in KVM.
+
+Patches 1-4 add tertiary processor-based VM-execution support
+framework, which is used to enumerate IPI virtualization.
+
+Patch 5 handles APIC-write VM exit due to writes to ICR MSR when
+guest works in x2APIC mode. This is a new case introduced by
+Intel VT-x.
+
+Patch 6 cleanup code in vmx_refresh_apicv_exec_ctrl(). Prepare for
+IPIv status dynamical update along with APICv status change.
+
+Patch 7 move kvm_arch_vcpu_precreate() under kvm->lock protection.
+This patch is prepared for IPIv PID-table allocation prior to
+the creation of vCPUs.
+
+Patch 8 provide userspace capability to set maximum possible VCPU
+ID for current VM. IPIv can refer to this value to allocate memory
+for PID-pointer table.
+
+Patch 9 implements IPI virtualization related function including
+feature enabling through tertiary processor-based VM-execution in
+various scenarios of VMCS configuration, PID table setup in vCPU
+creation and vCPU block consideration.
+
+Document for IPI virtualization is now available at the latest "Intel
+Architecture Instruction Set Extensions Programming Reference".
+
+Document Link:
+https://software.intel.com/content/www/us/en/develop/download/intel-architecture-instruction-set-extensions-programming-reference.html
+
+We did experiment to measure average time sending IPI from source vCPU
+to the target vCPU completing the IPI handling by kvm unittest w/ and
+w/o IPI virtualization. When IPI virtualization enabled, it will reduce
+22.21% and 15.98% cycles consuming in xAPIC mode and x2APIC mode
+respectively.
+--------------------------------------
+KVM unittest:vmexit/ipi
+
+2 vCPU, AP was modified to run in idle loop instead of halt to ensure
+no VM exit impact on target vCPU.
+
+                Cycles of IPI
+                xAPIC mode              x2APIC mode
+        test    w/o IPIv  w/ IPIv       w/o IPIv  w/ IPIv
+        1       6106      4816          4265      3768
+        2       6244      4656          4404      3546
+        3       6165      4658          4233      3474
+        4       5992      4710          4363      3430
+        5       6083      4741          4215      3551
+        6       6238      4904          4304      3547
+        7       6164      4617          4263      3709
+        8       5984      4763          4518      3779
+        9       5931      4712          4645      3667
+        10      5955      4530          4332      3724
+        11      5897      4673          4283      3569
+        12      6140      4794          4178      3598
+        13      6183      4728          4363      3628
+        14      5991      4994          4509      3842
+        15      5866      4665          4520      3739
+        16      6032      4654          4229      3701
+        17      6050      4653          4185      3726
+        18      6004      4792          4319      3746
+        19      5961      4626          4196      3392
+        20      6194      4576          4433      3760
+
+Average cycles  6059      4713.1        4337.85   3644.8
+%Reduction                -22.21%                 -15.98%
+
+--------------------------------------
+IPI microbenchmark:
+(https://lore.kernel.org/kvm/20171219085010.4081-1-ynorov@caviumnetworks.com)
+
+2 vCPUs, 1:1 pin vCPU to pCPU, guest VM runs with idle=poll, x2APIC mode
+
+Result with IPIv enabled:
+
+Dry-run:                         0,             272798 ns
+Self-IPI:                  5094123,           11114037 ns
+Normal IPI:              131697087,          173321200 ns
+Broadcast IPI:                   0,          155649075 ns
+Broadcast lock:                  0,          161518031 ns
+
+Result with IPIv disabled:
+
+Dry-run:                         0,             272766 ns
+Self-IPI:                  5091788,           11123699 ns
+Normal IPI:              145215772,          174558920 ns
+Broadcast IPI:                   0,          175785384 ns
+Broadcast lock:                  0,          149076195 ns
+
+
+As IPIv can benefit unicast IPI to other CPU, Normal IPI test case gain
+about 9.73% time saving on average out of 15 test runs when IPIv is
+enabled.
+
+Normal IPI statistics (unit:ns):
+        test    w/o IPIv        w/ IPIv
+        1       153346049       140907046
+        2       147218648       141660618
+        3       145215772       117890672
+        4       146621682       136430470
+        5       144821472       136199421
+        6       144704378       131676928
+        7       141403224       131697087
+        8       144775766       125476250
+        9       140658192       137263330
+        10      144768626       138593127
+        11      145166679       131946752
+        12      145020451       116852889
+        13      148161353       131406280
+        14      148378655       130174353
+        15      148903652       127969674
+
+Average time    145944306.6     131742993.1 ns
+%Reduction                      -9.73%
+
+--------------------------------------
+hackbench:
+
+8 vCPUs, guest VM free run, x2APIC mode
+./hackbench -p -l 100000
+
+                w/o IPIv        w/ IPIv
+Time            91.887          74.605
+%Reduction                      -18.808%
+
+96 vCPUs, guest VM fre run, x2APIC mode
+./hackbench -p -l 1000000
+
+                w/o IPIv        w/ IPIv
+Time            287.504         235.185
+%Reduction                      -18.198%
+
+--------------------------------------
+v8->v9:
+1. Drop patch to forbid change of APIC ID.
+2. Change max_vcpu_ids only set once
+3. Refactor vCPU pre-creation code
+
+v7->v8:
+1. Add trace in kvm_apic_write_nodecode() to track
+vICR Write in APIC Write VM-exit handling
+2. Move IPIv PID table allocation done in the vCPU
+pre-creation (kvm_arch_vcpu_precreate()) protected
+by kvm->lock.
+3. Misc code refine
+
+v6->v7:
+1. Revise kvm_apic_write_nodecode() on dealing with
+   vICR busy bit in x2apic mode
+2. Merge PID-table memory allocation with max_vcpu_id
+   into IPIv enabling patch
+3. Change to allocate PID-table, setup vCPU's PID-table
+   entry and IPIv related VMCS fields once IPIv can
+   be enabled, which support runtime enabling IPIv.
+
+v5->v6:
+1. Adapt kvm_apic_write_nodecode() implementation based
+   on Sean's fix of x2apic's ICR register process.
+2. Drop the patch handling IPIv table entry setting in
+   case APIC ID changed, instead applying Levitsky's patch
+   to disallow setting APIC ID in any case.
+3. Drop the patch resizing the PID-pointer table on demand.
+   Allow userspace to set maximum vcpu id at runtime that
+   IPIv can refer to the practical value to allocate memory
+   for PID-pointer table.
+
+v4 -> v5:
+1. Deal with enable_ipiv parameter following current
+   vmcs configuration rule.
+2. Allocate memory for PID-pointer table dynamically
+3. Support guest runtime modify APIC ID in xAPIC mode
+4. Helper to judge possibility to take PI block in IPIv case
+
+v3 -> v4:
+1. Refine code style of patch 2
+2. Move tertiary control shadow build into patch 3
+3. Make vmx_tertiary_exec_control to be static function
+
+v2 -> v3:
+1. Misc change on tertiary execution control
+   definition and capability setup
+2. Alternative to get tertiary execution
+   control configuration
+
+v1 -> v2:
+1. Refine the IPIv enabling logic for VM.
+   Remove ipiv_active definition per vCPU.
+
+--------------------------------------
+
+Chao Gao (1):
+  KVM: VMX: enable IPI virtualization
+
+Robert Hoo (4):
+  x86/cpu: Add new VMX feature, Tertiary VM-Execution control
+  KVM: VMX: Extend BUILD_CONTROLS_SHADOW macro to support 64-bit
+    variation
+  KVM: VMX: Detect Tertiary VM-Execution control when setup VMCS config
+  KVM: VMX: Report tertiary_exec_control field in dump_vmcs()
+
+Zeng Guang (4):
+  KVM: x86: Add support for vICR APIC-write VM-Exits in x2APIC mode
+  KVM: VMX: Clean up vmx_refresh_apicv_exec_ctrl()
+  KVM: Move kvm_arch_vcpu_precreate() under kvm->lock
+  KVM: x86: Allow userspace set maximum VCPU id for VM
+
+ Documentation/virt/kvm/api.rst     |  18 ++++
+ arch/s390/kvm/kvm-s390.c           |   2 -
+ arch/x86/include/asm/kvm-x86-ops.h |   1 +
+ arch/x86/include/asm/kvm_host.h    |   7 ++
+ arch/x86/include/asm/msr-index.h   |   1 +
+ arch/x86/include/asm/vmx.h         |  11 +++
+ arch/x86/include/asm/vmxfeatures.h |   5 +-
+ arch/x86/kernel/cpu/feat_ctl.c     |   9 +-
+ arch/x86/kvm/lapic.c               |  24 ++++-
+ arch/x86/kvm/vmx/capabilities.h    |  13 +++
+ arch/x86/kvm/vmx/evmcs.c           |   2 +
+ arch/x86/kvm/vmx/evmcs.h           |   1 +
+ arch/x86/kvm/vmx/posted_intr.c     |  15 +++-
+ arch/x86/kvm/vmx/posted_intr.h     |   2 +
+ arch/x86/kvm/vmx/vmcs.h            |   1 +
+ arch/x86/kvm/vmx/vmx.c             | 137 +++++++++++++++++++++++++----
+ arch/x86/kvm/vmx/vmx.h             |  64 ++++++++------
+ arch/x86/kvm/x86.c                 |  29 +++++-
+ virt/kvm/kvm_main.c                |  10 ++-
+ 19 files changed, 294 insertions(+), 58 deletions(-)
+
+-- 
+2.27.0
+
