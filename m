@@ -2,269 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F07E850627E
-	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 05:09:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B776506294
+	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 05:26:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345016AbiDSDMV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Apr 2022 23:12:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38720 "EHLO
+        id S1346601AbiDSD3K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Apr 2022 23:29:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233759AbiDSDMT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Apr 2022 23:12:19 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDDC42DA9D
-        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 20:09:38 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id i24-20020a17090adc1800b001cd5529465aso1052823pjv.0
-        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 20:09:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=YKFfQt23dUtFGdrF1F7iYdCmDeBOcbP+xYI8BamkfTw=;
-        b=muAPJeUCZ5EJiVsOdNd9dCpcCg/ha6GLJsvBjQBcNtt81FrKtDx8HJjd+V50X1tF7S
-         uQcP3bQXPka3bws59iWSiL2Gp1FBmf4sLX78INZX3gAUU7V3g2SLd/EMelp0MhcD4UnY
-         xbe4zEsZsbw+eeBq7gXuiUIGVizGkuLhPs0ldjBGseAP02JFKWTpc9ElpDSpM4f78Ilj
-         zFLticmKgXr3LlvcfrKk/COekG8ntHT93kC3/MyeMzRUm9Z8F2leXYIBPC3j4ut6EM92
-         pI1CliaqcoNL7MKnKqvWNXBxdeGJ8YEIqlEjiXUS63RUqHdXLxUGrlbp1gcU+IJZnXex
-         5GIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=YKFfQt23dUtFGdrF1F7iYdCmDeBOcbP+xYI8BamkfTw=;
-        b=kMfTWF1qdmSs/ORG/p4c5BSs1+QhBzaz+HdQEqWD8fHIGtXJYDCP5BUD4YHivm3Nqd
-         3ULH1x+7udHlJCKNJiTQSqMZ981Q95+6QOnt76peQH4i6sm4FYskgc3koJL4M5gG2myE
-         W2BWg/uEOkg8ptDUIMg++aPYoibaHu3xZSlXlMpxim0EMynwuzfM3bV3PObtOc+Zz+Vi
-         lTieF7932ZzTJUO0IKfxW+01YVsOFhVNBtKREjKCHmvB3QIffl050I2yX46ME+mscgSr
-         2Et5eqx1b/pU2YgsgclHV/veJIAF9JspscjLBYPPH9OoJpFsplB++qdnxf2fR30Yc7Aj
-         xVLQ==
-X-Gm-Message-State: AOAM531aSGwAZGWPL1gYBnyYbzryJhDxrYY/Xd2fPZ6QxKjh/dIQslE0
-        0aQvz/26Hd/Y+4C/d1mkwpgKbg==
-X-Google-Smtp-Source: ABdhPJx8u1DTy7iFh4/9gYKF1ioP+FdchbYezQT//Rc+Rc7XFGRYkIfgKljUvVDDsC4SClkf8FitrQ==
-X-Received: by 2002:a17:902:ed53:b0:159:804:e854 with SMTP id y19-20020a170902ed5300b001590804e854mr4765878plb.90.1650337778103;
-        Mon, 18 Apr 2022 20:09:38 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id p34-20020a056a000a2200b004cd49fc15e5sm15394994pfh.59.2022.04.18.20.09.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Apr 2022 20:09:37 -0700 (PDT)
-Date:   Mon, 18 Apr 2022 20:09:34 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Peter Shier <pshier@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>
-Subject: Re: [RFC PATCH 14/17] KVM: arm64: Punt last page reference to rcu
- callback for parallel walk
-Message-ID: <Yl4n7o45K0HFK52S@google.com>
-References: <20220415215901.1737897-1-oupton@google.com>
- <20220415215901.1737897-15-oupton@google.com>
- <Yl4leEoIg+dr/1QM@google.com>
+        with ESMTP id S233749AbiDSD3J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Apr 2022 23:29:09 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2084.outbound.protection.outlook.com [40.107.94.84])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B2D7289A1
+        for <kvm@vger.kernel.org>; Mon, 18 Apr 2022 20:26:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nZqeQgba+i8kBUk+JHPbiaNAPGBuowr1cSd99f4NgwLkVHR1BmRWxMlo25A6eFzdeTbhSjZkN4387FUjdmB6cXZASCQSwm8kXnKrdink4e+RtLqWX1/+gJTtgSKa09PcxDLzAxr8s91Wkfl0GOPH9aex8VbkhOjWZ9OFL8KSoS3OQGjZKZAEAPO1LTZBHjzIW5HlZC8cFi0XdcuVv1/TB4lIoENHcg2SpC3EGXSsLUDF1fHGl/Z2YcKPF193d5zcYfTHYL1bm5RMgXeOrUAFUsrl2dUuoUMyNkHp6ZxiPiuB+2UX3B4ASS8xBj/5qAhgANIyuIxPRClWXU9+hGAbrg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wyOd7fHWQNXHnx5BPmTEm7hqE3UeqBwbEsIU/knSStk=;
+ b=H0UcmsoNe9E+T5ovwE76MA4wJm4u4MgT9oRq0VdCLs0yKWtnMRqza2OAUpx4Sr+bFXdouqjYDKkYJM5H/Ts+umvPDNG5ryvLLQp6ho1WnrsfFvHQbIsSzNwPZNb+QJzUlG8Rk9ytXygji+OJNB7YYncV9UXTVpTdSveFH3BtbT4f2q0rcF0L5iy/jEiT7fQCXz1sC8Q4Awlu+RS7HAkzRBHJG4dYGa4+BHtU2DiBrn5c7li+E3ywgdVnJ/EZmU8am2XWLgVO+CvpmNtbqOVJ2Vr5ROZBc936O4Dx6qGatr7sxTtcBZiwjBdowxB5jq7UOZGpW5TfdkW8zAhfJKQJBg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.238) smtp.rcpttodomain=gibson.dropbear.id.au
+ smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
+ header.from=nvidia.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wyOd7fHWQNXHnx5BPmTEm7hqE3UeqBwbEsIU/knSStk=;
+ b=XwBetCG78kKL105vmjQXSRXCZnk5aiXmI0xCi8d7Nhw/pehsgAlXGxSJgibQsz+1Q9rVoI+k2NNsC9c7ApcacZ1KS2dW0fXSN7Uq8sz4BkM+d8wkehM1MAbuxp4PO4Iqe1/u7bBmLen9HBzI/1B8LNWKEEz6sVZ/9XxL0DaWGzOc7dddy0Oo3bOTL22sWlpItAJwxxfD6roIcz+/1+jUVEHIcP1TwQ0SaIxWVSA1l+OpgzBt6PtS9xKha0+BKstRaNDbC78DHAaBgM8Z2U8qVYwdNpOm+8XHUeobMyn8jXiLpQ7wjyQIgqKs508ncvbTarx1cN8wsBMK5HcU0/xmcA==
+Received: from BN9PR03CA0959.namprd03.prod.outlook.com (2603:10b6:408:108::34)
+ by CH0PR12MB5092.namprd12.prod.outlook.com (2603:10b6:610:bf::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.20; Tue, 19 Apr
+ 2022 03:26:26 +0000
+Received: from BN8NAM11FT019.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:108:cafe::66) by BN9PR03CA0959.outlook.office365.com
+ (2603:10b6:408:108::34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.20 via Frontend
+ Transport; Tue, 19 Apr 2022 03:26:25 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.238)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.238 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.238; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (12.22.5.238) by
+ BN8NAM11FT019.mail.protection.outlook.com (10.13.176.158) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.5164.19 via Frontend Transport; Tue, 19 Apr 2022 03:26:25 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by DRHQMAIL105.nvidia.com
+ (10.27.9.14) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Tue, 19 Apr
+ 2022 03:26:24 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Mon, 18 Apr
+ 2022 20:26:23 -0700
+Received: from Asurada-Nvidia (10.127.8.14) by mail.nvidia.com (10.129.68.6)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22 via Frontend
+ Transport; Mon, 18 Apr 2022 20:26:22 -0700
+Date:   Mon, 18 Apr 2022 20:26:20 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Eric Auger <eric.auger@redhat.com>
+CC:     Yi Liu <yi.l.liu@intel.com>, <alex.williamson@redhat.com>,
+        <cohuck@redhat.com>, <qemu-devel@nongnu.org>,
+        <david@gibson.dropbear.id.au>, <thuth@redhat.com>,
+        <farman@linux.ibm.com>, <mjrosato@linux.ibm.com>,
+        <akrowiak@linux.ibm.com>, <pasic@linux.ibm.com>,
+        <jjherne@linux.ibm.com>, <jasowang@redhat.com>,
+        <kvm@vger.kernel.org>, <jgg@nvidia.com>,
+        <eric.auger.pro@gmail.com>, <kevin.tian@intel.com>,
+        <chao.p.peng@intel.com>, <yi.y.sun@intel.com>, <peterx@redhat.com>
+Subject: Re: [RFC 00/18] vfio: Adopt iommufd
+Message-ID: <Yl4r3Ok61wxCc2zd@Asurada-Nvidia>
+References: <20220414104710.28534-1-yi.l.liu@intel.com>
+ <Ylku1VVsbYiAEALZ@Asurada-Nvidia>
+ <16ea3601-a3dd-ba9b-a5bc-420f4ac20611@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <Yl4leEoIg+dr/1QM@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <16ea3601-a3dd-ba9b-a5bc-420f4ac20611@redhat.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 60b59b91-5797-48f5-5938-08da21b46270
+X-MS-TrafficTypeDiagnostic: CH0PR12MB5092:EE_
+X-Microsoft-Antispam-PRVS: <CH0PR12MB509282BF6FF3EB8A73F7BCCCABF29@CH0PR12MB5092.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: GaZli78FTI1LBh+JQkQKk07SdttlUlBvl+5YzZQTeUvlUubOpE1FHKo+PwXiqc9ExuEXjgcuZdr4mB2A9veMZXcAIoHxGreylWICJ5Tht0q1jBRZWL/uBi4pcmrgj5sUw+UYwmDT75/ILa1PqWvMd1YSVAjordJ6qOyxanu3GnhW1Bs6k4sSLlhJr4EDwIhlsY7395iDuMs9p3OsHZHCVYBr4T7ds2zAP8LzfHmWE+D02/WKgGlPsinNQfPmrx+AGe1pUiY8bnKDbFEl2hNiJTvR8n7tIWVZeg3v1g26mtCWidNugjzb0kaeqnjqKw0DTA95e7qXe5BpgypkijF+jvLTWQFngjEaqipytSG0MwjW6fwA18R6yAUKuJ65C0t4GQq3hcoGJLlGR1qqMbYZjm+o+HUdztgB5YLQ3JGuXP256sgbvtLDhpKaQer4F9A/7py+VBRtyLqe/ox4mxjRbklySltIBzqeaNOusnxN9Nj1hApmgbcdPH5ed3/VfyMiJX86dc3eLqEh3y//DS9Md3OQfxS3ILK8p70GpSdgJ6fr8nV0lmVFa9angjzItZlE0Hl0AaHE8J418D/JtWuu7j1gl3UgUpLyHJIrfY5LXqFkoqzMmCSUO1COhMAhR5AUSVKeeDfqkOeHPMBjC1wPcss5XBLkVcHJKDoWlVmOw5oJYTBLwmt9uCZjOUWk/o1kpFfasqtA6QciDl79r+vnuQIGu3L510a/0/xFaYeJbtIVn0srkOkmF/UDMU8lW8fMy8LWCM3zmHJ+ZJ5GJ9FZArUZKJKnWyWKkhjTM1oq7eo=
+X-Forefront-Antispam-Report: CIP:12.22.5.238;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230001)(4636009)(40470700004)(46966006)(36840700001)(2906002)(36860700001)(83380400001)(508600001)(356005)(8676002)(82310400005)(86362001)(966005)(9686003)(26005)(40460700003)(186003)(70586007)(70206006)(4326008)(33716001)(81166007)(47076005)(7416002)(5660300002)(426003)(55016003)(336012)(316002)(6916009)(8936002)(54906003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Apr 2022 03:26:25.3831
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 60b59b91-5797-48f5-5938-08da21b46270
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.238];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT019.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5092
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 18, 2022 at 07:59:04PM -0700, Ricardo Koller wrote:
-> On Fri, Apr 15, 2022 at 09:58:58PM +0000, Oliver Upton wrote:
-> > It is possible that a table page remains visible to another thread until
-> > the next rcu synchronization event. To that end, we cannot drop the last
-> > page reference synchronous with post-order traversal for a parallel
-> > table walk.
-> > 
-> > Schedule an rcu callback to clean up the child table page for parallel
-> > walks.
-> > 
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_pgtable.h |  3 ++
-> >  arch/arm64/kvm/hyp/pgtable.c         | 24 +++++++++++++--
-> >  arch/arm64/kvm/mmu.c                 | 44 +++++++++++++++++++++++++++-
-> >  3 files changed, 67 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > index 74955aba5918..52e55e00f0ca 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -81,6 +81,8 @@ static inline bool kvm_level_supports_block_mapping(u32 level)
-> >   * @put_page:			Decrement the refcount on a page. When the
-> >   *				refcount reaches 0 the page is automatically
-> >   *				freed.
-> > + * @free_table:			Drop the last page reference, possibly in the
-> > + *				next RCU sync if doing a shared walk.
-> >   * @page_count:			Return the refcount of a page.
-> >   * @phys_to_virt:		Convert a physical address into a virtual
-> >   *				address	mapped in the current context.
-> > @@ -98,6 +100,7 @@ struct kvm_pgtable_mm_ops {
-> >  	void		(*get_page)(void *addr);
-> >  	void		(*put_page)(void *addr);
-> >  	int		(*page_count)(void *addr);
-> > +	void		(*free_table)(void *addr, bool shared);
-> >  	void*		(*phys_to_virt)(phys_addr_t phys);
-> >  	phys_addr_t	(*virt_to_phys)(void *addr);
-> >  	void		(*dcache_clean_inval_poc)(void *addr, size_t size);
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 121818d4c33e..a9a48edba63b 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -147,12 +147,19 @@ static inline void kvm_pgtable_walk_end(void)
-> >  {}
-> >  
-> >  #define kvm_dereference_ptep	rcu_dereference_raw
-> > +
-> > +static inline void kvm_pgtable_destroy_barrier(void)
-> > +{}
-> > +
-> >  #else
-> >  #define kvm_pgtable_walk_begin	rcu_read_lock
-> >  
-> >  #define kvm_pgtable_walk_end	rcu_read_unlock
-> >  
-> >  #define kvm_dereference_ptep	rcu_dereference
-> > +
-> > +#define kvm_pgtable_destroy_barrier	rcu_barrier
-> > +
-> >  #endif
-> >  
-> >  static kvm_pte_t *kvm_pte_follow(kvm_pte_t pte, struct kvm_pgtable_mm_ops *mm_ops)
-> > @@ -1063,7 +1070,12 @@ static int stage2_map_walk_table_post(u64 addr, u64 end, u32 level,
-> >  		childp = kvm_pte_follow(*old, mm_ops);
-> >  	}
-> >  
-> > -	mm_ops->put_page(childp);
-> > +	/*
-> > +	 * If we do not have exclusive access to the page tables it is possible
-> > +	 * the unlinked table remains visible to another thread until the next
-> > +	 * rcu synchronization.
-> > +	 */
-> > +	mm_ops->free_table(childp, shared);
-> >  	mm_ops->put_page(ptep);
-> >  
-> >  	return ret;
-> > @@ -1203,7 +1215,7 @@ static int stage2_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> >  					       kvm_granule_size(level));
-> >  
-> >  	if (childp)
-> > -		mm_ops->put_page(childp);
-> > +		mm_ops->free_table(childp, shared);
-> >  
-> >  	return 0;
-> >  }
-> > @@ -1433,7 +1445,7 @@ static int stage2_free_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> >  	mm_ops->put_page(ptep);
-> >  
-> >  	if (kvm_pte_table(*old, level))
-> > -		mm_ops->put_page(kvm_pte_follow(*old, mm_ops));
-> > +		mm_ops->free_table(kvm_pte_follow(*old, mm_ops), shared);
-> >  
-> >  	return 0;
-> >  }
-> > @@ -1452,4 +1464,10 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
-> >  	pgd_sz = kvm_pgd_pages(pgt->ia_bits, pgt->start_level) * PAGE_SIZE;
-> >  	pgt->mm_ops->free_pages_exact(pgt->pgd, pgd_sz);
-> >  	pgt->pgd = NULL;
-> > +
-> > +	/*
-> > +	 * Guarantee that all unlinked subtrees associated with the stage2 page
-> > +	 * table have also been freed before returning.
-> > +	 */
-> > +	kvm_pgtable_destroy_barrier();
-> >  }
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index cc6ed6b06ec2..6ecf37009c21 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -98,9 +98,50 @@ static bool kvm_is_device_pfn(unsigned long pfn)
-> >  static void *stage2_memcache_zalloc_page(void *arg)
-> >  {
-> >  	struct kvm_mmu_caches *mmu_caches = arg;
-> > +	struct stage2_page_header *hdr;
-> > +	void *addr;
-> >  
-> >  	/* Allocated with __GFP_ZERO, so no need to zero */
-> > -	return kvm_mmu_memory_cache_alloc(&mmu_caches->page_cache);
-> > +	addr = kvm_mmu_memory_cache_alloc(&mmu_caches->page_cache);
-> > +	if (!addr)
-> > +		return NULL;
-> > +
-> > +	hdr = kvm_mmu_memory_cache_alloc(&mmu_caches->header_cache);
-> > +	if (!hdr) {
-> > +		free_page((unsigned long)addr);
-> > +		return NULL;
-> > +	}
-> > +
-> > +	hdr->page = virt_to_page(addr);
-> > +	set_page_private(hdr->page, (unsigned long)hdr);
-> > +	return addr;
-> > +}
-> > +
-> > +static void stage2_free_page_now(struct stage2_page_header *hdr)
-> > +{
-> > +	WARN_ON(page_ref_count(hdr->page) != 1);
-> > +
-> > +	__free_page(hdr->page);
-> > +	kmem_cache_free(stage2_page_header_cache, hdr);
-> > +}
-> > +
-> > +static void stage2_free_page_rcu_cb(struct rcu_head *head)
-> > +{
-> > +	struct stage2_page_header *hdr = container_of(head, struct stage2_page_header,
-> > +						      rcu_head);
-> > +
-> > +	stage2_free_page_now(hdr);
-> > +}
-> > +
-> > +static void stage2_free_table(void *addr, bool shared)
-> > +{
-> > +	struct page *page = virt_to_page(addr);
-> > +	struct stage2_page_header *hdr = (struct stage2_page_header *)page_private(page);
-> > +
-> > +	if (shared)
-> > +		call_rcu(&hdr->rcu_head, stage2_free_page_rcu_cb);
-> 
-> Can the number of callbacks grow to "dangerous" numbers? can it be
-> bounded with something like the following?
-> 
-> if number of readers is really high:
-> 	synchronize_rcu() 
-> else
-> 	call_rcu()
+On Sun, Apr 17, 2022 at 12:30:40PM +0200, Eric Auger wrote:
 
-sorry, meant to say "number of callbacks"
+> >> - More tests
+> > I did a quick test on my ARM64 platform, using "iommu=smmuv3"
+> > string. The behaviors are different between using default and
+> > using legacy "iommufd=off".
+> >
+> > The legacy pathway exits the VM with:
+> >     vfio 0002:01:00.0:
+> >     failed to setup container for group 1:
+> >     memory listener initialization failed:
+> >     Region smmuv3-iommu-memory-region-16-0:
+> >     device 00.02.0 requires iommu MAP notifier which is not currently supported
+> >
+> > while the iommufd pathway started the VM but reported errors
+> > from host kernel about address translation failures, probably
+> > because of accessing unmapped addresses.
+> >
+> > I found iommufd pathway also calls error_propagate_prepend()
+> > to add to errp for not supporting IOMMU_NOTIFIER_MAP, but it
+> > doesn't get a chance to print errp out. Perhaps there should
+> > be a final error check somewhere to exit?
 > 
-> maybe the rcu API has an option for that.
+> thank you for giving it a try.
 > 
-> > +	else
-> > +		stage2_free_page_now(hdr);
-> >  }
-> >  
-> >  static void *kvm_host_zalloc_pages_exact(size_t size)
-> > @@ -613,6 +654,7 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
-> >  	.free_pages_exact	= free_pages_exact,
-> >  	.get_page		= kvm_host_get_page,
-> >  	.put_page		= kvm_host_put_page,
-> > +	.free_table		= stage2_free_table,
-> >  	.page_count		= kvm_host_page_count,
-> >  	.phys_to_virt		= kvm_host_va,
-> >  	.virt_to_phys		= kvm_host_pa,
-> > -- 
-> > 2.36.0.rc0.470.gd361397f0d-goog
-> > 
+> vsmmuv3 + vfio is not supported as we miss the HW nested stage support
+> and SMMU does not support cache mode. If you want to test viommu on ARM
+> you shall test virtio-iommu+vfio. This should work but this is not yet
+> tested.
+
+I tried "-device virtio-iommu" and "-device virtio-iommu-pci"
+separately with vfio-pci, but neither seems to work. The host
+SMMU driver reports Translation Faults.
+
+Do you know what commands I should use to run QEMU for that
+combination?
+
+> I pushed a fix for the error notification issue:
+> qemu-for-5.17-rc6-vm-rfcv2-rc0 on my git https://github.com/eauger/qemu.git
+
+Yes. This fixes the problem. Thanks!
