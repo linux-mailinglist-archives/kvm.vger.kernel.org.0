@@ -2,106 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36F175062E2
-	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 05:39:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E1175063E8
+	for <lists+kvm@lfdr.de>; Tue, 19 Apr 2022 07:35:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348155AbiDSDlb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Apr 2022 23:41:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42096 "EHLO
+        id S1348576AbiDSFhP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Apr 2022 01:37:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231829AbiDSDl3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Apr 2022 23:41:29 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DA37B1FA;
-        Mon, 18 Apr 2022 20:38:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650339528; x=1681875528;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=TQyDAhIW68Som/ku3Jrd/qF0VCpteuvHqR0Y8MoNXvY=;
-  b=RV3v7IwIAHi+ELmcPfPRCO2eB0gVjs7KEYDlif02wZJRDXpBUyksNAWN
-   P22cK20zgEI+QckLFlR5VEOSJ263W/F9bTRLCTgZUkEnMZ9U+sQ939E6e
-   UZO5N0UTyV99ma5dAtvE4daFaAWlQejjPf5JuUQtbmpEpwhB70DfRGU5W
-   fadgDlZgD0u+ull9UjsLckkLHGiphmVF8Wi2AL6nyYspGUaeCJjAMdkL8
-   E7gqU2D1Ry/Qsjw96urCZXMd1OkVXzWoL4D+pTzzoB/RZO0TLAcx5JF9p
-   ABje7BJ4dAnOQ6/devUiC1yPzW+d95FAligGhPNkA3K1mFfgEydysX+rx
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10321"; a="288760826"
-X-IronPort-AV: E=Sophos;i="5.90,271,1643702400"; 
-   d="scan'208";a="288760826"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2022 20:38:48 -0700
-X-IronPort-AV: E=Sophos;i="5.90,271,1643702400"; 
-   d="scan'208";a="554524814"
-Received: from jaspuehl-mobl2.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.31.185])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2022 20:38:44 -0700
-Message-ID: <caa2ae100494c4604d08d9459e6d3314be2dcf26.camel@intel.com>
-Subject: Re: [PATCH v3 01/21] x86/virt/tdx: Detect SEAM
-From:   Kai Huang <kai.huang@intel.com>
-To:     Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
-        len.brown@intel.com, tony.luck@intel.com,
-        rafael.j.wysocki@intel.com, reinette.chatre@intel.com,
-        dan.j.williams@intel.com, peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com, isaku.yamahata@intel.com
-Date:   Tue, 19 Apr 2022 15:38:42 +1200
-In-Reply-To: <8e2269a7-3e71-5030-8d04-1e8e3fc4323f@linux.intel.com>
-References: <cover.1649219184.git.kai.huang@intel.com>
-         <ab118fb9bd39b200feb843660a9b10421943aa70.1649219184.git.kai.huang@intel.com>
-         <8e2269a7-3e71-5030-8d04-1e8e3fc4323f@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+        with ESMTP id S230301AbiDSFhN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Apr 2022 01:37:13 -0400
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FDF71F60F;
+        Mon, 18 Apr 2022 22:34:30 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4KjCD10cMlz4xXW;
+        Tue, 19 Apr 2022 15:34:24 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1650346465;
+        bh=LASvUK9v/c4iVL7PX/RcYrawCz7wjdGe7O3W4abbhJg=;
+        h=Date:From:To:Cc:Subject:From;
+        b=XAwLGFd646aP5BRAuht3wKcw3DZ/zZCO+jYSbDTjU6nHtstfI8uCr+jZc/H78D6sh
+         NSu751OhhVckf/NG9CX64u7wgJOxNHPNUlF3pRq9OlCuxP7lFengXttDniDenkbG+3
+         lZF9r4QN5bDo/Rno5Qub2/dW+eVBlQBwI0zPXFiTPkTThCcth6iL9SFbUW+VTcvaQl
+         b1z1hXzmBkzpc3DoGoxXPTEqqIq/gchuyxrPNCb6SWXdi57/wn97E+swOEpjgk9hIm
+         ZdGFlhJBHg06A8F5fuFDl+xxP3fR4b8ZEYTM3uW0vz7Q5sVe0Jec1apEq5I37K9+W0
+         cggihrWAvVVSA==
+Date:   Tue, 19 Apr 2022 15:34:23 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, Peter Gonda <pgonda@google.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the kvm tree
+Message-ID: <20220419153423.644c0fa1@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; boundary="Sig_/DcR__SR_4Xx_1cFlZkvC3gW";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+--Sig_/DcR__SR_4Xx_1cFlZkvC3gW
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> > +
-> > +static void detect_seam(struct cpuinfo_x86 *c)
-> > +{
-> 
-> why not do this check directly in tdx_detect_cpu()?
+Hi all,
 
-The second patch will detect TDX KeyID too.  I suppose you are saying below is
-better?
+After merging the kvm tree, today's linux-next build (arm64 defconfig)
+failed like this:
 
-void tdx_detect_cpu(struct cpuinfo_x86 *c)
-{
-	if (c == &boot_cpu_data) {
-		detect_seam_bsp(c);
-		detect_tdx_keyids_bsp(c);
-	} else {
-		detect_seam_ap(c);
-		detect_tdx_keyids_ap(c);
-	}
-}
+arch/arm64/kvm/psci.c: In function 'kvm_prepare_system_event':
+arch/arm64/kvm/psci.c:184:32: error: 'struct <anonymous>' has no member nam=
+ed 'flags'
+  184 |         vcpu->run->system_event.flags =3D flags;
+      |                                ^
 
-I personally don't see how above is better than the current way.  Instead, I
-think having SEAM and TDX KeyID detection code in single function respectively
-is more flexible for future extension (if needed).
+Caused by commit
 
+  c24a950ec7d6 ("KVM, SEV: Add KVM_EXIT_SHUTDOWN metadata for SEV-ES")
 
-> 
-> > +	if (c == &boot_cpu_data)
-> > +		detect_seam_bsp(c);
-> > +	else
-> > +		detect_seam_ap(c);
-> > +}
-> > +
-> > +void tdx_detect_cpu(struct cpuinfo_x86 *c)
-> > +{
-> > +	detect_seam(c);
-> > +}
-> 
+In this commit, the uapi structure changes do not match the documentation
+changes :-(  Does it matter that the ABI may be changed by this commit
+(depending on the alignment of the structure members)?
 
+I have added the following patch or today:
+
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Date: Tue, 19 Apr 2022 15:25:17 +1000
+Subject: [PATCH] fix up for "KVM, SEV: Add KVM_EXIT_SHUTDOWN metadata for S=
+EV-ES"
+
+Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+---
+ include/uapi/linux/kvm.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index dd1d8167e71f..68ce07185f03 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -448,6 +448,7 @@ struct kvm_run {
+ #define KVM_SYSTEM_EVENT_NDATA_VALID    (1u << 31)
+ 			__u32 type;
+ 			__u32 ndata;
++			__u64 flags;
+ 			__u64 data[16];
+ 		} system_event;
+ 		/* KVM_EXIT_S390_STSI */
+--=20
+2.35.1
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/DcR__SR_4Xx_1cFlZkvC3gW
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmJeSd8ACgkQAVBC80lX
+0Gzqhgf9E3HBLYVdNuA4RE47McIbBq/Lun8JbASZFHYeDAmbwPYH+e2XpnKj3iHz
+6iOQ373UROq9qv5GPMTpz1QZtVjzipwTm/yAWDcwBvlWdlRW1JWs9m3PMVkfF4hF
+NeK81BeP97RkdHrvqAW+o3VdYUc+R59XCoUebfNfY55EaaPxBSLE0dmq8rSsD1/C
+vKZhjzG2jDC9FPaJjiSPfzM59qwwjoYCvtg3L4BKUYdiegzU79oKJ57U60ja5Po8
+tSmL/FSXqX8dOSviCS77dUsiztBcKsjkSKXaYQBR6kumkWl2/PWwZpWCn3s93Lo8
+n4LOnkrdc5eWa7j7/sbYrRHXeTsnyA==
+=fZAm
+-----END PGP SIGNATURE-----
+
+--Sig_/DcR__SR_4Xx_1cFlZkvC3gW--
