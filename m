@@ -2,54 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC037507E44
-	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 03:38:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5847F507E46
+	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 03:38:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358760AbiDTBkT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Apr 2022 21:40:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43724 "EHLO
+        id S1358771AbiDTBkV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Apr 2022 21:40:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234568AbiDTBkS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Apr 2022 21:40:18 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A57FF3467B
-        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 18:37:34 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id m12-20020a170902d18c00b001589ea4e0d6so137339plb.12
-        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 18:37:34 -0700 (PDT)
+        with ESMTP id S1358764AbiDTBkU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Apr 2022 21:40:20 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7F313467B
+        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 18:37:36 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id t12-20020a170902a5cc00b001590717a080so139079plq.10
+        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 18:37:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=eY9rhzFCQwp4CslexU/2ccvHtC1KtRSxjLpofde0bGw=;
-        b=VHH5ZBF37otk0WtV/tSvsGY/Gct4zudkIIYxo0R5S43YvQhA4s4SvHIWOFCkQam3Lg
-         2/wSihGWny4ZRcpoZ9Rd5JSXRhn6YF5twzkUSt18W33pViahuC2Td8TmzgBDdlHjI2+n
-         fc4nhFQZobPbNgCYFCpKgO2zoxunEX9IA5wHDvAutKvmo50yBckK5yE6cvJEFdRfb1oF
-         pgVTuzHizqB+/zwB5bYzQwm7/XQyWtP9bcP96LypAgUtm9972uxNLawZaPVsAtsXW+Oq
-         xKES0Kea7RalLxSBNj9jMHv22sRILhbdH+9wzq8/HQBZZpUNKWkd4bM9PwDmQ02QVXq8
-         UFAQ==
+        h=reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:to:cc;
+        bh=7XDJ2YAUSUHcgoV3YPLSl5Gau4y2D+i+qP4k1W8uuo0=;
+        b=Kzq671IMXGcPz9IKQMcDM3US3HjfGCUincXTuSeb8zoQ5g9zspDa+oftBodD+68BA0
+         ASknvWT3y3/2tm1pFvOJJf03UDGsxHlo9HiJfajn1z86XFO8VOYNgeJSfcldOjJttKL6
+         u4iQvkpiuIkouUmlKxAkJZjsKSp4mgT8LCkPtIuNgcc2wJgdk6U7HVc6zawUrxFqpmSh
+         cJMdz7quOHZhIjj/TZfU2uKppIHeoeY4vyOXo7g77A40z8OFTcPn3la8QqxicZn1Y0I2
+         coWmIbo0WusRrVIVoc6e2zWzddbvtftv+F4nVGPrWzvz4itxs6rqqz4CFy1AZrhnF+s1
+         VKiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=eY9rhzFCQwp4CslexU/2ccvHtC1KtRSxjLpofde0bGw=;
-        b=QH8iuaLWQB5CPMpCMOXRJ8wGmi72XHvFGnmliFTKrTbPAMGLHh/VY1cVCD1UzQBI/a
-         l2EBArWnXsDtXIEUHGbWC0t6zzN88RwKOvNu/nOmXn5Dg9nFDRZ1oWH/Z52B2yHtHzXN
-         7tIR33LifgkMPme7M1TY6W46df9icg6Qm6qd+OA28slUynw6LLwxRTb23UBYDLE4evc/
-         p/RTUYQb+QWuO4X8JgOuSKDxORtMX+9CEMSziEJMZh0P+hFSpK7ecvGGDHWDzZKvELPw
-         ZvABe7eaaPsKys8S9Km3vmDCcQwXM5Y4ON8LDaiqKRlbILF4MwW2rc0x3POJZgjwHGkK
-         VPmQ==
-X-Gm-Message-State: AOAM5324WQmLBlMrgHftKnMu2hqnlYSCtGoGcnmudm4hZvDsqlfigr+k
-        cBJpuaSui8e8ZbsYWHkYlTOqU0O6A90=
-X-Google-Smtp-Source: ABdhPJyItzAyxnB6JimtWaJClPTmyqjT/e4k9MJ4QGgq2Tsac1QNZdwbAF08WqmHc+RZjf6K63IxRjDytYc=
+        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:to:cc;
+        bh=7XDJ2YAUSUHcgoV3YPLSl5Gau4y2D+i+qP4k1W8uuo0=;
+        b=6dS/LZAfPMqF2mdsM+WG4LIfSC2JaGipRMjUFyGt7Oidj00E1Vk0j6wbWaZv9r4Tcm
+         yAsDTqw7dk70usmV3WOg+unPJVSEWHd+WARA9KA8eI2aFMfWc0OegcughUcdsQSk4fGC
+         FInechJHwTyluIWqR4DbNZiyoIjb8/2su7UR8YG9c+WiKLStaSTuzjNQ4/kQciPXW/Lc
+         qKqwoFNoKuWpypvvegZRdyECSnW9joACkYWO7c0d7MXe03pbaIGiMDBw/vaoJBs5+sve
+         gBHeje60CmgjFBqCL2nf1zNQdSI718nGwISOslHMvlboCYq2EuHEqSi/THGLQgp5E4co
+         +2Yw==
+X-Gm-Message-State: AOAM531e/UO1FqDQA/PhrWEVihpIrb641Sbm0YTEZrn1DyMVBF+IZW6Y
+        S5nRseW5JAHmVzAm+NH6z8uKhWNTMjY=
+X-Google-Smtp-Source: ABdhPJxuyNZSwYUgGu63fLJ8gbeXdplf35syAz3Hcvk6YC/6aaKdyYPIGOcMr0sABs2XFp+PY2pmPdIXT+g=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:1490:b0:4fb:1544:bc60 with SMTP id
- v16-20020a056a00149000b004fb1544bc60mr20634404pfu.73.1650418654213; Tue, 19
- Apr 2022 18:37:34 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:9105:b0:1d2:9e98:7e1e with SMTP id
+ k5-20020a17090a910500b001d29e987e1emr198610pjo.0.1650418655862; Tue, 19 Apr
+ 2022 18:37:35 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 20 Apr 2022 01:37:28 +0000
-Message-Id: <20220420013732.3308816-1-seanjc@google.com>
+Date:   Wed, 20 Apr 2022 01:37:29 +0000
+In-Reply-To: <20220420013732.3308816-1-seanjc@google.com>
+Message-Id: <20220420013732.3308816-2-seanjc@google.com>
 Mime-Version: 1.0
+References: <20220420013732.3308816-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.0.rc0.470.gd361397f0d-goog
-Subject: [PATCH v2 0/4] KVM: x86: APICv fixes
+Subject: [PATCH v2 1/4] KVM: x86: Tag APICv DISABLE inhibit, not ABSENT, if
+ APICv is disabled
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -70,41 +74,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Patch 1 is brown paper bag fix for a copy+paste bug (thankfully from this
-cycle).
+Set the DISABLE inhibit, not the ABSENT inhibit, if APICv is disabled via
+module param.  A recent refactoring to add a wrapper for setting/clearing
+inhibits unintentionally changed the flag, probably due to a copy+paste
+goof.
 
-Patch 2 fixes a nVMX + APICv bug where KVM essentially corrupts vmcs02 if
-an APICv update arrives while L2 is running.  Found when testing a slight
-variation of patch 3.
+Fixes: 4f4c4a3ee53c ("KVM: x86: Trace all APICv inhibit changes and capture overall status")
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ arch/x86/kvm/x86.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Patch 3 fixes a race where an APICv update that occurs while a vCPU is
-being created will fail to notify that vCPU due it not yet being visible
-to the updater.
-
-Patch 4 is a minor optimization/cleanup found by inspection when digging
-into everything else.
-
-v2:
-  - Collect reviews. [Maxim]
-  - Reword patch 2's changelog to make it clear that ignoring vmcs02
-    is perfectly ok. [Maxim]
-
-v1: https://lore.kernel.org/all/20220416034249.2609491-3-seanjc@google.com
-
-Sean Christopherson (4):
-  KVM: x86: Tag APICv DISABLE inhibit, not ABSENT, if APICv is disabled
-  KVM: nVMX: Defer APICv updates while L2 is active until L1 is active
-  KVM: x86: Pend KVM_REQ_APICV_UPDATE during vCPU creation to fix a race
-  KVM: x86: Skip KVM_GUESTDBG_BLOCKIRQ APICv update if APICv is disabled
-
- arch/x86/kvm/vmx/nested.c |  5 +++++
- arch/x86/kvm/vmx/vmx.c    |  5 +++++
- arch/x86/kvm/vmx/vmx.h    |  1 +
- arch/x86/kvm/x86.c        | 20 ++++++++++++++++++--
- 4 files changed, 29 insertions(+), 2 deletions(-)
-
-
-base-commit: 150866cd0ec871c765181d145aa0912628289c8a
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ab336f7c82e4..753296902535 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9159,7 +9159,7 @@ static void kvm_apicv_init(struct kvm *kvm)
+ 
+ 	if (!enable_apicv)
+ 		set_or_clear_apicv_inhibit(inhibits,
+-					   APICV_INHIBIT_REASON_ABSENT, true);
++					   APICV_INHIBIT_REASON_DISABLE, true);
+ }
+ 
+ static void kvm_sched_yield(struct kvm_vcpu *vcpu, unsigned long dest_id)
 -- 
 2.36.0.rc0.470.gd361397f0d-goog
 
