@@ -2,166 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3818C5081D8
-	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 09:16:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 021BF508227
+	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 09:30:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359635AbiDTHSz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Apr 2022 03:18:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35654 "EHLO
+        id S1359761AbiDTHcV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Apr 2022 03:32:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356677AbiDTHSx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Apr 2022 03:18:53 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 708E63A70C
-        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 00:16:07 -0700 (PDT)
-Received: from kwepemi500010.china.huawei.com (unknown [172.30.72.57])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4KjsQ11StKz1J9hw;
-        Wed, 20 Apr 2022 15:15:21 +0800 (CST)
-Received: from kwepemm600015.china.huawei.com (7.193.23.52) by
- kwepemi500010.china.huawei.com (7.221.188.191) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Wed, 20 Apr 2022 15:16:05 +0800
-Received: from localhost (10.174.149.172) by kwepemm600015.china.huawei.com
- (7.193.23.52) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Wed, 20 Apr
- 2022 15:16:05 +0800
-From:   Hogan Wang <hogan.wang@huawei.com>
-To:     <jgg@nvidia.com>, <yishaih@nvidia.com>,
-        <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
-        <kvm@vger.kernel.org>
-CC:     <weidong.huang@huawei.com>, <yechuan@huawei.com>,
-        <hogan.wang@huawei.com>
-Subject: [PATCH] vfio-pci: report recovery event after device recovery successful
-Date:   Wed, 20 Apr 2022 15:16:01 +0800
-Message-ID: <20220420071601.900-1-hogan.wang@huawei.com>
-X-Mailer: git-send-email 2.33.0
+        with ESMTP id S1359719AbiDTHcS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Apr 2022 03:32:18 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C9B43B2AC;
+        Wed, 20 Apr 2022 00:29:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1650439773; x=1681975773;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=+2VkkaHgs7Bi4lmS3LREzrgtsND2nPSs2jyfSDUHHGU=;
+  b=UZluPZINbjZCeCKdtOV5ANkT+aU0cv1b24ntmZoknuYw8hqim/iNpULc
+   MNhHhovbHKJgrWCRnRq0CAm/hfY3qC+jwgfs2tI0uA1r29zk5m7erIc4D
+   VWQIsuBdANH6hV3Ub5OFX16LbupJSUaiE42YJNsTG1p+X6kUsMgBaLaQJ
+   dUTl0atcHYsmCVG5BYaZoZkEHKwJMMzj1A0oV1Wyu2XcKmeRwKyi++bCl
+   +aLB4G2+JTCCqsGSbrGfYGgQ+8rDHVVlKvjU88A6OKx/7t5L01f8urPWK
+   P+0pfy03Cd/h17GCO1778ODdMuBhw4bdtY38Kh7vWCaXef0PNPD/C/aaS
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10322"; a="261565065"
+X-IronPort-AV: E=Sophos;i="5.90,275,1643702400"; 
+   d="scan'208";a="261565065"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2022 00:29:33 -0700
+X-IronPort-AV: E=Sophos;i="5.90,275,1643702400"; 
+   d="scan'208";a="562007675"
+Received: from ktuv-desk2.amr.corp.intel.com (HELO [10.212.227.192]) ([10.212.227.192])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2022 00:29:32 -0700
+Message-ID: <faf366f9-a0cb-4121-e5bf-c63e6d0b14aa@linux.intel.com>
+Date:   Wed, 20 Apr 2022 00:29:31 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.174.149.172]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600015.china.huawei.com (7.193.23.52)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.7.0
+Subject: Re: [PATCH v3 03/21] x86/virt/tdx: Implement the SEAMCALL base
+ function
+Content-Language: en-US
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
+        len.brown@intel.com, tony.luck@intel.com,
+        rafael.j.wysocki@intel.com, reinette.chatre@intel.com,
+        dan.j.williams@intel.com, peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com, isaku.yamahata@intel.com
+References: <cover.1649219184.git.kai.huang@intel.com>
+ <1c3f555934c73301a9cbf10232500f3d15efe3cc.1649219184.git.kai.huang@intel.com>
+ <dd9d6f7d-5cec-e6b7-2fa0-5bf1fdcb79b5@linux.intel.com>
+ <d1b88a6e08feee137df9acd2cdf37f7685171f4b.camel@intel.com>
+From:   Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
+In-Reply-To: <d1b88a6e08feee137df9acd2cdf37f7685171f4b.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-10.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As you all know, device faults are classified into the following
-types: unrecoverable error and recoverable error. vfio-pci drvier
-will report error event to user-space process while device occur
-hardware errors, and still report the other error event after deivce
-recovery successful. So the user-space process just like qemu can not
-identify the event is an hardware error event or a device recovery
-successful event. So in order to solve this problem, add an eventfd
-named recov_trigger to report device recovery successful event, the
-user-space process can make a decision whether to process the recovery
-event or not.
 
-Signed-off-by: Hogan Wang <hogan.wang@huawei.com>
----
- drivers/vfio/pci/vfio_pci_core.c  | 13 +++++++++++--
- drivers/vfio/pci/vfio_pci_intrs.c | 19 +++++++++++++++++++
- include/linux/vfio_pci_core.h     |  1 +
- include/uapi/linux/vfio.h         |  1 +
- 4 files changed, 32 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index b7bb16f92ac6..2360cb44aa36 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -483,6 +483,10 @@ void vfio_pci_core_close_device(struct vfio_device *core_vdev)
- 		eventfd_ctx_put(vdev->err_trigger);
- 		vdev->err_trigger = NULL;
- 	}
-+	if (vdev->recov_trigger) {
-+		eventfd_ctx_put(vdev->recov_trigger);
-+		vdev->recov_trigger = NULL;
-+	}
- 	if (vdev->req_trigger) {
- 		eventfd_ctx_put(vdev->req_trigger);
- 		vdev->req_trigger = NULL;
-@@ -1922,8 +1926,13 @@ pci_ers_result_t vfio_pci_core_aer_err_detected(struct pci_dev *pdev,
- 
- 	mutex_lock(&vdev->igate);
- 
--	if (vdev->err_trigger)
--		eventfd_signal(vdev->err_trigger, 1);
-+	if (state == pci_channel_io_normal) {
-+		if (vdev->recov_trigger)
-+			eventfd_signal(vdev->recov_trigger, 1);
-+	} else {
-+		if (vdev->err_trigger)
-+			eventfd_signal(vdev->err_trigger, 1);
-+	}
- 
- 	mutex_unlock(&vdev->igate);
- 
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index 6069a11fb51a..be76ff76c361 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -624,6 +624,17 @@ static int vfio_pci_set_err_trigger(struct vfio_pci_core_device *vdev,
- 					       count, flags, data);
- }
- 
-+static int vfio_pci_set_recov_trigger(struct vfio_pci_core_device *vdev,
-+				    unsigned index, unsigned start,
-+				    unsigned count, uint32_t flags, void *data)
-+{
-+	if (index != VFIO_PCI_ERR_IRQ_INDEX || start != 0 || count > 1)
-+		return -EINVAL;
-+
-+	return vfio_pci_set_ctx_trigger_single(&vdev->recov_trigger,
-+					       count, flags, data);
-+}
-+
- static int vfio_pci_set_req_trigger(struct vfio_pci_core_device *vdev,
- 				    unsigned index, unsigned start,
- 				    unsigned count, uint32_t flags, void *data)
-@@ -684,6 +695,14 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev, uint32_t flags,
- 			break;
- 		}
- 		break;
-+	case VFIO_PCI_RECOV_IRQ_INDEX:
-+		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
-+		case VFIO_IRQ_SET_ACTION_TRIGGER:
-+			if (pci_is_pcie(vdev->pdev))
-+				func = vfio_pci_set_recov_trigger;
-+			break;
-+		}
-+		break;
- 	}
- 
- 	if (!func)
-diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-index 74a4a0f17b28..d94addb18118 100644
---- a/include/linux/vfio_pci_core.h
-+++ b/include/linux/vfio_pci_core.h
-@@ -128,6 +128,7 @@ struct vfio_pci_core_device {
- 	struct pci_saved_state	*pm_save;
- 	int			ioeventfds_nr;
- 	struct eventfd_ctx	*err_trigger;
-+	struct eventfd_ctx	*recov_trigger;
- 	struct eventfd_ctx	*req_trigger;
- 	struct list_head	dummy_resources_list;
- 	struct mutex		ioeventfds_lock;
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index fea86061b44e..f88a6ca62c49 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -621,6 +621,7 @@ enum {
- 	VFIO_PCI_MSIX_IRQ_INDEX,
- 	VFIO_PCI_ERR_IRQ_INDEX,
- 	VFIO_PCI_REQ_IRQ_INDEX,
-+	VFIO_PCI_RECOV_IRQ_INDEX,
- 	VFIO_PCI_NUM_IRQS
- };
- 
+On 4/19/22 9:16 PM, Kai Huang wrote:
+> On Tue, 2022-04-19 at 07:07 -0700, Sathyanarayanan Kuppuswamy wrote:
+>>
+>> On 4/5/22 9:49 PM, Kai Huang wrote:
+>>> SEAMCALL leaf functions use an ABI different from the x86-64 system-v
+>>> ABI.  Instead, they share the same ABI with the TDCALL leaf functions.
+>>
+>> TDCALL is a new term for this patch set. Maybe add some detail about
+>> it in ()?.
+>>
+>>>
+> 
+> TDCALL implementation is already in tip/tdx.  This series will be rebased to it.
+> I don't think we need to explain more about something that is already in the tip
+> tree?
+
+Since you have already expanded terms like TD,TDX and SEAM in this patch
+set, I thought you wanted to explain TDX terms to make it easy for new 
+readers. So to keep it uniform, I have suggested adding some brief 
+details about the TDCALL.
+
+But I am fine either way.
+
+> 
+> 
+
 -- 
-2.33.0
-
+Sathyanarayanan Kuppuswamy
+Linux Kernel Developer
