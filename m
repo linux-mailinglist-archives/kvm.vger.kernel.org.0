@@ -2,233 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AFFA25088F5
-	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 15:11:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8771508925
+	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 15:22:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378835AbiDTNO1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Apr 2022 09:14:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53962 "EHLO
+        id S1378953AbiDTNZi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Apr 2022 09:25:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235000AbiDTNOX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Apr 2022 09:14:23 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 648B942A0A;
-        Wed, 20 Apr 2022 06:11:28 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id md20-20020a17090b23d400b001cb70ef790dso4901465pjb.5;
-        Wed, 20 Apr 2022 06:11:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=mWNorpTVTS8YkgukxxtTFjnF+otEpg4XNgwVUHpZnIQ=;
-        b=jj9A5Cyr874v3eIGy0ew2ad/5LfmJKMdu135QHTykt4YCKFEy0TWjxYdTejZso8y82
-         dDqAS+/8N+GIHN169rU+B689RGLl6EgNyCnrGTSpfGAw2V8eB3Yfqw5jBd8wYk8/FUA5
-         xwJbr0OwEEQhVkbTN/bo55HSk6SGS0e8s6wXQxfDhWLQRAZA/9+k1OWdmT7lGAEreqhJ
-         8Tg+UC71kewIwzZ8GSzXgzh/TraoW02d910vwan1oyZJqd9y3epvrW6aK3k21CytHhfL
-         x8F/3NRj3lccxZxSyRJBvT/b6lBTlDjcLeI0LzvxUD7bI8ScP2FT2BiPs4wqBR4kWJh4
-         Thng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=mWNorpTVTS8YkgukxxtTFjnF+otEpg4XNgwVUHpZnIQ=;
-        b=OYKBy7Yc7ff+m4DQ1oPPvGTLW4R2Gej8BN/Rj7cFEvLwlENFtpWXk5KFkZGo5Jo1Hv
-         HhZuWtIA1qrotwICjBOzhFpxb870Z2hk7TF/wrwSFrayIrMsZdHMrippdFqWwPHsWm+g
-         p69YMFagf6PyhMkRYdNCrNzdn8cUc0NF/bNEMW1JeWes5N3JUZv/dTJjbqzjZdzE04UD
-         CugDt5odI831Vd8jRIdr6AhbYL/+NvhnG7isS1oMYnn1DObbq+GhUPP0+CTook25gxp3
-         uyHHW1FvBJXvSxZVqppanZazymGTDP6Sef77lC28MVmkl/193VPdjQF4IfdFlCMVf+Iz
-         f15w==
-X-Gm-Message-State: AOAM533E1PfEW1OsFuzkc8isba1qk9RKNK79ObS0rPZlES/r3HA8x4fO
-        8u/ft7KBW5oLJFgGmP+GTrlRYK3Enbg=
-X-Google-Smtp-Source: ABdhPJy1Bwddw+H4T+PkoT9mTXN79JdHLJy9h4FOaLbu6y5LW6r9REHfASht15WV4yo9Cc0p1Z352w==
-X-Received: by 2002:a17:90a:6501:b0:1ca:a7df:695c with SMTP id i1-20020a17090a650100b001caa7df695cmr4467780pjj.152.1650460287648;
-        Wed, 20 Apr 2022 06:11:27 -0700 (PDT)
-Received: from localhost ([47.251.4.198])
-        by smtp.gmail.com with ESMTPSA id m13-20020a62a20d000000b004fe0ce6d7a1sm20353148pff.193.2022.04.20.06.11.26
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 20 Apr 2022 06:11:27 -0700 (PDT)
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-doc@vger.kernel.org
-Subject: [PATCH 2/2] KVM: X86/MMU: Introduce role.passthrough for shadowing 5-level NPT for 4-level NPT L1 guest
-Date:   Wed, 20 Apr 2022 21:12:04 +0800
-Message-Id: <20220420131204.2850-3-jiangshanlai@gmail.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
-In-Reply-To: <20220420131204.2850-1-jiangshanlai@gmail.com>
-References: <20220420131204.2850-1-jiangshanlai@gmail.com>
+        with ESMTP id S233144AbiDTNZg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Apr 2022 09:25:36 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 012B242A27;
+        Wed, 20 Apr 2022 06:22:50 -0700 (PDT)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23KCDeNo024516;
+        Wed, 20 Apr 2022 13:22:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=kN02BilbPjciMpzpxMIq+yOFK1czBMc+s5hK9BVxh4c=;
+ b=BX1RTwRzP/YV7cOaoaiVs70HelVItoebavNwqKBjIlaFutAlo5TGTWvlWNiNqn//k1PB
+ 7PMPiqx/xI3cX7SU3PzBckn4MSp5HGNSjMgJTth/eB+cyMPO6cwl5npJqaWAaPI0oPYF
+ RCpAbEP8W+oecETvBagzzVj0n2lu9rQ00ORMrFAO3IVMcd+Yef/FvyOrTnkAn2RkxboN
+ WbmVVH6Iyc3uka+AsnvSFexrI+rRL3vhHaG7MCM5Z0sErqWlDGsbb3zacB0bvq7ypBtw
+ jezeqZAc+NWHuxRpOhtFCgi1oUDTLgnnOzb9QHvWqwRYliPXwJyn6n1CetQd+lf0C8Xm 1Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fjff2vtn2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Apr 2022 13:22:50 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23KBmBbo011980;
+        Wed, 20 Apr 2022 13:22:49 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fjff2vtm4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Apr 2022 13:22:49 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23KDD54S030720;
+        Wed, 20 Apr 2022 13:22:47 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03fra.de.ibm.com with ESMTP id 3ffne951aq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Apr 2022 13:22:47 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23KDMtpr10093242
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 20 Apr 2022 13:22:55 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1D9DE11C04C;
+        Wed, 20 Apr 2022 13:22:44 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5896A11C05E;
+        Wed, 20 Apr 2022 13:22:43 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.10.176])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 20 Apr 2022 13:22:43 +0000 (GMT)
+Date:   Wed, 20 Apr 2022 15:22:41 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Heiko Carstens <hca@linux.ibm.com>
+Cc:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
+        david@redhat.com, thuth@redhat.com, gor@linux.ibm.com,
+        wintera@linux.ibm.com, seiden@linux.ibm.com, nrb@linux.ibm.com
+Subject: Re: [PATCH v8 1/2] s390x: KVM: guest support for topology function
+Message-ID: <20220420152241.4d9edea5@p-imbrenda>
+In-Reply-To: <Yl/27Pz3pvARmIHn@osiris>
+References: <20220420113430.11876-1-pmorel@linux.ibm.com>
+        <20220420113430.11876-2-pmorel@linux.ibm.com>
+        <Yl/27Pz3pvARmIHn@osiris>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: N15tDa8gHZtPnWoR-E3XoVQBWCf4a02g
+X-Proofpoint-ORIG-GUID: wrX6HMN0SUnpusW4M7c1dRW7XgatiOgq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-20_03,2022-04-20_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ mlxlogscore=951 adultscore=0 clxscore=1015 lowpriorityscore=0
+ malwarescore=0 bulkscore=0 phishscore=0 suspectscore=0 priorityscore=1501
+ mlxscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204200079
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+On Wed, 20 Apr 2022 14:05:00 +0200
+Heiko Carstens <hca@linux.ibm.com> wrote:
 
-When shadowing 5-level NPT for 4-level NPT L1 guest, the root_sp is
-allocated with role.level = 5 and the guest pagetable's root gfn.
+> > +static inline bool kvm_s390_topology_changed(struct kvm_vcpu *vcpu)
+> > +{
+> > +	if (!test_kvm_facility(vcpu->kvm, 11))
+> > +		return false;
+> > +
+> > +	/* A new vCPU has been hotplugged */
+> > +	if (vcpu->arch.prev_cpu == S390_KVM_TOPOLOGY_NEW_CPU)
+> > +		return true;
+> > +
+> > +	/* The real CPU backing up the vCPU moved to another socket */
+> > +	if (cpumask_test_cpu(vcpu->cpu,
+> > +			     topology_core_cpumask(vcpu->arch.prev_cpu)))
+> > +		return true;
+> > +
+> > +	return false;
+> > +}  
+> 
+> This seems to be wrong. I'd guess that you need
+> 
+> 	if (cpumask_test_cpu(vcpu->cpu,
+> 			     topology_core_cpumask(vcpu->arch.prev_cpu)))
+> -->		return false;
+> -->	return true;  
 
-And root_sp->spt[0] is also allocated with the same gfn and the same
-role except role.level = 4.  Luckily that they are different shadow
-pages, but only root_sp->spt[0] is the real translation of the guest
-pagetable.
-
-Here comes a problem:
-
-If the guest switches from gCR4_LA57=0 to gCR4_LA57=1 (or vice verse)
-and uses the same gfn as the root page for nested NPT before and after
-switching gCR4_LA57.  The host (hCR4_LA57=1) might use the same root_sp
-for the guest even the guest switches gCR4_LA57.  The guest will see
-unexpected page mapped and L2 may exploit the bug and hurt L1.  It is
-lucky that the problem can't hurt L0.
-
-And three special cases need to be handled:
-
-The root_sp should be like role.direct=1 sometimes: its contents are
-not backed by gptes, root_sp->gfns is meaningless.  (For a normal high
-level sp in shadow paging, sp->gfns is often unused and kept zero, but
-it could be relevant and meaningful if sp->gfns is used because they
-are backed by concrete gptes.)
-
-For such root_sp in the case, root_sp is just a portal to contribute
-root_sp->spt[0], and root_sp->gfns should not be used and
-root_sp->spt[0] should not be dropped if gpte[0] of the guest root
-pagetable is changed.
-
-Such root_sp should not be accounted too.
-
-So add role.passthrough to distinguish the shadow pages in the hash
-when gCR4_LA57 is toggled and fix above special cases by using it in
-kvm_mmu_page_{get|set}_gfn() and sp_has_gptes().
-
-Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
----
- Documentation/virt/kvm/mmu.rst  |  3 +++
- arch/x86/include/asm/kvm_host.h |  5 +++--
- arch/x86/kvm/mmu/mmu.c          | 16 ++++++++++++++++
- arch/x86/kvm/mmu/paging_tmpl.h  |  1 +
- 4 files changed, 23 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/virt/kvm/mmu.rst b/Documentation/virt/kvm/mmu.rst
-index 5b1ebad24c77..4018b9d7a0d3 100644
---- a/Documentation/virt/kvm/mmu.rst
-+++ b/Documentation/virt/kvm/mmu.rst
-@@ -202,6 +202,9 @@ Shadow pages contain the following information:
-     Is 1 if the MMU instance cannot use A/D bits.  EPT did not have A/D
-     bits before Haswell; shadow EPT page tables also cannot use A/D bits
-     if the L1 hypervisor does not enable them.
-+  role.passthrough:
-+    Is 1 if role.level = 5 when shadowing 5-level shadow NPT for
-+    4-level NPT L1.
-   gfn:
-     Either the guest page table containing the translations shadowed by this
-     page, or the base page frame for linear translations.  See role.direct.
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 9694dd5e6ccc..d4f8f4784d87 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -285,7 +285,7 @@ struct kvm_kernel_irq_routing_entry;
-  * minimize the size of kvm_memory_slot.arch.gfn_track, i.e. allows allocating
-  * 2 bytes per gfn instead of 4 bytes per gfn.
-  *
-- * Indirect upper-level shadow pages are tracked for write-protection via
-+ * Upper-level shadow pages having gptes are tracked for write-protection via
-  * gfn_track.  As above, gfn_track is a 16 bit counter, so KVM must not create
-  * more than 2^16-1 upper-level shadow pages at a single gfn, otherwise
-  * gfn_track will overflow and explosions will ensure.
-@@ -331,7 +331,8 @@ union kvm_mmu_page_role {
- 		unsigned smap_andnot_wp:1;
- 		unsigned ad_disabled:1;
- 		unsigned guest_mode:1;
--		unsigned :6;
-+		unsigned passthrough:1;
-+		unsigned :5;
- 
- 		/*
- 		 * This is left at the top of the word so that
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 1bdff55218ef..d14cb6f99cb1 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -737,6 +737,9 @@ static void mmu_free_pte_list_desc(struct pte_list_desc *pte_list_desc)
- 
- static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
- {
-+	if (sp->role.passthrough)
-+		return sp->gfn;
-+
- 	if (!sp->role.direct)
- 		return sp->gfns[index];
- 
-@@ -745,6 +748,11 @@ static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
- 
- static void kvm_mmu_page_set_gfn(struct kvm_mmu_page *sp, int index, gfn_t gfn)
- {
-+	if (sp->role.passthrough) {
-+		WARN_ON_ONCE(gfn != sp->gfn);
-+		return;
-+	}
-+
- 	if (!sp->role.direct) {
- 		sp->gfns[index] = gfn;
- 		return;
-@@ -1861,6 +1869,9 @@ static bool sp_has_gptes(struct kvm_mmu_page *sp)
- 	if (sp->role.direct)
- 		return false;
- 
-+	if (sp->role.passthrough)
-+		return false;
-+
- 	return true;
- }
- 
-@@ -2059,6 +2070,8 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
- 		quadrant &= (1 << ((PT32_PT_BITS - PT64_PT_BITS) * level)) - 1;
- 		role.quadrant = quadrant;
- 	}
-+	if (level <= vcpu->arch.mmu->root_level)
-+		role.passthrough = 0;
- 
- 	sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
- 	for_each_valid_sp(vcpu->kvm, sp, sp_list) {
-@@ -4890,6 +4903,9 @@ kvm_calc_shadow_npt_root_page_role(struct kvm_vcpu *vcpu,
- 
- 	role.base.direct = false;
- 	role.base.level = kvm_mmu_get_tdp_level(vcpu);
-+	if (role.base.level == PT64_ROOT_5LEVEL &&
-+	    role_regs_to_root_level(regs) == PT64_ROOT_4LEVEL)
-+		role.base.passthrough = 1;
- 
- 	return role;
- }
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 8621188b46df..c1b975fb85a2 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -1042,6 +1042,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
- 		.level = 0xf,
- 		.access = 0x7,
- 		.quadrant = 0x3,
-+		.passthrough = 0x1,
- 	};
- 
- 	/*
--- 
-2.19.1.6.gb485710b
-
+so if the CPU moved to a different socket, it's not a change?
+and if nothing happened, it is a change?
