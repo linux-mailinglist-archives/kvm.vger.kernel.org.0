@@ -2,75 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0276C50894A
-	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 15:26:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 867F450898B
+	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 15:43:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379068AbiDTN2x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Apr 2022 09:28:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46420 "EHLO
+        id S1378881AbiDTNqh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Apr 2022 09:46:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379059AbiDTN2t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Apr 2022 09:28:49 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB3E842A00;
-        Wed, 20 Apr 2022 06:26:01 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id j8so1747558pll.11;
-        Wed, 20 Apr 2022 06:26:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=Hj08weOnMiNuvuHVFNgvhLkhm3HK1Sro404l1Lgvx5w=;
-        b=dQ+WiKwx0u/NmwBwydj2yJ1x8OVhFo/mHdn0LkOYsir5MmvEhpCLhJm/Yzyes8fgwu
-         qQjJ65wunCxFnKvDDMmJfnTTGYHbHXrUzUKzBwmYme61y0syvzoFbZGXHSBMAXSgtFP9
-         2Q2Ad6VtfEmcpqBVTlFXKeSxCxfEt4hTXShrSkJfrCCcGv0PF0esZ8fOcR6xxgXx54wE
-         QtYKsX0irPO8Sl3teQ7Fet+7UQiVW2A7Ed1rd/NZFAg7tickWu7hPWAxnOU/Twe7J4W0
-         PftUVvquEjFyvq75OqeD45O/THW+Ihrgkw0NLqIOoAvyS1yy6REzdUMqTHI+aHIFdo3H
-         4q1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Hj08weOnMiNuvuHVFNgvhLkhm3HK1Sro404l1Lgvx5w=;
-        b=s0OopmQllmra15MOtWImzk+T3Hc0ZIM8OEwhLfCp4yw/879gwxrGllFg5u1dELSQBJ
-         sLedOzmlbTjxl9MOBfUSayE7sYgSOXEhlyrVX5To6Pv4RXBPc70ZDn/D+jvQock/M5cm
-         LMC1k8BwK8UXRdkHQeOMoHGcU6vhdsY5ZzHKAJGNIZpOxzWqLhs7t7qCIQp1D8t6QLDo
-         RDK5K1kdu5cMy5kU5jHGpOTqzDMJwu7MueXZBA+gWg/ZCy6YpFRLfLBf8DQff/hR99Q8
-         jc8TVIyFJeZWcDv+tkrxRiFBYyl7ZKnjn4bFi7GrtWfVTk51DMPVGf2xuvF9q75AFxmy
-         C+dQ==
-X-Gm-Message-State: AOAM533NFxiY3X3uu6Y3MV+1W0McT5rD0x7ks8RPZATmeyqR2gwZ5gqs
-        VRw6x//OAc2O2xAhTYY+4iMgMcBDsRg=
-X-Google-Smtp-Source: ABdhPJy486mRkFHpISnRUJKz6ZAlNggZCTjfunDQffEZynbc8jWDKiMf6Zrhc5uO/NzhUIZj1gKGtQ==
-X-Received: by 2002:a17:902:8b8a:b0:158:fbd0:45ab with SMTP id ay10-20020a1709028b8a00b00158fbd045abmr14527557plb.110.1650461161319;
-        Wed, 20 Apr 2022 06:26:01 -0700 (PDT)
-Received: from localhost ([47.251.4.198])
-        by smtp.gmail.com with ESMTPSA id f187-20020a6251c4000000b005058e59604csm20451115pfb.217.2022.04.20.06.26.00
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 20 Apr 2022 06:26:01 -0700 (PDT)
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH 7/7] KVM: X86/MMU: Remove mmu_alloc_special_roots()
-Date:   Wed, 20 Apr 2022 21:26:05 +0800
-Message-Id: <20220420132605.3813-8-jiangshanlai@gmail.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
-In-Reply-To: <20220420132605.3813-1-jiangshanlai@gmail.com>
-References: <20220420132605.3813-1-jiangshanlai@gmail.com>
+        with ESMTP id S235764AbiDTNqf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Apr 2022 09:46:35 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FDB8433A9;
+        Wed, 20 Apr 2022 06:43:50 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23KD8PDf029086;
+        Wed, 20 Apr 2022 13:43:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=TQ89idDVj5DnsiPty35O+SNdf9oVI1XNdc4Vs+NJmRU=;
+ b=PlCNhHPBHSzSPVmBWk0lT9IkkkZkI+nvVA5RFAOSUInoP2FGasVBHOSBwC/QeMvP8oqG
+ PviCuNNkg2LsPeq/ETSVgE9B2cRuldC9iNn64Nt1ru90+n/6lFOOFFABYEJ6tcOf3iYg
+ LwgqPsDg4U0c0qzTExugLPL+VbThLXu778muu6GoV6v7WUsHwSM3m81tHATojy5INpGG
+ vSBf6at59xax1Ukf5/HKjnBpNjX6QXKNUI06oU0izzjA29qpIwDR7QMcQ4fh7uZqJx6L
+ Xv7hdEbJ01PD7QkVcCEjhuWEzWiG6gHT9XoQ8c+6Je9AJ/9STS9EvEqRD9XGq7Tnagsb ug== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fjdn3qmtq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Apr 2022 13:43:49 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23KCqXle007363;
+        Wed, 20 Apr 2022 13:43:48 GMT
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fjdn3qmt0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Apr 2022 13:43:48 +0000
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23KDhDlf031586;
+        Wed, 20 Apr 2022 13:43:47 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma03wdc.us.ibm.com with ESMTP id 3ffnea4mpj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Apr 2022 13:43:47 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23KDhkIt6030222
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 20 Apr 2022 13:43:46 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B750FAE062;
+        Wed, 20 Apr 2022 13:43:46 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3D01DAE05C;
+        Wed, 20 Apr 2022 13:43:41 +0000 (GMT)
+Received: from [9.211.82.47] (unknown [9.211.82.47])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed, 20 Apr 2022 13:43:40 +0000 (GMT)
+Message-ID: <0a8848fb-73b3-97aa-4147-9a647ceb2397@linux.ibm.com>
+Date:   Wed, 20 Apr 2022 09:43:40 -0400
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v5 11/21] KVM: s390: pci: do initial setup for AEN
+ interpretation
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org
+References: <20220404174349.58530-1-mjrosato@linux.ibm.com>
+ <20220404174349.58530-12-mjrosato@linux.ibm.com>
+ <c405e8de-5f6b-d33d-15e3-c4453e0348fe@linux.ibm.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <c405e8de-5f6b-d33d-15e3-c4453e0348fe@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: p6G_grO_i8XKwRVty1YfCzZCf21NCMxf
+X-Proofpoint-GUID: ONyjyGYwammObKJXRBzYE-UvW_WocnDI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-20_03,2022-04-20_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
+ malwarescore=0 bulkscore=0 clxscore=1015 priorityscore=1501
+ impostorscore=0 mlxlogscore=999 phishscore=0 lowpriorityscore=0
+ spamscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204200081
+X-Spam-Status: No, score=-6.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,138 +104,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+On 4/19/22 4:16 AM, Pierre Morel wrote:
+> 
+> 
+> On 4/4/22 19:43, Matthew Rosato wrote:
+>> Initial setup for Adapter Event Notification Interpretation for zPCI
+>> passthrough devices.  Specifically, allocate a structure for 
+>> forwarding of
+>> adapter events and pass the address of this structure to firmware.
+>>
+>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>> ---
 
-mmu_alloc_special_roots() allocates mmu->pae_root for non-PAE paging
-(as for shadowing 32bit NPT on 64 bit host) and mmu->pml4_root and
-mmu->pml5_root.
+...
 
-But mmu->pml4_root and mmu->pml5_root is not used, neither mmu->pae_root
-for non-PAE paging.
+>> +
+>> +static int zpci_reset_aipb(u8 nisc)
+>> +{
+>> +    /*
+>> +     * AEN registration can only happen once per system boot.  If
+>> +     * an aipb already exists then AEN was already registered and
+>> +     * we can re-use the aipb contents.  This can only happen if
+>> +     * the KVM module was removed and re-inserted.
+>> +     */
+>> +    if (zpci_aipb->aipb.faal != ZPCI_NR_DEVICES ||
+>> +        zpci_aipb->aipb.afi != nisc) {
+>> +        return -EINVAL;
+>> +    }
+> 
+> I do not understand how faal cound be different of ZPCI_NR_DEVICES if 
+> aipb has been already initialised.
+> Same for afi.
+> Can you please explain?
 
-So remove mmu_alloc_special_roots(), mmu->pml4_root and mmu->pml5_root.
+Well, my concern was along the lines of 'what if we rmmod kvm and then 
+insmod a different version of the kvm module' -- These are really sanity 
+checks.
 
-Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
----
- arch/x86/include/asm/kvm_host.h |  3 --
- arch/x86/kvm/mmu/mmu.c          | 76 ---------------------------------
- 2 files changed, 79 deletions(-)
+Now, ZPCI_NR_DEVICES/faal is built in with PCI, so yeah this check is 
+probably unnecessary as we shouldn't be able to change this value 
+without a new kernel.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index d4f8f4784d87..8bfebe509c09 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -462,9 +462,6 @@ struct kvm_mmu {
- 	u32 pkru_mask;
- 
- 	u64 *pae_root;
--	u64 *pml4_root;
--	u64 *pml5_root;
--
- 	/*
- 	 * check zero bits on shadow page table entries, these
- 	 * bits include not only hardware reserved bits but also
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 2f590779ee39..b16255c00c5a 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3571,77 +3571,6 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
- 	return r;
- }
- 
--static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
--{
--	struct kvm_mmu *mmu = vcpu->arch.mmu;
--	bool need_pml5 = mmu->shadow_root_level > PT64_ROOT_4LEVEL;
--	u64 *pml5_root = NULL;
--	u64 *pml4_root = NULL;
--	u64 *pae_root;
--
--	/*
--	 * When shadowing 32-bit or PAE NPT with 64-bit NPT, the PML4 and PDP
--	 * tables are allocated and initialized at root creation as there is no
--	 * equivalent level in the guest's NPT to shadow.  Allocate the tables
--	 * on demand, as running a 32-bit L1 VMM on 64-bit KVM is very rare.
--	 */
--	if (mmu->direct_map || mmu->root_level >= PT64_ROOT_4LEVEL ||
--	    mmu->shadow_root_level < PT64_ROOT_4LEVEL)
--		return 0;
--
--	/*
--	 * NPT, the only paging mode that uses this horror, uses a fixed number
--	 * of levels for the shadow page tables, e.g. all MMUs are 4-level or
--	 * all MMus are 5-level.  Thus, this can safely require that pml5_root
--	 * is allocated if the other roots are valid and pml5 is needed, as any
--	 * prior MMU would also have required pml5.
--	 */
--	if (mmu->pae_root && mmu->pml4_root && (!need_pml5 || mmu->pml5_root))
--		return 0;
--
--	/*
--	 * The special roots should always be allocated in concert.  Yell and
--	 * bail if KVM ends up in a state where only one of the roots is valid.
--	 */
--	if (WARN_ON_ONCE(!tdp_enabled || mmu->pae_root || mmu->pml4_root ||
--			 (need_pml5 && mmu->pml5_root)))
--		return -EIO;
--
--	/*
--	 * Unlike 32-bit NPT, the PDP table doesn't need to be in low mem, and
--	 * doesn't need to be decrypted.
--	 */
--	pae_root = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
--	if (!pae_root)
--		return -ENOMEM;
--
--#ifdef CONFIG_X86_64
--	pml4_root = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
--	if (!pml4_root)
--		goto err_pml4;
--
--	if (need_pml5) {
--		pml5_root = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
--		if (!pml5_root)
--			goto err_pml5;
--	}
--#endif
--
--	mmu->pae_root = pae_root;
--	mmu->pml4_root = pml4_root;
--	mmu->pml5_root = pml5_root;
--
--	return 0;
--
--#ifdef CONFIG_X86_64
--err_pml5:
--	free_page((unsigned long)pml4_root);
--err_pml4:
--	free_page((unsigned long)pae_root);
--	return -ENOMEM;
--#endif
--}
--
- static bool is_unsync_root(hpa_t root)
- {
- 	struct kvm_mmu_page *sp;
-@@ -5074,9 +5003,6 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
- 	r = mmu_alloc_pae_root(vcpu);
- 	if (r)
- 		return r;
--	r = mmu_alloc_special_roots(vcpu);
--	if (r)
--		goto out;
- 	if (vcpu->arch.mmu->direct_map)
- 		r = mmu_alloc_direct_roots(vcpu);
- 	else
-@@ -5534,8 +5460,6 @@ static void free_mmu_pages(struct kvm_mmu *mmu)
- 	if (!tdp_enabled && mmu->pae_root)
- 		set_memory_encrypted((unsigned long)mmu->pae_root, 1);
- 	free_page((unsigned long)mmu->pae_root);
--	free_page((unsigned long)mmu->pml4_root);
--	free_page((unsigned long)mmu->pml5_root);
- }
- 
- static void __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
--- 
-2.19.1.6.gb485710b
-
+afi is however derived from nisc, which was passed in all the way from 
+kvm_s390_gib_init during kvm_arch_init.  Today, this is hard-coded as 
+GAL_ISC; but the point is that this is hard-coded within the kvm module, 
+so we can't be quite sure that it's the same value every time we insmod 
+kvm.  In an (admittedly, far-fetched) scenario where we insmod kvm, 
+initialize AEN with GAL_ISC, rmmod kvm, then insmod a kvm where, for 
+example, GAL_ISC was changed to a different number, we would need to 
+trigger a failure here because we have no way to update the forwarding 
+isc with firmware until the kernel is rebooted.
