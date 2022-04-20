@@ -2,126 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A8771508925
-	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 15:22:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7348650893B
+	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 15:25:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378953AbiDTNZi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Apr 2022 09:25:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40794 "EHLO
+        id S1378994AbiDTN2O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Apr 2022 09:28:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233144AbiDTNZg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Apr 2022 09:25:36 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 012B242A27;
-        Wed, 20 Apr 2022 06:22:50 -0700 (PDT)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23KCDeNo024516;
-        Wed, 20 Apr 2022 13:22:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=kN02BilbPjciMpzpxMIq+yOFK1czBMc+s5hK9BVxh4c=;
- b=BX1RTwRzP/YV7cOaoaiVs70HelVItoebavNwqKBjIlaFutAlo5TGTWvlWNiNqn//k1PB
- 7PMPiqx/xI3cX7SU3PzBckn4MSp5HGNSjMgJTth/eB+cyMPO6cwl5npJqaWAaPI0oPYF
- RCpAbEP8W+oecETvBagzzVj0n2lu9rQ00ORMrFAO3IVMcd+Yef/FvyOrTnkAn2RkxboN
- WbmVVH6Iyc3uka+AsnvSFexrI+rRL3vhHaG7MCM5Z0sErqWlDGsbb3zacB0bvq7ypBtw
- jezeqZAc+NWHuxRpOhtFCgi1oUDTLgnnOzb9QHvWqwRYliPXwJyn6n1CetQd+lf0C8Xm 1Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fjff2vtn2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Apr 2022 13:22:50 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23KBmBbo011980;
-        Wed, 20 Apr 2022 13:22:49 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fjff2vtm4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Apr 2022 13:22:49 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23KDD54S030720;
-        Wed, 20 Apr 2022 13:22:47 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03fra.de.ibm.com with ESMTP id 3ffne951aq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Apr 2022 13:22:47 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23KDMtpr10093242
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Apr 2022 13:22:55 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1D9DE11C04C;
-        Wed, 20 Apr 2022 13:22:44 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5896A11C05E;
-        Wed, 20 Apr 2022 13:22:43 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.10.176])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 20 Apr 2022 13:22:43 +0000 (GMT)
-Date:   Wed, 20 Apr 2022 15:22:41 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Heiko Carstens <hca@linux.ibm.com>
-Cc:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        david@redhat.com, thuth@redhat.com, gor@linux.ibm.com,
-        wintera@linux.ibm.com, seiden@linux.ibm.com, nrb@linux.ibm.com
-Subject: Re: [PATCH v8 1/2] s390x: KVM: guest support for topology function
-Message-ID: <20220420152241.4d9edea5@p-imbrenda>
-In-Reply-To: <Yl/27Pz3pvARmIHn@osiris>
-References: <20220420113430.11876-1-pmorel@linux.ibm.com>
-        <20220420113430.11876-2-pmorel@linux.ibm.com>
-        <Yl/27Pz3pvARmIHn@osiris>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        with ESMTP id S1378984AbiDTN2E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Apr 2022 09:28:04 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E82015821;
+        Wed, 20 Apr 2022 06:25:18 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id bg9so1603442pgb.9;
+        Wed, 20 Apr 2022 06:25:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Uw7hE+OpDQkdNr0uKGFZJ5vQVWL49z4s2WTRmwaQ05I=;
+        b=YaLiP2hUxSk43v5wycBbgbuw54epFr//EDwKZMZqVaaXkWYBV04u8LyERu3YOAvA4q
+         nBrMMPx7EfraBDUgjCJHCadWlrBtxmwKqtcVZgORyF467eE7wmk4CSOa6O5hyUsPaom5
+         h9meZm536lpbJhAU0YRJJy59jGae3NLgnP3suOoYHjR4uGsxg2E67BkDqATTSwIqH+n2
+         yu/dQKpmD419FSE/SiPJ4Cx+OGvyee/PAhWBOsqr6Q/epp4RSK0vNdXASXUAcAGCkIOq
+         FGjHs/tXaxaslowH3R1o2rCskBwDxNBaMD879H9z8tFYwax1pm1YRFb2wJIyZy1V9ddT
+         tc7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Uw7hE+OpDQkdNr0uKGFZJ5vQVWL49z4s2WTRmwaQ05I=;
+        b=6uaZ8G4lg4Emmq/rjNthLgzo3dMmBhrSCnYXgLhlYc9KWnDB3CnN5bOhjWmwvcWJAJ
+         Cy95J/caZJArvU86sSNqYaB3vHy4nv56lVrnReVi7W6jTp+Ps93FPJAufB1QflK9wWEz
+         VtLBgJtPFM7Pamp0fusYQKDUvJNO0zrDJ45OQ9bax1C+KFO8IcBN2STv4UjKmToLfAj1
+         vlr+Ld+ChAibcHyBptPUtAtKUmgELoDgvz3tRvdBu4HPNJz0DVpG8Uw0gE9e1Dc4FS1m
+         lDarxF5S9FiY94lSx/ZJReS24M4hb38XT0pgK7cnEyz9k99iVlRwhxARmKxiIlkO72dr
+         IF/A==
+X-Gm-Message-State: AOAM530P46r0YOjvK55vq3f31bKKxdcZFYQI/V01CWKc2k6BhLB+NQ0o
+        I9GYp2xHLlHrrcKDE96qNzJbUdSIlsc=
+X-Google-Smtp-Source: ABdhPJySltv7rc/II4M/udcWI3xD4Wa4S92ymS+5C210i7zImcrX8IK2s9pIhTZIBTDu5BRi4DOAxg==
+X-Received: by 2002:a63:780f:0:b0:386:5d6f:2153 with SMTP id t15-20020a63780f000000b003865d6f2153mr18767782pgc.555.1650461117971;
+        Wed, 20 Apr 2022 06:25:17 -0700 (PDT)
+Received: from localhost ([47.251.4.198])
+        by smtp.gmail.com with ESMTPSA id w13-20020a17090a5e0d00b001c7d4099670sm19611329pjf.28.2022.04.20.06.25.17
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 20 Apr 2022 06:25:17 -0700 (PDT)
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>
+Subject: [PATCH 0/7] KVM: X86/MMU: Use one-off special shadow page for special roots
+Date:   Wed, 20 Apr 2022 21:25:58 +0800
+Message-Id: <20220420132605.3813-1-jiangshanlai@gmail.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: N15tDa8gHZtPnWoR-E3XoVQBWCf4a02g
-X-Proofpoint-ORIG-GUID: wrX6HMN0SUnpusW4M7c1dRW7XgatiOgq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-20_03,2022-04-20_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- mlxlogscore=951 adultscore=0 clxscore=1015 lowpriorityscore=0
- malwarescore=0 bulkscore=0 phishscore=0 suspectscore=0 priorityscore=1501
- mlxscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204200079
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 20 Apr 2022 14:05:00 +0200
-Heiko Carstens <hca@linux.ibm.com> wrote:
+From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-> > +static inline bool kvm_s390_topology_changed(struct kvm_vcpu *vcpu)
-> > +{
-> > +	if (!test_kvm_facility(vcpu->kvm, 11))
-> > +		return false;
-> > +
-> > +	/* A new vCPU has been hotplugged */
-> > +	if (vcpu->arch.prev_cpu == S390_KVM_TOPOLOGY_NEW_CPU)
-> > +		return true;
-> > +
-> > +	/* The real CPU backing up the vCPU moved to another socket */
-> > +	if (cpumask_test_cpu(vcpu->cpu,
-> > +			     topology_core_cpumask(vcpu->arch.prev_cpu)))
-> > +		return true;
-> > +
-> > +	return false;
-> > +}  
-> 
-> This seems to be wrong. I'd guess that you need
-> 
-> 	if (cpumask_test_cpu(vcpu->cpu,
-> 			     topology_core_cpumask(vcpu->arch.prev_cpu)))
-> -->		return false;
-> -->	return true;  
+Current code use mmu->pae_root, mmu->pml4_root, and mmu->pml5_root to
+setup special roots.  The initialization code is complex and the roots
+are not associated with struct kvm_mmu_page which causes the code more
+complex.
 
-so if the CPU moved to a different socket, it's not a change?
-and if nothing happened, it is a change?
+So add new special shadow pages to simplify it.
+
+The special shadow pages are associated with struct kvm_mmu_page and
+VCPU-local.
+
+The special shadow pages are created and freed when the roots are
+changed (or one-off) which can be optimized but not in the patchset
+since the re-creating is light way (in normal case only the struct
+kvm_mmu_page needs to be re-allocated and sp->spt doens't)
+
+Lai Jiangshan (7):
+  KVM: X86/MMU: Add using_special_root_page()
+  KVM: X86/MMU: Add special shadow pages
+  KVM: X86/MMU: Link PAE root pagetable with its children
+  KVM: X86/MMU: Activate special shadow pages and remove old logic
+  KVM: X86/MMU: Remove the check of the return value of to_shadow_page()
+  KVM: X86/MMU: Allocate mmu->pae_root for PAE paging on-demand
+  KVM: X86/MMU: Remove mmu_alloc_special_roots()
+
+ arch/x86/include/asm/kvm_host.h |   3 -
+ arch/x86/kvm/mmu/mmu.c          | 486 ++++++++++----------------------
+ arch/x86/kvm/mmu/mmu_internal.h |  10 -
+ arch/x86/kvm/mmu/paging_tmpl.h  |  15 +-
+ arch/x86/kvm/mmu/spte.c         |   7 +
+ arch/x86/kvm/mmu/spte.h         |   1 +
+ arch/x86/kvm/mmu/tdp_mmu.h      |   7 +-
+ 7 files changed, 179 insertions(+), 350 deletions(-)
+
+-- 
+2.19.1.6.gb485710b
+
