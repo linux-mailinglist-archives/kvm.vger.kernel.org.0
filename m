@@ -2,57 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5016508632
-	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 12:42:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6455450865E
+	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 12:51:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377686AbiDTKov (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Apr 2022 06:44:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41464 "EHLO
+        id S1377826AbiDTKyb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Apr 2022 06:54:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377778AbiDTKoq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Apr 2022 06:44:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5EF763FD92
-        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 03:42:01 -0700 (PDT)
+        with ESMTP id S1355729AbiDTKy3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Apr 2022 06:54:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 18A6C403C5
+        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 03:51:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650451320;
+        s=mimecast20190719; t=1650451903;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
         bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=Uvto2cniJprB4KPw5gMK5PkNn+/aXJ+JICWYOpNyfu1E7La6VPR3YMnMvwNTld8r/T4QGx
-        SeqnisRkS39Bsm+1vZPUdIVl64uUA8t9YVsfMXd2RXsgVWr/ZcbV4+JGCaxjiciYk3Oo2l
-        6SAn/hBEoBum4QtRc3dd4+zh1GnmoKs=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        b=ZOFQNp2gjrRwhYgoSSBk0CHzaakExbjQmsvic/wFaHAxcx3YNW8ddkKes44fHNfn13ADkj
+        Eysx5OqEqIxlZWD1v5fyOqnij/4bP63exn0KLYY8DvaVKhNivZixqMFyDLIyDmxCsFZmT7
+        OYNAxSQSpNQeZi4A9ZmLnOlipwlpNRA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-195--cl_FGM3O7mlrnHiNB7jkQ-1; Wed, 20 Apr 2022 06:41:56 -0400
-X-MC-Unique: -cl_FGM3O7mlrnHiNB7jkQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+ us-mta-610-fZR-POXDP5WGVTgfAt0lfQ-1; Wed, 20 Apr 2022 06:51:39 -0400
+X-MC-Unique: fZR-POXDP5WGVTgfAt0lfQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CC90F3806739;
-        Wed, 20 Apr 2022 10:41:55 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ABC9386B8A3;
+        Wed, 20 Apr 2022 10:51:38 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A64B1572334;
-        Wed, 20 Apr 2022 10:41:55 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ED5851410F39;
+        Wed, 20 Apr 2022 10:51:37 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Mingwei Zhang <mizhang@google.com>
-Subject: Re: [PATCH 0/2] KVM: Fix mmu_notifier vs. pfncache race
-Date:   Wed, 20 Apr 2022 06:41:38 -0400
-Message-Id: <20220420104137.1144281-1-pbonzini@redhat.com>
-In-Reply-To: <20220420004859.3298837-1-seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
+        Gaoning Pan <pgn@zju.edu.cn>, Yongkang Jia <kangel@zju.edu.cn>
+Subject: Re: [PATCH v2 0/4] KVM: x86: APICv fixes
+Date:   Wed, 20 Apr 2022 06:51:36 -0400
+Message-Id: <20220420105136.1144769-1-pbonzini@redhat.com>
+In-Reply-To: <20220420013732.3308816-1-seanjc@google.com>
 References: 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
