@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 03A07508F8D
-	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 20:36:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 460BD508F98
+	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 20:39:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381537AbiDTSio (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Apr 2022 14:38:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57260 "EHLO
+        id S1381544AbiDTSmf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Apr 2022 14:42:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346657AbiDTSin (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Apr 2022 14:38:43 -0400
+        with ESMTP id S1381545AbiDTSmd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Apr 2022 14:42:33 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B132322502
-        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 11:35:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0304724582
+        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 11:39:47 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 611A0B8215B
-        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 18:35:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFF9AC385A1;
-        Wed, 20 Apr 2022 18:35:52 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A21D8B81ED5
+        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 18:39:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A5E8C385A8;
+        Wed, 20 Apr 2022 18:39:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1650479752;
-        bh=u2r4w9p5uaRArdJXLzwYtVdEK/zUbS5atk2CBlOmQHk=;
+        s=k20201202; t=1650479984;
+        bh=kFh40/0OsXUs9qt4wAQZUHDG9XsPYO3525O2NBSzEZo=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=BL1pdHfwF5AkfaKZyaKrJJk9wXofzCPhiAzNX4vKoQDqn1G3YIPdXUfNKvj/gTg03
-         aNmI5bNkuLyBfLXrhPDcE07bQRkhl3y0HoTDNvjQ+cVY6hZmqvsp41dHMehnGArlmc
-         rMDxH8FpUDH0FuQHjAFeC0whl/38FhDffNrUX0oPJuwj0g6/v9P9C5/qoiN8C+SYax
-         1OFJBTPjWXUYhAupgH5ezm4jYBpgIUZjkj9F27O13bqdKZIswuGswq8zdN53KJhgO4
-         b6rIdR3sBqYtITFX/X3+VHrDxd2XlMwDZ29usiKCAOEoYYFecVRD9SPBLj80zrpf03
-         oTK5zMYopLgjA==
+        b=rsrZouD/zDJ5AdumErVBdLvJyNEZZXLPcOU+gZQ0kRd3CQ5+7SBpKXOQKoZrTBFFn
+         sqXDyxTDekKbEmMce/wwcaCWsywweGFS/dnyVHOq58LrC4I71AsyRv0ljIN8sE6UZJ
+         Wy4jF+QXEBJX+R9y8ki9m4PnEGUWEY8oOhMSKmwnY4ukEh4lQai//lzLh2s6OF6xe6
+         hcKW0wCzWU0xDfvMopbakD0EX72uVN+s/xH5r1pPoTkn1NmN85Y7k44k2VVRSnyMMi
+         pGq9RcTYyq5QPFvvjpEfAFJeQLKj8X0ASrWUHfdGB6C/G5rEwlcNsl72xdUoIvImg5
+         l3c69apWkk7Eg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1nhFB8-005hRS-6O; Wed, 20 Apr 2022 19:35:50 +0100
-Date:   Wed, 20 Apr 2022 19:35:49 +0100
-Message-ID: <87levza9h6.wl-maz@kernel.org>
+        id 1nhFEr-005hVQ-Te; Wed, 20 Apr 2022 19:39:42 +0100
+Date:   Wed, 20 Apr 2022 19:39:41 +0100
+Message-ID: <87k0bja9aq.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Catalin Marinas <catalin.marinas@arm.com>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
@@ -47,11 +47,11 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Joey Gouly <joey.gouly@arm.com>, kernel-team@android.com
-Subject: Re: [PATCH v2 10/10] arm64: Use WFxT for __delay() when possible
-In-Reply-To: <YmBGYLpaJJ3OZMQV@arm.com>
+Subject: Re: [PATCH v2 08/10] arm64: Add HWCAP advertising FEAT_WFXT
+In-Reply-To: <YmBClAXRSsiUDK/f@arm.com>
 References: <20220419182755.601427-1-maz@kernel.org>
-        <20220419182755.601427-11-maz@kernel.org>
-        <YmBGYLpaJJ3OZMQV@arm.com>
+        <20220419182755.601427-9-maz@kernel.org>
+        <YmBClAXRSsiUDK/f@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -70,60 +70,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 20 Apr 2022 18:44:00 +0100,
+On Wed, 20 Apr 2022 18:27:48 +0100,
 Catalin Marinas <catalin.marinas@arm.com> wrote:
 > 
-> On Tue, Apr 19, 2022 at 07:27:55PM +0100, Marc Zyngier wrote:
-> > Marginally optimise __delay() by using a WFIT/WFET sequence.
-> > It probably is a win if no interrupt fires during the delay.
+> On Tue, Apr 19, 2022 at 07:27:53PM +0100, Marc Zyngier wrote:
+> > In order to allow userspace to enjoy WFET, add a new HWCAP that
+> > advertises it when available.
 > > 
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/lib/delay.c | 12 +++++++++++-
-> >  1 file changed, 11 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/lib/delay.c b/arch/arm64/lib/delay.c
-> > index 1688af0a4c97..5b7890139bc2 100644
-> > --- a/arch/arm64/lib/delay.c
-> > +++ b/arch/arm64/lib/delay.c
-> > @@ -27,7 +27,17 @@ void __delay(unsigned long cycles)
-> >  {
-> >  	cycles_t start = get_cycles();
-> >  
-> > -	if (arch_timer_evtstrm_available()) {
-> > +	if (cpus_have_const_cap(ARM64_HAS_WFXT)) {
-> > +		u64 end = start + cycles;
-> > +
-> > +		/*
-> > +		 * Start with WFIT. If an interrupt makes us resume
-> > +		 * early, use a WFET loop to complete the delay.
-> > +		 */
-> > +		wfit(end);
-> > +		while ((get_cycles() - start) < cycles)
-> > +			wfet(end);
-> 
-> Do you use WFET here as a pending interrupt would cause WFIT to complete
-> immediately?
-
-Yes, that's the idea. Even if a pending interrupt is not immediately
-present, it could come halfway through, shortening the delay, and
-making WFIT useless until the interrupt is acknowledged.
-
-I would have loved for WFIT to return a status indicating whether the
-wakeup was for a pending interrupt or for another reason (such as
-reaching the timeout), but apparently it was too much to ask... Maybe
-in ARMv11!  ;-)
-
-> 
-> > +	} else 	if (arch_timer_evtstrm_available()) {
-> 
-> Nit: two spaces between else and if ;).
-
-I'll make sure to fix this! ;-)
-
 > 
 > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 > 
+> I assume this series will go in via the kvm tree? Could we have the
+> HWCAP changes at the beginning, I'm sure they'll conflict with other
+> series (I plan to queue the SME patches).
+
+No problem, I can rejig the series to fit that plan. I'll push
+something tomorrow.
 
 Thanks,
 
