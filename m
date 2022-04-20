@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C35F5088F3
-	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 15:11:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AFFA25088F5
+	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 15:11:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376471AbiDTNOK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Apr 2022 09:14:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53672 "EHLO
+        id S1378835AbiDTNO1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Apr 2022 09:14:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235000AbiDTNOJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Apr 2022 09:14:09 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09FE43D1E1;
-        Wed, 20 Apr 2022 06:11:22 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id s14so1726089plk.8;
-        Wed, 20 Apr 2022 06:11:22 -0700 (PDT)
+        with ESMTP id S235000AbiDTNOX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Apr 2022 09:14:23 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 648B942A0A;
+        Wed, 20 Apr 2022 06:11:28 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id md20-20020a17090b23d400b001cb70ef790dso4901465pjb.5;
+        Wed, 20 Apr 2022 06:11:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=2C18i9mk0AxmdYsk78ordW23WD/zuKFKPHlUE7fZPyo=;
-        b=WD6f7zl5bfuQMvqTkd7lGqrYDhWxkwK5FurI28K5hrO3bAL3d4R+mAnaEzcSRXYpfl
-         Vv0UkkW3Q6ztlZQO/N2koOPS7tp5Sdy1jSIEzLUkLu8ot3UCauPD20DBidyBMVMHxrjY
-         5YJr6fLD01AyVDEjOYMHiSSY66mjiZrHVPS3yljnwwlXt7eQ+smIrcl7+siKWq841E3i
-         iZb3fQTwXnUdp6Ywv3qHpuXhP6MI/uOGyA8ZjrgW9woV9+h+/iGOaRsJn0m+Z4P7qU8c
-         VlKOBoXq3ATqSaO2Av9+CSmfQxHAUJ7zQLMk4rqZYB7OaYE51PbLzrYkZm5RtIMXVydA
-         sCpQ==
+        bh=mWNorpTVTS8YkgukxxtTFjnF+otEpg4XNgwVUHpZnIQ=;
+        b=jj9A5Cyr874v3eIGy0ew2ad/5LfmJKMdu135QHTykt4YCKFEy0TWjxYdTejZso8y82
+         dDqAS+/8N+GIHN169rU+B689RGLl6EgNyCnrGTSpfGAw2V8eB3Yfqw5jBd8wYk8/FUA5
+         xwJbr0OwEEQhVkbTN/bo55HSk6SGS0e8s6wXQxfDhWLQRAZA/9+k1OWdmT7lGAEreqhJ
+         8Tg+UC71kewIwzZ8GSzXgzh/TraoW02d910vwan1oyZJqd9y3epvrW6aK3k21CytHhfL
+         x8F/3NRj3lccxZxSyRJBvT/b6lBTlDjcLeI0LzvxUD7bI8ScP2FT2BiPs4wqBR4kWJh4
+         Thng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=2C18i9mk0AxmdYsk78ordW23WD/zuKFKPHlUE7fZPyo=;
-        b=ygxNSLojoOVUJsftKQMeyaJc/2hBEwe9JezO4if0Wvt8lGpc615TijiQQXeLQR+kVg
-         XCoy4WVikiZA1wPhQXg9wssG6tM76wqma4xcqL41sEhDSSeb9hPr94G7B9fHgOoKLuWK
-         CmcGAeZTQ5UbeIHaX5urT3CiI0gjNdpiH0iMKJMJ0vd36oh/QRXI+2zhsLMvfexkUDPO
-         sNQpiUQlMJD2pwAg7HZGo+CQzIYWXRkmnOQ1F6z15/3jG3DNq1gJh+B++Vt24xaMgYe2
-         mVDjBquzl5pAkcw0HfVad6g6VlxMajI4un4FEo1dm99V1nQm0m6chNPUMW2X9E3hMu28
-         RF2Q==
-X-Gm-Message-State: AOAM531SVG5jxUVmezmzX26JxkoU+bMSCDcLYNh70Sn1Ikfd+yPV39A3
-        0Is/gE2jFSc0hunbG0LGF9HKrU/oMxk=
-X-Google-Smtp-Source: ABdhPJztmDRLIWjd/9493LpkAI13JE3NTwegVBUXFfFHlEble9ySj3WpWUcF08Rbg0ejNDZwpCGqvA==
-X-Received: by 2002:a17:90b:4b07:b0:1d1:8a08:5096 with SMTP id lx7-20020a17090b4b0700b001d18a085096mr4321458pjb.91.1650460281335;
-        Wed, 20 Apr 2022 06:11:21 -0700 (PDT)
+        bh=mWNorpTVTS8YkgukxxtTFjnF+otEpg4XNgwVUHpZnIQ=;
+        b=OYKBy7Yc7ff+m4DQ1oPPvGTLW4R2Gej8BN/Rj7cFEvLwlENFtpWXk5KFkZGo5Jo1Hv
+         HhZuWtIA1qrotwICjBOzhFpxb870Z2hk7TF/wrwSFrayIrMsZdHMrippdFqWwPHsWm+g
+         p69YMFagf6PyhMkRYdNCrNzdn8cUc0NF/bNEMW1JeWes5N3JUZv/dTJjbqzjZdzE04UD
+         CugDt5odI831Vd8jRIdr6AhbYL/+NvhnG7isS1oMYnn1DObbq+GhUPP0+CTook25gxp3
+         uyHHW1FvBJXvSxZVqppanZazymGTDP6Sef77lC28MVmkl/193VPdjQF4IfdFlCMVf+Iz
+         f15w==
+X-Gm-Message-State: AOAM533E1PfEW1OsFuzkc8isba1qk9RKNK79ObS0rPZlES/r3HA8x4fO
+        8u/ft7KBW5oLJFgGmP+GTrlRYK3Enbg=
+X-Google-Smtp-Source: ABdhPJy1Bwddw+H4T+PkoT9mTXN79JdHLJy9h4FOaLbu6y5LW6r9REHfASht15WV4yo9Cc0p1Z352w==
+X-Received: by 2002:a17:90a:6501:b0:1ca:a7df:695c with SMTP id i1-20020a17090a650100b001caa7df695cmr4467780pjj.152.1650460287648;
+        Wed, 20 Apr 2022 06:11:27 -0700 (PDT)
 Received: from localhost ([47.251.4.198])
-        by smtp.gmail.com with ESMTPSA id s190-20020a625ec7000000b005061c17c111sm20299959pfb.71.2022.04.20.06.11.20
+        by smtp.gmail.com with ESMTPSA id m13-20020a62a20d000000b004fe0ce6d7a1sm20353148pff.193.2022.04.20.06.11.26
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 20 Apr 2022 06:11:21 -0700 (PDT)
+        Wed, 20 Apr 2022 06:11:27 -0700 (PDT)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
 Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        Jonathan Corbet <corbet@lwn.net>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -59,10 +60,10 @@ Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH 1/2] KVM: X86/MMU: Add sp_has_gptes()
-Date:   Wed, 20 Apr 2022 21:12:03 +0800
-Message-Id: <20220420131204.2850-2-jiangshanlai@gmail.com>
+        "H. Peter Anvin" <hpa@zytor.com>, linux-doc@vger.kernel.org
+Subject: [PATCH 2/2] KVM: X86/MMU: Introduce role.passthrough for shadowing 5-level NPT for 4-level NPT L1 guest
+Date:   Wed, 20 Apr 2022 21:12:04 +0800
+Message-Id: <20220420131204.2850-3-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20220420131204.2850-1-jiangshanlai@gmail.com>
 References: <20220420131204.2850-1-jiangshanlai@gmail.com>
@@ -80,94 +81,154 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-Add sp_has_gptes() which equals to !sp->role.direct currently.
+When shadowing 5-level NPT for 4-level NPT L1 guest, the root_sp is
+allocated with role.level = 5 and the guest pagetable's root gfn.
 
-Shadow page having gptes needs to be write-protected, accounted and
-responded to kvm_mmu_pte_write().
+And root_sp->spt[0] is also allocated with the same gfn and the same
+role except role.level = 4.  Luckily that they are different shadow
+pages, but only root_sp->spt[0] is the real translation of the guest
+pagetable.
 
-Use it in these places to replace !sp->role.direct and rename
-for_each_gfn_indirect_valid_sp.
+Here comes a problem:
+
+If the guest switches from gCR4_LA57=0 to gCR4_LA57=1 (or vice verse)
+and uses the same gfn as the root page for nested NPT before and after
+switching gCR4_LA57.  The host (hCR4_LA57=1) might use the same root_sp
+for the guest even the guest switches gCR4_LA57.  The guest will see
+unexpected page mapped and L2 may exploit the bug and hurt L1.  It is
+lucky that the problem can't hurt L0.
+
+And three special cases need to be handled:
+
+The root_sp should be like role.direct=1 sometimes: its contents are
+not backed by gptes, root_sp->gfns is meaningless.  (For a normal high
+level sp in shadow paging, sp->gfns is often unused and kept zero, but
+it could be relevant and meaningful if sp->gfns is used because they
+are backed by concrete gptes.)
+
+For such root_sp in the case, root_sp is just a portal to contribute
+root_sp->spt[0], and root_sp->gfns should not be used and
+root_sp->spt[0] should not be dropped if gpte[0] of the guest root
+pagetable is changed.
+
+Such root_sp should not be accounted too.
+
+So add role.passthrough to distinguish the shadow pages in the hash
+when gCR4_LA57 is toggled and fix above special cases by using it in
+kvm_mmu_page_{get|set}_gfn() and sp_has_gptes().
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+ Documentation/virt/kvm/mmu.rst  |  3 +++
+ arch/x86/include/asm/kvm_host.h |  5 +++--
+ arch/x86/kvm/mmu/mmu.c          | 16 ++++++++++++++++
+ arch/x86/kvm/mmu/paging_tmpl.h  |  1 +
+ 4 files changed, 23 insertions(+), 2 deletions(-)
 
+diff --git a/Documentation/virt/kvm/mmu.rst b/Documentation/virt/kvm/mmu.rst
+index 5b1ebad24c77..4018b9d7a0d3 100644
+--- a/Documentation/virt/kvm/mmu.rst
++++ b/Documentation/virt/kvm/mmu.rst
+@@ -202,6 +202,9 @@ Shadow pages contain the following information:
+     Is 1 if the MMU instance cannot use A/D bits.  EPT did not have A/D
+     bits before Haswell; shadow EPT page tables also cannot use A/D bits
+     if the L1 hypervisor does not enable them.
++  role.passthrough:
++    Is 1 if role.level = 5 when shadowing 5-level shadow NPT for
++    4-level NPT L1.
+   gfn:
+     Either the guest page table containing the translations shadowed by this
+     page, or the base page frame for linear translations.  See role.direct.
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 9694dd5e6ccc..d4f8f4784d87 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -285,7 +285,7 @@ struct kvm_kernel_irq_routing_entry;
+  * minimize the size of kvm_memory_slot.arch.gfn_track, i.e. allows allocating
+  * 2 bytes per gfn instead of 4 bytes per gfn.
+  *
+- * Indirect upper-level shadow pages are tracked for write-protection via
++ * Upper-level shadow pages having gptes are tracked for write-protection via
+  * gfn_track.  As above, gfn_track is a 16 bit counter, so KVM must not create
+  * more than 2^16-1 upper-level shadow pages at a single gfn, otherwise
+  * gfn_track will overflow and explosions will ensure.
+@@ -331,7 +331,8 @@ union kvm_mmu_page_role {
+ 		unsigned smap_andnot_wp:1;
+ 		unsigned ad_disabled:1;
+ 		unsigned guest_mode:1;
+-		unsigned :6;
++		unsigned passthrough:1;
++		unsigned :5;
+ 
+ 		/*
+ 		 * This is left at the top of the word so that
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 1361eb4599b4..1bdff55218ef 100644
+index 1bdff55218ef..d14cb6f99cb1 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1856,15 +1856,23 @@ static bool kvm_mmu_prepare_zap_page(struct kvm *kvm, struct kvm_mmu_page *sp,
- static void kvm_mmu_commit_zap_page(struct kvm *kvm,
- 				    struct list_head *invalid_list);
+@@ -737,6 +737,9 @@ static void mmu_free_pte_list_desc(struct pte_list_desc *pte_list_desc)
  
-+static bool sp_has_gptes(struct kvm_mmu_page *sp)
-+{
-+	if (sp->role.direct)
+ static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
+ {
++	if (sp->role.passthrough)
++		return sp->gfn;
++
+ 	if (!sp->role.direct)
+ 		return sp->gfns[index];
+ 
+@@ -745,6 +748,11 @@ static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
+ 
+ static void kvm_mmu_page_set_gfn(struct kvm_mmu_page *sp, int index, gfn_t gfn)
+ {
++	if (sp->role.passthrough) {
++		WARN_ON_ONCE(gfn != sp->gfn);
++		return;
++	}
++
+ 	if (!sp->role.direct) {
+ 		sp->gfns[index] = gfn;
+ 		return;
+@@ -1861,6 +1869,9 @@ static bool sp_has_gptes(struct kvm_mmu_page *sp)
+ 	if (sp->role.direct)
+ 		return false;
+ 
++	if (sp->role.passthrough)
 +		return false;
 +
-+	return true;
-+}
-+
- #define for_each_valid_sp(_kvm, _sp, _list)				\
- 	hlist_for_each_entry(_sp, _list, hash_link)			\
- 		if (is_obsolete_sp((_kvm), (_sp))) {			\
- 		} else
+ 	return true;
+ }
  
--#define for_each_gfn_indirect_valid_sp(_kvm, _sp, _gfn)			\
-+#define for_each_gfn_valid_sp_has_gptes(_kvm, _sp, _gfn)		\
- 	for_each_valid_sp(_kvm, _sp,					\
- 	  &(_kvm)->arch.mmu_page_hash[kvm_page_table_hashfn(_gfn)])	\
--		if ((_sp)->gfn != (_gfn) || (_sp)->role.direct) {} else
-+		if ((_sp)->gfn != (_gfn) || !sp_has_gptes(_sp)) {} else
+@@ -2059,6 +2070,8 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 		quadrant &= (1 << ((PT32_PT_BITS - PT64_PT_BITS) * level)) - 1;
+ 		role.quadrant = quadrant;
+ 	}
++	if (level <= vcpu->arch.mmu->root_level)
++		role.passthrough = 0;
  
- static bool kvm_sync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 			 struct list_head *invalid_list)
-@@ -2112,7 +2120,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
- 	sp->gfn = gfn;
- 	sp->role = role;
- 	hlist_add_head(&sp->hash_link, sp_list);
--	if (!direct) {
-+	if (sp_has_gptes(sp)) {
- 		account_shadowed(vcpu->kvm, sp);
- 		if (level == PG_LEVEL_4K && kvm_vcpu_write_protect_gfn(vcpu, gfn))
- 			kvm_flush_remote_tlbs_with_address(vcpu->kvm, gfn, 1);
-@@ -2321,7 +2329,7 @@ static bool __kvm_mmu_prepare_zap_page(struct kvm *kvm,
- 	/* Zapping children means active_mmu_pages has become unstable. */
- 	list_unstable = *nr_zapped;
+ 	sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
+ 	for_each_valid_sp(vcpu->kvm, sp, sp_list) {
+@@ -4890,6 +4903,9 @@ kvm_calc_shadow_npt_root_page_role(struct kvm_vcpu *vcpu,
  
--	if (!sp->role.invalid && !sp->role.direct)
-+	if (!sp->role.invalid && sp_has_gptes(sp))
- 		unaccount_shadowed(kvm, sp);
+ 	role.base.direct = false;
+ 	role.base.level = kvm_mmu_get_tdp_level(vcpu);
++	if (role.base.level == PT64_ROOT_5LEVEL &&
++	    role_regs_to_root_level(regs) == PT64_ROOT_4LEVEL)
++		role.base.passthrough = 1;
  
- 	if (sp->unsync)
-@@ -2501,7 +2509,7 @@ int kvm_mmu_unprotect_page(struct kvm *kvm, gfn_t gfn)
- 	pgprintk("%s: looking for gfn %llx\n", __func__, gfn);
- 	r = 0;
- 	write_lock(&kvm->mmu_lock);
--	for_each_gfn_indirect_valid_sp(kvm, sp, gfn) {
-+	for_each_gfn_valid_sp_has_gptes(kvm, sp, gfn) {
- 		pgprintk("%s: gfn %llx role %x\n", __func__, gfn,
- 			 sp->role.word);
- 		r = 1;
-@@ -2563,7 +2571,7 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
- 	 * that case, KVM must complete emulation of the guest TLB flush before
- 	 * allowing shadow pages to become unsync (writable by the guest).
- 	 */
--	for_each_gfn_indirect_valid_sp(kvm, sp, gfn) {
-+	for_each_gfn_valid_sp_has_gptes(kvm, sp, gfn) {
- 		if (!can_unsync)
- 			return -EPERM;
+ 	return role;
+ }
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 8621188b46df..c1b975fb85a2 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -1042,6 +1042,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+ 		.level = 0xf,
+ 		.access = 0x7,
+ 		.quadrant = 0x3,
++		.passthrough = 0x1,
+ 	};
  
-@@ -5311,7 +5319,7 @@ static void kvm_mmu_pte_write(struct kvm_vcpu *vcpu, gpa_t gpa,
- 
- 	++vcpu->kvm->stat.mmu_pte_write;
- 
--	for_each_gfn_indirect_valid_sp(vcpu->kvm, sp, gfn) {
-+	for_each_gfn_valid_sp_has_gptes(vcpu->kvm, sp, gfn) {
- 		if (detect_write_misaligned(sp, gpa, bytes) ||
- 		      detect_write_flooding(sp)) {
- 			kvm_mmu_prepare_zap_page(vcpu->kvm, sp, &invalid_list);
+ 	/*
 -- 
 2.19.1.6.gb485710b
 
