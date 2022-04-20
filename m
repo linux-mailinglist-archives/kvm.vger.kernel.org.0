@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 460BD508F98
-	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 20:39:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B548508FCC
+	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 20:50:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381544AbiDTSmf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Apr 2022 14:42:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58344 "EHLO
+        id S1358721AbiDTSxV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Apr 2022 14:53:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381545AbiDTSmd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Apr 2022 14:42:33 -0400
+        with ESMTP id S244792AbiDTSxU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Apr 2022 14:53:20 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0304724582
-        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 11:39:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8698B43AC4
+        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 11:50:33 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A21D8B81ED5
-        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 18:39:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A5E8C385A8;
-        Wed, 20 Apr 2022 18:39:44 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 33B1DB82148
+        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 18:50:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B08FDC385A0;
+        Wed, 20 Apr 2022 18:50:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1650479984;
-        bh=kFh40/0OsXUs9qt4wAQZUHDG9XsPYO3525O2NBSzEZo=;
+        s=k20201202; t=1650480630;
+        bh=TtpYHAojBKeFkFtzR8GvyFddahkz6NTMC2Tu1YaWfEc=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=rsrZouD/zDJ5AdumErVBdLvJyNEZZXLPcOU+gZQ0kRd3CQ5+7SBpKXOQKoZrTBFFn
-         sqXDyxTDekKbEmMce/wwcaCWsywweGFS/dnyVHOq58LrC4I71AsyRv0ljIN8sE6UZJ
-         Wy4jF+QXEBJX+R9y8ki9m4PnEGUWEY8oOhMSKmwnY4ukEh4lQai//lzLh2s6OF6xe6
-         hcKW0wCzWU0xDfvMopbakD0EX72uVN+s/xH5r1pPoTkn1NmN85Y7k44k2VVRSnyMMi
-         pGq9RcTYyq5QPFvvjpEfAFJeQLKj8X0ASrWUHfdGB6C/G5rEwlcNsl72xdUoIvImg5
-         l3c69apWkk7Eg==
+        b=KXNNu8UMbtulTxejPpUKkAbRITmuRqN5XhQAMhPdb4UZvhS3Q6ohduM35eWAf6DaG
+         6m3esYRyAT2ZvvWyOGSverrpS7o5XSscZgK914A348XuJHwxEIb2d6t1rRHc+23fKx
+         nLWP+8kSDqH/C/WYjaljQBtfPGp7S/VsQlrtXoe2FFUfE4pSp12NrVNzlC+yC/eAEF
+         7yEBLDTnFMpgjI2r4AVm+htUubzXRUGtNjC4X+ljhAZdSblVukmanvG0XXyWduWO8k
+         gVWgYgYlREVbK1WFHApeoJhSwA0axqaW2yBtDrVQEIjzX7UIQpXlGpsJN6DRt4ffj5
+         d+qhujr3KSC0Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1nhFEr-005hVQ-Te; Wed, 20 Apr 2022 19:39:42 +0100
-Date:   Wed, 20 Apr 2022 19:39:41 +0100
-Message-ID: <87k0bja9aq.wl-maz@kernel.org>
+        id 1nhFPI-005hdC-7b; Wed, 20 Apr 2022 19:50:28 +0100
+Date:   Wed, 20 Apr 2022 19:50:27 +0100
+Message-ID: <87ilr3a8ss.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Catalin Marinas <catalin.marinas@arm.com>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
@@ -47,11 +47,10 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Joey Gouly <joey.gouly@arm.com>, kernel-team@android.com
-Subject: Re: [PATCH v2 08/10] arm64: Add HWCAP advertising FEAT_WFXT
-In-Reply-To: <YmBClAXRSsiUDK/f@arm.com>
+Subject: Re: [PATCH v2 00/10] arm64: Add initial support for FEAT_WFxT
+In-Reply-To: <YmBBz8yKPAWSHAJo@arm.com>
 References: <20220419182755.601427-1-maz@kernel.org>
-        <20220419182755.601427-9-maz@kernel.org>
-        <YmBClAXRSsiUDK/f@arm.com>
+        <YmBBz8yKPAWSHAJo@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -70,25 +69,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 20 Apr 2022 18:27:48 +0100,
+On Wed, 20 Apr 2022 18:24:31 +0100,
 Catalin Marinas <catalin.marinas@arm.com> wrote:
 > 
-> On Tue, Apr 19, 2022 at 07:27:53PM +0100, Marc Zyngier wrote:
-> > In order to allow userspace to enjoy WFET, add a new HWCAP that
-> > advertises it when available.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> On Tue, Apr 19, 2022 at 07:27:45PM +0100, Marc Zyngier wrote:
+> > A potential addition to this series would be to remove the event
+> > generation from the counters, and rely on the timeout where it
+> > matters (spinlocks?). Feedback welcome.
 > 
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> 
-> I assume this series will go in via the kvm tree? Could we have the
-> HWCAP changes at the beginning, I'm sure they'll conflict with other
-> series (I plan to queue the SME patches).
+> I think we still need to keep the event generation around, at least for
+> hardware bugs we don't know about. I don't think user-space rely on it
+> though, people tend to come up with weird delays like isb ;). But yes,
+> the WFET should be handy when it turns up in hardware.
 
-No problem, I can rejig the series to fit that plan. I'll push
-something tomorrow.
+My hope was that the trick of using the event generation to work
+around systems failing to broadcast events could become a thing of the
+past when WFET is present in the HW. After all, they serve the same
+purpose (generate a local event to un-wedge the CPU).
 
-Thanks,
+But the more I look at it, the more I hate the potential solution. One
+of the issues is that WFxT takes an absolute deadline, rather than a
+relative one. So you end up with things like:
+
+	ISB
+	MRS	x0, CNTVCT_EL0
+	ADD	x0, x0, #some_small_value
+	WFET	x0
+
+which is really heavy handed for the slow path of an atomic operation.
+Even if you have ECV and CNTVCTSS_EL0 (which allows you to get rid of
+the ISB), it is a royal pain.
+
+It would be much better if there was a *relative* version of WFET that
+would directly take a timeout relative to the current virtual count,
+but I can sense HW designers calling me names already, so I'll shut
+up.
 
 	M.
 
