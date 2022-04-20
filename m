@@ -2,88 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C5B61507CB5
-	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 00:44:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B8EC507D9C
+	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 02:27:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358276AbiDSWqz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Apr 2022 18:46:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41700 "EHLO
+        id S1347935AbiDTAaj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Apr 2022 20:30:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347902AbiDSWqw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Apr 2022 18:46:52 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6715C3055E
-        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 15:44:08 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id bo5so166899pfb.4
-        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 15:44:08 -0700 (PDT)
+        with ESMTP id S231793AbiDTAai (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Apr 2022 20:30:38 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61A1E338AF
+        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 17:27:53 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id h14-20020a63530e000000b0039daafb0a84so20673pgb.7
+        for <kvm@vger.kernel.org>; Tue, 19 Apr 2022 17:27:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VLhwP2K5wAQdNCL/I+laKlmhhmXTIYpsE+P3ZBVdEQY=;
-        b=r6feRZnKvLFz70LElt69P5H+fCR2FPIhGGDf/HEN3FRecAYZ9XCe48UHMGy+CySLim
-         Nf5DSsTsuheV1j+T6ia1xrZDpsTF3FTPXu+PVf45W3eRaPm0iYir4XnaqNkn/g+rZCO2
-         +mve4Z0JSADruCniouTjwzcvVDbH3e2O3juiT4JkLMIr7ZXwKFqeJlsDlQ8PoQ143YKV
-         4mXbdBPsHAvnmaRpFABAN6Fu2TxYwMuj7lx3m1l+FUNKtOImv1EuD09eyGgiiWGIIwwL
-         LNoj8AvJNwOZZPiT6ZBr88Y7Sec+d18PBB4ep9ryJg1nLwP6Jf9EVG8Bvth2Y321pPhZ
-         R+rg==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=JVVQnl/KYP++X9fCgwSWz3X+dYjBYA16WR3/C3IIdtI=;
+        b=WPRu2kU0u+hfUVClXeD6/hdwDt9tvMKj7XG+L0pw/m7FKIKxVvsaG2Wv6VXMMC/qAy
+         WC3E/tf23b0jUpr57KGiFmxG5q9ov88HzZjqejfc32g2OJSfcAfhye2W69i7ohQAji9c
+         v7A0fWaG8b+hUC6iN3EXw45zZwB2Xr9yaZzmHBeq0UHdmXrS/8DvFPu5mpcZQFbFXbdh
+         9fr3nu+SSY53Kxya/K60dDdpFVVO/eUwQtfW9cEgs5nmZEyBYCrHfUuNX1JLRjXjaRwY
+         /A52ZqxyiYI93b7U9oe7B+1mTWoN9ghBOXbT3DVJAuvwjwJDrNc7BTEDLYba45mLEOvY
+         yGfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VLhwP2K5wAQdNCL/I+laKlmhhmXTIYpsE+P3ZBVdEQY=;
-        b=jUAmTnLtbwTlmQPb4egP0ev7Sx5LqCkTNz1FGHV/nenwUCFpU3vi1sc3fRSzvJVwbR
-         +6S8PjvB3wBoAjG0d7g7q8NdMICk7YGYuaDrPow4zFHpiUV6kS81uRrm4mw2bhMeLIUv
-         gzGS9pDhuWlnRJDiOC6li4NL385vcWjaiNSW0xffF/nEeUDb06wiAozqngFPupR6NSz5
-         hDcmBDRxEhnWk7u3Ct5MmKyQp7VsvIchFzcdck4ZSC4td59gVgz45IyCWRazQdhcwn7y
-         YlY4GQxYeyhHR9+cLZ4v66Xuc//VKnUwlgw4/rNBDgAGJx8y4uVn+rr1jnTTO8V1pfkj
-         jz2Q==
-X-Gm-Message-State: AOAM5316fVaDKVsEiVpSmwS4NlB7GdguIvPOKS3CHaiLz2AFDIXyyO9i
-        L3EUGhyInc8tokGNsDzh/WadZdwGuhX1kpS5bzVN3A==
-X-Google-Smtp-Source: ABdhPJy1nh6THruK7UwMlM2wpxzbJNt+bc4+NMZX+nwIAjwmQ/JmNyUx85odCJYd4rFIN0fRrs6lthI6/1JylF8mddI=
-X-Received: by 2002:a65:56cb:0:b0:378:82ed:d74 with SMTP id
- w11-20020a6556cb000000b0037882ed0d74mr16683302pgs.491.1650408247642; Tue, 19
- Apr 2022 15:44:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com> <20220310140911.50924-12-chao.p.peng@linux.intel.com>
-In-Reply-To: <20220310140911.50924-12-chao.p.peng@linux.intel.com>
-From:   Vishal Annapurve <vannapurve@google.com>
-Date:   Tue, 19 Apr 2022 15:43:56 -0700
-Message-ID: <CAGtprH-qTB2sehidF7xkSvR3X4D5cUOLpMBXf4mhTEh0BUR-mQ@mail.gmail.com>
-Subject: Re: [PATCH v5 11/13] KVM: Zap existing KVM mappings when pages
- changed in the private fd
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=JVVQnl/KYP++X9fCgwSWz3X+dYjBYA16WR3/C3IIdtI=;
+        b=eGg+po3lwHUPHuog5h7iHrHu0QszZjyJA8aEixmX+hHf3I76Edjeq4MLi0a3fxnfXk
+         zmbe0OKkAMrC9wLKEE5hsR6EeulrutzOzX+MCBiN/YZrI0wCYKgJu/sn8Llmjt1GNQrX
+         jmOifc/83E9O/oNoNSU7l5d01HsznpvCFQXTd8L45oA76xDi5PGGrTq2DOpTRZbDtJvx
+         OeLBZkU2CdLlIpVkdpEvPi9mPXuO02jGLtcaWHzQOBQc+xzphCk94dGTPB8Hfere+coz
+         Y1pijfBodiQVefPv7UNzcYqLCHu06eMlx4IuU+XN6zwe6518zebtW0+KzBKtSxfxPPQv
+         CusQ==
+X-Gm-Message-State: AOAM532WXh5W9UQ7g1ZnYQQIAw6AbwaF0lb3nkNe8BlhNKr6Z/FYkYoi
+        pI/thZYyHM1jpId5h1x5chWJjoLY9D4=
+X-Google-Smtp-Source: ABdhPJx5ytIMuPqXDzt5hExFtmr+teWqieLJnqBP1OGfF+HF2diufwCXow16yqBg0nqfSEJemIHGUwk8vuM=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:1e45:b0:1d2:3ef6:18d9 with SMTP id
+ pi5-20020a17090b1e4500b001d23ef618d9mr1345549pjb.221.1650414472927; Tue, 19
+ Apr 2022 17:27:52 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed, 20 Apr 2022 00:27:47 +0000
+Message-Id: <20220420002747.3287931-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.rc0.470.gd361397f0d-goog
+Subject: [PATCH] KVM: x86/mmu: Use enable_mmio_caching to track if MMIO
+ caching is enabled
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jun Nakajima <jun.nakajima@intel.com>, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Kai Huang <kai.huang@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,113 +72,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 10, 2022 at 6:11 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
->
-> KVM gets notified when memory pages changed in the memory backing store.
-> When userspace allocates the memory with fallocate() or frees memory
-> with fallocate(FALLOC_FL_PUNCH_HOLE), memory backing store calls into
-> KVM fallocate/invalidate callbacks respectively. To ensure KVM never
-> maps both the private and shared variants of a GPA into the guest, in
-> the fallocate callback, we should zap the existing shared mapping and
-> in the invalidate callback we should zap the existing private mapping.
->
-> In the callbacks, KVM firstly converts the offset range into the
-> gfn_range and then calls existing kvm_unmap_gfn_range() which will zap
-> the shared or private mapping. Both callbacks pass in a memslot
-> reference but we need 'kvm' so add a reference in memslot structure.
->
-> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> ---
->  include/linux/kvm_host.h |  3 ++-
->  virt/kvm/kvm_main.c      | 36 ++++++++++++++++++++++++++++++++++++
->  2 files changed, 38 insertions(+), 1 deletion(-)
->
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 9b175aeca63f..186b9b981a65 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -236,7 +236,7 @@ bool kvm_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu);
->  #endif
->
-> -#ifdef KVM_ARCH_WANT_MMU_NOTIFIER
-> +#if defined(KVM_ARCH_WANT_MMU_NOTIFIER) || defined(CONFIG_MEMFILE_NOTIFIER)
->  struct kvm_gfn_range {
->         struct kvm_memory_slot *slot;
->         gfn_t start;
-> @@ -568,6 +568,7 @@ struct kvm_memory_slot {
->         loff_t private_offset;
->         struct memfile_pfn_ops *pfn_ops;
->         struct memfile_notifier notifier;
-> +       struct kvm *kvm;
->  };
->
->  static inline bool kvm_slot_is_private(const struct kvm_memory_slot *slot)
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 67349421eae3..52319f49d58a 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -841,8 +841,43 @@ static int kvm_init_mmu_notifier(struct kvm *kvm)
->  #endif /* CONFIG_MMU_NOTIFIER && KVM_ARCH_WANT_MMU_NOTIFIER */
->
->  #ifdef CONFIG_MEMFILE_NOTIFIER
-> +static void kvm_memfile_notifier_handler(struct memfile_notifier *notifier,
-> +                                        pgoff_t start, pgoff_t end)
-> +{
-> +       int idx;
-> +       struct kvm_memory_slot *slot = container_of(notifier,
-> +                                                   struct kvm_memory_slot,
-> +                                                   notifier);
-> +       struct kvm_gfn_range gfn_range = {
-> +               .slot           = slot,
-> +               .start          = start - (slot->private_offset >> PAGE_SHIFT),
-> +               .end            = end - (slot->private_offset >> PAGE_SHIFT),
-> +               .may_block      = true,
-> +       };
-> +       struct kvm *kvm = slot->kvm;
-> +
-> +       gfn_range.start = max(gfn_range.start, slot->base_gfn);
+Clear enable_mmio_caching if hardware can't support MMIO caching and use
+the dedicated flag to detect if MMIO caching is enabled instead of
+assuming shadow_mmio_value==0 means MMIO caching is disabled.  TDX will
+use a zero value even when caching is enabled, and is_mmio_spte() isn't
+so hot that it needs to avoid an extra memory access, i.e. there's no
+reason to be super clever.  And the clever approach may not even be more
+performant, e.g. gcc-11 lands the extra check on a non-zero value inline,
+but puts the enable_mmio_caching out-of-line, i.e. avoids the few extra
+uops for non-MMIO SPTEs.
 
-gfn_range.start seems to be page offset within the file. Should this rather be:
-gfn_range.start = slot->base_gfn + min(gfn_range.start, slot->npages);
+Cc: Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: Kai Huang <kai.huang@intel.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c  | 2 +-
+ arch/x86/kvm/mmu/spte.c | 5 ++++-
+ arch/x86/kvm/mmu/spte.h | 4 +++-
+ 3 files changed, 8 insertions(+), 3 deletions(-)
 
-> +       gfn_range.end = min(gfn_range.end, slot->base_gfn + slot->npages);
-> +
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 69a30d6d1e2b..01bbe7744342 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2991,7 +2991,7 @@ static bool handle_abnormal_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
+ 		 * touching the shadow page tables as attempting to install an
+ 		 * MMIO SPTE will just be an expensive nop.
+ 		 */
+-		if (unlikely(!shadow_mmio_value)) {
++		if (unlikely(!enable_mmio_caching)) {
+ 			*ret_val = RET_PF_EMULATE;
+ 			return true;
+ 		}
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 4739b53c9734..eedfc599a457 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -19,7 +19,7 @@
+ #include <asm/memtype.h>
+ #include <asm/vmx.h>
+ 
+-static bool __read_mostly enable_mmio_caching = true;
++bool __read_mostly enable_mmio_caching = true;
+ module_param_named(mmio_caching, enable_mmio_caching, bool, 0444);
+ 
+ u64 __read_mostly shadow_host_writable_mask;
+@@ -351,6 +351,9 @@ void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask)
+ 	    WARN_ON(mmio_value && (REMOVED_SPTE & mmio_mask) == mmio_value))
+ 		mmio_value = 0;
+ 
++	if (!mmio_value)
++		enable_mmio_caching = false;
++
+ 	shadow_mmio_value = mmio_value;
+ 	shadow_mmio_mask  = mmio_mask;
+ 	shadow_mmio_access_mask = access_mask;
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index 73f12615416f..ad8ce3c5d083 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -5,6 +5,8 @@
+ 
+ #include "mmu_internal.h"
+ 
++extern bool __read_mostly enable_mmio_caching;
++
+ /*
+  * A MMU present SPTE is backed by actual memory and may or may not be present
+  * in hardware.  E.g. MMIO SPTEs are not considered present.  Use bit 11, as it
+@@ -210,7 +212,7 @@ extern u8 __read_mostly shadow_phys_bits;
+ static inline bool is_mmio_spte(u64 spte)
+ {
+ 	return (spte & shadow_mmio_mask) == shadow_mmio_value &&
+-	       likely(shadow_mmio_value);
++	       likely(enable_mmio_caching);
+ }
+ 
+ static inline bool is_shadow_present_pte(u64 pte)
 
-Similar to previous comment, should this rather be:
-gfn_range.end = slot->base_gfn + min(gfn_range.end, slot->npages);
+base-commit: 150866cd0ec871c765181d145aa0912628289c8a
+-- 
+2.36.0.rc0.470.gd361397f0d-goog
 
-> +       if (gfn_range.start >= gfn_range.end)
-> +               return;
-> +
-> +       idx = srcu_read_lock(&kvm->srcu);
-> +       KVM_MMU_LOCK(kvm);
-> +       kvm_unmap_gfn_range(kvm, &gfn_range);
-> +       kvm_flush_remote_tlbs(kvm);
-> +       KVM_MMU_UNLOCK(kvm);
-> +       srcu_read_unlock(&kvm->srcu, idx);
-> +}
-> +
-> +static struct memfile_notifier_ops kvm_memfile_notifier_ops = {
-> +       .invalidate = kvm_memfile_notifier_handler,
-> +       .fallocate = kvm_memfile_notifier_handler,
-> +};
-> +
->  static inline int kvm_memfile_register(struct kvm_memory_slot *slot)
->  {
-> +       slot->notifier.ops = &kvm_memfile_notifier_ops;
->         return memfile_register_notifier(file_inode(slot->private_file),
->                                          &slot->notifier,
->                                          &slot->pfn_ops);
-> @@ -1963,6 +1998,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
->         new->private_file = file;
->         new->private_offset = mem->flags & KVM_MEM_PRIVATE ?
->                               region_ext->private_offset : 0;
-> +       new->kvm = kvm;
->
->         r = kvm_set_memslot(kvm, old, new, change);
->         if (!r)
-> --
-> 2.17.1
->
