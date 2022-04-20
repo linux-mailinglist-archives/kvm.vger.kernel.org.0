@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C1F55092B9
+	by mail.lfdr.de (Postfix) with ESMTP id C35F65092BB
 	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 00:25:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382774AbiDTW2d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Apr 2022 18:28:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34736 "EHLO
+        id S1382791AbiDTW2f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Apr 2022 18:28:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1382772AbiDTW21 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1382779AbiDTW21 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 20 Apr 2022 18:28:27 -0400
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1647440A3B;
-        Wed, 20 Apr 2022 15:25:31 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id j6so2339063qkp.9;
-        Wed, 20 Apr 2022 15:25:31 -0700 (PDT)
+Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64ABE40E70;
+        Wed, 20 Apr 2022 15:25:32 -0700 (PDT)
+Received: by mail-qv1-xf34.google.com with SMTP id x20so2410392qvl.10;
+        Wed, 20 Apr 2022 15:25:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=zSf1GL9eubeAu2SSHZoa9QHUnjXkUaWTs3jcrLRRG7o=;
-        b=IB+Ao/Wwsh2cprgs+BXA24MhK96+Zox6WxUF2ehNrx1BFrzPZV7JAWu4EFvsOtu7Iu
-         YxETq/bn/pHm/OAmmR4pyblkfRLBRX8FmmvfAvteqDSXZL2/mewEl8dHQACtpk0T1/fS
-         Vd1eFmxiEsSX7RvV81/urQwV88aFxIfIG3XXxIZ54tl2/mtxMUGMMLmg4dc9qATOEBIn
-         9WhBmDfcIIaBAq+YgjhMWR8ulSAmcGjL9UGImfIiNr2FuS8tVNm000as9rZP7eeW/oIo
-         J5Wqs9orX0mO1wldiSLWfIexV0XiT9wjHjbGM2KyEUgvv+G24T2ouN/DUf6y7tB03/C7
-         7qtA==
+        bh=0aCn71l79sWRnE6PzUFhlzrvw/Z81bCS4EyB61dWEL0=;
+        b=BeT9QhYpFDK/CREoEjtw3QLmD+QNTZYuSZtoOHzOZeF9Wk/6j2V2H3kA3wL4UYGuWk
+         bStsY3ZHW3fS86+/Qp4uKXdOHItAD8ztT8NsEfukqkzFoAfgcOUgd8yUM/nDHnF4sklJ
+         dd6QdPuIkebTGaheYNDy0f/odnNV+3d7kYB8XcetsILmO7TE8+NomUZDVgQl64wBbJf/
+         mbVLw/7/pX+8Dp52EgtlUHsndFzWYaOF/ijzguYNdcuGEeh12jdHmoJ/N1X0f+mzK33N
+         O5k3n+n4mMqME0y1UH9WUXDcYro2Drz38nXYidMQhdGlFfmvQMttCXCbAA5q4kt0hGho
+         cesA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=zSf1GL9eubeAu2SSHZoa9QHUnjXkUaWTs3jcrLRRG7o=;
-        b=ttRwI8ioIONIWxBLWEtriIugWOub4dQIDd3nnl0pipZrL7TMVi8Ii0ApnyAh1KxqlD
-         jtoA9UuLSkV2WJ8x46nNw/9BEjqrH8HDAgiLJ8Z9tO9PWGjBRk+XAaIBXGv9FZQkzGOm
-         aU19d8OIi3eF6wMrDzLZ44mY+elSkqS/EYqpmVtBV11EE1Cl0iHjxI5xgHieV/BJbQgH
-         8smhDeUHfAgzafHQy3tG9W7SJ9QwJPPLKXVj34YJi+Rw7ve+hCjcWOerbnboc1BT06rz
-         pRtt2VXAInQ2O5v4CHejEMGdIgohP+P3ZabEBzTWlash3Vzt4sBh7e2wyZKl10odvFZh
-         Pfkg==
-X-Gm-Message-State: AOAM532a5twKv/Ik9mosCzeFfhBzd/q5EwN5Xf/rQJLGt+rMr09Zxbye
-        naq//IjG2Q0NTc1zlYX2GHBtLkX5dw8=
-X-Google-Smtp-Source: ABdhPJwZK35fAiaLQ+j7TJ3EfZjXWxZdeKrrNFVTBDOtXlzg189KMCbYhzpcTl5qhDxdOMWY5Qur+A==
-X-Received: by 2002:a37:f519:0:b0:69c:29e0:f740 with SMTP id l25-20020a37f519000000b0069c29e0f740mr14135823qkk.652.1650493529925;
-        Wed, 20 Apr 2022 15:25:29 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=0aCn71l79sWRnE6PzUFhlzrvw/Z81bCS4EyB61dWEL0=;
+        b=KQgoCrvHO/U93ut8PIUrUXW+F+L7GF7FMeU5NgD80kWhphjMgbGU8TTF6jkJCswGxZ
+         nwchzNYw5JYNT8u5gLTH58qfu9DwknPQ4lKP7GOIlDHNX9kt0ahxFWFThSXJbzF6hm+K
+         YsYSd0iKNi/SaUb2vVThGih1UKEyLkJUk6QzY0jRfDXS5ePU5SsJwzyoL9sg3veElUn3
+         l+TG4m01XgbD+VSa1rUPPAYEGwfTTRQkPhn+yAqMReRV7bmhzU5Ly6VxuLfYAZt3MFN9
+         n5YqCiy/k7k4lPu5EKa35wJvcRK7iejrs2CUR1zTh+pYsRBL3bPWwFynsKpaeJsS3kjb
+         t2zw==
+X-Gm-Message-State: AOAM532vFpdoTJJtLPAy4/NSSDihy1lSReVyABVnGVH07SJ5WlwFPxkz
+        NUygIyla/TvwDBiYwXqr2axde2fOeeQ=
+X-Google-Smtp-Source: ABdhPJzKjiKgZgtEl0vYGkFkHYaxfwEQ6T08SLZ3cvCfSIFo6Vw62fRxM9StAFAMUIujrWHH+gVNUA==
+X-Received: by 2002:ad4:58c9:0:b0:444:4bb4:651a with SMTP id dh9-20020ad458c9000000b004444bb4651amr16938759qvb.49.1650493531208;
+        Wed, 20 Apr 2022 15:25:31 -0700 (PDT)
 Received: from localhost ([2601:c4:c432:60a:188a:94a5:4e52:4f76])
-        by smtp.gmail.com with ESMTPSA id d18-20020a05622a05d200b002f07ed88a54sm2806618qtb.46.2022.04.20.15.25.29
+        by smtp.gmail.com with ESMTPSA id w6-20020a05622a190600b002f1f91ad3e7sm2539168qtc.22.2022.04.20.15.25.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Apr 2022 15:25:29 -0700 (PDT)
+        Wed, 20 Apr 2022 15:25:30 -0700 (PDT)
 From:   Yury Norov <yury.norov@gmail.com>
 To:     linux-kernel@vger.kernel.org,
         Alexander Gordeev <agordeev@linux.ibm.com>,
@@ -61,10 +61,12 @@ To:     linux-kernel@vger.kernel.org,
         Vasily Gorbik <gor@linux.ibm.com>,
         Yury Norov <yury.norov@gmail.com>, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: [PATCH 0/4] bitmap: fix conversion from/to fix-sized arrays
-Date:   Wed, 20 Apr 2022 15:25:26 -0700
-Message-Id: <20220420222530.910125-1-yury.norov@gmail.com>
+Subject: [PATCH 1/4] lib/bitmap: extend comment for bitmap_(from,to)_arr32()
+Date:   Wed, 20 Apr 2022 15:25:27 -0700
+Message-Id: <20220420222530.910125-2-yury.norov@gmail.com>
 X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220420222530.910125-1-yury.norov@gmail.com>
+References: <20220420222530.910125-1-yury.norov@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -77,36 +79,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In the kernel codebase we have functions that call bitmap_copy()
-to convert bitmaps to and from fix-sized 32 or 64-bit arrays. It
-works well for LE architectures when size of long is equal to the
-size of fixed type.
+On LE systems bitmaps are naturally ordered, therefore we can potentially
+use bitmap_copy routines when converting from 32-bit arrays, even if host
+system is 64-bit. But it may lead to out-of-bond access due to unsafe
+typecast, and the bitmap_(from,to)_arr32 comment doesn't explain that
+clearly.
 
-If the system is BE and/or size of long is not equal to the size of
-fixed type of the array, bitmap_copy() may produce wrong result either
-because of endianness issue, or because of out-of-bound access.
+Signed-off-by: Yury Norov <yury.norov@gmail.com>
+---
+ include/linux/bitmap.h | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-To address this problem we already have bitmap_{from,to}_arr32().
-In recent discussion it was spotted that we also need 64-bit
-analogue of it:
-https://lore.kernel.org/all/YiCWNdWd+AsLbDkp@smile.fi.intel.com/T/#m754da92acb0003e12b99293d07ddcd46dbe04ada
-
-This series takes care of it.
-
-Yury Norov (4):
-  lib/bitmap: extend comment for bitmap_(from,to)_arr32()
-  lib: add bitmap_{from,to}_arr64
-  KVM: s390: replace bitmap_copy with bitmap_{from,to}_arr64 where
-    appropriate
-  drm/amd/pm: use bitmap_{from,to}_arr32 where appropriate
-
- arch/s390/kvm/kvm-s390.c                      | 10 ++--
- .../gpu/drm/amd/pm/swsmu/smu11/smu_v11_0.c    |  2 +-
- .../gpu/drm/amd/pm/swsmu/smu13/smu_v13_0.c    |  2 +-
- include/linux/bitmap.h                        | 31 +++++++++---
- lib/bitmap.c                                  | 47 +++++++++++++++++++
- 5 files changed, 77 insertions(+), 15 deletions(-)
-
+diff --git a/include/linux/bitmap.h b/include/linux/bitmap.h
+index a89b626d0fbe..10d805c2893c 100644
+--- a/include/linux/bitmap.h
++++ b/include/linux/bitmap.h
+@@ -271,8 +271,12 @@ static inline void bitmap_copy_clear_tail(unsigned long *dst,
+ }
+ 
+ /*
+- * On 32-bit systems bitmaps are represented as u32 arrays internally, and
+- * therefore conversion is not needed when copying data from/to arrays of u32.
++ * On 32-bit systems bitmaps are represented as u32 arrays internally. On LE64
++ * machines the order of hi and lo parts of nubmers match the bitmap structure.
++ * In both cases conversion is not needed when copying data from/to arrays of
++ * u32. But in LE64 case, typecast in bitmap_copy_clear_tail() may lead to the
++ * out-of-bound access. To avoid that, both LE and BE variants of 64-bit
++ * architectures are not using bitmap_copy_clear_tail().
+  */
+ #if BITS_PER_LONG == 64
+ void bitmap_from_arr32(unsigned long *bitmap, const u32 *buf,
 -- 
 2.32.0
 
