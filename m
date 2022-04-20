@@ -2,98 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D0479508C74
-	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 17:50:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 07E93508CFB
+	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 18:15:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380340AbiDTPxK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Apr 2022 11:53:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60702 "EHLO
+        id S1380436AbiDTQSc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Apr 2022 12:18:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380211AbiDTPxI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Apr 2022 11:53:08 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2047.outbound.protection.outlook.com [40.107.223.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9F2E33359;
-        Wed, 20 Apr 2022 08:50:21 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CQyZnCUuqvH6O2bTyQUbPeV1TWJpAMDVR/WaCAShK7CmJZAL0WEzej+JpVNg2mwYxgF8xE0tTzqySUP/kLEwYdQSad7CeHd+Bxjuu/HBIdSdOJ8tJysALZpQzUd+rUzUFmnncu3JWkS0flEmkzWies0XdnnUGEGSo7sMHrZVusvHfMyHGGm5S81zkJkXrMCrHdB7iNetT+fx7ttBowNyviX84riwrVlXrkq+qCkwCGNOlkUtaTkNQU6OAzs+5qAj9w7h336E2v6VRCA/h/iHkRM6UqM307ViNe8JxQabwxQ/WB3VXUaqJbMUMXzBuyrRbK5fHBwvgUR9HiIjRW8Hsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dFBJKynoFw5waANKbjnG8CQPQ2CJoQn6GvO9g2Hza8I=;
- b=Ojuv/EX8hcU3BWC1fJzwarzJW/wjq2qQY1EDWglzFoz/6lZinNk/k6U2NTEcavwp1blbXMauzixftQsoTWeGedqaItjudWuqs2UIL+H2phUgGOOmu5JJYRph1VjN7NjfF/sqfIAOUJ7xad0lFbp6tCJ2PlSTLZrj4txdnzD2cd6VwZb0rztpw3UMpLfiNE/Js3L8Rkhwga1A+DyGTp8r8dQD2AoKH5ApeNh6XVHodxmxRlBTbWIWOkeP6QLcVr86ylPYZkiQMglXG1r9//2oQ+sC5qYAbrUSomHLzzjI3VOdBQmLtMtmmWFhWQedSSDFa09YvSKzLURwJaYdmtTEfw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dFBJKynoFw5waANKbjnG8CQPQ2CJoQn6GvO9g2Hza8I=;
- b=kWfWq4HOHC/MfAAbbEYea4LGzhpexyuyiru5e1U54lOqUzxlcQm50Igs1KY4sc3lCIQM7CkJFUCnrCK+d7NwhuhesHJdGzxPxFXilClxo6ay9Rl1lWwP9h9xa/SgEhKw68OieXBqkNn+0z0Z0/C1eGpbskvOf5OIpgYAkk9uE90=
-Received: from MW4PR03CA0088.namprd03.prod.outlook.com (2603:10b6:303:b6::33)
- by MWHPR12MB1168.namprd12.prod.outlook.com (2603:10b6:300:e::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.14; Wed, 20 Apr
- 2022 15:50:18 +0000
-Received: from CO1NAM11FT066.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:b6:cafe::9e) by MW4PR03CA0088.outlook.office365.com
- (2603:10b6:303:b6::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.14 via Frontend
- Transport; Wed, 20 Apr 2022 15:50:18 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT066.mail.protection.outlook.com (10.13.175.18) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5186.14 via Frontend Transport; Wed, 20 Apr 2022 15:50:18 +0000
-Received: from sp5-759chost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Wed, 20 Apr
- 2022 10:50:15 -0500
-From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
-CC:     <pbonzini@redhat.com>, <mlevitsk@redhat.com>, <seanjc@google.com>,
-        <joro@8bytes.org>, <jon.grimm@amd.com>, <wei.huang2@amd.com>,
-        <terry.bowman@amd.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Subject: [PATCH 2/2] KVM: SVM: Introduce trace point for the slow-path of avic_kic_target_vcpus
-Date:   Wed, 20 Apr 2022 10:49:54 -0500
-Message-ID: <20220420154954.19305-3-suravee.suthikulpanit@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220420154954.19305-1-suravee.suthikulpanit@amd.com>
-References: <20220420154954.19305-1-suravee.suthikulpanit@amd.com>
+        with ESMTP id S1380431AbiDTQSa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Apr 2022 12:18:30 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD58B27CC8
+        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 09:15:43 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id j8so2197506pll.11
+        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 09:15:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=tnEdHKpPyZkZmrpdyV+90S+5wmdBROjGyPq57BetpoU=;
+        b=D4JPc+7j0ulu+47aOpYDf++g8UTividvLRWK2iqrM38t4CWHmEoGr8rz8OOYNdiNyO
+         GOKHSHQAFxq2lF8cjaOFbwh9GTn4d87loazZMySaAMuNgdtiP2QB+IUHC10aAWMzK/oo
+         eg0fgki2O3/oP+Yo2CywVQsBFo3U5SFVtqkdF6K5/S07SwcB7IeNC+Kn+UJqfIKtT+X9
+         +6L3PYP6IJcAY6zyffxblxGRhjXelIWutWa9WDwxZGnTh1Hklfpu4LcTLesYtkMFKUFR
+         C+m8eoQGlpdQcP/Esz+2sogoUlGc9mGlMIFOy7nCbQbU+jmYwW/UhJk4yblgmZltuBz0
+         T6JA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=tnEdHKpPyZkZmrpdyV+90S+5wmdBROjGyPq57BetpoU=;
+        b=558QMm4EQeW+eagqCoAAfZ2vdpOIyrfp/1zciOdnkorDPJOJHTwqOp4IuCfNSCdILF
+         zp76OiEbArmKBpQ8ArpGsQltY3pOU6O3mGBQXbb5GbCDqpgdxdF3xK74OxqWFqpAeMdQ
+         HEaIdHS+cdw06c8sLLHBh5aHsgNckEtNGGFrx7vPqOrNyOh+juFNhxZl/z14zLRvolbJ
+         FtLovOHKZLBd9zlRsDulqyRJM0lQQ2PtfBuN+Tw/1YY4ki9WBMvBHbyeEecYjwY3uP8e
+         0MWb5Vd07cG1FLJxEcaMCD4OG+0CQQ19ed0rhp4yn6RTBoP+1wTugHCrX/DXpKxpTbXn
+         PSRw==
+X-Gm-Message-State: AOAM531l+v05oqgNypExpE1vDkdg32Le+qLsYKIt8h+L4V0POJKvbj3N
+        kqbazPzqno7S7lNwrs3QiERl4g==
+X-Google-Smtp-Source: ABdhPJwiECiSV47yGzjO1OSK5czfQAfEaTNuFinGeQPK7mUTXZmde2s/5XsQi8Zbio0IBM1grb9y/A==
+X-Received: by 2002:a17:902:bc8c:b0:156:bc64:fa47 with SMTP id bb12-20020a170902bc8c00b00156bc64fa47mr21385934plb.135.1650471343113;
+        Wed, 20 Apr 2022 09:15:43 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id a9-20020aa78649000000b004fe3d6c1731sm20575560pfo.175.2022.04.20.09.15.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Apr 2022 09:15:42 -0700 (PDT)
+Date:   Wed, 20 Apr 2022 16:15:38 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/8] KVM: nSVM: Sync next_rip field from vmcb12 to vmcb02
+Message-ID: <YmAxqrbMRx76Ye5a@google.com>
+References: <20220402010903.727604-1-seanjc@google.com>
+ <20220402010903.727604-2-seanjc@google.com>
+ <112c2108-7548-f5bd-493d-19b944701f1b@maciej.szmigiero.name>
+ <YkspIjFMwpMYWV05@google.com>
+ <4505b43d-5c33-4199-1259-6d4e8ebac1ec@redhat.com>
+ <98fca5c8-ca8e-be1f-857d-3d04041b66d7@maciej.szmigiero.name>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e6df3fb5-b319-487b-ed16-08da22e57809
-X-MS-TrafficTypeDiagnostic: MWHPR12MB1168:EE_
-X-Microsoft-Antispam-PRVS: <MWHPR12MB1168A7B1CCC49AA0DDF1806DF3F59@MWHPR12MB1168.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: LIqnrpd8vg1q7YGHngohc9G8dHIbGasXtM9gkzVk8s+EaE/D7FoGuMAH4bJwnxLeqmPX+Tyfp65CaU55OraSF7SsxsscIXpbmmmsy/FpFISCFwr053aUdTRaNmUhkg5nOTs0ipNSTKCMOshatAOPhsxSzXmWN9D5Q6X1ksa8UOq92S/0piirXsMr57xxrPz553wHL5NaFHpGGtwl30L3z+NItwbVJTrviMsiwtYCRJrnxYkbVRvAO1Et9UeWtj1Rz/h1nqvlr8XoOZd+YnrvF0UyTF2giaXGfXMs2u/VE0j7CReqj5WlaD7U3uzOrZ5Bsj12MwO+SRGUs+jHJkR90A7RNjcSNvyOqV8Zty80qc+75GRAWn76NjStqvdj1pMzs+Ms7L6PMvr2mlAPcZS4Lr9S25V3Lc5vnKY95OnjF6giyysrJbztidT43yMNG7YjqamfslUV2SaVMm3TyeR8CQ4X4cY67fkiKRVh8kRtaBcla7iycbitZOK7CqbmFdB9JHIiS7zwsRCcxm2M2/9lDtaoZMpwpADEeuKMKm37XmctfqGwJFcaudIVUkRMnqVnliDhOSRkedATcjBVh9grlU71BvSvEiUjCS1Fhcqf4KrRa6bh7by5UuXoRsnMCqXu2txGjk7tMIk7kwzzQyeyylWH9PxaB3dbVvYmhWnuR3sBvFQP4Gx4SmeG8N2KTPxN0CvW58US2IKfdWbow0Zx5Q==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(40470700004)(46966006)(5660300002)(508600001)(40460700003)(7696005)(44832011)(6666004)(8936002)(83380400001)(70586007)(70206006)(47076005)(426003)(316002)(1076003)(110136005)(36756003)(54906003)(2616005)(36860700001)(8676002)(81166007)(336012)(4326008)(82310400005)(356005)(86362001)(2906002)(26005)(186003)(16526019)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Apr 2022 15:50:18.1399
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e6df3fb5-b319-487b-ed16-08da22e57809
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT066.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR12MB1168
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+In-Reply-To: <98fca5c8-ca8e-be1f-857d-3d04041b66d7@maciej.szmigiero.name>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -101,73 +81,117 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This can help identify potential performance issues when handles
-AVIC incomplete IPI due vCPU not running.
+On Wed, Apr 20, 2022, Maciej S. Szmigiero wrote:
+> On 20.04.2022 17:00, Paolo Bonzini wrote:
+> > On 4/4/22 19:21, Sean Christopherson wrote:
+> > > On Mon, Apr 04, 2022, Maciej S. Szmigiero wrote:
+> > > > > @@ -1606,7 +1622,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+> > > > >        nested_copy_vmcb_control_to_cache(svm, ctl);
+> > > > >        svm_switch_vmcb(svm, &svm->nested.vmcb02);
+> > > > > -    nested_vmcb02_prepare_control(svm);
+> > > > > +    nested_vmcb02_prepare_control(svm, save->rip);
+> > > > 
+> > > >                        ^
+> > > > I guess this should be "svm->vmcb->save.rip", since
+> > > > KVM_{GET,SET}_NESTED_STATE "save" field contains vmcb01 data,
+> > > > not vmcb{0,1}2 (in contrast to the "control" field).
+> > > 
+> > > Argh, yes.  Is userspace required to set L2 guest state prior to KVM_SET_NESTED_STATE?
+> > > If not, this will result in garbage being loaded into vmcb02.
+> > > 
+> > 
+> > Let's just require X86_FEATURE_NRIPS, either in general or just to
+> > enable nested virtualiazation
+> 
+> 👍
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
----
- arch/x86/kvm/svm/avic.c |  2 ++
- arch/x86/kvm/trace.h    | 20 ++++++++++++++++++++
- arch/x86/kvm/x86.c      |  1 +
- 3 files changed, 23 insertions(+)
+Hmm, so requiring NRIPS for nested doesn't actually buy us anything.  KVM still
+has to deal with userspace hiding NRIPS from L1, so unless I'm overlooking something,
+the only change would be:
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index c8b8a0cb02b0..c5b38b160180 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -355,6 +355,8 @@ static void avic_kick_target_vcpus(struct kvm *kvm, struct kvm_lapic *source,
- 	if (!avic_kick_target_vcpus_fast(kvm, source, icrl, icrh, index))
- 		return;
- 
-+	trace_kvm_avic_kick_vcpu_slowpath(icrh, icrl, index);
-+
- 	/*
- 	 * Wake any target vCPUs that are blocking, i.e. waiting for a wake
- 	 * event.  There's no need to signal doorbells, as hardware has handled
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index e3a24b8f04be..de4762517569 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -1459,6 +1459,26 @@ TRACE_EVENT(kvm_avic_ga_log,
- 		  __entry->vmid, __entry->vcpuid)
- );
- 
-+TRACE_EVENT(kvm_avic_kick_vcpu_slowpath,
-+	    TP_PROTO(u32 icrh, u32 icrl, u32 index),
-+	    TP_ARGS(icrh, icrl, index),
-+
-+	TP_STRUCT__entry(
-+		__field(u32, icrh)
-+		__field(u32, icrl)
-+		__field(u32, index)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->icrh = icrh;
-+		__entry->icrl = icrl;
-+		__entry->index = index;
-+	),
-+
-+	TP_printk("icrh:icrl=%#08x:%08x, index=%u",
-+		  __entry->icrh, __entry->icrl, __entry->index)
-+);
-+
- TRACE_EVENT(kvm_hv_timer_state,
- 		TP_PROTO(unsigned int vcpu_id, unsigned int hv_timer_in_use),
- 		TP_ARGS(vcpu_id, hv_timer_in_use),
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 547ba00ef64f..d90e4020e9b9 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12980,6 +12980,7 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_pi_irte_update);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_avic_unaccelerated_access);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_avic_incomplete_ipi);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_avic_ga_log);
-+EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_avic_kick_vcpu_slowpath);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_apicv_accept_irq);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_enter);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_exit);
--- 
-2.25.1
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index bdf8375a718b..7bed4e05aaea 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -686,7 +686,7 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
+         */
+        if (svm->nrips_enabled)
+                vmcb02->control.next_rip    = svm->nested.ctl.next_rip;
+-       else if (boot_cpu_has(X86_FEATURE_NRIPS))
++       else
+                vmcb02->control.next_rip    = vmcb12_rip;
+
+        if (is_evtinj_soft(vmcb02->control.event_inj)) {
+
+And sadly, because SVM doesn't provide the instruction length if an exit occurs
+while vectoring a software interrupt/exception, making NRIPS mandatory doesn't buy
+us much either.
+
+I believe the below diff is the total savings (plus the above nested thing) against
+this series if NRIPS is mandatory (ignoring the setup code, which is a wash).  It
+does eliminate the rewind in svm_complete_soft_interrupt() and the funky logic in
+svm_update_soft_interrupt_rip(), but that's it AFAICT.  The most obnoxious code of
+having to unwind EMULTYPE_SKIP when retrieving the next RIP for software int/except
+injection doesn't go away :-(
+
+I'm not totally opposed to requiring NRIPS, but I'm not in favor of it either.
+
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 66cfd533aaf8..6b48af423246 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -354,7 +354,7 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
+        if (sev_es_guest(vcpu->kvm))
+                goto done;
+
+-       if (nrips && svm->vmcb->control.next_rip != 0) {
++       if (svm->vmcb->control.next_rip != 0) {
+                WARN_ON_ONCE(!static_cpu_has(X86_FEATURE_NRIPS));
+                svm->next_rip = svm->vmcb->control.next_rip;
+        }
+@@ -401,7 +401,7 @@ static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
+         * in use, the skip must not commit any side effects such as clearing
+         * the interrupt shadow or RFLAGS.RF.
+         */
+-       if (!__svm_skip_emulated_instruction(vcpu, !nrips))
++       if (!__svm_skip_emulated_instruction(vcpu, false))
+                return -EIO;
+
+        rip = kvm_rip_read(vcpu);
+@@ -420,11 +420,8 @@ static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
+        svm->soft_int_old_rip = old_rip;
+        svm->soft_int_next_rip = rip;
+
+-       if (nrips)
+-               kvm_rip_write(vcpu, old_rip);
+-
+-       if (static_cpu_has(X86_FEATURE_NRIPS))
+-               svm->vmcb->control.next_rip = rip;
++       kvm_rip_write(vcpu, old_rip);
++       svm->vmcb->control.next_rip = rip;
+
+        return 0;
+ }
+@@ -3738,20 +3735,9 @@ static void svm_complete_soft_interrupt(struct kvm_vcpu *vcpu, u8 vector,
+         * the same event, i.e. if the event is a soft exception/interrupt,
+         * otherwise next_rip is unused on VMRUN.
+         */
+-       if (nrips && (is_soft || (is_exception && kvm_exception_is_soft(vector))) &&
++       if ((is_soft || (is_exception && kvm_exception_is_soft(vector))) &&
+            kvm_is_linear_rip(vcpu, svm->soft_int_old_rip + svm->soft_int_csbase))
+                svm->vmcb->control.next_rip = svm->soft_int_next_rip;
+-       /*
+-        * If NextRIP isn't enabled, KVM must manually advance RIP prior to
+-        * injecting the soft exception/interrupt.  That advancement needs to
+-        * be unwound if vectoring didn't complete.  Note, the new event may
+-        * not be the injected event, e.g. if KVM injected an INTn, the INTn
+-        * hit a #NP in the guest, and the #NP encountered a #PF, the #NP will
+-        * be the reported vectored event, but RIP still needs to be unwound.
+-        */
+-       else if (!nrips && (is_soft || is_exception) &&
+-                kvm_is_linear_rip(vcpu, svm->soft_int_next_rip + svm->soft_int_csbase))
+-               kvm_rip_write(vcpu, svm->soft_int_old_rip);
+ }
+
+ static void svm_complete_interrupts(struct kvm_vcpu *vcpu)
 
