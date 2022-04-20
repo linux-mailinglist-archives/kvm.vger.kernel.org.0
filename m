@@ -2,106 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 94296508D88
-	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 18:42:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FF7E508D96
+	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 18:44:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380696AbiDTQo4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Apr 2022 12:44:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54028 "EHLO
+        id S1380733AbiDTQrU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Apr 2022 12:47:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380608AbiDTQoy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Apr 2022 12:44:54 -0400
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC4BE45508;
-        Wed, 20 Apr 2022 09:42:07 -0700 (PDT)
-Received: by mail-wr1-x42b.google.com with SMTP id i20so3027560wrb.13;
-        Wed, 20 Apr 2022 09:42:07 -0700 (PDT)
+        with ESMTP id S1380675AbiDTQrT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Apr 2022 12:47:19 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CF7346661
+        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 09:44:32 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d15so2281579pll.10
+        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 09:44:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=+ou1ou1zV9UaV2Zj7tsZVE0ZuabN20IH6pOGkZC7FGM=;
-        b=ZGfOw2Oxxo9b4JYyBgKxTh+/uMVBGNG9Q/dljYIqhRg+IYvE3cvcuoqHhos10MMFFv
-         m0qDlPj7ubAXrs86bEDpUSy4oSoLh6QBCsjVoLyb2qW8Njw+2wP5bigWFiCJLP/JoZEY
-         UcVMQThCCwzQhzTQAXuVMsfBO4fidkgLNJD+SzYlbNG/z+zMSe4yipazjqENYHhA+pcy
-         HFtUJm4ZOB7dX5fH8x8Zqp4G7M9Cj5hJkprZX+8/39swie8RLAn8iiYZV5KgL9GX8seM
-         UgjBSq47hSeD0hZ8IKsB+nuv0jW7LfyU969xLNIj7CSnaz0gMQHG3Fk3TX3ZldYMfrDh
-         G+1Q==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=mmUDe7z0b0FTLJ9wvVbnLdVpkfi8vNaqEQvU41wotf8=;
+        b=EhmOxAP7NMWiC0dM6+rCeAa0PCDqYByqawACSsIs2E6eanZPg9Bq+ts26QVKu2bQcz
+         LHRfk1U7f9I/0FTB+S5j0KxaT6zN4Ks9h4GvCS5SIEIr6w34WuDlv3swX6ZMgDOXhOCK
+         pCUdbPAvqlvW4JD0jACrMXV64cMxsww9zxB1cso7wqZX7ji5IQ/cNiy4/gmmO7WSTiz8
+         sqmlEsqoJ40YJJgGsxHMG1NzSx5pl1QE9x8rlnULNt96G/fAs/kLYq5TkC/lWCeaI/y+
+         sigjzPOV5Nu/duAKbA2bjfxMY60SYlQ+JmVoIqCpVIjs5neEljK9Wh0Kr6fEUOskUi9/
+         ORgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=+ou1ou1zV9UaV2Zj7tsZVE0ZuabN20IH6pOGkZC7FGM=;
-        b=LkQBp0nLIgxph4fjAVZiY5hn4Qcaoh2vwEz+/RNL8U6EQg5I3rsMlL8Z+dMMBq9N6m
-         frLFT6Ab6OeglrybDcrEzezNabbF5TpFe3AbC19j/n7tnz4Ip2DLovSRJbc8XB01nHH/
-         ATgaANZRxoveoSUtrqvOsSS8Pc558sq4WY2C6dUbJ6oramDFw7ObiE+04Cvr/tLT595M
-         P6quj9uXFB3bweWxeNl8T6YSpkHCJyMD2r6Hbspn6csZvBg75gMEgOxwLR5C8CuE1hpV
-         Tq75SNJtXsPq4NAZN4urNvPDjxGYMXySsv9rvokfd7M2y7UNq7muqFgbRoq3zKyOc7Vn
-         NPug==
-X-Gm-Message-State: AOAM532dvLKuuEStKvNuyjbiwe79yW8U6G+EDGHo0qDT4fwKxTB6AUI9
-        N7Hg+p9JCJnwTO01ddEdr0o=
-X-Google-Smtp-Source: ABdhPJwddJlv85690FDtb2F9R7/n0XYYswhWBDPE9VCI8YgTgGJzNni/RVAm3/lL0vc+eyZ/zGWwsw==
-X-Received: by 2002:adf:e346:0:b0:205:97d0:50db with SMTP id n6-20020adfe346000000b0020597d050dbmr16526628wrj.257.1650472926236;
-        Wed, 20 Apr 2022 09:42:06 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id e16-20020a05600c2dd000b0038ed449cbdbsm326460wmh.3.2022.04.20.09.42.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Apr 2022 09:42:05 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <36ffc0e3-ac2d-be99-002b-916c1e0797b8@redhat.com>
-Date:   Wed, 20 Apr 2022 18:42:04 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=mmUDe7z0b0FTLJ9wvVbnLdVpkfi8vNaqEQvU41wotf8=;
+        b=6KbPTbkfZbQLEohTQRij1mqag8fhhWm7ux1M3ule/S70A1JLUwzR3gtxiBJ3RCjv01
+         6eeKmHUHdHM1JgiEDXKAlqx9hWA/2apiD+JJ+1klqLP7NzHyuvGqh6BTaPmZLAcV++BJ
+         I9L68f2AvtKnfmAE/jAzlShcWX9hqapyhZOuxXJFX0M1REErjSrDQeUa77vD5FK5YwYH
+         EKmuHVEd5lG9Kd7u1+zUPe4ZGPX8NyVAz7Ik4upcXC2zZAxWzO3HXpYDJfVqrH6y7A1y
+         h93n7/ltZiN0CDdVQ7aq1TPx7EglBZt2bVJ083vOqOSdDuTkJ477uO+znd2nYFNGpKHi
+         VEzQ==
+X-Gm-Message-State: AOAM531DEzYMYzkx8IxVkjlP3vckMUFDtTdKtW0O3+jpptOBvOxtVIMk
+        4VPaV9UKbpuxa6BSh5XBDi3Dog==
+X-Google-Smtp-Source: ABdhPJyDyGoYOudnVdumER/MV2n/NsBRU/3RKfNR1fONov5Rh0TSOA0eXyIZ64x4VIQ+ZRyavxZKCQ==
+X-Received: by 2002:a17:902:ab4c:b0:158:e896:7939 with SMTP id ij12-20020a170902ab4c00b00158e8967939mr20392237plb.154.1650473071757;
+        Wed, 20 Apr 2022 09:44:31 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id b16-20020a056a00115000b004f6ff260c9esm20844971pfm.207.2022.04.20.09.44.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Apr 2022 09:44:31 -0700 (PDT)
+Date:   Wed, 20 Apr 2022 16:44:27 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/8] KVM: nSVM: Sync next_rip field from vmcb12 to vmcb02
+Message-ID: <YmA4a8jwcL0PzkIr@google.com>
+References: <20220402010903.727604-1-seanjc@google.com>
+ <20220402010903.727604-2-seanjc@google.com>
+ <112c2108-7548-f5bd-493d-19b944701f1b@maciej.szmigiero.name>
+ <YkspIjFMwpMYWV05@google.com>
+ <4505b43d-5c33-4199-1259-6d4e8ebac1ec@redhat.com>
+ <98fca5c8-ca8e-be1f-857d-3d04041b66d7@maciej.szmigiero.name>
+ <YmAxqrbMRx76Ye5a@google.com>
+ <41d956ab-3d25-2c2f-8b1a-2c49e03b4df4@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH V2 0/2] KVM: SVM: Optimize AVIC incomplete IPI #vmexit
- handling
-Content-Language: en-US
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     mlevitsk@redhat.com, seanjc@google.com, joro@8bytes.org,
-        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
-References: <20220420154954.19305-1-suravee.suthikulpanit@amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220420154954.19305-1-suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <41d956ab-3d25-2c2f-8b1a-2c49e03b4df4@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/20/22 17:49, Suravee Suthikulpanit wrote:
-> This series introduce a fast-path when handling AVIC incomplete IPI #vmexit
-> for AVIC, and introduce a new tracepoint for the slow-path processing.
+On Wed, Apr 20, 2022, Paolo Bonzini wrote:
+> On 4/20/22 18:15, Sean Christopherson wrote:
+> > > > Let's just require X86_FEATURE_NRIPS, either in general or just to
+> > > > enable nested virtualiazation
+> > > 👍
+> > Hmm, so requiring NRIPS for nested doesn't actually buy us anything.  KVM still
+> > has to deal with userspace hiding NRIPS from L1, so unless I'm overlooking something,
+> > the only change would be:
+> > 
+> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > index bdf8375a718b..7bed4e05aaea 100644
+> > --- a/arch/x86/kvm/svm/nested.c
+> > +++ b/arch/x86/kvm/svm/nested.c
+> > @@ -686,7 +686,7 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
+> >           */
+> >          if (svm->nrips_enabled)
+> >                  vmcb02->control.next_rip    = svm->nested.ctl.next_rip;
+> > -       else if (boot_cpu_has(X86_FEATURE_NRIPS))
+> > +       else
+> >                  vmcb02->control.next_rip    = vmcb12_rip;
+> > 
+> >          if (is_evtinj_soft(vmcb02->control.event_inj)) {
+> > 
+> > And sadly, because SVM doesn't provide the instruction length if an exit occurs
+> > while vectoring a software interrupt/exception, making NRIPS mandatory doesn't buy
+> > us much either.
+> > 
+> > I believe the below diff is the total savings (plus the above nested thing) against
+> > this series if NRIPS is mandatory (ignoring the setup code, which is a wash).  It
+> > does eliminate the rewind in svm_complete_soft_interrupt() and the funky logic in
+> > svm_update_soft_interrupt_rip(), but that's it AFAICT.  The most obnoxious code of
+> > having to unwind EMULTYPE_SKIP when retrieving the next RIP for software int/except
+> > injection doesn't go away:-(
+> > 
+> > I'm not totally opposed to requiring NRIPS, but I'm not in favor of it either.
 > 
-> Regards,
-> Suravee
+> Yeah, you're right.  However:
 > 
-> Change from v1: (https://lore.kernel.org/lkml/20220414051151.77710-1-suravee.suthikulpanit@amd.com/T/)
->   * Rebased on top of Linux 5.18-rc3
->   * Patch 1/2:
->      - Update commit shortlog to be more meaningful
->      - Refactor to remove x2AVIC related logic for now, which will be included
->        in the x2AVIC patch series.
-> 
-> Suravee Suthikulpanit (2):
->    KVM: SVM: Use target APIC ID to complete AVIC IRQs when possible
->    KVM: SVM: Introduce trace point for the slow-path of
->      avic_kic_target_vcpus
-> 
->   arch/x86/kvm/svm/avic.c | 74 ++++++++++++++++++++++++++++++++++++++---
->   arch/x86/kvm/trace.h    | 20 +++++++++++
->   arch/x86/kvm/x86.c      |  1 +
->   3 files changed, 91 insertions(+), 4 deletions(-)
-> 
+> * the rewind might already be worth it;
 
-Queued, thanks.
+FWIW, I don't actually care about supporting nrips=false, it's the ability to test
+EMULTYPE_SKIP that I find valuable.  I also find the extra perspective of how RIP
+interacts with software interrupts/exceptions to be very helpful/educational, though
+that's of debatable value going forward.
 
-Paolo
+> * if we require NRIPS for nested, we can also assume that the SVM save state
+> data has a valid next_rip; even if !svm->nrips_enabled.  There's the pesky
+> issue of restoring from an old system that did not have NRIPS, but let's
+> assume for now that NRIPS was set on the source as well.
+
+How about I throw a Not-signed-off-by patch on the end of the series to make NRIPS
+mandatory, that way we (in theory) have a fully functional snapshot for nrips=false
+if we want to go back in time.  And we probably need to give a deprecation grace
+period, i.e. wait a release or two before disappearing nrips?
