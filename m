@@ -2,95 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD6EA508BDC
-	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 17:13:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11B07508C61
+	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 17:47:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237859AbiDTPQF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Apr 2022 11:16:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44406 "EHLO
+        id S1380185AbiDTPuR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Apr 2022 11:50:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380236AbiDTPPu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Apr 2022 11:15:50 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A5A94553E
-        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 08:12:53 -0700 (PDT)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23KDS9oQ005575;
-        Wed, 20 Apr 2022 15:12:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=2QjDcmuQezqaNkyEO6jI8dBmrXaIfCpYK/bI29yIygM=;
- b=iODecKy6eTuthRJLWnFBgU7QfENmRjCceN9DisDFPbfj5Rd/JqChgX/r/ES/rjJXu5Vc
- 9iu85HbW6I7frGI2Ojv1guhSvtYWi7n2aLfurBvTe6gBY6Qp6yd7h0sIwmWpYibLGB/U
- fihnWViBFEZoVPmWHZKq6LvtukC4qAiqeRev2HgfPmg1+aECUbupwDda07TiuHGCY4gJ
- PV8bQN1sMkPOG5oevDmtBOP0nkQJ4w7TlcsPVQ5vsZd+wlT6UDuTnLcYEG/uCYmxTidM
- OecN7qzdQpWyjtECbfqnFf+nhhu0mDY4nloEZ6GlThTGsMJGaxEF8dVq9RIa7A1SOFa6 pg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3fjf52037r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Apr 2022 15:12:39 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23KF7CXZ026644;
-        Wed, 20 Apr 2022 15:12:39 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3fjf520372-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Apr 2022 15:12:39 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23KF33Nb018672;
-        Wed, 20 Apr 2022 15:12:38 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma02wdc.us.ibm.com with ESMTP id 3fg2xw1qp4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Apr 2022 15:12:38 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23KFCbel25166218
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Apr 2022 15:12:37 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B19F7AE060;
-        Wed, 20 Apr 2022 15:12:37 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AA18FAE05C;
-        Wed, 20 Apr 2022 15:12:35 +0000 (GMT)
-Received: from [9.211.82.47] (unknown [9.211.82.47])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed, 20 Apr 2022 15:12:35 +0000 (GMT)
-Message-ID: <1d9a128a-1391-712b-abdc-7d4d9c1e5cc0@linux.ibm.com>
-Date:   Wed, 20 Apr 2022 11:12:34 -0400
+        with ESMTP id S1354734AbiDTPuQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Apr 2022 11:50:16 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CAC820F7D
+        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 08:47:29 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id c12so2132229plr.6
+        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 08:47:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=cqlJftLH7LHu8dCSErsdrnwCHb1OWQ+El5mNGRz6CTM=;
+        b=W0Qzt+Ms8vroIUw71xYpAS+6OEn3MUJEOz6v8iktT067NsTQXfff+TDX3hwl8sNUK4
+         FI9Kelf5oNKVRcSKP2KGDfWGWB33AvEB4xyp54L2ziPXzTTzH7O38P93IaNpjyYISC2x
+         lrspa+IGFFjOTu+lHwI0rk0F1StDPmwlQfg0OfJE7FEzsy9yJAqj/yUBOeyqeZnGxswX
+         x6sVEKpuMpHpAY7INbq/1vP//9SKrhAKI1vBqpO9kic469zTJoR274FDLKiGilFJh6CS
+         B603k99CmO2bi+2w1GeTnKhln9msdGJKA1qRW6YWzJyVDiRdQ3Zv7ybEkOyoq/6nU5KK
+         Ej+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=cqlJftLH7LHu8dCSErsdrnwCHb1OWQ+El5mNGRz6CTM=;
+        b=f5tiItYEEcRe3A//IQYwrfSwqrd0Y6cc10lpKOrLcvWWYn34o6+SSBt9ho2yC15ttB
+         AiTYC0YguWRl51dKmYxBNPh9nl0yttCpi5hk9tRcgviuAkgoBax7o3h6qbZPxGt8LzeS
+         rrXTNJW077kM9bbTfjj7ouuajtr101rH2Dibp2MSr66XJ38m2rlwSuzFY5ftmtyqrpYe
+         Jf5DInNbeTPihrJsLT/ZeNHjGldjCN9qVWC6ljHIC15VbVzLHDLGs/BZq1yZSLUtYl67
+         QjGSg+aM2vjnZe1Ps6wTT96Bj9rejmAP0RnF4eF0VjrpgSIdNQ0NWqtwSUSimgWcr1Bu
+         0Osw==
+X-Gm-Message-State: AOAM532xABmXnOStSjzrUOUY/hANffLtwGHlcUJ8CU7O/mhnMOAshgaG
+        zvQOYSXrCJvp/3a5ftseOfRvQes3IN+uLQ==
+X-Google-Smtp-Source: ABdhPJwo8kbb/lVSaTjgR1gKI8cyICpyngATTNb6AxQoNPCrkFq2Ln7Mjzv4TKJZsooHBeCBIYiGCg==
+X-Received: by 2002:a17:90a:ee81:b0:1cb:ade8:6c61 with SMTP id i1-20020a17090aee8100b001cbade86c61mr5179240pjz.167.1650469648947;
+        Wed, 20 Apr 2022 08:47:28 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id y21-20020a631815000000b0039fcedd7bedsm21104065pgl.41.2022.04.20.08.47.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Apr 2022 08:47:28 -0700 (PDT)
+Date:   Wed, 20 Apr 2022 15:47:24 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        peterx@redhat.com
+Subject: Re: [PATCH] kvm: selftests: do not use bitfields larger than 32-bits
+ for PTEs
+Message-ID: <YmArDFQXF1lA3z8K@google.com>
+References: <20220420103624.1143824-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v5 5/9] s390x/pci: enable for load/store intepretation
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
-        cohuck@redhat.com, thuth@redhat.com, farman@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com,
-        pasic@linux.ibm.com, borntraeger@linux.ibm.com, mst@redhat.com,
-        pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <20220404181726.60291-1-mjrosato@linux.ibm.com>
- <20220404181726.60291-6-mjrosato@linux.ibm.com>
- <cb628847-9b52-b64a-da1e-18f69fe20e4b@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <cb628847-9b52-b64a-da1e-18f69fe20e4b@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: VQkOyMvibtvLhK9kE5Pjk8lXQdukuxaH
-X-Proofpoint-ORIG-GUID: KLLJjORwFVWkq2bf7jyoGfePBSlGTOGj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-20_04,2022-04-20_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
- spamscore=0 phishscore=0 adultscore=0 priorityscore=1501
- lowpriorityscore=0 suspectscore=0 mlxlogscore=999 malwarescore=0
- mlxscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204200090
-X-Spam-Status: No, score=-6.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H3,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220420103624.1143824-1-pbonzini@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -98,98 +71,144 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/19/22 3:47 PM, Pierre Morel wrote:
+On Wed, Apr 20, 2022, Paolo Bonzini wrote:
+> ---
+>  .../selftests/kvm/lib/x86_64/processor.c      | 202 ++++++++----------
+>  1 file changed, 89 insertions(+), 113 deletions(-)
 > 
-> 
-> On 4/4/22 20:17, Matthew Rosato wrote:
->> If the appropriate CPU facilty is available as well as the necessary
->> ZPCI_OP ioctl, then the underlying KVM host will enable load/store
->> intepretation for any guest device without a SHM bit in the guest
->> function handle.  For a device that will be using interpretation
->> support, ensure the guest function handle matches the host function
->> handle; this value is re-checked every time the guest issues a SET PCI FN
->> to enable the guest device as it is the only opportunity to reflect
->> function handle changes.
->>
->> By default, unless interpret=off is specified, interpretation support 
->> will
->> always be assumed and exploited if the necessary ioctl and features are
->> available on the host kernel.  When these are unavailable, we will 
->> silently
->> revert to the interception model; this allows existing guest 
->> configurations
->> to work unmodified on hosts with and without zPCI interpretation support,
->> allowing QEMU to choose the best support model available.
->>
->> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->> ---
->>   hw/s390x/meson.build            |  1 +
->>   hw/s390x/s390-pci-bus.c         | 66 ++++++++++++++++++++++++++++++++-
->>   hw/s390x/s390-pci-inst.c        | 12 ++++++
->>   hw/s390x/s390-pci-kvm.c         | 21 +++++++++++
->>   include/hw/s390x/s390-pci-bus.h |  1 +
->>   include/hw/s390x/s390-pci-kvm.h | 24 ++++++++++++
->>   target/s390x/kvm/kvm.c          |  7 ++++
->>   target/s390x/kvm/kvm_s390x.h    |  1 +
->>   8 files changed, 132 insertions(+), 1 deletion(-)
->>   create mode 100644 hw/s390x/s390-pci-kvm.c
->>   create mode 100644 include/hw/s390x/s390-pci-kvm.h
->>
-> 
-> ...snip...
-> 
->>           if (s390_pci_msix_init(pbdev)) {
->> @@ -1360,6 +1423,7 @@ static Property s390_pci_device_properties[] = {
->>       DEFINE_PROP_UINT16("uid", S390PCIBusDevice, uid, UID_UNDEFINED),
->>       DEFINE_PROP_S390_PCI_FID("fid", S390PCIBusDevice, fid),
->>       DEFINE_PROP_STRING("target", S390PCIBusDevice, target),
->> +    DEFINE_PROP_BOOL("interpret", S390PCIBusDevice, interp, true),
->>       DEFINE_PROP_END_OF_LIST(),
->>   };
->> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
->> index 6d400d4147..c898c8abe9 100644
->> --- a/hw/s390x/s390-pci-inst.c
->> +++ b/hw/s390x/s390-pci-inst.c
->> @@ -18,6 +18,8 @@
->>   #include "sysemu/hw_accel.h"
->>   #include "hw/s390x/s390-pci-inst.h"
->>   #include "hw/s390x/s390-pci-bus.h"
->> +#include "hw/s390x/s390-pci-kvm.h"
->> +#include "hw/s390x/s390-pci-vfio.h"
->>   #include "hw/s390x/tod.h"
->>   #ifndef DEBUG_S390PCI_INST
->> @@ -246,6 +248,16 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, 
->> uintptr_t ra)
->>                   goto out;
->>               }
->> +            /*
->> +             * Take this opportunity to make sure we still have an 
->> accurate
->> +             * host fh.  It's possible part of the handle changed 
->> while the
->> +             * device was disabled to the guest (e.g. vfio hot reset for
->> +             * ISM during plug)
->> +             */
->> +            if (pbdev->interp) {
->> +                /* Take this opportunity to make sure we are sync'd 
->> with host */
->> +                s390_pci_get_host_fh(pbdev, &pbdev->fh);
->> +            }
->>               pbdev->fh |= FH_MASK_ENABLE;
-> 
-> Are we sure here that the PCI device is always enabled?
-> Shouldn't we check?
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index 9f000dfb5594..90c3d34ce80b 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -20,36 +20,18 @@
+>  vm_vaddr_t exception_handlers;
+>  
+>  /* Virtual translation table structure declarations */
 
-I guess you mean the host device?  Interesting thought.
+Stale comment.
 
-So, to be clear, the idea on setting FH_MASK_ENABLE here is that we are 
-handling a guest CLP SET PCI FN enable so the guest fh should always 
-have FH_MASK_ENABLE set if we return CLP_RC_OK to the guest.
+> -struct pageUpperEntry {
+> -	uint64_t present:1;
+> -	uint64_t writable:1;
+> -	uint64_t user:1;
+> -	uint64_t write_through:1;
+> -	uint64_t cache_disable:1;
+> -	uint64_t accessed:1;
+> -	uint64_t ignored_06:1;
+> -	uint64_t page_size:1;
+> -	uint64_t ignored_11_08:4;
+> -	uint64_t pfn:40;
+> -	uint64_t ignored_62_52:11;
+> -	uint64_t execute_disable:1;
+> -};
+> -
+> -struct pageTableEntry {
+> -	uint64_t present:1;
+> -	uint64_t writable:1;
+> -	uint64_t user:1;
+> -	uint64_t write_through:1;
+> -	uint64_t cache_disable:1;
+> -	uint64_t accessed:1;
+> -	uint64_t dirty:1;
+> -	uint64_t reserved_07:1;
+> -	uint64_t global:1;
+> -	uint64_t ignored_11_09:3;
+> -	uint64_t pfn:40;
+> -	uint64_t ignored_62_52:11;
+> -	uint64_t execute_disable:1;
+> -};
+> +#define PTE_PRESENT_MASK  (1ULL << 0)
+> +#define PTE_WRITABLE_MASK (1ULL << 1)
+> +#define PTE_USER_MASK     (1ULL << 2)
+> +#define PTE_ACCESSED_MASK (1ULL << 5)
+> +#define PTE_DIRTY_MASK    (1ULL << 6)
+> +#define PTE_LARGE_MASK    (1ULL << 7)
+> +#define PTE_GLOBAL_MASK   (1ULL << 8)
+> +#define PTE_NX_MASK       (1ULL << 63)
 
-But for interpretation, if we find the host function is disabled, I 
-suppose we could return an error on the guest CLP (not sure which error 
-yet); otherwise, if we return the force-enabled handle and CLP_RC_OK as 
-we do here then the guest will just get errors attempting to use it.
+Any objection to using BIT_ULL()?  And tab(s) after the MASK so that there's some
+breathing room in the unlikely scenario we need a new, longer flag?
+
+> +#define PTE_PFN_MASK      0xFFFFFFFFFF000ULL
+
+GENMASK_ULL(52, 12), or maybe use the PAGE_SHIFT in the generation, though I find
+that more difficult to read for whatever reason.
+
+> +#define PTE_PFN_SHIFT     12
+
+Can we use the kernel's nomenclature?  That way if selftests ever find a way to
+pull in arch/x86/include/asm/page_types.h, we don't need to do a bunch of renames.
+And IMO it will make it easier to context switch between KVM and selftests.
 
 
+#define PTE_PRESENT_MASK	BIT_ULL(0)
+#define PTE_WRITABLE_MASK	BIT_ULL(1)
+#define PTE_USER_MASK		BIT_ULL(2)
+#define PTE_ACCESSED_MASK	BIT_ULL(5)
+#define PTE_DIRTY_MASK		BIT_ULL(6)
+#define PTE_LARGE_MASK		BIT_ULL(7)
+#define PTE_GLOBAL_MASK		BIT_ULL(8)
+#define PTE_NX_MASK		BIT_ULL(63)
 
+#define PAGE_SHIFT		12
+#define PAGE_SIZE		(1ULL << PAGE_SHIFT)
+#define PHYSICAL_PAGE_MASK	GENMASK_ULL(51, 12)
+
+#define PTE_GET_PFN(pte) (((pte) & PHYSICAL_PAGE_MASK) >> PAGE_SHIFT)
+
+
+I'd also vote to move these (in a different patch) to processor.h so that selftests
+can use PAGE_SIZE in particular.
+
+  tools/testing/selftests/kvm/x86_64 $ git grep -E "define\s+PAGE_SIZE" | wc -l
+  6
+
+And _vm_get_page_table_entry() has several gross open-coded masks/shifts that can
+be opportunistically converted now
+
+@@ -269,8 +270,7 @@ static uint64_t *_vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid,
+        struct kvm_cpuid_entry2 *entry;
+        struct kvm_sregs sregs;
+        int max_phy_addr;
+-       /* Set the bottom 52 bits. */
+-       uint64_t rsvd_mask = 0x000fffffffffffff;
++       uint64_t rsvd_mask = PHYSICAL_PAGE_MASK;
+ 
+        entry = kvm_get_supported_cpuid_index(0x80000008, 0);
+        max_phy_addr = entry->eax & 0x000000ff;
+@@ -284,9 +284,8 @@ static uint64_t *_vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid,
+         * the XD flag (bit 63) is reserved.
+         */
+        vcpu_sregs_get(vm, vcpuid, &sregs);
+-       if ((sregs.efer & EFER_NX) == 0) {
+-               rsvd_mask |= (1ull << 63);
+-       }
++       if (!(sregs.efer & EFER_NX))
++               rsvd_mask |= PTE_NX_MASK;
+ 
+
+
+and even more that can/should be cleaned up in the future, e.g. this pile, though
+that can be left for a different day.
+
+	/*
+	 * Based on the mode check above there are 48 bits in the vaddr, so
+	 * shift 16 to sign extend the last bit (bit-47),
+	 */
+	TEST_ASSERT(vaddr == (((int64_t)vaddr << 16) >> 16),
+		"Canonical check failed.  The virtual address is invalid.");
+
+	index[0] = (vaddr >> 12) & 0x1ffu;
+	index[1] = (vaddr >> 21) & 0x1ffu;
+	index[2] = (vaddr >> 30) & 0x1ffu;
+	index[3] = (vaddr >> 39) & 0x1ffu;
+  
+> -	return (pte[index[0]].pfn * vm->page_size) + (gva & 0xfffu);
+> +	return (PTE_GET_PFN(pte[index[0]]) * vm->page_size) + (gva & 0xfffu);
+
+Yeesh, and yet more cleanup.  Probably worth adding
+
+#define PAGE_MASK		(~(PAGE_SIZE-1))
+
+and using ~PAGE_MASK here?  Or defining PAGE_OFFSET?  Though that would conflict
+with the kernel's use of PAGE_OFFSET.
