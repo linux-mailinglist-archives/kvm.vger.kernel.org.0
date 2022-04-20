@@ -2,68 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 11B07508C61
-	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 17:47:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB23F508C6F
+	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 17:50:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380185AbiDTPuR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Apr 2022 11:50:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57502 "EHLO
+        id S1380324AbiDTPxH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Apr 2022 11:53:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354734AbiDTPuQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Apr 2022 11:50:16 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CAC820F7D
-        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 08:47:29 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id c12so2132229plr.6
-        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 08:47:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=cqlJftLH7LHu8dCSErsdrnwCHb1OWQ+El5mNGRz6CTM=;
-        b=W0Qzt+Ms8vroIUw71xYpAS+6OEn3MUJEOz6v8iktT067NsTQXfff+TDX3hwl8sNUK4
-         FI9Kelf5oNKVRcSKP2KGDfWGWB33AvEB4xyp54L2ziPXzTTzH7O38P93IaNpjyYISC2x
-         lrspa+IGFFjOTu+lHwI0rk0F1StDPmwlQfg0OfJE7FEzsy9yJAqj/yUBOeyqeZnGxswX
-         x6sVEKpuMpHpAY7INbq/1vP//9SKrhAKI1vBqpO9kic469zTJoR274FDLKiGilFJh6CS
-         B603k99CmO2bi+2w1GeTnKhln9msdGJKA1qRW6YWzJyVDiRdQ3Zv7ybEkOyoq/6nU5KK
-         Ej+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=cqlJftLH7LHu8dCSErsdrnwCHb1OWQ+El5mNGRz6CTM=;
-        b=f5tiItYEEcRe3A//IQYwrfSwqrd0Y6cc10lpKOrLcvWWYn34o6+SSBt9ho2yC15ttB
-         AiTYC0YguWRl51dKmYxBNPh9nl0yttCpi5hk9tRcgviuAkgoBax7o3h6qbZPxGt8LzeS
-         rrXTNJW077kM9bbTfjj7ouuajtr101rH2Dibp2MSr66XJ38m2rlwSuzFY5ftmtyqrpYe
-         Jf5DInNbeTPihrJsLT/ZeNHjGldjCN9qVWC6ljHIC15VbVzLHDLGs/BZq1yZSLUtYl67
-         QjGSg+aM2vjnZe1Ps6wTT96Bj9rejmAP0RnF4eF0VjrpgSIdNQ0NWqtwSUSimgWcr1Bu
-         0Osw==
-X-Gm-Message-State: AOAM532xABmXnOStSjzrUOUY/hANffLtwGHlcUJ8CU7O/mhnMOAshgaG
-        zvQOYSXrCJvp/3a5ftseOfRvQes3IN+uLQ==
-X-Google-Smtp-Source: ABdhPJwo8kbb/lVSaTjgR1gKI8cyICpyngATTNb6AxQoNPCrkFq2Ln7Mjzv4TKJZsooHBeCBIYiGCg==
-X-Received: by 2002:a17:90a:ee81:b0:1cb:ade8:6c61 with SMTP id i1-20020a17090aee8100b001cbade86c61mr5179240pjz.167.1650469648947;
-        Wed, 20 Apr 2022 08:47:28 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y21-20020a631815000000b0039fcedd7bedsm21104065pgl.41.2022.04.20.08.47.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Apr 2022 08:47:28 -0700 (PDT)
-Date:   Wed, 20 Apr 2022 15:47:24 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        peterx@redhat.com
-Subject: Re: [PATCH] kvm: selftests: do not use bitfields larger than 32-bits
- for PTEs
-Message-ID: <YmArDFQXF1lA3z8K@google.com>
-References: <20220420103624.1143824-1-pbonzini@redhat.com>
+        with ESMTP id S1380211AbiDTPxF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Apr 2022 11:53:05 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2044.outbound.protection.outlook.com [40.107.223.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7127533359;
+        Wed, 20 Apr 2022 08:50:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ko7z4hqRZ2PDBslnE0szOmQMy+bFSVQCxAbCbPnO4MVA+9kIVDFjwlZZ+PwsVauKd0Xdxe+9/N05QE/Y4aIgS5mvmR4khaBcVpPtwOQJX9TEEAgrzcOGjKzKaN3NvYagXwwrCvb7qf99t+cmZWLefZ3rArc/mgVUqDeN6jaxObDJQQLhemb72Y1OBci4lc60j+RGDLm1+Y5aezUuF5+v7XyEQg975NsX4kB5V4DqBIDgau06uyM9SIdIG4Rgjs1/vyrcY4BfAil+BEsf8nRHSF8M4/UxpkIalaBAoI89JF5o36RWTisKWzf/lrbgIuzrgicQNfxUn+5Ff6vgmlhk7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vERCj8v9Zj2m8Wx79KdPwqjV0jMHyaOPSvheCrJ9/bY=;
+ b=VqfpIWtgSk63QTOZTRNsBJTFi508MDUavW3j1xZVrqOz0wMTEpVoKhB51RvD1vcDfZAHwgym7bc9SCQy51jMsJILeEs/qKZh+BUJ2MDmfa3nPheBpE8KP4JXYzvo0bWZkSJMVgQb+qvmMIjeDJty1ZW8uK2zOnnK4FjphF3ebcnM2S9dOj4wwKavbkT2EWS1jrruard1x4hsP4GZnaLFL9TK588ZLwuN9ohGIBVGVa3hx9zySCvWoecJ6Tv4PT9dIAEQoebGaoo4tJUDHSnBkg+d/VB9s3gS4+XJAC49J41p5O3KLbSFlCkY2SGWpYT43xW878SKSlOL+8/nhNryKQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vERCj8v9Zj2m8Wx79KdPwqjV0jMHyaOPSvheCrJ9/bY=;
+ b=gF+csGeem+0qb0317GgR9mnDIea3c0BIFvuYxqwUAswrM4B/apJSjt7XWI7Ccno/BwpnTXee3xxlkHdr4iw+YBeI2mV1zWUnawREOLCWw8cvW0gnMsU4sc5JoL8koZRiKKpvyD2t6rFyIX8Nb+zUSfCE/oP7osvSkdgtiDqx1iM=
+Received: from MW4PR03CA0062.namprd03.prod.outlook.com (2603:10b6:303:b6::7)
+ by BY5PR12MB4869.namprd12.prod.outlook.com (2603:10b6:a03:1d9::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.14; Wed, 20 Apr
+ 2022 15:50:17 +0000
+Received: from CO1NAM11FT066.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:b6:cafe::a3) by MW4PR03CA0062.outlook.office365.com
+ (2603:10b6:303:b6::7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.13 via Frontend
+ Transport; Wed, 20 Apr 2022 15:50:17 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT066.mail.protection.outlook.com (10.13.175.18) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5186.14 via Frontend Transport; Wed, 20 Apr 2022 15:50:16 +0000
+Received: from sp5-759chost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Wed, 20 Apr
+ 2022 10:50:13 -0500
+From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
+CC:     <pbonzini@redhat.com>, <mlevitsk@redhat.com>, <seanjc@google.com>,
+        <joro@8bytes.org>, <jon.grimm@amd.com>, <wei.huang2@amd.com>,
+        <terry.bowman@amd.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Subject: [PATCH V2 0/2] KVM: SVM: Optimize AVIC incomplete IPI #vmexit handling
+Date:   Wed, 20 Apr 2022 10:49:52 -0500
+Message-ID: <20220420154954.19305-1-suravee.suthikulpanit@amd.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220420103624.1143824-1-pbonzini@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d945a9aa-1a22-49f5-e51d-08da22e5775b
+X-MS-TrafficTypeDiagnostic: BY5PR12MB4869:EE_
+X-Microsoft-Antispam-PRVS: <BY5PR12MB4869706227CE71EA942899A9F3F59@BY5PR12MB4869.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: WuDfBaq56oYOq2qac/G6tPkiAn/zBAgxUI8YcJR1Yux8SItvQpG9uxulKnsH1ZzdLeF0j7pIh1KN9WSLP042JTVtpTvPjL2o/MQrDnEbqHW+aMHWiAf0rlpwKoXCRU/PzniQ1DPhE7k6CpSiKst7VeMNGyYSQbbvv8YwY1oFeXH5OSJbU1gKeZm5O3tqjOXRc5rRjFJSudS9JuWLrCvdyrW3FMrjLtS0wKe845Ib+C5Ar/LzlKOYrVqRV7E5lNWKqW3DEtqAdApqBHyJxbFF8p4eNP3vg9NTNSzOBFsXs090eS8ZJ2PyfN/051VMSGHOH16BpZDA31QAQHhJ3SEUNzV/uAxdA07GcxdmQhgwx1+ijkT7iwAD7Vh8lNLfSDAmQmaBrYkafO1MXJbt5ScE/q8aVXCDIep81ZnUkqri4ammHQAz+BlqP6Lxp6enGdFFyOSNYxlgM6PZXk3tSu9nXiH++ngFcnfb0i+oHkYSVirpZc9tzq5VzBZup5gLINFBLRplK342+DKS87WpWBp0xvPRz+w+8OIBHJbNBYbfrXN8+zhQadJCEiVK+fOEimN1XPX+d9XcztEB+jKy/OQqV9ga+s+ypRCHvJXqEy9tDVIpKU7nF4HeKa/QkyK77Ryvndx4RQXD5lgLiGks4+cmbsQCdzYCJ2aBlzh3S+Fg0GB1U2GKd2/7jZ5qtjOp4FykuQf3RIuir94v6kAx0LD4e0S9ICTVLNHWKeHWuA/bRmXS5+hpHfAga0ShtA5XQK5VUZoELzXgLEPtdUPTvflLCX6SPzKbMLWt1JWmMcCZpbc=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(46966006)(36840700001)(40470700004)(8936002)(508600001)(36860700001)(86362001)(356005)(40460700003)(110136005)(316002)(83380400001)(7696005)(336012)(47076005)(426003)(36756003)(54906003)(44832011)(70586007)(81166007)(4744005)(26005)(2906002)(70206006)(186003)(4326008)(1076003)(16526019)(5660300002)(2616005)(82310400005)(6666004)(8676002)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Apr 2022 15:50:16.9994
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d945a9aa-1a22-49f5-e51d-08da22e5775b
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT066.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4869
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,144 +99,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 20, 2022, Paolo Bonzini wrote:
-> ---
->  .../selftests/kvm/lib/x86_64/processor.c      | 202 ++++++++----------
->  1 file changed, 89 insertions(+), 113 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index 9f000dfb5594..90c3d34ce80b 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -20,36 +20,18 @@
->  vm_vaddr_t exception_handlers;
->  
->  /* Virtual translation table structure declarations */
+This series introduce a fast-path when handling AVIC incomplete IPI #vmexit
+for AVIC, and introduce a new tracepoint for the slow-path processing.
 
-Stale comment.
+Regards,
+Suravee
 
-> -struct pageUpperEntry {
-> -	uint64_t present:1;
-> -	uint64_t writable:1;
-> -	uint64_t user:1;
-> -	uint64_t write_through:1;
-> -	uint64_t cache_disable:1;
-> -	uint64_t accessed:1;
-> -	uint64_t ignored_06:1;
-> -	uint64_t page_size:1;
-> -	uint64_t ignored_11_08:4;
-> -	uint64_t pfn:40;
-> -	uint64_t ignored_62_52:11;
-> -	uint64_t execute_disable:1;
-> -};
-> -
-> -struct pageTableEntry {
-> -	uint64_t present:1;
-> -	uint64_t writable:1;
-> -	uint64_t user:1;
-> -	uint64_t write_through:1;
-> -	uint64_t cache_disable:1;
-> -	uint64_t accessed:1;
-> -	uint64_t dirty:1;
-> -	uint64_t reserved_07:1;
-> -	uint64_t global:1;
-> -	uint64_t ignored_11_09:3;
-> -	uint64_t pfn:40;
-> -	uint64_t ignored_62_52:11;
-> -	uint64_t execute_disable:1;
-> -};
-> +#define PTE_PRESENT_MASK  (1ULL << 0)
-> +#define PTE_WRITABLE_MASK (1ULL << 1)
-> +#define PTE_USER_MASK     (1ULL << 2)
-> +#define PTE_ACCESSED_MASK (1ULL << 5)
-> +#define PTE_DIRTY_MASK    (1ULL << 6)
-> +#define PTE_LARGE_MASK    (1ULL << 7)
-> +#define PTE_GLOBAL_MASK   (1ULL << 8)
-> +#define PTE_NX_MASK       (1ULL << 63)
+Change from v1: (https://lore.kernel.org/lkml/20220414051151.77710-1-suravee.suthikulpanit@amd.com/T/)
+ * Rebased on top of Linux 5.18-rc3
+ * Patch 1/2:
+    - Update commit shortlog to be more meaningful
+    - Refactor to remove x2AVIC related logic for now, which will be included
+      in the x2AVIC patch series.
 
-Any objection to using BIT_ULL()?  And tab(s) after the MASK so that there's some
-breathing room in the unlikely scenario we need a new, longer flag?
+Suravee Suthikulpanit (2):
+  KVM: SVM: Use target APIC ID to complete AVIC IRQs when possible
+  KVM: SVM: Introduce trace point for the slow-path of
+    avic_kic_target_vcpus
 
-> +#define PTE_PFN_MASK      0xFFFFFFFFFF000ULL
+ arch/x86/kvm/svm/avic.c | 74 ++++++++++++++++++++++++++++++++++++++---
+ arch/x86/kvm/trace.h    | 20 +++++++++++
+ arch/x86/kvm/x86.c      |  1 +
+ 3 files changed, 91 insertions(+), 4 deletions(-)
 
-GENMASK_ULL(52, 12), or maybe use the PAGE_SHIFT in the generation, though I find
-that more difficult to read for whatever reason.
+-- 
+2.25.1
 
-> +#define PTE_PFN_SHIFT     12
-
-Can we use the kernel's nomenclature?  That way if selftests ever find a way to
-pull in arch/x86/include/asm/page_types.h, we don't need to do a bunch of renames.
-And IMO it will make it easier to context switch between KVM and selftests.
-
-
-#define PTE_PRESENT_MASK	BIT_ULL(0)
-#define PTE_WRITABLE_MASK	BIT_ULL(1)
-#define PTE_USER_MASK		BIT_ULL(2)
-#define PTE_ACCESSED_MASK	BIT_ULL(5)
-#define PTE_DIRTY_MASK		BIT_ULL(6)
-#define PTE_LARGE_MASK		BIT_ULL(7)
-#define PTE_GLOBAL_MASK		BIT_ULL(8)
-#define PTE_NX_MASK		BIT_ULL(63)
-
-#define PAGE_SHIFT		12
-#define PAGE_SIZE		(1ULL << PAGE_SHIFT)
-#define PHYSICAL_PAGE_MASK	GENMASK_ULL(51, 12)
-
-#define PTE_GET_PFN(pte) (((pte) & PHYSICAL_PAGE_MASK) >> PAGE_SHIFT)
-
-
-I'd also vote to move these (in a different patch) to processor.h so that selftests
-can use PAGE_SIZE in particular.
-
-  tools/testing/selftests/kvm/x86_64 $ git grep -E "define\s+PAGE_SIZE" | wc -l
-  6
-
-And _vm_get_page_table_entry() has several gross open-coded masks/shifts that can
-be opportunistically converted now
-
-@@ -269,8 +270,7 @@ static uint64_t *_vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid,
-        struct kvm_cpuid_entry2 *entry;
-        struct kvm_sregs sregs;
-        int max_phy_addr;
--       /* Set the bottom 52 bits. */
--       uint64_t rsvd_mask = 0x000fffffffffffff;
-+       uint64_t rsvd_mask = PHYSICAL_PAGE_MASK;
- 
-        entry = kvm_get_supported_cpuid_index(0x80000008, 0);
-        max_phy_addr = entry->eax & 0x000000ff;
-@@ -284,9 +284,8 @@ static uint64_t *_vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid,
-         * the XD flag (bit 63) is reserved.
-         */
-        vcpu_sregs_get(vm, vcpuid, &sregs);
--       if ((sregs.efer & EFER_NX) == 0) {
--               rsvd_mask |= (1ull << 63);
--       }
-+       if (!(sregs.efer & EFER_NX))
-+               rsvd_mask |= PTE_NX_MASK;
- 
-
-
-and even more that can/should be cleaned up in the future, e.g. this pile, though
-that can be left for a different day.
-
-	/*
-	 * Based on the mode check above there are 48 bits in the vaddr, so
-	 * shift 16 to sign extend the last bit (bit-47),
-	 */
-	TEST_ASSERT(vaddr == (((int64_t)vaddr << 16) >> 16),
-		"Canonical check failed.  The virtual address is invalid.");
-
-	index[0] = (vaddr >> 12) & 0x1ffu;
-	index[1] = (vaddr >> 21) & 0x1ffu;
-	index[2] = (vaddr >> 30) & 0x1ffu;
-	index[3] = (vaddr >> 39) & 0x1ffu;
-  
-> -	return (pte[index[0]].pfn * vm->page_size) + (gva & 0xfffu);
-> +	return (PTE_GET_PFN(pte[index[0]]) * vm->page_size) + (gva & 0xfffu);
-
-Yeesh, and yet more cleanup.  Probably worth adding
-
-#define PAGE_MASK		(~(PAGE_SIZE-1))
-
-and using ~PAGE_MASK here?  Or defining PAGE_OFFSET?  Though that would conflict
-with the kernel's use of PAGE_OFFSET.
