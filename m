@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D87FE508944
-	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 15:26:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D320508942
+	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 15:26:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379038AbiDTN2o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Apr 2022 09:28:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46238 "EHLO
+        id S1379054AbiDTN2q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Apr 2022 09:28:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379032AbiDTN2g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Apr 2022 09:28:36 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E174F11A36;
-        Wed, 20 Apr 2022 06:25:49 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id bg9so1604742pgb.9;
-        Wed, 20 Apr 2022 06:25:49 -0700 (PDT)
+        with ESMTP id S1379039AbiDTN2m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Apr 2022 09:28:42 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07F5D3A187;
+        Wed, 20 Apr 2022 06:25:56 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id p8so1914724pfh.8;
+        Wed, 20 Apr 2022 06:25:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=6LkvNab/6tjOJLVxEQOpqPQJoB0oTUl274FVeJL6vXA=;
-        b=DorGCDAlIME225NVrrVUdFe8hl/FJoxit0vf/SUZTlVJQ096P6UpSwyZwsw/dTyUEa
-         Uo038b/+rHeHFZlhzABlPJr0+jFGm+lW8E5YRG4JwKl9B7bDk3sirniuZY0gjnJqbRh4
-         emAKGdruA57bwR+VWQRwcZ7GpI1x6eU93GoAdZRK6YFApFIxhQ1YLobYbz0iafOdxJcp
-         hKU0kbGSE4dZL4EEt8FaL1/Orgk1xMe3JUV9IdvghTAY7B98GNtr0b3EFaBAQ1ot4F5F
-         8S++ZnqFOFyulmaGa9t8sm6xp6NUzz1WNo0wwMF/VJu6lV0aqRwrTcWeSrvcCgGpOdBR
-         NUQg==
+        bh=jjSP1EY6GE15ryex7YKFqGxc3rcSfRHmQrniXn4FjUc=;
+        b=oxqxZbWgxFnLN2naCgMlw72VN2dZ8fNFqgDsgoz14rgp5AkETywM4CqumR97t1lY+D
+         3wPmWxKvPumh1YOlTnyDWTsaYfhW4YHTwhAmiOW2sWz5ni3FWvlnte1dgQv0efKYroyB
+         D575woexiYfgqBhNLg+MHL+1TC9HsAmTzyo+TMGjjlaO0DKwSdh/Y1XMA3tVAisCcIZo
+         k8tIkemMiE6euldW9QGnAv1tCL0OFCmYDBszr0Q6BVIvckw7nbaavngx8dC+wpynCMlU
+         oI2Qt4A5css2nzXBjLC/XTwd+PPYgYxI79oJQzac+Ni+zGeqP4QOI8UHjckSLk7KqVhQ
+         CbtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=6LkvNab/6tjOJLVxEQOpqPQJoB0oTUl274FVeJL6vXA=;
-        b=cFABkfaVNs3zXY8NLa3d4/JBFQFV+RuncnDF8OSdkL6+ivLuXN/vVtRpTKVOo0V8mM
-         LPQRWV2G4G3QktXtRYWTr/xF1PreIJN2Ovek6FshdF9q3K8XFa4poMtey+w6T7dgwDhN
-         cNS1TKS7Jy93ddXnh98eCHt/NHOdLmCyoUzWN5BTc7vuPHqig3kmI1iWZUAWI2tHhFK2
-         kTiTow5U2Qmrws0H5YuaN0vkDH3C/2tKCSV517hx4fpCaZbq0twruixURC7l9nQ0yH6+
-         Q+VTOXQ443LWcvA08DhV4Fxq8C/8lCroWct5OlrOi9Fzuz+jP0EWr1l4ZzCs7D9aAcZj
-         l55Q==
-X-Gm-Message-State: AOAM532lMqRdb2W9793fSrJl/aOh7xVAs/Mqdnc6a8+NtCqyHXQ4S8mX
-        C46sNBfh0iguOKorL2NH/MjhOSUNh9A=
-X-Google-Smtp-Source: ABdhPJxH753vNUNaiRfbkVu9zw8nveSjuhbUIU8CFyc/KgFf6Qzj99r6dwCkttJRsoKDV0SGKwswiQ==
-X-Received: by 2002:a62:5343:0:b0:4f7:baad:5c22 with SMTP id h64-20020a625343000000b004f7baad5c22mr23214956pfb.30.1650461149233;
-        Wed, 20 Apr 2022 06:25:49 -0700 (PDT)
+        bh=jjSP1EY6GE15ryex7YKFqGxc3rcSfRHmQrniXn4FjUc=;
+        b=GsJCpuFNgQGvmHKQsGmr6HuNpDq8ehSNg2lfZKqZnxC+gizF/6TLsRkBAc6Wr3XA/6
+         1qlsgLGwCVl8yp7vhzrA9mwwmsMqwuhaXVOADeffOc1vBshzPpvRY7FMYUl2A/6y5QCM
+         2SxVWqyi15pqEHLOR7b8AVtCcrHCA5L6L7p3/h1dfI41ApDRcs3K6d4bjDyhR0k1ACjT
+         PmdeLbmsoy/xJM55UhWJENqkun3UoWqATJ65uUlaDQ8ctJR+QQdb2pUHZxsK5a1/0Nus
+         O+OMZN+bADNdTCLu10GHVLuQx8e5z6drlL7PDxhLqZ/AmjVq0LTTtviHaZfFvwNIfSg0
+         OnMg==
+X-Gm-Message-State: AOAM531T65rbMG8DstiP5/R+Nv4NtpkFbnVzh9utRQdBfrqtQJYinYMI
+        jd5YE2IgEJhXO/VkE9LchBT+gWqbouQ=
+X-Google-Smtp-Source: ABdhPJwhFmtlDYofvkK6rrlWWHpnRtw4Vxe368lehSgXLDlKKHkTlAn5aqSevVHHFdMs5fRn1UKE3g==
+X-Received: by 2002:a05:6a00:1893:b0:50a:9b07:20bd with SMTP id x19-20020a056a00189300b0050a9b0720bdmr7228985pfh.66.1650461155230;
+        Wed, 20 Apr 2022 06:25:55 -0700 (PDT)
 Received: from localhost ([47.251.4.198])
-        by smtp.gmail.com with ESMTPSA id d8-20020a636808000000b00398e9c7049bsm19899161pgc.31.2022.04.20.06.25.48
+        by smtp.gmail.com with ESMTPSA id r8-20020a17090a0ac800b001c9e35d3a3asm19297925pje.24.2022.04.20.06.25.54
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 20 Apr 2022 06:25:49 -0700 (PDT)
+        Wed, 20 Apr 2022 06:25:55 -0700 (PDT)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -60,9 +60,9 @@ Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH 5/7] KVM: X86/MMU: Remove the check of the return value of to_shadow_page()
-Date:   Wed, 20 Apr 2022 21:26:03 +0800
-Message-Id: <20220420132605.3813-6-jiangshanlai@gmail.com>
+Subject: [PATCH 6/7] KVM: X86/MMU: Allocate mmu->pae_root for PAE paging on-demand
+Date:   Wed, 20 Apr 2022 21:26:04 +0800
+Message-Id: <20220420132605.3813-7-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20220420132605.3813-1-jiangshanlai@gmail.com>
 References: <20220420132605.3813-1-jiangshanlai@gmail.com>
@@ -80,132 +80,183 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-Remove the check of the return value of to_shadow_page() in
-mmu_free_root_page(), kvm_mmu_free_guest_mode_roots(), is_unsync_root()
-and is_tdp_mmu() because it can not return NULL.
+mmu->pae_root for non-PAE paging is allocated on-demand, but
+mmu->pae_root for PAE paging is allocated early when struct kvm_mmu is
+being created.
 
-Remove the check of the return value of to_shadow_page() in
-is_page_fault_stale() and is_obsolete_root() because it can not return
-NULL and the obsoleting for special shadow page is already handled by
-a different way.
-
-When the obsoleting process is done, all the obsoleted shadow pages are
-already unlinked from the special pages by the help of the rmap of the
-children and the special pages become theoretically valid again.  The
-special shadow page can be freed if is_obsolete_sp() return true, or be
-reused if is_obsolete_sp() return false.
+Simplify the code to allocate mmu->pae_root for PAE paging and make
+it on-demand.
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 ---
- arch/x86/kvm/mmu/mmu.c     | 44 +++-----------------------------------
- arch/x86/kvm/mmu/tdp_mmu.h |  7 +-----
- 2 files changed, 4 insertions(+), 47 deletions(-)
+ arch/x86/kvm/mmu/mmu.c          | 99 ++++++++++++++-------------------
+ arch/x86/kvm/mmu/mmu_internal.h | 10 ----
+ 2 files changed, 42 insertions(+), 67 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 3b34a6912081..72a1af35e331 100644
+index 72a1af35e331..2f590779ee39 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3278,8 +3278,6 @@ static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
- 		return;
- 
- 	sp = to_shadow_page(*root_hpa & PT64_BASE_ADDR_MASK);
--	if (WARN_ON(!sp))
--		return;
- 
- 	if (is_tdp_mmu_page(sp))
- 		kvm_tdp_mmu_put_root(kvm, sp, false);
-@@ -3382,8 +3380,7 @@ void kvm_mmu_free_guest_mode_roots(struct kvm *kvm, struct kvm_mmu *mmu)
- 		if (!VALID_PAGE(root_hpa))
- 			continue;
- 
--		if (!to_shadow_page(root_hpa) ||
--			to_shadow_page(root_hpa)->role.guest_mode)
-+		if (to_shadow_page(root_hpa)->role.guest_mode)
- 			roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
+@@ -694,6 +694,41 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
  	}
- 
-@@ -3632,13 +3629,6 @@ static bool is_unsync_root(hpa_t root)
- 	smp_rmb();
- 	sp = to_shadow_page(root);
- 
--	/*
--	 * PAE roots (somewhat arbitrarily) aren't backed by shadow pages, the
--	 * PDPTEs for a given PAE root need to be synchronized individually.
--	 */
--	if (WARN_ON_ONCE(!sp))
--		return false;
--
- 	if (sp->unsync || sp->unsync_children)
- 		return true;
- 
-@@ -3934,21 +3924,7 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
- static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
- 				struct kvm_page_fault *fault, int mmu_seq)
- {
--	struct kvm_mmu_page *sp = to_shadow_page(vcpu->arch.mmu->root.hpa);
--
--	/* Special roots, e.g. pae_root, are not backed by shadow pages. */
--	if (sp && is_obsolete_sp(vcpu->kvm, sp))
--		return true;
--
--	/*
--	 * Roots without an associated shadow page are considered invalid if
--	 * there is a pending request to free obsolete roots.  The request is
--	 * only a hint that the current root _may_ be obsolete and needs to be
--	 * reloaded, e.g. if the guest frees a PGD that KVM is tracking as a
--	 * previous root, then __kvm_mmu_prepare_zap_page() signals all vCPUs
--	 * to reload even if no vCPU is actively using the root.
--	 */
--	if (!sp && kvm_test_request(KVM_REQ_MMU_FREE_OBSOLETE_ROOTS, vcpu))
-+	if (is_obsolete_sp(vcpu->kvm, to_shadow_page(vcpu->arch.mmu->root.hpa)))
- 		return true;
- 
- 	return fault->slot &&
-@@ -5099,24 +5075,10 @@ void kvm_mmu_unload(struct kvm_vcpu *vcpu)
- 
- static bool is_obsolete_root(struct kvm *kvm, hpa_t root_hpa)
- {
--	struct kvm_mmu_page *sp;
--
- 	if (!VALID_PAGE(root_hpa))
- 		return false;
- 
--	/*
--	 * When freeing obsolete roots, treat roots as obsolete if they don't
--	 * have an associated shadow page.  This does mean KVM will get false
--	 * positives and free roots that don't strictly need to be freed, but
--	 * such false positives are relatively rare:
--	 *
--	 *  (a) only PAE paging and nested NPT has roots without shadow pages
--	 *  (b) remote reloads due to a memslot update obsoletes _all_ roots
--	 *  (c) KVM doesn't track previous roots for PAE paging, and the guest
--	 *      is unlikely to zap an in-use PGD.
--	 */
--	sp = to_shadow_page(root_hpa);
--	return !sp || is_obsolete_sp(kvm, sp);
-+	return is_obsolete_sp(kvm, to_shadow_page(root_hpa));
  }
  
- static void __kvm_mmu_free_obsolete_roots(struct kvm *kvm, struct kvm_mmu *mmu)
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 5e5ef2576c81..4f70cb1b46df 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -84,13 +84,8 @@ static inline bool is_tdp_mmu(struct kvm_mmu *mmu)
- 	if (WARN_ON(!VALID_PAGE(hpa)))
- 		return false;
- 
--	/*
--	 * A NULL shadow page is legal when shadowing a non-paging guest with
--	 * PAE paging, as the MMU will be direct with root_hpa pointing at the
--	 * pae_root page, not a shadow page.
--	 */
- 	sp = to_shadow_page(hpa);
--	return sp && is_tdp_mmu_page(sp) && sp->root_count;
-+	return is_tdp_mmu_page(sp) && sp->root_count;
++static int mmu_alloc_pae_root(struct kvm_vcpu *vcpu)
++{
++	struct page *page;
++
++	if (vcpu->arch.mmu->shadow_root_level != PT32E_ROOT_LEVEL)
++		return 0;
++	if (vcpu->arch.mmu->pae_root)
++		return 0;
++
++	/*
++	 * Allocate a page to hold the four PDPTEs for PAE paging when emulating
++	 * 32-bit mode.  CR3 is only 32 bits even on x86_64 in this case.
++	 * Therefore we need to allocate the PDP table in the first 4GB of
++	 * memory, which happens to fit the DMA32 zone.
++	 */
++	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO | __GFP_DMA32);
++	if (!page)
++		return -ENOMEM;
++	vcpu->arch.mmu->pae_root = page_address(page);
++
++	/*
++	 * CR3 is only 32 bits when PAE paging is used, thus it's impossible to
++	 * get the CPU to treat the PDPTEs as encrypted.  Decrypt the page so
++	 * that KVM's writes and the CPU's reads get along.  Note, this is
++	 * only necessary when using shadow paging, as 64-bit NPT can get at
++	 * the C-bit even when shadowing 32-bit NPT, and SME isn't supported
++	 * by 32-bit kernels (when KVM itself uses 32-bit NPT).
++	 */
++	if (!tdp_enabled)
++		set_memory_decrypted((unsigned long)vcpu->arch.mmu->pae_root, 1);
++	else
++		WARN_ON_ONCE(shadow_me_mask);
++	return 0;
++}
++
+ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
+ {
+ 	int r;
+@@ -5036,6 +5071,9 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
+ 	r = mmu_topup_memory_caches(vcpu, !vcpu->arch.mmu->direct_map);
+ 	if (r)
+ 		goto out;
++	r = mmu_alloc_pae_root(vcpu);
++	if (r)
++		return r;
+ 	r = mmu_alloc_special_roots(vcpu);
+ 	if (r)
+ 		goto out;
+@@ -5500,63 +5538,18 @@ static void free_mmu_pages(struct kvm_mmu *mmu)
+ 	free_page((unsigned long)mmu->pml5_root);
  }
- #else
- static inline bool kvm_mmu_init_tdp_mmu(struct kvm *kvm) { return false; }
+ 
+-static int __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
++static void __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
+ {
+-	struct page *page;
+ 	int i;
+ 
+ 	mmu->root.hpa = INVALID_PAGE;
+ 	mmu->root.pgd = 0;
+ 	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+ 		mmu->prev_roots[i] = KVM_MMU_ROOT_INFO_INVALID;
+-
+-	/* vcpu->arch.guest_mmu isn't used when !tdp_enabled. */
+-	if (!tdp_enabled && mmu == &vcpu->arch.guest_mmu)
+-		return 0;
+-
+-	/*
+-	 * When using PAE paging, the four PDPTEs are treated as 'root' pages,
+-	 * while the PDP table is a per-vCPU construct that's allocated at MMU
+-	 * creation.  When emulating 32-bit mode, cr3 is only 32 bits even on
+-	 * x86_64.  Therefore we need to allocate the PDP table in the first
+-	 * 4GB of memory, which happens to fit the DMA32 zone.  TDP paging
+-	 * generally doesn't use PAE paging and can skip allocating the PDP
+-	 * table.  The main exception, handled here, is SVM's 32-bit NPT.  The
+-	 * other exception is for shadowing L1's 32-bit or PAE NPT on 64-bit
+-	 * KVM; that horror is handled on-demand by mmu_alloc_special_roots().
+-	 */
+-	if (tdp_enabled && kvm_mmu_get_tdp_level(vcpu) > PT32E_ROOT_LEVEL)
+-		return 0;
+-
+-	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_DMA32);
+-	if (!page)
+-		return -ENOMEM;
+-
+-	mmu->pae_root = page_address(page);
+-
+-	/*
+-	 * CR3 is only 32 bits when PAE paging is used, thus it's impossible to
+-	 * get the CPU to treat the PDPTEs as encrypted.  Decrypt the page so
+-	 * that KVM's writes and the CPU's reads get along.  Note, this is
+-	 * only necessary when using shadow paging, as 64-bit NPT can get at
+-	 * the C-bit even when shadowing 32-bit NPT, and SME isn't supported
+-	 * by 32-bit kernels (when KVM itself uses 32-bit NPT).
+-	 */
+-	if (!tdp_enabled)
+-		set_memory_decrypted((unsigned long)mmu->pae_root, 1);
+-	else
+-		WARN_ON_ONCE(shadow_me_mask);
+-
+-	for (i = 0; i < 4; ++i)
+-		mmu->pae_root[i] = INVALID_PAE_ROOT;
+-
+-	return 0;
+ }
+ 
+ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+ {
+-	int ret;
+-
+ 	vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
+ 	vcpu->arch.mmu_pte_list_desc_cache.gfp_zero = __GFP_ZERO;
+ 
+@@ -5568,18 +5561,10 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.mmu = &vcpu->arch.root_mmu;
+ 	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
+ 
+-	ret = __kvm_mmu_create(vcpu, &vcpu->arch.guest_mmu);
+-	if (ret)
+-		return ret;
+-
+-	ret = __kvm_mmu_create(vcpu, &vcpu->arch.root_mmu);
+-	if (ret)
+-		goto fail_allocate_root;
++	__kvm_mmu_create(vcpu, &vcpu->arch.guest_mmu);
++	__kvm_mmu_create(vcpu, &vcpu->arch.root_mmu);
+ 
+-	return ret;
+- fail_allocate_root:
+-	free_mmu_pages(&vcpu->arch.guest_mmu);
+-	return ret;
++	return 0;
+ }
+ 
+ #define BATCH_ZAP_PAGES	10
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index 1bff453f7cbe..d5673a42680f 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -20,16 +20,6 @@ extern bool dbg;
+ #define MMU_WARN_ON(x) do { } while (0)
+ #endif
+ 
+-/*
+- * Unlike regular MMU roots, PAE "roots", a.k.a. PDPTEs/PDPTRs, have a PRESENT
+- * bit, and thus are guaranteed to be non-zero when valid.  And, when a guest
+- * PDPTR is !PRESENT, its corresponding PAE root cannot be set to INVALID_PAGE,
+- * as the CPU would treat that as PRESENT PDPTR with reserved bits set.  Use
+- * '0' instead of INVALID_PAGE to indicate an invalid PAE root.
+- */
+-#define INVALID_PAE_ROOT	0
+-#define IS_VALID_PAE_ROOT(x)	(!!(x))
+-
+ typedef u64 __rcu *tdp_ptep_t;
+ 
+ struct kvm_mmu_page {
 -- 
 2.19.1.6.gb485710b
 
