@@ -2,210 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E9549507F8B
-	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 05:18:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DBFD5507F93
+	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 05:23:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359226AbiDTDUY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Apr 2022 23:20:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49064 "EHLO
+        id S1359249AbiDTDZs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Apr 2022 23:25:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238897AbiDTDUV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Apr 2022 23:20:21 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BB139FD6;
-        Tue, 19 Apr 2022 20:17:36 -0700 (PDT)
+        with ESMTP id S1359239AbiDTDZp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Apr 2022 23:25:45 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3932421E2C;
+        Tue, 19 Apr 2022 20:23:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650424656; x=1681960656;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
+  t=1650424981; x=1681960981;
+  h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=aSlmWYo67979bXI+8rgE6ppMUFAAUoPR5mX4oC2meD8=;
-  b=QzBDTsvB3pu732uwEag5dKe9Z5E4wa2OBJsOu4qRT8u9ak/Jwj8wDepy
-   hrvclFPbcUWUmVpyOIRKUJ8ybBNU+dDgHMzBKzKMHRieiGfcMVXiuUPcK
-   C2sLPXkWyP6AHeM9M2kvB1CAXL9fvOdyyhvl3Wd2lgnUCV05eaq//irld
-   m8PEQd3mOZkWzJz1N1+Z2OFBWt77Zrrg4/PzhZWQgWyfEVsMHLR90TyXQ
-   4u8juvKqF0fiNsgu+RiS4oFwTOXNqcuYX4uCRG1zbcGO2HHwyVJreDvR8
-   6vVg458hdAiLnQrEOfMRCgSCO/rfRpkqXnF1n1Zirg0JHrclmKisYCgVb
+  bh=1AiC9VeveMPhro24gHqzjyeU34rUd2EVyr+r3itMve4=;
+  b=iUfOVHrmqmBRjJ3bzkShScz8IUtZ5GaGCaxA7HbL6XPn9bfkhfvYSMvp
+   UMozJuBSCJ3MxYW+xpcvTI48R1ahJvCLOMTYSmF1KN6VwNUwiQVjJCm08
+   k4gx6wE+AoCcTfj/l1IT0sVmtnQ7t0mJSbY5nKg5oSuMJyZFPevHL0pNF
+   8EbazH8M3gSoLoOPMy4E5QyytLJF9Ti+tUq1n/jaZWxVq+7QHrb8RLrs8
+   qdUBdP9f5KTERxd0v4tRNBLtRKz4/gu1tHmwF+HBP3QB1V0FMwV07YTgx
+   yvKJpLwnn7Fv4eVu3dfqrYyFcmhQuSJDze+xzi2gdlf2zfqmHmrZNGi+6
    g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10322"; a="350375126"
+X-IronPort-AV: E=McAfee;i="6400,9594,10322"; a="251234129"
 X-IronPort-AV: E=Sophos;i="5.90,274,1643702400"; 
-   d="scan'208";a="350375126"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2022 20:17:36 -0700
-X-ExtLoop1: 1
+   d="scan'208";a="251234129"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2022 20:23:00 -0700
 X-IronPort-AV: E=Sophos;i="5.90,274,1643702400"; 
-   d="scan'208";a="667588846"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by orsmga004.jf.intel.com with ESMTP; 19 Apr 2022 20:17:27 -0700
-Date:   Wed, 20 Apr 2022 11:17:18 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Vishal Annapurve <vannapurve@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+   d="scan'208";a="727317671"
+Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.23])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2022 20:22:55 -0700
+Date:   Wed, 20 Apr 2022 11:22:51 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     Zeng Guang <guang.zeng@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jun Nakajima <jun.nakajima@intel.com>, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com
-Subject: Re: [PATCH v5 11/13] KVM: Zap existing KVM mappings when pages
- changed in the private fd
-Message-ID: <20220420031718.GA39591@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <20220310140911.50924-12-chao.p.peng@linux.intel.com>
- <CAGtprH-qTB2sehidF7xkSvR3X4D5cUOLpMBXf4mhTEh0BUR-mQ@mail.gmail.com>
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>
+Subject: Re: [PATCH v9 8/9] KVM: x86: Allow userspace set maximum VCPU id for
+ VM
+Message-ID: <20220420032245.GA14083@gao-cwp>
+References: <20220419154444.11888-1-guang.zeng@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAGtprH-qTB2sehidF7xkSvR3X4D5cUOLpMBXf4mhTEh0BUR-mQ@mail.gmail.com>
+In-Reply-To: <20220419154444.11888-1-guang.zeng@intel.com>
 User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 19, 2022 at 03:43:56PM -0700, Vishal Annapurve wrote:
-> On Thu, Mar 10, 2022 at 6:11 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
-> >
-> > KVM gets notified when memory pages changed in the memory backing store.
-> > When userspace allocates the memory with fallocate() or frees memory
-> > with fallocate(FALLOC_FL_PUNCH_HOLE), memory backing store calls into
-> > KVM fallocate/invalidate callbacks respectively. To ensure KVM never
-> > maps both the private and shared variants of a GPA into the guest, in
-> > the fallocate callback, we should zap the existing shared mapping and
-> > in the invalidate callback we should zap the existing private mapping.
-> >
-> > In the callbacks, KVM firstly converts the offset range into the
-> > gfn_range and then calls existing kvm_unmap_gfn_range() which will zap
-> > the shared or private mapping. Both callbacks pass in a memslot
-> > reference but we need 'kvm' so add a reference in memslot structure.
-> >
-> > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> > ---
-> >  include/linux/kvm_host.h |  3 ++-
-> >  virt/kvm/kvm_main.c      | 36 ++++++++++++++++++++++++++++++++++++
-> >  2 files changed, 38 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 9b175aeca63f..186b9b981a65 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -236,7 +236,7 @@ bool kvm_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-> >  int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu);
-> >  #endif
-> >
-> > -#ifdef KVM_ARCH_WANT_MMU_NOTIFIER
-> > +#if defined(KVM_ARCH_WANT_MMU_NOTIFIER) || defined(CONFIG_MEMFILE_NOTIFIER)
-> >  struct kvm_gfn_range {
-> >         struct kvm_memory_slot *slot;
-> >         gfn_t start;
-> > @@ -568,6 +568,7 @@ struct kvm_memory_slot {
-> >         loff_t private_offset;
-> >         struct memfile_pfn_ops *pfn_ops;
-> >         struct memfile_notifier notifier;
-> > +       struct kvm *kvm;
-> >  };
-> >
-> >  static inline bool kvm_slot_is_private(const struct kvm_memory_slot *slot)
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 67349421eae3..52319f49d58a 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -841,8 +841,43 @@ static int kvm_init_mmu_notifier(struct kvm *kvm)
-> >  #endif /* CONFIG_MMU_NOTIFIER && KVM_ARCH_WANT_MMU_NOTIFIER */
-> >
-> >  #ifdef CONFIG_MEMFILE_NOTIFIER
-> > +static void kvm_memfile_notifier_handler(struct memfile_notifier *notifier,
-> > +                                        pgoff_t start, pgoff_t end)
-> > +{
-> > +       int idx;
-> > +       struct kvm_memory_slot *slot = container_of(notifier,
-> > +                                                   struct kvm_memory_slot,
-> > +                                                   notifier);
-> > +       struct kvm_gfn_range gfn_range = {
-> > +               .slot           = slot,
-> > +               .start          = start - (slot->private_offset >> PAGE_SHIFT),
-> > +               .end            = end - (slot->private_offset >> PAGE_SHIFT),
-> > +               .may_block      = true,
-> > +       };
-> > +       struct kvm *kvm = slot->kvm;
-> > +
-> > +       gfn_range.start = max(gfn_range.start, slot->base_gfn);
+On Tue, Apr 19, 2022 at 11:44:44PM +0800, Zeng Guang wrote:
+>Introduce new max_vcpu_ids in KVM for x86 architecture. Userspace
+>can assign maximum possible vcpu id for current VM session using
+>KVM_CAP_MAX_VCPU_ID of KVM_ENABLE_CAP ioctl().
+>
+>This is done for x86 only because the sole use case is to guide
+>memory allocation for PID-pointer table, a structure needed to
+>enable VMX IPI.
+>
+>By default, max_vcpu_ids set as KVM_MAX_VCPU_IDS.
+>
+>Suggested-by: Sean Christopherson <seanjc@google.com>
+>Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+>Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+>---
+> Documentation/virt/kvm/api.rst  | 18 ++++++++++++++++++
+> arch/x86/include/asm/kvm_host.h |  6 ++++++
+> arch/x86/kvm/x86.c              | 25 ++++++++++++++++++++++++-
+> 3 files changed, 48 insertions(+), 1 deletion(-)
+>
+>diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>index d13fa6600467..0c6ad2d8bea0 100644
+>--- a/Documentation/virt/kvm/api.rst
+>+++ b/Documentation/virt/kvm/api.rst
+>@@ -7136,6 +7136,24 @@ The valid bits in cap.args[0] are:
+>                                     IA32_MISC_ENABLE[bit 18] is cleared.
+> =================================== ============================================
 > 
-> gfn_range.start seems to be page offset within the file. Should this rather be:
-> gfn_range.start = slot->base_gfn + min(gfn_range.start, slot->npages);
-
-Right. For start we don't really need care about the uppper bound
-here (will check below), so this should be enough:
-	gfn_range.start = slot->base_gfn + gfn_range.start;
-
+>+7.32 KVM_CAP_MAX_VCPU_ID
+>+------------------------
+>+
+>+:Architectures: x86
+>+:Target: VM
+>+:Parameters: args[0] - maximum APIC ID value set for current VM
+>+:Returns: 0 on success, -EINVAL if args[0] is beyond KVM_MAX_VCPU_IDS
+>+          supported in KVM or if it has been settled.
+>+
+>+Userspace is able to calculate the limit to APIC ID values from designated CPU
+>+topology. This capability allows userspace to specify maximum possible APIC ID
+>+assigned for current VM session prior to the creation of vCPUs. By design, it
+>+can set only once and doesn't accept change any more. KVM will manage memory
+>+allocation of VM-scope structures which depends on the value of APIC ID.
+>+
+>+Calling KVM_CHECK_EXTENSION for this capability returns the value of maximum APIC
+>+ID that KVM supports at runtime. It sets as KVM_MAX_VCPU_IDS by default.
+>+
+> 8. Other capabilities.
+> ======================
 > 
-> > +       gfn_range.end = min(gfn_range.end, slot->base_gfn + slot->npages);
-> > +
+>diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>index d23e80a56eb8..cdd14033988d 100644
+>--- a/arch/x86/include/asm/kvm_host.h
+>+++ b/arch/x86/include/asm/kvm_host.h
+>@@ -1238,6 +1238,12 @@ struct kvm_arch {
+> 	hpa_t	hv_root_tdp;
+> 	spinlock_t hv_root_tdp_lock;
+> #endif
+>+	/*
+>+	 * VM-scope maximum vCPU ID. Used to determine the size of structures
+>+	 * that increase along with the maximum vCPU ID, in which case, using
+>+	 * the global KVM_MAX_VCPU_IDS may lead to significant memory waste.
+>+	 */
+>+	u32 max_vcpu_ids;
+> };
 > 
-> Similar to previous comment, should this rather be:
-> gfn_range.end = slot->base_gfn + min(gfn_range.end, slot->npages);
+> struct kvm_vm_stat {
+>diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>index 277a0da8c290..744e88a71b63 100644
+>--- a/arch/x86/kvm/x86.c
+>+++ b/arch/x86/kvm/x86.c
+>@@ -4320,7 +4320,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+> 		r = KVM_MAX_VCPUS;
+> 		break;
+> 	case KVM_CAP_MAX_VCPU_ID:
+>-		r = KVM_MAX_VCPU_IDS;
+>+		if (!kvm->arch.max_vcpu_ids)
+>+			r = KVM_MAX_VCPU_IDS;
+>+		else
+>+			r = kvm->arch.max_vcpu_ids;
+> 		break;
+> 	case KVM_CAP_PV_MMU:	/* obsolete */
+> 		r = 0;
+>@@ -6064,6 +6067,20 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+> 		}
+> 		mutex_unlock(&kvm->lock);
+> 		break;
+>+	case KVM_CAP_MAX_VCPU_ID:
+>+		r = -EINVAL;
+>+		if (cap->args[0] > KVM_MAX_VCPU_IDS)
+>+			break;
+>+
+>+		mutex_lock(&kvm->lock);
+>+		if (kvm->arch.max_vcpu_ids == cap->args[0]) {
+>+			r = 0;
+>+		} else if (!kvm->arch.max_vcpu_ids) {
+>+			kvm->arch.max_vcpu_ids = cap->args[0];
+>+			r = 0;
+>+		}
+>+		mutex_unlock(&kvm->lock);
+>+		break;
 
-This is correct.
+It would be better to have a kselftest to exercise this capability.
+For example,
+1. launch a VM.
+2. set the max vCPU ID via KVM_CAP_MAX_VCPU_ID
+3. read the max vCPU ID to check if the value written is returned.
+4. create a vCPU which has apic id larger than the maximum.
+5. try to change the max vCPU ID after set once.
+...
 
-Thanks,
-Chao
-> 
-> > +       if (gfn_range.start >= gfn_range.end)
-> > +               return;
-> > +
-> > +       idx = srcu_read_lock(&kvm->srcu);
-> > +       KVM_MMU_LOCK(kvm);
-> > +       kvm_unmap_gfn_range(kvm, &gfn_range);
-> > +       kvm_flush_remote_tlbs(kvm);
-> > +       KVM_MMU_UNLOCK(kvm);
-> > +       srcu_read_unlock(&kvm->srcu, idx);
-> > +}
-> > +
-> > +static struct memfile_notifier_ops kvm_memfile_notifier_ops = {
-> > +       .invalidate = kvm_memfile_notifier_handler,
-> > +       .fallocate = kvm_memfile_notifier_handler,
-> > +};
-> > +
-> >  static inline int kvm_memfile_register(struct kvm_memory_slot *slot)
-> >  {
-> > +       slot->notifier.ops = &kvm_memfile_notifier_ops;
-> >         return memfile_register_notifier(file_inode(slot->private_file),
-> >                                          &slot->notifier,
-> >                                          &slot->pfn_ops);
-> > @@ -1963,6 +1998,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
-> >         new->private_file = file;
-> >         new->private_offset = mem->flags & KVM_MEM_PRIVATE ?
-> >                               region_ext->private_offset : 0;
-> > +       new->kvm = kvm;
-> >
-> >         r = kvm_set_memslot(kvm, old, new, change);
-> >         if (!r)
-> > --
-> > 2.17.1
-> >
+This test can be the last patch of this series or posted separately.
