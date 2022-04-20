@@ -2,187 +2,272 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DBFD5507F93
-	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 05:23:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B79D507F97
+	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 05:24:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359249AbiDTDZs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Apr 2022 23:25:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53286 "EHLO
+        id S1359261AbiDTD1O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Apr 2022 23:27:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359239AbiDTDZp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Apr 2022 23:25:45 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3932421E2C;
-        Tue, 19 Apr 2022 20:23:01 -0700 (PDT)
+        with ESMTP id S239413AbiDTD1N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Apr 2022 23:27:13 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C0D021E13;
+        Tue, 19 Apr 2022 20:24:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650424981; x=1681960981;
-  h=date:from:to:cc:subject:message-id:references:
+  t=1650425068; x=1681961068;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
    mime-version:in-reply-to;
-  bh=1AiC9VeveMPhro24gHqzjyeU34rUd2EVyr+r3itMve4=;
-  b=iUfOVHrmqmBRjJ3bzkShScz8IUtZ5GaGCaxA7HbL6XPn9bfkhfvYSMvp
-   UMozJuBSCJ3MxYW+xpcvTI48R1ahJvCLOMTYSmF1KN6VwNUwiQVjJCm08
-   k4gx6wE+AoCcTfj/l1IT0sVmtnQ7t0mJSbY5nKg5oSuMJyZFPevHL0pNF
-   8EbazH8M3gSoLoOPMy4E5QyytLJF9Ti+tUq1n/jaZWxVq+7QHrb8RLrs8
-   qdUBdP9f5KTERxd0v4tRNBLtRKz4/gu1tHmwF+HBP3QB1V0FMwV07YTgx
-   yvKJpLwnn7Fv4eVu3dfqrYyFcmhQuSJDze+xzi2gdlf2zfqmHmrZNGi+6
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10322"; a="251234129"
+  bh=ABPdNmHHBR0xLY/Ru6EV3J58j73qsnuwoz1VPUML71M=;
+  b=PmUeqC6NglhqYOwwQZTyPjSTIKFIaCW9F8Pg9ELdrMX408heS/7HrFPf
+   0S1B4VDUrgGqHVzK6R8PNahYofIAgMFJp28duALUcJ1nWcO4mGA+OewN5
+   HNMjtoSW8A5D3Dtx+tZV/vCjwJgFCXUKG/3M4HBpR7mSHe+mPR4XIicr1
+   vCqWqlAttn5jgpujFtSA16Y1oQogxJnjl8jOgJ3cpghP3DzG4j/E5mvMm
+   jVx/0hFz7i/NHGk0114DOjGVPyUmudI73PXWDkHFvlfCMAGhGrMkYPxhV
+   8UeI9p8aGeirJkEQWeREqKJOyYk4DD4IDOWk646A8VHgqLqa9WmGXejtQ
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10322"; a="243859398"
 X-IronPort-AV: E=Sophos;i="5.90,274,1643702400"; 
-   d="scan'208";a="251234129"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2022 20:23:00 -0700
+   d="scan'208";a="243859398"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2022 20:24:28 -0700
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.90,274,1643702400"; 
-   d="scan'208";a="727317671"
-Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.23])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2022 20:22:55 -0700
-Date:   Wed, 20 Apr 2022 11:22:51 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Zeng Guang <guang.zeng@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+   d="scan'208";a="667599784"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
+  by orsmga004.jf.intel.com with ESMTP; 19 Apr 2022 20:24:19 -0700
+Date:   Wed, 20 Apr 2022 11:24:10 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Vishal Annapurve <vannapurve@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>
-Subject: Re: [PATCH v9 8/9] KVM: x86: Allow userspace set maximum VCPU id for
- VM
-Message-ID: <20220420032245.GA14083@gao-cwp>
-References: <20220419154444.11888-1-guang.zeng@intel.com>
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jun Nakajima <jun.nakajima@intel.com>, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com
+Subject: Re: [PATCH v5 03/13] mm/shmem: Support memfile_notifier
+Message-ID: <20220420032410.GB39591@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
+ <20220310140911.50924-4-chao.p.peng@linux.intel.com>
+ <CAGtprH9X-v-R+UiAvdvKgqAqoc4MBJAWTnoEtP+Y2nip_y8Heg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220419154444.11888-1-guang.zeng@intel.com>
+In-Reply-To: <CAGtprH9X-v-R+UiAvdvKgqAqoc4MBJAWTnoEtP+Y2nip_y8Heg@mail.gmail.com>
 User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 19, 2022 at 11:44:44PM +0800, Zeng Guang wrote:
->Introduce new max_vcpu_ids in KVM for x86 architecture. Userspace
->can assign maximum possible vcpu id for current VM session using
->KVM_CAP_MAX_VCPU_ID of KVM_ENABLE_CAP ioctl().
->
->This is done for x86 only because the sole use case is to guide
->memory allocation for PID-pointer table, a structure needed to
->enable VMX IPI.
->
->By default, max_vcpu_ids set as KVM_MAX_VCPU_IDS.
->
->Suggested-by: Sean Christopherson <seanjc@google.com>
->Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
->Signed-off-by: Zeng Guang <guang.zeng@intel.com>
->---
-> Documentation/virt/kvm/api.rst  | 18 ++++++++++++++++++
-> arch/x86/include/asm/kvm_host.h |  6 ++++++
-> arch/x86/kvm/x86.c              | 25 ++++++++++++++++++++++++-
-> 3 files changed, 48 insertions(+), 1 deletion(-)
->
->diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->index d13fa6600467..0c6ad2d8bea0 100644
->--- a/Documentation/virt/kvm/api.rst
->+++ b/Documentation/virt/kvm/api.rst
->@@ -7136,6 +7136,24 @@ The valid bits in cap.args[0] are:
->                                     IA32_MISC_ENABLE[bit 18] is cleared.
-> =================================== ============================================
+On Tue, Apr 19, 2022 at 03:40:09PM -0700, Vishal Annapurve wrote:
+> On Thu, Mar 10, 2022 at 6:10 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
+> >
+> > From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+> >
+> > It maintains a memfile_notifier list in shmem_inode_info structure and
+> > implements memfile_pfn_ops callbacks defined by memfile_notifier. It
+> > then exposes them to memfile_notifier via
+> > shmem_get_memfile_notifier_info.
+> >
+> > We use SGP_NOALLOC in shmem_get_lock_pfn since the pages should be
+> > allocated by userspace for private memory. If there is no pages
+> > allocated at the offset then error should be returned so KVM knows that
+> > the memory is not private memory.
+> >
+> > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > ---
+> >  include/linux/shmem_fs.h |  4 +++
+> >  mm/shmem.c               | 76 ++++++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 80 insertions(+)
+> >
+> > diff --git a/include/linux/shmem_fs.h b/include/linux/shmem_fs.h
+> > index 2dde843f28ef..7bb16f2d2825 100644
+> > --- a/include/linux/shmem_fs.h
+> > +++ b/include/linux/shmem_fs.h
+> > @@ -9,6 +9,7 @@
+> >  #include <linux/percpu_counter.h>
+> >  #include <linux/xattr.h>
+> >  #include <linux/fs_parser.h>
+> > +#include <linux/memfile_notifier.h>
+> >
+> >  /* inode in-kernel data */
+> >
+> > @@ -28,6 +29,9 @@ struct shmem_inode_info {
+> >         struct simple_xattrs    xattrs;         /* list of xattrs */
+> >         atomic_t                stop_eviction;  /* hold when working on inode */
+> >         unsigned int            xflags;         /* shmem extended flags */
+> > +#ifdef CONFIG_MEMFILE_NOTIFIER
+> > +       struct memfile_notifier_list memfile_notifiers;
+> > +#endif
+> >         struct inode            vfs_inode;
+> >  };
+> >
+> > diff --git a/mm/shmem.c b/mm/shmem.c
+> > index 9b31a7056009..7b43e274c9a2 100644
+> > --- a/mm/shmem.c
+> > +++ b/mm/shmem.c
+> > @@ -903,6 +903,28 @@ static struct folio *shmem_get_partial_folio(struct inode *inode, pgoff_t index)
+> >         return page ? page_folio(page) : NULL;
+> >  }
+> >
+> > +static void notify_fallocate(struct inode *inode, pgoff_t start, pgoff_t end)
+> > +{
+> > +#ifdef CONFIG_MEMFILE_NOTIFIER
+> > +       struct shmem_inode_info *info = SHMEM_I(inode);
+> > +
+> > +       memfile_notifier_fallocate(&info->memfile_notifiers, start, end);
+> > +#endif
+> > +}
+> > +
+> > +static void notify_invalidate_page(struct inode *inode, struct folio *folio,
+> > +                                  pgoff_t start, pgoff_t end)
+> > +{
+> > +#ifdef CONFIG_MEMFILE_NOTIFIER
+> > +       struct shmem_inode_info *info = SHMEM_I(inode);
+> > +
+> > +       start = max(start, folio->index);
+> > +       end = min(end, folio->index + folio_nr_pages(folio));
+> > +
+> > +       memfile_notifier_invalidate(&info->memfile_notifiers, start, end);
+> > +#endif
+> > +}
+> > +
+> >  /*
+> >   * Remove range of pages and swap entries from page cache, and free them.
+> >   * If !unfalloc, truncate or punch hole; if unfalloc, undo failed fallocate.
+> > @@ -946,6 +968,8 @@ static void shmem_undo_range(struct inode *inode, loff_t lstart, loff_t lend,
+> >                         }
+> >                         index += folio_nr_pages(folio) - 1;
+> >
+> > +                       notify_invalidate_page(inode, folio, start, end);
+> > +
+> >                         if (!unfalloc || !folio_test_uptodate(folio))
+> >                                 truncate_inode_folio(mapping, folio);
+> >                         folio_unlock(folio);
+> > @@ -1019,6 +1043,9 @@ static void shmem_undo_range(struct inode *inode, loff_t lstart, loff_t lend,
+> >                                         index--;
+> >                                         break;
+> >                                 }
+> > +
+> > +                               notify_invalidate_page(inode, folio, start, end);
+> > +
 > 
->+7.32 KVM_CAP_MAX_VCPU_ID
->+------------------------
->+
->+:Architectures: x86
->+:Target: VM
->+:Parameters: args[0] - maximum APIC ID value set for current VM
->+:Returns: 0 on success, -EINVAL if args[0] is beyond KVM_MAX_VCPU_IDS
->+          supported in KVM or if it has been settled.
->+
->+Userspace is able to calculate the limit to APIC ID values from designated CPU
->+topology. This capability allows userspace to specify maximum possible APIC ID
->+assigned for current VM session prior to the creation of vCPUs. By design, it
->+can set only once and doesn't accept change any more. KVM will manage memory
->+allocation of VM-scope structures which depends on the value of APIC ID.
->+
->+Calling KVM_CHECK_EXTENSION for this capability returns the value of maximum APIC
->+ID that KVM supports at runtime. It sets as KVM_MAX_VCPU_IDS by default.
->+
-> 8. Other capabilities.
-> ======================
-> 
->diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->index d23e80a56eb8..cdd14033988d 100644
->--- a/arch/x86/include/asm/kvm_host.h
->+++ b/arch/x86/include/asm/kvm_host.h
->@@ -1238,6 +1238,12 @@ struct kvm_arch {
-> 	hpa_t	hv_root_tdp;
-> 	spinlock_t hv_root_tdp_lock;
-> #endif
->+	/*
->+	 * VM-scope maximum vCPU ID. Used to determine the size of structures
->+	 * that increase along with the maximum vCPU ID, in which case, using
->+	 * the global KVM_MAX_VCPU_IDS may lead to significant memory waste.
->+	 */
->+	u32 max_vcpu_ids;
-> };
-> 
-> struct kvm_vm_stat {
->diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->index 277a0da8c290..744e88a71b63 100644
->--- a/arch/x86/kvm/x86.c
->+++ b/arch/x86/kvm/x86.c
->@@ -4320,7 +4320,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> 		r = KVM_MAX_VCPUS;
-> 		break;
-> 	case KVM_CAP_MAX_VCPU_ID:
->-		r = KVM_MAX_VCPU_IDS;
->+		if (!kvm->arch.max_vcpu_ids)
->+			r = KVM_MAX_VCPU_IDS;
->+		else
->+			r = kvm->arch.max_vcpu_ids;
-> 		break;
-> 	case KVM_CAP_PV_MMU:	/* obsolete */
-> 		r = 0;
->@@ -6064,6 +6067,20 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> 		}
-> 		mutex_unlock(&kvm->lock);
-> 		break;
->+	case KVM_CAP_MAX_VCPU_ID:
->+		r = -EINVAL;
->+		if (cap->args[0] > KVM_MAX_VCPU_IDS)
->+			break;
->+
->+		mutex_lock(&kvm->lock);
->+		if (kvm->arch.max_vcpu_ids == cap->args[0]) {
->+			r = 0;
->+		} else if (!kvm->arch.max_vcpu_ids) {
->+			kvm->arch.max_vcpu_ids = cap->args[0];
->+			r = 0;
->+		}
->+		mutex_unlock(&kvm->lock);
->+		break;
+> Should this be done in batches or done once for all of range [start, end)?
 
-It would be better to have a kselftest to exercise this capability.
-For example,
-1. launch a VM.
-2. set the max vCPU ID via KVM_CAP_MAX_VCPU_ID
-3. read the max vCPU ID to check if the value written is returned.
-4. create a vCPU which has apic id larger than the maximum.
-5. try to change the max vCPU ID after set once.
-...
+Batching is definitely prefered. Will look at that.
 
-This test can be the last patch of this series or posted separately.
+Thanks,
+Chao
+> 
+> >                                 VM_BUG_ON_FOLIO(folio_test_writeback(folio),
+> >                                                 folio);
+> >                                 truncate_inode_folio(mapping, folio);
+> > @@ -2279,6 +2306,9 @@ static struct inode *shmem_get_inode(struct super_block *sb, const struct inode
+> >                 info->flags = flags & VM_NORESERVE;
+> >                 INIT_LIST_HEAD(&info->shrinklist);
+> >                 INIT_LIST_HEAD(&info->swaplist);
+> > +#ifdef CONFIG_MEMFILE_NOTIFIER
+> > +               memfile_notifier_list_init(&info->memfile_notifiers);
+> > +#endif
+> >                 simple_xattrs_init(&info->xattrs);
+> >                 cache_no_acl(inode);
+> >                 mapping_set_large_folios(inode->i_mapping);
+> > @@ -2802,6 +2832,7 @@ static long shmem_fallocate(struct file *file, int mode, loff_t offset,
+> >         if (!(mode & FALLOC_FL_KEEP_SIZE) && offset + len > inode->i_size)
+> >                 i_size_write(inode, offset + len);
+> >         inode->i_ctime = current_time(inode);
+> > +       notify_fallocate(inode, start, end);
+> >  undone:
+> >         spin_lock(&inode->i_lock);
+> >         inode->i_private = NULL;
+> > @@ -3909,6 +3940,47 @@ static struct file_system_type shmem_fs_type = {
+> >         .fs_flags       = FS_USERNS_MOUNT,
+> >  };
+> >
+> > +#ifdef CONFIG_MEMFILE_NOTIFIER
+> > +static long shmem_get_lock_pfn(struct inode *inode, pgoff_t offset, int *order)
+> > +{
+> > +       struct page *page;
+> > +       int ret;
+> > +
+> > +       ret = shmem_getpage(inode, offset, &page, SGP_NOALLOC);
+> > +       if (ret)
+> > +               return ret;
+> > +
+> > +       *order = thp_order(compound_head(page));
+> > +
+> > +       return page_to_pfn(page);
+> > +}
+> > +
+> > +static void shmem_put_unlock_pfn(unsigned long pfn)
+> > +{
+> > +       struct page *page = pfn_to_page(pfn);
+> > +
+> > +       VM_BUG_ON_PAGE(!PageLocked(page), page);
+> > +
+> > +       set_page_dirty(page);
+> > +       unlock_page(page);
+> > +       put_page(page);
+> > +}
+> > +
+> > +static struct memfile_notifier_list* shmem_get_notifier_list(struct inode *inode)
+> > +{
+> > +       if (!shmem_mapping(inode->i_mapping))
+> > +               return NULL;
+> > +
+> > +       return  &SHMEM_I(inode)->memfile_notifiers;
+> > +}
+> > +
+> > +static struct memfile_backing_store shmem_backing_store = {
+> > +       .pfn_ops.get_lock_pfn = shmem_get_lock_pfn,
+> > +       .pfn_ops.put_unlock_pfn = shmem_put_unlock_pfn,
+> > +       .get_notifier_list = shmem_get_notifier_list,
+> > +};
+> > +#endif /* CONFIG_MEMFILE_NOTIFIER */
+> > +
+> >  int __init shmem_init(void)
+> >  {
+> >         int error;
+> > @@ -3934,6 +4006,10 @@ int __init shmem_init(void)
+> >         else
+> >                 shmem_huge = SHMEM_HUGE_NEVER; /* just in case it was patched */
+> >  #endif
+> > +
+> > +#ifdef CONFIG_MEMFILE_NOTIFIER
+> > +       memfile_register_backing_store(&shmem_backing_store);
+> > +#endif
+> >         return 0;
+> >
+> >  out1:
+> > --
+> > 2.17.1
+> >
