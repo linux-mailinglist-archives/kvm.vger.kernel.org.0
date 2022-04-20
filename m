@@ -2,390 +2,262 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E075E508A77
-	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 16:16:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B730B508AAB
+	for <lists+kvm@lfdr.de>; Wed, 20 Apr 2022 16:22:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347950AbiDTOTJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Apr 2022 10:19:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38768 "EHLO
+        id S1352736AbiDTOZS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Apr 2022 10:25:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379765AbiDTORo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Apr 2022 10:17:44 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B78F44751;
-        Wed, 20 Apr 2022 07:10:55 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23KD854J025916;
-        Wed, 20 Apr 2022 14:10:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
+        with ESMTP id S238125AbiDTOZQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Apr 2022 10:25:16 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6755443CB;
+        Wed, 20 Apr 2022 07:22:30 -0700 (PDT)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23KEHB6m024692;
+        Wed, 20 Apr 2022 14:22:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
  content-type : content-transfer-encoding; s=pp1;
- bh=+KpPsG/KXdTLYehRtMGZ14VcLZk0xtGeaU0Cts2zpW4=;
- b=seS4lExkzXSPwnipgbu9FRbB2Bo1uACe5S3oHHN1ZAVmcOTsHaGjBaSGFFZFtJY1e5T2
- NhNo3sVgOPiHsWoDQymuLrgzYNBt319yhSHXjsPsITUpSW9Rikuud0zwQHLJEpgqIpLj
- HqZyjiUdu1+BEK60Ec5WK6+Xg4Q7Cq41vYBlLUEgz2ZlvulEmHmhKCIY4qC8BNsMtYZE
- 0DpLJCoIJ8iOPTNKAVYRjDA4MJTREn31M4JkDgnTfAMrMVWxw1pVYiWEAZXekP4gm7/X
- gTY0kU1+SETGbfE+KPMXZYT+Ntg4PU8kFUbFoERHqj8t1+01WK5Vw02u5GDb2jUyhekK FQ== 
+ bh=x6wGtle0ZTTKKFOmQ44XkNuq4yD/szsth1NNcJiVIcI=;
+ b=VpVIGxk/pVQG0oW3W/p15LfiqUcfA1Y7XpEUu9zTQW391XoYqcGAAU2fYh2Ed36EhTur
+ zPzeNnhm3nytaxvZIejPMhHaqU3LwGrGa8u6jA4FlpPGMxZxL1DK6JldBxMSi1B8wTHH
+ 8+KccN4Fiw3ajUMOtnTxcnqLsI1Y+eRuMv9DNtVqRMeU+udNHJVh72O7TPS4pfmRkJi1
+ 1p4Mh3XUXkXG3uBky+Bb969rx/HJPZQrY72UIoNIylJI5XLgQdKs29uoPmwEXsDx6Zy7
+ t1P8r9m2Kuaf3C9Fe54OWE1x68iuOxopZCLfxsXY4uCMjRROaMRsaNEl2Xx59yNPh4Nj /A== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fhuukfq3m-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fjff2x6p5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Apr 2022 14:10:46 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23KCW1cr023137;
-        Wed, 20 Apr 2022 14:10:46 GMT
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fhuukfq34-1
+        Wed, 20 Apr 2022 14:22:30 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23KCXvwv015495;
+        Wed, 20 Apr 2022 14:22:29 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fjff2x6n4-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Apr 2022 14:10:46 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23KE92MG028509;
-        Wed, 20 Apr 2022 14:10:44 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma02dal.us.ibm.com with ESMTP id 3ffneabw8t-1
+        Wed, 20 Apr 2022 14:22:29 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23KEJ8VH028570;
+        Wed, 20 Apr 2022 14:22:27 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03fra.de.ibm.com with ESMTP id 3ffne953k6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Apr 2022 14:10:44 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23KEAhWa12583222
+        Wed, 20 Apr 2022 14:22:27 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23KEMNDB51970368
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Apr 2022 14:10:43 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C28E0AE05C;
-        Wed, 20 Apr 2022 14:10:43 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7E886AE064;
-        Wed, 20 Apr 2022 14:10:40 +0000 (GMT)
-Received: from [9.211.82.47] (unknown [9.211.82.47])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed, 20 Apr 2022 14:10:40 +0000 (GMT)
-Message-ID: <754b4f2e-00ba-07b0-b848-29b714c9d3b3@linux.ibm.com>
-Date:   Wed, 20 Apr 2022 10:10:39 -0400
+        Wed, 20 Apr 2022 14:22:23 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B578CA4054;
+        Wed, 20 Apr 2022 14:22:23 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 588EDA405C;
+        Wed, 20 Apr 2022 14:22:23 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.10.176])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 20 Apr 2022 14:22:23 +0000 (GMT)
+Date:   Wed, 20 Apr 2022 16:16:14 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v3 1/4] lib: s390x: add support for SCLP
+ console read
+Message-ID: <20220420161614.2fc6d218@p-imbrenda>
+In-Reply-To: <20220420134557.1307305-2-nrb@linux.ibm.com>
+References: <20220420134557.1307305-1-nrb@linux.ibm.com>
+        <20220420134557.1307305-2-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v5 19/21] KVM: s390: add KVM_S390_ZPCI_OP to manage guest
- zPCI devices
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org
-References: <20220404174349.58530-1-mjrosato@linux.ibm.com>
- <20220404174349.58530-20-mjrosato@linux.ibm.com>
- <de630458-f48a-1b97-2bd3-53284c7d2a5e@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <de630458-f48a-1b97-2bd3-53284c7d2a5e@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: leioqiAKMkMsJPJXKn8efSaDpx9FqYlf
-X-Proofpoint-GUID: -t_0WUjp1m5_oghuMIt3__eQpu7baauW
+X-Proofpoint-GUID: xDLMJWr7rGaY8wruVF4jHjs0mp801a4m
+X-Proofpoint-ORIG-GUID: L0f7c2NHawMfZ7treFV6-SWh9hgt2hj5
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-20_03,2022-04-20_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
- impostorscore=0 malwarescore=0 mlxlogscore=999 bulkscore=0
- lowpriorityscore=0 phishscore=0 mlxscore=0 priorityscore=1501 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ definitions=2022-04-20_04,2022-04-20_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 clxscore=1015 lowpriorityscore=0
+ malwarescore=0 bulkscore=0 phishscore=0 suspectscore=0 priorityscore=1501
+ mlxscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2202240000 definitions=main-2204200081
-X-Spam-Status: No, score=-6.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H3,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/19/22 6:07 AM, Pierre Morel wrote:
-> 
-> 
-> On 4/4/22 19:43, Matthew Rosato wrote:
->> The KVM_S390_ZPCI_OP ioctl provides a mechanism for managing
->> hardware-assisted virtualization features for s390X zPCI passthrough.
->> Add the first 2 operations, which can be used to enable/disable
->> the specified device for Adapter Event Notification interpretation.
->>
->> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->> ---
->>   Documentation/virt/kvm/api.rst | 45 +++++++++++++++++++++++
->>   arch/s390/kvm/kvm-s390.c       | 23 ++++++++++++
->>   arch/s390/kvm/pci.c            | 65 ++++++++++++++++++++++++++++++++++
->>   arch/s390/kvm/pci.h            |  2 ++
->>   include/uapi/linux/kvm.h       | 31 ++++++++++++++++
->>   5 files changed, 166 insertions(+)
->>
->> diff --git a/Documentation/virt/kvm/api.rst 
->> b/Documentation/virt/kvm/api.rst
->> index d13fa6600467..474f502c2ea0 100644
->> --- a/Documentation/virt/kvm/api.rst
->> +++ b/Documentation/virt/kvm/api.rst
->> @@ -5645,6 +5645,51 @@ enabled with ``arch_prctl()``, but this may 
->> change in the future.
->>   The offsets of the state save areas in struct kvm_xsave follow the 
->> contents
->>   of CPUID leaf 0xD on the host.
->> +4.135 KVM_S390_ZPCI_OP
->> +--------------------
->> +
->> +:Capability: KVM_CAP_S390_ZPCI_OP
->> +:Architectures: s390
->> +:Type: vcpu ioctl
->> +:Parameters: struct kvm_s390_zpci_op (in)
->> +:Returns: 0 on success, <0 on error
->> +
->> +Used to manage hardware-assisted virtualization features for zPCI 
->> devices.
->> +
->> +Parameters are specified via the following structure::
->> +
->> +  struct kvm_s390_zpci_op {
->> +    /* in */
->> +    __u32 fh;        /* target device */
->> +    __u8  op;        /* operation to perform */
->> +    __u8  pad[3];
->> +    union {
->> +        /* for KVM_S390_ZPCIOP_REG_AEN */
->> +        struct {
->> +            __u64 ibv;    /* Guest addr of interrupt bit vector */
->> +            __u64 sb;    /* Guest addr of summary bit */
->> +            __u32 flags;
->> +            __u32 noi;    /* Number of interrupts */
->> +            __u8 isc;    /* Guest interrupt subclass */
->> +            __u8 sbo;    /* Offset of guest summary bit vector */
->> +            __u16 pad;
->> +        } reg_aen;
->> +        __u64 reserved[8];
->> +    } u;
->> +  };
->> +
->> +The type of operation is specified in the "op" field.
->> +KVM_S390_ZPCIOP_REG_AEN is used to register the VM for adapter event
->> +notification interpretation, which will allow firmware delivery of 
->> adapter
->> +events directly to the vm, with KVM providing a backup delivery 
->> mechanism;
->> +KVM_S390_ZPCIOP_DEREG_AEN is used to subsequently disable 
->> interpretation of
->> +adapter event notifications.
->> +
->> +The target zPCI function must also be specified via the "fh" field.  
->> For the
->> +KVM_S390_ZPCIOP_REG_AEN operation, additional information to 
->> establish firmware
->> +delivery must be provided via the "reg_aen" struct.
->> +
->> +The "reserved" field is meant for future extensions.
->>   5. The kvm_run structure
->>   ========================
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index 704d85214f4f..65a53e22f686 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -616,6 +616,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
->> long ext)
->>       case KVM_CAP_S390_PROTECTED:
->>           r = is_prot_virt_host();
->>           break;
->> +    case KVM_CAP_S390_ZPCI_OP:
->> +        if (kvm_s390_pci_interp_allowed())
->> +            r = 1;
->> +        else
->> +            r = 0;
->> +        break;
->>       default:
->>           r = 0;
->>       }
->> @@ -2621,6 +2627,23 @@ long kvm_arch_vm_ioctl(struct file *filp,
->>               r = -EFAULT;
->>           break;
->>       }
->> +    case KVM_S390_ZPCI_OP: {
->> +        struct kvm_s390_zpci_op args;
->> +
->> +        r = -EINVAL;
->> +        if (!IS_ENABLED(CONFIG_VFIO_PCI))
->> +            break;
->> +        if (copy_from_user(&args, argp, sizeof(args))) {
->> +            r = -EFAULT;
->> +            break;
->> +        }
->> +        r = kvm_s390_pci_zpci_op(kvm, &args);
->> +        if (r)
->> +            break;
->> +        if (copy_to_user(argp, &args, sizeof(args)))
->> +            r = -EFAULT;
->> +        break;
->> +    }
->>       default:
->>           r = -ENOTTY;
->>       }
->> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
->> index 66565f5f3f43..d941657bcb39 100644
->> --- a/arch/s390/kvm/pci.c
->> +++ b/arch/s390/kvm/pci.c
->> @@ -588,6 +588,71 @@ void kvm_s390_pci_clear_list(struct kvm *kvm)
->>           unregister_kvm(kzdev->zdev);
->>   }
->> +static struct kvm_zdev *get_kzdev_by_fh(struct kvm *kvm, u32 fh)
->> +{
->> +    struct kvm_zdev *kzdev, *retval = NULL;
->> +
->> +    spin_lock(&kvm->arch.kzdev_list_lock);
->> +    list_for_each_entry(kzdev, &kvm->arch.kzdev_list, entry) {
->> +        if (kzdev->zdev->fh == fh) {
->> +            retval = kzdev;
->> +            break;
->> +        }
->> +    }
->> +    spin_unlock(&kvm->arch.kzdev_list_lock);
->> +
->> +    return retval;
->> +}
->> +
->> +static int kvm_s390_pci_zpci_reg_aen(struct zpci_dev *zdev,
->> +                     struct kvm_s390_zpci_op *args)
->> +{
->> +    struct zpci_fib fib = {};
->> +
->> +    fib.fmt0.aibv = args->u.reg_aen.ibv;
->> +    fib.fmt0.isc = args->u.reg_aen.isc;
->> +    fib.fmt0.noi = args->u.reg_aen.noi;
->> +    if (args->u.reg_aen.sb != 0) {
->> +        fib.fmt0.aisb = args->u.reg_aen.sb;
->> +        fib.fmt0.aisbo = args->u.reg_aen.sbo;
->> +        fib.fmt0.sum = 1;
->> +    } else {
->> +        fib.fmt0.aisb = 0;
->> +        fib.fmt0.aisbo = 0;
->> +        fib.fmt0.sum = 0;
->> +    }
->> +
->> +    if (args->u.reg_aen.flags & KVM_S390_ZPCIOP_REGAEN_HOST)
->> +        return kvm_s390_pci_aif_enable(zdev, &fib, true);
->> +    else
->> +        return kvm_s390_pci_aif_enable(zdev, &fib, false);
->> +}
->> +
->> +int kvm_s390_pci_zpci_op(struct kvm *kvm, struct kvm_s390_zpci_op *args)
->> +{
->> +    struct kvm_zdev *kzdev;
->> +    struct zpci_dev *zdev;
->> +    int r;
->> +
->> +    kzdev = get_kzdev_by_fh(kvm, args->fh);
->> +    if (!kzdev)
->> +        return -ENODEV;
->> +    zdev = kzdev->zdev;
->> +
->> +    switch (args->op) {
->> +    case KVM_S390_ZPCIOP_REG_AEN:
->> +        r = kvm_s390_pci_zpci_reg_aen(zdev, args);
->> +        break;
->> +    case KVM_S390_ZPCIOP_DEREG_AEN:
->> +        r = kvm_s390_pci_aif_disable(zdev, false);
->> +        break;
->> +    default:
->> +        r = -EINVAL;
->> +    }
->> +
->> +    return r;
->> +}
->> +
->>   int kvm_s390_pci_init(void)
->>   {
->>       aift = kzalloc(sizeof(struct zpci_aift), GFP_KERNEL);
->> diff --git a/arch/s390/kvm/pci.h b/arch/s390/kvm/pci.h
->> index cb5ec3208923..b053b50c0904 100644
->> --- a/arch/s390/kvm/pci.h
->> +++ b/arch/s390/kvm/pci.h
->> @@ -59,6 +59,8 @@ void kvm_s390_pci_aen_exit(void);
->>   void kvm_s390_pci_init_list(struct kvm *kvm);
->>   void kvm_s390_pci_clear_list(struct kvm *kvm);
->> +int kvm_s390_pci_zpci_op(struct kvm *kvm, struct kvm_s390_zpci_op 
->> *args);
->> +
->>   int kvm_s390_pci_init(void);
->>   static inline bool kvm_s390_pci_interp_allowed(void)
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index 91a6fe4e02c0..014adb30d42c 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -1144,6 +1144,7 @@ struct kvm_ppc_resize_hpt {
->>   #define KVM_CAP_S390_MEM_OP_EXTENSION 211
->>   #define KVM_CAP_PMU_CAPABILITY 212
->>   #define KVM_CAP_DISABLE_QUIRKS2 213
->> +#define KVM_CAP_S390_ZPCI_OP 214
->>   #ifdef KVM_CAP_IRQ_ROUTING
->> @@ -2060,4 +2061,34 @@ struct kvm_stats_desc {
->>   /* Available with KVM_CAP_XSAVE2 */
->>   #define KVM_GET_XSAVE2          _IOR(KVMIO,  0xcf, struct kvm_xsave)
->> +/* Available with KVM_CAP_S390_ZPCI_OP */
->> +#define KVM_S390_ZPCI_OP      _IOW(KVMIO,  0xd0, struct 
->> kvm_s390_zpci_op)
->> +
->> +struct kvm_s390_zpci_op {
->> +    /* in */
->> +    __u32 fh;        /* target device */
->> +    __u8  op;        /* operation to perform */
->> +    __u8  pad[3];
->> +    union {
->> +        /* for KVM_S390_ZPCIOP_REG_AEN */
->> +        struct {
->> +            __u64 ibv;    /* Guest addr of interrupt bit vector */
->> +            __u64 sb;    /* Guest addr of summary bit */
->> +            __u32 flags;
->> +            __u32 noi;    /* Number of interrupts */
->> +            __u8 isc;    /* Guest interrupt subclass */
->> +            __u8 sbo;    /* Offset of guest summary bit vector */
->> +            __u16 pad;
->> +        } reg_aen;
->> +        __u64 reserved[8];
->> +    } u;
->> +};
->> +
->> +/* types for kvm_s390_zpci_op->op */
->> +#define KVM_S390_ZPCIOP_REG_AEN        0
->> +#define KVM_S390_ZPCIOP_DEREG_AEN    1
->> +
->> +/* flags for kvm_s390_zpci_op->u.reg_aen.flags */
->> +#define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
->> +
->>   #endif /* __LINUX_KVM_H */
->>
-> 
-> 
-> The purpose is to setup the IRQ for the zPCI device wouldn't it be more 
-> logical to go through VFIO_DEVICE_SET_IRQS and there jump to the zPCI 
-> handling, like it is done for the capabilities, instead to go directly 
-> through KVM?
-> We would also spare the research for the real FH in KVM.
-> 
+On Wed, 20 Apr 2022 15:45:54 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-We need the host FH anyway -- for load/store intepretation, the guest 
-must be using the FH that the firmware expects.  Plus we need that FH 
-when issuing the MPCIFC op 2.  I guess maybe you mean the lookup (get 
-the exact device associated with this fd vs scanning the list of PCI 
-devices associated with this KVM).
+> Add a basic implementation for reading from the SCLP ASCII console. The goal of
+> this is to support migration tests on s390x. To know when the migration has been
+> finished, we need to listen for a newline on our console.
+> 
+> Hence, this implementation is focused on the SCLP ASCII console of QEMU and
+> currently won't work under e.g. LPAR.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-One of the issues here is that, with load/store interpretation enabled, 
-vfio in QEMU will never get the config space notifiers triggered; these 
-are the things that end up calling vfio_enable_vectors() which will in 
-turn issue the VFIO_DEVICE_SET_IRQS (instead these guest config space 
-writes are executed interpretively)
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-I did play around with this for a while, but if we were to call 
-VFIO_DEVICE_SET_IRQS ourselves from QEMU s390-pci instead of relying on 
-the config space notifier, we still have the issue of associating the 
-previously-established routes with the host function - because at the 
-end of it we need to issue a MPCIFC(2) specifying the host FH and 
-including the forwarding information (e.g. the work done in 
-kvm_s390_pci_aif_enable).  AFAICT today we can't derive the FH from 
-routes, that's where I got stuck.  But if you have an idea please share.
+> ---
+>  lib/s390x/sclp-console.c | 79 +++++++++++++++++++++++++++++++++++++---
+>  lib/s390x/sclp.h         |  8 ++++
+>  s390x/Makefile           |  1 +
+>  3 files changed, 82 insertions(+), 6 deletions(-)
+> 
+> diff --git a/lib/s390x/sclp-console.c b/lib/s390x/sclp-console.c
+> index fa36a6a42381..8c4bf68cbbab 100644
+> --- a/lib/s390x/sclp-console.c
+> +++ b/lib/s390x/sclp-console.c
+> @@ -89,6 +89,10 @@ static char lm_buff[120];
+>  static unsigned char lm_buff_off;
+>  static struct spinlock lm_buff_lock;
+>  
+> +static char read_buf[4096];
+> +static int read_index = sizeof(read_buf) - 1;
+> +static int read_buf_end = 0;
+> +
+>  static void sclp_print_ascii(const char *str)
+>  {
+>  	int len = strlen(str);
+> @@ -185,7 +189,7 @@ static void sclp_print_lm(const char *str)
+>   * indicating which messages the control program (we) want(s) to
+>   * send/receive.
+>   */
+> -static void sclp_set_write_mask(void)
+> +static void sclp_write_event_mask(int receive_mask, int send_mask)
+>  {
+>  	WriteEventMask *sccb = (void *)_sccb;
+>  
+> @@ -195,18 +199,27 @@ static void sclp_set_write_mask(void)
+>  	sccb->h.function_code = SCLP_FC_NORMAL_WRITE;
+>  	sccb->mask_length = sizeof(sccb_mask_t);
+>  
+> -	/* For now we don't process sclp input. */
+> -	sccb->cp_receive_mask = 0;
+> -	/* We send ASCII and line mode. */
+> -	sccb->cp_send_mask = SCLP_EVENT_MASK_MSG_ASCII | SCLP_EVENT_MASK_MSG;
+> +	sccb->cp_receive_mask = receive_mask;
+> +	sccb->cp_send_mask = send_mask;
+>  
+>  	sclp_service_call(SCLP_CMD_WRITE_EVENT_MASK, sccb);
+>  	assert(sccb->h.response_code == SCLP_RC_NORMAL_COMPLETION);
+>  }
+>  
+> +static void sclp_console_enable_read(void)
+> +{
+> +	sclp_write_event_mask(SCLP_EVENT_MASK_MSG_ASCII, SCLP_EVENT_MASK_MSG_ASCII | SCLP_EVENT_MASK_MSG);
+> +}
+> +
+> +static void sclp_console_disable_read(void)
+> +{
+> +	sclp_write_event_mask(0, SCLP_EVENT_MASK_MSG_ASCII | SCLP_EVENT_MASK_MSG);
+> +}
+> +
+>  void sclp_console_setup(void)
+>  {
+> -	sclp_set_write_mask();
+> +	/* We send ASCII and line mode. */
+> +	sclp_write_event_mask(0, SCLP_EVENT_MASK_MSG_ASCII | SCLP_EVENT_MASK_MSG);
+>  }
+>  
+>  void sclp_print(const char *str)
+> @@ -227,3 +240,57 @@ void sclp_print(const char *str)
+>  	sclp_print_ascii(str);
+>  	sclp_print_lm(str);
+>  }
+> +
+> +static int console_refill_read_buffer(void)
+> +{
+> +	const int max_event_buffer_len = SCCB_SIZE - offsetof(ReadEventDataAsciiConsole, ebh);
+> +	ReadEventDataAsciiConsole *sccb = (void *)_sccb;
+> +	const int event_buffer_ascii_recv_header_len = sizeof(sccb->ebh) + sizeof(sccb->type);
+> +	int ret = -1;
+> +
+> +	sclp_console_enable_read();
+> +
+> +	sclp_mark_busy();
+> +	memset(sccb, 0, SCCB_SIZE);
+> +	sccb->h.length = PAGE_SIZE;
+> +	sccb->h.function_code = SCLP_UNCONDITIONAL_READ;
+> +	sccb->h.control_mask[2] = SCLP_CM2_VARIABLE_LENGTH_RESPONSE;
+> +
+> +	sclp_service_call(SCLP_CMD_READ_EVENT_DATA, sccb);
+> +
+> +	if (sccb->h.response_code == SCLP_RC_NO_EVENT_BUFFERS_STORED ||
+> +	    sccb->ebh.type != SCLP_EVENT_ASCII_CONSOLE_DATA ||
+> +	    sccb->type != SCLP_EVENT_ASCII_TYPE_DATA_STREAM_FOLLOWS) {
+> +		ret = -1;
+> +		goto out;
+> +	}
+> +
+> +	assert(sccb->ebh.length <= max_event_buffer_len);
+> +	assert(sccb->ebh.length > event_buffer_ascii_recv_header_len);
+> +
+> +	read_buf_end = sccb->ebh.length - event_buffer_ascii_recv_header_len;
+> +
+> +	assert(read_buf_end <= sizeof(read_buf));
+> +	memcpy(read_buf, sccb->data, read_buf_end);
+> +
+> +	read_index = 0;
+> +	ret = 0;
+> +
+> +out:
+> +	sclp_console_disable_read();
+> +
+> +	return ret;
+> +}
+> +
+> +int __getchar(void)
+> +{
+> +	int ret;
+> +
+> +	if (read_index >= read_buf_end) {
+> +		ret = console_refill_read_buffer();
+> +		if (ret < 0)
+> +			return ret;
+> +	}
+> +
+> +	return read_buf[read_index++];
+> +}
+> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
+> index fead007a6037..e48a5a3df20b 100644
+> --- a/lib/s390x/sclp.h
+> +++ b/lib/s390x/sclp.h
+> @@ -313,6 +313,14 @@ typedef struct ReadEventData {
+>  	uint32_t mask;
+>  } __attribute__((packed)) ReadEventData;
+>  
+> +#define SCLP_EVENT_ASCII_TYPE_DATA_STREAM_FOLLOWS 0
+> +typedef struct ReadEventDataAsciiConsole {
+> +	SCCBHeader h;
+> +	EventBufferHeader ebh;
+> +	uint8_t type;
+> +	char data[];
+> +} __attribute__((packed)) ReadEventDataAsciiConsole;
+> +
+>  extern char _sccb[];
+>  void sclp_setup_int(void);
+>  void sclp_handle_ext(void);
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index c11f6efbd767..f38f442b9cb1 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -75,6 +75,7 @@ cflatobjs += lib/alloc_phys.o
+>  cflatobjs += lib/alloc_page.o
+>  cflatobjs += lib/vmalloc.o
+>  cflatobjs += lib/alloc_phys.o
+> +cflatobjs += lib/getchar.o
+>  cflatobjs += lib/s390x/io.o
+>  cflatobjs += lib/s390x/stack.o
+>  cflatobjs += lib/s390x/sclp.o
+
