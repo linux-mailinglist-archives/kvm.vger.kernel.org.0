@@ -2,119 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 78BD450956B
-	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 05:31:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC790509655
+	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 07:13:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1383952AbiDUDeV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Apr 2022 23:34:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37310 "EHLO
+        id S1384232AbiDUFPr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 01:15:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1383951AbiDUDeU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Apr 2022 23:34:20 -0400
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C44CC641A
-        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 20:31:31 -0700 (PDT)
-Received: by mail-lf1-x12f.google.com with SMTP id w1so6385280lfa.4
-        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 20:31:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wWdUpnsb47o1FNM4DoFpuEPQUv5HBP0fq0XE67umR3Y=;
-        b=Em7H+xBAsQLN4Gfkl0tOWFxTWA6mp3EJVkxmQrtP7FkeppyKVEhkOkbeDkfOJnIK6e
-         4GzQiMgAJRysMw6qNPLW2RQ4BeQcSzeHannnjEvhUUlSea8L/xq6lL84CDPqelwEC66/
-         DjpoRulaMnTXmCkyRprav16+4wsDsMY//k2DxY03iB/h550gC8zPbKV8LjoCIo1Xi5s1
-         ny0TjWryT9M3G8tYAdPC4Mc4hYySvojuaGF6RUhoe/r0qeVx/o4fLJhE4rRz5szl6b/3
-         IMzexZ8YSnVyIih1HgYxFSqH+5p7csAdXh9f2Ig63ym8CG7j9xbBciEtcAMfu5ib1ubL
-         qa+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wWdUpnsb47o1FNM4DoFpuEPQUv5HBP0fq0XE67umR3Y=;
-        b=IsD4X7dIAA0GhZYHisBWp2kdMgWMcllbeZF/lqlUsILyb2Oq94CKW7qN+5ZcMFiAxr
-         3P6SYert6PIkpYqy/0cCibdE2I9QsRFfXQ73yNPl1Me1AfsOtkw8qJbOAR2KYYR6ms0J
-         ZUPORvjLjdHg5PpWVW2oGLM5GeHDlgHVStRnwdNJFWC9y6IulVyHp/BR83qYO3unmBFp
-         fBxBlQPp4C/C5UZHw+V2OKZuPeOqRn1wEygiAudsyTmPXROLvE21/ltuLCZrhWJTxHuk
-         SvzWJN9yVRoBkdUyPjuESAFvgSvxj92HrXTGCSSKncVSxBl6bs4CidM//dmkSLVzMTLo
-         cAeQ==
-X-Gm-Message-State: AOAM532uRnyti+sZR+hhFG/gGBzb95258CMnp4e++FCoXnXWWGhHhNiv
-        pb//u1xpWHGYN55zAVhKN+vvM7X/XJM7ODTG3wLQZAoQgwc=
-X-Google-Smtp-Source: ABdhPJx6nIHUt1znd18RCHDSGPMHuur2dCYr/WggeHytHt7gs5Kiuo7HWarJ3QIphs0ibhh1V0k2ShQlVVJDHLWEv84=
-X-Received: by 2002:a05:6512:3b9b:b0:471:8e54:2ecf with SMTP id
- g27-20020a0565123b9b00b004718e542ecfmr12971220lfv.286.1650511889850; Wed, 20
- Apr 2022 20:31:29 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220409184549.1681189-1-oupton@google.com> <20220409184549.1681189-4-oupton@google.com>
- <CAAeT=FxQ5qBMrYZpGbDT7i+bGFCyfoV32ddKeeprj7mEemnbEA@mail.gmail.com>
-In-Reply-To: <CAAeT=FxQ5qBMrYZpGbDT7i+bGFCyfoV32ddKeeprj7mEemnbEA@mail.gmail.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Wed, 20 Apr 2022 20:31:18 -0700
-Message-ID: <CAOQ_QsjzfWH=UV0hemGt5jeSrYrpzzcVLVPdOBe7LV__RkDT+Q@mail.gmail.com>
-Subject: Re: [PATCH v5 03/13] KVM: arm64: Track vCPU power state using MP
- state values
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        James Morse <james.morse@arm.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        with ESMTP id S1384234AbiDUFPp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 01:15:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 00190DEC4
+        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 22:12:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650517976;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=gw2WgO3NdEKefNIzU7OyyGWhN8RKFPXQkhGeUbUxcYw=;
+        b=NSuwvCJ+FexfoiS6r1ezvXpShvzKtvq2cBl+PBS8RDWyxrMBcVihfpwx8sut3yL7eyfu52
+        O6hdawqVBVVDmF+ZaseYwJsJSCSsj8sY7Z3EQ2YDZNUDNJAMr2xf5sk9nuyBcqq9uMJ3TN
+        Xwmdb2Ot6b/IlXio/CwHILvTTaa4rXs=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-10-L9HPRdJxNBmr5i5MKpw9hg-1; Thu, 21 Apr 2022 01:12:53 -0400
+X-MC-Unique: L9HPRdJxNBmr5i5MKpw9hg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D1D6880A0AD;
+        Thu, 21 Apr 2022 05:12:51 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.40.194.231])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AEF55145B96B;
+        Thu, 21 Apr 2022 05:12:45 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Rodrigo Vivi <rodrigo.vivi@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        intel-gfx@lists.freedesktop.org,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        intel-gvt-dev@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, x86@kernel.org,
+        David Airlie <airlied@linux.ie>,
+        Sean Christopherson <seanjc@google.com>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [RFC PATCH v2 00/10] RFCv2: nested AVIC
+Date:   Thu, 21 Apr 2022 08:12:34 +0300
+Message-Id: <20220421051244.187733-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
+This patch series implement everything that is needed to=0D
+use AMD's AVIC while a nested guest is running including=0D
+ability of the nested guest to use it, and brings feature=0D
+parity vs APICv.=0D
+=0D
+Compared to v1 of the series, there are lot of fixes,=0D
+and refactoring.=0D
+=0D
+This version still use unconditional read-only apic id,=0D
+which will be addressed in the next version.=0D
+=0D
+For the last patch, which allows to avoid cleaning is_running=0D
+bit in physid pages as long as it is possible, I measured=0D
+what would happen in a worst case:=0D
+=0D
+- A malicious guest runs with 2 vCPUs pinned,=0D
+its first vCPU pounds on ICR sending IPIs to the 2nd vCPU=0D
+=0D
+and 2nd vCPU scheduled out forever and not halted=0D
+(something that should not happen with Qemu though)=0D
+=0D
+- A normal guest with single vCPU is pinned to run=0D
+on the same CPU as the 2nd vCPU of the first guest.=0D
+=0D
+The normal guest continued to run, but was observed to run=0D
+about 40% slower.=0D
+=0D
+Therefore AVIC doorbel is strict by default but if the admin=0D
+policy is to pin guests and not allow them to share a physical=0D
+cpu, then strict doorbel can be set to false and that does=0D
+improves the nested (and not nested as well) AVIC perf futher.=0D
+=0D
+Suggestions, comments are welcome.=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (10):=0D
+  KVM: x86: mmu: allow to enable write tracking externally=0D
+  x86: KVMGT: use kvm_page_track_write_tracking_enable=0D
+  KVM: x86: mmu: add gfn_in_memslot helper=0D
+  KVM: x86: mmu: tweak fast path for emulation of access to nested NPT=0D
+    pages=0D
+  KVM: x86: lapic: don't allow to change APIC ID when apic acceleration=0D
+    is enabled=0D
+  KVM: x86: SVM: remove avic's broken code that updated APIC ID=0D
+  KVM: x86: SVM: move avic state to separate struct=0D
+  KVM: x86: rename .set_apic_access_page_addr to reload_apic_access_page=0D
+  KVM: nSVM: implement support for nested AVIC=0D
+  KVM: SVM: allow to avoid not needed updates to is_running=0D
+=0D
+ arch/x86/include/asm/kvm-x86-ops.h    |   2 +-=0D
+ arch/x86/include/asm/kvm_host.h       |   5 +-=0D
+ arch/x86/include/asm/kvm_page_track.h |   1 +=0D
+ arch/x86/kvm/Kconfig                  |   3 -=0D
+ arch/x86/kvm/lapic.c                  |  28 +-=0D
+ arch/x86/kvm/mmu.h                    |   8 +-=0D
+ arch/x86/kvm/mmu/mmu.c                |  21 +-=0D
+ arch/x86/kvm/mmu/page_track.c         |  10 +-=0D
+ arch/x86/kvm/svm/avic.c               | 949 ++++++++++++++++++++++++--=0D
+ arch/x86/kvm/svm/nested.c             | 131 +++-=0D
+ arch/x86/kvm/svm/svm.c                |  31 +-=0D
+ arch/x86/kvm/svm/svm.h                | 165 ++++-=0D
+ arch/x86/kvm/trace.h                  | 140 +++-=0D
+ arch/x86/kvm/vmx/vmx.c                |   8 +-=0D
+ arch/x86/kvm/x86.c                    |  17 +-=0D
+ drivers/gpu/drm/i915/Kconfig          |   1 -=0D
+ drivers/gpu/drm/i915/gvt/kvmgt.c      |   5 +=0D
+ include/linux/kvm_host.h              |  10 +-=0D
+ 18 files changed, 1413 insertions(+), 122 deletions(-)=0D
+=0D
+-- =0D
+2.26.3=0D
+=0D
 
-Sorry for the late reply.
-
-On Wed, Apr 13, 2022 at 10:26 PM Reiji Watanabe <reijiw@google.com> wrote:
-
-[...]
-
-> > @@ -457,7 +459,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
-> >
-> >         switch (mp_state->mp_state) {
-> >         case KVM_MP_STATE_RUNNABLE:
-> > -               vcpu->arch.power_off = false;
-> > +               vcpu->arch.mp_state = *mp_state;
->
-> Nit: It might be a bit odd that KVM_MP_STATE_STOPPED case only copies
-> the 'mp_state' field of kvm_mp_state from userspace (that's not a 'copy'
-> operation though), while KVM_MP_STATE_RUNNABLE case copies entire
-> kvm_mp_state from user space.
-> ('mp_state' is the only field of kvm_mp_state though)
-
-I tried my best to leave this all as-is. I hinted at it in another
-thread, but I really do think a refactoring would be good to make ARM
-actually use the mp_state value instead of relying on vCPU requests. I
-completely agree with the nit, but think it might be better to
-collapse all of the weirdness around mp_state in a separate
-patch/series which will drag the vCPU run loop along.
-
-> Reviewed-by: Reiji Watanabe <reijiw@google.com>
-
-Much appreciated :)
-
---
-Best,
-Oliver
