@@ -2,183 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E3694509FB5
-	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 14:33:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE94C509FC4
+	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 14:39:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384837AbiDUMfH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Apr 2022 08:35:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41214 "EHLO
+        id S1384950AbiDUMmI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 08:42:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1384802AbiDUMfF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Apr 2022 08:35:05 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A39720BE3
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 05:32:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650544336; x=1682080336;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=0gk0Yr6OYwc6wvYMz0DTXtavCaI219f0MHkJuR8UMJE=;
-  b=jYBkkP3JlZy2nPxmzTCtV5M0HOxZyaWn1EJS/Bj5Fpnl7sPUpx3CYnW8
-   hEkzq57S804ugjVRRGAstLibDk0GfgKY3H6KBZrFc6qZyxsGnlbIKabGE
-   U3+wvvQ9K9xUj5FxGXrNe/DS+dYOC23Fm8zsDC74D5xypuftrIZzO34Hb
-   RU3r5gE+3SH3G9Sbpx1snqk83SJoC7yUbbm6RVlRX0QzHzwknNuJ0Znl2
-   BlWzgxrh/EMnVcmnJ1kj0kWYDk6bFaukIX7rAoohXGnMeKqcVFTQVQeA/
-   EUHASLjmLPjXpYEkM+Dn/dr5xAAfEgjSIOfPacQ3/J0ujO1FuoBbuJoHu
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10323"; a="246231388"
-X-IronPort-AV: E=Sophos;i="5.90,278,1643702400"; 
-   d="scan'208";a="246231388"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2022 05:32:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,278,1643702400"; 
-   d="scan'208";a="670632947"
-Received: from lkp-server01.sh.intel.com (HELO 3abc53900bec) ([10.239.97.150])
-  by orsmga004.jf.intel.com with ESMTP; 21 Apr 2022 05:32:02 -0700
-Received: from kbuild by 3abc53900bec with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1nhVyb-0008OB-GC;
-        Thu, 21 Apr 2022 12:32:01 +0000
-Date:   Thu, 21 Apr 2022 20:31:07 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Anton Romanov <romanton@google.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com
-Cc:     kbuild-all@lists.01.org, seanjc@google.com, vkuznets@redhat.com,
-        Anton Romanov <romanton@google.com>
-Subject: Re: [PATCH v2] KVM: x86: Use current rather than snapshotted TSC
- frequency if it is constant
-Message-ID: <202204212040.klu29ce8-lkp@intel.com>
-References: <20220421005645.56801-1-romanton@google.com>
+        with ESMTP id S238809AbiDUMmH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 08:42:07 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 387B921839;
+        Thu, 21 Apr 2022 05:39:18 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23LBw3qM004864;
+        Thu, 21 Apr 2022 12:39:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=+kgvRLmDHARgRwULOwUQD+32iZe0gP8THrq10wEwyys=;
+ b=hWTpwOty+m6y+HCOPymgsC5RJMzaANX+oiJkXWBSpz51Cr1yJlMU7Y67dRQNe4vGjUbg
+ t9Ftyyf4qHdsvCi+h7wn5I4l3LznUbL+QY5K/26KE8mbhjVQPix+hmT0KMDZIIaTVZGh
+ m/yXDOFOiRY/oSbQFadQ+tiAmdQdnnnGNSv2k9p32lwz69aKILih2FDHIF5Al+OtrNsY
+ xD37ezRuakSLKLt5p2uF/WOKEw7n/Xb5xA4RZf/BDG/aPy5p11K6r+SLiyjyvP3qMexA
+ MTa5QVm6DTRaODgdiywVqHFiaC+/ZwAl/UiSYLt48GX3QEyf/4NwBvQl7prgWvSPgHZA yQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3fjer8pmhq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Apr 2022 12:39:17 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23LCBCFH024800;
+        Thu, 21 Apr 2022 12:39:16 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3fjer8pmh0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Apr 2022 12:39:16 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23LCX6KU028726;
+        Thu, 21 Apr 2022 12:39:14 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3ffne8quuh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Apr 2022 12:39:14 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23LCdN1l2949632
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 21 Apr 2022 12:39:23 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C014542042;
+        Thu, 21 Apr 2022 12:39:11 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5CB844203F;
+        Thu, 21 Apr 2022 12:39:11 +0000 (GMT)
+Received: from [9.145.69.75] (unknown [9.145.69.75])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 21 Apr 2022 12:39:11 +0000 (GMT)
+Message-ID: <c3f528fc-16ff-ce88-d2ed-e8bb71cd42d2@linux.ibm.com>
+Date:   Thu, 21 Apr 2022 14:39:11 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220421005645.56801-1-romanton@google.com>
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [kvm-unit-tests PATCH v3 00/11] s390x: Cleanup and maintenance 4
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
+        thuth@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com
+References: <20220421101130.23107-1-frankja@linux.ibm.com>
+ <20220421135920.426687fc@p-imbrenda>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20220421135920.426687fc@p-imbrenda>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 2jQA2CaF8JxTxjDo7gYwhcwfot9QgDKh
+X-Proofpoint-ORIG-GUID: o2r-rMWdqPj8KyQ_FLibJJILjJfxV-9U
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-21_01,2022-04-21_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ mlxscore=0 priorityscore=1501 phishscore=0 malwarescore=0 mlxlogscore=999
+ lowpriorityscore=0 spamscore=0 adultscore=0 bulkscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2204210069
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Anton,
+On 4/21/22 13:59, Claudio Imbrenda wrote:
+> On Thu, 21 Apr 2022 10:11:19 +0000
+> Janosch Frank <frankja@linux.ibm.com> wrote:
+> 
+>> A few small cleanups and two patches that I forgot to upstream which
+>> have now been rebased onto the machine.h library functions.
+> 
+> thanks, queued
+> 
 
-Thank you for the patch! Yet something to improve:
+Please drop the register restore patch #11 from your queue.
 
-[auto build test ERROR on kvm/master]
-[also build test ERROR on mst-vhost/linux-next v5.18-rc3 next-20220421]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+Nico rightly complained that r0/r1 are volatile and I shouldn't have to 
+restore them. It's been too long for me to fully remember why I had to 
+fix that. It might have been a diag308 wrongfully resetting all 
+registers but not loading the reset PSW. Whatever issue I had, the 
+commit message is wrong anyway. If I'm able to remember the issue I'll 
+fix and post the patch again.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Anton-Romanov/KVM-x86-Use-current-rather-than-snapshotted-TSC-frequency-if-it-is-constant/20220421-090221
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git master
-config: x86_64-randconfig-a015 (https://download.01.org/0day-ci/archive/20220421/202204212040.klu29ce8-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.2.0-20) 11.2.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/c60b3070bd6e7e804de118dac10002e4f5f714a6
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Anton-Romanov/KVM-x86-Use-current-rather-than-snapshotted-TSC-frequency-if-it-is-constant/20220421-090221
-        git checkout c60b3070bd6e7e804de118dac10002e4f5f714a6
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
+>>
+>> v3:
+>> 	* Added review tags
+>> 	* Added uv-host and diag308 fix
+>> 	* Diag308 subcode 2 patch, moved the prefix push and pop outside of the if
+>>
+>> v2:
+>> 	* Added host_is_qemu() function
+>> 	* Fixed qemu checks
+>>
+>> Janosch Frank (11):
+>>    lib: s390x: hardware: Add host_is_qemu() function
+>>    s390x: css: Skip if we're not run by qemu
+>>    s390x: diag308: Only test subcode 2 under QEMU
+>>    s390x: pfmf: Initialize pfmf_r1 union on declaration
+>>    s390x: snippets: asm: Add license and copyright headers
+>>    s390x: pv-diags: Cleanup includes
+>>    s390x: css: Cleanup includes
+>>    s390x: iep: Cleanup includes
+>>    s390x: mvpg: Cleanup includes
+>>    s390x: uv-host: Fix pgm tests
+>>    s390x: Restore registers in diag308_load_reset() error path
+>>
+>>   lib/s390x/hardware.h                       |  5 +++
+>>   s390x/cpu.S                                |  1 +
+>>   s390x/css.c                                | 18 ++++++----
+>>   s390x/diag308.c                            | 18 +++++++++-
+>>   s390x/iep.c                                |  3 +-
+>>   s390x/mvpg.c                               |  3 --
+>>   s390x/pfmf.c                               | 39 +++++++++++-----------
+>>   s390x/pv-diags.c                           | 17 ++--------
+>>   s390x/snippets/asm/snippet-pv-diag-288.S   |  9 +++++
+>>   s390x/snippets/asm/snippet-pv-diag-500.S   |  9 +++++
+>>   s390x/snippets/asm/snippet-pv-diag-yield.S |  9 +++++
+>>   s390x/uv-host.c                            |  2 +-
+>>   12 files changed, 85 insertions(+), 48 deletions(-)
+>>
+> 
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>):
-
-   arch/x86/kvm/x86.c: In function '__get_kvmclock':
->> arch/x86/kvm/x86.c:2936:17: error: expected expression before 'struct'
-    2936 |                 struct timespec64 ts;
-         |                 ^~~~~~
-   arch/x86/kvm/x86.c:2933:9: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
-    2933 |         if (ka->use_master_clock &&
-         |         ^~
-   arch/x86/kvm/x86.c:2938:17: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
-    2938 |                 if (kvm_get_walltime_and_clockread(&ts, &data->host_tsc)) {
-         |                 ^~
->> arch/x86/kvm/x86.c:2938:53: error: 'ts' undeclared (first use in this function); did you mean 'tms'?
-    2938 |                 if (kvm_get_walltime_and_clockread(&ts, &data->host_tsc)) {
-         |                                                     ^~
-         |                                                     tms
-   arch/x86/kvm/x86.c:2938:53: note: each undeclared identifier is reported only once for each function it appears in
-   arch/x86/kvm/x86.c: At top level:
-   arch/x86/kvm/x86.c:2952:11: error: expected identifier or '(' before 'else'
-    2952 |         } else {
-         |           ^~~~
-   In file included from include/linux/percpu.h:6,
-                    from include/linux/context_tracking_state.h:5,
-                    from include/linux/hardirq.h:5,
-                    from include/linux/kvm_host.h:7,
-                    from arch/x86/kvm/x86.c:19:
-   include/linux/preempt.h:240:1: error: expected identifier or '(' before 'do'
-     240 | do { \
-         | ^~
-   include/linux/smp.h:268:33: note: in expansion of macro 'preempt_enable'
-     268 | #define put_cpu()               preempt_enable()
-         |                                 ^~~~~~~~~~~~~~
-   arch/x86/kvm/x86.c:2956:9: note: in expansion of macro 'put_cpu'
-    2956 |         put_cpu();
-         |         ^~~~~~~
-   include/linux/preempt.h:243:3: error: expected identifier or '(' before 'while'
-     243 | } while (0)
-         |   ^~~~~
-   include/linux/smp.h:268:33: note: in expansion of macro 'preempt_enable'
-     268 | #define put_cpu()               preempt_enable()
-         |                                 ^~~~~~~~~~~~~~
-   arch/x86/kvm/x86.c:2956:9: note: in expansion of macro 'put_cpu'
-    2956 |         put_cpu();
-         |         ^~~~~~~
-   arch/x86/kvm/x86.c:2957:1: error: expected identifier or '(' before '}' token
-    2957 | }
-         | ^
-
-
-vim +/struct +2936 arch/x86/kvm/x86.c
-
-c60b3070bd6e7e Anton Romanov 2022-04-21  2922  
-869b44211adc87 Paolo Bonzini 2021-09-16  2923  /* Called within read_seqcount_begin/retry for kvm->pvclock_sc.  */
-869b44211adc87 Paolo Bonzini 2021-09-16  2924  static void __get_kvmclock(struct kvm *kvm, struct kvm_clock_data *data)
-108b249c453dd7 Paolo Bonzini 2016-09-01  2925  {
-108b249c453dd7 Paolo Bonzini 2016-09-01  2926  	struct kvm_arch *ka = &kvm->arch;
-8b953440645631 Paolo Bonzini 2016-11-16  2927  	struct pvclock_vcpu_time_info hv_clock;
-8b953440645631 Paolo Bonzini 2016-11-16  2928  
-e2c2206a18993b Wanpeng Li    2017-05-11  2929  	/* both __this_cpu_read() and rdtsc() should be on the same cpu */
-e2c2206a18993b Wanpeng Li    2017-05-11  2930  	get_cpu();
-e2c2206a18993b Wanpeng Li    2017-05-11  2931  
-869b44211adc87 Paolo Bonzini 2021-09-16  2932  	data->flags = 0;
-c60b3070bd6e7e Anton Romanov 2022-04-21  2933  	if (ka->use_master_clock &&
-c60b3070bd6e7e Anton Romanov 2022-04-21  2934  		(static_cpu_has(X86_FEATURE_CONSTANT_TSC) || __this_cpu_read(cpu_tsc_khz)))
-c68dc1b577eabd Oliver Upton  2021-09-16  2935  #ifdef CONFIG_X86_64
-c68dc1b577eabd Oliver Upton  2021-09-16 @2936  		struct timespec64 ts;
-c68dc1b577eabd Oliver Upton  2021-09-16  2937  
-c68dc1b577eabd Oliver Upton  2021-09-16 @2938  		if (kvm_get_walltime_and_clockread(&ts, &data->host_tsc)) {
-c68dc1b577eabd Oliver Upton  2021-09-16  2939  			data->realtime = ts.tv_nsec + NSEC_PER_SEC * ts.tv_sec;
-c68dc1b577eabd Oliver Upton  2021-09-16  2940  			data->flags |= KVM_CLOCK_REALTIME | KVM_CLOCK_HOST_TSC;
-c68dc1b577eabd Oliver Upton  2021-09-16  2941  		} else
-c68dc1b577eabd Oliver Upton  2021-09-16  2942  #endif
-c68dc1b577eabd Oliver Upton  2021-09-16  2943  		data->host_tsc = rdtsc();
-c68dc1b577eabd Oliver Upton  2021-09-16  2944  
-869b44211adc87 Paolo Bonzini 2021-09-16  2945  		data->flags |= KVM_CLOCK_TSC_STABLE;
-869b44211adc87 Paolo Bonzini 2021-09-16  2946  		hv_clock.tsc_timestamp = ka->master_cycle_now;
-869b44211adc87 Paolo Bonzini 2021-09-16  2947  		hv_clock.system_time = ka->master_kernel_ns + ka->kvmclock_offset;
-c60b3070bd6e7e Anton Romanov 2022-04-21  2948  		kvm_get_time_scale(NSEC_PER_SEC, get_cpu_tsc_khz() * 1000LL,
-8b953440645631 Paolo Bonzini 2016-11-16  2949  				   &hv_clock.tsc_shift,
-8b953440645631 Paolo Bonzini 2016-11-16  2950  				   &hv_clock.tsc_to_system_mul);
-c68dc1b577eabd Oliver Upton  2021-09-16  2951  		data->clock = __pvclock_read_cycles(&hv_clock, data->host_tsc);
-55c0cefbdbdaca Oliver Upton  2021-09-16  2952  	} else {
-55c0cefbdbdaca Oliver Upton  2021-09-16  2953  		data->clock = get_kvmclock_base_ns() + ka->kvmclock_offset;
-55c0cefbdbdaca Oliver Upton  2021-09-16  2954  	}
-e2c2206a18993b Wanpeng Li    2017-05-11  2955  
-e2c2206a18993b Wanpeng Li    2017-05-11  2956  	put_cpu();
-55c0cefbdbdaca Oliver Upton  2021-09-16  2957  }
-e2c2206a18993b Wanpeng Li    2017-05-11  2958  
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
