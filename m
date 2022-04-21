@@ -2,91 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 531B9509D21
-	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 12:08:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F38A6509D40
+	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 12:16:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1388093AbiDUKK0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Apr 2022 06:10:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35566 "EHLO
+        id S1388120AbiDUKQe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 06:16:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354947AbiDUKKY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Apr 2022 06:10:24 -0400
-X-Greylist: delayed 411 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 21 Apr 2022 03:07:35 PDT
-Received: from mail.mimoja.de (mail.mimoja.de [213.160.72.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1BE5B25E8D;
-        Thu, 21 Apr 2022 03:07:35 -0700 (PDT)
-Received: from [IPV6:2003:cf:571f:200:d4c7:7b5a:7538:c333] (p200300cf571f0200d4c77b5a7538c333.dip0.t-ipconnect.de [IPv6:2003:cf:571f:200:d4c7:7b5a:7538:c333])
-        by mail.mimoja.de (Postfix) with ESMTPSA id 0D2CA2223B;
-        Thu, 21 Apr 2022 12:00:41 +0200 (CEST)
-Message-ID: <e3ef8236-344d-e840-575c-a5fb1450a13b@mimoja.de>
-Date:   Thu, 21 Apr 2022 12:00:40 +0200
+        with ESMTP id S1388153AbiDUKQb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 06:16:31 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B1F0C27;
+        Thu, 21 Apr 2022 03:13:33 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23L9ZVw5002649;
+        Thu, 21 Apr 2022 10:13:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=EU2XgCQfd2UYLsyU7gZxSwFse6opEUDtqv9UEaoNBEc=;
+ b=DLc0Fs5pJzFEurBWlqBJjDfxwwVzQ0gl4Zp5gApzLpw5+buwfp9tfI8W47rEw5Nrc8oA
+ RgOeMIG9ZVgAiDal9/3scfGHz7GaPPQcUXVklD1fnbn+BeQ6t8jow2lTXD50bFgAwe4J
+ d2grrqm9w2rbfxG78Xp21yl97eDhasJXhqFgnKfqM+iUYPq5YtvbahJEpRoW2xHq4q4E
+ s2KaXp1U/rBCPcrrnxOs9MjN6l5oOXoE/E9bVg2Tj4jEiPtgPbNuMxzovurLWwNK9gZ9
+ aMXDLCGWFFchA/m3RJfrBm0fnIKJumPPFiXxjIiMnuRcUrRDlghh8xOOoRZVha+Iiq6V ag== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fhxh90a5w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Apr 2022 10:13:33 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23LA6JcJ028941;
+        Thu, 21 Apr 2022 10:13:33 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fhxh90a4x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Apr 2022 10:13:32 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23LA3MKK026794;
+        Thu, 21 Apr 2022 10:13:29 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma05fra.de.ibm.com with ESMTP id 3ffne8x2vf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Apr 2022 10:13:29 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23LADQAr44368194
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 21 Apr 2022 10:13:26 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 41728AE04D;
+        Thu, 21 Apr 2022 10:13:26 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7ECAAAE045;
+        Thu, 21 Apr 2022 10:13:25 +0000 (GMT)
+Received: from linux6.. (unknown [9.114.12.104])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 21 Apr 2022 10:13:25 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com, seiden@linux.ibm.com,
+        nrb@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v3 00/11] s390x: Cleanup and maintenance 4
+Date:   Thu, 21 Apr 2022 10:11:19 +0000
+Message-Id: <20220421101130.23107-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v3 0/9] Parallel CPU bringup for x86_64
-Content-Language: en-US
-To:     Paul Menzel <pmenzel@molgen.mpg.de>,
-        David Woodhouse <dwmw2@infradead.org>, thomas.lendacky@amd.com,
-        mimoja@mimoja.de
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Paul E . McKenney" <paulmck@kernel.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, hewenliang4@huawei.com, hushiyuan@huawei.com,
-        luolongjun@huawei.com, hejingxian@huawei.com
-References: <20211215145633.5238-1-dwmw2@infradead.org>
- <9a47b5ec-f2d1-94d9-3a48-9b326c88cfcb@molgen.mpg.de>
- <ab28d2ce-4a9c-387d-9eda-558045a0c35b@molgen.mpg.de>
- <3bfacf45d2d0f3dfa3789ff5a2dcb46744aacff7.camel@infradead.org>
- <ea433e41-0038-554d-3348-70aa98aff9e1@molgen.mpg.de>
- <efbe0d3d92e6c279e3a6d7a4191ca7470bc4beec.camel@infradead.org>
- <74d2302f-88fc-c75c-6d2d-4aece1a515bb@molgen.mpg.de>
-From:   Mimoja <mimoja@mimoja.de>
-In-Reply-To: <74d2302f-88fc-c75c-6d2d-4aece1a515bb@molgen.mpg.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: T3RcI7zI4g6pt6AlmwP3RAN3uFPXRw-a
+X-Proofpoint-GUID: j-yvrDbZu9sYFO-PdzKCNbjF6A065rcv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-20_06,2022-04-20_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
+ mlxscore=0 impostorscore=0 bulkscore=0 malwarescore=0 mlxlogscore=942
+ phishscore=0 lowpriorityscore=0 adultscore=0 clxscore=1015
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204210056
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dear Paul,
+A few small cleanups and two patches that I forgot to upstream which
+have now been rebased onto the machine.h library functions.
 
-> Sorry for replying so late. I saw your v4 patches, and tried commit 
-> 5e3524d21d2a () from your branch `parallel-5.17-part1`. Unfortunately, 
-> the boot problem still persists on an AMD Ryzen 3 2200 g system, I 
-> tested with. Please tell, where I should report these results too 
-> (here or posted v4 patches).
+v3:
+	* Added review tags
+	* Added uv-host and diag308 fix
+	* Diag308 subcode 2 patch, moved the prefix push and pop outside of the if
 
-We have confirmed the issue on multiple AMD CPUs from multiple 
-generations, leading to the guess that only Zen and Zen+ CPU seem 
-affected with Zen3 and Zen2 (only tested ulv) working fine. Tho we 
-struggled to get any output as the failing machines just go silent.
+v2:
+	* Added host_is_qemu() function
+	* Fixed qemu checks
 
-Not working:
+Janosch Frank (11):
+  lib: s390x: hardware: Add host_is_qemu() function
+  s390x: css: Skip if we're not run by qemu
+  s390x: diag308: Only test subcode 2 under QEMU
+  s390x: pfmf: Initialize pfmf_r1 union on declaration
+  s390x: snippets: asm: Add license and copyright headers
+  s390x: pv-diags: Cleanup includes
+  s390x: css: Cleanup includes
+  s390x: iep: Cleanup includes
+  s390x: mvpg: Cleanup includes
+  s390x: uv-host: Fix pgm tests
+  s390x: Restore registers in diag308_load_reset() error path
 
-Ryzen 5 Pro 2500u and 7 2700U
-Ryzen 3 2300G
+ lib/s390x/hardware.h                       |  5 +++
+ s390x/cpu.S                                |  1 +
+ s390x/css.c                                | 18 ++++++----
+ s390x/diag308.c                            | 18 +++++++++-
+ s390x/iep.c                                |  3 +-
+ s390x/mvpg.c                               |  3 --
+ s390x/pfmf.c                               | 39 +++++++++++-----------
+ s390x/pv-diags.c                           | 17 ++--------
+ s390x/snippets/asm/snippet-pv-diag-288.S   |  9 +++++
+ s390x/snippets/asm/snippet-pv-diag-500.S   |  9 +++++
+ s390x/snippets/asm/snippet-pv-diag-yield.S |  9 +++++
+ s390x/uv-host.c                            |  2 +-
+ 12 files changed, 85 insertions(+), 48 deletions(-)
 
-while e.g.
-
-Ryzen 7 Pro 4750U
-Ryzen 9 5950X
-
-both work fine. We will continue to investigate the issue but are 
-currently a bit pulled into other topics.
-
-Thomas, could please maybe help us identify which CPUs and MC-Versions 
-are worth looking at? David suggested you might have a good overview here.
-
-
-Best regards
-
-Johanna "Mimoja"
+-- 
+2.32.0
 
