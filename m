@@ -2,116 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 238AA50990C
-	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 09:27:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48268509906
+	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 09:27:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1385716AbiDUH1U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Apr 2022 03:27:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47246 "EHLO
+        id S1385777AbiDUH1p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 03:27:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229843AbiDUH1T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Apr 2022 03:27:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1CBD61837E
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 00:24:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650525867;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ueojm38snUDgcNkd8GnzNsJGz3O6fhwaTuAkVszcmuo=;
-        b=NFX49FIfuJj38zcz16yV4P/6aSjoTusGBllY1/OEwfb0RwP6Qy82hMDY4GJt1RhlIRlng4
-        HKyWz9W23Agso2rWzeewUhHR6zJsjPew0fyyvGsYNREMpWmbH/ip26keS6BZPR1Lk+mMZh
-        LATtvf2rgZq1sEaQV54puq9cg6VSJjs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-277-KLvRBc_XPGSd0fL4RBf18g-1; Thu, 21 Apr 2022 03:24:25 -0400
-X-MC-Unique: KLvRBc_XPGSd0fL4RBf18g-1
-Received: by mail-wm1-f70.google.com with SMTP id az19-20020a05600c601300b003914ac8efb8so2055586wmb.2
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 00:24:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=Ueojm38snUDgcNkd8GnzNsJGz3O6fhwaTuAkVszcmuo=;
-        b=5jhwSTc1w7loxde+9uT/ISsl2st+r3dmR8o+vcEa9N114a/QNXptQYBSorD+iFpIjC
-         NgLgq7I4+HL3DHb4fgQiS/Goc4AD+lgVXoc4wdpp+pMUYp04p8cKvp+ZRZ/dB+xhYct+
-         2HkvH2MZjtuxh1TfY7KXnsTBFKMTtox+uzlWDEED/bGJVtQDRDq9cooxzc3XkkbX9kkR
-         9GGTr+item9Z2qEkr0PMnfNMTlvUA5aUhCcDISuNT6naGHEhflPtYvgvNw64jnI12JPG
-         nPtelvObyr3Unbvel4sO3RW90gEBWCjCWAZIVZJ0TdYvsVsARjAqwa2J235nZIs314uM
-         +q+A==
-X-Gm-Message-State: AOAM530mXehhO6Q62vve9dJIfT6yf8gVgG7aD8rsayFfab1aclOEofxh
-        oQ9kYgk6J0wMfctx4OUEzAiuyfI8Kd6o6SrCcZWxGu/ANaKzpVls6lZBlk1uida/Ri5nfPaNVR+
-        V9WLGySD+MAdi
-X-Received: by 2002:a05:600c:4f53:b0:392:e99:3002 with SMTP id m19-20020a05600c4f5300b003920e993002mr7271152wmq.35.1650525864749;
-        Thu, 21 Apr 2022 00:24:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyT3pnm5Sh+vV0Sy7hhyznn/LgwWMwSX+xjIVufjxa9zkFnFGy5AD9tPDmaVij6DMrjv3pJ9w==
-X-Received: by 2002:a05:600c:4f53:b0:392:e99:3002 with SMTP id m19-20020a05600c4f5300b003920e993002mr7271129wmq.35.1650525864513;
-        Thu, 21 Apr 2022 00:24:24 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c702:de00:711b:76af:b335:9b70? (p200300cbc702de00711b76afb3359b70.dip0.t-ipconnect.de. [2003:cb:c702:de00:711b:76af:b335:9b70])
-        by smtp.gmail.com with ESMTPSA id t9-20020adfa2c9000000b002061561d4a7sm1601302wra.96.2022.04.21.00.24.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Apr 2022 00:24:21 -0700 (PDT)
-Message-ID: <f2edeb89-54be-6100-9464-c99fdc4bd439@redhat.com>
-Date:   Thu, 21 Apr 2022 09:24:20 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.2
-Subject: Re: [PATCH 3/4] KVM: s390: replace bitmap_copy with
- bitmap_{from,to}_arr64 where appropriate
-Content-Language: en-US
-To:     Yury Norov <yury.norov@gmail.com>, linux-kernel@vger.kernel.org,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20220420222530.910125-1-yury.norov@gmail.com>
- <20220420222530.910125-4-yury.norov@gmail.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20220420222530.910125-4-yury.norov@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S1385755AbiDUH1m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 03:27:42 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66E80B49;
+        Thu, 21 Apr 2022 00:24:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1650525891; x=1682061891;
+  h=from:to:cc:subject:date:message-id;
+  bh=5i2QjPQG+ow+ZD5MP6LoJVVxJRKvV2NNUYuaxiC+6pM=;
+  b=mKPSNgzP53i/pYgNiH+fPMgF1k21LU+RknuSO8ux8RbZPAuKNEONBtlL
+   Sn7vMAc/VIwy5OH7JhJDAO+rRtntgIM1s3yY6DczvbY6VfwWFtTUg+A17
+   mwOvEM0T/Xi02lWyeE/CNAtS6VXr5XmdxHM6kBxxL4N785u5+0s3SalED
+   CknnxFj74HM6U1qozI5CTVQKdmhiIKLz8iu+ZvbjUcI3mXHpOVqnIJxxN
+   9J1hMSbhDk93q31WleGIf89n777+DnWugIwao2L/mrlLebBUi+3gtUAH9
+   ydzGZ01HgMVRzD/BVRbKndwNgnLko0YNZXZNRGAXlVA1GFaLTyyEIRaFC
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10323"; a="324709279"
+X-IronPort-AV: E=Sophos;i="5.90,278,1643702400"; 
+   d="scan'208";a="324709279"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2022 00:24:49 -0700
+X-IronPort-AV: E=Sophos;i="5.90,278,1643702400"; 
+   d="scan'208";a="727860203"
+Received: from chenyi-pc.sh.intel.com ([10.239.159.73])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2022 00:24:47 -0700
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v6 0/3] Introduce Notify VM exit
+Date:   Thu, 21 Apr 2022 15:29:55 +0800
+Message-Id: <20220421072958.16375-1-chenyi.qiang@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21.04.22 00:25, Yury Norov wrote:
-> Copying bitmaps from/to 64-bit arrays with bitmap_copy is not safe
-> in general case. Use designated functions instead.
-> 
+Virtual machines can exploit Intel ISA characterstics to cause
+functional denial of service to the VMM. This series introduces a new
+feature named Notify VM exit, which can help mitigate such kind of
+attacks.
 
-Just so I understand correctly: there is no BUG, it's just cleaner to do
-it that way, correct?
+Patch 1: An extension of KVM_SET_VCPU_EVENTS ioctl to inject a
+synthesized shutdown event from user space. This is also a fix for other
+synthesized triple fault, e.g. the RSM patch or nested_vmx_abort(),
+which could get lost when exit to userspace to do migrate.
 
-IIUC, bitmap_to_arr64() translates to bitmap_copy_clear_tail() on s390x.
+Patch 2: A selftest about get/set triple fault event.
 
-As the passed length is always 1024 (KVM_S390_VM_CPU_FEAT_NR_BITS), we
-essentially end up with bitmap_copy() again.
+Patch 3: The main patch to enable Notify VM exit.
 
+---
+Change logs:
+v5 -> v6
+- Do some changes in document.
+- Add a selftest about get/set triple fault event. (Sean)
+- extend the argument to include both the notify window and some flags
+  when enabling KVM_CAP_X86_BUS_LOCK_EXIT CAP. (Sean)
+- Change to use KVM_VCPUEVENT_VALID_TRIPE_FAULT in flags field and add
+  pending_triple_fault field in struct kvm_vcpu_events, which allows
+  userspace to make/clear triple fault request. (Sean)
+- Add a flag in kvm_x86_ops to avoid the kvm_has_notify_vmexit global
+  varialbe and its export.(Sean)
+- v5: https://lore.kernel.org/lkml/20220318074955.22428-1-chenyi.qiang@intel.com/
 
-Looks cleaner to me
+v4 -> v5
+- rename KVM_VCPUEVENTS_SHUTDOWN to KVM_VCPUEVENTS_TRIPLE_FAULT. Make it
+  bidirection and add it to get_vcpu_events. (Sean)
+- v4: https://lore.kernel.org/all/20220310084001.10235-1-chenyi.qiang@intel.com/
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+v3 -> v4
+- Change this feature to per-VM scope. (Jim)
+- Once VM_CONTEXT_INVALID set in exit_qualification, exit to user space
+  notify this fatal case, especially the notify VM exit happens in L2.
+  (Jim)
+- extend KVM_SET_VCPU_EVENTS to allow user space to inject a shutdown
+  event. (Jim)
+- A minor code changes.
+- Add document for the new KVM capability.
+- v3: https://lore.kernel.org/lkml/20220223062412.22334-1-chenyi.qiang@intel.com/
 
+v2 -> v3
+- add a vcpu state notify_window_exits to record the number of
+  occurence as well as a pr_warn output. (Sean)
+- Add the handling in nested VM to prevent L1 bypassing the restriction
+  through launching a L2. (Sean)
+- Only kill L2 when L2 VM is context invalid, synthesize a
+  EXIT_REASON_TRIPLE_FAULT to L1 (Sean)
+- To ease the current implementation, make module parameter
+  notify_window read-only. (Sean)
+- Disable notify window exit by default.
+- v2: https://lore.kernel.org/lkml/20210525051204.1480610-1-tao3.xu@intel.com/
+
+v1 -> v2
+- Default set notify window to 0, less than 0 to disable.
+- Add more description in commit message.
+---
+
+Chenyi Qiang (2):
+  KVM: X86: Save&restore the triple fault request
+  KVM: selftests: Add a test to get/set triple fault event
+
+Tao Xu (1):
+  KVM: VMX: Enable Notify VM exit
+
+ Documentation/virt/kvm/api.rst                | 55 +++++++++++
+ arch/x86/include/asm/kvm_host.h               |  9 ++
+ arch/x86/include/asm/vmx.h                    |  7 ++
+ arch/x86/include/asm/vmxfeatures.h            |  1 +
+ arch/x86/include/uapi/asm/kvm.h               |  4 +-
+ arch/x86/include/uapi/asm/vmx.h               |  4 +-
+ arch/x86/kvm/vmx/capabilities.h               |  6 ++
+ arch/x86/kvm/vmx/nested.c                     |  8 ++
+ arch/x86/kvm/vmx/vmx.c                        | 48 +++++++++-
+ arch/x86/kvm/x86.c                            | 33 ++++++-
+ arch/x86/kvm/x86.h                            |  5 +
+ include/uapi/linux/kvm.h                      | 10 ++
+ tools/testing/selftests/kvm/.gitignore        |  1 +
+ tools/testing/selftests/kvm/Makefile          |  1 +
+ .../kvm/x86_64/triple_fault_event_test.c      | 96 +++++++++++++++++++
+ 15 files changed, 280 insertions(+), 8 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/triple_fault_event_test.c
 
 -- 
-Thanks,
-
-David / dhildenb
+2.17.1
 
