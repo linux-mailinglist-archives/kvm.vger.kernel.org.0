@@ -2,80 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A06B509F2C
-	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 13:59:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A63EC509F32
+	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 14:00:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382734AbiDUMCE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Apr 2022 08:02:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43806 "EHLO
+        id S1382807AbiDUMCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 08:02:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240811AbiDUMCC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Apr 2022 08:02:02 -0400
+        with ESMTP id S1382755AbiDUMCT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 08:02:19 -0400
 Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C1E32ED4D;
-        Thu, 21 Apr 2022 04:59:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A36EC2ED71;
+        Thu, 21 Apr 2022 04:59:29 -0700 (PDT)
 Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23L9Cuoo004921;
-        Thu, 21 Apr 2022 11:59:12 GMT
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23LBuP3f004924;
+        Thu, 21 Apr 2022 11:59:28 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
  subject : message-id : in-reply-to : references : mime-version :
  content-type : content-transfer-encoding; s=pp1;
- bh=UfM4SajG/EAi4X1WZrdGARqPQdG3u1TBkxrT33iA3v4=;
- b=J8FFjEHrvjDGDaQE0rG0WqGC02sNSd3rt/CMCae2zyzDI9nJm/ekgUJ/yRsUQpxWld5L
- 6EZv/9mEl3x4Q0mQMG/omtFbJmPfGvzvXwo5jbiESaCnrQYyA/9LaOfJg9oLH/1eY5QH
- PEWYTngjkLwqU6FD+kVThDSsz3m2WSVwLICD6Utphj+n5tBqZhJwo08QY7cku7HvmGnU
- 2zqo8I+OMHeuBYQPWSZQXJZkPXUuUtmAq6NvrRMuWXSkCpSFj9tpeFhkfa+qTrAviF8K
- tdHYp0WnhL8KvM2PuSaL921MYKa/ncl+Rn1ORyBViA8Tq1U/jsw4yixPSgqCN2WEi/Tm RA== 
+ bh=Tpmmp9WK1HsAkLROYtxLyS3Z8zVE1BCFvUUg+wcoj1Q=;
+ b=YY4pNfvzB7HLvVbb3CoU+Q+6RB5up0A6LWUXoZeXJVFsJJ/mhrPQpDMDgppjhP9ApxHn
+ 7xNdm4cEc/kwq4KqfVsRwHYMYvMCKdEBR7n0MSpPfX4cHMod9WVkP54cRI/AxzDjT534
+ WrWYsVEBWE9XU+XDprhSsT4YgWUq0NnbQp7ZKyCw8X+2mlbqQf8JvM164fuuVRJBQONg
+ U2yvFgNFPlaqrUymegC3pQCM4dVj42wlUj7WQ2oxp9RZ6F2Z29XOblOuAeflfeW9tlxx
+ J9BO0gTBT6EXgoUGzD0qoxroUHDGF9wxtjo4H1avif/kjo/oqhwX9X8Ei9xVn1P8hn7u cw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3fjjhfrj10-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3fjjhfrj60-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Apr 2022 11:59:12 +0000
+        Thu, 21 Apr 2022 11:59:28 +0000
 Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23LBQ8uO027927;
-        Thu, 21 Apr 2022 11:59:12 GMT
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23LBE88n023563;
+        Thu, 21 Apr 2022 11:59:28 GMT
 Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3fjjhfrj0h-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3fjjhfrj5k-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Apr 2022 11:59:11 +0000
+        Thu, 21 Apr 2022 11:59:28 +0000
 Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23LBq96q016093;
-        Thu, 21 Apr 2022 11:59:10 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 3ffne8qsx4-1
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23LBqIdx016140;
+        Thu, 21 Apr 2022 11:59:26 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 3ffne8qsxe-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Apr 2022 11:59:09 +0000
+        Thu, 21 Apr 2022 11:59:26 +0000
 Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23LBx6g043581742
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23LBxN7N48300308
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Apr 2022 11:59:06 GMT
+        Thu, 21 Apr 2022 11:59:23 GMT
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BDDEEA4051;
-        Thu, 21 Apr 2022 11:59:06 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id F29E2A4053;
+        Thu, 21 Apr 2022 11:59:22 +0000 (GMT)
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4CB0CA404D;
-        Thu, 21 Apr 2022 11:59:06 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 7F67CA4040;
+        Thu, 21 Apr 2022 11:59:22 +0000 (GMT)
 Received: from p-imbrenda (unknown [9.145.10.176])
         by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 21 Apr 2022 11:59:06 +0000 (GMT)
-Date:   Thu, 21 Apr 2022 13:59:04 +0200
+        Thu, 21 Apr 2022 11:59:22 +0000 (GMT)
+Date:   Thu, 21 Apr 2022 13:59:20 +0200
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     Janosch Frank <frankja@linux.ibm.com>
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
         thuth@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v3 11/11] s390x: Restore registers in
- diag308_load_reset() error path
-Message-ID: <20220421135904.6ac14c7e@p-imbrenda>
-In-Reply-To: <20220421101130.23107-12-frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v3 00/11] s390x: Cleanup and maintenance
+ 4
+Message-ID: <20220421135920.426687fc@p-imbrenda>
+In-Reply-To: <20220421101130.23107-1-frankja@linux.ibm.com>
 References: <20220421101130.23107-1-frankja@linux.ibm.com>
-        <20220421101130.23107-12-frankja@linux.ibm.com>
 Organization: IBM
 X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: KutmVzuGsuuGrQ_HoP-BMmJRJl_NxHfT
-X-Proofpoint-GUID: a6aO3cQnMh_h0XvTr5HO7wX9cse_tqig
+X-Proofpoint-ORIG-GUID: P6X6lf8nbHN0qS--MYN5-mGkchRyEQMh
+X-Proofpoint-GUID: siBaPhmj4r_kvlVTmylqcyGszx7SKjzY
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-04-20_06,2022-04-21_01,2022-02-23_01
@@ -93,31 +92,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 21 Apr 2022 10:11:30 +0000
+On Thu, 21 Apr 2022 10:11:19 +0000
 Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> In case of an error we'll currently return with the wrong values in
-> gr0 and gr1. Let's fix that by restoring the registers before setting
-> the return value and branching to the return address.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> A few small cleanups and two patches that I forgot to upstream which
+> have now been rebased onto the machine.h library functions.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+thanks, queued
 
-> ---
->  s390x/cpu.S | 1 +
->  1 file changed, 1 insertion(+)
 > 
-> diff --git a/s390x/cpu.S b/s390x/cpu.S
-> index 82b5e25d..0bd8c0e3 100644
-> --- a/s390x/cpu.S
-> +++ b/s390x/cpu.S
-> @@ -34,6 +34,7 @@ diag308_load_reset:
->  	stg     %r15, GEN_LC_SW_INT_GRS + 15 * 8
->  	/* Do the reset */
->  	diag    %r0,%r2,0x308
-> +	RESTORE_REGS_STACK
->  	/* Failure path */
->  	xgr	%r2, %r2
->  	br	%r14
+> v3:
+> 	* Added review tags
+> 	* Added uv-host and diag308 fix
+> 	* Diag308 subcode 2 patch, moved the prefix push and pop outside of the if
+> 
+> v2:
+> 	* Added host_is_qemu() function
+> 	* Fixed qemu checks
+> 
+> Janosch Frank (11):
+>   lib: s390x: hardware: Add host_is_qemu() function
+>   s390x: css: Skip if we're not run by qemu
+>   s390x: diag308: Only test subcode 2 under QEMU
+>   s390x: pfmf: Initialize pfmf_r1 union on declaration
+>   s390x: snippets: asm: Add license and copyright headers
+>   s390x: pv-diags: Cleanup includes
+>   s390x: css: Cleanup includes
+>   s390x: iep: Cleanup includes
+>   s390x: mvpg: Cleanup includes
+>   s390x: uv-host: Fix pgm tests
+>   s390x: Restore registers in diag308_load_reset() error path
+> 
+>  lib/s390x/hardware.h                       |  5 +++
+>  s390x/cpu.S                                |  1 +
+>  s390x/css.c                                | 18 ++++++----
+>  s390x/diag308.c                            | 18 +++++++++-
+>  s390x/iep.c                                |  3 +-
+>  s390x/mvpg.c                               |  3 --
+>  s390x/pfmf.c                               | 39 +++++++++++-----------
+>  s390x/pv-diags.c                           | 17 ++--------
+>  s390x/snippets/asm/snippet-pv-diag-288.S   |  9 +++++
+>  s390x/snippets/asm/snippet-pv-diag-500.S   |  9 +++++
+>  s390x/snippets/asm/snippet-pv-diag-yield.S |  9 +++++
+>  s390x/uv-host.c                            |  2 +-
+>  12 files changed, 85 insertions(+), 48 deletions(-)
+> 
 
