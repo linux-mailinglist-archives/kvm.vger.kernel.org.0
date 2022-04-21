@@ -2,75 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6392750A688
-	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 19:04:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BE5050A6D0
+	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 19:15:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232406AbiDURG6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Apr 2022 13:06:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46824 "EHLO
+        id S1390632AbiDURRV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 13:17:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229717AbiDURG5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Apr 2022 13:06:57 -0400
-Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F1084992A
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 10:04:07 -0700 (PDT)
-Received: by mail-yb1-xb29.google.com with SMTP id b95so9890338ybi.1
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 10:04:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Mt5d94ouBNRgK4aft9t5vNr0uFkR55z3XwWAQdD5FUc=;
-        b=HrQ6SnoElb85r6De0Gyb6QYtmGW0UZZHoRqYniWGXxhbAJxdJBxxDoGjWfFzlyLHCa
-         iS6FEOJghE+gwwbiFuO/qzE+v0/xWyacDc/dig/lj0OLYAFuIqjszn6bBifsCmbCzGIr
-         ZlEiv9/ngqKNSNChcABhKOqkpYvRxWU6mu2hEvjbWIdvs8nbFLsj6ub4GEwaRL1dxgib
-         GQJBc2PA+Rsc0hrZUet+I8zxDXI7xr1LxSnpddJMeRCy6DAIJcYqCV9Dw81JA9zuNR8F
-         b6jtRfyhxgw76JMs9k0bR9BotnAZkTT7vy8KrdVPkKxBKDPwT/PbrInF9l6bNSyIIZE8
-         hL2Q==
+        with ESMTP id S1390619AbiDURRR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 13:17:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5BDC549F29
+        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 10:14:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650561265;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1YMKcSiA0LOgoG4cDHR7os5spSf2HROMrqJ1+238Lww=;
+        b=cj0fzBHYl4qY6eYwpBOee9+Qmka1dtm0noXOISNgxRlSq/aYNsoi2veTYPwZRTLxxmCGRu
+        43ecHb2GUvN5r35njLRQgS571QRJZ3F53RQ/E3NCyjFNnnIxDRmXny9+tMHVzY7r/IiqRv
+        hJJmc0gTEx/eItYe0+w0IzhgGwMteAw=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-648-4q7FdTSQM_2wQ4vq2ZixSg-1; Thu, 21 Apr 2022 13:14:24 -0400
+X-MC-Unique: 4q7FdTSQM_2wQ4vq2ZixSg-1
+Received: by mail-ej1-f72.google.com with SMTP id qk32-20020a1709077fa000b006eff51cd918so2775712ejc.19
+        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 10:14:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Mt5d94ouBNRgK4aft9t5vNr0uFkR55z3XwWAQdD5FUc=;
-        b=tVmj5LHVSKBj6MArq6QAXMa1rMVZn/w07sIa4pqP6xDA6PMuuWQIs9ELW+QJDetdFE
-         FQSICk1relVYThB53HIiRLHdnUkizZ1yM3DIJ34FAycm3+rh29+eeb3m+EY6Oz6DNhMj
-         JDfOv5snNX8yeaEoiUELTo/2kZAscDLlIrrgl8Swg28Dh8tiRbz/UX3Juz+pYMDu22hZ
-         XKYc/cD+5vs8EPaHK5x16YzBpykjDc7LJv6ijaOkwKfEtmFuX6fMZpCmy7zVOeATz5iB
-         KlNsN9G+gOsbIkhS2wGyg/1+zr2/QCNx7DxxJEtwYAwmQ6MDMFBgFIIVHEpiwcGL5LaH
-         Koqg==
-X-Gm-Message-State: AOAM533NAFo1ODNYTkSPpMvLBPPqoHWVo8kg4uU5AT917Q69MGVXSOvU
-        VzzFCmvRdKJdNQW125i4AcP0zAkS6OcCGPO36iCZnA==
-X-Google-Smtp-Source: ABdhPJwGlxPxobbr+AhQQh2O9DUBl0dl6jeVvCmp3KF1DE8dxE/HTfIURpAV8tgSrH2T97uM8B8yRKMtO3mXmGlYNio=
-X-Received: by 2002:a25:84c6:0:b0:641:5a21:90bc with SMTP id
- x6-20020a2584c6000000b006415a2190bcmr699446ybm.26.1650560646522; Thu, 21 Apr
- 2022 10:04:06 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=1YMKcSiA0LOgoG4cDHR7os5spSf2HROMrqJ1+238Lww=;
+        b=MVVcVHQcBRKgrCPgZFl3peHY0YL3lZU6VpRz9OVzfKwSB6zlbg2lJYtR8KA/2f+uR6
+         tZaRCIIsdUzf/D7g1fCPYsV0CUZUdF8RD1gmtCrNO5XQhw8+ztrWubHtsMQi5pDuJurE
+         JFNQ4l3PQlUWL7LdfVkoA3YCKK+squPUWRR3RImAn3boQ/dr4TWPsVpiuZQqIWRuItIq
+         IGAqYK2ApxqXY513G1OKum6G6E1ElvLLk2cZOGkigXzOPlj1AwP3P3CCdWPfGd2XsSeq
+         UHS6vJ86rlWsK48ckBOILth5mWeg6eN4m0OSkMFElXXpd+0+5ReCvtC7TBEujEXppebO
+         epUw==
+X-Gm-Message-State: AOAM530pdWYhqZneUFY1UAnkGGu2M2okI++/w5IW4eNG73Y8Wc9QZgwZ
+        PYYAnak199MrPWfXSPyBV6tRvbq4Fi/mbCaO5exlpmNB9wqHmlfhM4CrQYjYmugsl8uadhg2gDi
+        ZZwPdU4FYtjrl
+X-Received: by 2002:a17:907:7815:b0:6ce:5242:1280 with SMTP id la21-20020a170907781500b006ce52421280mr466142ejc.217.1650561263076;
+        Thu, 21 Apr 2022 10:14:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyjpxVRQrq2bmfsUTwiZkkocLi9PluIUEZjPLmqlLk+39bZSgQ5aZ8L7QdX/BJW0PyqWPmlIA==
+X-Received: by 2002:a17:907:7815:b0:6ce:5242:1280 with SMTP id la21-20020a170907781500b006ce52421280mr466118ejc.217.1650561262828;
+        Thu, 21 Apr 2022 10:14:22 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id e12-20020a170906c00c00b006e66eff7584sm8022976ejz.102.2022.04.21.10.14.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Apr 2022 10:14:22 -0700 (PDT)
+Message-ID: <b1b04160-1604-8281-4c82-09b1f84ba86c@redhat.com>
+Date:   Thu, 21 Apr 2022 19:14:20 +0200
 MIME-Version: 1.0
-References: <20220415215901.1737897-1-oupton@google.com> <20220415215901.1737897-17-oupton@google.com>
- <CANgfPd9bb213hsdKTMW9K0EsVLuKEKCF8V0pb6xM1qfnRj1qfw@mail.gmail.com> <YmGKaoStt9Lf9xOP@google.com>
-In-Reply-To: <YmGKaoStt9Lf9xOP@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Thu, 21 Apr 2022 10:03:55 -0700
-Message-ID: <CANgfPd-ebvPq5eqgHz0ED1eSqk0Z-+utoBE8w67uo=GSS+UrpQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 16/17] KVM: arm64: Enable parallel stage 2 MMU faults
-To:     Oliver Upton <oupton@google.com>
-Cc:     "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>, kvm <kvm@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH] KVM: x86: add HC_VMM_CUSTOM hypercall
+Content-Language: en-US
+To:     Peter Oskolkov <posk@google.com>,
         Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Paul Turner <pjt@google.com>, Peter Oskolkov <posk@posk.io>
+References: <20220421165137.306101-1-posk@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220421165137.306101-1-posk@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,81 +88,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 21, 2022 at 9:46 AM Oliver Upton <oupton@google.com> wrote:
->
-> On Thu, Apr 21, 2022 at 09:35:27AM -0700, Ben Gardon wrote:
-> > On Fri, Apr 15, 2022 at 2:59 PM Oliver Upton <oupton@google.com> wrote:
-> > >
-> > > Voila! Since the map walkers are able to work in parallel there is no
-> > > need to take the write lock on a stage 2 memory abort. Relax locking
-> > > on map operations and cross fingers we got it right.
-> >
-> > Might be worth a healthy sprinkle of lockdep on the functions taking
-> > "shared" as an argument, just to make sure the wrong value isn't going
-> > down a callstack you didn't expect.
->
-> If we're going to go this route we might need to just punch a pointer
-> to the vCPU through to the stage 2 table walker. All of this plumbing is
-> built around the idea that there are multiple tables to manage and
-> needn't be in the context of a vCPU/VM, which is why I went the WARN()
-> route instead of better lockdep assertions.
+On 4/21/22 18:51, Peter Oskolkov wrote:
+> Allow kvm-based VMMs to request KVM to pass a custom vmcall
+> from the guest to the VMM in the host.
+> 
+> Quite often, operating systems research projects and/or specialized
+> paravirtualized workloads would benefit from a extra-low-overhead,
+> extra-low-latency guest-host communication channel.
 
-Oh right, it didn't even occur to me that those functions wouldn't
-have a vCPU / KVM pointer.
+You can use a memory page and an I/O port.  It should be as fast as a 
+hypercall.  You can even change it to use ioeventfd if an asynchronous 
+channel is enough, and then it's going to be less than 1 us latency.
 
->
-> > >
-> > > Signed-off-by: Oliver Upton <oupton@google.com>
-> > > ---
-> > >  arch/arm64/kvm/mmu.c | 21 +++------------------
-> > >  1 file changed, 3 insertions(+), 18 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > index 63cf18cdb978..2881051c3743 100644
-> > > --- a/arch/arm64/kvm/mmu.c
-> > > +++ b/arch/arm64/kvm/mmu.c
-> > > @@ -1127,7 +1127,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> > >         gfn_t gfn;
-> > >         kvm_pfn_t pfn;
-> > >         bool logging_active = memslot_is_logging(memslot);
-> > > -       bool use_read_lock = false;
-> > >         unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
-> > >         unsigned long vma_pagesize, fault_granule;
-> > >         enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-> > > @@ -1162,8 +1161,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> > >         if (logging_active) {
-> > >                 force_pte = true;
-> > >                 vma_shift = PAGE_SHIFT;
-> > > -               use_read_lock = (fault_status == FSC_PERM && write_fault &&
-> > > -                                fault_granule == PAGE_SIZE);
-> > >         } else {
-> > >                 vma_shift = get_vma_page_shift(vma, hva);
-> > >         }
-> > > @@ -1267,15 +1264,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> > >         if (exec_fault && device)
-> > >                 return -ENOEXEC;
-> > >
-> > > -       /*
-> > > -        * To reduce MMU contentions and enhance concurrency during dirty
-> > > -        * logging dirty logging, only acquire read lock for permission
-> > > -        * relaxation.
-> > > -        */
-> > > -       if (use_read_lock)
-> > > -               read_lock(&kvm->mmu_lock);
-> > > -       else
-> > > -               write_lock(&kvm->mmu_lock);
-> > > +       read_lock(&kvm->mmu_lock);
-> > > +
-> >
-> > Ugh, I which we could get rid of the analogous ugly block on x86.
->
-> Maybe we could fold it in to a MMU macro in the arch-generic scope?
-> Conditional locking is smelly, I was very pleased to delete these lines :)
+Paolo
 
-Smelly indeed. I don't think hiding it behind a macro would really
-help. It's just something we'll have to live with in x86.
+> With cloud-hypervisor modified to handle the new hypercall (simply
+> return the sum of the received arguments), the following function in
+> guest_userspace_  completes, on average, in 2.5 microseconds (walltime)
+> on a relatively modern Intel Xeon processor:
 
->
-> --
-> Thanks,
-> Oliver
