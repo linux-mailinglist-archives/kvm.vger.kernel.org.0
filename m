@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 46776509685
-	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 07:18:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF11D509684
+	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 07:18:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384350AbiDUFQq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Apr 2022 01:16:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49812 "EHLO
+        id S1384296AbiDUFQw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 01:16:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1384251AbiDUFQ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Apr 2022 01:16:28 -0400
+        with ESMTP id S1384331AbiDUFQk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 01:16:40 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E0C2ADED5
-        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 22:13:38 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CF4F813D18
+        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 22:13:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650518017;
+        s=mimecast20190719; t=1650518024;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bFfak0fL1x1PD2NGlDq0gbCHu4stLjWexcxTqgBpjZU=;
-        b=IxDvtY4pLKokF401M+qD8TDKUBa/eBcQKmJHGLKO21pLWioNCQ+hMOK/GQ1TiSXbQTiAe0
-        vBoAhPUWvP4msHesoZzToT/tBWFg2sCNYYN2VR2xfL9LyK1L1ROgXL/9dAsQCmJ6HkQ/qn
-        3qJ8Fs0nIz4DlQ4T2a4ZJfAV4GOp238=
+        bh=httJCT0Tg3TZnTNvm8TBcLaMq9M0mwNcCFiF9q7hQXs=;
+        b=igqxYCTx1Gf0JhOi1ho38yrDaJ2MIyZtKQyFmA5CTmuE9kd3EyxTAc1YXbCoRKSRPOr5u+
+        a9Y93uerCgpLM4YKqSvvNgS13yNtY4gKEFtWzNFWFB637ItNX3CWmRkjIQdtU1UEbv4Qgf
+        xxCd78QziSgpIcyQZqe8FvwogifHp7Q=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-210-E-cy5rt1PnWU_0o6vX-bsg-1; Thu, 21 Apr 2022 01:13:33 -0400
-X-MC-Unique: E-cy5rt1PnWU_0o6vX-bsg-1
+ us-mta-460-VNUGnnvNOnmOxtmgV5S5vw-1; Thu, 21 Apr 2022 01:13:38 -0400
+X-MC-Unique: VNUGnnvNOnmOxtmgV5S5vw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 16E3D8038E3;
-        Thu, 21 Apr 2022 05:13:32 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C01BF803D65;
+        Thu, 21 Apr 2022 05:13:37 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.40.194.231])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BD2DE145BA5A;
-        Thu, 21 Apr 2022 05:13:26 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 70F05145BA5A;
+        Thu, 21 Apr 2022 05:13:32 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Rodrigo Vivi <rodrigo.vivi@intel.com>,
@@ -61,9 +61,9 @@ Cc:     Rodrigo Vivi <rodrigo.vivi@intel.com>,
         Borislav Petkov <bp@alien8.de>,
         Zhenyu Wang <zhenyuw@linux.intel.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [RFC PATCH v2 07/10] KVM: x86: SVM: move avic state to separate struct
-Date:   Thu, 21 Apr 2022 08:12:41 +0300
-Message-Id: <20220421051244.187733-8-mlevitsk@redhat.com>
+Subject: [RFC PATCH v2 08/10] KVM: x86: rename .set_apic_access_page_addr to reload_apic_access_page
+Date:   Thu, 21 Apr 2022 08:12:42 +0300
+Message-Id: <20220421051244.187733-9-mlevitsk@redhat.com>
 In-Reply-To: <20220421051244.187733-1-mlevitsk@redhat.com>
 References: <20220421051244.187733-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -72,193 +72,124 @@ X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This will make the code a bit easier to read when nested AVIC support
-is added.
+This will be used on SVM to reload shadow page of the AVIC physid table
 
-No functional change intended.
+No functional change intended
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/svm/avic.c | 49 +++++++++++++++++++++++------------------
- arch/x86/kvm/svm/svm.h  | 14 +++++++-----
- 2 files changed, 36 insertions(+), 27 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h | 2 +-
+ arch/x86/include/asm/kvm_host.h    | 3 +--
+ arch/x86/kvm/vmx/vmx.c             | 8 ++++----
+ arch/x86/kvm/x86.c                 | 6 +++---
+ 4 files changed, 9 insertions(+), 10 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index f375ca1d6518e..87756237c646d 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -69,6 +69,8 @@ int avic_ga_log_notifier(u32 ga_tag)
- 	unsigned long flags;
- 	struct kvm_svm *kvm_svm;
- 	struct kvm_vcpu *vcpu = NULL;
-+	struct kvm_svm_avic *avic;
-+
- 	u32 vm_id = AVIC_GATAG_TO_VMID(ga_tag);
- 	u32 vcpu_id = AVIC_GATAG_TO_VCPUID(ga_tag);
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 96e4e9842dfc6..997edb7453ac2 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -82,7 +82,7 @@ KVM_X86_OP_OPTIONAL(hwapic_isr_update)
+ KVM_X86_OP_OPTIONAL_RET0(guest_apic_has_interrupt)
+ KVM_X86_OP_OPTIONAL(load_eoi_exitmap)
+ KVM_X86_OP_OPTIONAL(set_virtual_apic_mode)
+-KVM_X86_OP_OPTIONAL(set_apic_access_page_addr)
++KVM_X86_OP_OPTIONAL(reload_apic_pages)
+ KVM_X86_OP(deliver_interrupt)
+ KVM_X86_OP_OPTIONAL(sync_pir_to_irr)
+ KVM_X86_OP_OPTIONAL_RET0(set_tss_addr)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index ae41d2df69fe9..f83cfcd7dd74c 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1415,7 +1415,7 @@ struct kvm_x86_ops {
+ 	bool (*guest_apic_has_interrupt)(struct kvm_vcpu *vcpu);
+ 	void (*load_eoi_exitmap)(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap);
+ 	void (*set_virtual_apic_mode)(struct kvm_vcpu *vcpu);
+-	void (*set_apic_access_page_addr)(struct kvm_vcpu *vcpu);
++	void (*reload_apic_pages)(struct kvm_vcpu *vcpu);
+ 	void (*deliver_interrupt)(struct kvm_lapic *apic, int delivery_mode,
+ 				  int trig_mode, int vector);
+ 	int (*sync_pir_to_irr)(struct kvm_vcpu *vcpu);
+@@ -1888,7 +1888,6 @@ int kvm_cpu_has_extint(struct kvm_vcpu *v);
+ int kvm_arch_interrupt_allowed(struct kvm_vcpu *vcpu);
+ int kvm_cpu_get_interrupt(struct kvm_vcpu *v);
+ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
+-
+ int kvm_pv_send_ipi(struct kvm *kvm, unsigned long ipi_bitmap_low,
+ 		    unsigned long ipi_bitmap_high, u32 min,
+ 		    unsigned long icr, int op_64_bit);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index cf8581978bce3..7defd31703c61 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6339,7 +6339,7 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
+ 	vmx_update_msr_bitmap_x2apic(vcpu);
+ }
  
-@@ -76,9 +78,13 @@ int avic_ga_log_notifier(u32 ga_tag)
- 	trace_kvm_avic_ga_log(vm_id, vcpu_id);
- 
- 	spin_lock_irqsave(&svm_vm_data_hash_lock, flags);
--	hash_for_each_possible(svm_vm_data_hash, kvm_svm, hnode, vm_id) {
--		if (kvm_svm->avic_vm_id != vm_id)
-+	hash_for_each_possible(svm_vm_data_hash, avic, hnode, vm_id) {
-+
-+
-+		if (avic->vm_id != vm_id)
- 			continue;
-+
-+		kvm_svm = container_of(avic, struct kvm_svm, avic);
- 		vcpu = kvm_get_vcpu_by_id(&kvm_svm->kvm, vcpu_id);
- 		break;
- 	}
-@@ -98,18 +104,18 @@ int avic_ga_log_notifier(u32 ga_tag)
- void avic_vm_destroy(struct kvm *kvm)
+-static void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
++static void vmx_reload_apic_access_page(struct kvm_vcpu *vcpu)
  {
- 	unsigned long flags;
--	struct kvm_svm *kvm_svm = to_kvm_svm(kvm);
-+	struct kvm_svm_avic *avic = &to_kvm_svm(kvm)->avic;
+ 	struct page *page;
  
- 	if (!enable_apicv)
+@@ -7777,7 +7777,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 	.enable_irq_window = vmx_enable_irq_window,
+ 	.update_cr8_intercept = vmx_update_cr8_intercept,
+ 	.set_virtual_apic_mode = vmx_set_virtual_apic_mode,
+-	.set_apic_access_page_addr = vmx_set_apic_access_page_addr,
++	.reload_apic_pages = vmx_reload_apic_access_page,
+ 	.refresh_apicv_exec_ctrl = vmx_refresh_apicv_exec_ctrl,
+ 	.load_eoi_exitmap = vmx_load_eoi_exitmap,
+ 	.apicv_post_state_restore = vmx_apicv_post_state_restore,
+@@ -7940,12 +7940,12 @@ static __init int hardware_setup(void)
+ 		enable_vnmi = 0;
+ 
+ 	/*
+-	 * set_apic_access_page_addr() is used to reload apic access
++	 * kvm_vcpu_reload_apic_pages() is used to reload apic access
+ 	 * page upon invalidation.  No need to do anything if not
+ 	 * using the APIC_ACCESS_ADDR VMCS field.
+ 	 */
+ 	if (!flexpriority_enabled)
+-		vmx_x86_ops.set_apic_access_page_addr = NULL;
++		vmx_x86_ops.reload_apic_pages = NULL;
+ 
+ 	if (!cpu_has_vmx_tpr_shadow())
+ 		vmx_x86_ops.update_cr8_intercept = NULL;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ab336f7c82e4b..3ac2d0134271b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9949,12 +9949,12 @@ void kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
+ 		kvm_make_all_cpus_request(kvm, KVM_REQ_APIC_PAGE_RELOAD);
+ }
+ 
+-static void kvm_vcpu_reload_apic_access_page(struct kvm_vcpu *vcpu)
++static void kvm_vcpu_reload_apic_pages(struct kvm_vcpu *vcpu)
+ {
+ 	if (!lapic_in_kernel(vcpu))
  		return;
  
--	if (kvm_svm->avic_logical_id_table_page)
--		__free_page(kvm_svm->avic_logical_id_table_page);
--	if (kvm_svm->avic_physical_id_table_page)
--		__free_page(kvm_svm->avic_physical_id_table_page);
-+	if (avic->logical_id_table_page)
-+		__free_page(avic->logical_id_table_page);
-+	if (avic->physical_id_table_page)
-+		__free_page(avic->physical_id_table_page);
- 
- 	spin_lock_irqsave(&svm_vm_data_hash_lock, flags);
--	hash_del(&kvm_svm->hnode);
-+	hash_del(&avic->hnode);
- 	spin_unlock_irqrestore(&svm_vm_data_hash_lock, flags);
+-	static_call_cond(kvm_x86_set_apic_access_page_addr)(vcpu);
++	static_call_cond(kvm_x86_reload_apic_pages)(vcpu);
  }
  
-@@ -117,10 +123,9 @@ int avic_vm_init(struct kvm *kvm)
- {
- 	unsigned long flags;
- 	int err = -ENOMEM;
--	struct kvm_svm *kvm_svm = to_kvm_svm(kvm);
--	struct kvm_svm *k2;
- 	struct page *p_page;
- 	struct page *l_page;
-+	struct kvm_svm_avic *avic = &to_kvm_svm(kvm)->avic;
- 	u32 vm_id;
- 
- 	if (!enable_apicv)
-@@ -131,14 +136,14 @@ int avic_vm_init(struct kvm *kvm)
- 	if (!p_page)
- 		goto free_avic;
- 
--	kvm_svm->avic_physical_id_table_page = p_page;
-+	avic->physical_id_table_page = p_page;
- 
- 	/* Allocating logical APIC ID table (4KB) */
- 	l_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
- 	if (!l_page)
- 		goto free_avic;
- 
--	kvm_svm->avic_logical_id_table_page = l_page;
-+	avic->logical_id_table_page = l_page;
- 
- 	spin_lock_irqsave(&svm_vm_data_hash_lock, flags);
-  again:
-@@ -149,13 +154,15 @@ int avic_vm_init(struct kvm *kvm)
- 	}
- 	/* Is it still in use? Only possible if wrapped at least once */
- 	if (next_vm_id_wrapped) {
--		hash_for_each_possible(svm_vm_data_hash, k2, hnode, vm_id) {
--			if (k2->avic_vm_id == vm_id)
-+		struct kvm_svm_avic *avic2;
-+
-+		hash_for_each_possible(svm_vm_data_hash, avic2, hnode, vm_id) {
-+			if (avic2->vm_id == vm_id)
- 				goto again;
- 		}
- 	}
--	kvm_svm->avic_vm_id = vm_id;
--	hash_add(svm_vm_data_hash, &kvm_svm->hnode, kvm_svm->avic_vm_id);
-+	avic->vm_id = vm_id;
-+	hash_add(svm_vm_data_hash, &avic->hnode, avic->vm_id);
- 	spin_unlock_irqrestore(&svm_vm_data_hash_lock, flags);
- 
- 	return 0;
-@@ -169,8 +176,8 @@ void avic_init_vmcb(struct vcpu_svm *svm, struct vmcb *vmcb)
- {
- 	struct kvm_svm *kvm_svm = to_kvm_svm(svm->vcpu.kvm);
- 	phys_addr_t bpa = __sme_set(page_to_phys(svm->avic_backing_page));
--	phys_addr_t lpa = __sme_set(page_to_phys(kvm_svm->avic_logical_id_table_page));
--	phys_addr_t ppa = __sme_set(page_to_phys(kvm_svm->avic_physical_id_table_page));
-+	phys_addr_t lpa = __sme_set(page_to_phys(kvm_svm->avic.logical_id_table_page));
-+	phys_addr_t ppa = __sme_set(page_to_phys(kvm_svm->avic.physical_id_table_page));
- 
- 	vmcb->control.avic_backing_page = bpa & AVIC_HPA_MASK;
- 	vmcb->control.avic_logical_id = lpa & AVIC_HPA_MASK;
-@@ -193,7 +200,7 @@ static u64 *avic_get_physical_id_entry(struct kvm_vcpu *vcpu,
- 	if (index >= AVIC_MAX_PHYSICAL_ID_COUNT)
- 		return NULL;
- 
--	avic_physical_id_table = page_address(kvm_svm->avic_physical_id_table_page);
-+	avic_physical_id_table = page_address(kvm_svm->avic.physical_id_table_page);
- 
- 	return &avic_physical_id_table[index];
- }
-@@ -387,7 +394,7 @@ static u32 *avic_get_logical_id_entry(struct kvm_vcpu *vcpu, u32 ldr, bool flat)
- 		index = (cluster << 2) + apic;
- 	}
- 
--	logical_apic_id_table = (u32 *) page_address(kvm_svm->avic_logical_id_table_page);
-+	logical_apic_id_table = (u32 *) page_address(kvm_svm->avic.logical_id_table_page);
- 
- 	return &logical_apic_id_table[index];
- }
-@@ -737,7 +744,7 @@ int avic_pi_update_irte(struct kvm *kvm, unsigned int host_irq,
- 			/* Try to enable guest_mode in IRTE */
- 			pi.base = __sme_set(page_to_phys(svm->avic_backing_page) &
- 					    AVIC_HPA_MASK);
--			pi.ga_tag = AVIC_GATAG(to_kvm_svm(kvm)->avic_vm_id,
-+			pi.ga_tag = AVIC_GATAG(to_kvm_svm(kvm)->avic.vm_id,
- 						     svm->vcpu.vcpu_id);
- 			pi.is_guest_mode = true;
- 			pi.vcpu_data = &vcpu_info;
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index e246793cbeaeb..96390fa5e3917 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -88,15 +88,17 @@ struct kvm_sev_info {
- 	atomic_t migration_in_progress;
- };
- 
--struct kvm_svm {
--	struct kvm kvm;
- 
--	/* Struct members for AVIC */
--	u32 avic_vm_id;
--	struct page *avic_logical_id_table_page;
--	struct page *avic_physical_id_table_page;
-+struct kvm_svm_avic {
-+	u32 vm_id;
-+	struct page *logical_id_table_page;
-+	struct page *physical_id_table_page;
- 	struct hlist_node hnode;
-+};
- 
-+struct kvm_svm {
-+	struct kvm kvm;
-+	struct kvm_svm_avic avic;
- 	struct kvm_sev_info sev_info;
- };
- 
+ void __kvm_request_immediate_exit(struct kvm_vcpu *vcpu)
+@@ -10071,7 +10071,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 		if (kvm_check_request(KVM_REQ_LOAD_EOI_EXITMAP, vcpu))
+ 			vcpu_load_eoi_exitmap(vcpu);
+ 		if (kvm_check_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu))
+-			kvm_vcpu_reload_apic_access_page(vcpu);
++			kvm_vcpu_reload_apic_pages(vcpu);
+ 		if (kvm_check_request(KVM_REQ_HV_CRASH, vcpu)) {
+ 			vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+ 			vcpu->run->system_event.type = KVM_SYSTEM_EVENT_CRASH;
 -- 
 2.26.3
 
