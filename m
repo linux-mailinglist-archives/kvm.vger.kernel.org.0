@@ -2,99 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4434A50A834
-	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 20:36:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4465250A87A
+	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 20:52:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1391394AbiDUSie (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Apr 2022 14:38:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56614 "EHLO
+        id S1391593AbiDUSxl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 14:53:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1391410AbiDUSi2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Apr 2022 14:38:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 98E1A369EA
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 11:35:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650566137;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lD3idtDd7NCL34P0gct5UJAjxUjJHC0DJflfQTN0p9Y=;
-        b=WzXq+PslL/uK2s+w2SYpZXdGM+XcEn6iMP7qyOzwR1SaJ5kO0w4CzxVQnSvL/TTKyd3Re6
-        lrq6MEaVfFPbKbyCvQXgQO9xOMYM39t7qFWAfYmYXg6vZ5eU0DZ2Z+l+flBVHIxXBIWZYi
-        2PLPfliNIRDbzeQeXUJIBzcyoD4uETc=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-42-LOXGJtNkOPmxprWKkSTQ8g-1; Thu, 21 Apr 2022 14:35:36 -0400
-X-MC-Unique: LOXGJtNkOPmxprWKkSTQ8g-1
-Received: by mail-io1-f70.google.com with SMTP id j6-20020a5d93c6000000b0064fbbf9566bso3854453ioo.12
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 11:35:36 -0700 (PDT)
+        with ESMTP id S1391552AbiDUSxk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 14:53:40 -0400
+Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3FC14C401
+        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 11:50:49 -0700 (PDT)
+Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-2ec42eae76bso62032357b3.10
+        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 11:50:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SCveG505PM0eS4oBerBuk8CsCGSzSfCcKji+8XOvNE0=;
+        b=YVMhd2GdKPqj5XRaHBO6N/nswQFtI7i9d4QbnTiuK4aCbwsWsiG8ZFmX6GOl6MhkAV
+         o+AhQ0ZvhniV8nr6agpx70BJa740lqEWylQZvshC4Gw2JtW6ZjD2qYclDeSdv89qrZ6l
+         WIOhjihx0hhk+bsAg98Ju15YA6ahSA8mwhlpK1yNgcyLmxzR14X97Q+2JNkELqArkQ0P
+         09LB1QF0KnJJCDkxGy6tPZAGj/5Kpuh4oU53RZwgQm3Ycnjsn4fYxp8mjLynWvQKuZTp
+         TNSNldWPJ1g0H61gMzG9Yij3GF+s6XXA7L+Dlwd+IzaP3u9awOGCEA4jcSpZRz3bsE11
+         6eBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=lD3idtDd7NCL34P0gct5UJAjxUjJHC0DJflfQTN0p9Y=;
-        b=4uGLsvqc7gq3mdNdcxHeB3PYL8K85HIl042YlH2Sw4HfOBfutNlZfGr5C3C03nxmdC
-         ERbs55FuOTvPWwlcd1vnZxb9kihMCwlePNdzj9FJMUixw2TZpTZZB1SE2ODGIr+apOJW
-         Pg5upzyM3UrxaZ8E8y0eEagKvyh//bxiPKz0Og0xTdU1quARVuT6i62Pp0DODbuF3LzB
-         aEGDvNZadttq7zngCTWt81DI/Fmzelze8qV7bDbA/esiL8XDeD9/0Ibqz9VYuajFl+KS
-         AnDj2YAfnCKluLO80Kl7kx19/XYQd940X10+n7rsXbLoeghAAgMEpneVq4EFpE5YOp1T
-         +pJg==
-X-Gm-Message-State: AOAM533f592B7JoZ5nW+VM02E4XQr+KbrxANcc4MmgfFHjHoDDWkI6mQ
-        6NQi+WNL8TXDW2ZH/Yvnx24WmK3C8fzUK/0C6FA4dXr4k/EPrahx3o52kf8umPQCKV/GG21mdz1
-        PVXnkgOb+ouU5
-X-Received: by 2002:a92:ca48:0:b0:2cd:63e9:81b1 with SMTP id q8-20020a92ca48000000b002cd63e981b1mr423943ilo.17.1650566135745;
-        Thu, 21 Apr 2022 11:35:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyzjxVMafCVT6sXTxD41ACNCtxSKenuGT1XbA+oKeoBEXeyn+wkrOZt3LF1GmIC5S2VnNfh3Q==
-X-Received: by 2002:a92:ca48:0:b0:2cd:63e9:81b1 with SMTP id q8-20020a92ca48000000b002cd63e981b1mr423934ilo.17.1650566135540;
-        Thu, 21 Apr 2022 11:35:35 -0700 (PDT)
-Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id h8-20020a92d088000000b002cbe5d18e21sm12325242ilh.31.2022.04.21.11.35.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Apr 2022 11:35:35 -0700 (PDT)
-Date:   Thu, 21 Apr 2022 14:35:33 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SCveG505PM0eS4oBerBuk8CsCGSzSfCcKji+8XOvNE0=;
+        b=sz688wjQGYzGYsuyiUWtZ290xVO3blAKI2S1G2Tc8FEw55n189YeP+4eMwLUbpj2Oc
+         e9mA88aMeQhdVGYYo7rwEvXN9mFEZmkjk3yWXV/9EobDiMRqNyN28N0gyRwuu5qvO/Z9
+         kNWh32EBQvoZu1m1tG3gVFllVdR2rc2QUHBvZLd9WxCPqo5KUD9MySoQdqJoDfYMTvNZ
+         aJ3vJdJSktChI3J1WfOBTo8zKrX4OJ9/vRnjdQy/FqU6Q2hKW1bNvYpFFnUe85SqabEy
+         WLt9cMdu4uVsB5Q+tW0lSmw+7GNgsYKHAfVOZA/y1kT/2hUm0tsKk5oed2hDlw4Fe0rA
+         DE9Q==
+X-Gm-Message-State: AOAM533LF4xDILEpOrfbsrQPXp+OaTrWsUvUzqZwIxLPArCRFEBd9RxB
+        4j5p01cpqY6AY2wGK192ucsKS6+unVij3g3xtvypng==
+X-Google-Smtp-Source: ABdhPJz9dtxKniYusPWYrT1L2uWBlhv4ib1AmPhNQr8X18eUEOacA3eksamFMnR8UoXnwEkCQOrMDb7FztRO1dcZH0s=
+X-Received: by 2002:a0d:f485:0:b0:2e6:8c95:d874 with SMTP id
+ d127-20020a0df485000000b002e68c95d874mr1158308ywf.23.1650567048746; Thu, 21
+ Apr 2022 11:50:48 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220321224358.1305530-1-bgardon@google.com> <20220321224358.1305530-6-bgardon@google.com>
+ <YlWe6bwQX9V4Oc5S@google.com>
+In-Reply-To: <YlWe6bwQX9V4Oc5S@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Thu, 21 Apr 2022 11:50:37 -0700
+Message-ID: <CANgfPd8a3opGRKqzgWj9bAUx42wXG9Wc2HrsgtP6PoTBttQ3+w@mail.gmail.com>
+Subject: Re: [PATCH v2 5/9] KVM: x86/mmu: Factor out the meat of reset_tdp_shadow_zero_bits_mask
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        Peter Xu <peterx@redhat.com>,
         David Matlack <dmatlack@google.com>,
         Jim Mattson <jmattson@google.com>,
         David Dunn <daviddunn@google.com>,
         Jing Zhang <jingzhangos@google.com>,
         Junaid Shahid <junaids@google.com>
-Subject: Re: [PATCH v6 07/10] KVM: x86: Fix errant brace in KVM capability
- handling
-Message-ID: <YmGj9dXMuIKLVJpj@xz-m1.local>
-References: <20220420173513.1217360-1-bgardon@google.com>
- <20220420173513.1217360-8-bgardon@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220420173513.1217360-8-bgardon@google.com>
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 20, 2022 at 10:35:10AM -0700, Ben Gardon wrote:
-> The braces around the KVM_CAP_XSAVE2 block also surround the
-> KVM_CAP_PMU_CAPABILITY block, likely the result of a merge issue. Simply
-> move the curly brace back to where it belongs.
-> 
-> Fixes: ba7bb663f5547 ("KVM: x86: Provide per VM capability for disabling PMU virtualization")
-> 
-> Reviewed-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: Ben Gardon <bgardon@google.com>
+On Tue, Apr 12, 2022 at 8:46 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Mar 21, 2022, Ben Gardon wrote:
+> > Factor out the implementation of reset_tdp_shadow_zero_bits_mask to a
+> > helper function which does not require a vCPU pointer. The only element
+> > of the struct kvm_mmu context used by the function is the shadow root
+> > level, so pass that in too instead of the mmu context.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: Ben Gardon <bgardon@google.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c | 17 +++++++++++------
+> >  1 file changed, 11 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 3b8da8b0745e..6f98111f8f8b 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -4487,16 +4487,14 @@ static inline bool boot_cpu_is_amd(void)
+> >   * possible, however, kvm currently does not do execution-protection.
+> >   */
+> >  static void
+>
+> Strongly prefer the newline here get dropped (see below).
+>
+> > -reset_tdp_shadow_zero_bits_mask(struct kvm_mmu *context)
+> > +build_tdp_shadow_zero_bits_mask(struct rsvd_bits_validate *shadow_zero_check,
+>
+> Kind of a nit, but KVM uses "calc" for this sort of thing.  There are no other
+> instances of "build_" to describe this behavior.
+>
+> Am I alone in think that shadow_zero_check is an awful, awful name?  E.g. the EPT
+> memtype case has legal non-zero values.  Anyone object to opportunistically
+> renaming the function and the local shadow_zero_check to "rsvd_bits" to shorten
+> line lengths and move KVM one step closer to consistent naming?
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+That makes sense to me. I'm happy to add a commit to this series to
+standardize on rsvd_bits.
 
--- 
-Peter Xu
-
+>
+> > +                             int shadow_root_level)
+> >  {
+> > -     struct rsvd_bits_validate *shadow_zero_check;
+> >       int i;
+> >
+> > -     shadow_zero_check = &context->shadow_zero_check;
+> > -
+> >       if (boot_cpu_is_amd())
+> >               __reset_rsvds_bits_mask(shadow_zero_check, reserved_hpa_bits(),
+> > -                                     context->shadow_root_level, false,
+> > +                                     shadow_root_level, false,
+> >                                       boot_cpu_has(X86_FEATURE_GBPAGES),
+> >                                       false, true);
+> >       else
+> > @@ -4507,12 +4505,19 @@ reset_tdp_shadow_zero_bits_mask(struct kvm_mmu *context)
+> >       if (!shadow_me_mask)
+> >               return;
+> >
+> > -     for (i = context->shadow_root_level; --i >= 0;) {
+> > +     for (i = shadow_root_level; --i >= 0;) {
+> >               shadow_zero_check->rsvd_bits_mask[0][i] &= ~shadow_me_mask;
+> >               shadow_zero_check->rsvd_bits_mask[1][i] &= ~shadow_me_mask;
+> >       }
+> >  }
+> >
+> > +static void
+> > +reset_tdp_shadow_zero_bits_mask(struct kvm_mmu *context)
+>
+> One line!  Aside from being against the One True Style[*], there is zero reason
+> for a newline here.
+>
+> And I vote to drop the "mask", because (a) it's not a singular mask and (b) it's
+> not even a mask in all cases.
+>
+> And while I'm on a naming consistency rant, s/context/mmu.
+>
+> I.e. end up with:
+>
+> static void calc_tdp_shadow_rsvd_bits(struct rsvd_bits_validate *rsvd_bits,
+>                                       int shadow_root_level)
+>
+> static void reset_tdp_shadow_rsvd_bits(struct kvm_mmu *mmu)
+>
+> [*] https://lore.kernel.org/mm-commits/CAHk-=wjS-Jg7sGMwUPpDsjv392nDOOs0CtUtVkp=S6Q7JzFJRw@mail.gmail.com
+>
+> > +{
+> > +     build_tdp_shadow_zero_bits_mask(&context->shadow_zero_check,
+> > +                                     context->shadow_root_level);
+> > +}
+> > +
+> >  /*
+> >   * as the comments in reset_shadow_zero_bits_mask() except it
+> >   * is the shadow page table for intel nested guest.
+> > --
+> > 2.35.1.894.gb6a874cedc-goog
+> >
