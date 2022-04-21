@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4017509938
-	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 09:38:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 837C0509944
+	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 09:38:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1385848AbiDUHie (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Apr 2022 03:38:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59710 "EHLO
+        id S1385876AbiDUHin (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 03:38:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1385827AbiDUHi3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Apr 2022 03:38:29 -0400
+        with ESMTP id S1385818AbiDUHia (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 03:38:30 -0400
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 917F1E00D
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 00:35:40 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D28B13D7C
+        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 00:35:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650526540; x=1682062540;
+  t=1650526541; x=1682062541;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=SK6DfUD1Elhz4wP8ubWVI6Kmk8qCznEz0nRUM7R0eFk=;
-  b=a8rmEu9O9Tvjb2cnGcLoo+SgoKHKkcGtjVpsKW0lddoswseairfs2I9i
-   mnxuolaAOOoi+NJocYH9D3u+VCrwjLUw0KB+9K4ym7sRwQa/ILLzhGPXA
-   Pig9bGCuqtG/oVKbvyuRO1YQcFOIkfEJ14WIDIAWauTKmJn0aEi5F7xpB
-   yQFxAxw8nF7ws2u2Ngav68wYT/U++LmQtlul+MrvzDa7uwTPH16EzfI3C
-   oI4QF4MhM43l6GLpTMPoN6qx5pmaG9GcF2ll2ytEtPWe/dwuNTtMLnuC1
-   kDe6P+6Q371CB47fRyif9mCJ29kOAbvxhnu/o73qAMw3LlPPNHG5C6eOY
+  bh=iiCAR1Rfqc66iGGWY17iyr5Co4ZAZLinh3HQEEGKipA=;
+  b=QJzj/EEvprYWlP6pVcfz68GwfMxSE13M8uLD0LHen07j7OMgIK7Viu4G
+   Ab4jPIT3LyZ9KeeitseYbpTlEmdhMDxApaEWR94ktbXNdW017De4FSXeZ
+   LEpavcTHD3lrsdbJPKMe3hs/P6LV05QNLEkuFGGyAGDZNtQc6StOEF0GN
+   UPF5appGFl5W9TrePaI6lxdQqYxu4Ek9znSMm1VhgGNm2MzpQU8iiRBYa
+   h3HqlfttjyIAqhkA7cLD6UX1b33SdCCct3itNXAWWSJwOm4WrI9/Tf/gb
+   9cmYSvmR0TL6o4422SBVqFE2kXH4RKzC+cBt/c+1lhxURKw6boe/XYhff
    A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10323"; a="264440500"
+X-IronPort-AV: E=McAfee;i="6400,9594,10323"; a="264440513"
 X-IronPort-AV: E=Sophos;i="5.90,278,1643702400"; 
-   d="scan'208";a="264440500"
+   d="scan'208";a="264440513"
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2022 00:35:17 -0700
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2022 00:35:20 -0700
 X-IronPort-AV: E=Sophos;i="5.90,278,1643702400"; 
-   d="scan'208";a="530155145"
+   d="scan'208";a="530155163"
 Received: from chenyi-pc.sh.intel.com ([10.239.159.73])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2022 00:35:14 -0700
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2022 00:35:17 -0700
 From:   Chenyi Qiang <chenyi.qiang@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -45,9 +45,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
         Xiaoyao Li <xiaoyao.li@intel.com>
 Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
         Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: [PATCH v3 1/3] linux-header: update linux header
-Date:   Thu, 21 Apr 2022 15:40:26 +0800
-Message-Id: <20220421074028.18196-2-chenyi.qiang@intel.com>
+Subject: [PATCH v3 2/3] i386: kvm: Save&restore triple fault event
+Date:   Thu, 21 Apr 2022 15:40:27 +0800
+Message-Id: <20220421074028.18196-3-chenyi.qiang@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20220421074028.18196-1-chenyi.qiang@intel.com>
 References: <20220421074028.18196-1-chenyi.qiang@intel.com>
@@ -60,77 +60,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This linux-header update is only a reference to include some definitions
-related to notify VM exit.
+For the direct triple faults, i.e. hardware detected and KVM morphed
+to VM-Exit, KVM will never lose them. But for triple faults sythesized
+by KVM, e.g. the RSM path, if KVM exits to userspace before the request
+is serviced, userspace could migrate the VM and lose the triple fault.
+
+A new flag KVM_VCPUEVENT_VALID_TRIPLE_FAULT is defined to signal that
+the event.triple_fault_pending field contains a valid state.
 
 Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
 ---
- linux-headers/asm-x86/kvm.h |  4 +++-
- linux-headers/linux/kvm.h   | 10 ++++++++++
- 2 files changed, 13 insertions(+), 1 deletion(-)
+ target/i386/cpu.c     | 1 +
+ target/i386/cpu.h     | 1 +
+ target/i386/kvm/kvm.c | 8 +++++++-
+ 3 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
-index bf6e96011d..41541561ed 100644
---- a/linux-headers/asm-x86/kvm.h
-+++ b/linux-headers/asm-x86/kvm.h
-@@ -325,6 +325,7 @@ struct kvm_reinject_control {
- #define KVM_VCPUEVENT_VALID_SHADOW	0x00000004
- #define KVM_VCPUEVENT_VALID_SMM		0x00000008
- #define KVM_VCPUEVENT_VALID_PAYLOAD	0x00000010
-+#define KVM_VCPUEVENT_VALID_TRIPLE_FAULT	0x00000020
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index cb6b5467d0..276058d52e 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5998,6 +5998,7 @@ static void x86_cpu_reset(DeviceState *dev)
+     env->exception_has_payload = false;
+     env->exception_payload = 0;
+     env->nmi_injected = false;
++    env->triple_fault_pending = false;
+ #if !defined(CONFIG_USER_ONLY)
+     /* We hard-wire the BSP to the first CPU. */
+     apic_designate_bsp(cpu->apic_state, s->cpu_index == 0);
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 982c532353..a2a9423747 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1701,6 +1701,7 @@ typedef struct CPUArchState {
+     uint8_t has_error_code;
+     uint8_t exception_has_payload;
+     uint64_t exception_payload;
++    bool triple_fault_pending;
+     uint32_t ins_len;
+     uint32_t sipi_vector;
+     bool tsc_valid;
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 9cf8e03669..bd44a02f51 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -4099,7 +4099,9 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
+     }
  
- /* Interrupt shadow states */
- #define KVM_X86_SHADOW_INT_MOV_SS	0x01
-@@ -359,7 +360,8 @@ struct kvm_vcpu_events {
- 		__u8 smm_inside_nmi;
- 		__u8 latched_init;
- 	} smi;
--	__u8 reserved[27];
-+	__u8 triple_fault_pending;
-+	__u8 reserved[26];
- 	__u8 exception_has_payload;
- 	__u64 exception_payload;
- };
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index d232feaae9..67c0f6a938 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -270,6 +270,7 @@ struct kvm_xen_exit {
- #define KVM_EXIT_X86_BUS_LOCK     33
- #define KVM_EXIT_XEN              34
- #define KVM_EXIT_RISCV_SBI        35
-+#define KVM_EXIT_NOTIFY           36
+     if (level >= KVM_PUT_RESET_STATE) {
+-        events.flags |= KVM_VCPUEVENT_VALID_NMI_PENDING;
++        events.flags |= KVM_VCPUEVENT_VALID_NMI_PENDING |
++                        KVM_VCPUEVENT_VALID_TRIPLE_FAULT;
++        events.triple_fault_pending = env->triple_fault_pending;
+         if (env->mp_state == KVM_MP_STATE_SIPI_RECEIVED) {
+             events.flags |= KVM_VCPUEVENT_VALID_SIPI_VECTOR;
+         }
+@@ -4174,6 +4176,10 @@ static int kvm_get_vcpu_events(X86CPU *cpu)
+         }
+     }
  
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
-@@ -487,6 +488,11 @@ struct kvm_run {
- 			unsigned long args[6];
- 			unsigned long ret[2];
- 		} riscv_sbi;
-+		/* KVM_EXIT_NOTIFY */
-+		struct {
-+#define KVM_NOTIFY_CONTEXT_INVALID	(1 << 0)
-+			__u32 flags;
-+		} notify;
- 		/* Fix the size of the union. */
- 		char padding[256];
- 	};
-@@ -1134,6 +1140,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_VM_GPA_BITS 207
- #define KVM_CAP_XSAVE2 208
- #define KVM_CAP_SYS_ATTRIBUTES 209
-+#define KVM_CAP_X86_NOTIFY_VMEXIT  215
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -2051,4 +2058,7 @@ struct kvm_stats_desc {
- /* Available with KVM_CAP_XSAVE2 */
- #define KVM_GET_XSAVE2		  _IOR(KVMIO,  0xcf, struct kvm_xsave)
- 
-+#define KVM_X86_NOTIFY_VMEXIT_ENABLED		(1ULL << 0)
-+#define KVM_X86_NOTIFY_VMEXIT_USER		(1ULL << 1)
++    if (events.flags & KVM_VCPUEVENT_VALID_TRIPLE_FAULT) {
++        env->triple_fault_pending = events.triple_fault_pending;
++    }
 +
- #endif /* __LINUX_KVM_H */
+     env->sipi_vector = events.sipi_vector;
+ 
+     return 0;
 -- 
 2.17.1
 
