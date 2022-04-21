@@ -2,56 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C765F50A5E6
-	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 18:38:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 561F450A5EB
+	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 18:38:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231340AbiDUQi3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Apr 2022 12:38:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52070 "EHLO
+        id S231580AbiDUQko (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 12:40:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229872AbiDUQi2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Apr 2022 12:38:28 -0400
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD8D2E09C
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 09:35:38 -0700 (PDT)
-Received: by mail-yb1-xb33.google.com with SMTP id r189so9738742ybr.6
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 09:35:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2o+bfoCrm9ENS05/J4NbbBTAqkMpAlAf6csqUjQGcTQ=;
-        b=m/ShF2lo3xbNaf8VAl5+Uia+xkKXoGYXilGMMPwqyh4OC1sg7+KDOMh6T+lZnC0GyF
-         DzuRd+Q9l56n1anfHL3gafeiHNO9sqQFiwhwYqgFnyZD1d44XVjWjPeJReCzH6pf/7nk
-         OkhzFnLO5KjRVIk+br7E9CWH0wsyQPfn+Qu35KvWTakz78FDeUTIA1x4Zf2NTGqhzIEU
-         4cM2K7uY+ftNRBqv9Ws0GFb2BjQ4IQb/si+kZwf4AmjOp4iFOS+BIVNEWsdAXZv42qQY
-         zCynBapR/RnINkNzeB4scrWsZoWDO/jSR7bGrk8hKVaJmERoTVg9RpO0RY7IjjCisuoU
-         N0Zg==
+        with ESMTP id S231373AbiDUQkn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 12:40:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7F3914888F
+        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 09:37:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650559072;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=brgeju7NODhN/2dLIKQ/IUJ0B+QHaX9FBW60LEyuxpw=;
+        b=g5HhzwzLkYARRJTuroHs4ILD2WekEzvIBN0rZc0waA3+ia8Vrp4rdqFMp6HlXTKEDd+P3i
+        o0c6lqUIW27fbRuHnQteZ7wAYYy8m/mhyP8lOcEmWhG223UKz4Y2gbTJ3xUxnNd2uMqt9j
+        n99VdYxmebfrwgriR/5aLyO7Q5h+3hg=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-34-r5CXuQOEPqmJbJHgmx9DwQ-1; Thu, 21 Apr 2022 12:37:50 -0400
+X-MC-Unique: r5CXuQOEPqmJbJHgmx9DwQ-1
+Received: by mail-wm1-f70.google.com with SMTP id n37-20020a05600c502500b0038fdc1394c6so2531650wmr.6
+        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 09:37:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2o+bfoCrm9ENS05/J4NbbBTAqkMpAlAf6csqUjQGcTQ=;
-        b=dxhv+FeEZeqxRZLvIDU0loD0ROXmamNQb4RqbKO4alvTiv1ClOQRYo87pYBTbwfk2W
-         2VP6v5Vr7ZzL8uuoMHqtd0OyYUL6gVqNk/bNnaODwMJRH9zA/m/Uyu8IMImtEuvmZynl
-         xPa/pCDWwM0zRfzhCmy8CcHZbSn+YV6Uq/ZNSsFLhMxfWAqXniRg+FDWqTnM2gIE/CSM
-         Scq1HJpi6vNbyPmng1egWtC7p04ALQBpsw7/KL/ZC2kpC2xzKSAjBjAQSTjTFxAB6ZU8
-         n+gjRvsJ/4ZbWfO35wTVprr1KCTmwYI6P8T6VbilLPUYnlGjvPs/YXoa+2jx0Gd6cIV4
-         2UNA==
-X-Gm-Message-State: AOAM532SERAecjTnWLY7lNTymPtxx3o+0Tm6MLEwhREv5MVh60tDRoK1
-        hI/ufko8bfonqinsr+R6JI+bmfz7uMyRzLYQbjAR2A==
-X-Google-Smtp-Source: ABdhPJwQjb989eibb7OonB7D8gVNlF36degE7seajBqNLXdn06AMKJRHpNLrwXdZytOXmLLJ77afmYHmHe7MXZNMyss=
-X-Received: by 2002:a25:4094:0:b0:641:2b90:3b1a with SMTP id
- n142-20020a254094000000b006412b903b1amr568265yba.8.1650558937838; Thu, 21 Apr
- 2022 09:35:37 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=brgeju7NODhN/2dLIKQ/IUJ0B+QHaX9FBW60LEyuxpw=;
+        b=B0a8a+/PhVnnNi3XNOzOdqu58ucyE8yL5F+w0RIErEtuVJ7MRXqbBNyDyKPART6qLF
+         8WgufCAVcNwfRQ2PGOLwTAVQBlu2vbzhQClE6i1zKtU5zaD/ZkQGktrN+Utam8D0gAw1
+         zTZyR6iaco3TO3v4aMtMFpCgRH0egt5s8HwBkXUVoA3r/1/vB+VVcef+y3bGdxXbqs1u
+         uDDi34Bp3w4IRBrEtCroCJqfKCd1TvKHigQJEqd60OzMJfhKluQQIo8cOvxOLjc+RE37
+         HTsLSxUhAeCaqzj8gc9ELQp+5NwEapIWZLaZImGwVn+EoGCQJsxwIau+QMQJLeOjUc+/
+         QHWg==
+X-Gm-Message-State: AOAM531VnZxXdhF2LNWNvx3V3o/b/r837D9zCrkbOLLCdF+5FKz0J8ch
+        YnfXCQ2YQKIO6J9w5xnj/E0RnqMhxshxAY5dM/18jHYaJS9Q8H+xVV5+F5cNMbTtr0A40XsnXxF
+        7SRjG0MNsQIO6
+X-Received: by 2002:a7b:c384:0:b0:38e:6b47:58c4 with SMTP id s4-20020a7bc384000000b0038e6b4758c4mr9375203wmj.134.1650559069612;
+        Thu, 21 Apr 2022 09:37:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxvIVdBeolfle0+MQhnrKJDPjFQuSaQU4IprZ5TNOACBXAXD4rsWSDLK/lc/MIeOlpdQg3O+A==
+X-Received: by 2002:a7b:c384:0:b0:38e:6b47:58c4 with SMTP id s4-20020a7bc384000000b0038e6b4758c4mr9375186wmj.134.1650559069366;
+        Thu, 21 Apr 2022 09:37:49 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id c3-20020a05600c148300b0038ebc8ad740sm2812873wmh.1.2022.04.21.09.37.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Apr 2022 09:37:48 -0700 (PDT)
+Message-ID: <bf1ba747-ee89-35b4-7095-eafa91536b4e@redhat.com>
+Date:   Thu, 21 Apr 2022 18:37:43 +0200
 MIME-Version: 1.0
-References: <20220415215901.1737897-1-oupton@google.com> <20220415215901.1737897-17-oupton@google.com>
-In-Reply-To: <20220415215901.1737897-17-oupton@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Thu, 21 Apr 2022 09:35:27 -0700
-Message-ID: <CANgfPd9bb213hsdKTMW9K0EsVLuKEKCF8V0pb6xM1qfnRj1qfw@mail.gmail.com>
-Subject: Re: [RFC PATCH 16/17] KVM: arm64: Enable parallel stage 2 MMU faults
-To:     Oliver Upton <oupton@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [RFC PATCH 00/17] KVM: arm64: Parallelize stage 2 fault handling
+Content-Language: en-US
+To:     Ben Gardon <bgardon@google.com>, Oliver Upton <oupton@google.com>
 Cc:     "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
         <kvmarm@lists.cs.columbia.edu>, kvm <kvm@vger.kernel.org>,
         Marc Zyngier <maz@kernel.org>,
@@ -62,14 +73,19 @@ Cc:     "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)"
         Peter Shier <pshier@google.com>,
         Ricardo Koller <ricarkol@google.com>,
         Reiji Watanabe <reijiw@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+References: <20220415215901.1737897-1-oupton@google.com>
+ <CANgfPd8V5AdH0dEAox2PvKJpqDrqmfJyiwoLpxEGqVfb7EEP9Q@mail.gmail.com>
+ <CAOQ_QsieUXOFXLkZ=ya0RUpU8Mv2sd9hmskwEW99tH26cjjX_A@mail.gmail.com>
+ <CANgfPd80wTYX92Q9dP7irMdZW+Y0_VNFQ19xJaf5DvndEaa7dw@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <CANgfPd80wTYX92Q9dP7irMdZW+Y0_VNFQ19xJaf5DvndEaa7dw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,85 +93,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 15, 2022 at 2:59 PM Oliver Upton <oupton@google.com> wrote:
->
-> Voila! Since the map walkers are able to work in parallel there is no
-> need to take the write lock on a stage 2 memory abort. Relax locking
-> on map operations and cross fingers we got it right.
+On 4/21/22 18:30, Ben Gardon wrote:
+> Completely agree. I'm surprised that ARM doesn't have a need for a
+> metadata structure associated with each page of the stage 2 paging
+> structure, but if you don't need it, that definitely makes things
+> simpler.
 
-Might be worth a healthy sprinkle of lockdep on the functions taking
-"shared" as an argument, just to make sure the wrong value isn't going
-down a callstack you didn't expect.
+The uses of struct kvm_mmu_page in the TDP MMU are all relatively new, 
+for the work_struct and the roots' reference count.  sp->ptep is only 
+used to in a very specific path, kvm_recover_nx_lpages.
 
->
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  arch/arm64/kvm/mmu.c | 21 +++------------------
->  1 file changed, 3 insertions(+), 18 deletions(-)
->
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 63cf18cdb978..2881051c3743 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1127,7 +1127,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->         gfn_t gfn;
->         kvm_pfn_t pfn;
->         bool logging_active = memslot_is_logging(memslot);
-> -       bool use_read_lock = false;
->         unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
->         unsigned long vma_pagesize, fault_granule;
->         enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-> @@ -1162,8 +1161,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->         if (logging_active) {
->                 force_pte = true;
->                 vma_shift = PAGE_SHIFT;
-> -               use_read_lock = (fault_status == FSC_PERM && write_fault &&
-> -                                fault_granule == PAGE_SIZE);
->         } else {
->                 vma_shift = get_vma_page_shift(vma, hva);
->         }
-> @@ -1267,15 +1264,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->         if (exec_fault && device)
->                 return -ENOEXEC;
->
-> -       /*
-> -        * To reduce MMU contentions and enhance concurrency during dirty
-> -        * logging dirty logging, only acquire read lock for permission
-> -        * relaxation.
-> -        */
-> -       if (use_read_lock)
-> -               read_lock(&kvm->mmu_lock);
-> -       else
-> -               write_lock(&kvm->mmu_lock);
-> +       read_lock(&kvm->mmu_lock);
-> +
+I wouldn't be surprised if ARM grows more metadata later, but in fact 
+it's not _that_ surprising that it doesn't need it yet!
 
-Ugh, I which we could get rid of the analogous ugly block on x86.
+Paolo
 
->         pgt = vcpu->arch.hw_mmu->pgt;
->         if (mmu_notifier_retry(kvm, mmu_seq))
->                 goto out_unlock;
-> @@ -1322,8 +1312,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->         if (fault_status == FSC_PERM && vma_pagesize == fault_granule) {
->                 ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
->         } else {
-> -               WARN_ONCE(use_read_lock, "Attempted stage-2 map outside of write lock\n");
-> -
->                 ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
->                                              __pfn_to_phys(pfn), prot,
->                                              mmu_caches, true);
-> @@ -1336,10 +1324,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->         }
->
->  out_unlock:
-> -       if (use_read_lock)
-> -               read_unlock(&kvm->mmu_lock);
-> -       else
-> -               write_unlock(&kvm->mmu_lock);
-> +       read_unlock(&kvm->mmu_lock);
->         kvm_set_pfn_accessed(pfn);
->         kvm_release_pfn_clean(pfn);
->         return ret != -EAGAIN ? ret : 0;
-> --
-> 2.36.0.rc0.470.gd361397f0d-goog
->
