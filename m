@@ -2,85 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BE5050A6D0
-	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 19:15:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 224C250A6DE
+	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 19:17:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1390632AbiDURRV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Apr 2022 13:17:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51740 "EHLO
+        id S1390678AbiDURTm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 13:19:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1390619AbiDURRR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Apr 2022 13:17:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5BDC549F29
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 10:14:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650561265;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1YMKcSiA0LOgoG4cDHR7os5spSf2HROMrqJ1+238Lww=;
-        b=cj0fzBHYl4qY6eYwpBOee9+Qmka1dtm0noXOISNgxRlSq/aYNsoi2veTYPwZRTLxxmCGRu
-        43ecHb2GUvN5r35njLRQgS571QRJZ3F53RQ/E3NCyjFNnnIxDRmXny9+tMHVzY7r/IiqRv
-        hJJmc0gTEx/eItYe0+w0IzhgGwMteAw=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-648-4q7FdTSQM_2wQ4vq2ZixSg-1; Thu, 21 Apr 2022 13:14:24 -0400
-X-MC-Unique: 4q7FdTSQM_2wQ4vq2ZixSg-1
-Received: by mail-ej1-f72.google.com with SMTP id qk32-20020a1709077fa000b006eff51cd918so2775712ejc.19
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 10:14:24 -0700 (PDT)
+        with ESMTP id S241462AbiDURTl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 13:19:41 -0400
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DEFD49F34
+        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 10:16:51 -0700 (PDT)
+Received: by mail-il1-x129.google.com with SMTP id y16so3470064ilc.7
+        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 10:16:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=XzhY22rtiJ4F18tBLtgYTs/jI9h0RWvVOlQ+tRau+5o=;
+        b=pK42OJHT0CeEuc0jhItLyks4fe+Xnjx0pc5hU0u/pCXZcWmvdLl+OE/12crIT84m1F
+         VJVkgDjOAeSiFct9qEntE2I7HQ1FsGWVdJ86FpnqgNsfTfFHKscoqGSRaypz7Xt4ApBh
+         ZWPI/IJ+v4WeM4TVbVbI0n82DvePsALfkbz2hG6tI9YDWgnZK9vxY7tbZj+zXBgU2Z5E
+         oe3zu+r8g49xPpC22rBu0pNm4L+j/CKW6d9J3NRboLuKc2JLq8Hp75N/p14Gkc0TadDu
+         Vi1nIgZNnu6KydVo6ByWz3Ztrc+m4Ejx2hSRQF+gUi4ZgBi6hO1FnbAGc8yqszaU6zwx
+         Njag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=1YMKcSiA0LOgoG4cDHR7os5spSf2HROMrqJ1+238Lww=;
-        b=MVVcVHQcBRKgrCPgZFl3peHY0YL3lZU6VpRz9OVzfKwSB6zlbg2lJYtR8KA/2f+uR6
-         tZaRCIIsdUzf/D7g1fCPYsV0CUZUdF8RD1gmtCrNO5XQhw8+ztrWubHtsMQi5pDuJurE
-         JFNQ4l3PQlUWL7LdfVkoA3YCKK+squPUWRR3RImAn3boQ/dr4TWPsVpiuZQqIWRuItIq
-         IGAqYK2ApxqXY513G1OKum6G6E1ElvLLk2cZOGkigXzOPlj1AwP3P3CCdWPfGd2XsSeq
-         UHS6vJ86rlWsK48ckBOILth5mWeg6eN4m0OSkMFElXXpd+0+5ReCvtC7TBEujEXppebO
-         epUw==
-X-Gm-Message-State: AOAM530pdWYhqZneUFY1UAnkGGu2M2okI++/w5IW4eNG73Y8Wc9QZgwZ
-        PYYAnak199MrPWfXSPyBV6tRvbq4Fi/mbCaO5exlpmNB9wqHmlfhM4CrQYjYmugsl8uadhg2gDi
-        ZZwPdU4FYtjrl
-X-Received: by 2002:a17:907:7815:b0:6ce:5242:1280 with SMTP id la21-20020a170907781500b006ce52421280mr466142ejc.217.1650561263076;
-        Thu, 21 Apr 2022 10:14:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyjpxVRQrq2bmfsUTwiZkkocLi9PluIUEZjPLmqlLk+39bZSgQ5aZ8L7QdX/BJW0PyqWPmlIA==
-X-Received: by 2002:a17:907:7815:b0:6ce:5242:1280 with SMTP id la21-20020a170907781500b006ce52421280mr466118ejc.217.1650561262828;
-        Thu, 21 Apr 2022 10:14:22 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id e12-20020a170906c00c00b006e66eff7584sm8022976ejz.102.2022.04.21.10.14.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Apr 2022 10:14:22 -0700 (PDT)
-Message-ID: <b1b04160-1604-8281-4c82-09b1f84ba86c@redhat.com>
-Date:   Thu, 21 Apr 2022 19:14:20 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH] KVM: x86: add HC_VMM_CUSTOM hypercall
-Content-Language: en-US
-To:     Peter Oskolkov <posk@google.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=XzhY22rtiJ4F18tBLtgYTs/jI9h0RWvVOlQ+tRau+5o=;
+        b=gIhrFRZzOsnNIVXGFEgWfFqqm+3yT5+bMIx90/mb0XMpIpf4TJyQTI3oFeitOu7zgr
+         Uw9xobwG28zvObYC+4fhycFhDWANoIMuN5SWE2B/Oek6IB62NRvO1tc32iSJYvYUxT8I
+         r+EGEOM13JP/R5zgitBkR6qfTOgZeyTeDkI71LHhC5r8YskmCa7nhOtlP8Ecz8ofJcIK
+         KWXfrCpJ44R6aStSR9yhrmAKv68NXXsIJQFbzqBcwft+E7ZpL/F18wuXfPaXPki7f7Rt
+         pxzheOBRJoK1KLVvtJZYNjV8r0/k2zVxsq5jD1dUuQhA0jfaFMqJt/6femhghRjs//9U
+         VLVw==
+X-Gm-Message-State: AOAM5317JMHhk7xNC8FnzDlR/RZMUBoGoJ9QHP2BG9+JnnjyBKMwySw6
+        mM4vzBAwO+m8bdKce3HYC6dFCQ==
+X-Google-Smtp-Source: ABdhPJz6XkmJvX5hjmcdaIfdUbIKzuxRz6hJn/RCOLM3kCv4aIyILwYHTuG617IunDBh4Y458w/0tg==
+X-Received: by 2002:a05:6e02:b41:b0:2cc:55ae:91b0 with SMTP id f1-20020a056e020b4100b002cc55ae91b0mr334271ilu.126.1650561410732;
+        Thu, 21 Apr 2022 10:16:50 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id n12-20020a92dd0c000000b002cac22690b6sm12524629ilm.0.2022.04.21.10.16.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Apr 2022 10:16:49 -0700 (PDT)
+Date:   Thu, 21 Apr 2022 17:16:46 +0000
+From:   Oliver Upton <oupton@google.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm <kvm@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Paul Turner <pjt@google.com>, Peter Oskolkov <posk@posk.io>
-References: <20220421165137.306101-1-posk@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220421165137.306101-1-posk@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        David Matlack <dmatlack@google.com>
+Subject: Re: [RFC PATCH 10/17] KVM: arm64: Assume a table pte is already
+ owned in post-order traversal
+Message-ID: <YmGRfoVUuDZ2YTyc@google.com>
+References: <20220415215901.1737897-1-oupton@google.com>
+ <20220415215901.1737897-11-oupton@google.com>
+ <CANgfPd-LZf1tkSiFTkJ-rww4Cmaign4bJRsg1KWm5eA2P5=j+A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANgfPd-LZf1tkSiFTkJ-rww4Cmaign4bJRsg1KWm5eA2P5=j+A@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,22 +83,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/21/22 18:51, Peter Oskolkov wrote:
-> Allow kvm-based VMMs to request KVM to pass a custom vmcall
-> from the guest to the VMM in the host.
+On Thu, Apr 21, 2022 at 09:11:37AM -0700, Ben Gardon wrote:
+> On Fri, Apr 15, 2022 at 2:59 PM Oliver Upton <oupton@google.com> wrote:
+> >
+> > For parallel walks that collapse a table into a block KVM ensures a
+> > locked invalid pte is visible to all observers in pre-order traversal.
+> > As such, there is no need to try breaking the pte again.
 > 
-> Quite often, operating systems research projects and/or specialized
-> paravirtualized workloads would benefit from a extra-low-overhead,
-> extra-low-latency guest-host communication channel.
+> When you're doing the pre and post-order traversals, are they
+> implemented as separate traversals from the root, or is it a kind of
+> pre and post-order where non-leaf nodes are visited on the way down
+> and on the way up?
 
-You can use a memory page and an I/O port.  It should be as fast as a 
-hypercall.  You can even change it to use ioeventfd if an asynchronous 
-channel is enough, and then it's going to be less than 1 us latency.
+The latter. We do one walk of the tables and fire the appropriate
+visitor callbacks based on what part of the walk we're in.
 
-Paolo
+> I assume either could be made to work, but the re-traversal from the
+> root probably minimizes TLB flushes, whereas the pre-and-post-order
+> would be a more efficient walk?
 
-> With cloud-hypervisor modified to handle the new hypercall (simply
-> return the sum of the received arguments), the following function in
-> guest_userspace_  completes, on average, in 2.5 microseconds (walltime)
-> on a relatively modern Intel Xeon processor:
+When we need to start doing operations on a whole range of memory this
+way I completely agree (collapse to 2M, shatter to 4K for a memslot,
+etc.).
 
+For the current use cases of the stage 2 walker, to coalesce TLBIs we'd
+need a better science around when to do blast all of stage 2 vs. TLBI with
+an IPA argument. IOW, we go through a decent bit of trouble to avoid
+flushing all of stage 2 unless deemed necessary. And the other unfortunate
+thing about that is I doubt observations are portable between implementations
+so the point where we cut over to a full flush is likely highly dependent
+on the microarch.
+
+Later revisions of the ARM architecture bring us TLBI instructions that
+take a range argument, which could help a lot in this department.
+
+--
+Thanks,
+Oliver
