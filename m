@@ -2,207 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 571E450A586
-	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 18:33:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF71D50A58B
+	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 18:33:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231409AbiDUQdq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Apr 2022 12:33:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45870 "EHLO
+        id S231329AbiDUQds (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 12:33:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1390597AbiDUQdS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Apr 2022 12:33:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4153448883
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 09:28:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650558509;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=D3OVcmZyD5fQf7XMBGl6jNoW5Atc9YkshU+4HcOs24k=;
-        b=FKr+USxDcPidGpP86Xg3zI2CuNkLnfOxmDiZKKlw3ayIErYdUTTXOAtnNMLicNqx+hrNj6
-        DvJS5sxbk4eoFh36bOZCN2JPpHsB32qCScm+KQBVCusV66eGC8DSnokGieLJDwLMhpbf0c
-        aZ5yQ/3u2MfEyPw7D+o5Nq/OZ/E/qzU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-207-o9QRIk8dPoudnJQi56rPlA-1; Thu, 21 Apr 2022 12:28:26 -0400
-X-MC-Unique: o9QRIk8dPoudnJQi56rPlA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D6DD883395E;
-        Thu, 21 Apr 2022 16:28:25 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B33CA145BA53;
-        Thu, 21 Apr 2022 16:28:25 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     peterx@redhat.com, seanjc@google.com
-Subject: [PATCH 2/2] kvm: selftests: introduce and use more page size-related constants
-Date:   Thu, 21 Apr 2022 12:28:25 -0400
-Message-Id: <20220421162825.1412792-3-pbonzini@redhat.com>
-In-Reply-To: <20220421162825.1412792-1-pbonzini@redhat.com>
-References: <20220421162825.1412792-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        with ESMTP id S1390625AbiDUQdg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 12:33:36 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2049.outbound.protection.outlook.com [40.107.236.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 299472AE09;
+        Thu, 21 Apr 2022 09:28:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jsnB6B4d8oGR1zQuHEFPvXo7fpf501q+NiCQakSJR0QixPpHVTOV4sZu3k7U5IUkOMs4jX1NnRuvJcMxZc/APHdvejGSy86/3rzYly+EhWlMmwR5qZ3ywsOr6ZTtwzvHGCmcVeHfPYbsvy+qEd7SVSqYSHvxxSc056cTD84xFXqZVSYAXZlgWYflmkzj4dHuFYGTG1p0xJaXd8e4oVZbgTYwsba1heue9h2Sr0Ys7rPA1LXlS3NlKeYy1cGAbrbzoPmnrwm2W3+KwMpjlb3Iir4R/DxzzjlshoVvl8dt6KCUo4ZZFlis46FguA54KWVQHg43EtO8sGdDQ2w1gaC/fw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bispNZajcvmsByoqo566tfpFZgr9cqQv06V/wVpCJbQ=;
+ b=CBJRU/nl5M0eqTAilPbukdZo+r3PJo6H7r5r8D3jKFtEy2qZqlw+suADtBgkI4pE29V3M5J+0JpnPfQ/EP5pFIqZuqxjTjVZJ6wa9e8KRxRs85bzmoTPuoDxmt0VjBcB5YAsdXKScvHggsiGiLj8GnxVkCCaEMX69wKAAUWuDaXPQ6m0BOTbFAS3nEGNNztIaI/P7qFRp3VHSn5jae1u6OyXODaS8qAIAy904KFkqMhtghpHncsmd1ENgxTinVCbHpD0GQbgovi0FdfJazA7ZVSRQ2pVnT845vuMFthbh232t8Bbya+1NZSY+mVJY5wV3lR1PIY7zJM2qvxAiv0E3w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bispNZajcvmsByoqo566tfpFZgr9cqQv06V/wVpCJbQ=;
+ b=CrQMgXl/YQT+kaotBKUq1quS8ztT2lc/I/Y8ImDdXzAL6fWt7HV6eRmDltaFMrTWQyq2ufPYCIc8QcIwSUI0obvngJAKTmuf6e0mfNIwJnYIHVC2xB3wZbbs+0WhJMWDp70GSuj5YS39R4PYd2G8WZ/tKXQAYM+T4SdibyNcRDCUfHP3EKXABlpsxQun+hzTrK4SOdGlOCSNr/EHxlVNYR0Lfgpd/NIqGD7sap2wM/VnMwNiwBqlqYW9t9Z0Q+TdKjMkbQXqg1jvwbx0e2Ghnh8qE0aRWeeoGT6gQ97urrap+cbLtq68y5CVi7SsN92mQg6HnOT+il5sEWXI6GbQpA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by DM6PR12MB2907.namprd12.prod.outlook.com (2603:10b6:5:183::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.20; Thu, 21 Apr
+ 2022 16:28:39 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2%6]) with mapi id 15.20.5186.015; Thu, 21 Apr 2022
+ 16:28:39 +0000
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+Cc:     Tony Krowiak <akrowiak@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: [PATCH v2 0/7] Make the rest of the VFIO driver interface use vfio_device
+Date:   Thu, 21 Apr 2022 13:28:31 -0300
+Message-Id: <0-v2-6011bde8e0a1+5f-vfio_mdev_no_group_jgg@nvidia.com>
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-ClientProxiedBy: BL0PR05CA0006.namprd05.prod.outlook.com
+ (2603:10b6:208:91::16) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 3bff6123-0065-4e6b-0824-08da23b3fdb5
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2907:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR12MB29070454C3455FE6212117CCC2F49@DM6PR12MB2907.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dYTjnMjgkExXnHSjEPTV3Im4hVr9gyNDAZ/tFOyCOEhV4LAqCikpOLW3TCqXd8t8JRNCyXWUiRnryTqndhgTzonKroYZsK1bcYQsUVtNqmnxmFPSxuu7wcFVAkkHeKh895KNq4MwaaoeWDWjdcv4gL/Xx6BLhcaiQKgeYtSVsKj0TYPXxZx7wE/OXS1fn2WbD9t+PykfX9hk6dCf1g39+FmX4Mtzl6MdQ9sRsGPY9V7YF2eWQGqLrOp0nAwKooCCs7pkJ9OxhSocXTGwr7JkfeGeuFXyM3Ey7tv8Ns/tcVvk1MkOdusNZslY6ToYqJ9nB3e99PqlhC68pKXmlAFpPvAvQ8YUdiI9vn26DZMj+/tRbjkuDqRdXsgFSY6hngdO+pp0/7zq10g7H+7EQCsNBdwv5CjTPdAPDpjSYJGyyNzdtN4EyhagtA2sl4aKZLFHj+VPisf5aP7AhUQ1O+GFbNdZraJgNhUw/eflaS/tjkDdNUqMPxykRyImPrCl1a4rpP6HNoJVTfcrZbdRQF1OjtefsYGwj2Ls9jqgLiYdhmJFeSBK7iLjVEjuLv36SRCAoCFGi7MrCOsBnqiv9BBshXtyM87usUFE8Taz+XwTUgitr8eI2EoOgs6O1/MQ1K79xztMKAv2EfVV5ShltxrnSqTcTiXuMY4uAkOO++9xORz2KNvJzjZlQgn0vJrbKVoRReOoo16BimOQsd+Je1Fudkt5LYFDrQ6RemTYcg6IeSn2CZVhBNA06MKgJlhKiPjG6eN1ew50rKnLLBkruMxx/4TH2MKSkcMe8EbrhO20uNNhyI/kRVy565QFTRHJRlyH4d00730lzcRPltE9fs7vAg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6486002)(6506007)(966005)(316002)(5660300002)(38100700002)(6512007)(54906003)(36756003)(66946007)(86362001)(186003)(921005)(110136005)(508600001)(8936002)(6666004)(2616005)(83380400001)(8676002)(7416002)(7406005)(66556008)(4326008)(26005)(2906002)(66476007)(4216001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qNZz/kjSP4bw36JHvbi3wYP2OLmAAHnJ40za/mJcSH7jwxo6LN2BkhtWFCWT?=
+ =?us-ascii?Q?EynjhsIh0eG+vDXiLyHRBQCQLja8uP9YePkgNXyKJj8/OAKV5qzg7g2NS/57?=
+ =?us-ascii?Q?sMSMz8V2tcK6Dk87xdgTrWmhGClO5K6BjpHpxdnAiWwoWt0XKlJDItvbJG+G?=
+ =?us-ascii?Q?s3bfaGhcOpVVdLlGkTfWcOeZg/EA5PMWEBSCLbyROh4iKCsIOjFpv9fin5Zd?=
+ =?us-ascii?Q?jCVQ/YD77iIwpK6Dc9Eot15C9ZHPGXAMgHUUh4c4f5z9uie301R7mz+p1eVi?=
+ =?us-ascii?Q?ik22x+glznwlpBJW/zXzFFEY88gu2YbkRclA2otjR3rkk3xx46rdRtqUrftH?=
+ =?us-ascii?Q?sv79Sb8w02ElizkD+OKakJifOrLoxkbPkSQftVqlY43v4GaOYCzV0NjALDa6?=
+ =?us-ascii?Q?bPQ4yJJQB27pd6BoXtP50HJK2g3HrokyaeR0F006VJviQxOSL7iu4QZVvOfV?=
+ =?us-ascii?Q?SOZVNnGN0cpOZeagHFjvqIfJSlnhGGlUargby9RMBNOGFqzArFvVxiD+PlfW?=
+ =?us-ascii?Q?8ZQ0sqbnxUGjK1/ySNo3uaOHKKmieTQH2Aaqg8Z+aiO2GHZH6pha01h4RdPK?=
+ =?us-ascii?Q?r6BjFXgKE8z9bKfLFg68RU1szQFckdLtK9eecNIphITSiyqgdTr4Me/jJHpa?=
+ =?us-ascii?Q?9VWXykWkxBY3M4XRedWK9ZYjXtePOrGaCj4YndPQY5saXKnHvJyRTYq29QTi?=
+ =?us-ascii?Q?3xftdLyVqqfNdgxJdQrfXFQozlPwn8DjQvIs60FxjNObV7VAxfuBv/NjMb4Y?=
+ =?us-ascii?Q?/ujqG7cVoO0ahTjXRcHRQ3SAJHoTqS1w3A4LGVT6baNaa8MVKjxHwISifbnz?=
+ =?us-ascii?Q?A8Wn/C10nwlyJUecmjYBu7SHwbMHrRITVYOiMObXntg0/Z6I7ude26SZjgCB?=
+ =?us-ascii?Q?i27e97AqKAWVIlJZieKbFoykYOPmtjuJd7AXNFXxEufLWT5VZ6ZUe9ZMJRkW?=
+ =?us-ascii?Q?d9lsmF2sZFGv3bl6sQ+IWVhTfeDH9dkk6Qon4vTK+1W0GfgRBXu//XOhswhK?=
+ =?us-ascii?Q?ob1K9u3bul3tOwVrQOLDcA9bgeNEBYOvkLYTLgdaR10Z0Ag1jJ2mAVN0k0O7?=
+ =?us-ascii?Q?HvzSXBhOzDsirElHeQE1k9LtHUuGoguEcYL5Rl7un28TNDzAjBpHHTJz9a7d?=
+ =?us-ascii?Q?KEoBDwOAJCqbCHYUoz5ImVY7KnXxkvsYioSd3rIYSa4ikHajB08Xt6vvPmTz?=
+ =?us-ascii?Q?xeBHfoHllspKq02gj0LfyKNt9dMHCaPi4QgyGeEjw+IorGi7t6SJeYcyYtXf?=
+ =?us-ascii?Q?UkLyfiCQFbZn+xWrpAP12FE0NsZtmhen2dZZowITjk8KKHZi3U7ZG+b7qVEu?=
+ =?us-ascii?Q?P8khZtNl1b8tefJ/KatCf4bKcX+n7Ta57BuX/crZQQqBthn5sbZ2iytLSuCV?=
+ =?us-ascii?Q?vTGoyVrz9Z+CsgLmMP5MS08JK+PM5j9Pv1h4+67SP8CpRA71lMnI3FZO8pG9?=
+ =?us-ascii?Q?7G3ghCqWSbsc0naDC+Q1yrOLqI6vQ46RXQRwIlG0J84itJpkya6M2AIC4w5d?=
+ =?us-ascii?Q?pVwDjy0aILsVbBp86DFJdN5axO2t091rMspBkgb4x7FqRIyn8IhLRD19dZa1?=
+ =?us-ascii?Q?+O6Gm3OgeevE1jPkJfJp2ZkA1Tla7uVU5N+mgBy02+hSyuE+pNq2CmD3h/LJ?=
+ =?us-ascii?Q?6u9bQBnhbP0M43CdC7tdVVuHYCoSiqJDb+BEAjN9gk5gf9krTXHIpJoaLZ0c?=
+ =?us-ascii?Q?LI30rmP1B5rkfH5F4+IGav5jXyWt/s4wlutC8hotkHxWj+uORUSsmJLbF+zG?=
+ =?us-ascii?Q?heeQ2zx4Lg=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3bff6123-0065-4e6b-0824-08da23b3fdb5
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2022 16:28:39.0057
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EdvVziAQDw5intFUPO94W7LC3wFuOLkdahCD+SKZBzR/SWc8jNvlnmXjuzYtyuNB
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2907
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Clean up code that was hardcoding masks for various fields,
-now that the masks are included in processor.h.
+Prior series have transformed other parts of VFIO from working on struct
+device or struct vfio_group into working directly on struct
+vfio_device. Based on that work we now have vfio_device's readily
+available in all the drivers.
 
-For more cleanup, define PAGE_SIZE and PAGE_MASK just like in Linux.
-PAGE_SIZE in particular was defined by several tests.
+Update the rest of the driver facing API to use vfio_device as an input.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- .../testing/selftests/kvm/include/x86_64/processor.h |  2 ++
- tools/testing/selftests/kvm/lib/x86_64/processor.c   | 12 ++++++------
- tools/testing/selftests/kvm/x86_64/amx_test.c        |  1 -
- .../selftests/kvm/x86_64/emulator_error_test.c       |  1 -
- tools/testing/selftests/kvm/x86_64/smm_test.c        |  2 --
- .../selftests/kvm/x86_64/vmx_tsc_adjust_test.c       |  1 -
- tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c |  1 -
- tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c |  1 -
- 8 files changed, 8 insertions(+), 13 deletions(-)
+The following are switched from struct device to struct vfio_device:
+  vfio_register_notifier()
+  vfio_unregister_notifier()
+  vfio_pin_pages()
+  vfio_unpin_pages()
+  vfio_dma_rw()
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 86e79af64dea..d0d51adec76e 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -71,6 +71,8 @@
- #define PTE_NX_MASK             BIT_ULL(63)
- 
- #define PAGE_SHIFT		12
-+#define PAGE_SIZE		(1ULL << PAGE_SHIFT)
-+#define PAGE_MASK		(~(PAGE_SIZE-1))
- 
- #define PHYSICAL_PAGE_MASK      GENMASK_ULL(51, 12)
- #define PTE_GET_PFN(pte)        (((pte) & PHYSICAL_PAGE_MASK) >> PAGE_SHIFT)
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 0dd442c26015..33ea5e9955d9 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -255,13 +255,13 @@ static uint64_t *_vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid,
- 	struct kvm_cpuid_entry2 *entry;
- 	struct kvm_sregs sregs;
- 	int max_phy_addr;
--	/* Set the bottom 52 bits. */
--	uint64_t rsvd_mask = 0x000fffffffffffff;
-+	uint64_t rsvd_mask = 0;
- 
- 	entry = kvm_get_supported_cpuid_index(0x80000008, 0);
- 	max_phy_addr = entry->eax & 0x000000ff;
--	/* Clear the bottom bits of the reserved mask. */
--	rsvd_mask = (rsvd_mask >> max_phy_addr) << max_phy_addr;
-+	/* Set the high bits in the reserved mask. */
-+	if (max_phy_addr < 52)
-+		rsvd_mask = GENMASK_ULL(51, max_phy_addr);
- 
- 	/*
- 	 * SDM vol 3, fig 4-11 "Formats of CR3 and Paging-Structure Entries
-@@ -271,7 +271,7 @@ static uint64_t *_vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid,
- 	 */
- 	vcpu_sregs_get(vm, vcpuid, &sregs);
- 	if ((sregs.efer & EFER_NX) == 0) {
--		rsvd_mask |= (1ull << 63);
-+		rsvd_mask |= PTE_NX_MASK;
- 	}
- 
- 	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K, "Attempt to use "
-@@ -549,7 +549,7 @@ vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
- 	if (!(pte[index[0]] & PTE_PRESENT_MASK))
- 		goto unmapped_gva;
- 
--	return (PTE_GET_PFN(pte[index[0]]) * vm->page_size) + (gva & 0xfffu);
-+	return (PTE_GET_PFN(pte[index[0]]) * vm->page_size) + (gva & ~PAGE_MASK);
- 
- unmapped_gva:
- 	TEST_FAIL("No mapping for vm virtual address, gva: 0x%lx", gva);
-diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
-index 52a3ef6629e8..76f65c22796f 100644
---- a/tools/testing/selftests/kvm/x86_64/amx_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
-@@ -29,7 +29,6 @@
- #define X86_FEATURE_XSAVE		(1 << 26)
- #define X86_FEATURE_OSXSAVE		(1 << 27)
- 
--#define PAGE_SIZE			(1 << 12)
- #define NUM_TILES			8
- #define TILE_SIZE			1024
- #define XSAVE_SIZE			((NUM_TILES * TILE_SIZE) + PAGE_SIZE)
-diff --git a/tools/testing/selftests/kvm/x86_64/emulator_error_test.c b/tools/testing/selftests/kvm/x86_64/emulator_error_test.c
-index f070ff0224fa..aeb3850f81bd 100644
---- a/tools/testing/selftests/kvm/x86_64/emulator_error_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/emulator_error_test.c
-@@ -12,7 +12,6 @@
- #include "vmx.h"
- 
- #define VCPU_ID	   1
--#define PAGE_SIZE  4096
- #define MAXPHYADDR 36
- 
- #define MEM_REGION_GVA	0x0000123456789000
-diff --git a/tools/testing/selftests/kvm/x86_64/smm_test.c b/tools/testing/selftests/kvm/x86_64/smm_test.c
-index a626d40fdb48..b4e0c860769e 100644
---- a/tools/testing/selftests/kvm/x86_64/smm_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/smm_test.c
-@@ -21,8 +21,6 @@
- 
- #define VCPU_ID	      1
- 
--#define PAGE_SIZE  4096
--
- #define SMRAM_SIZE 65536
- #define SMRAM_MEMSLOT ((1 << 16) | 1)
- #define SMRAM_PAGES (SMRAM_SIZE / PAGE_SIZE)
-diff --git a/tools/testing/selftests/kvm/x86_64/vmx_tsc_adjust_test.c b/tools/testing/selftests/kvm/x86_64/vmx_tsc_adjust_test.c
-index e683d0ac3e45..19b35c607dc6 100644
---- a/tools/testing/selftests/kvm/x86_64/vmx_tsc_adjust_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/vmx_tsc_adjust_test.c
-@@ -32,7 +32,6 @@
- #define MSR_IA32_TSC_ADJUST 0x3b
- #endif
- 
--#define PAGE_SIZE	4096
- #define VCPU_ID		5
- 
- #define TSC_ADJUST_VALUE (1ll << 32)
-diff --git a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-index 865e17146815..bcd370827859 100644
---- a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-@@ -23,7 +23,6 @@
- #define SHINFO_REGION_GVA	0xc0000000ULL
- #define SHINFO_REGION_GPA	0xc0000000ULL
- #define SHINFO_REGION_SLOT	10
--#define PAGE_SIZE		4096
- 
- #define DUMMY_REGION_GPA	(SHINFO_REGION_GPA + (2 * PAGE_SIZE))
- #define DUMMY_REGION_SLOT	11
-diff --git a/tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c b/tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c
-index adc94452b57c..b30fe9de1d4f 100644
---- a/tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c
-@@ -15,7 +15,6 @@
- 
- #define HCALL_REGION_GPA	0xc0000000ULL
- #define HCALL_REGION_SLOT	10
--#define PAGE_SIZE		4096
- 
- static struct kvm_vm *vm;
- 
+The following group APIs are obsoleted and removed by just using struct
+vfio_device with the above:
+  vfio_group_pin_pages()
+  vfio_group_unpin_pages()
+  vfio_group_iommu_domain()
+  vfio_group_get_external_user_from_dev()
+
+To retain the performance of the new device APIs relative to their group
+versions optimize how vfio_group_add_container_user() is used to avoid
+calling it when the driver must already guarantee the device is open and
+the container_users incrd.
+
+The remaining exported VFIO group interfaces are only used by kvm, and are
+addressed by a parallel series.
+
+This series is based on Christoph's gvt rework here:
+
+ https://lore.kernel.org/all/5a8b9f48-2c32-8177-1c18-e3bd7bfde558@intel.com/
+
+and so will need the PR merged first.
+
+I have a followup series that needs this.
+
+This is also part of the iommufd work - moving the driver facing interface
+to vfio_device provides a much cleaner path to integrate with iommufd.
+
+v2:
+ - Based on Christoph's series so mdev_legacy_get_vfio_device() is removed
+ - Reflow indenting
+ - Use vfio_assert_device_open() and WARN_ON_ONCE instead of open coding
+   the assertion
+v1: https://lore.kernel.org/r/0-v1-a8faf768d202+125dd-vfio_mdev_no_group_jgg@nvidia.com
+
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: intel-gfx@lists.freedesktop.org
+Cc: intel-gvt-dev@lists.freedesktop.org
+Cc: kvm@vger.kernel.org
+Cc: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: "Liu, Yi L" <yi.l.liu@intel.com>
+Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+
+Jason Gunthorpe (7):
+  vfio: Make vfio_(un)register_notifier accept a vfio_device
+  vfio/ccw: Remove mdev from struct channel_program
+  vfio/mdev: Pass in a struct vfio_device * to vfio_pin/unpin_pages()
+  vfio/mdev: Pass in a struct vfio_device * to vfio_dma_rw()
+  drm/i915/gvt: Change from vfio_group_(un)pin_pages to
+    vfio_(un)pin_pages
+  vfio: Remove dead code
+  vfio: Remove calls to vfio_group_add_container_user()
+
+ .../driver-api/vfio-mediated-device.rst       |   4 +-
+ drivers/gpu/drm/i915/gvt/gvt.h                |   5 +-
+ drivers/gpu/drm/i915/gvt/kvmgt.c              |  51 ++--
+ drivers/s390/cio/vfio_ccw_cp.c                |  47 +--
+ drivers/s390/cio/vfio_ccw_cp.h                |   4 +-
+ drivers/s390/cio/vfio_ccw_fsm.c               |   3 +-
+ drivers/s390/cio/vfio_ccw_ops.c               |   7 +-
+ drivers/s390/crypto/vfio_ap_ops.c             |  23 +-
+ drivers/vfio/vfio.c                           | 288 ++----------------
+ include/linux/vfio.h                          |  21 +-
+ 10 files changed, 102 insertions(+), 351 deletions(-)
+
+
+base-commit: 3515cc4aa9440795ab20b87ade2e2727267d469d
 -- 
-2.31.1
+2.36.0
 
