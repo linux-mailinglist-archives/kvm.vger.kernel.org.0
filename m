@@ -2,80 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32F5950A629
-	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 18:49:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C5D650A640
+	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 18:52:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232289AbiDUQtb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Apr 2022 12:49:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59904 "EHLO
+        id S1355269AbiDUQyp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 12:54:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232270AbiDUQt3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Apr 2022 12:49:29 -0400
-Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50BC649245
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 09:46:39 -0700 (PDT)
-Received: by mail-il1-x136.google.com with SMTP id e1so3429783ile.2
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 09:46:39 -0700 (PDT)
+        with ESMTP id S1352895AbiDUQym (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 12:54:42 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE1D7496BD
+        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 09:51:51 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id b73-20020a25cb4c000000b0064505a59a7aso4869875ybg.5
+        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 09:51:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ckFrAKsgzMvhyYwd1DVzzN/3nS9H6cXtvsMtyZqX9aM=;
-        b=GGnQsYCBc7m0sb4hHXxmKxyVDlaKtiaUHTSkrcsRbKdnF/OLl9BH9pkaG8KmPePwAH
-         GFnZvAnXZTNxNDVxKvJkJmlFGbDhiP+zy8Z3LECciut3GiViyDXLAAuyDjhcvgvCHd95
-         9RZno8WXANvk1HA27qMQsBhii5EMRryAqFjMHiA6jQZ89AnnpaarP0duHppYZ+nG5SZv
-         c66Bk7ryt53J/3iOloBULhibsniEkSISPrkGaQYvqiUq2fcHGaw89VI+6Wveqzv+9dxy
-         ZR/Jw0K3SrcDXPSnc73yUsx4FXiPdd6DMCbMoeCWI5y1g2cc4geCxc1qUCY15L7+5TuW
-         3xfA==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=IFP8dHfODAcQGiAaeMaPY6n82yRD8VX6rTDaKDuDzEA=;
+        b=p9OLIeRHd/WWFguaSWOzgqSENN+cWNzfUAd9HPgNGe3r/rzFn62/OoDwtSjkoNL78A
+         ec1FiOJ67UPu04RxzQolGEkLPyXnpyCe0vnOnI7vpmfGAz09rvlHWedd6NhgaBBa3ssq
+         KMyBweJ4oUBbuHgwRW3neg+L0xQWZuOpCkrUoB0cb41CA+1R1sLYp/G5QQjrmZ2e4wwp
+         qMBf/Phy4x24C8GsmqaEXK4LsAp3ye7Euya2qnbzoJQF43MAgst27zwKyxVA/i8uJ6fc
+         lhlyS4n20g10s9/31Wru17Ho4nZC3jhQSQNLh4gVscY3ySdyqWwdFXkOcGwmj+nJdXuh
+         GDNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ckFrAKsgzMvhyYwd1DVzzN/3nS9H6cXtvsMtyZqX9aM=;
-        b=tSRrpY6j+0SgVR/1HcB4GXSbuUaqDDr4x5ydkGtb62ydNvzPcEsfeINS6q3fVHURuQ
-         78gaTX3bv7UY2g6MI72tBenS8T/rwx0jgwRwNoikEbVbyYIyQpETiteKdLWYMdx65g/l
-         Jf32DCkk4olk3J/SvDKthvfCU7t//fcbluzdbT1RNoeiI7dlMviCiTP/jF5rTvwOLDJy
-         6Vb2hruYhAfDYMt22UkWDYpHjSisFlErbMPBhHi1rQFk/9WgHwbE7yg2uPeVG6Ejd9we
-         yh8nYRF0Ddk6pCT+Nxc5NCbJf6fWGlmpodd8Z6d+y/c3IS/kdYReJv6avLQ5ewazdt4h
-         3H2A==
-X-Gm-Message-State: AOAM533mZWYBzuxIMJDploaJDEf6lJMsbD35Sue1y3jSoDnqLqZCpVri
-        uWYPjUFcSdE9JSl3v2gplnLlNg==
-X-Google-Smtp-Source: ABdhPJxWbQuijQVv7g9clCzQllXZaGyUynAlG+W8mud7Ir6TVd5bJHybLM8Rf2hpLE1AQFIvqx0Uow==
-X-Received: by 2002:a05:6e02:1d83:b0:2cc:1dbc:7c34 with SMTP id h3-20020a056e021d8300b002cc1dbc7c34mr285019ila.315.1650559598456;
-        Thu, 21 Apr 2022 09:46:38 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id p6-20020a0566022b0600b0064c59797e67sm15044931iov.46.2022.04.21.09.46.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Apr 2022 09:46:37 -0700 (PDT)
-Date:   Thu, 21 Apr 2022 16:46:34 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>, kvm <kvm@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=IFP8dHfODAcQGiAaeMaPY6n82yRD8VX6rTDaKDuDzEA=;
+        b=APO27P9R9wHevmU1u5THYXQGsXnq0Q4I4RCKXmOySsTecWeBmf++MD+81uOQ8zSpw3
+         pQtZuJBgtcMcGMmEhnjIXszLTVtthG5YIG4AGjJYQ9oJa1AlMPQgLgQKDPSOJQ1t3EW3
+         JF2lzYaxay3Um6rMHbV1Kt9Cr9QK4YRC7p+Tfi2Yr7wCJLpRrnlIlwTszuMkoMz2oArq
+         8Q/MO7DUt3Xk7IMXoVJKkcHRazBOkwquLzQhEqe8CjAKRcJMoXHImUSDKpY57MNN9u56
+         7hcCPDjFvMEkrdvENrfUHSfwDgQpSrrj+o2k9IAgIQE7pxxZ9Py4uy5dwi+V3lnnS5gI
+         314A==
+X-Gm-Message-State: AOAM5320BAn0HAkcVJeEq2iOLiZYUv8+2cTX4CV1sTQvJvuBIhp9Mg7g
+        4cMMgaB23FxgtZPp9QZBMPG74ue0
+X-Google-Smtp-Source: ABdhPJyCWHZngFS/hK6FPiBgDeCIeK3wTfM3o5WOxaOCHNI3yjxGeiEtBjueumJuylGxnBtGQXTymqBx
+X-Received: from posk.svl.corp.google.com ([2620:15c:2cd:202:af90:3136:42b1:c8e2])
+ (user=posk job=sendgmr) by 2002:a05:6902:10c2:b0:645:2c6e:b43b with SMTP id
+ w2-20020a05690210c200b006452c6eb43bmr662985ybu.358.1650559910996; Thu, 21 Apr
+ 2022 09:51:50 -0700 (PDT)
+Date:   Thu, 21 Apr 2022 09:51:37 -0700
+Message-Id: <20220421165137.306101-1-posk@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.rc2.479.g8af0fa9b8e-goog
+Subject: [PATCH] KVM: x86: add HC_VMM_CUSTOM hypercall
+From:   Peter Oskolkov <posk@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>
-Subject: Re: [RFC PATCH 16/17] KVM: arm64: Enable parallel stage 2 MMU faults
-Message-ID: <YmGKaoStt9Lf9xOP@google.com>
-References: <20220415215901.1737897-1-oupton@google.com>
- <20220415215901.1737897-17-oupton@google.com>
- <CANgfPd9bb213hsdKTMW9K0EsVLuKEKCF8V0pb6xM1qfnRj1qfw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANgfPd9bb213hsdKTMW9K0EsVLuKEKCF8V0pb6xM1qfnRj1qfw@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Paul Turner <pjt@google.com>, Peter Oskolkov <posk@posk.io>,
+        Peter Oskolkov <posk@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,71 +72,123 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 21, 2022 at 09:35:27AM -0700, Ben Gardon wrote:
-> On Fri, Apr 15, 2022 at 2:59 PM Oliver Upton <oupton@google.com> wrote:
-> >
-> > Voila! Since the map walkers are able to work in parallel there is no
-> > need to take the write lock on a stage 2 memory abort. Relax locking
-> > on map operations and cross fingers we got it right.
-> 
-> Might be worth a healthy sprinkle of lockdep on the functions taking
-> "shared" as an argument, just to make sure the wrong value isn't going
-> down a callstack you didn't expect.
+Allow kvm-based VMMs to request KVM to pass a custom vmcall
+from the guest to the VMM in the host.
 
-If we're going to go this route we might need to just punch a pointer
-to the vCPU through to the stage 2 table walker. All of this plumbing is
-built around the idea that there are multiple tables to manage and
-needn't be in the context of a vCPU/VM, which is why I went the WARN()
-route instead of better lockdep assertions.
+Quite often, operating systems research projects and/or specialized
+paravirtualized workloads would benefit from a extra-low-overhead,
+extra-low-latency guest-host communication channel.
 
-> >
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> >  arch/arm64/kvm/mmu.c | 21 +++------------------
-> >  1 file changed, 3 insertions(+), 18 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 63cf18cdb978..2881051c3743 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -1127,7 +1127,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >         gfn_t gfn;
-> >         kvm_pfn_t pfn;
-> >         bool logging_active = memslot_is_logging(memslot);
-> > -       bool use_read_lock = false;
-> >         unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
-> >         unsigned long vma_pagesize, fault_granule;
-> >         enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-> > @@ -1162,8 +1161,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >         if (logging_active) {
-> >                 force_pte = true;
-> >                 vma_shift = PAGE_SHIFT;
-> > -               use_read_lock = (fault_status == FSC_PERM && write_fault &&
-> > -                                fault_granule == PAGE_SIZE);
-> >         } else {
-> >                 vma_shift = get_vma_page_shift(vma, hva);
-> >         }
-> > @@ -1267,15 +1264,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >         if (exec_fault && device)
-> >                 return -ENOEXEC;
-> >
-> > -       /*
-> > -        * To reduce MMU contentions and enhance concurrency during dirty
-> > -        * logging dirty logging, only acquire read lock for permission
-> > -        * relaxation.
-> > -        */
-> > -       if (use_read_lock)
-> > -               read_lock(&kvm->mmu_lock);
-> > -       else
-> > -               write_lock(&kvm->mmu_lock);
-> > +       read_lock(&kvm->mmu_lock);
-> > +
-> 
-> Ugh, I which we could get rid of the analogous ugly block on x86.
+With cloud-hypervisor modified to handle the new hypercall (simply
+return the sum of the received arguments), the following function in
+guest _userspace_ completes, on average, in 2.5 microseconds (walltime)
+on a relatively modern Intel Xeon processor:
 
-Maybe we could fold it in to a MMU macro in the arch-generic scope?
-Conditional locking is smelly, I was very pleased to delete these lines :)
+	uint64_t hypercall_custom_vmm(uint64_t a0, uint64_t a1,
+					uint64_t a2, uint64_t a3)
+	{
+		uint64_t ret;
 
---
-Thanks,
-Oliver
+		asm(
+			"movq   $13, %%rax \n\t"  // hypercall nr.
+			"movq %[a0], %%rbx \n\t"  // a0
+			"movq %[a1], %%rcx \n\t"  // a1
+			"movq %[a2], %%rdx \n\t"  // a2
+			"movq %[a3], %%rsi \n\t"  // a3
+			"vmcall            \n\t"
+			"movq %%rax, %[ret] \n\t" // ret
+			: [ret] "=r"(ret)
+			: [a0] "r"(a0), [a1] "r"(a1), [a2] "r"(a2), [a3] "r"(a3)
+			: "rax", "rbx", "rcx", "rdx", "rsi"
+		);
+
+		return ret;
+	}
+
+Signed-off-by: Peter Oskolkov <posk@google.com>
+---
+ arch/x86/kvm/x86.c            | 28 ++++++++++++++++++++++++++--
+ include/uapi/linux/kvm_para.h |  1 +
+ 2 files changed, 27 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ab336f7c82e4..343971128da7 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -108,7 +108,8 @@ static u64 __read_mostly efer_reserved_bits = ~((u64)EFER_SCE);
+ 
+ static u64 __read_mostly cr4_reserved_bits = CR4_RESERVED_BITS;
+ 
+-#define KVM_EXIT_HYPERCALL_VALID_MASK (1 << KVM_HC_MAP_GPA_RANGE)
++#define KVM_EXIT_HYPERCALL_VALID_MASK  ((1 << KVM_HC_MAP_GPA_RANGE) | \
++					(1 << KVM_HC_VMM_CUSTOM))
+ 
+ #define KVM_CAP_PMU_VALID_MASK KVM_PMU_CAP_DISABLE
+ 
+@@ -9207,10 +9208,16 @@ static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
+ 	return kvm_skip_emulated_instruction(vcpu);
+ }
+ 
++static int kvm_allow_hypercall_from_userspace(int nr)
++{
++	return nr == KVM_HC_VMM_CUSTOM;
++}
++
+ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+ {
+ 	unsigned long nr, a0, a1, a2, a3, ret;
+ 	int op_64_bit;
++	int cpl;
+ 
+ 	if (kvm_xen_hypercall_enabled(vcpu->kvm))
+ 		return kvm_xen_hypercall(vcpu);
+@@ -9235,7 +9242,8 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+ 		a3 &= 0xFFFFFFFF;
+ 	}
+ 
+-	if (static_call(kvm_x86_get_cpl)(vcpu) != 0) {
++	cpl = static_call(kvm_x86_get_cpl)(vcpu);
++	if (cpl != 0 && !kvm_allow_hypercall_from_userspace(nr)) {
+ 		ret = -KVM_EPERM;
+ 		goto out;
+ 	}
+@@ -9294,6 +9302,22 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.complete_userspace_io = complete_hypercall_exit;
+ 		return 0;
+ 	}
++	case KVM_HC_VMM_CUSTOM:
++		ret = -KVM_ENOSYS;
++		if (!(vcpu->kvm->arch.hypercall_exit_enabled & (1 << KVM_HC_VMM_CUSTOM)))
++			break;
++
++		vcpu->run->exit_reason        = KVM_EXIT_HYPERCALL;
++		vcpu->run->hypercall.nr       = KVM_HC_VMM_CUSTOM;
++		vcpu->run->hypercall.args[0]  = a0;
++		vcpu->run->hypercall.args[1]  = a1;
++		vcpu->run->hypercall.args[2]  = a2;
++		vcpu->run->hypercall.args[3]  = a3;
++		vcpu->run->hypercall.args[4]  = 0;
++		vcpu->run->hypercall.args[5]  = cpl;
++		vcpu->run->hypercall.longmode = op_64_bit;
++		vcpu->arch.complete_userspace_io = complete_hypercall_exit;
++		return 0;
+ 	default:
+ 		ret = -KVM_ENOSYS;
+ 		break;
+diff --git a/include/uapi/linux/kvm_para.h b/include/uapi/linux/kvm_para.h
+index 960c7e93d1a9..8caab28c9025 100644
+--- a/include/uapi/linux/kvm_para.h
++++ b/include/uapi/linux/kvm_para.h
+@@ -30,6 +30,7 @@
+ #define KVM_HC_SEND_IPI		10
+ #define KVM_HC_SCHED_YIELD		11
+ #define KVM_HC_MAP_GPA_RANGE		12
++#define KVM_HC_VMM_CUSTOM		13
+ 
+ /*
+  * hypercalls use architecture specific
+
+base-commit: 150866cd0ec871c765181d145aa0912628289c8a
+-- 
+2.36.0.rc2.479.g8af0fa9b8e-goog
+
