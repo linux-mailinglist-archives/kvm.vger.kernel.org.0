@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 601E750968F
-	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 07:18:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BCE1750968D
+	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 07:18:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384283AbiDUFQL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Apr 2022 01:16:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49254 "EHLO
+        id S1384268AbiDUFQQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 01:16:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1384246AbiDUFQC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Apr 2022 01:16:02 -0400
+        with ESMTP id S1384272AbiDUFQJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 01:16:09 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8FB89DED5
-        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 22:13:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 88C2812AD3
+        for <kvm@vger.kernel.org>; Wed, 20 Apr 2022 22:13:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650517991;
+        s=mimecast20190719; t=1650517999;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5bCkYEOsNHgNL9DAc6eiIfRMxj3itayT5GreRyCWKFU=;
-        b=jMiC3O6XKhMtJ0JUPc/JY0UnlClq9ZzUFNjMnkIIwJ+/PDNIbEhw7FiEV9ZITveivIU1rF
-        kYG0ASjBFE5AizznTiXa9lDA7wvt+cJbAyFE3+wh1wDiJ85UHtMAgj46WvDoN59ZyliiEI
-        FMWwlH1EQ1uzY3QHYnIuOm0MxxX0wsg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=onN0ZHZPa2j6tpDgsJt0Wzjm7hzuHqZyanl0pCWwqvQ=;
+        b=LdDLhbOrjZfR6vHHIxaadkBLyqYtEO00yGBzUyk4bkG/AiJqnuwvZzDw+sQuC0181wsMNh
+        cb0sYK4PC3MTbGy4xFI2VXsZgk39IA9/aSvAxGgwfXN/a9Arp0pJa/EZxY4qWCnvDv7JYv
+        xc3vibJAj3qb10JUn8W/lXKU1+DXbok=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-516-0HIxVeq1PGehQlJ21WvyzA-1; Thu, 21 Apr 2022 01:13:10 -0400
-X-MC-Unique: 0HIxVeq1PGehQlJ21WvyzA-1
+ us-mta-588-n6ShaFpmO8GKtexO1bl7cw-1; Thu, 21 Apr 2022 01:13:15 -0400
+X-MC-Unique: n6ShaFpmO8GKtexO1bl7cw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4FF8229DD98F;
-        Thu, 21 Apr 2022 05:13:09 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C7D40185A794;
+        Thu, 21 Apr 2022 05:13:14 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.40.194.231])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C534D145B96B;
-        Thu, 21 Apr 2022 05:13:03 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 791B6145BA5A;
+        Thu, 21 Apr 2022 05:13:09 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Rodrigo Vivi <rodrigo.vivi@intel.com>,
@@ -61,9 +61,9 @@ Cc:     Rodrigo Vivi <rodrigo.vivi@intel.com>,
         Borislav Petkov <bp@alien8.de>,
         Zhenyu Wang <zhenyuw@linux.intel.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [RFC PATCH v2 03/10] KVM: x86: mmu: add gfn_in_memslot helper
-Date:   Thu, 21 Apr 2022 08:12:37 +0300
-Message-Id: <20220421051244.187733-4-mlevitsk@redhat.com>
+Subject: [RFC PATCH v2 04/10] KVM: x86: mmu: tweak fast path for emulation of access to nested NPT pages
+Date:   Thu, 21 Apr 2022 08:12:38 +0300
+Message-Id: <20220421051244.187733-5-mlevitsk@redhat.com>
 In-Reply-To: <20220421051244.187733-1-mlevitsk@redhat.com>
 References: <20220421051244.187733-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -72,54 +72,32 @@ X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is a tiny refactoring, and can be useful to check
-if a GPA/GFN is within a memslot a bit more cleanly.
-
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- include/linux/kvm_host.h | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ arch/x86/kvm/mmu/mmu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 252ee4a61b58b..12e261559070b 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1580,6 +1580,13 @@ int kvm_request_irq_source_id(struct kvm *kvm);
- void kvm_free_irq_source_id(struct kvm *kvm, int irq_source_id);
- bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 23f895d439cf5..b63398dfdac3b 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5315,8 +5315,8 @@ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
+ 	 */
+ 	if (vcpu->arch.mmu->root_role.direct &&
+ 	    (error_code & PFERR_NESTED_GUEST_PAGE) == PFERR_NESTED_GUEST_PAGE) {
+-		kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(cr2_or_gpa));
+-		return 1;
++		if (kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(cr2_or_gpa)))
++			return 1;
+ 	}
  
-+
-+static inline bool gfn_in_memslot(struct kvm_memory_slot *slot, gfn_t gfn)
-+{
-+	return (gfn >= slot->base_gfn && gfn < slot->base_gfn + slot->npages);
-+}
-+
-+
- /*
-  * Returns a pointer to the memslot if it contains gfn.
-  * Otherwise returns NULL.
-@@ -1590,12 +1597,13 @@ try_get_memslot(struct kvm_memory_slot *slot, gfn_t gfn)
- 	if (!slot)
- 		return NULL;
- 
--	if (gfn >= slot->base_gfn && gfn < slot->base_gfn + slot->npages)
-+	if (gfn_in_memslot(slot, gfn))
- 		return slot;
- 	else
- 		return NULL;
- }
- 
-+
- /*
-  * Returns a pointer to the memslot that contains gfn. Otherwise returns NULL.
-  *
+ 	/*
 -- 
 2.26.3
 
