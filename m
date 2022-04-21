@@ -2,152 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE94C509FC4
-	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 14:39:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FD1250A036
+	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 15:02:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384950AbiDUMmI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Apr 2022 08:42:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44002 "EHLO
+        id S229956AbiDUNER (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 09:04:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238809AbiDUMmH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Apr 2022 08:42:07 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 387B921839;
-        Thu, 21 Apr 2022 05:39:18 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23LBw3qM004864;
-        Thu, 21 Apr 2022 12:39:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=+kgvRLmDHARgRwULOwUQD+32iZe0gP8THrq10wEwyys=;
- b=hWTpwOty+m6y+HCOPymgsC5RJMzaANX+oiJkXWBSpz51Cr1yJlMU7Y67dRQNe4vGjUbg
- t9Ftyyf4qHdsvCi+h7wn5I4l3LznUbL+QY5K/26KE8mbhjVQPix+hmT0KMDZIIaTVZGh
- m/yXDOFOiRY/oSbQFadQ+tiAmdQdnnnGNSv2k9p32lwz69aKILih2FDHIF5Al+OtrNsY
- xD37ezRuakSLKLt5p2uF/WOKEw7n/Xb5xA4RZf/BDG/aPy5p11K6r+SLiyjyvP3qMexA
- MTa5QVm6DTRaODgdiywVqHFiaC+/ZwAl/UiSYLt48GX3QEyf/4NwBvQl7prgWvSPgHZA yQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3fjer8pmhq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Apr 2022 12:39:17 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23LCBCFH024800;
-        Thu, 21 Apr 2022 12:39:16 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3fjer8pmh0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Apr 2022 12:39:16 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23LCX6KU028726;
-        Thu, 21 Apr 2022 12:39:14 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3ffne8quuh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Apr 2022 12:39:14 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23LCdN1l2949632
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Apr 2022 12:39:23 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C014542042;
-        Thu, 21 Apr 2022 12:39:11 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5CB844203F;
-        Thu, 21 Apr 2022 12:39:11 +0000 (GMT)
-Received: from [9.145.69.75] (unknown [9.145.69.75])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 21 Apr 2022 12:39:11 +0000 (GMT)
-Message-ID: <c3f528fc-16ff-ce88-d2ed-e8bb71cd42d2@linux.ibm.com>
-Date:   Thu, 21 Apr 2022 14:39:11 +0200
+        with ESMTP id S229947AbiDUNEQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 09:04:16 -0400
+Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7596E33342;
+        Thu, 21 Apr 2022 06:01:26 -0700 (PDT)
+Received: by mail-qk1-x72d.google.com with SMTP id b189so3439038qkf.11;
+        Thu, 21 Apr 2022 06:01:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=mQCnCf+K1M125bkYqePGyRgfEVPHEBFfxFtvjhJFkdM=;
+        b=CvLfCvp2RlnXmb8Ch8UStJY+Vdi4Se+tSAFtvLIozHN7P6YwKXGs6opnQhgfIEHwS2
+         VM1uBwviA1G8vFR6ELNSNdnxH6Bv8N9Rns6Ma8JJCDNfsdeWuucmWxiox42fgWevvSIe
+         AaJycjaS2jXEGlq/zyqCqIr3sJAKyQofhP2XHgtrCpK2fQq2tkMJogd3V3Tw1dTJrGdx
+         MKRiBGTB2SRjsTXwb1dTtpRHoQitYw70IjlkU1RTqU9MtAgYdBaqJIirQdxQlAX8rfh7
+         b5ZAB3ntSfIGqbRsCTWvscP+GgAIlY2CTtvNe8aG2MV2CQO+6hwUSQvIRZ/x9VgcmcHJ
+         5PWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=mQCnCf+K1M125bkYqePGyRgfEVPHEBFfxFtvjhJFkdM=;
+        b=odMGJmV72YuA2oo+1+9v2ApvxD3wlMypT+NaDUS2LE6tAImQDELsfl8kX2XFLFDl0O
+         uO7q5M389Y6cMUzDZzx4F7Wgf3cwOZWQvZHVAI5KKHIK6+2IWSrJCjPlA2b8o/meAeZA
+         J1rfPg3FRRWv3Gtb9zrdLm+I8okF3WTt4fWUxnHIdjs5GDTRNrHo9RHQ5zdazb/qWhRA
+         LzNhR9+L0/BCKxQgHSTkeNs7aZSaMqrabVKz615YBIREldEWjgqDaV5Og0daUalcZe2d
+         bUNDfcVRT/lR41GmH229y7Ew4Hr2kC7KqiyZ1daM2SCxawn9uFsjTNXDKYZJ/yLu4cX0
+         5y3A==
+X-Gm-Message-State: AOAM533YgZ8X+6MRWyWWrsjzonvYdAPV/xkhUmu9LAnG5saaYwVmjtWM
+        MHUjPpQ8SnIeRXU3E7xoLQ0=
+X-Google-Smtp-Source: ABdhPJxzqG8C1m/qSVTQIEwcpd6q8Y0psH+4g3rTkgMlOIbP5fXBF2c+6tJlNST0HG9ZqJK3Q28c2A==
+X-Received: by 2002:a37:aa48:0:b0:69e:d351:9683 with SMTP id t69-20020a37aa48000000b0069ed3519683mr5033435qke.539.1650546085430;
+        Thu, 21 Apr 2022 06:01:25 -0700 (PDT)
+Received: from localhost ([2601:c4:c432:7a1:dbb0:23b:8a79:595c])
+        by smtp.gmail.com with ESMTPSA id p13-20020a05622a048d00b002e1ce0c627csm3645548qtx.58.2022.04.21.06.01.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Apr 2022 06:01:24 -0700 (PDT)
+Date:   Thu, 21 Apr 2022 06:01:23 -0700
+From:   Yury Norov <yury.norov@gmail.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 3/4] KVM: s390: replace bitmap_copy with
+ bitmap_{from,to}_arr64 where appropriate
+Message-ID: <YmFVo8gR8UQ9uu2e@yury-laptop>
+References: <20220420222530.910125-1-yury.norov@gmail.com>
+ <20220420222530.910125-4-yury.norov@gmail.com>
+ <f2edeb89-54be-6100-9464-c99fdc4bd439@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [kvm-unit-tests PATCH v3 00/11] s390x: Cleanup and maintenance 4
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        thuth@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com
-References: <20220421101130.23107-1-frankja@linux.ibm.com>
- <20220421135920.426687fc@p-imbrenda>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220421135920.426687fc@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 2jQA2CaF8JxTxjDo7gYwhcwfot9QgDKh
-X-Proofpoint-ORIG-GUID: o2r-rMWdqPj8KyQ_FLibJJILjJfxV-9U
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-21_01,2022-04-21_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- mlxscore=0 priorityscore=1501 phishscore=0 malwarescore=0 mlxlogscore=999
- lowpriorityscore=0 spamscore=0 adultscore=0 bulkscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2204210069
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f2edeb89-54be-6100-9464-c99fdc4bd439@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/21/22 13:59, Claudio Imbrenda wrote:
-> On Thu, 21 Apr 2022 10:11:19 +0000
-> Janosch Frank <frankja@linux.ibm.com> wrote:
+On Thu, Apr 21, 2022 at 09:24:20AM +0200, David Hildenbrand wrote:
+> On 21.04.22 00:25, Yury Norov wrote:
+> > Copying bitmaps from/to 64-bit arrays with bitmap_copy is not safe
+> > in general case. Use designated functions instead.
+> > 
 > 
->> A few small cleanups and two patches that I forgot to upstream which
->> have now been rebased onto the machine.h library functions.
+> Just so I understand correctly: there is no BUG, it's just cleaner to do
+> it that way, correct?
+
+Yes. there's no bug, but the pattern is considered bad.
+
+https://lore.kernel.org/all/YiCWNdWd+AsLbDkp@smile.fi.intel.com/T/#m9080cbb8a8235d7d4b7e38292cee8e4903f9afe4q
+ 
+> IIUC, bitmap_to_arr64() translates to bitmap_copy_clear_tail() on s390x.
+
+Yes.
+ 
+> As the passed length is always 1024 (KVM_S390_VM_CPU_FEAT_NR_BITS), we
+> essentially end up with bitmap_copy() again.
 > 
-> thanks, queued
 > 
+> Looks cleaner to me
 
-Please drop the register restore patch #11 from your queue.
+Thanks.
 
-Nico rightly complained that r0/r1 are volatile and I shouldn't have to 
-restore them. It's been too long for me to fully remember why I had to 
-fix that. It might have been a diag308 wrongfully resetting all 
-registers but not loading the reset PSW. Whatever issue I had, the 
-commit message is wrong anyway. If I'm able to remember the issue I'll 
-fix and post the patch again.
-
->>
->> v3:
->> 	* Added review tags
->> 	* Added uv-host and diag308 fix
->> 	* Diag308 subcode 2 patch, moved the prefix push and pop outside of the if
->>
->> v2:
->> 	* Added host_is_qemu() function
->> 	* Fixed qemu checks
->>
->> Janosch Frank (11):
->>    lib: s390x: hardware: Add host_is_qemu() function
->>    s390x: css: Skip if we're not run by qemu
->>    s390x: diag308: Only test subcode 2 under QEMU
->>    s390x: pfmf: Initialize pfmf_r1 union on declaration
->>    s390x: snippets: asm: Add license and copyright headers
->>    s390x: pv-diags: Cleanup includes
->>    s390x: css: Cleanup includes
->>    s390x: iep: Cleanup includes
->>    s390x: mvpg: Cleanup includes
->>    s390x: uv-host: Fix pgm tests
->>    s390x: Restore registers in diag308_load_reset() error path
->>
->>   lib/s390x/hardware.h                       |  5 +++
->>   s390x/cpu.S                                |  1 +
->>   s390x/css.c                                | 18 ++++++----
->>   s390x/diag308.c                            | 18 +++++++++-
->>   s390x/iep.c                                |  3 +-
->>   s390x/mvpg.c                               |  3 --
->>   s390x/pfmf.c                               | 39 +++++++++++-----------
->>   s390x/pv-diags.c                           | 17 ++--------
->>   s390x/snippets/asm/snippet-pv-diag-288.S   |  9 +++++
->>   s390x/snippets/asm/snippet-pv-diag-500.S   |  9 +++++
->>   s390x/snippets/asm/snippet-pv-diag-yield.S |  9 +++++
->>   s390x/uv-host.c                            |  2 +-
->>   12 files changed, 85 insertions(+), 48 deletions(-)
->>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
 > 
-
+> 
+> -- 
+> Thanks,
+> 
+> David / dhildenb
