@@ -2,158 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E9DC650A477
-	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 17:40:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE37F50A4D2
+	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 17:58:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231931AbiDUPmv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Apr 2022 11:42:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37116 "EHLO
+        id S1390399AbiDUQAB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 12:00:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1390287AbiDUPms (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Apr 2022 11:42:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32B8EA187
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 08:39:58 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BFD4D61C83
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 15:39:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B193C385A5;
-        Thu, 21 Apr 2022 15:39:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1650555597;
-        bh=xnNDIFGmGErE9LYA+F8Mqxfij5dEJ8CYiCbCDus4rCM=;
-        h=From:To:Cc:Subject:Date:From;
-        b=fFfaFq+4lbUg60iP1903baEwHcLK0HONk8bCGwEKfntbSrr9q3sHmA38cyfcn6oJd
-         BIztdjiDJyBTr2sDSvuN/4bNwbyiEcQeymFfGbyql+2jdkR0gf3GidJP8XSstDTD9e
-         0GhhSHSpCrRqwiJ0vQ2/o0umPM93SR/cUUVXOZ1QwQOKIUgGq2l7f5OI8BKPZR9Tf9
-         VOpSSvQKqMon7ShWo99ziVbHXN/8LdUdgvCsNldrh4CP2pkIdmVHOZ5XhAXEjtKm7b
-         Z+CooR4j8q2WCV8Bk8GhN21XWrFPhyWUjCDRD/wzDUjtPqEEqtl/XeyLuFo9u/CTVz
-         7HJ6jc3zOYhpw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1nhYuQ-005vqc-Nr; Thu, 21 Apr 2022 16:39:54 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com, Quentin Perret <qperret@google.com>,
-        Will Deacon <will@kernel.org>,
-        Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH] KVM: arm64: Inject exception on out-of-IPA-range translation fault
-Date:   Thu, 21 Apr 2022 16:39:49 +0100
-Message-Id: <20220421153949.2931552-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S1390438AbiDUP7y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 11:59:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 395B147045
+        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 08:56:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650556617;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kTeK/qAo71TOtFSLAt36q1Ck1F47EJBRXs8RHdefg1E=;
+        b=QddvzlnKhsW2BZeob9ga3fG8IPvj/7eZxhPwSAvGKbExEQqia4miPIfZ9RxwgMSn0pmZeU
+        AXiVGFshYtAabTNr3SVMoDCGO2fqvOBH7f575aX/Zhc8bveoK3DYV/Ifz9jctaVPsasfsZ
+        cox/LdxCJo0OfC6ASNLQiDj/zLAl0u8=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-523-_gdXU4J0NxGT8eRprjwqFg-1; Thu, 21 Apr 2022 11:56:55 -0400
+X-MC-Unique: _gdXU4J0NxGT8eRprjwqFg-1
+Received: by mail-wr1-f71.google.com with SMTP id f2-20020a056000036200b00207a14a1f96so1284799wrf.3
+        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 08:56:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:subject:in-reply-to
+         :content-transfer-encoding;
+        bh=kTeK/qAo71TOtFSLAt36q1Ck1F47EJBRXs8RHdefg1E=;
+        b=XRcRqdWdt/BEAolQoWJPXwzdgoeZBgSz5HfX33gm/d8c0uA22pCOlyv4rMSfIweS01
+         2zP/7p3eEeeiZCldi6SGJvwXI8Y3m9XDQr+9O6Fkxa0Vca/uoEXiwrdfnhKHMAwFqBQ3
+         pdKrPkwrv38lyCOkizN9DROds4fqfVn3rU3QEXFIZTcYxSS7I0Vx0h8cFjl/375oUmpN
+         Eny7JOCOZ8DRwFohXHqfgJDHTf/qvjk8eRKpi0qRmqoOziR/WwiHJ5QeAW90bb49wVeD
+         Qx+yxRTvJj8/uhEpZkhf8l9IqqY5bV+HeDcIxoiBWhlRYfsdr5oI/6+OIJ0G4FEPtlIS
+         xFZw==
+X-Gm-Message-State: AOAM530qxdBG+J35+PzK3TukwxxpGDP7xnF1Gph+1ObY+oRUcLCsPydZ
+        F47+9f3hrp9BKnYfTew29Iq6AKhgeqjVKHQDy0KeVSwZd4wAp7i4i0kjcERdvYwsaiUUzZ8+7qu
+        lrjsu3Vdtx4ob
+X-Received: by 2002:a05:600c:1553:b0:392:8de8:9dfa with SMTP id f19-20020a05600c155300b003928de89dfamr9333055wmg.71.1650556614807;
+        Thu, 21 Apr 2022 08:56:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy0vnAguST9pNCVtCDxTQ4/Al3Ko2yn2bs4Mmrfapj6XXW5P+04XyixAwoJmjwNo7AIJIlKpg==
+X-Received: by 2002:a05:600c:1553:b0:392:8de8:9dfa with SMTP id f19-20020a05600c155300b003928de89dfamr9333046wmg.71.1650556614571;
+        Thu, 21 Apr 2022 08:56:54 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id l10-20020a05600002aa00b0020a7cc29000sm2769430wry.75.2022.04.21.08.56.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Apr 2022 08:56:53 -0700 (PDT)
+Message-ID: <62e9ece1-5d71-f803-3f65-2755160cf1d1@redhat.com>
+Date:   Thu, 21 Apr 2022 17:56:52 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com, qperret@google.com, will@kernel.org, christoffer.dall@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Content-Language: en-US
+To:     Peter Gonda <pgonda@google.com>,
+        John Sperbeck <jsperbeck@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        LKML <linux-kernel@vger.kernel.org>
+References: <20220407195908.633003-1-pgonda@google.com>
+ <CAFNjLiXC0AdOw5f8Ovu47D==ex7F0=WN_Ocirymz4xL=mWvC5A@mail.gmail.com>
+ <CAMkAt6r-Mc_YN-gVHuCpTj4E1EmcvyYpP9jhtHo5HRHnoNJAdA@mail.gmail.com>
+ <CAMkAt6r+OMPWCbV_svUyGWa0qMzjj2UEG29G6P7jb6uH6yko2w@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3] KVM: SEV: Mark nested locking of vcpu->lock
+In-Reply-To: <CAMkAt6r+OMPWCbV_svUyGWa0qMzjj2UEG29G6P7jb6uH6yko2w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When taking an translation fault for an IPA that is outside of
-the range defined by the hypervisor (between the HW PARange and
-that exposed to the guest), we stupidly treat it as an IO and
-forward the access to userspace. Of course, userspace can't do
-much with it, and things end badly.
+On 4/20/22 22:14, Peter Gonda wrote:
+>>>> svm_vm_migrate_from() uses sev_lock_vcpus_for_migration() to lock all
+>>>> source and target vcpu->locks. Mark the nested subclasses to avoid false
+>>>> positives from lockdep.
+>> Nope. Good catch, I didn't realize there was a limit 8 subclasses:
+> Does anyone have thoughts on how we can resolve this vCPU locking with
+> the 8 subclass max?
 
-Arguably, the guest is braindead, but we should at least catch the
-case and inject an exception.
+The documentation does not have anything.  Maybe you can call 
+mutex_release manually (and mutex_acquire before unlocking).
 
-Check the faulting IPA against the IPA size the VM has, and
-inject an Address Size Fault at level 0 if the access fails the
-check.
-
-Reported-by: Christoffer Dall <christoffer.dall@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_emulate.h |  1 +
- arch/arm64/kvm/inject_fault.c        | 28 ++++++++++++++++++++++++++++
- arch/arm64/kvm/mmu.c                 |  7 +++++++
- 3 files changed, 36 insertions(+)
-
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 7496deab025a..f71358271b71 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -40,6 +40,7 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
- void kvm_inject_vabt(struct kvm_vcpu *vcpu);
- void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
- void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
-+void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
- 
- void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
- 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index b47df73e98d7..ba20405d2dc2 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -145,6 +145,34 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
- 		inject_abt64(vcpu, true, addr);
- }
- 
-+void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
-+{
-+	unsigned long addr, esr;
-+
-+	addr  = kvm_vcpu_get_fault_ipa(vcpu);
-+	addr |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
-+
-+	if (kvm_vcpu_trap_is_iabt(vcpu))
-+		kvm_inject_pabt(vcpu, addr);
-+	else
-+		kvm_inject_dabt(vcpu, addr);
-+
-+	/*
-+	 * If AArch64 or LPAE, set FSC to 0 to indicate an Address
-+	 * Size Fault at level 0, as if exceeding PARange.
-+	 *
-+	 * Non-LPAE guests will only get the external abort, as there
-+	 * is no way to to describe the ASF.
-+	 */
-+	if (vcpu_el1_is_32bit(vcpu) &&
-+	    !(vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE))
-+		return;
-+
-+	esr = vcpu_read_sys_reg(vcpu, ESR_EL1);
-+	esr &= ~GENMASK_ULL(5, 0);
-+	vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
-+}
-+
- /**
-  * kvm_inject_undefined - inject an undefined instruction into the guest
-  * @vcpu: The vCPU in which to inject the exception
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 53ae2c0640bc..de6c3ae4afd5 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1337,6 +1337,13 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
- 	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
- 
-+	/* Address Size Fault? */
-+	if (fault_status == FSC_FAULT &&
-+	    fault_ipa >= BIT_ULL(vcpu->arch.hw_mmu->pgt->ia_bits)) {
-+		kvm_inject_size_fault(vcpu);
-+		return 1;
-+	}
-+
- 	/* Synchronous External Abort? */
- 	if (kvm_vcpu_abt_issea(vcpu)) {
- 		/*
--- 
-2.34.1
+Paolo
 
