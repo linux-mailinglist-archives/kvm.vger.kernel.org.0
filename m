@@ -2,69 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C5D650A640
-	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 18:52:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4778650A66B
+	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 18:59:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355269AbiDUQyp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Apr 2022 12:54:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35688 "EHLO
+        id S1390485AbiDURAl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 13:00:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352895AbiDUQym (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Apr 2022 12:54:42 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE1D7496BD
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 09:51:51 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id b73-20020a25cb4c000000b0064505a59a7aso4869875ybg.5
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 09:51:51 -0700 (PDT)
+        with ESMTP id S232622AbiDURAe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 13:00:34 -0400
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 355C649CA0
+        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 09:57:44 -0700 (PDT)
+Received: by mail-yb1-xb29.google.com with SMTP id j2so9892375ybu.0
+        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 09:57:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=IFP8dHfODAcQGiAaeMaPY6n82yRD8VX6rTDaKDuDzEA=;
-        b=p9OLIeRHd/WWFguaSWOzgqSENN+cWNzfUAd9HPgNGe3r/rzFn62/OoDwtSjkoNL78A
-         ec1FiOJ67UPu04RxzQolGEkLPyXnpyCe0vnOnI7vpmfGAz09rvlHWedd6NhgaBBa3ssq
-         KMyBweJ4oUBbuHgwRW3neg+L0xQWZuOpCkrUoB0cb41CA+1R1sLYp/G5QQjrmZ2e4wwp
-         qMBf/Phy4x24C8GsmqaEXK4LsAp3ye7Euya2qnbzoJQF43MAgst27zwKyxVA/i8uJ6fc
-         lhlyS4n20g10s9/31Wru17Ho4nZC3jhQSQNLh4gVscY3ySdyqWwdFXkOcGwmj+nJdXuh
-         GDNw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=cd7VNqz49ygj/O4UJWXzkGobo65UJfz5UPdoBEmOe7Q=;
+        b=dGscUWZoj1e1HyGOcqBRSS5CrnxTGzyftEuoC36qDGfMjsxnd7J8FJPYKkhmXbhESi
+         SgoBJw0iC5T2/+DcIyhWkJNR4fXmNTMLUG34G+Y6r0RopSlSLLIOV2y2vDaRaBJyJ2w9
+         9tu3QZAKRDwts/cI58ZwesvVIanL7d5nOzW2FNqEwoS2nNK4gUtb9BHYeQUD2y2i9/c0
+         OzTXrixonKk1S0WERX+2iW7NTAkp8Npg6hfI/fQjuO7+l/PgqirKjwM85MGLpX4OmANp
+         li3yMxI/WwqN4fyiIN9fdiSI53P4m8Ov5Mj29fdEhJvM5WSsf1Cb0J8fzp1uHFL6M4xw
+         SC3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=IFP8dHfODAcQGiAaeMaPY6n82yRD8VX6rTDaKDuDzEA=;
-        b=APO27P9R9wHevmU1u5THYXQGsXnq0Q4I4RCKXmOySsTecWeBmf++MD+81uOQ8zSpw3
-         pQtZuJBgtcMcGMmEhnjIXszLTVtthG5YIG4AGjJYQ9oJa1AlMPQgLgQKDPSOJQ1t3EW3
-         JF2lzYaxay3Um6rMHbV1Kt9Cr9QK4YRC7p+Tfi2Yr7wCJLpRrnlIlwTszuMkoMz2oArq
-         8Q/MO7DUt3Xk7IMXoVJKkcHRazBOkwquLzQhEqe8CjAKRcJMoXHImUSDKpY57MNN9u56
-         7hcCPDjFvMEkrdvENrfUHSfwDgQpSrrj+o2k9IAgIQE7pxxZ9Py4uy5dwi+V3lnnS5gI
-         314A==
-X-Gm-Message-State: AOAM5320BAn0HAkcVJeEq2iOLiZYUv8+2cTX4CV1sTQvJvuBIhp9Mg7g
-        4cMMgaB23FxgtZPp9QZBMPG74ue0
-X-Google-Smtp-Source: ABdhPJyCWHZngFS/hK6FPiBgDeCIeK3wTfM3o5WOxaOCHNI3yjxGeiEtBjueumJuylGxnBtGQXTymqBx
-X-Received: from posk.svl.corp.google.com ([2620:15c:2cd:202:af90:3136:42b1:c8e2])
- (user=posk job=sendgmr) by 2002:a05:6902:10c2:b0:645:2c6e:b43b with SMTP id
- w2-20020a05690210c200b006452c6eb43bmr662985ybu.358.1650559910996; Thu, 21 Apr
- 2022 09:51:50 -0700 (PDT)
-Date:   Thu, 21 Apr 2022 09:51:37 -0700
-Message-Id: <20220421165137.306101-1-posk@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.36.0.rc2.479.g8af0fa9b8e-goog
-Subject: [PATCH] KVM: x86: add HC_VMM_CUSTOM hypercall
-From:   Peter Oskolkov <posk@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=cd7VNqz49ygj/O4UJWXzkGobo65UJfz5UPdoBEmOe7Q=;
+        b=OPEI3yjbq618/6qorcecXddedacpHXOyv23kz4zQ9vgADCLOsYjOD1WIbXz+RgC8zA
+         un4XiIs/6hmOri7Vr2li40howe//+sodUQKzq75BmOO3m0RFMb/EjnMHcd4zMi3iYoMF
+         tOPf2b+JC7Zc5iqd2ggNAW3geL0ep8wD6qZ5hap5fkdIa7RUuefYtjBatn4vRH/8ATSX
+         NOD5/QH6cR5QlN7j6kgpJDIsK3zFg7zBby1XrjvlYFbinFa+vYpiuk2Jn4jlEzy1w6/y
+         sAbhaZFSnhAF65eyzb5KbiBj5XQnxEmSuDEYJ6shyTXlzFL6fNZOnW3y5/HBX6zi881o
+         WNzA==
+X-Gm-Message-State: AOAM530huqs1IDF1x5+F9j0AXiqMW1nEhEkYjy9QHBH8gNJSsbIesyNz
+        SiHcVTFyIkBmBxjS/jIcbs5wi1LiSQn6Ol4NpZnibQ==
+X-Google-Smtp-Source: ABdhPJzf2IxEf+MJhO6vY8kqURjFFp1Ri0to8KxTdQWq4zfs9C6bKJx8y9ifyDEITwNp7ShT1yqiKumS2tz2RxLv13Q=
+X-Received: by 2002:a25:add6:0:b0:641:2562:4022 with SMTP id
+ d22-20020a25add6000000b0064125624022mr582597ybe.391.1650560263152; Thu, 21
+ Apr 2022 09:57:43 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220415215901.1737897-1-oupton@google.com> <20220415215901.1737897-7-oupton@google.com>
+In-Reply-To: <20220415215901.1737897-7-oupton@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Thu, 21 Apr 2022 09:57:32 -0700
+Message-ID: <CANgfPd8RLDtmFks0BLEVyHPaEANF93d4iJxHt3n6cKewQsBLuA@mail.gmail.com>
+Subject: Re: [RFC PATCH 06/17] KVM: arm64: Implement break-before-make
+ sequence for parallel walks
+To:     Oliver Upton <oupton@google.com>
+Cc:     "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>, kvm <kvm@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Paul Turner <pjt@google.com>, Peter Oskolkov <posk@posk.io>,
-        Peter Oskolkov <posk@google.com>
+        David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,123 +78,304 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Allow kvm-based VMMs to request KVM to pass a custom vmcall
-from the guest to the VMM in the host.
+On Fri, Apr 15, 2022 at 2:59 PM Oliver Upton <oupton@google.com> wrote:
+>
+> The ARM architecture requires that software use the 'break-before-make'
+> sequence whenever memory is being remapped. An additional requirement of
+> parallel page walks is a mechanism to ensure exclusive access to a pte,
+> thereby avoiding two threads changing the pte and invariably stomping on
+> one another.
+>
+> Roll the two concepts together into a new helper to implement the
+> 'break' sequence. Use a special invalid pte value to indicate that the
+> pte is under the exclusive control of a thread. If software walkers are
+> traversing the tables in parallel, use an atomic compare-exchange to
+> break the pte. Retry execution on a failed attempt to break the pte, in
+> the hopes that either the instruction will succeed or the pte lock will
+> be successfully acquired.
+>
+> Avoid unnecessary DSBs and TLBIs by only completing the sequence if the
+> evicted pte was valid. For counted non-table ptes drop the reference
+> immediately. Otherwise, references on tables are dropped in post-order
+> traversal as the walker must recurse on the pruned subtree.
+>
+> All of the new atomics do nothing (for now), as there are a few other
+> bits of the map walker that need to be addressed before actually walking
+> in parallel.
 
-Quite often, operating systems research projects and/or specialized
-paravirtualized workloads would benefit from a extra-low-overhead,
-extra-low-latency guest-host communication channel.
+I want to make sure I understand the make before break / PTE locking
+patterns here.
+Please check my understanding of the following cases:
 
-With cloud-hypervisor modified to handle the new hypercall (simply
-return the sum of the received arguments), the following function in
-guest _userspace_ completes, on average, in 2.5 microseconds (walltime)
-on a relatively modern Intel Xeon processor:
+Case 1: Change a leaf PTE (for some reason)
+1. Traverse the page table to the leaf
+2. Invalidate the leaf PTE, replacing it with a locked PTE
+3. Flush TLBs
+4. Replace the locked PTE with the new value
 
-	uint64_t hypercall_custom_vmm(uint64_t a0, uint64_t a1,
-					uint64_t a2, uint64_t a3)
-	{
-		uint64_t ret;
+In this case, no need to lock the parent SPTEs, right? This is pretty simple.
 
-		asm(
-			"movq   $13, %%rax \n\t"  // hypercall nr.
-			"movq %[a0], %%rbx \n\t"  // a0
-			"movq %[a1], %%rcx \n\t"  // a1
-			"movq %[a2], %%rdx \n\t"  // a2
-			"movq %[a3], %%rsi \n\t"  // a3
-			"vmcall            \n\t"
-			"movq %%rax, %[ret] \n\t" // ret
-			: [ret] "=r"(ret)
-			: [a0] "r"(a0), [a1] "r"(a1), [a2] "r"(a2), [a3] "r"(a3)
-			: "rax", "rbx", "rcx", "rdx", "rsi"
-		);
+Case 2:  Drop a page table
+1. Traverse to some non-leaf PTE
+2. Lock the PTE, invalidating it
+3. Recurse into the child page table
+4. Lock the PTEs in the child page table. (We need to lock ALL the
+PTEs here right? I don't think we'd get away with locking only the
+valid ones)
+5. Flush TLBs
+6. Unlock the PTE from 2
+7. Free the child page after an RCU grace period (via callback)
 
-		return ret;
-	}
+Case 3: Drop a range of leaf PTEs
+1. Traverse the page table to the first leaf
+2. For each leaf in the range:
+        a. Invalidate the leaf PTE, replacing it with a locked PTE
+3. Flush TLBs
+4. unlock the locked PTEs
 
-Signed-off-by: Peter Oskolkov <posk@google.com>
----
- arch/x86/kvm/x86.c            | 28 ++++++++++++++++++++++++++--
- include/uapi/linux/kvm_para.h |  1 +
- 2 files changed, 27 insertions(+), 2 deletions(-)
+In this case we have to lock ALL PTEs in the range too, right? My
+worry about the whole locking scheme is making sure each thread
+correctly remembers which PTEs it locked versus which might have been
+locked by other threads.
+On x86 we solved this by only locking one SPTE at a time, flushing,
+then fixing it, but if you're locking a bunch at once it might get
+complicated.
+Making this locking scheme work without demolishing performance seems hard.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ab336f7c82e4..343971128da7 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -108,7 +108,8 @@ static u64 __read_mostly efer_reserved_bits = ~((u64)EFER_SCE);
- 
- static u64 __read_mostly cr4_reserved_bits = CR4_RESERVED_BITS;
- 
--#define KVM_EXIT_HYPERCALL_VALID_MASK (1 << KVM_HC_MAP_GPA_RANGE)
-+#define KVM_EXIT_HYPERCALL_VALID_MASK  ((1 << KVM_HC_MAP_GPA_RANGE) | \
-+					(1 << KVM_HC_VMM_CUSTOM))
- 
- #define KVM_CAP_PMU_VALID_MASK KVM_PMU_CAP_DISABLE
- 
-@@ -9207,10 +9208,16 @@ static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
- 	return kvm_skip_emulated_instruction(vcpu);
- }
- 
-+static int kvm_allow_hypercall_from_userspace(int nr)
-+{
-+	return nr == KVM_HC_VMM_CUSTOM;
-+}
-+
- int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
- {
- 	unsigned long nr, a0, a1, a2, a3, ret;
- 	int op_64_bit;
-+	int cpl;
- 
- 	if (kvm_xen_hypercall_enabled(vcpu->kvm))
- 		return kvm_xen_hypercall(vcpu);
-@@ -9235,7 +9242,8 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
- 		a3 &= 0xFFFFFFFF;
- 	}
- 
--	if (static_call(kvm_x86_get_cpl)(vcpu) != 0) {
-+	cpl = static_call(kvm_x86_get_cpl)(vcpu);
-+	if (cpl != 0 && !kvm_allow_hypercall_from_userspace(nr)) {
- 		ret = -KVM_EPERM;
- 		goto out;
- 	}
-@@ -9294,6 +9302,22 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
- 		vcpu->arch.complete_userspace_io = complete_hypercall_exit;
- 		return 0;
- 	}
-+	case KVM_HC_VMM_CUSTOM:
-+		ret = -KVM_ENOSYS;
-+		if (!(vcpu->kvm->arch.hypercall_exit_enabled & (1 << KVM_HC_VMM_CUSTOM)))
-+			break;
-+
-+		vcpu->run->exit_reason        = KVM_EXIT_HYPERCALL;
-+		vcpu->run->hypercall.nr       = KVM_HC_VMM_CUSTOM;
-+		vcpu->run->hypercall.args[0]  = a0;
-+		vcpu->run->hypercall.args[1]  = a1;
-+		vcpu->run->hypercall.args[2]  = a2;
-+		vcpu->run->hypercall.args[3]  = a3;
-+		vcpu->run->hypercall.args[4]  = 0;
-+		vcpu->run->hypercall.args[5]  = cpl;
-+		vcpu->run->hypercall.longmode = op_64_bit;
-+		vcpu->arch.complete_userspace_io = complete_hypercall_exit;
-+		return 0;
- 	default:
- 		ret = -KVM_ENOSYS;
- 		break;
-diff --git a/include/uapi/linux/kvm_para.h b/include/uapi/linux/kvm_para.h
-index 960c7e93d1a9..8caab28c9025 100644
---- a/include/uapi/linux/kvm_para.h
-+++ b/include/uapi/linux/kvm_para.h
-@@ -30,6 +30,7 @@
- #define KVM_HC_SEND_IPI		10
- #define KVM_HC_SCHED_YIELD		11
- #define KVM_HC_MAP_GPA_RANGE		12
-+#define KVM_HC_VMM_CUSTOM		13
- 
- /*
-  * hypercalls use architecture specific
-
-base-commit: 150866cd0ec871c765181d145aa0912628289c8a
--- 
-2.36.0.rc2.479.g8af0fa9b8e-goog
-
+>
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  arch/arm64/kvm/hyp/pgtable.c | 172 +++++++++++++++++++++++++++++------
+>  1 file changed, 146 insertions(+), 26 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index bf46d6d24951..059ebb921125 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -49,6 +49,12 @@
+>  #define KVM_INVALID_PTE_OWNER_MASK     GENMASK(9, 2)
+>  #define KVM_MAX_OWNER_ID               1
+>
+> +/*
+> + * Used to indicate a pte for which a 'make-before-break' sequence is in
+> + * progress.
+> + */
+> +#define KVM_INVALID_PTE_LOCKED         BIT(10)
+> +
+>  struct kvm_pgtable_walk_data {
+>         struct kvm_pgtable              *pgt;
+>         struct kvm_pgtable_walker       *walker;
+> @@ -707,6 +713,122 @@ static bool stage2_pte_is_counted(kvm_pte_t pte)
+>         return kvm_pte_valid(pte) || kvm_invalid_pte_owner(pte);
+>  }
+>
+> +static bool stage2_pte_is_locked(kvm_pte_t pte)
+> +{
+> +       return !kvm_pte_valid(pte) && (pte & KVM_INVALID_PTE_LOCKED);
+> +}
+> +
+> +static inline bool kvm_try_set_pte(kvm_pte_t *ptep, kvm_pte_t old, kvm_pte_t new, bool shared)
+> +{
+> +       if (!shared) {
+> +               WRITE_ONCE(*ptep, new);
+> +               return true;
+> +       }
+> +
+> +       return cmpxchg(ptep, old, new) == old;
+> +}
+> +
+> +/**
+> + * stage2_try_break_pte() - Invalidates a pte according to the
+> + *                         'break-before-make' sequence.
+> + *
+> + * @ptep: Pointer to the pte to break
+> + * @old: The previously observed value of the pte; used for compare-exchange in
+> + *      a parallel walk
+> + * @addr: IPA corresponding to the pte
+> + * @level: Table level of the pte
+> + * @shared: true if the tables are shared by multiple software walkers
+> + * @data: pointer to the map walker data
+> + *
+> + * Returns: true if the pte was successfully broken.
+> + *
+> + * If the removed pt was valid, performs the necessary DSB and TLB flush for
+> + * the old value. Drops references to the page table if a non-table entry was
+> + * removed. Otherwise, the table reference is preserved as the walker must also
+> + * recurse through the child tables.
+> + *
+> + * See ARM DDI0487G.a D5.10.1 "General TLB maintenance requirements" for details
+> + * on the 'break-before-make' sequence.
+> + */
+> +static bool stage2_try_break_pte(kvm_pte_t *ptep, kvm_pte_t old, u64 addr, u32 level, bool shared,
+> +                                struct stage2_map_data *data)
+> +{
+> +       /*
+> +        * Another thread could have already visited this pte and taken
+> +        * ownership.
+> +        */
+> +       if (stage2_pte_is_locked(old)) {
+> +               /*
+> +                * If the table walker has exclusive access to the page tables
+> +                * then no other software walkers should have locked the pte.
+> +                */
+> +               WARN_ON(!shared);
+> +               return false;
+> +       }
+> +
+> +       if (!kvm_try_set_pte(ptep, old, KVM_INVALID_PTE_LOCKED, shared))
+> +               return false;
+> +
+> +       /*
+> +        * If we removed a valid pte, break-then-make rules are in effect as a
+> +        * translation may have been cached that traversed this entry.
+> +        */
+> +       if (kvm_pte_valid(old)) {
+> +               dsb(ishst);
+> +
+> +               if (kvm_pte_table(old, level))
+> +                       /*
+> +                        * Invalidate the whole stage-2, as we may have numerous leaf
+> +                        * entries below us which would otherwise need invalidating
+> +                        * individually.
+> +                        */
+> +                       kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
+> +               else
+> +                       kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, data->mmu, addr, level);
+> +       }
+> +
+> +       /*
+> +        * Don't drop the reference on table entries yet, as the walker must
+> +        * first recurse on the unlinked subtree to unlink and drop references
+> +        * to child tables.
+> +        */
+> +       if (!kvm_pte_table(old, level) && stage2_pte_is_counted(old))
+> +               data->mm_ops->put_page(ptep);
+> +
+> +       return true;
+> +}
+> +
+> +/**
+> + * stage2_make_pte() - Installs a new pte according to the 'break-before-make'
+> + *                    sequence.
+> + *
+> + * @ptep: pointer to the pte to make
+> + * @new: new pte value to install
+> + *
+> + * Assumes that the pte addressed by ptep has already been broken and is under
+> + * the ownership of the table walker. If the new pte to be installed is a valid
+> + * entry, perform a DSB to make the write visible. Raise the reference count on
+> + * the table if the new pte requires a reference.
+> + *
+> + * See ARM DDI0487G.a D5.10.1 "General TLB maintenance requirements" for details
+> + * on the 'break-before-make' sequence.
+> + */
+> +static void stage2_make_pte(kvm_pte_t *ptep, kvm_pte_t new, struct kvm_pgtable_mm_ops *mm_ops)
+> +{
+> +       /* Yikes! We really shouldn't install to an entry we don't own. */
+> +       WARN_ON(!stage2_pte_is_locked(*ptep));
+> +
+> +       if (stage2_pte_is_counted(new))
+> +               mm_ops->get_page(ptep);
+> +
+> +       if (kvm_pte_valid(new)) {
+> +               WRITE_ONCE(*ptep, new);
+> +               dsb(ishst);
+> +       } else {
+> +               smp_store_release(ptep, new);
+> +       }
+> +}
+> +
+>  static void stage2_put_pte(kvm_pte_t *ptep, struct kvm_s2_mmu *mmu, u64 addr,
+>                            u32 level, struct kvm_pgtable_mm_ops *mm_ops)
+>  {
+> @@ -760,18 +882,17 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+>         else
+>                 new = kvm_init_invalid_leaf_owner(data->owner_id);
+>
+> -       if (stage2_pte_is_counted(old)) {
+> -               /*
+> -                * Skip updating the PTE if we are trying to recreate the exact
+> -                * same mapping or only change the access permissions. Instead,
+> -                * the vCPU will exit one more time from guest if still needed
+> -                * and then go through the path of relaxing permissions.
+> -                */
+> -               if (!stage2_pte_needs_update(old, new))
+> -                       return -EAGAIN;
+> +       /*
+> +        * Skip updating the PTE if we are trying to recreate the exact same
+> +        * mapping or only change the access permissions. Instead, the vCPU will
+> +        * exit one more time from the guest if still needed and then go through
+> +        * the path of relaxing permissions.
+> +        */
+> +       if (!stage2_pte_needs_update(old, new))
+> +               return -EAGAIN;
+>
+> -               stage2_put_pte(ptep, data->mmu, addr, level, mm_ops);
+> -       }
+> +       if (!stage2_try_break_pte(ptep, old, addr, level, shared, data))
+> +               return -EAGAIN;
+>
+>         /* Perform CMOs before installation of the guest stage-2 PTE */
+>         if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
+> @@ -781,9 +902,7 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+>         if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
+>                 mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
+>
+> -       smp_store_release(ptep, new);
+> -       if (stage2_pte_is_counted(new))
+> -               mm_ops->get_page(ptep);
+> +       stage2_make_pte(ptep, new, data->mm_ops);
+>         if (kvm_phys_is_valid(phys))
+>                 data->phys += granule;
+>         return 0;
+> @@ -800,15 +919,10 @@ static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
+>         if (!stage2_leaf_mapping_allowed(addr, end, level, data))
+>                 return 0;
+>
+> -       data->childp = kvm_pte_follow(*old, data->mm_ops);
+> -       kvm_clear_pte(ptep);
+> +       if (!stage2_try_break_pte(ptep, *old, addr, level, shared, data))
+> +               return -EAGAIN;
+>
+> -       /*
+> -        * Invalidate the whole stage-2, as we may have numerous leaf
+> -        * entries below us which would otherwise need invalidating
+> -        * individually.
+> -        */
+> -       kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
+> +       data->childp = kvm_pte_follow(*old, data->mm_ops);
+>         data->anchor = ptep;
+>         return 0;
+>  }
+> @@ -837,18 +951,24 @@ static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>         if (!data->memcache)
+>                 return -ENOMEM;
+>
+> +       if (!stage2_try_break_pte(ptep, *old, addr, level, shared, data))
+> +               return -EAGAIN;
+> +
+>         childp = mm_ops->zalloc_page(data->memcache);
+> -       if (!childp)
+> +       if (!childp) {
+> +               /*
+> +                * Release the pte if we were unable to install a table to allow
+> +                * another thread to make an attempt.
+> +                */
+> +               stage2_make_pte(ptep, 0, data->mm_ops);
+>                 return -ENOMEM;
+> +       }
+>
+>         /*
+>          * If we've run into an existing block mapping then replace it with
+>          * a table. Accesses beyond 'end' that fall within the new table
+>          * will be mapped lazily.
+>          */
+> -       if (stage2_pte_is_counted(*old))
+> -               stage2_put_pte(ptep, data->mmu, addr, level, mm_ops);
+> -
+>         kvm_set_table_pte(ptep, childp, mm_ops);
+>         mm_ops->get_page(ptep);
+>         *old = *ptep;
+> --
+> 2.36.0.rc0.470.gd361397f0d-goog
+>
