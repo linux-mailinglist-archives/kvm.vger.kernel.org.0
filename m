@@ -2,95 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 214D650A7AB
-	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 20:03:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A45D50A7D1
+	for <lists+kvm@lfdr.de>; Thu, 21 Apr 2022 20:06:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1391115AbiDUSFS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Apr 2022 14:05:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60770 "EHLO
+        id S1391246AbiDUSHu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 14:07:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1391131AbiDUSFN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Apr 2022 14:05:13 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 623E64B1E1
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 11:02:22 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id h11so6733189ljb.2
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 11:02:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ak6QqPmm4AQbpNhOQu87q9LEr9+mQ3asTsa/QbWlBQU=;
-        b=ootSWzXFAwsBY7jD1xTnFCZHZtZEjwkBUZp8yzJvhEwIf1usqNgy3MW3YXnTFyInRl
-         pgFLlTuvlZwFwfmwQMvQVVzOIV/9rUmprEtVY+6MgcilOQPIpyMbYES7Jyq/LVZSNAB0
-         ErOb4YXRYVh3GI2aGEtVAHn66KBvwvGG2gVW0TJTDtKDvSWEtgZHwIw7OI78Aoj8k6qe
-         00U0aoQKCBcIg33r0tKrH5dWA7v702Pdv70LF5HkPDjVolF2ANqHBBXVr4Q/t+4nIXsw
-         zdcH5nwNiRcAYGOqPjB7Ne1CM92SzA+I+SqtgHgl+1vhFj2AsLfvCD39bkfyOuHZbrUZ
-         uBgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ak6QqPmm4AQbpNhOQu87q9LEr9+mQ3asTsa/QbWlBQU=;
-        b=7dREJwKV0G0mezCjHGOJV96+CPpN0kn+ItH92WMW30nWNq+0g57wWuveSlFlUDh0r1
-         Va30i/Z+bARnEzcRX1E0FMSzHk2W1Ijv4+mYLXPdc0xNgN9vVwHpfHKZU/cE0v8VQw70
-         ZWdZ3BqM5Kr0eUcU6+Rwn2QeGsIqAP8Vdl5HEc9IIBet76GlDQEvciS/qRCwptPjroGS
-         pzW6fTMi9HQNpmweI5kvUpXbNBVXQ+Ni6IOywyg3/5+KVRM4Aa1474+mP6ir8E8ToyDF
-         6POEapLifBuhsSaHABUGwALN2lAi/SQHYFZV02Ty27qbM3Dw/3WHIH6XVbkG8S5SMq8H
-         +rag==
-X-Gm-Message-State: AOAM531VqCA5SW3wai646LDia3u6D89kbAbhDxA/IwTJGA4J8eu+eOR4
-        iAPCBp6dy1W70dXN36D5ErrFfoEm8PZzcwReX0v+gg==
-X-Google-Smtp-Source: ABdhPJzUI1h3NotonH2SjnObM5v+rR0GgHD0HFAj+ft7o7CvhswV6yU9RmjDy5j1AbIBljPX4izK26oRhqyVO7/cvF0=
-X-Received: by 2002:a2e:bf27:0:b0:246:7ed6:33b0 with SMTP id
- c39-20020a2ebf27000000b002467ed633b0mr513433ljr.167.1650564140447; Thu, 21
- Apr 2022 11:02:20 -0700 (PDT)
+        with ESMTP id S1391229AbiDUSHl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 14:07:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B00324B1F5
+        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 11:04:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650564289;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=YOH2Qpi3OWvJdj6PxZT56UXJ38oEXRy/KfJlwINMGqU=;
+        b=DhU5JDQ1Ev4eYXn/GiLrzFkJlaOB/qFUGAk55pr/J/D5h538bnEMG/CXJw6LX7EvoEXscy
+        qN0sNa0ERbMp3SP3FJl7XmwJOS/eVv0NjABPauHuWJEv8NZHL/cdkBtmY70/MVizESjXvi
+        JFnZ4W63glkV3IGz5FC/xnIs+IWLCoc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-547-ZUyglecdOV2CRHb3TKRkZA-1; Thu, 21 Apr 2022 14:04:44 -0400
+X-MC-Unique: ZUyglecdOV2CRHb3TKRkZA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DAA72811E78;
+        Thu, 21 Apr 2022 18:04:43 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 97A0140E80F5;
+        Thu, 21 Apr 2022 18:04:43 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     will@kernel.org, maz@kernel.org, apatel@ventanamicro.com,
+        atishp@rivosinc.com, seanjc@google.com, pgonda@google.com
+Subject: [PATCH 0/4] KVM: fix KVM_EXIT_SYSTEM_EVENT mess
+Date:   Thu, 21 Apr 2022 14:04:39 -0400
+Message-Id: <20220421180443.1465634-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20220421165137.306101-1-posk@google.com> <b1b04160-1604-8281-4c82-09b1f84ba86c@redhat.com>
-In-Reply-To: <b1b04160-1604-8281-4c82-09b1f84ba86c@redhat.com>
-From:   Peter Oskolkov <posk@google.com>
-Date:   Thu, 21 Apr 2022 11:02:09 -0700
-Message-ID: <CAPNVh5cQ6HhVqfuM7rhyK5RH6YYczkjAAgMwn7qHt8cbJneG_g@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: add HC_VMM_CUSTOM hypercall
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Paul Turner <pjt@google.com>, Peter Oskolkov <posk@posk.io>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 21, 2022 at 10:14 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 4/21/22 18:51, Peter Oskolkov wrote:
-> > Allow kvm-based VMMs to request KVM to pass a custom vmcall
-> > from the guest to the VMM in the host.
-> >
-> > Quite often, operating systems research projects and/or specialized
-> > paravirtualized workloads would benefit from a extra-low-overhead,
-> > extra-low-latency guest-host communication channel.
->
-> You can use a memory page and an I/O port.  It should be as fast as a
-> hypercall.  You can even change it to use ioeventfd if an asynchronous
-> channel is enough, and then it's going to be less than 1 us latency.
+The KVM_SYSTEM_EVENT_NDATA_VALID mechanism that was introduced
+contextually with KVM_SYSTEM_EVENT_SEV_TERM is not a good match
+for ARM and RISC-V, which want to communicate information even
+for existing KVM_SYSTEM_EVENT_* constants.  Userspace is not ready
+to filter out bit 31 of type, and fails to process the
+KVM_EXIT_SYSTEM_EVENT exit.
 
-Thank you for the suggestion. Let me try that.
+Therefore, tie the availability of ndata to a system capability;
+if the capability is present, ndata is always valid, so patch 1
+makes x86 always initialize it.  Then patches 2 and 3 fix
+ARM and RISC-V compilation and patch 4 enables the capability.
 
-Thanks,
-Peter
+Only compiled on x86, waiting for acks.
 
-[...]
+Paolo
+
+Paolo Bonzini (4):
+  KVM: x86: always initialize system_event.ndata
+  KVM: ARM: replace system_event.flags with ndata and data[0]
+  KVM: RISC-V: replace system_event.flags with ndata and data[0]
+  KVM: tell userspace that system_event.ndata is valid
+
+ Documentation/virt/kvm/api.rst        | 29 +++++++++++++++------------
+ arch/arm64/kvm/psci.c                 |  3 ++-
+ arch/riscv/include/asm/kvm_vcpu_sbi.h |  2 +-
+ arch/riscv/kvm/vcpu_sbi.c             |  5 +++--
+ arch/riscv/kvm/vcpu_sbi_replace.c     |  4 ++--
+ arch/riscv/kvm/vcpu_sbi_v01.c         |  2 +-
+ arch/x86/kvm/svm/sev.c                |  3 +--
+ arch/x86/kvm/x86.c                    |  2 ++
+ include/uapi/linux/kvm.h              |  2 +-
+ virt/kvm/kvm_main.c                   |  1 +
+ 10 files changed, 30 insertions(+), 23 deletions(-)
+
+-- 
+2.31.1
+
