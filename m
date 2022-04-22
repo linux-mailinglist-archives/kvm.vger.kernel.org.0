@@ -2,58 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC90650B467
-	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 11:49:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3478950B491
+	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 12:01:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1446219AbiDVJvX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Apr 2022 05:51:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34504 "EHLO
+        id S1446356AbiDVKEM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Apr 2022 06:04:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1387288AbiDVJvV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Apr 2022 05:51:21 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D82D1E01B;
-        Fri, 22 Apr 2022 02:48:28 -0700 (PDT)
+        with ESMTP id S1446353AbiDVKEK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Apr 2022 06:04:10 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A9E353E32;
+        Fri, 22 Apr 2022 03:01:18 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 8F892B82BB8;
-        Fri, 22 Apr 2022 09:48:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 392ADC385AB;
-        Fri, 22 Apr 2022 09:48:26 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AF39861BCE;
+        Fri, 22 Apr 2022 10:01:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E068C385A0;
+        Fri, 22 Apr 2022 10:01:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1650620906;
-        bh=GqQteHqQWVMtYRhHCscBLVDrA/2KZmg5bBHyhsfBNrU=;
+        s=k20201202; t=1650621677;
+        bh=Wd+lczt9RgngB+KHzFwDqzcWWJ5RsUNianvpFDvjBR4=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ddO8+grNLavLM2U+3CXGXlyC3Uj2lZwKwEBOh0LKmB1zLcCiXPzujY70QeExAXUs0
-         GMxu5vnuARfljdyepP21+wylC+A6xHU2qGNKjNm2dcVq1Ss2W3VOduIfmAEpRRAqt5
-         nKddkMVvWQsgd9zC6BLJJl2v74rbQfOKbaAIJecWLQQkSjy+U+5+N0lKgcZ3I6+7q6
-         dF3qMFou7P/l1xe8IFtFBmnEWxrnrexOLPCsWL4QBsFRqMsVwDCmpa0mflOLfDLhaC
-         RgHGLjLTNVCrSMzqj9GeCNnd8fGVVuwZivw2DtoVtWtZxPhgFcjelzZKeunORRQArr
-         bopcwdpl2XwXw==
+        b=XURCIgmbHSzRc2sunmW23qD95gOcgPejG/ca+zhwIpRmOV+BJ3DR1b3kYWq/tc/Bc
+         QMMFwTRfAeo3wgBdl8GE5xUVH7Pn49mbE53wJXJcwcjqpJKKjzvGungj8y6Lx6217p
+         83H/9vyNPwcPr/MeK8M2Mxb2Mdp5iRFoEuTUOCX2eYHwV7/Jp9aysd2mcaoyGsnJsp
+         5hCASXGz9VpzREL4zA3KJuiVEtgZkt3qCFDpzfHlNWyVvaotBXgcMbfuDNkVrI44/v
+         ww4oTyAe0SgxaAZytIHUXauYVntyBhZwK8+jTK3lpu1cD8pUOm8U/tsP4LBLA52pjD
+         DbSRvHfaeLhrQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1nhptn-0067k3-OQ; Fri, 22 Apr 2022 10:48:23 +0100
-Date:   Fri, 22 Apr 2022 10:48:23 +0100
-Message-ID: <87bkwta1p4.wl-maz@kernel.org>
+        id 1nhq6E-0067tx-DP; Fri, 22 Apr 2022 11:01:14 +0100
+Date:   Fri, 22 Apr 2022 11:01:14 +0100
+Message-ID: <87a6cda13p.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, will@kernel.org,
-        apatel@ventanamicro.com, atishp@rivosinc.com, seanjc@google.com,
-        pgonda@google.com
-Subject: Re: [PATCH 1/4] KVM: x86: always initialize system_event.ndata
-In-Reply-To: <20220421180443.1465634-2-pbonzini@redhat.com>
+Cc:     Oliver Upton <oupton@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, will@kernel.org, apatel@ventanamicro.com,
+        atishp@rivosinc.com, seanjc@google.com, pgonda@google.com
+Subject: Re: [PATCH 0/4] KVM: fix KVM_EXIT_SYSTEM_EVENT mess
+In-Reply-To: <ef5c6c5b-2ed1-7d4c-e757-ed8bcead5d18@redhat.com>
 References: <20220421180443.1465634-1-pbonzini@redhat.com>
-        <20220421180443.1465634-2-pbonzini@redhat.com>
+        <YmJgIQe+5zGbrxoF@google.com>
+        <ef5c6c5b-2ed1-7d4c-e757-ed8bcead5d18@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, will@kernel.org, apatel@ventanamicro.com, atishp@rivosinc.com, seanjc@google.com, pgonda@google.com
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, oupton@google.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, will@kernel.org, apatel@ventanamicro.com, atishp@rivosinc.com, seanjc@google.com, pgonda@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -65,89 +66,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 21 Apr 2022 19:04:40 +0100,
+On Fri, 22 Apr 2022 10:41:34 +0100,
 Paolo Bonzini <pbonzini@redhat.com> wrote:
 > 
-> The KVM_SYSTEM_EVENT_NDATA_VALID mechanism that was introduced
-> contextually with KVM_SYSTEM_EVENT_SEV_TERM is not a good match
-> for ARM and RISC-V, which want to communicate information even
-> for existing KVM_SYSTEM_EVENT_* constants.  Userspace is not ready
-> to filter out bit 31 of type, and fails to process the
-> KVM_EXIT_SYSTEM_EVENT exit.
+> On 4/22/22 09:58, Oliver Upton wrote:
+> > Is there any way we could clean this up in 5.18 and leave the whole
+> > ndata/data pattern for 5.19?
+> > 
+> > IOW, for 5.18 go back and fix the padding:
+> > 
+> > 	struct {
+> > 		__u32 type;
+> > 		__u32 pad;
+> > 		__u64 flags;
+> > 	} system_event;
+> > 
+> > Then for 5.19 circle back on the data business, except use a flag bit
+> > for it:
+> > 
+> > 	struct {
+> > 		__u32 type;
+> > 		__u32 pad;
+> > 	#define KVM_SYSTEM_EVENT_NDATA_VALID	(1u << 63)
+> > 		__u64 flags;
+> > 		__u64 ndata;
+> > 		__u64 data[16];
+> > 	} system_event;
+> > 
+> > Where we apply that bit to system_event::flags this time instead of
+> > ::type. Could also go the CAP route.
 > 
-> Therefore, tie the availability of ndata to a system capability
-> (which will be added once all architectures are on board).
-> Userspace written for released versions of Linux has no reason to
-> check flags, since it was never written, so it is okay to replace
-> it with ndata and data[0] (on 32-bit kernels) or with data[0]
-> (on 64-bit kernels).
+> These patches are against kvm/next, so that is already what I did. :)
 
-How is it going to work for new userspace on old kernels, for which
-the ndata field is left uninitialised?
+Can you please post a complete series? It is becoming really hard to
+track what you are doing.
 
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/svm/sev.c   | 3 +--
->  arch/x86/kvm/x86.c       | 2 ++
->  include/uapi/linux/kvm.h | 1 -
->  3 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index a93f0d01bb90..51b963ec122b 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -2739,8 +2739,7 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
->  			reason_set, reason_code);
->  
->  		vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
-> -		vcpu->run->system_event.type = KVM_SYSTEM_EVENT_SEV_TERM |
-> -					       KVM_SYSTEM_EVENT_NDATA_VALID;
-> +		vcpu->run->system_event.type = KVM_SYSTEM_EVENT_SEV_TERM;
->  		vcpu->run->system_event.ndata = 1;
->  		vcpu->run->system_event.data[1] = control->ghcb_gpa;
+> On the other hand right now the ARM and RISC-V flags are unusable with
+> 32-bit userspace, so we need to fix _something_ in 5.18 as well.
 
-Isn't this really odd? ndata = 1, and yet you populate data[1]?
+What 32bit userspace? arm64 doesn't have any that can interact with KVM,
+so I don't see anything to fix on that front.
 
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 4e7f3a8da16a..517c0228881c 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10056,12 +10056,14 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  		if (kvm_check_request(KVM_REQ_HV_CRASH, vcpu)) {
->  			vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
->  			vcpu->run->system_event.type = KVM_SYSTEM_EVENT_CRASH;
-> +			vcpu->run->system_event.ndata = 0;
->  			r = 0;
->  			goto out;
->  		}
->  		if (kvm_check_request(KVM_REQ_HV_RESET, vcpu)) {
->  			vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
->  			vcpu->run->system_event.type = KVM_SYSTEM_EVENT_RESET;
-> +			vcpu->run->system_event.ndata = 0;
->  			r = 0;
->  			goto out;
->  		}
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index dd1d8167e71f..5a57f74b4903 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -445,7 +445,6 @@ struct kvm_run {
->  #define KVM_SYSTEM_EVENT_RESET          2
->  #define KVM_SYSTEM_EVENT_CRASH          3
->  #define KVM_SYSTEM_EVENT_SEV_TERM       4
-> -#define KVM_SYSTEM_EVENT_NDATA_VALID    (1u << 31)
->  			__u32 type;
->  			__u32 ndata;
->  			__u64 data[16];
+> For
+> your proposal, all that's missing is a 5.18 patch to add the
+> padding. But since the flags UAPI was completely unused before 5.18
+> and there's no reason to inflict the different naming of fields to
+> userspace.  So I think we want to apply this UAPI change in 5.18 too.
 
-Cat we please get a #define that aliases data[0] to flags? At the next
-merge of the KVM headers into their respective trees, all the existing
-VMM are going to break if they have a reference to this field (CrosVM
-definitely does today -- yes, we're ahead of time).
+As it was pointed out already, CrosVM has already started looking at
+the flags. The fact that it was always 0 until now doesn't make it
+less of a UAPI.
 
-Also, getting a bisectable series would be good.
+I'd like to see a full series that implements the transition before we
+make a decision on this.
 
 Thanks,
 
