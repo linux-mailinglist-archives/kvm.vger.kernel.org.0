@@ -2,133 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB91550B265
-	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 09:59:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C5ABE50B296
+	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 10:09:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382596AbiDVIB0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Apr 2022 04:01:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41534 "EHLO
+        id S1445440AbiDVIFP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Apr 2022 04:05:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242754AbiDVIBX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Apr 2022 04:01:23 -0400
-Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68EE134678
-        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 00:58:31 -0700 (PDT)
-Received: by mail-il1-x12e.google.com with SMTP id y11so4582044ilp.4
-        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 00:58:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Bs1ARD/3mYc/Q8GOvyTn31OWHleeyCohrGDUgjVzb5c=;
-        b=p+I+yyKB3vk9fRPIkec81mqI7u7jjNG4T/gBJ7wEluxmyol/g/AAulxisd7IjBxgr2
-         IO6BpSnF1kpLqLtrdnvrHaTUJv0X2wBtdniE/vF2ftltP2695m9jCGk4rRlGK8tOchIX
-         DlGhM0xaSPRnCZQx7+9tFMg1cvBMYUTK09FM0PNRn+VHNTXzyvQATMS8o6aBe40UaOqB
-         FGfOWAw7zIE0ev4+5dxe0f2SMwTyZlRzBP/x3mUsH/00DNrTIfks0QKDdqfywjvbK+ut
-         zMxmoLAKwNdMgG1bQDz8doVsp1uwm2fWWa2FRdN8rgAwgg7shr1NqQb3KPlHx0IHfH+x
-         1Xeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Bs1ARD/3mYc/Q8GOvyTn31OWHleeyCohrGDUgjVzb5c=;
-        b=Nt5vA2WHDRqfOHC/SWDn/Yl75MATe01HBNB1AZHthfbHgfPs0kTY5vLH6lPLZ47Mr5
-         lGtTBS6BrSDC+x1WJ0rHj4WLs++mC3NiKgiNxNpPF7mfgmOaCYQzTZf2qqC3W8WyIOTy
-         LSWGFNLTkXUjdAx47B/5FauWIwfHg+Q0QeMG/U4g4UqRi1oeV4qX7v2zSWNII6+86ncc
-         IU5jiSUrDzpM3F0jla2+mVv4OK0wVZYcSuSvThW3DsLzoKbnwuBJMJorZ/tO7Z++1T6c
-         M5naI210qLCPPl/s17wvo+DMxD/0LTad4MVZcloGkC9ucpGHdH+/rWKHgAvpZeIJPzGc
-         lLFg==
-X-Gm-Message-State: AOAM5328boNOTStARWtFmVu2rAZAj12K89mEYLvuX+CHH7u7ylZp4qRT
-        GfniwR7PVEJThWySIdktDEXT6w==
-X-Google-Smtp-Source: ABdhPJxGh4l1P/5zNuiHNIaIg80R6S4iA2eyq7GpR4Gotde6duI/fSeWt3QpVY9yefAmiuwTK8d/2A==
-X-Received: by 2002:a05:6e02:148f:b0:2cd:2242:40d6 with SMTP id n15-20020a056e02148f00b002cd224240d6mr1503449ilk.187.1650614310633;
-        Fri, 22 Apr 2022 00:58:30 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id f4-20020a056e0204c400b002caa9f3cc3fsm893115ils.56.2022.04.22.00.58.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Apr 2022 00:58:29 -0700 (PDT)
-Date:   Fri, 22 Apr 2022 07:58:25 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, will@kernel.org,
-        maz@kernel.org, apatel@ventanamicro.com, atishp@rivosinc.com,
-        seanjc@google.com, pgonda@google.com
-Subject: Re: [PATCH 0/4] KVM: fix KVM_EXIT_SYSTEM_EVENT mess
-Message-ID: <YmJgIQe+5zGbrxoF@google.com>
-References: <20220421180443.1465634-1-pbonzini@redhat.com>
+        with ESMTP id S1445436AbiDVIFN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Apr 2022 04:05:13 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A871527D6;
+        Fri, 22 Apr 2022 01:02:21 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23M7CGLC020150;
+        Fri, 22 Apr 2022 08:02:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=k8IqdTJREoNElLpuXIY1bxU0Qimegc2GWe9c0tCwUlY=;
+ b=Ceoc6EwH+O+a99xtFFIJkJR1xXG8m1XQNzm37X93sb+sdafRVWKogzQ3PMeYD0/ve5zv
+ GPCSY0v1od54ZWqdRzAUi84c9QDzt38a9/m3OEOAIlDmAD85VElHRIvoaU8KhaiV78dd
+ KhzgIjDY+8jY61Kj2CiN5QkAwLenQu+B6lqQeOHJ0U6Mw+u3Fz3+chfSWa0XXTKZI/vE
+ KBlUgoCwDlRvuoBv6gvKCEx4tTCJltSbqsFzbj/wDBf+NaXcpF/A9sxzqqzfvYv44tlh
+ cO6wpnYibyEivdypOJjOjlMQAI2gxsPYXlsafZ3f8mLFFfEOOc8Ka09kr75lpSXbc1Th 5w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fk1yeu654-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 22 Apr 2022 08:02:20 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23M7Pfmi008771;
+        Fri, 22 Apr 2022 08:02:20 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fk1yeu61d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 22 Apr 2022 08:02:20 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23M7xTCE027466;
+        Fri, 22 Apr 2022 08:02:03 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06fra.de.ibm.com with ESMTP id 3ffn2hy536-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 22 Apr 2022 08:02:03 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23M820U337945784
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 22 Apr 2022 08:02:00 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7BCCCAE04D;
+        Fri, 22 Apr 2022 08:02:00 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 31E3AAE045;
+        Fri, 22 Apr 2022 08:02:00 +0000 (GMT)
+Received: from [9.145.85.218] (unknown [9.145.85.218])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 22 Apr 2022 08:01:59 +0000 (GMT)
+Message-ID: <35766f5c-cf7a-ecd8-6183-ea683eb9ff49@linux.ibm.com>
+Date:   Fri, 22 Apr 2022 10:01:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220421180443.1465634-1-pbonzini@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [kvm-unit-tests PATCH v3 1/4] lib: s390x: add support for SCLP
+ console read
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc:     imbrenda@linux.ibm.com, thuth@redhat.com
+References: <20220420134557.1307305-1-nrb@linux.ibm.com>
+ <20220420134557.1307305-2-nrb@linux.ibm.com>
+ <d8e6d465-3a8a-db75-1244-ed574efd9f59@linux.ibm.com>
+ <b7044e507dc7828f4c75d737b190a33800645666.camel@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <b7044e507dc7828f4c75d737b190a33800645666.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: o_POifjnSehYHFrQcR4CNrxOnO0GN592
+X-Proofpoint-GUID: kSBgBwWc2Os_6o59cVdSOAuauqA_k5gJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-22_02,2022-04-21_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ bulkscore=0 suspectscore=0 impostorscore=0 lowpriorityscore=0
+ priorityscore=1501 phishscore=0 mlxscore=0 clxscore=1015 adultscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204220036
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
-
-On Thu, Apr 21, 2022 at 02:04:39PM -0400, Paolo Bonzini wrote:
-> The KVM_SYSTEM_EVENT_NDATA_VALID mechanism that was introduced
-> contextually with KVM_SYSTEM_EVENT_SEV_TERM is not a good match
-> for ARM and RISC-V, which want to communicate information even
-> for existing KVM_SYSTEM_EVENT_* constants.  Userspace is not ready
-> to filter out bit 31 of type, and fails to process the
-> KVM_EXIT_SYSTEM_EVENT exit.
-> 
-> Therefore, tie the availability of ndata to a system capability;
-> if the capability is present, ndata is always valid, so patch 1
-> makes x86 always initialize it.  Then patches 2 and 3 fix
-> ARM and RISC-V compilation and patch 4 enables the capability.
-> 
-> Only compiled on x86, waiting for acks.
-> 
-> Paolo
-> 
-> Paolo Bonzini (4):
->   KVM: x86: always initialize system_event.ndata
->   KVM: ARM: replace system_event.flags with ndata and data[0]
->   KVM: RISC-V: replace system_event.flags with ndata and data[0]
->   KVM: tell userspace that system_event.ndata is valid
-
-Is there any way we could clean this up in 5.18 and leave the whole
-ndata/data pattern for 5.19?
-
-IOW, for 5.18 go back and fix the padding:
-
-	struct {
-		__u32 type;
-		__u32 pad;
-		__u64 flags;
-	} system_event;
-
-Then for 5.19 circle back on the data business, except use a flag bit
-for it:
-
-	struct {
-		__u32 type;
-		__u32 pad;
-	#define KVM_SYSTEM_EVENT_NDATA_VALID	(1u << 63)
-		__u64 flags;
-		__u64 ndata;
-		__u64 data[16];
-	} system_event;
-
-Where we apply that bit to system_event::flags this time instead of
-::type. Could also go the CAP route.
-
-Wouldn't this be enough to preserve ABI with whatever userspace has been
-spun up for system_event::flags already and also keep the SEV stuff
-happy in 5.19?
-
-It is a bit weird to churn existing UAPI usage in the very next kernel
-cycle, but could be convinced otherwise :)
-
---
-Thanks,
-Oliver
+T24gNC8yMi8yMiAwOTo1MCwgTmljbyBCb2VociB3cm90ZToNCj4gT24gVGh1LCAyMDIyLTA0
+LTIxIGF0IDE2OjI5ICswMjAwLCBKYW5vc2NoIEZyYW5rIHdyb3RlOg0KPj4NCj4gWy4uLl0N
+Cj4+PiBkaWZmIC0tZ2l0IGEvbGliL3MzOTB4L3NjbHAtY29uc29sZS5jIGIvbGliL3MzOTB4
+L3NjbHAtY29uc29sZS5jDQo+Pj4gaW5kZXggZmEzNmE2YTQyMzgxLi44YzRiZjY4Y2JiYWIg
+MTAwNjQ0DQo+Pj4gLS0tIGEvbGliL3MzOTB4L3NjbHAtY29uc29sZS5jDQo+Pj4gKysrIGIv
+bGliL3MzOTB4L3NjbHAtY29uc29sZS5jDQo+IFsuLi5dDQo+Pj4gK8KgwqDCoMKgwqDCoMKg
+cmVhZF9idWZfZW5kID0gc2NjYi0+ZWJoLmxlbmd0aCAtDQo+Pj4gZXZlbnRfYnVmZmVyX2Fz
+Y2lpX3JlY3ZfaGVhZGVyX2xlbjsNCj4+DQo+PiBJc24ndCB0aGlzIG1vcmUgbGlrZSBhIGxl
+bmd0aCBvZiB0aGUgY3VycmVudCByZWFkIGJ1ZmZlciBjb250ZW50cz8NCj4gDQo+IFJpZ2h0
+LCB0aGFua3MsIGxlbmd0aCBpcyBhIG11Y2ggYmV0dGVyIG5hbWUuDQo+IA0KPiBbLi4uXQ0K
+Pj4+IGRpZmYgLS1naXQgYS9saWIvczM5MHgvc2NscC5oIGIvbGliL3MzOTB4L3NjbHAuaA0K
+Pj4+IGluZGV4IGZlYWQwMDdhNjAzNy4uZTQ4YTVhM2RmMjBiIDEwMDY0NA0KPj4+IC0tLSBh
+L2xpYi9zMzkweC9zY2xwLmgNCj4+PiArKysgYi9saWIvczM5MHgvc2NscC5oDQo+Pj4gQEAg
+LTMxMyw2ICszMTMsMTQgQEAgdHlwZWRlZiBzdHJ1Y3QgUmVhZEV2ZW50RGF0YSB7DQo+Pj4g
+IMKgwqDCoMKgwqDCoMKgwqB1aW50MzJfdCBtYXNrOw0KPj4+ICDCoCB9IF9fYXR0cmlidXRl
+X18oKHBhY2tlZCkpIFJlYWRFdmVudERhdGE7DQo+Pj4gICAgDQo+Pj4gKyNkZWZpbmUgU0NM
+UF9FVkVOVF9BU0NJSV9UWVBFX0RBVEFfU1RSRUFNX0ZPTExPV1MgMA0KPj4NCj4+IEhybSwg
+SSdtIG5vdCBjb21wbGV0ZWx5IGhhcHB5IHdpdGggdGhlIG5hbWluZyBoZXJlIHNpbmNlIEkg
+Y29uZnVzZWQNCj4+IGl0DQo+PiB0byB0aGUgZWJoLT50eXBlIHdoZW4gbG9va2luZyB1cCB0
+aGUgY29uc3RhbnRzLiBCdXQgbm93IEkgdW5kZXJzdGFuZA0KPj4gd2h5DQo+PiB5b3UgY2hv
+c2UgaXQuDQo+IA0KPiBZZWFoLCBpdCBzdXJlIGlzIGNvbmZ1c2luZy4NCj4gDQo+IE1heWJl
+IGl0IGlzIGJldHRlciBpZiB3ZSBsZWF2ZSBvdXQgdGhlICJ0eXBlIiBlbnRpcmVseSwgYnV0
+IHRoaXMgbWlnaHQNCj4gbWFrZSBpdCBoYXJkZXIgdG8gdW5kZXJzdGFuZCB3aGVyZSBpdCdz
+IGNvbWluZyBmcm9tOg0KPiBTQ0xQX0FTQ0lJX1JFQ0VJVkVfREFUQV9TVFJFQU1fRk9MTE9X
+Uw0KPiANCj4gQW5vdGhlciBhbHRlcm5hdGl2ZSBJIHRob3VnaHQgYWJvdXQgaXMgdXNpbmcg
+ZW51bXMsIGl0IHdvbid0IGZpeCB0aGUNCj4gbmFtaW5nLCBidXQgYXQgbGVhc3QgaXQgbWln
+aHQgYmUgY2xlYXJlciB0byB3aGljaCB0eXBlIGl0IGJlbG9uZ3MuDQo+IA0KPiBMZXQgbWUg
+a25vdyB3aGF0IHlvdSB0aGluay4NCg0KSXQgc2hvdWxkIGJlIGZpbmUgYXMgaXMuIEkgZG9u
+J3QgZXhwZWN0IHRoYXQgd2UgaGF2ZSB0byB0b3VjaCB0aGlzIGZpbGUgDQp2ZXJ5IG9mdGVu
+Lg0K
