@@ -2,49 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C3F6C50B27A
-	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 10:00:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 676EF50B268
+	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 09:59:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1445232AbiDVH6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Apr 2022 03:58:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38126 "EHLO
+        id S1445296AbiDVH6z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Apr 2022 03:58:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1445191AbiDVH62 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Apr 2022 03:58:28 -0400
+        with ESMTP id S1445211AbiDVH63 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Apr 2022 03:58:29 -0400
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17A9237BF8;
-        Fri, 22 Apr 2022 00:55:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A100E51E79;
+        Fri, 22 Apr 2022 00:55:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650614135; x=1682150135;
+  t=1650614136; x=1682150136;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=EA6a6CyPC45YVCqPmIq4IBT07StS5s8kYmLcjF4Qrcc=;
-  b=G108q40Odd1QoRh5G3IQDOTcmGFGCmUuq9NPSpr+RupOtrJyo5Y+pX62
-   /0hM7aLmsZH614ERm6n0RevTTvWSNIrh+mK68M0aytu69mBrauNb53xdH
-   nt3c/xTaEyOtZFydXbfJ52YfXGkUec9koyyTiTTlrA3hwOQOsXROobvqv
-   jswGPUsU0Jzp2O/Og91SENt9l80b9kkFcc3VDdZ6TM2p46DCPz+iyLuKH
-   meTc3XPYbfVoIZRrcrRGkMbFxn5zIJq8XMhmevZtswYryxAgIrLUudDYI
-   5iDalraft+OBjC5S4oN5FIoSJdsA8vi/1qLv5BUsIm9xDz/bK2IfMYLvj
+  bh=M8cYWcZbWEjzhmqLzPp/4+ccRcVloQj1jlvtvB/8F6c=;
+  b=Wnse5KLB7pL8f4NDIiTm+s8bWAD/3E+nZEkvK7KEV+WQEWK3uXgZLfLK
+   bZPE92phHhlKuIJCGkHDgLjUIycsVv/TeoJnnWexsJRAtOD6OA5w/HMBm
+   k9dCEMWUmao+m+4in7Jj0SiZ+R0kD6Mt2JDyIhn+55NHZjCrkdQCrEJz5
+   B6BVpBaANsJzo+HAmLzyw0hL639eYmyRB3pwi3EjKaCiANYBrfvPEpjxZ
+   rkScecEh6NKk0o0s+W7L5ZK932dDg3wHsTH0Hav6UNOjVj4np/lm7O1Pf
+   BMoWYzCl1YcShIvUxUvZDh/p6N4Rai3pJ8SH8W4Mxxe7XgQzzUwQs5KuH
    Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10324"; a="264384832"
+X-IronPort-AV: E=McAfee;i="6400,9594,10324"; a="264384834"
 X-IronPort-AV: E=Sophos;i="5.90,281,1643702400"; 
-   d="scan'208";a="264384832"
+   d="scan'208";a="264384834"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
   by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2022 00:55:30 -0700
 X-IronPort-AV: E=Sophos;i="5.90,281,1643702400"; 
-   d="scan'208";a="577741355"
+   d="scan'208";a="577741358"
 Received: from embargo.jf.intel.com ([10.165.9.183])
   by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2022 00:55:30 -0700
 From:   Yang Weijiang <weijiang.yang@intel.com>
 To:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
         like.xu.linux@gmail.com, vkuznets@redhat.com, wei.w.wang@intel.com,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Yang Weijiang <weijiang.yang@intel.com>,
-        Like Xu <like.xu@linux.intel.com>
-Subject: [PATCH v10 11/16] KVM: x86/vmx: Check Arch LBR config when return perf capabilities
-Date:   Fri, 22 Apr 2022 03:55:04 -0400
-Message-Id: <20220422075509.353942-12-weijiang.yang@intel.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH v10 12/16] KVM: nVMX: Add necessary Arch LBR settings for nested VM
+Date:   Fri, 22 Apr 2022 03:55:05 -0400
+Message-Id: <20220422075509.353942-13-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220422075509.353942-1-weijiang.yang@intel.com>
 References: <20220422075509.353942-1-weijiang.yang@intel.com>
@@ -59,100 +58,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Two new bit fields(VM_EXIT_CLEAR_IA32_LBR_CTL, VM_ENTRY_LOAD_IA32_LBR_CTL)
-are added to support guest Arch LBR. These two bits should be set in order
-to make Arch LBR workable in both guest and host.
+Arch LBR is not supported in nested VM now. This patch is to add
+necessary settings to make it pass host KVM checks before L2 VM is
+launched and also to avoid some warnings reported from L1.
 
-Co-developed-by: Like Xu <like.xu@linux.intel.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 ---
- arch/x86/include/asm/vmx.h      |  2 ++
- arch/x86/kvm/vmx/capabilities.h |  8 ++++++++
- arch/x86/kvm/vmx/vmx.c          | 10 ++++++++--
- 3 files changed, 18 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/nested.c    | 7 +++++--
+ arch/x86/kvm/vmx/pmu_intel.c | 2 ++
+ arch/x86/kvm/vmx/vmcs12.c    | 1 +
+ arch/x86/kvm/vmx/vmcs12.h    | 3 ++-
+ 4 files changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index ea3be961cc8e..d9b1dffc4638 100644
---- a/arch/x86/include/asm/vmx.h
-+++ b/arch/x86/include/asm/vmx.h
-@@ -95,6 +95,7 @@
- #define VM_EXIT_CLEAR_BNDCFGS                   0x00800000
- #define VM_EXIT_PT_CONCEAL_PIP			0x01000000
- #define VM_EXIT_CLEAR_IA32_RTIT_CTL		0x02000000
-+#define VM_EXIT_CLEAR_IA32_LBR_CTL		0x04000000
- 
- #define VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR	0x00036dff
- 
-@@ -108,6 +109,7 @@
- #define VM_ENTRY_LOAD_BNDCFGS                   0x00010000
- #define VM_ENTRY_PT_CONCEAL_PIP			0x00020000
- #define VM_ENTRY_LOAD_IA32_RTIT_CTL		0x00040000
-+#define VM_ENTRY_LOAD_IA32_LBR_CTL		0x00200000
- 
- #define VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR	0x000011ff
- 
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index 3f430e218375..68fbb76ba439 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -385,6 +385,12 @@ static inline bool vmx_pt_mode_is_host_guest(void)
- 	return pt_mode == PT_MODE_HOST_GUEST;
- }
- 
-+static inline bool cpu_has_vmx_arch_lbr(void)
-+{
-+	return (vmcs_config.vmexit_ctrl & VM_EXIT_CLEAR_IA32_LBR_CTL) &&
-+		(vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_LBR_CTL);
-+}
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index f18744f7ff82..97a4da07a0ec 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -6558,7 +6558,9 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
+ 		VM_EXIT_HOST_ADDR_SPACE_SIZE |
+ #endif
+ 		VM_EXIT_LOAD_IA32_PAT | VM_EXIT_SAVE_IA32_PAT |
+-		VM_EXIT_CLEAR_BNDCFGS | VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
++		VM_EXIT_CLEAR_BNDCFGS | VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
++		VM_EXIT_CLEAR_IA32_LBR_CTL;
 +
- static inline u64 vmx_get_perf_capabilities(void)
- {
- 	u64 perf_cap = 0;
-@@ -396,6 +402,8 @@ static inline u64 vmx_get_perf_capabilities(void)
- 		rdmsrl(MSR_IA32_PERF_CAPABILITIES, perf_cap);
+ 	msrs->exit_ctls_high |=
+ 		VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR |
+ 		VM_EXIT_LOAD_IA32_EFER | VM_EXIT_SAVE_IA32_EFER |
+@@ -6578,7 +6580,8 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
+ 		VM_ENTRY_IA32E_MODE |
+ #endif
+ 		VM_ENTRY_LOAD_IA32_PAT | VM_ENTRY_LOAD_BNDCFGS |
+-		VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
++		VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VM_ENTRY_LOAD_IA32_LBR_CTL;
++
+ 	msrs->entry_ctls_high |=
+ 		(VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR | VM_ENTRY_LOAD_IA32_EFER);
  
- 	perf_cap &= PMU_CAP_LBR_FMT;
-+	if (boot_cpu_has(X86_FEATURE_ARCH_LBR) && !cpu_has_vmx_arch_lbr())
-+		perf_cap &= ~PMU_CAP_LBR_FMT;
- 
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index cb28888e9f4f..79eecbffa07b 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -228,6 +228,8 @@ static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+ 		break;
+ 	case MSR_ARCH_LBR_DEPTH:
+ 	case MSR_ARCH_LBR_CTL:
++		if (is_guest_mode(vcpu))
++			break;
+ 		if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
+ 			ret = guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR);
+ 		break;
+diff --git a/arch/x86/kvm/vmx/vmcs12.c b/arch/x86/kvm/vmx/vmcs12.c
+index 2251b60920f8..bcda664e4d26 100644
+--- a/arch/x86/kvm/vmx/vmcs12.c
++++ b/arch/x86/kvm/vmx/vmcs12.c
+@@ -65,6 +65,7 @@ const unsigned short vmcs12_field_offsets[] = {
+ 	FIELD64(HOST_IA32_PAT, host_ia32_pat),
+ 	FIELD64(HOST_IA32_EFER, host_ia32_efer),
+ 	FIELD64(HOST_IA32_PERF_GLOBAL_CTRL, host_ia32_perf_global_ctrl),
++	FIELD64(GUEST_IA32_LBR_CTL, guest_lbr_ctl),
+ 	FIELD(PIN_BASED_VM_EXEC_CONTROL, pin_based_vm_exec_control),
+ 	FIELD(CPU_BASED_VM_EXEC_CONTROL, cpu_based_vm_exec_control),
+ 	FIELD(EXCEPTION_BITMAP, exception_bitmap),
+diff --git a/arch/x86/kvm/vmx/vmcs12.h b/arch/x86/kvm/vmx/vmcs12.h
+index 746129ddd5ae..bf50227fe401 100644
+--- a/arch/x86/kvm/vmx/vmcs12.h
++++ b/arch/x86/kvm/vmx/vmcs12.h
+@@ -71,7 +71,7 @@ struct __packed vmcs12 {
+ 	u64 pml_address;
+ 	u64 encls_exiting_bitmap;
+ 	u64 tsc_multiplier;
+-	u64 padding64[1]; /* room for future expansion */
++	u64 guest_lbr_ctl;
  	/*
- 	 * Since counters are virtualized, KVM would support full
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 60d92a459f4c..8962a8bab5eb 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2532,7 +2532,8 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
- 	      VM_EXIT_LOAD_IA32_EFER |
- 	      VM_EXIT_CLEAR_BNDCFGS |
- 	      VM_EXIT_PT_CONCEAL_PIP |
--	      VM_EXIT_CLEAR_IA32_RTIT_CTL;
-+	      VM_EXIT_CLEAR_IA32_RTIT_CTL |
-+	      VM_EXIT_CLEAR_IA32_LBR_CTL;
- 	if (adjust_vmx_controls(min, opt, MSR_IA32_VMX_EXIT_CTLS,
- 				&_vmexit_control) < 0)
- 		return -EIO;
-@@ -2556,7 +2557,8 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
- 	      VM_ENTRY_LOAD_IA32_EFER |
- 	      VM_ENTRY_LOAD_BNDCFGS |
- 	      VM_ENTRY_PT_CONCEAL_PIP |
--	      VM_ENTRY_LOAD_IA32_RTIT_CTL;
-+	      VM_ENTRY_LOAD_IA32_RTIT_CTL |
-+	      VM_ENTRY_LOAD_IA32_LBR_CTL;
- 	if (adjust_vmx_controls(min, opt, MSR_IA32_VMX_ENTRY_CTLS,
- 				&_vmentry_control) < 0)
- 		return -EIO;
-@@ -5925,6 +5927,10 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
- 	    vmentry_ctl & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL)
- 		pr_err("PerfGlobCtl = 0x%016llx\n",
- 		       vmcs_read64(GUEST_IA32_PERF_GLOBAL_CTRL));
-+	if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR) &&
-+	    vmentry_ctl & VM_ENTRY_LOAD_IA32_LBR_CTL)
-+		pr_err("ArchLBRCtl = 0x%016llx\n",
-+		       vmcs_read64(GUEST_IA32_LBR_CTL));
- 	if (vmentry_ctl & VM_ENTRY_LOAD_BNDCFGS)
- 		pr_err("BndCfgS = 0x%016llx\n", vmcs_read64(GUEST_BNDCFGS));
- 	pr_err("Interruptibility = %08x  ActivityState = %08x\n",
+ 	 * To allow migration of L1 (complete with its L2 guests) between
+ 	 * machines of different natural widths (32 or 64 bit), we cannot have
+@@ -254,6 +254,7 @@ static inline void vmx_check_vmcs12_offsets(void)
+ 	CHECK_OFFSET(pml_address, 312);
+ 	CHECK_OFFSET(encls_exiting_bitmap, 320);
+ 	CHECK_OFFSET(tsc_multiplier, 328);
++	CHECK_OFFSET(guest_lbr_ctl, 336);
+ 	CHECK_OFFSET(cr0_guest_host_mask, 344);
+ 	CHECK_OFFSET(cr4_guest_host_mask, 352);
+ 	CHECK_OFFSET(cr0_read_shadow, 360);
 -- 
 2.27.0
 
