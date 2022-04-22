@@ -2,116 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF97B50C15B
-	for <lists+kvm@lfdr.de>; Sat, 23 Apr 2022 00:06:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DCE1B50C210
+	for <lists+kvm@lfdr.de>; Sat, 23 Apr 2022 00:07:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230372AbiDVV7F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Apr 2022 17:59:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58942 "EHLO
+        id S231941AbiDVWJ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Apr 2022 18:09:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231159AbiDVV7A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Apr 2022 17:59:00 -0400
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADC762B6F70
-        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 13:41:56 -0700 (PDT)
-Received: by mail-io1-xd33.google.com with SMTP id y85so9848314iof.3
-        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 13:41:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=PIHedjvBDUsd4o0hzUsuDNj6ptFVTAlpQe59DURQa44=;
-        b=oPO5Yme2y6EXk+fi6Lg8OhVIAVnIWkQGaDDC9BX04q6vbLeGn9fa4C+0nNAI1KB3Ap
-         GJ3lDkeLxz/RC2Mn+I0BJbJ/SIcCy3bkUVoidHCqveVWxNpOniChJSHEjoXOUv3v3hEK
-         ttEB6l7t9bxij3rfjOiWbcpjsBWLHC8NYvFw48qjT/lcQV79kYwH7HvuHrqnzfqm2VhL
-         jmbhjaqlWtqQLTXWVnSmIL7dtVKNqaQgoLSPeES5HDckhkWXKBxiE3YsewOYkDwjCvdc
-         wRZSzh0E0v/26h84z5+gDanAse3uW30/Q8TyYTi046k7NDB4ay0Wi/dpb949ukm52o+K
-         ZEMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=PIHedjvBDUsd4o0hzUsuDNj6ptFVTAlpQe59DURQa44=;
-        b=JtJr5RqJlpMk/W/iMBDOVQ0jbBCbtfhCyp7EwUtn9W8GO1c9Ap7GBz4fbspMuVX2c1
-         9QQEtZ7nGzOtMC/qQP08aagXj4hlJMdT+WdSwRmiqUzZG2wTpQKAWW7aFQMyfJBRFvZc
-         qRoISmBbtCLgpuY8A/Uyo7wwRJjYH64oKDWZqzVXEAqHoH1VSp+Ax7NTJ7Stm+pV2Vli
-         MYG7QZcCj7C8pm1Qp5/ocGwx1hafIigI0bngqPhcPLOBYgKs13kdA5/WdGJVKvu6blwp
-         ZKq5D81A1RefxvUXg9jn+KErKrMLAqRX+rW2logc+0IEoc985w9is38YdLFoVeyoGGPD
-         4eAQ==
-X-Gm-Message-State: AOAM533w145WyugE5G6fJIsZcSapUbvnB7iKbFUHQBGJepWNgybR44uj
-        3s+BSXkWReHiL/Wh0p1f9znUcg==
-X-Google-Smtp-Source: ABdhPJy+APL9BkWInbd+QFDrmKyPHiSNDP9EVCz9Mw0NDYDizkUIV8IR5t71M6VANKddfh1vSizGaA==
-X-Received: by 2002:a05:6638:35a0:b0:32a:8f99:fa03 with SMTP id v32-20020a05663835a000b0032a8f99fa03mr3002986jal.8.1650660115087;
-        Fri, 22 Apr 2022 13:41:55 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id w3-20020a92d2c3000000b002cbca0cd15fsm1970376ilg.8.2022.04.22.13.41.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Apr 2022 13:41:53 -0700 (PDT)
-Date:   Fri, 22 Apr 2022 20:41:47 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Quentin Perret <qperret@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>, Ben Gardon <bgardon@google.com>,
-        Peter Shier <pshier@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [RFC PATCH 09/17] KVM: arm64: Tear down unlinked page tables in
- parallel walk
-Message-ID: <YmMTC2f0DiAU5OtZ@google.com>
-References: <20220415215901.1737897-1-oupton@google.com>
- <20220415215901.1737897-10-oupton@google.com>
- <YmFactP0GnSp3vEv@google.com>
- <YmGJGIrNVmdqYJj8@google.com>
- <YmLRLf2GQSgA97Kr@google.com>
-MIME-Version: 1.0
+        with ESMTP id S232858AbiDVWIg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Apr 2022 18:08:36 -0400
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam07on2068.outbound.protection.outlook.com [40.107.212.68])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0156203F4F;
+        Fri, 22 Apr 2022 13:55:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KfcDuUQOxotsScJs+SekJFiSp4GfWATOtVBdoHzdBDcrsLL7OQ6JsibxBfFgIG5QmRgJysxjHX+sMMe5yQ4kgfpax7uAYtqweZa2pL/xnZflJIVjIuHWfa8iQ4Dxpvrung0NTSWnm9HvKu09wjf2NFEFbRq3QEFEFM1FyL8qzh7ZcOjmdbpDeY0jD4tM8UrzYN3/3HmAEAAfBIzsFRUidFzkQ4LtKSoUex/8JUCzP/Jk7bglk2IxW4zlt4CeuiDUlEwzTmpHRYZ/+pNgVD+FXIY5DS3S2TpQ7c1dofXC/HDL7l2h7AH7nMIkqdYedSsbk8Bgx5feQafZQSLkKjX4UQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=j7RI9TTBBoc6BMqIvSebm52iDYjg+o3XVin2RcV5APk=;
+ b=WwVqHOKhYH6jUvmlzYFSONqG6V31clUxyTbHKUQKpecVRNRufUBowZowfwUIIpVyxVIYaC/C1MX0trOFmFijNjRJlJBQo9unOS2Lix5CeXDxAKLIZ1/3va3KkXNLz3rjCjutykiFOeZ8uLM6KE1V8DQCMMyMhuGs0pZJ65xsM51oYALH7cGtkzpHl9QXrjok6uyx+1hRdHdeeuky7wdy+u2a3vsCkPl++KqLuXjprfHBMkG4SlySCtW0mYfAkXpTVUgMPExT0wMCfy7wi1W/oXkBGJsK8KYaDRm81SnGwLCb0Zdx/A8swmrrjS+4shzdQgF8Mk7n05Ab/hUWEaV2qg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j7RI9TTBBoc6BMqIvSebm52iDYjg+o3XVin2RcV5APk=;
+ b=KF7sIuiHmPd82pf9VYt0BXvSsw/nOVLvxWG41+4MhhCaAmaJ4k3TTrvil2/cnoLX/1sXjotT6knGlK0kfaeCpyyftxaNWggHMBCjhO+YY9f5tNlEPm+jbtxztx74SHmRXxWiqFYRGp7vyEl1rpZ+kM08I/7UnsOxoBXoVtydXYRw7KCOjS3blPrHeeNF0aUlmP2WM3Hf9DUrxEWpbk+il0y+PT7GyvKVY9SxTZ46V7lJuSFrx8uGm5LVI2Jz1Ms8rRdBAbRVkN6qhhiYfOd00keQ3F1EGamxGTSODMnADj5/sJcM4sCUup7US00StkQVnrknAtseR8hPPYyTNeS4hg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by DM5PR1201MB0058.namprd12.prod.outlook.com (2603:10b6:4:50::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.13; Fri, 22 Apr
+ 2022 20:55:35 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2%6]) with mapi id 15.20.5186.015; Fri, 22 Apr 2022
+ 20:55:35 +0000
+Date:   Fri, 22 Apr 2022 17:55:33 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 7/7] vfio: Remove calls to
+ vfio_group_add_container_user()
+Message-ID: <20220422205533.GE1951132@nvidia.com>
+References: <0-v2-6011bde8e0a1+5f-vfio_mdev_no_group_jgg@nvidia.com>
+ <7-v2-6011bde8e0a1+5f-vfio_mdev_no_group_jgg@nvidia.com>
+ <BN9PR11MB52760B405E5F68C2155492078CF79@BN9PR11MB5276.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YmLRLf2GQSgA97Kr@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <BN9PR11MB52760B405E5F68C2155492078CF79@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BL1PR13CA0260.namprd13.prod.outlook.com
+ (2603:10b6:208:2ba::25) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ce308680-ba9e-4a80-38b3-08da24a2725b
+X-MS-TrafficTypeDiagnostic: DM5PR1201MB0058:EE_
+X-Microsoft-Antispam-PRVS: <DM5PR1201MB0058DE128BBDDE5E34A53F2DC2F79@DM5PR1201MB0058.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xIzCinhsX9fAqnpXIhCUcpCZY47yrbZGeTJGwmk4ligrRVT4F6wYBV8f3rNWeoC6grviEAqvM3ccZ1rCquFN/8qlGP7rb+NfOOSYIaZRFICBnb67ja8HzK+Ed3nKg70Z82r16N+4eDf74/C+ZMhlokHFSGg4kaLwc5AVNkUkYzmzzOWdRrHVff4Dfjn6k898Ori5Qljxz9qjFtUKlO/TcKK3tBB0+W0nQrrjx39rTch8+wAq6YGqnlpuU6NCAKFZVT+FeN1s4cEvusBKJIE5smdTQ0q+RTrW9aBEDBvyl0h0jig2zkpcittKV4tl0ltiQ2ZVZGrQKU6f88qam2RQkLLtt8vcM79UZgb0MQlCUXbL/t8/+QF/Og0wMMmVV/Wgnpl+zBI22MvVgq2rbXHa+/q5sykFEEZ1D0MYNj4u41ESPIBgOpWOZIuiPp4G+0WaaRxRyD9Lapr0VSQ83l3J4nBDccpcCFo7ZWN7jXjC0EUsArs7AhLwS6JSyBKIpSpDgZ6tNeByc4qLoezeQ7WaMdQFB4WmLG6d0gvsLoTRgXxVajXUYfNiMDfJpmw/LT5PBLmlvMwNxhwREw/3JSjIKHx7GLmPsKvMfBxhFsdHw8RCMvnVoy3toMqpmMOvr1+C7cEc1wuG3mRhoN6+Ayg9CQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(8676002)(316002)(66476007)(66946007)(66556008)(5660300002)(6506007)(6512007)(7406005)(36756003)(54906003)(33656002)(6916009)(2906002)(86362001)(4744005)(8936002)(7416002)(4326008)(508600001)(83380400001)(2616005)(38100700002)(186003)(1076003)(26005)(6486002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PCavLKgy2twAB8kMyftQ2TnDpxa5oaPWpTb3jkKc7Q9Bcu1PVX6U4aQ+Tpz7?=
+ =?us-ascii?Q?vebSmNZLO+tiEqg0PQmRDUgyYw+ThNODwwq0Krn9t/AIsuMgfqsaUlNIub3Z?=
+ =?us-ascii?Q?USDSjCwcXzi8AVG0fNjwhgX9nv+RAifNU/ouG/eVvH4ov4hvjgyBWN4llSFv?=
+ =?us-ascii?Q?euIawedO4oOJMUF/2mNo9gOPpuW3p0K08cmVvf7FSQiy0svWLuRT1Y9R3y6O?=
+ =?us-ascii?Q?sRreuN/DWeKvtWcwURATYBnT8gsnLKfdej0rU0fH9WFq8dcpsHrXY8YKY8W5?=
+ =?us-ascii?Q?04xVq8tyNi7DhCKwck+IwdhnmRCLebEsIgVncTNPtgqL2qDL1CFZ1ZVu5UwI?=
+ =?us-ascii?Q?BDXjXSW+nqZp9t7z8mKN66DIZ53ebadXM6exWjWqIjlTBHHo7hsaQgo3qoCZ?=
+ =?us-ascii?Q?uq1PhHptnJ8zaEs+k1HwFSLQf+UekvI81zQo2n88OK/VcM9geiw4uC9HhHLH?=
+ =?us-ascii?Q?aBc4CBiE7X9QpmCU0SnYicMmRMDJKIlKtdrk79rFtIQ2u1CQJTj4JY44epXJ?=
+ =?us-ascii?Q?kcM3V6dGiNV5KWcaQ1GPdjNfhr0NeVaMybx0Det5SZtjHaudctRf8x7bUYxx?=
+ =?us-ascii?Q?fwJHICt75fvn9AMul1oeE+cMyin8xaSz/VpP6HBM2cRBP+o+bOvbB2vlMoVs?=
+ =?us-ascii?Q?b+r24j9FXdrtOQ+Qv2A1OGK5nMdmOjm2cHrv804W2VDKB+ksca9WM5QqoZZb?=
+ =?us-ascii?Q?Ypi2gfHRDsx5dgZw+N0nBMRD88HkQgu+3/542QMqOAWbqqKj2vlI/5mSJLy1?=
+ =?us-ascii?Q?24D0K2DRROWwMIkQlEo+NUIKEgdYyU6TcfX1GO7p9HrJnKzWn1UZetD1stJc?=
+ =?us-ascii?Q?42AgI7jbtKR8Jt0Jjn4pBxFiETdkPrgmvyARwc1YElhlxWoLnoyZTbMOeXR+?=
+ =?us-ascii?Q?MvC7E84ibsR67qAdCoD+COSAJUFv2nwBEIn96YVgdnyM2/cWq+5T6VJAeEiN?=
+ =?us-ascii?Q?QpbGE8cAZoh3r3jfen4PRh9tvWIC1pjEFYLIhZZZpGNdammtlncrI5Brhzta?=
+ =?us-ascii?Q?mHnyv+ehuXraj3+sU7Kxm8LKqoX0MTTVtihPQLhun5VjKENQfmmOz7NBGzid?=
+ =?us-ascii?Q?5xvWLfwKg8nTH6yy1ZLjUokKzm2GfQU4QUup71phzUZ0hS7B9sExYkrZ6Mxa?=
+ =?us-ascii?Q?gXFMLiHVD2AyLqtssS1xU9hg+FGS3HYQRMiHHGppggA2ptOxGAhx7YcX8Y0a?=
+ =?us-ascii?Q?LbpQzSdhiZrvkSNjqRs6zSxBrhpSBuzylD6Adx6IkxmfLIQnL+ZXmbZ+m5N3?=
+ =?us-ascii?Q?iaai/78jMZu3C3xFxV+DXKf0hbArL3K36H2K/s/fdnzWEU1YvoNoAW8Pv9oF?=
+ =?us-ascii?Q?/FEob8ElIm6Cq023SbTujX6kH471tzl9ljUsPqb9XH2Z5xp41pIDo7j/1gMY?=
+ =?us-ascii?Q?6l4g3cEMWsnI4aZzGx3srVGc1My8E2z1dytjP+T1cCuQO61i6U0TkhH0QYUd?=
+ =?us-ascii?Q?lkev5s9a1PSW+BLtMJcuVx0SWTcPhJ5yZRsdVu8YCmffm2JTL3EKys5WjNGh?=
+ =?us-ascii?Q?khFG6vynnBmMjJm+XXztusw60cVeOUe5hqi9Xe+NsC8X8zTRr+YMnflPKyKZ?=
+ =?us-ascii?Q?vZha2AzEz9/sDxf9G6MtYxoN56lEMfUEvdraSl1lzG/rYEoyyCgCSWpQSpwo?=
+ =?us-ascii?Q?n9y9uV8H2zYQQVjz69IUsmABySiNuJ9/Gda7sgQGHquW7UY2JYw/1pgBUlx0?=
+ =?us-ascii?Q?SXKsqqpQfBwt9PSz/+pyLPVPZEb72BXvuBR4XzHvmDLvsNeG+vy4HDKLQWJL?=
+ =?us-ascii?Q?whBKXuqZ8A=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ce308680-ba9e-4a80-38b3-08da24a2725b
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2022 20:55:35.0417
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: szKENFsBvwVUAMUF0UTLmZ5uYDScW1mRXPXXhmT3nQCM8bn3ir1znNTz7Xxc5x7z
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1201MB0058
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 22, 2022 at 04:00:45PM +0000, Quentin Perret wrote:
-> On Thursday 21 Apr 2022 at 16:40:56 (+0000), Oliver Upton wrote:
-> > The other option would be to not touch the subtree at all until the rcu
-> > callback, as at that point software will not tweak the tables any more.
-> > No need for atomics/spinning and can just do a boring traversal.
+On Fri, Apr 22, 2022 at 02:11:27AM +0000, Tian, Kevin wrote:
+
+> >  	mutex_lock(&device->dev_set->lock);
+> > -	if (!--device->open_count && device->ops->close_device)
+> > +	vfio_assert_device_open(device);
+> > +	if (device->open_count == 1 && device->ops->close_device)
+> >  		device->ops->close_device(device);
+> > +	device->open_count--;
+> >  	mutex_unlock(&device->dev_set->lock);
 > 
-> Right that is sort of what I had in mind. Note that I'm still trying to
-> make my mind about the overall approach -- I can see how RCU protection
-> provides a rather elegant solution to this problem, but this makes the
-> whole thing inaccessible to e.g. pKVM where RCU is a non-starter.
+> Is it necessary to add assertion here? This is the only place to
+> decrement the counter and no similar assertion in other release()/
+> put() functions.
 
-Heh, figuring out how to do this for pKVM seemed hard hence my lazy
-attempt :)
+Necessary, no, but since we have it we may as well check it here. It
+is common to check that refcounts don't underflow.
 
-> A
-> possible alternative that comes to mind would be to have all walkers
-> take references on the pages as they walk down, and release them on
-> their way back, but I'm still not sure how to make this race-safe. I'll
-> have a think ...
-
-Does pKVM ever collapse tables into blocks? That is the only reason any
-of this mess ever gets roped in. If not I think it is possible to get
-away with a rwlock with unmap on the write side and everything else on
-the read side, right?
-
-As far as regular KVM goes we get in this business when disabling dirty
-logging on a memslot. Guest faults will lazily collapse the tables back
-into blocks. An equally valid implementation would be just to unmap the
-whole memslot and have the guest build out the tables again, which could
-work with the aforementioned rwlock.
-
-Do any of my ramblings sound workable? :)
-
---
-Thanks,
-Oliver
+Jason
