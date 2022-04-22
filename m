@@ -2,178 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CFFD50BDBB
-	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 18:57:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A632C50BDC3
+	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 18:58:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353440AbiDVRAE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Apr 2022 13:00:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34964 "EHLO
+        id S1346606AbiDVRBl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Apr 2022 13:01:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345433AbiDVQ7z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Apr 2022 12:59:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5FCAA5FF31
-        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 09:57:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650646619;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=6ojSZXPxoDV2f3YOyvbbjydnRtJRzwjRtv+89W8ar4I=;
-        b=PtwcmwT9pl5rm93iN2i6RVAdktCL2ioDmtNjPTIm4OjJQ22SDlzeBrJbI4kKLjbEvBGJl+
-        9fJOFSc03i9q2r8Ifr4wvdMVaVKa/lpvOYbrl0zgM5/pyfLqTj71hhmTiIyJAA25GHgamb
-        4Dlwi47EEgsOVpcnsoARdaO/x1qh52U=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-671-0TRUTmCUPLGLWrakOyZq_Q-1; Fri, 22 Apr 2022 12:56:56 -0400
-X-MC-Unique: 0TRUTmCUPLGLWrakOyZq_Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1733A1E1AE4C;
-        Fri, 22 Apr 2022 16:56:56 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EDC5A2166B5E;
-        Fri, 22 Apr 2022 16:56:55 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for Linux 5.18-rc4
-Date:   Fri, 22 Apr 2022 12:56:55 -0400
-Message-Id: <20220422165655.1665574-1-pbonzini@redhat.com>
+        with ESMTP id S229699AbiDVRBh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Apr 2022 13:01:37 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2057.outbound.protection.outlook.com [40.107.93.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DCC5606D2
+        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 09:58:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=F+6BaE4McADpgU9ZKbH/eVHUB9zvO0SIow1quNkWO6GGiXZQ9jeFGwYj4bnsTTrBg/f9DvOvZnXY3e8w05hl+/g1IqYYwA1OptDaE/5EeGWE9F+M+2juP0TDFS40eqsmfr7CigRvr/N+qi0/6Vd1afBmAsdDOj8jnu5aggpEiiDThnmASl9IzQz4jntWtEWBMrcZAO2MubFr60GUzy4NcV5r9f0TktFz1wLDZa7GTiR+3TVaWyjCT5O1Vz6PViEIg6erzVTD0sjV4Jn3nV6i/+1WQJ1k1XOsVFVxk3ZFTaER2us3nlx0v8pwvtYDRdVbiqUbBaLaW7Rbzsh5WGHo1A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9jwuD96ir2wzfLiQky7dgy3X2M5D5oUwsk/qwiXNVW0=;
+ b=n5Ho5pSN7A8gUensvcXuZPaBmHy18xBmY1F4JbA6KiBCax6rgOg8hJ1XAViX+GQma3vQRXiao+Wx7+vsaUFlyHkerKNS7WBiRvTr77+9fzSU0/cXOFIAi7J2bSDzWkmybG9IWDa6+Dw71WxiDdr3ZViVktTwURScomYqBLS6P3dBHb6CYgfBpfSuCj9YKJHVwF/3fQ08b8/3IgemMkh+GIcR47KInZVIZQJHxvgUTueU4ueftyr2TjxApl5oBLl5MT0L7TEICFZfqX31v2dg9sNZaHA2LQOvs+Ob6r92aYMt1Bhrxi+uWJaKtG8tXbRHqXF4RoSCogC6Eoi81lPe/w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9jwuD96ir2wzfLiQky7dgy3X2M5D5oUwsk/qwiXNVW0=;
+ b=F/QTpvuVLvUGAXZAAFlfpfpk+kzhFCJnM9+TYPiVTjfYhZUOQCZoTDRe+hVQ1+EGFCHiDOhRusTI5QhiGb0uVnyl+mYD7p+NBvHNH2aFaPjQ2o37taRvdz6zsyhy23toW8vSNAm4hkHo5Xf7HiGkPJuWBe8DgARvnOTTW50zUa9xva5aHFrWGUrao7Yv33yJSVugzV4AN0WdR5aop6fSlqOPYsxoEd7r1HWQhL+09VWVe0a9LaVh6l2h63upB6Ehsjt8Lm2/jGUfeSWx+sr3VS5wbMiKlQjw63V9KUmMXHOKkY6TctqQ1xqZgkjt6DStlrNJEmQEOQWHIS4s4K0guQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by CH0PR12MB5347.namprd12.prod.outlook.com (2603:10b6:610:d6::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.14; Fri, 22 Apr
+ 2022 16:58:34 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2%6]) with mapi id 15.20.5186.015; Fri, 22 Apr 2022
+ 16:58:34 +0000
+Date:   Fri, 22 Apr 2022 13:58:32 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 5/8] vfio: Change vfio_external_check_extension() to
+ vfio_file_enforced_coherent()
+Message-ID: <20220422165832.GA1951132@nvidia.com>
+References: <0-v2-6a528653a750+1578a-vfio_kvm_no_group_jgg@nvidia.com>
+ <5-v2-6a528653a750+1578a-vfio_kvm_no_group_jgg@nvidia.com>
+ <20220421054116.GC20660@lst.de>
+ <BN9PR11MB5276CFD31471D4EE85DD705A8CF79@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <BN9PR11MB527616A86D88299C7E5F4B598CF79@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB527616A86D88299C7E5F4B598CF79@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: MN2PR01CA0028.prod.exchangelabs.com (2603:10b6:208:10c::41)
+ To MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5abe0926-8662-4edb-5e02-08da24815635
+X-MS-TrafficTypeDiagnostic: CH0PR12MB5347:EE_
+X-Microsoft-Antispam-PRVS: <CH0PR12MB53478FE3D69697235F9272A2C2F79@CH0PR12MB5347.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 2smaXcg2ZE7uqHvdiw4+Kd3y4EmSXGUgd9yjcF1L7fv51lpTqysz5W/XkKOIFQqgl+X2bMHmzo2CcEukxKjwEcB+5v7OCEmH8C/nLQimiHAl9x6xvZIFKNOcHzfADS1cfhOcegNKPs8/STHOYOTrmMqT0BqXJYk+5DeVum8xXTZPDT6hcPNtE/mCvupltKU3fd/eqixdqKjbF/QCOC/+6+2On7MMP7v+XZV2W9CkyOcucIKGARwV9xZtsn8PR5TJvX4ufT4pBIIRJkTCu98amjz/766b+k8qfX9E78LTbncd+SAlLd8GwiF6mPO0K1KfL3oQFIIqH495d4dr70FunYiN1qOqfhc5luKW3VubKlcnqVxeiVjAlQ94zcf3rXYEXXm1r91cprM4F+k3u7RfofvISKoOZXBEjXq2GnNFyDKbuIf2MoQFLQnrNrgxiHqDd3KRGLi+pDSJxTosqn5zsuIAduGeYz0pBL2NcwYSML0eDPQN0GgT8p1Xzn6Pw7qdC0tKJNgC2NLMnRGpGgDIeGAK6yXJFCvyxP3Ywvj+U/oYq6uAS/lZO8H2IA11JsKqMfF+5HPydHbD/khwQr7d3L5l8WtzM97lca9F8j4wV9y8Bh6Bd0ohcOOX3scUfiwPurFnNrRLmtzgqw2J8EsqLA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6916009)(316002)(8676002)(86362001)(6506007)(66946007)(2906002)(66476007)(66556008)(38100700002)(4326008)(54906003)(508600001)(8936002)(6486002)(5660300002)(33656002)(6512007)(1076003)(36756003)(186003)(2616005)(26005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?dXo+b77zcFIyVoLE2987h/hMp/4TgEqOV0tL48GNO+HUeagG1JyDsZ7xuKBx?=
+ =?us-ascii?Q?vnfestFArN589w0LEs28sf+A6mghKBOemiqDE2WdPS9eoWi49jbiNIa0SjxP?=
+ =?us-ascii?Q?8l2ydZQhREaDhNi4PgYfImdd+looS+hiGQwW8Ho+x1Ili+MkGYAt0JFoDJkJ?=
+ =?us-ascii?Q?u7te0LIfjylTn9O8/5wG0h74K08dOCgghsrpI7rdxUhVGcIkoCV+a41qmpec?=
+ =?us-ascii?Q?gnOxX2SlHFNjg1L0MHirApuKkUFmE8olBNJYZcq6gtbQpNA3iaUYSRC7X9cH?=
+ =?us-ascii?Q?vaLDH2DgAW0wTtPEI+H8Q1jaW1XEmf3RlQEFJwVquu5VeuCQD9Im3rPMH0A/?=
+ =?us-ascii?Q?Xx+17f+m9R1FFlTFoDji7fghNf6BrTZK6Lz4p6416vIHtEc7A3wWk9cTrB4M?=
+ =?us-ascii?Q?KuEgZg0ATN/ySOArJ6maDzwjoSeUgrujc3yXnLdqvP50EMekWhE2ZoZfrDHV?=
+ =?us-ascii?Q?1qhUvcaG6hpcKXmCVuc72M3XJYPLMEI3BtiKSYG4RcfdLuI87KOnt/Y3ulGs?=
+ =?us-ascii?Q?1LcZ+zT2IR5CUvVrNFsv82wDskTrxIgoF+IX6fAkJb+a3VG9L5yb2BkDMw3r?=
+ =?us-ascii?Q?I6PolQVIDLPhnrb+LNZqeO0rxICQD/jQJ0t37/GU0bh1bf7tn505WtBROAiZ?=
+ =?us-ascii?Q?Fui7M7CCU+Zkv6qIYXX/JFhAwInkkFPtDtiEPtjFSUZ9IHtFyS+dMRWkZxs3?=
+ =?us-ascii?Q?r5Q0zGZL1LhdCe7pkQ4B1m5pwgkxM0Ou9KFgI5o32JbCxlKe3GE6v9mUCiO7?=
+ =?us-ascii?Q?qCmPvYP6M5tAxCzNyTM9Jqhi1msLaMZNreHBXa/nECgsNYrbxmTTFskznr4c?=
+ =?us-ascii?Q?m9Lsz72Y69AO0qED3j4qZU+Tulh17Bdn9p9f5M2LqVNSUOzQIDLRJVVbzCiS?=
+ =?us-ascii?Q?gqRx3fs0qotBBpCLOz4pBaGS4SnOEJePut9eLSJqXKye3RvEkmqEmiIerC2V?=
+ =?us-ascii?Q?owHE7Z0Pute5whnngb6GYsdobuTNqW+jJWM7KLVr/wqZkLhTxOIqUgue4ibd?=
+ =?us-ascii?Q?6XHQLZREyg/VGRZAO7B6UjMV2Z5hqfNC3eaWV0iA5V7taCm0cTUmqgksJZcx?=
+ =?us-ascii?Q?VnpCUcWYqD+3Ei6noCaegDfuJ5zr3KLQzAZ4X10M8eO/8SrKwsm+oi+GfVEm?=
+ =?us-ascii?Q?Y4x8tsExv/KXfZvF0aXF5lbzPukjRXXio5aa24w2AOEPa9ck0N+Euhsv7XA/?=
+ =?us-ascii?Q?qjRnnXJpNDgzWYKEHajG0Od6PTabLP33oLtOKwFVEfKnqEScXzaIBWYJpTMF?=
+ =?us-ascii?Q?/RgsUW6vDe5+sLmY9zPUeULdF6HSkGnLlCuI91vnO1C2rQnrmE12h4yWbNb8?=
+ =?us-ascii?Q?QzNW9gG2vXGHq8s8eCBWWUrHsZ5NwiRoiI/83c89tQ8Z/zWsdEbFMfFmLoGr?=
+ =?us-ascii?Q?wlS8b+70IXD8QoMzRTh4At0NLA7MxgfyzseErIY13xJYoR5WD/0luDkZ+YAW?=
+ =?us-ascii?Q?ZmJaiLn9QEQU5Rp0aajZlMd9W+M7rDwOhkFd6UBbIjLtdziNzHxOiSYKCdCt?=
+ =?us-ascii?Q?LnpkMjHAm2kbgh2eUBrL9Rnc0zUM38OFkXCTmqk8ErLrK2mx3JOM2A6v4UIW?=
+ =?us-ascii?Q?UmNJKOqWnslp5eFUSH00EdL0MOeteIZKtySHIghsk/MoFRfUmBcfTvEe9udQ?=
+ =?us-ascii?Q?O/JqSMjuVfqptvPJV4bdAXWYZ1XBdNsz86vgwPIw/JFHP3EHOdv/uRE3qnJU?=
+ =?us-ascii?Q?Axi3RDnJskJFGrEz4wU0Dz5ncKG6fdbc0RwNZamgNoTYhG58dwK3CyNH/IQV?=
+ =?us-ascii?Q?x4rvF9TPag=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5abe0926-8662-4edb-5e02-08da24815635
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2022 16:58:34.4252
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rPTKzvcPV28cNyKUekK1DvTN+JJYPVMip40Ez2AU4ks8XcpV9NCI4yQcnJD+VVAr
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5347
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On Fri, Apr 22, 2022 at 12:32:58AM +0000, Tian, Kevin wrote:
+> > From: Tian, Kevin
+> > Sent: Friday, April 22, 2022 8:13 AM
+> > 
+> > > From: Christoph Hellwig <hch@lst.de>
+> > > Sent: Thursday, April 21, 2022 1:41 PM
+> > >
+> > > I can see why a specific error might be nice for some cases and am
+> > > open to that, but as a simple transformation this already looks good:
+> > >
+> > 
+> > There is a slight semantics change together with patch7.
+> > 
+> > Before patch7 the container must be attached before calling
+> > KVM_DEV_VFIO_GROUP_ADD, otherwise vfio_group_get_external_user()
+> > will fail. In this case the result of cache coherency for a group is
+> > deterministic, either true or false.
 
-The following changes since commit b2d229d4ddb17db541098b83524d901257e93845:
+No, it isn't. The coherency is a propery of the iommu_domain/container
+and it can change when more groups are attached to the same
+domain. The best KVM can say is that if it is reporting coherency
+enforced it won't stop reporting that - which doesn't change in this
+series.
 
-  Linux 5.18-rc3 (2022-04-17 13:57:31 -0700)
+> > After patch7 vfio_group_get_external_user() is not called. It's possible
+> > that KVM_DEV_VFIO_GROUP_ADD is called before a container is attached
+> > by the group. In this case cache coherency of the group cannot be
+> > determined at that point. 
 
-are available in the Git repository at:
+groups don't have cache coherency, only iommu_domains do. In this case
+it is correct to report that no non-coherent DMA is possible becuase
+it isn't possible at that instant when no domain is attached.
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+> I prefer to returning an error in this callback > so KVM can still
+> fail adding the group, instead of letting the inaccurate > coherency
+> info to bit the user in a much latter point...
+> 
+> More accurately: s/cache coherency/enforced coherency/ in above.
 
-for you to fetch changes up to e852be8b148e117e25be1c98cf72ee489b05919e:
+An error here will not cause KVM to fail adding the group without more
+changes to how it works.
 
-  kvm: selftests: introduce and use more page size-related constants (2022-04-21 15:41:01 -0400)
+I'll check, it would be nice to preserve the ABI behavior of rejecting
+groups with no container.
 
-The main and larger change here is a workaround for AMD's lack of cache
-coherency for encrypted-memory guests.
-
-I have another patch pending, but it's waiting for review from the
-architecture maintainers.
-
-----------------------------------------------------------------
-RISC-V:
-
-* Remove 's' & 'u' as valid ISA extension
-
-* Do not allow disabling the base extensions 'i'/'m'/'a'/'c'
-
-x86:
-
-* Fix NMI watchdog in guests on AMD
-
-* Fix for SEV cache incoherency issues
-
-* Don't re-acquire SRCU lock in complete_emulated_io()
-
-* Avoid NULL pointer deref if VM creation fails
-
-* Fix race conditions between APICv disabling and vCPU creation
-
-* Bugfixes for disabling of APICv
-
-* Preserve BSP MSR_KVM_POLL_CONTROL across suspend/resume
-
-selftests:
-
-* Do not use bitfields larger than 32-bits, they differ between GCC and clang
-
-----------------------------------------------------------------
-Atish Patra (2):
-      RISC-V: KVM: Remove 's' & 'u' as valid ISA extension
-      RISC-V: KVM: Restrict the extensions that can be disabled
-
-Like Xu (1):
-      KVM: x86/pmu: Update AMD PMC sample period to fix guest NMI-watchdog
-
-Mingwei Zhang (2):
-      KVM: SVM: Flush when freeing encrypted pages even on SME_COHERENT CPUs
-      KVM: SEV: add cache flush to solve SEV cache incoherency issues
-
-Paolo Bonzini (3):
-      Merge tag 'kvm-riscv-fixes-5.18-2' of https://github.com/kvm-riscv/linux into HEAD
-      kvm: selftests: do not use bitfields larger than 32-bits for PTEs
-      kvm: selftests: introduce and use more page size-related constants
-
-Sean Christopherson (9):
-      KVM: x86: Don't re-acquire SRCU lock in complete_emulated_io()
-      KVM: RISC-V: Use kvm_vcpu.srcu_idx, drop RISC-V's unnecessary copy
-      KVM: Add helpers to wrap vcpu->srcu_idx and yell if it's abused
-      KVM: Initialize debugfs_dentry when a VM is created to avoid NULL deref
-      KVM: x86: Tag APICv DISABLE inhibit, not ABSENT, if APICv is disabled
-      KVM: nVMX: Defer APICv updates while L2 is active until L1 is active
-      KVM: x86: Pend KVM_REQ_APICV_UPDATE during vCPU creation to fix a race
-      KVM: x86: Skip KVM_GUESTDBG_BLOCKIRQ APICv update if APICv is disabled
-      KVM: SVM: Simplify and harden helper to flush SEV guest page(s)
-
-Thomas Huth (1):
-      KVM: selftests: Silence compiler warning in the kvm_page_table_test
-
-Tom Rix (1):
-      KVM: SPDX style and spelling fixes
-
-Wanpeng Li (1):
-      x86/kvm: Preserve BSP MSR_KVM_POLL_CONTROL across suspend/resume
-
- arch/powerpc/kvm/book3s_64_mmu_radix.c             |   9 +-
- arch/powerpc/kvm/book3s_hv_nested.c                |  16 +-
- arch/powerpc/kvm/book3s_rtas.c                     |   4 +-
- arch/powerpc/kvm/powerpc.c                         |   4 +-
- arch/riscv/include/asm/kvm_host.h                  |   3 -
- arch/riscv/kvm/vcpu.c                              |  37 ++--
- arch/riscv/kvm/vcpu_exit.c                         |   4 +-
- arch/s390/kvm/interrupt.c                          |   4 +-
- arch/s390/kvm/kvm-s390.c                           |   8 +-
- arch/s390/kvm/vsie.c                               |   4 +-
- arch/x86/include/asm/kvm-x86-ops.h                 |   1 +
- arch/x86/include/asm/kvm_host.h                    |   1 +
- arch/x86/kernel/kvm.c                              |  13 ++
- arch/x86/kvm/pmu.h                                 |   9 +
- arch/x86/kvm/svm/pmu.c                             |   1 +
- arch/x86/kvm/svm/sev.c                             |  67 ++++---
- arch/x86/kvm/svm/svm.c                             |   1 +
- arch/x86/kvm/svm/svm.h                             |   2 +
- arch/x86/kvm/vmx/nested.c                          |   5 +
- arch/x86/kvm/vmx/pmu_intel.c                       |   8 +-
- arch/x86/kvm/vmx/vmx.c                             |   5 +
- arch/x86/kvm/vmx/vmx.h                             |   1 +
- arch/x86/kvm/x86.c                                 |  60 +++---
- include/linux/kvm_host.h                           |  26 ++-
- .../selftests/kvm/include/x86_64/processor.h       |  17 ++
- tools/testing/selftests/kvm/kvm_page_table_test.c  |   2 +-
- tools/testing/selftests/kvm/lib/x86_64/processor.c | 202 +++++++++------------
- tools/testing/selftests/kvm/x86_64/amx_test.c      |   1 -
- .../selftests/kvm/x86_64/emulator_error_test.c     |   1 -
- tools/testing/selftests/kvm/x86_64/smm_test.c      |   2 -
- .../selftests/kvm/x86_64/vmx_tsc_adjust_test.c     |   1 -
- .../testing/selftests/kvm/x86_64/xen_shinfo_test.c |   1 -
- .../testing/selftests/kvm/x86_64/xen_vmcall_test.c |   1 -
- virt/kvm/dirty_ring.c                              |   2 +-
- virt/kvm/kvm_main.c                                |  43 +++--
- virt/kvm/kvm_mm.h                                  |   2 +-
- 36 files changed, 316 insertions(+), 252 deletions(-)
-
+Jason
