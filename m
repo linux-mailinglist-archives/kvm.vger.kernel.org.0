@@ -2,96 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 84C3050ACCD
-	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 02:33:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BDAB50AD48
+	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 03:39:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442945AbiDVAfz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Apr 2022 20:35:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43116 "EHLO
+        id S1443116AbiDVBmL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Apr 2022 21:42:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229784AbiDVAfx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Apr 2022 20:35:53 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 230F443EC5
-        for <kvm@vger.kernel.org>; Thu, 21 Apr 2022 17:33:02 -0700 (PDT)
+        with ESMTP id S1344083AbiDVBmK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Apr 2022 21:42:10 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BF5A49F94;
+        Thu, 21 Apr 2022 18:39:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650587582; x=1682123582;
+  t=1650591558; x=1682127558;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=zm/g8OPzNR9giOyFr9uM7ZZdfGYxNp5OC0ULeJAh1XM=;
-  b=V9W3M+RkLhv5i/IM5RhmZggwxokLEKBxnlVSL7sQHKTlo6DD9T4IPmmx
-   7HR8Cg3HKTshMIfe8wDhD+I1Yf7qeKue5FsZlhP2UqC78GTN1DouaL9hf
-   2d/z93sA2xs5SDUbqMgc/DcodA8bIuUNRdYjE+6Rnqa+6jEkHGgkJi/rx
-   MgFqBSkYdZ3Y3vWb91YVppfgQYVsm5NzzHOzaSI6IWHZrHJ4to+W57+rA
-   hLXWmjIqLIfNzhzIp+jv9SE8tmNjXDUksxsvIxMXXhbM66P+d0mdWFur3
-   SlDmVtWrbqGcM0Y3OKX49lNNCiv8Z1mnVE0j8ZQuHVWcageVCoQzsw2wk
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10324"; a="251848255"
+  bh=LlSeNJZw9K0gs+mSo7Cj6lJNYTXDNTi7/dqz/0pJyqM=;
+  b=fgbpWBZUCIefmjGdRFi62ig6AoFHdnmlL/aia/O7rLNNYwXamfwl2mw1
+   9dGkfxhRb4hazp3JKrXmh2an14WDxTd8Vm7ZaybxJPBh10OkhW9G2bicA
+   /ADtew3hl7uGYsR0YhNb7r1Ldak1yW+mZjNoUwESjOZ5uYotE99+S2FBv
+   oXupOUth7eXy4KNHJr9iz/OYzY0Bx0YeEd5W3rPOhyLBdrSo46hv2HGLt
+   pShShrcqMBzEM8XQIg7LYJsSVcCIBVXTh9ss61kPzO6jLT4KIUV9nv52o
+   ZHGgPfCFd7ALAnnpS1JERDNxQOEc+pbwWhuNd3kF5NV8pNo4SV681ZOao
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10324"; a="324984443"
 X-IronPort-AV: E=Sophos;i="5.90,280,1643702400"; 
-   d="scan'208";a="251848255"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2022 17:33:01 -0700
+   d="scan'208";a="324984443"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2022 18:39:15 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.90,280,1643702400"; 
-   d="scan'208";a="648371821"
+   d="scan'208";a="511356189"
 Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by FMSMGA003.fm.intel.com with ESMTP; 21 Apr 2022 17:33:01 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+  by orsmga003.jf.intel.com with ESMTP; 21 Apr 2022 18:39:14 -0700
+Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
  fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27; Thu, 21 Apr 2022 17:33:01 -0700
-Received: from fmsmsx605.amr.corp.intel.com (10.18.126.85) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ 15.1.2308.27; Thu, 21 Apr 2022 18:39:13 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27; Thu, 21 Apr 2022 17:33:00 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27 via Frontend Transport; Thu, 21 Apr 2022 17:33:00 -0700
+ 15.1.2308.27 via Frontend Transport; Thu, 21 Apr 2022 18:39:13 -0700
 Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.171)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2308.27; Thu, 21 Apr 2022 17:33:00 -0700
+ 15.1.2308.27; Thu, 21 Apr 2022 18:39:13 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gvhFSZgVZOwnF02/zdKmpd+xEd6JT3CZuO0PQh2ceXGKDLTGd6kOYRvd+JzhtizagFh0sTheg2klK8amflOE+Hpc5eAgVFF6FFPi1QUvhRJ2gfsgGC7WWIwCPOiAzd0RjokSSCUnTMy6GdarrQWP9g0Zdn1mnzo41V0Uv0udilQoH+tmjf+Es0dyiXWn4VsebcShdDZaeyr+yRl4JdocZWgJFLVHMjpOgKh6QhOLMMQcIIGu6usw14uadn366JcXBCn6eEz0Geu3YBnkDfHtvUn5VBUe8F1KUPppG2WfioWuQbBlL7dV5nNWEypPemhYolkOMJ0Of4dhYd7LI5dI+w==
+ b=nx0zEByFV3tlDTYZ1DslV3DKhCWV6MI/hR2DTU28xyxmEwZGoSCcePlJyclJ7LU5g7YTEViDCZyGA6GfaVD9ArEFWnLhJXF67tnFMYb+dcH0M5PV6TDV425V2cuMD/YQAHylacWvpaByFJv8U8JOJo2y9YsxRhlNwZimKZCqIzDJ29g10LM7Mq76QYTkmgtA+pic2ndjfJdQovu8B1uUR70q/QuALUzGFKFdM2VESN+sF9Y7CDjX7Z6x3Z8JdzrQcaakYfI2poor4Mf2+CxTZAW5EFHxcS1K3awse5NH+y1L153N1Ha6WkdC2HB8XH8icMAv0A+a4tsqbh0tsX/7ZA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zm/g8OPzNR9giOyFr9uM7ZZdfGYxNp5OC0ULeJAh1XM=;
- b=FT7A8rWSjPKYU4oFhXqIbHirQcC+3OOB4D4pOhVnAxMGFNaaFqA0U4xj3UGG84cEeR2T37d9/4Xo7WZ7JQIm1Po8fifPzZqMry+JUQ+LlqzkxGNi1ff8VOvbASpJd59PUZXQrqMfrQOB/X25TnxrV6r1XCtCgKocQBDVr/jv/ZbupZzR1w+Sv/KMU83iuP4vwWTQpQuL1eTLfd/oAHXGoFTuL1UvE1JCxnVxfkOVBORClxFJqVQbyottXajSU7KARehJUWhs93nlJ9xowsaQYOhIHyhpRa55byKZHryTMfql/I+pgCxjDIHcGii3dqzdhgz6FP+kHOcEmucoQ4nUow==
+ bh=Kddw+Fu+YsDqf7Sb/ou1bxbSz4o19BA1/4PC7EVr14I=;
+ b=QjHBaYp+IjdJ7/AP5Aatq8Sm6TuTn04K6Ekx9PoPEGrjwDjJS/DG6ljisDJth1jpCT4uce6A7p03Bsz62qGktx20nrPQk1cgWmlz8wYak49qW6E3gzNBhdwaIieD+eCeHn7k/5D+eBMr5p2gK5Sd4nWLhSwr5In05MmIKtj13q8+BGD3TFQ0kHn/ZdDXz+85Znwnpqgbxi3VWB7BqdoT5mvkwp/cCSx0Ndi+mEzjAFXaMnjmQHBvPZd4P/EjHPnuEA2aDMemYtEWMiCiSrTw5SL4qmvZLDWXOZTwG0kWOUhYpvltCG9PQNG/vY6tHIpE7o3BPe4Q9utQGLtQYWD5xQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by BN6PR11MB1890.namprd11.prod.outlook.com (2603:10b6:404:106::13) with
+ by PH0PR11MB5093.namprd11.prod.outlook.com (2603:10b6:510:3e::23) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.14; Fri, 22 Apr
- 2022 00:32:58 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.15; Fri, 22 Apr
+ 2022 01:39:10 +0000
 Received: from BN9PR11MB5276.namprd11.prod.outlook.com
  ([fe80::24dd:37c2:3778:1adb]) by BN9PR11MB5276.namprd11.prod.outlook.com
  ([fe80::24dd:37c2:3778:1adb%2]) with mapi id 15.20.5186.015; Fri, 22 Apr 2022
- 00:32:58 +0000
+ 01:39:10 +0000
 From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@nvidia.com>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
         Cornelia Huck <cohuck@redhat.com>,
+        "Jonathan Corbet" <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "Harald Freudenberger" <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        "Joonas Lahtinen" <joonas.lahtinen@linux.intel.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: RE: [PATCH v2 5/8] vfio: Change vfio_external_check_extension() to
- vfio_file_enforced_coherent()
-Thread-Topic: [PATCH v2 5/8] vfio: Change vfio_external_check_extension() to
- vfio_file_enforced_coherent()
-Thread-Index: AQHYVOwc8QHMMV75gUKPqgPshj3xIaz52v0AgAEzw8CAAAguEA==
-Date:   Fri, 22 Apr 2022 00:32:58 +0000
-Message-ID: <BN9PR11MB527616A86D88299C7E5F4B598CF79@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <0-v2-6a528653a750+1578a-vfio_kvm_no_group_jgg@nvidia.com>
- <5-v2-6a528653a750+1578a-vfio_kvm_no_group_jgg@nvidia.com>
- <20220421054116.GC20660@lst.de>
- <BN9PR11MB5276CFD31471D4EE85DD705A8CF79@BN9PR11MB5276.namprd11.prod.outlook.com>
-In-Reply-To: <BN9PR11MB5276CFD31471D4EE85DD705A8CF79@BN9PR11MB5276.namprd11.prod.outlook.com>
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        "Halil Pasic" <pasic@linux.ibm.com>,
+        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
+        "Sven Schnelle" <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>
+CC:     Tony Krowiak <akrowiak@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, Christoph Hellwig <hch@lst.de>
+Subject: RE: [PATCH v2 1/7] vfio: Make vfio_(un)register_notifier accept a
+ vfio_device
+Thread-Topic: [PATCH v2 1/7] vfio: Make vfio_(un)register_notifier accept a
+ vfio_device
+Thread-Index: AQHYVZz2Cke44OBD9UOI6FhokQW4CKz7J+BA
+Date:   Fri, 22 Apr 2022 01:39:09 +0000
+Message-ID: <BN9PR11MB52761D81DA24CD00E0FFA7728CF79@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <0-v2-6011bde8e0a1+5f-vfio_mdev_no_group_jgg@nvidia.com>
+ <1-v2-6011bde8e0a1+5f-vfio_mdev_no_group_jgg@nvidia.com>
+In-Reply-To: <1-v2-6011bde8e0a1+5f-vfio_mdev_no_group_jgg@nvidia.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -99,92 +120,346 @@ X-MS-TNEF-Correlator:
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0c971189-9a93-4fec-49ed-08da23f7a698
-x-ms-traffictypediagnostic: BN6PR11MB1890:EE_
-x-microsoft-antispam-prvs: <BN6PR11MB1890C08CEA94F26D19565F118CF79@BN6PR11MB1890.namprd11.prod.outlook.com>
+x-ms-office365-filtering-correlation-id: 8d853ae9-22c4-4d8f-c9ce-08da2400e5cd
+x-ms-traffictypediagnostic: PH0PR11MB5093:EE_
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-microsoft-antispam-prvs: <PH0PR11MB5093086AF4D8ED18D90397A68CF79@PH0PR11MB5093.namprd11.prod.outlook.com>
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ffgpSvCiOlHpPUeOZ+LUMbilqNyNV58zRpOJVsAJTDYCDx0AOvE/A76TAso0pgWvInYFzBvavyoC5k7b40If2vfhYcEYl7T0OMlnlocNaB3U/PbuMz6N74oQ5VQomcyYTsKweicyHoztteoezGfu7/WWU7ZqILPD38TD3C2uxmqO4bl+EBV5HBKyDGdKVsJXx6V6opbadR1Y0vOAMi40+hkEcx+TdpbwAKPjHUL7JLlMWqVF+8eOgKdUp3ChFYo1lYzmZ5BNBN+rruSYJDcOGs3+USfS1ozbzPxFqSa+o0t7E28wPpfgez2rMsLtlU8HIYKsCx6mgt1fiktD+z0XTVVlRztf7cIBLVatxiU4tsx/cipBVix2lH4sM8GUxVDlnRuQBqxEOY8YB3Lb6Ygl9iMJSDePTpIsmrVO2TVz5aNA2Ez1jQcrVXuKM+PdrljNUDq0iffIj6pYYhfqFOk44o2x70VYvIExiV3dEkZRsQhAooWIOn9/kB4f3oDxvxpXILLtn/T9Ys7CkAGLZ0OZ1tDj0gxAavSsC2D8p6HlOXpw4L//2QoEff2+JlCwJNLFLJufKOs37xSbrm56gW1MYfrekt3y32dO5X83zPJiuPhM7jl/NYi2SIige1auuVnWf4/e2IoDeO3WC88uVD5AuQhiZkl8i0jpuY6OE9UFUH+xOMDqElGTpp8FyVLOsxkzcY5kSE3Q9a4XbPhhTAYk7Q==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(508600001)(5660300002)(7696005)(64756008)(54906003)(2940100002)(52536014)(66446008)(82960400001)(9686003)(33656002)(4326008)(8936002)(6506007)(8676002)(2906002)(38100700002)(110136005)(38070700005)(86362001)(107886003)(186003)(316002)(26005)(71200400001)(122000001)(66476007)(66556008)(55016003)(76116006)(66946007);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: m/eJofcHIRn3h9ZLAO+8yCS+QEa2mWqWYNPp1fY1RiMQ28SrNPs8C/W+0g17HGOX5Hy+svJv21As6218Kcw5tzW854Sq+gNSmJ/g3F8cpe2gp8L9TiWF7bkANCa1cFbOdShjDL7ynFtFimpZV8M6ibrajfaV6gpPrUXwi/M4iATz7ZZS8/FLItS8LOUnUmvrqBqcDsTV7PZTayGobGG8IIVL8ZoH/Fucm5JjlTH5i2dB4iv/gxFYeqopyVfEd4HOzcZe5Gm8Qvz90xUrh3YBK0SZn/aohf1AE6FvK6VAYtwyXPjFHlZMQGQn/xNyU60erK4KkxXi2CbnYPXmvIYfN0+ABOrz36ZlNsrZoK2D00CQdsNw4tW6u/T0hOvuXDwGKwZZWLrZH8fXemU3/k/yvA/kx3D5doSj0rvxw8/A8vbjsIKw9uZjR3eqzr27kACvcRX/SaReqdnTEGxJrN6twHwX05aEpEB919m8QUzv1U07eVmrgH5QmCxtRWcJZP8EhOdaLYb2kG0ggyJ9wsiPzx1ta9G341E+zybdseDgzimxZHQ+aBLdhTBTXY/bQM5kI6bEvCRH/NDEtwtWv+xkYMkNhbnCnSSUo+LGM2PxNLqclyvNmvpK8eIgOGFS5hm6WrpBVZlJ4w5MeDVyzXdjkzyY6SfHqD7vALzbqxGYc2lvLeXQJK3HAXsLXm/7per+Ma9D9ki/SPBHLWO6PxW5u7V4uhUcLzn9TI2v2v13eng=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(186003)(86362001)(508600001)(66446008)(66476007)(66946007)(76116006)(6636002)(64756008)(66556008)(4326008)(8676002)(54906003)(110136005)(316002)(71200400001)(38070700005)(5660300002)(38100700002)(6506007)(7416002)(7406005)(52536014)(7696005)(8936002)(26005)(9686003)(83380400001)(55016003)(921005)(82960400001)(122000001)(33656002)(2906002);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?sgvYBhs0uzde4yEe63q4LAqZsDXNRHlvMGqkbBM5m9OoEwSnHeU8GH9eNOC3?=
- =?us-ascii?Q?efykejdE+BvM7YQ+eHp4Z+1erdkcKkegUoJZxOrqrIeHj/Pz+col0KtPSRfL?=
- =?us-ascii?Q?UJLjk3RlCEZDmx1zKiFvdGZBq78R+4oPJXbCdrGzhcQJqPDXOEErG9h+NdpL?=
- =?us-ascii?Q?B+fhHIdY6wd3aNqPl70SmgqykYCqGqQSA3fPgGPFFRGperipMucgWH+IHJNL?=
- =?us-ascii?Q?F6DmTgL2UXEMcnSh8X3iDzZP4j9fK2PEQlECfNUUfUFBeYVNY8zzBw8j35yq?=
- =?us-ascii?Q?bVGYb/p1fJMtzrtqV3BnEMexg6EY50mv2XdzapQu0lhHt9QkPeeGFmY5Wdgu?=
- =?us-ascii?Q?uB9eWurNhQOSecN/4LSK59/OPo6yQVq5g8uIb1moiPBFhaAlCrfkiADvh/oQ?=
- =?us-ascii?Q?aT2tLjaiAkpNwnrLSz8rJGfUL1BgA311yuZJftWlyHIXcdxLLrnrMdwpT9c3?=
- =?us-ascii?Q?t6DIbWSIsbaWfemjlDXn73jXWKOW8rm/nIe621//0hy+vldhShdrdARP93CZ?=
- =?us-ascii?Q?+bwNm9MA1nkmXzzRO5RBNUkCu8wowTtGdPPSxVRr9aUpjPai9SD3YWpRoJTW?=
- =?us-ascii?Q?/DH2rkjD+qD3XvhNMYQFchEcj2P5uIVEHLZ37Q16IbY1pUcBwhpX5Zs7pbFr?=
- =?us-ascii?Q?bPXiB4UmUvbkGb7dGclm2Lhjo+xcnaBUCrnsUajkyU8SYF88I7GtHr4IxFUx?=
- =?us-ascii?Q?VRlQQc0HsPRrOHDEc94Syd2nHqvpb2kF8TWOJANiUTbC3GFr+3tPR6SOeeX8?=
- =?us-ascii?Q?nR8u1xeUH2eJHkRJ1V+2Z0CTOpD+QQAZMACwPlMbdkWjNrL2/DO75p8Yx952?=
- =?us-ascii?Q?wx+5RfvJr9vHTy9zYu/wYYSg5XMR+MhIEJ1LO5gv4FnOHDVp9KCXeua83NFn?=
- =?us-ascii?Q?Nxggwzvzsi5B31d2AVMu7Kg2L6FKzZdKEFIMUsbelFbDOSIIGyueQiF/drg7?=
- =?us-ascii?Q?LoBQmeu9TWTjqaaZ2W2GPO96t+1Aq2LW/EM9QuDfoYZJ+ANexXmTKGj4JXm8?=
- =?us-ascii?Q?ML1JrhFY47FpFd3pj7YrT8wTuVMzAWy0++sYL2QJc38FxXt/H+t1ZdboUz0i?=
- =?us-ascii?Q?LdLqKRv9N4Y1sQSK/yhrq4XdwigmUUcczRR7rwjyLgiz+enXHdL3yiqFbMJw?=
- =?us-ascii?Q?ZMYFoCBYZTj8UA5DJVIT2AqiwaZk9NIGuYB0ysnxc9XSAZ4xZqGRtLvJVDQV?=
- =?us-ascii?Q?gPPFDC4jFzrGghelc88/eFTD5lZWUp1HFNeQIRA0vPvGl2wHSiey1tdWwOcc?=
- =?us-ascii?Q?cEw4OG7l7HcR7qUbYCdYGKN94EmmEyncunyassEyfA+tbHKu2IuoyMGmVvBn?=
- =?us-ascii?Q?BiepEn5fvBBJ6xZ5rUr4jNyqH1mJr1eV8DZMImpf4IJlqikojiB3tkGlqbly?=
- =?us-ascii?Q?7YBt36XrHkNbPgdn47foJTgB+WUO5qGnu4Hzug++DYx2Z3jRNbNB+q8fJY7n?=
- =?us-ascii?Q?sV8frW3KecGN9qsVBrbMFLKasPp3b0/90nUQ20tNLidomr8SdlaQzSttI79G?=
- =?us-ascii?Q?EeQIHg0ScHDPbv4cncCPEXqOk/jO5ZgYL12kkR2UI3y1ConQiy/tbErTz4/J?=
- =?us-ascii?Q?26bSPczheF1MGzeVk/F6tuL74zJ1oI3viZeFBjTcVd0hN3m5qjZXDu+R2yZb?=
- =?us-ascii?Q?8zmgUJEX9kcaaqRpEAi59YLldaiTiCie2MuBRm/Zu2bdP+FCoVLMP89yWyAC?=
- =?us-ascii?Q?wIxHSvEf0hnkqiLYWaZVRaw5xlMOU8NM9m6/NpTX0D33EkZ9krPEvRuguDC/?=
- =?us-ascii?Q?/b9xgs96SA=3D=3D?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?W66AdAphoMzDy27Ku9L1isYvIIFqej/6eMU9hXu4b5yLqTdZnMHToGXdJSo5?=
+ =?us-ascii?Q?40cCA9wydAIt7QOu+aUfs8mV9/3sPeO5Wn2sDyk3wKymGPpCyCdhVhDsl8NM?=
+ =?us-ascii?Q?OVVkYJFjqqAIwv6i7uaoegCjbevzo3SyQQErgP4dBGZwxQoZK+diZ5Y0ntO1?=
+ =?us-ascii?Q?1jvpgCc1PwPflMpaeFia/z5v/+wG3EGYnvPvYqrwrnYstasr51KRldSvksHB?=
+ =?us-ascii?Q?9o7GjM/6w/bWVVkBid7awMVerxs6l7p6+16WV0bjEXk9cnR/tfIWdKtq7N2Q?=
+ =?us-ascii?Q?zC0ZTMbZo8a+euYV24tufBiqWFrbLBgU/vRY6iR9LFnHqJ8QVtnCakUCIYaI?=
+ =?us-ascii?Q?MK6tScO22MKcD9TW7kdFRIo5DHQ3nbFo1yD5ay6hV4GpHJn95O7Q04Jgdobr?=
+ =?us-ascii?Q?gzOs25KN1ifC7HIGQl3JdU300KM+lhzJChQFcpwS/qSNCSOPQghUfZVvQPPP?=
+ =?us-ascii?Q?NdBZcLcyKn/++88AWk9RFP2vqcc1xUuqs6Ofx1yCvSLei26evy5LzMi/8nm7?=
+ =?us-ascii?Q?4WXM4086vFf/eyDRTDgISLeEY+D6VafEgjxTdAoEoepIcSxyq4CFgi3RMcZ/?=
+ =?us-ascii?Q?ORfAYVVqnV1KpfJp3nGCwFZsZC3LAQolD4ZlNncLf9H0nzs/epntUwjw5Y80?=
+ =?us-ascii?Q?IY83Kkpyxp8b65O5cbfn7/Ognk4wVB4U7sbl7dDoTcCtOjDlCyYeRZNs2vr7?=
+ =?us-ascii?Q?E+VjgawIHVhsiha3gR0BB9Zz2mi+roFZevLqzyG0oIaSLKS6RjECJ7eYHB6B?=
+ =?us-ascii?Q?83HjoPnttXuKuq1ed9E+bCfYCIm8S2ZyuqD/jDPSQfDWz5FR8fj+jlFosb37?=
+ =?us-ascii?Q?WBXX0YofK8Oucga2x+IMCxPY3nFRNrxvDLk5QsS6kTBMb/JWeSQY96B5sVYN?=
+ =?us-ascii?Q?4+vzJhdlEJIaylo6A7Rke+f179M6lgbc8IyihG0We2na46kHsjFvb/FCs08h?=
+ =?us-ascii?Q?fOcUfJeuRi+tfobtWXr0+Rh6VNHEhgU5rNuvE9AcuEs6ke50tnAQbDJHms/U?=
+ =?us-ascii?Q?Vkrexc5Yd+txvF7l6jJceh2r15+RThtkWrSRQQjzL8L1xMLiYsx45/wk5BKS?=
+ =?us-ascii?Q?+nB7IT4BRHj7PmF3/LU/0CSMGll0ah55U7OnA5hp3Vwj7Uxc86LEKABwm9v0?=
+ =?us-ascii?Q?XymaY1Pa38Skdwq08wuqoPEa0SL2oz3cRrEPH8CpkHIvCSbMQEdbnJLLqpzI?=
+ =?us-ascii?Q?wuwZQddezgELeU96FB8t71i+j3tm2GZ3Ha4LDqcIKJEK7pb+E4/z5BGw55nd?=
+ =?us-ascii?Q?4LNMXKFmf7caCXKNUyyREm3JeBeue/BV1xR5D6RWe26n07sALdYrb8SvG/c/?=
+ =?us-ascii?Q?JwQfTths1gdsyYtAYvQmepaR24iPFdjG6gY2gOfMH2o8ixVaVL4BGb6FdAwi?=
+ =?us-ascii?Q?0wVbdRhcxEjCqqgGGq6QYhpDJEC+Fdl3tm0u5SaSKczaczyyUtEK3bv8Ua20?=
+ =?us-ascii?Q?tXuD8fs7ql4VCfeHRDZc3lixFybYMI0fqM7s8h/2tUcKPuPpGlUqVNpHOVwU?=
+ =?us-ascii?Q?QC0ctK1caYvbbM5wU8mIrMBoW3ukyYkO/takca8X5xYiuCtEHVri93ACtofm?=
+ =?us-ascii?Q?8zM843wWEB0dz8kSZM8afNxVwcFTgT6CIn5bfDbotQjc117FwDGUwEzmB2ox?=
+ =?us-ascii?Q?NjH05wkikkPRJDFPbwgYEF9f9Q0Gsegp7825MRMeIjll2tBPYRhA0K1gVCVK?=
+ =?us-ascii?Q?pXMLjVr/iTybETLcbLzyXmWNZNg43SZtQH62Zs06zHrYl4z14LE7Zs3FAerM?=
+ =?us-ascii?Q?3+FFQ0Sv2g=3D=3D?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0c971189-9a93-4fec-49ed-08da23f7a698
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Apr 2022 00:32:58.5082
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8d853ae9-22c4-4d8f-c9ce-08da2400e5cd
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Apr 2022 01:39:09.9946
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qJP23PAcLzZbzabc5po4t9H5iZ4HuuWZF9bxDbNpXUzzSOudDNLFZeDnofDukdEtW1LyI95AkLupJfHMl0zj6w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR11MB1890
+X-MS-Exchange-CrossTenant-userprincipalname: nMj66Julz1N+aGk4MAdind55RkbRKqXl+aNkKtD1xAp8IBEZEbMrc/sh/KyrbvNiCOJ5xY5Pj9z3gT1rPipz2g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5093
 X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Tian, Kevin
-> Sent: Friday, April 22, 2022 8:13 AM
+> From: Jason Gunthorpe
+> Sent: Friday, April 22, 2022 12:29 AM
 >=20
-> > From: Christoph Hellwig <hch@lst.de>
-> > Sent: Thursday, April 21, 2022 1:41 PM
-> >
-> > I can see why a specific error might be nice for some cases and am
-> > open to that, but as a simple transformation this already looks good:
-> >
+> All callers have a struct vfio_device trivially available, pass it in
+> directly and avoid calling the expensive vfio_group_get_from_dev().
 >=20
-> There is a slight semantics change together with patch7.
->=20
-> Before patch7 the container must be attached before calling
-> KVM_DEV_VFIO_GROUP_ADD, otherwise vfio_group_get_external_user()
-> will fail. In this case the result of cache coherency for a group is
-> deterministic, either true or false.
->=20
-> After patch7 vfio_group_get_external_user() is not called. It's possible
-> that KVM_DEV_VFIO_GROUP_ADD is called before a container is attached
-> by the group. In this case cache coherency of the group cannot be
-> determined at that point. I prefer to returning an error in this callback
-> so KVM can still fail adding the group, instead of letting the inaccurate
-> coherency info to bit the user in a much latter point...
->=20
+> To support the unconverted kvmgt mdev driver add
+> mdev_legacy_get_vfio_device() which will return the vfio_device pointer
+> vfio_mdev.c puts in the drv_data.
 
-More accurately: s/cache coherency/enforced coherency/ in above.
+stale comment
+
+>=20
+> Acked-by: Eric Farman <farman@linux.ibm.com>
+> Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
+> Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+
+> ---
+>  drivers/gpu/drm/i915/gvt/kvmgt.c  | 24 ++++++++++++------------
+>  drivers/s390/cio/vfio_ccw_ops.c   |  7 +++----
+>  drivers/s390/crypto/vfio_ap_ops.c | 14 +++++++-------
+>  drivers/vfio/vfio.c               | 25 +++++++------------------
+>  include/linux/vfio.h              |  4 ++--
+>  5 files changed, 31 insertions(+), 43 deletions(-)
+>=20
+> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> index 0787ba5c301f5e..1cec4f1fdfaced 100644
+> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> @@ -810,8 +810,8 @@ static int intel_vgpu_open_device(struct vfio_device
+> *vfio_dev)
+>  	vgpu->group_notifier.notifier_call =3D intel_vgpu_group_notifier;
+>=20
+>  	events =3D VFIO_IOMMU_NOTIFY_DMA_UNMAP;
+> -	ret =3D vfio_register_notifier(vfio_dev->dev, VFIO_IOMMU_NOTIFY,
+> &events,
+> -				&vgpu->iommu_notifier);
+> +	ret =3D vfio_register_notifier(vfio_dev, VFIO_IOMMU_NOTIFY, &events,
+> +				     &vgpu->iommu_notifier);
+>  	if (ret !=3D 0) {
+>  		gvt_vgpu_err("vfio_register_notifier for iommu failed: %d\n",
+>  			ret);
+> @@ -819,8 +819,8 @@ static int intel_vgpu_open_device(struct vfio_device
+> *vfio_dev)
+>  	}
+>=20
+>  	events =3D VFIO_GROUP_NOTIFY_SET_KVM;
+> -	ret =3D vfio_register_notifier(vfio_dev->dev, VFIO_GROUP_NOTIFY,
+> &events,
+> -				&vgpu->group_notifier);
+> +	ret =3D vfio_register_notifier(vfio_dev, VFIO_GROUP_NOTIFY, &events,
+> +				     &vgpu->group_notifier);
+>  	if (ret !=3D 0) {
+>  		gvt_vgpu_err("vfio_register_notifier for group failed: %d\n",
+>  			ret);
+> @@ -873,12 +873,12 @@ static int intel_vgpu_open_device(struct
+> vfio_device *vfio_dev)
+>  	vgpu->vfio_group =3D NULL;
+>=20
+>  undo_register:
+> -	vfio_unregister_notifier(vfio_dev->dev, VFIO_GROUP_NOTIFY,
+> -					&vgpu->group_notifier);
+> +	vfio_unregister_notifier(vfio_dev, VFIO_GROUP_NOTIFY,
+> +				 &vgpu->group_notifier);
+>=20
+>  undo_iommu:
+> -	vfio_unregister_notifier(vfio_dev->dev, VFIO_IOMMU_NOTIFY,
+> -					&vgpu->iommu_notifier);
+> +	vfio_unregister_notifier(vfio_dev, VFIO_IOMMU_NOTIFY,
+> +				 &vgpu->iommu_notifier);
+>  out:
+>  	return ret;
+>  }
+> @@ -907,13 +907,13 @@ static void __intel_vgpu_release(struct intel_vgpu
+> *vgpu)
+>=20
+>  	intel_gvt_release_vgpu(vgpu);
+>=20
+> -	ret =3D vfio_unregister_notifier(vgpu->vfio_device.dev,
+> VFIO_IOMMU_NOTIFY,
+> -					&vgpu->iommu_notifier);
+> +	ret =3D vfio_unregister_notifier(&vgpu->vfio_device,
+> VFIO_IOMMU_NOTIFY,
+> +				       &vgpu->iommu_notifier);
+>  	drm_WARN(&i915->drm, ret,
+>  		 "vfio_unregister_notifier for iommu failed: %d\n", ret);
+>=20
+> -	ret =3D vfio_unregister_notifier(vgpu->vfio_device.dev,
+> VFIO_GROUP_NOTIFY,
+> -					&vgpu->group_notifier);
+> +	ret =3D vfio_unregister_notifier(&vgpu->vfio_device,
+> VFIO_GROUP_NOTIFY,
+> +				       &vgpu->group_notifier);
+>  	drm_WARN(&i915->drm, ret,
+>  		 "vfio_unregister_notifier for group failed: %d\n", ret);
+>=20
+> diff --git a/drivers/s390/cio/vfio_ccw_ops.c
+> b/drivers/s390/cio/vfio_ccw_ops.c
+> index c4d60cdbf247bf..b49e2e9db2dc6f 100644
+> --- a/drivers/s390/cio/vfio_ccw_ops.c
+> +++ b/drivers/s390/cio/vfio_ccw_ops.c
+> @@ -183,7 +183,7 @@ static int vfio_ccw_mdev_open_device(struct
+> vfio_device *vdev)
+>=20
+>  	private->nb.notifier_call =3D vfio_ccw_mdev_notifier;
+>=20
+> -	ret =3D vfio_register_notifier(vdev->dev, VFIO_IOMMU_NOTIFY,
+> +	ret =3D vfio_register_notifier(vdev, VFIO_IOMMU_NOTIFY,
+>  				     &events, &private->nb);
+>  	if (ret)
+>  		return ret;
+> @@ -204,8 +204,7 @@ static int vfio_ccw_mdev_open_device(struct
+> vfio_device *vdev)
+>=20
+>  out_unregister:
+>  	vfio_ccw_unregister_dev_regions(private);
+> -	vfio_unregister_notifier(vdev->dev, VFIO_IOMMU_NOTIFY,
+> -				 &private->nb);
+> +	vfio_unregister_notifier(vdev, VFIO_IOMMU_NOTIFY, &private->nb);
+>  	return ret;
+>  }
+>=20
+> @@ -223,7 +222,7 @@ static void vfio_ccw_mdev_close_device(struct
+> vfio_device *vdev)
+>=20
+>  	cp_free(&private->cp);
+>  	vfio_ccw_unregister_dev_regions(private);
+> -	vfio_unregister_notifier(vdev->dev, VFIO_IOMMU_NOTIFY, &private-
+> >nb);
+> +	vfio_unregister_notifier(vdev, VFIO_IOMMU_NOTIFY, &private->nb);
+>  }
+>=20
+>  static ssize_t vfio_ccw_mdev_read_io_region(struct vfio_ccw_private
+> *private,
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c
+> b/drivers/s390/crypto/vfio_ap_ops.c
+> index ee0a3bf8f476ca..bfa7ee6ef532d9 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -1406,21 +1406,21 @@ static int vfio_ap_mdev_open_device(struct
+> vfio_device *vdev)
+>  	matrix_mdev->group_notifier.notifier_call =3D
+> vfio_ap_mdev_group_notifier;
+>  	events =3D VFIO_GROUP_NOTIFY_SET_KVM;
+>=20
+> -	ret =3D vfio_register_notifier(vdev->dev, VFIO_GROUP_NOTIFY,
+> -				     &events, &matrix_mdev->group_notifier);
+> +	ret =3D vfio_register_notifier(vdev, VFIO_GROUP_NOTIFY, &events,
+> +				     &matrix_mdev->group_notifier);
+>  	if (ret)
+>  		return ret;
+>=20
+>  	matrix_mdev->iommu_notifier.notifier_call =3D
+> vfio_ap_mdev_iommu_notifier;
+>  	events =3D VFIO_IOMMU_NOTIFY_DMA_UNMAP;
+> -	ret =3D vfio_register_notifier(vdev->dev, VFIO_IOMMU_NOTIFY,
+> -				     &events, &matrix_mdev->iommu_notifier);
+> +	ret =3D vfio_register_notifier(vdev, VFIO_IOMMU_NOTIFY, &events,
+> +				     &matrix_mdev->iommu_notifier);
+>  	if (ret)
+>  		goto out_unregister_group;
+>  	return 0;
+>=20
+>  out_unregister_group:
+> -	vfio_unregister_notifier(vdev->dev, VFIO_GROUP_NOTIFY,
+> +	vfio_unregister_notifier(vdev, VFIO_GROUP_NOTIFY,
+>  				 &matrix_mdev->group_notifier);
+>  	return ret;
+>  }
+> @@ -1430,9 +1430,9 @@ static void vfio_ap_mdev_close_device(struct
+> vfio_device *vdev)
+>  	struct ap_matrix_mdev *matrix_mdev =3D
+>  		container_of(vdev, struct ap_matrix_mdev, vdev);
+>=20
+> -	vfio_unregister_notifier(vdev->dev, VFIO_IOMMU_NOTIFY,
+> +	vfio_unregister_notifier(vdev, VFIO_IOMMU_NOTIFY,
+>  				 &matrix_mdev->iommu_notifier);
+> -	vfio_unregister_notifier(vdev->dev, VFIO_GROUP_NOTIFY,
+> +	vfio_unregister_notifier(vdev, VFIO_GROUP_NOTIFY,
+>  				 &matrix_mdev->group_notifier);
+>  	vfio_ap_mdev_unset_kvm(matrix_mdev);
+>  }
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index a4555014bd1e72..8a5c46aa2bef61 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -2484,19 +2484,15 @@ static int vfio_unregister_group_notifier(struct
+> vfio_group *group,
+>  	return ret;
+>  }
+>=20
+> -int vfio_register_notifier(struct device *dev, enum vfio_notify_type typ=
+e,
+> +int vfio_register_notifier(struct vfio_device *dev, enum vfio_notify_typ=
+e
+> type,
+>  			   unsigned long *events, struct notifier_block *nb)
+>  {
+> -	struct vfio_group *group;
+> +	struct vfio_group *group =3D dev->group;
+>  	int ret;
+>=20
+> -	if (!dev || !nb || !events || (*events =3D=3D 0))
+> +	if (!nb || !events || (*events =3D=3D 0))
+>  		return -EINVAL;
+>=20
+> -	group =3D vfio_group_get_from_dev(dev);
+> -	if (!group)
+> -		return -ENODEV;
+> -
+>  	switch (type) {
+>  	case VFIO_IOMMU_NOTIFY:
+>  		ret =3D vfio_register_iommu_notifier(group, events, nb);
+> @@ -2507,25 +2503,20 @@ int vfio_register_notifier(struct device *dev,
+> enum vfio_notify_type type,
+>  	default:
+>  		ret =3D -EINVAL;
+>  	}
+> -
+> -	vfio_group_put(group);
+>  	return ret;
+>  }
+>  EXPORT_SYMBOL(vfio_register_notifier);
+>=20
+> -int vfio_unregister_notifier(struct device *dev, enum vfio_notify_type t=
+ype,
+> +int vfio_unregister_notifier(struct vfio_device *dev,
+> +			     enum vfio_notify_type type,
+>  			     struct notifier_block *nb)
+>  {
+> -	struct vfio_group *group;
+> +	struct vfio_group *group =3D dev->group;
+>  	int ret;
+>=20
+> -	if (!dev || !nb)
+> +	if (!nb)
+>  		return -EINVAL;
+>=20
+> -	group =3D vfio_group_get_from_dev(dev);
+> -	if (!group)
+> -		return -ENODEV;
+> -
+>  	switch (type) {
+>  	case VFIO_IOMMU_NOTIFY:
+>  		ret =3D vfio_unregister_iommu_notifier(group, nb);
+> @@ -2536,8 +2527,6 @@ int vfio_unregister_notifier(struct device *dev,
+> enum vfio_notify_type type,
+>  	default:
+>  		ret =3D -EINVAL;
+>  	}
+> -
+> -	vfio_group_put(group);
+>  	return ret;
+>  }
+>  EXPORT_SYMBOL(vfio_unregister_notifier);
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index 66dda06ec42d1b..748ec0e0293aea 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -178,11 +178,11 @@ enum vfio_notify_type {
+>  /* events for VFIO_GROUP_NOTIFY */
+>  #define VFIO_GROUP_NOTIFY_SET_KVM	BIT(0)
+>=20
+> -extern int vfio_register_notifier(struct device *dev,
+> +extern int vfio_register_notifier(struct vfio_device *dev,
+>  				  enum vfio_notify_type type,
+>  				  unsigned long *required_events,
+>  				  struct notifier_block *nb);
+> -extern int vfio_unregister_notifier(struct device *dev,
+> +extern int vfio_unregister_notifier(struct vfio_device *dev,
+>  				    enum vfio_notify_type type,
+>  				    struct notifier_block *nb);
+>=20
+> --
+> 2.36.0
+
