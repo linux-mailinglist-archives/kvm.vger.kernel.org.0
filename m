@@ -2,156 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C39C50B465
+	by mail.lfdr.de (Postfix) with ESMTP id BC90650B467
 	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 11:49:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1445995AbiDVJvO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Apr 2022 05:51:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34410 "EHLO
+        id S1446219AbiDVJvX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Apr 2022 05:51:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1387288AbiDVJvL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Apr 2022 05:51:11 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE6B6101DC;
-        Fri, 22 Apr 2022 02:48:18 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id c12so9710694plr.6;
-        Fri, 22 Apr 2022 02:48:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id;
-        bh=UgfEhZ8+0guBOJEB+LTVzDck5+orSXs7YLCmPKl/+a8=;
-        b=MR2tzT3jkl8yDrm9X9xI11YMz7iWT4zt50glV/lxhyzah3WfjSHGC5ke9zLIxJ+qFh
-         0IrbrndYo+hMgjE9wLqnkA19AjUavzncOZrLZ1MDYUFYr/u8f5k0TltsihjLQy5/FvOH
-         USatLJhB+v1VPeTyG8FA8yI/YkhzGcwQ/eeZ9w3K4VSs0GUU/j11IV4+N3aK68ghCqih
-         Cbrki7S95gAJcTDGY77CXw80U/wwiZXjQHSOCDij4ESZNyVYVrELaeAOuNr5qO1wWrO9
-         53cPHcwwiL+aBu0pqWnO+US9pjJSmBdszFFH2gCeHvSba6u3QJKZ/UAs0ZPinayBMnfn
-         DArw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=UgfEhZ8+0guBOJEB+LTVzDck5+orSXs7YLCmPKl/+a8=;
-        b=NHSldvw94UlK9auvjMX/duYrwy2USx1LSLBHbNR0tiNihRI2WDG6vNRaQ7z1BleL2L
-         gx6yFiHGBB1nM9W8kbBNH5xrQL4UMMLY4WsBkXaV5zUsdzHAbx8LPqQPprb/RMWyq2aM
-         6QgIIrEsJZQVOxg3n3m3ADGBGn9mBb2+Ynx6VRiNhouXtinbI0wFJ+wqdCYDIDrkzZM2
-         +eCQMBMIW5IMdUWzwwyamZPOCrDRokS5coYU+HIqK1kNBaFP4zuyVxr3Z9HtMvK4wuM7
-         mlcpSOBaELPpiJT5t0EvopmFWje0cRZbY/wmQzszDW/0KGPxLHv1EK+G9783+zAuNsqE
-         UiKQ==
-X-Gm-Message-State: AOAM533NApGYjlJh2kKWR2EKaADYpAsaNY6T0ZS/k5sfn9uwqTXnMDtJ
-        wfeTVZ2FT9jZDpBCl/f8eRwFCPns7fc=
-X-Google-Smtp-Source: ABdhPJwCDbYkZRgiIKnvoI0V+j2m8JLvkWAhPEkF5WV6KqGvx6NqAcj6S5MMCqEuDyoA3sQ+Yf2OUg==
-X-Received: by 2002:a17:90b:1d0e:b0:1c9:b74e:494 with SMTP id on14-20020a17090b1d0e00b001c9b74e0494mr4362366pjb.238.1650620898216;
-        Fri, 22 Apr 2022 02:48:18 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.119])
-        by smtp.googlemail.com with ESMTPSA id 80-20020a630453000000b003aa6779ff5asm1702172pge.16.2022.04.22.02.48.15
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 22 Apr 2022 02:48:17 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH] x86/kvm: handle the failure of __pv_cpu_mask allocation
-Date:   Fri, 22 Apr 2022 02:47:26 -0700
-Message-Id: <1650620846-12092-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S1387288AbiDVJvV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Apr 2022 05:51:21 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D82D1E01B;
+        Fri, 22 Apr 2022 02:48:28 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8F892B82BB8;
+        Fri, 22 Apr 2022 09:48:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 392ADC385AB;
+        Fri, 22 Apr 2022 09:48:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1650620906;
+        bh=GqQteHqQWVMtYRhHCscBLVDrA/2KZmg5bBHyhsfBNrU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ddO8+grNLavLM2U+3CXGXlyC3Uj2lZwKwEBOh0LKmB1zLcCiXPzujY70QeExAXUs0
+         GMxu5vnuARfljdyepP21+wylC+A6xHU2qGNKjNm2dcVq1Ss2W3VOduIfmAEpRRAqt5
+         nKddkMVvWQsgd9zC6BLJJl2v74rbQfOKbaAIJecWLQQkSjy+U+5+N0lKgcZ3I6+7q6
+         dF3qMFou7P/l1xe8IFtFBmnEWxrnrexOLPCsWL4QBsFRqMsVwDCmpa0mflOLfDLhaC
+         RgHGLjLTNVCrSMzqj9GeCNnd8fGVVuwZivw2DtoVtWtZxPhgFcjelzZKeunORRQArr
+         bopcwdpl2XwXw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nhptn-0067k3-OQ; Fri, 22 Apr 2022 10:48:23 +0100
+Date:   Fri, 22 Apr 2022 10:48:23 +0100
+Message-ID: <87bkwta1p4.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, will@kernel.org,
+        apatel@ventanamicro.com, atishp@rivosinc.com, seanjc@google.com,
+        pgonda@google.com
+Subject: Re: [PATCH 1/4] KVM: x86: always initialize system_event.ndata
+In-Reply-To: <20220421180443.1465634-2-pbonzini@redhat.com>
+References: <20220421180443.1465634-1-pbonzini@redhat.com>
+        <20220421180443.1465634-2-pbonzini@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, will@kernel.org, apatel@ventanamicro.com, atishp@rivosinc.com, seanjc@google.com, pgonda@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Thu, 21 Apr 2022 19:04:40 +0100,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 
+> The KVM_SYSTEM_EVENT_NDATA_VALID mechanism that was introduced
+> contextually with KVM_SYSTEM_EVENT_SEV_TERM is not a good match
+> for ARM and RISC-V, which want to communicate information even
+> for existing KVM_SYSTEM_EVENT_* constants.  Userspace is not ready
+> to filter out bit 31 of type, and fails to process the
+> KVM_EXIT_SYSTEM_EVENT exit.
+> 
+> Therefore, tie the availability of ndata to a system capability
+> (which will be added once all architectures are on board).
+> Userspace written for released versions of Linux has no reason to
+> check flags, since it was never written, so it is okay to replace
+> it with ndata and data[0] (on 32-bit kernels) or with data[0]
+> (on 64-bit kernels).
 
-Fallback to native ipis/tlb flush if fails to allocate __pv_cpu_mask.
+How is it going to work for new userspace on old kernels, for which
+the ndata field is left uninitialised?
 
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kernel/kvm.c | 26 ++++++++++++++++++++++++--
- 1 file changed, 24 insertions(+), 2 deletions(-)
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/svm/sev.c   | 3 +--
+>  arch/x86/kvm/x86.c       | 2 ++
+>  include/uapi/linux/kvm.h | 1 -
+>  3 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index a93f0d01bb90..51b963ec122b 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -2739,8 +2739,7 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+>  			reason_set, reason_code);
+>  
+>  		vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+> -		vcpu->run->system_event.type = KVM_SYSTEM_EVENT_SEV_TERM |
+> -					       KVM_SYSTEM_EVENT_NDATA_VALID;
+> +		vcpu->run->system_event.type = KVM_SYSTEM_EVENT_SEV_TERM;
+>  		vcpu->run->system_event.ndata = 1;
+>  		vcpu->run->system_event.data[1] = control->ghcb_gpa;
 
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index a22deb58f86d..29d79d760996 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -46,6 +46,7 @@
- 
- DEFINE_STATIC_KEY_FALSE(kvm_async_pf_enabled);
- 
-+static struct apic orig_apic;
- static int kvmapf = 1;
- 
- static int __init parse_no_kvmapf(char *arg)
-@@ -542,6 +543,11 @@ static void __send_ipi_mask(const struct cpumask *mask, int vector)
- 
- static void kvm_send_ipi_mask(const struct cpumask *mask, int vector)
- {
-+	if (unlikely(!this_cpu_cpumask_var_ptr(__pv_cpu_mask))) {
-+		orig_apic.send_IPI_mask(mask, vector);
-+		return;
-+	}
-+
- 	__send_ipi_mask(mask, vector);
- }
- 
-@@ -551,6 +557,11 @@ static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int vector)
- 	struct cpumask *new_mask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
- 	const struct cpumask *local_mask;
- 
-+	if (unlikely(!new_mask)) {
-+		orig_apic.send_IPI_mask_allbutself(mask, vector);
-+		return;
-+	}
-+
- 	cpumask_copy(new_mask, mask);
- 	cpumask_clear_cpu(this_cpu, new_mask);
- 	local_mask = new_mask;
-@@ -611,6 +622,7 @@ late_initcall(setup_efi_kvm_sev_migration);
-  */
- static void kvm_setup_pv_ipi(void)
- {
-+	orig_apic = *apic;
- 	apic->send_IPI_mask = kvm_send_ipi_mask;
- 	apic->send_IPI_mask_allbutself = kvm_send_ipi_mask_allbutself;
- 	pr_info("setup PV IPIs\n");
-@@ -639,6 +651,11 @@ static void kvm_flush_tlb_multi(const struct cpumask *cpumask,
- 	struct kvm_steal_time *src;
- 	struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
- 
-+	if (unlikely(!flushmask)) {
-+		native_flush_tlb_multi(cpumask, info);
-+		return;
-+	}
-+
- 	cpumask_copy(flushmask, cpumask);
- 	/*
- 	 * We have to call flush only on online vCPUs. And
-@@ -671,11 +688,16 @@ static __init int kvm_alloc_cpumask(void)
- 
- 	if (pv_tlb_flush_supported() || pv_ipi_supported())
- 		for_each_possible_cpu(cpu) {
--			zalloc_cpumask_var_node(per_cpu_ptr(&__pv_cpu_mask, cpu),
--				GFP_KERNEL, cpu_to_node(cpu));
-+			if (!zalloc_cpumask_var_node(&per_cpu(__pv_cpu_mask, cpu),
-+				GFP_KERNEL, cpu_to_node(cpu)))
-+				goto err_out;
- 		}
- 
- 	return 0;
-+err_out:
-+	for_each_possible_cpu(cpu)
-+		free_cpumask_var(per_cpu(__pv_cpu_mask, cpu));
-+	return -ENOMEM;
- }
- arch_initcall(kvm_alloc_cpumask);
- 
+Isn't this really odd? ndata = 1, and yet you populate data[1]?
+
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 4e7f3a8da16a..517c0228881c 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10056,12 +10056,14 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  		if (kvm_check_request(KVM_REQ_HV_CRASH, vcpu)) {
+>  			vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+>  			vcpu->run->system_event.type = KVM_SYSTEM_EVENT_CRASH;
+> +			vcpu->run->system_event.ndata = 0;
+>  			r = 0;
+>  			goto out;
+>  		}
+>  		if (kvm_check_request(KVM_REQ_HV_RESET, vcpu)) {
+>  			vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+>  			vcpu->run->system_event.type = KVM_SYSTEM_EVENT_RESET;
+> +			vcpu->run->system_event.ndata = 0;
+>  			r = 0;
+>  			goto out;
+>  		}
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index dd1d8167e71f..5a57f74b4903 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -445,7 +445,6 @@ struct kvm_run {
+>  #define KVM_SYSTEM_EVENT_RESET          2
+>  #define KVM_SYSTEM_EVENT_CRASH          3
+>  #define KVM_SYSTEM_EVENT_SEV_TERM       4
+> -#define KVM_SYSTEM_EVENT_NDATA_VALID    (1u << 31)
+>  			__u32 type;
+>  			__u32 ndata;
+>  			__u64 data[16];
+
+Cat we please get a #define that aliases data[0] to flags? At the next
+merge of the KVM headers into their respective trees, all the existing
+VMM are going to break if they have a reference to this field (CrosVM
+definitely does today -- yes, we're ahead of time).
+
+Also, getting a bisectable series would be good.
+
+Thanks,
+
+	M.
+
 -- 
-2.25.1
-
+Without deviation from the norm, progress is not possible.
