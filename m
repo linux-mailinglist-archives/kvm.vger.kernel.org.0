@@ -2,226 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C16B150B558
-	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 12:38:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C309750B5AD
+	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 12:55:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1383225AbiDVKks (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Apr 2022 06:40:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37476 "EHLO
+        id S1446929AbiDVK54 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Apr 2022 06:57:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236831AbiDVKkr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Apr 2022 06:40:47 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3D7A554F8D
-        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 03:37:54 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0CF881576;
-        Fri, 22 Apr 2022 03:37:54 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BBA063F766;
-        Fri, 22 Apr 2022 03:37:52 -0700 (PDT)
-Date:   Fri, 22 Apr 2022 11:37:48 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Martin Radev <martin.b.radev@gmail.com>
-Cc:     Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org,
-        will@kernel.org, julien.thierry.kdev@gmail.com
-Subject: Re: [PATCH v2 kvmtool 0/5] Fix few small issues in virtio code
-Message-ID: <YmKFfN0k8fXQmsdl@monolith.localdoman>
-References: <20220303231050.2146621-1-martin.b.radev@gmail.com>
- <YioRnsym4HmOSgjl@monolith.localdoman>
- <20220311112321.2f71b6bd@donnerap.cambridge.arm.com>
- <Yi926JwV50u86yRB@monolith.localdoman>
- <YkBcuwMi7gPy9Wew@sisu-ThinkPad-E14-Gen-2>
+        with ESMTP id S1344416AbiDVK5y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Apr 2022 06:57:54 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8FE863A2;
+        Fri, 22 Apr 2022 03:55:00 -0700 (PDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23M8E7MT007509;
+        Fri, 22 Apr 2022 10:55:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=evssS65znSL4US0yutJ2bW4WDBbDhdYge6WwoF0UEVw=;
+ b=rmoOw5bDt0LqI71AmC1bJ/Y+rEwxIp/e6WiDkbbo+UpSbAN+2wq781Nxgh6ZsBJ61bR0
+ GU08E+5IVGjzDH3qWlE1gNP+y6xVFUzAOchUqHt90KGdV5nsvKK0uWa7oT6utgIm5sND
+ p2ZNlZ/J5nua656jfYXcNes3JU3gav0RQGW6FJkEA/4b/NSxYedGjbQBSQC3BpGGTm6Z
+ GXdrDFPfXhkKTGOA7S/fEZMSFZs5UnDhealns+BmqcCSapSC8A5UNiQUQNeVcfMMd0LY
+ S/mJmtEhNNqt6OYzsNd6RnhXEz4HPotjSNFxuuf/2/TqTi+uzr0D96VN9EdILJMx7n3e Mg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fkdg4wjqk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 22 Apr 2022 10:55:00 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23MArZlS022639;
+        Fri, 22 Apr 2022 10:55:00 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fkdg4wjpy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 22 Apr 2022 10:54:59 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23MAsBDm010198;
+        Fri, 22 Apr 2022 10:54:57 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma05fra.de.ibm.com with ESMTP id 3ffne8ybfu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 22 Apr 2022 10:54:57 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23MAss0n16843028
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 22 Apr 2022 10:54:54 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 38AA4AE05A;
+        Fri, 22 Apr 2022 10:54:54 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7BDE4AE059;
+        Fri, 22 Apr 2022 10:54:53 +0000 (GMT)
+Received: from t46lp57.lnxne.boe (unknown [9.152.108.100])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 22 Apr 2022 10:54:53 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Subject: [kvm-unit-tests PATCH v4 0/4] s390x: add migration test support
+Date:   Fri, 22 Apr 2022 12:54:49 +0200
+Message-Id: <20220422105453.2153299-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YkBcuwMi7gPy9Wew@sisu-ThinkPad-E14-Gen-2>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ydIuzWOuMcD3TX4H11OgXN824bR7hXgP
+X-Proofpoint-GUID: VX69jzyXMPmpBnrSTkWZD_KdPQE6Cf97
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-22_02,2022-04-22_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ impostorscore=0 clxscore=1015 bulkscore=0 phishscore=0 lowpriorityscore=0
+ suspectscore=0 adultscore=0 spamscore=0 mlxlogscore=999 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2204220046
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Changelog from v3:
+---
+- Rename read_buf_end to read_buf_length (Thanks Janosch)
 
-On Sun, Mar 27, 2022 at 03:46:51PM +0300, Martin Radev wrote:
-> Thanks for the explanation and suggestion.
-> Is this better?
+This series depends on my SIGP store additional status series to have access to
+the guarded-storage and vector related defines
+("[kvm-unit-tests PATCH v3 0/2] s390x: Add tests for SIGP store adtl status").
 
-Looks good to me, please send it as a separate patch in the next iteration
-of the series.
+Add migration test support for s390x.
 
-Thanks,
-Alex
+arm and powerpc already support basic migration tests.
 
-> 
-> From 4ed0d9d3d3c39eb5b23b04227c3fee53b77d9aa5 Mon Sep 17 00:00:00 2001
-> From: Martin Radev <martin.b.radev@gmail.com>
-> Date: Fri, 25 Mar 2022 23:25:42 +0200
-> Subject: kvmtool: Have stack be not executable on x86
-> 
-> This patch fixes an issue of having the stack be executable
-> for x86 builds by ensuring that the two objects bios-rom.o
-> and entry.o have the section .note.GNU-stack.
-> 
-> Suggested-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Signed-off-by: Martin Radev <martin.b.radev@gmail.com>
-> ---
->  x86/bios/bios-rom.S | 5 +++++
->  x86/bios/entry.S    | 5 +++++
->  2 files changed, 10 insertions(+)
-> 
-> diff --git a/x86/bios/bios-rom.S b/x86/bios/bios-rom.S
-> index 3269ce9..d1c8b25 100644
-> --- a/x86/bios/bios-rom.S
-> +++ b/x86/bios/bios-rom.S
-> @@ -10,3 +10,8 @@
->  GLOBAL(bios_rom)
->  	.incbin "x86/bios/bios.bin"
->  END(bios_rom)
-> +
-> +/*
-> + * Add this section to ensure final binary has a non-executable stack.
-> + */
-> +.section .note.GNU-stack,"",@progbits
-> diff --git a/x86/bios/entry.S b/x86/bios/entry.S
-> index 85056e9..1b71f89 100644
-> --- a/x86/bios/entry.S
-> +++ b/x86/bios/entry.S
-> @@ -90,3 +90,8 @@ GLOBAL(__locals)
->  #include "local.S"
->  
->  END(__locals)
-> +
-> +/*
-> + * Add this section to ensure final binary has a non-executable stack.
-> + */
-> +.section .note.GNU-stack,"",@progbits
-> -- 
-> 2.25.1
-> 
-> On Mon, Mar 14, 2022 at 05:11:08PM +0000, Alexandru Elisei wrote:
-> > Hi,
-> > 
-> > On Fri, Mar 11, 2022 at 11:23:21AM +0000, Andre Przywara wrote:
-> > > On Thu, 10 Mar 2022 14:56:30 +0000
-> > > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > > 
-> > > Hi,
-> > > 
-> > > > Hi Martin,
-> > > > 
-> > > > On Fri, Mar 04, 2022 at 01:10:45AM +0200, Martin Radev wrote:
-> > > > > Hello everyone,
-> > > > >   
-> > > > [..]
-> > > > > The Makefile change is kept in its original form because I didn't understand
-> > > > > if there is an issue with it on aarch64.  
-> > > > 
-> > > > I'll try to explain it better. According to this blogpost about executable
-> > > > stacks [1], gcc marks the stack as executable automatically for assembly
-> > > > (.S) files. C files have their stack mark as non-executable by default. If
-> > > > any of the object files have the stack executable, then the resulting
-> > > > binary also has the stack marked as executable (obviously).
-> > > > 
-> > > > To mark the stack as non-executable in assembly files, the empty section
-> > > > .note.GNU-stack must be present in the file. This is a marking to tell
-> > > > the linker that the final executable does not require an executable stack.
-> > > > When the linker finds this section, it will create a PT_GNU_STACK empty
-> > > > segment in the final executable. This segment tells Linux to mark the stack
-> > > > as non-executable when it loads the binary.
-> > > 
-> > > Ah, many thanks for the explanation, that makes sense.
-> > > 
-> > > > The only assembly files that kvmtool compiles into objects are the x86
-> > > > files x86/bios/entry.S and x86/bios/bios-rom.S; the other architectures are
-> > > > not affected by this. I haven't found any instances where these files (and
-> > > > the other files they are including) do a call/jmp to something on the
-> > > > stack, so I've added the .note.GNU-Stack section to the files:
-> > > 
-> > > Yes, looks that the same to me, actually the assembly looks more like
-> > > marshalling arguments than actual code, so we should be safe.
-> > > 
-> > > Alex, can you send this as a proper patch. It should be somewhat
-> > > independent of Martin's series, code-wise, so at least it should apply and
-> > > build.
-> > 
-> > Martin, would you like to pick up the diff and turn it into a proper patch? You
-> > don't need to credit me as the author, you can just add a Suggested-by:
-> > Alexandru Elisei <alexandru.elisei@arm.com> tag in the commit message. Or do you
-> > want me to turn this into a patch? If I do, I'll add a Reported-by: Martin Radev
-> > <martin.b.radev@gmail.com> tag to it.
-> > 
-> > I don't have a preference, I am asking because you were the first person who
-> > discovered and tried to fix this.
-> > 
-> > Thanks,
-> > Alex
-> > 
-> > > 
-> > > Cheers,
-> > > Andre
-> > > 
-> > > > 
-> > > > diff --git a/x86/bios/bios-rom.S b/x86/bios/bios-rom.S
-> > > > index 3269ce9793ae..571029fc157e 100644
-> > > > --- a/x86/bios/bios-rom.S
-> > > > +++ b/x86/bios/bios-rom.S
-> > > > @@ -10,3 +10,6 @@
-> > > >  GLOBAL(bios_rom)
-> > > >         .incbin "x86/bios/bios.bin"
-> > > >  END(bios_rom)
-> > > > +
-> > > > +# Mark the stack as non-executable.
-> > > > +.section .note.GNU-stack,"",@progbits
-> > > > diff --git a/x86/bios/entry.S b/x86/bios/entry.S
-> > > > index 85056e9816c4..4d5bb663a25d 100644
-> > > > --- a/x86/bios/entry.S
-> > > > +++ b/x86/bios/entry.S
-> > > > @@ -90,3 +90,6 @@ GLOBAL(__locals)
-> > > >  #include "local.S"
-> > > > 
-> > > >  END(__locals)
-> > > > +
-> > > > +# Mark the stack as non-executable.
-> > > > +.section .note.GNU-stack,"",@progbits
-> > > > 
-> > > > which makes the final executable have a non-executable stack. Did some very
-> > > > *light* testing by booting a guest, and everything looked right to me.
-> > > > 
-> > > > [1] https://www.airs.com/blog/archives/518
-> > > > 
-> > > > Thanks,
-> > > > Alex
-> > > > 
-> > > > > 
-> > > > > Martin Radev (5):
-> > > > >   kvmtool: Add WARN_ONCE macro
-> > > > >   virtio: Sanitize config accesses
-> > > > >   virtio: Check for overflows in QUEUE_NOTIFY and QUEUE_SEL
-> > > > >   Makefile: Mark stack as not executable
-> > > > >   mmio: Sanitize addr and len
-> > > > > 
-> > > > >  Makefile                |  7 +++--
-> > > > >  include/kvm/util.h      | 10 +++++++
-> > > > >  include/kvm/virtio-9p.h |  1 +
-> > > > >  include/kvm/virtio.h    |  3 ++-
-> > > > >  mmio.c                  |  4 +++
-> > > > >  virtio/9p.c             | 27 ++++++++++++++-----
-> > > > >  virtio/balloon.c        | 10 ++++++-
-> > > > >  virtio/blk.c            | 10 ++++++-
-> > > > >  virtio/console.c        | 10 ++++++-
-> > > > >  virtio/mmio.c           | 44 +++++++++++++++++++++++++-----
-> > > > >  virtio/net.c            | 12 +++++++--
-> > > > >  virtio/pci.c            | 59 ++++++++++++++++++++++++++++++++++++++---
-> > > > >  virtio/rng.c            |  8 +++++-
-> > > > >  virtio/scsi.c           | 10 ++++++-
-> > > > >  virtio/vsock.c          | 10 ++++++-
-> > > > >  15 files changed, 199 insertions(+), 26 deletions(-)
-> > > > > 
-> > > > > -- 
-> > > > > 2.25.1
-> > > > >   
-> > > 
+If a test is in the migration group, it can print "migrate" on its console. This
+will cause it to be migrated to a new QEMU instance. When migration is finished,
+the test will be able to read a newline from its standard input.
+
+We need the following pieces for this to work under s390x:
+
+* read support for the sclp console. This can be very basic, it doesn't even
+  have to read anything useful, we just need to know something happened on
+  the console.
+* s390/run adjustments to call the migration helper script.
+
+This series adds basic migration tests for s390x, which I plan to extend
+further.
+
+Nico Boehr (4):
+  lib: s390x: add support for SCLP console read
+  s390x: add support for migration tests
+  s390x: don't run migration tests under PV
+  s390x: add basic migration test
+
+ lib/s390x/sclp-console.c |  79 ++++++++++++++++--
+ lib/s390x/sclp.h         |   8 ++
+ s390x/Makefile           |   2 +
+ s390x/migration.c        | 172 +++++++++++++++++++++++++++++++++++++++
+ s390x/run                |   7 +-
+ s390x/unittests.cfg      |   5 ++
+ scripts/s390x/func.bash  |   2 +-
+ 7 files changed, 267 insertions(+), 8 deletions(-)
+ create mode 100644 s390x/migration.c
+
+-- 
+2.31.1
+
