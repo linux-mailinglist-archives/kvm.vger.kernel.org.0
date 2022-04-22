@@ -2,81 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 836AF50C2F0
-	for <lists+kvm@lfdr.de>; Sat, 23 Apr 2022 01:09:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A111A50C43C
+	for <lists+kvm@lfdr.de>; Sat, 23 Apr 2022 01:12:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232252AbiDVWQb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Apr 2022 18:16:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33126 "EHLO
+        id S232896AbiDVW2n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Apr 2022 18:28:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232524AbiDVWPk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Apr 2022 18:15:40 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A10831AA9E
-        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 14:06:21 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id i69-20020a636d48000000b003aa4ae583bcso5644231pgc.14
-        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 14:06:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=qNafRzYSxajZcD5Mb7G7HwgtsT9tx7k/FBBt0jG1f+0=;
-        b=gqbc3uOkLP/e9O9i10UZ3Vk6hwl/aQe7I/s77XD9XyL5XYVrzQEYV68Jqod5bYUl0L
-         q+gYahYOIn96sXYYvjTMU6t0BOKzzqzxqIAFtYvgvNp7hXLvm5bnUdYj2s5JHWBlOscQ
-         1ADwC5GBoF/14EzT8KKh2MM+5Tw4r62oSr2X01YxxojTIZHjBdhX8TEUkma8jZz6IuMo
-         /dGG0Tt7HnkGmT7Ank1K/tMzZf7Qi1NNGnpI8AQVwnZIfzsI6+vzKYwE2UloSVq9rKEc
-         0Q118WO3rFhjgKjuTsi8UN7N52XVuAmJGT7JGAoD0S9vO57doQnadpECPZsXRLlaniAv
-         hP7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=qNafRzYSxajZcD5Mb7G7HwgtsT9tx7k/FBBt0jG1f+0=;
-        b=XQTYw4ayTVy8ulDlhZOXdykMXFWdQIjJrlipzvYE6cAvRGhriftlIXpXuGqwBd0IJH
-         UiadXrvCwd+N3ahraW9iqcTtJjQVgUJ2kkvKaq2QHMNMS7LR1DkeiQENV5N+NsV1aUko
-         uKOrxLG+jZCZnkuiuNo9XYZVQHECirmytNxeasXDC6KVqsuVZw1vk9pSMPE4DW1Q6Ync
-         1Eb7N6jr1WvujqgR7mp30SjVN4M3lue09vQ4sjDe4w5/S6alaGL1/mNHQyViZBNu48HA
-         os7HV5B9+doxGO9ipP8UsDRyimOpPUtCTtWa/yDjrXhzAsonXSfVhsyfLeGNrAO8tUea
-         I7Vw==
-X-Gm-Message-State: AOAM530tf1ApTM4+0d5PWw09HD8cBe3cGLSz/wvB70WgJRRU2Y8zmcEn
-        9QMFWeLvPg9Yp/VbhDONDzIf1p2sWsHrVw==
-X-Google-Smtp-Source: ABdhPJwrUfgV11nRSDBwHOtcD13yNpJbzIJyIWwUuk5MB+4+IpX0/DyBgGZEFv0WSXiPMJ+gf/ImPMjruaCU5Q==
-X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a05:6a00:16c7:b0:4f7:e497:69c7 with SMTP
- id l7-20020a056a0016c700b004f7e49769c7mr6793716pfc.7.1650661580864; Fri, 22
- Apr 2022 14:06:20 -0700 (PDT)
-Date:   Fri, 22 Apr 2022 21:05:46 +0000
-In-Reply-To: <20220422210546.458943-1-dmatlack@google.com>
-Message-Id: <20220422210546.458943-21-dmatlack@google.com>
-Mime-Version: 1.0
-References: <20220422210546.458943-1-dmatlack@google.com>
-X-Mailer: git-send-email 2.36.0.rc2.479.g8af0fa9b8e-goog
-Subject: [PATCH v4 20/20] KVM: x86/mmu: Extend Eager Page Splitting to nested MMUs
-From:   David Matlack <dmatlack@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        maciej.szmigiero@oracle.com,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        with ESMTP id S232805AbiDVW1T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Apr 2022 18:27:19 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2063.outbound.protection.outlook.com [40.107.223.63])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 364261CFFBA;
+        Fri, 22 Apr 2022 14:20:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kzuNYQHcdme8ZZFRW9Mw060vWHVG54wp8APy6amkaMt+JVEzD+aXc1pX5Rs4oF8XuaJqSqjc6zok3nA2WzubKY0JBywzPjKxk8z0TRmzEZpmgCd6FjELdLeUWFWaeuAfsTwpul0jszoJZ2Nk1NtE50e7fFAEegGIbdqZifO2zBHL1vOsrswvF17FEHib3D4H4J1P4OICrl/m6HcHc9K6x22xIsgSySks13bHEjrQaewylvmypvXTg48L9mUQRYVO6Xay0XZKqlpiGmVm11FP0Kk70PgrXt70oLl67vhDrgfvFJN3tFYEERvXBGDrP2pj388VcYAJ/ujWdZj3fpZTsA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0Gl+JpD3PC7wVLwq+Rk+S9FN/ymuoouajxzal7JkpBo=;
+ b=Seo6DfWOFYRJjMQ7zj7yk1xxqkF7PqHYwTs6z/CpcRo6KI6kJ4Aq4JRfctqDh/f8SZkFGFMLfgC8devb0E5sWMv8ftgByWaSM4AK/RVtj7vvWHYP60GwU2QHfFLGG/4GrbSRGfmQp1YG6WM/7yL3V7SlTOdb3pE/xuQhkC0gejTVz/Koi4w8SpmVvWPV3fwHSrGCRp6rRLCG7zzJQZ1+0E79j2vlEJsZqFAWp9wJdd+0JG3m+0ttmV2nmbhtnWoCxZmshPaKGihPpicGijCyHyYgPAsiYR7lrB/NADrAguy6BIBhxCvsHPTTnWhUs7lTg1fNe2xX9/bwyv9cet1i0Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0Gl+JpD3PC7wVLwq+Rk+S9FN/ymuoouajxzal7JkpBo=;
+ b=GC4sck5tzjzkkuMm6OrsBQtTwUgsUXuBj0p+uxMaJtyfhd1Hqtj5+8EXEkDqNAKKGAXkuXtaExY2gnL9AbjufHORgB/TW0trQJ/OMsd3eHbCpZz1kb7MnZg6vvXfbVY5RupuuW3nS+pqYpmbHl2MAflCgyLJ7ZpzLSa0yC3Ho+A=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by BY5PR12MB4275.namprd12.prod.outlook.com (2603:10b6:a03:20a::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.14; Fri, 22 Apr
+ 2022 21:20:01 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::781d:15d6:8f63:a4e7]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::781d:15d6:8f63:a4e7%7]) with mapi id 15.20.5186.015; Fri, 22 Apr 2022
+ 21:20:01 +0000
+Message-ID: <1f644aac-3fae-ca1b-76f8-dd3bd34bcef3@amd.com>
+Date:   Fri, 22 Apr 2022 16:19:58 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Content-Language: en-US
+To:     Mimoja <mimoja@mimoja.de>, Paul Menzel <pmenzel@molgen.mpg.de>,
+        David Woodhouse <dwmw2@infradead.org>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, hewenliang4@huawei.com, hushiyuan@huawei.com,
+        luolongjun@huawei.com, hejingxian@huawei.com
+References: <20211215145633.5238-1-dwmw2@infradead.org>
+ <9a47b5ec-f2d1-94d9-3a48-9b326c88cfcb@molgen.mpg.de>
+ <ab28d2ce-4a9c-387d-9eda-558045a0c35b@molgen.mpg.de>
+ <3bfacf45d2d0f3dfa3789ff5a2dcb46744aacff7.camel@infradead.org>
+ <ea433e41-0038-554d-3348-70aa98aff9e1@molgen.mpg.de>
+ <efbe0d3d92e6c279e3a6d7a4191ca7470bc4beec.camel@infradead.org>
+ <74d2302f-88fc-c75c-6d2d-4aece1a515bb@molgen.mpg.de>
+ <e3ef8236-344d-e840-575c-a5fb1450a13b@mimoja.de>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH v3 0/9] Parallel CPU bringup for x86_64
+In-Reply-To: <e3ef8236-344d-e840-575c-a5fb1450a13b@mimoja.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9PR13CA0064.namprd13.prod.outlook.com
+ (2603:10b6:806:23::9) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 42e92a01-021b-4244-7ae3-08da24a5dc4d
+X-MS-TrafficTypeDiagnostic: BY5PR12MB4275:EE_
+X-Microsoft-Antispam-PRVS: <BY5PR12MB427543EF079600804A45699FECF79@BY5PR12MB4275.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: l00f9hf4MUuviHyS38Sq9+F57QxxTe7GLTHWRmPzljFWz6l6P99I/nblhntL9Sb6V6C0+ng8xgzGmiBkGF3D7lL84PrWUwM1zYaLSBjp/aDr3bfHY7zKortkId4KR0ZVvfQDBXmbr+9GGxcfhIw52RdXxTz83q8PA4nIWau4biF8gzxxbdnZaTymAk1ZhoZtSS0jFvTUqMKod+eLYOEQYuzgOvJU+s+jbHxVyzCoeioEJwqHM+Rqk9PMC2Bp1vpTwqB1pYu8I/SDwZnszWX7BSG9grz6ToZ9lNE44bCDQnqcCv7+WqWFlbKCYIuN6VYJg4H0ivZxGSraUyVDzIr2LP2pPh332Ul2XkVHOjwIffe2j60ZZKBzh0eV2DmPe48tC2qxnSzpM5yRHL+cNb8lyMSgT7654mmdOVRXMHHT91l4BKDI1v1Fskg2HxHSKqukc4Oy/GHk9xaEHcBf3qN4kOKG/aYNP5dgWHlycoEAFKWBJB51Vo9tuSDp+xw0YibAeTLsmfrQpzMvbrh/Ukb+umzXw9h3XOA0TWLMA395EGSLAhMwoRjsrh6ElxTmMnRuFnnFy52THfYkipC+GLu7rUOpaSugOBCjM0y9+ssOUAEirOvNs5BT7p8KjZXeDJny4uHN62Urc41hld3dzH8si/0LRTYEDNa4Ze3bMdu2Ho17Gu4rZH4VbWpzlbQmLML0IES9E79pU6MVz4VpPC8k2+aiVSWy/oC7nZk0WihJzR+T1jb3Dm/8VXdODXmJ/p8b
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(2906002)(66476007)(36756003)(38100700002)(86362001)(8936002)(4326008)(316002)(66946007)(8676002)(66556008)(83380400001)(31696002)(31686004)(26005)(54906003)(7416002)(2616005)(508600001)(186003)(6512007)(6666004)(110136005)(6506007)(53546011)(6486002)(5660300002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?T2psaGRKbDNNMXVpc2F0ZUpGNUsvV2NCY3VTeTc5MGNqNmpGMmhyRUIrbEFM?=
+ =?utf-8?B?MHNzZkNYT3R0c3RSRkdBOE5zZTFjeTJ4OEVDVmJ4VTY4Vlg0b1pSbnFIQkZB?=
+ =?utf-8?B?Tm1WcFhwaVF2SE5NZG55MWVRMUxjMXB0Ni8xc3J3TnA5eFlQd3JDdEpySmdC?=
+ =?utf-8?B?TTY1RFJRVjhaQVAzSHVVampaWW1yTWloMlRsL0F3U1Jkek0yNnZtZUxMeVkr?=
+ =?utf-8?B?NkUxdWZtaGRnQW9GelVNdXBwajRyeDROMkxSRHI3d0Y3cDZ0bmVlRWFzRlA5?=
+ =?utf-8?B?V1E2ZGNtMjA5Q3phUGdrMGZYNDJMOUFoTlNmZHF5UjhNNGE5VjVWL2ZTd1Jy?=
+ =?utf-8?B?R3ZyV1J4Skg3WXJwblBUbHhJWTA2L0RFU2t4ZUM4VW9vSHRab2MzNFh2c1V5?=
+ =?utf-8?B?RWVNdElsTnN0TGhjQVJXbFA0NzlWbnBJcFdhTFRhNVVjU3ZGYzFPNGYvc3hk?=
+ =?utf-8?B?UEEvVnZNbDQwN3NxNjN2Vm1Wd1lwemt5Wmh1U3NuY2dBUXZwU2o0eFNoUkpy?=
+ =?utf-8?B?a1hkS2FXMjZ6UUFTQnVLdExZUVJpclJYb3NrVVB6dkxINDMxd3g3RjZaTFNj?=
+ =?utf-8?B?ZDFuTEk4bUdIZGFySkwxTVBLK0ovUS92Z25iWFk0MnVEanhZN2IwQVcwajBz?=
+ =?utf-8?B?azFaK1hSRnNxc2JKU1c0TnBOTlhCQmFUMkN5MzV1bUhOUzgwUUVycTFPejBr?=
+ =?utf-8?B?UG5MT2Z4VitUTTlXS3podFFjOVpGcUJ6SUM3TjQ4UG13ZGtVWkc3K0QxbjdI?=
+ =?utf-8?B?b1VZbW9GVnBPSnlOcTRnNUlxd0ZpM0dQazVId3dYT3FlVVNOejNGdS9XdXNn?=
+ =?utf-8?B?cUdQUTJXZTBJWnFzYW9MMnRWQ1VZMFFVVjg1Y1ZUek4wbXlmUnB0ZDNRR1BL?=
+ =?utf-8?B?LzF6SW5HVWRHYjg5enh2ejlNUXJrUEV2bGtnTEp4YUhvR0ppVk9pSVBSSS9q?=
+ =?utf-8?B?cldWZEV3UVdrZWE3eFEyQkR2NGVQZTltK1hHQVFrd0lvc20xNEV4M0RQTVdi?=
+ =?utf-8?B?L05TNWUwSDM0TlZwdmNWK0x3MEZ0bzA2Q0VGZUY1Ti8wTEtFUjdlUFZtU0dk?=
+ =?utf-8?B?K0JhQTFJeTNCTHZwUUhjVVptUElOMU4wMk5kbzNmTXVKTDI2TXNyd1djcUI0?=
+ =?utf-8?B?UTdIdGpuczRZZGNZU2w3cXM2Wk14MzRzZFBxMFZhdWl6WWxXTjRRZ1NBekxJ?=
+ =?utf-8?B?aExQZVA2U0x1WUNBdHRZdXFwWjhiQllYTm9wcGdJMEYwUlJzSFl4T2xkSWlO?=
+ =?utf-8?B?TWtudjN6aHp1a254SVlzL2g4eExpMld2Z3RsTDVJdHRGOS9HWWxBZGc5d3ZZ?=
+ =?utf-8?B?MFFIQ2twK3RTSXlCZ2EzZk5zYk1zZ1lZZ0gxNVBIa3d5VEJRdGtoQTlCeDJw?=
+ =?utf-8?B?V29ocmJuaklEeFRaSmZoNExSbTlRZmFiVUtGSVdpZGp1YmI4d1ErajJGYndn?=
+ =?utf-8?B?YkxJYWxKRUlQbWJTNVBaR0JVRmoyTEI1NzhhSmRLaFdYVi9SUVJMUStablRW?=
+ =?utf-8?B?Tk9Hc3ZRNE1adGMzbG4rZGhGQ2xVSXY4bjdMTmc0TnkreWpNaitrZE55QU54?=
+ =?utf-8?B?Y3BJaWxaQXFteVF5TEJWL3VsbUxLalNHOHdnaVlpSmtjWXNXWHFsVTl4QnBW?=
+ =?utf-8?B?aGQxUXJnWWQ1ajBzR2pmSEZUM0NQRXJURWMwWVNnaXlGYWwzajQ3OFB4dTkz?=
+ =?utf-8?B?L1FLTjczbi9kc3JWaFBYWUxSdGFJNDFaM3JaR0xlaElHd2crMUQ5YXUxVVRU?=
+ =?utf-8?B?c2R2cmJOSkgxdXA3dURldG01b0hmUWdheXovR3U3S3o4QWJ0cTc3dm1kRUkx?=
+ =?utf-8?B?MjUxUU9JbEZEVTgxdmRaeHd3N2xPaUR6aG1EVURzL296NkdIVm9PaDJGRjYr?=
+ =?utf-8?B?d3NPZXZ3VjI5cVhGbmdsVUpFN1FwdkxIeUdmVm1XMzdRY2ZsNE9IbHVSaW5n?=
+ =?utf-8?B?RU1RZGZTYTVPbU9JY2tnMkdVdjM0MWRYejZuSlVRM29XOXlGNW9IOFA5Rit0?=
+ =?utf-8?B?QXh5MG02WS9TWGFKTEE0cnhVa1JXYmx4aUZsWkN3dWpTQUFFYjlSeGV4WGVW?=
+ =?utf-8?B?SzRNREVTTVRPbDAvSnBVeWRaSFZtdHBjUXJ5Zm15Q3phUXpzTTJzWnE2K2ty?=
+ =?utf-8?B?UTAwMlpDeWl3dXR0djVPUDBvWFpxYmVYSWw4c3NlanFneGxsaXArOEkwc3Bp?=
+ =?utf-8?B?SjRLbnA4TW1YN1dROG1IbGtNeGRFNFpQWmEzTXlWZExCQkk2NG40cjFNcUFp?=
+ =?utf-8?B?amRrUGRxRDAxemdWYUVHOWtFNTFaM3UzMlhLV2NuQ0V0QnNZYjdsZmRSZFU3?=
+ =?utf-8?B?d1dLc3oxQlY1dnJRc1NzajZjL1ArODJHNVloNGpFUkdTR0FHZ0swdz09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 42e92a01-021b-4244-7ae3-08da24a5dc4d
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2022 21:20:01.3114
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OsqNcmrBuR8WpYKhUjjYx+nYHswPH99VCrNj44z4b8tuIL6qNH/IWoMUzyjd8j4K9jBalFiuaiKpusfozZi2Bg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4275
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,439 +142,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add support for Eager Page Splitting pages that are mapped by nested
-MMUs. Walk through the rmap first splitting all 1GiB pages to 2MiB
-pages, and then splitting all 2MiB pages to 4KiB pages.
+On 4/21/22 05:00, Mimoja wrote:
+> Dear Paul,
+> 
+>> Sorry for replying so late. I saw your v4 patches, and tried commit 
+>> 5e3524d21d2a () from your branch `parallel-5.17-part1`. Unfortunately, 
+>> the boot problem still persists on an AMD Ryzen 3 2200 g system, I 
+>> tested with. Please tell, where I should report these results too (here 
+>> or posted v4 patches).
+> 
+> We have confirmed the issue on multiple AMD CPUs from multiple 
+> generations, leading to the guess that only Zen and Zen+ CPU seem affected 
+> with Zen3 and Zen2 (only tested ulv) working fine. Tho we struggled to get 
+> any output as the failing machines just go silent.
+> 
+> Not working:
+> 
+> Ryzen 5 Pro 2500u and 7 2700U
+> Ryzen 3 2300G
+> 
+> while e.g.
+> 
+> Ryzen 7 Pro 4750U
+> Ryzen 9 5950X
+> 
+> both work fine. We will continue to investigate the issue but are 
+> currently a bit pulled into other topics.
+> 
+> Thomas, could please maybe help us identify which CPUs and MC-Versions are 
+> worth looking at? David suggested you might have a good overview here.
 
-Note, Eager Page Splitting is limited to nested MMUs as a policy rather
-than due to any technical reason (the sp->role.guest_mode check could
-just be deleted and Eager Page Splitting would work correctly for all
-shadow MMU pages). There is really no reason to support Eager Page
-Splitting for tdp_mmu=N, since such support will eventually be phased
-out, and there is no current use case supporting Eager Page Splitting on
-hosts where TDP is either disabled or unavailable in hardware.
-Furthermore, future improvements to nested MMU scalability may diverge
-the code from the legacy shadow paging implementation. These
-improvements will be simpler to make if Eager Page Splitting does not
-have to worry about legacy shadow paging.
+Sorry, but not knowing what the actual reason for the boot problem, I 
+really couldn't give you an idea as to which CPUs and/or MC versions are 
+appropriate to look at.
 
-Splitting huge pages mapped by nested MMUs requires dealing with some
-extra complexity beyond that of the TDP MMU:
+Thanks,
+Tom
 
-(1) The shadow MMU has a limit on the number of shadow pages that are
-    allowed to be allocated. So, as a policy, Eager Page Splitting
-    refuses to split if there are KVM_MIN_FREE_MMU_PAGES or fewer
-    pages available.
-
-(2) Splitting a huge page may end up re-using an existing lower level
-    shadow page tables. This is unlike the TDP MMU which always allocates
-    new shadow page tables when splitting.
-
-(3) When installing the lower level SPTEs, they must be added to the
-    rmap which may require allocating additional pte_list_desc structs.
-
-Case (2) is especially interesting since it may require a TLB flush,
-unlike the TDP MMU which can fully split huge pages without any TLB
-flushes. Specifically, an existing lower level page table may point to
-even lower level page tables that are not fully populated, effectively
-unmapping a portion of the huge page, which requires a flush.
-
-This commit performs such flushes after dropping the huge page and
-before installing the lower level page table. This TLB flush could
-instead be delayed until the MMU lock is about to be dropped, which
-would batch flushes for multiple splits.  However these flushes should
-be rare in practice (a huge page must be aliased in multiple SPTEs and
-have been split for NX Huge Pages in only some of them). Flushing
-immediately is simpler to plumb and also reduces the chances of tripping
-over a CPU bug (e.g. see iTLB multihit).
-
-Suggested-by: Peter Feiner <pfeiner@google.com>
-[ This commit is based off of the original implementation of Eager Page
-  Splitting from Peter in Google's kernel from 2016. ]
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- .../admin-guide/kernel-parameters.txt         |   3 +-
- arch/x86/include/asm/kvm_host.h               |  20 ++
- arch/x86/kvm/mmu/mmu.c                        | 276 +++++++++++++++++-
- arch/x86/kvm/x86.c                            |   6 +
- 4 files changed, 296 insertions(+), 9 deletions(-)
-
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 3f1cc5e317ed..bc3ad3d4df0b 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2387,8 +2387,7 @@
- 			the KVM_CLEAR_DIRTY ioctl, and only for the pages being
- 			cleared.
- 
--			Eager page splitting currently only supports splitting
--			huge pages mapped by the TDP MMU.
-+			Eager page splitting is only supported when kvm.tdp_mmu=Y.
- 
- 			Default is Y (on).
- 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 15131aa05701..5df4dff385a1 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1240,6 +1240,24 @@ struct kvm_arch {
- 	hpa_t	hv_root_tdp;
- 	spinlock_t hv_root_tdp_lock;
- #endif
-+
-+	/*
-+	 * Memory caches used to allocate shadow pages when performing eager
-+	 * page splitting. No need for a shadowed_info_cache since eager page
-+	 * splitting only allocates direct shadow pages.
-+	 */
-+	struct kvm_mmu_memory_cache split_shadow_page_cache;
-+	struct kvm_mmu_memory_cache split_page_header_cache;
-+
-+	/*
-+	 * Memory cache used to allocate pte_list_desc structs while splitting
-+	 * huge pages. In the worst case, to split one huge page, 512
-+	 * pte_list_desc structs are needed to add each lower level leaf sptep
-+	 * to the rmap plus 1 to extend the parent_ptes rmap of the lower level
-+	 * page table.
-+	 */
-+#define SPLIT_DESC_CACHE_CAPACITY 513
-+	struct kvm_mmu_memory_cache split_desc_cache;
- };
- 
- struct kvm_vm_stat {
-@@ -1608,6 +1626,8 @@ void kvm_mmu_zap_all(struct kvm *kvm);
- void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen);
- void kvm_mmu_change_mmu_pages(struct kvm *kvm, unsigned long kvm_nr_mmu_pages);
- 
-+void free_split_caches(struct kvm *kvm);
-+
- int load_pdptrs(struct kvm_vcpu *vcpu, unsigned long cr3);
- 
- int emulator_write_phys(struct kvm_vcpu *vcpu, gpa_t gpa,
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 5b1458b911ab..9a59ec9b78fb 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5897,6 +5897,18 @@ int kvm_mmu_init_vm(struct kvm *kvm)
- 	node->track_write = kvm_mmu_pte_write;
- 	node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
- 	kvm_page_track_register_notifier(kvm, node);
-+
-+	kvm->arch.split_page_header_cache.capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-+	kvm->arch.split_page_header_cache.kmem_cache = mmu_page_header_cache;
-+	kvm->arch.split_page_header_cache.gfp_zero = __GFP_ZERO;
-+
-+	kvm->arch.split_shadow_page_cache.capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-+	kvm->arch.split_shadow_page_cache.gfp_zero = __GFP_ZERO;
-+
-+	kvm->arch.split_desc_cache.capacity = SPLIT_DESC_CACHE_CAPACITY;
-+	kvm->arch.split_desc_cache.kmem_cache = pte_list_desc_cache;
-+	kvm->arch.split_desc_cache.gfp_zero = __GFP_ZERO;
-+
- 	return 0;
- }
- 
-@@ -6028,15 +6040,256 @@ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
- 		kvm_arch_flush_remote_tlbs_memslot(kvm, memslot);
- }
- 
-+void free_split_caches(struct kvm *kvm)
-+{
-+	kvm_mmu_free_memory_cache(&kvm->arch.split_desc_cache);
-+	kvm_mmu_free_memory_cache(&kvm->arch.split_page_header_cache);
-+	kvm_mmu_free_memory_cache(&kvm->arch.split_shadow_page_cache);
-+}
-+
-+static inline bool need_topup(struct kvm_mmu_memory_cache *cache, int min)
-+{
-+	return kvm_mmu_memory_cache_nr_free_objects(cache) < min;
-+}
-+
-+static bool need_topup_split_caches_or_resched(struct kvm *kvm)
-+{
-+	if (need_resched() || rwlock_needbreak(&kvm->mmu_lock))
-+		return true;
-+
-+	/*
-+	 * In the worst case, SPLIT_DESC_CACHE_CAPACITY descriptors are needed
-+	 * to split a single huge page. Calculating how many are actually needed
-+	 * is possible but not worth the complexity.
-+	 */
-+	return need_topup(&kvm->arch.split_desc_cache, SPLIT_DESC_CACHE_CAPACITY) ||
-+		need_topup(&kvm->arch.split_page_header_cache, 1) ||
-+		need_topup(&kvm->arch.split_shadow_page_cache, 1);
-+}
-+
-+static int topup_split_caches(struct kvm *kvm)
-+{
-+	int r;
-+
-+	r = kvm_mmu_topup_memory_cache(&kvm->arch.split_desc_cache,
-+				       SPLIT_DESC_CACHE_CAPACITY);
-+	if (r)
-+		return r;
-+
-+	r = kvm_mmu_topup_memory_cache(&kvm->arch.split_page_header_cache, 1);
-+	if (r)
-+		return r;
-+
-+	return kvm_mmu_topup_memory_cache(&kvm->arch.split_shadow_page_cache, 1);
-+}
-+
-+static struct kvm_mmu_page *nested_mmu_get_sp_for_split(struct kvm *kvm, u64 *huge_sptep)
-+{
-+	struct kvm_mmu_page *huge_sp = sptep_to_sp(huge_sptep);
-+	struct shadow_page_caches caches = {};
-+	union kvm_mmu_page_role role;
-+	unsigned int access;
-+	gfn_t gfn;
-+
-+	gfn = kvm_mmu_page_get_gfn(huge_sp, huge_sptep - huge_sp->spt);
-+	access = kvm_mmu_page_get_access(huge_sp, huge_sptep - huge_sp->spt);
-+
-+	/*
-+	 * Note, huge page splitting always uses direct shadow pages, regardless
-+	 * of whether the huge page itself is mapped by a direct or indirect
-+	 * shadow page, since the huge page region itself is being directly
-+	 * mapped with smaller pages.
-+	 */
-+	role = kvm_mmu_child_role(huge_sptep, /*direct=*/true, access);
-+
-+	/* Direct SPs do not require a shadowed_info_cache. */
-+	caches.page_header_cache = &kvm->arch.split_page_header_cache;
-+	caches.shadow_page_cache = &kvm->arch.split_shadow_page_cache;
-+
-+	/* Safe to pass NULL for vCPU since requesting a direct SP. */
-+	return __kvm_mmu_get_shadow_page(kvm, NULL, &caches, gfn, role);
-+}
-+
-+static void nested_mmu_split_huge_page(struct kvm *kvm,
-+				       const struct kvm_memory_slot *slot,
-+				       u64 *huge_sptep)
-+
-+{
-+	struct kvm_mmu_memory_cache *cache = &kvm->arch.split_desc_cache;
-+	u64 huge_spte = READ_ONCE(*huge_sptep);
-+	struct kvm_mmu_page *sp;
-+	bool flush = false;
-+	u64 *sptep, spte;
-+	gfn_t gfn;
-+	int index;
-+
-+	sp = nested_mmu_get_sp_for_split(kvm, huge_sptep);
-+
-+	for (index = 0; index < PT64_ENT_PER_PAGE; index++) {
-+		sptep = &sp->spt[index];
-+		gfn = kvm_mmu_page_get_gfn(sp, index);
-+
-+		/*
-+		 * The SP may already have populated SPTEs, e.g. if this huge
-+		 * page is aliased by multiple sptes with the same access
-+		 * permissions. These entries are guaranteed to map the same
-+		 * gfn-to-pfn translation since the SP is direct, so no need to
-+		 * modify them.
-+		 *
-+		 * However, if a given SPTE points to a lower level page table,
-+		 * that lower level page table may only be partially populated.
-+		 * Installing such SPTEs would effectively unmap a potion of the
-+		 * huge page, which requires a TLB flush.
-+		 */
-+		if (is_shadow_present_pte(*sptep)) {
-+			flush |= !is_last_spte(*sptep, sp->role.level);
-+			continue;
-+		}
-+
-+		spte = make_huge_page_split_spte(huge_spte, sp, index);
-+		mmu_spte_set(sptep, spte);
-+		__rmap_add(kvm, cache, slot, sptep, gfn, sp->role.access);
-+	}
-+
-+	/*
-+	 * Replace the huge spte with a pointer to the populated lower level
-+	 * page table. If the lower-level page table indentically maps the huge
-+	 * page (i.e. no memory is unmapped), there's no need for a TLB flush.
-+	 * Otherwise, flush TLBs after dropping the huge page and before
-+	 * installing the shadow page table.
-+	 */
-+	__drop_large_spte(kvm, huge_sptep, flush);
-+	__link_shadow_page(cache, huge_sptep, sp);
-+}
-+
-+static int nested_mmu_try_split_huge_page(struct kvm *kvm,
-+					  const struct kvm_memory_slot *slot,
-+					  u64 *huge_sptep)
-+{
-+	struct kvm_mmu_page *huge_sp = sptep_to_sp(huge_sptep);
-+	int level, r = 0;
-+	gfn_t gfn;
-+	u64 spte;
-+
-+	/* Grab information for the tracepoint before dropping the MMU lock. */
-+	gfn = kvm_mmu_page_get_gfn(huge_sp, huge_sptep - huge_sp->spt);
-+	level = huge_sp->role.level;
-+	spte = *huge_sptep;
-+
-+	if (kvm_mmu_available_pages(kvm) <= KVM_MIN_FREE_MMU_PAGES) {
-+		r = -ENOSPC;
-+		goto out;
-+	}
-+
-+	if (need_topup_split_caches_or_resched(kvm)) {
-+		write_unlock(&kvm->mmu_lock);
-+		cond_resched();
-+		/*
-+		 * If the topup succeeds, return -EAGAIN to indicate that the
-+		 * rmap iterator should be restarted because the MMU lock was
-+		 * dropped.
-+		 */
-+		r = topup_split_caches(kvm) ?: -EAGAIN;
-+		write_lock(&kvm->mmu_lock);
-+		goto out;
-+	}
-+
-+	nested_mmu_split_huge_page(kvm, slot, huge_sptep);
-+
-+out:
-+	trace_kvm_mmu_split_huge_page(gfn, spte, level, r);
-+	return r;
-+}
-+
-+static bool nested_mmu_skip_split_huge_page(u64 *huge_sptep)
-+{
-+	struct kvm_mmu_page *sp = sptep_to_sp(huge_sptep);
-+
-+	/* TDP MMU is enabled, so rmap should only contain nested MMU SPs. */
-+	if (WARN_ON_ONCE(!sp->role.guest_mode))
-+		return true;
-+
-+	/* The rmaps should never contain non-leaf SPTEs. */
-+	if (WARN_ON_ONCE(!is_large_pte(*huge_sptep)))
-+		return true;
-+
-+	/* SPs with level >PG_LEVEL_4K should never by unsync. */
-+	if (WARN_ON_ONCE(sp->unsync))
-+		return true;
-+
-+	/* Don't bother splitting huge pages on invalid SPs. */
-+	if (sp->role.invalid)
-+		return true;
-+
-+	return false;
-+}
-+
-+static bool nested_mmu_try_split_huge_pages(struct kvm *kvm,
-+					    struct kvm_rmap_head *rmap_head,
-+					    const struct kvm_memory_slot *slot)
-+{
-+	struct rmap_iterator iter;
-+	u64 *huge_sptep;
-+	int r;
-+
-+restart:
-+	for_each_rmap_spte(rmap_head, &iter, huge_sptep) {
-+		if (nested_mmu_skip_split_huge_page(huge_sptep))
-+			continue;
-+
-+		r = nested_mmu_try_split_huge_page(kvm, slot, huge_sptep);
-+
-+		/*
-+		 * The split succeeded or needs to be retried because the MMU
-+		 * lock was dropped. Either way, restart the iterator to get it
-+		 * back into a consistent state.
-+		 */
-+		if (!r || r == -EAGAIN)
-+			goto restart;
-+
-+		/* The split failed and shouldn't be retried (e.g. -ENOMEM). */
-+		break;
-+	}
-+
-+	return false;
-+}
-+
-+static void kvm_nested_mmu_try_split_huge_pages(struct kvm *kvm,
-+						const struct kvm_memory_slot *slot,
-+						gfn_t start, gfn_t end,
-+						int target_level)
-+{
-+	int level;
-+
-+	/*
-+	 * Split huge pages starting with KVM_MAX_HUGEPAGE_LEVEL and working
-+	 * down to the target level. This ensures pages are recursively split
-+	 * all the way to the target level. There's no need to split pages
-+	 * already at the target level.
-+	 */
-+	for (level = KVM_MAX_HUGEPAGE_LEVEL; level > target_level; level--) {
-+		slot_handle_level_range(kvm, slot,
-+					nested_mmu_try_split_huge_pages,
-+					level, level, start, end - 1,
-+					true, false);
-+	}
-+}
-+
- /* Must be called with the mmu_lock held in write-mode. */
- void kvm_mmu_try_split_huge_pages(struct kvm *kvm,
- 				   const struct kvm_memory_slot *memslot,
- 				   u64 start, u64 end,
- 				   int target_level)
- {
--	if (is_tdp_mmu_enabled(kvm))
--		kvm_tdp_mmu_try_split_huge_pages(kvm, memslot, start, end,
--						 target_level, false);
-+	if (!is_tdp_mmu_enabled(kvm))
-+		return;
-+
-+	kvm_tdp_mmu_try_split_huge_pages(kvm, memslot, start, end, target_level,
-+					 false);
-+
-+	if (kvm_memslots_have_rmaps(kvm))
-+		kvm_nested_mmu_try_split_huge_pages(kvm, memslot, start, end,
-+						    target_level);
- 
- 	/*
- 	 * A TLB flush is unnecessary at this point for the same resons as in
-@@ -6051,10 +6304,19 @@ void kvm_mmu_slot_try_split_huge_pages(struct kvm *kvm,
- 	u64 start = memslot->base_gfn;
- 	u64 end = start + memslot->npages;
- 
--	if (is_tdp_mmu_enabled(kvm)) {
--		read_lock(&kvm->mmu_lock);
--		kvm_tdp_mmu_try_split_huge_pages(kvm, memslot, start, end, target_level, true);
--		read_unlock(&kvm->mmu_lock);
-+	if (!is_tdp_mmu_enabled(kvm))
-+		return;
-+
-+	read_lock(&kvm->mmu_lock);
-+	kvm_tdp_mmu_try_split_huge_pages(kvm, memslot, start, end, target_level,
-+					 true);
-+	read_unlock(&kvm->mmu_lock);
-+
-+	if (kvm_memslots_have_rmaps(kvm)) {
-+		write_lock(&kvm->mmu_lock);
-+		kvm_nested_mmu_try_split_huge_pages(kvm, memslot, start, end,
-+						    target_level);
-+		write_unlock(&kvm->mmu_lock);
- 	}
- 
- 	/*
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ab336f7c82e4..e123e24a130f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12161,6 +12161,12 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
- 		 * page faults will create the large-page sptes.
- 		 */
- 		kvm_mmu_zap_collapsible_sptes(kvm, new);
-+
-+		/*
-+		 * Free any memory left behind by eager page splitting. Ignore
-+		 * the module parameter since userspace might have changed it.
-+		 */
-+		free_split_caches(kvm);
- 	} else {
- 		/*
- 		 * Initially-all-set does not require write protecting any page,
--- 
-2.36.0.rc2.479.g8af0fa9b8e-goog
-
+> 
+> 
+> Best regards
+> 
+> Johanna "Mimoja"
+> 
