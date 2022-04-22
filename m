@@ -2,141 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 20C4350B6C0
-	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 14:05:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20B1550B70B
+	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 14:12:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1447245AbiDVMHu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Apr 2022 08:07:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60724 "EHLO
+        id S1447359AbiDVMOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Apr 2022 08:14:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1447268AbiDVMHZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Apr 2022 08:07:25 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2516856741;
-        Fri, 22 Apr 2022 05:03:03 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23M9c8i9004872;
-        Fri, 22 Apr 2022 12:03:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
+        with ESMTP id S1447473AbiDVMN4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Apr 2022 08:13:56 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EC8C5715F
+        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 05:10:49 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23MBlSXq017503;
+        Fri, 22 Apr 2022 12:10:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=JWJ+ZPkJO3WhXInMIWV1iLxq2i9MU1/flMmX4do8+lA=;
- b=pHBzxt66H9LneeO3tfSkXZL7zj0lm+E+e2noKqE7NcT+f3XrioYoEBywoADFLEBNKgAX
- 9sVKUsdvfbqrKXQnqAGLbyj9vAAExIdUqNEfoS0ENdh9BJgZEzB921M0Jx0LmTf7CmmP
- rRM8exjZrxMCJooK/+Efv1h9bE5k/Lalgz1GbaITUTHatjCoMllsHru/3XLqtKiOTJSY
- OnXNu8kfKRltUPCh1BnmSLbcZFhBcWLahSApDA3c0+DDIHVz+KcjAl7/YhdpLrVegj1/
- PiJwyxfKV/+H+1V0+cpU5jo1fyFEzqu9iPzCDE29Ix8nsoR0sR9zw+N6+dI+7sW07+m+ kQ== 
+ bh=5SAS3lOhc41mekbq3ItnfDwgHr/whPaP4RfScw//zUk=;
+ b=Hb2rm4K/CPIMJXgvHkm2TNo9obIeFOtSbQTmXxO+P7mdlQghLWJ50F9tGG8pBilzIGFY
+ kerd0NQoyc/cSG/Ij3kyIHDKd62mIxNx/rH4En+Bd2N5hF1Jr7zqoWGW6PH1DGVX3O8C
+ BVnqKVPSz9KDhGNBlwDP3VoGxV7JCzaSzXGNxjvlpyo7KFJFeqYNhET6IY5toyB6dnWH
+ tvey56dCUhS/mne3odR02D+oV7kzsn55aXmPg5SznmoWtfp/15HIToWzmstEwnBgrnMi
+ zL0OAraVahCC2KWyLqYgXedgOC9fxzE5HLhSv39Ax+gsvyrRd3WV2zREQb3YwWu7MN+j eA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3fjer9enbb-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fjm2jq5h4-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Apr 2022 12:02:59 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23MBdhEF027669;
-        Fri, 22 Apr 2022 12:02:55 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3fjer9en32-1
+        Fri, 22 Apr 2022 12:10:41 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23MAN7Fi017956;
+        Fri, 22 Apr 2022 12:10:41 GMT
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fjm2jq5gt-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Apr 2022 12:02:55 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23MBqVAL019154;
-        Fri, 22 Apr 2022 12:02:18 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 3ffn2j1bah-1
+        Fri, 22 Apr 2022 12:10:41 +0000
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23MC7CXI024023;
+        Fri, 22 Apr 2022 12:10:40 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma02dal.us.ibm.com with ESMTP id 3ffneaw8jm-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Apr 2022 12:02:18 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23MC2FRw40370618
+        Fri, 22 Apr 2022 12:10:40 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23MCAdoP57868784
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 22 Apr 2022 12:02:15 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7DAD1A4055;
-        Fri, 22 Apr 2022 12:02:15 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 21682A404D;
-        Fri, 22 Apr 2022 12:02:15 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.10.176])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 22 Apr 2022 12:02:15 +0000 (GMT)
-Date:   Fri, 22 Apr 2022 14:02:13 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v4 0/4] s390x: add migration test support
-Message-ID: <20220422140213.1b70e4cb@p-imbrenda>
-In-Reply-To: <20220422105453.2153299-1-nrb@linux.ibm.com>
-References: <20220422105453.2153299-1-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Fri, 22 Apr 2022 12:10:39 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6BADFB2064;
+        Fri, 22 Apr 2022 12:10:39 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0ADD4B2067;
+        Fri, 22 Apr 2022 12:10:36 +0000 (GMT)
+Received: from [9.211.145.86] (unknown [9.211.145.86])
+        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri, 22 Apr 2022 12:10:35 +0000 (GMT)
+Message-ID: <9a171204-6d71-ee1d-d8bd-cd4eac91c3d5@linux.ibm.com>
+Date:   Fri, 22 Apr 2022 08:10:34 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v5 7/9] s390x/pci: enable adapter event notification for
+ interpreted devices
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
+        cohuck@redhat.com, thuth@redhat.com, farman@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com,
+        pasic@linux.ibm.com, borntraeger@linux.ibm.com, mst@redhat.com,
+        pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20220404181726.60291-1-mjrosato@linux.ibm.com>
+ <20220404181726.60291-8-mjrosato@linux.ibm.com>
+ <31b5f911-0e1f-ba3c-94f2-1947d5b16057@linux.ibm.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <31b5f911-0e1f-ba3c-94f2-1947d5b16057@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: IMg1hVmTjWauuHbNq4fah1V4ZwoszyNk
-X-Proofpoint-ORIG-GUID: NayaAUio_nx_YDhL-IzBSaqvc298XO7t
+X-Proofpoint-GUID: 0Oo-4KEx3ZLQVXxMgUV-Q531CBH-15UI
+X-Proofpoint-ORIG-GUID: fSc6mpgNoIEkD61BE-eM1TLWNeee0uZB
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-04-22_03,2022-04-22_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- mlxscore=0 priorityscore=1501 phishscore=0 malwarescore=0 mlxlogscore=999
- lowpriorityscore=0 spamscore=0 adultscore=0 bulkscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2204220053
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 clxscore=1015 lowpriorityscore=0 adultscore=0
+ suspectscore=0 mlxlogscore=999 spamscore=0 bulkscore=0 phishscore=0
+ malwarescore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204220053
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 22 Apr 2022 12:54:49 +0200
-Nico Boehr <nrb@linux.ibm.com> wrote:
-
-> Changelog from v3:
-> ---
-> - Rename read_buf_end to read_buf_length (Thanks Janosch)
+On 4/22/22 5:39 AM, Pierre Morel wrote:
 > 
-> This series depends on my SIGP store additional status series to have access to
-> the guarded-storage and vector related defines
-> ("[kvm-unit-tests PATCH v3 0/2] s390x: Add tests for SIGP store adtl status").
 > 
-> Add migration test support for s390x.
-
-thanks, queued
-
+> On 4/4/22 20:17, Matthew Rosato wrote:
+>> Use the associated kvm ioctl operation to enable adapter event 
+>> notification
+>> and forwarding for devices when requested.  This feature will be set up
+>> with or without firmware assist based upon the 'forwarding_assist' 
+>> setting.
+>>
+>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>> ---
+>>   hw/s390x/s390-pci-bus.c         | 20 ++++++++++++++---
+>>   hw/s390x/s390-pci-inst.c        | 40 +++++++++++++++++++++++++++++++--
+>>   hw/s390x/s390-pci-kvm.c         | 30 +++++++++++++++++++++++++
+>>   include/hw/s390x/s390-pci-bus.h |  1 +
+>>   include/hw/s390x/s390-pci-kvm.h | 14 ++++++++++++
+>>   5 files changed, 100 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>> index 9c02d31250..47918d2ce9 100644
+>> --- a/hw/s390x/s390-pci-bus.c
+>> +++ b/hw/s390x/s390-pci-bus.c
+>> @@ -190,7 +190,10 @@ void s390_pci_sclp_deconfigure(SCCB *sccb)
+>>           rc = SCLP_RC_NO_ACTION_REQUIRED;
+>>           break;
+>>       default:
+>> -        if (pbdev->summary_ind) {
+>> +        if (pbdev->interp && (pbdev->fh & FH_MASK_ENABLE)) {
+>> +            /* Interpreted devices were using interrupt forwarding */
+>> +            s390_pci_kvm_aif_disable(pbdev);
 > 
-> arm and powerpc already support basic migration tests.
-> 
-> If a test is in the migration group, it can print "migrate" on its console. This
-> will cause it to be migrated to a new QEMU instance. When migration is finished,
-> the test will be able to read a newline from its standard input.
-> 
-> We need the following pieces for this to work under s390x:
-> 
-> * read support for the sclp console. This can be very basic, it doesn't even
->   have to read anything useful, we just need to know something happened on
->   the console.
-> * s390/run adjustments to call the migration helper script.
-> 
-> This series adds basic migration tests for s390x, which I plan to extend
-> further.
-> 
-> Nico Boehr (4):
->   lib: s390x: add support for SCLP console read
->   s390x: add support for migration tests
->   s390x: don't run migration tests under PV
->   s390x: add basic migration test
-> 
->  lib/s390x/sclp-console.c |  79 ++++++++++++++++--
->  lib/s390x/sclp.h         |   8 ++
->  s390x/Makefile           |   2 +
->  s390x/migration.c        | 172 +++++++++++++++++++++++++++++++++++++++
->  s390x/run                |   7 +-
->  s390x/unittests.cfg      |   5 ++
->  scripts/s390x/func.bash  |   2 +-
->  7 files changed, 267 insertions(+), 8 deletions(-)
->  create mode 100644 s390x/migration.c
+> Same remark as for the kernel part.
+> The VFIO device is already initialized and the action is on this device, 
+> Shouldn't we use the VFIO device interface instead of the KVM interface?
 > 
 
+I don't necessarily disagree, but in v3 of the kernel series I was told 
+not to use VFIO ioctls to accomplish tasks that are unique to KVM (e.g. 
+AEN interpretation) and to instead use a KVM ioctl.
+
+VFIO_DEVICE_SET_IRQS won't work as-is for reasons described in the 
+kernel series (e.g. we don't see any of the config space notifiers 
+because of instruction interpretation) -- as far as I can figure we 
+could add our own s390 code to QEMU to issue VFIO_DEVICE_SET_IRQS 
+directly for an interpreted device, but I think would also need 
+s390-specific changes to VFIO_DEVICE_SET_IRQS accommodate this (e.g. 
+maybe something like a VFIO_IRQ_SET_DATA_S390AEN where we can then 
+specify the aen information in vfio_irq_set.data -- or something else I 
+haven't though of yet) -- I can try to look at this some more and see if 
+I get a good idea.
