@@ -2,74 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 429AD50B4BE
-	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 12:11:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E930450B4C1
+	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 12:13:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1446435AbiDVKOn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Apr 2022 06:14:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49690 "EHLO
+        id S1446450AbiDVKPJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Apr 2022 06:15:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377723AbiDVKOm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Apr 2022 06:14:42 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1BC6506E7;
-        Fri, 22 Apr 2022 03:11:49 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id k23so15458529ejd.3;
-        Fri, 22 Apr 2022 03:11:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Xesg0AXR4SVizI2s21m60p1BFH5JwHKKCprTxCBAOZ0=;
-        b=Ri00KQO0hd6LSntka2TZ6PirwuyYrkyAMVgRFbuJV8d57Zv6pFabFzdPDqERK8yv9v
-         MvoKwnj1uyAIrhz6zUGu5TL5I5eiU+ts7ed6boJEUDszFoyYeFEGDxRv1Qi81hzU/dd8
-         BaHcN9soDcTXrh3RiMqEYggPfvrBXx5bUJDww76BoCVQDo/eM63IK9PyPozd/48w0wAo
-         8p79QC3/+/qlhC9Zb7qwcV2175hkSJK4R9N7DJltZS+IJXT6Yh87A+jtMYIs2gRVF7S4
-         xFZYhFa5RSpT72IdZZLi4gCNjwL7xyTztPZew0q/Q25hIWJBJhbepaYHiou7RDDTeVLm
-         SHrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Xesg0AXR4SVizI2s21m60p1BFH5JwHKKCprTxCBAOZ0=;
-        b=FFU0DLORU6RHDtNpcx9+tkLKF7RBF/t68YQiTCmddhvuT4wobx2UksuFs9w1BZw/v/
-         S5MdsaGG0oFaUjJ7muhAHCHaToAA7Ie+CGBVCxysiqnHnZJCabZkItQZsSmmvw5yLtma
-         FVSqJ/xNcdY8yNgudW6gcd9D00x4SGJcR4RRVNtaZLp+I8E52RO+kaXeUwN9JURTLlgh
-         eEFDCTfG9Z7VHZFamDV7n6d6V03TZqxZIFouqhEog8/E0DinWuExABrUmiB1wiiAmFv1
-         BW1wkIDFx1HwLa8PV2iLnbBQykZANU7qQ+A10GcmGwWyWoOkQevS3MpHCB42ugzH7VW8
-         1MTA==
-X-Gm-Message-State: AOAM533ca3BvFfcfXefIWd1aNKsOP3ISid56Ae47gHYPcPMQmHQguk9W
-        y/o77RDr5GrvLdJ0zNSD/5U=
-X-Google-Smtp-Source: ABdhPJzY+ORSQNuSHjVhlOYjZ3FQLp74rSUzg7lTJukBuAyD/T3nkDrbZ+GWtHO9t6eHguq2+1LYXA==
-X-Received: by 2002:a17:906:6a11:b0:6e8:d248:f8ea with SMTP id qw17-20020a1709066a1100b006e8d248f8eamr3358974ejc.500.1650622308164;
-        Fri, 22 Apr 2022 03:11:48 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id s12-20020a1709062ecc00b006e8558c9a5csm600431eji.94.2022.04.22.03.11.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Apr 2022 03:11:47 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <1c13abb3-cd9e-c9ca-3bd8-406bcc6965b4@redhat.com>
-Date:   Fri, 22 Apr 2022 12:11:44 +0200
+        with ESMTP id S1446446AbiDVKPI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Apr 2022 06:15:08 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 24A1D53A7E
+        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 03:12:15 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E819C1477;
+        Fri, 22 Apr 2022 03:12:14 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A195D3F766;
+        Fri, 22 Apr 2022 03:12:13 -0700 (PDT)
+Date:   Fri, 22 Apr 2022 11:12:09 +0100
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Martin Radev <martin.b.radev@gmail.com>
+Cc:     kvm@vger.kernel.org, will@kernel.org,
+        julien.thierry.kdev@gmail.com, andre.przywara@arm.com
+Subject: Re: [PATCH kvmtool 2/5] virtio: Sanitize config accesses
+Message-ID: <YmJ/ebYEP7tcrxem@monolith.localdoman>
+References: <20220303231050.2146621-1-martin.b.radev@gmail.com>
+ <20220303231050.2146621-3-martin.b.radev@gmail.com>
+ <YjHgCrYF20UhtwWc@monolith.localdoman>
+ <YkDK7L4vU/DpGmCN@sisu-ThinkPad-E14-Gen-2>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH 1/4] KVM: x86: always initialize system_event.ndata
-Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, will@kernel.org,
-        apatel@ventanamicro.com, atishp@rivosinc.com, seanjc@google.com,
-        pgonda@google.com
-References: <20220421180443.1465634-1-pbonzini@redhat.com>
- <20220421180443.1465634-2-pbonzini@redhat.com> <87bkwta1p4.wl-maz@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <87bkwta1p4.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YkDK7L4vU/DpGmCN@sisu-ThinkPad-E14-Gen-2>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,37 +43,237 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/22/22 11:48, Marc Zyngier wrote:
-> On Thu, 21 Apr 2022 19:04:40 +0100,
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> The KVM_SYSTEM_EVENT_NDATA_VALID mechanism that was introduced
->> contextually with KVM_SYSTEM_EVENT_SEV_TERM is not a good match
->> for ARM and RISC-V, which want to communicate information even
->> for existing KVM_SYSTEM_EVENT_* constants.  Userspace is not ready
->> to filter out bit 31 of type, and fails to process the
->> KVM_EXIT_SYSTEM_EVENT exit.
->>
->> Therefore, tie the availability of ndata to a system capability
->> (which will be added once all architectures are on board).
->> Userspace written for released versions of Linux has no reason to
->> check flags, since it was never written, so it is okay to replace
->> it with ndata and data[0] (on 32-bit kernels) or with data[0]
->> (on 64-bit kernels).
+Hi,
+
+On Sun, Mar 27, 2022 at 11:37:00PM +0300, Martin Radev wrote:
 > 
-> How is it going to work for new userspace on old kernels, for which
-> the ndata field is left uninitialised?
+> Thank you for the review.
+> Answers are inline.
+> Here are the two patches:
+> 
+> int to u32 patch:
+> 
+> From ddedd3a59b41d97e07deac59af177b360cc04b20 Mon Sep 17 00:00:00 2001
+> From: Martin Radev <martin.b.radev@gmail.com>
+> Date: Thu, 24 Mar 2022 23:24:57 +0200
+> Subject: [PATCH kvmtool 3/6] virtio: Use u32 instead of int in pci_data_in/out
+> 
+> The PCI access size type is changed from a signed type
+> to an unsigned type since the size is never expected to
+> be negative, and the type also matches the type in the
+> signature of virtio_pci__io_mmio_callback.
+> This change simplifies size checking in the next patch.
+> 
+> Signed-off-by: Martin Radev <martin.b.radev@gmail.com>
+> ---
+>  virtio/pci.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/virtio/pci.c b/virtio/pci.c
+> index 2777d1c..bcb205a 100644
+> --- a/virtio/pci.c
+> +++ b/virtio/pci.c
+> @@ -116,7 +116,7 @@ static inline bool virtio_pci__msix_enabled(struct virtio_pci *vpci)
+>  }
+>  
+>  static bool virtio_pci__specific_data_in(struct kvm *kvm, struct virtio_device *vdev,
+> -					 void *data, int size, unsigned long offset)
+> +					 void *data, u32 size, unsigned long offset)
+>  {
+>  	u32 config_offset;
+>  	struct virtio_pci *vpci = vdev->virtio;
+> @@ -146,7 +146,7 @@ static bool virtio_pci__specific_data_in(struct kvm *kvm, struct virtio_device *
+>  }
+>  
+>  static bool virtio_pci__data_in(struct kvm_cpu *vcpu, struct virtio_device *vdev,
+> -				unsigned long offset, void *data, int size)
+> +				unsigned long offset, void *data, u32 size)
+>  {
+>  	bool ret = true;
+>  	struct virtio_pci *vpci;
+> @@ -211,7 +211,7 @@ static void update_msix_map(struct virtio_pci *vpci,
+>  }
+>  
+>  static bool virtio_pci__specific_data_out(struct kvm *kvm, struct virtio_device *vdev,
+> -					  void *data, int size, unsigned long offset)
+> +					  void *data, u32 size, unsigned long offset)
+>  {
+>  	struct virtio_pci *vpci = vdev->virtio;
+>  	u32 config_offset, vec;
+> @@ -285,7 +285,7 @@ static bool virtio_pci__specific_data_out(struct kvm *kvm, struct virtio_device
+>  }
+>  
+>  static bool virtio_pci__data_out(struct kvm_cpu *vcpu, struct virtio_device *vdev,
+> -				 unsigned long offset, void *data, int size)
+> +				 unsigned long offset, void *data, u32 size)
+>  {
+>  	bool ret = true;
+>  	struct virtio_pci *vpci;
+> -- 
+> 2.25.1
 
-New userspace needs to check the capability before accessing ndata.
+That looks good to me. Please send it as a separate patch in the next
+version of the series.
 
-If it is desirable for Android, crosvm can "quirk" that ARM always has 
-valid data[0] even in the absence of the capability.
+> 
+> Original patch but with comments addressed:
 
-> Cat we please get a #define that aliases data[0] to flags? At the next
-> merge of the KVM headers into their respective trees, all the existing
-> VMM are going to break if they have a reference to this field (CrosVM
-> definitely does today -- yes, we're ahead of time).
+If you change the patch, the new version should be sent as a new series.
+The version of the series should be reflected in the subject of each patch.
+For example, this series should have been v2, which means the prefix for
+the patches should have been: PATCH v2 kvmtool [..]. This can be
+accomplished with git format-patch directly, by using the command line
+argument --subject-prefix="PATCH v2 kvmtool". The next iteration of the
+series will be v3, and so on.
 
-That would be a union rather than a define but yes, I can do it.
+This is done to make it easier for everyone to keep track of the latest
+version of a patch set. It's also easier to review and test a new version
+of a patch when it is standalone than when it is attached to an email
+containing several other things.
 
-Paolo
+For example, you've attached two patches to this email, which can cause
+confusion about the order of the patches. This can be easily avoided by
+sending the changes in a separate series.
+
+I'll reply to your comments below.
+
+> On Wed, Mar 16, 2022 at 01:04:08PM +0000, Alexandru Elisei wrote:
+> > Hi,
+> > 
+> > On Fri, Mar 04, 2022 at 01:10:47AM +0200, Martin Radev wrote:
+> > > The handling of VIRTIO_PCI_O_CONFIG is prone to buffer access overflows.
+> > > This patch sanitizes this operation by using the newly added virtio op
+> > > get_config_size. Any access which goes beyond the config structure's
+> > > size is prevented and a failure is returned.
+> > > 
+> > > Additionally, PCI accesses which span more than a single byte are prevented
+> > > and a warning is printed because the implementation does not currently
+> > > support the behavior correctly.
+> > > 
+> > > Signed-off-by: Martin Radev <martin.b.radev@gmail.com>
+> > > ---
+> > >  include/kvm/virtio-9p.h |  1 +
+> > >  include/kvm/virtio.h    |  1 +
+> > >  virtio/9p.c             | 25 ++++++++++++++++++++-----
+> > >  virtio/balloon.c        |  8 ++++++++
+> > >  virtio/blk.c            |  8 ++++++++
+> > >  virtio/console.c        |  8 ++++++++
+> > >  virtio/mmio.c           | 24 ++++++++++++++++++++----
+> > >  virtio/net.c            |  8 ++++++++
+> > >  virtio/pci.c            | 38 ++++++++++++++++++++++++++++++++++++++
+> > >  virtio/rng.c            |  6 ++++++
+> > >  virtio/scsi.c           |  8 ++++++++
+> > >  virtio/vsock.c          |  8 ++++++++
+> > >  12 files changed, 134 insertions(+), 9 deletions(-)
+> > > 
+> > > diff --git a/include/kvm/virtio-9p.h b/include/kvm/virtio-9p.h
+> > > index 3ea7698..77c5062 100644
+> > > --- a/include/kvm/virtio-9p.h
+> > > +++ b/include/kvm/virtio-9p.h
+> > > @@ -44,6 +44,7 @@ struct p9_dev {
+> > >  	struct virtio_device	vdev;
+> > >  	struct rb_root		fids;
+> > >  
+> > > +	size_t config_size;
+> > >  	struct virtio_9p_config	*config;
+> > >  	u32			features;
+> > >  
+> > > diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
+> > > index 3a311f5..3880e74 100644
+> > > --- a/include/kvm/virtio.h
+> > > +++ b/include/kvm/virtio.h
+> > > @@ -184,6 +184,7 @@ struct virtio_device {
+> > >  
+> > >  struct virtio_ops {
+> > >  	u8 *(*get_config)(struct kvm *kvm, void *dev);
+> > > +	size_t (*get_config_size)(struct kvm *kvm, void *dev);
+> > >  	u32 (*get_host_features)(struct kvm *kvm, void *dev);
+> > >  	void (*set_guest_features)(struct kvm *kvm, void *dev, u32 features);
+> > >  	int (*get_vq_count)(struct kvm *kvm, void *dev);
+> > > diff --git a/virtio/9p.c b/virtio/9p.c
+> > > index b78f2b3..6074f3a 100644
+> > > --- a/virtio/9p.c
+> > > +++ b/virtio/9p.c
+> > > @@ -1375,6 +1375,13 @@ static u8 *get_config(struct kvm *kvm, void *dev)
+> > >  	return ((u8 *)(p9dev->config));
+> > >  }
+> > >  
+> > > +static size_t get_config_size(struct kvm *kvm, void *dev)
+> > > +{
+> > > +	struct p9_dev *p9dev = dev;
+> > > +
+> > > +	return p9dev->config_size;
+> > > +}
+> > > +
+> > >  static u32 get_host_features(struct kvm *kvm, void *dev)
+> > >  {
+> > >  	return 1 << VIRTIO_9P_MOUNT_TAG;
+> > > @@ -1469,6 +1476,7 @@ static int get_vq_count(struct kvm *kvm, void *dev)
+> > >  
+> > >  struct virtio_ops p9_dev_virtio_ops = {
+> > >  	.get_config		= get_config,
+> > > +	.get_config_size	= get_config_size,
+> > >  	.get_host_features	= get_host_features,
+> > >  	.set_guest_features	= set_guest_features,
+> > >  	.init_vq		= init_vq,
+> > > @@ -1568,7 +1576,9 @@ virtio_dev_init(virtio_9p__init);
+> > >  int virtio_9p__register(struct kvm *kvm, const char *root, const char *tag_name)
+> > >  {
+> > >  	struct p9_dev *p9dev;
+> > > -	int err = 0;
+> > > +	size_t tag_name_length;
+> > 
+> > I think it would be better to name the variable tag_len, the same name as
+> > the corresponding field in struct virtio_9p_config. As a bonus, it's also
+> > shorter. But this is personal preference in the end, so I leave it up to
+> > you to decide which works better.
+> > 
+> Done.
+> 
+> > > +	size_t config_size;
+> > > +	int err;
+> > >  
+> > >  	p9dev = calloc(1, sizeof(*p9dev));
+> > >  	if (!p9dev)
+> > > @@ -1577,29 +1587,34 @@ int virtio_9p__register(struct kvm *kvm, const char *root, const char *tag_name)
+> > >  	if (!tag_name)
+> > >  		tag_name = VIRTIO_9P_DEFAULT_TAG;
+> > >  
+> > > -	p9dev->config = calloc(1, sizeof(*p9dev->config) + strlen(tag_name) + 1);
+> > > +	tag_name_length = strlen(tag_name);
+> > > +	/* The tag_name zero byte is intentionally excluded */
+> > 
+> > If this is indeed a bug (the comment from virtio_9p_config seems to suggest
+> > it is, but I couldn't find the 9p spec), the bug is that the config size is
+> > computed incorrectly, which is a different bug than a guest being able to
+> > write outside of the config region for the device. As such, it should be
+> > fixed in a separate patch.
+> > 
+> I couldn't find information about how large the configuration size is and
+> whether the 0 byte is included. QEMU explicitly excludes it.
+> See https://elixir.bootlin.com/qemu/latest/source/hw/9pfs/virtio-9p-device.c#L218
+> I think this is almost surely the correct way considering the tag length
+> is also part of the config.
+
+I think I haven't managed to make myself clear. I agree that the NUL
+terminating byte shouldn't be taken into account when calculating the
+config size. What I was referring to is the fact that there two different
+bugs here:
+
+1. The config size is calculated incorrectly in the existing code:
+
+p9dev->config = calloc(1, sizeof(*p9dev->config) + strlen(tag_name) + 1);
+
+The code shouldn't add that one byte to the size, which presumably
+represent the NUL terminating byte from the tag_name string.
+
+2. The code doesn't check for overflow.
+
+Your patch tries to fix both bugs in one go. What I was suggesting is to
+write a standalone patch that fixes bug #1, and keep this patch that adds
+the overflow check, minus the fix for #1. This makes everything cleaner,
+easier to review and test, and easier to diagnose and fix or revert if the
+fix turns out to be wrong.
+
+Thanks,
+Alex
