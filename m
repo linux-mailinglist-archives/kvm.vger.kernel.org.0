@@ -2,308 +2,295 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38D3350B5B4
-	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 12:55:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D698750B5BD
+	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 12:56:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1446943AbiDVK6C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Apr 2022 06:58:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53200 "EHLO
+        id S1446956AbiDVK7Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Apr 2022 06:59:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1446934AbiDVK55 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Apr 2022 06:57:57 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFD64AE47;
-        Fri, 22 Apr 2022 03:55:03 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23MAP3RG025833;
-        Fri, 22 Apr 2022 10:55:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=Kxj0+j/Jg812IAocnjjXaPzLWYZknfmR/54PX7P2lkY=;
- b=FmpAzItVpEIW5xxa58QMj18bGOMEUMHCm/vP9h5mE095tIWLwTwDxqQyyUf0VmmyeuyT
- P/9rq+Yu+ITRa8ZV8ZhXER/lLj3wMfyF2QJFddIDkEXl+EJpyZzvov43vKCaZ3B590pg
- 4yRwgZICjhxYe8na0+aUnQe9BabfPW5epVjqj/+1Y4RiXN8uJY6VCne+nruKgb2RS65w
- 7wbteFkfEwdgCm6KWdKzTA13SXhllMecr7I+5C3ttRmZEM3n/Qy/xjrmNriunjI3FvWu
- eZZ2p5Id4uSTXnVY14x4a6qoqtqfJqQdRSbCWQJZ9Vnni1AHi8ZGDkChXb7f5dukd6sc aA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fkm5pyfn7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Apr 2022 10:55:03 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23MAqtIu016924;
-        Fri, 22 Apr 2022 10:55:02 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fkm5pyfmh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Apr 2022 10:55:02 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23MAsBDn010198;
-        Fri, 22 Apr 2022 10:55:00 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma05fra.de.ibm.com with ESMTP id 3ffne8ybfv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Apr 2022 10:55:00 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23MAg49L54133038
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 22 Apr 2022 10:42:04 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D96B6AE059;
-        Fri, 22 Apr 2022 10:54:56 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9F85CAE05A;
-        Fri, 22 Apr 2022 10:54:56 +0000 (GMT)
-Received: from t46lp57.lnxne.boe (unknown [9.152.108.100])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 22 Apr 2022 10:54:56 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v4 4/4] s390x: add basic migration test
-Date:   Fri, 22 Apr 2022 12:54:53 +0200
-Message-Id: <20220422105453.2153299-5-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220422105453.2153299-1-nrb@linux.ibm.com>
-References: <20220422105453.2153299-1-nrb@linux.ibm.com>
+        with ESMTP id S245078AbiDVK7X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Apr 2022 06:59:23 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D08A5622F;
+        Fri, 22 Apr 2022 03:56:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1650624990; x=1682160990;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=rJVd1tK/Yiyruq2AWcvjVHLhacTHQWBMSusJV1SX9dM=;
+  b=MRyyVoy3shcHXZEII43UaothFabqrwNprY+dYa8pCAFhqobTGTQveTxc
+   /HH8b8rKFsISmF43ADKqis0eahSW6GEFKxNIobRG/bJbly2pmWhYWG0/0
+   +MqiydPS8BgI+Df1+3i9m7vErF5BlUFibb+2Ws9n6oURS9Ag8K7HXSVDG
+   HV85gm3ABwPl0zO+Gvg6R5bDna1x0qRLiCGdXFold6J8m9Sint9S+xY9y
+   qiNJ2Ilxu+IT9TGrQKbppa+0EEum9Ra2nxjwjxjSPt/y+HlTNqPqCdz5d
+   tbVT8HqkbYlBrF/35gG9Hg/eZ03ruTLe0z9fHs7Hacsess6y95M8DSKWj
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10324"; a="246551068"
+X-IronPort-AV: E=Sophos;i="5.90,281,1643702400"; 
+   d="scan'208";a="246551068"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2022 03:56:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,281,1643702400"; 
+   d="scan'208";a="703511229"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
+  by fmsmga001.fm.intel.com with ESMTP; 22 Apr 2022 03:56:21 -0700
+Date:   Fri, 22 Apr 2022 18:56:12 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Quentin Perret <qperret@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+Message-ID: <20220422105612.GB61987@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <YkQzfjgTQaDd2E2T@google.com>
+ <YkSaUQX89ZEojsQb@google.com>
+ <80aad2f9-9612-4e87-a27a-755d3fa97c92@www.fastmail.com>
+ <YkcTTY4YjQs5BRhE@google.com>
+ <83fd55f8-cd42-4588-9bf6-199cbce70f33@www.fastmail.com>
+ <YksIQYdG41v3KWkr@google.com>
+ <Ykslo2eo2eRXrpFR@google.com>
+ <eefc3c74-acca-419c-8947-726ce2458446@www.fastmail.com>
+ <Ykwbqv90C7+8K+Ao@google.com>
+ <YkyEaYiL0BrDYcZv@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: -jozRLVZhHEYIZeBH3bTx8u11DPrwY6p
-X-Proofpoint-GUID: 7HV3qJzQBWqF8RfhEJS8q0Im4WztY_ku
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-22_02,2022-04-22_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- clxscore=1015 bulkscore=0 phishscore=0 priorityscore=1501
- lowpriorityscore=0 malwarescore=0 mlxscore=0 suspectscore=0
- mlxlogscore=999 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2202240000 definitions=main-2204220046
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YkyEaYiL0BrDYcZv@google.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a basic migration test for s390x. This tests the guarded-storage registers
-and vector registers are preserved on migration.
+On Tue, Apr 05, 2022 at 06:03:21PM +0000, Sean Christopherson wrote:
+> On Tue, Apr 05, 2022, Quentin Perret wrote:
+> > On Monday 04 Apr 2022 at 15:04:17 (-0700), Andy Lutomirski wrote:
+> > > >>  - it can be very useful for protected VMs to do shared=>private
+> > > >>    conversions. Think of a VM receiving some data from the host in a
+> > > >>    shared buffer, and then it wants to operate on that buffer without
+> > > >>    risking to leak confidential informations in a transient state. In
+> > > >>    that case the most logical thing to do is to convert the buffer back
+> > > >>    to private, do whatever needs to be done on that buffer (decrypting a
+> > > >>    frame, ...), and then share it back with the host to consume it;
+> > > >
+> > > > If performance is a motivation, why would the guest want to do two
+> > > > conversions instead of just doing internal memcpy() to/from a private
+> > > > page?  I would be quite surprised if multiple exits and TLB shootdowns is
+> > > > actually faster, especially at any kind of scale where zapping stage-2
+> > > > PTEs will cause lock contention and IPIs.
+> > > 
+> > > I don't know the numbers or all the details, but this is arm64, which is a
+> > > rather better architecture than x86 in this regard.  So maybe it's not so
+> > > bad, at least in very simple cases, ignoring all implementation details.
+> > > (But see below.)  Also the systems in question tend to have fewer CPUs than
+> > > some of the massive x86 systems out there.
+> > 
+> > Yep. I can try and do some measurements if that's really necessary, but
+> > I'm really convinced the cost of the TLBI for the shared->private
+> > conversion is going to be significantly smaller than the cost of memcpy
+> > the buffer twice in the guest for us.
+> 
+> It's not just the TLB shootdown, the VM-Exits aren't free.   And barring non-trivial
+> improvements to KVM's MMU, e.g. sharding of mmu_lock, modifying the page tables will
+> block all other updates and MMU operations.  Taking mmu_lock for read, should arm64
+> ever convert to a rwlock, is not an option because KVM needs to block other
+> conversions to avoid races.
+> 
+> Hmm, though batching multiple pages into a single request would mitigate most of
+> the overhead.
+> 
+> > There are variations of that idea: e.g. allow userspace to mmap the
+> > entire private fd but w/o taking a reference on pages mapped with
+> > PROT_NONE. And then the VMM can use mprotect() in response to
+> > share/unshare requests. I think Marc liked that idea as it keeps the
+> > userspace API closer to normal KVM -- there actually is a
+> > straightforward gpa->hva relation. Not sure how much that would impact
+> > the implementation at this point.
+> > 
+> > For the shared=>private conversion, this would be something like so:
+> > 
+> >  - the guest issues a hypercall to unshare a page;
+> > 
+> >  - the hypervisor forwards the request to the host;
+> > 
+> >  - the host kernel forwards the request to userspace;
+> > 
+> >  - userspace then munmap()s the shared page;
+> > 
+> >  - KVM then tries to take a reference to the page. If it succeeds, it
+> >    re-enters the guest with a flag of some sort saying that the share
+> >    succeeded, and the hypervisor will adjust pgtables accordingly. If
+> >    KVM failed to take a reference, it flags this and the hypervisor will
+> >    be responsible for communicating that back to the guest. This means
+> >    the guest must handle failures (possibly fatal).
+> > 
+> > (There are probably many ways in which we can optimize this, e.g. by
+> > having the host proactively munmap() pages it no longer needs so that
+> > the unshare hypercall from the guest doesn't need to exit all the way
+> > back to host userspace.)
+> 
+> ...
+> 
+> > > Maybe there could be a special mode for the private memory fds in which
+> > > specific pages are marked as "managed by this fd but actually shared".
+> > > pread() and pwrite() would work on those pages, but not mmap().  (Or maybe
+> > > mmap() but the resulting mappings would not permit GUP.)
+> 
+> Unless I misunderstand what you intend by pread()/pwrite(), I think we'd need to
+> allow mmap(), otherwise e.g. uaccess from the kernel wouldn't work.
+> 
+> > > And transitioning them would be a special operation on the fd that is
+> > > specific to pKVM and wouldn't work on TDX or SEV.
+> 
+> To keep things feature agnostic (IMO, baking TDX vs SEV vs pKVM info into private-fd
+> is a really bad idea), this could be handled by adding a flag and/or callback into
+> the notifier/client stating whether or not it supports mapping a private-fd, and then
+> mapping would be allowed if and only if all consumers support/allow mapping.
+> 
+> > > Hmm.  Sean and Chao, are we making a bit of a mistake by making these fds
+> > > technology-agnostic?  That is, would we want to distinguish between a TDX
+> > > backing fd, a SEV backing fd, a software-based backing fd, etc?  API-wise
+> > > this could work by requiring the fd to be bound to a KVM VM instance and
+> > > possibly even configured a bit before any other operations would be
+> > > allowed.
+> 
+> I really don't want to distinguish between between each exact feature, but I've
+> no objection to adding flags/callbacks to track specific properties of the
+> downstream consumers, e.g. "can this memory be accessed by userspace" is a fine
+> abstraction.  It also scales to multiple consumers (see above).
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- s390x/Makefile      |   1 +
- s390x/migration.c   | 172 ++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |   5 ++
- 3 files changed, 178 insertions(+)
- create mode 100644 s390x/migration.c
+Great thanks for the discussions. I summarized the requirements/gaps and the
+potential changes for next step. Please help to review.
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index f38f442b9cb1..5336ed8ae0b4 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -30,6 +30,7 @@ tests += $(TEST_DIR)/spec_ex-sie.elf
- tests += $(TEST_DIR)/firq.elf
- tests += $(TEST_DIR)/epsw.elf
- tests += $(TEST_DIR)/adtl-status.elf
-+tests += $(TEST_DIR)/migration.elf
- 
- pv-tests += $(TEST_DIR)/pv-diags.elf
- 
-diff --git a/s390x/migration.c b/s390x/migration.c
-new file mode 100644
-index 000000000000..2f31fc53bf68
---- /dev/null
-+++ b/s390x/migration.c
-@@ -0,0 +1,172 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Migration Test for s390x
-+ *
-+ * Copyright IBM Corp. 2022
-+ *
-+ * Authors:
-+ *  Nico Boehr <nrb@linux.ibm.com>
-+ */
-+#include <libcflat.h>
-+#include <asm/arch_def.h>
-+#include <asm/vector.h>
-+#include <asm/barrier.h>
-+#include <gs.h>
-+#include <bitops.h>
-+#include <smp.h>
-+
-+static struct gs_cb gs_cb;
-+static struct gs_epl gs_epl;
-+
-+/* set by CPU1 to signal it has completed */
-+static int flag_thread_complete;
-+/* set by CPU0 to signal migration has completed */
-+static int flag_migration_complete;
-+
-+static void write_gs_regs(void)
-+{
-+	const unsigned long gs_area = 0x2000000;
-+	const unsigned long gsc = 25; /* align = 32 M, section size = 512K */
-+
-+	gs_cb.gsd = gs_area | gsc;
-+	gs_cb.gssm = 0xfeedc0ffe;
-+	gs_cb.gs_epl_a = (uint64_t) &gs_epl;
-+
-+	load_gs_cb(&gs_cb);
-+}
-+
-+static void check_gs_regs(void)
-+{
-+	struct gs_cb gs_cb_after_migration;
-+
-+	store_gs_cb(&gs_cb_after_migration);
-+
-+	report_prefix_push("guarded-storage registers");
-+
-+	report(gs_cb_after_migration.gsd == gs_cb.gsd, "gsd matches");
-+	report(gs_cb_after_migration.gssm == gs_cb.gssm, "gssm matches");
-+	report(gs_cb_after_migration.gs_epl_a == gs_cb.gs_epl_a, "gs_epl_a matches");
-+
-+	report_prefix_pop();
-+}
-+
-+static void test_func(void)
-+{
-+	uint8_t expected_vec_contents[VEC_REGISTER_NUM][VEC_REGISTER_SIZE];
-+	uint8_t actual_vec_contents[VEC_REGISTER_NUM][VEC_REGISTER_SIZE];
-+	uint8_t *vec_reg;
-+	int i;
-+	int vec_result = 0;
-+
-+	for (i = 0; i < VEC_REGISTER_NUM; i++) {
-+		vec_reg = &expected_vec_contents[i][0];
-+		/* i+1 to avoid zero content */
-+		memset(vec_reg, i + 1, VEC_REGISTER_SIZE);
-+	}
-+
-+	ctl_set_bit(0, CTL0_VECTOR);
-+	ctl_set_bit(2, CTL2_GUARDED_STORAGE);
-+
-+	write_gs_regs();
-+
-+	/*
-+	 * It is important loading the vector/floating point registers and
-+	 * comparing their contents occurs in the same inline assembly block.
-+	 * Otherwise, the compiler is allowed to re-use the registers for
-+	 * something else in between.
-+	 * For this very reason, this also runs on a second CPU, so all the
-+	 * complex console stuff can be done in C on the first CPU and here we
-+	 * just need to wait for it to set the flag.
-+	 */
-+	asm inline(
-+		"	.machine z13\n"
-+		/* load vector registers: vlm handles at most 16 registers at a time */
-+		"	vlm 0,15, 0(%[expected_vec_reg])\n"
-+		"	vlm 16,31, 256(%[expected_vec_reg])\n"
-+		/* inform CPU0 we are done, it will request migration */
-+		"	mvhi %[flag_thread_complete], 1\n"
-+		/* wait for migration to finish */
-+		"0:	clfhsi %[flag_migration_complete], 1\n"
-+		"	jnz 0b\n"
-+		/*
-+		 * store vector register contents in actual_vec_reg: vstm
-+		 * handles at most 16 registers at a time
-+		 */
-+		"	vstm 0,15, 0(%[actual_vec_reg])\n"
-+		"	vstm 16,31, 256(%[actual_vec_reg])\n"
-+		/*
-+		 * compare the contents in expected_vec_reg with actual_vec_reg:
-+		 * clc handles at most 256 bytes at a time
-+		 */
-+		"	clc 0(256, %[expected_vec_reg]), 0(%[actual_vec_reg])\n"
-+		"	jnz 1f\n"
-+		"	clc 256(256, %[expected_vec_reg]), 256(%[actual_vec_reg])\n"
-+		"	jnz 1f\n"
-+		/* success */
-+		"	mvhi %[vec_result], 1\n"
-+		"1:"
-+		:
-+		: [expected_vec_reg] "a"(expected_vec_contents),
-+		  [actual_vec_reg] "a"(actual_vec_contents),
-+		  [flag_thread_complete] "Q"(flag_thread_complete),
-+		  [flag_migration_complete] "Q"(flag_migration_complete),
-+		  [vec_result] "Q"(vec_result)
-+		: "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9",
-+		  "v10", "v11", "v12", "v13", "v14", "v15", "v16", "v17", "v18",
-+		  "v19", "v20", "v21", "v22", "v23", "v24", "v25", "v26", "v27",
-+		  "v28", "v29", "v30", "v31", "cc", "memory"
-+	);
-+
-+	report(vec_result, "vector contents match");
-+
-+	check_gs_regs();
-+
-+	report(stctg(0) & BIT(CTL0_VECTOR), "ctl0 vector bit set");
-+	report(stctg(2) & BIT(CTL2_GUARDED_STORAGE), "ctl2 guarded-storage bit set");
-+
-+	ctl_clear_bit(0, CTL0_VECTOR);
-+	ctl_clear_bit(2, CTL2_GUARDED_STORAGE);
-+
-+	flag_thread_complete = 1;
-+}
-+
-+int main(void)
-+{
-+	struct psw psw;
-+
-+	/* don't say migrate here otherwise we will migrate right away */
-+	report_prefix_push("migration");
-+
-+	if (smp_query_num_cpus() == 1) {
-+		report_skip("need at least 2 cpus for this test");
-+		goto done;
-+	}
-+
-+	/* Second CPU does the actual tests */
-+	psw.mask = extract_psw_mask();
-+	psw.addr = (unsigned long)test_func;
-+	smp_cpu_setup(1, psw);
-+
-+	/* wait for thread setup */
-+	while(!flag_thread_complete)
-+		mb();
-+	flag_thread_complete = 0;
-+
-+	/* ask migrate_cmd to migrate (it listens for 'migrate') */
-+	puts("Please migrate me, then press return\n");
-+
-+	/* wait for migration to finish, we will read a newline */
-+	(void)getchar();
-+
-+	flag_migration_complete = 1;
-+
-+	/* wait for thread to complete assertions */
-+	while(!flag_thread_complete)
-+		mb();
-+
-+	smp_cpu_destroy(1);
-+
-+done:
-+	report_prefix_pop();
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 256c71691adc..b456b2881448 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -171,3 +171,8 @@ file = adtl-status.elf
- smp = 2
- accel = tcg
- extra_params = -cpu qemu,gs=off,vx=off
-+
-+[migration]
-+file = migration.elf
-+groups = migration
-+smp = 2
--- 
-2.31.1
 
+Terminologies:
+--------------
+  - memory conversion: the action of converting guest memory between private
+    and shared.
+  - explicit conversion: an enlightened guest uses a hypercall to explicitly
+    request a memory conversion to VMM.
+  - implicit conversion: the conversion when VMM reacts to a page fault due
+    to different guest/host memory attributes (private/shared).
+  - destructive conversion: the memory content is lost/destroyed during
+    conversion.
+  - non-destructive conversion: the memory content is preserved during
+    conversion.
+
+
+Requirements & Gaps
+-------------------------------------
+  - Confidential computing(CC): TDX/SEV/CCA
+    * Need support both explicit/implicit conversions.
+    * Need support only destructive conversion at runtime.
+    * The current patch should just work, but prefer to have pre-boot guest
+      payload/firmware population into private memory for performance.
+
+  - pKVM
+    * Support explicit conversion only. Hard to achieve implicit conversion,
+      does not record the guest access info (private/shared) in page fault,
+      also makes little sense.
+    * Expect to support non-destructive conversion at runtime. Additionally
+      in-place conversion (the underlying physical page is unchanged) is
+      desirable since copy is not disirable. The current destructive conversion
+      does not fit well.
+    * The current callbacks between mm/KVM is useful and reusable for pKVM.
+    * Pre-boot guest payload population is nice to have.
+
+
+Change Proposal
+---------------
+Since there are some divergences for pKVM from CC usages and at this time looks
+whether we will and how we will support pKVM with this private memory patchset
+is still not quite clear, so this proposal does not imply certain detailed pKVM
+implementation. But from the API level, we want this can be possible to be future
+extended for pKVM or other potential usages.
+
+  - No new user APIs introduced for memory backing store, e.g. remove the
+    current MFD_INACCESSIBLE. This info will be communicated from memfile_notifier
+    consumers to backing store via the new 'flag' field in memfile_notifier
+    described below. At creation time, the fd is normal shared fd. At rumtime CC
+    usages will keep using current fallocate/FALLOC_FL_PUNCH_HOLE to do the
+    conversion, but pKVM may also possible use a different way (e.g. rely on
+    mmap/munmap or mprotect as discussed). These are all not new APIs anyway.
+
+  - Add a flag to memfile_notifier so its consumers can state the requirements.
+
+        struct memfile_notifier {
+                struct list_head list;
+                unsigned long flags;     /* consumer states its requirements here */
+                struct memfile_notifier_ops *ops; /* future function may also extend ops when necessary */
+        };
+
+    For current CC usage, we can define and set below flags from KVM.
+
+        /* memfile notifier flags */
+        #define MFN_F_USER_INACCESSIBLE   0x0001  /* memory allocated in the file is inaccessible from userspace (e.g. read/write/mmap) */
+        #define MFN_F_UNMOVABLE           0x0002  /* memory allocated in the file is unmovable */
+        #define MFN_F_UNRECLAIMABLE       0x0003  /* memory allocated in the file is unreclaimable (e.g. via kswapd or any other pathes) */
+
+    When memfile_notifier is being registered, memfile_register_notifier will
+    need check these flags. E.g. for MFN_F_USER_INACCESSIBLE, it fails when
+    previous mmap-ed mapping exists on the fd (I'm still unclear on how to do
+    this). When multiple consumers are supported it also need check all
+    registered consumers to see if any conflict (e.g. all consumers should have
+    MFN_F_USER_INACCESSIBLE set). Only when the register succeeds, the fd is
+    converted into a private fd, before that, the fd is just a normal (shared)
+    one. During this conversion, the previous data is preserved so you can put
+    some initial data in guest pages (whether the architecture allows this is
+    architecture-specific and out of the scope of this patch).
+
+  - Pre-boot guest payload populating is done by normal mmap/munmap on the fd
+    before it's converted into private fd when KVM registers itself to the
+    backing store.
+
+  - Implicit conversion: maybe it's worthy to discuss again: how about totally
+    remove implicit converion support? TDX should be OK, unsure SEV/CCA. pKVM
+    should be happy to see. Removing also makes the work much easier and prevents
+    guest bugs/unitended behaviors early. If it turns out that there is reason to
+    keep it, then for pKVM we can make it an optional feature (e.g. via a new
+    module param). But that can be added when pKVM really gets supported.
+
+  - non-destructive in-place conversion: Out of scope for this series, pKVM can
+    invent other pKVM specific interfaces (either extend memfile_notifier and using
+    mmap/mprotect or use totaly different ways like access through vmfd as Sean
+    suggested).
+
+Thanks,
+Chao
