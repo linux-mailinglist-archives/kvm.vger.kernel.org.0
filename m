@@ -2,91 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C5ABE50B296
-	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 10:09:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81A5D50B3F7
+	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 11:24:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1445440AbiDVIFP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Apr 2022 04:05:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44436 "EHLO
+        id S1445944AbiDVJ1B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Apr 2022 05:27:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1445436AbiDVIFN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Apr 2022 04:05:13 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A871527D6;
-        Fri, 22 Apr 2022 01:02:21 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23M7CGLC020150;
-        Fri, 22 Apr 2022 08:02:20 GMT
+        with ESMTP id S1445943AbiDVJ06 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Apr 2022 05:26:58 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5955A40E60
+        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 02:24:05 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23M9D4l0016852;
+        Fri, 22 Apr 2022 09:23:59 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=k8IqdTJREoNElLpuXIY1bxU0Qimegc2GWe9c0tCwUlY=;
- b=Ceoc6EwH+O+a99xtFFIJkJR1xXG8m1XQNzm37X93sb+sdafRVWKogzQ3PMeYD0/ve5zv
- GPCSY0v1od54ZWqdRzAUi84c9QDzt38a9/m3OEOAIlDmAD85VElHRIvoaU8KhaiV78dd
- KhzgIjDY+8jY61Kj2CiN5QkAwLenQu+B6lqQeOHJ0U6Mw+u3Fz3+chfSWa0XXTKZI/vE
- KBlUgoCwDlRvuoBv6gvKCEx4tTCJltSbqsFzbj/wDBf+NaXcpF/A9sxzqqzfvYv44tlh
- cO6wpnYibyEivdypOJjOjlMQAI2gxsPYXlsafZ3f8mLFFfEOOc8Ka09kr75lpSXbc1Th 5w== 
+ bh=5YoUscdCvZqMTS+O22FyvVCvWlKSJU/srPDMwqRJN5c=;
+ b=iug3hUjKwA7qBXyQjdc0X3LRWzYCBSio54oJJfuPPhWLhC9Z73AXjXFROYk8tY3QH+yd
+ TlQGunZ//Gq5Snqh7stw1bCu2RXkLw8tKUvPkHl1LG93CJEWODsp5pAgZ2Il/1fZykHS
+ 2X0L8g/Er6s5BZHCODQmzNRxenVradimvmX4mEAOUWDx2kbKX/iTeBw1WMJUVdsNcrVj
+ kW2yKCQdfyFk6mBvl61psbA5uIoFqQsRGveAMeSEdgqK4XjYqkoou3U5jjq//kEreK9K
+ kdZEgLK8GOkNEClG7GyPtjfAybpkDV5k9Xv5PUTxRmRRPHA8dyjqgYSSvqkWCFOp7ien 8w== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fk1yeu654-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fjm2jm4n4-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Apr 2022 08:02:20 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23M7Pfmi008771;
-        Fri, 22 Apr 2022 08:02:20 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3fk1yeu61d-1
+        Fri, 22 Apr 2022 09:23:59 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23M8H8K0007805;
+        Fri, 22 Apr 2022 09:23:58 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fjm2jm4mn-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Apr 2022 08:02:20 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23M7xTCE027466;
-        Fri, 22 Apr 2022 08:02:03 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06fra.de.ibm.com with ESMTP id 3ffn2hy536-1
+        Fri, 22 Apr 2022 09:23:58 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23M9NGu9019134;
+        Fri, 22 Apr 2022 09:23:56 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 3ffne9944f-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Apr 2022 08:02:03 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23M820U337945784
+        Fri, 22 Apr 2022 09:23:56 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23M9NrrP28836344
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 22 Apr 2022 08:02:00 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7BCCCAE04D;
-        Fri, 22 Apr 2022 08:02:00 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 31E3AAE045;
-        Fri, 22 Apr 2022 08:02:00 +0000 (GMT)
-Received: from [9.145.85.218] (unknown [9.145.85.218])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 22 Apr 2022 08:01:59 +0000 (GMT)
-Message-ID: <35766f5c-cf7a-ecd8-6183-ea683eb9ff49@linux.ibm.com>
-Date:   Fri, 22 Apr 2022 10:01:59 +0200
+        Fri, 22 Apr 2022 09:23:53 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0176BA405E;
+        Fri, 22 Apr 2022 09:23:53 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3A8EEA4055;
+        Fri, 22 Apr 2022 09:23:52 +0000 (GMT)
+Received: from [9.171.20.253] (unknown [9.171.20.253])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 22 Apr 2022 09:23:52 +0000 (GMT)
+Message-ID: <f3515bef-9724-5e3d-0e42-3baa289ed441@linux.ibm.com>
+Date:   Fri, 22 Apr 2022 11:27:11 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [kvm-unit-tests PATCH v3 1/4] lib: s390x: add support for SCLP
- console read
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v5 5/9] s390x/pci: enable for load/store intepretation
 Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc:     imbrenda@linux.ibm.com, thuth@redhat.com
-References: <20220420134557.1307305-1-nrb@linux.ibm.com>
- <20220420134557.1307305-2-nrb@linux.ibm.com>
- <d8e6d465-3a8a-db75-1244-ed574efd9f59@linux.ibm.com>
- <b7044e507dc7828f4c75d737b190a33800645666.camel@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <b7044e507dc7828f4c75d737b190a33800645666.camel@linux.ibm.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
+        cohuck@redhat.com, thuth@redhat.com, farman@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com,
+        pasic@linux.ibm.com, borntraeger@linux.ibm.com, mst@redhat.com,
+        pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20220404181726.60291-1-mjrosato@linux.ibm.com>
+ <20220404181726.60291-6-mjrosato@linux.ibm.com>
+ <cb628847-9b52-b64a-da1e-18f69fe20e4b@linux.ibm.com>
+ <1d9a128a-1391-712b-abdc-7d4d9c1e5cc0@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <1d9a128a-1391-712b-abdc-7d4d9c1e5cc0@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: o_POifjnSehYHFrQcR4CNrxOnO0GN592
-X-Proofpoint-GUID: kSBgBwWc2Os_6o59cVdSOAuauqA_k5gJ
+X-Proofpoint-GUID: Z1MuzbFHrS26hqKl5rR8s3w-doGZW0QD
+X-Proofpoint-ORIG-GUID: 9JqfT1mtV0dSzouRf6hgbfxJFlpOst8G
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-04-22_02,2022-04-21_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- bulkscore=0 suspectscore=0 impostorscore=0 lowpriorityscore=0
- priorityscore=1501 phishscore=0 mlxscore=0 clxscore=1015 adultscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204220036
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 clxscore=1015 lowpriorityscore=0 adultscore=0
+ suspectscore=0 mlxlogscore=999 spamscore=0 bulkscore=0 phishscore=0
+ malwarescore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204220040
 X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
@@ -96,33 +98,120 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gNC8yMi8yMiAwOTo1MCwgTmljbyBCb2VociB3cm90ZToNCj4gT24gVGh1LCAyMDIyLTA0
-LTIxIGF0IDE2OjI5ICswMjAwLCBKYW5vc2NoIEZyYW5rIHdyb3RlOg0KPj4NCj4gWy4uLl0N
-Cj4+PiBkaWZmIC0tZ2l0IGEvbGliL3MzOTB4L3NjbHAtY29uc29sZS5jIGIvbGliL3MzOTB4
-L3NjbHAtY29uc29sZS5jDQo+Pj4gaW5kZXggZmEzNmE2YTQyMzgxLi44YzRiZjY4Y2JiYWIg
-MTAwNjQ0DQo+Pj4gLS0tIGEvbGliL3MzOTB4L3NjbHAtY29uc29sZS5jDQo+Pj4gKysrIGIv
-bGliL3MzOTB4L3NjbHAtY29uc29sZS5jDQo+IFsuLi5dDQo+Pj4gK8KgwqDCoMKgwqDCoMKg
-cmVhZF9idWZfZW5kID0gc2NjYi0+ZWJoLmxlbmd0aCAtDQo+Pj4gZXZlbnRfYnVmZmVyX2Fz
-Y2lpX3JlY3ZfaGVhZGVyX2xlbjsNCj4+DQo+PiBJc24ndCB0aGlzIG1vcmUgbGlrZSBhIGxl
-bmd0aCBvZiB0aGUgY3VycmVudCByZWFkIGJ1ZmZlciBjb250ZW50cz8NCj4gDQo+IFJpZ2h0
-LCB0aGFua3MsIGxlbmd0aCBpcyBhIG11Y2ggYmV0dGVyIG5hbWUuDQo+IA0KPiBbLi4uXQ0K
-Pj4+IGRpZmYgLS1naXQgYS9saWIvczM5MHgvc2NscC5oIGIvbGliL3MzOTB4L3NjbHAuaA0K
-Pj4+IGluZGV4IGZlYWQwMDdhNjAzNy4uZTQ4YTVhM2RmMjBiIDEwMDY0NA0KPj4+IC0tLSBh
-L2xpYi9zMzkweC9zY2xwLmgNCj4+PiArKysgYi9saWIvczM5MHgvc2NscC5oDQo+Pj4gQEAg
-LTMxMyw2ICszMTMsMTQgQEAgdHlwZWRlZiBzdHJ1Y3QgUmVhZEV2ZW50RGF0YSB7DQo+Pj4g
-IMKgwqDCoMKgwqDCoMKgwqB1aW50MzJfdCBtYXNrOw0KPj4+ICDCoCB9IF9fYXR0cmlidXRl
-X18oKHBhY2tlZCkpIFJlYWRFdmVudERhdGE7DQo+Pj4gICAgDQo+Pj4gKyNkZWZpbmUgU0NM
-UF9FVkVOVF9BU0NJSV9UWVBFX0RBVEFfU1RSRUFNX0ZPTExPV1MgMA0KPj4NCj4+IEhybSwg
-SSdtIG5vdCBjb21wbGV0ZWx5IGhhcHB5IHdpdGggdGhlIG5hbWluZyBoZXJlIHNpbmNlIEkg
-Y29uZnVzZWQNCj4+IGl0DQo+PiB0byB0aGUgZWJoLT50eXBlIHdoZW4gbG9va2luZyB1cCB0
-aGUgY29uc3RhbnRzLiBCdXQgbm93IEkgdW5kZXJzdGFuZA0KPj4gd2h5DQo+PiB5b3UgY2hv
-c2UgaXQuDQo+IA0KPiBZZWFoLCBpdCBzdXJlIGlzIGNvbmZ1c2luZy4NCj4gDQo+IE1heWJl
-IGl0IGlzIGJldHRlciBpZiB3ZSBsZWF2ZSBvdXQgdGhlICJ0eXBlIiBlbnRpcmVseSwgYnV0
-IHRoaXMgbWlnaHQNCj4gbWFrZSBpdCBoYXJkZXIgdG8gdW5kZXJzdGFuZCB3aGVyZSBpdCdz
-IGNvbWluZyBmcm9tOg0KPiBTQ0xQX0FTQ0lJX1JFQ0VJVkVfREFUQV9TVFJFQU1fRk9MTE9X
-Uw0KPiANCj4gQW5vdGhlciBhbHRlcm5hdGl2ZSBJIHRob3VnaHQgYWJvdXQgaXMgdXNpbmcg
-ZW51bXMsIGl0IHdvbid0IGZpeCB0aGUNCj4gbmFtaW5nLCBidXQgYXQgbGVhc3QgaXQgbWln
-aHQgYmUgY2xlYXJlciB0byB3aGljaCB0eXBlIGl0IGJlbG9uZ3MuDQo+IA0KPiBMZXQgbWUg
-a25vdyB3aGF0IHlvdSB0aGluay4NCg0KSXQgc2hvdWxkIGJlIGZpbmUgYXMgaXMuIEkgZG9u
-J3QgZXhwZWN0IHRoYXQgd2UgaGF2ZSB0byB0b3VjaCB0aGlzIGZpbGUgDQp2ZXJ5IG9mdGVu
-Lg0K
+
+
+On 4/20/22 17:12, Matthew Rosato wrote:
+> On 4/19/22 3:47 PM, Pierre Morel wrote:
+>>
+>>
+>> On 4/4/22 20:17, Matthew Rosato wrote:
+>>> If the appropriate CPU facilty is available as well as the necessary
+>>> ZPCI_OP ioctl, then the underlying KVM host will enable load/store
+>>> intepretation for any guest device without a SHM bit in the guest
+>>> function handle.  For a device that will be using interpretation
+>>> support, ensure the guest function handle matches the host function
+>>> handle; this value is re-checked every time the guest issues a SET 
+>>> PCI FN
+>>> to enable the guest device as it is the only opportunity to reflect
+>>> function handle changes.
+>>>
+>>> By default, unless interpret=off is specified, interpretation support 
+>>> will
+>>> always be assumed and exploited if the necessary ioctl and features are
+>>> available on the host kernel.  When these are unavailable, we will 
+>>> silently
+>>> revert to the interception model; this allows existing guest 
+>>> configurations
+>>> to work unmodified on hosts with and without zPCI interpretation 
+>>> support,
+>>> allowing QEMU to choose the best support model available.
+>>>
+>>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>>> ---
+>>>   hw/s390x/meson.build            |  1 +
+>>>   hw/s390x/s390-pci-bus.c         | 66 ++++++++++++++++++++++++++++++++-
+>>>   hw/s390x/s390-pci-inst.c        | 12 ++++++
+>>>   hw/s390x/s390-pci-kvm.c         | 21 +++++++++++
+>>>   include/hw/s390x/s390-pci-bus.h |  1 +
+>>>   include/hw/s390x/s390-pci-kvm.h | 24 ++++++++++++
+>>>   target/s390x/kvm/kvm.c          |  7 ++++
+>>>   target/s390x/kvm/kvm_s390x.h    |  1 +
+>>>   8 files changed, 132 insertions(+), 1 deletion(-)
+>>>   create mode 100644 hw/s390x/s390-pci-kvm.c
+>>>   create mode 100644 include/hw/s390x/s390-pci-kvm.h
+>>>
+>>
+>> ...snip...
+>>
+>>>           if (s390_pci_msix_init(pbdev)) {
+>>> @@ -1360,6 +1423,7 @@ static Property s390_pci_device_properties[] = {
+>>>       DEFINE_PROP_UINT16("uid", S390PCIBusDevice, uid, UID_UNDEFINED),
+>>>       DEFINE_PROP_S390_PCI_FID("fid", S390PCIBusDevice, fid),
+>>>       DEFINE_PROP_STRING("target", S390PCIBusDevice, target),
+>>> +    DEFINE_PROP_BOOL("interpret", S390PCIBusDevice, interp, true),
+>>>       DEFINE_PROP_END_OF_LIST(),
+>>>   };
+>>> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+>>> index 6d400d4147..c898c8abe9 100644
+>>> --- a/hw/s390x/s390-pci-inst.c
+>>> +++ b/hw/s390x/s390-pci-inst.c
+>>> @@ -18,6 +18,8 @@
+>>>   #include "sysemu/hw_accel.h"
+>>>   #include "hw/s390x/s390-pci-inst.h"
+>>>   #include "hw/s390x/s390-pci-bus.h"
+>>> +#include "hw/s390x/s390-pci-kvm.h"
+>>> +#include "hw/s390x/s390-pci-vfio.h"
+>>>   #include "hw/s390x/tod.h"
+>>>   #ifndef DEBUG_S390PCI_INST
+>>> @@ -246,6 +248,16 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, 
+>>> uintptr_t ra)
+>>>                   goto out;
+>>>               }
+>>> +            /*
+>>> +             * Take this opportunity to make sure we still have an 
+>>> accurate
+>>> +             * host fh.  It's possible part of the handle changed 
+>>> while the
+>>> +             * device was disabled to the guest (e.g. vfio hot reset 
+>>> for
+>>> +             * ISM during plug)
+>>> +             */
+>>> +            if (pbdev->interp) {
+>>> +                /* Take this opportunity to make sure we are sync'd 
+>>> with host */
+>>> +                s390_pci_get_host_fh(pbdev, &pbdev->fh);
+
+Here we should check the return value and, AFAIU, assume that the device 
+disappear if it did return false.
+
+>>> +            }
+>>>               pbdev->fh |= FH_MASK_ENABLE;
+>>
+>> Are we sure here that the PCI device is always enabled?
+>> Shouldn't we check?
+> 
+> I guess you mean the host device?  Interesting thought.
+> 
+> So, to be clear, the idea on setting FH_MASK_ENABLE here is that we are 
+> handling a guest CLP SET PCI FN enable so the guest fh should always 
+> have FH_MASK_ENABLE set if we return CLP_RC_OK to the guest.
+> 
+> But for interpretation, if we find the host function is disabled, I 
+> suppose we could return an error on the guest CLP (not sure which error 
+> yet); otherwise, if we return the force-enabled handle and CLP_RC_OK as 
+> we do here then the guest will just get errors attempting to use it.
+
+hum, in this case can't we have a loop on
+clp enable->error->clp disable->clp enable->error...
+
+I think we should return an error if what the guest asked for could not 
+be done.
+
+
+> 
+> 
+> 
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
