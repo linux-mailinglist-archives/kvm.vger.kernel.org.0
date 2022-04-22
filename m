@@ -2,176 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2102250BF7A
-	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 20:28:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE0F550C22B
+	for <lists+kvm@lfdr.de>; Sat, 23 Apr 2022 00:07:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231261AbiDVSHO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Apr 2022 14:07:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44266 "EHLO
+        id S231787AbiDVWK3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Apr 2022 18:10:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236418AbiDVSCt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Apr 2022 14:02:49 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2079.outbound.protection.outlook.com [40.107.92.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9733BCABA7;
-        Fri, 22 Apr 2022 10:59:50 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WeGNC9wFyLeyejn9BWPCqs37DyPepTfVYlPI+ZARpnYLf3bLOxVbq97ljGJv4opzjuOMeEk/T1VlX/D7TsLFppNPWXoKYJi7FcHbjFd1xIwyqapZfVCbKzFpZ7a6daSkdGdSbaki88xyLmXKHA0sSHim7GHjFL+eXR86aLbzm4aZNX4nawnVUMenekmP2GesFZRRmTmHchTCaaZRAeS2cqB7tlhlt9uSDwkAy1axtUaTvkulUdGRKb7StvAfmTJ+x5THnvwq88zCkFT4GPnHuPsVFdSdRkkgQ7RIrpynzeNV6G2Iux23E9D67/WBVs2F8hbMPCDAcmcsoUvOucBM7Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=db69jfkaQztvPP+2IgMS01L+HE/MOg6arRHICeMRt90=;
- b=j/zQA/z+WHrOTgPoQTDlnle5KKpNevh9lhkw4iQt6FfVmwfysHY/0fjDVtmGmdAj3DTCyMLHU5u2ZZfMLuxrmn/6WSf959mPWqGPgjpzyMGhgEVFZMDsdXCwtxm+6FWeXTyZ0uZVWdJfRIfztg4BO6uaaF06iDUtHuOtZOa78hC/41RahCE/Tp3+YWfV/5zIHmebxNU3lbevqckT4hxvt4A1jH7c9izbg7TvdzZFkZb502/zFVFDyO6Ht8U8yEwZ/n0pBx/wJRgfZUAPehfARKI66hD7SSAZTeM0TkOhaeO8dHbac4SmNNXKC0XWjdYHewSlyoI3Sdxdn8X4BTh0sw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=db69jfkaQztvPP+2IgMS01L+HE/MOg6arRHICeMRt90=;
- b=F6bAF0FeGi5FeoDwAhQAtKE9bjfd2UKcSz+nUHa8MHGDQh//00+FPJEtU10mSKyAsjpIdZqLh8a6fdTMQe9xP9CxyPJCjzzNdZUeNVbbQIlgeuQv9C+gaWbkxMlVVdv+iqlbn/u3vxGi+v2xH2xyjL6UrZnrXjDehA6+FiTKLQ40mAph2IDO43T6dGAedtom27mD/hRGEZMKq5zHByo7ageklua8fBNsVsknY6Yerauwf8dTq83vhk7ma6TAgdKkkgIUAUoOijb1wJiooJdAK1S91VHLGr6z0JBYjmpiF8AqpsZ9peieDfT80pKt60weSCDdUVaVunRedrxldYbO2A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by MN2PR12MB4438.namprd12.prod.outlook.com (2603:10b6:208:267::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.15; Fri, 22 Apr
- 2022 17:59:39 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2%6]) with mapi id 15.20.5186.015; Fri, 22 Apr 2022
- 17:59:39 +0000
-Date:   Fri, 22 Apr 2022 14:59:37 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Airlie <airlied@linux.ie>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [PATCH v2 4/7] vfio/mdev: Pass in a struct vfio_device * to
- vfio_dma_rw()
-Message-ID: <20220422175937.GD1951132@nvidia.com>
-References: <0-v2-6011bde8e0a1+5f-vfio_mdev_no_group_jgg@nvidia.com>
- <4-v2-6011bde8e0a1+5f-vfio_mdev_no_group_jgg@nvidia.com>
- <BN9PR11MB52764597BDC02C88E855EA808CF79@BN9PR11MB5276.namprd11.prod.outlook.com>
+        with ESMTP id S231657AbiDVWIy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Apr 2022 18:08:54 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB8DB1FB896;
+        Fri, 22 Apr 2022 13:56:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1650660980; x=1682196980;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=khxBa9ANLkANHc/Zo28EzKs8RaABxYVq6PMhf/+H9ok=;
+  b=BL8kJj1ccBFecM9fTJ+DU79Mzha5qMOf1qrhMFICsOLTpz6vacQVN/HS
+   VQsvtjzABCRt7kf8cx9ICK/lSbT+SqVbvq9ayayG2RTp4VD3e0Q0gNgZb
+   UvyIF+M6beG/WWR8Wz9DDEDoIxFJQrVVyUHdLZwKKCpk27CmRRESjP+gM
+   X9erwN/0OWJQ8lqwpl/j2KtW0B5TuaxmeAbNpCKmtPTKaxu2TLCjRyOVW
+   103/XCerF17/5+sVJyMbX7ihFNUiMBu0Ykmquzc/SyjyoAkZyrxP0FioO
+   on0JZWPLytjUAOnIeFnly7u/FdJUVdRcKy7KlkAG+vFkgdx96Yt2v8dYi
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10324"; a="252102512"
+X-IronPort-AV: E=Sophos;i="5.90,282,1643702400"; 
+   d="scan'208";a="252102512"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2022 12:58:15 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,282,1643702400"; 
+   d="scan'208";a="511718007"
+Received: from lkp-server01.sh.intel.com (HELO 3abc53900bec) ([10.239.97.150])
+  by orsmga003.jf.intel.com with ESMTP; 22 Apr 2022 12:58:11 -0700
+Received: from kbuild by 3abc53900bec with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1nhzPu-000AXl-M5;
+        Fri, 22 Apr 2022 19:58:10 +0000
+Date:   Sat, 23 Apr 2022 03:57:29 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Peter Gonda <pgonda@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH for-5.18] KVM: fix bad user ABI for KVM_EXIT_SYSTEM_EVENT
+Message-ID: <202204230312.8EOM8DHM-lkp@intel.com>
+References: <20220422103013.34832-1-pbonzini@redhat.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BN9PR11MB52764597BDC02C88E855EA808CF79@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: MN2PR18CA0023.namprd18.prod.outlook.com
- (2603:10b6:208:23c::28) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 868565b8-a5d0-43c0-b923-08da2489de8c
-X-MS-TrafficTypeDiagnostic: MN2PR12MB4438:EE_
-X-Microsoft-Antispam-PRVS: <MN2PR12MB4438BE9237B33D60BEC0C4B6C2F79@MN2PR12MB4438.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Xdu/e4jkZ30O6qvf+ucXg3ePlY0stCg9E5Y4OHA4KWORvWVABhd+lDyPEOqujeyQlHGzUlQPA1ueJEaWn1IR4PzWE6BKa/xSIwk3AV6B9Tgugxi61SdkoH8GuHeXjfXSptVSx86IyXzbLwXa+StREYo8CGg82jpZG9ud3BIDMRP40ryyhUa2lLgsABOzDjtQ4vkekIwb44fmmu5NhQvorRfCIaZgJGII/ccDtWS2gHbPbHX3epAFztUaaRCJFalPKswz6mFicHrhTLfSo4/9hh6Hqch03owuvWWG1jxpOGwlbXvTmlHlpZ5+H+PzhJASbwqFLiwEpKK3dqV00imq9bldg2AdjoPKDYtJ5G3D1FF9mm2OQYkQN0qlz7xywvFxxEbTEfkqPT9v6H1TjsnTY884U1tkm2CGojRnOKlL/1HVig8gdedCsc2oifMyfDyCCRiBdcRWiw5QQ89mhAd0lxvJKdhkEGRABJ4VYwJ8twxGVG+9DcqDOWbpbQNhM8tJVMJEFXprlAEcVNNq7p6+VJQwpVVzQVRWAHh40XAjvtGsEqayQ/4gooRzVEMD4guwB4K2SEzRoTn21Ca6OQIHvfh6lRBm13a0IlyRZTJs1fHLd4UlrJ+Yl89E4hmUb5Pnu9LcwRwcoSMN/Iu37zoTLg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(2906002)(54906003)(6916009)(38100700002)(508600001)(8936002)(1076003)(2616005)(6506007)(316002)(33656002)(26005)(6512007)(36756003)(5660300002)(4326008)(8676002)(6486002)(7416002)(7406005)(186003)(66946007)(66476007)(66556008)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?RWPhWj9KJpX6Rtl1/1q3+5ics6JoqHS7DCJcZhpuFuDpuVk1cAFfBeLAxkHC?=
- =?us-ascii?Q?1QXkSe9jhk52e1u4T/AZ7izDlFiY4MSF0gu36t4lHvu9fQ8bNwtNh3z5569B?=
- =?us-ascii?Q?lsMI+3fLmxdRr3eSp2nRJtVMvaNGMHwKvbQ+74HqLC9UBqy4PCGx36l0lOYr?=
- =?us-ascii?Q?aqeK81DThRgjBfkd21BILvPO1nyGMysM+5Y4piOfl5uClxSgDPV0aA8wRtAy?=
- =?us-ascii?Q?8EFxCbwOzymfnhxTTQ4HDh1nUWccSLnA70+QKMk0wzYcLXR9OcoSOORq+4qo?=
- =?us-ascii?Q?REXXcp1umFJwOoh9mQpOz2K0JZc323I9y0cP6DlI1ckyl0GzKFEpu/krxLpS?=
- =?us-ascii?Q?sXhbX09Q0NHQDXJ1XdVSVRDT0kExmyglpFnpMMWTNZwRNy4BaSEg3VjpM7JQ?=
- =?us-ascii?Q?mtdARMWHB60VS6uFW+Kg7dqCzavAOdPccNDQHMsRkIYRxj+6DMjCi8RYSaEd?=
- =?us-ascii?Q?OX92C5Ym7GiY4gjtgSM0Rupt5oynPZeiVYBHsVQ7XZOGfxx5lbuxn3STQIma?=
- =?us-ascii?Q?ybG37AhHCwSbouXbgiqo7Wa3H1p2ZA4tA6TJlAcal0EdDJZWS8c0zzIhmhI3?=
- =?us-ascii?Q?1zNLi8SH38cbfApUbx/p4HRPogcw0I9elgQ6ywaIncNM786P3jzfcE0QmSLx?=
- =?us-ascii?Q?0SFIcRmmabBGLYpU/DVKzedt4YSNpduMOMSx9jomvCZGK+Cvp4mb6PSlcG7c?=
- =?us-ascii?Q?t1Ngm9bjSloZpGjBP7uGym132g5EPQojRRo75+mc0wAhYADRHRmG77HiJVnO?=
- =?us-ascii?Q?kBz/V/za73rHxjbX+NQXUaeUJDOREKRoqQl++tojugNNsWj18K7JoKr1A7/6?=
- =?us-ascii?Q?3tBWs5W3fe8KzIHT97cPAxw+A+AUZCiyhVJ1yjNnNo7Ue1QA8XKMrEac/fhl?=
- =?us-ascii?Q?DiK9bYMUcmqH1nmPAFGn6jYrzJou/dkpB9hItAgb3NnUMgXap/PwBhF9q6gi?=
- =?us-ascii?Q?R8obcRvG+l4tBBSCsXams3GoCCM7FkLH749ajXHY8kZ5jL8WWnOSZvgwy5tB?=
- =?us-ascii?Q?79wH350yHZeZ1EOwKna0kDZYcXs3eFCb+ipoid9bst/3xrt94LU4dxVAYj3n?=
- =?us-ascii?Q?2itN9KQRGPenPGTbml/ZUHme6tYVRbQRO5eAdjB4XlC+LhU/Uy+YpS8oiSsL?=
- =?us-ascii?Q?xpGdRQEnxYUU8eJRJxSqbNBYFRyIgBdHH9kWF7yxA84H4Mif20QqlfOGXUcE?=
- =?us-ascii?Q?sb1agbcW0/YlfQJO0caOk9nhNz2AQlTQ7t6pZhsE6BXetzOX60IYzrj4LHid?=
- =?us-ascii?Q?rRS/cixVQHoP9rD+t9gvSxGkv9d4yEGTLUkoqcy8Ja7oWLX5uXxEpYn7QP0i?=
- =?us-ascii?Q?5B03yfK9Qr7nRniIzQfI+KARunozlo1IQ9iRpJXDhH59fwXje1hOqeBBFKvc?=
- =?us-ascii?Q?AeBV1Zke4WThszkWryR5MaKNct8rwhwL0K2uUTZBjat4xwqB73e1Zv0ekyuC?=
- =?us-ascii?Q?+XqQp9gFSMap26yi/rnq5iGTuZ43eKe2eUZz0Wikyu1mus/wsMSsXDbBGYfS?=
- =?us-ascii?Q?QNGrO1d7nwmQFvyy5cgIH+91OxjcL6gGkw4hOnYaQNaUoq90CDCX0xJOD3zg?=
- =?us-ascii?Q?Z3azVAT5O9CWKl8mOrSAvsVQKyZCadslOZ4Nn+0QbM/vV1MLiWJIclBJSBbT?=
- =?us-ascii?Q?FpC5m2fMUGDx1xWuUEg/b58yAG1v+W77U4AwyQlEvt0tMRotoJpWmKZl/Z3q?=
- =?us-ascii?Q?49gvmqeEzsHCTqmWaIcF0NltwTG8SzHirMiK+maRCUV0GHVFnBZtKWa4xTSq?=
- =?us-ascii?Q?NpuUhUFxxA=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 868565b8-a5d0-43c0-b923-08da2489de8c
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2022 17:59:39.1729
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /b89+m3GmnhDUaBFnfnquy/xSPLE9aoKCGOMaFaQKpgLmC8mz+l/EC8anVcwda1T
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4438
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20220422103013.34832-1-pbonzini@redhat.com>
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 22, 2022 at 01:50:00AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Friday, April 22, 2022 12:29 AM
-> > 
-> > Every caller has a readily available vfio_device pointer, use that instead
-> > of passing in a generic struct device. The struct vfio_device already
-> > contains the group we need so this avoids complexity, extra refcountings,
-> > and a confusing lifecycle model.
-> 
-> Using the same description as last patch leaves the impression that
-> the two patches do the exactly same type of change. But this
-> patch actually includes one more change to grab a reference on the
-> container. This is worth an explanation.
+Hi Paolo,
 
-How about this:
+I love your patch! Yet something to improve:
 
-Every caller has a readily available vfio_device pointer, use that instead
-of passing in a generic struct device. Change vfio_dma_rw() to take in the
-struct vfio_device and move the container users that would have been held
-by vfio_group_get_external_user_from_dev() to vfio_dma_rw() directly, like
-vfio_pin/unpin_pages().
+[auto build test ERROR on kvm/master]
+[also build test ERROR on linus/master v5.18-rc3]
+[cannot apply to kvmarm/next mst-vhost/linux-next linux/master next-20220422]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-Thanks,
-Jason
+url:    https://github.com/intel-lab-lkp/linux/commits/Paolo-Bonzini/KVM-fix-bad-user-ABI-for-KVM_EXIT_SYSTEM_EVENT/20220422-184535
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git master
+config: riscv-randconfig-r014-20220422 (https://download.01.org/0day-ci/archive/20220423/202204230312.8EOM8DHM-lkp@intel.com/config)
+compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project 5bd87350a5ae429baf8f373cb226a57b62f87280)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # install riscv cross compiling tool for clang build
+        # apt-get install binutils-riscv64-linux-gnu
+        # https://github.com/intel-lab-lkp/linux/commit/71af2c55b700878ad9d73c90c6b75f327f36d0a9
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Paolo-Bonzini/KVM-fix-bad-user-ABI-for-KVM_EXIT_SYSTEM_EVENT/20220422-184535
+        git checkout 71af2c55b700878ad9d73c90c6b75f327f36d0a9
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=riscv SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+>> arch/riscv/kvm/vcpu_sbi.c:98:30: error: use of undeclared identifier 'reason'
+           run->system_event.data[0] = reason;
+                                       ^
+   1 error generated.
+
+
+vim +/reason +98 arch/riscv/kvm/vcpu_sbi.c
+
+    83	
+    84	void kvm_riscv_vcpu_sbi_system_reset(struct kvm_vcpu *vcpu,
+    85					     struct kvm_run *run,
+    86					     u32 type, u64 flags)
+    87	{
+    88		unsigned long i;
+    89		struct kvm_vcpu *tmp;
+    90	
+    91		kvm_for_each_vcpu(i, tmp, vcpu->kvm)
+    92			tmp->arch.power_off = true;
+    93		kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
+    94	
+    95		memset(&run->system_event, 0, sizeof(run->system_event));
+    96		run->system_event.type = type;
+    97		run->system_event.ndata = 1;
+  > 98		run->system_event.data[0] = reason;
+    99		run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+   100	}
+   101	
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
