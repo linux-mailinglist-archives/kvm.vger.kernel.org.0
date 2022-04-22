@@ -2,121 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EBA750B443
-	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 11:41:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB1F250B441
+	for <lists+kvm@lfdr.de>; Fri, 22 Apr 2022 11:41:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1446145AbiDVJoe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Apr 2022 05:44:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57516 "EHLO
+        id S1446147AbiDVJnj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Apr 2022 05:43:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356118AbiDVJod (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Apr 2022 05:44:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A856644A2D
-        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 02:41:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650620499;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=htBc+tkv2t0KCV7NxZPr1OZ70wCiPUIfu1Kk+i4HfxA=;
-        b=fMJL1lNI/C3bZ+8ObPJoJ9isV5/17AB2tkIUZ6yJTP/syiE6BZlRrZKRzSegpdYdS7X55K
-        XpgqDPy9Gw41JarhiJnK+QX81R5uzwctbZMFF7+czoI9OcR1yrbfQTQ9H8qhzz3tV32phT
-        ZNludOnsRQtBOR6rLGOO6yh5YaAl/t0=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-612-RZq7xuovOb2yrUKXq6PNnw-1; Fri, 22 Apr 2022 05:41:38 -0400
-X-MC-Unique: RZq7xuovOb2yrUKXq6PNnw-1
-Received: by mail-ej1-f70.google.com with SMTP id i14-20020a17090639ce00b006dabe6a112fso3824708eje.13
-        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 02:41:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=htBc+tkv2t0KCV7NxZPr1OZ70wCiPUIfu1Kk+i4HfxA=;
-        b=NlC385LXMOWap00FuwaJ5fGRZFih1dFDjf37HibBBbhp66WzTrpwBO0OquDF3Y6GFl
-         NSV1fnQ4IvR4KFUWyANkVzHPXZI4Qn77egeEeBo7FEDvGfFxuOUCjuSxgz+8+V3L0NkD
-         wBz4QQiIyDV5zNRYrQnGbbbjnEHXaqzm4bZddxWNjzhPD9u7cyag1GhQFxOOeNxz8SiL
-         G1p0m0AofQ1WBL1EWS5sh3BKoQWty9ZBdh2Vi1nDfiPqVtAi6K6wWYHrEXIyzpp/jwlO
-         bffEH2FyRVwmjmm4GB5XCoIFwyovVzzEp2+eJQLqYZqU1n7X8BWr+Hct7uINIk0AShpw
-         s1VA==
-X-Gm-Message-State: AOAM531kOBuLPl2t9G4vyqsUKslI8i7i7Uj8dLqhSwutrUUUAMX1JTi8
-        X8nOjdDB9OhNp2ONYvcIHV+d94y3yD2Oz/VKKvyPNHZoCxlAJL0MkQrZck/qShaMonqGs/7Dl7O
-        k8OrXCEjkRCNw
-X-Received: by 2002:a05:6402:330a:b0:41d:9477:4ee4 with SMTP id e10-20020a056402330a00b0041d94774ee4mr3858048eda.41.1650620497311;
-        Fri, 22 Apr 2022 02:41:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy3+W8XeooBv/xYG8vXSPaTlAAiTLR9U3UtE31iprIJBj9s/wuC7xpO4ci6HkA1+ALchq0hCw==
-X-Received: by 2002:a05:6402:330a:b0:41d:9477:4ee4 with SMTP id e10-20020a056402330a00b0041d94774ee4mr3858034eda.41.1650620497057;
-        Fri, 22 Apr 2022 02:41:37 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id y14-20020a056402440e00b00416046b623csm727084eda.2.2022.04.22.02.41.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Apr 2022 02:41:36 -0700 (PDT)
-Message-ID: <ef5c6c5b-2ed1-7d4c-e757-ed8bcead5d18@redhat.com>
-Date:   Fri, 22 Apr 2022 11:41:34 +0200
+        with ESMTP id S1353303AbiDVJnc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Apr 2022 05:43:32 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9344844A12
+        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 02:40:39 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23M8gBZE004925;
+        Fri, 22 Apr 2022 09:40:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=3mPYrZiCFsGlzZPvWuAMQcQYvBhkD+0kMPJg2kAgOgo=;
+ b=gom2dwWu6j0PtfaDQqer/fahY/j1p4OQfBnMtt8/wIle5mcZwsUKKE2vWD9UBAXOtlWx
+ pVOFDM+5ryG3PZ6q867CJqphqdG0gbSdVkA1sbzVVIqww5xTNSLGEe5aUjVCVCccXqWL
+ /kdy+bI8v4ByOtBREWHs2jLopE5l03S+WIfMjSlLjM1YLAh26ByzvlxAO/bFdun9Y1zS
+ ds5iQAse7XZQEekfueKZxBfLUdHcqFIrpJJy++mHRb8+Cv57FUi7dNxKCFe/Qj4et9Cd
+ /hol3iZZZel5SqWPIC1hWK6IpzZBm7XXdkIwOm3UVSrdY9YPYJARTVxGgdpMxxHYr+/a Jg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3fjer9c39j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 22 Apr 2022 09:40:35 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23M9QiBx017770;
+        Fri, 22 Apr 2022 09:40:35 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3fjer9c391-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 22 Apr 2022 09:40:35 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23M9NLnU019359;
+        Fri, 22 Apr 2022 09:40:33 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma02fra.de.ibm.com with ESMTP id 3fgu6u5q0y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 22 Apr 2022 09:40:33 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23M9eTrr33030624
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 22 Apr 2022 09:40:30 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D405BA404D;
+        Fri, 22 Apr 2022 09:40:29 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EB4BFA4040;
+        Fri, 22 Apr 2022 09:40:28 +0000 (GMT)
+Received: from [9.171.20.253] (unknown [9.171.20.253])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 22 Apr 2022 09:40:28 +0000 (GMT)
+Message-ID: <43e63ad6-7dba-642d-2039-a63e89f8bdf2@linux.ibm.com>
+Date:   Fri, 22 Apr 2022 11:43:47 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH 0/4] KVM: fix KVM_EXIT_SYSTEM_EVENT mess
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v5 9/9] s390x/pci: reflect proper maxstbl for groups of
+ interpreted devices
 Content-Language: en-US
-To:     Oliver Upton <oupton@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, will@kernel.org,
-        maz@kernel.org, apatel@ventanamicro.com, atishp@rivosinc.com,
-        seanjc@google.com, pgonda@google.com
-References: <20220421180443.1465634-1-pbonzini@redhat.com>
- <YmJgIQe+5zGbrxoF@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YmJgIQe+5zGbrxoF@google.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
+        cohuck@redhat.com, thuth@redhat.com, farman@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com,
+        pasic@linux.ibm.com, borntraeger@linux.ibm.com, mst@redhat.com,
+        pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20220404181726.60291-1-mjrosato@linux.ibm.com>
+ <20220404181726.60291-10-mjrosato@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <20220404181726.60291-10-mjrosato@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: AC52ZQVCLQ949ioZ1tObjhnzynAgKSJh
+X-Proofpoint-ORIG-GUID: lMrrDfxa8LNGnLcbvVo83bUHvEixn-0d
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-22_02,2022-04-21_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ mlxscore=0 priorityscore=1501 phishscore=0 malwarescore=0 mlxlogscore=999
+ lowpriorityscore=0 spamscore=0 adultscore=0 bulkscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2204220042
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/22/22 09:58, Oliver Upton wrote:
-> Is there any way we could clean this up in 5.18 and leave the whole
-> ndata/data pattern for 5.19?
-> 
-> IOW, for 5.18 go back and fix the padding:
-> 
-> 	struct {
-> 		__u32 type;
-> 		__u32 pad;
-> 		__u64 flags;
-> 	} system_event;
-> 
-> Then for 5.19 circle back on the data business, except use a flag bit
-> for it:
-> 
-> 	struct {
-> 		__u32 type;
-> 		__u32 pad;
-> 	#define KVM_SYSTEM_EVENT_NDATA_VALID	(1u << 63)
-> 		__u64 flags;
-> 		__u64 ndata;
-> 		__u64 data[16];
-> 	} system_event;
-> 
-> Where we apply that bit to system_event::flags this time instead of
-> ::type. Could also go the CAP route.
 
-These patches are against kvm/next, so that is already what I did. :)
 
-On the other hand right now the ARM and RISC-V flags are unusable with 
-32-bit userspace, so we need to fix _something_ in 5.18 as well.  For 
-your proposal, all that's missing is a 5.18 patch to add the padding. 
-But since the flags UAPI was completely unused before 5.18 and there's 
-no reason to inflict the different naming of fields to userspace.  So I 
-think we want to apply this UAPI change in 5.18 too.
+On 4/4/22 20:17, Matthew Rosato wrote:
+> The maximum supported store block length might be different depending
+> on whether the instruction is interpretively executed (firmware-reported
+> maximum) or handled via userspace intercept (host kernel API maximum).
+> Choose the best available value during group creation.
+> 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 
-Paolo
+Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
 
+> ---
+>   hw/s390x/s390-pci-vfio.c | 6 +++++-
+>   1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/s390-pci-vfio.c b/hw/s390x/s390-pci-vfio.c
+> index 985980f021..212dd053f7 100644
+> --- a/hw/s390x/s390-pci-vfio.c
+> +++ b/hw/s390x/s390-pci-vfio.c
+> @@ -213,7 +213,11 @@ static void s390_pci_read_group(S390PCIBusDevice *pbdev,
+>           resgrp->msia = cap->msi_addr;
+>           resgrp->mui = cap->mui;
+>           resgrp->i = cap->noi;
+> -        resgrp->maxstbl = cap->maxstbl;
+> +        if (pbdev->interp && hdr->version >= 2) {
+> +            resgrp->maxstbl = cap->imaxstbl;
+> +        } else {
+> +            resgrp->maxstbl = cap->maxstbl;
+> +        }
+>           resgrp->version = cap->version;
+>           resgrp->dtsm = ZPCI_DTSM;
+>       }
+> 
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
