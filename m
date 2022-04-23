@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0862B50C70D
-	for <lists+kvm@lfdr.de>; Sat, 23 Apr 2022 05:48:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A47AF50C718
+	for <lists+kvm@lfdr.de>; Sat, 23 Apr 2022 06:00:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232784AbiDWDvT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Apr 2022 23:51:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55244 "EHLO
+        id S232902AbiDWDvh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Apr 2022 23:51:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232756AbiDWDvM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Apr 2022 23:51:12 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A42A1C2415
-        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 20:48:16 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id m8-20020a62a208000000b0050593296139so6575343pff.1
-        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 20:48:16 -0700 (PDT)
+        with ESMTP id S232754AbiDWDvO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Apr 2022 23:51:14 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2998F1C37AE
+        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 20:48:18 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id a16-20020a62d410000000b00505734b752aso6564118pfh.4
+        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 20:48:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=moq5t2aceAdbzIzukfRmgSKet+BsMKCYgSlsSAirzs0=;
-        b=FbDhbCaF8hOQ7EYUVhNkt6Tmwu1NFcBdYH6RBxl2Sh3YMMQBgs0eDoRhoGrFjg3HBX
-         WaQaXIJWLH1C5vWv397BpYdWwHWnhAVDs6kIib54ckP1KMbipi/UZEj1oFKGgoRqWee3
-         PxJ1j32pQ6Uqq3FkvX0hfj4D7UuXKPC3boSebggtMZxhnkAeDZo3AT1tHnQQLCfwMPPZ
-         Y4DtNppAsVRLppmn2mBkDINvS0VmaA0s2WFX92khgy9kE0g4qPnXX1iR8ATFxRRb3mo2
-         YUtzfLWgjxZDrLgGnKgvKWc5/57X7tlzAFj8RSVtOpdVwQt4BEAwWGycFivQazrN1PE8
-         JKAQ==
+        bh=s1FdvFSZ5B4eOljesil+5nZQsUnLyQTrJ9BbjzQR3zY=;
+        b=dG4roe8tmNBs3teFZlh8AQCmDvgQZvVdbxLP3lsVzH1JbCuuVevt2rKfOqBKh9FwzH
+         0L++ZsjttRWY8LjRlxb/2k8UzTLWR8IaheYNrtUBIGyfM0MpPto/9X/66EV5ytOqfI4N
+         ZhSg5a5+4WtQpkXd08lpYFN8748PHSodN8+GXDDzsXBsEH9mKY/hQC2LN8Tq6/47EDOf
+         kO6N0oP2vaHXSS4JMTFRKcjp/1nPA6FuLe8nJGUOnUNJAZ6LsdaGbx4RZtsYWjzUjRqb
+         yF6Y0tPVEgcgFOIsUfHPmbU8nlWxYadO/5uCTOZjEQrZF65AvNMKw2uwprWDATQ5Gl/s
+         Vz3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=moq5t2aceAdbzIzukfRmgSKet+BsMKCYgSlsSAirzs0=;
-        b=B8eorJoVVqdjCg3MYkHR0ZkVjMxXEfDCgO2l420dHht8L91LOuryyhzbkpnXjYfGLl
-         G8CmEyKlnkV745hp1axRgv/srUduv4xaTSqsgeRbtXhCv6MCdK3EaZ1RlV6cbY1dsSxt
-         C6MgzTXliSpGZ3I9lltbYJ6Smb5EfNRlAPyaRasoaiaHWlIGmiPpy1TTfu6gZYqvGqPR
-         fjMUqWXZNVtcwLKpZub3+3ryVClVgmH9RBrJoNsyilwIMqkNtPCAsJRvyhUYs6okWYmm
-         /bWVUMRbAhvfejh8gERijs71CJQmZLxRPbzvxN8rrMOoGP63/xA3i2rzT5YPV3DF/THl
-         AQHg==
-X-Gm-Message-State: AOAM532gYDJOEvXOi/SxduK3/tvVKmUpA94pzmHeeFdfFF0XNp9CAUH1
-        ryfECIifL8L/8oRBcPtF1+o1MyLBbsE=
-X-Google-Smtp-Source: ABdhPJzcS9IArhXpxbfXdD5/BljR1DmGHgBCCOg8nBjyT9uxpr1r7vUEFp8lVhJl8c/G5V31ziU92656SWc=
+        bh=s1FdvFSZ5B4eOljesil+5nZQsUnLyQTrJ9BbjzQR3zY=;
+        b=T5yDSmE8NEJHBYA3IBUu3FnFZond4ks+jJuv1z9At0CnQr6wc+0QctW0sRZuTauo6q
+         tVEOfXU9PdebJ0fL8LjPG+Fl55NfeD9tTumVaBYUrlBMB5k76euGsTAbAPvNq+nkpLBi
+         P9c2vMkuQb+7eeABbGA9xCs7hnm2Y1wJNWDj5n6FKjLl/TvUt3M0+IYUhX307IKLfmhn
+         /GUNQGdonfWuDcUjfN7NI6snt+NjUx6ExBMH5Td22IRgZNfDbRIRCf5AlUBuEgz8vABB
+         oFSeVtWofruwriBqPDT/pB7UFZslCa6d8vDcx8SUjNv1Ts6IwmAlzOmvkvIPj46yz19P
+         1Ejw==
+X-Gm-Message-State: AOAM532xGYSbdBWuMFW20ChxbfwXBXb39DNmR5DhNarcWfv4F5rLM9OW
+        dP4DWTMNLLKvwP4FV8+iLLSUkg+RnW8=
+X-Google-Smtp-Source: ABdhPJz5NQNv1hdLtAQq4ffsV/hY9ndFZZJXFkD5aX28NMEWgpojXPxIe+Priq6HJRRLcXS48lPt84zpYlU=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90a:a593:b0:1c9:b837:e77d with SMTP id
- b19-20020a17090aa59300b001c9b837e77dmr8653466pjq.205.1650685695924; Fri, 22
- Apr 2022 20:48:15 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:5d08:b0:1d7:9587:9288 with SMTP id
+ s8-20020a17090a5d0800b001d795879288mr9142204pji.204.1650685697637; Fri, 22
+ Apr 2022 20:48:17 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat, 23 Apr 2022 03:47:43 +0000
+Date:   Sat, 23 Apr 2022 03:47:44 +0000
 In-Reply-To: <20220423034752.1161007-1-seanjc@google.com>
-Message-Id: <20220423034752.1161007-4-seanjc@google.com>
+Message-Id: <20220423034752.1161007-5-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220423034752.1161007-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.0.rc2.479.g8af0fa9b8e-goog
-Subject: [PATCH 03/12] KVM: x86/mmu: Use atomic XCHG to write TDP MMU SPTEs
- with volatile bits
+Subject: [PATCH 04/12] KVM: x86/mmu: Don't attempt fast page fault just
+ because EPT is in use
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -68,266 +68,168 @@ Cc:     Sean Christopherson <seanjc@google.com>,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use an atomic XCHG to write TDP MMU SPTEs that have volatile bits, even
-if mmu_lock is held for write, as volatile SPTEs can be written by other
-tasks/vCPUs outside of mmu_lock.  If a vCPU uses the to-be-modified SPTE
-to write a page, the CPU can cache the translation as WRITABLE in the TLB
-despite it being seen by KVM as !WRITABLE, and/or KVM can clobber the
-Accessed/Dirty bits and not properly tag the backing page.
+Check for A/D bits being disabled instead of the access tracking mask
+being non-zero when deciding whether or not to attempt to fix a page
+fault vian the fast path.  Originally, the access tracking mask was
+non-zero if and only if A/D bits were disabled by _KVM_ (including not
+being supported by hardware), but that hasn't been true since nVMX was
+fixed to honor EPTP12's A/D enabling, i.e. since KVM allowed L1 to cause
+KVM to not use A/D bits while running L2 despite KVM using them while
+running L1.
 
-Exempt non-leaf SPTEs from atomic updates as KVM itself doesn't modify
-non-leaf SPTEs without holding mmu_lock, they do not have Dirty bits, and
-KVM doesn't consume the Accessed bit of non-leaf SPTEs.
+In other words, don't attempt the fast path just because EPT is enabled.
 
-Dropping the Dirty and/or Writable bits is most problematic for dirty
-logging, as doing so can result in a missed TLB flush and eventually a
-missed dirty page.  In the unlikely event that the only dirty page(s) is
-a clobbered SPTE, clear_dirty_gfn_range() will see the SPTE as not dirty
-(based on the Dirty or Writable bit depending on the method) and so not
-update the SPTE and ultimately not flush.  If the SPTE is cached in the
-TLB as writable before it is clobbered, the guest can continue writing
-the associated page without ever taking a write-protect fault.
+Note, attempting the fast path for all !PRESENT faults can "fix" a very,
+_VERY_ tiny percentage of faults out of mmu_lock by detecting that the
+fault is spurious, i.e. has been fixed by a different vCPU, but again the
+odds of that happening are vanishingly small.  E.g. booting an 8-vCPU VM
+gets less than 10 successes out of 30k+ faults, and that's likely one of
+the more favorable scenarios.  Disabling dirty logging can likely lead to
+a rash of collisions between vCPUs for some workloads that operate on a
+common set of pages, but penalizing _all_ !PRESENT faults for that one
+case is unlikely to be a net positive, not to mention that that problem
+is best solved by not zapping in the first place.
 
-For most (all?) file back memory, dropping the Dirty bit is a non-issue.
-The primary MMU write-protects its PTEs on writeback, i.e. KVM's dirty
-bit is effectively ignored because the primary MMU will mark that page
-dirty when the write-protection is lifted, e.g. when KVM faults the page
-back in for write.
+The number of spurious faults does scale with the number of vCPUs, e.g. a
+255-vCPU VM using TDP "jumps" to ~60 spurious faults detected in the fast
+path (again out of 30k), but that's all of 0.2% of faults.  Using legacy
+shadow paging does get more spurious faults, and a few more detected out
+of mmu_lock, but the percentage goes _down_ to 0.08% (and that's ignoring
+faults that are reflected into the guest), i.e. the extra detections are
+purely due to the sheer number of faults observed.
 
-The Accessed bit is a complete non-issue.  Aside from being unused for
-non-leaf SPTEs, KVM doesn't do a TLB flush when aging SPTEs, i.e. the
-Accessed bit may be dropped anyways.
+On the other hand, getting a "negative" in the fast path takes in the
+neighborhood of 150-250 cycles.  So while it is tempting to keep/extend
+the current behavior, such a change needs to come with hard numbers
+showing that it's actually a win in the grand scheme, or any scheme for
+that matter.
 
-Lastly, the Writable bit is also problematic as an extension of the Dirty
-bit, as KVM (correctly) treats the Dirty bit as volatile iff the SPTE is
-!DIRTY && WRITABLE.  If KVM fixes an MMU-writable, but !WRITABLE, SPTE
-out of mmu_lock, then it can allow the CPU to set the Dirty bit despite
-the SPTE being !WRITABLE when it is checked by KVM.  But that all depends
-on the Dirty bit being problematic in the first place.
-
-Fixes: 2f2fad0897cb ("kvm: x86/mmu: Add functions to handle changed TDP SPTEs")
-Cc: stable@vger.kernel.org
-Cc: Ben Gardon <bgardon@google.com>
-Cc: David Matlack <dmatlack@google.com>
-Cc: Venkatesh Srinivas <venkateshs@google.com>
+Fixes: 995f00a61958 ("x86: kvm: mmu: use ept a/d in vmcs02 iff used in vmcs12")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/tdp_iter.h | 34 ++++++++++++++-
- arch/x86/kvm/mmu/tdp_mmu.c  | 82 ++++++++++++++++++++++++-------------
- 2 files changed, 85 insertions(+), 31 deletions(-)
+ arch/x86/kvm/mmu/mmu.c     | 45 ++++++++++++++++++++++++--------------
+ arch/x86/kvm/mmu/spte.h    | 11 ++++++++++
+ arch/x86/kvm/mmu/tdp_mmu.c |  2 +-
+ 3 files changed, 41 insertions(+), 17 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
-index b1eaf6ec0e0b..f0af385c56e0 100644
---- a/arch/x86/kvm/mmu/tdp_iter.h
-+++ b/arch/x86/kvm/mmu/tdp_iter.h
-@@ -6,6 +6,7 @@
- #include <linux/kvm_host.h>
- 
- #include "mmu.h"
-+#include "spte.h"
- 
- /*
-  * TDP MMU SPTEs are RCU protected to allow paging structures (non-leaf SPTEs)
-@@ -17,9 +18,38 @@ static inline u64 kvm_tdp_mmu_read_spte(tdp_ptep_t sptep)
- {
- 	return READ_ONCE(*rcu_dereference(sptep));
- }
--static inline void kvm_tdp_mmu_write_spte(tdp_ptep_t sptep, u64 val)
-+
-+static inline u64 kvm_tdp_mmu_write_spte_atomic(tdp_ptep_t sptep, u64 new_spte)
- {
--	WRITE_ONCE(*rcu_dereference(sptep), val);
-+	return xchg(rcu_dereference(sptep), new_spte);
-+}
-+
-+static inline void __kvm_tdp_mmu_write_spte(tdp_ptep_t sptep, u64 new_spte)
-+{
-+	WRITE_ONCE(*rcu_dereference(sptep), new_spte);
-+}
-+
-+static inline u64 kvm_tdp_mmu_write_spte(tdp_ptep_t sptep, u64 old_spte,
-+					 u64 new_spte, int level)
-+{
-+	/*
-+	 * Atomically write the SPTE if it is a shadow-present, leaf SPTE with
-+	 * volatile bits, i.e. has bits that can be set outside of mmu_lock.
-+	 * The Writable bit can be set by KVM's fast page fault handler, and
-+	 * Accessed and Dirty bits can be set by the CPU.
-+	 *
-+	 * Note, non-leaf SPTEs do have Accessed bits and those bits are
-+	 * technically volatile, but KVM doesn't consume the Accessed bit of
-+	 * non-leaf SPTEs, i.e. KVM doesn't care if it clobbers the bit.  This
-+	 * logic needs to be reassessed if KVM were to use non-leaf Accessed
-+	 * bits, e.g. to skip stepping down into child SPTEs when aging SPTEs.
-+	 */
-+	if (is_shadow_present_pte(old_spte) && is_last_spte(old_spte, level) &&
-+	    spte_has_volatile_bits(old_spte))
-+		return kvm_tdp_mmu_write_spte_atomic(sptep, new_spte);
-+
-+	__kvm_tdp_mmu_write_spte(sptep, new_spte);
-+	return old_spte;
- }
- 
- /*
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 566548a3efa7..e9033cce8aeb 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -426,9 +426,9 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
- 	tdp_mmu_unlink_sp(kvm, sp, shared);
- 
- 	for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
--		u64 *sptep = rcu_dereference(pt) + i;
-+		tdp_ptep_t sptep = pt + i;
- 		gfn_t gfn = base_gfn + i * KVM_PAGES_PER_HPAGE(level);
--		u64 old_child_spte;
-+		u64 old_spte;
- 
- 		if (shared) {
- 			/*
-@@ -440,8 +440,8 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
- 			 * value to the removed SPTE value.
- 			 */
- 			for (;;) {
--				old_child_spte = xchg(sptep, REMOVED_SPTE);
--				if (!is_removed_spte(old_child_spte))
-+				old_spte = kvm_tdp_mmu_write_spte_atomic(sptep, REMOVED_SPTE);
-+				if (!is_removed_spte(old_spte))
- 					break;
- 				cpu_relax();
- 			}
-@@ -455,23 +455,43 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
- 			 * are guarded by the memslots generation, not by being
- 			 * unreachable.
- 			 */
--			old_child_spte = READ_ONCE(*sptep);
--			if (!is_shadow_present_pte(old_child_spte))
-+			old_spte = kvm_tdp_mmu_read_spte(sptep);
-+			if (!is_shadow_present_pte(old_spte))
- 				continue;
- 
- 			/*
--			 * Marking the SPTE as a removed SPTE is not
--			 * strictly necessary here as the MMU lock will
--			 * stop other threads from concurrently modifying
--			 * this SPTE. Using the removed SPTE value keeps
--			 * the two branches consistent and simplifies
--			 * the function.
-+			 * Use the common helper instead of a raw WRITE_ONCE as
-+			 * the SPTE needs to be updated atomically if it can be
-+			 * modified by a different vCPU outside of mmu_lock.
-+			 * Even though the parent SPTE is !PRESENT, the TLB
-+			 * hasn't yet been flushed, and both Intel and AMD
-+			 * document that A/D assists can use upper-level PxE
-+			 * entries that are cached in the TLB, i.e. the CPU can
-+			 * still access the page and mark it dirty.
-+			 *
-+			 * No retry is needed in the atomic update path as the
-+			 * sole concern is dropping a Dirty bit, i.e. no other
-+			 * task can zap/remove the SPTE as mmu_lock is held for
-+			 * write.  Marking the SPTE as a removed SPTE is not
-+			 * strictly necessary for the same reason, but using
-+			 * the remove SPTE value keeps the shared/exclusive
-+			 * paths consistent and allows the handle_changed_spte()
-+			 * call below to hardcode the new value to REMOVED_SPTE.
-+			 *
-+			 * Note, even though dropping a Dirty bit is the only
-+			 * scenario where a non-atomic update could result in a
-+			 * functional bug, simply checking the Dirty bit isn't
-+			 * sufficient as a fast page fault could read the upper
-+			 * level SPTE before it is zapped, and then make this
-+			 * target SPTE writable, resume the guest, and set the
-+			 * Dirty bit between reading the SPTE above and writing
-+			 * it here.
- 			 */
--			WRITE_ONCE(*sptep, REMOVED_SPTE);
-+			old_spte = kvm_tdp_mmu_write_spte(sptep, old_spte,
-+							  REMOVED_SPTE, level);
- 		}
- 		handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), gfn,
--				    old_child_spte, REMOVED_SPTE, level,
--				    shared);
-+				    old_spte, REMOVED_SPTE, level, shared);
- 	}
- 
- 	call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
-@@ -667,14 +687,13 @@ static inline int tdp_mmu_zap_spte_atomic(struct kvm *kvm,
- 					   KVM_PAGES_PER_HPAGE(iter->level));
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 65b723201738..dfd1cfa9c08c 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3013,19 +3013,20 @@ static bool page_fault_can_be_fast(struct kvm_page_fault *fault)
  
  	/*
--	 * No other thread can overwrite the removed SPTE as they
--	 * must either wait on the MMU lock or use
--	 * tdp_mmu_set_spte_atomic which will not overwrite the
--	 * special removed SPTE value. No bookkeeping is needed
--	 * here since the SPTE is going from non-present
--	 * to non-present.
-+	 * No other thread can overwrite the removed SPTE as they must either
-+	 * wait on the MMU lock or use tdp_mmu_set_spte_atomic() which will not
-+	 * overwrite the special removed SPTE value. No bookkeeping is needed
-+	 * here since the SPTE is going from non-present to non-present.  Use
-+	 * the raw write helper to avoid an unnecessary check on volatile bits.
+ 	 * #PF can be fast if:
+-	 * 1. The shadow page table entry is not present, which could mean that
+-	 *    the fault is potentially caused by access tracking (if enabled).
+-	 * 2. The shadow page table entry is present and the fault
+-	 *    is caused by write-protect, that means we just need change the W
+-	 *    bit of the spte which can be done out of mmu-lock.
+ 	 *
+-	 * However, if access tracking is disabled we know that a non-present
+-	 * page must be a genuine page fault where we have to create a new SPTE.
+-	 * So, if access tracking is disabled, we return true only for write
+-	 * accesses to a present page.
++	 * 1. The shadow page table entry is not present and A/D bits are
++	 *    disabled _by KVM_, which could mean that the fault is potentially
++	 *    caused by access tracking (if enabled).  If A/D bits are enabled
++	 *    by KVM, but disabled by L1 for L2, KVM is forced to disable A/D
++	 *    bits for L2 and employ access tracking, but the fast page fault
++	 *    mechanism only supports direct MMUs.
++	 * 2. The shadow page table entry is present, the access is a write,
++	 *    and no reserved bits are set (MMIO SPTEs cannot be "fixed"), i.e.
++	 *    the fault was caused by a write-protection violation.  If the
++	 *    SPTE is MMU-writable (determined later), the fault can be fixed
++	 *    by setting the Writable bit, which can be done out of mmu_lock.
  	 */
--	kvm_tdp_mmu_write_spte(iter->sptep, 0);
-+	__kvm_tdp_mmu_write_spte(iter->sptep, 0);
- 
- 	return 0;
+-
+-	return shadow_acc_track_mask != 0 || (fault->write && fault->present);
++	return !kvm_ad_enabled() || (fault->write && fault->present);
  }
-@@ -699,10 +718,13 @@ static inline int tdp_mmu_zap_spte_atomic(struct kvm *kvm,
-  *		      unless performing certain dirty logging operations.
-  *		      Leaving record_dirty_log unset in that case prevents page
-  *		      writes from being double counted.
-+ *
-+ * Returns the old SPTE value, which _may_ be different than @old_spte if the
-+ * SPTE had voldatile bits.
-  */
--static void __tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
--			       u64 old_spte, u64 new_spte, gfn_t gfn, int level,
--			       bool record_acc_track, bool record_dirty_log)
-+static u64 __tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
-+			      u64 old_spte, u64 new_spte, gfn_t gfn, int level,
-+			      bool record_acc_track, bool record_dirty_log)
+ 
+ /*
+@@ -3140,13 +3141,25 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 
+ 		new_spte = spte;
+ 
+-		if (is_access_track_spte(spte))
++		/*
++		 * KVM only supports fixing page faults outside of MMU lock for
++		 * direct MMUs, nested MMUs are always indirect, and KVM always
++		 * uses A/D bits for non-nested MMUs.  Thus, if A/D bits are
++		 * enabled, the SPTE can't be an access-tracked SPTE.
++		 */
++		if (unlikely(!kvm_ad_enabled()) && is_access_track_spte(spte))
+ 			new_spte = restore_acc_track_spte(new_spte);
+ 
+ 		/*
+-		 * Currently, to simplify the code, write-protection can
+-		 * be removed in the fast path only if the SPTE was
+-		 * write-protected for dirty-logging or access tracking.
++		 * To keep things simple, only SPTEs that are MMU-writable can
++		 * be made fully writable outside of mmu_lock, e.g. only SPTEs
++		 * that were write-protected for dirty-logging or access
++		 * tracking are handled here.  Don't bother checking if the
++		 * SPTE is writable to prioritize running with A/D bits enabled.
++		 * The is_access_allowed() check above handles the common case
++		 * of the fault being spurious, and the SPTE is known to be
++		 * shadow-present, i.e. except for access tracking restoration
++		 * making the new SPTE writable, the check is wasteful.
+ 		 */
+ 		if (fault->write && is_mmu_writable_spte(spte)) {
+ 			new_spte |= PT_WRITABLE_MASK;
+@@ -4751,7 +4764,7 @@ kvm_calc_tdp_mmu_root_page_role(struct kvm_vcpu *vcpu,
+ 	role.efer_nx = true;
+ 	role.smm = cpu_role.base.smm;
+ 	role.guest_mode = cpu_role.base.guest_mode;
+-	role.ad_disabled = (shadow_accessed_mask == 0);
++	role.ad_disabled = !kvm_ad_enabled();
+ 	role.level = kvm_mmu_get_tdp_level(vcpu);
+ 	role.direct = true;
+ 	role.has_4_byte_gpte = false;
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index 098d7d144627..43ec7a8641b3 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -220,6 +220,17 @@ static inline bool is_shadow_present_pte(u64 pte)
+ 	return !!(pte & SPTE_MMU_PRESENT_MASK);
+ }
+ 
++/*
++ * Returns true if A/D bits are supported in hardware and are enabled by KVM.
++ * When enabled, KVM uses A/D bits for all non-nested MMUs.  Because L1 can
++ * disable A/D bits in EPTP12, SP and SPTE variants are needed to handle the
++ * scenario where KVM is using A/D bits for L1, but not L2.
++ */
++static inline bool kvm_ad_enabled(void)
++{
++	return !!shadow_accessed_mask;
++}
++
+ static inline bool sp_ad_disabled(struct kvm_mmu_page *sp)
  {
- 	lockdep_assert_held_write(&kvm->mmu_lock);
- 
-@@ -715,7 +737,7 @@ static void __tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
- 	 */
- 	WARN_ON(is_removed_spte(old_spte) || is_removed_spte(new_spte));
- 
--	kvm_tdp_mmu_write_spte(sptep, new_spte);
-+	old_spte = kvm_tdp_mmu_write_spte(sptep, old_spte, new_spte, level);
- 
- 	__handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level, false);
- 
-@@ -724,6 +746,7 @@ static void __tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
- 	if (record_dirty_log)
- 		handle_changed_spte_dirty_log(kvm, as_id, gfn, old_spte,
- 					      new_spte, level);
-+	return old_spte;
- }
- 
- static inline void _tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
-@@ -732,9 +755,10 @@ static inline void _tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
+ 	return sp->role.ad_disabled;
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index e9033cce8aeb..a2eda3e55697 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1135,7 +1135,7 @@ static int tdp_mmu_link_sp(struct kvm *kvm, struct tdp_iter *iter,
+ 			   struct kvm_mmu_page *sp, bool account_nx,
+ 			   bool shared)
  {
- 	WARN_ON_ONCE(iter->yielded);
+-	u64 spte = make_nonleaf_spte(sp->spt, !shadow_accessed_mask);
++	u64 spte = make_nonleaf_spte(sp->spt, !kvm_ad_enabled());
+ 	int ret = 0;
  
--	__tdp_mmu_set_spte(kvm, iter->as_id, iter->sptep, iter->old_spte,
--			   new_spte, iter->gfn, iter->level,
--			   record_acc_track, record_dirty_log);
-+	iter->old_spte = __tdp_mmu_set_spte(kvm, iter->as_id, iter->sptep,
-+					    iter->old_spte, new_spte,
-+					    iter->gfn, iter->level,
-+					    record_acc_track, record_dirty_log);
- }
- 
- static inline void tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
+ 	if (shared) {
 -- 
 2.36.0.rc2.479.g8af0fa9b8e-goog
 
