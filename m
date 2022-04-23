@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D0F0A50C662
-	for <lists+kvm@lfdr.de>; Sat, 23 Apr 2022 04:14:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4432A50C666
+	for <lists+kvm@lfdr.de>; Sat, 23 Apr 2022 04:14:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231876AbiDWCRR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Apr 2022 22:17:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49610 "EHLO
+        id S231897AbiDWCRT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Apr 2022 22:17:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231822AbiDWCRN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231825AbiDWCRN (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 22 Apr 2022 22:17:13 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ED3121A671
-        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 19:14:16 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id i69-20020a636d48000000b003aa4ae583bcso5960575pgc.14
-        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 19:14:16 -0700 (PDT)
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F8D121AF59
+        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 19:14:18 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id d5-20020a62f805000000b0050566b4f4c0so6465671pfh.11
+        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 19:14:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=4V4fYOOx19aLgtO3bZkAZcLhXo54aE7TN/hmI1hVjK0=;
-        b=fxN5sEadn4wpsVuyRDEN1xnjtYATl9Jnlz1X/u04pUWGdAY7yRwdXgWYouii6v/Ynh
-         0L0GDMLYsS7xNqWEudFlq/aNhrB4XVYfEICu7PnqkeRyXItjj/rELzxkxwvDiC4EuD10
-         SkQcdHOLprj8bmaFKELTi7uxOvKfbe+48AJ/ux7HSl2f7pvIIH4YxfhT98DB0t2+jRVU
-         EH/CzjKSbZQwiCQzcSHbYUlGb8QpHPBr/JCLqTn8O4qLIVCKMYm/O3o462bqzh5H8gSJ
-         boAtGxiSCbxfcGn0d9Zf2OWpNZR/qCbo2eWlUQNgZLYUH8yuOHOZCecEFgViDq6nI5Fh
-         vPgg==
+        bh=Fx01//NwlDcIPy9Gd6hi0TEGXUFkV39UbcfuM1U0Pac=;
+        b=RaOWoAaVoZE+trOJkineMnnNNBOLtCqhTtXswHg7iJAUost1QTYPP/CRID7dK/kfea
+         kfENExlBKBkOd92k+WRP/mLUzPCTxokKeFbFbUtPCPVoMy1RqUFSQrzQkGRLo3J2aG5E
+         azQgnQ29v4QH/49ZyUK0pr6hLnHIWFZsllXr6+g8bzANSe63Fy2Ca5t2Qpx3ZMAYeNZF
+         7q9ue2c8E1jjCo59N+yf/7agfh0UCDbeMwSIDPG9oBRAFg13jfBFnIGUdVmVvDjXwTfN
+         1ynW96+WZnulm/GTSb5L/bQg2V65orFWW5oRqJYuj74/4jXOdOAy2GDl4+x1wqdI7kr9
+         RMaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=4V4fYOOx19aLgtO3bZkAZcLhXo54aE7TN/hmI1hVjK0=;
-        b=6GPnwnueKIozkX7Ig3r5HgD3bMnqkrA9a/Y6PVihka/OfNLzAnRWqV9FomE+jD9RS9
-         yf5bJw/nmQWHGnR6R5AwQjW583WEjLKHaZ+8zjl5lDKpuAnKidIG25uaezOMXNOrh3dB
-         cjfEgMWwPoFKl7kOzmNVNR8vzpARxQZQ9arlmkSlUW2C/fsKeHSDngpWTHJgpVQeXWmX
-         taTMYMcOr/glZsqGh0+GJoC+hrcWnV17gHg8C4tDYj2m8qCzGPFpH0fPIAYGLq58PrFN
-         ZbDIDbXJqblBp8amVwpdVjP5gBkrKl1KmdLSe8sb7yq9WjifxpL0HxGhq+DbvgPKHW0b
-         I3Cw==
-X-Gm-Message-State: AOAM533oAJy68tmINotP7fXfz0bE13FVnqBu9I1C9rHUZ/1DQvi243Qq
-        toKFZ0voM6KQWiDA1EbfMMfIDwGioqA=
-X-Google-Smtp-Source: ABdhPJzQ/xbiIP/rNdWA1KVR1iUlC6bHzhLcVP7dnu4Hsyaxr1/n90CtPDb8g5YEeO16z5rt0uFKMql6qFg=
+        bh=Fx01//NwlDcIPy9Gd6hi0TEGXUFkV39UbcfuM1U0Pac=;
+        b=ut+ssYoHAOp4CslhjlrU/D2DT6ERrhJQOY6a2gL+bdcEyqq69/aGf1F0nSF/wtyzuF
+         57MVhBNFcq3EVCkCsscnsr93iKugEp3KQvutIGg+ccjlYkEaeiVBZNYOjyh+fu9eynjf
+         Wfw4elvRRY0VcKOEC2MFod0xuxZAp4Y3D+qEZSCZyEOxT8be1dJkWZBmL88GYccj6Xcp
+         kGgn/v9HUOwWHg2maYlOSjNif0fmM/km7pqpzHVR1Xf0SiA4uXakAyplR++bwSkC5txI
+         66tR78gxeNVz0u+TRYnTynN5GlljBMYxeXl7GcS7KF8BsbaQCwgYsKMYvjNX0QBfmt7Q
+         Jxmw==
+X-Gm-Message-State: AOAM5311mK4zb+eS8hN5kXFK17OOK77iHWMydVFqN0F+NOgsB4rZ/Nm4
+        uDkj6Xl75qOU89cz+BVpdbzFN+y3H0E=
+X-Google-Smtp-Source: ABdhPJxHrKcNAcpzYMl3xza9zupR0/MNb4GVV4iPrHFcAIG7ie4uua4bRBngh7F9T5WF9kjaB33yBo8dZwg=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90a:8a92:b0:1d7:3cca:69d8 with SMTP id
- x18-20020a17090a8a9200b001d73cca69d8mr10179857pjn.61.1650680056056; Fri, 22
- Apr 2022 19:14:16 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:384d:b0:1d2:97de:eb8c with SMTP id
+ l13-20020a17090a384d00b001d297deeb8cmr19587685pjf.208.1650680057791; Fri, 22
+ Apr 2022 19:14:17 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat, 23 Apr 2022 02:14:02 +0000
+Date:   Sat, 23 Apr 2022 02:14:03 +0000
 In-Reply-To: <20220423021411.784383-1-seanjc@google.com>
-Message-Id: <20220423021411.784383-3-seanjc@google.com>
+Message-Id: <20220423021411.784383-4-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220423021411.784383-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.0.rc2.479.g8af0fa9b8e-goog
-Subject: [PATCH v2 02/11] KVM: SVM: Don't BUG if userspace injects a soft
- interrupt with GIF=0
+Subject: [PATCH v2 03/11] KVM: SVM: Unwind "speculative" RIP advancement if
+ INTn injection "fails"
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -66,7 +66,7 @@ Cc:     Sean Christopherson <seanjc@google.com>,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,66 +74,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+Unwind the RIP advancement done by svm_queue_exception() when injecting
+an INT3 ultimately "fails" due to the CPU encountering a VM-Exit while
+vectoring the injected event, even if the exception reported by the CPU
+isn't the same event that was injected.  If vectoring INT3 encounters an
+exception, e.g. #NP, and vectoring the #NP encounters an intercepted
+exception, e.g. #PF when KVM is using shadow paging, then the #NP will
+be reported as the event that was in-progress.
 
-Don't BUG/WARN on interrupt injection due to GIF being cleared if the
-injected event is a soft interrupt, which are not actually IRQs and thus
-not subject to IRQ blocking conditions.  KVM doesn't currently use event
-injection to handle incomplete soft interrupts, but it's trivial for
-userspace to force the situation via KVM_SET_VCPU_EVENTS.
+Note, this is still imperfect, as it will get a false positive if the
+INT3 is cleanly injected, no VM-Exit occurs before the IRET from the INT3
+handler in the guest, the instruction following the INT3 generates an
+exception (directly or indirectly), _and_ vectoring that exception
+encounters an exception that is intercepted by KVM.  The false positives
+could theoretically be solved by further analyzing the vectoring event,
+e.g. by comparing the error code against the expected error code were an
+exception to occur when vectoring the original injected exception, but
+SVM without NRIPS is a complete disaster, trying to make it 100% correct
+is a waste of time.
 
-Opportunistically downgrade the BUG_ON() to WARN_ON(), there's no need to
-bring down the whole host just because there might be some issue with
-respect to guest GIF handling in KVM, or as evidenced here, an egregious
-oversight with respect to KVM's uAPI.
-
-  kernel BUG at arch/x86/kvm/svm/svm.c:3386!
-  invalid opcode: 0000 [#1] SMP
-  CPU: 15 PID: 926 Comm: smm_test Not tainted 5.17.0-rc3+ #264
-  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
-  RIP: 0010:svm_inject_irq+0xab/0xb0 [kvm_amd]
-  Code: <0f> 0b 0f 1f 00 0f 1f 44 00 00 80 3d ac b3 01 00 00 55 48 89 f5 53
-  RSP: 0018:ffffc90000b37d88 EFLAGS: 00010246
-  RAX: 0000000000000000 RBX: ffff88810a234ac0 RCX: 0000000000000006
-  RDX: 0000000000000000 RSI: ffffc90000b37df7 RDI: ffff88810a234ac0
-  RBP: ffffc90000b37df7 R08: ffff88810a1fa410 R09: 0000000000000000
-  R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-  R13: ffff888109571000 R14: ffff88810a234ac0 R15: 0000000000000000
-  FS:  0000000001821380(0000) GS:ffff88846fdc0000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 00007f74fc550008 CR3: 000000010a6fe000 CR4: 0000000000350ea0
-  Call Trace:
-   <TASK>
-   inject_pending_event+0x2f7/0x4c0 [kvm]
-   kvm_arch_vcpu_ioctl_run+0x791/0x17a0 [kvm]
-   kvm_vcpu_ioctl+0x26d/0x650 [kvm]
-   __x64_sys_ioctl+0x82/0xb0
-   do_syscall_64+0x3b/0xc0
-   entry_SYSCALL_64_after_hwframe+0x44/0xae
-   </TASK>
-
-Fixes: 219b65dcf6c0 ("KVM: SVM: Improve nested interrupt injection")
-Cc: stable@vger.kernel.org
-Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-Co-developed-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Fixes: 66b7138f9136 ("KVM: SVM: Emulate nRIP feature when reinjecting INT3")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/svm/svm.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 75b4f3ac8b1a..151fba0b405f 100644
+index 151fba0b405f..82175a13c668 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -3384,7 +3384,7 @@ static void svm_inject_irq(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -3700,6 +3700,18 @@ static void svm_complete_interrupts(struct kvm_vcpu *vcpu)
+ 	vector = exitintinfo & SVM_EXITINTINFO_VEC_MASK;
+ 	type = exitintinfo & SVM_EXITINTINFO_TYPE_MASK;
  
--	BUG_ON(!(gif_set(svm)));
-+	WARN_ON(!vcpu->arch.interrupt.soft && !gif_set(svm));
++	/*
++	 * If NextRIP isn't enabled, KVM must manually advance RIP prior to
++	 * injecting the soft exception/interrupt.  That advancement needs to
++	 * be unwound if vectoring didn't complete.  Note, the _new_ event may
++	 * not be the injected event, e.g. if KVM injected an INTn, the INTn
++	 * hit a #NP in the guest, and the #NP encountered a #PF, the #NP will
++	 * be the reported vectored event, but RIP still needs to be unwound.
++	 */
++	if (int3_injected && type == SVM_EXITINTINFO_TYPE_EXEPT &&
++	   kvm_is_linear_rip(vcpu, svm->int3_rip))
++		kvm_rip_write(vcpu, kvm_rip_read(vcpu) - int3_injected);
++
+ 	switch (type) {
+ 	case SVM_EXITINTINFO_TYPE_NMI:
+ 		vcpu->arch.nmi_injected = true;
+@@ -3713,16 +3725,11 @@ static void svm_complete_interrupts(struct kvm_vcpu *vcpu)
  
- 	trace_kvm_inj_virq(vcpu->arch.interrupt.nr);
- 	++vcpu->stat.irq_injections;
+ 		/*
+ 		 * In case of software exceptions, do not reinject the vector,
+-		 * but re-execute the instruction instead. Rewind RIP first
+-		 * if we emulated INT3 before.
++		 * but re-execute the instruction instead.
+ 		 */
+-		if (kvm_exception_is_soft(vector)) {
+-			if (vector == BP_VECTOR && int3_injected &&
+-			    kvm_is_linear_rip(vcpu, svm->int3_rip))
+-				kvm_rip_write(vcpu,
+-					      kvm_rip_read(vcpu) - int3_injected);
++		if (kvm_exception_is_soft(vector))
+ 			break;
+-		}
++
+ 		if (exitintinfo & SVM_EXITINTINFO_VALID_ERR) {
+ 			u32 err = svm->vmcb->control.exit_int_info_err;
+ 			kvm_requeue_exception_e(vcpu, vector, err);
 -- 
 2.36.0.rc2.479.g8af0fa9b8e-goog
 
