@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BB0250C709
-	for <lists+kvm@lfdr.de>; Sat, 23 Apr 2022 05:48:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6572350C70B
+	for <lists+kvm@lfdr.de>; Sat, 23 Apr 2022 05:48:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232726AbiDWDvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Apr 2022 23:51:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54936 "EHLO
+        id S232768AbiDWDvO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Apr 2022 23:51:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232626AbiDWDvI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Apr 2022 23:51:08 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B8A71BD5C4
-        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 20:48:13 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id p18-20020aa78612000000b0050d1c170018so441193pfn.15
-        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 20:48:13 -0700 (PDT)
+        with ESMTP id S231573AbiDWDvK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Apr 2022 23:51:10 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E79BF1C1BA6
+        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 20:48:14 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d6-20020aa78686000000b0050adc2b200cso4680889pfo.21
+        for <kvm@vger.kernel.org>; Fri, 22 Apr 2022 20:48:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=UpDwvHE3te50hhADXZwRX35cXLlp2sOCZQHjdNcE0rc=;
-        b=COJtGw4Wavj/9yPBesyN/SgXH/HIWMsbDBmf9ECoXEaMXvPup15jFuJN/PKGgWnlrB
-         jXQrLxE14lurQzFajjzsr6+93rpNVy0pIwYNdg8JIDm7VJdeWKnfDokdHbFVGSsHe+gq
-         eF20CJ8Xb1pTUI6pAPJPUM2864n/FJqbcrJ0YL6xAH5iQ+PvmulL5BGd3XB/HtKO6VhW
-         e/DLavN3/K0BJ4walqhBRroYuU43zEWA3Pyp2XgG7MNM/htDDPvXuw+CNjngMubCA+ND
-         3tuYU6togv1tI/lvupH9gh2cO0JI1qNgVAmez5RGIc2Yz1u2xisxETb4wB3qCtqDONdi
-         iBTw==
+        bh=dtBZMDfTalZh2XkDGyYCthXE8Qbr+M1eG4ZapuRAgmk=;
+        b=Bcff9EnUeQjBvfNF0ZD4Jxot9AFwuW5ObvM+nOepNeFE8fW67Rqag9IEH+IVOpA1IH
+         0NIIFCxWds+9BXOGtnmxHFMuQSLcb77BloSATp/9nrhR6+Ve2ES0m8fYr2UaCI4FYk6I
+         vgfH8sA7JIsKX86nzfLOpomrU5h+yvKjWWxR7iEgq9ILHpiJyaBHxkUEhok1E+FDfnKe
+         YSEcl1SBDKQiXHpOpWEvhx/qEsDtpwXag9Xk2AAGjmRrhVmiz6yzddEPnsFGmDTUaqDb
+         zv8fiwFlGnQfMxiOTuAJXVqPDwCHt/eRyNbjo3Qzno1kI+MEypVRgJAhDuQvW0O+pZaq
+         wF8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=UpDwvHE3te50hhADXZwRX35cXLlp2sOCZQHjdNcE0rc=;
-        b=XWJ6yySjygHvTCkcAusnFgsXbn3Lnk7X+C0oYjeqVgLYJzPwx56akGEmdlj63Ap4fG
-         P/nUYvw6TWwoEbKLTkXaETgcPZCfE4cTDjpFXQ3RTqx1uR71AiTOvjCCpEUAgQwECRYS
-         m6xSwT3IvWjYVtPKWMA26DYYKmN8IqgT+YmICqdkYKnPK0mA7ir8FbsuOMXpQNnFykLk
-         8pGooYsW0Jzq5BFNlHf5No20QoinHiRJElgAQlzhQZH7bk+KRS2XkaVkhqKe3ZlFlC93
-         VI5vbziXljKQ1Ac5/D+MdyEa6bWudV6xHAoYsVAXLMSYgfzrcNcXaZEEw1y5dXwitMZ+
-         95dw==
-X-Gm-Message-State: AOAM5331ICwDKZtrtCdjDOIwyaPj3Wneu0FEAwERVtiiHsp60c1dbVbk
-        g/XgqSK6MM38MT6yA9TMNIwwM43J3lg=
-X-Google-Smtp-Source: ABdhPJyXteO9JqYc3L2JBj7BFHCj5A5q1lxAeJctmp3IloEpb2fcn+tkkeSHQ58pOpEy2m1zzPRxNbsLstQ=
+        bh=dtBZMDfTalZh2XkDGyYCthXE8Qbr+M1eG4ZapuRAgmk=;
+        b=7LQOwM8rHOYUV3iYS/MvzOCtmbtD/xz6tWwRqJ/r8+2XW2vXvmOiiCerQ6b7ClnDcu
+         AHQJbzD1uycsDGmqJin180LXfqC1zOJmgomFSEbuPM3aBCY+f5BrVWCaQJuSa5aGtE2w
+         kFyMLmbfGXWvUCpKUfpWgf+WaIDDcCjo+c3XWRxK+VVZUEl8icvbRY4CBCkJftfFD7bx
+         /1QDpBMM7D7EX2V2nCZY5sljTCq3bl6BXgdZ4rFl94CQendzjY43lDGSwtPmO+BMX17h
+         O/mpmtdzOmiBnP8dRerzuEzMyr73qXL2TS2pqCsdm1oHS0WW9EWEz5u1l3QuXwyQsBLB
+         Pnlg==
+X-Gm-Message-State: AOAM531B8PodErz7BxR1U1B7zglTPsx5XPX02gvGRpz3rtCaK/QoB1hi
+        noEfKCqfOAbXMyIThleA05PBPxjW2fQ=
+X-Google-Smtp-Source: ABdhPJzB5ZvT1BP2AXWkijl7gJ9hs+fwyWMBfbxmRJUD6kFR5UyFoyTZ4f782KaP5mq3+tk3zPM049PzgQ0=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:c14a:b0:15b:9c29:935a with SMTP id
- 10-20020a170902c14a00b0015b9c29935amr7612387plj.2.1650685692822; Fri, 22 Apr
- 2022 20:48:12 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1955:b0:505:7902:36d3 with SMTP id
+ s21-20020a056a00195500b00505790236d3mr8175856pfk.77.1650685694468; Fri, 22
+ Apr 2022 20:48:14 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat, 23 Apr 2022 03:47:41 +0000
+Date:   Sat, 23 Apr 2022 03:47:42 +0000
 In-Reply-To: <20220423034752.1161007-1-seanjc@google.com>
-Message-Id: <20220423034752.1161007-2-seanjc@google.com>
+Message-Id: <20220423034752.1161007-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220423034752.1161007-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.0.rc2.479.g8af0fa9b8e-goog
-Subject: [PATCH 01/12] KVM: x86/mmu: Don't treat fully writable SPTEs as
- volatile (modulo A/D)
+Subject: [PATCH 02/12] KVM: x86/mmu: Move shadow-present check out of spte_has_volatile_bits()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -76,88 +75,135 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Don't treat SPTEs that are truly writable, i.e. writable in hardware, as
-being volatile (unless they're volatile for other reasons, e.g. A/D bits).
-KVM _sets_ the WRITABLE bit out of mmu_lock, but never _clears_ the bit
-out of mmu_lock, so if the WRITABLE bit is set, it cannot magically get
-cleared just because the SPTE is MMU-writable.
+Move the is_shadow_present_pte() check out of spte_has_volatile_bits()
+and into its callers.  Well, caller, since only one of its two callers
+doesn't already do the shadow-present check.
 
-Rename the wrapper of MMU-writable to be more literal, the previous name
-of spte_can_locklessly_be_made_writable() is wrong and misleading.
+Opportunistically move the helper to spte.c/h so that it can be used by
+the TDP MMU, which is also the primary motivation for the shadow-present
+change.  Unlike the legacy MMU, the TDP MMU uses a single path for clear
+leaf and non-leaf SPTEs, and to avoid unnecessary atomic updates, the TDP
+MMU will need to check is_last_spte() prior to calling
+spte_has_volatile_bits(), and calling is_last_spte() without first
+calling is_shadow_present_spte() is at best odd, and at worst a violation
+of KVM's loosely defines SPTE rules.
 
-Fixes: c7ba5b48cc8d ("KVM: MMU: fast path of handling guest page fault")
+Note, mmu_spte_clear_track_bits() could likely skip the write entirely
+for SPTEs that are not shadow-present.  Leave that cleanup for a future
+patch to avoid introducing a functional change, and because the
+shadow-present check can likely be moved further up the stack, e.g.
+drop_large_spte() appears to be the only path that doesn't already
+explicitly check for a shadow-present SPTE.
+
+No functional change intended.
+
 Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c  | 17 +++++++++--------
- arch/x86/kvm/mmu/spte.h |  2 +-
- 2 files changed, 10 insertions(+), 9 deletions(-)
+ arch/x86/kvm/mmu/mmu.c  | 29 ++---------------------------
+ arch/x86/kvm/mmu/spte.c | 28 ++++++++++++++++++++++++++++
+ arch/x86/kvm/mmu/spte.h |  2 ++
+ 3 files changed, 32 insertions(+), 27 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 904f0faff218..612316768e8e 100644
+index 612316768e8e..65b723201738 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -481,13 +481,15 @@ static bool spte_has_volatile_bits(u64 spte)
- 	 * also, it can help us to get a stable is_writable_pte()
- 	 * to ensure tlb flush is not missed.
- 	 */
--	if (spte_can_locklessly_be_made_writable(spte) ||
--	    is_access_track_spte(spte))
+@@ -470,32 +470,6 @@ static u64 __get_spte_lockless(u64 *sptep)
+ }
+ #endif
+ 
+-static bool spte_has_volatile_bits(u64 spte)
+-{
+-	if (!is_shadow_present_pte(spte))
+-		return false;
+-
+-	/*
+-	 * Always atomically update spte if it can be updated
+-	 * out of mmu-lock, it can ensure dirty bit is not lost,
+-	 * also, it can help us to get a stable is_writable_pte()
+-	 * to ensure tlb flush is not missed.
+-	 */
+-	if (!is_writable_pte(spte) && is_mmu_writable_spte(spte))
+-		return true;
+-
+-	if (is_access_track_spte(spte))
+-		return true;
+-
+-	if (spte_ad_enabled(spte)) {
+-		if (!(spte & shadow_accessed_mask) ||
+-		    (is_writable_pte(spte) && !(spte & shadow_dirty_mask)))
+-			return true;
+-	}
+-
+-	return false;
+-}
+-
+ /* Rules for using mmu_spte_set:
+  * Set the sptep from nonpresent to present.
+  * Note: the sptep being assigned *must* be either not present
+@@ -590,7 +564,8 @@ static int mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
+ 	u64 old_spte = *sptep;
+ 	int level = sptep_to_sp(sptep)->role.level;
+ 
+-	if (!spte_has_volatile_bits(old_spte))
++	if (!is_shadow_present_pte(old_spte) ||
++	    !spte_has_volatile_bits(old_spte))
+ 		__update_clear_spte_fast(sptep, 0ull);
+ 	else
+ 		old_spte = __update_clear_spte_slow(sptep, 0ull);
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 3d611f07eee8..800b857b3a53 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -90,6 +90,34 @@ static bool kvm_is_mmio_pfn(kvm_pfn_t pfn)
+ 				     E820_TYPE_RAM);
+ }
+ 
++/*
++ * Returns true if the SPTE has bits that may be set without holding mmu_lock.
++ * The caller is responsible for checking if the SPTE is shadow-present, and
++ * for determining whether or not the caller cares about non-leaf SPTEs.
++ */
++bool spte_has_volatile_bits(u64 spte)
++{
++	/*
++	 * Always atomically update spte if it can be updated
++	 * out of mmu-lock, it can ensure dirty bit is not lost,
++	 * also, it can help us to get a stable is_writable_pte()
++	 * to ensure tlb flush is not missed.
++	 */
 +	if (!is_writable_pte(spte) && is_mmu_writable_spte(spte))
 +		return true;
 +
 +	if (is_access_track_spte(spte))
- 		return true;
- 
- 	if (spte_ad_enabled(spte)) {
--		if ((spte & shadow_accessed_mask) == 0 ||
--	    	    (is_writable_pte(spte) && (spte & shadow_dirty_mask) == 0))
++		return true;
++
++	if (spte_ad_enabled(spte)) {
 +		if (!(spte & shadow_accessed_mask) ||
 +		    (is_writable_pte(spte) && !(spte & shadow_dirty_mask)))
- 			return true;
- 	}
- 
-@@ -554,7 +556,7 @@ static bool mmu_spte_update(u64 *sptep, u64 new_spte)
- 	 * we always atomically update it, see the comments in
- 	 * spte_has_volatile_bits().
- 	 */
--	if (spte_can_locklessly_be_made_writable(old_spte) &&
-+	if (is_mmu_writable_spte(old_spte) &&
- 	      !is_writable_pte(new_spte))
- 		flush = true;
- 
-@@ -1192,7 +1194,7 @@ static bool spte_write_protect(u64 *sptep, bool pt_protect)
- 	u64 spte = *sptep;
- 
- 	if (!is_writable_pte(spte) &&
--	      !(pt_protect && spte_can_locklessly_be_made_writable(spte)))
-+	    !(pt_protect && is_mmu_writable_spte(spte)))
- 		return false;
- 
- 	rmap_printk("spte %p %llx\n", sptep, *sptep);
-@@ -3171,8 +3173,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		 * be removed in the fast path only if the SPTE was
- 		 * write-protected for dirty-logging or access tracking.
- 		 */
--		if (fault->write &&
--		    spte_can_locklessly_be_made_writable(spte)) {
-+		if (fault->write && is_mmu_writable_spte(spte)) {
- 			new_spte |= PT_WRITABLE_MASK;
- 
- 			/*
++			return true;
++	}
++
++	return false;
++}
++
+ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	       const struct kvm_memory_slot *slot,
+ 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
 diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index ad8ce3c5d083..570699682f6d 100644
+index 570699682f6d..098d7d144627 100644
 --- a/arch/x86/kvm/mmu/spte.h
 +++ b/arch/x86/kvm/mmu/spte.h
-@@ -398,7 +398,7 @@ static inline void check_spte_writable_invariants(u64 spte)
- 			  "kvm: Writable SPTE is not MMU-writable: %llx", spte);
+@@ -412,6 +412,8 @@ static inline u64 get_mmio_spte_generation(u64 spte)
+ 	return gen;
  }
  
--static inline bool spte_can_locklessly_be_made_writable(u64 spte)
-+static inline bool is_mmu_writable_spte(u64 spte)
- {
- 	return spte & shadow_mmu_writable_mask;
- }
++bool spte_has_volatile_bits(u64 spte);
++
+ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	       const struct kvm_memory_slot *slot,
+ 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
 -- 
 2.36.0.rc2.479.g8af0fa9b8e-goog
 
