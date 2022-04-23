@@ -2,95 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AAA650C98B
-	for <lists+kvm@lfdr.de>; Sat, 23 Apr 2022 13:18:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F023A50CA17
+	for <lists+kvm@lfdr.de>; Sat, 23 Apr 2022 14:49:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232564AbiDWLVl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 23 Apr 2022 07:21:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38814 "EHLO
+        id S235532AbiDWMwP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 23 Apr 2022 08:52:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231814AbiDWLVi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 23 Apr 2022 07:21:38 -0400
-Received: from mail-yb1-xb42.google.com (mail-yb1-xb42.google.com [IPv6:2607:f8b0:4864:20::b42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDB6F1569E8
-        for <kvm@vger.kernel.org>; Sat, 23 Apr 2022 04:18:40 -0700 (PDT)
-Received: by mail-yb1-xb42.google.com with SMTP id b95so18870335ybi.1
-        for <kvm@vger.kernel.org>; Sat, 23 Apr 2022 04:18:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=KF9CBFBiCC+kvpalEDedIJ8Haa0pAmY/lXpNc2tlFI8=;
-        b=ZvjIDoXlwiWnEm69C+1BlzvnvFls/DeGZe8wKYEGOlonUotcEZ4zGglVpP36MAKYUX
-         qG3BQoloPeB9DVF8Cp3Mv55vg/hFf01bzSgHaoiL7OnAAh6NeV24uU/pGMSSMNjNtPvm
-         wrr4BvNvPftzmozCokggF2IlTE0uZV/Gu2NKAohzNBzGDM4RLLt18ER5W41PnqKdApRR
-         AcSiPwzfqhwNX/IdLnf0AFQ7jbkwvR6MSD/JWggrMgt6fiXBx18C6H8N2q5Gb2pjwPEt
-         VCQNdSNnB3wmGD1kd2RlqsxUdtHmhvS0ORNFHlsU+83WoOi5oe1gKYlWgHYFpRTeLQYQ
-         tIUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=KF9CBFBiCC+kvpalEDedIJ8Haa0pAmY/lXpNc2tlFI8=;
-        b=khF8+TydNjtTCeyi/cXVQXEs70YpocmPI7TbLGPdfy/A1RGQ47CjLtFG9TM0OOk0Qo
-         b0ffyr/4vIE1nM7/50arVAzgK8BElYuFXcLlipoqDnyMkKUJjbUvufl9CfOVyUNdoPJH
-         nxh/pPxg0gQNj/0EgIHKDWcNpdUtPYRbbm5qbNWlWbjr2EGt6l0yv//NPa8V+zFAkL1J
-         a1ubKWtefsM6pehUU5y8PyNTM7a3CvjYjUmU6fwKOzeSB/5ChaWzcZRxT1kLCW9CTrFr
-         bVmpQtnkBqjT4hzvDzvK6GmOQnE79iz2ltr1Sye2VC8AaCWpGiCQ0lVwuRUBiggHEx8m
-         Dm9A==
-X-Gm-Message-State: AOAM5323PXDepYCGYEiLSCIBUTt5pgnaqDzJJQbsW4fXl9o4RIOF53q3
-        LFwdnkxYKBqLFmeVJFFb3naRuNpRwLDNyGC+2fw=
-X-Google-Smtp-Source: ABdhPJxFsM6I2sBvg/R6lER8KGnFTMKs/RYazcmVn7XgOMeUlc8+hsn1/oIXp9qyKiXU+8755lq+AG1b2mBeJdYI3vY=
-X-Received: by 2002:a25:bc2:0:b0:648:3b1b:36cc with SMTP id
- 185-20020a250bc2000000b006483b1b36ccmr1044033ybl.445.1650712720299; Sat, 23
- Apr 2022 04:18:40 -0700 (PDT)
+        with ESMTP id S235514AbiDWMwN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 23 Apr 2022 08:52:13 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2050.outbound.protection.outlook.com [40.107.236.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBED01C102;
+        Sat, 23 Apr 2022 05:49:15 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=li8PcwZjfbWVHN7xA/oatSMxcXPxn36fbusg/+mVdIU9JXkjhhzEA+vVRvq6lDJpH42OzzXY3dXahBhnjK/odqZKWslokZeDL9ei29n95F/d+pDkFwI/AerBzSx2/ElP4srVeblAjB9amfbvtxlTtsDKksGlhciLnW02hfqdsUxAxe+fTcPzvZvUvA8UguttDS1FygMO1cWBuZFTC/j7OWkmyen2ELSdAC42IjyupZD13CJ7GeLjLNS7kPM45+7pOJa2PZhpmg1NFuNe5aeP3xdquUCPqZv19loJMb3XKeQowcV54f4BhErc7eAQievvjkrKNLrYqNDY89yhUE2R8w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LU1z22KXlDpV5Kfz7jKeG3fM2JH1nfPsDZpNyua6n/w=;
+ b=Jei0IT6azEPBkU8mTiGlqSfgqjY3qCfFvz3mXefENNStVfFZmCKRFO1S8pd/CI/Idjw5V+HhL8fpw4Gp6sc3Kd8hPWagAy7LVWSU3KyiFkXmeLa46B19dDmOW2Dcp+65D/z9vwQSBoAiDZ3hVfnKkAt/dzOQIvznn36QFPGqg/N7gOoQU3s4AHd2XPn9eohwOUy8pQc5Pqv/gLGb1ieZgS3M3e21RiU1HO5Mpw+CpR4Dd2Hc6BZJGobBlCb8QsVChGtC58KWlqJ0qwAueFgBjCH+VOhkKiFzH359LdcMIwx58Rv5u+TxGRfGwpDMX53JXO74jJ6oce7q2v6zF/ZGRA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LU1z22KXlDpV5Kfz7jKeG3fM2JH1nfPsDZpNyua6n/w=;
+ b=klSuTCWNK0Oa/PaN0sB4J564YR8LL7YdyIjdLJRqm1HX3l3bDCvrBAStl0WTW6aIwnQBRoocEfgjDtoRIzh0GMPh/RZEjPKHZ9eUQgL8sUmlVEEnLVGQm1kNjI52sSL1oaMn9o+q/037aOVSjGUcq/ycOyYxfc216HMS0FpGa/wYIpmOV3/us3gXT5n7K7zN4B/l8FrgRFW++pXw5uaRC/B8ZaChMy5av+tk27hSF2ydEDFenE046iihLV01RniPtd8ycPWATbW7WDMmz3H8D4vxkJr9pxbxw+fW/IhBLx5WJv5ee2NtS9X1kOmTPuu/VrRBJLNYPs0n7wKGQM9xQg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by PH7PR12MB5805.namprd12.prod.outlook.com (2603:10b6:510:1d1::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.15; Sat, 23 Apr
+ 2022 12:49:14 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2%6]) with mapi id 15.20.5186.020; Sat, 23 Apr 2022
+ 12:49:14 +0000
+Date:   Sat, 23 Apr 2022 09:49:12 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 3/7] vfio/mdev: Pass in a struct vfio_device * to
+ vfio_pin/unpin_pages()
+Message-ID: <20220423124912.GM2120790@nvidia.com>
+References: <0-v2-6011bde8e0a1+5f-vfio_mdev_no_group_jgg@nvidia.com>
+ <3-v2-6011bde8e0a1+5f-vfio_mdev_no_group_jgg@nvidia.com>
+ <20220422062232.GB11926@lst.de>
+ <20220422205651.GF1951132@nvidia.com>
+ <20220423051551.GA17488@lst.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220423051551.GA17488@lst.de>
+X-ClientProxiedBy: BL1PR13CA0146.namprd13.prod.outlook.com
+ (2603:10b6:208:2bb::31) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Received: by 2002:a05:7108:71d5:0:0:0:0 with HTTP; Sat, 23 Apr 2022 04:18:40
- -0700 (PDT)
-Reply-To: marianadavies68@hotmail.com
-From:   Marian Davies <mamadouibro001@gmail.com>
-Date:   Sat, 23 Apr 2022 11:18:40 +0000
-Message-ID: <CAFk6F=R2ogOLGnzMWxFwJai6FB7cZ28OHmd3KBbQWCRjdwTsgw@mail.gmail.com>
-Subject: Hi
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: Yes, score=5.7 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,UNDISC_FREEM autolearn=no
-        autolearn_force=no version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2607:f8b0:4864:20:0:0:0:b42 listed in]
-        [list.dnswl.org]
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.4917]
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [mamadouibro001[at]gmail.com]
-        *  0.2 FREEMAIL_REPLYTO_END_DIGIT Reply-To freemail username ends in
-        *      digit
-        *      [marianadavies68[at]hotmail.com]
-        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
-        *       in digit
-        *      [mamadouibro001[at]gmail.com]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        *  3.6 UNDISC_FREEM Undisclosed recipients + freemail reply-to
-        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
-        *      different freemails
-X-Spam-Level: *****
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 66951928-5e1c-4992-01ee-08da2527ab6c
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5805:EE_
+X-Microsoft-Antispam-PRVS: <PH7PR12MB5805331FC83E0085514F2402C2F69@PH7PR12MB5805.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ubtX0keUHbsZ+RF6ZxcWLoGuVq/FaeinJRZrw1Qh4wnVw1gCKK6WlysTMtYOCTbK5psC1eKrVp6Zxp8UBPmsJs81cNPcKxoYUzZSB9FBoKrMoh7LXF7ZQI+DEEWKCIqTjwX0NdNKA7H9VIbL/xUMJsv4TUSu+DFXucen4TrNNOnET51VDpbDu4fq6zAbifZCcjWdDKu5ahhcb8WL4T4GpmzSq983g5BU0kxQm93JKJzah5n7ReosIzRr2Q0SnTmQoyUTE7xkZZE/2aSGoczMxjW9/TDOqn0yA7qI3TErFGlUsvSVPEO16e1EGaR+1a1HylHQv21VNTbaZKapS0Q9hQg8NP43qQk5dmYk2D5zQmQ1jivZWzg9M/QuDBRe1iP/JQmQP0ratCA40uoEw+5KpzkZWfLg5iLd6thoORL3suv1g+5cnl1xpKmluZq/M8kK1mKUGP1faeziuUv4h8Jsnlr7XCChAtUoNFPCiK408RYlOZQNzjS8o+POdxWH+H5UQCanMT4Z41sQsu0Sq6dIt+QjRT1H6nTpQxnen+o7gMnL40VPTiUPgnwpLTYv0EM8WMnw6860fEVZICGgJJzdXFnOmIPzRd53fjURmuhI87IsdMKXqi2Htn6r85325a7z0erZvJak87Nnu2dhK0OYXQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(26005)(6512007)(66556008)(6506007)(5660300002)(2616005)(8676002)(36756003)(4326008)(54906003)(6916009)(38100700002)(86362001)(2906002)(8936002)(66946007)(66476007)(33656002)(316002)(7416002)(6486002)(7406005)(4744005)(1076003)(186003)(508600001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?+JXR+9hf/Iq3AVIFoPWaSTjV7PKo/QU+hiwKyzCnjvW28iYNDEu+itKr8zAx?=
+ =?us-ascii?Q?PxzafGtPGjlblRi3J7hjxX0r1Z9wlVV2/NALSzA9S+JxvjY+y4JSLQ/oTBts?=
+ =?us-ascii?Q?cQhHZTq+pNVsud5ER3gdNZ82GfhGzd8sf8nUegRzLcvFt+AnJc5XnHoNTSPQ?=
+ =?us-ascii?Q?wvzkofzqtth0IJTad9VUXpzMQr/nQ3lklOZFwyLpeR+5XsCtMan80Av0zC/Y?=
+ =?us-ascii?Q?dO5kYnpQrEoWNoMZ8pGPtj3JQyiTi77LmpHMLqLe5+nZYzJliJ6cpoe0Otej?=
+ =?us-ascii?Q?kQiC4rmoO/7Iqqx66GyjOj3JEGEG5vll6ZRSyvPBzPX4fLJ2jrLLSmhjObdc?=
+ =?us-ascii?Q?agv9paQPVe8EcLvrtL86Tpz0DoToqQ5hFDIG4IUwN+H1JxVi2gOBJkq6QMOo?=
+ =?us-ascii?Q?qCbZY9mT92KUnWCaEVfxeLfzV6Lvvd0aZ34yOXeu4q6xo6UTCyymX7hFGPSH?=
+ =?us-ascii?Q?++N+bfI3pIE66UVGo4pqZEp2UWFftdlWqJTJlsHL4CvhfRJyHnRD40l/aoFK?=
+ =?us-ascii?Q?YhU7OcKqBJ8Dkr6O+Y6kRfdlOlqB0dO3GmYzrUPrh7QYwX0WpY+9dWlC78W1?=
+ =?us-ascii?Q?eSngDe1QHkoYNJgm5DF7tms5XACeyk0UbIC9S+QyCh2DcuypqobkBg1Wjbn4?=
+ =?us-ascii?Q?LSXxtD8I72fWcVsa7IKKB7EXjuPtXWvUamrgJ1v00mhMIuvpnNajC0YsklP6?=
+ =?us-ascii?Q?ZneacGoF6ZoHqKgfhDA5cLva9YCNtVbkicneJj8eNjky/kBK+hJ7ES/yYP0I?=
+ =?us-ascii?Q?bf0DYbaAy0141h7T2I9eT5/5CkF9a+m9ZZ/Ums4LbtzzRpU7mcDFRZU/p62p?=
+ =?us-ascii?Q?jiz4h+JSViAf0mOKSxwygBIKkCC4V3iPM9beUqRquVEV2dvJ3PmCOBvQO8ku?=
+ =?us-ascii?Q?uEF3Igh0SjZFtbC+f5PL6CsClGNk99P8M+VJvdv0N/O44DJ9H7YXLY+k6sZi?=
+ =?us-ascii?Q?VwFHBWAX/2m4+g4PF7aiMLxyLxfnEpOVC9LD6PvYAk8mBmHa735cW0n+KzDu?=
+ =?us-ascii?Q?2XTNdk4gqAGjYcEJ2OEEmZruT22ds5qxwS+0eR6phGa/BshAq48L5qeAOCz+?=
+ =?us-ascii?Q?Xb/e9HPA3/Bf0iV9AD6WjWoJERDYrr9JYUpNzkqGCRWHTTxxKGk5eSSUw1KZ?=
+ =?us-ascii?Q?k928kKCGbSi08fBQHZOReQbDYPQgdQA3Cu/2RdCLQxOfLYPUBUG2P9Tzf5Z0?=
+ =?us-ascii?Q?Dg22ljFLF8uZJ8iO2jREUh+7oHEXmz3ijW+0ixrrVqNLjUM14XaEccYuBUPr?=
+ =?us-ascii?Q?WC7SMZmUEh42Hwbm3vGOqUOmPOEeXwhvtoSqdzntTSzz7ppE4kCeMCWAuCjh?=
+ =?us-ascii?Q?6oa0KCmoFkhqeh/kHjhyIvtJFr7AOgV61cVsGqoayWoxJf6O2TS7qCOHvI0Q?=
+ =?us-ascii?Q?3a6EDBSmojDnhTnh2FoO1wMKkqDE3TrOLjnI4JqYNvhi6pijKMp423MH73Wg?=
+ =?us-ascii?Q?S0tYPIQifz3PvVOFNl5tmuGG9tx//6HtRnIMP1gbB0gGcYo2jod0KZ69m/s6?=
+ =?us-ascii?Q?0gAnd/qQotCZEOztKCgejdq0ROSN9CJI1c4TokUydM0lUHZ2++Jwh0SCDH22?=
+ =?us-ascii?Q?CN1Ctrh/iSDJysHI80UGFt5P4cYUdQsrqXlP67BVp0C+ozwlRRygc0M2qT3Q?=
+ =?us-ascii?Q?LTqywR/97yL12+19+H4ASKT/vCHEu5ToA75AV+TmuLjE8hOhSI1jtHaIcwc/?=
+ =?us-ascii?Q?sI8+jTQR5H1hAaijAb89co5TbkOSZEA4KAlYhhn2AnQdZp4p4GN4Gh0Cn6AW?=
+ =?us-ascii?Q?crYm6U3tyA=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 66951928-5e1c-4992-01ee-08da2527ab6c
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2022 12:49:14.0187
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JLdN2WccaPZGCSqsZ+KH7BiV9yIysu1uF7jvV3dGQpzCaODOrX6LcyVgZNy0Ptq1
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5805
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
--- 
-Hello Dear.....Did you got my first message ?
+On Sat, Apr 23, 2022 at 07:15:52AM +0200, Christoph Hellwig wrote:
+> On Fri, Apr 22, 2022 at 05:56:51PM -0300, Jason Gunthorpe wrote:
+> > On Fri, Apr 22, 2022 at 08:22:32AM +0200, Christoph Hellwig wrote:
+> > > Nit: why do some of these patches that don't touch the mdev code
+> > > mdev in the subject?
+> > 
+> > I consider these APIs to be 'mdev apis' because only mdev drivers
+> > should call them.
+> 
+> I thought we settled on 'emulated IOMMU device' in the VFIO core for
+> them, leaving mdev just for the odd lifecycle management glue.
+
+Yes
+
+vfio/emulated
+
+?
+
+Jason
