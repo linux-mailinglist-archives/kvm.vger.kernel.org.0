@@ -2,218 +2,296 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E72E50D070
-	for <lists+kvm@lfdr.de>; Sun, 24 Apr 2022 10:15:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C04EE50D0D3
+	for <lists+kvm@lfdr.de>; Sun, 24 Apr 2022 11:34:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238669AbiDXISn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 Apr 2022 04:18:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59262 "EHLO
+        id S236341AbiDXJhk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 24 Apr 2022 05:37:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238659AbiDXISl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 Apr 2022 04:18:41 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62AED6E4DC;
-        Sun, 24 Apr 2022 01:15:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650788142; x=1682324142;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=R5/zZF/IyIdTwmbR+/CpSjzujNVRZET5P/KUYqz4hbY=;
-  b=mUe/0iSmQ8BsD5PsLd7n1RL0F8BH/VTKHaMVrdOuAIPVJ8GR89w/HnDB
-   sKsqeaFN4klnuZVvXos7Rs9PfCT8mvRHLLqPffnbpu/OvFZr3pBaX3Ly5
-   vs1NLQgCJ5T8TbhmuS1yW9DUQofWNL6oLMLB0sPaFdoR6yieCfloodtXB
-   pqDREHAfH+SAnBiNmZ/735NAWoGG4g1bKq+4lXVUG96cjjbLxojf6ywrH
-   DFLiaes0EbuZn8tkgduvX1WS9lAM30v1xwDkyv2ZutjeDS5YtczRGo9Z0
-   O+GB7OWcBXIBDjNyH9qox8ZFW3iYxyk8F0fgVl+8dBtY7aN0NYyBE/7l2
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10326"; a="246931372"
-X-IronPort-AV: E=Sophos;i="5.90,286,1643702400"; 
-   d="scan'208";a="246931372"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2022 01:15:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,286,1643702400"; 
-   d="scan'208";a="704147618"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by fmsmga001.fm.intel.com with ESMTP; 24 Apr 2022 01:15:34 -0700
-Date:   Sun, 24 Apr 2022 16:15:25 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Vishal Annapurve <vannapurve@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        with ESMTP id S236334AbiDXJh1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 24 Apr 2022 05:37:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 83F49205C7
+        for <kvm@vger.kernel.org>; Sun, 24 Apr 2022 02:34:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650792865;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kSIpLejv7h+Qh7GF1vX9N5MH/EeI/nqqXVhbiI5Iaao=;
+        b=PGy1DY1vliCY9oDyRVa3SeFyGRjf0ezu1ok41Q6sbkaVVzqE2O8cXZ2B/Ajnr6XcycDcAI
+        68F/o4TL+yDSc8iYS+OPwKWttK76leIxGWa1WnI1BIru7/+8hq+M1OpiCnxxH5YSTtPJIH
+        eVtrrmtWKNlSHIxYPnRDzHnTLyRJm8Q=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-252-u0DT-vpdOgay35q41ALOKg-1; Sun, 24 Apr 2022 05:34:20 -0400
+X-MC-Unique: u0DT-vpdOgay35q41ALOKg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DFD013806729;
+        Sun, 24 Apr 2022 09:34:19 +0000 (UTC)
+Received: from starship (unknown [10.40.192.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8B45F145BEF9;
+        Sun, 24 Apr 2022 09:34:17 +0000 (UTC)
+Message-ID: <2327614a18d60a5e1b0d9d3aed754cccebce3117.camel@redhat.com>
+Subject: Re: [PATCH v2 11/11] KVM: SVM: Drop support for CPUs without NRIPS
+ (NextRIP Save) support
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jun Nakajima <jun.nakajima@intel.com>, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com
-Subject: Re: [PATCH v5 01/13] mm/memfd: Introduce MFD_INACCESSIBLE flag
-Message-ID: <20220424081525.GB4207@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <20220310140911.50924-2-chao.p.peng@linux.intel.com>
- <CAGtprH9sncAeS7-=ewr07B=Q+htVDdwRJhbqF+GhehHMYmvw5w@mail.gmail.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>
+Date:   Sun, 24 Apr 2022 12:34:16 +0300
+In-Reply-To: <20220423021411.784383-12-seanjc@google.com>
+References: <20220423021411.784383-1-seanjc@google.com>
+         <20220423021411.784383-12-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAGtprH9sncAeS7-=ewr07B=Q+htVDdwRJhbqF+GhehHMYmvw5w@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 22, 2022 at 10:43:50PM -0700, Vishal Annapurve wrote:
-> On Thu, Mar 10, 2022 at 6:09 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
-> >
-> > From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-> >
-> > Introduce a new memfd_create() flag indicating the content of the
-> > created memfd is inaccessible from userspace through ordinary MMU
-> > access (e.g., read/write/mmap). However, the file content can be
-> > accessed via a different mechanism (e.g. KVM MMU) indirectly.
-> >
-> > It provides semantics required for KVM guest private memory support
-> > that a file descriptor with this flag set is going to be used as the
-> > source of guest memory in confidential computing environments such
-> > as Intel TDX/AMD SEV but may not be accessible from host userspace.
-> >
-> > Since page migration/swapping is not yet supported for such usages
-> > so these pages are currently marked as UNMOVABLE and UNEVICTABLE
-> > which makes them behave like long-term pinned pages.
-> >
-> > The flag can not coexist with MFD_ALLOW_SEALING, future sealing is
-> > also impossible for a memfd created with this flag.
-> >
-> > At this time only shmem implements this flag.
-> >
-> > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> > ---
-> >  include/linux/shmem_fs.h   |  7 +++++
-> >  include/uapi/linux/memfd.h |  1 +
-> >  mm/memfd.c                 | 26 +++++++++++++++--
-> >  mm/shmem.c                 | 57 ++++++++++++++++++++++++++++++++++++++
-> >  4 files changed, 88 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/include/linux/shmem_fs.h b/include/linux/shmem_fs.h
-> > index e65b80ed09e7..2dde843f28ef 100644
-> > --- a/include/linux/shmem_fs.h
-> > +++ b/include/linux/shmem_fs.h
-> > @@ -12,6 +12,9 @@
-> >
-> >  /* inode in-kernel data */
-> >
-> > +/* shmem extended flags */
-> > +#define SHM_F_INACCESSIBLE     0x0001  /* prevent ordinary MMU access (e.g. read/write/mmap) to file content */
-> > +
-> >  struct shmem_inode_info {
-> >         spinlock_t              lock;
-> >         unsigned int            seals;          /* shmem seals */
-> > @@ -24,6 +27,7 @@ struct shmem_inode_info {
-> >         struct shared_policy    policy;         /* NUMA memory alloc policy */
-> >         struct simple_xattrs    xattrs;         /* list of xattrs */
-> >         atomic_t                stop_eviction;  /* hold when working on inode */
-> > +       unsigned int            xflags;         /* shmem extended flags */
-> >         struct inode            vfs_inode;
-> >  };
-> >
-> > @@ -61,6 +65,9 @@ extern struct file *shmem_file_setup(const char *name,
-> >                                         loff_t size, unsigned long flags);
-> >  extern struct file *shmem_kernel_file_setup(const char *name, loff_t size,
-> >                                             unsigned long flags);
-> > +extern struct file *shmem_file_setup_xflags(const char *name, loff_t size,
-> > +                                           unsigned long flags,
-> > +                                           unsigned int xflags);
-> >  extern struct file *shmem_file_setup_with_mnt(struct vfsmount *mnt,
-> >                 const char *name, loff_t size, unsigned long flags);
-> >  extern int shmem_zero_setup(struct vm_area_struct *);
-> > diff --git a/include/uapi/linux/memfd.h b/include/uapi/linux/memfd.h
-> > index 7a8a26751c23..48750474b904 100644
-> > --- a/include/uapi/linux/memfd.h
-> > +++ b/include/uapi/linux/memfd.h
-> > @@ -8,6 +8,7 @@
-> >  #define MFD_CLOEXEC            0x0001U
-> >  #define MFD_ALLOW_SEALING      0x0002U
-> >  #define MFD_HUGETLB            0x0004U
-> > +#define MFD_INACCESSIBLE       0x0008U
-> >
-> >  /*
-> >   * Huge page size encoding when MFD_HUGETLB is specified, and a huge page
-> > diff --git a/mm/memfd.c b/mm/memfd.c
-> > index 9f80f162791a..74d45a26cf5d 100644
-> > --- a/mm/memfd.c
-> > +++ b/mm/memfd.c
-> > @@ -245,16 +245,20 @@ long memfd_fcntl(struct file *file, unsigned int cmd, unsigned long arg)
-> >  #define MFD_NAME_PREFIX_LEN (sizeof(MFD_NAME_PREFIX) - 1)
-> >  #define MFD_NAME_MAX_LEN (NAME_MAX - MFD_NAME_PREFIX_LEN)
-> >
-> > -#define MFD_ALL_FLAGS (MFD_CLOEXEC | MFD_ALLOW_SEALING | MFD_HUGETLB)
-> > +#define MFD_ALL_FLAGS (MFD_CLOEXEC | MFD_ALLOW_SEALING | MFD_HUGETLB | \
-> > +                      MFD_INACCESSIBLE)
-> >
-> >  SYSCALL_DEFINE2(memfd_create,
-> >                 const char __user *, uname,
-> >                 unsigned int, flags)
-> >  {
-> > +       struct address_space *mapping;
-> >         unsigned int *file_seals;
-> > +       unsigned int xflags;
-> >         struct file *file;
-> >         int fd, error;
-> >         char *name;
-> > +       gfp_t gfp;
-> >         long len;
-> >
-> >         if (!(flags & MFD_HUGETLB)) {
-> > @@ -267,6 +271,10 @@ SYSCALL_DEFINE2(memfd_create,
-> >                         return -EINVAL;
-> >         }
-> >
-> > +       /* Disallow sealing when MFD_INACCESSIBLE is set. */
-> > +       if (flags & MFD_INACCESSIBLE && flags & MFD_ALLOW_SEALING)
-> > +               return -EINVAL;
-> > +
-> >         /* length includes terminating zero */
-> >         len = strnlen_user(uname, MFD_NAME_MAX_LEN + 1);
-> >         if (len <= 0)
-> > @@ -301,8 +309,11 @@ SYSCALL_DEFINE2(memfd_create,
-> >                                         HUGETLB_ANONHUGE_INODE,
-> >                                         (flags >> MFD_HUGE_SHIFT) &
-> >                                         MFD_HUGE_MASK);
+On Sat, 2022-04-23 at 02:14 +0000, Sean Christopherson wrote:
+> Drop support for CPUs without NRIPS along with the associated module
+> param.  Requiring NRIPS simplifies a handful of paths in KVM, especially
+> paths where KVM has to do silly things when nrips=false but supported in
+> hardware as there is no way to tell the CPU _not_ to use NRIPS.
 > 
-> Should hugetlbfs also be modified to be a backing store for private
-> memory like shmem when hugepages are to be used?
-> As of now, this series doesn't seem to support using private memfds
-> with backing hugepages.
+> NRIPS was introduced in 2009, i.e. every AMD-based CPU released in the
+> last decade should support NRIPS.
 > 
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Not-signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/svm/nested.c                     |  9 +--
+>  arch/x86/kvm/svm/svm.c                        | 77 +++++++------------
+>  .../kvm/x86_64/svm_nested_soft_inject_test.c  |  6 +-
+>  3 files changed, 32 insertions(+), 60 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index a83e367ade54..f39c958c77f5 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -681,14 +681,13 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
+>  	/*
+>  	 * next_rip is consumed on VMRUN as the return address pushed on the
+>  	 * stack for injected soft exceptions/interrupts.  If nrips is exposed
+> -	 * to L1, take it verbatim from vmcb12.  If nrips is supported in
+> -	 * hardware but not exposed to L1, stuff the actual L2 RIP to emulate
+> -	 * what a nrips=0 CPU would do (L1 is responsible for advancing RIP
+> -	 * prior to injecting the event).
+> +	 * to L1, take it verbatim from vmcb12.  If nrips is not exposed to L1,
+> +	 * stuff the actual L2 RIP to emulate what an nrips=0 CPU would do (L1
+> +	 * is responsible for advancing RIP prior to injecting the event).
+>  	 */
+>  	if (svm->nrips_enabled)
+>  		vmcb02->control.next_rip    = svm->nested.ctl.next_rip;
+> -	else if (boot_cpu_has(X86_FEATURE_NRIPS))
+> +	else
+>  		vmcb02->control.next_rip    = vmcb12_rip;
+>  
+>  	if (is_evtinj_soft(vmcb02->control.event_inj)) {
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 4a912623b961..6e6530c01e34 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -162,10 +162,6 @@ module_param_named(npt, npt_enabled, bool, 0444);
+>  static int nested = true;
+>  module_param(nested, int, S_IRUGO);
+>  
+> -/* enable/disable Next RIP Save */
+> -static int nrips = true;
+> -module_param(nrips, int, 0444);
+> -
+>  /* enable/disable Virtual VMLOAD VMSAVE */
+>  static int vls = true;
+>  module_param(vls, int, 0444);
+> @@ -355,10 +351,8 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
+>  	if (sev_es_guest(vcpu->kvm))
+>  		goto done;
+>  
+> -	if (nrips && svm->vmcb->control.next_rip != 0) {
+> -		WARN_ON_ONCE(!static_cpu_has(X86_FEATURE_NRIPS));
+> +	if (svm->vmcb->control.next_rip != 0)
+>  		svm->next_rip = svm->vmcb->control.next_rip;
+> -	}
+>  
+>  	if (!svm->next_rip) {
+>  		if (unlikely(!commit_side_effects))
+> @@ -394,15 +388,14 @@ static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
+>  	 * Due to architectural shortcomings, the CPU doesn't always provide
+>  	 * NextRIP, e.g. if KVM intercepted an exception that occurred while
+>  	 * the CPU was vectoring an INTO/INT3 in the guest.  Temporarily skip
+> -	 * the instruction even if NextRIP is supported to acquire the next
+> -	 * RIP so that it can be shoved into the NextRIP field, otherwise
+> -	 * hardware will fail to advance guest RIP during event injection.
+> -	 * Drop the exception/interrupt if emulation fails and effectively
+> -	 * retry the instruction, it's the least awful option.  If NRIPS is
+> -	 * in use, the skip must not commit any side effects such as clearing
+> -	 * the interrupt shadow or RFLAGS.RF.
+> +	 * the instruction to acquire the next RIP so that it can be shoved
+> +	 * into the NextRIP field, otherwise hardware will fail to advance
+> +	 * guest RIP during event injection.  Drop the exception/interrupt if
+> +	 * emulation fails and effectively retry the instruction, it's the
+> +	 * least awful option.  The skip must not commit any side effects such
+> +	 * as clearing the interrupt shadow or RFLAGS.RF.
+>  	 */
+> -	if (!__svm_skip_emulated_instruction(vcpu, !nrips))
+> +	if (!__svm_skip_emulated_instruction(vcpu, false))
+>  		return -EIO;
+>  
+>  	rip = kvm_rip_read(vcpu);
+> @@ -421,11 +414,9 @@ static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
+>  	svm->soft_int_old_rip = old_rip;
+>  	svm->soft_int_next_rip = rip;
+>  
+> -	if (nrips)
+> -		kvm_rip_write(vcpu, old_rip);
+> +	kvm_rip_write(vcpu, old_rip);
+>  
+> -	if (static_cpu_has(X86_FEATURE_NRIPS))
+> -		svm->vmcb->control.next_rip = rip;
+> +	svm->vmcb->control.next_rip = rip;
+>  
+>  	return 0;
+>  }
+> @@ -3732,28 +3723,16 @@ static void svm_complete_soft_interrupt(struct kvm_vcpu *vcpu, u8 vector,
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  
+>  	/*
+> -	 * If NRIPS is enabled, KVM must snapshot the pre-VMRUN next_rip that's
+> -	 * associated with the original soft exception/interrupt.  next_rip is
+> -	 * cleared on all exits that can occur while vectoring an event, so KVM
+> -	 * needs to manually set next_rip for re-injection.  Unlike the !nrips
+> -	 * case below, this needs to be done if and only if KVM is re-injecting
+> -	 * the same event, i.e. if the event is a soft exception/interrupt,
+> -	 * otherwise next_rip is unused on VMRUN.
+> +	 * KVM must snapshot the pre-VMRUN next_rip that's associated with the
+> +	 * original soft exception/interrupt.  next_rip is cleared on all exits
+> +	 * that can occur while vectoring an event, so KVM needs to manually
+> +	 * set next_rip for re-injection.  This needs to be done if and only if
+> +	 * KVM is re-injecting the same event, i.e. if the event is a soft
+> +	 * exception/interrupt, otherwise next_rip is unused on VMRUN.
+>  	 */
+> -	if (nrips && (is_soft || (is_exception && kvm_exception_is_soft(vector))) &&
+> +	if ((is_soft || (is_exception && kvm_exception_is_soft(vector))) &&
+>  	    kvm_is_linear_rip(vcpu, svm->soft_int_old_rip + svm->soft_int_csbase))
+>  		svm->vmcb->control.next_rip = svm->soft_int_next_rip;
+> -	/*
+> -	 * If NRIPS isn't enabled, KVM must manually advance RIP prior to
+> -	 * injecting the soft exception/interrupt.  That advancement needs to
+> -	 * be unwound if vectoring didn't complete.  Note, the new event may
+> -	 * not be the injected event, e.g. if KVM injected an INTn, the INTn
+> -	 * hit a #NP in the guest, and the #NP encountered a #PF, the #NP will
+> -	 * be the reported vectored event, but RIP still needs to be unwound.
+> -	 */
+> -	else if (!nrips && (is_soft || is_exception) &&
+> -		 kvm_is_linear_rip(vcpu, svm->soft_int_next_rip + svm->soft_int_csbase))
+> -		kvm_rip_write(vcpu, svm->soft_int_old_rip);
+>  }
+>  
+>  static void svm_complete_interrupts(struct kvm_vcpu *vcpu)
+> @@ -4112,8 +4091,7 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>  				    boot_cpu_has(X86_FEATURE_XSAVES);
+>  
+>  	/* Update nrips enabled cache */
+> -	svm->nrips_enabled = kvm_cpu_cap_has(X86_FEATURE_NRIPS) &&
+> -			     guest_cpuid_has(vcpu, X86_FEATURE_NRIPS);
+> +	svm->nrips_enabled = guest_cpuid_has(vcpu, X86_FEATURE_NRIPS);
+>  
+>  	svm->tsc_scaling_enabled = tsc_scaling && guest_cpuid_has(vcpu, X86_FEATURE_TSCRATEMSR);
+>  	svm->lbrv_enabled = lbrv && guest_cpuid_has(vcpu, X86_FEATURE_LBRV);
+> @@ -4324,9 +4302,7 @@ static int svm_check_intercept(struct kvm_vcpu *vcpu,
+>  		break;
+>  	}
+>  
+> -	/* TODO: Advertise NRIPS to guest hypervisor unconditionally */
+> -	if (static_cpu_has(X86_FEATURE_NRIPS))
+> -		vmcb->control.next_rip  = info->next_rip;
+> +	vmcb->control.next_rip  = info->next_rip;
+>  	vmcb->control.exit_code = icpt_info.exit_code;
+>  	vmexit = nested_svm_exit_handled(svm);
+>  
+> @@ -4859,9 +4835,7 @@ static __init void svm_set_cpu_caps(void)
+>  	if (nested) {
+>  		kvm_cpu_cap_set(X86_FEATURE_SVM);
+>  		kvm_cpu_cap_set(X86_FEATURE_VMCBCLEAN);
+> -
+> -		if (nrips)
+> -			kvm_cpu_cap_set(X86_FEATURE_NRIPS);
+> +		kvm_cpu_cap_set(X86_FEATURE_NRIPS);
+>  
+>  		if (npt_enabled)
+>  			kvm_cpu_cap_set(X86_FEATURE_NPT);
+> @@ -4908,6 +4882,12 @@ static __init int svm_hardware_setup(void)
+>  	int r;
+>  	unsigned int order = get_order(IOPM_SIZE);
+>  
+> +	/* KVM no longer supports CPUs without NextRIP Save support. */
+> +	if (!boot_cpu_has(X86_FEATURE_NRIPS)) {
+> +		pr_err_ratelimited("NRIPS (NextRIP Save) not supported\n");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+>  	/*
+>  	 * NX is required for shadow paging and for NPT if the NX huge pages
+>  	 * mitigation is enabled.
+> @@ -4989,11 +4969,6 @@ static __init int svm_hardware_setup(void)
+>  			goto err;
+>  	}
+>  
+> -	if (nrips) {
+> -		if (!boot_cpu_has(X86_FEATURE_NRIPS))
+> -			nrips = false;
+> -	}
+> -
+>  	enable_apicv = avic = avic && npt_enabled && (boot_cpu_has(X86_FEATURE_AVIC) || force_avic);
+>  
+>  	if (enable_apicv) {
+> diff --git a/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c b/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c
+> index 257aa2280b5c..39a6569715fd 100644
+> --- a/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c
+> @@ -106,10 +106,8 @@ int main(int argc, char *argv[])
+>  	nested_svm_check_supported();
+>  
+>  	cpuid = kvm_get_supported_cpuid_entry(0x8000000a);
+> -	if (!(cpuid->edx & X86_FEATURE_NRIPS)) {
+> -		print_skip("nRIP Save unavailable");
+> -		exit(KSFT_SKIP);
+> -	}
+> +	TEST_ASSERT(cpuid->edx & X86_FEATURE_NRIPS,
+> +		    "KVM is supposed to unconditionally advertise nRIP Save\n");
+>  
+>  	vm = vm_create_default(VCPU_ID, 0, (void *) l1_guest_code);
+>  
 
-Right, as the first step tmpfs is the first backing store supported,
-hugetlbfs would be potentially the second one to support once the user
-semantics and kAPIs exposed to KVM are well understood.
 
-Thanks,
-Chao
+The only issue would be IMHO that if (for testing/whatever) you boot a guest without NRIPS,
+then the guest won't be able to use SVM
+Or in other words, its true that every sane AMD cpu supports NRIPs, but a "nested AMD cpu"
+in theory might not.
+
+Best regards,
+	Maxim Levitsky
+
+
+
+
