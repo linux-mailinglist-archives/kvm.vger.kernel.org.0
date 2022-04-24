@@ -2,91 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BBDF50D02C
-	for <lists+kvm@lfdr.de>; Sun, 24 Apr 2022 09:12:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0E4350D066
+	for <lists+kvm@lfdr.de>; Sun, 24 Apr 2022 10:07:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238498AbiDXHM7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 Apr 2022 03:12:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48676 "EHLO
+        id S238631AbiDXIKy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 24 Apr 2022 04:10:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237386AbiDXHM5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 Apr 2022 03:12:57 -0400
-Received: from out0-155.mail.aliyun.com (out0-155.mail.aliyun.com [140.205.0.155])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8931118356
-        for <kvm@vger.kernel.org>; Sun, 24 Apr 2022 00:09:56 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R711e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018047207;MF=darcy.sh@antgroup.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---.NWmtL54_1650784193;
-Received: from localhost(mailfrom:darcy.sh@antgroup.com fp:SMTPD_---.NWmtL54_1650784193)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Sun, 24 Apr 2022 15:09:54 +0800
-From:   "SU Hang" <darcy.sh@antgroup.com>
-To:     <kvm@vger.kernel.org>, <pbonzini@redhat.com>, <thuth@redhat.com>,
-        <drjones@redhat.com>, "SU Hang" <darcy.sh@antgroup.com>
-Subject: [kvm-unit-tests PATCH 2/2] x86: replace `int 0x20` with `syscall`
-Date:   Sun, 24 Apr 2022 15:09:51 +0800
-Message-Id: <20220424070951.106990-2-darcy.sh@antgroup.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20220424070951.106990-1-darcy.sh@antgroup.com>
-References: <20220424070951.106990-1-darcy.sh@antgroup.com>
+        with ESMTP id S236428AbiDXIKx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 24 Apr 2022 04:10:53 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AB101816C6;
+        Sun, 24 Apr 2022 01:07:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1650787674; x=1682323674;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=Jg69NAeROVkmxoEWc411QwNioJnF4WnIiJ0sHVRfPPE=;
+  b=gl1rcmLSizfukbF+kURWVeQ4WDc6GXknisCAooeJSK5KrUnRfxau5Ldv
+   /f//mIHeegzZVbXychQYSUZfHzUbIjTOJl3EPoUtVvq0XVPY8jO9w8E0f
+   JFQTqnqvp/ODv0keKt0KFlKUEfIConqJkvaLbciCSEKkPWCX2ydMGRxTB
+   /VNcdAkmv/POalgQ2zYktLqTYvUeyp4OIpPWK9+t93vkosScOo/oJSXXW
+   FqJSK9QNlzhI4JSLEPT/SLI1n+nXxkoFs9ikujHMKt71obVDrzjLH/1lI
+   WBC0fvBjNjsGZiPDyOcx+S1S+Bf35DIwlTh1t7KKxyOO1uD2H7NZXhEnR
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10326"; a="265182519"
+X-IronPort-AV: E=Sophos;i="5.90,286,1643702400"; 
+   d="scan'208";a="265182519"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2022 01:07:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,286,1643702400"; 
+   d="scan'208";a="704146191"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
+  by fmsmga001.fm.intel.com with ESMTP; 24 Apr 2022 01:07:45 -0700
+Date:   Sun, 24 Apr 2022 16:07:37 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Quentin Perret <qperret@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+Message-ID: <20220424080737.GA4207@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <80aad2f9-9612-4e87-a27a-755d3fa97c92@www.fastmail.com>
+ <YkcTTY4YjQs5BRhE@google.com>
+ <83fd55f8-cd42-4588-9bf6-199cbce70f33@www.fastmail.com>
+ <YksIQYdG41v3KWkr@google.com>
+ <Ykslo2eo2eRXrpFR@google.com>
+ <eefc3c74-acca-419c-8947-726ce2458446@www.fastmail.com>
+ <Ykwbqv90C7+8K+Ao@google.com>
+ <YkyEaYiL0BrDYcZv@google.com>
+ <20220422105612.GB61987@chaop.bj.intel.com>
+ <ae7c9c7a-ecda-8c80-751f-f05dbc6489d7@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ae7c9c7a-ecda-8c80-751f-f05dbc6489d7@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: SU Hang <darcy.sh@antgroup.com>
----
- lib/x86/usermode.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+On Fri, Apr 22, 2022 at 01:06:25PM +0200, Paolo Bonzini wrote:
+> On 4/22/22 12:56, Chao Peng wrote:
+> >          /* memfile notifier flags */
+> >          #define MFN_F_USER_INACCESSIBLE   0x0001  /* memory allocated in the file is inaccessible from userspace (e.g. read/write/mmap) */
+> >          #define MFN_F_UNMOVABLE           0x0002  /* memory allocated in the file is unmovable */
+> >          #define MFN_F_UNRECLAIMABLE       0x0003  /* memory allocated in the file is unreclaimable (e.g. via kswapd or any other pathes) */
+> 
+> You probably mean BIT(0/1/2) here.
 
-diff --git a/lib/x86/usermode.c b/lib/x86/usermode.c
-index 477cb9f..e4cb899 100644
---- a/lib/x86/usermode.c
-+++ b/lib/x86/usermode.c
-@@ -12,7 +12,6 @@
- #include <stdint.h>
- 
- #define USERMODE_STACK_SIZE	0x2000
--#define RET_TO_KERNEL_IRQ	0x20
- 
- static jmp_buf jmpbuf;
- 
-@@ -40,9 +39,11 @@ uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
- 	static unsigned char user_stack[USERMODE_STACK_SIZE];
- 
- 	*raised_vector = 0;
--	set_idt_entry(RET_TO_KERNEL_IRQ, &ret_to_kernel, 3);
- 	handle_exception(fault_vector,
- 			restore_exec_to_jmpbuf_exception_handler);
-+	wrmsr(MSR_EFER, rdmsr(MSR_EFER) | EFER_SCE);
-+	wrmsr(MSR_STAR, ((u64)(USER_CS32 << 16) | KERNEL_CS) << 32);
-+	wrmsr(MSR_LSTAR, (u64)&ret_to_kernel);
- 
- 	if (setjmp(jmpbuf) != 0) {
- 		*raised_vector = 1;
-@@ -73,7 +74,7 @@ uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
- 			"mov %[arg4], %%rcx\n\t"
- 			"call *%[func]\n\t"
- 			/* Return to kernel via system call */
--			"int %[kernel_entry_vector]\n\t"
-+			"syscall\n\t"
- 			/* Kernel Mode */
- 			"ret_to_kernel:\n\t"
- 			"mov %[rsp0], %%rsp\n\t"
-@@ -89,8 +90,7 @@ uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
- 			[user_ds]"i"(USER_DS),
- 			[user_cs]"i"(USER_CS),
- 			[user_stack_top]"r"(user_stack +
--					sizeof(user_stack)),
--			[kernel_entry_vector]"i"(RET_TO_KERNEL_IRQ)
-+					sizeof(user_stack))
- 			:
- 			"rsi", "rdi", "rbx", "rcx", "rdx", "r8", "r9", "r10", "r11");
- 
--- 
-2.32.0.3.g01195cf9f
+Right, it's BIT(n), Thanks.
 
+Chao
+> 
+> Paolo
+> 
+> >      When memfile_notifier is being registered, memfile_register_notifier will
+> >      need check these flags. E.g. for MFN_F_USER_INACCESSIBLE, it fails when
+> >      previous mmap-ed mapping exists on the fd (I'm still unclear on how to do
+> >      this). When multiple consumers are supported it also need check all
+> >      registered consumers to see if any conflict (e.g. all consumers should have
+> >      MFN_F_USER_INACCESSIBLE set). Only when the register succeeds, the fd is
+> >      converted into a private fd, before that, the fd is just a normal (shared)
+> >      one. During this conversion, the previous data is preserved so you can put
+> >      some initial data in guest pages (whether the architecture allows this is
+> >      architecture-specific and out of the scope of this patch).
