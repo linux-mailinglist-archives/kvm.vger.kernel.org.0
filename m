@@ -2,65 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C04EE50D0D3
-	for <lists+kvm@lfdr.de>; Sun, 24 Apr 2022 11:34:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35A4D50D10C
+	for <lists+kvm@lfdr.de>; Sun, 24 Apr 2022 12:16:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236341AbiDXJhk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 Apr 2022 05:37:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37110 "EHLO
+        id S238996AbiDXKTA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 24 Apr 2022 06:19:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236334AbiDXJh1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 Apr 2022 05:37:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 83F49205C7
-        for <kvm@vger.kernel.org>; Sun, 24 Apr 2022 02:34:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650792865;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kSIpLejv7h+Qh7GF1vX9N5MH/EeI/nqqXVhbiI5Iaao=;
-        b=PGy1DY1vliCY9oDyRVa3SeFyGRjf0ezu1ok41Q6sbkaVVzqE2O8cXZ2B/Ajnr6XcycDcAI
-        68F/o4TL+yDSc8iYS+OPwKWttK76leIxGWa1WnI1BIru7/+8hq+M1OpiCnxxH5YSTtPJIH
-        eVtrrmtWKNlSHIxYPnRDzHnTLyRJm8Q=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-252-u0DT-vpdOgay35q41ALOKg-1; Sun, 24 Apr 2022 05:34:20 -0400
-X-MC-Unique: u0DT-vpdOgay35q41ALOKg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DFD013806729;
-        Sun, 24 Apr 2022 09:34:19 +0000 (UTC)
-Received: from starship (unknown [10.40.192.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8B45F145BEF9;
-        Sun, 24 Apr 2022 09:34:17 +0000 (UTC)
-Message-ID: <2327614a18d60a5e1b0d9d3aed754cccebce3117.camel@redhat.com>
-Subject: Re: [PATCH v2 11/11] KVM: SVM: Drop support for CPUs without NRIPS
- (NextRIP Save) support
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>
-Date:   Sun, 24 Apr 2022 12:34:16 +0300
-In-Reply-To: <20220423021411.784383-12-seanjc@google.com>
-References: <20220423021411.784383-1-seanjc@google.com>
-         <20220423021411.784383-12-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S238962AbiDXKS7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 24 Apr 2022 06:18:59 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9366140A5;
+        Sun, 24 Apr 2022 03:15:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1650795358; x=1682331358;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=jZlRG8AqX1Ezm6cxswh52LD9bW0bpmqIXQ5DvoEol1Y=;
+  b=Lk6pNcYYOQxuJNNgg0hAhHGQ4kGyYPo8SooqwZcfZzmNsCt6rybG63vJ
+   oPfjA24UaSeKPftbCf9SbyA8HWoqh/JbNB9ElOHxtBFEBLvvGjarycE4f
+   Qxbb9p72CXKWGJcqbJhPcb/NqmcIpaxLu6jGknrJqZUL+8CuX5eZovitW
+   I7F4v2eV5m3oKHh3m2x+aPE3i5OXoliBAt1vaWqAiJi/UN/AKMbBr9Wee
+   tYIsOja4ywZGQf6iQBXP+Bga+zoNkP8vuVyo5HYcxnHE6bQH74ps0Ih6W
+   iv/QpdJPCoUkwy5scUTI7rmk67MRPWCp12GupNdMI0JYK2Kn2l+J3oOI/
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10326"; a="264813941"
+X-IronPort-AV: E=Sophos;i="5.90,286,1643702400"; 
+   d="scan'208";a="264813941"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2022 03:15:58 -0700
+X-IronPort-AV: E=Sophos;i="5.90,286,1643702400"; 
+   d="scan'208";a="616086703"
+Received: from 984fee00be24.jf.intel.com ([10.165.54.246])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2022 03:15:58 -0700
+From:   Lei Wang <lei4.wang@intel.com>
+To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org
+Cc:     lei4.wang@intel.com, chenyi.qiang@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v7 0/8] KVM: PKS Virtualization support
+Date:   Sun, 24 Apr 2022 03:15:49 -0700
+Message-Id: <20220424101557.134102-1-lei4.wang@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,230 +57,137 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 2022-04-23 at 02:14 +0000, Sean Christopherson wrote:
-> Drop support for CPUs without NRIPS along with the associated module
-> param.  Requiring NRIPS simplifies a handful of paths in KVM, especially
-> paths where KVM has to do silly things when nrips=false but supported in
-> hardware as there is no way to tell the CPU _not_ to use NRIPS.
-> 
-> NRIPS was introduced in 2009, i.e. every AMD-based CPU released in the
-> last decade should support NRIPS.
-> 
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Not-signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/svm/nested.c                     |  9 +--
->  arch/x86/kvm/svm/svm.c                        | 77 +++++++------------
->  .../kvm/x86_64/svm_nested_soft_inject_test.c  |  6 +-
->  3 files changed, 32 insertions(+), 60 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index a83e367ade54..f39c958c77f5 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -681,14 +681,13 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
->  	/*
->  	 * next_rip is consumed on VMRUN as the return address pushed on the
->  	 * stack for injected soft exceptions/interrupts.  If nrips is exposed
-> -	 * to L1, take it verbatim from vmcb12.  If nrips is supported in
-> -	 * hardware but not exposed to L1, stuff the actual L2 RIP to emulate
-> -	 * what a nrips=0 CPU would do (L1 is responsible for advancing RIP
-> -	 * prior to injecting the event).
-> +	 * to L1, take it verbatim from vmcb12.  If nrips is not exposed to L1,
-> +	 * stuff the actual L2 RIP to emulate what an nrips=0 CPU would do (L1
-> +	 * is responsible for advancing RIP prior to injecting the event).
->  	 */
->  	if (svm->nrips_enabled)
->  		vmcb02->control.next_rip    = svm->nested.ctl.next_rip;
-> -	else if (boot_cpu_has(X86_FEATURE_NRIPS))
-> +	else
->  		vmcb02->control.next_rip    = vmcb12_rip;
->  
->  	if (is_evtinj_soft(vmcb02->control.event_inj)) {
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 4a912623b961..6e6530c01e34 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -162,10 +162,6 @@ module_param_named(npt, npt_enabled, bool, 0444);
->  static int nested = true;
->  module_param(nested, int, S_IRUGO);
->  
-> -/* enable/disable Next RIP Save */
-> -static int nrips = true;
-> -module_param(nrips, int, 0444);
-> -
->  /* enable/disable Virtual VMLOAD VMSAVE */
->  static int vls = true;
->  module_param(vls, int, 0444);
-> @@ -355,10 +351,8 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
->  	if (sev_es_guest(vcpu->kvm))
->  		goto done;
->  
-> -	if (nrips && svm->vmcb->control.next_rip != 0) {
-> -		WARN_ON_ONCE(!static_cpu_has(X86_FEATURE_NRIPS));
-> +	if (svm->vmcb->control.next_rip != 0)
->  		svm->next_rip = svm->vmcb->control.next_rip;
-> -	}
->  
->  	if (!svm->next_rip) {
->  		if (unlikely(!commit_side_effects))
-> @@ -394,15 +388,14 @@ static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
->  	 * Due to architectural shortcomings, the CPU doesn't always provide
->  	 * NextRIP, e.g. if KVM intercepted an exception that occurred while
->  	 * the CPU was vectoring an INTO/INT3 in the guest.  Temporarily skip
-> -	 * the instruction even if NextRIP is supported to acquire the next
-> -	 * RIP so that it can be shoved into the NextRIP field, otherwise
-> -	 * hardware will fail to advance guest RIP during event injection.
-> -	 * Drop the exception/interrupt if emulation fails and effectively
-> -	 * retry the instruction, it's the least awful option.  If NRIPS is
-> -	 * in use, the skip must not commit any side effects such as clearing
-> -	 * the interrupt shadow or RFLAGS.RF.
-> +	 * the instruction to acquire the next RIP so that it can be shoved
-> +	 * into the NextRIP field, otherwise hardware will fail to advance
-> +	 * guest RIP during event injection.  Drop the exception/interrupt if
-> +	 * emulation fails and effectively retry the instruction, it's the
-> +	 * least awful option.  The skip must not commit any side effects such
-> +	 * as clearing the interrupt shadow or RFLAGS.RF.
->  	 */
-> -	if (!__svm_skip_emulated_instruction(vcpu, !nrips))
-> +	if (!__svm_skip_emulated_instruction(vcpu, false))
->  		return -EIO;
->  
->  	rip = kvm_rip_read(vcpu);
-> @@ -421,11 +414,9 @@ static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
->  	svm->soft_int_old_rip = old_rip;
->  	svm->soft_int_next_rip = rip;
->  
-> -	if (nrips)
-> -		kvm_rip_write(vcpu, old_rip);
-> +	kvm_rip_write(vcpu, old_rip);
->  
-> -	if (static_cpu_has(X86_FEATURE_NRIPS))
-> -		svm->vmcb->control.next_rip = rip;
-> +	svm->vmcb->control.next_rip = rip;
->  
->  	return 0;
->  }
-> @@ -3732,28 +3723,16 @@ static void svm_complete_soft_interrupt(struct kvm_vcpu *vcpu, u8 vector,
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  
->  	/*
-> -	 * If NRIPS is enabled, KVM must snapshot the pre-VMRUN next_rip that's
-> -	 * associated with the original soft exception/interrupt.  next_rip is
-> -	 * cleared on all exits that can occur while vectoring an event, so KVM
-> -	 * needs to manually set next_rip for re-injection.  Unlike the !nrips
-> -	 * case below, this needs to be done if and only if KVM is re-injecting
-> -	 * the same event, i.e. if the event is a soft exception/interrupt,
-> -	 * otherwise next_rip is unused on VMRUN.
-> +	 * KVM must snapshot the pre-VMRUN next_rip that's associated with the
-> +	 * original soft exception/interrupt.  next_rip is cleared on all exits
-> +	 * that can occur while vectoring an event, so KVM needs to manually
-> +	 * set next_rip for re-injection.  This needs to be done if and only if
-> +	 * KVM is re-injecting the same event, i.e. if the event is a soft
-> +	 * exception/interrupt, otherwise next_rip is unused on VMRUN.
->  	 */
-> -	if (nrips && (is_soft || (is_exception && kvm_exception_is_soft(vector))) &&
-> +	if ((is_soft || (is_exception && kvm_exception_is_soft(vector))) &&
->  	    kvm_is_linear_rip(vcpu, svm->soft_int_old_rip + svm->soft_int_csbase))
->  		svm->vmcb->control.next_rip = svm->soft_int_next_rip;
-> -	/*
-> -	 * If NRIPS isn't enabled, KVM must manually advance RIP prior to
-> -	 * injecting the soft exception/interrupt.  That advancement needs to
-> -	 * be unwound if vectoring didn't complete.  Note, the new event may
-> -	 * not be the injected event, e.g. if KVM injected an INTn, the INTn
-> -	 * hit a #NP in the guest, and the #NP encountered a #PF, the #NP will
-> -	 * be the reported vectored event, but RIP still needs to be unwound.
-> -	 */
-> -	else if (!nrips && (is_soft || is_exception) &&
-> -		 kvm_is_linear_rip(vcpu, svm->soft_int_next_rip + svm->soft_int_csbase))
-> -		kvm_rip_write(vcpu, svm->soft_int_old_rip);
->  }
->  
->  static void svm_complete_interrupts(struct kvm_vcpu *vcpu)
-> @@ -4112,8 +4091,7 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->  				    boot_cpu_has(X86_FEATURE_XSAVES);
->  
->  	/* Update nrips enabled cache */
-> -	svm->nrips_enabled = kvm_cpu_cap_has(X86_FEATURE_NRIPS) &&
-> -			     guest_cpuid_has(vcpu, X86_FEATURE_NRIPS);
-> +	svm->nrips_enabled = guest_cpuid_has(vcpu, X86_FEATURE_NRIPS);
->  
->  	svm->tsc_scaling_enabled = tsc_scaling && guest_cpuid_has(vcpu, X86_FEATURE_TSCRATEMSR);
->  	svm->lbrv_enabled = lbrv && guest_cpuid_has(vcpu, X86_FEATURE_LBRV);
-> @@ -4324,9 +4302,7 @@ static int svm_check_intercept(struct kvm_vcpu *vcpu,
->  		break;
->  	}
->  
-> -	/* TODO: Advertise NRIPS to guest hypervisor unconditionally */
-> -	if (static_cpu_has(X86_FEATURE_NRIPS))
-> -		vmcb->control.next_rip  = info->next_rip;
-> +	vmcb->control.next_rip  = info->next_rip;
->  	vmcb->control.exit_code = icpt_info.exit_code;
->  	vmexit = nested_svm_exit_handled(svm);
->  
-> @@ -4859,9 +4835,7 @@ static __init void svm_set_cpu_caps(void)
->  	if (nested) {
->  		kvm_cpu_cap_set(X86_FEATURE_SVM);
->  		kvm_cpu_cap_set(X86_FEATURE_VMCBCLEAN);
-> -
-> -		if (nrips)
-> -			kvm_cpu_cap_set(X86_FEATURE_NRIPS);
-> +		kvm_cpu_cap_set(X86_FEATURE_NRIPS);
->  
->  		if (npt_enabled)
->  			kvm_cpu_cap_set(X86_FEATURE_NPT);
-> @@ -4908,6 +4882,12 @@ static __init int svm_hardware_setup(void)
->  	int r;
->  	unsigned int order = get_order(IOPM_SIZE);
->  
-> +	/* KVM no longer supports CPUs without NextRIP Save support. */
-> +	if (!boot_cpu_has(X86_FEATURE_NRIPS)) {
-> +		pr_err_ratelimited("NRIPS (NextRIP Save) not supported\n");
-> +		return -EOPNOTSUPP;
-> +	}
-> +
->  	/*
->  	 * NX is required for shadow paging and for NPT if the NX huge pages
->  	 * mitigation is enabled.
-> @@ -4989,11 +4969,6 @@ static __init int svm_hardware_setup(void)
->  			goto err;
->  	}
->  
-> -	if (nrips) {
-> -		if (!boot_cpu_has(X86_FEATURE_NRIPS))
-> -			nrips = false;
-> -	}
-> -
->  	enable_apicv = avic = avic && npt_enabled && (boot_cpu_has(X86_FEATURE_AVIC) || force_avic);
->  
->  	if (enable_apicv) {
-> diff --git a/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c b/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c
-> index 257aa2280b5c..39a6569715fd 100644
-> --- a/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c
-> @@ -106,10 +106,8 @@ int main(int argc, char *argv[])
->  	nested_svm_check_supported();
->  
->  	cpuid = kvm_get_supported_cpuid_entry(0x8000000a);
-> -	if (!(cpuid->edx & X86_FEATURE_NRIPS)) {
-> -		print_skip("nRIP Save unavailable");
-> -		exit(KSFT_SKIP);
-> -	}
-> +	TEST_ASSERT(cpuid->edx & X86_FEATURE_NRIPS,
-> +		    "KVM is supposed to unconditionally advertise nRIP Save\n");
->  
->  	vm = vm_create_default(VCPU_ID, 0, (void *) l1_guest_code);
->  
+This patch series is based on top of v10 PKS core support kernel patchset:
+https://lore.kernel.org/lkml/20220419170649.1022246-1-ira.weiny@intel.com/
 
+---
 
-The only issue would be IMHO that if (for testing/whatever) you boot a guest without NRIPS,
-then the guest won't be able to use SVM
-Or in other words, its true that every sane AMD cpu supports NRIPs, but a "nested AMD cpu"
-in theory might not.
+Protection Keys for Supervisor Pages(PKS) is a feature that extends the
+Protection Keys architecture to support thread-specific permission
+restrictions on supervisor pages.
 
-Best regards,
-	Maxim Levitsky
+PKS works similar to an existing feature named PKU(protecting user pages).
+They both perform an additional check after normal paging permission
+checks are done. Access or Writes can be disabled via a MSR update
+without TLB flushes when permissions changes. If violating this
+addional check, #PF occurs and PFEC.PK bit will be set.
 
+PKS introduces MSR IA32_PKRS to manage supervisor protection key
+rights. The MSR contains 16 pairs of ADi and WDi bits. Each pair
+advertises on a group of pages with the same key which is set in the
+leaf paging-structure entries(bits[62:59]). Currently, IA32_PKRS is not
+supported by XSAVES architecture.
 
+This patchset aims to add the virtualization of PKS in KVM. It
+implemented PKS CPUID enumeration, vmentry/vmexit configuration, MSR
+exposure, nested supported etc. Currently, PKS is not yet supported for
+shadow paging. 
 
+Detailed information about PKS can be found in the latest Intel 64 and
+IA-32 Architectures Software Developer's Manual.
+
+---
+
+Changelogs:
+
+v6->v7
+- Add documentation to note that it's nice-to-have cache tracking for PKRS,
+  and we also needn't hesitate to rip it out in the future if there's a strong
+  reason to drop the caching. (Sean)
+- Blindly reading PKRU/PKRS is wrong, fixed. (Sean)
+- Add a non-inline helper kvm_mmu_pkr_bits() to read PKR bits. (Sean)
+- Delete the comment for exposing the PKS because the pattern is common and the
+  behavior is self-explanatory. (Sean)
+- Add a helper vmx_set_host_pkrs() for setting host pkrs and rewrite the
+  related code for concise. (Sean)
+- Align an indentation in arch/x86/kvm/vmx/nested.c. (Sean)
+- Read the current PKRS if from_vmentry == false under the nested condition.
+  (Sean)
+- v6: https://lore.kernel.org/lkml/20220221080840.7369-1-chenyi.qiang@intel.com/
+
+v5->v6
+- PKRS is preserved on INIT. Add the PKRS reset operation in kvm_vcpu_reset.
+  (Sean)
+- Track the pkrs as u32. Add the code WARN on bits 64:32 being set in VMCS field.
+  (Sean)
+- Adjust the MSR intercept and entry/exit control in VMCS according to
+  guest CPUID. This resolve the issue when userspace re-enable this feature.
+  (Sean)
+- Split VMX restriction on PKS support(entry/exit load controls) out of
+  common x86. And put tdp restriction together with PKU in common x86.
+  (Sean)
+- Thanks for Sean to revise the comments in mmu.c related to
+  update_pkr_bitmap, which make it more clear for pkr bitmask cache usage.
+- v5: https://lore.kernel.org/lkml/20210811101126.8973-1-chenyi.qiang@intel.com/
+
+v4->v5
+- Make setting of MSR intercept/vmcs control bits not dependent on guest.CR4.PKS.
+  And set them if PKS is exposed to guest. (Suggested by Sean)
+- Add pkrs to standard register caching mechanism to help update
+  vcpu->arch.pkrs on demand. Add related helper functions. (Suggested by Sean)
+- Do the real pkrs update in VMCS field in vmx_vcpu_reset and
+  vmx_sync_vmcs_host_state(). (Sean)
+- Add a new mmu_role cr4_pks instead of smushing PKU and PKS together.
+  (Sean & Paolo)
+- v4: https://lore.kernel.org/lkml/20210205083706.14146-1-chenyi.qiang@intel.com/
+
+v3->v4
+- Make the MSR intercept and load-controls setting depend on CR4.PKS value
+- shadow the guest pkrs and make it usable in PKS emultion
+- add the cr4_pke and cr4_pks check in pkr_mask update
+- squash PATCH 2 and PATCH 5 to make the dependencies read more clear
+- v3: https://lore.kernel.org/lkml/20201105081805.5674-1-chenyi.qiang@intel.com/
+
+v2->v3:
+- No function changes since last submit
+- rebase on the latest PKS kernel support:
+  https://lore.kernel.org/lkml/20201102205320.1458656-1-ira.weiny@intel.com/
+- add MSR_IA32_PKRS to the vmx_possible_passthrough_msrs[]
+- RFC v2: https://lore.kernel.org/lkml/20201014021157.18022-1-chenyi.qiang@intel.com/
+
+v1->v2:
+- rebase on the latest PKS kernel support:
+  https://github.com/weiny2/linux-kernel/tree/pks-rfc-v3
+- add a kvm-unit-tests for PKS
+- add the check in kvm_init_msr_list for PKRS
+- place the X86_CR4_PKS in mmu_role_bits in kvm_set_cr4
+- add the support to expose VM_{ENTRY, EXIT}_LOAD_IA32_PKRS in nested
+  VMX MSR
+- RFC v1: https://lore.kernel.org/lkml/20200807084841.7112-1-chenyi.qiang@intel.com/
+
+---
+
+Chenyi Qiang (7):
+  KVM: VMX: Introduce PKS VMCS fields
+  KVM: VMX: Add proper cache tracking for PKRS
+  KVM: X86: Expose IA32_PKRS MSR
+  KVM: MMU: Rename the pkru to pkr
+  KVM: MMU: Add support for PKS emulation
+  KVM: VMX: Expose PKS to guest
+  KVM: VMX: Enable PKS for nested VM
+
+Lei Wang (1):
+  KVM: MMU: Add helper function to get pkr bits
+
+ arch/x86/include/asm/kvm_host.h |  17 +++--
+ arch/x86/include/asm/vmx.h      |   6 ++
+ arch/x86/kvm/cpuid.c            |  13 +++-
+ arch/x86/kvm/kvm_cache_regs.h   |   7 ++
+ arch/x86/kvm/mmu.h              |  29 +++----
+ arch/x86/kvm/mmu/mmu.c          | 130 +++++++++++++++++++++++---------
+ arch/x86/kvm/vmx/capabilities.h |   6 ++
+ arch/x86/kvm/vmx/nested.c       |  36 ++++++++-
+ arch/x86/kvm/vmx/vmcs.h         |   1 +
+ arch/x86/kvm/vmx/vmcs12.c       |   2 +
+ arch/x86/kvm/vmx/vmcs12.h       |   4 +
+ arch/x86/kvm/vmx/vmx.c          |  85 +++++++++++++++++++--
+ arch/x86/kvm/vmx/vmx.h          |  14 +++-
+ arch/x86/kvm/x86.c              |   9 ++-
+ arch/x86/kvm/x86.h              |   8 ++
+ arch/x86/mm/pkeys.c             |   6 ++
+ include/linux/pks.h             |   7 ++
+ 17 files changed, 301 insertions(+), 79 deletions(-)
+
+-- 
+2.25.1
 
