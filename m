@@ -2,266 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD47A50D118
-	for <lists+kvm@lfdr.de>; Sun, 24 Apr 2022 12:17:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F73050D3C7
+	for <lists+kvm@lfdr.de>; Sun, 24 Apr 2022 19:00:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239036AbiDXKTX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 Apr 2022 06:19:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60154 "EHLO
+        id S230092AbiDXRDG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 24 Apr 2022 13:03:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239016AbiDXKTC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 Apr 2022 06:19:02 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABBD3140A5;
-        Sun, 24 Apr 2022 03:16:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650795362; x=1682331362;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=y7Qa/RTMtrNvcVvyMDQP5HKRtGLkqkD84LwqpgUU1FI=;
-  b=ZSGblX3uuTLwUKJI8o/iBRSXkFLcoMsTA/He0O60tCwrza35evwEiqcC
-   IKU0VHJNfbajIj9rE+1pXC9O+goV/zlmtCPqG1x4KI4zPutZ/UWbeAWza
-   zoFLywI9JV3weAV4lUf/5RWYM+C8qNQpmuwyRcw8HP2ukY1oWvG5bVWuE
-   xWp6C/ufCsM+7hyVz/w7Pbr/Xl7uj9bOVobDaV9UHXofldb7/qvatz3v/
-   Xm9JIyijAAYB6s9iXPe+LVpkZeRouFA7VQqVb2TqMnCQ3zpni9gVFPTkf
-   K1BxKZPZqQ3r5xVyA220zFbPWonowbYCRszdyV9FD7SDzd4Lk3I8eCwQo
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10326"; a="264813949"
-X-IronPort-AV: E=Sophos;i="5.90,286,1643702400"; 
-   d="scan'208";a="264813949"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2022 03:16:01 -0700
-X-IronPort-AV: E=Sophos;i="5.90,286,1643702400"; 
-   d="scan'208";a="616086730"
-Received: from 984fee00be24.jf.intel.com ([10.165.54.246])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2022 03:16:01 -0700
-From:   Lei Wang <lei4.wang@intel.com>
-To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org
-Cc:     lei4.wang@intel.com, chenyi.qiang@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v7 8/8] KVM: VMX: Enable PKS for nested VM
-Date:   Sun, 24 Apr 2022 03:15:57 -0700
-Message-Id: <20220424101557.134102-9-lei4.wang@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220424101557.134102-1-lei4.wang@intel.com>
-References: <20220424101557.134102-1-lei4.wang@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S234895AbiDXRDF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 24 Apr 2022 13:03:05 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DB1EAE7C;
+        Sun, 24 Apr 2022 10:00:03 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0B6C3611DE;
+        Sun, 24 Apr 2022 17:00:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0358C385AD;
+        Sun, 24 Apr 2022 17:00:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1650819602;
+        bh=Je+h7tOqeRuiQPlVHJ9YBtSjYKQSsE87o9H6bqNhv0E=;
+        h=In-Reply-To:References:Date:From:To:Cc:Subject:From;
+        b=LQiLb34FBw2eNgmoSiK231PONOUqKINkvAm71Hqa/6IFcH84IBd4KI62BNG2mLhtK
+         Hc6wfzDdol11Q6iTwsjdogfokTjyEWWEbGSpsOx/knOJKp6Crx5ySz6ZBPNfCPm2Y2
+         UTOM8YD+BmK8eAmsrEjDxw20mEt5bF7RNwdoAAbcP7G3bq3wsJBVcC+ket5QCp7pNZ
+         ebwBj9BNaRZhioAXdPrTG0cP2ypE2dSneAE2Y4RaBLyhY3E0B2q6+EJuUHx1fwlqL9
+         ky9DUb3woG18oxgarN9knFcnkhJA5NdzVOb2xc+hnzYweKSFCn+6GsqSZcJd4W0g4C
+         eLcYkopG6nWTg==
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+        by mailauth.nyi.internal (Postfix) with ESMTP id AF9FB27C0054;
+        Sun, 24 Apr 2022 12:59:59 -0400 (EDT)
+Received: from imap48 ([10.202.2.98])
+  by compute2.internal (MEProxy); Sun, 24 Apr 2022 12:59:59 -0400
+X-ME-Sender: <xms:DYJlYrS34FbKgFIeuLj_dSMvkd5cU95kEUVKwMNEB6sujYQvoPVv6Q>
+    <xme:DYJlYswLoJzXo6S6_R7s1t-GiUI4O6DLQ-Pd_h4VfsSNC7qvDxGEUISicXFj94Pnp
+    ZNy6B9ZgrmKpY1sYlo>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrtdelgddutdelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehn
+    ugihucfnuhhtohhmihhrshhkihdfuceolhhuthhosehkvghrnhgvlhdrohhrgheqnecugg
+    ftrfgrthhtvghrnhepvdfhuedvtdfhudffhfekkefftefghfeltdelgeffteehueegjeff
+    udehgfetiefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrh
+    homheprghnugihodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduudeiudek
+    heeifedvqddvieefudeiiedtkedqlhhuthhopeepkhgvrhhnvghlrdhorhhgsehlihhnuh
+    igrdhluhhtohdruhhs
+X-ME-Proxy: <xmx:DYJlYg2mLjrVZeMpqDRGXmRBOA-ECqlSFMjTE8uGdMFCztXmSs1Oww>
+    <xmx:DYJlYrDN603TmyI_zfJc_c4WIOl52Lr3VQyhal9I5Eb6ECdOYdjpsg>
+    <xmx:DYJlYkh4toKPkrvr3za3g-nANRCLI8UWxf7YtZx3gqdjE5hym31nCA>
+    <xmx:D4JlYtA1fc6cjZhfnkcH18sWUIyRZ7lxNJCXAb7CsWUmjH9hBozjjg>
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 5AA8821E006E; Sun, 24 Apr 2022 12:59:57 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.7.0-alpha0-569-g7622ad95cc-fm-20220421.002-g7622ad95
+Mime-Version: 1.0
+Message-Id: <3b99f157-0f30-4b30-8399-dd659250ab8d@www.fastmail.com>
+In-Reply-To: <20220422105612.GB61987@chaop.bj.intel.com>
+References: <YkQzfjgTQaDd2E2T@google.com> <YkSaUQX89ZEojsQb@google.com>
+ <80aad2f9-9612-4e87-a27a-755d3fa97c92@www.fastmail.com>
+ <YkcTTY4YjQs5BRhE@google.com>
+ <83fd55f8-cd42-4588-9bf6-199cbce70f33@www.fastmail.com>
+ <YksIQYdG41v3KWkr@google.com> <Ykslo2eo2eRXrpFR@google.com>
+ <eefc3c74-acca-419c-8947-726ce2458446@www.fastmail.com>
+ <Ykwbqv90C7+8K+Ao@google.com> <YkyEaYiL0BrDYcZv@google.com>
+ <20220422105612.GB61987@chaop.bj.intel.com>
+Date:   Sun, 24 Apr 2022 09:59:37 -0700
+From:   "Andy Lutomirski" <luto@kernel.org>
+To:     "Chao Peng" <chao.p.peng@linux.intel.com>,
+        "Sean Christopherson" <seanjc@google.com>
+Cc:     "Quentin Perret" <qperret@google.com>,
+        "Steven Price" <steven.price@arm.com>,
+        "kvm list" <kvm@vger.kernel.org>,
+        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        "Linux API" <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        "Jonathan Corbet" <corbet@lwn.net>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        "Wanpeng Li" <wanpengli@tencent.com>,
+        "Jim Mattson" <jmattson@google.com>,
+        "Joerg Roedel" <joro@8bytes.org>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Hugh Dickins" <hughd@google.com>,
+        "Jeff Layton" <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        "Mike Rapoport" <rppt@kernel.org>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        "Vlastimil Babka" <vbabka@suse.cz>,
+        "Vishal Annapurve" <vannapurve@google.com>,
+        "Yu Zhang" <yu.c.zhang@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        "Dave Hansen" <dave.hansen@intel.com>,
+        "Andi Kleen" <ak@linux.intel.com>,
+        "David Hildenbrand" <david@redhat.com>,
+        "Marc Zyngier" <maz@kernel.org>, "Will Deacon" <will@kernel.org>
+Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM guest
+ private memory
+Content-Type: text/plain
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Chenyi Qiang <chenyi.qiang@intel.com>
 
-PKS MSR passes through guest directly. Configure the MSR to match the
-L0/L1 settings so that nested VM runs PKS properly.
 
-Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
-Co-developed-by: Lei Wang <lei4.wang@intel.com>
-Signed-off-by: Lei Wang <lei4.wang@intel.com>
----
- arch/x86/kvm/vmx/nested.c | 36 ++++++++++++++++++++++++++++++++++--
- arch/x86/kvm/vmx/vmcs12.c |  2 ++
- arch/x86/kvm/vmx/vmcs12.h |  4 ++++
- arch/x86/kvm/vmx/vmx.c    |  1 +
- arch/x86/kvm/vmx/vmx.h    |  2 ++
- 5 files changed, 43 insertions(+), 2 deletions(-)
+On Fri, Apr 22, 2022, at 3:56 AM, Chao Peng wrote:
+> On Tue, Apr 05, 2022 at 06:03:21PM +0000, Sean Christopherson wrote:
+>> On Tue, Apr 05, 2022, Quentin Perret wrote:
+>> > On Monday 04 Apr 2022 at 15:04:17 (-0700), Andy Lutomirski wrote:
+>     Only when the register succeeds, the fd is
+>     converted into a private fd, before that, the fd is just a normal (shared)
+>     one. During this conversion, the previous data is preserved so you can put
+>     some initial data in guest pages (whether the architecture allows this is
+>     architecture-specific and out of the scope of this patch).
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 58a1fa7defc9..dde359dacfcb 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -252,6 +252,7 @@ static void vmx_sync_vmcs_host_state(struct vcpu_vmx *vmx,
- 	dest->ds_sel = src->ds_sel;
- 	dest->es_sel = src->es_sel;
- #endif
-+	vmx_set_host_pkrs(dest, src->pkrs);
- }
- 
- static void vmx_switch_vmcs(struct kvm_vcpu *vcpu, struct loaded_vmcs *vmcs)
-@@ -685,6 +686,9 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
- 					 MSR_IA32_PRED_CMD, MSR_TYPE_W);
- 
-+	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
-+					 MSR_IA32_PKRS, MSR_TYPE_RW);
-+
- 	kvm_vcpu_unmap(vcpu, &vmx->nested.msr_bitmap_map, false);
- 
- 	vmx->nested.force_msr_bitmap_recalc = false;
-@@ -2433,6 +2437,10 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
- 		if (kvm_mpx_supported() && vmx->nested.nested_run_pending &&
- 		    (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS))
- 			vmcs_write64(GUEST_BNDCFGS, vmcs12->guest_bndcfgs);
-+
-+		if (vmx->nested.nested_run_pending &&
-+		    (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PKRS))
-+			vmcs_write64(GUEST_IA32_PKRS, vmcs12->guest_ia32_pkrs);
- 	}
- 
- 	if (nested_cpu_has_xsaves(vmcs12))
-@@ -2521,6 +2529,11 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
- 	if (kvm_mpx_supported() && (!vmx->nested.nested_run_pending ||
- 	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
- 		vmcs_write64(GUEST_BNDCFGS, vmx->nested.vmcs01_guest_bndcfgs);
-+	if (kvm_cpu_cap_has(X86_FEATURE_PKS) &&
-+	    (!vmx->nested.nested_run_pending ||
-+	     !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PKRS)))
-+		vmcs_write64(GUEST_IA32_PKRS, vmx->nested.vmcs01_guest_pkrs);
-+
- 	vmx_set_rflags(vcpu, vmcs12->guest_rflags);
- 
- 	/* EXCEPTION_BITMAP and CR0_GUEST_HOST_MASK should basically be the
-@@ -2897,6 +2910,10 @@ static int nested_vmx_check_host_state(struct kvm_vcpu *vcpu,
- 					   vmcs12->host_ia32_perf_global_ctrl)))
- 		return -EINVAL;
- 
-+	if ((vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_PKRS) &&
-+	    CC(!kvm_pkrs_valid(vmcs12->host_ia32_pkrs)))
-+		return -EINVAL;
-+
- #ifdef CONFIG_X86_64
- 	ia32e = !!(vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE);
- #else
-@@ -3049,6 +3066,10 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
- 	if (nested_check_guest_non_reg_state(vmcs12))
- 		return -EINVAL;
- 
-+	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PKRS) &&
-+	    CC(!kvm_pkrs_valid(vmcs12->guest_ia32_pkrs)))
-+		return -EINVAL;
-+
- 	return 0;
- }
- 
-@@ -3384,6 +3405,10 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
- 	    (!from_vmentry ||
- 	     !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
- 		vmx->nested.vmcs01_guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
-+	if (kvm_cpu_cap_has(X86_FEATURE_PKS) && 
-+	    (!from_vmentry ||
-+	     !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PKRS)))
-+		vmx->nested.vmcs01_guest_pkrs = vmcs_read64(GUEST_IA32_PKRS);
- 
- 	/*
- 	 * Overwrite vmcs01.GUEST_CR3 with L1's CR3 if EPT is disabled *and*
-@@ -4029,6 +4054,7 @@ static bool is_vmcs12_ext_field(unsigned long field)
- 	case GUEST_IDTR_BASE:
- 	case GUEST_PENDING_DBG_EXCEPTIONS:
- 	case GUEST_BNDCFGS:
-+	case GUEST_IA32_PKRS:
- 		return true;
- 	default:
- 		break;
-@@ -4080,6 +4106,8 @@ static void sync_vmcs02_to_vmcs12_rare(struct kvm_vcpu *vcpu,
- 		vmcs_readl(GUEST_PENDING_DBG_EXCEPTIONS);
- 	if (kvm_mpx_supported())
- 		vmcs12->guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
-+	if (vmx->nested.msrs.entry_ctls_high & VM_ENTRY_LOAD_IA32_PKRS)
-+		vmcs12->guest_ia32_pkrs = vmcs_read64(GUEST_IA32_PKRS);
- 
- 	vmx->nested.need_sync_vmcs02_to_vmcs12_rare = false;
- }
-@@ -4317,6 +4345,9 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
- 		WARN_ON_ONCE(kvm_set_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
- 					 vmcs12->host_ia32_perf_global_ctrl));
- 
-+	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_PKRS)
-+		vmcs_write64(GUEST_IA32_PKRS, vmcs12->host_ia32_pkrs);
-+
- 	/* Set L1 segment info according to Intel SDM
- 	    27.5.2 Loading Host Segment and Descriptor-Table Registers */
- 	seg = (struct kvm_segment) {
-@@ -6559,7 +6590,8 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
- 		VM_EXIT_HOST_ADDR_SPACE_SIZE |
- #endif
- 		VM_EXIT_LOAD_IA32_PAT | VM_EXIT_SAVE_IA32_PAT |
--		VM_EXIT_CLEAR_BNDCFGS | VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
-+		VM_EXIT_CLEAR_BNDCFGS | VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-+		VM_EXIT_LOAD_IA32_PKRS;
- 	msrs->exit_ctls_high |=
- 		VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR |
- 		VM_EXIT_LOAD_IA32_EFER | VM_EXIT_SAVE_IA32_EFER |
-@@ -6579,7 +6611,7 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
- 		VM_ENTRY_IA32E_MODE |
- #endif
- 		VM_ENTRY_LOAD_IA32_PAT | VM_ENTRY_LOAD_BNDCFGS |
--		VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
-+		VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VM_ENTRY_LOAD_IA32_PKRS;
- 	msrs->entry_ctls_high |=
- 		(VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR | VM_ENTRY_LOAD_IA32_EFER);
- 
-diff --git a/arch/x86/kvm/vmx/vmcs12.c b/arch/x86/kvm/vmx/vmcs12.c
-index 2251b60920f8..7aad1b2f1d81 100644
---- a/arch/x86/kvm/vmx/vmcs12.c
-+++ b/arch/x86/kvm/vmx/vmcs12.c
-@@ -62,9 +62,11 @@ const unsigned short vmcs12_field_offsets[] = {
- 	FIELD64(GUEST_PDPTR2, guest_pdptr2),
- 	FIELD64(GUEST_PDPTR3, guest_pdptr3),
- 	FIELD64(GUEST_BNDCFGS, guest_bndcfgs),
-+	FIELD64(GUEST_IA32_PKRS, guest_ia32_pkrs),
- 	FIELD64(HOST_IA32_PAT, host_ia32_pat),
- 	FIELD64(HOST_IA32_EFER, host_ia32_efer),
- 	FIELD64(HOST_IA32_PERF_GLOBAL_CTRL, host_ia32_perf_global_ctrl),
-+	FIELD64(HOST_IA32_PKRS, host_ia32_pkrs),
- 	FIELD(PIN_BASED_VM_EXEC_CONTROL, pin_based_vm_exec_control),
- 	FIELD(CPU_BASED_VM_EXEC_CONTROL, cpu_based_vm_exec_control),
- 	FIELD(EXCEPTION_BITMAP, exception_bitmap),
-diff --git a/arch/x86/kvm/vmx/vmcs12.h b/arch/x86/kvm/vmx/vmcs12.h
-index 746129ddd5ae..4f41be3c351c 100644
---- a/arch/x86/kvm/vmx/vmcs12.h
-+++ b/arch/x86/kvm/vmx/vmcs12.h
-@@ -185,6 +185,8 @@ struct __packed vmcs12 {
- 	u16 host_gs_selector;
- 	u16 host_tr_selector;
- 	u16 guest_pml_index;
-+	u64 host_ia32_pkrs;
-+	u64 guest_ia32_pkrs;
- };
- 
- /*
-@@ -359,6 +361,8 @@ static inline void vmx_check_vmcs12_offsets(void)
- 	CHECK_OFFSET(host_gs_selector, 992);
- 	CHECK_OFFSET(host_tr_selector, 994);
- 	CHECK_OFFSET(guest_pml_index, 996);
-+	CHECK_OFFSET(host_ia32_pkrs, 998);
-+	CHECK_OFFSET(guest_ia32_pkrs, 1006);
- }
- 
- extern const unsigned short vmcs12_field_offsets[];
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index cbcb0d7b47a4..a62dc65299d5 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7294,6 +7294,7 @@ static void nested_vmx_cr_fixed1_bits_update(struct kvm_vcpu *vcpu)
- 	cr4_fixed1_update(X86_CR4_PKE,        ecx, feature_bit(PKU));
- 	cr4_fixed1_update(X86_CR4_UMIP,       ecx, feature_bit(UMIP));
- 	cr4_fixed1_update(X86_CR4_LA57,       ecx, feature_bit(LA57));
-+	cr4_fixed1_update(X86_CR4_PKS,        ecx, feature_bit(PKS));
- 
- #undef cr4_fixed1_update
- }
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 91723a226bf3..82f79ac46d7b 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -222,6 +222,8 @@ struct nested_vmx {
- 	u64 vmcs01_debugctl;
- 	u64 vmcs01_guest_bndcfgs;
- 
-+	u64 vmcs01_guest_pkrs;
-+
- 	/* to migrate it to L1 if L2 writes to L1's CR8 directly */
- 	int l1_tpr_threshold;
- 
--- 
-2.25.1
+I think this can be made to work, but it will be awkward.  On TDX, for example, what exactly are the semantics supposed to be?  An error code if the memory isn't all zero?  An error code if it has ever been written?
 
+Fundamentally, I think this is because your proposed lifecycle for these memfiles results in a lightweight API but is awkward for the intended use cases.  You're proposing, roughly:
+
+1. Create a memfile. 
+
+Now it's in a shared state with an unknown virt technology.  It can be read and written.  Let's call this state BRAND_NEW.
+
+2. Bind to a VM.
+
+Now it's an a bound state.  For TDX, for example, let's call the new state BOUND_TDX.  In this state, the TDX rules are followed (private memory can't be converted, etc).
+
+The problem here is that the BOUND_NEW state allows things that are nonsensical in TDX, and the binding step needs to invent some kind of semantics for what happens when binding a nonempty memfile.
+
+
+So I would propose a somewhat different order:
+
+1. Create a memfile.  It's in the UNBOUND state and no operations whatsoever are allowed except binding or closing.
+
+2. Bind the memfile to a VM (or at least to a VM technology).  Now it's in the initial state appropriate for that VM.
+
+For TDX, this completely bypasses the cases where the data is prepopulated and TDX can't handle it cleanly.  For SEV, it bypasses a situation in which data might be written to the memory before we find out whether that data will be unreclaimable or unmovable.
+
+
+----------------------------------------------
+
+Now I have a question, since I don't think anyone has really answered it: how does this all work with SEV- or pKVM-like technologies in which private and shared pages share the same address space?  I sounds like you're proposing to have a big memfile that contains private and shared pages and to use that same memfile as pages are converted back and forth.  IO and even real physical DMA could be done on that memfile.  Am I understanding correctly?
+
+If so, I think this makes sense, but I'm wondering if the actual memslot setup should be different.  For TDX, private memory lives in a logically separate memslot space.  For SEV and pKVM, it doesn't.  I assume the API can reflect this straightforwardly.
+
+And the corresponding TDX question: is the intent still that shared pages aren't allowed at all in a TDX memfile?  If so, that would be the most direct mapping to what the hardware actually does.
+
+--Andy
