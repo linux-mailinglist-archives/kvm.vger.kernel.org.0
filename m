@@ -2,76 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE58350E1B4
-	for <lists+kvm@lfdr.de>; Mon, 25 Apr 2022 15:30:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8708D50E1C2
+	for <lists+kvm@lfdr.de>; Mon, 25 Apr 2022 15:31:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242017AbiDYNdU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Apr 2022 09:33:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41454 "EHLO
+        id S242090AbiDYNdz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Apr 2022 09:33:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242013AbiDYNbV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Apr 2022 09:31:21 -0400
+        with ESMTP id S240542AbiDYNdQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Apr 2022 09:33:16 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 195D140A33
-        for <kvm@vger.kernel.org>; Mon, 25 Apr 2022 06:28:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4DD0F26559
+        for <kvm@vger.kernel.org>; Mon, 25 Apr 2022 06:30:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650893289;
+        s=mimecast20190719; t=1650893402;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1zia9ZkLNn3Uw1gbiJ05wW12+mUK9KGbre/JX1TEYww=;
-        b=VcqWmSmKzbSBUCYVjsM1TW22nDY/k0TD1OlSSLfLBMLccu5TPw29W7AlREBKtR+ExHwL9a
-        gC3H6Y+F1wnx/afqZ72oGp9llBRazdhiiruoAmLlJVWuPkZAhmCyku7p9TTN1tts5MEGUq
-        02jpqKlrbZH9eaO7yyNHBIn1w+scW24=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=2ysjpn5GurDC9K04LZuM1iXJthxfVvp1YJZ3HYeR+zo=;
+        b=dn30iG6bZ+sG85PGWjE8fiqIV6v5eH3Gq654DlrczaWRo1g3pLmDpKjlA05kxIM8UM00TD
+        wlJsKfyyL+Jk31srMdkyhUlGwGtyW6iaDgqNy7spzyzo/zpw8oAYaHOvHmqlaSDKOfpyuT
+        ySvsjIzZEyxyGGAQyshx9JE0c1Gh6XA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-66-8d3l4E5dN4q9Rv2x2pQafA-1; Mon, 25 Apr 2022 09:28:08 -0400
-X-MC-Unique: 8d3l4E5dN4q9Rv2x2pQafA-1
-Received: by mail-wr1-f69.google.com with SMTP id j21-20020adfa555000000b0020adb9ac14fso805120wrb.13
-        for <kvm@vger.kernel.org>; Mon, 25 Apr 2022 06:28:07 -0700 (PDT)
+ us-mta-474-4yDbiNSaMRCPeqGLskkRWw-1; Mon, 25 Apr 2022 09:30:01 -0400
+X-MC-Unique: 4yDbiNSaMRCPeqGLskkRWw-1
+Received: by mail-wm1-f70.google.com with SMTP id n186-20020a1c27c3000000b00392ae974ca1so3074wmn.0
+        for <kvm@vger.kernel.org>; Mon, 25 Apr 2022 06:30:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=1zia9ZkLNn3Uw1gbiJ05wW12+mUK9KGbre/JX1TEYww=;
-        b=v5Z2g4f9nt2gFjkvjxf+bJOSed4t6VRQVRBsMk2BN0HI86xBpFhlHVXKZh7TbGf4J+
-         vfXBnePs4YA/hTHGpdR3B6lSNJRfunKBa/eE5meV5TaiyA70/hLxHaObL6C1Ibcid6wa
-         8ar0KeoMZhWvi+gg8WUkWma2ff0zbLTYnBRali1SKwKi2VveYzsOITQFBsqCJ/elmbJV
-         lHBnbpQoYWZWMLWbC3yp1CLvXL7A6ljSsW73JRupMRV6cjrWM9ljmeBz0JCIIB6GzOGO
-         oOeqa3hn/7lXPAI6R282YiAip/Exy8T1XLqozN0ZHI1gJiEO/8sh5xO/aWc03/gG455H
-         KS8w==
-X-Gm-Message-State: AOAM533VK7/r+/o1UWWcsKQ9QJHpxY3/A6xUeAXHw8hrO6hWgiq8XLc5
-        lwfykImP+JB8fS/Cpo00/gItwEmn4GXQdtQuI2PhTTjSqYyQmr5B6IefsStymgcN0Go7RRDRUBY
-        a/ddqoCGmwGGM
-X-Received: by 2002:a5d:59a5:0:b0:20a:da19:32cf with SMTP id p5-20020a5d59a5000000b0020ada1932cfmr4802854wrr.147.1650893286688;
-        Mon, 25 Apr 2022 06:28:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJybpiyw2AUDdzK8eie5iFirsBO1OK+mtnmEkz7wJ78OukDW7WDIUwz2HH/Vs/rM20leeO9fkQ==
-X-Received: by 2002:a5d:59a5:0:b0:20a:da19:32cf with SMTP id p5-20020a5d59a5000000b0020ada1932cfmr4802842wrr.147.1650893286448;
-        Mon, 25 Apr 2022 06:28:06 -0700 (PDT)
+        bh=2ysjpn5GurDC9K04LZuM1iXJthxfVvp1YJZ3HYeR+zo=;
+        b=IDGBolGkCyGr8BzXtpKIHCyVXY/fY27Fs7sMrQ1aVnz6WhYfEqnH2QDU/ouZlG1GfI
+         H2vCGfrTqPsnM3/2O80zQL4JyuZPnSbDlHUTEH9xyH1FLAJIjbwi0gw/FgH91a2OVKVQ
+         IGwj2UFdul9FDEQ+ujDBvCDZUbwlmMvhiuuiNzTCXgl1bIkJ0voQNPCxR7wn2ZiqxB2W
+         S+ZBwQjU6j26nCSuwi5t/qmRTyabaTa1Cc5K3rnRQ0bvI46/HHc6KMCsd5nJn2/w89L8
+         Im9QDhIpH0LMz8FO884glfI3QPsjNnssFnVkemd6NJ1/R3dfODec9Nl8qo8D+PnxWKRY
+         FlJQ==
+X-Gm-Message-State: AOAM5325O3eZZ5+lMhoo3E6bHUGFsvnqzUv2FsqOGkrx7fdTQ7yq/ar8
+        LFKbDyQ4EKbFIaIHmslxSHDqnbl8uOe68E5jR2/BIhtEtT/3u2UI+fs6vaudT8h7mFa/x54nm1M
+        rRsHdv0GG+paD
+X-Received: by 2002:a5d:584f:0:b0:20a:83aa:ad2a with SMTP id i15-20020a5d584f000000b0020a83aaad2amr14778251wrf.610.1650893400056;
+        Mon, 25 Apr 2022 06:30:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyB26ThkGATvZ4h88Pq1rEn0Bl6acuGFnadbKgKghFn8mGUwtq7J8BvXFzA83LeFHXja0gk1A==
+X-Received: by 2002:a5d:584f:0:b0:20a:83aa:ad2a with SMTP id i15-20020a5d584f000000b0020a83aaad2amr14778234wrf.610.1650893399876;
+        Mon, 25 Apr 2022 06:29:59 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:e3ec:5559:7c5c:1928? ([2001:b07:6468:f312:e3ec:5559:7c5c:1928])
-        by smtp.googlemail.com with ESMTPSA id c3-20020a05600c148300b0038ebc8ad740sm12622635wmh.1.2022.04.25.06.28.03
+        by smtp.googlemail.com with ESMTPSA id l6-20020a1c2506000000b0038e6fe8e8d8sm10873123wml.5.2022.04.25.06.29.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Apr 2022 06:28:05 -0700 (PDT)
-Message-ID: <6f716388-ea25-288a-847e-c602051157b6@redhat.com>
-Date:   Mon, 25 Apr 2022 15:28:03 +0200
+        Mon, 25 Apr 2022 06:29:59 -0700 (PDT)
+Message-ID: <d87652a4-660b-ce49-005c-adfda0537d29@redhat.com>
+Date:   Mon, 25 Apr 2022 15:29:58 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.8.0
-Subject: Re: [lttng-dev] Unexport of kvm_x86_ops vs tracer modules
+Subject: Re: [kvm-unit-tests RESEND PATCH v3 8/8] x86: nSVM: Correct
+ indentation for svm_tests.c part-2
 Content-Language: en-US
-To:     Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        lttng-dev <lttng-dev@lists.lttng.org>,
-        rostedt <rostedt@goodmis.org>, KVM list <kvm@vger.kernel.org>
-References: <1218866473.10909.1649432186473.JavaMail.zimbra@efficios.com>
- <3c11308e-006a-a7e9-8482-c6b341690530@redhat.com>
- <1622857974.11247.1649441213797.JavaMail.zimbra@efficios.com>
- <358746537.34457.1650891622938.JavaMail.zimbra@efficios.com>
+To:     Manali Shukla <manali.shukla@amd.com>, seanjc@google.com
+Cc:     kvm@vger.kernel.org
+References: <20220425114417.151540-1-manali.shukla@amd.com>
+ <20220425114417.151540-9-manali.shukla@amd.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <358746537.34457.1650891622938.JavaMail.zimbra@efficios.com>
+In-Reply-To: <20220425114417.151540-9-manali.shukla@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -84,15 +81,10 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/25/22 15:00, Mathieu Desnoyers wrote:
-> We are at 5.18-rc4 now. Should I expect this unexport to stay in place
-> for 5.18 final and go ahead with using kallsyms to find this symbol from
-> lttng-modules instead ?
+On 4/25/22 13:44, Manali Shukla wrote:
+> +			if (r->rip == (u64) & vmrun_rip) {
 
-Yes, I don't think honestly that there's any reason to have the symbols 
-in place for out-of-tree modules.  I would have hoped Steven to chime 
-in, but this also does not seem to be one of the cases where using 
-trace_*_enabled() is the way to go.
+This reindentation is wrong (several instances below).
 
 Paolo
 
