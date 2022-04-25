@@ -2,137 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 836AF50E74F
-	for <lists+kvm@lfdr.de>; Mon, 25 Apr 2022 19:30:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C55F050E764
+	for <lists+kvm@lfdr.de>; Mon, 25 Apr 2022 19:35:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243927AbiDYRce (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Apr 2022 13:32:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37674 "EHLO
+        id S244030AbiDYRiF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Apr 2022 13:38:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244035AbiDYRcb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Apr 2022 13:32:31 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DA48C13;
-        Mon, 25 Apr 2022 10:29:26 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23PEi3wm010252;
-        Mon, 25 Apr 2022 17:29:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=N0FdWIrseGzC8YyI83oVDNXfI2pKptqK1F8lrNfRxC8=;
- b=eVLgFZgy5ODeXwQi/DvL9VEkt9tmujPkq6f8T+itF2W3fuMfg393We6Nz8mYTanWBu4Y
- Z+8qPBNZ8X329UOMSFDAtjwcEsxNyu9IWFgsrxGPnMXB49aE7t9mD9pVifZYaJyLxs4R
- /5wHOCYMtO+0ToYIcxdZTqGBUSRS/62Nf9EbNI69+REEog/X7S37vp+DYQUwzhiDJvkU
- NlgW7Fd7P76oo+CW9wCeaFVOlMTNuOmvP2vENdm0dt8VC7ijQnaYO2AbgEr1nW4Py1i4
- jIJqJOlgY8KgmbzqiPC5BGgLF6o2TMoj8xYbGa35xH0boVKgmGa+19zpWqhWm2zPvyYp xQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fnwng3yjj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Apr 2022 17:29:23 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 23PGqWLb019269;
-        Mon, 25 Apr 2022 17:29:23 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fnwng3yhv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Apr 2022 17:29:22 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23PHTDqp027136;
-        Mon, 25 Apr 2022 17:29:21 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 3fm938tqnp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Apr 2022 17:29:20 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23PHTUuk12452370
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 25 Apr 2022 17:29:30 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B6A45AE045;
-        Mon, 25 Apr 2022 17:29:17 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2ACB4AE04D;
-        Mon, 25 Apr 2022 17:29:17 +0000 (GMT)
-Received: from [9.171.38.55] (unknown [9.171.38.55])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 25 Apr 2022 17:29:17 +0000 (GMT)
-Message-ID: <13d0d706-abc4-3e4d-88c3-6447636fd1fd@linux.ibm.com>
-Date:   Mon, 25 Apr 2022 19:29:16 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v2 0/2] Dirtying, failing memop: don't indicate
- suppression
+        with ESMTP id S244090AbiDYRhp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Apr 2022 13:37:45 -0400
+Received: from na01-obe.outbound.protection.outlook.com (mail-centralusazon11021015.outbound.protection.outlook.com [52.101.62.15])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A53C86FA15;
+        Mon, 25 Apr 2022 10:34:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DUQIBTENsqHksKmlePu31M1FSv78DXKFKEPMcafBoCAM5Q8sJ48pVgC277Dp79aqFOxgFi6qlv8n5zXz7vJM5lZxUqIZ0jZHw1l9lpsYzH/UcPRlRvZheJkyJxx8Sb8TusOXiRr47h8dpubITpRNcRnZ3BamuAaMUH3lAAzyvlldXL+FBq2mpO3NddhKL9M5H35PVQE3rCJaOWLc8Lz8EeSOVYNIGDklay1nHS2YqSR9p1ZLUHOLjgOc18u9oOxrpwLdncoLzcopW03Asx90B1PitETG+nf9kWGgvtiqNChc889Xu+1ijHVbsdk6KcO55uwmnuZt6lNROBd/9qoxfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UyCFs/9kObdnsEh9IhLSU5L5X0yzjkm6ggeROPEfx8M=;
+ b=KpDHERUluAMULfEkGOrDahVvbYhnBssxWKSnoTkiX+Fm4h6Z9dtro9BshG86nAA90mHDRIHW+H+5tmoIgFt8C7sMBpk9e+fGXSOt9P/i5vAT7XBJPGXgC++hH2+x6aTLHVjdstKp1HGPctK7SSVrli+TCAETTAh5KAj5xl4haCPSOWxM8CuA7JCxc0Noj4BUtlI5WHJMkGD6WJAvgYOU7FIuXU/C2CkTedRi2fZGhXjr1pV9G1vTLD0w/q5O77nUoBQLGJMq7XnY960tAaSUsKxlS9UjzlOepq4uXIrhQZ9SFMKh4OiB4FeWX3RQOPo3ilNbYGZQnJeLGNjRmWZNig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UyCFs/9kObdnsEh9IhLSU5L5X0yzjkm6ggeROPEfx8M=;
+ b=PYB3zj883v/3NSGLrmXkV18r0UzkANq8RvFJ20or5NkRaC3EK4fVvBpwoWjT6Ixh4XyND1RbCdTZz6rXT4iRSYufYuCJzVMKhkKXG0jnzKTMnmzfamgWrMe/BwFBuO1LvaeF+qWHpZ9jb39XSNWhfGlHs04H8vNE7kGsago/+V0=
+Received: from PH0PR21MB3025.namprd21.prod.outlook.com (2603:10b6:510:d2::21)
+ by CY4PR21MB0469.namprd21.prod.outlook.com (2603:10b6:903:db::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5227.4; Mon, 25 Apr
+ 2022 17:34:36 +0000
+Received: from PH0PR21MB3025.namprd21.prod.outlook.com
+ ([fe80::dd77:2d4d:329e:87df]) by PH0PR21MB3025.namprd21.prod.outlook.com
+ ([fe80::dd77:2d4d:329e:87df%6]) with mapi id 15.20.5227.004; Mon, 25 Apr 2022
+ 17:34:36 +0000
+From:   "Michael Kelley (LINUX)" <mikelley@microsoft.com>
+To:     Wei Liu <wei.liu@kernel.org>, vkuznets <vkuznets@redhat.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v3 07/34] x86/hyperv: Introduce
+ HV_MAX_SPARSE_VCPU_BANKS/HV_VCPUS_PER_SPARSE_BANK constants
+Thread-Topic: [PATCH v3 07/34] x86/hyperv: Introduce
+ HV_MAX_SPARSE_VCPU_BANKS/HV_VCPUS_PER_SPARSE_BANK constants
+Thread-Index: AQHYUAJtfXLi4XUjsUG86ifscbB5yK0A13uAgAAc0nA=
+Date:   Mon, 25 Apr 2022 17:34:36 +0000
+Message-ID: <PH0PR21MB302548198FBE43E7D51FB154D7F89@PH0PR21MB3025.namprd21.prod.outlook.com>
+References: <20220414132013.1588929-1-vkuznets@redhat.com>
+ <20220414132013.1588929-8-vkuznets@redhat.com>
+ <20220425154721.xunncuuuzs55nwc7@liuwe-devbox-debian-v2>
+In-Reply-To: <20220425154721.xunncuuuzs55nwc7@liuwe-devbox-debian-v2>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20220425100147.1755340-1-scgl@linux.ibm.com>
- <8095d0de-dd99-0388-b1d4-e59b01dc4be0@linux.ibm.com>
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-In-Reply-To: <8095d0de-dd99-0388-b1d4-e59b01dc4be0@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ZkwzIZly1vuuNPivtdv1igWVwga-Mhr3
-X-Proofpoint-ORIG-GUID: 7Fiwm8QBpGHHlEky2A7xZEoSpjPTUcbd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-25_09,2022-04-25_03,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 adultscore=0 mlxlogscore=962 suspectscore=0 malwarescore=0
- spamscore=0 phishscore=0 priorityscore=1501 clxscore=1015 mlxscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204250076
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=94b7bd67-1daf-4f9d-8231-3aff00339454;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2022-04-25T17:30:30Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 0c9a6a40-b15d-4829-b315-08da26e1de4f
+x-ms-traffictypediagnostic: CY4PR21MB0469:EE_
+x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
+x-microsoft-antispam-prvs: <CY4PR21MB0469A7BFFA033094D79A4365D7F89@CY4PR21MB0469.namprd21.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: dZMiq1HENwo863sXPOXGB75kZIh//cBombTb1BfGqV5Zq9mBx0P7GbFuDvY7Ec0IRgiNafWj2roFzkVViAS+cT7rhxoTRwCClSu6yrNzckq3fPOfWZB5jaKYxDmENzNhUWEA1hVu+90MfbbkHVIigqzEBoKKGQfIcDP8ySXGl3DuqPPOpDjmfToMeS9YQJSxw1jujET+RbDEx40yZg0tCeUaO54bpGbKyplFsJzWMTzwqrw+TF/uZW1IBysXghWynmGhq3obTSKazyrd5onCRa6v1c1O3fSm12FYZREpGGRkd3gQVODDRiK2yCmbUo4izyNBEWvc/o4nk5UpzWujyJFZlfvwM8akYmcHqzuPMBtIn7n4LeC1Ie+IsFkouJiCJAzKspB+gm4nlKQUhTR6D7gpJnuVKvugW/zpCEdJM0sS4ESx7Y8BaXenjNuORCXFPGk2rhZ5QkYKjwK32cJFrjLp/1+Plnbdyq/5CVav8/GF8FtkkGozOFdCPS/gKJxrs6FCcnsrvMXJFrpHBS9bnalkiCsAWFMIT5z6VnHR4lIg5tByT8KqZyasrG3hSMXGRSKYh+xHJoCYIxDzQkSe0YjEQbe9C3C+yFwaBv4PJ3mB+HPv2gpinLf8iBi5X++MFuAGnV9VmTLlabb7B0z8BZEglShsnR8xN7Oz0I6PJwUn4hPS5qPvxL/0mfLoTnaUCWJv/LTJLBc3LfDOmu38I0KD9J2bU7a0miTvIQTuEEtbPR1SqSqotA92x6ygs13Z
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR21MB3025.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(451199009)(26005)(9686003)(508600001)(2906002)(8676002)(52536014)(4326008)(33656002)(7696005)(5660300002)(7416002)(8936002)(66946007)(6506007)(66476007)(66556008)(76116006)(66446008)(8990500004)(64756008)(86362001)(186003)(122000001)(82950400001)(82960400001)(10290500003)(38100700002)(55016003)(38070700005)(54906003)(83380400001)(316002)(71200400001)(110136005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?nGIsru5pY8BU/ikvA3nai3jjtBcvjrPiIAcnJplio3++Or/wjGB5FbaBwpBb?=
+ =?us-ascii?Q?VGCTzE82U22FdimGJKq0qBvD02cJ/3DTMnpYtQAKKvIo9et5tsu/3gV9kJvR?=
+ =?us-ascii?Q?5tUIy3o2OQDj7xvUsuZ4kb0DkizxHvC2ZjBajulRWNLpe/9+g2yrpJwzbiVK?=
+ =?us-ascii?Q?hlT5RZITwaQIV5H7jcVUGj+JVA+kWbgUwg8kndFxLFYUlCnhko/tmT2AfYyr?=
+ =?us-ascii?Q?WqB/Hw6YQ28UxII/WJQ4STVxzwuGUHXUQoLmwzC28ePcIXVuolbF4RPY/kn7?=
+ =?us-ascii?Q?ohzuNinumXJ2yUwYjEoyFNv4X0/VeIocz+VyJm9IkGP08ceSp0aw9lICStmV?=
+ =?us-ascii?Q?RutZ2k6IyT2rErWb8YeKlGUtnAgsfsEhNKFXpYXucYHb+8yA5rhbUcrSQP97?=
+ =?us-ascii?Q?a9EQweNOf1Zpfr+kXKVHg+1F78dMj1EMsaoR3QtqYSV4ruJ5dlM4gNhdUtbG?=
+ =?us-ascii?Q?Lzu9w8sHbfcs+fM1qMHadT8XyCVvSGpP8T52YueTJ8HECvbiZ5FgrsOhtfJA?=
+ =?us-ascii?Q?vdIzgXUcYunLLxajgHQ1OGSjC8qjNMCi9H9qLIkzTdfwfpYj+C0DvhwLPEe8?=
+ =?us-ascii?Q?TLpbwO7i57ntjvBRtdVutBafiukNZKz+Dk+QVutM6v79dGq9PNBXlF40JnHp?=
+ =?us-ascii?Q?UUONJZc8kzEVLxqFdD1ofY4N/dNLiva8MzzTJLohbzUNxgIpZh/5u8hPBoPn?=
+ =?us-ascii?Q?ph+n8VenAmC943vE1fWisG3qcqW/Saoex9NFvcSGwoEPtvDR5QhV8FKTNTQ5?=
+ =?us-ascii?Q?SWAOaa4nXdkibTUbV/gIoCX+g3/vSXQEiUvbl1RUO1Hn7HgGgO5uJ/bNpy5B?=
+ =?us-ascii?Q?Dro8FMJQEC+mxRyoqOT4aI0qlzrG+jzWn1w04rV4dqS3sZMxyKi7sqZiCLBf?=
+ =?us-ascii?Q?cLYX+sZYAbl4kKZj786mk2WS9OV3ELP2C/0DBRW9kWW6JMj44gBnpkhXNdB6?=
+ =?us-ascii?Q?rUMU5fo/dETuOmk312MRaYkGF/yCqIQuRkBIQ1KqVNHO1owyLK6M3gPFEJan?=
+ =?us-ascii?Q?kXscw2u4iTssGklKLLCXOn1Ext41SiOw3d8Py7/2AWQ+k0SrQt5s+yPVz/iu?=
+ =?us-ascii?Q?roG9iQhaBr0MqTq4o9zLK80UzaHPr01+U8fdWy1x7VJ4KBdyStD/dpRhHSlO?=
+ =?us-ascii?Q?lnbT+e1cTRoUxIlfQrOCaBNEzFzliePeVOw+4i1+d/texXEgox2btWU97Ihy?=
+ =?us-ascii?Q?QFDZIGeH2krLRmv4DbIdHXAhet+u+eQXhftYDfQtD6O21vARQhlyKoZkd7h3?=
+ =?us-ascii?Q?GkNKAxVjpYje83+DKBB4cD1epR99dt0qcXYAu4hg+p5kInvmWNzm84NHcfVs?=
+ =?us-ascii?Q?CvNEgxaWZTzvkRXHgbP8sTW9BvJabdNOMwcwTF6jjO9iad5Emci7ltUGCmDl?=
+ =?us-ascii?Q?0OPWy+qWxEBkzJSUVamHloDIVYcR5jZW7bQv0apa0Rjv9yhcbGPwRrR1OTdW?=
+ =?us-ascii?Q?ALtWWVB2D/uUOa3R8NDHKoT+6D6ahN4y34NCGdtPRhez0nSTMPva3lF1pE3U?=
+ =?us-ascii?Q?UEc2glxF5XzjGdQBt5vMMDDCa28fXsEXxdIWCl/s6Ew1V7ilYHbjgxJATAxR?=
+ =?us-ascii?Q?yR1XbyRzvJ0I6mfFccpcy5Wo4c3QSLDFOHS4G6Qt1i119MhD1OGLSh8fOrvA?=
+ =?us-ascii?Q?Ov2XJ8nB9NZqOk1/FLEpI7k4XR5dZ8r6uNiU32oXXij7b6N+2MnFzSAyiHFi?=
+ =?us-ascii?Q?E2ElMrcdyNB35QYVHC5/ubudIYSHASnltxBtVXyi3Mb43cQLmYfX/U5/WkgW?=
+ =?us-ascii?Q?BIn/J29IkyhJ3WR68jLi2v3dqmPBxZA=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR21MB3025.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0c9a6a40-b15d-4829-b315-08da26e1de4f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Apr 2022 17:34:36.4908
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: AlPkxRpexLEu6zKLS0+lRoY3TuYGM4n+TeLGd3mi6aQ18Bji7buL3rScDWkcrdOyoH2kN8yBHQtqUkfiPiYqprSD7j9pObmQo8kxbgoeZPk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR21MB0469
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_PASS,SPF_NONE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/25/22 18:30, Christian Borntraeger wrote:
-> Am 25.04.22 um 12:01 schrieb Janis Schoetterl-Glausch:
->> If a memop fails due to key checked protection, after already having
->> written to the guest, don't indicate suppression to the guest, as that
->> would imply that memory wasn't modified.
->>
->> This could be considered a fix to the code introducing storage key
->> support, however this is a bug in KVM only if we emulate an
->> instructions writing to an operand spanning multiple pages, which I
->> don't believe we do.
->>
-> 
-> Thanks applied. I think it makes sense for 5.18 nevertheless.
+From: Wei Liu <wei.liu@kernel.org> Sent: Monday, April 25, 2022 8:47 AM
 
-Janosch had some concerns because the protection code being 000 implies
-that the effective address in the TEID is unpredictable.
-Let's see if he chimes in.
+> On Thu, Apr 14, 2022 at 03:19:46PM +0200, Vitaly Kuznetsov wrote:
+> > It may not come clear from where the magical '64' value used in
+> > __cpumask_to_vpset() come from. Moreover, '64' means both the maximum
+> > sparse bank number as well as the number of vCPUs per bank. Add defines
+> > to make things clear. These defines are also going to be used by KVM.
+> >
+> > No functional change.
+> >
+> > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> > ---
+> >  include/asm-generic/hyperv-tlfs.h |  5 +++++
+> >  include/asm-generic/mshyperv.h    | 11 ++++++-----
+> >  2 files changed, 11 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/include/asm-generic/hyperv-tlfs.h b/include/asm-generic/hy=
+perv-tlfs.h
+> > index fdce7a4cfc6f..020ca9bdbb79 100644
+> > --- a/include/asm-generic/hyperv-tlfs.h
+> > +++ b/include/asm-generic/hyperv-tlfs.h
+> > @@ -399,6 +399,11 @@ struct hv_vpset {
+> >  	u64 bank_contents[];
+> >  } __packed;
+> >
+> > +/* The maximum number of sparse vCPU banks which can be encoded by 'st=
+ruct
+> hv_vpset' */
+> > +#define HV_MAX_SPARSE_VCPU_BANKS (64)
+> > +/* The number of vCPUs in one sparse bank */
+> > +#define HV_VCPUS_PER_SPARSE_BANK (64)
+>=20
+> I think replacing the magic number with a macro is a good thing.
+>=20
+> Where do you get these names? Did you make them up yourself?
+>=20
+> I'm trying to dig into internal code to find the most appropriate names,
+> but I couldn't find any so far. Michael, do you have insight here?
+>=20
+> Thanks,
+> Wei.
 
-> 
->> v1 -> v2
->>   * Reword commit message of patch 1
->>
->> Janis Schoetterl-Glausch (2):
->>    KVM: s390: Don't indicate suppression on dirtying, failing memop
->>    KVM: s390: selftest: Test suppression indication on key prot exception
->>
->>   arch/s390/kvm/gaccess.c                   | 47 ++++++++++++++---------
->>   tools/testing/selftests/kvm/s390x/memop.c | 43 ++++++++++++++++++++-
->>   2 files changed, 70 insertions(+), 20 deletions(-)
->>
->>
->> base-commit: af2d861d4cd2a4da5137f795ee3509e6f944a25b
-> 
+These names look good to me.  The "sparse" and "bank" terminology
+comes from the Hyper-V TLFS, sections 7.8.7.3 thru 7.8.7.5.  The TLFS
+uses the constant "64", but for two different purposes as Vitaly
+points out.  But in both cases the "64" accrues from the use of
+a uint64 value as a bitmap.
 
+Michael
