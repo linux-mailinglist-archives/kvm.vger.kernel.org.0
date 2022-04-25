@@ -2,112 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F73050D3C7
-	for <lists+kvm@lfdr.de>; Sun, 24 Apr 2022 19:00:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62FE150D6A1
+	for <lists+kvm@lfdr.de>; Mon, 25 Apr 2022 03:35:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230092AbiDXRDG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 Apr 2022 13:03:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41722 "EHLO
+        id S240183AbiDYBiH convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sun, 24 Apr 2022 21:38:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234895AbiDXRDF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 Apr 2022 13:03:05 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DB1EAE7C;
-        Sun, 24 Apr 2022 10:00:03 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0B6C3611DE;
-        Sun, 24 Apr 2022 17:00:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0358C385AD;
-        Sun, 24 Apr 2022 17:00:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1650819602;
-        bh=Je+h7tOqeRuiQPlVHJ9YBtSjYKQSsE87o9H6bqNhv0E=;
-        h=In-Reply-To:References:Date:From:To:Cc:Subject:From;
-        b=LQiLb34FBw2eNgmoSiK231PONOUqKINkvAm71Hqa/6IFcH84IBd4KI62BNG2mLhtK
-         Hc6wfzDdol11Q6iTwsjdogfokTjyEWWEbGSpsOx/knOJKp6Crx5ySz6ZBPNfCPm2Y2
-         UTOM8YD+BmK8eAmsrEjDxw20mEt5bF7RNwdoAAbcP7G3bq3wsJBVcC+ket5QCp7pNZ
-         ebwBj9BNaRZhioAXdPrTG0cP2ypE2dSneAE2Y4RaBLyhY3E0B2q6+EJuUHx1fwlqL9
-         ky9DUb3woG18oxgarN9knFcnkhJA5NdzVOb2xc+hnzYweKSFCn+6GsqSZcJd4W0g4C
-         eLcYkopG6nWTg==
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailauth.nyi.internal (Postfix) with ESMTP id AF9FB27C0054;
-        Sun, 24 Apr 2022 12:59:59 -0400 (EDT)
-Received: from imap48 ([10.202.2.98])
-  by compute2.internal (MEProxy); Sun, 24 Apr 2022 12:59:59 -0400
-X-ME-Sender: <xms:DYJlYrS34FbKgFIeuLj_dSMvkd5cU95kEUVKwMNEB6sujYQvoPVv6Q>
-    <xme:DYJlYswLoJzXo6S6_R7s1t-GiUI4O6DLQ-Pd_h4VfsSNC7qvDxGEUISicXFj94Pnp
-    ZNy6B9ZgrmKpY1sYlo>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrtdelgddutdelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehn
-    ugihucfnuhhtohhmihhrshhkihdfuceolhhuthhosehkvghrnhgvlhdrohhrgheqnecugg
-    ftrfgrthhtvghrnhepvdfhuedvtdfhudffhfekkefftefghfeltdelgeffteehueegjeff
-    udehgfetiefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrh
-    homheprghnugihodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduudeiudek
-    heeifedvqddvieefudeiiedtkedqlhhuthhopeepkhgvrhhnvghlrdhorhhgsehlihhnuh
-    igrdhluhhtohdruhhs
-X-ME-Proxy: <xmx:DYJlYg2mLjrVZeMpqDRGXmRBOA-ECqlSFMjTE8uGdMFCztXmSs1Oww>
-    <xmx:DYJlYrDN603TmyI_zfJc_c4WIOl52Lr3VQyhal9I5Eb6ECdOYdjpsg>
-    <xmx:DYJlYkh4toKPkrvr3za3g-nANRCLI8UWxf7YtZx3gqdjE5hym31nCA>
-    <xmx:D4JlYtA1fc6cjZhfnkcH18sWUIyRZ7lxNJCXAb7CsWUmjH9hBozjjg>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 5AA8821E006E; Sun, 24 Apr 2022 12:59:57 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-569-g7622ad95cc-fm-20220421.002-g7622ad95
-Mime-Version: 1.0
-Message-Id: <3b99f157-0f30-4b30-8399-dd659250ab8d@www.fastmail.com>
-In-Reply-To: <20220422105612.GB61987@chaop.bj.intel.com>
-References: <YkQzfjgTQaDd2E2T@google.com> <YkSaUQX89ZEojsQb@google.com>
- <80aad2f9-9612-4e87-a27a-755d3fa97c92@www.fastmail.com>
- <YkcTTY4YjQs5BRhE@google.com>
- <83fd55f8-cd42-4588-9bf6-199cbce70f33@www.fastmail.com>
- <YksIQYdG41v3KWkr@google.com> <Ykslo2eo2eRXrpFR@google.com>
- <eefc3c74-acca-419c-8947-726ce2458446@www.fastmail.com>
- <Ykwbqv90C7+8K+Ao@google.com> <YkyEaYiL0BrDYcZv@google.com>
- <20220422105612.GB61987@chaop.bj.intel.com>
-Date:   Sun, 24 Apr 2022 09:59:37 -0700
-From:   "Andy Lutomirski" <luto@kernel.org>
-To:     "Chao Peng" <chao.p.peng@linux.intel.com>,
-        "Sean Christopherson" <seanjc@google.com>
-Cc:     "Quentin Perret" <qperret@google.com>,
-        "Steven Price" <steven.price@arm.com>,
-        "kvm list" <kvm@vger.kernel.org>,
-        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        "Linux API" <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        "Jonathan Corbet" <corbet@lwn.net>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        "Wanpeng Li" <wanpengli@tencent.com>,
-        "Jim Mattson" <jmattson@google.com>,
-        "Joerg Roedel" <joro@8bytes.org>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Hugh Dickins" <hughd@google.com>,
-        "Jeff Layton" <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        "Mike Rapoport" <rppt@kernel.org>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        "Vlastimil Babka" <vbabka@suse.cz>,
-        "Vishal Annapurve" <vannapurve@google.com>,
-        "Yu Zhang" <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        "Dave Hansen" <dave.hansen@intel.com>,
-        "Andi Kleen" <ak@linux.intel.com>,
-        "David Hildenbrand" <david@redhat.com>,
-        "Marc Zyngier" <maz@kernel.org>, "Will Deacon" <will@kernel.org>
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM guest
- private memory
-Content-Type: text/plain
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        with ESMTP id S240181AbiDYBh7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 24 Apr 2022 21:37:59 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E713EF32B2
+        for <kvm@vger.kernel.org>; Sun, 24 Apr 2022 18:34:55 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4KmnWg4mX6zCsH1;
+        Mon, 25 Apr 2022 09:30:23 +0800 (CST)
+Received: from kwepemm600015.china.huawei.com (7.193.23.52) by
+ kwepemi500008.china.huawei.com (7.221.188.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Mon, 25 Apr 2022 09:34:53 +0800
+Received: from kwepemm600015.china.huawei.com ([7.193.23.52]) by
+ kwepemm600015.china.huawei.com ([7.193.23.52]) with mapi id 15.01.2375.024;
+ Mon, 25 Apr 2022 09:34:53 +0800
+From:   "Wangjing(Hogan)" <hogan.wang@huawei.com>
+To:     "jgg@nvidia.com" <jgg@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "Huangweidong (C)" <weidong.huang@huawei.com>,
+        Yechuan <yechuan@huawei.com>
+Subject: Re:  [PATCH] vfio-pci: report recovery event after device recovery
+ successful
+Thread-Topic: [PATCH] vfio-pci: report recovery event after device recovery
+ successful
+Thread-Index: AdhYQ6REZrzWDB6aT9yrdNSXU0vsTg==
+Date:   Mon, 25 Apr 2022 01:34:53 +0000
+Message-ID: <9acffefb77ac4f228fb175a6d5272283@huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.166.163.49]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -116,47 +58,122 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+Ping
 
-On Fri, Apr 22, 2022, at 3:56 AM, Chao Peng wrote:
-> On Tue, Apr 05, 2022 at 06:03:21PM +0000, Sean Christopherson wrote:
->> On Tue, Apr 05, 2022, Quentin Perret wrote:
->> > On Monday 04 Apr 2022 at 15:04:17 (-0700), Andy Lutomirski wrote:
->     Only when the register succeeds, the fd is
->     converted into a private fd, before that, the fd is just a normal (shared)
->     one. During this conversion, the previous data is preserved so you can put
->     some initial data in guest pages (whether the architecture allows this is
->     architecture-specific and out of the scope of this patch).
+> 
+> As you all know, device faults are classified into the following
+> types: unrecoverable error and recoverable error. vfio-pci drvier will report
+> error event to user-space process while device occur hardware errors, and
+> still report the other error event after deivce recovery successful. So the
+> user-space process just like qemu can not identify the event is an hardware
+> error event or a device recovery successful event. So in order to solve this
+> problem, add an eventfd named recov_trigger to report device recovery
+> successful event, the user-space process can make a decision whether to
+> process the recovery event or not.
+> 
+> Signed-off-by: Hogan Wang <hogan.wang@huawei.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_core.c  | 13 +++++++++++--
+> drivers/vfio/pci/vfio_pci_intrs.c | 19 +++++++++++++++++++
+>  include/linux/vfio_pci_core.h     |  1 +
+>  include/uapi/linux/vfio.h         |  1 +
+>  4 files changed, 32 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index b7bb16f92ac6..2360cb44aa36 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -483,6 +483,10 @@ void vfio_pci_core_close_device(struct vfio_device
+> *core_vdev)
+>  		eventfd_ctx_put(vdev->err_trigger);
+>  		vdev->err_trigger = NULL;
+>  	}
+> +	if (vdev->recov_trigger) {
+> +		eventfd_ctx_put(vdev->recov_trigger);
+> +		vdev->recov_trigger = NULL;
+> +	}
+>  	if (vdev->req_trigger) {
+>  		eventfd_ctx_put(vdev->req_trigger);
+>  		vdev->req_trigger = NULL;
+> @@ -1922,8 +1926,13 @@ pci_ers_result_t
+> vfio_pci_core_aer_err_detected(struct pci_dev *pdev,
+> 
+>  	mutex_lock(&vdev->igate);
+> 
+> -	if (vdev->err_trigger)
+> -		eventfd_signal(vdev->err_trigger, 1);
+> +	if (state == pci_channel_io_normal) {
+> +		if (vdev->recov_trigger)
+> +			eventfd_signal(vdev->recov_trigger, 1);
+> +	} else {
+> +		if (vdev->err_trigger)
+> +			eventfd_signal(vdev->err_trigger, 1);
+> +	}
+> 
+>  	mutex_unlock(&vdev->igate);
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+> index 6069a11fb51a..be76ff76c361 100644
+> --- a/drivers/vfio/pci/vfio_pci_intrs.c
+> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
+> @@ -624,6 +624,17 @@ static int vfio_pci_set_err_trigger(struct
+> vfio_pci_core_device *vdev,
+>  					       count, flags, data);
+>  }
+> 
+> +static int vfio_pci_set_recov_trigger(struct vfio_pci_core_device *vdev,
+> +				    unsigned index, unsigned start,
+> +				    unsigned count, uint32_t flags, void *data) {
+> +	if (index != VFIO_PCI_ERR_IRQ_INDEX || start != 0 || count > 1)
+> +		return -EINVAL;
+> +
+> +	return vfio_pci_set_ctx_trigger_single(&vdev->recov_trigger,
+> +					       count, flags, data);
+> +}
+> +
+>  static int vfio_pci_set_req_trigger(struct vfio_pci_core_device *vdev,
+>  				    unsigned index, unsigned start,
+>  				    unsigned count, uint32_t flags, void *data) @@
+> -684,6 +695,14 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device
+> *vdev, uint32_t flags,
+>  			break;
+>  		}
+>  		break;
+> +	case VFIO_PCI_RECOV_IRQ_INDEX:
+> +		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
+> +		case VFIO_IRQ_SET_ACTION_TRIGGER:
+> +			if (pci_is_pcie(vdev->pdev))
+> +				func = vfio_pci_set_recov_trigger;
+> +			break;
+> +		}
+> +		break;
+>  	}
+> 
+>  	if (!func)
+> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h index
+> 74a4a0f17b28..d94addb18118 100644
+> --- a/include/linux/vfio_pci_core.h
+> +++ b/include/linux/vfio_pci_core.h
+> @@ -128,6 +128,7 @@ struct vfio_pci_core_device {
+>  	struct pci_saved_state	*pm_save;
+>  	int			ioeventfds_nr;
+>  	struct eventfd_ctx	*err_trigger;
+> +	struct eventfd_ctx	*recov_trigger;
+>  	struct eventfd_ctx	*req_trigger;
+>  	struct list_head	dummy_resources_list;
+>  	struct mutex		ioeventfds_lock;
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h index
+> fea86061b44e..f88a6ca62c49 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -621,6 +621,7 @@ enum {
+>  	VFIO_PCI_MSIX_IRQ_INDEX,
+>  	VFIO_PCI_ERR_IRQ_INDEX,
+>  	VFIO_PCI_REQ_IRQ_INDEX,
+> +	VFIO_PCI_RECOV_IRQ_INDEX,
+>  	VFIO_PCI_NUM_IRQS
+>  };
+> 
+> --
+> 2.33.0
 
-I think this can be made to work, but it will be awkward.  On TDX, for example, what exactly are the semantics supposed to be?  An error code if the memory isn't all zero?  An error code if it has ever been written?
-
-Fundamentally, I think this is because your proposed lifecycle for these memfiles results in a lightweight API but is awkward for the intended use cases.  You're proposing, roughly:
-
-1. Create a memfile. 
-
-Now it's in a shared state with an unknown virt technology.  It can be read and written.  Let's call this state BRAND_NEW.
-
-2. Bind to a VM.
-
-Now it's an a bound state.  For TDX, for example, let's call the new state BOUND_TDX.  In this state, the TDX rules are followed (private memory can't be converted, etc).
-
-The problem here is that the BOUND_NEW state allows things that are nonsensical in TDX, and the binding step needs to invent some kind of semantics for what happens when binding a nonempty memfile.
-
-
-So I would propose a somewhat different order:
-
-1. Create a memfile.  It's in the UNBOUND state and no operations whatsoever are allowed except binding or closing.
-
-2. Bind the memfile to a VM (or at least to a VM technology).  Now it's in the initial state appropriate for that VM.
-
-For TDX, this completely bypasses the cases where the data is prepopulated and TDX can't handle it cleanly.  For SEV, it bypasses a situation in which data might be written to the memory before we find out whether that data will be unreclaimable or unmovable.
-
-
-----------------------------------------------
-
-Now I have a question, since I don't think anyone has really answered it: how does this all work with SEV- or pKVM-like technologies in which private and shared pages share the same address space?  I sounds like you're proposing to have a big memfile that contains private and shared pages and to use that same memfile as pages are converted back and forth.  IO and even real physical DMA could be done on that memfile.  Am I understanding correctly?
-
-If so, I think this makes sense, but I'm wondering if the actual memslot setup should be different.  For TDX, private memory lives in a logically separate memslot space.  For SEV and pKVM, it doesn't.  I assume the API can reflect this straightforwardly.
-
-And the corresponding TDX question: is the intent still that shared pages aren't allowed at all in a TDX memfile?  If so, that would be the most direct mapping to what the hardware actually does.
-
---Andy
