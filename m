@@ -2,129 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4651F50E950
-	for <lists+kvm@lfdr.de>; Mon, 25 Apr 2022 21:16:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2DB750E9A1
+	for <lists+kvm@lfdr.de>; Mon, 25 Apr 2022 21:40:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244894AbiDYTTc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Apr 2022 15:19:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52324 "EHLO
+        id S245009AbiDYTn0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Apr 2022 15:43:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237138AbiDYTTa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Apr 2022 15:19:30 -0400
-Received: from smtp.smtpout.orange.fr (smtp07.smtpout.orange.fr [80.12.242.129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16F10387BC
-        for <kvm@vger.kernel.org>; Mon, 25 Apr 2022 12:16:16 -0700 (PDT)
-Received: from [192.168.1.18] ([86.243.180.246])
-        by smtp.orange.fr with ESMTPA
-        id j4BrnYRN3jXpHj4BrnJm6d; Mon, 25 Apr 2022 21:16:15 +0200
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
-X-ME-Date: Mon, 25 Apr 2022 21:16:15 +0200
-X-ME-IP: 86.243.180.246
-Message-ID: <19a812b3-73b4-7e5a-8885-ec652598a5ce@wanadoo.fr>
-Date:   Mon, 25 Apr 2022 21:16:06 +0200
+        with ESMTP id S245012AbiDYTnT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Apr 2022 15:43:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AB25D632A
+        for <kvm@vger.kernel.org>; Mon, 25 Apr 2022 12:40:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650915609;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=59OsmWVuRNUrfdHh8Mtn4PpwkZAEMGMF05GKzQKOW8M=;
+        b=TAjApmMMxoK3fAnYBGG5QMjWOhGnT+g0wPgIAXpIrJS6A0U3G2szzEnZoT8tF9bN3IMqbY
+        XqfW+hdP8wys+YAuqFAkk8JEcMOeoynl8O+cPHIByqy8GRZMc72EewZoJDLJMNNrO168gA
+        RWxJQeLIFR+Eb2Iixtdb3cKwcM2IPvo=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-586-_78CB8wdOuWaspaQCj0HBA-1; Mon, 25 Apr 2022 15:40:06 -0400
+X-MC-Unique: _78CB8wdOuWaspaQCj0HBA-1
+Received: by mail-wm1-f71.google.com with SMTP id d6-20020a05600c34c600b0039296a2ac7cso127355wmq.1
+        for <kvm@vger.kernel.org>; Mon, 25 Apr 2022 12:40:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:subject:to:cc:references:from
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-transfer-encoding:content-language;
+        bh=59OsmWVuRNUrfdHh8Mtn4PpwkZAEMGMF05GKzQKOW8M=;
+        b=tYcF/9Uu4Ni60GohNFUElzuWyic6cauFC0B3a1d+XPRP4hopYiavch9M092TEfJ6Eq
+         YpmXk0lGe0TorFUEXbrI9RIIMrDA5FaoaNopbWdLn7SwTGAWFYnbFAgKpVWklyfLlMai
+         gj9dQhrmKVD8O5eEg5618Mid2rbN8DMoEFwh7Nc7MtYRViLRa1bFZTtd2Rar5AIePnLU
+         R4Wb9RHImwt2H3O8+VkE467xALt18Pw/o7A2pvlu20nam9cmg2ZlAxatpMBNIOfpqlgm
+         n6w5HcxJGI56b56I5oJlk5xQURcBrf0LqLCQI6nD/gc0weB4mS1POehAQrIdq4ChjHRF
+         S7KQ==
+X-Gm-Message-State: AOAM5312ZD4nACNFxxRRGm0Xm8/WZ/ugy+zB/QRoCXNGO/jMIz2HxzvM
+        a4RjeM+MY+iieo+g4okgfgMd3auUUN4Fibhv8y63Pa391JC90SDGb2/7JIfLaeFdxT4cToq6h53
+        tsE8kTpAySplW
+X-Received: by 2002:a05:600c:1ca5:b0:393:e846:4ea1 with SMTP id k37-20020a05600c1ca500b00393e8464ea1mr8986757wms.32.1650915605257;
+        Mon, 25 Apr 2022 12:40:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxklePhnj02IPsy8/Irc8mp3FLrjMXCVlgPJkcGwG6Xi81YV8G9XFRpOl9CalYqeU5TAb0+9w==
+X-Received: by 2002:a05:600c:1ca5:b0:393:e846:4ea1 with SMTP id k37-20020a05600c1ca500b00393e8464ea1mr8986728wms.32.1650915605016;
+        Mon, 25 Apr 2022 12:40:05 -0700 (PDT)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id o21-20020adfa115000000b0020adea2767csm2615032wro.83.2022.04.25.12.40.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Apr 2022 12:40:04 -0700 (PDT)
+Reply-To: eric.auger@redhat.com
+Subject: Re: [RFC 00/18] vfio: Adopt iommufd
+To:     Nicolin Chen <nicolinc@nvidia.com>
+Cc:     Yi Liu <yi.l.liu@intel.com>, alex.williamson@redhat.com,
+        cohuck@redhat.com, qemu-devel@nongnu.org,
+        david@gibson.dropbear.id.au, thuth@redhat.com,
+        farman@linux.ibm.com, mjrosato@linux.ibm.com,
+        akrowiak@linux.ibm.com, pasic@linux.ibm.com, jjherne@linux.ibm.com,
+        jasowang@redhat.com, kvm@vger.kernel.org, jgg@nvidia.com,
+        eric.auger.pro@gmail.com, kevin.tian@intel.com,
+        chao.p.peng@intel.com, yi.y.sun@intel.com, peterx@redhat.com
+References: <20220414104710.28534-1-yi.l.liu@intel.com>
+ <Ylku1VVsbYiAEALZ@Asurada-Nvidia>
+ <16ea3601-a3dd-ba9b-a5bc-420f4ac20611@redhat.com>
+ <Yl4r3Ok61wxCc2zd@Asurada-Nvidia>
+From:   Eric Auger <eric.auger@redhat.com>
+Message-ID: <9ba412e7-85c1-8dd7-9a55-3a0078642bf8@redhat.com>
+Date:   Mon, 25 Apr 2022 21:40:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v3 07/34] x86/hyperv: Introduce
- HV_MAX_SPARSE_VCPU_BANKS/HV_VCPUS_PER_SPARSE_BANK constants
-Content-Language: fr
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220414132013.1588929-1-vkuznets@redhat.com>
- <20220414132013.1588929-8-vkuznets@redhat.com>
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20220414132013.1588929-8-vkuznets@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <Yl4r3Ok61wxCc2zd@Asurada-Nvidia>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Language: en-US
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Le 14/04/2022 à 15:19, Vitaly Kuznetsov a écrit :
-> It may not come clear from where the magical '64' value used in
-> __cpumask_to_vpset() come from. Moreover, '64' means both the maximum
-> sparse bank number as well as the number of vCPUs per bank. Add defines
-> to make things clear. These defines are also going to be used by KVM.
-> 
-> No functional change.
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->   include/asm-generic/hyperv-tlfs.h |  5 +++++
->   include/asm-generic/mshyperv.h    | 11 ++++++-----
->   2 files changed, 11 insertions(+), 5 deletions(-)
-> 
-> diff --git a/include/asm-generic/hyperv-tlfs.h b/include/asm-generic/hyperv-tlfs.h
-> index fdce7a4cfc6f..020ca9bdbb79 100644
-> --- a/include/asm-generic/hyperv-tlfs.h
-> +++ b/include/asm-generic/hyperv-tlfs.h
-> @@ -399,6 +399,11 @@ struct hv_vpset {
->   	u64 bank_contents[];
->   } __packed;
->   
-> +/* The maximum number of sparse vCPU banks which can be encoded by 'struct hv_vpset' */
-> +#define HV_MAX_SPARSE_VCPU_BANKS (64)
-> +/* The number of vCPUs in one sparse bank */
-> +#define HV_VCPUS_PER_SPARSE_BANK (64)
-> +
->   /* HvCallSendSyntheticClusterIpi hypercall */
->   struct hv_send_ipi {
->   	u32 vector;
-> diff --git a/include/asm-generic/mshyperv.h b/include/asm-generic/mshyperv.h
-> index c08758b6b364..0abe91df1ef6 100644
-> --- a/include/asm-generic/mshyperv.h
-> +++ b/include/asm-generic/mshyperv.h
-> @@ -214,9 +214,10 @@ static inline int __cpumask_to_vpset(struct hv_vpset *vpset,
->   {
->   	int cpu, vcpu, vcpu_bank, vcpu_offset, nr_bank = 1;
->   	int this_cpu = smp_processor_id();
-> +	int max_vcpu_bank = hv_max_vp_index / HV_VCPUS_PER_SPARSE_BANK;
->   
-> -	/* valid_bank_mask can represent up to 64 banks */
-> -	if (hv_max_vp_index / 64 >= 64)
-> +	/* vpset.valid_bank_mask can represent up to HV_MAX_SPARSE_VCPU_BANKS banks */
-> +	if (max_vcpu_bank >= HV_MAX_SPARSE_VCPU_BANKS)
->   		return 0;
->   
->   	/*
-> @@ -224,7 +225,7 @@ static inline int __cpumask_to_vpset(struct hv_vpset *vpset,
->   	 * structs are not cleared between calls, we risk flushing unneeded
->   	 * vCPUs otherwise.
->   	 */
-> -	for (vcpu_bank = 0; vcpu_bank <= hv_max_vp_index / 64; vcpu_bank++)
-> +	for (vcpu_bank = 0; vcpu_bank <= max_vcpu_bank; vcpu_bank++)
->   		vpset->bank_contents[vcpu_bank] = 0;
+Hi Nicolin,
 
-and here:
-	bitmap_clear(vpset->bank_contents, 0, hv_max_vp_index);
-or maybe even if it is safe to do so:
-	bitmap_zero(vpset->bank_contents, hv_max_vp_index);
+On 4/19/22 5:26 AM, Nicolin Chen wrote:
+> On Sun, Apr 17, 2022 at 12:30:40PM +0200, Eric Auger wrote:
+>
+>>>> - More tests
+>>> I did a quick test on my ARM64 platform, using "iommu=smmuv3"
+>>> string. The behaviors are different between using default and
+>>> using legacy "iommufd=off".
+>>>
+>>> The legacy pathway exits the VM with:
+>>>     vfio 0002:01:00.0:
+>>>     failed to setup container for group 1:
+>>>     memory listener initialization failed:
+>>>     Region smmuv3-iommu-memory-region-16-0:
+>>>     device 00.02.0 requires iommu MAP notifier which is not currently supported
+>>>
+>>> while the iommufd pathway started the VM but reported errors
+>>> from host kernel about address translation failures, probably
+>>> because of accessing unmapped addresses.
+>>>
+>>> I found iommufd pathway also calls error_propagate_prepend()
+>>> to add to errp for not supporting IOMMU_NOTIFIER_MAP, but it
+>>> doesn't get a chance to print errp out. Perhaps there should
+>>> be a final error check somewhere to exit?
+>> thank you for giving it a try.
+>>
+>> vsmmuv3 + vfio is not supported as we miss the HW nested stage support
+>> and SMMU does not support cache mode. If you want to test viommu on ARM
+>> you shall test virtio-iommu+vfio. This should work but this is not yet
+>> tested.
+> I tried "-device virtio-iommu" and "-device virtio-iommu-pci"
+> separately with vfio-pci, but neither seems to work. The host
+> SMMU driver reports Translation Faults.
+>
+> Do you know what commands I should use to run QEMU for that
+> combination?
+you shall use :
 
-CJ
+ -device virtio-iommu-pci -device vfio-pci,host=<BDF>
 
->   
->   	/*
-> @@ -236,8 +237,8 @@ static inline int __cpumask_to_vpset(struct hv_vpset *vpset,
->   		vcpu = hv_cpu_number_to_vp_number(cpu);
->   		if (vcpu == VP_INVAL)
->   			return -1;
-> -		vcpu_bank = vcpu / 64;
-> -		vcpu_offset = vcpu % 64;
-> +		vcpu_bank = vcpu / HV_VCPUS_PER_SPARSE_BANK;
-> +		vcpu_offset = vcpu % HV_VCPUS_PER_SPARSE_BANK;
->   		__set_bit(vcpu_offset, (unsigned long *)
->   			  &vpset->bank_contents[vcpu_bank]);
->   		if (vcpu_bank >= nr_bank)
+Please make sure the "-device virtio-iommu-pci" is set *before* the
+"-device vfio-pci,"
+
+Otherwise the IOMMU MR notifiers are not set properly and this may be
+the cause of your physical SMMU translations faults.
+
+Eric
+>
+>> I pushed a fix for the error notification issue:
+>> qemu-for-5.17-rc6-vm-rfcv2-rc0 on my git https://github.com/eauger/qemu.git
+> Yes. This fixes the problem. Thanks!
+>
 
