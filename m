@@ -2,300 +2,248 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1059B50EA91
-	for <lists+kvm@lfdr.de>; Mon, 25 Apr 2022 22:31:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCEBF50EC49
+	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 00:53:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245490AbiDYUeM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Apr 2022 16:34:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52630 "EHLO
+        id S235371AbiDYW4v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Apr 2022 18:56:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235083AbiDYUeJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Apr 2022 16:34:09 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8E0B29812
-        for <kvm@vger.kernel.org>; Mon, 25 Apr 2022 13:31:01 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id bd19-20020a17090b0b9300b001d98af6dcd1so371162pjb.4
-        for <kvm@vger.kernel.org>; Mon, 25 Apr 2022 13:31:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=PsaBjMYML1023D8/4JD8bY2eiV+rm0b5YNMBVGX+9ac=;
-        b=W9EEFrpqDbP5K7T2M89kwc5VijgBvLR9xu/SFAX6MmS6EbuAvukDwCTL8RjSs9LFDc
-         7DIXQ92NL7hcT2TdQZphsKqUq0S9lFttgqPUIJlJlmYYcaBmxnKQN2yRksnjcM35qQXQ
-         6eK8d1F9UAvSuofKNBJproSeSnulD0UMta2JauyqZcOqgU4D/A2ISU3JPOmaeZFu+atU
-         iRtI1bHu4P4YPf7VDdMSRTJdXItlCxtaLZ4oTRMOGSdDN6hUXL9UbjuKYGdcXgm1yl5E
-         bZ46oDiKhrpb+QjGQIXuw2C+6Kc776/4xXUcniAWAml+hdT71SDQAJ/r18+Js6AeeCwl
-         ZKAg==
+        with ESMTP id S231548AbiDYW4t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Apr 2022 18:56:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5BB8D107822
+        for <kvm@vger.kernel.org>; Mon, 25 Apr 2022 15:53:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650927218;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8KYvTG6fHslGLTAEOj7E7ypkGRqTXSPQpyoWIpPfwOQ=;
+        b=AGMmA53HNEtYR8FUD+CD7BV76bh66ocpchKTuSde0xX2htMCotItAykYjPyd8fk0jVrV84
+        mYLvXRwHakg9qetxRloCqHdMTAa6/EMHnVyuHSvifL4aaTtfKrzgQdlaE6T81KROzTAKLh
+        ih87+B9CkVICzS4+eqIQ244CMT1Dle4=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-350-hIoT_lfWNnWZm9IEc8dyYw-1; Mon, 25 Apr 2022 18:53:37 -0400
+X-MC-Unique: hIoT_lfWNnWZm9IEc8dyYw-1
+Received: by mail-io1-f70.google.com with SMTP id q5-20020a0566022f0500b00654a56b1dfbso12478677iow.8
+        for <kvm@vger.kernel.org>; Mon, 25 Apr 2022 15:53:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=PsaBjMYML1023D8/4JD8bY2eiV+rm0b5YNMBVGX+9ac=;
-        b=3yS4oCbe31ZbOwpqAAfDwSJ/DO9hYJwTStKUgibuSKPNTbBhnDj2R7wqh/NCyxub2t
-         BD1cnpP9aLz6mYC5Xe1NBzLnr7qbWet+OWa1VyMmnIKSrqu8nDhFRPwDP4eJupK8wCYx
-         eRvH/IPHVpj4wN4qCJ6Q6+ZnWhHIJk+Bb6Sc6eUM9qkCmA4d79mITae0l0P1PDO2H4bk
-         AG11xO7dG8XVLf686fSi4VctWBjDWeMh3zbJDsRZqlBqxLmCQ0OuWmeAHnaVttwVndKf
-         yZBcdwvVSna9KwValK0divl2Jj3B6vLWC6c8W+HWuHRVnKijG8lV1deaee5Tayizgap8
-         YIzw==
-X-Gm-Message-State: AOAM53386AzXhiScx2ucOtmDjwF7hSMwLsmdjW876daFE71fDHXItw/v
-        ZBw6k9d+0WuXSI5j0aT3j6KdEQ==
-X-Google-Smtp-Source: ABdhPJwor5d6ibi2AgdFiFHQGhGsostR437Q/Y5WjT0lBvTnaVMftYLa6G75JiDj0ZWMHfoUjJBQ9g==
-X-Received: by 2002:a17:90a:cc6:b0:1d2:9a04:d29e with SMTP id 6-20020a17090a0cc600b001d29a04d29emr22712562pjt.136.1650918660848;
-        Mon, 25 Apr 2022 13:31:00 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id fh20-20020a17090b035400b001cb978f906esm222025pjb.0.2022.04.25.13.31.00
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=8KYvTG6fHslGLTAEOj7E7ypkGRqTXSPQpyoWIpPfwOQ=;
+        b=uRVuPqeYmLw8GoBwquSn9t+nCndxpREwdoCyppJKfjEyKQfglJO/+9nSfp2RCquCdq
+         /yk+cR9Z1K732uXF5OIrIOrNmakgcMt2ZFTlT7qpWpjux2zHiYwcyNf3E033dMZmOLI4
+         BV493aalyeRgwkYTLQnJP7cjsZ5UPdzv7L3I1HkIGRSjIMQHVXmm7JcLx5CLx706+8RI
+         y2N9rKgLHo4yYIggDNmzsEnuJNndYf1sZAiCNU3giuxaAkXjpUGRmdZPUlHX7aAgpKIR
+         CjLLzBymAkSBMmazwYsF3PkRYTx8LU67H/S1gt3MxpZ2A6yDmHOCSdasPo5dwb/kNdon
+         iJZw==
+X-Gm-Message-State: AOAM531DfcTVGk3BK8MVijuwg7oEiQT2VqSh3f9KuJIRNJF+EThgbin9
+        SfWwQBytShr+mjnY1UqOK3/HIuoNGDLAGD3vMdvZpxdGJcEAnxMiJWMswtPcPnx55rLfXMGqeu9
+        JV34XvoqG/rRM
+X-Received: by 2002:a05:6e02:1608:b0:2cc:1bf8:bf2f with SMTP id t8-20020a056e02160800b002cc1bf8bf2fmr8105867ilu.219.1650927216163;
+        Mon, 25 Apr 2022 15:53:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyGcyC03xq2TvlmJYcMx22EPxDF94K5SeUE/sXwrixAbxujdIriJqkWIKd0w2OhVivFjXAlNg==
+X-Received: by 2002:a05:6e02:1608:b0:2cc:1bf8:bf2f with SMTP id t8-20020a056e02160800b002cc1bf8bf2fmr8105855ilu.219.1650927215849;
+        Mon, 25 Apr 2022 15:53:35 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id s7-20020a5eaa07000000b00654bf640320sm8127085ioe.55.2022.04.25.15.53.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Apr 2022 13:31:00 -0700 (PDT)
-Date:   Mon, 25 Apr 2022 20:30:56 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Steven Price <steven.price@arm.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <YmcFAJEJmmtYa+82@google.com>
-References: <83fd55f8-cd42-4588-9bf6-199cbce70f33@www.fastmail.com>
- <YksIQYdG41v3KWkr@google.com>
- <Ykslo2eo2eRXrpFR@google.com>
- <eefc3c74-acca-419c-8947-726ce2458446@www.fastmail.com>
- <Ykwbqv90C7+8K+Ao@google.com>
- <YkyEaYiL0BrDYcZv@google.com>
- <20220422105612.GB61987@chaop.bj.intel.com>
- <3b99f157-0f30-4b30-8399-dd659250ab8d@www.fastmail.com>
- <20220425134051.GA175928@chaop.bj.intel.com>
- <27616b2f-1eff-42ff-91e0-047f531639ea@www.fastmail.com>
+        Mon, 25 Apr 2022 15:53:34 -0700 (PDT)
+Date:   Mon, 25 Apr 2022 16:53:33 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Eric Auger <eric.auger@redhat.com>
+Cc:     Yi Liu <yi.l.liu@intel.com>, cohuck@redhat.com,
+        qemu-devel@nongnu.org, david@gibson.dropbear.id.au,
+        thuth@redhat.com, farman@linux.ibm.com, mjrosato@linux.ibm.com,
+        akrowiak@linux.ibm.com, pasic@linux.ibm.com, jjherne@linux.ibm.com,
+        jasowang@redhat.com, kvm@vger.kernel.org, jgg@nvidia.com,
+        nicolinc@nvidia.com, eric.auger.pro@gmail.com,
+        kevin.tian@intel.com, chao.p.peng@intel.com, yi.y.sun@intel.com,
+        peterx@redhat.com,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        Laine Stump <laine@redhat.com>
+Subject: Re: [RFC 00/18] vfio: Adopt iommufd
+Message-ID: <20220425165333.034bb2c8.alex.williamson@redhat.com>
+In-Reply-To: <fbe4728a-da58-e7de-aa36-97af48cbca0a@redhat.com>
+References: <20220414104710.28534-1-yi.l.liu@intel.com>
+        <20220422160943.6ff4f330.alex.williamson@redhat.com>
+        <fbe4728a-da58-e7de-aa36-97af48cbca0a@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <27616b2f-1eff-42ff-91e0-047f531639ea@www.fastmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 25, 2022, Andy Lutomirski wrote:
-> 
-> 
-> On Mon, Apr 25, 2022, at 6:40 AM, Chao Peng wrote:
-> > On Sun, Apr 24, 2022 at 09:59:37AM -0700, Andy Lutomirski wrote:
-> >> 
-> 
-> >> 
-> >> 2. Bind the memfile to a VM (or at least to a VM technology).  Now it's in
-> >> the initial state appropriate for that VM.
-> >> 
-> >> For TDX, this completely bypasses the cases where the data is prepopulated
-> >> and TDX can't handle it cleanly.
+On Mon, 25 Apr 2022 22:23:05 +0200
+Eric Auger <eric.auger@redhat.com> wrote:
 
-I believe TDX can handle this cleanly, TDH.MEM.PAGE.ADD doesn't require that the
-source and destination have different HPAs.  There's just no pressing need to
-support such behavior because userspace is highly motivated to keep the initial
-image small for performance reasons, i.e. burning a few extra pages while building
-the guest is a non-issue.
-
-> >> For SEV, it bypasses a situation in which data might be written to the
-> >> memory before we find out whether that data will be unreclaimable or
-> >> unmovable.
+> Hi Alex,
+> 
+> On 4/23/22 12:09 AM, Alex Williamson wrote:
+> > [Cc +libvirt folks]
 > >
-> > This sounds a more strict rule to avoid semantics unclear.
+> > On Thu, 14 Apr 2022 03:46:52 -0700
+> > Yi Liu <yi.l.liu@intel.com> wrote:
+> >  
+> >> With the introduction of iommufd[1], the linux kernel provides a generic
+> >> interface for userspace drivers to propagate their DMA mappings to kernel
+> >> for assigned devices. This series does the porting of the VFIO devices
+> >> onto the /dev/iommu uapi and let it coexist with the legacy implementation.
+> >> Other devices like vpda, vfio mdev and etc. are not considered yet.
+> >>
+> >> For vfio devices, the new interface is tied with device fd and iommufd
+> >> as the iommufd solution is device-centric. This is different from legacy
+> >> vfio which is group-centric. To support both interfaces in QEMU, this
+> >> series introduces the iommu backend concept in the form of different
+> >> container classes. The existing vfio container is named legacy container
+> >> (equivalent with legacy iommu backend in this series), while the new
+> >> iommufd based container is named as iommufd container (may also be mentioned
+> >> as iommufd backend in this series). The two backend types have their own
+> >> way to setup secure context and dma management interface. Below diagram
+> >> shows how it looks like with both BEs.
+> >>
+> >>                     VFIO                           AddressSpace/Memory
+> >>     +-------+  +----------+  +-----+  +-----+
+> >>     |  pci  |  | platform |  |  ap |  | ccw |
+> >>     +---+---+  +----+-----+  +--+--+  +--+--+     +----------------------+
+> >>         |           |           |        |        |   AddressSpace       |
+> >>         |           |           |        |        +------------+---------+
+> >>     +---V-----------V-----------V--------V----+               /
+> >>     |           VFIOAddressSpace              | <------------+
+> >>     |                  |                      |  MemoryListener
+> >>     |          VFIOContainer list             |
+> >>     +-------+----------------------------+----+
+> >>             |                            |
+> >>             |                            |
+> >>     +-------V------+            +--------V----------+
+> >>     |   iommufd    |            |    vfio legacy    |
+> >>     |  container   |            |     container     |
+> >>     +-------+------+            +--------+----------+
+> >>             |                            |
+> >>             | /dev/iommu                 | /dev/vfio/vfio
+> >>             | /dev/vfio/devices/vfioX    | /dev/vfio/$group_id
+> >>  Userspace  |                            |
+> >>  ===========+============================+================================
+> >>  Kernel     |  device fd                 |
+> >>             +---------------+            | group/container fd
+> >>             | (BIND_IOMMUFD |            | (SET_CONTAINER/SET_IOMMU)
+> >>             |  ATTACH_IOAS) |            | device fd
+> >>             |               |            |
+> >>             |       +-------V------------V-----------------+
+> >>     iommufd |       |                vfio                  |
+> >> (map/unmap  |       +---------+--------------------+-------+
+> >>  ioas_copy) |                 |                    | map/unmap
+> >>             |                 |                    |
+> >>      +------V------+    +-----V------+      +------V--------+
+> >>      | iommfd core |    |  device    |      |  vfio iommu   |
+> >>      +-------------+    +------------+      +---------------+
+> >>
+> >> [Secure Context setup]
+> >> - iommufd BE: uses device fd and iommufd to setup secure context
+> >>               (bind_iommufd, attach_ioas)
+> >> - vfio legacy BE: uses group fd and container fd to setup secure context
+> >>                   (set_container, set_iommu)
+> >> [Device access]
+> >> - iommufd BE: device fd is opened through /dev/vfio/devices/vfioX
+> >> - vfio legacy BE: device fd is retrieved from group fd ioctl
+> >> [DMA Mapping flow]
+> >> - VFIOAddressSpace receives MemoryRegion add/del via MemoryListener
+> >> - VFIO populates DMA map/unmap via the container BEs
+> >>   *) iommufd BE: uses iommufd
+> >>   *) vfio legacy BE: uses container fd
+> >>
+> >> This series qomifies the VFIOContainer object which acts as a base class
+> >> for a container. This base class is derived into the legacy VFIO container
+> >> and the new iommufd based container. The base class implements generic code
+> >> such as code related to memory_listener and address space management whereas
+> >> the derived class implements callbacks that depend on the kernel user space
+> >> being used.
+> >>
+> >> The selection of the backend is made on a device basis using the new
+> >> iommufd option (on/off/auto). By default the iommufd backend is selected
+> >> if supported by the host and by QEMU (iommufd KConfig). This option is
+> >> currently available only for the vfio-pci device. For other types of
+> >> devices, it does not yet exist and the legacy BE is chosen by default.  
+> > I've discussed this a bit with Eric, but let me propose a different
+> > command line interface.  Libvirt generally likes to pass file
+> > descriptors to QEMU rather than grant it access to those files
+> > directly.  This was problematic with vfio-pci because libvirt can't
+> > easily know when QEMU will want to grab another /dev/vfio/vfio
+> > container.  Therefore we abandoned this approach and instead libvirt
+> > grants file permissions.
 > >
-> > So userspace needs to know what excatly happens for a 'bind' operation.
-> > This is different when binds to different technologies. E.g. for SEV, it
-> > may imply after this call, the memfile can be accessed (through mmap or
-> > what ever) from userspace, while for current TDX this should be not allowed.
-> 
-> I think this is actually a good thing.  While SEV, TDX, pKVM, etc achieve
-> similar goals and have broadly similar ways of achieving them, they really
-> are different, and having userspace be aware of the differences seems okay to
-> me.
-
-I agree, _if_ the properties of the memory are enumerated in a technology-agnostic
-way.  The underlying mechanisms are different, but conceptually the set of sane
-operations that userspace can perform/initiate are the same.  E.g. TDX and SNP can
-support swap, they just don't because no one has requested Intel/AMD to provide
-that support (no use cases for oversubscribing confidential VMs).  SNP does support
-page migration, and TDX can add that support without too much fuss.
-
-SEV "allows" the host to access guest private memory, but that doesn't mean it
-should be deliberately supported by the kernel.  It's a bit of a moot point for
-SEV/SEV-ES, as the host doesn't get any kind of notification that the guest has
-"converted" a page, but the kernel shouldn't allow userspace to map memory that
-is _known_ to be private.
-
-> (Although I don't think that allowing userspace to mmap SEV shared pages is
-
-s/shared/private?
-
-> particularly wise -- it will result in faults or cache incoherence depending
-> on the variant of SEV in use.)
->
-> > And I feel we still need a third flow/operation to indicate the
-> > completion of the initialization on the memfile before the guest's 
-> > first-time launch. SEV needs to check previous mmap-ed areas are munmap-ed
-> > and prevent future userspace access. After this point, then the memfile
-> > becomes truely private fd.
-> 
-> Even that is technology-dependent.  For TDX, this operation doesn't really
-> exist.
-
-As above, I believe this is TDH.MEM.PAGE.ADD.
-
-> For SEV, I'm not sure (I haven't read the specs in nearly enough detail).
-
-QEMU+KVM does in-place conversion for SEV/SEV-ES via SNP_LAUNCH_UPDATE, AFAICT
-that's still allowed for SNP.
-
-> For pKVM, I guess it does exist and isn't quite the same as a
-> shared->private conversion.
-> 
-> Maybe this could be generalized a bit as an operation "measure and make
-> private" that would be supported by the technologies for which it's useful.
-> 
-> 
-> >> Now I have a question, since I don't think anyone has really answered it:
-> >> how does this all work with SEV- or pKVM-like technologies in which
-> >> private and shared pages share the same address space?
-
-The current proposal is to have both a private fd and a shared hva for memslot
-that can be mapped private.  A GPA is considered private by KVM if the memslot
-has a private fd and that corresponding page in the private fd is populated.  KVM
-will always and only map the current flavor of shared/private based on that
-definition.  If userspace punches a hole in the private fd, KVM will unmap any
-relevant private GPAs.  If userspace populates a range in the private fd, KVM will
-unmap any relevant shared GPAs.
-
-> >> I sounds like you're proposing to have a big memfile that contains private
-> >> and shared pages and to use that same memfile as pages are converted back
-> >> and forth.  IO and even real physical DMA could be done on that memfile.
-> >> Am I understanding correctly?
+> > However, with iommufd there's no reason that QEMU ever needs more than
+> > a single instance of /dev/iommufd and we're using per device vfio file
+> > descriptors, so it seems like a good time to revisit this.
 > >
-> > For TDX case, and probably SEV as well, this memfile contains private memory
-> > only. But this design at least makes it possible for usage cases like
-> > pKVM which wants both private/shared memory in the same memfile and rely
-> > on other ways like mmap/munmap or mprotect to toggle private/shared instead
-> > of fallocate/hole punching.
-> 
-> Hmm.  Then we still need some way to get KVM to generate the correct SEV
-> pagetables.  For TDX, there are private memslots and shared memslots, and
-> they can overlap.  If they overlap and both contain valid pages at the same
-> address, then the results may not be what the guest-side ABI expects, but
-> everything will work.
-
-Absolutely not, KVM is not concurrently mapping both private and shared variants
-of a single GPA into the guest.  The Shared bit is a glorified attribute/permission
-bit, that it's carved out of the GPA space is a hack to minimize Intel's hardware
-development cost.
-
-> So, when a single logical guest page transitions between shared and private,
-> no change to the memslots is needed.
-
-Hard no, KVM is not supporting different memslot semantics for TDX versus everything
-else.
-
-> For SEV, this is not the case: everything is in one set of pagetables, and
-> there isn't a natural way to resolve overlaps.
-> 
-> If the memslot code becomes efficient enough, then the memslots could be
-> fragmented.
-
-No, because the only way to not artificially limit the amount of fragmentation is
-to turn the memslots into a tree structure, i.e. to make them effectively multi-level
-page tables as opposed to the single-level "tables" that they are today.
-
-> Or the memfile could support private and shared data in the same memslot.
-> And if pKVM does this, I don't see why SEV couldn't also do it and hopefully
-> reuse the same code.
-> 
+> > The interface I was considering would be to add an iommufd object to
+> > QEMU, so we might have a:
 > >
-> >> 
-> >> If so, I think this makes sense, but I'm wondering if the actual memslot
-> >> setup should be different.  For TDX, private memory lives in a logically
-> >> separate memslot space.  For SEV and pKVM, it doesn't.  I assume the API
-> >> can reflect this straightforwardly.
-
-Again, no.  KVM is not going to give special treatment to TDX.
-
-> > I believe so. The flow should be similar but we do need pass different
-> > flags during the 'bind' to the backing store for different usages. That
-> > should be some new flags for pKVM but the callbacks (API here) between
-> > memfile_notifile and its consumers can be reused.
-> 
-> And also some different flag in the operation that installs the fd as a memslot?
-
-No, memslots updates need to come directly from userspace.
-
-> >> And the corresponding TDX question: is the intent still that shared pages
-> >> aren't allowed at all in a TDX memfile?  If so, that would be the most
-> >> direct mapping to what the hardware actually does.
+> > -device iommufd[,fd=#][,id=foo]
 > >
-> > Exactly. TDX will still use fallocate/hole punching to turn on/off the
-> > private page. Once off, the traditional shared page will become
-> > effective in KVM.
-> 
-> Works for me.
-> 
-> For what it's worth, I still think it should be fine to land all the TDX
-> memfile bits upstream as long as we're confident that SEV, pKVM, etc can be
-> added on without issues.
-> 
-> I think we can increase confidence in this by either getting one other
-> technology's maintainers to get far enough along in the design to be
-> confident and/or by having a pure-kernel-software implementation that serves
-> as a testbed.  For the latter, maybe it could support two different models
-> with little overhead:
-> 
-> Pure software "interleaved" model: pages are shared or private and a
-> hypercall converts them.  The access mode is entirely determined by the state
-> programmed by hypercall.  I think this is essentially what Vishal
-> implemented, but with the "HACK" replaced by something permanent and (if
-> they're not already in the series) appropriate access checks implemented to
-> actually protect the private memory.
-> 
-> Pure software "separate" mode: one GPA bit is set aside as the shared vs
-> private bit.  The normal memslots are restricted to the shared half of GPA
-> space.  Private memslots use the private half.  This works a lot like TDX.
-> This would be new code.  We don't *really* need this for testing, since TDX
-> itself exercises the same programming model, but it would let people without
-> TDX hardware exercise the interesting bits of the memory management.
+> > For non-libivrt usage this would have the ability to open /dev/iommufd
+> > itself if an fd is not provided.  This object could be shared with
+> > other iommufd users in the VM and maybe we'd allow multiple instances
+> > for more esoteric use cases.  [NB, maybe this should be a -object rather than
+> > -device since the iommufd is not a guest visible device?]
+> >
+> > The vfio-pci device might then become:
+> >
+> > -device vfio-pci[,host=DDDD:BB:DD.f][,sysfsdev=/sys/path/to/device][,fd=#][,iommufd=foo]
+> >
+> > So essentially we can specify the device via host, sysfsdev, or passing
+> > an fd to the vfio device file.  When an iommufd object is specified,
+> > "foo" in the example above, each of those options would use the
+> > vfio-device access mechanism, essentially the same as iommufd=on in
+> > your example.  With the fd passing option, an iommufd object would be
+> > required and necessarily use device level access.  
+> What is the use case you foresee for the "fd=#" option?
 
-No, KVM is not bifurcating the memslots into shared and private.  Except for TDX,
-hardware can't support mapping both variants.  That means KVM has to define some
-semantic for which memslot "wins", and that puts userspace/KVM back to square one
-in having punch a hole into a memslot in order to allow mapping the "loser" into
-the guest.
+On the vfio-pci device this was intended to be the actual vfio device
+file descriptor.  Once we have a file per device, QEMU doesn't really
+have any need to navigate through sysfs to determine which fd to use
+other than for user convenience on the command line.  For libvirt usage,
+I assume QEMU could accept the device fd, without ever really knowing
+anything about the host address or sysfs path of the device.
+
+> >
+> > In your example, the iommufd=auto seems especially troublesome for
+> > libvirt because QEMU is going to have different locked memory
+> > requirements based on whether we're using type1 or iommufd, where the
+> > latter resolves the duplicate accounting issues.  libvirt needs to know
+> > deterministically which backed is being used, which this proposal seems
+> > to provide, while at the same time bringing us more in line with fd
+> > passing.  Thoughts?  Thanks,  
+> I like your proposal (based on the -object iommufd). The only thing that
+> may be missing I think is for a qemu end-user who actually does not care
+> about the iommu backend being used but just wishes to use the most
+> recent available one it adds some extra complexity. But this is not the
+> most important use case ;)
+
+Yeah, I can sympathize with that, but isn't that also why we're pursing
+a vfio compatibility interface at the kernel level?  Eventually, once
+the native vfio IOMMU backends go away, the vfio "container" device
+file will be provided by iommufd and that transition to the new
+interface can be both seamless to the user and apparent to tools like
+libvirt.
+
+An end-user with a fixed command line should continue to work and will
+eventually get iommufd via compatibility, but taking care of an
+end-user that "does not care" and "wishes to use the most recent" is a
+non-goal for me.  That would be more troublesome for tools and use cases
+that we do care about imo.  Thanks,
+
+Alex
+
