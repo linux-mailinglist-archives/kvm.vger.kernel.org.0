@@ -2,182 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C68550E233
-	for <lists+kvm@lfdr.de>; Mon, 25 Apr 2022 15:45:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 387D350E248
+	for <lists+kvm@lfdr.de>; Mon, 25 Apr 2022 15:48:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242202AbiDYNrg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Apr 2022 09:47:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45356 "EHLO
+        id S242254AbiDYNvA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Apr 2022 09:51:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242230AbiDYNrc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Apr 2022 09:47:32 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BA174969E;
-        Mon, 25 Apr 2022 06:44:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650894268; x=1682430268;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=11l8nWOAh8jVYp4pTM08c8ajsmoXROtLceTxJ8NiSMU=;
-  b=JR8Ute/GJoN07izCCk5Zc7OxBCMey/J59svcRudy72t4VzM309/Aw6PH
-   b/ZHjjIihKYyKpfM8+XOo1aiwT9+JD5evTwPYtHVbZpOMMUspu7dfP2Qz
-   xHJ59bXkoWawJr77n/TAShrgT6z7DsIyDd0KRJeHGQD4YTHq79TEuEZWL
-   cihD4uIu1nnZ2+tI0H3LJvH6botetkQ42mxukQY4FaloFsWV+E0wT32+3
-   ZTGCGEmIk5hWwJIyqlTZEKzlC6M9ZaiiqAlW8gyBHs+2QuuOAjvlFDSQc
-   5KWCAW+vAOHaTFNEpOTv9vwOpPmMR4efSl4tnzFzA+Z1BGA5psG2o5g/q
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10327"; a="325738297"
-X-IronPort-AV: E=Sophos;i="5.90,288,1643702400"; 
-   d="scan'208";a="325738297"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2022 06:44:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,288,1643702400"; 
-   d="scan'208";a="704562650"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by fmsmga001.fm.intel.com with ESMTP; 25 Apr 2022 06:44:19 -0700
-Date:   Mon, 25 Apr 2022 21:40:51 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Quentin Perret <qperret@google.com>,
-        Steven Price <steven.price@arm.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
+        with ESMTP id S235281AbiDYNu4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Apr 2022 09:50:56 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FF374AE36;
+        Mon, 25 Apr 2022 06:47:44 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23PBs8u7023685;
+        Mon, 25 Apr 2022 13:47:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=aRI5j41VpO8jAl2VMpmL1bsu0V2/kiQ5Nz3OxejtxIA=;
+ b=rmA/b0KHoecQED+Q7nGpBoJjIvTDWi2d2dloxPWD0Isoc6m0QUbtOhpvsPy6Nqz+IeLo
+ WGlTbLmwhRyzhXrTbxUNyMNMQoNe26V/cB+n7NSgX1Y/hbs8ViODr96p0+6EO/LL+3zJ
+ rJDphNw71suddZfXDBYlCSAGvPETdquT2cJFFyGyDLY9crVIAYq4GTTVKQgte0HRlXrJ
+ CagXnrFAIFbebwOX2RzwnfZ8FoCJfxlCb8AftVp6BnBTBS9KJUSFCDhz8QB+ZXHCn6Ix
+ 4XMw6cUvqcTqD5i/hEQUTNpehbj45nntek9cr1J/HpK3wmRcFRrqKGnMmZ5z0CqpiNTs ZA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fmuh62k6j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Apr 2022 13:47:41 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 23PDOrqA002560;
+        Mon, 25 Apr 2022 13:47:40 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fmuh62k5v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Apr 2022 13:47:40 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23PDeUQI020699;
+        Mon, 25 Apr 2022 13:47:38 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma02fra.de.ibm.com with ESMTP id 3fm938t1us-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Apr 2022 13:47:38 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23PDlmgu35389696
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 25 Apr 2022 13:47:48 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AC18A42042;
+        Mon, 25 Apr 2022 13:47:35 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EEB2942041;
+        Mon, 25 Apr 2022 13:47:34 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.10.176])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 25 Apr 2022 13:47:34 +0000 (GMT)
+Date:   Mon, 25 Apr 2022 15:46:44 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <20220425134051.GA175928@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <80aad2f9-9612-4e87-a27a-755d3fa97c92@www.fastmail.com>
- <YkcTTY4YjQs5BRhE@google.com>
- <83fd55f8-cd42-4588-9bf6-199cbce70f33@www.fastmail.com>
- <YksIQYdG41v3KWkr@google.com>
- <Ykslo2eo2eRXrpFR@google.com>
- <eefc3c74-acca-419c-8947-726ce2458446@www.fastmail.com>
- <Ykwbqv90C7+8K+Ao@google.com>
- <YkyEaYiL0BrDYcZv@google.com>
- <20220422105612.GB61987@chaop.bj.intel.com>
- <3b99f157-0f30-4b30-8399-dd659250ab8d@www.fastmail.com>
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] KVM: s390: Don't indicate suppression on
+ dirtying, failing memop
+Message-ID: <20220425154644.383d4b7f@p-imbrenda>
+In-Reply-To: <20220425100147.1755340-2-scgl@linux.ibm.com>
+References: <20220425100147.1755340-1-scgl@linux.ibm.com>
+        <20220425100147.1755340-2-scgl@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3b99f157-0f30-4b30-8399-dd659250ab8d@www.fastmail.com>
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 9VILd7bZh7d1OxRloBhWWofwLk4TdcfC
+X-Proofpoint-GUID: vZ_izivV8rp6opn6LJ13O4ZaW4lly9nH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-25_08,2022-04-25_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ phishscore=0 adultscore=0 bulkscore=0 spamscore=0 mlxlogscore=862
+ lowpriorityscore=0 malwarescore=0 priorityscore=1501 suspectscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204250060
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Apr 24, 2022 at 09:59:37AM -0700, Andy Lutomirski wrote:
-> 
-> 
-> On Fri, Apr 22, 2022, at 3:56 AM, Chao Peng wrote:
-> > On Tue, Apr 05, 2022 at 06:03:21PM +0000, Sean Christopherson wrote:
-> >> On Tue, Apr 05, 2022, Quentin Perret wrote:
-> >> > On Monday 04 Apr 2022 at 15:04:17 (-0700), Andy Lutomirski wrote:
-> >     Only when the register succeeds, the fd is
-> >     converted into a private fd, before that, the fd is just a normal (shared)
-> >     one. During this conversion, the previous data is preserved so you can put
-> >     some initial data in guest pages (whether the architecture allows this is
-> >     architecture-specific and out of the scope of this patch).
-> 
-> I think this can be made to work, but it will be awkward.  On TDX, for example, what exactly are the semantics supposed to be?  An error code if the memory isn't all zero?  An error code if it has ever been written?
-> 
-> Fundamentally, I think this is because your proposed lifecycle for these memfiles results in a lightweight API but is awkward for the intended use cases.  You're proposing, roughly:
-> 
-> 1. Create a memfile. 
-> 
-> Now it's in a shared state with an unknown virt technology.  It can be read and written.  Let's call this state BRAND_NEW.
-> 
-> 2. Bind to a VM.
-> 
-> Now it's an a bound state.  For TDX, for example, let's call the new state BOUND_TDX.  In this state, the TDX rules are followed (private memory can't be converted, etc).
-> 
-> The problem here is that the BOUND_NEW state allows things that are nonsensical in TDX, and the binding step needs to invent some kind of semantics for what happens when binding a nonempty memfile.
-> 
-> 
-> So I would propose a somewhat different order:
-> 
-> 1. Create a memfile.  It's in the UNBOUND state and no operations whatsoever are allowed except binding or closing.
+On Mon, 25 Apr 2022 12:01:46 +0200
+Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
 
-OK, so we need invent new user API to indicate UNBOUND state. For memfd
-based, it can be a new feature-neutral flag at creation time.
-
+> If user space uses a memop to emulate an instruction and that
+> memop fails, the execution of the instruction ends.
+> Instruction execution can end in different ways, one of which is
+> suppression, which requires that the instruction execute like a no-op.
+> A writing memop that spans multiple pages and fails due to key
+> protection can modified guest memory, as a result, the likely
+> correct ending is termination. Therefore do not indicate a
+> suppressing instruction ending in this case.
 > 
-> 2. Bind the memfile to a VM (or at least to a VM technology).  Now it's in the initial state appropriate for that VM.
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> ---
+>  arch/s390/kvm/gaccess.c | 47 ++++++++++++++++++++++++-----------------
+>  1 file changed, 28 insertions(+), 19 deletions(-)
 > 
-> For TDX, this completely bypasses the cases where the data is prepopulated and TDX can't handle it cleanly.  For SEV, it bypasses a situation in which data might be written to the memory before we find out whether that data will be unreclaimable or unmovable.
+> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
+> index d53a183c2005..3b1fbef82288 100644
+> --- a/arch/s390/kvm/gaccess.c
+> +++ b/arch/s390/kvm/gaccess.c
+> @@ -491,8 +491,8 @@ enum prot_type {
+>  	PROT_TYPE_IEP  = 4,
+>  };
+>  
+> -static int trans_exc(struct kvm_vcpu *vcpu, int code, unsigned long gva,
+> -		     u8 ar, enum gacc_mode mode, enum prot_type prot)
+> +static int trans_exc_ending(struct kvm_vcpu *vcpu, int code, unsigned long gva, u8 ar,
+> +			    enum gacc_mode mode, enum prot_type prot, bool suppress)
+>  {
+>  	struct kvm_s390_pgm_info *pgm = &vcpu->arch.pgm;
+>  	struct trans_exc_code_bits *tec;
+> @@ -503,22 +503,24 @@ static int trans_exc(struct kvm_vcpu *vcpu, int code, unsigned long gva,
+>  
+>  	switch (code) {
+>  	case PGM_PROTECTION:
+> -		switch (prot) {
+> -		case PROT_TYPE_IEP:
+> -			tec->b61 = 1;
+> -			fallthrough;
+> -		case PROT_TYPE_LA:
+> -			tec->b56 = 1;
+> -			break;
+> -		case PROT_TYPE_KEYC:
+> -			tec->b60 = 1;
+> -			break;
+> -		case PROT_TYPE_ALC:
+> -			tec->b60 = 1;
+> -			fallthrough;
+> -		case PROT_TYPE_DAT:
+> -			tec->b61 = 1;
+> -			break;
+> +		if (suppress) {
+> +			switch (prot) {
+> +			case PROT_TYPE_IEP:
+> +				tec->b61 = 1;
+> +				fallthrough;
+> +			case PROT_TYPE_LA:
+> +				tec->b56 = 1;
+> +				break;
+> +			case PROT_TYPE_KEYC:
+> +				tec->b60 = 1;
+> +				break;
+> +			case PROT_TYPE_ALC:
+> +				tec->b60 = 1;
+> +				fallthrough;
+> +			case PROT_TYPE_DAT:
+> +				tec->b61 = 1;
+> +				break;
+> +			}
+>  		}
+>  		fallthrough;
+>  	case PGM_ASCE_TYPE:
+> @@ -552,6 +554,12 @@ static int trans_exc(struct kvm_vcpu *vcpu, int code, unsigned long gva,
+>  	return code;
+>  }
+>  
+> +static int trans_exc(struct kvm_vcpu *vcpu, int code, unsigned long gva, u8 ar,
+> +		     enum gacc_mode mode, enum prot_type prot)
+> +{
+> +	return trans_exc_ending(vcpu, code, gva, ar, mode, prot, true);
+> +}
+> +
+>  static int get_vcpu_asce(struct kvm_vcpu *vcpu, union asce *asce,
+>  			 unsigned long ga, u8 ar, enum gacc_mode mode)
+>  {
+> @@ -1110,7 +1118,8 @@ int access_guest_with_key(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
+>  		ga = kvm_s390_logical_to_effective(vcpu, ga + fragment_len);
+>  	}
+>  	if (rc > 0)
+> -		rc = trans_exc(vcpu, rc, ga, ar, mode, prot);
+> +		rc = trans_exc_ending(vcpu, rc, ga, ar, mode, prot,
+> +				      (mode != GACC_STORE) || (idx == 0));
+>  out_unlock:
+>  	if (need_ipte_lock)
+>  		ipte_unlock(vcpu);
 
-This sounds a more strict rule to avoid semantics unclear.
-
-So userspace needs to know what excatly happens for a 'bind' operation.
-This is different when binds to different technologies. E.g. for SEV, it
-may imply after this call, the memfile can be accessed (through mmap or
-what ever) from userspace, while for current TDX this should be not allowed.
-
-And I feel we still need a third flow/operation to indicate the
-completion of the initialization on the memfile before the guest's 
-first-time launch. SEV needs to check previous mmap-ed areas are munmap-ed
-and prevent future userspace access. After this point, then the memfile
-becomes truely private fd.
-
-> 
-> 
-> ----------------------------------------------
-> 
-> Now I have a question, since I don't think anyone has really answered it: how does this all work with SEV- or pKVM-like technologies in which private and shared pages share the same address space?  I sounds like you're proposing to have a big memfile that contains private and shared pages and to use that same memfile as pages are converted back and forth.  IO and even real physical DMA could be done on that memfile.  Am I understanding correctly?
-
-For TDX case, and probably SEV as well, this memfile contains private memory
-only. But this design at least makes it possible for usage cases like
-pKVM which wants both private/shared memory in the same memfile and rely
-on other ways like mmap/munmap or mprotect to toggle private/shared instead
-of fallocate/hole punching.
-
-> 
-> If so, I think this makes sense, but I'm wondering if the actual memslot setup should be different.  For TDX, private memory lives in a logically separate memslot space.  For SEV and pKVM, it doesn't.  I assume the API can reflect this straightforwardly.
-
-I believe so. The flow should be similar but we do need pass different
-flags during the 'bind' to the backing store for different usages. That
-should be some new flags for pKVM but the callbacks (API here) between
-memfile_notifile and its consumers can be reused.
-
-> 
-> And the corresponding TDX question: is the intent still that shared pages aren't allowed at all in a TDX memfile?  If so, that would be the most direct mapping to what the hardware actually does.
-
-Exactly. TDX will still use fallocate/hole punching to turn on/off the
-private page. Once off, the traditional shared page will become
-effective in KVM.
-
-Chao
-> 
-> --Andy
