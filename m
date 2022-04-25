@@ -2,173 +2,247 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CABD50E2DD
-	for <lists+kvm@lfdr.de>; Mon, 25 Apr 2022 16:18:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E30F350E36D
+	for <lists+kvm@lfdr.de>; Mon, 25 Apr 2022 16:37:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242317AbiDYOVc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Apr 2022 10:21:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56504 "EHLO
+        id S242408AbiDYOk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Apr 2022 10:40:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231361AbiDYOVb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Apr 2022 10:21:31 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65DF41F610;
-        Mon, 25 Apr 2022 07:18:25 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23PCm0OB004740;
-        Mon, 25 Apr 2022 14:18:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=xFYQxtC0B7SQPiXLH83zoxvzJC20pJOVt28ZEpZyYpA=;
- b=omHtM9MGzhzTUvtRiHQBSNMMsNGZ1kmIN1r+7xXTAHDqnqt9HBNyP2M/wuB7MIza9e1W
- l22FqlAYaa8wUDCNPOe0p/9TCt0zVHiaDGfUQkwsCDbk5lW4w2bzqyrbY+FKXeSiHKEH
- Jt5Kk9saJM+WKu93uvQir0OP1YzicBqGkQD1zGbM+5t5QbWr85ITSNefvP4+WVKrNUj5
- rJlpUJZQVq+9RjD6thWsIaJ/DoQN9AqWGqpVBnrdVU8Dp+nn2PSCZAUR9SicL1XN6r6T
- CRW0zXfdAQQ93vfuZV1r3t9EnaMd/fSGl+UKbKnLuOpF72L5FgI4GdeBWFY5P5Yb2dsM xQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fns00phey-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Apr 2022 14:18:23 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 23PE1SXp017501;
-        Mon, 25 Apr 2022 14:18:22 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fns00phe6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Apr 2022 14:18:22 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23PEAVR8003972;
-        Mon, 25 Apr 2022 14:18:21 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 3fm938thaw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Apr 2022 14:18:20 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23PEIHPF40108340
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 25 Apr 2022 14:18:17 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8F91DAE051;
-        Mon, 25 Apr 2022 14:18:17 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 33554AE04D;
-        Mon, 25 Apr 2022 14:18:17 +0000 (GMT)
-Received: from [9.171.38.55] (unknown [9.171.38.55])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 25 Apr 2022 14:18:17 +0000 (GMT)
-Message-ID: <64fe2f40-4430-ba31-134f-c891d03bcf7c@linux.ibm.com>
-Date:   Mon, 25 Apr 2022 16:18:16 +0200
+        with ESMTP id S230382AbiDYOk5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Apr 2022 10:40:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7602B1E8
+        for <kvm@vger.kernel.org>; Mon, 25 Apr 2022 07:37:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650897472;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UhyqkvZiXbRxPiBMWj6oIQlfqnIMog7MDN3Wn9vBOhY=;
+        b=hezHL/4PL9x6GbBkqosioqcyvrNh7ZoiadUOayVWB0nM6cVFClzP7qJ3AtXjxK7RYOotFw
+        wWrIG1z59F+Ya2qsbZyCh0JolyJZcHnQqTBD7LVKMWZt6fiVHwpGEKRLv9lWBsNuFsvaz0
+        TA5S26A92+4gPKEBj6uZ2/+V+Bphb7M=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-576-uJ7u3moDOJ-sFsS08Fr1aQ-1; Mon, 25 Apr 2022 10:37:51 -0400
+X-MC-Unique: uJ7u3moDOJ-sFsS08Fr1aQ-1
+Received: by mail-il1-f199.google.com with SMTP id h28-20020a056e021d9c00b002cc403e851aso6181731ila.12
+        for <kvm@vger.kernel.org>; Mon, 25 Apr 2022 07:37:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=UhyqkvZiXbRxPiBMWj6oIQlfqnIMog7MDN3Wn9vBOhY=;
+        b=ioC4Ox3ZOj/bBT4g06WzldrUe1o2M2BWLKHBpbIr7pZvU6qxQQ0dR+i3ySza/5jtUz
+         K4zPt33E7MD/M+tyT2x75juW1KXn4XI+/itODILYuQf/7dHi5TMPlrsGSM80VyyTtfRY
+         /xgl7vKNAmudK5OIs4ZcHDQBHitjIWWYFZt2a6Wv04FIKTKUCRYvKUoZl2hPmIsmQ6Zi
+         JgB99vHgdSMI1t7XoTgp9kt8qn2thbvGogB/AU+nxUIIS75H873HG+XmsGqAhgGdoKBA
+         AzRPw/K7GyYU7XGxH997dZmvB8yoz767Lscuv+z+N9ygL1hBKnv7ycWkrZSz75wPndgH
+         UDkg==
+X-Gm-Message-State: AOAM532aWHgRwehkkQXxEnT1Rr0F4Wi0Q/mqQA8MGp6bL7Sl6JEpcmB8
+        HsYeIxtfR/S36Fde6cnk/hTNz67kHUs909CtZ+9GPtbP0pkue8SdZ5ph8XJ4ho5FEu5SXf84/wn
+        3ZLOqChnmEq23
+X-Received: by 2002:a05:6638:240a:b0:32a:a215:41a3 with SMTP id z10-20020a056638240a00b0032aa21541a3mr8316589jat.156.1650897470358;
+        Mon, 25 Apr 2022 07:37:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwS7GTFh2yY895Pni62/QdISmWYLk7VmGOTC4VuBWdATuKGT727MB+40Ctal/9iM5+RXQofbQ==
+X-Received: by 2002:a05:6638:240a:b0:32a:a215:41a3 with SMTP id z10-20020a056638240a00b0032aa21541a3mr8316573jat.156.1650897469981;
+        Mon, 25 Apr 2022 07:37:49 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id s5-20020a0566022bc500b0065490deaf19sm7718890iov.31.2022.04.25.07.37.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Apr 2022 07:37:49 -0700 (PDT)
+Date:   Mon, 25 Apr 2022 08:37:48 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc:     Yi Liu <yi.l.liu@intel.com>, akrowiak@linux.ibm.com,
+        jjherne@linux.ibm.com, chao.p.peng@intel.com, kvm@vger.kernel.org,
+        Laine Stump <laine@redhat.com>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        jasowang@redhat.com, cohuck@redhat.com, thuth@redhat.com,
+        peterx@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com,
+        eric.auger@redhat.com, yi.y.sun@intel.com, nicolinc@nvidia.com,
+        kevin.tian@intel.com, jgg@nvidia.com, eric.auger.pro@gmail.com,
+        david@gibson.dropbear.id.au
+Subject: Re: [RFC 00/18] vfio: Adopt iommufd
+Message-ID: <20220425083748.3465c50f.alex.williamson@redhat.com>
+In-Reply-To: <YmZzhohO81z1PVKS@redhat.com>
+References: <20220414104710.28534-1-yi.l.liu@intel.com>
+        <20220422160943.6ff4f330.alex.williamson@redhat.com>
+        <YmZzhohO81z1PVKS@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [kvm-unit-tests PATCH v4] s390x: Test effect of storage keys on
- some instructions
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20220425084128.809134-1-scgl@linux.ibm.com>
- <20220425131623.2c855fcd@p-imbrenda>
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-In-Reply-To: <20220425131623.2c855fcd@p-imbrenda>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: _gAucEgrxiRyi9PmWbiclZmO4yDyumE9
-X-Proofpoint-ORIG-GUID: esmbFkllDkuh6Ecrij9u4R89aqChBJMU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-25_08,2022-04-25_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- mlxlogscore=999 adultscore=0 suspectscore=0 clxscore=1015 impostorscore=0
- spamscore=0 mlxscore=0 bulkscore=0 phishscore=0 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204250062
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/25/22 13:16, Claudio Imbrenda wrote:
-> On Mon, 25 Apr 2022 10:41:28 +0200
-> Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
-> 
->> Some instructions are emulated by KVM. Test that KVM correctly emulates
->> storage key checking for two of those instructions (STORE CPU ADDRESS,
->> SET PREFIX).
->> Test success and error conditions, including coverage of storage and
->> fetch protection override.
->> Also add test for TEST PROTECTION, even if that instruction will not be
->> emulated by KVM under normal conditions.
->>
->> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
->> ---
+On Mon, 25 Apr 2022 11:10:14 +0100
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-[...]
+> On Fri, Apr 22, 2022 at 04:09:43PM -0600, Alex Williamson wrote:
+> > [Cc +libvirt folks]
+> >=20
+> > On Thu, 14 Apr 2022 03:46:52 -0700
+> > Yi Liu <yi.l.liu@intel.com> wrote:
+> >  =20
+> > > With the introduction of iommufd[1], the linux kernel provides a gene=
+ric
+> > > interface for userspace drivers to propagate their DMA mappings to ke=
+rnel
+> > > for assigned devices. This series does the porting of the VFIO devices
+> > > onto the /dev/iommu uapi and let it coexist with the legacy implement=
+ation.
+> > > Other devices like vpda, vfio mdev and etc. are not considered yet. =
+=20
+>=20
+> snip
+>=20
+> > > The selection of the backend is made on a device basis using the new
+> > > iommufd option (on/off/auto). By default the iommufd backend is selec=
+ted
+> > > if supported by the host and by QEMU (iommufd KConfig). This option is
+> > > currently available only for the vfio-pci device. For other types of
+> > > devices, it does not yet exist and the legacy BE is chosen by default=
+. =20
+> >=20
+> > I've discussed this a bit with Eric, but let me propose a different
+> > command line interface.  Libvirt generally likes to pass file
+> > descriptors to QEMU rather than grant it access to those files
+> > directly.  This was problematic with vfio-pci because libvirt can't
+> > easily know when QEMU will want to grab another /dev/vfio/vfio
+> > container.  Therefore we abandoned this approach and instead libvirt
+> > grants file permissions.
+> >=20
+> > However, with iommufd there's no reason that QEMU ever needs more than
+> > a single instance of /dev/iommufd and we're using per device vfio file
+> > descriptors, so it seems like a good time to revisit this. =20
+>=20
+> I assume access to '/dev/iommufd' gives the process somewhat elevated
+> privileges, such that you don't want to unconditionally give QEMU
+> access to this device ?
 
->> +static void test_set_prefix(void)
->> +{
->> +	char lowcore_tmp[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
-> 
-> perhaps it's cleaner to put this as a global (static) variable
-> 
-> also, please define LC_SIZE (2*PAGE_SIZE) and use that
+It's not that much dissimilar to /dev/vfio/vfio, it's an unprivileged
+interface which should have limited scope for abuse, but more so here
+the goal would be to de-privilege QEMU that one step further that it
+cannot open the device file itself.
 
-I'll call that PREFIX_AREA_SIZE, otherwise it is confusing that that is
-not the same as sizeof(struct lowcore).
-> 
->> +	uint32_t *prefix_ptr = (uint32_t *)pagebuf;
->> +	uint32_t old_prefix;
->> +	pgd_t *root;
->> +
->> +	report_prefix_push("SET PREFIX");
->> +	root = (pgd_t *)(stctg(1) & PAGE_MASK);
->> +	old_prefix = get_prefix();
->> +	memcpy(lowcore_tmp, 0, PAGE_SIZE * 2);
->> +	assert(((uint64_t)&lowcore_tmp >> 31) == 0);
->> +	*prefix_ptr = (uint32_t)(uint64_t)&lowcore_tmp;
->> +
->> +	report_prefix_push("zero key");
->> +	set_prefix(old_prefix);
->> +	set_storage_key(prefix_ptr, 0x20, 0);
->> +	set_prefix(*prefix_ptr);
->> +	report(get_prefix() == *prefix_ptr, "set prefix");
->> +	report_prefix_pop();
->> +
->> +	report_prefix_push("matching key");
->> +	set_prefix(old_prefix);
->> +	set_storage_key(pagebuf, 0x10, 0);
->> +	set_prefix_key_1(prefix_ptr);
->> +	report(get_prefix() == *prefix_ptr, "set prefix");
->> +	report_prefix_pop();
->> +
->> +	report_prefix_push("mismatching key");
->> +
->> +	report_prefix_push("no fetch protection");
->> +	set_prefix(old_prefix);
->> +	set_storage_key(pagebuf, 0x20, 0);
->> +	set_prefix_key_1(prefix_ptr);
->> +	report(get_prefix() == *prefix_ptr, "set prefix");
->> +	report_prefix_pop();
->> +
->> +	report_prefix_push("fetch protection");
->> +	set_prefix(old_prefix);
->> +	set_storage_key(pagebuf, 0x28, 0);
->> +	expect_pgm_int();
->> +	set_prefix_key_1(prefix_ptr);
->> +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
->> +	report(get_prefix() != *prefix_ptr, "did not set prefix");
-> 
-> why don't you check == old_prefix instead? that way you know noting has
-> changed (also for all the other tests below where you do the same)
+> > The interface I was considering would be to add an iommufd object to
+> > QEMU, so we might have a:
+> >=20
+> > -device iommufd[,fd=3D#][,id=3Dfoo]
+> >=20
+> > For non-libivrt usage this would have the ability to open /dev/iommufd
+> > itself if an fd is not provided.  This object could be shared with
+> > other iommufd users in the VM and maybe we'd allow multiple instances
+> > for more esoteric use cases.  [NB, maybe this should be a -object rathe=
+r than
+> > -device since the iommufd is not a guest visible device?] =20
+>=20
+> Yes,  -object would be the right answer for something that's purely
+> a host side backend impl selector.
+>=20
+> > The vfio-pci device might then become:
+> >=20
+> > -device vfio-pci[,host=3DDDDD:BB:DD.f][,sysfsdev=3D/sys/path/to/device]=
+[,fd=3D#][,iommufd=3Dfoo]
+> >=20
+> > So essentially we can specify the device via host, sysfsdev, or passing
+> > an fd to the vfio device file.  When an iommufd object is specified,
+> > "foo" in the example above, each of those options would use the
+> > vfio-device access mechanism, essentially the same as iommufd=3Don in
+> > your example.  With the fd passing option, an iommufd object would be
+> > required and necessarily use device level access.
+> >=20
+> > In your example, the iommufd=3Dauto seems especially troublesome for
+> > libvirt because QEMU is going to have different locked memory
+> > requirements based on whether we're using type1 or iommufd, where the
+> > latter resolves the duplicate accounting issues.  libvirt needs to know
+> > deterministically which backed is being used, which this proposal seems
+> > to provide, while at the same time bringing us more in line with fd
+> > passing.  Thoughts?  Thanks, =20
+>=20
+> Yep, I agree that libvirt needs to have more direct control over this.
+> This is also even more important if there are notable feature differences
+> in the 2 backends.
+>=20
+> I wonder if anyone has considered an even more distinct impl, whereby
+> we have a completely different device type on the backend, eg
+>=20
+>   -device vfio-iommu-pci[,host=3DDDDD:BB:DD.f][,sysfsdev=3D/sys/path/to/d=
+evice][,fd=3D#][,iommufd=3Dfoo]
+>=20
+> If a vendor wants to fully remove the legacy impl, they can then use the
+> Kconfig mechanism to disable the build of the legacy impl device, while
+> keeping the iommu impl (or vica-verca if the new iommu impl isn't conside=
+red
+> reliable enough for them to support yet).
+>=20
+> Libvirt would use
+>=20
+>    -object iommu,id=3Diommu0,fd=3DNNN
+>    -device vfio-iommu-pci,fd=3DMMM,iommu=3Diommu0
+>=20
+> Non-libvirt would use a simpler
+>=20
+>    -device vfio-iommu-pci,host=3D0000:03:22.1
+>=20
+> with QEMU auto-creating a 'iommu' object in the background.
+>=20
+> This would fit into libvirt's existing modelling better. We currently have
+> a concept of a PCI assignment backend, which previously supported the
+> legacy PCI assignment, vs the VFIO PCI assignment. This new iommu impl
+> feels like a 3rd PCI assignment approach, and so fits with how we modelled
+> it as a different device type in the past.
 
-Yeah, that's better.
+I don't think we want to conflate "iommu" and "iommufd", we're creating
+an object that interfaces into the iommufd uAPI, not an iommu itself.
+Likewise "vfio-iommu-pci" is just confusing, there was an iommu
+interface previously, it's just a different implementation now and as
+far as the VM interface to the device, it's identical.  Note that a
+"vfio-iommufd-pci" device multiplies the matrix of every vfio device
+for a rather subtle implementation detail.
 
-[...]
+My expectation would be that libvirt uses:
+
+ -object iommufd,id=3Diommufd0,fd=3DNNN
+ -device vfio-pci,fd=3DMMM,iommufd=3Diommufd0
+
+Whereas simple QEMU command line would be:
+
+ -object iommufd,id=3Diommufd0
+ -device vfio-pci,iommufd=3Diommufd0,host=3D0000:02:00.0
+
+The iommufd object would open /dev/iommufd itself.  Creating an
+implicit iommufd object is someone problematic because one of the
+things I forgot to highlight in my previous description is that the
+iommufd object is meant to be shared across not only various vfio
+devices (platform, ccw, ap, nvme, etc), but also across subsystems, ex.
+vdpa.
+
+If the old style were used:
+
+ -device vfio-pci,host=3D0000:02:00.0
+
+Then QEMU would use vfio for the IOMMU backend.
+
+If libvirt/userspace wants to query whether "legacy" vfio is still
+supported by the host kernel, I think it'd only need to look for
+whether the /dev/vfio/vfio container interface still exists.
+
+If we need some means for QEMU to remove legacy support, I'd rather
+find a way to do it via probing device options.  It's easy enough to
+see if iommufd support exists by looking for the presence of the
+iommufd option for the vfio-pci device and Kconfig within QEMU could be
+used regardless of whether we define a new device name.  Thanks,
+
+Alex
+
