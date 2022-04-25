@@ -2,75 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC0F150D885
-	for <lists+kvm@lfdr.de>; Mon, 25 Apr 2022 06:53:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CBA250D8DE
+	for <lists+kvm@lfdr.de>; Mon, 25 Apr 2022 07:32:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241103AbiDYE4C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Apr 2022 00:56:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51304 "EHLO
+        id S241284AbiDYFfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Apr 2022 01:35:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237173AbiDYEz7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Apr 2022 00:55:59 -0400
-Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E16FE5E74E
-        for <kvm@vger.kernel.org>; Sun, 24 Apr 2022 21:52:54 -0700 (PDT)
-Received: by mail-ot1-x333.google.com with SMTP id r14-20020a9d750e000000b00605446d683eso10028259otk.10
-        for <kvm@vger.kernel.org>; Sun, 24 Apr 2022 21:52:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nxr8P/8LYAjImRUJY9isuo5GyoJq9tiUp/5nOt8Z3Ko=;
-        b=tQq4KslXbk4UqwnlJXx2G+rWNdJZduOq4oltSWaVFircBc6GW0cd1GS5NzKTIfzltG
-         lNHlAIcMUPjrW/I7wuF4Qb1nRKwzOuVZpp6Fl0RqF1D6g2LE6VrqPxVmFFRQpexNz8H4
-         QYuq29rSPqSz76IcY5hB9DuO+7kNNSOdXWDINUdX8Iak1i6JmbKf7cLVzuqk/5WrXOr1
-         wxKIT/1EeUDQDJ5+3DaDeOgIaP3dBxCE+8yUkpiN1CIH4UysbNyBUF9zVX1FqJAfIvd+
-         9xFExKheL8wFZ7u6IXvFxRQ9H1AHVRIidZqf00qgKoHkVFUn/Lqm64e/Hfh+jMT0dmiP
-         13ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nxr8P/8LYAjImRUJY9isuo5GyoJq9tiUp/5nOt8Z3Ko=;
-        b=Ml+9/1d5o2jKuhA2AHIy3gP7Reu66XGBD4qQT65q+f2Ds3gcBTsNkzHnJwyjh08g14
-         GiyYOERtr6Sr9QnmhjMgjm6B6VQvZsE44mYQOjcoP9R0XQocB4S2IcZFfzq1Fjv3WfwA
-         w8NN4rpMUhDV7WQubD2tPYbPfmNR82lArU4NZ2GAJhkzMxH7c6RRQD0TGNnWhB8xl/4o
-         U894llMUgLdzojIUNvhQIFrAl5KRFK4lfQtaIG7s7bz3r3F4Z/NEqNo4V5kYaZ5MHNtW
-         irGOF1gPFO6a8gLPfjMzjunkgs95Yqdu+CqZBHjbFkicgA9iIi+KhjmW8X3Fvq/qgAMn
-         U59A==
-X-Gm-Message-State: AOAM532IUd3+W8LU+D3v8QCVB09TtZH7UOXlnARBzFYqoxnCDOwW8qM4
-        Xbw8px6PN2Teh4o8l6/MZTW278IT32AN8CjCz9R4FA==
-X-Google-Smtp-Source: ABdhPJzo13f47F8TfeyzclCIJeQ7/YIn41atGyvT5OinvOB8BhQb4008gvlcSoiB7RDWEuTgPv5gk0lNXAdL0S6QvYY=
-X-Received: by 2002:a05:6830:18d:b0:605:4cfb:19cd with SMTP id
- q13-20020a056830018d00b006054cfb19cdmr5690723ota.177.1650862373909; Sun, 24
- Apr 2022 21:52:53 -0700 (PDT)
+        with ESMTP id S239961AbiDYFfE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Apr 2022 01:35:04 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48966263F;
+        Sun, 24 Apr 2022 22:32:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1650864721; x=1682400721;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=uRjpvrn6fat50gU61mLUaxLzgOtTofX/Vbsr1sYOfiE=;
+  b=X8rEeaR2l2NB2wIWs511Lvv4BK8F/Fu8CjDWmJtf8+3jcZVXF+k/LgC/
+   hZmZSNMrFVUs9YhFKNSTw4NsSfrm6PTLdXp8BOF7cUV8GwIs4p5jXa8wO
+   IRIPWfR6N3eXS+SUoPVr2HW05ImIFDr4ig8+fWbw1JAjkCxGHqQZWX3Mw
+   FYkG1hnbx7es7Hfg9g8CbzqoUBrnwEHAdYtrTZqeg/dnTI2F+rYeVSDzn
+   ZqC+IR7abBotuvildJlAdRUlLOUeI9F4mEuWhM4D8P3gVLKPbzyYf766X
+   ltPFhfZG5OdTJv3Y2zy3FR0bvZZlnFpaHM/Cez3xcTPk9WHqBOu/Gzbuq
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10327"; a="351592660"
+X-IronPort-AV: E=Sophos;i="5.90,287,1643702400"; 
+   d="scan'208";a="351592660"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2022 22:31:06 -0700
+X-IronPort-AV: E=Sophos;i="5.90,287,1643702400"; 
+   d="scan'208";a="579083258"
+Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.252.46.155])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2022 22:30:59 -0700
+Message-ID: <50fd2671-6070-0eba-ea68-9df9b79ccac3@intel.com>
+Date:   Mon, 25 Apr 2022 08:30:55 +0300
 MIME-Version: 1.0
-References: <20220423000328.2103733-1-rananta@google.com> <20220423000328.2103733-3-rananta@google.com>
-In-Reply-To: <20220423000328.2103733-3-rananta@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Sun, 24 Apr 2022 21:52:38 -0700
-Message-ID: <CAAeT=Fyv2Hc1oPb=UiDUvCSpzS9iYbEPBCvXuskBniTcOKfA5g@mail.gmail.com>
-Subject: Re: [PATCH v6 2/9] KVM: arm64: Setup a framework for hypercall bitmap
- firmware registers
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.7.0
+Subject: Re: [PATCH V2 03/11] perf/x86: Add support for TSC in nanoseconds as
+ a perf event clock
+Content-Language: en-US
+From:   Adrian Hunter <adrian.hunter@intel.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Jiri Olsa <jolsa@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        H Peter Anvin <hpa@zytor.com>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        Leo Yan <leo.yan@linaro.org>,
+        "jgross@suse.com" <jgross@suse.com>,
+        "sdeep@vmware.com" <sdeep@vmware.com>,
+        "pv-drivers@vmware.com" <pv-drivers@vmware.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "kys@microsoft.com" <kys@microsoft.com>,
+        "sthemmin@microsoft.com" <sthemmin@microsoft.com>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "Andrew.Cooper3@citrix.com" <Andrew.Cooper3@citrix.com>,
+        "Hall, Christopher S" <christopher.s.hall@intel.com>
+References: <20220214110914.268126-1-adrian.hunter@intel.com>
+ <20220214110914.268126-4-adrian.hunter@intel.com>
+ <YiIXFmA4vpcTSk2L@hirez.programming.kicks-ass.net>
+ <853ce127-25f0-d0fe-1d8f-0b0dd4f3ce71@intel.com>
+ <YiXVgEk/1UClkygX@hirez.programming.kicks-ass.net>
+ <30383f92-59cb-2875-1e1b-ff1a0eacd235@intel.com>
+ <YiYZv+LOmjzi5wcm@hirez.programming.kicks-ass.net>
+ <013b5425-2a60-e4d4-b846-444a576f2b28@intel.com>
+ <6f07a7d4e1ad4440bf6c502c8cb6c2ed@intel.com>
+ <c3e1842b-79c3-634a-3121-938b5160ca4c@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <c3e1842b-79c3-634a-3121-938b5160ca4c@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,403 +95,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Raghu,
+On 14/03/22 13:50, Adrian Hunter wrote:
+> On 08/03/2022 23:06, Hall, Christopher S wrote:
+>> Adrian Hunter wrote:
+>>> On 7.3.2022 16.42, Peter Zijlstra wrote:
+>>>> On Mon, Mar 07, 2022 at 02:36:03PM +0200, Adrian Hunter wrote:
+>>>>
+>>>>>> diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
+>>>>>> index 4420499f7bb4..a1f179ed39bf 100644
+>>>>>> --- a/arch/x86/kernel/paravirt.c
+>>>>>> +++ b/arch/x86/kernel/paravirt.c
+>>>>>> @@ -145,6 +145,15 @@ DEFINE_STATIC_CALL(pv_sched_clock, native_sched_clock);
+>>>>>>
+>>>>>>  void paravirt_set_sched_clock(u64 (*func)(void))
+>>>>>>  {
+>>>>>> +	/*
+>>>>>> +	 * Anything with ART on promises to have sane TSC, otherwise the whole
+>>>>>> +	 * ART thing is useless. In order to make ART useful for guests, we
+>>>>>> +	 * should continue to use the TSC. As such, ignore any paravirt
+>>>>>> +	 * muckery.
+>>>>>> +	 */
+>>>>>> +	if (cpu_feature_enabled(X86_FEATURE_ART))
+>>>>>
+>>>>> Does not seem to work because the feature X86_FEATURE_ART does not seem to get set.
+>>>>> Possibly because detect_art() excludes anything running on a hypervisor.
+>>>>
+>>>> Simple enough to delete that clause I suppose. Christopher, what is
+>>>> needed to make that go away? I suppose the guest needs to be aware of
+>>>> the active TSC scaling parameters to make it work ?
+>>>
+>>> There is also not X86_FEATURE_NONSTOP_TSC nor values for art_to_tsc_denominator
+>>> or art_to_tsc_numerator.  Also, from the VM's point of view, TSC will jump
+>>> forwards every VM-Exit / VM-Entry unless the hypervisor changes the offset
+>>> every VM-Entry, which KVM does not, so it still cannot be used as a stable
+>>> clocksource.
+>>
+>> Translating between ART and the guest TSC can be a difficult problem and ART software
+>> support is disabled by default in a VM.
+>>
+>> There are two major issues translating ART to TSC in a VM:
+>>
+>> The range of the TSC scaling field in the VMCS is much larger than the range of values
+>> that can be represented using CPUID[15H], i.e., it is not possible to communicate this
+>> to the VM using the current CPUID interface. The range of scaling would need to be
+>> restricted or another para-virtualized method - preferably OS/hypervisor agnostic - to
+>> communicate the scaling factor to the guest needs to be invented.
+>>
+>> TSC offsetting may also be a problem. The VMCS TSC offset must be discoverable by the
+>> guest. This can be done via TSC_ADJUST MSR. The offset in the VMCS and the guest
+>> TSC_ADJUST MSR must always be equivalent, i.e. a write to TSC_ADJUST in the guest
+>> must be reflected in the VMCS and any changes to the offset in the VMCS must be
+>> reflected in the TSC_ADJUST MSR. Otherwise a para-virtualized method must
+>> be invented to communicate an arbitrary VMCS TSC offset to the guest.
+>>
+> 
+> In my view it is reasonable for perf to support TSC as a perf clock in any case
+> because:
+> 	a) it allows users to work entirely with TSC if they wish
+> 	b) other kernel performance / debug facilities like ftrace already support TSC
+> 	c) the patches to add TSC support are relatively small and straight-forward
+> 
+> May we have support for TSC as a perf event clock?
 
-On Fri, Apr 22, 2022 at 5:03 PM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
->
-> KVM regularly introduces new hypercall services to the guests without
-> any consent from the userspace. This means, the guests can observe
-> hypercall services in and out as they migrate across various host
-> kernel versions. This could be a major problem if the guest
-> discovered a hypercall, started using it, and after getting migrated
-> to an older kernel realizes that it's no longer available. Depending
-> on how the guest handles the change, there's a potential chance that
-> the guest would just panic.
->
-> As a result, there's a need for the userspace to elect the services
-> that it wishes the guest to discover. It can elect these services
-> based on the kernels spread across its (migration) fleet. To remedy
-> this, extend the existing firmware pseudo-registers, such as
-> KVM_REG_ARM_PSCI_VERSION, but by creating a new COPROC register space
-> for all the hypercall services available.
->
-> These firmware registers are categorized based on the service call
-> owners, but unlike the existing firmware pseudo-registers, they hold
-> the features supported in the form of a bitmap.
->
-> During the VM initialization, the registers are set to upper-limit of
-> the features supported by the corresponding registers. It's expected
-> that the VMMs discover the features provided by each register via
-> GET_ONE_REG, and write back the desired values using SET_ONE_REG.
-> KVM allows this modification only until the VM has started.
->
-> Some of the standard features are not mapped to any bits of the
-> registers. But since they can recreate the original problem of
-> making it available without userspace's consent, they need to
-> be explicitly added to the case-list in
-> kvm_hvc_call_default_allowed(). Any function-id that's not enabled
-> via the bitmap, or not listed in kvm_hvc_call_default_allowed, will
-> be returned as SMCCC_RET_NOT_SUPPORTED to the guest.
->
-> Older userspace code can simply ignore the feature and the
-> hypercall services will be exposed unconditionally to the guests,
-> thus ensuring backward compatibility.
->
-> In this patch, the framework adds the register only for ARM's standard
-> secure services (owner value 4). Currently, this includes support only
-> for ARM True Random Number Generator (TRNG) service, with bit-0 of the
-> register representing mandatory features of v1.0. Other services are
-> momentarily added in the upcoming patches.
->
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 12 ++++
->  arch/arm64/include/uapi/asm/kvm.h |  9 +++
->  arch/arm64/kvm/arm.c              |  1 +
->  arch/arm64/kvm/guest.c            |  8 ++-
->  arch/arm64/kvm/hypercalls.c       | 94 +++++++++++++++++++++++++++++++
->  arch/arm64/kvm/psci.c             | 13 +++++
->  include/kvm/arm_hypercalls.h      |  6 ++
->  include/kvm/arm_psci.h            |  2 +-
->  8 files changed, 142 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 94a27a7520f4..df07f4c10197 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -101,6 +101,15 @@ struct kvm_s2_mmu {
->  struct kvm_arch_memory_slot {
->  };
->
-> +/**
-> + * struct kvm_smccc_features: Descriptor the hypercall services exposed to the guests
-> + *
-> + * @std_bmap: Bitmap of standard secure service calls
-> + */
-> +struct kvm_smccc_features {
-> +       unsigned long std_bmap;
-> +};
-> +
->  struct kvm_arch {
->         struct kvm_s2_mmu mmu;
->
-> @@ -150,6 +159,9 @@ struct kvm_arch {
->
->         u8 pfr0_csv2;
->         u8 pfr0_csv3;
-> +
-> +       /* Hypercall features firmware registers' descriptor */
-> +       struct kvm_smccc_features smccc_feat;
->  };
->
->  struct kvm_vcpu_fault_info {
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index c1b6ddc02d2f..0b79d2dc6ffd 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -332,6 +332,15 @@ struct kvm_arm_copy_mte_tags {
->  #define KVM_ARM64_SVE_VLS_WORDS        \
->         ((KVM_ARM64_SVE_VQ_MAX - KVM_ARM64_SVE_VQ_MIN) / 64 + 1)
->
-> +/* Bitmap feature firmware registers */
-> +#define KVM_REG_ARM_FW_FEAT_BMAP               (0x0016 << KVM_REG_ARM_COPROC_SHIFT)
-> +#define KVM_REG_ARM_FW_FEAT_BMAP_REG(r)                (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
-> +                                               KVM_REG_ARM_FW_FEAT_BMAP |      \
-> +                                               ((r) & 0xffff))
-> +
-> +#define KVM_REG_ARM_STD_BMAP                   KVM_REG_ARM_FW_FEAT_BMAP_REG(0)
-> +#define KVM_REG_ARM_STD_BIT_TRNG_V1_0          0
-> +
->  /* Device Control API: ARM VGIC */
->  #define KVM_DEV_ARM_VGIC_GRP_ADDR      0
->  #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS 1
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 523bc934fe2f..a37fadbd617e 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -156,6 +156,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->         kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
->
->         set_default_spectre(kvm);
-> +       kvm_arm_init_hypercalls(kvm);
->
->         return ret;
->  out_free_stage2_pgd:
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 0d5cca56cbda..8c607199cad1 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -756,7 +756,9 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->
->         switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
->         case KVM_REG_ARM_CORE:  return get_core_reg(vcpu, reg);
-> -       case KVM_REG_ARM_FW:    return kvm_arm_get_fw_reg(vcpu, reg);
-> +       case KVM_REG_ARM_FW:
-> +       case KVM_REG_ARM_FW_FEAT_BMAP:
-> +               return kvm_arm_get_fw_reg(vcpu, reg);
->         case KVM_REG_ARM64_SVE: return get_sve_reg(vcpu, reg);
->         }
->
-> @@ -774,7 +776,9 @@ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->
->         switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
->         case KVM_REG_ARM_CORE:  return set_core_reg(vcpu, reg);
-> -       case KVM_REG_ARM_FW:    return kvm_arm_set_fw_reg(vcpu, reg);
-> +       case KVM_REG_ARM_FW:
-> +       case KVM_REG_ARM_FW_FEAT_BMAP:
-> +               return kvm_arm_set_fw_reg(vcpu, reg);
->         case KVM_REG_ARM64_SVE: return set_sve_reg(vcpu, reg);
->         }
->
-> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-> index fa6d9378d8e7..df55a04d2fe8 100644
-> --- a/arch/arm64/kvm/hypercalls.c
-> +++ b/arch/arm64/kvm/hypercalls.c
-> @@ -58,6 +58,48 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
->         val[3] = lower_32_bits(cycles);
->  }
->
-> +static bool kvm_arm_fw_reg_feat_enabled(unsigned long *reg_bmap, unsigned long feat_bit)
-> +{
-> +       return test_bit(feat_bit, reg_bmap);
-> +}
-> +
-> +static bool kvm_hvc_call_default_allowed(struct kvm_vcpu *vcpu, u32 func_id)
-> +{
-> +       switch (func_id) {
-> +       /*
-> +        * List of function-ids that are not gated with the bitmapped feature
-> +        * firmware registers, and are to be allowed for servicing the call by default.
-> +        */
-> +       case ARM_SMCCC_VERSION_FUNC_ID:
-> +       case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
-> +       case ARM_SMCCC_HV_PV_TIME_FEATURES:
-> +       case ARM_SMCCC_HV_PV_TIME_ST:
-> +       case ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID:
-> +       case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
-> +       case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
-> +               return true;
-> +       default:
-> +               return kvm_psci_func_id_is_valid(vcpu, func_id);
-> +       }
-> +}
-> +
-> +static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu, u32 func_id)
-> +{
-> +       struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
-> +
-> +       switch (func_id) {
-> +       case ARM_SMCCC_TRNG_VERSION:
-> +       case ARM_SMCCC_TRNG_FEATURES:
-> +       case ARM_SMCCC_TRNG_GET_UUID:
-> +       case ARM_SMCCC_TRNG_RND32:
-> +       case ARM_SMCCC_TRNG_RND64:
-> +               return kvm_arm_fw_reg_feat_enabled(&smccc_feat->std_bmap,
-> +                                               KVM_REG_ARM_STD_BIT_TRNG_V1_0);
-> +       default:
-> +               return kvm_hvc_call_default_allowed(vcpu, func_id);
-> +       }
-> +}
-> +
->  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->  {
->         u32 func_id = smccc_get_function(vcpu);
-> @@ -65,6 +107,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->         u32 feature;
->         gpa_t gpa;
->
-> +       if (!kvm_hvc_call_allowed(vcpu, func_id))
-> +               goto out;
-> +
->         switch (func_id) {
->         case ARM_SMCCC_VERSION_FUNC_ID:
->                 val[0] = ARM_SMCCC_VERSION_1_1;
-> @@ -155,6 +200,7 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->                 return kvm_psci_call(vcpu);
->         }
->
-> +out:
->         smccc_set_retval(vcpu, val[0], val[1], val[2], val[3]);
->         return 1;
->  }
-> @@ -164,8 +210,16 @@ static const u64 kvm_arm_fw_reg_ids[] = {
->         KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1,
->         KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2,
->         KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3,
-> +       KVM_REG_ARM_STD_BMAP,
->  };
->
-> +void kvm_arm_init_hypercalls(struct kvm *kvm)
-> +{
-> +       struct kvm_smccc_features *smccc_feat = &kvm->arch.smccc_feat;
-> +
-> +       smccc_feat->std_bmap = KVM_ARM_SMCCC_STD_FEATURES;
-> +}
-> +
->  int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
->  {
->         return ARRAY_SIZE(kvm_arm_fw_reg_ids);
-> @@ -237,6 +291,7 @@ static int get_kernel_wa_level(u64 regid)
->
->  int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  {
-> +       struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
->         void __user *uaddr = (void __user *)(long)reg->addr;
->         u64 val;
->
-> @@ -249,6 +304,9 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->         case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3:
->                 val = get_kernel_wa_level(reg->id) & KVM_REG_FEATURE_LEVEL_MASK;
->                 break;
-> +       case KVM_REG_ARM_STD_BMAP:
-> +               val = READ_ONCE(smccc_feat->std_bmap);
-> +               break;
->         default:
->                 return -ENOENT;
->         }
-> @@ -259,6 +317,40 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->         return 0;
->  }
->
-> +static int kvm_arm_set_fw_reg_bmap(struct kvm_vcpu *vcpu, u64 reg_id, u64 val)
-> +{
-> +       int ret = 0;
-> +       struct kvm *kvm = vcpu->kvm;
-> +       struct kvm_smccc_features *smccc_feat = &kvm->arch.smccc_feat;
-> +       unsigned long *fw_reg_bmap, fw_reg_features;
-> +
-> +       switch (reg_id) {
-> +       case KVM_REG_ARM_STD_BMAP:
-> +               fw_reg_bmap = &smccc_feat->std_bmap;
-> +               fw_reg_features = KVM_ARM_SMCCC_STD_FEATURES;
-> +               break;
-> +       default:
-> +               return -ENOENT;
-> +       }
-> +
-> +       /* Check for unsupported bit */
-> +       if (val & ~fw_reg_features)
-> +               return -EINVAL;
-> +
-> +       mutex_lock(&kvm->lock);
-
-Why don't you check if the register value will be modified before
-getting the lock ? (then there is nothing to do)
-It would help reduce unnecessary serialization for live migration
-(even without the vm-scoped register capability).
-
-
-
-> +
-> +       /* Return -EBUSY if the VM (any vCPU) has already started running. */
-> +       if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags)) {
-> +               ret = -EBUSY;
-> +               goto out;
-> +       }
-
-I just would like to make sure that you are sure that existing
-userspace you know will not run KVM_RUN for any vCPUs until
-KVM_SET_ONE_REG is complete for all vCPUs (even for migration),
-correct ?
-
-
-> +
-> +       WRITE_ONCE(*fw_reg_bmap, val);
-> +out:
-> +       mutex_unlock(&kvm->lock);
-> +       return ret;
-> +}
-> +
->  int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  {
->         void __user *uaddr = (void __user *)(long)reg->addr;
-> @@ -337,6 +429,8 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->                         return -EINVAL;
->
->                 return 0;
-> +       case KVM_REG_ARM_STD_BMAP:
-> +               return kvm_arm_set_fw_reg_bmap(vcpu, reg->id, val);
->         default:
->                 return -ENOENT;
->         }
-> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> index 346535169faa..67d1273e8086 100644
-> --- a/arch/arm64/kvm/psci.c
-> +++ b/arch/arm64/kvm/psci.c
-> @@ -436,3 +436,16 @@ int kvm_psci_call(struct kvm_vcpu *vcpu)
->                 return -EINVAL;
->         }
->  }
-> +
-> +bool kvm_psci_func_id_is_valid(struct kvm_vcpu *vcpu, u32 func_id)
-> +{
-> +       /* PSCI 0.1 doesn't comply with the standard SMCCC */
-> +       if (kvm_psci_version(vcpu) == KVM_ARM_PSCI_0_1)
-> +               return (func_id == KVM_PSCI_FN_CPU_OFF || func_id == KVM_PSCI_FN_CPU_ON);
-> +
-> +       if (ARM_SMCCC_OWNER_NUM(func_id) == ARM_SMCCC_OWNER_STANDARD &&
-> +               ARM_SMCCC_FUNC_NUM(func_id) >= 0 && ARM_SMCCC_FUNC_NUM(func_id) <= 0x1f)
-> +               return true;
-
-For PSCI 0.1, the function checks if the funct_id is valid for
-the vCPU (according to the vCPU's PSCI version).
-For other version of PSCI, the function doesn't care the vCPU's
-PSCI version (although supported functions depend on the PSCI
-version and not all of them are defined yet, the code returns
-true as long as the function id is within the reserved PSCI
-function id range).
-So, the behavior appears to be inconsistent.
-Shouldn't it return the validity of the function id according
-to the vCPU's psci version for non-PSCI 0.1 case as well ?
-(Otherwise, shouldn't it return true if the function id is valid
-for any of the PSCI versions ?)
-
-Thanks,
-Reiji
-
-
-
-> +
-> +       return false;
-> +}
-> diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
-> index 5d38628a8d04..499b45b607b6 100644
-> --- a/include/kvm/arm_hypercalls.h
-> +++ b/include/kvm/arm_hypercalls.h
-> @@ -6,6 +6,11 @@
->
->  #include <asm/kvm_emulate.h>
->
-> +/* Last valid bits of the bitmapped firmware registers */
-> +#define KVM_REG_ARM_STD_BMAP_BIT_MAX           0
-> +
-> +#define KVM_ARM_SMCCC_STD_FEATURES             GENMASK(KVM_REG_ARM_STD_BMAP_BIT_MAX, 0)
-> +
->  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
->
->  static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
-> @@ -42,6 +47,7 @@ static inline void smccc_set_retval(struct kvm_vcpu *vcpu,
->
->  struct kvm_one_reg;
->
-> +void kvm_arm_init_hypercalls(struct kvm *kvm);
->  int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu);
->  int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
->  int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
-> diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-> index 6e55b9283789..c47be3e26965 100644
-> --- a/include/kvm/arm_psci.h
-> +++ b/include/kvm/arm_psci.h
-> @@ -36,7 +36,7 @@ static inline int kvm_psci_version(struct kvm_vcpu *vcpu)
->         return KVM_ARM_PSCI_0_1;
->  }
->
-> -
->  int kvm_psci_call(struct kvm_vcpu *vcpu);
-> +bool kvm_psci_func_id_is_valid(struct kvm_vcpu *vcpu, u32 func_id);
->
->  #endif /* __KVM_ARM_PSCI_H__ */
-> --
-> 2.36.0.rc2.479.g8af0fa9b8e-goog
->
+Any update on this?
