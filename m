@@ -2,217 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D39350E2AF
-	for <lists+kvm@lfdr.de>; Mon, 25 Apr 2022 16:08:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CABD50E2DD
+	for <lists+kvm@lfdr.de>; Mon, 25 Apr 2022 16:18:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242378AbiDYOKR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Apr 2022 10:10:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43130 "EHLO
+        id S242317AbiDYOVc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Apr 2022 10:21:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234068AbiDYOKP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Apr 2022 10:10:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1815D2C65A
-        for <kvm@vger.kernel.org>; Mon, 25 Apr 2022 07:07:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650895630;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=SVM3muYPJyfaOhJtwnQezE4YHj5J/gwIIpTn05v9eQ0=;
-        b=AX+p/qHMvsVRnowd0dCqAfHdaD4AqpAvu1BQ72T5NRR2xuZiMFceKe91L+FGy24p1mZtQc
-        9pyYcyzDNgyw6T12dGsmShqx1bImQ9xJi4r+mT72J1WjS3vW/tDdBZQuGoyrYlJ6dwJYIG
-        L+bFjZdNjTd2t8OAthyV6SBIc6IaxNs=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-660-2jxJLpN_PBqGRIqhI_CXnA-1; Mon, 25 Apr 2022 10:07:08 -0400
-X-MC-Unique: 2jxJLpN_PBqGRIqhI_CXnA-1
-Received: by mail-wm1-f72.google.com with SMTP id q6-20020a1cf306000000b0038c5726365aso7195485wmq.3
-        for <kvm@vger.kernel.org>; Mon, 25 Apr 2022 07:07:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:organization:subject
-         :in-reply-to:content-transfer-encoding;
-        bh=SVM3muYPJyfaOhJtwnQezE4YHj5J/gwIIpTn05v9eQ0=;
-        b=UA4Krm079oxbAKmxaorRVr7vaM04AlTTe2DHRbNqhv8MQgSfl6uUwq85mKjNo39fny
-         doCkRQq8QCuJOqosWq4NH+sFn+/MrfIpkGcFKrkdSQXnIPATvrwLg7fdZ7a6SnZNG0IS
-         5iwg4duEba31z/qIBRjv3R3GmHEhoVF71WSleVm0tr+kLuKjtS2fDSNhCk0hy85ilZuu
-         ZC0UgDKdiATUfVnOBHB4gUPtMuO87K+JBZx1QxfJQi8V7FM0xzFMYLaLYzke2WHcEPiK
-         KQB25xPnKvb6pegaOISHaDdU4t7+ZEu8LL/DMrWU4b5rK7aslvVYTek9RFkT430+ePXn
-         5sTw==
-X-Gm-Message-State: AOAM532n1Gjmlu0bgTpsOI8hlOJTXbT10YZrpLotT9dwqU+oWtFcsqQW
-        wW9JSgEtgvk6bqSeC8uRfrD1qpjGpY05rtiQosHtWoe5jio55QaSiwnRYm3FFiFPVjxxcV8ldyj
-        ReE11VqXwSv3K
-X-Received: by 2002:a5d:6241:0:b0:207:ac0e:3549 with SMTP id m1-20020a5d6241000000b00207ac0e3549mr14371863wrv.343.1650895627104;
-        Mon, 25 Apr 2022 07:07:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzgoNX9maOD+O7h8van/rWNjXvLl8lKMAp755C32BIUi/e19PViAQ+6Xwf7k6WLPh49+cUdlA==
-X-Received: by 2002:a5d:6241:0:b0:207:ac0e:3549 with SMTP id m1-20020a5d6241000000b00207ac0e3549mr14371841wrv.343.1650895626813;
-        Mon, 25 Apr 2022 07:07:06 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c700:fc00:490d:ed6a:8b22:223a? (p200300cbc700fc00490ded6a8b22223a.dip0.t-ipconnect.de. [2003:cb:c700:fc00:490d:ed6a:8b22:223a])
-        by smtp.gmail.com with ESMTPSA id t18-20020a05600c199200b0039291537cfesm11669789wmq.21.2022.04.25.07.07.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Apr 2022 07:07:06 -0700 (PDT)
-Message-ID: <d2aa867b-3355-8223-2721-f3e825632255@redhat.com>
-Date:   Mon, 25 Apr 2022 16:07:03 +0200
+        with ESMTP id S231361AbiDYOVb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Apr 2022 10:21:31 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65DF41F610;
+        Mon, 25 Apr 2022 07:18:25 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23PCm0OB004740;
+        Mon, 25 Apr 2022 14:18:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=xFYQxtC0B7SQPiXLH83zoxvzJC20pJOVt28ZEpZyYpA=;
+ b=omHtM9MGzhzTUvtRiHQBSNMMsNGZ1kmIN1r+7xXTAHDqnqt9HBNyP2M/wuB7MIza9e1W
+ l22FqlAYaa8wUDCNPOe0p/9TCt0zVHiaDGfUQkwsCDbk5lW4w2bzqyrbY+FKXeSiHKEH
+ Jt5Kk9saJM+WKu93uvQir0OP1YzicBqGkQD1zGbM+5t5QbWr85ITSNefvP4+WVKrNUj5
+ rJlpUJZQVq+9RjD6thWsIaJ/DoQN9AqWGqpVBnrdVU8Dp+nn2PSCZAUR9SicL1XN6r6T
+ CRW0zXfdAQQ93vfuZV1r3t9EnaMd/fSGl+UKbKnLuOpF72L5FgI4GdeBWFY5P5Yb2dsM xQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fns00phey-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Apr 2022 14:18:23 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 23PE1SXp017501;
+        Mon, 25 Apr 2022 14:18:22 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fns00phe6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Apr 2022 14:18:22 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23PEAVR8003972;
+        Mon, 25 Apr 2022 14:18:21 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 3fm938thaw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Apr 2022 14:18:20 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23PEIHPF40108340
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 25 Apr 2022 14:18:17 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8F91DAE051;
+        Mon, 25 Apr 2022 14:18:17 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 33554AE04D;
+        Mon, 25 Apr 2022 14:18:17 +0000 (GMT)
+Received: from [9.171.38.55] (unknown [9.171.38.55])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 25 Apr 2022 14:18:17 +0000 (GMT)
+Message-ID: <64fe2f40-4430-ba31-134f-c891d03bcf7c@linux.ibm.com>
+Date:   Mon, 25 Apr 2022 16:18:16 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.2
+ Thunderbird/91.7.0
+Subject: Re: [kvm-unit-tests PATCH v4] s390x: Test effect of storage keys on
+ some instructions
 Content-Language: en-US
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <20220310140911.50924-5-chao.p.peng@linux.intel.com>
- <Yk8L0CwKpTrv3Rg3@google.com>
- <02e18c90-196e-409e-b2ac-822aceea8891@www.fastmail.com>
- <YlB3Z8fqJ+67a2Ck@google.com>
- <7ab689e7-e04d-5693-f899-d2d785b09892@redhat.com>
- <20220412143636.GG64706@ziepe.ca>
- <1686fd2d-d9c3-ec12-32df-8c4c5ae26b08@redhat.com>
- <20220413175208.GI64706@ziepe.ca>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: [PATCH v5 04/13] mm/shmem: Restrict MFD_INACCESSIBLE memory
- against RLIMIT_MEMLOCK
-In-Reply-To: <20220413175208.GI64706@ziepe.ca>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20220425084128.809134-1-scgl@linux.ibm.com>
+ <20220425131623.2c855fcd@p-imbrenda>
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+In-Reply-To: <20220425131623.2c855fcd@p-imbrenda>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: _gAucEgrxiRyi9PmWbiclZmO4yDyumE9
+X-Proofpoint-ORIG-GUID: esmbFkllDkuh6Ecrij9u4R89aqChBJMU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-25_08,2022-04-25_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=999 adultscore=0 suspectscore=0 clxscore=1015 impostorscore=0
+ spamscore=0 mlxscore=0 bulkscore=0 phishscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204250062
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13.04.22 19:52, Jason Gunthorpe wrote:
-> On Wed, Apr 13, 2022 at 06:24:56PM +0200, David Hildenbrand wrote:
->> On 12.04.22 16:36, Jason Gunthorpe wrote:
->>> On Fri, Apr 08, 2022 at 08:54:02PM +0200, David Hildenbrand wrote:
->>>
->>>> RLIMIT_MEMLOCK was the obvious candidate, but as we discovered int he
->>>> past already with secretmem, it's not 100% that good of a fit (unmovable
->>>> is worth than mlocked). But it gets the job done for now at least.
->>>
->>> No, it doesn't. There are too many different interpretations how
->>> MELOCK is supposed to work
->>>
->>> eg VFIO accounts per-process so hostile users can just fork to go past
->>> it.
->>>
->>> RDMA is per-process but uses a different counter, so you can double up
->>>
->>> iouring is per-user and users a 3rd counter, so it can triple up on
->>> the above two
+On 4/25/22 13:16, Claudio Imbrenda wrote:
+> On Mon, 25 Apr 2022 10:41:28 +0200
+> Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
+> 
+>> Some instructions are emulated by KVM. Test that KVM correctly emulates
+>> storage key checking for two of those instructions (STORE CPU ADDRESS,
+>> SET PREFIX).
+>> Test success and error conditions, including coverage of storage and
+>> fetch protection override.
+>> Also add test for TEST PROTECTION, even if that instruction will not be
+>> emulated by KVM under normal conditions.
 >>
->> Thanks for that summary, very helpful.
+>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>> ---
+
+[...]
+
+>> +static void test_set_prefix(void)
+>> +{
+>> +	char lowcore_tmp[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
 > 
-> I kicked off a big discussion when I suggested to change vfio to use
-> the same as io_uring
+> perhaps it's cleaner to put this as a global (static) variable
 > 
-> We may still end up trying it, but the major concern is that libvirt
-> sets the RLIMIT_MEMLOCK and if we touch anything here - including
-> fixing RDMA, or anything really, it becomes a uAPI break for libvirt..
+> also, please define LC_SIZE (2*PAGE_SIZE) and use that
+
+I'll call that PREFIX_AREA_SIZE, otherwise it is confusing that that is
+not the same as sizeof(struct lowcore).
 > 
-
-Okay, so we have to introduce a second mechanism, don't use
-RLIMIT_MEMLOCK for new unmovable memory, and then eventually phase out
-RLIMIT_MEMLOCK usage for existing unmovable memory consumers (which, as
-you say, will be difficult).
-
->>>> So I'm open for alternative to limit the amount of unmovable memory we
->>>> might allocate for user space, and then we could convert seretmem as well.
->>>
->>> I think it has to be cgroup based considering where we are now :\
->>
->> Most probably. I think the important lessons we learned are that
->>
->> * mlocked != unmovable.
->> * RLIMIT_MEMLOCK should most probably never have been abused for
->>   unmovable memory (especially, long-term pinning)
+>> +	uint32_t *prefix_ptr = (uint32_t *)pagebuf;
+>> +	uint32_t old_prefix;
+>> +	pgd_t *root;
+>> +
+>> +	report_prefix_push("SET PREFIX");
+>> +	root = (pgd_t *)(stctg(1) & PAGE_MASK);
+>> +	old_prefix = get_prefix();
+>> +	memcpy(lowcore_tmp, 0, PAGE_SIZE * 2);
+>> +	assert(((uint64_t)&lowcore_tmp >> 31) == 0);
+>> +	*prefix_ptr = (uint32_t)(uint64_t)&lowcore_tmp;
+>> +
+>> +	report_prefix_push("zero key");
+>> +	set_prefix(old_prefix);
+>> +	set_storage_key(prefix_ptr, 0x20, 0);
+>> +	set_prefix(*prefix_ptr);
+>> +	report(get_prefix() == *prefix_ptr, "set prefix");
+>> +	report_prefix_pop();
+>> +
+>> +	report_prefix_push("matching key");
+>> +	set_prefix(old_prefix);
+>> +	set_storage_key(pagebuf, 0x10, 0);
+>> +	set_prefix_key_1(prefix_ptr);
+>> +	report(get_prefix() == *prefix_ptr, "set prefix");
+>> +	report_prefix_pop();
+>> +
+>> +	report_prefix_push("mismatching key");
+>> +
+>> +	report_prefix_push("no fetch protection");
+>> +	set_prefix(old_prefix);
+>> +	set_storage_key(pagebuf, 0x20, 0);
+>> +	set_prefix_key_1(prefix_ptr);
+>> +	report(get_prefix() == *prefix_ptr, "set prefix");
+>> +	report_prefix_pop();
+>> +
+>> +	report_prefix_push("fetch protection");
+>> +	set_prefix(old_prefix);
+>> +	set_storage_key(pagebuf, 0x28, 0);
+>> +	expect_pgm_int();
+>> +	set_prefix_key_1(prefix_ptr);
+>> +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
+>> +	report(get_prefix() != *prefix_ptr, "did not set prefix");
 > 
-> The trouble is I'm not sure how anything can correctly/meaningfully
-> set a limit.
-> 
-> Consider qemu where we might have 3 different things all pinning the
-> same page (rdma, iouring, vfio) - should the cgroup give 3x the limit?
-> What use is that really?
+> why don't you check == old_prefix instead? that way you know noting has
+> changed (also for all the other tests below where you do the same)
 
-I think your tackling a related problem, that we double-account
-unmovable/mlocked memory due to lack of ways to track that a page is
-already pinned by the same user/cgroup/whatsoever. Not easy to solve.
+Yeah, that's better.
 
-The problem also becomes interesting if iouring with fixed buffers
-doesn't work on guest RAM, but on some other QEMU buffers.
-
-> 
-> IMHO there are only two meaningful scenarios - either you are unpriv
-> and limited to a very small number for your user/cgroup - or you are
-> priv and you can do whatever you want.
-> 
-> The idea we can fine tune this to exactly the right amount for a
-> workload does not seem realistic and ends up exporting internal kernel
-> decisions into a uAPI..
-
-
-IMHO, there are three use cases:
-
-* App that conditionally uses selected mechanism that end up requiring
-  unmovable, long-term allocations. Secretmem, iouring, rdma. We want
-  some sane, small default. Apps have a backup path in case any such
-  mechanism fails because we're out of allowed unmovable resources.
-* App that relies on selected mechanism that end up requiring unmovable,
-  long-term allocations. E.g., vfio with known memory consumption, such
-  as the VM size. It's fairly easy to come up with the right value.
-* App that relies on multiple mechanism that end up requiring unmovable,
-  long-term allocations. QEMU with rdma, iouring, vfio, ... I agree that
-  coming up with something good is problematic.
-
-Then, there are privileged/unprivileged apps. There might be admins that
-just don't care. There might be admins that even want to set some limit
-instead of configuring "unlimited" for QEMU.
-
-Long story short, it should be an admin choice what to configure,
-especially:
-* What the default is for random apps
-* What the maximum is for selected apps
-* Which apps don't have a maximum
-
--- 
-Thanks,
-
-David / dhildenb
-
+[...]
