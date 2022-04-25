@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C5CB50DF4F
-	for <lists+kvm@lfdr.de>; Mon, 25 Apr 2022 13:47:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 077E150DF55
+	for <lists+kvm@lfdr.de>; Mon, 25 Apr 2022 13:48:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241766AbiDYLu2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Apr 2022 07:50:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33212 "EHLO
+        id S241786AbiDYLvT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Apr 2022 07:51:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241806AbiDYLth (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Apr 2022 07:49:37 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2062.outbound.protection.outlook.com [40.107.220.62])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B58A403CC
-        for <kvm@vger.kernel.org>; Mon, 25 Apr 2022 04:46:27 -0700 (PDT)
+        with ESMTP id S236134AbiDYLvG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Apr 2022 07:51:06 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2061.outbound.protection.outlook.com [40.107.92.61])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4088F40A2F
+        for <kvm@vger.kernel.org>; Mon, 25 Apr 2022 04:46:52 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IZxCPSYZ/YqpFewdM4VlsXNB4eEHdceO/OBhwIBwNtMBOqQFAz2I0RhSj8l8oqy0rl9xuQcg4SGqU9I2yd/LqNvFqTEM8YNQxcTojryAUfw0qsJ6v32AVQCw96uw4E9GPaupIS/IuD+TlYZaPpNASBx9crtWukN3vKRZK7sve56EUmUM+OEJnmUGG+dP07nKMpIBDTfVOVZ1AIO3fyJT6XTl1kiH/oKCSHtVghbAw0LYdHnmS4yjGTSZqhq/xnjTwR+5ADqrwM7Toek6un4xv8f5TrrU9Dkr4G2q9Be6RhfGN9Ec5Y9CkNFpyj4XQ/7xeBiyHZdtxRIMKRwkGyZSEw==
+ b=oIu6pO603YKMKVfZrbzfBap9PL66Ywk8/CYkqkvMfUYXwjXRs54BSq7+EKSk97ptlTnqu4+XqQ4lIxFPEFgxr46s8XbZUBXYJGZ9y1uVbPbRiB4hp3lYnzXk9ocgG9ZX8VBdEQBJYiPxTe0er+6ksJjjh7QrVpOVgeU5g9qQ6lxl/NDBzy/0no3pJmAX539vzqxUyq1IRKNtvK75I3hmqxxMiev1+X6jhegLqDS2FFo9ucGchFjKZROBQXUYoi3RSdFY8m0gpss0SWihX0CtlU4nIBwJ/wFmxYCe6wtepSFmORDGLnsLc1A3FhlvkhQu0KVIvLTA5ahu5g/DQ8k0tg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fKPRMBVh8zRQNedbMqrr6A5GVdeIF1KGsdCCMLQagfU=;
- b=UvcHU+k6SA20jpBA9Nok/rEM0fF82e+33KO9m4DXoeMs8e+lw7DFjuEJ200hD5CpJumpHydKSn70FucrlVkHyL9m1K/ZS2i5q1QRpeDTn4rO0zI3hdSisFSP2B3u89yx9P9KVLxm1l9apuxmRCTBfggS+LxX/FrtfgLKvYSRL2wb1JRgEyZ+YrCOuBAZW9c9HcPbKq+x0++azw4UZKsEjUkb/BmCyOiha/KxPdnN2cq0UF+Zztzj+MvGk8WCLJRws7GLJJ7VfNth0HTVMFcK5CGmNkQO+UmqBZbzm1zGltvNn1A2OhiZaidlfuD94hmR7XAmcmcNw+svKofEuXV64w==
+ bh=ifysPn+UzVElbSebOWLoX2+0oRU9G3Q7+70kyvRpnVk=;
+ b=QcSQOS9mX34EjfJQkY4LcXep0kNtb44xd/nyKiXRFi3/bjzx++RWN3Jqq6hR2rgcFQ+e5akKP8YrfpICJzU7xt+xQJ8G3i1otBw3JmB0PVkEWsp3uIlyw1wKanLMj+18QDJ6gzO6GDOihUWAXKQAfRThz5kdrAVE8sxxcfCbpm33Mio8OVsfAeIEC94oKDIb+oSKqGUtKE3K+yZIkD2ZBDKXyBWSa1/m7dvVqiP+OZLPxe5t/D+Tv2xqhx+ydHMiCwftjtXKvhs93RZnyANnPOH8qbS3PdD3IAFlPpiyp2Q/qn+z7BF8IQLJOi+z4Kt/K5usXZXQGW/eJu4HZTNSxQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fKPRMBVh8zRQNedbMqrr6A5GVdeIF1KGsdCCMLQagfU=;
- b=qkgGNBXOd/Arys9JK1RrVpyYG8vQ8Mn1zEvtipIcLFkFL+FA4M9g7YulC4bKSNP6amQXGqgkqCk31EYyRzuy1XP41NLdQ+r/6FsRWuB8RwKrIcc5uaE1Tce6tTy6sJiTwTlCnAyXLv7+KFnoZ7BDNpaYooWpFR8+1sN9FiGNDXE=
-Received: from BN9PR03CA0605.namprd03.prod.outlook.com (2603:10b6:408:106::10)
- by SJ1PR12MB6172.namprd12.prod.outlook.com (2603:10b6:a03:459::22) with
+ bh=ifysPn+UzVElbSebOWLoX2+0oRU9G3Q7+70kyvRpnVk=;
+ b=UoeYhH4tHnFxtieqEdEcvGcbM9KFNmpKlsd2B4XVUy8/cWfYkg2VOS4U9UnRM1pNIk5vb3bsACCi7ph/Y1eywcP+DBbhYfZb6vJCLW4wNQ/zvijQ1z68u8GCM/7rwO1qbG++fV+uXiPMIuCBuHmPVwk5pxmvaSG6bltPawb2BnU=
+Received: from BN9P223CA0019.NAMP223.PROD.OUTLOOK.COM (2603:10b6:408:10b::24)
+ by MN2PR12MB3117.namprd12.prod.outlook.com (2603:10b6:208:d1::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.20; Mon, 25 Apr
- 2022 11:46:25 +0000
-Received: from BN8NAM11FT011.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:106:cafe::8) by BN9PR03CA0605.outlook.office365.com
- (2603:10b6:408:106::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.15 via Frontend
- Transport; Mon, 25 Apr 2022 11:46:25 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.14; Mon, 25 Apr
+ 2022 11:46:46 +0000
+Received: from BN8NAM11FT050.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:10b:cafe::b2) by BN9P223CA0019.outlook.office365.com
+ (2603:10b6:408:10b::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.14 via Frontend
+ Transport; Mon, 25 Apr 2022 11:46:46 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,19 +46,19 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN8NAM11FT011.mail.protection.outlook.com (10.13.176.140) with Microsoft SMTP
+ BN8NAM11FT050.mail.protection.outlook.com (10.13.177.5) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5186.14 via Frontend Transport; Mon, 25 Apr 2022 11:46:25 +0000
+ 15.20.5186.14 via Frontend Transport; Mon, 25 Apr 2022 11:46:45 +0000
 Received: from bhadra.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Mon, 25 Apr
- 2022 06:46:23 -0500
+ 2022 06:46:44 -0500
 From:   Manali Shukla <manali.shukla@amd.com>
 To:     <pbonzini@redhat.com>, <seanjc@google.com>
 CC:     <kvm@vger.kernel.org>
-Subject: [kvm-unit-tests RESEND PATCH v3 5/8] x86: nSVM: Build up the nested page table dynamically
-Date:   Mon, 25 Apr 2022 11:44:14 +0000
-Message-ID: <20220425114417.151540-6-manali.shukla@amd.com>
+Subject: [kvm-unit-tests RESEND PATCH v3 6/8] x86: nSVM: Correct indentation for svm.c
+Date:   Mon, 25 Apr 2022 11:44:15 +0000
+Message-ID: <20220425114417.151540-7-manali.shukla@amd.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220425114417.151540-1-manali.shukla@amd.com>
 References: <20220425114417.151540-1-manali.shukla@amd.com>
@@ -70,24 +70,24 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2036c155-f024-4ac1-78fa-08da26b13a3e
-X-MS-TrafficTypeDiagnostic: SJ1PR12MB6172:EE_
-X-Microsoft-Antispam-PRVS: <SJ1PR12MB617250F638B98C060C75BF76FDF89@SJ1PR12MB6172.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 9b1a215e-dc01-4dfb-f56f-08da26b1467b
+X-MS-TrafficTypeDiagnostic: MN2PR12MB3117:EE_
+X-Microsoft-Antispam-PRVS: <MN2PR12MB31178F49260F8C8E93C99C8BFDF89@MN2PR12MB3117.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: G5OKO+iH5WkayLYg6M5DoY2CLt2+v3OddfkYn3r/5wZBW5q5vAwqT6usquHGNVwCfhcdyVUapkBh76nUsrHoyyrt8BLu8/mj8xYuIEoQBjXH9iz1KPIyc2IbyrJlNA3PlcR0/j0u8Fm1w0KeneB2QKYdLLldBxPcM7sf8mnbyyadBOG73t/zA0xBQbItbz13GnI224JCJpY2rensaocw3J9US4YTxnyX+LmAs/orsRIJp2q2V+1S3I5GE1UtWZvmU2A8GAUfLYjWu2qpSHrD0MpihTSbsHGyCjm+uaeC3UjdhwngElSrr+cxtJrzhKnzZrXUgA0av1kWI9WERa0SyVWfATUPTiczlRixvA1Hl/Y5MAEHIHIyKm3yiTVndKZpURILX2Kx1Knc3lsXnrO+NKjU6Jzjw02qUgXNpZMMKCoEky5KEYMG0/wY86Z30Vpycs9QTrVPt7QB56T3ZCZ2wrGl1h282TFwZwg55G1S/foumnNm1QR9AlRTnqhm+O4X8WmuSkxKz5MdkicVNkXN3DZlAKsx0p/by+dsDcfBvyr4aO8KOuTANtIZUk8vSpDFqwG31n6udNq0giTwWKfQcsBHwFJYXbt9TQn9ZGuwbZEKyvp3lziQa6rwnDYkol64doASu/Yzs61UhTFii79A98afDamWrvCEXIc7eqclIacWGdz7HWmsCZsvBcti+6h9+tCosmSJtNMjXEFQ/o9LuQ==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(40470700004)(46966006)(26005)(70206006)(86362001)(2616005)(2906002)(508600001)(6666004)(5660300002)(44832011)(36860700001)(356005)(81166007)(83380400001)(8936002)(7696005)(40460700003)(1076003)(16526019)(47076005)(426003)(186003)(336012)(316002)(70586007)(4326008)(82310400005)(110136005)(8676002)(36756003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: PKfVEppOiIazXRwfGA+ymi16eXOwzE1RSpfl9Ei6lqpsYqN0IU8kH0SfkxRJ/B5pS4MzZlGid5zAJXS/edbnI+QvMbN0opd3c5ZC2tqTapmAdg4PZ+Cfqw0ykDPQXh3To+kQKeoTwWQogt068t+mAbTOqLtdVkiGGADlNK0zD6wX0Ut5jvY/gnJuayXMkdQO7U150jZ/jzBvWkXPpDgG/XQunSzLbqm+TffFHrujXIqvWYyDiTAHyPc9tmunpA4i3N2PQLlcYVq5Ea5DdW+Ool8XW3sz4jpdUbwAvfbNyZ4Gz5Bnc0DYBE5zomVl4UAOMveTb7fRzJQdp83TTw4mY+G4HO8seH1G2SS7lCH3XbG4WNWOSclfCSl/mViOYPUmwENHeTbkCBtybLW49P7/UHQ76ZUMnJDm3n2jg5NkbQXW+8fWiB0+1fBspPPdHA0QUcHFjzSfpBx1TOFby6RPRsyuHdzzUrm8m9/7xtRk5BYkyUEM84wZ0F6Gq45gjCZWQnbAQIlrZGOfn+W+q/zs4oX0AUjFzGwT4/oP6Lkc7KWmnkDBSPb4emolcWeHAkaLHaPdwjJJ5y8UrBrD3RMAfshU4LGEVfT3wsE+nz0L4Pvbwy+3ws2JmeVCV5HHgKGIgv8Wa3UPxbBNrNcSH9dKn8CkuG26pNHD77XbXde6B0R8BMht3GJOYcgoyQRA2JFI9UdjPQhvp7NKMTQd5AddnA==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(46966006)(36840700001)(40470700004)(5660300002)(36756003)(2906002)(40460700003)(81166007)(356005)(47076005)(336012)(426003)(1076003)(110136005)(44832011)(316002)(2616005)(82310400005)(16526019)(7696005)(30864003)(6666004)(36860700001)(70206006)(4326008)(8676002)(70586007)(26005)(186003)(86362001)(83380400001)(508600001)(8936002)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Apr 2022 11:46:25.3961
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Apr 2022 11:46:45.9317
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2036c155-f024-4ac1-78fa-08da26b13a3e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9b1a215e-dc01-4dfb-f56f-08da26b1467b
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT011.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT050.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6172
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3117
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
@@ -98,193 +98,416 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Current implementation of nested page table does the page table build
-up statistically with 2048 PTEs and one pml4 entry.
-That is why current implementation is not extensible.
+Used ./scripts/Lident script from linux kernel source base to correct the
+indentation in svm.c file.
 
-New implementation does page table build up dynamically based on the
-RAM size of the VM which enables us to have separate memory range to
-test various npt test cases.
+No functional changes intended.
 
 Signed-off-by: Manali Shukla <manali.shukla@amd.com>
 ---
- x86/svm.c     | 75 ++++++++++++++++-----------------------------------
- x86/svm.h     |  4 ++-
- x86/svm_npt.c |  5 ++--
- 3 files changed, 29 insertions(+), 55 deletions(-)
+ x86/svm.c | 225 +++++++++++++++++++++++++++---------------------------
+ 1 file changed, 111 insertions(+), 114 deletions(-)
 
 diff --git a/x86/svm.c b/x86/svm.c
-index ec825c7..e66c801 100644
+index e66c801..081a167 100644
 --- a/x86/svm.c
 +++ b/x86/svm.c
-@@ -8,6 +8,7 @@
- #include "desc.h"
- #include "msr.h"
- #include "vm.h"
-+#include "fwcfg.h"
- #include "smp.h"
- #include "types.h"
- #include "alloc_page.h"
-@@ -16,43 +17,32 @@
- #include "vmalloc.h"
- 
- /* for the nested page table*/
--u64 *pte[2048];
--u64 *pde[4];
--u64 *pdpe;
- u64 *pml4e;
- 
- struct vmcb *vmcb;
+@@ -23,26 +23,26 @@ struct vmcb *vmcb;
  
  u64 *npt_get_pte(u64 address)
  {
--	int i1, i2;
--
--	address >>= 12;
--	i1 = (address >> 9) & 0x7ff;
--	i2 = address & 0x1ff;
--
--	return &pte[i1][i2];
-+        return get_pte(npt_get_pml4e(), (void*)address);
+-        return get_pte(npt_get_pml4e(), (void*)address);
++	return get_pte(npt_get_pml4e(), (void *)address);
  }
  
  u64 *npt_get_pde(u64 address)
  {
--	int i1, i2;
--
--	address >>= 21;
--	i1 = (address >> 9) & 0x3;
--	i2 = address & 0x1ff;
--
--	return &pde[i1][i2];
-+    struct pte_search search;
-+    search = find_pte_level(npt_get_pml4e(), (void*)address, 2);
-+    return search.pte;
+-    struct pte_search search;
+-    search = find_pte_level(npt_get_pml4e(), (void*)address, 2);
+-    return search.pte;
++	struct pte_search search;
++	search = find_pte_level(npt_get_pml4e(), (void *)address, 2);
++	return search.pte;
  }
  
--u64 *npt_get_pdpe(void)
-+u64 *npt_get_pdpe(u64 address)
+ u64 *npt_get_pdpe(u64 address)
  {
--	return pdpe;
-+    struct pte_search search;
-+    search = find_pte_level(npt_get_pml4e(), (void*)address, 3);
-+    return search.pte;
+-    struct pte_search search;
+-    search = find_pte_level(npt_get_pml4e(), (void*)address, 3);
+-    return search.pte;
++	struct pte_search search;
++	search = find_pte_level(npt_get_pml4e(), (void *)address, 3);
++	return search.pte;
  }
  
  u64 *npt_get_pml4e(void)
  {
--	return pml4e;
-+    return pml4e;
+-    return pml4e;
++	return pml4e;
  }
  
  bool smp_supported(void)
-@@ -300,11 +290,21 @@ static void set_additional_vcpu_msr(void *msr_efer)
- 	wrmsr(MSR_EFER, (ulong)msr_efer | EFER_SVME);
+@@ -52,7 +52,7 @@ bool smp_supported(void)
+ 
+ bool default_supported(void)
+ {
+-    return true;
++	return true;
  }
  
-+void setup_npt(void) {
-+    u64 end_of_memory;
-+    pml4e = alloc_page();
-+
-+    end_of_memory = fwcfg_get_u64(FW_CFG_RAM_SIZE);
-+    if (end_of_memory < (1ul << 32))
-+        end_of_memory = (1ul << 32);
-+
-+    setup_mmu_range(pml4e, 0, end_of_memory, true);
-+}
-+
- static void setup_svm(void)
+ bool vgif_supported(void)
+@@ -62,25 +62,24 @@ bool vgif_supported(void)
+ 
+ bool lbrv_supported(void)
  {
+-    return this_cpu_has(X86_FEATURE_LBRV);
++	return this_cpu_has(X86_FEATURE_LBRV);
+ }
+ 
+ bool tsc_scale_supported(void)
+ {
+-    return this_cpu_has(X86_FEATURE_TSCRATEMSR);
++	return this_cpu_has(X86_FEATURE_TSCRATEMSR);
+ }
+ 
+ bool pause_filter_supported(void)
+ {
+-    return this_cpu_has(X86_FEATURE_PAUSEFILTER);
++	return this_cpu_has(X86_FEATURE_PAUSEFILTER);
+ }
+ 
+ bool pause_threshold_supported(void)
+ {
+-    return this_cpu_has(X86_FEATURE_PFTHRESHOLD);
++	return this_cpu_has(X86_FEATURE_PFTHRESHOLD);
+ }
+ 
+-
+ void default_prepare(struct svm_test *test)
+ {
+ 	vmcb_ident(vmcb);
+@@ -92,7 +91,7 @@ void default_prepare_gif_clear(struct svm_test *test)
+ 
+ bool default_finished(struct svm_test *test)
+ {
+-	return true; /* one vmexit */
++	return true;		/* one vmexit */
+ }
+ 
+ bool npt_supported(void)
+@@ -121,7 +120,7 @@ void inc_test_stage(struct svm_test *test)
+ }
+ 
+ static void vmcb_set_seg(struct vmcb_seg *seg, u16 selector,
+-                         u64 base, u32 limit, u32 attr)
++			 u64 base, u32 limit, u32 attr)
+ {
+ 	seg->selector = selector;
+ 	seg->attrib = attr;
+@@ -131,7 +130,7 @@ static void vmcb_set_seg(struct vmcb_seg *seg, u16 selector,
+ 
+ inline void vmmcall(void)
+ {
+-	asm volatile ("vmmcall" : : : "memory");
++	asm volatile ("vmmcall":::"memory");
+ }
+ 
+ static test_guest_func guest_main;
+@@ -165,15 +164,17 @@ void vmcb_ident(struct vmcb *vmcb)
+ 	struct descriptor_table_ptr desc_table_ptr;
+ 
+ 	memset(vmcb, 0, sizeof(*vmcb));
+-	asm volatile ("vmsave %0" : : "a"(vmcb_phys) : "memory");
++	asm volatile ("vmsave %0"::"a" (vmcb_phys):"memory");
+ 	vmcb_set_seg(&save->es, read_es(), 0, -1U, data_seg_attr);
+ 	vmcb_set_seg(&save->cs, read_cs(), 0, -1U, code_seg_attr);
+ 	vmcb_set_seg(&save->ss, read_ss(), 0, -1U, data_seg_attr);
+ 	vmcb_set_seg(&save->ds, read_ds(), 0, -1U, data_seg_attr);
+ 	sgdt(&desc_table_ptr);
+-	vmcb_set_seg(&save->gdtr, 0, desc_table_ptr.base, desc_table_ptr.limit, 0);
++	vmcb_set_seg(&save->gdtr, 0, desc_table_ptr.base, desc_table_ptr.limit,
++		     0);
+ 	sidt(&desc_table_ptr);
+-	vmcb_set_seg(&save->idtr, 0, desc_table_ptr.base, desc_table_ptr.limit, 0);
++	vmcb_set_seg(&save->idtr, 0, desc_table_ptr.base, desc_table_ptr.limit,
++		     0);
+ 	ctrl->asid = 1;
+ 	save->cpl = 0;
+ 	save->efer = rdmsr(MSR_EFER);
+@@ -186,14 +187,13 @@ void vmcb_ident(struct vmcb *vmcb)
+ 	save->g_pat = rdmsr(MSR_IA32_CR_PAT);
+ 	save->dbgctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
+ 	ctrl->intercept = (1ULL << INTERCEPT_VMRUN) |
+-			  (1ULL << INTERCEPT_VMMCALL) |
+-			  (1ULL << INTERCEPT_SHUTDOWN);
++	    (1ULL << INTERCEPT_VMMCALL) | (1ULL << INTERCEPT_SHUTDOWN);
+ 	ctrl->iopm_base_pa = virt_to_phys(io_bitmap);
+ 	ctrl->msrpm_base_pa = virt_to_phys(msr_bitmap);
+ 
+ 	if (npt_supported()) {
+ 		ctrl->nested_ctl = 1;
+-		ctrl->nested_cr3 = (u64)pml4e;
++		ctrl->nested_cr3 = (u64) pml4e;
+ 		ctrl->tlb_ctl = TLB_CONTROL_FLUSH_ALL_ASID;
+ 	}
+ }
+@@ -207,32 +207,29 @@ struct regs get_regs(void)
+ 
+ // rax handled specially below
+ 
+-
+ struct svm_test *v2_test;
+ 
+-
+ u64 guest_stack[10000];
+ 
+ int __svm_vmrun(u64 rip)
+ {
+-	vmcb->save.rip = (ulong)rip;
+-	vmcb->save.rsp = (ulong)(guest_stack + ARRAY_SIZE(guest_stack));
+-	regs.rdi = (ulong)v2_test;
++	vmcb->save.rip = (ulong) rip;
++	vmcb->save.rsp = (ulong) (guest_stack + ARRAY_SIZE(guest_stack));
++	regs.rdi = (ulong) v2_test;
+ 
+-	asm volatile (
+-		ASM_PRE_VMRUN_CMD
+-                "vmrun %%rax\n\t"               \
+-		ASM_POST_VMRUN_CMD
+-		:
+-		: "a" (virt_to_phys(vmcb))
+-		: "memory", "r15");
++	asm volatile (ASM_PRE_VMRUN_CMD
++			  "vmrun %%rax\n\t" \
++			  ASM_POST_VMRUN_CMD
++			  :
++			  :"a"(virt_to_phys(vmcb))
++			  :"memory", "r15");
+ 
+ 	return (vmcb->control.exit_code);
+ }
+ 
+ int svm_vmrun(void)
+ {
+-	return __svm_vmrun((u64)test_thunk);
++	return __svm_vmrun((u64) test_thunk);
+ }
+ 
+ extern u8 vmrun_rip;
+@@ -246,40 +243,38 @@ static noinline void test_run(struct svm_test *test)
+ 
+ 	test->prepare(test);
+ 	guest_main = test->guest_func;
+-	vmcb->save.rip = (ulong)test_thunk;
+-	vmcb->save.rsp = (ulong)(guest_stack + ARRAY_SIZE(guest_stack));
+-	regs.rdi = (ulong)test;
++	vmcb->save.rip = (ulong) test_thunk;
++	vmcb->save.rsp = (ulong) (guest_stack + ARRAY_SIZE(guest_stack));
++	regs.rdi = (ulong) test;
+ 	do {
+ 		struct svm_test *the_test = test;
+ 		u64 the_vmcb = vmcb_phys;
+-		asm volatile (
+-			"clgi;\n\t" // semi-colon needed for LLVM compatibility
+-			"sti \n\t"
+-			"call *%c[PREPARE_GIF_CLEAR](%[test]) \n \t"
+-			"mov %[vmcb_phys], %%rax \n\t"
+-			ASM_PRE_VMRUN_CMD
+-			".global vmrun_rip\n\t"		\
+-			"vmrun_rip: vmrun %%rax\n\t"    \
+-			ASM_POST_VMRUN_CMD
+-			"cli \n\t"
+-			"stgi"
+-			: // inputs clobbered by the guest:
+-			"=D" (the_test),            // first argument register
+-			"=b" (the_vmcb)             // callee save register!
+-			: [test] "0" (the_test),
+-			[vmcb_phys] "1"(the_vmcb),
+-			[PREPARE_GIF_CLEAR] "i" (offsetof(struct svm_test, prepare_gif_clear))
+-			: "rax", "rcx", "rdx", "rsi",
+-			"r8", "r9", "r10", "r11" , "r12", "r13", "r14", "r15",
+-			"memory");
++		asm volatile ("clgi;\n\t"	// semi-colon needed for LLVM compatibility
++			      "sti \n\t"
++			      "call *%c[PREPARE_GIF_CLEAR](%[test]) \n \t"
++			      "mov %[vmcb_phys], %%rax \n\t"
++			      ASM_PRE_VMRUN_CMD
++			      ".global vmrun_rip\n\t"       \
++			      "vmrun_rip: vmrun %%rax\n\t"  \
++			      ASM_POST_VMRUN_CMD "cli \n\t"
++			      "stgi"
++			      :	// inputs clobbered by the guest:
++			      "=D"(the_test),	// first argument register
++			      "=b"(the_vmcb)	// callee save register!
++			      :[test] "0"(the_test),
++			      [vmcb_phys] "1"(the_vmcb),
++			      [PREPARE_GIF_CLEAR]
++			      "i"(offsetof(struct svm_test, prepare_gif_clear))
++			      :"rax", "rcx", "rdx", "rsi", "r8", "r9", "r10",
++			      "r11", "r12", "r13", "r14", "r15", "memory");
+ 		++test->exits;
+ 	} while (!test->finished(test));
+ 	irq_enable();
+ 
+ 	report(test->succeeded(test), "%s", test->name);
+ 
+-        if (test->on_vcpu)
+-	    test->on_vcpu_done = true;
++	if (test->on_vcpu)
++		test->on_vcpu_done = true;
+ }
+ 
+ static void set_additional_vcpu_msr(void *msr_efer)
+@@ -287,18 +282,19 @@ static void set_additional_vcpu_msr(void *msr_efer)
  	void *hsave = alloc_page();
--	u64 *page, address;
--	int i,j;
-+	int i;
  
  	wrmsr(MSR_VM_HSAVE_PA, virt_to_phys(hsave));
- 	wrmsr(MSR_EFER, rdmsr(MSR_EFER) | EFER_SVME);
-@@ -327,36 +327,7 @@ static void setup_svm(void)
- 	* pages to get enough granularity for the NPT unit-tests.
- 	*/
+-	wrmsr(MSR_EFER, (ulong)msr_efer | EFER_SVME);
++	wrmsr(MSR_EFER, (ulong) msr_efer | EFER_SVME);
+ }
  
--	address = 0;
--
--	/* PTE level */
--	for (i = 0; i < 2048; ++i) {
--		page = alloc_page();
--
--		for (j = 0; j < 512; ++j, address += 4096)
--	    		page[j] = address | 0x067ULL;
--
--		pte[i] = page;
--	}
--
--	/* PDE level */
--	for (i = 0; i < 4; ++i) {
--		page = alloc_page();
--
--	for (j = 0; j < 512; ++j)
--	    page[j] = (u64)pte[(i * 512) + j] | 0x027ULL;
--
--		pde[i] = page;
--	}
--
--	/* PDPe level */
--	pdpe   = alloc_page();
--	for (i = 0; i < 4; ++i)
--		pdpe[i] = ((u64)(pde[i])) | 0x27;
--
--	/* PML4e level */
--	pml4e    = alloc_page();
--	pml4e[0] = ((u64)pdpe) | 0x27;
-+  setup_npt();
+-void setup_npt(void) {
+-    u64 end_of_memory;
+-    pml4e = alloc_page();
++void setup_npt(void)
++{
++	u64 end_of_memory;
++	pml4e = alloc_page();
+ 
+-    end_of_memory = fwcfg_get_u64(FW_CFG_RAM_SIZE);
+-    if (end_of_memory < (1ul << 32))
+-        end_of_memory = (1ul << 32);
++	end_of_memory = fwcfg_get_u64(FW_CFG_RAM_SIZE);
++	if (end_of_memory < (1ul << 32))
++		end_of_memory = (1ul << 32);
+ 
+-    setup_mmu_range(pml4e, 0, end_of_memory, true);
++	setup_mmu_range(pml4e, 0, end_of_memory, true);
+ }
+ 
+ static void setup_svm(void)
+@@ -309,63 +305,64 @@ static void setup_svm(void)
+ 	wrmsr(MSR_VM_HSAVE_PA, virt_to_phys(hsave));
+ 	wrmsr(MSR_EFER, rdmsr(MSR_EFER) | EFER_SVME);
+ 
+-	io_bitmap = (void *) ALIGN((ulong)io_bitmap_area, PAGE_SIZE);
++	io_bitmap = (void *)ALIGN((ulong) io_bitmap_area, PAGE_SIZE);
+ 
+-	msr_bitmap = (void *) ALIGN((ulong)msr_bitmap_area, PAGE_SIZE);
++	msr_bitmap = (void *)ALIGN((ulong) msr_bitmap_area, PAGE_SIZE);
+ 
+ 	if (!npt_supported())
+ 		return;
+ 
+ 	for (i = 1; i < cpu_count(); i++)
+-		on_cpu(i, (void *)set_additional_vcpu_msr, (void *)rdmsr(MSR_EFER));
++		on_cpu(i, (void *)set_additional_vcpu_msr,
++		       (void *)rdmsr(MSR_EFER));
+ 
+ 	printf("NPT detected - running all tests with NPT enabled\n");
+ 
+ 	/*
+-	* Nested paging supported - Build a nested page table
+-	* Build the page-table bottom-up and map everything with 4k
+-	* pages to get enough granularity for the NPT unit-tests.
+-	*/
++	 * Nested paging supported - Build a nested page table
++	 * Build the page-table bottom-up and map everything with 4k
++	 * pages to get enough granularity for the NPT unit-tests.
++	 */
+ 
+-  setup_npt();
++	setup_npt();
  }
  
  int matched;
-diff --git a/x86/svm.h b/x86/svm.h
-index 123e64f..85eff3f 100644
---- a/x86/svm.h
-+++ b/x86/svm.h
-@@ -406,7 +406,7 @@ typedef void (*test_guest_func)(struct svm_test *);
- int run_svm_tests(int ac, char **av);
- u64 *npt_get_pte(u64 address);
- u64 *npt_get_pde(u64 address);
--u64 *npt_get_pdpe(void);
-+u64 *npt_get_pdpe(u64 address);
- u64 *npt_get_pml4e(void);
- bool smp_supported(void);
- bool default_supported(void);
-@@ -429,6 +429,8 @@ int __svm_vmrun(u64 rip);
- void __svm_bare_vmrun(void);
- int svm_vmrun(void);
- void test_set_guest(test_guest_func func);
-+void setup_npt(void);
-+u64* get_npt_pte(u64 *pml4, u64 guest_addr, int level);
  
- extern struct vmcb *vmcb;
- extern struct svm_test svm_tests[];
-diff --git a/x86/svm_npt.c b/x86/svm_npt.c
-index 53e8a90..ab4dcf4 100644
---- a/x86/svm_npt.c
-+++ b/x86/svm_npt.c
-@@ -209,7 +209,8 @@ static void __svm_npt_rsvd_bits_test(u64 * pxe, u64 rsvd_bits, u64 efer,
- 	       "Wanted #NPF on rsvd bits = 0x%lx, got exit = 0x%x", rsvd_bits,
- 	       exit_reason);
+-static bool
+-test_wanted(const char *name, char *filters[], int filter_count)
+-{
+-        int i;
+-        bool positive = false;
+-        bool match = false;
+-        char clean_name[strlen(name) + 1];
+-        char *c;
+-        const char *n;
+-
+-        /* Replace spaces with underscores. */
+-        n = name;
+-        c = &clean_name[0];
+-        do *c++ = (*n == ' ') ? '_' : *n;
+-        while (*n++);
+-
+-        for (i = 0; i < filter_count; i++) {
+-                const char *filter = filters[i];
+-
+-                if (filter[0] == '-') {
+-                        if (simple_glob(clean_name, filter + 1))
+-                                return false;
+-                } else {
+-                        positive = true;
+-                        match |= simple_glob(clean_name, filter);
+-                }
+-        }
+-
+-        if (!positive || match) {
+-                matched++;
+-                return true;
+-        } else {
+-                return false;
+-        }
++static bool test_wanted(const char *name, char *filters[], int filter_count)
++{
++	int i;
++	bool positive = false;
++	bool match = false;
++	char clean_name[strlen(name) + 1];
++	char *c;
++	const char *n;
++
++	/* Replace spaces with underscores. */
++	n = name;
++	c = &clean_name[0];
++	do
++		*c++ = (*n == ' ') ? '_' : *n;
++	while (*n++);
++
++	for (i = 0; i < filter_count; i++) {
++		const char *filter = filters[i];
++
++		if (filter[0] == '-') {
++			if (simple_glob(clean_name, filter + 1))
++				return false;
++		} else {
++			positive = true;
++			match |= simple_glob(clean_name, filter);
++		}
++	}
++
++	if (!positive || match) {
++		matched++;
++		return true;
++	} else {
++		return false;
++	}
+ }
  
--	if (pxe == npt_get_pdpe() || pxe == npt_get_pml4e()) {
-+	if (pxe == npt_get_pdpe((u64) basic_guest_main)
-+	    || pxe == npt_get_pml4e()) {
- 		/*
- 		 * The guest's page tables will blow up on a bad PDPE/PML4E,
- 		 * before starting the final walk of the guest page.
-@@ -338,7 +339,7 @@ skip_pte_test:
- 				get_random_bits(20, 13) | PT_PAGE_SIZE_MASK,
- 				host_efer, host_cr4, guest_efer, guest_cr4);
- 
--	_svm_npt_rsvd_bits_test(npt_get_pdpe(),
-+	_svm_npt_rsvd_bits_test(npt_get_pdpe((u64) basic_guest_main),
- 				PT_PAGE_SIZE_MASK |
- 				(this_cpu_has(X86_FEATURE_GBPAGES) ?
- 				 get_random_bits(29, 13) : 0), host_efer,
+ int run_svm_tests(int ac, char **av)
+@@ -393,11 +390,11 @@ int run_svm_tests(int ac, char **av)
+ 			if (svm_tests[i].on_vcpu) {
+ 				if (cpu_count() <= svm_tests[i].on_vcpu)
+ 					continue;
+-				on_cpu_async(svm_tests[i].on_vcpu, (void *)test_run, &svm_tests[i]);
++				on_cpu_async(svm_tests[i].on_vcpu,
++					     (void *)test_run, &svm_tests[i]);
+ 				while (!svm_tests[i].on_vcpu_done)
+ 					cpu_relax();
+-			}
+-			else
++			} else
+ 				test_run(&svm_tests[i]);
+ 		} else {
+ 			vmcb_ident(vmcb);
 -- 
 2.30.2
 
