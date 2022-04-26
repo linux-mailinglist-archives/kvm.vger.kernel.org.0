@@ -2,89 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6715F510501
-	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 19:14:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8E0F51052F
+	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 19:20:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354138AbiDZRQv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 13:16:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51876 "EHLO
+        id S232006AbiDZRXM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 13:23:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352707AbiDZROx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Apr 2022 13:14:53 -0400
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0203532EFC
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 10:11:29 -0700 (PDT)
-Received: by mail-wr1-x42b.google.com with SMTP id t6so22953505wra.4
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 10:11:28 -0700 (PDT)
+        with ESMTP id S232134AbiDZRXJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Apr 2022 13:23:09 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D42394BB85
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 10:20:00 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id y38so2820173pfa.6
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 10:20:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=pamMaaVZYdygrWXDRxaeRqbvXXd7KzsUab9eejNupEM=;
-        b=OMe/wMtEHmzc+4un6Figod63BYFZ5h1tujb66Jnawj3zsgyNLOfve5RqPrJl5/0X1F
-         +iPjHur9QY6tKsw8nMP/XkE2scN9eIq21Ma56UXjizbhU9YyKUyCOx3ecBPBh4uT9WUb
-         KaPr6GMbTqQdpZ080OHQSC4nBSNMGdrrGxCW9Vg8VQPF4rW80XlC5EQoMd2QectU77uB
-         HhAqHp4gBRO49gHVqTnULoMkCscMrr4/uy+m/O3YZqb4xcmg9DAZVyZs8Ncb0FybKqAB
-         IV7G2jKtYfGUY1YwUiOEgpNCUIlt8LsqHSCV3XZxD4lDFHhRk2WhZQ+2mUWx1BHeYgJZ
-         dBeA==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=O4FZja9WudcKens4azldCUmjh2etbVq0EGH84l7RjgU=;
+        b=gcOCeXEtfA5bcZ/0OV4XMefXitjP6xuTILazvyaC+XU0gpaBiM0Dlgq0QSn5nnYeDu
+         hhDibZtZpYTsaYC0GBYi9E4xYXa1QxVYXJPTKhW5jEogY9D7brvG/037iX8URKn16x/Y
+         a45/RuOD/U5pb9Hj6+uANTPMZDlDhiPvLhJUfjpngUdOCiueITld9oB5KmFW6mJiK1+S
+         N76z7OfUxd1I62SO1Fu0ejnC4zUVdviKqwRlQv0tkpyGOXmistKqH7Bnmmdly65qfeU7
+         Gnq6Sbk7uyoGGHhUYla7OHHq8l+ncuWcUxttGrpEjVKb9jBI5znDmgB8HDYwHZMvbBfy
+         +6KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=pamMaaVZYdygrWXDRxaeRqbvXXd7KzsUab9eejNupEM=;
-        b=HxDrItQILw6iTpB5ac74u/JfIwmntFH1YFBzJm3k/X+UvqRhVBXhNT+zG3wZqgk/cV
-         slf6g1j5+970JPmsd11/76xTFQHiRa9TGhIs2u3WeqWVTOD/5wddOJugwhLXScY6O7P6
-         xW+S9cprOMOhuz+vCEIj+QfGwE41aGTXaeY1Yu+h/eDP85dcBXfD27p0W9G3yAAwJjjr
-         9JluCUn77xDF0VYH1LvldNVcsSTaOEjIGeHiFFyzmbtlzY/tris846g6bnJAFSUgo6rb
-         xDfwKqkgar5jneKzHvdZfgIR2uBrVMaERR31d/czpUR6ZQtY8hr5ZR9UlI5zPQzy/kyB
-         pVNg==
-X-Gm-Message-State: AOAM530LxojsnfGy1ZKEcK4XwLWDZ95dArVg64vg9qRzAFckqihtZWnT
-        gumTtgpeHzaIdbxIWw5GXu0=
-X-Google-Smtp-Source: ABdhPJxYCA9Qx+BhHfzATKCmDicrXdteAdALSWfqV3gsh8RgXoBS2FPfaCWAK8GY4OEBreBmrYRV3g==
-X-Received: by 2002:a05:6000:1e05:b0:20a:ecc7:41cf with SMTP id bj5-20020a0560001e0500b0020aecc741cfmr255937wrb.102.1650993087399;
-        Tue, 26 Apr 2022 10:11:27 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id c3-20020a05600c148300b0038ebc8ad740sm75025wmh.1.2022.04.26.10.11.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Apr 2022 10:11:26 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <cc0c62dd-9c95-f3b9-b736-226b8c864cd4@redhat.com>
-Date:   Tue, 26 Apr 2022 19:11:26 +0200
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=O4FZja9WudcKens4azldCUmjh2etbVq0EGH84l7RjgU=;
+        b=tYd3koQ0BFUVWeN8O/+w7NYQ3Yav1ZLZed8MC+JRXvOk6iIS8wJEYo9h6+krEL8YdY
+         Gkl006qozrgKIVRc8WvotP49JF50w4+IM1vpqH8TgwmOsAWJ1RaSzKI79UhZjutyNXPO
+         8Mr2ynWm7Wck8wJFBqRYxQMAXGqUTLeXa62sXjc36G8gYrJF4fHtgFGeipChRHilK68C
+         FuI1PtTmmRQDN8q3zgR40eG9aHcbm6Ou7huEIBKimIhy+/id6PaVBukssJtuhfAcEZY5
+         I1fpW+Gk07TXzYznS+L39MMkQuo4timp4On5qj2J76waxfS7h1ILFCEKQIhIKlN4KaCs
+         gicA==
+X-Gm-Message-State: AOAM532AV6cVUcYalNaMTRxqBeDeLwvHsXzrjI1XdIO6KSDkgrfh6sIS
+        fqorWrMLQl3A80oQGeRzNQ2u6WC6LCi3pvaTgIyMG3RF7hJG+Q==
+X-Google-Smtp-Source: ABdhPJw41MD54CZn3iFTHAqU/4zXInNZxrbaKEbgqHdskaF06GdYcfMFMso5Ak25IGKvB9HSfzmpK89B5hdyIBaBt1M=
+X-Received: by 2002:a63:8ac7:0:b0:3aa:fa62:5a28 with SMTP id
+ y190-20020a638ac7000000b003aafa625a28mr14854945pgd.400.1650993600084; Tue, 26
+ Apr 2022 10:20:00 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: kvm_gfn_to_pfn_cache_refresh started getting a warning recently
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>
-References: <e415e20f899407fb24dfb8ecbc1940c5cb14a302.camel@redhat.com>
- <YmghjwgcSZzuH7Rb@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YmghjwgcSZzuH7Rb@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20220327205803.739336-1-mizhang@google.com> <YkHRYY6x1Ewez/g4@google.com>
+ <CAL715WL7ejOBjzXy9vbS_M2LmvXcC-CxmNr+oQtCZW0kciozHA@mail.gmail.com> <YkH7KZbamhKpCidK@google.com>
+In-Reply-To: <YkH7KZbamhKpCidK@google.com>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Tue, 26 Apr 2022 10:19:49 -0700
+Message-ID: <CAL715W+6UwO2zgoSLUeTmBHRo1HMSGshA6YMhvBiqfJrejhwFQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/mmu: add lockdep check before lookup_address_in_mm()
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/26/22 18:45, Sean Christopherson wrote:
-> On Tue, Apr 26, 2022, Maxim Levitsky wrote:
->> [  390.511995] BUG: sleeping function called from invalid context at include/linux/highmem-internal.h:161
->> [  390.513681] in_atomic(): 1, irqs_disabled(): 1, non_block: 0, pid: 4439, name: CPU 0/KVM
-> 
-> This is my fault.  memremap() can sleep as well.  I'll work on a fix.
+On Mon, Mar 28, 2022 at 11:15 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Mar 28, 2022, Mingwei Zhang wrote:
+> > With that, I start to feel this is a bug. The issue is just so rare
+> > that it has never triggered a problem.
+> >
+> > lookup_address_in_mm() walks the host page table as if it is a
+> > sequence of _static_ memory chunks. This is clearly dangerous.
+>
+> Yeah, it's broken.  The proper fix is do something like what perf uses, or maybe
+> just genericize and reuse the code from commit 8af26be06272
+> ("perf/core: Fix arch_perf_get_page_size()).
 
-Indeed, "KVM: Fix race between mmu_notifier invalidation and pfncache 
-refresh" hadn't gone through a full test cycle yet.
+hmm, I am thinking about this. We clearly need an adaptor layer if we
+choose to use this function, e.g., size -> layer change; using irq or
+not. Alternatively, I am wondering if we can just modify
+lookup_address_in_mm() to make the code compatible with "lockless"
+walk?
 
-Paolo
+On top of that, since kvm_mmu_max_mapping_level() is used in two
+places: 1) ept violation and 2) disabling dirty logging. The former
+does not require disable/enable irq since it is safe. So maybe add a
+parameter in this function and plumb through towards
+host_pfn_mapping_level()?
+>
+> > But right now,  kvm_mmu_max_mapping_level() are used in other places
+> > as well: kvm_mmu_zap_collapsible_spte(), which does not satisfy the
+> > strict requirement of walking the host page table.
+>
+> The host pfn size is used only as a hueristic, so false postives/negatives are
+> ok, the only race that needs to be avoided is dereferencing freed page table
+> memory.  lookup_address_in_pgd() is really broken because it doesn't even ensure
+> a given PxE is READ_ONCE().  I suppose one could argue the caller is broken, but
+> I doubt KVM is the only user that doesn't provide the necessary protections.
+
+right. since lookup_address_in_pgd() is so broken. I am thinking about
+just fix it in place instead of switching to a different function.
