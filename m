@@ -2,227 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E411851092C
-	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 21:34:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D66F6510930
+	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 21:36:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354253AbiDZThV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 15:37:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56076 "EHLO
+        id S1351390AbiDZTjd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 15:39:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231679AbiDZThS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Apr 2022 15:37:18 -0400
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 249D51A177D
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 12:34:06 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id a14-20020a7bc1ce000000b00393fb52a386so1518817wmj.1
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 12:34:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=HdglKt24ulKLWyX0LsILT516ozly9pUWvxRymOVkqGI=;
-        b=D9ihhOYCzfSq6PHe75gU3OheUI3W9iH7N3JyrClUp6au/zHYy/RjIQ+jFjvmiw3I9o
-         uU7o/2RsJb0OvTjqDki2JlEYfTgugeTS76dPfA3259nEGmWh42vCXrHa6/5V7/2johUN
-         +QaWhuSllkcd3/yIwhHQc0dL4v+1u2xt3a0+X1HNRFS3ddbQntWN7TwV79pXNZP4tjWY
-         q9oDYLmA6GmRpsibkQ3SJm8PJsmjU0ySPtDfndPYlEEAFXG22uifNwS/0VoF2zqchWyZ
-         YeBZmMfcWMAOzmPfGY/zoiJYCO20nTusS/8yz+ffjxEMcUZ2DMbLY7V/1myPVVFJC4B1
-         X+8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HdglKt24ulKLWyX0LsILT516ozly9pUWvxRymOVkqGI=;
-        b=dbuuj1NeSyxL9JARDGcJY6iqRfbJQg42xoHoIAv3KzWnrfBxbYI5mtbGGi4RDIRpJj
-         MqiPwPKKRFbS7ndJY6eCumh07iVLsv4l/ms2vwXn3QX4wC95gm8aIs3Bc3yM2y5Xca4N
-         HNydzPDQ74lAQDNCsf7KBMBr/t88zvDr3YU37iqcLiPzglPA5VfQSOw8fgf9U3tEl0V9
-         bXjkAKD2qKyz4WItpzNY7gMQNMkBBKSKYsovD6bpJCbOGIG8fIAm1AYCtdnulw1Xuhs/
-         MAOlRhpsP3fflTkArDG7MjndZ1yv20DwYf7wlpu/XYCzxTpQgbOLRC2JPnwmSuAap71C
-         vf4g==
-X-Gm-Message-State: AOAM5321DYR/bngtbxAfpWI8Wm5EAWWk0We10MYWDbZ8EflLAU340VeC
-        K/JVx5WyTRANYXf9Baz9W35hi799Bj25Vxkola3zWA==
-X-Google-Smtp-Source: ABdhPJxfcXYYWDf1qEw77YopXVh9hGlDN3ohweZv6hh7qehoXVg7JxTIKYy8mWq0Lcp0jdkpbGhhqEQXGML1k1dn1J0=
-X-Received: by 2002:a05:600c:4e46:b0:393:f5fb:b3df with SMTP id
- e6-20020a05600c4e4600b00393f5fbb3dfmr4865915wmq.80.1651001644438; Tue, 26 Apr
- 2022 12:34:04 -0700 (PDT)
+        with ESMTP id S1350664AbiDZTj3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Apr 2022 15:39:29 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2050.outbound.protection.outlook.com [40.107.94.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2E69344E6
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 12:36:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XfvRIT25Jvrao5iM8Txo66VAsX7T3v3RnhF3K7JEX3JD/Vd+hv3PuhHirHQp+28ssOYZ5b2gW7jCOTQhUtsbSnt+gMJp8Gr7N1qa7sVJYWGPVRjssjJw2WZYr9C57eHOyyt947YU3/fBNBWZheyuRFP8gJaJk1NN1H/hz0rG3tsjWePDDGT5mNF5UGyEEp37vPNJ8Um8VqKLj/G2VQApo9we80Cq3egqGhvltB8Le5UUCAhzO9mDaCVI8vEODiZcEFHhtcb+Bln98VvgBTiq9Sn77aS0nHHAXVnMKmWX23qAJ0d/db0BpKG3f++ruH6C/Tc+dcCyIeYnriExLMamww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+sx7We/cOE17zkXkMNGjxcHHvdbsLE1BCI2r3NS3Do4=;
+ b=WfSoSImsbo1nKmlGBH3ssJ/tv94VdTIMTvLM6x8e/Gao+8K5EIL0CjQ9aGIYDtOUTs9QvttPniQd2YL5nuDL2d57kgU/sfy20OA5hOn5bLQsQu1rbyC8H1DUO7jtTOcBeLHEKc7LHew3tbnqUhxk4IlVQ1fer1amXbXtYNtIqG71qmxx4uXnbMfK7wAP6fp4sKBCKDUmi03yVjLO5HUpVL0kDFqQ8DgXFkx7w8kugZQEMFnsBNDWnBmxzafn0sdKo5eGyiz1k2BsZR7e8rZCn7Vmv3+Mli1jUD6pc5dfH0HCB/fUeXY9pcm8zmcIST2GOPJ+JjD/GNmbrpj7Kq/YPw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+sx7We/cOE17zkXkMNGjxcHHvdbsLE1BCI2r3NS3Do4=;
+ b=Jib1vcE1jk5eQwYiPjwBh4wcfZjtBTs/Nn7XjCgr31im3W+AK8IYQ6W0cYMH+eMLV6PmbSpmS8m1ubcE9PkAICfuYWAUPbWx+P/OVFFLbMekZEOMjMaIfwVw2i94SnNvdS1yj5ZoZDUyu4d2NceL+wlvtsM5Sb83P9tXEHuASWjb92Eb7n3JYG+3Q6P2oRmHbtJcqVxzzWzasBbC0O4Pdjp1YwOu9HPg98gk7YrvfEjxI5Ff61gWFwAs/HFTHuO6NH5Wq7HT0BZvEHpa8Va9yZsszeMKBqOJs20CMrQOUUrN1/SolwkT6A0fRkwO1s7eSBPcC0Bl6N7EJpGldJnlWQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by BYAPR12MB3541.namprd12.prod.outlook.com (2603:10b6:a03:13c::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.15; Tue, 26 Apr
+ 2022 19:36:19 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2%6]) with mapi id 15.20.5186.021; Tue, 26 Apr 2022
+ 19:36:19 +0000
+Date:   Tue, 26 Apr 2022 16:36:17 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
+        "Peng, Chao P" <chao.p.peng@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Laine Stump <laine@redhat.com>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "thuth@redhat.com" <thuth@redhat.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Subject: Re: [RFC 00/18] vfio: Adopt iommufd
+Message-ID: <20220426193617.GT2125828@nvidia.com>
+References: <20220414104710.28534-1-yi.l.liu@intel.com>
+ <20220422160943.6ff4f330.alex.williamson@redhat.com>
+ <YmZzhohO81z1PVKS@redhat.com>
+ <20220425083748.3465c50f.alex.williamson@redhat.com>
+ <BN9PR11MB5276F549912E03553411736D8CFB9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20220426102159.5ece8c1f.alex.williamson@redhat.com>
+ <20220426164217.GR2125828@nvidia.com>
+ <20220426132435.6ecddd1d.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220426132435.6ecddd1d.alex.williamson@redhat.com>
+X-ClientProxiedBy: MN2PR07CA0028.namprd07.prod.outlook.com
+ (2603:10b6:208:1a0::38) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-References: <20220426053904.3684293-1-yosryahmed@google.com>
- <20220426053904.3684293-5-yosryahmed@google.com> <874k2falbk.wl-maz@kernel.org>
-In-Reply-To: <874k2falbk.wl-maz@kernel.org>
-From:   Yosry Ahmed <yosryahmed@google.com>
-Date:   Tue, 26 Apr 2022 12:33:28 -0700
-Message-ID: <CAJD7tkZ-mrhCXoR0ZONjJ7kuAuzWED8Dcjkw6mv812-3uSo_Cg@mail.gmail.com>
-Subject: Re: [PATCH v3 4/6] KVM: arm64/mmu: count KVM page table pages in
- pagetable stats
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Shakeel Butt <shakeelb@google.com>,
-        James Morse <james.morse@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, Linux-MM <linux-mm@kvack.org>,
-        cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5470c1ea-1ba9-432c-f928-08da27bc0937
+X-MS-TrafficTypeDiagnostic: BYAPR12MB3541:EE_
+X-Microsoft-Antispam-PRVS: <BYAPR12MB3541CC63FF7A6CC324776CA1C2FB9@BYAPR12MB3541.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Gx1ZVNs4YqIScFXY6h9xpeKlwKd0fBQV+kj4DwqstcDrYLwLDq99fC46RDpOLGs4eSM3mB5OQUHUlFB6V0G3/C3UPfVp3QNg9A/hJmyTiGg8g6eyFgBnhcK+uK7RxFtM+l0HmcD3lu4fXkDvCWRldLuvCxzjPi2q9aHL36t7ryGWrqpHQ440YaaQ8qcxEBGzE7GbDTian6xybGqA5/6l2ZRdK6pO2bF+1bV94Oj9AiYpinI+Uwyqw7Wvc01qrYGWSzFpRL9VGz18QwlJEonTI8U5JBJ61qxYJ32Va43AKKw4Yp15tgzg+NbhTN4MYgARklnJQhO4mM6jV3sf6pUgVy+gD2KdX9O1pB49yN2gwP1/VbiUz/MW6CZ/qWFB0M+9n9Mo9Q4zdCLzDYH0LFbVgI+k3C5CDqd+KtZwExcWqMeFHWCWdMLCs5hM9vZWW+VoaCa82g0qxsGanYrWXgW4zYVL0ptYAVghYmkXBd+k3GtjvV3IytXbbzQI1e1kkAeo48NlB+DlvTCS259rPjVq5+ZBCP9Dh9RfYjj0rqeL5vIoFdsKtCHJjyu7yb18fjwWYDEgKO38Fqebu8QMz1KRfPAYi+KnLv4E3gevq1Pl5LHARdoZ8H7Q2GBHNw5HYfK56qw04Tm5Z48yaeikiSY8wA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(5660300002)(66946007)(6512007)(8936002)(2616005)(7416002)(26005)(66556008)(316002)(2906002)(1076003)(86362001)(38100700002)(6486002)(508600001)(54906003)(6916009)(8676002)(66476007)(83380400001)(186003)(6506007)(33656002)(36756003)(4326008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?5gN/dORRIalAAgTe4XVs/gS0fWvPob7zcpxphBndVp/7Rc31bhTetJquL+H0?=
+ =?us-ascii?Q?+6Iqu18o+QA+PP/lY3cyQihQMWMq9l1ithvXy+YTwUf1ANg17YX9FrwcqxdQ?=
+ =?us-ascii?Q?QP/QPJmn4yZsFUlgEpVaUo0gTl1VWYfidasR7prL6uaBc5Yf+Zly8PDl5oGv?=
+ =?us-ascii?Q?61DVgZvyzaMdc8Zeb+fGfSOB8voyBr5i6WbfuAeJcVeP8vdQqBIOEsjSCdmU?=
+ =?us-ascii?Q?T9q3CVNp9CrFXOKFp0KKh1fcm66wLxxYnlsTbcUx18MkskycS0LQ7ECCp4uk?=
+ =?us-ascii?Q?mk/c494kj7CvmN/5r6SBDOk5Or6tIulwmRQLq3sjQRmS+THsh7N99cxVaAth?=
+ =?us-ascii?Q?k04ZEAUIPErU8TDwxSCOOOZFOcCoPnz5Ss3Nrj/OBo2rKbIbq8WOou4+txRv?=
+ =?us-ascii?Q?bByNWiwPvXbJmJlbt9xMnm375L1+mi9NOpeBc+w5tOm3a2ZFdHTJqGSsd5eI?=
+ =?us-ascii?Q?ubXbPza0geE7SmYQWE2bOysFm4fSn3DTx4XAWhmA1TSJEm9ONmLLFnY+uIC/?=
+ =?us-ascii?Q?W0Fv1fCTBvFyZzlOJ99szJR42U04NoP1t+Jr1sCbSfAluEuL1wfDVhsuRGe6?=
+ =?us-ascii?Q?URevoKAHOL8LvROzaLxnKEnrQnyQcsh6m3dbDJhu/o6Nnsin8oBtd25TUMIa?=
+ =?us-ascii?Q?fbTvcn7bc1bt/JNjt5UQbywUUTgttdRLxTZoDra3L0CuJsBbLZYuHNxOTWeX?=
+ =?us-ascii?Q?m6hLlRCcEGaCGJSUda8ggIsCcq8J3PZfNktVDCvBaGJPX+S652KJxOKKqiOi?=
+ =?us-ascii?Q?lm0turH5EQWpkvH/wj/SFNSPUeLBVT8RgCDFt8maCy/F3dl2txyU/ylkkb/4?=
+ =?us-ascii?Q?xYb36wrJ/bv6prmA7eRpeKMM3jtROb2P6J+dwBDEXs0xClBoOvTuOfGE8gOt?=
+ =?us-ascii?Q?gUAVdg5XP1syhIRqLqExSbwjZjDv03NzcfZJgPljuJ3xcIL4EiYVqkRMeWmH?=
+ =?us-ascii?Q?a32/wJHoXEpryzJrzx/jF0rraQSdeBe+zmYDNqCxpsew8boxoIRhyLlkLfIJ?=
+ =?us-ascii?Q?RJwRC4uRK2ZWMPaRfLl2hbjhsH+zBe6ITD15Z5+/UXfZnU19OmZJUxwVcJPK?=
+ =?us-ascii?Q?dhSX423E+ZpTzGcJboylRgeJdDc1Ab627YhrMI8E50OWjRwP8WrZpgDTV2ip?=
+ =?us-ascii?Q?tm/7y4sItNRxrLuMf7s9iXvDH4tQ2TDGvOgfP1T9VFMYPt+yu9q9x9N42/4z?=
+ =?us-ascii?Q?3UO9O9HwRAzK6v9hLDXwV7GTCbC+aL38kFlUZoECNbKcJmXK5G2RvQRKiDKS?=
+ =?us-ascii?Q?vbm8u5H30GXth2qPaoNFyuOLLPK3qZP7nGawKz5Fvht+ZULyNpZWEMrG0vqd?=
+ =?us-ascii?Q?PerbhnU51jxNLAapvKSVMCROf+xzabEfEr4TCny+BJDesitvBLTr45wMTSa3?=
+ =?us-ascii?Q?5nkDfu8Tx8duTB3uCXz7gGwHsOlIgJENTy3v90MGkNE6RHVN7W0iojb08H1k?=
+ =?us-ascii?Q?Zr4pcqttGEqBxet4IEu3D2YEhU02X9OUe9WPTyy1Wid0yY+5pcCJ6Qyb5cT3?=
+ =?us-ascii?Q?JRxtc8zSEx2CcUHNbEYyW1vY+SoTyyBLWN1la/9pskmWbXUT8eGew7TNA8KD?=
+ =?us-ascii?Q?8EdToqg2l5OYZZHU/xYo1AyPulzIyiW9+lOcqDwrA/qQtrVuaZ0iCVFlRMvI?=
+ =?us-ascii?Q?4ILSGEybfnF5lYS7pcT2X/N0D6FxlexXP3yugS+Pv7vNQXr85vIpBECTbVZy?=
+ =?us-ascii?Q?Mzt7UdqKpiI+PcM5y5JJ88ErpMPh/6zaw7eyP4dn4LpZHFx0T6zQMlCIyIcF?=
+ =?us-ascii?Q?f4hu11fQYA=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5470c1ea-1ba9-432c-f928-08da27bc0937
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Apr 2022 19:36:18.9594
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mEUlvqySfgHoOptY1P6/ZJnnitr6YfYbNv+nZkMdlBSIHUtCYugKWXtjEuC+nqZn
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB3541
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thanks a lot for taking the time to look at this!
+On Tue, Apr 26, 2022 at 01:24:35PM -0600, Alex Williamson wrote:
+> On Tue, 26 Apr 2022 13:42:17 -0300
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+> 
+> > On Tue, Apr 26, 2022 at 10:21:59AM -0600, Alex Williamson wrote:
+> > > We also need to be able to advise libvirt as to how each iommufd object
+> > > or user of that object factors into the VM locked memory requirement.
+> > > When used by vfio-pci, we're only mapping VM RAM, so we'd ask libvirt
+> > > to set the locked memory limit to the size of VM RAM per iommufd,
+> > > regardless of the number of devices using a given iommufd.  However, I
+> > > don't know if all users of iommufd will be exclusively mapping VM RAM.
+> > > Combinations of devices where some map VM RAM and others map QEMU
+> > > buffer space could still require some incremental increase per device
+> > > (I'm not sure if vfio-nvme is such a device).  It seems like heuristics
+> > > will still be involved even after iommufd solves the per-device
+> > > vfio-pci locked memory limit issue.  Thanks,  
+> > 
+> > If the model is to pass the FD, how about we put a limit on the FD
+> > itself instead of abusing the locked memory limit?
+> > 
+> > We could have a no-way-out ioctl that directly limits the # of PFNs
+> > covered by iopt_pages inside an iommufd.
+> 
+> FD passing would likely only be the standard for libvirt invoked VMs.
+> The QEMU vfio-pci device would still parse a host= or sysfsdev= option
+> when invoked by mortals and associate to use the legacy vfio group
+> interface or the new vfio device interface based on whether an iommufd
+> is specified.
 
-On Tue, Apr 26, 2022 at 8:58 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Tue, 26 Apr 2022 06:39:02 +0100,
-> Yosry Ahmed <yosryahmed@google.com> wrote:
-> >
-> > Count the pages used by KVM in arm64 for page tables in pagetable stats.
-> >
-> > Account pages allocated for PTEs in pgtable init functions and
-> > kvm_set_table_pte().
-> >
-> > Since most page table pages are freed using put_page(), add a helper
-> > function put_pte_page() that checks if this is the last ref for a pte
-> > page before putting it, and unaccounts stats accordingly.
-> >
-> > Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
-> > ---
-> >  arch/arm64/kernel/image-vars.h |  3 ++
-> >  arch/arm64/kvm/hyp/pgtable.c   | 50 +++++++++++++++++++++-------------
-> >  2 files changed, 34 insertions(+), 19 deletions(-)
-> >
-> > diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-> > index 241c86b67d01..25bf058714f6 100644
-> > --- a/arch/arm64/kernel/image-vars.h
-> > +++ b/arch/arm64/kernel/image-vars.h
-> > @@ -143,6 +143,9 @@ KVM_NVHE_ALIAS(__hyp_rodata_end);
-> >  /* pKVM static key */
-> >  KVM_NVHE_ALIAS(kvm_protected_mode_initialized);
-> >
-> > +/* Called by kvm_account_pgtable_pages() to update pagetable stats */
-> > +KVM_NVHE_ALIAS(__mod_lruvec_page_state);
->
-> This cannot be right. It means that this function will be called
-> directly from the EL2 code when in protected mode, and will result in
-> extreme fireworks.  There is no way you can call core kernel stuff
-> like this from this context.
->
-> Please do not add random symbols to this list just for the sake of
-> being able to link the kernel.
+Yes, but perhaps we don't need resource limits in the mortals case..
 
-Excuse my ignorance, this is my first time touching kvm code. Thanks a
-lot for pointing this out.
+> Does that rule out your suggestion?  I don't know, please reveal more
+> about the mechanics of putting a limit on the FD itself and this
+> no-way-out ioctl.  The latter name suggests to me that I should also
+> note that we need to support memory hotplug with these devices.  Thanks,
 
->
-> > +
-> >  #endif /* CONFIG_KVM */
-> >
-> >  #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 2cb3867eb7c2..53e13c3313e9 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -152,6 +152,7 @@ static void kvm_set_table_pte(kvm_pte_t *ptep, kvm_pte_t *childp,
-> >
-> >       WARN_ON(kvm_pte_valid(old));
-> >       smp_store_release(ptep, pte);
-> > +     kvm_account_pgtable_pages((void *)childp, +1);
->
-> Why the + sign?
+So libvirt uses CAP_SYS_RESOURCE and prlimit to adjust things in
+realtime today?
 
-I am following conventions in other existing stat accounting hooks
-(e.g. kvm_mod_used_mmu_pages(vcpu->kvm, +1) call in
-arch/x86/kvm/mmu/mmu.c), but I can certainly remove it if you think
-this is better.
+It could still work, instead of no way out iommufd would have to check
+for CAP_SYS_RESOURCE to make the limit higher.
 
->
-> >  }
-> >
-> >  static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
-> > @@ -326,6 +327,14 @@ int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
-> >       return ret;
-> >  }
-> >
-> > +static void put_pte_page(kvm_pte_t *ptep, struct kvm_pgtable_mm_ops *mm_ops)
-> > +{
-> > +     /* If this is the last page ref, decrement pagetable stats first. */
-> > +     if (!mm_ops->page_count || mm_ops->page_count(ptep) == 1)
-> > +             kvm_account_pgtable_pages((void *)ptep, -1);
-> > +     mm_ops->put_page(ptep);
-> > +}
-> > +
-> >  struct hyp_map_data {
-> >       u64                             phys;
-> >       kvm_pte_t                       attr;
-> > @@ -488,10 +497,10 @@ static int hyp_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> >
-> >       dsb(ish);
-> >       isb();
-> > -     mm_ops->put_page(ptep);
-> > +     put_pte_page(ptep, mm_ops);
-> >
-> >       if (childp)
-> > -             mm_ops->put_page(childp);
-> > +             put_pte_page(childp, mm_ops);
-> >
-> >       return 0;
-> >  }
-> > @@ -522,6 +531,7 @@ int kvm_pgtable_hyp_init(struct kvm_pgtable *pgt, u32 va_bits,
-> >       pgt->pgd = (kvm_pte_t *)mm_ops->zalloc_page(NULL);
-> >       if (!pgt->pgd)
-> >               return -ENOMEM;
-> > +     kvm_account_pgtable_pages((void *)pgt->pgd, +1);
-> >
-> >       pgt->ia_bits            = va_bits;
-> >       pgt->start_level        = KVM_PGTABLE_MAX_LEVELS - levels;
-> > @@ -541,10 +551,10 @@ static int hyp_free_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> >       if (!kvm_pte_valid(pte))
-> >               return 0;
-> >
-> > -     mm_ops->put_page(ptep);
-> > +     put_pte_page(ptep, mm_ops);
-> >
-> >       if (kvm_pte_table(pte, level))
-> > -             mm_ops->put_page(kvm_pte_follow(pte, mm_ops));
-> > +             put_pte_page(kvm_pte_follow(pte, mm_ops), mm_ops);
->
-> OK, I see the pattern. I don't think this workable as such. I'd rather
-> the callbacks themselves (put_page, zalloc_page*) call into the
-> accounting code when it makes sense, rather than spreading the
-> complexity and having to special case the protected case.
->
+It is a pretty simple idea, we just attach a resource limit to the FD
+and every PFN that gets mapped into the iommufd counts against that
+limit, regardless if it is pinned or not. An ioctl on the FD would set
+the limit, defaulting to unlimited.
 
-This makes sense. I am working on moving calls to
-kvm_account_pgtable_pages to callbacks in mmu.c in the next version
-(stage2_memcache_zalloc_page, kvm_host_put_page, etc).
+To me this has the appeal that what is being resourced controlled is
+strictly defined - address space mapped into an iommufd - which has a
+bunch of nice additional consequences like partially bounding the
+amount of kernel memory an iommufd can consume and so forth.
 
+Doesn't interact with iouring or rdma however.
 
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Though we could certianly consider allowing RDMA to consume an iommufd
+to access pinned pages much like a vfio-mdev would - I'm not sure what
+is ideal for the qemu usage of RDMA for migration..
+
+Jason
