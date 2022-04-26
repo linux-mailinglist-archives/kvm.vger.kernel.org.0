@@ -2,105 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 895E95108B1
-	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 21:09:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 055645108E8
+	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 21:24:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231679AbiDZTLC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 15:11:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60598 "EHLO
+        id S1348904AbiDZT1u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 15:27:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354104AbiDZTKv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Apr 2022 15:10:51 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74A99377D0
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 12:07:11 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id bu29so33666789lfb.0
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 12:07:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=CMUo75UTC5Zq38VD1DUMdcugqakIxwdJdBuqcLGg5cM=;
-        b=B6l2FCoWUjMTIYAm5BMFDODEvyat9Os9xRTWwN1Y7lxxKOMc7fWsNmyA631uNgIzP5
-         98LOTnMDdjHq1kUQ4BV9Eay7YwgnLnB6KhSzy4SWqKBFpOomK+qQFHsk71vKeqTvP4Ht
-         yMSY2xAUu9haK6Xh9r7uOVsUASl28383s5DS5byk5LPeJW45hquSmvSFMmXJHil0JRhB
-         WeK295aiBwnvCnZrLNwI9Nj/sa/sdvNRiXz/sAILmka6AZl8o8ujlvCpBymzX0YUTOWE
-         KiWLkzTA47UMfsO1C1S+Mai5kNR8Ut28n5Q9bQi4BG/6/+d68wjhiP6mB7B0DYVPAjJ0
-         NKow==
+        with ESMTP id S1344270AbiDZT1t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Apr 2022 15:27:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A31686AA61
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 12:24:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651001080;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8JQX3e1SHEkXg04Hw14Z/O/2neriC0qHwfrioTaaCGE=;
+        b=L3xgnurE541EMjAYDAVbon58nPEpvvUgpTLFdbRKlklTYaYO2tP97gMl/etL90FxRUQXVD
+        tlsnWimw/KDjfiBZRm0XbxKENDl4Q4aamWWR7A3n1nMVKkaZvh4o8LYlXiIZzkI/P7iUfC
+        hlVQKK4oB0wqwAe7HJP8S26S9hB5D1c=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-167-T3AGrob5PWeDnvV7FjyO0Q-1; Tue, 26 Apr 2022 15:24:39 -0400
+X-MC-Unique: T3AGrob5PWeDnvV7FjyO0Q-1
+Received: by mail-io1-f69.google.com with SMTP id q5-20020a0566022f0500b00654a56b1dfbso15109267iow.8
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 12:24:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=CMUo75UTC5Zq38VD1DUMdcugqakIxwdJdBuqcLGg5cM=;
-        b=D01o6xgcHz2hLQOaqrugDh8uekwhPNYLeybx32aTfzIKvTTsq1kFNXGEBnoeB2Hpz8
-         mju/zVfgDCiXniKCxgFbZhAkrdEX8u6zYgJ93rLYbet6zmmlJegVykNuXcU0areVfGoA
-         53iIthWbmpFgQJeF50KwyBt3I/HP6Fh1n/eEcmvqEe9jOALbMiY6bsVleobNejJbf3N7
-         YrtcEVg3wsaPbC/AqtAYw9qaLQWhI3/GvUpiKPiBNytUA3r4MAaf4+pSBAPJmw3CxWBA
-         e6OGtMcsL8PhSxKEpMOPFapYgLZdag7pAupPGpV8RMfwoX9uPERnUO+S0gM6xSV2MUhn
-         YywA==
-X-Gm-Message-State: AOAM533U1XwzH/QE3whbwoMjyW12uog+/ogAE+I+mh5i39DKqPzHYOOq
-        uwomcJXxhjE+pGnBnYGw9qK3CvN9CGQo0umRlaxANw==
-X-Google-Smtp-Source: ABdhPJydBoE/1X8tWwZ7TDirJEYimL8BCKNHbsayDufUP9gWpIaPHn2S15G3loeImJTnQ2dbUjvNGs97dN/VnOeZhBQ=
-X-Received: by 2002:a05:6512:c01:b0:448:6aec:65c5 with SMTP id
- z1-20020a0565120c0100b004486aec65c5mr18091652lfu.193.1651000029309; Tue, 26
- Apr 2022 12:07:09 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=8JQX3e1SHEkXg04Hw14Z/O/2neriC0qHwfrioTaaCGE=;
+        b=X+EIToA5X8OkilBkG7AESuU4crWypugw98I6eTd6spYRNa4OA0NLhO4hdW2wVue2kz
+         u2UtXIke7U0a6QRyp/YHuK3ieOGHijtp3K5LQFuLn48dsUDCK7zxx7Az5Xc7q69wj1CA
+         zVkdg5xF2HE8D6syIB+kBeD/NBDoym9aFss0Lo7vjg0C4NKHqfPoGdaq21Qdm/JZEDzP
+         9O6dVfBXEcDnJXT4FQMUpGHkc7OrQGvbivPTo+3VRo28q7Z/KbYy7hmB+yNjqUVc5tei
+         A8vrjWFLtzZPJ04ZfKdCm18MSNDvmdAyDB0z2C4oDKex5wMKcKzsi3B/s2H/nB8I9o5q
+         XMTA==
+X-Gm-Message-State: AOAM530tmc2ZMzXTakJkIby7SkqnCeJ/NwOpWrqa68os5uYIwzbQ04yn
+        h2k6A0Ljgg+oMrLNgVgr/dKnzSo+vLJA/IpOw70JQrq+san0YKxWbNwfuT6tV42NnhBZDFKafLz
+        prFCar+AJDrNa
+X-Received: by 2002:a05:6638:329b:b0:328:96c9:771d with SMTP id f27-20020a056638329b00b0032896c9771dmr10716294jav.48.1651001078547;
+        Tue, 26 Apr 2022 12:24:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx8zE5yOmVcACo/dOrg9YfDP/mTfj5ZZwrixzWX8n6YYyIdlMbucE34uD0EiuuwCs8A/CpZoQ==
+X-Received: by 2002:a05:6638:329b:b0:328:96c9:771d with SMTP id f27-20020a056638329b00b0032896c9771dmr10716278jav.48.1651001078339;
+        Tue, 26 Apr 2022 12:24:38 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id y126-20020a6bc884000000b00657ae00d56bsm1075463iof.48.2022.04.26.12.24.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Apr 2022 12:24:37 -0700 (PDT)
+Date:   Tue, 26 Apr 2022 13:24:35 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Daniel P. =?UTF-8?B?QmVycmFu?= =?UTF-8?B?Z8Op?=" 
+        <berrange@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
+        "Peng, Chao P" <chao.p.peng@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Laine Stump <laine@redhat.com>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "thuth@redhat.com" <thuth@redhat.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Subject: Re: [RFC 00/18] vfio: Adopt iommufd
+Message-ID: <20220426132435.6ecddd1d.alex.williamson@redhat.com>
+In-Reply-To: <20220426164217.GR2125828@nvidia.com>
+References: <20220414104710.28534-1-yi.l.liu@intel.com>
+        <20220422160943.6ff4f330.alex.williamson@redhat.com>
+        <YmZzhohO81z1PVKS@redhat.com>
+        <20220425083748.3465c50f.alex.williamson@redhat.com>
+        <BN9PR11MB5276F549912E03553411736D8CFB9@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <20220426102159.5ece8c1f.alex.williamson@redhat.com>
+        <20220426164217.GR2125828@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20220407195908.633003-1-pgonda@google.com> <CAFNjLiXC0AdOw5f8Ovu47D==ex7F0=WN_Ocirymz4xL=mWvC5A@mail.gmail.com>
- <CAMkAt6r-Mc_YN-gVHuCpTj4E1EmcvyYpP9jhtHo5HRHnoNJAdA@mail.gmail.com>
- <CAMkAt6r+OMPWCbV_svUyGWa0qMzjj2UEG29G6P7jb6uH6yko2w@mail.gmail.com> <62e9ece1-5d71-f803-3f65-2755160cf1d1@redhat.com>
-In-Reply-To: <62e9ece1-5d71-f803-3f65-2755160cf1d1@redhat.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 26 Apr 2022 13:06:57 -0600
-Message-ID: <CAMkAt6q6YLBfo2RceduSXTafckEehawhD4K4hUEuB4ZNqe2kKg@mail.gmail.com>
-Subject: Re: [PATCH v3] KVM: SEV: Mark nested locking of vcpu->lock
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     John Sperbeck <jsperbeck@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 21, 2022 at 9:56 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 4/20/22 22:14, Peter Gonda wrote:
-> >>>> svm_vm_migrate_from() uses sev_lock_vcpus_for_migration() to lock all
-> >>>> source and target vcpu->locks. Mark the nested subclasses to avoid false
-> >>>> positives from lockdep.
-> >> Nope. Good catch, I didn't realize there was a limit 8 subclasses:
-> > Does anyone have thoughts on how we can resolve this vCPU locking with
-> > the 8 subclass max?
->
-> The documentation does not have anything.  Maybe you can call
-> mutex_release manually (and mutex_acquire before unlocking).
->
-> Paolo
+On Tue, 26 Apr 2022 13:42:17 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Hmm this seems to be working thanks Paolo. To lock I have been using:
+> On Tue, Apr 26, 2022 at 10:21:59AM -0600, Alex Williamson wrote:
+> > We also need to be able to advise libvirt as to how each iommufd object
+> > or user of that object factors into the VM locked memory requirement.
+> > When used by vfio-pci, we're only mapping VM RAM, so we'd ask libvirt
+> > to set the locked memory limit to the size of VM RAM per iommufd,
+> > regardless of the number of devices using a given iommufd.  However, I
+> > don't know if all users of iommufd will be exclusively mapping VM RAM.
+> > Combinations of devices where some map VM RAM and others map QEMU
+> > buffer space could still require some incremental increase per device
+> > (I'm not sure if vfio-nvme is such a device).  It seems like heuristics
+> > will still be involved even after iommufd solves the per-device
+> > vfio-pci locked memory limit issue.  Thanks,  
+> 
+> If the model is to pass the FD, how about we put a limit on the FD
+> itself instead of abusing the locked memory limit?
+> 
+> We could have a no-way-out ioctl that directly limits the # of PFNs
+> covered by iopt_pages inside an iommufd.
 
-...
-                  if (mutex_lock_killable_nested(
-                              &vcpu->mutex, i * SEV_NR_MIGRATION_ROLES + role))
-                          goto out_unlock;
-                  mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
-...
+FD passing would likely only be the standard for libvirt invoked VMs.
+The QEMU vfio-pci device would still parse a host= or sysfsdev= option
+when invoked by mortals and associate to use the legacy vfio group
+interface or the new vfio device interface based on whether an iommufd
+is specified.
 
-To unlock:
-...
-                  mutex_acquire(&vcpu->mutex.dep_map, 0, 0, _THIS_IP_);
-                  mutex_unlock(&vcpu->mutex);
-...
+Does that rule out your suggestion?  I don't know, please reveal more
+about the mechanics of putting a limit on the FD itself and this
+no-way-out ioctl.  The latter name suggests to me that I should also
+note that we need to support memory hotplug with these devices.  Thanks,
 
-If I understand correctly we are fully disabling lockdep by doing
-this. If this is the case should I just remove all the '_nested' usage
-so switch to mutex_lock_killable() and remove the per vCPU subclass?
+Alex
+
