@@ -2,103 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 962BC50FD1D
-	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 14:35:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED67A50FD41
+	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 14:41:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350003AbiDZMiO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 08:38:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37134 "EHLO
+        id S1350080AbiDZMoA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 08:44:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349998AbiDZMiL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Apr 2022 08:38:11 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09D1825A;
-        Tue, 26 Apr 2022 05:35:03 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23QCMi45020635;
-        Tue, 26 Apr 2022 12:35:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=8fM+Z11fHvZYwZf6gdpIbKeSaYf1czjOyT5gU7GuPaU=;
- b=rxIfZXec0+eguTy9kRc2COrhbUGVdzoomKKATjM2A5Pl3G2ZrWhu5RWfu0lzrX1eMseJ
- 8YrgOfL0k3nzfnJad1avYsd4o41Xkh4oSAHyBRwKJ6ODPpvP4N+sK/aEKBDCYs2NgeIB
- tRYaVKs0aTGVJWefYsaq2MYWq+nEZoaaKkVYdP+NE0j1soaJTu5v9NTZdxgg1hJxK4wO
- 88X/LNOmXpbEYDuYxYlRWFL2dNCx1ibTVgbilhxJyviDavJZrhh56sBEVUpYYxGQFCdp
- +SdpiGIeA+RB1I7rp1c9fwEiDak4ejZ7H4Eah0hfCFNkulm9rUotd1Aw9ZK53wsZwGAO 2g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fpbrbejcf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Apr 2022 12:35:00 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 23QCWnHE008282;
-        Tue, 26 Apr 2022 12:34:59 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fpbrbejc0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Apr 2022 12:34:59 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23QCT4DG025188;
-        Tue, 26 Apr 2022 12:34:57 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3fm938vcsg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Apr 2022 12:34:57 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23QCYskr3801434
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 Apr 2022 12:34:54 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7FFE04C040;
-        Tue, 26 Apr 2022 12:34:54 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E203B4C046;
-        Tue, 26 Apr 2022 12:34:53 +0000 (GMT)
-Received: from [9.145.2.160] (unknown [9.145.2.160])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 26 Apr 2022 12:34:53 +0000 (GMT)
-Message-ID: <b6727a68-5918-c13d-d75c-2ea3f1a2469d@linux.ibm.com>
-Date:   Tue, 26 Apr 2022 14:34:53 +0200
+        with ESMTP id S1350088AbiDZMny (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Apr 2022 08:43:54 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E85915F5AA;
+        Tue, 26 Apr 2022 05:40:47 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id z16so17850524pfh.3;
+        Tue, 26 Apr 2022 05:40:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=yD7e9mPWeNwo1vgL89bG3pSg2Dekc+TvmVsazxgc/xQ=;
+        b=GnbxG5lHExJVNlDP+xzzDlUmG5m8kM2lnHSyteFhSHuHmpvLor+hykPvI88Ozca2bT
+         VJsDsUomaDNoDRz/VtOzCjG/S91wN/bnLQU8ay8+PyylBsG0a0DoyukUNb3/ScorOh8E
+         lvNdkOuaBkw48w94VH3S61M1BI0ruUpScv4/3bK0+55k1HhwfZC1sdGqEznzkYYu2e5y
+         0TjpNn2RhmZKHJlDu4Qlc8ZprjifkOaqcCdteN9ZnRdKvkFtklPpU3i8p1syKgIU1bjB
+         eVEDh8n9T3T8Fp8LX2Z/1S6VkrdAC9QTatPw6NZ/lXf2YVRUOwBrNp2flzFbpWTkFwgZ
+         s7zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=yD7e9mPWeNwo1vgL89bG3pSg2Dekc+TvmVsazxgc/xQ=;
+        b=dHq9xKz02sU+ib7v4vjZaW6lKxQdPUByZI+EuJmsc9tKd25L7fWUwXkZS4HzmpDXWr
+         ZWK1nSszTch9F3xSQ5/3O6v7RvibD0BqZwzlIBfA1OOtjY/IvgFoQil1/Pdg5MlqP+LP
+         V/CJjV4dtwQFSz0P2om4KwU21QGecnxxC5cVpHlZgcVcDsW42wmLxWG/ZwXZmn8o4ty0
+         cDPe3HrjrPZkwde49WiFRs6auUjf/4yKjHtNnH5QL1/gGV4y/mfU9Kc6uN6J4S/cCSZ9
+         5U1q7WME7I6RgmWvyeqILaqI2hcQFE/KoqvA+AlJFJRbPip8b+MlXvzje3hM5pVv2AUt
+         SIFg==
+X-Gm-Message-State: AOAM532emsBtvim/pJOsAqUpdUANRWUNd2bpjyEsnquCiktzdJArPel1
+        ABH680ogLR123EGO54GeQEqBSOGH7t67AA==
+X-Google-Smtp-Source: ABdhPJxQpQBnfySbDernbtM/2zvLb6OSYK+avT5/SNEuSrqQE/7Jv9ZFk6Gy3eDnWfCPcZ391s1lEg==
+X-Received: by 2002:a05:6a00:1145:b0:4f6:3ebc:a79b with SMTP id b5-20020a056a00114500b004f63ebca79bmr24461635pfm.41.1650976846536;
+        Tue, 26 Apr 2022 05:40:46 -0700 (PDT)
+Received: from [192.168.43.80] (subs02-180-214-232-1.three.co.id. [180.214.232.1])
+        by smtp.gmail.com with ESMTPSA id w129-20020a628287000000b0050d4246fbedsm6798183pfd.187.2022.04.26.05.40.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Apr 2022 05:40:45 -0700 (PDT)
+Message-ID: <9b428d55-322b-5685-b336-4bd71b52a73f@gmail.com>
+Date:   Tue, 26 Apr 2022 19:40:38 +0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v2 0/2] Dirtying, failing memop: don't indicate
- suppression
+ Thunderbird/91.8.1
+Subject: Re: [PATCH] KVM: powerpc: remove extraneous asterisk from
+ rm_host_ipi_action comment
 Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20220425100147.1755340-1-scgl@linux.ibm.com>
- <8095d0de-dd99-0388-b1d4-e59b01dc4be0@linux.ibm.com>
- <13d0d706-abc4-3e4d-88c3-6447636fd1fd@linux.ibm.com>
- <1ccb1333-2233-8832-4102-a6c082b29108@linux.ibm.com>
- <40038a9a-5647-c355-bad2-297b0a2baf4f@linux.ibm.com>
- <80ca4468-6b0a-e8d9-9922-1fae2a1f0fcc@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <80ca4468-6b0a-e8d9-9922-1fae2a1f0fcc@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: R38Fzu8Q8zOIqBOVDgHVgTNdO6EbnbhV
-X-Proofpoint-ORIG-GUID: NBlS-Q0iTBKBZ5zFnvAoicAtpb5vTP-5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-26_02,2022-04-26_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=588
- priorityscore=1501 bulkscore=0 phishscore=0 lowpriorityscore=0
- adultscore=0 suspectscore=0 impostorscore=0 clxscore=1015 spamscore=0
- malwarescore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204260080
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+To:     linux-doc@vger.kernel.org
+Cc:     kernel test robot <lkp@intel.com>,
+        Suresh Warrier <warrier@linux.vnet.ibm.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Segher Boessenkool <segher@kernel.crashing.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>,
+        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        stable@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220426074750.71251-1-bagasdotme@gmail.com>
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+In-Reply-To: <20220426074750.71251-1-bagasdotme@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -106,30 +87,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wy4uLl0NCj4+Pg0KPj4+IFRoZSBvbmx5IHF1ZXN0aW9uIGlzLCBkbyB3ZSBuZWVkIHRvIGNo
-YW5nZSB0aGUgc3VwcHJlc3Npb24gcGFyYW1ldGVyIGluDQo+Pj4gYWNjZXNzX2d1ZXN0X3dp
-dGhfa2V5DQo+Pj4NCj4+PiAgwqDCoCAobW9kZSAhPSBHQUNDX1NUT1JFKSB8fCAoaWR4ID09
-IDApDQo+Pj4NCj4+PiB0byBhbHNvIGNoZWNrIGZvciBwcm90ICE9IFBST1RfVFlQRV9LRVlD
-DQo+Pj4gPyBJIHRoaW5rIHdlIGRvIG5vdCBuZWVkIHRoaXMgYXMgd2UgaGF2ZSBjaGVja2Vk
-IG90aGVyIHJlYXNvbnMgYmVmb3JlLg0KPiANCj4gWWVzLCBpdCBpcyBub3QgbmVjZXNzYXJ5
-LCB0aGUgY29udHJvbCBmbG93IGlzIHN1Y2ggdGhhdCBhIHByb3RlY3Rpb24gZXhjZXB0aW9u
-DQo+IGltcGxpZXMgdGhhdCBpcyBkdWUgdG8ga2V5cy4NCj4+DQo+PiBUbyBtZSB0aGlzIG1l
-YXN1cmUgbG9va3MgbGlrZSBhIGxhc3QgcmVzb3J0IG9wdGlvbiBhbmQgdGhlIFBPUCBkb2Vz
-bid0IHN0YXRlIGEgMTAwJSB3aGF0IGlzIHRvIGJlIGRvbmUuIFNvbWUgaW5zdHJ1Y3Rpb25z
-IGNhbiBtYW5kYXRlIHN1cHByZXNzaW9uIGluc3RlYWQgb2YgdGVybWluYXRpb24gYWNjb3Jk
-aW5nIHRvIHRoZSBhcmNoaXRlY3RzLg0KPj4NCj4+IE15IGludHVpdGlvbiB0ZWxscyBtZSB0
-aGF0IGlmIHdlIGFyZSBpbiBhIHNpdHVhdGlvbiB3aGVyZSB0aGlzIHdvdWxkIGhhcHBlbiB0
-aGVuIHdlIHdvdWxkIGJlIG11Y2ggYmV0dGVyIG9mZiBqdXN0IGRvaW5nIGl0IGJ5IGhhbmQg
-KGkuZS4gaW4gdGhlIGluc3RydWN0aW9uIGVtdWxhdGlvbiBjb2RlKSBhbmQgbm90IGxldHRp
-bmcgdGhpcyBmdW5jdGlvbiBkZWNpZGUuDQo+IA0KPiBGb3IgdGhlIGluc3RydWN0aW9ucyB3
-ZSBjdXJyZW50bHkgbmVlZCB0byBlbXVsYXRlIGluIEtWTSB3ZSBzaG91bGQgYmUgZmluZS4N
-Cj4gU28gdGhlIHF1ZXN0aW9uIGlzIHdoYXQncyBiZXN0IGZvciB0aGUgZnV0dXJlIGFuZCBm
-b3IgaW5zdHJ1Y3Rpb25zIGVtdWxhdGVkIGJ5IHVzZXIgc3BhY2UuDQo+IFVwd2FyZCBpbiB0
-aGUgY2FsbCBzdGFjayAoaW5jbHVkaW5nIHVzZXIgc3BhY2UpLCB3ZSBkb24ndCBrbm93IHRo
-ZSBmYWlsaW5nIGFkZHJlc3MsDQo+IHdoaWNoIGNvbXBsaWNhdGVzIGhhbmRsaW5nIGl0IGlu
-IHRoZSBlbXVsYXRpb24gY29kZS4NCj4gWW91IGNvdWxkIGNob3AgdXAgdGhlIG1lbW9wIGlu
-IHBhZ2UgY2h1bmtzIHRvIGZpbmQgb3V0LCBidXQgdGhhdCBtaWdodCBoYXZlIG90aGVyIGlz
-c3Vlcy4NCj4gDQo+IFNpbmNlIHRoaXMgYmVoYXZpb3IgaXMgdmVyeSBpbXBsaWNpdCBhbmQg
-ZWFzeSB0byBvdmVybG9vayBtYXliZSB3ZSBzaG91bGQgZG9jdW1lbnQgaXQNCj4gaW4gdGhl
-IGRlc2NyaXB0aW9uIG9mIHRoZSBtZW1vcCBpb2N0bD8NCg0KWWVhaCwgcHJvcGVybHkgZG9j
-dW1lbnRpbmcgdGhpcyBpcyB0aGUgbGVhc3Qgd2UgY2FuIGRvLg0K
+On 4/26/22 14:47, Bagas Sanjaya wrote:
+> Link: https://lore.kernel.org/linux-doc/202204252334.Cd2IsiII-lkp@intel.com/
+> Reported-by: kernel test robot <lkp@intel.com>
+> Cc: Suresh Warrier <warrier@linux.vnet.ibm.com>
+> Cc: Paul Mackerras <paulus@samba.org>
+> Cc: Anders Roxell <anders.roxell@linaro.org>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Segher Boessenkool <segher@kernel.crashing.org>
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Cc: Nicholas Piggin <npiggin@gmail.com>
+> Cc: Fabiano Rosas <farosas@linux.ibm.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Cc: linuxppc-dev@lists.ozlabs.org
+> Cc: kvm@vger.kernel.org
+> Cc: stable@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+
+Oops, I forgot Fixes: 0c2a66062470cd ("KVM: PPC: Book3S HV: Host side kick VCPU when poked by real-mode KVM")
+tag.
+
+-- 
+An old man doll... just what I always wanted! - Clara
