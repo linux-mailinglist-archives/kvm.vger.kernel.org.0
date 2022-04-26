@@ -2,218 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC7B450F37C
-	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 10:14:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6689250F435
+	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 10:32:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344231AbiDZIRd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 04:17:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58272 "EHLO
+        id S1345044AbiDZIfP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 04:35:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233706AbiDZIRc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Apr 2022 04:17:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A38946D397
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 01:14:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650960864;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MEOR6S/ja4n9OTXgV5FZcIwBotf+F762IQYY3cXNpwg=;
-        b=SSD7j5/FKApdxL4eEKPMZdJKjKAms50AfoobkoKTGAy0ToXBuo2+iq4micKzCGPcjAOZ3U
-        C7o5jJWtcNTRXnujLMwpZxLBaxqKCLQIrYWLfgcGl3XzV/i+ru7i5kJWC0x4LX6HGgbFg7
-        0L9b77lt4dEaH4qk7ontqvkGDj86mlk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-325--M4JGlQgP9mKuY5GdlcSxg-1; Tue, 26 Apr 2022 04:14:21 -0400
-X-MC-Unique: -M4JGlQgP9mKuY5GdlcSxg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1E0E3811E76;
-        Tue, 26 Apr 2022 08:14:20 +0000 (UTC)
-Received: from starship (unknown [10.40.192.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 734972024CB8;
-        Tue, 26 Apr 2022 08:14:15 +0000 (UTC)
-Message-ID: <6475522c58aec5db3ee0a5ccd3230c63a2f013a9.camel@redhat.com>
-Subject: Re: [PATCH v8 6/9] KVM: x86: lapic: don't allow to change APIC ID
- unconditionally
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Zeng Guang <guang.zeng@intel.com>
+        with ESMTP id S1345279AbiDZIe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Apr 2022 04:34:28 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C48FB73065;
+        Tue, 26 Apr 2022 01:26:57 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id i24so17305091pfa.7;
+        Tue, 26 Apr 2022 01:26:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id;
+        bh=yhLyL+XNsxkwpVleNlagUYPk4ikrWSVwJ5iKvEtm9r4=;
+        b=QhrHokc1cqTSaM8Bm+BwVpjH81YmWkQrBRqiM+8OSkSDQlbidv8n9aGyRD16LTp05s
+         3WChyLlV3VO9IPi13CJKMhT05wEYckITk4L7Xghehtq7K/BS+BiP09vHFsi82wxpXF51
+         cnYzW9J7jWDyDd4NNG9GV4d4G16Er+IhZM+saPSpFcNO3B2T1kKbarnCdmpSiTl75D3w
+         uCu43xKe8ggtAvbg/t0TF+w4PEchRrPd4iiXPJefmSup2qnzNkxiXwWYD27F8miIR70s
+         dTrXz2rFYhLpRm73qjMHmgmOKI5Py9I+fjIY7ZDTvt7sj7Ob7807i7XbyOvTg1YhTVg5
+         cZ4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=yhLyL+XNsxkwpVleNlagUYPk4ikrWSVwJ5iKvEtm9r4=;
+        b=G/koMKj7p+r1r5mBySzqVe96txAtguoz15oNbt35xn9jrA3UG9kCDtqLMnIMsSyc3K
+         BVDAITq9JskNgYahWTrxeSgEjps3nLU3Aa7DGDQ9eg0IxDArT0rTg7a/eER3aUMNvEny
+         a18q5juj49WTtJSA5E8aSxxLPtQT8CE6JsPmwaRnfyrgjnL+aWe4olATxOFc6Ogwr2D4
+         +1yLDGE5U1esNSEplRbI8H+0qy390WJnAT1d9Iw/YtHO3K6ISuNft8usBZE3EZyrdacT
+         ZAwVcUqG1VCzRR/qerFFFgFHQ8QUsaefHSeSavMgSWZuzzExXs8ZvIyl1Y1hLxiPeqj5
+         roDA==
+X-Gm-Message-State: AOAM533NNn7n+oKdCI2xz9ZkeMKdAkwgYexUXFCej1HVk4SuzfhDjwif
+        MLZC1juYxMbCDGNyUth0xi9zNVnltr8=
+X-Google-Smtp-Source: ABdhPJz+74lK30qT8FEbdkFdhMy6GpRLV2X22ikbl7jvT9J2uD4jEhIbrQcWPhnJvO2yG0B2407JDw==
+X-Received: by 2002:a05:6a00:894:b0:4fe:25d7:f59e with SMTP id q20-20020a056a00089400b004fe25d7f59emr23477482pfj.58.1650961617115;
+        Tue, 26 Apr 2022 01:26:57 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.119])
+        by smtp.googlemail.com with ESMTPSA id k15-20020a63ab4f000000b00381eef69bfbsm12024832pgp.3.2022.04.26.01.26.46
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 26 Apr 2022 01:26:56 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
-        Gao Chao <chao.gao@intel.com>
-Date:   Tue, 26 Apr 2022 11:14:14 +0300
-In-Reply-To: <080d6ced254e56dbad2910447f81c5ea976fc419.camel@redhat.com>
-References: <20220411090447.5928-1-guang.zeng@intel.com>
-         <20220411090447.5928-7-guang.zeng@intel.com> <YlmDtC73u/AouMsu@google.com>
-         <080d6ced254e56dbad2910447f81c5ea976fc419.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH] KVM: LAPIC: Fix advance timer expiration delta trace
+Date:   Tue, 26 Apr 2022 01:25:51 -0700
+Message-Id: <1650961551-38390-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-04-19 at 17:07 +0300, Maxim Levitsky wrote:
-> On Fri, 2022-04-15 at 14:39 +0000, Sean Christopherson wrote:
-> > On Mon, Apr 11, 2022, Zeng Guang wrote:
-> > > From: Maxim Levitsky <mlevitsk@redhat.com>
-> > > 
-> > > No normal guest has any reason to change physical APIC IDs, and
-> > > allowing this introduces bugs into APIC acceleration code.
-> > > 
-> > > And Intel recent hardware just ignores writes to APIC_ID in
-> > > xAPIC mode. More background can be found at:
-> > > https://lore.kernel.org/lkml/Yfw5ddGNOnDqxMLs@google.com/
-> > > 
-> > > Looks there is no much value to support writable xAPIC ID in
-> > > guest except supporting some old and crazy use cases which
-> > > probably would fail on real hardware. So, make xAPIC ID
-> > > read-only for KVM guests.
-> > 
-> > AFAIK, the plan is to add a capability to let userspace opt-in to a fully read-only
-> > APIC ID[*], but I haven't seen patches...
-> > 
-> > Maxim?
-> 
-> Yep, I will start working on this pretty much today.
-> 
-> I was busy last 3 weeks stablilizing nested AVIC
-> (I am getting ~600,000 IPIs/s instead of ~40,000 in L2 VM with nested AVIC!),
-> with 700,000-900,000 IPIs native with AVIC, 
-> almost bare metal IPI performance in L2!
-> 
-> (the result is from test which I will soon publish makes all 
-> vCPUs send IPIs in round robin fashion, and a vCPU sends IPI only after 
-> it received it from previous vCPU - the number is total
-> number of IPIs send on 8 vCPUs).
-> 
-> 
-> The fact that the dreadful AVIC errata dominates my testing again,
-> supports my feeling that I mostly fixed nested AVIC bugs.'
-> Tomorrow I'll send RFC v2 of the patches.
-> 
-> 
-> About read-only apic ID cap, 
-> I have few questions before I start implementing it:
-> 
-> Paolo gave me recently an idea to make the APIC ID always read-only for 
-> guest writes, and only allow host APIC ID changes (unless the cap is set).
-> 
-> I am kind of torn about it - assuming that no guest writes APIC ID this will work just fine 
-> in empty logical sense, but if a guest actually writes an apic id, 
-> while it will migrate fine to a newer KVM, but then after a reboot 
-> it won't be able to set its APIC ID again.
-> 
-> On the other hand, versus fully unconditional read-only apic id, 
-> that will support that very unlikely case if the hypervisor
-> itself is actually the one that for some reason changes the apic id,
-> from the initial value it gave.
-> 
-> 
-> In terms of what I need:
-> 
-> - In nested AVIC I strongly prefer read-only apic ids, and I can
->   make nested AVIC be conditional on the new cap.
->   IPI virtualization also can be made conditional on the new cap.
-> 
-> 
-> - I also would love to remove broken code from *non nested* AVIC, 
->   which tries to support APIC ID change. 
-> 
->   I can make non nested AVIC *also* depend on the new cap, 
->   but that will technically be a regression, since this way users of 
->   older qemu and new kernel will suddenly have their AVIC inhibited. 
-> 
->   I don't know if that is such a big issue though because AVIC is
->   (sadly) by default disabled anyway.
-> 
->   If that is not possible the other way to solve this is to inhibit AVIC
->   as soon as the guest tries to change APIC ID.
-> 
-> - I would also want to remove the ability to relocate apic base,
->   likely depending on the new cap as well, but if there are objections
->   I can drop this. I don't need this, but it is just nice to do while we
->   are at it.
-> 
-> 
-> Paolo, Sean, and everyone else: What do you think?
+From: Wanpeng Li <wanpengli@tencent.com>
 
-Palo, Sean, Any update?
+The advance timer expiration delta trace is moved after guest_exit_irqoff()
+since it can avoid to violate RCU extended quiescent state when moving 
+wait_lapic_expire() just before vmentry. Now kvm can enter a guest multiple 
+times since IPI/Timer fastpath, snapshot the delta multiple times before 
+vmentry and trace it one time after vmexit is not accurately this time. 
+Commit 87fa7f3e98a1 (x86/kvm: Move context tracking where it belongs) moves 
+rcu state updates more closer around vmentry/vmexit, we will not violate RCU 
+any more. Let's fix it by keeping the advance timer expiration delta trace 
+in __kvm_wait_lapic_epire() and dropping advance_expire_delta.
 
-After thinking more about this, I actualy think I will do something
-different, something that actually was proposed here, and I was against it:
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ arch/x86/kvm/lapic.c | 4 ++--
+ arch/x86/kvm/lapic.h | 1 -
+ arch/x86/kvm/x86.c   | 8 --------
+ 3 files changed, 2 insertions(+), 11 deletions(-)
 
-
-1. I will add new inhibit APICV_INHIBIT_REASON_RO_SETTINGS, which will be set
-first time any vCPU touches apic id and/or apic base because why not...
-
-That will take care of non nested case cleanly, and will take care of IPIv
-for now (as long as it does't support nesting).
-
-2. For my nested AVIC, I will do 2 things:
-
-   a. My code never reads L1 apic ids, and always uses vcpu_id, thus
-      in theory, if I just ignore the problem, and the guest changes apic ids,
-      the nested AVIC will just keep on using initial apic ids, thus there is  no danger
-      of CVE like issue if the guest tries to change theses ids in the 'right' time.
-
-   b. on each nested vm entry I'll just check that apic id is not changed from the default,
-      if AVIC is enabled for the nested guest.
-
-      if so the nested entry will fail (best with kvm_vm_bugged) to get attention of
-      the user, but I can just fail it with standard vm exit reason of 0xFFFFFFFF.
-
-      Chances that there is a modern VM, which runs nested guests, on AMD, and changes APIC IDs,
-      IMHO are too low to bother, plus one can always disable nested AVIC for this case by tweaking
-      the nested CPUID.
-
-
-This way there will no need to patch qemu, propogate the new cap to the machines, etc, etc.
-
-What do you think?
-
-Best regards,
-	Maxim Levitsky
-
-
-
-> 
-> Also:
-> Suggestions for the name for the new cap? Is this all right if
-> the same cap would make both apic id read only and apic base
-> (this is also something Paolo suggested to me)
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
-> 
-> > [*] https://lore.kernel.org/all/c903e82ed2a1e98f66910c35b5aabdcf56e08e72.camel@redhat.com
-> > 
-
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 66b0eb0bda94..a4e9eb329e42 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1648,10 +1648,10 @@ static void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
+ 	tsc_deadline = apic->lapic_timer.expired_tscdeadline;
+ 	apic->lapic_timer.expired_tscdeadline = 0;
+ 	guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
+-	apic->lapic_timer.advance_expire_delta = guest_tsc - tsc_deadline;
++	trace_kvm_wait_lapic_expire(vcpu->vcpu_id, guest_tsc - tsc_deadline);
+ 
+ 	if (lapic_timer_advance_dynamic) {
+-		adjust_lapic_timer_advance(vcpu, apic->lapic_timer.advance_expire_delta);
++		adjust_lapic_timer_advance(vcpu, guest_tsc - tsc_deadline);
+ 		/*
+ 		 * If the timer fired early, reread the TSC to account for the
+ 		 * overhead of the above adjustment to avoid waiting longer
+diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+index 4e4f8a22754f..65bb2a8cf145 100644
+--- a/arch/x86/kvm/lapic.h
++++ b/arch/x86/kvm/lapic.h
+@@ -38,7 +38,6 @@ struct kvm_timer {
+ 	u64 tscdeadline;
+ 	u64 expired_tscdeadline;
+ 	u32 timer_advance_ns;
+-	s64 advance_expire_delta;
+ 	atomic_t pending;			/* accumulated triggered timers */
+ 	bool hv_timer_in_use;
+ };
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a6ab19afc638..5fa465b268d2 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10248,14 +10248,6 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	 */
+ 	guest_timing_exit_irqoff();
+ 
+-	if (lapic_in_kernel(vcpu)) {
+-		s64 delta = vcpu->arch.apic->lapic_timer.advance_expire_delta;
+-		if (delta != S64_MIN) {
+-			trace_kvm_wait_lapic_expire(vcpu->vcpu_id, delta);
+-			vcpu->arch.apic->lapic_timer.advance_expire_delta = S64_MIN;
+-		}
+-	}
+-
+ 	local_irq_enable();
+ 	preempt_enable();
+ 
+-- 
+2.25.1
 
