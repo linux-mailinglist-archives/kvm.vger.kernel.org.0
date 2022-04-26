@@ -2,76 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E01E510439
-	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 18:47:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39443510492
+	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 18:52:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353327AbiDZQuS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 12:50:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43242 "EHLO
+        id S1353458AbiDZQxl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 12:53:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353258AbiDZQs6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Apr 2022 12:48:58 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BFB631347
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 09:45:08 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id s137so16531186pgs.5
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 09:45:08 -0700 (PDT)
+        with ESMTP id S1353455AbiDZQvf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Apr 2022 12:51:35 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED91A199147
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 09:47:56 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id i5so7240590wrc.13
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 09:47:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=MV2rXZYLANBXwWeawR7/zt+GNp0SI8c9yVGczUHqvv4=;
-        b=r6w70AWNjkDBjBmqpgOgNvViaDdxusKCzQdUf8+ddzjZNEbVGB8BNzpSpqmLQV9kkX
-         t4Ll9moZ9exXPwffqEsab82NSUfL+cfMq0xaxpI6TdOwLRjQIUIGTczdgqYcxMw/8abU
-         czt2suDXv5z0FQnG+QMIb1xhXHOowYVpJ2SGzfp0Bnd3YMxW0EhuJVSq6G4jrpl5X7ul
-         wns8TD6ndZ0w96ijqoZ4aqUeQSkToYuSQg08AVOqdT0QhcO4Kx+TqT6GClaJY2ZguyRm
-         sG1hZ9XqcqU0JjayjIOurnmSOFU8PQ0jGW94nRzP5rMpW1LWYKFxEej2QU9jVPn3EO3G
-         rAOg==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=qt1xBfAjDwIVH/qIegeysO+xF5Q0Vhhl5yCUW73MsTA=;
+        b=iPSdU9gEehCKhkBxHp2xL4tFvgTizzxi1PKvzJBe5HnNrGCh36tsMXgjSokdKFaOrV
+         If/MeBrVHMQCyCUJHfnDC25OfBmq1wEPPxWYMlZtBXLhMJc4JnIox3pDRORS8LtTKq2E
+         Ajgl5GOr4sVWUJ+KCG0R8VrEu2q0XAzqL0Lxsw9HeDwlL8WtX98YOi58HtzLeFQhtUKT
+         CyyQzETYevzIc8wMtP3b9NfhvS+dWETbdmwXtroz1VKPZgrbn/aECzqYLU64TYkyhFGl
+         SoEa/9kVqfFHkX2LzD9jV5wlnONiXwspI32odAp1TTZ5qVpNaqay19ULRGsci794LRvf
+         O6Iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=MV2rXZYLANBXwWeawR7/zt+GNp0SI8c9yVGczUHqvv4=;
-        b=CYL8jGxngJUyk4BMsZ+TIbhx4Zqc8W5lRzLvdD7jkun2lw8ZZjMQghm2/pLdYH5uNk
-         h36GZ5r+Ri69UaWPwUO/tfvKyZ0qiwr98nRo0Uu3nRuLS84fZDblTPoA1YiUjXh3DUmQ
-         Odwd+PnJc8BVYNqNncGGkh7ZCYLhvQy519IbTaR5XLBX9uatR1yasGyj+hRDfVly9LF4
-         wRayb5RQ2Ks50E8FSq4+GLJ+vFH62edXXd2IRkhcquBmOfk/ThS1fYs4kWG2P4ukiw6M
-         Xua3YvIAYOIWPOZhgzpsywmeQITissHld6/WG2U5Srgf3OVtph4ljUE9Q+Z4DyP+jJmP
-         8fjQ==
-X-Gm-Message-State: AOAM5328X3NV++Sn7Csl8nBup0ra+0SNO3K4iDFnoIHDjg8NXCur0oI1
-        MgFuSALQz69SI3Onl06t4UzZdg==
-X-Google-Smtp-Source: ABdhPJy6h8hmHiUoYJVyLyaGoSTs+QoXckuB7nplL6Nv2HvHXWguabqu4OG0Yk00CbUeHnNbatbU2Q==
-X-Received: by 2002:a62:c545:0:b0:50d:2d0f:2e8a with SMTP id j66-20020a62c545000000b0050d2d0f2e8amr16084158pfg.12.1650991507582;
-        Tue, 26 Apr 2022 09:45:07 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id m9-20020a17090aab0900b001d2bff34228sm3452391pjq.9.2022.04.26.09.45.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Apr 2022 09:45:07 -0700 (PDT)
-Date:   Tue, 26 Apr 2022 16:45:03 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>
-Subject: Re: kvm_gfn_to_pfn_cache_refresh started getting a warning recently
-Message-ID: <YmghjwgcSZzuH7Rb@google.com>
-References: <e415e20f899407fb24dfb8ecbc1940c5cb14a302.camel@redhat.com>
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=qt1xBfAjDwIVH/qIegeysO+xF5Q0Vhhl5yCUW73MsTA=;
+        b=JBYdNEe8cxjRHYbeI/Oh7Lr1BE2n3D9tLt/x7YfpCHY7oFQWAmdKXemKK5rVXQerAC
+         GLmfbBQARo+KimcfXOQEcKPoPj+fyijJorH5QuddmUuiLaN1hyFhcGdB7h4rWVNiLAi/
+         Ikq/gapaQ8fn6cOSHOx2JaSEMlwv9dfUgqauKjxgpJ5isUq0MfJ1E6E1kakLyhpvkE5V
+         zb/qk9HcIF7ZWTwGFow1ZIEEU+JAvptlfHY5u/uVCue4YQj+g1AIen361y30glGlW6XO
+         bFryyHxabGjsDcq1TkgS/inueB+4Ll1e3G58qU1i58ify8Zs9o/GL9Msf0sqsMmHEd7U
+         evlQ==
+X-Gm-Message-State: AOAM532DNxvqVHEdxjJ+FcTd9BPILMkh+FVOuzInnX5VxYJEBxCuRA/O
+        ZYPPg9n295x+ZsHo5c+qsacpnBd0flkWZQ==
+X-Google-Smtp-Source: ABdhPJxNerl8h48oNdhlPxP0K0QLg7jQc99z32TOeG8UnwyLQJK/4sfq+hMwCibz9iSbWLQuVSN4+A==
+X-Received: by 2002:a5d:4dc7:0:b0:20a:ed1a:2c0 with SMTP id f7-20020a5d4dc7000000b0020aed1a02c0mr5619wru.448.1650991675458;
+        Tue, 26 Apr 2022 09:47:55 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
+        by smtp.googlemail.com with ESMTPSA id y9-20020a05600015c900b0020adb0e106asm7513262wry.93.2022.04.26.09.47.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Apr 2022 09:47:55 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <7a627c97-0fb1-cb35-8623-7893e228852c@redhat.com>
+Date:   Tue, 26 Apr 2022 18:47:53 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e415e20f899407fb24dfb8ecbc1940c5cb14a302.camel@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: Another nice lockdep print in nested SVM code
+Content-Language: en-US
+To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc:     Sean Christopherson <seanjc@google.com>
+References: <8aab89fba5e682a4215dcf974ca5a2c9ae0f6757.camel@redhat.com>
+ <17948270d3c3261aa9fc5600072af437e4b85482.camel@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <17948270d3c3261aa9fc5600072af437e4b85482.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 26, 2022, Maxim Levitsky wrote:
-> [  390.511995] BUG: sleeping function called from invalid context at include/linux/highmem-internal.h:161
-> [  390.513681] in_atomic(): 1, irqs_disabled(): 1, non_block: 0, pid: 4439, name: CPU 0/KVM
+On 4/26/22 18:43, Maxim Levitsky wrote:
+> Actually for vmrun, that #GP is I think sort of correct now - that is
+> what AMD cpus do on 'invalid physical address', but for VM exit, we
+> just need to have the vmcb mapped instead of mapping it again -
+> injecting #GP at that point which will go to the nested guest is just
+> wrong.
 
-This is my fault.  memremap() can sleep as well.  I'll work on a fix.
+Yeah, in that case I can't think of anything better than triple fault.
+
+Paolo
