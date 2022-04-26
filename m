@@ -2,96 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD0DE50F9EF
-	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 12:14:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED2A650FA2B
+	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 12:20:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348596AbiDZKQl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 06:16:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55594 "EHLO
+        id S1345353AbiDZKVl convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 26 Apr 2022 06:21:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348598AbiDZKQ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Apr 2022 06:16:28 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C62C43385;
-        Tue, 26 Apr 2022 02:39:42 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23Q9CCCA012220;
-        Tue, 26 Apr 2022 09:39:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=wf2o/TngjbdQCkWU8ln2Fq1y+dpilYYa4+CZjwx8RKI=;
- b=ake9Gj4VuU6VZUKVMpccI0CiI0mAAuo2uyK8fL1s4zyN79eRDlnkuz3Og6+eKkgTYVdN
- RSvaQ09ndJ9R3fh18E/GGvb8/xOqDD8somytFxZGTisHGQqL9QqUhkWwNKs0QVsZzGrp
- dFe1Tojz04/LRBSgz2MhdgLKozSzV2434pZhdDmenad31y9tnyylOTRssxXnmuT/e37a
- euJQrxQSr/AdI4V0N+7KLbvArjwmNzhzwTjjA6AlgI78M1oVHDAEhKAXMK8xa0QkdH1t
- dF9P1h5HBQ/GxZx6Hmw6h6h/jbaCM8BA9q/DBEbAhi5YFTV3/FA3XCYR2AIRl80ZRxLE Nw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fpdw2rfcu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Apr 2022 09:39:41 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 23Q9cSPL015877;
-        Tue, 26 Apr 2022 09:39:40 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fpdw2rfca-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Apr 2022 09:39:40 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23Q9dCLY024841;
-        Tue, 26 Apr 2022 09:39:38 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03fra.de.ibm.com with ESMTP id 3fm938u802-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Apr 2022 09:39:38 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23Q9QX0n41091366
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 Apr 2022 09:26:33 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 103004C046;
-        Tue, 26 Apr 2022 09:39:35 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BAAB74C044;
-        Tue, 26 Apr 2022 09:39:34 +0000 (GMT)
-Received: from [9.145.85.71] (unknown [9.145.85.71])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 26 Apr 2022 09:39:34 +0000 (GMT)
-Message-ID: <81a99617-d6ab-959c-be0c-73622cbf1203@linux.ibm.com>
-Date:   Tue, 26 Apr 2022 11:39:34 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [kvm-unit-tests PATCH v4 5/5] s390x: uv-guest: Add attestation
- tests
+        with ESMTP id S242482AbiDZKVQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Apr 2022 06:21:16 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66E80A1B2
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 02:47:08 -0700 (PDT)
+Received: from fraeml736-chm.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KncPk3w42z67XJ2;
+        Tue, 26 Apr 2022 17:43:06 +0800 (CST)
+Received: from lhreml721-chm.china.huawei.com (10.201.108.72) by
+ fraeml736-chm.china.huawei.com (10.206.15.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 26 Apr 2022 11:47:05 +0200
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml721-chm.china.huawei.com (10.201.108.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 26 Apr 2022 10:47:05 +0100
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2375.024; Tue, 26 Apr 2022 10:47:05 +0100
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Yi Liu <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+CC:     "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "thuth@redhat.com" <thuth@redhat.com>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "chao.p.peng@intel.com" <chao.p.peng@intel.com>,
+        "yi.y.sun@intel.com" <yi.y.sun@intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        Zhangfei Gao <zhangfei.gao@linaro.org>
+Subject: RE: [RFC 00/18] vfio: Adopt iommufd
+Thread-Topic: [RFC 00/18] vfio: Adopt iommufd
+Thread-Index: AQHYT+0OTGNprklv2E6ANQZpjBJsW60CAlLg
+Date:   Tue, 26 Apr 2022 09:47:05 +0000
+Message-ID: <4f920d463ebf414caa96419b625632d5@huawei.com>
+References: <20220414104710.28534-1-yi.l.liu@intel.com>
+In-Reply-To: <20220414104710.28534-1-yi.l.liu@intel.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20220421094527.32261-1-seiden@linux.ibm.com>
- <20220421094527.32261-6-seiden@linux.ibm.com>
- <ad44e7d2-6123-1981-b103-e5d9cc497c4c@linux.ibm.com>
-From:   Steffen Eiden <seiden@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <ad44e7d2-6123-1981-b103-e5d9cc497c4c@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: a9VjrP3foWgrhkGx3B7WXempjrD4OCSm
-X-Proofpoint-GUID: ODjpAgKXXgVROmN2-DwfGf0-vh9bW1zs
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-26_02,2022-04-25_03,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 mlxscore=0 spamscore=0 malwarescore=0 adultscore=0
- impostorscore=0 clxscore=1015 priorityscore=1501 bulkscore=0
- suspectscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2202240000 definitions=main-2204260062
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.178]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -99,120 +76,184 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-Hi Janosch,
 
-thanks for your review.
+> -----Original Message-----
+> From: Yi Liu [mailto:yi.l.liu@intel.com]
+> Sent: 14 April 2022 11:47
+> To: alex.williamson@redhat.com; cohuck@redhat.com;
+> qemu-devel@nongnu.org
+> Cc: david@gibson.dropbear.id.au; thuth@redhat.com; farman@linux.ibm.com;
+> mjrosato@linux.ibm.com; akrowiak@linux.ibm.com; pasic@linux.ibm.com;
+> jjherne@linux.ibm.com; jasowang@redhat.com; kvm@vger.kernel.org;
+> jgg@nvidia.com; nicolinc@nvidia.com; eric.auger@redhat.com;
+> eric.auger.pro@gmail.com; kevin.tian@intel.com; yi.l.liu@intel.com;
+> chao.p.peng@intel.com; yi.y.sun@intel.com; peterx@redhat.com
+> Subject: [RFC 00/18] vfio: Adopt iommufd
+> 
+> With the introduction of iommufd[1], the linux kernel provides a generic
+> interface for userspace drivers to propagate their DMA mappings to kernel
+> for assigned devices. This series does the porting of the VFIO devices
+> onto the /dev/iommu uapi and let it coexist with the legacy implementation.
+> Other devices like vpda, vfio mdev and etc. are not considered yet.
+> 
+> For vfio devices, the new interface is tied with device fd and iommufd
+> as the iommufd solution is device-centric. This is different from legacy
+> vfio which is group-centric. To support both interfaces in QEMU, this
+> series introduces the iommu backend concept in the form of different
+> container classes. The existing vfio container is named legacy container
+> (equivalent with legacy iommu backend in this series), while the new
+> iommufd based container is named as iommufd container (may also be
+> mentioned
+> as iommufd backend in this series). The two backend types have their own
+> way to setup secure context and dma management interface. Below diagram
+> shows how it looks like with both BEs.
+> 
+>                     VFIO
+> AddressSpace/Memory
+>     +-------+  +----------+  +-----+  +-----+
+>     |  pci  |  | platform |  |  ap |  | ccw |
+>     +---+---+  +----+-----+  +--+--+  +--+--+     +----------------------+
+>         |           |           |        |        |   AddressSpace
+> |
+>         |           |           |        |        +------------+---------+
+>     +---V-----------V-----------V--------V----+               /
+>     |           VFIOAddressSpace              | <------------+
+>     |                  |                      |  MemoryListener
+>     |          VFIOContainer list             |
+>     +-------+----------------------------+----+
+>             |                            |
+>             |                            |
+>     +-------V------+            +--------V----------+
+>     |   iommufd    |            |    vfio legacy    |
+>     |  container   |            |     container     |
+>     +-------+------+            +--------+----------+
+>             |                            |
+>             | /dev/iommu                 | /dev/vfio/vfio
+>             | /dev/vfio/devices/vfioX    | /dev/vfio/$group_id
+>  Userspace  |                            |
+> 
+> ===========+============================+==========================
+> ======
+>  Kernel     |  device fd                 |
+>             +---------------+            | group/container fd
+>             | (BIND_IOMMUFD |            |
+> (SET_CONTAINER/SET_IOMMU)
+>             |  ATTACH_IOAS) |            | device fd
+>             |               |            |
+>             |       +-------V------------V-----------------+
+>     iommufd |       |                vfio                  |
+> (map/unmap  |       +---------+--------------------+-------+
+>  ioas_copy) |                 |                    | map/unmap
+>             |                 |                    |
+>      +------V------+    +-----V------+      +------V--------+
+>      | iommfd core |    |  device    |      |  vfio iommu   |
+>      +-------------+    +------------+      +---------------+
+> 
+> [Secure Context setup]
+> - iommufd BE: uses device fd and iommufd to setup secure context
+>               (bind_iommufd, attach_ioas)
+> - vfio legacy BE: uses group fd and container fd to setup secure context
+>                   (set_container, set_iommu)
+> [Device access]
+> - iommufd BE: device fd is opened through /dev/vfio/devices/vfioX
+> - vfio legacy BE: device fd is retrieved from group fd ioctl
+> [DMA Mapping flow]
+> - VFIOAddressSpace receives MemoryRegion add/del via MemoryListener
+> - VFIO populates DMA map/unmap via the container BEs
+>   *) iommufd BE: uses iommufd
+>   *) vfio legacy BE: uses container fd
+> 
+> This series qomifies the VFIOContainer object which acts as a base class
+> for a container. This base class is derived into the legacy VFIO container
+> and the new iommufd based container. The base class implements generic
+> code
+> such as code related to memory_listener and address space management
+> whereas
+> the derived class implements callbacks that depend on the kernel user space
+> being used.
+> 
+> The selection of the backend is made on a device basis using the new
+> iommufd option (on/off/auto). By default the iommufd backend is selected
+> if supported by the host and by QEMU (iommufd KConfig). This option is
+> currently available only for the vfio-pci device. For other types of
+> devices, it does not yet exist and the legacy BE is chosen by default.
+> 
+> Test done:
+> - PCI and Platform device were tested
+> - ccw and ap were only compile-tested
+> - limited device hotplug test
+> - vIOMMU test run for both legacy and iommufd backends (limited tests)
+> 
+> This series was co-developed by Eric Auger and me based on the exploration
+> iommufd kernel[2], complete code of this series is available in[3]. As
+> iommufd kernel is in the early step (only iommufd generic interface is in
+> mailing list), so this series hasn't made the iommufd backend fully on par
+> with legacy backend w.r.t. features like p2p mappings, coherency tracking,
+> live migration, etc. This series hasn't supported PCI devices without FLR
+> neither as the kernel doesn't support VFIO_DEVICE_PCI_HOT_RESET when
+> userspace
+> is using iommufd. The kernel needs to be updated to accept device fd list for
+> reset when userspace is using iommufd. Related work is in progress by
+> Jason[4].
+> 
+> TODOs:
+> - Add DMA alias check for iommufd BE (group level)
+> - Make pci.c to be BE agnostic. Needs kernel change as well to fix the
+>   VFIO_DEVICE_PCI_HOT_RESET gap
+> - Cleanup the VFIODevice fields as it's used in both BEs
+> - Add locks
+> - Replace list with g_tree
+> - More tests
+> 
+> Patch Overview:
+> 
+> - Preparation:
+>   0001-scripts-update-linux-headers-Add-iommufd.h.patch
+>   0002-linux-headers-Import-latest-vfio.h-and-iommufd.h.patch
+>   0003-hw-vfio-pci-fix-vfio_pci_hot_reset_result-trace-poin.patch
+>   0004-vfio-pci-Use-vbasedev-local-variable-in-vfio_realize.patch
+> 
+> 0005-vfio-common-Rename-VFIOGuestIOMMU-iommu-into-iommu_m.patch
+>   0006-vfio-common-Split-common.c-into-common.c-container.c.patch
+> 
+> - Introduce container object and covert existing vfio to use it:
+>   0007-vfio-Add-base-object-for-VFIOContainer.patch
+>   0008-vfio-container-Introduce-vfio_attach-detach_device.patch
+>   0009-vfio-platform-Use-vfio_-attach-detach-_device.patch
+>   0010-vfio-ap-Use-vfio_-attach-detach-_device.patch
+>   0011-vfio-ccw-Use-vfio_-attach-detach-_device.patch
+>   0012-vfio-container-obj-Introduce-attach-detach-_device-c.patch
+>   0013-vfio-container-obj-Introduce-VFIOContainer-reset-cal.patch
+> 
+> - Introduce iommufd based container:
+>   0014-hw-iommufd-Creation.patch
+>   0015-vfio-iommufd-Implement-iommufd-backend.patch
+>   0016-vfio-iommufd-Add-IOAS_COPY_DMA-support.patch
+> 
+> - Add backend selection for vfio-pci:
+>   0017-vfio-as-Allow-the-selection-of-a-given-iommu-backend.patch
+>   0018-vfio-pci-Add-an-iommufd-option.patch
+> 
+> [1]
+> https://lore.kernel.org/kvm/0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com
+> /
+> [2] https://github.com/luxis1999/iommufd/tree/iommufd-v5.17-rc6
+> [3] https://github.com/luxis1999/qemu/tree/qemu-for-5.17-rc6-vm-rfcv1
 
-On 4/26/22 11:22, Janosch Frank wrote:
-> On 4/21/22 11:45, Steffen Eiden wrote:
->> Adds several tests to verify correct error paths of attestation.
->>
->> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
->> ---
->>   lib/s390x/asm/uv.h |   5 +-
->>   s390x/Makefile     |   1 +
->>   s390x/pv-attest.c  | 225 +++++++++++++++++++++++++++++++++++++++++++++
->>   s390x/uv-guest.c   |  13 ++-
->>   4 files changed, 240 insertions(+), 4 deletions(-)
->>   create mode 100644 s390x/pv-attest.c
->>
->> diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
->> index 7c8c399d..38920461 100644
->> --- a/lib/s390x/asm/uv.h
->> +++ b/lib/s390x/asm/uv.h
->> @@ -108,7 +108,10 @@ struct uv_cb_qui {
->>       u8  reserved88[158 - 136];    /* 0x0088 */
->>       uint16_t max_guest_cpus;    /* 0x009e */
->>       u64 uv_feature_indications;    /* 0x00a0 */
->> -    u8  reserveda8[200 - 168];    /* 0x00a8 */
->> +    uint8_t  reserveda8[224 - 168];    /* 0x00a8 */
->> +    uint64_t supp_att_hdr_ver;    /* 0x00e0 */
->> +    uint64_t supp_paf;        /* 0x00e8 */
->> +    uint8_t  reservedf0[256 - 240];    /* 0x00f0 */
->>   }  __attribute__((packed))  __attribute__((aligned(8)));
->>   struct uv_cb_cgc {
->> diff --git a/s390x/Makefile b/s390x/Makefile
->> index 8ff84db5..5a49d1e7 100644
->> --- a/s390x/Makefile
->> +++ b/s390x/Makefile
->> @@ -29,6 +29,7 @@ tests += $(TEST_DIR)/mvpg-sie.elf
->>   tests += $(TEST_DIR)/spec_ex-sie.elf
->>   tests += $(TEST_DIR)/firq.elf
->>   tests += $(TEST_DIR)/epsw.elf
->> +tests += $(TEST_DIR)/pv-attest.elf
->>   pv-tests += $(TEST_DIR)/pv-diags.elf
->> diff --git a/s390x/pv-attest.c b/s390x/pv-attest.c
->> new file mode 100644
->> index 00000000..e31780a3
->> --- /dev/null
->> +++ b/s390x/pv-attest.c
->> @@ -0,0 +1,225 @@
-> [...]
->> +
->> +static void test_attest_v1(uint64_t page)
->> +{
->> +    struct uv_cb_attest uvcb = {
->> +        .header.cmd = UVC_CMD_ATTESTATION,
->> +        .header.len = sizeof(uvcb),
->> +    };
->> +    const struct uv_cb_qui *uvcb_qui = uv_get_query_data();
->> +    struct attest_request_v1 *attest_req = (void *)page;
->> +    struct uv_arcb_v1 *arcb = &attest_req->arcb;
->> +    int cc;
->> +
->> +    report_prefix_push("v1");
->> +    if (!test_bit_inv(0, &uvcb_qui->supp_att_hdr_ver)) {
->> +        report_skip("Attestation version 1 not supported");
->> +        goto done;
->> +    }
->> +
->> +    memset((void *)page, 0, PAGE_SIZE);
->> +
->> +    /*
->> +     * Create a minimal arcb/uvcb such that FW has everything to start
->> +     * unsealing the request. However, this unsealing will fail as the
->> +     * kvm-unit-test framework provides no cryptography functions that
->> +     * would be needed to seal such requests.
->> +     */
->> +    arcb->req_ver = ARCB_VERSION_1;
->> +    arcb->req_len = sizeof(*arcb);
->> +    arcb->nks = 1;
->> +    arcb->sea = sizeof(arcb->meas_key);
->> +    arcb->plaint_att_flags = PAF_PHKH_ATT;
->> +    arcb->meas_alg_id = ARCB_MEAS_HMAC_SHA512;
->> +    uvcb.arcb_addr = (uint64_t)&attest_req->arcb;
->> +    uvcb.measurement_address = (uint64_t)attest_req->measurement;
->> +    uvcb.measurement_length = sizeof(attest_req->measurement);
->> +    uvcb.add_data_address = (uint64_t)attest_req->additional;
->> +    uvcb.add_data_length = sizeof(attest_req->additional);
->> +
->> +    uvcb.continuation_token = 0xff;
->> +    cc = uv_call(0, (uint64_t)&uvcb);
->> +    report(cc == 1 && uvcb.header.rc == 0x0101, "invalid continuation 
->> token");
-> 
-> Please don't add the 0 to the front of the rc values.
-OK
-> 
-> [...]
-> 
->> @@ -111,8 +120,6 @@ static void test_sharing(void)
->>       cc = uv_call(0, (u64)&uvcb);
->>       report(cc == 0 && uvcb.header.rc == UVC_RC_EXECUTED, "unshare");
->>       report_prefix_pop();
->> -
->> -    report_prefix_pop();
-> 
-> That's unrelated, no?
-Right, it is now unrelated. I forgot to remove that change for v4.
-  In the previous version this double pop would mess with the output as
-`test_sharing` was not the last test in that file
-(attestation test followed).
-I'll add another fix patch for this.
+Hi,
 
-> 
->>   }
->>   static struct {
-> 
+I had a go with the above branches on our ARM64 platform trying to pass-through
+a VF dev, but Qemu reports an error as below,
 
-Steffen
+[    0.444728] hisi_sec2 0000:00:01.0: enabling device (0000 -> 0002)
+qemu-system-aarch64-iommufd: IOMMU_IOAS_MAP failed: Bad address
+qemu-system-aarch64-iommufd: vfio_container_dma_map(0xaaaafeb40ce0, 0x8000000000, 0x10000, 0xffffb40ef000) = -14 (Bad address)
+
+I think this happens for the dev BAR addr range. I haven't debugged the kernel
+yet to see where it actually reports that. 
+
+Maybe I am missing something. Please let me know.
+
+Thanks,
+Shameer
+
