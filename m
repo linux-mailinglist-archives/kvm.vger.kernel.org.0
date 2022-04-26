@@ -2,472 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BE1B151041E
-	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 18:46:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 900B151040A
+	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 18:46:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353127AbiDZQtG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 12:49:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43282 "EHLO
+        id S1353124AbiDZQsr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 12:48:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353198AbiDZQs2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1353188AbiDZQs2 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 26 Apr 2022 12:48:28 -0400
-Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA25A1971C4
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 09:44:53 -0700 (PDT)
-Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-2f16645872fso188658847b3.4
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 09:44:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5YolzdQ/RaN8zb0z3UYC2BCPtKKY0DsygYzdEZGVsM0=;
-        b=qu3w9Lv2oWpOlpIS2xz0KvlAo7E5o1egJykT9lEmP91l+7c7eNPiBayrSE4JldqRXk
-         nseiaMmX1ADDvf7UqworHmjxLdYLC1nio33HJwAHLVqWq0KXQHtsko+se8VsmvKRCW6y
-         6xqkGZCp0ykwvdZEho43RBuZzpqswp1SK9l8uhTOVS/jGgxWzoqCtIas2fULzckaP951
-         x4m2Ac7KWIK9e/wW4JFNN312PtTAvllgLzE2cWPFhQbFQqFiuBxBWJWU+Naeth1P8Ygy
-         QbegkZq+iqzT/TYYEGoS5Je2Tx79qoU230sQRbhBqQ9r0S0kdcGLrdPLoz8m0RViMJJA
-         YEZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5YolzdQ/RaN8zb0z3UYC2BCPtKKY0DsygYzdEZGVsM0=;
-        b=A1xFIgHQSWm/RUIc08LHE3k5eioMidBiO3SC3/LsEIttPLKnYMI7FxFAqs81Z46C1K
-         XExbZZoC8SjYYcK56FBa/TOfJ1uedBuiCuvQ26cfvUhLLipy3aVfj995/hjYsa60o9Zm
-         Elm8I8gebFbw1FiPTSw0XLKDDbLbKDNIy3GDZreK28YCXzVu/ZKYYQ7iy8jemC5XcIF0
-         P7luMezXfi7/1ZLccUsBPGb1KTWH1Vze+xgQRXuzjl5xIZXz1awC3Uospo4yJ8ZeZM42
-         pZsnmMC3ryOjlR0F87buFUEiu/Hyg/33wExvV+I9ovu+Azyn1LLbYRZ8OAxYH7cQTf8q
-         WdLQ==
-X-Gm-Message-State: AOAM5312JFMvmzE9ZaZfUC70iKGV2+Pk56S4/B4yV4AQbeffB7i0/DBz
-        VBP2+jvb7zPhe9jDU0Poc9G5VEnL0IenrYl+KWW4yQ==
-X-Google-Smtp-Source: ABdhPJz6BMs3qL8FDXmrDnMspHrNQaTNpkNxjAWAvdmrAI5sNxKMjMbbC2HHYX6VSjRctHs6oHrQwLCemyMjKC53sZA=
-X-Received: by 2002:a81:af59:0:b0:2f4:d869:b5df with SMTP id
- x25-20020a81af59000000b002f4d869b5dfmr23414994ywj.367.1650991492557; Tue, 26
- Apr 2022 09:44:52 -0700 (PDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2231B194B0E;
+        Tue, 26 Apr 2022 09:44:50 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9527923A;
+        Tue, 26 Apr 2022 09:44:50 -0700 (PDT)
+Received: from lpieralisi (unknown [10.57.12.182])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 657163F73B;
+        Tue, 26 Apr 2022 09:44:48 -0700 (PDT)
+Date:   Tue, 26 Apr 2022 17:44:42 +0100
+From:   Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
+To:     Dexuan Cui <decui@microsoft.com>
+Cc:     Jake Oshins <jakeo@microsoft.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "wei.liu@kernel.org" <wei.liu@kernel.org>,
+        KY Srinivasan <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
+        "robh@kernel.org" <robh@kernel.org>, "kw@linux.com" <kw@linux.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH] PCI: hv: Do not set PCI_COMMAND_MEMORY to reduce VM boot
+ time
+Message-ID: <YmgheiPOApuiLcK6@lpieralisi>
+References: <BYAPR21MB12705103ED8F2B7024A22438BFF49@BYAPR21MB1270.namprd21.prod.outlook.com>
 MIME-Version: 1.0
-References: <20220423000328.2103733-1-rananta@google.com> <20220423000328.2103733-3-rananta@google.com>
- <bbaf7dcf-e776-49df-7a12-04b45e4af881@redhat.com>
-In-Reply-To: <bbaf7dcf-e776-49df-7a12-04b45e4af881@redhat.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Tue, 26 Apr 2022 09:44:41 -0700
-Message-ID: <CAJHc60w6YngA7iz=mUfjAEjQdwjG_pj2T9Cpd21xzU1Y_APCwQ@mail.gmail.com>
-Subject: Re: [PATCH v6 2/9] KVM: arm64: Setup a framework for hypercall bitmap
- firmware registers
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
-        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BYAPR21MB12705103ED8F2B7024A22438BFF49@BYAPR21MB1270.namprd21.prod.outlook.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Gavin,
+On Thu, Apr 21, 2022 at 06:26:36PM +0000, Dexuan Cui wrote:
+> > From: Jake Oshins <jakeo@microsoft.com>
+> > Sent: Wednesday, April 20, 2022 9:01 AM
+> > To: Bjorn Helgaas <helgaas@kernel.org>; Dexuan Cui <decui@microsoft.com>
+> > Cc: wei.liu@kernel.org; KY Srinivasan <kys@microsoft.com>; Haiyang Zhang
+> > <haiyangz@microsoft.com>; Stephen Hemminger <sthemmin@microsoft.com>;
+> > lorenzo.pieralisi@arm.com; bhelgaas@google.com;
+> > linux-hyperv@vger.kernel.org; linux-pci@vger.kernel.org;
+> > linux-kernel@vger.kernel.org; Michael Kelley (LINUX)
+> > <mikelley@microsoft.com>; robh@kernel.org; kw@linux.com; Alex Williamson
+> > <alex.williamson@redhat.com>; .kvm@vger.kernel.org
+> > Subject: RE: [EXTERNAL] Re: [PATCH] PCI: hv: Do not set
+> > PCI_COMMAND_MEMORY to reduce VM boot time
+> 
+> I removed the "[EXTERNAL]" tag as it looks like that prevents the email from being
+> archived properly. See this link for the archived email thread:
+> https://lwn.net/ml/linux-kernel/20220419220007.26550-1-decui%40microsoft.com/
+> 
+> > > -----Original Message-----
+> > > From: Bjorn Helgaas <helgaas@kernel.org>
+> > > Sent: Wednesday, April 20, 2022 8:36 AM
+> > > To: Dexuan Cui <decui@microsoft.com>
+> > > Cc: wei.liu@kernel.org; KY Srinivasan <kys@microsoft.com>; Haiyang Zhang
+> > > <haiyangz@microsoft.com>; Stephen Hemminger
+> > <sthemmin@microsoft.com>;
+> > > lorenzo.pieralisi@arm.com; bhelgaas@google.com; linux-
+> > > hyperv@vger.kernel.org; linux-pci@vger.kernel.org; linux-
+> > > kernel@vger.kernel.org; Michael Kelley (LINUX) <mikelley@microsoft.com>;
+> > > robh@kernel.org; kw@linux.com; Jake Oshins <jakeo@microsoft.com>; Alex
+> > > Williamson <alex.williamson@redhat.com>; .kvm@vger.kernel.org
+> 
+> I removed the period from ".kvm@" so the KVM list is correctly Cc'd.
+> 
+> > > Subject: [EXTERNAL] Re: [PATCH] PCI: hv: Do not set
+> > PCI_COMMAND_MEMORY
+> > > to reduce VM boot time
+> > >
+> > > [+cc Alex, kvm in case this idea is applicable for more than just Hyper-V]
+> 
+> Alex, your comments are welcome!
+> 
+> > > On Tue, Apr 19, 2022 at 03:00:07PM -0700, Dexuan Cui wrote:
+> > > > A VM on Azure can have 14 GPUs, and each GPU may have a huge MMIO
+> > > BAR,
+> > > > e.g. 128 GB. Currently the boot time of such a VM can be 4+ minutes,
+> > > > and most of the time is used by the host to unmap/map the vBAR from/to
+> > > > pBAR when the VM clears and sets the PCI_COMMAND_MEMORY bit: each
+> > > > unmap/map operation for a 128GB BAR needs about 1.8 seconds, and the
+> > > > pci-hyperv driver and the Linux PCI subsystem flip the
+> > > > PCI_COMMAND_MEMORY bit eight times (see pci_setup_device() ->
+> > > > pci_read_bases() and pci_std_update_resource()), increasing the boot
+> > > > time by 1.8 * 8 = 14.4 seconds per GPU, i.e. 14.4 * 14 = 201.6 seconds in
+> > total.
+> > > >
+> > > > Fix the slowness by not turning on the PCI_COMMAND_MEMORY in
+> > > > pci-hyperv.c, so the bit stays in the off state before the PCI device
+> > > > driver calls
+> > > > pci_enable_device(): when the bit is off, pci_read_bases() and
+> > > > pci_std_update_resource() don't cause Hyper-V to unmap/map the vBARs.
+> > > > With this change, the boot time of such a VM is reduced by
+> > > > 1.8 * (8-1) * 14 = 176.4 seconds.
+> > > >
+> > > > Tested-by: Boqun Feng (Microsoft) <boqun.feng@gmail.com>
+> > > > Signed-off-by: Dexuan Cui <decui@microsoft.com>
+> > > > Cc: Jake Oshins <jakeo@microsoft.com>
+> > > > ---
+> > > >  drivers/pci/controller/pci-hyperv.c | 17 +++++++++++------
+> > > >  1 file changed, 11 insertions(+), 6 deletions(-)
+> > > >
+> > > > diff --git a/drivers/pci/controller/pci-hyperv.c
+> > > > b/drivers/pci/controller/pci-hyperv.c
+> > > > index d270a204324e..f9fbbd8d94db 100644
+> > > > --- a/drivers/pci/controller/pci-hyperv.c
+> > > > +++ b/drivers/pci/controller/pci-hyperv.c
+> > > > @@ -2082,12 +2082,17 @@ static void prepopulate_bars(struct
+> > > hv_pcibus_device *hbus)
+> > > >  				}
+> > > >  			}
+> > > >  			if (high_size <= 1 && low_size <= 1) {
+> > > > -				/* Set the memory enable bit. */
+> > > > -				_hv_pcifront_read_config(hpdev,
+> > > PCI_COMMAND, 2,
+> > > > -							 &command);
+> > > > -				command |= PCI_COMMAND_MEMORY;
+> > > > -				_hv_pcifront_write_config(hpdev,
+> > > PCI_COMMAND, 2,
+> > > > -							  command);
+> > > > +				/*
+> > > > +				 * No need to set the
+> > > PCI_COMMAND_MEMORY bit as
+> > > > +				 * the core PCI driver doesn't require the bit
+> > > > +				 * to be pre-set. Actually here we intentionally
+> > > > +				 * keep the bit off so that the PCI BAR probing
+> > > > +				 * in the core PCI driver doesn't cause Hyper-V
+> > > > +				 * to unnecessarily unmap/map the virtual
+> > > BARs
+> > > > +				 * from/to the physical BARs multiple times.
+> > > > +				 * This reduces the VM boot time significantly
+> > > > +				 * if the BAR sizes are huge.
+> > > > +				 */
+> > > >  				break;
+> > > >  			}
+> > > >  		}
+> > > > --
+> > > > 2.17.1
+> > > >
+> > 
+> > My question about this, directed at the people who know a lot more about the
+> > PCI subsystem in Linux than I do (Bjorn, Alex, etc.), is whether this change can
+> > create a problem.
+> 
+> Bjorn, Lorenzo, Alex, it would be nice to have your insights!
+> 
+> > In a physical computer, you might sometimes want to move
+> > a device from one part of address space to another, typically when another
+> > device is being hot-added to the system.  Imagine a scenario where you have,
+> > in this case a VM, and there are perhaps 15 NVMe SSDs passed through to the
+> > VM.  One of them dies and so it is removed.  The replacement SSD has a
+> > larger BAR than the one that was removed (because it's a different SKU) and
+> > now it doesn't fit neatly into the hole that was vacated by the previous SSD.
+> > 
+> > In this case, will the kernel ever attempt to move some of the existing SSDs to
+> > make room for the new one?  And if so, does this come with the requirement
+> > that they actually get mapped out of the address space while they are being
+> > moved?  (This was the scenario that prompted me to write the code above as
+> > it was, originally.)
+> > 
+> > Thanks,
+> > Jake Oshins
+> 
+> Sorry I don't quite follow. pci-hyperv allocates MMIO for the bridge
+> window in hv_pci_allocate_bridge_windows() and registers the MMIO
+> ranges to the core PCI driver via pci_add_resource(), and later the
+> core PCI driver probes the bus/device(s), validates the BAR sizes and
+> the pre-initialized BAR values, and uses the BAR configuration. IMO
+> the whole process doesn't require the bit PCI_COMMAND_MEMORY to be
+> pre-set, and there should be no issue to delay setting the bit to a
+> PCI device device's .probe() -> pci_enable_device().
 
-On Mon, Apr 25, 2022 at 11:34 PM Gavin Shan <gshan@redhat.com> wrote:
->
-> Hi Raghavendra,
->
-> On 4/23/22 8:03 AM, Raghavendra Rao Ananta wrote:
-> > KVM regularly introduces new hypercall services to the guests without
-> > any consent from the userspace. This means, the guests can observe
-> > hypercall services in and out as they migrate across various host
-> > kernel versions. This could be a major problem if the guest
-> > discovered a hypercall, started using it, and after getting migrated
-> > to an older kernel realizes that it's no longer available. Depending
-> > on how the guest handles the change, there's a potential chance that
-> > the guest would just panic.
-> >
-> > As a result, there's a need for the userspace to elect the services
-> > that it wishes the guest to discover. It can elect these services
-> > based on the kernels spread across its (migration) fleet. To remedy
-> > this, extend the existing firmware pseudo-registers, such as
-> > KVM_REG_ARM_PSCI_VERSION, but by creating a new COPROC register space
-> > for all the hypercall services available.
-> >
-> > These firmware registers are categorized based on the service call
-> > owners, but unlike the existing firmware pseudo-registers, they hold
-> > the features supported in the form of a bitmap.
-> >
-> > During the VM initialization, the registers are set to upper-limit of
-> > the features supported by the corresponding registers. It's expected
-> > that the VMMs discover the features provided by each register via
-> > GET_ONE_REG, and write back the desired values using SET_ONE_REG.
-> > KVM allows this modification only until the VM has started.
-> >
-> > Some of the standard features are not mapped to any bits of the
-> > registers. But since they can recreate the original problem of
-> > making it available without userspace's consent, they need to
-> > be explicitly added to the case-list in
-> > kvm_hvc_call_default_allowed(). Any function-id that's not enabled
-> > via the bitmap, or not listed in kvm_hvc_call_default_allowed, will
-> > be returned as SMCCC_RET_NOT_SUPPORTED to the guest.
-> >
-> > Older userspace code can simply ignore the feature and the
-> > hypercall services will be exposed unconditionally to the guests,
-> > thus ensuring backward compatibility.
-> >
-> > In this patch, the framework adds the register only for ARM's standard
-> > secure services (owner value 4). Currently, this includes support only
-> > for ARM True Random Number Generator (TRNG) service, with bit-0 of the
-> > register representing mandatory features of v1.0. Other services are
-> > momentarily added in the upcoming patches.
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >   arch/arm64/include/asm/kvm_host.h | 12 ++++
-> >   arch/arm64/include/uapi/asm/kvm.h |  9 +++
-> >   arch/arm64/kvm/arm.c              |  1 +
-> >   arch/arm64/kvm/guest.c            |  8 ++-
-> >   arch/arm64/kvm/hypercalls.c       | 94 +++++++++++++++++++++++++++++++
-> >   arch/arm64/kvm/psci.c             | 13 +++++
-> >   include/kvm/arm_hypercalls.h      |  6 ++
-> >   include/kvm/arm_psci.h            |  2 +-
-> >   8 files changed, 142 insertions(+), 3 deletions(-)
-> >
->
-> Some nits as below, please consider to improve if you need another
-> respin.
->
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
->
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 94a27a7520f4..df07f4c10197 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -101,6 +101,15 @@ struct kvm_s2_mmu {
-> >   struct kvm_arch_memory_slot {
-> >   };
-> >
-> > +/**
-> > + * struct kvm_smccc_features: Descriptor the hypercall services exposed to the guests
-> > + *
-> > + * @std_bmap: Bitmap of standard secure service calls
-> > + */
-> > +struct kvm_smccc_features {
-> > +     unsigned long std_bmap;
-> > +};
-> > +
->
-> s/Descriptor/Descriptor of
->
-Nice catch!
+IIUC you want to bootstrap devices with PCI_COMMAND_MEMORY clear
+(otherwise PCI core would toggle it on and off for eg BAR sizing).
 
-> >   struct kvm_arch {
-> >       struct kvm_s2_mmu mmu;
-> >
-> > @@ -150,6 +159,9 @@ struct kvm_arch {
-> >
-> >       u8 pfr0_csv2;
-> >       u8 pfr0_csv3;
-> > +
-> > +     /* Hypercall features firmware registers' descriptor */
-> > +     struct kvm_smccc_features smccc_feat;
-> >   };
-> >
-> >   struct kvm_vcpu_fault_info {
-> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> > index c1b6ddc02d2f..0b79d2dc6ffd 100644
-> > --- a/arch/arm64/include/uapi/asm/kvm.h
-> > +++ b/arch/arm64/include/uapi/asm/kvm.h
-> > @@ -332,6 +332,15 @@ struct kvm_arm_copy_mte_tags {
-> >   #define KVM_ARM64_SVE_VLS_WORDS     \
-> >       ((KVM_ARM64_SVE_VQ_MAX - KVM_ARM64_SVE_VQ_MIN) / 64 + 1)
-> >
-> > +/* Bitmap feature firmware registers */
-> > +#define KVM_REG_ARM_FW_FEAT_BMAP             (0x0016 << KVM_REG_ARM_COPROC_SHIFT)
-> > +#define KVM_REG_ARM_FW_FEAT_BMAP_REG(r)              (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
-> > +                                             KVM_REG_ARM_FW_FEAT_BMAP |      \
-> > +                                             ((r) & 0xffff))
-> > +
-> > +#define KVM_REG_ARM_STD_BMAP                 KVM_REG_ARM_FW_FEAT_BMAP_REG(0)
-> > +#define KVM_REG_ARM_STD_BIT_TRNG_V1_0                0
-> > +
-> >   /* Device Control API: ARM VGIC */
-> >   #define KVM_DEV_ARM_VGIC_GRP_ADDR   0
-> >   #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS      1
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 523bc934fe2f..a37fadbd617e 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -156,6 +156,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-> >       kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
-> >
-> >       set_default_spectre(kvm);
-> > +     kvm_arm_init_hypercalls(kvm);
-> >
-> >       return ret;
-> >   out_free_stage2_pgd:
-> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > index 0d5cca56cbda..8c607199cad1 100644
-> > --- a/arch/arm64/kvm/guest.c
-> > +++ b/arch/arm64/kvm/guest.c
-> > @@ -756,7 +756,9 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >
-> >       switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
-> >       case KVM_REG_ARM_CORE:  return get_core_reg(vcpu, reg);
-> > -     case KVM_REG_ARM_FW:    return kvm_arm_get_fw_reg(vcpu, reg);
-> > +     case KVM_REG_ARM_FW:
-> > +     case KVM_REG_ARM_FW_FEAT_BMAP:
-> > +             return kvm_arm_get_fw_reg(vcpu, reg);
-> >       case KVM_REG_ARM64_SVE: return get_sve_reg(vcpu, reg);
-> >       }
-> >
-> > @@ -774,7 +776,9 @@ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >
-> >       switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
-> >       case KVM_REG_ARM_CORE:  return set_core_reg(vcpu, reg);
-> > -     case KVM_REG_ARM_FW:    return kvm_arm_set_fw_reg(vcpu, reg);
-> > +     case KVM_REG_ARM_FW:
-> > +     case KVM_REG_ARM_FW_FEAT_BMAP:
-> > +             return kvm_arm_set_fw_reg(vcpu, reg);
-> >       case KVM_REG_ARM64_SVE: return set_sve_reg(vcpu, reg);
-> >       }
-> >
-> > diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-> > index fa6d9378d8e7..df55a04d2fe8 100644
-> > --- a/arch/arm64/kvm/hypercalls.c
-> > +++ b/arch/arm64/kvm/hypercalls.c
-> > @@ -58,6 +58,48 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
-> >       val[3] = lower_32_bits(cycles);
-> >   }
-> >
-> > +static bool kvm_arm_fw_reg_feat_enabled(unsigned long *reg_bmap, unsigned long feat_bit)
-> > +{
-> > +     return test_bit(feat_bit, reg_bmap);
-> > +}
-> > +
->
-> Might be worhty to be 'inline'. This function would be called
-> frequently.
->
-I was hoping the compiler would optimize it for us as needed.
+Is that correct ?
 
-> > +static bool kvm_hvc_call_default_allowed(struct kvm_vcpu *vcpu, u32 func_id)
-> > +{
-> > +     switch (func_id) {
-> > +     /*
-> > +      * List of function-ids that are not gated with the bitmapped feature
-> > +      * firmware registers, and are to be allowed for servicing the call by default.
-> > +      */
-> > +     case ARM_SMCCC_VERSION_FUNC_ID:
-> > +     case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
-> > +     case ARM_SMCCC_HV_PV_TIME_FEATURES:
-> > +     case ARM_SMCCC_HV_PV_TIME_ST:
-> > +     case ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID:
-> > +     case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
-> > +     case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
-> > +             return true;
-> > +     default:
-> > +             return kvm_psci_func_id_is_valid(vcpu, func_id);
-> > +     }
-> > +}
-> > +
-> > +static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu, u32 func_id)
-> > +{
-> > +     struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
-> > +
-> > +     switch (func_id) {
-> > +     case ARM_SMCCC_TRNG_VERSION:
-> > +     case ARM_SMCCC_TRNG_FEATURES:
-> > +     case ARM_SMCCC_TRNG_GET_UUID:
-> > +     case ARM_SMCCC_TRNG_RND32:
-> > +     case ARM_SMCCC_TRNG_RND64:
-> > +             return kvm_arm_fw_reg_feat_enabled(&smccc_feat->std_bmap,
-> > +                                             KVM_REG_ARM_STD_BIT_TRNG_V1_0);
-> > +     default:
-> > +             return kvm_hvc_call_default_allowed(vcpu, func_id);
-> > +     }
-> > +}
-> > +
-> >   int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
-> >   {
-> >       u32 func_id = smccc_get_function(vcpu);
-> > @@ -65,6 +107,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
-> >       u32 feature;
-> >       gpa_t gpa;
-> >
-> > +     if (!kvm_hvc_call_allowed(vcpu, func_id))
-> > +             goto out;
-> > +
-> >       switch (func_id) {
-> >       case ARM_SMCCC_VERSION_FUNC_ID:
-> >               val[0] = ARM_SMCCC_VERSION_1_1;
-> > @@ -155,6 +200,7 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
-> >               return kvm_psci_call(vcpu);
-> >       }
-> >
-> > +out:
-> >       smccc_set_retval(vcpu, val[0], val[1], val[2], val[3]);
-> >       return 1;
-> >   }
-> > @@ -164,8 +210,16 @@ static const u64 kvm_arm_fw_reg_ids[] = {
-> >       KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1,
-> >       KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2,
-> >       KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3,
-> > +     KVM_REG_ARM_STD_BMAP,
-> >   };
-> >
-> > +void kvm_arm_init_hypercalls(struct kvm *kvm)
-> > +{
-> > +     struct kvm_smccc_features *smccc_feat = &kvm->arch.smccc_feat;
-> > +
-> > +     smccc_feat->std_bmap = KVM_ARM_SMCCC_STD_FEATURES;
-> > +}
-> > +
-> >   int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
-> >   {
-> >       return ARRAY_SIZE(kvm_arm_fw_reg_ids);
-> > @@ -237,6 +291,7 @@ static int get_kernel_wa_level(u64 regid)
-> >
-> >   int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >   {
-> > +     struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
-> >       void __user *uaddr = (void __user *)(long)reg->addr;
-> >       u64 val;
-> >
-> > @@ -249,6 +304,9 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >       case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3:
-> >               val = get_kernel_wa_level(reg->id) & KVM_REG_FEATURE_LEVEL_MASK;
-> >               break;
-> > +     case KVM_REG_ARM_STD_BMAP:
-> > +             val = READ_ONCE(smccc_feat->std_bmap);
-> > +             break;
-> >       default:
-> >               return -ENOENT;
-> >       }
-> > @@ -259,6 +317,40 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >       return 0;
-> >   }
-> >
-> > +static int kvm_arm_set_fw_reg_bmap(struct kvm_vcpu *vcpu, u64 reg_id, u64 val)
-> > +{
-> > +     int ret = 0;
-> > +     struct kvm *kvm = vcpu->kvm;
-> > +     struct kvm_smccc_features *smccc_feat = &kvm->arch.smccc_feat;
-> > +     unsigned long *fw_reg_bmap, fw_reg_features;
-> > +
-> > +     switch (reg_id) {
-> > +     case KVM_REG_ARM_STD_BMAP:
-> > +             fw_reg_bmap = &smccc_feat->std_bmap;
-> > +             fw_reg_features = KVM_ARM_SMCCC_STD_FEATURES;
-> > +             break;
-> > +     default:
-> > +             return -ENOENT;
-> > +     }
-> > +
-> > +     /* Check for unsupported bit */
-> > +     if (val & ~fw_reg_features)
-> > +             return -EINVAL;
-> > +
-> > +     mutex_lock(&kvm->lock);
-> > +
-> > +     /* Return -EBUSY if the VM (any vCPU) has already started running. */
-> > +     if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags)) {
-> > +             ret = -EBUSY;
-> > +             goto out;
-> > +     }
-> > +
-> > +     WRITE_ONCE(*fw_reg_bmap, val);
-> > +out:
-> > +     mutex_unlock(&kvm->lock);
-> > +     return ret;
-> > +}
-> > +
-> >   int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >   {
-> >       void __user *uaddr = (void __user *)(long)reg->addr;
-> > @@ -337,6 +429,8 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >                       return -EINVAL;
-> >
-> >               return 0;
-> > +     case KVM_REG_ARM_STD_BMAP:
-> > +             return kvm_arm_set_fw_reg_bmap(vcpu, reg->id, val);
-> >       default:
-> >               return -ENOENT;
-> >       }
-> > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> > index 346535169faa..67d1273e8086 100644
-> > --- a/arch/arm64/kvm/psci.c
-> > +++ b/arch/arm64/kvm/psci.c
-> > @@ -436,3 +436,16 @@ int kvm_psci_call(struct kvm_vcpu *vcpu)
-> >               return -EINVAL;
-> >       }
-> >   }
-> > +
-> > +bool kvm_psci_func_id_is_valid(struct kvm_vcpu *vcpu, u32 func_id)
-> > +{
-> > +     /* PSCI 0.1 doesn't comply with the standard SMCCC */
-> > +     if (kvm_psci_version(vcpu) == KVM_ARM_PSCI_0_1)
-> > +             return (func_id == KVM_PSCI_FN_CPU_OFF || func_id == KVM_PSCI_FN_CPU_ON);
-> > +
-> > +     if (ARM_SMCCC_OWNER_NUM(func_id) == ARM_SMCCC_OWNER_STANDARD &&
-> > +             ARM_SMCCC_FUNC_NUM(func_id) >= 0 && ARM_SMCCC_FUNC_NUM(func_id) <= 0x1f)
-> > +             return true;
-> > +
-> > +     return false;
-> > +}
-> > diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
-> > index 5d38628a8d04..499b45b607b6 100644
-> > --- a/include/kvm/arm_hypercalls.h
-> > +++ b/include/kvm/arm_hypercalls.h
-> > @@ -6,6 +6,11 @@
-> >
-> >   #include <asm/kvm_emulate.h>
-> >
-> > +/* Last valid bits of the bitmapped firmware registers */
-> > +#define KVM_REG_ARM_STD_BMAP_BIT_MAX         0
-> > +
-> > +#define KVM_ARM_SMCCC_STD_FEATURES           GENMASK(KVM_REG_ARM_STD_BMAP_BIT_MAX, 0)
-> > +
->
-> s/bits of/bit of
->
-Great catch again!
+If I read PCI core correctly PCI_COMMAND_MEMORY is obviously cleared
+only if it is set in the first place and that's what your patch is
+changing, namely you boostrap your devices with PCI_COMMAND_MEMORY
+clear so that PCI core does not touch it.
 
-> >   int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
-> >
-> >   static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
-> > @@ -42,6 +47,7 @@ static inline void smccc_set_retval(struct kvm_vcpu *vcpu,
-> >
-> >   struct kvm_one_reg;
-> >
-> > +void kvm_arm_init_hypercalls(struct kvm *kvm);
-> >   int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu);
-> >   int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
-> >   int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
-> > diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-> > index 6e55b9283789..c47be3e26965 100644
-> > --- a/include/kvm/arm_psci.h
-> > +++ b/include/kvm/arm_psci.h
-> > @@ -36,7 +36,7 @@ static inline int kvm_psci_version(struct kvm_vcpu *vcpu)
-> >       return KVM_ARM_PSCI_0_1;
-> >   }
-> >
-> > -
-> >   int kvm_psci_call(struct kvm_vcpu *vcpu);
-> > +bool kvm_psci_func_id_is_valid(struct kvm_vcpu *vcpu, u32 func_id);
-> >
-> >   #endif /* __KVM_ARM_PSCI_H__ */
-> >
->
+I am not familiar with Hyper-V code so forgive me the question.
+
+Thanks,
+Lorenzo
+
+> 
+> When a device is removed, hv_eject_device_work() -> 
+> pci_stop_and_remove_bus_device() triggers the PCI device driver's .remove(),
+> which calls pci_disable_device(), which instructs the hypervisor to unmap
+> the vBAR from the pBAR, so there should not be any issue when a new device
+> is added later. 
+> 
+> With the patch, if no PCI device driver is loaded, the PCI_COMMAND_MEMORY
+> bit stays in the off state, and the hypervisor doesn't map the vBAR to the pBAR.
+> I don't see any issue with this.
+> 
+> hv_pci_allocate_bridge_windows() -> vmbus_allocate_mmio() makes sure
+> that there is enough MMIO space for the devices on the bus, so the core
+> PCI driver doesn't have to worry about any MMIO conflict issue.
+> 
+> Please let me know if I understood and answered the questions.
+> 
 > Thanks,
-> Gavin
->
-
-Thanks for the review, Gavin.
-
-- Raghavendra
+> -- Dexuan
+> 
