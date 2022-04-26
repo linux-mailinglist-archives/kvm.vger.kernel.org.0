@@ -2,136 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CE4D50F94D
-	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 11:58:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0E7C50F95F
+	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 11:58:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346502AbiDZJ6F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 05:58:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42058 "EHLO
+        id S1347882AbiDZKBW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 06:01:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346695AbiDZJ5n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Apr 2022 05:57:43 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1D927387BE;
-        Tue, 26 Apr 2022 02:15:49 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 854F823A;
-        Tue, 26 Apr 2022 02:15:48 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D32D23F73B;
-        Tue, 26 Apr 2022 02:15:46 -0700 (PDT)
-Date:   Tue, 26 Apr 2022 10:15:43 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
-        reijiw@google.com, ricarkol@google.com
-Subject: Re: [PATCH v3 0/5] KVM: arm64: Limit feature register reads from
- AArch32
-Message-ID: <Yme4P2cVoxjOXqz9@monolith.localdoman>
-References: <20220425235342.3210912-1-oupton@google.com>
+        with ESMTP id S1347670AbiDZKAz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Apr 2022 06:00:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D221651325
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 02:19:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650964775;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=iBRkEviS1YNjQ13b+V4Agg/J+uYrF542VyGq785gczs=;
+        b=Aij1D81/amyn503Q6EoNu3e9BdGcDRPWvETSSwLPwAcV01Xylhget6L/hgFn+mPHccTO7r
+        GZqKSL/29zvAnjVG/HCZOIW6QadccogcQnTtG3HTfDKCjt3FtmDk5J5XENVQa3ig94E3br
+        wr/j+ZrDB5RbgmFqEjlC9Mx8yKVs77c=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-549-J6QDuBTzPs-ldmn9YUQYPA-1; Tue, 26 Apr 2022 05:19:34 -0400
+X-MC-Unique: J6QDuBTzPs-ldmn9YUQYPA-1
+Received: by mail-wr1-f70.google.com with SMTP id t17-20020adfa2d1000000b0020ac519c222so3139576wra.4
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 02:19:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=iBRkEviS1YNjQ13b+V4Agg/J+uYrF542VyGq785gczs=;
+        b=ThNB8mQ00u/unyIq07ZYSSCzoWV3FY58nuCBA6wevTdzybYtaWw+1UIh7NTaW0EV4L
+         da2HyKvaXVKPTagzTfIrk99gfokwqUOtiFDeKG3HEnBJ9bxtWtEpb+3eoJj9/R3lYqDf
+         XmafOOFtXHzvacfnBwGQS0fm8VClQgG58J0OSguvpKlpqdrX4/jxs3wCk/UndB0iE01O
+         4s1mdMAeOv/D/rI77Sr63iTkFAcNUoJxxFjFYRe3pUU+nMiaNcbjfnOuXAP/k4nH9h+u
+         KJKkkVMfUF8ss69jIO/cPfIkgZTS1aMqe6oCKnLtsrkzPGsTO1Hi/UigIDdk9ndEJM+2
+         A41w==
+X-Gm-Message-State: AOAM5301G5/xGS9lSQOvyYSU2T95ykXPm7Hov9B/sn3EGEmZVJD3g9FP
+        A9z2wk5EdF8tMGAiPi3y6OXZVmTqQU/UC5YviruLA/HyxoU7VM46+WDEL3whlhTZ/E1s6J6flIH
+        ALWpu/LAy+9hk
+X-Received: by 2002:a05:600c:34c7:b0:392:8d86:b148 with SMTP id d7-20020a05600c34c700b003928d86b148mr31128125wmq.117.1650964773189;
+        Tue, 26 Apr 2022 02:19:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz3g0T+/FCLjJ0bZ+M07PU+5ayGTcn33K/tOBGzxCqziai/a8wZXZpvP8ep38k8ROKZjCBQKw==
+X-Received: by 2002:a05:600c:34c7:b0:392:8d86:b148 with SMTP id d7-20020a05600c34c700b003928d86b148mr31128107wmq.117.1650964772945;
+        Tue, 26 Apr 2022 02:19:32 -0700 (PDT)
+Received: from [10.33.192.232] (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id c3-20020a05600c148300b0038ebc8ad740sm14574063wmh.1.2022.04.26.02.19.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Apr 2022 02:19:30 -0700 (PDT)
+Message-ID: <ae34a497-a471-8db9-ca0f-2a82e6803f45@redhat.com>
+Date:   Tue, 26 Apr 2022 11:19:29 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220425235342.3210912-1-oupton@google.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [kvm-unit-tests PATCH v5] s390x: Test effect of storage keys on
+ some instructions
+Content-Language: en-US
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20220425161731.1575742-1-scgl@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20220425161731.1575742-1-scgl@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On 25/04/2022 18.17, Janis Schoetterl-Glausch wrote:
+> Some instructions are emulated by KVM. Test that KVM correctly emulates
+> storage key checking for two of those instructions (STORE CPU ADDRESS,
+> SET PREFIX).
+> Test success and error conditions, including coverage of storage and
+> fetch protection override.
+> Also add test for TEST PROTECTION, even if that instruction will not be
+> emulated by KVM under normal conditions.
+> 
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-On Mon, Apr 25, 2022 at 11:53:37PM +0000, Oliver Upton wrote:
-> KVM/arm64 does not restrict the guest's view of the AArch32 feature
-> registers when read from AArch32. HCR_EL2.TID3 is cleared for AArch32
-> guests, meaning that register reads come straight from hardware. This is
-> problematic as KVM relies on read_sanitised_ftr_reg() to expose a set of
-> features consistent for a particular system.
-> 
-> Appropriate handlers must first be put in place for CP10 and CP15 ID
-> register accesses before setting TID3. Rather than exhaustively
-> enumerating each of the encodings for CP10 and CP15 registers, take the
-> lazy route and aim the register accesses at the AArch64 system register
-> table.
-> 
-> Patches 1-2 are small cleanups to how we handle register emulation
-> failure. No functional change for current KVM, but required to do
-> register emulation correctly in this series.
-> 
-> Patch 3 reroutes the CP15 registers into the AArch64 table, taking care
-> to immediately RAZ undefined ranges of registers. This is done to avoid
-> possibly conflicting with encodings for future AArch64 registers.
-> 
-> Patch 4 installs an exit handler for the CP10 ID registers and also
-> relies on the general AArch64 register handler to implement reads.
-> 
-> Finally, patch 5 actually sets TID3 for AArch32 guests, providing
-> known-safe values for feature register accesses.
-> 
-> There is an argument that the series is in fact a bug fix for running
-> AArch32 VMs on heterogeneous systems. To that end, it could be
-> blamed/backported to when we first knew better:
-> 
->   93390c0a1b20 ("arm64: KVM: Hide unsupported AArch64 CPU features from guests")
-> 
-> But I left that tag off as in the aforementioned change skipping
-> AArch32 was intentional. Up to you, Marc, if you want to call it a
-> bugfix ;-)
-> 
-> Applies cleanly to 5.18-rc4.
-> 
-> Tested with AArch32 kvm-unit-tests and booting an AArch32 debian guest
-> on a Raspberry Pi 4. Additionally, I tested AArch32 kvm-unit-tests w/
-> pmu={on,off} and saw no splat, as Alex had discovered [1]. The test
-> correctly skips with the PMU feature bit disabled now.
-
-But a guest who ignores the fact that the ID register doesn't advertise a PMU
-and tries to access the PMU registers regardless would still trigger the splat,
-right? I don't think the series changes the AArch32 PMU registers visibility to
-REG_HIDDEN when the VCPU feature is not set.
-
-Thanks,
-Alex
-
-> 
-> [1]: https://lore.kernel.org/r/20220425145530.723858-1-alexandru.elisei@arm.com
-> 
-> v1: https://lore.kernel.org/kvmarm/20220329011301.1166265-1-oupton@google.com/
-> v2: https://lore.kernel.org/r/20220401010832.3425787-1-oupton@google.com
-> 
-> v2 -> v3:
->  - Collect R-b from Reiji (thanks!)
->  - Adopt Marc's suggestion for CP15 register handling
->  - Avoid writing to Rt when emulation fails (Marc)
->  - Print some debug info on an unexpected CP10 register access (Reiji)
-> 
-> v1 -> v2:
->  - Actually set TID3! Oops.
->  - Refactor kvm_emulate_cp15_id_reg() to check preconditions before
->    proceeding to emulation (Reiji)
->  - Tighten up comment on kvm_is_cp15_id_reg() to indicate that the only
->    other trapped ID register (CTR) is already handled in the cp15
-> 
-> Oliver Upton (5):
->   KVM: arm64: Return a bool from emulate_cp()
->   KVM: arm64: Don't write to Rt unless sys_reg emulation succeeds
->   KVM: arm64: Wire up CP15 feature registers to their AArch64
->     equivalents
->   KVM: arm64: Plumb cp10 ID traps through the AArch64 sysreg handler
->   KVM: arm64: Start trapping ID registers for 32 bit guests
-> 
->  arch/arm64/include/asm/kvm_arm.h     |   3 +-
->  arch/arm64/include/asm/kvm_emulate.h |   7 -
->  arch/arm64/include/asm/kvm_host.h    |   1 +
->  arch/arm64/kvm/handle_exit.c         |   1 +
->  arch/arm64/kvm/sys_regs.c            | 197 +++++++++++++++++++++++----
->  arch/arm64/kvm/sys_regs.h            |   7 +
->  6 files changed, 178 insertions(+), 38 deletions(-)
-> 
-> -- 
-> 2.36.0.rc2.479.g8af0fa9b8e-goog
-> 
