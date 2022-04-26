@@ -2,330 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 865F250F32B
-	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 09:55:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC7B450F37C
+	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 10:14:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344405AbiDZH5F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 03:57:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34992 "EHLO
+        id S1344231AbiDZIRd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 04:17:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241672AbiDZH4x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Apr 2022 03:56:53 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C524135B0D;
-        Tue, 26 Apr 2022 00:53:17 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23Q70MZa002042;
-        Tue, 26 Apr 2022 07:53:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=IYNgV3kfSQ2S3+kMU8QUW6f64B/3L/esU654RfdKCxU=;
- b=ErbE4+sqLg3Q5/RFPuqNTPdZ+4jeVhQJI0fPQi+svb0uqilwNmGTjK1ex5ZJ7WVnBOBH
- dCoedhLAnIMBIHCp7G07Avg3I/JjNBhzFdWFAwUA5JGWU6lBWaRVzw/e2COfO2hDS0Pw
- RWhk2tPhXOLJwZNULB8U0B9QC9WXdTK/A4DJwm8PGS7kzuSq2+1Avjy58qUYIR65u1hd
- Z4f3iwqcRf4AeJc3On8wySqw1tbl3mhNLMT5j8SlnHly4aS9h7UdDz52BnTC+33gCGfs
- LYDe77S0p189JuFcwEVLkuUxMCW8MjNiC+XFHoqu3Jgh6MWorWeqk8WBo6TAcpUWD0jh /A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fpbyh0wrv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Apr 2022 07:53:16 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 23Q7Nvsp006968;
-        Tue, 26 Apr 2022 07:53:15 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fpbyh0wrc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Apr 2022 07:53:15 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23Q7mQlA023015;
-        Tue, 26 Apr 2022 07:53:14 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3fm938u298-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Apr 2022 07:53:13 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23Q7rNSB57803020
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 Apr 2022 07:53:23 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BCBE6AE053;
-        Tue, 26 Apr 2022 07:53:10 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5AA79AE04D;
-        Tue, 26 Apr 2022 07:53:10 +0000 (GMT)
-Received: from [9.145.2.160] (unknown [9.145.2.160])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 26 Apr 2022 07:53:10 +0000 (GMT)
-Message-ID: <95769733-5a42-a61d-aee7-e78257fcd9ea@linux.ibm.com>
-Date:   Tue, 26 Apr 2022 09:53:10 +0200
+        with ESMTP id S233706AbiDZIRc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Apr 2022 04:17:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A38946D397
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 01:14:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650960864;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MEOR6S/ja4n9OTXgV5FZcIwBotf+F762IQYY3cXNpwg=;
+        b=SSD7j5/FKApdxL4eEKPMZdJKjKAms50AfoobkoKTGAy0ToXBuo2+iq4micKzCGPcjAOZ3U
+        C7o5jJWtcNTRXnujLMwpZxLBaxqKCLQIrYWLfgcGl3XzV/i+ru7i5kJWC0x4LX6HGgbFg7
+        0L9b77lt4dEaH4qk7ontqvkGDj86mlk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-325--M4JGlQgP9mKuY5GdlcSxg-1; Tue, 26 Apr 2022 04:14:21 -0400
+X-MC-Unique: -M4JGlQgP9mKuY5GdlcSxg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1E0E3811E76;
+        Tue, 26 Apr 2022 08:14:20 +0000 (UTC)
+Received: from starship (unknown [10.40.192.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 734972024CB8;
+        Tue, 26 Apr 2022 08:14:15 +0000 (UTC)
+Message-ID: <6475522c58aec5db3ee0a5ccd3230c63a2f013a9.camel@redhat.com>
+Subject: Re: [PATCH v8 6/9] KVM: x86: lapic: don't allow to change APIC ID
+ unconditionally
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Zeng Guang <guang.zeng@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
+        Gao Chao <chao.gao@intel.com>
+Date:   Tue, 26 Apr 2022 11:14:14 +0300
+In-Reply-To: <080d6ced254e56dbad2910447f81c5ea976fc419.camel@redhat.com>
+References: <20220411090447.5928-1-guang.zeng@intel.com>
+         <20220411090447.5928-7-guang.zeng@intel.com> <YlmDtC73u/AouMsu@google.com>
+         <080d6ced254e56dbad2910447f81c5ea976fc419.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20220425161731.1575742-1-scgl@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v5] s390x: Test effect of storage keys on
- some instructions
-In-Reply-To: <20220425161731.1575742-1-scgl@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: nGcDqp6cTj0Sn9UT_xBUh0CfNbmBGxiX
-X-Proofpoint-GUID: fI_qKm_0mkLnhxEmE2mtmOvKLPKtRbUo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-26_02,2022-04-25_03,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- bulkscore=0 adultscore=0 mlxlogscore=999 lowpriorityscore=0 suspectscore=0
- priorityscore=1501 phishscore=0 mlxscore=0 malwarescore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2204260049
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/25/22 18:17, Janis Schoetterl-Glausch wrote:
-> Some instructions are emulated by KVM. Test that KVM correctly emulates
-> storage key checking for two of those instructions (STORE CPU ADDRESS,
-> SET PREFIX).
-> Test success and error conditions, including coverage of storage and
-> fetch protection override.
-> Also add test for TEST PROTECTION, even if that instruction will not be
-> emulated by KVM under normal conditions.
+On Tue, 2022-04-19 at 17:07 +0300, Maxim Levitsky wrote:
+> On Fri, 2022-04-15 at 14:39 +0000, Sean Christopherson wrote:
+> > On Mon, Apr 11, 2022, Zeng Guang wrote:
+> > > From: Maxim Levitsky <mlevitsk@redhat.com>
+> > > 
+> > > No normal guest has any reason to change physical APIC IDs, and
+> > > allowing this introduces bugs into APIC acceleration code.
+> > > 
+> > > And Intel recent hardware just ignores writes to APIC_ID in
+> > > xAPIC mode. More background can be found at:
+> > > https://lore.kernel.org/lkml/Yfw5ddGNOnDqxMLs@google.com/
+> > > 
+> > > Looks there is no much value to support writable xAPIC ID in
+> > > guest except supporting some old and crazy use cases which
+> > > probably would fail on real hardware. So, make xAPIC ID
+> > > read-only for KVM guests.
+> > 
+> > AFAIK, the plan is to add a capability to let userspace opt-in to a fully read-only
+> > APIC ID[*], but I haven't seen patches...
+> > 
+> > Maxim?
 > 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> ---
-[...]
->   lib/s390x/asm/arch_def.h |  20 ++--
->   s390x/skey.c             | 227 +++++++++++++++++++++++++++++++++++++++
->   2 files changed, 238 insertions(+), 9 deletions(-)
+> Yep, I will start working on this pretty much today.
 > 
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index bab3c374..676a2753 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -55,15 +55,17 @@ struct psw {
->   #define PSW_MASK_BA			0x0000000080000000UL
->   #define PSW_MASK_64			(PSW_MASK_BA | PSW_MASK_EA)
->   
-> -#define CTL0_LOW_ADDR_PROT		(63 - 35)
-> -#define CTL0_EDAT			(63 - 40)
-> -#define CTL0_IEP			(63 - 43)
-> -#define CTL0_AFP			(63 - 45)
-> -#define CTL0_VECTOR			(63 - 46)
-> -#define CTL0_EMERGENCY_SIGNAL		(63 - 49)
-> -#define CTL0_EXTERNAL_CALL		(63 - 50)
-> -#define CTL0_CLOCK_COMPARATOR		(63 - 52)
-> -#define CTL0_SERVICE_SIGNAL		(63 - 54)
-> +#define CTL0_LOW_ADDR_PROT			(63 - 35)
-> +#define CTL0_EDAT				(63 - 40)
-> +#define CTL0_FETCH_PROTECTION_OVERRIDE		(63 - 38)
-> +#define CTL0_STORAGE_PROTECTION_OVERRIDE	(63 - 39)
-> +#define CTL0_IEP				(63 - 43)
-> +#define CTL0_AFP				(63 - 45)
-> +#define CTL0_VECTOR				(63 - 46)
-> +#define CTL0_EMERGENCY_SIGNAL			(63 - 49)
-> +#define CTL0_EXTERNAL_CALL			(63 - 50)
-> +#define CTL0_CLOCK_COMPARATOR			(63 - 52)
-> +#define CTL0_SERVICE_SIGNAL			(63 - 54)
->   #define CR0_EXTM_MASK			0x0000000000006200UL /* Combined external masks */
->   
->   #define CTL2_GUARDED_STORAGE		(63 - 59)
-> diff --git a/s390x/skey.c b/s390x/skey.c
-> index edad53e9..39429960 100644
-> --- a/s390x/skey.c
-> +++ b/s390x/skey.c
-> @@ -10,6 +10,7 @@
->   #include <libcflat.h>
->   #include <asm/asm-offsets.h>
->   #include <asm/interrupt.h>
-> +#include <vmalloc.h>
->   #include <asm/page.h>
->   #include <asm/facility.h>
->   #include <asm/mem.h>
-> @@ -118,6 +119,227 @@ static void test_invalid_address(void)
->   	report_prefix_pop();
->   }
->   
-> +static void test_test_protection(void)
-> +{
-> +	unsigned long addr = (unsigned long)pagebuf;
-> +
-> +	report_prefix_push("TPROT");
-> +
-> +	set_storage_key(pagebuf, 0x10, 0);
-> +	report(tprot(addr, 0) == 0, "access key 0 -> no protection");
-> +	report(tprot(addr, 1) == 0, "access key matches -> no protection");
-> +	report(tprot(addr, 2) == 1, "access key mismatches, no fetch protection -> store protection");
-
-I'd love to see these numerical constants replaced with named constants 
-in the future so I don't have to look up the tprot CCs every time :)
-
-> +
-> +	set_storage_key(pagebuf, 0x18, 0);
-> +	report(tprot(addr, 2) == 2, "access key mismatches, fetch protection -> fetch & store protection");
-> +
-> +	ctl_set_bit(0, CTL0_STORAGE_PROTECTION_OVERRIDE);
-> +	set_storage_key(pagebuf, 0x90, 0);
-> +	report(tprot(addr, 2) == 0, "access key mismatches, storage protection override -> no protection");
-> +	ctl_clear_bit(0, CTL0_STORAGE_PROTECTION_OVERRIDE);
-> +
-> +	set_storage_key(pagebuf, 0x00, 0);
-> +	report_prefix_pop();
-> +}
-
-[...]
-
-> +/*
-> + * Perform SET PREFIX (SPX) instruction while temporarily executing
-> + * with access key 1.
-> + */
-> +static void set_prefix_key_1(uint32_t *prefix_ptr)
-> +{
-> +	asm volatile (
-> +		"spka	0x10\n\t"
-> +		"spx	%0\n\t"
-> +		"spka	0\n"
-> +	     :: "Q" (*prefix_ptr)
-> +	);
-> +}
-> +
-> +/*
-> + * We remapped page 0, making the lowcore inaccessible, which breaks the normal
-> + * handler and breaks skipping the faulting instruction.
-> + * Just disable dynamic address translation to make things work.
-> + */
-> +static void dat_fixup_pgm_int(void)
-> +{
-> +	uint64_t psw_mask = extract_psw_mask();
-> +
-> +	psw_mask &= ~PSW_MASK_DAT;
-> +	load_psw_mask(psw_mask);
-> +}
-> +
-> +#define PREFIX_AREA_SIZE (PAGE_SIZE * 2)
-> +static char lowcore_tmp[PREFIX_AREA_SIZE] __attribute__((aligned(PREFIX_AREA_SIZE)));
-> +
-
-Please add a comment that we're testing the fetch access of the operand 
-since the prefix is only checked for addressing.
-
-> +static void test_set_prefix(void)
-> +{
-> +	uint32_t *prefix_ptr = (uint32_t *)pagebuf;
-> +	uint32_t *no_override_prefix_ptr;
-> +	uint32_t old_prefix;
-> +	pgd_t *root;
-> +
-> +	report_prefix_push("SET PREFIX");
-> +	root = (pgd_t *)(stctg(1) & PAGE_MASK);
-> +	old_prefix = get_prefix();
-> +	memcpy(lowcore_tmp, 0, sizeof(lowcore_tmp));
-> +	assert(((uint64_t)&lowcore_tmp >> 31) == 0);
-> +	*prefix_ptr = (uint32_t)(uint64_t)&lowcore_tmp;
-> +
-> +	report_prefix_push("zero key");
-> +	set_prefix(old_prefix);
-> +	set_storage_key(prefix_ptr, 0x20, 0);
-> +	set_prefix(*prefix_ptr);
-> +	report(get_prefix() == *prefix_ptr, "set prefix");
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("matching key");
-> +	set_prefix(old_prefix);
-> +	set_storage_key(pagebuf, 0x10, 0);
-> +	set_prefix_key_1(prefix_ptr);
-> +	report(get_prefix() == *prefix_ptr, "set prefix");
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("mismatching key");
-> +
-> +	report_prefix_push("no fetch protection");
-> +	set_prefix(old_prefix);
-> +	set_storage_key(pagebuf, 0x20, 0);
-> +	set_prefix_key_1(prefix_ptr);
-> +	report(get_prefix() == *prefix_ptr, "set prefix");
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("fetch protection");
-> +	set_prefix(old_prefix);
-> +	set_storage_key(pagebuf, 0x28, 0);
-> +	expect_pgm_int();
-> +	set_prefix_key_1(prefix_ptr);
-> +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-> +	report(get_prefix() == old_prefix, "did not set prefix");
-> +	report_prefix_pop();
-> +
-> +	register_pgm_cleanup_func(dat_fixup_pgm_int);
-> +
-> +	report_prefix_push("remapped page, fetch protection");
-> +	set_prefix(old_prefix);
-> +	set_storage_key(pagebuf, 0x28, 0);
-> +	expect_pgm_int();
-> +	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
-> +	set_prefix_key_1((uint32_t *)0);
-> +	install_page(root, 0, 0);
-> +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-> +	report(get_prefix() == old_prefix, "did not set prefix");
-> +	report_prefix_pop();
-> +
-> +	ctl_set_bit(0, CTL0_FETCH_PROTECTION_OVERRIDE);
-> +
-> +	report_prefix_push("fetch protection override applies");
-> +	set_prefix(old_prefix);
-> +	set_storage_key(pagebuf, 0x28, 0);
-> +	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
-> +	set_prefix_key_1((uint32_t *)0);
-> +	install_page(root, 0, 0);
-> +	report(get_prefix() == *prefix_ptr, "set prefix");
-> +	report_prefix_pop();
-> +
-> +	no_override_prefix_ptr = (uint32_t *)(pagebuf + 2048);
-> +	WRITE_ONCE(*no_override_prefix_ptr, (uint32_t)(uint64_t)&lowcore_tmp);
-> +	report_prefix_push("fetch protection override does not apply");
-> +	set_prefix(old_prefix);
-> +	set_storage_key(pagebuf, 0x28, 0);
-> +	expect_pgm_int();
-> +	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
-> +	set_prefix_key_1((uint32_t *)2048);
-> +	install_page(root, 0, 0);
-> +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-> +	report(get_prefix() == old_prefix, "did not set prefix");
-> +	report_prefix_pop();
-> +
-> +	ctl_clear_bit(0, CTL0_FETCH_PROTECTION_OVERRIDE);
-> +	register_pgm_cleanup_func(NULL);
-> +	report_prefix_pop();
-> +	set_storage_key(pagebuf, 0x00, 0);
-> +	report_prefix_pop();
-> +}
-> +
->   int main(void)
->   {
->   	report_prefix_push("skey");
-> @@ -130,6 +352,11 @@ int main(void)
->   	test_set();
->   	test_set_mb();
->   	test_chg();
-> +	test_test_protection();
-> +	test_store_cpu_address();
-> +
-> +	setup_vm();
-> +	test_set_prefix();
->   done:
->   	report_prefix_pop();
->   	return report_summary();
+> I was busy last 3 weeks stablilizing nested AVIC
+> (I am getting ~600,000 IPIs/s instead of ~40,000 in L2 VM with nested AVIC!),
+> with 700,000-900,000 IPIs native with AVIC, 
+> almost bare metal IPI performance in L2!
 > 
-> base-commit: 6a7a83ed106211fc0ee530a3a05f171f6a4c4e66
+> (the result is from test which I will soon publish makes all 
+> vCPUs send IPIs in round robin fashion, and a vCPU sends IPI only after 
+> it received it from previous vCPU - the number is total
+> number of IPIs send on 8 vCPUs).
+> 
+> 
+> The fact that the dreadful AVIC errata dominates my testing again,
+> supports my feeling that I mostly fixed nested AVIC bugs.'
+> Tomorrow I'll send RFC v2 of the patches.
+> 
+> 
+> About read-only apic ID cap, 
+> I have few questions before I start implementing it:
+> 
+> Paolo gave me recently an idea to make the APIC ID always read-only for 
+> guest writes, and only allow host APIC ID changes (unless the cap is set).
+> 
+> I am kind of torn about it - assuming that no guest writes APIC ID this will work just fine 
+> in empty logical sense, but if a guest actually writes an apic id, 
+> while it will migrate fine to a newer KVM, but then after a reboot 
+> it won't be able to set its APIC ID again.
+> 
+> On the other hand, versus fully unconditional read-only apic id, 
+> that will support that very unlikely case if the hypervisor
+> itself is actually the one that for some reason changes the apic id,
+> from the initial value it gave.
+> 
+> 
+> In terms of what I need:
+> 
+> - In nested AVIC I strongly prefer read-only apic ids, and I can
+>   make nested AVIC be conditional on the new cap.
+>   IPI virtualization also can be made conditional on the new cap.
+> 
+> 
+> - I also would love to remove broken code from *non nested* AVIC, 
+>   which tries to support APIC ID change. 
+> 
+>   I can make non nested AVIC *also* depend on the new cap, 
+>   but that will technically be a regression, since this way users of 
+>   older qemu and new kernel will suddenly have their AVIC inhibited. 
+> 
+>   I don't know if that is such a big issue though because AVIC is
+>   (sadly) by default disabled anyway.
+> 
+>   If that is not possible the other way to solve this is to inhibit AVIC
+>   as soon as the guest tries to change APIC ID.
+> 
+> - I would also want to remove the ability to relocate apic base,
+>   likely depending on the new cap as well, but if there are objections
+>   I can drop this. I don't need this, but it is just nice to do while we
+>   are at it.
+> 
+> 
+> Paolo, Sean, and everyone else: What do you think?
+
+Palo, Sean, Any update?
+
+After thinking more about this, I actualy think I will do something
+different, something that actually was proposed here, and I was against it:
+
+
+1. I will add new inhibit APICV_INHIBIT_REASON_RO_SETTINGS, which will be set
+first time any vCPU touches apic id and/or apic base because why not...
+
+That will take care of non nested case cleanly, and will take care of IPIv
+for now (as long as it does't support nesting).
+
+2. For my nested AVIC, I will do 2 things:
+
+   a. My code never reads L1 apic ids, and always uses vcpu_id, thus
+      in theory, if I just ignore the problem, and the guest changes apic ids,
+      the nested AVIC will just keep on using initial apic ids, thus there is  no danger
+      of CVE like issue if the guest tries to change theses ids in the 'right' time.
+
+   b. on each nested vm entry I'll just check that apic id is not changed from the default,
+      if AVIC is enabled for the nested guest.
+
+      if so the nested entry will fail (best with kvm_vm_bugged) to get attention of
+      the user, but I can just fail it with standard vm exit reason of 0xFFFFFFFF.
+
+      Chances that there is a modern VM, which runs nested guests, on AMD, and changes APIC IDs,
+      IMHO are too low to bother, plus one can always disable nested AVIC for this case by tweaking
+      the nested CPUID.
+
+
+This way there will no need to patch qemu, propogate the new cap to the machines, etc, etc.
+
+What do you think?
+
+Best regards,
+	Maxim Levitsky
+
+
+
+> 
+> Also:
+> Suggestions for the name for the new cap? Is this all right if
+> the same cap would make both apic id read only and apic base
+> (this is also something Paolo suggested to me)
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
+> 
+> > [*] https://lore.kernel.org/all/c903e82ed2a1e98f66910c35b5aabdcf56e08e72.camel@redhat.com
+> > 
+
 
