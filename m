@@ -2,77 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 09422510B0C
-	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 23:12:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0911510B65
+	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 23:32:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355319AbiDZVPn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 17:15:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52982 "EHLO
+        id S1355564AbiDZVgA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 17:36:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233055AbiDZVPf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Apr 2022 17:15:35 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FC6A75E5D;
-        Tue, 26 Apr 2022 14:12:27 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id z16so19077311pfh.3;
-        Tue, 26 Apr 2022 14:12:27 -0700 (PDT)
+        with ESMTP id S1355570AbiDZVf4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Apr 2022 17:35:56 -0400
+Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D984851317
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 14:32:42 -0700 (PDT)
+Received: by mail-yb1-xb34.google.com with SMTP id w187so56522ybe.2
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 14:32:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=dTNHzgfUOL4osO2j/zaJgcQDZH2hhUWA+/riZkN8hcc=;
-        b=qrMvkpn1dhwLTmWBJPXzi8j82SmulVrBUqm+++Hg5yAlQt7JM9rqoaaQVhTL6+Qirj
-         VkJnyWNCuwEF77pl3w3Yn7v1OKFwbznYzvA+WvXSzFqL9xqGq8WxuyLRTsOS/scvDpnx
-         JS0tSuTVCGy0Oy+cOvHHdP9pgB1SHu2Y11M/T/aTLxvVm4AofVOpoX59bRz1GJkHajRb
-         dyX/f65P2Ygha/5H8VxyqInUOsDxU1zXBQDDWwJB7lp6H0O0C7SW1rnjmXMZC/ChgwI+
-         4xGvewgx/OvuNHOJ6X1uXSTWSZJ+eyaDI70Y0KmaG/FzPcX97+XoNr6Bn6LsM1gjSbJJ
-         zxTA==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=0ZElxhuSAR2kXik+WV1CBJfP81aAcXn9nSZuYMrCj5o=;
+        b=Ys3zkWxkCB6PuqZ83NVnRDcny4MAsiGdW/b+Qjy2gbCMH9u+f2MX69Cfp1fYEU9XYO
+         9G7GFpkd6BSiZnypz773adzA5fsdPDawhwYsFGopnLuQ+C35+S7k/iebM5lG1dOzvVu0
+         jgtdAaVJ74KBmCkYe9wButz4+CPrqnYV6uZGKpLOTq85+eghdwWICE6fGWtqosWfE6s5
+         SZuA64/A/PC/gITmxIcFwZ7tIIL6ejcy0RF1p4R8k2ttehJtiJJs+7xHE65pY4kCX3Dz
+         +1yvXgZGOVBA4BWRCVY/NrmMbnPmDI80KHajjstP3p7gvXnUi06uBgHsqOhTuguyTOH1
+         rfug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=dTNHzgfUOL4osO2j/zaJgcQDZH2hhUWA+/riZkN8hcc=;
-        b=uwhsM5AKpA+4XB36HZDaNrLtvon15V/k7GmTKXmbQAucaTVGXpqiXFCqhnkL6R8Tqk
-         kTvLF4b9hBLOe26Oz1dEeh+9Ky17tMNzos9m45wZx7QA7T3tMpMNjXWE92JqDmtYesBg
-         sS7GHGXlh+wuFqddnP4N0wV6I7XqloTgV9Xm2xedzeC8zcCcfyTPQZUb3FbkZcG576rc
-         mIhl/XpfEGysztkdHGrwCRK09bz0e+VwVuBRcUVD/V6YsUyg47ZwR4f2r78xWQaYNLxY
-         E71Am5wWTfAvrbCPMJ0qiGMGx20y0Y3+CvYlHHWj/P7uw5+AsK7lBmXxhuIbttWQO6PT
-         fxhw==
-X-Gm-Message-State: AOAM533939sTNKIEeiUQGpKFYTISK8t8QtOqksC/nR7l7V0cNgPdZy7d
-        C/CmvOMaKHLommDcgn125J8=
-X-Google-Smtp-Source: ABdhPJyOnqoegYBSF3apdSPf31rkfnNuc96uFOcVS4nbde0MYTQIrogR4qYfOw1CqlklwjUpY7Oqag==
-X-Received: by 2002:a63:2b8a:0:b0:3aa:f59e:a4a7 with SMTP id r132-20020a632b8a000000b003aaf59ea4a7mr15560768pgr.91.1651007546318;
-        Tue, 26 Apr 2022 14:12:26 -0700 (PDT)
-Received: from localhost (c-107-3-154-88.hsd1.ca.comcast.net. [107.3.154.88])
-        by smtp.gmail.com with ESMTPSA id f14-20020a63380e000000b0038253c4d5casm13765851pga.36.2022.04.26.14.12.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Apr 2022 14:12:25 -0700 (PDT)
-Date:   Tue, 26 Apr 2022 14:12:23 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Sagi Shahar <sagis@google.com>
-Cc:     Kai Huang <kai.huang@intel.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [RFC PATCH v5 048/104] KVM: x86/tdp_mmu: Support TDX private
- mapping for TDP MMU
-Message-ID: <20220426211223.GA1719560@private.email.ne.jp>
-References: <cover.1646422845.git.isaku.yamahata@intel.com>
- <7a5246c54427952728bd702bd7f2c6963eefa712.1646422845.git.isaku.yamahata@intel.com>
- <fb83aaeed48c7da071f0e9f3e4b36e9145ad5c63.camel@intel.com>
- <CAAhR5DHFi14LzAt+3t-1tSFMLZYmtx-TxXSovh8m4=R=5NsdXA@mail.gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=0ZElxhuSAR2kXik+WV1CBJfP81aAcXn9nSZuYMrCj5o=;
+        b=qx7TSzZXqOmXWltNxbCYnYxg0EyHrQ5fGmVLOeDaQMWYj0fZRNWEmNZTU8SZ+FYB6J
+         zH/q6ARDxeIZh2PTOrQzj2a0T7eqcYVyxkca7E1yWDmiFL7bjhtovSuqIhjEkQeqM/Iv
+         QvVY4U1SJbDU2DGSAoQiWQyYoi3OhAASa2uVN00CQWEzalRqtRxmr6a5BckUNq9LcCyi
+         6MrHqiFpQwkzagHlbS1BFnuv8th0QodCzGStitJSThHcb5ujLMnQ3KPMlQPcwC/aOOo2
+         WBPIJ6PMMB6vFClzcanNlp+/4qHSMmgUWW/k7t73HSmTS2Ra1aUwwhzYaqo37F3AdK4r
+         zOUA==
+X-Gm-Message-State: AOAM530ZtwENeJL7vLqh3aCj9nGTSDNJcpCNSXPFWd6xsagdLvuhCXL9
+        XaWCe38g4s10fMlQQGrX8OqqhdW3ewVt+VOpn3kzyA==
+X-Google-Smtp-Source: ABdhPJzFMeiSjx3amPJwdpBsr0sO+o/E22b8+fl9lFfN8jPlz1sXc1Yu45mvpYv1CGSYHPRXdZW91qjUr4hT0vY4fUc=
+X-Received: by 2002:a25:d209:0:b0:648:370f:573c with SMTP id
+ j9-20020a25d209000000b00648370f573cmr16501351ybg.255.1651008761872; Tue, 26
+ Apr 2022 14:32:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAhR5DHFi14LzAt+3t-1tSFMLZYmtx-TxXSovh8m4=R=5NsdXA@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+References: <20220415215901.1737897-1-oupton@google.com> <20220415215901.1737897-7-oupton@google.com>
+ <CANgfPd8RLDtmFks0BLEVyHPaEANF93d4iJxHt3n6cKewQsBLuA@mail.gmail.com> <YmGn8hVSGWvna02R@google.com>
+In-Reply-To: <YmGn8hVSGWvna02R@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Tue, 26 Apr 2022 14:32:31 -0700
+Message-ID: <CANgfPd9=Q_JTsLBxjgxBwkdAdpAKDe6ZC0fAY0oGY4nkm11chA@mail.gmail.com>
+Subject: Re: [RFC PATCH 06/17] KVM: arm64: Implement break-before-make
+ sequence for parallel walks
+To:     Oliver Upton <oupton@google.com>
+Cc:     "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>, kvm <kvm@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,32 +79,115 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 25, 2022 at 12:10:22PM -0700,
-Sagi Shahar <sagis@google.com> wrote:
-
-> On Wed, Apr 6, 2022 at 5:50 PM Kai Huang <kai.huang@intel.com> wrote:
-> >
-> > On Fri, 2022-03-04 at 11:49 -0800, isaku.yamahata@intel.com wrote:
-> > > From: Isaku Yamahata <isaku.yamahata@intel.com>
-...
-> > > @@ -914,14 +1014,23 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
-> > >       u64 new_spte;
-> > >       int ret = RET_PF_FIXED;
-> > >       bool wrprot = false;
-> > > +     unsigned long pte_access = ACC_ALL;
+On Thu, Apr 21, 2022 at 11:52 AM Oliver Upton <oupton@google.com> wrote:
+>
+> On Thu, Apr 21, 2022 at 09:57:32AM -0700, Ben Gardon wrote:
+> > On Fri, Apr 15, 2022 at 2:59 PM Oliver Upton <oupton@google.com> wrote:
 > > >
-> > >       WARN_ON(sp->role.level != fault->goal_level);
-> > > +
-> > > +     /* TDX shared GPAs are no executable, enforce this for the SDV. */
-> > > +     if (!kvm_is_private_gfn(vcpu->kvm, iter->gfn))
-> 
-> This should be:
-> if (kvm_gfn_stolen_mask(vcpu->kvm) && !kvm_is_private_gfn(vcpu->kvm, iter->gfn))
-> 
-> Otherwise, when TDX is disabled, all EPTs are going to be considered
-> as shared non-executable EPTs.
+> > > The ARM architecture requires that software use the 'break-before-make'
+> > > sequence whenever memory is being remapped. An additional requirement of
+> > > parallel page walks is a mechanism to ensure exclusive access to a pte,
+> > > thereby avoiding two threads changing the pte and invariably stomping on
+> > > one another.
+> > >
+> > > Roll the two concepts together into a new helper to implement the
+> > > 'break' sequence. Use a special invalid pte value to indicate that the
+> > > pte is under the exclusive control of a thread. If software walkers are
+> > > traversing the tables in parallel, use an atomic compare-exchange to
+> > > break the pte. Retry execution on a failed attempt to break the pte, in
+> > > the hopes that either the instruction will succeed or the pte lock will
+> > > be successfully acquired.
+> > >
+> > > Avoid unnecessary DSBs and TLBIs by only completing the sequence if the
+> > > evicted pte was valid. For counted non-table ptes drop the reference
+> > > immediately. Otherwise, references on tables are dropped in post-order
+> > > traversal as the walker must recurse on the pruned subtree.
+> > >
+> > > All of the new atomics do nothing (for now), as there are a few other
+> > > bits of the map walker that need to be addressed before actually walking
+> > > in parallel.
+> >
+> > I want to make sure I understand the make before break / PTE locking
+> > patterns here.
+> > Please check my understanding of the following cases:
+> >
+> > Case 1: Change a leaf PTE (for some reason)
+> > 1. Traverse the page table to the leaf
+> > 2. Invalidate the leaf PTE, replacing it with a locked PTE
+> > 3. Flush TLBs
+> > 4. Replace the locked PTE with the new value
+> >
+> > In this case, no need to lock the parent SPTEs, right? This is pretty simple.
+>
+> Right, if we're changing the OA of a leaf PTE. If we are just adjusting
+> attributes on a leaf we go through stage2_attr_walker(), which skips
+> step 2 and does the rest in this order: 1, 4, 3.
+>
+> > Case 2:  Drop a page table
+> > 1. Traverse to some non-leaf PTE
+> > 2. Lock the PTE, invalidating it
+> > 3. Recurse into the child page table
+> > 4. Lock the PTEs in the child page table. (We need to lock ALL the
+> > PTEs here right? I don't think we'd get away with locking only the
+> > valid ones)
+>
+> Right. We can just skip some of the TLBI/DSB dance when making an
+> invalid->invalid transition.
+>
+> > 5. Flush TLBs
+> > 6. Unlock the PTE from 2
+> > 7. Free the child page after an RCU grace period (via callback)
+> >
+> > Case 3: Drop a range of leaf PTEs
+> > 1. Traverse the page table to the first leaf
+> > 2. For each leaf in the range:
+> >         a. Invalidate the leaf PTE, replacing it with a locked PTE
+> > 3. Flush TLBs
+> > 4. unlock the locked PTEs
+> >
+> > In this case we have to lock ALL PTEs in the range too, right? My
+> > worry about the whole locking scheme is making sure each thread
+> > correctly remembers which PTEs it locked versus which might have been
+> > locked by other threads.
+>
+> Isn't exclusivity accomplished by checking what you get back from the
+> xchg()? If I get a locked PTE back, some other thread owns the PTE. If I
+> get anything else, then I've taken ownership of that PTE.
 
-Oops, will fix it. Thank you for pointing it out.
+That's true if you only modify one PTE at a time, but if you want to
+batch flushes by:
+1. Locking a bunch of PTEs
+2. TLB invalidate
+3. Set them to some new value (e.g. 0)
+Then you need to track which ones you locked. If you locked an entire
+contiguous region, that works, but you need some way to ensure you
+don't think you locked a pte locked by another thread.
 
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+>
+> > On x86 we solved this by only locking one SPTE at a time, flushing,
+> > then fixing it, but if you're locking a bunch at once it might get
+> > complicated.
+> > Making this locking scheme work without demolishing performance seems hard.
+>
+> We only change at most a single active PTE per fault on the stage 2 MMU.
+> We do one of three things on that path:
+>
+>  1. Install a page/block PTE to an empty PTE
+>  2. Replace a table PTE with a block PTE
+>  3. Replace a block PTE with a table PTE
+>
+> 1 is pretty cheap and can skip flushes altogether.
+>
+> 2 only requires a single TLBI (a big, painful flush of the stage 2 context),
+> but child PTEs needn't be flushed.
+>
+> 3 also requires a single TLBI, but can be done with an IPA and level
+> hint.
+>
+> Perhaps the answer is to push teardown into the rcu callback altogether,
+> IOW don't mess with links in the subtree until then. At that point
+> there's no need for TLBIs nor atomics.
+>
+> --
+> Thanks,
+> Oliver
