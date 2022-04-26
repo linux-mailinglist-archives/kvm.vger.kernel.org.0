@@ -2,111 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8E0F51052F
-	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 19:20:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31CEE51056D
+	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 19:30:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232006AbiDZRXM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 13:23:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34084 "EHLO
+        id S1344407AbiDZRdQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 13:33:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232134AbiDZRXJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Apr 2022 13:23:09 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D42394BB85
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 10:20:00 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id y38so2820173pfa.6
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 10:20:00 -0700 (PDT)
+        with ESMTP id S244815AbiDZRdO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Apr 2022 13:33:14 -0400
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C86821129
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 10:30:02 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id v64-20020a1cac43000000b0038cfd1b3a6dso1950365wme.5
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 10:30:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=O4FZja9WudcKens4azldCUmjh2etbVq0EGH84l7RjgU=;
-        b=gcOCeXEtfA5bcZ/0OV4XMefXitjP6xuTILazvyaC+XU0gpaBiM0Dlgq0QSn5nnYeDu
-         hhDibZtZpYTsaYC0GBYi9E4xYXa1QxVYXJPTKhW5jEogY9D7brvG/037iX8URKn16x/Y
-         a45/RuOD/U5pb9Hj6+uANTPMZDlDhiPvLhJUfjpngUdOCiueITld9oB5KmFW6mJiK1+S
-         N76z7OfUxd1I62SO1Fu0ejnC4zUVdviKqwRlQv0tkpyGOXmistKqH7Bnmmdly65qfeU7
-         Gnq6Sbk7uyoGGHhUYla7OHHq8l+ncuWcUxttGrpEjVKb9jBI5znDmgB8HDYwHZMvbBfy
-         +6KA==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Bc1rqbuReor9CC2s2gzOR+H/Jw8Ckn34i3rYm67mPWU=;
+        b=CZw4762XWWavWYjoe86A33UFbsr3H7Gg3TP3Zb1xeuingmZidF9NBwXgosIGcuWUz0
+         GqJmVWNVYIuMKrM9QFLFBS+yHRcL4PtUT2s+/imf6h0vjY1TPd8ezo13R2ASsqdsjjq/
+         Yj3ODHcUAFFKZSoN/gNjHFRCCE1Z1jOVYOMw6hjTIwY/wDQivJn4rQj8Ra6i62//l3k8
+         0dJnMUBedkW0y6IvmEAsunVbhBqpkk3yRdvyNZtOH4ROXNuFUU8ngZjrUmkc3K6+WB5S
+         EIq/Y0yH0643dKD9JIyENUVSGdxKXDf76RCdCy7Ec/VCfTtiGwIReC3AXtiUrUkustEQ
+         abfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=O4FZja9WudcKens4azldCUmjh2etbVq0EGH84l7RjgU=;
-        b=tYd3koQ0BFUVWeN8O/+w7NYQ3Yav1ZLZed8MC+JRXvOk6iIS8wJEYo9h6+krEL8YdY
-         Gkl006qozrgKIVRc8WvotP49JF50w4+IM1vpqH8TgwmOsAWJ1RaSzKI79UhZjutyNXPO
-         8Mr2ynWm7Wck8wJFBqRYxQMAXGqUTLeXa62sXjc36G8gYrJF4fHtgFGeipChRHilK68C
-         FuI1PtTmmRQDN8q3zgR40eG9aHcbm6Ou7huEIBKimIhy+/id6PaVBukssJtuhfAcEZY5
-         I1fpW+Gk07TXzYznS+L39MMkQuo4timp4On5qj2J76waxfS7h1ILFCEKQIhIKlN4KaCs
-         gicA==
-X-Gm-Message-State: AOAM532AV6cVUcYalNaMTRxqBeDeLwvHsXzrjI1XdIO6KSDkgrfh6sIS
-        fqorWrMLQl3A80oQGeRzNQ2u6WC6LCi3pvaTgIyMG3RF7hJG+Q==
-X-Google-Smtp-Source: ABdhPJw41MD54CZn3iFTHAqU/4zXInNZxrbaKEbgqHdskaF06GdYcfMFMso5Ak25IGKvB9HSfzmpK89B5hdyIBaBt1M=
-X-Received: by 2002:a63:8ac7:0:b0:3aa:fa62:5a28 with SMTP id
- y190-20020a638ac7000000b003aafa625a28mr14854945pgd.400.1650993600084; Tue, 26
- Apr 2022 10:20:00 -0700 (PDT)
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Bc1rqbuReor9CC2s2gzOR+H/Jw8Ckn34i3rYm67mPWU=;
+        b=M6x8xYtIuI4E2kyLovru+TKuL83EVwN/P1JFWYvW0T/mH1lsQUDW0xO7mU0Ko+xuKO
+         CPYRgBtq5e1eQIGsrtHR9JimQ8vK4BgMdMwiBWo3b+hGCZJhGbQ4RqHiBJfAgr1et+pw
+         w2hY4SZP9EQisbWvME0yHDKYusZJuXmzqLMhWlt4aQ6o2tvN9u1TCJ78T6/t9g7fxwzB
+         kW2HYyxBWRlMebhw47v1PpasT25zCcBa/3bNK5cb5PZgRnQV+1/NpK7LsjgHNzGPcXAY
+         ZKnTeHPwlV6Eb9Cn7AxVzvY+PukZJdr4G/BnQ2oFgBjoQTWqNtPZ2QyrqzjTem2YbJHK
+         34sQ==
+X-Gm-Message-State: AOAM530Eoyuddk517xdt3JaoCX37DqwuvcNCYBdfwV870TEZv3BTkHJU
+        B9/lhdNklYlPlaOjvu7L960=
+X-Google-Smtp-Source: ABdhPJwchjVnW9X66LiqoGj9q4dIXYeWaNxgKbo+w4CUHwybawMHF0AsRnDmu+40xypuyUgFePiK/g==
+X-Received: by 2002:a05:600c:a06:b0:37b:fdd8:4f8 with SMTP id z6-20020a05600c0a0600b0037bfdd804f8mr16477881wmp.41.1650994201355;
+        Tue, 26 Apr 2022 10:30:01 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
+        by smtp.googlemail.com with ESMTPSA id h10-20020a05600c414a00b0038ebb6884d8sm127959wmm.0.2022.04.26.10.30.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Apr 2022 10:30:00 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <75de1384-b5c5-009d-7082-c3f5df5cce45@redhat.com>
+Date:   Tue, 26 Apr 2022 19:29:59 +0200
 MIME-Version: 1.0
-References: <20220327205803.739336-1-mizhang@google.com> <YkHRYY6x1Ewez/g4@google.com>
- <CAL715WL7ejOBjzXy9vbS_M2LmvXcC-CxmNr+oQtCZW0kciozHA@mail.gmail.com> <YkH7KZbamhKpCidK@google.com>
-In-Reply-To: <YkH7KZbamhKpCidK@google.com>
-From:   Mingwei Zhang <mizhang@google.com>
-Date:   Tue, 26 Apr 2022 10:19:49 -0700
-Message-ID: <CAL715W+6UwO2zgoSLUeTmBHRo1HMSGshA6YMhvBiqfJrejhwFQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/mmu: add lockdep check before lookup_address_in_mm()
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: Another nice lockdep print in nested SVM code
+Content-Language: en-US
+To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc:     Sean Christopherson <seanjc@google.com>
+References: <8aab89fba5e682a4215dcf974ca5a2c9ae0f6757.camel@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <8aab89fba5e682a4215dcf974ca5a2c9ae0f6757.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 28, 2022 at 11:15 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, Mar 28, 2022, Mingwei Zhang wrote:
-> > With that, I start to feel this is a bug. The issue is just so rare
-> > that it has never triggered a problem.
-> >
-> > lookup_address_in_mm() walks the host page table as if it is a
-> > sequence of _static_ memory chunks. This is clearly dangerous.
->
-> Yeah, it's broken.  The proper fix is do something like what perf uses, or maybe
-> just genericize and reuse the code from commit 8af26be06272
-> ("perf/core: Fix arch_perf_get_page_size()).
+On 4/26/22 18:39, Maxim Levitsky wrote:
+> [ 1355.807187]  kvm_vcpu_map+0x159/0x190 [kvm]
+> [ 1355.807628]  nested_svm_vmexit+0x4c/0x7f0 [kvm_amd]
+> [ 1355.808036]  ? kvm_vcpu_block+0x54/0xa0 [kvm]
+> [ 1355.808450]  svm_check_nested_events+0x97/0x390 [kvm_amd]
+> [ 1355.808920]  kvm_check_nested_events+0x1c/0x40 [kvm]
 
-hmm, I am thinking about this. We clearly need an adaptor layer if we
-choose to use this function, e.g., size -> layer change; using irq or
-not. Alternatively, I am wondering if we can just modify
-lookup_address_in_mm() to make the code compatible with "lockless"
-walk?
+When called from kvm_vcpu_halt, it is not even necessary to do the
+vmexit immediately.  kvm_arch_vcpu_runnable should do the right thing
+anyway (e.g. kvm_arch_interrupt_allowed checks is_guest_mode for both
+VMX and SVM).
 
-On top of that, since kvm_mmu_max_mapping_level() is used in two
-places: 1) ept violation and 2) disabling dirty logging. The former
-does not require disable/enable irq since it is safe. So maybe add a
-parameter in this function and plumb through towards
-host_pfn_mapping_level()?
->
-> > But right now,  kvm_mmu_max_mapping_level() are used in other places
-> > as well: kvm_mmu_zap_collapsible_spte(), which does not satisfy the
-> > strict requirement of walking the host page table.
->
-> The host pfn size is used only as a hueristic, so false postives/negatives are
-> ok, the only race that needs to be avoided is dereferencing freed page table
-> memory.  lookup_address_in_pgd() is really broken because it doesn't even ensure
-> a given PxE is READ_ONCE().  I suppose one could argue the caller is broken, but
-> I doubt KVM is the only user that doesn't provide the necessary protections.
+The only case that is missing is MTF; it needs to be added to
+hv_timer_pending, like this
 
-right. since lookup_address_in_pgd() is so broken. I am thinking about
-just fix it in place instead of switching to a different function.
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 4ff36610af6a..e2e4f60159e9 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1504,7 +1504,7 @@ struct kvm_x86_ops {
+  struct kvm_x86_nested_ops {
+  	void (*leave_nested)(struct kvm_vcpu *vcpu);
+  	int (*check_events)(struct kvm_vcpu *vcpu);
+-	bool (*hv_timer_pending)(struct kvm_vcpu *vcpu);
++	bool (*has_events)(struct kvm_vcpu *vcpu);
+  	void (*triple_fault)(struct kvm_vcpu *vcpu);
+  	int (*get_state)(struct kvm_vcpu *vcpu,
+  			 struct kvm_nested_state __user *user_kvm_nested_state,
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 856c87563883..2744b905865c 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -3857,6 +3857,10 @@ static bool nested_vmx_preemption_timer_pending(struct kvm_vcpu *vcpu)
+  	       to_vmx(vcpu)->nested.preemption_timer_expired;
+  }
+  
++static bool nested_vmx_has_events(struct kvm_vcpu *vcpu)
++{
++	return nested_vmx_preemption_timer_pending(vcpu) || vmx->nested.mtf_pending;
++
+  static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+  {
+  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+@@ -6809,7 +6813,7 @@ __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *))
+  struct kvm_x86_nested_ops vmx_nested_ops = {
+  	.leave_nested = vmx_leave_nested,
+  	.check_events = vmx_check_nested_events,
+-	.hv_timer_pending = nested_vmx_preemption_timer_pending,
++	.has_events = nested_vmx_has_events,
+  	.triple_fault = nested_vmx_triple_fault,
+  	.get_state = vmx_get_nested_state,
+  	.set_state = vmx_set_nested_state,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7f21d9fe816f..231c55c4b33d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9471,8 +9471,8 @@ static int inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit)
+  	}
+  
+  	if (is_guest_mode(vcpu) &&
+-	    kvm_x86_ops.nested_ops->hv_timer_pending &&
+-	    kvm_x86_ops.nested_ops->hv_timer_pending(vcpu))
++	    kvm_x86_ops.nested_ops->has_events &&
++	    kvm_x86_ops.nested_ops->has_events(vcpu))
+  		*req_immediate_exit = true;
+  
+  	WARN_ON(vcpu->arch.exception.pending);
+@@ -12185,8 +12185,8 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
+  		return true;
+  
+  	if (is_guest_mode(vcpu) &&
+-	    kvm_x86_ops.nested_ops->hv_timer_pending &&
+-	    kvm_x86_ops.nested_ops->hv_timer_pending(vcpu))
++	    kvm_x86_ops.nested_ops->has_events &&
++	    kvm_x86_ops.nested_ops->has_events(vcpu))
+  		return true;
+  
+  	return false;
+
+
+> [ 1355.809396]  kvm_arch_vcpu_runnable+0x4e/0x190 [kvm]
+> [ 1355.809892]  kvm_vcpu_check_block+0x4f/0x100 [kvm]
+> [ 1355.810349]  ? kvm_vcpu_check_block+0x5/0x100 [kvm]
+> [ 1355.810806]  ? kvm_vcpu_block+0x54/0xa0 [kvm]
+> [ 1355.811259]  kvm_vcpu_block+0x6b/0xa0 [kvm]
+> [ 1355.811666]  kvm_vcpu_halt+0x3f/0x490 [kvm]
+> [ 1355.812049]  kvm_arch_vcpu_ioctl_run+0xb0b/0x1d00 [kvm]
+> [ 1355.812539]  ? rcu_read_lock_sched_held+0x16/0x80
+> [ 1355.813013]  ? lock_release+0x1c4/0x270
+> [ 1355.813365]  ? __wake_up_common+0x8d/0x180
+> [ 1355.813743]  ? _raw_spin_unlock_irq+0x28/0x40
+
