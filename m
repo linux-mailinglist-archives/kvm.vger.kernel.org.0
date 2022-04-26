@@ -2,212 +2,288 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 66E0550F20E
-	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 09:18:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 313BF50F250
+	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 09:25:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343793AbiDZHVf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 03:21:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58282 "EHLO
+        id S1343846AbiDZH14 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 03:27:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229557AbiDZHVe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Apr 2022 03:21:34 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36A2197BB4;
-        Tue, 26 Apr 2022 00:18:28 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23Q7EgBv018722;
-        Tue, 26 Apr 2022 07:18:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : from : subject : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=9+pOc/5w24EOaxSIM5Kzeu1VpGFG/SvBf+r0pH0Tn1w=;
- b=oFoX/6p+NCkMUpfUcVYQbsH3IL3MZ9NePKlzQYbj9Tt2/idLmbnaGFYM8pmE4vKZAj8Q
- tghO2E0oK03tj4EUeAxo5zj3Tqe+aug6l9DZ5ZVTuj7alaY8aF9EIAIebM01wUklq4mp
- 1jJ60TlrSbxLXDuWsFPXfOpvnJwe7uzHOY2Td+rEiMj+b9A/x0puyXx2GpD0mIHUko1j
- 7+4vKN8RKDopY3BsmpGP7JnJ7ENpehVkpWSkwJwjfvHZ4bis13iq4eHzYgPNLVcB2Wte
- l6Ak64ccQn+NmnDwNwMJSn3E5UXisCQvDBsWUq8IQmI42IPNQRIu9vyLbZfLJQF51Ge3 ow== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fpc67823a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Apr 2022 07:18:26 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 23Q7ExbX019211;
-        Tue, 26 Apr 2022 07:18:25 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fpc67822v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Apr 2022 07:18:25 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23Q78Zcs010899;
-        Tue, 26 Apr 2022 07:18:23 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06ams.nl.ibm.com with ESMTP id 3fm8qj3uh9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Apr 2022 07:18:23 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23Q7IJKM35324222
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 Apr 2022 07:18:20 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E1297AE055;
-        Tue, 26 Apr 2022 07:18:19 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 204D8AE045;
-        Tue, 26 Apr 2022 07:18:19 +0000 (GMT)
-Received: from [9.145.2.160] (unknown [9.145.2.160])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 26 Apr 2022 07:18:19 +0000 (GMT)
-Message-ID: <2be2e47d-c1f5-18ac-264d-a1bde3b03c24@linux.ibm.com>
-Date:   Tue, 26 Apr 2022 09:18:18 +0200
+        with ESMTP id S1343852AbiDZH1r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Apr 2022 03:27:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E8621AFAC2
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 00:24:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650957880;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Wq0cX5f/tSHQNq0CGIDaJqE3zMD36/mEnx1ziP9dP9M=;
+        b=hntyq7QvplcLOoyfFqkNMeFA1pQRdZKz2BZH2p+XoLoAqpIagh5xaa2hT/gWD/FaO9TP/C
+        a8oStkv419Cbau6X9P3sQjdYLmG6Dpn7H/eaqsIbXRr7YEM3QEtZc720zJsjojlZ2hK1pw
+        oXlHi23cKaHW7SPRKP3H9I8pC9RK7Kw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-609-u9WXaItiN1Ctt2Q916m_Gw-1; Tue, 26 Apr 2022 03:24:32 -0400
+X-MC-Unique: u9WXaItiN1Ctt2Q916m_Gw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D9A7B811E76;
+        Tue, 26 Apr 2022 07:24:31 +0000 (UTC)
+Received: from [10.72.13.230] (ovpn-13-230.pek2.redhat.com [10.72.13.230])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BDE42145BA44;
+        Tue, 26 Apr 2022 07:24:24 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v6 7/9] tools: Import ARM SMCCC definitions
+To:     Raghavendra Rao Ananta <rananta@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc:     kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+References: <20220423000328.2103733-1-rananta@google.com>
+ <20220423000328.2103733-8-rananta@google.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <867b0aeb-97f4-8fc0-b37a-42946a1e65ad@redhat.com>
+Date:   Tue, 26 Apr 2022 15:24:20 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v2 1/2] KVM: s390: Don't indicate suppression on dirtying,
- failing memop
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20220425100147.1755340-1-scgl@linux.ibm.com>
- <20220425100147.1755340-2-scgl@linux.ibm.com>
+In-Reply-To: <20220423000328.2103733-8-rananta@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-In-Reply-To: <20220425100147.1755340-2-scgl@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: WKoPV97it3lvEGGR1tLgLQkhXcJibm6b
-X-Proofpoint-GUID: Rppi6TdBmuvJfebvbmlxxEqMsg5UWf6V
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-26_02,2022-04-25_03,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
- adultscore=0 malwarescore=0 clxscore=1015 impostorscore=0 phishscore=0
- spamscore=0 priorityscore=1501 lowpriorityscore=0 mlxlogscore=939
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204260046
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,UPPERCASE_50_75
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/25/22 12:01, Janis Schoetterl-Glausch wrote:
-> If user space uses a memop to emulate an instruction and that
-> memop fails, the execution of the instruction ends.
-> Instruction execution can end in different ways, one of which is
-> suppression, which requires that the instruction execute like a no-op.
-
-
-
-> A writing memop that spans multiple pages and fails due to key
-> protection can modified guest memory, as a result, the likely
-> correct ending is termination. Therefore do not indicate a
-> suppressing instruction ending in this case.
-
-Check grammar.
-
+On 4/23/22 8:03 AM, Raghavendra Rao Ananta wrote:
+> Import the standard SMCCC definitions from include/linux/arm-smccc.h.
 > 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 > ---
->   arch/s390/kvm/gaccess.c | 47 ++++++++++++++++++++++++-----------------
->   1 file changed, 28 insertions(+), 19 deletions(-)
+>   tools/include/linux/arm-smccc.h | 193 ++++++++++++++++++++++++++++++++
+>   1 file changed, 193 insertions(+)
+>   create mode 100644 tools/include/linux/arm-smccc.h
 > 
-> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-> index d53a183c2005..3b1fbef82288 100644
-> --- a/arch/s390/kvm/gaccess.c
-> +++ b/arch/s390/kvm/gaccess.c
-> @@ -491,8 +491,8 @@ enum prot_type {
->   	PROT_TYPE_IEP  = 4,
->   };
->   
-> -static int trans_exc(struct kvm_vcpu *vcpu, int code, unsigned long gva,
-> -		     u8 ar, enum gacc_mode mode, enum prot_type prot)
-> +static int trans_exc_ending(struct kvm_vcpu *vcpu, int code, unsigned long gva, u8 ar,
-> +			    enum gacc_mode mode, enum prot_type prot, bool suppress)
->   {
->   	struct kvm_s390_pgm_info *pgm = &vcpu->arch.pgm;
->   	struct trans_exc_code_bits *tec;
-> @@ -503,22 +503,24 @@ static int trans_exc(struct kvm_vcpu *vcpu, int code, unsigned long gva,
->   
->   	switch (code) {
->   	case PGM_PROTECTION:
-> -		switch (prot) {
-> -		case PROT_TYPE_IEP:
-> -			tec->b61 = 1;
-> -			fallthrough;
-> -		case PROT_TYPE_LA:
-> -			tec->b56 = 1;
-> -			break;
-> -		case PROT_TYPE_KEYC:
-> -			tec->b60 = 1;
-> -			break;
-> -		case PROT_TYPE_ALC:
-> -			tec->b60 = 1;
-> -			fallthrough;
-> -		case PROT_TYPE_DAT:
-> -			tec->b61 = 1;
-> -			break;
-> +		if (suppress) {
-> +			switch (prot) {
-> +			case PROT_TYPE_IEP:
-> +				tec->b61 = 1;
-> +				fallthrough;
-> +			case PROT_TYPE_LA:
-> +				tec->b56 = 1;
-> +				break;
-> +			case PROT_TYPE_KEYC:
-> +				tec->b60 = 1;
-> +				break;
-> +			case PROT_TYPE_ALC:
-> +				tec->b60 = 1;
-> +				fallthrough;
-> +			case PROT_TYPE_DAT:
-> +				tec->b61 = 1;
-> +				break;
-> +			}
->   		}
 
-How about switching this around and masking those bits on termination.
+Reviewed-by: Gavin Shan <gshan@redhat.com>
 
->   		fallthrough;
->   	case PGM_ASCE_TYPE:
-> @@ -552,6 +554,12 @@ static int trans_exc(struct kvm_vcpu *vcpu, int code, unsigned long gva,
->   	return code;
->   }
->   
-> +static int trans_exc(struct kvm_vcpu *vcpu, int code, unsigned long gva, u8 ar,
-> +		     enum gacc_mode mode, enum prot_type prot)
-> +{
-> +	return trans_exc_ending(vcpu, code, gva, ar, mode, prot, true);
-> +}
+> diff --git a/tools/include/linux/arm-smccc.h b/tools/include/linux/arm-smccc.h
+> new file mode 100644
+> index 000000000000..63ce9bebccd3
+> --- /dev/null
+> +++ b/tools/include/linux/arm-smccc.h
+> @@ -0,0 +1,193 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (c) 2015, Linaro Limited
+> + */
+> +#ifndef __LINUX_ARM_SMCCC_H
+> +#define __LINUX_ARM_SMCCC_H
 > +
->   static int get_vcpu_asce(struct kvm_vcpu *vcpu, union asce *asce,
->   			 unsigned long ga, u8 ar, enum gacc_mode mode)
->   {
-> @@ -1110,7 +1118,8 @@ int access_guest_with_key(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
->   		ga = kvm_s390_logical_to_effective(vcpu, ga + fragment_len);
->   	}
->   	if (rc > 0)
-> -		rc = trans_exc(vcpu, rc, ga, ar, mode, prot);
-> +		rc = trans_exc_ending(vcpu, rc, ga, ar, mode, prot,
-> +				      (mode != GACC_STORE) || (idx == 0));
-
-Add a boolean variable named terminating, calculate the value before 
-passing the boolean on.
-
->   out_unlock:
->   	if (need_ipte_lock)
->   		ipte_unlock(vcpu);
-
+> +#include <linux/const.h>
+> +
+> +/*
+> + * This file provides common defines for ARM SMC Calling Convention as
+> + * specified in
+> + * https://developer.arm.com/docs/den0028/latest
+> + *
+> + * This code is up-to-date with version DEN 0028 C
+> + */
+> +
+> +#define ARM_SMCCC_STD_CALL	        _AC(0,U)
+> +#define ARM_SMCCC_FAST_CALL	        _AC(1,U)
+> +#define ARM_SMCCC_TYPE_SHIFT		31
+> +
+> +#define ARM_SMCCC_SMC_32		0
+> +#define ARM_SMCCC_SMC_64		1
+> +#define ARM_SMCCC_CALL_CONV_SHIFT	30
+> +
+> +#define ARM_SMCCC_OWNER_MASK		0x3F
+> +#define ARM_SMCCC_OWNER_SHIFT		24
+> +
+> +#define ARM_SMCCC_FUNC_MASK		0xFFFF
+> +
+> +#define ARM_SMCCC_IS_FAST_CALL(smc_val)	\
+> +	((smc_val) & (ARM_SMCCC_FAST_CALL << ARM_SMCCC_TYPE_SHIFT))
+> +#define ARM_SMCCC_IS_64(smc_val) \
+> +	((smc_val) & (ARM_SMCCC_SMC_64 << ARM_SMCCC_CALL_CONV_SHIFT))
+> +#define ARM_SMCCC_FUNC_NUM(smc_val)	((smc_val) & ARM_SMCCC_FUNC_MASK)
+> +#define ARM_SMCCC_OWNER_NUM(smc_val) \
+> +	(((smc_val) >> ARM_SMCCC_OWNER_SHIFT) & ARM_SMCCC_OWNER_MASK)
+> +
+> +#define ARM_SMCCC_CALL_VAL(type, calling_convention, owner, func_num) \
+> +	(((type) << ARM_SMCCC_TYPE_SHIFT) | \
+> +	((calling_convention) << ARM_SMCCC_CALL_CONV_SHIFT) | \
+> +	(((owner) & ARM_SMCCC_OWNER_MASK) << ARM_SMCCC_OWNER_SHIFT) | \
+> +	((func_num) & ARM_SMCCC_FUNC_MASK))
+> +
+> +#define ARM_SMCCC_OWNER_ARCH		0
+> +#define ARM_SMCCC_OWNER_CPU		1
+> +#define ARM_SMCCC_OWNER_SIP		2
+> +#define ARM_SMCCC_OWNER_OEM		3
+> +#define ARM_SMCCC_OWNER_STANDARD	4
+> +#define ARM_SMCCC_OWNER_STANDARD_HYP	5
+> +#define ARM_SMCCC_OWNER_VENDOR_HYP	6
+> +#define ARM_SMCCC_OWNER_TRUSTED_APP	48
+> +#define ARM_SMCCC_OWNER_TRUSTED_APP_END	49
+> +#define ARM_SMCCC_OWNER_TRUSTED_OS	50
+> +#define ARM_SMCCC_OWNER_TRUSTED_OS_END	63
+> +
+> +#define ARM_SMCCC_FUNC_QUERY_CALL_UID  0xff01
+> +
+> +#define ARM_SMCCC_QUIRK_NONE		0
+> +#define ARM_SMCCC_QUIRK_QCOM_A6		1 /* Save/restore register a6 */
+> +
+> +#define ARM_SMCCC_VERSION_1_0		0x10000
+> +#define ARM_SMCCC_VERSION_1_1		0x10001
+> +#define ARM_SMCCC_VERSION_1_2		0x10002
+> +#define ARM_SMCCC_VERSION_1_3		0x10003
+> +
+> +#define ARM_SMCCC_1_3_SVE_HINT		0x10000
+> +
+> +#define ARM_SMCCC_VERSION_FUNC_ID					\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_32,				\
+> +			   0, 0)
+> +
+> +#define ARM_SMCCC_ARCH_FEATURES_FUNC_ID					\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_32,				\
+> +			   0, 1)
+> +
+> +#define ARM_SMCCC_ARCH_SOC_ID						\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_32,				\
+> +			   0, 2)
+> +
+> +#define ARM_SMCCC_ARCH_WORKAROUND_1					\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_32,				\
+> +			   0, 0x8000)
+> +
+> +#define ARM_SMCCC_ARCH_WORKAROUND_2					\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_32,				\
+> +			   0, 0x7fff)
+> +
+> +#define ARM_SMCCC_ARCH_WORKAROUND_3					\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_32,				\
+> +			   0, 0x3fff)
+> +
+> +#define ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID				\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_32,				\
+> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
+> +			   ARM_SMCCC_FUNC_QUERY_CALL_UID)
+> +
+> +/* KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74 */
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
+> +
+> +/* KVM "vendor specific" services */
+> +#define ARM_SMCCC_KVM_FUNC_FEATURES		0
+> +#define ARM_SMCCC_KVM_FUNC_PTP			1
+> +#define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
+> +#define ARM_SMCCC_KVM_NUM_FUNCS			128
+> +
+> +#define ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID			\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_32,				\
+> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
+> +			   ARM_SMCCC_KVM_FUNC_FEATURES)
+> +
+> +#define SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED	1
+> +
+> +/*
+> + * ptp_kvm is a feature used for time sync between vm and host.
+> + * ptp_kvm module in guest kernel will get service from host using
+> + * this hypercall ID.
+> + */
+> +#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID				\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_32,				\
+> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
+> +			   ARM_SMCCC_KVM_FUNC_PTP)
+> +
+> +/* ptp_kvm counter type ID */
+> +#define KVM_PTP_VIRT_COUNTER			0
+> +#define KVM_PTP_PHYS_COUNTER			1
+> +
+> +/* Paravirtualised time calls (defined by ARM DEN0057A) */
+> +#define ARM_SMCCC_HV_PV_TIME_FEATURES				\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+> +			   ARM_SMCCC_SMC_64,			\
+> +			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
+> +			   0x20)
+> +
+> +#define ARM_SMCCC_HV_PV_TIME_ST					\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+> +			   ARM_SMCCC_SMC_64,			\
+> +			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
+> +			   0x21)
+> +
+> +/* TRNG entropy source calls (defined by ARM DEN0098) */
+> +#define ARM_SMCCC_TRNG_VERSION					\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+> +			   ARM_SMCCC_SMC_32,			\
+> +			   ARM_SMCCC_OWNER_STANDARD,		\
+> +			   0x50)
+> +
+> +#define ARM_SMCCC_TRNG_FEATURES					\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+> +			   ARM_SMCCC_SMC_32,			\
+> +			   ARM_SMCCC_OWNER_STANDARD,		\
+> +			   0x51)
+> +
+> +#define ARM_SMCCC_TRNG_GET_UUID					\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+> +			   ARM_SMCCC_SMC_32,			\
+> +			   ARM_SMCCC_OWNER_STANDARD,		\
+> +			   0x52)
+> +
+> +#define ARM_SMCCC_TRNG_RND32					\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+> +			   ARM_SMCCC_SMC_32,			\
+> +			   ARM_SMCCC_OWNER_STANDARD,		\
+> +			   0x53)
+> +
+> +#define ARM_SMCCC_TRNG_RND64					\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+> +			   ARM_SMCCC_SMC_64,			\
+> +			   ARM_SMCCC_OWNER_STANDARD,		\
+> +			   0x53)
+> +
+> +/*
+> + * Return codes defined in ARM DEN 0070A
+> + * ARM DEN 0070A is now merged/consolidated into ARM DEN 0028 C
+> + */
+> +#define SMCCC_RET_SUCCESS			0
+> +#define SMCCC_RET_NOT_SUPPORTED			-1
+> +#define SMCCC_RET_NOT_REQUIRED			-2
+> +#define SMCCC_RET_INVALID_PARAMETER		-3
+> +
+> +#endif /*__LINUX_ARM_SMCCC_H*/
+> 
 
