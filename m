@@ -2,119 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A8CDF50F182
-	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 08:52:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BD4450F1C7
+	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 09:08:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236637AbiDZGzK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 02:55:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36526 "EHLO
+        id S1343664AbiDZHLF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 03:11:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229838AbiDZGzJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Apr 2022 02:55:09 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAF8F31DDE;
-        Mon, 25 Apr 2022 23:52:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650955922; x=1682491922;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=7N+AkLZICdgvisk/KZV8bky8vfCRSJNl9xIZ2mypSW8=;
-  b=UEPlNMhJNFSsZ5WN6Ut0RQi1ZMpNVa3ow5qDmcm4/C0D7YjWfVkoeUY8
-   7PViwJbDF19S9wKY0nash9lMiTG7K/nOSUDjzLMUI2Se7yhT1IT4m3V5b
-   FGLlqWgPF/7VV46StpBmnuTWYalZHoi+ZzvB0h3WFqXQN8Ggn8gVno69r
-   l9bpc0ScrtKS8nLrWU8NnMp6I5Tkwdvx/ItVCOLf1s+2EANu8e2GsFHV0
-   LO9PSM+hkucaiyGO4yaTszmjr3SuUA5ilbbJzUjcMbm8KisCN9tbgXO7n
-   5hATppTkGvUprQ/deuNCNMr1PccZ6DBcAx+83nusPrdz3vAzoYEglDkL2
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10328"; a="263068459"
-X-IronPort-AV: E=Sophos;i="5.90,290,1643702400"; 
-   d="scan'208";a="263068459"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2022 23:52:02 -0700
-X-IronPort-AV: E=Sophos;i="5.90,290,1643702400"; 
-   d="scan'208";a="558145715"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.252.58.98])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2022 23:51:56 -0700
-Message-ID: <c8033229-97a0-3e4c-66d5-74c0d1d4e15c@intel.com>
-Date:   Tue, 26 Apr 2022 09:51:52 +0300
+        with ESMTP id S1343737AbiDZHKz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Apr 2022 03:10:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 99002381BF
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 00:07:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650956848;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YpftkYZ0lrK3bZQvM1sYPoVVT6SQafc7BkKTLE4CIa8=;
+        b=EyXoQeP1+onFqrV6JI8i5lDZSXTiNQ3pg5rxWLRVAxF7cjo4m5i3C3nf9aolX2c2pbT40+
+        g3hP9KTEVq28POV5H/eRn4D9MpXdNFts2PdE8lPZv9L39cyUx2DIpp8nT/hRzm0EI76yuj
+        +RRGUbc/22r+7lTYhUVkKt7dT6tVdbk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-98-mSGwnDNJMK2W-a_4HwW0bg-1; Tue, 26 Apr 2022 03:07:24 -0400
+X-MC-Unique: mSGwnDNJMK2W-a_4HwW0bg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7206A802819;
+        Tue, 26 Apr 2022 07:07:03 +0000 (UTC)
+Received: from starship (unknown [10.40.192.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 270D72024CB8;
+        Tue, 26 Apr 2022 07:06:47 +0000 (UTC)
+Message-ID: <b9ee5f62e904a690d7e2d8837ade8ece7e24a359.camel@redhat.com>
+Subject: Re: [PATCH v2 11/12] KVM: SVM: Do not inhibit APICv when x2APIC is
+ present
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
+        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
+Date:   Tue, 26 Apr 2022 10:06:46 +0300
+In-Reply-To: <01460b72-1189-fef1-9718-816f2f658d42@amd.com>
+References: <20220412115822.14351-1-suravee.suthikulpanit@amd.com>
+         <20220412115822.14351-12-suravee.suthikulpanit@amd.com>
+         <3fd0aabb6288a5703760da854fd6b09a485a2d69.camel@redhat.com>
+         <01460b72-1189-fef1-9718-816f2f658d42@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.7.0
-Subject: Re: [PATCH V2 03/11] perf/x86: Add support for TSC in nanoseconds as
- a perf event clock
-Content-Language: en-US
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Jiri Olsa <jolsa@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        H Peter Anvin <hpa@zytor.com>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Leo Yan <leo.yan@linaro.org>,
-        "jgross@suse.com" <jgross@suse.com>,
-        "sdeep@vmware.com" <sdeep@vmware.com>,
-        "pv-drivers@vmware.com" <pv-drivers@vmware.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "kys@microsoft.com" <kys@microsoft.com>,
-        "sthemmin@microsoft.com" <sthemmin@microsoft.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "Andrew.Cooper3@citrix.com" <Andrew.Cooper3@citrix.com>,
-        "Hall, Christopher S" <christopher.s.hall@intel.com>
-References: <20220214110914.268126-1-adrian.hunter@intel.com>
- <20220214110914.268126-4-adrian.hunter@intel.com>
- <YiIXFmA4vpcTSk2L@hirez.programming.kicks-ass.net>
- <853ce127-25f0-d0fe-1d8f-0b0dd4f3ce71@intel.com>
- <YiXVgEk/1UClkygX@hirez.programming.kicks-ass.net>
- <30383f92-59cb-2875-1e1b-ff1a0eacd235@intel.com>
- <YiYZv+LOmjzi5wcm@hirez.programming.kicks-ass.net>
- <013b5425-2a60-e4d4-b846-444a576f2b28@intel.com>
- <6f07a7d4e1ad4440bf6c502c8cb6c2ed@intel.com>
- <c3e1842b-79c3-634a-3121-938b5160ca4c@intel.com>
- <50fd2671-6070-0eba-ea68-9df9b79ccac3@intel.com> <87ilqx33vk.ffs@tglx>
- <ff1e190a-95e6-e2a6-dc01-a46f7ffd2162@intel.com> <87fsm114ax.ffs@tglx>
-From:   Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <87fsm114ax.ffs@tglx>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-9.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/04/22 20:05, Thomas Gleixner wrote:
-> On Mon, Apr 25 2022 at 16:15, Adrian Hunter wrote:
->> On 25/04/22 12:32, Thomas Gleixner wrote:
->>> It's hillarious, that we still cling to this pvclock abomination, while
->>> we happily expose TSC deadline timer to the guest. TSC virt scaling was
->>> implemented in hardware for a reason.
->>
->> So you are talking about changing VMX TCS Offset on every VM-Entry to try to hide
->> the time jumps when the VM is scheduled out?  Or neglect that and just let the time
->> jumps happen?
->>
->> If changing VMX TCS Offset, how can TSC be kept consistent between each VCPU i.e.
->> wouldn't that mean each VCPU has to have the same VMX TSC Offset?
+On Tue, 2022-04-26 at 09:25 +0700, Suravee Suthikulpanit wrote:
+> Hi Maim,
 > 
-> Obviously so. That's the only thing which makes sense, no?
+> On 4/19/22 8:29 PM, Maxim Levitsky wrote:
+> > On Tue, 2022-04-12 at 06:58 -0500, Suravee Suthikulpanit wrote:
+> > 
+> > Hi!
+> > 
+> > 
+> > I just got an idea, while writing a kvm selftest that would use AVIC,
+> > and finding out that selftest code uploads the '-host' cpuid right away
+> > which has x2apic enabled and that inhibits AVIC, and later clearing x2apic
+> > in the cpuid doesn't un-inhibit it.
+> >   
+> > That can be fixed in few ways but that got me thinking:
+> >   
+> > Why do we inhibit AVIC when the guest uses x2apic, even without X2AVIC?
+> > I think that if we didn't it would just work, and even work faster than
+> > pure software x2apic.
+> >   
+> > My thinking is:
+> >   
+> > - when a vcpu itself uses its x2apic, even if its avic is not inhibited,
+> > the guest will write x2apic msrs which kvm intercepts and will correctly emulate a proper x2apic.
+> >   
+> > - vcpu peers will also use x2apic msrs and again it will work correctly
+> > (even when there are more than 256 vcpus).
+> >   
+> > - and the host + iommu will still be able to use AVIC's doorbell to send interrupts to the guest
+> > and that doesn't need apic ids or anything, it should work just fine.
+> > 
+> > Also AVIC should have no issues scanning IRR and injecting interrupts on VM entry,
+> > x2apic mode doesn't matter for that.
+> >   
+> > AVIC mmio can still be though discovered by the guest which is technically against x86 spec
+> > (in x2apic mode, mmio supposed to not work) but that can be fixed easily by disabing
+> > the AVIC memslot if any of the vCPUs are in x2apic mode, or this can be ignored since
+> > it should not cause any issues.
+> > We seem to have a quirk for that KVM_X86_QUIRK_LAPIC_MMIO_HOLE.
+> >   
+> > On top of all this, removing this inhibit will also allow to test AVIC with guest
+> > which does have x2apic in the CPUID but doesn't use it (e.g kvm unit test, or
+> > linux booted with nox2apic, which is also nice IMHO)
+> >   
+> > What do you think?
+> 
+> This is actually a good idea!!! Let's call it hybrid-x2AVIC :)
+> 
+> I am working on prototype and test out the support for this, which will be introduced in V3.
 
-[ Sending this again, because I notice I messed up the email "From" ]
+Thanks! 
 
-But wouldn't that mean changing all the VCPUs VMX TSC Offset at the same time,
-which means when none are currently executing?  How could that be done?
+Best regards,
+	Maxim Levitsky
+
+> 
+> Regards,
+> Suravee
+> 
+
 
