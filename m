@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D56E25107AA
-	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 20:53:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E1ED65107A3
+	for <lists+kvm@lfdr.de>; Tue, 26 Apr 2022 20:53:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353017AbiDZS41 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 14:56:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33146 "EHLO
+        id S1353240AbiDZS4Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 14:56:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353151AbiDZS4W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1353130AbiDZS4W (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 26 Apr 2022 14:56:22 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E849F1569EB
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 11:53:10 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id d15so31057613pll.10
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 11:53:10 -0700 (PDT)
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B710E1569F6
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 11:53:12 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id w5-20020a17090aaf8500b001d74c754128so2992423pjq.0
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 11:53:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=KslgnjbYCZy+RC57ZlL0pYo5UT2utIjDNcmnyodLbb4=;
-        b=mlb9fCc5rb7zG7mTZaJ0VEWPjisdXFLSvYf5s+ONK4bMBESNNjkC9LspUvLeDIH7qg
-         KJWqNCNtmrDhGwSK8WWziE2vvMlKPHdrhOkxTNKqVrH4bzYAGPS3JOAcgn9uJq2U7GIc
-         rqsSRnlpOfMuOq6EQMF6XQB3zL1qkroK77mrAmkPgolCGxAEvrggowjCIMTKALEz7O5L
-         T0apibn7Lov23G7OW7GMaHKpIMQhO9kHaeUhCdh6NwztivMdV78PW8DemC/NYlrXYNCa
-         Tbvw8tsT61VlPxpax/4JEuuCl543oeV9N3N8bh+s/UR7NZ4AcjNRTV5pmDrO2xmEU0Yu
-         0vVg==
+        bh=D+SXwT/SJ1BJbq87GGWyit7MKCT0yhEbjDVEHkS9JaY=;
+        b=Z9GOxXKVlrR5xV0gHPbY+4kKmmF1WY+8H+M9B0psxISWmGz2FVgBqU9huy3KkQTC3V
+         6bFgG7obRq96JTn8NkAYyml28WP2VHD9d/+A+rqpT96V3DLLPpHwRV7XeeOkj+s25kx6
+         TJ4Holc+whFhjUX0Gsmza/Wzb7jz00dboknTTWY0oha7C2dcZuPhkqMuEnqlYWWH1lIX
+         Juuy8ObgdDHPqRAFmGp5wCC1zlYuYDF+W2W+m+2TcowHRc+yRIheJtG0+PlOyAy8aJpY
+         JXrUdgOc6WjB5VwDUBExmoEkoLEcmbh79m5h5PksiZ62NmruVMZRl2dokqfkj2USAktx
+         mZkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=KslgnjbYCZy+RC57ZlL0pYo5UT2utIjDNcmnyodLbb4=;
-        b=IzkBhpQNdvYBoJP8nNMBWRy2fZhY5HOZeHfi8FCN9s1xBMgbL+V/UMT2lJi1fCvGDA
-         OiWzSBSAqRAHJgL042gzbLQ4UBiZHp+iDLruDUS3DtIEPFeHdfl4eskuvftGOGNwy3Tl
-         4CTNK3vXuMS1QeUsroA1p/SfFiCal+ueJp0XuDXtHpaQT2awZYmWcixGveJH1oEzIMtc
-         MBEJbFFgqbv8CFuM//ZmqDUZYC1U/SWT5nfbW1F1hwafApZRAzGmoLh5WuVkhrR5avxb
-         4YDjOcnl8/yiGZCkypmrzyknHAv6IP+ocTCQS0MePuo+yXp40kRXfaBQE5F+bxWJ7YAN
-         Dhog==
-X-Gm-Message-State: AOAM530URHF9Q8lj4zzkKC/eVXwfDPXmPUXbVUIBrergURqvMP0PE51a
-        H7QtWlNibXpLkQ26JMf+On4YdA==
-X-Google-Smtp-Source: ABdhPJydAWW3DEffEILPWDD4OW996Ze0tqBY9UvoB/z8q/qtxrBuRCzG4CK+M8gIY/YrqzWEtsn8HQ==
-X-Received: by 2002:a17:902:d645:b0:158:f267:83b1 with SMTP id y5-20020a170902d64500b00158f26783b1mr25064870plh.11.1650999190315;
-        Tue, 26 Apr 2022 11:53:10 -0700 (PDT)
+        bh=D+SXwT/SJ1BJbq87GGWyit7MKCT0yhEbjDVEHkS9JaY=;
+        b=rz/ja8DOwJ18hCGG489ASqMvbvqhQi6VDGpFLFIl7hcATmSSTVnFDq5FfVSfFwp+b0
+         Yhu9eYSI6S9j5TV1wU9fBfoavKwFfmWItcvV3okfoClB4ZJWgLfbuNv/o0MpsKAPDbPd
+         /8ilkCU8cszLisOkzY7LKyRq/qx8LGOrZNALN/p40yYboOAu+WGK1l5L4rladFtQoCui
+         OJro0f3N+l3zP+dG5wKw+3y5yQ8lNNmaMAnBXVAvoDev4gaSToBC3knKNKvxI4eGcDJt
+         l1sqsF6nLC2p63GU5WXDJAlefwbHK79WxMQ3K8+MCC+fjYvZBfj6/82kPWn7w/F84rVM
+         JUCQ==
+X-Gm-Message-State: AOAM530MjRBB7n//d2XUOrjjEbfjtQjKEnKAANhWt//9WQDHvmheQPae
+        kg8y5AaCiqOs9i5hYQM+ALqrXQ==
+X-Google-Smtp-Source: ABdhPJzuRCCRkiCXmkQ4uct0ET1s6jpxuw4eppcALK9l9iv3G2BJT4A0mDWv47ZfhzCx8cMo3QuMAQ==
+X-Received: by 2002:a17:90a:f3c7:b0:1d9:6832:7be0 with SMTP id ha7-20020a17090af3c700b001d968327be0mr14406860pjb.209.1650999192070;
+        Tue, 26 Apr 2022 11:53:12 -0700 (PDT)
 Received: from atishp.ba.rivosinc.com ([66.220.2.162])
-        by smtp.gmail.com with ESMTPSA id cl18-20020a17090af69200b001cd4989ff5asm3839664pjb.33.2022.04.26.11.53.08
+        by smtp.gmail.com with ESMTPSA id cl18-20020a17090af69200b001cd4989ff5asm3839664pjb.33.2022.04.26.11.53.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Apr 2022 11:53:09 -0700 (PDT)
+        Tue, 26 Apr 2022 11:53:11 -0700 (PDT)
 From:   Atish Patra <atishp@rivosinc.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Atish Patra <atishp@rivosinc.com>,
@@ -60,71 +60,76 @@ Cc:     Atish Patra <atishp@rivosinc.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
         Rob Herring <robh+dt@kernel.org>
-Subject: [PATCH v3 2/4] RISC-V: Enable sstc extension parsing from DT
-Date:   Tue, 26 Apr 2022 11:52:43 -0700
-Message-Id: <20220426185245.281182-3-atishp@rivosinc.com>
+Subject: [PATCH v3 3/4] RISC-V: Prefer sstc extension if available
+Date:   Tue, 26 Apr 2022 11:52:44 -0700
+Message-Id: <20220426185245.281182-4-atishp@rivosinc.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220426185245.281182-1-atishp@rivosinc.com>
 References: <20220426185245.281182-1-atishp@rivosinc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The ISA extension framework now allows parsing any multi-letter
-ISA extension.
-
-Enable that for sstc extension.
+RISC-V ISA has sstc extension which allows updating the next clock event
+via a CSR (stimecmp) instead of an SBI call. This should happen dynamically
+if sstc extension is available. Otherwise, it will fallback to SBI call
+to maintain backward compatibility.
 
 Signed-off-by: Atish Patra <atishp@rivosinc.com>
 ---
- arch/riscv/include/asm/hwcap.h | 1 +
- arch/riscv/kernel/cpu.c        | 1 +
- arch/riscv/kernel/cpufeature.c | 1 +
- 3 files changed, 3 insertions(+)
+ drivers/clocksource/timer-riscv.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
-index 0734e42f74f2..25915eb60d61 100644
---- a/arch/riscv/include/asm/hwcap.h
-+++ b/arch/riscv/include/asm/hwcap.h
-@@ -52,6 +52,7 @@ extern unsigned long elf_hwcap;
-  */
- enum riscv_isa_ext_id {
- 	RISCV_ISA_EXT_SSCOFPMF = RISCV_ISA_EXT_BASE,
-+	RISCV_ISA_EXT_SSTC,
- 	RISCV_ISA_EXT_ID_MAX = RISCV_ISA_EXT_MAX,
- };
+diff --git a/drivers/clocksource/timer-riscv.c b/drivers/clocksource/timer-riscv.c
+index 1767f8bf2013..d9398ae84a20 100644
+--- a/drivers/clocksource/timer-riscv.c
++++ b/drivers/clocksource/timer-riscv.c
+@@ -23,11 +23,24 @@
+ #include <asm/sbi.h>
+ #include <asm/timex.h>
  
-diff --git a/arch/riscv/kernel/cpu.c b/arch/riscv/kernel/cpu.c
-index ccb617791e56..ca0e4c0db17e 100644
---- a/arch/riscv/kernel/cpu.c
-+++ b/arch/riscv/kernel/cpu.c
-@@ -88,6 +88,7 @@ int riscv_of_parent_hartid(struct device_node *node)
-  */
- static struct riscv_isa_ext_data isa_ext_arr[] = {
- 	__RISCV_ISA_EXT_DATA(sscofpmf, RISCV_ISA_EXT_SSCOFPMF),
-+	__RISCV_ISA_EXT_DATA(sstc, RISCV_ISA_EXT_SSTC),
- 	__RISCV_ISA_EXT_DATA("", RISCV_ISA_EXT_MAX),
- };
++static DEFINE_STATIC_KEY_FALSE(riscv_sstc_available);
++
+ static int riscv_clock_next_event(unsigned long delta,
+ 		struct clock_event_device *ce)
+ {
++	uint64_t next_tval = get_cycles64() + delta;
++
+ 	csr_set(CSR_IE, IE_TIE);
+-	sbi_set_timer(get_cycles64() + delta);
++	if (static_branch_likely(&riscv_sstc_available)) {
++#if __riscv_xlen == 32
++		csr_write(CSR_STIMECMP, next_tval & 0xFFFFFFFF);
++		csr_write(CSR_STIMECMPH, next_tval >> 32);
++#else
++		csr_write(CSR_STIMECMP, next_tval);
++#endif
++	} else
++		sbi_set_timer(next_tval);
++
+ 	return 0;
+ }
  
-diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-index 1b2d42d7f589..a214537c22f1 100644
---- a/arch/riscv/kernel/cpufeature.c
-+++ b/arch/riscv/kernel/cpufeature.c
-@@ -192,6 +192,7 @@ void __init riscv_fill_hwcap(void)
- 				set_bit(*ext - 'a', this_isa);
- 			} else {
- 				SET_ISA_EXT_MAP("sscofpmf", RISCV_ISA_EXT_SSCOFPMF);
-+				SET_ISA_EXT_MAP("sstc", RISCV_ISA_EXT_SSTC);
- 			}
- #undef SET_ISA_EXT_MAP
- 		}
+@@ -165,6 +178,12 @@ static int __init riscv_timer_init_dt(struct device_node *n)
+ 	if (error)
+ 		pr_err("cpu hp setup state failed for RISCV timer [%d]\n",
+ 		       error);
++
++	if (riscv_isa_extension_available(NULL, SSTC)) {
++		pr_info("Timer interrupt in S-mode is available via sstc extension\n");
++		static_branch_enable(&riscv_sstc_available);
++	}
++
+ 	return error;
+ }
+ 
 -- 
 2.25.1
 
