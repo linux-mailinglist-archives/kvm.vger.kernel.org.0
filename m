@@ -2,170 +2,367 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 899075124FD
-	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 00:04:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A94A512523
+	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 00:15:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238081AbiD0WIB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 18:08:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54462 "EHLO
+        id S232813AbiD0WSY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 18:18:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237989AbiD0WH7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 18:07:59 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A764D82D37
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 15:04:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 57E3EB82AE8
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 22:04:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 061F1C385A9;
-        Wed, 27 Apr 2022 22:04:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1651097085;
-        bh=pd+ppBS4AMOOPk2OjVc3EDZ0y0+9s9EffkC7oPOrVaA=;
-        h=From:To:Cc:Subject:Date:From;
-        b=bNd0y9GXq5k/qn0mRLOX7NDrArqeGsR6IzOkgOvtveIcb8irWHjo6I8JXX7U6wfyF
-         lSrhzyx70dySogcKsWMtoVQq6oIOmNNbCICS6dDL+/oZOdMfw6v5Mk8YKjwLBZuwpY
-         6S6KEf99Zgjmx7/E0G7xXPQ0UcSzp7GrviE+cej2UfIYUzShMMV7wHSCxU5f9lcDzj
-         iXESud4NQi2xXHC36GuAS80f/ZCigDGqxr4GR1wDf1L/9LKCPpni4Yni/OFOslwkrd
-         dPpD919UPz2vAnTUBWgdNUsJ3qj6Z7xcNzzc2IxImlr1bqM8rvg1NlY4ft29WNSogB
-         AzQErIphDSG5w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1njpm6-007U5C-Ix; Wed, 27 Apr 2022 23:04:42 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com, Quentin Perret <qperret@google.com>,
-        Will Deacon <will@kernel.org>,
-        Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH v2] KVM: arm64: Inject exception on out-of-IPA-range translation fault
-Date:   Wed, 27 Apr 2022 23:04:34 +0100
-Message-Id: <20220427220434.3097449-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S231854AbiD0WSW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 18:18:22 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9786F4E;
+        Wed, 27 Apr 2022 15:15:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651097708; x=1682633708;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=jpZdoeK9eUzaFjNG4QfNjD/n0e3XLLZ4Yvx414M0eCc=;
+  b=c0AkGDUVTnpoEtdRpeNJI/9b0Kn7Y1PgHeyaIPnB0zOftC6zj4v/Jve2
+   b1qUHRUfIa9VXr3jclkjPs+kUV8UYIf6AbBWWVewFaqtMF+nF5HS0/Jsx
+   KVFKq51dvH1bWe0/I83Ood4LXW4eCbJEUlN4L2L/X92AelOeWN+TEQ4K7
+   po/keeQ0rj5YBi4/UW9gFNonkvNHEDZZ6HFqpYYYUihkbPDghnnkDUseu
+   dSnLuGoZ2VT7AJnVG68mt+HLDMfAcQ3+5XqjDiEzBlL8mh8AIQb8fvW/j
+   WOn4P3fm0UO/f7nl6w1mQiim7lpMf38FH5vMeR0YaRhZT4xX1PUSIBuPx
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10330"; a="263672396"
+X-IronPort-AV: E=Sophos;i="5.90,294,1643702400"; 
+   d="scan'208";a="263672396"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 15:14:54 -0700
+X-IronPort-AV: E=Sophos;i="5.90,294,1643702400"; 
+   d="scan'208";a="513911851"
+Received: from lcdaughe-mobl1.amr.corp.intel.com (HELO [10.212.72.252]) ([10.212.72.252])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 15:14:53 -0700
+Message-ID: <f929fb7a-5bdc-2567-77aa-762a098c8513@intel.com>
+Date:   Wed, 27 Apr 2022 15:15:08 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com, qperret@google.com, will@kernel.org, christoffer.dall@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v3 09/21] x86/virt/tdx: Get information about TDX module
+ and convertible memory
+Content-Language: en-US
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com
+References: <cover.1649219184.git.kai.huang@intel.com>
+ <145620795852bf24ba2124a3f8234fd4aaac19d4.1649219184.git.kai.huang@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <145620795852bf24ba2124a3f8234fd4aaac19d4.1649219184.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-9.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When taking a translation fault for an IPA that is outside of
-the range defined by the hypervisor (between the HW PARange and
-the IPA range), we stupidly treat it as an IO and forward the access
-to userspace. Of course, userspace can't do much with it, and things
-end badly.
+On 4/5/22 21:49, Kai Huang wrote:
+> TDX provides increased levels of memory confidentiality and integrity.
+> This requires special hardware support for features like memory
+> encryption and storage of memory integrity checksums.  Not all memory
+> satisfies these requirements.
+> 
+> As a result, TDX introduced the concept of a "Convertible Memory Region"
+> (CMR).  During boot, the firmware builds a list of all of the memory
+> ranges which can provide the TDX security guarantees.  The list of these
+> ranges, along with TDX module information, is available to the kernel by
+> querying the TDX module via TDH.SYS.INFO SEAMCALL.
+> 
+> Host kernel can choose whether or not to use all convertible memory
+> regions as TDX memory.  Before TDX module is ready to create any TD
+> guests, all TDX memory regions that host kernel intends to use must be
+> configured to the TDX module, using specific data structures defined by
+> TDX architecture.  Constructing those structures requires information of
+> both TDX module and the Convertible Memory Regions.  Call TDH.SYS.INFO
+> to get this information as preparation to construct those structures.
+> 
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> ---
+>  arch/x86/virt/vmx/tdx/tdx.c | 131 ++++++++++++++++++++++++++++++++++++
+>  arch/x86/virt/vmx/tdx/tdx.h |  61 +++++++++++++++++
+>  2 files changed, 192 insertions(+)
+> 
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index ef2718423f0f..482e6d858181 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -80,6 +80,11 @@ static DEFINE_MUTEX(tdx_module_lock);
+>  
+>  static struct p_seamldr_info p_seamldr_info;
+>  
+> +/* Base address of CMR array needs to be 512 bytes aligned. */
+> +static struct cmr_info tdx_cmr_array[MAX_CMRS] __aligned(CMR_INFO_ARRAY_ALIGNMENT);
+> +static int tdx_cmr_num;
+> +static struct tdsysinfo_struct tdx_sysinfo;
 
-Arguably, the guest is braindead, but we should at least catch the
-case and inject an exception.
+I really dislike mixing hardware and software structures.  Please make
+it clear which of these are fully software-defined and which are part of
+the hardware ABI.
 
-Check the faulting IPA against:
-- the sanitised PARange: inject an address size fault
-- the IPA size: inject an abort
+>  static bool __seamrr_enabled(void)
+>  {
+>  	return (seamrr_mask & SEAMRR_ENABLED_BITS) == SEAMRR_ENABLED_BITS;
+> @@ -468,6 +473,127 @@ static int tdx_module_init_cpus(void)
+>  	return seamcall_on_each_cpu(&sc);
+>  }
+>  
+> +static inline bool cmr_valid(struct cmr_info *cmr)
+> +{
+> +	return !!cmr->size;
+> +}
+> +
+> +static void print_cmrs(struct cmr_info *cmr_array, int cmr_num,
+> +		       const char *name)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < cmr_num; i++) {
+> +		struct cmr_info *cmr = &cmr_array[i];
+> +
+> +		pr_info("%s : [0x%llx, 0x%llx)\n", name,
+> +				cmr->base, cmr->base + cmr->size);
+> +	}
+> +}
+> +
+> +static int sanitize_cmrs(struct cmr_info *cmr_array, int cmr_num)
+> +{
+> +	int i, j;
+> +
+> +	/*
+> +	 * Intel TDX module spec, 20.7.3 CMR_INFO:
+> +	 *
+> +	 *   TDH.SYS.INFO leaf function returns a MAX_CMRS (32) entry
+> +	 *   array of CMR_INFO entries. The CMRs are sorted from the
+> +	 *   lowest base address to the highest base address, and they
+> +	 *   are non-overlapping.
+> +	 *
+> +	 * This implies that BIOS may generate invalid empty entries
+> +	 * if total CMRs are less than 32.  Skip them manually.
+> +	 */
+> +	for (i = 0; i < cmr_num; i++) {
+> +		struct cmr_info *cmr = &cmr_array[i];
+> +		struct cmr_info *prev_cmr = NULL;
+> +
+> +		/* Skip further invalid CMRs */
+> +		if (!cmr_valid(cmr))
+> +			break;
+> +
+> +		if (i > 0)
+> +			prev_cmr = &cmr_array[i - 1];
+> +
+> +		/*
+> +		 * It is a TDX firmware bug if CMRs are not
+> +		 * in address ascending order.
+> +		 */
+> +		if (prev_cmr && ((prev_cmr->base + prev_cmr->size) >
+> +					cmr->base)) {
+> +			pr_err("Firmware bug: CMRs not in address ascending order.\n");
+> +			return -EFAULT;
 
-Reported-by: Christoffer Dall <christoffer.dall@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_emulate.h |  1 +
- arch/arm64/kvm/inject_fault.c        | 28 ++++++++++++++++++++++++++++
- arch/arm64/kvm/mmu.c                 | 19 +++++++++++++++++++
- 3 files changed, 48 insertions(+)
+-EFAULT is a really weird return code to use for this.  I'd use -EINVAL.
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 7496deab025a..f71358271b71 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -40,6 +40,7 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
- void kvm_inject_vabt(struct kvm_vcpu *vcpu);
- void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
- void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
-+void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
- 
- void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
- 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index b47df73e98d7..ba20405d2dc2 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -145,6 +145,34 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
- 		inject_abt64(vcpu, true, addr);
- }
- 
-+void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
-+{
-+	unsigned long addr, esr;
-+
-+	addr  = kvm_vcpu_get_fault_ipa(vcpu);
-+	addr |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
-+
-+	if (kvm_vcpu_trap_is_iabt(vcpu))
-+		kvm_inject_pabt(vcpu, addr);
-+	else
-+		kvm_inject_dabt(vcpu, addr);
-+
-+	/*
-+	 * If AArch64 or LPAE, set FSC to 0 to indicate an Address
-+	 * Size Fault at level 0, as if exceeding PARange.
-+	 *
-+	 * Non-LPAE guests will only get the external abort, as there
-+	 * is no way to to describe the ASF.
-+	 */
-+	if (vcpu_el1_is_32bit(vcpu) &&
-+	    !(vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE))
-+		return;
-+
-+	esr = vcpu_read_sys_reg(vcpu, ESR_EL1);
-+	esr &= ~GENMASK_ULL(5, 0);
-+	vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
-+}
-+
- /**
-  * kvm_inject_undefined - inject an undefined instruction into the guest
-  * @vcpu: The vCPU in which to inject the exception
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 53ae2c0640bc..5400fc020164 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1337,6 +1337,25 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
- 	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
- 
-+	if (fault_status == FSC_FAULT) {
-+		/* Beyond sanitised PARange (which is the IPA limit) */
-+		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
-+			kvm_inject_size_fault(vcpu);
-+			return 1;
-+		}
-+
-+		/* Falls between the IPA range and the PARange? */
-+		if (fault_ipa >= BIT_ULL(vcpu->arch.hw_mmu->pgt->ia_bits)) {
-+			fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
-+
-+			if (is_iabt)
-+				kvm_inject_pabt(vcpu, fault_ipa);
-+			else
-+				kvm_inject_dabt(vcpu, fault_ipa);
-+			return 1;
-+		}
-+	}
-+
- 	/* Synchronous External Abort? */
- 	if (kvm_vcpu_abt_issea(vcpu)) {
- 		/*
--- 
-2.34.1
+> +		}
+> +	}
+> +
+> +	/*
+> +	 * Also a sane BIOS should never generate invalid CMR(s) between
+> +	 * two valid CMRs.  Sanity check this and simply return error in
+> +	 * this case.
+> +	 *
+> +	 * By reaching here @i is the index of the first invalid CMR (or
+> +	 * cmr_num).  Starting with next entry of @i since it has already
+> +	 * been checked.
+> +	 */
+> +	for (j = i + 1; j < cmr_num; j++)
+> +		if (cmr_valid(&cmr_array[j])) {
+> +			pr_err("Firmware bug: invalid CMR(s) among valid CMRs.\n");
+> +			return -EFAULT;
+> +		}
+
+Please add brackets for the for().
+
+> +	/*
+> +	 * Trim all tail invalid empty CMRs.  BIOS should generate at
+> +	 * least one valid CMR, otherwise it's a TDX firmware bug.
+> +	 */
+> +	tdx_cmr_num = i;
+> +	if (!tdx_cmr_num) {
+> +		pr_err("Firmware bug: No valid CMR.\n");
+> +		return -EFAULT;
+> +	}
+> +
+> +	/* Print kernel sanitized CMRs */
+> +	print_cmrs(tdx_cmr_array, tdx_cmr_num, "Kernel-sanitized-CMR");
+> +
+> +	return 0;
+> +}
+> +
+> +static int tdx_get_sysinfo(void)
+> +{
+> +	struct tdx_module_output out;
+> +	u64 tdsysinfo_sz, cmr_num;
+> +	int ret;
+> +
+> +	BUILD_BUG_ON(sizeof(struct tdsysinfo_struct) != TDSYSINFO_STRUCT_SIZE);
+> +
+> +	ret = seamcall(TDH_SYS_INFO, __pa(&tdx_sysinfo), TDSYSINFO_STRUCT_SIZE,
+> +			__pa(tdx_cmr_array), MAX_CMRS, NULL, &out);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/*
+> +	 * If TDH.SYS.CONFIG succeeds, RDX contains the actual bytes
+> +	 * written to @tdx_sysinfo and R9 contains the actual entries
+> +	 * written to @tdx_cmr_array.  Sanity check them.
+> +	 */
+> +	tdsysinfo_sz = out.rdx;
+> +	cmr_num = out.r9;
+
+Please vertically align things like this:
+
+	tdsysinfo_sz = out.rdx;
+	cmr_num	     = out.r9;
+
+> +	if (WARN_ON_ONCE((tdsysinfo_sz > sizeof(tdx_sysinfo)) || !tdsysinfo_sz ||
+> +				(cmr_num > MAX_CMRS) || !cmr_num))
+> +		return -EFAULT;
+
+Sanity checking is good, but this makes me wonder how much is too much.
+ I don't see a lot of code for instance checking if sys_write() writes
+more than how much it was supposed to.
+
+Why are these sanity checks necessary here?  Is the TDX module expected
+to be *THAT* buggy?  The thing that's providing, oh, basically all of
+the security guarantees of this architecture.  It's overflowing the
+buffers you hand it?
+
+> +	pr_info("TDX module: vendor_id 0x%x, major_version %u, minor_version %u, build_date %u, build_num %u",
+> +		tdx_sysinfo.vendor_id, tdx_sysinfo.major_version,
+> +		tdx_sysinfo.minor_version, tdx_sysinfo.build_date,
+> +		tdx_sysinfo.build_num);
+> +
+> +	/* Print BIOS provided CMRs */
+> +	print_cmrs(tdx_cmr_array, cmr_num, "BIOS-CMR");
+> +
+> +	return sanitize_cmrs(tdx_cmr_array, cmr_num);
+> +}
+
+Does sanitize_cmrs() sanitize anything?  It looks to me like it *checks*
+the CMRs.  But, sanitizing is an active operation that writes to the
+data being sanitized.  This looks read-only to me.  check_cmrs() would
+be a better name for a passive check.
+
+>  static int init_tdx_module(void)
+>  {
+>  	int ret;
+> @@ -482,6 +608,11 @@ static int init_tdx_module(void)
+>  	if (ret)
+>  		goto out;
+>  
+> +	/* Get TDX module information and CMRs */
+> +	ret = tdx_get_sysinfo();
+> +	if (ret)
+> +		goto out;
+
+Couldn't we get rid of that comment if you did something like:
+
+	ret = tdx_get_sysinfo(&tdx_cmr_array, &tdx_sysinfo);
+
+and preferably make the variables function-local.
+
+>  	/*
+>  	 * Return -EFAULT until all steps of TDX module
+>  	 * initialization are done.
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
+> index b8cfdd6e12f3..2f21c45df6ac 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.h
+> +++ b/arch/x86/virt/vmx/tdx/tdx.h
+> @@ -29,6 +29,66 @@ struct p_seamldr_info {
+>  	u8	reserved2[88];
+>  } __packed __aligned(P_SEAMLDR_INFO_ALIGNMENT);
+>  
+> +struct cmr_info {
+> +	u64	base;
+> +	u64	size;
+> +} __packed;
+> +
+> +#define MAX_CMRS			32
+> +#define CMR_INFO_ARRAY_ALIGNMENT	512
+> +
+> +struct cpuid_config {
+> +	u32	leaf;
+> +	u32	sub_leaf;
+> +	u32	eax;
+> +	u32	ebx;
+> +	u32	ecx;
+> +	u32	edx;
+> +} __packed;
+> +
+> +#define TDSYSINFO_STRUCT_SIZE		1024
+> +#define TDSYSINFO_STRUCT_ALIGNMENT	1024
+> +
+> +struct tdsysinfo_struct {
+> +	/* TDX-SEAM Module Info */
+> +	u32	attributes;
+> +	u32	vendor_id;
+> +	u32	build_date;
+> +	u16	build_num;
+> +	u16	minor_version;
+> +	u16	major_version;
+> +	u8	reserved0[14];
+> +	/* Memory Info */
+> +	u16	max_tdmrs;
+> +	u16	max_reserved_per_tdmr;
+> +	u16	pamt_entry_size;
+> +	u8	reserved1[10];
+> +	/* Control Struct Info */
+> +	u16	tdcs_base_size;
+> +	u8	reserved2[2];
+> +	u16	tdvps_base_size;
+> +	u8	tdvps_xfam_dependent_size;
+> +	u8	reserved3[9];
+> +	/* TD Capabilities */
+> +	u64	attributes_fixed0;
+> +	u64	attributes_fixed1;
+> +	u64	xfam_fixed0;
+> +	u64	xfam_fixed1;
+> +	u8	reserved4[32];
+> +	u32	num_cpuid_config;
+> +	/*
+> +	 * The actual number of CPUID_CONFIG depends on above
+> +	 * 'num_cpuid_config'.  The size of 'struct tdsysinfo_struct'
+> +	 * is 1024B defined by TDX architecture.  Use a union with
+> +	 * specific padding to make 'sizeof(struct tdsysinfo_struct)'
+> +	 * equal to 1024.
+> +	 */
+> +	union {
+> +		struct cpuid_config	cpuid_configs[0];
+> +		u8			reserved5[892];
+> +	};
+> +} __packed __aligned(TDSYSINFO_STRUCT_ALIGNMENT);
+> +
+>  /*
+>   * P-SEAMLDR SEAMCALL leaf function
+>   */
+> @@ -38,6 +98,7 @@ struct p_seamldr_info {
+>  /*
+>   * TDX module SEAMCALL leaf functions
+>   */
+> +#define TDH_SYS_INFO		32
+>  #define TDH_SYS_INIT		33
+>  #define TDH_SYS_LP_INIT		35
+>  #define TDH_SYS_LP_SHUTDOWN	44
 
