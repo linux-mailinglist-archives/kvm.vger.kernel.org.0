@@ -2,68 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 614CC510E9A
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 04:21:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 813FB510F0C
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 04:57:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357164AbiD0CXY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 22:23:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35956 "EHLO
+        id S1357309AbiD0DAH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 23:00:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352947AbiD0CXW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Apr 2022 22:23:22 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44E205FC9
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 19:20:08 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id j8so369142pll.11
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 19:20:08 -0700 (PDT)
+        with ESMTP id S1357302AbiD0DAE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Apr 2022 23:00:04 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71F7416E698
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 19:56:51 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id a15so436520pfv.11
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 19:56:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=JBEck0eZfunlgydBxrnMtDgPMmvndDpR2yeT/EWK+G8=;
-        b=oaeV2vz9Hp+gQc9pd3fIHB7se2vGDwIRqj+dRAzOh9RICJoiJyunceiVBfKyzA7lBd
-         A6PtanwAVGTDAbj3HAmjw25Od1JiqyUbsc7RrTj+EKm86Hd/Mk4yRrk3JWrvUYUp3cA5
-         SJPPRj4Ii4+ZJep3RNwvgQIhGF8NtGZrHP09Cd8BC7KyqknkzQ1QWEi+MXS+/7SHIDRv
-         ylxS1qbw0y+7AzYsHMFCbVhTf4JsxW2HqSPClEBqvIt9ee6lns5vrkn89w0Zza1ZdPNz
-         GTvdH3Mg3PfroYyulMjzOAI3FM/Y22gOhtr/Bzkh4IJZ+FxIx2uqlb9ltzNStQU1eymI
-         zxPg==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Yvjyzv+d2RYx84AGU+f8Qgb5Z5AEIzJBRa0zZaQL6P8=;
+        b=jCPnHtoKm8g7mbup94ckl16T0R2qbP3Lzt1JMIL7mLKALfxpCjk691OoBHp90yEkdG
+         uyNAhHWeqGd1M4GjcWCFjSg71B6RFukRLbJNYmGtWDhWXOM8ihs8n1dj4b2LY5U0xrnS
+         o6ZUV+Ig063VrlpUNkybJl8mAyWIN8HnIeLTpYhozWJpDDgd2lfqDovBkGvm/LUSivcL
+         opirRHygw9hYsMirg3JAMIWRikwU5TZ308ZptchlsaLSeYISk1gU4m8YFZTkPHBknQiT
+         gGg8me8PQIzO/+sCEyzNZPeNDF31/s28sZK6b5ee9LLPMs7TNVj8ekdNGGvctvcQD+3W
+         xUjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=JBEck0eZfunlgydBxrnMtDgPMmvndDpR2yeT/EWK+G8=;
-        b=et2G5bQjcfJAk9Wqj9iMIgXFIYVooVMLm7gK2Qz9KpQQ5B+b+tyGJvLXnDpksGxQIc
-         sI7xM1swG1bc7UVL9afnh2YldiYGvfy4iE+e8ljAnS5NAr7u8l+5YLfa3KsX7/SLQcdn
-         4UhcVpPoxAeg7VSvqEypTTklGx/GO3DWCCC1vB+sDDTjKKZvvu8QLlVbxh6sbvtllvUv
-         MwLpEQxLbJlPbX6BevCaGqZKqXzKia68e2NuYXAutVxg0VtXlxsE9jzYduDkHLxBBWUb
-         ebTMKqTGjnG+ub7iy9DWtJsYcUvmNL8dulGUqImR2swlhccfW7PKJGdCxFgxj/sK2hD+
-         nq3A==
-X-Gm-Message-State: AOAM531j/o3ih1mJDia+5rbxIzZ/Qcv2UEga3HW+4rhzXSPHLRGiP9if
-        5i24hM8Nv9IBt/cYsnAEqmQm7A==
-X-Google-Smtp-Source: ABdhPJwoWGWtzGrXdMPSm0vyj8T+XpUOnjfyNDPm7Yld1QcS+RvJMc3znjCDnG77ukIGvQQj/s94Hw==
-X-Received: by 2002:a17:902:e054:b0:15c:ed0d:f13f with SMTP id x20-20020a170902e05400b0015ced0df13fmr19042016plx.76.1651026007546;
-        Tue, 26 Apr 2022 19:20:07 -0700 (PDT)
-Received: from [10.255.73.91] ([139.177.225.254])
-        by smtp.gmail.com with ESMTPSA id y10-20020a17090a390a00b001cda0b69a30sm325224pjb.52.2022.04.26.19.20.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Apr 2022 19:20:06 -0700 (PDT)
-Message-ID: <61e9dfd1-a663-549e-112b-761398996c2d@bytedance.com>
-Date:   Wed, 27 Apr 2022 10:16:14 +0800
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Yvjyzv+d2RYx84AGU+f8Qgb5Z5AEIzJBRa0zZaQL6P8=;
+        b=5lif06VPSVA9Br8IdIVPqSphsFFW+OCt0E/zpDKwBXi7QpKWoN3kdnNNoNCI0MCI7Z
+         mXqbbZntq61O3iDfc6rb+VABmAB0UZp5Ci7bpK95IEE3mHOnqTfc6xITcoIyuzLHB4ZI
+         eeq/jrhzQTm07NdwjNtbCTe/ElyD2ABzNQ0QQ6BgAsKznMvjgMkmkp5CHc3adkAiFfk+
+         OHaQhjunuL7ad9k9kV8YLwdfXQBUxMHMx9msMgSuypSmY05C6lp9duGxoqxod/4tCMxw
+         xUubVaoXRYxpA1CCKIWwMTgIO81cR2RYXgx7CNrz1WMlqyInAisK8IvUEMjplQXW9u6E
+         jRJw==
+X-Gm-Message-State: AOAM531idpeNbvbZ7Nt8pLvmK9q7c27t8DSqqXOKtA73N8/PSJ8QHyEs
+        Zht+tc2EfBsTrT6IbjIks+FQf69O+Tdx5lUD8uRQww==
+X-Google-Smtp-Source: ABdhPJxjMQtgaZowpVzhPTfplAUMsciMKvA2x/OchoocOj74xMII/JAAJWINHNcc3E1AjGbVUHyB30xLa/zPu6vL0zk=
+X-Received: by 2002:a63:6809:0:b0:3aa:93f5:c6f3 with SMTP id
+ d9-20020a636809000000b003aa93f5c6f3mr22309806pgc.342.1651028210725; Tue, 26
+ Apr 2022 19:56:50 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: PING: [PATCH] KVM: HWPoison: Fix memory address&size during remap
-Content-Language: en-US
-To:     pbonzini@redhat.com, peter.maydell@linaro.org, mtosatti@redhat.com
-Cc:     kvm@vger.kernel.org, qemu-devel@nongnu.org
-References: <20220420064542.423508-1-pizhenwei@bytedance.com>
-From:   zhenwei pi <pizhenwei@bytedance.com>
-In-Reply-To: <20220420064542.423508-1-pizhenwei@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <20220327205803.739336-1-mizhang@google.com> <YkHRYY6x1Ewez/g4@google.com>
+ <CAL715WL7ejOBjzXy9vbS_M2LmvXcC-CxmNr+oQtCZW0kciozHA@mail.gmail.com>
+ <YkH7KZbamhKpCidK@google.com> <7597fe2c-ce04-0e21-bd6c-4051d7d5101d@redhat.com>
+ <Ymg1lzsYAd6v/vGw@google.com> <CAL715WK8-cOJWK+iai=ygdOTzPb-QUvEwa607tVEkmGOu3gyQA@mail.gmail.com>
+ <YmiZcZf9YXxMVcfx@google.com> <CAL715W+nMyF_f762Qif8ZsiOT8vgxXJ3Rm8EjgG8A=b7iM-cbg@mail.gmail.com>
+ <YmiczBawg5s1z2DN@google.com>
+In-Reply-To: <YmiczBawg5s1z2DN@google.com>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Tue, 26 Apr 2022 19:56:39 -0700
+Message-ID: <CAL715W+iZ+uwctT80pcsBrHsF96zWZMAfeVgvWcvvboLz0MkaQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/mmu: add lockdep check before lookup_address_in_mm()
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,191 +77,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Paolo & Peter
+On Tue, Apr 26, 2022 at 6:30 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Tue, Apr 26, 2022, Mingwei Zhang wrote:
+> > On Tue, Apr 26, 2022 at 6:16 PM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Tue, Apr 26, 2022, Mingwei Zhang wrote:
+> > > > > I completely agree that lookup_address() and friends are unnecessarily fragile,
+> > > > > but I think that attempting to harden them to fix this KVM bug will open a can
+> > > > > of worms and end up delaying getting KVM fixed.
+> > > >
+> > > > So basically, we need to:
+> > > >  - choose perf_get_page_size() instead of using any of the
+> > > > lookup_address*() in mm.
+> > > >  - add a wrapper layer to adapt: 1) irq disabling/enabling and 2) size
+> > > > -> level translation.
+> > > >
+> > > > Agree?
+> > >
+> > > Drat, I didn't see that it returns the page size, not the level.  That's a bit
+> > > unfortunate.  It definitely makes me less averse to fixing lookup_address_in_pgd()
+> > >
+> > > Hrm.  I guess since we know there's at least one broken user, and in theory
+> > > fixing lookup_address_in_pgd() should do no harm to users that don't need protection,
+> > > it makes sense to just fix lookup_address_in_pgd() and see if the x86 maintainers
+> > > push back.
+> >
+> > Yeah, fixing lookup_address_in_pgd() should be cleaner(), since the
+> > page fault usage case does not need irq save/restore. But the other
+> > one needs it. So, we can easily fix the function with READ_ONCE and
+> > lockless staff. But wrapping the function with irq save/restore from
+> > the KVM side.
+>
+> I think it makes sense to do the save/restore in lookup_address_in_pgd().  The
+> Those helpers are exported, so odds are good there are broken users that will
+> benefit from fixing all paths.
 
-Could you please review this patch?
+no, lookup_address_in_pgd() is probably just broken for KVM. In other
+call sites, some may already disable IRQ, so doing that again inside
+lookup_address_in_pgd() will be bad.
 
-On 4/20/22 14:45, zhenwei pi wrote:
-> qemu exits during reset with log:
-> qemu-system-x86_64: Could not remap addr: 1000@22001000
-> 
-> Currently, after MCE on RAM of a guest, qemu records a ram_addr only,
-> remaps this address with a fixed size(TARGET_PAGE_SIZE) during reset.
-> In the hugetlbfs scenario, mmap(addr...) needs page_size aligned
-> address and correct size. Unaligned address leads mmap to fail.
-> 
-> What's more, hitting MCE on RAM of a guest, qemu records this address
-> and try to fix it during reset, this should be a common logic. So
-> remove kvm_hwpoison_page_add from architecture dependent code, record
-> this in SIGBUS handler instead. Finally poisoning/unpoisoning a page
-> gets static in kvm-all.c,
-> 
-> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
-> ---
->   accel/kvm/kvm-all.c      | 47 ++++++++++++++++++++++++++++++----------
->   include/sysemu/kvm_int.h | 12 ----------
->   target/arm/kvm64.c       |  1 -
->   target/i386/kvm/kvm.c    |  1 -
->   4 files changed, 36 insertions(+), 25 deletions(-)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 5f1377ca04..2a91c5a461 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -1167,11 +1167,14 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension)
->       return ret;
->   }
->   
-> +#ifdef KVM_HAVE_MCE_INJECTION
->   typedef struct HWPoisonPage {
->       ram_addr_t ram_addr;
-> +    size_t page_size; /* normal page or hugeTLB page? */
->       QLIST_ENTRY(HWPoisonPage) list;
->   } HWPoisonPage;
->   
-> +/* hwpoison_page_list stores the poisoned pages, unpoison them during reset */
->   static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
->       QLIST_HEAD_INITIALIZER(hwpoison_page_list);
->   
-> @@ -1181,25 +1184,48 @@ static void kvm_unpoison_all(void *param)
->   
->       QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
->           QLIST_REMOVE(page, list);
-> -        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
-> +        qemu_ram_remap(page->ram_addr, page->page_size);
->           g_free(page);
->       }
->   }
->   
-> -void kvm_hwpoison_page_add(ram_addr_t ram_addr)
-> +static void kvm_hwpoison_page_add(CPUState *cpu, int sigbus_code, void *addr)
->   {
->       HWPoisonPage *page;
-> +    ram_addr_t ram_addr, align_ram_addr;
-> +    ram_addr_t offset;
-> +    hwaddr paddr;
-> +    size_t page_size;
-> +
-> +    assert(sigbus_code == BUS_MCEERR_AR || sigbus_code == BUS_MCEERR_AO);
-> +    ram_addr = qemu_ram_addr_from_host(addr);
-> +    if (ram_addr == RAM_ADDR_INVALID ||
-> +        !kvm_physical_memory_addr_from_host(cpu->kvm_state, addr, &paddr)) {
-> +        /* only deal with valid guest RAM here */
-> +        return;
-> +    }
->   
-> +    /* get page size of RAM block, test it's a normal page or huge page */
-> +    page_size = qemu_ram_block_from_host(addr, false, &offset)->page_size;
-> +    align_ram_addr = QEMU_ALIGN_DOWN(ram_addr, page_size);
->       QLIST_FOREACH(page, &hwpoison_page_list, list) {
-> -        if (page->ram_addr == ram_addr) {
-> +        if (page->ram_addr == align_ram_addr) {
-> +            assert(page->page_size == page_size);
->               return;
->           }
->       }
-> -    page = g_new(HWPoisonPage, 1);
-> -    page->ram_addr = ram_addr;
-> +
-> +    page = g_new0(HWPoisonPage, 1);
-> +    page->ram_addr = align_ram_addr;
-> +    page->page_size = page_size;
->       QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
->   }
->   
-> +static __thread void *pending_sigbus_addr;
-> +static __thread int pending_sigbus_code;
-> +static __thread bool have_sigbus_pending;
-> +#endif
-> +
->   static uint32_t adjust_ioeventfd_endianness(uint32_t val, uint32_t size)
->   {
->   #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
-> @@ -2601,7 +2627,9 @@ static int kvm_init(MachineState *ms)
->           s->kernel_irqchip_split = mc->default_kernel_irqchip_split ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
->       }
->   
-> +#if defined KVM_HAVE_MCE_INJECTION
->       qemu_register_reset(kvm_unpoison_all, NULL);
-> +#endif
->   
->       if (s->kernel_irqchip_allowed) {
->           kvm_irqchip_create(s);
-> @@ -2782,12 +2810,6 @@ void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu)
->       run_on_cpu(cpu, do_kvm_cpu_synchronize_pre_loadvm, RUN_ON_CPU_NULL);
->   }
->   
-> -#ifdef KVM_HAVE_MCE_INJECTION
-> -static __thread void *pending_sigbus_addr;
-> -static __thread int pending_sigbus_code;
-> -static __thread bool have_sigbus_pending;
-> -#endif
-> -
->   static void kvm_cpu_kick(CPUState *cpu)
->   {
->       qatomic_set(&cpu->kvm_run->immediate_exit, 1);
-> @@ -2883,6 +2905,8 @@ int kvm_cpu_exec(CPUState *cpu)
->   #ifdef KVM_HAVE_MCE_INJECTION
->           if (unlikely(have_sigbus_pending)) {
->               qemu_mutex_lock_iothread();
-> +            kvm_hwpoison_page_add(cpu, pending_sigbus_code,
-> +                                  pending_sigbus_addr);
->               kvm_arch_on_sigbus_vcpu(cpu, pending_sigbus_code,
->                                       pending_sigbus_addr);
->               have_sigbus_pending = false;
-> @@ -3436,6 +3460,7 @@ int kvm_on_sigbus(int code, void *addr)
->        * we can only get action optional here.
->        */
->       assert(code != BUS_MCEERR_AR);
-> +    kvm_hwpoison_page_add(first_cpu, code, addr);
->       kvm_arch_on_sigbus_vcpu(first_cpu, code, addr);
->       return 0;
->   #else
-> diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-> index 1f5487d9b7..52ec8ef99c 100644
-> --- a/include/sysemu/kvm_int.h
-> +++ b/include/sysemu/kvm_int.h
-> @@ -40,16 +40,4 @@ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
->                                     AddressSpace *as, int as_id, const char *name);
->   
->   void kvm_set_max_memslot_size(hwaddr max_slot_size);
-> -
-> -/**
-> - * kvm_hwpoison_page_add:
-> - *
-> - * Parameters:
-> - *  @ram_addr: the address in the RAM for the poisoned page
-> - *
-> - * Add a poisoned page to the list
-> - *
-> - * Return: None.
-> - */
-> -void kvm_hwpoison_page_add(ram_addr_t ram_addr);
->   #endif
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index ccadfbbe72..a3184eb3d2 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -1450,7 +1450,6 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
->           ram_addr = qemu_ram_addr_from_host(addr);
->           if (ram_addr != RAM_ADDR_INVALID &&
->               kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
-> -            kvm_hwpoison_page_add(ram_addr);
->               /*
->                * If this is a BUS_MCEERR_AR, we know we have been called
->                * synchronously from the vCPU thread, so we can easily
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index 9cf8e03669..fb72b349ed 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -622,7 +622,6 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
->           ram_addr = qemu_ram_addr_from_host(addr);
->           if (ram_addr != RAM_ADDR_INVALID &&
->               kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
-> -            kvm_hwpoison_page_add(ram_addr);
->               kvm_mce_inject(cpu, paddr, code);
->   
->               /*
+I am looking at here:
+https://elixir.bootlin.com/linux/latest/source/arch/arm/kernel/traps.c#L304
 
--- 
-zhenwei pi
+so, the save/restore are done in oops_begin() and oops_end(), which is
+wrapping show_fault_oops() that calls lookup_address_in_pgd().
+
+So, I think we need to ensure the READ_ONCE.
+
+hmm, regarding the lockless macros, Paolo is right, for x86 it makes
+no difference. s390 seems to have a different implementation, but
+kvm_mmu_max_mapping_level() as well as host_pfn_mapping_level are both
+functions in x86 mmu.
+
+Thanks.
+-Mingwei
