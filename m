@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D34751234D
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 22:03:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46D7E512353
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 22:03:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235403AbiD0UG4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 16:06:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58636 "EHLO
+        id S235420AbiD0UHD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 16:07:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235244AbiD0UGt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 16:06:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E55DD10C4
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 13:03:35 -0700 (PDT)
+        with ESMTP id S235372AbiD0UGy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 16:06:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 41A7811C10
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 13:03:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651089815;
+        s=mimecast20190719; t=1651089818;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=O/591BE30Gw+sLgR7wcCQy4XNcbdAfVRmL/PYPXct/c=;
-        b=XPkkeYEAWFap96lYZxwrLKAMl5g2xvRV6SZcEsytJrK2mZoVUj0SutUScXd36DMtPib1ZU
-        hJFDhXkoIqTqAJDY1vylPIwYQGr3Ozl5H4tghMIujI7p89iL+sku38GtrdUUnS0F3z7eX2
-        6mojn0yqqe3JJmF8IOk9ZcVfa4xEQCg=
+        bh=d3HuyXBj7sbCyPJII4k+rhKVq+N2QJKVq0tQDMGX/Io=;
+        b=FuE+7amN+W2X5i1vizgfckKJfGooRfXBGJ58X4RHv82Gc92RajdGedrhRBocmS0OwaY6Ex
+        CWqdASVPBUKOGJfqcGy3J+3A35MHKrm7nO40koKRb6Pfr4yxwu7KpGlEUm+AXiA/xSEyMY
+        KL1aFtoHVoyNx33EjOHKbjHUEqvtlHQ=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-550-dQOqBeYMObyNtmOAhvPWIA-1; Wed, 27 Apr 2022 16:03:30 -0400
-X-MC-Unique: dQOqBeYMObyNtmOAhvPWIA-1
+ us-mta-99-gDqYxOC3NJe1YVvQKWXlBQ-1; Wed, 27 Apr 2022 16:03:36 -0400
+X-MC-Unique: gDqYxOC3NJe1YVvQKWXlBQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 06EDD8039D7;
-        Wed, 27 Apr 2022 20:03:29 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 92F9D101AA44;
+        Wed, 27 Apr 2022 20:03:34 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.40.192.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6323F9E82;
-        Wed, 27 Apr 2022 20:03:23 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2AE3D9E82;
+        Wed, 27 Apr 2022 20:03:28 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Wanpeng Li <wanpengli@tencent.com>,
@@ -63,9 +63,9 @@ Cc:     Wanpeng Li <wanpengli@tencent.com>,
         intel-gvt-dev@lists.freedesktop.org,
         dri-devel@lists.freedesktop.org,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [RFC PATCH v3 01/19] KVM: x86: document AVIC/APICv inhibit reasons
-Date:   Wed, 27 Apr 2022 23:02:56 +0300
-Message-Id: <20220427200314.276673-2-mlevitsk@redhat.com>
+Subject: [RFC PATCH v3 02/19] KVM: x86: inhibit APICv/AVIC when the guest and/or host changes apic id/base from the defaults.
+Date:   Wed, 27 Apr 2022 23:02:57 +0300
+Message-Id: <20220427200314.276673-3-mlevitsk@redhat.com>
 In-Reply-To: <20220427200314.276673-1-mlevitsk@redhat.com>
 References: <20220427200314.276673-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -73,57 +73,123 @@ Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-These days there are too many AVIC/APICv inhibit
-reasons, and it doesn't hurt to have some documentation
-for them.
+Neither of these settings should be changed by the guest and it is
+a burden to support it in the acceleration code, so just inhibit
+it instead.
+
+Also add a boolean 'apic_id_changed' to indicate if apic id ever changed.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ arch/x86/include/asm/kvm_host.h |  3 +++
+ arch/x86/kvm/lapic.c            | 25 ++++++++++++++++++++++---
+ arch/x86/kvm/lapic.h            |  8 ++++++++
+ 3 files changed, 33 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index f164c6c1514a4..63eae00625bda 100644
+index 63eae00625bda..636df87542555 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1046,14 +1046,29 @@ struct kvm_x86_msr_filter {
- };
- 
- enum kvm_apicv_inhibit {
-+	/* APICv/AVIC is disabled by module param and/or not supported in hardware */
- 	APICV_INHIBIT_REASON_DISABLE,
-+	/* APICv/AVIC is inhibited because AutoEOI feature is being used by a HyperV guest*/
- 	APICV_INHIBIT_REASON_HYPERV,
-+	/* AVIC is inhibited on a CPU because it runs a nested guest */
- 	APICV_INHIBIT_REASON_NESTED,
-+	/* AVIC is inhibited due to wait for an irq window (AVIC doesn't support this) */
- 	APICV_INHIBIT_REASON_IRQWIN,
-+	/*
-+	 * AVIC is inhibited because i8254 're-inject' mode is used
-+	 * which needs EOI intercept which AVIC doesn't support
-+	 */
- 	APICV_INHIBIT_REASON_PIT_REINJ,
-+	/* AVIC is inhibited because the guest has x2apic in its CPUID*/
- 	APICV_INHIBIT_REASON_X2APIC,
-+	/* AVIC/APICv is inhibited because KVM_GUESTDBG_BLOCKIRQ was enabled */
- 	APICV_INHIBIT_REASON_BLOCKIRQ,
-+	/*
-+	 * AVIC/APICv is inhibited because the guest didn't yet
-+	 * enable kernel/split irqchip
-+	 */
+@@ -1070,6 +1070,8 @@ enum kvm_apicv_inhibit {
  	APICV_INHIBIT_REASON_ABSENT,
-+	/* AVIC is disabled because SEV doesn't support it */
+ 	/* AVIC is disabled because SEV doesn't support it */
  	APICV_INHIBIT_REASON_SEV,
++	/* APIC ID and/or APIC base was changed by the guest */
++	APICV_INHIBIT_REASON_RO_SETTINGS,
  };
  
+ struct kvm_arch {
+@@ -1258,6 +1260,7 @@ struct kvm_arch {
+ 	hpa_t	hv_root_tdp;
+ 	spinlock_t hv_root_tdp_lock;
+ #endif
++	bool apic_id_changed;
+ };
+ 
+ struct kvm_vm_stat {
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 66b0eb0bda94e..8996675b3ef4c 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2038,6 +2038,19 @@ static void apic_manage_nmi_watchdog(struct kvm_lapic *apic, u32 lvt0_val)
+ 	}
+ }
+ 
++static void kvm_lapic_check_initial_apic_id(struct kvm_lapic *apic)
++{
++	if (kvm_apic_has_initial_apic_id(apic))
++		return;
++
++	pr_warn_once("APIC ID change is unsupported by KVM");
++
++	kvm_set_apicv_inhibit(apic->vcpu->kvm,
++			APICV_INHIBIT_REASON_RO_SETTINGS);
++
++	apic->vcpu->kvm->arch.apic_id_changed = true;
++}
++
+ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+ {
+ 	int ret = 0;
+@@ -2046,9 +2059,11 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+ 
+ 	switch (reg) {
+ 	case APIC_ID:		/* Local APIC ID */
+-		if (!apic_x2apic_mode(apic))
++		if (!apic_x2apic_mode(apic)) {
++
+ 			kvm_apic_set_xapic_id(apic, val >> 24);
+-		else
++			kvm_lapic_check_initial_apic_id(apic);
++		} else
+ 			ret = 1;
+ 		break;
+ 
+@@ -2335,8 +2350,11 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
+ 			     MSR_IA32_APICBASE_BASE;
+ 
+ 	if ((value & MSR_IA32_APICBASE_ENABLE) &&
+-	     apic->base_address != APIC_DEFAULT_PHYS_BASE)
++	     apic->base_address != APIC_DEFAULT_PHYS_BASE) {
++		kvm_set_apicv_inhibit(apic->vcpu->kvm,
++				APICV_INHIBIT_REASON_RO_SETTINGS);
+ 		pr_warn_once("APIC base relocation is unsupported by KVM");
++	}
+ }
+ 
+ void kvm_apic_update_apicv(struct kvm_vcpu *vcpu)
+@@ -2649,6 +2667,7 @@ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
+ 		}
+ 	}
+ 
++	kvm_lapic_check_initial_apic_id(vcpu->arch.apic);
+ 	return 0;
+ }
+ 
+diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+index 4e4f8a22754f9..b9c406d383080 100644
+--- a/arch/x86/kvm/lapic.h
++++ b/arch/x86/kvm/lapic.h
+@@ -252,4 +252,12 @@ static inline u8 kvm_xapic_id(struct kvm_lapic *apic)
+ 	return kvm_lapic_get_reg(apic, APIC_ID) >> 24;
+ }
+ 
++static inline bool kvm_apic_has_initial_apic_id(struct kvm_lapic *apic)
++{
++	if (apic_x2apic_mode(apic))
++		return true;
++
++	return kvm_xapic_id(apic) == apic->vcpu->vcpu_id;
++}
++
+ #endif
 -- 
 2.26.3
 
