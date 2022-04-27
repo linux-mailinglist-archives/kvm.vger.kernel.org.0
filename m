@@ -2,159 +2,486 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B010511F4D
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 20:37:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F90C51207E
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 20:39:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240071AbiD0Pmp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 11:42:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36530 "EHLO
+        id S240694AbiD0P54 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 11:57:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239986AbiD0Pmn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 11:42:43 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2061.outbound.protection.outlook.com [40.107.243.61])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D392B1C9;
-        Wed, 27 Apr 2022 08:39:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BdgHZ0dhniQCUXSwbVngx3+x0EpE+jlGkVk252urOyh4ctS5XTUWSuKgA6QPGFkHiQUuQgfz/rcpOaMtdZJJGoIOid9jmcEDCkxXXLZReXpD0MQ9BDM8zNDb/2sf/K9GU38HA4QYeIrb3evg3/pxNpbdOl7BLFnqTs0IjNFIma2ZkDPodC7wC7iMDlFmza4lUC07C/0Qjawgzsage6FqZkK0grXHlmMtNRbS9DTb4KYHoP4A2G/r9kOoUiYe66dSq7J6VddaQJfNz22wtWUu2IHmjDH3AmO+knHO26EGbB3pbixzAZQum1VecG9dsi2AkCYylFMwq+uqj2NtS4LHLQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3w3uGNnNj9C5O/XU7QTuwQ1oyNC9/cdH4Nh0g3yhvVE=;
- b=HtfxErF6+FW6d4dz+hp8JRO5jaVcuYimgAaKNxGyL2dgVo2if150DfYQ91tjX9YECSpvo7KE+qLyfZZ2pUKR8UKyfr9jQXvyNVwq0XqN6odx/soWCYz/43mBRzNwesOaSIrk4P8TsqDr6pyzEfo3GBcALLmXpER9pnFw4mcp8J9iTIypl251fOEvN6E0p8JpIr2h8HEIOCL/u53QSaxA1bt6uIDB3hbly2JfWLR1vp7dY+ZPaWd8n8XkWybs6ie2LTRPredvUeZ8IgnPaXqSR/XdFMOspmzGQgaFz3WnGnPr+0dGqy1MpyI9hdOj6Zsf2hHP0lCoywbZXufyqBgxGw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3w3uGNnNj9C5O/XU7QTuwQ1oyNC9/cdH4Nh0g3yhvVE=;
- b=eCuEgNPz3pEVABcA+ndOvOZWe7U1D+2t/Cke8J4CoJp4EOUmTpQ3MrbqT/+5I+2Wz9SthAB9iejfDsgyJoJPxvBTNXNKcGlxqlBZgqCAxSCZKpxXevGm7Zo2wmgqMwkv4Ei4eU1C0q1YTrcxzBi0eUXf1QydY6lQmLDg6ud7VSP+gUdAWqbIRZoRRgFcmVz2EojRZThqibj8cRy1tKl+syIn1gsLG9yHJJ+bHOkhnHzFCjaRCax8TUc7mpDRwcJz3wP7E6iNoANUt7QKyvBZTzE5oSQCMAly20WCrj5MeL3ghC7TsRC4cBlEP3yG4cvo0OvsJcjXTkaWHSLtkvVFBw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by BN9PR12MB5083.namprd12.prod.outlook.com (2603:10b6:408:134::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.14; Wed, 27 Apr
- 2022 15:39:26 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2%6]) with mapi id 15.20.5186.021; Wed, 27 Apr 2022
- 15:39:26 +0000
-Date:   Wed, 27 Apr 2022 12:39:24 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, alex.williamson@redhat.com,
-        cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
-        pmorel@linux.ibm.com, borntraeger@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
-        agordeev@linux.ibm.com, svens@linux.ibm.com, frankja@linux.ibm.com,
-        david@redhat.com, imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Subject: Re: [PATCH v6 16/21] vfio-pci/zdev: add open/close device hooks
-Message-ID: <20220427153924.GZ2125828@nvidia.com>
-References: <20220426200842.98655-1-mjrosato@linux.ibm.com>
- <20220426200842.98655-17-mjrosato@linux.ibm.com>
- <20220427140410.GX2125828@nvidia.com>
- <f6c78792-9cf7-0cde-f760-76166f9b7eb7@linux.ibm.com>
- <20220427150138.GA2512703@nvidia.com>
- <1bca5de9-88aa-6abc-88b7-cbd2a11e5c85@linux.ibm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1bca5de9-88aa-6abc-88b7-cbd2a11e5c85@linux.ibm.com>
-X-ClientProxiedBy: BL1PR13CA0268.namprd13.prod.outlook.com
- (2603:10b6:208:2ba::33) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S240590AbiD0P5w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 11:57:52 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0E396E57A;
+        Wed, 27 Apr 2022 08:54:23 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id F2C83B8287C;
+        Wed, 27 Apr 2022 15:54:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 683ECC385A7;
+        Wed, 27 Apr 2022 15:54:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1651074859;
+        bh=sCF9/f0mpayue4I5/Ou8kdySrWJ/3xgtXAf6JIycnzs=;
+        h=From:To:Cc:Subject:Date:From;
+        b=eun3howqrmfmfrqTeRvwFoNum5n9hO/CKvwD5QVnTAvRC7Ep43G0H1Iyb29YBYh4N
+         ULoi5wJ+jCZ14yPcp73udDqGWpJ7/r3LNNnDJ1UPSZATWkzDNFd+ZmeqFZruee1Ic2
+         aW6mXn+Y6I5Wa+uwJ4Bsc5Ta8566XHTKbNSyZsU/Pkum7sheL7I410a6CBi454USMZ
+         +/FfGRoYzFZbZ5nSrNGjnEmnyacAw+uc0jW1B/McfcIniuiKui8tVSRJ4riKQask+G
+         54YKFf6WiHfHB2bL634w6YveGo/37Q6jH++FhxcRp/pXRdnNRlK7EYuZC+FQW48YbT
+         vKd15ceUONFqw==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Nana Liu <nanliu@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Sasha Levin <sashal@kernel.org>,
+        shuah@kernel.org, nathan@kernel.org, ndesaulniers@google.com,
+        jmattson@google.com, oupton@google.com, seanjc@google.com,
+        ricarkol@google.com, yang.zhong@intel.com, aaronlewis@google.com,
+        wei.w.wang@intel.com, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev
+Subject: [PATCH MANUALSEL 5.17 1/7] kvm: selftests: do not use bitfields larger than 32-bits for PTEs
+Date:   Wed, 27 Apr 2022 11:53:57 -0400
+Message-Id: <20220427155408.19352-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2a081e1b-a000-48da-5c3d-08da28641c24
-X-MS-TrafficTypeDiagnostic: BN9PR12MB5083:EE_
-X-Microsoft-Antispam-PRVS: <BN9PR12MB5083F0E6FE5335FC715D44FAC2FA9@BN9PR12MB5083.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KZkv9cHbBu+Z4cbNVTukQkpff+gLxyPAcn+sahn/GX4SWTrOZ+rByCI+Wo2TQ//st+oBl+0rIlTVkLcFhImOhPbFSf5GWczngcHW35S0uuX8N40HBTIdPih4rSV7mDaHPFIkHV4PPBJ9/NKO9WT86EWuCbSP3DygJk9uV12fB/QX86heZULjxhO9v4hcBHewQdZwX/HTTgP2cQBwbPDLwKeSjAqBXzhwLs6cQNO2XjN75IPjcfVnti3VPzdli3V+t0kvFqfVVgh/EH2qfj5VadlzngI/vdWewydFOk3uCB7HHaElEY9duVh3bMPLYcbQitNaQM4ITwNjWOPdyJMGa3dEh4Q9x35MrtgXs/d3UG+R299Tea5lm5yip5qUGLPbcW8hprklZ8RezS0GJ23dPkh7RKQ5y8YV1FSCZJCu2ZPMEA/gHegxvTwtjvlcXU775dAWCS2SlWBuvbEIQpQ7GBbnJfgkxZXUgH7y8oImxHKBnjU+M1w9MPN0oavRvv6nUnIkOMzpG6CIaIzv4KA6DHFHZQyoUkb7vreRKgczIVxVokoSuzkTOOCRctHglRuI3XxSiNlhNKk7TJOacW1BMCbKOPzvevJulDIHOUnwm7GhShsH0ofK/4/fWBx67JbNdO7vAqI1fPo2irkXNlYImjEs0qSZLhC0pLyICdxjT9lI1IdnUcIZAfGgRl9ZWF80+KJj9rAAmDosFeMgXvTR/VO4PbFUx0MwsLTHukR0U2c=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(8936002)(1076003)(8676002)(4326008)(33656002)(6916009)(186003)(316002)(86362001)(6486002)(7416002)(966005)(2906002)(508600001)(38100700002)(5660300002)(2616005)(66946007)(66556008)(66476007)(6512007)(6506007)(26005)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?kfAe63i7Pma9S0lNS75G4jKHZ1z0mRAqimj5vR1KsrS4cu7zCktC6cOPcQIv?=
- =?us-ascii?Q?SjI3YPsU8qu+sq18C3tTQV+JZIMX/Nw5FPg3J403bVlahOEDrOqOzSpQKg69?=
- =?us-ascii?Q?3PN0uA/Hl8QaTLUIvpl65/uTfcD8nb5Ij1e9ThfrL8aBFIVLOJfLJNdI36Om?=
- =?us-ascii?Q?eFv8pPOZi+gi4XuwcrYynJWNeoXevwiThmD4EHCN4CKvqJB0Eki+0oaRWWgf?=
- =?us-ascii?Q?cAQtSAqU9K4BabT0FXPeTEhq9wAhfIqn3Cft8b/QzXIKuPWf4gI1Um7lRxmd?=
- =?us-ascii?Q?bBQWuoHF2xzWrHY8pF05Zed/YvldGybFqI3/ktnTHGOP0I5FeZaqrzMlfVUv?=
- =?us-ascii?Q?n5plL8kfm566rh6j1eUrBvkPf9K/vl8gbeg2WISEZi4h/m6RrRXvRFZspWg1?=
- =?us-ascii?Q?mjTxs0Xx1pEu9nvqPcuR+BdNrkz6nblmSpjZpAcnjKRv98gpgLNc/R2uWBG3?=
- =?us-ascii?Q?eViRRM79WTioEoznQ0jETSB5Il1jstFabY0YQZPdu5DK9ptFiPL0efCQrspb?=
- =?us-ascii?Q?o2orpBikJXEGut4rLUbmq/V2MeWDP5ATuXhXeYFw3x5b6pVVRozqMMpJVO3L?=
- =?us-ascii?Q?+OLRtusZvwYNM7maublhaAqBycIzJWbTTAO8Jii6u/k37WKMe6qxkiHe4a5I?=
- =?us-ascii?Q?WL3PUuf48CJSv81ZSW7iGZIIgPYywC6sXkBk0Vp1aAEtvdoCPVovoDVasN+2?=
- =?us-ascii?Q?ZSvbC5kK3A7NVSdu6c+0FFicwxi5mluntIm23SbRuQcY0axSAn8cjXqwtlei?=
- =?us-ascii?Q?F50RYqtWlSKoETe5s28RLwP/qeDZgm2LFoynXGXrC45m+wukFBoQKJ5qgYjM?=
- =?us-ascii?Q?gifcwJR2viGBcfK+5u7rQif7hgsEBZ0pxDjIEUpsQijUI7Y2pnXko394Ndiz?=
- =?us-ascii?Q?Ud4oU3mgcGlMJIa1GdY9E2pGOQDmustvMXOcMj5iSZacEixI8bzgFYgwx7lg?=
- =?us-ascii?Q?0IhTDb0m51VFtYoi+KV7zRoWCmJxZjwBv63Eu/doQZCOnbnNtSOzeI+oAawI?=
- =?us-ascii?Q?eNOTEEfRhPpS0w1ua6qIGIhvmqb2NdlMEgekaVmjKbIEaDvsq8TkqDkn1B3V?=
- =?us-ascii?Q?rDeez9SA8NmRtDgg98avXOtG4sAfnSWFP+hMKUUhwjDvjVtMb2cf6z7ME6S1?=
- =?us-ascii?Q?DlUextKUluGRCrvQRAoi9jxZcZQyPB+UOt4sa16JI1LwdfevGiBGY/kFGlif?=
- =?us-ascii?Q?CcKNH5VsNK2aLPKUUn2HcfD/elU+L2gcyTvy4f90NCR29pJvUE7DQkuAn024?=
- =?us-ascii?Q?iBbPPfRKZfTQVofhu+7ndtkKcTkSTzHr9l4DNiFEBglsqLJqwY74H2yHBR3K?=
- =?us-ascii?Q?43rnF9fZliALOnXgpr1aQzIbllU426TJu+RAqhq1+PjfrWTfZ0sHCDUgKCBC?=
- =?us-ascii?Q?KNJE5RQ2Wos5gsi37FLvoTu28UDwT7n7H7Zk7NYxY7a5G3+VvGHBTmo4cGFI?=
- =?us-ascii?Q?EiZifo2NM26cqlHBlpYFv/yXhSxkaEa5IKfRBZhDtbS/I1qotuBF9xFMHHiM?=
- =?us-ascii?Q?hIjdb721ormzAKV75boN/lplkYVVOsJu/qSpsWhBcF8Hx/mN7y6+fMgRxwZ5?=
- =?us-ascii?Q?lFb6mTprk0t9J6GUbx/GxDZv+Nrcr7dmS2n4sa4z6QeEg8baQFWyXRzfw17I?=
- =?us-ascii?Q?SURQg34jzyUk2qbkw7Nyacocpk7nO7Doq999DCZMoZACfbPImpJ3Uwxbi0xf?=
- =?us-ascii?Q?xz+MQJVVUEWR+wr3Im2bXDTMRkYbAhMPOS9wjwCweOXbkdhGsASsT+ZZt4Nl?=
- =?us-ascii?Q?rQ0/1mp0Xg=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2a081e1b-a000-48da-5c3d-08da28641c24
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2022 15:39:26.2675
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fccPEF2UuJ35KnZnMBJwb3Npg7/PQ+WsZs7pMbTFXpj2zCtECzvWTZP7wRbOxEhK
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5083
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 27, 2022 at 11:26:40AM -0400, Matthew Rosato wrote:
-> > > zPCI devices (zpci_dev) exist regardless of whether kvm is configured or
-> > > not, and you can e.g. bind the associated PCI device to vfio-pci when KVM is
-> > > not configured (or module not loaded) and get the existing vfio-pci-zdev
-> > > extensions for that device (extra VFIO_DEVICE_INFO response data).  Making a
-> > > direct dependency on KVM would remove that; this was discussed in a prior
-> > > version because this extra info is not used today outside of a KVM usecase
-> > > are not specific to kvm that need vfio-pci-zdev).
-> > 
-> > I'm a bit confused, what is the drawback of just having a direct
-> > symbol dependency here? It means vfio loads a little extra kernel
-> > module code, but is that really a big worry given almost all vfio
-> > users on s390 will be using it with kvm?
-> 
-> It's about trying to avoid loading unnecessary code (or at least giving a
-> way to turn it off).
-> 
-> Previously I did something like....
-> 
-> https://lore.kernel.org/kvm/20220204211536.321475-15-mjrosato@linux.ibm.com/
-> 
-> And could do so again; as discussed in the thread there, I can use e.g.
-> CONFIG_VFIO_PCI_ZDEV_KVM and make vfio-pci-zdev depend on KVM in this
-> series.  You only get the vfio-pci-zdev extensions when you configure KVM.
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-That make sense to me, I'd rather see that then the symbol_get/put here
+[ Upstream commit f18b4aebe107d092e384b1ae680b1e1de7a0196d ]
 
-Thanks,
-Jason
+Red Hat's QE team reported test failure on access_tracking_perf_test:
+
+Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
+guest physical test memory offset: 0x3fffbffff000
+
+Populating memory             : 0.684014577s
+Writing to populated memory   : 0.006230175s
+Reading from populated memory : 0.004557805s
+==== Test Assertion Failure ====
+  lib/kvm_util.c:1411: false
+  pid=125806 tid=125809 errno=4 - Interrupted system call
+     1  0x0000000000402f7c: addr_gpa2hva at kvm_util.c:1411
+     2   (inlined by) addr_gpa2hva at kvm_util.c:1405
+     3  0x0000000000401f52: lookup_pfn at access_tracking_perf_test.c:98
+     4   (inlined by) mark_vcpu_memory_idle at access_tracking_perf_test.c:152
+     5   (inlined by) vcpu_thread_main at access_tracking_perf_test.c:232
+     6  0x00007fefe9ff81ce: ?? ??:0
+     7  0x00007fefe9c64d82: ?? ??:0
+  No vm physical memory at 0xffbffff000
+
+I can easily reproduce it with a Intel(R) Xeon(R) CPU E5-2630 with 46 bits
+PA.
+
+It turns out that the address translation for clearing idle page tracking
+returned a wrong result; addr_gva2gpa()'s last step, which is based on
+"pte[index[0]].pfn", did the calculation with 40 bits length and the
+high 12 bits got truncated.  In above case the GPA address to be returned
+should be 0x3fffbffff000 for GVA 0xc0000000, but it got truncated into
+0xffbffff000 and the subsequent gpa2hva lookup failed.
+
+The width of operations on bit fields greater than 32-bit is
+implementation defined, and differs between GCC (which uses the bitfield
+precision) and clang (which uses 64-bit arithmetic), so this is a
+potential minefield.  Remove the bit fields and using manual masking
+instead.
+
+Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=2075036
+Reported-by: Nana Liu <nanliu@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Tested-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ .../selftests/kvm/include/x86_64/processor.h  |  15 ++
+ .../selftests/kvm/lib/x86_64/processor.c      | 192 +++++++-----------
+ 2 files changed, 92 insertions(+), 115 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index 8a470da7b71a..15a2875698b5 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -60,6 +60,21 @@
+ /* CPUID.0x8000_0001.EDX */
+ #define CPUID_GBPAGES		(1ul << 26)
+ 
++/* Page table bitfield declarations */
++#define PTE_PRESENT_MASK        BIT_ULL(0)
++#define PTE_WRITABLE_MASK       BIT_ULL(1)
++#define PTE_USER_MASK           BIT_ULL(2)
++#define PTE_ACCESSED_MASK       BIT_ULL(5)
++#define PTE_DIRTY_MASK          BIT_ULL(6)
++#define PTE_LARGE_MASK          BIT_ULL(7)
++#define PTE_GLOBAL_MASK         BIT_ULL(8)
++#define PTE_NX_MASK             BIT_ULL(63)
++
++#define PAGE_SHIFT		12
++
++#define PHYSICAL_PAGE_MASK      GENMASK_ULL(51, 12)
++#define PTE_GET_PFN(pte)        (((pte) & PHYSICAL_PAGE_MASK) >> PAGE_SHIFT)
++
+ /* General Registers in 64-Bit Mode */
+ struct gpr64_regs {
+ 	u64 rax;
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index 9f000dfb5594..0dd442c26015 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -19,38 +19,6 @@
+ 
+ vm_vaddr_t exception_handlers;
+ 
+-/* Virtual translation table structure declarations */
+-struct pageUpperEntry {
+-	uint64_t present:1;
+-	uint64_t writable:1;
+-	uint64_t user:1;
+-	uint64_t write_through:1;
+-	uint64_t cache_disable:1;
+-	uint64_t accessed:1;
+-	uint64_t ignored_06:1;
+-	uint64_t page_size:1;
+-	uint64_t ignored_11_08:4;
+-	uint64_t pfn:40;
+-	uint64_t ignored_62_52:11;
+-	uint64_t execute_disable:1;
+-};
+-
+-struct pageTableEntry {
+-	uint64_t present:1;
+-	uint64_t writable:1;
+-	uint64_t user:1;
+-	uint64_t write_through:1;
+-	uint64_t cache_disable:1;
+-	uint64_t accessed:1;
+-	uint64_t dirty:1;
+-	uint64_t reserved_07:1;
+-	uint64_t global:1;
+-	uint64_t ignored_11_09:3;
+-	uint64_t pfn:40;
+-	uint64_t ignored_62_52:11;
+-	uint64_t execute_disable:1;
+-};
+-
+ void regs_dump(FILE *stream, struct kvm_regs *regs,
+ 	       uint8_t indent)
+ {
+@@ -195,23 +163,21 @@ static void *virt_get_pte(struct kvm_vm *vm, uint64_t pt_pfn, uint64_t vaddr,
+ 	return &page_table[index];
+ }
+ 
+-static struct pageUpperEntry *virt_create_upper_pte(struct kvm_vm *vm,
+-						    uint64_t pt_pfn,
+-						    uint64_t vaddr,
+-						    uint64_t paddr,
+-						    int level,
+-						    enum x86_page_size page_size)
++static uint64_t *virt_create_upper_pte(struct kvm_vm *vm,
++				       uint64_t pt_pfn,
++				       uint64_t vaddr,
++				       uint64_t paddr,
++				       int level,
++				       enum x86_page_size page_size)
+ {
+-	struct pageUpperEntry *pte = virt_get_pte(vm, pt_pfn, vaddr, level);
+-
+-	if (!pte->present) {
+-		pte->writable = true;
+-		pte->present = true;
+-		pte->page_size = (level == page_size);
+-		if (pte->page_size)
+-			pte->pfn = paddr >> vm->page_shift;
++	uint64_t *pte = virt_get_pte(vm, pt_pfn, vaddr, level);
++
++	if (!(*pte & PTE_PRESENT_MASK)) {
++		*pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK;
++		if (level == page_size)
++			*pte |= PTE_LARGE_MASK | (paddr & PHYSICAL_PAGE_MASK);
+ 		else
+-			pte->pfn = vm_alloc_page_table(vm) >> vm->page_shift;
++			*pte |= vm_alloc_page_table(vm) & PHYSICAL_PAGE_MASK;
+ 	} else {
+ 		/*
+ 		 * Entry already present.  Assert that the caller doesn't want
+@@ -221,7 +187,7 @@ static struct pageUpperEntry *virt_create_upper_pte(struct kvm_vm *vm,
+ 		TEST_ASSERT(level != page_size,
+ 			    "Cannot create hugepage at level: %u, vaddr: 0x%lx\n",
+ 			    page_size, vaddr);
+-		TEST_ASSERT(!pte->page_size,
++		TEST_ASSERT(!(*pte & PTE_LARGE_MASK),
+ 			    "Cannot create page table at level: %u, vaddr: 0x%lx\n",
+ 			    level, vaddr);
+ 	}
+@@ -232,8 +198,8 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+ 		   enum x86_page_size page_size)
+ {
+ 	const uint64_t pg_size = 1ull << ((page_size * 9) + 12);
+-	struct pageUpperEntry *pml4e, *pdpe, *pde;
+-	struct pageTableEntry *pte;
++	uint64_t *pml4e, *pdpe, *pde;
++	uint64_t *pte;
+ 
+ 	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K,
+ 		    "Unknown or unsupported guest mode, mode: 0x%x", vm->mode);
+@@ -257,24 +223,22 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+ 	 */
+ 	pml4e = virt_create_upper_pte(vm, vm->pgd >> vm->page_shift,
+ 				      vaddr, paddr, 3, page_size);
+-	if (pml4e->page_size)
++	if (*pml4e & PTE_LARGE_MASK)
+ 		return;
+ 
+-	pdpe = virt_create_upper_pte(vm, pml4e->pfn, vaddr, paddr, 2, page_size);
+-	if (pdpe->page_size)
++	pdpe = virt_create_upper_pte(vm, PTE_GET_PFN(*pml4e), vaddr, paddr, 2, page_size);
++	if (*pdpe & PTE_LARGE_MASK)
+ 		return;
+ 
+-	pde = virt_create_upper_pte(vm, pdpe->pfn, vaddr, paddr, 1, page_size);
+-	if (pde->page_size)
++	pde = virt_create_upper_pte(vm, PTE_GET_PFN(*pdpe), vaddr, paddr, 1, page_size);
++	if (*pde & PTE_LARGE_MASK)
+ 		return;
+ 
+ 	/* Fill in page table entry. */
+-	pte = virt_get_pte(vm, pde->pfn, vaddr, 0);
+-	TEST_ASSERT(!pte->present,
++	pte = virt_get_pte(vm, PTE_GET_PFN(*pde), vaddr, 0);
++	TEST_ASSERT(!(*pte & PTE_PRESENT_MASK),
+ 		    "PTE already present for 4k page at vaddr: 0x%lx\n", vaddr);
+-	pte->pfn = paddr >> vm->page_shift;
+-	pte->writable = true;
+-	pte->present = 1;
++	*pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK | (paddr & PHYSICAL_PAGE_MASK);
+ }
+ 
+ void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+@@ -282,12 +246,12 @@ void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+ 	__virt_pg_map(vm, vaddr, paddr, X86_PAGE_SIZE_4K);
+ }
+ 
+-static struct pageTableEntry *_vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid,
++static uint64_t *_vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid,
+ 						       uint64_t vaddr)
+ {
+ 	uint16_t index[4];
+-	struct pageUpperEntry *pml4e, *pdpe, *pde;
+-	struct pageTableEntry *pte;
++	uint64_t *pml4e, *pdpe, *pde;
++	uint64_t *pte;
+ 	struct kvm_cpuid_entry2 *entry;
+ 	struct kvm_sregs sregs;
+ 	int max_phy_addr;
+@@ -329,30 +293,29 @@ static struct pageTableEntry *_vm_get_page_table_entry(struct kvm_vm *vm, int vc
+ 	index[3] = (vaddr >> 39) & 0x1ffu;
+ 
+ 	pml4e = addr_gpa2hva(vm, vm->pgd);
+-	TEST_ASSERT(pml4e[index[3]].present,
++	TEST_ASSERT(pml4e[index[3]] & PTE_PRESENT_MASK,
+ 		"Expected pml4e to be present for gva: 0x%08lx", vaddr);
+-	TEST_ASSERT((*(uint64_t*)(&pml4e[index[3]]) &
+-		(rsvd_mask | (1ull << 7))) == 0,
++	TEST_ASSERT((pml4e[index[3]] & (rsvd_mask | PTE_LARGE_MASK)) == 0,
+ 		"Unexpected reserved bits set.");
+ 
+-	pdpe = addr_gpa2hva(vm, pml4e[index[3]].pfn * vm->page_size);
+-	TEST_ASSERT(pdpe[index[2]].present,
++	pdpe = addr_gpa2hva(vm, PTE_GET_PFN(pml4e[index[3]]) * vm->page_size);
++	TEST_ASSERT(pdpe[index[2]] & PTE_PRESENT_MASK,
+ 		"Expected pdpe to be present for gva: 0x%08lx", vaddr);
+-	TEST_ASSERT(pdpe[index[2]].page_size == 0,
++	TEST_ASSERT(!(pdpe[index[2]] & PTE_LARGE_MASK),
+ 		"Expected pdpe to map a pde not a 1-GByte page.");
+-	TEST_ASSERT((*(uint64_t*)(&pdpe[index[2]]) & rsvd_mask) == 0,
++	TEST_ASSERT((pdpe[index[2]] & rsvd_mask) == 0,
+ 		"Unexpected reserved bits set.");
+ 
+-	pde = addr_gpa2hva(vm, pdpe[index[2]].pfn * vm->page_size);
+-	TEST_ASSERT(pde[index[1]].present,
++	pde = addr_gpa2hva(vm, PTE_GET_PFN(pdpe[index[2]]) * vm->page_size);
++	TEST_ASSERT(pde[index[1]] & PTE_PRESENT_MASK,
+ 		"Expected pde to be present for gva: 0x%08lx", vaddr);
+-	TEST_ASSERT(pde[index[1]].page_size == 0,
++	TEST_ASSERT(!(pde[index[1]] & PTE_LARGE_MASK),
+ 		"Expected pde to map a pte not a 2-MByte page.");
+-	TEST_ASSERT((*(uint64_t*)(&pde[index[1]]) & rsvd_mask) == 0,
++	TEST_ASSERT((pde[index[1]] & rsvd_mask) == 0,
+ 		"Unexpected reserved bits set.");
+ 
+-	pte = addr_gpa2hva(vm, pde[index[1]].pfn * vm->page_size);
+-	TEST_ASSERT(pte[index[0]].present,
++	pte = addr_gpa2hva(vm, PTE_GET_PFN(pde[index[1]]) * vm->page_size);
++	TEST_ASSERT(pte[index[0]] & PTE_PRESENT_MASK,
+ 		"Expected pte to be present for gva: 0x%08lx", vaddr);
+ 
+ 	return &pte[index[0]];
+@@ -360,7 +323,7 @@ static struct pageTableEntry *_vm_get_page_table_entry(struct kvm_vm *vm, int vc
+ 
+ uint64_t vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid, uint64_t vaddr)
+ {
+-	struct pageTableEntry *pte = _vm_get_page_table_entry(vm, vcpuid, vaddr);
++	uint64_t *pte = _vm_get_page_table_entry(vm, vcpuid, vaddr);
+ 
+ 	return *(uint64_t *)pte;
+ }
+@@ -368,18 +331,17 @@ uint64_t vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid, uint64_t vaddr)
+ void vm_set_page_table_entry(struct kvm_vm *vm, int vcpuid, uint64_t vaddr,
+ 			     uint64_t pte)
+ {
+-	struct pageTableEntry *new_pte = _vm_get_page_table_entry(vm, vcpuid,
+-								  vaddr);
++	uint64_t *new_pte = _vm_get_page_table_entry(vm, vcpuid, vaddr);
+ 
+ 	*(uint64_t *)new_pte = pte;
+ }
+ 
+ void virt_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
+ {
+-	struct pageUpperEntry *pml4e, *pml4e_start;
+-	struct pageUpperEntry *pdpe, *pdpe_start;
+-	struct pageUpperEntry *pde, *pde_start;
+-	struct pageTableEntry *pte, *pte_start;
++	uint64_t *pml4e, *pml4e_start;
++	uint64_t *pdpe, *pdpe_start;
++	uint64_t *pde, *pde_start;
++	uint64_t *pte, *pte_start;
+ 
+ 	if (!vm->pgd_created)
+ 		return;
+@@ -389,58 +351,58 @@ void virt_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
+ 	fprintf(stream, "%*s      index hvaddr         gpaddr         "
+ 		"addr         w exec dirty\n",
+ 		indent, "");
+-	pml4e_start = (struct pageUpperEntry *) addr_gpa2hva(vm, vm->pgd);
++	pml4e_start = (uint64_t *) addr_gpa2hva(vm, vm->pgd);
+ 	for (uint16_t n1 = 0; n1 <= 0x1ffu; n1++) {
+ 		pml4e = &pml4e_start[n1];
+-		if (!pml4e->present)
++		if (!(*pml4e & PTE_PRESENT_MASK))
+ 			continue;
+-		fprintf(stream, "%*spml4e 0x%-3zx %p 0x%-12lx 0x%-10lx %u "
++		fprintf(stream, "%*spml4e 0x%-3zx %p 0x%-12lx 0x%-10llx %u "
+ 			" %u\n",
+ 			indent, "",
+ 			pml4e - pml4e_start, pml4e,
+-			addr_hva2gpa(vm, pml4e), (uint64_t) pml4e->pfn,
+-			pml4e->writable, pml4e->execute_disable);
++			addr_hva2gpa(vm, pml4e), PTE_GET_PFN(*pml4e),
++			!!(*pml4e & PTE_WRITABLE_MASK), !!(*pml4e & PTE_NX_MASK));
+ 
+-		pdpe_start = addr_gpa2hva(vm, pml4e->pfn * vm->page_size);
++		pdpe_start = addr_gpa2hva(vm, *pml4e & PHYSICAL_PAGE_MASK);
+ 		for (uint16_t n2 = 0; n2 <= 0x1ffu; n2++) {
+ 			pdpe = &pdpe_start[n2];
+-			if (!pdpe->present)
++			if (!(*pdpe & PTE_PRESENT_MASK))
+ 				continue;
+-			fprintf(stream, "%*spdpe  0x%-3zx %p 0x%-12lx 0x%-10lx "
++			fprintf(stream, "%*spdpe  0x%-3zx %p 0x%-12lx 0x%-10llx "
+ 				"%u  %u\n",
+ 				indent, "",
+ 				pdpe - pdpe_start, pdpe,
+ 				addr_hva2gpa(vm, pdpe),
+-				(uint64_t) pdpe->pfn, pdpe->writable,
+-				pdpe->execute_disable);
++				PTE_GET_PFN(*pdpe), !!(*pdpe & PTE_WRITABLE_MASK),
++				!!(*pdpe & PTE_NX_MASK));
+ 
+-			pde_start = addr_gpa2hva(vm, pdpe->pfn * vm->page_size);
++			pde_start = addr_gpa2hva(vm, *pdpe & PHYSICAL_PAGE_MASK);
+ 			for (uint16_t n3 = 0; n3 <= 0x1ffu; n3++) {
+ 				pde = &pde_start[n3];
+-				if (!pde->present)
++				if (!(*pde & PTE_PRESENT_MASK))
+ 					continue;
+ 				fprintf(stream, "%*spde   0x%-3zx %p "
+-					"0x%-12lx 0x%-10lx %u  %u\n",
++					"0x%-12lx 0x%-10llx %u  %u\n",
+ 					indent, "", pde - pde_start, pde,
+ 					addr_hva2gpa(vm, pde),
+-					(uint64_t) pde->pfn, pde->writable,
+-					pde->execute_disable);
++					PTE_GET_PFN(*pde), !!(*pde & PTE_WRITABLE_MASK),
++					!!(*pde & PTE_NX_MASK));
+ 
+-				pte_start = addr_gpa2hva(vm, pde->pfn * vm->page_size);
++				pte_start = addr_gpa2hva(vm, *pde & PHYSICAL_PAGE_MASK);
+ 				for (uint16_t n4 = 0; n4 <= 0x1ffu; n4++) {
+ 					pte = &pte_start[n4];
+-					if (!pte->present)
++					if (!(*pte & PTE_PRESENT_MASK))
+ 						continue;
+ 					fprintf(stream, "%*spte   0x%-3zx %p "
+-						"0x%-12lx 0x%-10lx %u  %u "
++						"0x%-12lx 0x%-10llx %u  %u "
+ 						"    %u    0x%-10lx\n",
+ 						indent, "",
+ 						pte - pte_start, pte,
+ 						addr_hva2gpa(vm, pte),
+-						(uint64_t) pte->pfn,
+-						pte->writable,
+-						pte->execute_disable,
+-						pte->dirty,
++						PTE_GET_PFN(*pte),
++						!!(*pte & PTE_WRITABLE_MASK),
++						!!(*pte & PTE_NX_MASK),
++						!!(*pte & PTE_DIRTY_MASK),
+ 						((uint64_t) n1 << 27)
+ 							| ((uint64_t) n2 << 18)
+ 							| ((uint64_t) n3 << 9)
+@@ -558,8 +520,8 @@ static void kvm_seg_set_kernel_data_64bit(struct kvm_vm *vm, uint16_t selector,
+ vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+ {
+ 	uint16_t index[4];
+-	struct pageUpperEntry *pml4e, *pdpe, *pde;
+-	struct pageTableEntry *pte;
++	uint64_t *pml4e, *pdpe, *pde;
++	uint64_t *pte;
+ 
+ 	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K, "Attempt to use "
+ 		"unknown or unsupported guest mode, mode: 0x%x", vm->mode);
+@@ -572,22 +534,22 @@ vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+ 	if (!vm->pgd_created)
+ 		goto unmapped_gva;
+ 	pml4e = addr_gpa2hva(vm, vm->pgd);
+-	if (!pml4e[index[3]].present)
++	if (!(pml4e[index[3]] & PTE_PRESENT_MASK))
+ 		goto unmapped_gva;
+ 
+-	pdpe = addr_gpa2hva(vm, pml4e[index[3]].pfn * vm->page_size);
+-	if (!pdpe[index[2]].present)
++	pdpe = addr_gpa2hva(vm, PTE_GET_PFN(pml4e[index[3]]) * vm->page_size);
++	if (!(pdpe[index[2]] & PTE_PRESENT_MASK))
+ 		goto unmapped_gva;
+ 
+-	pde = addr_gpa2hva(vm, pdpe[index[2]].pfn * vm->page_size);
+-	if (!pde[index[1]].present)
++	pde = addr_gpa2hva(vm, PTE_GET_PFN(pdpe[index[2]]) * vm->page_size);
++	if (!(pde[index[1]] & PTE_PRESENT_MASK))
+ 		goto unmapped_gva;
+ 
+-	pte = addr_gpa2hva(vm, pde[index[1]].pfn * vm->page_size);
+-	if (!pte[index[0]].present)
++	pte = addr_gpa2hva(vm, PTE_GET_PFN(pde[index[1]]) * vm->page_size);
++	if (!(pte[index[0]] & PTE_PRESENT_MASK))
+ 		goto unmapped_gva;
+ 
+-	return (pte[index[0]].pfn * vm->page_size) + (gva & 0xfffu);
++	return (PTE_GET_PFN(pte[index[0]]) * vm->page_size) + (gva & 0xfffu);
+ 
+ unmapped_gva:
+ 	TEST_FAIL("No mapping for vm virtual address, gva: 0x%lx", gva);
+-- 
+2.35.1
+
