@@ -2,108 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 751F651248F
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 23:30:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23825512496
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 23:34:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237533AbiD0Vd6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 17:33:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34068 "EHLO
+        id S233000AbiD0VhP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 17:37:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237509AbiD0Vd4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 17:33:56 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A372827152;
-        Wed, 27 Apr 2022 14:30:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651095044; x=1682631044;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=9AnR0+i4WyZuMptJB4sGh0+ILBAmTrqUC5l0VYBK5DQ=;
-  b=OLVFTDseiEs8H9fUvj40yBhty5zkBeBjcMUOSNhl1W0gPhmb9MTZbD1f
-   OMdcrmwDD5XnR7YgrJ0AqK0c9SmSY5cIg/0Q+tTaWOdloNoXekPimZZi/
-   3by0OvjfJdfZUhrA1KfOb+7/v0YKYihas94uEd/erZiWGqepC+59pR4tt
-   gWCLDpFYRp6cMI0ngTm0rzmQdnl2LB1BiC6nOhbULKyC3sZyigiy3H+vC
-   Iy4flTapKyFfpn38d0kjYdxTzbrbpYxg+6dGB7BLbcOlByPxdeBjBC6V7
-   wRWNo6/VQT8qX7+sD45PN86w1aIJyKdT7Ulb5fp/d+5ZEv/d29nTzbif9
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10330"; a="246634544"
-X-IronPort-AV: E=Sophos;i="5.90,294,1643702400"; 
-   d="scan'208";a="246634544"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 14:30:44 -0700
-X-IronPort-AV: E=Sophos;i="5.90,294,1643702400"; 
-   d="scan'208";a="705733567"
-Received: from rrnambia-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.60.78])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 14:30:41 -0700
-Message-ID: <68484e168226037c3a25b6fb983b052b26ab3ec1.camel@intel.com>
-Subject: Re: [PATCH v3 05/21] x86/virt/tdx: Detect P-SEAMLDR and TDX module
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-Date:   Thu, 28 Apr 2022 09:30:39 +1200
-In-Reply-To: <49cc6848-47ae-9c25-f479-c5aed8c892df@intel.com>
-References: <cover.1649219184.git.kai.huang@intel.com>
-         <b9f4d4afd244d685182ce9ab5ffdd0bf245be6e2.1649219184.git.kai.huang@intel.com>
-         <104a6959-3bd4-1e75-5e3d-5dc3ef025ed0@intel.com>
-         <98af78402861b1982607c5fd14b0c89403c042a6.camel@intel.com>
-         <49cc6848-47ae-9c25-f479-c5aed8c892df@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+        with ESMTP id S241421AbiD0Vgw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 17:36:52 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 686D2BF60
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 14:33:36 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2278EB82AD6
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 21:33:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7D83C385A7;
+        Wed, 27 Apr 2022 21:33:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1651095213;
+        bh=1iBDbgaS38FCqRlOfss8ueKSHJ7VkjrleWU06kV5KbM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=IhRiECsXSHyR/fYqJQfGsNByuU4TGKmyhtiHJwzjys6Ak0JoLhtUNRxfeUxHn9uCX
+         39K1bY0WsIxVyqPGMzYtQVM/LLnsLYqETORk0kiy0EVGTNcLzgAGwwvaH2Rg2youdw
+         eJ4DJ37s8ll1C86aqIzEutexyxv0knj46iSGSJG49w1OtIZodMpQe+XFor8zOtplGD
+         3GQHLbVFbGZQ2tXaKZ5+UKjGr3jlfFkXVrhdanSmDO4SR+tK+nvYvBm8cPd++Z95ip
+         5wwO0MmFuyoC/7ECiAsSm2DEN4Lxt9ayz4gGj8QmQAokBfL3ns/lKelTE2nmb8kpjn
+         3AUvhYDQaIKCQ==
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1njpHu-007TnV-TE; Wed, 27 Apr 2022 22:33:30 +0100
 MIME-Version: 1.0
+Date:   Wed, 27 Apr 2022 22:33:30 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com, Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>,
+        Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Inject exception on out-of-IPA-range
+ translation fault
+In-Reply-To: <20220421153949.2931552-1-maz@kernel.org>
+References: <20220421153949.2931552-1-maz@kernel.org>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <f317899241aaf6858e3419f23800b987@kernel.org>
+X-Sender: maz@kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com, qperret@google.com, will@kernel.org, christoffer.dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-04-27 at 07:24 -0700, Dave Hansen wrote:
-> On 4/26/22 17:01, Kai Huang wrote:
-> > On Tue, 2022-04-26 at 13:56 -0700, Dave Hansen wrote:
-> > > On 4/5/22 21:49, Kai Huang wrote:
-> > > > The P-SEAMLDR (persistent SEAM loader) is the first software module that
-> > > > runs in SEAM VMX root, responsible for loading and updating the TDX
-> > > > module.  Both the P-SEAMLDR and the TDX module are expected to be loaded
-> > > > before host kernel boots.
-> > > 
-> > > Why bother with the P-SEAMLDR here at all?  The kernel isn't loading the
-> > > TDX module in this series.  Why not just call into the TDX module directly?
-> > 
-> > It's not absolutely needed in this series.  I choose to detect P-SEAMLDR because
-> > detecting it can also detect the TDX module, and eventually we will need to
-> > support P-SEAMLDR because the TDX module runtime update uses P-SEAMLDR's
-> > SEAMCALL to do that.
-> > 
-> > Also, even for this series, detecting the P-SEAMLDR allows us to provide the P-
-> > SEAMLDR information to user at a basic level in dmesg:
-> > 
-> > [..] tdx: P-SEAMLDR: version 0x0, vendor_id: 0x8086, build_date: 20211209,
-> > build_num 160, major 1, minor 0
-> > 
-> > This may be useful to users, but it's not a hard requirement for this series.
+On 2022-04-21 16:39, Marc Zyngier wrote:
+> When taking an translation fault for an IPA that is outside of
+> the range defined by the hypervisor (between the HW PARange and
+> that exposed to the guest), we stupidly treat it as an IO and
+> forward the access to userspace. Of course, userspace can't do
+> much with it, and things end badly.
 > 
-> We've had a lot of problems in general with this code trying to do too
-> much at once.  I thought we agreed that this was going to only contain
-> the minimum code to make TDX functional.  It seems to be creeping to
-> grow bigger and bigger.
+> Arguably, the guest is braindead, but we should at least catch the
+> case and inject an exception.
 > 
-> Am I remembering this wrong?
+> Check the faulting IPA against the IPA size the VM has, and
+> inject an Address Size Fault at level 0 if the access fails the
+> check.
 
-OK. I'll remove the P-SEAMLDR related code.
+I'm having second thoughts about this last point.
+t
+As it turns out, we do no override the PARange exposed to the guest,
+and it sees the sanitised HW version. Which makes sense, as the
+IPA range is much more fine grained than the PARange (1 bit for
+IPA range, 4 bits for PARange).
 
+So a fault can fall into a number of "don't do that" categories:
+- outside of the *physical* PARange: the HW injects an AS fault
+- outside of the *sanitised* PARange: KVM must inject an AS fault
+- between IPA range and PARange: KVM must inject a external abort
+
+This patch merges the last two cases, which is a bit wrong.
+
+I'll repost an updated version and queue it for 5.18.
+
+         M.
 -- 
-Thanks,
--Kai
-
-
+Jazz is not dead. It just smells funny...
