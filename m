@@ -2,116 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9756C5123A9
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 22:09:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EA8A5123C4
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 22:18:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233807AbiD0UMK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 16:12:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35384 "EHLO
+        id S234082AbiD0UVi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 16:21:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235637AbiD0ULv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 16:11:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0514F8BE12
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 13:06:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651089963;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lggN3RfeBWkcrXGP2XX4hq9ENBmADwLyyEqxgrx+HuM=;
-        b=a+72cecBpZsdEaqmVkz8zB097KwlxtUA+EgZo8JbqSUE8PsQrTEHNJralrJueJCJ8cd8xO
-        PCVJj6le7Je3c4p/yRY8BWqJazLN03tvAmLLuFZ/t1CZu/oyfnhHN2pwyol4l6ObUitGJV
-        ssLgNmwZT2wHpLOBtlC0CkX+egXa+fY=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-104-Gz4Bkn4gMvCnTjdaHLk12w-1; Wed, 27 Apr 2022 16:05:59 -0400
-X-MC-Unique: Gz4Bkn4gMvCnTjdaHLk12w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 389A43834C16;
-        Wed, 27 Apr 2022 20:05:58 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.40.192.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C3AE49E74;
-        Wed, 27 Apr 2022 20:05:51 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        David Airlie <airlied@linux.ie>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        intel-gfx@lists.freedesktop.org,
-        Sean Christopherson <seanjc@google.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [RFC PATCH v3 19/19] KVM: x86: nSVM: expose the nested AVIC to the guest
-Date:   Wed, 27 Apr 2022 23:03:14 +0300
-Message-Id: <20220427200314.276673-20-mlevitsk@redhat.com>
-In-Reply-To: <20220427200314.276673-1-mlevitsk@redhat.com>
-References: <20220427200314.276673-1-mlevitsk@redhat.com>
+        with ESMTP id S229730AbiD0UVg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 16:21:36 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DE378AE60
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 13:18:23 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id m23so4117294ljb.8
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 13:18:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=GXFnAVqWMpf/YDrR850VsivYujGHnkwJcitva2FzMCY=;
+        b=AsMo9skrDD8q8UQN0XdxKlPDJ4+e3dYaIoN3KEWpWtFNuZL3YImkDoePDywipkcPXC
+         7gr6gyPMz+HHZWqFwZJltblh2rRUK0qPATYMnQdpYW8mSeHz+n8OoHmU2qgnhDaWt3JR
+         aDMqR97ZibWUX6nKkJF7K50tNMvPeK9aK2N+9BKoSWRgBVptUUiIWzetJUSZFezy2OtE
+         W2Yktn/wIisc/6zuQSZK5FVi6MtnmNmF9xF1NM/i2TsZY5m0S+D9W63nVc3LBMKK2Wqa
+         6VY4hv6eDQorANkiVZwst2udkY5trvoLSpwJUEsuIO24BkBH6h0iLXu6Jz6AwiVPZqqH
+         UE5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=GXFnAVqWMpf/YDrR850VsivYujGHnkwJcitva2FzMCY=;
+        b=o0PMTLXJxAbmy9w2pCsvBrQtVxgfVPoG3aKs+654tVL7Pbnmms7NVUtfbHXlyCz+ep
+         TgFnRXWjEOl2iJ/H6mIHAQuk7o1h+T5Q11BxYZmsGGUd4kL3n8bwCUQpYMo9xQINc98n
+         +t7+NTaJ48ZPST2hiN/vwDyAvSH+RdgKO13M9vLk6SV6kFxS2fmPsnUzOEDvkstff1Zm
+         d898dG4vEYbclgA3Xmb6eHN/x5LXoqgc1k3kCsJOmaxfrelEzBYSoddpCxURL6tP5bTV
+         JbboIgLI6tMKjl0gZHt/cUlALNYXQl/mMLX892R2edx4PFEJPMzoCoEGcAeSRNxvX+rA
+         brKQ==
+X-Gm-Message-State: AOAM532ZATPCgKin42RYcNbounhrJc+04EHgFGm8u9zectra7SVoS45q
+        uDO3QTsKGxfv1cYY1fUxzd+gTZivQYK+/PDGXT6J/Q==
+X-Google-Smtp-Source: ABdhPJzDDO/eY2GpC6TtuCyZdzeb0QOjebpOsfygIMaVPVBqnO7DcKZk5c4IubxxlVoCTLYkKGurPu6NtObI/0mLeZA=
+X-Received: by 2002:a05:651c:1994:b0:24d:d4b9:516c with SMTP id
+ bx20-20020a05651c199400b0024dd4b9516cmr18883821ljb.278.1651090700825; Wed, 27
+ Apr 2022 13:18:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220407195908.633003-1-pgonda@google.com> <CAFNjLiXC0AdOw5f8Ovu47D==ex7F0=WN_Ocirymz4xL=mWvC5A@mail.gmail.com>
+ <CAMkAt6r-Mc_YN-gVHuCpTj4E1EmcvyYpP9jhtHo5HRHnoNJAdA@mail.gmail.com>
+ <CAMkAt6r+OMPWCbV_svUyGWa0qMzjj2UEG29G6P7jb6uH6yko2w@mail.gmail.com>
+ <62e9ece1-5d71-f803-3f65-2755160cf1d1@redhat.com> <CAMkAt6q6YLBfo2RceduSXTafckEehawhD4K4hUEuB4ZNqe2kKg@mail.gmail.com>
+ <4c0edc90-36a1-4f4c-1923-4b20e7bdbb4c@redhat.com>
+In-Reply-To: <4c0edc90-36a1-4f4c-1923-4b20e7bdbb4c@redhat.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Wed, 27 Apr 2022 14:18:09 -0600
+Message-ID: <CAMkAt6oL5qi7z-eh4z7z8WBhpc=Ow6WtcJA5bDi6-aGMnz135A@mail.gmail.com>
+Subject: Re: [PATCH v3] KVM: SEV: Mark nested locking of vcpu->lock
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     John Sperbeck <jsperbeck@google.com>,
+        kvm list <kvm@vger.kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch enables and exposes to the nested guest
-the support for the nested AVIC.
+On Wed, Apr 27, 2022 at 10:04 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 4/26/22 21:06, Peter Gonda wrote:
+> > On Thu, Apr 21, 2022 at 9:56 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >>
+> >> On 4/20/22 22:14, Peter Gonda wrote:
+> >>>>>> svm_vm_migrate_from() uses sev_lock_vcpus_for_migration() to lock all
+> >>>>>> source and target vcpu->locks. Mark the nested subclasses to avoid false
+> >>>>>> positives from lockdep.
+> >>>> Nope. Good catch, I didn't realize there was a limit 8 subclasses:
+> >>> Does anyone have thoughts on how we can resolve this vCPU locking with
+> >>> the 8 subclass max?
+> >>
+> >> The documentation does not have anything.  Maybe you can call
+> >> mutex_release manually (and mutex_acquire before unlocking).
+> >>
+> >> Paolo
+> >
+> > Hmm this seems to be working thanks Paolo. To lock I have been using:
+> >
+> > ...
+> >                    if (mutex_lock_killable_nested(
+> >                                &vcpu->mutex, i * SEV_NR_MIGRATION_ROLES + role))
+> >                            goto out_unlock;
+> >                    mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
+> > ...
+> >
+> > To unlock:
+> > ...
+> >                    mutex_acquire(&vcpu->mutex.dep_map, 0, 0, _THIS_IP_);
+> >                    mutex_unlock(&vcpu->mutex);
+> > ...
+> >
+> > If I understand correctly we are fully disabling lockdep by doing
+> > this. If this is the case should I just remove all the '_nested' usage
+> > so switch to mutex_lock_killable() and remove the per vCPU subclass?
+>
+> Yes, though you could also do:
+>
+>         bool acquired = false;
+>         kvm_for_each_vcpu(...) {
+>                 if (acquired)
+>                         mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
+>                 if (mutex_lock_killable_nested(&vcpu->mutex, role)
+>                         goto out_unlock;
+>                 acquired = true;
+>                 ...
+>
+> and to unlock:
+>
+>         bool acquired = true;
+>         kvm_for_each_vcpu(...) {
+>                 if (!acquired)
+>                         mutex_acquire(&vcpu->mutex.dep_map, 0, role, _THIS_IP_);
+>                 mutex_unlock(&vcpu->mutex);
+>                 acquired = false;
+>         }
+>
+> where role is either 0 or SINGLE_DEPTH_NESTING and is passed to
+> sev_{,un}lock_vcpus_for_migration.
+>
+> That coalesces all the mutexes for a vm in a single subclass, essentially.
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/x86/kvm/svm/svm.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Ah thats a great idea to allow for lockdep to work still. I'll try
+that out, thanks again Paolo.
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 099329711ad13..431281ccc40ef 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4087,6 +4087,9 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 		if (guest_cpuid_has(vcpu, X86_FEATURE_X2APIC))
- 			kvm_set_apicv_inhibit(kvm, APICV_INHIBIT_REASON_X2APIC);
- 	}
-+
-+	svm->avic_enabled = enable_apicv && guest_cpuid_has(vcpu, X86_FEATURE_AVIC);
-+
- 	init_vmcb_after_set_cpuid(vcpu);
- }
- 
-@@ -4827,6 +4830,9 @@ static __init void svm_set_cpu_caps(void)
- 		if (vgif)
- 			kvm_cpu_cap_set(X86_FEATURE_VGIF);
- 
-+		if (enable_apicv)
-+			kvm_cpu_cap_set(X86_FEATURE_AVIC);
-+
- 		/* Nested VM can receive #VMEXIT instead of triggering #GP */
- 		kvm_cpu_cap_set(X86_FEATURE_SVME_ADDR_CHK);
- 	}
--- 
-2.26.3
-
+>
+> Paolo
+>
