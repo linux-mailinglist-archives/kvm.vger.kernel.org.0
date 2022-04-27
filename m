@@ -2,225 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DE2605124E6
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 23:59:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 899075124FD
+	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 00:04:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237828AbiD0WCP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 18:02:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35978 "EHLO
+        id S238081AbiD0WIB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 18:08:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236499AbiD0WCO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 18:02:14 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80640114E;
-        Wed, 27 Apr 2022 14:59:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651096741; x=1682632741;
-  h=message-id:date:mime-version:from:subject:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=ReKgWjo5Fy4ccefVXI5WqZ17NyQEm0KPvtdTQFFhd4Q=;
-  b=XIEFDv4nLLeFa23t1t7QlsI5v58+4bHEJgRxkXlij5a/xy4oGoWAklR4
-   UPnGJD5ExNUteH/67Nwdj3/Y6Gzl01FvuRyQkyvUrWuC1b1Ub89v4hGNq
-   n3Z068La5opclGRXXO5YsGS2xt/FDFLG2w204arE2Pi9ZbzW3z2eEZjFv
-   Rj9KnIjuT2pB4njb31XdQFTbevvT4nCtioMnMFC9mTFhbwLZuoaNiX33x
-   ZggpYENMKJELjr87cnT25T7Tgzmbokoq73ZfczDqbQ+l55aDWqZ6vIaoj
-   4tNAK8oOX1A0Yy4iMcM19zYleIQ2UgevL6dConqZYlvQysu1bNHCJrVKo
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10330"; a="263666520"
-X-IronPort-AV: E=Sophos;i="5.90,294,1643702400"; 
-   d="scan'208";a="263666520"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 14:59:01 -0700
-X-IronPort-AV: E=Sophos;i="5.90,294,1643702400"; 
-   d="scan'208";a="513905331"
-Received: from lcdaughe-mobl1.amr.corp.intel.com (HELO [10.212.72.252]) ([10.212.72.252])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 14:59:00 -0700
-Message-ID: <de24ac7e-349c-e49a-70bb-31b9bc867b10@intel.com>
-Date:   Wed, 27 Apr 2022 14:59:15 -0700
+        with ESMTP id S237989AbiD0WH7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 18:07:59 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A764D82D37
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 15:04:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 57E3EB82AE8
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 22:04:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 061F1C385A9;
+        Wed, 27 Apr 2022 22:04:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1651097085;
+        bh=pd+ppBS4AMOOPk2OjVc3EDZ0y0+9s9EffkC7oPOrVaA=;
+        h=From:To:Cc:Subject:Date:From;
+        b=bNd0y9GXq5k/qn0mRLOX7NDrArqeGsR6IzOkgOvtveIcb8irWHjo6I8JXX7U6wfyF
+         lSrhzyx70dySogcKsWMtoVQq6oIOmNNbCICS6dDL+/oZOdMfw6v5Mk8YKjwLBZuwpY
+         6S6KEf99Zgjmx7/E0G7xXPQ0UcSzp7GrviE+cej2UfIYUzShMMV7wHSCxU5f9lcDzj
+         iXESud4NQi2xXHC36GuAS80f/ZCigDGqxr4GR1wDf1L/9LKCPpni4Yni/OFOslwkrd
+         dPpD919UPz2vAnTUBWgdNUsJ3qj6Z7xcNzzc2IxImlr1bqM8rvg1NlY4ft29WNSogB
+         AzQErIphDSG5w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1njpm6-007U5C-Ix; Wed, 27 Apr 2022 23:04:42 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com, Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>,
+        Christoffer Dall <christoffer.dall@arm.com>
+Subject: [PATCH v2] KVM: arm64: Inject exception on out-of-IPA-range translation fault
+Date:   Wed, 27 Apr 2022 23:04:34 +0100
+Message-Id: <20220427220434.3097449-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-From:   Dave Hansen <dave.hansen@intel.com>
-Subject: Re: [PATCH v3 00/21] TDX host kernel support
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-References: <cover.1649219184.git.kai.huang@intel.com>
- <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
- <ecf718abf864bbb2366209f00d4315ada090aedc.camel@intel.com>
-Content-Language: en-US
-In-Reply-To: <ecf718abf864bbb2366209f00d4315ada090aedc.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-9.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com, qperret@google.com, will@kernel.org, christoffer.dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/26/22 18:15, Kai Huang wrote:
-> On Tue, 2022-04-26 at 13:13 -0700, Dave Hansen wrote:
->> On 4/5/22 21:49, Kai Huang wrote:
->>> SEAM VMX root operation is designed to host a CPU-attested, software
->>> module called the 'TDX module' which implements functions to manage
->>> crypto protected VMs called Trust Domains (TD).  SEAM VMX root is also
->>
->> "crypto protected"?  What the heck is that?
-> 
-> How about "crypto-protected"?  I googled and it seems it is used by someone
-> else.
+When taking a translation fault for an IPA that is outside of
+the range defined by the hypervisor (between the HW PARange and
+the IPA range), we stupidly treat it as an IO and forward the access
+to userspace. Of course, userspace can't do much with it, and things
+end badly.
 
-Cryptography itself doesn't provide (much) protection in the TDX
-architecture.  TDX guests are isolated from the VMM in ways that
-traditional guests are not, but that has almost nothing to do with
-cryptography.
+Arguably, the guest is braindead, but we should at least catch the
+case and inject an exception.
 
-Is it cryptography that keeps the host from reading guest private data
-in the clear?  Is it cryptography that keeps the host from reading guest
-ciphertext?  Does cryptography enforce the extra rules of Secure-EPT?
+Check the faulting IPA against:
+- the sanitised PARange: inject an address size fault
+- the IPA size: inject an abort
 
->>> 3. Memory hotplug
->>>
->>> The first generation of TDX architecturally doesn't support memory
->>> hotplug.  And the first generation of TDX-capable platforms don't support
->>> physical memory hotplug.  Since it physically cannot happen, this series
->>> doesn't add any check in ACPI memory hotplug code path to disable it.
->>>
->>> A special case of memory hotplug is adding NVDIMM as system RAM using
->>> kmem driver.  However the first generation of TDX-capable platforms
->>> cannot enable TDX and NVDIMM simultaneously, so in practice this cannot
->>> happen either.
->>
->> What prevents this code from today's code being run on tomorrow's
->> platforms and breaking these assumptions?
-> 
-> I forgot to add below (which is in the documentation patch):
-> 
-> "This can be enhanced when future generation of TDX starts to support ACPI
-> memory hotplug, or NVDIMM and TDX can be enabled simultaneously on the
-> same platform."
-> 
-> Is this acceptable?
+Reported-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_emulate.h |  1 +
+ arch/arm64/kvm/inject_fault.c        | 28 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/mmu.c                 | 19 +++++++++++++++++++
+ 3 files changed, 48 insertions(+)
 
-No, Kai.
-
-You're basically saying: *this* code doesn't work with feature A, B and
-C.  Then, you're pivoting to say that it doesn't matter because one
-version of Intel's hardware doesn't support A, B, or C.
-
-I don't care about this *ONE* version of the hardware.  I care about
-*ALL* the hardware that this code will ever support.  *ALL* the hardware
-on which this code will run.
-
-In 5 years, if someone takes this code and runs it on Intel hardware
-with memory hotplug, CPU hotplug, NVDIMMs *AND* TDX support, what happens?
-
-You can't just ignore the problems because they're not present on one
-version of the hardware.
-
->>> Another case is admin can use 'memmap' kernel command line to create
->>> legacy PMEMs and use them as TD guest memory, or theoretically, can use
->>> kmem driver to add them as system RAM.  To avoid having to change memory
->>> hotplug code to prevent this from happening, this series always include
->>> legacy PMEMs when constructing TDMRs so they are also TDX memory.
->>>
->>> 4. CPU hotplug
->>>
->>> The first generation of TDX architecturally doesn't support ACPI CPU
->>> hotplug.  All logical cpus are enabled by BIOS in MADT table.  Also, the
->>> first generation of TDX-capable platforms don't support ACPI CPU hotplug
->>> either.  Since this physically cannot happen, this series doesn't add any
->>> check in ACPI CPU hotplug code path to disable it.
->>>
->>> Also, only TDX module initialization requires all BIOS-enabled cpus are
->>> online.  After the initialization, any logical cpu can be brought down
->>> and brought up to online again later.  Therefore this series doesn't
->>> change logical CPU hotplug either.
->>>
->>> 5. TDX interaction with kexec()
->>>
->>> If TDX is ever enabled and/or used to run any TD guests, the cachelines
->>> of TDX private memory, including PAMTs, used by TDX module need to be
->>> flushed before transiting to the new kernel otherwise they may silently
->>> corrupt the new kernel.  Similar to SME, this series flushes cache in
->>> stop_this_cpu().
->>
->> What does this have to do with kexec()?  What's a PAMT?
-> 
-> The point is the dirty cachelines of TDX private memory must be flushed
-> otherwise they may slightly corrupt the new kexec()-ed kernel.
-> 
-> Will use "TDX metadata" instead of "PAMT".  The former has already been
-> mentioned above.
-
-Longer description for the patch itself:
-
-TDX memory encryption is built on top of MKTME which uses physical
-address aliases to designate encryption keys.  This architecture is not
-cache coherent.  Software is responsible for flushing the CPU caches
-when memory changes keys.  When kexec()'ing, memory can be repurposed
-from TDX use to non-TDX use, changing the effective encryption key.
-
-Cover-letter-level description:
-
-Just like SME, TDX hosts require special cache flushing before kexec().
-
->>> uninitialized state so it can be initialized again.
->>>
->>> This implies:
->>>
->>>   - If the old kernel fails to initialize TDX, the new kernel cannot
->>>     use TDX too unless the new kernel fixes the bug which leads to
->>>     initialization failure in the old kernel and can resume from where
->>>     the old kernel stops. This requires certain coordination between
->>>     the two kernels.
->>
->> OK, but what does this *MEAN*?
-> 
-> This means we need to extend the information which the old kernel passes to the
-> new kernel.  But I don't think it's feasible.  I'll refine this kexec() section
-> to make it more concise next version.
-> 
->>
->>>   - If the old kernel has initialized TDX successfully, the new kernel
->>>     may be able to use TDX if the two kernels have the exactly same
->>>     configurations on the TDX module. It further requires the new kernel
->>>     to reserve the TDX metadata pages (allocated by the old kernel) in
->>>     its page allocator. It also requires coordination between the two
->>>     kernels.  Furthermore, if kexec() is done when there are active TD
->>>     guests running, the new kernel cannot use TDX because it's extremely
->>>     hard for the old kernel to pass all TDX private pages to the new
->>>     kernel.
->>>
->>> Given that, this series doesn't support TDX after kexec() (except the
->>> old kernel doesn't attempt to initialize TDX at all).
->>>
->>> And this series doesn't shut down TDX module but leaves it open during
->>> kexec().  It is because shutting down TDX module requires CPU being in
->>> VMX operation but there's no guarantee of this during kexec().  Leaving
->>> the TDX module open is not the best case, but it is OK since the new
->>> kernel won't be able to use TDX anyway (therefore TDX module won't run
->>> at all).
->>
->> tl;dr: kexec() doesn't work with this code.
->>
->> Right?
->>
->> That doesn't seem good.
-> 
-> It can work in my understanding.  We just need to flush cache before booting to
-> the new kernel.
-
-What about all the concerns about TDX module configuration changing?
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 7496deab025a..f71358271b71 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -40,6 +40,7 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
+ void kvm_inject_vabt(struct kvm_vcpu *vcpu);
+ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
+ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
++void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
+ 
+ void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
+ 
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index b47df73e98d7..ba20405d2dc2 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -145,6 +145,34 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
+ 		inject_abt64(vcpu, true, addr);
+ }
+ 
++void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
++{
++	unsigned long addr, esr;
++
++	addr  = kvm_vcpu_get_fault_ipa(vcpu);
++	addr |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
++
++	if (kvm_vcpu_trap_is_iabt(vcpu))
++		kvm_inject_pabt(vcpu, addr);
++	else
++		kvm_inject_dabt(vcpu, addr);
++
++	/*
++	 * If AArch64 or LPAE, set FSC to 0 to indicate an Address
++	 * Size Fault at level 0, as if exceeding PARange.
++	 *
++	 * Non-LPAE guests will only get the external abort, as there
++	 * is no way to to describe the ASF.
++	 */
++	if (vcpu_el1_is_32bit(vcpu) &&
++	    !(vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE))
++		return;
++
++	esr = vcpu_read_sys_reg(vcpu, ESR_EL1);
++	esr &= ~GENMASK_ULL(5, 0);
++	vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
++}
++
+ /**
+  * kvm_inject_undefined - inject an undefined instruction into the guest
+  * @vcpu: The vCPU in which to inject the exception
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 53ae2c0640bc..5400fc020164 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1337,6 +1337,25 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
+ 	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+ 
++	if (fault_status == FSC_FAULT) {
++		/* Beyond sanitised PARange (which is the IPA limit) */
++		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
++			kvm_inject_size_fault(vcpu);
++			return 1;
++		}
++
++		/* Falls between the IPA range and the PARange? */
++		if (fault_ipa >= BIT_ULL(vcpu->arch.hw_mmu->pgt->ia_bits)) {
++			fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
++
++			if (is_iabt)
++				kvm_inject_pabt(vcpu, fault_ipa);
++			else
++				kvm_inject_dabt(vcpu, fault_ipa);
++			return 1;
++		}
++	}
++
+ 	/* Synchronous External Abort? */
+ 	if (kvm_vcpu_abt_issea(vcpu)) {
+ 		/*
+-- 
+2.34.1
 
