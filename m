@@ -2,85 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 69293511DC4
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 20:36:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2B2C511ED2
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 20:37:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241759AbiD0QKo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 12:10:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49288 "EHLO
+        id S242603AbiD0QRJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 12:17:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242788AbiD0QJy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 12:09:54 -0400
+        with ESMTP id S244195AbiD0QPw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 12:15:52 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D57A8492000
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 09:06:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 09D7B466095
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 09:12:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651075470;
+        s=mimecast20190719; t=1651075875;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KnIiu4aHbqX/cEMaulV4w/SJ9uqmiCPjBFKvPiEFRe0=;
-        b=WprXT2TPiweaF750Wry+tjUJuEmboKF8/vqSkZBxZFMnBSbGyciuA/ZQUKNSL9NpYln79H
-        4IdH+DG4ZpNC7oF9FBLVwX0O+yIEq9RFoPduvo1fTQkApqxqTj+39jKSj/44MLf0Rft+nE
-        gzex4BGU2jS5h6/ZrA9OtvWmPbhfEsE=
+        bh=sFc20t4Fawn4HcmOMiQMfQ+t+zsv9RfRTHop2w51OBY=;
+        b=PQbYC5uz6sAmVtJARKrdxdzFYM/foYn9eB6djDSZN8UzqufayomhPRrJ4L6yzF4u2RvLHB
+        gnrrYBMu/bVPWj2nXRRuOq+SFRaJpPzkxwt3GlcpBifTj9tmph4GOoes9eanx3gzPB0oCW
+        fgei6Nh9JM6PtvDEZQ/4sSPHCTTR6XE=
 Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
  [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-500-4WtCj3CZPvmUblIL8wUL8w-1; Wed, 27 Apr 2022 12:04:28 -0400
-X-MC-Unique: 4WtCj3CZPvmUblIL8wUL8w-1
-Received: by mail-ej1-f69.google.com with SMTP id i14-20020a17090639ce00b006dabe6a112fso1404603eje.13
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 09:04:27 -0700 (PDT)
+ us-mta-279-KdKAFhWfNpC8eBo6lqQEjw-1; Wed, 27 Apr 2022 12:04:58 -0400
+X-MC-Unique: KdKAFhWfNpC8eBo6lqQEjw-1
+Received: by mail-ej1-f69.google.com with SMTP id nd34-20020a17090762a200b006e0ef16745cso1404485ejc.20
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 09:04:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:subject:in-reply-to
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=KnIiu4aHbqX/cEMaulV4w/SJ9uqmiCPjBFKvPiEFRe0=;
-        b=y0HJZJcvbgwW3PtJyf+Yxo0KIJ8+XnJyeXBq5wrclL2+GF1gKV0Lz7+JiszQQ1WzaI
-         RgOq2jYuXtPZ6InnqD41NQ3FC3Q2HvnBEjO7FEKr4x8E7jup5bpn7yu+dMjQkS6DE1wk
-         Y7A6lGETgPUaUiqGppUVvTJGpRM06NNrfaGEjiDrIKZYfh6eF3hduhrTbkGXXzMvR36R
-         3eXomOpgzhi0AunBMrT939hnF/H1ntYm/lqarrH0vaz3qrIZw3Ruig9dL7kROgqVSN7C
-         t9ZRgfCwGJNKPVXbqz54jyCu17W0AfvruEBTkPpQIUqDCKq7boeYVt/1HgJQaGUI2P8J
-         fQ/w==
-X-Gm-Message-State: AOAM531HpriR7vRJJ6Vw6gHcPlhv02EC6XIb6F4RFxtQ40sOdhnN5kvP
-        GMENHRkZBNIcc8JrP09LmknKThyRJV1LDdSQ106MGZRtlQfWwCAuOoTPEtZufLIN0CWGVU4hhLq
-        Eztpl8NwYogMI
-X-Received: by 2002:a17:907:7ea3:b0:6e8:92eb:3dcc with SMTP id qb35-20020a1709077ea300b006e892eb3dccmr27624640ejc.75.1651075466142;
-        Wed, 27 Apr 2022 09:04:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzqNSR4hVvkXBeP+K+imWXt9ZGbaPI48pJcmDVu7PsJz8M+Q4F+vXJ4MZ3xBab8Khy6a1oUhg==
-X-Received: by 2002:a17:907:7ea3:b0:6e8:92eb:3dcc with SMTP id qb35-20020a1709077ea300b006e892eb3dccmr27624614ejc.75.1651075465846;
-        Wed, 27 Apr 2022 09:04:25 -0700 (PDT)
+        bh=sFc20t4Fawn4HcmOMiQMfQ+t+zsv9RfRTHop2w51OBY=;
+        b=VXtpB4lmCXhAKCc5+goRxPXio30lrJjhEq/9g9NI4f05MpaYo4PSJ0llEQCkkfOvNk
+         /LE970XajRmBZTFNVQbLdvACvkgp6z0I2XW9f8seXTfWF/cEeHlt7vZdARmfpy92CYLh
+         /FiP8NqzFM2qP1Lt3Ahkv9KpfMfUY42rgs+8wtcw24SFnUU7x+anos+QVLQpM8IKxub4
+         sYlGbySxxIlLm0t08TUckuz/n6qKY9nAzJ7rZJUt3sFOqpxb1K2tiPdvpZTgWq0mr5la
+         LJu9Rhy7+fCs4ShNANHieFEGkbisoxRZaZXyofGp3eyAnJqzd2h/DhL1FsSf7gJxhQhq
+         614w==
+X-Gm-Message-State: AOAM531tpoJDtCeTuHWe8RO2m9N8mmSPjxzVI73ktkw5otOwom5qle6c
+        4DpSZKXE/QLeoq4biWa67HMtZp3TKNWEopHyzV78ubRUy69ZQeh+ZOOPC/7CTcb7v83+5U70hwL
+        +ozGNAXEiByrt
+X-Received: by 2002:a05:6402:4396:b0:426:1bac:ec8e with SMTP id o22-20020a056402439600b004261bacec8emr2595333edc.127.1651075497457;
+        Wed, 27 Apr 2022 09:04:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxtkMRCC7iFIg553pfAq0G1hyWgV7GPKDWn4F7ecqeNassaGQOMNoNiOoH9aE0X0vc/J585yQ==
+X-Received: by 2002:a05:6402:4396:b0:426:1bac:ec8e with SMTP id o22-20020a056402439600b004261bacec8emr2595304edc.127.1651075497189;
+        Wed, 27 Apr 2022 09:04:57 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id z12-20020a50f14c000000b00425d61cbb0esm6345687edl.22.2022.04.27.09.04.23
+        by smtp.googlemail.com with ESMTPSA id i6-20020a170906850600b006f3984d939esm4384576ejx.65.2022.04.27.09.04.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Apr 2022 09:04:24 -0700 (PDT)
-Message-ID: <4c0edc90-36a1-4f4c-1923-4b20e7bdbb4c@redhat.com>
-Date:   Wed, 27 Apr 2022 18:04:23 +0200
+        Wed, 27 Apr 2022 09:04:56 -0700 (PDT)
+Message-ID: <654e8afb-6417-d146-0cea-64ab3d693643@redhat.com>
+Date:   Wed, 27 Apr 2022 18:04:54 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.8.0
+Subject: Re: [PATCH MANUALSEL 5.17 6/7] KVM: SEV: Allow SEV intra-host
+ migration of VM with mirrors
 Content-Language: en-US
-To:     Peter Gonda <pgonda@google.com>
-Cc:     John Sperbeck <jsperbeck@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        David Rientjes <rientjes@google.com>,
+To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+Cc:     Peter Gonda <pgonda@google.com>,
         Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20220407195908.633003-1-pgonda@google.com>
- <CAFNjLiXC0AdOw5f8Ovu47D==ex7F0=WN_Ocirymz4xL=mWvC5A@mail.gmail.com>
- <CAMkAt6r-Mc_YN-gVHuCpTj4E1EmcvyYpP9jhtHo5HRHnoNJAdA@mail.gmail.com>
- <CAMkAt6r+OMPWCbV_svUyGWa0qMzjj2UEG29G6P7jb6uH6yko2w@mail.gmail.com>
- <62e9ece1-5d71-f803-3f65-2755160cf1d1@redhat.com>
- <CAMkAt6q6YLBfo2RceduSXTafckEehawhD4K4hUEuB4ZNqe2kKg@mail.gmail.com>
+        Marc Orr <marcorr@google.com>, kvm@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, shuah@kernel.org,
+        linux-kselftest@vger.kernel.org
+References: <20220427155408.19352-1-sashal@kernel.org>
+ <20220427155408.19352-6-sashal@kernel.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3] KVM: SEV: Mark nested locking of vcpu->lock
-In-Reply-To: <CAMkAt6q6YLBfo2RceduSXTafckEehawhD4K4hUEuB4ZNqe2kKg@mail.gmail.com>
+In-Reply-To: <20220427155408.19352-6-sashal@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,66 +87,257 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/26/22 21:06, Peter Gonda wrote:
-> On Thu, Apr 21, 2022 at 9:56 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 4/20/22 22:14, Peter Gonda wrote:
->>>>>> svm_vm_migrate_from() uses sev_lock_vcpus_for_migration() to lock all
->>>>>> source and target vcpu->locks. Mark the nested subclasses to avoid false
->>>>>> positives from lockdep.
->>>> Nope. Good catch, I didn't realize there was a limit 8 subclasses:
->>> Does anyone have thoughts on how we can resolve this vCPU locking with
->>> the 8 subclass max?
->>
->> The documentation does not have anything.  Maybe you can call
->> mutex_release manually (and mutex_acquire before unlocking).
->>
->> Paolo
+On 4/27/22 17:54, Sasha Levin wrote:
+> From: Peter Gonda <pgonda@google.com>
 > 
-> Hmm this seems to be working thanks Paolo. To lock I have been using:
+> [ Upstream commit b2125513dfc0dd0ec5a9605138a3c356592cfb73 ]
 > 
-> ...
->                    if (mutex_lock_killable_nested(
->                                &vcpu->mutex, i * SEV_NR_MIGRATION_ROLES + role))
->                            goto out_unlock;
->                    mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
-> ...
+> For SEV-ES VMs with mirrors to be intra-host migrated they need to be
+> able to migrate with the mirror. This is due to that fact that all VMSAs
+> need to be added into the VM with LAUNCH_UPDATE_VMSA before
+> lAUNCH_FINISH. Allowing migration with mirrors allows users of SEV-ES to
+> keep the mirror VMs VMSAs during migration.
 > 
-> To unlock:
-> ...
->                    mutex_acquire(&vcpu->mutex.dep_map, 0, 0, _THIS_IP_);
->                    mutex_unlock(&vcpu->mutex);
-> ...
+> Adds a list of mirror VMs for the original VM iterate through during its
+> migration. During the iteration the owner pointers can be updated from
+> the source to the destination. This fixes the ASID leaking issue which
+> caused the blocking of migration of VMs with mirrors.
 > 
-> If I understand correctly we are fully disabling lockdep by doing
-> this. If this is the case should I just remove all the '_nested' usage
-> so switch to mutex_lock_killable() and remove the per vCPU subclass?
+> Signed-off-by: Peter Gonda <pgonda@google.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Marc Orr <marcorr@google.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Message-Id: <20220211193634.3183388-1-pgonda@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
 
-Yes, though you could also do:
+Too scary,
 
-	bool acquired = false;
-	kvm_for_each_vcpu(...) {
-		if (acquired)
-			mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
-		if (mutex_lock_killable_nested(&vcpu->mutex, role)
-			goto out_unlock;
-		acquired = true;
-		...
-
-and to unlock:
-
-	bool acquired = true;
-	kvm_for_each_vcpu(...) {
-		if (!acquired)
-			mutex_acquire(&vcpu->mutex.dep_map, 0, role, _THIS_IP_);
-		mutex_unlock(&vcpu->mutex);
-		acquired = false;
-	}
-
-where role is either 0 or SINGLE_DEPTH_NESTING and is passed to 
-sev_{,un}lock_vcpus_for_migration.
-
-That coalesces all the mutexes for a vm in a single subclass, essentially.
+NACK
 
 Paolo
+
+> ---
+>   arch/x86/kvm/svm/sev.c                        | 57 ++++++++++++-------
+>   arch/x86/kvm/svm/svm.h                        |  3 +-
+>   .../selftests/kvm/x86_64/sev_migrate_tests.c  | 47 ++++++++++-----
+>   3 files changed, 73 insertions(+), 34 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index fef975852582..553d6dbf19a2 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -258,6 +258,7 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>   		goto e_free;
+>   
+>   	INIT_LIST_HEAD(&sev->regions_list);
+> +	INIT_LIST_HEAD(&sev->mirror_vms);
+>   
+>   	return 0;
+>   
+> @@ -1623,9 +1624,12 @@ static void sev_unlock_vcpus_for_migration(struct kvm *kvm)
+>   	}
+>   }
+>   
+> -static void sev_migrate_from(struct kvm_sev_info *dst,
+> -			      struct kvm_sev_info *src)
+> +static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
+>   {
+> +	struct kvm_sev_info *dst = &to_kvm_svm(dst_kvm)->sev_info;
+> +	struct kvm_sev_info *src = &to_kvm_svm(src_kvm)->sev_info;
+> +	struct kvm_sev_info *mirror;
+> +
+>   	dst->active = true;
+>   	dst->asid = src->asid;
+>   	dst->handle = src->handle;
+> @@ -1639,6 +1643,30 @@ static void sev_migrate_from(struct kvm_sev_info *dst,
+>   	src->enc_context_owner = NULL;
+>   
+>   	list_cut_before(&dst->regions_list, &src->regions_list, &src->regions_list);
+> +
+> +	/*
+> +	 * If this VM has mirrors, "transfer" each mirror's refcount of the
+> +	 * source to the destination (this KVM).  The caller holds a reference
+> +	 * to the source, so there's no danger of use-after-free.
+> +	 */
+> +	list_cut_before(&dst->mirror_vms, &src->mirror_vms, &src->mirror_vms);
+> +	list_for_each_entry(mirror, &dst->mirror_vms, mirror_entry) {
+> +		kvm_get_kvm(dst_kvm);
+> +		kvm_put_kvm(src_kvm);
+> +		mirror->enc_context_owner = dst_kvm;
+> +	}
+> +
+> +	/*
+> +	 * If this VM is a mirror, remove the old mirror from the owners list
+> +	 * and add the new mirror to the list.
+> +	 */
+> +	if (is_mirroring_enc_context(dst_kvm)) {
+> +		struct kvm_sev_info *owner_sev_info =
+> +			&to_kvm_svm(dst->enc_context_owner)->sev_info;
+> +
+> +		list_del(&src->mirror_entry);
+> +		list_add_tail(&dst->mirror_entry, &owner_sev_info->mirror_vms);
+> +	}
+>   }
+>   
+>   static int sev_es_migrate_from(struct kvm *dst, struct kvm *src)
+> @@ -1708,15 +1736,6 @@ int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
+>   
+>   	src_sev = &to_kvm_svm(source_kvm)->sev_info;
+>   
+> -	/*
+> -	 * VMs mirroring src's encryption context rely on it to keep the
+> -	 * ASID allocated, but below we are clearing src_sev->asid.
+> -	 */
+> -	if (src_sev->num_mirrored_vms) {
+> -		ret = -EBUSY;
+> -		goto out_unlock;
+> -	}
+> -
+>   	dst_sev->misc_cg = get_current_misc_cg();
+>   	cg_cleanup_sev = dst_sev;
+>   	if (dst_sev->misc_cg != src_sev->misc_cg) {
+> @@ -1738,7 +1757,8 @@ int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
+>   		if (ret)
+>   			goto out_source_vcpu;
+>   	}
+> -	sev_migrate_from(dst_sev, src_sev);
+> +
+> +	sev_migrate_from(kvm, source_kvm);
+>   	kvm_vm_dead(source_kvm);
+>   	cg_cleanup_sev = src_sev;
+>   	ret = 0;
+> @@ -2008,10 +2028,10 @@ int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd)
+>   	 */
+>   	source_sev = &to_kvm_svm(source_kvm)->sev_info;
+>   	kvm_get_kvm(source_kvm);
+> -	source_sev->num_mirrored_vms++;
+> +	mirror_sev = &to_kvm_svm(kvm)->sev_info;
+> +	list_add_tail(&mirror_sev->mirror_entry, &source_sev->mirror_vms);
+>   
+>   	/* Set enc_context_owner and copy its encryption context over */
+> -	mirror_sev = &to_kvm_svm(kvm)->sev_info;
+>   	mirror_sev->enc_context_owner = source_kvm;
+>   	mirror_sev->active = true;
+>   	mirror_sev->asid = source_sev->asid;
+> @@ -2019,6 +2039,7 @@ int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd)
+>   	mirror_sev->es_active = source_sev->es_active;
+>   	mirror_sev->handle = source_sev->handle;
+>   	INIT_LIST_HEAD(&mirror_sev->regions_list);
+> +	INIT_LIST_HEAD(&mirror_sev->mirror_vms);
+>   	ret = 0;
+>   
+>   	/*
+> @@ -2041,19 +2062,17 @@ void sev_vm_destroy(struct kvm *kvm)
+>   	struct list_head *head = &sev->regions_list;
+>   	struct list_head *pos, *q;
+>   
+> -	WARN_ON(sev->num_mirrored_vms);
+> -
+>   	if (!sev_guest(kvm))
+>   		return;
+>   
+> +	WARN_ON(!list_empty(&sev->mirror_vms));
+> +
+>   	/* If this is a mirror_kvm release the enc_context_owner and skip sev cleanup */
+>   	if (is_mirroring_enc_context(kvm)) {
+>   		struct kvm *owner_kvm = sev->enc_context_owner;
+> -		struct kvm_sev_info *owner_sev = &to_kvm_svm(owner_kvm)->sev_info;
+>   
+>   		mutex_lock(&owner_kvm->lock);
+> -		if (!WARN_ON(!owner_sev->num_mirrored_vms))
+> -			owner_sev->num_mirrored_vms--;
+> +		list_del(&sev->mirror_entry);
+>   		mutex_unlock(&owner_kvm->lock);
+>   		kvm_put_kvm(owner_kvm);
+>   		return;
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 86bcfed6599e..831bca1fdc29 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -81,7 +81,8 @@ struct kvm_sev_info {
+>   	struct list_head regions_list;  /* List of registered regions */
+>   	u64 ap_jump_table;	/* SEV-ES AP Jump Table address */
+>   	struct kvm *enc_context_owner; /* Owner of copied encryption context */
+> -	unsigned long num_mirrored_vms; /* Number of VMs sharing this ASID */
+> +	struct list_head mirror_vms; /* List of VMs mirroring */
+> +	struct list_head mirror_entry; /* Use as a list entry of mirrors */
+>   	struct misc_cg *misc_cg; /* For misc cgroup accounting */
+>   	atomic_t migration_in_progress;
+>   };
+> diff --git a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
+> index 80056bbbb003..2e5a42cb470b 100644
+> --- a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
+> +++ b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
+> @@ -341,35 +341,54 @@ static void test_sev_mirror_parameters(void)
+>   
+>   static void test_sev_move_copy(void)
+>   {
+> -	struct kvm_vm *dst_vm, *sev_vm, *mirror_vm, *dst_mirror_vm;
+> -	int ret;
+> +	struct kvm_vm *dst_vm, *dst2_vm, *dst3_vm, *sev_vm, *mirror_vm,
+> +		      *dst_mirror_vm, *dst2_mirror_vm, *dst3_mirror_vm;
+>   
+>   	sev_vm = sev_vm_create(/* es= */ false);
+>   	dst_vm = aux_vm_create(true);
+> +	dst2_vm = aux_vm_create(true);
+> +	dst3_vm = aux_vm_create(true);
+>   	mirror_vm = aux_vm_create(false);
+>   	dst_mirror_vm = aux_vm_create(false);
+> +	dst2_mirror_vm = aux_vm_create(false);
+> +	dst3_mirror_vm = aux_vm_create(false);
+>   
+>   	sev_mirror_create(mirror_vm->fd, sev_vm->fd);
+> -	ret = __sev_migrate_from(dst_vm->fd, sev_vm->fd);
+> -	TEST_ASSERT(ret == -1 && errno == EBUSY,
+> -		    "Cannot migrate VM that has mirrors. ret %d, errno: %d\n", ret,
+> -		    errno);
+>   
+> -	/* The mirror itself can be migrated.  */
+>   	sev_migrate_from(dst_mirror_vm->fd, mirror_vm->fd);
+> -	ret = __sev_migrate_from(dst_vm->fd, sev_vm->fd);
+> -	TEST_ASSERT(ret == -1 && errno == EBUSY,
+> -		    "Cannot migrate VM that has mirrors. ret %d, errno: %d\n", ret,
+> -		    errno);
+> +	sev_migrate_from(dst_vm->fd, sev_vm->fd);
+> +
+> +	sev_migrate_from(dst2_vm->fd, dst_vm->fd);
+> +	sev_migrate_from(dst2_mirror_vm->fd, dst_mirror_vm->fd);
+> +
+> +	sev_migrate_from(dst3_mirror_vm->fd, dst2_mirror_vm->fd);
+> +	sev_migrate_from(dst3_vm->fd, dst2_vm->fd);
+> +
+> +	kvm_vm_free(dst_vm);
+> +	kvm_vm_free(sev_vm);
+> +	kvm_vm_free(dst2_vm);
+> +	kvm_vm_free(dst3_vm);
+> +	kvm_vm_free(mirror_vm);
+> +	kvm_vm_free(dst_mirror_vm);
+> +	kvm_vm_free(dst2_mirror_vm);
+> +	kvm_vm_free(dst3_mirror_vm);
+>   
+>   	/*
+> -	 * mirror_vm is not a mirror anymore, dst_mirror_vm is.  Thus,
+> -	 * the owner can be copied as soon as dst_mirror_vm is gone.
+> +	 * Run similar test be destroy mirrors before mirrored VMs to ensure
+> +	 * destruction is done safely.
+>   	 */
+> -	kvm_vm_free(dst_mirror_vm);
+> +	sev_vm = sev_vm_create(/* es= */ false);
+> +	dst_vm = aux_vm_create(true);
+> +	mirror_vm = aux_vm_create(false);
+> +	dst_mirror_vm = aux_vm_create(false);
+> +
+> +	sev_mirror_create(mirror_vm->fd, sev_vm->fd);
+> +
+> +	sev_migrate_from(dst_mirror_vm->fd, mirror_vm->fd);
+>   	sev_migrate_from(dst_vm->fd, sev_vm->fd);
+>   
+>   	kvm_vm_free(mirror_vm);
+> +	kvm_vm_free(dst_mirror_vm);
+>   	kvm_vm_free(dst_vm);
+>   	kvm_vm_free(sev_vm);
+>   }
 
