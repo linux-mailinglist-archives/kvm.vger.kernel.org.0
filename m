@@ -2,73 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AAD05510E9B
+	by mail.lfdr.de (Postfix) with ESMTP id 614CC510E9A
 	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 04:21:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357053AbiD0CNL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 22:13:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55886 "EHLO
+        id S1357164AbiD0CXY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 22:23:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232839AbiD0CNK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Apr 2022 22:13:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 754D24EDF0
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 19:09:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651025396;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7bkyrH5c2hKUcaITiGmdDBOvO8zmEbp3dCpxTZkvZz4=;
-        b=ZoRAZIps2BZs8cPDXH/KqAphTMSl9KGP2irdju/Il6zcsec/EFliVk4APG4iPfITCEkfX9
-        8l/kE+ZRnCgpQ5I+9ymjyarfWDy2TWTZ7NR8HlXTby0NFst7RLhTbR8FY7ommqydiatuB0
-        wvEGJ4NPP0vnLBnZG9IsdR8y5kFibqc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-378-n4KVVouZOf-54OhBmwSxKA-1; Tue, 26 Apr 2022 22:09:53 -0400
-X-MC-Unique: n4KVVouZOf-54OhBmwSxKA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6AD76833963;
-        Wed, 27 Apr 2022 02:09:52 +0000 (UTC)
-Received: from [10.72.13.230] (ovpn-13-230.pek2.redhat.com [10.72.13.230])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 424A05673BD;
-        Wed, 27 Apr 2022 02:09:44 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v6 8/9] selftests: KVM: aarch64: Introduce hypercall ABI
- test
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
-        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-References: <20220423000328.2103733-1-rananta@google.com>
- <20220423000328.2103733-9-rananta@google.com>
- <896e95a1-6a3e-c524-4951-8fae9697b85e@redhat.com>
- <CAJHc60z_+O09u0wB9=PnuEu3bZC0tQG93iWbjTP7-WvnN-FEnQ@mail.gmail.com>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <85a332a0-541e-648a-db98-eff894737338@redhat.com>
-Date:   Wed, 27 Apr 2022 10:09:36 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        with ESMTP id S1352947AbiD0CXW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Apr 2022 22:23:22 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44E205FC9
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 19:20:08 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id j8so369142pll.11
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 19:20:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=JBEck0eZfunlgydBxrnMtDgPMmvndDpR2yeT/EWK+G8=;
+        b=oaeV2vz9Hp+gQc9pd3fIHB7se2vGDwIRqj+dRAzOh9RICJoiJyunceiVBfKyzA7lBd
+         A6PtanwAVGTDAbj3HAmjw25Od1JiqyUbsc7RrTj+EKm86Hd/Mk4yRrk3JWrvUYUp3cA5
+         SJPPRj4Ii4+ZJep3RNwvgQIhGF8NtGZrHP09Cd8BC7KyqknkzQ1QWEi+MXS+/7SHIDRv
+         ylxS1qbw0y+7AzYsHMFCbVhTf4JsxW2HqSPClEBqvIt9ee6lns5vrkn89w0Zza1ZdPNz
+         GTvdH3Mg3PfroYyulMjzOAI3FM/Y22gOhtr/Bzkh4IJZ+FxIx2uqlb9ltzNStQU1eymI
+         zxPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=JBEck0eZfunlgydBxrnMtDgPMmvndDpR2yeT/EWK+G8=;
+        b=et2G5bQjcfJAk9Wqj9iMIgXFIYVooVMLm7gK2Qz9KpQQ5B+b+tyGJvLXnDpksGxQIc
+         sI7xM1swG1bc7UVL9afnh2YldiYGvfy4iE+e8ljAnS5NAr7u8l+5YLfa3KsX7/SLQcdn
+         4UhcVpPoxAeg7VSvqEypTTklGx/GO3DWCCC1vB+sDDTjKKZvvu8QLlVbxh6sbvtllvUv
+         MwLpEQxLbJlPbX6BevCaGqZKqXzKia68e2NuYXAutVxg0VtXlxsE9jzYduDkHLxBBWUb
+         ebTMKqTGjnG+ub7iy9DWtJsYcUvmNL8dulGUqImR2swlhccfW7PKJGdCxFgxj/sK2hD+
+         nq3A==
+X-Gm-Message-State: AOAM531j/o3ih1mJDia+5rbxIzZ/Qcv2UEga3HW+4rhzXSPHLRGiP9if
+        5i24hM8Nv9IBt/cYsnAEqmQm7A==
+X-Google-Smtp-Source: ABdhPJwoWGWtzGrXdMPSm0vyj8T+XpUOnjfyNDPm7Yld1QcS+RvJMc3znjCDnG77ukIGvQQj/s94Hw==
+X-Received: by 2002:a17:902:e054:b0:15c:ed0d:f13f with SMTP id x20-20020a170902e05400b0015ced0df13fmr19042016plx.76.1651026007546;
+        Tue, 26 Apr 2022 19:20:07 -0700 (PDT)
+Received: from [10.255.73.91] ([139.177.225.254])
+        by smtp.gmail.com with ESMTPSA id y10-20020a17090a390a00b001cda0b69a30sm325224pjb.52.2022.04.26.19.20.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Apr 2022 19:20:06 -0700 (PDT)
+Message-ID: <61e9dfd1-a663-549e-112b-761398996c2d@bytedance.com>
+Date:   Wed, 27 Apr 2022 10:16:14 +0800
 MIME-Version: 1.0
-In-Reply-To: <CAJHc60z_+O09u0wB9=PnuEu3bZC0tQG93iWbjTP7-WvnN-FEnQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: PING: [PATCH] KVM: HWPoison: Fix memory address&size during remap
 Content-Language: en-US
+To:     pbonzini@redhat.com, peter.maydell@linaro.org, mtosatti@redhat.com
+Cc:     kvm@vger.kernel.org, qemu-devel@nongnu.org
+References: <20220420064542.423508-1-pizhenwei@bytedance.com>
+From:   zhenwei pi <pizhenwei@bytedance.com>
+In-Reply-To: <20220420064542.423508-1-pizhenwei@bytedance.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,445 +71,191 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Raghavendra,
+Hi, Paolo & Peter
 
-On 4/27/22 12:59 AM, Raghavendra Rao Ananta wrote:
-> On Tue, Apr 26, 2022 at 12:50 AM Gavin Shan <gshan@redhat.com> wrote:
->> On 4/23/22 8:03 AM, Raghavendra Rao Ananta wrote:
->>> Introduce a KVM selftest to check the hypercall interface
->>> for arm64 platforms. The test validates the user-space'
->>> [GET|SET]_ONE_REG interface to read/write the psuedo-firmware
->>> registers as well as its effects on the guest upon certain
->>> configurations.
->>>
->>> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
->>> ---
->>>    tools/testing/selftests/kvm/.gitignore        |   1 +
->>>    tools/testing/selftests/kvm/Makefile          |   1 +
->>>    .../selftests/kvm/aarch64/hypercalls.c        | 335 ++++++++++++++++++
->>>    3 files changed, 337 insertions(+)
->>>    create mode 100644 tools/testing/selftests/kvm/aarch64/hypercalls.c
->>>
->>
->> There are comments about @false_hvc_info[] and some nits, as below.
->> Please evaluate and improve if it makes sense to you. Otherwise, it
->> looks good to me:
->>
->> Reviewed-by: Gavin Shan <gshan@redhat.com>
->>
->>> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
->>> index 1bb575dfc42e..b17e464ec661 100644
->>> --- a/tools/testing/selftests/kvm/.gitignore
->>> +++ b/tools/testing/selftests/kvm/.gitignore
->>> @@ -2,6 +2,7 @@
->>>    /aarch64/arch_timer
->>>    /aarch64/debug-exceptions
->>>    /aarch64/get-reg-list
->>> +/aarch64/hypercalls
->>>    /aarch64/psci_test
->>>    /aarch64/vcpu_width_config
->>>    /aarch64/vgic_init
->>> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
->>> index c2cf4d318296..97eef0c03d3b 100644
->>> --- a/tools/testing/selftests/kvm/Makefile
->>> +++ b/tools/testing/selftests/kvm/Makefile
->>> @@ -105,6 +105,7 @@ TEST_GEN_PROGS_x86_64 += system_counter_offset_test
->>>    TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
->>>    TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
->>>    TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
->>> +TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
->>>    TEST_GEN_PROGS_aarch64 += aarch64/psci_test
->>>    TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
->>>    TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
->>> diff --git a/tools/testing/selftests/kvm/aarch64/hypercalls.c b/tools/testing/selftests/kvm/aarch64/hypercalls.c
->>> new file mode 100644
->>> index 000000000000..f404343a0ae3
->>> --- /dev/null
->>> +++ b/tools/testing/selftests/kvm/aarch64/hypercalls.c
->>> @@ -0,0 +1,335 @@
->>> +// SPDX-License-Identifier: GPL-2.0-only
->>> +
->>> +/* hypercalls: Check the ARM64's psuedo-firmware bitmap register interface.
->>> + *
->>> + * The test validates the basic hypercall functionalities that are exposed
->>> + * via the psuedo-firmware bitmap register. This includes the registers'
->>> + * read/write behavior before and after the VM has started, and if the
->>> + * hypercalls are properly masked or unmasked to the guest when disabled or
->>> + * enabled from the KVM userspace, respectively.
->>> + */
->>> +
->>> +#include <errno.h>
->>> +#include <linux/arm-smccc.h>
->>> +#include <asm/kvm.h>
->>> +#include <kvm_util.h>
->>> +
->>> +#include "processor.h"
->>> +
->>> +#define FW_REG_ULIMIT_VAL(max_feat_bit) (GENMASK(max_feat_bit, 0))
->>> +
->>> +/* Last valid bits of the bitmapped firmware registers */
->>> +#define KVM_REG_ARM_STD_BMAP_BIT_MAX         0
->>> +#define KVM_REG_ARM_STD_HYP_BMAP_BIT_MAX     0
->>> +#define KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_MAX  1
->>> +
->>> +struct kvm_fw_reg_info {
->>> +     uint64_t reg;           /* Register definition */
->>> +     uint64_t max_feat_bit;  /* Bit that represents the upper limit of the feature-map */
->>> +};
->>> +
->>> +#define FW_REG_INFO(r)                       \
->>> +     {                                       \
->>> +             .reg = r,                       \
->>> +             .max_feat_bit = r##_BIT_MAX,    \
->>> +     }
->>> +
->>> +static const struct kvm_fw_reg_info fw_reg_info[] = {
->>> +     FW_REG_INFO(KVM_REG_ARM_STD_BMAP),
->>> +     FW_REG_INFO(KVM_REG_ARM_STD_HYP_BMAP),
->>> +     FW_REG_INFO(KVM_REG_ARM_VENDOR_HYP_BMAP),
->>> +};
->>> +
->>> +enum test_stage {
->>> +     TEST_STAGE_REG_IFACE,
->>> +     TEST_STAGE_HVC_IFACE_FEAT_DISABLED,
->>> +     TEST_STAGE_HVC_IFACE_FEAT_ENABLED,
->>> +     TEST_STAGE_HVC_IFACE_FALSE_INFO,
->>> +     TEST_STAGE_END,
->>> +};
->>> +
->>> +static int stage = TEST_STAGE_REG_IFACE;
->>> +
->>> +struct test_hvc_info {
->>> +     uint32_t func_id;
->>> +     uint64_t arg1;
->>> +};
->>> +
->>> +#define TEST_HVC_INFO(f, a1) \
->>> +     {                       \
->>> +             .func_id = f,   \
->>> +             .arg1 = a1,     \
->>> +     }
->>> +
->>> +static const struct test_hvc_info hvc_info[] = {
->>> +     /* KVM_REG_ARM_STD_BMAP */
->>> +     TEST_HVC_INFO(ARM_SMCCC_TRNG_VERSION, 0),
->>> +     TEST_HVC_INFO(ARM_SMCCC_TRNG_FEATURES, ARM_SMCCC_TRNG_RND64),
->>> +     TEST_HVC_INFO(ARM_SMCCC_TRNG_GET_UUID, 0),
->>> +     TEST_HVC_INFO(ARM_SMCCC_TRNG_RND32, 0),
->>> +     TEST_HVC_INFO(ARM_SMCCC_TRNG_RND64, 0),
->>> +
->>> +     /* KVM_REG_ARM_STD_HYP_BMAP */
->>> +     TEST_HVC_INFO(ARM_SMCCC_ARCH_FEATURES_FUNC_ID, ARM_SMCCC_HV_PV_TIME_FEATURES),
->>> +     TEST_HVC_INFO(ARM_SMCCC_HV_PV_TIME_FEATURES, ARM_SMCCC_HV_PV_TIME_ST),
->>> +     TEST_HVC_INFO(ARM_SMCCC_HV_PV_TIME_ST, 0),
->>> +
->>> +     /* KVM_REG_ARM_VENDOR_HYP_BMAP */
->>> +     TEST_HVC_INFO(ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID,
->>> +                     ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID),
->>> +     TEST_HVC_INFO(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, 0),
->>> +     TEST_HVC_INFO(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID, KVM_PTP_VIRT_COUNTER),
->>> +};
->>> +
->>> +/* Feed false hypercall info to test the KVM behavior */
->>> +static const struct test_hvc_info false_hvc_info[] = {
->>> +     /* Feature support check against a different family of hypercalls */
->>> +     TEST_HVC_INFO(ARM_SMCCC_TRNG_FEATURES, ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID),
->>> +     TEST_HVC_INFO(ARM_SMCCC_ARCH_FEATURES_FUNC_ID, ARM_SMCCC_TRNG_RND64),
->>> +     TEST_HVC_INFO(ARM_SMCCC_HV_PV_TIME_FEATURES, ARM_SMCCC_TRNG_RND64),
->>> +};
->>> +
->>
->> I don't see too much benefits of @false_hvc_info[] because
->> NOT_SUPPORTED is always returned from its test case. I think
->> it and its test case can be removed if you agree. I'm not
->> sure if it was suggested by somebody else.
->>
-> While this is not exactly testing the bitmap firmware registers, the
-> idea behind introducing false_hvc_info[] was to introduce some
-> negative tests and see if KVM handles it well. Especially with
-> *_FEATURES func_ids, we can accidentally introduce functional bugs in
-> KVM, and these would act as our safety net. I was planning to also
-> test with some reserved hypercall numbers, just to test if the kernel
-> doesn't panic for some reason.
+Could you please review this patch?
+
+On 4/20/22 14:45, zhenwei pi wrote:
+> qemu exits during reset with log:
+> qemu-system-x86_64: Could not remap addr: 1000@22001000
 > 
-
-Ok, thanks for the explanation. It makes sense to me.
-
->>> +static void guest_test_hvc(const struct test_hvc_info *hc_info)
->>> +{
->>> +     unsigned int i;
->>> +     struct arm_smccc_res res;
->>> +     unsigned int hvc_info_arr_sz;
->>> +
->>> +     hvc_info_arr_sz =
->>> +     hc_info == hvc_info ? ARRAY_SIZE(hvc_info) : ARRAY_SIZE(false_hvc_info);
->>> +
->>> +     for (i = 0; i < hvc_info_arr_sz; i++, hc_info++) {
->>> +             memset(&res, 0, sizeof(res));
->>> +             smccc_hvc(hc_info->func_id, hc_info->arg1, 0, 0, 0, 0, 0, 0, &res);
->>> +
->>> +             switch (stage) {
->>> +             case TEST_STAGE_HVC_IFACE_FEAT_DISABLED:
->>> +             case TEST_STAGE_HVC_IFACE_FALSE_INFO:
->>> +                     GUEST_ASSERT_3(res.a0 == SMCCC_RET_NOT_SUPPORTED,
->>> +                                     res.a0, hc_info->func_id, hc_info->arg1);
->>> +                     break;
->>> +             case TEST_STAGE_HVC_IFACE_FEAT_ENABLED:
->>> +                     GUEST_ASSERT_3(res.a0 != SMCCC_RET_NOT_SUPPORTED,
->>> +                                     res.a0, hc_info->func_id, hc_info->arg1);
->>> +                     break;
->>> +             default:
->>> +                     GUEST_ASSERT_1(0, stage);
->>> +             }
->>> +     }
->>> +}
->>> +
->>> +static void guest_code(void)
->>> +{
->>> +     while (stage != TEST_STAGE_END) {
->>> +             switch (stage) {
->>> +             case TEST_STAGE_REG_IFACE:
->>> +                     break;
->>> +             case TEST_STAGE_HVC_IFACE_FEAT_DISABLED:
->>> +             case TEST_STAGE_HVC_IFACE_FEAT_ENABLED:
->>> +                     guest_test_hvc(hvc_info);
->>> +                     break;
->>> +             case TEST_STAGE_HVC_IFACE_FALSE_INFO:
->>> +                     guest_test_hvc(false_hvc_info);
->>> +                     break;
->>> +             default:
->>> +                     GUEST_ASSERT_1(0, stage);
->>> +             }
->>> +
->>> +             GUEST_SYNC(stage);
->>> +     }
->>> +
->>> +     GUEST_DONE();
->>> +}
->>> +
->>> +static int set_fw_reg(struct kvm_vm *vm, uint64_t id, uint64_t val)
->>> +{
->>> +     struct kvm_one_reg reg = {
->>> +             .id = id,
->>> +             .addr = (uint64_t)&val,
->>> +     };
->>> +
->>> +     return _vcpu_ioctl(vm, 0, KVM_SET_ONE_REG, &reg);
->>> +}
->>> +
->>> +static void get_fw_reg(struct kvm_vm *vm, uint64_t id, uint64_t *addr)
->>> +{
->>> +     struct kvm_one_reg reg = {
->>> +             .id = id,
->>> +             .addr = (uint64_t)addr,
->>> +     };
->>> +
->>> +     vcpu_ioctl(vm, 0, KVM_GET_ONE_REG, &reg);
->>> +}
->>> +
->>> +struct st_time {
->>> +     uint32_t rev;
->>> +     uint32_t attr;
->>> +     uint64_t st_time;
->>> +};
->>> +
->>> +#define STEAL_TIME_SIZE              ((sizeof(struct st_time) + 63) & ~63)
->>> +#define ST_GPA_BASE          (1 << 30)
->>> +
->>> +static void steal_time_init(struct kvm_vm *vm)
->>> +{
->>> +     uint64_t st_ipa = (ulong)ST_GPA_BASE;
->>> +     unsigned int gpages;
->>> +     struct kvm_device_attr dev = {
->>> +             .group = KVM_ARM_VCPU_PVTIME_CTRL,
->>> +             .attr = KVM_ARM_VCPU_PVTIME_IPA,
->>> +             .addr = (uint64_t)&st_ipa,
->>> +     };
->>> +
->>> +     gpages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, STEAL_TIME_SIZE);
->>> +     vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, ST_GPA_BASE, 1, gpages, 0);
->>> +
->>> +     vcpu_ioctl(vm, 0, KVM_SET_DEVICE_ATTR, &dev);
->>> +}
->>> +
->>> +static void test_fw_regs_before_vm_start(struct kvm_vm *vm)
->>> +{
->>> +     uint64_t val;
->>> +     unsigned int i;
->>> +     int ret;
->>> +
->>> +     for (i = 0; i < ARRAY_SIZE(fw_reg_info); i++) {
->>> +             const struct kvm_fw_reg_info *reg_info = &fw_reg_info[i];
->>> +
->>> +             /* First 'read' should be an upper limit of the features supported */
->>> +             get_fw_reg(vm, reg_info->reg, &val);
->>> +             TEST_ASSERT(val == FW_REG_ULIMIT_VAL(reg_info->max_feat_bit),
->>> +                     "Expected all the features to be set for reg: 0x%lx; expected: 0x%lx; read: 0x%lx\n",
->>> +                     reg_info->reg, FW_REG_ULIMIT_VAL(reg_info->max_feat_bit), val);
->>> +
->>> +             /* Test a 'write' by disabling all the features of the register map */
->>> +             ret = set_fw_reg(vm, reg_info->reg, 0);
->>> +             TEST_ASSERT(ret == 0,
->>> +                     "Failed to clear all the features of reg: 0x%lx; ret: %d\n",
->>> +                     reg_info->reg, errno);
->>> +
->>> +             get_fw_reg(vm, reg_info->reg, &val);
->>> +             TEST_ASSERT(val == 0,
->>> +                     "Expected all the features to be cleared for reg: 0x%lx\n", reg_info->reg);
->>> +
->>> +             /*
->>> +              * Test enabling a feature that's not supported.
->>> +              * Avoid this check if all the bits are occupied.
->>> +              */
->>> +             if (reg_info->max_feat_bit < 63) {
->>> +                     ret = set_fw_reg(vm, reg_info->reg, BIT(reg_info->max_feat_bit + 1));
->>> +                     TEST_ASSERT(ret != 0 && errno == EINVAL,
->>> +                     "Unexpected behavior or return value (%d) while setting an unsupported feature for reg: 0x%lx\n",
->>> +                     errno, reg_info->reg);
->>> +             }
->>> +     }
->>> +}
->>
->> Just in case :)
->>
->>        ret = set_fw_reg(vm, reg_info->reg, GENMASK(63, reg_info->max_feat_bit + 1));
->>
-> It may be better to cover the entire range, but to test only the
-> (max_feat_bit + 1) gives us the advantage of checking if there's any
-> discrepancy between the kernel and the test, now that *_BIT_MAX are
-> not a part of UAPI headers.
+> Currently, after MCE on RAM of a guest, qemu records a ram_addr only,
+> remaps this address with a fixed size(TARGET_PAGE_SIZE) during reset.
+> In the hugetlbfs scenario, mmap(addr...) needs page_size aligned
+> address and correct size. Unaligned address leads mmap to fail.
 > 
-> Probably also include your test along with the existing one?
-
-Thanks for your explanation again. Lets keep it as it is then.
-
->>
->>> +
->>> +static void test_fw_regs_after_vm_start(struct kvm_vm *vm)
->>> +{
->>> +     uint64_t val;
->>> +     unsigned int i;
->>> +     int ret;
->>> +
->>> +     for (i = 0; i < ARRAY_SIZE(fw_reg_info); i++) {
->>> +             const struct kvm_fw_reg_info *reg_info = &fw_reg_info[i];
->>> +
->>> +             /*
->>> +              * Before starting the VM, the test clears all the bits.
->>> +              * Check if that's still the case.
->>> +              */
->>> +             get_fw_reg(vm, reg_info->reg, &val);
->>> +             TEST_ASSERT(val == 0,
->>> +                     "Expected all the features to be cleared for reg: 0x%lx\n",
->>> +                     reg_info->reg);
->>> +
->>> +             /*
->>> +              * Set all the features for this register again. KVM shouldn't
->>> +              * allow this as the VM is running.
->>> +              */
->>> +             ret = set_fw_reg(vm, reg_info->reg, FW_REG_ULIMIT_VAL(reg_info->max_feat_bit));
->>> +             TEST_ASSERT(ret != 0 && errno == EBUSY,
->>> +             "Unexpected behavior or return value (%d) while setting a feature while VM is running for reg: 0x%lx\n",
->>> +             errno, reg_info->reg);
->>> +     }
->>> +}
->>> +
->>
->> I guess you want to check -EBUSY is returned. In that case,
->> the comments here could be clearer, something like below
->> to emphasize '-EBUSY'.
->>
->>           /*
->>            * After VM runs for once, -EBUSY should be returned on attempt
->>            * to set features. Check if the correct errno is returned.
->>            */
->>
-> Sounds good.
+> What's more, hitting MCE on RAM of a guest, qemu records this address
+> and try to fix it during reset, this should be a common logic. So
+> remove kvm_hwpoison_page_add from architecture dependent code, record
+> this in SIGBUS handler instead. Finally poisoning/unpoisoning a page
+> gets static in kvm-all.c,
 > 
->>> +static struct kvm_vm *test_vm_create(void)
->>> +{
->>> +     struct kvm_vm *vm;
->>> +
->>> +     vm = vm_create_default(0, 0, guest_code);
->>> +
->>> +     ucall_init(vm, NULL);
->>> +     steal_time_init(vm);
->>> +
->>> +     return vm;
->>> +}
->>> +
->>> +static struct kvm_vm *test_guest_stage(struct kvm_vm *vm)
->>> +{
->>> +     struct kvm_vm *ret_vm = vm;
->>> +
->>> +     pr_debug("Stage: %d\n", stage);
->>> +
->>> +     switch (stage) {
->>> +     case TEST_STAGE_REG_IFACE:
->>> +             test_fw_regs_after_vm_start(vm);
->>> +             break;
->>> +     case TEST_STAGE_HVC_IFACE_FEAT_DISABLED:
->>> +             /* Start a new VM so that all the features are now enabled by default */
->>> +             kvm_vm_free(vm);
->>> +             ret_vm = test_vm_create();
->>> +             break;
->>> +     case TEST_STAGE_HVC_IFACE_FEAT_ENABLED:
->>> +     case TEST_STAGE_HVC_IFACE_FALSE_INFO:
->>> +             break;
->>> +     default:
->>> +             TEST_FAIL("Unknown test stage: %d\n", stage);
->>> +     }
->>> +
->>> +     stage++;
->>> +     sync_global_to_guest(vm, stage);
->>> +
->>> +     return ret_vm;
->>> +}
->>> +
->>> +static void test_run(void)
->>> +{
->>> +     struct kvm_vm *vm;
->>> +     struct ucall uc;
->>> +     bool guest_done = false;
->>> +
->>> +     vm = test_vm_create();
->>> +
->>> +     test_fw_regs_before_vm_start(vm);
->>> +
->>> +     while (!guest_done) {
->>> +             vcpu_run(vm, 0);
->>> +
->>> +             switch (get_ucall(vm, 0, &uc)) {
->>> +             case UCALL_SYNC:
->>> +                     vm = test_guest_stage(vm);
->>> +                     break;
->>> +             case UCALL_DONE:
->>> +                     guest_done = true;
->>> +                     break;
->>> +             case UCALL_ABORT:
->>> +                     TEST_FAIL("%s at %s:%ld\n\tvalues: 0x%lx, 0x%lx; 0x%lx, stage: %u",
->>> +                     (const char *)uc.args[0], __FILE__, uc.args[1],
->>> +                     uc.args[2], uc.args[3], uc.args[4], stage);
->>> +                     break;
->>> +             default:
->>> +                     TEST_FAIL("Unexpected guest exit\n");
->>> +             }
->>> +     }
->>> +
->>> +     kvm_vm_free(vm);
->>> +}
->>> +
->>> +int main(void)
->>> +{
->>> +     setbuf(stdout, NULL);
->>> +
->>> +     test_run();
->>> +     return 0;
->>> +}
->>>
+> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
+> ---
+>   accel/kvm/kvm-all.c      | 47 ++++++++++++++++++++++++++++++----------
+>   include/sysemu/kvm_int.h | 12 ----------
+>   target/arm/kvm64.c       |  1 -
+>   target/i386/kvm/kvm.c    |  1 -
+>   4 files changed, 36 insertions(+), 25 deletions(-)
+> 
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 5f1377ca04..2a91c5a461 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -1167,11 +1167,14 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension)
+>       return ret;
+>   }
+>   
+> +#ifdef KVM_HAVE_MCE_INJECTION
+>   typedef struct HWPoisonPage {
+>       ram_addr_t ram_addr;
+> +    size_t page_size; /* normal page or hugeTLB page? */
+>       QLIST_ENTRY(HWPoisonPage) list;
+>   } HWPoisonPage;
+>   
+> +/* hwpoison_page_list stores the poisoned pages, unpoison them during reset */
+>   static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
+>       QLIST_HEAD_INITIALIZER(hwpoison_page_list);
+>   
+> @@ -1181,25 +1184,48 @@ static void kvm_unpoison_all(void *param)
+>   
+>       QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
+>           QLIST_REMOVE(page, list);
+> -        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
+> +        qemu_ram_remap(page->ram_addr, page->page_size);
+>           g_free(page);
+>       }
+>   }
+>   
+> -void kvm_hwpoison_page_add(ram_addr_t ram_addr)
+> +static void kvm_hwpoison_page_add(CPUState *cpu, int sigbus_code, void *addr)
+>   {
+>       HWPoisonPage *page;
+> +    ram_addr_t ram_addr, align_ram_addr;
+> +    ram_addr_t offset;
+> +    hwaddr paddr;
+> +    size_t page_size;
+> +
+> +    assert(sigbus_code == BUS_MCEERR_AR || sigbus_code == BUS_MCEERR_AO);
+> +    ram_addr = qemu_ram_addr_from_host(addr);
+> +    if (ram_addr == RAM_ADDR_INVALID ||
+> +        !kvm_physical_memory_addr_from_host(cpu->kvm_state, addr, &paddr)) {
+> +        /* only deal with valid guest RAM here */
+> +        return;
+> +    }
+>   
+> +    /* get page size of RAM block, test it's a normal page or huge page */
+> +    page_size = qemu_ram_block_from_host(addr, false, &offset)->page_size;
+> +    align_ram_addr = QEMU_ALIGN_DOWN(ram_addr, page_size);
+>       QLIST_FOREACH(page, &hwpoison_page_list, list) {
+> -        if (page->ram_addr == ram_addr) {
+> +        if (page->ram_addr == align_ram_addr) {
+> +            assert(page->page_size == page_size);
+>               return;
+>           }
+>       }
+> -    page = g_new(HWPoisonPage, 1);
+> -    page->ram_addr = ram_addr;
+> +
+> +    page = g_new0(HWPoisonPage, 1);
+> +    page->ram_addr = align_ram_addr;
+> +    page->page_size = page_size;
+>       QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
+>   }
+>   
+> +static __thread void *pending_sigbus_addr;
+> +static __thread int pending_sigbus_code;
+> +static __thread bool have_sigbus_pending;
+> +#endif
+> +
+>   static uint32_t adjust_ioeventfd_endianness(uint32_t val, uint32_t size)
+>   {
+>   #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
+> @@ -2601,7 +2627,9 @@ static int kvm_init(MachineState *ms)
+>           s->kernel_irqchip_split = mc->default_kernel_irqchip_split ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+>       }
+>   
+> +#if defined KVM_HAVE_MCE_INJECTION
+>       qemu_register_reset(kvm_unpoison_all, NULL);
+> +#endif
+>   
+>       if (s->kernel_irqchip_allowed) {
+>           kvm_irqchip_create(s);
+> @@ -2782,12 +2810,6 @@ void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu)
+>       run_on_cpu(cpu, do_kvm_cpu_synchronize_pre_loadvm, RUN_ON_CPU_NULL);
+>   }
+>   
+> -#ifdef KVM_HAVE_MCE_INJECTION
+> -static __thread void *pending_sigbus_addr;
+> -static __thread int pending_sigbus_code;
+> -static __thread bool have_sigbus_pending;
+> -#endif
+> -
+>   static void kvm_cpu_kick(CPUState *cpu)
+>   {
+>       qatomic_set(&cpu->kvm_run->immediate_exit, 1);
+> @@ -2883,6 +2905,8 @@ int kvm_cpu_exec(CPUState *cpu)
+>   #ifdef KVM_HAVE_MCE_INJECTION
+>           if (unlikely(have_sigbus_pending)) {
+>               qemu_mutex_lock_iothread();
+> +            kvm_hwpoison_page_add(cpu, pending_sigbus_code,
+> +                                  pending_sigbus_addr);
+>               kvm_arch_on_sigbus_vcpu(cpu, pending_sigbus_code,
+>                                       pending_sigbus_addr);
+>               have_sigbus_pending = false;
+> @@ -3436,6 +3460,7 @@ int kvm_on_sigbus(int code, void *addr)
+>        * we can only get action optional here.
+>        */
+>       assert(code != BUS_MCEERR_AR);
+> +    kvm_hwpoison_page_add(first_cpu, code, addr);
+>       kvm_arch_on_sigbus_vcpu(first_cpu, code, addr);
+>       return 0;
+>   #else
+> diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+> index 1f5487d9b7..52ec8ef99c 100644
+> --- a/include/sysemu/kvm_int.h
+> +++ b/include/sysemu/kvm_int.h
+> @@ -40,16 +40,4 @@ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
+>                                     AddressSpace *as, int as_id, const char *name);
+>   
+>   void kvm_set_max_memslot_size(hwaddr max_slot_size);
+> -
+> -/**
+> - * kvm_hwpoison_page_add:
+> - *
+> - * Parameters:
+> - *  @ram_addr: the address in the RAM for the poisoned page
+> - *
+> - * Add a poisoned page to the list
+> - *
+> - * Return: None.
+> - */
+> -void kvm_hwpoison_page_add(ram_addr_t ram_addr);
+>   #endif
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index ccadfbbe72..a3184eb3d2 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -1450,7 +1450,6 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+>           ram_addr = qemu_ram_addr_from_host(addr);
+>           if (ram_addr != RAM_ADDR_INVALID &&
+>               kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
+> -            kvm_hwpoison_page_add(ram_addr);
+>               /*
+>                * If this is a BUS_MCEERR_AR, we know we have been called
+>                * synchronously from the vCPU thread, so we can easily
+> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> index 9cf8e03669..fb72b349ed 100644
+> --- a/target/i386/kvm/kvm.c
+> +++ b/target/i386/kvm/kvm.c
+> @@ -622,7 +622,6 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+>           ram_addr = qemu_ram_addr_from_host(addr);
+>           if (ram_addr != RAM_ADDR_INVALID &&
+>               kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
+> -            kvm_hwpoison_page_add(ram_addr);
+>               kvm_mce_inject(cpu, paddr, code);
+>   
+>               /*
 
-[...]
-
-Thanks,
-Gavin
-
+-- 
+zhenwei pi
