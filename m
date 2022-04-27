@@ -2,143 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EA8A5123C4
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 22:18:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A38F5123CD
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 22:20:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234082AbiD0UVi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 16:21:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54946 "EHLO
+        id S235863AbiD0UXo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 16:23:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229730AbiD0UVg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 16:21:36 -0400
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DE378AE60
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 13:18:23 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id m23so4117294ljb.8
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 13:18:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=GXFnAVqWMpf/YDrR850VsivYujGHnkwJcitva2FzMCY=;
-        b=AsMo9skrDD8q8UQN0XdxKlPDJ4+e3dYaIoN3KEWpWtFNuZL3YImkDoePDywipkcPXC
-         7gr6gyPMz+HHZWqFwZJltblh2rRUK0qPATYMnQdpYW8mSeHz+n8OoHmU2qgnhDaWt3JR
-         aDMqR97ZibWUX6nKkJF7K50tNMvPeK9aK2N+9BKoSWRgBVptUUiIWzetJUSZFezy2OtE
-         W2Yktn/wIisc/6zuQSZK5FVi6MtnmNmF9xF1NM/i2TsZY5m0S+D9W63nVc3LBMKK2Wqa
-         6VY4hv6eDQorANkiVZwst2udkY5trvoLSpwJUEsuIO24BkBH6h0iLXu6Jz6AwiVPZqqH
-         UE5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GXFnAVqWMpf/YDrR850VsivYujGHnkwJcitva2FzMCY=;
-        b=o0PMTLXJxAbmy9w2pCsvBrQtVxgfVPoG3aKs+654tVL7Pbnmms7NVUtfbHXlyCz+ep
-         TgFnRXWjEOl2iJ/H6mIHAQuk7o1h+T5Q11BxYZmsGGUd4kL3n8bwCUQpYMo9xQINc98n
-         +t7+NTaJ48ZPST2hiN/vwDyAvSH+RdgKO13M9vLk6SV6kFxS2fmPsnUzOEDvkstff1Zm
-         d898dG4vEYbclgA3Xmb6eHN/x5LXoqgc1k3kCsJOmaxfrelEzBYSoddpCxURL6tP5bTV
-         JbboIgLI6tMKjl0gZHt/cUlALNYXQl/mMLX892R2edx4PFEJPMzoCoEGcAeSRNxvX+rA
-         brKQ==
-X-Gm-Message-State: AOAM532ZATPCgKin42RYcNbounhrJc+04EHgFGm8u9zectra7SVoS45q
-        uDO3QTsKGxfv1cYY1fUxzd+gTZivQYK+/PDGXT6J/Q==
-X-Google-Smtp-Source: ABdhPJzDDO/eY2GpC6TtuCyZdzeb0QOjebpOsfygIMaVPVBqnO7DcKZk5c4IubxxlVoCTLYkKGurPu6NtObI/0mLeZA=
-X-Received: by 2002:a05:651c:1994:b0:24d:d4b9:516c with SMTP id
- bx20-20020a05651c199400b0024dd4b9516cmr18883821ljb.278.1651090700825; Wed, 27
- Apr 2022 13:18:20 -0700 (PDT)
+        with ESMTP id S236659AbiD0UXh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 16:23:37 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F36B1EEF5;
+        Wed, 27 Apr 2022 13:20:21 -0700 (PDT)
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23RILb1c008987;
+        Wed, 27 Apr 2022 20:20:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=gjDixvznS3OUZDhDu+ceM/p4K0gyyuopeZlFpkcmmjc=;
+ b=KaorH21DAb05vhKzfbv1u5YMlqNu7crAKkmVZsb8gSzmoYSzbMBgQyVAectAP6zeuSEs
+ CCAGb66FxOGe43SExX6BIfJadyH7+QAZzJHhCPOmbZRwUIfI2IL2hgBNI6OyyeVWWVyq
+ pmkhBriT2mTyUVxaF8E2yGPN9YEe/UJ7dp5MTUKxlZtaJoEjsZD7ojDdCAeoAi5vWusB
+ AtaVqUYaWA2jiklthjuBZO6ToLo6bOAllfSSbPnrAEUnWoDvVDy3DO31Xsnxfeqe9f0i
+ OwUMuqfPExKLY414GFu1CSigZvJpUlWETbvv4XCitova+DDL/1t0jlAvgFxHt28kmsq7 Yg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fqb1ua1vr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Apr 2022 20:20:19 +0000
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 23RK7Ns6027451;
+        Wed, 27 Apr 2022 20:20:18 GMT
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fqb1ua1vg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Apr 2022 20:20:18 +0000
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23RK8cSQ001950;
+        Wed, 27 Apr 2022 20:20:17 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma03dal.us.ibm.com with ESMTP id 3fm93a62ct-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Apr 2022 20:20:17 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23RKKGpo23855576
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 27 Apr 2022 20:20:16 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 91E9EAC062;
+        Wed, 27 Apr 2022 20:20:16 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 72639AC059;
+        Wed, 27 Apr 2022 20:20:11 +0000 (GMT)
+Received: from [9.211.73.42] (unknown [9.211.73.42])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed, 27 Apr 2022 20:20:11 +0000 (GMT)
+Message-ID: <b9575614-a234-0c36-7601-9c09d159c3b0@linux.ibm.com>
+Date:   Wed, 27 Apr 2022 16:20:10 -0400
 MIME-Version: 1.0
-References: <20220407195908.633003-1-pgonda@google.com> <CAFNjLiXC0AdOw5f8Ovu47D==ex7F0=WN_Ocirymz4xL=mWvC5A@mail.gmail.com>
- <CAMkAt6r-Mc_YN-gVHuCpTj4E1EmcvyYpP9jhtHo5HRHnoNJAdA@mail.gmail.com>
- <CAMkAt6r+OMPWCbV_svUyGWa0qMzjj2UEG29G6P7jb6uH6yko2w@mail.gmail.com>
- <62e9ece1-5d71-f803-3f65-2755160cf1d1@redhat.com> <CAMkAt6q6YLBfo2RceduSXTafckEehawhD4K4hUEuB4ZNqe2kKg@mail.gmail.com>
- <4c0edc90-36a1-4f4c-1923-4b20e7bdbb4c@redhat.com>
-In-Reply-To: <4c0edc90-36a1-4f4c-1923-4b20e7bdbb4c@redhat.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Wed, 27 Apr 2022 14:18:09 -0600
-Message-ID: <CAMkAt6oL5qi7z-eh4z7z8WBhpc=Ow6WtcJA5bDi6-aGMnz135A@mail.gmail.com>
-Subject: Re: [PATCH v3] KVM: SEV: Mark nested locking of vcpu->lock
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     John Sperbeck <jsperbeck@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v6 15/21] KVM: s390: pci: add routines to start/stop
+ interpretive execution
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     linux-s390@vger.kernel.org, alex.williamson@redhat.com,
+        cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        agordeev@linux.ibm.com, svens@linux.ibm.com, frankja@linux.ibm.com,
+        david@redhat.com, imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org
+References: <20220426200842.98655-1-mjrosato@linux.ibm.com>
+ <20220426200842.98655-16-mjrosato@linux.ibm.com>
+ <20220427151400.GY2125828@nvidia.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <20220427151400.GY2125828@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: HaAkdg-qH8ONb4fcE-33RKJwrgsbU-JV
+X-Proofpoint-GUID: Sw17_kpvkFHU4xFu2acH_zFgc8AUdWMt
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-27_04,2022-04-27_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ mlxscore=0 impostorscore=0 clxscore=1015 mlxlogscore=999 spamscore=0
+ priorityscore=1501 adultscore=0 malwarescore=0 lowpriorityscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204270123
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 27, 2022 at 10:04 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 4/26/22 21:06, Peter Gonda wrote:
-> > On Thu, Apr 21, 2022 at 9:56 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >>
-> >> On 4/20/22 22:14, Peter Gonda wrote:
-> >>>>>> svm_vm_migrate_from() uses sev_lock_vcpus_for_migration() to lock all
-> >>>>>> source and target vcpu->locks. Mark the nested subclasses to avoid false
-> >>>>>> positives from lockdep.
-> >>>> Nope. Good catch, I didn't realize there was a limit 8 subclasses:
-> >>> Does anyone have thoughts on how we can resolve this vCPU locking with
-> >>> the 8 subclass max?
-> >>
-> >> The documentation does not have anything.  Maybe you can call
-> >> mutex_release manually (and mutex_acquire before unlocking).
-> >>
-> >> Paolo
-> >
-> > Hmm this seems to be working thanks Paolo. To lock I have been using:
-> >
-> > ...
-> >                    if (mutex_lock_killable_nested(
-> >                                &vcpu->mutex, i * SEV_NR_MIGRATION_ROLES + role))
-> >                            goto out_unlock;
-> >                    mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
-> > ...
-> >
-> > To unlock:
-> > ...
-> >                    mutex_acquire(&vcpu->mutex.dep_map, 0, 0, _THIS_IP_);
-> >                    mutex_unlock(&vcpu->mutex);
-> > ...
-> >
-> > If I understand correctly we are fully disabling lockdep by doing
-> > this. If this is the case should I just remove all the '_nested' usage
-> > so switch to mutex_lock_killable() and remove the per vCPU subclass?
->
-> Yes, though you could also do:
->
->         bool acquired = false;
->         kvm_for_each_vcpu(...) {
->                 if (acquired)
->                         mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
->                 if (mutex_lock_killable_nested(&vcpu->mutex, role)
->                         goto out_unlock;
->                 acquired = true;
->                 ...
->
-> and to unlock:
->
->         bool acquired = true;
->         kvm_for_each_vcpu(...) {
->                 if (!acquired)
->                         mutex_acquire(&vcpu->mutex.dep_map, 0, role, _THIS_IP_);
->                 mutex_unlock(&vcpu->mutex);
->                 acquired = false;
->         }
->
-> where role is either 0 or SINGLE_DEPTH_NESTING and is passed to
-> sev_{,un}lock_vcpus_for_migration.
->
-> That coalesces all the mutexes for a vm in a single subclass, essentially.
+On 4/27/22 11:14 AM, Jason Gunthorpe wrote:
+> On Tue, Apr 26, 2022 at 04:08:36PM -0400, Matthew Rosato wrote:
+> 
+>> +int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm)
+>> +{
+>> +	if (!zdev)
+>> +		return 0;
+>> +
+>> +	/*
+>> +	 * Register device with this KVM (or remove the KVM association if 0).
+>> +	 * If interpetation facilities are available, enable them and let
+>> +	 * userspace indicate whether or not they will be used (specify SHM bit
+>> +	 * to disable).
+>> +	 */
+>> +	if (kvm)
+>> +		return register_kvm(zdev, kvm);
+>> +	else
+>> +		return unregister_kvm(zdev);
+>> +}
+>> +EXPORT_SYMBOL_GPL(kvm_s390_pci_register_kvm);
+> 
+> I think it is cleaner to expose both the register/unregister APIs and
+> not multiplex them like this
+> 
 
-Ah thats a great idea to allow for lockdep to work still. I'll try
-that out, thanks again Paolo.
+OK
 
+>> +void kvm_s390_pci_clear_list(struct kvm *kvm)
+>> +{
+>> +	struct kvm_zdev *tmp, *kzdev;
+>> +	LIST_HEAD(remove);
+>> +
+>> +	spin_lock(&kvm->arch.kzdev_list_lock);
+>> +	list_for_each_entry_safe(kzdev, tmp, &kvm->arch.kzdev_list, entry)
+>> +		list_move_tail(&kzdev->entry, &remove);
+>> +	spin_unlock(&kvm->arch.kzdev_list_lock);
+>> +
+>> +	list_for_each_entry_safe(kzdev, tmp, &remove, entry)
+>> +		unregister_kvm(kzdev->zdev);
+> 
+> Hum, I wonder if this is a mistake in kvm:
+> 
+> static void kvm_destroy_vm(struct kvm *kvm)
+> {
+> [..]
+> 	kvm_arch_destroy_vm(kvm);
+> 	kvm_destroy_devices(kvm);
+> 
+> kvm_destroy_devices() triggers the VFIO notifier with NULL. Indeed for
+> correctness I would expect the VFIO users to have been notified to
+> release the kvm before the kvm object becomes partially destroyed?
+> 
+> Maybe you should investigate re-ordering this at the KVM side and just
+> WARN_ON(!list_empty) in the arch code?
+> 
+> (vfio has this odd usage model where it should use the kvm pointer
+> without taking a ref on it so long as the unregister hasn't been
+> called)
 >
-> Paolo
->
+
+The issue there is that I am unregistering the notifier during 
+close_device for each zPCI dev, which will have already happened -- so 
+by the time we get to kvm_destroy_devices(), whether it's before or 
+after kvm_arch_destroy_vm, there are no longer any zPCI notifiers 
+registered that will trigger.
+
+One way to solve this is to have the zpci close_device hook also trigger 
+the work that a KVM_DEV_VFIO_GROUP_DEL would (if the device is being 
+closed, the KVM association for that device isn't applicable anymore so 
+go ahead and clean up).
+
+Then, since we know each device will get closed (either by userspace or 
+by kvm), I don't need something like kvm_s390_pci_clear_list at all.
+
+> If you keep it like this then the locking in register/unregister looks
+> not broad enough and has to cover the zdev->kzdev also.
+
+But I would still need to revisit the locking with the above idea.
+
+> 
+> Overall I think it is OK designed like this, aside from the ugly
+> symbol_get in vfio which I hope you can resolve.
+> 
+> Jason
+
