@@ -2,192 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D7CC511EAE
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 20:37:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB413511F7D
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 20:38:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239502AbiD0PVS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 11:21:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56670 "EHLO
+        id S239871AbiD0PaG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 11:30:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239498AbiD0PVF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 11:21:05 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 251783B547;
-        Wed, 27 Apr 2022 08:17:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=xqfaPuZm2wMK4xxvXtdqxzFvK1J9mOsAEiewsfYYJog=; b=nuf4n2E9/bDzYP19YtkC+h7h8A
-        W6Dk3tZ/Z7vUoR2DOzFEBDJKld7yOzr2IZZLA97hN/qRpaeztdj3zZ9Z9yQ/LW0i0J4ALtv7QmCHd
-        n7WSGPprgK4G/wqBcETfyfNxkL4f7ktNPXVInCWYMNa1Kw8LahcpYc6H2lz9KqnUd4M9CWrui0E7k
-        cpnIqzgOpNdUO0XBFUTYO8xujLRQsJaOYqxi/coXZpIRucUGMaCaX6bCzxb3kRfrxdxzM+skXW/nK
-        aBxHvG7VlFMwzF2gXyI6CMhv5e8Xq0VpjoKGT8YVZzFw702zk3Nyw7sHbn+Whm3Pt3Xl8rDcSW0/I
-        Cn6YbnVg==;
-Received: from [2001:8b0:10b:1:4a2a:e3ff:fe14:8625] (helo=u3832b3a9db3152.ant.amazon.com)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1njjPr-0095sp-7q; Wed, 27 Apr 2022 15:17:19 +0000
-Message-ID: <68b3f18e156391e20aed8e10e974fdf8052b7f47.camel@infradead.org>
-Subject: Re: [PATCH v2 8/8] DO NOT MERGE: Hack-a-test to verify gpc
- invalidation+refresh
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Mingwei Zhang <mizhang@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Date:   Wed, 27 Apr 2022 16:17:14 +0100
-In-Reply-To: <20220427014004.1992589-9-seanjc@google.com>
-References: <20220427014004.1992589-1-seanjc@google.com>
-         <20220427014004.1992589-9-seanjc@google.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-vSyMHBeLQe+ZDzzajsVP"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        with ESMTP id S239846AbiD0PaC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 11:30:02 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FCDA36AF07;
+        Wed, 27 Apr 2022 08:26:50 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23RFDTwk029543;
+        Wed, 27 Apr 2022 15:26:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=r/3UuYYj8lO8LNwPx+iO0uhHHmy7sV/1IWHWhgrIb+g=;
+ b=j1eISLJej7TVVPvyYib7O3eAR5TKVrNTi/l8XEUJkP+atwGe5nJAxphBf+tpZ6BLUDRb
+ zo04XNDMX1ShJyMD4g1iELqmPFI/feKGau7JH1N06jiVz6pPAvo0k0PQBilEUDzTGWlu
+ kBaTQK9wAqvhUPwpV2gQUgA88gkyKKR4igJU8mevFXBrZ1UAnl8jhWffeEJpmvnoBW+O
+ gAOyrBScdI0f8ya4VYxMzR90iQaKYbdvKWZXkXg5a2hUQHnhhw47XkNnirGBmxId4szG
+ /LLaAZWfU2+M5cj5xtEJIB9TSdoez93S1UcxDGL0PWSHlIXAd4xTgA7oa1s329rXBuRA cQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fq7w5gx31-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Apr 2022 15:26:48 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 23RFDaU8030514;
+        Wed, 27 Apr 2022 15:26:47 GMT
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fq7w5gx2p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Apr 2022 15:26:47 +0000
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23RF8buU029492;
+        Wed, 27 Apr 2022 15:26:47 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma03dal.us.ibm.com with ESMTP id 3fm93a43ct-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Apr 2022 15:26:46 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23RFQjMj7013312
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 27 Apr 2022 15:26:45 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CE390AC05F;
+        Wed, 27 Apr 2022 15:26:45 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 430B2AC059;
+        Wed, 27 Apr 2022 15:26:41 +0000 (GMT)
+Received: from [9.211.73.42] (unknown [9.211.73.42])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed, 27 Apr 2022 15:26:41 +0000 (GMT)
+Message-ID: <1bca5de9-88aa-6abc-88b7-cbd2a11e5c85@linux.ibm.com>
+Date:   Wed, 27 Apr 2022 11:26:40 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v6 16/21] vfio-pci/zdev: add open/close device hooks
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     linux-s390@vger.kernel.org, alex.williamson@redhat.com,
+        cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        agordeev@linux.ibm.com, svens@linux.ibm.com, frankja@linux.ibm.com,
+        david@redhat.com, imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org
+References: <20220426200842.98655-1-mjrosato@linux.ibm.com>
+ <20220426200842.98655-17-mjrosato@linux.ibm.com>
+ <20220427140410.GX2125828@nvidia.com>
+ <f6c78792-9cf7-0cde-f760-76166f9b7eb7@linux.ibm.com>
+ <20220427150138.GA2512703@nvidia.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <20220427150138.GA2512703@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 1a0tWSpKHa4Hxx9OL5kRQS7-X1kND_AI
+X-Proofpoint-GUID: e_IrcGUWVhlThRpDryPgxUwfKy6CAsgR
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-27_04,2022-04-27_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=999
+ priorityscore=1501 bulkscore=0 clxscore=1015 lowpriorityscore=0
+ malwarescore=0 phishscore=0 suspectscore=0 mlxscore=0 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204270096
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 4/27/22 11:01 AM, Jason Gunthorpe wrote:
+> On Wed, Apr 27, 2022 at 10:42:07AM -0400, Matthew Rosato wrote:
+>> On 4/27/22 10:04 AM, Jason Gunthorpe wrote:
+>>> On Tue, Apr 26, 2022 at 04:08:37PM -0400, Matthew Rosato wrote:
+>>>
+>>>> +static int vfio_pci_zdev_group_notifier(struct notifier_block *nb,
+>>>> +					unsigned long action, void *data)
+>>>> +{
+>>>> +	struct zpci_dev *zdev = container_of(nb, struct zpci_dev, nb);
+>>>> +	int (*fn)(struct zpci_dev *zdev, struct kvm *kvm);
+>>>> +	int rc = NOTIFY_OK;
+>>>> +
+>>>> +	if (action == VFIO_GROUP_NOTIFY_SET_KVM) {
+>>>> +		if (!zdev)
+>>>> +			return NOTIFY_DONE;
+>>>> +
+>>>> +		fn = symbol_get(kvm_s390_pci_register_kvm);
+>>>> +		if (!fn)
+>>>> +			return NOTIFY_DONE;
+>>>> +
+>>>> +		if (fn(zdev, (struct kvm *)data))
+>>>> +			rc = NOTIFY_BAD;
+>>>> +
+>>>> +		symbol_put(kvm_s390_pci_register_kvm);
+>>>
+>>> Is it possible this function can be in statically linked arch code?
+>>>
+>>> Or, actually, is zPCI useful anyhow without kvm ie can you just have a
+>>> direct dependency here?
+>>>
+>>
+>> zPCI devices (zpci_dev) exist regardless of whether kvm is configured or
+>> not, and you can e.g. bind the associated PCI device to vfio-pci when KVM is
+>> not configured (or module not loaded) and get the existing vfio-pci-zdev
+>> extensions for that device (extra VFIO_DEVICE_INFO response data).  Making a
+>> direct dependency on KVM would remove that; this was discussed in a prior
+>> version because this extra info is not used today outside of a KVM usecase
+>> are not specific to kvm that need vfio-pci-zdev).
+> 
+> I'm a bit confused, what is the drawback of just having a direct
+> symbol dependency here? It means vfio loads a little extra kernel
+> module code, but is that really a big worry given almost all vfio
+> users on s390 will be using it with kvm?
 
---=-vSyMHBeLQe+ZDzzajsVP
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+It's about trying to avoid loading unnecessary code (or at least giving 
+a way to turn it off).
 
-On Wed, 2022-04-27 at 01:40 +0000, Sean Christopherson wrote:
-> Add a VM-wide gfn=3D>pfn cache and a fake MSR to let userspace control th=
-e
-> cache.  On writes, reflect the value of the MSR into the backing page of
-> a gfn=3D>pfn cache so that userspace can detect if a value was written to
-> the wrong page, i.e. to a stale mapping.
->=20
-> Spin up 16 vCPUs (arbitrary) to use/refresh the cache, and another thread
-> to trigger mmu_notifier events and memslot updates.
+Previously I did something like....
 
-Do you need the MSR hack? Can't you exercise this using Xen interrupt
-delivery or runstate information and the same kind of thread setup?
+https://lore.kernel.org/kvm/20220204211536.321475-15-mjrosato@linux.ibm.com/
 
-Thanks for working on this!
+And could do so again; as discussed in the thread there, I can use e.g. 
+CONFIG_VFIO_PCI_ZDEV_KVM and make vfio-pci-zdev depend on KVM in this 
+series.  You only get the vfio-pci-zdev extensions when you configure KVM.
 
---=-vSyMHBeLQe+ZDzzajsVP
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+Then if we find a usecase for a vfio-pci-zdev extension without KVM 
+later, we can further split vfio-pci-zdev and go back to building 
+vfio-pci-zdev when CONFIG_S390 but only build the kvm pieces (like the 
+code above) when you specify CONFIG_VFIO_PCI_ZDEV_KVM.  This would 
+eliminate this symbol_get.  Sound OK?
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwNDI3MTUxNzE0WjAvBgkqhkiG9w0BCQQxIgQgJRcg8JBS
-qMz941WFJOR8zHsu5eywt6Z+n9l60p7RlvQwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAXQcBRC299v8Jkq6L+Q4qXSjF7ny3RyA9v
-2uUFARkZ8zPoPWu/98m66+iQOve6vtOeNG6ZPb+LapTLLNHsItavR3w+x9kMB97qEFGuMImNbsUK
-+iElEPWk7u3zo81RFNnLev+pJX3H1/Q/KHVn5SneWZVHl9ht8tnRor1aueg6EC5zyyVhSYY0Q1x7
-3qss0wPXiwPgc6lVcX3OoFfhdky7LfkeAG6pTnTZwCwtFFyhcGpf7NhL6rRaxyb9DV4pB4LgcLFa
-Ez4GyI828awA43lvKlmi0ke/FFFgZi/ofFqxaw/W6cBvlmNGJslH57Ee/n3r3Fzn14/QJs6Zlufw
-kthrw3ITjQWdZAwqmRQ/7Smphf0L4Z9K51uA+n/c105+iYv4JxIac5GiIWBxRTYivcf3/6P8jxWp
-qxg9alnGa/AcfdZPF2/RGc2EKhVPn+3/yxs2+YAiXJH+eqNfoz/USQe5JKYiCOE20f3Lxf8/mqmW
-BcYoZIwE8Jb9It1RtjPJ5MPHStGBcc718az3jGqadByxeDXcrJ3VRGhl4lgH4WHTgBkbGlk9uH8K
-97L9fDjJhe+0KYWqBhPLk0qzWxKFv2G5Sc1GzvgCRVRz9l/wiIf2GNhjaGNMSfra4oIBoVcf6550
-hpcWxCEAkCbI4UzpDyp2qD6d5ok1pup1iZCgBfcO6gAAAAAAAA==
-
-
---=-vSyMHBeLQe+ZDzzajsVP--
+> 
+> Or is there some technical blocker? (circular dep or something?)
+> 
+> Jason
 
