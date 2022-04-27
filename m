@@ -2,154 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CBF55119EB
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 16:56:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C71F511926
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 16:55:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237034AbiD0OH2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 10:07:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35854 "EHLO
+        id S237250AbiD0OLh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 10:11:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236817AbiD0OHZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 10:07:25 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2082.outbound.protection.outlook.com [40.107.236.82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE54F49F3C;
-        Wed, 27 Apr 2022 07:04:13 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WkPup6EzLRaxXvm9iCwACLlNUOJUZVQgm2h8UHW+Oo/bEWeGQMLBZKcEGIHO/ll9QJnxUznOsFvmTo31HdQGV2IfR5plfmpFN1FBqTi6ePlXMeCIrk91Xd3ZJ3wdKl4QxdSZKzpi5bH11QOTquNtmscs52zh2F+LyGn8SJnecAGAi44evK/PQ5yaqo4C+yJAfOxV029QeiZVm1YuqPJobDRzPUNXzTvWQsrO0iq2cP2gSXAsLkxshPx5PjeU3thMi3AIhvxPr4V5JxzQnqrfGE1yViO8hEZgap15eUm6Omt1Od+40sM8awXydiFpBaNeu8U8DmL2tpn3i/+d2yCbzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OOgcx4a9oXkoYntP12BfQ3X6+7t7XYyNmex6/Vx0HUw=;
- b=LdTBEruiHTzwmB11CEyxduJimQC0abd2Vd9yw61fVDhRf8Au/XIsrSFF2Pm8RoYYmVx72LlDjlRYxXyG0iEqED5REF+9H+pZ7tevcYtGu0QP5kbzMQWYdnkpqkK1fbE8Xc3M7ESViFivZ/W8af0qJ1/Rqm5KyyOi+COa0c6fww4aSAzdwI7v8jgaibJHzQFJDpsKFfK2h+k9kSsnA4bJRrK26CF0cev4bRODVazjsyvtYH6OGfQd2VCuUgiDd6WM8DSZ0EXyucQOgR3+VjgeJoJprkNsLorr3DjREOJQwyncN4KfN+V71SXvQaG/GP5TbTKCi1/hCehzvPhbMu114Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OOgcx4a9oXkoYntP12BfQ3X6+7t7XYyNmex6/Vx0HUw=;
- b=FdUs5HEPKE5HMbRaEV5HEkIHQS6NwzQF/QfxpmcL+AV1tWnG3PfIznBOj0y4/z6Uu8Xjx1t9dGV2pjNksqyotKli2dyk6VW6nRNOJdPZHGcxVkxsrP7Xul5ePLDRe696ojMwbgQspHmVNXzDFmMyDWZFXm/wBpvft6/L9X4J7b77O0Sejarpi41rxJEt/eGzxIGADJqQ6QzyfoqBq7yOkGhvSdBMa1LDa6kqF2fNDL7Cbswm9782gJPmwLgG6DgqpSOKAKGYmP5d6qHshfH1AspVOL1flem1DHHhJ+hfc2UgoBSFEKKWXJhSqpuvgqLQHQGXRl+pgVKqgFvjEmHM7g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by MN2PR12MB3728.namprd12.prod.outlook.com (2603:10b6:208:167::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.15; Wed, 27 Apr
- 2022 14:04:12 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2%6]) with mapi id 15.20.5186.021; Wed, 27 Apr 2022
- 14:04:12 +0000
-Date:   Wed, 27 Apr 2022 11:04:10 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, alex.williamson@redhat.com,
-        cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
-        pmorel@linux.ibm.com, borntraeger@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
-        agordeev@linux.ibm.com, svens@linux.ibm.com, frankja@linux.ibm.com,
-        david@redhat.com, imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Subject: Re: [PATCH v6 16/21] vfio-pci/zdev: add open/close device hooks
-Message-ID: <20220427140410.GX2125828@nvidia.com>
-References: <20220426200842.98655-1-mjrosato@linux.ibm.com>
- <20220426200842.98655-17-mjrosato@linux.ibm.com>
+        with ESMTP id S237145AbiD0OLg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 10:11:36 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B886B4B40F
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 07:08:24 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id iq10so1625177pjb.0
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 07:08:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=wcKBX/x7aHbwy2eQa/0b3oj/jc0z2fTHrAAn+gTDCRc=;
+        b=cbQDMg9fNNcB4Lp8zQBGRiZIVuDVCRQBnuWm0ShFQvBTPTyKeBHwxnZEZ2Qm5ge2V/
+         /A3xdNy/M1a5/U74cSqRRBxYfwVLFs8ZmroqKiPQyvWubn5q5GZMqkcDZ1Jkwu4tNREX
+         VxngRXDJgMRyrMVbJP6lhs/vPVcl/H6HPtEryQUcGXDOlNpB0UTjLaIy1tUxHDGnjN7f
+         VNNA3TYpSs5UOPWE7zg0KYHTUdCTZOQhzKnw5gZ1nNqN1FZnO8O1RPg5alkEfgyFRgkK
+         hObGk09T5NHAiQ6nCJxlaR3/hWY60yA4oN+4DyoYk9I0A+NnhBS8f+n1MCMfe+OY2K0p
+         NulA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=wcKBX/x7aHbwy2eQa/0b3oj/jc0z2fTHrAAn+gTDCRc=;
+        b=tEtkGcRWrwm9tSBG0vYv7sO4Kfc/9O5Ewy7ZhP0ucL4PD8ZjTx0KkDJAbUeBgqTLrq
+         xq38aD/7RA0L7nWkOSzCffKhcypdbmiHvkbjUCg97gh+ZXFv6beTCRbQiSFSdemMIQrZ
+         s0e+LxGfxEnPcOzSCgP/H67nHu/6L55M7r8B6vz7HbvJTSJ1ildq5I776A9z30zXFcaZ
+         Bs3wd5c4DPWircQGX97wl06pl8Q4HXXbCDcBnx0rB0A1/iWTbjHBaBHBf2UqsZa8AQmh
+         uiZrKLzzxNA9eL6d6KaFP3GmkIWPM7bqmWWsG6+7LlgtvCKGE/q39Op+7c6D6uG39E6K
+         Fpgw==
+X-Gm-Message-State: AOAM531ACeORhTGzVJ86GrPMm1dgm5M8xZZAsbgCkYcSgznISvBCmyrF
+        8MxW53wLJ4jHRSexnGwIdz77dQ==
+X-Google-Smtp-Source: ABdhPJxMFkyeA50O/t8Mv2R7XyttGzuDp/Jy9gQJ5gEhceX+lGxbN7XZKDrSvie2PtooYYn/Uez/vQ==
+X-Received: by 2002:a17:902:8e81:b0:158:fd26:1b95 with SMTP id bg1-20020a1709028e8100b00158fd261b95mr28443970plb.142.1651068504045;
+        Wed, 27 Apr 2022 07:08:24 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id z23-20020a17090a609700b001d93118827asm2969315pji.57.2022.04.27.07.08.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Apr 2022 07:08:23 -0700 (PDT)
+Date:   Wed, 27 Apr 2022 14:08:20 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: add lockdep check before
+ lookup_address_in_mm()
+Message-ID: <YmlOVNAQodY+5p/N@google.com>
+References: <YkHRYY6x1Ewez/g4@google.com>
+ <CAL715WL7ejOBjzXy9vbS_M2LmvXcC-CxmNr+oQtCZW0kciozHA@mail.gmail.com>
+ <YkH7KZbamhKpCidK@google.com>
+ <7597fe2c-ce04-0e21-bd6c-4051d7d5101d@redhat.com>
+ <Ymg1lzsYAd6v/vGw@google.com>
+ <CAL715WK8-cOJWK+iai=ygdOTzPb-QUvEwa607tVEkmGOu3gyQA@mail.gmail.com>
+ <YmiZcZf9YXxMVcfx@google.com>
+ <CAL715W+nMyF_f762Qif8ZsiOT8vgxXJ3Rm8EjgG8A=b7iM-cbg@mail.gmail.com>
+ <YmiczBawg5s1z2DN@google.com>
+ <CAL715W+iZ+uwctT80pcsBrHsF96zWZMAfeVgvWcvvboLz0MkaQ@mail.gmail.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220426200842.98655-17-mjrosato@linux.ibm.com>
-X-ClientProxiedBy: BL0PR1501CA0033.namprd15.prod.outlook.com
- (2603:10b6:207:17::46) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 505dafd7-d316-448b-8802-08da2856ce5c
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3728:EE_
-X-Microsoft-Antispam-PRVS: <MN2PR12MB3728D46821AAF5FCF8383642C2FA9@MN2PR12MB3728.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: lSgGXmr/9EtqD0Nf6fx9+BBsyXVrXHUnWN9d4KbHNbXfeEnE6C5O5GGstGZqR/STpYAVZBuwE9Rj2YdEuTGFzXyY9Ziw3ns4lSIwieMLH5QyGoOpDp1FQysJAn/TeB+Wcs1Ad4GwggizrAnXEfZzVxxXyf4jo/GO5d+jyS2aZHrm8+GG5TdZ6gHBVEb/RJmCZ6766dHzoMyOKRoc31FIhOYGZB/PFxK7xE6QPwzWg8NsgnnheuSXorPcPoCGasdUGfk9x/BRKJXvOJF1bZBC3AFgZHKym3OOlaZxw4oWxQt4DWwM8fJGtBweXu0LnbFYEE7AzFdaxduR+S3ccG4rUuVXYn8kC+CJ7Hjp2zh/erxVfvbb4uwg/22GWW3ntbC+0MjI2rb6rHiwqpt1tnaWe4Znt7JFIwsPLz7ISCGzgwZYW0asn/OoNsswwYcz5d814VSvBIoMGc65KQ03S5a8RgNvhYXVSVd8F46PvzPczHrJi4aCirPr8UfvyWKjMIZwlLlQiiSEiJe3c3QVPTwCvq+5UhiveInzRYM81akNJ6L8SSVqTD0u41cftsMEuHBGehc+Js2nrNiWPLwpnvJE2uvllK2xQBU9n3/njxzKH1NZlVn9i1YRfO8vQov7IJb1dbpXJxO0tIwFVnNQPqFXPg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(83380400001)(38100700002)(186003)(1076003)(508600001)(86362001)(4744005)(7416002)(36756003)(5660300002)(8936002)(33656002)(2906002)(26005)(66476007)(4326008)(2616005)(6916009)(6512007)(8676002)(66946007)(66556008)(316002)(6506007)(6486002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?L6qgz2jmcKSxmzQgj41HZKGbOV90psXvEfj0Om74ctEr9eF6230O8S2PO1Ox?=
- =?us-ascii?Q?rfCXX3jFRgok1BgFkBInk+QmaFvip7UQZCrOKRN/Nq5RoE+3+TLgtcUEesd2?=
- =?us-ascii?Q?IlEFKX4u7r3ly/XYGgaAmkvF51CvgUb0OqG+qVLMPzgXRS6cKsj3YV4k8Q9H?=
- =?us-ascii?Q?SW4J2PB+SCI/utlyE5vksWHW0abdPEa7Fne8QiQNOIdO5yg/r7mH/IoeHD1H?=
- =?us-ascii?Q?fWXtCjRApXNfrYWrLLrEnCv2x0G4NODqyTmqaIInu0kAQXZXd1iWHDnkC+6V?=
- =?us-ascii?Q?fEudAJzkmZG/LdP/KZWFFw1Ma/hGZv7Zgs3iPRg31lOzeAP8fLiihM5QMQOd?=
- =?us-ascii?Q?UaAMDFwbkBVeD/sUOiKVEPvq8QbJkZn0sw8mBp1+Thb6EM15U9B3Kjo3DSdZ?=
- =?us-ascii?Q?oEhvvI7TQ6kZuaU0uLI1KlgFFDmoHPBlas9v0jh4dcGybKHeoS8W0XRP7i9x?=
- =?us-ascii?Q?zzRybdoiq+/ma+AQWE2xRNIPlACC1JkVy3R4dBbkAs2EKE4xWda2vB8arEeA?=
- =?us-ascii?Q?NwtM+M/8Kk+QZkGpgLMKW9asYfKrGTWTaoGN3XUXnlgxlbTgnvOW3Y9zXTi1?=
- =?us-ascii?Q?50+dVOPE97s9+AdcqQh58MtLwpAl22a85HazyWJib/3wiC8A31GqlmJrR230?=
- =?us-ascii?Q?59ibX3ibNwFgojA+lsNXt1+CbO/cUajDW+cdhPjzWUsT2dj61TXWLaRCp6tI?=
- =?us-ascii?Q?Chw5IoU1igdZonRAVgJUtQLKC27ddi+mfwQf7raTA4cb8JFNzimoVvk67P3L?=
- =?us-ascii?Q?I6AM5FQRavNnV6RRXySU4C3qugLBk27itgRVQtfPZEJEFCSScFvSlc7QTwqv?=
- =?us-ascii?Q?Gd2DSBZY8fyOTUkLFx935iAYNNOGeuWnC2sPZrqvQFe+XIABB81C2fYygsED?=
- =?us-ascii?Q?5LFr/YVUeieGmtShhGIOc4uJnfjOWC6666S9pptvi26gkJu1Kxzo9yk3msfX?=
- =?us-ascii?Q?KDqnRl6L59gjEj6Hkn8SDkFGwUFlzBFebJDmJFApF+Dzo2eKJqsw4iNUv9Ue?=
- =?us-ascii?Q?tZjOtdsRGxa5huzeWbTLohrcrWxJf89Ex2tD+baDnxtsNs+GA8sLnwvChWw4?=
- =?us-ascii?Q?o+Sb3dktLTgTVkhA5/NdWwqPd7Facsw3wZbXOmH/iesaBcui6dTaPLAcg5YW?=
- =?us-ascii?Q?vMt62shuz1elO5AuEFSCRlPSTWuwDKOUBW7VdhGVRSGc/S91M8gvZqpsV1yF?=
- =?us-ascii?Q?pbi0ZZLQTGS0dShu2JWNrAZIB5wers2fc0KE9C2G6XbjHqw3UTrDow21hX8c?=
- =?us-ascii?Q?YhqBchsBwHVaoQoFRx4BJO20CVNhB84lfDvk/XDFQcFw/Z28XPTOFGUUAwXG?=
- =?us-ascii?Q?eduhd0rTXmUGX4aWKIkc0M3FbDg1zU4Q0Xtev5huGzJMWJn4+n2dMpJ7dSJ/?=
- =?us-ascii?Q?aYzzRysnIo4LQg+AoWYztfI1XHelqa8tqEaEFPiLUutDktTiVabmZpizLfJo?=
- =?us-ascii?Q?rRIdRUNXnZcT4j0nAJRMChB7trLxfN407frwnit90ZPzG0XSxrxi72X2hgBx?=
- =?us-ascii?Q?suy72XhJ2VNylWzPji8CcO88lf+ujDxzHHMCr/4OHUwfoqAdpVjZObfRxRxR?=
- =?us-ascii?Q?0XFZ/c+Ve/rnIBbTUn0ozUMAFzaonzWVWoVsWhc4nxeptU4ZJ5+whzPJA0i/?=
- =?us-ascii?Q?9rmXppiAfisTZvFXC1HVauICZJtUaOnDRuK6+XZyr5j3Cr9CpugTBmAOwrKs?=
- =?us-ascii?Q?PoR3rirAYZzvasIO6M0ftoBjmVohcQbVBO2rSnVOphUlod5Uhhwwf+2CSjv6?=
- =?us-ascii?Q?nk3Rgzq+7Q=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 505dafd7-d316-448b-8802-08da2856ce5c
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2022 14:04:12.2690
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HiGgoAPoWyId0kfiep94wpP3bUV0x/SfgWABIuO/aD59p+vUZHj//MSCRXhG11UO
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3728
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <CAL715W+iZ+uwctT80pcsBrHsF96zWZMAfeVgvWcvvboLz0MkaQ@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 26, 2022 at 04:08:37PM -0400, Matthew Rosato wrote:
+On Tue, Apr 26, 2022, Mingwei Zhang wrote:
+> On Tue, Apr 26, 2022 at 6:30 PM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Tue, Apr 26, 2022, Mingwei Zhang wrote:
+> > > On Tue, Apr 26, 2022 at 6:16 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > >
+> > > > On Tue, Apr 26, 2022, Mingwei Zhang wrote:
+> > > > > > I completely agree that lookup_address() and friends are unnecessarily fragile,
+> > > > > > but I think that attempting to harden them to fix this KVM bug will open a can
+> > > > > > of worms and end up delaying getting KVM fixed.
+> > > > >
+> > > > > So basically, we need to:
+> > > > >  - choose perf_get_page_size() instead of using any of the
+> > > > > lookup_address*() in mm.
+> > > > >  - add a wrapper layer to adapt: 1) irq disabling/enabling and 2) size
+> > > > > -> level translation.
+> > > > >
+> > > > > Agree?
+> > > >
+> > > > Drat, I didn't see that it returns the page size, not the level.  That's a bit
+> > > > unfortunate.  It definitely makes me less averse to fixing lookup_address_in_pgd()
+> > > >
+> > > > Hrm.  I guess since we know there's at least one broken user, and in theory
+> > > > fixing lookup_address_in_pgd() should do no harm to users that don't need protection,
+> > > > it makes sense to just fix lookup_address_in_pgd() and see if the x86 maintainers
+> > > > push back.
+> > >
+> > > Yeah, fixing lookup_address_in_pgd() should be cleaner(), since the
+> > > page fault usage case does not need irq save/restore. But the other
+> > > one needs it. So, we can easily fix the function with READ_ONCE and
+> > > lockless staff. But wrapping the function with irq save/restore from
+> > > the KVM side.
+> >
+> > I think it makes sense to do the save/restore in lookup_address_in_pgd().  The
+> > Those helpers are exported, so odds are good there are broken users that will
+> > benefit from fixing all paths.
+> 
+> no, lookup_address_in_pgd() is probably just broken for KVM. In other
+> call sites, some may already disable IRQ, so doing that again inside
+> lookup_address_in_pgd() will be bad.
 
-> +static int vfio_pci_zdev_group_notifier(struct notifier_block *nb,
-> +					unsigned long action, void *data)
-> +{
-> +	struct zpci_dev *zdev = container_of(nb, struct zpci_dev, nb);
-> +	int (*fn)(struct zpci_dev *zdev, struct kvm *kvm);
-> +	int rc = NOTIFY_OK;
-> +
-> +	if (action == VFIO_GROUP_NOTIFY_SET_KVM) {
-> +		if (!zdev)
-> +			return NOTIFY_DONE;
-> +
-> +		fn = symbol_get(kvm_s390_pci_register_kvm);
-> +		if (!fn)
-> +			return NOTIFY_DONE;
-> +
-> +		if (fn(zdev, (struct kvm *)data))
-> +			rc = NOTIFY_BAD;
-> +
-> +		symbol_put(kvm_s390_pci_register_kvm);
+No, it's not bad.  local_irq_save/restore() intended preciesly for cases where
+IRQs need to be disabled but IRQs may or may not have already been disabled by
+the caller.   PUSHF+POPF is not expensive relatively speaking, 
 
-Is it possible this function can be in statically linked arch code?
+> I am looking at here:
+> https://elixir.bootlin.com/linux/latest/source/arch/arm/kernel/traps.c#L304
 
-Or, actually, is zPCI useful anyhow without kvm ie can you just have a
-direct dependency here?
+That's arm code, lookup_address_in_pgd() is x86 specific.  :-) That said, I'm sure
+there exists at least one caller that runs with IRQs disabled.  But as above,
+it's not a problem.
 
-Jason
+> so, the save/restore are done in oops_begin() and oops_end(), which is
+> wrapping show_fault_oops() that calls lookup_address_in_pgd().
+> 
+> So, I think we need to ensure the READ_ONCE.
+> 
+> hmm, regarding the lockless macros, Paolo is right, for x86 it makes
+> no difference. s390 seems to have a different implementation, but
+> kvm_mmu_max_mapping_level() as well as host_pfn_mapping_level are both
+> functions in x86 mmu.
+
+Yep, all of this is x86 specific.
