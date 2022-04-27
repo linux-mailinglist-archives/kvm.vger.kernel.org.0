@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B8AE0510E3A
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 03:47:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A9F8510E3E
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 03:47:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356857AbiD0Bnd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 21:43:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56666 "EHLO
+        id S1356907AbiD0Bni (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 21:43:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356861AbiD0Bn1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Apr 2022 21:43:27 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2984E016
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 18:40:16 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id z5-20020a170902ccc500b0015716eaec65so219517ple.14
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 18:40:16 -0700 (PDT)
+        with ESMTP id S1356882AbiD0Bnd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Apr 2022 21:43:33 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC21D13DFF
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 18:40:18 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id q91-20020a17090a756400b001d951f4846cso2500920pjk.8
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 18:40:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=rawRdx79XoHw8u43omV3BLmCVZwqFd6EN+RncnsvFlQ=;
-        b=Wy77UfIaH1Mz9LQ3+COp24Uf6HTFpZN3jikhvs5fDCb3iOPjgt5BDq5JW28/5uZEgW
-         EfhDviZS9N2Rj9bFTfA2iNGMgNU0M9nHiAUnW16ps6fAaocJBj1JFneqZOYBNnH0/D2o
-         v0RwN8ACclFIH5cHcM4vRBa3fTFlm1cgcGo6O+BP0xyTbp0LHTVecQhWa/mX7GfSj9s9
-         WL8GrinfpesY+cgz5KFFUpm76wbH4242+dMvlTM5l9y/Flz4ffOG+o7khGfNHZDpAKFH
-         Y8F4dIVBmZOPCGCR1dxkxSNv93kBBXZZSnt1urN6U1Mk0+7lpfW1wI0RETVqjnc5Ut8i
-         M2jw==
+        bh=oIuDd5cR02hrHErNclDHZMSuVoVOazN+F6VIuRriZDA=;
+        b=LFic/f7rom8f+3sEzUp8LncT/ayhH/Id71SNRHr2XaRLR2TbdzmR7eBMyTACE8hyLO
+         ehKTK6h/Lhd8ADH+GgmSkM8ZI5l2RI5D/Sr1w2R9Fo4qiNoukbb0Pt5HG+B7izJylETm
+         Da65BQ/6ZDweC74dSvEtERft9mGiw1Di4/rDH9iBUEfIhIzsl1/iQBcOAfdjjzCfcfz7
+         QTPKsdtKcTHeJqvRJ8XGFdXuKOcqt6FxOVglXcNzxlQ/f9d2srgft2g74XGwV6O9AFE8
+         rgi4nBW4G5S+qS2cHwgngAHUlWvaHOKRHYoltuU16p0yhfj8ilCCvLgBifuxns3S9LPX
+         Sjig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=rawRdx79XoHw8u43omV3BLmCVZwqFd6EN+RncnsvFlQ=;
-        b=TwOF6YP6LfiQsOP35ArEtk5+tcQ3WwHk9oDv8i/sjXib7oz8lhSVb5UNk8g1px7OSa
-         G56hrJ/yXERIR40CcMDP1nkcuMAminOXIENSy7UqLcJsG2hiG6XOgT2/wQ6G8aDqKB7/
-         a+dSCe4J6WLBrx7Pw2P2ZZJiJFpcxbZzY6zLwhWfkRoY+E9kOFjMaqj5LTOJo/R+qFCF
-         1E88oKhom3xGCPT4U+Ec4EiSpDBoPncNhB0OI3GN3t1qsPM5/zRQ3YBWMuJuHN8RYW+W
-         fiRqpZxkaA1RHtHyDt9GAp86Pxn8JELM7d0DHsTHStt1k2E/rf7cmdYD92P2yRkZnSEU
-         BaIw==
-X-Gm-Message-State: AOAM532Iy1IO9adRp3qlt+1/tUpNISTeYus5y5PbXWT3KiF5QwMriQNo
-        Zk8OU5PqMHCuILBqNQs5ClMaOH4e9Qo=
-X-Google-Smtp-Source: ABdhPJxHu98OqKrbCDEoXrAFUU0bOj8alASiiDJ2JP3PBWJVsUZI7J3kcLtf88ASn3gUX5Vp4RckwrphTes=
+        bh=oIuDd5cR02hrHErNclDHZMSuVoVOazN+F6VIuRriZDA=;
+        b=co0CI6iQhTOHUq+zk0vRcg1+ZCRt5TH1COC4JIqysOyhldigxmTROjGEkdVK6+LKZ6
+         EMMqw5fCtMrHmadnUowJ0tlPlg7LRXsXIThDWBFPCWXPtwgMuLNDyttHbB6d1DbSFAkh
+         Y6hAynyjFzyQnkB/d6GrgRHdbimhx3ZAAnrWgrAJB1gROBRaqLuzQ1IW1DerYKgYKzKd
+         qcfPm+eh05FZT/iiCBXRLUIv2IfI7KF403CDVx75eaunz3QRXZlgqPtig4VHXeoYAAV7
+         GtHa3JJsHa1twuU3WKoVicqZrakAtZEIAD9i/GMq/EUf6xF+pUMHBLLoRTB97jWFiaX4
+         5/ug==
+X-Gm-Message-State: AOAM532E33aaeKqGiUdU4yXUDl/o/FTFUvUK5gV6SzIjVVoORvug2LXW
+        udhHoa76cPxDD/E3ts9gGvuTTq/g7v4=
+X-Google-Smtp-Source: ABdhPJxL0wfOOjc+DR3645JlGmw0wdarGu9sglFlqvJiGN+pgAEHoaVjWlH4Mk4mSs95mgr4A1GI9T4GYnY=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90a:cf:b0:1d9:44ad:2607 with SMTP id
- v15-20020a17090a00cf00b001d944ad2607mr20399981pjd.25.1651023616264; Tue, 26
- Apr 2022 18:40:16 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:b78d:b0:1d9:4f4f:bc2a with SMTP id
+ m13-20020a17090ab78d00b001d94f4fbc2amr19717628pjr.155.1651023617849; Tue, 26
+ Apr 2022 18:40:17 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 27 Apr 2022 01:40:00 +0000
+Date:   Wed, 27 Apr 2022 01:40:01 +0000
 In-Reply-To: <20220427014004.1992589-1-seanjc@google.com>
-Message-Id: <20220427014004.1992589-5-seanjc@google.com>
+Message-Id: <20220427014004.1992589-6-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220427014004.1992589-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.0.rc2.479.g8af0fa9b8e-goog
-Subject: [PATCH v2 4/8] KVM: Put the extra pfn reference when reusing a pfn in
- the gpc cache
+Subject: [PATCH v2 5/8] KVM: Do not incorporate page offset into gfn=>pfn
+ cache user address
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -75,36 +75,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Put the struct page reference to pfn acquired by hva_to_pfn() when the
-old and new pfns for a gfn=>pfn cache match.  The cache already has a
-reference via the old/current pfn, and will only put one reference when
-the cache is done with the pfn.
+Don't adjust the userspace address in the gfn=>pfn cache by the page
+offset from the gpa.  KVM should never use the user address directly, and
+all KVM operations that translate a user address to something else
+require the user address to be page aligned.  Ignoring the offset will
+allow the cache to reuse a gfn=>hva translation in the unlikely event
+that the page offset of the gpa changes, but the gfn does not.
 
-Fixes: 982ed0de4753 ("KVM: Reinstate gfn_to_pfn_cache with invalidation support")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- virt/kvm/pfncache.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ virt/kvm/pfncache.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-index e05a6a1b8eff..40cbe90d52e0 100644
+index 40cbe90d52e0..05cb0bcbf662 100644
 --- a/virt/kvm/pfncache.c
 +++ b/virt/kvm/pfncache.c
-@@ -206,6 +206,14 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+@@ -179,8 +179,6 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+ 			ret = -EFAULT;
+ 			goto out;
+ 		}
+-
+-		gpc->uhva += page_offset;
+ 	}
  
- 		if (gpc->usage & KVM_HOST_USES_PFN) {
- 			if (new_pfn == old_pfn) {
-+				/*
-+				 * Reuse the existing pfn and khva, but put the
-+				 * reference acquired hva_to_pfn_retry(); the
-+				 * cache still holds a reference to the pfn
-+				 * from the previous refresh.
-+				 */
-+				gpc_release_pfn_and_khva(kvm, new_pfn, NULL);
-+
- 				new_khva = old_khva;
- 				old_pfn = KVM_PFN_ERR_FAULT;
- 				old_khva = NULL;
+ 	/*
 -- 
 2.36.0.rc2.479.g8af0fa9b8e-goog
 
