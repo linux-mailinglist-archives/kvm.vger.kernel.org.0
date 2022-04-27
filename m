@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 51AAB5121E6
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 20:59:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DAF35121EA
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 20:59:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232180AbiD0TCM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 15:02:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41314 "EHLO
+        id S229986AbiD0TCX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 15:02:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231409AbiD0TBp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231784AbiD0TBp (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 27 Apr 2022 15:01:45 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 612EF811A6
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 11:48:22 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id i19-20020aa79093000000b0050d44b83506so1465717pfa.22
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 11:48:22 -0700 (PDT)
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCB2CA94C5
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 11:48:23 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id b6-20020a170902d50600b0015d1eb8c82eso1429294plg.12
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 11:48:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=cxxvMCNZeVbSnvKA2qdbM4fbtMJ+yHcSGuyT17AD6dQ=;
-        b=e4sA4jfm+rWhALZYwHLB6njNTs6Wb97KPoc3OTVuID8F7aBVjW50U7XBOVFUoU1Gun
-         UdPeobwkJ9yMzcy2SHfgL5CORXWT9OD9e22D2Ba5J7NXy6npGNvF0oBSjLtTuwpnryX/
-         qR3usaPkOPnE9ugKYDIAVowYZeWQbIqzr6FeHCFozOR2lfizFaTBpcE0HfM4ZJwFLCK7
-         hfU5TYpxx0gzAowKUAq5zss86Xzv9dwVoCtRlhHUn9a0JOaP7uG/5Ld8RXtqVuAtYAXJ
-         gX/kvFPAaJ2YrWmxFQRNSjpyKIZqQvSnN9pTd617t7vDjlOwElhZWmiaylmLsAKyu1Mi
-         HIkg==
+        bh=h6i932oX/jFZxDeCgPoTJkzP+yH7aYfI+DgBzirxODs=;
+        b=QIZgIEqufTlsX6ImsR51+hEPqbxHx3Yf30qGjXgSYPJCBVtJj4VFyxlmGt4GLy2fme
+         O8v20Qbl7rUGzQVhQvtgICDH36pYKZjiSHCDic9hjSujDY59PrB6N3ef3LAwDSvgCCgY
+         LoDThBX9JNQmVC4vz9ZOE3BzD8QhP9UVJnKsnh3PPZE0I9Q+BVwlhA+BW/nCI7HMuwKI
+         QMvn2o5vyv7eFxrsRZ1DJlK1ewKninzZ2J5mX9C86VZFH4ZQW5rVGEOiB8xlMJiDT3YO
+         Yjj/Ska9kuvKyxC9bgoavvCxoPprqgGd1e3PNCk21QMX6meNtLRxdo9IOkIDrzCiubzM
+         v50A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=cxxvMCNZeVbSnvKA2qdbM4fbtMJ+yHcSGuyT17AD6dQ=;
-        b=JmXdLcQFHrG6jkNQJuo40GM9OD+UQA0nIRicNV2ZN3HdVN9mwgQ3CWDu2I3rhSARk1
-         BvaKE56Haqd7HrrgHvX+OuEu9+mhvpFTK/Nj2/16A2Snw6qLka+oDWRJhEKMUIKNpzve
-         sMGbZkx/JCv162oIAlzmltuqGMU6WuZQfZCtgSkESseXQKXY2m0YMAkKSP1KJq8AO+zu
-         PsP4ep9PaoyhmpvasJ9dLWRuNsKNJnxXsZ2MADux/vXiKTzfKcJV6/Dzw5nNzmQ7IYyy
-         VfSNGaMBU2b+rDzCDVnOvwPTSyqp5vgsV+GvLu82oe9E6aJLlX5mYYAxQdwd9ZC2S/bg
-         Bbkg==
-X-Gm-Message-State: AOAM532Me8ZAwcLL3ABTCSZZ49RYQFV/Eps5D8MIRzCCdDPelc+SiA8O
-        CAP/q2BvZogziN9MP6JzvqPsPn0kcK3hm4ItLXhrOqR7dc+RyUZMGbHqHACT5QUmPipqhhSIid6
-        tSSRYyLHJ8834bRHNJCbkCuDmBclOXkhtusCdvjfAZ+Dz64P0LNg9cE+YLYuU+Ys=
-X-Google-Smtp-Source: ABdhPJyknPlo5DBIr5KBuqPWpNATajXUqy1RAWRHznIjdBuSCbRAzwcaMXDVvDKPr6EbhIw5bJiJDDG9lmFPCQ==
+        bh=h6i932oX/jFZxDeCgPoTJkzP+yH7aYfI+DgBzirxODs=;
+        b=B5n9Ja7TVmnuvU+qkWjKkQFKDn0681rgHPRtFEZxcefVPYS6dpVZEooUQ60QJzemcd
+         CAf0HyNsS8Se/Accn7UhK4J/pOGIQ/VACxjm1RJNxne3zr7RkcsO3xj6qRylf0J/dsp2
+         iWrH7n8xmGdVXNRu9DGkmyu2c2fHQW751Ss9lRFwv1qdpIOliP4Xck0lKL251UkgzgQ6
+         0P/flWTxJi/f8BYSOIft949vAlmy1xoG8YsDiLmJ3SrZw6+AvyXWMRUrkKyy1c71okSd
+         bDvGYkl3YaAMS/H/2lDjdFa8NoaDr4SjyEY3sV018z6rk1Lle0LBMffV26P5pVRg6pmO
+         7nEA==
+X-Gm-Message-State: AOAM531wyzBob/RK+NuyJo++VWh2WTJjfXtkmGp4cf9mRPqCUJ3RXHgv
+        YikgQOzPP+EBNrHDyUh1sb58biWJGvWwpdFzz/9jl6TERp9GXFFJ6KW5kEdMoOAPxgxlao8ZEh7
+        YZqWT0XshIhwgqofiYTnL33DRxcQMYb2zUMktQKdV3b4pVA5sPFdXCAtV+3+Q6gE=
+X-Google-Smtp-Source: ABdhPJzNqPfb/x+YKrEsZ3li+cQ0pLyAnvLP4bZGKCHDHyL9eXtfLjRh5cZ+nMHDNIO+Th6alnvjKnACtR2EJA==
 X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:903:2285:b0:15b:cd9e:f018 with SMTP
- id b5-20020a170903228500b0015bcd9ef018mr28691242plh.106.1651085301614; Wed,
- 27 Apr 2022 11:48:21 -0700 (PDT)
-Date:   Wed, 27 Apr 2022 11:48:13 -0700
+ (user=ricarkol job=sendgmr) by 2002:a62:1e03:0:b0:505:64c1:3e19 with SMTP id
+ e3-20020a621e03000000b0050564c13e19mr31675138pfe.32.1651085303160; Wed, 27
+ Apr 2022 11:48:23 -0700 (PDT)
+Date:   Wed, 27 Apr 2022 11:48:14 -0700
 In-Reply-To: <20220427184814.2204513-1-ricarkol@google.com>
-Message-Id: <20220427184814.2204513-4-ricarkol@google.com>
+Message-Id: <20220427184814.2204513-5-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20220427184814.2204513-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH v2 3/4] KVM: arm64: vgic: Do not ignore vgic_its_restore_cte failures
+Subject: [PATCH v2 4/4] KVM: arm64: vgic: Undo work in failed ITS restores
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     pbonzini@redhat.com, maz@kernel.org, andre.przywara@arm.com,
@@ -70,128 +70,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Restoring a corrupted collection entry is being ignored and treated as
-success. More specifically, vgic_its_restore_cte failure is treated as
-success by vgic_its_restore_collection_table.  vgic_its_restore_cte uses
-a positive number to return ITS error codes, and +1 to return success.
-The caller then uses "ret > 0" to check for success. An additional issue
-is that invalid entries return 0 and although that doesn't fail the
-restore, it leads to skipping all the next entries.
+Failed ITS restores should clean up all state restored until the
+failure. There is some cleanup already present when failing to restore
+some tables, but it's not complete. Add the missing cleanup.
 
-Fix this by having vgic_its_restore_cte return negative numbers on
-error, and 0 on success (which includes skipping an invalid entry).
-While doing that, also fix alloc_collection return codes to not mix ITS
-error codes (positive numbers) and generic error codes (negative
-numbers).
+Note that this changes the behavior in case of a failed restore of the
+device tables.
+
+	restore ioctl:
+	1. restore collection tables
+	2. restore device tables
+
+With this commit, failures in 2. clean up everything created so far,
+including state created by 1.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arch/arm64/kvm/vgic/vgic-its.c | 35 ++++++++++++++++++++++++----------
- 1 file changed, 25 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/vgic/vgic-its.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index fb2d26a73880..86c26aaa8275 100644
+index 86c26aaa8275..c35534d7393a 100644
 --- a/arch/arm64/kvm/vgic/vgic-its.c
 +++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -999,15 +999,16 @@ static bool vgic_its_check_event_id(struct vgic_its *its, struct its_device *dev
- 	return __is_visible_gfn_locked(its, gpa);
- }
+@@ -2222,8 +2222,10 @@ static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
+ 		vcpu = kvm_get_vcpu(kvm, collection->target_addr);
  
-+/*
-+ * Adds a new collection into the ITS collection table.
-+ * Returns 0 on success, and a negative error value for generic errors.
-+ */
- static int vgic_its_alloc_collection(struct vgic_its *its,
- 				     struct its_collection **colp,
- 				     u32 coll_id)
- {
- 	struct its_collection *collection;
+ 	irq = vgic_add_lpi(kvm, lpi_id, vcpu);
+-	if (IS_ERR(irq))
++	if (IS_ERR(irq)) {
++		its_free_ite(kvm, ite);
+ 		return PTR_ERR(irq);
++	}
+ 	ite->irq = irq;
  
--	if (!vgic_its_check_id(its, its->baser_coll_table, coll_id, NULL))
--		return E_ITS_MAPC_COLLECTION_OOR;
--
- 	collection = kzalloc(sizeof(*collection), GFP_KERNEL_ACCOUNT);
- 	if (!collection)
- 		return -ENOMEM;
-@@ -1101,7 +1102,12 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+ 	return offset;
+@@ -2491,6 +2493,9 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
+ 	if (ret > 0)
+ 		ret = 0;
  
- 	collection = find_collection(its, coll_id);
- 	if (!collection) {
--		int ret = vgic_its_alloc_collection(its, &collection, coll_id);
-+		int ret;
++	if (ret < 0)
++		vgic_its_free_device_list(its->dev->kvm, its);
 +
-+		if (!vgic_its_check_id(its, its->baser_coll_table, coll_id, NULL))
-+			return E_ITS_MAPC_COLLECTION_OOR;
-+
-+		ret = vgic_its_alloc_collection(its, &collection, coll_id);
- 		if (ret)
- 			return ret;
- 		new_coll = collection;
-@@ -1256,6 +1262,10 @@ static int vgic_its_cmd_handle_mapc(struct kvm *kvm, struct vgic_its *its,
- 		if (!collection) {
- 			int ret;
- 
-+			if (!vgic_its_check_id(its, its->baser_coll_table,
-+						coll_id, NULL))
-+				return E_ITS_MAPC_COLLECTION_OOR;
-+
- 			ret = vgic_its_alloc_collection(its, &collection,
- 							coll_id);
- 			if (ret)
-@@ -2497,6 +2507,10 @@ static int vgic_its_save_cte(struct vgic_its *its,
- 	return kvm_write_guest_lock(its->dev->kvm, gpa, &val, esz);
- }
- 
-+/*
-+ * Restores a collection entry into the ITS collection table.
-+ * Returns 0 on success, and a negative error value for generic errors.
-+ */
- static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
- {
- 	struct its_collection *collection;
-@@ -2511,7 +2525,7 @@ static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
- 		return ret;
- 	val = le64_to_cpu(val);
- 	if (!(val & KVM_ITS_CTE_VALID_MASK))
--		return 0;
-+		return 0; /* invalid entry, skip it */
- 
- 	target_addr = (u32)(val >> KVM_ITS_CTE_RDBASE_SHIFT);
- 	coll_id = val & KVM_ITS_CTE_ICID_MASK;
-@@ -2523,11 +2537,15 @@ static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
- 	collection = find_collection(its, coll_id);
- 	if (collection)
- 		return -EEXIST;
-+
-+	if (!vgic_its_check_id(its, its->baser_coll_table, coll_id, NULL))
-+		return -EINVAL;
-+
- 	ret = vgic_its_alloc_collection(its, &collection, coll_id);
- 	if (ret)
- 		return ret;
- 	collection->target_addr = target_addr;
--	return 1;
-+	return 0;
- }
- 
- /**
-@@ -2593,15 +2611,12 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
- 
- 	while (read < max_size) {
- 		ret = vgic_its_restore_cte(its, gpa, cte_esz);
--		if (ret <= 0)
-+		if (ret < 0)
- 			break;
- 		gpa += cte_esz;
- 		read += cte_esz;
- 	}
- 
--	if (ret > 0)
--		return 0;
--
  	return ret;
  }
  
+@@ -2617,6 +2622,9 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
+ 		read += cte_esz;
+ 	}
+ 
++	if (ret < 0)
++		vgic_its_free_collection_list(its->dev->kvm, its);
++
+ 	return ret;
+ }
+ 
+@@ -2648,7 +2656,10 @@ static int vgic_its_restore_tables_v0(struct vgic_its *its)
+ 	if (ret)
+ 		return ret;
+ 
+-	return vgic_its_restore_device_tables(its);
++	ret = vgic_its_restore_device_tables(its);
++	if (ret)
++		vgic_its_free_collection_list(its->dev->kvm, its);
++	return ret;
+ }
+ 
+ static int vgic_its_commit_v0(struct vgic_its *its)
 -- 
 2.36.0.464.gb9c8b46e94-goog
 
