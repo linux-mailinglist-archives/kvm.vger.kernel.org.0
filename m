@@ -2,189 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E2DB2511F2C
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 20:37:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D7CC511EAE
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 20:37:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229769AbiD0PRS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 11:17:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40234 "EHLO
+        id S239502AbiD0PVS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 11:21:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239300AbiD0PRP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 11:17:15 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2071.outbound.protection.outlook.com [40.107.92.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32A66381A2;
-        Wed, 27 Apr 2022 08:14:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jROTHk3exkjwbgqOpCAVjSyFKwS+VBaqXcG9nFLtVkuLgVCNXkD+CDh/YpJTFs6BDnQs6Wq0pqn9b7ITtTtuqxXluyekQBCpMTd7NaTQkK5B8GQbn/4suyFt0ZNPdUy53EAKVjRFarq0XxOPo1l9eJpmSE9pKoZs3r6ou+d8lkrBSYjIAROKO31E9yoiKMDD6kpfIDBJ3/Jc7TbHMRQ8iWCD7qWIMjfgVqUa3WiTLOJH/5FlY/xAbdMPODvHGkXI8vo2lAniRf1ABZk5qrRaEuBVEjmKxoxKjzjRgp9Y28zmX8hrfumU0mtdjcnrfhnh1Wn4Tn8LFmhZLdVPuMUo2w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=S+wayqI8cT3E9XrzUjIeXL7SQy9Yx4IGRtqU8ZF+DPU=;
- b=ieNcLi15sT4XdCMgZOh9+V35XgkJH5Rwbf+sH36/yfIe67pxim0NwdyjRX0fiNpnDNbLbv7hD7Zhxy95YF7G1fnjpw6c7zVWPE0xync9VeVKyq2knxuuMJOYMfpFXXV2cIj/v67tT8Vd6jnU+fPXmL9fHMA/lMrSgBbEiigXi6Um5USrUSlQ8Gdaz0d4P8cMWMoi0M6gLdfb33EyS+rylxA5b+QXIgkqMv8MOYHjPkHp9H1b8e+FAAZBlHqtnP1iZPPOfSpf2NQ0w8cpjxWYTYiosV48tu6YH/CEj8RDM6eyv6lLatHHAkg0yoL7FtDTWi+Lsvzo75yLORTA4l0KYw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=S+wayqI8cT3E9XrzUjIeXL7SQy9Yx4IGRtqU8ZF+DPU=;
- b=n6gvV3RhsahodS+sD8ZiSt+UmDX5NUl6Ty1V3jkFf9f+59AuR50YWsxCSXSYy733dBC/Y8Fj7V1j5WT7bFR3oDzHLjxKpOF2ARHQEeQ6rpLfAy+pCIPOcVMDoQDoHgX2Tr4B1alZK2N5AolQA0Z3aVtG8xFtQ3abpW4Q1u56gHaKhRqrZy5U71s7Lx8JjQfIMFdUOVn2iO1ULeAymFEF2uINx+ypUIWMxc096/DZb677Hob/V0hjVMA6h6hZCLH+dQ8L5VXwfBDz1xqLlFO5guE+2Q0B+9WysRXfZEjeEUkhicJujeAyyfKy1YrU3kLXBpbgrj/1zWNtkPBiMxmdjQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by BL1PR12MB5077.namprd12.prod.outlook.com (2603:10b6:208:310::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.14; Wed, 27 Apr
- 2022 15:14:01 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2%6]) with mapi id 15.20.5186.021; Wed, 27 Apr 2022
- 15:14:01 +0000
-Date:   Wed, 27 Apr 2022 12:14:00 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, alex.williamson@redhat.com,
-        cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
-        pmorel@linux.ibm.com, borntraeger@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
-        agordeev@linux.ibm.com, svens@linux.ibm.com, frankja@linux.ibm.com,
-        david@redhat.com, imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Subject: Re: [PATCH v6 15/21] KVM: s390: pci: add routines to start/stop
- interpretive execution
-Message-ID: <20220427151400.GY2125828@nvidia.com>
-References: <20220426200842.98655-1-mjrosato@linux.ibm.com>
- <20220426200842.98655-16-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220426200842.98655-16-mjrosato@linux.ibm.com>
-X-ClientProxiedBy: MN2PR06CA0025.namprd06.prod.outlook.com
- (2603:10b6:208:23d::30) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S239498AbiD0PVF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 11:21:05 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 251783B547;
+        Wed, 27 Apr 2022 08:17:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=xqfaPuZm2wMK4xxvXtdqxzFvK1J9mOsAEiewsfYYJog=; b=nuf4n2E9/bDzYP19YtkC+h7h8A
+        W6Dk3tZ/Z7vUoR2DOzFEBDJKld7yOzr2IZZLA97hN/qRpaeztdj3zZ9Z9yQ/LW0i0J4ALtv7QmCHd
+        n7WSGPprgK4G/wqBcETfyfNxkL4f7ktNPXVInCWYMNa1Kw8LahcpYc6H2lz9KqnUd4M9CWrui0E7k
+        cpnIqzgOpNdUO0XBFUTYO8xujLRQsJaOYqxi/coXZpIRucUGMaCaX6bCzxb3kRfrxdxzM+skXW/nK
+        aBxHvG7VlFMwzF2gXyI6CMhv5e8Xq0VpjoKGT8YVZzFw702zk3Nyw7sHbn+Whm3Pt3Xl8rDcSW0/I
+        Cn6YbnVg==;
+Received: from [2001:8b0:10b:1:4a2a:e3ff:fe14:8625] (helo=u3832b3a9db3152.ant.amazon.com)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1njjPr-0095sp-7q; Wed, 27 Apr 2022 15:17:19 +0000
+Message-ID: <68b3f18e156391e20aed8e10e974fdf8052b7f47.camel@infradead.org>
+Subject: Re: [PATCH v2 8/8] DO NOT MERGE: Hack-a-test to verify gpc
+ invalidation+refresh
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Mingwei Zhang <mizhang@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Date:   Wed, 27 Apr 2022 16:17:14 +0100
+In-Reply-To: <20220427014004.1992589-9-seanjc@google.com>
+References: <20220427014004.1992589-1-seanjc@google.com>
+         <20220427014004.1992589-9-seanjc@google.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-vSyMHBeLQe+ZDzzajsVP"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a3afe478-331a-47fd-d379-08da28608f5e
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5077:EE_
-X-Microsoft-Antispam-PRVS: <BL1PR12MB507738D027B6DDA60781CC84C2FA9@BL1PR12MB5077.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: FM5ZB/w1INyfcQvZtocQXkn1n3oDaH3A0+84z/UGbD7JYHOKbWs6M4zGopRSrRn6OYURRrYnhH6q8uOp84YlVZEL0RmJMoHEoEBv5PI0afeid832+bmKLjq7Yfwws9aZsbXMZsK1N7Gs1lj7o/Gzo8HKmrDjatvuVedDEFnV4XTK3JB1cTq2/NiwI0Eg0KXKES7qjAPs6GyNFyAdpW8DKfR6bjUDM3Ox8BO93+VjMhjzwlzhMmUp2j30hB1FQxkadFOQCiRTEBsvlDsaV2yM98P8PrwnYH5o2nIVlCwtMPyUoQf+8SkMQxcrLMWQEU4lmidL78MBhU7ayi8Vuv65oLowZCASqXPx68Dss1WGuXM7sMTsaU4fhSp3KCco4hUE25qMXOcHcdEBoRDQF1jeod3Hn27VC1moRVn19tVQGC0Cwj41jRhowhqWUXUYJjEaFF4mRVxCQzDqd3MzzQ9x1SnLbGtTC+Q/QfoQK+j9nwH4nkt/AERPePjZvW1HZlazTtlWX31892Y4RT7/KDA2kw2mMkeG4DP6CqZtxIMx4prZ882FOkiMCLxP4fs0nX5NFSUVHd73JFLgQDy5VvXwSoaxXONxMzaMh8iVlzD5xiB0LLAAErGa8GgrCdv+LG4maSG4Vnd+huiRKKvOG3GdJQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(7416002)(8676002)(5660300002)(2906002)(508600001)(4326008)(6486002)(66476007)(2616005)(186003)(83380400001)(1076003)(38100700002)(8936002)(6506007)(86362001)(26005)(66946007)(33656002)(6916009)(66556008)(36756003)(316002)(6512007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?HY1yu7bEu5xdA6izINQN5+R0jgiJXFDb0l4iS2/LB4QHAvyGtp8GC8pm4XXI?=
- =?us-ascii?Q?MLEGgetHk7QKVTOj+zSSl1fIowiQuDMIWNfj0bvwYdae97ItRAOsdpVyNjXA?=
- =?us-ascii?Q?Mhxfmctcb5iBqEBTxhnp72F1Ntd04G7umGbqBiXmpx0AR0gMA6KDLZqwRhBw?=
- =?us-ascii?Q?L8ipCUHmcfFuD5gf5HDeGXwkiQy+21qqvE9XqyIDFJ7O0ziySUeV/tzOspGG?=
- =?us-ascii?Q?v/W2ak1EgLAZQr6zkODnqXqh9vSiLENrELR/N23GfAT86wRNKOI040IaDkZ9?=
- =?us-ascii?Q?8cvgA6OLQNSs8lbplo7NwWADxdUTGg5WDjNvPUzXpvMd9ZgxNl9jyo4frSWz?=
- =?us-ascii?Q?e6BKFtHw7HfDq73b9Bl7QM3pAX96RkqhRh+wOsPV21BqDHZPMIEjZOfzhcJ9?=
- =?us-ascii?Q?unJqGXswlMFWqKzlTf1Ix1V2I5gS4Te7RtGkGJMKyH2qIZMWTDvqBoumVcFf?=
- =?us-ascii?Q?ure3WsGr8JwuTCnAP0DRbJ7vZjVt6+tZXQOOhgPcBGswQGypFFDSxL9FhAVg?=
- =?us-ascii?Q?5EbmSZ/2EY1nZo7gFCZqrhDsRiqCg74w3NtHTjnQvWqKGAYICRpwAmh3Oodv?=
- =?us-ascii?Q?TDcRf36R7m/nsE+DhwlocSF/f3LhFbp4w1iw955wOUqYSM6PVKXXzoVJ+UOW?=
- =?us-ascii?Q?RSpvcGyd+fLHBNe9nK7Gb+DfmVyl7cNSAUT4gK+7YIGti5CjaPMEKksFD7O4?=
- =?us-ascii?Q?6bY48E5o4uIduZR19hl6n1uIALf1YRfM51tA1+RAWuqGVKI2ItY5+cAcKALs?=
- =?us-ascii?Q?0dQ/lhomShoIMElKDA4KfAK3vq+Jn0CQvEOz1pUqSchU2zdhNPhGHH9Ekiwr?=
- =?us-ascii?Q?LEE4dvh0yD1O+vvANXQLfYLS80Cv2Oz2dxakwOLen9WqrO9sanCvWhRqPpnz?=
- =?us-ascii?Q?msUC7PR1IJXpNMLYoIjuoun3ZbltiTnIWd7Jrm7C9LkfOP6whqHk27xhAMey?=
- =?us-ascii?Q?bG6azAcMRtJe1T4T4U/5ZlKiPCVsQUkXCrP8BkVAl8ZEWj4RjubwQsKBgE9p?=
- =?us-ascii?Q?2qGXN2DeMKx5lSoRJ/Rqc6suTs27v1MC8HWzTs5tSLhZNsoPybCUtLS8r6gx?=
- =?us-ascii?Q?IBZWjxXIEB2/mNL2N36EGWKGNv327a+2UG0QtlpjKxkPOpfvdAVz2HDqrkBA?=
- =?us-ascii?Q?WQsWWfgRyZIp26QDAQeKC8yf4omZ86HhuYagwt4SxaemjyzS3ikWuilB2ZJF?=
- =?us-ascii?Q?5Fn5V10Woz//RkxxnTE+jHMOXF32serh665SVAaXl5jV9kfDimC9if2+D0wm?=
- =?us-ascii?Q?WWJtFeD+WnlYrLPxWTF/S8vEQ64TTpvhHMqvxciACTAnRAxSFgctvYXwSpPT?=
- =?us-ascii?Q?hq8HBaPn+NVKJw3d9B1X8aLgZUVfuffCugr8pIrg2rmiOTT4PxX9RtEsaYxO?=
- =?us-ascii?Q?AD5Md2gkr0dKGDfwgyJciPfyjUGbvdNZ6a/QxGfPWvw1rUiQkOiUSjcNVP17?=
- =?us-ascii?Q?KzLAxZyJXRCXdE4V6cU5cld/eyRhFfTUzyfMLl6h3x4cLcsixMHw/1pYItzG?=
- =?us-ascii?Q?ZE0FXSL5jd374saFv94tTM+h6qhoAdtUGV6m/D8SI39ceEblV1zL3lmTgDQO?=
- =?us-ascii?Q?UysXNAzG+yaR77SjNDRG2LjWP6ygT8+edaXAwW6Gwelzy6lxK5kv2ULrGoPh?=
- =?us-ascii?Q?cMjKfhVU5jBibpY/Fqe2MmYfmuXjAO5qw4u5BOYECG2vHPU1JVyesCHWm65Y?=
- =?us-ascii?Q?5lKKH1dpNrCE0+TA4uab75JSN8HxLyRa3AXtJlvPcWaytyyvK003M9ET+9Hj?=
- =?us-ascii?Q?4FL7NJTlcw=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a3afe478-331a-47fd-d379-08da28608f5e
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2022 15:14:01.6017
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WkObWjOcs8sXpi6DnpO8wz5RAs2cQWT+f9do+/boBCDMKi3Cxz7qmjMjBv6MtCS/
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5077
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 26, 2022 at 04:08:36PM -0400, Matthew Rosato wrote:
 
-> +int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm)
-> +{
-> +	if (!zdev)
-> +		return 0;
-> +
-> +	/*
-> +	 * Register device with this KVM (or remove the KVM association if 0).
-> +	 * If interpetation facilities are available, enable them and let
-> +	 * userspace indicate whether or not they will be used (specify SHM bit
-> +	 * to disable).
-> +	 */
-> +	if (kvm)
-> +		return register_kvm(zdev, kvm);
-> +	else
-> +		return unregister_kvm(zdev);
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_s390_pci_register_kvm);
+--=-vSyMHBeLQe+ZDzzajsVP
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I think it is cleaner to expose both the register/unregister APIs and
-not multiplex them like this
+On Wed, 2022-04-27 at 01:40 +0000, Sean Christopherson wrote:
+> Add a VM-wide gfn=3D>pfn cache and a fake MSR to let userspace control th=
+e
+> cache.  On writes, reflect the value of the MSR into the backing page of
+> a gfn=3D>pfn cache so that userspace can detect if a value was written to
+> the wrong page, i.e. to a stale mapping.
+>=20
+> Spin up 16 vCPUs (arbitrary) to use/refresh the cache, and another thread
+> to trigger mmu_notifier events and memslot updates.
 
-> +void kvm_s390_pci_clear_list(struct kvm *kvm)
-> +{
-> +	struct kvm_zdev *tmp, *kzdev;
-> +	LIST_HEAD(remove);
-> +
-> +	spin_lock(&kvm->arch.kzdev_list_lock);
-> +	list_for_each_entry_safe(kzdev, tmp, &kvm->arch.kzdev_list, entry)
-> +		list_move_tail(&kzdev->entry, &remove);
-> +	spin_unlock(&kvm->arch.kzdev_list_lock);
-> +
-> +	list_for_each_entry_safe(kzdev, tmp, &remove, entry)
-> +		unregister_kvm(kzdev->zdev);
+Do you need the MSR hack? Can't you exercise this using Xen interrupt
+delivery or runstate information and the same kind of thread setup?
 
-Hum, I wonder if this is a mistake in kvm:
+Thanks for working on this!
 
-static void kvm_destroy_vm(struct kvm *kvm)
-{
-[..]
-	kvm_arch_destroy_vm(kvm);
-	kvm_destroy_devices(kvm);
+--=-vSyMHBeLQe+ZDzzajsVP
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-kvm_destroy_devices() triggers the VFIO notifier with NULL. Indeed for
-correctness I would expect the VFIO users to have been notified to
-release the kvm before the kvm object becomes partially destroyed?
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwNDI3MTUxNzE0WjAvBgkqhkiG9w0BCQQxIgQgJRcg8JBS
+qMz941WFJOR8zHsu5eywt6Z+n9l60p7RlvQwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAXQcBRC299v8Jkq6L+Q4qXSjF7ny3RyA9v
+2uUFARkZ8zPoPWu/98m66+iQOve6vtOeNG6ZPb+LapTLLNHsItavR3w+x9kMB97qEFGuMImNbsUK
++iElEPWk7u3zo81RFNnLev+pJX3H1/Q/KHVn5SneWZVHl9ht8tnRor1aueg6EC5zyyVhSYY0Q1x7
+3qss0wPXiwPgc6lVcX3OoFfhdky7LfkeAG6pTnTZwCwtFFyhcGpf7NhL6rRaxyb9DV4pB4LgcLFa
+Ez4GyI828awA43lvKlmi0ke/FFFgZi/ofFqxaw/W6cBvlmNGJslH57Ee/n3r3Fzn14/QJs6Zlufw
+kthrw3ITjQWdZAwqmRQ/7Smphf0L4Z9K51uA+n/c105+iYv4JxIac5GiIWBxRTYivcf3/6P8jxWp
+qxg9alnGa/AcfdZPF2/RGc2EKhVPn+3/yxs2+YAiXJH+eqNfoz/USQe5JKYiCOE20f3Lxf8/mqmW
+BcYoZIwE8Jb9It1RtjPJ5MPHStGBcc718az3jGqadByxeDXcrJ3VRGhl4lgH4WHTgBkbGlk9uH8K
+97L9fDjJhe+0KYWqBhPLk0qzWxKFv2G5Sc1GzvgCRVRz9l/wiIf2GNhjaGNMSfra4oIBoVcf6550
+hpcWxCEAkCbI4UzpDyp2qD6d5ok1pup1iZCgBfcO6gAAAAAAAA==
 
-Maybe you should investigate re-ordering this at the KVM side and just
-WARN_ON(!list_empty) in the arch code?
 
-(vfio has this odd usage model where it should use the kvm pointer
-without taking a ref on it so long as the unregister hasn't been
-called)
+--=-vSyMHBeLQe+ZDzzajsVP--
 
-If you keep it like this then the locking in register/unregister looks
-not broad enough and has to cover the zdev->kzdev also.
-
-Overall I think it is OK designed like this, aside from the ugly
-symbol_get in vfio which I hope you can resolve.
-
-Jason
