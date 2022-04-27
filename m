@@ -2,150 +2,273 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BFB7511A57
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 16:56:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7C9A5119B2
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 16:55:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238426AbiD0Opa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 10:45:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54230 "EHLO
+        id S238546AbiD0Otp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 10:49:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238319AbiD0Op3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 10:45:29 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5534B35878;
-        Wed, 27 Apr 2022 07:42:18 -0700 (PDT)
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23RCh5FA014600;
-        Wed, 27 Apr 2022 14:42:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=k+GrStm0Ysu+JMQMOJRXy4Xc+c0DmeROAWKzUIFx2OI=;
- b=guAshWAXrH1xD/9nK/Ha65c1rzDE4LFaM1shEsCAK4SzKn/Ve97tA7VSHhHZa+T/A3Jo
- QBgK80SF5Y5hRXjdRucfF3ZMEsl71fqgHZiuv+wg9mVomSCIl2ac/IBJNp59NJbnEOeV
- A0XwHUJ5inHR+ho7f75YxA/QjL7H/4/iXMQ+1Uxvp3l0Q9YPHB8TN0mwISkKg8E5uerD
- 4QlEw8F9Q/aqnSi7QSL0xDXqas1Llz0Q6sJGXsUIiK4q/jBI4hpsPeoRxNcspNBBjABc
- gFLWqP1+IG6Zg4ou1s561CwiWspyt09sdJ/afRzPmrzwyW7p898XWGqf9Z5a44EDGMAy GA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fpvf2n5vp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Apr 2022 14:42:16 +0000
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 23REXrLx026641;
-        Wed, 27 Apr 2022 14:42:15 GMT
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fpvf2n5vc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Apr 2022 14:42:15 +0000
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23REcSWQ028307;
-        Wed, 27 Apr 2022 14:42:14 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma04dal.us.ibm.com with ESMTP id 3fm93abs84-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Apr 2022 14:42:14 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23REgDwm55902600
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 27 Apr 2022 14:42:13 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8E693AC065;
-        Wed, 27 Apr 2022 14:42:13 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C838CAC05E;
-        Wed, 27 Apr 2022 14:42:08 +0000 (GMT)
-Received: from [9.211.73.42] (unknown [9.211.73.42])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed, 27 Apr 2022 14:42:08 +0000 (GMT)
-Message-ID: <f6c78792-9cf7-0cde-f760-76166f9b7eb7@linux.ibm.com>
-Date:   Wed, 27 Apr 2022 10:42:07 -0400
+        with ESMTP id S238516AbiD0Oto (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 10:49:44 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8938A39149;
+        Wed, 27 Apr 2022 07:46:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651070791; x=1682606791;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=PyxzdMNHi5SNpD/gU2LCc0lK3E+ymcTdlRxMk2lgO8o=;
+  b=AXWZK2UHoI5YXfJhu7FvNjF7LOQL9GCl9zHoX7n8ovqMG/ulE8VrSufc
+   MZCSupTgn6LRqORCVu5hPhk1QMg5Urtzwt3O/u41vRX6jxdMn5YrSD5U9
+   Kt5rz9W4uQdm8M/B7ohrmjtEof/hDSmq5lR/L8KoOOqsNLknR9R0FhvC/
+   8Sdjo7s4RjesqJd3ZCabGOSxyUVr+yhO0GyIpdqrLx4uno9Owiqa1DYRH
+   YiN+7zXCxBGOqHcJ1ZHx7mvIbeiCbRs0IFwmmx1y7+hhzrquNJjEDFgK0
+   5rPpvYAAL60WnagovszliJ8ZlN1kABAjjuqW6XTpstVbKRAOOQz5AfWx9
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10330"; a="352384332"
+X-IronPort-AV: E=Sophos;i="5.90,293,1643702400"; 
+   d="scan'208";a="352384332"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 07:46:30 -0700
+X-IronPort-AV: E=Sophos;i="5.90,293,1643702400"; 
+   d="scan'208";a="533239142"
+Received: from pcurcohe-mobl.amr.corp.intel.com (HELO [10.212.68.237]) ([10.212.68.237])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 07:46:29 -0700
+Message-ID: <c833aff2-b459-a1d7-431f-bce5c5f29182@intel.com>
+Date:   Wed, 27 Apr 2022 07:49:50 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v6 16/21] vfio-pci/zdev: add open/close device hooks
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v3 04/21] x86/virt/tdx: Add skeleton for detecting and
+ initializing TDX on demand
 Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     linux-s390@vger.kernel.org, alex.williamson@redhat.com,
-        cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
-        pmorel@linux.ibm.com, borntraeger@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
-        agordeev@linux.ibm.com, svens@linux.ibm.com, frankja@linux.ibm.com,
-        david@redhat.com, imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org
-References: <20220426200842.98655-1-mjrosato@linux.ibm.com>
- <20220426200842.98655-17-mjrosato@linux.ibm.com>
- <20220427140410.GX2125828@nvidia.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <20220427140410.GX2125828@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com
+References: <cover.1649219184.git.kai.huang@intel.com>
+ <32dcf4c7acc95244a391458d79cd6907125c5c29.1649219184.git.kai.huang@intel.com>
+ <ac482f2b-d2d1-0643-faa4-1b36340268c5@intel.com>
+ <22e3adf42b8ea2cae3aabc26f762acb983133fea.camel@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <22e3adf42b8ea2cae3aabc26f762acb983133fea.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: GxVsMEQcXGhlmQ992YWp9KhgwHCvcuKx
-X-Proofpoint-ORIG-GUID: R49eDuTDRAQg8XPIhpr4WkOX4mWpEJrd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-27_04,2022-04-27_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=749
- lowpriorityscore=0 spamscore=0 malwarescore=0 bulkscore=0 phishscore=0
- mlxscore=0 priorityscore=1501 adultscore=0 impostorscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2204270092
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/27/22 10:04 AM, Jason Gunthorpe wrote:
-> On Tue, Apr 26, 2022 at 04:08:37PM -0400, Matthew Rosato wrote:
+On 4/26/22 17:43, Kai Huang wrote:
+> On Tue, 2022-04-26 at 13:53 -0700, Dave Hansen wrote:
+>> On 4/5/22 21:49, Kai Huang wrote:
+...
+>>> +static bool tdx_keyid_sufficient(void)
+>>> +{
+>>> +	if (!cpumask_equal(&cpus_booted_once_mask,
+>>> +					cpu_present_mask))
+>>> +		return false;
+>>
+>> I'd move this cpumask_equal() to a helper.
 > 
->> +static int vfio_pci_zdev_group_notifier(struct notifier_block *nb,
->> +					unsigned long action, void *data)
->> +{
->> +	struct zpci_dev *zdev = container_of(nb, struct zpci_dev, nb);
->> +	int (*fn)(struct zpci_dev *zdev, struct kvm *kvm);
->> +	int rc = NOTIFY_OK;
->> +
->> +	if (action == VFIO_GROUP_NOTIFY_SET_KVM) {
->> +		if (!zdev)
->> +			return NOTIFY_DONE;
->> +
->> +		fn = symbol_get(kvm_s390_pci_register_kvm);
->> +		if (!fn)
->> +			return NOTIFY_DONE;
->> +
->> +		if (fn(zdev, (struct kvm *)data))
->> +			rc = NOTIFY_BAD;
->> +
->> +		symbol_put(kvm_s390_pci_register_kvm);
+> Sorry to double confirm, do you want something like:
 > 
-> Is it possible this function can be in statically linked arch code?
-> 
-> Or, actually, is zPCI useful anyhow without kvm ie can you just have a
-> direct dependency here?
-> 
+> static bool tdx_detected_on_all_cpus(void)
+> {
+> 	/*
+> 	 * To detect any BIOS misconfiguration among cores, all logical
+> 	 * cpus must have been brought up at least once.  This is true
+> 	 * unless 'maxcpus' kernel command line is used to limit the
+> 	 * number of cpus to be brought up during boot time.  However
+> 	 * 'maxcpus' is basically an invalid operation mode due to the
+> 	 * MCE broadcast problem, and it should not be used on a TDX
+> 	 * capable machine.  Just do paranoid check here and do not
+> 	 * report SEAMRR as enabled in this case.
+> 	 */
+> 	return cpumask_equal(&cpus_booted_once_mask, cpu_present_mask);
+> }
 
-zPCI devices (zpci_dev) exist regardless of whether kvm is configured or 
-not, and you can e.g. bind the associated PCI device to vfio-pci when 
-KVM is not configured (or module not loaded) and get the existing 
-vfio-pci-zdev extensions for that device (extra VFIO_DEVICE_INFO 
-response data).  Making a direct dependency on KVM would remove that; 
-this was discussed in a prior version because this extra info is not 
-used today outside of a KVM usecase -- but it could be useful in the 
-future (or we may have other s390-isms that are not specific to kvm that 
-need vfio-pci-zdev).
+That's logically the right idea, but I hate the name since the actual
+test has nothing to do with TDX being detected.  The comment is also
+rather verbose and rambling.
 
-As far as statically linking in arch...  The fundamental 
-(un)registration task being done here -- (dis)associating the guest GISA 
-with the firmware and thus allowing this particular guest to use 
-firmware assists (or turning it off when kvm == 0) -- is only relevant 
-to guest passthrough with kvm and calls a number of different routines 
-that reside in the kvm module during the (un)registration process. 
-Without a direct dependency I think a symbol lookup still has to 
-inevitably happen at some point in the call chain.
+It should be named something like:
+
+	all_cpus_booted()
+
+and with a comment like this:
+
+/*
+ * To initialize TDX, the kernel needs to run some code on every
+ * present CPU.  Detect cases where present CPUs have not been
+ * booted, like when maxcpus=N is used.
+ */
+
+> static bool seamrr_enabled(void)
+> {
+> 	if (!tdx_detected_on_all_cpus())
+> 		return false;
+> 
+> 	return __seamrr_enabled();
+> }
+> 
+> static bool tdx_keyid_sufficient()
+> {
+> 	if (!tdx_detected_on_all_cpus())
+> 		return false;
+> 
+> 	...
+> }
+
+Although, looking at those, it's *still* unclear why you need this.  I
+assume it's because some later TDX SEAMCALL will fail if you get this
+wrong, and you want to be able to provide a better error message.
+
+*BUT* this code doesn't actually provide halfway reasonable error
+messages.  If someone uses maxcpus=99, then this code will report:
+
+	pr_info("SEAMRR not enabled.\n");
+
+right?  That's bonkers.
+
+>>> +	/*
+>>> +	 * TDX requires at least two KeyIDs: one global KeyID to
+>>> +	 * protect the metadata of the TDX module and one or more
+>>> +	 * KeyIDs to run TD guests.
+>>> +	 */
+>>> +	return tdx_keyid_num >= 2;
+>>> +}
+>>> +
+>>> +static int __tdx_detect(void)
+>>> +{
+>>> +	/* The TDX module is not loaded if SEAMRR is disabled */
+>>> +	if (!seamrr_enabled()) {
+>>> +		pr_info("SEAMRR not enabled.\n");
+>>> +		goto no_tdx_module;
+>>> +	}
+>>
+>> Why even bother with the SEAMRR stuff?  It sounded like you can "ping"
+>> the module with SEAMCALL.  Why not just use that directly?
+> 
+> SEAMCALL will cause #GP if SEAMRR is not enabled.  We should check whether
+> SEAMRR is enabled before making SEAMCALL.
+
+So...  You could actually get rid of all this code.  if SEAMCALL #GP's,
+then you say, "Whoops, the firmware didn't load the TDX module
+correctly, sorry."
+
+Why is all this code here?  What is it for?
+
+>>> +	/*
+>>> +	 * Also do not report the TDX module as loaded if there's
+>>> +	 * no enough TDX private KeyIDs to run any TD guests.
+>>> +	 */
+>>> +	if (!tdx_keyid_sufficient()) {
+>>> +		pr_info("Number of TDX private KeyIDs too small: %u.\n",
+>>> +				tdx_keyid_num);
+>>> +		goto no_tdx_module;
+>>> +	}
+>>> +
+>>> +	/* Return -ENODEV until the TDX module is detected */
+>>> +no_tdx_module:
+>>> +	tdx_module_status = TDX_MODULE_NONE;
+>>> +	return -ENODEV;
+>>> +}
+
+Again, if someone uses maxcpus=1234 and we get down here, then it
+reports to the user:
+	
+	Number of TDX private KeyIDs too small: ...
+
+????  When the root of the problem has nothing to do with KeyIDs.
+
+>>> +static int init_tdx_module(void)
+>>> +{
+>>> +	/*
+>>> +	 * Return -EFAULT until all steps of TDX module
+>>> +	 * initialization are done.
+>>> +	 */
+>>> +	return -EFAULT;
+>>> +}
+>>> +
+>>> +static void shutdown_tdx_module(void)
+>>> +{
+>>> +	/* TODO: Shut down the TDX module */
+>>> +	tdx_module_status = TDX_MODULE_SHUTDOWN;
+>>> +}
+>>> +
+>>> +static int __tdx_init(void)
+>>> +{
+>>> +	int ret;
+>>> +
+>>> +	/*
+>>> +	 * Logical-cpu scope initialization requires calling one SEAMCALL
+>>> +	 * on all logical cpus enabled by BIOS.  Shutting down the TDX
+>>> +	 * module also has such requirement.  Further more, configuring
+>>> +	 * the key of the global KeyID requires calling one SEAMCALL for
+>>> +	 * each package.  For simplicity, disable CPU hotplug in the whole
+>>> +	 * initialization process.
+>>> +	 *
+>>> +	 * It's perhaps better to check whether all BIOS-enabled cpus are
+>>> +	 * online before starting initializing, and return early if not.
+>>
+>> But you did some of this cpumask checking above.  Right?
+> 
+> Above check only guarantees SEAMRR/TDX KeyID has been detected on all presnet
+> cpus.  the 'present' cpumask doesn't equal to all BIOS-enabled CPUs.
+
+I have no idea what this is saying.  In general, I have no idea what the
+comment is saying.  It makes zero sense.  The locking pattern for stuff
+like this is:
+
+	cpus_read_lock();
+
+	for_each_online_cpu()
+		do_something();
+
+	cpus_read_unlock();
+
+because you need to make sure that you don't miss "do_something()" on a
+CPU that comes online during the loop.
+
+But, now that I think about it, all of the checks I've seen so far are
+for *booted* CPUs.  While the lock (I assume) would keep new CPUs from
+booting, it doesn't do any good really since the "cpus_booted_once_mask"
+bits are only set and not cleared.  A CPU doesn't un-become booted once.
+
+Again, we seem to have a long, verbose comment that says very little and
+only confuses me.
+
+...
+>> Why does this need both a tdx_detect() and a tdx_init()?  Shouldn't the
+>> interface from outside just be "get TDX up and running, please?"
+> 
+> We can have a single tdx_init().  However tdx_init() can be heavy, and having a
+> separate non-heavy tdx_detect() may be useful if caller wants to separate
+> "detecting the TDX module" and "initializing the TDX module", i.e. to do
+> something in the middle.
+
+<Sigh>  So, this "design" went unmentioned, *and* I can't review if the
+actual callers of this need the functionality or not because they're not
+in this series.
+
+> However tdx_detect() basically only detects P-SEAMLDR.  If we move P-SEAMLDR
+> detection to tdx_init(), or we git rid of P-SEAMLDR completely, then we don't
+> need tdx_detect() anymore.  We can expose seamrr_enabled() and TDX KeyID
+> variables or functions so caller can use them to see whether it should do TDX
+> related staff and then call tdx_init().
+
+I don't think you've made a strong case for why P-SEAMLDR detection is
+even necessary in this series.
