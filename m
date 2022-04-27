@@ -2,82 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9013F510DF3
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 03:34:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63EC5510E3F
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 03:47:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356725AbiD0BeH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 21:34:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48948 "EHLO
+        id S1356827AbiD0Bm0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 21:42:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351630AbiD0BeF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Apr 2022 21:34:05 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 028732C102
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 18:30:57 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id n8so334610plh.1
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 18:30:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=sCWqajasA7ISIMDWcDl8o7kKYsl9k0UXiOkTS2c8CkA=;
-        b=CgjAmV3+4L5oDF5/Ww+PKMhWwfZTnIeyhNvyibGENxZ1fU+LuOuGhRPMqS23/A+UnL
-         8yD4EvpKtSup8J3Oa3anE+tiHnsreDKDnCmN175zFehTg98rJrfRoQFhcM6VmEidE6Lr
-         TsyHBPX5mG0QFRCUZoXGTn6jtjdtjMJl0+7Mujd7v8wDqRGHKbOH4kgZw9xv2EvoSACx
-         6VjKo6JFKEAM5nNiyO9Yl9wK1dEGP546Hq0YOv+Zxse9y7VUreXfshGcy6lWuDcFo8mF
-         mCEZWgRGWBPpM3pYSZQ+GQ5DwDJodZA7C+pakJx8z/Dp+ID4qO0gMLy/kpLR9i0xy75E
-         8IOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=sCWqajasA7ISIMDWcDl8o7kKYsl9k0UXiOkTS2c8CkA=;
-        b=usLzJsRfey2lb3fsMudkt81l6c5/9W4d33kNYa2fr/duCKQnoDvdhBwZAeHuXv9B1e
-         dwMHoXGnJhkY9QVbMFfl6aBrqlw7Tn48JQWaFtKptvjh3GJRwjW+fso/M0C/JaJ/1yAy
-         aEze43lh22y7TJ6T9fQDKNPUkkS1uNjJBQWQtYjbSkqjRRXbfumKHk/ZOaS6CbK2pTYi
-         4BHcYBwyionRVfLhStVyMXmWFJxYMNhslac8th7PHt89MGkjMBH9gP+zhOCmRXD31pGp
-         EfTqi+c4api0QfsZKeGFgiV9kTZ/abG3PzzFJrrHnd0OG5KoPN/S47u353zIOx1mKNOY
-         yoqA==
-X-Gm-Message-State: AOAM5331/Gqtk+z7EkQHyqmbOL4EvG+BCHov203vZu9B4G3R13pNc6NJ
-        IrvWpFR2qe1jUwLcd1HeHGudtw==
-X-Google-Smtp-Source: ABdhPJw1q0Fag74CGwko5HHS4Hk4zlk2TrCAQ78XHacUPoQtem1CluOKqzNTZkS5BQBYQuJ8PiRMqw==
-X-Received: by 2002:a17:902:e84a:b0:15c:e28c:5f7c with SMTP id t10-20020a170902e84a00b0015ce28c5f7cmr20698565plg.94.1651023056330;
-        Tue, 26 Apr 2022 18:30:56 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y2-20020a056a00190200b004fa865d1fd3sm17211203pfi.86.2022.04.26.18.30.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Apr 2022 18:30:56 -0700 (PDT)
-Date:   Wed, 27 Apr 2022 01:30:52 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH] KVM: x86/mmu: add lockdep check before
- lookup_address_in_mm()
-Message-ID: <YmiczBawg5s1z2DN@google.com>
-References: <20220327205803.739336-1-mizhang@google.com>
- <YkHRYY6x1Ewez/g4@google.com>
- <CAL715WL7ejOBjzXy9vbS_M2LmvXcC-CxmNr+oQtCZW0kciozHA@mail.gmail.com>
- <YkH7KZbamhKpCidK@google.com>
- <7597fe2c-ce04-0e21-bd6c-4051d7d5101d@redhat.com>
- <Ymg1lzsYAd6v/vGw@google.com>
- <CAL715WK8-cOJWK+iai=ygdOTzPb-QUvEwa607tVEkmGOu3gyQA@mail.gmail.com>
- <YmiZcZf9YXxMVcfx@google.com>
- <CAL715W+nMyF_f762Qif8ZsiOT8vgxXJ3Rm8EjgG8A=b7iM-cbg@mail.gmail.com>
+        with ESMTP id S1356818AbiD0BmZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Apr 2022 21:42:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3E59D10DE12
+        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 18:39:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651023554;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Mv2PG0J16u04IOE7IzppCh3+OrinjhIx5rulSiUSyN4=;
+        b=XTYUn9wFsVS/NfaaPeGwNbv42afWdD5DcgySXBWQh6KHBy+ZjqEx3hAoYAmY8XXssRt5ux
+        LRJf17tumyPUEnWzeSY/aajdDtZfRMbEdUUnDX45IA0Rv1yyO7U8GVJJa+AoJcipO24Cl/
+        GeSqOmlA754Ca8nSpdK+yDunT4iI2do=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-588-WznQarsDP92TVFdxSRKtzg-1; Tue, 26 Apr 2022 21:39:03 -0400
+X-MC-Unique: WznQarsDP92TVFdxSRKtzg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BF98729ABA19;
+        Wed, 27 Apr 2022 01:39:02 +0000 (UTC)
+Received: from [10.72.13.230] (ovpn-13-230.pek2.redhat.com [10.72.13.230])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 78B0A1468F20;
+        Wed, 27 Apr 2022 01:38:55 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v6 2/9] KVM: arm64: Setup a framework for hypercall bitmap
+ firmware registers
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+References: <20220423000328.2103733-1-rananta@google.com>
+ <20220423000328.2103733-3-rananta@google.com>
+ <bbaf7dcf-e776-49df-7a12-04b45e4af881@redhat.com>
+ <CAJHc60w6YngA7iz=mUfjAEjQdwjG_pj2T9Cpd21xzU1Y_APCwQ@mail.gmail.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <5d8beda7-f7f7-dc1f-79b9-b12314c6d603@redhat.com>
+Date:   Wed, 27 Apr 2022 09:38:50 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAL715W+nMyF_f762Qif8ZsiOT8vgxXJ3Rm8EjgG8A=b7iM-cbg@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+In-Reply-To: <CAJHc60w6YngA7iz=mUfjAEjQdwjG_pj2T9Cpd21xzU1Y_APCwQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -85,36 +76,408 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 26, 2022, Mingwei Zhang wrote:
-> On Tue, Apr 26, 2022 at 6:16 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Tue, Apr 26, 2022, Mingwei Zhang wrote:
-> > > > I completely agree that lookup_address() and friends are unnecessarily fragile,
-> > > > but I think that attempting to harden them to fix this KVM bug will open a can
-> > > > of worms and end up delaying getting KVM fixed.
-> > >
-> > > So basically, we need to:
-> > >  - choose perf_get_page_size() instead of using any of the
-> > > lookup_address*() in mm.
-> > >  - add a wrapper layer to adapt: 1) irq disabling/enabling and 2) size
-> > > -> level translation.
-> > >
-> > > Agree?
-> >
-> > Drat, I didn't see that it returns the page size, not the level.  That's a bit
-> > unfortunate.  It definitely makes me less averse to fixing lookup_address_in_pgd()
-> >
-> > Hrm.  I guess since we know there's at least one broken user, and in theory
-> > fixing lookup_address_in_pgd() should do no harm to users that don't need protection,
-> > it makes sense to just fix lookup_address_in_pgd() and see if the x86 maintainers
-> > push back.
-> 
-> Yeah, fixing lookup_address_in_pgd() should be cleaner(), since the
-> page fault usage case does not need irq save/restore. But the other
-> one needs it. So, we can easily fix the function with READ_ONCE and
-> lockless staff. But wrapping the function with irq save/restore from
-> the KVM side.
+Hi Raghavendra,
 
-I think it makes sense to do the save/restore in lookup_address_in_pgd().  The
-Those helpers are exported, so odds are good there are broken users that will
-benefit from fixing all paths.
+On 4/27/22 12:44 AM, Raghavendra Rao Ananta wrote:
+> On Mon, Apr 25, 2022 at 11:34 PM Gavin Shan <gshan@redhat.com> wrote:
+>> On 4/23/22 8:03 AM, Raghavendra Rao Ananta wrote:
+>>> KVM regularly introduces new hypercall services to the guests without
+>>> any consent from the userspace. This means, the guests can observe
+>>> hypercall services in and out as they migrate across various host
+>>> kernel versions. This could be a major problem if the guest
+>>> discovered a hypercall, started using it, and after getting migrated
+>>> to an older kernel realizes that it's no longer available. Depending
+>>> on how the guest handles the change, there's a potential chance that
+>>> the guest would just panic.
+>>>
+>>> As a result, there's a need for the userspace to elect the services
+>>> that it wishes the guest to discover. It can elect these services
+>>> based on the kernels spread across its (migration) fleet. To remedy
+>>> this, extend the existing firmware pseudo-registers, such as
+>>> KVM_REG_ARM_PSCI_VERSION, but by creating a new COPROC register space
+>>> for all the hypercall services available.
+>>>
+>>> These firmware registers are categorized based on the service call
+>>> owners, but unlike the existing firmware pseudo-registers, they hold
+>>> the features supported in the form of a bitmap.
+>>>
+>>> During the VM initialization, the registers are set to upper-limit of
+>>> the features supported by the corresponding registers. It's expected
+>>> that the VMMs discover the features provided by each register via
+>>> GET_ONE_REG, and write back the desired values using SET_ONE_REG.
+>>> KVM allows this modification only until the VM has started.
+>>>
+>>> Some of the standard features are not mapped to any bits of the
+>>> registers. But since they can recreate the original problem of
+>>> making it available without userspace's consent, they need to
+>>> be explicitly added to the case-list in
+>>> kvm_hvc_call_default_allowed(). Any function-id that's not enabled
+>>> via the bitmap, or not listed in kvm_hvc_call_default_allowed, will
+>>> be returned as SMCCC_RET_NOT_SUPPORTED to the guest.
+>>>
+>>> Older userspace code can simply ignore the feature and the
+>>> hypercall services will be exposed unconditionally to the guests,
+>>> thus ensuring backward compatibility.
+>>>
+>>> In this patch, the framework adds the register only for ARM's standard
+>>> secure services (owner value 4). Currently, this includes support only
+>>> for ARM True Random Number Generator (TRNG) service, with bit-0 of the
+>>> register representing mandatory features of v1.0. Other services are
+>>> momentarily added in the upcoming patches.
+>>>
+>>> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+>>> ---
+>>>    arch/arm64/include/asm/kvm_host.h | 12 ++++
+>>>    arch/arm64/include/uapi/asm/kvm.h |  9 +++
+>>>    arch/arm64/kvm/arm.c              |  1 +
+>>>    arch/arm64/kvm/guest.c            |  8 ++-
+>>>    arch/arm64/kvm/hypercalls.c       | 94 +++++++++++++++++++++++++++++++
+>>>    arch/arm64/kvm/psci.c             | 13 +++++
+>>>    include/kvm/arm_hypercalls.h      |  6 ++
+>>>    include/kvm/arm_psci.h            |  2 +-
+>>>    8 files changed, 142 insertions(+), 3 deletions(-)
+>>>
+>>
+>> Some nits as below, please consider to improve if you need another
+>> respin.
+>>
+>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>>
+>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>> index 94a27a7520f4..df07f4c10197 100644
+>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>> @@ -101,6 +101,15 @@ struct kvm_s2_mmu {
+>>>    struct kvm_arch_memory_slot {
+>>>    };
+>>>
+>>> +/**
+>>> + * struct kvm_smccc_features: Descriptor the hypercall services exposed to the guests
+>>> + *
+>>> + * @std_bmap: Bitmap of standard secure service calls
+>>> + */
+>>> +struct kvm_smccc_features {
+>>> +     unsigned long std_bmap;
+>>> +};
+>>> +
+>>
+>> s/Descriptor/Descriptor of
+>>
+> Nice catch!
+> 
+>>>    struct kvm_arch {
+>>>        struct kvm_s2_mmu mmu;
+>>>
+>>> @@ -150,6 +159,9 @@ struct kvm_arch {
+>>>
+>>>        u8 pfr0_csv2;
+>>>        u8 pfr0_csv3;
+>>> +
+>>> +     /* Hypercall features firmware registers' descriptor */
+>>> +     struct kvm_smccc_features smccc_feat;
+>>>    };
+>>>
+>>>    struct kvm_vcpu_fault_info {
+>>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+>>> index c1b6ddc02d2f..0b79d2dc6ffd 100644
+>>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>>> @@ -332,6 +332,15 @@ struct kvm_arm_copy_mte_tags {
+>>>    #define KVM_ARM64_SVE_VLS_WORDS     \
+>>>        ((KVM_ARM64_SVE_VQ_MAX - KVM_ARM64_SVE_VQ_MIN) / 64 + 1)
+>>>
+>>> +/* Bitmap feature firmware registers */
+>>> +#define KVM_REG_ARM_FW_FEAT_BMAP             (0x0016 << KVM_REG_ARM_COPROC_SHIFT)
+>>> +#define KVM_REG_ARM_FW_FEAT_BMAP_REG(r)              (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
+>>> +                                             KVM_REG_ARM_FW_FEAT_BMAP |      \
+>>> +                                             ((r) & 0xffff))
+>>> +
+>>> +#define KVM_REG_ARM_STD_BMAP                 KVM_REG_ARM_FW_FEAT_BMAP_REG(0)
+>>> +#define KVM_REG_ARM_STD_BIT_TRNG_V1_0                0
+>>> +
+>>>    /* Device Control API: ARM VGIC */
+>>>    #define KVM_DEV_ARM_VGIC_GRP_ADDR   0
+>>>    #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS      1
+>>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>>> index 523bc934fe2f..a37fadbd617e 100644
+>>> --- a/arch/arm64/kvm/arm.c
+>>> +++ b/arch/arm64/kvm/arm.c
+>>> @@ -156,6 +156,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>>>        kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
+>>>
+>>>        set_default_spectre(kvm);
+>>> +     kvm_arm_init_hypercalls(kvm);
+>>>
+>>>        return ret;
+>>>    out_free_stage2_pgd:
+>>> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+>>> index 0d5cca56cbda..8c607199cad1 100644
+>>> --- a/arch/arm64/kvm/guest.c
+>>> +++ b/arch/arm64/kvm/guest.c
+>>> @@ -756,7 +756,9 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>>>
+>>>        switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
+>>>        case KVM_REG_ARM_CORE:  return get_core_reg(vcpu, reg);
+>>> -     case KVM_REG_ARM_FW:    return kvm_arm_get_fw_reg(vcpu, reg);
+>>> +     case KVM_REG_ARM_FW:
+>>> +     case KVM_REG_ARM_FW_FEAT_BMAP:
+>>> +             return kvm_arm_get_fw_reg(vcpu, reg);
+>>>        case KVM_REG_ARM64_SVE: return get_sve_reg(vcpu, reg);
+>>>        }
+>>>
+>>> @@ -774,7 +776,9 @@ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>>>
+>>>        switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
+>>>        case KVM_REG_ARM_CORE:  return set_core_reg(vcpu, reg);
+>>> -     case KVM_REG_ARM_FW:    return kvm_arm_set_fw_reg(vcpu, reg);
+>>> +     case KVM_REG_ARM_FW:
+>>> +     case KVM_REG_ARM_FW_FEAT_BMAP:
+>>> +             return kvm_arm_set_fw_reg(vcpu, reg);
+>>>        case KVM_REG_ARM64_SVE: return set_sve_reg(vcpu, reg);
+>>>        }
+>>>
+>>> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+>>> index fa6d9378d8e7..df55a04d2fe8 100644
+>>> --- a/arch/arm64/kvm/hypercalls.c
+>>> +++ b/arch/arm64/kvm/hypercalls.c
+>>> @@ -58,6 +58,48 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
+>>>        val[3] = lower_32_bits(cycles);
+>>>    }
+>>>
+>>> +static bool kvm_arm_fw_reg_feat_enabled(unsigned long *reg_bmap, unsigned long feat_bit)
+>>> +{
+>>> +     return test_bit(feat_bit, reg_bmap);
+>>> +}
+>>> +
+>>
+>> Might be worhty to be 'inline'. This function would be called
+>> frequently.
+>>
+> I was hoping the compiler would optimize it for us as needed.
+> 
+
+Yeah, GCC is smart enough. It could be compiled to inline function
+even it's not specified explicitly. I guess __always_inline can be
+used here. However, it seems __always_inline isn't used broadly in
+kvm/arm64 scope. Anyway, it's not a big deal in this specific case :)
+
+>>> +static bool kvm_hvc_call_default_allowed(struct kvm_vcpu *vcpu, u32 func_id)
+>>> +{
+>>> +     switch (func_id) {
+>>> +     /*
+>>> +      * List of function-ids that are not gated with the bitmapped feature
+>>> +      * firmware registers, and are to be allowed for servicing the call by default.
+>>> +      */
+>>> +     case ARM_SMCCC_VERSION_FUNC_ID:
+>>> +     case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
+>>> +     case ARM_SMCCC_HV_PV_TIME_FEATURES:
+>>> +     case ARM_SMCCC_HV_PV_TIME_ST:
+>>> +     case ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID:
+>>> +     case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+>>> +     case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
+>>> +             return true;
+>>> +     default:
+>>> +             return kvm_psci_func_id_is_valid(vcpu, func_id);
+>>> +     }
+>>> +}
+>>> +
+>>> +static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu, u32 func_id)
+>>> +{
+>>> +     struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
+>>> +
+>>> +     switch (func_id) {
+>>> +     case ARM_SMCCC_TRNG_VERSION:
+>>> +     case ARM_SMCCC_TRNG_FEATURES:
+>>> +     case ARM_SMCCC_TRNG_GET_UUID:
+>>> +     case ARM_SMCCC_TRNG_RND32:
+>>> +     case ARM_SMCCC_TRNG_RND64:
+>>> +             return kvm_arm_fw_reg_feat_enabled(&smccc_feat->std_bmap,
+>>> +                                             KVM_REG_ARM_STD_BIT_TRNG_V1_0);
+>>> +     default:
+>>> +             return kvm_hvc_call_default_allowed(vcpu, func_id);
+>>> +     }
+>>> +}
+>>> +
+>>>    int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>>>    {
+>>>        u32 func_id = smccc_get_function(vcpu);
+>>> @@ -65,6 +107,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>>>        u32 feature;
+>>>        gpa_t gpa;
+>>>
+>>> +     if (!kvm_hvc_call_allowed(vcpu, func_id))
+>>> +             goto out;
+>>> +
+>>>        switch (func_id) {
+>>>        case ARM_SMCCC_VERSION_FUNC_ID:
+>>>                val[0] = ARM_SMCCC_VERSION_1_1;
+>>> @@ -155,6 +200,7 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>>>                return kvm_psci_call(vcpu);
+>>>        }
+>>>
+>>> +out:
+>>>        smccc_set_retval(vcpu, val[0], val[1], val[2], val[3]);
+>>>        return 1;
+>>>    }
+>>> @@ -164,8 +210,16 @@ static const u64 kvm_arm_fw_reg_ids[] = {
+>>>        KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1,
+>>>        KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2,
+>>>        KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3,
+>>> +     KVM_REG_ARM_STD_BMAP,
+>>>    };
+>>>
+>>> +void kvm_arm_init_hypercalls(struct kvm *kvm)
+>>> +{
+>>> +     struct kvm_smccc_features *smccc_feat = &kvm->arch.smccc_feat;
+>>> +
+>>> +     smccc_feat->std_bmap = KVM_ARM_SMCCC_STD_FEATURES;
+>>> +}
+>>> +
+>>>    int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
+>>>    {
+>>>        return ARRAY_SIZE(kvm_arm_fw_reg_ids);
+>>> @@ -237,6 +291,7 @@ static int get_kernel_wa_level(u64 regid)
+>>>
+>>>    int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>>>    {
+>>> +     struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
+>>>        void __user *uaddr = (void __user *)(long)reg->addr;
+>>>        u64 val;
+>>>
+>>> @@ -249,6 +304,9 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>>>        case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3:
+>>>                val = get_kernel_wa_level(reg->id) & KVM_REG_FEATURE_LEVEL_MASK;
+>>>                break;
+>>> +     case KVM_REG_ARM_STD_BMAP:
+>>> +             val = READ_ONCE(smccc_feat->std_bmap);
+>>> +             break;
+>>>        default:
+>>>                return -ENOENT;
+>>>        }
+>>> @@ -259,6 +317,40 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>>>        return 0;
+>>>    }
+>>>
+>>> +static int kvm_arm_set_fw_reg_bmap(struct kvm_vcpu *vcpu, u64 reg_id, u64 val)
+>>> +{
+>>> +     int ret = 0;
+>>> +     struct kvm *kvm = vcpu->kvm;
+>>> +     struct kvm_smccc_features *smccc_feat = &kvm->arch.smccc_feat;
+>>> +     unsigned long *fw_reg_bmap, fw_reg_features;
+>>> +
+>>> +     switch (reg_id) {
+>>> +     case KVM_REG_ARM_STD_BMAP:
+>>> +             fw_reg_bmap = &smccc_feat->std_bmap;
+>>> +             fw_reg_features = KVM_ARM_SMCCC_STD_FEATURES;
+>>> +             break;
+>>> +     default:
+>>> +             return -ENOENT;
+>>> +     }
+>>> +
+>>> +     /* Check for unsupported bit */
+>>> +     if (val & ~fw_reg_features)
+>>> +             return -EINVAL;
+>>> +
+>>> +     mutex_lock(&kvm->lock);
+>>> +
+>>> +     /* Return -EBUSY if the VM (any vCPU) has already started running. */
+>>> +     if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags)) {
+>>> +             ret = -EBUSY;
+>>> +             goto out;
+>>> +     }
+>>> +
+>>> +     WRITE_ONCE(*fw_reg_bmap, val);
+>>> +out:
+>>> +     mutex_unlock(&kvm->lock);
+>>> +     return ret;
+>>> +}
+>>> +
+>>>    int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>>>    {
+>>>        void __user *uaddr = (void __user *)(long)reg->addr;
+>>> @@ -337,6 +429,8 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>>>                        return -EINVAL;
+>>>
+>>>                return 0;
+>>> +     case KVM_REG_ARM_STD_BMAP:
+>>> +             return kvm_arm_set_fw_reg_bmap(vcpu, reg->id, val);
+>>>        default:
+>>>                return -ENOENT;
+>>>        }
+>>> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+>>> index 346535169faa..67d1273e8086 100644
+>>> --- a/arch/arm64/kvm/psci.c
+>>> +++ b/arch/arm64/kvm/psci.c
+>>> @@ -436,3 +436,16 @@ int kvm_psci_call(struct kvm_vcpu *vcpu)
+>>>                return -EINVAL;
+>>>        }
+>>>    }
+>>> +
+>>> +bool kvm_psci_func_id_is_valid(struct kvm_vcpu *vcpu, u32 func_id)
+>>> +{
+>>> +     /* PSCI 0.1 doesn't comply with the standard SMCCC */
+>>> +     if (kvm_psci_version(vcpu) == KVM_ARM_PSCI_0_1)
+>>> +             return (func_id == KVM_PSCI_FN_CPU_OFF || func_id == KVM_PSCI_FN_CPU_ON);
+>>> +
+>>> +     if (ARM_SMCCC_OWNER_NUM(func_id) == ARM_SMCCC_OWNER_STANDARD &&
+>>> +             ARM_SMCCC_FUNC_NUM(func_id) >= 0 && ARM_SMCCC_FUNC_NUM(func_id) <= 0x1f)
+>>> +             return true;
+>>> +
+>>> +     return false;
+>>> +}
+>>> diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
+>>> index 5d38628a8d04..499b45b607b6 100644
+>>> --- a/include/kvm/arm_hypercalls.h
+>>> +++ b/include/kvm/arm_hypercalls.h
+>>> @@ -6,6 +6,11 @@
+>>>
+>>>    #include <asm/kvm_emulate.h>
+>>>
+>>> +/* Last valid bits of the bitmapped firmware registers */
+>>> +#define KVM_REG_ARM_STD_BMAP_BIT_MAX         0
+>>> +
+>>> +#define KVM_ARM_SMCCC_STD_FEATURES           GENMASK(KVM_REG_ARM_STD_BMAP_BIT_MAX, 0)
+>>> +
+>>
+>> s/bits of/bit of
+>>
+> Great catch again!
+> 
+>>>    int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
+>>>
+>>>    static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
+>>> @@ -42,6 +47,7 @@ static inline void smccc_set_retval(struct kvm_vcpu *vcpu,
+>>>
+>>>    struct kvm_one_reg;
+>>>
+>>> +void kvm_arm_init_hypercalls(struct kvm *kvm);
+>>>    int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu);
+>>>    int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
+>>>    int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+>>> diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
+>>> index 6e55b9283789..c47be3e26965 100644
+>>> --- a/include/kvm/arm_psci.h
+>>> +++ b/include/kvm/arm_psci.h
+>>> @@ -36,7 +36,7 @@ static inline int kvm_psci_version(struct kvm_vcpu *vcpu)
+>>>        return KVM_ARM_PSCI_0_1;
+>>>    }
+>>>
+>>> -
+>>>    int kvm_psci_call(struct kvm_vcpu *vcpu);
+>>> +bool kvm_psci_func_id_is_valid(struct kvm_vcpu *vcpu, u32 func_id);
+>>>
+>>>    #endif /* __KVM_ARM_PSCI_H__ */
+>>>
+>>
+>> Thanks,
+>> Gavin
+>>
+> 
+> Thanks for the review, Gavin.
+> 
+
+No worries :)
+
+Thanks,
+Gavin
+
