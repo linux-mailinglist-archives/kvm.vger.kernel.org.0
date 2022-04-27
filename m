@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 37852512143
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 20:40:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3672C511F95
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 20:38:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243038AbiD0Q1R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 12:27:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43160 "EHLO
+        id S241668AbiD0Q2V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 12:28:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243040AbiD0Q0t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 12:26:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7808557999
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 09:21:36 -0700 (PDT)
+        with ESMTP id S243339AbiD0Q1l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 12:27:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C8C9D36334
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 09:22:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651076346;
+        s=mimecast20190719; t=1651076538;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ffzoPVo40T1QB8nGCSIveEjN49tY8CiNvdur2uf9BJA=;
-        b=KQWFmVmsrJvYasYc8HeK2lgAiqLsluRefD9yhizsl4o8ZyvtHdDmc2Q+ZrgjzKzF0mqboI
-        meVudgyqeXdma8M3zjE9M0pRy0IH990jKsionWw2/kBuLEzA+Jg6vWxSCgp3wJVwZeAmr6
-        8+vo+RgvgzGM7YU2Ntug2j1Brd0r3Y0=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=KCM+kR4pTupLxaN7Pzr4seAbVUE+H+zCFEJvKXyp008=;
+        b=jJ5anBsONaEYO4X0BfrfQ+Un4bNCRDu4JZAZTRWZ/ZQKLnbDx7w86kepeRrBS6R0IJwqbc
+        K2USzEuDxr6rLZHsYblCr3gjoeszs7VWXS8cGj6AK7M0+FzWgdC8dA/WxVGrWixeQXSWsY
+        7/jPDIZYrZG5AplhulholKE/ahw7jyc=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-458-wdAVLq8fM82AIgABYtqELg-1; Wed, 27 Apr 2022 12:19:04 -0400
-X-MC-Unique: wdAVLq8fM82AIgABYtqELg-1
-Received: by mail-ed1-f72.google.com with SMTP id ec44-20020a0564020d6c00b00425b136662eso1270080edb.12
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 09:19:04 -0700 (PDT)
+ us-mta-416-WFCC1_xHP1Oz1QtdcOLvCQ-1; Wed, 27 Apr 2022 12:19:06 -0400
+X-MC-Unique: WFCC1_xHP1Oz1QtdcOLvCQ-1
+Received: by mail-ed1-f69.google.com with SMTP id co27-20020a0564020c1b00b00425ab566200so1272713edb.6
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 09:19:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=ffzoPVo40T1QB8nGCSIveEjN49tY8CiNvdur2uf9BJA=;
-        b=CTkZFrT0gZvSdGYaZxI2RVKcyjo3xgPgHHOiACofxmKOsa9fID9sJQeEA6l1nGeqtf
-         Pj7HfmeWRAUpYlEuNXoVJaTidRA4v2IENUeaklXqKCnJ3rLrgqffajD3EPpYJdbafDDx
-         bq83hvNWAfMsxAwOAxZW66seo0m2cWCmNLzp7TsZ8gETrOrPC3LEA2WwJtoHnDZPdDel
-         PZGeeuWVOjWj6j562Je6izAhlnCtWX/CCmbC045kxqH6JgUO8eAYzOkca9PcuWHKXXAk
-         GUSuDhrzi+hbdkOFngnae7YED3h7pR3LJzoZHroBcAWX4c2O3i6hP951L9na+IX6+4v4
-         Ywiw==
-X-Gm-Message-State: AOAM53264RO/k6AxM0hsuVupqAgdJ8g5TolKlS6/ExLsUVccnv2vg798
-        ygQeV6k5y8BFwuI8mgx/ybfzR8tzsPAbBS72WtZri9GJ+dD0fd/cytwauNNLwJ7XblH//WiwsK9
-        Vnl1FBNQAI/9w
-X-Received: by 2002:a17:907:6286:b0:6da:6e24:5e43 with SMTP id nd6-20020a170907628600b006da6e245e43mr27124076ejc.449.1651076343669;
-        Wed, 27 Apr 2022 09:19:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzabc0/sYttxf8D1jkbuABMsGvUHBUQ5TkmebPJVuLdNvlX2fgRhAzqQvVk/Pgui8yCvJ73OA==
-X-Received: by 2002:a17:907:6286:b0:6da:6e24:5e43 with SMTP id nd6-20020a170907628600b006da6e245e43mr27124052ejc.449.1651076343424;
-        Wed, 27 Apr 2022 09:19:03 -0700 (PDT)
+        bh=KCM+kR4pTupLxaN7Pzr4seAbVUE+H+zCFEJvKXyp008=;
+        b=hkqEtHiIyQPa07L0J+o9M1TiTp6xWw7SmvlTsERKh56wnFDfXluoupXTJF8sFOUe7f
+         3aqgsDy3NA6wZpg5Ovu9q/rtubsNjHaEDiV19625wdW7/R2D8sGKsYWXpFOKWcAXn0oO
+         jbp75qgPBWOttMMmTNPw2VlzRrXG/mJn2Qjo1nSHG4FbghcLXhFscVThWVYHGOCsallO
+         h6iWoU5FVXjytMuxU0rcXrQ0JalRP/TbjR+Zs4Hd4TSC+dassbEPb4OUVoOtguqw+bo6
+         dN2OLey3FBGpEC3dZFV2lrO+wrzAdhgOmuoNvP4bomamUgi7okGzGLhuWx1C9UV9Mpv2
+         GMGg==
+X-Gm-Message-State: AOAM531sPqGZO6T8367RlW1KN59GC4v6yJurQp2ArSNjUedz7OS9AX4X
+        NFM4tP0lvkksfbZuI5Ukqz1//1AdpKGZKabHFzO6nE4nsDqRZc0eXvERaZw1dnK2fHQUzeP5Zt2
+        R3lWfAfQU2okv
+X-Received: by 2002:a05:6402:5201:b0:426:124:a40b with SMTP id s1-20020a056402520100b004260124a40bmr7129616edd.198.1651076345458;
+        Wed, 27 Apr 2022 09:19:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxoHUy4nFsODaBAroyqMZG+PQ9rRZ5tD2/3U187eXKeQcTQ49CZmgADEk7rJYMAIQsQErds4g==
+X-Received: by 2002:a05:6402:5201:b0:426:124:a40b with SMTP id s1-20020a056402520100b004260124a40bmr7129587edd.198.1651076345207;
+        Wed, 27 Apr 2022 09:19:05 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id bg16-20020a170906a05000b006f3c03f5871sm1884081ejb.108.2022.04.27.09.19.00
+        by smtp.googlemail.com with ESMTPSA id mb22-20020a170906eb1600b006f38dcf211bsm4894492ejb.138.2022.04.27.09.19.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Apr 2022 09:19:02 -0700 (PDT)
-Message-ID: <b02f8edc-8d29-46c4-32b4-7317f8eaae2d@redhat.com>
-Date:   Wed, 27 Apr 2022 18:18:58 +0200
+        Wed, 27 Apr 2022 09:19:04 -0700 (PDT)
+Message-ID: <bfe99275-a15e-306b-d628-d68754e52c2d@redhat.com>
+Date:   Wed, 27 Apr 2022 18:19:03 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.8.0
-Subject: Re: [PATCH MANUALSEL 5.4 1/2] x86/kvm: Preserve BSP
+Subject: Re: [PATCH MANUALSEL 5.10 1/4] x86/kvm: Preserve BSP
  MSR_KVM_POLL_CONTROL across suspend/resume
 Content-Language: en-US
 To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
@@ -69,9 +69,9 @@ Cc:     Wanpeng Li <wanpengli@tencent.com>,
         Marcelo Tosatti <mtosatti@redhat.com>, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
         x86@kernel.org, kvm@vger.kernel.org
-References: <20220427155438.19612-1-sashal@kernel.org>
+References: <20220427155435.19554-1-sashal@kernel.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220427155438.19612-1-sashal@kernel.org>
+In-Reply-To: <20220427155435.19554-1-sashal@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -110,10 +110,10 @@ On 4/27/22 17:54, Sasha Levin wrote:
 >   1 file changed, 13 insertions(+)
 > 
 > diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index 408b51aba293..f582dda8dd34 100644
+> index 18e952fed021..6c3d38b5a8ad 100644
 > --- a/arch/x86/kernel/kvm.c
 > +++ b/arch/x86/kernel/kvm.c
-> @@ -59,6 +59,7 @@ static DEFINE_PER_CPU_DECRYPTED(struct kvm_vcpu_pv_apf_data, apf_reason) __align
+> @@ -66,6 +66,7 @@ static DEFINE_PER_CPU_DECRYPTED(struct kvm_vcpu_pv_apf_data, apf_reason) __align
 >   DEFINE_PER_CPU_DECRYPTED(struct kvm_steal_time, steal_time) __aligned(64) __visible;
 >   static int has_steal_clock = 0;
 >   
@@ -121,7 +121,7 @@ On 4/27/22 17:54, Sasha Levin wrote:
 >   /*
 >    * No need for any "IO delay" on KVM
 >    */
-> @@ -584,14 +585,26 @@ static int kvm_cpu_down_prepare(unsigned int cpu)
+> @@ -624,14 +625,26 @@ static int kvm_cpu_down_prepare(unsigned int cpu)
 >   
 >   static int kvm_suspend(void)
 >   {
