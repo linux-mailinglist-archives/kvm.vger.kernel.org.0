@@ -2,96 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC0A25123D6
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 22:23:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BCB13512401
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 22:41:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236168AbiD0U0s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 16:26:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44910 "EHLO
+        id S236558AbiD0UoV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 16:44:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235227AbiD0U0r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 16:26:47 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E38B8AD10E
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 13:23:32 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id h12so2529651plf.12
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 13:23:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Lf9in1R/IyB6rX6jUJyTZ+zPOwsufKTBlApv7ttWWfI=;
-        b=mkxmR1CbEjd7T2oSqQlrgTQGHLlxZ+wMChlXJfbXaJrep9GBLX60uCfKBbyXYGwQyY
-         KDeQaI/saGyf/LQwrsxRc4jpYpOJDNAOWSHS6RjaaHaFYnWhyYzY0WUVLU0fnQ65rQ1L
-         +IFWWit2h/ta/ZKMcHoXuZFGd2pAt9kJ0eIVPm2WL/+Y2ya5kO2EVd89BcXV+C2iWt2k
-         8j9H7dPQ2goG7B4GUDT7ajgoo8khiZPhogewkTSA26dLrc9B4lyzV5SLazc217D393SB
-         UOkHV1x8I5ReHmCKZvlenNboSq2xb/YT0q/ccK4jrEv5Sn8UVrX+fSmKgtGjVNIe16lI
-         URhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Lf9in1R/IyB6rX6jUJyTZ+zPOwsufKTBlApv7ttWWfI=;
-        b=go8JjYjp6RxXVquG5iEB1U7OWZehAZjGVSt9yKywKIvqXVlktERzJpv7kmAtp98tct
-         dXI8oBBTEETgueqVNOGQzjQ23oZg2uLslh7DUwmJBPEOWpusCNX81BXevVbiPZycfCSA
-         GBWE7/sIj9S9mxSM0pJkI7dlALIZzQ0YUUWfb+MgKRixvVo8ERtaIw7z19hRUyF+2CHT
-         xs8TlxfVWz6Var2PcShwq0Kzm0idMFEvZ74Sl/h9gKnhLuO5Lo0TuF7gxSDG7S5Koup+
-         sBjOa+BqFBs2y3MYoIWr6susNLwkgvlRoef9VzZGiqBdY7HpFt+aIZ1lroKvuQcpR074
-         fyCg==
-X-Gm-Message-State: AOAM532ZO5yJ0tqobuS/6/IcfDSw0GFnkMRA7vQw4Q32KM7m10a0iLJp
-        y9eDozachm+XnKFAQcJEtfkduw==
-X-Google-Smtp-Source: ABdhPJw3HiHU2l0Zxdnl8FI3SE8UUCEm63BOmZlO5wTWpPxNDy3Afc0ad7VVfEKZ63cdvh+uY/IWNA==
-X-Received: by 2002:a17:902:e8cf:b0:156:36e0:6bcb with SMTP id v15-20020a170902e8cf00b0015636e06bcbmr29286930plg.105.1651091012280;
-        Wed, 27 Apr 2022 13:23:32 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id i23-20020a056a00225700b0050d38d0f58dsm12888790pfu.213.2022.04.27.13.23.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Apr 2022 13:23:31 -0700 (PDT)
-Date:   Wed, 27 Apr 2022 20:23:27 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Mingwei Zhang <mizhang@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v2 8/8] DO NOT MERGE: Hack-a-test to verify gpc
- invalidation+refresh
-Message-ID: <YmmmP0TSmj5CxV06@google.com>
-References: <20220427014004.1992589-1-seanjc@google.com>
- <20220427014004.1992589-9-seanjc@google.com>
- <68b3f18e156391e20aed8e10e974fdf8052b7f47.camel@infradead.org>
+        with ESMTP id S229899AbiD0UoO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 16:44:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8F8F2E013
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 13:41:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651092061;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=gFMPjJE+QXYf1X/XGRpB326TaYnBoulTgNBrURc+les=;
+        b=DC8hYUwgyNTw41KcBXkTLnNAhuXk1r5F+vZbT4LZeA4+j3hCZOzXyEdQliDskqa0OYBIFB
+        B7NiFAfXmkrwI5blz6wSJAhob/oAUsTvgWSU76atxFtN4i7Yf+OtnOgWUOGEtikvyg431X
+        qiaZeB0B1PoOSv8w445/h3eWlLc/Aok=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-621-mWbQvKmbN8GaGizkGLS-GA-1; Wed, 27 Apr 2022 16:40:57 -0400
+X-MC-Unique: mWbQvKmbN8GaGizkGLS-GA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0C409381D8A1;
+        Wed, 27 Apr 2022 20:40:56 +0000 (UTC)
+Received: from starship (unknown [10.40.192.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B8939400E436;
+        Wed, 27 Apr 2022 20:40:54 +0000 (UTC)
+Message-ID: <f38141478fa37ddff287b48c146261fe7d878379.camel@redhat.com>
+Subject: Re: [PATCH 1/3] KVM: x86: make vendor code check for all nested
+ events
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, stable@vger.kernel.org
+Date:   Wed, 27 Apr 2022 23:40:53 +0300
+In-Reply-To: <20220427173758.517087-2-pbonzini@redhat.com>
+References: <20220427173758.517087-1-pbonzini@redhat.com>
+         <20220427173758.517087-2-pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <68b3f18e156391e20aed8e10e974fdf8052b7f47.camel@infradead.org>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 27, 2022, David Woodhouse wrote:
-> On Wed, 2022-04-27 at 01:40 +0000, Sean Christopherson wrote:
-> > Add a VM-wide gfn=>pfn cache and a fake MSR to let userspace control the
-> > cache.  On writes, reflect the value of the MSR into the backing page of
-> > a gfn=>pfn cache so that userspace can detect if a value was written to
-> > the wrong page, i.e. to a stale mapping.
-> > 
-> > Spin up 16 vCPUs (arbitrary) to use/refresh the cache, and another thread
-> > to trigger mmu_notifier events and memslot updates.
+On Wed, 2022-04-27 at 13:37 -0400, Paolo Bonzini wrote:
+> Right now, the VMX preemption timer is special cased via the
+> hv_timer_pending, but the purpose of the callback can be easily
+> extended to observing any event that can occur only in non-root
+> mode.  Interrupts, NMIs etc. are already handled properly by
+> the *_interrupt_allowed callbacks, so what is missing is only
+> MTF.  Check it in the newly-renamed callback, so that
+> kvm_vcpu_running's call to kvm_check_nested_events
+> becomes redundant.
 > 
-> Do you need the MSR hack? Can't you exercise this using Xen interrupt
-> delivery or runstate information and the same kind of thread setup?
+> Cc: stable@vger.kernel.org
+> Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 2 +-
+>  arch/x86/kvm/vmx/nested.c       | 7 ++++++-
+>  arch/x86/kvm/x86.c              | 8 ++++----
+>  3 files changed, 11 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 4ff36610af6a..e2e4f60159e9 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1504,7 +1504,7 @@ struct kvm_x86_ops {
+>  struct kvm_x86_nested_ops {
+>  	void (*leave_nested)(struct kvm_vcpu *vcpu);
+>  	int (*check_events)(struct kvm_vcpu *vcpu);
+> -	bool (*hv_timer_pending)(struct kvm_vcpu *vcpu);
+> +	bool (*has_events)(struct kvm_vcpu *vcpu);
+>  	void (*triple_fault)(struct kvm_vcpu *vcpu);
+>  	int (*get_state)(struct kvm_vcpu *vcpu,
+>  			 struct kvm_nested_state __user *user_kvm_nested_state,
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 856c87563883..54672025c3a1 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3857,6 +3857,11 @@ static bool nested_vmx_preemption_timer_pending(struct kvm_vcpu *vcpu)
+>  	       to_vmx(vcpu)->nested.preemption_timer_expired;
+>  }
+>  
+> +static bool vmx_has_nested_events(struct kvm_vcpu *vcpu)
+> +{
+Typo: needs struct vcpu_vmx *vmx = to_vmx(vcpu);
 
-Yeah, I asumme it's possible, and medium/long term I definitely want to have a
-proper test.  I went the hack route to get something that could hammer a cache
-with minimal chance of a test bug.  I only have a rough idea of what the Xen stuff
-does.
+> +	return nested_vmx_preemption_timer_pending(vcpu) || vmx->nested.mtf_pending;
+> +}
+> +
+>  static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> @@ -6809,7 +6814,7 @@ __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *))
+>  struct kvm_x86_nested_ops vmx_nested_ops = {
+>  	.leave_nested = vmx_leave_nested,
+>  	.check_events = vmx_check_nested_events,
+> -	.hv_timer_pending = nested_vmx_preemption_timer_pending,
+> +	.has_events = vmx_has_nested_events,
+>  	.triple_fault = nested_vmx_triple_fault,
+>  	.get_state = vmx_get_nested_state,
+>  	.set_state = vmx_set_nested_state,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index a6ab19afc638..0e73607b02bd 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9471,8 +9471,8 @@ static int inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit)
+>  	}
+>  
+>  	if (is_guest_mode(vcpu) &&
+> -	    kvm_x86_ops.nested_ops->hv_timer_pending &&
+> -	    kvm_x86_ops.nested_ops->hv_timer_pending(vcpu))
+> +	    kvm_x86_ops.nested_ops->has_events &&
+> +	    kvm_x86_ops.nested_ops->has_events(vcpu))
+>  		*req_immediate_exit = true;
+>  
+>  	WARN_ON(vcpu->arch.exception.pending);
+> @@ -12183,8 +12183,8 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
+>  		return true;
+>  
+>  	if (is_guest_mode(vcpu) &&
+> -	    kvm_x86_ops.nested_ops->hv_timer_pending &&
+> -	    kvm_x86_ops.nested_ops->hv_timer_pending(vcpu))
+> +	    kvm_x86_ops.nested_ops->has_events &&
+> +	    kvm_x86_ops.nested_ops->has_events(vcpu))
+Nitpick: Won't it make sense to use conditional static call here instead?
+
+>  		return true;
+>  
+>  	return false;
+
+
+Besides nitpicks,
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+
+Wasn't able to test on my intel laptop, I am getting out of sudden in qemu:
+
+'cpuid_data is full, no space for cpuid(eax:0x8000001d,ecx:0x3e)'
+
+I will investigate tomorrow.
+
+Best regards,
+	Maxim Levitsky
+
+
