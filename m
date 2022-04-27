@@ -2,107 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CBBA0512408
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 22:43:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 751F651248F
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 23:30:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235923AbiD0UqN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 16:46:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58560 "EHLO
+        id S237533AbiD0Vd6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 17:33:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229725AbiD0UqK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 16:46:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 29BDA6459
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 13:42:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651092177;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zJmjZ87fPrZOkM1Htcs8yFb8d1wAfXTp9xbOKbFh9NY=;
-        b=gngKL4olwT1uYrMnlHix4sB/BWi6l2Ub+xQt68H396mLg1pa3cxq+LtiaLotIsKIaO1yGF
-        8L9ggOjtJWS/5EeuTclfLZAgTxNpmRZGLPN1unlMlk+pa5hXqmkusHJI9WjRIBmAyAPm1q
-        fzquhNfBzfCk5hscV5i4fN1ocQBNx44=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-586-ZUZr-R13PFObJtKRkLJUAA-1; Wed, 27 Apr 2022 16:42:54 -0400
-X-MC-Unique: ZUZr-R13PFObJtKRkLJUAA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9CF20808799;
-        Wed, 27 Apr 2022 20:42:53 +0000 (UTC)
-Received: from starship (unknown [10.40.192.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5989D2024CB6;
-        Wed, 27 Apr 2022 20:42:52 +0000 (UTC)
-Message-ID: <6ad7ecdd82cd85adff008e5ae967516f00c3bf73.camel@redhat.com>
-Subject: Re: [PATCH 3/3] KVM: x86: never write to memory from
- kvm_vcpu_check_block
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        with ESMTP id S237509AbiD0Vd4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 17:33:56 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A372827152;
+        Wed, 27 Apr 2022 14:30:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651095044; x=1682631044;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=9AnR0+i4WyZuMptJB4sGh0+ILBAmTrqUC5l0VYBK5DQ=;
+  b=OLVFTDseiEs8H9fUvj40yBhty5zkBeBjcMUOSNhl1W0gPhmb9MTZbD1f
+   OMdcrmwDD5XnR7YgrJ0AqK0c9SmSY5cIg/0Q+tTaWOdloNoXekPimZZi/
+   3by0OvjfJdfZUhrA1KfOb+7/v0YKYihas94uEd/erZiWGqepC+59pR4tt
+   gWCLDpFYRp6cMI0ngTm0rzmQdnl2LB1BiC6nOhbULKyC3sZyigiy3H+vC
+   Iy4flTapKyFfpn38d0kjYdxTzbrbpYxg+6dGB7BLbcOlByPxdeBjBC6V7
+   wRWNo6/VQT8qX7+sD45PN86w1aIJyKdT7Ulb5fp/d+5ZEv/d29nTzbif9
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10330"; a="246634544"
+X-IronPort-AV: E=Sophos;i="5.90,294,1643702400"; 
+   d="scan'208";a="246634544"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 14:30:44 -0700
+X-IronPort-AV: E=Sophos;i="5.90,294,1643702400"; 
+   d="scan'208";a="705733567"
+Received: from rrnambia-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.60.78])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 14:30:41 -0700
+Message-ID: <68484e168226037c3a25b6fb983b052b26ab3ec1.camel@intel.com>
+Subject: Re: [PATCH v3 05/21] x86/virt/tdx: Detect P-SEAMLDR and TDX module
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Cc:     seanjc@google.com, stable@vger.kernel.org
-Date:   Wed, 27 Apr 2022 23:42:51 +0300
-In-Reply-To: <20220427173758.517087-4-pbonzini@redhat.com>
-References: <20220427173758.517087-1-pbonzini@redhat.com>
-         <20220427173758.517087-4-pbonzini@redhat.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com
+Date:   Thu, 28 Apr 2022 09:30:39 +1200
+In-Reply-To: <49cc6848-47ae-9c25-f479-c5aed8c892df@intel.com>
+References: <cover.1649219184.git.kai.huang@intel.com>
+         <b9f4d4afd244d685182ce9ab5ffdd0bf245be6e2.1649219184.git.kai.huang@intel.com>
+         <104a6959-3bd4-1e75-5e3d-5dc3ef025ed0@intel.com>
+         <98af78402861b1982607c5fd14b0c89403c042a6.camel@intel.com>
+         <49cc6848-47ae-9c25-f479-c5aed8c892df@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-04-27 at 13:37 -0400, Paolo Bonzini wrote:
-> kvm_vcpu_check_block is called while not in TASK_RUNNING, and therefore
-> cannot sleep.  Writing to guest memory is therefore forbidden, but it
-> can happen if kvm_check_nested_events causes a vmexit.
+On Wed, 2022-04-27 at 07:24 -0700, Dave Hansen wrote:
+> On 4/26/22 17:01, Kai Huang wrote:
+> > On Tue, 2022-04-26 at 13:56 -0700, Dave Hansen wrote:
+> > > On 4/5/22 21:49, Kai Huang wrote:
+> > > > The P-SEAMLDR (persistent SEAM loader) is the first software module that
+> > > > runs in SEAM VMX root, responsible for loading and updating the TDX
+> > > > module.  Both the P-SEAMLDR and the TDX module are expected to be loaded
+> > > > before host kernel boots.
+> > > 
+> > > Why bother with the P-SEAMLDR here at all?  The kernel isn't loading the
+> > > TDX module in this series.  Why not just call into the TDX module directly?
+> > 
+> > It's not absolutely needed in this series.  I choose to detect P-SEAMLDR because
+> > detecting it can also detect the TDX module, and eventually we will need to
+> > support P-SEAMLDR because the TDX module runtime update uses P-SEAMLDR's
+> > SEAMCALL to do that.
+> > 
+> > Also, even for this series, detecting the P-SEAMLDR allows us to provide the P-
+> > SEAMLDR information to user at a basic level in dmesg:
+> > 
+> > [..] tdx: P-SEAMLDR: version 0x0, vendor_id: 0x8086, build_date: 20211209,
+> > build_num 160, major 1, minor 0
+> > 
+> > This may be useful to users, but it's not a hard requirement for this series.
 > 
-> Fortunately, all events that are caught by kvm_check_nested_events are
-> also handled by kvm_vcpu_has_events through vendor callbacks such as
-> kvm_x86_interrupt_allowed or kvm_x86_ops.nested_ops->has_events, so
-> remove the call.
+> We've had a lot of problems in general with this code trying to do too
+> much at once.  I thought we agreed that this was going to only contain
+> the minimum code to make TDX functional.  It seems to be creeping to
+> grow bigger and bigger.
 > 
-> Cc: stable@vger.kernel.org
-> Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/x86.c | 3 ---
->  1 file changed, 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index d563812ca229..90b4f50b9a84 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10341,9 +10341,6 @@ static inline int vcpu_block(struct kvm_vcpu *vcpu)
->  
->  static inline bool kvm_vcpu_running(struct kvm_vcpu *vcpu)
->  {
-> -	if (is_guest_mode(vcpu))
-> -		kvm_check_nested_events(vcpu);
-> -
->  	return (vcpu->arch.mp_state == KVM_MP_STATE_RUNNABLE &&
->  		!vcpu->arch.apf.halted);
->  }
+> Am I remembering this wrong?
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+OK. I'll remove the P-SEAMLDR related code.
 
-I tested this on AMD, and it seems to work fine, and my nested AVIC test
-works as good as was before.
+-- 
+Thanks,
+-Kai
 
-Note that I forgot to mention, that I had to apply most of the patches
-manually, they don't apply to kvm/queue.
-
-Best regards,
-	Maxim Levitsky
 
