@@ -2,81 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0992751175A
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 14:46:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2024E511719
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 14:46:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233937AbiD0MZj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 08:25:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45412 "EHLO
+        id S234533AbiD0Mm5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 08:42:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234117AbiD0MZh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 08:25:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3BAE240A22
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 05:22:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651062136;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EQ+0Ceo3McurL0XSQT/LicuV5aNuvEIglYDv/pzRVNQ=;
-        b=JCiRHHs+Z5ptDQFVgNA8JuykU6T4Z6UESQ0GVfnaO1JXSSQzXpvo5XMQc0JYVXVGYk7roM
-        bUDAPUetyFRUBohKti6Ryxh4X4pq2el51p8S1F1OoCpVhj2xfe/v0EqUlLIwu4dJWrN1pj
-        Ykad70EL2G3TRereG3CWDo1XXcpxCMw=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-59-DONuUUZNPJGeU4YxZtWpsg-1; Wed, 27 Apr 2022 08:22:13 -0400
-X-MC-Unique: DONuUUZNPJGeU4YxZtWpsg-1
-Received: by mail-ej1-f71.google.com with SMTP id qf24-20020a1709077f1800b006e87e97d2e7so1066193ejc.3
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 05:22:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:subject:in-reply-to
-         :content-transfer-encoding;
-        bh=EQ+0Ceo3McurL0XSQT/LicuV5aNuvEIglYDv/pzRVNQ=;
-        b=xEv48loEL7WNeaYfbPBjzGoQXb9m95b90aLDljqXIcnD/cySDhG6hCpZEOl7ZmGuVR
-         JSx3feDiMgUF8QqzJpong7OF2wAe4Qgco3wMY2R0ALBmM4HinNMrLsKCNP9luznnM7pK
-         /nsLUIZUKqqaNcv0aSqNSTQIMyLbWd1D+IWhOJG5hoZ7LnaW0XULDK/47df8N7Uzt+wn
-         GChrLo741OVdvhr4UoLGVfCO8Jyo/Zc3VQcA2TBYixRUu/WvofJ1e7+GIiCy8AV7yHfM
-         dxl7uw93tmsD8AK7BjT7IVKEKnepcDAYaoczWPRRGJfDGEvE4hrpG2i9pkrO+OWzB9Uq
-         OBzA==
-X-Gm-Message-State: AOAM532Z83M1j/CXKSf88srhWb7HNjk0rDLqApzEdSxTbP5X2QUL0Iml
-        BZ2Gnci9WFlo2tPa2Nzd40yh0Civia3TTE2mrZfDUBOxKLO6A1by9Ovh7zNmQV7ftwJNE95pde4
-        9b7OhoRlfN8SB
-X-Received: by 2002:a05:6402:3609:b0:425:a4bc:db86 with SMTP id el9-20020a056402360900b00425a4bcdb86mr30240318edb.98.1651062131908;
-        Wed, 27 Apr 2022 05:22:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxuj09Zt9Xrl6beXjm441/a58r42X6yqePyFwWFQI6q2sJBs4NcSfoDnbKEM2YpH2jkXcbBhw==
-X-Received: by 2002:a05:6402:3609:b0:425:a4bc:db86 with SMTP id el9-20020a056402360900b00425a4bcdb86mr30240296edb.98.1651062131708;
-        Wed, 27 Apr 2022 05:22:11 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id b16-20020a170906709000b006f3a8aac0eesm3136859ejk.0.2022.04.27.05.22.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Apr 2022 05:22:11 -0700 (PDT)
-Message-ID: <229c4cb9-c8f4-6392-dfb5-c9afedc3262b@redhat.com>
-Date:   Wed, 27 Apr 2022 14:22:10 +0200
+        with ESMTP id S234489AbiD0Mmz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 08:42:55 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70D3E31514;
+        Wed, 27 Apr 2022 05:39:41 -0700 (PDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23RB3B2G012983;
+        Wed, 27 Apr 2022 12:39:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=u0nadIK7z0bvpO1bTNMb/ymcluSbpnagZ6CWDk9UtSE=;
+ b=sIadZoA/anY4/hFkalao9hQoO7DEBj/Jw2G0A1HVMAPl9SkXNQU9ARkk7trCynosipkz
+ TZIpb0Wq9546JwJD52/rqN7mZCa3C8tNMIx4W/UTI4zcWCJ51lSZAkGj6+Tr3EiCi0YJ
+ Xhu7U6pq4k0WeJ2/7qfgJrHCyiXG5kJRqiOcztXC3n+VHEYIOndZ2mSqIFx5N1Wqp1x/
+ q05Jardgx3hqs3fhEKgpe0aPTimqscdpD/85fsReqSj65sURPcjRfuyOI0qk79/hWw1R
+ 70MFfNqL0oXcVQm5/g3MwwbF5yejS9/MGNqBiqUSaZ1iTOi7kIyNka0tjXRTv6AWc37J Hw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fpssq50rc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Apr 2022 12:39:41 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 23RCWEYU002605;
+        Wed, 27 Apr 2022 12:39:40 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fpssq50qq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Apr 2022 12:39:40 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23RCWsLP006510;
+        Wed, 27 Apr 2022 12:39:38 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3fm938wxwx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Apr 2022 12:39:38 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23RCdZ8H49676694
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 27 Apr 2022 12:39:35 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 54E1B11C054;
+        Wed, 27 Apr 2022 12:39:35 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DD67211C04A;
+        Wed, 27 Apr 2022 12:39:34 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.10.176])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 27 Apr 2022 12:39:34 +0000 (GMT)
+Date:   Wed, 27 Apr 2022 14:39:33 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v6 1/3] s390x: Give name to return value
+ of tprot()
+Message-ID: <20220427143933.0593212d@p-imbrenda>
+In-Reply-To: <9869b838-0070-ae67-737f-2bd3d0e21d60@linux.ibm.com>
+References: <20220427100611.2119860-1-scgl@linux.ibm.com>
+        <20220427100611.2119860-2-scgl@linux.ibm.com>
+        <20220427131449.61cce697@p-imbrenda>
+        <9869b838-0070-ae67-737f-2bd3d0e21d60@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>
-References: <e415e20f899407fb24dfb8ecbc1940c5cb14a302.camel@redhat.com>
- <YmghjwgcSZzuH7Rb@google.com>
- <cc0c62dd-9c95-f3b9-b736-226b8c864cd4@redhat.com>
- <YmgtPGur0Uwk5Yg6@google.com> <Ymg2pN9V4uwkmLZ/@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: kvm_gfn_to_pfn_cache_refresh started getting a warning recently
-In-Reply-To: <Ymg2pN9V4uwkmLZ/@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: JF7C5GvI5xkmmQnnGmRU57Xgqup7RynR
+X-Proofpoint-ORIG-GUID: fK6gJdmeZJrxiDYTvtD7iXMr6SNjkXgU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-27_04,2022-04-27_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 mlxscore=0 phishscore=0 suspectscore=0 adultscore=0
+ lowpriorityscore=0 bulkscore=0 impostorscore=0 mlxlogscore=989
+ malwarescore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2202240000 definitions=main-2204270082
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,34 +97,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/26/22 20:15, Sean Christopherson wrote:
-> On Tue, Apr 26, 2022, Sean Christopherson wrote:
->> On Tue, Apr 26, 2022, Paolo Bonzini wrote:
->>> On 4/26/22 18:45, Sean Christopherson wrote:
->>>> On Tue, Apr 26, 2022, Maxim Levitsky wrote:
->>>>> [  390.511995] BUG: sleeping function called from invalid context at include/linux/highmem-internal.h:161
->>>>> [  390.513681] in_atomic(): 1, irqs_disabled(): 1, non_block: 0, pid: 4439, name: CPU 0/KVM
->>>>
->>>> This is my fault.  memremap() can sleep as well.  I'll work on a fix.
->>>
->>> Indeed, "KVM: Fix race between mmu_notifier invalidation and pfncache
->>> refresh" hadn't gone through a full test cycle yet.
->>
->> And I didn't run with PROVE_LOCKING :-(
->>
->> I'm pretty sure there's an existing memory leak too.  If a refresh occurs, but
->> the pfn ends up being the same, KVM will keep references to both the "old" and the
->> "new", but only release one when the cache is destroyed.
->>
->> The refcounting bug begs the question of why KVM even keeps a reference.  This code
->> really should look exactly like the page fault path, i.e. should drop the reference
->> to the pfn once the pfn has been installed into the cache and obtained protection
->> via the mmu_notifier.
+On Wed, 27 Apr 2022 14:04:52 +0200
+Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
+
+> On 4/27/22 13:14, Claudio Imbrenda wrote:
+> > On Wed, 27 Apr 2022 12:06:09 +0200
+> > Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
+> >   
+> >> Improve readability by making the return value of tprot() an enum.
+> >>
+> >> No functional change intended.  
+> > 
+> > Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > 
+> > but see nit below
+> >   
+> >>
+> >> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> >> ---
+> >>  lib/s390x/asm/arch_def.h | 11 +++++++++--
+> >>  lib/s390x/sclp.c         |  6 +++---
+> >>  s390x/tprot.c            | 24 ++++++++++++------------
+> >>  3 files changed, 24 insertions(+), 17 deletions(-)  
 > 
-> This is getting a bit gnarly.  It probably makes sense to drop the existing patches
-> from kvm/queue, and then I can send a full v2 instead of just the delta?
+> [...]
+> 
+> >> diff --git a/s390x/tprot.c b/s390x/tprot.c
+> >> index 460a0db7..8eb91c18 100644
+> >> --- a/s390x/tprot.c
+> >> +++ b/s390x/tprot.c
+> >> @@ -20,26 +20,26 @@ static uint8_t pagebuf[PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
+> >>  
+> >>  static void test_tprot_rw(void)
+> >>  {
+> >> -	int cc;
+> >> +	enum tprot_permission permission;
+> >>  
+> >>  	report_prefix_push("Page read/writeable");
+> >>  
+> >> -	cc = tprot((unsigned long)pagebuf, 0);
+> >> -	report(cc == 0, "CC = 0");
+> >> +	permission = tprot((unsigned long)pagebuf, 0);
+> >> +	report(permission == TPROT_READ_WRITE, "CC = 0");  
+> > 
+> > here and in all similar cases below: does it still make sense to have
+> > "CC = 0" as message at this point? Maybe a more descriptive one would
+> > be better  
+> 
+> I thought about it, but decided against it. Firstly, because I preferred
+> not to do any functional changes and secondly, I could not think of anything
+> better. The prefix already tells you the meaning of the cc, so I don't know
+> what to print that would not be redundant.
+> 
+> [...]
 
-Yes, that's a good idea.
-
-Paolo
-
+fair enough
