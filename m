@@ -2,42 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F3BAB510CF9
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 02:01:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 94FE9510D06
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 02:06:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356286AbiD0AEk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Apr 2022 20:04:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36012 "EHLO
+        id S1356290AbiD0AJu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Apr 2022 20:09:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231330AbiD0AEj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Apr 2022 20:04:39 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FCFE177731;
-        Tue, 26 Apr 2022 17:01:30 -0700 (PDT)
+        with ESMTP id S232385AbiD0AJs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Apr 2022 20:09:48 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 424462F382;
+        Tue, 26 Apr 2022 17:06:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651017690; x=1682553690;
+  t=1651017998; x=1682553998;
   h=message-id:subject:from:to:cc:date:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=yJVAQLGQpmSEwTIQy0c+wdcVPv3sKrYh2NRxvL5xBC0=;
-  b=lph9hf2Nld+3oexIUm65IbGXk8OTlYnnQ8k05vx6lB5wQEEZvtaYdCIZ
-   YbVYTJ6Cp/Kx2MhWbyT25BNZYE7XRpVQVVHuhzUbuXsn4QfM8QDFScnXb
-   ocpyz5OLP6O7sH9RUZBtji255taXEz6UCt2VyAHQzm4f+Z/EKCQE3li5C
-   hwgVnlzUi4o15LqQ75ys9RJXTYMFpBXShCX7ZS3Xb10rq04kZxcQpK6fF
-   4vh/ae8aSFmPS9IUbqear23i/+UJC/bzJ+Ww1g8ga3vvJ795S4sGvCLNx
-   wwQQe8wydB796eZ8LAEDa7WrREbwi832bZO1ROpKNStmYmhIgTdUQBqDA
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10329"; a="265283244"
+  bh=WF0BUOeCUWjXtygZ0fA+ocYyTRB01MF/mxmqK/OFDYg=;
+  b=H1jbq50hw9Me9mg3kFpgKW5OEP7gVVm4g6eN4TPRg3eBmVqkYFLAr9UJ
+   oWUIuwqacAdmNdWTK1uI121j5mmgBlufe3L+/oiOWVyxyjs3vwTrD4zZi
+   5epcYRYawq5SeeMN35CumMuh+OMOkC2FZUJc6y5GqeAGLjcCaofBTuRxE
+   47Vvjiie76QAafrBA3rjD4A612VRY0igR3h885xGNNVy3t7hWKlyqTLUD
+   QSUxZrSrcuYEVoAlyhpnko2wEFDtxFig93FipC+CZtMenlVsDxbAALyKK
+   aMMPTtX7iv95KAXT4gOzrd2AL89OfRH7ziiIH31wCV+q1Z9rEfXsipCj0
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10329"; a="245685354"
 X-IronPort-AV: E=Sophos;i="5.90,292,1643702400"; 
-   d="scan'208";a="265283244"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2022 17:01:30 -0700
+   d="scan'208";a="245685354"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2022 17:06:37 -0700
 X-IronPort-AV: E=Sophos;i="5.90,292,1643702400"; 
-   d="scan'208";a="564824694"
+   d="scan'208";a="558612050"
 Received: from ssaride-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.0.221])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2022 17:01:27 -0700
-Message-ID: <98af78402861b1982607c5fd14b0c89403c042a6.camel@intel.com>
-Subject: Re: [PATCH v3 05/21] x86/virt/tdx: Detect P-SEAMLDR and TDX module
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2022 17:06:34 -0700
+Message-ID: <345753e50e4c113b1dfb71bba1ed841eee55aed3.camel@intel.com>
+Subject: Re: [PATCH v3 06/21] x86/virt/tdx: Shut down TDX module in case of
+ error
 From:   Kai Huang <kai.huang@intel.com>
 To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
@@ -48,47 +49,79 @@ Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
         kirill.shutemov@linux.intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com,
         isaku.yamahata@intel.com
-Date:   Wed, 27 Apr 2022 12:01:25 +1200
-In-Reply-To: <104a6959-3bd4-1e75-5e3d-5dc3ef025ed0@intel.com>
+Date:   Wed, 27 Apr 2022 12:06:32 +1200
+In-Reply-To: <b3c81b7f-3016-8f4e-3ac5-bff1fc52a879@intel.com>
 References: <cover.1649219184.git.kai.huang@intel.com>
-         <b9f4d4afd244d685182ce9ab5ffdd0bf245be6e2.1649219184.git.kai.huang@intel.com>
-         <104a6959-3bd4-1e75-5e3d-5dc3ef025ed0@intel.com>
+         <3f19ac995d184e52107e7117a82376cb7ecb35e7.1649219184.git.kai.huang@intel.com>
+         <b3c81b7f-3016-8f4e-3ac5-bff1fc52a879@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-04-26 at 13:56 -0700, Dave Hansen wrote:
+On Tue, 2022-04-26 at 13:59 -0700, Dave Hansen wrote:
 > On 4/5/22 21:49, Kai Huang wrote:
-> > The P-SEAMLDR (persistent SEAM loader) is the first software module that
-> > runs in SEAM VMX root, responsible for loading and updating the TDX
-> > module.  Both the P-SEAMLDR and the TDX module are expected to be loaded
-> > before host kernel boots.
+> > TDX supports shutting down the TDX module at any time during its
+> > lifetime.  After TDX module is shut down, no further SEAMCALL can be
+> > made on any logical cpu.
 > 
-> Why bother with the P-SEAMLDR here at all?  The kernel isn't loading the
-> TDX module in this series.  Why not just call into the TDX module directly?
+> Is this strictly true?
+> 
+> I thought SEAMCALLs were used for the P-SEAMLDR too.
 
-It's not absolutely needed in this series.  I choose to detect P-SEAMLDR because
-detecting it can also detect the TDX module, and eventually we will need to
-support P-SEAMLDR because the TDX module runtime update uses P-SEAMLDR's
-SEAMCALL to do that.
+Sorry will change to no TDX module SEAMCALL can be made on any logical cpu.
 
-Also, even for this series, detecting the P-SEAMLDR allows us to provide the P-
-SEAMLDR information to user at a basic level in dmesg:
+[...]
 
-[..] tdx: P-SEAMLDR: version 0x0, vendor_id: 0x8086, build_date: 20211209,
-build_num 160, major 1, minor 0
+> >  
+> > +/* Data structure to make SEAMCALL on multiple CPUs concurrently */
+> > +struct seamcall_ctx {
+> > +	u64 fn;
+> > +	u64 rcx;
+> > +	u64 rdx;
+> > +	u64 r8;
+> > +	u64 r9;
+> > +	atomic_t err;
+> > +	u64 seamcall_ret;
+> > +	struct tdx_module_output out;
+> > +};
+> > +
+> > +static void seamcall_smp_call_function(void *data)
+> > +{
+> > +	struct seamcall_ctx *sc = data;
+> > +	int ret;
+> > +
+> > +	ret = seamcall(sc->fn, sc->rcx, sc->rdx, sc->r8, sc->r9,
+> > +			&sc->seamcall_ret, &sc->out);
+> > +	if (ret)
+> > +		atomic_set(&sc->err, ret);
+> > +}
+> > +
+> > +/*
+> > + * Call the SEAMCALL on all online cpus concurrently.
+> > + * Return error if SEAMCALL fails on any cpu.
+> > + */
+> > +static int seamcall_on_each_cpu(struct seamcall_ctx *sc)
+> > +{
+> > +	on_each_cpu(seamcall_smp_call_function, sc, true);
+> > +	return atomic_read(&sc->err);
+> > +}
+> 
+> Why bother returning something that's not read?
 
-This may be useful to users, but it's not a hard requirement for this series.
+It's not needed.  I'll make it void.
+
+Caller can check seamcall_ctx::err directly if they want to know whether any
+error happened.
+
 
 
 -- 
