@@ -2,80 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CC335120FB
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 20:39:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA3635121E8
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 20:59:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229516AbiD0SgN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 14:36:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54926 "EHLO
+        id S231521AbiD0TCO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 15:02:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229765AbiD0SfJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 14:35:09 -0400
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F52111155;
-        Wed, 27 Apr 2022 11:22:21 -0700 (PDT)
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1njmIg-0001kz-B8; Wed, 27 Apr 2022 20:22:06 +0200
-Message-ID: <97fdc9bf-2a33-3ca9-cee8-6e88fd0c5d2c@maciej.szmigiero.name>
-Date:   Wed, 27 Apr 2022 20:21:59 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Content-Language: en-US
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20220423021411.784383-1-seanjc@google.com>
- <6991d5b3-0e42-207b-2da3-63dda27e0784@maciej.szmigiero.name>
-Subject: Re: [PATCH v2 00/11] KVM: SVM: Fix soft int/ex re-injection
-In-Reply-To: <6991d5b3-0e42-207b-2da3-63dda27e0784@maciej.szmigiero.name>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231532AbiD0TBp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 15:01:45 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C87B1CFC2
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 11:48:17 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id c194-20020a6335cb000000b0039d9a489d44so1309434pga.6
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 11:48:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=W31J+NXrVsC6+MO2Lwj0kB41xQsk0gH6sl8VC4G0Hhw=;
+        b=FESEaVxAwhhRxp009/PbfkU87OUhtLSXa32rvs7Sy1rWU0fM9GFCw5A3ulYIQlSwgF
+         hsymoNj32M8/ZLy0y54HR9w9x8Z8oYHlYOc0TmBwHpeLJMLwgeHs3TrV4FNvGbDFuvvt
+         XyvHEn41GBYC5Du+JHk4EFcMGoFQiDHuJOMoVzdMKfOgGPEzRvEsue/01R49rkbM/9b2
+         RsqFZzJB4cMmtGJr2G0U7BwT80PFoVDwDn1/xsPOmbDYYxzUItfAlrxrmCwTvp2kWy6w
+         HdDHBWxWkNAJHhmxBAAC/mV4UanmAA5bkIU9Bz5iiqMiMDyFkUFAYoE7dxNKPPvZSk48
+         S0/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=W31J+NXrVsC6+MO2Lwj0kB41xQsk0gH6sl8VC4G0Hhw=;
+        b=cXwRQcun2LR0N1sJs88YkU/VEJn9y2f5AZdHRrO9AEZQK6TsTo4LRTpuynXZnPl/W5
+         q6mIaL7uHO9ZZ4XnmkqOE5f59Io3Pr5UT9L18/+h1FP2Hdccgw/m886lvkZJkeOTnUpu
+         dsgzUlnmzWooW0o+ZIBBORekGQDGyYWa5fWM2ilBa3jPLHuIS1e/6jPk0xw39pF4b6To
+         mO43+UfNzUAVBa2G65ghHOEQolTVsayceYILHB8qfLLLFElgiI0Y0S6aRm1GDdGS9if1
+         U1WDjM3nPjX5er5jvSAZ32vmSuQ3HviP8vhgQJRm+T/oSsqThau3e8SHFk9FC3ouFbwB
+         dpfw==
+X-Gm-Message-State: AOAM531P8DVgUcEfpDzI8pCyp0in/co0PvO0QU4pV+B5+N1lj3Z/w/st
+        +nRKoQa3C6AaQp1JsdzLl06l3P8ZRaJh+5pItwWoGl6WDZ/a0a5y0I1ifPmS8DaCI41P7gGfrGU
+        DDAdIaJnY7iYi38keuxU5t+BbbmlAFIiy5HlSy/VnHZ7O/3LyCsZ1xOM+C7AM7wQ=
+X-Google-Smtp-Source: ABdhPJwPe8FNq1K7NbxdZ9TP/wTRtiQjsYQUJ4+BrlzwseokJPagTVD2W3Cq84m7PQ7pNxDPRSa8a14AiQHXxg==
+X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
+ (user=ricarkol job=sendgmr) by 2002:a62:2742:0:b0:505:89a5:2023 with SMTP id
+ n63-20020a622742000000b0050589a52023mr31612943pfn.18.1651085296858; Wed, 27
+ Apr 2022 11:48:16 -0700 (PDT)
+Date:   Wed, 27 Apr 2022 11:48:10 -0700
+Message-Id: <20220427184814.2204513-1-ricarkol@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
+Subject: [PATCH v2 0/4] KVM: arm64: vgic: Misc ITS fixes
+From:   Ricardo Koller <ricarkol@google.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     pbonzini@redhat.com, maz@kernel.org, andre.przywara@arm.com,
+        drjones@redhat.com, alexandru.elisei@arm.com,
+        eric.auger@redhat.com, oupton@google.com, reijiw@google.com,
+        pshier@google.com, Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26.04.2022 01:01, Maciej S. Szmigiero wrote:
-> On 23.04.2022 04:14, Sean Christopherson wrote:
->> Fix soft interrupt/exception reinjection on SVM.
->>
-> 
-> Thanks for the patch set Sean, I can't see anything being obviously wrong
-> during a static code review - just small nits.
-> 
-> Will test it practically tomorrow and report the results.
+The purpose of this series is to help debugging failed ITS saves and
+restores.  Failures can be due to misconfiguration on the guest side:
+tables with bogus base addresses, or the guest overwriting L1 indirect
+tables. KVM can't do much in these cases, but one thing it can do to help
+is raising errors as soon as possible. Here are a couple of cases where
+KVM could do more:
 
-I've tested this patch set and it seems to work fine with respect
-to soft {exception,interrupt} re-injection and next_rip field consistency.
+- A command that adds an entry into an ITS table that is not in guest
+  memory should fail, as any command should be treated as if it was
+  actually saving entries in guest memory (KVM doesn't until saving).  KVM
+  does this check for collections and devices (using vgic_its_check_id),
+  but it doesn't for the ITT (Interrupt Translation Table). Commit #1 adds
+  the missing check.
 
-I have prepared a draft of an updated version at [1] with the following
-further changes:
-* "Downgraded" the commit affecting !nrips CPUs to just drop nested SVM
-support for such parts instead of SVM support in general,
+- Restoring the ITS tables does some checks for corrupted tables, but not
+  as many as in a save.  For example, a device ID overflowing the table
+  will be detected on save but not on restore.  The consequence is that
+  restoring a corrupted table won't be detected until the next save;
+  including the ITS not working as expected after the restore. As an
+  example, if the guest sets tables overlapping each other, this would most
+  likely result in some corrupted table; and this is what we would see from
+  the host point of view:
 
-* Added a fix for L1/L2 NMI state confusion during L1 -> L2 NMI re-injection,
+	guest sets bogus baser addresses
+	save ioctl
+	restore ioctl
+	save ioctl (fails)
 
-* Updated the new KVM self-test to also check for the NMI injection
-scenario being fixed (that was found causing issues with a real guest),
+  This failed save could happen many days after the first operation, so it
+  would be hard to track down. Commit #2 adds some checks into restore:
+  like checking that the ITE entries are not repeated.
 
-* Changed "kvm_inj_virq" trace event "reinjected" field type to bool.
+- Restoring a corrupted collection entry is being ignored. Commit #3 fixes
+  this while trying to organize the code so to make the bug more obvious
+  next time.
 
-Will post a v3 patch set (with proper SoBs, etc.) if there are no further
-comments or objections.
+Finally, failed restores should clean up all intermediate state. Commit #4
+takes care of cleaning up everything created until the restore was deemed a
+failure.
 
-Thanks,
-Maciej
+v1: https://lore.kernel.org/kvmarm/20220425185534.57011-1-ricarkol@google.com/
+v1 -> v2:
+- moved alloc_collection comment to its respective commit. [marc]
+- refactored check_ite to reuse some code from check_id. [marc]
+- rewrote all commit messages. [marc]
 
-[1]: https://github.com/maciejsszmigiero/linux/commits/svm_next_rip-sc
+Tested with kvm-unit-tests ITS tests.
+
+Ricardo Koller (4):
+  KVM: arm64: vgic: Check that new ITEs could be saved in guest memory
+  KVM: arm64: vgic: Add more checks when restoring ITS tables
+  KVM: arm64: vgic: Do not ignore vgic_its_restore_cte failures
+  KVM: arm64: vgic: Undo work in failed ITS restores
+
+ arch/arm64/kvm/vgic/vgic-its.c | 112 +++++++++++++++++++++++++--------
+ 1 file changed, 87 insertions(+), 25 deletions(-)
+
+-- 
+2.36.0.464.gb9c8b46e94-goog
+
