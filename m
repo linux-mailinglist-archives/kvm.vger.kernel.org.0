@@ -2,100 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C749B5110DF
-	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 08:07:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E1175111FF
+	for <lists+kvm@lfdr.de>; Wed, 27 Apr 2022 09:07:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232728AbiD0GKL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 02:10:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38694 "EHLO
+        id S1358564AbiD0HLE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 03:11:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232772AbiD0GKJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 02:10:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DD8295AA60
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 23:06:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651039616;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aWgF3IzWwc8DWyaMyWyQeWJPbHFs1Ob+K2sFzH1yItI=;
-        b=U0GjodZyvRS1EHdF+kYQXRuJKjQ0GFVUU9hIcNPKgPq5SzcSjxxLx7CUZkO3m+R5vfrNGZ
-        IGPPivXenvp1gtCe32+rxYAvuI7BsV2DigQfBjnjRnlxlS8Cd2x9I/QMQjWBFo0nP9yPKV
-        D/lA8UytnHIhOxUKqMCgZs6yymvXuAQ=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-55-8o0yQZiHP26Vc1KwUefoBA-1; Wed, 27 Apr 2022 02:06:53 -0400
-X-MC-Unique: 8o0yQZiHP26Vc1KwUefoBA-1
-Received: by mail-ej1-f71.google.com with SMTP id sg44-20020a170907a42c00b006f3a40146e8so486469ejc.19
-        for <kvm@vger.kernel.org>; Tue, 26 Apr 2022 23:06:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=aWgF3IzWwc8DWyaMyWyQeWJPbHFs1Ob+K2sFzH1yItI=;
-        b=R7ieJfGlpBY7GCvcEcE+TXNhrlOSsXfPPa6eNNiUcrGrgYoXSB4lpYSaPzL4jjiF61
-         sguFkvFgBqQg/16k9qU0+wzdvoofXPPiq/tESDLjkW9kQ20R8//VLRd07cV2LTiQYipn
-         iIMerlDByItj7uxb4etKi2sY0QIfk1P+BxpLkAoYHnkBc7qy7569aLyaW7CtUwLdmJGC
-         vBzprMliPXjphwMCTSxquA1FaEBmSZE9iInkN9fti6L+eFS8ZVSb1DsHNBWfVI+sD+oz
-         m6ZKyIwF4Kx43NiKiQLrzmI68iv6MRfmvZf+Z8bu0clXLudujtNF+AiC2FW9fiZfVflW
-         25SA==
-X-Gm-Message-State: AOAM531WKSSpZP+v1DK0f5r7Q68M/K/Nw2PphKeK1oMZHVOYRXlwtlMK
-        lk2dKyc5Am7oU+eynptZaxdD/xPPj2zQwDa8TMVxu5h4Ar2Rj6wTnri2UuNnuxGaywn0T0kYnb0
-        YzfijSo1XSDUO
-X-Received: by 2002:a17:906:9b85:b0:6db:ab80:7924 with SMTP id dd5-20020a1709069b8500b006dbab807924mr24971949ejc.160.1651039612808;
-        Tue, 26 Apr 2022 23:06:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw1fzon5VKfL8UuAC13xokgOYYm8jW/639n9tuhmfdvm9dqgjTr2RdDrxELXnom6MWbMljbzg==
-X-Received: by 2002:a17:906:9b85:b0:6db:ab80:7924 with SMTP id dd5-20020a1709069b8500b006dbab807924mr24971936ejc.160.1651039612638;
-        Tue, 26 Apr 2022 23:06:52 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id o5-20020a170906974500b006dfc781498dsm6176164ejy.37.2022.04.26.23.06.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Apr 2022 23:06:51 -0700 (PDT)
-Message-ID: <24265b0c-ce9f-58b7-1717-944e4cd313c9@redhat.com>
-Date:   Wed, 27 Apr 2022 08:06:51 +0200
+        with ESMTP id S1357350AbiD0HLC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 03:11:02 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 189892B1B8;
+        Wed, 27 Apr 2022 00:07:52 -0700 (PDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23R3Xsjw013169;
+        Wed, 27 Apr 2022 07:07:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=B67+j3oXFnkiSg6DNRe3WHK5zySHQwpUkwhESGoxCbo=;
+ b=kRVTxpgyrde2oL1puFGAToRY0aCW/OxdFYkbSycCoSW2gvafb5tIxY5lgvGz5Vc9kEOF
+ eBABtkbul+D66Achobk9TOrPuXJCpzgZxuhSfwUOai2LlFVu9zW3EnHl7BnPcpHOBAol
+ VFWjUZ8uht8neRYecPDG4GHwgaOnV6HYdAVYU08GahL1Tp+LzetbG5Ze9Q+fUYdCws1H
+ TgztsNJsLetXw2Rm0xzgWId+K59U6wDfI/mxyBEbQqfBc79k/zbxxv6UcwjhNc0Xbfor
+ vQjuUQ0uEB+V+y4E4DFqfxipMo7SOxo6C4rDvwGGBrK/L6qdmjg9i4lF8jnSswuxx6rh MA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fpsspy5ud-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Apr 2022 07:07:51 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 23R6tJOP012846;
+        Wed, 27 Apr 2022 07:07:51 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fpsspy5tr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Apr 2022 07:07:51 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23R72Uv2013217;
+        Wed, 27 Apr 2022 07:07:49 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 3fm938wgkc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Apr 2022 07:07:48 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23R77jcN48365908
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 27 Apr 2022 07:07:45 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BD8F842042;
+        Wed, 27 Apr 2022 07:07:45 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 717394203F;
+        Wed, 27 Apr 2022 07:07:45 +0000 (GMT)
+Received: from [9.145.11.55] (unknown [9.145.11.55])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 27 Apr 2022 07:07:45 +0000 (GMT)
+Message-ID: <07c0a131-d695-1c08-e500-94b593203db9@linux.ibm.com>
+Date:   Wed, 27 Apr 2022 09:07:44 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: linux-next: build failure after merge of the kvm tree
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v2 0/9] kvm: s390: Add PV dump support
 Content-Language: en-US
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     KVM <kvm@vger.kernel.org>, Peter Gonda <pgonda@google.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-References: <20220419153423.644c0fa1@canb.auug.org.au>
- <20220427132327.731b35d8@canb.auug.org.au>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220427132327.731b35d8@canb.auug.org.au>
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, borntraeger@linux.ibm.com
+References: <20220310103112.2156-1-frankja@linux.ibm.com>
+In-Reply-To: <20220310103112.2156-1-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: jxELmoLMLNKBgohA32KvE1gGVyvSrCHR
+X-Proofpoint-ORIG-GUID: Tl9BbERA6vh2jqKsT20SM3F69hNSA8br
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-27_02,2022-04-26_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 mlxscore=0 phishscore=0 suspectscore=0 adultscore=0
+ lowpriorityscore=0 bulkscore=0 impostorscore=0 mlxlogscore=687
+ malwarescore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2202240000 definitions=main-2204270047
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/27/22 05:23, Stephen Rothwell wrote:
->>   #define KVM_SYSTEM_EVENT_NDATA_VALID    (1u << 31)
->>   			__u32 type;
->>   			__u32 ndata;
->> +			__u64 flags;
->>   			__u64 data[16];
->>   		} system_event;
->>   		/* KVM_EXIT_S390_STSI */
->> -- 
->> 2.35.1
-> I am still applying the above patch.
+On 3/10/22 11:31, Janosch Frank wrote:
+> Sometimes dumping inside of a VM fails, is unavailable or doesn't
+> yield the required data. For these occasions we dump the VM from the
+> outside, writing memory and cpu data to a file.
+> 
+> Up to now PV guests only supported dumping from the inside of the
+> guest through dumpers like KDUMP. A PV guest can be dumped from the
+> hypervisor but the data will be stale and / or encrypted.
+> 
+> To get the actual state of the PV VM we need the help of the
+> Ultravisor who safeguards the VM state. New UV calls have been added
+> to initialize the dump, dump storage state data, dump cpu data and
+> complete the dump process.
 
-I am waiting for review of 
-https://lore.kernel.org/kvm/202204230312.8EOM8DHM-lkp@intel.com/T/.
-
-Paolo
-
+Ping
