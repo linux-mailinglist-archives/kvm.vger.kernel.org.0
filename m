@@ -2,137 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B3F77513F36
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 01:49:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACBEE513F3D
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 01:53:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353425AbiD1XxI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Apr 2022 19:53:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42286 "EHLO
+        id S1353398AbiD1X5D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Apr 2022 19:57:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353422AbiD1XxH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Apr 2022 19:53:07 -0400
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F19D6AC06A
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 16:49:46 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id n126-20020a1c2784000000b0038e8af3e788so3850893wmn.1
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 16:49:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=focMG0Yvzu8kTNlJIkjfWrJiugje96+mCpIttRqo5P4=;
-        b=GOeTnHyfLUj1kYuuIm0Y/SV6rdbaURUuZyug5U8+bM9txNVDB4zqvMsTo6LgWxqqJ+
-         EJzVOKlCGbXzZnVXdg3zImUfxT1mhWA8cbxLRGVt1mE5eBxCAY3hnU4fMZFKFe1/ysTG
-         cyomFq/31PJ7L9dLLImNGTzmHFLpGkzqWJGCsZd6ESc2YMwmrym/vaV+ntsJIKN6uPzN
-         GHJN6ZJmWTueQxTkthcuYUVcXcDsF4uUX/S+zj4KBcwgIjmuet5DXc3NMlNVPJ+MF4Jl
-         g76wI45mkRhG8Ow9F+ienA/5IabcbdIA62pAqypAHshKR/CNShI7i+XFMGHcSQdqfi8n
-         ZW7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=focMG0Yvzu8kTNlJIkjfWrJiugje96+mCpIttRqo5P4=;
-        b=s1q7AswbHkGsnbXrOTY/tbEBdK5n/1LlqWOkqyxOf3WFmOZIwX3Ae/xtturADQvhrX
-         ieGcP6FjTB6CNM3Q8d2fRMWF2NKNa2+SMhzDc8ETZZkVeIPsZEKfp7nN9kQ7DGXx5wFQ
-         2goPiVVCSYkJzbmimReoTnyicNqPIzFPOYtpKAjzQlfRchMd6mJ6grcha6a9WCNU5uFJ
-         i/IAl2QDWtQrx0Pik41ebXknilYrMiATLcSx0x1TW3+Yfk2TTSB6Cwdd8aDzGj8KC0De
-         I5etBHN84LFa0Pkp1gL+irOSmIMt3kCoUFvk0jpYFbFuh4h1esDZB/3n2314QzPLLWzy
-         Fvog==
-X-Gm-Message-State: AOAM531DECftJy+X1ykmJc/d4cz7NqSqTAW2ng5TKyvR8DtccE5qd5Gb
-        H5CFETdE5KRkxJkdKuHhuoVI9vMdOetXXAgYAylmNg==
-X-Google-Smtp-Source: ABdhPJya8b5HEmPINhPN/otjpFgAZMsVFO+BsikAPMu9LghWg6ZEVzzp+YtbjdBMxFE0lABxkDoCV9sNN45FlpkElhQ=
-X-Received: by 2002:a05:600c:1c88:b0:394:dfa:917f with SMTP id
- k8-20020a05600c1c8800b003940dfa917fmr536458wms.27.1651189785285; Thu, 28 Apr
- 2022 16:49:45 -0700 (PDT)
+        with ESMTP id S230353AbiD1X47 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Apr 2022 19:56:59 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF901B3C78;
+        Thu, 28 Apr 2022 16:53:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651190023; x=1682726023;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=c+sAzt2o0UKRKpXJlOxWmvT2lgcpIolw3UTKXSk1UVQ=;
+  b=NSWzvN2Y/6yC4QryqaYDKnVwq/7CsCd2C/5VSNsCCXcXqf2A4Qca/2Gx
+   6eMzhI1C7dSAwvrxOTqy38urMIxcmMBmExC68CwlYJ10vOGOefVYV8JKp
+   gYLc/j2ItPwjY49+cYHDlcCI715twBVmjt1LH4sizxII0AUF0q7aUHUDT
+   qBCTbxNYRFvTE+TVIdx55rRrnJNywYgMTOX98WxRSTDNbjTlmc+2uvZxm
+   cW2KcWtbBflf+SPqJ8vGlCytkdIiFBHct0CeVHc5fOhbOQyBKm1MOY9Wt
+   KvG34HaPqvYRj1E+/C+LCJVeqjkRLm8PdaLs9whwGF3/TV+AEjrGli7WO
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10331"; a="265991706"
+X-IronPort-AV: E=Sophos;i="5.91,296,1647327600"; 
+   d="scan'208";a="265991706"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2022 16:53:43 -0700
+X-IronPort-AV: E=Sophos;i="5.91,296,1647327600"; 
+   d="scan'208";a="565862963"
+Received: from mpoursae-mobl2.amr.corp.intel.com (HELO [10.212.0.84]) ([10.212.0.84])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2022 16:53:42 -0700
+Message-ID: <0aa81fd0-a491-847d-9fc6-4b853f2cf7b4@intel.com>
+Date:   Thu, 28 Apr 2022 16:53:59 -0700
 MIME-Version: 1.0
-References: <20220426053904.3684293-1-yosryahmed@google.com>
- <20220426053904.3684293-5-yosryahmed@google.com> <YmegoB/fBkfwaE5z@google.com>
- <CAJD7tkY-WZKcyer=TbWF0dVfOhvZO7hqPN=AYCDZe1f+2HA-QQ@mail.gmail.com> <YmrSywSU1ezREvT6@google.com>
-In-Reply-To: <YmrSywSU1ezREvT6@google.com>
-From:   Yosry Ahmed <yosryahmed@google.com>
-Date:   Thu, 28 Apr 2022 16:49:09 -0700
-Message-ID: <CAJD7tkY1sdjXFAhftWG+ZV1B4z_HR9mf4QZGA-EJWeKaRQGs4Q@mail.gmail.com>
-Subject: Re: [PATCH v3 4/6] KVM: arm64/mmu: count KVM page table pages in
- pagetable stats
-To:     Oliver Upton <oupton@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Shakeel Butt <shakeelb@google.com>,
-        James Morse <james.morse@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, Linux-MM <linux-mm@kvack.org>,
-        cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v3 04/21] x86/virt/tdx: Add skeleton for detecting and
+ initializing TDX on demand
+Content-Language: en-US
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com
+References: <cover.1649219184.git.kai.huang@intel.com>
+ <32dcf4c7acc95244a391458d79cd6907125c5c29.1649219184.git.kai.huang@intel.com>
+ <ac482f2b-d2d1-0643-faa4-1b36340268c5@intel.com>
+ <22e3adf42b8ea2cae3aabc26f762acb983133fea.camel@intel.com>
+ <c833aff2-b459-a1d7-431f-bce5c5f29182@intel.com>
+ <37efe2074eba47c51bf5c1a2369a05ddf9082885.camel@intel.com>
+ <3731a852-71b8-b081-2426-3b0a650e174c@intel.com>
+ <edcae7ab1e6a074255a6624e8e0536bd77f84eed.camel@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <edcae7ab1e6a074255a6624e8e0536bd77f84eed.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 28, 2022 at 10:45 AM Oliver Upton <oupton@google.com> wrote:
->
-> On Tue, Apr 26, 2022 at 12:27:57PM -0700, Yosry Ahmed wrote:
-> > > What page tables do we want to account? KVM on ARM manages several page
-> > > tables.
-> > >
-> > > For regular KVM, the host kernel manages allocations for the hyp stage 1
-> > > tables in addition to the stage 2 tables used for a particular VM. The
-> > > former is system overhead whereas the latter could be attributed to a
-> > > guest VM.
-> >
-> > Honestly I would love to get your input on this. The main motivation
-> > here is to give users insights on the kernel memory usage on their
-> > system (or in a cgroup). We currently have NR_PAGETABLE stats for
-> > normal kernel page tables (allocated using
-> > __pte_alloc_one()/pte_free()), this shows up in /proc/meminfo,
-> > /path/to/cgroup/memory.stat, and node stats. The idea is to add
-> > NR_SECONDARY_PAGETABLE that should include the memory used for kvm
-> > pagetables, which should be a separate category (no overlap). What
-> > gets included or not depends on the semantics of KVM and what exactly
-> > falls under the category of secondary pagetables from the user's pov.
-> >
-> > Currently it looks like s2 page table allocations get accounted to
-> > kmem of memory control groups (GFP_KERNEL_ACCOUNT), while hyp page
-> > table allocations do not (GFP_KERNEL). So we could either follow this
-> > and only account s2 page table allocations in the stats, or make hyp
-> > allocations use GFP_KERNEL_ACCOUNT as well and add them to the stats.
-> > Let me know what you think.
->
-> I think it is reasonable to just focus on stage 2 table allocations and
-> ignore all else. As Marc pointed out it isn't workable in other
-> contexts anyway (pKVM), and keeps the patch tidy too.
->
-> GFP_KERNEL_ACCOUNT for hyp allocations wouldn't make sense, as it is
-> done at init to build out the system page tables for EL2.
+On 4/28/22 16:44, Kai Huang wrote:
+>> Just like the SME test, it doesn't even need to be precise.  It just
+>> needs to be 100% accurate in that it is *ALWAYS* set for any system that
+>> might have dirtied cache aliases.
+>>
+>> I'm not sure why you are so fixated on SEAMRR specifically for this.
+> I see.  I think I can simply use MTRR.SEAMRR bit check.  If CPU supports SEAMRR,
+> then basically it supports MKTME.
+> 
+> Is this look good for you?
 
-Thanks so much for the insights, will send out v4 according to our discussion.
+Sure, fine, as long as it comes with a coherent description that
+explains why the check is good enough.
 
->
-> --
-> Thanks,
-> Oliver
+>>> "During initializing the TDX module, one step requires some SEAMCALL must be
+>>> done on all logical cpus enabled by BIOS, otherwise a later step will fail. 
+>>> Disable CPU hotplug during the initialization process to prevent any CPU going
+>>> offline during initializing the TDX module.  Note it is caller's responsibility
+>>> to guarantee all BIOS-enabled CPUs are in cpu_present_mask and all present CPUs
+>>> are online."
+>> But, what if a CPU went offline just before this lock was taken?  What
+>> if the caller make sure all present CPUs are online, makes the call,
+>> then a CPU is taken offline.  The lock wouldn't do any good.
+>>
+>> What purpose does the lock serve?
+> I thought cpus_read_lock() can prevent any CPU from going offline, no?
+
+It doesn't prevent squat before the lock is taken, though.
