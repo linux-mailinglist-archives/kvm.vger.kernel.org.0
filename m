@@ -2,89 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A8F3F513934
-	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 17:58:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EA4E513962
+	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 18:07:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343948AbiD1QB1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Apr 2022 12:01:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57134 "EHLO
+        id S236159AbiD1QKo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Apr 2022 12:10:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232991AbiD1QBZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Apr 2022 12:01:25 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5027DAD136
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 08:58:11 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id n8so4763845plh.1
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 08:58:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=D5W8BN5fLNgb1BgZas8DGUwqs+FBpTKYjzFWJMRULiM=;
-        b=qsI0KU2AcANsDpqsXtUnUZJOk0dmozYqNgewlnAM2LK8cA/kQnraOZY7+1eCfPzfOh
-         VwJvcRX6gaupGUFTEoGwtjBH2rxZONEC3Zta+7r0FY6N+XCvRNP1UQ2txhDbO+9kq3ZT
-         ZqMDeIzd0hlCqzQKVKpkJvoBvoAzbauay59lfSR28dsAbkar5A0Gq64Ee/UBcdYIGrgJ
-         VMxK/Zu0j6QXj1u0KNoZovieRC/mE8ftoOmOH7OsOZtYMgXjaECbAcy5PtSjMBMSp+vv
-         qu2Y1yxr+RrGscUX1XyivmJA40iQB6uwNfjlHfGk1FmwMEcPNd+EVZOUUy5pCiPME+1z
-         46Tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=D5W8BN5fLNgb1BgZas8DGUwqs+FBpTKYjzFWJMRULiM=;
-        b=QjEUAzrK6R4948SJ/XYScrm6KVI+3gob2g7aZlV6cLneCx7sW7eUHYXhu+4bv5+ahj
-         TCLXnESyif2x7MaI3AgvUSgE2+pZpH3ylqpb9M1CSui8AciOts08oo24PR9zILwFKU8O
-         xxFX6qyuEOWFpyxdyx/HPgSlADDxzgGgh90kUtRVE1knZcQbODyFxX8xJT8/x356ADJm
-         IQFOMWtPrA+MMTnOGnHpevrD0K0AhDXdZ2LoMfSlKQZstz5/DVrkP0SdKufalW8nYGW1
-         g2V31gNXpL6t9a2Q+S86kbIfj3ag4+W2O96pUxGv+Dx3cvL8x7ew+2rKJWAH8Y/4Be7K
-         L5oA==
-X-Gm-Message-State: AOAM531NXCrLhGQLPqwjO9bFVuOm8H3PBPx/jeu3Y0I/FYBSHEsUuPu6
-        4dfOEj5zmLXm+WscpFBTmijVFg==
-X-Google-Smtp-Source: ABdhPJzfpQ9n5T0M/1gYzl/ihQ2cFlEXZ4t7vzP2iLTgnTlDoFcNQteDvy2UeFVkTh+pRLULL2NAdA==
-X-Received: by 2002:a17:902:e847:b0:15d:1533:3053 with SMTP id t7-20020a170902e84700b0015d15333053mr21056164plg.49.1651161490637;
-        Thu, 28 Apr 2022 08:58:10 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h132-20020a62838a000000b0050d3d6ad020sm242380pfe.205.2022.04.28.08.58.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Apr 2022 08:58:10 -0700 (PDT)
-Date:   Thu, 28 Apr 2022 15:58:06 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     SU Hang <darcy.sh@antgroup.com>
-Cc:     drjones@redhat.com, kvm@vger.kernel.org, pbonzini@redhat.com,
-        thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH 2/2] x86: replace `int 0x20` with `syscall`
-Message-ID: <Ymq5jsuPIjkXSQxj@google.com>
-References: <YmbFN6yKwnLDRdr8@google.com>
- <20220427092700.98464-1-darcy.sh@antgroup.com>
+        with ESMTP id S236129AbiD1QKj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Apr 2022 12:10:39 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 447B15BE4E
+        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 09:07:21 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C86731474;
+        Thu, 28 Apr 2022 09:07:20 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1BCB03F774;
+        Thu, 28 Apr 2022 09:07:18 -0700 (PDT)
+Date:   Thu, 28 Apr 2022 17:07:21 +0100
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com, Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>,
+        Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH v2] KVM: arm64: Inject exception on out-of-IPA-range
+ translation fault
+Message-ID: <Ymq7qUU67DoXTmkP@monolith.localdoman>
+References: <20220427220434.3097449-1-maz@kernel.org>
+ <YmpUXWRJc3Kq3wGE@monolith.localdoman>
+ <87zgk5b5bh.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220427092700.98464-1-darcy.sh@antgroup.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <87zgk5b5bh.wl-maz@kernel.org>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 27, 2022, SU Hang wrote:
-> > It doesn't matter at this time because this framework doesn't ses SYSRET, but
-> > this should be USER_CS or USER_CS64.
-> Oops, intel SDM vol.3 <chap 5.8.8> says:
-> """
-> When SYSRET transfers control to 64-bit mode user code using REX.W, the
-> processor gets the privilege level 3 target code segment, instruction pointer,
->           stack segment, and flags as follows:
->     • Target code segment — Reads a non-NULL selector from IA32_STAR[63:48] + 16.
+Hi,
 
-Ugh, missed that detail.
+On Thu, Apr 28, 2022 at 04:22:58PM +0100, Marc Zyngier wrote:
+> On Thu, 28 Apr 2022 09:46:21 +0100,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > 
+> > Hi,
+> > 
+> > On Wed, Apr 27, 2022 at 11:04:34PM +0100, Marc Zyngier wrote:
+> > > When taking a translation fault for an IPA that is outside of
+> > > the range defined by the hypervisor (between the HW PARange and
+> > > the IPA range), we stupidly treat it as an IO and forward the access
+> > > to userspace. Of course, userspace can't do much with it, and things
+> > > end badly.
+> > > 
+> > > Arguably, the guest is braindead, but we should at least catch the
+> > > case and inject an exception.
+> > > 
+> > > Check the faulting IPA against:
+> > > - the sanitised PARange: inject an address size fault
+> > > - the IPA size: inject an abort
+> > > 
+> > > Reported-by: Christoffer Dall <christoffer.dall@arm.com>
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_emulate.h |  1 +
+> > >  arch/arm64/kvm/inject_fault.c        | 28 ++++++++++++++++++++++++++++
+> > >  arch/arm64/kvm/mmu.c                 | 19 +++++++++++++++++++
+> > >  3 files changed, 48 insertions(+)
+> > > 
+> > > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > > index 7496deab025a..f71358271b71 100644
+> > > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > > @@ -40,6 +40,7 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
+> > >  void kvm_inject_vabt(struct kvm_vcpu *vcpu);
+> > >  void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
+> > >  void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
+> > > +void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
+> > >  
+> > >  void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
+> > >  
+> > > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> > > index b47df73e98d7..ba20405d2dc2 100644
+> > > --- a/arch/arm64/kvm/inject_fault.c
+> > > +++ b/arch/arm64/kvm/inject_fault.c
+> > > @@ -145,6 +145,34 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
+> > >  		inject_abt64(vcpu, true, addr);
+> > >  }
+> > >  
+> > > +void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +	unsigned long addr, esr;
+> > > +
+> > > +	addr  = kvm_vcpu_get_fault_ipa(vcpu);
+> > > +	addr |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
+> > > +
+> > > +	if (kvm_vcpu_trap_is_iabt(vcpu))
+> > > +		kvm_inject_pabt(vcpu, addr);
+> > > +	else
+> > > +		kvm_inject_dabt(vcpu, addr);
+> > > +
+> > > +	/*
+> > > +	 * If AArch64 or LPAE, set FSC to 0 to indicate an Address
+> > > +	 * Size Fault at level 0, as if exceeding PARange.
+> > > +	 *
+> > > +	 * Non-LPAE guests will only get the external abort, as there
+> > > +	 * is no way to to describe the ASF.
+> > > +	 */
+> > > +	if (vcpu_el1_is_32bit(vcpu) &&
+> > > +	    !(vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE))
+> > > +		return;
+> > > +
+> > > +	esr = vcpu_read_sys_reg(vcpu, ESR_EL1);
+> > > +	esr &= ~GENMASK_ULL(5, 0);
+> > > +	vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
+> > > +}
+> > > +
+> > >  /**
+> > >   * kvm_inject_undefined - inject an undefined instruction into the guest
+> > >   * @vcpu: The vCPU in which to inject the exception
+> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > index 53ae2c0640bc..5400fc020164 100644
+> > > --- a/arch/arm64/kvm/mmu.c
+> > > +++ b/arch/arm64/kvm/mmu.c
+> > > @@ -1337,6 +1337,25 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+> > >  	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
+> > >  	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+> > >  
+> > > +	if (fault_status == FSC_FAULT) {
+> > > +		/* Beyond sanitised PARange (which is the IPA limit) */
+> > > +		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
+> > > +			kvm_inject_size_fault(vcpu);
+> > > +			return 1;
+> > > +		}
+> > > +
+> > > +		/* Falls between the IPA range and the PARange? */
+> > > +		if (fault_ipa >= BIT_ULL(vcpu->arch.hw_mmu->pgt->ia_bits)) {
+> > > +			fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
+> > > +
+> > > +			if (is_iabt)
+> > > +				kvm_inject_pabt(vcpu, fault_ipa);
+> > > +			else
+> > > +				kvm_inject_dabt(vcpu, fault_ipa);
+> > > +			return 1;
+> > > +		}
+> > 
+> > Doesn't KVM treat faults outside a valid memslot (aka guest RAM) as MMIO
+> > aborts? From the guest's point of view, the IPA is valid because it's
+> > inside the HW PARange, so it's not entirely impossible that the VMM put a
+> > device there.
+> 
+> Sure. But the generated IPA is outside of the range the VMM has asked
+> to handle. The IPA space describes the whole of the guest address
+> space, and there shouldn't be anything outside of it.
+> 
+> We actually state in the documentation that the IPA Size limit *is*
+> the physical address size for the VM. If the VMM places something
+> outside if the IPA space and still expect something to be reported to
+> it, we have a problem (in some cases, we may want to actually put page
+> tables in place even for MMIO that traps to userspace -- see my
+> earlier work on MMIO guard).
 
->     • Stack segment — IA32_STAR[63:48] + 8.
-> """
+If you mean this bit:
 
+On arm64, the physical address size for a VM (IPA Size limit) is limited
+to 40bits by default. The limit can be configured if the host supports the
+extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
+KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
+identifier, where IPA_Bits is the maximum width of any physical
+address used by the VM.
+
+And then below there is this paragraph:
+
+Please note that configuring the IPA size does not affect the capability
+exposed by the guest CPUs in ID_AA64MMFR0_EL1[PARange]. It only affects
+**size of the address translated by the stage2 level (guest physical to
+host physical address translations)**.
+
+Emphasis added by me.
+
+It looks to me like the two paragraph state different things, first says
+the IPA size caps "the physical address size for a VM", the second that it
+caps the RAM size - "size of the address translated by the stage 2 level.
+
+I have no problem with either, but it looks confusing.
+
+So if a VMM that wants to put devices above RAM it must make sure that the
+IPA size is extended to match, did I get that right?
+
+I'm also a bit confused about the rationale. Why is the PARange exposed to
+the guest in effect the wrong value, because the true PARange is defined by
+IPA size?
+
+Thanks,
+Alex
