@@ -2,110 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A6D25137AF
-	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 17:04:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED2B55137B8
+	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 17:05:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348753AbiD1PIC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Apr 2022 11:08:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37950 "EHLO
+        id S1348779AbiD1PIt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Apr 2022 11:08:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348744AbiD1PH7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Apr 2022 11:07:59 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99691B3DE2
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 08:04:44 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id bg9so4194239pgb.9
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 08:04:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=1izZyID2JVcsZHuk9qcOHy8QVMSnHDmxGlhaD1X6JZE=;
-        b=WRrJSVfXKnRNEU+qLmI6Rj4HeuvfpqNhpSzfbha0UXvP5WsX/CY+Mkf0pCsoTch+hq
-         svxDaQLsuJlSGtth0lbdJkOyy/GkU6McQfvA2Kv8LUa29WtIbFgShnyjHj7EA4fg6Usz
-         H3Lv9xgE1ALBpsbhNoVhyIvkXT/ohsz0pgzmDDKtYscNfegRR556kZLTSOjRnBnZUJgl
-         LsKfLKhjf8uYsT0xnqXCTzYiZ8/nzsdLgEwvM64AI5AQe5PE6wOICBBZgEscHUaq9Ros
-         2I6p6Pz7jYW4IGIqw3eGJ0qBdWOmeFThZBTcx+evNZtZLsoB9FQfEhVfVOGey2/NykuD
-         fc2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=1izZyID2JVcsZHuk9qcOHy8QVMSnHDmxGlhaD1X6JZE=;
-        b=LfYhv+gZScy6eS74FCt8zI+VVYc1n0EqPOsLvt22mozKwF9UJU4uHcFkwkWTeSXyE7
-         davICj/dgqS9AbZRVAP7oOyj1/Ii2Sct1E3G6bNpMpLPPFbUTefJtO6l2TACs3F3QI3J
-         fNUPy4c3DJKMnYRA7I91KSVAWbEX7RrTnJ1xvxPYXBTwfo6FpYftOTWFBpI1rYw2+1mG
-         6vL9lTlOuwVwRSVGaa5YCHXjs0Dop6tv6Xg04bWVWAPc2AynkshG8tlOAyU6FJT8x1S0
-         LYs7yatWb23R0uLo+HYzBIcMP8jeeQn8r+hhRpLLwaC8uGtcSXhQtx3CxoXNZ8ewzNko
-         dN0Q==
-X-Gm-Message-State: AOAM532PgwDPp10jxsNbk8MfMwkIVqu3SPrYf3nfANNfduDW2Lpts8se
-        wJBfpr6g6v76f31kHtDWqUEu/w==
-X-Google-Smtp-Source: ABdhPJyaj8spNf9/8BRmduOg+RCzwbSCa+S1Ac5s2d0kitz8NoF0jbdjfCL+Rbgk9DOX5MTCpjjaew==
-X-Received: by 2002:a65:6955:0:b0:380:64fd:a2dd with SMTP id w21-20020a656955000000b0038064fda2ddmr27637714pgq.383.1651158283925;
-        Thu, 28 Apr 2022 08:04:43 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id s9-20020a639e09000000b003c14af5063asm3225467pgd.82.2022.04.28.08.04.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Apr 2022 08:04:43 -0700 (PDT)
-Date:   Thu, 28 Apr 2022 15:04:40 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 02/11] KVM: SVM: Don't BUG if userspace injects a soft
- interrupt with GIF=0
-Message-ID: <YmqtCNFxCSF2hENP@google.com>
-References: <20220423021411.784383-1-seanjc@google.com>
- <20220423021411.784383-3-seanjc@google.com>
- <61ad22d6de1f6a51148d2538f992700cac5540d4.camel@redhat.com>
- <4baa5071-3fb6-64f3-bcd7-2ffc1181d811@maciej.szmigiero.name>
- <b8a02f2eab780262c172cd4bbffd801ca8a37e98.camel@redhat.com>
+        with ESMTP id S230392AbiD1PIr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Apr 2022 11:08:47 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0DD6289AF;
+        Thu, 28 Apr 2022 08:05:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651158331; x=1682694331;
+  h=message-id:date:mime-version:subject:to:references:from:
+   in-reply-to:content-transfer-encoding;
+  bh=eOK5HE/oeuSepL/hJEIhyFK1/8Mn9ZDugt6wwTOmKLM=;
+  b=aXkbQ7YdroWWcv7nZf3WFKOiRtpFP+85k3uo/LASPD1y0neuifA2nx72
+   SypFP8BY3n5JgEUGVXH2knFq4Tz92f2tl+pHRjiu/9uItB+FUsB+DvhFS
+   iD6K9CPxHX/Ynn31vGXddVVoIp/zdhM1bjkNpUoHufLWm1+bY+fwvT6VK
+   RMRZ2fKv41ZXDRlpObrBQCLEMM8hAsc5K9pRBq9xtW2hWQ2zSdeq8FoOi
+   mwAlQR+2owUGc9SRJbDJH7KbJeAG1F2+jUP5cDLOtHBqHZCPFsTfp8jq6
+   FFnHTaw6fcfLJNwXsO3MvyqrlZN1JXZMtiAOAoReokwg7U0fIEhLBwLco
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10330"; a="246873976"
+X-IronPort-AV: E=Sophos;i="5.91,295,1647327600"; 
+   d="scan'208";a="246873976"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2022 08:05:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,295,1647327600"; 
+   d="scan'208";a="651255558"
+Received: from linux.intel.com ([10.54.29.200])
+  by FMSMGA003.fm.intel.com with ESMTP; 28 Apr 2022 08:05:31 -0700
+Received: from [10.209.10.70] (kliang2-MOBL.ccr.corp.intel.com [10.209.10.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by linux.intel.com (Postfix) with ESMTPS id 2D891580689;
+        Thu, 28 Apr 2022 08:05:30 -0700 (PDT)
+Message-ID: <6f2107fd-4475-86c7-e410-fe02c37b0f4d@linux.intel.com>
+Date:   Thu, 28 Apr 2022 11:05:29 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b8a02f2eab780262c172cd4bbffd801ca8a37e98.camel@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+Subject: Re: [PATCH v10 15/16] KVM: x86: Add Arch LBR data MSR access
+ interface
+Content-Language: en-US
+To:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
+        jmattson@google.com, seanjc@google.com, like.xu.linux@gmail.com,
+        vkuznets@redhat.com, wei.w.wang@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220422075509.353942-1-weijiang.yang@intel.com>
+ <20220422075509.353942-16-weijiang.yang@intel.com>
+From:   "Liang, Kan" <kan.liang@linux.intel.com>
+In-Reply-To: <20220422075509.353942-16-weijiang.yang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 28, 2022, Maxim Levitsky wrote:
-> On Thu, 2022-04-28 at 15:27 +0200, Maciej S. Szmigiero wrote:
-> > On 28.04.2022 09:35, Maxim Levitsky wrote:
-> > > On Sat, 2022-04-23 at 02:14 +0000, Sean Christopherson wrote:
-> > > > From: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-> > > > 
-> > > > Don't BUG/WARN on interrupt injection due to GIF being cleared if the
-> > > > injected event is a soft interrupt, which are not actually IRQs and thus
-> > > 
-> > > Are any injected events subject to GIF set? I think that EVENTINJ just injects
-> > > unconditionaly whatever hypervisor puts in it.
-> > 
-> > That's right, EVENTINJ will pretty much always inject, even when the CPU
-> > is in a 'wrong' state (like for example, injecting a hardware interrupt
-> > or a NMI with GIF masked).
-> > 
-> > But KVM as a L0 is not supposed to inject a hardware interrupt into guest
-> > with GIF unset since the guest is obviously not expecting it then.
-> > Hence this WARN_ON().
+
+
+On 4/22/2022 3:55 AM, Yang Weijiang wrote:
+> Arch LBR MSRs are xsave-supported, but they're operated as "independent"
+> xsave feature by PMU code, i.e., during thread/process context switch,
+> the MSRs are saved/restored with PMU specific code instead of generic
+> kernel fpu XSAVES/XRSTORS operation. 
+
+During thread/process context switch, Linux perf still uses the 
+XSAVES/XRSTORS operation to save/restore the LBR MSRs.
+
+Linux perf only manipulates these MSRs only when the xsave feature is 
+not supported.
+
+Thanks,
+Kan
+
+> When vcpu guest/host fpu state swap
+> happens, Arch LBR MSRs won't be touched so access them directly.
 > 
-> If you mean L0->L1 injection, that sure, but if L1 injects interrupt to L2,
-> then it should always be allowed to do so.
-
-Yes, L1 can inject whatever it wants, whenever it wants.
-
-I kept the WARN_ON() under the assumption that KVM would refuse to inject IRQs
-stuffed by userspace if GIF is disabled, but looking at the code again, I have
-no idea why I thought that.  KVM_SET_VCPU_EVENTS blindly takes whatever userspace
-provides, I don't see anything that would prevent userspace from shoving in a
-hardware IRQ.
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>   arch/x86/kvm/vmx/pmu_intel.c | 10 ++++++++++
+>   1 file changed, 10 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index 79eecbffa07b..5f81644c4612 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -431,6 +431,11 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   	case MSR_ARCH_LBR_CTL:
+>   		msr_info->data = vmcs_read64(GUEST_IA32_LBR_CTL);
+>   		return 0;
+> +	case MSR_ARCH_LBR_FROM_0 ... MSR_ARCH_LBR_FROM_0 + 31:
+> +	case MSR_ARCH_LBR_TO_0 ... MSR_ARCH_LBR_TO_0 + 31:
+> +	case MSR_ARCH_LBR_INFO_0 ... MSR_ARCH_LBR_INFO_0 + 31:
+> +		rdmsrl(msr_info->index, msr_info->data);
+> +		return 0;
+>   	default:
+>   		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
+>   		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
+> @@ -512,6 +517,11 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   		    (data & ARCH_LBR_CTL_LBREN))
+>   			intel_pmu_create_guest_lbr_event(vcpu);
+>   		return 0;
+> +	case MSR_ARCH_LBR_FROM_0 ... MSR_ARCH_LBR_FROM_0 + 31:
+> +	case MSR_ARCH_LBR_TO_0 ... MSR_ARCH_LBR_TO_0 + 31:
+> +	case MSR_ARCH_LBR_INFO_0 ... MSR_ARCH_LBR_INFO_0 + 31:
+> +		wrmsrl(msr_info->index, msr_info->data);
+> +		return 0;
+>   	default:
+>   		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
+>   		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
