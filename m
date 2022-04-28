@@ -2,93 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 04F335136F7
-	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 16:33:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6145A5136FE
+	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 16:35:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348257AbiD1Oga (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Apr 2022 10:36:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42192 "EHLO
+        id S1348307AbiD1OiJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Apr 2022 10:38:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232063AbiD1Og2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Apr 2022 10:36:28 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6729DB53F0
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 07:33:14 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id j17so4396708pfi.9
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 07:33:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=BuOTqKc9sqFd+ASkPxmorv168u2FksHgKMK0GFD3aGQ=;
-        b=YqaNvZ7/aCJqDhRJhCBs70cMsPakYNrz1UntfpjxnLvPHbRr7iZCG1JEZGZjblmTt/
-         km3XqonzOCSEJtxdQOCu0rV4miGWEhjUiJ/O9Z6aj2vKVtJ9ZKraHTeB/qMhAbYjfmoD
-         CFgsTwQmuagVPmuBYE3XzMIQeyewGsY2yQhPGrMlKqi6qop6vR/43BAcxE5XeGgMoWBd
-         mEiQenGsvxDZhKFY6HrMxnk1aA7PCRmS7SJhgA/M4wdf2FQWP/dKlppc8QJzr4jXCKLb
-         CdqnD9hBL7Fcz086P5vbK4BgQCBGT2SFvA/Uq6SquJvGxC3G6rPJRoEurG4llhu+gM01
-         ECAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=BuOTqKc9sqFd+ASkPxmorv168u2FksHgKMK0GFD3aGQ=;
-        b=fy92a/nXC9i0Hl80ireClJBkxO1+htrWaz/7NO5lOZhqO58NKgWYJ3Z1UNh4Eg3lPj
-         Zg1Iz1zzEDq9RbHwNqkqAqPPapwM4jc3Hw/8FHAp4exYbJ0ox5K9UBqkSGYfsMsL6vhK
-         Lu5KB5fgIXDxoWB1RSVFTnwTXXq7OWGx+rsS6fQ72cSGWlFcrNAyOF3n0aWFZ8SPlGV+
-         NWJxspYxkcml1F7flp6oYXvD6nkjFWQtCY27Pi9AlZ7jRhRCv9+/pXUI8ookeC18W4H/
-         E8LzdEBIuUb8ipACuGiyHEvdRIMT+3zc6NBtiIeDSNEs7WShj+OBi7WHPkFmMAasJFgB
-         wJNQ==
-X-Gm-Message-State: AOAM533tTmtoGwVUp2k8bCeMGP25wBfnORiHajpOu5mpLskEWTi03Mx+
-        tdzT1Q7/XoFriW+XigjpLc/1gQ==
-X-Google-Smtp-Source: ABdhPJxq6bzKApArCJ8hwnuvcE1d1i8whx/RLcvuw8uep9J2dflc6Bb/JzAD2oItd84sVyAC4KTLWw==
-X-Received: by 2002:a63:5b0c:0:b0:3ab:358a:3b16 with SMTP id p12-20020a635b0c000000b003ab358a3b16mr17745860pgb.306.1651156393674;
-        Thu, 28 Apr 2022 07:33:13 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y26-20020a056a00181a00b004fe3a6f02cesm93936pfa.85.2022.04.28.07.33.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Apr 2022 07:33:13 -0700 (PDT)
-Date:   Thu, 28 Apr 2022 14:33:10 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        with ESMTP id S230364AbiD1OiI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Apr 2022 10:38:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C716DB6E50
+        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 07:34:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651156491;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5PDm4tHCHPYdLQ9C5vAO9ilNtVAoyTm1UBO+qRDuy2I=;
+        b=Sn4z5XqgjETqPOGWmwO3piPSS7DWP7yytyJbIZa3tfpEsBC9w6nM8WwUzQ2QuIt4bZrUCm
+        lcMPbWNsKlcf795/zT+nAAlAWmVd00zNVr84tH8/qWnJ9Qsd4UTVWLcRg/NVdWs8bKAehx
+        /Bhnt2HsOxbwBW8OnthnpXltMuGYjwg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-259-mXTDc8oQPDqKujQj-mWFaQ-1; Thu, 28 Apr 2022 10:34:48 -0400
+X-MC-Unique: mXTDc8oQPDqKujQj-mWFaQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8B9328001EA;
+        Thu, 28 Apr 2022 14:34:47 +0000 (UTC)
+Received: from starship (unknown [10.40.192.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8C3242166B4D;
+        Thu, 28 Apr 2022 14:34:45 +0000 (UTC)
+Message-ID: <b8a02f2eab780262c172cd4bbffd801ca8a37e98.camel@redhat.com>
+Subject: Re: [PATCH v2 02/11] KVM: SVM: Don't BUG if userspace injects a
+ soft interrupt with GIF=0
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Mingwei Zhang <mizhang@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v2 6/8] KVM: Fix multiple races in gfn=>pfn cache refresh
-Message-ID: <YmqlpgE5iCBTdbnk@google.com>
-References: <20220427014004.1992589-1-seanjc@google.com>
- <20220427014004.1992589-7-seanjc@google.com>
- <CAJhGHyB4RwNekpKNQu_KsGTZCyz2EoZMt0V9+PF=p43EksD_6Q@mail.gmail.com>
+        linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Date:   Thu, 28 Apr 2022 17:34:44 +0300
+In-Reply-To: <4baa5071-3fb6-64f3-bcd7-2ffc1181d811@maciej.szmigiero.name>
+References: <20220423021411.784383-1-seanjc@google.com>
+         <20220423021411.784383-3-seanjc@google.com>
+         <61ad22d6de1f6a51148d2538f992700cac5540d4.camel@redhat.com>
+         <4baa5071-3fb6-64f3-bcd7-2ffc1181d811@maciej.szmigiero.name>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJhGHyB4RwNekpKNQu_KsGTZCyz2EoZMt0V9+PF=p43EksD_6Q@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 28, 2022, Lai Jiangshan wrote:
-> On Wed, Apr 27, 2022 at 7:16 PM Sean Christopherson <seanjc@google.com> wrote:
+On Thu, 2022-04-28 at 15:27 +0200, Maciej S. Szmigiero wrote:
+> On 28.04.2022 09:35, Maxim Levitsky wrote:
+> > On Sat, 2022-04-23 at 02:14 +0000, Sean Christopherson wrote:
+> > > From: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> > > 
+> > > Don't BUG/WARN on interrupt injection due to GIF being cleared if the
+> > > injected event is a soft interrupt, which are not actually IRQs and thus
+> > 
+> > Are any injected events subject to GIF set? I think that EVENTINJ just injects
+> > unconditionaly whatever hypervisor puts in it.
 > 
-> > @@ -159,10 +249,23 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
-> >
+> That's right, EVENTINJ will pretty much always inject, even when the CPU
+> is in a 'wrong' state (like for example, injecting a hardware interrupt
+> or a NMI with GIF masked).
 > 
-> The following code of refresh_in_progress is somewhat like mutex.
-> 
-> + mutex_lock(&gpc->refresh_in_progress); // before write_lock_irq(&gpc->lock);
-> 
-> Is it fit for the intention?
+> But KVM as a L0 is not supposed to inject a hardware interrupt into guest
+> with GIF unset since the guest is obviously not expecting it then.
+> Hence this WARN_ON().
 
-Yeah, I mutex should work.  Not sure why I shied away from a mutex...
+If you mean L0->L1 injection, that sure, but if L1 injects interrupt to L2,
+then it should always be allowed to do so.
+
+
+I am not sure that I am right here, just noticed something odd. I'll take
+a better look at this next week.
+
+
+Best regards,
+	Maxim levitsky
+
+> 
+> > Best regards,
+> > 	Maxim Levitsky
+> 
+> Thanks,
+> Maciej
+> 
+
+
