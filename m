@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3341D5134F4
+	by mail.lfdr.de (Postfix) with ESMTP id 7C27E5134F5
 	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 15:23:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346999AbiD1N0I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Apr 2022 09:26:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58192 "EHLO
+        id S1346139AbiD1N0G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Apr 2022 09:26:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230508AbiD1N0E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S238725AbiD1N0E (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 28 Apr 2022 09:26:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 625DDAC917
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3F29FAC914
         for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 06:22:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1651152169;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=8PQduM8Cm6+v2eU6zkUJYKtrg0KGSwBOax3SMcC5NWw=;
-        b=JSeCV7e+pbXQUnARr8DAYLAy1wH1HcomXBJiwzlma593Jg/Z+OIFkTL4mwmIs1gA4+MB2K
-        RIOvp9c3TfuuzGjWB+IV+hZ/uOXHlhUu8qdvHKg80YaHF2htrHLBJVpIgWEpb83QzwPtuf
-        gFa0fa8iTu+/xyBxLAF01fRgxVvBJao=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=W6dlhZBY+AtMsp+AcyPDmHg9swfew9GIgRtcUZ3Lw40=;
+        b=ERGRWPExNBg0Pvy0b1aC2RyZ9uCcm09vBbygDZnBwciKtm+n9Ib9QUd7nZLGQGTrh5QajR
+        ncKogxSpXRWn6zXHwX6Wi8ji3XWCbMPZ7bjRh2m63jTc/GtG5QbdL6yqhUqbdGBS71SlNQ
+        Mwl0kEKBSIi081bEWFfOIPEaHIMq3F8=
 Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
  [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-394-B7tYvC7PNWG5DT2j1XHIPQ-1; Thu, 28 Apr 2022 09:22:45 -0400
-X-MC-Unique: B7tYvC7PNWG5DT2j1XHIPQ-1
-Received: by mail-wr1-f72.google.com with SMTP id o11-20020adfca0b000000b0020adc114131so1930399wrh.8
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 06:22:45 -0700 (PDT)
+ us-mta-231-NjKFEaHZO-GLizLpxz31ww-1; Thu, 28 Apr 2022 09:22:48 -0400
+X-MC-Unique: NjKFEaHZO-GLizLpxz31ww-1
+Received: by mail-wr1-f72.google.com with SMTP id y13-20020adfc7cd000000b0020ac7c7bf2eso1935910wrg.9
+        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 06:22:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=8PQduM8Cm6+v2eU6zkUJYKtrg0KGSwBOax3SMcC5NWw=;
-        b=1n7mE77Y/5qVWyfd9Nt2KZUedCMmKq5pRgmHVSksDVE9fuwuKjTjFSvSp309m/XecH
-         hk45sUc+t2smiE50ggI/Cqw0/hZJ1XApJl2aK7+QezQuEFyFala57tVMcNBs4vlb1do3
-         BighaF6yMlySxYESfQUdkJKkp2Hrle+iqpxBVLfSpwJAGoR6jZI1VEwmhxo6TyRFDY/B
-         Q9eXnn8u+5BX2LOp7ORyA08GO0mSj0Qs6MFoF9p+tzKwvjLl2UuJLXTBn5l5M3HQK4QZ
-         MyxQ+QWulHB8s1oP+9dUyCYOtIwMVmJbhqzLnOf7zmImt+TBnL5oNmKLViSAr4HLsbjE
-         YLOw==
-X-Gm-Message-State: AOAM531Bm6rOFkNwXVX46LSSw3wKgjDLRk2W5OiJLVpIXkxzeEbqP20x
-        cJyIvt6EHwlXqgVsNNCO8w3gcnX/ipFp9m8W97pHa8cSwAFv7Fm/8FFnf48zb1lmvPqDtXK+tjH
-        eLZ9n0gA5SMNu
-X-Received: by 2002:a1c:2185:0:b0:38f:f4ed:f964 with SMTP id h127-20020a1c2185000000b0038ff4edf964mr31065702wmh.115.1651152164528;
-        Thu, 28 Apr 2022 06:22:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyh0SQ9LojN8eIegKUo+h+ntmqGzG2tJdfRq4/rRAMPBONENZjji/VGZxEgoBORxb2iYpBK1g==
-X-Received: by 2002:a1c:2185:0:b0:38f:f4ed:f964 with SMTP id h127-20020a1c2185000000b0038ff4edf964mr31065683wmh.115.1651152164320;
-        Thu, 28 Apr 2022 06:22:44 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=W6dlhZBY+AtMsp+AcyPDmHg9swfew9GIgRtcUZ3Lw40=;
+        b=xz2r1A0mzLUSAOeUnnNap8LmI1Clc3b+WITQlv/2szgxAzmNeTd3NyYVB9xRJpjPtK
+         q3jqTw5L+rOuPAEIHanGoe7KUBGZwb1+uviF94h+dTu9N7iiDfkT3nXlXo65FZWGtxGO
+         8E/CJtbh6nesnBewCgr0wT3DONxMGfAvRLn+XWrZxVfndLMKGd6y8vWi6/cILrvHsZg+
+         KhZfrpRH1szZSGn+gyXAi+Hr/RqJUggKkGUDNnKEDQ9l51z1GPNquHmGtVSVsBFp9pAQ
+         NjIjzDOqH+/ZmG5yo7cs/oB9TiBeGZQgkKt/vL8SJYXEo0/grxklArj/Ii8Xca9e3/h+
+         8Rmw==
+X-Gm-Message-State: AOAM5338Mojy3roMmLNZNHOFHoDzifZUUvvJcOT0fF7VKFbMUGaSMuz5
+        XIKpMckoQPiW2uJzWjxiQM/i1PBmpr3z19NY9CeLQhx2p2EtCaig2u5kJm+onQ8+O5lKy4krVky
+        iVGgBFy4ZZIzu
+X-Received: by 2002:a05:6000:510:b0:203:e469:f0a3 with SMTP id a16-20020a056000051000b00203e469f0a3mr26951302wrf.710.1651152166433;
+        Thu, 28 Apr 2022 06:22:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxYAkm50ZItGhHTzdsIHOIHFbRvU2OlAJNnEs3e9LhZU6vcKw9GOx6UJGzwm9gFfHP9K8b2vw==
+X-Received: by 2002:a05:6000:510:b0:203:e469:f0a3 with SMTP id a16-20020a056000051000b00203e469f0a3mr26951279wrf.710.1651152166162;
+        Thu, 28 Apr 2022 06:22:46 -0700 (PDT)
 Received: from step1.redhat.com (host-87-11-6-234.retail.telecomitalia.it. [87.11.6.234])
-        by smtp.gmail.com with ESMTPSA id f7-20020a05600c4e8700b00393f1393abfsm4680978wmq.41.2022.04.28.06.22.42
+        by smtp.gmail.com with ESMTPSA id f7-20020a05600c4e8700b00393f1393abfsm4680978wmq.41.2022.04.28.06.22.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Apr 2022 06:22:43 -0700 (PDT)
+        Thu, 28 Apr 2022 06:22:45 -0700 (PDT)
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     netdev@vger.kernel.org
 Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
@@ -65,12 +66,14 @@ Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
         Jakub Kicinski <kuba@kernel.org>,
         "Michael S. Tsirkin" <mst@redhat.com>
-Subject: [PATCH net-next 0/2] vsock/virtio: add support for device suspend/resume
-Date:   Thu, 28 Apr 2022 15:22:39 +0200
-Message-Id: <20220428132241.152679-1-sgarzare@redhat.com>
+Subject: [PATCH net-next 1/2] vsock/virtio: factor our the code to initialize and delete VQs
+Date:   Thu, 28 Apr 2022 15:22:40 +0200
+Message-Id: <20220428132241.152679-2-sgarzare@redhat.com>
 X-Mailer: git-send-email 2.35.1
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20220428132241.152679-1-sgarzare@redhat.com>
+References: <20220428132241.152679-1-sgarzare@redhat.com>
 MIME-Version: 1.0
+Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
@@ -82,27 +85,212 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vilas reported that virtio-vsock no longer worked properly after
-suspend/resume (echo mem >/sys/power/state).
-It was impossible to connect to the host and vice versa.
+Add virtio_vsock_vqs_init() and virtio_vsock_vqs_del() with the code
+that was in virtio_vsock_probe() and virtio_vsock_remove to initialize
+and delete VQs.
 
-Indeed, the support has never been implemented.
-
-This series implement .freeze and .restore callbacks of struct virtio_driver
-to support device suspend/resume.
-
-The first patch factors our the code to initialize and delete VQs.
-The second patch uses that code to support device suspend/resume.
+These new functions will be used in the next commit to support device
+suspend/resume
 
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ net/vmw_vsock/virtio_transport.c | 150 +++++++++++++++++--------------
+ 1 file changed, 84 insertions(+), 66 deletions(-)
 
-Stefano Garzarella (2):
-  vsock/virtio: factor our the code to initialize and delete VQs
-  vsock/virtio: add support for device suspend/resume
-
- net/vmw_vsock/virtio_transport.c | 197 ++++++++++++++++++++-----------
- 1 file changed, 131 insertions(+), 66 deletions(-)
-
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index ba1c8cc0c467..31f4f6f40614 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -566,67 +566,28 @@ static void virtio_transport_rx_work(struct work_struct *work)
+ 	mutex_unlock(&vsock->rx_lock);
+ }
+ 
+-static int virtio_vsock_probe(struct virtio_device *vdev)
++static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
+ {
+-	vq_callback_t *callbacks[] = {
+-		virtio_vsock_rx_done,
+-		virtio_vsock_tx_done,
+-		virtio_vsock_event_done,
+-	};
++	struct virtio_device *vdev = vsock->vdev;
+ 	static const char * const names[] = {
+ 		"rx",
+ 		"tx",
+ 		"event",
+ 	};
+-	struct virtio_vsock *vsock = NULL;
++	vq_callback_t *callbacks[] = {
++		virtio_vsock_rx_done,
++		virtio_vsock_tx_done,
++		virtio_vsock_event_done,
++	};
+ 	int ret;
+ 
+-	ret = mutex_lock_interruptible(&the_virtio_vsock_mutex);
+-	if (ret)
+-		return ret;
+-
+-	/* Only one virtio-vsock device per guest is supported */
+-	if (rcu_dereference_protected(the_virtio_vsock,
+-				lockdep_is_held(&the_virtio_vsock_mutex))) {
+-		ret = -EBUSY;
+-		goto out;
+-	}
+-
+-	vsock = kzalloc(sizeof(*vsock), GFP_KERNEL);
+-	if (!vsock) {
+-		ret = -ENOMEM;
+-		goto out;
+-	}
+-
+-	vsock->vdev = vdev;
+-
+-	ret = virtio_find_vqs(vsock->vdev, VSOCK_VQ_MAX,
+-			      vsock->vqs, callbacks, names,
++	ret = virtio_find_vqs(vdev, VSOCK_VQ_MAX, vsock->vqs, callbacks, names,
+ 			      NULL);
+ 	if (ret < 0)
+-		goto out;
++		return ret;
+ 
+ 	virtio_vsock_update_guest_cid(vsock);
+ 
+-	vsock->rx_buf_nr = 0;
+-	vsock->rx_buf_max_nr = 0;
+-	atomic_set(&vsock->queued_replies, 0);
+-
+-	mutex_init(&vsock->tx_lock);
+-	mutex_init(&vsock->rx_lock);
+-	mutex_init(&vsock->event_lock);
+-	spin_lock_init(&vsock->send_pkt_list_lock);
+-	INIT_LIST_HEAD(&vsock->send_pkt_list);
+-	INIT_WORK(&vsock->rx_work, virtio_transport_rx_work);
+-	INIT_WORK(&vsock->tx_work, virtio_transport_tx_work);
+-	INIT_WORK(&vsock->event_work, virtio_transport_event_work);
+-	INIT_WORK(&vsock->send_pkt_work, virtio_transport_send_pkt_work);
+-
+-	if (virtio_has_feature(vdev, VIRTIO_VSOCK_F_SEQPACKET))
+-		vsock->seqpacket_allow = true;
+-
+-	vdev->priv = vsock;
+-
+ 	virtio_device_ready(vdev);
+ 
+ 	mutex_lock(&vsock->tx_lock);
+@@ -643,30 +604,15 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+ 	vsock->event_run = true;
+ 	mutex_unlock(&vsock->event_lock);
+ 
+-	rcu_assign_pointer(the_virtio_vsock, vsock);
+-
+-	mutex_unlock(&the_virtio_vsock_mutex);
+-
+ 	return 0;
+-
+-out:
+-	kfree(vsock);
+-	mutex_unlock(&the_virtio_vsock_mutex);
+-	return ret;
+ }
+ 
+-static void virtio_vsock_remove(struct virtio_device *vdev)
++static void virtio_vsock_vqs_del(struct virtio_vsock *vsock)
+ {
+-	struct virtio_vsock *vsock = vdev->priv;
++	struct virtio_device *vdev = vsock->vdev;
+ 	struct virtio_vsock_pkt *pkt;
+ 
+-	mutex_lock(&the_virtio_vsock_mutex);
+-
+-	vdev->priv = NULL;
+-	rcu_assign_pointer(the_virtio_vsock, NULL);
+-	synchronize_rcu();
+-
+-	/* Reset all connected sockets when the device disappear */
++	/* Reset all connected sockets when the VQs disappear */
+ 	vsock_for_each_connected_socket(&virtio_transport.transport,
+ 					virtio_vsock_reset_sock);
+ 
+@@ -711,6 +657,78 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
+ 
+ 	/* Delete virtqueues and flush outstanding callbacks if any */
+ 	vdev->config->del_vqs(vdev);
++}
++
++static int virtio_vsock_probe(struct virtio_device *vdev)
++{
++	struct virtio_vsock *vsock = NULL;
++	int ret;
++
++	ret = mutex_lock_interruptible(&the_virtio_vsock_mutex);
++	if (ret)
++		return ret;
++
++	/* Only one virtio-vsock device per guest is supported */
++	if (rcu_dereference_protected(the_virtio_vsock,
++				lockdep_is_held(&the_virtio_vsock_mutex))) {
++		ret = -EBUSY;
++		goto out;
++	}
++
++	vsock = kzalloc(sizeof(*vsock), GFP_KERNEL);
++	if (!vsock) {
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	vsock->vdev = vdev;
++
++	vsock->rx_buf_nr = 0;
++	vsock->rx_buf_max_nr = 0;
++	atomic_set(&vsock->queued_replies, 0);
++
++	mutex_init(&vsock->tx_lock);
++	mutex_init(&vsock->rx_lock);
++	mutex_init(&vsock->event_lock);
++	spin_lock_init(&vsock->send_pkt_list_lock);
++	INIT_LIST_HEAD(&vsock->send_pkt_list);
++	INIT_WORK(&vsock->rx_work, virtio_transport_rx_work);
++	INIT_WORK(&vsock->tx_work, virtio_transport_tx_work);
++	INIT_WORK(&vsock->event_work, virtio_transport_event_work);
++	INIT_WORK(&vsock->send_pkt_work, virtio_transport_send_pkt_work);
++
++	if (virtio_has_feature(vdev, VIRTIO_VSOCK_F_SEQPACKET))
++		vsock->seqpacket_allow = true;
++
++	vdev->priv = vsock;
++
++	ret = virtio_vsock_vqs_init(vsock);
++	if (ret < 0)
++		goto out;
++
++	rcu_assign_pointer(the_virtio_vsock, vsock);
++
++	mutex_unlock(&the_virtio_vsock_mutex);
++
++	return 0;
++
++out:
++	kfree(vsock);
++	mutex_unlock(&the_virtio_vsock_mutex);
++	return ret;
++}
++
++static void virtio_vsock_remove(struct virtio_device *vdev)
++{
++	struct virtio_vsock *vsock = vdev->priv;
++
++	mutex_lock(&the_virtio_vsock_mutex);
++
++	vdev->priv = NULL;
++	rcu_assign_pointer(the_virtio_vsock, NULL);
++	synchronize_rcu();
++
++	virtio_vsock_vqs_del(vsock);
+ 
+ 	/* Other works can be queued before 'config->del_vqs()', so we flush
+ 	 * all works before to free the vsock object to avoid use after free.
 -- 
 2.35.1
 
