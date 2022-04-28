@@ -2,66 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 90453513D96
-	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 23:29:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C838513E7A
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 00:21:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352307AbiD1Vbi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Apr 2022 17:31:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45644 "EHLO
+        id S237245AbiD1WY2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Apr 2022 18:24:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232724AbiD1Vbh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Apr 2022 17:31:37 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDACF68FAB
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 14:28:20 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id t25so10853821lfg.7
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 14:28:20 -0700 (PDT)
+        with ESMTP id S237198AbiD1WY0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Apr 2022 18:24:26 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3B6F70925
+        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 15:21:09 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id h1so5372594pfv.12
+        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 15:21:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Bkwm56G8Y7QJPuweRPoHg97Ydlf3HkBjvFlQy90GFK0=;
-        b=j8ecA+fwUBStisq2hVVSQX9H3Ciop/uqbnHdnf1SMFF/1XkCfjkVrAtyh5SnH9akNz
-         GO5NYXKun+J6QCK9Q+710N91SKx/ESs113lcZsqgC64vTmpAtRwsKUGV9OC64Mu0w4VX
-         pVvaPK/EqFG6BNnpRhnFxfPMiXpOhZQN/pCJ7X7qenHKoKr8jEAc0TM6PCtcm5evBLZL
-         629zl38T512N5R50MLrLToZQkDK/+bX78EDXw6ZDpfB48rnkSeJ4mXImDOWMU01GfqFx
-         RDLVOcbY07YAjVjTDVETO2tfbQkJOLUbf3VtQFaFfB+AJo5dY6808gcdODScgpL7UYpl
-         6xag==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=cc9TTPCgAe2q5px/N1vrmnQy5NmXb5L4YvUPqGlCPDA=;
+        b=Q2iJ9J2XrEU8LhLWwdSa4jTWkfrg0XE/oMOAIEHU1HI2GWCuh6e8L5Msc9ZTNlX+gI
+         c6U255yflc915BYD9if2UHu/0IkWOl/bXHeBYBhf+cLoNiq2kdHLeIaHBWKQQEdDzvwW
+         MrFuxuqCgqTyxAORKBShCvNqEVF6550g04s24jQh6vpi7A0CQcOt1PuCXJJrMU9Pjihu
+         2CQYCfNBCp6jSU4mW4dn69EN/UG6gclsLid4APYBZoLZIkOEY2hOSmmb0gwwaeLK7BzH
+         EYMd0HWqyZbC/xGDHvgE6nomPw113wv0PRA4azRt8H2++uGUi5wdXR6ieMnua6oX9HQL
+         dPug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Bkwm56G8Y7QJPuweRPoHg97Ydlf3HkBjvFlQy90GFK0=;
-        b=L1JtMuWaVjJIfUURAp8harmY18PEHqDGPld7vKDWZYFtrETdIrcahPGEJi6ecEg+aB
-         6ps1CGhNZnd53BwQxnVABbHw5Twf4TCkMvWteIgCDHgFNbU3MMmY0IO4rd5XnVWq2iBN
-         xOOeS2Az2XIDO6+Cd739/cjbgAtyLG3DqGEKrz3R+Ct0VgNgk9Fk04TKztBf6aSiEJgx
-         9j0DUFEPAEW/ZlghThEicp/PhOnsg3/DW/pQj0UV+2/PQAaZB4Nlxf33vuaNJB4CFnmF
-         vGwRrOISiIdxBFoOq0KVL0FAKfy7qA91qd2pftWXwN0iNoRlXST1taPw/SSgta64ysaw
-         0jOw==
-X-Gm-Message-State: AOAM531VXPtoZV8MAOxTiQJ9YHdViDIJFexIrQpSysEBOmoFOiTEAwPW
-        iM7h2eNMVTzN0J5gyR/2eZmAJuyp8re8BUzvS0/w/Q==
-X-Google-Smtp-Source: ABdhPJzWKOj0CHH3UKDJnrvYLX5uCYVGltmTThXG3JneGx/DprH2BuRoU+iqLBFi6Wkf4UHNQBiYAkO6d11eKTZ9YyY=
-X-Received: by 2002:a05:6512:c01:b0:448:6aec:65c5 with SMTP id
- z1-20020a0565120c0100b004486aec65c5mr25924602lfu.193.1651181298953; Thu, 28
- Apr 2022 14:28:18 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=cc9TTPCgAe2q5px/N1vrmnQy5NmXb5L4YvUPqGlCPDA=;
+        b=rQoAq7+zAiJO2TUWMJfwWiDWxbbuSkzvXq6kuYNp29yww42X8HrTgogC6Q3zDofgFO
+         tXq0JaMk4I2sxkCPQlXX2bHcMKZbT+sUdAAQtF4wYLVGnKv17pmHQ6meWGVGKwHpnFSH
+         FuM8GCRbYdy9xOwL93jBKgEj8dEyloLMuODgWek6tDIW3V7ntc6Twi5tHI0uClXxdwix
+         fXyACM+Dd7s5IC6mlh+cF/59TVG48meZh38RNDjr+tcXpAXvS4x7SVmwmbzpAOhj5xx+
+         s6Bp7+X0uSJLLSsUFNOrT/bPCMG2o8iUKl2J7m0vgEMVcToiWe7WeauapSPVeb4XOAiP
+         W0eA==
+X-Gm-Message-State: AOAM532w2ePuYlaE/HwAzIGaf/9IaHwyO0q9WPKYjpCoZ/BGv9olA6MR
+        WJ2dxbPar6ySgApHuh4vTkUqhw==
+X-Google-Smtp-Source: ABdhPJzLsrBix3NHPIGwu7aUty0/RvbJ9I2JhDSInfB0jz/EvnTjjSE6Vwzttof/6p/KWP2FSJwn6A==
+X-Received: by 2002:a63:f156:0:b0:3ab:ada6:b463 with SMTP id o22-20020a63f156000000b003abada6b463mr10549328pgk.462.1651184469317;
+        Thu, 28 Apr 2022 15:21:09 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id b4-20020a63d804000000b003c14af50604sm3880023pgh.28.2022.04.28.15.21.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Apr 2022 15:21:08 -0700 (PDT)
+Date:   Thu, 28 Apr 2022 22:21:04 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Oskolkov <posk@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Paul Turner <pjt@google.com>, Peter Oskolkov <posk@posk.io>
+Subject: Re: [PATCH] KVM: x86: add HC_VMM_CUSTOM hypercall
+Message-ID: <YmsTUGJfVzU3XTkl@google.com>
+References: <20220421165137.306101-1-posk@google.com>
+ <b1b04160-1604-8281-4c82-09b1f84ba86c@redhat.com>
+ <CAPNVh5eTzpK6QpJumegoN4_7r56ZHsi6hFCG-Mqt+R8ngrCitw@mail.gmail.com>
 MIME-Version: 1.0
-References: <20220407195908.633003-1-pgonda@google.com> <CAFNjLiXC0AdOw5f8Ovu47D==ex7F0=WN_Ocirymz4xL=mWvC5A@mail.gmail.com>
- <CAMkAt6r-Mc_YN-gVHuCpTj4E1EmcvyYpP9jhtHo5HRHnoNJAdA@mail.gmail.com>
- <CAMkAt6r+OMPWCbV_svUyGWa0qMzjj2UEG29G6P7jb6uH6yko2w@mail.gmail.com>
- <62e9ece1-5d71-f803-3f65-2755160cf1d1@redhat.com> <CAMkAt6q6YLBfo2RceduSXTafckEehawhD4K4hUEuB4ZNqe2kKg@mail.gmail.com>
- <4c0edc90-36a1-4f4c-1923-4b20e7bdbb4c@redhat.com> <CAMkAt6oL5qi7z-eh4z7z8WBhpc=Ow6WtcJA5bDi6-aGMnz135A@mail.gmail.com>
-In-Reply-To: <CAMkAt6oL5qi7z-eh4z7z8WBhpc=Ow6WtcJA5bDi6-aGMnz135A@mail.gmail.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Thu, 28 Apr 2022 15:28:07 -0600
-Message-ID: <CAMkAt6rmDrZfN5DbNOTsKFV57PwEnK2zxgBTCbEPeE206+5v5w@mail.gmail.com>
-Subject: Re: [PATCH v3] KVM: SEV: Mark nested locking of vcpu->lock
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     John Sperbeck <jsperbeck@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPNVh5eTzpK6QpJumegoN4_7r56ZHsi6hFCG-Mqt+R8ngrCitw@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,105 +80,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 27, 2022 at 2:18 PM Peter Gonda <pgonda@google.com> wrote:
->
-> On Wed, Apr 27, 2022 at 10:04 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Thu, Apr 28, 2022, Peter Oskolkov wrote:
+> On Thu, Apr 21, 2022 at 10:14 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 > >
-> > On 4/26/22 21:06, Peter Gonda wrote:
-> > > On Thu, Apr 21, 2022 at 9:56 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > >>
-> > >> On 4/20/22 22:14, Peter Gonda wrote:
-> > >>>>>> svm_vm_migrate_from() uses sev_lock_vcpus_for_migration() to lock all
-> > >>>>>> source and target vcpu->locks. Mark the nested subclasses to avoid false
-> > >>>>>> positives from lockdep.
-> > >>>> Nope. Good catch, I didn't realize there was a limit 8 subclasses:
-> > >>> Does anyone have thoughts on how we can resolve this vCPU locking with
-> > >>> the 8 subclass max?
-> > >>
-> > >> The documentation does not have anything.  Maybe you can call
-> > >> mutex_release manually (and mutex_acquire before unlocking).
-> > >>
-> > >> Paolo
+> > On 4/21/22 18:51, Peter Oskolkov wrote:
+> > > Allow kvm-based VMMs to request KVM to pass a custom vmcall
+> > > from the guest to the VMM in the host.
 > > >
-> > > Hmm this seems to be working thanks Paolo. To lock I have been using:
-> > >
-> > > ...
-> > >                    if (mutex_lock_killable_nested(
-> > >                                &vcpu->mutex, i * SEV_NR_MIGRATION_ROLES + role))
-> > >                            goto out_unlock;
-> > >                    mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
-> > > ...
-> > >
-> > > To unlock:
-> > > ...
-> > >                    mutex_acquire(&vcpu->mutex.dep_map, 0, 0, _THIS_IP_);
-> > >                    mutex_unlock(&vcpu->mutex);
-> > > ...
-> > >
-> > > If I understand correctly we are fully disabling lockdep by doing
-> > > this. If this is the case should I just remove all the '_nested' usage
-> > > so switch to mutex_lock_killable() and remove the per vCPU subclass?
+> > > Quite often, operating systems research projects and/or specialized
+> > > paravirtualized workloads would benefit from a extra-low-overhead,
+> > > extra-low-latency guest-host communication channel.
 > >
-> > Yes, though you could also do:
-> >
-> >         bool acquired = false;
-> >         kvm_for_each_vcpu(...) {
-> >                 if (acquired)
-> >                         mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
-> >                 if (mutex_lock_killable_nested(&vcpu->mutex, role)
-> >                         goto out_unlock;
-> >                 acquired = true;
-> >                 ...
-> >
-> > and to unlock:
-> >
-> >         bool acquired = true;
-> >         kvm_for_each_vcpu(...) {
-> >                 if (!acquired)
-> >                         mutex_acquire(&vcpu->mutex.dep_map, 0, role, _THIS_IP_);
-> >                 mutex_unlock(&vcpu->mutex);
-> >                 acquired = false;
-> >         }
+> > You can use a memory page and an I/O port.  It should be as fast as a
+> > hypercall.  You can even change it to use ioeventfd if an asynchronous
+> > channel is enough, and then it's going to be less than 1 us latency.
+> 
+> So this function:
+> 
+> uint8_t hyperchannel_ping(uint8_t arg)
+> {
+>         uint8_t inb;
+>         uint16_t port = PORT;
+> 
+>         asm(
+>                 "outb %[arg] , %[port]  \n\t"  // write arg
+>                 "inb  %[port], %[inb]   \n\t"  // read  res
+>                 : [inb] "=r"(inb)
+>                 : [arg] "r"(arg), [port] "r"(port)
+>         );
+>         return inb;
+> }
+> 
+> takes about 5.5usec vs 2.5usec for a vmcall on the same
+> hardware/kernel/etc. I've also tried AF_VSOCK, and a roundtrip there
+> is 30-50usec.
+> 
+> The main problem of port I/O vs a vmcall is that with port I/O a
+> second VM exit is needed to return any result to the guest. Am I
+> missing something?
 
-So when actually trying this out I noticed that we are releasing the
-current vcpu iterator but really we haven't actually taken that lock
-yet. So we'd need to maintain a prev_* pointer and release that one.
-That seems a bit more complicated than just doing this:
+The intent of the port I/O approach is that it's just a kick, the actual data
+payload is delivered via a different memory channel. 
 
-To lock:
+  0. guest/host establish a memory channel, e.g. guest annouces address to host at boot
+  1. guest writes parameters to the memory channel
+  2. guest does port I/O to let the host know there's work to be done
+  3. KVM exits to the host
+  4. host does the work, fills memory with the response
+  5. host does KVM_RUN to re-enter the guest
+  6. KVM runs the guest
+  7. guest reads the response from memory
 
-         bool acquired = false;
-         kvm_for_each_vcpu(...) {
-                 if (!acquired) {
-                    if (mutex_lock_killable_nested(&vcpu->mutex, role)
-                        goto out_unlock;
-                    acquired = true;
-                 } else {
-                    if (mutex_lock_killable(&vcpu->mutex, role)
-                        goto out_unlock;
-                 }
-         }
+This is what Paolo meant by "memory page".
 
-To unlock:
+Using an ioeventfd avoids the overhead of #3 and #5.  Instead of exiting to
+userspace, KVM signals the ioeventfd to wake the userspace I/O thread and immediately
+resumes the guest.  The catch is that if you want a synchronous response, the guest
+will have to wait for the host I/O thread to service the request, at which point the
+benefits of avoiding the exit to userspace are largely lost.
 
-         kvm_for_each_vcpu(...) {
-            mutex_unlock(&vcpu->mutex);
-         }
-
-This way instead of mocking and releasing the lock_dep we just lock
-the fist vcpu with mutex_lock_killable_nested(). I think this
-maintains the property you suggested of "coalesces all the mutexes for
-a vm in a single subclass".  Thoughts?
-
-> >
-> > where role is either 0 or SINGLE_DEPTH_NESTING and is passed to
-> > sev_{,un}lock_vcpus_for_migration.
-> >
-> > That coalesces all the mutexes for a vm in a single subclass, essentially.
->
-> Ah thats a great idea to allow for lockdep to work still. I'll try
-> that out, thanks again Paolo.
->
-> >
-> > Paolo
-> >
+Things like virtio-net (and presumably other virtio devices?) take advantage of
+ioeventfd by using a ring buffer, e.g. put a Tx payload in the buffer, kick the
+host and move on.
