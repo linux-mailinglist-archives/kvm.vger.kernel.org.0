@@ -2,151 +2,387 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DF6C513A51
-	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 18:49:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A745513AAB
+	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 19:12:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242210AbiD1QwZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Apr 2022 12:52:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45948 "EHLO
+        id S234091AbiD1RPV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Apr 2022 13:15:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233777AbiD1QwX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Apr 2022 12:52:23 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF5CAB3DF6;
-        Thu, 28 Apr 2022 09:49:08 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23SFUiZV022860;
-        Thu, 28 Apr 2022 16:49:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=vw3jVl9sakAXhTI6X73MPQh3wYMAWsH4Ay6MIfyWyok=;
- b=Hz5KsGBGPbVP2T+Bntqb8AWWxgztNS0uEuJ5QxtSr9sTDuJuBovGBQeziVXBx+pRXtrP
- QWOuOBe7yhXF7HL3l5e7udw3gNtjMQfxPMB/H4zHu2+lGM5VIhARFYMkB8nbG8h2AATX
- 3U7tMB7TYvn7XpGMx6wQGyuKCxTXFY1A5+dgoHkwB3z6Ny+CWj8pOULb7HXu14QZAk2q
- C8m6iu4qPhl17oG9BblcxajKU95uxPBozTpVwgQfTHBtUjBjPzSnXuujCZ5IRGFAjofG
- 5FVQgmWxlG8tD230NA1dWIHDw+CSrwXi4Eh241yS87OOMYy67M+xbKtzvuR+S3IKJwjo yA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fqnkde0fy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Apr 2022 16:49:06 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 23SG7B2b017215;
-        Thu, 28 Apr 2022 16:49:06 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fqnkde0f7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Apr 2022 16:49:06 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23SGglMr010651;
-        Thu, 28 Apr 2022 16:49:04 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3fm8qj7ua4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Apr 2022 16:49:03 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23SGnBeh26542418
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 28 Apr 2022 16:49:11 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F0F9DA404D;
-        Thu, 28 Apr 2022 16:49:00 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 50A55A4040;
-        Thu, 28 Apr 2022 16:48:57 +0000 (GMT)
-Received: from [9.171.92.46] (unknown [9.171.92.46])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 28 Apr 2022 16:48:57 +0000 (GMT)
-Message-ID: <aa19672b-3da6-032b-e940-6fd6c3199d5b@linux.ibm.com>
-Date:   Thu, 28 Apr 2022 18:48:57 +0200
+        with ESMTP id S232392AbiD1RPR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Apr 2022 13:15:17 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B97015B3CB;
+        Thu, 28 Apr 2022 10:12:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651165921; x=1682701921;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=JdBXr/9oSksag+/nxKTUxBBIRexFX7+EFVcvFRYWHuU=;
+  b=VsmvwVH7e2e7Vgmj7h4BjIUAba8aRSq8PIkuQgC2rLRMb4Mi32kujHxZ
+   0E3VtqPi/7wjnjEADJ1+v1NbYuyoxRs6scWw+pUXCWIKpi/WEKRe51Izq
+   8ahtmLiSgJ9hYJBeAmgDXA8SNf/kHUHUnWSuhd10Omo1mBH4f0kfZKulf
+   3r/8DdzWIJxKUVrMZ5b6nYukGMYGj+JaBGu9o7UZVNpyncn5eWWYnnp6m
+   N/y7HeAwdNq2SfJZdJ57aC9mbIFsF8wzDhGfwHsu3hPMxIiAX866J4Usx
+   GFuDvZZephhTi0uGJ30hgUUUl0przp0H3ORDNzREy1eOhvvtpvgfo7nih
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10331"; a="266171367"
+X-IronPort-AV: E=Sophos;i="5.91,295,1647327600"; 
+   d="scan'208";a="266171367"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2022 10:12:01 -0700
+X-IronPort-AV: E=Sophos;i="5.91,295,1647327600"; 
+   d="scan'208";a="559778708"
+Received: from mpoursae-mobl2.amr.corp.intel.com (HELO [10.212.0.84]) ([10.212.0.84])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2022 10:12:00 -0700
+Message-ID: <c9b17e50-e665-3fc6-be8c-5bb16afa784e@intel.com>
+Date:   Thu, 28 Apr 2022 10:12:16 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.7.0
-Subject: Re: [PATCH v2 2/2] KVM: s390: selftest: Test suppression indication
- on key prot exception
+Subject: Re: [PATCH v3 13/21] x86/virt/tdx: Allocate and set up PAMTs for
+ TDMRs
 Content-Language: en-US
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20220425100147.1755340-1-scgl@linux.ibm.com>
- <20220425100147.1755340-3-scgl@linux.ibm.com>
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-In-Reply-To: <20220425100147.1755340-3-scgl@linux.ibm.com>
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com
+References: <cover.1649219184.git.kai.huang@intel.com>
+ <ffc2eefdd212a31278978e8bfccd571355db69b0.1649219184.git.kai.huang@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <ffc2eefdd212a31278978e8bfccd571355db69b0.1649219184.git.kai.huang@intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: mMWAOfeigfsXYJR7iMql67xsNmxoAB07
-X-Proofpoint-GUID: MjjEA3sKilhqhWKHVtTqePLh3_gfYXri
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-28_02,2022-04-28_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 bulkscore=0
- malwarescore=0 suspectscore=0 impostorscore=0 clxscore=1015 adultscore=0
- priorityscore=1501 spamscore=0 lowpriorityscore=0 phishscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2204280099
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/25/22 12:01, Janis Schoetterl-Glausch wrote:
-> Check that suppression is not indicated on injection of a key checked
-> protection exception caused by a memop after it already modified guest
-> memory, as that violates the definition of suppression.
+On 4/5/22 21:49, Kai Huang wrote:
+> In order to provide crypto protection to guests, the TDX module uses
+> additional metadata to record things like which guest "owns" a given
+> page of memory.  This metadata, referred as Physical Address Metadata
+> Table (PAMT), essentially serves as the 'struct page' for the TDX
+> module.  PAMTs are not reserved by hardware upfront.  They must be
+> allocated by the kernel and then given to the TDX module.
 > 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> TDX supports 3 page sizes: 4K, 2M, and 1G.  Each "TD Memory Region"
+> (TDMR) has 3 PAMTs to track the 3 supported page sizes respectively.
+
+s/respectively//
+
+> Each PAMT must be a physically contiguous area from the Convertible
+
+							^ s/the/a/
+
+> Memory Regions (CMR).  However, the PAMTs which track pages in one TDMR
+> do not need to reside within that TDMR but can be anywhere in CMRs.
+> If one PAMT overlaps with any TDMR, the overlapping part must be
+> reported as a reserved area in that particular TDMR.
+> 
+> Use alloc_contig_pages() since PAMT must be a physically contiguous area
+> and it may be potentially large (~1/256th of the size of the given TDMR).
+
+This is also a good place to note the downsides of using
+alloc_contig_pages().
+
+> The current version of TDX supports at most 16 reserved areas per TDMR
+> to cover both PAMTs and potential memory holes within the TDMR.  If many
+> PAMTs are allocated within a single TDMR, 16 reserved areas may not be
+> sufficient to cover all of them.
+> 
+> Adopt the following policies when allocating PAMTs for a given TDMR:
+> 
+>   - Allocate three PAMTs of the TDMR in one contiguous chunk to minimize
+>     the total number of reserved areas consumed for PAMTs.
+>   - Try to first allocate PAMT from the local node of the TDMR for better
+>     NUMA locality.
+> 
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
 > ---
->  tools/testing/selftests/kvm/s390x/memop.c | 43 ++++++++++++++++++++++-
->  1 file changed, 42 insertions(+), 1 deletion(-)
+>  arch/x86/Kconfig            |   1 +
+>  arch/x86/virt/vmx/tdx/tdx.c | 165 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 166 insertions(+)
 > 
-> diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
-> index b04c2c1b3c30..ce176ad9f216 100644
-> --- a/tools/testing/selftests/kvm/s390x/memop.c
-> +++ b/tools/testing/selftests/kvm/s390x/memop.c
+> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> index 7414625b938f..ff68d0829bd7 100644
+> --- a/arch/x86/Kconfig
+> +++ b/arch/x86/Kconfig
+> @@ -1973,6 +1973,7 @@ config INTEL_TDX_HOST
+>  	depends on CPU_SUP_INTEL
+>  	depends on X86_64
+>  	select NUMA_KEEP_MEMINFO if NUMA
+> +	depends on CONTIG_ALLOC
+>  	help
+>  	  Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
+>  	  host and certain physical attacks.  This option enables necessary TDX
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index 82534e70df96..1b807dcbc101 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -21,6 +21,7 @@
+>  #include <asm/cpufeatures.h>
+>  #include <asm/virtext.h>
+>  #include <asm/e820/api.h>
+> +#include <asm/pgtable.h>
+>  #include <asm/tdx.h>
+>  #include "tdx.h"
+>  
+> @@ -66,6 +67,16 @@
+>  #define TDMR_START(_tdmr)	((_tdmr)->base)
+>  #define TDMR_END(_tdmr)		((_tdmr)->base + (_tdmr)->size)
+>  
+> +/* Page sizes supported by TDX */
+> +enum tdx_page_sz {
+> +	TDX_PG_4K = 0,
+> +	TDX_PG_2M,
+> +	TDX_PG_1G,
+> +	TDX_PG_MAX,
+> +};
 
-[...]
+Is that =0 required?  I thought the first enum was defined to be 0.
 
-> +static void test_termination(void)
+> +#define TDX_HPAGE_SHIFT	9
+> +
+>  /*
+>   * TDX module status during initialization
+>   */
+> @@ -959,6 +970,148 @@ static int create_tdmrs(struct tdmr_info **tdmr_array, int *tdmr_num)
+>  	return ret;
+>  }
+>  
+> +/* Calculate PAMT size given a TDMR and a page size */
+> +static unsigned long __tdmr_get_pamt_sz(struct tdmr_info *tdmr,
+> +					enum tdx_page_sz pgsz)
 > +{
-> +	struct test_default t = test_default_init(guest_error_key);
-> +	uint64_t prefix;
-> +	uint64_t teid;
-> +	uint64_t psw[2];
+> +	unsigned long pamt_sz;
 > +
-> +	HOST_SYNC(t.vcpu, STAGE_INITED);
-> +	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
+> +	pamt_sz = (tdmr->size >> ((TDX_HPAGE_SHIFT * pgsz) + PAGE_SHIFT)) *
+> +		tdx_sysinfo.pamt_entry_size;
+
+That 'pgsz' thing is just hideous.  I'd *much* rather see something like
+this:
+
+static int tdx_page_size_shift(enum tdx_page_sz page_sz)
+{
+	switch (page_sz) {
+	case TDX_PG_4K:
+		return PAGE_SIZE;
+	...
+	}
+}
+
+That's easy to figure out what's going on.
+
+> +	/* PAMT size must be 4K aligned */
+> +	pamt_sz = ALIGN(pamt_sz, PAGE_SIZE);
 > +
-> +	/* vcpu, mismatching keys after first page */
-> +	ERR_PROT_MOP(t.vcpu, LOGICAL, WRITE, mem1, t.size, GADDR_V(mem1), KEY(1), INJECT);
+> +	return pamt_sz;
+> +}
+> +
+> +/* Calculate the size of all PAMTs for a TDMR */
+> +static unsigned long tdmr_get_pamt_sz(struct tdmr_info *tdmr)
+> +{
+> +	enum tdx_page_sz pgsz;
+> +	unsigned long pamt_sz;
+> +
+> +	pamt_sz = 0;
+> +	for (pgsz = TDX_PG_4K; pgsz < TDX_PG_MAX; pgsz++)
+> +		pamt_sz += __tdmr_get_pamt_sz(tdmr, pgsz);
+> +
+> +	return pamt_sz;
+> +}
+
+But, there are 3 separate pointers pointing to 3 separate PAMTs.  Why do
+they all have to be contiguously allocated?
+
+> +/*
+> + * Locate the NUMA node containing the start of the given TDMR's first
+> + * RAM entry.  The given TDMR may also cover memory in other NUMA nodes.
+> + */
+
+Please add a sentence or two on the implications here of what this means
+when it happens.  Also, the joining of e820 regions seems like it might
+span NUMA nodes.  What prevents that code from just creating one large
+e820 area that leads to one large TDMR and horrible NUMA affinity for
+these structures?
+
+> +static int tdmr_get_nid(struct tdmr_info *tdmr)
+> +{
+> +	u64 start, end;
+> +	int i;
+> +
+> +	/* Find the first RAM entry covered by the TDMR */
+> +	e820_for_each_mem(i, start, end)
+> +		if (end > TDMR_START(tdmr))
+> +			break;
+
+Brackets around the big loop, please.
+
 > +	/*
-> +	 * The memop injected a program exception and the test needs to check the
-> +	 * Translation-Exception Identification (TEID). It is necessary to run
-> +	 * the guest in order to be able to read the TEID from guest memory.
-> +	 * Set the guest program new PSW, so the guest state is not clobbered.
+> +	 * One TDMR must cover at least one (or partial) RAM entry,
+> +	 * otherwise it is kernel bug.  WARN_ON() in this case.
 > +	 */
-> +	prefix = t.run->s.regs.prefix;
-> +	psw[0] = t.run->psw_mask;
-> +	psw[1] = t.run->psw_addr;
-> +	MOP(t.vm, ABSOLUTE, WRITE, psw, sizeof(psw), GADDR(prefix + 464));
-> +	HOST_SYNC(t.vcpu, STAGE_IDLED);
-> +	MOP(t.vm, ABSOLUTE, READ, &teid, sizeof(teid), GADDR(prefix + 168));
-> +	/* Bits 56, 60, 61 form a code, 0 being the only one allowing for termination */
-> +	ASSERT_EQ(teid & 0x4c, 0);
+> +	if (WARN_ON_ONCE((start >= end) || start >= TDMR_END(tdmr)))
+> +		return 0;
+> +
+> +	/*
+> +	 * The first RAM entry may be partially covered by the previous
+> +	 * TDMR.  In this case, use TDMR's start to find the NUMA node.
+> +	 */
+> +	if (start < TDMR_START(tdmr))
+> +		start = TDMR_START(tdmr);
+> +
+> +	return phys_to_target_node(start);
+> +}
+> +
+> +static int tdmr_setup_pamt(struct tdmr_info *tdmr)
+> +{
+> +	unsigned long tdmr_pamt_base, pamt_base[TDX_PG_MAX];
+> +	unsigned long pamt_sz[TDX_PG_MAX];
+> +	unsigned long pamt_npages;
+> +	struct page *pamt;
+> +	enum tdx_page_sz pgsz;
+> +	int nid;
 
-The constant is wrong, should be 0x8c instead, or better, a more straight forward
-expression that evaluates to it.
+Sooooooooooooooooooo close to reverse Christmas tree, but no cigar.
+Please fix it.
 
-[...]
+> +	/*
+> +	 * Allocate one chunk of physically contiguous memory for all
+> +	 * PAMTs.  This helps minimize the PAMT's use of reserved areas
+> +	 * in overlapped TDMRs.
+> +	 */
+
+Ahh, this explains it.  Considering that tdmr_get_pamt_sz() is really
+just two lines of code, I'd probably just the helper and open-code it
+here.  Then you only have one place to comment on it.
+
+> +	nid = tdmr_get_nid(tdmr);
+> +	pamt_npages = tdmr_get_pamt_sz(tdmr) >> PAGE_SHIFT;
+> +	pamt = alloc_contig_pages(pamt_npages, GFP_KERNEL, nid,
+> +			&node_online_map);
+> +	if (!pamt)
+> +		return -ENOMEM;
+> +
+> +	/* Calculate PAMT base and size for all supported page sizes. */
+> +	tdmr_pamt_base = page_to_pfn(pamt) << PAGE_SHIFT;
+> +	for (pgsz = TDX_PG_4K; pgsz < TDX_PG_MAX; pgsz++) {
+> +		unsigned long sz = __tdmr_get_pamt_sz(tdmr, pgsz);
+> +
+> +		pamt_base[pgsz] = tdmr_pamt_base;
+> +		pamt_sz[pgsz] = sz;
+> +
+> +		tdmr_pamt_base += sz;
+> +	}
+> +
+> +	tdmr->pamt_4k_base = pamt_base[TDX_PG_4K];
+> +	tdmr->pamt_4k_size = pamt_sz[TDX_PG_4K];
+> +	tdmr->pamt_2m_base = pamt_base[TDX_PG_2M];
+> +	tdmr->pamt_2m_size = pamt_sz[TDX_PG_2M];
+> +	tdmr->pamt_1g_base = pamt_base[TDX_PG_1G];
+> +	tdmr->pamt_1g_size = pamt_sz[TDX_PG_1G];
+
+This would all vertically align nicely if you renamed pamt_sz -> pamt_size.
+
+> +	return 0;
+> +}
+> +
+> +static void tdmr_free_pamt(struct tdmr_info *tdmr)
+> +{
+> +	unsigned long pamt_pfn, pamt_sz;
+> +
+> +	pamt_pfn = tdmr->pamt_4k_base >> PAGE_SHIFT;
+
+Comment, please:
+
+	/*
+	 * The PAMT was allocated in one contiguous unit.  The 4k PAMT
+	 * should always point to the beginning of that allocation.
+	 */
+
+> +	pamt_sz = tdmr->pamt_4k_size + tdmr->pamt_2m_size + tdmr->pamt_1g_size;
+> +
+> +	/* Do nothing if PAMT hasn't been allocated for this TDMR */
+> +	if (!pamt_sz)
+> +		return;
+> +
+> +	if (WARN_ON(!pamt_pfn))
+> +		return;
+> +
+> +	free_contig_range(pamt_pfn, pamt_sz >> PAGE_SHIFT);
+> +}
+> +
+> +static void tdmrs_free_pamt_all(struct tdmr_info **tdmr_array, int tdmr_num)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < tdmr_num; i++)
+> +		tdmr_free_pamt(tdmr_array[i]);
+> +}
+> +
+> +/* Allocate and set up PAMTs for all TDMRs */
+> +static int tdmrs_setup_pamt_all(struct tdmr_info **tdmr_array, int tdmr_num)
+
+	"set_up", please, not "setup".
+
+> +{
+> +	int i, ret;
+> +
+> +	for (i = 0; i < tdmr_num; i++) {
+> +		ret = tdmr_setup_pamt(tdmr_array[i]);
+> +		if (ret)
+> +			goto err;
+> +	}
+> +
+> +	return 0;
+> +err:
+> +	tdmrs_free_pamt_all(tdmr_array, tdmr_num);
+> +	return -ENOMEM;
+> +}
+> +
+>  static int construct_tdmrs(struct tdmr_info **tdmr_array, int *tdmr_num)
+>  {
+>  	int ret;
+> @@ -971,8 +1124,14 @@ static int construct_tdmrs(struct tdmr_info **tdmr_array, int *tdmr_num)
+>  	if (ret)
+>  		goto err;
+>  
+> +	ret = tdmrs_setup_pamt_all(tdmr_array, *tdmr_num);
+> +	if (ret)
+> +		goto err_free_tdmrs;
+> +
+>  	/* Return -EFAULT until constructing TDMRs is done */
+>  	ret = -EFAULT;
+> +	tdmrs_free_pamt_all(tdmr_array, *tdmr_num);
+> +err_free_tdmrs:
+>  	free_tdmrs(tdmr_array, *tdmr_num);
+>  err:
+>  	return ret;
+> @@ -1022,6 +1181,12 @@ static int init_tdx_module(void)
+>  	 * initialization are done.
+>  	 */
+>  	ret = -EFAULT;
+> +	/*
+> +	 * Free PAMTs allocated in construct_tdmrs() when TDX module
+> +	 * initialization fails.
+> +	 */
+> +	if (ret)
+> +		tdmrs_free_pamt_all(tdmr_array, tdmr_num);
+>  out_free_tdmrs:
+>  	/*
+>  	 * TDMRs are only used during initializing TDX module.  Always
+
+In a follow-on patch, I'd like this to dump out (in a pr_debug() or
+pr_info()) how much memory is consumed by PAMT allocations.
