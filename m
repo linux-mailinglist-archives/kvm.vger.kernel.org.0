@@ -2,165 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C55715134F6
-	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 15:23:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 43CBE513519
+	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 15:27:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347134AbiD1N0N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Apr 2022 09:26:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58316 "EHLO
+        id S1347395AbiD1Naj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Apr 2022 09:30:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234092AbiD1N0G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Apr 2022 09:26:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 42959AC917
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 06:22:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651152171;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=a14xq4pv5r/FkYeXeUtrnJ56gM2JRtUzYDAyxUxKyXw=;
-        b=iDC0CFsnmCpHl15+zW16wPNx+Dh8aGQYLzhqz8TjfbntpWAeOxpIMmYtq6uMG4nlO+C0Se
-        dwDOQ46Jhs9KTSFAkQWE/ImWH6DR97Flgyo/eLHGdo78c5hmeJ9QjZL8Vu2MQ80iwzcT00
-        V13ei9k+yHRrNdtAO9Qnd4oRZbO1Spc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-44-v2KJ5LQLP_GwQt881EqowQ-1; Thu, 28 Apr 2022 09:22:50 -0400
-X-MC-Unique: v2KJ5LQLP_GwQt881EqowQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 26-20020a05600c021a00b003940660c053so1717135wmi.2
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 06:22:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=a14xq4pv5r/FkYeXeUtrnJ56gM2JRtUzYDAyxUxKyXw=;
-        b=HyCt0qAOw6CDN5B0ohjRtJSXpSO+nHsEhENHLTOGaNRDSKudiLyX/Y2AATYpJmhgrT
-         L++asRTeARsLeSwH7gp34Qik+YiJ4BvWYvaG828N+AqUeXla8yNgJPi5tFfsBKHEf7wl
-         W9y0QO/a2/gVSc1I9p35Wb/j5N+wLhX73Y34vCiB3C8bdvqqALpOuTJyU0NGO3CmKp6L
-         CPf8TyYua6SqBONY+NZbMzY9I6wuwem2+riwT+CshnUutybZHWd7wfiXcp3IpaEmXAac
-         GM1JIqoMPzRzjv51Q6bR0PXMTH+aN+KsdFfu1rRuLUEVCO5hLufqhebzLwZNwrXSnH6O
-         7LOg==
-X-Gm-Message-State: AOAM530SreUtHinFjMUUkz/kGneTvaFpFXfek0nkc2P5aHqAFujJGkUq
-        nsbtxfJvf/8KDA+zODDY4PVWgcWZ0Wj1GfzexqQGd1l5cXOH/MaA1rRpKckighcoPEILpeBOV+y
-        8fXH25fbJQ3zl
-X-Received: by 2002:a05:600c:502b:b0:38f:f7c6:3609 with SMTP id n43-20020a05600c502b00b0038ff7c63609mr31169273wmr.15.1651152168730;
-        Thu, 28 Apr 2022 06:22:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwQVnCQJ38EwfNhzDeSYDCstkye3h+BWbMt9XxC8erbs+iXajlC/fBdW5XhbJa/npUVsWgZzw==
-X-Received: by 2002:a05:600c:502b:b0:38f:f7c6:3609 with SMTP id n43-20020a05600c502b00b0038ff7c63609mr31169254wmr.15.1651152168532;
-        Thu, 28 Apr 2022 06:22:48 -0700 (PDT)
-Received: from step1.redhat.com (host-87-11-6-234.retail.telecomitalia.it. [87.11.6.234])
-        by smtp.gmail.com with ESMTPSA id f7-20020a05600c4e8700b00393f1393abfsm4680978wmq.41.2022.04.28.06.22.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Apr 2022 06:22:47 -0700 (PDT)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     netdev@vger.kernel.org
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Vilas R K <vilas.r.k@intel.com>,
-        linux-kernel@vger.kernel.org,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: [PATCH net-next 2/2] vsock/virtio: add support for device suspend/resume
-Date:   Thu, 28 Apr 2022 15:22:41 +0200
-Message-Id: <20220428132241.152679-3-sgarzare@redhat.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220428132241.152679-1-sgarzare@redhat.com>
-References: <20220428132241.152679-1-sgarzare@redhat.com>
+        with ESMTP id S1347383AbiD1Naf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Apr 2022 09:30:35 -0400
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BEBFB18A0;
+        Thu, 28 Apr 2022 06:27:19 -0700 (PDT)
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1nk4Al-0004RG-SE; Thu, 28 Apr 2022 15:27:07 +0200
+Message-ID: <4baa5071-3fb6-64f3-bcd7-2ffc1181d811@maciej.szmigiero.name>
+Date:   Thu, 28 Apr 2022 15:27:01 +0200
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v2 02/11] KVM: SVM: Don't BUG if userspace injects a soft
+ interrupt with GIF=0
+Content-Language: en-US
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20220423021411.784383-1-seanjc@google.com>
+ <20220423021411.784383-3-seanjc@google.com>
+ <61ad22d6de1f6a51148d2538f992700cac5540d4.camel@redhat.com>
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+In-Reply-To: <61ad22d6de1f6a51148d2538f992700cac5540d4.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement .freeze and .restore callbacks of struct virtio_driver
-to support device suspend/resume.
+On 28.04.2022 09:35, Maxim Levitsky wrote:
+> On Sat, 2022-04-23 at 02:14 +0000, Sean Christopherson wrote:
+>> From: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+>>
+>> Don't BUG/WARN on interrupt injection due to GIF being cleared if the
+>> injected event is a soft interrupt, which are not actually IRQs and thus
+> 
+> Are any injected events subject to GIF set? I think that EVENTINJ just injects
+> unconditionaly whatever hypervisor puts in it.
 
-During suspension all connected sockets are reset and VQs deleted.
-During resume the VQs are re-initialized.
+That's right, EVENTINJ will pretty much always inject, even when the CPU
+is in a 'wrong' state (like for example, injecting a hardware interrupt
+or a NMI with GIF masked).
 
-Reported by: Vilas R K <vilas.r.k@intel.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- net/vmw_vsock/virtio_transport.c | 47 ++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
+But KVM as a L0 is not supposed to inject a hardware interrupt into guest
+with GIF unset since the guest is obviously not expecting it then.
+Hence this WARN_ON().
 
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index 31f4f6f40614..ad64f403536a 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -743,6 +743,49 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
- 	kfree(vsock);
- }
- 
-+#ifdef CONFIG_PM_SLEEP
-+static int virtio_vsock_freeze(struct virtio_device *vdev)
-+{
-+	struct virtio_vsock *vsock = vdev->priv;
-+
-+	mutex_lock(&the_virtio_vsock_mutex);
-+
-+	rcu_assign_pointer(the_virtio_vsock, NULL);
-+	synchronize_rcu();
-+
-+	virtio_vsock_vqs_del(vsock);
-+
-+	mutex_unlock(&the_virtio_vsock_mutex);
-+
-+	return 0;
-+}
-+
-+static int virtio_vsock_restore(struct virtio_device *vdev)
-+{
-+	struct virtio_vsock *vsock = vdev->priv;
-+	int ret;
-+
-+	mutex_lock(&the_virtio_vsock_mutex);
-+
-+	/* Only one virtio-vsock device per guest is supported */
-+	if (rcu_dereference_protected(the_virtio_vsock,
-+				lockdep_is_held(&the_virtio_vsock_mutex))) {
-+		ret = -EBUSY;
-+		goto out;
-+	}
-+
-+	ret = virtio_vsock_vqs_init(vsock);
-+	if (ret < 0)
-+		goto out;
-+
-+	rcu_assign_pointer(the_virtio_vsock, vsock);
-+
-+out:
-+	mutex_unlock(&the_virtio_vsock_mutex);
-+	return ret;
-+}
-+#endif /* CONFIG_PM_SLEEP */
-+
- static struct virtio_device_id id_table[] = {
- 	{ VIRTIO_ID_VSOCK, VIRTIO_DEV_ANY_ID },
- 	{ 0 },
-@@ -760,6 +803,10 @@ static struct virtio_driver virtio_vsock_driver = {
- 	.id_table = id_table,
- 	.probe = virtio_vsock_probe,
- 	.remove = virtio_vsock_remove,
-+#ifdef CONFIG_PM_SLEEP
-+	.freeze = virtio_vsock_freeze,
-+	.restore = virtio_vsock_restore,
-+#endif
- };
- 
- static int __init virtio_vsock_init(void)
--- 
-2.35.1
+> Best regards,
+> 	Maxim Levitsky
 
+Thanks,
+Maciej
