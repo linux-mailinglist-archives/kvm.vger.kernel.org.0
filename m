@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 439ED512C6A
-	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 09:11:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F51F512C6D
+	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 09:11:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244898AbiD1HOe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Apr 2022 03:14:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50626 "EHLO
+        id S244902AbiD1HO7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Apr 2022 03:14:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244886AbiD1HOc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Apr 2022 03:14:32 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2089.outbound.protection.outlook.com [40.107.220.89])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A643B84A1D
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 00:11:17 -0700 (PDT)
+        with ESMTP id S241941AbiD1HO5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Apr 2022 03:14:57 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2054.outbound.protection.outlook.com [40.107.236.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D9428A7C3
+        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 00:11:43 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Xt2T18Gp/LyLyLB0UleE9eDJlvs4WsflgXYdBIM0QYgnGAgWyRvVNItpHvsBAiyzUjRachsSjCZqOeMkloPT2YiyzLV58l17tVwr7g3lQMF3N5iqWpAwFDXTTx1X6BSIgIgDjlBpPuK5kdDb6xbjpjp3m/o+l/fEFwjOeBcGUTpcJ4ZSEU7MeC/wv+LfAxWvJ6amJfwSOZU4vxenym65A6DY4RM51ybvUMm2Kv/Rekn6HS7UeRWk5/FGy5mt+FR/4a0c+GJf5ODxYwgWI0FWhtIhemUBOzc7wSphUtMRs8VmZo0WjTIF6Sul/IDWvvpLps6CZeN9N2S3XmI9Lc/jow==
+ b=HqOavYTiFAZiW6Pl3NppWJk8l5jonshYmvIU++Qm+a2SWKgjUatq+fyzNsXTsWpuX5mUHXsFNuc6c3bySFdeSzxqVUnutFe3oiNvFOgL2U/ydFWRm4/AgjFbj1PwB7QOrapUjEe/mmY/Ky0YVLpFJB1aNnYoZCd0iHK3liDfrlKhMWEqtN0sKOOVUaUTnZwKaCH5QONFkqWHNySdEvXbxZfdeo02729N09KXOO2xBus36c/9A/wd9rnEBrLsIrSiTrqRuprrzXRquRhQbEXp1p87gwM1iyAX4azQm4lneMdLrFUj4p6PHeCQrm4OOrko8fnF7qDwuXfkjN5VEjGf+Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MHm2+E/PyY0Oitkb4o0PC3K0HvTeqO0g2uKc0ioKecA=;
- b=juA775lZTr7hnfrEocS2BqRFxSgLYWga11ciHP5+rzjqzH0fvCslmCoOBmX9aCA42wA1d998ctqJuI1bQhog/fdQwk8b0R/uuHXv/aPWX7FuUqZBgT/AxRO4CNfzlZJ+PWTog0Np74TO0bOW3vregg+O+f/raV3ojc2OYSjGtgN3ofrhgrhXK6PHYm7HIJCf0Qw1XqGZ2KtVcx+1fjlhAVtJ0gSajharnJzJqnU7y++nV7FRLGMsN+h5bLLUpuZBJ7K4Cgruuppk840TbwOMkK+Nm0ssovV/Y9inD8WpMXqenWEu2Kg9juCvmL6BqztlNP0EgbI0ifQ/6scqa/47gQ==
+ bh=fKPRMBVh8zRQNedbMqrr6A5GVdeIF1KGsdCCMLQagfU=;
+ b=Q/0dRuYKtAybDtiRdL1P4qazYnz0kFCSpknMS6JhrUjCnZREIsf1cUfoJGZ3oZVkQxAyLIovfX1yfc7ezBpjrdgrm9Qqc+R0XbwBoVKkTDjynV/Zr+OcK4oUlsr8AKhOlLGQoAYpLTQFokEi9JOLaRPNv6yf0wf9S5N8b6b7z+1secbj3CKu+BtjQGpoNEuTwhYYCQCgEWslv9BODkuwpmus33DfbJHKXZu/F/bQHF66uYTpl9ewCVV405GQn8dLVsG6y9akLnRej+PX6kvQRxp/asHPFqi7wCB1DX1BIZO8DyGfj4QgNcB9y/82WbM5xjEhomCpEbRzwydG4DIQlQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MHm2+E/PyY0Oitkb4o0PC3K0HvTeqO0g2uKc0ioKecA=;
- b=X9f6nwJsTnNMZ+ETzvE78xYcRQOqKqTrTCcp/tzsoItsHeYhBBOV6xqXo8nLJ0tbLIxPWDa0qlA47zPvZi//ooP0y7whx9AQL5NclDBBpnMy9MoDbRJWuhvbFocEmWN/ngaXtz3cU78EZNtr6Jd46iSXAh0zIzCLCTUXNTikv+U=
-Received: from DM6PR03CA0040.namprd03.prod.outlook.com (2603:10b6:5:100::17)
- by DM6PR12MB2873.namprd12.prod.outlook.com (2603:10b6:5:18a::32) with
+ bh=fKPRMBVh8zRQNedbMqrr6A5GVdeIF1KGsdCCMLQagfU=;
+ b=wu3enahQr4ciukDpH9zJuYDYhO70GTEPB544EtsrOZMFO2U9aUkgiOGgCXEavjOTQEF7iWoftLNqbeWkfWLUPvDbEPnwBRynIkDnBE3ZzaqjcbuzHVC46xR1KG7v0v0qhima4vYHgDbcuEpRTVCtotxXOl4O2KeYIJ0fUYXZVxY=
+Received: from DS7PR03CA0228.namprd03.prod.outlook.com (2603:10b6:5:3ba::23)
+ by CY4PR12MB1479.namprd12.prod.outlook.com (2603:10b6:910:d::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.20; Thu, 28 Apr
- 2022 07:11:16 +0000
-Received: from DM6NAM11FT042.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:100:cafe::7e) by DM6PR03CA0040.outlook.office365.com
- (2603:10b6:5:100::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.14 via Frontend
- Transport; Thu, 28 Apr 2022 07:11:16 +0000
+ 2022 07:11:38 +0000
+Received: from DM6NAM11FT057.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:3ba:cafe::14) by DS7PR03CA0228.outlook.office365.com
+ (2603:10b6:5:3ba::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.15 via Frontend
+ Transport; Thu, 28 Apr 2022 07:11:38 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,19 +46,19 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT042.mail.protection.outlook.com (10.13.173.165) with Microsoft SMTP
+ DM6NAM11FT057.mail.protection.outlook.com (10.13.172.252) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5206.12 via Frontend Transport; Thu, 28 Apr 2022 07:11:15 +0000
+ 15.20.5206.12 via Frontend Transport; Thu, 28 Apr 2022 07:11:37 +0000
 Received: from bhadra.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Thu, 28 Apr
- 2022 02:11:12 -0500
+ 2022 02:11:35 -0500
 From:   Manali Shukla <manali.shukla@amd.com>
 To:     <pbonzini@redhat.com>, <seanjc@google.com>
 CC:     <kvm@vger.kernel.org>
-Subject: [kvm-unit-tests PATCH v4 4/8] x86: Improve set_mmu_range() to implement npt
-Date:   Thu, 28 Apr 2022 07:08:47 +0000
-Message-ID: <20220428070851.21985-5-manali.shukla@amd.com>
+Subject: [kvm-unit-tests PATCH v4 5/8] x86: nSVM: Build up the nested page table dynamically
+Date:   Thu, 28 Apr 2022 07:08:48 +0000
+Message-ID: <20220428070851.21985-6-manali.shukla@amd.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220428070851.21985-1-manali.shukla@amd.com>
 References: <20220428070851.21985-1-manali.shukla@amd.com>
@@ -70,24 +70,24 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1b53f636-bad8-4a49-248c-08da28e64923
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2873:EE_
-X-Microsoft-Antispam-PRVS: <DM6PR12MB287376118F5FB4562F05F017FDFD9@DM6PR12MB2873.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 9491d2ad-4487-4201-f397-08da28e6562c
+X-MS-TrafficTypeDiagnostic: CY4PR12MB1479:EE_
+X-Microsoft-Antispam-PRVS: <CY4PR12MB147929F4F182A52269BAA3DDFDFD9@CY4PR12MB1479.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: CmjK9KgyW7o53rY1LVi8A6KFKvUN4tnr87/DiA6JpEHUUaxQGsl287xh/uzeyle0Y/6FlVHc99a2Fdpw4M6nrirzl8ji6EHv8Hdlj/DUhh4OJaxYFU+4oNlCIAwAoL7WDnL+4YlMcLU7oPVgRYVwVwJ//11DO7HEt5dLGwZvA1UTKnlbO4UL2Blbfa1W+vVhrkuN7Iq1VvXHa316jY+tIkyNgPaktK7IAuqYeyMeCweqxim3B3CybofhNUX/HSfkrBtipkBRM+gKb8zr7KW8wZG43LMyp9LpbbH2q14wSDXr+r8QqQa8eRrO+RJCZROEflGlcVw9t3LrPuUZ1YR6xi8k3ySRLwbjLSnp8FMHhsndjPJh0EKLLnW2W+0dKUlBV0fBQjNyy42ht3mMQv6/wwB2G+kLwvm6PBy0XeQxqie0+r1jvmcKzk0yxS67IQqTIDJgn+9jnOOWtzPfQwGLCq3yg+PhPFMTKbfrpP9Q77E7388qLzZXC2aM2eSFoIlnHJr3zrJmZylGpdh+SKpXqrrughbIqyuM1C91NiwghOlIbP45a1pS/5q7UjyaTFvvBMObWPjxHeyw16ovzmJzVxsbr11i57ZNxDFOTQFdT9NNKLfQcFvAeq6M8gG39HpsYJKR/+aVzLnGyQYVBoD6e5mJmvU1L83M3R+nu/VNc3IfDwO5oKyts84CrosCDjkLgukAoyxuhk868t0As23hTQ==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(40470700004)(46966006)(81166007)(356005)(110136005)(316002)(2616005)(5660300002)(8936002)(186003)(44832011)(16526019)(36756003)(6666004)(40460700003)(1076003)(426003)(2906002)(47076005)(336012)(26005)(86362001)(7696005)(36860700001)(83380400001)(70586007)(70206006)(4326008)(82310400005)(8676002)(508600001)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 8WZ5gB1AOZYgKsnt2mmWUDUcXjGtSuYbXuWnfKjGXtyptfdm7ZkXlwqusgoC7zvGIwNHJSpWi6JFJWbcYuLeWx535AEV5vswyghInKQQwtREHPRLZRBwCcWv+/y8yVdspuFlya8GzEF/uqBmBBj4WwDAgXTS0faTXueo8wHHz5EEsFdTRb6vonOpMAvby2sEw7rH/sZwfhvQWrPlB8FqXq3A5mNvoU8+ZthJvnm/0ItBwveNtmgwcCJUQotr1rET8iyzydTj1Et8l/IBu/v1FOdc8fo4/qPP8NFRbpI5Ekq8HSWL5FsXIic4+Ty1xG4eQOUblDlc6itOVzxzmDkHtOvoCr7fibEz72ht8oK6IG6SLRSdPa/gxfFNdDnoHRM99WyvNnxN7XOWsnm9RgDwUHeT/K4+C3EYwZaiiHp0d013EU4oJVQe6/ImOkk9QXjQZENWvRyDUhpRg99Tmh9vUERAokctCUBwsjtVxgd5LrbJ0el9NQSsXtwl+Y9guH2wy64psuxcC2hrtsuRA+o2b63+k4CdOeNTd6gAExO91eypprH1c1HTh0XrZ1PWbBGp2GKyEBwhYpEqXR5wH2xCtIVzGk3HrlfcOfXW5kTpb/5DV4WJ0jXyhjnyCDgjNzTrHCOjyNbNLE/703OIb4GoGsV21ZKsVgZB+Dw+7WGeB7pFgRUWwvkDzZFtY6O1FRuHTHe24SzqqQseMCHi431AOg==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(46966006)(36840700001)(40470700004)(26005)(86362001)(186003)(2906002)(6666004)(7696005)(1076003)(16526019)(82310400005)(316002)(4326008)(36756003)(8676002)(70206006)(110136005)(70586007)(81166007)(36860700001)(44832011)(5660300002)(508600001)(40460700003)(47076005)(426003)(336012)(8936002)(356005)(83380400001)(2616005)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2022 07:11:15.9881
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2022 07:11:37.8472
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1b53f636-bad8-4a49-248c-08da28e64923
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9491d2ad-4487-4201-f397-08da28e6562c
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT042.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT057.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2873
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1479
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
@@ -98,104 +98,193 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If U/S bit is "0" for all page table entries, all these pages are
-considered as supervisor pages. By default, pte_opt_mask is set to "0"
-for all npt test cases, which sets U/S bit in all PTEs to "0".
+Current implementation of nested page table does the page table build
+up statistically with 2048 PTEs and one pml4 entry.
+That is why current implementation is not extensible.
 
-Any nested page table accesses performed by the MMU are treated as user
-acesses. So while implementing a nested page table dynamically, PT_USER_MASK
-needs to be enabled for all npt entries.
+New implementation does page table build up dynamically based on the
+RAM size of the VM which enables us to have separate memory range to
+test various npt test cases.
 
-set_mmu_range() function is improved based on above analysis.
-
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Manali Shukla <manali.shukla@amd.com>
 ---
- lib/x86/vm.c | 37 +++++++++++++++++++++++++++----------
- lib/x86/vm.h |  3 +++
- 2 files changed, 30 insertions(+), 10 deletions(-)
+ x86/svm.c     | 75 ++++++++++++++++-----------------------------------
+ x86/svm.h     |  4 ++-
+ x86/svm_npt.c |  5 ++--
+ 3 files changed, 29 insertions(+), 55 deletions(-)
 
-diff --git a/lib/x86/vm.c b/lib/x86/vm.c
-index 25a4f5f..b555d5b 100644
---- a/lib/x86/vm.c
-+++ b/lib/x86/vm.c
-@@ -4,7 +4,7 @@
- #include "alloc_page.h"
+diff --git a/x86/svm.c b/x86/svm.c
+index ec825c7..e66c801 100644
+--- a/x86/svm.c
++++ b/x86/svm.c
+@@ -8,6 +8,7 @@
+ #include "desc.h"
+ #include "msr.h"
+ #include "vm.h"
++#include "fwcfg.h"
  #include "smp.h"
+ #include "types.h"
+ #include "alloc_page.h"
+@@ -16,43 +17,32 @@
+ #include "vmalloc.h"
  
--static pteval_t pte_opt_mask;
-+static pteval_t pte_opt_mask, prev_pte_opt_mask;
+ /* for the nested page table*/
+-u64 *pte[2048];
+-u64 *pde[4];
+-u64 *pdpe;
+ u64 *pml4e;
  
- pteval_t *install_pte(pgd_t *cr3,
- 		      int pte_level,
-@@ -140,16 +140,33 @@ bool any_present_pages(pgd_t *cr3, void *virt, size_t len)
- 	return false;
+ struct vmcb *vmcb;
+ 
+ u64 *npt_get_pte(u64 address)
+ {
+-	int i1, i2;
+-
+-	address >>= 12;
+-	i1 = (address >> 9) & 0x7ff;
+-	i2 = address & 0x1ff;
+-
+-	return &pte[i1][i2];
++        return get_pte(npt_get_pml4e(), (void*)address);
  }
  
--static void setup_mmu_range(pgd_t *cr3, phys_addr_t start, size_t len)
-+void set_pte_opt_mask()
-+{
-+        prev_pte_opt_mask = pte_opt_mask;
-+        pte_opt_mask = PT_USER_MASK;
-+}
-+
-+void reset_pte_opt_mask()
-+{
-+        pte_opt_mask = prev_pte_opt_mask;
-+}
-+
-+void setup_mmu_range(pgd_t *cr3, phys_addr_t start, size_t len, bool nested_mmu)
+ u64 *npt_get_pde(u64 address)
  {
- 	u64 max = (u64)len + (u64)start;
- 	u64 phys = start;
+-	int i1, i2;
+-
+-	address >>= 21;
+-	i1 = (address >> 9) & 0x3;
+-	i2 = address & 0x1ff;
+-
+-	return &pde[i1][i2];
++    struct pte_search search;
++    search = find_pte_level(npt_get_pml4e(), (void*)address, 2);
++    return search.pte;
+ }
  
--	while (phys + LARGE_PAGE_SIZE <= max) {
--		install_large_page(cr3, phys, (void *)(ulong)phys);
--		phys += LARGE_PAGE_SIZE;
+-u64 *npt_get_pdpe(void)
++u64 *npt_get_pdpe(u64 address)
+ {
+-	return pdpe;
++    struct pte_search search;
++    search = find_pte_level(npt_get_pml4e(), (void*)address, 3);
++    return search.pte;
+ }
+ 
+ u64 *npt_get_pml4e(void)
+ {
+-	return pml4e;
++    return pml4e;
+ }
+ 
+ bool smp_supported(void)
+@@ -300,11 +290,21 @@ static void set_additional_vcpu_msr(void *msr_efer)
+ 	wrmsr(MSR_EFER, (ulong)msr_efer | EFER_SVME);
+ }
+ 
++void setup_npt(void) {
++    u64 end_of_memory;
++    pml4e = alloc_page();
++
++    end_of_memory = fwcfg_get_u64(FW_CFG_RAM_SIZE);
++    if (end_of_memory < (1ul << 32))
++        end_of_memory = (1ul << 32);
++
++    setup_mmu_range(pml4e, 0, end_of_memory, true);
++}
++
+ static void setup_svm(void)
+ {
+ 	void *hsave = alloc_page();
+-	u64 *page, address;
+-	int i,j;
++	int i;
+ 
+ 	wrmsr(MSR_VM_HSAVE_PA, virt_to_phys(hsave));
+ 	wrmsr(MSR_EFER, rdmsr(MSR_EFER) | EFER_SVME);
+@@ -327,36 +327,7 @@ static void setup_svm(void)
+ 	* pages to get enough granularity for the NPT unit-tests.
+ 	*/
+ 
+-	address = 0;
+-
+-	/* PTE level */
+-	for (i = 0; i < 2048; ++i) {
+-		page = alloc_page();
+-
+-		for (j = 0; j < 512; ++j, address += 4096)
+-	    		page[j] = address | 0x067ULL;
+-
+-		pte[i] = page;
 -	}
--	install_pages(cr3, phys, max - phys, (void *)(ulong)phys);
-+        if (nested_mmu == false) {
-+                while (phys + LARGE_PAGE_SIZE <= max) {
-+                        install_large_page(cr3, phys, (void *)(ulong)phys);
-+		        phys += LARGE_PAGE_SIZE;
-+	        }
-+	        install_pages(cr3, phys, max - phys, (void *)(ulong)phys);
-+        } else {
-+                set_pte_opt_mask();
-+                install_pages(cr3, phys, len, (void *)(ulong)phys);
-+                reset_pte_opt_mask();
-+        }
+-
+-	/* PDE level */
+-	for (i = 0; i < 4; ++i) {
+-		page = alloc_page();
+-
+-	for (j = 0; j < 512; ++j)
+-	    page[j] = (u64)pte[(i * 512) + j] | 0x027ULL;
+-
+-		pde[i] = page;
+-	}
+-
+-	/* PDPe level */
+-	pdpe   = alloc_page();
+-	for (i = 0; i < 4; ++i)
+-		pdpe[i] = ((u64)(pde[i])) | 0x27;
+-
+-	/* PML4e level */
+-	pml4e    = alloc_page();
+-	pml4e[0] = ((u64)pdpe) | 0x27;
++  setup_npt();
  }
  
- static void set_additional_vcpu_vmregs(struct vm_vcpu_info *info)
-@@ -176,10 +193,10 @@ void *setup_mmu(phys_addr_t end_of_memory, void *opt_mask)
-     if (end_of_memory < (1ul << 32))
-         end_of_memory = (1ul << 32);  /* map mmio 1:1 */
+ int matched;
+diff --git a/x86/svm.h b/x86/svm.h
+index 123e64f..85eff3f 100644
+--- a/x86/svm.h
++++ b/x86/svm.h
+@@ -406,7 +406,7 @@ typedef void (*test_guest_func)(struct svm_test *);
+ int run_svm_tests(int ac, char **av);
+ u64 *npt_get_pte(u64 address);
+ u64 *npt_get_pde(u64 address);
+-u64 *npt_get_pdpe(void);
++u64 *npt_get_pdpe(u64 address);
+ u64 *npt_get_pml4e(void);
+ bool smp_supported(void);
+ bool default_supported(void);
+@@ -429,6 +429,8 @@ int __svm_vmrun(u64 rip);
+ void __svm_bare_vmrun(void);
+ int svm_vmrun(void);
+ void test_set_guest(test_guest_func func);
++void setup_npt(void);
++u64* get_npt_pte(u64 *pml4, u64 guest_addr, int level);
  
--    setup_mmu_range(cr3, 0, end_of_memory);
-+    setup_mmu_range(cr3, 0, end_of_memory, false);
- #else
--    setup_mmu_range(cr3, 0, (2ul << 30));
--    setup_mmu_range(cr3, 3ul << 30, (1ul << 30));
-+    setup_mmu_range(cr3, 0, (2ul << 30), false);
-+    setup_mmu_range(cr3, 3ul << 30, (1ul << 30), false);
-     init_alloc_vpage((void*)(3ul << 30));
- #endif
+ extern struct vmcb *vmcb;
+ extern struct svm_test svm_tests[];
+diff --git a/x86/svm_npt.c b/x86/svm_npt.c
+index 53e8a90..ab4dcf4 100644
+--- a/x86/svm_npt.c
++++ b/x86/svm_npt.c
+@@ -209,7 +209,8 @@ static void __svm_npt_rsvd_bits_test(u64 * pxe, u64 rsvd_bits, u64 efer,
+ 	       "Wanted #NPF on rsvd bits = 0x%lx, got exit = 0x%x", rsvd_bits,
+ 	       exit_reason);
  
-diff --git a/lib/x86/vm.h b/lib/x86/vm.h
-index 4c6dff9..fbb657f 100644
---- a/lib/x86/vm.h
-+++ b/lib/x86/vm.h
-@@ -37,6 +37,9 @@ pteval_t *install_pte(pgd_t *cr3,
- pteval_t *install_large_page(pgd_t *cr3, phys_addr_t phys, void *virt);
- void install_pages(pgd_t *cr3, phys_addr_t phys, size_t len, void *virt);
- bool any_present_pages(pgd_t *cr3, void *virt, size_t len);
-+void set_pte_opt_mask(void);
-+void reset_pte_opt_mask(void);
-+void setup_mmu_range(pgd_t *cr3, phys_addr_t start, size_t len, bool nested_mmu);
+-	if (pxe == npt_get_pdpe() || pxe == npt_get_pml4e()) {
++	if (pxe == npt_get_pdpe((u64) basic_guest_main)
++	    || pxe == npt_get_pml4e()) {
+ 		/*
+ 		 * The guest's page tables will blow up on a bad PDPE/PML4E,
+ 		 * before starting the final walk of the guest page.
+@@ -338,7 +339,7 @@ skip_pte_test:
+ 				get_random_bits(20, 13) | PT_PAGE_SIZE_MASK,
+ 				host_efer, host_cr4, guest_efer, guest_cr4);
  
- static inline void *current_page_table(void)
- {
+-	_svm_npt_rsvd_bits_test(npt_get_pdpe(),
++	_svm_npt_rsvd_bits_test(npt_get_pdpe((u64) basic_guest_main),
+ 				PT_PAGE_SIZE_MASK |
+ 				(this_cpu_has(X86_FEATURE_GBPAGES) ?
+ 				 get_random_bits(29, 13) : 0), host_efer,
 -- 
 2.30.2
 
