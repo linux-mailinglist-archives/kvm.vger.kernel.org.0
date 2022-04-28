@@ -2,162 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 26A3F51354E
-	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 15:37:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB0525135BC
+	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 15:52:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347321AbiD1Nk0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Apr 2022 09:40:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47536 "EHLO
+        id S1347759AbiD1Nyb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Apr 2022 09:54:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235714AbiD1NkZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Apr 2022 09:40:25 -0400
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 964F095A3B;
-        Thu, 28 Apr 2022 06:37:09 -0700 (PDT)
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1nk4KJ-0004TN-Vj; Thu, 28 Apr 2022 15:37:00 +0200
-Message-ID: <9553b164-67a6-3634-34c5-f7319ce2dc60@maciej.szmigiero.name>
-Date:   Thu, 28 Apr 2022 15:36:53 +0200
+        with ESMTP id S1347761AbiD1NyV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Apr 2022 09:54:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1E0C55EBFB
+        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 06:51:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651153865;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=FuiynTfD1RLuR66vVTzTONoWwWN8fYgLX9NPTT/dKvI=;
+        b=D5GypMdsdqqOwzmx0TGKngPWhUfT8VMf3II7n9vT7LoqvtBnWkeD1MRWR2+I0kkiLdgj3w
+        KugxqaF90ftCEdxNPgq8u49ujyKWcxW+6PNlClRr2TGouEexCCGXDXniY16U4OhMO5ZSMc
+        2WAJOIj01x53rHNx9HjC/P7dpNGka14=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-169-6Xz61OvZN1aEwojcas8hzQ-1; Thu, 28 Apr 2022 09:50:58 -0400
+X-MC-Unique: 6Xz61OvZN1aEwojcas8hzQ-1
+Received: by mail-wr1-f70.google.com with SMTP id w4-20020adfbac4000000b0020acba4b779so1964159wrg.22
+        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 06:50:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:organization:subject
+         :in-reply-to:content-transfer-encoding;
+        bh=FuiynTfD1RLuR66vVTzTONoWwWN8fYgLX9NPTT/dKvI=;
+        b=MM6KhmZqJGXB2es6BoSmgTNfkSCyam4bL4QNc+UAkThvl+5Vomafz2aW3X91/b7tPH
+         HlNbdyRu0/8GelFyDSYo67bpBfqvGRlX6S354wi2ux5tQ74jcvNgxYSuxcu96+jazr+5
+         vKSSRbseROv+JYG1lqLki5VFxfH4TLuWUgpaaZlAdyDVTIkvSylr/CHHuWUvGOtSTL5b
+         XWeX0fxr7oLrWA+QvqVmhCQg+9Lpq/kgBehDU2U5CyddrQMi5i6T5zpKRrxiBwjh4ffq
+         yV4mvxso5l9leoZznh41HTnkIB05AiNw7SqeFpELoNIueqCnXmC5lLlLxziW/opQWffm
+         FGyw==
+X-Gm-Message-State: AOAM5333w4O96WPSqa/S1qBmLkgFxcWui7paFWeStYuNw4k1mRPU2x1m
+        SxzPz/rkS/JI+G4qnr0n23VGAlmM6BNk2BiMne0v/2W08iZQrPAmX78EdGzc9I2bl02q+u+K84m
+        CGvTZMBmUdMOD
+X-Received: by 2002:a05:600c:190b:b0:392:95b8:5b18 with SMTP id j11-20020a05600c190b00b0039295b85b18mr39560234wmq.152.1651153857206;
+        Thu, 28 Apr 2022 06:50:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzeVPvVPpXXrRQLuvUge6iFuS32PuH9PMzyLJBTvWQmhu79zqAA4V53hn1tleu4LtR6OCxdgA==
+X-Received: by 2002:a05:600c:190b:b0:392:95b8:5b18 with SMTP id j11-20020a05600c190b00b0039295b85b18mr39560218wmq.152.1651153856918;
+        Thu, 28 Apr 2022 06:50:56 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c708:ef00:7443:a23c:26b8:b96? (p200300cbc708ef007443a23c26b80b96.dip0.t-ipconnect.de. [2003:cb:c708:ef00:7443:a23c:26b8:b96])
+        by smtp.gmail.com with ESMTPSA id p18-20020adfa212000000b0020adf08d88asm8984368wra.116.2022.04.28.06.50.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Apr 2022 06:50:55 -0700 (PDT)
+Message-ID: <22f7742e-c009-c53b-8f14-34156ea1d135@redhat.com>
+Date:   Thu, 28 Apr 2022 15:50:54 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
+ Thunderbird/91.6.2
 Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20220423021411.784383-1-seanjc@google.com>
- <20220423021411.784383-6-seanjc@google.com>
- <051f508121bcf47d8cbc79ee2c0817aafbe5af48.camel@redhat.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH v2 05/11] KVM: SVM: Re-inject INT3/INTO instead of
- retrying the instruction
-In-Reply-To: <051f508121bcf47d8cbc79ee2c0817aafbe5af48.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, wintera@linux.ibm.com, seiden@linux.ibm.com,
+        nrb@linux.ibm.com
+References: <20220420113430.11876-1-pmorel@linux.ibm.com>
+ <20220420113430.11876-3-pmorel@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [PATCH v8 2/2] s390x: KVM: resetting the Topology-Change-Report
+In-Reply-To: <20220420113430.11876-3-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28.04.2022 11:37, Maxim Levitsky wrote:
-> On Sat, 2022-04-23 at 02:14 +0000, Sean Christopherson wrote:
->> Re-inject INT3/INTO instead of retrying the instruction if the CPU
->> encountered an intercepted exception while vectoring the software
->> exception, e.g. if vectoring INT3 encounters a #PF and KVM is using
->> shadow paging.  Retrying the instruction is architecturally wrong, e.g.
->> will result in a spurious #DB if there's a code breakpoint on the INT3/O,
->> and lack of re-injection also breaks nested virtualization, e.g. if L1
->> injects a software exception and vectoring the injected exception
->> encounters an exception that is intercepted by L0 but not L1.
->>
->> Due to, ahem, deficiencies in the SVM architecture, acquiring the next
->> RIP may require flowing through the emulator even if NRIPS is supported,
->> as the CPU clears next_rip if the VM-Exit is due to an exception other
->> than "exceptions caused by the INT3, INTO, and BOUND instructions".  To
->> deal with this, "skip" the instruction to calculate next_rip (if it's
->> not already known), and then unwind the RIP write and any side effects
->> (RFLAGS updates).
->>
->> Save the computed next_rip and use it to re-stuff next_rip if injection
->> doesn't complete.  This allows KVM to do the right thing if next_rip was
->> known prior to injection, e.g. if L1 injects a soft event into L2, and
->> there is no backing INTn instruction, e.g. if L1 is injecting an
->> arbitrary event.
->>
->> Note, it's impossible to guarantee architectural correctness given SVM's
->> architectural flaws.  E.g. if the guest executes INTn (no KVM injection),
->> an exit occurs while vectoring the INTn, and the guest modifies the code
->> stream while the exit is being handled, KVM will compute the incorrect
->> next_rip due to "skipping" the wrong instruction.  A future enhancement
->> to make this less awful would be for KVM to detect that the decoded
->> instruction is not the correct INTn and drop the to-be-injected soft
->> event (retrying is a lesser evil compared to shoving the wrong RIP on the
->> exception stack).
->>
->> Reported-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
->> Signed-off-by: Sean Christopherson <seanjc@google.com>
->> ---
->>   arch/x86/kvm/svm/nested.c |  28 +++++++-
->>   arch/x86/kvm/svm/svm.c    | 140 +++++++++++++++++++++++++++-----------
->>   arch/x86/kvm/svm/svm.h    |   6 +-
->>   3 files changed, 130 insertions(+), 44 deletions(-)
->>
->> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
->> index 461c5f247801..0163238aa198 100644
->> --- a/arch/x86/kvm/svm/nested.c
->> +++ b/arch/x86/kvm/svm/nested.c
->> @@ -609,6 +609,21 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
->>   	}
->>   }
->>   
->> +static inline bool is_evtinj_soft(u32 evtinj)
->> +{
->> +	u32 type = evtinj & SVM_EVTINJ_TYPE_MASK;
->> +	u8 vector = evtinj & SVM_EVTINJ_VEC_MASK;
->> +
->> +	if (!(evtinj & SVM_EVTINJ_VALID))
->> +		return false;
->> +
->> +	/*
->> +	 * Intentionally return false for SOFT events, SVM doesn't yet support
->> +	 * re-injecting soft interrupts.
->> +	 */
->> +	return type == SVM_EVTINJ_TYPE_EXEPT && kvm_exception_is_soft(vector);
->> +}
->> +
->>   static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
->>   					  unsigned long vmcb12_rip)
->>   {
->> @@ -677,6 +692,16 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
->>   	else if (boot_cpu_has(X86_FEATURE_NRIPS))
->>   		vmcb02->control.next_rip    = vmcb12_rip;
->>   
->> +	if (is_evtinj_soft(vmcb02->control.event_inj)) {
->> +		svm->soft_int_injected = true;
->> +		svm->soft_int_csbase = svm->vmcb->save.cs.base;
->> +		svm->soft_int_old_rip = vmcb12_rip;
->> +		if (svm->nrips_enabled)
->> +			svm->soft_int_next_rip = svm->nested.ctl.next_rip;
->> +		else
->> +			svm->soft_int_next_rip = vmcb12_rip;
->> +	}
->> +
->>   	vmcb02->control.virt_ext            = vmcb01->control.virt_ext &
->>   					      LBR_CTL_ENABLE_MASK;
->>   	if (svm->lbrv_enabled)
->> @@ -849,6 +874,7 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
->>   
->>   out_exit_err:
->>   	svm->nested.nested_run_pending = 0;
->> +	svm->soft_int_injected = false;
->>   
->>   	svm->vmcb->control.exit_code    = SVM_EXIT_ERR;
->>   	svm->vmcb->control.exit_code_hi = 0;
->> @@ -1618,7 +1644,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
->>   	nested_copy_vmcb_control_to_cache(svm, ctl);
->>   
->>   	svm_switch_vmcb(svm, &svm->nested.vmcb02);
->> -	nested_vmcb02_prepare_control(svm, save->rip);
->> +	nested_vmcb02_prepare_control(svm, svm->vmcb->save.rip);
+On 20.04.22 13:34, Pierre Morel wrote:
+> During a subsystem reset the Topology-Change-Report is cleared.
+> Let's give userland the possibility to clear the MTCR in the case
+> of a subsystem reset.
 > 
-> Is this change intentional?
+> To migrate the MTCR, let's give userland the possibility to
+> query the MTCR state.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  arch/s390/include/uapi/asm/kvm.h |   9 +++
+>  arch/s390/kvm/kvm-s390.c         | 103 +++++++++++++++++++++++++++++++
+>  2 files changed, 112 insertions(+)
+> 
+> diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
+> index 7a6b14874d65..bb3df6d49f27 100644
+> --- a/arch/s390/include/uapi/asm/kvm.h
+> +++ b/arch/s390/include/uapi/asm/kvm.h
+> @@ -74,6 +74,7 @@ struct kvm_s390_io_adapter_req {
+>  #define KVM_S390_VM_CRYPTO		2
+>  #define KVM_S390_VM_CPU_MODEL		3
+>  #define KVM_S390_VM_MIGRATION		4
+> +#define KVM_S390_VM_CPU_TOPOLOGY	5
+>  
+>  /* kvm attributes for mem_ctrl */
+>  #define KVM_S390_VM_MEM_ENABLE_CMMA	0
+> @@ -171,6 +172,14 @@ struct kvm_s390_vm_cpu_subfunc {
+>  #define KVM_S390_VM_MIGRATION_START	1
+>  #define KVM_S390_VM_MIGRATION_STATUS	2
+>  
+> +/* kvm attributes for cpu topology */
+> +#define KVM_S390_VM_CPU_TOPO_MTR_CLEAR	0
+> +#define KVM_S390_VM_CPU_TOPO_MTR_SET	1
+> +
+> +struct kvm_s390_cpu_topology {
+> +	__u16 mtcr;
+> +};
 
-It looks to me the final code is correct since "svm->vmcb->save"
-contains L2 register save, while "save" has L1 register save.
+Just wondering:
 
-It was the patch 1 from this series that was incorrect in
-using "save->rip" here instead.
+1) Do we really need a struct for that
+2) Do we want to leave some room for later expansion?
 
+> +
+>  /* for KVM_GET_REGS and KVM_SET_REGS */
+>  struct kvm_regs {
+>  	/* general purpose regs for s390 */
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 925ccc59f283..755f325c9e70 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -1756,6 +1756,100 @@ static int kvm_s390_sca_set_mtcr(struct kvm *kvm)
+>  	return 0;
+>  }
+>  
+> +/**
+> + * kvm_s390_sca_clear_mtcr
+> + * @kvm: guest KVM description
+> + *
+> + * Is only relevant if the topology facility is present,
+> + * the caller should check KVM facility 11
+> + *
+> + * Updates the Multiprocessor Topology-Change-Report to signal
+> + * the guest with a topology change.
+> + */
+> +static int kvm_s390_sca_clear_mtcr(struct kvm *kvm)
+> +{
+> +	struct bsca_block *sca = kvm->arch.sca;
+> +	struct kvm_vcpu *vcpu;
+> +	int val;
+> +
+> +	vcpu = kvm_s390_get_first_vcpu(kvm);
+> +	if (!vcpu)
+> +		return -ENODEV;
+
+It would be cleaner to have ipte_lock/ipte_unlock variants that are
+independent of a vcpu.
+
+Instead of checking for "vcpu->arch.sie_block->eca & ECA_SII" we might
+just check for sclp.has_siif. Everything else that performs the
+lock/unlock should be contained in "struct kvm" directly, unless I am
+missing something.
+
+[...]
+
+> +
+> +static int kvm_s390_get_topology(struct kvm *kvm, struct kvm_device_attr *attr)
+> +{
+> +	struct kvm_s390_cpu_topology *topology;
+> +	int ret = 0;
+> +
+> +	if (!test_kvm_facility(kvm, 11))
+> +		return -ENXIO;
+> +
+> +	topology = kzalloc(sizeof(*topology), GFP_KERNEL);
+> +	if (!topology)
+> +		return -ENOMEM;
+
+I'm confused. We're allocating a __u16 to then free it again below? Why
+not simply use a value on the stack like in kvm_s390_vm_get_migration()?
+
+
+
+u16 mtcr;
+...
+mtcr = kvm_s390_sca_get_mtcr(kvm);
+
+if (copy_to_user((void __user *)attr->addr, &mtcr, sizeof(mtcr)))
+	return -EFAULT;
+return 0;
+
+
+
+> +
+> +	topology->mtcr =  kvm_s390_sca_get_mtcr(kvm);
+
+s/  / /
+
+> +	if (copy_to_user((void __user *)attr->addr, topology,
+> +			 sizeof(struct kvm_s390_cpu_topology)))
+> +		ret = -EFAULT;
+> +
+> +	kfree(topology);
+> +	return ret;
+> +}
+> +
+
+
+-- 
 Thanks,
-Maciej
+
+David / dhildenb
+
