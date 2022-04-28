@@ -2,285 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 66BB1513483
-	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 15:05:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3341D5134F4
+	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 15:23:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346837AbiD1NJF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Apr 2022 09:09:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57338 "EHLO
+        id S1346999AbiD1N0I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Apr 2022 09:26:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346803AbiD1NIz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Apr 2022 09:08:55 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADE798564D;
-        Thu, 28 Apr 2022 06:05:40 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23SCTijj011198;
-        Thu, 28 Apr 2022 13:05:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=WJW7LkDj7H45liKkCkRnyij+AegkzTHBoOyCkAu5ZOk=;
- b=DEH96GUKlaDta+gnzCdeEHF/2npfbYlFsYjG5mADcG9PKy1vQFjnbITQRxCxoXmYjXXl
- QwQNCprqlQJ3zcZXjQK1a1l4klvRVJXmI+OKifYQF7SgeJRD0h4Gjj8eVa7An2qTLW2M
- 97ncV5fchHhGBom+2gjYlSaOCOtWdmFhPUOb1NecBzYJzHVhLOGF4IZeOb38EO7Ft/lg
- vEd0EnP0B86mOtN4VIagzz8DQ3w34cH0tAole1cmOHmvEOgr//EZpI+QH0je/ONgC6NJ
- lSBXXn4PWbJdqcFhbFugqlDcb6FKSVdOMx/bX8cJK2lSup5NpOBAHdW/u9xhVpIjqBfW XQ== 
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fqtyw0rjw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Apr 2022 13:05:40 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23SCwfLT002506;
-        Thu, 28 Apr 2022 13:05:38 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3fm938wxxk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Apr 2022 13:05:37 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23SD5jEb15663428
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 28 Apr 2022 13:05:45 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8087242041;
-        Thu, 28 Apr 2022 13:05:34 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 03ACF4203F;
-        Thu, 28 Apr 2022 13:05:34 +0000 (GMT)
-Received: from linux6.. (unknown [9.114.12.104])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 28 Apr 2022 13:05:33 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, borntraeger@linux.ibm.com,
-        imbrenda@linux.ibm.com
-Subject: [PATCH 9/9] Documentation/virt/kvm/api.rst: Add protvirt dump/info api descriptions
-Date:   Thu, 28 Apr 2022 13:01:02 +0000
-Message-Id: <20220428130102.230790-10-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220428130102.230790-1-frankja@linux.ibm.com>
-References: <20220428130102.230790-1-frankja@linux.ibm.com>
+        with ESMTP id S230508AbiD1N0E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Apr 2022 09:26:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 625DDAC917
+        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 06:22:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651152169;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=8PQduM8Cm6+v2eU6zkUJYKtrg0KGSwBOax3SMcC5NWw=;
+        b=JSeCV7e+pbXQUnARr8DAYLAy1wH1HcomXBJiwzlma593Jg/Z+OIFkTL4mwmIs1gA4+MB2K
+        RIOvp9c3TfuuzGjWB+IV+hZ/uOXHlhUu8qdvHKg80YaHF2htrHLBJVpIgWEpb83QzwPtuf
+        gFa0fa8iTu+/xyBxLAF01fRgxVvBJao=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-394-B7tYvC7PNWG5DT2j1XHIPQ-1; Thu, 28 Apr 2022 09:22:45 -0400
+X-MC-Unique: B7tYvC7PNWG5DT2j1XHIPQ-1
+Received: by mail-wr1-f72.google.com with SMTP id o11-20020adfca0b000000b0020adc114131so1930399wrh.8
+        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 06:22:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=8PQduM8Cm6+v2eU6zkUJYKtrg0KGSwBOax3SMcC5NWw=;
+        b=1n7mE77Y/5qVWyfd9Nt2KZUedCMmKq5pRgmHVSksDVE9fuwuKjTjFSvSp309m/XecH
+         hk45sUc+t2smiE50ggI/Cqw0/hZJ1XApJl2aK7+QezQuEFyFala57tVMcNBs4vlb1do3
+         BighaF6yMlySxYESfQUdkJKkp2Hrle+iqpxBVLfSpwJAGoR6jZI1VEwmhxo6TyRFDY/B
+         Q9eXnn8u+5BX2LOp7ORyA08GO0mSj0Qs6MFoF9p+tzKwvjLl2UuJLXTBn5l5M3HQK4QZ
+         MyxQ+QWulHB8s1oP+9dUyCYOtIwMVmJbhqzLnOf7zmImt+TBnL5oNmKLViSAr4HLsbjE
+         YLOw==
+X-Gm-Message-State: AOAM531Bm6rOFkNwXVX46LSSw3wKgjDLRk2W5OiJLVpIXkxzeEbqP20x
+        cJyIvt6EHwlXqgVsNNCO8w3gcnX/ipFp9m8W97pHa8cSwAFv7Fm/8FFnf48zb1lmvPqDtXK+tjH
+        eLZ9n0gA5SMNu
+X-Received: by 2002:a1c:2185:0:b0:38f:f4ed:f964 with SMTP id h127-20020a1c2185000000b0038ff4edf964mr31065702wmh.115.1651152164528;
+        Thu, 28 Apr 2022 06:22:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyh0SQ9LojN8eIegKUo+h+ntmqGzG2tJdfRq4/rRAMPBONENZjji/VGZxEgoBORxb2iYpBK1g==
+X-Received: by 2002:a1c:2185:0:b0:38f:f4ed:f964 with SMTP id h127-20020a1c2185000000b0038ff4edf964mr31065683wmh.115.1651152164320;
+        Thu, 28 Apr 2022 06:22:44 -0700 (PDT)
+Received: from step1.redhat.com (host-87-11-6-234.retail.telecomitalia.it. [87.11.6.234])
+        by smtp.gmail.com with ESMTPSA id f7-20020a05600c4e8700b00393f1393abfsm4680978wmq.41.2022.04.28.06.22.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Apr 2022 06:22:43 -0700 (PDT)
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     netdev@vger.kernel.org
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Vilas R K <vilas.r.k@intel.com>,
+        linux-kernel@vger.kernel.org,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Subject: [PATCH net-next 0/2] vsock/virtio: add support for device suspend/resume
+Date:   Thu, 28 Apr 2022 15:22:39 +0200
+Message-Id: <20220428132241.152679-1-sgarzare@redhat.com>
+X-Mailer: git-send-email 2.35.1
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 4Ybwl2EshRQkwllcL0wyPYRiXvQU11hl
-X-Proofpoint-ORIG-GUID: 4Ybwl2EshRQkwllcL0wyPYRiXvQU11hl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-28_01,2022-04-28_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 priorityscore=1501 malwarescore=0 impostorscore=0
- adultscore=0 mlxscore=0 mlxlogscore=999 clxscore=1015 suspectscore=0
- bulkscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204280081
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Time to add the dump API changes to the api documentation file.
-Also some minor cleanup.
+Vilas reported that virtio-vsock no longer worked properly after
+suspend/resume (echo mem >/sys/power/state).
+It was impossible to connect to the host and vice versa.
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- Documentation/virt/kvm/api.rst | 152 ++++++++++++++++++++++++++++++++-
- 1 file changed, 150 insertions(+), 2 deletions(-)
+Indeed, the support has never been implemented.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 85c7abc51af5..70222f46ad22 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -5061,7 +5061,7 @@ into ESA mode. This reset is a superset of the initial reset.
- 	__u32 reserved[3];
-   };
- 
--cmd values:
-+**cmd values:**
- 
- KVM_PV_ENABLE
-   Allocate memory and register the VM with the Ultravisor, thereby
-@@ -5077,7 +5077,6 @@ KVM_PV_ENABLE
-   =====      =============================
- 
- KVM_PV_DISABLE
--
-   Deregister the VM from the Ultravisor and reclaim the memory that
-   had been donated to the Ultravisor, making it usable by the kernel
-   again.  All registered VCPUs are converted back to non-protected
-@@ -5094,6 +5093,114 @@ KVM_PV_VM_VERIFY
-   Verify the integrity of the unpacked image. Only if this succeeds,
-   KVM is allowed to start protected VCPUs.
- 
-+KVM_PV_INFO
-+  :Capability: KVM_CAP_S390_PROTECTED_DUMP
-+
-+  Presents an API that provides Ultravisor related data to userspace
-+  via subcommands. len_max is the size of the user space buffer,
-+  len_written is KVM's indication of how much bytes of that buffer
-+  were actually written to. len_written can be used to determine the
-+  valid fields if more response fields are added in the future.
-+
-+  ::
-+     enum pv_cmd_info_id {
-+        KVM_PV_INFO_VM,
-+        KVM_PV_INFO_DUMP,
-+     };
-+
-+     struct kvm_s390_pv_info_header {
-+        __u32 id;
-+        __u32 len_max;
-+        __u32 len_written;
-+        __u32 reserved;
-+     };
-+
-+     struct kvm_s390_pv_info {
-+        struct kvm_s390_pv_info_header header;
-+        struct kvm_s390_pv_info_dump dump;
-+	struct kvm_s390_pv_info_vm vm;
-+     };
-+
-+**subcommands:**
-+
-+  KVM_PV_INFO_VM
-+    This subcommand provides basic Ultravisor information for PV
-+    hosts. These values are likely also exported as files in the sysfs
-+    firmware UV query interface but they are more easily available to
-+    programs in this API.
-+
-+    The installed calls and feature_indication members provide the
-+    installed UV calls and the UV's other feature indications.
-+
-+    The max_* members provide information about the maximum number of PV
-+    vcpus, PV guests and PV guest memory size.
-+
-+    ::
-+
-+      struct kvm_s390_pv_info_vm {
-+        __u64 inst_calls_list[4];
-+        __u64 max_cpus;
-+        __u64 max_guests;
-+        __u64 max_guest_addr;
-+        __u64 feature_indication;
-+      };
-+
-+
-+  KVM_PV_INFO_DUMP
-+    This subcommand provides information related to dumping PV guests.
-+
-+    ::
-+
-+      struct kvm_s390_pv_info_dump {
-+        __u64 dump_cpu_buffer_len;
-+        __u64 dump_config_mem_buffer_per_1m;
-+        __u64 dump_config_finalize_len;
-+      };
-+
-+KVM_PV_DUMP
-+  :Capability: KVM_CAP_S390_PROTECTED_DUMP
-+
-+  Presents an API that provides calls which facilitate dumping a
-+  protected VM.
-+
-+  ::
-+
-+    struct kvm_s390_pv_dmp {
-+      __u64 subcmd;
-+      __u64 buff_addr;
-+      __u64 buff_len;
-+      __u64 gaddr;		/* For dump storage state */
-+    };
-+
-+  **subcommands:**
-+
-+  KVM_PV_DUMP_INIT
-+    Initializes the dump process of a protected VM. If this call does
-+    not succeed all other subcommands will fail with -EINVAL. This
-+    subcommand will return -EINVAL if a dump process has not yet been
-+    completed.
-+
-+    Not all PV vms can be dumped, the owner needs to set `dump
-+    allowed` PCF bit 34 in the SE header to allow dumping.
-+
-+  KVM_PV_DUMP_CONFIG_STOR_STATE
-+    Stores `buff_len` bytes of tweak component values starting with
-+    the 1MB block specified by the absolute guest address
-+    (`gaddr`). `buff_len` needs to be `conf_dump_storage_state_len`
-+    aligned and at least >= the `conf_dump_storage_state_len` value
-+    provided by the dump uv_info data.
-+
-+  KVM_PV_DUMP_COMPLETE
-+    If the subcommand succeeds it completes the dump process and lets
-+    KVM_PV_DUMP_INIT be called again.
-+
-+    On success `conf_dump_finalize_len` bytes of completion data will be
-+    stored to the `buff_addr`. The completion data contains a key
-+    derivation seed, IV, tweak nonce and encryption keys as well as an
-+    authentication tag all of which are needed to decrypt the dump at a
-+    later time.
-+
-+
- 4.126 KVM_X86_SET_MSR_FILTER
- ----------------------------
- 
-@@ -5646,6 +5753,32 @@ The offsets of the state save areas in struct kvm_xsave follow the contents
- of CPUID leaf 0xD on the host.
- 
- 
-+4.135 KVM_S390_PV_CPU_COMMAND
-+-----------------------------
-+
-+:Capability: KVM_CAP_S390_PROTECTED_DUMP
-+:Architectures: s390
-+:Type: vcpu ioctl
-+:Parameters: none
-+:Returns: 0 on success, < 0 on error
-+
-+This ioctl closely mirrors `KVM_S390_PV_COMMAND` but handles requests
-+for vcpus. It re-uses the kvm_s390_pv_dmp struct and hence also shares
-+the command ids.
-+
-+**command:**
-+
-+KVM_PV_DUMP
-+  Presents an API that provides calls which facilitate dumping a vcpu
-+  of a protected VM.
-+
-+**subcommand:**
-+
-+KVM_PV_DUMP_CPU
-+  Provides encrypted dump data like register values.
-+  The length of the returned data is provided by uv_info.guest_cpu_stor_len.
-+
-+
- 5. The kvm_run structure
- ========================
- 
-@@ -7724,6 +7857,21 @@ At this time, KVM_PMU_CAP_DISABLE is the only capability.  Setting
- this capability will disable PMU virtualization for that VM.  Usermode
- should adjust CPUID leaf 0xA to reflect that the PMU is disabled.
- 
-+
-+8.36 KVM_CAP_S390_PROTECTED_DUMP
-+--------------------------------
-+
-+:Capability: KVM_CAP_S390_PROTECTED_DUMP
-+:Architectures: s390
-+:Type: vm
-+
-+This capability indicates that KVM and the Ultravisor support dumping
-+PV guests. The `KVM_PV_DUMP` command is available for the
-+`KVM_S390_PV_COMMAND` ioctl and the `KVM_PV_INFO` command provides
-+dump related UV data. Also the vcpu ioctl `KVM_S390_PV_CPU_COMMAND` is
-+available and supports the `KVM_PV_DUMP_CPU` subcommand.
-+
-+
- 9. Known KVM API problems
- =========================
- 
+This series implement .freeze and .restore callbacks of struct virtio_driver
+to support device suspend/resume.
+
+The first patch factors our the code to initialize and delete VQs.
+The second patch uses that code to support device suspend/resume.
+
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+
+Stefano Garzarella (2):
+  vsock/virtio: factor our the code to initialize and delete VQs
+  vsock/virtio: add support for device suspend/resume
+
+ net/vmw_vsock/virtio_transport.c | 197 ++++++++++++++++++++-----------
+ 1 file changed, 131 insertions(+), 66 deletions(-)
+
 -- 
-2.32.0
+2.35.1
 
