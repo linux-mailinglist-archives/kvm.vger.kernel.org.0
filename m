@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 22FD95127DF
-	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 02:00:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2EEB5127F2
+	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 02:15:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233953AbiD1ADZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 20:03:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38582 "EHLO
+        id S230354AbiD1AS4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 20:18:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230266AbiD1ADX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 20:03:23 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0B2B6F9EF;
-        Wed, 27 Apr 2022 17:00:09 -0700 (PDT)
+        with ESMTP id S229654AbiD1ASy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 20:18:54 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08D9622B38;
+        Wed, 27 Apr 2022 17:15:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651104009; x=1682640009;
+  t=1651104941; x=1682640941;
   h=message-id:subject:from:to:cc:date:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=BKlbNUNxvRuoiGC/R1CmSrldmG/so6YvZM9s0kRllgE=;
-  b=IC+IaY/JoOVLAZgM9R/yMLx0uzFXWFw4kRnkK4Zxjhi8Cn44q4MMxzPw
-   pexUemFxXgfvqh8gM7zGrOoglS0Q0P2M9u07lNJHU1zEk8KK3JBQSCZaK
-   ehVD39Ga5PS3YSPkJ7KVEC8pAid1el0P24xz/fX/9HRtMdeo4GjSNSjPl
-   XvvoXzvFNHcLcPwi4EsGz6dAK9TEguSG5493mpvhHUWyM/tFeP/O/RIjh
-   6kFKpsS3oAdttDrfP1HyqrBBKDndxKKdsdjdrPQJeSZcxECn+3ZlJfXAy
-   Jh2DyM7HHuw8tQI8OxlbUH6RUZV7Os5PLxIWc8CkL5Q/63jim/zDaHGfy
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10330"; a="291266630"
+  bh=hAKuRjHNr9yLfpAW60dj3hws84dhaDPrOBkrdjgC0GI=;
+  b=D1yTnmZt8HetHLobkPQsiInWbh0XScDrDoNHasWr859xRo88lgEIikNW
+   sLXS317ge04NddOLOUDuS8g1+xU732TZUyDgX3yp3gG6umil1YqsloVNu
+   DAkJKjcFBc4nzUTMpMZdI2JxTG+llTBOra1I7DoQJ+MO1lYHUiEXj8yG6
+   rzPexIBJcEZRv9AzXW6eA8zolwSBb+XYHed9x2/Nn9RZuvQckNOvMNb/i
+   Pv7SLJ5Tsx7Dw3xrDdJIzWOvhvI4OS56kd01BznddxylPoHOLd8cHZCd+
+   epNagz5H2PxvIbt4Z1tygCciLcnnaUCB31AjYkLIRsSfiNBd9+xao5bwu
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10330"; a="263699511"
 X-IronPort-AV: E=Sophos;i="5.90,294,1643702400"; 
-   d="scan'208";a="291266630"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 17:00:09 -0700
+   d="scan'208";a="263699511"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 17:15:20 -0700
 X-IronPort-AV: E=Sophos;i="5.90,294,1643702400"; 
-   d="scan'208";a="540517311"
+   d="scan'208";a="533516325"
 Received: from rrnambia-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.60.78])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 17:00:05 -0700
-Message-ID: <37efe2074eba47c51bf5c1a2369a05ddf9082885.camel@intel.com>
-Subject: Re: [PATCH v3 04/21] x86/virt/tdx: Add skeleton for detecting and
- initializing TDX on demand
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 17:15:17 -0700
+Message-ID: <0bab7221179229317a11311386c968bd0d40e344.camel@intel.com>
+Subject: Re: [PATCH v3 09/21] x86/virt/tdx: Get information about TDX module
+ and convertible memory
 From:   Kai Huang <kai.huang@intel.com>
 To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
@@ -49,286 +49,284 @@ Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
         kirill.shutemov@linux.intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com,
         isaku.yamahata@intel.com
-Date:   Thu, 28 Apr 2022 12:00:03 +1200
-In-Reply-To: <c833aff2-b459-a1d7-431f-bce5c5f29182@intel.com>
+Date:   Thu, 28 Apr 2022 12:15:14 +1200
+In-Reply-To: <f929fb7a-5bdc-2567-77aa-762a098c8513@intel.com>
 References: <cover.1649219184.git.kai.huang@intel.com>
-         <32dcf4c7acc95244a391458d79cd6907125c5c29.1649219184.git.kai.huang@intel.com>
-         <ac482f2b-d2d1-0643-faa4-1b36340268c5@intel.com>
-         <22e3adf42b8ea2cae3aabc26f762acb983133fea.camel@intel.com>
-         <c833aff2-b459-a1d7-431f-bce5c5f29182@intel.com>
+         <145620795852bf24ba2124a3f8234fd4aaac19d4.1649219184.git.kai.huang@intel.com>
+         <f929fb7a-5bdc-2567-77aa-762a098c8513@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-04-27 at 07:49 -0700, Dave Hansen wrote:
-> On 4/26/22 17:43, Kai Huang wrote:
-> > On Tue, 2022-04-26 at 13:53 -0700, Dave Hansen wrote:
-> > > On 4/5/22 21:49, Kai Huang wrote:
-> ...
-> > > > +static bool tdx_keyid_sufficient(void)
-> > > > +{
-> > > > +	if (!cpumask_equal(&cpus_booted_once_mask,
-> > > > +					cpu_present_mask))
-> > > > +		return false;
-> > > 
-> > > I'd move this cpumask_equal() to a helper.
+On Wed, 2022-04-27 at 15:15 -0700, Dave Hansen wrote:
+> On 4/5/22 21:49, Kai Huang wrote:
+> > TDX provides increased levels of memory confidentiality and integrity.
+> > This requires special hardware support for features like memory
+> > encryption and storage of memory integrity checksums.  Not all memory
+> > satisfies these requirements.
 > > 
-> > Sorry to double confirm, do you want something like:
+> > As a result, TDX introduced the concept of a "Convertible Memory Region"
+> > (CMR).  During boot, the firmware builds a list of all of the memory
+> > ranges which can provide the TDX security guarantees.  The list of these
+> > ranges, along with TDX module information, is available to the kernel by
+> > querying the TDX module via TDH.SYS.INFO SEAMCALL.
 > > 
-> > static bool tdx_detected_on_all_cpus(void)
-> > {
-> > 	/*
-> > 	 * To detect any BIOS misconfiguration among cores, all logical
-> > 	 * cpus must have been brought up at least once.  This is true
-> > 	 * unless 'maxcpus' kernel command line is used to limit the
-> > 	 * number of cpus to be brought up during boot time.  However
-> > 	 * 'maxcpus' is basically an invalid operation mode due to the
-> > 	 * MCE broadcast problem, and it should not be used on a TDX
-> > 	 * capable machine.  Just do paranoid check here and do not
-> > 	 * report SEAMRR as enabled in this case.
-> > 	 */
-> > 	return cpumask_equal(&cpus_booted_once_mask, cpu_present_mask);
-> > }
-> 
-> That's logically the right idea, but I hate the name since the actual
-> test has nothing to do with TDX being detected.  The comment is also
-> rather verbose and rambling.
-> 
-> It should be named something like:
-> 
-> 	all_cpus_booted()
-> 
-> and with a comment like this:
-> 
-> /*
->  * To initialize TDX, the kernel needs to run some code on every
->  * present CPU.  Detect cases where present CPUs have not been
->  * booted, like when maxcpus=N is used.
->  */
-
-Thank you.
-
-> 
-> > static bool seamrr_enabled(void)
-> > {
-> > 	if (!tdx_detected_on_all_cpus())
-> > 		return false;
+> > Host kernel can choose whether or not to use all convertible memory
+> > regions as TDX memory.  Before TDX module is ready to create any TD
+> > guests, all TDX memory regions that host kernel intends to use must be
+> > configured to the TDX module, using specific data structures defined by
+> > TDX architecture.  Constructing those structures requires information of
+> > both TDX module and the Convertible Memory Regions.  Call TDH.SYS.INFO
+> > to get this information as preparation to construct those structures.
 > > 
-> > 	return __seamrr_enabled();
-> > }
+> > Signed-off-by: Kai Huang <kai.huang@intel.com>
+> > ---
+> >  arch/x86/virt/vmx/tdx/tdx.c | 131 ++++++++++++++++++++++++++++++++++++
+> >  arch/x86/virt/vmx/tdx/tdx.h |  61 +++++++++++++++++
+> >  2 files changed, 192 insertions(+)
 > > 
-> > static bool tdx_keyid_sufficient()
-> > {
-> > 	if (!tdx_detected_on_all_cpus())
-> > 		return false;
-> > 
-> > 	...
-> > }
+> > diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> > index ef2718423f0f..482e6d858181 100644
+> > --- a/arch/x86/virt/vmx/tdx/tdx.c
+> > +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> > @@ -80,6 +80,11 @@ static DEFINE_MUTEX(tdx_module_lock);
+> >  
+> >  static struct p_seamldr_info p_seamldr_info;
+> >  
+> > +/* Base address of CMR array needs to be 512 bytes aligned. */
+> > +static struct cmr_info tdx_cmr_array[MAX_CMRS] __aligned(CMR_INFO_ARRAY_ALIGNMENT);
+> > +static int tdx_cmr_num;
+> > +static struct tdsysinfo_struct tdx_sysinfo;
 > 
-> Although, looking at those, it's *still* unclear why you need this.  I
-> assume it's because some later TDX SEAMCALL will fail if you get this
-> wrong, and you want to be able to provide a better error message.
-> 
-> *BUT* this code doesn't actually provide halfway reasonable error
-> messages.  If someone uses maxcpus=99, then this code will report:
-> 
-> 	pr_info("SEAMRR not enabled.\n");
-> 
-> right?  That's bonkers.
+> I really dislike mixing hardware and software structures.  Please make
+> it clear which of these are fully software-defined and which are part of
+> the hardware ABI.
 
-Right this isn't good.
+Both 'struct tdsysinfo_struct' and 'struct cmr_info' are hardware structures. 
+They are defined in tdx.h which has a comment saying the data structures below
+this comment is hardware structures:
 
-I think we can use pr_info_once() when all_cpus_booted() returns false, and get
-rid of printing "SEAMRR not enabled" in seamrr_enabled().  How about below?
+	+/*
+	+ * TDX architectural data structures
+	+ */
 
-static bool seamrr_enabled(void)
-{
-	if (!all_cpus_booted())
-		pr_info_once("Not all present CPUs have been booted.  Report
-SEAMRR as not enabled");
+It is introduced in the P-SEAMLDR patch.
 
-	return __seamrr_enabled();
-}
+Should I explicitly add comments around the variables saying they are used by
+hardware, something like:
 
-And we don't print "SEAMRR not enabled".
+	/*
+	 * Data structures used by TDH.SYS.INFO SEAMCALL to return CMRs and
+	 * TDX module system information.
+	 */
 
+?
+ 
 > 
-> > > > +	/*
-> > > > +	 * TDX requires at least two KeyIDs: one global KeyID to
-> > > > +	 * protect the metadata of the TDX module and one or more
-> > > > +	 * KeyIDs to run TD guests.
-> > > > +	 */
-> > > > +	return tdx_keyid_num >= 2;
-> > > > +}
-> > > > +
-> > > > +static int __tdx_detect(void)
-> > > > +{
-> > > > +	/* The TDX module is not loaded if SEAMRR is disabled */
-> > > > +	if (!seamrr_enabled()) {
-> > > > +		pr_info("SEAMRR not enabled.\n");
-> > > > +		goto no_tdx_module;
-> > > > +	}
-> > > 
-> > > Why even bother with the SEAMRR stuff?  It sounded like you can "ping"
-> > > the module with SEAMCALL.  Why not just use that directly?
-> > 
-> > SEAMCALL will cause #GP if SEAMRR is not enabled.  We should check whether
-> > SEAMRR is enabled before making SEAMCALL.
+> >  static bool __seamrr_enabled(void)
+> >  {
+> >  	return (seamrr_mask & SEAMRR_ENABLED_BITS) == SEAMRR_ENABLED_BITS;
+> > @@ -468,6 +473,127 @@ static int tdx_module_init_cpus(void)
+> >  	return seamcall_on_each_cpu(&sc);
+> >  }
+> >  
+> > +static inline bool cmr_valid(struct cmr_info *cmr)
+> > +{
+> > +	return !!cmr->size;
+> > +}
+> > +
+> > +static void print_cmrs(struct cmr_info *cmr_array, int cmr_num,
+> > +		       const char *name)
+> > +{
+> > +	int i;
+> > +
+> > +	for (i = 0; i < cmr_num; i++) {
+> > +		struct cmr_info *cmr = &cmr_array[i];
+> > +
+> > +		pr_info("%s : [0x%llx, 0x%llx)\n", name,
+> > +				cmr->base, cmr->base + cmr->size);
+> > +	}
+> > +}
+> > +
+> > +static int sanitize_cmrs(struct cmr_info *cmr_array, int cmr_num)
+> > +{
+> > +	int i, j;
+> > +
+> > +	/*
+> > +	 * Intel TDX module spec, 20.7.3 CMR_INFO:
+> > +	 *
+> > +	 *   TDH.SYS.INFO leaf function returns a MAX_CMRS (32) entry
+> > +	 *   array of CMR_INFO entries. The CMRs are sorted from the
+> > +	 *   lowest base address to the highest base address, and they
+> > +	 *   are non-overlapping.
+> > +	 *
+> > +	 * This implies that BIOS may generate invalid empty entries
+> > +	 * if total CMRs are less than 32.  Skip them manually.
+> > +	 */
+> > +	for (i = 0; i < cmr_num; i++) {
+> > +		struct cmr_info *cmr = &cmr_array[i];
+> > +		struct cmr_info *prev_cmr = NULL;
+> > +
+> > +		/* Skip further invalid CMRs */
+> > +		if (!cmr_valid(cmr))
+> > +			break;
+> > +
+> > +		if (i > 0)
+> > +			prev_cmr = &cmr_array[i - 1];
+> > +
+> > +		/*
+> > +		 * It is a TDX firmware bug if CMRs are not
+> > +		 * in address ascending order.
+> > +		 */
+> > +		if (prev_cmr && ((prev_cmr->base + prev_cmr->size) >
+> > +					cmr->base)) {
+> > +			pr_err("Firmware bug: CMRs not in address ascending order.\n");
+> > +			return -EFAULT;
 > 
-> So...  You could actually get rid of all this code.  if SEAMCALL #GP's,
-> then you say, "Whoops, the firmware didn't load the TDX module
-> correctly, sorry."
+> -EFAULT is a really weird return code to use for this.  I'd use -EINVAL.
 
-Yes we can just use the first SEAMCALL (TDH.SYS.INIT) to detect whether TDX
-module is loaded.  If SEAMCALL is successful, the module is loaded.
-
-One problem is currently the patch to flush cache for kexec() uses
-seamrr_enabled() and tdx_keyid_sufficient() to determine whether we need to
-flush the cache.  The reason is, similar to SME, the flush is done in
-stop_this_cpu(), but the status of TDX module initialization is protected by
-mutex, so we cannot use TDX module status in stop_this_cpu() to determine
-whether to flush.
-
-If that patch makes sense, I think we still need to detect SEAMRR?
-
-> 
-> Why is all this code here?  What is it for?
-> 
-> > > > +	/*
-> > > > +	 * Also do not report the TDX module as loaded if there's
-> > > > +	 * no enough TDX private KeyIDs to run any TD guests.
-> > > > +	 */
-> > > > +	if (!tdx_keyid_sufficient()) {
-> > > > +		pr_info("Number of TDX private KeyIDs too small: %u.\n",
-> > > > +				tdx_keyid_num);
-> > > > +		goto no_tdx_module;
-> > > > +	}
-> > > > +
-> > > > +	/* Return -ENODEV until the TDX module is detected */
-> > > > +no_tdx_module:
-> > > > +	tdx_module_status = TDX_MODULE_NONE;
-> > > > +	return -ENODEV;
-> > > > +}
-> 
-> Again, if someone uses maxcpus=1234 and we get down here, then it
-> reports to the user:
-> 	
-> 	Number of TDX private KeyIDs too small: ...
-> 
-> ????  When the root of the problem has nothing to do with KeyIDs.
-
-Thanks for catching.  Similar to seamrr_enabled() above.
-
-> 
-> > > > +static int init_tdx_module(void)
-> > > > +{
-> > > > +	/*
-> > > > +	 * Return -EFAULT until all steps of TDX module
-> > > > +	 * initialization are done.
-> > > > +	 */
-> > > > +	return -EFAULT;
-> > > > +}
-> > > > +
-> > > > +static void shutdown_tdx_module(void)
-> > > > +{
-> > > > +	/* TODO: Shut down the TDX module */
-> > > > +	tdx_module_status = TDX_MODULE_SHUTDOWN;
-> > > > +}
-> > > > +
-> > > > +static int __tdx_init(void)
-> > > > +{
-> > > > +	int ret;
-> > > > +
-> > > > +	/*
-> > > > +	 * Logical-cpu scope initialization requires calling one SEAMCALL
-> > > > +	 * on all logical cpus enabled by BIOS.  Shutting down the TDX
-> > > > +	 * module also has such requirement.  Further more, configuring
-> > > > +	 * the key of the global KeyID requires calling one SEAMCALL for
-> > > > +	 * each package.  For simplicity, disable CPU hotplug in the whole
-> > > > +	 * initialization process.
-> > > > +	 *
-> > > > +	 * It's perhaps better to check whether all BIOS-enabled cpus are
-> > > > +	 * online before starting initializing, and return early if not.
-> > > 
-> > > But you did some of this cpumask checking above.  Right?
-> > 
-> > Above check only guarantees SEAMRR/TDX KeyID has been detected on all presnet
-> > cpus.  the 'present' cpumask doesn't equal to all BIOS-enabled CPUs.
-> 
-> I have no idea what this is saying.  In general, I have no idea what the
-> comment is saying.  It makes zero sense.  The locking pattern for stuff
-> like this is:
-> 
-> 	cpus_read_lock();
-> 
-> 	for_each_online_cpu()
-> 		do_something();
-> 
-> 	cpus_read_unlock();
-> 
-> because you need to make sure that you don't miss "do_something()" on a
-> CPU that comes online during the loop.
-
-I don't want any CPU going offline so  "do_something" will be done on all online
-CPUs.
+OK thanks.
 
 > 
-> But, now that I think about it, all of the checks I've seen so far are
-> for *booted* CPUs.  While the lock (I assume) would keep new CPUs from
-> booting, it doesn't do any good really since the "cpus_booted_once_mask"
-> bits are only set and not cleared.  A CPU doesn't un-become booted once.
+> > +		}
+> > +	}
+> > +
+> > +	/*
+> > +	 * Also a sane BIOS should never generate invalid CMR(s) between
+> > +	 * two valid CMRs.  Sanity check this and simply return error in
+> > +	 * this case.
+> > +	 *
+> > +	 * By reaching here @i is the index of the first invalid CMR (or
+> > +	 * cmr_num).  Starting with next entry of @i since it has already
+> > +	 * been checked.
+> > +	 */
+> > +	for (j = i + 1; j < cmr_num; j++)
+> > +		if (cmr_valid(&cmr_array[j])) {
+> > +			pr_err("Firmware bug: invalid CMR(s) among valid CMRs.\n");
+> > +			return -EFAULT;
+> > +		}
 > 
-> Again, we seem to have a long, verbose comment that says very little and
-> only confuses me.
+> Please add brackets for the for().
 
-How about below:
-
-"During initializing the TDX module, one step requires some SEAMCALL must be
-done on all logical cpus enabled by BIOS, otherwise a later step will fail. 
-Disable CPU hotplug during the initialization process to prevent any CPU going
-offline during initializing the TDX module.  Note it is caller's responsibility
-to guarantee all BIOS-enabled CPUs are in cpu_present_mask and all present CPUs
-are online."
-
-
-> 
-> ...
-> > > Why does this need both a tdx_detect() and a tdx_init()?  Shouldn't the
-> > > interface from outside just be "get TDX up and running, please?"
-> > 
-> > We can have a single tdx_init().  However tdx_init() can be heavy, and having a
-> > separate non-heavy tdx_detect() may be useful if caller wants to separate
-> > "detecting the TDX module" and "initializing the TDX module", i.e. to do
-> > something in the middle.
-> 
-> <Sigh>  So, this "design" went unmentioned, *and* I can't review if the
-> actual callers of this need the functionality or not because they're not
-> in this series.
-
-I'll remove tdx_detect().  Currently KVM doesn't do anything between
-tdx_detect() and tdx_init(). 
-
-https://lore.kernel.org/lkml/cover.1646422845.git.isaku.yamahata@intel.com/T/#mc7d5bb37107131b65ca7142b418b3e17da36a9ca
+OK.
 
 > 
-> > However tdx_detect() basically only detects P-SEAMLDR.  If we move P-SEAMLDR
-> > detection to tdx_init(), or we git rid of P-SEAMLDR completely, then we don't
-> > need tdx_detect() anymore.  We can expose seamrr_enabled() and TDX KeyID
-> > variables or functions so caller can use them to see whether it should do TDX
-> > related staff and then call tdx_init().
+> > +	/*
+> > +	 * Trim all tail invalid empty CMRs.  BIOS should generate at
+> > +	 * least one valid CMR, otherwise it's a TDX firmware bug.
+> > +	 */
+> > +	tdx_cmr_num = i;
+> > +	if (!tdx_cmr_num) {
+> > +		pr_err("Firmware bug: No valid CMR.\n");
+> > +		return -EFAULT;
+> > +	}
+> > +
+> > +	/* Print kernel sanitized CMRs */
+> > +	print_cmrs(tdx_cmr_array, tdx_cmr_num, "Kernel-sanitized-CMR");
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int tdx_get_sysinfo(void)
+> > +{
+> > +	struct tdx_module_output out;
+> > +	u64 tdsysinfo_sz, cmr_num;
+> > +	int ret;
+> > +
+> > +	BUILD_BUG_ON(sizeof(struct tdsysinfo_struct) != TDSYSINFO_STRUCT_SIZE);
+> > +
+> > +	ret = seamcall(TDH_SYS_INFO, __pa(&tdx_sysinfo), TDSYSINFO_STRUCT_SIZE,
+> > +			__pa(tdx_cmr_array), MAX_CMRS, NULL, &out);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	/*
+> > +	 * If TDH.SYS.CONFIG succeeds, RDX contains the actual bytes
+> > +	 * written to @tdx_sysinfo and R9 contains the actual entries
+> > +	 * written to @tdx_cmr_array.  Sanity check them.
+> > +	 */
+> > +	tdsysinfo_sz = out.rdx;
+> > +	cmr_num = out.r9;
 > 
-> I don't think you've made a strong case for why P-SEAMLDR detection is
-> even necessary in this series.
+> Please vertically align things like this:
+> 
+> 	tdsysinfo_sz = out.rdx;
+> 	cmr_num	     = out.r9;
 
-Will remove P-SEAMLDR code and tdx_detect().
+OK.
+
+> 
+> > +	if (WARN_ON_ONCE((tdsysinfo_sz > sizeof(tdx_sysinfo)) || !tdsysinfo_sz ||
+> > +				(cmr_num > MAX_CMRS) || !cmr_num))
+> > +		return -EFAULT;
+> 
+> Sanity checking is good, but this makes me wonder how much is too much.
+>  I don't see a lot of code for instance checking if sys_write() writes
+> more than how much it was supposed to.
+> 
+> Why are these sanity checks necessary here?  Is the TDX module expected
+> to be *THAT* buggy?  The thing that's providing, oh, basically all of
+> the security guarantees of this architecture.  It's overflowing the
+> buffers you hand it?
+
+I think this check can be removed.  Will remove.
+
+> 
+> > +	pr_info("TDX module: vendor_id 0x%x, major_version %u, minor_version %u, build_date %u, build_num %u",
+> > +		tdx_sysinfo.vendor_id, tdx_sysinfo.major_version,
+> > +		tdx_sysinfo.minor_version, tdx_sysinfo.build_date,
+> > +		tdx_sysinfo.build_num);
+> > +
+> > +	/* Print BIOS provided CMRs */
+> > +	print_cmrs(tdx_cmr_array, cmr_num, "BIOS-CMR");
+> > +
+> > +	return sanitize_cmrs(tdx_cmr_array, cmr_num);
+> > +}
+> 
+> Does sanitize_cmrs() sanitize anything?  It looks to me like it *checks*
+> the CMRs.  But, sanitizing is an active operation that writes to the
+> data being sanitized.  This looks read-only to me.  check_cmrs() would
+> be a better name for a passive check.
+
+Sure will change to check_cmrs().
+
+> 
+> >  static int init_tdx_module(void)
+> >  {
+> >  	int ret;
+> > @@ -482,6 +608,11 @@ static int init_tdx_module(void)
+> >  	if (ret)
+> >  		goto out;
+> >  
+> > +	/* Get TDX module information and CMRs */
+> > +	ret = tdx_get_sysinfo();
+> > +	if (ret)
+> > +		goto out;
+> 
+> Couldn't we get rid of that comment if you did something like:
+> 
+> 	ret = tdx_get_sysinfo(&tdx_cmr_array, &tdx_sysinfo);
+
+Yes will do.
+
+> 
+> and preferably make the variables function-local.
+
+'tdx_sysinfo' will be used by KVM too.
+
+
+
+-- 
+Thanks,
+-Kai
+
 
