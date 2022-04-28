@@ -2,166 +2,279 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1010251365D
-	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 16:07:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C48FE5136A8
+	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 16:17:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348128AbiD1OKO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Apr 2022 10:10:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47556 "EHLO
+        id S1348218AbiD1OTz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Apr 2022 10:19:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348141AbiD1OJw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Apr 2022 10:09:52 -0400
+        with ESMTP id S233037AbiD1OTx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Apr 2022 10:19:53 -0400
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DD2E286EF;
-        Thu, 28 Apr 2022 07:06:38 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47F024EA1C;
+        Thu, 28 Apr 2022 07:16:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651154798; x=1682690798;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=iu+rc0+JdwazCgqT5q1CfpFbh0ggfQOpl3l/mKEVveo=;
-  b=VDwdo7B+Hq7QUc4GrAxdo7o2ycv4cZ/Sw4Kp5cD7nKr/lLNSjHAXjaYk
-   UzjA8pkGmVdfNyJEkj10ofMI/wU+D6nuJd9Pg8Mid55PIKg9LO6dQqYc6
-   8DYNSDD/fpa7N48/bV3iw7uR0ntYsxqv1LDNpiJcpQ6o4ZURm8n+I7g7z
-   5RGpKuaOFF9JvdEPJlwQCA4Z6dPHaLEyC2nyrCl7oPSNOvtHR4egryeZE
-   7MieoerhnnRabBIV/M+NJmZmubT/fpch0JuLn2lEEm5HiaPnLi5a/sQqZ
-   HtU0eGzCwRhmhHdx3dYCY1JPHA5EL8M1HUYTepR3DXe8mPC8l2xcegODo
+  t=1651155398; x=1682691398;
+  h=message-id:date:mime-version:subject:to:references:from:
+   in-reply-to:content-transfer-encoding;
+  bh=2G2qPAimlQVyg5V7Ct8GtdDOryOBTEIMTjn+8CkRzds=;
+  b=ZER2EafqrQ3AJxWFUDH03FAIUah9uaG6U79s2CufS2TevgIdC57NmE/U
+   ZqnlrKFpj9sPoWO4qxqsCHycbItd79kjXJaJMu/86LfeKv4hfkKARaN0N
+   SpaCgQqRaPcx3/r0t9xSv5GKtPsfG+j0L14xxozdHNV8FeUzoCi8TOEYG
+   8ZXoZ6cFF9Ls8BnyAsH+tkb6XNmfWPtMEXAgRGPpLQtpNH3rapbNrQAYB
+   Up1A1jiUBHfdz2ZyeDMKqtsfEG7njIcvWBJ/Uhsh56HtwQwXkrQ6g6T1u
+   Wzk6KCIUBcAYTn38gMuGHOLc5We+ydO4ojgfuCzGJ8WL0ieKzEoJi4Zos
    A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10330"; a="352732658"
+X-IronPort-AV: E=McAfee;i="6400,9594,10330"; a="352735278"
 X-IronPort-AV: E=Sophos;i="5.91,295,1647327600"; 
-   d="scan'208";a="352732658"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2022 07:06:37 -0700
+   d="scan'208";a="352735278"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2022 07:16:38 -0700
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.91,295,1647327600"; 
-   d="scan'208";a="559685466"
-Received: from mpoursae-mobl2.amr.corp.intel.com (HELO [10.212.0.84]) ([10.212.0.84])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2022 07:06:36 -0700
-Message-ID: <98f81eed-e532-75bc-d2d8-4e020517b634@intel.com>
-Date:   Thu, 28 Apr 2022 07:06:52 -0700
+   d="scan'208";a="541332604"
+Received: from linux.intel.com ([10.54.29.200])
+  by orsmga002.jf.intel.com with ESMTP; 28 Apr 2022 07:16:37 -0700
+Received: from [10.209.10.70] (kliang2-MOBL.ccr.corp.intel.com [10.209.10.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by linux.intel.com (Postfix) with ESMTPS id DA31A580689;
+        Thu, 28 Apr 2022 07:16:36 -0700 (PDT)
+Message-ID: <bc3b3f6c-8d68-ffc1-cb6e-604d84797da1@linux.intel.com>
+Date:   Thu, 28 Apr 2022 10:16:36 -0400
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v3 09/21] x86/virt/tdx: Get information about TDX module
- and convertible memory
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+Subject: Re: [PATCH v10 07/16] KVM: vmx/pmu: Emulate MSR_ARCH_LBR_CTL for
+ guest Arch LBR
 Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-References: <cover.1649219184.git.kai.huang@intel.com>
- <145620795852bf24ba2124a3f8234fd4aaac19d4.1649219184.git.kai.huang@intel.com>
- <f929fb7a-5bdc-2567-77aa-762a098c8513@intel.com>
- <0bab7221179229317a11311386c968bd0d40e344.camel@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <0bab7221179229317a11311386c968bd0d40e344.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
+To:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
+        jmattson@google.com, seanjc@google.com, like.xu.linux@gmail.com,
+        vkuznets@redhat.com, wei.w.wang@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220422075509.353942-1-weijiang.yang@intel.com>
+ <20220422075509.353942-8-weijiang.yang@intel.com>
+From:   "Liang, Kan" <kan.liang@linux.intel.com>
+In-Reply-To: <20220422075509.353942-8-weijiang.yang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/27/22 17:15, Kai Huang wrote:
-> On Wed, 2022-04-27 at 15:15 -0700, Dave Hansen wrote:
->> On 4/5/22 21:49, Kai Huang wrote:
->>> TDX provides increased levels of memory confidentiality and integrity.
->>> This requires special hardware support for features like memory
->>> encryption and storage of memory integrity checksums.  Not all memory
->>> satisfies these requirements.
->>>
->>> As a result, TDX introduced the concept of a "Convertible Memory Region"
->>> (CMR).  During boot, the firmware builds a list of all of the memory
->>> ranges which can provide the TDX security guarantees.  The list of these
->>> ranges, along with TDX module information, is available to the kernel by
->>> querying the TDX module via TDH.SYS.INFO SEAMCALL.
->>>
->>> Host kernel can choose whether or not to use all convertible memory
->>> regions as TDX memory.  Before TDX module is ready to create any TD
->>> guests, all TDX memory regions that host kernel intends to use must be
->>> configured to the TDX module, using specific data structures defined by
->>> TDX architecture.  Constructing those structures requires information of
->>> both TDX module and the Convertible Memory Regions.  Call TDH.SYS.INFO
->>> to get this information as preparation to construct those structures.
->>>
->>> Signed-off-by: Kai Huang <kai.huang@intel.com>
->>> ---
->>>  arch/x86/virt/vmx/tdx/tdx.c | 131 ++++++++++++++++++++++++++++++++++++
->>>  arch/x86/virt/vmx/tdx/tdx.h |  61 +++++++++++++++++
->>>  2 files changed, 192 insertions(+)
->>>
->>> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
->>> index ef2718423f0f..482e6d858181 100644
->>> --- a/arch/x86/virt/vmx/tdx/tdx.c
->>> +++ b/arch/x86/virt/vmx/tdx/tdx.c
->>> @@ -80,6 +80,11 @@ static DEFINE_MUTEX(tdx_module_lock);
->>>  
->>>  static struct p_seamldr_info p_seamldr_info;
->>>  
->>> +/* Base address of CMR array needs to be 512 bytes aligned. */
->>> +static struct cmr_info tdx_cmr_array[MAX_CMRS] __aligned(CMR_INFO_ARRAY_ALIGNMENT);
->>> +static int tdx_cmr_num;
->>> +static struct tdsysinfo_struct tdx_sysinfo;
->>
->> I really dislike mixing hardware and software structures.  Please make
->> it clear which of these are fully software-defined and which are part of
->> the hardware ABI.
-> 
-> Both 'struct tdsysinfo_struct' and 'struct cmr_info' are hardware structures. 
-> They are defined in tdx.h which has a comment saying the data structures below
-> this comment is hardware structures:
-> 
-> 	+/*
-> 	+ * TDX architectural data structures
-> 	+ */
-> 
-> It is introduced in the P-SEAMLDR patch.
-> 
-> Should I explicitly add comments around the variables saying they are used by
-> hardware, something like:
-> 
-> 	/*
-> 	 * Data structures used by TDH.SYS.INFO SEAMCALL to return CMRs and
-> 	 * TDX module system information.
-> 	 */
 
-I think we know they are data structures. :)
 
-But, saying:
-
-	/* Used in TDH.SYS.INFO SEAMCALL ABI: */
-
-*is* actually helpful.  It (probably) tells us where in the spec we can
-find the definition and tells how it gets used.  Plus, it tells us this
-isn't a software data structure.
-
->>> +	/* Get TDX module information and CMRs */
->>> +	ret = tdx_get_sysinfo();
->>> +	if (ret)
->>> +		goto out;
->>
->> Couldn't we get rid of that comment if you did something like:
->>
->> 	ret = tdx_get_sysinfo(&tdx_cmr_array, &tdx_sysinfo);
+On 4/22/2022 3:55 AM, Yang Weijiang wrote:
+> From: Like Xu <like.xu@linux.intel.com>
 > 
-> Yes will do.
+> Arch LBR is enabled by setting MSR_ARCH_LBR_CTL.LBREn to 1. A new guest
+> state field named "Guest IA32_LBR_CTL" is added to enhance guest LBR usage.
+> When guest Arch LBR is enabled, a guest LBR event will be created like the
+> model-specific LBR does. Clear guest LBR enable bit on host PMI handling so
+> guest can see expected config.
 > 
->> and preferably make the variables function-local.
+> On processors that support Arch LBR, MSR_IA32_DEBUGCTLMSR[bit 0] has no
+> meaning. It can be written to 0 or 1, but reads will always return 0.
+> Like IA32_DEBUGCTL, IA32_ARCH_LBR_CTL msr is also preserved on INIT.
 > 
-> 'tdx_sysinfo' will be used by KVM too.
+> Regardless of the Arch LBR or legacy LBR, when the LBR_EN bit 0 of the
+> corresponding control MSR is set to 1, LBR recording will be enabled.
+> 
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> Co-developed-by: Yang Weijiang <weijiang.yang@intel.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>   arch/x86/events/intel/lbr.c      |  2 --
+>   arch/x86/include/asm/msr-index.h |  1 +
+>   arch/x86/include/asm/vmx.h       |  2 ++
+>   arch/x86/kvm/vmx/pmu_intel.c     | 58 +++++++++++++++++++++++++++++---
+>   arch/x86/kvm/vmx/vmx.c           | 12 +++++++
+>   5 files changed, 68 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/events/intel/lbr.c b/arch/x86/events/intel/lbr.c
+> index 4529ce448b2e..4fe6c3b50fc3 100644
+> --- a/arch/x86/events/intel/lbr.c
+> +++ b/arch/x86/events/intel/lbr.c
+> @@ -160,8 +160,6 @@ enum {
+>   	 ARCH_LBR_RETURN		|\
+>   	 ARCH_LBR_OTHER_BRANCH)
+>   
+> -#define ARCH_LBR_CTL_MASK			0x7f000e
+> -
+>   static void intel_pmu_lbr_filter(struct cpu_hw_events *cpuc);
+>   
+>   static __always_inline bool is_lbr_call_stack_bit_set(u64 config)
+> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+> index 0eb90d21049e..60e0ab108dc0 100644
+> --- a/arch/x86/include/asm/msr-index.h
+> +++ b/arch/x86/include/asm/msr-index.h
+> @@ -169,6 +169,7 @@
+>   #define LBR_INFO_BR_TYPE		(0xfull << LBR_INFO_BR_TYPE_OFFSET)
+>   
+>   #define MSR_ARCH_LBR_CTL		0x000014ce
+> +#define ARCH_LBR_CTL_MASK		0x7f000e
+>   #define ARCH_LBR_CTL_LBREN		BIT(0)
+>   #define ARCH_LBR_CTL_CPL_OFFSET		1
+>   #define ARCH_LBR_CTL_CPL		(0x3ull << ARCH_LBR_CTL_CPL_OFFSET)
+> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+> index 0ffaa3156a4e..ea3be961cc8e 100644
+> --- a/arch/x86/include/asm/vmx.h
+> +++ b/arch/x86/include/asm/vmx.h
+> @@ -245,6 +245,8 @@ enum vmcs_field {
+>   	GUEST_BNDCFGS_HIGH              = 0x00002813,
+>   	GUEST_IA32_RTIT_CTL		= 0x00002814,
+>   	GUEST_IA32_RTIT_CTL_HIGH	= 0x00002815,
+> +	GUEST_IA32_LBR_CTL		= 0x00002816,
+> +	GUEST_IA32_LBR_CTL_HIGH		= 0x00002817,
+>   	HOST_IA32_PAT			= 0x00002c00,
+>   	HOST_IA32_PAT_HIGH		= 0x00002c01,
+>   	HOST_IA32_EFER			= 0x00002c02,
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index c8e6c1e1e00c..7dc8a5783df7 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -19,6 +19,7 @@
+>   #include "pmu.h"
+>   
+>   #define MSR_PMC_FULL_WIDTH_BIT      (MSR_IA32_PMC0 - MSR_IA32_PERFCTR0)
+> +#define KVM_ARCH_LBR_CTL_MASK  (ARCH_LBR_CTL_MASK | ARCH_LBR_CTL_LBREN)
+>   
+>   static struct kvm_event_hw_type_mapping intel_arch_events[] = {
+>   	[0] = { 0x3c, 0x00, PERF_COUNT_HW_CPU_CYCLES },
+> @@ -215,6 +216,7 @@ static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+>   		ret = pmu->version > 1;
+>   		break;
+>   	case MSR_ARCH_LBR_DEPTH:
+> +	case MSR_ARCH_LBR_CTL:
+>   		if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
+>   			ret = guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR);
+>   		break;
+> @@ -361,6 +363,35 @@ static bool arch_lbr_depth_is_valid(struct kvm_vcpu *vcpu, u64 depth)
+>   	return (depth == pmu->kvm_arch_lbr_depth);
+>   }
+>   
+> +#define ARCH_LBR_CTL_BRN_MASK   GENMASK_ULL(22, 16)
+> +
+> +static bool arch_lbr_ctl_is_valid(struct kvm_vcpu *vcpu, u64 ctl)
+> +{
+> +	struct kvm_cpuid_entry2 *entry;
+> +
+> +	if (!kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
+> +		return false;
+> +
+> +	if (ctl & ~KVM_ARCH_LBR_CTL_MASK)
+> +		goto warn;
+> +
+> +	entry = kvm_find_cpuid_entry(vcpu, 0x1c, 0);
+> +	if (!entry)
+> +		return false;
+> +
+> +	if (!(entry->ebx & BIT(0)) && (ctl & ARCH_LBR_CTL_CPL))
+> +		return false;
+> +	if (!(entry->ebx & BIT(2)) && (ctl & ARCH_LBR_CTL_STACK))
+> +		return false;
+> +	if (!(entry->ebx & BIT(1)) && (ctl & ARCH_LBR_CTL_BRN_MASK))
 
-In other words, it's not a part of this series so I can't review whether
-this statement is correct or whether there's a better way to hand this
-information over to KVM.
+Why KVM wants to define this mask by itself? Cannot we use the 
+ARCH_LBR_CTL_FILTER?
 
-This (minor) nugget influencing the design also isn't even commented or
-addressed in the changelog.
+Thanks,
+Kan
+
+> +		return false;
+> +	return true;
+> +warn:
+> +	pr_warn_ratelimited("kvm: vcpu-%d: invalid arch lbr ctl.\n",
+> +			    vcpu->vcpu_id);
+> +	return false;
+> +}
+> +
+>   static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   {
+>   	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> @@ -384,6 +415,9 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   	case MSR_ARCH_LBR_DEPTH:
+>   		msr_info->data = lbr_desc->records.nr;
+>   		return 0;
+> +	case MSR_ARCH_LBR_CTL:
+> +		msr_info->data = vmcs_read64(GUEST_IA32_LBR_CTL);
+> +		return 0;
+>   	default:
+>   		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
+>   		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
+> @@ -455,6 +489,16 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   		 */
+>   		wrmsrl(MSR_ARCH_LBR_DEPTH, lbr_desc->records.nr);
+>   		return 0;
+> +	case MSR_ARCH_LBR_CTL:
+> +		if (!arch_lbr_ctl_is_valid(vcpu, data))
+> +			break;
+> +
+> +		vmcs_write64(GUEST_IA32_LBR_CTL, data);
+> +
+> +		if (intel_pmu_lbr_is_enabled(vcpu) && !lbr_desc->event &&
+> +		    (data & ARCH_LBR_CTL_LBREN))
+> +			intel_pmu_create_guest_lbr_event(vcpu);
+> +		return 0;
+>   	default:
+>   		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
+>   		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
+> @@ -668,12 +712,16 @@ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
+>    */
+>   static void intel_pmu_legacy_freezing_lbrs_on_pmi(struct kvm_vcpu *vcpu)
+>   {
+> -	u64 data = vmcs_read64(GUEST_IA32_DEBUGCTL);
+> +	u32 lbr_ctl_field = GUEST_IA32_DEBUGCTL;
+>   
+> -	if (data & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI) {
+> -		data &= ~DEBUGCTLMSR_LBR;
+> -		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
+> -	}
+> +	if (!(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI))
+> +		return;
+> +
+> +	if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR) &&
+> +	    guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
+> +		lbr_ctl_field = GUEST_IA32_LBR_CTL;
+> +
+> +	vmcs_write64(lbr_ctl_field, vmcs_read64(lbr_ctl_field) & ~0x1ULL);
+>   }
+>   
+>   static void intel_pmu_deliver_pmi(struct kvm_vcpu *vcpu)
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 04d170c4b61e..73961fcfb62d 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2022,6 +2022,13 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   						VM_EXIT_SAVE_DEBUG_CONTROLS)
+>   			get_vmcs12(vcpu)->guest_ia32_debugctl = data;
+>   
+> +		/*
+> +		 * For Arch LBR, IA32_DEBUGCTL[bit 0] has no meaning.
+> +		 * It can be written to 0 or 1, but reads will always return 0.
+> +		 */
+> +		if (guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
+> +			data &= ~DEBUGCTLMSR_LBR;
+> +
+>   		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
+>   		if (intel_pmu_lbr_is_enabled(vcpu) && !to_vmx(vcpu)->lbr_desc.event &&
+>   		    (data & DEBUGCTLMSR_LBR))
+> @@ -4548,6 +4555,11 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>   	kvm_make_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu);
+>   
+>   	vpid_sync_context(vmx->vpid);
+> +
+> +	if (!init_event) {
+> +		if (static_cpu_has(X86_FEATURE_ARCH_LBR))
+> +			vmcs_write64(GUEST_IA32_LBR_CTL, 0);
+> +	}
+>   }
+>   
+>   static void vmx_enable_irq_window(struct kvm_vcpu *vcpu)
