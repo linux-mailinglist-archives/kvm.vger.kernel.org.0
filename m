@@ -2,133 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B678512858
-	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 02:58:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DA1751286D
+	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 03:02:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239604AbiD1BBv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 21:01:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54218 "EHLO
+        id S236234AbiD1BFT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 21:05:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230197AbiD1BBu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 21:01:50 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEB00BE24;
-        Wed, 27 Apr 2022 17:58:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651107517; x=1682643517;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ibHcxG9AHdP/Hj3kBOm8zboMb+9SC8cFbK9QS2LtEU4=;
-  b=M/qLkpK33ycDu9Wi+t/TWufAY3fUdrxIydEkKL7tEbAljzAyudBGAwh6
-   UMvOTRTpVK4sYPZR9wICGa7ltE/IUOlvZnDV3NnU6DIVBMh/s0Y7SmJDV
-   f4Q8k/8Bj0+VNH17Gm1oeeI/LUISucInnFYjRbJ5GnJ22XqiIoHNJsdyf
-   u62GxiYJmto+IGjsB+sjyGcXWX2nF6eUsd6NhKou63MEHQEFwOga/p8mP
-   bTv+tg/KRajx4TnGyE2SY4Ug7IZ+AqP0PUNdO5F8ZWPxqxf46aOQ5K9FW
-   2t54dGpS6j8sxAHSfW6Uo8xWpB2w+dZ9xgUkKiEiRV6flsqH7P4I0LS2x
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10330"; a="329063334"
-X-IronPort-AV: E=Sophos;i="5.90,294,1643702400"; 
-   d="scan'208";a="329063334"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 17:58:37 -0700
-X-IronPort-AV: E=Sophos;i="5.90,294,1643702400"; 
-   d="scan'208";a="596551591"
-Received: from rrnambia-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.60.78])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 17:58:34 -0700
-Message-ID: <c90a10763969077826f42be6f492e3a3e062326b.camel@intel.com>
-Subject: Re: [PATCH v3 00/21] TDX host kernel support
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-Date:   Thu, 28 Apr 2022 12:58:31 +1200
-In-Reply-To: <d98ca73b-2d2d-757d-e937-acc83cfedfb0@intel.com>
-References: <cover.1649219184.git.kai.huang@intel.com>
-         <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
-         <ecf718abf864bbb2366209f00d4315ada090aedc.camel@intel.com>
-         <de24ac7e-349c-e49a-70bb-31b9bc867b10@intel.com>
-         <9b388f54f13b34fe684ef77603fc878952e48f87.camel@intel.com>
-         <d98ca73b-2d2d-757d-e937-acc83cfedfb0@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+        with ESMTP id S229848AbiD1BFR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 21:05:17 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16B9213DC0
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 18:02:05 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id u9so2384567plf.6
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 18:02:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=gGGuSc0LSBpuNtbaK3b654kpekt8+afyXub7g//oygQ=;
+        b=lfN+Nhqc2aJ4rKKRp29t9F072aKzevhDma4KY5PS1Z/oIl/YgaJt1bXV+Qghxx6s0e
+         dXntgAWGVNC6Y4bxz9ls0y/VdHGaZ9PgdmVNvcdsvCfWV4w4bV4pS43+dT3k6bq0N97q
+         mn2BLHfNh93NYHcrOtUbs3g370CwDKhkNY0xqKp6HDoIMf0MohHESw8owRmF56Q1KJZl
+         tKwh+sE3tnkwAPlIfglLpZZjQFx2vx+2GBqiLJqdln9Ji4yMbzZqIJ3Akk2OMeGLcJHg
+         +0kHO5wjo5AlS2L0n6lBNDuccRTU0SzPLtNB7HBzNcvetMpbt+rN8Xsy+uwFbXD5Tkyc
+         xBKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=gGGuSc0LSBpuNtbaK3b654kpekt8+afyXub7g//oygQ=;
+        b=FoGdCV1KyfPTJhxY3gVRPFy6gaUALlaaLB+xInCgrDsYKghoRuntsGsqDIGs5ORKeF
+         1J05ZDdyKQQpMoklTnin/ta0irWdMNNGCmW/AvnPprhX/cQ0tL4KvnG53l4c3HPr9XhT
+         ZWC3NGornIwaeGuNV0ubIkMXdt6KC2tUj4mNB/OlRlwNKWfYTIK1udubxMIp8HVsEV8c
+         uj8447IZO5MizMQy3lWI/13sT5bkUeR00B9zRoq5XSPkEzy2sFxoSqie726+z9ffucTR
+         maxwQT85AcXl9x7ugjSjgC1qFCkPTjt4eYPhgpClBzTohDJdRSL5/oi+gy44C7prclPB
+         KtWg==
+X-Gm-Message-State: AOAM533e++oXtbZ1pR6osdjRzg7gHvhP9WAlNaAs7OMNhe0in7cxHHe5
+        mggf0Gz76XOdnzal0HATyHrDp062oAtUs+1GCYnzfw==
+X-Google-Smtp-Source: ABdhPJzjke2ZEb+yF7GVfe3sX27nyy/kmsf+yglPd7alvwRgx2AoojnzZ+0Ix57E6s7+ew5bxxyRUl/ZtqkXCCwM560=
+X-Received: by 2002:a17:902:da81:b0:15d:37b9:70df with SMTP id
+ j1-20020a170902da8100b0015d37b970dfmr10897086plx.34.1651107724585; Wed, 27
+ Apr 2022 18:02:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <cover.1649219184.git.kai.huang@intel.com> <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
+In-Reply-To: <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Wed, 27 Apr 2022 18:01:53 -0700
+Message-ID: <CAPcyv4g5E_TOow=3pFJXyFr=KLV9pTSnDthgz6TuXvru4xDzaQ@mail.gmail.com>
+Subject: Re: [PATCH v3 00/21] TDX host kernel support
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Kai Huang <kai.huang@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-04-27 at 17:50 -0700, Dave Hansen wrote:
-> On 4/27/22 17:37, Kai Huang wrote:
-> > On Wed, 2022-04-27 at 14:59 -0700, Dave Hansen wrote:
-> > > In 5 years, if someone takes this code and runs it on Intel hardware
-> > > with memory hotplug, CPU hotplug, NVDIMMs *AND* TDX support, what happens?
-> > 
-> > I thought we could document this in the documentation saying that this code can
-> > only work on TDX machines that don't have above capabilities (SPR for now).  We
-> > can change the code and the documentation  when we add the support of those
-> > features in the future, and update the documentation.
-> > 
-> > If 5 years later someone takes this code, he/she should take a look at the
-> > documentation and figure out that he/she should choose a newer kernel if the
-> > machine support those features.
-> > 
-> > I'll think about design solutions if above doesn't look good for you.
-> 
-> No, it doesn't look good to me.
-> 
-> You can't just say:
-> 
-> 	/*
-> 	 * This code will eat puppies if used on systems with hotplug.
-> 	 */
-> 
-> and merrily await the puppy bloodbath.
-> 
-> If it's not compatible, then you have to *MAKE* it not compatible in a
-> safe, controlled way.
-> 
-> > > You can't just ignore the problems because they're not present on one
-> > > version of the hardware.
-> 
-> Please, please read this again ^^
+On Tue, Apr 26, 2022 at 1:10 PM Dave Hansen <dave.hansen@intel.com> wrote:
+[..]
+> > 3. Memory hotplug
+> >
+> > The first generation of TDX architecturally doesn't support memory
+> > hotplug.  And the first generation of TDX-capable platforms don't support
+> > physical memory hotplug.  Since it physically cannot happen, this series
+> > doesn't add any check in ACPI memory hotplug code path to disable it.
+> >
+> > A special case of memory hotplug is adding NVDIMM as system RAM using
 
-OK.  I'll think about solutions and come back later.
+Saw "NVDIMM" mentioned while browsing this, so stopped to make a comment...
 
-> 
-> > > What about all the concerns about TDX module configuration changing?
-> > 
-> > Leaving the TDX module in fully initialized state or shutdown state (in case of
-> > error during it's initialization) to the new kernel is fine.  If the new kernel
-> > doesn't use TDX at all, then the TDX module won't access memory using it's
-> > global TDX KeyID.  If the new kernel wants to use TDX, it will fail on the very
-> > first SEAMCALL when it tries to initialize the TDX module, and won't use
-> > SEAMCALL to call the TDX module again.  If the new kernel doesn't follow this,
-> > then it is a bug in the new kernel, or the new kernel is malicious, in which
-> > case it can potentially corrupt the data.  But I don't think we need to consider
-> > this as if the new kernel is malicious, then it can corrupt data anyway.
-> > 
-> > Does this make sense?
-> 
-> No, I'm pretty lost.  But, I'll look at the next version of this with
-> fresh eyes and hopefully you'll have had time to streamline the text by
-> then.
+> > kmem driver.  However the first generation of TDX-capable platforms
+> > cannot enable TDX and NVDIMM simultaneously, so in practice this cannot
+> > happen either.
+>
+> What prevents this code from today's code being run on tomorrow's
+> platforms and breaking these assumptions?
 
-OK thanks.
+The assumption is already broken today with NVDIMM-N. The lack of
+DDR-T support on TDX enabled platforms has zero effect on DDR-based
+persistent memory solutions. In other words, please describe the
+actual software and hardware conflicts at play here, and do not make
+the mistake of assuming that "no DDR-T support on TDX platforms" ==
+"no NVDIMM support".
 
--- 
-Thanks,
--Kai
+> > Another case is admin can use 'memmap' kernel command line to create
+> > legacy PMEMs and use them as TD guest memory, or theoretically, can use
+> > kmem driver to add them as system RAM.  To avoid having to change memory
+> > hotplug code to prevent this from happening, this series always include
+> > legacy PMEMs when constructing TDMRs so they are also TDX memory.
 
+I am not sure what you are trying to say here?
 
+> > 4. CPU hotplug
+> >
+> > The first generation of TDX architecturally doesn't support ACPI CPU
+> > hotplug.  All logical cpus are enabled by BIOS in MADT table.  Also, the
+> > first generation of TDX-capable platforms don't support ACPI CPU hotplug
+> > either.  Since this physically cannot happen, this series doesn't add any
+> > check in ACPI CPU hotplug code path to disable it.
+
+What are the actual challenges posed to TDX with respect to CPU hotplug?
+
+> > Also, only TDX module initialization requires all BIOS-enabled cpus are
+
+Please define "BIOS-enabled" cpus. There is no "BIOS-enabled" line in
+/proc/cpuinfo for example.
