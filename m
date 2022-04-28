@@ -2,68 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1607D512A41
-	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 05:55:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03644512B17
+	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 07:47:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237416AbiD1D7B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 23:59:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51194 "EHLO
+        id S236607AbiD1Fuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Apr 2022 01:50:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231944AbiD1D7A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 23:59:00 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B45F3337C;
-        Wed, 27 Apr 2022 20:55:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651118144; x=1682654144;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=UM3ugeObnhWoZ4muc5hHOKA0zHtXIpTMZ5+iv76ouZE=;
-  b=k4/QYlY8RYgCl+56Dctm1Pm6KwMQC7mD88XuRpNGWPIb4DHtAEEL1QQZ
-   Cmpby7b5Z7LKyaPdzYyZiUKVHD1B8RAKV05uv0QFbpdA0/R0QUYWR9VAn
-   BHBL+O7pANDqNiEiDY8SIqNVv8RCoT1MGd3YDnp/nrcWp70ilA+o182zE
-   XBqeg9oj3ItlAFwdNZ10bqTMIK10ehRMYmCmBkvTL4d6swiEag+ChzXEB
-   PexYjA6DNlKnrfy5lKKhioIoG28A4sgbVXvXRhReVfSJAE90gL9YiB8Mu
-   KgtdtqmAhfSwVQdR2wDiPU5ioAaSru/yRAyYBnLQ5wATa1h6g+6fk/Bof
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10330"; a="266309888"
-X-IronPort-AV: E=Sophos;i="5.90,295,1643702400"; 
-   d="scan'208";a="266309888"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 20:55:43 -0700
-X-IronPort-AV: E=Sophos;i="5.90,295,1643702400"; 
-   d="scan'208";a="565409201"
-Received: from gachar1x-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.58.159])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 20:55:39 -0700
-Message-ID: <8cb0535827a73b3fac75ac8b0163045ef166efa6.camel@intel.com>
-Subject: Re: [PATCH v3 10/21] x86/virt/tdx: Add placeholder to coveret all
- system RAM as TDX memory
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-Date:   Thu, 28 Apr 2022 15:55:37 +1200
-In-Reply-To: <73c8e61c-1057-a3ff-904d-6b7ddaaac83b@intel.com>
-References: <cover.1649219184.git.kai.huang@intel.com>
-         <6230ef28be8c360ab326c8f592acf1964ac065c1.1649219184.git.kai.huang@intel.com>
-         <d69c08da-80fa-2001-bbe8-8c45552e74ae@intel.com>
-         <228cfa7e5326fa378c1dde2b5e9022146f97b706.camel@intel.com>
-         <1624e839-81e5-7bc7-533b-c5c838d35f47@intel.com>
-         <a6fb489700ce00fcb32a670a2fd7bf99a113d878.camel@intel.com>
-         <73c8e61c-1057-a3ff-904d-6b7ddaaac83b@intel.com>
+        with ESMTP id S233008AbiD1Fun (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Apr 2022 01:50:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6649B60D91
+        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 22:47:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651124847;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=DG+ZWTYM+2N3N8ie381woeSNrk5TKMnxDxFcPW5T2gU=;
+        b=ANwMoVLoAPNn52nzcbabSYPK29Jup2CneEKztpm5MJ8wWbnMN/Qh0TNALykpONhXTVgOun
+        DC+kHDQ0lbzWAivtd6O72H7/FAUn677Y0i9gW2UouYaQtbVg+Trm+tJnJ5ZPDaoTjG7Cfj
+        SUJz6CqkU21+xhii2z2t1SMs/Whx8iE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-671-6NkoKukGOtaavdgTVDpqmw-1; Thu, 28 Apr 2022 01:47:23 -0400
+X-MC-Unique: 6NkoKukGOtaavdgTVDpqmw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C903885A5BE;
+        Thu, 28 Apr 2022 05:47:22 +0000 (UTC)
+Received: from starship (unknown [10.40.192.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2536C2024CBB;
+        Thu, 28 Apr 2022 05:47:14 +0000 (UTC)
+Message-ID: <68707ba71f3e03d9d9a7bc5b0f592fb3cef2f776.camel@redhat.com>
+Subject: Re: [PATCH 1/8] KVM: x86: avoid loading a vCPU after .vm_destroy
+ was called
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        linux-kernel@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>, stable@vger.kernel.org
+Date:   Thu, 28 Apr 2022 08:47:13 +0300
+In-Reply-To: <27670a35-c67e-726f-f03f-9cf2eae83523@redhat.com>
+References: <20220322172449.235575-1-mlevitsk@redhat.com>
+         <20220322172449.235575-2-mlevitsk@redhat.com> <YkOkCwUgMD1SVfaD@google.com>
+         <27670a35-c67e-726f-f03f-9cf2eae83523@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,85 +72,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-04-27 at 20:40 -0700, Dave Hansen wrote:
-> On 4/27/22 18:35, Kai Huang wrote:
-> > On Wed, 2022-04-27 at 18:07 -0700, Dave Hansen wrote:
-> > > Also, considering that you're about to go allocate potentially gigabytes
-> > > of physically contiguous memory, it seems laughable that you'd go to any
-> > > trouble at all to allocate an array of pointers here.  Why not just
-> > > 
-> > > 	kcalloc(tdx_sysinfo.max_tdmrs, sizeof(struct tmdr_info), ...);
+On Wed, 2022-03-30 at 14:07 +0200, Paolo Bonzini wrote:
+> On 3/30/22 02:27, Sean Christopherson wrote:
+> > Rather than split kvm_free_vcpus(), can we instead move the call to svm_vm_destroy()
+> > by adding a second hook, .vm_teardown(), which is needed for TDX?  I.e. keep VMX
+> > where it is by using vm_teardown, but effectively move SVM?
 > > 
-> > kmalloc() guarantees the size-alignment if the size is power-of-two.  TDMR_INFO
-> > (512-bytes) itself is  power of two, but the 'max_tdmrs x sizeof(TDMR_INFO)' may
-> > not be power of two.  For instance, when max_tdmrs == 3, the result is not
-> > power-of-two.
-> > 
-> > Or am I wrong? I am not good at math though.
+> > https://lore.kernel.org/all/1fa2d0db387a99352d44247728c5b8ae5f5cab4d.1637799475.git.isaku.yamahata@intel.com
 > 
-> No, you're right, the kcalloc() wouldn't work for odd sizes.
+> I'd rather do that only for the TDX patches.
 > 
-> But, the point is still that you don't need an array of pointers.  Use
-> vmalloc().  Use a plain old alloc_pages_exact().  Why bother wasting
-> the memory and addiong the complexity of an array of pointers?
-
-OK.  This makes sense.
-
-One thing I didn't say clearly is TDMR_INFO is 512-byte aligned, but not could
-be larger than 512 bytes, and the maximum number of reserved areas in TDMR_INFO
-is enumerated via TDSYSINFO_STRUCT.  We can always roundup TDMR_INFO size to be
-512-byte aligned, and calculate enough pages to hold maximum number of
-TDMR_INFO.  In this case, we can still guarantee each TDMR_INFO is 512-byte
-aligned.
-
-I'll change to use alloc_pages_exact(), since we can get physical address of
-TDMR_INFO from it easily.
-
+> Paolo
 > 
-> > > Or, heck, just vmalloc() the dang thing.  Why even bother with the array
-> > > of pointers?
-> > > 
-> > > 
-> > > > > > +	if (!tdmr_array) {
-> > > > > > +		ret = -ENOMEM;
-> > > > > > +		goto out;
-> > > > > > +	}
-> > > > > > +
-> > > > > > +	/* Construct TDMRs to build TDX memory */
-> > > > > > +	ret = construct_tdmrs(tdmr_array, &tdmr_num);
-> > > > > > +	if (ret)
-> > > > > > +		goto out_free_tdmrs;
-> > > > > > +
-> > > > > >  	/*
-> > > > > >  	 * Return -EFAULT until all steps of TDX module
-> > > > > >  	 * initialization are done.
-> > > > > >  	 */
-> > > > > >  	ret = -EFAULT;
-> > > > > 
-> > > > > There's the -EFAULT again.  I'd replace these with a better error code.
-> > > > 
-> > > > I couldn't think out a better error code.  -EINVAL looks doesn't suit.  -EAGAIN
-> > > > also doesn't make sense for now since we always shutdown the TDX module in case
-> > > > of any error so caller should never retry.  I think we need some error code to
-> > > > tell "the job isn't done yet".  Perhaps -EBUSY?
-> > > 
-> > > Is this going to retry if it sees -EFAULT or -EBUSY?
-> > 
-> > No.  Currently we always shutdown the module in case of any error.  Caller won't
-> > be able to retry.
-> > 
-> > In the future, this can be optimized.  We don't shutdown the module in case of
-> > *some* error (i.e. -ENOMEM), but record an internal state when error happened,
-> > so the caller can retry again.  For now, there's no retry.
-> 
-> Just make the error codes -EINVAL, please.  I don't think anything else
-> makes sense.
-> 
+Any update on this patch? Looks like it is not upstream nor in kvm/queue.
 
-OK will do.
-
--- 
-Thanks,
--Kai
-
+Best regards,
+	Maxim Levitsky
 
