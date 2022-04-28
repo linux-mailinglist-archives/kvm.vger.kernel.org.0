@@ -2,88 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D9BD513F46
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 01:59:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46EEE513F4C
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 02:00:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230353AbiD2ACi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Apr 2022 20:02:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41656 "EHLO
+        id S1353498AbiD2ACv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Apr 2022 20:02:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353464AbiD2ACh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Apr 2022 20:02:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F189BB3DE0
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 16:59:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651190360;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GmImSFPf7Lk+sCfWgtXvV7fwMchqJTRIojOVtL7C1jE=;
-        b=Gx7/kBzIrtIc7KWC+CdYzCfI/7G2bB8DmSU/ArTIGUz17+MTZh6TLlLZgKJEPXGO82GTGh
-        azGpuPSi6cIoe1Vu5KK34KqaEV2Te1Lws8ZIVBAyJCIeSEg9hE6gJtwUAkRWcZqMHDM5nH
-        VDmOKCxAPRqyjuDE/dVGUWsmBEULw+c=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-628-g5ppDwloNhKUcy2OBiyqCw-1; Thu, 28 Apr 2022 19:59:18 -0400
-X-MC-Unique: g5ppDwloNhKUcy2OBiyqCw-1
-Received: by mail-ej1-f72.google.com with SMTP id sc8-20020a1709078a0800b006f3ed35a96bso795066ejc.15
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 16:59:18 -0700 (PDT)
+        with ESMTP id S1353494AbiD2ACt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Apr 2022 20:02:49 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BADA1B3DFA
+        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 16:59:33 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id t13so5565098pfg.2
+        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 16:59:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=NkdAc4ROI0IN/ucEyriBKuBm/wRvD7rJzE7ZldBnAVc=;
+        b=ieCdewl7trcwYiGuAViRjmy/2tPSl//ooh0sBkiUyaOLVGeYHI7HVNyw1r6oF2JGQO
+         wfPhoK55na+q18w1IdYcarFh52JwEJunWLJfpUerDlCXy4BqlJkTthQFCWzT10C5/ZVU
+         0+HWNKY67dGMsV+nXLrNvwTZKqqBzKZL16K6YZD7Cpc/U8hwdKDAgjrVS3IfWkpIGreI
+         D430VmGlMTpTRYD+IQcZ/H/qobaUYmH1FL+2Vz1q7oNagkq4L4WL60pu/V5/mVYs1kKG
+         KzC4J6Y5AjnwmiyJRQB6MqXVRBitr4Oj5gIOfXtkBoM61rdWVcm7rmBkrKtjNvTS0/j7
+         22+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:subject:in-reply-to
-         :content-transfer-encoding;
-        bh=GmImSFPf7Lk+sCfWgtXvV7fwMchqJTRIojOVtL7C1jE=;
-        b=APPRnoZ9ECI8NIWmmb/cZjCBcyalOhiG/jPLKSdZoJoK13voi6F3Yj553TpBZNgA/D
-         Z9M0rVez2aKRyr4Ex7ULEH0tYlS52QCqNHfTJa8j4MGR01LdLEWoj6eeoZ6Ft27Q+1uu
-         gpip/IKohvTqcshLIweNu4uNxbug4kbF4K85CF09ixifywF45o7XElV4XM288v2atZID
-         8sHTeTLlO9S7OTi2eWB64xmqR5tgwj5LV9ajRhiXTK0stbFH5/5zBSdi2dUipgJUzsLj
-         zwi73UpHT9pDFIeQankqNZ2IdCElvoq87Q7VcXwC5VMuzhUMkEv2pqs+QVL4h7a26X5v
-         fDjw==
-X-Gm-Message-State: AOAM533pR+Jg10Pqw8XM89bpzSy1a3dXaCkCu0N9YS3lLgcEcCDfxENE
-        u1ccnMrOjgeEgyjtDw9dpArsV2OyWUfeFr/Vf1pweJjc0c7mOG2U+UN/3eJhmsE+mvilCTIB8+C
-        MFKTK3ab1BPzs
-X-Received: by 2002:a17:907:3e03:b0:6da:8c5a:6d4a with SMTP id hp3-20020a1709073e0300b006da8c5a6d4amr34480355ejc.585.1651190357693;
-        Thu, 28 Apr 2022 16:59:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyvQWqAkEscMBqtrgcOG7c/Xt8T1z0QIoEC+It5ziR4YdJrD098v9gADqk/w3yefNecLK0hTQ==
-X-Received: by 2002:a17:907:3e03:b0:6da:8c5a:6d4a with SMTP id hp3-20020a1709073e0300b006da8c5a6d4amr34480346ejc.585.1651190357468;
-        Thu, 28 Apr 2022 16:59:17 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id em20-20020a170907289400b006f3ef214e03sm129292ejc.105.2022.04.28.16.59.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Apr 2022 16:59:16 -0700 (PDT)
-Message-ID: <0d282be4-d612-374d-84ba-067994321bab@redhat.com>
-Date:   Fri, 29 Apr 2022 01:59:15 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=NkdAc4ROI0IN/ucEyriBKuBm/wRvD7rJzE7ZldBnAVc=;
+        b=1tnmR5hjE0FJVuFzJDsLsVTEb0Ucp/Criq4C019f8AIFv2+6u+3+yOPm8P6MV3tAVx
+         2IhWS7nUxSbeLTkoYFAH46QuZ0LOE1gK/80wRZu60/nkQ8oCkkplShQqZTp89aRlgOiM
+         /GaU4dcnCYtEq5UmU0gYJAHPAihxZrwKCNrCV/hYRjLcN1+U6LVqN7w/fjaZuPlxMVyZ
+         JU26e0O96ywYqDCX/CjU6HWr8fRDS579RLCS7pG9V9AFSXlk9AoJxJnL4qVdXBELaaAu
+         wrlWBN9w2HPoSjbPs0qk4Cl2GHPOYe7Av/YgFYB+3VtwS5UR+OHwS3iJqBhnFt58Ge1a
+         pRDg==
+X-Gm-Message-State: AOAM531DvtTQ4ebPn3jKJp53sckZ/tmEmI0n4HYS8skysnSur0BU/sW5
+        6zW3Tz0CKXePbJ6CTXOhvbKfsQ==
+X-Google-Smtp-Source: ABdhPJygQErW25U15esiDo2hH4DIrCtVSvl+BhW210cRVNRvdTJew+wcH3kEtOeLxjnuGlXwcmydZg==
+X-Received: by 2002:a05:6a00:1307:b0:4b0:b1c:6fd9 with SMTP id j7-20020a056a00130700b004b00b1c6fd9mr37165986pfu.27.1651190373046;
+        Thu, 28 Apr 2022 16:59:33 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id i68-20020a628747000000b0050d25c48c3fsm936677pfe.90.2022.04.28.16.59.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Apr 2022 16:59:32 -0700 (PDT)
+Date:   Thu, 28 Apr 2022 23:59:29 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v3 3/3] KVM: selftests: Add selftests for dirty quota
+ throttling
+Message-ID: <YmsqYZCMxR+Y/EP5@google.com>
+References: <20220306220849.215358-1-shivam.kumar1@nutanix.com>
+ <20220306220849.215358-4-shivam.kumar1@nutanix.com>
+ <3bd9825e-311f-1d33-08d4-04f3d22f9239@nutanix.com>
+ <6c5ee7d1-63bb-a0a7-fb0c-78ffcfd97bc5@nutanix.com>
+ <Yl2PEXqHswOc2j0L@google.com>
+ <a8468330-5126-901a-7e49-2566ffcca591@nutanix.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Content-Language: en-US
-To:     Peter Gonda <pgonda@google.com>
-Cc:     John Sperbeck <jsperbeck@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20220407195908.633003-1-pgonda@google.com>
- <CAFNjLiXC0AdOw5f8Ovu47D==ex7F0=WN_Ocirymz4xL=mWvC5A@mail.gmail.com>
- <CAMkAt6r-Mc_YN-gVHuCpTj4E1EmcvyYpP9jhtHo5HRHnoNJAdA@mail.gmail.com>
- <CAMkAt6r+OMPWCbV_svUyGWa0qMzjj2UEG29G6P7jb6uH6yko2w@mail.gmail.com>
- <62e9ece1-5d71-f803-3f65-2755160cf1d1@redhat.com>
- <CAMkAt6q6YLBfo2RceduSXTafckEehawhD4K4hUEuB4ZNqe2kKg@mail.gmail.com>
- <4c0edc90-36a1-4f4c-1923-4b20e7bdbb4c@redhat.com>
- <CAMkAt6oL5qi7z-eh4z7z8WBhpc=Ow6WtcJA5bDi6-aGMnz135A@mail.gmail.com>
- <CAMkAt6rmDrZfN5DbNOTsKFV57PwEnK2zxgBTCbEPeE206+5v5w@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3] KVM: SEV: Mark nested locking of vcpu->lock
-In-Reply-To: <CAMkAt6rmDrZfN5DbNOTsKFV57PwEnK2zxgBTCbEPeE206+5v5w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a8468330-5126-901a-7e49-2566ffcca591@nutanix.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,60 +80,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/28/22 23:28, Peter Gonda wrote:
+On Thu, Apr 28, 2022, Shivam Kumar wrote:
 > 
-> So when actually trying this out I noticed that we are releasing the
-> current vcpu iterator but really we haven't actually taken that lock
-> yet. So we'd need to maintain a prev_* pointer and release that one.
+> On 18/04/22 9:47 pm, Sean Christopherson wrote:
+> > On Mon, Apr 18, 2022, Shivam Kumar wrote:
+> > > > > +void vcpu_handle_dirty_quota_exit(struct kvm_run *run,
+> > > > > +            uint64_t test_dirty_quota_increment)
+> > > > > +{
+> > > > > +    uint64_t quota = run->dirty_quota_exit.quota;
+> > > > > +    uint64_t count = run->dirty_quota_exit.count;
+> > > > > +
+> > > > > +    /*
+> > > > > +     * Due to PML, number of pages dirtied by the vcpu can exceed its dirty
+> > > > > +     * quota by PML buffer size.
+> > > > > +     */
+> > > > > +    TEST_ASSERT(count <= quota + PML_BUFFER_SIZE, "Invalid number of pages
+> > > > > +        dirtied: count=%"PRIu64", quota=%"PRIu64"\n", count, quota);
+> > > Sean, I don't think this would be valid anymore because as you mentioned, the
+> > > vcpu can dirty multiple pages in one vmexit. I could use your help here.
+> > TL;DR: Should be fine, but s390 likely needs an exception.
+> > 
+> > Practically speaking the 512 entry fuzziness is all but guaranteed to prevent
+> > false failures.
+> > 
+> > But, unconditionally allowing for overflow of 512 entries also means the test is
+> > unlikely to ever detect violations.  So to provide meaningful coverage, this needs
+> > to allow overflow if and only if PML is enabled.
+> > 
+> > And that brings us back to false failures due to _legitimate_ scenarios where a vCPU
+> > can dirty multiple pages.  Emphasis on legitimate, because except for an s390 edge
+> > case, I don't think this test's guest code does anything that would dirty multiple
+> > pages in a single instruction, e.g. there's no emulation, shouldn't be any descriptor
+> > table side effects, etc...  So unless I'm missing something, KVM should be able to
+> > precisely handle the core run loop.
+> > 
+> > s390 does appear to have a caveat:
+> > 
+> > 	/*
+> > 	 * On s390x, all pages of a 1M segment are initially marked as dirty
+> > 	 * when a page of the segment is written to for the very first time.
+> > 	 * To compensate this specialty in this test, we need to touch all
+> > 	 * pages during the first iteration.
+> > 	 */
+> > 	for (i = 0; i < guest_num_pages; i++) {
+> > 		addr = guest_test_virt_mem + i * guest_page_size;
+> > 		*(uint64_t *)addr = READ_ONCE(iteration);
+> > 	}
+> > 
+> > IIUC, subsequent iterations will be ok, but the first iteration needs to allow
+> > for overflow of 256 (AFAIK the test only uses 4kb pages on s390).
+> Hi Sean, need an advice from your side before sending v4. In my opinion, I
+> should organise my patchset in a way that the first n-1 patches have changes
+> for x86 and the last patch has the changes for s390 and arm64. This can help
+> me move forward for the x86 arch and get help and reviews from s390 and
+> arm64 maintainers in parallel. Please let me know if this makes sense.
 
-Not entirely true because all vcpu->mutex.dep_maps will be for the same 
-lock.  The dep_map is essentially a fancy string, in this case 
-"&vcpu->mutex".
-
-See the definition of mutex_init:
-
-#define mutex_init(mutex)                                              \
-do {                                                                   \
-         static struct lock_class_key __key;                            \
-                                                                        \
-         __mutex_init((mutex), #mutex, &__key);                         \
-} while (0)
-
-and the dep_map field is initialized with
-
-         lockdep_init_map_wait(&lock->dep_map, name, key, 0, LD_WAIT_SLEEP);
-
-(i.e. all vcpu->mutexes share the same name and key because they have a 
-single mutex_init-ialization site).  Lockdep is as crude in theory as it 
-is effective in practice!
-
-> 
->           bool acquired = false;
->           kvm_for_each_vcpu(...) {
->                   if (!acquired) {
->                      if (mutex_lock_killable_nested(&vcpu->mutex, role)
->                          goto out_unlock;
->                      acquired = true;
->                   } else {
->                      if (mutex_lock_killable(&vcpu->mutex, role)
->                          goto out_unlock;
-
-This will cause a lockdep splat because it uses subclass 0.  All the 
-*_nested functions is allow you to specify a subclass other than zero.
-
-Paolo
-
->                   }
->           }
-> 
-> To unlock:
-> 
->           kvm_for_each_vcpu(...) {
->              mutex_unlock(&vcpu->mutex);
->           }
-> 
-> This way instead of mocking and releasing the lock_dep we just lock
-> the fist vcpu with mutex_lock_killable_nested(). I think this
-> maintains the property you suggested of "coalesces all the mutexes for
-> a vm in a single subclass".  Thoughts?
-
+Works for me.  It probably makes sense to split s390 and arm64 too, that way you
+don't need a v5 if one wants the feature and the other does not.
