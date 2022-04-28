@@ -2,127 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DA1751286D
-	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 03:02:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5721851287C
+	for <lists+kvm@lfdr.de>; Thu, 28 Apr 2022 03:07:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236234AbiD1BFT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Apr 2022 21:05:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35666 "EHLO
+        id S231331AbiD1BK4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Apr 2022 21:10:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229848AbiD1BFR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Apr 2022 21:05:17 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16B9213DC0
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 18:02:05 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id u9so2384567plf.6
-        for <kvm@vger.kernel.org>; Wed, 27 Apr 2022 18:02:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gGGuSc0LSBpuNtbaK3b654kpekt8+afyXub7g//oygQ=;
-        b=lfN+Nhqc2aJ4rKKRp29t9F072aKzevhDma4KY5PS1Z/oIl/YgaJt1bXV+Qghxx6s0e
-         dXntgAWGVNC6Y4bxz9ls0y/VdHGaZ9PgdmVNvcdsvCfWV4w4bV4pS43+dT3k6bq0N97q
-         mn2BLHfNh93NYHcrOtUbs3g370CwDKhkNY0xqKp6HDoIMf0MohHESw8owRmF56Q1KJZl
-         tKwh+sE3tnkwAPlIfglLpZZjQFx2vx+2GBqiLJqdln9Ji4yMbzZqIJ3Akk2OMeGLcJHg
-         +0kHO5wjo5AlS2L0n6lBNDuccRTU0SzPLtNB7HBzNcvetMpbt+rN8Xsy+uwFbXD5Tkyc
-         xBKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gGGuSc0LSBpuNtbaK3b654kpekt8+afyXub7g//oygQ=;
-        b=FoGdCV1KyfPTJhxY3gVRPFy6gaUALlaaLB+xInCgrDsYKghoRuntsGsqDIGs5ORKeF
-         1J05ZDdyKQQpMoklTnin/ta0irWdMNNGCmW/AvnPprhX/cQ0tL4KvnG53l4c3HPr9XhT
-         ZWC3NGornIwaeGuNV0ubIkMXdt6KC2tUj4mNB/OlRlwNKWfYTIK1udubxMIp8HVsEV8c
-         uj8447IZO5MizMQy3lWI/13sT5bkUeR00B9zRoq5XSPkEzy2sFxoSqie726+z9ffucTR
-         maxwQT85AcXl9x7ugjSjgC1qFCkPTjt4eYPhgpClBzTohDJdRSL5/oi+gy44C7prclPB
-         KtWg==
-X-Gm-Message-State: AOAM533e++oXtbZ1pR6osdjRzg7gHvhP9WAlNaAs7OMNhe0in7cxHHe5
-        mggf0Gz76XOdnzal0HATyHrDp062oAtUs+1GCYnzfw==
-X-Google-Smtp-Source: ABdhPJzjke2ZEb+yF7GVfe3sX27nyy/kmsf+yglPd7alvwRgx2AoojnzZ+0Ix57E6s7+ew5bxxyRUl/ZtqkXCCwM560=
-X-Received: by 2002:a17:902:da81:b0:15d:37b9:70df with SMTP id
- j1-20020a170902da8100b0015d37b970dfmr10897086plx.34.1651107724585; Wed, 27
- Apr 2022 18:02:04 -0700 (PDT)
+        with ESMTP id S229887AbiD1BKz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Apr 2022 21:10:55 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB1A76A064;
+        Wed, 27 Apr 2022 18:07:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651108062; x=1682644062;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=2gBxdgt48nj77jzRla0ic/dl45U8oWm98zru5apAGlA=;
+  b=jV3o/oRDzfSVeSwkYHfKYXOC9Ta1Zi97+hTCtD4vgpNekXxYmA06kli5
+   Te+h4hsawr+M0waL160hOZ5HSl/5aplTJcjhHqyJ/7q6aNn0ytVMkYyFM
+   C1hxyH2cIen6sTJq2eDjMNTiAjlCAqeRsJMecpFLZjbjjHboDviqgxvR8
+   5YMjW+XPi19bGGEJONse5rDxpxj58J3mJR8j+qN8Xocv62PgeFoSjbde8
+   Ia9pX0SnbNK7gQgaZL44scHaynW7VINFfmKrsGqVlw17+nF10fsXU/RMG
+   TYVZ9Hxdted6U32CGqMtwyOdEURNhh6ElzlzXR89uZQA+YO/ETLR9B1CG
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10330"; a="253503506"
+X-IronPort-AV: E=Sophos;i="5.90,294,1643702400"; 
+   d="scan'208";a="253503506"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 18:07:42 -0700
+X-IronPort-AV: E=Sophos;i="5.90,294,1643702400"; 
+   d="scan'208";a="513988230"
+Received: from lcdaughe-mobl1.amr.corp.intel.com (HELO [10.212.72.252]) ([10.212.72.252])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2022 18:07:41 -0700
+Message-ID: <1624e839-81e5-7bc7-533b-c5c838d35f47@intel.com>
+Date:   Wed, 27 Apr 2022 18:07:57 -0700
 MIME-Version: 1.0
-References: <cover.1649219184.git.kai.huang@intel.com> <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
-In-Reply-To: <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Wed, 27 Apr 2022 18:01:53 -0700
-Message-ID: <CAPcyv4g5E_TOow=3pFJXyFr=KLV9pTSnDthgz6TuXvru4xDzaQ@mail.gmail.com>
-Subject: Re: [PATCH v3 00/21] TDX host kernel support
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Kai Huang <kai.huang@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Kuppuswamy Sathyanarayanan 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v3 10/21] x86/virt/tdx: Add placeholder to coveret all
+ system RAM as TDX memory
+Content-Language: en-US
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com
+References: <cover.1649219184.git.kai.huang@intel.com>
+ <6230ef28be8c360ab326c8f592acf1964ac065c1.1649219184.git.kai.huang@intel.com>
+ <d69c08da-80fa-2001-bbe8-8c45552e74ae@intel.com>
+ <228cfa7e5326fa378c1dde2b5e9022146f97b706.camel@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <228cfa7e5326fa378c1dde2b5e9022146f97b706.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 26, 2022 at 1:10 PM Dave Hansen <dave.hansen@intel.com> wrote:
-[..]
-> > 3. Memory hotplug
-> >
-> > The first generation of TDX architecturally doesn't support memory
-> > hotplug.  And the first generation of TDX-capable platforms don't support
-> > physical memory hotplug.  Since it physically cannot happen, this series
-> > doesn't add any check in ACPI memory hotplug code path to disable it.
-> >
-> > A special case of memory hotplug is adding NVDIMM as system RAM using
+On 4/27/22 17:53, Kai Huang wrote:
+> On Wed, 2022-04-27 at 15:24 -0700, Dave Hansen wrote:
+>> On 4/5/22 21:49, Kai Huang wrote:
+>>> TDX provides increased levels of memory confidentiality and integrity.
+>>> This requires special hardware support for features like memory
+>>> encryption and storage of memory integrity checksums.  Not all memory
+>>> satisfies these requirements.
+>>>
+>>> As a result, TDX introduced the concept of a "Convertible Memory Region"
+>>> (CMR).  During boot, the firmware builds a list of all of the memory
+>>> ranges which can provide the TDX security guarantees.  The list of these
+>>> ranges, along with TDX module information, is available to the kernel by
+>>> querying the TDX module.
+>>>
+>>> In order to provide crypto protection to TD guests, the TDX architecture
+>>
+>> There's that "crypto protection" thing again.  I'm not really a fan of
+>> the changes made to this changelog since I wrote it. :)
+> 
+> Sorry about that.  I'll remove "In order to provide crypto protection to TD
+> guests".
 
-Saw "NVDIMM" mentioned while browsing this, so stopped to make a comment...
+Seriously, though.  I took the effort to write these changelogs for you.
+ They were fine.  I'm not stoked about needing to proofread them again.
 
-> > kmem driver.  However the first generation of TDX-capable platforms
-> > cannot enable TDX and NVDIMM simultaneously, so in practice this cannot
-> > happen either.
->
-> What prevents this code from today's code being run on tomorrow's
-> platforms and breaking these assumptions?
+>>> also needs additional metadata to record things like which TD guest
+>>> "owns" a given page of memory.  This metadata essentially serves as the
+>>> 'struct page' for the TDX module.  The space for this metadata is not
+>>> reserved by the hardware upfront and must be allocated by the kernel
+>>
+>> 			    ^ "up front"
+> 
+> Thanks will change to "up front".
+> 
+> Btw, the gmail grammar check gives me a red line if I use "up front", but it
+> doesn't complain "upfront".
 
-The assumption is already broken today with NVDIMM-N. The lack of
-DDR-T support on TDX enabled platforms has zero effect on DDR-based
-persistent memory solutions. In other words, please describe the
-actual software and hardware conflicts at play here, and do not make
-the mistake of assuming that "no DDR-T support on TDX platforms" ==
-"no NVDIMM support".
+I'm pretty sure it's wrong.  "up front" is an adverb that applies to
+"reserved".  "Upfront" is an adjective and not how you used it in that
+sentence.
 
-> > Another case is admin can use 'memmap' kernel command line to create
-> > legacy PMEMs and use them as TD guest memory, or theoretically, can use
-> > kmem driver to add them as system RAM.  To avoid having to change memory
-> > hotplug code to prevent this from happening, this series always include
-> > legacy PMEMs when constructing TDMRs so they are also TDX memory.
+>>> +	 * allocated individually within construct_tdmrs() to meet
+>>> +	 * this requirement.
+>>> +	 */
+>>> +	tdmr_array = kcalloc(tdx_sysinfo.max_tdmrs, sizeof(struct tdmr_info *),
+>>> +			GFP_KERNEL);
+>>
+>> Where, exactly is that alignment provided?  A 'struct tdmr_info *' is 8
+>> bytes so a tdx_sysinfo.max_tdmrs=8 kcalloc() would only guarantee
+>> 64-byte alignment.
+> 
+> The entries in the array only contain a pointer to TDMR_INFO.  The actual
+> TDMR_INFO is allocated separately. The array itself is never used by TDX
+> hardware so it doesn't matter.  We just need to guarantee each TDMR_INFO is
+> 512B-byte aligned.
 
-I am not sure what you are trying to say here?
+The comment was clear as mud about this.  If you're going to talk about
+alignment, then do it near the allocation that guarantees the alignment,
+not in some other function near *ANOTHER* allocation.
 
-> > 4. CPU hotplug
-> >
-> > The first generation of TDX architecturally doesn't support ACPI CPU
-> > hotplug.  All logical cpus are enabled by BIOS in MADT table.  Also, the
-> > first generation of TDX-capable platforms don't support ACPI CPU hotplug
-> > either.  Since this physically cannot happen, this series doesn't add any
-> > check in ACPI CPU hotplug code path to disable it.
+Also, considering that you're about to go allocate potentially gigabytes
+of physically contiguous memory, it seems laughable that you'd go to any
+trouble at all to allocate an array of pointers here.  Why not just
 
-What are the actual challenges posed to TDX with respect to CPU hotplug?
+	kcalloc(tdx_sysinfo.max_tdmrs, sizeof(struct tmdr_info), ...);
 
-> > Also, only TDX module initialization requires all BIOS-enabled cpus are
+Or, heck, just vmalloc() the dang thing.  Why even bother with the array
+of pointers?
 
-Please define "BIOS-enabled" cpus. There is no "BIOS-enabled" line in
-/proc/cpuinfo for example.
+
+>>> +	if (!tdmr_array) {
+>>> +		ret = -ENOMEM;
+>>> +		goto out;
+>>> +	}
+>>> +
+>>> +	/* Construct TDMRs to build TDX memory */
+>>> +	ret = construct_tdmrs(tdmr_array, &tdmr_num);
+>>> +	if (ret)
+>>> +		goto out_free_tdmrs;
+>>> +
+>>>  	/*
+>>>  	 * Return -EFAULT until all steps of TDX module
+>>>  	 * initialization are done.
+>>>  	 */
+>>>  	ret = -EFAULT;
+>>
+>> There's the -EFAULT again.  I'd replace these with a better error code.
+> 
+> I couldn't think out a better error code.  -EINVAL looks doesn't suit.  -EAGAIN
+> also doesn't make sense for now since we always shutdown the TDX module in case
+> of any error so caller should never retry.  I think we need some error code to
+> tell "the job isn't done yet".  Perhaps -EBUSY?
+
+Is this going to retry if it sees -EFAULT or -EBUSY?
