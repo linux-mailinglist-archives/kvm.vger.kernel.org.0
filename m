@@ -2,125 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 475205153C3
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 20:32:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1822F5153C6
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 20:34:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380043AbiD2SgE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 14:36:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48038 "EHLO
+        id S1379927AbiD2Shy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 14:37:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237744AbiD2SgD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 14:36:03 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AA18D4C90;
-        Fri, 29 Apr 2022 11:32:44 -0700 (PDT)
+        with ESMTP id S236661AbiD2Shx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 14:37:53 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07CA4D5543;
+        Fri, 29 Apr 2022 11:34:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651257164; x=1682793164;
+  t=1651257274; x=1682793274;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=zftMOiKfzA2N0SvkmILBHm7NmobiVBrkq7/3clP0XAg=;
-  b=iFkFV6bQaGu5XPbuMLNm3Fi30Bao33Vi82qTPmXCeCI3QV45o0j/3gJP
-   iSV4U8rFE+vQNHeJ0VcNRJ68Lu6j1mj/ODJN8EYdt3y1PELd3E1QXEFGj
-   J0oRMsddQrj2i+zVArwEnBML3qpXbpihIXHkkzIZ59gpCoL0JlWxb/su3
-   NcmSeap1IvNPnLHi9WN3q+Hhe2ue9c2GYttTj0/qcNLkdGlmBm98nRzvT
-   RBPFPjX8QvGwRW15/ej1wBwnmWekexR28FsOxDaJYNi/oRNESbmDLPF2m
-   bh54kzlO6i0c0WtrMm6VWTkI6vicC85r7vKQhT3HMWl+venwA6znq6tKs
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10332"; a="265582909"
+  bh=LMD/xKUKZ25/S/WmOS4jXEEPVwy0dkFAu8aG3A2vSHY=;
+  b=by1/H/rsOq2efLwZ7+Osj3/eKKyV52CKHWkyp3zoitWI5lq9xoFsC2hy
+   2HfhcCXog4OneGZVVynbmgorxTSrvt7IwdIWn14svsjhNeCorv11X6Xf1
+   2x9EW+qUN/1NmySUM2RMLiIiLmbZngvWheLsmkUWF5nUy0L5+c9YDp72Y
+   shlUD9iIku2KzOrPmDLTsyVoA3Nwj1u7pRK3MdVB/X28F1hLGVoOEkmKA
+   mdihpGxnXAMn6IJRa2lR8NedGaopTLSrvWvOMoXsmo3ENcwg/MjWKWn72
+   o6K6IdgPMEpff93BXmWx2bPw3DGQAeMBBebiAfjs3r4/2T3UbnrNwOu5O
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10332"; a="291911490"
 X-IronPort-AV: E=Sophos;i="5.91,186,1647327600"; 
-   d="scan'208";a="265582909"
+   d="scan'208";a="291911490"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 11:32:44 -0700
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 11:34:34 -0700
 X-IronPort-AV: E=Sophos;i="5.91,186,1647327600"; 
-   d="scan'208";a="582322111"
+   d="scan'208";a="582322897"
 Received: from jinggu-mobl1.amr.corp.intel.com (HELO [10.212.30.227]) ([10.212.30.227])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 11:32:43 -0700
-Message-ID: <7359e83b-9056-11a1-30ca-d13e9b953c95@intel.com>
-Date:   Fri, 29 Apr 2022 11:32:59 -0700
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 11:34:33 -0700
+Message-ID: <4d0c7316-3564-ef27-1113-042019d583dc@intel.com>
+Date:   Fri, 29 Apr 2022 11:34:50 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.7.0
-Subject: Re: [PATCH v3 13/21] x86/virt/tdx: Allocate and set up PAMTs for
- TDMRs
+Subject: Re: [PATCH v3 00/21] TDX host kernel support
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     Kai Huang <kai.huang@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>
 References: <cover.1649219184.git.kai.huang@intel.com>
- <ffc2eefdd212a31278978e8bfccd571355db69b0.1649219184.git.kai.huang@intel.com>
- <c9b17e50-e665-3fc6-be8c-5bb16afa784e@intel.com>
- <3664ab2a8e0b0fcbb4b048b5c3aa5a6e85f9618a.camel@intel.com>
- <5984b61f-6a4a-c12a-944d-f4a78bdefc3d@intel.com>
- <Ymv2h1GYCMQ9ZQvJ@google.com>
- <c875fc4a-c3c0-dab1-c7cb-525b0bff5ae3@intel.com>
- <YmwsOo4TCq1/5hgd@google.com>
+ <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
+ <CAPcyv4g5E_TOow=3pFJXyFr=KLV9pTSnDthgz6TuXvru4xDzaQ@mail.gmail.com>
+ <de9b8f4cef5da03226158492988956099199aa60.camel@intel.com>
+ <CAPcyv4iGsXkHAVgf+JZ4Pah_fkCZ=VvUmj7s3C6Rkejtdw_sgQ@mail.gmail.com>
+ <92af7b22-fa8a-5d42-ae15-8526abfd2622@intel.com>
+ <CAPcyv4iG977DErCfYTqhVzuZqjtqFHK3smnaOpO3p+EbxfvXcQ@mail.gmail.com>
+ <4a5143cc-3102-5e30-08b4-c07e44f1a2fc@intel.com>
+ <CAPcyv4i6X6ODNbOnT7+NEzpicLS4m9bNDybZLvN3gqXFTTf=mg@mail.gmail.com>
 From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <YmwsOo4TCq1/5hgd@google.com>
+In-Reply-To: <CAPcyv4i6X6ODNbOnT7+NEzpicLS4m9bNDybZLvN3gqXFTTf=mg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-10.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/29/22 11:19, Sean Christopherson wrote:
-> On Fri, Apr 29, 2022, Dave Hansen wrote:
->> On 4/29/22 07:30, Sean Christopherson wrote:
->>> On Fri, Apr 29, 2022, Dave Hansen wrote:
->> ...
->>>> A *good* way (although not foolproof) is to launch a TDX VM early
->>>> in boot before memory gets fragmented or consumed.  You might even
->>>> want to recommend this in the documentation.
->>>
->>> What about providing a kernel param to tell the kernel to do the
->>> allocation during boot?
->>
->> I think that's where we'll end up eventually.  But, I also want to defer
->> that discussion until after we have something merged.
->>
->> Right now, allocating the PAMTs precisely requires running the TDX
->> module.  Running the TDX module requires VMXON.  VMXON is only done by
->> KVM.  KVM isn't necessarily there during boot.  So, it's hard to do
->> precisely today without a bunch of mucking with VMX.
-> 
-> Meh, it's hard only if we ignore the fact that the PAMT entry size isn't going
-> to change for a given TDX module, and is extremely unlikely to change in general.
-> 
-> Odds are good the kernel can hardcode a sane default and Just Work.  Or provide
-> the assumed size of a PAMT entry via module param.  If the size ends up being
-> wrong, log an error, free the reserved memory, and move on with TDX setup with
-> the correct size.
+On 4/29/22 10:48, Dan Williams wrote:
+>> But, neither of those really help with, say, a device-DAX mapping of
+>> TDX-*IN*capable memory handed to KVM.  The "new syscall" would just
+>> throw up its hands and leave users with the same result: TDX can't be
+>> used.  The new sysfs ABI for NUMA nodes wouldn't clearly apply to
+>> device-DAX because they don't respect the NUMA policy ABI.
+> They do have "target_node" attributes to associate node specific
+> metadata, and could certainly express target_node capabilities in its
+> own ABI. Then it's just a matter of making pfn_to_nid() do the right
+> thing so KVM kernel side can validate the capabilities of all inbound
+> pfns.
 
-Sure.  The boot param could be:
+Let's walk through how this would work with today's kernel on tomorrow's
+hardware, without KVM validating PFNs:
 
-	tdx_reserve_whatever=auto
+1. daxaddr mmap("/dev/dax1234")
+2. kvmfd = open("/dev/kvm")
+3. ioctl(KVM_SET_USER_MEMORY_REGION, { daxaddr };
+4. guest starts running
+5. guest touches 'daxaddr'
+6. Page fault handler maps 'daxaddr'
+7. KVM finds new 'daxaddr' PTE
+8. TDX code tries to add physical address to Secure-EPT
+9. TDX "SEAMCALL" fails because page is not convertible
+10. Guest dies
 
-and then it can be overridden if necessary.  I just don't want to have
-kernel binaries that are only good as paperweights if Intel decides it
-needs another byte of metadata.
+All we can do to improve on that is call something that pledges to only
+map convertible memory at 'daxaddr'.  We can't *actually* validate the
+physical addresses at mmap() time or even
+KVM_SET_USER_MEMORY_REGION-time because the memory might not have been
+allocated.
 
->> You can arm-wrestle the distro folks who hate adding command-line tweaks
->> when the time comes. ;)
-> 
-> Sure, you just find me the person that's going to run TDX guests with an
-> off-the-shelf distro kernel :-D
-
-Well, everyone gets their kernel from upstream eventually and everyone
-watches upstream.
-
-But, in all seriousness, do you really expect TDX to remain solely in
-the non-distro-kernel crowd forever?  I expect that the fancy cloud
-providers (with custom kernels) who care the most to deploy TDX fist.
-But, things will trickle down to the distro crowd over time.
+Those pledges are hard for anonymous memory though.  To fulfill the
+pledge, we not only have to validate that the NUMA policy is compatible
+at KVM_SET_USER_MEMORY_REGION, we also need to decline changes to the
+policy that might undermine the pledge.
