@@ -2,68 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4321251564D
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 23:01:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 567B35156BD
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 23:21:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381217AbiD2VEU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 17:04:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37676 "EHLO
+        id S237867AbiD2VYp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 17:24:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381183AbiD2VEC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 17:04:02 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69E7AD3AD7
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 14:00:43 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id ij27-20020a170902ab5b00b0015d41282214so4711177plb.9
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 14:00:43 -0700 (PDT)
+        with ESMTP id S238143AbiD2VX5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 17:23:57 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BEED1D0D2
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 14:20:23 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id iq10so8146830pjb.0
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 14:20:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=zP2FwEa8Nl8vyFhUbOzmbrhYzn9cxhFMqsrmIQIuWwA=;
-        b=QK+xPeiwXa6e33Pjngc5P2E6KIFwQs9puOhH3flfkWXWJjvTKXQ4n91xk7xnBs0MNz
-         CaTaxYpqw7PaqazqF3yUJGpzzeZ8ns3tbtrUYeByfLzUy3PLjdebI4YjLp7A2sYGkYzT
-         EJp9fMGmqRLDPZUA4odmFAcwCLnNP35Um8+Ftl6Mr0VdEz0WeJ89UzdHtM8aL34pgIgy
-         tO32M5MDejwBUSal0KDQviidOrx3DfvdQKvqZNAUCp0SKJi4yDWbB8NKxbUMzOvfSKvn
-         J40p4UHDnCJHgrukR+KdzHhjTuPl+GWEBtkh6ZGhIpNnM/nV03UA8bWZWwuJuPOYiD5i
-         CdtA==
+        d=intel-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mv9DFGVUjNjUvqKoeugVcxd/ako81vZgq6bN3/Q4KTM=;
+        b=YX11bDowuMsHld0w/gipG/XgdOmxj1kgDmE5tMo2jIz8rxGjO3VsQu7T2QXaz7Z6sU
+         PU4lSh1a1owSkqGU5yW8N7tGu8dmUCxKlHQhHr3na2wPJCn6XVK1+FZ5r7A87VV+t1XC
+         6xreO4ia6lTVzLB3JRtX+S0Ii6yWsnWGHOjJIZCvthh4xw8WKIrfUn1WeS7ACEdVrqrj
+         NJ2+i2MNj93Wv7koCo0IleJIU0EZLKguMx0uvsSan1YJLoPw5lWGC3m7BHKy/9jTfEoF
+         Ra2cLQQ090Awym3IrQCdk+fev3rLdz+kEfX/tl7cRaKOF6g6gIEMQuEMOeIWJYFnB8CQ
+         RL8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=zP2FwEa8Nl8vyFhUbOzmbrhYzn9cxhFMqsrmIQIuWwA=;
-        b=P4QG9CSFdEU0B7/pT3rDCg9BZ7lsa/56VgWBFVcyNnZTXCQzB/Czfi+odCw0byMdu/
-         Q8pVA9gH2zrdl0RgG1Zb8GkAaUgOwN0E9u2uH7N9po8DdIWcB5AOd8dCl8WikFgQ91JT
-         PL5foH46bmMenjwETZ9kaUySMdwpLOyEgju9TorVRPVd9KB2hTYdpenO8RviMSfYmWKB
-         000x9Wx0z/yMFaRo36MY2EZQvrWvQ+ufSSMoHmlRyQPb1AS4eR0oLldX51k8N4xiHUfG
-         vAokAB0c554JW4ImYBfedqys1TWoQyEyHvEr1sKax4mZ0/Y+j87qpYn4FtQ1fdV/DDnf
-         6E7g==
-X-Gm-Message-State: AOAM533h/iQhplgTQDY0eP2gpm2AUKdwzyvyNdnOR9fPeP0eCdTggxpn
-        Zoj4s98sa0v1omYAZbgmpPAhbkU6SJA=
-X-Google-Smtp-Source: ABdhPJz4W33FH39XL8rGj5+zrdiDe0gJH35R1ZBKg0xwvpX8Ebhc6cVEBCEMyApi7dDt9qXfs+Vz2pnMXrs=
-X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:851:b0:50d:62f6:5494 with SMTP id
- q17-20020a056a00085100b0050d62f65494mr799201pfk.75.1651266042949; Fri, 29 Apr
- 2022 14:00:42 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 29 Apr 2022 21:00:25 +0000
-In-Reply-To: <20220429210025.3293691-1-seanjc@google.com>
-Message-Id: <20220429210025.3293691-9-seanjc@google.com>
-Mime-Version: 1.0
-References: <20220429210025.3293691-1-seanjc@google.com>
-X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH v3 8/8] KVM: Do not pin pages tracked by gfn=>pfn caches
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mv9DFGVUjNjUvqKoeugVcxd/ako81vZgq6bN3/Q4KTM=;
+        b=IO3wFRafLrVCVqKzGp1e9ax6mORbfOosBUph06v+YuY2sYszYqfHHguvG79TJRVKFl
+         Uxda0CHc7y8zU2tNBG/zPwejEcQso60cO/t3H3mat+ZphSHKDsJbLBvdEFIRPS2jM/xa
+         F5/JSW37x6zz1oq34gGyeIzxfVhZHo+GZ1tVXod2LwfUX7fgb45HhJ8ynu268fyJF069
+         HSnb4SfLjaSMB6jiAkNqzqYe/8YsASrgrQPXmc/KRW/UjTkPFjjJMDVC8nvRFTOv4YTW
+         juRDMv5eGC+FLOubCPnwXdcv7aPHoBC0/OP1DWDKFXmuBXiGmYl/VuMcEfiEM6CSm7OG
+         a2Dg==
+X-Gm-Message-State: AOAM531tE6E5w8BZQEwL5knQ2o+8fDsgl5QuxxzEkKGg1btHuUk+S9gY
+        O4w/1M02Xn7Y+YG3to95bG5gbhJJPJS0wEUIbiWidw==
+X-Google-Smtp-Source: ABdhPJxOI015Sua0vDUUKeCI4dI8/hOf+yDLEE38Ku6igW+0R2tZGclgp0+NOE/F4FBVFyUgX/Ne2S2gL7vatmBgrHc=
+X-Received: by 2002:a17:902:da81:b0:15d:37b9:70df with SMTP id
+ j1-20020a170902da8100b0015d37b970dfmr1257018plx.34.1651267222305; Fri, 29 Apr
+ 2022 14:20:22 -0700 (PDT)
+MIME-Version: 1.0
+References: <cover.1649219184.git.kai.huang@intel.com> <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
+ <CAPcyv4g5E_TOow=3pFJXyFr=KLV9pTSnDthgz6TuXvru4xDzaQ@mail.gmail.com>
+ <de9b8f4cef5da03226158492988956099199aa60.camel@intel.com>
+ <CAPcyv4iGsXkHAVgf+JZ4Pah_fkCZ=VvUmj7s3C6Rkejtdw_sgQ@mail.gmail.com>
+ <92af7b22-fa8a-5d42-ae15-8526abfd2622@intel.com> <CAPcyv4iG977DErCfYTqhVzuZqjtqFHK3smnaOpO3p+EbxfvXcQ@mail.gmail.com>
+ <4a5143cc-3102-5e30-08b4-c07e44f1a2fc@intel.com> <CAPcyv4i6X6ODNbOnT7+NEzpicLS4m9bNDybZLvN3gqXFTTf=mg@mail.gmail.com>
+ <4d0c7316-3564-ef27-1113-042019d583dc@intel.com> <CAPcyv4gYw3k4YMEV1E26fMx-GNCNCb+zJDERfhieCrROWv_Jxg@mail.gmail.com>
+ <73ed1e55-7e7c-2995-b411-8e26b711cc22@intel.com>
+In-Reply-To: <73ed1e55-7e7c-2995-b411-8e26b711cc22@intel.com>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Fri, 29 Apr 2022 14:20:11 -0700
+Message-ID: <CAPcyv4gzEvMA4F5ncuhVenRDuz7Tq6aCSJR=z7wVqNGOYGS5Kw@mail.gmail.com>
+Subject: Re: [PATCH v3 00/21] TDX host kernel support
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Kai Huang <kai.huang@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
         Sean Christopherson <seanjc@google.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Mingwei Zhang <mizhang@google.com>
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,97 +84,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Put the reference to any struct page mapped/tracked by a gfn=>pfn cache
-upon inserting the pfn into its associated cache, as opposed to putting
-the reference only when the cache is done using the pfn.  In other words,
-don't pin pages while they're in the cache.  One of the major roles of
-the gfn=>pfn cache is to play nicely with invalidation events, i.e. it
-exists in large part so that KVM doesn't rely on pinning pages.
+On Fri, Apr 29, 2022 at 12:20 PM Dave Hansen <dave.hansen@intel.com> wrote:
+>
+> On 4/29/22 11:47, Dan Williams wrote:
+> > On Fri, Apr 29, 2022 at 11:34 AM Dave Hansen <dave.hansen@intel.com> wrote:
+> >>
+> >> On 4/29/22 10:48, Dan Williams wrote:
+> >>>> But, neither of those really help with, say, a device-DAX mapping of
+> >>>> TDX-*IN*capable memory handed to KVM.  The "new syscall" would just
+> >>>> throw up its hands and leave users with the same result: TDX can't be
+> >>>> used.  The new sysfs ABI for NUMA nodes wouldn't clearly apply to
+> >>>> device-DAX because they don't respect the NUMA policy ABI.
+> >>> They do have "target_node" attributes to associate node specific
+> >>> metadata, and could certainly express target_node capabilities in its
+> >>> own ABI. Then it's just a matter of making pfn_to_nid() do the right
+> >>> thing so KVM kernel side can validate the capabilities of all inbound
+> >>> pfns.
+> >>
+> >> Let's walk through how this would work with today's kernel on tomorrow's
+> >> hardware, without KVM validating PFNs:
+> >>
+> >> 1. daxaddr mmap("/dev/dax1234")
+> >> 2. kvmfd = open("/dev/kvm")
+> >> 3. ioctl(KVM_SET_USER_MEMORY_REGION, { daxaddr };
+> >
+> > At least for a file backed mapping the capability lookup could be done
+> > here, no need to wait for the fault.
+>
+> For DAX mappings, sure.  But, anything that's backed by page cache, you
+> can't know until the RAM is allocated.
+>
+> ...
+> >> Those pledges are hard for anonymous memory though.  To fulfill the
+> >> pledge, we not only have to validate that the NUMA policy is compatible
+> >> at KVM_SET_USER_MEMORY_REGION, we also need to decline changes to the
+> >> policy that might undermine the pledge.
+> >
+> > I think it's less that the kernel needs to enforce a pledge and more
+> > that an interface is needed to communicate the guest death reason.
+> > I.e. "here is the impossible thing you asked for, next time set this
+> > policy to avoid this problem".
+>
+> IF this code is booted on a system where non-TDX-capable memory is
+> discovered, do we:
+> 1. Disable TDX, printk() some nasty message, then boot as normal
+> or,
+> 2a. Boot normally with TDX enabled
+> 2b. Add enhanced error messages in case of TDH.MEM.PAGE.AUG/ADD failure
+>     (the "SEAMCALLs" which are the last line of defense and will reject
+>      the request to add non-TDX-capable memory to a guest).  Or maybe
+>     an even earlier message.
+>
+> For #1, if TDX is on, we are quite sure it will work.  But, it will
+> probably throw up its hands on tomorrow's hardware.  (This patch set).
+>
+> For #2, TDX might break (guests get killed) at runtime on tomorrow's
+> hardware, but it also might be just fine.  Users might be able to work
+> around things by, for instance, figuring out a NUMA policy which
+> excludes TDX-incapable memory. (I think what Dan is looking for)
+>
+> Is that a fair summary?
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- virt/kvm/pfncache.c | 36 ++++++++++++++++++++----------------
- 1 file changed, 20 insertions(+), 16 deletions(-)
+Yes, just the option for TDX and non-TDX to live alongside each
+other... although in the past I have argued to do option-1 and enforce
+it at the lowest level [1]. Like platform BIOS is responsible to
+disable CXL if CXL support for a given CPU security feature is
+missing. However, I think end users will want to have their
+confidential computing and capacity too. As long as that is not
+precluded to be added after the fact, option-1 can be a way forward
+until a concrete user for mixed mode shows up.
 
-diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-index 0535669ea2a1..c4fb81929663 100644
---- a/virt/kvm/pfncache.c
-+++ b/virt/kvm/pfncache.c
-@@ -95,20 +95,16 @@ bool kvm_gfn_to_pfn_cache_check(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
- }
- EXPORT_SYMBOL_GPL(kvm_gfn_to_pfn_cache_check);
- 
--static void gpc_release_pfn_and_khva(struct kvm *kvm, kvm_pfn_t pfn, void *khva)
-+static void gpc_unmap_khva(struct kvm *kvm, kvm_pfn_t pfn, void *khva)
- {
--	/* Unmap the old page if it was mapped before, and release it */
--	if (!is_error_noslot_pfn(pfn)) {
--		if (khva) {
--			if (pfn_valid(pfn))
--				kunmap(pfn_to_page(pfn));
-+	/* Unmap the old pfn/page if it was mapped before. */
-+	if (!is_error_noslot_pfn(pfn) && khva) {
-+		if (pfn_valid(pfn))
-+			kunmap(pfn_to_page(pfn));
- #ifdef CONFIG_HAS_IOMEM
--			else
--				memunmap(khva);
-+		else
-+			memunmap(khva);
- #endif
--		}
--
--		kvm_release_pfn(pfn, false);
- 	}
- }
- 
-@@ -147,10 +143,10 @@ static kvm_pfn_t hva_to_pfn_retry(struct kvm *kvm, struct gfn_to_pfn_cache *gpc)
- 			 * Keep the mapping if the previous iteration reused
- 			 * the existing mapping and didn't create a new one.
- 			 */
--			if (new_khva == old_khva)
--				new_khva = NULL;
-+			if (new_khva != old_khva)
-+				gpc_unmap_khva(kvm, new_pfn, new_khva);
- 
--			gpc_release_pfn_and_khva(kvm, new_pfn, new_khva);
-+			kvm_release_pfn_clean(new_pfn);
- 
- 			cond_resched();
- 		}
-@@ -222,6 +218,14 @@ static kvm_pfn_t hva_to_pfn_retry(struct kvm *kvm, struct gfn_to_pfn_cache *gpc)
- 	gpc->valid = true;
- 	gpc->pfn = new_pfn;
- 	gpc->khva = new_khva + (gpc->gpa & ~PAGE_MASK);
-+
-+	/*
-+	 * Put the reference to the _new_ pfn.  The pfn is now tracked by the
-+	 * cache and can be safely migrated, swapped, etc... as the cache will
-+	 * invalidate any mappings in response to relevant mmu_notifier events.
-+	 */
-+	kvm_release_pfn_clean(new_pfn);
-+
- 	return 0;
- 
- out_error:
-@@ -308,7 +312,7 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
- 	mutex_unlock(&gpc->refresh_lock);
- 
- 	if (old_pfn != new_pfn)
--		gpc_release_pfn_and_khva(kvm, old_pfn, old_khva);
-+		gpc_unmap_khva(kvm, old_pfn, old_khva);
- 
- 	return ret;
- }
-@@ -335,7 +339,7 @@ void kvm_gfn_to_pfn_cache_unmap(struct kvm *kvm, struct gfn_to_pfn_cache *gpc)
- 
- 	write_unlock_irq(&gpc->lock);
- 
--	gpc_release_pfn_and_khva(kvm, old_pfn, old_khva);
-+	gpc_unmap_khva(kvm, old_pfn, old_khva);
- }
- EXPORT_SYMBOL_GPL(kvm_gfn_to_pfn_cache_unmap);
- 
--- 
-2.36.0.464.gb9c8b46e94-goog
+Is there something already like this today for people that, for
+example, attempt to use PCI BAR mappings as memory? Or does KVM simply
+allow for garbage-in garbage-out?
 
+In the end the patches shouldn't talk about whether or not PMEM is
+supported on a platform or not, that's irrelevant. What matters is
+that misconfigurations can happen, should be rare to non-existent on
+current platforms, and if it becomes a problem the kernel can grow ABI
+to let userspace enumerate the conflicts.
+
+[1]: https://lore.kernel.org/linux-cxl/CAPcyv4jMQbHYQssaDDDQFEbOR1v14VUnejcSwOP9VGUnZSsCKw@mail.gmail.com/
