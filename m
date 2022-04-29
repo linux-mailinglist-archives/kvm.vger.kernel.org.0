@@ -2,187 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EDCE05153ED
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 20:46:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88FCA5153EE
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 20:47:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380120AbiD2Stk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 14:49:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51004 "EHLO
+        id S1380123AbiD2SvD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 14:51:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233167AbiD2Stj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 14:49:39 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2066.outbound.protection.outlook.com [40.107.236.66])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF1B2C90FA
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 11:46:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=i6mukaDjCdQwG8ZN0uGf5rxG2fchwVrpxAbwlGW24xWOPdcg/SRdzppOLUFSIDYAZNPQ2HzcqXp+O2hkCssEOtG26BFSOGDnlM9DjcrEBG04fLYq43uFTU2uEObGaSB1oaX4+Zd8VYJ/A8DvKgKxEmyOLdBLiM8X+WobJFUWIhfRCsxh6qcGebUnRHl7QeKQnY9j6h6EPyEQQc8e4pJEce4Wij/OJVvTPGRIHEn+AqW8D//yb3sFAEm7qNgeU31QNTX8MIvI6+ONQMoDDDN3yY6I3JfKQQfGMn2Wd2GI2vGBQN4qwmKGLv5kWaU1qJqjLssOsKCbNHL8bYf3zd5s1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=e+WugyDiAICCVbFpyVb+f7p/Isz2b4JmSiU7HwZbeKw=;
- b=RJ72GFuuSIL5Yk6H/9uimBU2DfQxpty43hVjqRa3elumt+amHqPSSGuxnLPcqvi9UJiRK5JSa/g+11tw1pwg53chZVkUYzzv63HHe1I0BcVoeX7SmtpP9hoi2JEYWHsBELTLCcnHqQPRxAoCTzg1Q+z2s6X4yKCIgk4mdCErPvliKprXks+z3J+e2WZRa78L511YpsVj29BfaTy6FC8xSIY5JPpeZe0KIJoHEROInjlPvkIa0egeK6MVcajZBZ5fM7eKxOHiIgLayvX/aRjaXrt9yYVV9u3WT2KuW95oQ5EE6OShjYzI0jyJGPI5f8YTKiT2vn0poor3vbgWosJVwQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e+WugyDiAICCVbFpyVb+f7p/Isz2b4JmSiU7HwZbeKw=;
- b=GZxfsQ3LYLNAdskOuWKfgz56saRhj5UDbLFcf6Du2PzqSs3InbB5dF4AbK+BquNwNX8lhSyietZDSVQXnaYwSe6VpqkP1HUUS1XKyel88RveOa6abwWqKLUfmuRK+k5udcVRr6T5YB5uQbmytSUHwLqp9feeex1+W3aXE6kjsoTGqQv1Z/YQhT1BBtdxsWsdVQdv25tSHqyzT8T/hoWAsP4eRexR+w1pOSAGSmFyDKaHFNrq7ylGFbo3FrNrNIQeAL2aCeHvd2cSkJg5dDkXJLW/3Fems7nkPV7K+DHhNQPYmrPIEXlZeYaCXZLW+lPv6X4tPfgYeylrsbaM/ZibaQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by BN6PR1201MB2528.namprd12.prod.outlook.com (2603:10b6:404:ae::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.15; Fri, 29 Apr
- 2022 18:46:19 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2%6]) with mapi id 15.20.5186.026; Fri, 29 Apr 2022
- 18:46:19 +0000
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Kevin Tian <kevin.tian@intel.com>
-Subject: [PATCH] vfio: Delete container_q
-Date:   Fri, 29 Apr 2022 15:46:17 -0300
-Message-Id: <0-v1-a1e8791d795b+6b-vfio_container_q_jgg@nvidia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MN2PR15CA0028.namprd15.prod.outlook.com
- (2603:10b6:208:1b4::41) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S232807AbiD2SvB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 14:51:01 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91C5A8BE39
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 11:47:42 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id fv2so7836127pjb.4
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 11:47:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=eF2Vsl1Y+sSmbDFKvxvLG8OQAc2P8BqrkxARZmIJo/4=;
+        b=UaXK0qek/m3KBku94FiR2aCpLAmc5L7lHG00+M/6bHi2MEYsMwwXqvgB2pRRMk14wg
+         s6tblUC23UdGhOat3IEPEcSOpJDcOMrCdHM58Mw8ZXum5+ZuoTGa7Xk2q1eRJpiyeRay
+         Hep4LWc+YYOikH03Cqom/UkSCzLEu3MDszrqmo3ssDuL1liGDgvRSpq38S11WoniJNab
+         1sovPccL6OxSpAGgoV8egZ1SiuVmGbinm4i5byzEsnqhUZt4Tus1ISfCed5wKrxemRSd
+         rIElvttjQpwC9+cRUf0seywgw+zpDqfTHFTglZJ+aTXFUBhYdLoJWiP6A2LOEa9Euo+r
+         dFOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=eF2Vsl1Y+sSmbDFKvxvLG8OQAc2P8BqrkxARZmIJo/4=;
+        b=Wf+HchWCKZi2f7BINrNR5JSR3Sv9aEMhc0PIlJcRZJHx8DakRXdvQDzBgJ+zzPXemS
+         kUWg9DkCD+pCZn1yCisl3l9r9MSe/sLSkcSwKy14t1SOnFsdJchgrSngpK4kMzsxTJ/z
+         8ygDHlSvZnLj89J7hVNUO6JMQ/IwPaf5LNeBvOhUTPlHAQ097AaqlXj+p7U4Z3dav10S
+         jP1lOF9mOBUa02CQy6UXk6fCBYUC7DVZj/iWWUWu6cHmQrqGW3BH6+gL53zthXCecX2r
+         slvH/0GXh0P+T728pI+p6A255Ang/vWxJPD3ocYd9JWO8O2Wu+VnRG6wUlpYfoWVYtew
+         yAZw==
+X-Gm-Message-State: AOAM533cQSvful0VdNbPl/DTDDORCng3nBIth44FjcWE6Oc22L8rC62b
+        w6+/TXeg4X2BElmq7F5zBLGprlbLNzHVJR+XlOJhdw==
+X-Google-Smtp-Source: ABdhPJyI5QgAmrNdhx4aroprhMSjkSXeHnyeBO/jtZgb1InUac6OW3lRr7VO74ETA83tRzss8c9IRukmCKSKSvVwNek=
+X-Received: by 2002:a17:902:ea57:b0:15a:6173:87dd with SMTP id
+ r23-20020a170902ea5700b0015a617387ddmr437403plg.147.1651258062096; Fri, 29
+ Apr 2022 11:47:42 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b820ea02-bfe4-4e93-2b23-08da2a108c5f
-X-MS-TrafficTypeDiagnostic: BN6PR1201MB2528:EE_
-X-Microsoft-Antispam-PRVS: <BN6PR1201MB2528C03A51B0E29D65A8350BC2FC9@BN6PR1201MB2528.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: xcW93nd7qxi9qh7y5uMdi4M6KjuVRkpgAHMiXSSIPECNvUF2D+t+x9QrNwORjT7CycDe0381SPc6eCBznIhK7GNYJEyNR+keicrKYmgXblDWkkDK/31hCW/zb/tOvo96fuGvMnh4GxqGsQuZd3KOsvLsrUG0NgKf7sIhzdRcoz0AjK9AI7FRTg71xn8bu0Zu9HS/JmLTqnPKopbJaE6KNebigZN62xL+U9YYByysMVIE0AH0SP55v7NpoqpMsAY91g9gYhrnutCecmPNS3j3fYsIcKlrTOl/si8+aztsI3PKx39jbanIVvEP1ceqMhiQLvbPBDwequjErnrI0OVkVKiwwC2/mzG1WPNQztK9uCoqDBbzQOUxzkqvGWBrYAVqoo7/zu6cxKe2DGK6Qa3JutVBdyUbylI0L1UiHgVCCfR2cuqOLbYwjYHAp0ghwjPEaP/StvyI9ZdIsaXzyax65WRA0hQlyYyfnwo6IO1U14Z3xoJoZwtcKTWyOPC4uqKeHsNUpVPbnbLQeYE3M3IxjNmKQMMY2XBWhYtvZ7kksqdLJ0RveaY1hJWPHhaPoI3COnjdSHeN2IGK2crOOhwyV5Ae0A8Oxt9gpv/OwxpxgYwIucElyv1vM1ymVvjoD+V3GNBYykLu+6BB2d0NAcvwQZxfIhaQBgii3ADIozPJBjaeCFjURoN9Cl+iNFxbIz1lAWJdVPPs7CgZijB+6Y1T0w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(5660300002)(2616005)(38100700002)(66946007)(2906002)(6506007)(66476007)(66556008)(6512007)(26005)(186003)(8936002)(508600001)(316002)(6486002)(110136005)(86362001)(83380400001)(36756003)(8676002)(4216001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Mt/5s62IKo4mmAHYWpAbXVrzO121H1oKL2thrlnoHfglefNAvFvYeJkGKF08?=
- =?us-ascii?Q?uxg6h2LEuTqvBiUzxeMU6ROz3VBE8nPttRNzMD+mSWL+khKa6ekhm6Hp83AQ?=
- =?us-ascii?Q?YUBm3BG7POdoblhq5p3XlqEcGfDEp+FeMKGPxtjLeLfkYzInAxNb4DpxgSOa?=
- =?us-ascii?Q?B3UKSZtxGVpnC42GhfZ2wt6PBWw5ZkCYQypuwAUbBJ7btB387cguldaIQsBU?=
- =?us-ascii?Q?1g86agDrfEg+aAcsmYh+XAzu9d4ROrVW65xaOqXEcX/saa4v07sKN1fiUl0X?=
- =?us-ascii?Q?NpFvATZarA9pIIfO4mmNFJfEzh6Rf38dLpR2K5CA3kvHom55BuGmtYIpY8RY?=
- =?us-ascii?Q?kKlMS7KkOJ6iw5iSKZk7UhMkxvnssp993+sOS89bYWgLLcXRrXFgWEsnC9sD?=
- =?us-ascii?Q?WQ/tUxCp1oSyQNkZTru8668B43LgnNsuo7S+uj3olpwbJd+0fYZVKoRyNZDC?=
- =?us-ascii?Q?E9DAWsMjgAjIZvNLgIK+e5T+TEm4RIu3YfWTuu0+L9oQ0p40uTwyBnWWIRMt?=
- =?us-ascii?Q?FqXu7HTObFC82LWoTu9NQdfKupwMbyR4Svp5nUHe+gwjvGkOm4v+J4tA2cA7?=
- =?us-ascii?Q?/kv3m2sbQ4w2PEsvPWRu3IrQmSjZ9/k/rtrEPJku6Jl6O7h4vgZe9hlYNi4/?=
- =?us-ascii?Q?htj6tzG//nLdh8GlfOiRUm71MmboleviDrqG6+U+fdrwkVdriqqljq2HBK/b?=
- =?us-ascii?Q?H+Gv6c2vVuRSoVvqs3Y8uYPSgkpRxYDV7QdbIuB9sBqswbiFny/LCclsHnx+?=
- =?us-ascii?Q?zfgcbZAihhJWqpUGeiKD2FyHVcakwdcNzf01SJRnqoy1xTmqwXR6Wqv0ZzkA?=
- =?us-ascii?Q?HJsceQuqXHBVH9kI7QfZRLsH8QckSpA8MENraRBVMCsOuugjgusR50Vl/3gX?=
- =?us-ascii?Q?pwjetVcqmh8SD8CFYeZaGDMui24Rft+QpBbuh9UXh5SSVurv+AWshFLsf6eW?=
- =?us-ascii?Q?tPWnYO5qgE1A8pqY1sPgG5PTaji6VWxyWB1VER8hq5NfctpsSdJ8IIQh9CH6?=
- =?us-ascii?Q?0Xyty8peRrktk6eBVJWIVt4NoHNTnaqcB5ngow6Zrwyk+/LiOqJxFdAAIqZN?=
- =?us-ascii?Q?EjnwI/8SEoVAlqJherucTsbfByt+oNE6ZwR12+OoF3VbR7WTcd7fSBYbpRV5?=
- =?us-ascii?Q?sNcbsP4WiaWKH/GsNWKTOok2YHdU628JPH4aRnehjs/nuD++O7T/PmWYqjtK?=
- =?us-ascii?Q?aLE9ste1n9LDB0M26CEZyNAtJiF/pTMQicERbzZJAVMCDp3VVWmwFNMD/2G/?=
- =?us-ascii?Q?D0kvRE1hJsJV67zuhW+JXKzeBbBWJUkjOkVOZghvoExFifdOzuwI2JGDDrc4?=
- =?us-ascii?Q?G59DnHsYmKVPCRpOl/VKYXEOSMlyZPH4/BF7GFtluywNos8Jw6x0wkhPh3iz?=
- =?us-ascii?Q?uvmGlSpDA9EssIjAnFPlDtW4vk7Mf6Ji5lgidKINwQJvS3JAiXLNuB9o6Dzn?=
- =?us-ascii?Q?JdC7TShwVKYG5MRfZC1jVuIMeBKgJlr+9WOyhhMk05GQ1VCEcQ9S7diXa/y0?=
- =?us-ascii?Q?HIcnrVwfPXIZzPV3ar6USk58RYxXqDgsGcGHrCKoXMDeUXubJVkfOC8HnfrA?=
- =?us-ascii?Q?nhZKZaAhALyWGGEia6OMFXbWiYfLJ/XVUJR2tLXUG56qVGoYvcUaZxMOv851?=
- =?us-ascii?Q?c/nwSuR03V3SrBIncK8EDfb/rPITChCvGMboaq3dtCejkhKp/odm09FJa+Hs?=
- =?us-ascii?Q?otdpBmlEr0FstRLEyYfXFRQRc0T+5BbChI0SSAkIlg2G67ZiFUXCskL7lq+l?=
- =?us-ascii?Q?XpJHCh6woQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b820ea02-bfe4-4e93-2b23-08da2a108c5f
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2022 18:46:19.0642
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sVC6OAboNoM8gy9ksJOyEkevNOYrT11sk4rHPJ9Eq7MjMgQhieQLimuJXbhG90Xr
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR1201MB2528
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+References: <cover.1649219184.git.kai.huang@intel.com> <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
+ <CAPcyv4g5E_TOow=3pFJXyFr=KLV9pTSnDthgz6TuXvru4xDzaQ@mail.gmail.com>
+ <de9b8f4cef5da03226158492988956099199aa60.camel@intel.com>
+ <CAPcyv4iGsXkHAVgf+JZ4Pah_fkCZ=VvUmj7s3C6Rkejtdw_sgQ@mail.gmail.com>
+ <92af7b22-fa8a-5d42-ae15-8526abfd2622@intel.com> <CAPcyv4iG977DErCfYTqhVzuZqjtqFHK3smnaOpO3p+EbxfvXcQ@mail.gmail.com>
+ <4a5143cc-3102-5e30-08b4-c07e44f1a2fc@intel.com> <CAPcyv4i6X6ODNbOnT7+NEzpicLS4m9bNDybZLvN3gqXFTTf=mg@mail.gmail.com>
+ <4d0c7316-3564-ef27-1113-042019d583dc@intel.com>
+In-Reply-To: <4d0c7316-3564-ef27-1113-042019d583dc@intel.com>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Fri, 29 Apr 2022 11:47:31 -0700
+Message-ID: <CAPcyv4gYw3k4YMEV1E26fMx-GNCNCb+zJDERfhieCrROWv_Jxg@mail.gmail.com>
+Subject: Re: [PATCH v3 00/21] TDX host kernel support
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Kai Huang <kai.huang@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that the iommu core takes care of isolation there is no race between
-driver attach and container unset. Once iommu_group_release_dma_owner()
-returns the device can immediately be re-used.
+On Fri, Apr 29, 2022 at 11:34 AM Dave Hansen <dave.hansen@intel.com> wrote:
+>
+> On 4/29/22 10:48, Dan Williams wrote:
+> >> But, neither of those really help with, say, a device-DAX mapping of
+> >> TDX-*IN*capable memory handed to KVM.  The "new syscall" would just
+> >> throw up its hands and leave users with the same result: TDX can't be
+> >> used.  The new sysfs ABI for NUMA nodes wouldn't clearly apply to
+> >> device-DAX because they don't respect the NUMA policy ABI.
+> > They do have "target_node" attributes to associate node specific
+> > metadata, and could certainly express target_node capabilities in its
+> > own ABI. Then it's just a matter of making pfn_to_nid() do the right
+> > thing so KVM kernel side can validate the capabilities of all inbound
+> > pfns.
+>
+> Let's walk through how this would work with today's kernel on tomorrow's
+> hardware, without KVM validating PFNs:
+>
+> 1. daxaddr mmap("/dev/dax1234")
+> 2. kvmfd = open("/dev/kvm")
+> 3. ioctl(KVM_SET_USER_MEMORY_REGION, { daxaddr };
 
-Remove this mechanism.
+At least for a file backed mapping the capability lookup could be done
+here, no need to wait for the fault.
 
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
----
- drivers/vfio/vfio.c | 20 --------------------
- 1 file changed, 20 deletions(-)
+> 4. guest starts running
+> 5. guest touches 'daxaddr'
+> 6. Page fault handler maps 'daxaddr'
+> 7. KVM finds new 'daxaddr' PTE
+> 8. TDX code tries to add physical address to Secure-EPT
+> 9. TDX "SEAMCALL" fails because page is not convertible
+> 10. Guest dies
+>
+> All we can do to improve on that is call something that pledges to only
+> map convertible memory at 'daxaddr'.  We can't *actually* validate the
+> physical addresses at mmap() time or even
+> KVM_SET_USER_MEMORY_REGION-time because the memory might not have been
+> allocated.
+>
+> Those pledges are hard for anonymous memory though.  To fulfill the
+> pledge, we not only have to validate that the NUMA policy is compatible
+> at KVM_SET_USER_MEMORY_REGION, we also need to decline changes to the
+> policy that might undermine the pledge.
 
-This was missed in Baolu's series, and applies on top of "iommu: Remove iommu
-group changes notifier"
-
-diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index 0c766384cee0f8..4a1847f50c9289 100644
---- a/drivers/vfio/vfio.c
-+++ b/drivers/vfio/vfio.c
-@@ -74,7 +74,6 @@ struct vfio_group {
- 	struct list_head		vfio_next;
- 	struct list_head		container_next;
- 	atomic_t			opened;
--	wait_queue_head_t		container_q;
- 	enum vfio_group_type		type;
- 	unsigned int			dev_counter;
- 	struct kvm			*kvm;
-@@ -363,7 +362,6 @@ static struct vfio_group *vfio_group_alloc(struct iommu_group *iommu_group,
- 	refcount_set(&group->users, 1);
- 	INIT_LIST_HEAD(&group->device_list);
- 	mutex_init(&group->device_lock);
--	init_waitqueue_head(&group->container_q);
- 	group->iommu_group = iommu_group;
- 	/* put in vfio_group_release() */
- 	iommu_group_ref_get(iommu_group);
-@@ -723,23 +721,6 @@ void vfio_unregister_group_dev(struct vfio_device *device)
- 	group->dev_counter--;
- 	mutex_unlock(&group->device_lock);
- 
--	/*
--	 * In order to support multiple devices per group, devices can be
--	 * plucked from the group while other devices in the group are still
--	 * in use.  The container persists with this group and those remaining
--	 * devices still attached.  If the user creates an isolation violation
--	 * by binding this device to another driver while the group is still in
--	 * use, that's their fault.  However, in the case of removing the last,
--	 * or potentially the only, device in the group there can be no other
--	 * in-use devices in the group.  The user has done their due diligence
--	 * and we should lay no claims to those devices.  In order to do that,
--	 * we need to make sure the group is detached from the container.
--	 * Without this stall, we're potentially racing with a user process
--	 * that may attempt to immediately bind this device to another driver.
--	 */
--	if (list_empty(&group->device_list))
--		wait_event(group->container_q, !group->container);
--
- 	if (group->type == VFIO_NO_IOMMU || group->type == VFIO_EMULATED_IOMMU)
- 		iommu_group_remove_device(device->dev);
- 
-@@ -984,7 +965,6 @@ static void __vfio_group_unset_container(struct vfio_group *group)
- 	iommu_group_release_dma_owner(group->iommu_group);
- 
- 	group->container = NULL;
--	wake_up(&group->container_q);
- 	list_del(&group->container_next);
- 
- 	/* Detaching the last group deprivileges a container, remove iommu */
-
-base-commit: 46788c84354d07f8b1e5df87e805500611fd04fb
--- 
-2.36.0
-
+I think it's less that the kernel needs to enforce a pledge and more
+that an interface is needed to communicate the guest death reason.
+I.e. "here is the impossible thing you asked for, next time set this
+policy to avoid this problem".
