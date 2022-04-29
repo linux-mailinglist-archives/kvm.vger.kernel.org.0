@@ -2,71 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB98C51513B
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 19:01:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 83FCA515142
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 19:03:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379368AbiD2RES (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 13:04:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46068 "EHLO
+        id S1379397AbiD2RGm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 13:06:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358853AbiD2RER (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 13:04:17 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E8274D9FC
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 10:00:57 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id bd19-20020a17090b0b9300b001d98af6dcd1so11028356pjb.4
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 10:00:57 -0700 (PDT)
+        with ESMTP id S1378535AbiD2RGk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 13:06:40 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C79AFB0A7F
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 10:03:21 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id p6so7637871pjm.1
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 10:03:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=9p9eVD7iEikBC4jxuapL3VYhAWQBtz27pVnAlOGf5zE=;
-        b=fzyXgX/Hvc4RANCjLs/z+2QFceApoWrIuJrLyV+Ogz+4rJYaG8ih8IKOKjKHHza6+K
-         1ynm/CiyQSgcS6fIHCjrXSX0OJPpf90YOogGOeKMf7/5qnJEbMVhPD8S74sLbDif7sVi
-         vFd1Zi4PDIOBfiRf0nWsGQf9xHRUCz+pSxAtsvbgpyqauE69sgNYeQL/VVUQYDhALLhA
-         KuA5yY6OIy7QNF0q2GCaKDqaJmEg4Iyk0bHQmx4tUnQEGhB+CmNvnTzFvYqOOEmONDPx
-         q2u/9OQqCKdg/QQPjitOvn5czH3chLldwTFF5/Tt8vLAOuHO4P2JXSxlCgOrk2LtcbyZ
-         bFww==
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=RkN7JUMz0DAtONAVPRmRHnP64HBiaCnPPuSBpGqI0Eo=;
+        b=APvmC5k2WUKy0VF/8OFRKt3sJeb7n0edWipqz/MuxQSpQdH6U840xRClQNgeSB0/HP
+         CorEabT7uAif+i25odVZeixSMo+CrYTYX0OCnVriOtMIrhAOjQNKxMuoqgWXTAZgMl2P
+         nSOmNzDXu54i8slffbv/+iAa3TqxxKOgSzJCyGmNjc48RJVfqclQY74gl/+qZEQWQaRL
+         G5fGahViQBcY78yDKgrE3WecQcf8RitMoYp1YinysH+SnU/xWu61GQYEH15+arqh/kUj
+         FWhXZjI9jmGQM1gJbsagSphVpJWn67RBBedRQD6AunGL/AormBN2S16j4yeB+1GMnWCZ
+         r4tQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=9p9eVD7iEikBC4jxuapL3VYhAWQBtz27pVnAlOGf5zE=;
-        b=XvxUiIpL+nqJ2WS1nCwNMjWXNuWbGFhmtBoj0ffA37dErZlBCOSaMWmGyKnGm1XPoV
-         wTYomvytgd6GH6P80flHxnd4NatUmQ3A5BHyDXx4X1pbWjdQ3lH6TBmEz04/enHHZofp
-         Kxzi8wHxuL9GzhwACcKeOzT/itgIcHOXUc6f/3rPc6385Qdb5PNIFAEwcHcYLzKpDREy
-         VOSL9XgGsu4NaChvDgyEz9K7s/X3z+zmNV7Lkw92z5hCGThX6iUNOaFv+kRRLh8fSQpK
-         Vwa6i7r6iiGGmY4sSpR1jTHb9TDyGeDP/2MMftMzCTbowQN65L1UXxNeF4NYF63lC7yU
-         B9jw==
-X-Gm-Message-State: AOAM531qUZRdQ1FtAf+RCpD4SxHW3hzlTPYX1Kpbc/lEV1YhJyfU7KTb
-        57U0spr0Y3fQ6ox1AjyNJ4DB1w==
-X-Google-Smtp-Source: ABdhPJyg0c0xfEePFDAfiEKVwFjS/OFrsTaLMjnglwUOt9AxLJHqFm5OEEm8eUBOdTZqvAW4ZCPK3A==
-X-Received: by 2002:a17:90a:9bc6:b0:1d8:2d8e:1b97 with SMTP id b6-20020a17090a9bc600b001d82d8e1b97mr81799pjw.45.1651251656592;
-        Fri, 29 Apr 2022 10:00:56 -0700 (PDT)
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=RkN7JUMz0DAtONAVPRmRHnP64HBiaCnPPuSBpGqI0Eo=;
+        b=nU9zm6wD67VCDmInliNUeo4dX1pL9dndEXHlvUumAJo5s0Ozi2ROUFkXYzOrda+T+g
+         8MmBm9FOTEzoe9zu94xBpvuWwPXZiJKb0a+SyWUCE/aGJh+Q39d/VUmKbbDH8FcOVYvS
+         a8bvzbxcm2oTltw956Ze/6Q30niTshe1CfSFg3KDmxJMOXw6ZFNATjfTBYvHijyo5xZj
+         7Bv7GGk189QbyGS751X8rj4GqQAVWnwPjpInqgRpA421rej3hI+u53TGfIGbk+82Jidc
+         DASsSVpe/otgUQdxh6Q7W2G8pQ6QMYTYR2+zvrybKTIpdaJA9lVZTnRSZdyJHRutfvyQ
+         aS6Q==
+X-Gm-Message-State: AOAM533DefL8eRTioSquKwUJzqpkGS+8b1NFQK4I+LyTejX7AQqVDZ+E
+        CZlDPB9SRwpZlq4Kk6pxADvfag==
+X-Google-Smtp-Source: ABdhPJxa3u/ecjwn+3JjLKK6oRMJ5TZ6P/zhBeChiNrcd61l1FaXIYCxObf1ewlGxrCmBH+ZJBZv7Q==
+X-Received: by 2002:a17:90a:ab81:b0:1ca:8a76:cdda with SMTP id n1-20020a17090aab8100b001ca8a76cddamr5005883pjq.26.1651251801115;
+        Fri, 29 Apr 2022 10:03:21 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id o3-20020a63f143000000b003c14af5062asm6196820pgk.66.2022.04.29.10.00.55
+        by smtp.gmail.com with ESMTPSA id l5-20020a63ea45000000b003c1b2bea056sm2061378pgk.84.2022.04.29.10.03.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Apr 2022 10:00:56 -0700 (PDT)
-Date:   Fri, 29 Apr 2022 17:00:52 +0000
+        Fri, 29 Apr 2022 10:03:20 -0700 (PDT)
+Date:   Fri, 29 Apr 2022 17:03:17 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com, joro@8bytes.org, jon.grimm@amd.com,
-        wei.huang2@amd.com, terry.bowman@amd.com
-Subject: Re: [PATCH v2 11/12] KVM: SVM: Do not inhibit APICv when x2APIC is
- present
-Message-ID: <YmwZxAWJ8KqHodbf@google.com>
-References: <20220412115822.14351-1-suravee.suthikulpanit@amd.com>
- <20220412115822.14351-12-suravee.suthikulpanit@amd.com>
- <3fd0aabb6288a5703760da854fd6b09a485a2d69.camel@redhat.com>
- <01460b72-1189-fef1-9718-816f2f658d42@amd.com>
- <b9ee5f62e904a690d7e2d8837ade8ece7e24a359.camel@redhat.com>
- <41b1e63ad6e45be019bbedc93bd18cfcb9475b06.camel@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        mlevitsk@redhat.com, stable@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: x86: make vendor code check for all nested
+ events
+Message-ID: <YmwaVY5vERO43CRI@google.com>
+References: <20220427173758.517087-1-pbonzini@redhat.com>
+ <20220427173758.517087-2-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <41b1e63ad6e45be019bbedc93bd18cfcb9475b06.camel@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220427173758.517087-2-pbonzini@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -78,35 +74,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 26, 2022, Maxim Levitsky wrote:
-> On Tue, 2022-04-26 at 10:06 +0300, Maxim Levitsky wrote:
-> BTW, can I ask you to check something on the AMD side of things of AVIC?
+On Wed, Apr 27, 2022, Paolo Bonzini wrote:
+> Right now, the VMX preemption timer is special cased via the
+> hv_timer_pending, but the purpose of the callback can be easily
+> extended to observing any event that can occur only in non-root
+> mode.  Interrupts, NMIs etc. are already handled properly by
+> the *_interrupt_allowed callbacks, so what is missing is only
+> MTF.  Check it in the newly-renamed callback, so that
+> kvm_vcpu_running's call to kvm_check_nested_events
+> becomes redundant.
 > 
-> I noticed that AMD's manual states that:
+> Cc: stable@vger.kernel.org
+> Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 2 +-
+>  arch/x86/kvm/vmx/nested.c       | 7 ++++++-
+>  arch/x86/kvm/x86.c              | 8 ++++----
+>  3 files changed, 11 insertions(+), 6 deletions(-)
 > 
-> "Multiprocessor VM requirements. When running a VM which has multiple virtual CPUs, and the
-> VMM runs a virtual CPU on a core which had last run a different virtual CPU from the same VM,
-> regardless of the respective ASID values, care must be taken to flush the TLB on the VMRUN using a
-> TLB_CONTROL value of 3h. Failure to do so may result in stale mappings misdirecting virtual APIC
-> accesses to the previous virtual CPU's APIC backing page."
-> 
-> It it relevant to KVM? I don't fully understand why it was mentioned that ASID doesn't matter,
-> what makes it special about 'virtual CPU from the same VM' if ASID doesn't matter? 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 4ff36610af6a..e2e4f60159e9 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1504,7 +1504,7 @@ struct kvm_x86_ops {
+>  struct kvm_x86_nested_ops {
+>  	void (*leave_nested)(struct kvm_vcpu *vcpu);
+>  	int (*check_events)(struct kvm_vcpu *vcpu);
+> -	bool (*hv_timer_pending)(struct kvm_vcpu *vcpu);
+> +	bool (*has_events)(struct kvm_vcpu *vcpu);
+>  	void (*triple_fault)(struct kvm_vcpu *vcpu);
+>  	int (*get_state)(struct kvm_vcpu *vcpu,
+>  			 struct kvm_nested_state __user *user_kvm_nested_state,
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 856c87563883..54672025c3a1 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3857,6 +3857,11 @@ static bool nested_vmx_preemption_timer_pending(struct kvm_vcpu *vcpu)
+>  	       to_vmx(vcpu)->nested.preemption_timer_expired;
+>  }
+>  
+> +static bool vmx_has_nested_events(struct kvm_vcpu *vcpu)
+> +{
+> +	return nested_vmx_preemption_timer_pending(vcpu) || vmx->nested.mtf_pending;
 
-I believe it's calling out that, because vCPUs from the same VM likely share an ASID,
-the magic TLB entry for the APIC-access page, which redirects to the virtual APIC page,
-will be preserved.  And so if the hypervisor doesn't flush the ASID/TLB, accelerated
-xAPIC accesses for the new vCPU will go to the previous vCPU's virtual APIC page.
+This doesn't even compile...
 
-Intel has the same requirement, though this specific scenario isn't as well documented.
-E.g. even if using EPT and VPID, the EPT still needs to be invalidated because the
-TLB can cache guest-physical mappings, which are not associated with a VPID.
-
-Huh.  I was going to say that KVM does the necessary flushes in vmx_vcpu_load_vmcs()
-and pre_svm_run(), but I don't think that's true.  KVM flushes if the _new_ VMCS/VMCB
-is being migrated to a different pCPU, but neither VMX nor SVM flush when switching
-between vCPUs that are both "loaded" on the current pCPU.
-
-Switching between vmcs01 and vmcs02 is ok, because KVM always forces a different
-EPTP, even if L1 is using shadow paging (the guest_mode bit in the role prevents
-reusing a root).  nSVM is "ok" because it flushes on every transition anyways.
+arch/x86/kvm/vmx/nested.c: In function ‘vmx_has_nested_events’:
+arch/x86/kvm/vmx/nested.c:3862:61: error: ‘vmx’ undeclared (first use in this function)
+ 3862 |         return nested_vmx_preemption_timer_pending(vcpu) || vmx->nested.mtf_pending;
+      |                                                             ^~~
+arch/x86/kvm/vmx/nested.c:3862:61: note: each undeclared identifier is reported only once for each function it appears in
+  CC [M]  arch/x86/kvm/svm/svm_onhyperv.o
+arch/x86/kvm/vmx/nested.c:3863:1: error: control reaches end of non-void function [-Werror=return-type]
+ 3863 | }
+      | ^
+cc1: all warnings being treated as errors
+  LD [M]  arch/x86/kvm/kvm.o
