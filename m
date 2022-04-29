@@ -2,139 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D831A515392
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 20:21:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 475205153C3
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 20:32:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379992AbiD2SYj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 14:24:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37606 "EHLO
+        id S1380043AbiD2SgE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 14:36:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236995AbiD2SYg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 14:24:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5BB1BC8653
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 11:21:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651256476;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/stkcvJjykGRYHDCQBNH7PAqqEJypDF4kYoHuS+OVKA=;
-        b=gLGGpaHugbBBzMN+di8QpYyiGltIrc6KzqTnknPkVYZ4EFv8bsqSNFYe7rzPdiSzEg/Yae
-        gY6Tb+UZKSQYztTWbY9yOUGzQh4VhXtlemEWj/1GeJI3dU2F1Ec4TKA2R+5JK7bmjt8acT
-        N2rNcA6jylCx55xy5g7IV/6IReTqWnA=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-377-CljRLPyrPc-slNRIOyOhzw-1; Fri, 29 Apr 2022 14:21:14 -0400
-X-MC-Unique: CljRLPyrPc-slNRIOyOhzw-1
-Received: by mail-il1-f197.google.com with SMTP id j5-20020a056e020ee500b002cbc90840ecso4024531ilk.23
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 11:21:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=/stkcvJjykGRYHDCQBNH7PAqqEJypDF4kYoHuS+OVKA=;
-        b=JI2h1+DmuaiBPaFTmrvNbUVmlyauX8pCaJ1D1Qz99Z/oG7fiIjj2mHyB+fv3TrdDgk
-         8PZZu0WKQQciZWgCWaEeqEqAg9SSfB8zIQkG1UuNn0yva80icKi8ED6/rBP2g8OkoLiG
-         qnB5V6fEIS6dNSo8vxgu/HWKt1dswZMeMKPE8uZAPpNDv+vm/woFOqFdTk9Qaw92ctRF
-         i289b7To2ezHE/wXTLBB7NMVal2IFnGTLZd5DSZC8LXvdO9SnDEcCKrBbAG/iHLhKcdZ
-         B71+e5euRzqwWAPvo7raP4kXBykYdj6+qRA2rZmeNZZKjtPmDuIZdRVYkdYs/gBKbL4h
-         D+Fg==
-X-Gm-Message-State: AOAM531QM8Zt6pDYJOnUBLHsEtGiqKWBXRDA4yUL7zgFVlZSVEKj8gmt
-        8AU/oMTzN7oZ04Ap61lIxzWqCiCKiJhKRUD5lUS2ooRB1I9s5nTu7uoj7MO88riIa+F9b0ilvJH
-        PEraNG2U6rZKt
-X-Received: by 2002:a05:6e02:1809:b0:2cc:507a:acfa with SMTP id a9-20020a056e02180900b002cc507aacfamr266306ilv.114.1651256474186;
-        Fri, 29 Apr 2022 11:21:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxMQe01BrdjkQTGSc8GhfcNnSFwj4USJ8BqMV1n3p5cbt4caHClRYCCsnFmYOxhkaUoVr9wpg==
-X-Received: by 2002:a05:6e02:1809:b0:2cc:507a:acfa with SMTP id a9-20020a056e02180900b002cc507aacfamr266282ilv.114.1651256473927;
-        Fri, 29 Apr 2022 11:21:13 -0700 (PDT)
-Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id 70-20020a6b1449000000b00657b4130f57sm1184609iou.25.2022.04.29.11.21.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Apr 2022 11:21:13 -0700 (PDT)
-Date:   Fri, 29 Apr 2022 14:21:11 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Joao Martins <joao.m.martins@oracle.com>,
-        Jason Wang <jasowang@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        qemu-devel <qemu-devel@nongnu.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>, Yi Liu <yi.l.liu@intel.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Thanos Makatos <thanos.makatos@nutanix.com>,
-        "John G . Johnson" <john.g.johnson@oracle.com>,
-        kvm <kvm@vger.kernel.org>
-Subject: Re: [PATCH RFC 04/10] intel_iommu: Second Stage Access Dirty bit
- support
-Message-ID: <Ymwsl5G/TCuRFja2@xz-m1.local>
-References: <20220428211351.3897-1-joao.m.martins@oracle.com>
- <20220428211351.3897-5-joao.m.martins@oracle.com>
- <CACGkMEug0zW0pWCSEtHQ5KE5KRpXyWvgJmPZm-yvJnCLmocAYg@mail.gmail.com>
- <f90a8126-7805-be8d-e378-f129196e753d@oracle.com>
+        with ESMTP id S237744AbiD2SgD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 14:36:03 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AA18D4C90;
+        Fri, 29 Apr 2022 11:32:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651257164; x=1682793164;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=zftMOiKfzA2N0SvkmILBHm7NmobiVBrkq7/3clP0XAg=;
+  b=iFkFV6bQaGu5XPbuMLNm3Fi30Bao33Vi82qTPmXCeCI3QV45o0j/3gJP
+   iSV4U8rFE+vQNHeJ0VcNRJ68Lu6j1mj/ODJN8EYdt3y1PELd3E1QXEFGj
+   J0oRMsddQrj2i+zVArwEnBML3qpXbpihIXHkkzIZ59gpCoL0JlWxb/su3
+   NcmSeap1IvNPnLHi9WN3q+Hhe2ue9c2GYttTj0/qcNLkdGlmBm98nRzvT
+   RBPFPjX8QvGwRW15/ej1wBwnmWekexR28FsOxDaJYNi/oRNESbmDLPF2m
+   bh54kzlO6i0c0WtrMm6VWTkI6vicC85r7vKQhT3HMWl+venwA6znq6tKs
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10332"; a="265582909"
+X-IronPort-AV: E=Sophos;i="5.91,186,1647327600"; 
+   d="scan'208";a="265582909"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 11:32:44 -0700
+X-IronPort-AV: E=Sophos;i="5.91,186,1647327600"; 
+   d="scan'208";a="582322111"
+Received: from jinggu-mobl1.amr.corp.intel.com (HELO [10.212.30.227]) ([10.212.30.227])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 11:32:43 -0700
+Message-ID: <7359e83b-9056-11a1-30ca-d13e9b953c95@intel.com>
+Date:   Fri, 29 Apr 2022 11:32:59 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f90a8126-7805-be8d-e378-f129196e753d@oracle.com>
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v3 13/21] x86/virt/tdx: Allocate and set up PAMTs for
+ TDMRs
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com
+References: <cover.1649219184.git.kai.huang@intel.com>
+ <ffc2eefdd212a31278978e8bfccd571355db69b0.1649219184.git.kai.huang@intel.com>
+ <c9b17e50-e665-3fc6-be8c-5bb16afa784e@intel.com>
+ <3664ab2a8e0b0fcbb4b048b5c3aa5a6e85f9618a.camel@intel.com>
+ <5984b61f-6a4a-c12a-944d-f4a78bdefc3d@intel.com>
+ <Ymv2h1GYCMQ9ZQvJ@google.com>
+ <c875fc4a-c3c0-dab1-c7cb-525b0bff5ae3@intel.com>
+ <YmwsOo4TCq1/5hgd@google.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <YmwsOo4TCq1/5hgd@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 29, 2022 at 10:12:01AM +0100, Joao Martins wrote:
-> On 4/29/22 03:26, Jason Wang wrote:
-> > On Fri, Apr 29, 2022 at 5:14 AM Joao Martins <joao.m.martins@oracle.com> wrote:
-> >> @@ -3693,7 +3759,8 @@ static void vtd_init(IntelIOMMUState *s)
-> >>
-> >>      /* TODO: read cap/ecap from host to decide which cap to be exposed. */
-> >>      if (s->scalable_mode) {
-> >> -        s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
-> >> +        s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS |
-> >> +                   VTD_ECAP_SLADS;
-> >>      }
-> > 
-> > We probably need a dedicated command line parameter and make it compat
-> > for pre 7.1 machines.
-> > 
-> > Otherwise we may break migration.
+On 4/29/22 11:19, Sean Christopherson wrote:
+> On Fri, Apr 29, 2022, Dave Hansen wrote:
+>> On 4/29/22 07:30, Sean Christopherson wrote:
+>>> On Fri, Apr 29, 2022, Dave Hansen wrote:
+>> ...
+>>>> A *good* way (although not foolproof) is to launch a TDX VM early
+>>>> in boot before memory gets fragmented or consumed.  You might even
+>>>> want to recommend this in the documentation.
+>>>
+>>> What about providing a kernel param to tell the kernel to do the
+>>> allocation during boot?
+>>
+>> I think that's where we'll end up eventually.  But, I also want to defer
+>> that discussion until after we have something merged.
+>>
+>> Right now, allocating the PAMTs precisely requires running the TDX
+>> module.  Running the TDX module requires VMXON.  VMXON is only done by
+>> KVM.  KVM isn't necessarily there during boot.  So, it's hard to do
+>> precisely today without a bunch of mucking with VMX.
 > 
-> I can gate over an 'x-ssads' option (default disabled). Which reminds me that I probably
-> should rename to the most recent mnemonic (as SLADS no longer exists in manuals).
+> Meh, it's hard only if we ignore the fact that the PAMT entry size isn't going
+> to change for a given TDX module, and is extremely unlikely to change in general.
 > 
-> If we all want by default enabled I can add a separate patch to do so.
+> Odds are good the kernel can hardcode a sane default and Just Work.  Or provide
+> the assumed size of a PAMT entry via module param.  If the size ends up being
+> wrong, log an error, free the reserved memory, and move on with TDX setup with
+> the correct size.
 
-The new option sounds good.
+Sure.  The boot param could be:
 
-Jason, per our previous discussion, shall we not worry about the
-compatibility issues per machine-type until the whole feature reaches a
-mostly-complete stage?
+	tdx_reserve_whatever=auto
 
-There seems to have a bunch of sub-features for scalable mode and it's a
-large project as a whole.  I'm worried trying to maintain compatibilities
-for all the small sub-features could be an unnessary burden to the code
-base.
+and then it can be overridden if necessary.  I just don't want to have
+kernel binaries that are only good as paperweights if Intel decides it
+needs another byte of metadata.
 
-Thanks,
+>> You can arm-wrestle the distro folks who hate adding command-line tweaks
+>> when the time comes. ;)
+> 
+> Sure, you just find me the person that's going to run TDX guests with an
+> off-the-shelf distro kernel :-D
 
--- 
-Peter Xu
+Well, everyone gets their kernel from upstream eventually and everyone
+watches upstream.
 
+But, in all seriousness, do you really expect TDX to remain solely in
+the non-distro-kernel crowd forever?  I expect that the fancy cloud
+providers (with custom kernels) who care the most to deploy TDX fist.
+But, things will trickle down to the distro crowd over time.
