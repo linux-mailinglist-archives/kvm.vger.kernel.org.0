@@ -2,75 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 69D26514DB0
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 16:41:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D53C7514DCB
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 16:43:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377593AbiD2Ooc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 10:44:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33536 "EHLO
+        id S1377679AbiD2Ops (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 10:45:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377951AbiD2OoO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 10:44:14 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DAD8D3443;
-        Fri, 29 Apr 2022 07:39:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651243179; x=1682779179;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=K5arLAYfSYDkrBf/hz/XwShI81HHiEcz3kuzcBSRsJU=;
-  b=YUo1ZqkZfGucNv9LjOvupNtfciF5vQPqk6Kkg0pkkRl82eekQ9q6Isvm
-   AUcL7DxFzzRiUn/OkHve0NKu+DVyy7uedsQVVYFvA9MIBsH0oEfl8Q+Rl
-   630JVG2WlUlPklSjUOeLa7zjR/+h6THb3NwgKVfh+XEVZ3mi19z7ZpDoI
-   2sNoteX7jJbD8Fdt72Zn7d26MmsSJfCNExKhfunSZBQDt5wlFI5lxUXmF
-   EBjdejrEGWkuw0umSTnEC9yALxSVt/oGbzN/63TbbK/ohS/reoair+Se3
-   AIUqfdyqOjokfUw0ob0t7S02tkcsUPk8NSRXD6Y+qjLS0X8jMkcL8zBed
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10331"; a="266478752"
-X-IronPort-AV: E=Sophos;i="5.91,185,1647327600"; 
-   d="scan'208";a="266478752"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 07:39:38 -0700
-X-IronPort-AV: E=Sophos;i="5.91,185,1647327600"; 
-   d="scan'208";a="582156648"
-Received: from jinggu-mobl1.amr.corp.intel.com (HELO [10.212.30.227]) ([10.212.30.227])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 07:39:37 -0700
-Message-ID: <92af7b22-fa8a-5d42-ae15-8526abfd2622@intel.com>
-Date:   Fri, 29 Apr 2022 07:39:52 -0700
+        with ESMTP id S1377654AbiD2Opo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 10:45:44 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1D9968300
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 07:42:25 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id y38so7091569pfa.6
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 07:42:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Q8Sf/GbjZKXQvTHW2LwW4qAGOz3b9F7JEp6h77YJ1Oo=;
+        b=qkeV4CtdSEM5tiWHb1MIxWYVlPfLgGE7UevmkBnAbFH9057fEACF93fsFXKz4W78kT
+         GolFOevTDcjA6d9cOVyV8wm7NnCDZpJ6qMGTbgJLEXqq7xa/3ulb+5ZzBKpxqGlXSq6d
+         HdtRm0U0qlohOxBJOOLjb0QyzAAA1vC+e25Kdwxz+tYDp/PmNt/RK28EeG0VakCxkJJK
+         tIn2Dj9i9H7HBZiiN7/80Ce64afhJkaLQ5tq338mVjJ18i/IyRjej+Bl2QfkoUPXP+lJ
+         onZ+lHU0vcjwafKhTaKJtkxRFdBtVZeG362TZVEFKS87HvQrmMzWvPKqEKkT8HPhRqVV
+         aosA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Q8Sf/GbjZKXQvTHW2LwW4qAGOz3b9F7JEp6h77YJ1Oo=;
+        b=TP6jKW2mXeQCUO283Tjh8wS0vCJBC1mi6GMl4uQSjURKzWzQle6fkiQHjLqJwo6vYb
+         wBqB2oWUotirNzRXERVBB4A94wS+7K0cvVXaaVwtJ55i9+F9ub5YdL+k1OwEn7TrGoup
+         STZLpygkzEGrWV8XQx1MrM4cLxilSrlEj8OAtIXSdpKqi87dPDikeHz+JNetJdNTNbU0
+         WwEyrc6WkuPVg4ZTBlpNBzbku23obw1AaFNeWGY6KussszRAlXJ8v9Wiv2Fzzu/ddUhH
+         BbqxijGkfpBsFiuL+K+1no0rkWGos/H2hJ1OFwUZdg/nD35Lt3X7m7GM8npuOghJ5WBE
+         xJWQ==
+X-Gm-Message-State: AOAM531dFbxLXX3j7QGmVN9E4kOO3paJvlHFzpaAe46jGEveOkVtYM6J
+        6hrcMRrht8lwo9djsMp5xD6jo3EItxGw0Q==
+X-Google-Smtp-Source: ABdhPJzTZJpSp9OxdNz1eGasYYqmBNDjW6EMNn24fFlY6RotVQJetGMsjQZrSR30PRSCZy5b5WZcYA==
+X-Received: by 2002:a63:d758:0:b0:380:fba9:f6e5 with SMTP id w24-20020a63d758000000b00380fba9f6e5mr32765775pgi.330.1651243345281;
+        Fri, 29 Apr 2022 07:42:25 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id n2-20020aa79042000000b005057336554bsm3382348pfo.128.2022.04.29.07.42.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Apr 2022 07:42:24 -0700 (PDT)
+Date:   Fri, 29 Apr 2022 14:42:21 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Do not create SPTEs for GFNs that exceed
+ host.MAXPHYADDR
+Message-ID: <Ymv5TR76RNvFBQhz@google.com>
+References: <20220428233416.2446833-1-seanjc@google.com>
+ <337332ca-835c-087c-c99b-92c35ea8dcd3@redhat.com>
+ <Ymv1I5ixX1+k8Nst@google.com>
+ <20e1e7b1-ece7-e9e7-9085-999f7a916ac2@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v3 00/21] TDX host kernel support
-Content-Language: en-US
-To:     Dan Williams <dan.j.williams@intel.com>,
-        Kai Huang <kai.huang@intel.com>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Kuppuswamy Sathyanarayanan 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>
-References: <cover.1649219184.git.kai.huang@intel.com>
- <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
- <CAPcyv4g5E_TOow=3pFJXyFr=KLV9pTSnDthgz6TuXvru4xDzaQ@mail.gmail.com>
- <de9b8f4cef5da03226158492988956099199aa60.camel@intel.com>
- <CAPcyv4iGsXkHAVgf+JZ4Pah_fkCZ=VvUmj7s3C6Rkejtdw_sgQ@mail.gmail.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <CAPcyv4iGsXkHAVgf+JZ4Pah_fkCZ=VvUmj7s3C6Rkejtdw_sgQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20e1e7b1-ece7-e9e7-9085-999f7a916ac2@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,32 +79,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/28/22 19:58, Dan Williams wrote:
-> That only seems possible if the kernel is given a TDX capable physical
-> address map at the beginning of time.
+On Fri, Apr 29, 2022, Paolo Bonzini wrote:
+> On 4/29/22 16:24, Sean Christopherson wrote:
+> > I don't love the divergent memslot behavior, but it's technically correct, so I
+> > can't really argue.  Do we want to "officially" document the memslot behavior?
+> > 
+> 
+> I don't know what you mean by officially document,
 
-TDX actually brings along its own memory map.  The "EAS"[1]. has a lot
-of info on it, if you know where to find it.  Here's the relevant chunk:
+Something in kvm/api.rst under KVM_SET_USER_MEMORY_REGION.
 
-CMR - Convertible Memory Range -
-	A range of physical memory configured by BIOS and verified by
-	MCHECK. MCHECK verificatio n is intended to help ensure that a
-	CMR may be used to hold TDX memory pages encrypted with a
-	private HKID.
+> but at least I have relied on it to test KVM's MAXPHYADDR=52 cases before
+> such hardware existed.  :)
 
-So, the BIOS has the platform knowledge to enumerate this range.  It
-stashes the information off somewhere that the TDX module can find it.
-Then, during OS boot, the OS makes a SEAMCALL (TDH.SYS.CONFIG) to the
-TDX module and gets the list of CMRs.
-
-The OS then has to reconcile this CMR "memory map" against the regular
-old BIOS-provided memory map, tossing out any memory regions which are
-RAM, but not covered by a CMR, or disabling TDX entirely.
-
-Fun, eh?
-
-I'm still grappling with how this series handles the policy of what
-memory to throw away when.
-
-1.
-https://www.intel.com/content/dam/develop/external/us/en/documents/intel-tdx-module-1eas.pdf
+Ah, that's a very good reason to support this for shadow paging.  Maybe throw
+something about testing in the changelog?  Without considering the testing angle,
+it looks like KVM supports max=52 for !TDP just because it can, because practically
+speaking there's unlikely to be a use case for exposing that much memory to a
+guest when using shadow paging.
