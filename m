@@ -2,163 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 070B7514F96
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 17:36:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3245B514F9D
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 17:36:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378543AbiD2PjS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 11:39:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33308 "EHLO
+        id S236500AbiD2Pju (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 11:39:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232486AbiD2PjR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 11:39:17 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A431D5EB3
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 08:35:58 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id m23so11033199ljc.0
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 08:35:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6s1nwoJRGgRDD+cc6eVnKDXhc5zKGyzdqBiCfjhgACw=;
-        b=QRe3ug7K1fccdkgWK9+JEOfzzP1wXoDKVm5M/ouWALA2QAkiM9sM5mQaCM+wK7D+v3
-         vosrmviy1SYp/52eVj7aSP8AN0D8VAU5Okvb4Ww8xgcqiXF9ZElmdP2YOFbhm7XV0qCz
-         OrPJDhWWzcWkt5ISnaWJp4UWFQSRujN2mYmOd3ptUuFcjqk7kK0xf02f8kQk/8GxjGYv
-         R8dlQH1h9WQLZqOX7d7Vbo/s7c+YzOvhAVSm7esn70hVYOYtl6QPHQW/lR70eu6ztjZD
-         pKiaKcokFfvJ242z+zynG0IN4GowpMyhRJWo/gnYQwpL2wc3PwtK2z0FlehP2gRrMqKr
-         MO6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6s1nwoJRGgRDD+cc6eVnKDXhc5zKGyzdqBiCfjhgACw=;
-        b=qUrw/lHLDzOSnnaSzo+GdVLgqcdHtpwZZ9YLYcSImC152iuuzRXvEvhHTmiyNBPDdQ
-         S2pUJuoqGTlLjT4sKvCtzz/wswP7L8Cc0yFcNC4/dLPQL1BR6MSaFzwBlu+57sITdN0Y
-         InYO+Lf9did7aiTdVSwe0ArezMxSvZtLG6jsrj2/fdXUqOdfDgUNDiebXiEFqGrH6abb
-         npoUqWSxYAljUU9CZPMidT9PLmw4yOntGZ4n0Tg/lAjz8pNMkouylyubb5Bi7WnvcYxE
-         nYFRLBsQhRSNPUR8mGN5n/IaBYBc9FtfTHKdRIb5B63HjGKx8OfLoBIaQPFtULvFQLa3
-         nelQ==
-X-Gm-Message-State: AOAM532b2hLuuu8OYlA3ggFYwI+KEiG9G4//rlu7EWa1C96zDFtg+Bg7
-        5VJGSzX0att8hgJ1jhubWWgpWCRKK8soi9dvrP/uSw==
-X-Google-Smtp-Source: ABdhPJyN+azZ/dxOkvmmY0WVIZMlkjaocYqwrPftbufCjEDjpdvoZ1xb9ffcGeGw5Jbxb8q7SMK3CoZJfVIG0FB5O0U=
-X-Received: by 2002:a05:651c:1508:b0:24f:2fa6:89a4 with SMTP id
- e8-20020a05651c150800b0024f2fa689a4mr6252956ljf.132.1651246556519; Fri, 29
- Apr 2022 08:35:56 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220407195908.633003-1-pgonda@google.com> <CAFNjLiXC0AdOw5f8Ovu47D==ex7F0=WN_Ocirymz4xL=mWvC5A@mail.gmail.com>
- <CAMkAt6r-Mc_YN-gVHuCpTj4E1EmcvyYpP9jhtHo5HRHnoNJAdA@mail.gmail.com>
- <CAMkAt6r+OMPWCbV_svUyGWa0qMzjj2UEG29G6P7jb6uH6yko2w@mail.gmail.com>
- <62e9ece1-5d71-f803-3f65-2755160cf1d1@redhat.com> <CAMkAt6q6YLBfo2RceduSXTafckEehawhD4K4hUEuB4ZNqe2kKg@mail.gmail.com>
- <4c0edc90-36a1-4f4c-1923-4b20e7bdbb4c@redhat.com> <CAMkAt6oL5qi7z-eh4z7z8WBhpc=Ow6WtcJA5bDi6-aGMnz135A@mail.gmail.com>
- <CAMkAt6rmDrZfN5DbNOTsKFV57PwEnK2zxgBTCbEPeE206+5v5w@mail.gmail.com> <0d282be4-d612-374d-84ba-067994321bab@redhat.com>
-In-Reply-To: <0d282be4-d612-374d-84ba-067994321bab@redhat.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Fri, 29 Apr 2022 09:35:45 -0600
-Message-ID: <CAMkAt6ragq4OmnX+n628Yd5pn51qFv4qV20upGR6tTvyYw3U5A@mail.gmail.com>
-Subject: Re: [PATCH v3] KVM: SEV: Mark nested locking of vcpu->lock
+        with ESMTP id S1378555AbiD2Pjn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 11:39:43 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FF13D64C3
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 08:36:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BE8D3B835F2
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 15:36:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49B66C385A7;
+        Fri, 29 Apr 2022 15:36:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1651246581;
+        bh=BAgz6vYtSujJ/yUysgj+N8ugRgXzdEi+Mw7D0wyLeiY=;
+        h=From:To:Cc:Subject:Date:From;
+        b=iLgRz1NCf3HCJlCsT34FlyrY375tBr2mgNMV87dGuI0zj9N8pag/ky7noWuO6b6x9
+         xfg5nx2D6jBBnNSHfO1KZw+w/qBVt1o7V5RQbtjpEgYfrrjohPZPr0MgfU6wyJPlxb
+         0fPq3TUluj5H0pt72CyvpyD0xt+xKB7gWHxUDd58OC8gUgln/kuQmFdZcjDidOkH8K
+         vSkCzVQjnZQFw2UMijH5XXtI6kxpTnjxmZxAPYWsj6J/lWECz+Fa1lEpisx4DyasJ6
+         JBngxjusFW0I58PWnCzilB7GfTInrKxqQQhxQ0CQUguttLEiY4z1zElFpgKGroAer9
+         lDSyN7igAf3oQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nkSfK-007ySy-OM; Fri, 29 Apr 2022 16:36:18 +0100
+From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     John Sperbeck <jsperbeck@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Subject: [GIT PULL] KVM/arm64 fixes for 5.18, take #2
+Date:   Fri, 29 Apr 2022 16:36:15 +0100
+Message-Id: <20220429153615.710743-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, qperret@google.com, will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, kernel-team@android.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 28, 2022 at 5:59 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 4/28/22 23:28, Peter Gonda wrote:
-> >
-> > So when actually trying this out I noticed that we are releasing the
-> > current vcpu iterator but really we haven't actually taken that lock
-> > yet. So we'd need to maintain a prev_* pointer and release that one.
->
-> Not entirely true because all vcpu->mutex.dep_maps will be for the same
-> lock.  The dep_map is essentially a fancy string, in this case
-> "&vcpu->mutex".
->
-> See the definition of mutex_init:
->
-> #define mutex_init(mutex)                                              \
-> do {                                                                   \
->          static struct lock_class_key __key;                            \
->                                                                         \
->          __mutex_init((mutex), #mutex, &__key);                         \
-> } while (0)
->
-> and the dep_map field is initialized with
->
->          lockdep_init_map_wait(&lock->dep_map, name, key, 0, LD_WAIT_SLEEP);
->
-> (i.e. all vcpu->mutexes share the same name and key because they have a
-> single mutex_init-ialization site).  Lockdep is as crude in theory as it
-> is effective in practice!
->
-> >
-> >           bool acquired = false;
-> >           kvm_for_each_vcpu(...) {
-> >                   if (!acquired) {
-> >                      if (mutex_lock_killable_nested(&vcpu->mutex, role)
-> >                          goto out_unlock;
-> >                      acquired = true;
-> >                   } else {
-> >                      if (mutex_lock_killable(&vcpu->mutex, role)
-> >                          goto out_unlock;
->
-> This will cause a lockdep splat because it uses subclass 0.  All the
-> *_nested functions is allow you to specify a subclass other than zero.
+Paolo,
 
-OK got it. I now have this to lock:
+Here's a trio of fixes for 5.18. Nothing terribly interesting, but
+nonetheless important fixes (two of the bugs are related to AArch32).
 
-         kvm_for_each_vcpu (i, vcpu, kvm) {
-                  if (prev_vcpu != NULL) {
-                          mutex_release(&prev_vcpu->mutex.dep_map, _THIS_IP_);
-                          prev_vcpu = NULL;
-                  }
+Please pull,
 
-                  if (mutex_lock_killable_nested(&vcpu->mutex, role))
-                          goto out_unlock;
-                  prev_vcpu = vcpu;
-          }
+	M.
 
-But I've noticed the unlocking is in the wrong order since we are
-using kvm_for_each_vcpu() I think we need a kvm_for_each_vcpu_rev() or
-something. Which maybe a bit for work:
-https://elixir.bootlin.com/linux/latest/source/lib/xarray.c#L1119.
-Then I think we could something like this to unlock:
+The following changes since commit 21db83846683d3987666505a3ec38f367708199a:
 
-         bool acquired = true;
-          kvm_for_each_vcpu_rev(i, vcpu, kvm) {
-                  if (!acquired) {
-                          mutex_acquire(&vcpu->mutex.dep_map, 0, role,
-_THIS_IP_);
-                  }
-                  mutex_unlock(&vcpu->mutex);
-                  acquired = false;
-          }
->
-> Paolo
->
-> >                   }
-> >           }
-> >
-> > To unlock:
-> >
-> >           kvm_for_each_vcpu(...) {
-> >              mutex_unlock(&vcpu->mutex);
-> >           }
-> >
-> > This way instead of mocking and releasing the lock_dep we just lock
-> > the fist vcpu with mutex_lock_killable_nested(). I think this
-> > maintains the property you suggested of "coalesces all the mutexes for
-> > a vm in a single subclass".  Thoughts?
->
+  selftests: KVM: Free the GIC FD when cleaning up in arch_timer (2022-04-07 08:46:13 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.18-2
+
+for you to fetch changes up to 85ea6b1ec915c9dd90caf3674b203999d8c7e062:
+
+  KVM: arm64: Inject exception on out-of-IPA-range translation fault (2022-04-27 23:02:23 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 5.18, take #2
+
+- Take care of faults occuring between the PARange and
+  IPA range by injecting an exception
+
+- Fix S2 faults taken from a host EL0 in protected mode
+
+- Work around Oops caused by a PMU access from a 32bit
+  guest when PMU has been created. This is a temporary
+  bodge until we fix it for good.
+
+----------------------------------------------------------------
+Alexandru Elisei (1):
+      KVM/arm64: Don't emulate a PMU for 32-bit guests if feature not set
+
+Marc Zyngier (1):
+      KVM: arm64: Inject exception on out-of-IPA-range translation fault
+
+Will Deacon (1):
+      KVM: arm64: Handle host stage-2 faults from 32-bit EL0
+
+ arch/arm64/include/asm/kvm_emulate.h |  1 +
+ arch/arm64/kvm/hyp/nvhe/host.S       | 18 +++++++++---------
+ arch/arm64/kvm/inject_fault.c        | 28 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/mmu.c                 | 19 +++++++++++++++++++
+ arch/arm64/kvm/pmu-emul.c            | 23 ++++++++++++++++++++++-
+ 5 files changed, 79 insertions(+), 10 deletions(-)
