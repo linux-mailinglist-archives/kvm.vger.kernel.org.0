@@ -2,147 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 95EB0513FE1
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 03:00:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1B34513FF1
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 03:04:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353617AbiD2BDO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Apr 2022 21:03:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48418 "EHLO
+        id S1353701AbiD2BHj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Apr 2022 21:07:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345344AbiD2BDN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Apr 2022 21:03:13 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA54BB9F38;
-        Thu, 28 Apr 2022 17:59:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651193997; x=1682729997;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=3ekdhigpdA6kzMTJSHW/fF9UhW2DvRZyiyNm6ygRxaM=;
-  b=b2t0j8eRbU2gaJMXjeM1tKPuJbljnOlGQYk1dmwurVv5dK63XgbKXX2x
-   MOa1Wexm2ztTW//hc2iFbdHD2IUynfto3odeI/dnVue2+lWEmAG+wqaR2
-   JA+0CWbFE0obsomVfTmTGqbi/lGbBNnEwb/eu6AzWpsDX8u1V7a+1X6f1
-   z0HWWB9tTWCEuHAAooc3t0/yx9VJdAoNQmqFOM5VxEWeyqyy4pcyzdBIN
-   lGOUF1hW73CpGdYO76pU7pot43/efvOkNWw25Nz5Zk31BPxHYdBVnzzq2
-   YPQFBGUIEhkaXiStRfcCbyBnfm9rg0foGx8NYCzqeBAKB73Ur6Q+oFQQL
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10331"; a="352912726"
-X-IronPort-AV: E=Sophos;i="5.91,296,1647327600"; 
-   d="scan'208";a="352912726"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2022 17:59:57 -0700
-X-IronPort-AV: E=Sophos;i="5.91,296,1647327600"; 
-   d="scan'208";a="706315227"
-Received: from gshechtm-mobl.ger.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.60.191])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2022 17:59:54 -0700
-Message-ID: <3547101508b3f168cce202827bd73a051224a542.camel@intel.com>
-Subject: Re: [PATCH v3 04/21] x86/virt/tdx: Add skeleton for detecting and
- initializing TDX on demand
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-Date:   Fri, 29 Apr 2022 12:59:52 +1200
-In-Reply-To: <966b1f45-ba5d-febd-e365-29308a9a59b4@intel.com>
-References: <cover.1649219184.git.kai.huang@intel.com>
-         <32dcf4c7acc95244a391458d79cd6907125c5c29.1649219184.git.kai.huang@intel.com>
-         <ac482f2b-d2d1-0643-faa4-1b36340268c5@intel.com>
-         <22e3adf42b8ea2cae3aabc26f762acb983133fea.camel@intel.com>
-         <c833aff2-b459-a1d7-431f-bce5c5f29182@intel.com>
-         <37efe2074eba47c51bf5c1a2369a05ddf9082885.camel@intel.com>
-         <3731a852-71b8-b081-2426-3b0a650e174c@intel.com>
-         <edcae7ab1e6a074255a6624e8e0536bd77f84eed.camel@intel.com>
-         <0aa81fd0-a491-847d-9fc6-4b853f2cf7b4@intel.com>
-         <af6fccf2f6f8d83593f0eedd003c7cd07f89274d.camel@intel.com>
-         <966b1f45-ba5d-febd-e365-29308a9a59b4@intel.com>
+        with ESMTP id S1353678AbiD2BHf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Apr 2022 21:07:35 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62549BC864
+        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 18:04:19 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id z5-20020a170902ccc500b0015716eaec65so3482080ple.14
+        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 18:04:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=/1wb0EUJMAOVjEcNcUn77zKNCe+7w/+d1xa9d1eIEYw=;
+        b=sjl1W+oS3wTgYKVlkQFCV2ylujEI4H1j269rgfGJ12THGn5+Rvk4vLClgn0o7czy4s
+         j01ESF7enfH8zDQBtCV+mxjNVBkkm+rLKvUHMXNm9oJyGUk3H2RZu3HiFCx5EFp28ohW
+         0GPYxySnIUaTAcFsEi50p2wnwAF9EDayimNf0f+O0R1gtwiBZSMlKo7rGI09N93tZ/ww
+         bz77QOUjQQF2JCU5rLECAdd3GK4qGHZsdTzhLJc0jO0qi8nDrrvwGXul5qHfPzKD8uLK
+         +A1OKQqF5JBS6WrOyqqFvpzN9EeyGxRpls3oqRbg2MbE1l1ENz8RD7XOVds3FVF0wb2T
+         O0XA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=/1wb0EUJMAOVjEcNcUn77zKNCe+7w/+d1xa9d1eIEYw=;
+        b=yIPzpQ3z5UlrlB99FXq75ByhRBH05iYihVLS8LQJm3iOTpCr14Z6KcpHYnSonaTkeZ
+         XDUayhV20y3tfwkzm/p6E+CGVf0gaamEm3vL5stRtGWDbMPbMmBdM86Y6CXQz+SOSBiF
+         lZj0X8R3jkeZbYRBzPRV8HFVNqEG5Q111gWSTFMlGuvzOTSvKsf/bWACDz4Y1llTm83O
+         9IIeKXUwv1n6HUEoteuAX/QQroekbaBjI1hwjYyPaXQGEDy6ryyvFlIvki64VKL4/c0A
+         AvfVXa+ldidYCP0Z93dHLgzAT4VUz6+AvQj3R4Q+UT/04tGZTYPMgs+z6AKkMRJAiBQ/
+         +Quw==
+X-Gm-Message-State: AOAM532jV9Ac9E9hk73aiCd188t0g9V+DAWv+ESyOf+YIvqpg4kxwlDC
+        neZo06ux9cG4YKHfRue9TbGZf2CVT+8=
+X-Google-Smtp-Source: ABdhPJwbWXQVHFF1qK8TuOCj10tHHD5fJztnTGKmSRlsECbDASEEZkNbM4JFFFCD6hU3qDT7mQgxB3wI198=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2391:b0:50a:3ea9:e84d with SMTP id
+ f17-20020a056a00239100b0050a3ea9e84dmr37688617pfc.21.1651194258843; Thu, 28
+ Apr 2022 18:04:18 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 29 Apr 2022 01:04:06 +0000
+Message-Id: <20220429010416.2788472-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
+Subject: [PATCH 00/10] KVM: Clean up 'struct page' / pfn helpers
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-04-28 at 17:26 -0700, Dave Hansen wrote:
-> On 4/28/22 17:11, Kai Huang wrote:
-> > This is true.  So I think w/o taking the lock is also fine, as the TDX module
-> > initialization is a state machine.  If any cpu goes offline during logical-cpu
-> > level initialization and TDH.SYS.LP.INIT isn't done on that cpu, then later the
-> > TDH.SYS.CONFIG will fail.  Similarly, if any cpu going offline causes
-> > TDH.SYS.KEY.CONFIG is not done for any package, then TDH.SYS.TDMR.INIT will
-> > fail.
-> 
-> Right.  The worst-case scenario is someone is mucking around with CPU
-> hotplug during TDX initialization is that TDX initialization will fail.
-> 
-> We *can* fix some of this at least and provide coherent error messages
-> with a pattern like this:
-> 
-> 	cpus_read_lock();
-> 	// check that all MADT-enumerated CPUs are online
-> 	tdx_init();
-> 	cpus_read_unlock();
-> 
-> That, of course, *does* prevent CPUs from going offline during
-> tdx_init().  It also provides a nice place for an error message:
-> 
-> 	pr_warn("You offlined a CPU then want to use TDX?  Sod off.\n");
+Clean up KVM's struct page / pfn helpers to reduce the number of
+pfn_to_page() and page_to_pfn() conversions.  E.g. kvm_release_pfn_dirty()
+makes 6 (if I counted right) calls to pfn_to_page() when releasing a dirty
+pfn that backed by a vanilla struct page.  That is easily trimmed down to
+a single call.
 
-Yes this is better.
+And perhaps more importantly, rename and refactor kvm_is_reserved_pfn() to
+try and better reflect what it actually queries, which at this point is
+effectively whether or not the pfn is backed by a refcounted page.
 
-The problem is how to check MADT-enumerated CPUs are online?
+Sean Christopherson (10):
+  KVM: Do not zero initialize 'pfn' in hva_to_pfn()
+  KVM: Drop bogus "pfn != 0" guard from kvm_release_pfn()
+  KVM: Don't set Accessed/Dirty bits for ZERO_PAGE
+  KVM: Avoid pfn_to_page() and vice versa when releasing pages
+  KVM: nVMX: Use kvm_vcpu_map() to get/pin vmcs12's APIC-access page
+  KVM: Don't WARN if kvm_pfn_to_page() encounters a "reserved" pfn
+  KVM: Remove kvm_vcpu_gfn_to_page() and kvm_vcpu_gpa_to_page()
+  KVM: Take a 'struct page', not a pfn in kvm_is_zone_device_page()
+  KVM: Rename/refactor kvm_is_reserved_pfn() to
+    kvm_pfn_to_refcounted_page()
+  KVM: x86/mmu: Shove refcounted page dependency into
+    host_pfn_mapping_level()
 
-I checked the code, and it seems we can use 'num_processors + disabled_cpus' as
-MADT-enumerated CPUs?  In fact, there should be no 'disabled_cpus' for TDX, so I
-think:
+ arch/x86/kvm/mmu/mmu.c     |  26 +++++--
+ arch/x86/kvm/mmu/tdp_mmu.c |   3 +-
+ arch/x86/kvm/vmx/nested.c  |  39 ++++-------
+ arch/x86/kvm/vmx/vmx.h     |   2 +-
+ include/linux/kvm_host.h   |  12 +---
+ virt/kvm/kvm_main.c        | 140 +++++++++++++++++++++++++------------
+ 6 files changed, 131 insertions(+), 91 deletions(-)
 
-	if (disabled_cpus || num_processors != num_online_cpus()) {
-		pr_err("Initializing the TDX module requires all MADT-
-enumerated CPUs being onine.");
-		return -EINVAL;
-	}
 
-But I may have misunderstanding.
-
-> 
-> > A problem (I realized it exists in current implementation too) is shutting down
-> > the TDX module, which requires calling TDH.SYS.LP.SHUTDOWN on all BIOS-enabled
-> > cpus.  Kernel can do this SEAMCALL at most for all present cpus.  However when
-> > any cpu is offline, this SEAMCALL won't be called on it, and it seems we need to
-> > add new CPU hotplug callback to call this SEAMCALL when the cpu is online again.
-> 
-> Hold on a sec.  If you call TDH.SYS.LP.SHUTDOWN on any CPU, then TDX
-> stops working everywhere, right?  
-> 
-
-Yes.
-
-But tot shut down the TDX module, it's better to call  LP.SHUTDOWN on all 
-logical cpus as suggested by spec.
-
-> But, if someone offlines one CPU, we
-> don't want TDX to stop working everywhere.
-
-Right.   I am talking about when initializing fails due to any reason (i.e. -
-ENOMEM), currently we shutdown the TDX module.  When shutting down the TDX
-module, we want to call LP.SHUTDOWN on all logical cpus.  If there's any CPU
-being offline when we do the shutdown, then LP.SHUTDOWN won't be called for that
-cpu. 
-
-But as you suggested above, if we have an early check whether all MADT-
-enumerated CPUs are online and if not we return w/o shutting down the TDX
-module, then if we shutdown the module the LP.SHUTDOWN will be called on all
-cpus.
+base-commit: 2a39d8b39bffdaf1a4223d0d22f07baee154c8f3
+-- 
+2.36.0.464.gb9c8b46e94-goog
 
