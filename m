@@ -2,113 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FF97515466
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 21:22:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF90F515468
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 21:25:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238144AbiD2TZj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 15:25:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43912 "EHLO
+        id S238467AbiD2T3Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 15:29:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238707AbiD2TYN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 15:24:13 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 689093A5CF
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 12:20:54 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 00F7B1063;
-        Fri, 29 Apr 2022 12:20:54 -0700 (PDT)
-Received: from [10.57.80.98] (unknown [10.57.80.98])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 226FC3F73B;
-        Fri, 29 Apr 2022 12:20:50 -0700 (PDT)
-Message-ID: <cab0cf66-5e9c-346e-6eb5-ea1f996fbab3@arm.com>
-Date:   Fri, 29 Apr 2022 20:20:46 +0100
+        with ESMTP id S234368AbiD2T3P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 15:29:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 67B7981483
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 12:25:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651260355;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=f98T4BJHfJan6nA7b2NKA9Mwn0L7MATFzgHNudByTF0=;
+        b=ehPdrvPa55MOODsD+uo1dWHEpce6/XH/nsNdUg+6fBdOHrHZ+oEQVS/ciZSUaPKOwZ1Mpd
+        jeAaZ8PY/Kv4ZhMwNsouKLbm/pdzpjf8pP8x+Wmsyuaoyon1QwKl6wwC+YK0qDjbmbcIqp
+        NAg9UCAcgK1gQXtH6yiELDCtKDOcJvI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-483-XS1Nj7v1OguIBsNbGBb46w-1; Fri, 29 Apr 2022 15:25:53 -0400
+X-MC-Unique: XS1Nj7v1OguIBsNbGBb46w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 516593834C02;
+        Fri, 29 Apr 2022 19:25:53 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 34E7BC15D70;
+        Fri, 29 Apr 2022 19:25:53 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH] KVM: x86: work around QEMU issue with synthetic CPUID leaves
+Date:   Fri, 29 Apr 2022 15:25:53 -0400
+Message-Id: <20220429192553.932611-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: [PATCH RFC 15/19] iommu/arm-smmu-v3: Add
- set_dirty_tracking_range() support
-Content-Language: en-GB
-To:     Joao Martins <joao.m.martins@oracle.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Will Deacon <will@kernel.org>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>
-References: <20220428210933.3583-1-joao.m.martins@oracle.com>
- <20220428210933.3583-16-joao.m.martins@oracle.com>
- <BN9PR11MB5276AEDA199F2BC7F13035B98CFC9@BN9PR11MB5276.namprd11.prod.outlook.com>
- <f37924f3-ee44-4579-e4e2-251bb0557bfc@oracle.com>
- <a0331f20-9cf4-708e-a30d-6198dadd1b23@arm.com>
- <e1c92dad-c672-51c6-5acc-1a50218347ff@oracle.com>
- <20220429122352.GU8364@nvidia.com>
- <bed35e91-3b47-f312-4555-428bb8a7bd89@oracle.com>
- <20220429161134.GB8364@nvidia.com>
- <e238dd28-2449-ec1e-ee32-08446c4383a9@oracle.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <e238dd28-2449-ec1e-ee32-08446c4383a9@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-9.8 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-04-29 17:40, Joao Martins wrote:
-> On 4/29/22 17:11, Jason Gunthorpe wrote:
->> On Fri, Apr 29, 2022 at 03:45:23PM +0100, Joao Martins wrote:
->>> On 4/29/22 13:23, Jason Gunthorpe wrote:
->>>> On Fri, Apr 29, 2022 at 01:06:06PM +0100, Joao Martins wrote:
->>>>
->>>>>> TBH I'd be inclined to just enable DBM unconditionally in
->>>>>> arm_smmu_domain_finalise() if the SMMU supports it. Trying to toggle it
->>>>>> dynamically (especially on a live domain) seems more trouble that it's
->>>>>> worth.
->>>>>
->>>>> Hmmm, but then it would strip userland/VMM from any sort of control (contrary
->>>>> to what we can do on the CPU/KVM side). e.g. the first time you do
->>>>> GET_DIRTY_IOVA it would return all dirtied IOVAs since the beginning
->>>>> of guest time, as opposed to those only after you enabled dirty-tracking.
->>>>
->>>> It just means that on SMMU the start tracking op clears all the dirty
->>>> bits.
->>>>
->>> Hmm, OK. But aren't really picking a poison here? On ARM it's the difference
->>> from switching the setting the DBM bit and put the IOPTE as writeable-clean (which
->>> is clearing another bit) versus read-and-clear-when-dirty-track-start which means
->>> we need to re-walk the pagetables to clear one bit.
->>
->> Yes, I don't think a iopte walk is avoidable?
->>
-> Correct -- exactly why I am still more learning towards enable DBM bit only at start
-> versus enabling DBM at domain-creation while clearing dirty at start.
+Synthesizing AMD leaves up to 0x80000021 caused problems with QEMU,
+which assumes the *host* CPUID[0x80000000].EAX is higher or equal
+to what KVM_GET_SUPPORTED_CPUID reports.
 
-I'd say it's largely down to whether you want the bother of 
-communicating a dynamic behaviour change into io-pgtable. The big 
-advantage of having it just use DBM all the time is that you don't have 
-to do that, and the "start tracking" operation is then nothing more than 
-a normal "read and clear" operation but ignoring the read result.
+This causes QEMU to issue bogus host CPUIDs when preparing the input
+to KVM_SET_CPUID2.  It can even get into an infinite loop, which is
+only terminated by an abort():
 
-At this point I'd much rather opt for simplicity, and leave the fancier 
-stuff to revisit later if and when somebody does demonstrate a 
-significant overhead from using DBM when not strictly needed.
+   cpuid_data is full, no space for cpuid(eax:0x8000001d,ecx:0x3e)
 
-Thanks,
-Robin.
+To work around this, only synthesize those leaves if 0x8000001d exists
+on the host.  The synthetic 0x80000021 leaf is mostly useful on Zen2,
+which satisfies the condition.
+
+Fixes: f144c49e8c39 ("KVM: x86: synthesize CPUID leaf 0x80000021h if useful")
+Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/cpuid.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index b24ca7f4ed7c..598334ed5fbc 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -1085,12 +1085,21 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 	case 0x80000000:
+ 		entry->eax = min(entry->eax, 0x80000021);
+ 		/*
+-		 * Serializing LFENCE is reported in a multitude of ways,
+-		 * and NullSegClearsBase is not reported in CPUID on Zen2;
+-		 * help userspace by providing the CPUID leaf ourselves.
++		 * Serializing LFENCE is reported in a multitude of ways, and
++		 * NullSegClearsBase is not reported in CPUID on Zen2; help
++		 * userspace by providing the CPUID leaf ourselves.
++		 *
++		 * However, only do it if the host has CPUID leaf 0x8000001d.
++		 * QEMU thinks that it can query the host blindly for that
++		 * CPUID leaf if KVM reports that it supports 0x8000001d or
++		 * above.  The processor merrily returns values from the
++		 * highest Intel leaf which QEMU tries to use as the guest's
++		 * 0x8000001d.  Even worse, this can result in an infinite
++		 * loop if said highest leaf has no subleaves indexed by ECX.
+ 		 */
+-		if (static_cpu_has(X86_FEATURE_LFENCE_RDTSC)
+-		    || !static_cpu_has_bug(X86_BUG_NULL_SEG))
++		if (entry->eax >= 0x8000001d &&
++		    (static_cpu_has(X86_FEATURE_LFENCE_RDTSC)
++		     || !static_cpu_has_bug(X86_BUG_NULL_SEG)))
+ 			entry->eax = max(entry->eax, 0x80000021);
+ 		break;
+ 	case 0x80000001:
+-- 
+2.31.1
+
