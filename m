@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C46DD5153D9
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 20:39:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DC225153DA
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 20:39:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380082AbiD2SnK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 14:43:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35918 "EHLO
+        id S1380084AbiD2SnL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 14:43:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380079AbiD2SnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 14:43:09 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79B87D64CD
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 11:39:50 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id i19-20020aa79093000000b0050d44b83506so4552072pfa.22
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 11:39:50 -0700 (PDT)
+        with ESMTP id S1380079AbiD2SnK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 14:43:10 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BABCD64D3
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 11:39:52 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id mm2-20020a17090b358200b001bf529127dfso4423758pjb.6
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 11:39:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=gMz0hMrjdbXDHTQ8RW43oHBBrWZy5mDRZcH9wKZIsjA=;
-        b=H3CBdqdsB9ntXoC+QEn+ptAhZ+1NnPUx0WGPaFsHmv/czxEoiyg+osRLoq2eKToeUy
-         Eg0shDnk/juZr6IE7KAW+8aIB5VKjAsA5Ds2msL7dnB5iC3OdaJN+5zyBBQkpe3xnCRi
-         gITTd2CW90g18ePySX/T8/CS8aW5rfBQOuuZEJulkuEgJM/D9uPYLMHzzYKTYURRvxem
-         dybUUP3VjmiVFqv5041ZzLvHrkIybPGyJZtYg4TnDGZHcD48HiYGFQ1hOuwqcmqTpCOK
-         Kfr2Z2rQobqmB/B/Mw/ey6l3JfrcmRzzwSySxgewsW8TD5sbstDF3veb2aO3VCUh5nHR
-         KlHg==
+        bh=vX0LiIlEVdgzV2l+bjk1F0pjD+Z7yYfTJycwcaaWHm0=;
+        b=J5pA4KS9iUHgNTgxm1NA4hWaWB+XUrv/1vLWiWpfDmJfXjQEzIE+NYB1ED9reknwB/
+         WaMrDqPjUt7w5vUvOi+UMxi+httAOBrEakCKV/nVRJj6CVluz7Us4Fx+d7KlTrzOsOAV
+         6bcOZlcMuinmqE/++n6MNXVqDEkNUNhZjvIcHvR0HxH2HLzJorBzDvALO9YtISVG7Hhu
+         0dVZYPZuBfsaXHVmj+9WUX3M7Iz6N986+2vjXbOfTmDU8ltTULaRYwXXef5X2HnbfQZ8
+         1B5TJr7XnyDq1nstjE6sj0BcbX6vDtD4tfZvBWf+Roae5TihoKB0blrSvHj29oTbhKBD
+         eLDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=gMz0hMrjdbXDHTQ8RW43oHBBrWZy5mDRZcH9wKZIsjA=;
-        b=dNE+7uEVPD+j63lqB/zCRqxcHzrVCNUSCP8gqToFFvrEpbxjXEGqlghpBhy386QKhW
-         52SkMfX+pmaSvS0ytlJHBhR5zetBtjjY4xewq8NpzpQRbR+PQ5Hof1FCeoq1Bdm1cfEv
-         SuKLTMJOv0iHdm6bv3fBCAFWQsGyfqkzgZ8t2tDYUqs+06RvaHGwc/3KcVnM6fC9yJSj
-         CoN2nQI9z7tRG+qrkAb7+Po8YmN6V3TzVivmn7wfkFRoLNG0Tk7c2U54WnQJsIKX3lz3
-         eo4Cv3mlLl7pfMxD/v3clQCe3uOAnxEQ79YiOaQYhe+5Z1aP3xEml7WrWvpoYpgZ12dd
-         3Rww==
-X-Gm-Message-State: AOAM5311DAZjbGfj2/LDQ3qNIG4YPE6rxgRdX+0gYQWmszphA/LcezEc
-        u94hmmaAXhaHXDHj61SBXnRU3drQtFdaMg==
-X-Google-Smtp-Source: ABdhPJznv9O8EXzm+YUnM0sJ0lmY5JEYOpv4OTXTjoQYBumPzDAz/5rO+0vENUvbhJ4vqlq2tEXTHhfNMr5PtQ==
+        bh=vX0LiIlEVdgzV2l+bjk1F0pjD+Z7yYfTJycwcaaWHm0=;
+        b=MZXaH+qzVriDEaeVaoLEnsnEm+ewq/iiA3auFseMWbrZBdd7uTzlhNJrfLOyx93Vdu
+         eg0+qP57dkBdldasakNLnv7DKPp1ZUy+LTkQvflXEKk1ujBlSdfKJcG3fIPgMAFU/U1y
+         rCAsXMadEyDNRdauZGdHVa3by+BHdzohNyZc+NiQtNYqGsyhKEUe81GEUeTaYXkJYY+B
+         wGuR0AFxkcAmF/4qp0oHv8ewpviyrDcLq2Gs3Kh7D19yT/1MO2UcLNbeQIh5Eel1IIT1
+         umm/7TQhRSzy3+ZMKfanDoV37+kko1zhlo9atx0HIQR7wGGir+/0c2k+Xv085CtQ/4dn
+         zVzw==
+X-Gm-Message-State: AOAM532tO9a4IoY485ernS7s9hfxK9p47eUcRwoOz9St4bATUcadT4/K
+        BcdEvWpMgblAEDT6h+ORxTSxeOp0sVJLog==
+X-Google-Smtp-Source: ABdhPJyzmzd8Apv913MJngKeZqQgg7C9oVD1UkwShw8U2wjNitFwL/lMJnITRL7YWkM7ZxlgC9ItF+0ZZLCqWA==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:aa7:8385:0:b0:4f6:ef47:e943 with SMTP id
- u5-20020aa78385000000b004f6ef47e943mr619660pfm.38.1651257589945; Fri, 29 Apr
- 2022 11:39:49 -0700 (PDT)
-Date:   Fri, 29 Apr 2022 18:39:30 +0000
+ (user=dmatlack job=sendgmr) by 2002:a63:8f45:0:b0:398:d78:142f with SMTP id
+ r5-20020a638f45000000b003980d78142fmr584412pgn.162.1651257591510; Fri, 29 Apr
+ 2022 11:39:51 -0700 (PDT)
+Date:   Fri, 29 Apr 2022 18:39:31 +0000
 In-Reply-To: <20220429183935.1094599-1-dmatlack@google.com>
-Message-Id: <20220429183935.1094599-5-dmatlack@google.com>
+Message-Id: <20220429183935.1094599-6-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220429183935.1094599-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH 4/9] KVM: selftests: Refactor nested_map() to specify target level
+Subject: [PATCH 5/9] KVM: selftests: Move VMX_EPT_VPID_CAP_AD_BITS to vmx.h
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Ben Gardon <bgardon@google.com>,
@@ -72,64 +72,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Refactor nested_map() to specify that it explicityl wants 4K mappings
-(the existing behavior) and push the implementation down into
-__nested_map(), which can be used in subsequent commits to create huge
-page mappings.
+This is a VMX-related macro so move it to vmx.h. While here, open code
+the mask like the rest of the VMX bitmask macros.
 
-No function change intended.
+No functional change intended.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- tools/testing/selftests/kvm/lib/x86_64/vmx.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ tools/testing/selftests/kvm/include/x86_64/processor.h | 3 ---
+ tools/testing/selftests/kvm/include/x86_64/vmx.h       | 2 ++
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/vmx.c b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-index ac432e064fcd..715b58f1f7bc 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-@@ -485,6 +485,7 @@ void nested_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
-  *   nested_paddr - Nested guest physical address to map
-  *   paddr - VM Physical Address
-  *   size - The size of the range to map
-+ *   level - The level at which to map the range
-  *
-  * Output Args: None
-  *
-@@ -493,22 +494,29 @@ void nested_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
-  * Within the VM given by vm, creates a nested guest translation for the
-  * page range starting at nested_paddr to the page range starting at paddr.
-  */
--void nested_map(struct vmx_pages *vmx, struct kvm_vm *vm,
--		uint64_t nested_paddr, uint64_t paddr, uint64_t size)
-+void __nested_map(struct vmx_pages *vmx, struct kvm_vm *vm,
-+		  uint64_t nested_paddr, uint64_t paddr, uint64_t size,
-+		  int level)
- {
--	size_t page_size = vm->page_size;
-+	size_t page_size = PG_LEVEL_SIZE(level);
- 	size_t npages = size / page_size;
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index b512f9f508ae..5a8854e85b8f 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -488,9 +488,6 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
+ #define X86_CR0_CD          (1UL<<30) /* Cache Disable */
+ #define X86_CR0_PG          (1UL<<31) /* Paging */
  
- 	TEST_ASSERT(nested_paddr + size > nested_paddr, "Vaddr overflow");
- 	TEST_ASSERT(paddr + size > paddr, "Paddr overflow");
+-/* VMX_EPT_VPID_CAP bits */
+-#define VMX_EPT_VPID_CAP_AD_BITS       (1ULL << 21)
+-
+ #define XSTATE_XTILE_CFG_BIT		17
+ #define XSTATE_XTILE_DATA_BIT		18
  
- 	while (npages--) {
--		nested_pg_map(vmx, vm, nested_paddr, paddr);
-+		__nested_pg_map(vmx, vm, nested_paddr, paddr, level);
- 		nested_paddr += page_size;
- 		paddr += page_size;
- 	}
- }
+diff --git a/tools/testing/selftests/kvm/include/x86_64/vmx.h b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+index 583ceb0d1457..3b1794baa97c 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/vmx.h
++++ b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+@@ -96,6 +96,8 @@
+ #define VMX_MISC_PREEMPTION_TIMER_RATE_MASK	0x0000001f
+ #define VMX_MISC_SAVE_EFER_LMA			0x00000020
  
-+void nested_map(struct vmx_pages *vmx, struct kvm_vm *vm,
-+		uint64_t nested_paddr, uint64_t paddr, uint64_t size)
-+{
-+	__nested_map(vmx, vm, nested_paddr, paddr, size, PG_LEVEL_4K);
-+}
++#define VMX_EPT_VPID_CAP_AD_BITS		0x00200000
 +
- /* Prepare an identity extended page table that maps all the
-  * physical pages in VM.
-  */
+ #define EXIT_REASON_FAILED_VMENTRY	0x80000000
+ #define EXIT_REASON_EXCEPTION_NMI	0
+ #define EXIT_REASON_EXTERNAL_INTERRUPT	1
 -- 
 2.36.0.464.gb9c8b46e94-goog
 
