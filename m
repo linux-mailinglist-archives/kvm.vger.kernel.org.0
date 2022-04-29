@@ -2,172 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C3ECE5140C4
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 05:07:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74DB0514116
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 05:48:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234992AbiD2DHs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Apr 2022 23:07:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53312 "EHLO
+        id S235455AbiD2DR2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Apr 2022 23:17:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234847AbiD2DHr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Apr 2022 23:07:47 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EED1BF304
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 20:04:30 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id p6so5988631plf.9
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 20:04:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5VVgFc+AWvo5UdP8jPH8kMYu27hfTPHx7TcE08ruWnQ=;
-        b=IR/xKb+GabRkSbkhHaocsMPuhj4+DswB7PeaFqXyL5ZCswzf+2jRMoChLc7LEI6GoG
-         pWpKwQrOX3hFPBUwyDnlNrEbg4iGQ1/BRI22Yj6Ow/FLmxaasrJK5GHJ9mOYCBB8VX7p
-         vOhomVSn/Jb9cvvd3HyWrCIRQDpD2CVgCnIjhGXjhbazcInjTmXGM0Em/R0Lp+kAsF+1
-         XnnFuduYAprfX1W2w09E2RkF9QA8/VG3WSAUI3pCasm2GnuCJqWwQgFzifBD56dL/f4e
-         YZP++qNEiK7Wc9Y7tYIAYrfNr+S0n/ZhxX+ZT5daJZ/dFaFSBhn/MYis8k8LQufVqY96
-         POPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5VVgFc+AWvo5UdP8jPH8kMYu27hfTPHx7TcE08ruWnQ=;
-        b=jgHPs4Sb9bc5dsh9cnXomhn0tArawD18CnwsE4OgHdoGtJ2DEyFsoZsFe42dO8jN5c
-         PpamdLOXANvIy/4Sm5x4SCf9BhdyMIEz6rYt39DD0RNQPJxcUercaUNhfae4pLvscO0I
-         P9GGHAkdgO8+UoQDhHfM0T3CFhueyGYBezMdQlideqfFgvJfFB30RsiQeeiQs2bbpseM
-         g0VIpt0DF4+jNKn1QBjqmqLD2h5nED0tOl1pNQLcDkQi5CLiC88LfLVFjz/yJ4fxFkJ/
-         iTGw5g6YUh1t2wtKlIw8RzgUvKhoNijOykyEGUmO24ag/+Q4PdPofey8oXLpmI7YRgCm
-         QyzQ==
-X-Gm-Message-State: AOAM533Zda4f3ot9PtZiYOquHhLImXPypFYnzq7LaYPpqM0wXAJU9J45
-        f2/cLUDKv9H7ifAKhhTKFDqpKiI/v/lSD1LRWnWU3Q==
-X-Google-Smtp-Source: ABdhPJzlzgG4+md3WPt7mPqg66q3zRmdw58tFxmZdy9Oa/PGMQN0pBnrwycAdpTKW4vv20P5zf/JoPGGGTJNqlAMYHk=
-X-Received: by 2002:a17:902:7296:b0:14b:4bc6:e81 with SMTP id
- d22-20020a170902729600b0014b4bc60e81mr36466562pll.132.1651201470117; Thu, 28
- Apr 2022 20:04:30 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1649219184.git.kai.huang@intel.com> <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
- <ecf718abf864bbb2366209f00d4315ada090aedc.camel@intel.com>
- <de24ac7e-349c-e49a-70bb-31b9bc867b10@intel.com> <9b388f54f13b34fe684ef77603fc878952e48f87.camel@intel.com>
- <d98ca73b-2d2d-757d-e937-acc83cfedfb0@intel.com> <c90a10763969077826f42be6f492e3a3e062326b.camel@intel.com>
- <fc1ca04d94ad45e79c0297719d5ef50a7c33c352.camel@intel.com>
-In-Reply-To: <fc1ca04d94ad45e79c0297719d5ef50a7c33c352.camel@intel.com>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Thu, 28 Apr 2022 20:04:19 -0700
-Message-ID: <CAPcyv4gEwjnNE9cWb_KLZ6C7-UxKdUMZKFPF+LAJ4L1SjByisw@mail.gmail.com>
-Subject: Re: [PATCH v3 00/21] TDX host kernel support
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     Dave Hansen <dave.hansen@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Kuppuswamy Sathyanarayanan 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>
+        with ESMTP id S235312AbiD2DRW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Apr 2022 23:17:22 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16BB75AEEC
+        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 20:14:06 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9F52A62256
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 03:14:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 09AE4C385B2
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 03:14:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1651202045;
+        bh=cgMPXC3SlNfzkj6FU2PRmrp1Shc2sNTR1VjPBe9rWg8=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=UNS3ZYRCC01wSFxkPp/Ju2uVa2CcfY1sy6o+dsN0cIqbIsJvLaX9IbuQicKvAqDn6
+         JyBxGGcB4e/ZPYyAeiU55vi+CuJuCXqOoHiHw1OFfzelPWPS3ZasUFXI3hEk/6Mj0B
+         QUA33rnswsa2erZKpPh1MpWxNVmUltan/bJ9VsjNNORdw2X5hNplILaLpSa/qe4a6K
+         gIbPaTRoxX1eI0jscvyx3ykyEh6LijpppQrPRuAlCYtEySx9eeSqcc39gVdqNoB2eR
+         xj0iJtfLczld1mm6LC1Zq3O5ndOZE5YaCSAQaQIxbctcJNwK2ODEti+ey5yceqq5Nl
+         aFj7dNri05bkQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id E1A38CAC6E2; Fri, 29 Apr 2022 03:14:04 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 208767] kernel stack overflow due to Lazy update IOAPIC on an
+ x86_64 *host*, when gpu is passthrough to macos guest vm
+Date:   Fri, 29 Apr 2022 03:14:04 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: fivescarynightsgames@gmail.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-208767-28872-KxlDVcRfBN@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-208767-28872@https.bugzilla.kernel.org/>
+References: <bug-208767-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 28, 2022 at 6:40 PM Kai Huang <kai.huang@intel.com> wrote:
->
-> On Thu, 2022-04-28 at 12:58 +1200, Kai Huang wrote:
-> > On Wed, 2022-04-27 at 17:50 -0700, Dave Hansen wrote:
-> > > On 4/27/22 17:37, Kai Huang wrote:
-> > > > On Wed, 2022-04-27 at 14:59 -0700, Dave Hansen wrote:
-> > > > > In 5 years, if someone takes this code and runs it on Intel hardware
-> > > > > with memory hotplug, CPU hotplug, NVDIMMs *AND* TDX support, what happens?
-> > > >
-> > > > I thought we could document this in the documentation saying that this code can
-> > > > only work on TDX machines that don't have above capabilities (SPR for now).  We
-> > > > can change the code and the documentation  when we add the support of those
-> > > > features in the future, and update the documentation.
-> > > >
-> > > > If 5 years later someone takes this code, he/she should take a look at the
-> > > > documentation and figure out that he/she should choose a newer kernel if the
-> > > > machine support those features.
-> > > >
-> > > > I'll think about design solutions if above doesn't look good for you.
-> > >
-> > > No, it doesn't look good to me.
-> > >
-> > > You can't just say:
-> > >
-> > >     /*
-> > >      * This code will eat puppies if used on systems with hotplug.
-> > >      */
-> > >
-> > > and merrily await the puppy bloodbath.
-> > >
-> > > If it's not compatible, then you have to *MAKE* it not compatible in a
-> > > safe, controlled way.
-> > >
-> > > > > You can't just ignore the problems because they're not present on one
-> > > > > version of the hardware.
-> > >
-> > > Please, please read this again ^^
-> >
-> > OK.  I'll think about solutions and come back later.
-> > >
->
-> Hi Dave,
->
-> I think we have two approaches to handle memory hotplug interaction with the TDX
-> module initialization.
->
-> The first approach is simple.  We just block memory from being added as system
-> RAM managed by page allocator when the platform supports TDX [1]. It seems we
-> can add some arch-specific-check to __add_memory_resource() and reject the new
-> memory resource if platform supports TDX.  __add_memory_resource() is called by
-> both __add_memory() and add_memory_driver_managed() so it prevents from adding
-> NVDIMM as system RAM and normal ACPI memory hotplug [2].
+https://bugzilla.kernel.org/show_bug.cgi?id=3D208767
 
-What if the memory being added *is* TDX capable? What if someone
-wanted to manage a memory range as soft-reserved and move it back and
-forth from the core-mm to device access. That should be perfectly
-acceptable as long as the memory is TDX capable.
+Carey Dalton (fivescarynightsgames@gmail.com) changed:
 
-> The second approach is relatively more complicated.  Instead of directly
-> rejecting the new memory resource in __add_memory_resource(), we check whether
-> the memory resource can be added based on CMR and the TDX module initialization
-> status.   This is feasible as with the latest public P-SEAMLDR spec, we can get
-> CMR from P-SEAMLDR SEAMCALL[3].  So we can detect P-SEAMLDR and get CMR info
-> during kernel boots.  And in __add_memory_resource() we do below check:
->
->         tdx_init_disable();     /*similar to cpu_hotplug_disable() */
->         if (tdx_module_initialized())
->                 // reject memory hotplug
->         else if (new_memory_resource NOT in CMRs)
->                 // reject memory hotplug
->         else
->                 allow memory hotplug
->         tdx_init_enable();      /*similar to cpu_hotplug_enable() */
->
-> tdx_init_disable() temporarily disables TDX module initialization by trying to
-> grab the mutex.  If the TDX module initialization is already on going, then it
-> waits until it completes.
->
-> This should work better for future platforms, but would requires non-trivial
-> more code as we need to add VMXON/VMXOFF support to the core-kernel to detect
-> CMR using  SEAMCALL.  A side advantage is with VMXON in core-kernel we can
-> shutdown the TDX module in kexec().
->
-> But for this series I think the second approach is overkill and we can choose to
-> use the first simple approach?
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |fivescarynightsgames@gmail.
+                   |                            |com
 
-This still sounds like it is trying to solve symptoms and not the root
-problem. Why must the core-mm never have non-TDX memory when VMs are
-fine to operate with either core-mm pages or memory from other sources
-like hugetlbfs and device-dax?
+--- Comment #9 from Carey Dalton (fivescarynightsgames@gmail.com) ---
+I see, thanks, I've created a new issue:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D211853
+https://friday-nightfunkin.com
+(In reply to Alex Williamson from comment #7)
+> (In reply to Paolo Bonzini from comment #1)
+> > This should have been fixed by commit
+> > 8be8f932e3db5fe4ed178b8892eeffeab530273a in Linux 5.7.
+>=20
+> This is not fixed and it's not unique to a macos VM, a Linux guest can al=
+so
+> reproduce this.  I've seen this both during PXE boot and during shutdown
+> with certain NIC combinations (see rhbz1867373).  The only workaround is =
+to
+> disable acpiv (kvm_intel.enable_apicv=3D0).  Any suggestions, Paolo?
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
