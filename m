@@ -2,154 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 99F8D51427C
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 08:39:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7131C514308
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 09:12:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354639AbiD2Gle (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 02:41:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46170 "EHLO
+        id S1354981AbiD2HPT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 03:15:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354610AbiD2GlY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 02:41:24 -0400
+        with ESMTP id S1354793AbiD2HPS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 03:15:18 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 528DEBABAD
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 23:38:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 22DE3192BE
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 00:12:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651214285;
+        s=mimecast20190719; t=1651216321;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Qh2pYsSv0Jsq4yPSrKOGS/h5dSBWkO2z1DpVXJerATU=;
-        b=ODJ9Iq+ecnMaItdsyTj+uq/2cFA2NAw5Kx2bF6mJPMR2geqSFw3Q+JsNWlIrOQ4s9MyVcE
-        WLkyjFM4+2x9gptG4Qm4WVXDTPy9H12eLKd3ENp7dki8XnvJfNHMUozP01WUwF8gxURrBU
-        oy3kYEC3xUPuo7xJVjnoKbtRw7nQgmU=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Eeml1NGAG++uLXs/s/HDZYXT+SQjn5HA3mIKGb81Y4o=;
+        b=Ca2Vk0qdGk9TF6QVh4zRFYunxOWfl15V20tQyM0V7VFf+GKWZPB5uIHwpRdPdfaZtNcKvJ
+        P+JWNztpvKDyGhXM8+bLWlNc34dQQRihUGFAqA10iXMpdYZJoM3wxccXJD2tn9yqUb8PPe
+        31TTseNB1rMthivtOhgzkgvfaT5iIKg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-96-g8Utg0-KMFW-Rd9hjjEMvg-1; Fri, 29 Apr 2022 02:38:04 -0400
-X-MC-Unique: g8Utg0-KMFW-Rd9hjjEMvg-1
+ us-mta-156-dRuKLd0tPkin7KSv8IMuaQ-1; Fri, 29 Apr 2022 03:11:55 -0400
+X-MC-Unique: dRuKLd0tPkin7KSv8IMuaQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 87A8E1C07382;
-        Fri, 29 Apr 2022 06:38:02 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C4D3C85A5A8;
+        Fri, 29 Apr 2022 07:11:54 +0000 (UTC)
 Received: from thuth.com (unknown [10.39.192.118])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EC86914A5060;
-        Fri, 29 Apr 2022 06:37:59 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C9E814A5060;
+        Fri, 29 Apr 2022 07:11:52 +0000 (UTC)
 From:   Thomas Huth <thuth@redhat.com>
-To:     kvm@vger.kernel.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        linux-s390@vger.kernel.org
-Subject: [PATCH v3 4/4] KVM: s390: selftests: Use TAP interface in the reset test
-Date:   Fri, 29 Apr 2022 08:37:24 +0200
-Message-Id: <20220429063724.480919-5-thuth@redhat.com>
-In-Reply-To: <20220429063724.480919-1-thuth@redhat.com>
-References: <20220429063724.480919-1-thuth@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: selftests: Use TAP interface in the kvm_binary_stats_test
+Date:   Fri, 29 Apr 2022 09:11:49 +0200
+Message-Id: <20220429071149.488114-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's standardize the s390x KVM selftest output to the TAP output
-generated via the kselftests.h interface.
+The kvm_binary_stats_test test currently does not have any output (unless
+one of the TEST_ASSERT statement fails), so it's hard to say for a user
+how far it did proceed already. Thus let's make this a little bit more
+user-friendly and include some TAP output via the kselftest.h interface.
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tools/testing/selftests/kvm/s390x/resets.c | 38 +++++++++++++++++-----
- 1 file changed, 30 insertions(+), 8 deletions(-)
+ .../testing/selftests/kvm/kvm_binary_stats_test.c  | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/s390x/resets.c b/tools/testing/selftests/kvm/s390x/resets.c
-index b143db6d8693..889449a22e7a 100644
---- a/tools/testing/selftests/kvm/s390x/resets.c
-+++ b/tools/testing/selftests/kvm/s390x/resets.c
-@@ -12,6 +12,7 @@
- 
- #include "test_util.h"
+diff --git a/tools/testing/selftests/kvm/kvm_binary_stats_test.c b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+index 17f65d514915..aa648834e178 100644
+--- a/tools/testing/selftests/kvm/kvm_binary_stats_test.c
++++ b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+@@ -19,6 +19,7 @@
  #include "kvm_util.h"
+ #include "asm/kvm.h"
+ #include "linux/kvm.h"
 +#include "kselftest.h"
  
- #define VCPU_ID 3
- #define LOCAL_IRQS 32
-@@ -202,7 +203,7 @@ static void inject_irq(int cpu_id)
- 
- static void test_normal(void)
+ static void stats_test(int stats_fd)
  {
--	pr_info("Testing normal reset\n");
-+	ksft_print_msg("Testing normal reset\n");
- 	/* Create VM */
- 	vm = vm_create_default(VCPU_ID, 0, guest_code_initial);
- 	run = vcpu_state(vm, VCPU_ID);
-@@ -225,7 +226,7 @@ static void test_normal(void)
+@@ -52,7 +53,7 @@ static void stats_test(int stats_fd)
  
- static void test_initial(void)
- {
--	pr_info("Testing initial reset\n");
-+	ksft_print_msg("Testing initial reset\n");
- 	vm = vm_create_default(VCPU_ID, 0, guest_code_initial);
- 	run = vcpu_state(vm, VCPU_ID);
- 	sync_regs = &run->s.regs;
-@@ -247,7 +248,7 @@ static void test_initial(void)
- 
- static void test_clear(void)
- {
--	pr_info("Testing clear reset\n");
-+	ksft_print_msg("Testing clear reset\n");
- 	vm = vm_create_default(VCPU_ID, 0, guest_code_initial);
- 	run = vcpu_state(vm, VCPU_ID);
- 	sync_regs = &run->s.regs;
-@@ -266,14 +267,35 @@ static void test_clear(void)
- 	kvm_vm_free(vm);
- }
- 
-+struct testdef {
-+	const char *name;
-+	void (*test)(void);
-+	bool needs_cap;
-+} testlist[] = {
-+	{ "initial", test_initial, false },
-+	{ "normal", test_normal, true },
-+	{ "clear", test_clear, true },
-+};
-+
- int main(int argc, char *argv[])
- {
-+	bool has_s390_vcpu_resets = kvm_check_cap(KVM_CAP_S390_VCPU_RESETS);
-+	int idx;
-+
- 	setbuf(stdout, NULL);	/* Tell stdout not to buffer its content */
- 
--	test_initial();
--	if (kvm_check_cap(KVM_CAP_S390_VCPU_RESETS)) {
--		test_normal();
--		test_clear();
-+	ksft_print_header();
-+	ksft_set_plan(ARRAY_SIZE(testlist));
-+
-+	for (idx = 0; idx < ARRAY_SIZE(testlist); idx++) {
-+		if (!testlist[idx].needs_cap || has_s390_vcpu_resets) {
-+			testlist[idx].test();
-+			ksft_test_result_pass("%s\n", testlist[idx].name);
-+		} else {
-+			ksft_test_result_skip("%s - no VCPU_RESETS capability\n",
-+					      testlist[idx].name);
-+		}
+ 	/* Sanity check for other fields in header */
+ 	if (header->num_desc == 0) {
+-		printf("No KVM stats defined!");
++		ksft_print_msg("No KVM stats defined!\n");
+ 		return;
  	}
+ 	/* Check overlap */
+@@ -219,12 +220,15 @@ int main(int argc, char *argv[])
+ 			max_vcpu = DEFAULT_NUM_VCPU;
+ 	}
+ 
++	ksft_print_header();
++
+ 	/* Check the extension for binary stats */
+ 	if (kvm_check_cap(KVM_CAP_BINARY_STATS_FD) <= 0) {
+-		print_skip("Binary form statistics interface is not supported");
+-		exit(KSFT_SKIP);
++		ksft_exit_skip("Binary form statistics interface is not supported\n");
+ 	}
+ 
++	ksft_set_plan(max_vm);
++
+ 	/* Create VMs and VCPUs */
+ 	vms = malloc(sizeof(vms[0]) * max_vm);
+ 	TEST_ASSERT(vms, "Allocate memory for storing VM pointers");
+@@ -240,10 +244,12 @@ int main(int argc, char *argv[])
+ 		vm_stats_test(vms[i]);
+ 		for (j = 0; j < max_vcpu; ++j)
+ 			vcpu_stats_test(vms[i], j);
++		ksft_test_result_pass("vm%i\n", i);
+ 	}
+ 
+ 	for (i = 0; i < max_vm; ++i)
+ 		kvm_vm_free(vms[i]);
+ 	free(vms);
 -	return 0;
 +
 +	ksft_finished();	/* Print results and exit() accordingly */
