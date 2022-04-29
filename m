@@ -2,55 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 92BE45140CC
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 05:07:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3ECE5140C4
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 05:07:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234800AbiD2DCP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Apr 2022 23:02:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41012 "EHLO
+        id S234992AbiD2DHs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Apr 2022 23:07:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234648AbiD2DCP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Apr 2022 23:02:15 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7291BB09A
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 19:58:58 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id bo5so5835546pfb.4
-        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 19:58:58 -0700 (PDT)
+        with ESMTP id S234847AbiD2DHr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Apr 2022 23:07:47 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EED1BF304
+        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 20:04:30 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id p6so5988631plf.9
+        for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 20:04:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=intel-com.20210112.gappssmtp.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=ZMdJPf2szG7jWooabNPVXM6MEeYUwbGrZLNSWclN2LA=;
-        b=moQBxhRZe4qA2k9riOgBJbbxEm04nXLW9FwhVY6asFHo5bHPxjsj4g3UVwhe4d5oJl
-         mCj0Tjr3CS3rqYsyRbADS4U8M4YlL+8DQntWM02XwcbUo+UmOmnnDGEO5W++BzX/MW7t
-         kYoL7RniuWg2Sc7o9N7pfCL4g76RanUxJ8wb0gmICKuhkquZovxFfiY2LvHlh/XQUdme
-         uHNiDokx9eHJ3vvBoV0THW4QAXJwSugTxXEnPYy8VejJq3kpBTdevVkVNJMjwIlBZlNO
-         Os9wzijKksm3nDiQQWvZjgdwrAD1031w3xAbpmSHkOyo3p+y+0c5WbaucfwCHFuJPOkO
-         a9iw==
+        bh=5VVgFc+AWvo5UdP8jPH8kMYu27hfTPHx7TcE08ruWnQ=;
+        b=IR/xKb+GabRkSbkhHaocsMPuhj4+DswB7PeaFqXyL5ZCswzf+2jRMoChLc7LEI6GoG
+         pWpKwQrOX3hFPBUwyDnlNrEbg4iGQ1/BRI22Yj6Ow/FLmxaasrJK5GHJ9mOYCBB8VX7p
+         vOhomVSn/Jb9cvvd3HyWrCIRQDpD2CVgCnIjhGXjhbazcInjTmXGM0Em/R0Lp+kAsF+1
+         XnnFuduYAprfX1W2w09E2RkF9QA8/VG3WSAUI3pCasm2GnuCJqWwQgFzifBD56dL/f4e
+         YZP++qNEiK7Wc9Y7tYIAYrfNr+S0n/ZhxX+ZT5daJZ/dFaFSBhn/MYis8k8LQufVqY96
+         POPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=ZMdJPf2szG7jWooabNPVXM6MEeYUwbGrZLNSWclN2LA=;
-        b=KmOElfXmyUjoJ55+QQ0hPryvHlg2Hiq1XcwLBKMaI5QG7ULdkfx9knN683FbbMQMRx
-         oFO5BZuhA3LIOyOnNLp9Ad0oZlEehOmur/AnhXUyK01HNy1wpqwAdb3pE/4ZnQ+Mhp1m
-         IEbR99I6zA6t4csYxOYrXRfwjowmuJXlHQoVdBRTntrS8SYxTJcj/RnKhrJv6ZBaYCWz
-         HHs5FUhxDF8YTKP85Bi3QcrFxVeB9XW2Rhjf0Hp1BkoqAx4Tb3Bi169IVk4AXsX+MsZo
-         BQ2SQlt2LLcMxj8adpHYWyltc38dRkxIII6Km4xx5w1t48zfFAJ51iuB/W+BODKTutQv
-         TDHw==
-X-Gm-Message-State: AOAM530qqZszyH2aWExYuPDi9pPK5Sf9dRYaSdMAX8banosuQZL9vI9u
-        sOqVbVfvnBaG25cPokOEEbj7hu04X271N+7FovFysQ==
-X-Google-Smtp-Source: ABdhPJynfpp1FDMlID1Fi4CPNT0GJC+7mQt3UP2y/xh9g5J1blG2Zc4OVE3BqXTw5cjIzN9QJPg/gf2nNT4eB78vzmc=
-X-Received: by 2002:a63:1117:0:b0:399:2df0:7fb9 with SMTP id
- g23-20020a631117000000b003992df07fb9mr31449685pgl.40.1651201137593; Thu, 28
- Apr 2022 19:58:57 -0700 (PDT)
+        bh=5VVgFc+AWvo5UdP8jPH8kMYu27hfTPHx7TcE08ruWnQ=;
+        b=jgHPs4Sb9bc5dsh9cnXomhn0tArawD18CnwsE4OgHdoGtJ2DEyFsoZsFe42dO8jN5c
+         PpamdLOXANvIy/4Sm5x4SCf9BhdyMIEz6rYt39DD0RNQPJxcUercaUNhfae4pLvscO0I
+         P9GGHAkdgO8+UoQDhHfM0T3CFhueyGYBezMdQlideqfFgvJfFB30RsiQeeiQs2bbpseM
+         g0VIpt0DF4+jNKn1QBjqmqLD2h5nED0tOl1pNQLcDkQi5CLiC88LfLVFjz/yJ4fxFkJ/
+         iTGw5g6YUh1t2wtKlIw8RzgUvKhoNijOykyEGUmO24ag/+Q4PdPofey8oXLpmI7YRgCm
+         QyzQ==
+X-Gm-Message-State: AOAM533Zda4f3ot9PtZiYOquHhLImXPypFYnzq7LaYPpqM0wXAJU9J45
+        f2/cLUDKv9H7ifAKhhTKFDqpKiI/v/lSD1LRWnWU3Q==
+X-Google-Smtp-Source: ABdhPJzlzgG4+md3WPt7mPqg66q3zRmdw58tFxmZdy9Oa/PGMQN0pBnrwycAdpTKW4vv20P5zf/JoPGGGTJNqlAMYHk=
+X-Received: by 2002:a17:902:7296:b0:14b:4bc6:e81 with SMTP id
+ d22-20020a170902729600b0014b4bc60e81mr36466562pll.132.1651201470117; Thu, 28
+ Apr 2022 20:04:30 -0700 (PDT)
 MIME-Version: 1.0
 References: <cover.1649219184.git.kai.huang@intel.com> <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
- <CAPcyv4g5E_TOow=3pFJXyFr=KLV9pTSnDthgz6TuXvru4xDzaQ@mail.gmail.com> <de9b8f4cef5da03226158492988956099199aa60.camel@intel.com>
-In-Reply-To: <de9b8f4cef5da03226158492988956099199aa60.camel@intel.com>
+ <ecf718abf864bbb2366209f00d4315ada090aedc.camel@intel.com>
+ <de24ac7e-349c-e49a-70bb-31b9bc867b10@intel.com> <9b388f54f13b34fe684ef77603fc878952e48f87.camel@intel.com>
+ <d98ca73b-2d2d-757d-e937-acc83cfedfb0@intel.com> <c90a10763969077826f42be6f492e3a3e062326b.camel@intel.com>
+ <fc1ca04d94ad45e79c0297719d5ef50a7c33c352.camel@intel.com>
+In-Reply-To: <fc1ca04d94ad45e79c0297719d5ef50a7c33c352.camel@intel.com>
 From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Thu, 28 Apr 2022 19:58:46 -0700
-Message-ID: <CAPcyv4iGsXkHAVgf+JZ4Pah_fkCZ=VvUmj7s3C6Rkejtdw_sgQ@mail.gmail.com>
+Date:   Thu, 28 Apr 2022 20:04:19 -0700
+Message-ID: <CAPcyv4gEwjnNE9cWb_KLZ6C7-UxKdUMZKFPF+LAJ4L1SjByisw@mail.gmail.com>
 Subject: Re: [PATCH v3 00/21] TDX host kernel support
 To:     Kai Huang <kai.huang@intel.com>
 Cc:     Dave Hansen <dave.hansen@intel.com>,
@@ -70,139 +73,101 @@ Cc:     Dave Hansen <dave.hansen@intel.com>,
         Isaku Yamahata <isaku.yamahata@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 27, 2022 at 6:21 PM Kai Huang <kai.huang@intel.com> wrote:
+On Thu, Apr 28, 2022 at 6:40 PM Kai Huang <kai.huang@intel.com> wrote:
 >
-> On Wed, 2022-04-27 at 18:01 -0700, Dan Williams wrote:
-> > On Tue, Apr 26, 2022 at 1:10 PM Dave Hansen <dave.hansen@intel.com> wrote:
-> > [..]
-> > > > 3. Memory hotplug
+> On Thu, 2022-04-28 at 12:58 +1200, Kai Huang wrote:
+> > On Wed, 2022-04-27 at 17:50 -0700, Dave Hansen wrote:
+> > > On 4/27/22 17:37, Kai Huang wrote:
+> > > > On Wed, 2022-04-27 at 14:59 -0700, Dave Hansen wrote:
+> > > > > In 5 years, if someone takes this code and runs it on Intel hardware
+> > > > > with memory hotplug, CPU hotplug, NVDIMMs *AND* TDX support, what happens?
 > > > >
-> > > > The first generation of TDX architecturally doesn't support memory
-> > > > hotplug.  And the first generation of TDX-capable platforms don't support
-> > > > physical memory hotplug.  Since it physically cannot happen, this series
-> > > > doesn't add any check in ACPI memory hotplug code path to disable it.
+> > > > I thought we could document this in the documentation saying that this code can
+> > > > only work on TDX machines that don't have above capabilities (SPR for now).  We
+> > > > can change the code and the documentation  when we add the support of those
+> > > > features in the future, and update the documentation.
 > > > >
-> > > > A special case of memory hotplug is adding NVDIMM as system RAM using
-> >
-> > Saw "NVDIMM" mentioned while browsing this, so stopped to make a comment...
-> >
-> > > > kmem driver.  However the first generation of TDX-capable platforms
-> > > > cannot enable TDX and NVDIMM simultaneously, so in practice this cannot
-> > > > happen either.
+> > > > If 5 years later someone takes this code, he/she should take a look at the
+> > > > documentation and figure out that he/she should choose a newer kernel if the
+> > > > machine support those features.
+> > > >
+> > > > I'll think about design solutions if above doesn't look good for you.
 > > >
-> > > What prevents this code from today's code being run on tomorrow's
-> > > platforms and breaking these assumptions?
+> > > No, it doesn't look good to me.
+> > >
+> > > You can't just say:
+> > >
+> > >     /*
+> > >      * This code will eat puppies if used on systems with hotplug.
+> > >      */
+> > >
+> > > and merrily await the puppy bloodbath.
+> > >
+> > > If it's not compatible, then you have to *MAKE* it not compatible in a
+> > > safe, controlled way.
+> > >
+> > > > > You can't just ignore the problems because they're not present on one
+> > > > > version of the hardware.
+> > >
+> > > Please, please read this again ^^
 > >
-> > The assumption is already broken today with NVDIMM-N. The lack of
-> > DDR-T support on TDX enabled platforms has zero effect on DDR-based
-> > persistent memory solutions. In other words, please describe the
-> > actual software and hardware conflicts at play here, and do not make
-> > the mistake of assuming that "no DDR-T support on TDX platforms" ==
-> > "no NVDIMM support".
+> > OK.  I'll think about solutions and come back later.
+> > >
 >
-> Sorry I got this information from planning team or execution team I guess. I was
-> told NVDIMM and TDX cannot "co-exist" on the first generation of TDX capable
-> machine.  "co-exist" means they cannot be turned on simultaneously on the same
-> platform.  I am also not aware NVDIMM-N, nor the difference between DDR based
-> and DDR-T based persistent memory.  Could you give some more background here so
-> I can take a look?
-
-My rough understanding is that TDX makes use of metadata communicated
-"on the wire" for DDR, but that infrastructure is not there for DDR-T.
-However, there are plenty of DDR based NVDIMMs that use super-caps /
-batteries and flash to save contents. I believe the concern for TDX is
-that the kernel needs to know not use TDX accepted PMEM as PMEM
-because the contents saved by the DIMM's onboard energy source are
-unreadable outside of a TD.
-
-Here is one of the links that comes up in a search for NVDIMM-N.
-
-https://www.snia.org/educational-library/what-you-can-do-nvdimm-n-and-nvdimm-p-2019
-
+> Hi Dave,
 >
-> >
-> > > > Another case is admin can use 'memmap' kernel command line to create
-> > > > legacy PMEMs and use them as TD guest memory, or theoretically, can use
-> > > > kmem driver to add them as system RAM.  To avoid having to change memory
-> > > > hotplug code to prevent this from happening, this series always include
-> > > > legacy PMEMs when constructing TDMRs so they are also TDX memory.
-> >
-> > I am not sure what you are trying to say here?
+> I think we have two approaches to handle memory hotplug interaction with the TDX
+> module initialization.
 >
-> We want to always make sure the memory managed by page allocator is TDX memory.
+> The first approach is simple.  We just block memory from being added as system
+> RAM managed by page allocator when the platform supports TDX [1]. It seems we
+> can add some arch-specific-check to __add_memory_resource() and reject the new
+> memory resource if platform supports TDX.  __add_memory_resource() is called by
+> both __add_memory() and add_memory_driver_managed() so it prevents from adding
+> NVDIMM as system RAM and normal ACPI memory hotplug [2].
 
-That only seems possible if the kernel is given a TDX capable physical
-address map at the beginning of time.
+What if the memory being added *is* TDX capable? What if someone
+wanted to manage a memory range as soft-reserved and move it back and
+forth from the core-mm to device access. That should be perfectly
+acceptable as long as the memory is TDX capable.
 
-> So if the legacy PMEMs are unconditionally configured as TDX memory, then we
-> don't need to prevent them from being added as system memory via kmem driver.
-
-I think that is too narrow of a focus.
-
-Does a memory map exist for the physical address ranges that are TDX
-capable? Please don't say EFI_MEMORY_CPU_CRYPTO, as that single bit is
-ambiguous beyond the point of utility across the industry's entire
-range of confidential computing memory capabilities.
-
-One strawman would be an ACPI table with contents like:
-
-struct acpi_protected_memory {
-   struct range range;
-   uuid_t platform_mem_crypto_capability;
-};
-
-With some way to map those uuids to a set of platform vendor specific
-constraints and specifications. Some would be shared across
-confidential computing vendors, some might be unique. Otherwise, I do
-not see how you enforce the expectation of "all memory in the page
-allocator is TDX capable". The other alternative is that *none* of the
-memory in the page allocator is TDX capable and a special memory
-allocation device is used to map memory for TDs. In either case a map
-of all possible TDX memory is needed and the discussion above seems
-like an incomplete / "hopeful" proposal about the memory dax_kmem, or
-other sources, might online. See the CXL CEDT CFWMS (CXL Fixed Memory
-Window Structure) as an example of an ACPI table that sets the
-kernel's expectations about how a physical address range might be
-used.
-
-https://www.computeexpresslink.org/spec-landing
-
+> The second approach is relatively more complicated.  Instead of directly
+> rejecting the new memory resource in __add_memory_resource(), we check whether
+> the memory resource can be added based on CMR and the TDX module initialization
+> status.   This is feasible as with the latest public P-SEAMLDR spec, we can get
+> CMR from P-SEAMLDR SEAMCALL[3].  So we can detect P-SEAMLDR and get CMR info
+> during kernel boots.  And in __add_memory_resource() we do below check:
 >
-> >
-> > > > 4. CPU hotplug
-> > > >
-> > > > The first generation of TDX architecturally doesn't support ACPI CPU
-> > > > hotplug.  All logical cpus are enabled by BIOS in MADT table.  Also, the
-> > > > first generation of TDX-capable platforms don't support ACPI CPU hotplug
-> > > > either.  Since this physically cannot happen, this series doesn't add any
-> > > > check in ACPI CPU hotplug code path to disable it.
-> >
-> > What are the actual challenges posed to TDX with respect to CPU hotplug?
+>         tdx_init_disable();     /*similar to cpu_hotplug_disable() */
+>         if (tdx_module_initialized())
+>                 // reject memory hotplug
+>         else if (new_memory_resource NOT in CMRs)
+>                 // reject memory hotplug
+>         else
+>                 allow memory hotplug
+>         tdx_init_enable();      /*similar to cpu_hotplug_enable() */
 >
-> During the TDX module initialization, there is a step to call SEAMCALL on all
-> logical cpus to initialize per-cpu TDX staff.  TDX doesn't support initializing
-> the new hot-added CPUs after the initialization.  There are MCHECK/BIOS changes
-> to enforce this check too I guess but I don't know details about this.
-
-Is there an ACPI table that indicates CPU-x passed the check? Or since
-the BIOS is invoked in the CPU-online path, is it trusted to suppress
-those events for CPUs outside of the mcheck domain?
-
-> > > > Also, only TDX module initialization requires all BIOS-enabled cpus are
-> >
-> > Please define "BIOS-enabled" cpus. There is no "BIOS-enabled" line in
-> > /proc/cpuinfo for example.
+> tdx_init_disable() temporarily disables TDX module initialization by trying to
+> grab the mutex.  If the TDX module initialization is already on going, then it
+> waits until it completes.
 >
-> It means the CPUs with "enable" bit set in the MADT table.
+> This should work better for future platforms, but would requires non-trivial
+> more code as we need to add VMXON/VMXOFF support to the core-kernel to detect
+> CMR using  SEAMCALL.  A side advantage is with VMXON in core-kernel we can
+> shutdown the TDX module in kexec().
+>
+> But for this series I think the second approach is overkill and we can choose to
+> use the first simple approach?
 
-That just indicates to the present CPUs and then a hot add event
-changes the state of now present CPUs to enabled. Per above is the
-BIOS responsible for rejecting those new CPUs, or is the kernel?
+This still sounds like it is trying to solve symptoms and not the root
+problem. Why must the core-mm never have non-TDX memory when VMs are
+fine to operate with either core-mm pages or memory from other sources
+like hugetlbfs and device-dax?
