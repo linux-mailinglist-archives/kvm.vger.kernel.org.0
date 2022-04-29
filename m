@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A60E7514852
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 13:37:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51177514896
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 13:53:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358553AbiD2Lji (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 07:39:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45438 "EHLO
+        id S1358736AbiD2L4b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 07:56:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358686AbiD2Li4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 07:38:56 -0400
+        with ESMTP id S1358699AbiD2L43 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 07:56:29 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B67708931D
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 04:35:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C47BDC6EFD
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 04:53:11 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5872E1063;
-        Fri, 29 Apr 2022 04:35:37 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7F9DD1063;
+        Fri, 29 Apr 2022 04:53:11 -0700 (PDT)
 Received: from [10.57.80.98] (unknown [10.57.80.98])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0FFF03F73B;
-        Fri, 29 Apr 2022 04:35:31 -0700 (PDT)
-Message-ID: <599f3156-17f3-96fb-2736-ac6d63c91951@arm.com>
-Date:   Fri, 29 Apr 2022 12:35:25 +0100
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 740FC3F73B;
+        Fri, 29 Apr 2022 04:53:08 -0700 (PDT)
+Message-ID: <abdbfda9-63f5-8d66-84b9-0d0badf76233@arm.com>
+Date:   Fri, 29 Apr 2022 12:53:03 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
  Thunderbird/91.8.1
-Subject: Re: [PATCH RFC 16/19] iommu/arm-smmu-v3: Enable HTTU for stage1 with
- io-pgtable mapping
+Subject: Re: [PATCH RFC 17/19] iommu/arm-smmu-v3: Add unmap_read_dirty()
+ support
 Content-Language: en-GB
 To:     Joao Martins <joao.m.martins@oracle.com>,
         iommu@lists.linux-foundation.org
@@ -46,12 +46,11 @@ Cc:     Joerg Roedel <joro@8bytes.org>,
         Eric Auger <eric.auger@redhat.com>,
         Yi Liu <yi.l.liu@intel.com>,
         Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Kunkun Jiang <jiangkunkun@huawei.com>
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
 References: <20220428210933.3583-1-joao.m.martins@oracle.com>
- <20220428210933.3583-17-joao.m.martins@oracle.com>
+ <20220428210933.3583-18-joao.m.martins@oracle.com>
 From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <20220428210933.3583-17-joao.m.martins@oracle.com>
+In-Reply-To: <20220428210933.3583-18-joao.m.martins@oracle.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-9.8 required=5.0 tests=BAYES_00,NICE_REPLY_A,
@@ -64,108 +63,219 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 2022-04-28 22:09, Joao Martins wrote:
-> From: Kunkun Jiang <jiangkunkun@huawei.com>
+> Mostly reuses unmap existing code with the extra addition of
+> marshalling into a bitmap of a page size. To tackle the race,
+> switch away from a plain store to a cmpxchg() and check whether
+> IOVA was dirtied or not once it succeeds.
 > 
-> As nested mode is not upstreamed now, we just aim to support dirty
-> log tracking for stage1 with io-pgtable mapping (means not support
-> SVA mapping). If HTTU is supported, we enable HA/HD bits in the SMMU
-> CD and transfer ARM_HD quirk to io-pgtable.
-> 
-> We additionally filter out HD|HA if not supportted. The CD.HD bit
-> is not particularly useful unless we toggle the DBM bit in the PTE
-> entries.
-> 
-> Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
-> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
-> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
-> [joaomart:Convey HD|HA bits over to the context descriptor
->   and update commit message]
 > Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
 > ---
->   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 11 +++++++++++
->   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  3 +++
->   include/linux/io-pgtable.h                  |  1 +
->   3 files changed, 15 insertions(+)
+>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 17 +++++
+>   drivers/iommu/io-pgtable-arm.c              | 78 +++++++++++++++++----
+>   2 files changed, 82 insertions(+), 13 deletions(-)
 > 
 > diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index 1ca72fcca930..5f728f8f20a2 100644
+> index 5f728f8f20a2..d1fb757056cc 100644
 > --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
 > +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -1077,10 +1077,18 @@ int arm_smmu_write_ctx_desc(struct arm_smmu_domain *smmu_domain, int ssid,
->   		 * this substream's traffic
->   		 */
->   	} else { /* (1) and (2) */
-> +		struct arm_smmu_device *smmu = smmu_domain->smmu;
-> +		u64 tcr = cd->tcr;
+> @@ -2499,6 +2499,22 @@ static size_t arm_smmu_unmap_pages(struct iommu_domain *domain, unsigned long io
+>   	return ops->unmap_pages(ops, iova, pgsize, pgcount, gather);
+>   }
+>   
+> +static size_t arm_smmu_unmap_pages_read_dirty(struct iommu_domain *domain,
+> +					      unsigned long iova, size_t pgsize,
+> +					      size_t pgcount,
+> +					      struct iommu_iotlb_gather *gather,
+> +					      struct iommu_dirty_bitmap *dirty)
+> +{
+> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+> +	struct io_pgtable_ops *ops = smmu_domain->pgtbl_ops;
 > +
->   		cdptr[1] = cpu_to_le64(cd->ttbr & CTXDESC_CD_1_TTB0_MASK);
->   		cdptr[2] = 0;
->   		cdptr[3] = cpu_to_le64(cd->mair);
->   
-> +		if (!(smmu->features & ARM_SMMU_FEAT_HD))
-> +			tcr &= ~CTXDESC_CD_0_TCR_HD;
-> +		if (!(smmu->features & ARM_SMMU_FEAT_HA))
-> +			tcr &= ~CTXDESC_CD_0_TCR_HA;
-
-This is very backwards...
-
+> +	if (!ops)
+> +		return 0;
 > +
->   		/*
->   		 * STE is live, and the SMMU might read dwords of this CD in any
->   		 * order. Ensure that it observes valid values before reading
-> @@ -2100,6 +2108,7 @@ static int arm_smmu_domain_finalise_s1(struct arm_smmu_domain *smmu_domain,
->   			  FIELD_PREP(CTXDESC_CD_0_TCR_ORGN0, tcr->orgn) |
->   			  FIELD_PREP(CTXDESC_CD_0_TCR_SH0, tcr->sh) |
->   			  FIELD_PREP(CTXDESC_CD_0_TCR_IPS, tcr->ips) |
-> +			  CTXDESC_CD_0_TCR_HA | CTXDESC_CD_0_TCR_HD |
-
-...these should be set in io-pgtable's TCR value *if* io-pgatble is 
-using DBM, then propagated through from there like everything else.
-
->   			  CTXDESC_CD_0_TCR_EPD1 | CTXDESC_CD_0_AA64;
->   	cfg->cd.mair	= pgtbl_cfg->arm_lpae_s1_cfg.mair;
+> +	return ops->unmap_pages_read_dirty(ops, iova, pgsize, pgcount,
+> +					   gather, dirty);
+> +}
+> +
+>   static void arm_smmu_flush_iotlb_all(struct iommu_domain *domain)
+>   {
+>   	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+> @@ -2938,6 +2954,7 @@ static struct iommu_ops arm_smmu_ops = {
+>   		.free			= arm_smmu_domain_free,
+>   		.read_and_clear_dirty	= arm_smmu_read_and_clear_dirty,
+>   		.set_dirty_tracking_range = arm_smmu_set_dirty_tracking,
+> +		.unmap_pages_read_dirty	= arm_smmu_unmap_pages_read_dirty,
+>   	}
+>   };
 >   
-> @@ -2203,6 +2212,8 @@ static int arm_smmu_domain_finalise(struct iommu_domain *domain,
->   		.iommu_dev	= smmu->dev,
->   	};
+> diff --git a/drivers/iommu/io-pgtable-arm.c b/drivers/iommu/io-pgtable-arm.c
+> index 361410aa836c..143ee7d73f88 100644
+> --- a/drivers/iommu/io-pgtable-arm.c
+> +++ b/drivers/iommu/io-pgtable-arm.c
+> @@ -259,10 +259,30 @@ static void __arm_lpae_clear_pte(arm_lpae_iopte *ptep, struct io_pgtable_cfg *cf
+>   		__arm_lpae_sync_pte(ptep, 1, cfg);
+>   }
 >   
-> +	if (smmu->features & ARM_SMMU_FEAT_HD)
-> +		pgtbl_cfg.quirks |= IO_PGTABLE_QUIRK_ARM_HD;
+> +static bool __arm_lpae_clear_dirty_pte(arm_lpae_iopte *ptep,
+> +				       struct io_pgtable_cfg *cfg)
+> +{
+> +	arm_lpae_iopte tmp;
+> +	bool dirty = false;
+> +
+> +	do {
+> +		tmp = cmpxchg64(ptep, *ptep, 0);
+> +		if ((tmp & ARM_LPAE_PTE_DBM) &&
+> +		    !(tmp & ARM_LPAE_PTE_AP_RDONLY))
+> +			dirty = true;
+> +	} while (tmp);
+> +
+> +	if (!cfg->coherent_walk)
+> +		__arm_lpae_sync_pte(ptep, 1, cfg);
 
-You need to depend on ARM_SMMU_FEAT_COHERENCY for this as well, not 
-least because you don't have any of the relevant business for 
-synchronising non-coherent PTEs in your walk functions, but it's also 
-implementation-defined whether HTTU even operates on non-cacheable 
-pagetables, and frankly you just don't want to go there ;)
+Note that this doesn't do enough, since it's only making the CPU's 
+clearing of the PTE visible to the SMMU; the cmpxchg could have happily 
+succeeded on a stale cached copy of the writeable-clean PTE regardless 
+of what the SMMU might have done in the meantime. If we were to even 
+pretend to cope with a non-coherent SMMU writing back to the pagetables, 
+I think we'd have to scrap the current DMA API approach and make the CPU 
+view of the pagetables non-cacheable as well, but as mentioned, there's 
+no guarantee that that would even be useful anyway.
 
 Robin.
 
->   	if (smmu->features & ARM_SMMU_FEAT_BBML1)
->   		pgtbl_cfg.quirks |= IO_PGTABLE_QUIRK_ARM_BBML1;
->   	else if (smmu->features & ARM_SMMU_FEAT_BBML2)
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> index e15750be1d95..ff32242f2fdb 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> @@ -292,6 +292,9 @@
->   #define CTXDESC_CD_0_TCR_IPS		GENMASK_ULL(34, 32)
->   #define CTXDESC_CD_0_TCR_TBI0		(1ULL << 38)
->   
-> +#define CTXDESC_CD_0_TCR_HA            (1UL << 43)
-> +#define CTXDESC_CD_0_TCR_HD            (1UL << 42)
 > +
->   #define CTXDESC_CD_0_AA64		(1UL << 41)
->   #define CTXDESC_CD_0_S			(1UL << 44)
->   #define CTXDESC_CD_0_R			(1UL << 45)
-> diff --git a/include/linux/io-pgtable.h b/include/linux/io-pgtable.h
-> index d7626ca67dbf..a11902ae9cf1 100644
-> --- a/include/linux/io-pgtable.h
-> +++ b/include/linux/io-pgtable.h
-> @@ -87,6 +87,7 @@ struct io_pgtable_cfg {
->   	#define IO_PGTABLE_QUIRK_ARM_OUTER_WBWA	BIT(6)
->   	#define IO_PGTABLE_QUIRK_ARM_BBML1      BIT(7)
->   	#define IO_PGTABLE_QUIRK_ARM_BBML2      BIT(8)
-> +	#define IO_PGTABLE_QUIRK_ARM_HD         BIT(9)
+> +	return dirty;
+> +}
+> +
+>   static size_t __arm_lpae_unmap(struct arm_lpae_io_pgtable *data,
+>   			       struct iommu_iotlb_gather *gather,
+>   			       unsigned long iova, size_t size, size_t pgcount,
+> -			       int lvl, arm_lpae_iopte *ptep);
+> +			       int lvl, arm_lpae_iopte *ptep,
+> +			       struct iommu_dirty_bitmap *dirty);
 >   
->   	unsigned long			quirks;
->   	unsigned long			pgsize_bitmap;
+>   static void __arm_lpae_init_pte(struct arm_lpae_io_pgtable *data,
+>   				phys_addr_t paddr, arm_lpae_iopte prot,
+> @@ -306,8 +326,13 @@ static int arm_lpae_init_pte(struct arm_lpae_io_pgtable *data,
+>   			size_t sz = ARM_LPAE_BLOCK_SIZE(lvl, data);
+>   
+>   			tblp = ptep - ARM_LPAE_LVL_IDX(iova, lvl, data);
+> +
+> +			/*
+> +			 * No need for dirty bitmap as arm_lpae_init_pte() is
+> +			 * only called from __arm_lpae_map()
+> +			 */
+>   			if (__arm_lpae_unmap(data, NULL, iova + i * sz, sz, 1,
+> -					     lvl, tblp) != sz) {
+> +					     lvl, tblp, NULL) != sz) {
+>   				WARN_ON(1);
+>   				return -EINVAL;
+>   			}
+> @@ -564,7 +589,8 @@ static size_t arm_lpae_split_blk_unmap(struct arm_lpae_io_pgtable *data,
+>   				       struct iommu_iotlb_gather *gather,
+>   				       unsigned long iova, size_t size,
+>   				       arm_lpae_iopte blk_pte, int lvl,
+> -				       arm_lpae_iopte *ptep, size_t pgcount)
+> +				       arm_lpae_iopte *ptep, size_t pgcount,
+> +				       struct iommu_dirty_bitmap *dirty)
+>   {
+>   	struct io_pgtable_cfg *cfg = &data->iop.cfg;
+>   	arm_lpae_iopte pte, *tablep;
+> @@ -617,13 +643,15 @@ static size_t arm_lpae_split_blk_unmap(struct arm_lpae_io_pgtable *data,
+>   		return num_entries * size;
+>   	}
+>   
+> -	return __arm_lpae_unmap(data, gather, iova, size, pgcount, lvl, tablep);
+> +	return __arm_lpae_unmap(data, gather, iova, size, pgcount,
+> +				lvl, tablep, dirty);
+>   }
+>   
+>   static size_t __arm_lpae_unmap(struct arm_lpae_io_pgtable *data,
+>   			       struct iommu_iotlb_gather *gather,
+>   			       unsigned long iova, size_t size, size_t pgcount,
+> -			       int lvl, arm_lpae_iopte *ptep)
+> +			       int lvl, arm_lpae_iopte *ptep,
+> +			       struct iommu_dirty_bitmap *dirty)
+>   {
+>   	arm_lpae_iopte pte;
+>   	struct io_pgtable *iop = &data->iop;
+> @@ -649,7 +677,11 @@ static size_t __arm_lpae_unmap(struct arm_lpae_io_pgtable *data,
+>   			if (WARN_ON(!pte))
+>   				break;
+>   
+> -			__arm_lpae_clear_pte(ptep, &iop->cfg);
+> +			if (likely(!dirty))
+> +				__arm_lpae_clear_pte(ptep, &iop->cfg);
+> +			else if (__arm_lpae_clear_dirty_pte(ptep, &iop->cfg))
+> +				iommu_dirty_bitmap_record(dirty, iova, size);
+> +
+>   
+>   			if (!iopte_leaf(pte, lvl, iop->fmt)) {
+>   				/* Also flush any partial walks */
+> @@ -671,17 +703,20 @@ static size_t __arm_lpae_unmap(struct arm_lpae_io_pgtable *data,
+>   		 * minus the part we want to unmap
+>   		 */
+>   		return arm_lpae_split_blk_unmap(data, gather, iova, size, pte,
+> -						lvl + 1, ptep, pgcount);
+> +						lvl + 1, ptep, pgcount, dirty);
+>   	}
+>   
+>   	/* Keep on walkin' */
+>   	ptep = iopte_deref(pte, data);
+> -	return __arm_lpae_unmap(data, gather, iova, size, pgcount, lvl + 1, ptep);
+> +	return __arm_lpae_unmap(data, gather, iova, size, pgcount,
+> +				lvl + 1, ptep, dirty);
+>   }
+>   
+> -static size_t arm_lpae_unmap_pages(struct io_pgtable_ops *ops, unsigned long iova,
+> -				   size_t pgsize, size_t pgcount,
+> -				   struct iommu_iotlb_gather *gather)
+> +static size_t __arm_lpae_unmap_pages(struct io_pgtable_ops *ops,
+> +				     unsigned long iova,
+> +				     size_t pgsize, size_t pgcount,
+> +				     struct iommu_iotlb_gather *gather,
+> +				     struct iommu_dirty_bitmap *dirty)
+>   {
+>   	struct arm_lpae_io_pgtable *data = io_pgtable_ops_to_data(ops);
+>   	struct io_pgtable_cfg *cfg = &data->iop.cfg;
+> @@ -697,13 +732,29 @@ static size_t arm_lpae_unmap_pages(struct io_pgtable_ops *ops, unsigned long iov
+>   		return 0;
+>   
+>   	return __arm_lpae_unmap(data, gather, iova, pgsize, pgcount,
+> -				data->start_level, ptep);
+> +				data->start_level, ptep, dirty);
+> +}
+> +
+> +static size_t arm_lpae_unmap_pages(struct io_pgtable_ops *ops, unsigned long iova,
+> +				   size_t pgsize, size_t pgcount,
+> +				   struct iommu_iotlb_gather *gather)
+> +{
+> +	return __arm_lpae_unmap_pages(ops, iova, pgsize, pgcount, gather, NULL);
+>   }
+>   
+>   static size_t arm_lpae_unmap(struct io_pgtable_ops *ops, unsigned long iova,
+>   			     size_t size, struct iommu_iotlb_gather *gather)
+>   {
+> -	return arm_lpae_unmap_pages(ops, iova, size, 1, gather);
+> +	return __arm_lpae_unmap_pages(ops, iova, size, 1, gather, NULL);
+> +}
+> +
+> +static size_t arm_lpae_unmap_pages_read_dirty(struct io_pgtable_ops *ops,
+> +					      unsigned long iova,
+> +					      size_t pgsize, size_t pgcount,
+> +					      struct iommu_iotlb_gather *gather,
+> +					      struct iommu_dirty_bitmap *dirty)
+> +{
+> +	return __arm_lpae_unmap_pages(ops, iova, pgsize, pgcount, gather, dirty);
+>   }
+>   
+>   static phys_addr_t arm_lpae_iova_to_phys(struct io_pgtable_ops *ops,
+> @@ -969,6 +1020,7 @@ arm_lpae_alloc_pgtable(struct io_pgtable_cfg *cfg)
+>   		.iova_to_phys	= arm_lpae_iova_to_phys,
+>   		.read_and_clear_dirty = arm_lpae_read_and_clear_dirty,
+>   		.set_dirty_tracking   = arm_lpae_set_dirty_tracking,
+> +		.unmap_pages_read_dirty     = arm_lpae_unmap_pages_read_dirty,
+>   	};
+>   
+>   	return data;
