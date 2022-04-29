@@ -2,116 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8ABF751537D
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 20:19:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D831A515392
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 20:21:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379944AbiD2SXH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 14:23:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60686 "EHLO
+        id S1379992AbiD2SYj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 14:24:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379774AbiD2SXC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 14:23:02 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6536BD0A99
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 11:19:43 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id p6so7806196plf.9
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 11:19:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=wBht/QJpKirnQLRjfU3qpuPFg9KVLlBJOHxobySJY84=;
-        b=r7pzjeEkU56Xb/PrhsyeDT3rj09eyhkVOOf0c9svwGplQYdNJteW3ugc9U+C8hivVT
-         3Mrr0tnEK/GrhuqlPEIeeQs3+x1u8NuGrbxafMRv4MHcs6KPq8HlXZAedK+JwJ1cvL5S
-         V1mtlsbCRaz1aGXyrKHvizHqdvZTw4DHpcXI2A5x+PftjUVXFrczZzXU/MGYemogzsk3
-         vz37LiqE8poSl+Wp+M/APmNHWeRuSE/tTYhpsjnq2P9cUumI3ezmDpne8lCw77Yc1Au0
-         mxgaVRaoMfyIZHLISRiDb2E0MIAP43ZmJy/rD9V7X2XmW9swkIWlKd67VwVeY+9GwgK7
-         lNXw==
+        with ESMTP id S236995AbiD2SYg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 14:24:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5BB1BC8653
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 11:21:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651256476;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/stkcvJjykGRYHDCQBNH7PAqqEJypDF4kYoHuS+OVKA=;
+        b=gLGGpaHugbBBzMN+di8QpYyiGltIrc6KzqTnknPkVYZ4EFv8bsqSNFYe7rzPdiSzEg/Yae
+        gY6Tb+UZKSQYztTWbY9yOUGzQh4VhXtlemEWj/1GeJI3dU2F1Ec4TKA2R+5JK7bmjt8acT
+        N2rNcA6jylCx55xy5g7IV/6IReTqWnA=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-377-CljRLPyrPc-slNRIOyOhzw-1; Fri, 29 Apr 2022 14:21:14 -0400
+X-MC-Unique: CljRLPyrPc-slNRIOyOhzw-1
+Received: by mail-il1-f197.google.com with SMTP id j5-20020a056e020ee500b002cbc90840ecso4024531ilk.23
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 11:21:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=wBht/QJpKirnQLRjfU3qpuPFg9KVLlBJOHxobySJY84=;
-        b=Yq3fUkl7CfY/uLbvJcNnpXSFSl7p0j6ejJe0fv6uL2kSYPy8Zum3cvlt/H0FoYp5Q1
-         K1UFhPcenKoOxH9oNFzPKSd9DrYlXxDEnvDFtz85jgtk28J68GBbFZbku6ixECC9svK/
-         OZNaebDuwJDHjTyslf9t5MayXR2fO2y7CVbanqHlU0yZDk0P7zIWpQNjpBIGE4QHvUv8
-         KNGqXSP1zZrd9j9y8rOzl0V1+Z9ZgJd90eBjyfeh3T8OQho3HHMOOfqR+pQnXl4eQx2N
-         PBe473+PcwuRlke+l1bf2REbactl+oUfGvG0lpc5puDg9gwvPEHSWBqAR/asPVIN5waF
-         D5dw==
-X-Gm-Message-State: AOAM5331ZOhAespQ0w8KrVTcNygJB5vz1M7vD62ADBRCX3fdciQp5pm5
-        X3FPhKUzUzG8cXhMOFDjTNaCpA==
-X-Google-Smtp-Source: ABdhPJzIbOlJ2QDNab19z2WyabpDVNPH1SwLU2cRelG7TFhZ87ku6YiqDSuoNAqPH7kzRGC4ljGIlw==
-X-Received: by 2002:a17:903:1109:b0:15e:7c4b:5045 with SMTP id n9-20020a170903110900b0015e7c4b5045mr641211plh.3.1651256382703;
-        Fri, 29 Apr 2022 11:19:42 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id u19-20020a63b553000000b003c14af50616sm6518855pgo.46.2022.04.29.11.19.41
+        bh=/stkcvJjykGRYHDCQBNH7PAqqEJypDF4kYoHuS+OVKA=;
+        b=JI2h1+DmuaiBPaFTmrvNbUVmlyauX8pCaJ1D1Qz99Z/oG7fiIjj2mHyB+fv3TrdDgk
+         8PZZu0WKQQciZWgCWaEeqEqAg9SSfB8zIQkG1UuNn0yva80icKi8ED6/rBP2g8OkoLiG
+         qnB5V6fEIS6dNSo8vxgu/HWKt1dswZMeMKPE8uZAPpNDv+vm/woFOqFdTk9Qaw92ctRF
+         i289b7To2ezHE/wXTLBB7NMVal2IFnGTLZd5DSZC8LXvdO9SnDEcCKrBbAG/iHLhKcdZ
+         B71+e5euRzqwWAPvo7raP4kXBykYdj6+qRA2rZmeNZZKjtPmDuIZdRVYkdYs/gBKbL4h
+         D+Fg==
+X-Gm-Message-State: AOAM531QM8Zt6pDYJOnUBLHsEtGiqKWBXRDA4yUL7zgFVlZSVEKj8gmt
+        8AU/oMTzN7oZ04Ap61lIxzWqCiCKiJhKRUD5lUS2ooRB1I9s5nTu7uoj7MO88riIa+F9b0ilvJH
+        PEraNG2U6rZKt
+X-Received: by 2002:a05:6e02:1809:b0:2cc:507a:acfa with SMTP id a9-20020a056e02180900b002cc507aacfamr266306ilv.114.1651256474186;
+        Fri, 29 Apr 2022 11:21:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxMQe01BrdjkQTGSc8GhfcNnSFwj4USJ8BqMV1n3p5cbt4caHClRYCCsnFmYOxhkaUoVr9wpg==
+X-Received: by 2002:a05:6e02:1809:b0:2cc:507a:acfa with SMTP id a9-20020a056e02180900b002cc507aacfamr266282ilv.114.1651256473927;
+        Fri, 29 Apr 2022 11:21:13 -0700 (PDT)
+Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
+        by smtp.gmail.com with ESMTPSA id 70-20020a6b1449000000b00657b4130f57sm1184609iou.25.2022.04.29.11.21.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Apr 2022 11:19:41 -0700 (PDT)
-Date:   Fri, 29 Apr 2022 18:19:38 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-Subject: Re: [PATCH v3 13/21] x86/virt/tdx: Allocate and set up PAMTs for
- TDMRs
-Message-ID: <YmwsOo4TCq1/5hgd@google.com>
-References: <cover.1649219184.git.kai.huang@intel.com>
- <ffc2eefdd212a31278978e8bfccd571355db69b0.1649219184.git.kai.huang@intel.com>
- <c9b17e50-e665-3fc6-be8c-5bb16afa784e@intel.com>
- <3664ab2a8e0b0fcbb4b048b5c3aa5a6e85f9618a.camel@intel.com>
- <5984b61f-6a4a-c12a-944d-f4a78bdefc3d@intel.com>
- <Ymv2h1GYCMQ9ZQvJ@google.com>
- <c875fc4a-c3c0-dab1-c7cb-525b0bff5ae3@intel.com>
+        Fri, 29 Apr 2022 11:21:13 -0700 (PDT)
+Date:   Fri, 29 Apr 2022 14:21:11 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Joao Martins <joao.m.martins@oracle.com>,
+        Jason Wang <jasowang@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        qemu-devel <qemu-devel@nongnu.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Juan Quintela <quintela@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>, Yi Liu <yi.l.liu@intel.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Thanos Makatos <thanos.makatos@nutanix.com>,
+        "John G . Johnson" <john.g.johnson@oracle.com>,
+        kvm <kvm@vger.kernel.org>
+Subject: Re: [PATCH RFC 04/10] intel_iommu: Second Stage Access Dirty bit
+ support
+Message-ID: <Ymwsl5G/TCuRFja2@xz-m1.local>
+References: <20220428211351.3897-1-joao.m.martins@oracle.com>
+ <20220428211351.3897-5-joao.m.martins@oracle.com>
+ <CACGkMEug0zW0pWCSEtHQ5KE5KRpXyWvgJmPZm-yvJnCLmocAYg@mail.gmail.com>
+ <f90a8126-7805-be8d-e378-f129196e753d@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <c875fc4a-c3c0-dab1-c7cb-525b0bff5ae3@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <f90a8126-7805-be8d-e378-f129196e753d@oracle.com>
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 29, 2022, Dave Hansen wrote:
-> On 4/29/22 07:30, Sean Christopherson wrote:
-> > On Fri, Apr 29, 2022, Dave Hansen wrote:
-> ...
-> >> A *good* way (although not foolproof) is to launch a TDX VM early
-> >> in boot before memory gets fragmented or consumed.  You might even
-> >> want to recommend this in the documentation.
+On Fri, Apr 29, 2022 at 10:12:01AM +0100, Joao Martins wrote:
+> On 4/29/22 03:26, Jason Wang wrote:
+> > On Fri, Apr 29, 2022 at 5:14 AM Joao Martins <joao.m.martins@oracle.com> wrote:
+> >> @@ -3693,7 +3759,8 @@ static void vtd_init(IntelIOMMUState *s)
+> >>
+> >>      /* TODO: read cap/ecap from host to decide which cap to be exposed. */
+> >>      if (s->scalable_mode) {
+> >> -        s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
+> >> +        s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS |
+> >> +                   VTD_ECAP_SLADS;
+> >>      }
 > > 
-> > What about providing a kernel param to tell the kernel to do the
-> > allocation during boot?
+> > We probably need a dedicated command line parameter and make it compat
+> > for pre 7.1 machines.
+> > 
+> > Otherwise we may break migration.
 > 
-> I think that's where we'll end up eventually.  But, I also want to defer
-> that discussion until after we have something merged.
+> I can gate over an 'x-ssads' option (default disabled). Which reminds me that I probably
+> should rename to the most recent mnemonic (as SLADS no longer exists in manuals).
 > 
-> Right now, allocating the PAMTs precisely requires running the TDX
-> module.  Running the TDX module requires VMXON.  VMXON is only done by
-> KVM.  KVM isn't necessarily there during boot.  So, it's hard to do
-> precisely today without a bunch of mucking with VMX.
+> If we all want by default enabled I can add a separate patch to do so.
 
-Meh, it's hard only if we ignore the fact that the PAMT entry size isn't going
-to change for a given TDX module, and is extremely unlikely to change in general.
+The new option sounds good.
 
-Odds are good the kernel can hardcode a sane default and Just Work.  Or provide
-the assumed size of a PAMT entry via module param.  If the size ends up being
-wrong, log an error, free the reserved memory, and move on with TDX setup with
-the correct size.
+Jason, per our previous discussion, shall we not worry about the
+compatibility issues per machine-type until the whole feature reaches a
+mostly-complete stage?
 
-> You can arm-wrestle the distro folks who hate adding command-line tweaks
-> when the time comes. ;)
+There seems to have a bunch of sub-features for scalable mode and it's a
+large project as a whole.  I'm worried trying to maintain compatibilities
+for all the small sub-features could be an unnessary burden to the code
+base.
 
-Sure, you just find me the person that's going to run TDX guests with an
-off-the-shelf distro kernel :-D
+Thanks,
+
+-- 
+Peter Xu
+
