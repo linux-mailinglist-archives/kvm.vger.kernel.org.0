@@ -2,439 +2,259 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B1E25514365
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 09:46:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E9C4051437A
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 09:54:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355239AbiD2Htb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 03:49:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48462 "EHLO
+        id S1355292AbiD2H5m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 03:57:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245158AbiD2Ht3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 03:49:29 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52910A66DD;
-        Fri, 29 Apr 2022 00:46:11 -0700 (PDT)
+        with ESMTP id S1355283AbiD2H5g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 03:57:36 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ACA97B566
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 00:54:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651218371; x=1682754371;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=pJ1NtxgSMXpPx7nH2L8yOizHHNsDkFgvdLjPcvxnm8s=;
-  b=eXyiXZwViOhXCnlMGOFDLp7utzCgbEgMrpdayIey+Xp9LONywztEJ/Er
-   fJZCOqXm7NadhuEYoJpM7n5pqGZrGQfJGIQ7URaoW74EBgCkkhS0K41P8
-   XxEQe4AcE05MPiVPgAR5JfD3TAsrdmnueB8oWrBc4E2/Sjo0oIhKH00Jv
-   ehhXlZ4jQAmb/rtV1E4zBx45G0a/9gTYe+m6rEL1jsclh8RNorgmDUtzF
-   zh6FAgZsO5WSI4W2Gsuk5NoX+B3x0YAQSWqBDk1KNz3ygKqDm+BaTox31
-   QX3MijLOPGzuLhQFHSmfYO9bg7lQfr3im8lE6ZtRWqMyPNMkvzOAVZr06
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10331"; a="247123028"
+  t=1651218859; x=1682754859;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ze6d5zqeil6eGdqRdcP7G15akCWKlDQncaOLeBZV4VQ=;
+  b=d+bThXmubBsYDzzXMM15Ftn2CMB8MxPYGYczaSYRuwRnELYPAPfVfF5U
+   +4rPxYkk8HvZjL6Q/Oa+uSYWo0r3E+Bp3d59uW7AxruAHRmm6shG32wFH
+   0Lcqb9Iny+oWLIYNqdMFvj56kQObhQUf7L7eZ3j/2NlL7b9idoVLB8mNO
+   DYFoDftPQb/kZt9QYkY97o9vx+fC69ffAhog8wIDGoUFJxNbYKCB88Q7G
+   nGmJJWELg82hn8SiaCIrCGzaiSacOvwkxBM2VdrExcqjJZSUWy5j8hNVp
+   uTlKSHceR0K9FKhHQD5XZr04pJAzbuN0hSc8rzJyniuNPGsU3ghumlxwI
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10331"; a="248498352"
 X-IronPort-AV: E=Sophos;i="5.91,297,1647327600"; 
-   d="scan'208";a="247123028"
+   d="scan'208";a="248498352"
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 00:46:10 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 00:54:18 -0700
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.91,297,1647327600"; 
-   d="scan'208";a="534360918"
-Received: from jenegret-mobl2.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.59.236])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 00:46:07 -0700
-Message-ID: <3664ab2a8e0b0fcbb4b048b5c3aa5a6e85f9618a.camel@intel.com>
-Subject: Re: [PATCH v3 13/21] x86/virt/tdx: Allocate and set up PAMTs for
- TDMRs
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-Date:   Fri, 29 Apr 2022 19:46:05 +1200
-In-Reply-To: <c9b17e50-e665-3fc6-be8c-5bb16afa784e@intel.com>
-References: <cover.1649219184.git.kai.huang@intel.com>
-         <ffc2eefdd212a31278978e8bfccd571355db69b0.1649219184.git.kai.huang@intel.com>
-         <c9b17e50-e665-3fc6-be8c-5bb16afa784e@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+   d="scan'208";a="534364168"
+Received: from orsmsx604.amr.corp.intel.com ([10.22.229.17])
+  by orsmga006.jf.intel.com with ESMTP; 29 Apr 2022 00:54:18 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Fri, 29 Apr 2022 00:54:18 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27 via Frontend Transport; Fri, 29 Apr 2022 00:54:18 -0700
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.48) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.27; Fri, 29 Apr 2022 00:54:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Rv6724NKsUW2rzBpK7wk31LIp4kicRVCdep0AEJbKmyuOJdBzPU2f8/vbUjHSYf4xVrqv89Ru541PK8lUlBOrBSDdjiU9UJXgYGf7BQqHT/oi+74UJfXablenTO4SoORKFvbEzlX8u4pVkuRR0A2eyRaYfohjhQBTysoiu8L323TlUxF5me9gR5I6KsYlYH3Ywrste4ipgmwDjwy/NyZvPJpyHFYVYyZiHrGvoiO2ORSp/9+jPujqaEIxQJbLeW69vC+k96NRR4Yl3pSiT34wVSqggDkWUGJrYRRkuH5EAxWOh0MznQKVPhzu2qnRa85tMAdaJWFjd0pvl0Jo083SA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=467jZdvi+39uQEk2JZIeeTsalPOEJB8oaqE+5hIi/VU=;
+ b=fIgsEg5DbE9FouE5YhkMbaDEXlc3lE8439LQYo6t0+yfIYbfyY6ahI66w8eKX4lHuN1Af/S+/TQuRXIhLdmbnnOIU0qqntMuLrqsPpcxLVhwGA4ut+Ol4rRSy4NkOWl7GRWZbBE1c6I7eYCMBO1XYAAbI65CpK7GPlwhZrg2BNaSwKGSGCYPivVggC9KtyItUX9bjInKaR+bi7aub2cvd8fGT6FoH+IhfusljiFGZLCuLRjchorDl6qElTp2e2azzXei6d93A2TfEVGzGP3Qzx3Eu9mvCipBicuFLwqICK64DaBlzbv/GMjcwwqpUOLCnkterjyJZaQfiAnl5bzw+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by DM6PR11MB4721.namprd11.prod.outlook.com (2603:10b6:5:2a3::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.14; Fri, 29 Apr
+ 2022 07:54:14 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::24dd:37c2:3778:1adb]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::24dd:37c2:3778:1adb%2]) with mapi id 15.20.5206.013; Fri, 29 Apr 2022
+ 07:54:09 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     "Martins, Joao" <joao.m.martins@oracle.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>
+CC:     "Martins, Joao" <joao.m.martins@oracle.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "Cornelia Huck" <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: RE: [PATCH RFC 01/19] iommu: Add iommu_domain ops for dirty tracking
+Thread-Topic: [PATCH RFC 01/19] iommu: Add iommu_domain ops for dirty tracking
+Thread-Index: AQHYW0SBddBMaWdJy0ea6VnH/ggNiK0GeQsQ
+Date:   Fri, 29 Apr 2022 07:54:09 +0000
+Message-ID: <BN9PR11MB527684203C6344FF46B4163A8CFC9@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20220428210933.3583-1-joao.m.martins@oracle.com>
+ <20220428210933.3583-2-joao.m.martins@oracle.com>
+In-Reply-To: <20220428210933.3583-2-joao.m.martins@oracle.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: cecc7c9d-ed6c-44e4-5b54-08da29b5712c
+x-ms-traffictypediagnostic: DM6PR11MB4721:EE_
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-microsoft-antispam-prvs: <DM6PR11MB4721459F30F6CC32991E5EBB8CFC9@DM6PR11MB4721.namprd11.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: N+Pc6V5J43CF87jNy+PeiPhwhwsrGN05CAEcgSfRr8RXOWy/yb9GPuKoU1JEaAB0n8qXhCmmoRYO9pXLPktRyIKiAonHyaiJMUjLyaj4DkWQ02DSJHaazFWvGt8r8g41zPRaRG+US5f4mLR69uLg8dx4Ji50zH6AVmNaUjZnCBFpyTcmeuN/+CQwdHeStJ+hZdoAXAJ32bibHqJfSIWeg1HNIHPyqWZ2HcWpNMsS8W5e2XJbZC2KUvi5TsA4jd9UcH9ljqaxTDm/3PdRkfafNFWANdBvEgKJjf1TFmSQJ6nJ0cf8k/4E6LtYGP+iwG4SLAhOyvCr9BjM3Bq8XH1/auY7j9/TPpHWwx8+UAZ3RY2Nw0skJw6LsZgiJXmsVs6X6zuj5zY7BuXvIrGpcZ/8cjzdacbnOV4Hbu07CDEbzbGFfC44Z4VghAeIL+TYHYOX27vbV5WJKSw6qTgZXqKzUWPFQVoqA6qGDbyVWXKRxM3fAQTpetXs4489xWLo3BouKQoJsHfGdeU5rrzVNSzz1IHRAnKGAZZH+HrFpUFUa526p4fC9cm5jHsnABpm0DDZcERSOznJW8oyICO6bXHPShvg9Ivt8cDYXbsYuqZ5SYxMTLfVtLBquu8fJKo4/MgJ5wlbqujLjRNu8VaZXABgyZJ9/ykjwNXESOBAaYbC8+K8QHDE4+6JgIveHudqXq5UCg3EO8iGkhpZUXOf2Nw436nqwJ8X2DVLzLys2CBCokY=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(38070700005)(186003)(2906002)(9686003)(38100700002)(122000001)(6506007)(26005)(33656002)(7696005)(82960400001)(7416002)(8936002)(52536014)(83380400001)(110136005)(55016003)(8676002)(508600001)(71200400001)(4326008)(5660300002)(64756008)(66446008)(66476007)(66556008)(66946007)(76116006)(316002)(86362001)(54906003)(14143004);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?P4zSUTuR4323WcPy4G02EFUlZh47sMD+dhHjKM631I2prUu8Iksu+HtvFA1a?=
+ =?us-ascii?Q?UmMt5U6xSj9+RvdYBSEWc6x8ihKEOUWo+FWeX1iFLPEqWZ6wVO9hxBrUEiLE?=
+ =?us-ascii?Q?PL+X8/UWv1PXR7HaPSmaOpEgis9XjY2zgtkHIXHc97oa1xrpWu9oGEpK7rbZ?=
+ =?us-ascii?Q?0nGnJ4mXnYvPxvYqaVXD5ZLYKpRPjG2ON7Zej/oM1b/03dFPSyfMk3dF+jkw?=
+ =?us-ascii?Q?XEgCiIs5UnDFjlqFSWcHiB4HBhJ1tFyc2MAjVU2SMu1fUTc6K73Xt3kI5Jgr?=
+ =?us-ascii?Q?7xdOH4ZcQfNqonqNxPxk7eVOqO8s/RXD/TY3WY7N1SOnspZheMXHXS4hRlTY?=
+ =?us-ascii?Q?M/VZ0QyRMnxmD3zgaZsyUXTFe27Yos8vnW9Y0tevqgmGQAiVmtFBeXYLhT3F?=
+ =?us-ascii?Q?Jcz9cROg9m13WNWfzgC+CrlzeXUJ9XDRrU7RKwbIzJaOFtSxPdDgq3ZMsTXo?=
+ =?us-ascii?Q?GB/3LvjpaXLaNe2Vmqc5kpacip9m2C9OFyU8CWAr+Ya2bYNbmS8a8oXOhFFf?=
+ =?us-ascii?Q?E93U3L5YXAEBktArGNloOr6eoQV8ww9O1nlGS6k/s4fLpRPXzMzVLx5TXCEC?=
+ =?us-ascii?Q?eq4WBI9ooyWATzrvvGotAdWQ6IuewF5PIDQDXTDtXFlRjUoaXA9hKh0DflXq?=
+ =?us-ascii?Q?oHGz6ly/RZyQIR2hnn3synsDuDzYvKJgiszbYwd7xFovRLgDPgsfvJk26FEf?=
+ =?us-ascii?Q?Hgp7+C0jjXfHFEhWQRpjkRcSnOgUMPW9+6cFqRtD/gVL6WWUDP6JyUJSiQ7p?=
+ =?us-ascii?Q?5r98caOUo+5vqTSIHlSIjhcP1Z4ZEJ1uANvqKO7Y1dKjKU/yhHJlkFaFPtZi?=
+ =?us-ascii?Q?GhmMQJz3i+2oVsWA9/VYpfsiwsk2RDtpEjZHl1yFYjfm3K3n5RKn2NpEskxQ?=
+ =?us-ascii?Q?8LaOu6ua5HNR+Qs0ZkHmrXAVQFQHvYhyeScxoFmFhkO9vXU0xxHblQE23UMT?=
+ =?us-ascii?Q?MyDafo6jgDTM8WdB0XJ1OnhbFQY6KOpQZsbfa2P1COP9S9kt3koOvxL1vYwc?=
+ =?us-ascii?Q?3rdqYoYWtm5ZOIrQowtjEoUTCHUj4vi+mhoxrcDIJV++pBipm6Vtw+G90xdy?=
+ =?us-ascii?Q?cfh2QEu0+yRAOdMFy36saEj41wqieBZjxSkd9TUvcAn8OBrBA1XZ+Tn85QE9?=
+ =?us-ascii?Q?uLR71uBAS/5C39J8gpsQUvsgn1mAJ+uHY16HfOUa87JcGaoyI2HrxLD1x/pX?=
+ =?us-ascii?Q?3veLMx6KCi6pUD7fpBJJXjzBOypJdcHFZ9Y0MA8cWLDhgu7UqC1fNHxjEWK8?=
+ =?us-ascii?Q?9rYElfkKnbNic/xoVGB2ks7JeTbvED240acqnzYPQ3xMCWZIIWs2cs1Sm+e2?=
+ =?us-ascii?Q?WDBTD+0xMREzpSQW2e6fefDcXIl/1X8kN7fWGt+DV4SlViUryL8oSgP5wAzo?=
+ =?us-ascii?Q?9wrR6HG304YW8v+M4tzce94pCxH8DT0Nr7u0IAAhBHWj2a6p3edbsQbvrctd?=
+ =?us-ascii?Q?s8inevSMTax97Yo/NwuRUQkCLl1wMd/K1OGspM3gpANQD+WWHAoBUPP8y64C?=
+ =?us-ascii?Q?wrOCJl8y01LowR9ZeO/roY+k9fwTz5p0VYZk2sps6Sv96odG21teEjJAfg7a?=
+ =?us-ascii?Q?b22OgJgtdlzdFovw6qbKwOCv4KAiYJ5kHaIkFtx3XlFm7PNoyFqM9h+WbQXi?=
+ =?us-ascii?Q?xsvVnDNKGu3DAnItZ76wlJHdlsFzk+tp1LprRx1GpKxlt/F2r8YVco1sGFxx?=
+ =?us-ascii?Q?ATAfEmnokbWdd5Hca/Ww5QoX963m0lyye4tDPrKh1XcG/M4JYpN2iV1em//o?=
+ =?us-ascii?Q?4RkkoIXIRA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cecc7c9d-ed6c-44e4-5b54-08da29b5712c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Apr 2022 07:54:09.0741
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: AzX3Yb437a03WL0PKeUYYrvgokX5pAa9lJI7vdcfHpBzKqWJDeHmhByjEWz1KxdIG9jvr84q0a53zZ3WqMnozA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4721
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-04-28 at 10:12 -0700, Dave Hansen wrote:
-> On 4/5/22 21:49, Kai Huang wrote:
-> > In order to provide crypto protection to guests, the TDX module uses
-> > additional metadata to record things like which guest "owns" a given
-> > page of memory.  This metadata, referred as Physical Address Metadata
-> > Table (PAMT), essentially serves as the 'struct page' for the TDX
-> > module.  PAMTs are not reserved by hardware upfront.  They must be
-> > allocated by the kernel and then given to the TDX module.
-> > 
-> > TDX supports 3 page sizes: 4K, 2M, and 1G.  Each "TD Memory Region"
-> > (TDMR) has 3 PAMTs to track the 3 supported page sizes respectively.
-> 
-> s/respectively//
-> 
+> From: Joao Martins <joao.m.martins@oracle.com>
+> Sent: Friday, April 29, 2022 5:09 AM
+>=20
+> Add to iommu domain operations a set of callbacks to
+> perform dirty tracking, particulary to start and stop
+> tracking and finally to test and clear the dirty data.
 
-Will remove.
+to be consistent with other context, s/test/read/
 
-> > Each PAMT must be a physically contiguous area from the Convertible
-> 
-> 							^ s/the/a/
+>=20
+> Drivers are expected to dynamically change its hw protection
+> domain bits to toggle the tracking and flush some form of
 
-OK.
+'hw protection domain bits' sounds a bit weird. what about
+just using 'translation structures'?
 
-> 
-> > Memory Regions (CMR).  However, the PAMTs which track pages in one TDMR
-> > do not need to reside within that TDMR but can be anywhere in CMRs.
-> > If one PAMT overlaps with any TDMR, the overlapping part must be
-> > reported as a reserved area in that particular TDMR.
-> > 
-> > Use alloc_contig_pages() since PAMT must be a physically contiguous area
-> > and it may be potentially large (~1/256th of the size of the given TDMR).
-> 
-> This is also a good place to note the downsides of using
-> alloc_contig_pages().
+> control state structure that stands in the IOVA translation
+> path.
+>=20
+> For reading and clearing dirty data, in all IOMMUs a transition
+> from any of the PTE access bits (Access, Dirty) implies flushing
+> the IOTLB to invalidate any stale data in the IOTLB as to whether
+> or not the IOMMU should update the said PTEs. The iommu core APIs
+> introduce a new structure for storing the dirties, albeit vendor
+> IOMMUs implementing .read_and_clear_dirty() just use
 
-For instance:
+s/vendor IOMMUs/iommu drivers/
 
-	The allocation may fail when memory usage is under pressure.
+btw according to past history in iommu mailing list sounds like
+'vendor' is not a term welcomed in the kernel, while there are
+many occurrences in this series.
 
-?
+[...]
+> Although, The ARM SMMUv3 case is a tad different that its x86
+> counterparts. Rather than changing *only* the IOMMU domain device entry
+> to
+> enable dirty tracking (and having a dedicated bit for dirtyness in IOPTE)
+> ARM instead uses a dirty-bit modifier which is separately enabled, and
+> changes the *existing* meaning of access bits (for ro/rw), to the point
+> that marking access bit read-only but with dirty-bit-modifier enabled
+> doesn't trigger an perm io page fault.
+>=20
+> In pratice this means that changing iommu context isn't enough
+> and in fact mostly useless IIUC (and can be always enabled). Dirtying
+> is only really enabled when the DBM pte bit is enabled (with the
+> CD.HD bit as a prereq).
+>=20
+> To capture this h/w construct an iommu core API is added which enables
+> dirty tracking on an IOVA range rather than a device/context entry.
+> iommufd picks one or the other, and IOMMUFD core will favour
+> device-context op followed by IOVA-range alternative.
 
-> 
-> > The current version of TDX supports at most 16 reserved areas per TDMR
-> > to cover both PAMTs and potential memory holes within the TDMR.  If many
-> > PAMTs are allocated within a single TDMR, 16 reserved areas may not be
-> > sufficient to cover all of them.
-> > 
-> > Adopt the following policies when allocating PAMTs for a given TDMR:
-> > 
-> >   - Allocate three PAMTs of the TDMR in one contiguous chunk to minimize
-> >     the total number of reserved areas consumed for PAMTs.
-> >   - Try to first allocate PAMT from the local node of the TDMR for better
-> >     NUMA locality.
-> > 
-> > Signed-off-by: Kai Huang <kai.huang@intel.com>
-> > ---
-> >  arch/x86/Kconfig            |   1 +
-> >  arch/x86/virt/vmx/tdx/tdx.c | 165 ++++++++++++++++++++++++++++++++++++
-> >  2 files changed, 166 insertions(+)
-> > 
-> > diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-> > index 7414625b938f..ff68d0829bd7 100644
-> > --- a/arch/x86/Kconfig
-> > +++ b/arch/x86/Kconfig
-> > @@ -1973,6 +1973,7 @@ config INTEL_TDX_HOST
-> >  	depends on CPU_SUP_INTEL
-> >  	depends on X86_64
-> >  	select NUMA_KEEP_MEMINFO if NUMA
-> > +	depends on CONTIG_ALLOC
-> >  	help
-> >  	  Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
-> >  	  host and certain physical attacks.  This option enables necessary TDX
-> > diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> > index 82534e70df96..1b807dcbc101 100644
-> > --- a/arch/x86/virt/vmx/tdx/tdx.c
-> > +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> > @@ -21,6 +21,7 @@
-> >  #include <asm/cpufeatures.h>
-> >  #include <asm/virtext.h>
-> >  #include <asm/e820/api.h>
-> > +#include <asm/pgtable.h>
-> >  #include <asm/tdx.h>
-> >  #include "tdx.h"
-> >  
-> > @@ -66,6 +67,16 @@
-> >  #define TDMR_START(_tdmr)	((_tdmr)->base)
-> >  #define TDMR_END(_tdmr)		((_tdmr)->base + (_tdmr)->size)
-> >  
-> > +/* Page sizes supported by TDX */
-> > +enum tdx_page_sz {
-> > +	TDX_PG_4K = 0,
-> > +	TDX_PG_2M,
-> > +	TDX_PG_1G,
-> > +	TDX_PG_MAX,
-> > +};
-> 
-> Is that =0 required?  I thought the first enum was defined to be 0.
+Above doesn't convince me on the necessity of introducing two ops
+here. Even for ARM it can accept a per-domain op and then walk the
+page table to manipulate any modifier for existing mappings. It
+doesn't matter whether it sets one bit in the context entry or multiple
+bits in the page table.
 
-No it's not required.  Will remove.
+[...]
+> +
 
-> 
-> > +#define TDX_HPAGE_SHIFT	9
-> > +
-> >  /*
-> >   * TDX module status during initialization
-> >   */
-> > @@ -959,6 +970,148 @@ static int create_tdmrs(struct tdmr_info **tdmr_array, int *tdmr_num)
-> >  	return ret;
-> >  }
-> >  
-> > +/* Calculate PAMT size given a TDMR and a page size */
-> > +static unsigned long __tdmr_get_pamt_sz(struct tdmr_info *tdmr,
-> > +					enum tdx_page_sz pgsz)
-> > +{
-> > +	unsigned long pamt_sz;
-> > +
-> > +	pamt_sz = (tdmr->size >> ((TDX_HPAGE_SHIFT * pgsz) + PAGE_SHIFT)) *
-> > +		tdx_sysinfo.pamt_entry_size;
-> 
-> That 'pgsz' thing is just hideous.  I'd *much* rather see something like
-> this:
-> 
-> static int tdx_page_size_shift(enum tdx_page_sz page_sz)
-> {
-> 	switch (page_sz) {
-> 	case TDX_PG_4K:
-> 		return PAGE_SIZE;
-> 	...
-> 	}
-> }
-> 
-> That's easy to figure out what's going on.
+Miss comment for this function.
 
-OK. Will do.
+> +unsigned int iommu_dirty_bitmap_record(struct iommu_dirty_bitmap
+> *dirty,
+> +				       unsigned long iova, unsigned long length)
+> +{
+> +	unsigned long nbits, offset, start_offset, idx, size, *kaddr;
+> +
+> +	nbits =3D max(1UL, length >> dirty->pgshift);
+> +	offset =3D (iova - dirty->iova) >> dirty->pgshift;
+> +	idx =3D offset / (PAGE_SIZE * BITS_PER_BYTE);
+> +	offset =3D offset % (PAGE_SIZE * BITS_PER_BYTE);
+> +	start_offset =3D dirty->start_offset;
 
-> 
-> > +	/* PAMT size must be 4K aligned */
-> > +	pamt_sz = ALIGN(pamt_sz, PAGE_SIZE);
-> > +
-> > +	return pamt_sz;
-> > +}
-> > +
-> > +/* Calculate the size of all PAMTs for a TDMR */
-> > +static unsigned long tdmr_get_pamt_sz(struct tdmr_info *tdmr)
-> > +{
-> > +	enum tdx_page_sz pgsz;
-> > +	unsigned long pamt_sz;
-> > +
-> > +	pamt_sz = 0;
-> > +	for (pgsz = TDX_PG_4K; pgsz < TDX_PG_MAX; pgsz++)
-> > +		pamt_sz += __tdmr_get_pamt_sz(tdmr, pgsz);
-> > +
-> > +	return pamt_sz;
-> > +}
-> 
-> But, there are 3 separate pointers pointing to 3 separate PAMTs.  Why do
-> they all have to be contiguously allocated?
+could you elaborate the purpose of dirty->start_offset? Why dirty->iova
+doesn't start at offset 0 of the bitmap?
 
-It is also explained in the changelog (the last two paragraphs).
+> +
+> +	while (nbits > 0) {
+> +		kaddr =3D kmap(dirty->pages[idx]) + start_offset;
+> +		size =3D min(PAGE_SIZE * BITS_PER_BYTE - offset, nbits);
+> +		bitmap_set(kaddr, offset, size);
+> +		kunmap(dirty->pages[idx]);
 
-> 
-> > +/*
-> > + * Locate the NUMA node containing the start of the given TDMR's first
-> > + * RAM entry.  The given TDMR may also cover memory in other NUMA nodes.
-> > + */
-> 
-> Please add a sentence or two on the implications here of what this means
-> when it happens.  Also, the joining of e820 regions seems like it might
-> span NUMA nodes.  What prevents that code from just creating one large
-> e820 area that leads to one large TDMR and horrible NUMA affinity for
-> these structures?
+what about the overhead of kmap/kunmap when it's done for every
+dirtied page (as done in patch 18)?
 
-How about adding:
-
-	When TDMR is created, it stops spanning at NUAM boundary.
-
-> 
-> > +static int tdmr_get_nid(struct tdmr_info *tdmr)
-> > +{
-> > +	u64 start, end;
-> > +	int i;
-> > +
-> > +	/* Find the first RAM entry covered by the TDMR */
-> > +	e820_for_each_mem(i, start, end)
-> > +		if (end > TDMR_START(tdmr))
-> > +			break;
-> 
-> Brackets around the big loop, please.
-
-OK.
-
-> 
-> > +	/*
-> > +	 * One TDMR must cover at least one (or partial) RAM entry,
-> > +	 * otherwise it is kernel bug.  WARN_ON() in this case.
-> > +	 */
-> > +	if (WARN_ON_ONCE((start >= end) || start >= TDMR_END(tdmr)))
-> > +		return 0;
-> > +
-> > +	/*
-> > +	 * The first RAM entry may be partially covered by the previous
-> > +	 * TDMR.  In this case, use TDMR's start to find the NUMA node.
-> > +	 */
-> > +	if (start < TDMR_START(tdmr))
-> > +		start = TDMR_START(tdmr);
-> > +
-> > +	return phys_to_target_node(start);
-> > +}
-> > +
-> > +static int tdmr_setup_pamt(struct tdmr_info *tdmr)
-> > +{
-> > +	unsigned long tdmr_pamt_base, pamt_base[TDX_PG_MAX];
-> > +	unsigned long pamt_sz[TDX_PG_MAX];
-> > +	unsigned long pamt_npages;
-> > +	struct page *pamt;
-> > +	enum tdx_page_sz pgsz;
-> > +	int nid;
-> 
-> Sooooooooooooooooooo close to reverse Christmas tree, but no cigar.
-> Please fix it.
-
-Will fix.  Thanks.
-
-> 
-> > +	/*
-> > +	 * Allocate one chunk of physically contiguous memory for all
-> > +	 * PAMTs.  This helps minimize the PAMT's use of reserved areas
-> > +	 * in overlapped TDMRs.
-> > +	 */
-> 
-> Ahh, this explains it.  Considering that tdmr_get_pamt_sz() is really
-> just two lines of code, I'd probably just the helper and open-code it
-> here.  Then you only have one place to comment on it.
-
-It has a loop and internally calls __tdmr_get_pamt_sz().  It looks doesn't fit
-if we open-code it here.
-
-How about move this comment to tdmr_get_pamt_sz()?
-
-	
-> 
-> > +	nid = tdmr_get_nid(tdmr);
-> > +	pamt_npages = tdmr_get_pamt_sz(tdmr) >> PAGE_SHIFT;
-> > +	pamt = alloc_contig_pages(pamt_npages, GFP_KERNEL, nid,
-> > +			&node_online_map);
-> > +	if (!pamt)
-> > +		return -ENOMEM;
-> > +
-> > +	/* Calculate PAMT base and size for all supported page sizes. */
-> > +	tdmr_pamt_base = page_to_pfn(pamt) << PAGE_SHIFT;
-> > +	for (pgsz = TDX_PG_4K; pgsz < TDX_PG_MAX; pgsz++) {
-> > +		unsigned long sz = __tdmr_get_pamt_sz(tdmr, pgsz);
-> > +
-> > +		pamt_base[pgsz] = tdmr_pamt_base;
-> > +		pamt_sz[pgsz] = sz;
-> > +
-> > +		tdmr_pamt_base += sz;
-> > +	}
-> > +
-> > +	tdmr->pamt_4k_base = pamt_base[TDX_PG_4K];
-> > +	tdmr->pamt_4k_size = pamt_sz[TDX_PG_4K];
-> > +	tdmr->pamt_2m_base = pamt_base[TDX_PG_2M];
-> > +	tdmr->pamt_2m_size = pamt_sz[TDX_PG_2M];
-> > +	tdmr->pamt_1g_base = pamt_base[TDX_PG_1G];
-> > +	tdmr->pamt_1g_size = pamt_sz[TDX_PG_1G];
-> 
-> This would all vertically align nicely if you renamed pamt_sz -> pamt_size.
-
-OK.
-
-> 
-> > +	return 0;
-> > +}
-> > +
-> > +static void tdmr_free_pamt(struct tdmr_info *tdmr)
-> > +{
-> > +	unsigned long pamt_pfn, pamt_sz;
-> > +
-> > +	pamt_pfn = tdmr->pamt_4k_base >> PAGE_SHIFT;
-> 
-> Comment, please:
-> 
-> 	/*
-> 	 * The PAMT was allocated in one contiguous unit.  The 4k PAMT
-> 	 * should always point to the beginning of that allocation.
-> 	 */
-
-Thanks will add.
-
-> 
-> > +	pamt_sz = tdmr->pamt_4k_size + tdmr->pamt_2m_size + tdmr->pamt_1g_size;
-> > +
-> > +	/* Do nothing if PAMT hasn't been allocated for this TDMR */
-> > +	if (!pamt_sz)
-> > +		return;
-> > +
-> > +	if (WARN_ON(!pamt_pfn))
-> > +		return;
-> > +
-> > +	free_contig_range(pamt_pfn, pamt_sz >> PAGE_SHIFT);
-> > +}
-> > +
-> > +static void tdmrs_free_pamt_all(struct tdmr_info **tdmr_array, int tdmr_num)
-> > +{
-> > +	int i;
-> > +
-> > +	for (i = 0; i < tdmr_num; i++)
-> > +		tdmr_free_pamt(tdmr_array[i]);
-> > +}
-> > +
-> > +/* Allocate and set up PAMTs for all TDMRs */
-> > +static int tdmrs_setup_pamt_all(struct tdmr_info **tdmr_array, int tdmr_num)
-> 
-> 	"set_up", please, not "setup".
-
-OK.
-
-> 
-> > +{
-> > +	int i, ret;
-> > +
-> > +	for (i = 0; i < tdmr_num; i++) {
-> > +		ret = tdmr_setup_pamt(tdmr_array[i]);
-> > +		if (ret)
-> > +			goto err;
-> > +	}
-> > +
-> > +	return 0;
-> > +err:
-> > +	tdmrs_free_pamt_all(tdmr_array, tdmr_num);
-> > +	return -ENOMEM;
-> > +}
-> > +
-> >  static int construct_tdmrs(struct tdmr_info **tdmr_array, int *tdmr_num)
-> >  {
-> >  	int ret;
-> > @@ -971,8 +1124,14 @@ static int construct_tdmrs(struct tdmr_info **tdmr_array, int *tdmr_num)
-> >  	if (ret)
-> >  		goto err;
-> >  
-> > +	ret = tdmrs_setup_pamt_all(tdmr_array, *tdmr_num);
-> > +	if (ret)
-> > +		goto err_free_tdmrs;
-> > +
-> >  	/* Return -EFAULT until constructing TDMRs is done */
-> >  	ret = -EFAULT;
-> > +	tdmrs_free_pamt_all(tdmr_array, *tdmr_num);
-> > +err_free_tdmrs:
-> >  	free_tdmrs(tdmr_array, *tdmr_num);
-> >  err:
-> >  	return ret;
-> > @@ -1022,6 +1181,12 @@ static int init_tdx_module(void)
-> >  	 * initialization are done.
-> >  	 */
-> >  	ret = -EFAULT;
-> > +	/*
-> > +	 * Free PAMTs allocated in construct_tdmrs() when TDX module
-> > +	 * initialization fails.
-> > +	 */
-> > +	if (ret)
-> > +		tdmrs_free_pamt_all(tdmr_array, tdmr_num);
-> >  out_free_tdmrs:
-> >  	/*
-> >  	 * TDMRs are only used during initializing TDX module.  Always
-> 
-> In a follow-on patch, I'd like this to dump out (in a pr_debug() or
-> pr_info()) how much memory is consumed by PAMT allocations.
-
-OK.
-
-
+Thanks
+Kevin
