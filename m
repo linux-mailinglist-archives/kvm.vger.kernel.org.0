@@ -2,252 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 254705141DB
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 07:43:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC3705141E1
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 07:45:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354184AbiD2Fqy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 01:46:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39666 "EHLO
+        id S1354199AbiD2Fsb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 01:48:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231326AbiD2Fqv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 01:46:51 -0400
+        with ESMTP id S1354162AbiD2Fs2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 01:48:28 -0400
 Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85E056FF63;
-        Thu, 28 Apr 2022 22:43:33 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEED83FBD9;
+        Thu, 28 Apr 2022 22:45:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651211013; x=1682747013;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=UI81Hy0EeAd+tens49psKJFgFs0JlShTYmgbYNU/Y5k=;
-  b=EzAdR29A4QkLg470LLlbVWoBIyG8aCHWwkhki3cFFg2/xWZNbtUan6u3
-   C94p9YrdHuLnNnq49A8IrH+9l7i1c6MLM7MXpksjbdDnbp+9zg4G7cpUd
-   mBrGYmfHGyvfREBHnx0Ts/P5mpQyeYv/WgUe84SbnPQneXpscL1m1gNsi
-   j5vDOnyQjQJvqqErsaofgPgp+LB1ln8iT0qpn993smbSD+DmyA0J9190G
-   NfVqCG7fnnHVJHgGRUQf8zo+XCu+6VM4rq/lpY2FSsEsN8UT8RqEsU9Q5
-   ykTsNukgasY4BaOqFgo0d5vuT68riusx62t/ha5fkV9BdAcfRaFvS7hoK
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10331"; a="266065418"
+  t=1651211109; x=1682747109;
+  h=message-id:date:mime-version:subject:to:references:from:
+   in-reply-to:content-transfer-encoding;
+  bh=zvnfBG7BKg/DyeMcD9WDj5UDxwVxbi2ih2bn8ZMBFwc=;
+  b=imcmbKB/86pP2+taGtwBZGdtKtYXVSkify1cx5sRFL6cxHj1PS98joc0
+   9l+MqRSrJcp9hQbnLfiy7FQQfN7rVMKaz7CohvzqObhS54WK2b3V0jFc4
+   zyR3YwG/Fpm63phGLs++lvukovSdjh0Xf605CBkqkg3xsf5y6VXcMQJlB
+   cL9htnNdVL+EjXIKpLFJEwYhcgAgpYjr4XdTlMuK5AXwpseYEi+tervRy
+   TeGVZQfVIZxvggVb5dICKE9jy7Pwtdn64+FNzF5MQHGF0Is0exGXjRP2R
+   aEguVhydzqKa2mvKE/z4KqV5TKNXnXdtLz2Okoa26aYWQ7BJkRoSdnin+
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10331"; a="266065800"
 X-IronPort-AV: E=Sophos;i="5.91,297,1647327600"; 
-   d="scan'208";a="266065418"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2022 22:43:32 -0700
+   d="scan'208";a="266065800"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2022 22:45:09 -0700
 X-IronPort-AV: E=Sophos;i="5.91,297,1647327600"; 
-   d="scan'208";a="684103579"
-Received: from jenegret-mobl2.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.59.236])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2022 22:43:29 -0700
-Message-ID: <224392eea0042b621541aa916f49dd830704ba9a.camel@intel.com>
-Subject: Re: [PATCH v3 00/21] TDX host kernel support
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dan Williams <dan.j.williams@intel.com>
-Cc:     Dave Hansen <dave.hansen@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Kuppuswamy Sathyanarayanan 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>
-Date:   Fri, 29 Apr 2022 17:43:27 +1200
-In-Reply-To: <CAPcyv4iGsXkHAVgf+JZ4Pah_fkCZ=VvUmj7s3C6Rkejtdw_sgQ@mail.gmail.com>
-References: <cover.1649219184.git.kai.huang@intel.com>
-         <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
-         <CAPcyv4g5E_TOow=3pFJXyFr=KLV9pTSnDthgz6TuXvru4xDzaQ@mail.gmail.com>
-         <de9b8f4cef5da03226158492988956099199aa60.camel@intel.com>
-         <CAPcyv4iGsXkHAVgf+JZ4Pah_fkCZ=VvUmj7s3C6Rkejtdw_sgQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+   d="scan'208";a="560126685"
+Received: from yangweij-mobl.ccr.corp.intel.com (HELO [10.249.171.134]) ([10.249.171.134])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2022 22:45:06 -0700
+Message-ID: <cc1089a8-cbb6-4148-2721-9beb694591b7@intel.com>
+Date:   Fri, 29 Apr 2022 13:45:02 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+Subject: Re: [PATCH v10 08/16] KVM: x86/pmu: Refactor code to support guest
+ Arch LBR
+Content-Language: en-US
+To:     "Liang, Kan" <kan.liang@linux.intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "like.xu.linux@gmail.com" <like.xu.linux@gmail.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20220422075509.353942-1-weijiang.yang@intel.com>
+ <20220422075509.353942-9-weijiang.yang@intel.com>
+ <4ad3bbff-8577-8e84-6ed9-b6f90e018224@linux.intel.com>
+From:   "Yang, Weijiang" <weijiang.yang@intel.com>
+In-Reply-To: <4ad3bbff-8577-8e84-6ed9-b6f90e018224@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-04-28 at 19:58 -0700, Dan Williams wrote:
-> On Wed, Apr 27, 2022 at 6:21 PM Kai Huang <kai.huang@intel.com> wrote:
-> > 
-> > On Wed, 2022-04-27 at 18:01 -0700, Dan Williams wrote:
-> > > On Tue, Apr 26, 2022 at 1:10 PM Dave Hansen <dave.hansen@intel.com> wrote:
-> > > [..]
-> > > > > 3. Memory hotplug
-> > > > > 
-> > > > > The first generation of TDX architecturally doesn't support memory
-> > > > > hotplug.  And the first generation of TDX-capable platforms don't support
-> > > > > physical memory hotplug.  Since it physically cannot happen, this series
-> > > > > doesn't add any check in ACPI memory hotplug code path to disable it.
-> > > > > 
-> > > > > A special case of memory hotplug is adding NVDIMM as system RAM using
-> > > 
-> > > Saw "NVDIMM" mentioned while browsing this, so stopped to make a comment...
-> > > 
-> > > > > kmem driver.  However the first generation of TDX-capable platforms
-> > > > > cannot enable TDX and NVDIMM simultaneously, so in practice this cannot
-> > > > > happen either.
-> > > > 
-> > > > What prevents this code from today's code being run on tomorrow's
-> > > > platforms and breaking these assumptions?
-> > > 
-> > > The assumption is already broken today with NVDIMM-N. The lack of
-> > > DDR-T support on TDX enabled platforms has zero effect on DDR-based
-> > > persistent memory solutions. In other words, please describe the
-> > > actual software and hardware conflicts at play here, and do not make
-> > > the mistake of assuming that "no DDR-T support on TDX platforms" ==
-> > > "no NVDIMM support".
-> > 
-> > Sorry I got this information from planning team or execution team I guess. I was
-> > told NVDIMM and TDX cannot "co-exist" on the first generation of TDX capable
-> > machine.  "co-exist" means they cannot be turned on simultaneously on the same
-> > platform.  I am also not aware NVDIMM-N, nor the difference between DDR based
-> > and DDR-T based persistent memory.  Could you give some more background here so
-> > I can take a look?
-> 
-> My rough understanding is that TDX makes use of metadata communicated
-> "on the wire" for DDR, but that infrastructure is not there for DDR-T.
-> However, there are plenty of DDR based NVDIMMs that use super-caps /
-> batteries and flash to save contents. I believe the concern for TDX is
-> that the kernel needs to know not use TDX accepted PMEM as PMEM
-> because the contents saved by the DIMM's onboard energy source are
-> unreadable outside of a TD.
-> 
-> Here is one of the links that comes up in a search for NVDIMM-N.
-> 
-> https://www.snia.org/educational-library/what-you-can-do-nvdimm-n-and-nvdimm-p-2019
 
-Thanks for the info.  I need some more time to digest those different types of
-DDRs and NVDIMMs.  However I guess they are not quite relevant since TDX has a
-concept of "Convertible Memory Region".  Please see below.
-
-> 
-> > 
-> > > 
-> > > > > Another case is admin can use 'memmap' kernel command line to create
-> > > > > legacy PMEMs and use them as TD guest memory, or theoretically, can use
-> > > > > kmem driver to add them as system RAM.  To avoid having to change memory
-> > > > > hotplug code to prevent this from happening, this series always include
-> > > > > legacy PMEMs when constructing TDMRs so they are also TDX memory.
-> > > 
-> > > I am not sure what you are trying to say here?
-> > 
-> > We want to always make sure the memory managed by page allocator is TDX memory.
-> 
-> That only seems possible if the kernel is given a TDX capable physical
-> address map at the beginning of time.
-
-Yes TDX architecture has a concept "Convertible Memory Region" (CMR). The memory
-used by TDX must be convertible memory.  BIOS generates an array of CMR entries
-during boot and they are verified by MCHECK.  CMRs are static during machine's
-runtime.
-
-> 
-> > So if the legacy PMEMs are unconditionally configured as TDX memory, then we
-> > don't need to prevent them from being added as system memory via kmem driver.
-> 
-> I think that is too narrow of a focus.
-> 
-> Does a memory map exist for the physical address ranges that are TDX
-> capable? Please don't say EFI_MEMORY_CPU_CRYPTO, as that single bit is
-> ambiguous beyond the point of utility across the industry's entire
-> range of confidential computing memory capabilities.
-> 
-> One strawman would be an ACPI table with contents like:
-> 
-> struct acpi_protected_memory {
->    struct range range;
->    uuid_t platform_mem_crypto_capability;
-> };
-> 
-> With some way to map those uuids to a set of platform vendor specific
-> constraints and specifications. Some would be shared across
-> confidential computing vendors, some might be unique. Otherwise, I do
-> not see how you enforce the expectation of "all memory in the page
-> allocator is TDX capable". 
-> 
-
-Please see above.  TDX has CMR.
-
-> The other alternative is that *none* of the
-> memory in the page allocator is TDX capable and a special memory
-> allocation device is used to map memory for TDs. In either case a map
-> of all possible TDX memory is needed and the discussion above seems
-> like an incomplete / "hopeful" proposal about the memory dax_kmem, or
-> other sources, might online. 
-
-Yes we are also developing a new memfd based approach to support TD guest
-memory.  Please see my another reply to you.
-
-
-> See the CXL CEDT CFWMS (CXL Fixed Memory
-> Window Structure) as an example of an ACPI table that sets the
-> kernel's expectations about how a physical address range might be
-> used.
-> 
-> https://www.computeexpresslink.org/spec-landing
-
-Thanks for the info. I'll take a look to get some background.
-
-> 
-> > 
-> > > 
-> > > > > 4. CPU hotplug
-> > > > > 
-> > > > > The first generation of TDX architecturally doesn't support ACPI CPU
-> > > > > hotplug.  All logical cpus are enabled by BIOS in MADT table.  Also, the
-> > > > > first generation of TDX-capable platforms don't support ACPI CPU hotplug
-> > > > > either.  Since this physically cannot happen, this series doesn't add any
-> > > > > check in ACPI CPU hotplug code path to disable it.
-> > > 
-> > > What are the actual challenges posed to TDX with respect to CPU hotplug?
-> > 
-> > During the TDX module initialization, there is a step to call SEAMCALL on all
-> > logical cpus to initialize per-cpu TDX staff.  TDX doesn't support initializing
-> > the new hot-added CPUs after the initialization.  There are MCHECK/BIOS changes
-> > to enforce this check too I guess but I don't know details about this.
-> 
-> Is there an ACPI table that indicates CPU-x passed the check? Or since
-> the BIOS is invoked in the CPU-online path, is it trusted to suppress
-> those events for CPUs outside of the mcheck domain?
-
-No the TDX module (and the P-SEAMLDR) internally maintains some data to record
-the total number of LPs and packages, and which logical cpu has been
-initialized, etc.
-
-I asked Intel guys whether BIOS would suppress an ACPI CPU hotplug event but I
-never got a concrete answer.  I'll try again.
-
-> 
-> > > > > Also, only TDX module initialization requires all BIOS-enabled cpus are
-> > > 
-> > > Please define "BIOS-enabled" cpus. There is no "BIOS-enabled" line in
-> > > /proc/cpuinfo for example.
-> > 
-> > It means the CPUs with "enable" bit set in the MADT table.
-> 
-> That just indicates to the present CPUs and then a hot add event
-> changes the state of now present CPUs to enabled. Per above is the
-> BIOS responsible for rejecting those new CPUs, or is the kernel?
-
-I'll ask BIOS guys again to see whether BIOS will suppress ACPI CPU hotplug
-event.  But I think we can have a simple patch to reject ACPI CPU hotplug if
-platform is TDX-capable?
-
-Or do you think we don't need to explicitly reject ACPI CPU hotplug if we can
-confirm with BIOS guys that it will suppress on TDX capable machine?
-
--- 
-Thanks,
--Kai
-
-
+On 4/28/2022 10:18 PM, Liang, Kan wrote:
+>
+> On 4/22/2022 3:55 AM, Yang Weijiang wrote:
+>> Take account of Arch LBR when do sanity checks before program
+>> vPMU for guest. Pass through Arch LBR recording MSRs to guest
+>> to gain better performance. Note, Arch LBR and Legacy LBR support
+>> are mutually exclusive, i.e., they're not both available on one
+>> platform.
+>>
+>> Co-developed-by: Like Xu <like.xu@linux.intel.com>
+>> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+>> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+>> ---
+>>    arch/x86/kvm/vmx/pmu_intel.c | 37 +++++++++++++++++++++++++++++-------
+>>    arch/x86/kvm/vmx/vmx.c       |  3 +++
+>>    2 files changed, 33 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+>> index 7dc8a5783df7..cb28888e9f4f 100644
+>> --- a/arch/x86/kvm/vmx/pmu_intel.c
+>> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+>> @@ -170,12 +170,16 @@ static inline struct kvm_pmc *get_fw_gp_pmc(struct kvm_pmu *pmu, u32 msr)
+>>    
+>>    bool intel_pmu_lbr_is_compatible(struct kvm_vcpu *vcpu)
+>>    {
+>> +	if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
+>> +		return guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR);
+>> +
+>>    	/*
+>>    	 * As a first step, a guest could only enable LBR feature if its
+>>    	 * cpu model is the same as the host because the LBR registers
+>>    	 * would be pass-through to the guest and they're model specific.
+>>    	 */
+>> -	return boot_cpu_data.x86_model == guest_cpuid_model(vcpu);
+>> +	return !boot_cpu_has(X86_FEATURE_ARCH_LBR) &&
+>> +		boot_cpu_data.x86_model == guest_cpuid_model(vcpu);
+>>    }
+>>    
+>>    bool intel_pmu_lbr_is_enabled(struct kvm_vcpu *vcpu)
+>> @@ -193,12 +197,19 @@ static bool intel_pmu_is_valid_lbr_msr(struct kvm_vcpu *vcpu, u32 index)
+> I think we should move MSR_ARCH_LBR_DEPTH and MSR_ARCH_LBR_CTL to this
+> function as well, since they are LBR related MSRs.
+Makes sense, will change it in next version.
+>
+>>    	if (!intel_pmu_lbr_is_enabled(vcpu))
+>>    		return ret;
+>>    
+>> -	ret = (index == MSR_LBR_SELECT) || (index == MSR_LBR_TOS) ||
+>> -		(index >= records->from && index < records->from + records->nr) ||
+>> -		(index >= records->to && index < records->to + records->nr);
+>> +	if (!guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
+>> +		ret = (index == MSR_LBR_SELECT) || (index == MSR_LBR_TOS);
+>> +
+>> +	if (!ret) {
+>> +		ret = (index >= records->from &&
+>> +		       index < records->from + records->nr) ||
+>> +		      (index >= records->to &&
+>> +		       index < records->to + records->nr);
+>> +	}
+>>    
+>>    	if (!ret && records->info)
+>> -		ret = (index >= records->info && index < records->info + records->nr);
+>> +		ret = (index >= records->info &&
+>> +		       index < records->info + records->nr);
+> Please use "{}" since you split it to two lines.
+OK.
+>
+> Thanks,
+> Kan
+>>    
+>>    	return ret;
+>>    }
+>> @@ -747,6 +758,9 @@ static void vmx_update_intercept_for_lbr_msrs(struct kvm_vcpu *vcpu, bool set)
+>>    			vmx_set_intercept_for_msr(vcpu, lbr->info + i, MSR_TYPE_RW, set);
+>>    	}
+>>    
+>> +	if (guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
+>> +		return;
+>> +
+>>    	vmx_set_intercept_for_msr(vcpu, MSR_LBR_SELECT, MSR_TYPE_RW, set);
+>>    	vmx_set_intercept_for_msr(vcpu, MSR_LBR_TOS, MSR_TYPE_RW, set);
+>>    }
+>> @@ -787,10 +801,13 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
+>>    {
+>>    	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+>>    	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
+>> +	bool lbr_enable = guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR) ?
+>> +		(vmcs_read64(GUEST_IA32_LBR_CTL) & ARCH_LBR_CTL_LBREN) :
+>> +		(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR);
+>>    
+>>    	if (!lbr_desc->event) {
+>>    		vmx_disable_lbr_msrs_passthrough(vcpu);
+>> -		if (vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR)
+>> +		if (lbr_enable)
+>>    			goto warn;
+>>    		if (test_bit(INTEL_PMC_IDX_FIXED_VLBR, pmu->pmc_in_use))
+>>    			goto warn;
+>> @@ -807,13 +824,19 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
+>>    	return;
+>>    
+>>    warn:
+>> +	if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
+>> +		wrmsrl(MSR_ARCH_LBR_DEPTH, lbr_desc->records.nr);
+>>    	pr_warn_ratelimited("kvm: vcpu-%d: fail to passthrough LBR.\n",
+>>    		vcpu->vcpu_id);
+>>    }
+>>    
+>>    static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
+>>    {
+>> -	if (!(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR))
+>> +	bool lbr_enable = guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR) ?
+>> +		(vmcs_read64(GUEST_IA32_LBR_CTL) & ARCH_LBR_CTL_LBREN) :
+>> +		(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR);
+>> +
+>> +	if (!lbr_enable)
+>>    		intel_pmu_release_guest_lbr_event(vcpu);
+>>    }
+>>    
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 73961fcfb62d..a1816c6597f5 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -573,6 +573,9 @@ static bool is_valid_passthrough_msr(u32 msr)
+>>    	case MSR_LBR_NHM_TO ... MSR_LBR_NHM_TO + 31:
+>>    	case MSR_LBR_CORE_FROM ... MSR_LBR_CORE_FROM + 8:
+>>    	case MSR_LBR_CORE_TO ... MSR_LBR_CORE_TO + 8:
+>> +	case MSR_ARCH_LBR_FROM_0 ... MSR_ARCH_LBR_FROM_0 + 31:
+>> +	case MSR_ARCH_LBR_TO_0 ... MSR_ARCH_LBR_TO_0 + 31:
+>> +	case MSR_ARCH_LBR_INFO_0 ... MSR_ARCH_LBR_INFO_0 + 31:
+>>    		/* LBR MSRs. These are handled in vmx_update_intercept_for_lbr_msrs() */
+>>    		return true;
+>>    	}
