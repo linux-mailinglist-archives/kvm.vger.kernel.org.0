@@ -2,231 +2,289 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5470051475F
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 12:50:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E633651473F
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 12:49:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358242AbiD2KuA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 06:50:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59180 "EHLO
+        id S1358032AbiD2KvD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 06:51:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358085AbiD2KtS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 06:49:18 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 613ABCB009
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 03:44:27 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 21BE01063;
-        Fri, 29 Apr 2022 03:44:27 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 68F1B3F73B;
-        Fri, 29 Apr 2022 03:44:25 -0700 (PDT)
-Date:   Fri, 29 Apr 2022 11:44:27 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com, Quentin Perret <qperret@google.com>,
+        with ESMTP id S1358260AbiD2Kuy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 06:50:54 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BE1226ADF
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 03:45:21 -0700 (PDT)
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23TAiQPp011396;
+        Fri, 29 Apr 2022 10:44:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2021-07-09;
+ bh=YvIlKqX1jdO8j2SMl1Pp2XjqT+m3KXUKu/FiHDFcLMo=;
+ b=WbVys2K5NLgyMapejYUk8t8hVsPfsej8zb+o997JTdA1XWQnbEeAj7FFgs8mJ/S7VwmZ
+ 3dtnMnWV0S4oeXpDG65vXMe7/0ZM8Q9o18jJpygC4kjO2yppMQLBkrIIXI9K7MiTZtEh
+ co98XVKyc1nsqo9Uvnn4N+EQPPhAm/7ds0SGGv0eP26eVsLBcL33aJz2rYLfMRpconDD
+ rK8H2TrQuaiGty9rpqubwRzK+vqGmlUYyTYQMU+3CDP74ZOZ7ZuOdap8wx1Xi9JsisZi
+ /CBxP+ggZFcZoUQRPMC+CdvoREjqxbDA68PdnVe3Pb6o4ibPF8y73Sd4+LtOZuWx6dit 5g== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3fmaw4phem-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 29 Apr 2022 10:44:50 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.16.1.2/8.16.1.2) with SMTP id 23TAeFw9020722;
+        Fri, 29 Apr 2022 10:44:50 GMT
+Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2174.outbound.protection.outlook.com [104.47.55.174])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com with ESMTP id 3fm7w7vqmy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 29 Apr 2022 10:44:50 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VFLDERcNUAk2Xfi/sWF5rvyXuCjX2IvBLreb4SSJQogO4Os6b3oRIp3KCo7tyhTx5L5e6Xt8D6LNFEbhp0llAoIwa6UqxJqaZ1swe8TESc3mRhRYbAtNitUsmX6W5KWRPiUyjBgQRZmbFo4GGE4u2E3hgFJ0kmSEbesV/o8p8Ws9po0yw3RF1X6cLjKmAeUOtHDuupk8u+AX59Q7c3YbRtJXgQQHujir2vBNinJJbY+K19RBsX8dqpxnPhnaDpDetLrvrMG39c5TOX2tO9HVVFvnwOnCIz8XNTpzRh9R0isxsyiUnEFTVib9WNQI4zIabEYcXPk0NDzpAM7DrEgAyA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YvIlKqX1jdO8j2SMl1Pp2XjqT+m3KXUKu/FiHDFcLMo=;
+ b=HMsof7IcW1nvFA/TMzREZzLbt0i51kEJKFw5p6O6OQHCY0jCwE55RIKFb54OKzCZO9qj0Z62BXilJcIB7eP5rHy5GFeQXJfQNDO9MsvoZnvDHN6fTww8toTu5Or4+SnjY5IqeWdwICmPoXAKw3wSfWjhWno7SgjhklnfAV9srXH/n3wxei2TTbFnAy+9VNckVUp4wwjsf1O/5USpXwScIVaZs39dk21gap+UQERd8oQjxE7CqFcHi9P8OnDmpeOLSg1ccO3d0KnrvmbAtAselFtWBj3hhvgTM7bHsjGZVsGCOYXsF0LwX3Gsm94H5XzLHmTjLHtzy7AcUEQoTsqjUg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YvIlKqX1jdO8j2SMl1Pp2XjqT+m3KXUKu/FiHDFcLMo=;
+ b=EhRRJp4oRTUvzjErlEsVPNtBGZdo15D0PN2fpuxxnKlrBf3un03e/jSeDBqpLQaBkrO2MEhsYCnzeqOiKpe7ZhZb8zqfTcS/OP+GxnmVkXeMtOWTfEuUkXnlPtmAmUyssRxXTVkFAK6lJo3NDw5zsZdadWzekrTSW2BKzea0e1I=
+Received: from BLAPR10MB4835.namprd10.prod.outlook.com (2603:10b6:208:331::11)
+ by BN8PR10MB3220.namprd10.prod.outlook.com (2603:10b6:408:c8::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5206.13; Fri, 29 Apr
+ 2022 10:44:48 +0000
+Received: from BLAPR10MB4835.namprd10.prod.outlook.com
+ ([fe80::b9e5:d1b6:b4be:f9d]) by BLAPR10MB4835.namprd10.prod.outlook.com
+ ([fe80::b9e5:d1b6:b4be:f9d%5]) with mapi id 15.20.5206.013; Fri, 29 Apr 2022
+ 10:44:48 +0000
+Message-ID: <f07188e8-501f-770a-b9a3-c7ea2907c969@oracle.com>
+Date:   Fri, 29 Apr 2022 11:44:40 +0100
+Subject: Re: [PATCH RFC 01/19] iommu: Add iommu_domain ops for dirty tracking
+Content-Language: en-US
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
         Will Deacon <will@kernel.org>,
-        Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v2] KVM: arm64: Inject exception on out-of-IPA-range
- translation fault
-Message-ID: <YmvBi/BF7rA43lqr@monolith.localdoman>
-References: <20220427220434.3097449-1-maz@kernel.org>
- <YmpUXWRJc3Kq3wGE@monolith.localdoman>
- <87zgk5b5bh.wl-maz@kernel.org>
- <Ymq7qUU67DoXTmkP@monolith.localdoman>
- <87v8ut853n.wl-maz@kernel.org>
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>
+References: <20220428210933.3583-1-joao.m.martins@oracle.com>
+ <20220428210933.3583-2-joao.m.martins@oracle.com>
+ <BN9PR11MB527684203C6344FF46B4163A8CFC9@BN9PR11MB5276.namprd11.prod.outlook.com>
+From:   Joao Martins <joao.m.martins@oracle.com>
+In-Reply-To: <BN9PR11MB527684203C6344FF46B4163A8CFC9@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM9P250CA0019.EURP250.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21c::24) To BLAPR10MB4835.namprd10.prod.outlook.com
+ (2603:10b6:208:331::11)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87v8ut853n.wl-maz@kernel.org>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a801eb29-7891-41e9-6a3d-08da29cd483c
+X-MS-TrafficTypeDiagnostic: BN8PR10MB3220:EE_
+X-Microsoft-Antispam-PRVS: <BN8PR10MB32206E6B8DAFDE9199791295BBFC9@BN8PR10MB3220.namprd10.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: YqtuuzKLYT+d8Cy/XlYNYUlbEHUc10Ot2Hs40r9mToM+eg6GedV4XkBkhP8jZ5Kkai4MZNGKlVF7XU2gdOu6154Mq1RQ+stddawHKJDZuFRHZo5JQExbIxBB4FPvwSLlq8K2pExQxo0/h1Nrlx5/PJBKA6g89NZ9MfhC0gR3uBDQOSUQvI1gi+MbMDoWFipw30pVTedclioaIVQ56O7z3dy1jQcc9hZCPQXknNgZX7/XWJ4tBD18Prdv/JredWCLVDBBTrIbMEj3t1KWvFWzZw2qulsedkce6EyynipRP+h+eCMjbg9Q10HkhYW35pXpv+9wy7NCBkJQlLrCbF0IOy3D+1Q7hXfe4OKDcw8FyGQJbmQbMxcghvcJc1/s56CEWP9LOeF2dSiX+yZd80iQI0o6GwqbPOr4Uto1AG6OvcCSX6678Lck+CHWxs1RfgUS0p2ws+KRb3V1pN8tLDxoQFvjw8ozDhR2OF28VkkL3VfnsAZ3foLqeA4q5T76uR8JVpvnwjkRonPjcK2IfbgCqU1kinoVa68Vi5SC6CMhuljPcEZmmGZF0447MPMy22ZBD4sRYIy8in31GluFaG/LM7hdSCmEzi+N9rijcPUOYzzhhg5yFl6VgHQ+5DxEjpFOu6i9vc6VwyfEuZrMwygz3nf89EDKHQvJOsSABqUixoZ5wiBPxSNV/TpMRgELP0xl3Aq2+wxSc6xT/KT/l/fZQyIJEfJSdzVeOdNRcojkw4g=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(38100700002)(7416002)(31696002)(2906002)(6666004)(8936002)(5660300002)(508600001)(186003)(6486002)(316002)(6512007)(4326008)(26005)(6916009)(54906003)(2616005)(66476007)(66946007)(66556008)(53546011)(31686004)(36756003)(6506007)(86362001)(8676002)(83380400001)(14143004)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NVk4T1N5RmNhSkNLZDhXOSs0N1IzUlFsNGRRMm56dENLZGFTbjJ5NnBkM0RQ?=
+ =?utf-8?B?YlluQjZPRU9YRlE4b1B2U0Z3U3VTRlpKWHdhV3lmcUN1blR4dzNXUUsyc2NB?=
+ =?utf-8?B?U05FQjhPUmw0U0dWblMzOHhaWGh6NHBlV3REWkJLQzBBSXIyT0NpaHVHUncw?=
+ =?utf-8?B?M2ZYU2F4UDBNamtBQzA4ZXluWEVhaEhsTnlPVHdyNmVRbnBzeHlqUC9FbXhO?=
+ =?utf-8?B?NkdDNU1lcFE0MVFnMGh5Umo5THFzd1ZGNHpRUnFGUEpsc0o4bG1HbTVHZndx?=
+ =?utf-8?B?aXBDOWMrdEZldncybXRIM3BTWlpxVWI4UURkR1o3eEhFajk3WFFoWHpoa1Jk?=
+ =?utf-8?B?bnhoUVVIRk5WRURZRnBSQWVYQTl4Z29zdWxTMS9Fc0x4dS9ZS2E0a3ZjcVdK?=
+ =?utf-8?B?QjF2eWdMR3A3cmNad3NCY1crU0cwRy9UNjV5c2ErS0xrVmtjRlhtSFpqVFEy?=
+ =?utf-8?B?Rk4rZHdCZFZOUHFFSmsyci95elZvRmNmT2lzM3Z4UnNiem1RRWs2STc1dlRZ?=
+ =?utf-8?B?N2ZrWW5FcGVPYVppTzVnaVppMTlobXNGT21XN0QzVlZCajFsSFJORFV2dTg4?=
+ =?utf-8?B?ejllV3BkeHhFaDNPQWQzZVI3OWRSMkRmSnEzajZBWW9uVEZDMmFoOVJiNW1O?=
+ =?utf-8?B?ZEtPWmh2VHpmYzVYSWEydXBhUVVTOFNsbGZiWjNNTmFqMmRnaXdYdzhHWmRD?=
+ =?utf-8?B?Z05vK2ZoaWd1RjJZYjlORUF6a1I3bWpHc0JaemM5YzdTT3RrT0ZxK0xLTjJQ?=
+ =?utf-8?B?NFRvdElPTHdWRno2VjNocEJZZDJuQytOVjVCT3graHBBWHZMeG9XWTFwSnBt?=
+ =?utf-8?B?ZkNqOFduSzIyNDE1N2FOdzFiU0VsTm5aNGwxNDlsTldkdHpISGxGaEJ5UzFm?=
+ =?utf-8?B?OUVKQmR6cU12ZDlZcHRQUnh6NjlMYm0rZFlRbFZHZW4xM0NzeTlQOXFGS0li?=
+ =?utf-8?B?YnNhU3VVcmN4a3JhUDF1Z215OXBxWHd2ZE1sWmdXOUxlWTBuUy82Vk5qTU45?=
+ =?utf-8?B?eUkwZ05lU2RQWTY2K2dRMlVCdlhrQUt6SnFoTFJyQXQ3cjFYRFdZQUlIWCtp?=
+ =?utf-8?B?TmQ3eTMwVmxSVElydXJHanhXdng1VTBjZmZVMUMrNHRzN3MyRWZCS1VjNmlM?=
+ =?utf-8?B?dmRsMUxXUEdjRnJwdWYvdFBzbDVYalBNdVNOd1UxME9BZXNUTGRCVnZPNFdF?=
+ =?utf-8?B?S2pTREErcTZDbEs5NnI3R2V1bDY2QWliUnpDOGxhMVdLcXo0YXorSjBjaEZh?=
+ =?utf-8?B?NnNGZDF5bEc1ZDdkd1laNWUwMUxjMVB4QytRdjVjNWpCeXkvUEFQS2FlbEN5?=
+ =?utf-8?B?U2YvYXd4QytWZXlkSHRNa0ZuckhlczRueTJlbFhyL1lzd1Vzd2FYb2h4Zmhz?=
+ =?utf-8?B?bkxMaXpsWG44MTdlRUM5L2hGa0QvU2hjQTZERVdVaEE1THpEd0NQRDN6YU9r?=
+ =?utf-8?B?VmQrWjJoS0F4S3pDeUVlVWE0UmFnT3liSExUUXo1Ui8vQW9kOTlGV2pWdDNk?=
+ =?utf-8?B?R3VZbGxaK1pKWlhjdlhreHNrVTdxNDRPbGVxc1lXUlI5SzZubTRFVFdWWnNo?=
+ =?utf-8?B?cHRkNFhzUktRMW1WRmt4RVRpWDRHWjJvdTFnT2xrU3hvb0RrZThJV2s3cVJy?=
+ =?utf-8?B?Rmx0ZlkxT3YzOTEwWlJ5UzZ4R3pYYVY0ZS9mdmVUZk9DQlpFV2cvTUVuNXJD?=
+ =?utf-8?B?Q3YzcXRQRkJqTjNBK3g2bkFQTzFkdjJSNnhRZGprS05qeFVER0V5d1FHMVlF?=
+ =?utf-8?B?L0hFSW4rZHk1QmpTV0NPdllGa21kSUdPMm9BNGcxbmVEdWRpNnBHZU1iSkpH?=
+ =?utf-8?B?cGNMdnVzUDlBN2RXTjRSQWo3ZXBmNlE0WVpOSHhvS1oyZk9MRmJiTlZBbzZv?=
+ =?utf-8?B?UUZBaVArM3h3N08zcytQQ2xVazhnOXZUM3dtdmMyb3N3NVozTGxsUmpvWDd5?=
+ =?utf-8?B?aDVtMmljZndxaWppMXFjNThxT24yczNCMHlHaUVPQUt2Ylc3WWJvcHdUUVpD?=
+ =?utf-8?B?ckRjNDAzTDlmamFPZTgxR2orbmFqc0QwWlBrSXc1UHhWZjhFOVVlaVJzV0gw?=
+ =?utf-8?B?a0RhMnBFTUZlUVdDSVJYNFEydFJSeTFGUzB6Nk15T2VXek83d1Ird1BOam9r?=
+ =?utf-8?B?dVovditnZlZTUldLUlg5aDVLZmZsRjdxR2NlYTFvdG55eEgrWHh6M01mYnJh?=
+ =?utf-8?B?d3NUTFNMUmhPZjd0ODk4TUY5ank0MXlqR24xK2N2VUlLRmVlelY0MTU2Vmx5?=
+ =?utf-8?B?eDlDNkdjSjA4dFpKS2VBVEJhYWdoTWZibndjQUROMmVTZFpKUDY3TXp2NTd0?=
+ =?utf-8?B?V0hOSEVPSm9zSW0yNy9KdEJuL0UyYjlPNXMwMjA5dlNHR2x2SjZiZGhvRXZY?=
+ =?utf-8?Q?t50oaLW/a4m1Wc7Y=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a801eb29-7891-41e9-6a3d-08da29cd483c
+X-MS-Exchange-CrossTenant-AuthSource: BLAPR10MB4835.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2022 10:44:48.5487
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: h25lGAC96PyHv4f8d7qAAczSfpkUUdV7aLx/mItjosZJnKIfoQ/F33O6PoYTGSZxSa7+/4O0y72cXUUGU6AeZvfVZkiGzqrYXuxVRpM59yU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR10MB3220
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.486,18.0.858
+ definitions=2022-04-29_03:2022-04-28,2022-04-29 signatures=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
+ malwarescore=0 mlxscore=0 phishscore=0 bulkscore=0 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204290061
+X-Proofpoint-GUID: v-oXG_K9WKdieEEnb13lJsKBPQlbIuMd
+X-Proofpoint-ORIG-GUID: v-oXG_K9WKdieEEnb13lJsKBPQlbIuMd
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On 4/29/22 08:54, Tian, Kevin wrote:
+>> From: Joao Martins <joao.m.martins@oracle.com>
+>> Sent: Friday, April 29, 2022 5:09 AM
+>>
+>> Add to iommu domain operations a set of callbacks to
+>> perform dirty tracking, particulary to start and stop
+>> tracking and finally to test and clear the dirty data.
+> 
+> to be consistent with other context, s/test/read/
+> 
+/me nods
 
-On Thu, Apr 28, 2022 at 06:55:56PM +0100, Marc Zyngier wrote:
-> On Thu, 28 Apr 2022 17:07:21 +0100,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > Hi,
-> > 
-> > On Thu, Apr 28, 2022 at 04:22:58PM +0100, Marc Zyngier wrote:
-> > > On Thu, 28 Apr 2022 09:46:21 +0100,
-> > > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > > > 
-> > > > Hi,
-> > > > 
-> > > > On Wed, Apr 27, 2022 at 11:04:34PM +0100, Marc Zyngier wrote:
-> > > > > When taking a translation fault for an IPA that is outside of
-> > > > > the range defined by the hypervisor (between the HW PARange and
-> > > > > the IPA range), we stupidly treat it as an IO and forward the access
-> > > > > to userspace. Of course, userspace can't do much with it, and things
-> > > > > end badly.
-> > > > > 
-> > > > > Arguably, the guest is braindead, but we should at least catch the
-> > > > > case and inject an exception.
-> > > > > 
-> > > > > Check the faulting IPA against:
-> > > > > - the sanitised PARange: inject an address size fault
-> > > > > - the IPA size: inject an abort
-> > > > > 
-> > > > > Reported-by: Christoffer Dall <christoffer.dall@arm.com>
-> > > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > > > ---
-> > > > >  arch/arm64/include/asm/kvm_emulate.h |  1 +
-> > > > >  arch/arm64/kvm/inject_fault.c        | 28 ++++++++++++++++++++++++++++
-> > > > >  arch/arm64/kvm/mmu.c                 | 19 +++++++++++++++++++
-> > > > >  3 files changed, 48 insertions(+)
-> > > > > 
-> > > > > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> > > > > index 7496deab025a..f71358271b71 100644
-> > > > > --- a/arch/arm64/include/asm/kvm_emulate.h
-> > > > > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> > > > > @@ -40,6 +40,7 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
-> > > > >  void kvm_inject_vabt(struct kvm_vcpu *vcpu);
-> > > > >  void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
-> > > > >  void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
-> > > > > +void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
-> > > > >  
-> > > > >  void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
-> > > > >  
-> > > > > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> > > > > index b47df73e98d7..ba20405d2dc2 100644
-> > > > > --- a/arch/arm64/kvm/inject_fault.c
-> > > > > +++ b/arch/arm64/kvm/inject_fault.c
-> > > > > @@ -145,6 +145,34 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
-> > > > >  		inject_abt64(vcpu, true, addr);
-> > > > >  }
-> > > > >  
-> > > > > +void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
-> > > > > +{
-> > > > > +	unsigned long addr, esr;
-> > > > > +
-> > > > > +	addr  = kvm_vcpu_get_fault_ipa(vcpu);
-> > > > > +	addr |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
-> > > > > +
-> > > > > +	if (kvm_vcpu_trap_is_iabt(vcpu))
-> > > > > +		kvm_inject_pabt(vcpu, addr);
-> > > > > +	else
-> > > > > +		kvm_inject_dabt(vcpu, addr);
-> > > > > +
-> > > > > +	/*
-> > > > > +	 * If AArch64 or LPAE, set FSC to 0 to indicate an Address
-> > > > > +	 * Size Fault at level 0, as if exceeding PARange.
-> > > > > +	 *
-> > > > > +	 * Non-LPAE guests will only get the external abort, as there
-> > > > > +	 * is no way to to describe the ASF.
-> > > > > +	 */
-> > > > > +	if (vcpu_el1_is_32bit(vcpu) &&
-> > > > > +	    !(vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE))
-> > > > > +		return;
-> > > > > +
-> > > > > +	esr = vcpu_read_sys_reg(vcpu, ESR_EL1);
-> > > > > +	esr &= ~GENMASK_ULL(5, 0);
-> > > > > +	vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
-> > > > > +}
-> > > > > +
-> > > > >  /**
-> > > > >   * kvm_inject_undefined - inject an undefined instruction into the guest
-> > > > >   * @vcpu: The vCPU in which to inject the exception
-> > > > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > > > index 53ae2c0640bc..5400fc020164 100644
-> > > > > --- a/arch/arm64/kvm/mmu.c
-> > > > > +++ b/arch/arm64/kvm/mmu.c
-> > > > > @@ -1337,6 +1337,25 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
-> > > > >  	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
-> > > > >  	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
-> > > > >  
-> > > > > +	if (fault_status == FSC_FAULT) {
-> > > > > +		/* Beyond sanitised PARange (which is the IPA limit) */
-> > > > > +		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
-> > > > > +			kvm_inject_size_fault(vcpu);
-> > > > > +			return 1;
-> > > > > +		}
-> > > > > +
-> > > > > +		/* Falls between the IPA range and the PARange? */
-> > > > > +		if (fault_ipa >= BIT_ULL(vcpu->arch.hw_mmu->pgt->ia_bits)) {
-> > > > > +			fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
-> > > > > +
-> > > > > +			if (is_iabt)
-> > > > > +				kvm_inject_pabt(vcpu, fault_ipa);
-> > > > > +			else
-> > > > > +				kvm_inject_dabt(vcpu, fault_ipa);
-> > > > > +			return 1;
-> > > > > +		}
-> > > > 
-> > > > Doesn't KVM treat faults outside a valid memslot (aka guest RAM) as MMIO
-> > > > aborts? From the guest's point of view, the IPA is valid because it's
-> > > > inside the HW PARange, so it's not entirely impossible that the VMM put a
-> > > > device there.
-> > > 
-> > > Sure. But the generated IPA is outside of the range the VMM has asked
-> > > to handle. The IPA space describes the whole of the guest address
-> > > space, and there shouldn't be anything outside of it.
-> > > 
-> > > We actually state in the documentation that the IPA Size limit *is*
-> > > the physical address size for the VM. If the VMM places something
-> > > outside if the IPA space and still expect something to be reported to
-> > > it, we have a problem (in some cases, we may want to actually put page
-> > > tables in place even for MMIO that traps to userspace -- see my
-> > > earlier work on MMIO guard).
-> > 
-> > If you mean this bit:
-> > 
-> > On arm64, the physical address size for a VM (IPA Size limit) is limited
-> > to 40bits by default. The limit can be configured if the host supports the
-> > extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
-> > KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
-> > identifier, where IPA_Bits is the maximum width of any physical
-> > address used by the VM.
-> >
-> > And then below there is this paragraph:
-> > 
-> > Please note that configuring the IPA size does not affect the capability
-> > exposed by the guest CPUs in ID_AA64MMFR0_EL1[PARange]. It only affects
-> > **size of the address translated by the stage2 level (guest physical to
-> > host physical address translations)**.
+>>
+>> Drivers are expected to dynamically change its hw protection
+>> domain bits to toggle the tracking and flush some form of
 > 
-> I don't see that as a contradiction. It just says that we don't
-> repaint PARange.
+> 'hw protection domain bits' sounds a bit weird. what about
+> just using 'translation structures'?
 > 
-> > 
-> > Emphasis added by me.
-> > 
-> > It looks to me like the two paragraph state different things, first says
-> > the IPA size caps "the physical address size for a VM", the second that it
-> > caps the RAM size - "size of the address translated by the stage 2 level.
-> 
-> That's not the way I understand it. It just gives a textbook
-> definition of the IPA space. And to be clear, this is just an
-> implementation detail. We should be able to populate all full IPA
-> space with faulting entries and keep the behaviour the same.
-> 
-> > I have no problem with either, but it looks confusing.
-> > 
-> > So if a VMM that wants to put devices above RAM it must make sure that the
-> > IPA size is extended to match, did I get that right?
-> 
-> Yes. Anything that is reacheable by a memory transaction has to fit in
-> the IPA space.
-> 
-> > I'm also a bit confused about the rationale. Why is the PARange exposed to
-> > the guest in effect the wrong value, because the true PARange is defined by
-> > IPA size?
-> 
-> PARange and IPA range don't have the same granularity. You can't
-> express a PARange of 37 bits, for example, while it is perfectly
-> possible for the IPA range. And they do cover two different concepts:
-> the IPA space means nothing to the guest.
+I replace with that instead.
 
-I see, thank you for the detailed explanation!
+>> control state structure that stands in the IOVA translation
+>> path.
+>>
+>> For reading and clearing dirty data, in all IOMMUs a transition
+>> from any of the PTE access bits (Access, Dirty) implies flushing
+>> the IOTLB to invalidate any stale data in the IOTLB as to whether
+>> or not the IOMMU should update the said PTEs. The iommu core APIs
+>> introduce a new structure for storing the dirties, albeit vendor
+>> IOMMUs implementing .read_and_clear_dirty() just use
+> 
+> s/vendor IOMMUs/iommu drivers/
+> 
+> btw according to past history in iommu mailing list sounds like
+> 'vendor' is not a term welcomed in the kernel, while there are
+> many occurrences in this series.
+> 
+Hmm, I wasn't aware actually.
 
-Thanks,
-Alex
+Will move away from using 'vendor'.
+
+> [...]
+>> Although, The ARM SMMUv3 case is a tad different that its x86
+>> counterparts. Rather than changing *only* the IOMMU domain device entry
+>> to
+>> enable dirty tracking (and having a dedicated bit for dirtyness in IOPTE)
+>> ARM instead uses a dirty-bit modifier which is separately enabled, and
+>> changes the *existing* meaning of access bits (for ro/rw), to the point
+>> that marking access bit read-only but with dirty-bit-modifier enabled
+>> doesn't trigger an perm io page fault.
+>>
+>> In pratice this means that changing iommu context isn't enough
+>> and in fact mostly useless IIUC (and can be always enabled). Dirtying
+>> is only really enabled when the DBM pte bit is enabled (with the
+>> CD.HD bit as a prereq).
+>>
+>> To capture this h/w construct an iommu core API is added which enables
+>> dirty tracking on an IOVA range rather than a device/context entry.
+>> iommufd picks one or the other, and IOMMUFD core will favour
+>> device-context op followed by IOVA-range alternative.
+> 
+> Above doesn't convince me on the necessity of introducing two ops
+> here. Even for ARM it can accept a per-domain op and then walk the
+> page table to manipulate any modifier for existing mappings. It
+> doesn't matter whether it sets one bit in the context entry or multiple
+> bits in the page table.
+> 
+OK
+
+> [...]
+>> +
+> 
+> Miss comment for this function.
+> 
+ack
+
+>> +unsigned int iommu_dirty_bitmap_record(struct iommu_dirty_bitmap
+>> *dirty,
+>> +				       unsigned long iova, unsigned long length)
+>> +{
+>> +	unsigned long nbits, offset, start_offset, idx, size, *kaddr;
+>> +
+>> +	nbits = max(1UL, length >> dirty->pgshift);
+>> +	offset = (iova - dirty->iova) >> dirty->pgshift;
+>> +	idx = offset / (PAGE_SIZE * BITS_PER_BYTE);
+>> +	offset = offset % (PAGE_SIZE * BITS_PER_BYTE);
+>> +	start_offset = dirty->start_offset;
+> 
+> could you elaborate the purpose of dirty->start_offset? Why dirty->iova
+> doesn't start at offset 0 of the bitmap?
+> 
+
+It is to deal with page-unaligned addresses.
+
+Like if the start of the bitmap -- and hence bitmap base IOVA for the first bit of the
+bitmap -- isn't page-aligned and starts in the offset of a given page. Thus start-offset
+is to know bit in the pinned page does dirty::iova correspond to.
+
+>> +
+>> +	while (nbits > 0) {
+>> +		kaddr = kmap(dirty->pages[idx]) + start_offset;
+>> +		size = min(PAGE_SIZE * BITS_PER_BYTE - offset, nbits);
+>> +		bitmap_set(kaddr, offset, size);
+>> +		kunmap(dirty->pages[idx]);
+> 
+> what about the overhead of kmap/kunmap when it's done for every
+> dirtied page (as done in patch 18)?
+
+Isn't it an overhead mainly with highmem? Otherwise it ends up being page_to_virt(...)
+
+But anyways the kmap's should be cached, and teardown when pinning the next user data.
+
+Performance analysis is also something I want to fully hash out (as mentioned in the cover
+letter).
