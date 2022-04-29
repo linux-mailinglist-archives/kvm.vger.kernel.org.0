@@ -2,54 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 266C75151B7
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 19:22:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2463651521F
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 19:29:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377866AbiD2RZX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 13:25:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54440 "EHLO
+        id S1379741AbiD2Rcy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 13:32:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379557AbiD2RZP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 13:25:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 674E0C8665
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 10:21:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651252907;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qfPh0kjKV7Wz4rw1eQJIM18yZvKQM4d4G44x6rYSMsU=;
-        b=Ak3wnRHLiHYnZVxdA3lHlaz7pKFMOD4jMLmbdXrVY2tgR9LUw2QidIx6lyNouLURV1TEss
-        Dnb0VqA5X8Sqt+q2hxH9GoP/ffxVT8C7sQkp/AxJhH8VFZlo3UHxgrjWpo4HFdrqobP9WY
-        kFrgd18gx+aPRjzhKh4dnxZYSZtbvKA=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-83-lG-0LiXrOFmbaV02GZTDvw-1; Fri, 29 Apr 2022 13:21:46 -0400
-X-MC-Unique: lG-0LiXrOFmbaV02GZTDvw-1
-Received: by mail-pf1-f198.google.com with SMTP id 67-20020a621846000000b0050d22f49732so4480524pfy.14
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 10:21:46 -0700 (PDT)
+        with ESMTP id S1379644AbiD2RcU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 13:32:20 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5764EDB0C7
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 10:28:06 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id t25so15239391lfg.7
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 10:28:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=k5wgbbVMzxT1FGv3ToNsrykCep98GtsONmeu7ExUc9Q=;
+        b=Ooof03YYaerjHpgKdNiPWsEY0/0Dof5Tz3f/l3NM3t82c5E1iKlZq6AVPXH7KVYIH6
+         X0iW4bDtykLWpRUA0aFTl1zoZb6D1zksUCsNeGK4PbYeN/hSAip981Pdq3GvY9cWpIGa
+         S7jr4Ia7I0MCL9snxMeGlLXf1oWzHPFugitt9t0znydt9cx3QNGRLv9Qta8Qx0RsBORv
+         O31pV3mithTb0WNiKc5dnD+lkhpglvtgjGLf6WzYWqepdwo3zG87nGVUMSbep/g7KU43
+         ltQNnCH9OiGTffgBabg9qYb+C2TTPZbJLX0uq5IGHF+ZO1sRlGKjXmOr/QZUOY59VTjp
+         A3hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=qfPh0kjKV7Wz4rw1eQJIM18yZvKQM4d4G44x6rYSMsU=;
-        b=JMJLyGIHQVDAnvFAEkSDNR6FQEBItdkOIjIi7Kncy3mOofHluAhnNZUmdjA+uLI9Mg
-         9coWlIC36dTGL9U4ona1w67tYWQYCASwpuJGNAse+TeXIXzgpmlv7XzTE0ghbMAiGOye
-         CflOhH2V3VxOgbygMDLe9vLpO9RNvl8HLQCqIplOatyjla4wzNyKGm0L2TVeuhh1k8Ar
-         qPGRlcU83dMFTVAlOawcNWPGLHMp+rCzXZhyBp/qdfcOvVp4GLj7/6fXXPz7Y6ZiSEeS
-         blTO2LBRSI/CBpkGpKwph0RbmCHgFHNQvrRgnErLZGFMHhKeyvTHdcFPhQCCA9fHDT0e
-         9MfQ==
-X-Gm-Message-State: AOAM532ejk0BPsuQE+PeWMTrtPaf4bZ8JB8U//tGYYUGkEvSR/XS1VE0
-        Tv16Bxq73Z71SLzO2/0y8NTkEJ23DcVnvcJ0Fot7ljwcf4s8QD4puA9lnA1pHKD1RNU12vnh0/J
-        xpSVcSSif0V1aP32wqPwybwuciYe2
-X-Received: by 2002:a17:90a:8591:b0:1b9:da10:2127 with SMTP id m17-20020a17090a859100b001b9da102127mr5054435pjn.13.1651252905189;
-        Fri, 29 Apr 2022 10:21:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJybgqQTGFo3aPUV0q7YyahyM+1X9q79zPVfMkdYHvLOVGnT5fGnsEfPpCBwqLhpGPFvVxVgzJb2z2I0F5oFwfY=
-X-Received: by 2002:a17:90a:8591:b0:1b9:da10:2127 with SMTP id
- m17-20020a17090a859100b001b9da102127mr5054410pjn.13.1651252904923; Fri, 29
- Apr 2022 10:21:44 -0700 (PDT)
+        bh=k5wgbbVMzxT1FGv3ToNsrykCep98GtsONmeu7ExUc9Q=;
+        b=ZfcAik2ZNy2frtniD46WG8wkwYw4l3oScdd6b6dt0e/6FGOhPX3OwBT2JV85NqysW0
+         +B1Ksf/KTzBNSFHdjK7oViWB0iY1hetecjkQju8eO4AZ5TObqV2SuR4OkCS9cS8z1PzP
+         WMZhf+mriEFclpN6NWtlSvu4mBIHVAX/hpnrCE1oE2ffzr9aWfdJRDX0EGcAh0xxyvZL
+         BpL/1DqiASAL0/Cv4pPB+H9F0Tlt2mLPC782ofq3yvbNr/Hqgct1R0vkBx2n0jDC4o+Q
+         kYAf6pFvw7+aXHE1SIBHvklMUqHgin3/S9e/q8J1UunW6Po+EwiU4W/BwRvNNAoqUUe2
+         uSeA==
+X-Gm-Message-State: AOAM531U+IQE8f14+R+aTyrGqXV7APdHGyHvL0Xd6ftkpQuPWQvsHHDs
+        L74sC3Jp9CbRWCIu+HOuoxK3gsM6Z2L3kQBAUun0uA==
+X-Google-Smtp-Source: ABdhPJwg3BtzWCk4ed0t1y77RW806RTg1nSgy4v/2th+J0/fN7ePNIb4Qp0MNC4cFS2diG3oqDYHS6+0sdvk4Sihi0E=
+X-Received: by 2002:a05:6512:2627:b0:44a:f55c:ded9 with SMTP id
+ bt39-20020a056512262700b0044af55cded9mr184036lfb.373.1651253283698; Fri, 29
+ Apr 2022 10:28:03 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220407195908.633003-1-pgonda@google.com> <CAFNjLiXC0AdOw5f8Ovu47D==ex7F0=WN_Ocirymz4xL=mWvC5A@mail.gmail.com>
  <CAMkAt6r-Mc_YN-gVHuCpTj4E1EmcvyYpP9jhtHo5HRHnoNJAdA@mail.gmail.com>
@@ -60,67 +54,78 @@ References: <20220407195908.633003-1-pgonda@google.com> <CAFNjLiXC0AdOw5f8Ovu47D
  <0d282be4-d612-374d-84ba-067994321bab@redhat.com> <CAMkAt6ragq4OmnX+n628Yd5pn51qFv4qV20upGR6tTvyYw3U5A@mail.gmail.com>
  <8a2c5f8c-503c-b4f0-75e7-039533c9852d@redhat.com> <CAMkAt6qAW5zFyTAqX_Az2DT2J3KROPo4u-Ak1sC0J+UTUeFfXA@mail.gmail.com>
  <4afce434-ab25-66d6-76f4-3a987f64e88e@redhat.com> <CAMkAt6o8u9=H_kjr_xyRO05J=RDFUZRiTc_Bw-FFDKEUaiyp2Q@mail.gmail.com>
-In-Reply-To: <CAMkAt6o8u9=H_kjr_xyRO05J=RDFUZRiTc_Bw-FFDKEUaiyp2Q@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Fri, 29 Apr 2022 19:21:33 +0200
-Message-ID: <CABgObfa0ubOwNv2Vi9ziEjHXQMR_Sa6P-fwuXfPq76qy0N61kA@mail.gmail.com>
+ <CABgObfa0ubOwNv2Vi9ziEjHXQMR_Sa6P-fwuXfPq76qy0N61kA@mail.gmail.com>
+In-Reply-To: <CABgObfa0ubOwNv2Vi9ziEjHXQMR_Sa6P-fwuXfPq76qy0N61kA@mail.gmail.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Fri, 29 Apr 2022 11:27:51 -0600
+Message-ID: <CAMkAt6pcg_Eg49nN5hS=wbeVWtPV1N_12G9Lvfgoq_bS_tUYog@mail.gmail.com>
 Subject: Re: [PATCH v3] KVM: SEV: Mark nested locking of vcpu->lock
-To:     Peter Gonda <pgonda@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     John Sperbeck <jsperbeck@google.com>,
         kvm list <kvm@vger.kernel.org>,
         David Rientjes <rientjes@google.com>,
         Sean Christopherson <seanjc@google.com>,
         LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 29, 2022 at 7:12 PM Peter Gonda <pgonda@google.com> wrote:
-> Sounds good. Instead of doing this prev_vcpu solution we could just
-> keep the 1st vcpu for source and target. I think this could work since
-> all the vcpu->mutex.dep_maps do not point to the same string.
+On Fri, Apr 29, 2022 at 11:21 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> Lock:
->          bool acquired = false;
->          kvm_for_each_vcpu(...) {
->                  if (mutex_lock_killable_nested(&vcpu->mutex, role)
->                      goto out_unlock;
->                 acquired = true;
->                  if (acquired)
->                       mutex_release(&vcpu->mutex, role)
+> On Fri, Apr 29, 2022 at 7:12 PM Peter Gonda <pgonda@google.com> wrote:
+> > Sounds good. Instead of doing this prev_vcpu solution we could just
+> > keep the 1st vcpu for source and target. I think this could work since
+> > all the vcpu->mutex.dep_maps do not point to the same string.
+> >
+> > Lock:
+> >          bool acquired = false;
+> >          kvm_for_each_vcpu(...) {
+> >                  if (mutex_lock_killable_nested(&vcpu->mutex, role)
+> >                      goto out_unlock;
+> >                 acquired = true;
+> >                  if (acquired)
+> >                       mutex_release(&vcpu->mutex, role)
+> >          }
+>
+> Almost:
+>
+>           bool first = true;
+>           kvm_for_each_vcpu(...) {
+>                   if (mutex_lock_killable_nested(&vcpu->mutex, role)
+>                       goto out_unlock;
+>                   if (first)
+>                       ++role, first = false;
+>                  else
+>                       mutex_release(&vcpu->mutex, role);
 >          }
+>
+> and to unlock:
+>
+>           bool first = true;
+>           kvm_for_each_vcpu(...) {
+>                 if (first)
+>                       first = false;
+>                 else
+>                       mutex_acquire(&vcpu->mutex, role);
+>                 mutex_unlock(&vcpu->mutex);
+>                 acquired = false;
+>           }
+>
+> because you cannot use the first vCPU's role again when locking.
 
-Almost:
+Ah yes I missed that. I would suggest `role = SEV_NR_MIGRATION_ROLES`
+or something else instead of role++ to avoid leaking this
+implementation detail outside of the function signature / enum.
 
-          bool first = true;
-          kvm_for_each_vcpu(...) {
-                  if (mutex_lock_killable_nested(&vcpu->mutex, role)
-                      goto out_unlock;
-                  if (first)
-                      ++role, first = false;
-                 else
-                      mutex_release(&vcpu->mutex, role);
-         }
 
-and to unlock:
-
-          bool first = true;
-          kvm_for_each_vcpu(...) {
-                if (first)
-                      first = false;
-                else
-                      mutex_acquire(&vcpu->mutex, role);
-                mutex_unlock(&vcpu->mutex);
-                acquired = false;
-          }
-
-because you cannot use the first vCPU's role again when locking.
-
-Paolo
-
+>
+> Paolo
+>
