@@ -2,80 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D357A514C20
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 15:59:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC96C514C06
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 15:56:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376945AbiD2ODD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 10:03:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44084 "EHLO
+        id S1376996AbiD2N7L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 09:59:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376940AbiD2OBf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 10:01:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 80CB9D0AB7
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 06:53:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651240330;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z7yAdUCrz3+5dYbONp1SEfIacy2JTP0wdG6m3C5H/Qc=;
-        b=Z5bD2VyfeSdS/rKqNmATSrryDf0H8L5J/FoZjRmgLS0HEzzDHGqnqgTia89Q2cQ3yG3r/a
-        wGb74lDE9UjpmTLj7mZ6/cT2g0qRAzsQAy2Q5z0U5MiUfnQIW41oLDcAWTGLqQZVcl5nYD
-        x1IT7PUy0BswGvTWFesVOmq+NqDKAAg=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-173-Lyp8MjYbM3etAB042q75lQ-1; Fri, 29 Apr 2022 09:52:08 -0400
-X-MC-Unique: Lyp8MjYbM3etAB042q75lQ-1
-Received: by mail-ej1-f71.google.com with SMTP id oz9-20020a1709077d8900b006f3d9488090so3041013ejc.6
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 06:52:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Z7yAdUCrz3+5dYbONp1SEfIacy2JTP0wdG6m3C5H/Qc=;
-        b=NOFOBm5fBUZBMxRds0MwywBzsQ5vdeyrfSWcZTqiGowgsVN1a/O36QdeoJhjpYl7Bv
-         NSE6IvX6XxzKGudHZjqzBFjdyP8qIlP0Fr5soRnCWyc7/ZK2emkATXwrZRUGS2vNvgzq
-         Y/s7fOhgGZ5mGvSBB7vE0Uz1W6oolT09k3bkiQ/9SRoUab7bv9KS1des7lTZ0asDfGPX
-         PV5bhQ24/Pe8SbY865T9Md0OSP7jI656+DrrbHwrTj5ifgCOcWXHTxkVjM5GrJV+W8r2
-         ozPjXEOZUFTAkYCC4YFmc6tK+vLZF0h9zMlSSQbvBum4OxqlnTtG5ByFECFOEixdMODM
-         WONw==
-X-Gm-Message-State: AOAM530IIPqcfip9SWoekJERFPjr60pR0RhkeI19ncww5Z+pJWZrZAaD
-        juFW2DDD5zao7/LGhpsysjmFntTtbpLZrRL3gzhVRfkS1yTGhv1xI7hvzC0C0I9qxXSw22k7l13
-        QEtKoNOI/fHGm
-X-Received: by 2002:a17:907:7ea9:b0:6f3:de9c:c6fb with SMTP id qb41-20020a1709077ea900b006f3de9cc6fbmr7793990ejc.304.1651240327298;
-        Fri, 29 Apr 2022 06:52:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwSXo0F7Exss/lylDpZAOA7UHVmHWcGdVTMhJKtTRR6xOlptpLZ9t9BCMS9mrHY58kigon4hg==
-X-Received: by 2002:a17:907:7ea9:b0:6f3:de9c:c6fb with SMTP id qb41-20020a1709077ea900b006f3de9cc6fbmr7793983ejc.304.1651240327113;
-        Fri, 29 Apr 2022 06:52:07 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id p9-20020a056402074900b0042617ba639dsm2979367edy.39.2022.04.29.06.52.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 Apr 2022 06:52:06 -0700 (PDT)
-Message-ID: <ed92111b-3b80-0cde-1821-0a491dee2dcf@redhat.com>
-Date:   Fri, 29 Apr 2022 15:52:02 +0200
+        with ESMTP id S1376762AbiD2N5j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 09:57:39 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77193CFBA4;
+        Fri, 29 Apr 2022 06:52:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651240337; x=1682776337;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=MNsNGb1KS2Bfdr9wXlInMU/yiClX+gR7Udk3isZ3pC0=;
+  b=GIvTE60Um0eexIffT68jOrR/ookVsCABp2hJ6h4k4HKG4WFkiQTiS+To
+   tPCb71A9SUEOe5wJ363Wg3mYcKopHaL1XObTlgsJUgbi5NKEvk+vgvWPe
+   0W3UGaXVxMXYAESlGGcwTvv6QW+8iqymMTrEDZVRqo3cOFPRGO2SCsDdr
+   A4AiiJKL973njv8PGq3jv1/3zrMAfbE1TOGUjRUvmqOXD8TRJx+XUgGyC
+   h9TvCjWzsTxRFst/WM0gpAieNcpvlUFEVaiNtwpTss9c/oiUy6bACuaNW
+   wAjckclQCQMf6oUySrqPBaOOCesR/yCd+5JhWZfEmUAToftg0pMrbyC+e
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10331"; a="246563217"
+X-IronPort-AV: E=Sophos;i="5.91,185,1647327600"; 
+   d="scan'208";a="246563217"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 06:52:06 -0700
+X-IronPort-AV: E=Sophos;i="5.91,185,1647327600"; 
+   d="scan'208";a="582135045"
+Received: from jinggu-mobl1.amr.corp.intel.com (HELO [10.212.30.227]) ([10.212.30.227])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 06:52:05 -0700
+Message-ID: <a651a489-ecc5-2439-61b1-03ff43cff7f6@intel.com>
+Date:   Fri, 29 Apr 2022 06:52:21 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH for-5.18] KVM: fix bad user ABI for KVM_EXIT_SYSTEM_EVENT
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v3 12/21] x86/virt/tdx: Create TDMRs to cover all system
+ RAM
 Content-Language: en-US
-To:     Oliver Upton <oupton@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Peter Gonda <pgonda@google.com>,
-        Sean Christopherson <seanjc@google.com>
-References: <20220422103013.34832-1-pbonzini@redhat.com>
- <Ymtr2mfyujoxLsDR@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Ymtr2mfyujoxLsDR@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com
+References: <cover.1649219184.git.kai.huang@intel.com>
+ <6cc984d5c23e06c9c87b4c7342758b29f8c8c022.1649219184.git.kai.huang@intel.com>
+ <fa4d15d5-4690-9e63-f0c9-af4b58e4325c@intel.com>
+ <695f319e637e7afb33f228a230566f0c671e3a03.camel@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <695f319e637e7afb33f228a230566f0c671e3a03.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-7.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,33 +71,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/29/22 06:38, Oliver Upton wrote:
->> +                        __u64 data[16];
-> This is out of sync with the union { flags; data; } now.
-
-Yes, that's intentional.  The flags member is mentioned below:
-
-+Previous versions of Linux defined a `flags` member in this struct.  The
-+field is now aliased to `data[0]`.  Userspace can assume that it is only
-+written if ndata is greater than 0.
-
-but I don't want projects to believe it is different in any way from
-`data[0]`.  In particular, `flags` should also be considered valid only
-if the cap is present (unless crosvm wants ARM to be grandfathered in).
-
-> IMO, we should put a giant disclaimer on all of this to*not*  use the
-> flags field and instead only use data. I imagine we wont want to persist
-> the union forever as it is quite ugly, but necessary.
-
-
->> +/* #define KVM_CAP_VM_TSC_CONTROL 214 */
+On 4/29/22 00:24, Kai Huang wrote:
+> On Thu, 2022-04-28 at 09:22 -0700, Dave Hansen wrote:
+>> On 4/5/22 21:49, Kai Huang wrote:
+>>> implies that one TDMR could cover multiple e820 RAM entries.  If a RAM
+>>> entry spans the 1GB boundary and the former part is already covered by
+>>> the previous TDMR, just create a new TDMR for the latter part.
+>>>
+>>> TDX only supports a limited number of TDMRs (currently 64).  Abort the
+>>> TDMR construction process when the number of TDMRs exceeds this
+>>> limitation.
+>>
+>> ... and what does this *MEAN*?  Is TDX disabled?  Does it throw away the
+>> RAM?  Does it eat puppies?
 > 
-> This sticks out a bit. Couldn't the VM TSC control patch just use a
-> different number? It seems that there will be a conflict anyway, if only to
-> delete this comment.
+> How about:
+> 
+> 	TDX only supports a limited number of TDMRs.  Simply return error when
+> 	the number of TDMRs exceeds the limitation.  TDX is disabled in this
+> 	case.
 
-I don't want to change cap numbers once things have landed in
-kvm/next, because that's when userspace projects pick them.
+Better, but two things there that need to be improved.  This is a cover
+letter.  Talking at the function level ("return error") is too
+low-level.  It's also slipping into passive mode "is disabled".  Fixing
+those, it looks like this:
 
-Paolo
+	TDX only supports a limited number of TDMRs.  Disable TDX if all
+	TDMRs are consumed but there is more RAM to cover.
 
