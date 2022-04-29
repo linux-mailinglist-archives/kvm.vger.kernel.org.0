@@ -2,81 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E369C515462
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 21:21:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FF97515466
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 21:22:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380329AbiD2TYH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 15:24:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42594 "EHLO
+        id S238144AbiD2TZj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 15:25:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380278AbiD2TXo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 15:23:44 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79D646428;
-        Fri, 29 Apr 2022 12:20:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651260024; x=1682796024;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=cgLtOlQqQhDyaF67C74v6XD8hoopctzCMPzs3mVdX60=;
-  b=lYJy37yYx/0FFnVU8lDCsiz3NFSqp8hA3tGiHNDQAcuT1srnUl4RQ0fF
-   xqChoLdNHKVPp4929lmh6RD+CFfbjUX2babBXHyE/jOkGEPi0HEQzRDGT
-   nakrY7t//ZDGjLyW55TVrxvNS+oskUHlR4UF+exX4Oh7+sVzrRP/vqnwE
-   sac1i5ZMUQ39xttVyYu8STfh7hiv4OclHoghjc1dpdPRw6Z0C7btUuktT
-   /KIJV7sT2nmeqkmlyzz01XrnOfR7VaTD7+j1sJF9GETnJXCrOgY8C+ZJ3
-   hoDs697xrIiHgh5bYBSY3rBnHp3/ELg+OELwY7bwoXpfOVZDY+eG7BOLE
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10332"; a="265593809"
-X-IronPort-AV: E=Sophos;i="5.91,186,1647327600"; 
-   d="scan'208";a="265593809"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 12:20:24 -0700
-X-IronPort-AV: E=Sophos;i="5.91,186,1647327600"; 
-   d="scan'208";a="582344666"
-Received: from jinggu-mobl1.amr.corp.intel.com (HELO [10.212.30.227]) ([10.212.30.227])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 12:20:23 -0700
-Message-ID: <73ed1e55-7e7c-2995-b411-8e26b711cc22@intel.com>
-Date:   Fri, 29 Apr 2022 12:20:40 -0700
+        with ESMTP id S238707AbiD2TYN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 15:24:13 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 689093A5CF
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 12:20:54 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 00F7B1063;
+        Fri, 29 Apr 2022 12:20:54 -0700 (PDT)
+Received: from [10.57.80.98] (unknown [10.57.80.98])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 226FC3F73B;
+        Fri, 29 Apr 2022 12:20:50 -0700 (PDT)
+Message-ID: <cab0cf66-5e9c-346e-6eb5-ea1f996fbab3@arm.com>
+Date:   Fri, 29 Apr 2022 20:20:46 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v3 00/21] TDX host kernel support
-Content-Language: en-US
-To:     Dan Williams <dan.j.williams@intel.com>
-Cc:     Kai Huang <kai.huang@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Kuppuswamy Sathyanarayanan 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>
-References: <cover.1649219184.git.kai.huang@intel.com>
- <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
- <CAPcyv4g5E_TOow=3pFJXyFr=KLV9pTSnDthgz6TuXvru4xDzaQ@mail.gmail.com>
- <de9b8f4cef5da03226158492988956099199aa60.camel@intel.com>
- <CAPcyv4iGsXkHAVgf+JZ4Pah_fkCZ=VvUmj7s3C6Rkejtdw_sgQ@mail.gmail.com>
- <92af7b22-fa8a-5d42-ae15-8526abfd2622@intel.com>
- <CAPcyv4iG977DErCfYTqhVzuZqjtqFHK3smnaOpO3p+EbxfvXcQ@mail.gmail.com>
- <4a5143cc-3102-5e30-08b4-c07e44f1a2fc@intel.com>
- <CAPcyv4i6X6ODNbOnT7+NEzpicLS4m9bNDybZLvN3gqXFTTf=mg@mail.gmail.com>
- <4d0c7316-3564-ef27-1113-042019d583dc@intel.com>
- <CAPcyv4gYw3k4YMEV1E26fMx-GNCNCb+zJDERfhieCrROWv_Jxg@mail.gmail.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <CAPcyv4gYw3k4YMEV1E26fMx-GNCNCb+zJDERfhieCrROWv_Jxg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+Subject: Re: [PATCH RFC 15/19] iommu/arm-smmu-v3: Add
+ set_dirty_tracking_range() support
+Content-Language: en-GB
+To:     Joao Martins <joao.m.martins@oracle.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>
+References: <20220428210933.3583-1-joao.m.martins@oracle.com>
+ <20220428210933.3583-16-joao.m.martins@oracle.com>
+ <BN9PR11MB5276AEDA199F2BC7F13035B98CFC9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <f37924f3-ee44-4579-e4e2-251bb0557bfc@oracle.com>
+ <a0331f20-9cf4-708e-a30d-6198dadd1b23@arm.com>
+ <e1c92dad-c672-51c6-5acc-1a50218347ff@oracle.com>
+ <20220429122352.GU8364@nvidia.com>
+ <bed35e91-3b47-f312-4555-428bb8a7bd89@oracle.com>
+ <20220429161134.GB8364@nvidia.com>
+ <e238dd28-2449-ec1e-ee32-08446c4383a9@oracle.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <e238dd28-2449-ec1e-ee32-08446c4383a9@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+X-Spam-Status: No, score=-9.8 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,61 +71,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/29/22 11:47, Dan Williams wrote:
-> On Fri, Apr 29, 2022 at 11:34 AM Dave Hansen <dave.hansen@intel.com> wrote:
+On 2022-04-29 17:40, Joao Martins wrote:
+> On 4/29/22 17:11, Jason Gunthorpe wrote:
+>> On Fri, Apr 29, 2022 at 03:45:23PM +0100, Joao Martins wrote:
+>>> On 4/29/22 13:23, Jason Gunthorpe wrote:
+>>>> On Fri, Apr 29, 2022 at 01:06:06PM +0100, Joao Martins wrote:
+>>>>
+>>>>>> TBH I'd be inclined to just enable DBM unconditionally in
+>>>>>> arm_smmu_domain_finalise() if the SMMU supports it. Trying to toggle it
+>>>>>> dynamically (especially on a live domain) seems more trouble that it's
+>>>>>> worth.
+>>>>>
+>>>>> Hmmm, but then it would strip userland/VMM from any sort of control (contrary
+>>>>> to what we can do on the CPU/KVM side). e.g. the first time you do
+>>>>> GET_DIRTY_IOVA it would return all dirtied IOVAs since the beginning
+>>>>> of guest time, as opposed to those only after you enabled dirty-tracking.
+>>>>
+>>>> It just means that on SMMU the start tracking op clears all the dirty
+>>>> bits.
+>>>>
+>>> Hmm, OK. But aren't really picking a poison here? On ARM it's the difference
+>>> from switching the setting the DBM bit and put the IOPTE as writeable-clean (which
+>>> is clearing another bit) versus read-and-clear-when-dirty-track-start which means
+>>> we need to re-walk the pagetables to clear one bit.
 >>
->> On 4/29/22 10:48, Dan Williams wrote:
->>>> But, neither of those really help with, say, a device-DAX mapping of
->>>> TDX-*IN*capable memory handed to KVM.  The "new syscall" would just
->>>> throw up its hands and leave users with the same result: TDX can't be
->>>> used.  The new sysfs ABI for NUMA nodes wouldn't clearly apply to
->>>> device-DAX because they don't respect the NUMA policy ABI.
->>> They do have "target_node" attributes to associate node specific
->>> metadata, and could certainly express target_node capabilities in its
->>> own ABI. Then it's just a matter of making pfn_to_nid() do the right
->>> thing so KVM kernel side can validate the capabilities of all inbound
->>> pfns.
+>> Yes, I don't think a iopte walk is avoidable?
 >>
->> Let's walk through how this would work with today's kernel on tomorrow's
->> hardware, without KVM validating PFNs:
->>
->> 1. daxaddr mmap("/dev/dax1234")
->> 2. kvmfd = open("/dev/kvm")
->> 3. ioctl(KVM_SET_USER_MEMORY_REGION, { daxaddr };
-> 
-> At least for a file backed mapping the capability lookup could be done
-> here, no need to wait for the fault.
+> Correct -- exactly why I am still more learning towards enable DBM bit only at start
+> versus enabling DBM at domain-creation while clearing dirty at start.
 
-For DAX mappings, sure.  But, anything that's backed by page cache, you
-can't know until the RAM is allocated.
+I'd say it's largely down to whether you want the bother of 
+communicating a dynamic behaviour change into io-pgtable. The big 
+advantage of having it just use DBM all the time is that you don't have 
+to do that, and the "start tracking" operation is then nothing more than 
+a normal "read and clear" operation but ignoring the read result.
 
-...
->> Those pledges are hard for anonymous memory though.  To fulfill the
->> pledge, we not only have to validate that the NUMA policy is compatible
->> at KVM_SET_USER_MEMORY_REGION, we also need to decline changes to the
->> policy that might undermine the pledge.
-> 
-> I think it's less that the kernel needs to enforce a pledge and more
-> that an interface is needed to communicate the guest death reason.
-> I.e. "here is the impossible thing you asked for, next time set this
-> policy to avoid this problem".
+At this point I'd much rather opt for simplicity, and leave the fancier 
+stuff to revisit later if and when somebody does demonstrate a 
+significant overhead from using DBM when not strictly needed.
 
-IF this code is booted on a system where non-TDX-capable memory is
-discovered, do we:
-1. Disable TDX, printk() some nasty message, then boot as normal
-or,
-2a. Boot normally with TDX enabled
-2b. Add enhanced error messages in case of TDH.MEM.PAGE.AUG/ADD failure
-    (the "SEAMCALLs" which are the last line of defense and will reject
-     the request to add non-TDX-capable memory to a guest).  Or maybe
-    an even earlier message.
-
-For #1, if TDX is on, we are quite sure it will work.  But, it will
-probably throw up its hands on tomorrow's hardware.  (This patch set).
-
-For #2, TDX might break (guests get killed) at runtime on tomorrow's
-hardware, but it also might be just fine.  Users might be able to work
-around things by, for instance, figuring out a NUMA policy which
-excludes TDX-incapable memory. (I think what Dan is looking for)
-
-Is that a fair summary?
+Thanks,
+Robin.
