@@ -2,137 +2,251 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 41664514CB7
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 16:24:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13B1E514CCF
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 16:27:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377224AbiD2O2A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 10:28:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44606 "EHLO
+        id S1377277AbiD2Oav (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 10:30:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234266AbiD2O17 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 10:27:59 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC0D991358
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 07:24:40 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id e24so7276461pjt.2
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 07:24:40 -0700 (PDT)
+        with ESMTP id S1377294AbiD2Oat (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 10:30:49 -0400
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6885DA2054
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 07:27:31 -0700 (PDT)
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23TEMneP015535;
+        Fri, 29 Apr 2022 14:26:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2021-07-09;
+ bh=hxVNWiJy3qO1DRCtxmUHMetlfEny6vPfeX2V5WHmPMs=;
+ b=GxR5lH3lnDtTAVV6tGAIsXYrmvZWlVxgyX89c3tZaLXPvZoLUWcYhsQNT0MOSMQdARhp
+ mtnrP8i/yGApKKtGjTdOHgC+09fjrYCBSMKMysMUbfYu2qB/SRRgJ7REJ0Mu+yG4cN6V
+ XBC9A+x0/Nujlnm/3d5cFJfB8nNDz4q+KZ+ddjlIqNpf+0i2qUfwPpZnSdBp1dB8LTUQ
+ D+mwOanDp9qkTQSaIeMmmugtzk1L2LwWhlag8/y6nTBcgW8rVVyI+TKG3wJdgU96qV1z
+ J67NOhO2agbkGPTVpLqzHv8ieZpRVstO4P1C6oR3vVCjKWiXpJcTxiP06paB/t/BX9IB hA== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3fmb9axv0a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 29 Apr 2022 14:26:54 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.16.1.2/8.16.1.2) with SMTP id 23TEGGjb008676;
+        Fri, 29 Apr 2022 14:26:52 GMT
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2172.outbound.protection.outlook.com [104.47.58.172])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com with ESMTP id 3fm7w82tcs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 29 Apr 2022 14:26:52 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XyhvjBy3BPhwCn3Q2VQW0paOrYedlF8lopH0oWY+PBLnwo5hCmy9kL8/Uz8ANkd+Q4AiN56qTV1RhJ3NeOAZan9rzs7LzkE/t1pq7tCROO8iXr/8npsEhbv8NfyUe/RvFWiCZOoUJ/XMT8KcpkHQc/pdjtIwj1B2IeAgBD4vmD5GgrxswLifEjGscCoIWlqKH6AGDigYovJo7AlLLVBISqiqS6eSY5TiIZKodX//F9amWZPOWau+id8VkygLK/E3nCuMl8dRZqxggLjSRZfHpvZqeBEymyKoWZ9efJfARk9rD9wKJmGLhIPwUrTaO89dqtxoBmLcRMX2xvoDHzF6SQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hxVNWiJy3qO1DRCtxmUHMetlfEny6vPfeX2V5WHmPMs=;
+ b=hevln6rU5rwGO5i9KmYHatiBo5iB9Az3hMw1SKm4P/p7HDHip+JUsyGKvDRyWjae2XETxakq9k93bcyfnEc+VqWy3KUnQsrdt3mPKIxsYt0/3LJvo6uS2Rxpa7Vwueu8erqy5tJnfWhenNhLtNd+DT064Gxdwnmo0XfguG6aQdYOdIS3Z2OpuhrEZ9b+DToC3GCKJLLA746DNXRS7udHEfxAMutNGm7qKlXwpA1jAK1Qj6J8rK/Glka+B4W7GQsy23NPP7u4X9rlJu73pRWqHYO6QP1S1AgxniEV1iuRP/yllgMj1oh15csGs3lPAsj79/w6YGy8y1cesYJbYzfrQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=7tC/JKOk9L0c4P3431GOxph3zjvk5J8dJFmkqVAnJxc=;
-        b=F0+Y3mMT0AqdA2ZfjnbeDVfDmZPiiSQXRHQCLASaN7eLfv15TfF0iLNRdE6IOoeC/g
-         6GkXEEBq0PSKDjB2LJstij0jmH99SMZXxtjVbtiDjgY2vdjLCU+EE5SoMc5FV4TR9tG5
-         ehRV+g9B5kQNJtwCJEoRKDuSMT/SV+oYmWMEAUsVtFJnPTYB5/qUX4MBdp8WlNfn0fyB
-         3ld1a7DlYAa61TIpVQunTEelniygDy9n7MOGhFEb2bhWuoZunIZEfAgiXofhJWVX062S
-         EB3po2+BTr4QWUV/PcCKFE/2uDBMP2pS/prgXU/+a7qr9JylszfvPmOveqX8gGS0sCOs
-         qOzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7tC/JKOk9L0c4P3431GOxph3zjvk5J8dJFmkqVAnJxc=;
-        b=wQmWx20CFGAemUkCejZ4O3C/rFrEAAxCLxUpk3Fqkc3/rCN42gz+DP0TL8VMeRs0ZU
-         p91EGwORi2sTJtSMSwg7kyRuubG5M7/aumsP0+ZLPoy41UHJh75J0z2AOP/yFU52vIu8
-         MlU6/X+XeYXfUf3U0bWxY8lJSw/Op33csPpvrPeIPozvnSh3fr54MAGL4Y9dSrgvJL9l
-         d7qqxszKwsje0UN1KEYmcuVkJacz2mXBeCu0c2eFUI3ymr2C07Gdm68AU3iQuqWyDcqF
-         Kv6PotnI2QUmAwOWrBkgKoX5LS1HxrDln0Xc4q4CN9FhbX9kuQAysUUdaKbv+63rVLn0
-         xGRg==
-X-Gm-Message-State: AOAM530iBWxtA1UGdkdbeC+UzgMOKNBzvollujOjLPKcdbhNXPR9zJzl
-        IauzOJO3l5iayf0iLRMxlGqDXQ==
-X-Google-Smtp-Source: ABdhPJwedY/+Y+SN/KDf33mBRLNyBEObEHex1x/IqkMk86Yt4Fukf5wpBrFB7Bnr5BKAbNwLSzjrUA==
-X-Received: by 2002:a17:902:e748:b0:15c:e3b9:bba3 with SMTP id p8-20020a170902e74800b0015ce3b9bba3mr33249235plf.139.1651242279947;
-        Fri, 29 Apr 2022 07:24:39 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id g17-20020a625211000000b005056a6313a7sm3168604pfb.87.2022.04.29.07.24.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Apr 2022 07:24:38 -0700 (PDT)
-Date:   Fri, 29 Apr 2022 14:24:35 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Do not create SPTEs for GFNs that exceed
- host.MAXPHYADDR
-Message-ID: <Ymv1I5ixX1+k8Nst@google.com>
-References: <20220428233416.2446833-1-seanjc@google.com>
- <337332ca-835c-087c-c99b-92c35ea8dcd3@redhat.com>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hxVNWiJy3qO1DRCtxmUHMetlfEny6vPfeX2V5WHmPMs=;
+ b=OJDlzXavpmsu6fGQs/pWR3uiRvSjBkxhe23r3dW7pVDuOzBEh2JHVZJ9CrCgoGVTIb5sA1jQPshisEY7Y3POCb9EFv+klbtHYLn3x0hhYuEqHkMmS3wOutukKBwWp4X2WpHMNfHo4GQBxiyD54uwfHXbklv3CHdTFHImVsG4oKY=
+Received: from BLAPR10MB4835.namprd10.prod.outlook.com (2603:10b6:208:331::11)
+ by DM6PR10MB2507.namprd10.prod.outlook.com (2603:10b6:5:b6::27) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.18; Fri, 29 Apr
+ 2022 14:26:51 +0000
+Received: from BLAPR10MB4835.namprd10.prod.outlook.com
+ ([fe80::b9e5:d1b6:b4be:f9d]) by BLAPR10MB4835.namprd10.prod.outlook.com
+ ([fe80::b9e5:d1b6:b4be:f9d%5]) with mapi id 15.20.5206.013; Fri, 29 Apr 2022
+ 14:26:51 +0000
+Message-ID: <eee58121-1224-cc56-f5a8-b7b8387b9e61@oracle.com>
+Date:   Fri, 29 Apr 2022 15:26:41 +0100
+Subject: Re: [PATCH RFC 01/19] iommu: Add iommu_domain ops for dirty tracking
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     iommu@lists.linux-foundation.org, Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Yi Liu <yi.l.liu@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+References: <20220428210933.3583-1-joao.m.martins@oracle.com>
+ <20220428210933.3583-2-joao.m.martins@oracle.com>
+ <20220429120820.GQ8364@nvidia.com>
+From:   Joao Martins <joao.m.martins@oracle.com>
+In-Reply-To: <20220429120820.GQ8364@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO2P265CA0107.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:c::23) To BLAPR10MB4835.namprd10.prod.outlook.com
+ (2603:10b6:208:331::11)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <337332ca-835c-087c-c99b-92c35ea8dcd3@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5ae38cea-b499-488f-9023-08da29ec4cc9
+X-MS-TrafficTypeDiagnostic: DM6PR10MB2507:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR10MB2507D657A8D37CB4E3B4798DBBFC9@DM6PR10MB2507.namprd10.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fuRRVyZe8ThfcU0LXv6Zxmjnd/WV7mQCl4diXzOwVE5gGyYDB3E7BjGyqD86fZXL76t7IiwAzNxUhuz4xW864x2oe6FsGQZBfqXupqu/mqPeseZdC/rNz0gfU1d2EynaJQmjpRLWvyugLlbXWbAjPJaUOZkW1ceQ3MQgOiKjA0oSHbJWmDgQbR6toaDJ2WsfUsUA6em0Us7JApYDLIsrUNV+E5NLBRKkfbNHRnyFvdGNlNd6kIyrSCmaL7DQeJiFokOK7TmdAYlARfAHgg+vrPlCh77/Ch2Y8I8J8oUoGZ3xNLqJfcRCzQ5G+MdRiDAtACbe3y1lavjdIm9ruubTJHQMadT3m1nwi+MHEF4Ab3lqXCpzZTGWGSLX6WOe56Uu9UZNALeIIEZ/cRqiD7+moqVWW0JgCT17Y+ZJN22wLpZIfDIRXtWBXXBIIOCUOAs9PGpgHesYQfFcke4Mg498sJxI7oL9yGNKad+5rz+51KsfY4dRZ/tBzLgqVqoc1q/1lsIbI13eHxLuNjpI5byAVo81QHZPG5L+jtZp5vdC+vkUSGhshHQsTKOCDVKsOwC1MdhxrkEoHwznALzp8+KSnLa/61Yw9KrTc+OTHcN1JlGR3XzvM+Z3iCaFu8R61yJ8x7EXXafSCDvEdmqEqsbgNAltXSiXkHa2tZbVvYFgslO8JK1VX3SuOJM9efN32FXHxWWYAVM86KrPIWXUIvwe3cHJ7zX7cu7XdcB4v4u20GQ=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(31696002)(186003)(8936002)(7416002)(508600001)(2616005)(53546011)(86362001)(2906002)(26005)(6506007)(6512007)(6666004)(38100700002)(83380400001)(5660300002)(316002)(6916009)(4326008)(8676002)(6486002)(31686004)(36756003)(66476007)(66556008)(54906003)(66946007)(14143004)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?d1E2dFY2T3dOYlhaRkV1SU85dVhQRG5LWGNsamN6VEJGc0ZGaUQ1blpYeTYw?=
+ =?utf-8?B?UXFEUVZXMXByYXozQ3Bia2hidXV1S2kvUkkzREdlM0VGdjQ0c3V1bnBZdkIw?=
+ =?utf-8?B?NTJjOFp3bStOWjB1enN4bDdZdllQMnFFUHhxUHhBSjlkdkw3alQ3eWpYZUlx?=
+ =?utf-8?B?ZjdSUkhJTE1VQThHR3NqY3YzWkd4UWxYZzg1dDJoNEpaekdzZVcya096cFgw?=
+ =?utf-8?B?RXpFUUxZbkV5TG02Zk92UW5LNFlaOFBJbjRrai9CMWl0UzAwYk9wNjZqM2Ro?=
+ =?utf-8?B?c0JFcE9aRW1Cak5iZ1lGdnkzeVJDWG15cGQwZ3RhWk9NT21YOG1jT0VFU2RD?=
+ =?utf-8?B?cWNyNTREQU9HbWZlSnF3ZEpUU0VqOGVPVzJRVnJpSGVoa05JT0xHU3J4UWRV?=
+ =?utf-8?B?MW9URjhaVTUyWUd4ZkZIaGtvTThQaEptQTE1ckJYNnVDK3VxaHRBQ1NFWkFr?=
+ =?utf-8?B?U2dibEdaZ1FYWVdaU2FyRDVkL0toOVhHYjdHN04yUUpWQXRROG04K3RCUUxW?=
+ =?utf-8?B?M2lCNDJlOWFaek9nWlNJanJSeE00WTdHaHdZQVM1NmR5cG1xckkwTWgyQ0d4?=
+ =?utf-8?B?eXE5TUtKYSsyOHNQU3hsS05JT00xZGVRZThDWWNYTkZyOWZuZ3puMG5sOUpI?=
+ =?utf-8?B?d1VNUGlPYWlYeXc0TVlzVWx0Wmg5MHFWSnJqU05JdmlHakZJK2NIL2JyYmdh?=
+ =?utf-8?B?cHg3aWt2Qk5nOXUwTmRRTUNseUV5Z2tBOTA3bm1jd1V1S1I2dDJnek5jdHg4?=
+ =?utf-8?B?Vm9PUS8wUFJvUGVZZktJUEVwdU50MWxMN1lQUDllU0hmZEZSMlRadTA0eEx3?=
+ =?utf-8?B?c21nRDVJZy9MVUcydnNucCtaOElzcDRDNjVtSWpkQUF0VEFIb3NvSjRKVEZQ?=
+ =?utf-8?B?TmJ1L2cyT3huWUxNbDV4SVFmVDd4S1dGZlpQTGVHMjNiZzJMb2dNZWhUTFdU?=
+ =?utf-8?B?a1lXczJMS21UL3UwNkMySGdjWEhCSVUvRW0rbTNLUlloYmV2ZVhXdHAvYVJi?=
+ =?utf-8?B?TGlmR2dMS1FDNmRMNG5nOE5wcGNyclArOTc5SEFWeGpyeVdId0dRVnpiTFdU?=
+ =?utf-8?B?NUFFY1dHQVlOcVoxOFRzSTh4NGZOcEMycU51d0NpWUFVKy9RTllxQzNnazBJ?=
+ =?utf-8?B?NWFmQ2E3bjlhYjVIUnRraU50YzRRYXozZ0lVSUNXRldvM2VQaG1CeCs3MDNY?=
+ =?utf-8?B?cGc0UUpkTzJJZ25wOUJqRE1hcmoyb2lWb1RjWFg2MXlIbk9VaDBkU1h0Snpn?=
+ =?utf-8?B?S0FjVExld0VmMk1oeTdjVTk3MFFLNklnSFN1aWI5Nml5UGpQQlhremNHUUhZ?=
+ =?utf-8?B?MitpaHVZdGk1Uysvdk1ZSHhZQTBRdkMzcnlRZXpYVU41cHh6bDFPaXVYd1pJ?=
+ =?utf-8?B?d2VhUFlwN09OTFBUTXd3TlZtUk9BL1VFc1N6czBIb3pSejFuRVJwNkNRS0tk?=
+ =?utf-8?B?eGpBcHVDbzNvWmhCU0RzRlUyUDd1MVBqRGI1SVA2TngyR1NWTkJIbjBocHBX?=
+ =?utf-8?B?MnR4d2FaVktqd3JVNitGWjZYMUhFVEZmbjVQaWZldWtnRFdpVGlCWUZqSDRT?=
+ =?utf-8?B?dDlVSDFFVVlOODNqdFA4RDVXWXJOeC94QjhpMG9oSDU4ZVEwQ1lQb2VWVWM1?=
+ =?utf-8?B?THZEMk1rRXc0U0hySitPTkhVV04wZ05hUlo3NTBFRkJROG1YS081VVEwa1RC?=
+ =?utf-8?B?QnEwdTFoK05NVkVLTDJhZUs4YzNWdTNzMmNjUmRENU9LekVZMHJuMlhmMG16?=
+ =?utf-8?B?NXhYYm9OYUFpT2lUNEhyM3FmT253WGYvcHg3VW5FaE5pbHBXY0pra1kvUHcr?=
+ =?utf-8?B?cEVVcFoyK1RzYVNQbUJ0QnlGc2JXSEtQOE9oZGZlTkllMHZXTnFGbGQ2NVls?=
+ =?utf-8?B?aWxMME9zcEphR1MwdEtvQ090bExpMzZ2YTZ1Qm94a1NPNnI3RzFJSWw1TS9T?=
+ =?utf-8?B?RzVxRDVMQmM5TEFIU3dLNFhKajN4MUNoVGRPbkI2Zy9UcWROZnFVdzhOekUw?=
+ =?utf-8?B?cnpZQTY1YXRmd3ZGb0ZHQkFVaTZ2WCs2SFZlT3U0RFVMcGRvOC9INHVoTXo5?=
+ =?utf-8?B?aEc5aFRRWms0MGhHek5GV282eFhiNzZNblBhcnJ6eXlVcmdmWFlXcGs4dVlL?=
+ =?utf-8?B?WmR4Q1BWWEM5YVJDck8yaUJFVFZhUDNlVGU1MTVRdkwrWWh3VmhTSmdpOW9D?=
+ =?utf-8?B?THJwUURTTjZWaHBhUFltemdMWlN2cVJ4Uy91WnhiUEFGWWVqbUNxeGE3RDdH?=
+ =?utf-8?B?UURMcjJoRmVCaURuNEc4S2EzV0dXZW42bHNYc3RrclRiV05BemN3TXZvT28x?=
+ =?utf-8?B?cCtwek9jR3pxMm9vRkpSUjB3UWhNTXYwRy9JVVRxRWh4cVVya0JoeWFJOHMz?=
+ =?utf-8?Q?jImXlUPsth2i9QfM=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5ae38cea-b499-488f-9023-08da29ec4cc9
+X-MS-Exchange-CrossTenant-AuthSource: BLAPR10MB4835.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2022 14:26:50.9128
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /BAB1RQm5piD5IWuU5BbVSq6eWmr15xiOtfK+IS2zd7wNYzHjxAMT+PpXBwQBTUzfA2ieSqX3lcnIKVmU01KvAALaCfnHorqQ4c4WG3ZPVc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR10MB2507
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.486,18.0.858
+ definitions=2022-04-29_05:2022-04-28,2022-04-29 signatures=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
+ malwarescore=0 mlxscore=0 phishscore=0 bulkscore=0 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204290080
+X-Proofpoint-ORIG-GUID: g_3d3vMhy-dzmSmMdBcRoatnTcbbVJ97
+X-Proofpoint-GUID: g_3d3vMhy-dzmSmMdBcRoatnTcbbVJ97
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 29, 2022, Paolo Bonzini wrote:
-> On 4/29/22 01:34, Sean Christopherson wrote:
+On 4/29/22 13:08, Jason Gunthorpe wrote:
+> On Thu, Apr 28, 2022 at 10:09:15PM +0100, Joao Martins wrote:
+>> +
+>> +unsigned int iommu_dirty_bitmap_record(struct iommu_dirty_bitmap *dirty,
+>> +				       unsigned long iova, unsigned long length)
+>> +{
 > 
-> > +static inline gfn_t kvm_mmu_max_gfn_host(void)
-> > +{
-> > +	/*
-> > +	 * Disallow SPTEs (via memslots or cached MMIO) whose gfn would exceed
-> > +	 * host.MAXPHYADDR.  Assuming KVM is running on bare metal, guest
-> > +	 * accesses beyond host.MAXPHYADDR will hit a #PF(RSVD) and never hit
-> > +	 * an EPT Violation/Misconfig / #NPF, and so KVM will never install a
-> > +	 * SPTE for such addresses.  That doesn't hold true if KVM is running
-> > +	 * as a VM itself, e.g. if the MAXPHYADDR KVM sees is less than
-> > +	 * hardware's real MAXPHYADDR, but since KVM can't honor such behavior
-> > +	 * on bare metal, disallow it entirely to simplify e.g. the TDP MMU.
-> > +	 */
-> > +	return (1ULL << (shadow_phys_bits - PAGE_SHIFT)) - 1;
+> Lets put iommu_dirty_bitmap in its own patch, the VFIO driver side
+> will want to use this same data structure.
 > 
-> The host.MAXPHYADDR however does not matter if EPT/NPT is not in use, because
-> the shadow paging fault path can accept any gfn.
+OK.
 
-... 
+>> +	while (nbits > 0) {
+>> +		kaddr = kmap(dirty->pages[idx]) + start_offset;
+> 
+> kmap_local?
+> 
+/me nods
 
-> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index e6cae6f22683..dba275d323a7 100644
-> --- a/arch/x86/kvm/mmu.h
-> +++ b/arch/x86/kvm/mmu.h
-> @@ -65,6 +65,30 @@ static __always_inline u64 rsvd_bits(int s, int e)
->  	return ((2ULL << (e - s)) - 1) << s;
->  }
-> +/*
-> + * The number of non-reserved physical address bits irrespective of features
-> + * that repurpose legal bits, e.g. MKTME.
-> + */
-> +extern u8 __read_mostly shadow_phys_bits;
-> +
-> +static inline gfn_t kvm_mmu_max_gfn(void)
-> +{
-> +	/*
-> +	 * Note that this uses the host MAXPHYADDR, not the guest's.
-> +	 * EPT/NPT cannot support GPAs that would exceed host.MAXPHYADDR;
-> +	 * assuming KVM is running on bare metal, guest accesses beyond
-> +	 * host.MAXPHYADDR will hit a #PF(RSVD) and never cause a vmexit
-> +	 * (either EPT Violation/Misconfig or #NPF), and so KVM will never
-> +	 * install a SPTE for such addresses.  If KVM is running as a VM
-> +	 * itself, on the other hand, it might see a MAXPHYADDR that is less
-> +	 * than hardware's real MAXPHYADDR.  Using the host MAXPHYADDR
-> +	 * disallows such SPTEs entirely and simplifies the TDP MMU.
-> +	 */
-> +	int max_gpa_bits = likely(tdp_enabled) ? shadow_phys_bits : 52;
+>> +/**
+>> + * struct iommu_dirty_bitmap - Dirty IOVA bitmap state
+>> + *
+>> + * @iova: IOVA representing the start of the bitmap, the first bit of the bitmap
+>> + * @pgshift: Page granularity of the bitmap
+>> + * @gather: Range information for a pending IOTLB flush
+>> + * @start_offset: Offset of the first user page
+>> + * @pages: User pages representing the bitmap region
+>> + * @npages: Number of user pages pinned
+>> + */
+>> +struct iommu_dirty_bitmap {
+>> +	unsigned long iova;
+>> +	unsigned long pgshift;
+>> +	struct iommu_iotlb_gather *gather;
+>> +	unsigned long start_offset;
+>> +	unsigned long npages;
+>> +	struct page **pages;
+> 
+> In many (all?) cases I would expect this to be called from a process
+> context, can we just store the __user pointer here, or is the idea
+> that with modern kernels poking a u64 to userspace is slower than a
+> kmap?
+> 
+I have both options implemented, I'll need to measure it. Code-wise it would be
+a lot simpler to just poke at the userspace addresses (that was my first
+prototype of this) but felt that poking at kernel addresses was safer and
+avoid assumptions over the context (from the iommu driver). I can bring back
+the former alternative if this was the wrong thing to do.
 
-I don't love the divergent memslot behavior, but it's technically correct, so I
-can't really argue.  Do we want to "officially" document the memslot behavior?
+> I'm particularly concerend that this starts to require high
+> order allocations with more than 2M of bitmap.. Maybe one direction is
+> to GUP 2M chunks at a time and walk the __user pointer.
+> 
+That's what I am doing here. We GUP 2M of *bitmap* at a time.
+Which is about 1 page for the struct page pointers. That is enough
+for 64G of IOVA dirties read worst-case scenario (i.e. with base pages).
 
-> +
-> +	return (1ULL << (max_gpa_bits - PAGE_SHIFT)) - 1;
-> +}
-> +
->  void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask);
->  void kvm_mmu_set_ept_masks(bool has_ad_bits, bool has_exec_only);
+>> +static inline void iommu_dirty_bitmap_init(struct iommu_dirty_bitmap *dirty,
+>> +					   unsigned long base,
+>> +					   unsigned long pgshift,
+>> +					   struct iommu_iotlb_gather *gather)
+>> +{
+>> +	memset(dirty, 0, sizeof(*dirty));
+>> +	dirty->iova = base;
+>> +	dirty->pgshift = pgshift;
+>> +	dirty->gather = gather;
+>> +
+>> +	if (gather)
+>> +		iommu_iotlb_gather_init(dirty->gather);
+>> +}
+> 
+> I would expect all the GUPing logic to be here too?
+
+I had this in the iommufd_dirty_iter logic given that the iommu iteration
+logic is in the parent structure that stores iommu_dirty_data.
+
+My thinking with this patch was just to have what the IOMMU driver needs.
+
+Which actually if anything this helper above ought to be in a later patch.
