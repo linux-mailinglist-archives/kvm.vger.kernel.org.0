@@ -2,68 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 89328514C9D
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 16:20:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41664514CB7
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 16:24:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377133AbiD2OX0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 10:23:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59742 "EHLO
+        id S1377224AbiD2O2A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 10:28:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355718AbiD2OXZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 10:23:25 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C6C72BCF;
-        Fri, 29 Apr 2022 07:20:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651242007; x=1682778007;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=/bGhVKHoEh7eHUDyaw5m0yQ3oS5lWEnkoQ/GQvJerek=;
-  b=c9ITCokXFmq+Z7NsDa4qGXrnaYFJUNENfuVWSnu02Jz0jUGrAfCwCpYV
-   xIrPgShsbJIaATPpKxMkxXkBglePDJyFCHT3sSRpSzwMrEWau0SGBS4Ha
-   J0yg9LXf4468CC2PT3YA0cruM7tBgVmyyUJBujwiBVbbHQEAobIWC5VhN
-   7697wGuM1eAeW2lySAtkfoQVw9h+puGkoPXiiYkRue/GAd6FNjYEFVW7E
-   fHguXUiH2ucqFhZeiiDZ718k4fw2jSlYKE4Q/3p20V1KpjkrZg2qaG2xy
-   ya/n2VUXy0srFexolBZIpOwqhq5P33j17YEQn4UynEVd3ch2YK/jxYwdr
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10331"; a="329600105"
-X-IronPort-AV: E=Sophos;i="5.91,185,1647327600"; 
-   d="scan'208";a="329600105"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 07:20:06 -0700
-X-IronPort-AV: E=Sophos;i="5.91,185,1647327600"; 
-   d="scan'208";a="582148551"
-Received: from jinggu-mobl1.amr.corp.intel.com (HELO [10.212.30.227]) ([10.212.30.227])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 07:20:05 -0700
-Message-ID: <5984b61f-6a4a-c12a-944d-f4a78bdefc3d@intel.com>
-Date:   Fri, 29 Apr 2022 07:20:21 -0700
+        with ESMTP id S234266AbiD2O17 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 10:27:59 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC0D991358
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 07:24:40 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id e24so7276461pjt.2
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 07:24:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=7tC/JKOk9L0c4P3431GOxph3zjvk5J8dJFmkqVAnJxc=;
+        b=F0+Y3mMT0AqdA2ZfjnbeDVfDmZPiiSQXRHQCLASaN7eLfv15TfF0iLNRdE6IOoeC/g
+         6GkXEEBq0PSKDjB2LJstij0jmH99SMZXxtjVbtiDjgY2vdjLCU+EE5SoMc5FV4TR9tG5
+         ehRV+g9B5kQNJtwCJEoRKDuSMT/SV+oYmWMEAUsVtFJnPTYB5/qUX4MBdp8WlNfn0fyB
+         3ld1a7DlYAa61TIpVQunTEelniygDy9n7MOGhFEb2bhWuoZunIZEfAgiXofhJWVX062S
+         EB3po2+BTr4QWUV/PcCKFE/2uDBMP2pS/prgXU/+a7qr9JylszfvPmOveqX8gGS0sCOs
+         qOzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=7tC/JKOk9L0c4P3431GOxph3zjvk5J8dJFmkqVAnJxc=;
+        b=wQmWx20CFGAemUkCejZ4O3C/rFrEAAxCLxUpk3Fqkc3/rCN42gz+DP0TL8VMeRs0ZU
+         p91EGwORi2sTJtSMSwg7kyRuubG5M7/aumsP0+ZLPoy41UHJh75J0z2AOP/yFU52vIu8
+         MlU6/X+XeYXfUf3U0bWxY8lJSw/Op33csPpvrPeIPozvnSh3fr54MAGL4Y9dSrgvJL9l
+         d7qqxszKwsje0UN1KEYmcuVkJacz2mXBeCu0c2eFUI3ymr2C07Gdm68AU3iQuqWyDcqF
+         Kv6PotnI2QUmAwOWrBkgKoX5LS1HxrDln0Xc4q4CN9FhbX9kuQAysUUdaKbv+63rVLn0
+         xGRg==
+X-Gm-Message-State: AOAM530iBWxtA1UGdkdbeC+UzgMOKNBzvollujOjLPKcdbhNXPR9zJzl
+        IauzOJO3l5iayf0iLRMxlGqDXQ==
+X-Google-Smtp-Source: ABdhPJwedY/+Y+SN/KDf33mBRLNyBEObEHex1x/IqkMk86Yt4Fukf5wpBrFB7Bnr5BKAbNwLSzjrUA==
+X-Received: by 2002:a17:902:e748:b0:15c:e3b9:bba3 with SMTP id p8-20020a170902e74800b0015ce3b9bba3mr33249235plf.139.1651242279947;
+        Fri, 29 Apr 2022 07:24:39 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id g17-20020a625211000000b005056a6313a7sm3168604pfb.87.2022.04.29.07.24.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Apr 2022 07:24:38 -0700 (PDT)
+Date:   Fri, 29 Apr 2022 14:24:35 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Do not create SPTEs for GFNs that exceed
+ host.MAXPHYADDR
+Message-ID: <Ymv1I5ixX1+k8Nst@google.com>
+References: <20220428233416.2446833-1-seanjc@google.com>
+ <337332ca-835c-087c-c99b-92c35ea8dcd3@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v3 13/21] x86/virt/tdx: Allocate and set up PAMTs for
- TDMRs
-Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-References: <cover.1649219184.git.kai.huang@intel.com>
- <ffc2eefdd212a31278978e8bfccd571355db69b0.1649219184.git.kai.huang@intel.com>
- <c9b17e50-e665-3fc6-be8c-5bb16afa784e@intel.com>
- <3664ab2a8e0b0fcbb4b048b5c3aa5a6e85f9618a.camel@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <3664ab2a8e0b0fcbb4b048b5c3aa5a6e85f9618a.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <337332ca-835c-087c-c99b-92c35ea8dcd3@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,110 +77,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/29/22 00:46, Kai Huang wrote:
-> On Thu, 2022-04-28 at 10:12 -0700, Dave Hansen wrote:
->> This is also a good place to note the downsides of using
->> alloc_contig_pages().
+On Fri, Apr 29, 2022, Paolo Bonzini wrote:
+> On 4/29/22 01:34, Sean Christopherson wrote:
 > 
-> For instance:
+> > +static inline gfn_t kvm_mmu_max_gfn_host(void)
+> > +{
+> > +	/*
+> > +	 * Disallow SPTEs (via memslots or cached MMIO) whose gfn would exceed
+> > +	 * host.MAXPHYADDR.  Assuming KVM is running on bare metal, guest
+> > +	 * accesses beyond host.MAXPHYADDR will hit a #PF(RSVD) and never hit
+> > +	 * an EPT Violation/Misconfig / #NPF, and so KVM will never install a
+> > +	 * SPTE for such addresses.  That doesn't hold true if KVM is running
+> > +	 * as a VM itself, e.g. if the MAXPHYADDR KVM sees is less than
+> > +	 * hardware's real MAXPHYADDR, but since KVM can't honor such behavior
+> > +	 * on bare metal, disallow it entirely to simplify e.g. the TDP MMU.
+> > +	 */
+> > +	return (1ULL << (shadow_phys_bits - PAGE_SHIFT)) - 1;
 > 
-> 	The allocation may fail when memory usage is under pressure.
+> The host.MAXPHYADDR however does not matter if EPT/NPT is not in use, because
+> the shadow paging fault path can accept any gfn.
 
-It's not really memory pressure, though.  The larger the allocation, the
-more likely it is to fail.  The more likely it is that the kernel can't
-free the memory or that if you need 1GB of contiguous memory that
-999.996MB gets freed, but there is one stubborn page left.
+... 
 
-alloc_contig_pages() can and will fail.  The only mitigation which is
-guaranteed to avoid this is doing the allocation at boot.  But, you're
-not doing that to avoid wasting memory on every TDX system that doesn't
-use TDX.
+> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> index e6cae6f22683..dba275d323a7 100644
+> --- a/arch/x86/kvm/mmu.h
+> +++ b/arch/x86/kvm/mmu.h
+> @@ -65,6 +65,30 @@ static __always_inline u64 rsvd_bits(int s, int e)
+>  	return ((2ULL << (e - s)) - 1) << s;
+>  }
+> +/*
+> + * The number of non-reserved physical address bits irrespective of features
+> + * that repurpose legal bits, e.g. MKTME.
+> + */
+> +extern u8 __read_mostly shadow_phys_bits;
+> +
+> +static inline gfn_t kvm_mmu_max_gfn(void)
+> +{
+> +	/*
+> +	 * Note that this uses the host MAXPHYADDR, not the guest's.
+> +	 * EPT/NPT cannot support GPAs that would exceed host.MAXPHYADDR;
+> +	 * assuming KVM is running on bare metal, guest accesses beyond
+> +	 * host.MAXPHYADDR will hit a #PF(RSVD) and never cause a vmexit
+> +	 * (either EPT Violation/Misconfig or #NPF), and so KVM will never
+> +	 * install a SPTE for such addresses.  If KVM is running as a VM
+> +	 * itself, on the other hand, it might see a MAXPHYADDR that is less
+> +	 * than hardware's real MAXPHYADDR.  Using the host MAXPHYADDR
+> +	 * disallows such SPTEs entirely and simplifies the TDP MMU.
+> +	 */
+> +	int max_gpa_bits = likely(tdp_enabled) ? shadow_phys_bits : 52;
 
-A *good* way (although not foolproof) is to launch a TDX VM early in
-boot before memory gets fragmented or consumed.  You might even want to
-recommend this in the documentation.
+I don't love the divergent memslot behavior, but it's technically correct, so I
+can't really argue.  Do we want to "officially" document the memslot behavior?
 
->>> +/*
->>> + * Locate the NUMA node containing the start of the given TDMR's first
->>> + * RAM entry.  The given TDMR may also cover memory in other NUMA nodes.
->>> + */
->>
->> Please add a sentence or two on the implications here of what this means
->> when it happens.  Also, the joining of e820 regions seems like it might
->> span NUMA nodes.  What prevents that code from just creating one large
->> e820 area that leads to one large TDMR and horrible NUMA affinity for
->> these structures?
-> 
-> How about adding:
-> 
-> 	When TDMR is created, it stops spanning at NUAM boundary.
-
-I actually don't know what that means at all.  I was thinking of
-something like this.
-
-/*
- * Pick a NUMA node on which to allocate this TDMR's metadata.
- *
- * This is imprecise since TDMRs are 1GB aligned and NUMA nodes might
- * not be.  If the TDMR covers more than one node, just use the _first_
- * one.  This can lead to small areas of off-node metadata for some
- * memory.
- */
-
->>> +static int tdmr_get_nid(struct tdmr_info *tdmr)
->>> +{
->>> +	u64 start, end;
->>> +	int i;
->>> +
->>> +	/* Find the first RAM entry covered by the TDMR */
-
-There's something else missing in here.  Why not just do:
-
-	return phys_to_target_node(TDMR_START(tdmr));
-
-This would explain it:
-
-	/*
-	 * The beginning of the TDMR might not point to RAM.
-	 * Find its first RAM address which which its node can
-	 * be found.
-	 */
-
->>> +	e820_for_each_mem(i, start, end)
->>> +		if (end > TDMR_START(tdmr))
->>> +			break;
->>
->> Brackets around the big loop, please.
-> 
-> OK.
-> 
->>
->>> +	/*
->>> +	 * One TDMR must cover at least one (or partial) RAM entry,
->>> +	 * otherwise it is kernel bug.  WARN_ON() in this case.
->>> +	 */
->>> +	if (WARN_ON_ONCE((start >= end) || start >= TDMR_END(tdmr)))
->>> +		return 0;
-
-This really means "no RAM found for this TDMR", right?  Can we say that,
-please.
-
-
->>> +	/*
->>> +	 * Allocate one chunk of physically contiguous memory for all
->>> +	 * PAMTs.  This helps minimize the PAMT's use of reserved areas
->>> +	 * in overlapped TDMRs.
->>> +	 */
->>
->> Ahh, this explains it.  Considering that tdmr_get_pamt_sz() is really
->> just two lines of code, I'd probably just the helper and open-code it
->> here.  Then you only have one place to comment on it.
-> 
-> It has a loop and internally calls __tdmr_get_pamt_sz().  It looks doesn't fit
-> if we open-code it here.
-> 
-> How about move this comment to tdmr_get_pamt_sz()?
-
-I thought about that.  But tdmr_get_pamt_sz() isn't itself doing any
-allocation so it doesn't make a whole lot of logical sense.  This is a
-place where a helper _can_ be removed.  Remove it, please.
+> +
+> +	return (1ULL << (max_gpa_bits - PAGE_SHIFT)) - 1;
+> +}
+> +
+>  void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask);
+>  void kvm_mmu_set_ept_masks(bool has_ad_bits, bool has_exec_only);
