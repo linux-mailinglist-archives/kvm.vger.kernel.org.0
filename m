@@ -2,234 +2,359 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 16870514A41
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 15:08:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2ECF514AC6
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 15:40:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359695AbiD2NLz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 09:11:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58086 "EHLO
+        id S1349313AbiD2Nnr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 09:43:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233159AbiD2NLy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 09:11:54 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2075.outbound.protection.outlook.com [40.107.236.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 767D5CABB4;
-        Fri, 29 Apr 2022 06:08:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CQE+evny/wF3Ek5znjhEc81kH4JDQL2PzQfvo2kAls55LarJvUsiaLSwB23gSzVQN7SzIOPqwzaQ3qrEOoRVswWUt05dBcQbxUtLlYuqaqEBPplZKN3qvuBFW6Ma3Qx53P3FAKiE7ZIrxx8mLWFYfaVeMgr0Tb8qYPrSBVK/kwOT8ei2DoA4U2TGTSmgziHunA2VWo7/jXxm5MDIrwlbjUUpxsHyxtzzi3pbTohA293uVFMXTH7CivhAIdfIdtBEF8gXs3bnJNXxdVa68p35WX68N9IYrwzue67WqUD8SQJRdzWgo3DDCH0s1Zh+R65VBI5nvtjhMHempMHG90e/rw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8QkW2q9FWkgFl4bBR16zdLA9b2Zq/BfTHXfBqHLJK2w=;
- b=e6kAa2Fmrp2YLsmQF29j3GOCg4PBe+WHfD+Z/ch9FbuLbuJq08ILJ5gtImfUqeXYdya7KzhVRtZHUB4qZJczPkz2AomII8ak3nC14H228Tb42oDNiVoPdtCKbyuu2peAFz+UDLDcgFg/hHi5ElPWJlZQvuBJIADdD9MA4whzV8Zw35ZK6OzHkchEPmVo7vD59E9OXBLqgxc8I+Vu1FD3zKFrljJLd8DK29dU8DSClZtUYvuwgdiE8WCSEm2cGobmDmLlg5BMrY3dCE0Q2uRCqUMaTPNiHMBLFl1pamlBUvIGLnna7E1+KpGiXzP+VJuf1aim3LaFVz8hlX1uyX9SBQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8QkW2q9FWkgFl4bBR16zdLA9b2Zq/BfTHXfBqHLJK2w=;
- b=oNVGZu7ew//79hsOIjiflbB2t+08n/rnJK+dmmBjLGYMqRPa3ASNEh5KHUrFR2zQZJC9B9bJkPY8Y7l2VR9UhUH69f5AIOcbm6t9ED5KU7HKAPURPsKqav21aD4s5gA7dW1S0xwKJTuUDQFTi+GzJVMGhBGvQVkPJxyljKtOXLs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by BN9PR12MB5210.namprd12.prod.outlook.com (2603:10b6:408:11b::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.13; Fri, 29 Apr
- 2022 13:08:31 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::db8:5b23:acf0:6f9a]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::db8:5b23:acf0:6f9a%4]) with mapi id 15.20.5186.026; Fri, 29 Apr 2022
- 13:08:31 +0000
-Message-ID: <46b27b72-aabf-f37d-7304-29debeefd8ae@amd.com>
-Date:   Fri, 29 Apr 2022 08:08:28 -0500
+        with ESMTP id S245622AbiD2Nnp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 09:43:45 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3268C2611
+        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 06:40:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651239627; x=1682775627;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=mO3fK/GMhj5ngxdTy682pnmAooXgUBLN8505Zg2MY9I=;
+  b=EIUuI2E1DUnraPW8PKN3NMbHcV1oahQ43tbA5Pt7zN8UvDEpGpIXIp4N
+   bx5q/Wtp5/nfeAvRzJTJeZbavGFev3KOeeDnpvp8RusR3zKvUt8LjGGyH
+   oQtoDqPAhLw7r2BhECVZpSc4qVn2N4mMjuMJ2Qz7BetURngdbn808ztxC
+   x6ltnTEFsFd5KEjQS4USa+an/4U4GMQfxs5aZfCRmiPYNqWpnjf67wU+k
+   1rq0FXIsElsUsHPSEivUjymYdrH+pMuqKhpW9VKwkYKq1hIdYnZL8gYy9
+   G9uit96lPskYRhZfm5Cyp1Hw/OsgFRv4zKCPChGTvu0Pqk2tWEfodJKaf
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10331"; a="248576182"
+X-IronPort-AV: E=Sophos;i="5.91,185,1647327600"; 
+   d="scan'208";a="248576182"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 06:40:26 -0700
+X-IronPort-AV: E=Sophos;i="5.91,185,1647327600"; 
+   d="scan'208";a="582130605"
+Received: from lye4-mobl.ccr.corp.intel.com (HELO [10.249.170.95]) ([10.249.170.95])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 06:40:22 -0700
+Message-ID: <2d369e58-8ac0-f263-7b94-fe73917782e1@linux.intel.com>
+Date:   Fri, 29 Apr 2022 21:40:19 +0800
+MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
+ Thunderbird/91.7.0
+Subject: Re: [PATCH RFC 01/19] iommu: Add iommu_domain ops for dirty tracking
 Content-Language: en-US
-To:     Tao Liu <ltao@redhat.com>, Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, kvm@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        virtualization@lists.linux-foundation.org,
-        Arvind Sankar <nivedita@alum.mit.edu>, hpa@zytor.com,
-        Jiri Slaby <jslaby@suse.cz>,
-        David Rientjes <rientjes@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Joerg Roedel <jroedel@suse.de>,
-        Kees Cook <keescook@chromium.org>,
-        Cfir Cohen <cfir@google.com>, linux-coco@lists.linux.dev,
-        Andy Lutomirski <luto@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Juergen Gross <jgross@suse.com>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        kexec@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Eric Biederman <ebiederm@xmission.com>,
-        Erdem Aktas <erdemaktas@google.com>
-References: <20220127101044.13803-1-joro@8bytes.org>
- <YmuqifsJltdh7rpv@localhost.localdomain>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v3 00/10] x86/sev: KEXEC/KDUMP support for SEV-ES guests
-In-Reply-To: <YmuqifsJltdh7rpv@localhost.localdomain>
+To:     Joao Martins <joao.m.martins@oracle.com>,
+        iommu@lists.linux-foundation.org
+Cc:     Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Yi Liu <yi.l.liu@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+References: <20220428210933.3583-1-joao.m.martins@oracle.com>
+ <20220428210933.3583-2-joao.m.martins@oracle.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20220428210933.3583-2-joao.m.martins@oracle.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA0PR11CA0046.namprd11.prod.outlook.com
- (2603:10b6:806:d0::21) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 84d2912a-3ca0-4169-c160-08da29e15bfb
-X-MS-TrafficTypeDiagnostic: BN9PR12MB5210:EE_
-X-Microsoft-Antispam-PRVS: <BN9PR12MB5210218EBF06A66A7710C2E6ECFC9@BN9PR12MB5210.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: euWGa+OpcLFnLunIFlSHZ83Nst/Y+Ftt+FY66S91Y2UtLV3qaJVIcHvY6x1HtBNmUvdXqkM9l8soH1NSbb7rVoLpunRGqYn457W8/OKZKUA76ntTGs20kBw3/dYeis52maKjkNPZYQzJ0Ef0hHqh5C92UH6C04WwMs0avC4uGJ26aRd+ENYVOjvui2uXVJBydet2k99oaTKjhzjIsMjtnPWddhdMB7a/xqbBaUFV+uK6na+GCV5rKRXxHb6/VgUCU2jN+DK8pDKI2Fdpx2G7UYAyWrLLfMIzFmR23UM4VOEr5MB3gOHz4AmIR29KrjD+Cg9VCvFNsGFtICn03B1NZRCXUQk+kfJY5mrQUtU+ltORsrfLx5PRgrPdHxe0rBq32eZZ5TwBu4k1toCQ14caWT61EkSk/eneUxgUKyq2xGy/ksl0VoIyUprQRrjQnpXs+ISI9pbE4OcjQigeYABKIvX0FTekNUdeK6bNlTPSnoveKDzEe4Ed70CLUzr1NrJtmSuMPj/8cfpW7yDdlliFrangJgA7Qe4587xlHMYLTyYVtXyFuc4f2ba2aQSwLLhdX++ablDlfEfPBP1hPGTr42tMRO6zRcqezdBYLAurKQakl8HDGtNZyt2yB1KgV49LLeCTt57UtX16R4ZY/Ptem0kXJnOWYszLVq7TanaO9E/saDTXrBpLiqI8pFJjZShsIrrmcJOF3teHPd+jz0T4nHq+iadIvScxB1agle0SSSkCQOfYcWCBuZBwyS0sKVHlPp9dOL+4BYCsp1mkvHYgwae1mIduXnybYQKTyQg4OHqXRNW7nj5WDHDy3gaSD1CW
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(2906002)(508600001)(36756003)(8936002)(31686004)(316002)(7416002)(966005)(4326008)(6486002)(8676002)(66946007)(66556008)(66476007)(5660300002)(110136005)(6512007)(6506007)(54906003)(2616005)(53546011)(26005)(186003)(38100700002)(86362001)(31696002)(6666004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?d1oraytseG5kRUpwU09GUVBZMGFFM1JPKzJDN1NyaURONlpISjRGTzFDblhV?=
- =?utf-8?B?b3ZNM3hhUmhwN3R2Y2oydE9EbDI3TUNHOGJQbklPcHcyVkovNjFpUUtobHFP?=
- =?utf-8?B?VFRBc1BJS3J5Uk85TXpqNnNma2NadWN3bXZqMkN0Y3VEd3dpU1JDYS9iVDk3?=
- =?utf-8?B?OGllU2x3N0tkTjJnTWZwam5tS2RKbitHcngvTzdSVHJ4cVhlOTgxeGZ1QmI2?=
- =?utf-8?B?M2VwOW1hZ2xSbmRwU21tRzJHWXVLeVc2eG1MV3FxUDNoZFN2UHRudjl6Nzcw?=
- =?utf-8?B?SHMyMGdwUHBRQ25MN3RCdHVwOXB5bHdwR0diV3FRL2ZibXR0S2pMckpFZmUz?=
- =?utf-8?B?Sm5jRm5PS2hoZG5ycGxFbE1UU2xPKzVtK2ZmSDN6ajFDVkpkdk1FeFVxZlRY?=
- =?utf-8?B?U0xDYnJTS1pLRnBGTVJrMjFaai8wNmpHVzdtSXNMR0xaL1lWeTgwdWFFNWk4?=
- =?utf-8?B?RmRYV1gxNUl6Q0ZIU1A3U3JBZ0VkaFdCa2pxYUZoQWcxV3VYUk1zdG9nZnRR?=
- =?utf-8?B?b0tPQ1ZZRDRoU24rdzJJN3RDN3VsdkRvOFl6RDREZmw4Ny80NGM5Zm9kbkhY?=
- =?utf-8?B?SUhLcTBYeUZ5MUNIN2x2TXBBdmVGUXNKd25QQy9RUTFjeHN0NFVPZzVSYkV6?=
- =?utf-8?B?VnNZSXRrSUhUN0NUS0NESWtpeFgzdDZBdnh3SkZyOVpCbnNNZVg4MWJqTzU3?=
- =?utf-8?B?QkNBOFl5NzVHZldkMDgvL2wwZ25kSktKby9kQUl3V0pvTTMwMGxTTlFRSUpM?=
- =?utf-8?B?N1lpUnlyQWt3S0pRM0gyejE5VlR2TGJxVnAwTG4wcWNGMEM3dkhydkVycHEv?=
- =?utf-8?B?S3lBS09md3V3c05rcVJ0WDFPZHlOd0xqSXhHNnFwZlUrNjhKSU55TlRlUlZi?=
- =?utf-8?B?NnhIcnNaV1RGM2FwTmVHKzN4eWg0ZXM4M1JKbXhjZzhQTURLS2RCalFQK0ps?=
- =?utf-8?B?WnRYSGVrazN0MUFYUHZSby84RS9ySEtWWVUvVERwSXJ5anQrRU5IcGdXeVVy?=
- =?utf-8?B?VVRNdGo5RkxldHpWNE5qUGF0eHJUUEVXYUJYTUNydHpIa2FTZkxQQjJjb3Jl?=
- =?utf-8?B?SEF1K2ZQVm9jSmhEODNCZHEzQ1VpbG9sRGw4akdGdXlqNTdad3Jka2cyVXRL?=
- =?utf-8?B?NklsRW1hWlhTeE5yaEM5MXBlYXNZOUFObXVPbkI0aUpRbWhhN1JjS0ppTHk2?=
- =?utf-8?B?djRvUkJOMDdXWFo1MDc5dklwMlVnQXgvMTM2UFR4ZXMwa1JScUhoeVU5cVN3?=
- =?utf-8?B?clFwYUsrOTlub2hnUVNYanJZbE0zb1ZtckpMTDBtUGpldTJwQTdpeWt2Ym9v?=
- =?utf-8?B?U1FqN0V2UjRJQ0JLVXlTY1lJLzRzbUJRaUFOUGh2UzdRQ2ltWkVEbnZnMTRp?=
- =?utf-8?B?TDZaMXhTWnB1YWhKSkJWOXdVMi9mNUZaLzJjeEFWWi84cStzSTlwR0lZbVEv?=
- =?utf-8?B?cUVSZHZwTmh6L3lUek5ZUTJ6RzVxN1plZUoxWHFNWEFmTnQxYmp0NkZVKzl5?=
- =?utf-8?B?WmlyVC90NEF2U2szdnNUa3J1L290elQ5UXF3MlVGdUhGaW1YTDZPSzJmb0Zz?=
- =?utf-8?B?djJXT2FiMlhIWjJiWkxDZ1ZiM3hTMXhGZUpOblJzaXhaN29uWGJRVllVRUVI?=
- =?utf-8?B?NSsvSzJucFdzWTNjWkErL0h6K1IxT0RkUDRtdElHVk1JcHhadG5nRGd0a0E4?=
- =?utf-8?B?VndZMWd3TWpwZjhXcjZoV3BTL09nZ0VBdSt4KzdWQy8xdXVFaHl1Mm05S3Fl?=
- =?utf-8?B?bmNHT3hkT1hsSjV3ckZXNXh6SEpTVERIWjRwd2VGQklCb1VpU0JoaGtIU2F2?=
- =?utf-8?B?NHdrUExOU0pHWWlCTXZlVVl5ZTA4VkN0RUt3citrRTBJb3dPVTNLcTc0MjM0?=
- =?utf-8?B?TVp1L2ZEalZUSWJmUXVBZ0Q5M3dtL0dibC9tYkZQVjRJSitKZHA1ellzYWNr?=
- =?utf-8?B?aGVIVzI3Y3plKzluUHFORktMeWlHZnUyWXAwVVMzZnp4RDgvYVdyRElwTUZv?=
- =?utf-8?B?TWhzVi95emZDbnBuQlg2L011anJUUGRuNXBlK0UveWlsU0hEYUxXR3hHcnBR?=
- =?utf-8?B?cElpNWF6c3J4WXA3aU1hVnVTVnR4Uit0RmJ2cjZtMzZTLzMrWkpmeVdTU0Js?=
- =?utf-8?B?L0FrZnBpL1RrQ0wzRnlPby9MMGV6Q3pFZ2VzZS9zWk5wbmlybjcwdFV0TW9o?=
- =?utf-8?B?dzcvZ1BZUVRiZkdHcnBjUks1RXh2b1N3RE9EeHVZMjY2TzRXcHlTbE1LMHdF?=
- =?utf-8?B?cGluUFJzTk9ZTGNNaDV2cEI2aWtJdXM2eUJhZVlNWnJCanBsem8vTm5yaGwr?=
- =?utf-8?B?MUpxcGJJdG15azJFMVpvbXZNNWdHTkpWWEVOMmFJRFJtZDBGNHdwUT09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 84d2912a-3ca0-4169-c160-08da29e15bfb
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2022 13:08:31.5826
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cpdhqnKuiVqxGbU87+sjSKcIpUrXY7J65eJhY5QwPXmMwoCuj7iBQYqfUd9HMc0KXekZvxR1hdduY69ggorp/A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5210
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/29/22 04:06, Tao Liu wrote:
-> On Thu, Jan 27, 2022 at 11:10:34AM +0100, Joerg Roedel wrote:
+Hi Joao,
 
-> 
-> Hi Joerg,
-> 
-> I tried the patch set with 5.17.0-rc1 kernel, and I have a few questions:
-> 
-> 1) Is it a bug or should qemu-kvm 6.2.0 be patched with specific patch? Because
->     I found it will exit with 0 when I tried to reboot the VM with sev-es enabled.
->     However with only sev enabled, the VM can do reboot with no problem:
+Thanks for doing this.
 
-Qemu was specifically patched to exit on reboot with SEV-ES guests. Qemu 
-performs a reboot by resetting the vCPU state, which can't be done with an 
-SEV-ES guest because the vCPU state is encrypted.
-
+On 2022/4/29 05:09, Joao Martins wrote:
+> Add to iommu domain operations a set of callbacks to
+> perform dirty tracking, particulary to start and stop
+> tracking and finally to test and clear the dirty data.
 > 
-> [root@dell-per7525-03 ~]# virsh start TW-SEV-ES --console
-> ....
-> Fedora Linux 35 (Server Edition)
-> Kernel 5.17.0-rc1 on an x86_64 (ttyS0)
-> ....
-> [root@fedora ~]# reboot
-> .....
-> [   48.077682] reboot: Restarting system
-> [   48.078109] reboot: machine restart
->                         ^^^^^^^^^^^^^^^ guest vm reached restart
-> [root@dell-per7525-03 ~]# echo $?
-> 0
-> ^^^ qemu-kvm exit with 0, no reboot back to normal VM kernel
-> [root@dell-per7525-03 ~]#
+> Drivers are expected to dynamically change its hw protection
+> domain bits to toggle the tracking and flush some form of
+> control state structure that stands in the IOVA translation
+> path.
 > 
-> 2) With sev-es enabled and the 2 patch sets applied: A) [PATCH v3 00/10] x86/sev:
-> KEXEC/KDUMP support for SEV-ES guests, and B) [PATCH v6 0/7] KVM: SVM: Add initial
-> GHCB protocol version 2 support. I can enable kdump and have vmcore generated:
+> For reading and clearing dirty data, in all IOMMUs a transition
+> from any of the PTE access bits (Access, Dirty) implies flushing
+> the IOTLB to invalidate any stale data in the IOTLB as to whether
+> or not the IOMMU should update the said PTEs. The iommu core APIs
+> introduce a new structure for storing the dirties, albeit vendor
+> IOMMUs implementing .read_and_clear_dirty() just use
+> iommu_dirty_bitmap_record() to set the memory storing dirties.
+> The underlying tracking/iteration of user bitmap memory is instead
+> done by iommufd which takes care of initializing the dirty bitmap
+> *prior* to passing to the IOMMU domain op.
 > 
-> [root@fedora ~]# dmesg|grep -i sev
-> [    0.030600] SEV: Hypervisor GHCB protocol version support: min=1 max=2
-> [    0.030602] SEV: Using GHCB protocol version 2
-> [    0.296144] AMD Memory Encryption Features active: SEV SEV-ES
-> [    0.450991] SEV: AP jump table Blob successfully set up
-> [root@fedora ~]# kdumpctl status
-> kdump: Kdump is operational
+> So far for currently/to-be-supported IOMMUs with dirty tracking
+> support this particularly because the tracking is part of
+> first stage tables and part of address translation. Below
+> it is mentioned how hardware deal with the hardware protection
+> domain control bits, to justify the added iommu core APIs.
+> vendor IOMMU implementation will also explain in more detail on
+> the dirty bit usage/clearing in the IOPTEs.
 > 
-> However without the 2 patch sets, I can also enable kdump and have vmcore generated:
+> * x86 AMD:
 > 
-> [root@fedora ~]# dmesg|grep -i sev
-> [    0.295754] AMD Memory Encryption Features active: SEV SEV-ES
->                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ patch set A & B
-> 	       not applied, so only have this string.
-> [root@fedora ~]# echo c > /proc/sysrq-trigger
+> The same thing for AMD particularly the Device Table
+> respectivally, followed by flushing the Device IOTLB. On AMD[1],
+> section "2.2.1 Updating Shared Tables", e.g.
+> 
+>> Each table can also have its contents cached by the IOMMU or
+> peripheral IOTLBs. Therefore, after
+> updating a table entry that can be cached, system software must
+> send the IOMMU an appropriate
+> invalidate command. Information in the peripheral IOTLBs must
+> also be invalidated.
+> 
+> There's no mention of particular bits that are cached or
+> not but fetching a dev entry is part of address translation
+> as also depicted, so invalidate the device table to make
+> sure the next translations fetch a DTE entry with the HD bits set.
+> 
+> * x86 Intel (rev3.0+):
+> 
+> Likewise[2] set the SSADE bit in the scalable-entry second stage table
+> to enable Access/Dirty bits in the second stage page table. See manual,
+> particularly on "6.2.3.1 Scalable-Mode PASID-Table Entry Programming
+> Considerations"
+> 
+>> When modifying root-entries, scalable-mode root-entries,
+> context-entries, or scalable-mode context
+> entries:
+>> Software must serially invalidate the context-cache,
+> PASID-cache (if applicable), and the IOTLB.  The serialization is
+> required since hardware may utilize information from the
+> context-caches (e.g., Domain-ID) to tag new entries inserted to
+> the PASID-cache and IOTLB for processing in-flight requests.
+> Section 6.5 describe the invalidation operations.
+> 
+> And also the whole chapter "" Table "Table 23.  Guidance to
+> Software for Invalidations" in "6.5.3.3 Guidance to Software for
+> Invalidations" explicitly mentions
+> 
+>> SSADE transition from 0 to 1 in a scalable-mode PASID-table
+> entry with PGTT value of Second-stage or Nested
+> 
+> * ARM SMMUV3.2:
+> 
+> SMMUv3.2 needs to toggle the dirty bit descriptor
+> over the CD (or S2CD) for toggling and flush/invalidate
+> the IOMMU dev IOTLB.
+> 
+> Reference[0]: SMMU spec, "5.4.1 CD notes",
+> 
+>> The following CD fields are permitted to be cached as part of a
+> translation or TLB entry, and alteration requires
+> invalidation of any TLB entry that might have cached these
+> fields, in addition to CD structure cache invalidation:
+> 
 > ...
-> [    2.759403] kdump[549]: saving vmcore-dmesg.txt to /sysroot/var/crash/127.0.0.1-2022-04-18-05:58:50/
-> [    2.804355] kdump[555]: saving vmcore-dmesg.txt complete
-> [    2.806915] kdump[557]: saving vmcore
->                             ^^^^^^^^^^^^^ vmcore can still be generated
+> HA, HD
 > ...
-> [    7.068981] reboot: Restarting system
-> [    7.069340] reboot: machine restart
 > 
-> [root@dell-per7525-03 ~]# echo $?
-> 0
-> ^^^ same exit issue as question 1.
+> Although, The ARM SMMUv3 case is a tad different that its x86
+> counterparts. Rather than changing *only* the IOMMU domain device entry to
+> enable dirty tracking (and having a dedicated bit for dirtyness in IOPTE)
+> ARM instead uses a dirty-bit modifier which is separately enabled, and
+> changes the *existing* meaning of access bits (for ro/rw), to the point
+> that marking access bit read-only but with dirty-bit-modifier enabled
+> doesn't trigger an perm io page fault.
 > 
-> I doesn't have a complete technical background of the patch set, but isn't
-> it the issue which this patch set is trying to solve? Or I missed something?
+> In pratice this means that changing iommu context isn't enough
+> and in fact mostly useless IIUC (and can be always enabled). Dirtying
+> is only really enabled when the DBM pte bit is enabled (with the
+> CD.HD bit as a prereq).
+> 
+> To capture this h/w construct an iommu core API is added which enables
+> dirty tracking on an IOVA range rather than a device/context entry.
+> iommufd picks one or the other, and IOMMUFD core will favour
+> device-context op followed by IOVA-range alternative.
 
-The main goal of this patch set is to really to solve the ability to 
-perform a kexec. I would expect kdump to work since kdump shuts down all 
-but the executing vCPU and performs its operations before "rebooting" 
-(which will exit Qemu as I mentioned above). But kexec requires the need 
-to restart the APs from within the guest after they have been stopped. 
-That requires specific support and actions on the part of the guest kernel 
-in how the APs are stopped and restarted.
-
-Thanks,
-Tom
+Instead of specification words, I'd like to read more about why the
+callbacks are needed and how should they be implemented and consumed.
 
 > 
-> Thanks,
-> Tao Liu
+> [0] https://developer.arm.com/documentation/ihi0070/latest
+> [1] https://www.amd.com/system/files/TechDocs/48882_IOMMU.pdf
+> [2] https://cdrdv2.intel.com/v1/dl/getContent/671081
+> 
+> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+> ---
+>   drivers/iommu/iommu.c      | 28 ++++++++++++++++++++
+>   include/linux/io-pgtable.h |  6 +++++
+>   include/linux/iommu.h      | 52 ++++++++++++++++++++++++++++++++++++++
+>   3 files changed, 86 insertions(+)
+> 
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 0c42ece25854..d18b9ddbcce4 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -15,6 +15,7 @@
+>   #include <linux/init.h>
+>   #include <linux/export.h>
+>   #include <linux/slab.h>
+> +#include <linux/highmem.h>
+>   #include <linux/errno.h>
+>   #include <linux/iommu.h>
+>   #include <linux/idr.h>
+> @@ -3167,3 +3168,30 @@ bool iommu_group_dma_owner_claimed(struct iommu_group *group)
+>   	return user;
+>   }
+>   EXPORT_SYMBOL_GPL(iommu_group_dma_owner_claimed);
+> +
+> +unsigned int iommu_dirty_bitmap_record(struct iommu_dirty_bitmap *dirty,
+> +				       unsigned long iova, unsigned long length)
+> +{
+> +	unsigned long nbits, offset, start_offset, idx, size, *kaddr;
+> +
+> +	nbits = max(1UL, length >> dirty->pgshift);
+> +	offset = (iova - dirty->iova) >> dirty->pgshift;
+> +	idx = offset / (PAGE_SIZE * BITS_PER_BYTE);
+> +	offset = offset % (PAGE_SIZE * BITS_PER_BYTE);
+> +	start_offset = dirty->start_offset;
+> +
+> +	while (nbits > 0) {
+> +		kaddr = kmap(dirty->pages[idx]) + start_offset;
+> +		size = min(PAGE_SIZE * BITS_PER_BYTE - offset, nbits);
+> +		bitmap_set(kaddr, offset, size);
+> +		kunmap(dirty->pages[idx]);
+> +		start_offset = offset = 0;
+> +		nbits -= size;
+> +		idx++;
+> +	}
+> +
+> +	if (dirty->gather)
+> +		iommu_iotlb_gather_add_range(dirty->gather, iova, length);
+> +
+> +	return nbits;
+> +}
+> diff --git a/include/linux/io-pgtable.h b/include/linux/io-pgtable.h
+> index 86af6f0a00a2..82b39925c21f 100644
+> --- a/include/linux/io-pgtable.h
+> +++ b/include/linux/io-pgtable.h
+> @@ -165,6 +165,12 @@ struct io_pgtable_ops {
+>   			      struct iommu_iotlb_gather *gather);
+>   	phys_addr_t (*iova_to_phys)(struct io_pgtable_ops *ops,
+>   				    unsigned long iova);
+> +	int (*set_dirty_tracking)(struct io_pgtable_ops *ops,
+> +				  unsigned long iova, size_t size,
+> +				  bool enabled);
+> +	int (*read_and_clear_dirty)(struct io_pgtable_ops *ops,
+> +				    unsigned long iova, size_t size,
+> +				    struct iommu_dirty_bitmap *dirty);
+>   };
 >   
->> _______________________________________________
->> Virtualization mailing list
->> Virtualization@lists.linux-foundation.org
->> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
-> 
+>   /**
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 6ef2df258673..ca076365d77b 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -189,6 +189,25 @@ struct iommu_iotlb_gather {
+>   	bool			queued;
+>   };
+>   
+> +/**
+> + * struct iommu_dirty_bitmap - Dirty IOVA bitmap state
+> + *
+> + * @iova: IOVA representing the start of the bitmap, the first bit of the bitmap
+> + * @pgshift: Page granularity of the bitmap
+> + * @gather: Range information for a pending IOTLB flush
+> + * @start_offset: Offset of the first user page
+> + * @pages: User pages representing the bitmap region
+> + * @npages: Number of user pages pinned
+> + */
+> +struct iommu_dirty_bitmap {
+> +	unsigned long iova;
+> +	unsigned long pgshift;
+> +	struct iommu_iotlb_gather *gather;
+> +	unsigned long start_offset;
+> +	unsigned long npages;
+
+I haven't found where "npages" is used in this patch. It's better to add
+it when it's really used? Sorry if I missed anything.
+
+> +	struct page **pages;
+> +};
+> +
+>   /**
+>    * struct iommu_ops - iommu ops and capabilities
+>    * @capable: check capability
+> @@ -275,6 +294,13 @@ struct iommu_ops {
+>    * @enable_nesting: Enable nesting
+>    * @set_pgtable_quirks: Set io page table quirks (IO_PGTABLE_QUIRK_*)
+>    * @free: Release the domain after use.
+> + * @set_dirty_tracking: Enable or Disable dirty tracking on the iommu domain
+> + * @set_dirty_tracking_range: Enable or Disable dirty tracking on a range of
+> + *                            an iommu domain
+> + * @read_and_clear_dirty: Walk IOMMU page tables for dirtied PTEs marshalled
+> + *                        into a bitmap, with a bit represented as a page.
+> + *                        Reads the dirty PTE bits and clears it from IO
+> + *                        pagetables.
+>    */
+>   struct iommu_domain_ops {
+>   	int (*attach_dev)(struct iommu_domain *domain, struct device *dev);
+> @@ -305,6 +331,15 @@ struct iommu_domain_ops {
+>   				  unsigned long quirks);
+>   
+>   	void (*free)(struct iommu_domain *domain);
+> +
+> +	int (*set_dirty_tracking)(struct iommu_domain *domain, bool enabled);
+> +	int (*set_dirty_tracking_range)(struct iommu_domain *domain,
+> +					unsigned long iova, size_t size,
+> +					struct iommu_iotlb_gather *iotlb_gather,
+> +					bool enabled);
+
+It seems that we are adding two callbacks for the same purpose. How
+should the IOMMU drivers select to support? Any functional different
+between these two? How should the caller select to use?
+
+> +	int (*read_and_clear_dirty)(struct iommu_domain *domain,
+> +				    unsigned long iova, size_t size,
+> +				    struct iommu_dirty_bitmap *dirty);
+>   };
+>   
+>   /**
+> @@ -494,6 +529,23 @@ void iommu_set_dma_strict(void);
+>   extern int report_iommu_fault(struct iommu_domain *domain, struct device *dev,
+>   			      unsigned long iova, int flags);
+>   
+> +unsigned int iommu_dirty_bitmap_record(struct iommu_dirty_bitmap *dirty,
+> +				       unsigned long iova, unsigned long length);
+> +
+> +static inline void iommu_dirty_bitmap_init(struct iommu_dirty_bitmap *dirty,
+> +					   unsigned long base,
+> +					   unsigned long pgshift,
+> +					   struct iommu_iotlb_gather *gather)
+> +{
+> +	memset(dirty, 0, sizeof(*dirty));
+> +	dirty->iova = base;
+> +	dirty->pgshift = pgshift;
+> +	dirty->gather = gather;
+> +
+> +	if (gather)
+> +		iommu_iotlb_gather_init(dirty->gather);
+> +}
+> +
+>   static inline void iommu_flush_iotlb_all(struct iommu_domain *domain)
+>   {
+>   	if (domain->ops->flush_iotlb_all)
+
+Best regards,
+baolu
