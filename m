@@ -2,73 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 73418515263
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 19:36:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99F7A5152F7
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 19:48:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236374AbiD2Rjp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 13:39:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36570 "EHLO
+        id S1379800AbiD2RwC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 13:52:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379725AbiD2Riv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 13:38:51 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5E2218E21
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 10:35:32 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id i24so7487824pfa.7
-        for <kvm@vger.kernel.org>; Fri, 29 Apr 2022 10:35:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=A2o+Ws1INtn1MzI5In4+SjIaL3aTcpeQBl4+z8iQMc4=;
-        b=NYOSSTKbRD04TVB73Y0G8dVDDfWwHH/CPTSC7daECEsRY/h46kd7k6dLGhMDlrO1s0
-         JvVKQn0GcojLy5mGg40A8qxM6FQZIPQi4E3s2mKqKKJv1jzvkw7Se89NURix2hwEHt+H
-         MtTv2gISdz6cnht5Tg5kg6rrV6Fx/cSjRSn7pGTnc+7EPv9mPozYNWHGWwqgp2tXR2J9
-         AGd9rij6dqLuXxB/ysKy16JHfzxL4TVnj0tTvZO4vvsqiepcOV1fqKW5w7XrakLIZ828
-         TsckfsDGxa6bcewapYWOT2P0Nj7VjF3Hf6IbOd47FClYM0iOw0IF590tdnx7A93nrUyb
-         RxZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=A2o+Ws1INtn1MzI5In4+SjIaL3aTcpeQBl4+z8iQMc4=;
-        b=vZKTCIHAhCELcU9Dz9HVZywqB3bZcsgyWl8ZLZeOuArFyxVFUFiu7dzf+jljdo6T5Z
-         eC70aTWFaR6TcQWz6kRbYXc85+f6ZduPLcrZBE6PULZ+zTaXPOtgiqIb8QIMBAkpmQVB
-         vjmFOg1DWOOQWzjytcIvzPVIUtp1ZikGXGGgqbn8D36yrVXUAS8fhPUNGyGaBoe6j3Pl
-         IFWC8ZLsq7x2X6uufincW4QFKCOOpo+KwO3A+zg8HqKBjKmY1Ve1rjWOctLZl9dHbkqO
-         JbKRx7ZWIWS7Yod12amG4MX6w3mAXpKw4EJt3yoKU+5Vtpofg1DK+jd0UW7IBu62vmUm
-         H1xA==
-X-Gm-Message-State: AOAM533p0FOIBR647/WkPHQny7XrkC12lD9EUXusfxOAZIzEHKJkA3xH
-        HP+HO1mk246ZB3Lz6Mq4L+aUwG9kw5BXTA==
-X-Google-Smtp-Source: ABdhPJySHzOFet3agObDF17Dhwfya9aBtbqQNVx7EZSgv30DDlpfHWNXSSP+dep1o8EZziq4Eyq0uA==
-X-Received: by 2002:a63:1c1d:0:b0:39d:9a7c:593b with SMTP id c29-20020a631c1d000000b0039d9a7c593bmr367462pgc.157.1651253732177;
-        Fri, 29 Apr 2022 10:35:32 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y38-20020a056a001ca600b0050dafe16d7bsm2804025pfw.26.2022.04.29.10.35.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Apr 2022 10:35:31 -0700 (PDT)
-Date:   Fri, 29 Apr 2022 17:35:28 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        mlevitsk@redhat.com, stable@vger.kernel.org
-Subject: Re: [PATCH 1/3] KVM: x86: make vendor code check for all nested
- events
-Message-ID: <Ymwh4PEZHDvWyR1f@google.com>
-References: <20220427173758.517087-1-pbonzini@redhat.com>
- <20220427173758.517087-2-pbonzini@redhat.com>
- <YmwaVY5vERO43CRI@google.com>
- <0b554e22-6766-8299-287c-c40240c08536@redhat.com>
+        with ESMTP id S1379817AbiD2Rv7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 13:51:59 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EBC1D4C6F;
+        Fri, 29 Apr 2022 10:48:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651254520; x=1682790520;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=5nf6dQ2n0VV5pIH0jfSN6QopQJy5UODqlRTGczslSjk=;
+  b=bwzv6/E3Bb+l62kp1snAABw1w9xTYoLBL4TQnL5FnIA5udFG7HwbsZSb
+   9SDiHGaH31NJfBqKdJHVovi7tQSj2hgTvmyUowWaoEwCC4x0aW6FFtVaF
+   nf3Fl2exD+hcvyIVXhSWguWPhJpmMirQy+a4a4mXcvrz9998f6C9MBfMQ
+   +9hxdht1uDA9/BaVjzJLUdlgx6ptOJJT5Sb0QegcU0YXzZB5qP/Se9wpZ
+   4LwnlLRoiUK1hj/LrfudLSxKw2C5KZLYfM5peOknjes1H2XW/PXqdxhZz
+   W5UdMoqJBh0L1j9HKGUhT+lNovcK4/v4WIRP1zQxcvTXZerd/yExySxyM
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10332"; a="266545761"
+X-IronPort-AV: E=Sophos;i="5.91,185,1647327600"; 
+   d="scan'208";a="266545761"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 10:46:40 -0700
+X-IronPort-AV: E=Sophos;i="5.91,185,1647327600"; 
+   d="scan'208";a="582296660"
+Received: from jinggu-mobl1.amr.corp.intel.com (HELO [10.212.30.227]) ([10.212.30.227])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 10:46:39 -0700
+Message-ID: <c875fc4a-c3c0-dab1-c7cb-525b0bff5ae3@intel.com>
+Date:   Fri, 29 Apr 2022 10:46:56 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0b554e22-6766-8299-287c-c40240c08536@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v3 13/21] x86/virt/tdx: Allocate and set up PAMTs for
+ TDMRs
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com
+References: <cover.1649219184.git.kai.huang@intel.com>
+ <ffc2eefdd212a31278978e8bfccd571355db69b0.1649219184.git.kai.huang@intel.com>
+ <c9b17e50-e665-3fc6-be8c-5bb16afa784e@intel.com>
+ <3664ab2a8e0b0fcbb4b048b5c3aa5a6e85f9618a.camel@intel.com>
+ <5984b61f-6a4a-c12a-944d-f4a78bdefc3d@intel.com>
+ <Ymv2h1GYCMQ9ZQvJ@google.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <Ymv2h1GYCMQ9ZQvJ@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,67 +73,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 29, 2022, Paolo Bonzini wrote:
-> On 4/29/22 19:03, Sean Christopherson wrote:
-> > This doesn't even compile...
-> > 
-> > arch/x86/kvm/vmx/nested.c: In function ‘vmx_has_nested_events’:
-> > arch/x86/kvm/vmx/nested.c:3862:61: error: ‘vmx’ undeclared (first use in this function)
-> >   3862 |         return nested_vmx_preemption_timer_pending(vcpu) || vmx->nested.mtf_pending;
-> >        |                                                             ^~~
-> > arch/x86/kvm/vmx/nested.c:3862:61: note: each undeclared identifier is reported only once for each function it appears in
-> >    CC [M]  arch/x86/kvm/svm/svm_onhyperv.o
-> > arch/x86/kvm/vmx/nested.c:3863:1: error: control reaches end of non-void function [-Werror=return-type]
-> >   3863 | }
-> >        | ^
-> > cc1: all warnings being treated as errors
-> >    LD [M]  arch/x86/kvm/kvm.o
+On 4/29/22 07:30, Sean Christopherson wrote:
+> On Fri, Apr 29, 2022, Dave Hansen wrote:
+...
+>> A *good* way (although not foolproof) is to launch a TDX VM early
+>> in boot before memory gets fragmented or consumed.  You might even
+>> want to recommend this in the documentation.
 > 
-> Yeah, it doesn't.  Of course this will need a v2, also because there are
-> failures in the vmx tests.
+> What about providing a kernel param to tell the kernel to do the
+> allocation during boot?
 
-Heh, I suspected there would be failures, I was about to type up a response to
-patch 3.  MTF is subtly relying on the call from kvm_vcpu_running() to inject
-the event.
+I think that's where we'll end up eventually.  But, I also want to defer
+that discussion until after we have something merged.
 
-From: Sean Christopherson <seanjc@google.com>
-Date: Fri, 29 Apr 2022 17:30:54 +0000
-Subject: [PATCH] KVM: nVMX: Make an event request when pending an MTF nested
- VM-Exit
+Right now, allocating the PAMTs precisely requires running the TDX
+module.  Running the TDX module requires VMXON.  VMXON is only done by
+KVM.  KVM isn't necessarily there during boot.  So, it's hard to do
+precisely today without a bunch of mucking with VMX.
 
-Set KVM_REQ_EVENT when MTF becomes pending to ensure that KVM will run
-through inject_pending_event() and thus vmx_check_nested_events() prior
-to re-entering the guest.  MTF currently works by virtue of KVM's hack
-that calls kvm_check_nested_events() from kvm_vcpu_running(), but that
-hack will be removed in the near future.
+But, it would be really easy to do something less precise like:
 
-Fixes: 5ef8acbdd687 ("KVM: nVMX: Emulate MTF when performing instruction emulation")
-Cc: stable@vger.kernel.org
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/vmx.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+	tdx_reserve_ratio=255
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index d58b763df855..4c635bc08105 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1577,10 +1577,12 @@ static void vmx_update_emulated_instruction(struct kvm_vcpu *vcpu)
- 	 */
- 	if (nested_cpu_has_mtf(vmcs12) &&
- 	    (!vcpu->arch.exception.pending ||
--	     vcpu->arch.exception.nr == DB_VECTOR))
-+	     vcpu->arch.exception.nr == DB_VECTOR)) {
- 		vmx->nested.mtf_pending = true;
--	else
-+		kvm_make_request(KVM_REQ_EVENT, vcpu);
-+	} else {
- 		vmx->nested.mtf_pending = false;
-+	}
- }
+...
 
- static int vmx_skip_emulated_instruction(struct kvm_vcpu *vcpu)
+u8 *pamt_reserve[MAX_NR_NODES]
 
-base-commit: 39aa5903e8c407e5128c15aeabb0717b275b007e
---
+	for_each_online_node(n) {
+		pamt_pages = (node_spanned_pages(n)/tdx_reserve_ratio) /
+			     PAGE_SIZE;
+		pamt_reserve[n] = alloc_bootmem([pamt_pages);
+	}
 
+Then have the TDX code use pamt_reserve[] instead of allocating more
+memory when it is needed later.
+
+That will work just fine as long as you know up front how much metadata
+TDX needs.  If the metadata requirements change in an updated TDX
+module, the command-line will need to be updated to regain the
+guarantee.  But, it can still fall back to the best-effort code that is
+ in the series today.
+
+In other words, I think we want what is in the series today no matter
+what, and we'll want it forever.  That's why it's the *one* way of doing
+things now.  I entirely agree that there will be TDX users that want a
+stronger guarantee.
+
+You can arm-wrestle the distro folks who hate adding command-line tweaks
+when the time comes. ;)
