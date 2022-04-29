@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75BA8514296
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 08:46:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 598DD514299
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 08:46:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354737AbiD2Grb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 02:47:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32826 "EHLO
+        id S1354742AbiD2Grf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 02:47:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354571AbiD2Gr3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230104AbiD2Gr3 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 29 Apr 2022 02:47:29 -0400
 Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D5A9BB92D
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D6B1BC847
         for <kvm@vger.kernel.org>; Thu, 28 Apr 2022 23:44:11 -0700 (PDT)
 Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
-        id 4KqNHs6dCPz4ySs; Fri, 29 Apr 2022 16:44:09 +1000 (AEST)
+        id 4KqNHs6pdwz4ySn; Fri, 29 Apr 2022 16:44:09 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gibson.dropbear.id.au; s=201602; t=1651214649;
-        bh=vMEJ0/5wf4X3tQtvSFm/Ubk9Drf2bPlOcerS5X8YBAo=;
+        bh=c+bgy/t0AsZWnmanT6NiNllspL4TZOIBuNXP/TG/nxA=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZuTAY2/uCtbrlN1ttULrI8hZo6pWlBNgxP6AE6dtds4TYMxZ8RBrU4E+VuW9FQJBo
-         B16/uk3+Tqfk+0cj8ayV0AXCb5hj0qdD9BPETpjRP5EtgwA1A0HsK58dQds33qohy3
-         +tZ0NXW9xSDsDr66LOEl9tjcPMZWTDlTV76mc+nU=
-Date:   Fri, 29 Apr 2022 16:00:14 +1000
+        b=HVFiGh8OOepaZ4YC0zDVDroNRIZC6ico59RdMbYPnewRiN9q1kLbq1ks4/SPIfr3/
+         SqFyYmQiyKMnApgFIktTrz8rRG3oVr2ePk7enApGRDP41KlZXQPVI7A28J6FnXx6hL
+         k6f086X6yYYrbfa7WcYhbfbBPZCleFZKL1HPWK44=
+Date:   Fri, 29 Apr 2022 16:20:36 +1000
 From:   David Gibson <david@gibson.dropbear.id.au>
 To:     Jason Gunthorpe <jgg@nvidia.com>
 Cc:     Alex Williamson <alex.williamson@redhat.com>,
@@ -43,19 +43,20 @@ Cc:     Alex Williamson <alex.williamson@redhat.com>,
         Shameerali Kolothum Thodi 
         <shameerali.kolothum.thodi@huawei.com>,
         Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH RFC 08/12] iommufd: IOCTLs for the io_pagetable
-Message-ID: <Ymt+7gOSlXyy4v5e@yekko>
+Subject: Re: [PATCH RFC 11/12] iommufd: vfio container FD ioctl compatibility
+Message-ID: <YmuDtPMksOj7NOEh@yekko>
 References: <0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
- <8-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
- <YkUvzfHM00FEAemt@yekko>
- <20220331125841.GG2120790@nvidia.com>
- <YmotBkM103HqanoZ@yekko>
- <20220428142258.GH8364@nvidia.com>
+ <11-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+ <20220323165125.5efd5976.alex.williamson@redhat.com>
+ <20220324003342.GV11336@nvidia.com>
+ <20220324160403.42131028.alex.williamson@redhat.com>
+ <YmqqXHsCTxVb2/Oa@yekko>
+ <20220428151037.GK8364@nvidia.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="5GpsMNu5u4FPgM1n"
+        protocol="application/pgp-signature"; boundary="qDvb63UsTUPHrpWS"
 Content-Disposition: inline
-In-Reply-To: <20220428142258.GH8364@nvidia.com>
+In-Reply-To: <20220428151037.GK8364@nvidia.com>
 X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,SPF_HELO_PASS,
         SPF_PASS autolearn=no autolearn_force=no version=3.4.6
@@ -66,199 +67,122 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---5GpsMNu5u4FPgM1n
+--qDvb63UsTUPHrpWS
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 28, 2022 at 11:22:58AM -0300, Jason Gunthorpe wrote:
-> On Thu, Apr 28, 2022 at 03:58:30PM +1000, David Gibson wrote:
-> > On Thu, Mar 31, 2022 at 09:58:41AM -0300, Jason Gunthorpe wrote:
-> > > On Thu, Mar 31, 2022 at 03:36:29PM +1100, David Gibson wrote:
-> > >=20
-> > > > > +/**
-> > > > > + * struct iommu_ioas_iova_ranges - ioctl(IOMMU_IOAS_IOVA_RANGES)
-> > > > > + * @size: sizeof(struct iommu_ioas_iova_ranges)
-> > > > > + * @ioas_id: IOAS ID to read ranges from
-> > > > > + * @out_num_iovas: Output total number of ranges in the IOAS
-> > > > > + * @__reserved: Must be 0
-> > > > > + * @out_valid_iovas: Array of valid IOVA ranges. The array lengt=
-h is the smaller
-> > > > > + *                   of out_num_iovas or the length implied by s=
-ize.
-> > > > > + * @out_valid_iovas.start: First IOVA in the allowed range
-> > > > > + * @out_valid_iovas.last: Inclusive last IOVA in the allowed ran=
-ge
-> > > > > + *
-> > > > > + * Query an IOAS for ranges of allowed IOVAs. Operation outside =
-these ranges is
-> > > > > + * not allowed. out_num_iovas will be set to the total number of=
- iovas
-> > > > > + * and the out_valid_iovas[] will be filled in as space permits.
-> > > > > + * size should include the allocated flex array.
-> > > > > + */
-> > > > > +struct iommu_ioas_iova_ranges {
-> > > > > +	__u32 size;
-> > > > > +	__u32 ioas_id;
-> > > > > +	__u32 out_num_iovas;
-> > > > > +	__u32 __reserved;
-> > > > > +	struct iommu_valid_iovas {
-> > > > > +		__aligned_u64 start;
-> > > > > +		__aligned_u64 last;
-> > > > > +	} out_valid_iovas[];
-> > > > > +};
-> > > > > +#define IOMMU_IOAS_IOVA_RANGES _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOA=
-S_IOVA_RANGES)
-> > > >=20
-> > > > Is the information returned by this valid for the lifeime of the IO=
-AS,
-> > > > or can it change?  If it can change, what events can change it?
-> > > >
-> > > > If it *can't* change, then how do we have enough information to
-> > > > determine this at ALLOC time, since we don't necessarily know which
-> > > > (if any) hardware IOMMU will be attached to it.
-> > >=20
-> > > It is a good point worth documenting. It can change. Particularly
-> > > after any device attachment.
-> >=20
-> > Right.. this is vital and needs to be front and centre in the
-> > comments/docs here.  Really, I think an interface that *doesn't* have
-> > magically changing status would be better (which is why I was
-> > advocating that the user set the constraints, and the kernel supplied
-> > or failed outright).  Still I recognize that has its own problems.
+On Thu, Apr 28, 2022 at 12:10:37PM -0300, Jason Gunthorpe wrote:
+> On Fri, Apr 29, 2022 at 12:53:16AM +1000, David Gibson wrote:
 >=20
-> That is a neat idea, it could be a nice option, it lets userspace
-> further customize the kernel allocator.
+> > 2) Costly GUPs.  pseries (the most common ppc machine type) always
+> > expects a (v)IOMMU.  That means that unlike the common x86 model of a
+> > host with IOMMU, but guests with no-vIOMMU, guest initiated
+> > maps/unmaps can be a hot path.  Accounting in that path can be
+> > prohibitive (and on POWER8 in particular it prevented us from
+> > optimizing that path the way we wanted).  We had two solutions for
+> > that, in v1 the explicit ENABLE/DISABLE calls, which preaccounted
+> > based on the IOVA window sizes.  That was improved in the v2 which
+> > used the concept of preregistration.  IIUC iommufd can achieve the
+> > same effect as preregistration using IOAS_COPY, so this one isn't
+> > really a problem either.
 >=20
-> But I don't have a use case in mind? The simplified things I know
-> about want to attach their devices then allocate valid IOVA, they
-> don't really have a notion about what IOVA regions they are willing to
-> accept, or necessarily do hotplug.
+> I think PPC and S390 are solving the same problem here. I think S390
+> is going to go to a SW nested model where it has an iommu_domain
+> controlled by iommufd that is populated with the pinned pages, eg
+> stored in an xarray.
+>=20
+> Then the performance map/unmap path is simply copying pages from the
+> xarray to the real IOPTEs - and this would be modeled as a nested
+> iommu_domain with a SW vIOPTE walker instead of a HW vIOPTE walker.
+>=20
+> Perhaps this is agreeable for PPC too?
 
-The obvious use case is qemu (or whatever) emulating a vIOMMU.  The
-emulation code knows the IOVA windows that are expected of the vIOMMU
-(because that's a property of the emulated platform), and requests
-them of the host IOMMU.  If the host can supply that, you're good
-(this doesn't necessarily mean the host windows match exactly, just
-that the requested windows fit within the host windows).  If not,
-you report an error.  This can be done at any point when the host
-windows might change - so try to attach a device that can't support
-the requested windows, and it will fail.  Attaching a device which
-shrinks the windows, but still fits the requested windows within, and
-you're still good to go.
+Uh.. maybe?  Note that I'm making these comments based on working on
+this some years ago (the initial VFIO for ppc implementation in
+particular).  I'm no longer actively involved in ppc kernel work.
 
-For a typical direct userspace case you don't want that.  However, it
-probably *does* make sense for userspace to specify how large a window
-it wants.  So some form that allows you to specify size without base
-address also makes sense.  In that case the kernel would set a base
-address according to the host IOMMU's capabilities, or fail if it
-can't supply any window of the requested size.  When to allocate that
-base address is a bit unclear though.  If you do it at window request
-time, then you might pick something that a later device can't work
-with.  If you do it later, it's less clear how to sensibly report it
-to userspace.
+> > 3) "dynamic DMA windows" (DDW).  The IBM IOMMU hardware allows for 2 IO=
+VA
+> > windows, which aren't contiguous with each other.  The base addresses
+> > of each of these are fixed, but the size of each window, the pagesize
+> > (i.e. granularity) of each window and the number of levels in the
+> > IOMMU pagetable are runtime configurable.  Because it's true in the
+> > hardware, it's also true of the vIOMMU interface defined by the IBM
+> > hypervisor (and adpoted by KVM as well).  So, guests can request
+> > changes in how these windows are handled.  Typical Linux guests will
+> > use the "low" window (IOVA 0..2GiB) dynamically, and the high window
+> > (IOVA 1<<60..???) to map all of RAM.  However, as a hypervisor we
+> > can't count on that; the guest can use them however it wants.
+>=20
+> As part of nesting iommufd will have a 'create iommu_domain using
+> iommu driver specific data' primitive.
+>=20
+> The driver specific data for PPC can include a description of these
+> windows so the PPC specific qemu driver can issue this new ioctl
+> using the information provided by the guest.
 
-One option might be to only allow IOAS_MAP (or COPY) operations after
-windows are requested, but otherwise you can choose the order.  So,
-things that have strict requirements for the windows (vIOMMU
-emulation) would request the windows then add devices: they know the
-windows they need, if the devices can't work with that, that's what
-needs to fail.  A userspace driver, however, would attach the devices
-it wants to use, then request a window (without specifying base
-address).
+Hmm.. not sure if that works.  At the moment, qemu (for example) needs
+to set up the domains/containers/IOASes as it constructs the machine,
+because that's based on the virtual hardware topology.  Initially they
+use the default windows (0..2GiB first window, second window
+disabled).  Only once the guest kernel is up and running does it issue
+the hypercalls to set the final windows as it prefers.  In theory the
+guest could change them during runtime though it's unlikely in
+practice.  They could change during machine lifetime in practice,
+though, if you rebooted from one guest kernel to another that uses a
+different configuration.
 
-A query ioctl to give the largest possible windows in the current
-state could still be useful for debugging here, of course, but
-wouldn't need to be used in the normal course of operation.
+*Maybe* IOAS construction can be deferred somehow, though I'm not sure
+because the assigned devices need to live somewhere.
 
-> What might be interesting is to have some option to load in a machine
-> specific default ranges - ie the union of every group and and every
-> iommu_domain. The idea being that after such a call hotplug of a
-> device should be very likely to succeed.
->=20
-> Though I don't have a user in mind..
->=20
-> > > I added this:
-> > >=20
-> > >  * Query an IOAS for ranges of allowed IOVAs. Mapping IOVA outside th=
-ese ranges
-> > >  * is not allowed. out_num_iovas will be set to the total number of i=
-ovas and
-> > >  * the out_valid_iovas[] will be filled in as space permits. size sho=
-uld include
-> > >  * the allocated flex array.
-> > >  *
-> > >  * The allowed ranges are dependent on the HW path the DMA operation =
-takes, and
-> > >  * can change during the lifetime of the IOAS. A fresh empty IOAS wil=
-l have a
-> > >  * full range, and each attached device will narrow the ranges based =
-on that
-> > >  * devices HW restrictions.
-> >=20
-> > I think you need to be even more explicit about this: which exact
-> > operations on the fd can invalidate exactly which items in the
-> > information from this call?  Can it only ever be narrowed, or can it
-> > be broadened with any operations?
->=20
-> I think "attach" is the phrase we are using for that operation - it is
-> not a specific IOCTL here because it happens on, say, the VFIO device FD.
->=20
-> Let's add "detatching a device can widen the ranges. Userspace should
-> query ranges after every attach/detatch to know what IOVAs are valid
-> for mapping."
->=20
-> > > > > +#define IOMMU_IOAS_COPY _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_COPY)
-> > > >=20
-> > > > Since it can only copy a single mapping, what's the benefit of this
-> > > > over just repeating an IOAS_MAP in the new IOAS?
-> > >=20
-> > > It causes the underlying pin accounting to be shared and can avoid
-> > > calling GUP entirely.
-> >=20
-> > If that's the only purpose, then that needs to be right here in the
-> > comments too.  So is expected best practice to IOAS_MAP everything you
-> > might want to map into a sort of "scratch" IOAS, then IOAS_COPY the
-> > mappings you actually end up wanting into the "real" IOASes for use?
->=20
-> That is one possibility, yes. qemu seems to be using this to establish
-> a clone ioas of an existing operational one which is another usage
-> model.
+> The main issue is that internally to the iommu subsystem the
+> iommu_domain aperture is assumed to be a single window. This kAPI will
+> have to be improved to model the PPC multi-window iommu_domain.
 
-Right, for qemu (or other hypervisors) the obvious choice would be to
-create a "staging" IOAS where IOVA =3D=3D GPA, then COPY that into the vari=
-ous
-emulated bus IOASes.  For a userspace driver situation, I'm guessing
-you'd map your relevant memory pool into an IOAS, then COPY to the
-IOAS you need for whatever specific devices you're using.
+Right.
 
-> I added this additionally:
+> If this API is not used then the PPC driver should choose some
+> sensible default windows that makes things like DPDK happy.
 >=20
->  * This may be used to efficiently clone a subset of an IOAS to another, =
-or as a
->  * kind of 'cache' to speed up mapping. Copy has an effciency advantage o=
-ver
->  * establishing equivilant new mappings, as internal resources are shared=
-, and
->  * the kernel will pin the user memory only once.
-
-I think adding that helps substantially.
-
-> > Seems like it would be nicer for the interface to just figure it out
-> > for you: I can see there being sufficient complications with that to
-> > have this slightly awkward interface, but I think it needs a rationale
-> > to accompany it.
+> > Then, there's handling existing qemu (or other software) that is using
+> > the VFIO SPAPR_TCE interfaces.  First, it's not entirely clear if this
+> > should be a goal or not: as others have noted, working actively to
+> > port qemu to the new interface at the same time as making a
+> > comprehensive in-kernel compat layer is arguably redundant work.
 >=20
-> It is more than complicates, the kernel has no way to accurately know
-> when a user pointer is an alias of an existing user pointer or is
-> something new because the mm has become incoherent.
+> At the moment I think I would stick with not including the SPAPR
+> interfaces in vfio_compat, but there does seem to be a path if someone
+> with HW wants to build and test them?
 >=20
-> It is possible that uncoordinated modules in userspace could
-> experience data corruption if the wrong decision is made - mm
-> coherence with pinning is pretty weak in Linux.. Since I dislike that
-> kind of unreliable magic I made it explicit.
+> > You might be able to do this by simply failing this outright if
+> > there's anything other than exactly one IOMMU group bound to the
+> > container / IOAS (which I think might be what VFIO itself does now).
+> > Handling that with a device centric API gets somewhat fiddlier, of
+> > course.
+>=20
+> Maybe every device gets a copy of the error notification?
 
-Fair enough.
+Alas, it's harder than that.  One of the things that can happen on an
+EEH fault is that the entire PE gets suspended (blocking both DMA and
+MMIO, IIRC) until the proper recovery steps are taken.  Since that's
+handled at the hardware/firmware level, it will obviously only affect
+the host side PE (=3D=3D host iommu group).  However the interfaces we
+have only allow things to be reported to the guest at the granularity
+of a guest side PE (=3D=3D container/IOAS =3D=3D guest host bridge in
+practice).  So to handle this correctly when guest PE !=3D host PE we'd
+need to synchronize suspended / recovery state between all the host
+PEs in the guest PE.  That *might* be technically possible, but it's
+really damn fiddly.
+
+> ie maybe this should be part of vfio_pci and not part of iommufd to
+> mirror how AER works?
+>=20
+> It feels strange to put in device error notification to iommufd, is
+> that connected the IOMMU?
+
+Only in that operates at the granularity of a PE, which is mostly an
+IOMMU concept.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -266,24 +190,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---5GpsMNu5u4FPgM1n
+--qDvb63UsTUPHrpWS
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEoULxWu4/Ws0dB+XtgypY4gEwYSIFAmJrfuUACgkQgypY4gEw
-YSKJmBAAjde8YxJgDgcIJGqIujY7PnD2MmBLeZOaEsCrFRfKXGwIatnhEv2ZX5bu
-AXgWLae0U0z8w0/Rv8sKSL9CXKPg5Jct8FQuCMVPS0B9icS7KhCycWmzq7GFVx42
-eZlWgJ2L7alEfcJkZEEGg8ZulLXVK1M43npm7ioWb2op7C33QT7geqYZM6IQYPLd
-wBeEDpAJ8qpahVBIlo1Taw365vSObAsRkPx7XVCHE/NW/OXTdC78i6Yj5C3VKDnS
-6g8BTXceA7ysCdJq/V+iL8YdOJdl/XqCmEgfijtkm3/QVQC0VDFA2gyyJ1Q+T+ek
-V3YjkjmCPH2Gv5wrR9YdudReapkC/XWpzJTspp7vCWUG0r3YKZDr6EhE1EQAEjZK
-2KNr5VkuQuVvUXd1lm3Pi3WkSFz+GBnUJJXJH6PgGsR4RKAr0jXODWHjkyS/wIwU
-vlFufPsY1erPobw1nF+GHVBloaAyxAVLG6S3ij8VSBAkcTeeehlHmCe3X9z3rkc3
-WOHj+PkpyC+IO9PLnRMTM6ApfNDuMXKJ7HvW1tRyNE1Pe4bSRicR990h+cQ8LFLu
-iCoDE+8hot3ceYLKcyzPDUMioR9mO3E0S4bAPPvf1dN2LFJI2Yku6k1AM7Mb10QF
-hqYheMuthKmnad3ofZV1Fq+ZYy9Af4kyYOuGPpUlbzvozE6NebM=
-=RvTr
+iQIzBAEBCAAdFiEEoULxWu4/Ws0dB+XtgypY4gEwYSIFAmJrg60ACgkQgypY4gEw
+YSKpug/+JhSOHfV6E38TUvKJitl9BMUyaVvi5y6Mm+TahO4cJKulYR+3eLG5/QeJ
+3V4XyJrQg7OanDqCNYKu71jEtIIOHkEoxO0qqV7SD77H4btWb6sFMq2jHmrOhfWW
+hp3ElTAqusvEFunlwghG5uk+edjgqHgEJSAqlmXWeRIds5SEWhz5nPWiFouNjp7H
+WzbQd6HiRqyG9NnFIvqOyHu5igfz1bqlJsiaHEp3JhNw/4AJp+yZqwkvw2/TPxUQ
+dUqkpFyb9+K6hju/dlGxsAlQlSwyCXBYDf8aSji3HOmvtx8LBLrCUxJpILibqD4y
+qzAYj7pIniOcQabjS0oe2v2uqpdh/UCVjdtRa7ZLeXgatXEBEFsX6ZKydAr5ZB59
+mD9/Ofxvb48x/hgb/gGMrQSiabxxNrh1boi7xH2v0YzASWLF1rDSJT0DFn/epqoe
+/LKqV7rnrYG8qvvSM/rzwqaObqQmY9okG/yHB4luGMGpRZxtGdjlTlsSRzi1T9W9
+0dJkSv53UrqVSycfpXCMk6zWEMn/lLqETcHmxq0s//KDTZBFoy974wJcMxbcFrsE
+F5QvONn2gxU26pK3DgTR1DwxP8muK/x90+qTob/+KsHcQ6E6v9JtQa+y49HVPMiJ
+hzwT3Nbo2kneXwGsLFR1bfcVVpYkwMj8TGpLHjj2dD1ybXTbxcc=
+=ipZz
 -----END PGP SIGNATURE-----
 
---5GpsMNu5u4FPgM1n--
+--qDvb63UsTUPHrpWS--
