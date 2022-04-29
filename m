@@ -2,276 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C4FBF5154F5
-	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 21:57:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE527515535
+	for <lists+kvm@lfdr.de>; Fri, 29 Apr 2022 22:10:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380439AbiD2UAx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Apr 2022 16:00:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33156 "EHLO
+        id S1380555AbiD2UOL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Apr 2022 16:14:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232481AbiD2UAu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Apr 2022 16:00:50 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36FCF24F35;
-        Fri, 29 Apr 2022 12:57:31 -0700 (PDT)
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23TJ3R4i021601;
-        Fri, 29 Apr 2022 19:57:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=x+oL6NDLEhADnlhkiFaHXoI/m7431USDSzUtah5SOa0=;
- b=oZjo8CwRcuWQ5ZbQcSbEgcakePHRFV4wIoVRtJ42GYf4XzbQDGH6SaXXXQKm7XFc3zKb
- nLMJ0PnBTVAj6PotZrzQUFTLVM4xvLNpYNXdaup/7F5qOEuY0DeCYWkbwnpIcDCDMSVT
- XaXh1aDZheg6uTpjRAgeLDN0pd28GknYWDTUfKFwd+h0lIcCXT9PiYvRFsOmar0Xulvk
- b8ZzXISXvSWqyPXgYpVUU1rdCQyKIrFdJhz/xlGrDKy1SIxqDv1ETRFBePmbBf5mHjHm
- hx7F6yurD50TEbaJfYvNKIU664tYtg1jEbV6kT4y8ZH60DFdLDvpfmCZmC+AIXGUh/g4 gw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fqtdnkrwb-1
+        with ESMTP id S1380541AbiD2UNn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Apr 2022 16:13:43 -0400
+Received: from mx0a-002c1b01.pphosted.com (mx0a-002c1b01.pphosted.com [148.163.151.68])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4D3CB85C;
+        Fri, 29 Apr 2022 13:10:22 -0700 (PDT)
+Received: from pps.filterd (m0127840.ppops.net [127.0.0.1])
+        by mx0a-002c1b01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23TGM7gh015639;
+        Fri, 29 Apr 2022 13:08:31 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version;
+ s=proofpoint20171006; bh=7ACfy3u+JrxtgkDNNNoour/BNTOQYrcrk/1AI9fKYqQ=;
+ b=FbkCWA1qDLYN54xpdCsi62Ef6VeaLakumG2PCl78c6OxVhwYMS1c5sL7ArkRRtCo8bRj
+ 2bY5gx0vg0ZJiFWPmd1w30uT7i60DDIIdXemeWxU1dffK13e4rvYKqx6/uC2pc64fLfl
+ XiIZxiVzWNgRsXs8o4O8Oyna5MD0snFfBrir7KaELUZ9iyu5enM+nipJ/u+9WxhuN4Mt
+ LezKq6b1WL8+AbIPOIEKBL8VKWkB8FoH2URevLb+Mh6briylh+4Wv9fJ6F6TUZKDATGw
+ FAA25gO/IaKMWEBFXI+NsCAS80K2guLaZDY2D5gmk/3GeNmHoH8BcIWV52fmKr/a4ypV 9Q== 
+Received: from nam04-mw2-obe.outbound.protection.outlook.com (mail-mw2nam08lp2169.outbound.protection.outlook.com [104.47.73.169])
+        by mx0a-002c1b01.pphosted.com (PPS) with ESMTPS id 3fps4ef1x0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 29 Apr 2022 19:57:24 +0000
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 23TJvN9B001189;
-        Fri, 29 Apr 2022 19:57:23 GMT
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fqtdnkrw3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 29 Apr 2022 19:57:23 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23TJuj5i008503;
-        Fri, 29 Apr 2022 19:57:22 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma01dal.us.ibm.com with ESMTP id 3fm93besak-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 29 Apr 2022 19:57:22 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23TJvLJU49218024
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 29 Apr 2022 19:57:21 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AD6BFB2065;
-        Fri, 29 Apr 2022 19:57:21 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0C717B205F;
-        Fri, 29 Apr 2022 19:57:21 +0000 (GMT)
-Received: from [9.65.193.44] (unknown [9.65.193.44])
-        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri, 29 Apr 2022 19:57:20 +0000 (GMT)
-Message-ID: <41dee99e-c10d-ab11-c9d4-b9ffbde1953d@linux.ibm.com>
-Date:   Fri, 29 Apr 2022 15:57:20 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v19 00/20] s390/vfio-ap: dynamic configuration support
+        Fri, 29 Apr 2022 13:08:31 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nHZxdaQKnBWECImn/Bp3Vff1Czuo0P6DcQw2LSRthjN5N/xT7Q2RMwSg2mEyxGuEDO/qDjUKvCft9EZHkbY3W3ePOnc+gj3VazO/sZDgBNtrHi7lfZu2HplATFdbaE/rUYStLdd4+16M1l2eKvbWN4DS558wMycxi0OYSTN4R4t7wBuOLlW5u5i45Ib4lTvMukrhEvYPNC9CT5wBJMs9c0WUmETupvSkWqYY0TIAlp/2NYsUHuCw9fnMWbvPZBemFLhynAeWNxbXoDKwWO9yRv08d1BV4udd/liRJW+U4G65UNv4iao/dgbWzJgVStBdy5b3RKy7g5zhQFPi5Fa49g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7ACfy3u+JrxtgkDNNNoour/BNTOQYrcrk/1AI9fKYqQ=;
+ b=IUKSFzxnd0BvoWcmXjapD6tob5R3PYFcUNBZEUxZjbNIdTpOkw2+ZbN99DF4B54Sac0qs7U/UsegnEanRZG1+6BAy37BHq9ddN/e+oKvEGbgF5gAgu4YP/mXA5RXgcuR7jtwIiC5zZR7xPMoD6jU477kRRbaw7/hchX8UnmZl0DBRmBbx6rdyPXdLIr228JiXVLZJWW2Zae0g6VUnOp6L7OcfutDPH/TI4qxCxmwe91LQsVLa2asV2v6Xc26GO2T1b5F0595JgAxdaJw5ThrCgbuInLX7gH9Q9/q05H+vMyXgJxT2u0g45YHey/GSKhP5BeZ+1SacPh04XBOicHJLQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from BL0PR02MB4579.namprd02.prod.outlook.com (2603:10b6:208:4b::10)
+ by DM6PR02MB6619.namprd02.prod.outlook.com (2603:10b6:5:217::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5206.14; Fri, 29 Apr
+ 2022 20:08:27 +0000
+Received: from BL0PR02MB4579.namprd02.prod.outlook.com
+ ([fe80::21f4:4c6:6a43:3882]) by BL0PR02MB4579.namprd02.prod.outlook.com
+ ([fe80::21f4:4c6:6a43:3882%4]) with mapi id 15.20.5186.023; Fri, 29 Apr 2022
+ 20:08:27 +0000
+From:   Jon Kohler <jon@nutanix.com>
+To:     Borislav Petkov <bp@alien8.de>
+CC:     Jon Kohler <jon@nutanix.com>, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Balbir Singh <sblbir@amazon.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Waiman Long <longman@redhat.com>
+Subject: Re: [PATCH v3] x86/speculation, KVM: only IBPB for
+ switch_mm_always_ibpb on vCPU load
+Thread-Topic: [PATCH v3] x86/speculation, KVM: only IBPB for
+ switch_mm_always_ibpb on vCPU load
+Thread-Index: AQHYVmUALWKOwI7bhUetXwvEOXsG/a0HKBwAgAAI9ICAACHkgIAACgcA
+Date:   Fri, 29 Apr 2022 20:08:27 +0000
+Message-ID: <104170E0-104F-46DB-8EE8-68261265CBAF@nutanix.com>
+References: <20220422162103.32736-1-jon@nutanix.com>
+ <YmwZYEGtJn3qs0j4@zn.tnic> <645E4ED5-F6EE-4F8F-A990-81F19ED82BFA@nutanix.com>
+ <Ymw9UZDpXym2vXJs@zn.tnic>
+In-Reply-To: <Ymw9UZDpXym2vXJs@zn.tnic>
+Accept-Language: en-US
 Content-Language: en-US
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jjherne@linux.ibm.com, freude@linux.ibm.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        pasic@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, fiuczy@linux.ibm.com
-References: <20220404221039.1272245-1-akrowiak@linux.ibm.com>
-In-Reply-To: <20220404221039.1272245-1-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: sCF0sJakzu4Bmi2p5bQfMksOK0pMdbRc
-X-Proofpoint-ORIG-GUID: yGBnleUL-DaFcetMz-XEDzXjDC4QRZDq
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: Apple Mail (2.3693.40.0.1.81)
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 05b0f662-e92b-4f20-1def-08da2a1c061b
+x-ms-traffictypediagnostic: DM6PR02MB6619:EE_
+x-microsoft-antispam-prvs: <DM6PR02MB661939DF8488BEF1676DD47DAFFC9@DM6PR02MB6619.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: stWK5v6q2x1m93XlAnjS8A2bEeK62VaS2w5Nlvm/knk4x18iIzerlChuevN2IW9zDBfxuy1DZeDQU6QU338HrI1KS7M3HdJr81gyBmlQDxm9Pa++qGB/IHP9NT/jmIu/SRMQNdhfrkmub7BdP9vU8KUbMvIbq2tsKV6V+lGleKgw5GrskgfalA46Ma4r8b2C12nXyaC2LmbB6TJaHHkZ7I1BTPIlfO0Tum7fhYGa1cm+Eu2ZRrVfWDHh81eCqotZGA031gQ/L6pRgcrKSl7kWHKRsWxUylFLmG5SmGl8DT0lc33vnFGtHOU5iaSVjvkDxP06OVC+Dl/lIUqZyv+PrwTBY8Dp9NU8W6hIF87PfIjwQPmm2yWsz5Mql86wly7knpEobUvPsAbkphw9bZJQ2QVLu7DIWOW5bCdBgJCo0wkp3dcgPbLJnYSlapNDUlVDLBC/FVtBxeqWG5UNwyHiakK+oXr0qkp1UdrtB0+OPsonRz1oFOwRBcdVwuvOITVV1mXDu9cswadQvXhLqw2VECVjq4t3bkBpgzwVdHu+zlRn/NHk5WU0PDypAFunHr8E+Jb5VjaCCc/BHc3/SazleJrMu3dvG6y/HTn38aTkgMZOIULNapRQGC9WaYtus+DRrKAHDezeakrDOtcZKuNDdAXQ0xvLgR6WdObVxqe6Ge5GvLLG8s8rCgIYMWondAMLe+EFL4QybpjSOkhT2K0xwh4lBf4FM7a6l1WACfm3MbXtHDzGZv40xD16Ga6naln/aqplVn46GM3yUByrN8ukMmSv1UUNpQ/q47xzfrBiUu6sbG+oIFi3GH341lX6KzBd
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR02MB4579.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(5660300002)(966005)(6486002)(2906002)(7416002)(8936002)(38070700005)(38100700002)(316002)(508600001)(53546011)(122000001)(6916009)(54906003)(6506007)(6512007)(83380400001)(86362001)(71200400001)(33656002)(186003)(66446008)(76116006)(8676002)(66946007)(64756008)(4326008)(66556008)(66476007)(91956017)(36756003)(2616005)(45980500001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 2
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZUZwQ1BDb3BtUENWOVZIeU83Z0dWanF2OHFwY2wvTVZGd1JVU1llS0liY0dm?=
+ =?utf-8?B?TFh6SmJScUZzZnhuNnh0cUgwN0QrNlVLaFhPZi9yMldaaFA1WHVyN2NVZmg0?=
+ =?utf-8?B?Y2FjdFZWNzY0T3BKczRreWQwK2Iyd05ZUVJ3b28yR3ZSaWk2eWxUMk5mY3du?=
+ =?utf-8?B?ajB6bHNyYXoraUJFSTBJUGQ4bUpzT01FVk9uYUJMS1dYTVlzWmRYOTlrck5p?=
+ =?utf-8?B?bzVrWG5Ea0Q0aTZ2bThtd2tJTWhuWHpwZkhKZDlTVENISit3eEl4NXhqUUU2?=
+ =?utf-8?B?LzVrSWNiN1F3Qit1c0NSSFY3Z0RjNE82ZEl5YjJ4QTBmWkt0TG5aQlMvTmNC?=
+ =?utf-8?B?WHRmdVI2Zk9VSXh0VnlFaU5XUmMrODlWZFRLazlCY2N1ZlpCZ0VxeFRBTE5W?=
+ =?utf-8?B?a1haVUF0ZlFlTzZjVzB6TEFXTUl1eFVSZk02TWRmVDZWaWZibDJOem4vSUt3?=
+ =?utf-8?B?WDFtdUFwOGJOODdqREhCWkM4R2FUZ2QvYWhHN3VwaDYraG45RGdlanhkSnd5?=
+ =?utf-8?B?Y0QrSUZRejFnL1M5T2J5VWN5N3pPWHhQSEpxSXVTQ203RUhsUXE2c3E4U3M5?=
+ =?utf-8?B?aU1WeGlQYm5HUUs0QytOTStWa0dNbm9pdVNOQXMrN0JiS1RCUUNocy9KaUdB?=
+ =?utf-8?B?bXQwSmhaSzM0cjB1Mk9MQnF6dmxQYldnMk1OQjROZVM1cXY5RFliUWoxYi90?=
+ =?utf-8?B?dXhPWlJaNnh5QmRMMXU5WkN4a2k1VXB3Q2FKRWFQTTJPVmZSNGVKanhjbzRK?=
+ =?utf-8?B?MWh2MDIyN05uMXFKTnF1NnlSY1BzTU1hbXNzci9sL01OMUd0aGJpWE9QODR0?=
+ =?utf-8?B?RmVQbmw5M2hTNWRXaXBENzVkWXUyaXpuWHJuRldPZFdaWWR3SkJqYXJVT2c1?=
+ =?utf-8?B?Q0VPWEd3aGFhZUZuZHB5ZjFCTUxIbW4vVW1la3VlTWlDTGkzRjJSQVZYVGxS?=
+ =?utf-8?B?RVBPRmNIR2R1RWdhUjZUa1JjVWFaUDlZWkg0ZFJUNm9WWDdNVlVYN1g2NXJB?=
+ =?utf-8?B?S2k5YnU0Y2pSbithOGNMMFRWd3NuTk13V1p1a25sYUl1L2haUkViL081VEk5?=
+ =?utf-8?B?YzBUM0d2ZE1nN3AzSWdIeUhSK3NDVlozYzhrUkVjNzVXUVBheFRPMGtLbDdk?=
+ =?utf-8?B?ak9aS3pnbjBMT2c5ckdwaEdjVVhXYnp2cytlSjFLNnMyTkkwRWNueWpaU1ho?=
+ =?utf-8?B?c2hBQlcvQ1djOEliNDBGVlExcnZRYS95dUJHODV1OEJwQ0h6NTgwVmU3THJh?=
+ =?utf-8?B?VmV6cnJQdVBWWXh0cy8vM20rNmUwbzBkOWx3VEZjaCtWTXluQ0llekJvS3dr?=
+ =?utf-8?B?WEV6RVNzbVQ1Wk44QkREajB5eU0yZGN1Y2F0cWkxelg5TEVyb2lDdmJRamdk?=
+ =?utf-8?B?Y0grTk1udFZUSC9XbWdLdm1rVFl5Q2dlWHE4VkNHeHoxbFZpbUJhV2R5WWk2?=
+ =?utf-8?B?R0V1OGo5ZHN3bFE2UHlUdGw5UUJnbFhCYUxWVzFyUHBvQWZhd21ZQWdPWDhv?=
+ =?utf-8?B?cDhhRWc2MWs3eUtiU3YrYk96TTFTa1V1MzUxWklMTFp0MWFvMVFUb3cyZjg1?=
+ =?utf-8?B?K0x2bnJlNDhXZkNBcmQyY2ttcE9UV3Flbk5Ba1J6Ykt5bjBobm5VUDk2Z2Nw?=
+ =?utf-8?B?ZE9RaVlFTkpqTmxDNVFDK3ZWSXRaY2hha3lSZTk4SVA0ZExubzZRZGlXZVNY?=
+ =?utf-8?B?ZWJiRjdHN1ZLQlZEejNtRUx3OG4wR3hFTldIY2NZTFdIMDNMMDR4OG5kbU1O?=
+ =?utf-8?B?Um93UGN6ZlU5QW9LZjVST2JJVzRsaDZwaVZPbXpjUTNncldzbnpLVUo2OVlZ?=
+ =?utf-8?B?aXJNMFI2U0l0YTMrWUFUSjdrUC9YdVVPZW0vOFhtakphNE11cEFzT3hHWVRE?=
+ =?utf-8?B?ZFhjREtsdk8zZ293MjdLdFNWSjM3d3VDZ2Vqd2NiTnNwYkxLQ25CYnZCWWxG?=
+ =?utf-8?B?VVBvVTd5RUh3NUFrenFZS1VlTzd6VzcrWVVrWkQvRXgzWXdUYWcvNFNnRVlE?=
+ =?utf-8?B?OSt6ZTB3V1FMNlhuREtDNTlxREUrWm8zSXdYQ1hCK3RIenZwOGErS1pRdWFp?=
+ =?utf-8?B?L0JlVnoxWFQzUGJvRFVTRkh3cTdGeGYzZ29Ob2JxY2JuWStheUh3b0JwVGlB?=
+ =?utf-8?B?UFJibWxSN0Z1bisyMzBNQUM2NE1rNHJJdmRzV3prc3cySFJpV3pRbTlUZS8r?=
+ =?utf-8?B?NmhZd1N3K2ZSc0krT214bkRDUUw2Z09wZUFlMExUN2lyT2RZWjZoUjM1R3BY?=
+ =?utf-8?B?cjR3TlJlWnRGamZxVUVreko2STNFZDdtdG5ONTNzUjdZTkI0c2JJYzRhYTBN?=
+ =?utf-8?B?QllpeDhuQ3N4d3NkL1FPYTNTTC9iUW4vRmN5cG55VUpJOWFmMHZDOHZHbm9u?=
+ =?utf-8?Q?0l0suQNuUYJpaH+ftAtbSCy3JB1DIWbUlWrrG30Bbglfr?=
+x-ms-exchange-antispam-messagedata-1: ZSfVpPBXj/SA4OjBy5Wi3RblkLTT893lbc58vDQh9kYYS7pQOQI7M4k/
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E666D9BF73F8F04A86E7A452D491767B@namprd02.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR02MB4579.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 05b0f662-e92b-4f20-1def-08da2a1c061b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Apr 2022 20:08:27.5925
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: bu0VIxallsHyaRnF4j26bC12aWV4qiC0XOq6VPOZ/83DnHGqXZ5VXGZLnPO82DHmLbLygjQsbN73r7fkAHhps4zQ5TnLMF+dJpCLQMWwyOI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR02MB6619
+X-Proofpoint-GUID: rLumYy2uk9ZZFfE4M-b-xToXFbaJZvqd
+X-Proofpoint-ORIG-GUID: rLumYy2uk9ZZFfE4M-b-xToXFbaJZvqd
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-04-29_09,2022-04-28_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 mlxscore=0 bulkscore=0 phishscore=0 suspectscore=0
- mlxlogscore=999 clxscore=1011 impostorscore=0 malwarescore=0 adultscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204290103
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Spam-Reason: safe
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PING!!
-
-On 4/4/22 6:10 PM, Tony Krowiak wrote:
-> The current design for AP pass-through does not support making dynamic
-> changes to the AP matrix of a running guest resulting in a few
-> deficiencies this patch series is intended to mitigate:
->
-> 1. Adapters, domains and control domains can not be added to or removed
->      from a running guest. In order to modify a guest's AP configuration,
->      the guest must be terminated; only then can AP resources be assigned
->      to or unassigned from the guest's matrix mdev. The new AP
->      configuration becomes available to the guest when it is subsequently
->      restarted.
->
-> 2. The AP bus's /sys/bus/ap/apmask and /sys/bus/ap/aqmask interfaces can
->      be modified by a root user without any restrictions. A change to
->      either mask can result in AP queue devices being unbound from the
->      vfio_ap device driver and bound to a zcrypt device driver even if a
->      guest is using the queues, thus giving the host access to the guest's
->      private crypto data and vice versa.
->
-> 3. The APQNs derived from the Cartesian product of the APIDs of the
->      adapters and APQIs of the domains assigned to a matrix mdev must
->      reference an AP queue device bound to the vfio_ap device driver. The
->      AP architecture allows assignment of AP resources that are not
->      available to the system, so this artificial restriction is not
->      compliant with the architecture.
->
-> 4. The AP configuration profile can be dynamically changed for the linux
->      host after a KVM guest is started. For example, a new domain can be
->      dynamically added to the configuration profile via the SE or an HMC
->      connected to a DPM enabled lpar. Likewise, AP adapters can be
->      dynamically configured (online state) and deconfigured (standby state)
->      using the SE, an SCLP command or an HMC connected to a DPM enabled
->      lpar. This can result in inadvertent sharing of AP queues between the
->      guest and host.
->
-> 5. A root user can manually unbind an AP queue device representing a
->      queue in use by a KVM guest via the vfio_ap device driver's sysfs
->      unbind attribute. In this case, the guest will be using a queue that
->      is not bound to the driver which violates the device model.
->
-> This patch series introduces the following changes to the current design
-> to alleviate the shortcomings described above as well as to implement
-> more of the AP architecture:
->
-> 1. A root user will be prevented from making edits to the AP bus's
->      /sys/bus/ap/apmask or /sys/bus/ap/aqmask if the change would transfer
->      ownership of an APQN from the vfio_ap device driver to a zcrypt driver
->      while the APQN is assigned to a matrix mdev.
->
-> 2. Allow a root user to hot plug/unplug AP adapters, domains and control
->      domains for a KVM guest using the matrix mdev via its sysfs
->      assign/unassign attributes.
->
-> 4. Allow assignment of an AP adapter or domain to a matrix mdev even if
->      it results in assignment of an APQN that does not reference an AP
->      queue device bound to the vfio_ap device driver, as long as the APQN
->      is not reserved for use by the default zcrypt drivers (also known as
->      over-provisioning of AP resources). Allowing over-provisioning of AP
->      resources better models the architecture which does not preclude
->      assigning AP resources that are not yet available in the system. Such
->      APQNs, however, will not be assigned to the guest using the matrix
->      mdev; only APQNs referencing AP queue devices bound to the vfio_ap
->      device driver will actually get assigned to the guest.
->
-> 5. Handle dynamic changes to the AP device model.
->
-> 1. Rationale for changes to AP bus's apmask/aqmask interfaces:
-> ----------------------------------------------------------
-> Due to the extremely sensitive nature of cryptographic data, it is
-> imperative that great care be taken to ensure that such data is secured.
-> Allowing a root user, either inadvertently or maliciously, to configure
-> these masks such that a queue is shared between the host and a guest is
-> not only avoidable, it is advisable. It was suggested that this scenario
-> is better handled in user space with management software, but that does
-> not preclude a malicious administrator from using the sysfs interfaces
-> to gain access to a guest's crypto data. It was also suggested that this
-> scenario could be avoided by taking access to the adapter away from the
-> guest and zeroing out the queues prior to the vfio_ap driver releasing the
-> device; however, stealing an adapter in use from a guest as a by-product
-> of an operation is bad and will likely cause problems for the guest
-> unnecessarily. It was decided that the most effective solution with the
-> least number of negative side effects is to prevent the situation at the
-> source.
->
-> 2. Rationale for hot plug/unplug using matrix mdev sysfs interfaces:
-> ----------------------------------------------------------------
-> Allowing a user to hot plug/unplug AP resources using the matrix mdev
-> sysfs interfaces circumvents the need to terminate the guest in order to
-> modify its AP configuration. Allowing dynamic configuration makes
-> reconfiguring a guest's AP matrix much less disruptive.
->
-> 3. Rationale for allowing over-provisioning of AP resources:
-> -----------------------------------------------------------
-> Allowing assignment of AP resources to a matrix mdev and ultimately to a
-> guest better models the AP architecture. The architecture does not
-> preclude assignment of unavailable AP resources. If a queue subsequently
-> becomes available while a guest using the matrix mdev to which its APQN
-> is assigned, the guest will be given access to it. If an APQN
-> is dynamically unassigned from the underlying host system, it will
-> automatically become unavailable to the guest.
->
-> Change log v18-v19:
-> ------------------
-> * Changed name of vfio_ap_mdev_hotplug_apcb (vfio_ap_ops.c) to
->    vfio_ap_mdev_update_guest_apcb
->    (Suggested by Jason: review of patch 10/18)
->
-> * Replace call to kvm_arch_crypto_set_masks in vfio_ap_mdev_set_kvm with
->    call to vfio_ap_mdev_update_guest_apcb
->    (Suggested by Jason: review of patch 10/18)
->
-> * Moved changes related to new locking scheme into its own set of
->    patches (Suggested by Jason: review of patch 10/18)
->
-> * Consolidated some of the lock acquisition code into macros called by the
->    functions that update a KVM guest's APCB.
->
-> * Refactored vfio_ap_mdev_unlink_adapter() and
->    vfio_ap_unlink_apqn_fr_mdev() functions according to Jason's sample
->    code. (Suggested by Jason: review of patch 12/18)
->
-> * Require callers of the AP bus ap_apqn_in_matrix_owned_by_def_drv and
->    ap_owned_by_def_drv - only called by the vfio_ap driver - to take the
->    ap_perms_mutex lock. The adapter/domain assignment interfaces will take
->    the ap_perms_mutex lock prior to other required locks to maintain a
->    proper locking order and avoid circular locking dependencies when the
->    vfio_ap device driver's in_use callback is invoked simultaneously with
->    the adapter/domain assignment interfaces. (Suggested by Jason)
->
-> * Refactored patch 15/18: handle config changed and scan complete
->    notification (Suggested by Jason)
->
-> * Refactored filtering of the matrix to reduce redundant processing of
->    APQNs:
->    - Inspect only the new APIDs or APQIs assigned to the matrix mdev or
->      added to the host's AP configuration
->    - Automatically removing APIDs or APQIs unassigned from the matrix mdev
->      or removed from the host's AP configuration.
->    (Suggested by Halil)
->
-> Tony Krowiak (20):
->    s390/vfio-ap: use new AP bus interface to search for queue devices
->    s390/vfio-ap: move probe and remove callbacks to vfio_ap_ops.c
->    s390/vfio-ap: manage link between queue struct and matrix mdev
->    s390/vfio-ap: introduce shadow APCB
->    s390/vfio-ap: refresh guest's APCB by filtering AP resources assigned
->      to mdev
->    s390/vfio-ap: allow assignment of unavailable AP queues to mdev device
->    s390/vfio-ap: rename matrix_dev->lock mutex to matrix_dev->mdevs_lock
->    s390/vfio-ap: introduce new mutex to control access to the KVM pointer
->    s390/vfio-ap: use proper locking order when setting/clearing KVM
->      pointer
->    s390/vfio-ap: prepare for dynamic update of guest's APCB on
->      assign/unassign
->    s390/vfio-ap: prepare for dynamic update of guest's APCB on queue
->      probe/remove
->    s390/vfio-ap: allow hot plug/unplug of AP devices when
->      assigned/unassigned
->    s390/vfio-ap: hot plug/unplug of AP devices when probed/removed
->    s390/vfio-ap: reset queues after adapter/domain unassignment
->    s390/vfio-ap: implement in-use callback for vfio_ap driver
->    s390/vfio-ap: sysfs attribute to display the guest's matrix
->    s390/vfio-ap: handle config changed and scan complete notification
->    s390/vfio-ap: update docs to include dynamic config support
->    s390/Docs: new doc describing lock usage by the vfio_ap device driver
->    MAINTAINERS: pick up all vfio_ap docs for VFIO AP maintainers
->
->   Documentation/s390/vfio-ap-locking.rst |  389 +++++++
->   Documentation/s390/vfio-ap.rst         |  492 ++++++---
->   MAINTAINERS                            |    6 +-
->   drivers/s390/crypto/ap_bus.c           |   31 +-
->   drivers/s390/crypto/vfio_ap_drv.c      |   69 +-
->   drivers/s390/crypto/vfio_ap_ops.c      | 1321 ++++++++++++++++++------
->   drivers/s390/crypto/vfio_ap_private.h  |   47 +-
->   7 files changed, 1820 insertions(+), 535 deletions(-)
->   create mode 100644 Documentation/s390/vfio-ap-locking.rst
->
-
+DQoNCj4gT24gQXByIDI5LCAyMDIyLCBhdCAzOjMyIFBNLCBCb3Jpc2xhdiBQZXRrb3YgPGJwQGFs
+aWVuOC5kZT4gd3JvdGU6DQo+IA0KPiBPbiBGcmksIEFwciAyOSwgMjAyMiBhdCAwNTozMToxNlBN
+ICswMDAwLCBKb24gS29obGVyIHdyb3RlOg0KPj4gU2VsZnRlc3RzIElJVUMsIGJ1dCB0aGVyZSBt
+YXkgYmUgb3RoZXIgVk1NcyB0aGF0IGRvIGZ1bm55IHN0dWZmLiBTYWlkDQo+PiBhbm90aGVyIHdh
+eSwgSSBkb27igJl0IHRoaW5rIHdlIGFjdGl2ZWx5IHJlc3RyaWN0IHVzZXIgc3BhY2UgZnJvbSBk
+b2luZw0KPj4gdGhpcyBhcyBmYXIgYXMgSSBrbm93Lg0KPiANCj4gInNlbGZ0ZXN0cyIsICJ0aGVy
+ZSBtYXkgYmUiPyENCj4gDQo+IFRoaXMgZG9lc24ndCBzb3VuZCBsaWtlIGEgcmVhbC1saWZlIHVz
+ZSBjYXNlIHRvIG1lIGFuZCB3ZSBkb24ndCBkbw0KPiBjaGFuZ2VzIGp1c3QgYmVjYXVzZS4gU29y
+cnkuDQoNCkkgYXBwcmVjaWF0ZSB5b3VyIGRpcmVjdCBmZWVkYmFjaywgdGhhbmsgeW91IGZvciBo
+ZWxwaW5nIGhlcmUuDQoNCkxldOKAmXMgc2VwYXJhdGUgdGhlIGRpc2N1c3Npb24gaW50byB0d28g
+cGFydHMuIA0KMTogQnVnIEZpeGluZyAtPiBhbiBJQlBCIGlzIGJlaW5nIHVuY29uZGl0aW9uYWxs
+eSBpc3N1ZWQgZXZlbiB3aGVuDQp0aGUgdXNlciBzZWxlY3RzIGNvbmRpdGlvbmFsLiBUaGF0IG5l
+ZWRzIHRvIGJlIGZpeGVkIGFuZCB0aGlzIHBhdGNoIGZpeGVzDQp0aGF0Lg0KDQoyOiBEZXNpZ24g
+LT4gZG8gd2UgZXZlbiB3YW50IHRvIGhhdmUgdGhpcyBJQlBCIGhlcmUgaW4gS1ZNIGF0IGFsbD8N
+Cg0KSW4gcHJldmlvdXMgZGlzY3Vzc2lvbnMgKHYxL3YyIHBhdGNoKSB3aXRoIFNlYW4sIHdlIHRh
+bGtlZCBhYm91dCB0aGlzDQpub3QgbWFraW5nIGEgd2hvbGUgbG90IG9mIHNlbnNlIGluIGdlbmVy
+YWw7IGhvd2V2ZXIsIHdlIGxhbmRlZCBvbg0KdHJ5aW5nIHRvIG5vdCByZWdyZXNzIHVzZXJzIHdo
+byBtaWdodCwgZm9yIHdoYXRldmVyIHJlYXNvbiwgY2FyZSBhYm91dCANCnRoaXMgSUJQQi4NCg0K
+SeKAmXZlIHNoYXJlZCBhIGJpdCBtb3JlIGRldGFpbCBvbiBvdXIgdXNlIGNhc2UgYmVsb3cuIEni
+gJltIGZpbmUgd2l0aCBudWtpbmcNCnRoaXMgSUJQQiBlbnRpcmVseSwganVzdCB3YW50IHRvIGJl
+IG1pbmRmdWwgb2YgdXNlIGNhc2VzIGZyb20gdGhlIHJlc3Qgb2YNCnRoZSBjb21tdW5pdHkgdGhh
+dCB3ZSBtaWdodCBub3Qgbm9ybWFsbHkgY3Jvc3MgaW4gb3VyIGRheSB0byBkYXkuDQoNCknigJlt
+IGhhcHB5IHRvIHRha2UgZmVlZGJhY2sgb24gdGhpcyBhbmQgaW50ZWdyYXRlIGl0IGludG8gYSB2
+NCBwYXRjaCBmb3INCmJvdGggb2YgdGhlc2UgcGFydHMsIGluIHRlcm1zIG9mIGJvdGggY29kZSBh
+bmQgY29ycmVjdG5lc3MgaW4gdGhlIGNoYW5nZQ0KbG9nLg0KDQo+IA0KPj4gVGhlIHBhcmFub2lk
+IGFzcGVjdCBoZXJlIGlzIEtWTSBpcyBpc3N1aW5nIGFuICphZGRpdGlvbmFsKiBJQlBCIG9uDQo+
+PiB0b3Agb2Ygd2hhdCBhbHJlYWR5IGhhcHBlbnMgaW4gc3dpdGNoX21tKCkuIA0KPiANCj4gWWVh
+aCwgSSBrbm93IGhvdyB0aGF0IHdvcmtzLg0KPiANCj4+IElNSE8gS1ZNIHNpZGUgSUJQQiBmb3Ig
+bW9zdCB1c2UgY2FzZXMgaXNu4oCZdCByZWFsbHkgbmVjZXNzYXJpbHkgYnV0IA0KPj4gdGhlIGdl
+bmVyYWwgY29uY2VwdCBpcyB0aGF0IHlvdSB3YW50IHRvIHByb3RlY3QgdkNQVSBmcm9tIGd1ZXN0
+IEENCj4+IGZyb20gZ3Vlc3QgQiwgc28geW91IGlzc3VlIGEgcHJlZGljdGlvbiBiYXJyaWVyIG9u
+IHZDUFUgc3dpdGNoLg0KPj4gDQo+PiAqaG93ZXZlciogdGhhdCBwcm90ZWN0aW9uIGFscmVhZHkg
+aGFwcGVucyBpbiBzd2l0Y2hfbW0oKSwgYmVjYXVzZQ0KPj4gZ3Vlc3QgQSBhbmQgQiBhcmUgbGlr
+ZWx5IHRvIHVzZSBkaWZmZXJlbnQgbW1fc3RydWN0LCBzbyB0aGUgb25seSBwb2ludA0KPj4gb2Yg
+aGF2aW5nIHRoaXMgc3VwcG9ydCBpbiBLVk0gc2VlbXMgdG8gYmUgdG8g4oCca2lsbCBpdCB3aXRo
+IGZpcmXigJ0gZm9yIA0KPj4gcGFyYW5vaWQgdXNlcnMgd2hvIG1pZ2h0IGJlIGRvaW5nIHNvbWUg
+dG9tZm9vbGVyeSB0aGF0IHdvdWxkIA0KPj4gc29tZWhvdyBieXBhc3Mgc3dpdGNoX21tKCkgcHJv
+dGVjdGlvbiAoc3VjaCBhcyBzb21laG93IA0KPj4gc2hhcmluZyBhIHN0cnVjdCkuDQo+IA0KPiBZ
+ZWFoLCBubywgdGhpcyBhbGwgc291bmRzIGxpa2Ugc29tZXRoaW5nIGhpZ2hseSBoeXBvdGhldGlj
+YWwgb3IgdGhlcmUncw0KPiBhIHVzZSBjYXNlIG9mIHdoaWNoIHlvdSBkb24ndCB3YW50IHRvIHRh
+bGsgYWJvdXQgcHVibGljbHkuDQoNCldl4oCZcmUgYW4gb3BlbiBib29rIGhlcmUsIHNvIEnigJlt
+IGhhcHB5IHRvIHNoYXJlIHdoYXQgd2XigJlyZSB1cCB0bw0KcHVibGljbHkuIE91ciB1c2UgY2Fz
+ZSBpcyAxMDAlIHFlbXUta3ZtLCB3aGljaCBpcyBhbGwgc2VwYXJhdGUgDQpwcm9jZXNzZXMvc3Ry
+dWN0cyBhbmQgaXMgY292ZXJlZCBhLW9rIGJ5IHRoZSBzd2l0Y2hfbW0oKSBwYXRoLiBXZQ0Kbm90
+aWNlZCB0aGlzIGJ1ZyBpbiBvbmUgb2Ygb3VyIHNjYWxhYmlsaXR5IHRlc3RzLCB3aGljaCBvdmVy
+c3Vic2NyaWJlcw0KdGhlIGhvc3Qgd2l0aCBtYW55IDIgdkNQVSBWTXMgYW5kIHJ1bnMgYSBsb2Fk
+IHJ1bm5lciB0aGF0IGluY3JlYXNlcw0KbG9hZCBvbmUgbWFjaGluZSBhdCBhIHRpbWUsIHNvIHRo
+YXQgd2UgY2FuIHNlZSB0aGUgdHJlbmQgb2YgcmVzcG9uc2UNCnRpbWUgb2YgYW4gYXBwIGFzIGhv
+c3QgbG9hZCBpbmNyZWFzZXMuIA0KDQpHaXZlbiB0aGF0IHRoZSBob3N0IGlzIGhlYXZpbHkgb3Zl
+cnN1YnNjcmliZWQsIHRoZXJlIGlzIGEgbG90IG9mDQp2Q1BVIHN3aXRjaGluZywgYW5kIGluIHBh
+cnRpY3VsYXIgc3dpdGNoaW5nIGluIGJldHdlZW4gdkNQVXMgDQpiZWxvbmdpbmcgdG8gZGlmZmVy
+ZW50IGd1ZXN0cywgc28gdGhhdCB3ZSBoaXQgdGhpcyBwYXJ0aWN1bGFyIGJhcnJpZXIgaW4gDQp2
+Y3B1X2xvYWQgY29uc3RhbnRseS4gVGFraW5nIHRoaXMgZml4IGhlbHBlZCBzbW9vdGhlZCBvdXQg
+dGhhdCByZXNwb25zZQ0KdGltZSBjdXJ2ZSBhIGJpdC4gSGFwcHkgdG8gc2hhcmUgbW9yZSBzcGVj
+aWZpYyBkYXRhIGlmIHlvdeKAmWQgbGlrZS4NCg0KPiANCj4gRWl0aGVyIHdheSwgZnJvbSB3aGF0
+IEknbSByZWFkaW5nIEknbSBub3QgaW4gdGhlIGxlYXN0IGNvbnZpbmNlZCB0aGF0DQo+IHRoaXMg
+aXMgbmVlZGVkLg0KPiANCj4gLS0gDQo+IFJlZ2FyZHMvR3J1c3MsDQo+ICAgIEJvcmlzLg0KPiAN
+Cj4gaHR0cHM6Ly91cmxkZWZlbnNlLnByb29mcG9pbnQuY29tL3YyL3VybD91PWh0dHBzLTNBX19w
+ZW9wbGUua2VybmVsLm9yZ190Z2x4X25vdGVzLTJEYWJvdXQtMkRuZXRpcXVldHRlJmQ9RHdJRGFR
+JmM9czg4M0dwVUNPQ2hLT0hpb2NZdEdjZyZyPU5HUFJHR28zN21RaVNYZ0hLbTVyQ1EmbT10Y3RV
+WTN6Z1lFd1VjUFo4RTh2LUVpWGxvSzRQd1l2VVZCbFItYW1vUkJFVlp5bTZhMlN1cXlSWWJOR0Yx
+X2FaJnM9bFFqeTloM0c2ZU9xcjJxRXVBVnZ0WDNMdUR4VzFrVkpIZGxrZXpDeTNzVSZlPSANCg0K
