@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 892EB51687B
+	by mail.lfdr.de (Postfix) with ESMTP id 3BFEA51687A
 	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 00:08:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355596AbiEAWL0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 1 May 2022 18:11:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43734 "EHLO
+        id S1359529AbiEAWLc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 1 May 2022 18:11:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355565AbiEAWLY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 1 May 2022 18:11:24 -0400
+        with ESMTP id S1355597AbiEAWL1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 1 May 2022 18:11:27 -0400
 Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6582A1CB37;
-        Sun,  1 May 2022 15:07:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EE301C93F;
+        Sun,  1 May 2022 15:08:00 -0700 (PDT)
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1nlHjH-0008MX-9t; Mon, 02 May 2022 00:07:47 +0200
+        id 1nlHjM-0008Mj-L7; Mon, 02 May 2022 00:07:52 +0200
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
@@ -28,9 +28,9 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Joerg Roedel <joro@8bytes.org>,
         Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v3 01/12] KVM: nSVM: Sync next_rip field from vmcb12 to vmcb02
-Date:   Mon,  2 May 2022 00:07:25 +0200
-Message-Id: <c2e0a3d78db3ae30530f11d4e9254b452a89f42b.1651440202.git.maciej.szmigiero@oracle.com>
+Subject: [PATCH v3 02/12] KVM: SVM: Don't BUG if userspace injects an interrupt with GIF=0
+Date:   Mon,  2 May 2022 00:07:26 +0200
+Message-Id: <35426af6e123cbe91ec7ce5132ce72521f02b1b5.1651440202.git.maciej.szmigiero@oracle.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <cover.1651440202.git.maciej.szmigiero@oracle.com>
 References: <cover.1651440202.git.maciej.szmigiero@oracle.com>
@@ -47,103 +47,55 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-The next_rip field of a VMCB is *not* an output-only field for a VMRUN.
-This field value (instead of the saved guest RIP) in used by the CPU for
-the return address pushed on stack when injecting a software interrupt or
-INT3 or INTO exception.
+Don't BUG/WARN on interrupt injection due to GIF being cleared,
+since it's trivial for userspace to force the situation via
+KVM_SET_VCPU_EVENTS (even if having at least a WARN there would be correct
+for KVM internally generated injections).
 
-Make sure this field gets synced from vmcb12 to vmcb02 when entering L2 or
-loading a nested state and NRIPS is exposed to L1.  If NRIPS is supported
-in hardware but not exposed to L1 (nrips=0 or hidden by userspace), stuff
-vmcb02's next_rip from the new L2 RIP to emulate a !NRIPS CPU (which
-saves RIP on the stack as-is).
+  kernel BUG at arch/x86/kvm/svm/svm.c:3386!
+  invalid opcode: 0000 [#1] SMP
+  CPU: 15 PID: 926 Comm: smm_test Not tainted 5.17.0-rc3+ #264
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+  RIP: 0010:svm_inject_irq+0xab/0xb0 [kvm_amd]
+  Code: <0f> 0b 0f 1f 00 0f 1f 44 00 00 80 3d ac b3 01 00 00 55 48 89 f5 53
+  RSP: 0018:ffffc90000b37d88 EFLAGS: 00010246
+  RAX: 0000000000000000 RBX: ffff88810a234ac0 RCX: 0000000000000006
+  RDX: 0000000000000000 RSI: ffffc90000b37df7 RDI: ffff88810a234ac0
+  RBP: ffffc90000b37df7 R08: ffff88810a1fa410 R09: 0000000000000000
+  R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+  R13: ffff888109571000 R14: ffff88810a234ac0 R15: 0000000000000000
+  FS:  0000000001821380(0000) GS:ffff88846fdc0000(0000) knlGS:0000000000000000
+  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+  CR2: 00007f74fc550008 CR3: 000000010a6fe000 CR4: 0000000000350ea0
+  Call Trace:
+   <TASK>
+   inject_pending_event+0x2f7/0x4c0 [kvm]
+   kvm_arch_vcpu_ioctl_run+0x791/0x17a0 [kvm]
+   kvm_vcpu_ioctl+0x26d/0x650 [kvm]
+   __x64_sys_ioctl+0x82/0xb0
+   do_syscall_64+0x3b/0xc0
+   entry_SYSCALL_64_after_hwframe+0x44/0xae
+   </TASK>
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Fixes: 219b65dcf6c0 ("KVM: SVM: Improve nested interrupt injection")
+Cc: stable@vger.kernel.org
 Co-developed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 ---
- arch/x86/kvm/svm/nested.c | 22 +++++++++++++++++++---
- arch/x86/kvm/svm/svm.h    |  1 +
- 2 files changed, 20 insertions(+), 3 deletions(-)
+ arch/x86/kvm/svm/svm.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index bed5e1692cef..91a1f9ff2b86 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -371,6 +371,7 @@ void __nested_copy_vmcb_control_to_cache(struct kvm_vcpu *vcpu,
- 	to->nested_ctl          = from->nested_ctl;
- 	to->event_inj           = from->event_inj;
- 	to->event_inj_err       = from->event_inj_err;
-+	to->next_rip            = from->next_rip;
- 	to->nested_cr3          = from->nested_cr3;
- 	to->virt_ext            = from->virt_ext;
- 	to->pause_filter_count  = from->pause_filter_count;
-@@ -608,7 +609,8 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
- 	}
- }
- 
--static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
-+static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
-+					  unsigned long vmcb12_rip)
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 75b4f3ac8b1a..1cec671fc668 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3384,8 +3384,6 @@ static void svm_inject_irq(struct kvm_vcpu *vcpu)
  {
- 	u32 int_ctl_vmcb01_bits = V_INTR_MASKING_MASK;
- 	u32 int_ctl_vmcb12_bits = V_TPR_MASK | V_IRQ_INJECTION_BITS_MASK;
-@@ -662,6 +664,19 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
- 	vmcb02->control.event_inj           = svm->nested.ctl.event_inj;
- 	vmcb02->control.event_inj_err       = svm->nested.ctl.event_inj_err;
+ 	struct vcpu_svm *svm = to_svm(vcpu);
  
-+	/*
-+	 * next_rip is consumed on VMRUN as the return address pushed on the
-+	 * stack for injected soft exceptions/interrupts.  If nrips is exposed
-+	 * to L1, take it verbatim from vmcb12.  If nrips is supported in
-+	 * hardware but not exposed to L1, stuff the actual L2 RIP to emulate
-+	 * what a nrips=0 CPU would do (L1 is responsible for advancing RIP
-+	 * prior to injecting the event).
-+	 */
-+	if (svm->nrips_enabled)
-+		vmcb02->control.next_rip    = svm->nested.ctl.next_rip;
-+	else if (boot_cpu_has(X86_FEATURE_NRIPS))
-+		vmcb02->control.next_rip    = vmcb12_rip;
-+
- 	vmcb02->control.virt_ext            = vmcb01->control.virt_ext &
- 					      LBR_CTL_ENABLE_MASK;
- 	if (svm->lbrv_enabled)
-@@ -745,7 +760,7 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
- 	nested_svm_copy_common_state(svm->vmcb01.ptr, svm->nested.vmcb02.ptr);
+-	BUG_ON(!(gif_set(svm)));
+-
+ 	trace_kvm_inj_virq(vcpu->arch.interrupt.nr);
+ 	++vcpu->stat.irq_injections;
  
- 	svm_switch_vmcb(svm, &svm->nested.vmcb02);
--	nested_vmcb02_prepare_control(svm);
-+	nested_vmcb02_prepare_control(svm, vmcb12->save.rip);
- 	nested_vmcb02_prepare_save(svm, vmcb12);
- 
- 	ret = nested_svm_load_cr3(&svm->vcpu, svm->nested.save.cr3,
-@@ -1418,6 +1433,7 @@ static void nested_copy_vmcb_cache_to_control(struct vmcb_control_area *dst,
- 	dst->nested_ctl           = from->nested_ctl;
- 	dst->event_inj            = from->event_inj;
- 	dst->event_inj_err        = from->event_inj_err;
-+	dst->next_rip             = from->next_rip;
- 	dst->nested_cr3           = from->nested_cr3;
- 	dst->virt_ext              = from->virt_ext;
- 	dst->pause_filter_count   = from->pause_filter_count;
-@@ -1602,7 +1618,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 	nested_copy_vmcb_control_to_cache(svm, ctl);
- 
- 	svm_switch_vmcb(svm, &svm->nested.vmcb02);
--	nested_vmcb02_prepare_control(svm);
-+	nested_vmcb02_prepare_control(svm, svm->vmcb->save.rip);
- 
- 	/*
- 	 * While the nested guest CR3 is already checked and set by
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 32220a1b0ea2..7d97e4d18c8b 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -139,6 +139,7 @@ struct vmcb_ctrl_area_cached {
- 	u64 nested_ctl;
- 	u32 event_inj;
- 	u32 event_inj_err;
-+	u64 next_rip;
- 	u64 nested_cr3;
- 	u64 virt_ext;
- 	u32 clean;
