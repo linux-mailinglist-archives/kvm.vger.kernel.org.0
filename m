@@ -2,196 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 069C451753B
-	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 18:58:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69B89517540
+	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 19:00:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353113AbiEBRCK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 May 2022 13:02:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41422 "EHLO
+        id S1348506AbiEBRDt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 May 2022 13:03:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350851AbiEBRCJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 May 2022 13:02:09 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CCFB6148
-        for <kvm@vger.kernel.org>; Mon,  2 May 2022 09:58:40 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id v8-20020a170902b7c800b0015e927ee201so1671356plz.12
-        for <kvm@vger.kernel.org>; Mon, 02 May 2022 09:58:40 -0700 (PDT)
+        with ESMTP id S1379683AbiEBRDq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 May 2022 13:03:46 -0400
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 104DC2A4
+        for <kvm@vger.kernel.org>; Mon,  2 May 2022 10:00:15 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id b24so17292803edu.10
+        for <kvm@vger.kernel.org>; Mon, 02 May 2022 10:00:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=bPx4uFSnc14yK8QTU/QEz0rdJyrogPiWttuTKlYBjBw=;
-        b=Qwbi3YniGcw+A+s7IOlUFx7dzRTqP2JZQYXQBah7k5tLMg/Mjq5gKYiLjvhOJJSqmn
-         +7UPgTqf/omglpT3nftLpmilF/NwSTftkx9l64Eh8XmCA4YR9WJVtrvxjrLnrrhKFzSm
-         NtmkEyQuiMcN/zzRyiSebm22aIsD1kV44OOG132zJ/Bnn4LCTNhAGyA2iZeledgKRKg2
-         C9p5VrvrjbNMQaefgRfQ1P6780BOJbB/K18QQeESeVPovL6eX/PSVcr+YyMtGOeg1BRd
-         Urv2vr9FHcTbhHZdr9wbZZ4P6GzQ1lDRILuojWGgHAxffEQ4uRDcQvxC6sll+5O8Qu1o
-         9n3w==
+        d=gmail.com; s=20210112;
+        h=date:from:to:subject:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=RRl3U79e4I4WsCLtz6uatCdwmnHIYEN/WR+OX+f29OQ=;
+        b=Uinhikwghh0rsGEpHIVqu+gUuo9wWwB4fkIqaUFeej8q7UK/HoaLPKkSXE3A9iXCv4
+         YPVoJ15VvNTaxNV6Pdhs1UY5dOuvVY0xQhzTUAhlgtOOnmJSkXcl1fIKF2oZ+B9h9KKY
+         rcKOy9HEq64D+b3aHB0SKX+pyXwnxNBqOfVSsR1j10E00ePy6QUSmxaZa03cIkvsW/B+
+         x+mKVK6/6iGTXaNGfUAMZFlrdt7ESPJxX8RP/x1we9c+kgh5GG04DpAJCpDFowTbq47X
+         /B7ymkKRmgseiNeUbNTi/MVYmlDsE+bpbWTzftGQPuOfTRRXD3YFdem7jMcwJcCa+e8K
+         u98A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=bPx4uFSnc14yK8QTU/QEz0rdJyrogPiWttuTKlYBjBw=;
-        b=yF9zlcwa/Uag3gfiE+6HNVVrkbp67VL2d/xzAeU0GsaYlXIihT+sF9jvfelUk5h6+6
-         EAIlZSp5xsddn+6DmOS32GrMyKtMXxHYDaC318Inx5qCySWNq0vzrVwPTltSz64c2fPS
-         WaDbVutnClXQBcmu2DU0Zsw2O4xAotMIfTFjC0RdinQR949IXTIop2wilYfFFRJQsp9X
-         vMlo499IiVOfmuaC6tEdYS7nbBFdDcmbn/FYvVLHXcmh8tRohwDDrsC4A16yahorEOxV
-         1yaZI5FByEnAVLwNmtnZYXI6HFQZTiJ/QkupM3EqgxxmjRLobtYQRlffo7aYymCnFm+A
-         nRog==
-X-Gm-Message-State: AOAM531qv3ETnu/p3047I9yXRnr3zwj3xMMtQpK9gWJNy870l6a8/EFI
-        0jQMdEuXXhhkIefUguBK+Uc/vh3s31sH6TInO21fHj/IGztUXABPNSG7JEODjRGVA2Ddzi4nvMG
-        nsrmsEnVRlqP0+DC73u4L30APVS/Pc3tnmMEvTJ6gUoD/U3KeLcz2vFp1MA==
-X-Google-Smtp-Source: ABdhPJzjhh/6LjTaauro8zl2Yor4TiNpnia0tJxk7Gu6fIKG7L7M+LcVnTGo4t8ZQ8KWcpmRpBCQXVMkO30=
-X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:a504:c712:edfe:ed97])
- (user=pgonda job=sendgmr) by 2002:a05:6a00:1d8f:b0:50d:cbc5:ff90 with SMTP id
- z15-20020a056a001d8f00b0050dcbc5ff90mr11545687pfw.50.1651510719447; Mon, 02
- May 2022 09:58:39 -0700 (PDT)
-Date:   Mon,  2 May 2022 09:58:07 -0700
-Message-Id: <20220502165807.529624-1-pgonda@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH v4] KVM: SEV: Mark nested locking of vcpu->lock
-From:   Peter Gonda <pgonda@google.com>
+        h=x-gm-message-state:date:from:to:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=RRl3U79e4I4WsCLtz6uatCdwmnHIYEN/WR+OX+f29OQ=;
+        b=HL1xkmwG4AbSHvfjkMYXpDxNxZohz72mHT/6lDad/OclSKK5cRVLyqzSG3BRK7Y2be
+         5TlfdNqIc7ncTSgjHCgzQYY6FJKUqttLYOKDmeKEtGlZB3S7e6/L+ZHUHNf+nng/IVvb
+         ffglFVLFjq9mt8RXlUCL5cEOCvzs3lr6bEUZhfVRaoJ21CjmFrCx/y4zSQKy8gC80tem
+         A5IczdcA3OxyPv8PzFMFk4Gm3jto2/pIH67LBupjBcTwiHEVJ1EQcoETjeMtuvJ8bWX1
+         WbGloMGmw3tx5NaiKRWMDPPOaxx2IQHnI/V43EmodaSscJdVKvLJGpLYFQFvwHsizrWG
+         p+NA==
+X-Gm-Message-State: AOAM5304kqgjJGkt9Qo0i1my/sD0CTObA06Srx0OHXinu/PW8pmukWr0
+        fH12W1W/9w+JVKoF1WAICeSTNU8JwsJUlQ==
+X-Google-Smtp-Source: ABdhPJz3WN07777i97JN0y/4Y19xZa7kpcl9/FreAf/dBR2ttHSjGlPhDfB0kuvKcr8gL90yNkhwdQ==
+X-Received: by 2002:a05:6402:3550:b0:427:c668:40d9 with SMTP id f16-20020a056402355000b00427c66840d9mr6219284edd.199.1651510814431;
+        Mon, 02 May 2022 10:00:14 -0700 (PDT)
+Received: from vm1 (ip-86-49-65-192.net.upcbroadband.cz. [86.49.65.192])
+        by smtp.gmail.com with ESMTPSA id de38-20020a1709069be600b006f3ef214dbcsm3734867ejc.34.2022.05.02.10.00.13
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 May 2022 10:00:13 -0700 (PDT)
+Date:   Mon, 2 May 2022 19:00:10 +0200
+From:   Zdenek Kaspar <zkaspar82@gmail.com>
 To:     kvm@vger.kernel.org
-Cc:     Peter Gonda <pgonda@google.com>,
-        John Sperbeck <jsperbeck@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Hillf Danton <hdanton@sina.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Subject: Re: Core2 and v5.18-rc5 troubles
+Message-ID: <20220502190010.7ff820e3.zkaspar82@gmail.com>
+In-Reply-To: <20220502022959.18aafe13.zkaspar82@gmail.com>
+References: <20220502022959.18aafe13.zkaspar82@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-svm_vm_migrate_from() uses sev_lock_vcpus_for_migration() to lock all
-source and target vcpu->locks. Unfortunately there is an 8 subclass
-limit, so a new subclass cannot be used for each vCPU. Instead maintain
-ownership of the first vcpu's mutex.dep_map using a role specific
-subclass: source vs target. Release the other vcpu's mutex.dep_maps.
+On Mon, 2 May 2022 02:29:59 +0200
+Zdenek Kaspar <zkaspar82@gmail.com> wrote:
 
-Fixes: b56639318bb2b ("KVM: SEV: Add support for SEV intra host migration")
-Reported-by: John Sperbeck<jsperbeck@google.com>
-Suggested-by: David Rientjes <rientjes@google.com>
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Hillf Danton <hdanton@sina.com>
-Cc: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Peter Gonda <pgonda@google.com>
+> Hi, when I noticed fix for pre-EPYC and older Intel hardware I checked
+> v5.18-rc5 on my old Core2 machine and something else fails here.
+> 
+> When I kill -9 the first qemu attempt (see dmesg-1), then next
+> attempt is OK, after successful VM shutdown another attempt fails
+> again (see dmesg-2). After that it takes some time and machine needs
+> reset (see dmesg-3).
+> 
+> HTH, Z.
 
----
+Oh crap, I had auto-applied mglru patch, sorry...
+Now starting qemu does this:
 
-V4
- * Due to 8 subclass limit keep dep_map on only the first vcpu and
-   release the others.
+20 root      20   0   0.0m R 100.0   0.0   0:28.33 kworker/1:0+rcu_gp
+looks like:  94.36%  [kernel]                  [k] delay_tsc
+kill -9 "qemu process" and noticed several D state processes:
+    107 ?        D      0:04 [kworker/u8:7+events_unbound]
+    108 ?        D      0:03 [kworker/u8:8+events_unbound]
+    632 ?        Ds     0:00 /usr/lib/systemd/systemd-journald
 
-V3
- * Updated signature to enum to self-document argument.
- * Updated comment as Seanjc@ suggested.
+machine is trashed, here's dmesg info:
 
-Tested by running sev_migrate_tests with lockdep enabled. Before we see
-a warning from sev_lock_vcpus_for_migration(). After we get no warnings.
-
----
- arch/x86/kvm/svm/sev.c | 46 ++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 42 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 75fa6dd268f0..0239def64eaa 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -1591,24 +1591,55 @@ static void sev_unlock_two_vms(struct kvm *dst_kvm, struct kvm *src_kvm)
- 	atomic_set_release(&src_sev->migration_in_progress, 0);
- }
- 
-+/*
-+ * To suppress lockdep false positives, subclass all vCPU mutex locks by
-+ * assigning even numbers to the source vCPUs and odd numbers to destination
-+ * vCPUs based on the vCPU's index.
-+ */
-+enum sev_migration_role {
-+	SEV_MIGRATION_SOURCE = 0,
-+	SEV_MIGRATION_TARGET,
-+	SEV_NR_MIGRATION_ROLES,
-+};
- 
--static int sev_lock_vcpus_for_migration(struct kvm *kvm)
-+static int sev_lock_vcpus_for_migration(struct kvm *kvm,
-+					enum sev_migration_role role)
- {
- 	struct kvm_vcpu *vcpu;
- 	unsigned long i, j;
-+	bool first = true;
- 
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
--		if (mutex_lock_killable(&vcpu->mutex))
-+		if (mutex_lock_killable_nested(&vcpu->mutex, role))
- 			goto out_unlock;
-+
-+		if (first) {
-+			/*
-+			 * Reset the role to one that avoids colliding with
-+			 * the role used for the first vcpu mutex.
-+			 */
-+			role = SEV_NR_MIGRATION_ROLES;
-+			first = false;
-+		} else {
-+			mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
-+		}
- 	}
- 
- 	return 0;
- 
- out_unlock:
-+
-+	first = true;
- 	kvm_for_each_vcpu(j, vcpu, kvm) {
- 		if (i == j)
- 			break;
- 
-+		if (first)
-+			first = false;
-+		else
-+			mutex_acquire(&vcpu->mutex.dep_map, role, 0, _THIS_IP_);
-+
-+
- 		mutex_unlock(&vcpu->mutex);
- 	}
- 	return -EINTR;
-@@ -1618,8 +1649,15 @@ static void sev_unlock_vcpus_for_migration(struct kvm *kvm)
- {
- 	struct kvm_vcpu *vcpu;
- 	unsigned long i;
-+	bool first = true;
- 
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		if (first)
-+			first = false;
-+		else
-+			mutex_acquire(&vcpu->mutex.dep_map,
-+				      SEV_NR_MIGRATION_ROLES, 0, _THIS_IP_);
-+
- 		mutex_unlock(&vcpu->mutex);
- 	}
- }
-@@ -1745,10 +1783,10 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
- 		charged = true;
- 	}
- 
--	ret = sev_lock_vcpus_for_migration(kvm);
-+	ret = sev_lock_vcpus_for_migration(kvm, SEV_MIGRATION_SOURCE);
- 	if (ret)
- 		goto out_dst_cgroup;
--	ret = sev_lock_vcpus_for_migration(source_kvm);
-+	ret = sev_lock_vcpus_for_migration(source_kvm, SEV_MIGRATION_TARGET);
- 	if (ret)
- 		goto out_dst_vcpu;
- 
--- 
-2.36.0.464.gb9c8b46e94-goog
+[  172.349282] BUG: kernel NULL pointer dereference, address: 000000000000000b
+[  172.349324] #PF: supervisor write access in kernel mode
+[  172.349345] #PF: error_code(0x0002) - not-present page
+[  172.349363] PGD 0 P4D 0 
+[  172.349375] Oops: 0002 [#1] PREEMPT SMP PTI
+[  172.349393] CPU: 0 PID: 626 Comm: qemu-build Not tainted 5.18.0-rc5-2-amd64 #1
+[  172.349420] Hardware name:  /DG35EC, BIOS ECG3510M.86A.0118.2010.0113.1426 01/13/2010
+[  172.349446] RIP: 0010:kvm_replace_memslot+0xb0/0x2a0 [kvm]
+[  172.349496] Code: ac 1c 80 04 00 00 4d 85 f6 74 65 48 89 e8 48 c1 e0 04 49 8b 4c 06 08 48 85 c9 74 21 4c 01 f0 48 8b 10 48 89 11 48 85 d2 74 04 <48> 89 4a 08 48 c7 40 08 00 00 00 00 48 c7 00 00 00 00 00 48 8d 44
+[  172.349556] RSP: 0018:ffffb0740064fd78 EFLAGS: 00010206
+[  172.349577] RAX: ffff9e9b41240e00 RBX: ffffb07401271000 RCX: ffffb07401271388
+[  172.349601] RDX: 0000000000000003 RSI: ffff9e9b41240e00 RDI: ffffb07401271000
+[  172.349626] RBP: 0000000000000000 R08: 000000000016000e R09: 000000000016000d
+[  172.349651] R10: ffffd73680764d00 R11: ffff9e9bbf226a78 R12: 0000000000000000
+[  172.349674] R13: ffffb07401271480 R14: ffff9e9b41240e00 R15: 0000000000000000
+[  172.349699] FS:  00007fdf1900f640(0000) GS:ffff9e9bbf200000(0000) knlGS:0000000000000000
+[  172.349726] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  172.349747] CR2: 000000000000000b CR3: 0000000003626000 CR4: 00000000000026f0
+[  172.349772] Call Trace:
+[  172.349785]  <TASK>
+[  172.349795]  kvm_set_memslot+0x3a8/0x5e0 [kvm]
+[  172.349837]  kvm_set_memory_region+0x22/0x40 [kvm]
+[  172.349879]  kvm_vm_ioctl+0x44d/0x500 [kvm]
+[  172.349920]  ? __fget_files+0x8d/0xa0
+[  172.349940]  __x64_sys_ioctl+0xbf3/0xce0
+[  172.349957]  ? do_user_addr_fault+0x280/0x3c0
+[  172.349977]  ? asm_exc_page_fault+0x5/0x20
+[  172.349995]  do_syscall_64+0x31/0x50
+[  172.350011]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[  172.350032] RIP: 0033:0x7fdf1a8cee6f
+[  172.350046] Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60 c7 04 24 10 00 00 00 48 89 44 24 08 48 8d 44 24 20 48 89 44 24 10 b8 10 00 00 00 0f 05 <41> 89 c0 3d 00 f0 ff ff 77 1f 48 8b 44 24 18 64 48 2b 04 25 28 00
+[  172.350105] RSP: 002b:00007fdf1900df70 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+[  172.350131] RAX: ffffffffffffffda RBX: 000000004020ae46 RCX: 00007fdf1a8cee6f
+[  172.350156] RDX: 00007fdf1900e110 RSI: 000000004020ae46 RDI: 000000000000000d
+[  172.350180] RBP: 000055d7a44e7280 R08: 0000000000000000 R09: 0000000000000000
+[  172.350204] R10: 00000000000c0000 R11: 0000000000000246 R12: 00007fdf1900e110
+[  172.350228] R13: 000000003ff40000 R14: 000055d7a4418ee0 R15: 00000000000c0000
+[  172.350254]  </TASK>
+[  172.350262] Modules linked in: vhost_net vhost vhost_iotlb tun nfsd ksmbd cifs_arc4 xfs nhpoly1305_sse2 nhpoly1305 chacha_generic chacha_x86_64 libchacha adiantum libpoly1305 algif_skcipher af_alg auth_rpcgss nfsv4 dns_resolver nfs lockd grace sunrpc lzo_rle zram zsmalloc cpufreq_powersave i915 kvm_intel video 8250 drm_buddy intel_gtt iosf_mbi kvm 8250_base ttm bridge serial_core i2c_algo_bit drm_dp_helper e1000e drm_kms_helper iTCO_wdt irqbypass lpc_ich sysimgblt syscopyarea mfd_core stp sysfillrect acpi_cpufreq evdev fb_sys_fops processor button llc drm sch_fq_codel backlight i2c_core ip_tables x_tables ipv6 autofs4 btrfs raid6_pq xor zstd_decompress zstd_compress lzo_decompress lzo_compress libcrc32c crc32c_generic xts ecb hid_generic usbhid hid dm_crypt dm_mod sd_mod t10_pi crc64_rocksoft_generic crc64_rocksoft crc64 uhci_hcd ehci_pci ahci ehci_hcd libahci usbcore pata_jmicron sata_sil24 usb_common
+[  172.350624] CR2: 000000000000000b
+[  172.352202] ---[ end trace 0000000000000000 ]---
+[  172.353793] RIP: 0010:kvm_replace_memslot+0xb0/0x2a0 [kvm]
+[  172.355383] Code: ac 1c 80 04 00 00 4d 85 f6 74 65 48 89 e8 48 c1 e0 04 49 8b 4c 06 08 48 85 c9 74 21 4c 01 f0 48 8b 10 48 89 11 48 85 d2 74 04 <48> 89 4a 08 48 c7 40 08 00 00 00 00 48 c7 00 00 00 00 00 48 8d 44
+[  172.358667] RSP: 0018:ffffb0740064fd78 EFLAGS: 00010206
+[  172.360335] RAX: ffff9e9b41240e00 RBX: ffffb07401271000 RCX: ffffb07401271388
+[  172.362025] RDX: 0000000000000003 RSI: ffff9e9b41240e00 RDI: ffffb07401271000
+[  172.363723] RBP: 0000000000000000 R08: 000000000016000e R09: 000000000016000d
+[  172.365430] R10: ffffd73680764d00 R11: ffff9e9bbf226a78 R12: 0000000000000000
+[  172.367147] R13: ffffb07401271480 R14: ffff9e9b41240e00 R15: 0000000000000000
+[  172.368856] FS:  00007fdf1900f640(0000) GS:ffff9e9bbf200000(0000) knlGS:0000000000000000
+[  172.370574] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  172.372295] CR2: 000000000000000b CR3: 0000000003626000 CR4: 00000000000026f0
+[  172.672682] BUG: kernel NULL pointer dereference, address: 0000000000000003
+[  172.674427] #PF: supervisor read access in kernel mode
+[  172.676176] #PF: error_code(0x0000) - not-present page
+[  172.677931] PGD 0 P4D 0 
+[  172.679677] Oops: 0000 [#2] PREEMPT SMP PTI
+[  172.681421] CPU: 1 PID: 200 Comm: systemd-journal Tainted: G      D           5.18.0-rc5-2-amd64 #1
+[  172.683186] Hardware name:  /DG35EC, BIOS ECG3510M.86A.0118.2010.0113.1426 01/13/2010
+[  172.684955] RIP: 0010:fsnotify+0x5b5/0x980
+[  172.686722] Code: 40 a8 10 74 13 48 8b 74 24 30 48 85 f6 74 09 4c 8b 6e 08 0b 16 0b 4e 40 f7 d1 23 4c 24 08 85 d1 0f 84 7f 02 00 00 49 8b 4d 00 <4c> 8b 19 4d 85 db 74 53 4c 89 ef 44 89 fe 48 8b 14 24 8b 4c 24 0c
+[  172.690438] RSP: 0018:ffffb074001afd28 EFLAGS: 00010202
+[  172.692310] RAX: 0000000000000008 RBX: 0000000000000000 RCX: 0000000000000003
+[  172.694141] RDX: 0000000008002fc6 RSI: ffff9e9b420acd70 RDI: ffff9e9b41297e00
+[  172.695920] RBP: ffff9e9b41297e00 R08: ffff9e9b4117e800 R09: ffff9e9b46068ed8
+[  172.697702] R10: 0000000000000000 R11: ffffffffa81914b0 R12: 0000000000000000
+[  172.699486] R13: ffff9e9b41297e00 R14: ffff9e9b46068ed8 R15: 0000000008000002
+[  172.701267] FS:  00007ff7ff68ee80(0000) GS:ffff9e9bbf280000(0000) knlGS:0000000000000000
+[  172.703050] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  172.704829] CR2: 0000000000000003 CR3: 0000000003ca8000 CR4: 00000000000026e0
+[  172.706618] Call Trace:
+[  172.708396]  <TASK>
+[  172.710149]  __fsnotify_parent+0x1f9/0x240
+[  172.711896]  ? shmem_setattr+0x172/0x1b0
+[  172.713628]  notify_change+0x3f0/0x410
+[  172.715363]  do_sys_ftruncate+0x121/0x1e0
+[  172.717103]  do_syscall_64+0x31/0x50
+[  172.718838]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[  172.720580] RIP: 0033:0x7ff80008932b
+[  172.722315] Code: 77 05 c3 0f 1f 40 00 48 8b 15 69 fa 0e 00 f7 d8 64 89 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 4d 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 05 c3 0f 1f 40 00 48 8b 15 39 fa 0e 00 f7 d8
+[  172.726019] RSP: 002b:00007ffc04a998b8 EFLAGS: 00000206 ORIG_RAX: 000000000000004d
+[  172.727913] RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007ff80008932b
+[  172.729821] RDX: 00005633275d43f0 RSI: 0000000000080000 RDI: 0000000000000013
+[  172.731736] RBP: 00007ffc04a99950 R08: 0000000000000001 R09: 00005633275de0ac
+[  172.733658] R10: 0000000000000010 R11: 0000000000000206 R12: 00005633275ce270
+[  172.735522] R13: 00007ffc04a998f8 R14: 00007ffc04a99900 R15: 0000000000000000
+[  172.737335]  </TASK>
+[  172.739122] Modules linked in: vhost_net vhost vhost_iotlb tun nfsd ksmbd cifs_arc4 xfs nhpoly1305_sse2 nhpoly1305 chacha_generic chacha_x86_64 libchacha adiantum libpoly1305 algif_skcipher af_alg auth_rpcgss nfsv4 dns_resolver nfs lockd grace sunrpc lzo_rle zram zsmalloc cpufreq_powersave i915 kvm_intel video 8250 drm_buddy intel_gtt iosf_mbi kvm 8250_base ttm bridge serial_core i2c_algo_bit drm_dp_helper e1000e drm_kms_helper iTCO_wdt irqbypass lpc_ich sysimgblt syscopyarea mfd_core stp sysfillrect acpi_cpufreq evdev fb_sys_fops processor button llc drm sch_fq_codel backlight i2c_core ip_tables x_tables ipv6 autofs4 btrfs raid6_pq xor zstd_decompress zstd_compress lzo_decompress lzo_compress libcrc32c crc32c_generic xts ecb hid_generic usbhid hid dm_crypt dm_mod sd_mod t10_pi crc64_rocksoft_generic crc64_rocksoft crc64 uhci_hcd ehci_pci ahci ehci_hcd libahci usbcore pata_jmicron sata_sil24 usb_common
+[  172.750745] CR2: 0000000000000003
+[  172.752725] ---[ end trace 0000000000000000 ]---
+[  172.754640] RIP: 0010:kvm_replace_memslot+0xb0/0x2a0 [kvm]
+[  172.756555] Code: ac 1c 80 04 00 00 4d 85 f6 74 65 48 89 e8 48 c1 e0 04 49 8b 4c 06 08 48 85 c9 74 21 4c 01 f0 48 8b 10 48 89 11 48 85 d2 74 04 <48> 89 4a 08 48 c7 40 08 00 00 00 00 48 c7 00 00 00 00 00 48 8d 44
+[  172.760417] RSP: 0018:ffffb0740064fd78 EFLAGS: 00010206
+[  172.762329] RAX: ffff9e9b41240e00 RBX: ffffb07401271000 RCX: ffffb07401271388
+[  172.764240] RDX: 0000000000000003 RSI: ffff9e9b41240e00 RDI: ffffb07401271000
+[  172.766173] RBP: 0000000000000000 R08: 000000000016000e R09: 000000000016000d
+[  172.768099] R10: ffffd73680764d00 R11: ffff9e9bbf226a78 R12: 0000000000000000
+[  172.769975] R13: ffffb07401271480 R14: ffff9e9b41240e00 R15: 0000000000000000
+[  172.771790] FS:  00007ff7ff68ee80(0000) GS:ffff9e9bbf200000(0000) knlGS:0000000000000000
+[  172.773618] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  172.775443] CR2: 000000000000000b CR3: 0000000003ca8000 CR4: 00000000000026f0
 
