@@ -2,103 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9EDD551724B
-	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 17:13:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 203F0517293
+	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 17:31:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1385684AbiEBPQq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 May 2022 11:16:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50850 "EHLO
+        id S1385791AbiEBPeh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 May 2022 11:34:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238710AbiEBPQo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 May 2022 11:16:44 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 098E726C2
-        for <kvm@vger.kernel.org>; Mon,  2 May 2022 08:13:16 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id 15so11910859pgf.4
-        for <kvm@vger.kernel.org>; Mon, 02 May 2022 08:13:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=gZqXMAjpC2GrxRmrdCb2L/PEy6IHm+hw+aWNQJWW42o=;
-        b=sQvdsdJMDsnRynWzWu/Onoxn/KnxXVpjbdO+M77tcdR7dHAEfCSD7yLnnefPpRMOhw
-         R4GoSyV7drXk4c7wg7fohQFFjgPF8MwT8pjFAK0RWF1lzGsFQ47JVoOA295qHydyqqDV
-         2NXAlSxa8pvBkAkRIRZXKQnbuXQH7aBEnswuugZ7TjzylcTbNeRQUvasLLSLN7/eIVCI
-         /ECus2Ij5KoiQ3x3QCi3VEfCgEGAfLBo5h3w80CTjqQIZySE6XWWU6ApOVKn8QHz5LR9
-         Ci1aJGEzDaWtAeGx3B97gbgmf5Csi01g7FV2znTCC5XRlTZwgQKbOOh5OryeU1GKlyL7
-         4egA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gZqXMAjpC2GrxRmrdCb2L/PEy6IHm+hw+aWNQJWW42o=;
-        b=iphaPmz2Ouc6FJC6VDJmdQXH76cZ3Mcl24d2IACFj7GzEh9GIe/NO+jPupnTaS3ndG
-         GoQaMll5Q1ubPvuifddUw0qumCUPpgZYazEqOjKMx1lu+6mR/yERc4sCl7AsiZv4mWBD
-         xZ6u6fihzOSY2LYDe1yi7Xk7mZno51z8A5fl3EKso11mOThaNVIEg6ydknb1DMrqSyh5
-         mHOrzhTyHAgOHaz83P3h0h8/Fey4Mr77Y/BrBwLiop4bSBR6/6NZgKc6gG1k8C18wTCy
-         slRTyvpTwo3BdQN0JE7zNXyKjetuL4zGJMktQoNNO1u1i9y3DnwHDHa5V/OISsU+FJmS
-         /rDw==
-X-Gm-Message-State: AOAM530H6zXaC8K92/RK89F2IdVqc3jafTkAV6bGFRTnBxmOFmcDz60p
-        3lnsPcQWktGp23L9qmv29fhgNw==
-X-Google-Smtp-Source: ABdhPJycEDsz+WaokYrUN535SirUeBZ/d8h5v46MnWk1jsBhquwB1CdqjBnO+nl6UZMvY4nILbjSvA==
-X-Received: by 2002:a63:78ca:0:b0:398:ae5:6515 with SMTP id t193-20020a6378ca000000b003980ae56515mr10253631pgc.345.1651504395198;
-        Mon, 02 May 2022 08:13:15 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id 1-20020a17090a1a0100b001dbe11be891sm10881858pjk.44.2022.05.02.08.13.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 May 2022 08:13:14 -0700 (PDT)
-Date:   Mon, 2 May 2022 15:13:11 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     syzbot <syzbot+cfafed3bb76d3e37581b@syzkaller.appspotmail.com>
-Cc:     bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mingo@redhat.com,
-        pbonzini@redhat.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
-        x86@kernel.org
-Subject: Re: [syzbot] WARNING in vmx_queue_exception (2)
-Message-ID: <Ym/1B2cy73fjAx34@google.com>
-References: <000000000000ed68ec05de05f7c4@google.com>
+        with ESMTP id S1385774AbiEBPeg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 May 2022 11:34:36 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01F9F10FCA;
+        Mon,  2 May 2022 08:31:01 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 242EoO3A026378;
+        Mon, 2 May 2022 15:31:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=/VoJ+AoqgeFf9BiV5ZbMjsYFGAZou4Vwb9itYmw+xOc=;
+ b=WpVxJiaQeZo6EISLFbsiImFrjHnBifQly6noi60NxJ1Ffb0/enc4ixf0iPtFpMev9naU
+ 11y9HSvBfFp82LEfwlQ8DcHktLqAh/f9S1N2gr/D6Qgrwm4h5akdshwtul20VbAbyYVd
+ 9x/PugNuxOHm3qnLI5f6j/DS04Xl8LJ5oBEFXhOFDX+M61PWNxVc/c1xH9njd5eMYBSP
+ Z4Pv6+XosQYmH6wRs8+GSot3T0PgbYQbCSAvuThHnm30OUBiurV4iFyEhQ6Gk0KkfnDe
+ HMx1LaVoD5UzGGp4mYDwZLkpMLDpSmjri522Q8fMEJ19XOZvj08XNlgDuysUpvVSlco2 Kw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fth1jsh7e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 02 May 2022 15:31:00 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 242FOjjU002652;
+        Mon, 2 May 2022 15:30:59 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fth1jsh6q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 02 May 2022 15:30:59 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 242FRxla025429;
+        Mon, 2 May 2022 15:30:57 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 3frvr8tuw0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 02 May 2022 15:30:57 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 242FUsYE49414458
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 2 May 2022 15:30:54 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 74CE25204F;
+        Mon,  2 May 2022 15:30:54 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 63A815204E;
+        Mon,  2 May 2022 15:30:54 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id 34ADFE02C7; Mon,  2 May 2022 17:30:54 +0200 (CEST)
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+Subject: [GIT PULL 0/1] KVM: s390: Fix lockdep issue in vm memop
+Date:   Mon,  2 May 2022 17:30:52 +0200
+Message-Id: <20220502153053.6460-1-borntraeger@linux.ibm.com>
+X-Mailer: git-send-email 2.35.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: LS5EmqijmTYkblOHM9H03q-LgVpKPbSS
+X-Proofpoint-GUID: gTedacztcOomKeIY1KjYOOpTsgU0XNbe
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <000000000000ed68ec05de05f7c4@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-02_04,2022-05-02_03,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ impostorscore=0 bulkscore=0 adultscore=0 clxscore=1015 spamscore=0
+ suspectscore=0 mlxlogscore=825 phishscore=0 priorityscore=1501
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205020118
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 02, 2022, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    57ae8a492116 Merge tag 'driver-core-5.18-rc5' of git://git..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=16d27d72f00000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=d21a72f6016e37e8
-> dashboard link: https://syzkaller.appspot.com/bug?extid=cfafed3bb76d3e37581b
-> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1202b25af00000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1386a07af00000
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+cfafed3bb76d3e37581b@syzkaller.appspotmail.com
-> 
-> ------------[ cut here ]------------
-> WARNING: CPU: 2 PID: 3674 at arch/x86/kvm/vmx/vmx.c:1628 vmx_queue_exception+0x3e6/0x450 arch/x86/kvm/vmx/vmx.c:1628
-> Modules linked in:
-> CPU: 2 PID: 3674 Comm: syz-executor352 Not tainted 5.18.0-rc4-syzkaller-00396-g57ae8a492116 #0
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
-> RIP: 0010:vmx_queue_exception+0x3e6/0x450 arch/x86/kvm/vmx/vmx.c:1628
+Paolo,
 
-Well this is comically straightforward.  Get to invalid guest state and force an
-injected exception from userspace.  KVM only bails on a pending exception, because
-it's impossible (barring other bugs) to get to an injected exception, but that
-obviously fails to account for userspace intervention.  I'll get a patch posted.
+one patch that is sitting already too long in my tree (sorry, was out of
+office some days).
+
+The following changes since commit 3bcc372c9865bec3ab9bfcf30b2426cf68bc18af:
+
+  KVM: s390: selftests: Add error memop tests (2022-03-14 16:12:27 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-master-5.18-1
+
+for you to fetch changes up to 4aa5ac75bf79cbbc46369163eb2e3addbff0d434:
+
+  KVM: s390: Fix lockdep issue in vm memop (2022-03-23 10:41:04 +0100)
+
+----------------------------------------------------------------
+KVM: s390: fix lockdep warning in new MEMOP call
+
+----------------------------------------------------------------
+Janis Schoetterl-Glausch (1):
+      KVM: s390: Fix lockdep issue in vm memop
+
+ arch/s390/kvm/kvm-s390.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
