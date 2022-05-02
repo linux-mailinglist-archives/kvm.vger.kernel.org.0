@@ -2,101 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58664516EA0
-	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 13:13:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EEF7E516EDD
+	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 13:27:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232459AbiEBLQj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 May 2022 07:16:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56056 "EHLO
+        id S1382903AbiEBLbK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 May 2022 07:31:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232682AbiEBLQd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 May 2022 07:16:33 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A515A5FFA;
-        Mon,  2 May 2022 04:13:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651489984; x=1683025984;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=EC3+2wnZVexq801X0N/krg0yVyBm5vCd1GA2Nj1Q5VM=;
-  b=GVsHRlOzTJFpDWz/SJPREFD7ZRgp23pauv5Z6MVovMHu+wyVg0VWw6TC
-   NPijD11Ep8FjPA4DQAneO9GdIG2tmgqDn0zpK8hAjv/rMJGLnEZKZreZs
-   S2xj64BGNgwFC7tOUKSDpy2slne/botKQfxLc8Ur6Tm66RlvJFqZpNxj4
-   ufY8248YXWk73X8SiuxgmDEhwgPFapHTlX8t1LP7FaTi7z49XscEt76Xq
-   kwLFDGscjnI5iyTXr58XZQwCZZA/31ESNkNZqLsbTMlrYrvsJMLyh2r0J
-   ZJgHbkglPSclEb12oaNbSFZP1pgb2Y44Qmx7b1kXEkso7vXjHtSJ9aRxT
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10334"; a="267339596"
-X-IronPort-AV: E=Sophos;i="5.91,190,1647327600"; 
-   d="scan'208";a="267339596"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2022 04:12:57 -0700
-X-IronPort-AV: E=Sophos;i="5.91,190,1647327600"; 
-   d="scan'208";a="535801181"
-Received: from bwu50-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.2.219])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2022 04:12:54 -0700
-Message-ID: <2d10ff16d3f5fa03886721c24f2db10d79759ed2.camel@intel.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Do not create SPTEs for GFNs that exceed
- host.MAXPHYADDR
-From:   Kai Huang <kai.huang@intel.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>
-Date:   Mon, 02 May 2022 23:12:52 +1200
-In-Reply-To: <20220428233416.2446833-1-seanjc@google.com>
-References: <20220428233416.2446833-1-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+        with ESMTP id S1384728AbiEBLbE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 May 2022 07:31:04 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B93CE13E11
+        for <kvm@vger.kernel.org>; Mon,  2 May 2022 04:27:32 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 242BEqiu021944;
+        Mon, 2 May 2022 11:27:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=23G5hD+xAVuN5BAluG6A+dlVmcKRonXuS7H6yt3tvPk=;
+ b=aVS+awh+qc57mHCl7kFLdfodhowSOxvRrp51sAYYV6vcmSL3CKQvj/qY8svhtlKgisSM
+ Pzsb8+cSTvvBiaJWobmhz4RB9F0RtEKbnVR5Z7WXJw70KDU91CNC58I8zs1KBOo4UFtm
+ aotIzij0nhmWrL8B5ihr2clATnNtDQSPWQBokj9yiUr9SWk3GdCGN0xBZr6/0oE9n3aa
+ t2zXW/vqqu3rfqKZ8fNVHLD1PqjsR5IANtx+I5yL5dKSKj+HY1pi2BAcJBFCqaaB6c8q
+ DAEHci8cCsaUy4B/gfqVbEPy43uMDrY1MdwvaW1jdb3L4EnXxQHVyL8wICoRImtGYDo2 LA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fte8r06nd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 02 May 2022 11:27:28 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 242BJV8W004376;
+        Mon, 2 May 2022 11:27:27 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fte8r06my-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 02 May 2022 11:27:27 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 242BKEtu029997;
+        Mon, 2 May 2022 11:27:25 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma02fra.de.ibm.com with ESMTP id 3frvr8t4t1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 02 May 2022 11:27:25 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 242BRMOe52101378
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 2 May 2022 11:27:22 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7C4ADAE04D;
+        Mon,  2 May 2022 11:27:22 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B9A0FAE045;
+        Mon,  2 May 2022 11:27:21 +0000 (GMT)
+Received: from [9.171.15.56] (unknown [9.171.15.56])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  2 May 2022 11:27:21 +0000 (GMT)
+Message-ID: <eb2fde35-7b9d-a8c8-3212-ae92b2b3e754@linux.ibm.com>
+Date:   Mon, 2 May 2022 13:30:54 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v5 7/9] s390x/pci: enable adapter event notification for
+ interpreted devices
+Content-Language: en-US
+To:     Niklas Schnelle <schnelle@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>, qemu-s390x@nongnu.org,
+        alex.williamson@redhat.com
+Cc:     cohuck@redhat.com, thuth@redhat.com, farman@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com,
+        pasic@linux.ibm.com, borntraeger@linux.ibm.com, mst@redhat.com,
+        pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20220404181726.60291-1-mjrosato@linux.ibm.com>
+ <20220404181726.60291-8-mjrosato@linux.ibm.com>
+ <31b5f911-0e1f-ba3c-94f2-1947d5b16057@linux.ibm.com>
+ <9a171204-6d71-ee1d-d8bd-cd4eac91c3d5@linux.ibm.com>
+ <d14625f4-d648-05d9-38aa-a5ad7e0c9cf5@linux.ibm.com>
+ <2df134498bf60e4878bdb362a28c56ec32d902f8.camel@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <2df134498bf60e4878bdb362a28c56ec32d902f8.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: QJRuyQT7Sb6HqkmzrUbdf4ILHwKznUcH
+X-Proofpoint-GUID: 9QQG1pdHwGuzTdxhLl7DU5zyUG6mvzdk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-02_03,2022-05-02_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 malwarescore=0 suspectscore=0 phishscore=0 mlxscore=0
+ clxscore=1015 priorityscore=1501 impostorscore=0 spamscore=0
+ mlxlogscore=999 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2202240000 definitions=main-2205020086
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-04-28 at 23:34 +0000, Sean Christopherson wrote:
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 904f0faff218..c10ae25135e3 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3010,9 +3010,15 @@ static bool handle_abnormal_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
->  		/*
->  		 * If MMIO caching is disabled, emulate immediately without
->  		 * touching the shadow page tables as attempting to install an
-> -		 * MMIO SPTE will just be an expensive nop.
-> +		 * MMIO SPTE will just be an expensive nop.  Do not cache MMIO
-> +		 * whose gfn is greater than host.MAXPHYADDR, any guest that
-> +		 * generates such gfns is either malicious or in the weeds.
-> +		 * Note, it's possible to observe a gfn > host.MAXPHYADDR if
-> +		 * and only if host.MAXPHYADDR is inaccurate with respect to
-> +		 * hardware behavior, e.g. if KVM itself is running as a VM.
->  		 */
-> -		if (unlikely(!enable_mmio_caching)) {
-> +		if (unlikely(!enable_mmio_caching) ||
-> +		    unlikely(fault->gfn > kvm_mmu_max_gfn_host())) {
 
-Shouldn't we check fault->gfn against cpuid_maxphyaddr(vcpu) instead of
-kvm_mmu_max_gfn_host() here?
 
->  			*ret_val = RET_PF_EMULATE;
->  			return true;
->  		}
+On 5/2/22 11:19, Niklas Schnelle wrote:
+> On Mon, 2022-05-02 at 09:48 +0200, Pierre Morel wrote:
+>>
+>> On 4/22/22 14:10, Matthew Rosato wrote:
+>>> On 4/22/22 5:39 AM, Pierre Morel wrote:
+>>>>
+>>>> On 4/4/22 20:17, Matthew Rosato wrote:
+>>>>> Use the associated kvm ioctl operation to enable adapter event
+>>>>> notification
+>>>>> and forwarding for devices when requested.  This feature will be set up
+>>>>> with or without firmware assist based upon the 'forwarding_assist'
+>>>>> setting.
+>>>>>
+>>>>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>>>>> ---
+>>>>>    hw/s390x/s390-pci-bus.c         | 20 ++++++++++++++---
+>>>>>    hw/s390x/s390-pci-inst.c        | 40 +++++++++++++++++++++++++++++++--
+>>>>>    hw/s390x/s390-pci-kvm.c         | 30 +++++++++++++++++++++++++
+>>>>>    include/hw/s390x/s390-pci-bus.h |  1 +
+>>>>>    include/hw/s390x/s390-pci-kvm.h | 14 ++++++++++++
+>>>>>    5 files changed, 100 insertions(+), 5 deletions(-)
+>>>>>
+>>>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>>>>> index 9c02d31250..47918d2ce9 100644
+>>>>> --- a/hw/s390x/s390-pci-bus.c
+>>>>> +++ b/hw/s390x/s390-pci-bus.c
+>>>>> @@ -190,7 +190,10 @@ void s390_pci_sclp_deconfigure(SCCB *sccb)
+>>>>>            rc = SCLP_RC_NO_ACTION_REQUIRED;
+>>>>>            break;
+>>>>>        default:
+>>>>> -        if (pbdev->summary_ind) {
+>>>>> +        if (pbdev->interp && (pbdev->fh & FH_MASK_ENABLE)) {
+>>>>> +            /* Interpreted devices were using interrupt forwarding */
+>>>>> +            s390_pci_kvm_aif_disable(pbdev);
+>>>>
+>>>> Same remark as for the kernel part.
+>>>> The VFIO device is already initialized and the action is on this
+>>>> device, Shouldn't we use the VFIO device interface instead of the KVM
+>>>> interface?
+>>>>
+>>>
+>>> I don't necessarily disagree, but in v3 of the kernel series I was told
+>>> not to use VFIO ioctls to accomplish tasks that are unique to KVM (e.g.
+>>> AEN interpretation) and to instead use a KVM ioctl.
+>>>
+>>> VFIO_DEVICE_SET_IRQS won't work as-is for reasons described in the
+>>> kernel series (e.g. we don't see any of the config space notifiers
+>>> because of instruction interpretation) -- as far as I can figure we
+>>> could add our own s390 code to QEMU to issue VFIO_DEVICE_SET_IRQS
+>>> directly for an interpreted device, but I think would also need
+>>> s390-specific changes to VFIO_DEVICE_SET_IRQS accommodate this (e.g.
+>>> maybe something like a VFIO_IRQ_SET_DATA_S390AEN where we can then
+>>> specify the aen information in vfio_irq_set.data -- or something else I
+>>
+>> Hi,
+>>
+>> yes this in VFIO_DEVICE_SET_IRQS is what I think should be done.
+>>
+>>> haven't though of yet) -- I can try to look at this some more and see if
+>>> I get a good idea.
+>>
+>>
+>> I understood that the demand was concerning the IOMMU but I may be wrong.
+>> For my opinion, the handling of AEN is not specific to KVM but specific
+>> to the device, for example the code should be the same if Z ever decide
+>> to use XEN or another hypervizor, except for the GISA part but this part
+>> is already implemented in KVM in a way it can be used from a device like
+>> in VFIO AP.
+>>
+>> @Alex, what do you think?
+>>
+>> Regards,
+>> Pierre
+>>
+> 
+> As I understand it the question isn't if it is specific to KVM but
+> rather if it is specific to virtualization. As vfio-pci is also used
+> for non virtualization purposes such as with DPDK/SPDK or a fully
+> emulating QEMU, it should only be in VFIO if it is relevant for these
+> kinds of user-space PCI accesses too. I'm not an AEN expert but as I
+> understand it, this does forwarding interrupts into a SIE context which
+> only makes sense for virtualization not for general user-space PCI.
+> 
 
+Being in VFIO kernel part does not mean that this part should be called 
+from any user of VFIO in userland.
+That is a reason why I did propose an extension and not using the 
+current implementation of VFIO_DEVICE_SET_IRQS as is.
+
+The reason behind is that the AEN hardware handling is device specific: 
+we need the Function Handle to program AEN.
+
+If the API is through KVM which is device agnostic the implementation in 
+KVM has to search through the system to find the device being handled to 
+apply AEN on it.
+
+This not the logical way for me and it is a potential source of problems 
+for future extensions.
+
+Regards,
+Pierre
 
 -- 
-Thanks,
--Kai
-
-
+Pierre Morel
+IBM Lab Boeblingen
