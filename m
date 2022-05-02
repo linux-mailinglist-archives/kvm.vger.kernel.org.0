@@ -2,182 +2,249 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C9FA6517768
-	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 21:25:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8646D51779F
+	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 21:57:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356497AbiEBT3Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 May 2022 15:29:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52618 "EHLO
+        id S234612AbiEBUAm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 May 2022 16:00:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238991AbiEBT3O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 May 2022 15:29:14 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2051.outbound.protection.outlook.com [40.107.93.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 627C1108
-        for <kvm@vger.kernel.org>; Mon,  2 May 2022 12:25:44 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H02GWqMgyGBXtVHT5xVXGZcaqK7hWClhT0SJHdDsc0crR7mCSEi+qluH0gLHZTs+hMwx35+UGLJKQdWpot+oUQ/Mp/hbhezeMJifIDhfYwQyRbJFxJqeId/xoC9InV9i+aOwybn1CmlH2v6pkcm5ZZO0CZVR987TiNEmGPt9MVN1saqlUIuadd5oSlu5EevLn1v00yZhOrAtSDo26cJhzbzlkHfImRwajgUkuoD0wAcaVPvsBFzqkI1wUnMa7pN/96FQQKkEGvTD1fOyyrqJD+rQ1PIzo5JJ9FHylkZzGTz37ihakx3SasJFWEHcINaNdmxgaEvUSWFVpau5wKxM6w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5IvLowyzvv4ifKQoBQNdDaw3Y/kB4N/iWSzRcrZWVvQ=;
- b=YaDl2FfUWWWQ8Ciyp9saqT/9hNDoikTx09EaUwOONS3WjDR34p3cLQUmn4ReV3n8h8Rw0EAkmgQ7JSLq9PLa5K8eLsM6YTBingZWhF/bB6GiSZ+1HAK2I7WkHil8+Em0wlvwhMbwhBxVZVCrYF1vndoqAuIBb0hVaHu9KZFweKYEdwdR6FkTuKQttl1ZDxD+j3+NQAxseY7Z+uf4nEy2BAD+28XfTL9URILFmmOuVIDaYE4GGRIm6uM1uDPu4lyYdfTQtJ+iJIHdCc3HXTv+Wgsn0zPV8SN1HSl5C4G4J6AOhVCxDHsWUEhiA+m3SsTfhW8Rxz0a9r/X6OxDFviq2Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5IvLowyzvv4ifKQoBQNdDaw3Y/kB4N/iWSzRcrZWVvQ=;
- b=kjCVYK/iErZ6Jok3flmux14ekV1e7m+UlKAjoPCtCxQdQ3w6l68SEC4RipdoamuHnlaXgzB+UtvlKeLMWrmRDYSG1vxVxaSiLUXyKaudtlR47wCNVxp0F5o1dwdfefJHYtidpbsmZfxKwpvPiaQvAsUUWWDUr1pNgWG8c5Hr9VrN6Lj3xzbY7vRYXK5+LiK3ThbRXnpDJRBD5GbYtqw3bLIFF8IYYRdCjbRQbmWZ66PHzvfd+Trm3bZzhNRhLANMHDZ0rtI6x7s2Ez6E7Xha1icUG3tQOl20vjkGKKsyslCHWHFcvftzUmuljtQBkg+Cs2otYP/uyJVnug0VKlxXxA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by CH2PR12MB4907.namprd12.prod.outlook.com (2603:10b6:610:68::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.14; Mon, 2 May
- 2022 19:25:42 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2%6]) with mapi id 15.20.5206.024; Mon, 2 May 2022
- 19:25:42 +0000
-Date:   Mon, 2 May 2022 16:25:41 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>, kvm@vger.kernel.org,
-        maorg@nvidia.com, cohuck@redhat.com, kevin.tian@intel.com,
-        joao.m.martins@oracle.com, cjia@nvidia.com, kwankhede@nvidia.com,
-        targupta@nvidia.com, shameerali.kolothum.thodi@huawei.com,
-        eric.auger@redhat.com
-Subject: Re: [PATCH RFC] vfio: Introduce DMA logging uAPIs for VFIO device
-Message-ID: <20220502192541.GS8364@nvidia.com>
-References: <20220501123301.127279-1-yishaih@nvidia.com>
- <20220502130701.62e10b00.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220502130701.62e10b00.alex.williamson@redhat.com>
-X-ClientProxiedBy: BL1PR13CA0258.namprd13.prod.outlook.com
- (2603:10b6:208:2ba::23) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S234557AbiEBUAl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 May 2022 16:00:41 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBD0BBC3D
+        for <kvm@vger.kernel.org>; Mon,  2 May 2022 12:57:10 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 242JKoXc030855;
+        Mon, 2 May 2022 19:57:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=84KxC3O83czdtJRgS7qoXRJ4ubFTgQmj1l+f2k9eX+I=;
+ b=XdovGjL9bgV48Qf2a1tvn5aoOPjKHRODp1suFT4+fkV0nW6JGmztPJSkJoT0h67NyoCL
+ 39eXU4MBPkyyAumkxo2kfBWUo5cKREBeqKx1zCUarYPBSsOg7140f++kJgBrx+4D/iVT
+ MuSE6CTbLUMKhHh9mHWymcoG2YLp5etGuboVNGhyE4yvcfNuGm0suJM6X8h7vbSocb1s
+ KnOFy19wkkzpCAva2t/ApH6wLUPP5Hp1RgXYaEOfVkbMVYEc23w8mzlFy/594h97JnzX
+ MN30pBLs5UMyVc2SxOi04yarv3vI//m6behMdGljCaA+0BxuLhU22aGuVy//ak4i/jSk pg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ftnckrjrd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 02 May 2022 19:57:04 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 242JoxVr013181;
+        Mon, 2 May 2022 19:57:04 GMT
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ftnckrjr3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 02 May 2022 19:57:04 +0000
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 242Jq9V7001296;
+        Mon, 2 May 2022 19:57:03 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma01wdc.us.ibm.com with ESMTP id 3frvr97ekh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 02 May 2022 19:57:03 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 242Jv2bs26018172
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 2 May 2022 19:57:02 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 689E8BE054;
+        Mon,  2 May 2022 19:57:02 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 113AABE04F;
+        Mon,  2 May 2022 19:57:01 +0000 (GMT)
+Received: from [9.211.144.152] (unknown [9.211.144.152])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Mon,  2 May 2022 19:57:00 +0000 (GMT)
+Message-ID: <8ad9f2c8-9fb8-cb47-fd1e-f9a33eced548@linux.ibm.com>
+Date:   Mon, 2 May 2022 15:57:00 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v5 7/9] s390x/pci: enable adapter event notification for
+ interpreted devices
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        qemu-s390x@nongnu.org, alex.williamson@redhat.com
+Cc:     cohuck@redhat.com, thuth@redhat.com, farman@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com,
+        pasic@linux.ibm.com, borntraeger@linux.ibm.com, mst@redhat.com,
+        pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20220404181726.60291-1-mjrosato@linux.ibm.com>
+ <20220404181726.60291-8-mjrosato@linux.ibm.com>
+ <31b5f911-0e1f-ba3c-94f2-1947d5b16057@linux.ibm.com>
+ <9a171204-6d71-ee1d-d8bd-cd4eac91c3d5@linux.ibm.com>
+ <d14625f4-d648-05d9-38aa-a5ad7e0c9cf5@linux.ibm.com>
+ <2df134498bf60e4878bdb362a28c56ec32d902f8.camel@linux.ibm.com>
+ <eb2fde35-7b9d-a8c8-3212-ae92b2b3e754@linux.ibm.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <eb2fde35-7b9d-a8c8-3212-ae92b2b3e754@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 7dygu4fLgW0mVtg-_zWrDgFsDBIrl98F
+X-Proofpoint-ORIG-GUID: DIL68uPF0rV0GCxtHd4WM0whwtm_qVvL
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 394b7a4a-7ca2-4114-c90f-08da2c718c70
-X-MS-TrafficTypeDiagnostic: CH2PR12MB4907:EE_
-X-Microsoft-Antispam-PRVS: <CH2PR12MB49073B9043F0591B931CD869C2C19@CH2PR12MB4907.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KBDJmGTAFTbpJaxG881088wC8U+YIY5jySygcJhJTJQ/M0msoBspW9jCXuD94M8eGflM+jXpqgWFkMF0iHSZKuP+fnqulPLWs5zW9kqUEQPhjYptN69cl1K2wdEQU9s2BQxpyYpSSAcEKs93DU3LQ17shZbseVTkqsybw88AAu1AjUHt3ifF0nVfh52EMvfeTrE9H08VYvLWERQDcoTWVf6XDU9mfZQo1B+1Alfgoz5KjI0ICxEGs91VcQbI38km8+Od0JVfKC9dWegGoJwzt8pXhCMvymfzThNzOOZ3YAoMHEByTCWN37EGr0LlNB1q4hBvrG5Dsq2IcthbpGG0gVfLXceNu7Qsd6LwtZqnZePOflhCRB12wxSFklhIsk1h2uLFwYdOmjDXu5YAQ5RLkGvr1JWFjqsZbjSvF4Kdldz1aGFjCXP+6Lo8y7Yv2oP5nCz48C8k0N8NoMTjYLAP7Jm12oou9IHM4+FxEqOFykUf7rr/yjUnQU1LbxtiB0dKaULhc9oznuNBwsIchdjK3Fezu79naWZuEhe5RigKFb9nEQoj/0sjM5O0VZVrHdxjduP3Xw3+Iy0P2FO4ngFOzgVHHea5JwUqoa+7NXL4qUC9U/lRBlik60uVQoi8Ah3ZtKjG3qluIeuTqGGqDL1XuA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(5660300002)(6486002)(8936002)(508600001)(86362001)(2616005)(26005)(6512007)(2906002)(186003)(6506007)(1076003)(33656002)(4326008)(8676002)(38100700002)(66556008)(66946007)(66476007)(6916009)(316002)(36756003)(83380400001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Li84PjmxWILJx5/WBCi2BB8PeYo3LYellApH+LmvBgjZJIPpP+YwgcYPctzu?=
- =?us-ascii?Q?cVD6+SfLwnnWJzxwz7vYesEn8TbeaBppnoLzFqIy9eeP+DU/xhqXT094QJZZ?=
- =?us-ascii?Q?FS03Qj52R0STig83+BFLBdlT+AfEJgDLOOSYHh4dv1+Hv1pbRYTxo/mBQHeV?=
- =?us-ascii?Q?AiZ6kTOAfZeY/ULYZdsuQ0kLFssAoxTeFD0yPvGotnKyaDh4B7IaXVwHC6CA?=
- =?us-ascii?Q?Cta8orB/8Yy6siWuc1L+TV+6ijRUIw1tYDvL+cymlXifpO+BccSzfNt82lfm?=
- =?us-ascii?Q?8F5y1YZORxd/JSsOeGwqV01K5fUSdIuX6D3lGJxOC+Heibw5Xv+NzwEKyuJH?=
- =?us-ascii?Q?4FsRgT2V+sN+PeOC8Ele+JcPrHs5CwHNhh/Kt/XjTKqeXeJBApkUyRFi54s+?=
- =?us-ascii?Q?7s/dKYr84bvQxirvxSP019LAsAR0WmFJ/7EkX/8NoHJe/McBDwbTs3HMjqdF?=
- =?us-ascii?Q?U/zpXxBZUkEttN7wjzkZ68LhBO9SCeUlqjmimvu06QaK/f5PY5GT2Zt6u4rr?=
- =?us-ascii?Q?V5c4ZmxZAiG4Eg+F3iS34vip8LMV1u9qcf4Via3oMj4dlbIGEiqZ3Eedj+6V?=
- =?us-ascii?Q?gO+JQ1tVGne/sIgYwGmrOkI30YuRmPLYm1cIjeEzBUpzmEKDCyMQMfayX6pO?=
- =?us-ascii?Q?qJWwKzUd/zrvhoudQRK7AS4XwkUpOXzOC2QVkUZmtJY7uJBhq7m64hJ2Nh14?=
- =?us-ascii?Q?1fsyADRCAiO6GaL0lOUwU/MGc19qL2C2X9rSD34UEUuwP2pHkukH4MtoM1RJ?=
- =?us-ascii?Q?rIrMJsAvJQTe3L4YCUFiwv29KM62Cul1nC/ES4xZJ5uV8pNSSpHqYnWKZ3zK?=
- =?us-ascii?Q?60nbtDkuHMgBcbtKXTEI/7QLNAgYiZTovLP87+gyiqY7NrpXPp/F5MLia3WM?=
- =?us-ascii?Q?zdhTrMFAxEQXuV1999zvrEGn4PzVwgItYVVMqbMwfdkvd1k1fclm7k7BRCT1?=
- =?us-ascii?Q?46XKs1lDsbzDl5yKgDOpFbKJjHlU/aV+moo/Aj92zkWjp/O2WCWL91UT9WvG?=
- =?us-ascii?Q?B5kAm8q7vwDyDdcPpBUbQkElBnXFXYheP5NWkMUvIQpBTrHGGjnpDOK61Fg+?=
- =?us-ascii?Q?vWdYjJ2nDY4MMymu0WW6XAuSuhq+5zsdwhc5c/kVQIt4LFjL4ZA2WNxDfJDS?=
- =?us-ascii?Q?WhArwGwQviqsAY7fJE/Zy+HQEfI2W9bZK+5mNExvKFdx3IagjV3eMQN7b+xp?=
- =?us-ascii?Q?vcoSrt7lfkJ4A646SuoNxols5hAaK8FNppRPhHKFjwMhPDwIHiJIVWaOI+Z5?=
- =?us-ascii?Q?RDSRjfl6kJU8s3T9ifkhXryt+AThnjZlF6kDk/GMkTp/ULb4RGf7ZIRJSujq?=
- =?us-ascii?Q?E5Mmf5YCYtAyZOB9JiGJTc/iqvZDt6pG8uQHLGRK3YObHPUcrVbvGmeGAq+M?=
- =?us-ascii?Q?S36B7cF2l4Tn8EegRoHDWo45p82EkLrp4ccd0LHh9EYYVcgdYWSSZ4IxNkIk?=
- =?us-ascii?Q?AJ66BTt4MFrzZKDEVZGeDF1SOvRD1WKAVb8ESYXHLaPZ6CALmAVF45crSmfz?=
- =?us-ascii?Q?9wXmyXn7qA1GNhNSuY73zTg98p7pUsWLMgHo+6vom2GbJpASVyRYJ3djI9yt?=
- =?us-ascii?Q?1On6ATaDcIoIQv7kGLrcN9x+voNB4UcGowcry+uWdodePW8dADPn1/uWGJSY?=
- =?us-ascii?Q?N0QTGt6kvetdF+OMKzOvA2MOSDfGdHCvJsWHix3UA9WbRaD60gidF0Vl6xfA?=
- =?us-ascii?Q?U6+sHRPcAWYqNIeVguuN1GmJETWQdEdQW+zhQsmtl4A8IC5hkAeJ+p8P9QOW?=
- =?us-ascii?Q?MOw1eoNlSw=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 394b7a4a-7ca2-4114-c90f-08da2c718c70
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 May 2022 19:25:42.6880
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wuShR4gWuthsYyL3On9xTNyE/WffPI0/SKDON5FSriQXEn21FjN9mNhlvst/l7p6
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4907
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-02_06,2022-05-02_03,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
+ clxscore=1015 suspectscore=0 malwarescore=0 priorityscore=1501
+ adultscore=0 impostorscore=0 spamscore=0 bulkscore=0 lowpriorityscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205020145
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 02, 2022 at 01:07:01PM -0600, Alex Williamson wrote:
-
-> > +/*
-> > + * Upon VFIO_DEVICE_FEATURE_SET stop device DMA logging that was started
-> > + * by VFIO_DEVICE_FEATURE_DMA_LOGGING_START
-> > + */
-> > +#define VFIO_DEVICE_FEATURE_DMA_LOGGING_STOP 4
+On 5/2/22 7:30 AM, Pierre Morel wrote:
 > 
-> This seems difficult to use from a QEMU perspective, where a vfio
-> device typically operates on a MemoryListener and we only have
-> visibility to one range at a time.  I don't see any indication that
-> LOGGING_START is meant to be cumulative such that userspace could
-> incrementally add ranges to be watched, nor clearly does LOGGING_STOP
-> appear to have any sort of IOVA range granularity.  
+> 
+> On 5/2/22 11:19, Niklas Schnelle wrote:
+>> On Mon, 2022-05-02 at 09:48 +0200, Pierre Morel wrote:
+>>>
+>>> On 4/22/22 14:10, Matthew Rosato wrote:
+>>>> On 4/22/22 5:39 AM, Pierre Morel wrote:
+>>>>>
+>>>>> On 4/4/22 20:17, Matthew Rosato wrote:
+>>>>>> Use the associated kvm ioctl operation to enable adapter event
+>>>>>> notification
+>>>>>> and forwarding for devices when requested.  This feature will be 
+>>>>>> set up
+>>>>>> with or without firmware assist based upon the 'forwarding_assist'
+>>>>>> setting.
+>>>>>>
+>>>>>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>>>>>> ---
+>>>>>>    hw/s390x/s390-pci-bus.c         | 20 ++++++++++++++---
+>>>>>>    hw/s390x/s390-pci-inst.c        | 40 
+>>>>>> +++++++++++++++++++++++++++++++--
+>>>>>>    hw/s390x/s390-pci-kvm.c         | 30 +++++++++++++++++++++++++
+>>>>>>    include/hw/s390x/s390-pci-bus.h |  1 +
+>>>>>>    include/hw/s390x/s390-pci-kvm.h | 14 ++++++++++++
+>>>>>>    5 files changed, 100 insertions(+), 5 deletions(-)
+>>>>>>
+>>>>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>>>>>> index 9c02d31250..47918d2ce9 100644
+>>>>>> --- a/hw/s390x/s390-pci-bus.c
+>>>>>> +++ b/hw/s390x/s390-pci-bus.c
+>>>>>> @@ -190,7 +190,10 @@ void s390_pci_sclp_deconfigure(SCCB *sccb)
+>>>>>>            rc = SCLP_RC_NO_ACTION_REQUIRED;
+>>>>>>            break;
+>>>>>>        default:
+>>>>>> -        if (pbdev->summary_ind) {
+>>>>>> +        if (pbdev->interp && (pbdev->fh & FH_MASK_ENABLE)) {
+>>>>>> +            /* Interpreted devices were using interrupt 
+>>>>>> forwarding */
+>>>>>> +            s390_pci_kvm_aif_disable(pbdev);
+>>>>>
+>>>>> Same remark as for the kernel part.
+>>>>> The VFIO device is already initialized and the action is on this
+>>>>> device, Shouldn't we use the VFIO device interface instead of the KVM
+>>>>> interface?
+>>>>>
+>>>>
+>>>> I don't necessarily disagree, but in v3 of the kernel series I was told
+>>>> not to use VFIO ioctls to accomplish tasks that are unique to KVM (e.g.
+>>>> AEN interpretation) and to instead use a KVM ioctl.
+>>>>
+>>>> VFIO_DEVICE_SET_IRQS won't work as-is for reasons described in the
+>>>> kernel series (e.g. we don't see any of the config space notifiers
+>>>> because of instruction interpretation) -- as far as I can figure we
+>>>> could add our own s390 code to QEMU to issue VFIO_DEVICE_SET_IRQS
+>>>> directly for an interpreted device, but I think would also need
+>>>> s390-specific changes to VFIO_DEVICE_SET_IRQS accommodate this (e.g.
+>>>> maybe something like a VFIO_IRQ_SET_DATA_S390AEN where we can then
+>>>> specify the aen information in vfio_irq_set.data -- or something else I
+>>>
+>>> Hi,
+>>>
+>>> yes this in VFIO_DEVICE_SET_IRQS is what I think should be done.
+>>>
+>>>> haven't though of yet) -- I can try to look at this some more and 
+>>>> see if
+>>>> I get a good idea.
+>>>
+>>>
+>>> I understood that the demand was concerning the IOMMU but I may be 
+>>> wrong.
 
-Correct, at least mlx5 HW just cannot do a change tracking operation,
-so userspace must pre-select some kind of IOVA range to monitor based
-on the current VM configuration.
+The IOMMU was an issue, but the request to move the ioctl out of vfio to 
+kvm was specifically because these ioctl operations were only relevant 
+for VMs and are not applicable to vfio uses cases outside of virtualization.
 
-> Is userspace intended to pass the full vCPU physical address range
-> here, and if so would a single min/max IOVA be sufficient?  
+https://lore.kernel.org/kvm/20220208185141.GH4160@nvidia.com/
 
-At least mlx5 doesn't have enough capacity for that. Some reasonable
-in-between of the current address space, and maybe a speculative extra
-for hot plug.
+>>> For my opinion, the handling of AEN is not specific to KVM but specific
+>>> to the device, for example the code should be the same if Z ever decide
+>>> to use XEN or another hypervizor, except for the GISA part but this part
+>>> is already implemented in KVM in a way it can be used from a device like
+>>> in VFIO AP.
 
-Multi-range is needed to support some arch cases that have a big
-discontinuity in their IOVA space, like PPC for instance.
 
-> I'm not sure how else we could support memory hotplug while this was
-> enabled.
+Fundamentally, these operations are valid only when you have _both_ a 
+virtual machine and vfio device.  (Yes, you could swap in a new 
+hypervisor with a new GISA implementation, but at the end of it the 
+hypervisor must still provide the GISA designation for this to work)
 
-Most likely memory hot plug events will have to take a 'everything got
-dirty' hit during pre-copy - not much else we can do with this HW.
+If fh lookup is a concern, one idea that Jason floated was passing the 
+vfio device fd as an argument to the kvm ioctl (so pass this down on a 
+kvm ioctl from userspace instead of a fh) and then using a new vfio 
+external API to get the relevant device from the provided fd.
 
-> How does this work with IOMMU based tracking, I assume that if devices
-> share an IOAS we wouldn't be able to exclude devices supporting
-> device-level tracking from the IOAS log.
+https://lore.kernel.org/kvm/20220208195117.GI4160@nvidia.com/
 
-Exclusion is possible, the userspace would have to manually create
-iommu_domains and attach devices to them with the idea that only
-iommu_domains for devices it wants to track would have dma dirty
-tracking turned on.
+>>>
+>>> @Alex, what do you think?
+>>>
+>>> Regards,
+>>> Pierre
+>>>
+>>
+>> As I understand it the question isn't if it is specific to KVM but
+>> rather if it is specific to virtualization. As vfio-pci is also used
+>> for non virtualization purposes such as with DPDK/SPDK or a fully
+>> emulating QEMU, it should only be in VFIO if it is relevant for these
+>> kinds of user-space PCI accesses too. I'm not an AEN expert but as I
+>> understand it, this does forwarding interrupts into a SIE context which
+>> only makes sense for virtualization not for general user-space PCI.
 
-But I'm not sure it makes much sense, if the iommu will track dirties,
-and you have to use it for another devices, then it is unlikely there
-will be a performance win to inject a device tracker as well.
+Right, AEN forwarding is only relevant for virtual machines.
 
-In any case the two interfaces are orthogonal, I would not expect
-userspace to want to track with both, but if it does everything does
-work.
+>>
+> 
+> Being in VFIO kernel part does not mean that this part should be called 
+> from any user of VFIO in userland.
+> That is a reason why I did propose an extension and not using the 
+> current implementation of VFIO_DEVICE_SET_IRQS as is.
+> 
+> The reason behind is that the AEN hardware handling is device specific: 
+> we need the Function Handle to program AEN.
 
-> Is there a bitmap size limit?  
+You also need the GISA designation which is provided by the kvm or you 
+also can't program AEN.  So you ultimately need both a function handle 
+that is 'owned' by the device (vfio device fd) and the GISA designation 
+that is 'owned' by kvm (kvm fd).  So there are 2 different "owning" fds 
+involved.
 
-Joao's code doesn't have a limit, it pulls user pages incrementally as
-it goes.
+> 
+> If the API is through KVM which is device agnostic the implementation in 
+> KVM has to search through the system to find the device being handled to 
+> apply AEN on it.
 
-I'm expecting VFIO devices to use the same bitmap library as the IOMMU
-drivers so we have a consistent reporting.
+See comment above about instead passing the vfio device fd.
 
-Jason
+> 
+> This not the logical way for me and it is a potential source of problems 
+> for future extensions.
+> 
+
+
+
