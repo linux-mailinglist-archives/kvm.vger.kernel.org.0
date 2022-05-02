@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 66AAA5178AE
-	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 22:58:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A08FC5178DA
+	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 23:11:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377771AbiEBVBt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 May 2022 17:01:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45588 "EHLO
+        id S1387576AbiEBVOr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 May 2022 17:14:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234261AbiEBVBi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 May 2022 17:01:38 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 749E66454
-        for <kvm@vger.kernel.org>; Mon,  2 May 2022 13:58:08 -0700 (PDT)
+        with ESMTP id S1387560AbiEBVOq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 May 2022 17:14:46 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86E382193
+        for <kvm@vger.kernel.org>; Mon,  2 May 2022 14:11:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651525088; x=1683061088;
+  t=1651525876; x=1683061876;
   h=date:from:to:cc:subject:message-id:mime-version;
-  bh=wbjFnBER4Dc9RytbOMj0elJyEk5o5pxKnlfsjbG8la8=;
-  b=C2G21177mPyz4CBced/j0uF2d/0y9lezbPNJee38fWFsFr5EkFLoi272
-   pwO6z75mdXrZ35L1GAGC80eH6cIheQELvb5e4KhDNeio9RJQrq2KjQDwy
-   rNzT54mfkdljQoRMLVLNf2nPQD05rUHROdXRb2jGQQB1lkU3RQY2VhqlS
-   5MvYQ/tKci0h8iJqiVVUhpxZqCh4u47ygXf/EKM9rfkzhgWQQoW+LI8vC
-   Wouv5HJH/VrIQtNINIg0Q+UlScLIg8I5n3oK/87iWwoCAJuefxrHdhOOp
-   W4Z99crPwEHeSGRMSObcr0fFdnTKytupB17NlER+Tt0veas/gJyv9ZpBB
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10335"; a="267202202"
+  bh=bz8XdlfC0zb93jdEankXZu3bo9qlArkBpYsL14jquwQ=;
+  b=hscWUOlbjNSUIQHSanGFQ3nVek4FOg/7aJAg6R+A32gYF7QLKAWyc0N1
+   HW9q7T9W+VtXsXa1reE2mAkU79s9N+mbi10FLKwsgFQc3xzZjj5wE4dY9
+   dtBEhmpt6V9a57tt2JHL1XDAKRgko24wp7+Ol8jGviAny++r/kgMhFU4j
+   W+kkc8Pdy+oIsG4lj2X7Fsqf34Hp4GWNooQYj873nsiTLiE0oTlVM66X8
+   b0y9+72qrFOcbFnOF/ClCA6zklU6UmXxsLReeb1cXGfHrL59/t2pslE5Q
+   s7bAMi5r3nY6uvW6M3fq0EYISuYdI6pdNA3/jfgBKo1jWHjbqzPCwdmo1
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10335"; a="353765055"
 X-IronPort-AV: E=Sophos;i="5.91,193,1647327600"; 
-   d="scan'208";a="267202202"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2022 13:58:08 -0700
+   d="scan'208";a="353765055"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2022 14:11:15 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.91,193,1647327600"; 
-   d="scan'208";a="598793152"
+   d="scan'208";a="516283619"
 Received: from lkp-server01.sh.intel.com (HELO 5056e131ad90) ([10.239.97.150])
-  by orsmga001.jf.intel.com with ESMTP; 02 May 2022 13:58:05 -0700
+  by orsmga003.jf.intel.com with ESMTP; 02 May 2022 14:11:13 -0700
 Received: from kbuild by 5056e131ad90 with local (Exim 4.95)
         (envelope-from <lkp@intel.com>)
-        id 1nld7N-0009rj-8B;
-        Mon, 02 May 2022 20:58:05 +0000
-Date:   Tue, 3 May 2022 04:57:10 +0800
+        id 1nldK4-0009sY-Hf;
+        Mon, 02 May 2022 21:11:12 +0000
+Date:   Tue, 3 May 2022 05:10:28 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     Chao Gao <chao.gao@intel.com>
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, kvm@vger.kernel.org,
+Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
         Robert Hu <robert.hu@intel.com>,
         Farrah Chen <farrah.chen@intel.com>,
         Danmei Wei <danmei.wei@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Zeng Guang <guang.zeng@intel.com>
 Subject: [kvm:queue 74/77] arch/x86/kvm/vmx/vmx.c:4405:5: warning: no
- previous prototype for function 'vmx_get_pid_table_order'
-Message-ID: <202205030401.Ka1ygWqv-lkp@intel.com>
+ previous prototype for 'vmx_get_pid_table_order'
+Message-ID: <202205030535.s9SuleZq-lkp@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -68,32 +68,25 @@ X-Mailing-List: kvm@vger.kernel.org
 tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
 head:   2764011106d0436cb44702cfb0981339d68c3509
 commit: 101c99f6506d7fc293111190d65fedadb711c9ea [74/77] KVM: VMX: enable IPI virtualization
-config: x86_64-randconfig-a014 (https://download.01.org/0day-ci/archive/20220503/202205030401.Ka1ygWqv-lkp@intel.com/config)
-compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project 09325d36061e42b495d1f4c7e933e260eac260ed)
+config: x86_64-randconfig-a015 (https://download.01.org/0day-ci/archive/20220503/202205030535.s9SuleZq-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.2.0-20) 11.2.0
 reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
         # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=101c99f6506d7fc293111190d65fedadb711c9ea
         git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
         git fetch --no-tags kvm queue
         git checkout 101c99f6506d7fc293111190d65fedadb711c9ea
         # save the config file
         mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash arch/x86/kvm/
+        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash arch/x86/kvm/
 
 If you fix the issue, kindly add following tag as appropriate
 Reported-by: kernel test robot <lkp@intel.com>
 
 All warnings (new ones prefixed by >>):
 
->> arch/x86/kvm/vmx/vmx.c:4405:5: warning: no previous prototype for function 'vmx_get_pid_table_order' [-Wmissing-prototypes]
-   int vmx_get_pid_table_order(struct kvm *kvm)
-       ^
-   arch/x86/kvm/vmx/vmx.c:4405:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-   int vmx_get_pid_table_order(struct kvm *kvm)
-   ^
-   static 
-   1 warning generated.
+>> arch/x86/kvm/vmx/vmx.c:4405:5: warning: no previous prototype for 'vmx_get_pid_table_order' [-Wmissing-prototypes]
+    4405 | int vmx_get_pid_table_order(struct kvm *kvm)
+         |     ^~~~~~~~~~~~~~~~~~~~~~~
 
 
 vim +/vmx_get_pid_table_order +4405 arch/x86/kvm/vmx/vmx.c
