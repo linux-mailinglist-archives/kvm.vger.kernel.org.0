@@ -2,118 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ACB9D516B84
-	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 09:58:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 968C2516B9A
+	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 10:01:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1383625AbiEBICV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 May 2022 04:02:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37396 "EHLO
+        id S1359016AbiEBIDm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 May 2022 04:03:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358979AbiEBICS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 May 2022 04:02:18 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3F682C649;
-        Mon,  2 May 2022 00:58:50 -0700 (PDT)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2427eQU7013210;
-        Mon, 2 May 2022 07:58:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=R6Znuo0uXIGgRF6ohS4ohIBGd/RGextPHf71KJR13a0=;
- b=EqFbyO+jnAJweyJE9ZKRHbbHLnAxdVp1uLFxRBn9IbDUUiy2E+dYZGxNVUasmiMIMMlR
- EnjTqX3I79ZC5NYwa++o1R6yaHpyl55m1MGW/jqryvf1miNNcVk6LI+YyNACN5sRT18u
- 9QvPFo0nDh6CqxJ4dHhKNZ7SdV+gaSZR2JVfBFDTWBNocF2zKxbBFKg3LVvWcE190nUX
- IPHZcnstRDs78UkymiVau2+P+kocpZLR/9FF5ise3cAeBOq6saDHsTU5naitij7qULrL
- 5MqX4dJe7LmyaoZa/W1QrLqrddYaiAcrIkztkKuNxhlBRGnhNltng0rlfL8Dh9edwSuA sQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ftawsgdvm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 02 May 2022 07:58:45 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2427wjl1018914;
-        Mon, 2 May 2022 07:58:45 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ftawsgdv6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 02 May 2022 07:58:44 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2427w9Oh013238;
-        Mon, 2 May 2022 07:58:43 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3frvr8sx55-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 02 May 2022 07:58:42 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2427wgUo26083626
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 2 May 2022 07:58:42 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BAF354C04E;
-        Mon,  2 May 2022 07:58:39 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 287264C046;
-        Mon,  2 May 2022 07:58:39 +0000 (GMT)
-Received: from [9.171.12.235] (unknown [9.171.12.235])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  2 May 2022 07:58:39 +0000 (GMT)
-Message-ID: <385126e7-b74b-1826-c134-3efd278e5b79@linux.ibm.com>
-Date:   Mon, 2 May 2022 09:58:38 +0200
+        with ESMTP id S1383673AbiEBIDe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 May 2022 04:03:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D718D5839F
+        for <kvm@vger.kernel.org>; Mon,  2 May 2022 00:59:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651478389;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=W0Qfj+us8bl0l2SCZoId7ov72GrRQTLv86U5FSCj7V4=;
+        b=daOT1AvHQuIqSzn7vYZBRvh6LhAy/hF9qxB7HigEeMT1QgnvS7ecVLHEM6B7fK4IN1el5d
+        tc12qMNhcMZhLOVNhCD6FfMhFIXMWH3wYXZnZTQISxkgZX0pez7evdgXEwYjtQhn+FcjoY
+        bYp2l8V3138qxfXy0ng2Uqy2nfQmeys=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-644-bJMjaCPYO8K1S2_A-acoiQ-1; Mon, 02 May 2022 03:59:44 -0400
+X-MC-Unique: bJMjaCPYO8K1S2_A-acoiQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0B7E31014A64;
+        Mon,  2 May 2022 07:59:43 +0000 (UTC)
+Received: from starship (unknown [10.40.192.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C9E7714A56A0;
+        Mon,  2 May 2022 07:59:39 +0000 (UTC)
+Message-ID: <82d1a5364f1cc479da3762b046d22f136db167e3.camel@redhat.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Do not create SPTEs for GFNs that exceed
+ host.MAXPHYADDR
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>
+Date:   Mon, 02 May 2022 10:59:38 +0300
+In-Reply-To: <f3ffad3aa8476156f369ff1d4c33f3e127b47d0c.camel@redhat.com>
+References: <20220428233416.2446833-1-seanjc@google.com>
+         <337332ca-835c-087c-c99b-92c35ea8dcd3@redhat.com>
+         <Ymv1I5ixX1+k8Nst@google.com>
+         <20e1e7b1-ece7-e9e7-9085-999f7a916ac2@redhat.com>
+         <Ymv5TR76RNvFBQhz@google.com>
+         <e5864cb4-cce8-bd32-04b0-ecb60c058d0b@redhat.com>
+         <YmwL87h6klEC4UKV@google.com>
+         <ac2001e66957edc8a3af2413b78478c15898f86c.camel@redhat.com>
+         <f3ffad3aa8476156f369ff1d4c33f3e127b47d0c.camel@redhat.com>
+Content-Type: multipart/mixed; boundary="=-7ZRabVNM6g/Surd/aE8E"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v2 0/2] Dirtying, failing memop: don't indicate
- suppression
-Content-Language: en-US
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20220425100147.1755340-1-scgl@linux.ibm.com>
- <8095d0de-dd99-0388-b1d4-e59b01dc4be0@linux.ibm.com>
- <13d0d706-abc4-3e4d-88c3-6447636fd1fd@linux.ibm.com>
- <1ccb1333-2233-8832-4102-a6c082b29108@linux.ibm.com>
- <40038a9a-5647-c355-bad2-297b0a2baf4f@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <40038a9a-5647-c355-bad2-297b0a2baf4f@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 5NTPEpSkXRcq0OaGO40nmWBv0goR-Gm9
-X-Proofpoint-ORIG-GUID: Oz37-pxOBfToHskwywnjIPdnyoPIKnaQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-02_02,2022-04-28_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 adultscore=0 suspectscore=0 bulkscore=0 spamscore=0
- clxscore=1015 priorityscore=1501 phishscore=0 impostorscore=0 mlxscore=0
- mlxlogscore=788 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205020058
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 26.04.22 um 09:25 schrieb Janosch Frank:
-> 
-> To me this measure looks like a last resort option and the POP doesn't state a 100% what is to be done. Some instructions can mandate suppression instead of termination according to the architects.
-> 
-> My intuition tells me that if we are in a situation where this would happen then we would be much better off just doing it by hand (i.e. in the instruction emulation code) and not letting this function decide.
-> 
-> So I'm not entirely sure if we're replacing something that is not correct with something that also won't be correct for all cases.
-> 
-> But to summarize this: I'm not entirely sure even after reading the POP for more than an hour and consulting an architect
 
-According to Damian, the definition in the POP is exactly the way it is to cover for z/VMs way of handling key protection for long operatings in a terminating fashion since the 70ies or 80ies.
-As it is fine for z/VM (and then also for z/OS and zVSE under z/VM) I guess we can (and should) mimic that behaviour.
+--=-7ZRabVNM6g/Surd/aE8E
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+On Sun, 2022-05-01 at 17:32 +0300, Maxim Levitsky wrote:
+> On Sun, 2022-05-01 at 17:28 +0300, Maxim Levitsky wrote:
+> > On Fri, 2022-04-29 at 16:01 +0000, Sean Christopherson wrote:
+> > > On Fri, Apr 29, 2022, Paolo Bonzini wrote:
+> > > > On 4/29/22 16:42, Sean Christopherson wrote:
+> > > > > On Fri, Apr 29, 2022, Paolo Bonzini wrote:
+> > > > > > On 4/29/22 16:24, Sean Christopherson wrote:
+> > > > > > > I don't love the divergent memslot behavior, but it's technically correct, so I
+> > > > > > > can't really argue.  Do we want to "officially" document the memslot behavior?
+> > > > > > > 
+> > > > > > 
+> > > > > > I don't know what you mean by officially document,
+> > > > > 
+> > > > > Something in kvm/api.rst under KVM_SET_USER_MEMORY_REGION.
+> > > > 
+> > > > Not sure if the API documentation is the best place because userspace does
+> > > > not know whether shadow paging is on (except indirectly through other
+> > > > capabilities, perhaps)?
+> > > 
+> > > Hrm, true, it's not like the userspace VMM can rewrite itself at runtime.
+> > > 
+> > > > It could even be programmatic, such as returning 52 for CPUID[0x80000008].
+> > > > A nested KVM on L1 would not be able to use the #PF(RSVD) trick to detect
+> > > > MMIO faults.  That's not a big price to pay, however I'm not sure it's a
+> > > > good idea in general...
+> > > 
+> > > Agreed, messing with CPUID is likely to end in tears.
+> > > 
+> > 
+> > Also I can reproduce it all the way to 5.14 kernel (last kernel I have installed in this VM).
+> > 
+> > I tested kvm/queue as of today, sadly I still see the warning.
+> 
+> Due to a race, the above statements are out of order ;-)
+
+
+So futher investigation shows that the trigger for this *is* cpu_pm=on :(
+
+So this is enough to trigger the warning when run in the guest:
+
+qemu-system-x86_64  -nodefaults  -vnc none -serial stdio -machine accel=kvm -kernel x86/dummy.flat -machine kernel-irqchip=on -smp 8 -m 1g -cpu host -overcommit cpu-pm=on
+
+
+'-smp 8' is needed, and the more vCPUs the more often the warning appears.
+
+
+Due to non atomic memslot update bug, I use patched qemu version, with an attached hack,
+to pause/resume vcpus around the memslot update it does, but even without this hack,
+you can just ctrl+c the test after it gets the KVM internal error, and 
+then tdp mmu memory leak warning shows up (not always but very often).
+
+
+Oh, and if I run the above command on the bare metal, it  never terminates. Must be due to preemption,
+qemu shows beeing stuck in kvm_vcpu_block. AVIC disabled, kvm/queue.
+Bugs, bugs, and features :)
+
+Best regards,
+	Maxim Levitsky
+
+
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
+> 
+> > [mlevitsk@fedora34 ~]$[   35.205241] ------------[ cut here ]------------
+> > [   35.207156] WARNING: CPU: 6 PID: 3236 at arch/x86/kvm/mmu/tdp_mmu.c:46 kvm_mmu_uninit_tdp_mmu+0x47/0x50 [kvm]
+> > [   35.211468] Modules linked in: uinput snd_seq_dummy snd_hrtimer xt_MASQUERADE xt_conntrack ipt_REJECT ip6table_filter ip6_tables iptable_mangle iptable_nat nf_nat bridge rpcsec_gss_krb5 auth_rpcgss
+> > nfsv4 dns_resolver nfs lockd grace fscache netfs rfkill sunrpc vfat fat snd_hda_codec_generic snd_hda_intel snd_intel_dspcfg snd_hda_codec kvm_amd snd_hwdep ccp snd_hda_core rng_core snd_seq kvm
+> > snd_seq_device snd_pcm joydev irqbypass snd_timer input_leds snd lpc_ich virtio_input mfd_core pcspkr efi_pstore rtc_cmos button ext4 mbcache jbd2 hid_generic usbhid hid virtio_gpu virtio_dma_buf
+> > drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops cec virtio_net net_failover drm virtio_console failover i2c_core virtio_blk crc32_pclmul xhci_pci crc32c_intel xhci_hcd virtio_pci
+> > virtio_pci_modern_dev virtio_ring virtio dm_mirror dm_region_hash dm_log fuse ipv6 autofs4
+> > [   35.248745] CPU: 6 PID: 3236 Comm: CPU 2/KVM Not tainted 5.14.0.stable #90
+> > [   35.251559] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+> > [   35.255011] RIP: 0010:kvm_mmu_uninit_tdp_mmu+0x47/0x50 [kvm]
+> > [   35.257531] Code: 48 89 e5 48 39 c2 75 21 48 8b 87 b0 91 00 00 48 81 c7 b0 91 00 00 48 39 f8 75 08 e8 b3 7c cd e0 5d c3 c3 90 0f 0b 90 eb f2 90 <0f> 0b 90 eb d9 0f 1f 40 00 0f 1f 44 00 00 55 b8 ff
+> > ff ff ff 48 89
+> > [   35.265355] RSP: 0018:ffffc90001f6fc28 EFLAGS: 00010283
+> > [   35.267659] RAX: ffffc90001f5a1c0 RBX: 0000000000000008 RCX: 0000000000000000
+> > [   35.270823] RDX: ffff888114168958 RSI: ffff888115636ac0 RDI: ffffc90001f51000
+> > [   35.273769] RBP: ffffc90001f6fc28 R08: 0000000000004802 R09: 0000000000000000
+> > [   35.276595] R10: 00000000000001cd R11: 0000000000000018 R12: ffffc90001f51000
+> > [   35.279470] R13: ffffc90001f51998 R14: ffff8881001d3060 R15: dead000000000100
+> > [   35.282314] FS:  0000000000000000(0000) GS:ffff88846ef80000(0000) knlGS:0000000000000000
+> > [   35.285594] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > [   35.287943] CR2: 0000000000000000 CR3: 0000000002a0b000 CR4: 0000000000350ee0
+> > [   35.290979] Call Trace:
+> > [   35.292082]  kvm_mmu_uninit_vm+0x22/0x30 [kvm]
+> > [   35.293909]  kvm_arch_destroy_vm+0x18f/0x200 [kvm]
+> > [   35.295884]  kvm_destroy_vm+0x164/0x250 [kvm]
+> > [   35.297680]  kvm_put_kvm+0x26/0x40 [kvm]
+> > [   35.299309]  kvm_vm_release+0x22/0x30 [kvm]
+> > [   35.301088]  __fput+0x94/0x240
+> > [   35.302338]  ____fput+0xe/0x10
+> > [   35.303599]  task_work_run+0x63/0xa0
+> > [   35.305083]  do_exit+0x353/0x9d0
+> > [   35.306470]  do_group_exit+0x3b/0xa0
+> > [   35.307882]  get_signal+0x163/0x850
+> > [   35.309403]  arch_do_signal_or_restart+0xf3/0x7c0
+> > [   35.311390]  exit_to_user_mode_prepare+0x112/0x1f0
+> > [   35.313374]  syscall_exit_to_user_mode+0x18/0x40
+> > [   35.315244]  do_syscall_64+0x44/0xb0
+> > [   35.316819]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+> > [   35.318874] RIP: 0033:0x7f51e5f8b0ab
+> > [   35.320395] Code: Unable to access opcode bytes at RIP 0x7f51e5f8b081.
+> > [   35.322985] RSP: 002b:00007f50dbdfd5c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+> > [   35.326015] RAX: fffffffffffffffc RBX: 000055df487dd0a0 RCX: 00007f51e5f8b0ab
+> > [   35.328914] RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 000000000000000e
+> > [   35.332162] RBP: 00007f50dbdfd6c0 R08: 000055df46521e60 R09: 00007ffcd47ed080
+> > [   35.335172] R10: 00007ffcd47ed090 R11: 0000000000000246 R12: 00007ffcd4653f2e
+> > [   35.338302] R13: 00007ffcd4653f2f R14: 0000000000000000 R15: 00007f50dbdff640
+> > [   35.341320] ---[ end trace fa01d10f9909874f ]---
+> > 
+> > 
+> > Oh, well, I will now switch to vanilla L0 kernel, just in case, and see where to go from this point.
+> > 
+> > Best regards,
+> > 	Maxim Levitsky
+> > 
+
+
+--=-7ZRabVNM6g/Surd/aE8E
+Content-Disposition: attachment;
+	filename="0001-Pause-all-VCPUs-on-host-bridge-memregion-changes.patch"
+Content-Type: text/x-patch;
+	name="0001-Pause-all-VCPUs-on-host-bridge-memregion-changes.patch";
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+RnJvbSA1YWJmOTljNzZlNzZmYTJmNWM3MmM1MWRiMTQ0M2U3MDMyNDIzOTk4IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBNYXhpbSBMZXZpdHNreSA8bWxldml0c2tAcmVkaGF0LmNvbT4K
+RGF0ZTogVGh1LCAyMCBKYW4gMjAyMiAxODowMDowNyArMDIwMApTdWJqZWN0OiBbUEFUQ0hdIFBh
+dXNlIGFsbCBWQ1BVcyBvbiBob3N0IGJyaWRnZSBtZW1yZWdpb24gY2hhbmdlcwoKVGhpcyBpcyB0
+ZW1wIGhhY2sgdG8gYXZvaWQgY3B1X3BtPW9uIGZhaWx1cmVzCi0tLQogaHcvcGNpLWhvc3QvaTQ0
+MGZ4LmMgfCA1ICsrKysrCiBody9wY2ktaG9zdC9xMzUuYyAgICB8IDUgKysrKysKIDIgZmlsZXMg
+Y2hhbmdlZCwgMTAgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL2h3L3BjaS1ob3N0L2k0NDBm
+eC5jIGIvaHcvcGNpLWhvc3QvaTQ0MGZ4LmMKaW5kZXggZTA4NzE2MTQyYi4uMDMzODRiNDEwZSAx
+MDA2NDQKLS0tIGEvaHcvcGNpLWhvc3QvaTQ0MGZ4LmMKKysrIGIvaHcvcGNpLWhvc3QvaTQ0MGZ4
+LmMKQEAgLTM2LDYgKzM2LDcgQEAKICNpbmNsdWRlICJxYXBpL3Zpc2l0b3IuaCIKICNpbmNsdWRl
+ICJxZW11L2Vycm9yLXJlcG9ydC5oIgogI2luY2x1ZGUgInFvbS9vYmplY3QuaCIKKyNpbmNsdWRl
+ICJzeXNlbXUvY3B1cy5oIgogCiAvKgogICogSTQ0MEZYIGNoaXBzZXQgZGF0YSBzaGVldC4KQEAg
+LTY5LDYgKzcwLDggQEAgc3RhdGljIHZvaWQgaTQ0MGZ4X3VwZGF0ZV9tZW1vcnlfbWFwcGluZ3Mo
+UENJSTQ0MEZYU3RhdGUgKmQpCiAgICAgaW50IGk7CiAgICAgUENJRGV2aWNlICpwZCA9IFBDSV9E
+RVZJQ0UoZCk7CiAKKyAgICBwYXVzZV9hbGxfdmNwdXMoKTsKKwogICAgIG1lbW9yeV9yZWdpb25f
+dHJhbnNhY3Rpb25fYmVnaW4oKTsKICAgICBmb3IgKGkgPSAwOyBpIDwgQVJSQVlfU0laRShkLT5w
+YW1fcmVnaW9ucyk7IGkrKykgewogICAgICAgICBwYW1fdXBkYXRlKCZkLT5wYW1fcmVnaW9uc1tp
+XSwgaSwKQEAgLTc5LDYgKzgyLDggQEAgc3RhdGljIHZvaWQgaTQ0MGZ4X3VwZGF0ZV9tZW1vcnlf
+bWFwcGluZ3MoUENJSTQ0MEZYU3RhdGUgKmQpCiAgICAgbWVtb3J5X3JlZ2lvbl9zZXRfZW5hYmxl
+ZCgmZC0+c21yYW0sCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBwZC0+Y29uZmlnW0k0
+NDBGWF9TTVJBTV0gJiBTTVJBTV9HX1NNUkFNRSk7CiAgICAgbWVtb3J5X3JlZ2lvbl90cmFuc2Fj
+dGlvbl9jb21taXQoKTsKKworICAgIHJlc3VtZV9hbGxfdmNwdXMoKTsKIH0KIAogCmRpZmYgLS1n
+aXQgYS9ody9wY2ktaG9zdC9xMzUuYyBiL2h3L3BjaS1ob3N0L3EzNS5jCmluZGV4IGFiNWE0N2Fm
+ZjUuLjAyODMxZjUyNDggMTAwNjQ0Ci0tLSBhL2h3L3BjaS1ob3N0L3EzNS5jCisrKyBiL2h3L3Bj
+aS1ob3N0L3EzNS5jCkBAIC0zNyw2ICszNyw3IEBACiAjaW5jbHVkZSAicWFwaS9lcnJvci5oIgog
+I2luY2x1ZGUgInFhcGkvdmlzaXRvci5oIgogI2luY2x1ZGUgInFlbXUvbW9kdWxlLmgiCisjaW5j
+bHVkZSAic3lzZW11L2NwdXMuaCIKIAogLyoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioq
+KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioKICAqIFEzNSBob3N0
+CkBAIC00NzEsNiArNDcyLDggQEAgc3RhdGljIHZvaWQgbWNoX3dyaXRlX2NvbmZpZyhQQ0lEZXZp
+Y2UgKmQsCiB7CiAgICAgTUNIUENJU3RhdGUgKm1jaCA9IE1DSF9QQ0lfREVWSUNFKGQpOwogCisg
+ICAgcGF1c2VfYWxsX3ZjcHVzKCk7CisKICAgICBwY2lfZGVmYXVsdF93cml0ZV9jb25maWcoZCwg
+YWRkcmVzcywgdmFsLCBsZW4pOwogCiAgICAgaWYgKHJhbmdlc19vdmVybGFwKGFkZHJlc3MsIGxl
+biwgTUNIX0hPU1RfQlJJREdFX1BBTTAsCkBAIC00OTYsNiArNDk5LDggQEAgc3RhdGljIHZvaWQg
+bWNoX3dyaXRlX2NvbmZpZyhQQ0lEZXZpY2UgKmQsCiAgICAgaWYgKHJhbmdlc19vdmVybGFwKGFk
+ZHJlc3MsIGxlbiwgTUNIX0hPU1RfQlJJREdFX0ZfU01CQVNFLCAxKSkgewogICAgICAgICBtY2hf
+dXBkYXRlX3NtYmFzZV9zbXJhbShtY2gpOwogICAgIH0KKworICAgIHJlc3VtZV9hbGxfdmNwdXMo
+KTsKIH0KIAogc3RhdGljIHZvaWQgbWNoX3VwZGF0ZShNQ0hQQ0lTdGF0ZSAqbWNoKQotLSAKMi4y
+Ni4zCgo=
+
+
+--=-7ZRabVNM6g/Surd/aE8E--
+
