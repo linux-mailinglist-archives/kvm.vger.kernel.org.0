@@ -2,125 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 87E9B5179D3
-	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 00:14:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02DB25179DE
+	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 00:19:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232116AbiEBWR4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 May 2022 18:17:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54550 "EHLO
+        id S243234AbiEBWW1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 May 2022 18:22:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229569AbiEBWRz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 May 2022 18:17:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AD61E2AE1
-        for <kvm@vger.kernel.org>; Mon,  2 May 2022 15:14:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651529661;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=xl6Xpdm3WlzJY8Flkv4/tA3bvvDEz6eyxdpQ2Cyhu6k=;
-        b=M/6HZC+eszNtlEYi99Cy5cqAK8VMKIo3XddcpyuYB0R835h+WtY2/6UJK0hkM308AQ7rpo
-        ad0pb7FLqmVfzyFz97dj18cODIdkPKLe3RirwRB0MqVMINT9zoItP99FCqqEys3bYfklKs
-        5kYnpe5h0hlTqBxGV6MPC6UI8pTT31M=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-631-1yjBhZCINjO60aOanfqZSQ-1; Mon, 02 May 2022 18:14:20 -0400
-X-MC-Unique: 1yjBhZCINjO60aOanfqZSQ-1
-Received: by mail-il1-f198.google.com with SMTP id v11-20020a056e0213cb00b002cbcd972206so7959436ilj.11
-        for <kvm@vger.kernel.org>; Mon, 02 May 2022 15:14:20 -0700 (PDT)
+        with ESMTP id S232116AbiEBWWZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 May 2022 18:22:25 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE65CD9B
+        for <kvm@vger.kernel.org>; Mon,  2 May 2022 15:18:53 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id fy8-20020a17090b020800b001d8de2118ccso207231pjb.8
+        for <kvm@vger.kernel.org>; Mon, 02 May 2022 15:18:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=TXIIJNLl5tS81cj1e6Sb3BybyFnRD2QLWwcLwhsiYDs=;
+        b=Qa0ikLUOxl2s5X8Ry8796VJb+tcDzIXLzrUSN7TnPSNNudW3bfEOQOU0kLfq1hxTfN
+         IP0sESs7FFstPfBGMaVlPw3HKJgDcJGjTmkSLqd0UrTUQtGrrOhmhHaEUYguiGrFlYpi
+         XX6v9u/nMe9PUrknwsQNDkHoJxoVXIQ2wh/eH25qHwZnKU/rnkU+MdkHiS3BC1oHQHOZ
+         ec8cSZKZ6NgLQEGvkV5zimwoWmRB8l7ztqb2//HE10AiNxDZOLT6df1hYp9p/CZGSAN7
+         WU8sq/BbQhJhtywBCzi4+sBjdWtrTkNbehr+5R6iHdwswF7JtkjD7Jo+AS2tZUokyc/C
+         eXjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xl6Xpdm3WlzJY8Flkv4/tA3bvvDEz6eyxdpQ2Cyhu6k=;
-        b=dW1/ZCI5ZY1BeeJRG1kSGH34B+hYg4x22xKVUvExyLxrg0snMVB/1FNq7EXOyn6V10
-         cr+4LQs4H/RTK+42zTrz6OMP0LJJGPbpJ5ik3aNnA0a3a99rGDcuof0j0eHQoQDQGPYY
-         Ae+xDFS6tue35wJhMrxVj+/4Nardp4gWuvqFIAcZ8JXNevlWsx/CCssBf6QEaTS+C/X2
-         46w43YmINR2I8pJJcHrKg3lMtI33Iyd6QtoV1ZiRME/s+CiU2Q01XGg/d37Z69Ui4+SL
-         pwjUngFi4pxp03cYBahdo6m34az4l9zJFC/eY+0DUXn7aIgOAyJ876mdWnukzJvPciUf
-         3ORA==
-X-Gm-Message-State: AOAM532jsJZ2gsfpf1M7mU7r5YA/aq8Rdmz9ruV7eDBFGsCYWzRivQhh
-        n+6nAYeIske3XO0tCPbqch1leNwGK6gsmRxnUnJ0ISW7IKunygJoOIpoRQPbrh+fgnYYsYlM0wl
-        aDlCu5YFgd3ZD
-X-Received: by 2002:a05:6e02:170c:b0:2cd:bac2:667f with SMTP id u12-20020a056e02170c00b002cdbac2667fmr5375105ill.14.1651529659641;
-        Mon, 02 May 2022 15:14:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz4f/QticTUJHNM8NJp6hUrgYGqHh++mP5pRLnkkpYYlvtmEzG3xnz/8HPgCyPk5SrOa/hi4g==
-X-Received: by 2002:a05:6e02:170c:b0:2cd:bac2:667f with SMTP id u12-20020a056e02170c00b002cdbac2667fmr5375101ill.14.1651529659440;
-        Mon, 02 May 2022 15:14:19 -0700 (PDT)
-Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id p10-20020a6bce0a000000b0065a47e16f54sm2438437iob.38.2022.05.02.15.14.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 May 2022 15:14:19 -0700 (PDT)
-Date:   Mon, 2 May 2022 18:14:17 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Shivam Kumar <shivam.kumar1@nutanix.com>
-Cc:     pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
-        Shaju Abraham <shaju.abraham@nutanix.com>,
-        Manish Mishra <manish.mishra@nutanix.com>,
-        Anurag Madnawat <anurag.madnawat@nutanix.com>
-Subject: Re: [PATCH v3 1/3] KVM: Implement dirty quota-based throttling of
- vcpus
-Message-ID: <YnBXuXTcX2OC6fQU@xz-m1.local>
-References: <20220306220849.215358-1-shivam.kumar1@nutanix.com>
- <20220306220849.215358-2-shivam.kumar1@nutanix.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220306220849.215358-2-shivam.kumar1@nutanix.com>
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=TXIIJNLl5tS81cj1e6Sb3BybyFnRD2QLWwcLwhsiYDs=;
+        b=xdJz6tzapaHA1LVRfjZeBj1OZpWIcXeBwA5A1KWOor8e7XhtFYW7ARd98NIjSqKoZQ
+         0YqEezTbrlNqjHTIb9QoN0cW+YlarVTZb4tD6odJs3CB879lHGs6tjpehhtTqQfFgtgK
+         WxT/M6Ib8ARzC2JIZmtdgEBc/G0AHj/pqi1JKMmpG0iXq+r7QaA+5aIzHPwakY6T7Kzx
+         lTsN+hZDsvqo3CunnHzovawQvFQ4/d+hk1e8y0eZDnx6sUmOxQgtPH6RqO9uFVnXBYCj
+         t88AoO3IF6E64eQ257LPke45kq1OJi1+JmMZSDZuGsws5o0K0tbhHBsfQvczBeXqDTdx
+         Xw8w==
+X-Gm-Message-State: AOAM530yqspZ9/9GON6UjpK7Ab+SQY6Ai/zs8qNJKNimRUSxAJPW5X46
+        YzSPqvEx1LDdgN0367cpHMlUbt3hYvk=
+X-Google-Smtp-Source: ABdhPJzAB+fTD/4HJyBSgaZ6B+/uiqDSapY8Q+Y3yfuxmKFMC3Uamz17CxAwrCKbS6zRQaerkilOVz5CgnQ=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:c986:b0:1d9:56e7:4e83 with SMTP id
+ w6-20020a17090ac98600b001d956e74e83mr149900pjt.1.1651529932080; Mon, 02 May
+ 2022 15:18:52 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Mon,  2 May 2022 22:18:50 +0000
+Message-Id: <20220502221850.131873-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
+Subject: [PATCH] KVM: VMX: Exit to userspace if vCPU has injected exception
+ and invalid state
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+cfafed3bb76d3e37581b@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Shivam,
+Exit to userspace with an emulation error if KVM encounters an injected
+exception with invalid guest state, in addition to the existing check of
+bailing if there's a pending exception (KVM doesn't support emulating
+exceptions except when emulating real mode via vm86).
 
-On Sun, Mar 06, 2022 at 10:08:48PM +0000, Shivam Kumar wrote:
-> +static inline int kvm_vcpu_check_dirty_quota(struct kvm_vcpu *vcpu)
-> +{
-> +	u64 dirty_quota = READ_ONCE(vcpu->run->dirty_quota);
-> +	u64 pages_dirtied = vcpu->stat.generic.pages_dirtied;
-> +	struct kvm_run *run = vcpu->run;
-> +
-> +	if (!dirty_quota || (pages_dirtied < dirty_quota))
-> +		return 1;
-> +
-> +	run->exit_reason = KVM_EXIT_DIRTY_QUOTA_EXHAUSTED;
-> +	run->dirty_quota_exit.count = pages_dirtied;
-> +	run->dirty_quota_exit.quota = dirty_quota;
+In theory, KVM should never get to such a situation as KVM is supposed to
+exit to userspace before injecting an exception with invalid guest state.
+But in practice, userspace can intervene and manually inject an exception
+and/or stuff registers to force invalid guest state while a previously
+injected exception is awaiting reinjection.
 
-Pure question: why this needs to be returned to userspace?  Is this value
-set from userspace?
+Fixes: fc4fad79fc3d ("KVM: VMX: Reject KVM_RUN if emulation is required with pending exception")
+Reported-by: syzbot+cfafed3bb76d3e37581b@syzkaller.appspotmail.com
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> +	return 0;
-> +}
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index cf8581978bce..c41f0ac700c7 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5465,7 +5465,7 @@ static bool vmx_emulation_required_with_pending_exception(struct kvm_vcpu *vcpu)
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 
+ 	return vmx->emulation_required && !vmx->rmode.vm86_active &&
+-	       vcpu->arch.exception.pending;
++	       (vcpu->arch.exception.pending || vcpu->arch.exception.injected);
+ }
+ 
+ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
 
-The other high level question is whether you have considered using the ring
-full event to achieve similar goal?
-
-Right now KVM_EXIT_DIRTY_RING_FULL event is generated when per-vcpu ring
-gets full.  I think there's a problem that the ring size can not be
-randomly set but must be a power of 2.  Also, there is a maximum size of
-ring allowed at least.
-
-However since the ring size can be fairly small (e.g. 4096 entries) it can
-still achieve some kind of accuracy.  For example, the userspace can
-quickly kick the vcpu back to VM_RUN only until it sees that it reaches
-some quota (and actually that's how dirty-limit is implemented on QEMU,
-contributed by China Telecom):
-
-https://lore.kernel.org/qemu-devel/cover.1646243252.git.huangy81@chinatelecom.cn/
-
-Is there perhaps some explicit reason that dirty ring cannot be used?
-
-Thanks!
-
+base-commit: 84e5ffd045f33e4fa32370135436d987478d0bf7
 -- 
-Peter Xu
+2.36.0.464.gb9c8b46e94-goog
 
