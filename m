@@ -2,160 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CFBED517B0A
-	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 01:57:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A03B517B7E
+	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 03:10:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230078AbiECAAE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 May 2022 20:00:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51436 "EHLO
+        id S229549AbiECBMy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 May 2022 21:12:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231934AbiEBX7C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 May 2022 19:59:02 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6B5A633A
-        for <kvm@vger.kernel.org>; Mon,  2 May 2022 16:55:28 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id iq2-20020a17090afb4200b001d93cf33ae9so770072pjb.5
-        for <kvm@vger.kernel.org>; Mon, 02 May 2022 16:55:28 -0700 (PDT)
+        with ESMTP id S229841AbiECBMw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 May 2022 21:12:52 -0400
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6D1159BA9
+        for <kvm@vger.kernel.org>; Mon,  2 May 2022 18:09:16 -0700 (PDT)
+Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
+        id 4Kshd02q3pz4yST; Tue,  3 May 2022 11:07:00 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=KF+0hHq9SEiR1B1K23N9qqmjFGxNYyDbMKeM3XCoCIA=;
-        b=lazFntWQL/l49iNuHrVAg+ZM2my/Zj1tAQupWNwnULXQWQ6RaIywfzw7Ji2YH00tfF
-         bZtIiCT+3Rh8Dbvp0GdIEA9WJc0Wc4PseZLS0cItxB7zQTQAd8dPd96WihSJujy5RV/T
-         90ZqnDWg+FYE9fwKzM0MYncZ2AEpJoVHQ49KsiZJ/RvQhJ0VdCZLlbfElbhN35xlBRlS
-         jDV8p8rFteDGJZier8572E1WzRDr9PwzVjzTg++6z/8nWJjhwMzgl95vk/jYNui4TvuR
-         GaI8BFeRU2fq/3gT+zTMsJMi6NMn7mfQxMUHecg6OM6JjB5yXhqbd+/HmirCHY9cBtcn
-         HYWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=KF+0hHq9SEiR1B1K23N9qqmjFGxNYyDbMKeM3XCoCIA=;
-        b=Y4WWrZwOM6lzkYPKtKmc7b2nG62jEuccWnIjWQ9IezC/MLsBXjGe0lJf/xb69qGuRz
-         VfLNFRLOMzD3HwaO/88yqDt846Iwihu49w8gR3v+6qJc7yIVLyUKNjLdzGz0x8T5uiST
-         PUoEJHHV1mI+J2nnGpsYG7MgpgIor6TMtEKIOTVMc832MJ0OG7Hx23JuZJTLcAylvjAU
-         IWWsOsmMsLlW/Tx7R8A5jOuf6Z6897xqCWMGRYASPBztIZ4Dk6B9Mg2y8X8SQ6ESDtc2
-         AUUzdFgUlRAAGfr0Au3UX91TjJSdj/XTBnpNpIUigRYzEBVjfcTdLDB8dojioOfhoWJq
-         nEIg==
-X-Gm-Message-State: AOAM5308Y7DB5mIgXte6Ea508FrhopvPFEKHrvbUVgsMK2NdKeu348BF
-        uoYUpA8obvSuwTXl9UqLvZXtqA==
-X-Google-Smtp-Source: ABdhPJxpaMM2fi5EZQja67jPxxKDSFZl//fXpAE1n0fwEK0QxIJzBAkYYQYIvcxXlPckj892rv/ZEw==
-X-Received: by 2002:a17:90a:9ea:b0:1dc:1c48:eda with SMTP id 97-20020a17090a09ea00b001dc1c480edamr1808249pjo.38.1651535728233;
-        Mon, 02 May 2022 16:55:28 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id d8-20020aa78e48000000b0050dc7628199sm5232277pfr.115.2022.05.02.16.55.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 May 2022 16:55:27 -0700 (PDT)
-Date:   Mon, 2 May 2022 23:55:24 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH v2] KVM: x86/mmu: Update number of zapped pages even if
- page list is stable
-Message-ID: <YnBvbHXTseOZkmHF@google.com>
-References: <20211129235233.1277558-1-seanjc@google.com>
- <YlCNpQ9nkD1ToY13@google.com>
+        d=gibson.dropbear.id.au; s=201602; t=1651540020;
+        bh=tl+xQY7b5PWuVIwdVZUBcQmBxqJUgBDX+VVK3NshUdM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=iwNAkgDTUM+C/hJsi3IqYspRuR24yJ0wEje5rmgyXA9e20Dkmj0pHsv59zE/oEtHB
+         C9J9ajMauFSPh2frlNXP/F/irO8ifYQsce6O4CAqk/AGeWmL6Z7K1gdB8V+PTOIzxs
+         Zgezn1XyMSxv8Kr/bVHCbVB7YDNXjKhKI4DXonik=
+Date:   Mon, 2 May 2022 14:10:07 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Martins, Joao" <joao.m.martins@oracle.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH RFC 11/12] iommufd: vfio container FD ioctl compatibility
+Message-ID: <Ym9Zn6P5Rrxl7ktM@yekko>
+References: <0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+ <11-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+ <20220323165125.5efd5976.alex.williamson@redhat.com>
+ <20220324003342.GV11336@nvidia.com>
+ <20220324160403.42131028.alex.williamson@redhat.com>
+ <YmqqXHsCTxVb2/Oa@yekko>
+ <20220428151037.GK8364@nvidia.com>
+ <BN9PR11MB5276C4C51B3EB6AD77DEFFCD8CFC9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <YmuEQCRqyzSsH270@yekko>
+ <20220429125030.GX8364@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="NOL/Vueg46+c6vaG"
 Content-Disposition: inline
-In-Reply-To: <YlCNpQ9nkD1ToY13@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220429125030.GX8364@nvidia.com>
+X-Spam-Status: No, score=-0.7 required=5.0 tests=BAYES_00,DATE_IN_PAST_12_24,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 08, 2022, Sean Christopherson wrote:
-> Very high latency ping, this is still problematic and still applies cleanly.
 
-PING!  PING!  PING!  PING!
+--NOL/Vueg46+c6vaG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Don't make me write a script to ping you every hour :-)
+On Fri, Apr 29, 2022 at 09:50:30AM -0300, Jason Gunthorpe wrote:
+> On Fri, Apr 29, 2022 at 04:22:56PM +1000, David Gibson wrote:
+> > On Fri, Apr 29, 2022 at 01:21:30AM +0000, Tian, Kevin wrote:
+> > > > From: Jason Gunthorpe <jgg@nvidia.com>
+> > > > Sent: Thursday, April 28, 2022 11:11 PM
+> > > >=20
+> > > >=20
+> > > > > 3) "dynamic DMA windows" (DDW).  The IBM IOMMU hardware allows for
+> > > > 2 IOVA
+> > > > > windows, which aren't contiguous with each other.  The base addre=
+sses
+> > > > > of each of these are fixed, but the size of each window, the page=
+size
+> > > > > (i.e. granularity) of each window and the number of levels in the
+> > > > > IOMMU pagetable are runtime configurable.  Because it's true in t=
+he
+> > > > > hardware, it's also true of the vIOMMU interface defined by the I=
+BM
+> > > > > hypervisor (and adpoted by KVM as well).  So, guests can request
+> > > > > changes in how these windows are handled.  Typical Linux guests w=
+ill
+> > > > > use the "low" window (IOVA 0..2GiB) dynamically, and the high win=
+dow
+> > > > > (IOVA 1<<60..???) to map all of RAM.  However, as a hypervisor we
+> > > > > can't count on that; the guest can use them however it wants.
+> > > >=20
+> > > > As part of nesting iommufd will have a 'create iommu_domain using
+> > > > iommu driver specific data' primitive.
+> > > >=20
+> > > > The driver specific data for PPC can include a description of these
+> > > > windows so the PPC specific qemu driver can issue this new ioctl
+> > > > using the information provided by the guest.
+> > > >=20
+> > > > The main issue is that internally to the iommu subsystem the
+> > > > iommu_domain aperture is assumed to be a single window. This kAPI w=
+ill
+> > > > have to be improved to model the PPC multi-window iommu_domain.
+> > > >=20
+> > >=20
+> > > From the point of nesting probably each window can be a separate
+> > > domain then the existing aperture should still work?
+> >=20
+> > Maybe.  There might be several different ways to represent it, but the
+> > vital piece is that any individual device (well, group, technically)
+> > must atomically join/leave both windows at once.
+>=20
+> I'm not keen on the multi-iommu_domains because it means we have to
+> create the idea that a device can be attached to multiple
+> iommu_domains, which we don't have at all today.
+>=20
+> Since iommu_domain allows PPC to implement its special rules, like the
+> atomicness above.
 
-> On Mon, Nov 29, 2021, Sean Christopherson wrote:
-> > When zapping obsolete pages, update the running count of zapped pages
-> > regardless of whether or not the list has become unstable due to zapping
-> > a shadow page with its own child shadow pages.  If the VM is backed by
-> > mostly 4kb pages, KVM can zap an absurd number of SPTEs without bumping
-> > the batch count and thus without yielding.  In the worst case scenario,
-> > this can cause a soft lokcup.
-> > 
-> >  watchdog: BUG: soft lockup - CPU#12 stuck for 22s! [dirty_log_perf_:13020]
-> >    RIP: 0010:workingset_activation+0x19/0x130
-> >    mark_page_accessed+0x266/0x2e0
-> >    kvm_set_pfn_accessed+0x31/0x40
-> >    mmu_spte_clear_track_bits+0x136/0x1c0
-> >    drop_spte+0x1a/0xc0
-> >    mmu_page_zap_pte+0xef/0x120
-> >    __kvm_mmu_prepare_zap_page+0x205/0x5e0
-> >    kvm_mmu_zap_all_fast+0xd7/0x190
-> >    kvm_mmu_invalidate_zap_pages_in_memslot+0xe/0x10
-> >    kvm_page_track_flush_slot+0x5c/0x80
-> >    kvm_arch_flush_shadow_memslot+0xe/0x10
-> >    kvm_set_memslot+0x1a8/0x5d0
-> >    __kvm_set_memory_region+0x337/0x590
-> >    kvm_vm_ioctl+0xb08/0x1040
-> > 
-> > Fixes: fbb158cb88b6 ("KVM: x86/mmu: Revert "Revert "KVM: MMU: zap pages in batch""")
-> > Reported-by: David Matlack <dmatlack@google.com>
-> > Reviewed-by: Ben Gardon <bgardon@google.com>
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> > 
-> > v2:
-> >  - Rebase to kvm/master, commit 30d7c5d60a88 ("KVM: SEV: expose...")
-> >  - Collect Ben's review, modulo bad splat.
-> >  - Copy+paste the correct splat and symptom. [David].
-> > 
-> > @David, I kept the unstable declaration out of the loop, mostly because I
-> > really don't like putting declarations in loops, but also because
-> > nr_zapped is declared out of the loop and I didn't want to change that
-> > unnecessarily or make the code inconsistent.
-> > 
-> >  arch/x86/kvm/mmu/mmu.c | 10 ++++++----
-> >  1 file changed, 6 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 0c839ee1282c..208c892136bf 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -5576,6 +5576,7 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
-> >  {
-> >  	struct kvm_mmu_page *sp, *node;
-> >  	int nr_zapped, batch = 0;
-> > +	bool unstable;
-> >  
-> >  restart:
-> >  	list_for_each_entry_safe_reverse(sp, node,
-> > @@ -5607,11 +5608,12 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
-> >  			goto restart;
-> >  		}
-> >  
-> > -		if (__kvm_mmu_prepare_zap_page(kvm, sp,
-> > -				&kvm->arch.zapped_obsolete_pages, &nr_zapped)) {
-> > -			batch += nr_zapped;
-> > +		unstable = __kvm_mmu_prepare_zap_page(kvm, sp,
-> > +				&kvm->arch.zapped_obsolete_pages, &nr_zapped);
-> > +		batch += nr_zapped;
-> > +
-> > +		if (unstable)
-> >  			goto restart;
-> > -		}
-> >  	}
-> >  
-> >  	/*
-> > -- 
-> > 2.34.0.rc2.393.gf8c9666880-goog
-> 
+I tend to agree; I think extending the iommu domain concept to
+incorporate multiple windows makes more sense than extending to allow
+multiple domains per device.  I'm just saying there might be other
+ways of representing this, and that's not a sticking point for me as
+long as the right properties can be preserved.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--NOL/Vueg46+c6vaG
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEoULxWu4/Ws0dB+XtgypY4gEwYSIFAmJvWX0ACgkQgypY4gEw
+YSIRyxAAsxY5Gh6o+Ak9QpzgluzTikqf2kOCRvhTCTBH+BSubWH7U0uasbYmdtMN
+ZrWKQRul/w8mKuuPp2IiUHuqA+TqNy/R69c8zcRN39Dt3RCpW0TaRrZXjhVsbliY
++2cgGXtemupprEgymq+njipYOX27ydhVHCRY18EYlrabldciOk2uv9rD7b00LIe8
+PPjpUN4KAIx8cRgcS5IEw9dyORlWdduaZtj38m4295IbsxdadQvH8TUPAkeXMnhR
+a/SVpdw3+EPrBeZlCIFsYZ+jCTyGLvc2knlJHskE6D+NVuNUnUnjv9e2MZ6f1hut
+ezDCfYJI988qaxQ+iAA+fvJmqBN+2/7ioh0nntvbhrrF8My2jwGOsT/ehVwlANcQ
+R63aCi4gyXosS7shQHHDDPhBRztviVnCq+biGG/4ly+7TSFhAklDzNYAUlex6mQ1
+fNrwTf9lI+gnQhi072S2q0dSlkNSV3zEU+ScAXPCJf4bgpLV93Vhy+EHLDpUEYP/
+iply4hG+UMVVJQw6LK0iTrgiKAEn9QdcWoqghB9mkl5q9G4Otw7t+nWeU0PmuFuA
+YqE7qx19N9IDcg3X/bo8ywaN2iwHp3G+6F8opzMKIFDI5vLDu2A9fHJ0CYPP/N0y
+sMhx7wNveaQS7S74n44F+HLdpzvkBfUkZ1oSWztWD3AhyALr9mI=
+=roey
+-----END PGP SIGNATURE-----
+
+--NOL/Vueg46+c6vaG--
