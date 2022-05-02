@@ -2,147 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4689051730A
-	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 17:41:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA6245173BE
+	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 18:07:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1385965AbiEBPov (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 May 2022 11:44:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52608 "EHLO
+        id S241030AbiEBQKs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 May 2022 12:10:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1385948AbiEBPot (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 May 2022 11:44:49 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C09EEE28;
-        Mon,  2 May 2022 08:41:20 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 242FYeKs019142;
-        Mon, 2 May 2022 15:41:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=xoy6xM262qGLX/dAmGncvgEeh+f1uPvBcosoTcR0alc=;
- b=gSnz+Ml1eNV/hXLG7HeHX0ITPSVhhZt6bSXA9QSQZfksVX025lMQcUYV2/ikw2YWG02K
- agKtpLRR9z8sE1uLuWDw/yh4JCzWUSyPXx4mz095BpJ3Em4flmyLLFCh/dPHsgyRk3VX
- JxEXe1ckM+MruOiBB8mVoe4kR6oHfiuj6fOZyOevamxFcFdxzWaZZ6H3sadWTnk+otXa
- 20AxxT4QXUDKryPRXCIxfkFCmVA3bL6h2yY7aKzMZ6glPLZnpN+iReP2WXxMNAUJ2tf/
- AMv5kZUEymGuhgp6EaKct5R8VH4KcxJEkshqrHbolXdw60YXdn7UorRJa7J3RSwb/i6C ug== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fthqsrn33-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 02 May 2022 15:41:20 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 242FYlUj019744;
-        Mon, 2 May 2022 15:41:19 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fthqsrn1u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 02 May 2022 15:41:19 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 242FW7I8004530;
-        Mon, 2 May 2022 15:41:17 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06fra.de.ibm.com with ESMTP id 3frvcj2cb8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 02 May 2022 15:41:17 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 242FfFtC23789968
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 2 May 2022 15:41:15 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0A9354C044;
-        Mon,  2 May 2022 15:41:14 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 879F24C040;
-        Mon,  2 May 2022 15:41:13 +0000 (GMT)
-Received: from [9.171.12.235] (unknown [9.171.12.235])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  2 May 2022 15:41:13 +0000 (GMT)
-Message-ID: <249d0100-fa58-bf48-b1d2-f28e94c3a5f2@linux.ibm.com>
-Date:   Mon, 2 May 2022 17:41:13 +0200
+        with ESMTP id S234025AbiEBQKq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 May 2022 12:10:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 853AD55AF
+        for <kvm@vger.kernel.org>; Mon,  2 May 2022 09:07:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651507636;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=s70MT6Y6b+EWzPq4TYtvjBhW+c7gKt8WCUmst+yWMcA=;
+        b=NOoPok6F3YLUvVYVKt0qwJG6RoU5PWdXFGSPb9ePPBDnF6dxQn3TlXsrV4i0w/NbtB6mG6
+        +OHYXJTom6VrDI5UcXv0MxtAklLUkuXb6tgcBc3hFOe1xuxBvuh6eq80E3f76Cz0ieGcGQ
+        +Raf/RLlEpAe0C5hcIlJSERBXN0UnZI=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-86-91pxlsGIPLqzX23KjoXRKw-1; Mon, 02 May 2022 12:07:15 -0400
+X-MC-Unique: 91pxlsGIPLqzX23KjoXRKw-1
+Received: by mail-ej1-f72.google.com with SMTP id nb10-20020a1709071c8a00b006e8f89863ceso7027297ejc.18
+        for <kvm@vger.kernel.org>; Mon, 02 May 2022 09:07:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=s70MT6Y6b+EWzPq4TYtvjBhW+c7gKt8WCUmst+yWMcA=;
+        b=kdHCN4EVaBuzFGlHe0OA3fBKLCbPkeukGaxM60MZm0FY039J+Zico/vjOmiH1NzY3j
+         kwloWHXsCKW1z2VZaKrQFslX4w2NMWOCOWuREtSTs1TrbgGicMz6zmK6qSq35eSFpvx4
+         F4on9jlql77vlj/DZeEKQtWheFaPfF/clCfR5KR9plABsD9s5S7WLMlCfRSj80t9MJ3E
+         cWaOKEdFgHDYsNL7Tv7HbWUek9VX/D7Ao6+CVwf299EyCVh7ZyO+FbgABIsvWEMX0icJ
+         vWXyxU2JoYPEU9lH7p8n6N33L+X9/qOF/M0Ws2TXm3i7h+ZUqRhl6vKc//7wuk1aYBs/
+         uuOg==
+X-Gm-Message-State: AOAM5323XlMeHAtvbokpEMGonnHGTmEy8MAzQxtI87NBSU7BTHrovzDx
+        WBII/YpztKwxPvJP/Hk5glqLBEPgGbuXA42/+QZq3OJfb7JaZGVOGDoHsi81c6B3NX/BsN0rUsK
+        yNmL7QJxQIO+q
+X-Received: by 2002:a17:907:72d4:b0:6f4:7b2:1dea with SMTP id du20-20020a17090772d400b006f407b21deamr12049366ejc.532.1651507634269;
+        Mon, 02 May 2022 09:07:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxHV9JQOzWXQ2/EuMLNL2Sk7plhApTBZcA1FAn/4yisC7DdLA+Ho0CT7zFqHqrSbD0Bufb/EQ==
+X-Received: by 2002:a17:907:72d4:b0:6f4:7b2:1dea with SMTP id du20-20020a17090772d400b006f407b21deamr12049334ejc.532.1651507634023;
+        Mon, 02 May 2022 09:07:14 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id zp1-20020a17090684e100b006f3ef214df0sm3710399ejb.86.2022.05.02.09.07.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 May 2022 09:07:13 -0700 (PDT)
+Message-ID: <a06997fe-8dd7-e91a-2017-912827f554e7@redhat.com>
+Date:   Mon, 2 May 2022 18:07:11 +0200
+MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.8.0
-Subject: Re: [GIT PULL 0/1] KVM: s390: Fix lockdep issue in vm memop
+Subject: Re: [PATCH v9 8/9] KVM: x86: Allow userspace set maximum VCPU id for
+ VM
 Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-References: <20220502153053.6460-1-borntraeger@linux.ibm.com>
- <47855c4c-dc85-3ee8-b903-4acf0b94e4a9@redhat.com>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <47855c4c-dc85-3ee8-b903-4acf0b94e4a9@redhat.com>
+To:     Zeng Guang <guang.zeng@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>
+References: <20220419154444.11888-1-guang.zeng@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220419154444.11888-1-guang.zeng@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: wtQQV_qhJPexIMV0DfGIeUR7Rn-kSkIg
-X-Proofpoint-ORIG-GUID: S-9SNC5xbenPAqIcgG2hVhSxR6w_wJKF
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
-MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-02_04,2022-05-02_03,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- suspectscore=0 adultscore=0 impostorscore=0 clxscore=1015
- priorityscore=1501 bulkscore=0 malwarescore=0 spamscore=0 mlxlogscore=999
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205020122
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 02.05.22 um 17:39 schrieb Paolo Bonzini:
-> On 5/2/22 17:30, Christian Borntraeger wrote:
->> Paolo,
->>
->> one patch that is sitting already too long in my tree (sorry, was out of
->> office some days).
-> 
-> Hi Christian,
-> 
-> at this point I don't have much waiting for 5.18.  Feel free to send it through the s390 tree.
+On 4/19/22 17:44, Zeng Guang wrote:
+> +Userspace is able to calculate the limit to APIC ID values from designated CPU
+> +topology. This capability allows userspace to specify maximum possible APIC ID
+> +assigned for current VM session prior to the creation of vCPUs. By design, it
+> +can set only once and doesn't accept change any more. KVM will manage memory
+> +allocation of VM-scope structures which depends on the value of APIC ID.
+> +
+> +Calling KVM_CHECK_EXTENSION for this capability returns the value of maximum APIC
+> +ID that KVM supports at runtime. It sets as KVM_MAX_VCPU_IDS by default.
 
-OK.
+Better:
 
-Heiko, Vasily, can you queue this for your next pull request?
+This capability allows userspace to specify maximum possible APIC ID
+assigned for current VM session prior to the creation of vCPUs, saving
+memory for data structures indexed by the APIC ID.  Userspace is able
+to calculate the limit to APIC ID values from designated
+CPU topology.
 
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-for carrying this via the s390 tree.
+The value can be changed only until KVM_ENABLE_CAP is set to a nonzero
+value or until a vCPU is created.  Upon creation of the first vCPU,
+if the value was set to zero or KVM_ENABLE_CAP was not invoked, KVM
+uses the return value of KVM_CHECK_EXTENSION(KVM_CAP_MAX_VCPU_ID) as
+the maximum APIC ID.
 
-> 
-> Paolo
-> 
->> The following changes since commit 3bcc372c9865bec3ab9bfcf30b2426cf68bc18af:
->>
->>    KVM: s390: selftests: Add error memop tests (2022-03-14 16:12:27 +0100)
->>
->> are available in the Git repository at:
->>
->>    git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-master-5.18-1
->>
->> for you to fetch changes up to 4aa5ac75bf79cbbc46369163eb2e3addbff0d434:
->>
->>    KVM: s390: Fix lockdep issue in vm memop (2022-03-23 10:41:04 +0100)
->>
->> ----------------------------------------------------------------
->> KVM: s390: fix lockdep warning in new MEMOP call
->>
->> ----------------------------------------------------------------
->> Janis Schoetterl-Glausch (1):
->>        KVM: s390: Fix lockdep issue in vm memop
->>
->>   arch/s390/kvm/kvm-s390.c | 11 ++++++++++-
->>   1 file changed, 10 insertions(+), 1 deletion(-)
->>
-> 
+>   	case KVM_CAP_MAX_VCPU_ID:
+> -		r = KVM_MAX_VCPU_IDS;
+> +		if (!kvm->arch.max_vcpu_ids)
+> +			r = KVM_MAX_VCPU_IDS;
+> +		else
+> +			r = kvm->arch.max_vcpu_ids;
+
+I think returning the constant KVM_CAP_MAX_VCPU_IDS is better.
+
+Paolo
+
