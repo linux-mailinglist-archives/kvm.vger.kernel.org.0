@@ -2,196 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 69B89517540
-	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 19:00:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 534EF517591
+	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 19:13:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348506AbiEBRDt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 May 2022 13:03:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42584 "EHLO
+        id S1385905AbiEBRQ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 May 2022 13:16:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379683AbiEBRDq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 May 2022 13:03:46 -0400
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 104DC2A4
-        for <kvm@vger.kernel.org>; Mon,  2 May 2022 10:00:15 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id b24so17292803edu.10
-        for <kvm@vger.kernel.org>; Mon, 02 May 2022 10:00:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:subject:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=RRl3U79e4I4WsCLtz6uatCdwmnHIYEN/WR+OX+f29OQ=;
-        b=Uinhikwghh0rsGEpHIVqu+gUuo9wWwB4fkIqaUFeej8q7UK/HoaLPKkSXE3A9iXCv4
-         YPVoJ15VvNTaxNV6Pdhs1UY5dOuvVY0xQhzTUAhlgtOOnmJSkXcl1fIKF2oZ+B9h9KKY
-         rcKOy9HEq64D+b3aHB0SKX+pyXwnxNBqOfVSsR1j10E00ePy6QUSmxaZa03cIkvsW/B+
-         x+mKVK6/6iGTXaNGfUAMZFlrdt7ESPJxX8RP/x1we9c+kgh5GG04DpAJCpDFowTbq47X
-         /B7ymkKRmgseiNeUbNTi/MVYmlDsE+bpbWTzftGQPuOfTRRXD3YFdem7jMcwJcCa+e8K
-         u98A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=RRl3U79e4I4WsCLtz6uatCdwmnHIYEN/WR+OX+f29OQ=;
-        b=HL1xkmwG4AbSHvfjkMYXpDxNxZohz72mHT/6lDad/OclSKK5cRVLyqzSG3BRK7Y2be
-         5TlfdNqIc7ncTSgjHCgzQYY6FJKUqttLYOKDmeKEtGlZB3S7e6/L+ZHUHNf+nng/IVvb
-         ffglFVLFjq9mt8RXlUCL5cEOCvzs3lr6bEUZhfVRaoJ21CjmFrCx/y4zSQKy8gC80tem
-         A5IczdcA3OxyPv8PzFMFk4Gm3jto2/pIH67LBupjBcTwiHEVJ1EQcoETjeMtuvJ8bWX1
-         WbGloMGmw3tx5NaiKRWMDPPOaxx2IQHnI/V43EmodaSscJdVKvLJGpLYFQFvwHsizrWG
-         p+NA==
-X-Gm-Message-State: AOAM5304kqgjJGkt9Qo0i1my/sD0CTObA06Srx0OHXinu/PW8pmukWr0
-        fH12W1W/9w+JVKoF1WAICeSTNU8JwsJUlQ==
-X-Google-Smtp-Source: ABdhPJz3WN07777i97JN0y/4Y19xZa7kpcl9/FreAf/dBR2ttHSjGlPhDfB0kuvKcr8gL90yNkhwdQ==
-X-Received: by 2002:a05:6402:3550:b0:427:c668:40d9 with SMTP id f16-20020a056402355000b00427c66840d9mr6219284edd.199.1651510814431;
-        Mon, 02 May 2022 10:00:14 -0700 (PDT)
-Received: from vm1 (ip-86-49-65-192.net.upcbroadband.cz. [86.49.65.192])
-        by smtp.gmail.com with ESMTPSA id de38-20020a1709069be600b006f3ef214dbcsm3734867ejc.34.2022.05.02.10.00.13
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 May 2022 10:00:13 -0700 (PDT)
-Date:   Mon, 2 May 2022 19:00:10 +0200
-From:   Zdenek Kaspar <zkaspar82@gmail.com>
-To:     kvm@vger.kernel.org
-Subject: Re: Core2 and v5.18-rc5 troubles
-Message-ID: <20220502190010.7ff820e3.zkaspar82@gmail.com>
-In-Reply-To: <20220502022959.18aafe13.zkaspar82@gmail.com>
-References: <20220502022959.18aafe13.zkaspar82@gmail.com>
+        with ESMTP id S242903AbiEBRQy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 May 2022 13:16:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E5A2C627B
+        for <kvm@vger.kernel.org>; Mon,  2 May 2022 10:13:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651511604;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7vf4sT7dDfJ18mM5fdZ4gMEt5hbjvc3fPcu9zyp1RQg=;
+        b=SbXe1IzoPfwVfTeixcF1YwtJxscXzJHV6uMGhJSyWeeRkNyamPbAvrXe84xfYPEWUYIW7O
+        aH2Jum3Dvb9Kt9T6f76M13RXcVkBA+6+WeW2Bav7i5th3VpDXuvhs6YqCl2DACrJ0mbbu4
+        fgTap0Xi8weOQmJ0BGacuAazHQ8+yFE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-277-KvGehVF_Pf2MdwaAFs1QEA-1; Mon, 02 May 2022 13:13:23 -0400
+X-MC-Unique: KvGehVF_Pf2MdwaAFs1QEA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 67CA7801210;
+        Mon,  2 May 2022 17:13:22 +0000 (UTC)
+Received: from starship (unknown [10.40.192.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5216440E7F06;
+        Mon,  2 May 2022 17:13:20 +0000 (UTC)
+Message-ID: <24b74f5bd8810c7f79777ed6898baeaf47bfe3e3.camel@redhat.com>
+Subject: Re: [PATCH v2 08/12] KVM: SVM: Update AVIC settings when changing
+ APIC mode
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
+        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
+Date:   Mon, 02 May 2022 20:13:19 +0300
+In-Reply-To: <9307c734-3473-0bdc-57be-c39e96bca4d8@amd.com>
+References: <20220412115822.14351-1-suravee.suthikulpanit@amd.com>
+         <20220412115822.14351-9-suravee.suthikulpanit@amd.com>
+         <abb93e2d73b7ada6cbabcd3ebbf7b38e4701ec57.camel@redhat.com>
+         <9307c734-3473-0bdc-57be-c39e96bca4d8@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2 May 2022 02:29:59 +0200
-Zdenek Kaspar <zkaspar82@gmail.com> wrote:
-
-> Hi, when I noticed fix for pre-EPYC and older Intel hardware I checked
-> v5.18-rc5 on my old Core2 machine and something else fails here.
+On Mon, 2022-05-02 at 21:07 +0700, Suravee Suthikulpanit wrote:
+> Maxim, Sean
 > 
-> When I kill -9 the first qemu attempt (see dmesg-1), then next
-> attempt is OK, after successful VM shutdown another attempt fails
-> again (see dmesg-2). After that it takes some time and machine needs
-> reset (see dmesg-3).
+> On 4/18/22 7:55 PM, Maxim Levitsky wrote:
+> > On Tue, 2022-04-12 at 06:58 -0500, Suravee Suthikulpanit wrote:
+> > > When APIC mode is updated (e.g. disabled, xAPIC, or x2APIC),
+> > > KVM needs to call kvm_vcpu_update_apicv() to update AVIC settings
+> > > accordingly.
+> > > 
+> > > Signed-off-by: Suravee Suthikulpanit<suravee.suthikulpanit@amd.com>
+> > > ---
+> > >   arch/x86/kvm/svm/avic.c | 15 +++++++++++++++
+> > >   arch/x86/kvm/svm/svm.c  |  1 +
+> > >   2 files changed, 16 insertions(+)
+> > > 
+> > > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> > > index 22ee1098e2a5..01392b8364f4 100644
+> > > --- a/arch/x86/kvm/svm/avic.c
+> > > +++ b/arch/x86/kvm/svm/avic.c
+> > > @@ -616,6 +616,21 @@ void avic_apicv_post_state_restore(struct kvm_vcpu *vcpu)
+> > >   	avic_handle_ldr_update(vcpu);
+> > >   }
+> > >   
+> > > +void avic_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +	struct vcpu_svm *svm = to_svm(vcpu);
+> > > +
+> > > +	if (!lapic_in_kernel(vcpu) || (avic_mode == AVIC_MODE_NONE))
+> > > +		return;
+> > > +
+> > > +	if (kvm_get_apic_mode(vcpu) == LAPIC_MODE_INVALID) {
+> > > +		WARN_ONCE(true, "Invalid local APIC state (vcpu_id=%d)", vcpu->vcpu_id);
+> > > +		return;
+> > > +	}
+> > > +
+> > > +	kvm_vcpu_update_apicv(&svm->vcpu);
+> > I think it makes sense to call avic_refresh_apicv_exec_ctrl directly here.
+> >   
+> > I am not sure that kvm_vcpu_update_apicv will even call it
+> > because it has an optimization of doing nothing when inhibition status
+> > didn't change.
+> >   
+> >   
+> > Another semi-related note:
+> >   
+> > the current way the x2avic msrs are configured creates slight performance
+> > problem for nesting:
+> >   
+> > The problem is that when entering a nested guest, AVIC on the current vCPU
+> > is inhibited, but this is done only so that this vCPU*peers*  don't
+> > try to use AVIC to send IPIs to it, so there is no need to update vmcb01
+> > msr interception bitmap, and vmcb02 should have all these msrs intercepted always.
+> > Same with returning to host.
+> > 
+> > It also should be checked that during nested entry, at least vmcb01 msr bitmap
+> > is updated - TL;DR - please check that x2avic works when there is a nested guest running.
 > 
-> HTH, Z.
+> In the kvm/queue branch, I found a regression on nested SVM guest, where L2 guest cannot
+> launch. The bad commit is:
+> 
+> commit a4cfff3f0f8c07f1f7873a82bdeb3995807dac8c (bisect)
+> Merge: 42dcbe7d8bac 8d5678a76689
+> Author: Paolo Bonzini <pbonzini@redhat.com>
+> Date:   Fri Apr 8 12:43:40 2022 -0400
+> 
+>      Merge branch 'kvm-older-features' into HEAD
+> 
+>      Merge branch for features that did not make it into 5.18:
+> 
+>      * New ioctls to get/set TSC frequency for a whole VM
+> 
+>      * Allow userspace to opt out of hypercall patching
+> 
+>      Nested virtualization improvements for AMD:
+> 
+>      * Support for "nested nested" optimizations (nested vVMLOAD/VMSAVE,
+>        nested vGIF)
+> 
+>      * Allow AVIC to co-exist with a nested guest running
+> 
+>      * Fixes for LBR virtualizations when a nested guest is running,
+>        and nested LBR virtualization support
+> 
+>      * PAUSE filtering for nested hypervisors
+> 
+>      Guest support:
+> 
+>      * Decoupling of vcpu_is_preempted from PV spinlocks
+> 
+>      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> I am still working on the bisect into the merge commits.
+> 
+> Regards,
+> Suravee
+> 
 
-Oh crap, I had auto-applied mglru patch, sorry...
-Now starting qemu does this:
+What happens when the guest can't launch? It sure works for me for kvm/queue
+from yesterday.
 
-20 root      20   0   0.0m R 100.0   0.0   0:28.33 kworker/1:0+rcu_gp
-looks like:  94.36%  [kernel]                  [k] delay_tsc
-kill -9 "qemu process" and noticed several D state processes:
-    107 ?        D      0:04 [kworker/u8:7+events_unbound]
-    108 ?        D      0:03 [kworker/u8:8+events_unbound]
-    632 ?        Ds     0:00 /usr/lib/systemd/systemd-journald
+I'll test again tomorrow.
 
-machine is trashed, here's dmesg info:
 
-[  172.349282] BUG: kernel NULL pointer dereference, address: 000000000000000b
-[  172.349324] #PF: supervisor write access in kernel mode
-[  172.349345] #PF: error_code(0x0002) - not-present page
-[  172.349363] PGD 0 P4D 0 
-[  172.349375] Oops: 0002 [#1] PREEMPT SMP PTI
-[  172.349393] CPU: 0 PID: 626 Comm: qemu-build Not tainted 5.18.0-rc5-2-amd64 #1
-[  172.349420] Hardware name:  /DG35EC, BIOS ECG3510M.86A.0118.2010.0113.1426 01/13/2010
-[  172.349446] RIP: 0010:kvm_replace_memslot+0xb0/0x2a0 [kvm]
-[  172.349496] Code: ac 1c 80 04 00 00 4d 85 f6 74 65 48 89 e8 48 c1 e0 04 49 8b 4c 06 08 48 85 c9 74 21 4c 01 f0 48 8b 10 48 89 11 48 85 d2 74 04 <48> 89 4a 08 48 c7 40 08 00 00 00 00 48 c7 00 00 00 00 00 48 8d 44
-[  172.349556] RSP: 0018:ffffb0740064fd78 EFLAGS: 00010206
-[  172.349577] RAX: ffff9e9b41240e00 RBX: ffffb07401271000 RCX: ffffb07401271388
-[  172.349601] RDX: 0000000000000003 RSI: ffff9e9b41240e00 RDI: ffffb07401271000
-[  172.349626] RBP: 0000000000000000 R08: 000000000016000e R09: 000000000016000d
-[  172.349651] R10: ffffd73680764d00 R11: ffff9e9bbf226a78 R12: 0000000000000000
-[  172.349674] R13: ffffb07401271480 R14: ffff9e9b41240e00 R15: 0000000000000000
-[  172.349699] FS:  00007fdf1900f640(0000) GS:ffff9e9bbf200000(0000) knlGS:0000000000000000
-[  172.349726] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  172.349747] CR2: 000000000000000b CR3: 0000000003626000 CR4: 00000000000026f0
-[  172.349772] Call Trace:
-[  172.349785]  <TASK>
-[  172.349795]  kvm_set_memslot+0x3a8/0x5e0 [kvm]
-[  172.349837]  kvm_set_memory_region+0x22/0x40 [kvm]
-[  172.349879]  kvm_vm_ioctl+0x44d/0x500 [kvm]
-[  172.349920]  ? __fget_files+0x8d/0xa0
-[  172.349940]  __x64_sys_ioctl+0xbf3/0xce0
-[  172.349957]  ? do_user_addr_fault+0x280/0x3c0
-[  172.349977]  ? asm_exc_page_fault+0x5/0x20
-[  172.349995]  do_syscall_64+0x31/0x50
-[  172.350011]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-[  172.350032] RIP: 0033:0x7fdf1a8cee6f
-[  172.350046] Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60 c7 04 24 10 00 00 00 48 89 44 24 08 48 8d 44 24 20 48 89 44 24 10 b8 10 00 00 00 0f 05 <41> 89 c0 3d 00 f0 ff ff 77 1f 48 8b 44 24 18 64 48 2b 04 25 28 00
-[  172.350105] RSP: 002b:00007fdf1900df70 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-[  172.350131] RAX: ffffffffffffffda RBX: 000000004020ae46 RCX: 00007fdf1a8cee6f
-[  172.350156] RDX: 00007fdf1900e110 RSI: 000000004020ae46 RDI: 000000000000000d
-[  172.350180] RBP: 000055d7a44e7280 R08: 0000000000000000 R09: 0000000000000000
-[  172.350204] R10: 00000000000c0000 R11: 0000000000000246 R12: 00007fdf1900e110
-[  172.350228] R13: 000000003ff40000 R14: 000055d7a4418ee0 R15: 00000000000c0000
-[  172.350254]  </TASK>
-[  172.350262] Modules linked in: vhost_net vhost vhost_iotlb tun nfsd ksmbd cifs_arc4 xfs nhpoly1305_sse2 nhpoly1305 chacha_generic chacha_x86_64 libchacha adiantum libpoly1305 algif_skcipher af_alg auth_rpcgss nfsv4 dns_resolver nfs lockd grace sunrpc lzo_rle zram zsmalloc cpufreq_powersave i915 kvm_intel video 8250 drm_buddy intel_gtt iosf_mbi kvm 8250_base ttm bridge serial_core i2c_algo_bit drm_dp_helper e1000e drm_kms_helper iTCO_wdt irqbypass lpc_ich sysimgblt syscopyarea mfd_core stp sysfillrect acpi_cpufreq evdev fb_sys_fops processor button llc drm sch_fq_codel backlight i2c_core ip_tables x_tables ipv6 autofs4 btrfs raid6_pq xor zstd_decompress zstd_compress lzo_decompress lzo_compress libcrc32c crc32c_generic xts ecb hid_generic usbhid hid dm_crypt dm_mod sd_mod t10_pi crc64_rocksoft_generic crc64_rocksoft crc64 uhci_hcd ehci_pci ahci ehci_hcd libahci usbcore pata_jmicron sata_sil24 usb_common
-[  172.350624] CR2: 000000000000000b
-[  172.352202] ---[ end trace 0000000000000000 ]---
-[  172.353793] RIP: 0010:kvm_replace_memslot+0xb0/0x2a0 [kvm]
-[  172.355383] Code: ac 1c 80 04 00 00 4d 85 f6 74 65 48 89 e8 48 c1 e0 04 49 8b 4c 06 08 48 85 c9 74 21 4c 01 f0 48 8b 10 48 89 11 48 85 d2 74 04 <48> 89 4a 08 48 c7 40 08 00 00 00 00 48 c7 00 00 00 00 00 48 8d 44
-[  172.358667] RSP: 0018:ffffb0740064fd78 EFLAGS: 00010206
-[  172.360335] RAX: ffff9e9b41240e00 RBX: ffffb07401271000 RCX: ffffb07401271388
-[  172.362025] RDX: 0000000000000003 RSI: ffff9e9b41240e00 RDI: ffffb07401271000
-[  172.363723] RBP: 0000000000000000 R08: 000000000016000e R09: 000000000016000d
-[  172.365430] R10: ffffd73680764d00 R11: ffff9e9bbf226a78 R12: 0000000000000000
-[  172.367147] R13: ffffb07401271480 R14: ffff9e9b41240e00 R15: 0000000000000000
-[  172.368856] FS:  00007fdf1900f640(0000) GS:ffff9e9bbf200000(0000) knlGS:0000000000000000
-[  172.370574] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  172.372295] CR2: 000000000000000b CR3: 0000000003626000 CR4: 00000000000026f0
-[  172.672682] BUG: kernel NULL pointer dereference, address: 0000000000000003
-[  172.674427] #PF: supervisor read access in kernel mode
-[  172.676176] #PF: error_code(0x0000) - not-present page
-[  172.677931] PGD 0 P4D 0 
-[  172.679677] Oops: 0000 [#2] PREEMPT SMP PTI
-[  172.681421] CPU: 1 PID: 200 Comm: systemd-journal Tainted: G      D           5.18.0-rc5-2-amd64 #1
-[  172.683186] Hardware name:  /DG35EC, BIOS ECG3510M.86A.0118.2010.0113.1426 01/13/2010
-[  172.684955] RIP: 0010:fsnotify+0x5b5/0x980
-[  172.686722] Code: 40 a8 10 74 13 48 8b 74 24 30 48 85 f6 74 09 4c 8b 6e 08 0b 16 0b 4e 40 f7 d1 23 4c 24 08 85 d1 0f 84 7f 02 00 00 49 8b 4d 00 <4c> 8b 19 4d 85 db 74 53 4c 89 ef 44 89 fe 48 8b 14 24 8b 4c 24 0c
-[  172.690438] RSP: 0018:ffffb074001afd28 EFLAGS: 00010202
-[  172.692310] RAX: 0000000000000008 RBX: 0000000000000000 RCX: 0000000000000003
-[  172.694141] RDX: 0000000008002fc6 RSI: ffff9e9b420acd70 RDI: ffff9e9b41297e00
-[  172.695920] RBP: ffff9e9b41297e00 R08: ffff9e9b4117e800 R09: ffff9e9b46068ed8
-[  172.697702] R10: 0000000000000000 R11: ffffffffa81914b0 R12: 0000000000000000
-[  172.699486] R13: ffff9e9b41297e00 R14: ffff9e9b46068ed8 R15: 0000000008000002
-[  172.701267] FS:  00007ff7ff68ee80(0000) GS:ffff9e9bbf280000(0000) knlGS:0000000000000000
-[  172.703050] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  172.704829] CR2: 0000000000000003 CR3: 0000000003ca8000 CR4: 00000000000026e0
-[  172.706618] Call Trace:
-[  172.708396]  <TASK>
-[  172.710149]  __fsnotify_parent+0x1f9/0x240
-[  172.711896]  ? shmem_setattr+0x172/0x1b0
-[  172.713628]  notify_change+0x3f0/0x410
-[  172.715363]  do_sys_ftruncate+0x121/0x1e0
-[  172.717103]  do_syscall_64+0x31/0x50
-[  172.718838]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-[  172.720580] RIP: 0033:0x7ff80008932b
-[  172.722315] Code: 77 05 c3 0f 1f 40 00 48 8b 15 69 fa 0e 00 f7 d8 64 89 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 4d 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 05 c3 0f 1f 40 00 48 8b 15 39 fa 0e 00 f7 d8
-[  172.726019] RSP: 002b:00007ffc04a998b8 EFLAGS: 00000206 ORIG_RAX: 000000000000004d
-[  172.727913] RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007ff80008932b
-[  172.729821] RDX: 00005633275d43f0 RSI: 0000000000080000 RDI: 0000000000000013
-[  172.731736] RBP: 00007ffc04a99950 R08: 0000000000000001 R09: 00005633275de0ac
-[  172.733658] R10: 0000000000000010 R11: 0000000000000206 R12: 00005633275ce270
-[  172.735522] R13: 00007ffc04a998f8 R14: 00007ffc04a99900 R15: 0000000000000000
-[  172.737335]  </TASK>
-[  172.739122] Modules linked in: vhost_net vhost vhost_iotlb tun nfsd ksmbd cifs_arc4 xfs nhpoly1305_sse2 nhpoly1305 chacha_generic chacha_x86_64 libchacha adiantum libpoly1305 algif_skcipher af_alg auth_rpcgss nfsv4 dns_resolver nfs lockd grace sunrpc lzo_rle zram zsmalloc cpufreq_powersave i915 kvm_intel video 8250 drm_buddy intel_gtt iosf_mbi kvm 8250_base ttm bridge serial_core i2c_algo_bit drm_dp_helper e1000e drm_kms_helper iTCO_wdt irqbypass lpc_ich sysimgblt syscopyarea mfd_core stp sysfillrect acpi_cpufreq evdev fb_sys_fops processor button llc drm sch_fq_codel backlight i2c_core ip_tables x_tables ipv6 autofs4 btrfs raid6_pq xor zstd_decompress zstd_compress lzo_decompress lzo_compress libcrc32c crc32c_generic xts ecb hid_generic usbhid hid dm_crypt dm_mod sd_mod t10_pi crc64_rocksoft_generic crc64_rocksoft crc64 uhci_hcd ehci_pci ahci ehci_hcd libahci usbcore pata_jmicron sata_sil24 usb_common
-[  172.750745] CR2: 0000000000000003
-[  172.752725] ---[ end trace 0000000000000000 ]---
-[  172.754640] RIP: 0010:kvm_replace_memslot+0xb0/0x2a0 [kvm]
-[  172.756555] Code: ac 1c 80 04 00 00 4d 85 f6 74 65 48 89 e8 48 c1 e0 04 49 8b 4c 06 08 48 85 c9 74 21 4c 01 f0 48 8b 10 48 89 11 48 85 d2 74 04 <48> 89 4a 08 48 c7 40 08 00 00 00 00 48 c7 00 00 00 00 00 48 8d 44
-[  172.760417] RSP: 0018:ffffb0740064fd78 EFLAGS: 00010206
-[  172.762329] RAX: ffff9e9b41240e00 RBX: ffffb07401271000 RCX: ffffb07401271388
-[  172.764240] RDX: 0000000000000003 RSI: ffff9e9b41240e00 RDI: ffffb07401271000
-[  172.766173] RBP: 0000000000000000 R08: 000000000016000e R09: 000000000016000d
-[  172.768099] R10: ffffd73680764d00 R11: ffff9e9bbf226a78 R12: 0000000000000000
-[  172.769975] R13: ffffb07401271480 R14: ffff9e9b41240e00 R15: 0000000000000000
-[  172.771790] FS:  00007ff7ff68ee80(0000) GS:ffff9e9bbf200000(0000) knlGS:0000000000000000
-[  172.773618] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  172.775443] CR2: 000000000000000b CR3: 0000000003ca8000 CR4: 00000000000026f0
+Best regards,
+	Maxim Levitsky
 
