@@ -2,142 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9438351741D
-	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 18:19:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98577517432
+	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 18:22:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1386316AbiEBQWX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 May 2022 12:22:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35706 "EHLO
+        id S242430AbiEBQZl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 May 2022 12:25:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1386311AbiEBQWV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 May 2022 12:22:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8965BE0D5
-        for <kvm@vger.kernel.org>; Mon,  2 May 2022 09:18:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651508331;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3dVu3cda9e/DnYte+PR82A6GQffK3GwvS8zB8AzhqgM=;
-        b=jVnOLxaqAlF+rhp22cdAgmlgkh4BwGZCWW1jb3IW4nzhtn3olVbj5ga8vm5ILeSf1KjwSO
-        MfxnfdNCgqy1EuZxvOaA0tVWCOBTrlr4I3rRnP4d+qVVJdif7M9oRRM7KUlOC/6UT0kn/C
-        fmegEZ96txlOd2M98towNztsHeRCFbs=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-299-k-pa20uxNMW0ooDsnbNVVQ-1; Mon, 02 May 2022 12:18:46 -0400
-X-MC-Unique: k-pa20uxNMW0ooDsnbNVVQ-1
-Received: by mail-ej1-f72.google.com with SMTP id dm7-20020a170907948700b006f3f999ed7dso3326110ejc.0
-        for <kvm@vger.kernel.org>; Mon, 02 May 2022 09:18:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:subject:in-reply-to
-         :content-transfer-encoding;
-        bh=3dVu3cda9e/DnYte+PR82A6GQffK3GwvS8zB8AzhqgM=;
-        b=OGuxYASIMTJvp9SxbfKr3UMX4j0PXvHdsfOVpOzx105cM3j/JbogpUUz0pdqfiyr4K
-         yBCCvOrzIkHk4/Kj/Hc28CRTOuUqJwoQHMKNXTX9k7TOtJaivWeo5rVoUvTzor48yvI5
-         SlBiX6+D5Apogj8AGKuthb9bUykG4Y6bvbpICjp8TcQGjgTHX7WFkM20A9V5Ybe0qVil
-         ZEpuOOT5VrnlO45rsnIOtnXncZ1Bdg3cZWsWD0c5ydvF6MOoCWe+9YSfSfbhxfxk8fOX
-         1XUQFvdpqBPW943frDoe8jXYKEVaVaV1tInC9adskCQwNyTC5dP2W0UEjEwZqReg4oqE
-         YqMQ==
-X-Gm-Message-State: AOAM533hC7s1ww2s72LzeUbUQTXD4S6d0PKvwqac0Om8co8ncs2mrhEq
-        f+ChLwx90dSx1rzj5GfzdRlNjvH22WgsaZkBR7A3yed2jyBhVra08YI3YD3QYdVirKXAUDawfSs
-        qZFWjcNNr15ku
-X-Received: by 2002:a05:6402:26d3:b0:427:c590:ae2 with SMTP id x19-20020a05640226d300b00427c5900ae2mr6411908edd.242.1651508322604;
-        Mon, 02 May 2022 09:18:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwWgTBRsmtnOix2xpdyet9Fkn61dhyjd3l0nRwiruGKfjGoLdFiy8arkd3UVa1l1da3QF9yVg==
-X-Received: by 2002:a05:6402:26d3:b0:427:c590:ae2 with SMTP id x19-20020a05640226d300b00427c5900ae2mr6411867edd.242.1651508322335;
-        Mon, 02 May 2022 09:18:42 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id t26-20020a05640203da00b0042617ba6383sm6791879edw.13.2022.05.02.09.18.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 May 2022 09:18:41 -0700 (PDT)
-Message-ID: <2d33b71a-13e5-d377-abc2-c20958526497@redhat.com>
-Date:   Mon, 2 May 2022 18:18:39 +0200
+        with ESMTP id S241466AbiEBQZi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 May 2022 12:25:38 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2049.outbound.protection.outlook.com [40.107.92.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D87AFAE48;
+        Mon,  2 May 2022 09:22:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=i3hRw9fhEP7fu9qW3vp/YOyrd5nADwZNYFviPHjhE6hxI/JItQ+/fTa3RNeegiljfI8oDJLWDW16Fxiv2ACB+b2hjzGnqacuEKXkxvZaePCh+PGWLLAyHZJiwkM63t6u3BjSjY/SuoRuciJbm2HY4eVXpI4ZiEzqAj6kDYGi2/yAVPZhpN3rabRrVcf5jtFkIk0dKkV3xgVxcCKKoV+0IkHNhslpEfbe3PO9apbN2d2t4Vc0gb0sKs2wl0/9k488xl6DpWxoqI7/pc/VIx17drpemC0A5ATBZI2qiKZsO2ZaS1cz75EcizLSlCg6KkJ71SgLAlIz7WiIUVmjuWb2kw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=b1FqS86lV6wC9xGaMtJX1UuHTZtydUY4mJK3cOUwIqM=;
+ b=G/RgCxpY+m6TC3geg2YvuNnrnMTrIXYO1CyZVq1IAyCYt4bwOuuleUMF2dUKfW8vxGP+yj6hx/wf8PIONZ8nn3BW25Ku0VUWs/U71VGntdGXByecjd9zX8dcMTw7N9wJxmlDvmIVaGr69gLIUAI3IB3Ro6bVE7Nlx7az2MxlrgeyKkBqinJOZqvoQQkh8D/Cf6TbxqlfTLLW80kO55ivKyDlLwhQxx35blN6vhhwK5gul/qDQmYrNmFlo+XuD3VOMAwS+T1DN/jcTvW9Ozpit4BzDieKYI/1r92YfTk9SCoGj4Di9/R3bUwVI5tkK4/YlVA03SBSxBsELThk8l3CSg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=b1FqS86lV6wC9xGaMtJX1UuHTZtydUY4mJK3cOUwIqM=;
+ b=NaMOYnekRXeNmqZICda/3kRi5fB3nxQgla7MdeLO0g4f/Jo0bSL8AtAjVi4GDxdr0LfqTzokL5p+D6ionpbaeCoia7s8WEfOPobJzaW35pnA85/CxDPqkc2UOQjbgrGV6wXVxEgWzhFB8zf98DeeNESfSNPRBPMwTCCHO5s9YFOFOWU28sWJAScCGnyNhqfRKMMGyGxU78NrfIXZx3EhnbgjDgJn+cs1h61Wmc2/Fp06/L9PBEyRlG6kWqMjoUiQ060Ppb+kjyXgynd1QahY8zVcV2Nv3AiSJ+PosUreVjT8z0pt4zAmkU2ejdow2SKr2Rar0NDx3EW5CHTwOEhNGA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by MN2PR12MB4831.namprd12.prod.outlook.com (2603:10b6:208:1b9::32) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.15; Mon, 2 May
+ 2022 16:22:08 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2%6]) with mapi id 15.20.5206.024; Mon, 2 May 2022
+ 16:22:08 +0000
+Date:   Mon, 2 May 2022 13:22:06 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 7/7] vfio: Remove calls to
+ vfio_group_add_container_user()
+Message-ID: <20220502162206.GA439065@nvidia.com>
+References: <0-v2-6011bde8e0a1+5f-vfio_mdev_no_group_jgg@nvidia.com>
+ <7-v2-6011bde8e0a1+5f-vfio_mdev_no_group_jgg@nvidia.com>
+ <20220429142820.6afe7bbe.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220429142820.6afe7bbe.alex.williamson@redhat.com>
+X-ClientProxiedBy: MN2PR16CA0017.namprd16.prod.outlook.com
+ (2603:10b6:208:134::30) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Content-Language: en-US
-To:     Zeng Guang <guang.zeng@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
-        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>
-References: <20220419153155.11504-1-guang.zeng@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v9 0/9] IPI virtualization support for VM
-In-Reply-To: <20220419153155.11504-1-guang.zeng@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e24affbf-ad42-4320-23eb-08da2c57e717
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4831:EE_
+X-Microsoft-Antispam-PRVS: <MN2PR12MB483171091609438BF527C94FC2C19@MN2PR12MB4831.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: iKknk6/agnHhZ3g5mT4jvLq968oMZXfi9Ta1xl0soQ1kcPN+Z7gVxZ+x6CU8K97WH0DJxzUwwPpMu1d8Db1Zig1FGxtMsX7YKCcKUTzHg8ouuGHKKVIHY8Eo82b087ZBbkGzmkN6b3DFjmbOxPxWqr8yD5lOeze+Hsytf064Wo/KTCDGtciCqAjJpkFsw5aE1lLqbGjUOKQhcGWe6Zv+u7ddTEL1h1DYOY4vg4V2kPVHgHhvk7jnwdZJzKoopxPrxWaU6BlkFaJWHmLX7L8VA0FGo2zmQwkYXOtHHV+kQJYhDBBOf8mV0PHotnPTMKJ/U6bEjIwTOPrjHO3r0F/mGn0gKB50l/HuElOr0KEmmvFofo4mjzwHSFuNw4SxooALcaScqozpzJ/54ULn3kOdY9I7jY3PCtfBtrlQcVbERm9bLK3x5r0Zrk23vUmxG3EvE+VI7hIjtVQJX84lQ7ecT012RJcwjxlLvlvwKsYcDDDte07ZEtMV1KNUnKXY+YTfXU/rO9ZQx+Vy6zodGDJjzCmrmVQmbfulIrT/XriwZtKcmXGKeKBDPSRKLvWZsEDOaujnLbUqKCq9gRs5gZMLD779h9vTX2euZ2glmEN7hUUgxq+6v7ZjV9dubCfx1zIcGROLI9NWALqqNz2npLQS8Vtp0grG1Xf0HdYy4Wwrqz+ZW6mY6QRkMZsJKGhlv5frH0tKKbaUhZ/FNJDO6B9RHQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(83380400001)(186003)(2616005)(1076003)(2906002)(36756003)(26005)(6512007)(8936002)(7416002)(7406005)(6506007)(5660300002)(508600001)(66946007)(66476007)(66556008)(4326008)(33656002)(86362001)(8676002)(6916009)(316002)(54906003)(38100700002)(6486002)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?/J/PRIdLivh2byLEaDC1AIzcXLJCETqfg4hOYPfwtdWCJb/gEMYHE7e/WVzg?=
+ =?us-ascii?Q?dEOL2kRH09ZMYZGqo1si+ftF33sEFyOyY7N0yEsXiDhF5VvHlxJPlAuxZfiS?=
+ =?us-ascii?Q?mbmWRsxbcKapxjL6DqrQRpNSCnLB0TlmIBBaI8mC1OvR36w49pPaErkcMHfN?=
+ =?us-ascii?Q?wZJmbgNiH/rJUDfQLBX4kTUuE+krGbHbWD8GDS4pkP1UjGI+o9a46VlqYmdt?=
+ =?us-ascii?Q?/Q2uGqZe6csEnICFLJd8/3AQKy9mpLiZtpd9eU3Pdj2Oc7UBgfnvtyiVP003?=
+ =?us-ascii?Q?2+N9r5rkl3sW2lQB0zcC0bYyeOO5oF0aOUruu4mCdU01ky5iq2sgHM78OiFv?=
+ =?us-ascii?Q?K2HsDEZQ3bNlj2agFkxjA7t/X0GpuAZqqf8QaDYkHk5UO3Hf1Jw8wCuNuY1C?=
+ =?us-ascii?Q?kXqcpsn+5JCrVOcIsXFMwcSvJ55US9MmvzJg92W6EwmGL8wHubCqkE28KdMp?=
+ =?us-ascii?Q?ya38zBSts2yWhgt3AGemtKKG+GjA2fTVy1tAX7PQRcFidjj56c2BXOklvECZ?=
+ =?us-ascii?Q?gXHWti0RO3B2Fw+OQLg5ZMoHQ6pw7ygsjXUhSTNaFBTHyA35kEsSHJ0tkWDd?=
+ =?us-ascii?Q?t1NJtEiLDA73+LoEWUvRVB4e4JDZIdr3o2J5OAUr9dXhA6wyJm9w2G7omgE+?=
+ =?us-ascii?Q?FpLPY7c844B1KVPML1snIh7JiJiP+9ef7QTut7GLAFD/9pItdCzBFUGE6+8g?=
+ =?us-ascii?Q?IoqUQIB7cqiUeWXmbRqVOoVJkhoZZjjfDtacXEwnlIg4XShJLJu19MBLhikN?=
+ =?us-ascii?Q?2DiLjGVd6jMYIPw/NYn4eiYqmSJqCvCy/yMMT44+CugBfhgi2judLAOCdvpx?=
+ =?us-ascii?Q?dfV2CCTuHRilKyH6SxCxHluD8WdA5LHkQL4/NrUtIL+IjasKFklDPB7oj/6F?=
+ =?us-ascii?Q?RqGxCH4rULTl93JxvHO2/exiKnhOSNUPDY0EzIViZ4SQ2bwMk6B71rwyNj6D?=
+ =?us-ascii?Q?9hFlPrmZ5IG17XX6E5Lz+Kzu9YLsEPY7gcd06q+PNSqZj5iofI30h8maM4ya?=
+ =?us-ascii?Q?uShqbUYpXdR+pE/TDrjhWMZU7zXrUWnlle3yXQDFeTNnq/Bf4FZ/zdXmFMbh?=
+ =?us-ascii?Q?sHn5ntTNDRxnGHqmfaKb7YLN6sdHRdXYs/kk/hLVxkYEv1M8vT/IJAhmpUcg?=
+ =?us-ascii?Q?bwU469qI+2m2/utYBYqD5LDkrq712jEWl/amHfO98QWNdu8jnsGVjPaY3ebR?=
+ =?us-ascii?Q?hokJYOEt72DMTkAzSXcqmN0xgZOnO+XganlyMQQ0NhIf7uNqkqiswGXsidNh?=
+ =?us-ascii?Q?SaHY7zIWaL9HX6A6aOClE9dkHGINmbZuUy01OPvv9bIl5DtLSEZCR5aAE00t?=
+ =?us-ascii?Q?UI4ySFx4ir8ovXRANi5vScTFM3594HaiyIzvm0XZSLQn+xdIJkUvvUlgZROX?=
+ =?us-ascii?Q?ktwxJpKy+OByb6dcIuX9HFUCEFmYDC0IJKEeSjbidayQo1FqdUU5iEa6VAtI?=
+ =?us-ascii?Q?q0PPukhEGfDNNckWxiUd5oU0b4nFRiyyB1k14lhqsAjKzr9F5NRSOXVCoDzg?=
+ =?us-ascii?Q?Mf+oSMqwewmLfECGQBJzyMlC/Pej7F3QqYury2M+ZwmAcTjGKUrN/yUpyQnS?=
+ =?us-ascii?Q?X56AGh9sp07UWZK/0yVmbCGIfm3Nse0Jbqjhh3cUKmc4iHdw4BVMtcEAhvdv?=
+ =?us-ascii?Q?s1kM7rA/vcjLSAN/KQeLRrSiwGT5LeVCHn51/0dLZyamVbSLca7YVjeLoa1I?=
+ =?us-ascii?Q?5B8ZTgRSrGOnTJ49BzLFEKEYcycPYIQZYdsN5tzFV8LBt53mp2zrMo94bD56?=
+ =?us-ascii?Q?5qkh6PLPhA=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e24affbf-ad42-4320-23eb-08da2c57e717
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 May 2022 16:22:08.0457
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 48VJowsjFYyFFQCafcNgN2X795LNXGTYUygKbG4gPMDzUijXyH++m3NQ6n5aLI3T
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4831
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/19/22 17:31, Zeng Guang wrote:
-> Currently, issuing an IPI except self-ipi in guest on Intel CPU
-> always causes a VM-exit. It can lead to non-negligible overhead
-> to some workloads involving frequent IPIs when running in VMs.
+On Fri, Apr 29, 2022 at 02:28:20PM -0600, Alex Williamson wrote:
+> On Thu, 21 Apr 2022 13:28:38 -0300
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
 > 
-> IPI virtualization is a new VT-x feature, targeting to eliminate
-> VM-exits on source vCPUs when issuing unicast, physical-addressing
-> IPIs. Once it is enabled, the processor virtualizes following kinds
-> of operations that send IPIs without causing VM-exits:
-> - Memory-mapped ICR writes
-> - MSR-mapped ICR writes
-> - SENDUIPI execution
+> > When the open_device() op is called the container_users is incremented and
+> > held incremented until close_device(). Thus, so long as drivers call
+> > functions within their open_device()/close_device() region they do not
+> > need to worry about the container_users.
+> > 
+> > These functions can all only be called between open_device() and
+> > close_device():
+> > 
+> >   vfio_pin_pages()
+> >   vfio_unpin_pages()
+> >   vfio_dma_rw()
+> >   vfio_register_notifier()
+> >   vfio_unregister_notifier()
+> > 
+> > Eliminate the calls to vfio_group_add_container_user() and add
+> > vfio_assert_device_open() to detect driver mis-use.
 > 
-> This patch series implements IPI virtualization support in KVM.
-> 
-> Patches 1-4 add tertiary processor-based VM-execution support
-> framework, which is used to enumerate IPI virtualization.
-> 
-> Patch 5 handles APIC-write VM exit due to writes to ICR MSR when
-> guest works in x2APIC mode. This is a new case introduced by
-> Intel VT-x.
-> 
-> Patch 6 cleanup code in vmx_refresh_apicv_exec_ctrl(). Prepare for
-> IPIv status dynamical update along with APICv status change.
-> 
-> Patch 7 move kvm_arch_vcpu_precreate() under kvm->lock protection.
-> This patch is prepared for IPIv PID-table allocation prior to
-> the creation of vCPUs.
-> 
-> Patch 8 provide userspace capability to set maximum possible VCPU
-> ID for current VM. IPIv can refer to this value to allocate memory
-> for PID-pointer table.
-> 
-> Patch 9 implements IPI virtualization related function including
-> feature enabling through tertiary processor-based VM-execution in
-> various scenarios of VMCS configuration, PID table setup in vCPU
-> creation and vCPU block consideration.
+> A comment here explaining that decrementing open_count is pushed until
+> after close_device to support this feature would help to explain the
+> somewhat subtle change in vfio_group_get_device_fd().
 
-I queued it, but I am not going to send it to Linus until I get 
-selftests for KVM_CAP_MAX_VCPU_ID.  Selftests are generally _not_ 
-optional for new userspace API.
+I changed it like this:
 
-Please send a patch on top of kvm/queue.
+Eliminate the calls to vfio_group_add_container_user() and add
+vfio_assert_device_open() to detect driver mis-use. This causes the
+close_device() op to check device->open_count so always leave it elevated
+while calling the op.
 
-Paolo
-
+Thanks,
+Jason
