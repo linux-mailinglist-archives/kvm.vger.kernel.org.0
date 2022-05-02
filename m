@@ -2,125 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4D8851762E
-	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 19:58:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EEA4517657
+	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 20:11:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244294AbiEBSBy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 May 2022 14:01:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56952 "EHLO
+        id S1355517AbiEBSOn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 May 2022 14:14:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231134AbiEBSBw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 May 2022 14:01:52 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00467DE6;
-        Mon,  2 May 2022 10:58:22 -0700 (PDT)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 242HpdvH026019;
-        Mon, 2 May 2022 17:58:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : content-type : in-reply-to :
- content-transfer-encoding : mime-version; s=pp1;
- bh=OnbL/YbZ/pFdIQ20YAOwNHPJyh6n17KQmF/QAh/zwMM=;
- b=HpVldZEkMLglethcdqBTXTtBNXSW+/g05//upemzRjV9gaH4k86r5Lf1JeBrGSw757y/
- AYSiupMK8lvfgM6bB1NoRF4p8Jhx9s20m1meYgQLju6cTldNKLBS4eBGWZ+kiH7duXwj
- ozzhUqlGX0qkTAiDfd33cxNXjyPGCTsUzeWoHMYHW1aQXgYBJJ+IVjeXbyQajBU1Ojhz
- ld87ynEVgZj0bWXd6ZfUfjsq///06MNmLoZPj+x6jL11no8nVHDDm8x3M6a0UY44eN7y
- N82sKKQwBmZjPTlmVKM986luOUDVJuba+MZoJzuZcn6gkCOa759iAqLcfyP8/dng0dne Vg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ftk5n99a9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 02 May 2022 17:58:22 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 242HuMj8015022;
-        Mon, 2 May 2022 17:58:22 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ftk5n999a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 02 May 2022 17:58:21 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 242HwJBw004945;
-        Mon, 2 May 2022 17:58:19 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3frvr8tyra-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 02 May 2022 17:58:19 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 242HwHYr23068980
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 2 May 2022 17:58:17 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4B8BCA4055;
-        Mon,  2 May 2022 17:58:16 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C6704A4051;
-        Mon,  2 May 2022 17:58:15 +0000 (GMT)
-Received: from osiris (unknown [9.145.50.234])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon,  2 May 2022 17:58:15 +0000 (GMT)
-Date:   Mon, 2 May 2022 19:58:14 +0200
-From:   Heiko Carstens <hca@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Subject: Re: [GIT PULL 0/1] KVM: s390: Fix lockdep issue in vm memop
-Message-ID: <YnAbtskXVQP11AkF@osiris>
-References: <20220502153053.6460-1-borntraeger@linux.ibm.com>
- <47855c4c-dc85-3ee8-b903-4acf0b94e4a9@redhat.com>
- <249d0100-fa58-bf48-b1d2-f28e94c3a5f2@linux.ibm.com>
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <249d0100-fa58-bf48-b1d2-f28e94c3a5f2@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: cRxzM0gYZpG6KR6W4Rlv-Qb4P7WqI8XG
-X-Proofpoint-ORIG-GUID: UJv4wA1iGZ6hPYx2LQ3Skd2sXJ_-Ij3x
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S238752AbiEBSOm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 May 2022 14:14:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6F6C5F2C
+        for <kvm@vger.kernel.org>; Mon,  2 May 2022 11:11:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651515072;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OB2hOtFGf786xTKJG2c2V8jCJu7i8Ybw34LncXS8QJg=;
+        b=V1Jr5+ywHEWyzHrrAF0PjDJxwsES5jdCNEq9hek4rONpeCmCRoN6eJ4uxTTBi5CDbVrJG4
+        PVYRHMAafC6CFmRJxSFdyO+9K00d8gvclYV1w32VRii3PvsA0tO0TD/cNz1Ko8E9vm0J4O
+        4x0QWP2VkpjAZsriTVxNyq3Cbd53LvQ=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-147-mnknv66gMD-Hjw6snNGM8Q-1; Mon, 02 May 2022 14:11:09 -0400
+X-MC-Unique: mnknv66gMD-Hjw6snNGM8Q-1
+Received: by mail-io1-f70.google.com with SMTP id o6-20020a0566022e0600b0065a5780f48bso2777831iow.10
+        for <kvm@vger.kernel.org>; Mon, 02 May 2022 11:11:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=OB2hOtFGf786xTKJG2c2V8jCJu7i8Ybw34LncXS8QJg=;
+        b=hCU95+0C5dfXpcsNdL7P7AObUX+gA5XAS2u7wEbu8Y5b8xd8mCzc6e5pE2xvHY7sOd
+         aLz3sYr4A/wiLgbKX2EqW66koLpWprWJKSG+4qLI1xtYaLVzz1bCZ/uUAFYO/kcF4UNL
+         3GUJvc7riqd3WxR0WwriZ6Db6DZIekurfJYwcp7QUhUo9c+LcGgZreSeL47Et6P8Fxpi
+         UoVMIPsFeQ/L4d3pYS1a334AJ+wkdJSGwIiEb4zpIzdHAY3uavXcNWzI0y1aqtr19B3y
+         Bk66dNzU81G0oQd1fsl/8hA2usNZynxfCLCtlJMhqVCqW1ItHsfZlz1HS+XSfal7GkNg
+         0Xaw==
+X-Gm-Message-State: AOAM531YzUrkGLZVcJ3VSvKleSye+3BBUUfUUh6K4r9Bm9YJHcfvflbb
+        RDBHLTUMRD1bBqAM+AmVYyKU0QrWa624jk0KzzOEqn8EHqekLtXNxYL0xDAkwhI8eM1JwZRKnNI
+        a0KcThFCWeg9X
+X-Received: by 2002:a05:6e02:1a2d:b0:2cc:4fb5:6007 with SMTP id g13-20020a056e021a2d00b002cc4fb56007mr4788048ile.124.1651515069098;
+        Mon, 02 May 2022 11:11:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw3mKkLtOXlkpKnETd6PyjwpXqsT5TaGR1bDtZUr1B8qKfwqjSCM2B65ksgE07ihNdH8nI4Fg==
+X-Received: by 2002:a05:6e02:1a2d:b0:2cc:4fb5:6007 with SMTP id g13-20020a056e021a2d00b002cc4fb56007mr4788033ile.124.1651515068830;
+        Mon, 02 May 2022 11:11:08 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id q13-20020a02a98d000000b0032b3a781741sm3252949jam.5.2022.05.02.11.11.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 May 2022 11:11:08 -0700 (PDT)
+Date:   Mon, 2 May 2022 12:11:07 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "Martins, Joao" <joao.m.martins@oracle.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "Cornelia Huck" <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH RFC 00/19] IOMMUFD Dirty Tracking
+Message-ID: <20220502121107.653ac0c5.alex.williamson@redhat.com>
+In-Reply-To: <BN9PR11MB5276F104A27ACD5F20BABC7F8CFC9@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20220428210933.3583-1-joao.m.martins@oracle.com>
+        <BN9PR11MB5276F104A27ACD5F20BABC7F8CFC9@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-02_05,2022-05-02_03,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=989
- priorityscore=1501 phishscore=0 adultscore=0 impostorscore=0 clxscore=1015
- spamscore=0 malwarescore=0 lowpriorityscore=0 mlxscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2205020132
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 02, 2022 at 05:41:13PM +0200, Christian Borntraeger wrote:
-> Am 02.05.22 um 17:39 schrieb Paolo Bonzini:
-> > On 5/2/22 17:30, Christian Borntraeger wrote:
-> > > Paolo,
-> > > 
-> > > one patch that is sitting already too long in my tree (sorry, was out of
-> > > office some days).
-> > 
-> > Hi Christian,
-> > 
-> > at this point I don't have much waiting for 5.18.  Feel free to send it through the s390 tree.
+On Fri, 29 Apr 2022 05:45:20 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
+> > From: Joao Martins <joao.m.martins@oracle.com>
+> >  3) Unmapping an IOVA range while returning its dirty bit prior to
+> > unmap. This case is specific for non-nested vIOMMU case where an
+> > erronous guest (or device) DMAing to an address being unmapped at the
+> > same time.  
 > 
-> OK.
+> an erroneous attempt like above cannot anticipate which DMAs can
+> succeed in that window thus the end behavior is undefined. For an
+> undefined behavior nothing will be broken by losing some bits dirtied
+> in the window between reading back dirty bits of the range and
+> actually calling unmap. From guest p.o.v. all those are black-box
+> hardware logic to serve a virtual iotlb invalidation request which just
+> cannot be completed in one cycle.
 > 
-> Heiko, Vasily, can you queue this for your next pull request?
+> Hence in reality probably this is not required except to meet vfio
+> compat requirement. Just in concept returning dirty bits at unmap
+> is more accurate.
 > 
-> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> for carrying this via the s390 tree.
+> I'm slightly inclined to abandon it in iommufd uAPI.
 
-It's now on the fixes branch:
-https://git.kernel.org/pub/scm/linux/kernel/git/s390/linux.git/log/?h=fixes
+Sorry, I'm not following why an unmap with returned dirty bitmap
+operation is specific to a vIOMMU case, or in fact indicative of some
+sort of erroneous, racy behavior of guest or device.  We need the
+flexibility to support memory hot-unplug operations during migration,
+but even in the vIOMMU case, isn't it fair for the VMM to ask whether a
+device dirtied the range being unmapped?  This was implemented as a
+single operation specifically to avoid races where ongoing access may be
+available after retrieving a snapshot of the bitmap.  Thanks,
 
-Actually I was waiting if some fixes would come in, since the fixes
-branch also had only one small fix until now.
+Alex
+
