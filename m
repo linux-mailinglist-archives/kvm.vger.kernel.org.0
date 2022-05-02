@@ -2,128 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B65951798D
-	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 23:57:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D99445179BB
+	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 00:07:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347523AbiEBWBV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 May 2022 18:01:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46230 "EHLO
+        id S236282AbiEBWKg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 May 2022 18:10:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1387840AbiEBV7k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 May 2022 17:59:40 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64455F33;
-        Mon,  2 May 2022 14:55:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651528558; x=1683064558;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=xkColIiWzUzT63cjf0p5tiFtU1yhRN1jJlgXlzvVJqY=;
-  b=AfWWk3dqhm8sCaX51ak8gVDAVC/2QTLsqoO3+DlRUDn7w/jboVdQzT+k
-   rMYzpoNIub05Z0u1y3jNK3oCL1PO2P1lDC8uX58BWu/zGvDwqb9HnMLIo
-   2JoacArZzTYA1ROGGEzV3MixzNOOGKgVLQXtfzizqj+Ucyr7z6MhEKpwU
-   V5iobYoQzkW+Nz5xBABrBz1BGomYblJvFUNQ9Zovf1mdQLw7s1Wq++0Oe
-   p9uiZfsVDMAQeUkVBr7EBUrFZtcMFWOOr339iJ7Tlpu3/4lyMp/+j71go
-   8ox4cFUUgzqEtn7R6ir+ExbuJElfGvVnrH9kB2BUyChGyYjbCw2qhVTQs
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10335"; a="266924602"
-X-IronPort-AV: E=Sophos;i="5.91,193,1647327600"; 
-   d="scan'208";a="266924602"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2022 14:55:58 -0700
-X-IronPort-AV: E=Sophos;i="5.91,193,1647327600"; 
-   d="scan'208";a="598813198"
-Received: from chgan-mobl1.gar.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.60.238])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2022 14:55:54 -0700
-Message-ID: <8ba1a3ec3a4c5a02c28476cbb36118f61aea8a6c.camel@intel.com>
-Subject: Re: [PATCH v3 13/21] x86/virt/tdx: Allocate and set up PAMTs for
- TDMRs
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-Date:   Tue, 03 May 2022 09:55:52 +1200
-In-Reply-To: <8d5715b5-d561-f482-af11-03a9a46e651a@intel.com>
-References: <cover.1649219184.git.kai.huang@intel.com>
-         <ffc2eefdd212a31278978e8bfccd571355db69b0.1649219184.git.kai.huang@intel.com>
-         <c9b17e50-e665-3fc6-be8c-5bb16afa784e@intel.com>
-         <3664ab2a8e0b0fcbb4b048b5c3aa5a6e85f9618a.camel@intel.com>
-         <5984b61f-6a4a-c12a-944d-f4a78bdefc3d@intel.com>
-         <af603d66512ec5dca0c240cf81c83de7dfe730e7.camel@intel.com>
-         <8d5715b5-d561-f482-af11-03a9a46e651a@intel.com>
+        with ESMTP id S1387838AbiEBWIb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 May 2022 18:08:31 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 430A9DEF0
+        for <kvm@vger.kernel.org>; Mon,  2 May 2022 15:03:55 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id b6-20020a5b0b46000000b006457d921729so14220906ybr.23
+        for <kvm@vger.kernel.org>; Mon, 02 May 2022 15:03:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=2gUboy0WpFlCg1gFI2kR0+guXhO1kfu4J8SY0iPJjDQ=;
+        b=GewRa3J35S+FRxNXKKNFgCgf7atU9k5i09pFjVniOagEm8rpyRY7mK3a3MyKONvGMZ
+         gNesx2hOixBJwkSpuKBZr1Po+U8aUb/Qb1UO7c2JL7F4D8oofG4pzq2GuXujTlHJpNWt
+         pG8PVZxHVVVztANqRqQO0xzma2sAQyz2xZGXKGEMCkWPMpuNzmPIyn44DoiKCbMN/gQW
+         Nrm86pDSQkwH8uo5SJHT0q+enzstOYvIvtu5iWpKQdvVrzV01Wy3rTMY0T6G24zBII2+
+         8YRJOGw6Ics802QVk8asorbOB7jvWxV15lAvXI6HHNBDcuUdLRq+JZ2a0RGoFc+GRqaJ
+         NnaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=2gUboy0WpFlCg1gFI2kR0+guXhO1kfu4J8SY0iPJjDQ=;
+        b=5bjdlwT0EbCVNFevRzxHrUT7v02PrD/2WdLfCHQwcYR577bQbo8BOVxcrbIlAoinR2
+         p5oR6M5c40vTpyRQ8EX1yzzfMdg7dnVcYaTBst1duiFxYvasAMbTtjE4lnAdGTdQ7tnd
+         Y72VuL+JFE3O06BRs3L3iHZEsA1VNTh9m/i2z/PjzIQuB8OYJwCjb2UY4tSeDUAKxePk
+         NoMPV2Oastn5N9DQYS1hp11lFoCyu/C98cR3fLKIbIXbg5645dyjDhNpAPzsgJdtlFrw
+         1IiwAHFVSPzicYAOg9y+GRU6hwrDBzob943/kKCFPyX64aTQmF9k5+XHdIorNw+bjlmd
+         meUw==
+X-Gm-Message-State: AOAM531eNMxgC23kfzMNaAE3GmaARJa5erLYwfaljrHQiYM8RR+bdiRp
+        mQjCf6/UEo7U0JZZjUxE9RrDgOmvf57T
+X-Google-Smtp-Source: ABdhPJzMjKvSd35EBOdYVwnOBd4B9dGqLkUE0gmUdyvpyWamIAbFHfgnhXf5yZ6H5mWCliCMcfTaEIE80lu+
+X-Received: from vipinsh.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:36b0])
+ (user=vipinsh job=sendgmr) by 2002:a5b:68a:0:b0:648:fcd2:3767 with SMTP id
+ j10-20020a5b068a000000b00648fcd23767mr12309259ybq.358.1651529034451; Mon, 02
+ May 2022 15:03:54 -0700 (PDT)
+Date:   Mon,  2 May 2022 22:03:47 +0000
+Message-Id: <20220502220347.174664-1-vipinsh@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
+Subject: [PATCH v2] KVM: x86/mmu: Speed up slot_rmap_walk_next for sparsely
+ populated rmaps
+From:   Vipin Sharma <vipinsh@google.com>
+To:     pbonzini@redhat.com
+Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, dmatlack@google.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vipin Sharma <vipinsh@google.com>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-05-02 at 07:17 -0700, Dave Hansen wrote:
-> On 5/1/22 22:59, Kai Huang wrote:
-> > On Fri, 2022-04-29 at 07:20 -0700, Dave Hansen wrote:
-> > How about adding below in the changelog:
-> > 
-> > "
-> > However using alloc_contig_pages() to allocate large physically contiguous
-> > memory at runtime may fail.  The larger the allocation, the more likely it is to
-> > fail.  Due to the fragmentation, the kernel may need to move pages out of the
-> > to-be-allocated contiguous memory range but it may fail to move even the last
-> > stubborn page.  A good way (although not foolproof) is to launch a TD VM early
-> > in boot to get PAMTs allocated before memory gets fragmented or consumed.
-> > "
-> 
-> Better, although it's getting a bit off topic for this changelog.
-> 
-> Just be short and sweet:
-> 
-> 1. the allocation can fail
-> 2. Launch a VM early to (badly) mitigate this
-> 3. the only way to fix it is to add a boot option
-> 
-OK. Thanks.
+Avoid calling handlers on empty rmap entries and skip to the next non
+empty rmap entry.
 
-> 
-> > > > > > +	/*
-> > > > > > +	 * One TDMR must cover at least one (or partial) RAM entry,
-> > > > > > +	 * otherwise it is kernel bug.  WARN_ON() in this case.
-> > > > > > +	 */
-> > > > > > +	if (WARN_ON_ONCE((start >= end) || start >= TDMR_END(tdmr)))
-> > > > > > +		return 0;
-> > > 
-> > > This really means "no RAM found for this TDMR", right?  Can we say that,
-> > > please.
-> > 
-> > OK will add it.  How about:
-> > 
-> > 	/*
-> > 	 * No RAM found for this TDMR.  WARN() in this case, as it
-> > 	 * cannot happen otherwise it is a kernel bug.
-> > 	 */
-> 
-> The only useful information in that comment is the first sentence.  The
-> jibberish about WARN() is patently obvious from the next two lines of code.
-> 
-> *WHY* can't this happen?  How might it have actually happened?
+Empty rmap entries are noop in handlers.
 
-When TDMRs are created, we already have made sure one TDMR must cover at least
-one or partial RAM entry.
+Signed-off-by: Vipin Sharma <vipinsh@google.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+---
 
+v2:
+- Removed noinline from slot_rmap_walk_next signature
+
+v1:
+- https://lore.kernel.org/lkml/20220325233125.413634-1-vipinsh@google.com
+
+ arch/x86/kvm/mmu/mmu.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 77785587332e..4e8d546431eb 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1501,9 +1501,11 @@ static bool slot_rmap_walk_okay(struct slot_rmap_walk_iterator *iterator)
+ 
+ static void slot_rmap_walk_next(struct slot_rmap_walk_iterator *iterator)
+ {
+-	if (++iterator->rmap <= iterator->end_rmap) {
++	while (++iterator->rmap <= iterator->end_rmap) {
+ 		iterator->gfn += (1UL << KVM_HPAGE_GFN_SHIFT(iterator->level));
+-		return;
++
++		if (iterator->rmap->val)
++			return;
+ 	}
+ 
+ 	if (++iterator->level > iterator->end_level) {
+
+base-commit: 71d7c575a673d42ad7175ad5fc27c85c80330311
 -- 
-Thanks,
--Kai
-
+2.36.0.464.gb9c8b46e94-goog
 
