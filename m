@@ -2,66 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA6245173BE
-	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 18:07:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E84C751740C
+	for <lists+kvm@lfdr.de>; Mon,  2 May 2022 18:16:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241030AbiEBQKs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 May 2022 12:10:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51758 "EHLO
+        id S1386287AbiEBQUM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 May 2022 12:20:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234025AbiEBQKq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 May 2022 12:10:46 -0400
+        with ESMTP id S1386251AbiEBQUH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 May 2022 12:20:07 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 853AD55AF
-        for <kvm@vger.kernel.org>; Mon,  2 May 2022 09:07:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 93672E0B5
+        for <kvm@vger.kernel.org>; Mon,  2 May 2022 09:16:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651507636;
+        s=mimecast20190719; t=1651508197;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=s70MT6Y6b+EWzPq4TYtvjBhW+c7gKt8WCUmst+yWMcA=;
-        b=NOoPok6F3YLUvVYVKt0qwJG6RoU5PWdXFGSPb9ePPBDnF6dxQn3TlXsrV4i0w/NbtB6mG6
-        +OHYXJTom6VrDI5UcXv0MxtAklLUkuXb6tgcBc3hFOe1xuxBvuh6eq80E3f76Cz0ieGcGQ
-        +Raf/RLlEpAe0C5hcIlJSERBXN0UnZI=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=rsSALeBOA7ZWPCcmJgm1/wGrXg4q+JRs+W7rdBh5ql0=;
+        b=ddC85xIe6EyqknPGRq3GtNS4EXuI15HxsJdpEO0Tl5onc3PSWV58fjxh9JHjYSDOHF1hVw
+        NxwOlAb+slnI8T04sYUzBU1TlxbmKXf/9ALAOD0aoaN4606cGwnZvz0q45bGsl0v4QyfKt
+        EDH3AlW6m3HF3wuoQWaEowMNEoXCNJU=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-86-91pxlsGIPLqzX23KjoXRKw-1; Mon, 02 May 2022 12:07:15 -0400
-X-MC-Unique: 91pxlsGIPLqzX23KjoXRKw-1
-Received: by mail-ej1-f72.google.com with SMTP id nb10-20020a1709071c8a00b006e8f89863ceso7027297ejc.18
-        for <kvm@vger.kernel.org>; Mon, 02 May 2022 09:07:15 -0700 (PDT)
+ us-mta-20-k3I802yfOLqfqo-IZ17hnw-1; Mon, 02 May 2022 12:16:36 -0400
+X-MC-Unique: k3I802yfOLqfqo-IZ17hnw-1
+Received: by mail-ej1-f71.google.com with SMTP id sh14-20020a1709076e8e00b006f3b7adb9ffso7015816ejc.16
+        for <kvm@vger.kernel.org>; Mon, 02 May 2022 09:16:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=s70MT6Y6b+EWzPq4TYtvjBhW+c7gKt8WCUmst+yWMcA=;
-        b=kdHCN4EVaBuzFGlHe0OA3fBKLCbPkeukGaxM60MZm0FY039J+Zico/vjOmiH1NzY3j
-         kwloWHXsCKW1z2VZaKrQFslX4w2NMWOCOWuREtSTs1TrbgGicMz6zmK6qSq35eSFpvx4
-         F4on9jlql77vlj/DZeEKQtWheFaPfF/clCfR5KR9plABsD9s5S7WLMlCfRSj80t9MJ3E
-         cWaOKEdFgHDYsNL7Tv7HbWUek9VX/D7Ao6+CVwf299EyCVh7ZyO+FbgABIsvWEMX0icJ
-         vWXyxU2JoYPEU9lH7p8n6N33L+X9/qOF/M0Ws2TXm3i7h+ZUqRhl6vKc//7wuk1aYBs/
-         uuOg==
-X-Gm-Message-State: AOAM5323XlMeHAtvbokpEMGonnHGTmEy8MAzQxtI87NBSU7BTHrovzDx
-        WBII/YpztKwxPvJP/Hk5glqLBEPgGbuXA42/+QZq3OJfb7JaZGVOGDoHsi81c6B3NX/BsN0rUsK
-        yNmL7QJxQIO+q
-X-Received: by 2002:a17:907:72d4:b0:6f4:7b2:1dea with SMTP id du20-20020a17090772d400b006f407b21deamr12049366ejc.532.1651507634269;
-        Mon, 02 May 2022 09:07:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxHV9JQOzWXQ2/EuMLNL2Sk7plhApTBZcA1FAn/4yisC7DdLA+Ho0CT7zFqHqrSbD0Bufb/EQ==
-X-Received: by 2002:a17:907:72d4:b0:6f4:7b2:1dea with SMTP id du20-20020a17090772d400b006f407b21deamr12049334ejc.532.1651507634023;
-        Mon, 02 May 2022 09:07:14 -0700 (PDT)
+        bh=rsSALeBOA7ZWPCcmJgm1/wGrXg4q+JRs+W7rdBh5ql0=;
+        b=Iln3ZBmOxAiNltFfJRDomAFRc9Kq/QU7YkpTmwx7+oMPgR32DTIj3AgrptUq4HQPCp
+         R1ifUKL4gfY8XfJgg/H3eKxUFlss0D3zfHOoKBwYRV37nQqVISOpX6e7j+5u7Ngg//ry
+         d3HzSd6eo/Ciq1LQE+hbjvvdPw4+URpkX1UwYmf2UUvy2mMzjrU3AxtCNj8Iw4OyqXu4
+         6hA7yY7PmPgHxXWt1aG+i5FD6WtTJzrMoqTeNy1Kuo3C4EsN+SlWwD33rlFGvsuNMBDk
+         8M2mSlXUUo2G5ik6+lzCHw7+OVT9Tso8+b8Wh0dCv/EsNoFZEhsmlDs7gAiXEG8TWhtY
+         LtxA==
+X-Gm-Message-State: AOAM5311unACfQ5LMyEMRgnn7JkjHidA0vYNT2BoJckV4K+u5vKU9XQy
+        OrIpUUwwbal5WkZZDV8GeHxLPzTHubOxBDdxTJ8umepXnF+HLZmQ3WhnJcbR0AmyEzdurUCueqi
+        xY3Mp21QSsBI4
+X-Received: by 2002:a17:907:7243:b0:6f4:1ce5:4ac4 with SMTP id ds3-20020a170907724300b006f41ce54ac4mr10031098ejc.198.1651508195316;
+        Mon, 02 May 2022 09:16:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzU+EeBkU27lcZBl76YkQuPJxEcLDXD3icDKAgpvTHo8/6jVVf/8/GP3t2VfXVkZob1OASV3A==
+X-Received: by 2002:a17:907:7243:b0:6f4:1ce5:4ac4 with SMTP id ds3-20020a170907724300b006f41ce54ac4mr10031056ejc.198.1651508195058;
+        Mon, 02 May 2022 09:16:35 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id zp1-20020a17090684e100b006f3ef214df0sm3710399ejb.86.2022.05.02.09.07.12
+        by smtp.googlemail.com with ESMTPSA id j12-20020a50ed0c000000b0042617ba63d4sm6834162eds.94.2022.05.02.09.16.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 May 2022 09:07:13 -0700 (PDT)
-Message-ID: <a06997fe-8dd7-e91a-2017-912827f554e7@redhat.com>
-Date:   Mon, 2 May 2022 18:07:11 +0200
+        Mon, 02 May 2022 09:16:34 -0700 (PDT)
+Message-ID: <bcb2a90f-a2ed-94fa-985e-d7b9efe52ae4@redhat.com>
+Date:   Mon, 2 May 2022 18:16:13 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.8.0
-Subject: Re: [PATCH v9 8/9] KVM: x86: Allow userspace set maximum VCPU id for
- VM
+Subject: Re: [PATCH v9 9/9] KVM: VMX: enable IPI virtualization
 Content-Language: en-US
 To:     Zeng Guang <guang.zeng@intel.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -81,9 +80,9 @@ To:     Zeng Guang <guang.zeng@intel.com>,
         Kai Huang <kai.huang@intel.com>
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
         Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>
-References: <20220419154444.11888-1-guang.zeng@intel.com>
+References: <20220419154510.11938-1-guang.zeng@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220419154444.11888-1-guang.zeng@intel.com>
+In-Reply-To: <20220419154510.11938-1-guang.zeng@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -96,38 +95,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/19/22 17:44, Zeng Guang wrote:
-> +Userspace is able to calculate the limit to APIC ID values from designated CPU
-> +topology. This capability allows userspace to specify maximum possible APIC ID
-> +assigned for current VM session prior to the creation of vCPUs. By design, it
-> +can set only once and doesn't accept change any more. KVM will manage memory
-> +allocation of VM-scope structures which depends on the value of APIC ID.
-> +
-> +Calling KVM_CHECK_EXTENSION for this capability returns the value of maximum APIC
-> +ID that KVM supports at runtime. It sets as KVM_MAX_VCPU_IDS by default.
+On 4/19/22 17:45, Zeng Guang wrote:
+> +static bool vmx_can_use_pi_wakeup(struct kvm_vcpu *vcpu)
+> +{
+> +	/*
+> +	 * If a blocked vCPU can be the target of posted interrupts,
+> +	 * switching notification vector is needed so that kernel can
+> +	 * be informed when an interrupt is posted and get the chance
+> +	 * to wake up the blocked vCPU. For now, using posted interrupt
+> +	 * for vCPU wakeup when IPI virtualization or VT-d PI can be
+> +	 * enabled.
+> +	 */
+> +	return vmx_can_use_ipiv(vcpu) || vmx_can_use_vtd_pi(vcpu->kvm);
+> +}
 
-Better:
+Slightly more accurate name and comment:
 
-This capability allows userspace to specify maximum possible APIC ID
-assigned for current VM session prior to the creation of vCPUs, saving
-memory for data structures indexed by the APIC ID.  Userspace is able
-to calculate the limit to APIC ID values from designated
-CPU topology.
+static bool vmx_needs_pi_wakeup(struct kvm_vcpu *vcpu)
+{
+         /*
+          * The default posted interrupt vector does nothing when
+          * invoked outside guest mode.   Return whether a blocked vCPU
+          * can be the target of posted interrupts, as is the case when
+          * using either IPI virtualization or VT-d PI, so that the
+          * notification vector is switched to the one that calls
+          * back to the pi_wakeup_handler() function.
+          */
+         return vmx_can_use_ipiv(vcpu) || vmx_can_use_vtd_pi(vcpu->kvm);
+}
 
-The value can be changed only until KVM_ENABLE_CAP is set to a nonzero
-value or until a vCPU is created.  Upon creation of the first vCPU,
-if the value was set to zero or KVM_ENABLE_CAP was not invoked, KVM
-uses the return value of KVM_CHECK_EXTENSION(KVM_CAP_MAX_VCPU_ID) as
-the maximum APIC ID.
-
->   	case KVM_CAP_MAX_VCPU_ID:
-> -		r = KVM_MAX_VCPU_IDS;
-> +		if (!kvm->arch.max_vcpu_ids)
-> +			r = KVM_MAX_VCPU_IDS;
-> +		else
-> +			r = kvm->arch.max_vcpu_ids;
-
-I think returning the constant KVM_CAP_MAX_VCPU_IDS is better.
 
 Paolo
 
