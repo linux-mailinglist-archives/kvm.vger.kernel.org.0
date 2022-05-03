@@ -2,220 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30E74518317
-	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 13:12:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1936F518365
+	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 13:39:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234625AbiECLP6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 07:15:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52984 "EHLO
+        id S234757AbiECLnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 07:43:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234306AbiECLP5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 07:15:57 -0400
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D86643464D
-        for <kvm@vger.kernel.org>; Tue,  3 May 2022 04:12:23 -0700 (PDT)
-Received: by mail-ej1-x633.google.com with SMTP id n10so15346465ejk.5
-        for <kvm@vger.kernel.org>; Tue, 03 May 2022 04:12:23 -0700 (PDT)
+        with ESMTP id S233066AbiECLnS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 07:43:18 -0400
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C0223525E
+        for <kvm@vger.kernel.org>; Tue,  3 May 2022 04:39:47 -0700 (PDT)
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 243B8MGr029440;
+        Tue, 3 May 2022 11:39:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2021-07-09;
+ bh=BrZHOJ3Ak3N2ruF35M2+qJSRf4Bi3VxMmsIXicDgTFo=;
+ b=Kgcj3s8LEHsqNCtlOWUNb4y5E53xVM1kGe56KIMctS3KJbqCQHMBhOysnO6ANYMTuhPZ
+ I7wTt2IwODsRzQNHsirWJBZns3FrLNliHP3mstVwxWzgB+mKYEbbGn5sEGKd9aDLUt5B
+ 5p1JFuXsCPzbrbIiUnZ5UzeI07FtlRRfub5EBVoPSjj41ciu5Tbph/dj5DwDKAmITx7U
+ uPpE9rzwFGmqWA3O8v19dBvWZBwsVFWx2G7D/RxwdmENQmWTzRmWgVlMLgLErjsIHGRX
+ iIuJOOrqklamtS+ahV9cplHt8NH+tjwK/QiHl0KeKvYSzDKgQ6yAsyTH6cEaunUKPIPq xA== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3fruq0dgar-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 03 May 2022 11:39:39 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.16.1.2/8.16.1.2) with SMTP id 243BVUra002750;
+        Tue, 3 May 2022 11:39:38 GMT
+Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2103.outbound.protection.outlook.com [104.47.70.103])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com with ESMTP id 3fs1a4mbjq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 03 May 2022 11:39:38 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PCzXHbvTRFWNA68fumCixe4HxmJA/m+96qNxE5kH28ZyNu+GZqt9WPDW427P9Plkay2M1/cH8m4/CEgt8Q2CSxBP2PG1bQ7O8324KiPfLu3aTYeZprspmdcShaRo+Y/gTVJVxXUbmGNUfYyhfXRZFVKjE4uOIMNVR79sRyyyZtX2RUjoRwCF8WmDiQG8JimKPE81daxlfOK7ZmGk58Kz8g4Ts+47zyjtAtLDirZuGZCJLBsjIbxTVa7G8Z94jKsnRNWVIWYYQXJY0vPdRag7hE38b/f4gi91xoqh1XZO3C+Wf/DNyw6jQ7Ro0EUFLTKX2GtgXf6OmcTwmZPDQYDA6w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BrZHOJ3Ak3N2ruF35M2+qJSRf4Bi3VxMmsIXicDgTFo=;
+ b=jrGj13fUKMjCuRSG/z2l5+XwNMbw600kJf/flJ9oDmeyo4k/4JlQu1CVnMNx/uiNxLdmgD5O2N8KI8NnfNLq9z5lEAcC4TRkmOypa7Bae4JzSSnFE2Pjl1Np1ZVE25QNIxsFCEFXitIK85Gn1zLfK7ctfRy0dGCo73dLnoKkYruED1U+IMsiIv1tasacyxxYfzFIjsCbThfl2OeAwQf1ggquZpZt6CusWfkeaJOaBgOeRqgi2EB8jjThuwMOyxup3ByanIDGdHaaRGhL6/iZWurW9R8ui3kGa7ska31+bbGKOildQeyXBuUCkMFW7LgqxtnE/wBpapzXRtM/oiZ6kg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=oFqiHnRl1AV5CwVvzFn8cPS0OwpSBHpXeStUM3laFbc=;
-        b=rgEPWEyb2782i+En/M1Gr9kW1acyISu99grDdKpqBvvPNsWCOiP+G46tw+T/g/PWac
-         0j/1IRgAx1LslBRX9J7N7iLrm3mcHMi7hhyzdYB5+ng2Ys2TT210cess3fl+KH+LXswP
-         YnUJ5G4gbXRsTmJeogARhIPFKX4YLURoQ/zauliX7py64FVLF0q/j/9nemRIgKYrxfRF
-         50bDBKtO24eHHvWVd0drvStgCLuh456LYRrNwiecHIdJqORZ5ymDAyfLWlif7S9+FR0S
-         sOpckw/TLRFb1sQNpj7W3yH7GGX6IflG6OTh0++C8FJ+iysRYy2A8JK6ATCEZuqV/FRP
-         J1cA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=oFqiHnRl1AV5CwVvzFn8cPS0OwpSBHpXeStUM3laFbc=;
-        b=KUcY8xgrGM1JludtSfVEdd94dliV9lVToM/95LTQT5gsnfkVlD+Q3NfTsnit0aUoDi
-         tVafSmAuc0cSDHuM1HW3zR/1ALOz7oclSobgj4JO5omAPFYq6c7hEGXL4TtpKTFrfjEo
-         iEeSfk1aX0+9TZm0A060hxUBmhjinrrxc32LnRQT5lG9Ioi0JurABGyUv/vHHMlKWmJj
-         NfIRiX5ddJv9Xg34VwRQD8qZNTLbH85WcmkWioWLc532cE2B1lQoheiwbZfUU4pCih0m
-         rkufIC9bxWtOEYfXfPGfvOI3meyC+2njCiF1HoHHhuJHxDfo4cODIWVWp3GlHndJie3m
-         i7mw==
-X-Gm-Message-State: AOAM531lVxZxhIkq8TDj8NGx7cJFNCv1JXtQj1i+DQ8VkFQkWxsrU7k+
-        GKqxe6GvIzTEvmttS6TxLCV7eg==
-X-Google-Smtp-Source: ABdhPJw97PYd30DNDpPNsRrpJXojPvheV9UWZoSzYNANOpCBRVYdFYA4fTJtujnPpl7vcUfHD29C2Q==
-X-Received: by 2002:a17:907:6e04:b0:6e0:95c0:47b8 with SMTP id sd4-20020a1709076e0400b006e095c047b8mr15127269ejc.483.1651576342075;
-        Tue, 03 May 2022 04:12:22 -0700 (PDT)
-Received: from google.com (30.171.91.34.bc.googleusercontent.com. [34.91.171.30])
-        by smtp.gmail.com with ESMTPSA id l24-20020a056402029800b0042617ba63a7sm7817960edv.49.2022.05.03.04.12.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 May 2022 04:12:21 -0700 (PDT)
-Date:   Tue, 3 May 2022 11:12:18 +0000
-From:   Quentin Perret <qperret@google.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Steven Price <steven.price@arm.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        Michael Roth <michael.roth@amd.com>
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <YnEOEmf4We1aeLcT@google.com>
-References: <YksIQYdG41v3KWkr@google.com>
- <Ykslo2eo2eRXrpFR@google.com>
- <eefc3c74-acca-419c-8947-726ce2458446@www.fastmail.com>
- <Ykwbqv90C7+8K+Ao@google.com>
- <YkyEaYiL0BrDYcZv@google.com>
- <20220422105612.GB61987@chaop.bj.intel.com>
- <3b99f157-0f30-4b30-8399-dd659250ab8d@www.fastmail.com>
- <20220425134051.GA175928@chaop.bj.intel.com>
- <27616b2f-1eff-42ff-91e0-047f531639ea@www.fastmail.com>
- <20220428122952.GA10508@chaop.bj.intel.com>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BrZHOJ3Ak3N2ruF35M2+qJSRf4Bi3VxMmsIXicDgTFo=;
+ b=vGmINpctoId/6W+YSCZShUu64Hm3h9YA50A18i4TUQu98mHuoyreEDK7TUeLJYA/q4/vxB27XEa4xMVRimNN3XijshMCqHav3159Q+wEM5fBcK/tkJ1Y1bFmk/XPGTKptzJLvn5bxv41yi0jEXp9M1wQAZvEJX6Gk5FjNy0+bQo=
+Received: from BLAPR10MB4835.namprd10.prod.outlook.com (2603:10b6:208:331::11)
+ by CH2PR10MB4200.namprd10.prod.outlook.com (2603:10b6:610:a5::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5206.24; Tue, 3 May
+ 2022 11:39:36 +0000
+Received: from BLAPR10MB4835.namprd10.prod.outlook.com
+ ([fe80::b9e5:d1b6:b4be:f9d]) by BLAPR10MB4835.namprd10.prod.outlook.com
+ ([fe80::b9e5:d1b6:b4be:f9d%5]) with mapi id 15.20.5206.013; Tue, 3 May 2022
+ 11:39:35 +0000
+Message-ID: <edfb253b-7f48-abad-f39e-f2937f97afbe@oracle.com>
+Date:   Tue, 3 May 2022 12:39:27 +0100
+Subject: Re: [PATCH RFC] vfio: Introduce DMA logging uAPIs for VFIO device
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, kvm@vger.kernel.org,
+        maorg@nvidia.com, cohuck@redhat.com, kevin.tian@intel.com,
+        cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, eric.auger@redhat.com
+References: <20220501123301.127279-1-yishaih@nvidia.com>
+ <20220502130701.62e10b00.alex.williamson@redhat.com>
+ <20220502192541.GS8364@nvidia.com>
+ <20220502135837.49ad40aa.alex.williamson@redhat.com>
+ <20220502220447.GT8364@nvidia.com>
+From:   Joao Martins <joao.m.martins@oracle.com>
+In-Reply-To: <20220502220447.GT8364@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P123CA0336.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:18c::17) To BLAPR10MB4835.namprd10.prod.outlook.com
+ (2603:10b6:208:331::11)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220428122952.GA10508@chaop.bj.intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e879bb56-12b7-4bf1-cf5d-08da2cf9991b
+X-MS-TrafficTypeDiagnostic: CH2PR10MB4200:EE_
+X-Microsoft-Antispam-PRVS: <CH2PR10MB42002A50AFFEBD4BCA44514DBBC09@CH2PR10MB4200.namprd10.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Kk9a3+rsLLaNa1UR8G4hZAKP1RUAfRa/e0dSCX2ub37P9FnBbGquRqayNIv5JoIyckOZuPzJNI9/m0CVPlqrRCDMh8GIaTKSwAq3GsHkEhvYMJGs4HWbHv9uL3orybBkmVLgnvy8qwfq01HB+CCz+WeX5qJ2L620d/O/zFWxTVG+SCcNrODS+4QBqkI6WVsWWKAFcWOxiL5sKMp/VzKP94RudjlNDkyZfxMzEHEN3g/aFCo9K8L0lok0xfXA4dW7u45l+FF6Ln9TL7a9yzFe02/wVd/Smqd3Goh0ucjKSaetjbnkHIm0w6QMm72EqwsagJL/PwyoT+X+4omDqvdawgLtVxCejKuBmD+QjLGK/MIrowjpKBZWmdhs9OKF7YsNVrLHDbPHMsJZfK0CUNsm9jXpBSGU976HwI8mS+6A9yB0L3AYJlDYi1ZCJIYq4tj/EhUxEaqnaDKJZPTGbydKq93313Fn6xc+26viScrBatl6hNPG5g4VUT94yDFoJZPL1tTlmyrlDO4Nl1ptb82nG1Hmy9/8JVIAPhsd/W5byWpRpT8i3NFzytXWCrDM9heiJeHo9CKjdz45o6Gsj7BsRECyqlFSArB05Mxb6wvKMsAPQH7y6DdBoit1hKeyrqRISs4Zfdiqdw6YKefvfqInKJrnp9orezjns1vOGDqAWGtanL5HxhoIAE3BzutrgdvSGgD+DfwkorEMC6cgS4oV7g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(66946007)(5660300002)(2906002)(4326008)(8676002)(7416002)(508600001)(66556008)(66476007)(8936002)(38100700002)(316002)(6486002)(6666004)(186003)(31686004)(86362001)(2616005)(36756003)(26005)(83380400001)(110136005)(6512007)(31696002)(6506007)(53546011)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MEtQNmM1SC8rL3U4aTlIWGNJZzF3ZERaL0k1UXhtY2RPM3dxelh6R2UvTGNT?=
+ =?utf-8?B?VGZTZ3RsVERET0xyVlRhcnYvcFo5T0ZJZEt1M2RReHdZK2RYblRPdmUrcWhE?=
+ =?utf-8?B?c0VLcWE2MDZ2YkUzUlJJdHZpK1dlMUtIa2wxY2svTHc5a2xlQjVHSUEzbTda?=
+ =?utf-8?B?bGF0OER4a1prM2FwQndpakd0d1Jtald3QTRLa2ZNZ2hhbDMrT1JnOU1WVkRa?=
+ =?utf-8?B?UDR3UGlJekpwckZab25GNDJlVXlWOTFWZmd0bU9UM1RLWHdRaTVGQ1JvZnRs?=
+ =?utf-8?B?VWZnRVdPa3ZKOFl0RU16bWpnSkJEYTU0d2Z4S2crRWZEUDVqYWF1djhNQ2c1?=
+ =?utf-8?B?R2JtcTlXaDFsalJQdjgzaTBrcnNibCtmd096NmUvR2MzWFFUeDJuRU4xNWM4?=
+ =?utf-8?B?b1N4dWhKTWkrVzZxUDFFQjZzZkp4Z1ZobndFaUNndW1qOThvR0l3cEFkQXkr?=
+ =?utf-8?B?Z3lPWGtNRWNlQ3A2OHQwUDdIS0lJQzV2d0xmRjVpU1kwSlluREM4bTZVSWpq?=
+ =?utf-8?B?VnU0a2U0b2laeC9hNWh2TVBzWlAyYVA4NHU3emorUUk4NGV6bFJmSGszVzdh?=
+ =?utf-8?B?S1BIU2NGWGoxZmR2cHE0WlBXb21nNDJ2cU9jVHllc1JTbVZnclIwSmJjQktq?=
+ =?utf-8?B?M2wwL3RqNi85c2dDYkdtNUlheVZKR1cyWm9MQmpxbjVFR2MrNS96RmJFeExs?=
+ =?utf-8?B?TjVzaXl2RWNROXZiN3kxbmFUSEpFdVdXU3ZOUVFSRmtSVXNONmtpdjVkK1RI?=
+ =?utf-8?B?ck9uVCtEZHlJbGQxUGhZUXAvL05IeTU3em95Zy9tbkgwb3lPN2Y4cjZDU1JG?=
+ =?utf-8?B?RTFSOFdhcWxLSHA3OTMxRmIxdFcxdksyTHBRWGZqR01IRXM0UEM4WE1kMlBt?=
+ =?utf-8?B?SlFaWXZNT0hJcUozSVNJVStaL0FoNkRUNXZVRTBYY0ZYcVA0WExlOVlqSFRO?=
+ =?utf-8?B?TGF0dDBFb244Nk5namVQVGwvUTBuanhVU09QbURyWWlUVE5VcmUyYnhCRmRw?=
+ =?utf-8?B?MDBkKzY5Y3VwRDBTdVYvT2k0N2Y1VW1DN1J6aGh5QmY1UUVJVjNDclpKa0g0?=
+ =?utf-8?B?NElrc0JXR0pjdjRLak5VMFhrUHRta1dQdm1iSEQyZ0RyUmxxNFlIMVdWZUNn?=
+ =?utf-8?B?TDRVMTFqRVBhM2t6dVU3VFJ3SnBVbUQxd0c0Rk9NRkRxRVE0M1FYaGVwZ1lZ?=
+ =?utf-8?B?eGlyOWxlQ25tdC83b3ZjVi9mcldNY1NpTmhsaWtOOTU2MjFOSjlBaGNIOGRl?=
+ =?utf-8?B?cTZKTjM1R3FOTWVCRE94cVJlWUVEYzROUC9ROTJZekhBbFBNRHduaHdVeC9n?=
+ =?utf-8?B?VGh3ZUFpa2V3aDREcVpUV0FpU3VvMTVKbEM0dEo4cjhIZzQ4Q1pCWVJISzYw?=
+ =?utf-8?B?b1JrYkFmbzhCRGw1TXlQWWZIYmxNT0pjMTJKSXFEem1UaTA3ZXpyOGxaU25Y?=
+ =?utf-8?B?SGxqeHdGMGNvSzlFSWxYNW9YR2RBNUhobWRDMWVLNk51UHBvck8rcm1jVzdI?=
+ =?utf-8?B?aTRZZnBMWnlaamtqV0ZpK1hTbUJlNGZucFZIcGxNaVdxTmdydmxqZkttUlRQ?=
+ =?utf-8?B?WlArWEVJZDduL09JeG1NYVhPaTRkaVRzbG1iMU4wamw1MFpGUVplNGxIZ1Vo?=
+ =?utf-8?B?c2JwelBXaGN2Rkpyckc5YkdvN3pjRHFJUnVqVXhobEtIVkhRVmVtYkNxRnNw?=
+ =?utf-8?B?cWtHczhsekZLa0tERWZ2YUd6T3haNktyM0lNWVhXb1RRQUpFOXplQ2w0ZTds?=
+ =?utf-8?B?aWZnS1ErK2xzVThSNkxUQjJwR0diRVRFWW9GNElSMkdaVzFDMzRoZzFqNW92?=
+ =?utf-8?B?UHZWTU5Nd3N1RkJKcC9lN1BFUlUwSk93MVFQVS9TVjNCMWUzZlEvRjlxVXcz?=
+ =?utf-8?B?SHlyRElVZ0tqcTd2NEFrSFFsOWlYbTlCV1Z3QnNkNTFXRGVDRDdORFFIVCtH?=
+ =?utf-8?B?VjI5Z1NYU3RZSC9hNlNSZllwSEVjWXVGM0Q0cy9kcmdWWmFNYWE3VGlhZjgw?=
+ =?utf-8?B?VnB6UUhVTDFRYTFwSXpsQzhKaktvQXRkYTYrTTlJQ0VlZzI3TDRFTFJiNERK?=
+ =?utf-8?B?eUN1YUxoR3pia3J3L1pSRkJmOGVuS2ZnZ3I2YzNtSWxIOWhEZGphTlVMbk1u?=
+ =?utf-8?B?NFl1bHN4enZxMkJuWURtTEl6YVdBa1BpTkE4VWZoem5LOWM4UmttUmk5SWt4?=
+ =?utf-8?B?NmRSN295R2NZOWhZMldibWpOWXpYajZZVU45Tkw5N2l1dDJ6eUp3dlQrSm1p?=
+ =?utf-8?B?NVpMSVpwVUx4Mi9nUUo1MEY2cXVNK3U3Y0oxVXlicUUrMHhuSTl4c29OdFpN?=
+ =?utf-8?B?OERzcExvc1VON0xWZFBYbGlmdFVEQlhVWTU4NE56MU9TVTlMdDV4NncrUENN?=
+ =?utf-8?Q?4COdpiZUhudwNPOc=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e879bb56-12b7-4bf1-cf5d-08da2cf9991b
+X-MS-Exchange-CrossTenant-AuthSource: BLAPR10MB4835.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 May 2022 11:39:35.5124
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: S5EN3+rcb71sAFqaey99AKL9/fIw5hO1WmBaU7eui8lPQpsdzPA82rRxfGUoLoZyiYJT+DCZfs86+D83B5NaUQGSs4aVvgcDxL8qmW3xWK8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR10MB4200
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.486,18.0.858
+ definitions=2022-05-03_03:2022-05-02,2022-05-03 signatures=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 malwarescore=0
+ spamscore=0 mlxlogscore=999 mlxscore=0 suspectscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2205030086
+X-Proofpoint-ORIG-GUID: yZd292kq99a2wyf7EtolK10CQE30VoIG
+X-Proofpoint-GUID: yZd292kq99a2wyf7EtolK10CQE30VoIG
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thursday 28 Apr 2022 at 20:29:52 (+0800), Chao Peng wrote:
-> 
-> + Michael in case he has comment from SEV side.
-> 
-> On Mon, Apr 25, 2022 at 07:52:38AM -0700, Andy Lutomirski wrote:
-> > 
-> > 
-> > On Mon, Apr 25, 2022, at 6:40 AM, Chao Peng wrote:
-> > > On Sun, Apr 24, 2022 at 09:59:37AM -0700, Andy Lutomirski wrote:
-> > >> 
-> > 
-> > >> 
-> > >> 2. Bind the memfile to a VM (or at least to a VM technology).  Now it's in the initial state appropriate for that VM.
-> > >> 
-> > >> For TDX, this completely bypasses the cases where the data is prepopulated and TDX can't handle it cleanly.  For SEV, it bypasses a situation in which data might be written to the memory before we find out whether that data will be unreclaimable or unmovable.
-> > >
-> > > This sounds a more strict rule to avoid semantics unclear.
-> > >
-> > > So userspace needs to know what excatly happens for a 'bind' operation.
-> > > This is different when binds to different technologies. E.g. for SEV, it
-> > > may imply after this call, the memfile can be accessed (through mmap or
-> > > what ever) from userspace, while for current TDX this should be not allowed.
-> > 
-> > I think this is actually a good thing.  While SEV, TDX, pKVM, etc achieve similar goals and have broadly similar ways of achieving them, they really are different, and having userspace be aware of the differences seems okay to me.
-> > 
-> > (Although I don't think that allowing userspace to mmap SEV shared pages is particularly wise -- it will result in faults or cache incoherence depending on the variant of SEV in use.)
-> > 
-> > >
-> > > And I feel we still need a third flow/operation to indicate the
-> > > completion of the initialization on the memfile before the guest's 
-> > > first-time launch. SEV needs to check previous mmap-ed areas are munmap-ed
-> > > and prevent future userspace access. After this point, then the memfile
-> > > becomes truely private fd.
-> > 
-> > Even that is technology-dependent.  For TDX, this operation doesn't really exist.  For SEV, I'm not sure (I haven't read the specs in nearly enough detail).  For pKVM, I guess it does exist and isn't quite the same as a shared->private conversion.
-> > 
-> > Maybe this could be generalized a bit as an operation "measure and make private" that would be supported by the technologies for which it's useful.
-> 
-> Then I think we need callback instead of static flag field. Backing
-> store implements this callback and consumers change the flags
-> dynamically with this callback. This implements kind of state machine
-> flow.
-> 
-> > 
-> > 
-> > >
-> > >> 
-> > >> 
-> > >> ----------------------------------------------
-> > >> 
-> > >> Now I have a question, since I don't think anyone has really answered it: how does this all work with SEV- or pKVM-like technologies in which private and shared pages share the same address space?  I sounds like you're proposing to have a big memfile that contains private and shared pages and to use that same memfile as pages are converted back and forth.  IO and even real physical DMA could be done on that memfile.  Am I understanding correctly?
-> > >
-> > > For TDX case, and probably SEV as well, this memfile contains private memory
-> > > only. But this design at least makes it possible for usage cases like
-> > > pKVM which wants both private/shared memory in the same memfile and rely
-> > > on other ways like mmap/munmap or mprotect to toggle private/shared instead
-> > > of fallocate/hole punching.
-> > 
-> > Hmm.  Then we still need some way to get KVM to generate the correct SEV pagetables.  For TDX, there are private memslots and shared memslots, and they can overlap.  If they overlap and both contain valid pages at the same address, then the results may not be what the guest-side ABI expects, but everything will work.  So, when a single logical guest page transitions between shared and private, no change to the memslots is needed.  For SEV, this is not the case: everything is in one set of pagetables, and there isn't a natural way to resolve overlaps.
-> 
-> I don't see SEV has problem. Note for all the cases, both private/shared
-> memory are in the same memslot. For a given GPA, if there is no private
-> page, then shared page will be used to establish KVM pagetables, so this
-> can guarantee there is no overlaps.
-> 
-> > 
-> > If the memslot code becomes efficient enough, then the memslots could be fragmented.  Or the memfile could support private and shared data in the same memslot.  And if pKVM does this, I don't see why SEV couldn't also do it and hopefully reuse the same code.
-> 
-> For pKVM, that might be the case. For SEV, I don't think we require
-> private/shared data in the same memfile. The same model that works for
-> TDX should also work for SEV. Or maybe I misunderstood something here?
-> 
-> > 
-> > >
-> > >> 
-> > >> If so, I think this makes sense, but I'm wondering if the actual memslot setup should be different.  For TDX, private memory lives in a logically separate memslot space.  For SEV and pKVM, it doesn't.  I assume the API can reflect this straightforwardly.
-> > >
-> > > I believe so. The flow should be similar but we do need pass different
-> > > flags during the 'bind' to the backing store for different usages. That
-> > > should be some new flags for pKVM but the callbacks (API here) between
-> > > memfile_notifile and its consumers can be reused.
-> > 
-> > And also some different flag in the operation that installs the fd as a memslot?
-> > 
-> > >
-> > >> 
-> > >> And the corresponding TDX question: is the intent still that shared pages aren't allowed at all in a TDX memfile?  If so, that would be the most direct mapping to what the hardware actually does.
-> > >
-> > > Exactly. TDX will still use fallocate/hole punching to turn on/off the
-> > > private page. Once off, the traditional shared page will become
-> > > effective in KVM.
-> > 
-> > Works for me.
-> > 
-> > For what it's worth, I still think it should be fine to land all the TDX memfile bits upstream as long as we're confident that SEV, pKVM, etc can be added on without issues.
-> > 
-> > I think we can increase confidence in this by either getting one other technology's maintainers to get far enough along in the design to be confident
-> 
-> AFAICS, SEV shouldn't have any problem, But would like to see AMD people
-> can comment. For pKVM, definitely need more work, but isn't totally
-> undoable. Also would be good if pKVM people can comment.
+On 5/2/22 23:04, Jason Gunthorpe wrote:
+> On Mon, May 02, 2022 at 01:58:37PM -0600, Alex Williamson wrote:
+>> On Mon, 2 May 2022 16:25:41 -0300
+>> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>>> On Mon, May 02, 2022 at 01:07:01PM -0600, Alex Williamson wrote:
+>>>>> +/*
+>>>>> + * Upon VFIO_DEVICE_FEATURE_SET stop device DMA logging that was started
+>>>>> + * by VFIO_DEVICE_FEATURE_DMA_LOGGING_START
+>>>>> + */
+>>>>> +#define VFIO_DEVICE_FEATURE_DMA_LOGGING_STOP 4  
+>>>>
+>>>> This seems difficult to use from a QEMU perspective, where a vfio
+>>>> device typically operates on a MemoryListener and we only have
+>>>> visibility to one range at a time.  I don't see any indication that
+>>>> LOGGING_START is meant to be cumulative such that userspace could
+>>>> incrementally add ranges to be watched, nor clearly does LOGGING_STOP
+>>>> appear to have any sort of IOVA range granularity.    
+>>>
+>>> Correct, at least mlx5 HW just cannot do a change tracking operation,
+>>> so userspace must pre-select some kind of IOVA range to monitor based
+>>> on the current VM configuration.
+>>>
+>>>> Is userspace intended to pass the full vCPU physical address range
+>>>> here, and if so would a single min/max IOVA be sufficient?    
+>>>
+>>> At least mlx5 doesn't have enough capacity for that. Some reasonable
+>>> in-between of the current address space, and maybe a speculative extra
+>>> for hot plug.
+>>
 
-Merging things incrementally sounds good to me if we can indeed get some
-time to make sure it'll be a workable solution for other technologies.
-I'm happy to prototype a pKVM extension to the proposed series to see if
-there are any major blockers.
+Though one knows (in the interim abstractions) at start of guest, the
+underlying memory map e.g. that you can only have <this much> for
+hotpluggable memory.
 
-Thanks,
-Quentin
+Albeit I can't remember (need to check) if a memory listener infra gets
+propagated with everything at start (including the non present stuff like
+hotplug MR).
+
+>>> I'm expecting VFIO devices to use the same bitmap library as the IOMMU
+>>> drivers so we have a consistent reporting.
+>>
+>> I haven't reviewed that series in any detail yet, but it seems to
+>> impose the same bitmap size and reporting to userspace features as
+>> type1 based in internal limits of bitmap_set().  Thanks,
+> 
+> It goes page by page, so the bitmap_set() can't see more than 4k of
+> bitmap at a time, IIRC.
+
+It allows a bitmap big enough to marshal 64G of IOVA space to it,
+albeit it only does a section at a time (128M) i.e. one 4K page or iow
+32K bits at a time. However the callers will only set bits in the bitmap
+for a given PTE page size, so we are always limited by PTE page size being
+recorded at the bitmap page-size granularity.
+
+The limit is implicitly bound by the IOVA range being passed in and bitmap
+page size. So this means it's the bitmap size necessary to record an iova range
+of length ULONG_MAX.
