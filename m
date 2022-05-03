@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 84547517CF3
-	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 08:02:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A76ED517CF9
+	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 08:02:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229653AbiECGF5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 02:05:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51770 "EHLO
+        id S229480AbiECGGG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 02:06:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbiECGFv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 02:05:51 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFD5533375
-        for <kvm@vger.kernel.org>; Mon,  2 May 2022 23:02:18 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id h19-20020aa796d3000000b0050d3c025470so9056752pfq.0
-        for <kvm@vger.kernel.org>; Mon, 02 May 2022 23:02:18 -0700 (PDT)
+        with ESMTP id S229616AbiECGFx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 02:05:53 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4176033A36
+        for <kvm@vger.kernel.org>; Mon,  2 May 2022 23:02:20 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id q13-20020a638c4d000000b003821725ad66so7983893pgn.23
+        for <kvm@vger.kernel.org>; Mon, 02 May 2022 23:02:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=5RbTqRjyv/JGe841RHBUI3rQBooiZTqU97QWl3obRNA=;
-        b=LCqHjMuYeDAd9/HrWXhkaqhxAgmYnzAuMgkj2Skj7h2SVOy0DF41l5Iqb+PY2WRmwu
-         m+n6uOOBJgZyUInQJ4py5riUdNHa0nn8xgeNtILhpUryktuSVRGJ5JWMGD3fUs3s05ZF
-         eidKTP9Y6yPGJ/3T6Z7hu2xHyLNXkhtuLUSPxj3qBai+hso8oDsUW7GjZGRucZ2mA+zl
-         7N0B8e8XsfgINQj1L+Kwnv1FD3StEbxqTdzlq0G6dBfip7l7PHECQLf9LW/DrmYoRdQT
-         kNk0NZCEoYH0RIWykEz2ffT7JFt1rgKi6DcxoM+Zep2U9/NwzDbhS33cuSlaZDQO4zBa
-         ccLQ==
+        bh=lyIfp9262fAQLqy8qC0Pz4SUM4FAzF4N7A6nbmSHB2c=;
+        b=NTvfdy6F18lFgUV8clR+0g6Lw3bcq5UgO40+92jzBn0iZGYe3Xw9MVeBL3+fvWQw5N
+         LB3zzRWSU4HLPPJXB/Dyw7ffCQbjT5/AAfQ9WdrD5WumB7wAGc8Ii16bK1GqoyShUxFT
+         T3kMr/bzKtBbctXnCXxWSUOFUbNsLWTvcedPoBzLgEc0OoGSRyBn6HFbR1QI6Sxm0ib1
+         LETkvqwaLmlU1m3vcCJyPISK9GXof6Kzpm1nbZPFsnyvcGewnf1XII3NShtf5PlhixsL
+         o+7dDUpiE1S+Xes0LqAZedN1LJOIxguMZTGVLGJBoZivv+psCSQs/f/P1ED6jOuNtCkh
+         UBAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=5RbTqRjyv/JGe841RHBUI3rQBooiZTqU97QWl3obRNA=;
-        b=xszgc9X2MwCWRIks+IFeUDC6lnVpCzKzefXu67uae3xovVxZE7YBJFkxlDyz8C/W7k
-         TBzqzqNCtt74pAEaxMSgTUNZLv827Dz0uch2SuR27RtJVit6CdTxdnW+D7MU1RxULTKW
-         a66CIYwtze7EQxl0JJbjSzt3T5EmvqOH0a1OOtMJAcKwlUnEYGj1U5hjCzNUJDpEcdLm
-         cJeUuzMNzbfD30KX1hTn5Rt+M4dDpUMOk+cPOZxCWoD64KE6bwdElWNyYXrgKzWd4f2u
-         GlWH8+NlcmRzuwhSwBcCd5GttAYiIwP5G+1w691YVhrs7OmqLPpqa1xPuv3KW6sbhZHP
-         xxWg==
-X-Gm-Message-State: AOAM531SqEKCujMGbdmuTyXLaN0mmw6ZvbIfXp5gHCsi26pYXyKME8A6
-        W+26j9aYkecKRCFYEqLH/RuB3kDEc2A=
-X-Google-Smtp-Source: ABdhPJyl27YQ6XmJQ9Fqp+P9ujgfURU/vv3w3Cp1SKq9Raj855FY/fiPv+W655fr40c2jGqj3G2V5IfUTNU=
+        bh=lyIfp9262fAQLqy8qC0Pz4SUM4FAzF4N7A6nbmSHB2c=;
+        b=GK/ZHrDFus0Ijf8VqiQD0k/2jrL3tWuIUcf+N9kZY3WYACMytXexSQy2ieLjpcNe9a
+         Q/c3ujkFzAuoQ/hKiREvLL+dKlsKfVMHhwYMKwfIkyNS2cEIwE5xuxWbBr/FnI2PK+8/
+         9Q7jrZQoJNSifAU7x+UIyeBqwVaditJ5q9y7CbnRD3KleuT0Iyv6F+qJ9n9gvDHzRGMl
+         2LJBTLX143Ib/umqBDstmVa/3dYOPCmQnoRdh4Kj0FHui0GdSXf6h4f6TmKPrcwBlUFY
+         lG+arvtgWvonTgVyi4Ch/zTzQvTDPA3NA6uv+bFv9aPJT1oR8WI8SHa5SaYBLaFad0ff
+         1yVg==
+X-Gm-Message-State: AOAM533oxFTQdf79zfRM+RF6uzmvaX6cx1Cid2cj1bI2zaSVUP9X57rr
+        chbwIXffSujPEp3x1eDqAOxYhiMdrkY=
+X-Google-Smtp-Source: ABdhPJySoUR5II5RZFESdkmpRUNaWMWZc4db9m57Xb50n4CBJPr51KRBblc9PtMJAUv+qFnKQOynLlQ7TLQ=
 X-Received: from oupton3.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:21eb])
- (user=oupton job=sendgmr) by 2002:a05:6a00:1a01:b0:505:b3e5:b5fc with SMTP id
- g1-20020a056a001a0100b00505b3e5b5fcmr14320992pfv.53.1651557737935; Mon, 02
- May 2022 23:02:17 -0700 (PDT)
-Date:   Tue,  3 May 2022 06:02:04 +0000
+ (user=oupton job=sendgmr) by 2002:a17:90b:e89:b0:1dc:18dc:26a0 with SMTP id
+ fv9-20020a17090b0e8900b001dc18dc26a0mr2986517pjb.188.1651557739605; Mon, 02
+ May 2022 23:02:19 -0700 (PDT)
+Date:   Tue,  3 May 2022 06:02:05 +0000
 In-Reply-To: <20220503060205.2823727-1-oupton@google.com>
-Message-Id: <20220503060205.2823727-7-oupton@google.com>
+Message-Id: <20220503060205.2823727-8-oupton@google.com>
 Mime-Version: 1.0
 References: <20220503060205.2823727-1-oupton@google.com>
 X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH v4 6/7] KVM/arm64: Hide AArch32 PMU registers when not available
+Subject: [PATCH v4 7/7] Revert "KVM/arm64: Don't emulate a PMU for 32-bit
+ guests if feature not set"
 From:   Oliver Upton <oupton@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -70,139 +71,103 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alexandru Elisei <alexandru.elisei@arm.com>
+This reverts commit 8f6379e207e7d834065a080f407a60d67349d961.
 
-commit 11663111cd49 ("KVM: arm64: Hide PMU registers from userspace when
-not available") hid the AArch64 PMU registers from userspace and guest
-when the PMU VCPU feature was not set. Do the same when the PMU
-registers are accessed by an AArch32 guest. While we're at it, rename
-the previously unused AA32_ZEROHIGH to AA32_DIRECT to match the behavior
-of get_access_mask().
+The original change was not problematic but chose nonarchitected PMU
+register behavior over a NULL deref as KVM failed to hide the PMU in the
+ID_DFR0.
 
-Now that KVM emulates ID_DFR0 and hides the PMU from the guest when the
-feature is not set, it is safe to inject to inject an undefined exception
-when the PMU is not present, as that corresponds to the architected
-behaviour.
+Since KVM now provides a sane value for ID_DFR0 and UNDEFs the guest for
+unsupported accesses, drop the unneeded checks in PMU register handlers.
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-[Oliver - Add AA32_DIRECT to match the zero value of the enum]
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 60 ++++++++++++++++++++-------------------
- arch/arm64/kvm/sys_regs.h |  2 +-
- 2 files changed, 32 insertions(+), 30 deletions(-)
+ arch/arm64/kvm/pmu-emul.c | 23 +----------------------
+ 1 file changed, 1 insertion(+), 22 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 586b292ca94f..f3235eafdadc 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2014,20 +2014,22 @@ static const struct sys_reg_desc cp14_64_regs[] = {
- 	{ Op1( 0), CRm( 2), .access = trap_raz_wi },
- };
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index 3dc990ac4f44..78fdc443adc7 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -177,9 +177,6 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+ 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+ 	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
  
-+#define CP15_PMU_SYS_REG(_map, _Op1, _CRn, _CRm, _Op2)			\
-+	AA32(_map),							\
-+	Op1(_Op1), CRn(_CRn), CRm(_CRm), Op2(_Op2),			\
-+	.visibility = pmu_visibility
-+
- /* Macro to expand the PMEVCNTRn register */
- #define PMU_PMEVCNTR(n)							\
--	/* PMEVCNTRn */							\
--	{ Op1(0), CRn(0b1110),						\
--	  CRm((0b1000 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
--	  access_pmu_evcntr }
-+	{ CP15_PMU_SYS_REG(DIRECT, 0, 0b1110,				\
-+	  (0b1000 | (((n) >> 3) & 0x3)), ((n) & 0x7)),			\
-+	  .access = access_pmu_evcntr }
- 
- /* Macro to expand the PMEVTYPERn register */
- #define PMU_PMEVTYPER(n)						\
--	/* PMEVTYPERn */						\
--	{ Op1(0), CRn(0b1110),						\
--	  CRm((0b1100 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
--	  access_pmu_evtyper }
+-	if (!kvm_vcpu_has_pmu(vcpu))
+-		return 0;
 -
-+	{ CP15_PMU_SYS_REG(DIRECT, 0, 0b1110,				\
-+	  (0b1100 | (((n) >> 3) & 0x3)), ((n) & 0x7)),			\
-+	  .access = access_pmu_evtyper }
- /*
-  * Trapped cp15 registers. TTBR0/TTBR1 get a double encoding,
-  * depending on the way they are accessed (as a 32bit or a 64bit
-@@ -2067,25 +2069,25 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	{ Op1( 0), CRn( 7), CRm(14), Op2( 2), access_dcsw },
+ 	counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
  
- 	/* PMU */
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 0), access_pmcr },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), access_pmcnten },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), access_pmcnten },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), access_pmovs },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 4), access_pmswinc },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmselr },
--	{ AA32(LO), Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmceid },
--	{ AA32(LO), Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmceid },
--	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), access_pmu_evcntr },
--	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), access_pmu_evtyper },
--	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), access_pmu_evcntr },
--	{ Op1( 0), CRn( 9), CRm(14), Op2( 0), access_pmuserenr },
--	{ Op1( 0), CRn( 9), CRm(14), Op2( 1), access_pminten },
--	{ Op1( 0), CRn( 9), CRm(14), Op2( 2), access_pminten },
--	{ Op1( 0), CRn( 9), CRm(14), Op2( 3), access_pmovs },
--	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 4), access_pmceid },
--	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 5), access_pmceid },
-+	{ CP15_PMU_SYS_REG(DIRECT, 0, 9, 12, 0), .access = access_pmcr },
-+	{ CP15_PMU_SYS_REG(DIRECT, 0, 9, 12, 1), .access = access_pmcnten },
-+	{ CP15_PMU_SYS_REG(DIRECT, 0, 9, 12, 2), .access = access_pmcnten },
-+	{ CP15_PMU_SYS_REG(DIRECT, 0, 9, 12, 3), .access = access_pmovs },
-+	{ CP15_PMU_SYS_REG(DIRECT, 0, 9, 12, 4), .access = access_pmswinc },
-+	{ CP15_PMU_SYS_REG(DIRECT, 0, 9, 12, 5), .access = access_pmselr },
-+	{ CP15_PMU_SYS_REG(LO,     0, 9, 12, 6), .access = access_pmceid },
-+	{ CP15_PMU_SYS_REG(LO,     0, 9, 12, 7), .access = access_pmceid },
-+	{ CP15_PMU_SYS_REG(DIRECT, 0, 9, 13, 0), .access = access_pmu_evcntr },
-+	{ CP15_PMU_SYS_REG(DIRECT, 0, 9, 13, 1), .access = access_pmu_evtyper },
-+	{ CP15_PMU_SYS_REG(DIRECT, 0, 9, 13, 2), .access = access_pmu_evcntr },
-+	{ CP15_PMU_SYS_REG(DIRECT, 0, 9, 14, 0), .access = access_pmuserenr },
-+	{ CP15_PMU_SYS_REG(DIRECT, 0, 9, 14, 1), .access = access_pminten },
-+	{ CP15_PMU_SYS_REG(DIRECT, 0, 9, 14, 2), .access = access_pminten },
-+	{ CP15_PMU_SYS_REG(DIRECT, 0, 9, 14, 3), .access = access_pmovs },
-+	{ CP15_PMU_SYS_REG(HI,     0, 9, 14, 4), .access = access_pmceid },
-+	{ CP15_PMU_SYS_REG(HI,     0, 9, 14, 5), .access = access_pmceid },
- 	/* PMMIR */
--	{ Op1( 0), CRn( 9), CRm(14), Op2( 6), trap_raz_wi },
-+	{ CP15_PMU_SYS_REG(DIRECT, 0, 9, 14, 6), .access = trap_raz_wi },
+ 	if (kvm_pmu_pmc_is_chained(pmc) &&
+@@ -201,9 +198,6 @@ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
+ {
+ 	u64 reg;
  
- 	/* PRRR/MAIR0 */
- 	{ AA32(LO), Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, MAIR_EL1 },
-@@ -2170,7 +2172,7 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	PMU_PMEVTYPER(29),
- 	PMU_PMEVTYPER(30),
- 	/* PMCCFILTR */
--	{ Op1(0), CRn(14), CRm(15), Op2(7), access_pmu_evtyper },
-+	{ CP15_PMU_SYS_REG(DIRECT, 0, 14, 15, 7), .access = access_pmu_evtyper },
+-	if (!kvm_vcpu_has_pmu(vcpu))
+-		return;
+-
+ 	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
+ 	      ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + select_idx;
+ 	__vcpu_sys_reg(vcpu, reg) += (s64)val - kvm_pmu_get_counter_value(vcpu, select_idx);
+@@ -328,9 +322,6 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+ 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+ 	struct kvm_pmc *pmc;
  
- 	{ Op1(1), CRn( 0), CRm( 0), Op2(0), access_ccsidr },
- 	{ Op1(1), CRn( 0), CRm( 0), Op2(1), access_clidr },
-@@ -2179,7 +2181,7 @@ static const struct sys_reg_desc cp15_regs[] = {
+-	if (!kvm_vcpu_has_pmu(vcpu))
+-		return;
+-
+ 	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) || !val)
+ 		return;
  
- static const struct sys_reg_desc cp15_64_regs[] = {
- 	{ Op1( 0), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR0_EL1 },
--	{ Op1( 0), CRn( 0), CRm( 9), Op2( 0), access_pmu_evcntr },
-+	{ CP15_PMU_SYS_REG(DIRECT, 0, 0, 9, 0), .access = access_pmu_evcntr },
- 	{ Op1( 0), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI1R */
- 	{ Op1( 1), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR1_EL1 },
- 	{ Op1( 1), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_ASGI1R */
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 0d31a12b640c..aee8ea054f0d 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -47,7 +47,7 @@ struct sys_reg_desc {
- 	const char *name;
+@@ -366,7 +357,7 @@ void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+ 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+ 	struct kvm_pmc *pmc;
  
- 	enum {
--		AA32_ZEROHIGH,
-+		AA32_DIRECT,
- 		AA32_LO,
- 		AA32_HI,
- 	} aarch32_map;
+-	if (!kvm_vcpu_has_pmu(vcpu) || !val)
++	if (!val)
+ 		return;
+ 
+ 	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
+@@ -536,9 +527,6 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
+ 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+ 	int i;
+ 
+-	if (!kvm_vcpu_has_pmu(vcpu))
+-		return;
+-
+ 	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E))
+ 		return;
+ 
+@@ -588,9 +576,6 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+ {
+ 	int i;
+ 
+-	if (!kvm_vcpu_has_pmu(vcpu))
+-		return;
+-
+ 	if (val & ARMV8_PMU_PMCR_E) {
+ 		kvm_pmu_enable_counter_mask(vcpu,
+ 		       __vcpu_sys_reg(vcpu, PMCNTENSET_EL0));
+@@ -754,9 +739,6 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+ {
+ 	u64 reg, mask;
+ 
+-	if (!kvm_vcpu_has_pmu(vcpu))
+-		return;
+-
+ 	mask  =  ARMV8_PMU_EVTYPE_MASK;
+ 	mask &= ~ARMV8_PMU_EVTYPE_EVENT;
+ 	mask |= kvm_pmu_event_mask(vcpu->kvm);
+@@ -845,9 +827,6 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+ 	u64 val, mask = 0;
+ 	int base, i, nr_events;
+ 
+-	if (!kvm_vcpu_has_pmu(vcpu))
+-		return 0;
+-
+ 	if (!pmceid1) {
+ 		val = read_sysreg(pmceid0_el0);
+ 		base = 0;
 -- 
 2.36.0.464.gb9c8b46e94-goog
 
