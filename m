@@ -2,106 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A7DA5187D5
-	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 17:04:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 229AA5187DD
+	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 17:07:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237797AbiECPIU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 11:08:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33418 "EHLO
+        id S237796AbiECPKc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 11:10:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237777AbiECPIS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 11:08:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 820DF3A1BD
-        for <kvm@vger.kernel.org>; Tue,  3 May 2022 08:04:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651590285;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=q8KRyeOIJowwgq1LjuL92i0OyzQpFO6OlQ5jrqBwiaQ=;
-        b=Rovcr81/5KAo4tVSPx96XPu2Xw4AQ7rQUc9sSTnkkisFAeIH9EHPb/u0ofh3JlKe/Nzpci
-        36RjBjOAXp3XZLfGJbn6UyQn+ZWuFNDMLeQd+M31cncjVEvXoRcPgvtbxjkZwjgRuf0ajr
-        rubaR0lRe4nCUncNU+xBewFQyKtFB04=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-613-UWXjStHVNZ29L_w4hTKO6g-1; Tue, 03 May 2022 11:01:23 -0400
-X-MC-Unique: UWXjStHVNZ29L_w4hTKO6g-1
-Received: by mail-wr1-f69.google.com with SMTP id s8-20020adf9788000000b0020adb01dc25so6440596wrb.20
-        for <kvm@vger.kernel.org>; Tue, 03 May 2022 08:01:23 -0700 (PDT)
+        with ESMTP id S237777AbiECPKb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 11:10:31 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B0FD2019B;
+        Tue,  3 May 2022 08:06:59 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id v11so5471995pff.6;
+        Tue, 03 May 2022 08:06:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=OSMLSuAh9ZaOYgp6DvdsEDlozfxSlnsFvoNeJKVnepo=;
+        b=PXHQ9B2dxdQLqnlS6VrGKXnDno9p5J8Jtz5tucPJkQuECIJP+K1AW+7cXASdAe2qZy
+         +OZx+5ABjQpu5eVQh0ahQGiHRyXNJPCk35ihzsV181MpgUrF1tf4x0P7UWykT92fxXFm
+         2JfErHjGcg3TSNf1gz6Of+F16rmtp9b2ZI7mrGssJk92XvH/XzOi237NlBe3d7D6t5lI
+         nWccAixnwX/KAvwfz/z3Em2z3JsmHGp/JdO8aPLspRiX06I3wg+K8fYXNy51axTNDCKX
+         ZGkwISM78XplytiLHzIE2W9raZnFzKT9YcZCawPJ//R8z1x+0sER6v/22cCGm17fLq1h
+         DO0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=q8KRyeOIJowwgq1LjuL92i0OyzQpFO6OlQ5jrqBwiaQ=;
-        b=sq8HO2bKc6BaNqnOSV0sfv3EfHra82XsBAiKUSSarRsotls8CZmWkB0FGryz5fSN7Y
-         d913gk6vsyRhwKbiOa42VwHeFdxH4wKQTNuQRr/r/BWEt8dTutqa9PoPusrMWusWF9M2
-         L/G1uG66fsHozysLMIdyXwaShkzR8uX4uROvuM/NCqPCr1TZa1TKya2awoivnGgZ458T
-         zcVPWlEA4llftiNNQn7zprAOhkBfsr7oz8Dbg6ixj3GG3HKmUOAcb9ybYJy7mQutQdzK
-         uII2OTHs9aBh/9YAaGY4zX0CXkC9a9WlPeWUNc1qRlhY7w47bRIpksEAyI2uUBnn5kLo
-         JiTg==
-X-Gm-Message-State: AOAM533IXBoz79xnJGgJRfLTj2XGk651l2/KpgvK5vSy8RhHcLkCOqI/
-        5YfY1AqARMAfv8wR0zMIsyPSNGwzRkIS8W2CQmqGjs06wLRLsLl/PFj6kOMhC0cl5C5QGJH8oY8
-        CPE9UIxljd7mm
-X-Received: by 2002:a5d:64c1:0:b0:20c:6ff9:3a61 with SMTP id f1-20020a5d64c1000000b0020c6ff93a61mr4770683wri.709.1651590080935;
-        Tue, 03 May 2022 08:01:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyFddadb0RhMqbED3cKhIrdL1UAliMUxLFrwK6VNOQYuEXW0q5ELPbxKJShs+8DVKmBmOBFgQ==
-X-Received: by 2002:a5d:64c1:0:b0:20c:6ff9:3a61 with SMTP id f1-20020a5d64c1000000b0020c6ff93a61mr4770661wri.709.1651590080743;
-        Tue, 03 May 2022 08:01:20 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id t1-20020adfba41000000b0020c6fa5a797sm3344358wrg.91.2022.05.03.08.01.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 May 2022 08:01:20 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 00/34] KVM: x86: hyper-v: Fine-grained TLB flush + L2
- TLB flush feature
-In-Reply-To: <20220414132013.1588929-1-vkuznets@redhat.com>
-References: <20220414132013.1588929-1-vkuznets@redhat.com>
-Date:   Tue, 03 May 2022 17:01:19 +0200
-Message-ID: <87bkwe3bk0.fsf@redhat.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=OSMLSuAh9ZaOYgp6DvdsEDlozfxSlnsFvoNeJKVnepo=;
+        b=xwVmYL5zcVXmpN3+QiMS97LkPEBg9i6oaCpU6u+4nZx8/zrXrP6L5z986tdB2SR0Xv
+         N03LNqIBOexm5PivvLWH4Vfe7lBmCk5L6/yz0GphT8rgUuuwNjPFBKxFIm2FMM6KjsL7
+         c/p4IMGi4xduXpqX2tJmwDN7SWTIS9ksS2j8q4SDPzT4VkLVNFJhbMD3vVwDHGtGXTQ3
+         Nkg9CiNs7x+VBXaPbfI6GBx0euUFgI3eeDGKRl7SUrS42b/vVmABkfIV1I6cBECtxmJj
+         Pv6QMjEHUmhVK7ntfaT7XS2CCWpS8Lrxtu98DyGhZEkWTQFPwcAb8adH/rhFp8seZ3eF
+         zKGQ==
+X-Gm-Message-State: AOAM533GvVIwqLdZ9y+jFVX4L0sFCbcQzICgItzFSWjJimQq7TAJQ3he
+        X6uJDiK/mu1kVYEF/ulFkF7t28/X+6o=
+X-Google-Smtp-Source: ABdhPJxVjZUmBGs8NcQw1/467jjwyFLNaaByMOc3V4JAOuXeTcLJYh8FdWsMEobIftnlwKMyEdzg7Q==
+X-Received: by 2002:aa7:8256:0:b0:4e0:78ad:eb81 with SMTP id e22-20020aa78256000000b004e078adeb81mr16398424pfn.30.1651590418427;
+        Tue, 03 May 2022 08:06:58 -0700 (PDT)
+Received: from localhost ([47.251.4.198])
+        by smtp.gmail.com with ESMTPSA id c22-20020a62e816000000b0050dc76281e3sm6360530pfi.189.2022.05.03.08.06.57
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 03 May 2022 08:06:58 -0700 (PDT)
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>
+Subject: [PATCH V2 0/7] KVM: X86/MMU: Use one-off special shadow page for special roots
+Date:   Tue,  3 May 2022 23:07:28 +0800
+Message-Id: <20220503150735.32723-1-jiangshanlai@gmail.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vitaly Kuznetsov <vkuznets@redhat.com> writes:
+From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-> Changes since v1:
+Current code uses mmu->pae_root, mmu->pml4_root, and mmu->pml5_root to
+setup special roots.  The initialization code is complex and the roots
+are not associated with struct kvm_mmu_page which causes the code more
+complex.
 
-This should've beed 'since v2', obviously.
+So add new special shadow pages to simplify it.
 
-...
+The special shadow pages are associated with struct kvm_mmu_page and
+VCPU-local.
 
->
-> Currently, KVM handles HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} requests
-> by flushing the whole VPID and this is sub-optimal. This series introduces
-> the required mechanism to make handling of these requests more 
-> fine-grained by flushing individual GVAs only (when requested). On this
-> foundation, "Direct Virtual Flush" Hyper-V feature is implemented. The 
-> feature allows L0 to handle Hyper-V TLB flush hypercalls directly at
-> L0 without the need to reflect the exit to L1. This has at least two
-> benefits: reflecting vmexit and the consequent vmenter are avoided + L0
-> has precise information whether the target vCPU is actually running (and
-> thus requires a kick).
+The special shadow pages are created and freed when the roots are
+changed (or one-off) which can be optimized but not in the patchset
+since the re-creating is light way (in normal case only the struct
+kvm_mmu_page needs to be re-allocated and sp->spt doens't, because
+it is likely to be mmu->pae_root)
 
-FWIW, patches still apply cleanly to kvm/queue so probably there's no
-need to resend.
+Changed from v1:
+	Rebase to newest kvm/queue. Slightly update patch4.
+
+[V1]: https://lore.kernel.org/lkml/20220420132605.3813-1-jiangshanlai@gmail.com/
+
+Lai Jiangshan (7):
+  KVM: X86/MMU: Add using_special_root_page()
+  KVM: X86/MMU: Add special shadow pages
+  KVM: X86/MMU: Link PAE root pagetable with its children
+  KVM: X86/MMU: Activate special shadow pages and remove old logic
+  KVM: X86/MMU: Remove the check of the return value of to_shadow_page()
+  KVM: X86/MMU: Allocate mmu->pae_root for PAE paging on-demand
+  KVM: X86/MMU: Remove mmu_alloc_special_roots()
+
+ arch/x86/include/asm/kvm_host.h |   3 -
+ arch/x86/kvm/mmu/mmu.c          | 487 ++++++++++----------------------
+ arch/x86/kvm/mmu/mmu_internal.h |  10 -
+ arch/x86/kvm/mmu/paging_tmpl.h  |  14 +-
+ arch/x86/kvm/mmu/spte.c         |   7 +
+ arch/x86/kvm/mmu/spte.h         |   1 +
+ arch/x86/kvm/mmu/tdp_mmu.h      |   7 +-
+ 7 files changed, 178 insertions(+), 351 deletions(-)
 
 -- 
-Vitaly
+2.19.1.6.gb485710b
 
