@@ -2,72 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 87029518AFB
-	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 19:24:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F050518B17
+	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 19:31:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240276AbiECR2G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 13:28:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41596 "EHLO
+        id S240380AbiECRel (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 13:34:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240273AbiECR2E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 13:28:04 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3A343D49F;
-        Tue,  3 May 2022 10:24:31 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 35EB36157D;
-        Tue,  3 May 2022 17:24:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E665C385A9;
-        Tue,  3 May 2022 17:24:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1651598670;
-        bh=ZclUTAJVzBmAqi9BEeXN8C+8mbdCK0z2xVVYE8dxTGw=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=KWJk8cLbF3BYq7Tluv9hEJA7x8pggxI5Obth4XqtfhIrsf7Pa3t21QthuzeyaYwI0
-         ZdouCzs88HYZUI1ZHDsGZM7AiDMUoGS8ubXhv4OaThgncdhWVCQMNphNE5cY0EWskk
-         ePpZqv2/iqWbaeKufjyACAImqPOYh7r53pDnJWICtPn/DBHLN/NOErvPp2bV4mRuej
-         1vo6OignF/5H/z+nbw6GjTp+WbxvlnNAHDKc0bdOMoFcx82ZdcagdcUpCNNcLwBaZM
-         1Sajx7KbZlIMJZmcJdlj2470LQLrNPJ/xhUwKHhG75JhiB/C8G4UcdxFZSb9ymODWE
-         lCiRdFSRxTweg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1nlwGB-008ht2-Vk; Tue, 03 May 2022 18:24:28 +0100
-Date:   Tue, 03 May 2022 18:24:27 +0100
-Message-ID: <878rri8r78.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        with ESMTP id S240337AbiECRek (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 13:34:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F2BE71CB3E
+        for <kvm@vger.kernel.org>; Tue,  3 May 2022 10:31:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651599067;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=TScWbWXEVWKnRBFQAFHlKCvx6D9GWzgwwEuiYtBAwlw=;
+        b=gl1myuvoIxAXL+k8XlvmEr1FUz/1fCHVd6NLLalGAQix3DCC8F8tFdOCWaSwtUYVYUGcdD
+        XYme7E28kKUgq6Mgvbj7I9qsIlluxo99ss8dktx7FbqYPOPqgw2qqOcFv+DthGkPPQ7NhW
+        2VLpYuAhuSpC4gdGQYcmoZrLys5ga7U=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-120-fCVdMqNkNx6Q-x0LIJTvEw-1; Tue, 03 May 2022 13:30:51 -0400
+X-MC-Unique: fCVdMqNkNx6Q-x0LIJTvEw-1
+Received: by mail-qk1-f200.google.com with SMTP id bs18-20020a05620a471200b0069f8c1c8b27so12820815qkb.8
+        for <kvm@vger.kernel.org>; Tue, 03 May 2022 10:30:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=TScWbWXEVWKnRBFQAFHlKCvx6D9GWzgwwEuiYtBAwlw=;
+        b=Fgj0HPfOOc6kpvQ10QN8CNwdHw4U0ysgb1MgUQ1lBlWzvlrjoIq9G3y79M5keNwlBN
+         54Z17/q8W4pg672UQmd46lGJsQTmMlVqGlcZ3eFPMhelhHI+004+em46Lep2vTGrOOnx
+         kMDL5bDkhcEdp2r7P1CL734dODJ76VodZeMKC6hPYQlp9VRMHc2vu0GRXsbM7jRHhvTU
+         VQraQuUikaFQs/niW3xTDhaCVRuL7zJ77OQnB3ha59fYInzzU7yLQ903mQ5OzfSoO5YH
+         481MpQ0v76PolZkKTc0OuaGQ1SEifsg9/rHfYNJMR9G+AJt1jMBs+fT8BGlsLitpHPVb
+         eNiw==
+X-Gm-Message-State: AOAM5308eH/Lx6iqPa6n5Ia1PZfgiMQaitdztlUzZ3UEkf0DYaAM+Lu6
+        bf4CxqS8iFgeUYeqyhFaNbacW/ec1H0Ve4RgiH82WsYIuFOKE3mYnAfc1VklqEkcdQMqm1DicZy
+        mZBqpdJcZKq4W
+X-Received: by 2002:a05:622a:309:b0:2f3:7d75:8409 with SMTP id q9-20020a05622a030900b002f37d758409mr15587836qtw.485.1651599050645;
+        Tue, 03 May 2022 10:30:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyjXJ6WRKqUWq4aJyRjPRGX9HKH3Wk5dPulo0BzJo+htkxjC4tIchweNZkYHPts6wI7BFCeNQ==
+X-Received: by 2002:a05:622a:309:b0:2f3:7d75:8409 with SMTP id q9-20020a05622a030900b002f37d758409mr15587816qtw.485.1651599050430;
+        Tue, 03 May 2022 10:30:50 -0700 (PDT)
+Received: from treble ([2600:1700:6e32:6c00::a])
+        by smtp.gmail.com with ESMTPSA id y144-20020a376496000000b0069fc13ce1efsm6104766qkb.32.2022.05.03.10.30.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 May 2022 10:30:49 -0700 (PDT)
+Date:   Tue, 3 May 2022 10:30:46 -0700
+From:   Josh Poimboeuf <jpoimboe@redhat.com>
+To:     Seth Forshee <sforshee@digitalocean.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Petr Mladek <pmladek@suse.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v7 0/9] KVM: arm64: Add support for hypercall services selection
-In-Reply-To: <20220502233853.1233742-1-rananta@google.com>
-References: <20220502233853.1233742-1-rananta@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: rananta@google.com, drjones@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, catalin.marinas@arm.com, will@kernel.org, pshier@google.com, ricarkol@google.com, oupton@google.com, reijiw@google.com, jingzhangos@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        linux-kernel@vger.kernel.org, live-patching@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] entry/kvm: Make vCPU tasks exit to userspace when a
+ livepatch is pending
+Message-ID: <20220503173046.fv2aluc34bxhzgq3@treble>
+References: <20220503125729.2556498-1-sforshee@digitalocean.com>
+ <YnE5kTeGmzKkDTWx@google.com>
+ <YnFVugyU8+XBVRqL@do-x1extreme>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <YnFVugyU8+XBVRqL@do-x1extreme>
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,29 +86,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 03 May 2022 00:38:44 +0100,
-Raghavendra Rao Ananta <rananta@google.com> wrote:
+On Tue, May 03, 2022 at 11:18:02AM -0500, Seth Forshee wrote:
+> > Can the changelog and comment use terminology other than migration?  Maybe "transition"?
+> > That seems to be prevelant through the livepatch code and docs.  There are already
+> > too many meanings for "migration" in KVM, e.g. live migration, page migration, task/vCPU
+> > migration, etc...
 > 
-> Hello,
-> 
-> Continuing the discussion from [1], the series tries to add support
-> for the userspace to elect the hypercall services that it wishes
-> to expose to the guest, rather than the guest discovering them
-> unconditionally. The idea employed by the series was taken from
-> [1] as suggested by Marc Z.
+> "Transition" is used a lot, but afaict it refers to the overall state of
+> the livepatch. "Migrate" is used a lot less, but it always seems to
+> refer to patching a single task, which is why I used that term. But I
+> can see the opportunity for confusion, so I'll reword it.
 
-As it took some time to get there, and that there was still a bunch of
-things to address, I've taken the liberty to apply my own fixes to the
-series.
-
-Please have a look at [1], and let me know if you're OK with the
-result. If you are, I'll merge the series for 5.19.
-
-Thanks,
-
-	M.
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/hcall-selection
+The livepatch code does seem to be guilty of using both terms
+interchangeably.  I agree "transition" is preferable.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Josh
+
