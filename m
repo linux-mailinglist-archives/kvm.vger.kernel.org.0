@@ -2,75 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C424451818D
-	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 11:46:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5ABE35181C3
+	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 11:56:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233558AbiECJu3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 05:50:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36824 "EHLO
+        id S231719AbiECJ74 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 05:59:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233389AbiECJu0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 05:50:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0CBAB31DE4
-        for <kvm@vger.kernel.org>; Tue,  3 May 2022 02:46:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651571214;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=EX9q35ptzETv/uSuvAIiku4mvKwaoJnmxcbps+ZVhfQmNGnx4E7bnNO9N3ZUXJxEUAQywE
-        SOtV9GxUMpcEmAo3I1X4E3ChTPl1F7lH8Pv9zvM7j6em2vC4GFX8XXx2+I3f4C0vXWP9Iy
-        kJ2LKeQS0S7l8fJJacgy7P+fXcTqmeI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-258-tA4pX72iPZWv40SJd40Oxw-1; Tue, 03 May 2022 05:46:51 -0400
-X-MC-Unique: tA4pX72iPZWv40SJd40Oxw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3A61385A5BE;
-        Tue,  3 May 2022 09:46:50 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 06FA015378AD;
-        Tue,  3 May 2022 09:46:48 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Kyle Huey <me@kylehuey.com>
+        with ESMTP id S229638AbiECJ7w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 05:59:52 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 732EC35AB2;
+        Tue,  3 May 2022 02:56:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651571780; x=1683107780;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=veuX5Z2XKbOrv1nhy63LuN6Vqs2xfeS7bWo2oDPBDQM=;
+  b=BGpclUgOlZS0w1eHX537b7bbqfccu6l2EXMSb0UpLTYxci4xdmFqmM10
+   HgOQA1vMdHxrs2lIolaLcTXcOXXLUAItyaaTJ+AjPFN942fvLILvYM3Yk
+   Cq6psqvyDhwxpkE+IWVHKFaWM4uiKff307OOcEY8v29gBRiZDu8l5NhLF
+   YtGJGORxja/+Y/e6oD1IzwttM/cyfBiaNK2hq0zeS3fshnjbs7lRFzPqk
+   k9w7NdtcKiw2gisaX3YGPqgUKtuA61n0CE6P6jSiRpiDdssslHUicx2p6
+   3s0lSTQbByY8ofBaejPECvcky1QQ5EDiUxU/JjrKYISNwFQ2LX/vHT+/E
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10335"; a="267598002"
+X-IronPort-AV: E=Sophos;i="5.91,194,1647327600"; 
+   d="scan'208";a="267598002"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2022 02:56:19 -0700
+X-IronPort-AV: E=Sophos;i="5.91,194,1647327600"; 
+   d="scan'208";a="733849974"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2022 02:56:16 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.95)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1nlpGP-00BOWp-CW;
+        Tue, 03 May 2022 12:56:13 +0300
+Date:   Tue, 3 May 2022 12:56:13 +0300
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Yury Norov <yury.norov@gmail.com>
 Cc:     linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        Robert O'Callahan <robert@ocallahan.org>,
-        Keno Fischer <keno@juliacomputing.com>
-Subject: Re: [PATCH] KVM: x86/svm: Account for family 17h event renumberings in amd_pmc_perf_hw_id
-Date:   Tue,  3 May 2022 05:46:32 -0400
-Message-Id: <20220503094631.1070921-1-pbonzini@redhat.com>
-In-Reply-To: <20220503050136.86298-1-khuey@kylehuey.com>
-References: 
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 2/5] lib: add bitmap_{from,to}_arr64
+Message-ID: <YnD8PSXA2f0ChT4P@smile.fi.intel.com>
+References: <20220428205116.861003-1-yury.norov@gmail.com>
+ <20220428205116.861003-3-yury.norov@gmail.com>
+ <YmvhLbIoHDhEhJFq@smile.fi.intel.com>
+ <YmwIHRhS2f1QTW3b@yury-laptop>
+ <YnA54HzrdfOr2QYl@yury-laptop>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YnA54HzrdfOr2QYl@yury-laptop>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Queued, thanks.
+On Mon, May 02, 2022 at 01:06:56PM -0700, Yury Norov wrote:
+> On Fri, Apr 29, 2022 at 08:45:35AM -0700, Yury Norov wrote:
+> > On Fri, Apr 29, 2022 at 03:59:25PM +0300, Andy Shevchenko wrote:
+> > > On Thu, Apr 28, 2022 at 01:51:13PM -0700, Yury Norov wrote:
 
-Paolo
+...
+
+> > > > +void bitmap_to_arr64(u64 *buf, const unsigned long *bitmap, unsigned int nbits)
+> > > > +{
+> > > > +	const unsigned long *end = bitmap + BITS_TO_LONGS(nbits);
+> > > > +
+> > > > +	while (bitmap < end) {
+> > > > +		*buf = *bitmap++;
+> > > > +		if (bitmap < end)
+> > > > +			*buf |= (u64)(*bitmap++) << 32;
+> > > > +		buf++;
+> > > > +	}
+> > > >  
+> > > > +	/* Clear tail bits in last element of array beyond nbits. */
+
+in the last
+
+> > > > +	if (nbits % 64)
+> > > > +		buf[-1] &= GENMASK_ULL(nbits, 0);
+> > > 
+> > > Hmm... if nbits is > 0 and < 64, wouldn't be this problematic, since
+> > > end == bitmap? Or did I miss something?
+> > 
+> > BITS_TO_LONGS(0) == 0
+> > BITS_TO_LONGS(1..32) == 1
+> > BITS_TO_LONGS(33..64) == 2
+> > 
+> > The only potential problem with buf[-1] is nbits == 0, but fortunately
+> > (0 % 64) == 0, and it doesn't happen.
+
+I see, perhaps adding a small comment would be nice to have to explain that -1
+index is safe.
+
+> Are there any other concerns? If no, I'll fix formatting and append it to
+> bitmap-for-next.
+
+Nope.
+
+-- 
+With Best Regards,
+Andy Shevchenko
 
 
