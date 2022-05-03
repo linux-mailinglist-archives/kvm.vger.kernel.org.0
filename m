@@ -2,68 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CD3A518C8E
-	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 20:48:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AFDE518C98
+	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 20:49:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241630AbiECSvt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 14:51:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40132 "EHLO
+        id S233688AbiECSxH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 14:53:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241617AbiECSvs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 14:51:48 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CDA92F3AF
-        for <kvm@vger.kernel.org>; Tue,  3 May 2022 11:48:13 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id m14-20020a17090a34ce00b001d5fe250e23so2748520pjf.3
-        for <kvm@vger.kernel.org>; Tue, 03 May 2022 11:48:13 -0700 (PDT)
+        with ESMTP id S241650AbiECSxF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 14:53:05 -0400
+Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D2B83F8B7
+        for <kvm@vger.kernel.org>; Tue,  3 May 2022 11:49:24 -0700 (PDT)
+Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-2f16645872fso189945697b3.4
+        for <kvm@vger.kernel.org>; Tue, 03 May 2022 11:49:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=zepmySBnv63WSkAXdeQNdsshIcZAMk3EbNb3138mR5I=;
-        b=bPTLq9HfixcNLyVJaD/IrjOzYpPYh6ISpk4y9g70RAzYOYURAhNFSKi9A8tlEgtCuJ
-         iHj76bj+ybFYWsdpewyIJ3JKcaRbYMR7FX+0Q/hYkNlr8qX9BEK1lv4F9wffhLucBx3q
-         SylUmT+RO9ZZ/BVTL5k64FhSzsgHlNaUBFLmE/U4/LP9YcLC2OZCh7DaHU0TaxBPJ2Dx
-         2NbnofXzs6vgcN9+tV/SLoEc+zEYD3D5rICX0xAIdUFNtq7wKMpc5IglomUTKK4yxDaY
-         ShhRYAJ/B66lGc7uGfFrMJbYDfmbVro4tMSlHoufl/pWmplvDYL/1g+YQftWwZAso+8+
-         8HlQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=2RVFHg4J+XiYNHLd6mO9jBpgTMA8wJDRHLKt8HLDZag=;
+        b=D8eHTcfTZf0aangD3/F507rAzlAJhrb5z3tZDy1kbX20PciK6IfBwz/4PNfuleSx0Q
+         Q0xU7/YQtPzsLyeLgw1EAa1R8W73BCJmdkq5MMpFtJNdr6ZvwYyxjYSWDH3eTqNsXRMB
+         tbCxbVWfMhpiKcj3/ASXTdhk5YNGZjKX6kOl5X4ZHYOs4V0Fa+ZbhGRjXdYgY/Erom7f
+         kmCXngcb/dxpkWWMSzCaE7lFNfN+fVCBzvJ/rNdquW8eZvEpSpOqjnzlsDZ+HgIWJEnj
+         vduTalPXsNoQB+nme19yLfsZu0p6LTEluDGahZfkayRKYiJqoVrjAQpWzOGig+3e8eto
+         7PAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=zepmySBnv63WSkAXdeQNdsshIcZAMk3EbNb3138mR5I=;
-        b=5u2CqsTTSpAF5wBvUf2wgebUj2AKYQ0y2t2tmqwf87IjqGyo1fam0jUR0duKIKvBGe
-         yXA8Zu+3tniEENRNZi2dzX+HfhIPLOgeF/1H/ojzG7uDtZSDkPJDfBkb4ZnCD3IE7wKg
-         Ak8E6sQ4EbpvUfBAPryktFHDnEej/tvDpkNUrljMW7bTxU9JJFFvk3XVCqgCbm1idu2x
-         rPgleW15eoYLY0RXaEE9AZmYnx0k458KCRPelzXZJ3ctqvynD6SII1EbxTZe37JPn5GM
-         7ahrRWXB4HQBGYg66r+gXEYeB/HmEQwjpsw03Fp90vcuqH75DEfJwf8rZLTFk9yrZRp/
-         /Z5w==
-X-Gm-Message-State: AOAM532bKE/92nBsKhJI4t/Dl3EHKWNIecrj9w1YDg1wR9sNjfPqAI9A
-        52QGeA6O/Db0fMwxx6QEzbpwEQ==
-X-Google-Smtp-Source: ABdhPJzGH6bZd7Lk7Z4f76hg2wclxCUfrHdcZ+b6yafpH1Mw5FD+OJyW444A9VnG32wg6W+XMssHDQ==
-X-Received: by 2002:a17:903:246:b0:153:857c:a1f6 with SMTP id j6-20020a170903024600b00153857ca1f6mr17679441plh.153.1651603692636;
-        Tue, 03 May 2022 11:48:12 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id 30-20020a63125e000000b003c291b46f7esm824358pgs.18.2022.05.03.11.48.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 May 2022 11:48:12 -0700 (PDT)
-Date:   Tue, 3 May 2022 18:48:08 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 00/12] KVM: SVM: Fix soft int/ex re-injection
-Message-ID: <YnF46K33TOKqpAUs@google.com>
-References: <cover.1651440202.git.maciej.szmigiero@oracle.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=2RVFHg4J+XiYNHLd6mO9jBpgTMA8wJDRHLKt8HLDZag=;
+        b=0bURFCSNjJbDLqH9dJYba/jWFpjjoRka6zOgZU0zdl3h+t0YgsI/dgR4dZBYK2qb0p
+         ySe0E+IN3nFiXgwn68ajoX/sUu7tGwnDBZUEj9qOI/sCnQTB8td43gG9ueZ9yuhbeUlz
+         TxSZ/AC89WCKkZDLsVglgCbFqNbBBVnOM474OtZJAYd4jBRReyb+FdCfsp2j6rt8Hd85
+         0EbO5rsJzvpmV76FAWBXpaJnQJG6zmlpaw0ccQ4LoGJgI90vSvhyfYxm/0s5IPgZsKmE
+         oAhontrO7XqV1qgkadjCv1Q4aQqe/BA5Q4nOwTlgfinwZigInglptLf9mRzPywr2oTuc
+         F+9g==
+X-Gm-Message-State: AOAM530ptmdlP94sSufOkYE9XeCWPPKhhlt+it7cQ1pmV8ulZswFPULm
+        hACTgwB/w4oPwh6RmU6ah/9I9pfUFIkxoFSrBuAQrw==
+X-Google-Smtp-Source: ABdhPJwlC5LLT8qc2EBu/75ZFoBSCD2aheEv/0F0Bxd/JtnhVZiAZdUSCNlpn7PYi6ZP9gaCJKYUVW6yxjrPsLKdXKQ=
+X-Received: by 2002:a0d:dd90:0:b0:2f8:5459:486e with SMTP id
+ g138-20020a0ddd90000000b002f85459486emr16835296ywe.427.1651603763187; Tue, 03
+ May 2022 11:49:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1651440202.git.maciej.szmigiero@oracle.com>
+References: <20220502233853.1233742-1-rananta@google.com> <878rri8r78.wl-maz@kernel.org>
+In-Reply-To: <878rri8r78.wl-maz@kernel.org>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Tue, 3 May 2022 11:49:13 -0700
+Message-ID: <CAJHc60xp=UQT_CX0zoiSjAmkS8JSe+NB5Gr+F5mmybjJAWkUtQ@mail.gmail.com>
+Subject: Re: [PATCH v7 0/9] KVM: arm64: Add support for hypercall services selection
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -75,50 +78,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 02, 2022, Maciej S. Szmigiero wrote:
-> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-> 
-> This series is an updated version of Sean's SVM soft interrupt/exception
-> re-injection fixes patch set, which in turn extended and generalized my
-> nSVM L1 -> L2 event injection fixes series.
-> 
-> Detailed list of changes in this version:
-> * "Downgraded" the commit affecting !nrips CPUs to just drop nested SVM
-> support for such parts instead of SVM support in general,
-> 
-> * Removed the BUG_ON() from svm_inject_irq() completely, instead of
-> replacing it with WARN() - Maxim has pointed out it can still be triggered
-> by userspace via KVM_SET_VCPU_EVENTS,
-> 
-> * Updated the new KVM self-test to switch to an alternate IDT before attempting
-> a second L1 -> L2 injection to cause intervening NPF again,
-> 
-> * Added a fix for L1/L2 NMI state confusion during L1 -> L2 NMI re-injection,
-> 
-> * Updated the new KVM self-test to also check for the NMI injection
-> scenario being fixed (that was found causing issues with a real guest),
-> 
-> * Changed "kvm_inj_virq" trace event "reinjected" field type to bool,
-> 
-> * Integrated the fix from patch 5 for nested_vmcb02_prepare_control() call
-> argument in svm_set_nested_state() to patch 1,
-> 
-> * Collected Maxim's "Reviewed-by:" for tracepoint patches.
-> 
-> Previous versions:
-> Sean's v2:
-> https://lore.kernel.org/kvm/20220423021411.784383-1-seanjc@google.com
-> 
-> Sean's v1:
-> https://lore.kernel.org/kvm/20220402010903.727604-1-seanjc@google.com
-> 
-> My original series:
-> https://lore.kernel.org/kvm/cover.1646944472.git.maciej.szmigiero@oracle.com
-> 
-> Maciej S. Szmigiero (4):
->   KVM: nSVM: Sync next_rip field from vmcb12 to vmcb02
->   KVM: SVM: Don't BUG if userspace injects an interrupt with GIF=0
+Hi Marc,
 
-LOL, this should win some kind of award for most ridiculous multi-author patch :-)
+On Tue, May 3, 2022 at 10:24 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Tue, 03 May 2022 00:38:44 +0100,
+> Raghavendra Rao Ananta <rananta@google.com> wrote:
+> >
+> > Hello,
+> >
+> > Continuing the discussion from [1], the series tries to add support
+> > for the userspace to elect the hypercall services that it wishes
+> > to expose to the guest, rather than the guest discovering them
+> > unconditionally. The idea employed by the series was taken from
+> > [1] as suggested by Marc Z.
+>
+> As it took some time to get there, and that there was still a bunch of
+> things to address, I've taken the liberty to apply my own fixes to the
+> series.
+>
+> Please have a look at [1], and let me know if you're OK with the
+> result. If you are, I'll merge the series for 5.19.
+>
+> Thanks,
+>
+>         M.
+>
+Thank you for speeding up the process; appreciate it. However, the
+series's selftest patches have a dependency on Oliver's
+PSCI_SYSTEM_SUSPEND's selftest patches [1][2]. Can we pull them in
+too?
 
-Series looks good, thanks!
+aarch64/hypercalls.c: In function =E2=80=98guest_test_hvc=E2=80=99:
+aarch64/hypercalls.c:95:30: error: storage size of =E2=80=98res=E2=80=99 is=
+n=E2=80=99t known
+   95 |         struct arm_smccc_res res;
+      |                              ^~~
+aarch64/hypercalls.c:103:17: warning: implicit declaration of function
+=E2=80=98smccc_hvc=E2=80=99 [-Wimplicit-function-declaration]
+  103 |                 smccc_hvc(hc_info->func_id, hc_info->arg1, 0,
+0, 0, 0, 0, 0, &res);
+      |                 ^~~~~~~~~
+
+Also, just a couple of readability nits in the fixed version:
+
+1. Patch-2/9, hypercall.c:kvm_hvc_call_default_allowed(), in the
+'default' case, do you think we should probably add a small comment
+that mentions we are checking for func_id in the PSCI range?
+2. Patch-2/9, arm_hypercall.h, clear all the macros in this patch
+itself instead of doing it in increments (unless there's some reason
+that I'm missing)?
+
+Regards,
+Raghavendra
+
+[1]: https://lore.kernel.org/all/20220409184549.1681189-10-oupton@google.co=
+m/
+[2]: https://lore.kernel.org/all/20220409184549.1681189-11-oupton@google.co=
+m/
+
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git=
+/log/?h=3Dkvm-arm64/hcall-selection
+>
+> --
+> Without deviation from the norm, progress is not possible.
