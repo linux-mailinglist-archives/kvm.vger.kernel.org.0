@@ -2,59 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 510A9518953
-	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 18:07:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E968D51898A
+	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 18:18:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239149AbiECQLG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 12:11:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52014 "EHLO
+        id S239313AbiECQVi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 12:21:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239139AbiECQLE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 12:11:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 13B3125C6F
-        for <kvm@vger.kernel.org>; Tue,  3 May 2022 09:07:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651594051;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=dYjV6DsKzSzOfXeEyc8qaxnaM1typob1tQ5rJe/Y9EZyXwVAr2j1wFy5sPzMjZacUZ8ZLh
-        gG6pINr7O6JZ6+XrtZd5VfqZ5HP3x8d7ApKA1YjxlaYmc/q/JSqvWdLL35/XtDzfK844wD
-        AGwgwPi+iybHZ1NmZlyXm+nzUXEMUsM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-364-asYFfomIPaOieA1Q86DAQg-1; Tue, 03 May 2022 12:07:16 -0400
-X-MC-Unique: asYFfomIPaOieA1Q86DAQg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DB8CB9A0C93;
-        Tue,  3 May 2022 12:18:39 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A211CC27EBA;
-        Tue,  3 May 2022 12:18:39 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] KVM: LAPIC: Fix advance timer expiration delta trace
-Date:   Tue,  3 May 2022 08:18:38 -0400
-Message-Id: <20220503121838.1092398-1-pbonzini@redhat.com>
-In-Reply-To: <1650961551-38390-1-git-send-email-wanpengli@tencent.com>
-References: 
+        with ESMTP id S239210AbiECQVh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 12:21:37 -0400
+Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2A7831223
+        for <kvm@vger.kernel.org>; Tue,  3 May 2022 09:18:04 -0700 (PDT)
+Received: by mail-oi1-x236.google.com with SMTP id e189so18654534oia.8
+        for <kvm@vger.kernel.org>; Tue, 03 May 2022 09:18:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=digitalocean.com; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Q51Ia3tetkXHUbkcfKD8S+gdtewHxa7+IUzoOiuzmQM=;
+        b=DXNemHdAsSJnzRfAFmFJDu7rxBi3j2CgdmhDiTTYFUQVZd81cb6Uc+goqkxzhoaGaE
+         rc1WCcIRmRkCpMkO0bJFB3uqZkeysudG4ESGLjj/ionJPTbCH6O/8VdViXZbrD2f4QEs
+         3SJHX2OkoKRviER0B91sBk/C0juHWnWJQLLHU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Q51Ia3tetkXHUbkcfKD8S+gdtewHxa7+IUzoOiuzmQM=;
+        b=1rxr/cA3ldouLuZPgETVFaCNqxCASRPwMNzUbvUKv5ZNlxKYsB2LoHe+fVjQS588ry
+         CU/j7HKv54m6SZSaO62vK5uu6XxEe1jp9vXWwBUaFgRBKUjs7TS+DSh3BbYm21iyT1Wo
+         AblhdcXzQtYMkX5ygwaRZdY3pxsMSiQAgrFDhmZTx6e53i7pV0/5D0nb16xg+Jy9D3uY
+         1u5Om6nJnlTOlPtRDp9GxLnX6ifR0xqWNo4TN2wveTRaLUe3YyC3AXGR6NdiSKdaEu9o
+         Ifq0/4GC/nxaWrfpSmBNvvci1j3EG1bTkRH4Xs4v5rXeA29lE3p2ux9N2V7tySHC/s5/
+         UF6A==
+X-Gm-Message-State: AOAM531wTcICZSa6dyqfAAKcxZRD51WtEaFrSowxAR9vCXbEPTz0t3iO
+        2CU4VDRYif4d+lb4IwUIixEskw==
+X-Google-Smtp-Source: ABdhPJzaqQPI/1igl+iB0OUCnACAJFry6dBnUhBprcHogtJiHS4VmyVxX1E5pHmdYanKyutyiI/1rA==
+X-Received: by 2002:a05:6808:1202:b0:322:dc37:2c3b with SMTP id a2-20020a056808120200b00322dc372c3bmr2217794oil.298.1651594683941;
+        Tue, 03 May 2022 09:18:03 -0700 (PDT)
+Received: from localhost ([2605:a601:ac0f:820:80d8:f53c:c84d:deaa])
+        by smtp.gmail.com with ESMTPSA id 8-20020a056870124800b000e686d13888sm7369543oao.34.2022.05.03.09.18.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 May 2022 09:18:03 -0700 (PDT)
+Date:   Tue, 3 May 2022 11:18:02 -0500
+From:   Seth Forshee <sforshee@digitalocean.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Petr Mladek <pmladek@suse.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, live-patching@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] entry/kvm: Make vCPU tasks exit to userspace when a
+ livepatch is pending
+Message-ID: <YnFVugyU8+XBVRqL@do-x1extreme>
+References: <20220503125729.2556498-1-sforshee@digitalocean.com>
+ <YnE5kTeGmzKkDTWx@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YnE5kTeGmzKkDTWx@google.com>
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -63,8 +76,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Queued, thanks.
+On Tue, May 03, 2022 at 02:17:53PM +0000, Sean Christopherson wrote:
+> On Tue, May 03, 2022, Seth Forshee wrote:
+> > A livepatch migration for a task can only happen when the task is
+> > sleeping or it exits to userspace. This may happen infrequently for a
+> > heavily loaded vCPU task, leading to livepatch transition failures.
+> > 
+> > Fake signals will be sent to tasks which fail to migrate via stack
+> > checking. This will cause running vCPU tasks to exit guest mode, but
+> > since no signal is pending they return to guest execution without
+> > exiting to userspace. Fix this by treating a pending livepatch migration
+> > like a pending signal, exiting to userspace with EINTR. This allows the
+> > migration to complete, and userspace should re-excecute KVM_RUN to
+> > resume guest execution.
+> > 
+> > In my testing, systems where livepatching would timeout after 60 seconds
+> > were able to load livepatches within a couple of seconds with this
+> > change.
+> > 
+> > Signed-off-by: Seth Forshee <sforshee@digitalocean.com>
+> > ---
+> >  kernel/entry/kvm.c | 7 ++++++-
+> >  1 file changed, 6 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/kernel/entry/kvm.c b/kernel/entry/kvm.c
+> > index 9d09f489b60e..efe4b791c253 100644
+> > --- a/kernel/entry/kvm.c
+> > +++ b/kernel/entry/kvm.c
+> > @@ -14,7 +14,12 @@ static int xfer_to_guest_mode_work(struct kvm_vcpu *vcpu, unsigned long ti_work)
+> >  				task_work_run();
+> >  		}
+> >  
+> > -		if (ti_work & _TIF_SIGPENDING) {
+> > +		/*
+> > +		 * When a livepatch migration is pending, force an exit to
+> 
+> Can the changelog and comment use terminology other than migration?  Maybe "transition"?
+> That seems to be prevelant through the livepatch code and docs.  There are already
+> too many meanings for "migration" in KVM, e.g. live migration, page migration, task/vCPU
+> migration, etc...
 
-Paolo
+"Transition" is used a lot, but afaict it refers to the overall state of
+the livepatch. "Migrate" is used a lot less, but it always seems to
+refer to patching a single task, which is why I used that term. But I
+can see the opportunity for confusion, so I'll reword it.
 
+> 
+> > +		 * userspace as though a signal is pending to allow the
+> > +		 * migration to complete.
+> > +		 */
+> > +		if (ti_work & (_TIF_SIGPENDING | _TIF_PATCH_PENDING)) {
+> 
+> _TIF_PATCH_PENDING needs to be in XFER_TO_GUEST_MODE_WORK too, otherwise there's
+> no guarantee KVM will see the flag and invoke xfer_to_guest_mode_handle_work().
 
+Yes, you are right. I was relying on the livepatch code setting
+_TIF_NOTIFY_SIGNAL for vCPU tasks which were running, but it would be
+better to have _TIF_PATCH_PENDING in XFER_TO_GUEST_MODE_WORK too.
+
+Thanks,
+Seth
+
+> 
+> >  			kvm_handle_signal_exit(vcpu);
+> >  			return -EINTR;
+> >  		}
+> > -- 
+> > 2.32.0
+> > 
