@@ -2,84 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A96CD518ABD
-	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 19:11:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7B5B518AC6
+	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 19:14:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240098AbiECRPQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 13:15:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60640 "EHLO
+        id S240128AbiECRRr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 13:17:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238946AbiECRPM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 13:15:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B73671CB2C
-        for <kvm@vger.kernel.org>; Tue,  3 May 2022 10:11:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651597898;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PmDpcAKRURnYViq/lT/qk3yWWoPeoPeLoyR0xccq8g0=;
-        b=OVrN68JxCuXd78k32SJL0CvGSnYSDyf1ulZad/gsZreO+T1BvFkQkDHr3LVVLhIO8f/x6p
-        4/7EnviCqP0ekD9rKOcKvtwjgkVbIPqMWu67ActN5ZAu0aPPaYI2LWK4LR/9X0bmRWvkNe
-        YQPVrpeVRTRWzuWIIRm9ChdMfoSkoH8=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-539-EVMfGqPQPwaoQ1xcc0uZKQ-1; Tue, 03 May 2022 13:11:27 -0400
-X-MC-Unique: EVMfGqPQPwaoQ1xcc0uZKQ-1
-Received: by mail-il1-f197.google.com with SMTP id j16-20020a056e02125000b002cc39632ab9so9325462ilq.9
-        for <kvm@vger.kernel.org>; Tue, 03 May 2022 10:11:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=PmDpcAKRURnYViq/lT/qk3yWWoPeoPeLoyR0xccq8g0=;
-        b=WXWQ8mg4lQQS8fuslNlrf2fI+qYAIw/ZMA4Y4k/uTAWjjYnV9rFKOKNntGsN5TXA4H
-         F1CfJkNfr+GI+4gYyzMu1bxjmTWRlMoW+cG5bjY2p72Y9i1gnFIsDIb9v56CktaCME4R
-         zvgUChCZLjBaZ/XhD0JyI2Ocog53F8EIW+3eLh05LRDUaX/TTRLWDH0SrsQ3Ju1uNuve
-         BkkCd48aD0hIjdW6DMVGOHHREkLCFVn6Aa/WgZLYCd9qdfFyqyJmW8a/wWXCY4a8wXQD
-         vS4U1DqOKcqa3NPuL/pc2TeImvfVvPvny/wcBK0qWq2PjCQiYTGjTD8JZcDwD1oZA15S
-         Rq7Q==
-X-Gm-Message-State: AOAM532qzDtOg0lQGjidHAsFNteUu+LsDtRm3OXxiKnrMfMUfc3pTdk7
-        41cUQuIuft0MnLrdfTLwH/ikj6viDlaDMQVNZ27iOZeJ8FutsS7OJnwL2YvJtXBAM5heoP4gZVG
-        uH9GrEIB+2Mq9
-X-Received: by 2002:a92:3405:0:b0:2c8:70ad:fa86 with SMTP id b5-20020a923405000000b002c870adfa86mr6944738ila.268.1651597887006;
-        Tue, 03 May 2022 10:11:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx7d7yOwkgKoHubTk3YAA9A5VeFfPMRsv66nBH6pKBak6btih6TX9vYxf5tX3YhN+5w9tPJ4w==
-X-Received: by 2002:a92:3405:0:b0:2c8:70ad:fa86 with SMTP id b5-20020a923405000000b002c870adfa86mr6944714ila.268.1651597886678;
-        Tue, 03 May 2022 10:11:26 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id r2-20020a92c502000000b002cde6e352e2sm3578912ilg.44.2022.05.03.10.11.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 May 2022 10:11:25 -0700 (PDT)
-Date:   Tue, 3 May 2022 11:11:24 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Abhishek Sahu <abhsahu@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linux-pm@vger.kernel.org>, <linux-pci@vger.kernel.org>
-Subject: Re: [PATCH v3 4/8] vfio/pci: Add support for setting driver data
- inside core layer
-Message-ID: <20220503111124.38b07a9e.alex.williamson@redhat.com>
-In-Reply-To: <20220425092615.10133-5-abhsahu@nvidia.com>
-References: <20220425092615.10133-1-abhsahu@nvidia.com>
-        <20220425092615.10133-5-abhsahu@nvidia.com>
-Organization: Red Hat
-MIME-Version: 1.0
+        with ESMTP id S240119AbiECRRo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 13:17:44 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A572C1CFF0;
+        Tue,  3 May 2022 10:14:11 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 61A28B81F74;
+        Tue,  3 May 2022 17:14:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE9B8C385A9;
+        Tue,  3 May 2022 17:14:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1651598049;
+        bh=AplqjMJygV5N2GJ3+bH6/snyHg1GxYj0Pi04o+s5Et0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Hi6mCfouyVmjZxSVbORS/GhkRPnI8onFUPKaZL32RKjhslEyhjFCcgfoHKxl3MFD2
+         mp0RhJ/mF5wujJ+csCdONmvxh/iqPpooUX+SqLoMtumsgGEMUxsKDYu98tdyzxgBAy
+         NitGG9dXGgMCuq61CfZaA3pbu0G6Gx6hB5Z6SnIJtDnE/o6YzJrzTunYhIRdZieTTy
+         a1A+R9HMMO5jTOeiDYLmWEOSamfz1rm/PZRd19SrejUhKGJY42IIWuV2fHVXV83LUP
+         2HbvLHn/rN/rrGo6gwV8mwrAaG+pj4VUPcc9E8aWlVLfsT/BggH0NLG8kyLm8Sj6CX
+         on/ZMB7FSaQPw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nlw6A-008hld-7y; Tue, 03 May 2022 18:14:06 +0100
+Date:   Tue, 03 May 2022 18:14:06 +0100
+Message-ID: <87a6by8roh.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v7 6/9] Docs: KVM: Add doc for the bitmap firmware registers
+In-Reply-To: <20220502233853.1233742-7-rananta@google.com>
+References: <20220502233853.1233742-1-rananta@google.com>
+        <20220502233853.1233742-7-rananta@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, drjones@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, catalin.marinas@arm.com, will@kernel.org, pshier@google.com, ricarkol@google.com, oupton@google.com, reijiw@google.com, jingzhangos@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, gshan@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -87,212 +77,189 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 25 Apr 2022 14:56:11 +0530
-Abhishek Sahu <abhsahu@nvidia.com> wrote:
-
-> The vfio driver is divided into two layers: core layer (implemented in
-> vfio_pci_core.c) and parent driver (For example, vfio_pci, mlx5_vfio_pci,
-> hisi_acc_vfio_pci, etc.). All the parent driver calls dev_set_drvdata()
-> and assigns its own structure as driver data. Some of the callback
-> functions are implemented in the core layer and these callback functions
-> provide the reference of 'struct pci_dev' or 'struct device'. Currently,
-> we use vfio_device_get_from_dev() which provides reference to the
-> vfio_device for a device. But this function follows long path to extract
-> the same. There are few cases, where we don't need to go through this
-> long path if we get this through drvdata.
+On Tue, 03 May 2022 00:38:50 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
 > 
-> This patch moves the setting of drvdata inside the core layer. If we see
-> the current implementation of parent driver structure implementation,
-> then 'struct vfio_pci_core_device' is a first member so the pointer of
-> the parent structure and 'struct vfio_pci_core_device' should be the same.
+> Add the documentation for the bitmap firmware registers in
+> hypercalls.rst and api.rst. This includes the details for
+> KVM_REG_ARM_STD_BMAP, KVM_REG_ARM_STD_HYP_BMAP, and
+> KVM_REG_ARM_VENDOR_HYP_BMAP registers.
 > 
-> struct hisi_acc_vf_core_device {
->     struct vfio_pci_core_device core_device;
->     ...
-> };
+> Since the document is growing to carry other hypercall related
+> information, make necessary adjustments to present the document
+> in a generic sense, rather than being PSCI focused.
 > 
-> struct mlx5vf_pci_core_device {
->     struct vfio_pci_core_device core_device;
->     ...
-> };
-> 
-> The vfio_pci.c uses 'struct vfio_pci_core_device' itself.
-> 
-> To support getting the drvdata in both the layers, we can put the
-> restriction to make 'struct vfio_pci_core_device' as a first member.
-> Also, vfio_pci_core_register_device() has this validation which makes sure
-> that this prerequisite is always satisfied.
-> 
-> Signed-off-by: Abhishek Sahu <abhsahu@nvidia.com>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
 > ---
->  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    |  4 ++--
->  drivers/vfio/pci/mlx5/main.c                  |  3 +--
->  drivers/vfio/pci/vfio_pci.c                   |  4 ++--
->  drivers/vfio/pci/vfio_pci_core.c              | 24 ++++++++++++++++---
->  include/linux/vfio_pci_core.h                 |  7 +++++-
->  5 files changed, 32 insertions(+), 10 deletions(-)
+>  Documentation/virt/kvm/api.rst            | 16 ++++
+>  Documentation/virt/kvm/arm/hypercalls.rst | 94 ++++++++++++++++++-----
+>  2 files changed, 92 insertions(+), 18 deletions(-)
 > 
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> index 767b5d47631a..c76c09302a8f 100644
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> @@ -1274,11 +1274,11 @@ static int hisi_acc_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device
->  					  &hisi_acc_vfio_pci_ops);
->  	}
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 4a900cdbc62e..8ae638be79fd 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -2542,6 +2542,22 @@ arm64 firmware pseudo-registers have the following bit pattern::
 >  
-> -	ret = vfio_pci_core_register_device(&hisi_acc_vdev->core_device);
-> +	ret = vfio_pci_core_register_device(&hisi_acc_vdev->core_device,
-> +					    hisi_acc_vdev);
->  	if (ret)
->  		goto out_free;
+>    0x6030 0000 0014 <regno:16>
 >  
-> -	dev_set_drvdata(&pdev->dev, hisi_acc_vdev);
->  	return 0;
->  
->  out_free:
-> diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
-> index bbec5d288fee..8689248f66f3 100644
-> --- a/drivers/vfio/pci/mlx5/main.c
-> +++ b/drivers/vfio/pci/mlx5/main.c
-> @@ -614,11 +614,10 @@ static int mlx5vf_pci_probe(struct pci_dev *pdev,
->  		}
->  	}
->  
-> -	ret = vfio_pci_core_register_device(&mvdev->core_device);
-> +	ret = vfio_pci_core_register_device(&mvdev->core_device, mvdev);
->  	if (ret)
->  		goto out_free;
->  
-> -	dev_set_drvdata(&pdev->dev, mvdev);
->  	return 0;
->  
->  out_free:
-> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> index 2b047469e02f..e0f8027c5cd8 100644
-> --- a/drivers/vfio/pci/vfio_pci.c
-> +++ b/drivers/vfio/pci/vfio_pci.c
-> @@ -151,10 +151,10 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  		return -ENOMEM;
->  	vfio_pci_core_init_device(vdev, pdev, &vfio_pci_ops);
->  
-> -	ret = vfio_pci_core_register_device(vdev);
-> +	ret = vfio_pci_core_register_device(vdev, vdev);
->  	if (ret)
->  		goto out_free;
-> -	dev_set_drvdata(&pdev->dev, vdev);
+> +arm64 bitmap feature firmware pseudo-registers have the following bit pattern::
 > +
->  	return 0;
->  
->  out_free:
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index 1271728a09db..953ac33b2f5f 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -1822,9 +1822,11 @@ void vfio_pci_core_uninit_device(struct vfio_pci_core_device *vdev)
->  }
->  EXPORT_SYMBOL_GPL(vfio_pci_core_uninit_device);
->  
-> -int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
-> +int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev,
-> +				  void *driver_data)
->  {
->  	struct pci_dev *pdev = vdev->pdev;
-> +	struct device *dev = &pdev->dev;
->  	int ret;
->  
->  	if (pdev->hdr_type != PCI_HEADER_TYPE_NORMAL)
-> @@ -1843,6 +1845,17 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
->  		return -EBUSY;
->  	}
->  
-> +	/*
-> +	 * The 'struct vfio_pci_core_device' should be the first member of the
-> +	 * of the structure referenced by 'driver_data' so that it can be
-> +	 * retrieved with dev_get_drvdata() inside vfio-pci core layer.
-> +	 */
-> +	if ((struct vfio_pci_core_device *)driver_data != vdev) {
-> +		pci_warn(pdev, "Invalid driver data\n");
-> +		return -EINVAL;
-> +	}
-
-It seems a bit odd to me to add a driver_data arg to the function,
-which is actually required to point to the same thing as the existing
-function arg.  Is this just to codify the requirement?  Maybe others
-can suggest alternatives.
-
-We also need to collaborate with Jason's patch:
-
-https://lore.kernel.org/all/0-v2-0f36bcf6ec1e+64d-vfio_get_from_dev_jgg@nvidia.com/
-
-(and maybe others)
-
-If we implement a change like proposed here that vfio-pci-core sets
-drvdata then we don't need for each variant driver to implement their
-own wrapper around err_handler or err_detected as Jason proposes in the
-linked patch.  Thanks,
-
-Alex
-
-> +	dev_set_drvdata(dev, driver_data);
+> +  0x6030 0000 0016 <regno:16>
 > +
->  	if (pci_is_root_bus(pdev->bus)) {
->  		ret = vfio_assign_device_set(&vdev->vdev, vdev);
->  	} else if (!pci_probe_reset_slot(pdev->slot)) {
-> @@ -1856,10 +1869,10 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
->  	}
->  
->  	if (ret)
-> -		return ret;
-> +		goto out_drvdata;
->  	ret = vfio_pci_vf_init(vdev);
->  	if (ret)
-> -		return ret;
-> +		goto out_drvdata;
->  	ret = vfio_pci_vga_init(vdev);
->  	if (ret)
->  		goto out_vf;
-> @@ -1890,6 +1903,8 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
->  		vfio_pci_set_power_state(vdev, PCI_D0);
->  out_vf:
->  	vfio_pci_vf_uninit(vdev);
-> +out_drvdata:
-> +	dev_set_drvdata(dev, NULL);
->  	return ret;
->  }
->  EXPORT_SYMBOL_GPL(vfio_pci_core_register_device);
-> @@ -1897,6 +1912,7 @@ EXPORT_SYMBOL_GPL(vfio_pci_core_register_device);
->  void vfio_pci_core_unregister_device(struct vfio_pci_core_device *vdev)
->  {
->  	struct pci_dev *pdev = vdev->pdev;
-> +	struct device *dev = &pdev->dev;
->  
->  	vfio_pci_core_sriov_configure(pdev, 0);
->  
-> @@ -1907,6 +1923,8 @@ void vfio_pci_core_unregister_device(struct vfio_pci_core_device *vdev)
->  
->  	if (!disable_idle_d3)
->  		vfio_pci_set_power_state(vdev, PCI_D0);
+> +The bitmap feature firmware registers exposes the hypercall services that are
+> +available for userspace to configure. The set bits corresponds to the services
+> +that are available for the guests to access. By default, KVM sets all the
+> +supported bits during VM initialization. The userspace can discover the
+> +available services via KVM_GET_ONE_REG, and write back the bitmap corresponding
+> +to the features that it wishes guests to see via KVM_SET_ONE_REG.
 > +
-> +	dev_set_drvdata(dev, NULL);
->  }
->  EXPORT_SYMBOL_GPL(vfio_pci_core_unregister_device);
->  
-> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-> index 505b2a74a479..3c7d65e68340 100644
-> --- a/include/linux/vfio_pci_core.h
-> +++ b/include/linux/vfio_pci_core.h
-> @@ -225,7 +225,12 @@ void vfio_pci_core_close_device(struct vfio_device *core_vdev);
->  void vfio_pci_core_init_device(struct vfio_pci_core_device *vdev,
->  			       struct pci_dev *pdev,
->  			       const struct vfio_device_ops *vfio_pci_ops);
-> -int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev);
-> +/*
-> + * The 'struct vfio_pci_core_device' should be the first member
-> + * of the structure referenced by 'driver_data'.
-> + */
-> +int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev,
-> +				  void *driver_data);
->  void vfio_pci_core_uninit_device(struct vfio_pci_core_device *vdev);
->  void vfio_pci_core_unregister_device(struct vfio_pci_core_device *vdev);
->  int vfio_pci_core_sriov_configure(struct pci_dev *pdev, int nr_virtfn);
+> +Note: These registers are immutable once any of the vCPUs of the VM has run at
+> +least once. A KVM_SET_ONE_REG in such a scenario will return a -EBUSY to userspace.
+> +
 
+The placement is odd, as SVE uses ID 0x0015, and is *after* this.
+
+> +(See Documentation/virt/kvm/arm/hypercalls.rst for more details.)
+> +
+>  arm64 SVE registers have the following bit patterns::
+>  
+>    0x6080 0000 0015 00 <n:5> <slice:5>   Zn bits[2048*slice + 2047 : 2048*slice]
+> diff --git a/Documentation/virt/kvm/arm/hypercalls.rst b/Documentation/virt/kvm/arm/hypercalls.rst
+> index d52c2e83b5b8..383ca766cf36 100644
+> --- a/Documentation/virt/kvm/arm/hypercalls.rst
+> +++ b/Documentation/virt/kvm/arm/hypercalls.rst
+> @@ -1,32 +1,32 @@
+>  .. SPDX-License-Identifier: GPL-2.0
+>  
+> -=========================================
+> -Power State Coordination Interface (PSCI)
+> -=========================================
+> +=======================
+> +ARM Hypercall Interface
+> +=======================
+>  
+> -KVM implements the PSCI (Power State Coordination Interface)
+> -specification in order to provide services such as CPU on/off, reset
+> -and power-off to the guest.
+> +KVM handles the hypercall services as requested by the guests. New hypercall
+> +services are regularly made available by the ARM specification or by KVM (as
+> +vendor services) if they make sense from a virtualization point of view.
+>  
+> -The PSCI specification is regularly updated to provide new features,
+> -and KVM implements these updates if they make sense from a virtualization
+> -point of view.
+> -
+> -This means that a guest booted on two different versions of KVM can
+> -observe two different "firmware" revisions. This could cause issues if
+> -a given guest is tied to a particular PSCI revision (unlikely), or if
+> -a migration causes a different PSCI version to be exposed out of the
+> -blue to an unsuspecting guest.
+> +This means that a guest booted on two different versions of KVM can observe
+> +two different "firmware" revisions. This could cause issues if a given guest
+> +is tied to a particular version of a hypercall service, or if a migration
+> +causes a different version to be exposed out of the blue to an unsuspecting
+> +guest.
+>  
+>  In order to remedy this situation, KVM exposes a set of "firmware
+>  pseudo-registers" that can be manipulated using the GET/SET_ONE_REG
+>  interface. These registers can be saved/restored by userspace, and set
+> -to a convenient value if required.
+> +to a convenient value as required.
+>  
+> -The following register is defined:
+> +The following registers are defined:
+>  
+>  * KVM_REG_ARM_PSCI_VERSION:
+>  
+> +  KVM implements the PSCI (Power State Coordination Interface)
+> +  specification in order to provide services such as CPU on/off, reset
+> +  and power-off to the guest.
+> +
+>    - Only valid if the vcpu has the KVM_ARM_VCPU_PSCI_0_2 feature set
+>      (and thus has already been initialized)
+>    - Returns the current PSCI version on GET_ONE_REG (defaulting to the
+> @@ -74,4 +74,62 @@ The following register is defined:
+>      KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED:
+>        The workaround is always active on this vCPU or it is not needed.
+>  
+> -.. [1] https://developer.arm.com/-/media/developer/pdf/ARM_DEN_0070A_Firmware_interfaces_for_mitigating_CVE-2017-5715.pdf
+> +
+> +Bitmap Feature Firmware Registers
+> +---------------------------------
+> +
+> +Contrary to the above registers, the following registers exposes the hypercall
+> +services in the form of a feature-bitmap to the userspace. This bitmap is
+> +translated to the services that are available to the guest. There is a register
+> +defined per service call owner and can be accessed via GET/SET_ONE_REG interface.
+> +
+> +By default, these registers are set with the upper limit of the features that
+> +are supported. This way userspace can discover all the electable hypercall services
+> +via GET_ONE_REG. The user-space can write-back the desired bitmap back via
+> +SET_ONE_REG. The features for the registers that are untouched, probably because
+> +userspace isn't aware of them, will be exposed as is to the guest.
+> +
+> +Note that KVM would't allow the userspace to configure the registers anymore once
+> +any of the vCPUs has run at least once. Instead, it will return a -EBUSY.
+> +
+
+Formatting is a bit off. We try to stay within the 80 cols format for
+text documents such as this.
+
+> +The psuedo-firmware bitmap register are as follows:
+
+Typo.
+
+> +
+> +* KVM_REG_ARM_STD_BMAP:
+> +    Controls the bitmap of the ARM Standard Secure Service Calls.
+> +
+> +  The following bits are accepted:
+> +
+> +    Bit-0: KVM_REG_ARM_STD_BIT_TRNG_V1_0:
+> +      The bit represents the services offered under v1.0 of ARM True Random
+> +      Number Generator (TRNG) specification, ARM DEN0098.
+> +
+> +* KVM_REG_ARM_STD_HYP_BMAP:
+> +    Controls the bitmap of the ARM Standard Hypervisor Service Calls.
+> +
+> +  The following bits are accepted:
+> +
+> +    Bit-0: KVM_REG_ARM_STD_HYP_BIT_PV_TIME:
+> +      The bit represents the Paravirtualized Time service as represented by
+> +      ARM DEN0057A.
+> +
+> +* KVM_REG_ARM_VENDOR_HYP_BMAP:
+> +    Controls the bitmap of the Vendor specific Hypervisor Service Calls.
+> +
+> +  The following bits are accepted:
+> +
+> +    Bit-0: KVM_REG_ARM_VENDOR_HYP_BIT_FUNC_FEAT
+> +      The bit represents the ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID
+> +      and ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID function-ids.
+> +
+> +    Bit-1: KVM_REG_ARM_VENDOR_HYP_BIT_PTP:
+> +      The bit represents the Precision Time Protocol KVM service.
+> +
+> +Errors:
+> +
+> +    =======  =============================================================
+> +    -ENOENT   Unknown register accessed.
+> +    -EBUSY    Attempt a 'write' to the register after the VM has started.
+> +    -EINVAL   Invalid bitmap written to the register.
+> +    =======  =============================================================
+> +
+> +.. [1] https://developer.arm.com/-/media/developer/pdf/ARM_DEN_0070A_Firmware_interfaces_for_mitigating_CVE-2017-5715.pdf
+> \ No newline at end of file
+> -- 
+> 2.36.0.464.gb9c8b46e94-goog
+> 
+> 
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
