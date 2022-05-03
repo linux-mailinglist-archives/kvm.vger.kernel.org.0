@@ -2,75 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AFDE518C98
-	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 20:49:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EDFE2518D4A
+	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 21:40:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233688AbiECSxH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 14:53:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41070 "EHLO
+        id S241973AbiECTo2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 15:44:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241650AbiECSxF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 14:53:05 -0400
-Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D2B83F8B7
-        for <kvm@vger.kernel.org>; Tue,  3 May 2022 11:49:24 -0700 (PDT)
-Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-2f16645872fso189945697b3.4
-        for <kvm@vger.kernel.org>; Tue, 03 May 2022 11:49:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=2RVFHg4J+XiYNHLd6mO9jBpgTMA8wJDRHLKt8HLDZag=;
-        b=D8eHTcfTZf0aangD3/F507rAzlAJhrb5z3tZDy1kbX20PciK6IfBwz/4PNfuleSx0Q
-         Q0xU7/YQtPzsLyeLgw1EAa1R8W73BCJmdkq5MMpFtJNdr6ZvwYyxjYSWDH3eTqNsXRMB
-         tbCxbVWfMhpiKcj3/ASXTdhk5YNGZjKX6kOl5X4ZHYOs4V0Fa+ZbhGRjXdYgY/Erom7f
-         kmCXngcb/dxpkWWMSzCaE7lFNfN+fVCBzvJ/rNdquW8eZvEpSpOqjnzlsDZ+HgIWJEnj
-         vduTalPXsNoQB+nme19yLfsZu0p6LTEluDGahZfkayRKYiJqoVrjAQpWzOGig+3e8eto
-         7PAA==
+        with ESMTP id S236024AbiECTo0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 15:44:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 72FC71A051
+        for <kvm@vger.kernel.org>; Tue,  3 May 2022 12:40:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651606852;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qyazgKmNz6MvewagZP0q+tDesycMY+RcOXxoB9vbg74=;
+        b=aN6vzCgpEx6x/kWX3eq3hdaxDIq9v4azfSN0FzXf9QxTzKnndNAC6a+xWBhQeEqkTPnKiF
+        JD0z/MrXNdc70tUFodMBtx5fEKyx+QhX/pK0GlZ3NCaV0k2iuhuByfSoNttpwktv7K8rB2
+        KjmSJD+xMTIy4J5+Qk6/FhS9fCFESis=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-587-gftBROQzONSgS8WuwEhu2g-1; Tue, 03 May 2022 15:40:51 -0400
+X-MC-Unique: gftBROQzONSgS8WuwEhu2g-1
+Received: by mail-qk1-f197.google.com with SMTP id bj2-20020a05620a190200b005084968bb24so13089961qkb.23
+        for <kvm@vger.kernel.org>; Tue, 03 May 2022 12:40:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=2RVFHg4J+XiYNHLd6mO9jBpgTMA8wJDRHLKt8HLDZag=;
-        b=0bURFCSNjJbDLqH9dJYba/jWFpjjoRka6zOgZU0zdl3h+t0YgsI/dgR4dZBYK2qb0p
-         ySe0E+IN3nFiXgwn68ajoX/sUu7tGwnDBZUEj9qOI/sCnQTB8td43gG9ueZ9yuhbeUlz
-         TxSZ/AC89WCKkZDLsVglgCbFqNbBBVnOM474OtZJAYd4jBRReyb+FdCfsp2j6rt8Hd85
-         0EbO5rsJzvpmV76FAWBXpaJnQJG6zmlpaw0ccQ4LoGJgI90vSvhyfYxm/0s5IPgZsKmE
-         oAhontrO7XqV1qgkadjCv1Q4aQqe/BA5Q4nOwTlgfinwZigInglptLf9mRzPywr2oTuc
-         F+9g==
-X-Gm-Message-State: AOAM530ptmdlP94sSufOkYE9XeCWPPKhhlt+it7cQ1pmV8ulZswFPULm
-        hACTgwB/w4oPwh6RmU6ah/9I9pfUFIkxoFSrBuAQrw==
-X-Google-Smtp-Source: ABdhPJwlC5LLT8qc2EBu/75ZFoBSCD2aheEv/0F0Bxd/JtnhVZiAZdUSCNlpn7PYi6ZP9gaCJKYUVW6yxjrPsLKdXKQ=
-X-Received: by 2002:a0d:dd90:0:b0:2f8:5459:486e with SMTP id
- g138-20020a0ddd90000000b002f85459486emr16835296ywe.427.1651603763187; Tue, 03
- May 2022 11:49:23 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:reply-to
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=qyazgKmNz6MvewagZP0q+tDesycMY+RcOXxoB9vbg74=;
+        b=BvhUdauxUy+yFa1Kf0Vuhwy4cGAbIEaDWs52nlHJN8XwUJPapqN38ZRTKnb/1Rl513
+         4+Ft/3EBNftoR+V5sxjsvxoD6x4j7pBqV3QsNJQ9qiUan5Q5n6WNXJ6hlQyqUaE+obVs
+         w2mmNZcU4GJOnSSzOZiefE313w6T4yLMg5Aoo9kSIth6jc55G7BmYkSUz/lvi/mOfOIr
+         HjU7814UR1Sh6z0vHTHYZWSWd4NMGuTmkQuVVkWm+XIDzWuwvxwwGFPqnVz8xp/ZqHww
+         +LWKSAnWLn0dw7+QTHuQqJiyba/8blsHYm8FbN3rP9NgPN4FcxIjy8qfXHxdc8xFn08r
+         sNCQ==
+X-Gm-Message-State: AOAM5316pv0lmwPPI8+UfHjA/roki0A9A+BRMNXn+mG0dfMJi1aJmMCB
+        hCPiRFw1bzA1BjtQecJ+MFo+7FZJCPY85NIFxYyvQ5YlMfVJNktwQpWb4bPEU7FLG7irQpSqddr
+        QRavSuju8UGNV
+X-Received: by 2002:ac8:7f0a:0:b0:2f1:f60d:2b39 with SMTP id f10-20020ac87f0a000000b002f1f60d2b39mr16038532qtk.470.1651606850795;
+        Tue, 03 May 2022 12:40:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyUzjOo6cdaooCBJoI2l9Mjw62a4uKABfTpoWuDdloGnEHRUre3/Lrt0n+yxqvJ2c59h8moIA==
+X-Received: by 2002:ac8:7f0a:0:b0:2f1:f60d:2b39 with SMTP id f10-20020ac87f0a000000b002f1f60d2b39mr16038516qtk.470.1651606850552;
+        Tue, 03 May 2022 12:40:50 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id s15-20020a05620a030f00b0069fc13ce254sm6152999qkm.133.2022.05.03.12.40.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 May 2022 12:40:49 -0700 (PDT)
+Message-ID: <7b5f03d4-1db1-c2c4-c7d6-9e6be3a427e2@redhat.com>
+Date:   Tue, 3 May 2022 21:40:44 +0200
 MIME-Version: 1.0
-References: <20220502233853.1233742-1-rananta@google.com> <878rri8r78.wl-maz@kernel.org>
-In-Reply-To: <878rri8r78.wl-maz@kernel.org>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Tue, 3 May 2022 11:49:13 -0700
-Message-ID: <CAJHc60xp=UQT_CX0zoiSjAmkS8JSe+NB5Gr+F5mmybjJAWkUtQ@mail.gmail.com>
-Subject: Re: [PATCH v7 0/9] KVM: arm64: Add support for hypercall services selection
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v2 4/4] KVM: arm64: vgic: Undo work in failed ITS restores
+Content-Language: en-US
+To:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     pbonzini@redhat.com, maz@kernel.org, andre.przywara@arm.com,
+        drjones@redhat.com, alexandru.elisei@arm.com, oupton@google.com,
+        reijiw@google.com, pshier@google.com
+References: <20220427184814.2204513-1-ricarkol@google.com>
+ <20220427184814.2204513-5-ricarkol@google.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20220427184814.2204513-5-ricarkol@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,67 +85,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Hi Ricardo,
 
-On Tue, May 3, 2022 at 10:24 AM Marc Zyngier <maz@kernel.org> wrote:
+On 4/27/22 20:48, Ricardo Koller wrote:
+> Failed ITS restores should clean up all state restored until the
+> failure. There is some cleanup already present when failing to restore
+> some tables, but it's not complete. Add the missing cleanup.
 >
-> On Tue, 03 May 2022 00:38:44 +0100,
-> Raghavendra Rao Ananta <rananta@google.com> wrote:
-> >
-> > Hello,
-> >
-> > Continuing the discussion from [1], the series tries to add support
-> > for the userspace to elect the hypercall services that it wishes
-> > to expose to the guest, rather than the guest discovering them
-> > unconditionally. The idea employed by the series was taken from
-> > [1] as suggested by Marc Z.
+> Note that this changes the behavior in case of a failed restore of the
+> device tables.
+I assume this is acceptable
 >
-> As it took some time to get there, and that there was still a bunch of
-> things to address, I've taken the liberty to apply my own fixes to the
-> series.
+> 	restore ioctl:
+> 	1. restore collection tables
+> 	2. restore device tables
 >
-> Please have a look at [1], and let me know if you're OK with the
-> result. If you are, I'll merge the series for 5.19.
+> With this commit, failures in 2. clean up everything created so far,
+> including state created by 1.
 >
-> Thanks,
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-its.c | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
 >
->         M.
->
-Thank you for speeding up the process; appreciate it. However, the
-series's selftest patches have a dependency on Oliver's
-PSCI_SYSTEM_SUSPEND's selftest patches [1][2]. Can we pull them in
-too?
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 86c26aaa8275..c35534d7393a 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -2222,8 +2222,10 @@ static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
+>  		vcpu = kvm_get_vcpu(kvm, collection->target_addr);
+>  
+>  	irq = vgic_add_lpi(kvm, lpi_id, vcpu);
+> -	if (IS_ERR(irq))
+> +	if (IS_ERR(irq)) {
+> +		its_free_ite(kvm, ite);
+>  		return PTR_ERR(irq);
+> +	}
+>  	ite->irq = irq;
+>  
+>  	return offset;
+> @@ -2491,6 +2493,9 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
+>  	if (ret > 0)
+>  		ret = 0;
+>  
+> +	if (ret < 0)
+> +		vgic_its_free_device_list(its->dev->kvm, its);
+> +
+>  	return ret;
+>  }
+>  
+> @@ -2617,6 +2622,9 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
+>  		read += cte_esz;
+>  	}
+>  
+> +	if (ret < 0)
+> +		vgic_its_free_collection_list(its->dev->kvm, its);
+> +
+>  	return ret;
+>  }
+>  
+> @@ -2648,7 +2656,10 @@ static int vgic_its_restore_tables_v0(struct vgic_its *its)
+>  	if (ret)
+>  		return ret;
+>  
+> -	return vgic_its_restore_device_tables(its);
+> +	ret = vgic_its_restore_device_tables(its);
+> +	if (ret)
+> +		vgic_its_free_collection_list(its->dev->kvm, its);
+> +	return ret;
+>  }
+>  
+>  static int vgic_its_commit_v0(struct vgic_its *its)
 
-aarch64/hypercalls.c: In function =E2=80=98guest_test_hvc=E2=80=99:
-aarch64/hypercalls.c:95:30: error: storage size of =E2=80=98res=E2=80=99 is=
-n=E2=80=99t known
-   95 |         struct arm_smccc_res res;
-      |                              ^~~
-aarch64/hypercalls.c:103:17: warning: implicit declaration of function
-=E2=80=98smccc_hvc=E2=80=99 [-Wimplicit-function-declaration]
-  103 |                 smccc_hvc(hc_info->func_id, hc_info->arg1, 0,
-0, 0, 0, 0, 0, &res);
-      |                 ^~~~~~~~~
+Looks good to me.
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Also, just a couple of readability nits in the fixed version:
 
-1. Patch-2/9, hypercall.c:kvm_hvc_call_default_allowed(), in the
-'default' case, do you think we should probably add a small comment
-that mentions we are checking for func_id in the PSCI range?
-2. Patch-2/9, arm_hypercall.h, clear all the macros in this patch
-itself instead of doing it in increments (unless there's some reason
-that I'm missing)?
+Eric
 
-Regards,
-Raghavendra
 
-[1]: https://lore.kernel.org/all/20220409184549.1681189-10-oupton@google.co=
-m/
-[2]: https://lore.kernel.org/all/20220409184549.1681189-11-oupton@google.co=
-m/
 
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git=
-/log/?h=3Dkvm-arm64/hcall-selection
->
-> --
-> Without deviation from the norm, progress is not possible.
