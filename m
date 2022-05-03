@@ -2,136 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 854C4519275
-	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 01:52:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4318051927D
+	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 01:59:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241688AbiECXzy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 19:55:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38688 "EHLO
+        id S244421AbiEDACm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 20:02:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230087AbiECXzx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 19:55:53 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 823EB2D1C4
-        for <kvm@vger.kernel.org>; Tue,  3 May 2022 16:52:19 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id p6so16726511pjm.1
-        for <kvm@vger.kernel.org>; Tue, 03 May 2022 16:52:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=dIl0jSqv+1IgIMRFplOI2lNE+rXmcECLP08qxYwGJc0=;
-        b=Jlr89hpZSSeBwdTt2G8dGUNqx50RzYQ2avJ34UjBJBOjpoemfQ3SDw5njPWuKl3mZ7
-         SFoXUJ9fjz/960VbtmnV/RLfqLoz/BF81W048v560CA4f3aVV+Ofcw+iwK3DoRSl5ihM
-         sRM5Jar9mB8/zyhK7WTAoSvTWYhlwsKbqYi4ET9ojQCYtjA01r+Avxls3u6W0Pyd9JH9
-         aFUmDU6IIO1tGgqcHlX3yCp9oeVCnErTMfk6LsbGXHlFd4gQzpNhRoN6pPbV/iIuH7W7
-         ZQ3ibuKe/danGYxshGOSQDX4K+3wh7Z5R3Lrrv8NeQnJ6eBq54jlnWMRISeEIcW6qSVU
-         a8jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dIl0jSqv+1IgIMRFplOI2lNE+rXmcECLP08qxYwGJc0=;
-        b=VVewGy2Uoi5PB3aWEhI1xZZnIR7nW0o/DmeBEyjp1EV7kNjeiphxSDGEAtSNaVuREk
-         xmoULRjXbXIMKRVoESaaH9wPf3lbiz6AYLQjQhB29dAmRRb6pGfZOkKLwP8hXvLatJ/b
-         2f1/iYErz6khYIcZOolAjFz6ajODR2VPRsUNhM4+C+9JatXrKeFmZYcmr4gupjEbvog2
-         LyMRuh02VbJkp/6eIuY0omLkNUyNv1fk/cpZaXQUDbNn+34k5fLAMSq7+JQO31M05ZpO
-         0IDbaneQ1FRePWnktoe71h3CqhsqIMmtVMpDz1kGlWxvwdJrh8TPopP46OOfNRmLvC1P
-         idEA==
-X-Gm-Message-State: AOAM531o9vDItOj2cUDZgzSCF4cAZkKJxsA+kqNC3jCXmijYiKrsaOHq
-        AHjGbF4wY1b5zWYR+TA+n6ttTQ==
-X-Google-Smtp-Source: ABdhPJywm9YWJHmbRUz5spi3dSy1OeaSeyXk5Q5GTVC6rernTTo6prNWFLy2KZDG0qUtIoX6JccFyQ==
-X-Received: by 2002:a17:90a:b285:b0:1d9:aee3:fabd with SMTP id c5-20020a17090ab28500b001d9aee3fabdmr7519129pjr.72.1651621938791;
-        Tue, 03 May 2022 16:52:18 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b7-20020a170902b60700b0015e8d4eb256sm6899015pls.160.2022.05.03.16.52.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 May 2022 16:52:18 -0700 (PDT)
-Date:   Tue, 3 May 2022 23:52:14 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Zdenek Kaspar <zkaspar82@gmail.com>
-Cc:     kvm@vger.kernel.org
-Subject: Re: Core2 and v5.18-rc5 troubles
-Message-ID: <YnHALvjWw6E94K53@google.com>
-References: <20220502022959.18aafe13.zkaspar82@gmail.com>
- <20220502190010.7ff820e3.zkaspar82@gmail.com>
- <YnFWT+OdBAOPpZfi@google.com>
- <20220503230727.54476050.zkaspar82@gmail.com>
+        with ESMTP id S230087AbiEDACk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 20:02:40 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB3D91AA;
+        Tue,  3 May 2022 16:59:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651622346; x=1683158346;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=VvdDQ9N6B8BjQR7ex6UTn3y2yUJ12GYZkaDzSacm6Ik=;
+  b=SSgmILqFLK7oOW4doblzja7ylwuvyGXUfbhHRnaU179sdohOGQ8LVrG/
+   tQUWgIiWuBG/rV2rGc0HEoTPIRWcMRrjdNglBDiXhAR6xZcHMOUwgxJ7Q
+   slszpNdI7O2+acEOuz0qp179p6r4P29mbDL+nUjaBx7yxVRwx6lU1Bn06
+   dS4q76OBvyNOny1HnBqbmLzC8UQOJ3poPSXFy7gnf1DtNK+5qHBKuQ5Mw
+   PscfjvQ/36g2vK60BQ/0/cl0pnkbWK9j7NOBbnW3o2osKV1sCdFPtu9Rf
+   pbhot6gCWJ63qQZKMNLt0A6R+I9LUIH6P1tGxoNSR+NI68EeVGNOEyQem
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10336"; a="330609754"
+X-IronPort-AV: E=Sophos;i="5.91,196,1647327600"; 
+   d="scan'208";a="330609754"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2022 16:59:06 -0700
+X-IronPort-AV: E=Sophos;i="5.91,196,1647327600"; 
+   d="scan'208";a="599291454"
+Received: from hsuhsiao-mobl2.gar.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.61.84])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2022 16:59:03 -0700
+Message-ID: <664f8adeb56ba61774f3c845041f016c54e0f96e.camel@intel.com>
+Subject: Re: [PATCH v3 00/21] TDX host kernel support
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com
+Date:   Wed, 04 May 2022 11:59:00 +1200
+In-Reply-To: <fc1ca04d94ad45e79c0297719d5ef50a7c33c352.camel@intel.com>
+References: <cover.1649219184.git.kai.huang@intel.com>
+         <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
+         <ecf718abf864bbb2366209f00d4315ada090aedc.camel@intel.com>
+         <de24ac7e-349c-e49a-70bb-31b9bc867b10@intel.com>
+         <9b388f54f13b34fe684ef77603fc878952e48f87.camel@intel.com>
+         <d98ca73b-2d2d-757d-e937-acc83cfedfb0@intel.com>
+         <c90a10763969077826f42be6f492e3a3e062326b.camel@intel.com>
+         <fc1ca04d94ad45e79c0297719d5ef50a7c33c352.camel@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220503230727.54476050.zkaspar82@gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 03, 2022, Zdenek Kaspar wrote:
-> On Tue, 3 May 2022 16:20:31 +0000 Sean Christopherson <seanjc@google.com> wrote:
-> Bisect is later on my TODO if needed... I build this kernel now on
-> debian/sid (saw some compiler/binutils updates) and added KASAN as
-> Maciej pointed out.
-> [  229.423151] ==================================================================
-> [  229.423284] BUG: KASAN: slab-out-of-bounds in fpu_copy_uabi_to_guest_fpstate+0x86/0x130
+On Fri, 2022-04-29 at 13:40 +1200, Kai Huang wrote:
+> On Thu, 2022-04-28 at 12:58 +1200, Kai Huang wrote:
+> > On Wed, 2022-04-27 at 17:50 -0700, Dave Hansen wrote:
+> > > On 4/27/22 17:37, Kai Huang wrote:
+> > > > On Wed, 2022-04-27 at 14:59 -0700, Dave Hansen wrote:
+> > > > > In 5 years, if someone takes this code and runs it on Intel hardware
+> > > > > with memory hotplug, CPU hotplug, NVDIMMs *AND* TDX support, what happens?
+> > > > 
+> > > > I thought we could document this in the documentation saying that this code can
+> > > > only work on TDX machines that don't have above capabilities (SPR for now).  We
+> > > > can change the code and the documentation  when we add the support of those
+> > > > features in the future, and update the documentation.
+> > > > 
+> > > > If 5 years later someone takes this code, he/she should take a look at the
+> > > > documentation and figure out that he/she should choose a newer kernel if the
+> > > > machine support those features.
+> > > > 
+> > > > I'll think about design solutions if above doesn't look good for you.
+> > > 
+> > > No, it doesn't look good to me.
+> > > 
+> > > You can't just say:
+> > > 
+> > > 	/*
+> > > 	 * This code will eat puppies if used on systems with hotplug.
+> > > 	 */
+> > > 
+> > > and merrily await the puppy bloodbath.
+> > > 
+> > > If it's not compatible, then you have to *MAKE* it not compatible in a
+> > > safe, controlled way.
+> > > 
+> > > > > You can't just ignore the problems because they're not present on one
+> > > > > version of the hardware.
+> > > 
+> > > Please, please read this again ^^
+> > 
+> > OK.  I'll think about solutions and come back later.
+> > > 
+> 
+> Hi Dave,
+> 
+> I think we have two approaches to handle memory hotplug interaction with the TDX
+> module initialization.  
+> 
+> The first approach is simple.  We just block memory from being added as system
+> RAM managed by page allocator when the platform supports TDX [1]. It seems we
+> can add some arch-specific-check to __add_memory_resource() and reject the new
+> memory resource if platform supports TDX.  __add_memory_resource() is called by
+> both __add_memory() and add_memory_driver_managed() so it prevents from adding
+> NVDIMM as system RAM and normal ACPI memory hotplug [2].
 
-Aha!  A clue, Sherlock!  I can reproduce in a VM by hiding XSAVE from the VM; that's
-why this only repros on Core2.
+Hi Dave,
 
-KASAN blames fpu_copy_uabi_to_guest_fpstate() first, but the '3' data corruption
-likely comes from this line in fpu_copy_guest_fpstate_to_uabi(), as the FP+SEE
-mask == 3.
+Try to close how to handle memory hotplug.  Any comments to below?
 
-		/* Make it restorable on a XSAVE enabled host */
-		ustate->xsave.header.xfeatures = XFEATURE_MASK_FPSSE;
+For the first approach, I forgot to think about memory hot-remove case.  If we
+just reject adding new memory resource when TDX is capable on the platform, then
+if the memory is hot-removed, we won't be able to add it back.  My thinking is
+we still want to support memory online/offline because it is purely in software
+but has nothing to do with TDX.  But if one memory resource can be put to
+offline, it seems we don't have any way to prevent it from being removed. 
 
-One or both of these commits is/are to blame, depending on whether we want to blame
-the bad calculation, the first use of the bad calculation, or yell at both.
+So if we do above, on the future platforms when memory hotplug can co-exist with
+TDX, ACPI hot-add and kmem-hot-add memory will be prevented.  However if some
+memory is hot-removed, it won't be able to be added back (even it is included in
+CMR, or TDMRs after TDX module is initialized).
 
-  be50b2065dfa ("kvm: x86: Add support for getting/setting expanded xstate buffer")
-  c60427dd50ba ("x86/fpu: Add uabi_size to guest_fpu")
+Is this behavior acceptable?  Or perhaps I have misunderstanding?
 
-I believe the right way to fix this is to set the starting uABI size to KVM's
-actual base uABI size, struct kvm_xsave.  I'll test the below more broadly and
-send a patch.
+The second approach will behave more nicely, but I don't know whether it is
+worth to do it now.
 
-diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index c049561f373a..99caae7e8b01 100644
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -14,6 +14,8 @@
- #include <asm/traps.h>
- #include <asm/irq_regs.h>
- 
-+#include <uapi/asm/kvm.h>
-+
- #include <linux/hardirq.h>
- #include <linux/pkeys.h>
- #include <linux/vmalloc.h>
-@@ -247,7 +249,20 @@ bool fpu_alloc_guest_fpstate(struct fpu_guest *gfpu)
-        gfpu->fpstate           = fpstate;
-        gfpu->xfeatures         = fpu_user_cfg.default_features;
-        gfpu->perm              = fpu_user_cfg.default_features;
--       gfpu->uabi_size         = fpu_user_cfg.default_size;
-+
-+       /*
-+        * KVM sets the FP+SSE bits in the XSAVE header when copying FPU state
-+        * to userspace, even when XSAVE is unsupported, so that restoring FPU
-+        * state on a different CPU that does support XSAVE can cleanly load
-+        * the incoming state using its natural XSAVE.  In other words, KVM's
-+        * uABI size may be larger than this host's default size.  Conversely,
-+        * the default size should never be larger than KVM's base uABI size;
-+        * all features that can expand the uABI size must be opt-in.
-+        */
-+       gfpu->uabi_size         = sizeof(struct kvm_xsave);
-+       if (WARN_ON_ONCE(fpu_user_cfg.default_size > gfpu->uabi_size))
-+               gfpu->uabi_size = fpu_user_cfg.default_size;
-+
-        fpu_init_guest_permissions(gfpu);
- 
-        return true;
+Btw, below logic when adding a new memory resource has a minor problem, please
+see below...
+
+> 
+> The second approach is relatively more complicated.  Instead of directly
+> rejecting the new memory resource in __add_memory_resource(), we check whether
+> the memory resource can be added based on CMR and the TDX module initialization
+> status.   This is feasible as with the latest public P-SEAMLDR spec, we can get
+> CMR from P-SEAMLDR SEAMCALL[3].  So we can detect P-SEAMLDR and get CMR info
+> during kernel boots.  And in __add_memory_resource() we do below check:
+> 
+> 	tdx_init_disable();	/*similar to cpu_hotplug_disable() */
+> 	if (tdx_module_initialized())
+> 		// reject memory hotplug
+> 	else if (new_memory_resource NOT in CMRs)
+> 		// reject memory hotplug
+> 	else
+> 		allow memory hotplug
+> 	tdx_init_enable();	/*similar to cpu_hotplug_enable() */
+
+...
+
+Should be:
+
+	// prevent racing with TDX module initialization */
+	tdx_init_disable();
+
+	if (tdx_module_initialized()) {
+		if (new_memory_resource in TDMRs)
+			// allow memory hot-add
+		else
+			// reject memory hot-add
+	} else if (new_memory_resource in CMR) {
+		// add new memory to TDX memory so it can be
+		// included into TDMRs
+
+		// allow memory hot-add
+	}
+	else
+		// reject memory hot-add
+	
+	tdx_module_enable();
+
+And when platform doesn't TDX, always allow memory hot-add.
+
+
+> 
+> tdx_init_disable() temporarily disables TDX module initialization by trying to
+> grab the mutex.  If the TDX module initialization is already on going, then it
+> waits until it completes.
+> 
+> This should work better for future platforms, but would requires non-trivial
+> more code as we need to add VMXON/VMXOFF support to the core-kernel to detect
+> CMR using  SEAMCALL.  A side advantage is with VMXON in core-kernel we can
+> shutdown the TDX module in kexec().
+> 
+> But for this series I think the second approach is overkill and we can choose to
+> use the first simple approach?
+> 
+> Any suggestions?
+> 
+> [1] Platform supports TDX means SEAMRR is enabled, and there are at least 2 TDX
+> keyIDs.  Or we can just check SEAMRR is enabled, as in practice a SEAMRR is
+> enabled means the machine is TDX-capable, and for now a TDX-capable machine
+> doesn't support ACPI memory hotplug.
+> 
+> [2] It prevents adding legacy PMEM as system RAM too but I think it's fine.  If
+> user wants legacy PMEM then it is unlikely user will add it back and use as
+> system RAM.  User is unlikely to use legacy PMEM as TD guest memory directly as
+> TD guests is likely to use a new memfd backend which allows private page not
+> accessible from usrspace, so in this way we can exclude legacy PMEM from TDMRs.
+> 
+> [3] Please refer to SEAMLDR.SEAMINFO SEAMCALL in latest P-SEAMLDR spec:
+> https://www.intel.com/content/dam/develop/external/us/en/documents-tps/intel-tdx-seamldr-interface-specification.pdf
+> > > > 
+
