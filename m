@@ -2,128 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 74EFE518661
-	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 16:17:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 47792518664
+	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 16:18:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236861AbiECOVE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 10:21:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45972 "EHLO
+        id S236928AbiECOVd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 10:21:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235673AbiECOVD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 10:21:03 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96EDB27CCE
-        for <kvm@vger.kernel.org>; Tue,  3 May 2022 07:17:30 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id bv19so33732776ejb.6
-        for <kvm@vger.kernel.org>; Tue, 03 May 2022 07:17:30 -0700 (PDT)
+        with ESMTP id S236864AbiECOVb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 10:21:31 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17B6024BEC
+        for <kvm@vger.kernel.org>; Tue,  3 May 2022 07:17:59 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id w17-20020a17090a529100b001db302efed6so2118304pjh.4
+        for <kvm@vger.kernel.org>; Tue, 03 May 2022 07:17:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=fbgMapne1rH6/kKlRXWbC6sN+d3viTII31UcYeBu5g4=;
-        b=p5StzTBTAohsMwlL6jHQBWtTQobIcqESt3kLVZnkNHJSG2DdBFZF7Tgs5QaZmPnlCr
-         F1l8QZ0lnzdHlhRVHnwsSRNzlNALEMzZuSnQCxowMh6uXeXOg3ZbmSEabk7olar1pdpp
-         9pZRvS+REXlThgWE/quskEMYIGVZw1x55jioiJE011eju4WdbP9ZextM5/dSqGnzJ/OA
-         Ip3n3G3Q5wiRXN3pJWPKqD+r0Wk199FnUkUPdXWP8Vhe6xFQIDSvsecKYYscAjJp/an6
-         Yukn9oKICYgAyT+VGWoiAnlgJf7HCdoInuF1DHTluTYZYb7iUxSiRZ05KmZ0heDnRw16
-         aUzw==
+        bh=9TEicqUAE63I8+bhURtXZYPHnUpdWS7u5S5vguxpyrQ=;
+        b=SvUvmzPnXmKqSMLga4gHcCBwanXiyia8gN9hvPGRlLu2ulpt8/vIgmTJjuCOGEOTmn
+         j34uWuews12zyFcQYo2azjKqZTlqyAgiAW9KGyg/rroHrDqy4UcxVtJQM9GHICf4I9hF
+         YX0+ySAO+0aArcPV2b3f7n7dU551X4uFF58Ye8CQKwcNpZLKkEALYpEq2YmEriMsq6/+
+         kbQBuUtKlXihC92w+sIrdgXeEC/rs6dxjRW0lcaIwk9Ir8C9uWfv8vHMp5g5JRswMog2
+         yCY95+ffcBTM791ByG3Rsnotl2nbewtT+jDQFLaYE8aHI9UB9z14PAztGdkeMLfU7dJP
+         +E4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=fbgMapne1rH6/kKlRXWbC6sN+d3viTII31UcYeBu5g4=;
-        b=XlCd8E/hqmXipF8wHhg1MSb8wo5aHpko5kmwQaiCP/3FGc/ZTL2KKrSmTaHulQ3/zl
-         cj789UkbsC4+9M1dNgLHdej345sFwxA3gpbYOr4H/w7uRU9XvIrjHk/NkIaYHH2Kcz+3
-         UO29X6mJexLrTZ8HY5emDJCuAxTtk68Uc9j77fg40D6VpeECh93Lmf4gEHsFQCp9DmB3
-         OJZ4wTeBdDl7PtCyxho9ZiaglChDz7FOvOeN5sQ2t5nFO134Rv05EzntnVQQPi+TUO3z
-         fXS17XVh+BvsUfLYBu42cfjsRCrjLOKFMVwjOX4ejCrtiJDZXEEj9c6HZXLetrRPuuJw
-         uF+g==
-X-Gm-Message-State: AOAM532vi9V72DRFrV9qCOrHDU9NFID5JSKRsKcVDG257x0Tup6l4bFy
-        G9GFwbuoHj4p9KefNl/E+8zVhw==
-X-Google-Smtp-Source: ABdhPJzSpQ9MzxynGtzoIUDLeJ/DfizCDd1t2kS5FNmZLRZhA9C+R6Uh6yCEZ5JtfHxxtU8soK6nAQ==
-X-Received: by 2002:a17:906:d555:b0:6da:ac8c:f66b with SMTP id cr21-20020a170906d55500b006daac8cf66bmr15765063ejc.107.1651587448896;
-        Tue, 03 May 2022 07:17:28 -0700 (PDT)
-Received: from google.com (30.171.91.34.bc.googleusercontent.com. [34.91.171.30])
-        by smtp.gmail.com with ESMTPSA id hg13-20020a1709072ccd00b006f3ef214df3sm4657306ejc.89.2022.05.03.07.17.28
+        bh=9TEicqUAE63I8+bhURtXZYPHnUpdWS7u5S5vguxpyrQ=;
+        b=OFO8CmCR1IF12oT4AXPye2qALT1I284hszrLaVAfk+/FSbebdieV504iIENVP9r+k7
+         I61KAjsTKwbK46LxeKrRPYKcoROAp17dDHOYZpOctWDNEiqGiqKyMvHeqPblPWKDaFgB
+         SNO6o6rHiht0Cj0hDT5pP9Zpwy+oUgZRZg3iiIfCUxlBzbs4XA0BuBhacjB83SaCd4ZH
+         Nb/RRd4zgVeqJDWr6mx09zRUpamxcRKfOUBZaO4RmUo+zccKbI40wVBJey3FZbNQhffW
+         anE1I1vIrnem61x4lI+AdbzmsoHnvuQ4st9ZjxZPLNCCh0WxhW+CmJW/e9Zz/bXAaA5R
+         XvDQ==
+X-Gm-Message-State: AOAM532v2nxLnath4jPOtOg1HJ3nNi9wUXh92/zl0v/y+XzJo9OcEiE2
+        3TBxBP7v4tLnjd1selzjaXszAg==
+X-Google-Smtp-Source: ABdhPJyTwTDHJdiiDTN0Dsj4FBQNu42qUygQhMEnNazehdA1ziyJz/asbePyPbuIpLAhUBSYrSRl3w==
+X-Received: by 2002:a17:90b:4b83:b0:1dc:93c0:b9fc with SMTP id lr3-20020a17090b4b8300b001dc93c0b9fcmr114780pjb.103.1651587477619;
+        Tue, 03 May 2022 07:17:57 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id c24-20020a17090abf1800b001cd4989ff44sm1408334pjs.11.2022.05.03.07.17.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 May 2022 07:17:28 -0700 (PDT)
-Date:   Tue, 3 May 2022 14:17:25 +0000
-From:   Quentin Perret <qperret@google.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>, Ben Gardon <bgardon@google.com>,
-        Peter Shier <pshier@google.com>,
-        David Matlack <dmatlack@google.com>,
+        Tue, 03 May 2022 07:17:57 -0700 (PDT)
+Date:   Tue, 3 May 2022 14:17:53 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Seth Forshee <sforshee@digitalocean.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Petr Mladek <pmladek@suse.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [RFC PATCH 09/17] KVM: arm64: Tear down unlinked page tables in
- parallel walk
-Message-ID: <YnE5dfaC3HpXli26@google.com>
-References: <20220415215901.1737897-1-oupton@google.com>
- <20220415215901.1737897-10-oupton@google.com>
- <YmFactP0GnSp3vEv@google.com>
- <YmGJGIrNVmdqYJj8@google.com>
- <YmLRLf2GQSgA97Kr@google.com>
- <YmMTC2f0DiAU5OtZ@google.com>
+        linux-kernel@vger.kernel.org, live-patching@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] entry/kvm: Make vCPU tasks exit to userspace when a
+ livepatch is pending
+Message-ID: <YnE5kTeGmzKkDTWx@google.com>
+References: <20220503125729.2556498-1-sforshee@digitalocean.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YmMTC2f0DiAU5OtZ@google.com>
+In-Reply-To: <20220503125729.2556498-1-sforshee@digitalocean.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Friday 22 Apr 2022 at 20:41:47 (+0000), Oliver Upton wrote:
-> On Fri, Apr 22, 2022 at 04:00:45PM +0000, Quentin Perret wrote:
-> > On Thursday 21 Apr 2022 at 16:40:56 (+0000), Oliver Upton wrote:
-> > > The other option would be to not touch the subtree at all until the rcu
-> > > callback, as at that point software will not tweak the tables any more.
-> > > No need for atomics/spinning and can just do a boring traversal.
-> > 
-> > Right that is sort of what I had in mind. Note that I'm still trying to
-> > make my mind about the overall approach -- I can see how RCU protection
-> > provides a rather elegant solution to this problem, but this makes the
-> > whole thing inaccessible to e.g. pKVM where RCU is a non-starter.
+On Tue, May 03, 2022, Seth Forshee wrote:
+> A livepatch migration for a task can only happen when the task is
+> sleeping or it exits to userspace. This may happen infrequently for a
+> heavily loaded vCPU task, leading to livepatch transition failures.
 > 
-> Heh, figuring out how to do this for pKVM seemed hard hence my lazy
-> attempt :)
+> Fake signals will be sent to tasks which fail to migrate via stack
+> checking. This will cause running vCPU tasks to exit guest mode, but
+> since no signal is pending they return to guest execution without
+> exiting to userspace. Fix this by treating a pending livepatch migration
+> like a pending signal, exiting to userspace with EINTR. This allows the
+> migration to complete, and userspace should re-excecute KVM_RUN to
+> resume guest execution.
 > 
-> > A
-> > possible alternative that comes to mind would be to have all walkers
-> > take references on the pages as they walk down, and release them on
-> > their way back, but I'm still not sure how to make this race-safe. I'll
-> > have a think ...
+> In my testing, systems where livepatching would timeout after 60 seconds
+> were able to load livepatches within a couple of seconds with this
+> change.
 > 
-> Does pKVM ever collapse tables into blocks? That is the only reason any
-> of this mess ever gets roped in. If not I think it is possible to get
-> away with a rwlock with unmap on the write side and everything else on
-> the read side, right?
+> Signed-off-by: Seth Forshee <sforshee@digitalocean.com>
+> ---
+>  kernel/entry/kvm.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 > 
-> As far as regular KVM goes we get in this business when disabling dirty
-> logging on a memslot. Guest faults will lazily collapse the tables back
-> into blocks. An equally valid implementation would be just to unmap the
-> whole memslot and have the guest build out the tables again, which could
-> work with the aforementioned rwlock.
+> diff --git a/kernel/entry/kvm.c b/kernel/entry/kvm.c
+> index 9d09f489b60e..efe4b791c253 100644
+> --- a/kernel/entry/kvm.c
+> +++ b/kernel/entry/kvm.c
+> @@ -14,7 +14,12 @@ static int xfer_to_guest_mode_work(struct kvm_vcpu *vcpu, unsigned long ti_work)
+>  				task_work_run();
+>  		}
+>  
+> -		if (ti_work & _TIF_SIGPENDING) {
+> +		/*
+> +		 * When a livepatch migration is pending, force an exit to
 
-Apologies for the delay on this one, I was away for a while.
+Can the changelog and comment use terminology other than migration?  Maybe "transition"?
+That seems to be prevelant through the livepatch code and docs.  There are already
+too many meanings for "migration" in KVM, e.g. live migration, page migration, task/vCPU
+migration, etc...
 
-Yup, that all makes sense. FWIW the pKVM use-case I have in mind is
-slightly different. Specifically, in the pKVM world the hypervisor
-maintains a stage-2 for the host, that is all identity mapped. So we use
-nice big block mappings as much as we can. But when a protected guest
-starts, the hypervisor needs to break down the host stage-2 blocks to
-unmap the 4K guest pages from the host (which is where the protection
-comes from in pKVM). And when the guest is torn down, the host can
-reclaim its pages, hence putting us in a position to coallesce its
-stage-2 into nice big blocks again. Note that none of this coallescing
-is currently implemented even in our pKVM prototype, so it's a bit
-unfair to ask you to deal with this stuff now, but clearly it'd be cool
-if there was a way we could make these things coexist and even ideally
-share some code...
+> +		 * userspace as though a signal is pending to allow the
+> +		 * migration to complete.
+> +		 */
+> +		if (ti_work & (_TIF_SIGPENDING | _TIF_PATCH_PENDING)) {
+
+_TIF_PATCH_PENDING needs to be in XFER_TO_GUEST_MODE_WORK too, otherwise there's
+no guarantee KVM will see the flag and invoke xfer_to_guest_mode_handle_work().
+
+>  			kvm_handle_signal_exit(vcpu);
+>  			return -EINTR;
+>  		}
+> -- 
+> 2.32.0
+> 
