@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 230035187E9
-	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 17:07:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CEEF35187E8
+	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 17:07:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237883AbiECPLG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 11:11:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36650 "EHLO
+        id S237899AbiECPLI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 11:11:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237838AbiECPLD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 11:11:03 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DD893A711;
-        Tue,  3 May 2022 08:07:24 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id d17so2213162plg.0;
-        Tue, 03 May 2022 08:07:24 -0700 (PDT)
+        with ESMTP id S237911AbiECPLE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 11:11:04 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AAE53969F;
+        Tue,  3 May 2022 08:07:31 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id t13so14233938pgn.8;
+        Tue, 03 May 2022 08:07:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=AFjKf7LIIV9bqkSfkyb0Gk99B+UCSeheppRzUjzdwAs=;
-        b=K0xJzzo4KtnKlnx+vjzZ81BqWzcL5nAJjuYugJQaIqP9NIvvTSR2vNAWVJjqW+04F3
-         scr+EEsLAIm7zi5r8yBcw2ZybdPAEqOu46RrH+HJXQYMWXe1ieoPOa7xTcEvSxQ5EwuL
-         LK+wz5PqtDZZKRucXU3VVOkTa9naWU+h9CL/nXd54cuOdyLD0IVuam2A0HIyGyeXuKZE
-         PXfmnJhmsCElXphvbfJpSFWGNkWW6J25z54PntDORmcAgSimKVWmhLVqE7Pq9GDn5Chr
-         S1lTzNgyZlT41SmxxZkaAhbn52hu5PqvlL1An3bdozIL/QoYYoN5vidOkDZVS+THuKAs
-         O5pg==
+        bh=EZO0FfzGaND0LPzWqKkRZ01ZZcZI/mFzJ/gCyTl0eyA=;
+        b=VO9ukxRL5ymaVr8gWWqs8jhW3T2lT41YAoRfa3txuvPz4Iyl26FO5m0ix9+2tHEJQV
+         9Fh/Ebtyj9sqqZk/lTDCLVNTRq1OUsty5lEyFBOrNY4E/aLflt1JdAS6QVYq/hXkvHqN
+         3ryV9ybn+xkP9km/w8qrk+VYzmNnRPxcH1+BeNLiYc2Jqp2dpsPh1dQ2Ux6p7fPgwJgT
+         SauEQX4w9cTuuceJb3MjQA3jYYbXv3usbLem3YHgyXBFanTT70+T0X1pOWpE1PUBZA8Q
+         yMAOPqNqEbBMhQDuxahEKsLQJmidKcLKJ+JEanzFTRHQqypwrMmGT08LyXaj8oqkNOUC
+         YzpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=AFjKf7LIIV9bqkSfkyb0Gk99B+UCSeheppRzUjzdwAs=;
-        b=8JZZTK6SAfDbU/Cyrhl7+DpIf74QL/KXIqZdIX9yEgyJeCu1I5U7VT2ADvfADJG1kM
-         y6UNG9QBQW32Hv3oW2lAy4aXWrln7vaqCO+7boPoZOm1DrWO9qFf95cihZKLLT72w8PQ
-         wyR79Y7CiVAZUXcrYGdZZRE2bgHs1fu4ywxGp44rakOJUd7Vao4uYlZwCsVkLAeAs0uT
-         807QzBf/Qn8TbQWReCQbhBI90b95pu4esgwJGVjuJzIeZ+3gMBgmv6zIDW7rBb7gUg9W
-         tFxjd4VnAWIzA7AcKHC/OJ9AoI5mUUq4M0+EO6fyKVCFXKDGBF1L4E2KegVfha4KJJYK
-         D0Gg==
-X-Gm-Message-State: AOAM5324AO2Nbf145snBenCrYbcUsNKr7j6GZ/ERWb7oOV3gKzMmgMTj
-        rBCVkjqRMip49ZP7/YUHcC/rInV3Na4=
-X-Google-Smtp-Source: ABdhPJzoJV9SGSC8eyz9eKiMFuDNF/NsGOVk20jcw7EUUKVxnv7qg2FJYOpzJYqBcXUOJniJiIx1nA==
-X-Received: by 2002:a17:902:ec83:b0:15e:b5d2:a81b with SMTP id x3-20020a170902ec8300b0015eb5d2a81bmr3970886plg.64.1651590443899;
-        Tue, 03 May 2022 08:07:23 -0700 (PDT)
+        bh=EZO0FfzGaND0LPzWqKkRZ01ZZcZI/mFzJ/gCyTl0eyA=;
+        b=zaSMLRfBoVmkBeuh0czkM19tLQmX7UfkbwV5SGXwq1CWsYOKe3mjpq8h5Hxxw1h7Gl
+         NG1Jn0UWh7CX65hg+64PO8f759cP2xmk2PmeltrCnnZC9nRckva65MP2hUtbTLAd+QN/
+         O1LSHjf2+Av+OM/KsNykjjjWQvIM2A6SqGH2/+VKM410BgKCXmJuc58eRfqXDSg2+htb
+         gW7wU38D3/45ThdZf10/tiJoJXOQ4WDTfSmqxPZzdfVM5NPfjCmfzf18UpFPTYMopKPD
+         Qo6dGnkKC9j1q1A5q10tI/mzPFlF/JOS7hfbIeagWBjPM+bGumupxf/e87gci27muis/
+         IYUQ==
+X-Gm-Message-State: AOAM531W/Rk7NyDu5/mzZ8zPc7ypkq5rv57qn+Z+Md/dWqzi6sepbUr8
+        +zdbdQ5yTr2w3MoBV+7VNuVcEwyO9Qw=
+X-Google-Smtp-Source: ABdhPJyVG47HE6rJDbmU53GOQw3j2KiQwxvve94OB5hT/Z04wpQwhvSMGEa6DZGc/MsJkbLf6i7fkA==
+X-Received: by 2002:a63:4:0:b0:3ab:17c6:e0ce with SMTP id 4-20020a630004000000b003ab17c6e0cemr14143744pga.511.1651590450750;
+        Tue, 03 May 2022 08:07:30 -0700 (PDT)
 Received: from localhost ([47.251.4.198])
-        by smtp.gmail.com with ESMTPSA id k15-20020a170902ce0f00b0015e8d4eb286sm6466299plg.208.2022.05.03.08.07.22
+        by smtp.gmail.com with ESMTPSA id y1-20020a636401000000b003c1424a25a9sm13436698pgb.2.2022.05.03.08.07.29
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 03 May 2022 08:07:23 -0700 (PDT)
+        Tue, 03 May 2022 08:07:30 -0700 (PDT)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -60,9 +60,9 @@ Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH V2 4/7] KVM: X86/MMU: Activate special shadow pages and remove old logic
-Date:   Tue,  3 May 2022 23:07:32 +0800
-Message-Id: <20220503150735.32723-5-jiangshanlai@gmail.com>
+Subject: [PATCH V2 5/7] KVM: X86/MMU: Remove the check of the return value of to_shadow_page()
+Date:   Tue,  3 May 2022 23:07:33 +0800
+Message-Id: <20220503150735.32723-6-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20220503150735.32723-1-jiangshanlai@gmail.com>
 References: <20220503150735.32723-1-jiangshanlai@gmail.com>
@@ -80,314 +80,132 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-Activate special shadow pages by allocate special shadow pages in
-mmu_alloc_direct_roots() and mmu_alloc_shadow_roots().
+Remove the check of the return value of to_shadow_page() in
+mmu_free_root_page(), kvm_mmu_free_guest_mode_roots(), is_unsync_root()
+and is_tdp_mmu() because it can not return NULL.
 
-Make shadow walkings walk from the topmost shadow page even it is
-special shadow page so that they can be walked like normal root
-and shadowed PDPTEs can be made and installed on-demand.
+Remove the check of the return value of to_shadow_page() in
+is_page_fault_stale() and is_obsolete_root() because it can not return
+NULL and the obsoleting for special shadow page is already handled by
+a different way.
 
-Walking from the topmost causes FNAME(fetch) needs to visit high level
-special shadow pages and allocate special shadow pages when shadowing
-NPT for 32bit L1 in 64bit host, so change FNAME(fetch) and
-FNAME(walk_addr_generic) to handle it for affected code.
-
-Do sync from the topmost in kvm_mmu_sync_roots() and simplifies
-the code.
-
-Now all the root pages and pagetable pointed by a present spte in
-struct kvm_mmu are associated by struct kvm_mmu_page, and
-to_shadow_page() is guaranteed to be not NULL.
-
-Affect cases are those that using_special_root_page() return true.
+When the obsoleting process is done, all the obsoleted shadow pages are
+already unlinked from the special pages by the help of the parent rmap
+of the children and the special pages become theoretically valid again.
+The special shadow page can be freed if is_obsolete_sp() return true,
+or be reused if is_obsolete_sp() return false.
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 ---
- arch/x86/kvm/mmu/mmu.c         | 168 +++------------------------------
- arch/x86/kvm/mmu/paging_tmpl.h |  14 ++-
- 2 files changed, 24 insertions(+), 158 deletions(-)
+ arch/x86/kvm/mmu/mmu.c     | 44 +++-----------------------------------
+ arch/x86/kvm/mmu/tdp_mmu.h |  7 +-----
+ 2 files changed, 4 insertions(+), 47 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 3fe70ad3bda2..6f626d7e8ebb 100644
+index 6f626d7e8ebb..bcb3e2730277 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2214,26 +2214,6 @@ static void shadow_walk_init_using_root(struct kvm_shadow_walk_iterator *iterato
- 	iterator->addr = addr;
- 	iterator->shadow_addr = root;
- 	iterator->level = vcpu->arch.mmu->root_role.level;
--
--	if (iterator->level >= PT64_ROOT_4LEVEL &&
--	    vcpu->arch.mmu->cpu_role.base.level < PT64_ROOT_4LEVEL &&
--	    !vcpu->arch.mmu->root_role.direct)
--		iterator->level = PT32E_ROOT_LEVEL;
--
--	if (iterator->level == PT32E_ROOT_LEVEL) {
--		/*
--		 * prev_root is currently only used for 64-bit hosts. So only
--		 * the active root_hpa is valid here.
--		 */
--		BUG_ON(root != vcpu->arch.mmu->root.hpa);
--
--		iterator->shadow_addr
--			= vcpu->arch.mmu->pae_root[(addr >> 30) & 3];
--		iterator->shadow_addr &= PT64_BASE_ADDR_MASK;
--		--iterator->level;
--		if (!iterator->shadow_addr)
--			iterator->level = 0;
--	}
- }
+@@ -3318,8 +3318,6 @@ static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
+ 		return;
  
- static void shadow_walk_init(struct kvm_shadow_walk_iterator *iterator,
-@@ -3412,21 +3392,10 @@ void kvm_mmu_free_roots(struct kvm *kvm, struct kvm_mmu *mmu,
- 					   &invalid_list);
+ 	sp = to_shadow_page(*root_hpa & PT64_BASE_ADDR_MASK);
+-	if (WARN_ON(!sp))
+-		return;
  
- 	if (free_active_root) {
--		if (to_shadow_page(mmu->root.hpa)) {
--			if (using_special_root_page(mmu))
--				mmu_free_special_root_page(kvm, mmu);
--			else
--				mmu_free_root_page(kvm, &mmu->root.hpa, &invalid_list);
--		} else if (mmu->pae_root) {
--			for (i = 0; i < 4; ++i) {
--				if (!IS_VALID_PAE_ROOT(mmu->pae_root[i]))
--					continue;
--
--				mmu_free_root_page(kvm, &mmu->pae_root[i],
--						   &invalid_list);
--				mmu->pae_root[i] = INVALID_PAE_ROOT;
--			}
--		}
-+		if (using_special_root_page(mmu))
-+			mmu_free_special_root_page(kvm, mmu);
-+		else
-+			mmu_free_root_page(kvm, &mmu->root.hpa, &invalid_list);
- 		mmu->root.hpa = INVALID_PAGE;
- 		mmu->root.pgd = 0;
+ 	if (is_tdp_mmu_page(sp))
+ 		kvm_tdp_mmu_put_root(kvm, sp, false);
+@@ -3422,8 +3420,7 @@ void kvm_mmu_free_guest_mode_roots(struct kvm *kvm, struct kvm_mmu *mmu)
+ 		if (!VALID_PAGE(root_hpa))
+ 			continue;
+ 
+-		if (!to_shadow_page(root_hpa) ||
+-			to_shadow_page(root_hpa)->role.guest_mode)
++		if (to_shadow_page(root_hpa)->role.guest_mode)
+ 			roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
  	}
-@@ -3491,7 +3460,6 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
- 	struct kvm_mmu *mmu = vcpu->arch.mmu;
- 	u8 shadow_root_level = mmu->root_role.level;
- 	hpa_t root;
--	unsigned i;
- 	int r;
  
- 	write_lock(&vcpu->kvm->mmu_lock);
-@@ -3502,24 +3470,9 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
- 	if (is_tdp_mmu_enabled(vcpu->kvm)) {
- 		root = kvm_tdp_mmu_get_vcpu_root_hpa(vcpu);
- 		mmu->root.hpa = root;
--	} else if (shadow_root_level >= PT64_ROOT_4LEVEL) {
-+	} else if (shadow_root_level >= PT32E_ROOT_LEVEL) {
- 		root = mmu_alloc_root(vcpu, 0, 0, shadow_root_level, true);
- 		mmu->root.hpa = root;
--	} else if (shadow_root_level == PT32E_ROOT_LEVEL) {
--		if (WARN_ON_ONCE(!mmu->pae_root)) {
--			r = -EIO;
--			goto out_unlock;
--		}
+@@ -3673,13 +3670,6 @@ static bool is_unsync_root(hpa_t root)
+ 	smp_rmb();
+ 	sp = to_shadow_page(root);
+ 
+-	/*
+-	 * PAE roots (somewhat arbitrarily) aren't backed by shadow pages, the
+-	 * PDPTEs for a given PAE root need to be synchronized individually.
+-	 */
+-	if (WARN_ON_ONCE(!sp))
+-		return false;
 -
--		for (i = 0; i < 4; ++i) {
--			WARN_ON_ONCE(IS_VALID_PAE_ROOT(mmu->pae_root[i]));
--
--			root = mmu_alloc_root(vcpu, i << (30 - PAGE_SHIFT),
--					      i << 30, PT32_ROOT_LEVEL, true);
--			mmu->pae_root[i] = root | PT_PRESENT_MASK |
--					   shadow_me_mask;
--		}
--		mmu->root.hpa = __pa(mmu->pae_root);
- 	} else {
- 		WARN_ONCE(1, "Bad TDP root level = %d\n", shadow_root_level);
- 		r = -EIO;
-@@ -3597,10 +3550,8 @@ static int mmu_first_shadow_root_alloc(struct kvm *kvm)
- static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+ 	if (sp->unsync || sp->unsync_children)
+ 		return true;
+ 
+@@ -3975,21 +3965,7 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+ static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
+ 				struct kvm_page_fault *fault, int mmu_seq)
  {
- 	struct kvm_mmu *mmu = vcpu->arch.mmu;
--	u64 pdptrs[4], pm_mask;
- 	gfn_t root_gfn, root_pgd;
- 	hpa_t root;
--	unsigned i;
- 	int r;
- 
- 	root_pgd = mmu->get_guest_pgd(vcpu);
-@@ -3609,21 +3560,6 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
- 	if (mmu_check_root(vcpu, root_gfn))
- 		return 1;
- 
--	/*
--	 * On SVM, reading PDPTRs might access guest memory, which might fault
--	 * and thus might sleep.  Grab the PDPTRs before acquiring mmu_lock.
--	 */
--	if (mmu->cpu_role.base.level == PT32E_ROOT_LEVEL) {
--		for (i = 0; i < 4; ++i) {
--			pdptrs[i] = mmu->get_pdptr(vcpu, i);
--			if (!(pdptrs[i] & PT_PRESENT_MASK))
--				continue;
+-	struct kvm_mmu_page *sp = to_shadow_page(vcpu->arch.mmu->root.hpa);
 -
--			if (mmu_check_root(vcpu, pdptrs[i] >> PAGE_SHIFT))
--				return 1;
--		}
--	}
--
- 	r = mmu_first_shadow_root_alloc(vcpu->kvm);
- 	if (r)
- 		return r;
-@@ -3633,70 +3569,9 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
- 	if (r < 0)
- 		goto out_unlock;
- 
--	/*
--	 * Do we shadow a long mode page table? If so we need to
--	 * write-protect the guests page table root.
--	 */
--	if (mmu->cpu_role.base.level >= PT64_ROOT_4LEVEL) {
--		root = mmu_alloc_root(vcpu, root_gfn, 0,
--				      mmu->root_role.level, false);
--		mmu->root.hpa = root;
--		goto set_root_pgd;
--	}
--
--	if (WARN_ON_ONCE(!mmu->pae_root)) {
--		r = -EIO;
--		goto out_unlock;
--	}
+-	/* Special roots, e.g. pae_root, are not backed by shadow pages. */
+-	if (sp && is_obsolete_sp(vcpu->kvm, sp))
+-		return true;
 -
 -	/*
--	 * We shadow a 32 bit page table. This may be a legacy 2-level
--	 * or a PAE 3-level page table. In either case we need to be aware that
--	 * the shadow page table may be a PAE or a long mode page table.
+-	 * Roots without an associated shadow page are considered invalid if
+-	 * there is a pending request to free obsolete roots.  The request is
+-	 * only a hint that the current root _may_ be obsolete and needs to be
+-	 * reloaded, e.g. if the guest frees a PGD that KVM is tracking as a
+-	 * previous root, then __kvm_mmu_prepare_zap_page() signals all vCPUs
+-	 * to reload even if no vCPU is actively using the root.
 -	 */
--	pm_mask = PT_PRESENT_MASK | shadow_me_value;
--	if (mmu->root_role.level >= PT64_ROOT_4LEVEL) {
--		pm_mask |= PT_ACCESSED_MASK | PT_WRITABLE_MASK | PT_USER_MASK;
--
--		if (WARN_ON_ONCE(!mmu->pml4_root)) {
--			r = -EIO;
--			goto out_unlock;
--		}
--		mmu->pml4_root[0] = __pa(mmu->pae_root) | pm_mask;
--
--		if (mmu->root_role.level == PT64_ROOT_5LEVEL) {
--			if (WARN_ON_ONCE(!mmu->pml5_root)) {
--				r = -EIO;
--				goto out_unlock;
--			}
--			mmu->pml5_root[0] = __pa(mmu->pml4_root) | pm_mask;
--		}
--	}
--
--	for (i = 0; i < 4; ++i) {
--		WARN_ON_ONCE(IS_VALID_PAE_ROOT(mmu->pae_root[i]));
--
--		if (mmu->cpu_role.base.level == PT32E_ROOT_LEVEL) {
--			if (!(pdptrs[i] & PT_PRESENT_MASK)) {
--				mmu->pae_root[i] = INVALID_PAE_ROOT;
--				continue;
--			}
--			root_gfn = pdptrs[i] >> PAGE_SHIFT;
--		}
--
--		root = mmu_alloc_root(vcpu, root_gfn, i << 30,
--				      PT32_ROOT_LEVEL, false);
--		mmu->pae_root[i] = root | pm_mask;
--	}
--
--	if (mmu->root_role.level == PT64_ROOT_5LEVEL)
--		mmu->root.hpa = __pa(mmu->pml5_root);
--	else if (mmu->root_role.level == PT64_ROOT_4LEVEL)
--		mmu->root.hpa = __pa(mmu->pml4_root);
--	else
--		mmu->root.hpa = __pa(mmu->pae_root);
--
--set_root_pgd:
-+	root = mmu_alloc_root(vcpu, root_gfn, 0,
-+			      mmu->root_role.level, false);
-+	mmu->root.hpa = root;
- 	mmu->root.pgd = root_pgd;
- out_unlock:
- 	write_unlock(&vcpu->kvm->mmu_lock);
-@@ -3813,8 +3688,7 @@ static bool is_unsync_root(hpa_t root)
+-	if (!sp && kvm_test_request(KVM_REQ_MMU_FREE_OBSOLETE_ROOTS, vcpu))
++	if (is_obsolete_sp(vcpu->kvm, to_shadow_page(vcpu->arch.mmu->root.hpa)))
+ 		return true;
  
- void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu)
+ 	return fault->slot &&
+@@ -5094,24 +5070,10 @@ void kvm_mmu_unload(struct kvm_vcpu *vcpu)
+ 
+ static bool is_obsolete_root(struct kvm *kvm, hpa_t root_hpa)
  {
--	int i;
 -	struct kvm_mmu_page *sp;
-+	hpa_t root = vcpu->arch.mmu->root.hpa;
+-
+ 	if (!VALID_PAGE(root_hpa))
+ 		return false;
  
- 	if (vcpu->arch.mmu->root_role.direct)
- 		return;
-@@ -3824,31 +3698,11 @@ void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu)
- 
- 	vcpu_clear_mmio_info(vcpu, MMIO_GVA_ANY);
- 
--	if (vcpu->arch.mmu->cpu_role.base.level >= PT64_ROOT_4LEVEL) {
--		hpa_t root = vcpu->arch.mmu->root.hpa;
--		sp = to_shadow_page(root);
--
--		if (!is_unsync_root(root))
--			return;
--
--		write_lock(&vcpu->kvm->mmu_lock);
--		mmu_sync_children(vcpu, sp, true);
--		write_unlock(&vcpu->kvm->mmu_lock);
-+	if (!is_unsync_root(root))
- 		return;
--	}
- 
- 	write_lock(&vcpu->kvm->mmu_lock);
--
--	for (i = 0; i < 4; ++i) {
--		hpa_t root = vcpu->arch.mmu->pae_root[i];
--
--		if (IS_VALID_PAE_ROOT(root)) {
--			root &= PT64_BASE_ADDR_MASK;
--			sp = to_shadow_page(root);
--			mmu_sync_children(vcpu, sp, true);
--		}
--	}
--
-+	mmu_sync_children(vcpu, to_shadow_page(root), true);
- 	write_unlock(&vcpu->kvm->mmu_lock);
+-	/*
+-	 * When freeing obsolete roots, treat roots as obsolete if they don't
+-	 * have an associated shadow page.  This does mean KVM will get false
+-	 * positives and free roots that don't strictly need to be freed, but
+-	 * such false positives are relatively rare:
+-	 *
+-	 *  (a) only PAE paging and nested NPT has roots without shadow pages
+-	 *  (b) remote reloads due to a memslot update obsoletes _all_ roots
+-	 *  (c) KVM doesn't track previous roots for PAE paging, and the guest
+-	 *      is unlikely to zap an in-use PGD.
+-	 */
+-	sp = to_shadow_page(root_hpa);
+-	return !sp || is_obsolete_sp(kvm, sp);
++	return is_obsolete_sp(kvm, to_shadow_page(root_hpa));
  }
  
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index b025decf610d..19ef31a078fa 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -316,6 +316,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 	u16 errcode = 0;
- 	gpa_t real_gpa;
- 	gfn_t gfn;
-+	int i;
+ static void __kvm_mmu_free_obsolete_roots(struct kvm *kvm, struct kvm_mmu *mmu)
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+index c163f7cc23ca..5779a2a7161e 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.h
++++ b/arch/x86/kvm/mmu/tdp_mmu.h
+@@ -78,13 +78,8 @@ static inline bool is_tdp_mmu(struct kvm_mmu *mmu)
+ 	if (WARN_ON(!VALID_PAGE(hpa)))
+ 		return false;
  
- 	trace_kvm_mmu_pagetable_walk(addr, access);
- retry_walk:
-@@ -323,6 +324,16 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 	pte           = mmu->get_guest_pgd(vcpu);
- 	have_ad       = PT_HAVE_ACCESSED_DIRTY(mmu);
- 
-+	/*
-+	 * FNAME(fetch) might pass these values to allocate special shadow
-+	 * page.  Although the gfn is not used at the end, it is better not
-+	 * to pass an uninitialized value to kvm_mmu_get_page().
-+	 */
-+	for (i = 2; i < PT_MAX_FULL_LEVELS; i++) {
-+		walker->table_gfn[i] = 0;
-+		walker->pt_access[i] = ACC_ALL;
-+	}
-+
- #if PTTYPE == 64
- 	walk_nx_mask = 1ULL << PT64_NX_SHIFT;
- 	if (walker->level == PT32E_ROOT_LEVEL) {
-@@ -675,7 +686,8 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
- 		 * Verify that the gpte in the page we've just write
- 		 * protected is still there.
- 		 */
--		if (FNAME(gpte_changed)(vcpu, gw, it.level - 1))
-+		if (it.level - 1 < top_level &&
-+		    FNAME(gpte_changed)(vcpu, gw, it.level - 1))
- 			goto out_gpte_changed;
- 
- 		if (sp)
+-	/*
+-	 * A NULL shadow page is legal when shadowing a non-paging guest with
+-	 * PAE paging, as the MMU will be direct with root_hpa pointing at the
+-	 * pae_root page, not a shadow page.
+-	 */
+ 	sp = to_shadow_page(hpa);
+-	return sp && is_tdp_mmu_page(sp) && sp->root_count;
++	return is_tdp_mmu_page(sp) && sp->root_count;
+ }
+ #else
+ static inline int kvm_mmu_init_tdp_mmu(struct kvm *kvm) { return 0; }
 -- 
 2.19.1.6.gb485710b
 
