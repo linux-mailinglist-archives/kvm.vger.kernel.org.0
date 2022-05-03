@@ -2,172 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A76ED517CF9
-	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 08:02:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EB8E517E27
+	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 09:13:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229480AbiECGGG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 02:06:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51682 "EHLO
+        id S231571AbiECHQj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 03:16:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229616AbiECGFx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 02:05:53 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4176033A36
-        for <kvm@vger.kernel.org>; Mon,  2 May 2022 23:02:20 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id q13-20020a638c4d000000b003821725ad66so7983893pgn.23
-        for <kvm@vger.kernel.org>; Mon, 02 May 2022 23:02:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=lyIfp9262fAQLqy8qC0Pz4SUM4FAzF4N7A6nbmSHB2c=;
-        b=NTvfdy6F18lFgUV8clR+0g6Lw3bcq5UgO40+92jzBn0iZGYe3Xw9MVeBL3+fvWQw5N
-         LB3zzRWSU4HLPPJXB/Dyw7ffCQbjT5/AAfQ9WdrD5WumB7wAGc8Ii16bK1GqoyShUxFT
-         T3kMr/bzKtBbctXnCXxWSUOFUbNsLWTvcedPoBzLgEc0OoGSRyBn6HFbR1QI6Sxm0ib1
-         LETkvqwaLmlU1m3vcCJyPISK9GXof6Kzpm1nbZPFsnyvcGewnf1XII3NShtf5PlhixsL
-         o+7dDUpiE1S+Xes0LqAZedN1LJOIxguMZTGVLGJBoZivv+psCSQs/f/P1ED6jOuNtCkh
-         UBAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=lyIfp9262fAQLqy8qC0Pz4SUM4FAzF4N7A6nbmSHB2c=;
-        b=GK/ZHrDFus0Ijf8VqiQD0k/2jrL3tWuIUcf+N9kZY3WYACMytXexSQy2ieLjpcNe9a
-         Q/c3ujkFzAuoQ/hKiREvLL+dKlsKfVMHhwYMKwfIkyNS2cEIwE5xuxWbBr/FnI2PK+8/
-         9Q7jrZQoJNSifAU7x+UIyeBqwVaditJ5q9y7CbnRD3KleuT0Iyv6F+qJ9n9gvDHzRGMl
-         2LJBTLX143Ib/umqBDstmVa/3dYOPCmQnoRdh4Kj0FHui0GdSXf6h4f6TmKPrcwBlUFY
-         lG+arvtgWvonTgVyi4Ch/zTzQvTDPA3NA6uv+bFv9aPJT1oR8WI8SHa5SaYBLaFad0ff
-         1yVg==
-X-Gm-Message-State: AOAM533oxFTQdf79zfRM+RF6uzmvaX6cx1Cid2cj1bI2zaSVUP9X57rr
-        chbwIXffSujPEp3x1eDqAOxYhiMdrkY=
-X-Google-Smtp-Source: ABdhPJySoUR5II5RZFESdkmpRUNaWMWZc4db9m57Xb50n4CBJPr51KRBblc9PtMJAUv+qFnKQOynLlQ7TLQ=
-X-Received: from oupton3.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:21eb])
- (user=oupton job=sendgmr) by 2002:a17:90b:e89:b0:1dc:18dc:26a0 with SMTP id
- fv9-20020a17090b0e8900b001dc18dc26a0mr2986517pjb.188.1651557739605; Mon, 02
- May 2022 23:02:19 -0700 (PDT)
-Date:   Tue,  3 May 2022 06:02:05 +0000
-In-Reply-To: <20220503060205.2823727-1-oupton@google.com>
-Message-Id: <20220503060205.2823727-8-oupton@google.com>
-Mime-Version: 1.0
-References: <20220503060205.2823727-1-oupton@google.com>
-X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH v4 7/7] Revert "KVM/arm64: Don't emulate a PMU for 32-bit
- guests if feature not set"
-From:   Oliver Upton <oupton@google.com>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, maz@kernel.org, james.morse@arm.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        reijiw@google.com, ricarkol@google.com,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S230209AbiECHQh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 03:16:37 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 617D931DF2;
+        Tue,  3 May 2022 00:13:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651561986; x=1683097986;
+  h=from:to:cc:subject:date:message-id;
+  bh=2CV86QC3Dw6WLOp/M+dDMYXWwCmN0sjD5K0oCUyw3DI=;
+  b=HRxISd6OLsEb6nQO72Lh5Ex8LZA3LJb9hc1JZtRDS/8vCuOHlgKFAAhi
+   713AI+phH7rTU3FzC/RvPXR0GUkG5TGoDurWbn0g45hvLiGylW2YNr5X/
+   Ev9BA8VYGDrqzAWo/WQNHgR57cWLr4aU4hSv57w1aMW5/lxh36t97WSdV
+   hmZUpopq/e7/iCJV0Meyg72Z+GtNsp0wBtZnF8AEGKiut+9Gq/DfFUGbD
+   r+5yKargyaZyBFixDK7v1guwPqFUtRhdKhk7lmrxX8+T5T4LBG+DlJNOG
+   q37kXP1ozeRXOoFVcFvB5Dx4pRcgU3AZKvBtQuXc1hnAdHHzNCs3kx/Xw
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10335"; a="327959061"
+X-IronPort-AV: E=Sophos;i="5.91,194,1647327600"; 
+   d="scan'208";a="327959061"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2022 00:12:34 -0700
+X-IronPort-AV: E=Sophos;i="5.91,194,1647327600"; 
+   d="scan'208";a="562107283"
+Received: from arthur-vostro-3668.sh.intel.com ([10.239.13.120])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2022 00:12:28 -0700
+From:   Zeng Guang <guang.zeng@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>,
+        Zeng Guang <guang.zeng@intel.com>
+Subject: [PATCH v2] kvm: selftests: Add KVM_CAP_MAX_VCPU_ID cap test
+Date:   Tue,  3 May 2022 14:40:37 +0800
+Message-Id: <20220503064037.10822-1-guang.zeng@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This reverts commit 8f6379e207e7d834065a080f407a60d67349d961.
+Basic test coverage of KVM_CAP_MAX_VCPU_ID cap.
 
-The original change was not problematic but chose nonarchitected PMU
-register behavior over a NULL deref as KVM failed to hide the PMU in the
-ID_DFR0.
+This capability can be enabled before vCPU creation and only allowed
+to set once. if assigned vcpu id is beyond KVM_CAP_MAX_VCPU_ID
+capability, vCPU creation will fail.
 
-Since KVM now provides a sane value for ID_DFR0 and UNDEFs the guest for
-unsupported accesses, drop the unneeded checks in PMU register handlers.
-
-Signed-off-by: Oliver Upton <oupton@google.com>
+Signed-off-by: Zeng Guang <guang.zeng@intel.com>
 ---
- arch/arm64/kvm/pmu-emul.c | 23 +----------------------
- 1 file changed, 1 insertion(+), 22 deletions(-)
+ tools/testing/selftests/kvm/.gitignore        |  1 +
+ tools/testing/selftests/kvm/Makefile          |  1 +
+ .../kvm/x86_64/max_vcpuid_cap_test.c          | 59 +++++++++++++++++++
+ 3 files changed, 61 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/max_vcpuid_cap_test.c
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 3dc990ac4f44..78fdc443adc7 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -177,9 +177,6 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
- 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
- 	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
- 
--	if (!kvm_vcpu_has_pmu(vcpu))
--		return 0;
--
- 	counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
- 
- 	if (kvm_pmu_pmc_is_chained(pmc) &&
-@@ -201,9 +198,6 @@ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
- {
- 	u64 reg;
- 
--	if (!kvm_vcpu_has_pmu(vcpu))
--		return;
--
- 	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
- 	      ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + select_idx;
- 	__vcpu_sys_reg(vcpu, reg) += (s64)val - kvm_pmu_get_counter_value(vcpu, select_idx);
-@@ -328,9 +322,6 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
- 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
- 	struct kvm_pmc *pmc;
- 
--	if (!kvm_vcpu_has_pmu(vcpu))
--		return;
--
- 	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) || !val)
- 		return;
- 
-@@ -366,7 +357,7 @@ void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
- 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
- 	struct kvm_pmc *pmc;
- 
--	if (!kvm_vcpu_has_pmu(vcpu) || !val)
-+	if (!val)
- 		return;
- 
- 	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
-@@ -536,9 +527,6 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
- 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
- 	int i;
- 
--	if (!kvm_vcpu_has_pmu(vcpu))
--		return;
--
- 	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E))
- 		return;
- 
-@@ -588,9 +576,6 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
- {
- 	int i;
- 
--	if (!kvm_vcpu_has_pmu(vcpu))
--		return;
--
- 	if (val & ARMV8_PMU_PMCR_E) {
- 		kvm_pmu_enable_counter_mask(vcpu,
- 		       __vcpu_sys_reg(vcpu, PMCNTENSET_EL0));
-@@ -754,9 +739,6 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
- {
- 	u64 reg, mask;
- 
--	if (!kvm_vcpu_has_pmu(vcpu))
--		return;
--
- 	mask  =  ARMV8_PMU_EVTYPE_MASK;
- 	mask &= ~ARMV8_PMU_EVTYPE_EVENT;
- 	mask |= kvm_pmu_event_mask(vcpu->kvm);
-@@ -845,9 +827,6 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
- 	u64 val, mask = 0;
- 	int base, i, nr_events;
- 
--	if (!kvm_vcpu_has_pmu(vcpu))
--		return 0;
--
- 	if (!pmceid1) {
- 		val = read_sysreg(pmceid0_el0);
- 		base = 0;
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index d1e8f5237469..b860dcfee920 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -22,6 +22,7 @@
+ /x86_64/hyperv_cpuid
+ /x86_64/hyperv_features
+ /x86_64/hyperv_svm_test
++/x86_64/max_vcpuid_cap_test
+ /x86_64/mmio_warning_test
+ /x86_64/mmu_role_test
+ /x86_64/platform_info_test
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 21c2dbd21a81..e92dc78de4d0 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -86,6 +86,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/xen_shinfo_test
+ TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
+ TEST_GEN_PROGS_x86_64 += x86_64/sev_migrate_tests
+ TEST_GEN_PROGS_x86_64 += x86_64/amx_test
++TEST_GEN_PROGS_x86_64 += x86_64/max_vcpuid_cap_test
+ TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
+ TEST_GEN_PROGS_x86_64 += demand_paging_test
+ TEST_GEN_PROGS_x86_64 += dirty_log_test
+diff --git a/tools/testing/selftests/kvm/x86_64/max_vcpuid_cap_test.c b/tools/testing/selftests/kvm/x86_64/max_vcpuid_cap_test.c
+new file mode 100644
+index 000000000000..2e3d1d236ef0
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/max_vcpuid_cap_test.c
+@@ -0,0 +1,59 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * maximum APIC ID capability tests
++ *
++ * Copyright (C) 2022, Intel, Inc.
++ *
++ * Tests for getting/setting maximum APIC ID capability
++ */
++
++#include "kvm_util.h"
++#include "../lib/kvm_util_internal.h"
++
++#define MAX_VCPU_ID	2
++
++int main(int argc, char *argv[])
++{
++	struct kvm_vm *vm;
++	struct kvm_enable_cap cap = { 0 };
++	int ret;
++
++	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
++
++	/* Get KVM_CAP_MAX_VCPU_ID cap supported in KVM */
++	ret = vm_check_cap(vm, KVM_CAP_MAX_VCPU_ID);
++
++	/* Check failure if set KVM_CAP_MAX_VCPU_ID beyond KVM cap */
++	cap.cap = KVM_CAP_MAX_VCPU_ID;
++	cap.args[0] = ret + 1;
++	ret = ioctl(vm->fd, KVM_ENABLE_CAP, &cap);
++	TEST_ASSERT(ret < 0,
++		    "Unexpected success to enable KVM_CAP_MAX_VCPU_ID"
++		    "beyond KVM cap!\n");
++
++	/* Check success if set KVM_CAP_MAX_VCPU_ID */
++	cap.args[0] = MAX_VCPU_ID;
++	ret = ioctl(vm->fd, KVM_ENABLE_CAP, &cap);
++	TEST_ASSERT(ret == 0,
++		    "Unexpected failure to enable KVM_CAP_MAX_VCPU_ID!\n");
++
++	/* Check success if set KVM_CAP_MAX_VCPU_ID same value */
++	ret = ioctl(vm->fd, KVM_ENABLE_CAP, &cap);
++	TEST_ASSERT(ret == 0,
++		    "Unexpected failure to set KVM_CAP_MAX_VCPU_ID same value\n");
++
++	/* Check failure if set KVM_CAP_MAX_VCPU_ID different value again */
++	cap.args[0] = MAX_VCPU_ID + 1;
++	ret = ioctl(vm->fd, KVM_ENABLE_CAP, &cap);
++	TEST_ASSERT(ret < 0,
++		    "Unexpected success to enable KVM_CAP_MAX_VCPU_ID with"
++		    "different value again\n");
++
++	/* Check failure if create vCPU with id beyond KVM_CAP_MAX_VCPU_ID cap*/
++	ret = ioctl(vm->fd, KVM_CREATE_VCPU, MAX_VCPU_ID);
++	TEST_ASSERT(ret < 0,
++		    "Unexpected success in creating a vCPU with VCPU ID out of range\n");
++
++	kvm_vm_free(vm);
++	return 0;
++}
 -- 
-2.36.0.464.gb9c8b46e94-goog
+2.27.0
 
