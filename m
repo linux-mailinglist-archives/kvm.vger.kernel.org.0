@@ -2,78 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E3D5518314
-	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 13:11:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30E74518317
+	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 13:12:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234592AbiECLPL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 07:15:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51816 "EHLO
+        id S234625AbiECLP6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 07:15:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233641AbiECLPK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 07:15:10 -0400
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98A583464A;
-        Tue,  3 May 2022 04:11:38 -0700 (PDT)
-Received: by mail-wm1-f49.google.com with SMTP id n126-20020a1c2784000000b0038e8af3e788so1076660wmn.1;
-        Tue, 03 May 2022 04:11:38 -0700 (PDT)
+        with ESMTP id S234306AbiECLP5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 07:15:57 -0400
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D86643464D
+        for <kvm@vger.kernel.org>; Tue,  3 May 2022 04:12:23 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id n10so15346465ejk.5
+        for <kvm@vger.kernel.org>; Tue, 03 May 2022 04:12:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=oFqiHnRl1AV5CwVvzFn8cPS0OwpSBHpXeStUM3laFbc=;
+        b=rgEPWEyb2782i+En/M1Gr9kW1acyISu99grDdKpqBvvPNsWCOiP+G46tw+T/g/PWac
+         0j/1IRgAx1LslBRX9J7N7iLrm3mcHMi7hhyzdYB5+ng2Ys2TT210cess3fl+KH+LXswP
+         YnUJ5G4gbXRsTmJeogARhIPFKX4YLURoQ/zauliX7py64FVLF0q/j/9nemRIgKYrxfRF
+         50bDBKtO24eHHvWVd0drvStgCLuh456LYRrNwiecHIdJqORZ5ymDAyfLWlif7S9+FR0S
+         sOpckw/TLRFb1sQNpj7W3yH7GGX6IflG6OTh0++C8FJ+iysRYy2A8JK6ATCEZuqV/FRP
+         J1cA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=GsogsT9bhJS0azISfSjF4/Gdtg2bL/l2CaKN/yJOq2U=;
-        b=KMTJX39ow68qWmWxgO+TP55iaLnuVRVItcxZCM/jcq0PDeUUkyUlH2Ta5j4TiY67tq
-         YyUyAMb3Va1AMjWmF8veGu5qMzZuUjBWGmNXmavS8exzwHLMsfphZzNnHv2ppX2DHFjZ
-         wMCFdHKhTnBTJDc+HnHyIg5mAyEKqcGkF1IjVvMxczSXu5Nl194gOsaLXz/yfa8eqPBi
-         B//FIZKXozbu4IwJcrJQ4EjqDdaiUPqt0C6ZAyB0frYn6IpTJxD3LnsDjsQGVM0fmCXj
-         xtXbsXGZ9QNFMU8E2k/CCy7e3Vr1Sf3p/kRAVjemRTqynn+o+ZwOzfGnuLNBPSchnqqQ
-         LkXA==
-X-Gm-Message-State: AOAM5309pMk1fKYbLOTgnX3bNOJrvnHBQ21xbEnFeozjTcrWu2epPEk2
-        JQ7nHJLhhBeWCp+/+HoX3EM=
-X-Google-Smtp-Source: ABdhPJyhUyArLZ6U7eQ4wiMgOJiKkSAK1pVUfdJy3Bn7VLBKr52ZTx0gXisXtzzC4SGwFA0Yn97PTA==
-X-Received: by 2002:a1c:770b:0:b0:394:3fae:ab79 with SMTP id t11-20020a1c770b000000b003943faeab79mr2884315wmi.200.1651576297176;
-        Tue, 03 May 2022 04:11:37 -0700 (PDT)
-Received: from liuwe-devbox-debian-v2 ([51.145.34.42])
-        by smtp.gmail.com with ESMTPSA id n21-20020a7bc5d5000000b003942a244f47sm1708601wmk.32.2022.05.03.04.11.36
+        bh=oFqiHnRl1AV5CwVvzFn8cPS0OwpSBHpXeStUM3laFbc=;
+        b=KUcY8xgrGM1JludtSfVEdd94dliV9lVToM/95LTQT5gsnfkVlD+Q3NfTsnit0aUoDi
+         tVafSmAuc0cSDHuM1HW3zR/1ALOz7oclSobgj4JO5omAPFYq6c7hEGXL4TtpKTFrfjEo
+         iEeSfk1aX0+9TZm0A060hxUBmhjinrrxc32LnRQT5lG9Ioi0JurABGyUv/vHHMlKWmJj
+         NfIRiX5ddJv9Xg34VwRQD8qZNTLbH85WcmkWioWLc532cE2B1lQoheiwbZfUU4pCih0m
+         rkufIC9bxWtOEYfXfPGfvOI3meyC+2njCiF1HoHHhuJHxDfo4cODIWVWp3GlHndJie3m
+         i7mw==
+X-Gm-Message-State: AOAM531lVxZxhIkq8TDj8NGx7cJFNCv1JXtQj1i+DQ8VkFQkWxsrU7k+
+        GKqxe6GvIzTEvmttS6TxLCV7eg==
+X-Google-Smtp-Source: ABdhPJw97PYd30DNDpPNsRrpJXojPvheV9UWZoSzYNANOpCBRVYdFYA4fTJtujnPpl7vcUfHD29C2Q==
+X-Received: by 2002:a17:907:6e04:b0:6e0:95c0:47b8 with SMTP id sd4-20020a1709076e0400b006e095c047b8mr15127269ejc.483.1651576342075;
+        Tue, 03 May 2022 04:12:22 -0700 (PDT)
+Received: from google.com (30.171.91.34.bc.googleusercontent.com. [34.91.171.30])
+        by smtp.gmail.com with ESMTPSA id l24-20020a056402029800b0042617ba63a7sm7817960edv.49.2022.05.03.04.12.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 May 2022 04:11:36 -0700 (PDT)
-Date:   Tue, 3 May 2022 11:11:34 +0000
-From:   Wei Liu <wei.liu@kernel.org>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Tue, 03 May 2022 04:12:21 -0700 (PDT)
+Date:   Tue, 3 May 2022 11:12:18 +0000
+From:   Quentin Perret <qperret@google.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Andy Lutomirski <luto@kernel.org>,
         Sean Christopherson <seanjc@google.com>,
+        Steven Price <steven.price@arm.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Wei Liu <wei.liu@kernel.org>
-Subject: Re: [PATCH v3 07/34] x86/hyperv: Introduce
- HV_MAX_SPARSE_VCPU_BANKS/HV_VCPUS_PER_SPARSE_BANK constants
-Message-ID: <20220503111134.zuzidhqfmac2csfm@liuwe-devbox-debian-v2>
-References: <20220414132013.1588929-1-vkuznets@redhat.com>
- <20220414132013.1588929-8-vkuznets@redhat.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        Michael Roth <michael.roth@amd.com>
+Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+Message-ID: <YnEOEmf4We1aeLcT@google.com>
+References: <YksIQYdG41v3KWkr@google.com>
+ <Ykslo2eo2eRXrpFR@google.com>
+ <eefc3c74-acca-419c-8947-726ce2458446@www.fastmail.com>
+ <Ykwbqv90C7+8K+Ao@google.com>
+ <YkyEaYiL0BrDYcZv@google.com>
+ <20220422105612.GB61987@chaop.bj.intel.com>
+ <3b99f157-0f30-4b30-8399-dd659250ab8d@www.fastmail.com>
+ <20220425134051.GA175928@chaop.bj.intel.com>
+ <27616b2f-1eff-42ff-91e0-047f531639ea@www.fastmail.com>
+ <20220428122952.GA10508@chaop.bj.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220414132013.1588929-8-vkuznets@redhat.com>
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20220428122952.GA10508@chaop.bj.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 14, 2022 at 03:19:46PM +0200, Vitaly Kuznetsov wrote:
-> It may not come clear from where the magical '64' value used in
-> __cpumask_to_vpset() come from. Moreover, '64' means both the maximum
-> sparse bank number as well as the number of vCPUs per bank. Add defines
-> to make things clear. These defines are also going to be used by KVM.
+On Thursday 28 Apr 2022 at 20:29:52 (+0800), Chao Peng wrote:
 > 
-> No functional change.
+> + Michael in case he has comment from SEV side.
 > 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> On Mon, Apr 25, 2022 at 07:52:38AM -0700, Andy Lutomirski wrote:
+> > 
+> > 
+> > On Mon, Apr 25, 2022, at 6:40 AM, Chao Peng wrote:
+> > > On Sun, Apr 24, 2022 at 09:59:37AM -0700, Andy Lutomirski wrote:
+> > >> 
+> > 
+> > >> 
+> > >> 2. Bind the memfile to a VM (or at least to a VM technology).  Now it's in the initial state appropriate for that VM.
+> > >> 
+> > >> For TDX, this completely bypasses the cases where the data is prepopulated and TDX can't handle it cleanly.  For SEV, it bypasses a situation in which data might be written to the memory before we find out whether that data will be unreclaimable or unmovable.
+> > >
+> > > This sounds a more strict rule to avoid semantics unclear.
+> > >
+> > > So userspace needs to know what excatly happens for a 'bind' operation.
+> > > This is different when binds to different technologies. E.g. for SEV, it
+> > > may imply after this call, the memfile can be accessed (through mmap or
+> > > what ever) from userspace, while for current TDX this should be not allowed.
+> > 
+> > I think this is actually a good thing.  While SEV, TDX, pKVM, etc achieve similar goals and have broadly similar ways of achieving them, they really are different, and having userspace be aware of the differences seems okay to me.
+> > 
+> > (Although I don't think that allowing userspace to mmap SEV shared pages is particularly wise -- it will result in faults or cache incoherence depending on the variant of SEV in use.)
+> > 
+> > >
+> > > And I feel we still need a third flow/operation to indicate the
+> > > completion of the initialization on the memfile before the guest's 
+> > > first-time launch. SEV needs to check previous mmap-ed areas are munmap-ed
+> > > and prevent future userspace access. After this point, then the memfile
+> > > becomes truely private fd.
+> > 
+> > Even that is technology-dependent.  For TDX, this operation doesn't really exist.  For SEV, I'm not sure (I haven't read the specs in nearly enough detail).  For pKVM, I guess it does exist and isn't quite the same as a shared->private conversion.
+> > 
+> > Maybe this could be generalized a bit as an operation "measure and make private" that would be supported by the technologies for which it's useful.
+> 
+> Then I think we need callback instead of static flag field. Backing
+> store implements this callback and consumers change the flags
+> dynamically with this callback. This implements kind of state machine
+> flow.
+> 
+> > 
+> > 
+> > >
+> > >> 
+> > >> 
+> > >> ----------------------------------------------
+> > >> 
+> > >> Now I have a question, since I don't think anyone has really answered it: how does this all work with SEV- or pKVM-like technologies in which private and shared pages share the same address space?  I sounds like you're proposing to have a big memfile that contains private and shared pages and to use that same memfile as pages are converted back and forth.  IO and even real physical DMA could be done on that memfile.  Am I understanding correctly?
+> > >
+> > > For TDX case, and probably SEV as well, this memfile contains private memory
+> > > only. But this design at least makes it possible for usage cases like
+> > > pKVM which wants both private/shared memory in the same memfile and rely
+> > > on other ways like mmap/munmap or mprotect to toggle private/shared instead
+> > > of fallocate/hole punching.
+> > 
+> > Hmm.  Then we still need some way to get KVM to generate the correct SEV pagetables.  For TDX, there are private memslots and shared memslots, and they can overlap.  If they overlap and both contain valid pages at the same address, then the results may not be what the guest-side ABI expects, but everything will work.  So, when a single logical guest page transitions between shared and private, no change to the memslots is needed.  For SEV, this is not the case: everything is in one set of pagetables, and there isn't a natural way to resolve overlaps.
+> 
+> I don't see SEV has problem. Note for all the cases, both private/shared
+> memory are in the same memslot. For a given GPA, if there is no private
+> page, then shared page will be used to establish KVM pagetables, so this
+> can guarantee there is no overlaps.
+> 
+> > 
+> > If the memslot code becomes efficient enough, then the memslots could be fragmented.  Or the memfile could support private and shared data in the same memslot.  And if pKVM does this, I don't see why SEV couldn't also do it and hopefully reuse the same code.
+> 
+> For pKVM, that might be the case. For SEV, I don't think we require
+> private/shared data in the same memfile. The same model that works for
+> TDX should also work for SEV. Or maybe I misunderstood something here?
+> 
+> > 
+> > >
+> > >> 
+> > >> If so, I think this makes sense, but I'm wondering if the actual memslot setup should be different.  For TDX, private memory lives in a logically separate memslot space.  For SEV and pKVM, it doesn't.  I assume the API can reflect this straightforwardly.
+> > >
+> > > I believe so. The flow should be similar but we do need pass different
+> > > flags during the 'bind' to the backing store for different usages. That
+> > > should be some new flags for pKVM but the callbacks (API here) between
+> > > memfile_notifile and its consumers can be reused.
+> > 
+> > And also some different flag in the operation that installs the fd as a memslot?
+> > 
+> > >
+> > >> 
+> > >> And the corresponding TDX question: is the intent still that shared pages aren't allowed at all in a TDX memfile?  If so, that would be the most direct mapping to what the hardware actually does.
+> > >
+> > > Exactly. TDX will still use fallocate/hole punching to turn on/off the
+> > > private page. Once off, the traditional shared page will become
+> > > effective in KVM.
+> > 
+> > Works for me.
+> > 
+> > For what it's worth, I still think it should be fine to land all the TDX memfile bits upstream as long as we're confident that SEV, pKVM, etc can be added on without issues.
+> > 
+> > I think we can increase confidence in this by either getting one other technology's maintainers to get far enough along in the design to be confident
+> 
+> AFAICS, SEV shouldn't have any problem, But would like to see AMD people
+> can comment. For pKVM, definitely need more work, but isn't totally
+> undoable. Also would be good if pKVM people can comment.
 
-Acked-by: Wei Liu <wei.liu@kernel.org>
+Merging things incrementally sounds good to me if we can indeed get some
+time to make sure it'll be a workable solution for other technologies.
+I'm happy to prototype a pKVM extension to the proposed series to see if
+there are any major blockers.
+
+Thanks,
+Quentin
