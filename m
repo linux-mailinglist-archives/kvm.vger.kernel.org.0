@@ -2,277 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B3EC518B34
-	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 19:39:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C87FA518B3E
+	for <lists+kvm@lfdr.de>; Tue,  3 May 2022 19:40:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240475AbiECRnC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 13:43:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55048 "EHLO
+        id S240538AbiECRo1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 13:44:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232024AbiECRnB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 13:43:01 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ABCC3E0F0;
-        Tue,  3 May 2022 10:39:28 -0700 (PDT)
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 243GJFXd028416;
-        Tue, 3 May 2022 17:39:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=j9BNr5zQkWnDEH9PVT43gMmm9Hi4h9CfyqcqCC+WKjw=;
- b=HjqIYCBbf74bXz5kSjcwKrxNOn6OCR+8HNucTim9GomMggF76Rwm4GNov6xC6JDJHYrV
- e+OwTq6DDG+8DuPFuvNXWOT9FoKxtsfTqpbuwT3Gsjc9I+1PCGVfnDEDpxNyPpeTEbng
- DjZVgVPFqJqc46lI+aekXZVu8bm08BMCp100kOM9JsUlF9bNK8a+KxsUEYlm8efhcKQk
- GwLjUZa3l3cyL8W63ACF89M98JLGkjkYc5UtR0teuo+RyvL1M8gCrlYPgEBlihSq3+mD
- Rq0dQcmvGh5JCHOYz9zIL8NPmr/FOes7S9xtPoksjHa5YMxAtJ2yYaqsoK3Wtav0BcW8 fw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fu7tf1kxe-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 03 May 2022 17:39:25 +0000
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 243GqRuj012336;
-        Tue, 3 May 2022 17:39:25 GMT
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fu7tf1kx3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 03 May 2022 17:39:25 +0000
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 243HIB0k014533;
-        Tue, 3 May 2022 17:39:24 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma01wdc.us.ibm.com with ESMTP id 3frvr9dctu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 03 May 2022 17:39:24 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 243HdNin34210260
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 3 May 2022 17:39:23 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 08B66BE051;
-        Tue,  3 May 2022 17:39:23 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CB459BE04F;
-        Tue,  3 May 2022 17:39:21 +0000 (GMT)
-Received: from [9.65.193.44] (unknown [9.65.193.44])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue,  3 May 2022 17:39:21 +0000 (GMT)
-Message-ID: <fc6bb78c-f628-1062-ae32-17842680ab77@linux.ibm.com>
-Date:   Tue, 3 May 2022 13:39:21 -0400
+        with ESMTP id S238225AbiECRo0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 13:44:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 126D4140CC
+        for <kvm@vger.kernel.org>; Tue,  3 May 2022 10:40:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651599651;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=elECMtmMZllVEc4cR7ZLOEg0DEfCXom1q7YYKq/9EWM=;
+        b=WsQkVB1c9j26B/LqrSv2z8XaScUpkhtCjKqlmXKN+u+p0aC6dbYdPffs6/viyAjfhkX/8P
+        IHCZpsieaZn9zCS9L8TTFIq+giEYPXV41Vlt6FWFKh3gE1vxURMZT+R3VIy/W2WkCPchHM
+        gINBBfF+wOWrKhl3fiNrkijwMm3Dq48=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-395-L7B0h8-7OIGEag3XQLX6FQ-1; Tue, 03 May 2022 13:40:50 -0400
+X-MC-Unique: L7B0h8-7OIGEag3XQLX6FQ-1
+Received: by mail-wm1-f71.google.com with SMTP id g14-20020a1c4e0e000000b0039425ef54d6so1019984wmh.9
+        for <kvm@vger.kernel.org>; Tue, 03 May 2022 10:40:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:reply-to
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=elECMtmMZllVEc4cR7ZLOEg0DEfCXom1q7YYKq/9EWM=;
+        b=KDu2lANM0vAoGydndk53Z3tmrg/PyzopSr5LNhf0sxrXlLuVIoZliK/GU7d4hfUjc+
+         S6iE7UTj6OWLfqP9SQGnh9LMgUyZupyNoFSkW504Nv42lY44+iTkDgprmLSfDDSFYFz4
+         hg60HAmymNpBZQYVkI6m/T8Uw5O/078ZdzSCrMT7tLts0IASQ4TJQApkSM3t2EyMZQO1
+         UOxniCw8MmSrG2oakhhq9ocM9W0uzYh036NVg6emsV1NQsbpwq3XW5+shtbnMz3g7ql4
+         omavLBLrNIdCgZWqctdyEaX2SEp4FdkZW6oskhR3DeIUkcYMdcQ3uH51rp+wmylEtELo
+         CcOw==
+X-Gm-Message-State: AOAM532wqJDNt+iITfBAqWEex5+X+bvhCI8wTHq+Bf7Ap1sJZWfAozac
+        wQprQEU6YD7+Z5SmIZV81R34XlCX3ftvoilXJ/AbhwjmnQnPn8TbFD/6UQNXcpvjP4KUVKMonDf
+        VlDtuBMMSVStn
+X-Received: by 2002:adf:ee90:0:b0:20a:de35:14b4 with SMTP id b16-20020adfee90000000b0020ade3514b4mr13729556wro.558.1651599649362;
+        Tue, 03 May 2022 10:40:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw8hBkHHn7iOsZtOm7YrEEIdMnX3D2t8E0X8gXbLIU+MdK7+3N3yPWthjRrSymAf+RGbtravw==
+X-Received: by 2002:adf:ee90:0:b0:20a:de35:14b4 with SMTP id b16-20020adfee90000000b0020ade3514b4mr13729545wro.558.1651599649081;
+        Tue, 03 May 2022 10:40:49 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id ay32-20020a05600c1e2000b003942a244ebesm2131921wmb.3.2022.05.03.10.40.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 May 2022 10:40:48 -0700 (PDT)
+Message-ID: <8cfeae8e-93f3-be10-8743-8d51b89b7a5a@redhat.com>
+Date:   Tue, 3 May 2022 19:40:46 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v19 00/20] s390/vfio-ap: dynamic configuration support
+ Thunderbird/91.8.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v2 3/4] KVM: arm64: vgic: Do not ignore
+ vgic_its_restore_cte failures
 Content-Language: en-US
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jjherne@linux.ibm.com, freude@linux.ibm.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        pasic@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, fiuczy@linux.ibm.com
-References: <20220404221039.1272245-1-akrowiak@linux.ibm.com>
-In-Reply-To: <20220404221039.1272245-1-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     pbonzini@redhat.com, maz@kernel.org, andre.przywara@arm.com,
+        drjones@redhat.com, alexandru.elisei@arm.com, oupton@google.com,
+        reijiw@google.com, pshier@google.com
+References: <20220427184814.2204513-1-ricarkol@google.com>
+ <20220427184814.2204513-4-ricarkol@google.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20220427184814.2204513-4-ricarkol@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 8lYEkBMO4zVFAvxUwU02Ls2ZyPH2E0-h
-X-Proofpoint-GUID: W7U1LQxVHlF1cPG1VgbaTOioq2u2BhMf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-03_07,2022-05-02_03,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- priorityscore=1501 clxscore=1015 mlxlogscore=999 lowpriorityscore=0
- suspectscore=0 impostorscore=0 spamscore=0 adultscore=0 bulkscore=0
- mlxscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205030112
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello, anybody home?
+Hi Ricardo,
 
-On 4/4/22 6:10 PM, Tony Krowiak wrote:
-> The current design for AP pass-through does not support making dynamic
-> changes to the AP matrix of a running guest resulting in a few
-> deficiencies this patch series is intended to mitigate:
+On 4/27/22 20:48, Ricardo Koller wrote:
+> Restoring a corrupted collection entry is being ignored and treated as
+maybe precise what is a corrupted ITE (out of range id or not matching
+guest RAM)
+> success. More specifically, vgic_its_restore_cte failure is treated as
+> success by vgic_its_restore_collection_table.  vgic_its_restore_cte uses
+> a positive number to return ITS error codes, and +1 to return success.
+Not fully correct as vgic_its_restore_cte() also returns a bunch of
+generic negative error codes. vgic_its_alloc_collection() only returns
+one positive ITS error code.
+> The caller then uses "ret > 0" to check for success. An additional issue
+> is that invalid entries return 0 and although that doesn't fail the
+> restore, it leads to skipping all the next entries.
+Isn't what we want. If I remember correctly an invalid entry corresponds
+to the end of the collection table, hence the break.
+see vgic_its_save_collection_table() and "add a last dummy element with
+valid bit unset".
 >
-> 1. Adapters, domains and control domains can not be added to or removed
->      from a running guest. In order to modify a guest's AP configuration,
->      the guest must be terminated; only then can AP resources be assigned
->      to or unassigned from the guest's matrix mdev. The new AP
->      configuration becomes available to the guest when it is subsequently
->      restarted.
+> Fix this by having vgic_its_restore_cte return negative numbers on
+> error, and 0 on success (which includes skipping an invalid entry).
+> While doing that, also fix alloc_collection return codes to not mix ITS
+> error codes (positive numbers) and generic error codes (negative
+> numbers).
 >
-> 2. The AP bus's /sys/bus/ap/apmask and /sys/bus/ap/aqmask interfaces can
->      be modified by a root user without any restrictions. A change to
->      either mask can result in AP queue devices being unbound from the
->      vfio_ap device driver and bound to a zcrypt device driver even if a
->      guest is using the queues, thus giving the host access to the guest's
->      private crypto data and vice versa.
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-its.c | 35 ++++++++++++++++++++++++----------
+>  1 file changed, 25 insertions(+), 10 deletions(-)
 >
-> 3. The APQNs derived from the Cartesian product of the APIDs of the
->      adapters and APQIs of the domains assigned to a matrix mdev must
->      reference an AP queue device bound to the vfio_ap device driver. The
->      AP architecture allows assignment of AP resources that are not
->      available to the system, so this artificial restriction is not
->      compliant with the architecture.
->
-> 4. The AP configuration profile can be dynamically changed for the linux
->      host after a KVM guest is started. For example, a new domain can be
->      dynamically added to the configuration profile via the SE or an HMC
->      connected to a DPM enabled lpar. Likewise, AP adapters can be
->      dynamically configured (online state) and deconfigured (standby state)
->      using the SE, an SCLP command or an HMC connected to a DPM enabled
->      lpar. This can result in inadvertent sharing of AP queues between the
->      guest and host.
->
-> 5. A root user can manually unbind an AP queue device representing a
->      queue in use by a KVM guest via the vfio_ap device driver's sysfs
->      unbind attribute. In this case, the guest will be using a queue that
->      is not bound to the driver which violates the device model.
->
-> This patch series introduces the following changes to the current design
-> to alleviate the shortcomings described above as well as to implement
-> more of the AP architecture:
->
-> 1. A root user will be prevented from making edits to the AP bus's
->      /sys/bus/ap/apmask or /sys/bus/ap/aqmask if the change would transfer
->      ownership of an APQN from the vfio_ap device driver to a zcrypt driver
->      while the APQN is assigned to a matrix mdev.
->
-> 2. Allow a root user to hot plug/unplug AP adapters, domains and control
->      domains for a KVM guest using the matrix mdev via its sysfs
->      assign/unassign attributes.
->
-> 4. Allow assignment of an AP adapter or domain to a matrix mdev even if
->      it results in assignment of an APQN that does not reference an AP
->      queue device bound to the vfio_ap device driver, as long as the APQN
->      is not reserved for use by the default zcrypt drivers (also known as
->      over-provisioning of AP resources). Allowing over-provisioning of AP
->      resources better models the architecture which does not preclude
->      assigning AP resources that are not yet available in the system. Such
->      APQNs, however, will not be assigned to the guest using the matrix
->      mdev; only APQNs referencing AP queue devices bound to the vfio_ap
->      device driver will actually get assigned to the guest.
->
-> 5. Handle dynamic changes to the AP device model.
->
-> 1. Rationale for changes to AP bus's apmask/aqmask interfaces:
-> ----------------------------------------------------------
-> Due to the extremely sensitive nature of cryptographic data, it is
-> imperative that great care be taken to ensure that such data is secured.
-> Allowing a root user, either inadvertently or maliciously, to configure
-> these masks such that a queue is shared between the host and a guest is
-> not only avoidable, it is advisable. It was suggested that this scenario
-> is better handled in user space with management software, but that does
-> not preclude a malicious administrator from using the sysfs interfaces
-> to gain access to a guest's crypto data. It was also suggested that this
-> scenario could be avoided by taking access to the adapter away from the
-> guest and zeroing out the queues prior to the vfio_ap driver releasing the
-> device; however, stealing an adapter in use from a guest as a by-product
-> of an operation is bad and will likely cause problems for the guest
-> unnecessarily. It was decided that the most effective solution with the
-> least number of negative side effects is to prevent the situation at the
-> source.
->
-> 2. Rationale for hot plug/unplug using matrix mdev sysfs interfaces:
-> ----------------------------------------------------------------
-> Allowing a user to hot plug/unplug AP resources using the matrix mdev
-> sysfs interfaces circumvents the need to terminate the guest in order to
-> modify its AP configuration. Allowing dynamic configuration makes
-> reconfiguring a guest's AP matrix much less disruptive.
->
-> 3. Rationale for allowing over-provisioning of AP resources:
-> -----------------------------------------------------------
-> Allowing assignment of AP resources to a matrix mdev and ultimately to a
-> guest better models the AP architecture. The architecture does not
-> preclude assignment of unavailable AP resources. If a queue subsequently
-> becomes available while a guest using the matrix mdev to which its APQN
-> is assigned, the guest will be given access to it. If an APQN
-> is dynamically unassigned from the underlying host system, it will
-> automatically become unavailable to the guest.
->
-> Change log v18-v19:
-> ------------------
-> * Changed name of vfio_ap_mdev_hotplug_apcb (vfio_ap_ops.c) to
->    vfio_ap_mdev_update_guest_apcb
->    (Suggested by Jason: review of patch 10/18)
->
-> * Replace call to kvm_arch_crypto_set_masks in vfio_ap_mdev_set_kvm with
->    call to vfio_ap_mdev_update_guest_apcb
->    (Suggested by Jason: review of patch 10/18)
->
-> * Moved changes related to new locking scheme into its own set of
->    patches (Suggested by Jason: review of patch 10/18)
->
-> * Consolidated some of the lock acquisition code into macros called by the
->    functions that update a KVM guest's APCB.
->
-> * Refactored vfio_ap_mdev_unlink_adapter() and
->    vfio_ap_unlink_apqn_fr_mdev() functions according to Jason's sample
->    code. (Suggested by Jason: review of patch 12/18)
->
-> * Require callers of the AP bus ap_apqn_in_matrix_owned_by_def_drv and
->    ap_owned_by_def_drv - only called by the vfio_ap driver - to take the
->    ap_perms_mutex lock. The adapter/domain assignment interfaces will take
->    the ap_perms_mutex lock prior to other required locks to maintain a
->    proper locking order and avoid circular locking dependencies when the
->    vfio_ap device driver's in_use callback is invoked simultaneously with
->    the adapter/domain assignment interfaces. (Suggested by Jason)
->
-> * Refactored patch 15/18: handle config changed and scan complete
->    notification (Suggested by Jason)
->
-> * Refactored filtering of the matrix to reduce redundant processing of
->    APQNs:
->    - Inspect only the new APIDs or APQIs assigned to the matrix mdev or
->      added to the host's AP configuration
->    - Automatically removing APIDs or APQIs unassigned from the matrix mdev
->      or removed from the host's AP configuration.
->    (Suggested by Halil)
->
-> Tony Krowiak (20):
->    s390/vfio-ap: use new AP bus interface to search for queue devices
->    s390/vfio-ap: move probe and remove callbacks to vfio_ap_ops.c
->    s390/vfio-ap: manage link between queue struct and matrix mdev
->    s390/vfio-ap: introduce shadow APCB
->    s390/vfio-ap: refresh guest's APCB by filtering AP resources assigned
->      to mdev
->    s390/vfio-ap: allow assignment of unavailable AP queues to mdev device
->    s390/vfio-ap: rename matrix_dev->lock mutex to matrix_dev->mdevs_lock
->    s390/vfio-ap: introduce new mutex to control access to the KVM pointer
->    s390/vfio-ap: use proper locking order when setting/clearing KVM
->      pointer
->    s390/vfio-ap: prepare for dynamic update of guest's APCB on
->      assign/unassign
->    s390/vfio-ap: prepare for dynamic update of guest's APCB on queue
->      probe/remove
->    s390/vfio-ap: allow hot plug/unplug of AP devices when
->      assigned/unassigned
->    s390/vfio-ap: hot plug/unplug of AP devices when probed/removed
->    s390/vfio-ap: reset queues after adapter/domain unassignment
->    s390/vfio-ap: implement in-use callback for vfio_ap driver
->    s390/vfio-ap: sysfs attribute to display the guest's matrix
->    s390/vfio-ap: handle config changed and scan complete notification
->    s390/vfio-ap: update docs to include dynamic config support
->    s390/Docs: new doc describing lock usage by the vfio_ap device driver
->    MAINTAINERS: pick up all vfio_ap docs for VFIO AP maintainers
->
->   Documentation/s390/vfio-ap-locking.rst |  389 +++++++
->   Documentation/s390/vfio-ap.rst         |  492 ++++++---
->   MAINTAINERS                            |    6 +-
->   drivers/s390/crypto/ap_bus.c           |   31 +-
->   drivers/s390/crypto/vfio_ap_drv.c      |   69 +-
->   drivers/s390/crypto/vfio_ap_ops.c      | 1321 ++++++++++++++++++------
->   drivers/s390/crypto/vfio_ap_private.h  |   47 +-
->   7 files changed, 1820 insertions(+), 535 deletions(-)
->   create mode 100644 Documentation/s390/vfio-ap-locking.rst
->
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index fb2d26a73880..86c26aaa8275 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -999,15 +999,16 @@ static bool vgic_its_check_event_id(struct vgic_its *its, struct its_device *dev
+>  	return __is_visible_gfn_locked(its, gpa);
+>  }
+>  
+> +/*
+> + * Adds a new collection into the ITS collection table.
+nit: s/Adds/Add here and below
+> + * Returns 0 on success, and a negative error value for generic errors.
+> + */
+>  static int vgic_its_alloc_collection(struct vgic_its *its,
+>  				     struct its_collection **colp,
+>  				     u32 coll_id)
+>  {
+>  	struct its_collection *collection;
+>  
+> -	if (!vgic_its_check_id(its, its->baser_coll_table, coll_id, NULL))
+> -		return E_ITS_MAPC_COLLECTION_OOR;
+> -
+>  	collection = kzalloc(sizeof(*collection), GFP_KERNEL_ACCOUNT);
+>  	if (!collection)
+>  		return -ENOMEM;
+> @@ -1101,7 +1102,12 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+>  
+>  	collection = find_collection(its, coll_id);
+>  	if (!collection) {
+> -		int ret = vgic_its_alloc_collection(its, &collection, coll_id);
+> +		int ret;
+> +
+> +		if (!vgic_its_check_id(its, its->baser_coll_table, coll_id, NULL))
+> +			return E_ITS_MAPC_COLLECTION_OOR;
+> +
+> +		ret = vgic_its_alloc_collection(its, &collection, coll_id);
+>  		if (ret)
+>  			return ret;
+>  		new_coll = collection;
+> @@ -1256,6 +1262,10 @@ static int vgic_its_cmd_handle_mapc(struct kvm *kvm, struct vgic_its *its,
+>  		if (!collection) {
+>  			int ret;
+>  
+> +			if (!vgic_its_check_id(its, its->baser_coll_table,
+> +						coll_id, NULL))
+> +				return E_ITS_MAPC_COLLECTION_OOR;
+> +
+>  			ret = vgic_its_alloc_collection(its, &collection,
+>  							coll_id);
+>  			if (ret)
+> @@ -2497,6 +2507,10 @@ static int vgic_its_save_cte(struct vgic_its *its,
+>  	return kvm_write_guest_lock(its->dev->kvm, gpa, &val, esz);
+>  }
+>  
+> +/*
+> + * Restores a collection entry into the ITS collection table.
+> + * Returns 0 on success, and a negative error value for generic errors.
+> + */
+>  static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
+>  {
+>  	struct its_collection *collection;
+> @@ -2511,7 +2525,7 @@ static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
+>  		return ret;
+>  	val = le64_to_cpu(val);
+>  	if (!(val & KVM_ITS_CTE_VALID_MASK))
+> -		return 0;
+> +		return 0; /* invalid entry, skip it */
+>  
+>  	target_addr = (u32)(val >> KVM_ITS_CTE_RDBASE_SHIFT);
+>  	coll_id = val & KVM_ITS_CTE_ICID_MASK;
+> @@ -2523,11 +2537,15 @@ static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
+>  	collection = find_collection(its, coll_id);
+>  	if (collection)
+>  		return -EEXIST;
+> +
+> +	if (!vgic_its_check_id(its, its->baser_coll_table, coll_id, NULL))
+> +		return -EINVAL;
+> +
+>  	ret = vgic_its_alloc_collection(its, &collection, coll_id);
+>  	if (ret)
+>  		return ret;
+>  	collection->target_addr = target_addr;
+> -	return 1;
+> +	return 0;
+>  }
+>  
+>  /**
+> @@ -2593,15 +2611,12 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
+>  
+>  	while (read < max_size) {
+>  		ret = vgic_its_restore_cte(its, gpa, cte_esz);
+> -		if (ret <= 0)
+> +		if (ret < 0)
+>  			break;
+>  		gpa += cte_esz;
+>  		read += cte_esz;
+>  	}
+>  
+> -	if (ret > 0)
+> -		return 0;
+> -
+>  	return ret;
+>  }
+>  
+Thanks
+
+Eric
 
