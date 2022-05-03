@@ -2,61 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E5B1B519126
-	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 00:16:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 854C4519275
+	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 01:52:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243558AbiECWRq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 18:17:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56784 "EHLO
+        id S241688AbiECXzy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 19:55:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243538AbiECWRi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 18:17:38 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1790E2E6A9
-        for <kvm@vger.kernel.org>; Tue,  3 May 2022 15:14:04 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id u1-20020a17090a2b8100b001d9325a862fso7758241pjd.6
-        for <kvm@vger.kernel.org>; Tue, 03 May 2022 15:14:04 -0700 (PDT)
+        with ESMTP id S230087AbiECXzx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 19:55:53 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 823EB2D1C4
+        for <kvm@vger.kernel.org>; Tue,  3 May 2022 16:52:19 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id p6so16726511pjm.1
+        for <kvm@vger.kernel.org>; Tue, 03 May 2022 16:52:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=VS+cZBe/F+V5XVdy41nyQYEcNSsK7oQL3Q7KYNlaZYY=;
-        b=NB0cWlqq8l9J6viXcISkx6p1um2SBpCPPgM3hB/Xfxb0vebMy0IDNjk8LaC1PjdwmO
-         xKZI1Ol6/kfTAaNvu+APTxnVSJ7fWeHqVYK2U6ljtE3yvgkCbfo27sBVqRN8gj35rUj5
-         MeqUyjTKckVdHAcVc1UY0sL0W3eUnGygzLHGEm2vC29014Q2XVLKTKLojt2bpG0Ywcf6
-         zaHKY77StU7GsHxEMCAq4dMLmD6eRQDQif/pcaPc0V5S/2NwlnI/COU2BgEWMT49FQpL
-         wzXUR4AstcsuRhxeiFQkPhfSGWja5ZwjG5ywq0gldpXXSmSYloYAioDCikZkXp2dL52i
-         9SfQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=dIl0jSqv+1IgIMRFplOI2lNE+rXmcECLP08qxYwGJc0=;
+        b=Jlr89hpZSSeBwdTt2G8dGUNqx50RzYQ2avJ34UjBJBOjpoemfQ3SDw5njPWuKl3mZ7
+         SFoXUJ9fjz/960VbtmnV/RLfqLoz/BF81W048v560CA4f3aVV+Ofcw+iwK3DoRSl5ihM
+         sRM5Jar9mB8/zyhK7WTAoSvTWYhlwsKbqYi4ET9ojQCYtjA01r+Avxls3u6W0Pyd9JH9
+         aFUmDU6IIO1tGgqcHlX3yCp9oeVCnErTMfk6LsbGXHlFd4gQzpNhRoN6pPbV/iIuH7W7
+         ZQ3ibuKe/danGYxshGOSQDX4K+3wh7Z5R3Lrrv8NeQnJ6eBq54jlnWMRISeEIcW6qSVU
+         a8jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=VS+cZBe/F+V5XVdy41nyQYEcNSsK7oQL3Q7KYNlaZYY=;
-        b=sIRQfMHjelGBo4npOndu5tp5vSm38eVfdNlGF9/skATQYnizYPGqnhjFGEGCi+gcAd
-         OV1N5OoN+ZzFf3BuOkIE62hOw82WxiVT+vjfPOfWTXOuJ7P0vB7XK2jk3rmL5SXvsAdq
-         RoX/NlJDv3d2Ce7Q3iRT3wJPFsF4t836CWv/4SkBQolJdD0UDEhXRNPtYMg1eHUGQtep
-         EV66FQrmK6up1ioNpTlQrmZDjY5pjxAJycLma/fgqBONNAoTZjgMehX8XTTrwgrFxyya
-         nQJzzmm5EhddlSzr+N6LtoCNRLSIpbE8AIcck/tnKNqIQgqrxSw/yRbb6VLPaoNgzNXR
-         KySg==
-X-Gm-Message-State: AOAM533bkJKjpp5j0y86LPk4z/emmlIxE3W5lQ4DJbTbu6t/RGjV1ln1
-        KK9KI8OEXwducniCUoWVvZNDSKw+POb7
-X-Google-Smtp-Source: ABdhPJwbYJ0pPCjgpDE1/BMvj2CtY+VLbYaKhkzHIiix4Z2nsbdSJXLWISM3RHg7iPF0w86JjlUmJWVD86OH
-X-Received: from vipinsh.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:36b0])
- (user=vipinsh job=sendgmr) by 2002:a17:903:2310:b0:15e:bc9c:18b9 with SMTP id
- d16-20020a170903231000b0015ebc9c18b9mr3656980plh.58.1651616043565; Tue, 03
- May 2022 15:14:03 -0700 (PDT)
-Date:   Tue,  3 May 2022 22:13:57 +0000
-Message-Id: <20220503221357.943536-1-vipinsh@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH RFC] KVM: x86/mmu: Remove KVM memory shrinker
-From:   Vipin Sharma <vipinsh@google.com>
-To:     pbonzini@redhat.com, seanjc@google.com, dmatlack@google.com
-Cc:     vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, bgardon@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dIl0jSqv+1IgIMRFplOI2lNE+rXmcECLP08qxYwGJc0=;
+        b=VVewGy2Uoi5PB3aWEhI1xZZnIR7nW0o/DmeBEyjp1EV7kNjeiphxSDGEAtSNaVuREk
+         xmoULRjXbXIMKRVoESaaH9wPf3lbiz6AYLQjQhB29dAmRRb6pGfZOkKLwP8hXvLatJ/b
+         2f1/iYErz6khYIcZOolAjFz6ajODR2VPRsUNhM4+C+9JatXrKeFmZYcmr4gupjEbvog2
+         LyMRuh02VbJkp/6eIuY0omLkNUyNv1fk/cpZaXQUDbNn+34k5fLAMSq7+JQO31M05ZpO
+         0IDbaneQ1FRePWnktoe71h3CqhsqIMmtVMpDz1kGlWxvwdJrh8TPopP46OOfNRmLvC1P
+         idEA==
+X-Gm-Message-State: AOAM531o9vDItOj2cUDZgzSCF4cAZkKJxsA+kqNC3jCXmijYiKrsaOHq
+        AHjGbF4wY1b5zWYR+TA+n6ttTQ==
+X-Google-Smtp-Source: ABdhPJywm9YWJHmbRUz5spi3dSy1OeaSeyXk5Q5GTVC6rernTTo6prNWFLy2KZDG0qUtIoX6JccFyQ==
+X-Received: by 2002:a17:90a:b285:b0:1d9:aee3:fabd with SMTP id c5-20020a17090ab28500b001d9aee3fabdmr7519129pjr.72.1651621938791;
+        Tue, 03 May 2022 16:52:18 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id b7-20020a170902b60700b0015e8d4eb256sm6899015pls.160.2022.05.03.16.52.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 May 2022 16:52:18 -0700 (PDT)
+Date:   Tue, 3 May 2022 23:52:14 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Zdenek Kaspar <zkaspar82@gmail.com>
+Cc:     kvm@vger.kernel.org
+Subject: Re: Core2 and v5.18-rc5 troubles
+Message-ID: <YnHALvjWw6E94K53@google.com>
+References: <20220502022959.18aafe13.zkaspar82@gmail.com>
+ <20220502190010.7ff820e3.zkaspar82@gmail.com>
+ <YnFWT+OdBAOPpZfi@google.com>
+ <20220503230727.54476050.zkaspar82@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220503230727.54476050.zkaspar82@gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -64,189 +72,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM memory shrinker is only used in the shadow paging. Most of the L1
-guests are backed by TDP (Two Dimensional Paging) which do not use the
-shrinker, only L2 guests are backed by shadow paging.
+On Tue, May 03, 2022, Zdenek Kaspar wrote:
+> On Tue, 3 May 2022 16:20:31 +0000 Sean Christopherson <seanjc@google.com> wrote:
+> Bisect is later on my TODO if needed... I build this kernel now on
+> debian/sid (saw some compiler/binutils updates) and added KASAN as
+> Maciej pointed out.
+> [  229.423151] ==================================================================
+> [  229.423284] BUG: KASAN: slab-out-of-bounds in fpu_copy_uabi_to_guest_fpstate+0x86/0x130
 
-KVM memory shrinker can cause guests performance to degrade if any other
-process (VM or non-VM) in the same or different cgroup in kernel causes
-memory shrinker to run.
+Aha!  A clue, Sherlock!  I can reproduce in a VM by hiding XSAVE from the VM; that's
+why this only repros on Core2.
 
-The KVM memory shrinker was introduced in 2008,
-commit 3ee16c814511 ("KVM: MMU: allow the vm to shrink the kvm mmu
-shadow caches"), each invocation of shrinker only released 1 shadow page
-in 1 VM. This behavior was not effective until the batch zapping commit
-was added in 2020, commit ebdb292dac79 ("KVM: x86/mmu: Batch zap MMU
-pages when shrinking the slab"), which zaps multiple pages but still in
-1 VM for each shrink invocation. Overall, this feature existed for many
-years without providing meaningful benefit.
+KASAN blames fpu_copy_uabi_to_guest_fpstate() first, but the '3' data corruption
+likely comes from this line in fpu_copy_guest_fpstate_to_uabi(), as the FP+SEE
+mask == 3.
 
-Signed-off-by: Vipin Sharma <vipinsh@google.com>
----
- arch/x86/kvm/mmu/mmu.c | 99 ++----------------------------------------
- 1 file changed, 3 insertions(+), 96 deletions(-)
+		/* Make it restorable on a XSAVE enabled host */
+		ustate->xsave.header.xfeatures = XFEATURE_MASK_FPSSE;
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 4e8d546431eb..80618c847ce2 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -178,7 +178,6 @@ struct kvm_shadow_walk_iterator {
- 
- static struct kmem_cache *pte_list_desc_cache;
- struct kmem_cache *mmu_page_header_cache;
--static struct percpu_counter kvm_total_used_mmu_pages;
- 
- static void mmu_spte_set(u64 *sptep, u64 spte);
- 
-@@ -1658,16 +1657,9 @@ static int is_empty_shadow_page(u64 *spt)
- }
- #endif
- 
--/*
-- * This value is the sum of all of the kvm instances's
-- * kvm->arch.n_used_mmu_pages values.  We need a global,
-- * aggregate version in order to make the slab shrinker
-- * faster
-- */
--static inline void kvm_mod_used_mmu_pages(struct kvm *kvm, long nr)
-+static inline void kvm_used_mmu_pages(struct kvm *kvm, long nr)
- {
- 	kvm->arch.n_used_mmu_pages += nr;
--	percpu_counter_add(&kvm_total_used_mmu_pages, nr);
- }
- 
- static void kvm_mmu_free_page(struct kvm_mmu_page *sp)
-@@ -1725,7 +1717,7 @@ static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct
- 	 */
- 	sp->mmu_valid_gen = vcpu->kvm->arch.mmu_valid_gen;
- 	list_add(&sp->link, &vcpu->kvm->arch.active_mmu_pages);
--	kvm_mod_used_mmu_pages(vcpu->kvm, +1);
-+	kvm_used_mmu_pages(vcpu->kvm, 1);
- 	return sp;
- }
- 
-@@ -2341,7 +2333,7 @@ static bool __kvm_mmu_prepare_zap_page(struct kvm *kvm,
- 			list_add(&sp->link, invalid_list);
- 		else
- 			list_move(&sp->link, invalid_list);
--		kvm_mod_used_mmu_pages(kvm, -1);
-+		kvm_used_mmu_pages(kvm, -1);
- 	} else {
- 		/*
- 		 * Remove the active root from the active page list, the root
-@@ -5801,11 +5793,6 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
- 		kvm_tdp_mmu_zap_invalidated_roots(kvm);
- }
- 
--static bool kvm_has_zapped_obsolete_pages(struct kvm *kvm)
--{
--	return unlikely(!list_empty_careful(&kvm->arch.zapped_obsolete_pages));
--}
--
- static void kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm *kvm,
- 			struct kvm_memory_slot *slot,
- 			struct kvm_page_track_notifier_node *node)
-@@ -6159,77 +6146,6 @@ void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen)
- 	}
- }
- 
--static unsigned long
--mmu_shrink_scan(struct shrinker *shrink, struct shrink_control *sc)
--{
--	struct kvm *kvm;
--	int nr_to_scan = sc->nr_to_scan;
--	unsigned long freed = 0;
--
--	mutex_lock(&kvm_lock);
--
--	list_for_each_entry(kvm, &vm_list, vm_list) {
--		int idx;
--		LIST_HEAD(invalid_list);
--
--		/*
--		 * Never scan more than sc->nr_to_scan VM instances.
--		 * Will not hit this condition practically since we do not try
--		 * to shrink more than one VM and it is very unlikely to see
--		 * !n_used_mmu_pages so many times.
--		 */
--		if (!nr_to_scan--)
--			break;
--		/*
--		 * n_used_mmu_pages is accessed without holding kvm->mmu_lock
--		 * here. We may skip a VM instance errorneosly, but we do not
--		 * want to shrink a VM that only started to populate its MMU
--		 * anyway.
--		 */
--		if (!kvm->arch.n_used_mmu_pages &&
--		    !kvm_has_zapped_obsolete_pages(kvm))
--			continue;
--
--		idx = srcu_read_lock(&kvm->srcu);
--		write_lock(&kvm->mmu_lock);
--
--		if (kvm_has_zapped_obsolete_pages(kvm)) {
--			kvm_mmu_commit_zap_page(kvm,
--			      &kvm->arch.zapped_obsolete_pages);
--			goto unlock;
--		}
--
--		freed = kvm_mmu_zap_oldest_mmu_pages(kvm, sc->nr_to_scan);
--
--unlock:
--		write_unlock(&kvm->mmu_lock);
--		srcu_read_unlock(&kvm->srcu, idx);
--
--		/*
--		 * unfair on small ones
--		 * per-vm shrinkers cry out
--		 * sadness comes quickly
--		 */
--		list_move_tail(&kvm->vm_list, &vm_list);
--		break;
--	}
--
--	mutex_unlock(&kvm_lock);
--	return freed;
--}
--
--static unsigned long
--mmu_shrink_count(struct shrinker *shrink, struct shrink_control *sc)
--{
--	return percpu_counter_read_positive(&kvm_total_used_mmu_pages);
--}
--
--static struct shrinker mmu_shrinker = {
--	.count_objects = mmu_shrink_count,
--	.scan_objects = mmu_shrink_scan,
--	.seeks = DEFAULT_SEEKS * 10,
--};
--
- static void mmu_destroy_caches(void)
- {
- 	kmem_cache_destroy(pte_list_desc_cache);
-@@ -6325,13 +6241,6 @@ int kvm_mmu_vendor_module_init(void)
- 	if (!mmu_page_header_cache)
- 		goto out;
- 
--	if (percpu_counter_init(&kvm_total_used_mmu_pages, 0, GFP_KERNEL))
--		goto out;
--
--	ret = register_shrinker(&mmu_shrinker);
--	if (ret)
--		goto out;
--
- 	return 0;
- 
- out:
-@@ -6350,8 +6259,6 @@ void kvm_mmu_destroy(struct kvm_vcpu *vcpu)
- void kvm_mmu_vendor_module_exit(void)
- {
- 	mmu_destroy_caches();
--	percpu_counter_destroy(&kvm_total_used_mmu_pages);
--	unregister_shrinker(&mmu_shrinker);
- }
- 
- /*
--- 
-2.36.0.464.gb9c8b46e94-goog
+One or both of these commits is/are to blame, depending on whether we want to blame
+the bad calculation, the first use of the bad calculation, or yell at both.
 
+  be50b2065dfa ("kvm: x86: Add support for getting/setting expanded xstate buffer")
+  c60427dd50ba ("x86/fpu: Add uabi_size to guest_fpu")
+
+I believe the right way to fix this is to set the starting uABI size to KVM's
+actual base uABI size, struct kvm_xsave.  I'll test the below more broadly and
+send a patch.
+
+diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
+index c049561f373a..99caae7e8b01 100644
+--- a/arch/x86/kernel/fpu/core.c
++++ b/arch/x86/kernel/fpu/core.c
+@@ -14,6 +14,8 @@
+ #include <asm/traps.h>
+ #include <asm/irq_regs.h>
+ 
++#include <uapi/asm/kvm.h>
++
+ #include <linux/hardirq.h>
+ #include <linux/pkeys.h>
+ #include <linux/vmalloc.h>
+@@ -247,7 +249,20 @@ bool fpu_alloc_guest_fpstate(struct fpu_guest *gfpu)
+        gfpu->fpstate           = fpstate;
+        gfpu->xfeatures         = fpu_user_cfg.default_features;
+        gfpu->perm              = fpu_user_cfg.default_features;
+-       gfpu->uabi_size         = fpu_user_cfg.default_size;
++
++       /*
++        * KVM sets the FP+SSE bits in the XSAVE header when copying FPU state
++        * to userspace, even when XSAVE is unsupported, so that restoring FPU
++        * state on a different CPU that does support XSAVE can cleanly load
++        * the incoming state using its natural XSAVE.  In other words, KVM's
++        * uABI size may be larger than this host's default size.  Conversely,
++        * the default size should never be larger than KVM's base uABI size;
++        * all features that can expand the uABI size must be opt-in.
++        */
++       gfpu->uabi_size         = sizeof(struct kvm_xsave);
++       if (WARN_ON_ONCE(fpu_user_cfg.default_size > gfpu->uabi_size))
++               gfpu->uabi_size = fpu_user_cfg.default_size;
++
+        fpu_init_guest_permissions(gfpu);
+ 
+        return true;
