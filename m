@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 74D2F51B266
-	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 00:51:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DBC351B270
+	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 00:51:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379616AbiEDWzB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 May 2022 18:55:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42498 "EHLO
+        id S1379290AbiEDWzH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 May 2022 18:55:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379465AbiEDWyH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 May 2022 18:54:07 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB69DFD00
-        for <kvm@vger.kernel.org>; Wed,  4 May 2022 15:50:28 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id t70-20020a638149000000b0039daafb0a84so1346718pgd.7
-        for <kvm@vger.kernel.org>; Wed, 04 May 2022 15:50:28 -0700 (PDT)
+        with ESMTP id S1379475AbiEDWyI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 May 2022 18:54:08 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 970AFE4F
+        for <kvm@vger.kernel.org>; Wed,  4 May 2022 15:50:30 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id bj12-20020a170902850c00b0015adf30aaccso1365050plb.15
+        for <kvm@vger.kernel.org>; Wed, 04 May 2022 15:50:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=sZH9G7euzV9rnyh47iho6g8MIzosuwbetrmDjZD8ZTE=;
-        b=RdrJ3mSRKo8KcMIwl96zO0aVxE7Kd9yL5NnXUXbiElkEsbIHCGetW9mNt/Ova49R5d
-         mbq0ihLPoPr8O8x5f7yUR6wqbj29pYJEAQgJzDg/S9AqPY+NuGb7FrZKR17SoZD2PXdd
-         3VQjbAqr9W2MRmdIRzUDkgAiG6SuwvQxlMN3KwFp/V0SDgiAY0q8LOtdwzu9OPMekRF2
-         2OW6PxJgdXCv1nZTwI+7V9t70/wt/ydAdX8ruvgbp4gSYans10VAUkaiIQO/n3mMLRXn
-         oGOmXVwvBH29ReHDXHJ6Rge3Y3rHuZbastkUEoO32vaZ745UOzdImh5SNEFuKdd7LfR8
-         iQ7Q==
+        bh=1aNRK/v5PJV+kxqA6liInwVdvDu0u370B7s4ZQwy8dY=;
+        b=o2163Irn7XxC//LJc+Tjo7pLivoUvw3p/c5fGf8IovDvdplxbQFlL9ZQp6ypiU51U4
+         jKbAIWMkpgoc0q8VVUR9uT9eznXfUsPDHdpEdLU8zpCfpaIzwf6XuiKzHAx3kDnLIJf1
+         yQxNaxFXU/M9JNhKAats9oXfLZOo68wofk4EMPxk+fGzLNKnO++MADnZr1qDY546e46y
+         9J1RHybWx95zGWf6bEh0IJ5DHNBwTzgZhr5/+5uBT3bE39FKxfVVqlsYIVWkxn27CDoD
+         m42nouqq34Q/NRFVtCyptDtloXsFyZSnsPn1iQJaalrVLJyHBECRyX1pS+6WQHrC+Fpp
+         xkkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=sZH9G7euzV9rnyh47iho6g8MIzosuwbetrmDjZD8ZTE=;
-        b=MH3uf4IgPJ1Ph1aff6ZxMQqtyAkL3Dfm9v56KATd9CLODyDSWxs6wVv3D+8vyKTxVn
-         eKh4y5S8THUEkv463kLae4EOD3gcLOW0fJSKHt7UuvDn9JofXpjiSmum9KlnmunnSyos
-         vpfLfS/yvLrpHFRx11Oa0Uqc0bnfkpZ53SR/mO0xkpHZqEXtmh3pjwXbARn4bQfCJuas
-         OgqFol2vJ37pr3IH+RLxQ3sxVP6jFWsQDbWD8kuxPckm4vFR545vM+oIYwMdfaiNOd7C
-         eh9nN14xNlfMkIJ4AQi1JTe/JwlssYZeWGPP+qGKNe13B7Wx30giF+9ob05rL/NUxQYr
-         ldGA==
-X-Gm-Message-State: AOAM532y1NgqN2eeXDXDV4I3IimHu5nAEiwHZzi99yI+DxOoBl918pPk
-        Qeu9oItotuQkBpiLPr9fKj8jd/CYwpA=
-X-Google-Smtp-Source: ABdhPJxz4jVPHmo56+gbSe+F7J/gie2YxwPijSVt8ps/mj3nYM65D/hVu0uM9fwRXY7yFUn0vH5sn5IwQas=
+        bh=1aNRK/v5PJV+kxqA6liInwVdvDu0u370B7s4ZQwy8dY=;
+        b=KpIiIzOLyZYN1iRgljzAjp8t6AfSp34oH0Rop2JOL+JTWYFQR1NC5H+pNoaPheCDuP
+         eSY2kV9YNjKOoIg0a6YDt8aBk7eP2PR3R5FowCDgXMoSu/50UV40AZ/4cgeRg3KKW+GM
+         2XQC+00ziQHAG7+bJbJ1q1CnIiqRnKnTzjbxh2ngbj214gw/4Y4hQKaT+9mOdjtakdLH
+         8kNMfQbWW4XqwkmXp4OufJZy0YKLTCWhoup00a9sXonVc0MgkUbRd6LHDLmVBakPiY0m
+         XifTtUJfDbGYBtaclhj9EtuZJtlnfjolWmtsEVDdGWUwEGMoejyKdrVednaY+DeEYFpx
+         xLlw==
+X-Gm-Message-State: AOAM531xDWoXnclNFEa8F1/Pg2Irau7X3Vx036zzqy8to/BZf5AfctJx
+        boLyT8jpID3wS4CUHWAj2uSQ1VvX118=
+X-Google-Smtp-Source: ABdhPJyiJRX6wi6I/Yfk/jzv+rbmknQ3xM/rsEhoAMsjXeMRkrqbQWi8O9GK5F8UZH2jawvA2g3f0YE9xgc=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:bf06:b0:156:af5b:e6c with SMTP id
- bi6-20020a170902bf0600b00156af5b0e6cmr23996876plb.147.1651704628278; Wed, 04
- May 2022 15:50:28 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2484:b0:50e:68e:d5a5 with SMTP id
+ c4-20020a056a00248400b0050e068ed5a5mr11922192pfv.47.1651704630068; Wed, 04
+ May 2022 15:50:30 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  4 May 2022 22:47:39 +0000
+Date:   Wed,  4 May 2022 22:47:40 +0000
 In-Reply-To: <20220504224914.1654036-1-seanjc@google.com>
-Message-Id: <20220504224914.1654036-34-seanjc@google.com>
+Message-Id: <20220504224914.1654036-35-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220504224914.1654036-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH 033/128] KVM: selftests: Use vm_create_without_vcpus() in hardware_disable_test
+Subject: [PATCH 034/128] KVM: selftests: Use vm_create_without_vcpus() in psci_cpu_on_test
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -66,7 +66,7 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -74,28 +74,27 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 Use vm_create_without_vcpus() instead of open coding a rough equivalent
-in hardware_disable_test.
+in psci_cpu_on_test.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/hardware_disable_test.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/hardware_disable_test.c b/tools/testing/selftests/kvm/hardware_disable_test.c
-index 81ba8645772a..32837207fe4e 100644
---- a/tools/testing/selftests/kvm/hardware_disable_test.c
-+++ b/tools/testing/selftests/kvm/hardware_disable_test.c
-@@ -104,9 +104,7 @@ static void run_test(uint32_t run)
- 	for (i = 0; i < VCPU_NUM; i++)
- 		CPU_SET(i, &cpu_set);
+diff --git a/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c b/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
+index bde7bae20a6e..b4b0fa5d7c21 100644
+--- a/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
++++ b/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
+@@ -76,8 +76,7 @@ int main(void)
+ 	struct kvm_vm *vm;
+ 	struct ucall uc;
  
 -	vm = vm_create(DEFAULT_GUEST_PHY_PAGES);
 -	kvm_vm_elf_load(vm, program_invocation_name);
--	vm_create_irqchip(vm);
-+	vm  = vm_create_without_vcpus(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES);
++	vm = vm_create_without_vcpus(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES);
+ 	ucall_init(vm, NULL);
  
- 	pr_debug("%s: [%d] start vcpus\n", __func__, run);
- 	for (i = 0; i < VCPU_NUM; ++i) {
+ 	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
 -- 
 2.36.0.464.gb9c8b46e94-goog
 
