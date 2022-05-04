@@ -2,161 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AE52951A0EA
-	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 15:29:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C151051A156
+	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 15:50:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350564AbiEDNdX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 May 2022 09:33:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46742 "EHLO
+        id S237638AbiEDNyM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 May 2022 09:54:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350145AbiEDNdU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 May 2022 09:33:20 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2084.outbound.protection.outlook.com [40.107.236.84])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E425923BFF;
-        Wed,  4 May 2022 06:29:44 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ND6xW8Djps55wpv33O/MJSBgiLrdm50pYdxYz2XccMxp60d6tAmxn8KO2lkZ1zPrXxslVbmh69zXh8z/rVPj3Sw5XlJYj4xIDSfziBJRTdAUhms9c+twERuAkUZIE7bVTcJ8RQ+oiqkMJbFt8LMMYjTiW/7H7yW7HkVjIwIDyJgDrLABlmNjY7RMzwSfnUthsvrwEEk87WwZuGPiyL1/pJk560+Aw+WfzS/n/3BJnXnCV/Qekp8RNvrMszgXH4p0uSDqCQ/d5FfXXqkdVCNVyFTd5UT5hvHAKk/otS69dtyXrvvY345KwGoMg84+qonmqw7USE6plJcfGhufiZaxIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2buBwKtXi5ss6arfdsLvObj1J6hPoaT6751mX5f9/TY=;
- b=gCUo2Ou7mU/MQICmwYa1sF1kzkne0fzitiA1H3wjFkuxZG3Vf+ML1VpFTjAHnZUBOn2H//BihcRnmFXrYMtmHzLuz31WN3eM9BnvHPfYzbWYKAHrfgAqZxXYHh3O9JiwOimasg7SpEv/bqegYQPtOv6+4Ogjhu0pUeH8Ft1F3fZVkn5QaFk2efFT64iGQtxP+oYhmuGEKGSQnr/hr8P5+IyfG/rXymlNSO9tC7ZBu3GyILGLpT0TiZ2Tmq0vpgxo5W/Hwg/63X19LjUBPbg2QnT6Vkqr2hL864rZMhPt9IJChqrBrxMaR02E3xPWC0ovCB27cXxXsf7lDgXu1c8cUw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.235) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2buBwKtXi5ss6arfdsLvObj1J6hPoaT6751mX5f9/TY=;
- b=knL8ry+Xd8faxKcZ9TMhEucu4RNfNGpXjOfNUE0v4LZMt1IRLkU1qzHdVqhQoOAx6PBJjg+QgzGU2oD1j4kB0KB/c+zv8hpXsv0TUeohx2e2qk3i1AqXzjdnMwuIPfSxxVwBddVxelS4ZzsIb4N8HBX4+0eoZZ5jvNQNBaowOr3J/60L5xQqZTZ9jcZUFUH1VmQtDmI7xqgGCGlnntQDNf/xuRIbUEzmk0N/OKN7C3XfJtVFNKdS2nyN/l/zBahb8x1lEc5yBnI/5bsr0Je1irO1GOpzU1fqqZt9oLM4pJ7TFDK/G/jd11rJ1cHSzWAbZpUEBfmId35/Q0mck9+E5Q==
-Received: from DM6PR05CA0066.namprd05.prod.outlook.com (2603:10b6:5:335::35)
- by MN2PR12MB2909.namprd12.prod.outlook.com (2603:10b6:208:103::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5206.25; Wed, 4 May
- 2022 13:29:43 +0000
-Received: from DM6NAM11FT050.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:335:cafe::35) by DM6PR05CA0066.outlook.office365.com
- (2603:10b6:5:335::35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5206.12 via Frontend
- Transport; Wed, 4 May 2022 13:29:43 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.235)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.235 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.235; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (12.22.5.235) by
- DM6NAM11FT050.mail.protection.outlook.com (10.13.173.111) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.5227.15 via Frontend Transport; Wed, 4 May 2022 13:29:43 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by DRHQMAIL107.nvidia.com
- (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Wed, 4 May
- 2022 13:29:42 +0000
-Received: from [172.27.12.171] (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Wed, 4 May 2022
- 06:29:39 -0700
-Message-ID: <4295eaec-9b11-8665-d3b4-b986a65d1d47@nvidia.com>
-Date:   Wed, 4 May 2022 16:29:37 +0300
+        with ESMTP id S1350900AbiEDNyB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 May 2022 09:54:01 -0400
+Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57875101EB
+        for <kvm@vger.kernel.org>; Wed,  4 May 2022 06:50:24 -0700 (PDT)
+Received: by mail-ot1-x332.google.com with SMTP id 31-20020a9d0822000000b00605f1807664so944134oty.3
+        for <kvm@vger.kernel.org>; Wed, 04 May 2022 06:50:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=digitalocean.com; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=XTovCgkI7WQYcs4fLS6xIfFtD2h0peXWgmZW9ZWgM9c=;
+        b=flt+V7uaIJ+YxK5IOF4TGv7uUZlvJNKb8RHlDGPj2YXYMGKQE+Mlfon7uJK7cbPsMP
+         YEWEa9uogbpfQgI5ZYT5HhLmRnlhv2bIFi3hppkc080Wt1W6A6Otk7CKT9/6KAdivNzT
+         BJBf8Otrn7TCDTqcQuZE2VK0k0Q38sASs+ieM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=XTovCgkI7WQYcs4fLS6xIfFtD2h0peXWgmZW9ZWgM9c=;
+        b=VFz4i8P8ikVOD7xy2VTcCpICQUqrILGwV7rJu5GUvGKzSBecI+Zb8h4pqdAav85DrS
+         mz1THAxtDzYPqZRzBNEdKQpf/rJVgDri4EDi17r5kICPzGdunHE4aSy5RESjPz9hSQOf
+         cGl2z3qtvb0HkvLGhzj4daave8opgmA4f8NnY3GdQvvJRWdPsPT1muKlBM6wAJzgNgWA
+         oE9pZ5X+aOI3hHat/1ha2QOhB6Th7WkuSzeD4AhL34gej4qVtZB+SJpdWSrx2bH8zhcc
+         rcYTWAub2k00pM84OFddN2/4Ou8f3Ayl1tBqNavHauSre5KWbRLMEJU7kFDvAIY1mszC
+         IrHw==
+X-Gm-Message-State: AOAM530miASBkRJ1xulax/CJdB1LWhI5L8ry1BD+8nBsC4Wbco6kmwp8
+        BNm/mOh7qKR0Sd6SRjnjhXGVoQ==
+X-Google-Smtp-Source: ABdhPJyT5OX5yA19yATjCMLSUzSorq5bTuRHKqrZICyhSWRgYn3BomUvxWCq1zrZojng3tnvWVym2w==
+X-Received: by 2002:a05:6830:1098:b0:605:4550:d51c with SMTP id y24-20020a056830109800b006054550d51cmr7120007oto.135.1651672223502;
+        Wed, 04 May 2022 06:50:23 -0700 (PDT)
+Received: from localhost ([2605:a601:ac0f:820:373b:a889:93d6:e756])
+        by smtp.gmail.com with ESMTPSA id p4-20020a0568301d4400b0060603221248sm5184523oth.24.2022.05.04.06.50.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 May 2022 06:50:23 -0700 (PDT)
+Date:   Wed, 4 May 2022 08:50:22 -0500
+From:   Seth Forshee <sforshee@digitalocean.com>
+To:     Petr Mladek <pmladek@suse.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org, live-patching@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v2] entry/kvm: Make vCPU tasks exit to userspace when a
+ livepatch is pending
+Message-ID: <YnKEnqfxSyVmSGYx@do-x1extreme>
+References: <20220503174934.2641605-1-sforshee@digitalocean.com>
+ <20220504130753.GB8069@pathway.suse.cz>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: [PATCH mlx5-next 0/5] Improve mlx5 live migration driver
-Content-Language: en-US
-To:     <alex.williamson@redhat.com>, <jgg@nvidia.com>, <saeedm@nvidia.com>
-CC:     <kvm@vger.kernel.org>, <netdev@vger.kernel.org>, <kuba@kernel.org>,
-        <leonro@nvidia.com>, <maorg@nvidia.com>, <cohuck@redhat.com>
-References: <20220427093120.161402-1-yishaih@nvidia.com>
-From:   Yishai Hadas <yishaih@nvidia.com>
-In-Reply-To: <20220427093120.161402-1-yishaih@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.126.231.35]
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8e49411a-2943-40dd-70a3-08da2dd22613
-X-MS-TrafficTypeDiagnostic: MN2PR12MB2909:EE_
-X-Microsoft-Antispam-PRVS: <MN2PR12MB29092AD296942A7DB04E5080C3C39@MN2PR12MB2909.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: I36A1LhYynrZ/xK7JtEh7GRfaHMmm+0/tVl7ZWwjuFetAjew2hKwn6UIaflE9MB0PzdHyWyO4DRzzBXpbodwxbXQjQU43J1Owl/lVYPS2X2dF8Pc9hvlo1kpAP4VaSRLRmFQSyDun/LQ1J73wfGZRHO+s/1ORF/WVsJxyViHQ0UQf2mNuJyNnfa7OTBAD6j3iy5QfVAhACrsmpXz/beHnOpnl60ovLpyFmfnREi39Wl0ChvXFQcHe7LSgbpbX/v+bG+Xc3lRmqFAjqiAyieomyJJnz++oRovBgaJCg5cNWBHpPsbVdkhb71k86qO4e0wSCgLUXqx2IaTOOE/v4b+C57hmvKlSxwU0IXvVXuATJ3IrK36YR1FzNaJK7YUWLj85IHlBUlcQPoHOIV6lIs/Sz+M+ZPA1I0dVCxm8RYkVdr81nzUoxqKkcuh0jkr/MfLWo23QQqtQvvaii1K49OM7+VTq/UoHOKvJRLVl7QYn59DeyzLS+mwKpHwyywSozicqW8stjL/TZWb/cq42DJB2HpAZRlvLcKY5Sq59DX+bw6YIU0dcJNytFAjnFO4ctTSUqnYsGJoqLVGPcsfSx7fSNRfZ2kZ+dTJlDZapzkhKrAeLRIwKB2gbV9z9eUEF80S8A0MWUe3PkyNHZ+BXLuLxNs2xLiCSQVbkmYx6qnRA6veEG89Hz4D2fbHJiUr6dxRY+amkCBDVv8LfZTzG0LQL3m+/kY62TlIOVoBISkGOV4ICxhyiJcrIBzB0MzC8efB
-X-Forefront-Antispam-Report: CIP:12.22.5.235;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230001)(4636009)(40470700004)(46966006)(36840700001)(110136005)(508600001)(82310400005)(5660300002)(54906003)(36860700001)(83380400001)(8936002)(31686004)(2906002)(36756003)(316002)(6636002)(16576012)(70586007)(4326008)(70206006)(8676002)(2616005)(186003)(47076005)(426003)(336012)(16526019)(26005)(53546011)(40460700003)(31696002)(86362001)(356005)(81166007)(43740500002)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2022 13:29:43.0286
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8e49411a-2943-40dd-70a3-08da2dd22613
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.235];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT050.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB2909
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220504130753.GB8069@pathway.suse.cz>
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/04/2022 12:31, Yishai Hadas wrote:
-> This series improves mlx5 live migration driver in few aspects as of
-> below.
->
-> Refactor to enable running migration commands in parallel over the PF
-> command interface.
->
-> To achieve that we exposed from mlx5_core an API to let the VF be
-> notified before that the PF command interface goes down/up. (e.g. PF
-> reload upon health recovery).
->
-> Once having the above functionality in place mlx5 vfio doesn't need any
-> more to obtain the global PF lock upon using the command interface but
-> can rely on the above mechanism to be in sync with the PF.
->
-> This can enable parallel VFs migration over the PF command interface
-> from kernel driver point of view.
->
-> In addition,
-> Moved to use the PF async command mode for the SAVE state command.
-> This enables returning earlier to user space upon issuing successfully
-> the command and improve latency by let things run in parallel.
->
-> Alex, as this series touches mlx5_core we may need to send this in a
-> pull request format to VFIO to avoid conflicts before acceptance.
->
-> Yishai
->
-> Yishai Hadas (5):
->    vfio/mlx5: Reorganize the VF is migratable code
->    net/mlx5: Expose mlx5_sriov_blocking_notifier_register /  unregister
->      APIs
->    vfio/mlx5: Manage the VF attach/detach callback from the PF
->    vfio/mlx5: Refactor to enable VFs migration in parallel
->    vfio/mlx5: Run the SAVE state command in an async mode
->
->   .../net/ethernet/mellanox/mlx5/core/sriov.c   |  65 ++++-
->   drivers/vfio/pci/mlx5/cmd.c                   | 229 +++++++++++++-----
->   drivers/vfio/pci/mlx5/cmd.h                   |  50 +++-
->   drivers/vfio/pci/mlx5/main.c                  | 133 +++++-----
->   include/linux/mlx5/driver.h                   |  12 +
->   5 files changed, 358 insertions(+), 131 deletions(-)
->
-Hi Alex,
+On Wed, May 04, 2022 at 03:07:53PM +0200, Petr Mladek wrote:
+> On Tue 2022-05-03 12:49:34, Seth Forshee wrote:
+> > A task can be livepatched only when it is sleeping or it exits to
+> > userspace. This may happen infrequently for a heavily loaded vCPU task,
+> > leading to livepatch transition failures.
+> 
+> This is misleading.
+> 
+> First, the problem is not a loaded CPU. The problem is that the
+> task might spend very long time in the kernel when handling
+> some syscall.
 
-Did you have the chance to look at the series ? It touches mlx5 code 
-(vfio, net), no core changes.
+It's a fully loaded vCPU, which yes to the host looks like spending a
+very long time in the ioctl(KVM_RUN) syscall. I can reword to clarify.
 
-This may go apparently via your tree as a PR from mlx5-next once you'll 
-be fine with.
+> Second, there is no timeout for the transition in the kernel code.
+> It might take very long time but it will not fail.
+
+I suppose the timeout is in kpatch then. I didn't check what implemented
+the timeout. I'll remove the statement about timing out.
+
+> > Fake signals will be sent to tasks which fail patching via stack
+> > checking. This will cause running vCPU tasks to exit guest mode, but
+> > since no signal is pending they return to guest execution without
+> > exiting to userspace. Fix this by treating a pending livepatch migration
+> > like a pending signal, exiting to userspace with EINTR. This allows the
+> > task to be patched, and userspace should re-excecute KVM_RUN to resume
+> > guest execution.
+> 
+> It seems that the patch works as expected but it is far from clear.
+> And the above description helps only partially. Let me try to
+> explain it for dummies like me ;-)
+> 
+> <explanation>
+> The problem was solved by sending a fake signal, see the commit
+> 0b3d52790e1cfd6b80b826 ("livepatch: Remove signal sysfs attribute").
+> It was achieved by calling signal_wake_up(). It set TIF_SIGPENDING
+> and woke the task. It interrupted the syscall and the task was
+> transitioned when leaving to the userspace.
+> 
+> signal_wake_up() was later replaced by set_notify_signal(),
+> see the commit 8df1947c71ee53c7e21 ("livepatch: Replace
+> the fake signal sending with TIF_NOTIFY_SIGNAL infrastructure").
+> The difference is that set_notify_signal() uses TIF_NOTIFY_SIGNAL
+> instead of TIF_SIGPENDING.
+> 
+> The effect is the same when running on a real hardware. The syscall
+> gets interrupted and exit_to_user_mode_loop() is called where
+> the livepatch state is updated (task migrated).
+> 
+> But it works a different way in kvm where the task works are
+> called in the guest mode and the task does not return into
+> the user space in the host mode.
+> </explanation>
+
+Thanks, I can update the commit message to include more of this
+background.
+
+> 
+> The solution provided by this patch is a bit weird, see below.
+> 
+> 
+> > In my testing, systems where livepatching would timeout after 60 seconds
+> > were able to load livepatches within a couple of seconds with this
+> > change.
+> > 
+> > Signed-off-by: Seth Forshee <sforshee@digitalocean.com>
+> > ---
+> > Changes in v2:
+> >  - Added _TIF_SIGPENDING to XFER_TO_GUEST_MODE_WORK
+> >  - Reworded commit message and comments to avoid confusion around the
+> >    term "migrate"
+> > 
+> >  include/linux/entry-kvm.h | 4 ++--
+> >  kernel/entry/kvm.c        | 7 ++++++-
+> >  2 files changed, 8 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/include/linux/entry-kvm.h b/include/linux/entry-kvm.h
+> > index 6813171afccb..bf79e4cbb5a2 100644
+> > --- a/include/linux/entry-kvm.h
+> > +++ b/include/linux/entry-kvm.h
+> > @@ -17,8 +17,8 @@
+> >  #endif
+> >  
+> >  #define XFER_TO_GUEST_MODE_WORK						\
+> > -	(_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_NOTIFY_SIGNAL |	\
+> > -	 _TIF_NOTIFY_RESUME | ARCH_XFER_TO_GUEST_MODE_WORK)
+> > +	(_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_PATCH_PENDING |	\
+> > +	 _TIF_NOTIFY_SIGNAL | _TIF_NOTIFY_RESUME | ARCH_XFER_TO_GUEST_MODE_WORK)
+> >  
+> >  struct kvm_vcpu;
+> >  
+> > diff --git a/kernel/entry/kvm.c b/kernel/entry/kvm.c
+> > index 9d09f489b60e..98439dfaa1a0 100644
+> > --- a/kernel/entry/kvm.c
+> > +++ b/kernel/entry/kvm.c
+> > @@ -14,7 +14,12 @@ static int xfer_to_guest_mode_work(struct kvm_vcpu *vcpu, unsigned long ti_work)
+> >  				task_work_run();
+> >  		}
+> >  
+> > -		if (ti_work & _TIF_SIGPENDING) {
+> > +		/*
+> > +		 * When a livepatch is pending, force an exit to userspace
+> > +		 * as though a signal is pending to allow the task to be
+> > +		 * patched.
+> > +		 */
+> > +		if (ti_work & (_TIF_SIGPENDING | _TIF_PATCH_PENDING)) {
+> >  			kvm_handle_signal_exit(vcpu);
+> >  			return -EINTR;
+> >  		}
+> 
+> This looks strange:
+> 
+>   + klp_send_signals() calls set_notify_signal(task) that sets
+>     TIF_NOTIFY_SIGNAL
+> 
+>   + xfer_to_guest_mode_work() handles TIF_NOTIFY_SIGNAL by calling
+>     task_work_run().
+> 
+>   + This patch calls kvm_handle_signal_exit(vcpu) when
+>     _TIF_PATCH_PENDING is set. It probably causes the guest
+>     to call exit_to_user_mode_loop() because TIF_PATCH_PENDING
+>     bit is set. But neither TIF_NOTIFY_SIGNAL not TIF_NOTIFY_SIGNAL
+>     is set so that it works different way than on the real hardware.
+> 
+> 
+> Question:
+> 
+> Does xfer_to_guest_mode_work() interrupts the syscall running
+> on the guest?
+
+xfer_to_guest_mode_work() is called as part of a loop to execute kvm
+guests (for example, on x86 see vcpu_run() in arch/x86/kvm/x86.c). When
+guest execution is interrupted (in the livepatch case it is interrupted
+when set_notify_signal() is called for the vCPU task)
+xfer_to_guest_mode_work() is called if there is pending work, and if it
+returns non-zero the loop does not immediately re-enter guest execution
+but instead returns to userspace.
+
+> If "yes" then we do not need to call kvm_handle_signal_exit(vcpu).
+> It will be enough to call:
+> 
+> 		if (ti_work & _TIF_PATCH_PENDING)
+> 			klp_update_patch_state(current);
+
+What if the task's call stack contains a function being patched?
+
+> 
+> If "no" then I do not understand why TIF_NOTIFY_SIGNAL interrupts
+> the syscall on the real hardware and not in kvm.
+
+It does interrupt, but xfer_to_guest_mode_handle_work() concludes it's
+not necessary to return to userspace and resumes guest execution.
 
 Thanks,
-Yishai
+Seth
 
+> Anyway, we either should make sure that TIF_NOTIFY_SIGNAL has the same
+> effect on the real hardware and in kvm. Or we need another interface
+> for the fake signal used by livepatching.
+> 
+> Adding Jens Axboe and Eric into Cc.
+> 
+> Best Regards,
+> Petr
