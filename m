@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9522551B34D
-	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 01:27:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8B3751B354
+	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 01:27:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379529AbiEDW4M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 May 2022 18:56:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45418 "EHLO
+        id S1354881AbiEDW4F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 May 2022 18:56:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379436AbiEDWyy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 May 2022 18:54:54 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DCBA53B75
-        for <kvm@vger.kernel.org>; Wed,  4 May 2022 15:51:06 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id d64-20020a17090a6f4600b001da3937032fso3565195pjk.5
-        for <kvm@vger.kernel.org>; Wed, 04 May 2022 15:51:06 -0700 (PDT)
+        with ESMTP id S1379454AbiEDWyz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 May 2022 18:54:55 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9D8753E14
+        for <kvm@vger.kernel.org>; Wed,  4 May 2022 15:51:07 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id b198-20020a6334cf000000b003ab23ccd0cbso1338406pga.14
+        for <kvm@vger.kernel.org>; Wed, 04 May 2022 15:51:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=OWG5SLItV7LvwK0/+ikCwsRpvTwxCQso8sF2TQ8YEnM=;
-        b=ZKmlmJzgZ4JzKhUTbhH/I23KY5Z5b9VMBKo2xMRFMz4DyZYFE1KeNik9OF9C1kIfOb
-         C+wkpKW+2XJK1OpC6JaSAJO6mW3VZWzjjuyhBz/AmD6unr6E61RtFbMe0UI7Iz2QkXN+
-         LmD8WqRwtRxB1GK4S1OFQhAmIpkUWwsUDf1s2xN3P5+68+CUeVVsfCmBjOozHroon29H
-         1H+4vGaQn+fVH9X+1U/Niartr7vBgEcUKjLD8oy7Z/QSL0U3yTaLckillZxtgS4FukTD
-         dJDGhsCJZzuwcX3CjlFQsca7aPq4I65JIb8V6lx7qdmNFC1XkrYlKQdmesliekVCi+tL
-         iIGQ==
+        bh=5K5Fz1ePxPdVaX17bcThUb5uJeS3vgOUejHN3idcjYI=;
+        b=Su+AFXd8gVSwgOvXwJ4uI0nhENW7VzSvc0XkctPnu5pI0EFXFtJOeIZkStTB2yC4Hq
+         g/P14AqlA5PL1q1zHb7mqAR00HVv9us0K5/rKiegN+dwaVr43BbvGAhSoB//JEZL1c95
+         DNx+YI6HJoEwfTxKvmkPLm253B++QeFX9/nKM+cdXICIbnfK3CfTSXH0R5EPs+b6yTuQ
+         m2A8Gt8ROmO2FMduOilZBaagj9pUzjsaj+z9m48Nlx+zg0qR3LjaPD4GTJTzBG3pDWFz
+         qdYw2jq/QZtXRJEOg2A7HaP9udIRMOWP9zrcXlZEBBx74mA2pxhQvSWBCbthAVZbkpEv
+         13Kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=OWG5SLItV7LvwK0/+ikCwsRpvTwxCQso8sF2TQ8YEnM=;
-        b=wkiM7dnPhY9F1KttzpuzqazqSQGFM77FMeYabyxvxE1GVC2bvzsucVCY8xzMzhD4YN
-         myGQIfSJkGFEq9R77f2j/mWa2jG6CT3F6p/0mqi4Pp5jMSkDqvESS7OBpICyhCwSC1wq
-         K3LRBSzLe6gshgrSi1BFRknLO//PXG953LmL48H7620FZSkQDuvyTqwzPMLlRkjfJ39D
-         KFV4qODJSXc1yjF9Cc99EOsJrg3cpn1vfN524c2F6QsoxYmss2HfTeUxjhn3JmImBasO
-         kJ0Sokp1KmzRDBWn4NllB5LM+x4a9FntgQQYAruC0WTNCvzgp2chzSeCChMpFKv26BBs
-         EmGg==
-X-Gm-Message-State: AOAM530Z5G0w3DymG6juAMSHPxi6t4HPwC8EkwtKvuJiEn7odyk+L1XF
-        xfHM4dkCsxgoHw/tzqYx83CXXzSorsw=
-X-Google-Smtp-Source: ABdhPJxQ8JxwciwXyutSnLiak0iPf/I4/7Pb7TMZbIng41hMdouKE1AZNzAS3U3i4cka2H01LwsrA/ZjdLs=
+        bh=5K5Fz1ePxPdVaX17bcThUb5uJeS3vgOUejHN3idcjYI=;
+        b=IXE+xrw5NdhKxrLt5fBz3NW0C9Gx74pt+qIMlnsQZ4zuCgjmsKz6ZvTY1ALzf5VNfA
+         AuQj5ZwyVi0pzlwoyyDe/hOQ40ujuhZswdkP5okNarZ9b8phi1wvhi8FYQ67R+yGUSvx
+         d65oThe8SAt7mOTXZej4dL+kUwugvQEV408eEP0lmmBH7oDMyva7ppYuSe2v+ndYNpv3
+         /Zb6ykhNOGwlTB6I8Wd79cxJOJwTQz5Jjg4PErvrQQhDcCYhqwx7L7O/Lc7XAUyxpZ0t
+         hMwLDJwocAzZG71llM93lIQbEbPHUizrvKlNNYB+EFzYKCdhjyBNifCrJkiFGqo4CCby
+         fW9Q==
+X-Gm-Message-State: AOAM530W7p94Qq2DvcSAvg+f+uCTkT9RpZurHdLGDcbNVGDY5oQo7bIc
+        Wy+rr0UsB+vT7ofFoE3JgxDJk+bAvf4=
+X-Google-Smtp-Source: ABdhPJwKxLZnwu6EdPiTHuTrtlHJYOb3zcL1SaTBUa69e0oYWwN1fY1BmhDI6P3isuiTAiVokRsUo2N/YMY=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:aa7:8892:0:b0:50e:1463:3cd1 with SMTP id
- z18-20020aa78892000000b0050e14633cd1mr8550029pfe.13.1651704665764; Wed, 04
- May 2022 15:51:05 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90b:1b0d:b0:1dc:672e:c913 with SMTP id
+ nu13-20020a17090b1b0d00b001dc672ec913mr2232357pjb.102.1651704667489; Wed, 04
+ May 2022 15:51:07 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  4 May 2022 22:48:01 +0000
+Date:   Wed,  4 May 2022 22:48:02 +0000
 In-Reply-To: <20220504224914.1654036-1-seanjc@google.com>
-Message-Id: <20220504224914.1654036-56-seanjc@google.com>
+Message-Id: <20220504224914.1654036-57-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220504224914.1654036-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH 055/128] KVM: selftests: Convert sync_regs_test away from VCPU_ID
+Subject: [PATCH 056/128] KVM: selftests: Convert hyperv_cpuid away from VCPU_ID
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -73,185 +73,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Convert sync_regs_test to use vm_create_with_one_vcpu() and pass around
-a 'struct kvm_vcpu' object instead of using a global VCPU_ID.  Note, this
-is a "functional" change in the sense that the test now creates a vCPU
-with vcpu_id==0 instead of vcpu_id==5.  The non-zero VCPU_ID was 100%
-arbitrary and added little to no validation coverage.  If testing
-non-zero vCPU IDs is desirable for generic tests, that can be
-done in the future by tweaking the VM creation helpers.
+Convert hyperv_cpuid to use vm_create_with_one_vcpu() and pass around a
+'struct kvm_vcpu' object instead of using a global VCPU_ID.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/x86_64/sync_regs_test.c     | 52 +++++++++----------
- 1 file changed, 25 insertions(+), 27 deletions(-)
+ .../selftests/kvm/x86_64/hyperv_cpuid.c       | 23 +++++++++----------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
-index fc03a150278d..c971706b49f5 100644
---- a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+index 896e1e7c1df7..d1a22ee98cf3 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
 @@ -20,8 +20,6 @@
- #include "kvm_util.h"
  #include "processor.h"
+ #include "vmx.h"
  
--#define VCPU_ID 5
+-#define VCPU_ID 0
 -
- #define UCALL_PIO_PORT ((uint16_t)0x1000)
+ static void guest_code(void)
+ {
+ }
+@@ -115,25 +113,26 @@ static void test_hv_cpuid(struct kvm_cpuid2 *hv_cpuid_entries,
+ 	}
+ }
  
- struct ucall uc_none = {
-@@ -84,6 +82,7 @@ static void compare_vcpu_events(struct kvm_vcpu_events *left,
+-void test_hv_cpuid_e2big(struct kvm_vm *vm, bool system)
++void test_hv_cpuid_e2big(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+ {
+ 	static struct kvm_cpuid2 cpuid = {.nent = 0};
+ 	int ret;
+ 
+-	if (!system)
+-		ret = __vcpu_ioctl(vm, VCPU_ID, KVM_GET_SUPPORTED_HV_CPUID, &cpuid);
++	if (vcpu)
++		ret = __vcpu_ioctl(vm, vcpu->id, KVM_GET_SUPPORTED_HV_CPUID, &cpuid);
+ 	else
+ 		ret = __kvm_ioctl(vm_get_kvm_fd(vm), KVM_GET_SUPPORTED_HV_CPUID, &cpuid);
+ 
+ 	TEST_ASSERT(ret == -1 && errno == E2BIG,
+ 		    "%s KVM_GET_SUPPORTED_HV_CPUID didn't fail with -E2BIG when"
+-		    " it should have: %d %d", system ? "KVM" : "vCPU", ret, errno);
++		    " it should have: %d %d", !vcpu ? "KVM" : "vCPU", ret, errno);
+ }
  
  int main(int argc, char *argv[])
  {
-+	struct kvm_vcpu *vcpu;
  	struct kvm_vm *vm;
- 	struct kvm_run *run;
- 	struct kvm_regs regs;
-@@ -104,57 +103,56 @@ int main(int argc, char *argv[])
+ 	struct kvm_cpuid2 *hv_cpuid_entries;
++	struct kvm_vcpu *vcpu;
+ 
+ 	/* Tell stdout not to buffer its content */
+ 	setbuf(stdout, NULL);
+@@ -143,12 +142,12 @@ int main(int argc, char *argv[])
  		exit(KSFT_SKIP);
  	}
  
--	/* Create VM */
 -	vm = vm_create_default(VCPU_ID, 0, guest_code);
 +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
  
--	run = vcpu_state(vm, VCPU_ID);
-+	run = vcpu->run;
+ 	/* Test vCPU ioctl version */
+-	test_hv_cpuid_e2big(vm, false);
++	test_hv_cpuid_e2big(vm, vcpu);
  
- 	/* Request reading invalid register set from VCPU. */
- 	run->kvm_valid_regs = INVALID_SYNC_FIELD;
--	rv = _vcpu_run(vm, VCPU_ID);
-+	rv = _vcpu_run(vm, vcpu->id);
- 	TEST_ASSERT(rv < 0 && errno == EINVAL,
- 		    "Invalid kvm_valid_regs did not cause expected KVM_RUN error: %d\n",
- 		    rv);
--	vcpu_state(vm, VCPU_ID)->kvm_valid_regs = 0;
-+	run->kvm_valid_regs = 0;
+-	hv_cpuid_entries = vcpu_get_supported_hv_cpuid(vm, VCPU_ID);
++	hv_cpuid_entries = vcpu_get_supported_hv_cpuid(vm, vcpu->id);
+ 	test_hv_cpuid(hv_cpuid_entries, false);
+ 	free(hv_cpuid_entries);
  
- 	run->kvm_valid_regs = INVALID_SYNC_FIELD | TEST_SYNC_FIELDS;
--	rv = _vcpu_run(vm, VCPU_ID);
-+	rv = _vcpu_run(vm, vcpu->id);
- 	TEST_ASSERT(rv < 0 && errno == EINVAL,
- 		    "Invalid kvm_valid_regs did not cause expected KVM_RUN error: %d\n",
- 		    rv);
--	vcpu_state(vm, VCPU_ID)->kvm_valid_regs = 0;
-+	run->kvm_valid_regs = 0;
+@@ -157,8 +156,8 @@ int main(int argc, char *argv[])
+ 		print_skip("Enlightened VMCS is unsupported");
+ 		goto do_sys;
+ 	}
+-	vcpu_enable_evmcs(vm, VCPU_ID);
+-	hv_cpuid_entries = vcpu_get_supported_hv_cpuid(vm, VCPU_ID);
++	vcpu_enable_evmcs(vm, vcpu->id);
++	hv_cpuid_entries = vcpu_get_supported_hv_cpuid(vm, vcpu->id);
+ 	test_hv_cpuid(hv_cpuid_entries, true);
+ 	free(hv_cpuid_entries);
  
- 	/* Request setting invalid register set into VCPU. */
- 	run->kvm_dirty_regs = INVALID_SYNC_FIELD;
--	rv = _vcpu_run(vm, VCPU_ID);
-+	rv = _vcpu_run(vm, vcpu->id);
- 	TEST_ASSERT(rv < 0 && errno == EINVAL,
- 		    "Invalid kvm_dirty_regs did not cause expected KVM_RUN error: %d\n",
- 		    rv);
--	vcpu_state(vm, VCPU_ID)->kvm_dirty_regs = 0;
-+	run->kvm_dirty_regs = 0;
+@@ -169,7 +168,7 @@ int main(int argc, char *argv[])
+ 		goto out;
+ 	}
  
- 	run->kvm_dirty_regs = INVALID_SYNC_FIELD | TEST_SYNC_FIELDS;
--	rv = _vcpu_run(vm, VCPU_ID);
-+	rv = _vcpu_run(vm, vcpu->id);
- 	TEST_ASSERT(rv < 0 && errno == EINVAL,
- 		    "Invalid kvm_dirty_regs did not cause expected KVM_RUN error: %d\n",
- 		    rv);
--	vcpu_state(vm, VCPU_ID)->kvm_dirty_regs = 0;
-+	run->kvm_dirty_regs = 0;
+-	test_hv_cpuid_e2big(vm, true);
++	test_hv_cpuid_e2big(vm, NULL);
  
- 	/* Request and verify all valid register sets. */
- 	/* TODO: BUILD TIME CHECK: TEST_ASSERT(KVM_SYNC_X86_NUM_FIELDS != 3); */
- 	run->kvm_valid_regs = TEST_SYNC_FIELDS;
--	rv = _vcpu_run(vm, VCPU_ID);
-+	rv = _vcpu_run(vm, vcpu->id);
- 	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
- 		    "Unexpected exit reason: %u (%s),\n",
- 		    run->exit_reason,
- 		    exit_reason_str(run->exit_reason));
- 
--	vcpu_regs_get(vm, VCPU_ID, &regs);
-+	vcpu_regs_get(vm, vcpu->id, &regs);
- 	compare_regs(&regs, &run->s.regs.regs);
- 
--	vcpu_sregs_get(vm, VCPU_ID, &sregs);
-+	vcpu_sregs_get(vm, vcpu->id, &sregs);
- 	compare_sregs(&sregs, &run->s.regs.sregs);
- 
--	vcpu_events_get(vm, VCPU_ID, &events);
-+	vcpu_events_get(vm, vcpu->id, &events);
- 	compare_vcpu_events(&events, &run->s.regs.events);
- 
- 	/* Set and verify various register values. */
-@@ -164,7 +162,7 @@ int main(int argc, char *argv[])
- 
- 	run->kvm_valid_regs = TEST_SYNC_FIELDS;
- 	run->kvm_dirty_regs = KVM_SYNC_X86_REGS | KVM_SYNC_X86_SREGS;
--	rv = _vcpu_run(vm, VCPU_ID);
-+	rv = _vcpu_run(vm, vcpu->id);
- 	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
- 		    "Unexpected exit reason: %u (%s),\n",
- 		    run->exit_reason,
-@@ -176,13 +174,13 @@ int main(int argc, char *argv[])
- 		    "apic_base sync regs value incorrect 0x%llx.",
- 		    run->s.regs.sregs.apic_base);
- 
--	vcpu_regs_get(vm, VCPU_ID, &regs);
-+	vcpu_regs_get(vm, vcpu->id, &regs);
- 	compare_regs(&regs, &run->s.regs.regs);
- 
--	vcpu_sregs_get(vm, VCPU_ID, &sregs);
-+	vcpu_sregs_get(vm, vcpu->id, &sregs);
- 	compare_sregs(&sregs, &run->s.regs.sregs);
- 
--	vcpu_events_get(vm, VCPU_ID, &events);
-+	vcpu_events_get(vm, vcpu->id, &events);
- 	compare_vcpu_events(&events, &run->s.regs.events);
- 
- 	/* Clear kvm_dirty_regs bits, verify new s.regs values are
-@@ -191,7 +189,7 @@ int main(int argc, char *argv[])
- 	run->kvm_valid_regs = TEST_SYNC_FIELDS;
- 	run->kvm_dirty_regs = 0;
- 	run->s.regs.regs.rbx = 0xDEADBEEF;
--	rv = _vcpu_run(vm, VCPU_ID);
-+	rv = _vcpu_run(vm, vcpu->id);
- 	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
- 		    "Unexpected exit reason: %u (%s),\n",
- 		    run->exit_reason,
-@@ -208,8 +206,8 @@ int main(int argc, char *argv[])
- 	run->kvm_dirty_regs = 0;
- 	run->s.regs.regs.rbx = 0xAAAA;
- 	regs.rbx = 0xBAC0;
--	vcpu_regs_set(vm, VCPU_ID, &regs);
--	rv = _vcpu_run(vm, VCPU_ID);
-+	vcpu_regs_set(vm, vcpu->id, &regs);
-+	rv = _vcpu_run(vm, vcpu->id);
- 	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
- 		    "Unexpected exit reason: %u (%s),\n",
- 		    run->exit_reason,
-@@ -217,7 +215,7 @@ int main(int argc, char *argv[])
- 	TEST_ASSERT(run->s.regs.regs.rbx == 0xAAAA,
- 		    "rbx sync regs value incorrect 0x%llx.",
- 		    run->s.regs.regs.rbx);
--	vcpu_regs_get(vm, VCPU_ID, &regs);
-+	vcpu_regs_get(vm, vcpu->id, &regs);
- 	TEST_ASSERT(regs.rbx == 0xBAC0 + 1,
- 		    "rbx guest value incorrect 0x%llx.",
- 		    regs.rbx);
-@@ -229,7 +227,7 @@ int main(int argc, char *argv[])
- 	run->kvm_valid_regs = 0;
- 	run->kvm_dirty_regs = TEST_SYNC_FIELDS;
- 	run->s.regs.regs.rbx = 0xBBBB;
--	rv = _vcpu_run(vm, VCPU_ID);
-+	rv = _vcpu_run(vm, vcpu->id);
- 	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
- 		    "Unexpected exit reason: %u (%s),\n",
- 		    run->exit_reason,
-@@ -237,7 +235,7 @@ int main(int argc, char *argv[])
- 	TEST_ASSERT(run->s.regs.regs.rbx == 0xBBBB,
- 		    "rbx sync regs value incorrect 0x%llx.",
- 		    run->s.regs.regs.rbx);
--	vcpu_regs_get(vm, VCPU_ID, &regs);
-+	vcpu_regs_get(vm, vcpu->id, &regs);
- 	TEST_ASSERT(regs.rbx == 0xBBBB + 1,
- 		    "rbx guest value incorrect 0x%llx.",
- 		    regs.rbx);
+ 	hv_cpuid_entries = kvm_get_supported_hv_cpuid();
+ 	test_hv_cpuid(hv_cpuid_entries, nested_vmx_supported());
 -- 
 2.36.0.464.gb9c8b46e94-goog
 
