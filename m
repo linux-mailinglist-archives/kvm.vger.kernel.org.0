@@ -2,79 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D427451AC60
-	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 20:07:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0AE051AC88
+	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 20:14:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376705AbiEDSKa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 May 2022 14:10:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47552 "EHLO
+        id S1376683AbiEDSRj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 May 2022 14:17:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376540AbiEDSJo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 May 2022 14:09:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B4FCB5A0B0
-        for <kvm@vger.kernel.org>; Wed,  4 May 2022 10:26:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651685192;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AxkTcPmk/s+qgBgTI+JGCtm1W6V+bkC5oNvBdsahWD8=;
-        b=hOdzfnBEobLtINAt6HOS7n1+grqLd2Gg2WV5lw+8fby/jkwtMoPu/faRZdnca/kMWC3r4P
-        W95LqxIBu6PYYJ/MMvq3eSVCZJkfEojX1lUkVMnH2ODd+Iq6yfO/akOhHmo/91Sn/s+GzJ
-        YpMuu0FSNUCnXz6ASsvour18nChSHfc=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-296-k_aRyZbNNAeEeYeBS-9_YQ-1; Wed, 04 May 2022 13:26:31 -0400
-X-MC-Unique: k_aRyZbNNAeEeYeBS-9_YQ-1
-Received: by mail-il1-f197.google.com with SMTP id j7-20020a056e02218700b002cd9e2f0ac7so1027251ila.16
-        for <kvm@vger.kernel.org>; Wed, 04 May 2022 10:26:31 -0700 (PDT)
+        with ESMTP id S1359548AbiEDSRc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 May 2022 14:17:32 -0400
+Received: from mail-oi1-x22c.google.com (mail-oi1-x22c.google.com [IPv6:2607:f8b0:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 612D0887B1
+        for <kvm@vger.kernel.org>; Wed,  4 May 2022 10:38:00 -0700 (PDT)
+Received: by mail-oi1-x22c.google.com with SMTP id l16so1880571oil.6
+        for <kvm@vger.kernel.org>; Wed, 04 May 2022 10:38:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=digitalocean.com; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=3Ip9zT2i7zSnGjJK9WeLXZOZAaABPsRWgCx7EqlZjQg=;
+        b=hCK9MT1LglHjjhfUWmXqK8hlepGZtMUw/+n/nTyx5T6t5nVgrr9oBrLd9zHzyEeDX7
+         2GLm10Puhu5yS0ToqLOHrDQvttMuPhf0ndlBDjxP5O9eIWA4/BtmdGDEjmdQET9KWizK
+         tG58PjCOSNi+Zi4R7LE5Oo91ibSmSa8skbVTo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=AxkTcPmk/s+qgBgTI+JGCtm1W6V+bkC5oNvBdsahWD8=;
-        b=0FiX0VRpOgrds7/oT6bI7avnb5/gKgOaVPEV7c/qbIILNlAlE9/b00Pkel3ERGZr9L
-         OBuRBs/wEZ2dumQj2YkjMMQQq3XvXKCvkYJ3Ca0Pvtdf3+UiHBRl6kM/XpBga0uVckpL
-         nz5QPX+Gmt9BR5I+jb/liOINhHQsjAd02Pd0Kt2MIX7QZCAxcHLKA9AYdBKDUM9XK/EI
-         U1yrTeZCwqOhgR1ugA5/2z8A1lqjPUttm4rqN0JErqh//dr5WASG8q2RWJd8l2XGMPFh
-         epRk8VOlT4DPcqPaCnhwkZoqfgA/jQASXQvBsXzHF0oYD0piP+Sc1Kt3l+7WaCQpi5oS
-         IGHQ==
-X-Gm-Message-State: AOAM532/HgYOhDsRF3vP/G238k6QX1kvJJtWOmGGfnyy8TS+hnJO8Fet
-        Vr/4FV9jIKGqtxo2/GuUFc0KC1RzfYKBvye+GfKjrN8/tB/VM9hu0AraWtCBxcb3gqSze71GmLX
-        qYgGLg4TP55jz
-X-Received: by 2002:a05:6e02:194f:b0:2cd:fc1e:77ad with SMTP id x15-20020a056e02194f00b002cdfc1e77admr8449194ilu.52.1651685190815;
-        Wed, 04 May 2022 10:26:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxB+UtOG8d1KoB+Mcnd4kp28/hRMISR6NMvfBSAVZCvFtcmcC69wTYmpA2312RVZetqqRrY6g==
-X-Received: by 2002:a05:6e02:194f:b0:2cd:fc1e:77ad with SMTP id x15-20020a056e02194f00b002cdfc1e77admr8449181ilu.52.1651685190440;
-        Wed, 04 May 2022 10:26:30 -0700 (PDT)
-Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id w63-20020a025d42000000b0032b3a781760sm4799819jaa.36.2022.05.04.10.26.29
+        bh=3Ip9zT2i7zSnGjJK9WeLXZOZAaABPsRWgCx7EqlZjQg=;
+        b=5rihwUAxs7WckY4U3D9YqIssquidtpGjSvYK9NQMYPYHFbLPHXLBP1Gbe8ID/b+JEw
+         I1Du4uK+4CvZTtYY4KHiVX9jIgFKVmB4HQ2eTWrEM1kPGbAlZEWptB+V7qXHd+EIj6DY
+         fuDJlRTnWzO0pkLNVIF5dBAEKOtJv4WSnDSz0s2OC1bbEHvs3SBxf3mM2QId2+JYGAMX
+         jTAs6kcVNH9k3O5Fozwlnp/WMjO7Ge31ZEtvyWziulQQdDpjozU12mYrtlzNqTeffmJp
+         tZzZmdA5KeNapB+tDTDbZzsUmxxeLJ2GWpoV6n/V5kgfM0iCdS6BqQISFdePEej38Vhi
+         NJAQ==
+X-Gm-Message-State: AOAM5336pjqWMCYlwWPHL9UJ1XYzUS5tJNR0WXHRJkOQYGW6tuT7xu35
+        /hYI0S6f+Nxd/9UFDiiWeluwLQ==
+X-Google-Smtp-Source: ABdhPJwHPZAHBDKtQ1+dzZYLy7BeIR0CDMWECYJv5dwF29U9QIkcsa19tJoIWWCCjU0bZIO202YqUA==
+X-Received: by 2002:a05:6808:14c9:b0:325:eba5:1325 with SMTP id f9-20020a05680814c900b00325eba51325mr288679oiw.249.1651685879122;
+        Wed, 04 May 2022 10:37:59 -0700 (PDT)
+Received: from localhost ([2605:a601:ac0f:820:373b:a889:93d6:e756])
+        by smtp.gmail.com with ESMTPSA id ay7-20020a056808300700b00325cda1ff8csm4587046oib.11.2022.05.04.10.37.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 May 2022 10:26:30 -0700 (PDT)
-Date:   Wed, 4 May 2022 13:26:28 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Shivam Kumar <shivam.kumar1@nutanix.com>
-Cc:     pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
-        Shaju Abraham <shaju.abraham@nutanix.com>,
-        Manish Mishra <manish.mishra@nutanix.com>,
-        Anurag Madnawat <anurag.madnawat@nutanix.com>
-Subject: Re: [PATCH v3 1/3] KVM: Implement dirty quota-based throttling of
- vcpus
-Message-ID: <YnK3RCW3RAMhDY2d@xz-m1.local>
-References: <20220306220849.215358-1-shivam.kumar1@nutanix.com>
- <20220306220849.215358-2-shivam.kumar1@nutanix.com>
- <YnBXuXTcX2OC6fQU@xz-m1.local>
- <8433df8b-fd88-1166-f27b-a87cfc08c50c@nutanix.com>
- <YnExg/3McGZK3YdR@xz-m1.local>
- <25888a8f-ef44-ec69-071c-609ddd7661dc@nutanix.com>
+        Wed, 04 May 2022 10:37:58 -0700 (PDT)
+Date:   Wed, 4 May 2022 12:37:56 -0500
+From:   Seth Forshee <sforshee@digitalocean.com>
+To:     Petr Mladek <pmladek@suse.com>
+Cc:     "Eric W. Biederman" <ebiederm@xmission.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org, live-patching@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v2] entry/kvm: Make vCPU tasks exit to userspace when a
+ livepatch is pending
+Message-ID: <YnK59HzEq8OBF5Is@do-x1extreme>
+References: <20220503174934.2641605-1-sforshee@digitalocean.com>
+ <20220504130753.GB8069@pathway.suse.cz>
+ <87r159fkmp.fsf@email.froward.int.ebiederm.org>
+ <20220504151252.GA13574@pathway.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <25888a8f-ef44-ec69-071c-609ddd7661dc@nutanix.com>
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+In-Reply-To: <20220504151252.GA13574@pathway.suse.cz>
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -83,189 +80,252 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 04, 2022 at 12:03:57PM +0530, Shivam Kumar wrote:
-> 
-> On 03/05/22 7:13 pm, Peter Xu wrote:
-> > On Tue, May 03, 2022 at 12:52:26PM +0530, Shivam Kumar wrote:
-> > > On 03/05/22 3:44 am, Peter Xu wrote:
-> > > > Hi, Shivam,
-> > > > 
-> > > > On Sun, Mar 06, 2022 at 10:08:48PM +0000, Shivam Kumar wrote:
-> > > > > +static inline int kvm_vcpu_check_dirty_quota(struct kvm_vcpu *vcpu)
-> > > > > +{
-> > > > > +	u64 dirty_quota = READ_ONCE(vcpu->run->dirty_quota);
-> > > > > +	u64 pages_dirtied = vcpu->stat.generic.pages_dirtied;
-> > > > > +	struct kvm_run *run = vcpu->run;
-> > > > > +
-> > > > > +	if (!dirty_quota || (pages_dirtied < dirty_quota))
-> > > > > +		return 1;
-> > > > > +
-> > > > > +	run->exit_reason = KVM_EXIT_DIRTY_QUOTA_EXHAUSTED;
-> > > > > +	run->dirty_quota_exit.count = pages_dirtied;
-> > > > > +	run->dirty_quota_exit.quota = dirty_quota;
-> > > > Pure question: why this needs to be returned to userspace?  Is this value
-> > > > set from userspace?
-> > > > 
-> > > 1) The quota needs to be replenished once exhasuted.
-> > > 2) The vcpu should be made to sleep if it has consumed its quota pretty
-> > > quick.
-> > > 
-> > > Both these actions are performed on the userspace side, where we expect a
-> > > thread calculating the quota at very small regular intervals based on
-> > > network bandwith information. This can enable us to micro-stun the vcpus
-> > > (steal their runtime just the moment they were dirtying heavily).
-> > > 
-> > > We have implemented a "common quota" approach, i.e. transfering any unused
-> > > quota to a common pool so that it can be consumed by any vcpu in the next
-> > > interval on FCFS basis.
-> > > 
-> > > It seemed fit to implement all this logic on the userspace side and just
-> > > keep the "dirty count" and the "logic to exit to userspace whenever the vcpu
-> > > has consumed its quota" on the kernel side. The count is required on the
-> > > userspace side because there are cases where a vcpu can actually dirty more
-> > > than its quota (e.g. if PML is enabled). Hence, this information can be
-> > > useful on the userspace side and can be used to re-adjust the next quotas.
-> > I agree this information is useful.  Though my question was that if the
-> > userspace should have a copy (per-vcpu) of that already then it's not
-> > needed to pass it over to it anymore?
-> This is how we started but then based on the feedback from Sean, we moved
-> 'pages_dirtied' to vcpu stats as it can be a useful stat. The 'dirty_quota'
-> variable is already shared with userspace as it is in the vcpu run struct
-> and hence the quota can be modified by userspace on the go. So, it made
-> sense to pass both the variables at the time of exit (the vcpu might be
-> exiting with an old copy of dirty quota, which the userspace needs to know).
-
-Correct.
-
-My point was the userspace could simply cache the old quota too in the
-userspace vcpu struct even if there's the real quota value in vcpu run.
-
-No strong opinion, but normally if this info is optional to userspace I
-think it's cleaner to not pass it over again to keep the kernel ABI simple.
-
-> 
-> Thanks.
-> > > Thank you for the question. Please let me know if you have further concerns.
-> > > 
-> > > > > +	return 0;
-> > > > > +}
-> > > > The other high level question is whether you have considered using the ring
-> > > > full event to achieve similar goal?
-> > > > 
-> > > > Right now KVM_EXIT_DIRTY_RING_FULL event is generated when per-vcpu ring
-> > > > gets full.  I think there's a problem that the ring size can not be
-> > > > randomly set but must be a power of 2.  Also, there is a maximum size of
-> > > > ring allowed at least.
-> > > > 
-> > > > However since the ring size can be fairly small (e.g. 4096 entries) it can
-> > > > still achieve some kind of accuracy.  For example, the userspace can
-> > > > quickly kick the vcpu back to VM_RUN only until it sees that it reaches
-> > > > some quota (and actually that's how dirty-limit is implemented on QEMU,
-> > > > contributed by China Telecom):
-> > > > 
-> > > > https://urldefense.proofpoint.com/v2/url?u=https-3A__lore.kernel.org_qemu-2Ddevel_cover.1646243252.git.huangy81-40chinatelecom.cn_&d=DwIBaQ&c=s883GpUCOChKOHiocYtGcg&r=4hVFP4-J13xyn-OcN0apTCh8iKZRosf5OJTQePXBMB8&m=y6cIruIsp50rH6ImgUi28etki9RTCTHLhRic4IzAtLa62j9PqDMsKGmePy8wGIy8&s=tAZZzTjg74UGxGVzhlREaLYpxBpsDaNV4X_DNdOcUJ8&e=
-> > > > 
-> > > > Is there perhaps some explicit reason that dirty ring cannot be used?
-> > > > 
-> > > > Thanks!
-> > > When we started this series, AFAIK it was not possible to set the dirty ring
-> > > size once the vcpus are created. So, we couldn't dynamically set dirty ring
-> > > size.
-> > Agreed.  The ring size can only be set when startup and can't be changed.
+On Wed, May 04, 2022 at 05:12:52PM +0200, Petr Mladek wrote:
+> On Wed 2022-05-04 09:16:46, Eric W. Biederman wrote:
+> > Petr Mladek <pmladek@suse.com> writes:
 > > 
-> > > Also, since we are going for micro-stunning and the allowed dirties in
-> > > such small intervals can be pretty low, it can cause issues if we can
-> > > only use a dirty quota which is a power of 2. For instance, if the dirty
-> > > quota is to be set to 9, we can only set it to 16 (if we round up) and if
-> > > dirty quota is to be set to 15 we can only set it to 8 (if we round
-> > > down). I hope you'd agree that this can make a huge difference.
-> > Yes. As discussed above, I didn't expect the ring size to be the quota
-> > per-se, so what I'm wondering is whether we can leverage a small and
-> > constant sized ring to emulate the behavior of a quota with any size, but
-> > with a minimum granule of the dirty ring size.
-> This would be an interesting thing to try. I've already planned efforts to
-> optimise it for dirty ring interface. Thank you for this suggestion.
+> > > On Tue 2022-05-03 12:49:34, Seth Forshee wrote:
+> > >> A task can be livepatched only when it is sleeping or it exits to
+> > >> userspace. This may happen infrequently for a heavily loaded vCPU task,
+> > >> leading to livepatch transition failures.
+> > >
+> > > This is misleading.
+> > >
+> > > First, the problem is not a loaded CPU. The problem is that the
+> > > task might spend very long time in the kernel when handling
+> > > some syscall.
+> > >
+> > > Second, there is no timeout for the transition in the kernel code.
+> > > It might take very long time but it will not fail.
+> > >
+> > >> Fake signals will be sent to tasks which fail patching via stack
+> > >> checking. This will cause running vCPU tasks to exit guest mode, but
+> > >> since no signal is pending they return to guest execution without
+> > >> exiting to userspace. Fix this by treating a pending livepatch migration
+> > >> like a pending signal, exiting to userspace with EINTR. This allows the
+> > >> task to be patched, and userspace should re-excecute KVM_RUN to resume
+> > >> guest execution.
+> > >
+> > > It seems that the patch works as expected but it is far from clear.
+> > > And the above description helps only partially. Let me try to
+> > > explain it for dummies like me ;-)
+> > >
+> > > <explanation>
+> > > The problem was solved by sending a fake signal, see the commit
+> > > 0b3d52790e1cfd6b80b826 ("livepatch: Remove signal sysfs attribute").
+> > > It was achieved by calling signal_wake_up(). It set TIF_SIGPENDING
+> > > and woke the task. It interrupted the syscall and the task was
+> > > transitioned when leaving to the userspace.
+> > >
+> > > signal_wake_up() was later replaced by set_notify_signal(),
+> > > see the commit 8df1947c71ee53c7e21 ("livepatch: Replace
+> > > the fake signal sending with TIF_NOTIFY_SIGNAL infrastructure").
+> > > The difference is that set_notify_signal() uses TIF_NOTIFY_SIGNAL
+> > > instead of TIF_SIGPENDING.
+> > >
+> > > The effect is the same when running on a real hardware. The syscall
+> > > gets interrupted and exit_to_user_mode_loop() is called where
+> > > the livepatch state is updated (task migrated).
+> > >
+> > > But it works a different way in kvm where the task works are
+> > > called in the guest mode and the task does not return into
+> > > the user space in the host mode.
+> > > </explanation>
+> > >
+> > > The solution provided by this patch is a bit weird, see below.
+> > >
+> > >
+> > >> In my testing, systems where livepatching would timeout after 60 seconds
+> > >> were able to load livepatches within a couple of seconds with this
+> > >> change.
+> > >> 
+> > >> Signed-off-by: Seth Forshee <sforshee@digitalocean.com>
+> > >> ---
+> > >> Changes in v2:
+> > >>  - Added _TIF_SIGPENDING to XFER_TO_GUEST_MODE_WORK
+> > >>  - Reworded commit message and comments to avoid confusion around the
+> > >>    term "migrate"
+> > >> 
+> > >>  include/linux/entry-kvm.h | 4 ++--
+> > >>  kernel/entry/kvm.c        | 7 ++++++-
+> > >>  2 files changed, 8 insertions(+), 3 deletions(-)
+> > >> 
+> > >> diff --git a/include/linux/entry-kvm.h b/include/linux/entry-kvm.h
+> > >> index 6813171afccb..bf79e4cbb5a2 100644
+> > >> --- a/include/linux/entry-kvm.h
+> > >> +++ b/include/linux/entry-kvm.h
+> > >> @@ -17,8 +17,8 @@
+> > >>  #endif
+> > >>  
+> > >>  #define XFER_TO_GUEST_MODE_WORK						\
+> > >> -	(_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_NOTIFY_SIGNAL |	\
+> > >> -	 _TIF_NOTIFY_RESUME | ARCH_XFER_TO_GUEST_MODE_WORK)
+> > >> +	(_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_PATCH_PENDING |	\
+> > >> +	 _TIF_NOTIFY_SIGNAL | _TIF_NOTIFY_RESUME | ARCH_XFER_TO_GUEST_MODE_WORK)
+> > >>  
+> > >>  struct kvm_vcpu;
+> > >>  
+> > >> diff --git a/kernel/entry/kvm.c b/kernel/entry/kvm.c
+> > >> index 9d09f489b60e..98439dfaa1a0 100644
+> > >> --- a/kernel/entry/kvm.c
+> > >> +++ b/kernel/entry/kvm.c
+> > >> @@ -14,7 +14,12 @@ static int xfer_to_guest_mode_work(struct kvm_vcpu *vcpu, unsigned long ti_work)
+> > >>  				task_work_run();
+> > >>  		}
+> > >>  
+> > >> -		if (ti_work & _TIF_SIGPENDING) {
+> > >> +		/*
+> > >> +		 * When a livepatch is pending, force an exit to userspace
+> > >> +		 * as though a signal is pending to allow the task to be
+> > >> +		 * patched.
+> > >> +		 */
+> > >> +		if (ti_work & (_TIF_SIGPENDING | _TIF_PATCH_PENDING)) {
+> > >>  			kvm_handle_signal_exit(vcpu);
+> > >>  			return -EINTR;
+> > >>  		}
+> > >
+> > > Anyway, we either should make sure that TIF_NOTIFY_SIGNAL has the same
+> > > effect on the real hardware and in kvm. Or we need another interface
+> > > for the fake signal used by livepatching.
+> > 
+> > The point of TIF_NOTIFY_SIGNAL is to break out of interruptible kernel
+> > loops.  Once out of the interruptible kernel loop the expectation is the
+> > returns to user space and on it's way runs the exit_to_user_mode_loop or
+> > is architecture specific equivalent.
 > 
-> Side question: Is there any plan to make it possible to dynamically update
-> the dirty ring size?
-
-No plan that I'm aware of..
-
-After I checked: kvm_dirty_ring_get_rsvd_entries() limits our current ring
-size, which is hardware dependent on PML.  It seems at least 1024 will
-still be a work-for-all case, but not sure how it'll work in reality since
-then soft_limit of the dirty ring will be relatively small so it'll kick to
-userspace more often.  Maybe that's not a huge problem for a throttle
-scenario.  In that case the granule will be <=4MB if it'll work.
-
-> > > Also, this approach works for both dirty bitmap and dirty ring interface
-> > > which can help in extending this solution to other architectures.
-> > Is there any specific arch that you're interested outside x86?
-> x86 is the first priority but this patchset targets s390 and arm as well.
-
-I see.
-
+> That would make sense. Thanks for explanation.
+> 
+> > Reading through the history of kernel/entry/kvm.c I believe
+> > I made ``conservative'' changes that has not helped this situation.
 > > 
-> > Logically we can also think about extending dirty ring to other archs, but
-> > there were indeed challenges where some pages can be dirtied without a vcpu
-> > context, and that's why it was only supported initially on x86.
-> This is an interesting problem and we are aware of it. We have a couple of
-> ideas but they are very raw as of now.
-
-I think a default (no-vcpu) ring will solve most of the issues, but that
-requires some thoughts, e.g. the major difference between ring and bitmap
-is that ring can be full while bitmap cannot.. We need to think careful on
-that when it comes.
-
-The other thing is IIRC s390 has been using dirty bits on the pgtables
-(either radix or hash based) to trap dirty, so that'll be challenging too
-when connected with a ring interface because it could make the whole thing
-much less helpful..
-
-So from that pov I think your solution sounds reasonable on that it
-decouples the feature with the interface, and it also looks simple.
-
+> > Long story short at one point it was thought that _TIF_SIGPENDING
+> > and _TIF_NOTIFY_SIGNAL could be separated and they could not.
+> > Unfortunately the work to separate their handling has not been
+> > completely undone.
 > > 
-> > I think it should not be a problem for the quota solution, because it's
-> > backed up by the dirty bitmap so no dirty page will be overlooked for
-> > migration purpose, which is definitely a benefit.  But I'm still curious
-> > whether you looked into any specific archs already (x86 doesn't have such
-> > problem) so that maybe there's some quota you still want to apply elsewhere
-> > where there's no vcpu context.
-> Yes, this is kind of similar to one of the ideas we have thought. Though,
-> there are many things which need a lot of brainstorming, e.g. the ratio in
-> which we can split the overall quota to accomodate for dirties with no vcpu
-> context.
+> > In this case it appears that the only reason xfer_to_guest_mode_work
+> > touches task_work_run is because of the separation work done by Jens
+> > Axboe.  I don't see any kvm specific reason for _TIF_NOTIFY_SIGNAL
+> > and _TIF_SIGPENDING to be treated differently.  Meanwhile my cleanups
+> > elsewhere have made the unnecessary _TIF_NOTIFY_SIGNAL special case
+> > bigger in xfer_to_guest_mode_work.
+> > 
+> > I suspect the first step in fixing things really should be just handling
+> > _TIF_SIGPENDING and _TIF_NOTIFY_SIGNAL the same.
+> > 
+> > static int xfer_to_guest_mode_work(struct kvm_vcpu *vcpu, unsigned long ti_work)
+> > {
+> > 	do {
+> > 		int ret;
+> > 
+> > 		if (ti_work & (_TIF_SIGPENDING | _TIF_NOTIFY_SIGNAL)) {
+> > 			kvm_handle_signal_exit(vcpu);
+> > 			return -EINTR;
+> > 		}
+> 
+> This has the advantage that we will exit only when _TIF_NOTIFY_SIGNAL
+> is explicitly set by the livepatch code. It happens when
+> _TIF_PATCH_PENDING is not handled for few seconds.
 
-I'm slightly worried it'll make things even more complicated.
+I agree. This maps better to the intended behavior of only interrupting
+tasks which fail to transition after a period of time.
 
-Only until we're thinking seriously on non-x86 platforms (since again x86
-doesn't have this issue afaict..): I think one thing we could do is to dig
-out all these cases and think about whether they do need any quota at all.
+> _TIF_PATCH_PENDING is cleared when the task is transitioned.
+> It might happen when it is not running and there is no livepatched
+> function on the stack.
+> 
+> 
+> > 		if (ti_work & _TIF_NEED_RESCHED)
+> > 			schedule();
+> > 
+> > 		if (ti_work & _TIF_NOTIFY_RESUME)
+> > 			resume_user_mode_work(NULL);
+> > 
+> > 		ret = arch_xfer_to_guest_mode_handle_work(vcpu, ti_work);
+> > 		if (ret)
+> > 			return ret;
+> > 
+> > 		ti_work = read_thread_flags();
+> > 	} while (ti_work & XFER_TO_GUEST_MODE_WORK || need_resched());
+> > 	return 0;
+> > }
+> > 
+> > That said I do expect adding support for the live patching into
+> > xfer_to_guest_mode_work, like there is in exit_to_user_mode_loop, is
+> > probably a good idea.  That should prevent the live patching code from
+> > needing to set TIF_NOTIFY_SIGNAL.
+> > 
+> > Something like:
+> > 
+> > Thomas Gleixner's patch to make _TIF_PATCH_PENDING always available.
+> > 
+> > #define XFER_TO_GUEST_MODE_WORK						\
+> > 	(_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_PATCH_PENDING |	\
+> > 	 _TIF_NOTIFY_SIGNAL | _TIF_NOTIFY_RESUME | ARCH_XFER_TO_GUEST_MODE_WORK)
+> > 
+> > 
+> > static int xfer_to_guest_mode_work(struct kvm_vcpu *vcpu, unsigned long ti_work)
+> > {
+> > 	do {
+> > 		int ret;
+> > 
+> > 		if (ti_work & _TIF_PATCH_PENDING)
+> > 			klp_update_patch_state(current);
+> 
+> We need to make sure that the syscall really gets restarted.
+> My understanding is that it will happen only when this function
+> returns a non-zero value.
+> 
+> We might need to do:
+> 
+> 		if (ti_work & (_TIF_SIGPENDING | _TIF_NOTIFY_SIGNAL | _TIF_PATCH_PENDING)) {
+> 			kvm_handle_signal_exit(vcpu);
+> 			return -EINTR;
+> 		}
+> 
+> But it might be better to do not check _TIF_PATCH_PENDING here at all.
+> It will allow to apply the livepatch without restarting the syscall.
+> The syscall will get restarted only by the fake signal when the
+> transition is blocked for too long.
 
-IOW, whether the no-vcpu dirty context are prone to have VM live migration
-converge issue.  If the answer is no, IMHO a simpler approach is we can
-ignore those dirty pages for quota purpose.
+Yes, if we need to force the syscall to be restarted either way then I
+don't see much of a point in preemptively calling
+klp_update_patch_state(). It will be handled (indirectly) by
+exit_to_user_mode_loop().
 
-I think that's a major benefit of your approach comparing to the full dirty
-ring approach, because you're always backed by the dirty bitmap so there's
-no way of data loss.  Dirty ring's one major challenge is how to make sure
-all dirty PFNs get recorded and meanwhile we don't interrupt kvm workflow
-in general.
-
-One thing I'd really appreciate is if this solution would be accepted from
-the kernel POV and if you plan to work on a qemu version of it, please
-consider reading the work from Hyman Huang from China Telecom on the dirty
-limit solution (which is currently based on dirty ring):
-
-https://lore.kernel.org/qemu-devel/cover.1648748793.git.huangy81@chinatelecom.cn/
-
-Since they'll be very similar approaches to solving the same problem.
-Hopefully we could unify the work and not have two fully separate
-approaches even if they should really share something in common.
+All we should need is to handle _TIF_NOTIFY_SIGNAL the same as
+_TIF_SIGPENDING, then as you say vCPU tasks will only be interrupted and
+forced to restart the syscall when the transition stalls for too long.
+I'll send a patch for this shortly.
 
 Thanks,
+Seth
 
--- 
-Peter Xu
-
+> 
+> > 		if (ti_work & (_TIF_SIGPENDING | _TIF_NOTIFY_SIGNAL)) {
+> > 			kvm_handle_signal_exit(vcpu);
+> > 			return -EINTR;
+> > 		}
+> > 
+> > 		if (ti_work & _TIF_NEED_RESCHED)
+> > 			schedule();
+> > 
+> > 		if (ti_work & _TIF_NOTIFY_RESUME)
+> > 			resume_user_mode_work(NULL);
+> > 
+> > 		ret = arch_xfer_to_guest_mode_handle_work(vcpu, ti_work);
+> > 		if (ret)
+> > 			return ret;
+> > 
+> > 		ti_work = read_thread_flags();
+> > 	} while (ti_work & XFER_TO_GUEST_MODE_WORK || need_resched());
+> > 	return 0;
+> > }
+> > 
+> > If the kvm and the live patching folks could check my thinking that
+> > would be great.
+> 
+> Yeah, I am not sure about the kvm behavior either.
+> 
+> Best Regards,
+> Petr
