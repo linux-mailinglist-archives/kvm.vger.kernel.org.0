@@ -2,295 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 307705192BD
-	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 02:21:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 152EC5192C6
+	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 02:25:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244584AbiEDAYg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 20:24:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57420 "EHLO
+        id S244655AbiEDA2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 20:28:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230437AbiEDAYd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 20:24:33 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2051.outbound.protection.outlook.com [40.107.94.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66CC61A811;
-        Tue,  3 May 2022 17:20:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E5RqliDX2MFZRJ5Qq1TNrHTDF55EFd542R1UEDTSfxu1l6xyOM7gsaTwSnVQglbkMFGE7UiFpbd5u7IkP8W9CVMIcYrCulK+5xnfESza3VOUCAgSDzstzfbqT9o73A8oaAbf5QBxVIFuAXNb6Xcb7FJJiqmAU6TkgfhEBDyrV+ECPQZWCmMxdi5earJrUBZKxET3ZLP8ir/iQ9kWDwxDJUkCiwcG5oB1xLbJpHdv5k1EY3CMIjaV11elk/CgVK8spsJzzjnDB7kXUXsLFLla2xAV1qtsFEfCLc0IecvAoFsoukgy0kI/kElQwfzwS9aEGQDB8UnFykRj/w3Stxiedw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FginmT8J/6XvmL6t/KIqeV5eqwhsP4DFKnZgwjAUPXc=;
- b=UQB04TLmnLbpsCOWGhBqEe/BCCl3fDJDL6pFEQlgeXuJw/Zjm3nJWD5Tm669CiGa+TEGQqaSLp1FtamHOU28rcp57Woen2TjxD8o29hmGEFjd94qzKdI55ltbwtHi6o3c5BA9E2Sc8Bhz02X38tgMr8Kann0bgM2xYa89dDUPhJgUdNa0SqxFQC4YAMmcrFs/EweVZ2MjsAjNY2+OMltZU5r7RgzR+Z42wqzIxm8mMVwFOVpP7E2tXb2gUc8mQJSXZWakqliEa8qKyJeTuU/EKYSygVOXcIr1g0HJ7xQUEb6B3ERPfKQxZXxDnoA4Eyy7MDTRwxV30RAm4G1MXycUA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FginmT8J/6XvmL6t/KIqeV5eqwhsP4DFKnZgwjAUPXc=;
- b=Hf8Y0rsnCUKe2uliTXkS7m38ikb77vmTvLI299bK6OBpxAvUoWJXt0ncxCG7cgtKhSReuppap43Dm2lVp+40eLhoCAVoP8GVaonFhg0G3ha1K6LQiIeaIVqaulb4JatA/DQXxTaHmbgYL3S5ymv9qerb+AuwaTd0lPE6V6jyKDQX80cqdJdRDJb4a3SvHQMd24snpI7uNpA53POx6oQohR+RqqSI6CLaxN6pHtMU1/LzPCWWG84jE/qDY9Hfmz1jJRR9ktIYmak9uSkIYDp8fooOWLciEVtRmcNXCScwwVlv/Tx2hprE0ybWT/tnX37ZqpLTnBvoytMls0ATIFTpzg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by DM6PR12MB2748.namprd12.prod.outlook.com (2603:10b6:5:43::28) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5206.14; Wed, 4 May
- 2022 00:20:57 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2%6]) with mapi id 15.20.5206.024; Wed, 4 May 2022
- 00:20:57 +0000
-Date:   Tue, 3 May 2022 21:20:56 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Abhishek Sahu <abhsahu@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-pci@vger.kernel.org
-Subject: Re: [PATCH v3 4/8] vfio/pci: Add support for setting driver data
- inside core layer
-Message-ID: <20220504002056.GW8364@nvidia.com>
-References: <20220425092615.10133-1-abhsahu@nvidia.com>
- <20220425092615.10133-5-abhsahu@nvidia.com>
- <20220503111124.38b07a9e.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220503111124.38b07a9e.alex.williamson@redhat.com>
-X-ClientProxiedBy: BLAPR03CA0141.namprd03.prod.outlook.com
- (2603:10b6:208:32e::26) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S244656AbiEDA2v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 20:28:51 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 609EC5F71;
+        Tue,  3 May 2022 17:25:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651623917; x=1683159917;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ZCzg68E9e6BqBao4oWRrx0n2MdE1MfcFFpx+KA+MVak=;
+  b=n7yHHnSbciamEuX96JvhMtGmN3pbbfxFPoiyeXL4PSkndFhYIuq5F9ce
+   3bTxW050PVXT7w566JDjwzFcE5eVxh9onga4VVcUQRCaO13N4PHclw4lt
+   xUUBW5GHKggPuUf58+XvWg5zeiIlPaAuLcpce35FDiKJSb43yUh4WLAhB
+   GTpaNUUIDU+iNpq0OFD/+HRaf5XM74PftP36+7m7n3AxOIaF/9f+Ba4R2
+   UC8ImQSu0uVg5GXLJMFi2Uiq4PuhFmRXJ4EfOd+LO1ZX9C0t1uzNQX1oD
+   vnru3/NkjZmPaH7nrcQE83QXz7V5FzPItMwcBzwBytS9uvsDvFhdKg3FE
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10336"; a="328169916"
+X-IronPort-AV: E=Sophos;i="5.91,196,1647327600"; 
+   d="scan'208";a="328169916"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2022 17:25:16 -0700
+X-IronPort-AV: E=Sophos;i="5.91,196,1647327600"; 
+   d="scan'208";a="664215706"
+Received: from dbandax-mobl2.amr.corp.intel.com (HELO [10.209.188.251]) ([10.209.188.251])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2022 17:25:15 -0700
+Message-ID: <1b681365-ef98-ec78-96dc-04e28316cf0e@intel.com>
+Date:   Tue, 3 May 2022 17:25:35 -0700
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fd4ebf35-27e0-4714-daf2-08da2d63f5c1
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2748:EE_
-X-Microsoft-Antispam-PRVS: <DM6PR12MB2748F1A9310C52EC6B58698EC2C39@DM6PR12MB2748.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: NysgA7pVsRM4d/Dck5tYBWG9heJ1fC/INJJ3ka2Y1UDuXfF6XUN/iOAS73le+UqvjYcak2gYe7V8+hUEkoGgNNOSioxxVvjkUyYZZqY7+9RtXREY2evFmE4J3E1gQlU+8VAldll3SD7wkOZ6G3sdCAwePYrAjzWm5Wd7ePvJmMEjGKSxwIfvkQ6jwxQtHLVVXKcMbPykuksrF2xwe/i4NrdIsT8s7Xllstw79334N+gXus6ZHHBrwEl2vkZ0ImRqrOmpgGP4l4C415RNfUk7M9f8VRlV3M22Z4mhlurlXMYR5kT/y5Q8fHNlRLPTjmjGggdb8yVACyC9qdvnGPvLvBqYSnz+2n4SDAAVRItjR8ihmnbP8hGd9Z4kmD2QpTZBiYy1VjITnIzSvfiIyQxsSvbEnuRtz9uU0UjAG1XeteZ5etRo+XoYapYbZY+bvhFwFcMnQsUKoCxJmLppvE2EAU63NSRh9y8+ZORyAYDofnsQaw/XuOcW68CgA+Gm8fbhNe/4KWzu2xj/6Fjp9YdUknk23fW8g4cf/Okkd9PFeKSBF13NDofptd3Jrpiz8Y3a0TGLAIRbbrBbtLtjbvDUcKjNq6RV7XTklRfxVeJwfasqnllWHNiuNTZRDxDyBe3yn2FoyrCzmpjGLAB3nSIlAG9zGV020o2sq2ISCj5udXkCawWMLJB/YeiM8BQ/1hkAn1AVpwTrTfysOILd0I04NPI0/XDHA4GcE/QGM8a3+28=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(26005)(86362001)(966005)(66476007)(36756003)(6506007)(6512007)(66946007)(66556008)(54906003)(2616005)(316002)(186003)(1076003)(6916009)(4326008)(6486002)(33656002)(8676002)(508600001)(7416002)(8936002)(83380400001)(2906002)(38100700002)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?exrOtyBZxZVmfaZ3YvSu9yEOveclWAik86zyiXt8tkFQeUDcg1i3D4OF2gkQ?=
- =?us-ascii?Q?+zWFcWLmOtc1HALlYxvJNBAEFwpDjsyEFxLd8yBKnBSzVH8/0Er/xHnsvQ9S?=
- =?us-ascii?Q?AiCyd+x8qWywlii1u/pD+qihScdHWU4zaajun3YAKf1bBFu8E4gc6O0hq54f?=
- =?us-ascii?Q?6pOrkUcbKnSm5zz9laeF+uv3iy0QmA6jnXWxDFs2IxEr6e/jhl7jgUslrCE+?=
- =?us-ascii?Q?mkGzX7/zVBWbtbpY0O5K9WwM4ikf8wVawFzyb3feens0z2xl2LvP+TY3Ws0/?=
- =?us-ascii?Q?VW5KqJR6/tDnIqafec/ovhqpTL/2aJ5JUiPFxJeEjNyFo3fJBW3dSJSHZyCs?=
- =?us-ascii?Q?GKvIrnbRbEnBhwUuJV22VNz727zM0K1v+9ud+WtgtaTgMfvDLGHCcqynbWbb?=
- =?us-ascii?Q?NoP1MdoiBeSrExE4wzpA5jerKOi64JSNzevw1dhOxAhqLGHYX4kk3A1IUGYC?=
- =?us-ascii?Q?0h6bbmARFIjuOBLlCjAIbJ5o+6xJgIPyVmLVYh43OFsPqBD8zdSiGuKaiH/D?=
- =?us-ascii?Q?5rfRQasicXrfNGbL1Y5eguYSWn43bwGaxqlqJh2ygaqc2+cuROrJWkWE3p8R?=
- =?us-ascii?Q?YD8+wD1HBAT3C8Cj6HfOWE77OdAwsDq5EEsyliG9VA5/fHlpH95fDDhAUj7g?=
- =?us-ascii?Q?qwGFxFLsyC5WpJj5PWZMhYIzFtSTqpEr5wwXfhMmB3uhumEs2ywfwv06iTrX?=
- =?us-ascii?Q?qFvcHGGXP5mOrI7aLhl4uJf+jgFRVqbccDAXWKwnrJKSsFA39iYgauO+UhkJ?=
- =?us-ascii?Q?4K8FdXmrnC27tv5ME2VQuJngGVYRfiDAzNkNkc3bruKsn0o959jzKU5pp3fL?=
- =?us-ascii?Q?2gOnRsL/hoHmVAdXYSpHPgzUhY9783Jce5JNY6IPb0fri4PCnLGK9nm6CTVf?=
- =?us-ascii?Q?GLVw5JY1fwxDQ6CAZsXJqI1+mqdr4TwQEUp7gccGnrjrLwY+DwlgA82h1j6b?=
- =?us-ascii?Q?welMRLjBDMIbbfynZxpjWE2WtJy1dt/8jvmSqUz0BWyZlyQH3DxrZ1IH8c0B?=
- =?us-ascii?Q?lAwrZXIusr5cEXdLBl1l6mVie8vrjOtPV5OcnP5+qnNuEjDIlYC5jvv/pzqE?=
- =?us-ascii?Q?vn4fp0Fx8ojmGPQVHnyIwnFyRd081MPggBKsihm5vXGyOi2WnxtK57+eAcUO?=
- =?us-ascii?Q?Sab5moolhv1375xwb1T53g33bn4rx0gXqJb6f3wX17/rVqnPqT78V9+7SEY7?=
- =?us-ascii?Q?ePvxNMCiRduTlanD3u/kvR0CoFZ6eQAvJfxb01TEegDwbQUuOMyQKgdnNcwb?=
- =?us-ascii?Q?GSFQH8MiQTXJOa38EwZXb+i3DKlbUiFmPDHU70Vqd9O6cY7zk8hnI/lwMm0g?=
- =?us-ascii?Q?r7YNv6r+OSVrK5oRxBk6PmKJRVA2uimpKF6c+6VuaokluudLrQZZMdqlNQN8?=
- =?us-ascii?Q?nXs6T9ksaznkohQmqKYChJ5lnEx+2ZHEFJm4HKghe8KAmPz0iRiUqZuylJf6?=
- =?us-ascii?Q?TY9BjIbMsl2TzCE/ceW+jXupyaPobg9Hs17KF6kQ/d4seBlWrq9IALw9W8qn?=
- =?us-ascii?Q?EL5GiCieQXLEOUkDhibc5bp+LI7ndOXgRqHaVdmI7Hyf6RT/+4eQLnKvd5bA?=
- =?us-ascii?Q?CmVybZCveAmx+J+wrGq96MtpBsTfRVuThLjDGV5OEvvlNh5+rhkSS9m4w2Kq?=
- =?us-ascii?Q?luxZWDZF4urYdPdwRAGwT10vMtDmeTbxujgO6B+L90q7m7wOClBzeEXlG/t8?=
- =?us-ascii?Q?DqEuMeU/+dw7fmgJsXW7fpP51lHUO7Pp/0EXfOXlHhq9ZZTBvNf/lz/4xury?=
- =?us-ascii?Q?JI6yX5Jjqg=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd4ebf35-27e0-4714-daf2-08da2d63f5c1
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2022 00:20:57.6199
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XNwS/C8MoKIv7iNVS995WQ/KwXK4C3TOOf0Z7fWpKNtbTMXYtAFEMgkCTiQ953Rw
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2748
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v3 00/21] TDX host kernel support
+Content-Language: en-US
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com
+References: <cover.1649219184.git.kai.huang@intel.com>
+ <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
+ <ecf718abf864bbb2366209f00d4315ada090aedc.camel@intel.com>
+ <de24ac7e-349c-e49a-70bb-31b9bc867b10@intel.com>
+ <9b388f54f13b34fe684ef77603fc878952e48f87.camel@intel.com>
+ <d98ca73b-2d2d-757d-e937-acc83cfedfb0@intel.com>
+ <c90a10763969077826f42be6f492e3a3e062326b.camel@intel.com>
+ <fc1ca04d94ad45e79c0297719d5ef50a7c33c352.camel@intel.com>
+ <664f8adeb56ba61774f3c845041f016c54e0f96e.camel@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <664f8adeb56ba61774f3c845041f016c54e0f96e.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 03, 2022 at 11:11:24AM -0600, Alex Williamson wrote:
-> > @@ -1843,6 +1845,17 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
-> >  		return -EBUSY;
-> >  	}
-> >  
-> > +	/*
-> > +	 * The 'struct vfio_pci_core_device' should be the first member of the
-> > +	 * of the structure referenced by 'driver_data' so that it can be
-> > +	 * retrieved with dev_get_drvdata() inside vfio-pci core layer.
-> > +	 */
-> > +	if ((struct vfio_pci_core_device *)driver_data != vdev) {
-> > +		pci_warn(pdev, "Invalid driver data\n");
-> > +		return -EINVAL;
-> > +	}
+On 5/3/22 16:59, Kai Huang wrote:
+> Should be:
 > 
-> It seems a bit odd to me to add a driver_data arg to the function,
-> which is actually required to point to the same thing as the existing
-> function arg.  Is this just to codify the requirement?  Maybe others
-> can suggest alternatives.
+> 	// prevent racing with TDX module initialization */
+> 	tdx_init_disable();
 > 
-> We also need to collaborate with Jason's patch:
+> 	if (tdx_module_initialized()) {
+> 		if (new_memory_resource in TDMRs)
+> 			// allow memory hot-add
+> 		else
+> 			// reject memory hot-add
+> 	} else if (new_memory_resource in CMR) {
+> 		// add new memory to TDX memory so it can be
+> 		// included into TDMRs
 > 
-> https://lore.kernel.org/all/0-v2-0f36bcf6ec1e+64d-vfio_get_from_dev_jgg@nvidia.com/
+> 		// allow memory hot-add
+> 	}
+> 	else
+> 		// reject memory hot-add
+> 	
+> 	tdx_module_enable();
 > 
-> (and maybe others)
-> 
-> If we implement a change like proposed here that vfio-pci-core sets
-> drvdata then we don't need for each variant driver to implement their
-> own wrapper around err_handler or err_detected as Jason proposes in the
-> linked patch.  Thanks,
+> And when platform doesn't TDX, always allow memory hot-add.
 
-Oh, I forgot about this series completely.
+I don't think it even needs to be *that* complicated.
 
-Yes, we need to pick a method, either drvdata always points at the
-core struct, or we wrapper the core functions.
+It could just be winner take all: if TDX is initialized first, don't
+allow memory hotplug.  If memory hotplug happens first, don't allow TDX
+to be initialized.
 
-I have an independent version of the above patch that uses the
-drvdata, but I chucked it because it was unnecessary for just a couple
-of AER functions. 
+That's fine at least for a minimal patch set.
 
-We should probably go back to it though if we are adding more
-functions, as the wrapping is a bit repetitive. I'll go and respin
-that series then. Abhishek can base on top of it.
+What you have up above is probably where you want to go eventually, but
+it means doing things like augmenting the e820 since it's the single
+source of truth for creating the TMDRs right now.
 
-My approach was more type-sane though:
-
-commit 12ba94a72d7aa134af8752d6ff78193acdac93ae
-Author: Jason Gunthorpe <jgg@ziepe.ca>
-Date:   Tue Mar 29 16:32:32 2022 -0300
-
-    vfio/pci: Have all VFIO PCI drivers store the vfio_pci_core_device in drvdata
-    
-    Having a consistent pointer in the drvdata will allow the next patch to
-    make use of the drvdata from some of the core code helpers.
-    
-    Use a WARN_ON inside vfio_pci_core_unregister_device() to detect drivers
-    that miss this.
-    
-    Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-index 767b5d47631a49..665691967a030c 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-@@ -337,6 +337,14 @@ static int vf_qm_cache_wb(struct hisi_qm *qm)
- 	return 0;
- }
- 
-+static struct hisi_acc_vf_core_device *hssi_acc_drvdata(struct pci_dev *pdev)
-+{
-+	struct vfio_pci_core_device *core_device = dev_get_drvdata(&pdev->dev);
-+
-+	return container_of(core_device, struct hisi_acc_vf_core_device,
-+			    core_device);
-+}
-+
- static void vf_qm_fun_reset(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 			    struct hisi_qm *qm)
- {
-@@ -962,7 +970,7 @@ hisi_acc_vfio_pci_get_device_state(struct vfio_device *vdev,
- 
- static void hisi_acc_vf_pci_aer_reset_done(struct pci_dev *pdev)
- {
--	struct hisi_acc_vf_core_device *hisi_acc_vdev = dev_get_drvdata(&pdev->dev);
-+	struct hisi_acc_vf_core_device *hisi_acc_vdev = hssi_acc_drvdata(pdev);
- 
- 	if (hisi_acc_vdev->core_device.vdev.migration_flags !=
- 				VFIO_MIGRATION_STOP_COPY)
-@@ -1278,7 +1286,7 @@ static int hisi_acc_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device
- 	if (ret)
- 		goto out_free;
- 
--	dev_set_drvdata(&pdev->dev, hisi_acc_vdev);
-+	dev_set_drvdata(&pdev->dev, &hisi_acc_vdev->core_device);
- 	return 0;
- 
- out_free:
-@@ -1289,7 +1297,7 @@ static int hisi_acc_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device
- 
- static void hisi_acc_vfio_pci_remove(struct pci_dev *pdev)
- {
--	struct hisi_acc_vf_core_device *hisi_acc_vdev = dev_get_drvdata(&pdev->dev);
-+	struct hisi_acc_vf_core_device *hisi_acc_vdev = hssi_acc_drvdata(pdev);
- 
- 	vfio_pci_core_unregister_device(&hisi_acc_vdev->core_device);
- 	vfio_pci_core_uninit_device(&hisi_acc_vdev->core_device);
-diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
-index bbec5d288fee97..3391f965abd9f0 100644
---- a/drivers/vfio/pci/mlx5/main.c
-+++ b/drivers/vfio/pci/mlx5/main.c
-@@ -39,6 +39,14 @@ struct mlx5vf_pci_core_device {
- 	struct mlx5_vf_migration_file *saving_migf;
- };
- 
-+static struct mlx5vf_pci_core_device *mlx5vf_drvdata(struct pci_dev *pdev)
-+{
-+	struct vfio_pci_core_device *core_device = dev_get_drvdata(&pdev->dev);
-+
-+	return container_of(core_device, struct mlx5vf_pci_core_device,
-+			    core_device);
-+}
-+
- static struct page *
- mlx5vf_get_migration_page(struct mlx5_vf_migration_file *migf,
- 			  unsigned long offset)
-@@ -505,7 +513,7 @@ static int mlx5vf_pci_get_device_state(struct vfio_device *vdev,
- 
- static void mlx5vf_pci_aer_reset_done(struct pci_dev *pdev)
- {
--	struct mlx5vf_pci_core_device *mvdev = dev_get_drvdata(&pdev->dev);
-+	struct mlx5vf_pci_core_device *mvdev = mlx5vf_drvdata(pdev);
- 
- 	if (!mvdev->migrate_cap)
- 		return;
-@@ -618,7 +626,7 @@ static int mlx5vf_pci_probe(struct pci_dev *pdev,
- 	if (ret)
- 		goto out_free;
- 
--	dev_set_drvdata(&pdev->dev, mvdev);
-+	dev_set_drvdata(&pdev->dev, &mvdev->core_device);
- 	return 0;
- 
- out_free:
-@@ -629,7 +637,7 @@ static int mlx5vf_pci_probe(struct pci_dev *pdev,
- 
- static void mlx5vf_pci_remove(struct pci_dev *pdev)
- {
--	struct mlx5vf_pci_core_device *mvdev = dev_get_drvdata(&pdev->dev);
-+	struct mlx5vf_pci_core_device *mvdev = mlx5vf_drvdata(pdev);
- 
- 	vfio_pci_core_unregister_device(&mvdev->core_device);
- 	vfio_pci_core_uninit_device(&mvdev->core_device);
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 06b6f3594a1316..53ad39d617653d 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -262,6 +262,10 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
- 	u16 cmd;
- 	u8 msix_pos;
- 
-+	/* Drivers must set the vfio_pci_core_device to their drvdata */
-+	if (WARN_ON(vdev != dev_get_drvdata(&vdev->pdev->dev)))
-+		return -EINVAL;
-+
- 	vfio_pci_set_power_state(vdev, PCI_D0);
- 
- 	/* Don't allow our initial saved state to include busmaster */
