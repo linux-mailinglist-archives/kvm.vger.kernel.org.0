@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E778B51B302
-	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 01:25:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B450951B2A8
+	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 01:23:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379578AbiEDW4h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 May 2022 18:56:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41246 "EHLO
+        id S1379491AbiEDW4m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 May 2022 18:56:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379244AbiEDWxh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1379260AbiEDWxh (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 4 May 2022 18:53:37 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FCBC53B7C
-        for <kvm@vger.kernel.org>; Wed,  4 May 2022 15:49:51 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 23-20020a630117000000b003c5ea4365a1so1343546pgb.6
-        for <kvm@vger.kernel.org>; Wed, 04 May 2022 15:49:51 -0700 (PDT)
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 505F953E10
+        for <kvm@vger.kernel.org>; Wed,  4 May 2022 15:49:53 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id v10-20020a17090a0c8a00b001c7a548e4f7so3574291pja.2
+        for <kvm@vger.kernel.org>; Wed, 04 May 2022 15:49:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=RSDJ745FCphTNvqXw5uFQREWtoioB/PaIos9DDppyWw=;
-        b=oZ/X9DlVHgrCDxUpGT4sgQW8stjbvmGDtc8TWZWTAgjt8ks3kbmWV6duE6LmBa8I6G
-         2nKsESB6OCm++OL8zzx2XtRt8vbE3sTkYlMSDEoJhDXCM+9edXSl3UD2DuQO/rX1Pdy/
-         k8RvNOdMdItWFiKuFYVRvL3frS11egfJltj55lza18KWSOtC2OEO2Mx4OFT+Io4KuT2b
-         kpB+rVw1yXoJ/aVUi516ES6yWrBbajMbDy5b9CgLQuJVGSYJVIetGfY4yMp1KqDlWumT
-         FTqcxzCMVKw6V8C4pHl/0SftLGXBjXFQYtbBf1KuTQH0kTpV7hhyscxuSumIauT8b/4s
-         EC4w==
+        bh=tN5g3ph93jNOSEVUREKui1+khzaKjUQx/GJZWoxm6Ug=;
+        b=rVjdi/ZOIIYdCNIqQS4d2g2lT+YOhy9gLOiBhSJbp2RNGFmKzWYAzVEG5huyNgEWoy
+         7oncgiPi5dpBxeGkjXGLZHIuH802r3dWcL5FSIL7pI964jUJajmxUbtD0EAbxBLV9ENo
+         eQQqLH3JnsIXCnkThsGexuq3X658ipPxoM97OHgGRIMsCAPuMWj5BQrTaNmX8j8con3+
+         wM5MJaH7x7gco7zyvz+k6uG6wAv52W22q0Etf4OXdveD0eF71S1ljE+uS4LJOEhOUUYk
+         IlXonds98uO81LAOozrVQeG4ljNozx8yErPYVnGETeEYPeDhOhVp6h2TdhmJdsSYFirC
+         +wGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=RSDJ745FCphTNvqXw5uFQREWtoioB/PaIos9DDppyWw=;
-        b=oPrY0HPEsJrspHo9PlwuZrWf5xyQ3/HKVcJ2jH8bZyi6RTdV5hXtHVl3sTpu+xXBXL
-         coWOshNHFrRlDS1raxKSRWlPCFxsAKpuoUTXucRNe1m/+MkcdkDM7IcJWyT7P70Fk+OL
-         Hf5C7FrxNFhTfV5H1ZopYmrU5ff3PaFQTRksxHzkf1skN0WaFnx1wbSBXV17ztsRJaKo
-         LQX98hKp3VT708e4NVywWWyTK/iDx0uyzZscGP2An9PFSSmBQjmpHzQrb+5DUDM/xhcE
-         vlN8JUyKVYyeLRfTZAFqdKsXDG9CCeniA392/YrRWKpNha+6OU99FTVRiQ+TnPQkJqXy
-         y/bw==
-X-Gm-Message-State: AOAM532iNvzkSXuc8Wrx3t6c9G0vyXD8zlBAwVqoYp0q0az6Fml+7Zs2
-        8J8uqzoc/YhUH/uKpGWg3KJAJhfHcCw=
-X-Google-Smtp-Source: ABdhPJxBI1IzjPiVO4Es15vna+ytUi3AjeD9zbHHoabY6Z8o7u8NsyabMQ7V/VC75TepWxFO/1w9hT8+6yY=
+        bh=tN5g3ph93jNOSEVUREKui1+khzaKjUQx/GJZWoxm6Ug=;
+        b=uRH4IOhIUy/7Wnd/IUZI9xE2RnBGDtUtrXrlyCRMlxKfk3X5+p1fzGPf/A40VG3gzW
+         BlkAjhPotcQTUoeic4tJd2aA/XLpJnOwu0yXSCFBIG2ZDIMU3vsvB006PU4TEl51UNCL
+         tNjp4a6WGyHUpfH6Y8o2fzTF6l141bLjno3FZ1cb3hg/zz9mdUIDZp/43Rjg5edxedm0
+         kHnPTlkazb2K3vNmyq5tIJLPrjsH3eatn2Mq0IVXLCa3G9OmDbLVLPhB21nN+CBUuOaT
+         /JA0oMSmJkupuDNKNUsl3EfpuYgN2HkcuDZ2iwTd3JLCLkEuxpz9xVGQf+ts/dtQZ+UV
+         DSsg==
+X-Gm-Message-State: AOAM531SOAFhNMD0enafQ0jZ47GJYc2RFRkxk9yE4tQJPGSDzapaYT4H
+        jQsEyUuIW+3Wk+OM3QAnQErs+1Z0B68=
+X-Google-Smtp-Source: ABdhPJzPRkUtgpAsl3Q2gmMdKlhCWtSvOFR4jZ9iXbf7HP9hEc0E+x+rnM6/CeEWMBDWVmhiuCFNheRQtQw=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:903:244d:b0:15e:a3a2:5a75 with SMTP id
- l13-20020a170903244d00b0015ea3a25a75mr17783647pls.89.1651704591007; Wed, 04
- May 2022 15:49:51 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:d512:b0:15e:93de:762a with SMTP id
+ b18-20020a170902d51200b0015e93de762amr21785035plg.132.1651704592846; Wed, 04
+ May 2022 15:49:52 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  4 May 2022 22:47:17 +0000
+Date:   Wed,  4 May 2022 22:47:18 +0000
 In-Reply-To: <20220504224914.1654036-1-seanjc@google.com>
-Message-Id: <20220504224914.1654036-12-seanjc@google.com>
+Message-Id: <20220504224914.1654036-13-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220504224914.1654036-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH 011/128] KVM: selftests: Use vcpu_access_device_attr() in
- arm64 code
+Subject: [PATCH 012/128] KVM: selftests: Remove vcpu_get_fd()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -67,43 +66,55 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use vcpu_access_device_attr() in arm's arch_timer test instead of
-manually retrieving the vCPU's fd.  This will allow dropping vcpu_get_fd()
-in a future patch.
+Drop vcpu_get_fd(), it no longer has any users, and really should not
+exist as the framework has failed if tests need to manually operate on
+a vCPU fd.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/aarch64/arch_timer.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ tools/testing/selftests/kvm/include/kvm_util_base.h | 1 -
+ tools/testing/selftests/kvm/lib/kvm_util.c          | 9 ---------
+ 2 files changed, 10 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-index 3b940a101bc0..f55c4c20d8b3 100644
---- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-+++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-@@ -349,12 +349,10 @@ static void test_run(struct kvm_vm *vm)
- static void test_init_timer_irq(struct kvm_vm *vm)
- {
- 	/* Timer initid should be same for all the vCPUs, so query only vCPU-0 */
--	int vcpu0_fd = vcpu_get_fd(vm, 0);
--
--	kvm_device_access(vcpu0_fd, KVM_ARM_VCPU_TIMER_CTRL,
--			KVM_ARM_VCPU_TIMER_IRQ_PTIMER, &ptimer_irq, false);
--	kvm_device_access(vcpu0_fd, KVM_ARM_VCPU_TIMER_CTRL,
--			KVM_ARM_VCPU_TIMER_IRQ_VTIMER, &vtimer_irq, false);
-+	vcpu_access_device_attr(vm, 0, KVM_ARM_VCPU_TIMER_CTRL,
-+				KVM_ARM_VCPU_TIMER_IRQ_PTIMER, &ptimer_irq, false);
-+	vcpu_access_device_attr(vm, 0, KVM_ARM_VCPU_TIMER_CTRL,
-+				KVM_ARM_VCPU_TIMER_IRQ_VTIMER, &vtimer_irq, false);
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index 6b7a5297053e..c2dfc4341b31 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -214,7 +214,6 @@ static inline int __vcpu_run(struct kvm_vm *vm, uint32_t vcpuid)
+ 	return __vcpu_ioctl(vm, vcpuid, KVM_RUN, NULL);
+ }
  
- 	sync_global_to_guest(vm, ptimer_irq);
- 	sync_global_to_guest(vm, vtimer_irq);
+-int vcpu_get_fd(struct kvm_vm *vm, uint32_t vcpuid);
+ void vcpu_run_complete_io(struct kvm_vm *vm, uint32_t vcpuid);
+ struct kvm_reg_list *vcpu_get_reg_list(struct kvm_vm *vm, uint32_t vcpuid);
+ 
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 45895c9ca35a..73123b9d9625 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -1608,15 +1608,6 @@ int _vcpu_run(struct kvm_vm *vm, uint32_t vcpuid)
+ 	return rc;
+ }
+ 
+-int vcpu_get_fd(struct kvm_vm *vm, uint32_t vcpuid)
+-{
+-	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
+-
+-	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
+-
+-	return vcpu->fd;
+-}
+-
+ void vcpu_run_complete_io(struct kvm_vm *vm, uint32_t vcpuid)
+ {
+ 	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
 -- 
 2.36.0.464.gb9c8b46e94-goog
 
