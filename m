@@ -2,124 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D3C851B310
-	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 01:25:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF57651B2D4
+	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 01:24:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381979AbiEDXFh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 May 2022 19:05:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58536 "EHLO
+        id S1379573AbiEDWzi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 May 2022 18:55:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380043AbiEDXCF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 May 2022 19:02:05 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C90B5A08C
-        for <kvm@vger.kernel.org>; Wed,  4 May 2022 15:53:43 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id v8-20020a170902b7c800b0015e927ee201so1368505plz.12
-        for <kvm@vger.kernel.org>; Wed, 04 May 2022 15:53:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=hThR3eXvdbL6PIPwsArk6NS/Y6ItR8JxmYPs055HfNQ=;
-        b=HZvGef4wMTUUww0ii1QoiwMBQSBC/Pvw3CoC72aul1ExRfDQ2K5By8y4/GGBcgJaeN
-         owaaHAG/e7rStRrir9ExqsMKk4ynjLGKLmJaW5Z/6z+xjstjP5ZbhJ3Kb6wDVrH9QauE
-         DkJedMIVsKGVgA4gID4rx3C4DyKI6MUL7S3Bffz5GU/1jUw6uYENZeYMnZJcSD1FBHxo
-         uqhvPCUHKfzKn25stT7tccHRDWctknK2xDWQEGGvAoVl9rL2byoPoQ07LbFg5Ho4zHpN
-         PGa+qnQwevzHvvolT3qf93eqYFEuuCX9mYdLStjxrXePI+/05RKJk2pFbAaGb7yOggAB
-         V58A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=hThR3eXvdbL6PIPwsArk6NS/Y6ItR8JxmYPs055HfNQ=;
-        b=hyM/HXhI/ceJstoGWLz2FnwIC67aMAYnptBxxY2B9QCNhiZBY1rn0IHMRZozVvoyIU
-         NexBZDmZbG20SQAyXdlsm+4iVt2ougWhy4WYmB8PgMjCZpZ6hUG7KUKR+O5w/FElWg7y
-         gdQvKaUPqEWwVpjyRhfch8Gf5o1PUPhThcPPfAqSur2+2o6UXk3ElDB5vYYl5Q94Jq+s
-         VxEPbhiMHI7btZGuBKlzC3ckTT+Xf0oqeaJsvP2TCfUToikeP9MWzZU3QAiJO9ctxgtx
-         MAlrOFEEzBHNcF3KubTqSqGwwMlqULY4tS7Spyo89AmlnhA9BtuA4nzFee2EkLoSSs/Z
-         VPew==
-X-Gm-Message-State: AOAM532GhJWQImDp5L8FKQvQXMSV14k7CelcPYzNBkYRB5/CvvvR0BmS
-        NAvyIJbOXQC5q8cyp4FvoM3KsqjNlcg=
-X-Google-Smtp-Source: ABdhPJwgHLHvRfb8WYuIp2kW1pjw/YQRzjjh1gfBOLY12cy5NstVGLntHtlD+eVhWnvP5CGghG3yOhajnck=
-X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:d487:b0:15e:a0a4:69e3 with SMTP id
- c7-20020a170902d48700b0015ea0a469e3mr18832343plg.155.1651704791544; Wed, 04
- May 2022 15:53:11 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  4 May 2022 22:49:14 +0000
-In-Reply-To: <20220504224914.1654036-1-seanjc@google.com>
-Message-Id: <20220504224914.1654036-129-seanjc@google.com>
-Mime-Version: 1.0
-References: <20220504224914.1654036-1-seanjc@google.com>
-X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH 128/128] KVM: selftests: Drop DEFAULT_GUEST_PHY_PAGES, open
- code the magic number
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Sean Christopherson <seanjc@google.com>
+        with ESMTP id S1350070AbiEDWy3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 May 2022 18:54:29 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26A93532D2;
+        Wed,  4 May 2022 15:50:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651704652; x=1683240652;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=A7XFxSLvRlucze5cun1lMJ4EA0Zppv8AXe28hpjk+nQ=;
+  b=eos/Qo6GspLIboRFPJy3uuZjFjNE1EDsGMcN45NyY3QET4N8cTsKMToS
+   nPPiu5LHRodM0p5C3dNY0oFYp5wH5eTV9M6UnNoOBl7j0KvE4EN4DWnF3
+   d7bti9h5gHxnupJpswchq/xnTAAYRJLWJ+FwqRCoVvyxNOX27/iQ451di
+   2WLwocp6n2zp65Of0yQvbUg4Kz5Fu8qyZb+m0qDmdz4yvb1FFad3T4xck
+   y6y1eYVnGiEctc2z5wezs6eXC76aQ3dJ/ZFbQ62V6IYr8a+H7VT3pPNhq
+   4H8o3YigfkspGzDf3x4SbiqFjKd4GbEBwJ850q1AOSwogqp1Lkjb0UChM
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10337"; a="330907720"
+X-IronPort-AV: E=Sophos;i="5.91,199,1647327600"; 
+   d="scan'208";a="330907720"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2022 15:50:51 -0700
+X-IronPort-AV: E=Sophos;i="5.91,199,1647327600"; 
+   d="scan'208";a="599744287"
+Received: from karendt-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.3.218])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2022 15:50:48 -0700
+Message-ID: <eb67bad8c09bd2c2c0613b864d7232cd8a941bc4.camel@intel.com>
+Subject: Re: [PATCH v3 00/21] TDX host kernel support
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>
+Date:   Thu, 05 May 2022 10:50:46 +1200
+In-Reply-To: <CAPcyv4jQ6C+vu3ALtG_3k483KYwYGB5gd_auUCeUNaJ=v4eTyQ@mail.gmail.com>
+References: <cover.1649219184.git.kai.huang@intel.com>
+         <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
+         <ecf718abf864bbb2366209f00d4315ada090aedc.camel@intel.com>
+         <de24ac7e-349c-e49a-70bb-31b9bc867b10@intel.com>
+         <9b388f54f13b34fe684ef77603fc878952e48f87.camel@intel.com>
+         <d98ca73b-2d2d-757d-e937-acc83cfedfb0@intel.com>
+         <c90a10763969077826f42be6f492e3a3e062326b.camel@intel.com>
+         <fc1ca04d94ad45e79c0297719d5ef50a7c33c352.camel@intel.com>
+         <664f8adeb56ba61774f3c845041f016c54e0f96e.camel@intel.com>
+         <CAPcyv4jQ6C+vu3ALtG_3k483KYwYGB5gd_auUCeUNaJ=v4eTyQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove DEFAULT_GUEST_PHY_PAGES and open code the magic number (with a
-comment) in vm_nr_pages_required().  Exposing DEFAULT_GUEST_PHY_PAGES to
-tests was a symptom of the VM creation APIs not cleanly supporting tests
-that create runnable vCPUs, but can't do so immediately.  Now that tests
-don't have to manually compute the amount of memory needed for basic
-operation, make it harder for tests to do things that should be handled
-by the framework, i.e. force developers to improve the framework instead
-of hacking around flaws in individual tests.
+On Wed, 2022-05-04 at 07:31 -0700, Dan Williams wrote:
+> On Tue, May 3, 2022 at 4:59 PM Kai Huang <kai.huang@intel.com> wrote:
+> > 
+> > On Fri, 2022-04-29 at 13:40 +1200, Kai Huang wrote:
+> > > On Thu, 2022-04-28 at 12:58 +1200, Kai Huang wrote:
+> > > > On Wed, 2022-04-27 at 17:50 -0700, Dave Hansen wrote:
+> > > > > On 4/27/22 17:37, Kai Huang wrote:
+> > > > > > On Wed, 2022-04-27 at 14:59 -0700, Dave Hansen wrote:
+> > > > > > > In 5 years, if someone takes this code and runs it on Intel hardware
+> > > > > > > with memory hotplug, CPU hotplug, NVDIMMs *AND* TDX support, what happens?
+> > > > > > 
+> > > > > > I thought we could document this in the documentation saying that this code can
+> > > > > > only work on TDX machines that don't have above capabilities (SPR for now).  We
+> > > > > > can change the code and the documentation  when we add the support of those
+> > > > > > features in the future, and update the documentation.
+> > > > > > 
+> > > > > > If 5 years later someone takes this code, he/she should take a look at the
+> > > > > > documentation and figure out that he/she should choose a newer kernel if the
+> > > > > > machine support those features.
+> > > > > > 
+> > > > > > I'll think about design solutions if above doesn't look good for you.
+> > > > > 
+> > > > > No, it doesn't look good to me.
+> > > > > 
+> > > > > You can't just say:
+> > > > > 
+> > > > >   /*
+> > > > >    * This code will eat puppies if used on systems with hotplug.
+> > > > >    */
+> > > > > 
+> > > > > and merrily await the puppy bloodbath.
+> > > > > 
+> > > > > If it's not compatible, then you have to *MAKE* it not compatible in a
+> > > > > safe, controlled way.
+> > > > > 
+> > > > > > > You can't just ignore the problems because they're not present on one
+> > > > > > > version of the hardware.
+> > > > > 
+> > > > > Please, please read this again ^^
+> > > > 
+> > > > OK.  I'll think about solutions and come back later.
+> > > > > 
+> > > 
+> > > Hi Dave,
+> > > 
+> > > I think we have two approaches to handle memory hotplug interaction with the TDX
+> > > module initialization.
+> > > 
+> > > The first approach is simple.  We just block memory from being added as system
+> > > RAM managed by page allocator when the platform supports TDX [1]. It seems we
+> > > can add some arch-specific-check to __add_memory_resource() and reject the new
+> > > memory resource if platform supports TDX.  __add_memory_resource() is called by
+> > > both __add_memory() and add_memory_driver_managed() so it prevents from adding
+> > > NVDIMM as system RAM and normal ACPI memory hotplug [2].
+> > 
+> > Hi Dave,
+> > 
+> > Try to close how to handle memory hotplug.  Any comments to below?
+> > 
+> > For the first approach, I forgot to think about memory hot-remove case.  If we
+> > just reject adding new memory resource when TDX is capable on the platform, then
+> > if the memory is hot-removed, we won't be able to add it back.  My thinking is
+> > we still want to support memory online/offline because it is purely in software
+> > but has nothing to do with TDX.  But if one memory resource can be put to
+> > offline, it seems we don't have any way to prevent it from being removed.
+> > 
+> > So if we do above, on the future platforms when memory hotplug can co-exist with
+> > TDX, ACPI hot-add and kmem-hot-add memory will be prevented.  However if some
+> > memory is hot-removed, it won't be able to be added back (even it is included in
+> > CMR, or TDMRs after TDX module is initialized).
+> > 
+> > Is this behavior acceptable?  Or perhaps I have misunderstanding?
+> 
+> Memory online at boot uses similar kernel paths as memory-online at
+> run time, so it sounds like your question is confusing physical vs
+> logical remove. Consider the case of logical offline then re-online
+> where the proposed TDX sanity check blocks the memory online, but then
+> a new kernel is kexec'd and that kernel again trusts the memory as TD
+> convertible again just because it onlines the memory in the boot path.
+> For physical memory remove it seems up to the platform to block that
+> if it conflicts with TDX, not for the kernel to add extra assumptions
+> that logical offline / online is incompatible with TDX.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- tools/testing/selftests/kvm/include/kvm_util_base.h | 1 -
- tools/testing/selftests/kvm/lib/kvm_util.c          | 8 +++++++-
- 2 files changed, 7 insertions(+), 2 deletions(-)
+Hi Dan,
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index 527f63a30668..d30f8e0612af 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -100,7 +100,6 @@ memslot2region(struct kvm_vm *vm, uint32_t memslot);
- #define KVM_UTIL_MIN_VADDR		0x2000
- #define KVM_GUEST_PAGE_TABLE_MIN_PADDR	0x180000
- 
--#define DEFAULT_GUEST_PHY_PAGES		512
- #define DEFAULT_GUEST_STACK_VADDR_MIN	0xab6000
- #define DEFAULT_STACK_PGS		5
- 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index f4bd4d7559b9..a0c8333d1bf6 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -274,7 +274,13 @@ static uint64_t vm_nr_pages_required(uint32_t nr_runnable_vcpus,
- 		    "nr_vcpus = %d too large for host, max-vcpus = %d",
- 		    nr_runnable_vcpus, kvm_check_cap(KVM_CAP_MAX_VCPUS));
- 
--	nr_pages = DEFAULT_GUEST_PHY_PAGES;
-+	/*
-+	 * Arbitrarily allocate 512 pages (2mb when page size is 4kb) for the
-+	 * test code and other per-VM assets that will be loaded into memslot0.
-+	 */
-+	nr_pages = 512;
-+
-+	/* Account for the per-vCPU stacks on behalf of the test. */
- 	nr_pages += nr_runnable_vcpus * DEFAULT_STACK_PGS;
- 
- 	/*
+No we don't block memory online, but we block memory add.  The code I mentioned
+is add_memory_resource(), while memory online code path is
+memory_block_online().  Or am I wrong?
+
 -- 
-2.36.0.464.gb9c8b46e94-goog
+Thanks,
+-Kai
+
 
