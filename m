@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32D7F5195E4
-	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 05:25:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C11C5195F1
+	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 05:25:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344344AbiEDD2u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 23:28:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33492 "EHLO
+        id S1344510AbiEDD3T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 23:29:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344287AbiEDD2o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1344278AbiEDD2o (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 3 May 2022 23:28:44 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5C1E27FCE
-        for <kvm@vger.kernel.org>; Tue,  3 May 2022 20:25:04 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id h16-20020a056902009000b00628a70584b2so205489ybs.6
-        for <kvm@vger.kernel.org>; Tue, 03 May 2022 20:25:04 -0700 (PDT)
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3288327FEB
+        for <kvm@vger.kernel.org>; Tue,  3 May 2022 20:25:06 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id w3-20020a17090ac98300b001b8b914e91aso83228pjt.0
+        for <kvm@vger.kernel.org>; Tue, 03 May 2022 20:25:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=w/QqgshLuynQgTB466qWOhG4L1sZJjE/JqxBMvksN+M=;
-        b=N3jQKX+4PykOhl6nZ1drc/9Lew6WcljIYtRCDc6P4D8aORoUCyCwa1y94HDlN/auep
-         U0S/tkT6hruzCY4df1lwwNeEDYzTfTTNDmjuHECFOFzqd45w0Bh4M7S2UEB2wT2xyd9V
-         Om2MLD+9HY5XQns71QRKuUBs/Z89hGng1kwNwWYaqQviBfUuAfBxHFiMjkL5R8pvWtkf
-         rOHMs0hg+8LmxC30toG3Je+XcQnsyhGn5YsDqalNd8ykJQd9jippv5iy5BJuZhJoSm4y
-         dTbFv4OeHgHpS1+O9SybxwMazOwywAWAVyUkdcEnd3TcI8F03sV3ZCtbsDUx5eBhlOWI
-         k8AQ==
+        bh=KbWTo46raws8ZeP/cKKWDq3eaHKeTtYLUUn/hJ/Yq0Q=;
+        b=X0r5vKhQHXSlovMskTb+/Y0UulLv1K8SHFQGmjeHu2rRz4j+Y4EU7elWUwcL/mFSlD
+         TIZ65arGMC7ZW+q+umFrbkLGcNl11Jl6qxeqkaLW0Eb5+jx7QtITYVeM7XFxTXLAkHrL
+         Qv5yQsD49+fe0dYL0bKWl9n9hJsb/HdG2ktw8mnRSANSteqtmqJoOd/DXGi5bpPZFYVc
+         55ts2YsQ/+eD2AAArLxxomKJwcZc44PQwWHQwfXYGY/T5+866ryGX4yEmMhnuCKRGMnV
+         xM8RfSiLsLQHYkd/8p3g69vSc7EeO+k3jRWEjQ9+4UaUVKSoDqIVzk4t6nWqbH71KfMi
+         A3yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=w/QqgshLuynQgTB466qWOhG4L1sZJjE/JqxBMvksN+M=;
-        b=tpg+2+gGVyXvOynhP5pxXjwfvuMBdIKjn6kHtBP4ic3PEquaXIXDW7m2HyHizJG3Tu
-         HnY53ppRosS6tN4u4nfAkKTfaMEaY9LcFnonc7z/VkQyGdMQ6yHV+rzxaETZmNsKioye
-         jdDdt88rdXS5WnCeLAoxnMEQhPx6h7Ka6LaYwsM9PcVr61bdLHfnoT/ysCVcKVxeKWIq
-         NbZx7vrDjaM1LUQjEWlA2TQMU7xAPaMhtpfB3VwrZiGrXydYDhJ1ZsmE63FLYhUWAhWK
-         bp5O46qlXxwYQRLGHyNmjHusHFCAHl6jtK6U8YOu7aOecPSRzpdkXfkWubV9QoA9+9/5
-         Jwqg==
-X-Gm-Message-State: AOAM530N7gsaXkiDObW4cCP2DrCgxzh/5fNXibRw4SbogrEt9YIlxaiZ
-        oo0UdaPqkhcxM6K/fgqfzaDWIracDB0=
-X-Google-Smtp-Source: ABdhPJxthJVzT4CGgTXTitH/slT/6c20wkW2hrOINoiHXBEgvKz6+2Jv6Hdz6oCFtbmll8gZoZteCawt0pI=
+        bh=KbWTo46raws8ZeP/cKKWDq3eaHKeTtYLUUn/hJ/Yq0Q=;
+        b=O0iKiLsS9vkGJ1qxtdV3PSAnCZ1jav/1YSqNgpCnZ8ZTHBMAX3NscfQreNXi6bgyM+
+         OGh2ziBG9Dqey6RKxXWdxGrK1eLQC2JvWRtFu5WO6NlMYeU1oUyHwirnIAktGWdTx3yR
+         NnY1vTTLM1Dmdss9CXDIeHAaSbrxWoI/SY9g1vuoBoJWi56mYVv6UGziQZHRCERpnOsk
+         ZwhiyiiQXtshz48/e0Xtl8OLmG2KXbiIc3aNLX6cEev3CSLVM9R35+jcLfnM3y/FCW3z
+         6kh/WRgXlqLo7Ci6V6/AW7l38c/3GmzoGzADINi3LrxVZtNsrin2P7HdWfg5mjT95PAU
+         h/mQ==
+X-Gm-Message-State: AOAM5326DCFMYmc5nD5m3E0EfXHHHpbIbEhBC6d9KvZdMyx/ORX51qKa
+        2OteXoTvx9ho51fG1x08hWA4NF57cag=
+X-Google-Smtp-Source: ABdhPJwzOh9Zro9DkXmenF5EvONcdPDxMSRHAdOuF37FYVEDY72O/4dxF2znD0589wCi9jfRMfTPbfDRpqk=
 X-Received: from oupton3.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:21eb])
- (user=oupton job=sendgmr) by 2002:a05:6902:728:b0:64a:9af:4796 with SMTP id
- l8-20020a056902072800b0064a09af4796mr1665597ybt.2.1651634703906; Tue, 03 May
- 2022 20:25:03 -0700 (PDT)
-Date:   Wed,  4 May 2022 03:24:40 +0000
+ (user=oupton job=sendgmr) by 2002:a05:6a00:a1e:b0:50d:bb0c:2e27 with SMTP id
+ p30-20020a056a000a1e00b0050dbb0c2e27mr18910040pfh.49.1651634705422; Tue, 03
+ May 2022 20:25:05 -0700 (PDT)
+Date:   Wed,  4 May 2022 03:24:41 +0000
 In-Reply-To: <20220504032446.4133305-1-oupton@google.com>
-Message-Id: <20220504032446.4133305-7-oupton@google.com>
+Message-Id: <20220504032446.4133305-8-oupton@google.com>
 Mime-Version: 1.0
 References: <20220504032446.4133305-1-oupton@google.com>
 X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH v6 06/12] KVM: arm64: Add support for userspace to suspend a vCPU
+Subject: [PATCH v6 07/12] KVM: arm64: Implement PSCI SYSTEM_SUSPEND
 From:   Oliver Upton <oupton@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -63,213 +63,228 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce a new MP state, KVM_MP_STATE_SUSPENDED, which indicates a vCPU
-is in a suspended state. In the suspended state the vCPU will block
-until a wakeup event (pending interrupt) is recognized.
+ARM DEN0022D.b 5.19 "SYSTEM_SUSPEND" describes a PSCI call that allows
+software to request that a system be placed in the deepest possible
+low-power state. Effectively, software can use this to suspend itself to
+RAM.
 
-Add a new system event type, KVM_SYSTEM_EVENT_WAKEUP, to indicate to
-userspace that KVM has recognized one such wakeup event. It is the
-responsibility of userspace to then make the vCPU runnable, or leave it
-suspended until the next wakeup event.
+Unfortunately, there really is no good way to implement a system-wide
+PSCI call in KVM. Any precondition checks done in the kernel will need
+to be repeated by userspace since there is no good way to protect a
+critical section that spans an exit to userspace. SYSTEM_RESET and
+SYSTEM_OFF are equally plagued by this issue, although no users have
+seemingly cared for the relatively long time these calls have been
+supported.
 
+The solution is to just make the whole implementation userspace's
+problem. Introduce a new system event, KVM_SYSTEM_EVENT_SUSPEND, that
+indicates to userspace a calling vCPU has invoked PSCI SYSTEM_SUSPEND.
+Additionally, add a CAP to get buy-in from userspace for this new exit
+type.
+
+Only advertise the SYSTEM_SUSPEND PSCI call if userspace has opted in.
+If a vCPU calls SYSTEM_SUSPEND, punt straight to userspace. Provide
+explicit documentation of userspace's responsibilites for the exit and
+point to the PSCI specification to describe the actual PSCI call.
+
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- Documentation/virt/kvm/api.rst    | 37 ++++++++++++++++++++--
- arch/arm64/include/asm/kvm_host.h |  1 +
- arch/arm64/kvm/arm.c              | 51 +++++++++++++++++++++++++++++++
+ Documentation/virt/kvm/api.rst    | 39 +++++++++++++++++++++++++++++++
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ arch/arm64/kvm/arm.c              |  5 ++++
+ arch/arm64/kvm/psci.c             | 29 +++++++++++++++++++++++
  include/uapi/linux/kvm.h          |  2 ++
- 4 files changed, 89 insertions(+), 2 deletions(-)
+ 5 files changed, 77 insertions(+)
 
 diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 4a900cdbc62e..46ca84600dca 100644
+index 46ca84600dca..d8d7859fc556 100644
 --- a/Documentation/virt/kvm/api.rst
 +++ b/Documentation/virt/kvm/api.rst
-@@ -1476,14 +1476,43 @@ Possible values are:
-                                  [s390]
-    KVM_MP_STATE_LOAD             the vcpu is in a special load/startup state
-                                  [s390]
-+   KVM_MP_STATE_SUSPENDED        the vcpu is in a suspend state and is waiting
-+                                 for a wakeup event [arm64]
-    ==========================    ===============================================
- 
- On x86, this ioctl is only useful after KVM_CREATE_IRQCHIP. Without an
- in-kernel irqchip, the multiprocessing state must be maintained by userspace on
- these architectures.
- 
--For arm64/riscv:
--^^^^^^^^^^^^^^^^
-+For arm64:
-+^^^^^^^^^^
-+
-+If a vCPU is in the KVM_MP_STATE_SUSPENDED state, KVM will emulate the
-+architectural execution of a WFI instruction.
-+
-+If a wakeup event is recognized, KVM will exit to userspace with a
-+KVM_SYSTEM_EVENT exit, where the event type is KVM_SYSTEM_EVENT_WAKEUP. If
-+userspace wants to honor the wakeup, it must set the vCPU's MP state to
-+KVM_MP_STATE_RUNNABLE. If it does not, KVM will continue to await a wakeup
-+event in subsequent calls to KVM_RUN.
-+
-+.. warning::
-+
-+     If userspace intends to keep the vCPU in a SUSPENDED state, it is
-+     strongly recommended that userspace take action to suppress the
-+     wakeup event (such as masking an interrupt). Otherwise, subsequent
-+     calls to KVM_RUN will immediately exit with a KVM_SYSTEM_EVENT_WAKEUP
-+     event and inadvertently waste CPU cycles.
-+
-+     Additionally, if userspace takes action to suppress a wakeup event,
-+     it is strongly recommended that it also restores the vCPU to its
-+     original state when the vCPU is made RUNNABLE again. For example,
-+     if userspace masked a pending interrupt to suppress the wakeup,
-+     the interrupt should be unmasked before returning control to the
-+     guest.
-+
-+For riscv:
-+^^^^^^^^^^
- 
- The only states that are valid are KVM_MP_STATE_STOPPED and
- KVM_MP_STATE_RUNNABLE which reflect if the vcpu is paused or not.
-@@ -5985,6 +6014,7 @@ should put the acknowledged interrupt vector into the 'epr' field.
-   #define KVM_SYSTEM_EVENT_SHUTDOWN       1
+@@ -6015,6 +6015,7 @@ should put the acknowledged interrupt vector into the 'epr' field.
    #define KVM_SYSTEM_EVENT_RESET          2
    #define KVM_SYSTEM_EVENT_CRASH          3
-+  #define KVM_SYSTEM_EVENT_WAKEUP         4
+   #define KVM_SYSTEM_EVENT_WAKEUP         4
++  #define KVM_SYSTEM_EVENT_SUSPEND        5
  			__u32 type;
                          __u32 ndata;
                          __u64 data[16];
-@@ -6009,6 +6039,9 @@ Valid values for 'type' are:
-    has requested a crash condition maintenance. Userspace can choose
-    to ignore the request, or to gather VM memory core dump and/or
-    reset/shutdown of the VM.
-+ - KVM_SYSTEM_EVENT_WAKEUP -- the exiting vCPU is in a suspended state and
-+   KVM has recognized a wakeup event. Userspace may honor this event by
-+   marking the exiting vCPU as runnable, or deny it and call KVM_RUN again.
+@@ -6042,6 +6043,34 @@ Valid values for 'type' are:
+  - KVM_SYSTEM_EVENT_WAKEUP -- the exiting vCPU is in a suspended state and
+    KVM has recognized a wakeup event. Userspace may honor this event by
+    marking the exiting vCPU as runnable, or deny it and call KVM_RUN again.
++ - KVM_SYSTEM_EVENT_SUSPEND -- the guest has requested a suspension of
++   the VM.
++
++For arm/arm64:
++^^^^^^^^^^^^^^
++
++   KVM_SYSTEM_EVENT_SUSPEND exits are enabled with the
++   KVM_CAP_ARM_SYSTEM_SUSPEND VM capability. If a guest invokes the PSCI
++   SYSTEM_SUSPEND function, KVM will exit to userspace with this event
++   type.
++
++   It is the sole responsibility of userspace to implement the PSCI
++   SYSTEM_SUSPEND call according to ARM DEN0022D.b 5.19 "SYSTEM_SUSPEND".
++   KVM does not change the vCPU's state before exiting to userspace, so
++   the call parameters are left in-place in the vCPU registers.
++
++   Userspace is _required_ to take action for such an exit. It must
++   either:
++
++    - Honor the guest request to suspend the VM. Userspace can request
++      in-kernel emulation of suspension by setting the calling vCPU's
++      state to KVM_MP_STATE_SUSPENDED. Userspace must configure the vCPU's
++      state according to the parameters passed to the PSCI function when
++      the calling vCPU is resumed. See ARM DEN0022D.b 5.19.1 "Intended use"
++      for details on the function parameters.
++
++    - Deny the guest request to suspend the VM. See ARM DEN0022D.b 5.19.2
++      "Caller responsibilities" for possible return values.
  
  If KVM_CAP_SYSTEM_EVENT_DATA is present, the 'data' field can contain
  architecture specific information for the system-level event.  Only
+@@ -7767,6 +7796,16 @@ At this time, KVM_PMU_CAP_DISABLE is the only capability.  Setting
+ this capability will disable PMU virtualization for that VM.  Usermode
+ should adjust CPUID leaf 0xA to reflect that the PMU is disabled.
+ 
++8.36 KVM_CAP_ARM_SYSTEM_SUSPEND
++-------------------------------
++
++:Capability: KVM_CAP_ARM_SYSTEM_SUSPEND
++:Architectures: arm64
++:Type: vm
++
++When enabled, KVM will exit to userspace with KVM_EXIT_SYSTEM_EVENT of
++type KVM_SYSTEM_EVENT_SUSPEND to process the guest suspend request.
++
+ 9. Known KVM API problems
+ =========================
+ 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f3f93d48e21a..46027b9b80ca 100644
+index 46027b9b80ca..d9df81949f76 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -46,6 +46,7 @@
- #define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
- #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
- #define KVM_REQ_RELOAD_PMU	KVM_ARCH_REQ(5)
-+#define KVM_REQ_SUSPEND		KVM_ARCH_REQ(6)
+@@ -137,6 +137,8 @@ struct kvm_arch {
+ 	 */
+ #define KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED		3
+ #define KVM_ARCH_FLAG_EL1_32BIT				4
++	/* PSCI SYSTEM_SUSPEND enabled for the guest */
++#define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		5
  
- #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
- 				     KVM_DIRTY_LOG_INITIALLY_SET)
+ 	unsigned long flags;
+ 
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index efe54aba5cce..abd32a84ed7a 100644
+index abd32a84ed7a..f8a89ae52710 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -444,6 +444,18 @@ bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu)
- 	return vcpu->arch.mp_state.mp_state == KVM_MP_STATE_STOPPED;
- }
- 
-+static void kvm_arm_vcpu_suspend(struct kvm_vcpu *vcpu)
-+{
-+	vcpu->arch.mp_state.mp_state = KVM_MP_STATE_SUSPENDED;
-+	kvm_make_request(KVM_REQ_SUSPEND, vcpu);
-+	kvm_vcpu_kick(vcpu);
-+}
-+
-+static bool kvm_arm_vcpu_suspended(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->arch.mp_state.mp_state == KVM_MP_STATE_SUSPENDED;
-+}
-+
- int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
- 				    struct kvm_mp_state *mp_state)
- {
-@@ -464,6 +476,9 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
- 	case KVM_MP_STATE_STOPPED:
- 		kvm_arm_vcpu_power_off(vcpu);
+@@ -97,6 +97,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		}
+ 		mutex_unlock(&kvm->lock);
  		break;
-+	case KVM_MP_STATE_SUSPENDED:
-+		kvm_arm_vcpu_suspend(vcpu);
++	case KVM_CAP_ARM_SYSTEM_SUSPEND:
++		r = 0;
++		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
 +		break;
  	default:
- 		ret = -EINVAL;
- 	}
-@@ -648,6 +663,39 @@ void kvm_vcpu_wfi(struct kvm_vcpu *vcpu)
- 	preempt_enable();
+ 		r = -EINVAL;
+ 		break;
+@@ -210,6 +214,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_SET_GUEST_DEBUG:
+ 	case KVM_CAP_VCPU_ATTRIBUTES:
+ 	case KVM_CAP_PTP_KVM:
++	case KVM_CAP_ARM_SYSTEM_SUSPEND:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG2:
+diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+index 2e6f060214a7..5de30e72ad40 100644
+--- a/arch/arm64/kvm/psci.c
++++ b/arch/arm64/kvm/psci.c
+@@ -195,6 +195,15 @@ static void kvm_psci_system_reset2(struct kvm_vcpu *vcpu)
+ 				 KVM_SYSTEM_EVENT_RESET_FLAG_PSCI_RESET2);
  }
  
-+static int kvm_vcpu_suspend(struct kvm_vcpu *vcpu)
++static void kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
 +{
-+	if (!kvm_arm_vcpu_suspended(vcpu))
-+		return 1;
++	struct kvm_run *run = vcpu->run;
 +
-+	kvm_vcpu_wfi(vcpu);
-+
-+	/*
-+	 * The suspend state is sticky; we do not leave it until userspace
-+	 * explicitly marks the vCPU as runnable. Request that we suspend again
-+	 * later.
-+	 */
-+	kvm_make_request(KVM_REQ_SUSPEND, vcpu);
-+
-+	/*
-+	 * Check to make sure the vCPU is actually runnable. If so, exit to
-+	 * userspace informing it of the wakeup condition.
-+	 */
-+	if (kvm_arch_vcpu_runnable(vcpu)) {
-+		memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
-+		vcpu->run->system_event.type = KVM_SYSTEM_EVENT_WAKEUP;
-+		vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
-+		return 0;
-+	}
-+
-+	/*
-+	 * Otherwise, we were unblocked to process a different event, such as a
-+	 * pending signal. Return 1 and allow kvm_arch_vcpu_ioctl_run() to
-+	 * process the event.
-+	 */
-+	return 1;
++	memset(&run->system_event, 0, sizeof(vcpu->run->system_event));
++	run->system_event.type = KVM_SYSTEM_EVENT_SUSPEND;
++	run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
 +}
 +
- /**
-  * check_vcpu_requests - check and handle pending vCPU requests
-  * @vcpu:	the VCPU pointer
-@@ -686,6 +734,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
- 		if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
- 			kvm_pmu_handle_pmcr(vcpu,
- 					    __vcpu_sys_reg(vcpu, PMCR_EL0));
-+
-+		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
-+			return kvm_vcpu_suspend(vcpu);
- 	}
+ static void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
+ {
+ 	int i;
+@@ -300,6 +309,7 @@ static int kvm_psci_1_x_call(struct kvm_vcpu *vcpu, u32 minor)
+ {
+ 	unsigned long val = PSCI_RET_NOT_SUPPORTED;
+ 	u32 psci_fn = smccc_get_function(vcpu);
++	struct kvm *kvm = vcpu->kvm;
+ 	u32 arg;
+ 	int ret = 1;
  
- 	return 1;
+@@ -331,6 +341,11 @@ static int kvm_psci_1_x_call(struct kvm_vcpu *vcpu, u32 minor)
+ 		case ARM_SMCCC_VERSION_FUNC_ID:
+ 			val = 0;
+ 			break;
++		case PSCI_1_0_FN_SYSTEM_SUSPEND:
++		case PSCI_1_0_FN64_SYSTEM_SUSPEND:
++			if (test_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags))
++				val = 0;
++			break;
+ 		case PSCI_1_1_FN_SYSTEM_RESET2:
+ 		case PSCI_1_1_FN64_SYSTEM_RESET2:
+ 			if (minor >= 1)
+@@ -338,6 +353,20 @@ static int kvm_psci_1_x_call(struct kvm_vcpu *vcpu, u32 minor)
+ 			break;
+ 		}
+ 		break;
++	case PSCI_1_0_FN_SYSTEM_SUSPEND:
++		kvm_psci_narrow_to_32bit(vcpu);
++		fallthrough;
++	case PSCI_1_0_FN64_SYSTEM_SUSPEND:
++		/*
++		 * Return directly to userspace without changing the vCPU's
++		 * registers. Userspace depends on reading the SMCCC parameters
++		 * to implement SYSTEM_SUSPEND.
++		 */
++		if (test_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags)) {
++			kvm_psci_system_suspend(vcpu);
++			return 0;
++		}
++		break;
+ 	case PSCI_1_1_FN_SYSTEM_RESET2:
+ 		kvm_psci_narrow_to_32bit(vcpu);
+ 		fallthrough;
 diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 6a184d260c7f..7f72fb7b05f2 100644
+index 7f72fb7b05f2..32c56384fd08 100644
 --- a/include/uapi/linux/kvm.h
 +++ b/include/uapi/linux/kvm.h
-@@ -444,6 +444,7 @@ struct kvm_run {
- #define KVM_SYSTEM_EVENT_SHUTDOWN       1
+@@ -445,6 +445,7 @@ struct kvm_run {
  #define KVM_SYSTEM_EVENT_RESET          2
  #define KVM_SYSTEM_EVENT_CRASH          3
-+#define KVM_SYSTEM_EVENT_WAKEUP         4
+ #define KVM_SYSTEM_EVENT_WAKEUP         4
++#define KVM_SYSTEM_EVENT_SUSPEND        5
  			__u32 type;
  			__u32 ndata;
  			union {
-@@ -646,6 +647,7 @@ struct kvm_vapic_addr {
- #define KVM_MP_STATE_OPERATING         7
- #define KVM_MP_STATE_LOAD              8
- #define KVM_MP_STATE_AP_RESET_HOLD     9
-+#define KVM_MP_STATE_SUSPENDED         10
+@@ -1154,6 +1155,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_DISABLE_QUIRKS2 213
+ /* #define KVM_CAP_VM_TSC_CONTROL 214 */
+ #define KVM_CAP_SYSTEM_EVENT_DATA 215
++#define KVM_CAP_ARM_SYSTEM_SUSPEND 216
  
- struct kvm_mp_state {
- 	__u32 mp_state;
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
 -- 
 2.36.0.464.gb9c8b46e94-goog
 
