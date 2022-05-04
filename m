@@ -2,125 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C20D519FC0
-	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 14:41:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 856AB519FCF
+	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 14:44:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240294AbiEDMoj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 May 2022 08:44:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59452 "EHLO
+        id S1349920AbiEDMsO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 May 2022 08:48:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349866AbiEDMoa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 May 2022 08:44:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A882D344F8
-        for <kvm@vger.kernel.org>; Wed,  4 May 2022 05:40:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651668053;
+        with ESMTP id S1349760AbiEDMsL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 May 2022 08:48:11 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07AA333A28;
+        Wed,  4 May 2022 05:44:36 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1651668274;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=p42ujX9orUiN3OgFIB7H1+2tqHSQ2wyI3UPSSooZMyQ=;
-        b=VtQMbm/wasnhsJuBP4vfgpMEBGeihp0rv/Vm/71GMMCsjiqEBrpNG0+flP5JegT0NeAzg6
-        7t00W4eFz6c2tRYzzyekx4VVT9a+oDQMoAV+hy0Om7nEeX/rWOhSafUfCvUTNdHaCRlYR7
-        IO+zRf/9o1f3y7j5epo1PJIe1PtZvKg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-528-CcVyKRYINI-YO_JLDinMVQ-1; Wed, 04 May 2022 08:40:50 -0400
-X-MC-Unique: CcVyKRYINI-YO_JLDinMVQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 241FA29AB40B;
-        Wed,  4 May 2022 12:40:50 +0000 (UTC)
-Received: from starship (unknown [10.40.192.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id ECAD4155F649;
-        Wed,  4 May 2022 12:40:47 +0000 (UTC)
-Message-ID: <03ff8d87c7aa513cf4b394b7ef5a769c17f865fa.camel@redhat.com>
-Subject: Re: [PATCH v3 00/12] KVM: SVM: Fix soft int/ex re-injection
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 04 May 2022 15:40:46 +0300
-In-Reply-To: <YnF46K33TOKqpAUs@google.com>
-References: <cover.1651440202.git.maciej.szmigiero@oracle.com>
-         <YnF46K33TOKqpAUs@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        bh=sq/ZfBcYwetCSwS2b1v/F95/fw7AV7LRpm+RRYHMFhE=;
+        b=4LWsQTH00ijleaQppiO3t8PwIRNvsJhi/eaxp4c661QYRYPdB4cMYRmZ2AlTcV3WLjOG8o
+        J6sJDVQAiE1Olv9kL3csyNnzQuaTuS+FafrD/tY5H5CqzmHvtfdYLpdfh+em2X4yhnURPz
+        5ejAoq1JTlKnXNijQcsdCfPiy03bMSYE4kCzpnwWRfVG/Mfk2Hk+riC4kyoY7TmIU2N+LQ
+        Obyf54E9NIzYmCbgqGo/YlHa5BbfymuLpPosjLnP1Xq4LlkP9Pf7KZEn1+32jwnC7dde87
+        1h1r7r//juLKkspYnPZKmaS+OxFef7aCxie9xUjUNLd+JTgheZaaVwb3ueN9UA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1651668274;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sq/ZfBcYwetCSwS2b1v/F95/fw7AV7LRpm+RRYHMFhE=;
+        b=a3BzJFbdP8WFS+URRo5HLJW0zwxmJmB1YnqUzTPzxTZlU1IyBpvvjRlqKVB97dk/CgfJln
+        ha3SjskYj8+MG7Cg==
+To:     Seth Forshee <sforshee@digitalocean.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>
+Cc:     Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Petr Mladek <pmladek@suse.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org, live-patching@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v2] entry/kvm: Make vCPU tasks exit to userspace when a
+ livepatch is pending
+In-Reply-To: <20220503174934.2641605-1-sforshee@digitalocean.com>
+References: <20220503174934.2641605-1-sforshee@digitalocean.com>
+Date:   Wed, 04 May 2022 14:44:34 +0200
+Message-ID: <87mtfxjwlp.ffs@tglx>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-05-03 at 18:48 +0000, Sean Christopherson wrote:
-> On Mon, May 02, 2022, Maciej S. Szmigiero wrote:
-> > From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-> > 
-> > This series is an updated version of Sean's SVM soft interrupt/exception
-> > re-injection fixes patch set, which in turn extended and generalized my
-> > nSVM L1 -> L2 event injection fixes series.
-> > 
-> > Detailed list of changes in this version:
-> > * "Downgraded" the commit affecting !nrips CPUs to just drop nested SVM
-> > support for such parts instead of SVM support in general,
-> > 
-> > * Removed the BUG_ON() from svm_inject_irq() completely, instead of
-> > replacing it with WARN() - Maxim has pointed out it can still be triggered
-> > by userspace via KVM_SET_VCPU_EVENTS,
-> > 
-> > * Updated the new KVM self-test to switch to an alternate IDT before attempting
-> > a second L1 -> L2 injection to cause intervening NPF again,
-> > 
-> > * Added a fix for L1/L2 NMI state confusion during L1 -> L2 NMI re-injection,
-> > 
-> > * Updated the new KVM self-test to also check for the NMI injection
-> > scenario being fixed (that was found causing issues with a real guest),
-> > 
-> > * Changed "kvm_inj_virq" trace event "reinjected" field type to bool,
-> > 
-> > * Integrated the fix from patch 5 for nested_vmcb02_prepare_control() call
-> > argument in svm_set_nested_state() to patch 1,
-> > 
-> > * Collected Maxim's "Reviewed-by:" for tracepoint patches.
-> > 
-> > Previous versions:
-> > Sean's v2:
-> > https://lore.kernel.org/kvm/20220423021411.784383-1-seanjc@google.com
-> > 
-> > Sean's v1:
-> > https://lore.kernel.org/kvm/20220402010903.727604-1-seanjc@google.com
-> > 
-> > My original series:
-> > https://lore.kernel.org/kvm/cover.1646944472.git.maciej.szmigiero@oracle.com
-> > 
-> > Maciej S. Szmigiero (4):
-> >   KVM: nSVM: Sync next_rip field from vmcb12 to vmcb02
-> >   KVM: SVM: Don't BUG if userspace injects an interrupt with GIF=0
-> 
-> LOL, this should win some kind of award for most ridiculous multi-author patch :-)
-> 
-> Series looks good, thanks!
-> 
-Well I think I, Paolo, and you hold the record for this, when we fixed the AVIC inhibition
-races, remember?
+On Tue, May 03 2022 at 12:49, Seth Forshee wrote:
+> diff --git a/include/linux/entry-kvm.h b/include/linux/entry-kvm.h
+> index 6813171afccb..bf79e4cbb5a2 100644
+> --- a/include/linux/entry-kvm.h
+> +++ b/include/linux/entry-kvm.h
+> @@ -17,8 +17,8 @@
+>  #endif
+>  
+>  #define XFER_TO_GUEST_MODE_WORK						\
+> -	(_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_NOTIFY_SIGNAL |	\
+> -	 _TIF_NOTIFY_RESUME | ARCH_XFER_TO_GUEST_MODE_WORK)
+> +	(_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_PATCH_PENDING |	\
+> +	 _TIF_NOTIFY_SIGNAL | _TIF_NOTIFY_RESUME | ARCH_XFER_TO_GUEST_MODE_WORK)
 
-Patch series also looks overall good to me, but I haven't checked everything to be honest.
+as the 0-day robot has demonstrated already, this cannot compile on
+architectures which do not provide _TIF_PATCH_PENDING...
 
-Best regards,
-	Maxim Levitsky
+Something like the below is required.
 
+Thanks,
+
+        tglx
+---
+--- a/include/linux/entry-common.h
++++ b/include/linux/entry-common.h
+@@ -3,6 +3,7 @@
+ #define __LINUX_ENTRYCOMMON_H
+ 
+ #include <linux/static_call_types.h>
++#include <linux/entry-defs.h>
+ #include <linux/ptrace.h>
+ #include <linux/syscalls.h>
+ #include <linux/seccomp.h>
+@@ -11,18 +12,6 @@
+ #include <asm/entry-common.h>
+ 
+ /*
+- * Define dummy _TIF work flags if not defined by the architecture or for
+- * disabled functionality.
+- */
+-#ifndef _TIF_PATCH_PENDING
+-# define _TIF_PATCH_PENDING		(0)
+-#endif
+-
+-#ifndef _TIF_UPROBE
+-# define _TIF_UPROBE			(0)
+-#endif
+-
+-/*
+  * SYSCALL_WORK flags handled in syscall_enter_from_user_mode()
+  */
+ #ifndef ARCH_SYSCALL_WORK_ENTER
+--- /dev/null
++++ b/include/linux/entry-defs.h
+@@ -0,0 +1,19 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __LINUX_ENTRYDEFS_H
++#define __LINUX_ENTRYDEFS_H
++
++#include <linux/thread_info.h>
++
++/*
++ * Define dummy _TIF work flags if not defined by the architecture or for
++ * disabled functionality.
++ */
++#ifndef _TIF_PATCH_PENDING
++# define _TIF_PATCH_PENDING		(0)
++#endif
++
++#ifndef _TIF_UPROBE
++# define _TIF_UPROBE			(0)
++#endif
++
++#endif
+--- a/include/linux/entry-kvm.h
++++ b/include/linux/entry-kvm.h
+@@ -4,6 +4,7 @@
+ 
+ #include <linux/static_call_types.h>
+ #include <linux/resume_user_mode.h>
++#include <linux/entry-defs.h>
+ #include <linux/syscalls.h>
+ #include <linux/seccomp.h>
+ #include <linux/sched.h>
