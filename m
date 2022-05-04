@@ -2,166 +2,317 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DAA6951A1F5
-	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 16:13:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CDF2551A2CF
+	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 16:58:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351058AbiEDOQ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 May 2022 10:16:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33594 "EHLO
+        id S1351606AbiEDPC0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 May 2022 11:02:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351153AbiEDOQy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 May 2022 10:16:54 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2075.outbound.protection.outlook.com [40.107.220.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCB82427C5
-        for <kvm@vger.kernel.org>; Wed,  4 May 2022 07:13:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aM8n/tI3Uv+aA351awZbsfyA61431aEbqxleHUipWDsxMw0CIGTW2otMQS8nDf6ahE/WJU8RRGhg6v6QmTQzF+9NVhWsVIYlUME4ECTiqwZqLhg/hkyxp4jPWrUyjdQAy2dpBQOu4sdw8D+MRYKpCWyzZW/TeMJUB3T/pPgRwFON1n4s+m9mULYxkV1Hr6Ss86FHVukdPyU/W3/f6hNWUXYUTZ+SYRovNKn72yjWsFffFCmXUOHuFKDAd/3hS2CzsTbtXac+EFW+v47qSUPDzOyd0nkj83Fk8QyN/FXc2lWttS92pHB28A0wdId23XB9OqGw8sWNt72brRhsKZNoQw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OaSbMuL12ieabc9MwXWXZ/nM/d0u6nTM5B0Jgu3NW+U=;
- b=Ys9yeGASDEvo9I7BglVX5cKLUrE21N8rIvK8BM1GYLVAeQWjx6fJUnd+CikkFj8yepEa+of55vYAm3dQZEbvWOZJUiKp6fQHojwfew5DDvLvkMz9PjQYCL+zSth8gbBAWFAEjwjhKcrB8KezIOiOpvwO0qgsNEPoX+o6vhP/WKYu6AxkNgs4YikjYsZjnPYL5Se+ZWSuaAv8yLF6GNnGrRKQVe24r7hfrOSToDLkOB+z0dyC2PhQ4JF9pOtn7YWuuyTattgoinueZRNFfgrzHiDaLRYjd1IZ/HqPnLV2juA2qfux9aJv675TCRGegZNSN+/NMpHQzYYhkCX54xk6Kg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OaSbMuL12ieabc9MwXWXZ/nM/d0u6nTM5B0Jgu3NW+U=;
- b=AXwghcER2Zd+cvbLKB0SaksuzwfkNGrtZAAz3q5/H+qlPNKFKOfI7yVZFn4hzPUowU0pKQdgooMbwBFMNggoPOghLdBpqP/oOWVankqT75ru4Yd2JQqLUJcnmDTvBEmAQNxylB4PEpo0CDEGtm+CbbT7cDDg2G65Bar9dK67TFazVrKVpZyQ3sROk6xq2qFRtDMzLR/0qLhI5tz5/YOpNKOq2wf25LOA+KteBVZH1JJGZHZytf7i3l4+3GDFVPO7H0+w7yLnu4Vud2GWc/j0K2SNVSNotctFeC+5//90X8jaXskzAJPr5wOtNYVGzLk1weQh8yDhZKKHq68aSnd35g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4206.namprd12.prod.outlook.com (2603:10b6:208:1d5::18)
- by BL0PR12MB2467.namprd12.prod.outlook.com (2603:10b6:207:4c::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5206.24; Wed, 4 May
- 2022 14:13:17 +0000
-Received: from MN2PR12MB4206.namprd12.prod.outlook.com
- ([fe80::98b2:1d32:afd7:eb2f]) by MN2PR12MB4206.namprd12.prod.outlook.com
- ([fe80::98b2:1d32:afd7:eb2f%5]) with mapi id 15.20.5206.024; Wed, 4 May 2022
- 14:13:17 +0000
-Message-ID: <abb3064c-f606-dfbc-a3ea-c423e33503cf@nvidia.com>
-Date:   Wed, 4 May 2022 19:43:05 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v2] vfio/pci: Remove vfio_device_get_from_dev()
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Longfang Liu <liulongfang@huawei.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Cc:     Kevin Tian <kevin.tian@intel.com>
-References: <0-v2-0f36bcf6ec1e+64d-vfio_get_from_dev_jgg@nvidia.com>
-X-Nvconfidentiality: public
-From:   Kirti Wankhede <kwankhede@nvidia.com>
-In-Reply-To: <0-v2-0f36bcf6ec1e+64d-vfio_get_from_dev_jgg@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MA0PR01CA0017.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:80::12) To MN2PR12MB4206.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::18)
+        with ESMTP id S240868AbiEDPCZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 May 2022 11:02:25 -0400
+Received: from out02.mta.xmission.com (out02.mta.xmission.com [166.70.13.232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F33B71A816;
+        Wed,  4 May 2022 07:58:48 -0700 (PDT)
+Received: from in02.mta.xmission.com ([166.70.13.52]:52804)
+        by out02.mta.xmission.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.93)
+        (envelope-from <ebiederm@xmission.com>)
+        id 1nmFoX-003bD1-UG; Wed, 04 May 2022 08:17:13 -0600
+Received: from ip68-227-174-4.om.om.cox.net ([68.227.174.4]:36906 helo=email.froward.int.ebiederm.org.xmission.com)
+        by in02.mta.xmission.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.93)
+        (envelope-from <ebiederm@xmission.com>)
+        id 1nmFoW-00DS5o-Ew; Wed, 04 May 2022 08:17:13 -0600
+From:   "Eric W. Biederman" <ebiederm@xmission.com>
+To:     Petr Mladek <pmladek@suse.com>
+Cc:     Seth Forshee <sforshee@digitalocean.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org, live-patching@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20220503174934.2641605-1-sforshee@digitalocean.com>
+        <20220504130753.GB8069@pathway.suse.cz>
+Date:   Wed, 04 May 2022 09:16:46 -0500
+In-Reply-To: <20220504130753.GB8069@pathway.suse.cz> (Petr Mladek's message of
+        "Wed, 4 May 2022 15:07:53 +0200")
+Message-ID: <87r159fkmp.fsf@email.froward.int.ebiederm.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: bcea93ab-058d-4723-82be-08da2dd83be9
-X-MS-TrafficTypeDiagnostic: BL0PR12MB2467:EE_
-X-Microsoft-Antispam-PRVS: <BL0PR12MB2467483CBEE2F3198C38905EDCC39@BL0PR12MB2467.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Ef5DgXYp4MJi6GJfBFB4/3TW5oiLLUO75TeD5YGCI42urXg+tiPmlf14UH69osE+fRRklDgOPnYG0/Do0wF9JjYw66IqaYDPWVmUrusIXYBCPFws7sKQcu1wYz+8EaL5tBj8tYiW99uTq7RAvVKqyvpbBkmiTyXZ8pkmNGqET8JITZ1sYIuOad9ecCQlejNCwA0eozEWGxI9geiil5SH6bUIp4jsFN05zEWmtQTFsDg3XuuLvL6cllu/JzK8NEBRJIAOTb5VnS4x/y4d2jALHJ7U/q4ouDuL5KdJ2j/okXAwB5ULmUp3lsEBQ6BIDFFufOQ924Ua1rB7sTK4IkQBdo54dY/Cw7Z906HlgcE4fwiEb00Yy+DDM42zWy8ki33LAmg37ZgDMkRyTcE2TU42VvsjPu5mbWaHEd/ozJnnCugfu/+pWmKTriHuG0od3jVVPKX4MMBBzrOvni0HlzRFYBUZxeCu/40OkKQm5SbkvlI63Jue9EJWjiRDRt+5xRIMBDFAlUhXZhdV4BF2CeoPXH+S9RFs5GaKSZvb2YSEdlUmSYGMxNmuTiKpS5A6IFNxHB4q//SBTgrW+71svSIpXEHuk4hTX/jOPAOgpPPrPi1/x2YmXlOwCh+uot9VgCPvAJIW+nBecIWsaEUvKu8L3UogLGiN13QJzgDIOpG31wx2MGt/2aI4vJIKvznH6B3J2pE7klolH+wXQmRhlaVa+d7nzU0zarLTB+MXT6ZbsvI=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4206.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(2616005)(36756003)(83380400001)(186003)(31686004)(6512007)(26005)(2906002)(508600001)(5660300002)(316002)(53546011)(55236004)(110136005)(6636002)(6506007)(8676002)(66476007)(66946007)(66556008)(8936002)(38100700002)(6666004)(86362001)(6486002)(31696002)(4326008)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Rk5YbzNGYmVpNFBCUDRKQVJPL1EveHVPWTNhS2grQ3R6RWF1ckpqWURSUlBo?=
- =?utf-8?B?c0IvNWVsbmoxd0tiNXBOV1o1QUdhZklVM2ZmVnk4dkI0dnJxbnF6ZXhKOEx2?=
- =?utf-8?B?ZUtDcEhqV055Sm9EY3lxMm1rOEJMN1hBQlR1UnBuMDhLTXVkVFBLTmhydk83?=
- =?utf-8?B?RDlUV3JZWVN2SHdKSzUrWWhEakZHM3dDVUhkRGtmalU3UXZXSFFqOXNvK2ln?=
- =?utf-8?B?Y1pubVgvREpRMTZYb2RKWXhqZitETXNPTUR6ek4rOHYrZTg3b1cxZ2NWeVdP?=
- =?utf-8?B?aWhzWWtGTUxRQlU4U25nalM3YklBUkhVSDdESlRRWkFjS3N2c0xSRDExTjdP?=
- =?utf-8?B?bllHdEp6SWNRNUljWkN1Z09iMC9OKzcwMTg5Q0p0ZER1bVo3MVhPRnoyR1RM?=
- =?utf-8?B?ZjlTY2grcnc2R1JuWlJsNFV5U1JFQjIyc1dnMkZqbERRbmV5eWU5MFJZUDkw?=
- =?utf-8?B?RldiWHNycCtjd0hvMzY0OTcwY2ZRWG4rdFE4ZWxkb1pjWFZhVEpsc1NOdnp6?=
- =?utf-8?B?Ylg2Z0hvUWs3bENlT214SjErMG5HTTNjekwwYlZ4MEF0UWF5TzN6eHJLTUtj?=
- =?utf-8?B?cGNubnpaaXIvaHhzdVgzZlZ3Rkp0dCtuZCs2UXg0L2Q1VUszSVB5N1ZpNHFl?=
- =?utf-8?B?aThUQkpOMkUxcHhOUUlUalV1NHZIZWxOQUFrdlh0WUo1MXFVSnZ1SjU3dHFr?=
- =?utf-8?B?NUxZekFmcG8vWUh4b0FZUkw2M3hlUndPRjBYZ0o1MjVsRDJ3RFdDcHdZMDMz?=
- =?utf-8?B?NTlYQmFQc2JKQkxMSlpxcUlrL09rV1M5TW9wZndGeFdTTnNvMUtNRDRYNHZT?=
- =?utf-8?B?U2QzaW1KaGt0QmZrbDVidVJWT2tFb3JKS0ZjZlM4b1dLcHJ4SmlxaUFEbXRO?=
- =?utf-8?B?Z1NPK0srL2FYYXFRTklieE1QYTY4QnFldm9NaUlaSEpGQVp0a0doaVpLajJG?=
- =?utf-8?B?Z3I2dGEzMXFaOU15MWhWdnZVRXZLWUFDcDJVOGxSeHF2Vzh0ZFI0YjRqYVVz?=
- =?utf-8?B?WHllT3VjV2dmZzhnSFlISTFnMnN1Lzl3YmpHelhUSU10MlM1dmYwSnNtK1BV?=
- =?utf-8?B?TnkyWC9Wc1dxanJzU3FBWjdUNWN0TmNuVnJTRXJ1a0s0L0tXR3hpd0tMWndu?=
- =?utf-8?B?R2FFSEFiVUNQU2VPVHl3L3BTd3FjR0hPRk81UjJyOTc0MGM2Q1dsVUtlYVBm?=
- =?utf-8?B?MzVIUFhKa1FkMGZJamNHdm9uVDZkNDhQUjQ3OXZzL1BtaWIvRnYxWFJhQ0ts?=
- =?utf-8?B?TklkT1RaZXR0dCtIK2ZTaWVYN3MxeTVPNHRGbHNXcEo0NTlvUVRSQmJIRy9M?=
- =?utf-8?B?alhCZElWYTBFRWkrMnZQOXM5NDBzcC9TdFNnWFJXZW4xa2U1WFZwRS8xNHdG?=
- =?utf-8?B?VCtRSExlczRYd1JweXo2Vm5HL2RzQUhZK1J5NTdnK2Z4SUkrTVV0ZktDTHJY?=
- =?utf-8?B?Q2dWdHRPSDZiMFVTWjJCQ3NxTlVHMTBVZnB3dlFrY0dCQm4ySzY0a2hWVHRH?=
- =?utf-8?B?UDRrWGcvQ0tDM0I3QnYyQ3dBZ1ZmZ2hxSXhSV29yWGdYMkZZWW5PUWhBMURR?=
- =?utf-8?B?N2wrL00rTitvMXRFdy8wWEwyU3RzQnNpa1JjZG1hUmlXSHlIVUFGWDZBUmcx?=
- =?utf-8?B?d3liTVNDaU0vRTcvZUtGdHI4dmptUVlsdVc4RytYUVlwY0NOZEJ6anB0Mkk5?=
- =?utf-8?B?Z1U4RUJPYmR0c01HYnpKVTdmNDZRRnVuVTBSQ1pUanVpNU91dTk5VVFsQXp4?=
- =?utf-8?B?RXljMmlmTHdUSXZzcVAvS0FzeGV3TVkyU0hnWkdVeS9FanRIMmdTNVZDd2dn?=
- =?utf-8?B?T3NrWlF1WmZOUGZIdWtPa1JwQm5WNC9TWUZLTE9DaXg5cHRiVVhTTzliZEhI?=
- =?utf-8?B?K3dGVEtUaWxzaHBrWnBEWm1qT3ZKeG81WkhHdEFZb1EvalhhUVRRNnZNaDBL?=
- =?utf-8?B?dVZtdWF4RWJ4U3ZaRC9oVjNnMzlYR1FDVmgraTlPcmoyeTR5czdIdHNieVlK?=
- =?utf-8?B?b1VSNmdpTDc2M2FHbHhyeE5vdzlmVEFDS09RaStydHRTZGtMYnFLdXF4VTR3?=
- =?utf-8?B?bnF3bFFLWVFRNVB4ZlpTOG0yL2dxSGVXNXdiaUlnUUx3YjUzMytlUDAwSnI5?=
- =?utf-8?B?dG9HaUVlTlJ0WDdza1ZkSFBXdU9MRGdvUFdIRVNRTlFyYmlGQ1RQVFp0aXZj?=
- =?utf-8?B?TDhnaHUrdFBiZzd3T3BGZWZHOW84c1VWUytaNXJtdWZhMEI5OE4yYkpmNGlU?=
- =?utf-8?B?eDlhZUkzdnVRc2Q2dUZXYkNFOXJMb0dSajhYNWpXV0RET08rTFNzM0FXWnRi?=
- =?utf-8?B?MFlBdi9mMVVrQkIwMU43TFJWNGVXSkFnaUxwWlBKOGQ5dVBONUFmQ3NtQnlZ?=
- =?utf-8?Q?yvzKwwg6/XvXFNAs=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bcea93ab-058d-4723-82be-08da2dd83be9
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4206.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2022 14:13:17.1284
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: aUr5eigm2mmFjCpQbUayJuD/EUoWAXjqcGtLjXQz9mYz8EP09xxNiG2G+zA06HAfsyk4qDXHfBxxeA/tH1Qs7w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB2467
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain
+X-XM-SPF: eid=1nmFoW-00DS5o-Ew;;;mid=<87r159fkmp.fsf@email.froward.int.ebiederm.org>;;;hst=in02.mta.xmission.com;;;ip=68.227.174.4;;;frm=ebiederm@xmission.com;;;spf=softfail
+X-XM-AID: U2FsdGVkX1/PsYWhFWPq0Ll6mfLUge9ag9Wd5++oPJw=
+X-SA-Exim-Connect-IP: 68.227.174.4
+X-SA-Exim-Mail-From: ebiederm@xmission.com
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
+X-Spam-DCC: XMission; sa06 1397; Body=1 Fuz1=1 Fuz2=1 
+X-Spam-Combo: ***;Petr Mladek <pmladek@suse.com>
+X-Spam-Relay-Country: 
+X-Spam-Timing: total 858 ms - load_scoreonly_sql: 0.08 (0.0%),
+        signal_user_changed: 10 (1.2%), b_tie_ro: 9 (1.0%), parse: 1.68 (0.2%),
+         extract_message_metadata: 20 (2.4%), get_uri_detail_list: 4.5 (0.5%),
+        tests_pri_-1000: 34 (4.0%), tests_pri_-950: 1.40 (0.2%),
+        tests_pri_-900: 1.15 (0.1%), tests_pri_-90: 161 (18.8%), check_bayes:
+        159 (18.6%), b_tokenize: 28 (3.3%), b_tok_get_all: 15 (1.8%),
+        b_comp_prob: 15 (1.7%), b_tok_touch_all: 96 (11.2%), b_finish: 1.21
+        (0.1%), tests_pri_0: 609 (70.9%), check_dkim_signature: 0.79 (0.1%),
+        check_dkim_adsp: 3.3 (0.4%), poll_dns_idle: 1.08 (0.1%), tests_pri_10:
+        2.3 (0.3%), tests_pri_500: 12 (1.4%), rewrite_mail: 0.00 (0.0%)
+Subject: Re: [PATCH v2] entry/kvm: Make vCPU tasks exit to userspace when a
+ livepatch is pending
+X-SA-Exim-Version: 4.2.1 (built Sat, 08 Feb 2020 21:53:50 +0000)
+X-SA-Exim-Scanned: Yes (on in02.mta.xmission.com)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Petr Mladek <pmladek@suse.com> writes:
+
+> On Tue 2022-05-03 12:49:34, Seth Forshee wrote:
+>> A task can be livepatched only when it is sleeping or it exits to
+>> userspace. This may happen infrequently for a heavily loaded vCPU task,
+>> leading to livepatch transition failures.
+>
+> This is misleading.
+>
+> First, the problem is not a loaded CPU. The problem is that the
+> task might spend very long time in the kernel when handling
+> some syscall.
+>
+> Second, there is no timeout for the transition in the kernel code.
+> It might take very long time but it will not fail.
+>
+>> Fake signals will be sent to tasks which fail patching via stack
+>> checking. This will cause running vCPU tasks to exit guest mode, but
+>> since no signal is pending they return to guest execution without
+>> exiting to userspace. Fix this by treating a pending livepatch migration
+>> like a pending signal, exiting to userspace with EINTR. This allows the
+>> task to be patched, and userspace should re-excecute KVM_RUN to resume
+>> guest execution.
+>
+> It seems that the patch works as expected but it is far from clear.
+> And the above description helps only partially. Let me try to
+> explain it for dummies like me ;-)
+>
+> <explanation>
+> The problem was solved by sending a fake signal, see the commit
+> 0b3d52790e1cfd6b80b826 ("livepatch: Remove signal sysfs attribute").
+> It was achieved by calling signal_wake_up(). It set TIF_SIGPENDING
+> and woke the task. It interrupted the syscall and the task was
+> transitioned when leaving to the userspace.
+>
+> signal_wake_up() was later replaced by set_notify_signal(),
+> see the commit 8df1947c71ee53c7e21 ("livepatch: Replace
+> the fake signal sending with TIF_NOTIFY_SIGNAL infrastructure").
+> The difference is that set_notify_signal() uses TIF_NOTIFY_SIGNAL
+> instead of TIF_SIGPENDING.
+>
+> The effect is the same when running on a real hardware. The syscall
+> gets interrupted and exit_to_user_mode_loop() is called where
+> the livepatch state is updated (task migrated).
+>
+> But it works a different way in kvm where the task works are
+> called in the guest mode and the task does not return into
+> the user space in the host mode.
+> </explanation>
+>
+> The solution provided by this patch is a bit weird, see below.
+>
+>
+>> In my testing, systems where livepatching would timeout after 60 seconds
+>> were able to load livepatches within a couple of seconds with this
+>> change.
+>> 
+>> Signed-off-by: Seth Forshee <sforshee@digitalocean.com>
+>> ---
+>> Changes in v2:
+>>  - Added _TIF_SIGPENDING to XFER_TO_GUEST_MODE_WORK
+>>  - Reworded commit message and comments to avoid confusion around the
+>>    term "migrate"
+>> 
+>>  include/linux/entry-kvm.h | 4 ++--
+>>  kernel/entry/kvm.c        | 7 ++++++-
+>>  2 files changed, 8 insertions(+), 3 deletions(-)
+>> 
+>> diff --git a/include/linux/entry-kvm.h b/include/linux/entry-kvm.h
+>> index 6813171afccb..bf79e4cbb5a2 100644
+>> --- a/include/linux/entry-kvm.h
+>> +++ b/include/linux/entry-kvm.h
+>> @@ -17,8 +17,8 @@
+>>  #endif
+>>  
+>>  #define XFER_TO_GUEST_MODE_WORK						\
+>> -	(_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_NOTIFY_SIGNAL |	\
+>> -	 _TIF_NOTIFY_RESUME | ARCH_XFER_TO_GUEST_MODE_WORK)
+>> +	(_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_PATCH_PENDING |	\
+>> +	 _TIF_NOTIFY_SIGNAL | _TIF_NOTIFY_RESUME | ARCH_XFER_TO_GUEST_MODE_WORK)
+>>  
+>>  struct kvm_vcpu;
+>>  
+>> diff --git a/kernel/entry/kvm.c b/kernel/entry/kvm.c
+>> index 9d09f489b60e..98439dfaa1a0 100644
+>> --- a/kernel/entry/kvm.c
+>> +++ b/kernel/entry/kvm.c
+>> @@ -14,7 +14,12 @@ static int xfer_to_guest_mode_work(struct kvm_vcpu *vcpu, unsigned long ti_work)
+>>  				task_work_run();
+>>  		}
+>>  
+>> -		if (ti_work & _TIF_SIGPENDING) {
+>> +		/*
+>> +		 * When a livepatch is pending, force an exit to userspace
+>> +		 * as though a signal is pending to allow the task to be
+>> +		 * patched.
+>> +		 */
+>> +		if (ti_work & (_TIF_SIGPENDING | _TIF_PATCH_PENDING)) {
+>>  			kvm_handle_signal_exit(vcpu);
+>>  			return -EINTR;
+>>  		}
+>
+> This looks strange:
+>
+>   + klp_send_signals() calls set_notify_signal(task) that sets
+>     TIF_NOTIFY_SIGNAL
+>
+>   + xfer_to_guest_mode_work() handles TIF_NOTIFY_SIGNAL by calling
+>     task_work_run().
+>
+>   + This patch calls kvm_handle_signal_exit(vcpu) when
+>     _TIF_PATCH_PENDING is set. It probably causes the guest
+>     to call exit_to_user_mode_loop() because TIF_PATCH_PENDING
+>     bit is set. But neither TIF_NOTIFY_SIGNAL not TIF_NOTIFY_SIGNAL
+>     is set so that it works different way than on the real hardware.
+>
+>
+> Question:
+>
+> Does xfer_to_guest_mode_work() interrupts the syscall running
+> on the guest?
+
+It looks like xfer_to_guest_mode_work runs like exit_to_user_mode_loop,
+just before guest mode is invoked.
+
+> If "yes" then we do not need to call kvm_handle_signal_exit(vcpu).
+> It will be enough to call:
+>
+> 		if (ti_work & _TIF_PATCH_PENDING)
+> 			klp_update_patch_state(current);
+>
+> If "no" then I do not understand why TIF_NOTIFY_SIGNAL interrupts
+> the syscall on the real hardware and not in kvm.
+>
+> Anyway, we either should make sure that TIF_NOTIFY_SIGNAL has the same
+> effect on the real hardware and in kvm. Or we need another interface
+> for the fake signal used by livepatching.
+
+The point of TIF_NOTIFY_SIGNAL is to break out of interruptible kernel
+loops.  Once out of the interruptible kernel loop the expectation is the
+returns to user space and on it's way runs the exit_to_user_mode_loop or
+is architecture specific equivalent.
 
 
-On 5/3/2022 5:12 AM, Jason Gunthorpe wrote:
-> The last user of this function is in PCI callbacks that want to convert
-> their struct pci_dev to a vfio_device. Instead of searching use the
-> vfio_device available trivially through the drvdata.
-> 
-> When a callback in the device_driver is called, the caller must hold the
-> device_lock() on dev. The purpose of the device_lock is to prevent
-> remove() from being called (see __device_release_driver), and allow the
-> driver to safely interact with its drvdata without races.
-> 
-> The PCI core correctly follows this and holds the device_lock() when
-> calling error_detected (see report_error_detected) and
-> sriov_configure (see sriov_numvfs_store).
-> 
-> Further, since the drvdata holds a positive refcount on the vfio_device
-> any access of the drvdata, under the driver_lock, from a driver callback
-> needs no further protection or refcounting.
-> 
-> Thus the remark in the vfio_device_get_from_dev() comment does not apply
-> here, VFIO PCI drivers all call vfio_unregister_group_dev() from their
-> remove callbacks under the driver lock and cannot race with the remaining
-> callers.
-> 
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Adding Jens Axboe and Eric into Cc.
 
-Reviewed-by: Kirti Wankhede <kwankhede@nvidia.com>
 
+Yes.  This is interesting.
+
+Reading through the history of kernel/entry/kvm.c I believe
+I made ``conservative'' changes that has not helped this situation.
+
+Long story short at one point it was thought that _TIF_SIGPENDING
+and _TIF_NOTIFY_SIGNAL could be separated and they could not.
+Unfortunately the work to separate their handling has not been
+completely undone.
+
+In this case it appears that the only reason xfer_to_guest_mode_work
+touches task_work_run is because of the separation work done by Jens
+Axboe.  I don't see any kvm specific reason for _TIF_NOTIFY_SIGNAL
+and _TIF_SIGPENDING to be treated differently.  Meanwhile my cleanups
+elsewhere have made the unnecessary _TIF_NOTIFY_SIGNAL special case
+bigger in xfer_to_guest_mode_work.
+
+I suspect the first step in fixing things really should be just handling
+_TIF_SIGPENDING and _TIF_NOTIFY_SIGNAL the same.
+
+static int xfer_to_guest_mode_work(struct kvm_vcpu *vcpu, unsigned long ti_work)
+{
+	do {
+		int ret;
+
+		if (ti_work & (_TIF_SIGPENDING | _TIF_NOTIFY_SIGNAL)) {
+			kvm_handle_signal_exit(vcpu);
+			return -EINTR;
+		}
+
+		if (ti_work & _TIF_NEED_RESCHED)
+			schedule();
+
+		if (ti_work & _TIF_NOTIFY_RESUME)
+			resume_user_mode_work(NULL);
+
+		ret = arch_xfer_to_guest_mode_handle_work(vcpu, ti_work);
+		if (ret)
+			return ret;
+
+		ti_work = read_thread_flags();
+	} while (ti_work & XFER_TO_GUEST_MODE_WORK || need_resched());
+	return 0;
+}
+
+That said I do expect adding support for the live patching into
+xfer_to_guest_mode_work, like there is in exit_to_user_mode_loop, is
+probably a good idea.  That should prevent the live patching code from
+needing to set TIF_NOTIFY_SIGNAL.
+
+Something like:
+
+Thomas Gleixner's patch to make _TIF_PATCH_PENDING always available.
+
+#define XFER_TO_GUEST_MODE_WORK						\
+	(_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_PATCH_PENDING |	\
+	 _TIF_NOTIFY_SIGNAL | _TIF_NOTIFY_RESUME | ARCH_XFER_TO_GUEST_MODE_WORK)
+
+
+static int xfer_to_guest_mode_work(struct kvm_vcpu *vcpu, unsigned long ti_work)
+{
+	do {
+		int ret;
+
+		if (ti_work & _TIF_PATCH_PENDING)
+			klp_update_patch_state(current);
+
+		if (ti_work & (_TIF_SIGPENDING | _TIF_NOTIFY_SIGNAL)) {
+			kvm_handle_signal_exit(vcpu);
+			return -EINTR;
+		}
+
+		if (ti_work & _TIF_NEED_RESCHED)
+			schedule();
+
+		if (ti_work & _TIF_NOTIFY_RESUME)
+			resume_user_mode_work(NULL);
+
+		ret = arch_xfer_to_guest_mode_handle_work(vcpu, ti_work);
+		if (ret)
+			return ret;
+
+		ti_work = read_thread_flags();
+	} while (ti_work & XFER_TO_GUEST_MODE_WORK || need_resched());
+	return 0;
+}
+
+If the kvm and the live patching folks could check my thinking that
+would be great.
+
+Eric
