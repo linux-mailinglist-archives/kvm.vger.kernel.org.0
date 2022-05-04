@@ -2,93 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 93C47519FED
-	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 14:47:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EB9251A079
+	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 15:09:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349977AbiEDMux (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 May 2022 08:50:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36574 "EHLO
+        id S1350108AbiEDNLy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 May 2022 09:11:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349982AbiEDMum (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 May 2022 08:50:42 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9104344F8;
-        Wed,  4 May 2022 05:47:05 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 244CirRH024983;
-        Wed, 4 May 2022 12:47:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=jsdVbxSUk/uY3txIBmJTnP0WCQis3fg+M9bRC4gZmF4=;
- b=GGpxDxoDaHs9nQtR7rlePzpHuRPwr7DA+PvBTB0drl5bDGrKHDKFI4m5s8giKPHWbJUM
- ezRIYL7MKKkq3NooDLGDNcBNEA1hKfpD86klzJtFeGE6Jwe53bOpiLz7m8nQIuc9Ldld
- wxDY5X2yQOM7JYE/X2IuY4+VUwmoP7aHNp3f6Rd+svLN1UsFmqp3NYo4sFHg0Q43BvnK
- j48qYkcU6lIZHGFNFuewopkgJ6YoZtDy5Qx8mnGQpVcN2FOyhmskr2oTP0nO/8GvXw/0
- s+zXK3S4g29JKEa7WlC7aXs88YduVOZRHBkZpxLX7O8YfCdX9z42yyuusQkzlnO8pawG sA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fuss0g117-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 04 May 2022 12:47:05 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 244CjD5L030765;
-        Wed, 4 May 2022 12:47:04 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fuss0g10v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 04 May 2022 12:47:04 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 244Cg7F8001522;
-        Wed, 4 May 2022 12:47:02 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma02fra.de.ibm.com with ESMTP id 3frvr8vj3p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 04 May 2022 12:47:02 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 244Cku6k32702746
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 4 May 2022 12:46:56 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 29C5BA4064;
-        Wed,  4 May 2022 12:46:59 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DBDD6A405C;
-        Wed,  4 May 2022 12:46:58 +0000 (GMT)
-Received: from [9.152.224.247] (unknown [9.152.224.247])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  4 May 2022 12:46:58 +0000 (GMT)
-Message-ID: <7fde36ed-42ec-c8df-dbfd-0b04605f0a69@linux.ibm.com>
-Date:   Wed, 4 May 2022 14:46:58 +0200
+        with ESMTP id S1350407AbiEDNLq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 May 2022 09:11:46 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EE10403D6;
+        Wed,  4 May 2022 06:07:55 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 3D4C81F38D;
+        Wed,  4 May 2022 13:07:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1651669674; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=bHBzjUbutvfWVjzQ6Q8d5vmhuWoPHH5ZuOIWJMc8g9E=;
+        b=VPQ1b+wAHZNaVD7IjQQM+Gsadlf1zX6y7DMNcdE38056VBFV5jZO0D52OfjhxhZBSmIiot
+        Zc/EczGYQMkAua+Q5HVnLjPFJa8OL7XuVnRxrRHd5SwLwROFVEUCPfFNE+KpCTI40O9pcw
+        dWCogcG6NNaar62vrPOougYo+eWQE/g=
+Received: from suse.cz (pathway.suse.cz [10.100.12.24])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 15FD82C142;
+        Wed,  4 May 2022 13:07:54 +0000 (UTC)
+Date:   Wed, 4 May 2022 15:07:53 +0200
+From:   Petr Mladek <pmladek@suse.com>
+To:     Seth Forshee <sforshee@digitalocean.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org, live-patching@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v2] entry/kvm: Make vCPU tasks exit to userspace when a
+ livepatch is pending
+Message-ID: <20220504130753.GB8069@pathway.suse.cz>
+References: <20220503174934.2641605-1-sforshee@digitalocean.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [kvm-unit-tests PATCH v7 2/3] s390x: Test effect of storage keys
- on some instructions
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20220502154101.3663941-1-scgl@linux.ibm.com>
- <20220502154101.3663941-3-scgl@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220502154101.3663941-3-scgl@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: wkuLiYFNEwgwxUaLJSh1AvglkjpOxnLA
-X-Proofpoint-ORIG-GUID: i3G7xEvppCuny3dpYWGdFuT7KvJ_jyAy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-04_03,2022-05-04_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- mlxlogscore=999 lowpriorityscore=0 bulkscore=0 adultscore=0 phishscore=0
- priorityscore=1501 malwarescore=0 mlxscore=0 impostorscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205040082
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220503174934.2641605-1-sforshee@digitalocean.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
         SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -97,327 +64,140 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/2/22 17:41, Janis Schoetterl-Glausch wrote:
-> Some instructions are emulated by KVM. Test that KVM correctly emulates
-> storage key checking for two of those instructions (STORE CPU ADDRESS,
-> SET PREFIX).
-> Test success and error conditions, including coverage of storage and
-> fetch protection override.
-> Also add test for TEST PROTECTION, even if that instruction will not be
-> emulated by KVM under normal conditions.
+On Tue 2022-05-03 12:49:34, Seth Forshee wrote:
+> A task can be livepatched only when it is sleeping or it exits to
+> userspace. This may happen infrequently for a heavily loaded vCPU task,
+> leading to livepatch transition failures.
+
+This is misleading.
+
+First, the problem is not a loaded CPU. The problem is that the
+task might spend very long time in the kernel when handling
+some syscall.
+
+Second, there is no timeout for the transition in the kernel code.
+It might take very long time but it will not fail.
+
+> Fake signals will be sent to tasks which fail patching via stack
+> checking. This will cause running vCPU tasks to exit guest mode, but
+> since no signal is pending they return to guest execution without
+> exiting to userspace. Fix this by treating a pending livepatch migration
+> like a pending signal, exiting to userspace with EINTR. This allows the
+> task to be patched, and userspace should re-excecute KVM_RUN to resume
+> guest execution.
+
+It seems that the patch works as expected but it is far from clear.
+And the above description helps only partially. Let me try to
+explain it for dummies like me ;-)
+
+<explanation>
+The problem was solved by sending a fake signal, see the commit
+0b3d52790e1cfd6b80b826 ("livepatch: Remove signal sysfs attribute").
+It was achieved by calling signal_wake_up(). It set TIF_SIGPENDING
+and woke the task. It interrupted the syscall and the task was
+transitioned when leaving to the userspace.
+
+signal_wake_up() was later replaced by set_notify_signal(),
+see the commit 8df1947c71ee53c7e21 ("livepatch: Replace
+the fake signal sending with TIF_NOTIFY_SIGNAL infrastructure").
+The difference is that set_notify_signal() uses TIF_NOTIFY_SIGNAL
+instead of TIF_SIGPENDING.
+
+The effect is the same when running on a real hardware. The syscall
+gets interrupted and exit_to_user_mode_loop() is called where
+the livepatch state is updated (task migrated).
+
+But it works a different way in kvm where the task works are
+called in the guest mode and the task does not return into
+the user space in the host mode.
+</explanation>
+
+The solution provided by this patch is a bit weird, see below.
+
+
+> In my testing, systems where livepatching would timeout after 60 seconds
+> were able to load livepatches within a couple of seconds with this
+> change.
 > 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
-
+> Signed-off-by: Seth Forshee <sforshee@digitalocean.com>
 > ---
->   lib/s390x/asm/arch_def.h |  20 ++--
->   s390x/skey.c             | 249 +++++++++++++++++++++++++++++++++++++++
->   2 files changed, 260 insertions(+), 9 deletions(-)
+> Changes in v2:
+>  - Added _TIF_SIGPENDING to XFER_TO_GUEST_MODE_WORK
+>  - Reworded commit message and comments to avoid confusion around the
+>    term "migrate"
 > 
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index 46c370e6..72553819 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -55,15 +55,17 @@ struct psw {
->   #define PSW_MASK_BA			0x0000000080000000UL
->   #define PSW_MASK_64			(PSW_MASK_BA | PSW_MASK_EA)
->   
-> -#define CTL0_LOW_ADDR_PROT		(63 - 35)
-> -#define CTL0_EDAT			(63 - 40)
-> -#define CTL0_IEP			(63 - 43)
-> -#define CTL0_AFP			(63 - 45)
-> -#define CTL0_VECTOR			(63 - 46)
-> -#define CTL0_EMERGENCY_SIGNAL		(63 - 49)
-> -#define CTL0_EXTERNAL_CALL		(63 - 50)
-> -#define CTL0_CLOCK_COMPARATOR		(63 - 52)
-> -#define CTL0_SERVICE_SIGNAL		(63 - 54)
-> +#define CTL0_LOW_ADDR_PROT			(63 - 35)
-> +#define CTL0_EDAT				(63 - 40)
-> +#define CTL0_FETCH_PROTECTION_OVERRIDE		(63 - 38)
-> +#define CTL0_STORAGE_PROTECTION_OVERRIDE	(63 - 39)
-> +#define CTL0_IEP				(63 - 43)
-> +#define CTL0_AFP				(63 - 45)
-> +#define CTL0_VECTOR				(63 - 46)
-> +#define CTL0_EMERGENCY_SIGNAL			(63 - 49)
-> +#define CTL0_EXTERNAL_CALL			(63 - 50)
-> +#define CTL0_CLOCK_COMPARATOR			(63 - 52)
-> +#define CTL0_SERVICE_SIGNAL			(63 - 54)
->   #define CR0_EXTM_MASK			0x0000000000006200UL /* Combined external masks */
->   
->   #define CTL2_GUARDED_STORAGE		(63 - 59)
-> diff --git a/s390x/skey.c b/s390x/skey.c
-> index edad53e9..32bf1070 100644
-> --- a/s390x/skey.c
-> +++ b/s390x/skey.c
-> @@ -10,6 +10,7 @@
->   #include <libcflat.h>
->   #include <asm/asm-offsets.h>
->   #include <asm/interrupt.h>
-> +#include <vmalloc.h>
->   #include <asm/page.h>
->   #include <asm/facility.h>
->   #include <asm/mem.h>
-> @@ -118,6 +119,249 @@ static void test_invalid_address(void)
->   	report_prefix_pop();
->   }
->   
-> +static void test_test_protection(void)
-> +{
-> +	unsigned long addr = (unsigned long)pagebuf;
-> +
-> +	report_prefix_push("TPROT");
-> +
-> +	set_storage_key(pagebuf, 0x10, 0);
-> +	report(tprot(addr, 0) == TPROT_READ_WRITE, "zero key: no protection");
-> +	report(tprot(addr, 1) == TPROT_READ_WRITE, "matching key: no protection");
-> +
-> +	report_prefix_push("mismatching key");
-> +
-> +	report(tprot(addr, 2) == TPROT_READ, "no fetch protection: store protection");
-> +
-> +	set_storage_key(pagebuf, 0x18, 0);
-> +	report(tprot(addr, 2) == TPROT_RW_PROTECTED,
-> +	       "fetch protection: fetch & store protection");
-> +
-> +	report_prefix_push("fetch-protection override");
-> +	set_storage_key(0, 0x18, 0);
-> +	report(tprot(0, 2) == TPROT_RW_PROTECTED, "disabled: fetch & store protection");
-> +	ctl_set_bit(0, CTL0_FETCH_PROTECTION_OVERRIDE);
-> +	report(tprot(0, 2) == TPROT_READ, "enabled: store protection");
-> +	report(tprot(2048, 2) == TPROT_RW_PROTECTED, "invalid: fetch & store protection");
-> +	ctl_clear_bit(0, CTL0_FETCH_PROTECTION_OVERRIDE);
-> +	set_storage_key(0, 0x00, 0);
-> +	report_prefix_pop();
-> +
-> +	ctl_set_bit(0, CTL0_STORAGE_PROTECTION_OVERRIDE);
-> +	set_storage_key(pagebuf, 0x90, 0);
-> +	report(tprot(addr, 2) == TPROT_READ_WRITE,
-> +	       "storage-protection override: no protection");
-> +	ctl_clear_bit(0, CTL0_STORAGE_PROTECTION_OVERRIDE);
-> +
-> +	report_prefix_pop();
-> +	set_storage_key(pagebuf, 0x00, 0);
-> +	report_prefix_pop();
-> +}
-> +
-> +/*
-> + * Perform STORE CPU ADDRESS (STAP) instruction while temporarily executing
-> + * with access key 1.
-> + */
-> +static void store_cpu_address_key_1(uint16_t *out)
-> +{
-> +	asm volatile (
-> +		"spka	0x10\n\t"
-> +		"stap	%0\n\t"
-> +		"spka	0\n"
-> +	     : "+Q" (*out) /* exception: old value remains in out -> + constraint */
-> +	);
-> +}
-> +
-> +static void test_store_cpu_address(void)
-> +{
-> +	uint16_t *out = (uint16_t *)pagebuf;
-> +	uint16_t cpu_addr;
-> +
-> +	report_prefix_push("STORE CPU ADDRESS");
-> +	asm ("stap %0" : "=Q" (cpu_addr));
-> +
-> +	report_prefix_push("zero key");
-> +	set_storage_key(pagebuf, 0x20, 0);
-> +	WRITE_ONCE(*out, 0xbeef);
-> +	asm ("stap %0" : "=Q" (*out));
-> +	report(*out == cpu_addr, "store occurred");
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("matching key");
-> +	set_storage_key(pagebuf, 0x10, 0);
-> +	*out = 0xbeef;
-> +	store_cpu_address_key_1(out);
-> +	report(*out == cpu_addr, "store occurred");
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("mismatching key");
-> +	set_storage_key(pagebuf, 0x20, 0);
-> +	expect_pgm_int();
-> +	*out = 0xbeef;
-> +	store_cpu_address_key_1(out);
-> +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-> +	report(*out == 0xbeef, "no store occurred");
-> +	report_prefix_pop();
-> +
-> +	ctl_set_bit(0, CTL0_STORAGE_PROTECTION_OVERRIDE);
-> +
-> +	report_prefix_push("storage-protection override, invalid key");
-> +	set_storage_key(pagebuf, 0x20, 0);
-> +	expect_pgm_int();
-> +	*out = 0xbeef;
-> +	store_cpu_address_key_1(out);
-> +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-> +	report(*out == 0xbeef, "no store occurred");
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("storage-protection override, override key");
-> +	set_storage_key(pagebuf, 0x90, 0);
-> +	*out = 0xbeef;
-> +	store_cpu_address_key_1(out);
-> +	report(*out == cpu_addr, "override occurred");
-> +	report_prefix_pop();
-> +
-> +	ctl_clear_bit(0, CTL0_STORAGE_PROTECTION_OVERRIDE);
-> +
-> +	report_prefix_push("storage-protection override disabled, override key");
-> +	set_storage_key(pagebuf, 0x90, 0);
-> +	expect_pgm_int();
-> +	*out = 0xbeef;
-> +	store_cpu_address_key_1(out);
-> +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-> +	report(*out == 0xbeef, "no store occurred");
-> +	report_prefix_pop();
-> +
-> +	set_storage_key(pagebuf, 0x00, 0);
-> +	report_prefix_pop();
-> +}
-> +
-> +/*
-> + * Perform SET PREFIX (SPX) instruction while temporarily executing
-> + * with access key 1.
-> + */
-> +static void set_prefix_key_1(uint32_t *prefix_ptr)
-> +{
-> +	asm volatile (
-> +		"spka	0x10\n\t"
-> +		"spx	%0\n\t"
-> +		"spka	0\n"
-> +	     :: "Q" (*prefix_ptr)
-> +	);
-> +}
-> +
-> +/*
-> + * We remapped page 0, making the lowcore inaccessible, which breaks the normal
-> + * handler and breaks skipping the faulting instruction.
-> + * Just disable dynamic address translation to make things work.
-> + */
-> +static void dat_fixup_pgm_int(void)
-> +{
-> +	uint64_t psw_mask = extract_psw_mask();
-> +
-> +	psw_mask &= ~PSW_MASK_DAT;
-> +	load_psw_mask(psw_mask);
-> +}
-> +
-> +#define PREFIX_AREA_SIZE (PAGE_SIZE * 2)
-> +static char lowcore_tmp[PREFIX_AREA_SIZE] __attribute__((aligned(PREFIX_AREA_SIZE)));
-> +
-> +/*
-> + * Test accessibility of the operand to SET PREFIX given different configurations
-> + * with regards to storage keys. That is, check the accessibility of the location
-> + * holding the new prefix, not that of the new prefix area. The new prefix area
-> + * is a valid lowcore, so that the test does not crash on failure.
-> + */
-> +static void test_set_prefix(void)
-> +{
-> +	uint32_t *prefix_ptr = (uint32_t *)pagebuf;
-> +	uint32_t *no_override_prefix_ptr;
-> +	uint32_t old_prefix;
-> +	pgd_t *root;
-> +
-> +	report_prefix_push("SET PREFIX");
-> +	root = (pgd_t *)(stctg(1) & PAGE_MASK);
-> +	old_prefix = get_prefix();
-> +	memcpy(lowcore_tmp, 0, sizeof(lowcore_tmp));
-> +	assert(((uint64_t)&lowcore_tmp >> 31) == 0);
-> +	*prefix_ptr = (uint32_t)(uint64_t)&lowcore_tmp;
-> +
-> +	report_prefix_push("zero key");
-> +	set_prefix(old_prefix);
-> +	set_storage_key(prefix_ptr, 0x20, 0);
-> +	set_prefix(*prefix_ptr);
-> +	report(get_prefix() == *prefix_ptr, "set prefix");
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("matching key");
-> +	set_prefix(old_prefix);
-> +	set_storage_key(pagebuf, 0x10, 0);
-> +	set_prefix_key_1(prefix_ptr);
-> +	report(get_prefix() == *prefix_ptr, "set prefix");
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("mismatching key");
-> +
-> +	report_prefix_push("no fetch protection");
-> +	set_prefix(old_prefix);
-> +	set_storage_key(pagebuf, 0x20, 0);
-> +	set_prefix_key_1(prefix_ptr);
-> +	report(get_prefix() == *prefix_ptr, "set prefix");
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("fetch protection");
-> +	set_prefix(old_prefix);
-> +	set_storage_key(pagebuf, 0x28, 0);
-> +	expect_pgm_int();
-> +	set_prefix_key_1(prefix_ptr);
-> +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-> +	report(get_prefix() == old_prefix, "did not set prefix");
-> +	report_prefix_pop();
-> +
-> +	register_pgm_cleanup_func(dat_fixup_pgm_int);
-> +
-> +	report_prefix_push("remapped page, fetch protection");
-> +	set_prefix(old_prefix);
-> +	set_storage_key(pagebuf, 0x28, 0);
-> +	expect_pgm_int();
-> +	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
-> +	set_prefix_key_1((uint32_t *)0);
-> +	install_page(root, 0, 0);
-> +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-> +	report(get_prefix() == old_prefix, "did not set prefix");
-> +	report_prefix_pop();
-> +
-> +	ctl_set_bit(0, CTL0_FETCH_PROTECTION_OVERRIDE);
-> +
-> +	report_prefix_push("fetch protection override applies");
-> +	set_prefix(old_prefix);
-> +	set_storage_key(pagebuf, 0x28, 0);
-> +	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
-> +	set_prefix_key_1((uint32_t *)0);
-> +	install_page(root, 0, 0);
-> +	report(get_prefix() == *prefix_ptr, "set prefix");
-> +	report_prefix_pop();
-> +
-> +	no_override_prefix_ptr = (uint32_t *)(pagebuf + 2048);
-> +	WRITE_ONCE(*no_override_prefix_ptr, (uint32_t)(uint64_t)&lowcore_tmp);
-> +	report_prefix_push("fetch protection override does not apply");
-> +	set_prefix(old_prefix);
-> +	set_storage_key(pagebuf, 0x28, 0);
-> +	expect_pgm_int();
-> +	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
-> +	set_prefix_key_1((uint32_t *)2048);
-> +	install_page(root, 0, 0);
-> +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-> +	report(get_prefix() == old_prefix, "did not set prefix");
-> +	report_prefix_pop();
-> +
-> +	ctl_clear_bit(0, CTL0_FETCH_PROTECTION_OVERRIDE);
-> +	register_pgm_cleanup_func(NULL);
-> +	report_prefix_pop();
-> +	set_storage_key(pagebuf, 0x00, 0);
-> +	report_prefix_pop();
-> +}
-> +
->   int main(void)
->   {
->   	report_prefix_push("skey");
-> @@ -130,6 +374,11 @@ int main(void)
->   	test_set();
->   	test_set_mb();
->   	test_chg();
-> +	test_test_protection();
-> +	test_store_cpu_address();
-> +
-> +	setup_vm();
-> +	test_set_prefix();
->   done:
->   	report_prefix_pop();
->   	return report_summary();
+>  include/linux/entry-kvm.h | 4 ++--
+>  kernel/entry/kvm.c        | 7 ++++++-
+>  2 files changed, 8 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/linux/entry-kvm.h b/include/linux/entry-kvm.h
+> index 6813171afccb..bf79e4cbb5a2 100644
+> --- a/include/linux/entry-kvm.h
+> +++ b/include/linux/entry-kvm.h
+> @@ -17,8 +17,8 @@
+>  #endif
+>  
+>  #define XFER_TO_GUEST_MODE_WORK						\
+> -	(_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_NOTIFY_SIGNAL |	\
+> -	 _TIF_NOTIFY_RESUME | ARCH_XFER_TO_GUEST_MODE_WORK)
+> +	(_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_PATCH_PENDING |	\
+> +	 _TIF_NOTIFY_SIGNAL | _TIF_NOTIFY_RESUME | ARCH_XFER_TO_GUEST_MODE_WORK)
+>  
+>  struct kvm_vcpu;
+>  
+> diff --git a/kernel/entry/kvm.c b/kernel/entry/kvm.c
+> index 9d09f489b60e..98439dfaa1a0 100644
+> --- a/kernel/entry/kvm.c
+> +++ b/kernel/entry/kvm.c
+> @@ -14,7 +14,12 @@ static int xfer_to_guest_mode_work(struct kvm_vcpu *vcpu, unsigned long ti_work)
+>  				task_work_run();
+>  		}
+>  
+> -		if (ti_work & _TIF_SIGPENDING) {
+> +		/*
+> +		 * When a livepatch is pending, force an exit to userspace
+> +		 * as though a signal is pending to allow the task to be
+> +		 * patched.
+> +		 */
+> +		if (ti_work & (_TIF_SIGPENDING | _TIF_PATCH_PENDING)) {
+>  			kvm_handle_signal_exit(vcpu);
+>  			return -EINTR;
+>  		}
 
+This looks strange:
+
+  + klp_send_signals() calls set_notify_signal(task) that sets
+    TIF_NOTIFY_SIGNAL
+
+  + xfer_to_guest_mode_work() handles TIF_NOTIFY_SIGNAL by calling
+    task_work_run().
+
+  + This patch calls kvm_handle_signal_exit(vcpu) when
+    _TIF_PATCH_PENDING is set. It probably causes the guest
+    to call exit_to_user_mode_loop() because TIF_PATCH_PENDING
+    bit is set. But neither TIF_NOTIFY_SIGNAL not TIF_NOTIFY_SIGNAL
+    is set so that it works different way than on the real hardware.
+
+
+Question:
+
+Does xfer_to_guest_mode_work() interrupts the syscall running
+on the guest?
+
+If "yes" then we do not need to call kvm_handle_signal_exit(vcpu).
+It will be enough to call:
+
+		if (ti_work & _TIF_PATCH_PENDING)
+			klp_update_patch_state(current);
+
+If "no" then I do not understand why TIF_NOTIFY_SIGNAL interrupts
+the syscall on the real hardware and not in kvm.
+
+Anyway, we either should make sure that TIF_NOTIFY_SIGNAL has the same
+effect on the real hardware and in kvm. Or we need another interface
+for the fake signal used by livepatching.
+
+Adding Jens Axboe and Eric into Cc.
+
+Best Regards,
+Petr
