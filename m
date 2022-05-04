@@ -2,67 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 705B65195F7
-	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 05:26:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B641519605
+	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 05:33:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236784AbiEDD32 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 23:29:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34750 "EHLO
+        id S1344324AbiEDDgi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 23:36:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344461AbiEDD3D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 23:29:03 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1A2E65DD
-        for <kvm@vger.kernel.org>; Tue,  3 May 2022 20:25:22 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id q13-20020a638c4d000000b003821725ad66so79424pgn.23
-        for <kvm@vger.kernel.org>; Tue, 03 May 2022 20:25:22 -0700 (PDT)
+        with ESMTP id S1343717AbiEDDgg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 23:36:36 -0400
+Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B7D81C10B
+        for <kvm@vger.kernel.org>; Tue,  3 May 2022 20:33:01 -0700 (PDT)
+Received: by mail-io1-xd35.google.com with SMTP id r27so329486iot.1
+        for <kvm@vger.kernel.org>; Tue, 03 May 2022 20:33:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=O6gsi1VosCJ9Q+QJJSE7NIUXWalRHVe1tFy/2jVg0nU=;
-        b=J2nRE+pM0k4FjNp2cMlnN8/gWRkViT6d6HglwgNSrVeXwgSSlC2eD0N42z2TxFenrK
-         1++90Z1DhXB+oCBWCaQUko3MtAX2Vwd7k7Tg1W8U1wFg4ebNTsyShXIVfZkQlXp61hpV
-         P8TkYscwX69KGqwKqPYsXZHORIsX6xH+TgDrD+LwGi6A533g0QAbvuLY4DBvjChRlkuh
-         uAKUg7eTOY8BCZ0zNkVkrc+zK8FyrgaDWWHxRBy50l5jAmd2A4PbUM4xe1EOHPswFwyu
-         luobZxTR3exLfL81rO4/ZURyhjwdWEhoN7RcpAgHC25Ze+urfrMTfV3ojBPHk7Pyw04k
-         jjPQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=MD7nPH76Zo4gzIjG6XroEYb+307Sv2T97DW30QPZNvQ=;
+        b=GCl3tUY0CxUSs2045e7bW3K3OMlsoVKLkDorqwMDkmosI+DarqkAsVZ4JutaruMtaq
+         VqOHlcJ06uzrO/wmARYsqy4RSsfaqwdhzD3Op9C9DJ5u3WeNoYMrxGWQJqnxWPKqFL+m
+         QRzSecp35sYjpDFlnSHnjh/mzL55frzR8ayJsgdjMS8lI8QEEt6j4UwSDAa+YE+WH32M
+         rV3TlIsrbFgDRyNTLm2bHTDSK86J1SDHWbQss+MyAldJlcz7OomuzVdYQ23f3ar+122V
+         j7OlhJvOkCtMEdVkoOKHFBAlv4QIa6gkZRCnrkWY8IjFhbXMImgVlCcrzHCLhXwUXHth
+         NoIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=O6gsi1VosCJ9Q+QJJSE7NIUXWalRHVe1tFy/2jVg0nU=;
-        b=W1tHmg/P818speNPfH1FjQw6BxywvguK9aq/GynS/v3yoLg+SDEZVj2YQ5+N1ZYoTX
-         S3YDiu4SMpu94BNSl2VVKBaRkLNn8TYqkvzfbIzv9V2GobHrx05Dpa+wGHYNlMv62EME
-         il0JlHU1dOn8ThGWrRSrLyL3qxLX5FCPBfSxt976YIpoLu4bdbB45cmjdmb3rVZJmMD0
-         H2VgeVkUzt8G9+tu39+XBGiVbeQx3hoWqcVq1KelmIjbjtns0foN7/1mZoQF8xZhb3pz
-         Utp0wlrOEpAU/vQV+LzyFG40wccQQk9VKJmqVtEcZkskNrZXG6Xbc6XMCDFSqgbOtuJ2
-         xjNA==
-X-Gm-Message-State: AOAM531p9qpUiyfaoYtOfa8AGMMN3qIs0R3DITUPQxHSG/NXn33W4bre
-        UsDqxBt9yPzvw+1mWB9R9f/ZQQTimWg=
-X-Google-Smtp-Source: ABdhPJzFv7NkWcBU+6vplhxBAUpwjxPW1/ACANI7rwBZF4ra9bVHx4OSHqKJtvMgIzFZVeY3+CTj/EOn3DA=
-X-Received: from oupton3.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:21eb])
- (user=oupton job=sendgmr) by 2002:a17:902:9309:b0:156:983d:2193 with SMTP id
- bc9-20020a170902930900b00156983d2193mr19155791plb.158.1651634713185; Tue, 03
- May 2022 20:25:13 -0700 (PDT)
-Date:   Wed,  4 May 2022 03:24:46 +0000
-In-Reply-To: <20220504032446.4133305-1-oupton@google.com>
-Message-Id: <20220504032446.4133305-13-oupton@google.com>
-Mime-Version: 1.0
-References: <20220504032446.4133305-1-oupton@google.com>
-X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH v6 12/12] selftests: KVM: Test SYSTEM_SUSPEND PSCI call
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=MD7nPH76Zo4gzIjG6XroEYb+307Sv2T97DW30QPZNvQ=;
+        b=JtiHpUd91siXtWVG5ETTkqgTXAr10QzSX3dkrlfoYPjT1GaGy7hPku6EJuVbT3rLUy
+         KxIDVlto81Tyob6vhq6cusIrkoJxcIV1TAcJUVDevMysK+RMUEJZcEA0Jh/y8rHbSzvT
+         oA35A9hg0h3An43wSX93KSrjxBkz/G854tnjUMVj9yUc8JxW6uHln8XAm4zLXodHUkAk
+         ZhWMJNfY7GP6xPxvnd2bUMtnXDK4U4bSrPjxiP9Sw+OuXbgzvGrs7OBwV9gK3KsODePN
+         GrAA5ysS+0lmt86rNHAoq8sZPUfh/xnvWbeAlc/OMTRRmX4MfGKyBSReV9wj2AbRH40N
+         wZtw==
+X-Gm-Message-State: AOAM532bV9dzpLxXCzqhqsiRRtUu0bd+7QUv5T6oHfwPZO4sJmWrcLpo
+        E1cX0FYu9BMnEergP7FuRG9Q+cZGpAv1sg==
+X-Google-Smtp-Source: ABdhPJy7vKJ/E6XbgDQRiEIsUnMlj/99SQ3gJhSHQZ0B1pirVzABIhS85iAuFB/rJZ2xJyY7/WLvCg==
+X-Received: by 2002:a6b:2b0b:0:b0:65a:4c08:7063 with SMTP id r11-20020a6b2b0b000000b0065a4c087063mr6885026ior.92.1651635180562;
+        Tue, 03 May 2022 20:33:00 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id v18-20020a056e0213d200b002cbed258dcfsm3913760ilj.0.2022.05.03.20.32.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 May 2022 20:32:59 -0700 (PDT)
+Date:   Wed, 4 May 2022 03:32:56 +0000
 From:   Oliver Upton <oupton@google.com>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, maz@kernel.org, james.morse@arm.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        reijiw@google.com, ricarkol@google.com,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, kernel@android.com,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: vgic-v3: Consistently populate
+ ID_AA64PFR0_EL1.GIC
+Message-ID: <YnHz6Cw5ONR2e+KA@google.com>
+References: <20220503211424.3375263-1-maz@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220503211424.3375263-1-maz@kernel.org>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,105 +72,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Assert that the vCPU exits to userspace with KVM_SYSTEM_EVENT_SUSPEND if
-the guest calls PSCI SYSTEM_SUSPEND. Additionally, guarantee that the
-SMC32 and SMC64 flavors of this call are discoverable with the
-PSCI_FEATURES call.
+On Tue, May 03, 2022 at 10:14:24PM +0100, Marc Zyngier wrote:
+> When adding support for the slightly wonky Apple M1, we had to
+> populate ID_AA64PFR0_EL1.GIC==1 to present something to the guest,
+> as the HW itself doesn't advertise the feature.
+> 
+> However, we gated this on the in-kernel irqchip being created.
+> This causes some trouble for QEMU, which snapshots the state of
+> the registers before creating a virtual GIC, and then tries to
+> restore these registers once the GIC has been created.  Obviously,
+> between the two stages, ID_AA64PFR0_EL1.GIC has changed value,
+> and the write fails.
+> 
+> The fix is to actually emulate the HW, and always populate the
+> field if the HW is capable of it.
+> 
+> Fixes: 562e530fd770 ("KVM: arm64: Force ID_AA64PFR0_EL1.GIC=1 when exposing a virtual GICv3")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
 
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- .../testing/selftests/kvm/aarch64/psci_test.c | 69 +++++++++++++++++++
- 1 file changed, 69 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/aarch64/psci_test.c b/tools/testing/selftests/kvm/aarch64/psci_test.c
-index 535130d5e97f..88541de21c41 100644
---- a/tools/testing/selftests/kvm/aarch64/psci_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/psci_test.c
-@@ -45,6 +45,25 @@ static uint64_t psci_affinity_info(uint64_t target_affinity,
- 	return res.a0;
- }
- 
-+static uint64_t psci_system_suspend(uint64_t entry_addr, uint64_t context_id)
-+{
-+	struct arm_smccc_res res;
-+
-+	smccc_hvc(PSCI_1_0_FN64_SYSTEM_SUSPEND, entry_addr, context_id,
-+		  0, 0, 0, 0, 0, &res);
-+
-+	return res.a0;
-+}
-+
-+static uint64_t psci_features(uint32_t func_id)
-+{
-+	struct arm_smccc_res res;
-+
-+	smccc_hvc(PSCI_1_0_FN_PSCI_FEATURES, func_id, 0, 0, 0, 0, 0, 0, &res);
-+
-+	return res.a0;
-+}
-+
- static void vcpu_power_off(struct kvm_vm *vm, uint32_t vcpuid)
- {
- 	struct kvm_mp_state mp_state = {
-@@ -137,8 +156,58 @@ static void host_test_cpu_on(void)
- 	kvm_vm_free(vm);
- }
- 
-+static void enable_system_suspend(struct kvm_vm *vm)
-+{
-+	struct kvm_enable_cap cap = {
-+		.cap = KVM_CAP_ARM_SYSTEM_SUSPEND,
-+	};
-+
-+	vm_enable_cap(vm, &cap);
-+}
-+
-+static void guest_test_system_suspend(void)
-+{
-+	uint64_t ret;
-+
-+	/* assert that SYSTEM_SUSPEND is discoverable */
-+	GUEST_ASSERT(!psci_features(PSCI_1_0_FN_SYSTEM_SUSPEND));
-+	GUEST_ASSERT(!psci_features(PSCI_1_0_FN64_SYSTEM_SUSPEND));
-+
-+	ret = psci_system_suspend(CPU_ON_ENTRY_ADDR, CPU_ON_CONTEXT_ID);
-+	GUEST_SYNC(ret);
-+}
-+
-+static void host_test_system_suspend(void)
-+{
-+	struct kvm_run *run;
-+	struct kvm_vm *vm;
-+
-+	vm = setup_vm(guest_test_system_suspend);
-+	enable_system_suspend(vm);
-+
-+	vcpu_power_off(vm, VCPU_ID_TARGET);
-+	run = vcpu_state(vm, VCPU_ID_SOURCE);
-+
-+	enter_guest(vm, VCPU_ID_SOURCE);
-+
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_SYSTEM_EVENT,
-+		    "Unhandled exit reason: %u (%s)",
-+		    run->exit_reason, exit_reason_str(run->exit_reason));
-+	TEST_ASSERT(run->system_event.type == KVM_SYSTEM_EVENT_SUSPEND,
-+		    "Unhandled system event: %u (expected: %u)",
-+		    run->system_event.type, KVM_SYSTEM_EVENT_SUSPEND);
-+
-+	kvm_vm_free(vm);
-+}
-+
- int main(void)
- {
-+	if (!kvm_check_cap(KVM_CAP_ARM_SYSTEM_SUSPEND)) {
-+		print_skip("KVM_CAP_ARM_SYSTEM_SUSPEND not supported");
-+		exit(KSFT_SKIP);
-+	}
-+
- 	host_test_cpu_on();
-+	host_test_system_suspend();
- 	return 0;
- }
--- 
-2.36.0.464.gb9c8b46e94-goog
-
+Reviewed-by: Oliver Upton <oupton@google.com>
