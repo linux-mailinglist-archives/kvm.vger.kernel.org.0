@@ -2,76 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 86D31519305
-	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 02:50:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DDC7519329
+	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 03:11:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244797AbiEDAyU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 20:54:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60120 "EHLO
+        id S244953AbiEDBOZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 May 2022 21:14:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232252AbiEDAyS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 20:54:18 -0400
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13EEC403E5
-        for <kvm@vger.kernel.org>; Tue,  3 May 2022 17:50:44 -0700 (PDT)
-Received: by mail-ej1-x633.google.com with SMTP id n10so129943ejk.5
-        for <kvm@vger.kernel.org>; Tue, 03 May 2022 17:50:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kylehuey.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cP9uWnOWqzXPA2lSzLL1mbAFP/+AM6E6742CRb8OAEg=;
-        b=Yjw/EnmWU+rVL+X/0xSJrIE/iLh0U6od8A1TLwfTPacJSqDXwPZV94B4OounqLhXTt
-         XEbie7CO8XsBLCGnT2GSkQSDhMY33fcdoRzml/OfqeCHeu3S7+V0lk1hsLS+q2Nbl0kW
-         tdrUbCUFVyLpTgrhfnNqZgd9O1HVEbe+61uNUkEqa2Q2OzlagZasK+g2d0oKPBCx2Xza
-         Q+szFBap2PoKIYJsspidTqqNg9KTzo7s2d5rgheyL6nybU7lGaDXZXyQhkumBnP2Y6Ww
-         gpZ5gLnurnrHBsM4HsCx174BIGZdwfhwPg+xA0zWW10Vt0iE+Xo1HB5u4kbu8vp7l2a+
-         uRJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cP9uWnOWqzXPA2lSzLL1mbAFP/+AM6E6742CRb8OAEg=;
-        b=5TOA3w7aV6MRSMvhHwqPTL/TFG1dX9g8nmZjT/UUceKLxGE0qMKXTrOVaGaeH8kJgc
-         yZTKtyNm0zQB78RevmrpGvANCoQDtFHBOc+VGV80K9isL4o9NO3AXnHDWDfG6am7gqUE
-         uZhtoAVllSSIriN7FqhG2aj5omfenGFBdgpWW3ZZMNIY9k7kqwMSQZoBcgC8tueq0UMh
-         7VeSFfLOkYa2Fli89NR1h7FNVQhm8x4XSzAm1HLDbayoMv7EfqYLnFoV8MZvfktpgDbW
-         WtVoLv+uvCEWApObHX8lhTAjrGyJhl+w1QNylbWYj0RjsLsTzRFogiqrDSJ7dyZTJF0o
-         wh7w==
-X-Gm-Message-State: AOAM531B8hDD+JWyELMVCesHyAEKYEV2w7DLMM9GIOUrd5VsYs+yITYI
-        HeuK+kqP+1HQ6j9FZrZGF8B7up9phT2T9oijPtfL1iQIGAE=
-X-Google-Smtp-Source: ABdhPJzxBsJ/lYcetbRrFJrg1HY5oPGvYeGqgVLu+BDtIgj1hsWIaG4NifJBOTiuYK2RioMqP80W8mL6G+tB3UzytlU=
-X-Received: by 2002:a17:907:7f90:b0:6f3:ee68:d332 with SMTP id
- qk16-20020a1709077f9000b006f3ee68d332mr17124127ejc.114.1651625442639; Tue, 03
- May 2022 17:50:42 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220503050136.86298-1-khuey@kylehuey.com> <20220503094631.1070921-1-pbonzini@redhat.com>
- <CALMp9eTCY3tMGL4=g4UfxGJoVhVB6KGu+vbwL-aDr+HJyaBBcQ@mail.gmail.com> <9085a08b-cbf8-8c79-f75d-61ae03bd92c5@redhat.com>
-In-Reply-To: <9085a08b-cbf8-8c79-f75d-61ae03bd92c5@redhat.com>
-From:   Kyle Huey <me@kylehuey.com>
-Date:   Tue, 3 May 2022 17:50:31 -0700
-Message-ID: <CAP045ApTz4K3QR=CezU2qnO4UfW-x6DTmivQ8xk5euqOAaVNXA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/svm: Account for family 17h event renumberings
- in amd_pmc_perf_hw_id
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        with ESMTP id S245091AbiEDBNb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 May 2022 21:13:31 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA54B434BB;
+        Tue,  3 May 2022 18:09:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651626577; x=1683162577;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Buwj+SlxXPnBGJavHI7353FU4QgOf6AThckH8kUbZjQ=;
+  b=IHsq5odG1ME+4w29sz0dlTtk71Qit49zaAWNl48pMcbXnV22/KCqXXbZ
+   BPr0M1w3UL8lrdDX8aTXHRkxAXVVGSR6xVV4pjx90N2U57RFsvFOLyAD/
+   93cg/D7Te+fW1YbhzKPWvkbWNvFzHIp6H5qps0Tq9t38tNaTqCdY980Gk
+   9EkP7LBXZBbByXpNxrIAetQXMk3j3zC1xVut+X45Q8vnEsbvV/WeEZ2Dm
+   +EgQROlh8xnigyvkMxnjsHHBnH7oRN4a/bvZQVsFUuHp9pDq2uegWrv7I
+   JHC6619+x0v4jwULzjn4jpAb9L0xPDk7oPl9jX20BumGlaN4MQcFOtFFC
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10336"; a="354071054"
+X-IronPort-AV: E=Sophos;i="5.91,196,1647327600"; 
+   d="scan'208";a="354071054"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2022 18:09:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,196,1647327600"; 
+   d="scan'208";a="599317744"
+Received: from lkp-server01.sh.intel.com (HELO 5056e131ad90) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 03 May 2022 18:09:32 -0700
+Received: from kbuild by 5056e131ad90 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1nm3WF-000AvV-VO;
+        Wed, 04 May 2022 01:09:31 +0000
+Date:   Wed, 4 May 2022 09:08:52 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Seth Forshee <sforshee@digitalocean.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "H . Peter Anvin" <hpa@zytor.com>, kvm list <kvm@vger.kernel.org>,
-        "Robert O'Callahan" <robert@ocallahan.org>,
-        Keno Fischer <keno@juliacomputing.com>,
-        Like Xu <like.xu.linux@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>
+Cc:     kbuild-all@lists.01.org, Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Petr Mladek <pmladek@suse.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org, live-patching@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v2] entry/kvm: Make vCPU tasks exit to userspace when a
+ livepatch is pending
+Message-ID: <202205040945.JZNNub2D-lkp@intel.com>
+References: <20220503174934.2641605-1-sforshee@digitalocean.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220503174934.2641605-1-sforshee@digitalocean.com>
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,17 +73,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 3, 2022 at 4:50 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 5/3/22 12:00, Jim Mattson wrote:
-> >> Queued, thanks.
-> > Isn't it better to just drop this entirely, as in
-> > https://lore.kernel.org/kvm/20220411093537.11558-12-likexu@tencent.com/?
->
-> I plan to do that on top, this patch is good enough for stable.
->
-> Paolo
+Hi Seth,
 
-Yeah, rr will want this on stable, though this patch won't apply cleanly.
+Thank you for the patch! Yet something to improve:
 
-- Kyle
+[auto build test ERROR on v5.18-rc5]
+[also build test ERROR on next-20220503]
+[cannot apply to tip/core/entry]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Seth-Forshee/entry-kvm-Make-vCPU-tasks-exit-to-userspace-when-a-livepatch-is-pending/20220504-015159
+base:    672c0c5173427e6b3e2a9bbb7be51ceeec78093a
+config: arm64-randconfig-r034-20220502 (https://download.01.org/0day-ci/archive/20220504/202205040945.JZNNub2D-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 11.3.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/1c97c02f02b9f8e6b8e1f11657f950510f9c828e
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Seth-Forshee/entry-kvm-Make-vCPU-tasks-exit-to-userspace-when-a-livepatch-is-pending/20220504-015159
+        git checkout 1c97c02f02b9f8e6b8e1f11657f950510f9c828e
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+   In file included from arch/arm64/kvm/arm.c:9:
+   include/linux/entry-kvm.h: In function '__xfer_to_guest_mode_work_pending':
+>> include/linux/entry-kvm.h:20:48: error: '_TIF_PATCH_PENDING' undeclared (first use in this function)
+      20 |         (_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_PATCH_PENDING |     \
+         |                                                ^~~~~~~~~~~~~~~~~~
+   include/linux/entry-kvm.h:80:29: note: in expansion of macro 'XFER_TO_GUEST_MODE_WORK'
+      80 |         return !!(ti_work & XFER_TO_GUEST_MODE_WORK);
+         |                             ^~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/entry-kvm.h:20:48: note: each undeclared identifier is reported only once for each function it appears in
+      20 |         (_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_PATCH_PENDING |     \
+         |                                                ^~~~~~~~~~~~~~~~~~
+   include/linux/entry-kvm.h:80:29: note: in expansion of macro 'XFER_TO_GUEST_MODE_WORK'
+      80 |         return !!(ti_work & XFER_TO_GUEST_MODE_WORK);
+         |                             ^~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/entry-kvm.h:81:1: error: control reaches end of non-void function [-Werror=return-type]
+      81 | }
+         | ^
+   cc1: some warnings being treated as errors
+--
+   In file included from kernel/entry/kvm.c:3:
+   include/linux/entry-kvm.h: In function '__xfer_to_guest_mode_work_pending':
+>> include/linux/entry-kvm.h:20:48: error: '_TIF_PATCH_PENDING' undeclared (first use in this function)
+      20 |         (_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_PATCH_PENDING |     \
+         |                                                ^~~~~~~~~~~~~~~~~~
+   include/linux/entry-kvm.h:80:29: note: in expansion of macro 'XFER_TO_GUEST_MODE_WORK'
+      80 |         return !!(ti_work & XFER_TO_GUEST_MODE_WORK);
+         |                             ^~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/entry-kvm.h:20:48: note: each undeclared identifier is reported only once for each function it appears in
+      20 |         (_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_PATCH_PENDING |     \
+         |                                                ^~~~~~~~~~~~~~~~~~
+   include/linux/entry-kvm.h:80:29: note: in expansion of macro 'XFER_TO_GUEST_MODE_WORK'
+      80 |         return !!(ti_work & XFER_TO_GUEST_MODE_WORK);
+         |                             ^~~~~~~~~~~~~~~~~~~~~~~
+   kernel/entry/kvm.c: In function 'xfer_to_guest_mode_work':
+>> kernel/entry/kvm.c:22:50: error: '_TIF_PATCH_PENDING' undeclared (first use in this function)
+      22 |                 if (ti_work & (_TIF_SIGPENDING | _TIF_PATCH_PENDING)) {
+         |                                                  ^~~~~~~~~~~~~~~~~~
+   In file included from kernel/entry/kvm.c:3:
+   kernel/entry/kvm.c: In function 'xfer_to_guest_mode_handle_work':
+>> include/linux/entry-kvm.h:20:48: error: '_TIF_PATCH_PENDING' undeclared (first use in this function)
+      20 |         (_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_PATCH_PENDING |     \
+         |                                                ^~~~~~~~~~~~~~~~~~
+   kernel/entry/kvm.c:55:25: note: in expansion of macro 'XFER_TO_GUEST_MODE_WORK'
+      55 |         if (!(ti_work & XFER_TO_GUEST_MODE_WORK))
+         |                         ^~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +/_TIF_PATCH_PENDING +20 include/linux/entry-kvm.h
+
+    18	
+    19	#define XFER_TO_GUEST_MODE_WORK						\
+  > 20		(_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_PATCH_PENDING |	\
+    21		 _TIF_NOTIFY_SIGNAL | _TIF_NOTIFY_RESUME | ARCH_XFER_TO_GUEST_MODE_WORK)
+    22	
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
