@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DFC5351B2BC
-	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 01:23:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7594251B35C
+	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 01:27:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379706AbiEDW6o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 May 2022 18:58:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46166 "EHLO
+        id S1379834AbiEDW6l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 May 2022 18:58:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379745AbiEDW5m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1379742AbiEDW5m (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 4 May 2022 18:57:42 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C178D54690
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9066254685
         for <kvm@vger.kernel.org>; Wed,  4 May 2022 15:51:59 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id m11-20020a170902f64b00b0015820f8038fso1363526plg.23
+Received: by mail-pj1-x1049.google.com with SMTP id i6-20020a17090a718600b001dc87aca289so1081595pjk.5
         for <kvm@vger.kernel.org>; Wed, 04 May 2022 15:51:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=m1fbDgBOpXedaeQkbwTaO9NDDO/UaHp/JOaIY7+2IJA=;
-        b=U6XkNnZfbRwmcwTVcILZn7/yn0z52QMJQNdxy2zzm3nA0Zgur3S3Wv2R8u92oG8O21
-         6LNCNn4cE6Ca4M3WDyEK+4XR0dzvyIsSF/vjiAfgfmzY+d8h5FL2FEDRqjZIFNa1DJPt
-         6DxmHYTCUbW1rSPx32SgGnFfozRM78QOUcPLdm2cgGBWCnXcHZJ2i/4PFAFl30v+lcN5
-         1vY98QOLZv9cHIbIlgf3ZyqCSeIH1C9a5idCLTZRbloHy1YeJ4lzk5hRmDrGp5UAUUEl
-         HZpa2/NYglxGxnMGNe+YO3EclTKMphGKBml3lN3dRhat2mC5tpi3tE9c7Axg4gDeVxPK
-         myag==
+        bh=Hx8sCbhJvCh5cLdAhmGu8wLUB1jVDA/mxGjlfX4jDqM=;
+        b=tfLtI6sfhovJRsf3jGIwzoV9D3TJaeV+YvUAEkJIwJSxaewRMzz53Llw7lmWCI0j4K
+         eUOSQ31RJ6XLelenIebss22NvfTU3D+X7Tt0X81MZenpjuKsgQulvOZP7MJ9UYP+Y6zr
+         3Lx1LOG1Aldt32RQMvbzPmu8gFeqV4vTHHkLlrKDG0dZLMgc4WHpXI9qVGdJW2zX7XAi
+         3gqd340xVwC3KBfYI3zro5OT4LTZKR5gbWOSuAHlA9FaoheMSe6OA62TW0rRctwSVvYm
+         XMGsPLfguqtHE6tKbO5tUvlN8G5KWIGfOtrKXLvTm6AAdIgd2OmOnR/Qh23Vku0QYZrr
+         h1Ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=m1fbDgBOpXedaeQkbwTaO9NDDO/UaHp/JOaIY7+2IJA=;
-        b=2A6Zb93KSi/qtTdQj8MNHvvwyfH7U4Wvx5j6NdUUgJPZeianPJSBqGp5ZhTOGUKc6O
-         LIuBLq5EzWN9zO3YkBgc9hyz/CDyqE0eSJDHD0OEJ6fSIfiiSRjM8JfgTUXL/Od5d3cO
-         bmYI+e4B5WVAa6lXoGMdVNnY/U5sKnfXB7F41/L/dNFdShZ/V5H6VxbdQWcguDDxFsaV
-         FH9X2aLjgdtCvOHZ6dwr2ZjDKaPe62Nc4vZgY/wDK4ghrSpaNbCv+2NgGde1sQk8kkI4
-         o/WmcQ8jo/vMg7GjSZ77HyO6z3Mliv+K3mvK1umPX/x87RRvN4O9ApMVpNO+jTr3HM2D
-         k70A==
-X-Gm-Message-State: AOAM533TtBK/f1N30OYJqGLYjTrBuNV+kd0a4sNmJdcgCxXnjkkqyXEx
-        RDJc5A+0S138+ebzeFNq1ejUAMk/FCs=
-X-Google-Smtp-Source: ABdhPJyLp2dISrNEcAcdcZKefkXikf28GNflF+SqJ9pbzuxjBWeSR4DDtG13+iu0PM89GzjXLxBV3oy5TCQ=
+        bh=Hx8sCbhJvCh5cLdAhmGu8wLUB1jVDA/mxGjlfX4jDqM=;
+        b=1h8wY6B7Pv9MdPfrc+sBYr6kPZIPFpex6EGXfxAAdQPPtlhScsKBbQMx2PCmvoJnxV
+         qTwFgJDL8UouJk3ryvkAx8Ii+NcUJtTh3akrylLTDhE0oGBB/GE+F6sSTvDI12kCxL5i
+         sSZojftJ7rNftlslAsrOeIeViqHZPuQPcYvx6s41wTeFcBN3O2gqBAalvdD2eMyW9g/w
+         gdTqyuJ16zX32jxUDWnIUzwKnVHQq0/a7FpCUv63kXqdB8neVxDPlXhwbNuzpV1xtNsD
+         69BQSn06ki1zuR/j+ucpYfMlitgIlp2Vrlhw9MbQc4dzzhddQ5dGkI+lO6RyOTQZX9SI
+         cyxg==
+X-Gm-Message-State: AOAM530+to7bmOLnehvlwSObGSnrFrfnlq6N6j8i7ancXAcMo1xDFpXj
+        HcJSmYW5GL6yxUdB3ceH5uQBb6VZcvs=
+X-Google-Smtp-Source: ABdhPJyQwjqPyAPUvRIzb7J6XsuFaPqeZRZSGX1w+CRJDk08taZEW9zNDQzFxttZ7zMLtPTHM+ir5HkkoEU=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90b:38c7:b0:1dc:77aa:e3d5 with SMTP id
- nn7-20020a17090b38c700b001dc77aae3d5mr2195419pjb.51.1651704717584; Wed, 04
- May 2022 15:51:57 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1784:b0:50d:d8cb:7a4f with SMTP id
+ s4-20020a056a00178400b0050dd8cb7a4fmr19715916pfg.23.1651704719268; Wed, 04
+ May 2022 15:51:59 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  4 May 2022 22:48:31 +0000
+Date:   Wed,  4 May 2022 22:48:32 +0000
 In-Reply-To: <20220504224914.1654036-1-seanjc@google.com>
-Message-Id: <20220504224914.1654036-86-seanjc@google.com>
+Message-Id: <20220504224914.1654036-87-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220504224914.1654036-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH 085/128] KVM: selftests: Track kvm_vcpu object in tsc_scaling_sync
+Subject: [PATCH 086/128] KVM: selftests: Convert xapic_state_test away from
+ hardcoded vCPU ID
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -66,77 +67,148 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Track the added 'struct kvm_vcpu' object in tsc_scaling_sync instead of
-relying purely on the VM + vcpu_id combination.  Ideally, the test
-wouldn't need to manually manage vCPUs, but the need to invoke a per-VM
-ioctl before creating vCPUs is not handled by the selftests framework,
-at least not yet...
+Convert xapic_state_test to use vm_create_with_one_vcpu() and pass around
+a 'struct kvm_vcpu' object instead of the raw vCPU ID.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/x86_64/tsc_scaling_sync.c     | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+ .../selftests/kvm/x86_64/xapic_state_test.c   | 48 ++++++++++---------
+ 1 file changed, 25 insertions(+), 23 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c b/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c
-index f0083d8cfe98..b7cd5c47fc53 100644
---- a/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c
-+++ b/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c
-@@ -46,38 +46,41 @@ static void guest_code(void)
+diff --git a/tools/testing/selftests/kvm/x86_64/xapic_state_test.c b/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
+index 9d8393b6ec75..56301ee1adee 100644
+--- a/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
++++ b/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
+@@ -12,7 +12,7 @@
+ #include "test_util.h"
  
- static void *run_vcpu(void *_cpu_nr)
- {
--	unsigned long cpu = (unsigned long)_cpu_nr;
-+	unsigned long vcpu_id = (unsigned long)_cpu_nr;
- 	unsigned long failures = 0;
- 	static bool first_cpu_done;
+ struct xapic_vcpu {
+-	uint32_t id;
 +	struct kvm_vcpu *vcpu;
+ 	bool is_x2apic;
+ };
  
- 	/* The kernel is fine, but vm_vcpu_add_default() needs locking */
- 	pthread_spin_lock(&create_lock);
+@@ -47,8 +47,9 @@ static void x2apic_guest_code(void)
+ 	} while (1);
+ }
  
--	vm_vcpu_add_default(vm, cpu, guest_code);
-+	vm_vcpu_add_default(vm, vcpu_id, guest_code);
-+	vcpu = vcpu_get(vm, vcpu_id);
+-static void ____test_icr(struct kvm_vm *vm, struct xapic_vcpu *vcpu, uint64_t val)
++static void ____test_icr(struct kvm_vm *vm, struct xapic_vcpu *x, uint64_t val)
+ {
++	struct kvm_vcpu *vcpu = x->vcpu;
+ 	struct kvm_lapic_state xapic;
+ 	struct ucall uc;
+ 	uint64_t icr;
+@@ -70,28 +71,29 @@ static void ____test_icr(struct kvm_vm *vm, struct xapic_vcpu *vcpu, uint64_t va
+ 	vcpu_ioctl(vm, vcpu->id, KVM_GET_LAPIC, &xapic);
+ 	icr = (u64)(*((u32 *)&xapic.regs[APIC_ICR])) |
+ 	      (u64)(*((u32 *)&xapic.regs[APIC_ICR2])) << 32;
+-	if (!vcpu->is_x2apic)
++	if (!x->is_x2apic)
+ 		val &= (-1u | (0xffull << (32 + 24)));
+ 	ASSERT_EQ(icr, val & ~APIC_ICR_BUSY);
+ }
  
- 	if (!first_cpu_done) {
- 		first_cpu_done = true;
--		vcpu_set_msr(vm, cpu, MSR_IA32_TSC, TEST_TSC_OFFSET);
-+		vcpu_set_msr(vm, vcpu->id, MSR_IA32_TSC, TEST_TSC_OFFSET);
+-static void __test_icr(struct kvm_vm *vm, struct xapic_vcpu *vcpu, uint64_t val)
++static void __test_icr(struct kvm_vm *vm, struct xapic_vcpu *x, uint64_t val)
+ {
+-	____test_icr(vm, vcpu, val | APIC_ICR_BUSY);
+-	____test_icr(vm, vcpu, val & ~(u64)APIC_ICR_BUSY);
++	____test_icr(vm, x, val | APIC_ICR_BUSY);
++	____test_icr(vm, x, val & ~(u64)APIC_ICR_BUSY);
+ }
+ 
+-static void test_icr(struct kvm_vm *vm, struct xapic_vcpu *vcpu)
++static void test_icr(struct kvm_vm *vm, struct xapic_vcpu *x)
+ {
++	struct kvm_vcpu *vcpu = x->vcpu;
+ 	uint64_t icr, i, j;
+ 
+ 	icr = APIC_DEST_SELF | APIC_INT_ASSERT | APIC_DM_FIXED;
+ 	for (i = 0; i <= 0xff; i++)
+-		__test_icr(vm, vcpu, icr | i);
++		__test_icr(vm, x, icr | i);
+ 
+ 	icr = APIC_INT_ASSERT | APIC_DM_FIXED;
+ 	for (i = 0; i <= 0xff; i++)
+-		__test_icr(vm, vcpu, icr | i);
++		__test_icr(vm, x, icr | i);
+ 
+ 	/*
+ 	 * Send all flavors of IPIs to non-existent vCPUs.  TODO: use number of
+@@ -100,32 +102,32 @@ static void test_icr(struct kvm_vm *vm, struct xapic_vcpu *vcpu)
+ 	icr = APIC_INT_ASSERT | 0xff;
+ 	for (i = vcpu->id + 1; i < 0xff; i++) {
+ 		for (j = 0; j < 8; j++)
+-			__test_icr(vm, vcpu, i << (32 + 24) | APIC_INT_ASSERT | (j << 8));
++			__test_icr(vm, x, i << (32 + 24) | APIC_INT_ASSERT | (j << 8));
  	}
  
- 	pthread_spin_unlock(&create_lock);
+ 	/* And again with a shorthand destination for all types of IPIs. */
+ 	icr = APIC_DEST_ALLBUT | APIC_INT_ASSERT;
+ 	for (i = 0; i < 8; i++)
+-		__test_icr(vm, vcpu, icr | (i << 8));
++		__test_icr(vm, x, icr | (i << 8));
  
- 	for (;;) {
--		volatile struct kvm_run *run = vcpu_state(vm, cpu);
-+		volatile struct kvm_run *run = vcpu->run;
-                 struct ucall uc;
+ 	/* And a few garbage value, just make sure it's an IRQ (blocked). */
+-	__test_icr(vm, vcpu, 0xa5a5a5a5a5a5a5a5 & ~APIC_DM_FIXED_MASK);
+-	__test_icr(vm, vcpu, 0x5a5a5a5a5a5a5a5a & ~APIC_DM_FIXED_MASK);
+-	__test_icr(vm, vcpu, -1ull & ~APIC_DM_FIXED_MASK);
++	__test_icr(vm, x, 0xa5a5a5a5a5a5a5a5 & ~APIC_DM_FIXED_MASK);
++	__test_icr(vm, x, 0x5a5a5a5a5a5a5a5a & ~APIC_DM_FIXED_MASK);
++	__test_icr(vm, x, -1ull & ~APIC_DM_FIXED_MASK);
+ }
  
--                vcpu_run(vm, cpu);
-+		vcpu_run(vm, vcpu->id);
-                 TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-                             "Got exit_reason other than KVM_EXIT_IO: %u (%s)\n",
-                             run->exit_reason,
-                             exit_reason_str(run->exit_reason));
+ int main(int argc, char *argv[])
+ {
+-	struct xapic_vcpu vcpu = {
+-		.id = 0,
++	struct xapic_vcpu x = {
++		.vcpu = NULL,
+ 		.is_x2apic = true,
+ 	};
+ 	struct kvm_cpuid2 *cpuid;
+ 	struct kvm_vm *vm;
+ 	int i;
  
--                switch (get_ucall(vm, cpu, &uc)) {
-+		switch (get_ucall(vm, vcpu->id, &uc)) {
-                 case UCALL_DONE:
- 			goto out;
+-	vm = vm_create_default(vcpu.id, 0, x2apic_guest_code);
+-	test_icr(vm, &vcpu);
++	vm = vm_create_with_one_vcpu(&x.vcpu, x2apic_guest_code);
++	test_icr(vm, &x);
+ 	kvm_vm_free(vm);
  
-                 case UCALL_SYNC:
--			printf("Guest %ld sync %lx %lx %ld\n", cpu, uc.args[2], uc.args[3], uc.args[2] - uc.args[3]);
-+			printf("Guest %d sync %lx %lx %ld\n", vcpu->id,
-+			       uc.args[2], uc.args[3], uc.args[2] - uc.args[3]);
- 			failures++;
+ 	/*
+@@ -133,18 +135,18 @@ int main(int argc, char *argv[])
+ 	 * the guest in order to test AVIC.  KVM disallows changing CPUID after
+ 	 * KVM_RUN and AVIC is disabled if _any_ vCPU is allowed to use x2APIC.
+ 	 */
+-	vm = vm_create_default(vcpu.id, 0, xapic_guest_code);
+-	vcpu.is_x2apic = false;
++	vm = vm_create_with_one_vcpu(&x.vcpu, xapic_guest_code);
++	x.is_x2apic = false;
+ 
+-	cpuid = vcpu_get_cpuid(vm, vcpu.id);
++	cpuid = vcpu_get_cpuid(vm, x.vcpu->id);
+ 	for (i = 0; i < cpuid->nent; i++) {
+ 		if (cpuid->entries[i].function == 1)
  			break;
+ 	}
+ 	cpuid->entries[i].ecx &= ~BIT(21);
+-	vcpu_set_cpuid(vm, vcpu.id, cpuid);
++	vcpu_set_cpuid(vm, x.vcpu->id, cpuid);
  
+ 	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA);
+-	test_icr(vm, &vcpu);
++	test_icr(vm, &x);
+ 	kvm_vm_free(vm);
+ }
 -- 
 2.36.0.464.gb9c8b46e94-goog
 
