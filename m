@@ -2,111 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A07951AE95
-	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 21:59:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E41F251AECE
+	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 22:11:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234674AbiEDUCq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 May 2022 16:02:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35586 "EHLO
+        id S1356626AbiEDUPT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 May 2022 16:15:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232611AbiEDUCl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 May 2022 16:02:41 -0400
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D55204EDFB
-        for <kvm@vger.kernel.org>; Wed,  4 May 2022 12:58:47 -0700 (PDT)
-Received: by mail-il1-x130.google.com with SMTP id y16so1548614ilc.7
-        for <kvm@vger.kernel.org>; Wed, 04 May 2022 12:58:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=GsfXoNKONKDKWhJHjg7OT8XgANJP2e9G7Mc1nVY0AYE=;
-        b=Aq1U8sdb7NiZVJWC4vUlChWXOfRbCGaFNjbSpc0WleExMf0SKkQUNrsAlYXljTlC8V
-         kIwakMFlClmc4+G6Yl7CQ/45/9xgObIBveZ7BjUWWP3+FAaW4C1aJyJALPCVD9lXJc+x
-         YJ++0U3IX23F9PeoHw9+6HPC3HlHHljxhgJrbOn5aAgZau7Q6TShdWIkw27qEr4r1db0
-         ySclaROjZ8pxDb8YfChQRlCjxbFar+IhUVYKk3BD08+hVk5gdraFe163Ypca8nO0QyxZ
-         DsoFqtJh0sAijvTR6s7QSXKCKou0s4gdKPXNW/z/rGUII4CS32K7EojcLfa8YVJI1oAs
-         x6EQ==
+        with ESMTP id S1377920AbiEDUPE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 May 2022 16:15:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 523964E3AA
+        for <kvm@vger.kernel.org>; Wed,  4 May 2022 13:11:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651695085;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=g8w8l8ma28D4DTNwuvPt+cKMYwBDuhQgRyZ4PAYyzes=;
+        b=A33hcPEjHag8h6W79qkhpi4OI+0pv6w4jYezTxT78hit4AMqkvOWoVT3nkquFDlovqEQ7L
+        qfumsppbXxlwXNAElsvX6JtkFa4j2KenrzHZw0var3Ks0SK18VJ9irZ7voPzXToVUutiQv
+        3b4oSWK8f9x/EL0WBMhKGWZL083+jW4=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-498-RUsQUNYPMdCj2lU9jVNeGw-1; Wed, 04 May 2022 16:11:22 -0400
+X-MC-Unique: RUsQUNYPMdCj2lU9jVNeGw-1
+Received: by mail-io1-f70.google.com with SMTP id d7-20020a0566022d4700b0065aa0c91f27so1663061iow.14
+        for <kvm@vger.kernel.org>; Wed, 04 May 2022 13:11:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=GsfXoNKONKDKWhJHjg7OT8XgANJP2e9G7Mc1nVY0AYE=;
-        b=5ma3BcWVn3Vl9tihPL5z9o1+efBRhi7SR8Pr85Pmxb+XHJNGFCqmuIWui2kHqUAG3O
-         aDEMzlsK/zWea+pg4lQGSgYgR9MzmCbRtPSN/llHzY4m/A+D0LqzYGyRadOvZpnnjiOI
-         VBJ4WmIOw8RfVZvYboM3aR1zik6qgUUd0EHxcjeZzknKt7UP6MtmDE9ERFec1e1eASKr
-         /NHCg2u/+ZxHkGbNdmC1dN8aF/q7febcfG2BlOkP6SnhL2kwa7s5GuDm+YJnX/etcOsU
-         XDhqx0Bl7SmqM9ART/tLnFn+GEfok39quPp2QHhZjheitvAI1keCzgSS7IDF054tuPTv
-         o7IA==
-X-Gm-Message-State: AOAM531Zv82RK5p3KGC8OfL9vR8M1EjVs46bR+ilO2GWLqDDhVRnfBbq
-        8PO3GazRDFErIu+wd0sU2kK3sQ==
-X-Google-Smtp-Source: ABdhPJy5Bzj+uvdC2D+9IucvrmZ0XZi+3AvPJbXcQc72eVCSrPti9fdcCscTtD01OvFKOzl/PHzgiQ==
-X-Received: by 2002:a05:6e02:164f:b0:2cf:3244:665d with SMTP id v15-20020a056e02164f00b002cf3244665dmr4183126ilu.170.1651694326903;
-        Wed, 04 May 2022 12:58:46 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id t13-20020a02ccad000000b0032b3a7817afsm4928792jap.115.2022.05.04.12.58.46
+        bh=g8w8l8ma28D4DTNwuvPt+cKMYwBDuhQgRyZ4PAYyzes=;
+        b=pimamT67IxmHZI1ztJqLBWU1bVcE2snx9tcYWs0GzyEmJf7YkadsOEZQvGmjkmCqTD
+         9/05Js+erCexVQcJyk7v7qoZPMZJeNkBR9OUpVpO4EACOWfupj3eMkRcwXFPI1U9oe68
+         tCeBpa0FgLKkE6N2S3jc7LQR7WcsNFcIi6rsJ7GRuN5lBvekqDCT8HsVDad6yTpqCwyw
+         r7P3eE6lTymaxbgWJ+4rCmlUJW+3vusHdH1mK/UO9/0WvhJIM4mr40UgtlWdvCXHClFc
+         J4blzwkALn2GaW7z76hLEGtsgtQ5PwDESrZUYvq30YiIHzyADbtNJQh/73dfMHwEfIiU
+         Hixg==
+X-Gm-Message-State: AOAM530RJkUFEpAGOrGu1E+Ml52yEHsNaHdu2DTjrHBt7NNlygdZ+8Pw
+        fGTfTDCcSfeMy7zWh9IwVI/NalgWRnoZVgnsML1YTTidrOAgPhIHZIZqPj4i0fK8xSDGDbtz7aH
+        kqy45vRy6qIUI
+X-Received: by 2002:a6b:7845:0:b0:64c:9acc:9f1a with SMTP id h5-20020a6b7845000000b0064c9acc9f1amr8823463iop.103.1651695080508;
+        Wed, 04 May 2022 13:11:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxXxJw8HskfKMhb2KmHeGVSapHKE///TS2gM+2yR+mKxK0u2oG3LMHfrNfO5rQ1xcrxh7e6RA==
+X-Received: by 2002:a6b:7845:0:b0:64c:9acc:9f1a with SMTP id h5-20020a6b7845000000b0064c9acc9f1amr8823452iop.103.1651695080319;
+        Wed, 04 May 2022 13:11:20 -0700 (PDT)
+Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
+        by smtp.gmail.com with ESMTPSA id q19-20020a0566380ed300b0032b3a78179csm4960800jas.96.2022.05.04.13.11.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 May 2022 12:58:46 -0700 (PDT)
-Date:   Wed, 4 May 2022 19:58:42 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH] selftests: KVM: aarch64: Let hypercalls use UAPI
- *_BIT_COUNT
-Message-ID: <YnLa8uH55/epyjlS@google.com>
-References: <20220504184415.1905224-1-rananta@google.com>
+        Wed, 04 May 2022 13:11:20 -0700 (PDT)
+Date:   Wed, 4 May 2022 16:11:17 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Joao Martins <joao.m.martins@oracle.com>
+Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Juan Quintela <quintela@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>, Yi Liu <yi.l.liu@intel.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Thanos Makatos <thanos.makatos@nutanix.com>,
+        "John G . Johnson" <john.g.johnson@oracle.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH RFC 04/10] intel_iommu: Second Stage Access Dirty bit
+ support
+Message-ID: <YnLd5b3GssL0l/uE@xz-m1.local>
+References: <20220428211351.3897-1-joao.m.martins@oracle.com>
+ <20220428211351.3897-5-joao.m.martins@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220504184415.1905224-1-rananta@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <20220428211351.3897-5-joao.m.martins@oracle.com>
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Raghavendra,
+Hi, Joao,
 
-On Wed, May 04, 2022 at 06:44:15PM +0000, Raghavendra Rao Ananta wrote:
-> The hypercalls test currently defines its own *_BMAP_BIT_MAX macros to
-> define the last valid feature bit for each bitmap firmware register.
-> However, since these definitions are already present in the uapi header,
-> kvm.h, as *_BMAP_BIT_COUNT, and would help to keep the test updated as
-> features grow, use these instead.
+On Thu, Apr 28, 2022 at 10:13:45PM +0100, Joao Martins wrote:
+> +/* Get the content of a spte located in @base_addr[@index] */
+> +static uint64_t vtd_set_slpte(dma_addr_t base_addr, uint32_t index,
+> +                              uint64_t slpte)
+> +{
+> +
+> +    if (dma_memory_write(&address_space_memory,
+> +                         base_addr + index * sizeof(slpte), &slpte,
+> +                         sizeof(slpte), MEMTXATTRS_UNSPECIFIED)) {
+> +        slpte = (uint64_t)-1;
+> +        return slpte;
+> +    }
+> +
+> +    return vtd_get_slpte(base_addr, index);
+> +}
 
-LOL, looks like I lost that one in the end! Still, the fact that you're
-patching the selftest highlights the fact that there is a nonzero chance
-of userspace using this value incorrectly expecting it to hold true
-across all kernels.
+Could I ask when the write succeeded, why need to read slpte again?
 
-Since this is the route going forward can we please consider documenting
-the fact that _BIT_COUNT *will* change and is not stable between kernel
-versions. Bad UAPI expectations could throw a wrench into this entire
-plan we've hatched for preserving hypercall ABI.
+Thanks,
 
-Just a warning at the end of the register documentation would suffice.
+-- 
+Peter Xu
 
-> No functional change intended.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-
-Besides considering the above hazard:
-
-Reviewed-by: Oliver Upton <oupton@google.com>
