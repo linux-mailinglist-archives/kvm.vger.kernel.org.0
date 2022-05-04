@@ -2,183 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CC5551A272
-	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 16:44:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44A0351A283
+	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 16:47:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351441AbiEDOrs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 May 2022 10:47:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58712 "EHLO
+        id S1351481AbiEDOu4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 May 2022 10:50:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351337AbiEDOrq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 May 2022 10:47:46 -0400
-Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6174B1260D
-        for <kvm@vger.kernel.org>; Wed,  4 May 2022 07:44:09 -0700 (PDT)
-Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-e2fa360f6dso1391693fac.2
-        for <kvm@vger.kernel.org>; Wed, 04 May 2022 07:44:09 -0700 (PDT)
+        with ESMTP id S240478AbiEDOuy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 May 2022 10:50:54 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64F4A13EBE
+        for <kvm@vger.kernel.org>; Wed,  4 May 2022 07:47:18 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id n18so1611681plg.5
+        for <kvm@vger.kernel.org>; Wed, 04 May 2022 07:47:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=digitalocean.com; s=google;
+        d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=hzXxKtcQps0ZAgRhahbmep1urQpR9Cgb4jllU0BGEjo=;
-        b=AaRIzJr666XG5+EfWEqXud0jEDdbtOXM3arp9tH/ET8Mu61UpwavXLlLZgQxIODP2d
-         4DshXJXHjPS28WuTdLfDzanffOSPGmzwsLqHAeWqGxfPYGzrxvrxuBcvBmiJmcvkQTSF
-         R3+3lAqSD3p+J4kIUAOaWa6OJlMzCRsSFoqpI=
+        bh=jA2U7X2p/3LAhjnBlGykYcq+8q32UQaHNqJDG7iDoz8=;
+        b=joZ7V/hZQ2CuTxOfNunTc0edKk1WTHwW1o5OkZ8MGaXXI6Mv8BBoA7wO4Abow3tXCJ
+         oMCqCxEikz77nG+WnNKxGpyVDgZTkrcL317GSOAuoCuwuMc44TDRZ22beADxjNX45ebC
+         TdxaH97JHE9e7ZkQnpvEdQI+I1RnGVWsq/4mH0ASU15nV42HY2RVcgcuBKIekswNqVfM
+         f2G2fS2iqH01BVOozgDIht7tJ0Kowm83QO39G8Dj0PRD6yeYgY0vym4JpriVXDLpuwjF
+         SfqgeRVV16sniPZiACP9Mohp3XtDQ8WtX19hsBJYPve0YOv/MPcavC9GB5Jt4ayHWKR6
+         uOzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=hzXxKtcQps0ZAgRhahbmep1urQpR9Cgb4jllU0BGEjo=;
-        b=LEZhVFicvPWqSTkN9EkXnF30/m1/0+wXbHwHoQRL4j3S3F/hHWjinlcWvCme6QK9dk
-         kZCmQK6je4VXQMyZEmCAYxAYiKgMdxhKdSvmq+vIGGtQH0OFnZhsDJIewFInfQVyuz84
-         e+jwlUUpdSnUGbMfgMIoABnXppmD9zIJX+7uYAC0PvT2Bck2j3Ap7+PYAAw3RIZNn4GA
-         bXg4lQzNDU4E3+Lqva2UVGw4gDxmVeuBxHsVFKqbPPpvl8S7hcSOHbrAxi8E9kLogZwy
-         B3sHP+dnbcLoqgDzN0guD9M5/xLrNsWLZMAoM7thupgRqk53cpuaWoFPAPpYG43xeMtz
-         gzPg==
-X-Gm-Message-State: AOAM532zRUnphxMfvNINTpF/KPedxXO8ECYl7y+6iJZV/Y5Q/F7h1tNL
-        wG7Gi5c9niP673W5/s8O8tLBIQ==
-X-Google-Smtp-Source: ABdhPJx3/UeuBZsluNWODA4kiKaqDvbK5qLaNKbUKByLbstg23zONbpgcCwRsLd3dXF4WjHRvUdLqw==
-X-Received: by 2002:a05:6870:eaa5:b0:da:b3f:2b45 with SMTP id s37-20020a056870eaa500b000da0b3f2b45mr3979241oap.228.1651675448541;
-        Wed, 04 May 2022 07:44:08 -0700 (PDT)
-Received: from localhost ([2605:a601:ac0f:820:373b:a889:93d6:e756])
-        by smtp.gmail.com with ESMTPSA id h3-20020a056870d24300b000e686d1386fsm8064357oac.9.2022.05.04.07.44.07
+        bh=jA2U7X2p/3LAhjnBlGykYcq+8q32UQaHNqJDG7iDoz8=;
+        b=mL1Rrf3DWqo7xPe0AB0N2njzNPhWMG8ucNWnaCHwSU/SV4KIEKXrq16utBzxqki96a
+         duseU/4JhOruqGJNFV3Mp/6nzI/rMGh4EAEaAN8botWyLvvb5bmeJpGznrweln8qG6N7
+         N0H7T9VXQdZQI0wxYRYxC7HBm5np3/AkrGbUrKpfszV8OjKJf1wPgLQKYP5u/DNM+A6B
+         aeXrKti82leIQWEbT3SPYCjN3HwjfA9HzWmsXYJTLR0+mKG+DGJ4nNk+MopvkQz+Ja8y
+         o8BhT+cYgcyt1OnzP1I9iUbK8xfONdWfmXE4mphT/odE9Qx4Rt+SeBMLMFYaj1sBCUkM
+         Gn/Q==
+X-Gm-Message-State: AOAM5330UZMPowsQebV/Igs5Qhr9BRd5U7s2e4fNvpCx0tAeAZ6qzB8g
+        uJroj/gsu9AzjKY3aagJYgIOJw==
+X-Google-Smtp-Source: ABdhPJzrRKFk/Q/08nIi9uR9fkY6YuJ+bC7hVDKCXz3dZK7Pu5WoMf9Zgg7LYQ84T6TO4Kow0A0sgQ==
+X-Received: by 2002:a17:902:f54a:b0:15e:a95a:c0a7 with SMTP id h10-20020a170902f54a00b0015ea95ac0a7mr13675385plf.134.1651675637749;
+        Wed, 04 May 2022 07:47:17 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id gv21-20020a17090b11d500b001cd4989ff41sm3355441pjb.8.2022.05.04.07.47.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 May 2022 07:44:08 -0700 (PDT)
-Date:   Wed, 4 May 2022 09:44:07 -0500
-From:   Seth Forshee <sforshee@digitalocean.com>
-To:     Petr Mladek <pmladek@suse.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Jiri Kosina <jikos@kernel.org>,
-        Miroslav Benes <mbenes@suse.cz>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Sean Christopherson <seanjc@google.com>,
-        linux-kernel@vger.kernel.org, live-patching@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v2] entry/kvm: Make vCPU tasks exit to userspace when a
- livepatch is pending
-Message-ID: <YnKRN1zXKuh/gIMl@do-x1extreme>
-References: <20220503174934.2641605-1-sforshee@digitalocean.com>
- <20220504130753.GB8069@pathway.suse.cz>
- <YnKEnqfxSyVmSGYx@do-x1extreme>
- <20220504142809.GC8069@pathway.suse.cz>
+        Wed, 04 May 2022 07:47:16 -0700 (PDT)
+Date:   Wed, 4 May 2022 14:47:12 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Do not create SPTEs for GFNs that exceed
+ host.MAXPHYADDR
+Message-ID: <YnKR8DYpwJeMVCoe@google.com>
+References: <YmwL87h6klEC4UKV@google.com>
+ <ac2001e66957edc8a3af2413b78478c15898f86c.camel@redhat.com>
+ <f3ffad3aa8476156f369ff1d4c33f3e127b47d0c.camel@redhat.com>
+ <82d1a5364f1cc479da3762b046d22f136db167e3.camel@redhat.com>
+ <af15fd31f73e8a956da50db6104e690f9d308dad.camel@redhat.com>
+ <YnAMKtfAeoydHr3x@google.com>
+ <e11c21e99e7c4ac758b4417e0ae66d3a2f1fe663.camel@redhat.com>
+ <cbd4709bb499874c60986083489e17c93b48d003.camel@redhat.com>
+ <YnGQyE60lHD7wusA@google.com>
+ <42e9431ec2c716f1066fc282ebd97a7a24cbac72.camel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220504142809.GC8069@pathway.suse.cz>
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <42e9431ec2c716f1066fc282ebd97a7a24cbac72.camel@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 04, 2022 at 04:28:09PM +0200, Petr Mladek wrote:
-> On Wed 2022-05-04 08:50:22, Seth Forshee wrote:
-> > On Wed, May 04, 2022 at 03:07:53PM +0200, Petr Mladek wrote:
-> > > On Tue 2022-05-03 12:49:34, Seth Forshee wrote:
-> > > > A task can be livepatched only when it is sleeping or it exits to
-> > > > userspace. This may happen infrequently for a heavily loaded vCPU task,
-> > > > leading to livepatch transition failures.
-> > > 
-> > > The problem was solved by sending a fake signal, see the commit
-> > > 0b3d52790e1cfd6b80b826 ("livepatch: Remove signal sysfs attribute").
-> > > It was achieved by calling signal_wake_up(). It set TIF_SIGPENDING
-> > > and woke the task. It interrupted the syscall and the task was
-> > > transitioned when leaving to the userspace.
-> > > 
-> > > signal_wake_up() was later replaced by set_notify_signal(),
-> > > see the commit 8df1947c71ee53c7e21 ("livepatch: Replace
-> > > the fake signal sending with TIF_NOTIFY_SIGNAL infrastructure").
-> > > The difference is that set_notify_signal() uses TIF_NOTIFY_SIGNAL
-> > > instead of TIF_SIGPENDING.
-> > > 
-> > > The effect is the same when running on a real hardware. The syscall
-> > > gets interrupted and exit_to_user_mode_loop() is called where
-> > > the livepatch state is updated (task migrated).
-> > > 
-> > > But it works a different way in kvm where the task works are
-> > > called in the guest mode and the task does not return into
-> > > the user space in the host mode.
+On Wed, May 04, 2022, Maxim Levitsky wrote:
+> On Tue, 2022-05-03 at 20:30 +0000, Sean Christopherson wrote:
+> > Well, I officially give up, I'm out of ideas to try and repro this on my end.  To
+> > try and narrow the search, maybe try processing "all" possible gfns and see if that
+> > makes the leak go away?
 > > 
-> > > > --- a/kernel/entry/kvm.c
-> > > > +++ b/kernel/entry/kvm.c
-> > > > @@ -14,7 +14,12 @@ static int xfer_to_guest_mode_work(struct kvm_vcpu *vcpu, unsigned long ti_work)
-> > > >  				task_work_run();
-> > > >  		}
-> > > >  
-> > > > -		if (ti_work & _TIF_SIGPENDING) {
-> > > > +		/*
-> > > > +		 * When a livepatch is pending, force an exit to userspace
-> > > > +		 * as though a signal is pending to allow the task to be
-> > > > +		 * patched.
-> > > > +		 */
-> > > > +		if (ti_work & (_TIF_SIGPENDING | _TIF_PATCH_PENDING)) {
-> > > >  			kvm_handle_signal_exit(vcpu);
-> 
-> Another problem. Is it safe to call kvm_handle_signal_exit(vcpu)
-> for kthreads?
-> 
-> kthreads have _TIF_PATCH_PENDING when they need the livepatch transition.
-> But kthreads never leave kernel so we do not send the fake signal
-> signals to them.
-
-xfer_to_guest_mode_handle_work() should only be getting called on user
-threads running ioctl(KVM_RUN).
-
-> 
-> > > >  			return -EINTR;
-> > > >  		}
-> > > 
-> > > Does xfer_to_guest_mode_work() interrupts the syscall running
-> > > on the guest?
+> > diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> > index 7e258cc94152..a354490939ec 100644
+> > --- a/arch/x86/kvm/mmu.h
+> > +++ b/arch/x86/kvm/mmu.h
+> > @@ -84,9 +84,7 @@ static inline gfn_t kvm_mmu_max_gfn(void)
+> >          * than hardware's real MAXPHYADDR.  Using the host MAXPHYADDR
+> >          * disallows such SPTEs entirely and simplifies the TDP MMU.
+> >          */
+> > -       int max_gpa_bits = likely(tdp_enabled) ? shadow_phys_bits : 52;
+> > -
+> > -       return (1ULL << (max_gpa_bits - PAGE_SHIFT)) - 1;
+> > +       return (1ULL << (52 - PAGE_SHIFT)) - 1;
+> >  }
 > > 
-> > xfer_to_guest_mode_work() is called as part of a loop to execute kvm
-> > guests (for example, on x86 see vcpu_run() in arch/x86/kvm/x86.c). When
-> > guest execution is interrupted (in the livepatch case it is interrupted
-> > when set_notify_signal() is called for the vCPU task)
-> > xfer_to_guest_mode_work() is called if there is pending work, and if it
-> > returns non-zero the loop does not immediately re-enter guest execution
-> > but instead returns to userspace.
-> 
-> Thanks for the detailed explanation.
-> 
-> 
-> > > If "yes" then we do not need to call kvm_handle_signal_exit(vcpu).
-> > > It will be enough to call:
-> > > 
-> > > 		if (ti_work & _TIF_PATCH_PENDING)
-> > > 			klp_update_patch_state(current);
+> >  static inline u8 kvm_get_shadow_phys_bits(void)
 > > 
-> > What if the task's call stack contains a function being patched?
 > 
-> We do not need to check the stack when the syscall gets restarted.
-> The task might be transitioned only when the syscall gets restarted.
-
-I see. Thanks!
-
-> > > If "no" then I do not understand why TIF_NOTIFY_SIGNAL interrupts
-> > > the syscall on the real hardware and not in kvm.
-> > 
-> > It does interrupt, but xfer_to_guest_mode_handle_work() concludes it's
-> > not necessary to return to userspace and resumes guest execution.
+> Nope, still reproduces.
 > 
-> In this case, we should revert the commit 8df1947c71ee53c7e21
-> ("livepatch: Replace the fake signal sending with TIF_NOTIFY_SIGNAL
-> infrastructure"). The flag TIF_NOTIFY_SIGNAL clearly does not guarantee
-> restarting the syscall or exiting to the user space with -EINTR.
-> 
-> It should solve this problem. And it looks like a cleaner solution
-> to me.
+> I'll think on how to trace this, maybe that will give me some ideas.
+> Anything useful to dump from the mmu pages that are still not freed at that point?
 
-It looks like that should fix the issue. I'll test to confirm.
+Dumping the role and gfn is most likely to be useful.  Assuming you aren't seeing
+this WARN too:
 
-Thanks,
-Seth
+	WARN_ON(!list_empty(&kvm->arch.tdp_mmu_roots));
+
+then it's not a VM refcounting problem.  The bugs thus far have been tied to the
+gfn in some way, e.g. skipping back-to-back entries, the MAXPHYADDR thing.  But I
+don't have any ideas for why such a simple test would generate unique behavior.
+
+> Also do you test on AMD? I test on my 3970X.
+
+Yep, I've tried Rome and Milan, and CLX (or maybe SKX?) and HSW on the Intel side.
