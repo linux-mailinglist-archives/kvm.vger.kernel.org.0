@@ -2,71 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C65D6519EF4
-	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 14:08:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5C3B519F08
+	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 14:12:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349101AbiEDMMZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 May 2022 08:12:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47984 "EHLO
+        id S1349341AbiEDMPu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 May 2022 08:15:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234191AbiEDMMX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 May 2022 08:12:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B95051DA62
-        for <kvm@vger.kernel.org>; Wed,  4 May 2022 05:08:47 -0700 (PDT)
+        with ESMTP id S1343788AbiEDMPt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 May 2022 08:15:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8375D237D0
+        for <kvm@vger.kernel.org>; Wed,  4 May 2022 05:12:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651666126;
+        s=mimecast20190719; t=1651666332;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5JmwH3ZBgKgTWBBO0FhYbpl+Uw/L1BpVs00veAWR2mo=;
-        b=CGFOBFSQW4W0VubrF1ae1nW7t04DME/XKh1x3y4aDqyf0pqOLrGlc17vY3I4XoH1eBEbSo
-        Uhet0oKki5N+yFLLw9bI09YHKoFSGtXGa7KZ+aXNIIu8X0qvPEmi8AEv8cLahdYH/Oj1CR
-        Rry/IOlRyMZBlZvMKgsvCMQ8Zl5/ZII=
+        bh=dCPW4qvwcpTydZ0St+Yp5/C2uYiVBC1zbL1N8xJvOoE=;
+        b=CKVrzrvkieZoKi9dijBY0ppKw/FQZwjG01j+NyOXX6O6iKA9USoT5jaUjmOv5nF2wNoQEW
+        Sd2sMg1IUPF7KtsTXY+p55WxdApuEts50X2Mn20fl3uXdhsK1AzinVPtkCEQjy6FTH2QEL
+        o9+bolhdlijr5RGZWMihhqUnXxan98M=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-546-BcUTJm7bM8W5xJWmZeLYrw-1; Wed, 04 May 2022 08:08:45 -0400
-X-MC-Unique: BcUTJm7bM8W5xJWmZeLYrw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+ us-mta-435-AtJSXlWaPcOqkMhwKzTjBA-1; Wed, 04 May 2022 08:12:09 -0400
+X-MC-Unique: AtJSXlWaPcOqkMhwKzTjBA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3AE403CF2AA0;
-        Wed,  4 May 2022 12:08:45 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 978AB3C01D8B;
+        Wed,  4 May 2022 12:12:08 +0000 (UTC)
 Received: from starship (unknown [10.40.192.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EC972C28101;
-        Wed,  4 May 2022 12:08:42 +0000 (UTC)
-Message-ID: <42e9431ec2c716f1066fc282ebd97a7a24cbac72.camel@redhat.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Do not create SPTEs for GFNs that exceed
- host.MAXPHYADDR
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1F8CE2024CBC;
+        Wed,  4 May 2022 12:12:03 +0000 (UTC)
+Message-ID: <a883ff438d6202f2dc0458dc4d7c1ab3688f5db8.camel@redhat.com>
+Subject: Re: [PATCH v3 03/14] KVM: SVM: Detect X2APIC virtualization
+ (x2AVIC) support
 From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>
-Date:   Wed, 04 May 2022 15:08:41 +0300
-In-Reply-To: <YnGQyE60lHD7wusA@google.com>
-References: <Ymv5TR76RNvFBQhz@google.com>
-         <e5864cb4-cce8-bd32-04b0-ecb60c058d0b@redhat.com>
-         <YmwL87h6klEC4UKV@google.com>
-         <ac2001e66957edc8a3af2413b78478c15898f86c.camel@redhat.com>
-         <f3ffad3aa8476156f369ff1d4c33f3e127b47d0c.camel@redhat.com>
-         <82d1a5364f1cc479da3762b046d22f136db167e3.camel@redhat.com>
-         <af15fd31f73e8a956da50db6104e690f9d308dad.camel@redhat.com>
-         <YnAMKtfAeoydHr3x@google.com>
-         <e11c21e99e7c4ac758b4417e0ae66d3a2f1fe663.camel@redhat.com>
-         <cbd4709bb499874c60986083489e17c93b48d003.camel@redhat.com>
-         <YnGQyE60lHD7wusA@google.com>
+To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
+        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
+Date:   Wed, 04 May 2022 15:12:02 +0300
+In-Reply-To: <20220504073128.12031-4-suravee.suthikulpanit@amd.com>
+References: <20220504073128.12031-1-suravee.suthikulpanit@amd.com>
+         <20220504073128.12031-4-suravee.suthikulpanit@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -77,81 +64,149 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-05-03 at 20:30 +0000, Sean Christopherson wrote:
-> On Tue, May 03, 2022, Maxim Levitsky wrote:
-> > On Tue, 2022-05-03 at 12:12 +0300, Maxim Levitsky wrote:
-> > > On Mon, 2022-05-02 at 16:51 +0000, Sean Christopherson wrote:
-> > > > On Mon, May 02, 2022, Maxim Levitsky wrote:
-> > > > > On Mon, 2022-05-02 at 10:59 +0300, Maxim Levitsky wrote:
-> > > > > > > > Also I can reproduce it all the way to 5.14 kernel (last kernel I have installed in this VM).
-> > > > > > > > 
-> > > > > > > > I tested kvm/queue as of today, sadly I still see the warning.
-> > > > > > > 
-> > > > > > > Due to a race, the above statements are out of order ;-)
-> > > > > > 
-> > > > > > So futher investigation shows that the trigger for this *is* cpu_pm=on :(
-> > > > > > 
-> > > > > > So this is enough to trigger the warning when run in the guest:
-> > > > > > 
-> > > > > > qemu-system-x86_64  -nodefaults  -vnc none -serial stdio -machine accel=kvm
-> > > > > > -kernel x86/dummy.flat -machine kernel-irqchip=on -smp 8 -m 1g -cpu host
-> > > > > > -overcommit cpu-pm=on
+On Wed, 2022-05-04 at 02:31 -0500, Suravee Suthikulpanit wrote:
+> Add CPUID check for the x2APIC virtualization (x2AVIC) feature.
+> If available, the SVM driver can support both AVIC and x2AVIC modes
+> when load the kvm_amd driver with avic=1. The operating mode will be
+> determined at runtime depending on the guest APIC mode.
 > 
-> ...
+> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> ---
+>  arch/x86/include/asm/svm.h |  3 +++
+>  arch/x86/kvm/svm/avic.c    | 40 ++++++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/svm/svm.c     | 15 ++------------
+>  arch/x86/kvm/svm/svm.h     |  1 +
+>  4 files changed, 46 insertions(+), 13 deletions(-)
 > 
-> > > > > All right, at least that was because I removed the '-device isa-debug-exit,iobase=0xf4,iosize=0x4',
-> > > > > which is apparently used by KVM unit tests to signal exit from the VM.
-> > > > 
-> > > > Can you provide your QEMU command line for running your L1 VM?  And your L0 and L1
-> > > > Kconfigs too?  I've tried both the dummy and ipi_stress tests on a variety of hardware,
-> > > > kernels, QEMUs, etc..., with no luck.
-> > > 
-> > > So now both L0 and L1 run almost pure kvm/queue)
-> > > (commit 2764011106d0436cb44702cfb0981339d68c3509)
-> > > 
-> > > I have some local patches but they are not relevant to KVM at all, more
-> > > like various tweaks to sensors, a sad hack for yet another regression
-> > > in AMDGPU, etc.
-> > > 
-> > > The config and qemu command line attached.
-> > > 
-> > > AVIC disabled in L0, L0 qemu is from master upstream.
-> > > Bug reproduces too well IMHO, almost always.
-> > > 
-> > > For reference the warning is printed in L1's dmesg.
-> > 
-> > Tested this without any preemption in L0 and L1 - bug still reproduces just fine.
-> > (kvm/queue)
-> 
-> Well, I officially give up, I'm out of ideas to try and repro this on my end.  To
-> try and narrow the search, maybe try processing "all" possible gfns and see if that
-> makes the leak go away?
-> 
-> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index 7e258cc94152..a354490939ec 100644
-> --- a/arch/x86/kvm/mmu.h
-> +++ b/arch/x86/kvm/mmu.h
-> @@ -84,9 +84,7 @@ static inline gfn_t kvm_mmu_max_gfn(void)
->          * than hardware's real MAXPHYADDR.  Using the host MAXPHYADDR
->          * disallows such SPTEs entirely and simplifies the TDP MMU.
->          */
-> -       int max_gpa_bits = likely(tdp_enabled) ? shadow_phys_bits : 52;
-> -
-> -       return (1ULL << (max_gpa_bits - PAGE_SHIFT)) - 1;
-> +       return (1ULL << (52 - PAGE_SHIFT)) - 1;
+> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+> index f70a5108d464..2c2a104b777e 100644
+> --- a/arch/x86/include/asm/svm.h
+> +++ b/arch/x86/include/asm/svm.h
+> @@ -195,6 +195,9 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+>  #define AVIC_ENABLE_SHIFT 31
+>  #define AVIC_ENABLE_MASK (1 << AVIC_ENABLE_SHIFT)
+>  
+> +#define X2APIC_MODE_SHIFT 30
+> +#define X2APIC_MODE_MASK (1 << X2APIC_MODE_SHIFT)
+> +
+>  #define LBR_CTL_ENABLE_MASK BIT_ULL(0)
+>  #define VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK BIT_ULL(1)
+>  
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index a8f514212b87..fc3ba6071482 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -40,6 +40,15 @@
+>  #define AVIC_GATAG_TO_VMID(x)		((x >> AVIC_VCPU_ID_BITS) & AVIC_VM_ID_MASK)
+>  #define AVIC_GATAG_TO_VCPUID(x)		(x & AVIC_VCPU_ID_MASK)
+>  
+> +enum avic_modes {
+> +	AVIC_MODE_NONE = 0,
+> +	AVIC_MODE_X1,
+> +	AVIC_MODE_X2,
+> +};
+> +
+> +static bool force_avic;
+> +module_param_unsafe(force_avic, bool, 0444);
+> +
+>  /* Note:
+>   * This hash table is used to map VM_ID to a struct kvm_svm,
+>   * when handling AMD IOMMU GALOG notification to schedule in
+> @@ -50,6 +59,7 @@ static DEFINE_HASHTABLE(svm_vm_data_hash, SVM_VM_DATA_HASH_BITS);
+>  static u32 next_vm_id = 0;
+>  static bool next_vm_id_wrapped = 0;
+>  static DEFINE_SPINLOCK(svm_vm_data_hash_lock);
+> +static enum avic_modes avic_mode;
+>  
+>  /*
+>   * This is a wrapper of struct amd_iommu_ir_data.
+> @@ -1077,3 +1087,33 @@ void avic_vcpu_unblocking(struct kvm_vcpu *vcpu)
+>  
+>  	avic_vcpu_load(vcpu);
 >  }
-> 
->  static inline u8 kvm_get_shadow_phys_bits(void)
-> 
+> +
+> +/*
+> + * Note:
+> + * - The module param avic enable both xAPIC and x2APIC mode.
+> + * - Hypervisor can support both xAVIC and x2AVIC in the same guest.
+> + * - The mode can be switched at run-time.
+> + */
+> +bool avic_hardware_setup(struct kvm_x86_ops *x86_ops)
+> +{
+> +	if (!npt_enabled)
+> +		return false;
+> +
+> +	if (boot_cpu_has(X86_FEATURE_AVIC)) {
+> +		avic_mode = AVIC_MODE_X1;
+> +		pr_info("AVIC enabled\n");
+> +	} else if (force_avic) {
+> +		pr_warn("AVIC is not supported in CPUID but force enabled");
+> +		pr_warn("Your system might crash and burn");
 
-Nope, still reproduces.
-
-I'll think on how to trace this, maybe that will give me some ideas.
-Anything useful to dump from the mmu pages that are still not freed at that point?
-
-Also do you test on AMD? I test on my 3970X.
-
+I think in this case avic_mode should also be set to AVIC_MODE_X1
+(Hopefully this won't be needed for systems that have x2avic enabled)
 
 Best regards,
 	Maxim Levitsky
+
+> +	}
+> +
+> +	if (boot_cpu_has(X86_FEATURE_X2AVIC)) {
+> +		avic_mode = AVIC_MODE_X2;
+> +		pr_info("x2AVIC enabled\n");
+> +	}
+> +
+> +	if (avic_mode != AVIC_MODE_NONE)
+> +		amd_iommu_register_ga_log_notifier(&avic_ga_log_notifier);
+> +
+> +	return !!avic_mode;
+> +}
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 3b49337998ec..74e6f86f5dc3 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -188,9 +188,6 @@ module_param(tsc_scaling, int, 0444);
+>  static bool avic;
+>  module_param(avic, bool, 0444);
+>  
+> -static bool force_avic;
+> -module_param_unsafe(force_avic, bool, 0444);
+> -
+>  bool __read_mostly dump_invalid_vmcb;
+>  module_param(dump_invalid_vmcb, bool, 0644);
+>  
+> @@ -4913,17 +4910,9 @@ static __init int svm_hardware_setup(void)
+>  			nrips = false;
+>  	}
+>  
+> -	enable_apicv = avic = avic && npt_enabled && (boot_cpu_has(X86_FEATURE_AVIC) || force_avic);
+> +	enable_apicv = avic = avic && avic_hardware_setup(&svm_x86_ops);
+>  
+> -	if (enable_apicv) {
+> -		if (!boot_cpu_has(X86_FEATURE_AVIC)) {
+> -			pr_warn("AVIC is not supported in CPUID but force enabled");
+> -			pr_warn("Your system might crash and burn");
+> -		} else
+> -			pr_info("AVIC enabled\n");
+> -
+> -		amd_iommu_register_ga_log_notifier(&avic_ga_log_notifier);
+> -	} else {
+> +	if (!enable_apicv) {
+>  		svm_x86_ops.vcpu_blocking = NULL;
+>  		svm_x86_ops.vcpu_unblocking = NULL;
+>  		svm_x86_ops.vcpu_get_apicv_inhibit_reasons = NULL;
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 32220a1b0ea2..678fc7757fe4 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -603,6 +603,7 @@ extern struct kvm_x86_nested_ops svm_nested_ops;
+>  
+>  /* avic.c */
+>  
+> +bool avic_hardware_setup(struct kvm_x86_ops *ops);
+>  int avic_ga_log_notifier(u32 ga_tag);
+>  void avic_vm_destroy(struct kvm *kvm);
+>  int avic_vm_init(struct kvm *kvm);
+
 
