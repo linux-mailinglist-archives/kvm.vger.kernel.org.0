@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E6EFB51B257
-	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 00:51:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0105651B25A
+	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 00:51:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347522AbiEDWxU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 May 2022 18:53:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40570 "EHLO
+        id S1379129AbiEDWxW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 May 2022 18:53:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379070AbiEDWxP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 May 2022 18:53:15 -0400
+        with ESMTP id S1379122AbiEDWxR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 May 2022 18:53:17 -0400
 Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E70E527F3
-        for <kvm@vger.kernel.org>; Wed,  4 May 2022 15:49:37 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id bj12-20020a170902850c00b0015adf30aaccso1364177plb.15
-        for <kvm@vger.kernel.org>; Wed, 04 May 2022 15:49:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47AF753729
+        for <kvm@vger.kernel.org>; Wed,  4 May 2022 15:49:39 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id t14-20020a1709028c8e00b0015cf7e541feso1373863plo.1
+        for <kvm@vger.kernel.org>; Wed, 04 May 2022 15:49:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=309h4CdGAPcwiHb0ZM4SWUVDb0T/f6xUJOwKAgDDSGM=;
-        b=ZUrelAy0Bnhc0z7Dj1FvhcDcGJufecyEo9sS9WZIefn7dmdWq21xt4WaQ2OXpsybKq
-         o6ilh7c+GhOO9FjT9yt5ae/jq0ta7aIPRzCDwZeVNNbqSrdav/H60mydYTiPdR6oD7bW
-         51zuLMcd6dho3EGrqFALGhLITdC/t4A2JX2TIUlTcHdcMEjnvi4PaFEdSmUUtHoLW4fR
-         geMCTJUNfo5r9O715SPThADanpQl9PQvGb2WAnzGHWTgOwnR6FUn+hy5jGDSAbKfqWZv
-         y1rAgl4LxLNEMPcc7zX8/ZWhdzOekI9X9riy55mouWBfcpRER2apGHf5AXDAZ+mp7CGg
-         pnMg==
+        bh=AvzrdOxuja+IM3jp+NGhvYWEUG9cjCsvbGuRmyXWkro=;
+        b=RljsCP2mzcLw8SpR7UUUBFp6ezJaKGzz7gByffGNE82TGgneLyxpsWNC5Z45vamJJM
+         1RgV8ovKGvQbl+Fi2rnn+dGJ1v7WBdAC67Vrp6gjPqbLi75arWmGJeWDZc69T6MVzG+i
+         OfQDSy7Hto976MaHOm96sALvXDutw1IDc1lZLsA45fKuCoh0SpAWOIEfHriRV/niQpMd
+         djpatNrvMuPkxnq+qLSlH97KEeCIy96hx/iWx4k/kdncjYecKJbAyAXxoUnX6sPvzZAI
+         QIxj0IVb0cPWI5sEk+WfoQajBGdhn6QB7/RDFzOrGVQM6Mjj0qp+iY6+3sxwzmpOUFLX
+         tzUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=309h4CdGAPcwiHb0ZM4SWUVDb0T/f6xUJOwKAgDDSGM=;
-        b=tuvlc7L68kgzmbLlSsIbakuB94z2dhwfKJzRKT/dUV+qHBy9Eh/kz2ilzmkGiHg1sW
-         uTh+tM5mtT02mRrJaorVMXxaBHqlhEaK2GiOH24C7g4FwZ4kPLv85XdmDuFTPzVDB0iO
-         8gAWFe94SYvc6RMbCxARcAzDG3fZCFpuKfbC+z88/D/rL+8fyZABHDIB09x1xeFL/fB7
-         uXzmna5OLLfS/LeA2QlB7G+xpAvLO8A2sTMVoml+BfWFA/cyCQTubbPEKhNHDXSio86c
-         6Rc4xkm5ARII6SrhMmIMHPHsd7ZPwDcCyMJqjita68g6MkKham4nyKAPcCAAGuJYhHOE
-         gsBA==
-X-Gm-Message-State: AOAM5310hCAB4iqDo4omqqWJK4D7f7IAR71aukFzulo4S9/t7HWqI87J
-        ToX1GYd+2lAP9P3QzARk7Yaf4W+s0vg=
-X-Google-Smtp-Source: ABdhPJyroa6y79geaC1Voqxr63GiFITL3Z3N0TL80As4HKXy0ciZTzff0PRUBNCA1EGsP1cZU0jjKr5Viis=
+        bh=AvzrdOxuja+IM3jp+NGhvYWEUG9cjCsvbGuRmyXWkro=;
+        b=Z/mYdsSYqya6vbftq49xf9imeXo2hA9+UugOH7RrgjnU4Ki2iLr+VyQBmSGblsHgfe
+         BTQw2upwBh1nwPtUhdw37esN1rfQhouJtnCVb2eVVDTpf5SnfEcYL9HV2RtR5JJwlYLe
+         3cIW+omw8cDjxpyx3cYqUuUP3FBkTy9oceOEenAPxwEevJOdXQcdkPJhXDr/+kTfCsQa
+         oMKo9NzRwtP501YDvrZ37HOPDjAb66lLOVZd4r1vKLQ9Z3tMkwKtOpRv4ElOBzl319CU
+         YWIS0YtGeJSX0nwmMp56FBQrxPaUC3WUKPVkdHigCdcSsXJ65gu2d1ZHHPo7AgJrYqjR
+         kTJg==
+X-Gm-Message-State: AOAM5328KCUqrX4A4ehsXQSW1PCwBDFS+KHPLynE9/WLH65VP9hua2b2
+        78CiYN17yQLnZI4jC4FnYvbGointiUM=
+X-Google-Smtp-Source: ABdhPJw0sLi5nyZslvyn1yK+USLCd7q5CZ5QolzT0AMl76EkSSIGhGfTyw3Z6rgTgrIGNqbeQL5+bN662yM=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:aa09:b0:159:684:c50d with SMTP id
- be9-20020a170902aa0900b001590684c50dmr24671868plb.51.1651704576963; Wed, 04
- May 2022 15:49:36 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a62:d445:0:b0:50d:b868:47bc with SMTP id
+ u5-20020a62d445000000b0050db86847bcmr23009842pfl.73.1651704578711; Wed, 04
+ May 2022 15:49:38 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  4 May 2022 22:47:09 +0000
+Date:   Wed,  4 May 2022 22:47:10 +0000
 In-Reply-To: <20220504224914.1654036-1-seanjc@google.com>
-Message-Id: <20220504224914.1654036-4-seanjc@google.com>
+Message-Id: <20220504224914.1654036-5-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220504224914.1654036-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH 003/128] KVM: selftests: Unconditionally compile KVM selftests
- with -Werror
+Subject: [PATCH 004/128] KVM: selftests: Always open VM file descriptors with O_RDWR
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -74,27 +73,393 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Specify -Werror when compiling KVM's selftests, there's zero reason to
-let warnings sneak into the selftests.
+Drop the @perm param from vm_create() and always open VM file descriptors
+with O_RDWR.  There's no legitimate use case for other permissions, and
+if a selftest wants to do oddball negative testing it can open code the
+necessary bits instead of forcing a bunch of tests to provide useless
+information.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../selftests/kvm/aarch64/get-reg-list.c      |  2 +-
+ .../selftests/kvm/aarch64/psci_cpu_on_test.c  |  2 +-
+ .../selftests/kvm/aarch64/vcpu_width_config.c |  6 +++---
+ tools/testing/selftests/kvm/dirty_log_test.c  |  2 +-
+ .../selftests/kvm/hardware_disable_test.c     |  2 +-
+ .../selftests/kvm/include/kvm_util_base.h     |  4 ++--
+ .../selftests/kvm/kvm_binary_stats_test.c     |  2 +-
+ .../selftests/kvm/kvm_create_max_vcpus.c      |  2 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 20 +++++++++----------
+ .../selftests/kvm/set_memory_region_test.c    |  4 ++--
+ tools/testing/selftests/kvm/x86_64/amx_test.c |  2 +-
+ .../testing/selftests/kvm/x86_64/evmcs_test.c |  2 +-
+ .../selftests/kvm/x86_64/set_boot_cpu_id.c    |  2 +-
+ .../selftests/kvm/x86_64/set_sregs_test.c     |  2 +-
+ .../selftests/kvm/x86_64/sev_migrate_tests.c  |  8 ++++----
+ tools/testing/selftests/kvm/x86_64/smm_test.c |  2 +-
+ .../testing/selftests/kvm/x86_64/state_test.c |  2 +-
+ .../kvm/x86_64/vmx_preemption_timer_test.c    |  2 +-
+ 18 files changed, 33 insertions(+), 35 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index af582d168621..c8efaaeb0885 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -153,7 +153,7 @@ LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/x86/include
- else
- LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
- endif
--CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
-+CFLAGS += -Wall -Werror -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
- 	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
- 	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
- 	-I$(<D) -Iinclude/$(UNAME_M) -I.. $(EXTRA_CFLAGS) $(KHDR_INCLUDES)
+diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+index 0b571f3fe64c..397ff6c79599 100644
+--- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
++++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+@@ -411,7 +411,7 @@ static void run_test(struct vcpu_config *c)
+ 
+ 	check_supported(c);
+ 
+-	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
++	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES);
+ 	prepare_vcpu_init(c, &init);
+ 	aarch64_vcpu_add_default(vm, 0, &init, NULL);
+ 	finalize_vcpu(vm, 0, c);
+diff --git a/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c b/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
+index 4c5f6814030f..15f4b3544ee5 100644
+--- a/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
++++ b/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
+@@ -76,7 +76,7 @@ int main(void)
+ 	struct kvm_vm *vm;
+ 	struct ucall uc;
+ 
+-	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
++	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES);
+ 	kvm_vm_elf_load(vm, program_invocation_name);
+ 	ucall_init(vm, NULL);
+ 
+diff --git a/tools/testing/selftests/kvm/aarch64/vcpu_width_config.c b/tools/testing/selftests/kvm/aarch64/vcpu_width_config.c
+index 6e9402679229..d48129349213 100644
+--- a/tools/testing/selftests/kvm/aarch64/vcpu_width_config.c
++++ b/tools/testing/selftests/kvm/aarch64/vcpu_width_config.c
+@@ -24,7 +24,7 @@ static int add_init_2vcpus(struct kvm_vcpu_init *init1,
+ 	struct kvm_vm *vm;
+ 	int ret;
+ 
+-	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
++	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES);
+ 
+ 	vm_vcpu_add(vm, 0);
+ 	ret = _vcpu_ioctl(vm, 0, KVM_ARM_VCPU_INIT, init1);
+@@ -49,7 +49,7 @@ static int add_2vcpus_init_2vcpus(struct kvm_vcpu_init *init1,
+ 	struct kvm_vm *vm;
+ 	int ret;
+ 
+-	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
++	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES);
+ 
+ 	vm_vcpu_add(vm, 0);
+ 	vm_vcpu_add(vm, 1);
+@@ -86,7 +86,7 @@ int main(void)
+ 	}
+ 
+ 	/* Get the preferred target type and copy that to init2 for later use */
+-	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
++	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES);
+ 	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init1);
+ 	kvm_vm_free(vm);
+ 	init2 = init1;
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index 3fcd89e195c7..11bf606e3165 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -679,7 +679,7 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, uint32_t vcpuid,
+ 
+ 	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
+ 
+-	vm = vm_create(mode, DEFAULT_GUEST_PHY_PAGES + extra_pg_pages, O_RDWR);
++	vm = vm_create(mode, DEFAULT_GUEST_PHY_PAGES + extra_pg_pages);
+ 	kvm_vm_elf_load(vm, program_invocation_name);
+ #ifdef __x86_64__
+ 	vm_create_irqchip(vm);
+diff --git a/tools/testing/selftests/kvm/hardware_disable_test.c b/tools/testing/selftests/kvm/hardware_disable_test.c
+index b21c69a56daa..1c9e2295c75b 100644
+--- a/tools/testing/selftests/kvm/hardware_disable_test.c
++++ b/tools/testing/selftests/kvm/hardware_disable_test.c
+@@ -104,7 +104,7 @@ static void run_test(uint32_t run)
+ 	for (i = 0; i < VCPU_NUM; i++)
+ 		CPU_SET(i, &cpu_set);
+ 
+-	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
++	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES);
+ 	kvm_vm_elf_load(vm, program_invocation_name);
+ 	vm_create_irqchip(vm);
+ 
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index 47b77ebda6a3..89b633b40247 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -110,9 +110,9 @@ int vcpu_enable_cap(struct kvm_vm *vm, uint32_t vcpu_id,
+ void vm_enable_dirty_ring(struct kvm_vm *vm, uint32_t ring_size);
+ const char *vm_guest_mode_string(uint32_t i);
+ 
+-struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm);
++struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages);
+ void kvm_vm_free(struct kvm_vm *vmp);
+-void kvm_vm_restart(struct kvm_vm *vmp, int perm);
++void kvm_vm_restart(struct kvm_vm *vmp);
+ void kvm_vm_release(struct kvm_vm *vmp);
+ void kvm_vm_get_dirty_log(struct kvm_vm *vm, int slot, void *log);
+ void kvm_vm_clear_dirty_log(struct kvm_vm *vm, int slot, void *log,
+diff --git a/tools/testing/selftests/kvm/kvm_binary_stats_test.c b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+index 17f65d514915..6217f4630e6c 100644
+--- a/tools/testing/selftests/kvm/kvm_binary_stats_test.c
++++ b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+@@ -230,7 +230,7 @@ int main(int argc, char *argv[])
+ 	TEST_ASSERT(vms, "Allocate memory for storing VM pointers");
+ 	for (i = 0; i < max_vm; ++i) {
+ 		vms[i] = vm_create(VM_MODE_DEFAULT,
+-				DEFAULT_GUEST_PHY_PAGES, O_RDWR);
++				DEFAULT_GUEST_PHY_PAGES);
+ 		for (j = 0; j < max_vcpu; ++j)
+ 			vm_vcpu_add(vms[i], j);
+ 	}
+diff --git a/tools/testing/selftests/kvm/kvm_create_max_vcpus.c b/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
+index aed9dc3ca1e9..bb69b75eac23 100644
+--- a/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
++++ b/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
+@@ -28,7 +28,7 @@ void test_vcpu_creation(int first_vcpu_id, int num_vcpus)
+ 	pr_info("Testing creating %d vCPUs, with IDs %d...%d.\n",
+ 		num_vcpus, first_vcpu_id, first_vcpu_id + num_vcpus - 1);
+ 
+-	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
++	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES);
+ 
+ 	for (i = first_vcpu_id; i < first_vcpu_id + num_vcpus; i++)
+ 		/* This asserts that the vCPU was created. */
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 1665a220abcb..da7e3369f4b8 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -173,9 +173,9 @@ void vm_enable_dirty_ring(struct kvm_vm *vm, uint32_t ring_size)
+ 	vm->dirty_ring_size = ring_size;
+ }
+ 
+-static void vm_open(struct kvm_vm *vm, int perm)
++static void vm_open(struct kvm_vm *vm)
+ {
+-	vm->kvm_fd = _open_kvm_dev_path_or_exit(perm);
++	vm->kvm_fd = _open_kvm_dev_path_or_exit(O_RDWR);
+ 
+ 	if (!kvm_check_cap(KVM_CAP_IMMEDIATE_EXIT)) {
+ 		print_skip("immediate_exit not available");
+@@ -240,7 +240,6 @@ _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params)
+  * Input Args:
+  *   mode - VM Mode (e.g. VM_MODE_P52V48_4K)
+  *   phy_pages - Physical memory pages
+- *   perm - permission
+  *
+  * Output Args: None
+  *
+@@ -253,12 +252,12 @@ _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params)
+  * descriptor to control the created VM is created with the permissions
+  * given by perm (e.g. O_RDWR).
+  */
+-struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
++struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages)
+ {
+ 	struct kvm_vm *vm;
+ 
+-	pr_debug("%s: mode='%s' pages='%ld' perm='%d'\n", __func__,
+-		 vm_guest_mode_string(mode), phy_pages, perm);
++	pr_debug("%s: mode='%s' pages='%ld'\n", __func__,
++		 vm_guest_mode_string(mode), phy_pages);
+ 
+ 	vm = calloc(1, sizeof(*vm));
+ 	TEST_ASSERT(vm != NULL, "Insufficient Memory");
+@@ -340,7 +339,7 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
+ 		vm->type = KVM_VM_TYPE_ARM_IPA_SIZE(vm->pa_bits);
+ #endif
+ 
+-	vm_open(vm, perm);
++	vm_open(vm);
+ 
+ 	/* Limit to VA-bit canonical virtual addresses. */
+ 	vm->vpages_valid = sparsebit_alloc();
+@@ -366,7 +365,7 @@ struct kvm_vm *vm_create_without_vcpus(enum vm_guest_mode mode, uint64_t pages)
+ {
+ 	struct kvm_vm *vm;
+ 
+-	vm = vm_create(mode, pages, O_RDWR);
++	vm = vm_create(mode, pages);
+ 
+ 	kvm_vm_elf_load(vm, program_invocation_name);
+ 
+@@ -458,7 +457,6 @@ struct kvm_vm *vm_create_default(uint32_t vcpuid, uint64_t extra_mem_pages,
+  *
+  * Input Args:
+  *   vm - VM that has been released before
+- *   perm - permission
+  *
+  * Output Args: None
+  *
+@@ -466,12 +464,12 @@ struct kvm_vm *vm_create_default(uint32_t vcpuid, uint64_t extra_mem_pages,
+  * global state, such as the irqchip and the memory regions that are mapped
+  * into the guest.
+  */
+-void kvm_vm_restart(struct kvm_vm *vmp, int perm)
++void kvm_vm_restart(struct kvm_vm *vmp)
+ {
+ 	int ctr;
+ 	struct userspace_mem_region *region;
+ 
+-	vm_open(vmp, perm);
++	vm_open(vmp);
+ 	if (vmp->has_irqchip)
+ 		vm_create_irqchip(vmp);
+ 
+diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+index 73bc297dabe6..d97cfd6866c3 100644
+--- a/tools/testing/selftests/kvm/set_memory_region_test.c
++++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+@@ -314,7 +314,7 @@ static void test_zero_memory_regions(void)
+ 
+ 	pr_info("Testing KVM_RUN with zero added memory regions\n");
+ 
+-	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
++	vm = vm_create(VM_MODE_DEFAULT, 0);
+ 	vm_vcpu_add(vm, VCPU_ID);
+ 
+ 	TEST_ASSERT(!ioctl(vm_get_fd(vm), KVM_SET_NR_MMU_PAGES, 64),
+@@ -354,7 +354,7 @@ static void test_add_max_memory_regions(void)
+ 		    "KVM_CAP_NR_MEMSLOTS should be greater than 0");
+ 	pr_info("Allowed number of memory slots: %i\n", max_mem_slots);
+ 
+-	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
++	vm = vm_create(VM_MODE_DEFAULT, 0);
+ 
+ 	/* Check it can be added memory slots up to the maximum allowed */
+ 	pr_info("Adding slots 0..%i, each memory region with %dK size\n",
+diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
+index 76f65c22796f..2f01247da0b5 100644
+--- a/tools/testing/selftests/kvm/x86_64/amx_test.c
++++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
+@@ -431,7 +431,7 @@ int main(int argc, char *argv[])
+ 		kvm_vm_release(vm);
+ 
+ 		/* Restore state in a new VM.  */
+-		kvm_vm_restart(vm, O_RDWR);
++		kvm_vm_restart(vm);
+ 		vm_vcpu_add(vm, VCPU_ID);
+ 		vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
+ 		vcpu_load_state(vm, VCPU_ID, state);
+diff --git a/tools/testing/selftests/kvm/x86_64/evmcs_test.c b/tools/testing/selftests/kvm/x86_64/evmcs_test.c
+index d12e043aa2ee..f97049ab045f 100644
+--- a/tools/testing/selftests/kvm/x86_64/evmcs_test.c
++++ b/tools/testing/selftests/kvm/x86_64/evmcs_test.c
+@@ -184,7 +184,7 @@ static void save_restore_vm(struct kvm_vm *vm)
+ 	kvm_vm_release(vm);
+ 
+ 	/* Restore state in a new VM.  */
+-	kvm_vm_restart(vm, O_RDWR);
++	kvm_vm_restart(vm);
+ 	vm_vcpu_add(vm, VCPU_ID);
+ 	vcpu_set_hv_cpuid(vm, VCPU_ID);
+ 	vcpu_enable_evmcs(vm, VCPU_ID);
+diff --git a/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c b/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
+index ae76436af0cc..2fe893ccedd0 100644
+--- a/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
++++ b/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
+@@ -88,7 +88,7 @@ static struct kvm_vm *create_vm(void)
+ 	uint64_t pages = DEFAULT_GUEST_PHY_PAGES + vcpu_pages + extra_pg_pages;
+ 
+ 	pages = vm_adjust_num_guest_pages(VM_MODE_DEFAULT, pages);
+-	vm = vm_create(VM_MODE_DEFAULT, pages, O_RDWR);
++	vm = vm_create(VM_MODE_DEFAULT, pages);
+ 
+ 	kvm_vm_elf_load(vm, program_invocation_name);
+ 	vm_create_irqchip(vm);
+diff --git a/tools/testing/selftests/kvm/x86_64/set_sregs_test.c b/tools/testing/selftests/kvm/x86_64/set_sregs_test.c
+index 318be0bf77ab..44711ab735c3 100644
+--- a/tools/testing/selftests/kvm/x86_64/set_sregs_test.c
++++ b/tools/testing/selftests/kvm/x86_64/set_sregs_test.c
+@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
+ 	 * use it to verify all supported CR4 bits can be set prior to defining
+ 	 * the vCPU model, i.e. without doing KVM_SET_CPUID2.
+ 	 */
+-	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
++	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES);
+ 	vm_vcpu_add(vm, VCPU_ID);
+ 
+ 	vcpu_sregs_get(vm, VCPU_ID, &sregs);
+diff --git a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
+index d1dc1acf997c..b0c052443c44 100644
+--- a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
++++ b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
+@@ -54,7 +54,7 @@ static struct kvm_vm *sev_vm_create(bool es)
+ 	struct kvm_sev_launch_start start = { 0 };
+ 	int i;
+ 
+-	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
++	vm = vm_create(VM_MODE_DEFAULT, 0);
+ 	sev_ioctl(vm->fd, es ? KVM_SEV_ES_INIT : KVM_SEV_INIT, NULL);
+ 	for (i = 0; i < NR_MIGRATE_TEST_VCPUS; ++i)
+ 		vm_vcpu_add(vm, i);
+@@ -71,7 +71,7 @@ static struct kvm_vm *aux_vm_create(bool with_vcpus)
+ 	struct kvm_vm *vm;
+ 	int i;
+ 
+-	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
++	vm = vm_create(VM_MODE_DEFAULT, 0);
+ 	if (!with_vcpus)
+ 		return vm;
+ 
+@@ -174,7 +174,7 @@ static void test_sev_migrate_parameters(void)
+ 		*sev_es_vm_no_vmsa;
+ 	int ret;
+ 
+-	vm_no_vcpu = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
++	vm_no_vcpu = vm_create(VM_MODE_DEFAULT, 0);
+ 	vm_no_sev = aux_vm_create(true);
+ 	ret = __sev_migrate_from(vm_no_vcpu->fd, vm_no_sev->fd);
+ 	TEST_ASSERT(ret == -1 && errno == EINVAL,
+@@ -186,7 +186,7 @@ static void test_sev_migrate_parameters(void)
+ 
+ 	sev_vm = sev_vm_create(/* es= */ false);
+ 	sev_es_vm = sev_vm_create(/* es= */ true);
+-	sev_es_vm_no_vmsa = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
++	sev_es_vm_no_vmsa = vm_create(VM_MODE_DEFAULT, 0);
+ 	sev_ioctl(sev_es_vm_no_vmsa->fd, KVM_SEV_ES_INIT, NULL);
+ 	vm_vcpu_add(sev_es_vm_no_vmsa, 1);
+ 
+diff --git a/tools/testing/selftests/kvm/x86_64/smm_test.c b/tools/testing/selftests/kvm/x86_64/smm_test.c
+index b4e0c860769e..dd2c1522ab90 100644
+--- a/tools/testing/selftests/kvm/x86_64/smm_test.c
++++ b/tools/testing/selftests/kvm/x86_64/smm_test.c
+@@ -204,7 +204,7 @@ int main(int argc, char *argv[])
+ 
+ 		state = vcpu_save_state(vm, VCPU_ID);
+ 		kvm_vm_release(vm);
+-		kvm_vm_restart(vm, O_RDWR);
++		kvm_vm_restart(vm);
+ 		vm_vcpu_add(vm, VCPU_ID);
+ 		vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
+ 		vcpu_load_state(vm, VCPU_ID, state);
+diff --git a/tools/testing/selftests/kvm/x86_64/state_test.c b/tools/testing/selftests/kvm/x86_64/state_test.c
+index 2e0a92da8ff5..41f7faaef2ac 100644
+--- a/tools/testing/selftests/kvm/x86_64/state_test.c
++++ b/tools/testing/selftests/kvm/x86_64/state_test.c
+@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
+ 		kvm_vm_release(vm);
+ 
+ 		/* Restore state in a new VM.  */
+-		kvm_vm_restart(vm, O_RDWR);
++		kvm_vm_restart(vm);
+ 		vm_vcpu_add(vm, VCPU_ID);
+ 		vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
+ 		vcpu_load_state(vm, VCPU_ID, state);
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c b/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
+index ff92e25b6f1e..f5b4ae914131 100644
+--- a/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
++++ b/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
+@@ -239,7 +239,7 @@ int main(int argc, char *argv[])
+ 		kvm_vm_release(vm);
+ 
+ 		/* Restore state in a new VM.  */
+-		kvm_vm_restart(vm, O_RDWR);
++		kvm_vm_restart(vm);
+ 		vm_vcpu_add(vm, VCPU_ID);
+ 		vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
+ 		vcpu_load_state(vm, VCPU_ID, state);
 -- 
 2.36.0.464.gb9c8b46e94-goog
 
