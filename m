@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 27AE651B292
-	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 01:23:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D3C851B310
+	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 01:25:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381942AbiEDXFf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 May 2022 19:05:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58392 "EHLO
+        id S1381979AbiEDXFh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 May 2022 19:05:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376312AbiEDXBM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 May 2022 19:01:12 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FD3459BB3
-        for <kvm@vger.kernel.org>; Wed,  4 May 2022 15:53:42 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id q14-20020a17090a178e00b001dc970bf587so1945692pja.1
-        for <kvm@vger.kernel.org>; Wed, 04 May 2022 15:53:41 -0700 (PDT)
+        with ESMTP id S1380043AbiEDXCF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 May 2022 19:02:05 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C90B5A08C
+        for <kvm@vger.kernel.org>; Wed,  4 May 2022 15:53:43 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id v8-20020a170902b7c800b0015e927ee201so1368505plz.12
+        for <kvm@vger.kernel.org>; Wed, 04 May 2022 15:53:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=gLfv5SLMJcSQPQ/Ju5zaAkWd2HIOB4z3HRnHNL4SQDI=;
-        b=WHNG80cfO6Tcty1emt0cr2ZRfola+mwo3Xx7vEmfo/M08fDw7RKpCZo2ciCaodmNRB
-         l1KZtURFo+tUKrso6qkLkun3Y8U6L0WKSEGiniIYxYLRVgLw8TLtzp639C/oGejrt51a
-         XSeyGK9WJMhMcmIzhJuEqPCrF91myLXOcw8ON851YzKaers7haXqum41vyTzytm/p+/t
-         a1tEqd3oSpXOYqvVqQJlq4R1h8/pBxp8gSnslxC5rCzxbC//TZWvNb/3mVbmQQgCTBuq
-         szX1+7oz8V14TbyCDuy/IstASVOqPEduFPfUmh1yufwgK7PPvv973HqKefcdfbPhk/RZ
-         TD3w==
+        bh=hThR3eXvdbL6PIPwsArk6NS/Y6ItR8JxmYPs055HfNQ=;
+        b=HZvGef4wMTUUww0ii1QoiwMBQSBC/Pvw3CoC72aul1ExRfDQ2K5By8y4/GGBcgJaeN
+         owaaHAG/e7rStRrir9ExqsMKk4ynjLGKLmJaW5Z/6z+xjstjP5ZbhJ3Kb6wDVrH9QauE
+         DkJedMIVsKGVgA4gID4rx3C4DyKI6MUL7S3Bffz5GU/1jUw6uYENZeYMnZJcSD1FBHxo
+         uqhvPCUHKfzKn25stT7tccHRDWctknK2xDWQEGGvAoVl9rL2byoPoQ07LbFg5Ho4zHpN
+         PGa+qnQwevzHvvolT3qf93eqYFEuuCX9mYdLStjxrXePI+/05RKJk2pFbAaGb7yOggAB
+         V58A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=gLfv5SLMJcSQPQ/Ju5zaAkWd2HIOB4z3HRnHNL4SQDI=;
-        b=O7VkB38b0QSDUP0L/23AXeB6Mcvwo0AhbLD02g/GmvgQ2x2GXdwX9LSZAJvlAYypZW
-         GBzoctfxb0drdddD/oG54h2Ef76HQTzBuR/VKMIt1rl1VL5nOTaZJ0RRQP75ywTV2Doe
-         LZ60Lohw4HXRZ/gUr4FCcJA4s3qfkESJQeT0YIxRZy/OVde2IeVER7yeC7jBz+x8GApr
-         nIrfD8WvEe0NrLE96YEheKt9BavOXQGDv6inozsRUuN+V0vaX04LaaiPOiCvRvg1tvA7
-         5T2QyxEhn0jPKO37q2HWTOO7TDS2s+tfMQE1RwH0ROfm1Nbpp3rBdzMfKC70CfoEALO0
-         wQQQ==
-X-Gm-Message-State: AOAM532XOIdxrkt+FoHQTzsDmq8IbskHgHG8bvCUMV6vnWxz1sjf8m7L
-        /Amd5AG571JA1vUY8d0NDCvg117vRnU=
-X-Google-Smtp-Source: ABdhPJwiqUWSlwjB4cPjqFgJiVLVDwoP4qOmo5KEo17lpHxloA+ZHrsQaErPHoJ7IxDiZXmG2ApfCJEZDDA=
+        bh=hThR3eXvdbL6PIPwsArk6NS/Y6ItR8JxmYPs055HfNQ=;
+        b=hyM/HXhI/ceJstoGWLz2FnwIC67aMAYnptBxxY2B9QCNhiZBY1rn0IHMRZozVvoyIU
+         NexBZDmZbG20SQAyXdlsm+4iVt2ougWhy4WYmB8PgMjCZpZ6hUG7KUKR+O5w/FElWg7y
+         gdQvKaUPqEWwVpjyRhfch8Gf5o1PUPhThcPPfAqSur2+2o6UXk3ElDB5vYYl5Q94Jq+s
+         VxEPbhiMHI7btZGuBKlzC3ckTT+Xf0oqeaJsvP2TCfUToikeP9MWzZU3QAiJO9ctxgtx
+         MAlrOFEEzBHNcF3KubTqSqGwwMlqULY4tS7Spyo89AmlnhA9BtuA4nzFee2EkLoSSs/Z
+         VPew==
+X-Gm-Message-State: AOAM532GhJWQImDp5L8FKQvQXMSV14k7CelcPYzNBkYRB5/CvvvR0BmS
+        NAvyIJbOXQC5q8cyp4FvoM3KsqjNlcg=
+X-Google-Smtp-Source: ABdhPJwgHLHvRfb8WYuIp2kW1pjw/YQRzjjh1gfBOLY12cy5NstVGLntHtlD+eVhWnvP5CGghG3yOhajnck=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2408:b0:4f7:a8cb:9b63 with SMTP id
- z8-20020a056a00240800b004f7a8cb9b63mr23382390pfh.33.1651704789825; Wed, 04
- May 2022 15:53:09 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:d487:b0:15e:a0a4:69e3 with SMTP id
+ c7-20020a170902d48700b0015ea0a469e3mr18832343plg.155.1651704791544; Wed, 04
+ May 2022 15:53:11 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  4 May 2022 22:49:13 +0000
+Date:   Wed,  4 May 2022 22:49:14 +0000
 In-Reply-To: <20220504224914.1654036-1-seanjc@google.com>
-Message-Id: <20220504224914.1654036-128-seanjc@google.com>
+Message-Id: <20220504224914.1654036-129-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220504224914.1654036-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH 127/128] KVM: selftests: Trust that MAXPHYADDR > memslot0 in vmx_apic_access_test
+Subject: [PATCH 128/128] KVM: selftests: Drop DEFAULT_GUEST_PHY_PAGES, open
+ code the magic number
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -73,45 +74,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use vm->max_gfn to compute the highest gpa in vmx_apic_access_test, and
-blindly trust that the highest gfn/gpa will be well above the memory
-carved out for memslot0.  The existing check is beyond paranoid; KVM
-doesn't support CPUs with host.MAXPHYADDR < 32, and the selftests are all
-kinds of hosed if memslot0 overlaps the local xAPIC, which resides above
-"lower" (below 4gb) DRAM.
+Remove DEFAULT_GUEST_PHY_PAGES and open code the magic number (with a
+comment) in vm_nr_pages_required().  Exposing DEFAULT_GUEST_PHY_PAGES to
+tests was a symptom of the VM creation APIs not cleanly supporting tests
+that create runnable vCPUs, but can't do so immediately.  Now that tests
+don't have to manually compute the amount of memory needed for basic
+operation, make it harder for tests to do things that should be handled
+by the framework, i.e. force developers to improve the framework instead
+of hacking around flaws in individual tests.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../testing/selftests/kvm/x86_64/vmx_apic_access_test.c  | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ tools/testing/selftests/kvm/include/kvm_util_base.h | 1 -
+ tools/testing/selftests/kvm/lib/kvm_util.c          | 8 +++++++-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/vmx_apic_access_test.c b/tools/testing/selftests/kvm/x86_64/vmx_apic_access_test.c
-index ef7514376b1e..ccb05ef7234e 100644
---- a/tools/testing/selftests/kvm/x86_64/vmx_apic_access_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/vmx_apic_access_test.c
-@@ -72,8 +72,6 @@ static void l1_guest_code(struct vmx_pages *vmx_pages, unsigned long high_gpa)
- int main(int argc, char *argv[])
- {
- 	unsigned long apic_access_addr = ~0ul;
--	unsigned int paddr_width;
--	unsigned int vaddr_width;
- 	vm_vaddr_t vmx_pages_gva;
- 	unsigned long high_gpa;
- 	struct vmx_pages *vmx;
-@@ -86,12 +84,7 @@ int main(int argc, char *argv[])
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index 527f63a30668..d30f8e0612af 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -100,7 +100,6 @@ memslot2region(struct kvm_vm *vm, uint32_t memslot);
+ #define KVM_UTIL_MIN_VADDR		0x2000
+ #define KVM_GUEST_PAGE_TABLE_MIN_PADDR	0x180000
  
- 	vm = vm_create_with_one_vcpu(&vcpu, l1_guest_code);
+-#define DEFAULT_GUEST_PHY_PAGES		512
+ #define DEFAULT_GUEST_STACK_VADDR_MIN	0xab6000
+ #define DEFAULT_STACK_PGS		5
  
--	kvm_get_cpu_address_width(&paddr_width, &vaddr_width);
--	high_gpa = (1ul << paddr_width) - getpagesize();
--	if ((unsigned long)DEFAULT_GUEST_PHY_PAGES * getpagesize() > high_gpa) {
--		print_skip("No unbacked physical page available");
--		exit(KSFT_SKIP);
--	}
-+	high_gpa = (vm->max_gfn - 1) << vm->page_shift;
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index f4bd4d7559b9..a0c8333d1bf6 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -274,7 +274,13 @@ static uint64_t vm_nr_pages_required(uint32_t nr_runnable_vcpus,
+ 		    "nr_vcpus = %d too large for host, max-vcpus = %d",
+ 		    nr_runnable_vcpus, kvm_check_cap(KVM_CAP_MAX_VCPUS));
  
- 	vmx = vcpu_alloc_vmx(vm, &vmx_pages_gva);
- 	prepare_virtualize_apic_accesses(vmx, vm);
+-	nr_pages = DEFAULT_GUEST_PHY_PAGES;
++	/*
++	 * Arbitrarily allocate 512 pages (2mb when page size is 4kb) for the
++	 * test code and other per-VM assets that will be loaded into memslot0.
++	 */
++	nr_pages = 512;
++
++	/* Account for the per-vCPU stacks on behalf of the test. */
+ 	nr_pages += nr_runnable_vcpus * DEFAULT_STACK_PGS;
+ 
+ 	/*
 -- 
 2.36.0.464.gb9c8b46e94-goog
 
