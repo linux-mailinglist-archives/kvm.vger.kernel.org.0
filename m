@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 37AAD51B30D
-	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 01:25:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC18B51B259
+	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 00:51:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379637AbiEDW44 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 May 2022 18:56:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42464 "EHLO
+        id S1379565AbiEDWzE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 May 2022 18:55:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379448AbiEDWyG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 May 2022 18:54:06 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3218C5FA6
-        for <kvm@vger.kernel.org>; Wed,  4 May 2022 15:50:25 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id z16-20020a17090a015000b001dbc8da29a1so1315971pje.7
-        for <kvm@vger.kernel.org>; Wed, 04 May 2022 15:50:25 -0700 (PDT)
+        with ESMTP id S1379462AbiEDWyH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 May 2022 18:54:07 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 342581D0D8
+        for <kvm@vger.kernel.org>; Wed,  4 May 2022 15:50:27 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id f7-20020a6547c7000000b003c600995546so780948pgs.5
+        for <kvm@vger.kernel.org>; Wed, 04 May 2022 15:50:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=7yAH+5mQpivzXrDqX+vptjX+TeCwxFtk+nD3YIQO4p4=;
-        b=KVITuzeGhJ+UUEfBbPkSfGR5qfMLN+KscCoiz27xYGMTaDb5voK/y/F+uIDP/eoRsQ
-         TCi0G/3DApU9l2g35Mc7lgx6Z+bW4XRBRL09tzTe6csI9J+jX/LaRWYBchyXmgr2Idr9
-         Pk0MSHC7JnDaGJWUkmeiFJ8MgY4w2MeAyBacLwFmCFvyPPmHUB0n58EdXV0z+BQUSWjR
-         Wm1K64JteYWWMJHQuABbrUvEfYpJl2Uuj2EwL8m5L4OD+GtDeke49752ABAnPq4FIrIj
-         zqvAqz8Osbg6KExI9xcgn5Gn5M230eM0eYDa475HjRjCr9DoCNgYqJAipNS46dKeSCGd
-         tyCA==
+        bh=NtspSlUg4ML5uMJ7vjR/+OVkX26xwVVuotNivGjDjEw=;
+        b=i8p9S2Q1YB++zvCiyZcgldBtm/WJw9SzZVcpnlekEf4KNcXr57t+cI2f9o5y/+bouz
+         hD3fCxoTJpO5y9V2EzM/7R69ywUoevXk1abQq/HM9nkCdKIe4TVijfS0UNDXifnnpzzq
+         uSm2bEf1r2cKU34QG5U9TK6Kp2LkoTvd1PyHpZFJM0qshIwz/IfxjMUIgFSa2hdETFW3
+         oZdOHglDbZJckyotMHLZJW9AD6sTY1QZ+4kFZe9iuaYB8345EP8ET8P8dJvxYYt+yu+7
+         w6Yn10lgUwLSQwS+7zSLiigBIbryXfcgT+F5dt/hTPRABsc8OigVmItPBCOYYOWe2KMp
+         LlCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=7yAH+5mQpivzXrDqX+vptjX+TeCwxFtk+nD3YIQO4p4=;
-        b=IQrgnzJflrTMoPWJxS84GeiZw4uhFLdy58jxkPMxztW4y84ebnFA7iGvA4H+UViiRe
-         535hQ8hUpuCMRiBARJBjdtWwyvr9U0PIhkdFSwtK0Az/6suOLnNdMaIECAtKHJFJ5EbD
-         c3gsi3xjZhZgTjiZAdmQrj1tLq8rQ6ny36eZ3Lt+moGsPCx4ejchKxTyAo3JgwrbUHB4
-         lEDr/JRCDMcmJZmUUq3yfsKQ5/gjzYxfLukHX3plWJQ/PmIVkbIhSlxw/RH4UDF/k4cr
-         v0ZpBFnhbmIFgRCwdMyFckoUq2lHNh7GIT3OQOm2CR7CPMgC6w/8w17XQ4gBGHYtX5dN
-         YXsg==
-X-Gm-Message-State: AOAM530TKVtiTQTLCMXEzg+DAWLVx1IKi2FnDqfrp63GYmgVQqvZ03/M
-        RuLtMFZHZYxwe+vX4X72aBiIAB3rnxI=
-X-Google-Smtp-Source: ABdhPJxbBMWiw7LrwCKAOBZkuqtVq1rOjNrD9JMGQpEhqBmv14TyW0x3pj7ac/dKTvGaAsX90nhMUZiPYmM=
+        bh=NtspSlUg4ML5uMJ7vjR/+OVkX26xwVVuotNivGjDjEw=;
+        b=hubjMpDoby2em24z7xVkCsGWoLV0J1SEogWtSKudUwNkzAT6N/4hYkHcap7mv+tawZ
+         ZoLEHCf8WG9bwYtrk4FR1Fs0TFXD9ZDzkd+hOkDmXzPJa9JptYurbVZz8Mf3dMhJKG45
+         +X1mosMNUmxoXXaU7Ug0G5IaOqCzHq/k6m8DeE5kN+Bk4T5eis3TlRKSQFna2Fw/Nfka
+         3WsZ4NCYTGksBcKGYiHULr0Fbnwg/qrIYDYOSjreyJAvBC7HzVIyXxFNSSRRaK4xO/tm
+         U8RyHLR1zyX9ggU8tH76ZrvacxKWiI7t1aTTDF15J2u98apC4ntIJb/n/vtKKIBiMXej
+         TX2A==
+X-Gm-Message-State: AOAM5315nb4tuB7qB9ikRvPmV9UXsy6ACwo99WnQPivweOig5wHs+6GB
+        zMKJMsm4Uxh4quChmjyZTB9MP3KLTNM=
+X-Google-Smtp-Source: ABdhPJxP1o0Y315OZJ5ArQVikvoycdcvFzlcnlwt1FfAgnv3BEg3jUo17c3+V0ncJnPB8bB7WS9S+77NCuY=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:846:b0:50d:f02f:bb46 with SMTP id
- q6-20020a056a00084600b0050df02fbb46mr15595775pfk.74.1651704625067; Wed, 04
- May 2022 15:50:25 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:7d81:b0:14f:e18b:2b9e with SMTP id
+ a1-20020a1709027d8100b0014fe18b2b9emr23642359plm.160.1651704626657; Wed, 04
+ May 2022 15:50:26 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  4 May 2022 22:47:37 +0000
+Date:   Wed,  4 May 2022 22:47:38 +0000
 In-Reply-To: <20220504224914.1654036-1-seanjc@google.com>
-Message-Id: <20220504224914.1654036-32-seanjc@google.com>
+Message-Id: <20220504224914.1654036-33-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220504224914.1654036-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH 031/128] KVM: selftests: Use vm_create_without_vcpus() in set_boot_cpu_id
+Subject: [PATCH 032/128] KVM: selftests: Use vm_create_without_vcpus() in dirty_log_test
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -66,46 +66,38 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use vm_create_without_vcpus() in set_boot_cpu_id instead of open coding
-the equivlant now that the "without_vcpus" variant does
-vm_adjust_num_guest_pages().
+Use vm_create_without_vcpus() instead of open coding a rough equivalent.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ tools/testing/selftests/kvm/dirty_log_test.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c b/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
-index b4da92ddc1c6..4c5775a8de6a 100644
---- a/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
-+++ b/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
-@@ -82,18 +82,11 @@ static void run_vcpu(struct kvm_vm *vm, uint32_t vcpuid)
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index 5752486764c9..74dcac0c22c5 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -677,11 +677,8 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, uint32_t vcpuid,
  
- static struct kvm_vm *create_vm(void)
- {
--	struct kvm_vm *vm;
- 	uint64_t vcpu_pages = (DEFAULT_STACK_PGS) * 2;
- 	uint64_t extra_pg_pages = vcpu_pages / PTES_PER_MIN_PAGE * N_VCPU;
- 	uint64_t pages = DEFAULT_GUEST_PHY_PAGES + vcpu_pages + extra_pg_pages;
+ 	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
  
--	pages = vm_adjust_num_guest_pages(VM_MODE_DEFAULT, pages);
--	vm = vm_create(pages);
--
+-	vm = __vm_create(mode, DEFAULT_GUEST_PHY_PAGES + extra_pg_pages);
 -	kvm_vm_elf_load(vm, program_invocation_name);
+-#ifdef __x86_64__
 -	vm_create_irqchip(vm);
--
--	return vm;
-+	return vm_create_without_vcpus(VM_MODE_DEFAULT, pages);
- }
- 
- static void add_x86_vcpu(struct kvm_vm *vm, uint32_t vcpuid, bool bsp_code)
+-#endif
++	vm = vm_create_without_vcpus(mode, DEFAULT_GUEST_PHY_PAGES + extra_pg_pages);
++
+ 	log_mode_create_vm_done(vm);
+ 	vm_vcpu_add_default(vm, vcpuid, guest_code);
+ 	return vm;
 -- 
 2.36.0.464.gb9c8b46e94-goog
 
