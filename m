@@ -2,89 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C335C51AD93
-	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 21:12:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 072D451AD95
+	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 21:12:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353205AbiEDTPl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 May 2022 15:15:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41744 "EHLO
+        id S1350503AbiEDTQB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 May 2022 15:16:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235335AbiEDTPj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 May 2022 15:15:39 -0400
+        with ESMTP id S1377463AbiEDTP5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 May 2022 15:15:57 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6BC1C488A9
-        for <kvm@vger.kernel.org>; Wed,  4 May 2022 12:11:59 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6E769488AD
+        for <kvm@vger.kernel.org>; Wed,  4 May 2022 12:12:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651691518;
+        s=mimecast20190719; t=1651691539;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Hd3MPPhfZEFzLVMyRypDkVk2xJ4qChQYAeQatJK81b8=;
-        b=VkbF9ketZgSP1c2dOtXPa8f+GREB8T2B2LoG73rDI61mJoqyVPJ2AtxMxzjxQVUMcCk/gJ
-        g7dioa2UUMdRPKxFVvVu/onQ7tb9bgL5OD1rfT12DRNCameHfuPH1/Cc/BA+iLwU7kA0L3
-        NnG4Vw+ON/5Sk1zWgeZjtpVnDQDuSIc=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=xDmu2VEbBUhEHNkxRESm0tt/LHwM6H1VfZRPNRo+6nI=;
+        b=bZD153QLu4GW943f4e4QhkRpYbCOKEYeWOQk4Uz1XL6/Z70tdGYz/o+RLSW+jp//HNEhoN
+        GfPOIgJ8u5CrBHoXNduFKhixg9sy70OuJ3zjBYVWO+3xJtZo2hEpY+LoexJzabHfsTMQna
+        3WMdGRSDr7ixOpMI96TVYjxFu10yNxA=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-669-PptpaQxaNPOdCb9Z6fG7iw-1; Wed, 04 May 2022 15:11:57 -0400
-X-MC-Unique: PptpaQxaNPOdCb9Z6fG7iw-1
-Received: by mail-ed1-f70.google.com with SMTP id cz24-20020a0564021cb800b00425dfdd7768so1292451edb.2
-        for <kvm@vger.kernel.org>; Wed, 04 May 2022 12:11:56 -0700 (PDT)
+ us-mta-665-0Cus4y5SNj2HAI_ZJuTBPg-1; Wed, 04 May 2022 15:12:18 -0400
+X-MC-Unique: 0Cus4y5SNj2HAI_ZJuTBPg-1
+Received: by mail-ed1-f71.google.com with SMTP id e3-20020a50a683000000b00427afcc840aso1263539edc.13
+        for <kvm@vger.kernel.org>; Wed, 04 May 2022 12:12:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=Hd3MPPhfZEFzLVMyRypDkVk2xJ4qChQYAeQatJK81b8=;
-        b=StJjI5SMla3J5oBDz0DJGON3XjxNOGHXWEXRnXO6NITv+8EYeXHZaqMrUriK/5AFwv
-         /Kl57UFS3R6zVh8lToxqYu3BgslhzC1neuQKMytqv+akMkxGeZsRzTwta7a7o9b6DJ/a
-         BdPm4S7B6Ycr63BpR91ii3wzeWYDiqAS5Y9tRCQA+TmzaGVaJyseznj6PjlFgNq5dI0T
-         qWXQk54q0zPLtvBBrhUMNNsmKAmaG2lPQ0RIMlH4Oyol6NkLOByS/KdUYzbP3E/cZUEk
-         8jidLOl+P3Da7TxVTwIGGEGx8nAJufG3eFFBXt4adXxpFcRcxfnGYdPu/D3knrUolILw
-         GHlg==
-X-Gm-Message-State: AOAM532kS7gw3icYH31Z3UM3hq1mtP0LFn2nShQtXig/5HhytTSlAVZC
-        dX2wpbWzK1RlAkBINDJZhI8+q+mNsRfcs/R45T3c3crakqDSBbA7EIAc7vKxioX1K8+vxXm/ycA
-        TPjo1gMXO3ouo
-X-Received: by 2002:a17:907:728d:b0:6f4:5a83:a616 with SMTP id dt13-20020a170907728d00b006f45a83a616mr14064184ejc.297.1651691516005;
-        Wed, 04 May 2022 12:11:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyg0JsD7iu2Y23r3GnlIcchSoad40wOMbWKHRukO45v+eQMegv9BK4IGGRz74EZIhhUiWnzCg==
-X-Received: by 2002:a17:907:728d:b0:6f4:5a83:a616 with SMTP id dt13-20020a170907728d00b006f45a83a616mr14064160ejc.297.1651691515824;
-        Wed, 04 May 2022 12:11:55 -0700 (PDT)
+        bh=xDmu2VEbBUhEHNkxRESm0tt/LHwM6H1VfZRPNRo+6nI=;
+        b=2k0sgF3NrJ6j5rieHYG9NNaRyGG43xHyJNcpCE/gv4a6/Q59U9yjkeFkBpI4vUEM4X
+         ZNZWWjDD3L4yfdfGF9xqHIAJgti3GeUBoxkUyHkO4r+seejU6fUpNbMPLvLgz8yu0ToR
+         P3rt1F0Swp8fDvFWDV3QPtocsnnnqxkBj2Eu8JxzMcBKeTsoUMcQUb4C6ejN2kcwoLUw
+         jntcns/Cx+5ASpig4/f7FuiGat7pd0uXilVyrvl+Tyut9uSF2GBW4TzT4iOvpGvXF9Qr
+         bU34lQ+PGwQq0bmaQwYTvqdpYDkK9MFjon0QcELOh0mVDdZnWY3bzQcIDdXl8lsW8v9X
+         lB3Q==
+X-Gm-Message-State: AOAM533GOwDz18ynNdnWK795CcWpxibHzYh8mjifTasXhyEhNMLxcpCk
+        vFWKb1rEaVREf2szlxQHf+jA7hngXM0mnTEOUcGV2T0ixnUlC2eZayak2He5knfokEcChVntHD8
+        AX/dGO46Wb0qm
+X-Received: by 2002:a17:906:6a1c:b0:6f4:b0e0:2827 with SMTP id qw28-20020a1709066a1c00b006f4b0e02827mr5515159ejc.249.1651691537188;
+        Wed, 04 May 2022 12:12:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyhnpEzLDxtlrhT1+lHv71xBxdKhZqRRQvwTtgteUIXhiyiwklv5dzaLmhmBQf0Y/Mi81f3iw==
+X-Received: by 2002:a17:906:6a1c:b0:6f4:b0e0:2827 with SMTP id qw28-20020a1709066a1c00b006f4b0e02827mr5515143ejc.249.1651691536949;
+        Wed, 04 May 2022 12:12:16 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id qz24-20020a170907681800b006f4c82c2b12sm930211ejc.19.2022.05.04.12.11.54
+        by smtp.googlemail.com with ESMTPSA id ml11-20020a170906cc0b00b006f3ef214e59sm6065311ejb.191.2022.05.04.12.12.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 May 2022 12:11:55 -0700 (PDT)
-Message-ID: <0ba0b879-cc46-1f60-539a-5bb7e407c01f@redhat.com>
-Date:   Wed, 4 May 2022 21:11:52 +0200
+        Wed, 04 May 2022 12:12:16 -0700 (PDT)
+Message-ID: <e17f9866-dfd0-da08-6128-852f7346b8a1@redhat.com>
+Date:   Wed, 4 May 2022 21:12:14 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.8.0
-Subject: Re: [PATCH] KVM: x86/mmu: Do not create SPTEs for GFNs that exceed
- host.MAXPHYADDR
+Subject: Re: [PATCH] KVM: VMX: Fix build error on claim of
+ vmx_get_pid_table_order()
 Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>
-References: <Ymv5TR76RNvFBQhz@google.com>
- <e5864cb4-cce8-bd32-04b0-ecb60c058d0b@redhat.com>
- <YmwL87h6klEC4UKV@google.com>
- <ac2001e66957edc8a3af2413b78478c15898f86c.camel@redhat.com>
- <f3ffad3aa8476156f369ff1d4c33f3e127b47d0c.camel@redhat.com>
- <82d1a5364f1cc479da3762b046d22f136db167e3.camel@redhat.com>
- <af15fd31f73e8a956da50db6104e690f9d308dad.camel@redhat.com>
- <YnAMKtfAeoydHr3x@google.com>
- <e11c21e99e7c4ac758b4417e0ae66d3a2f1fe663.camel@redhat.com>
- <cbd4709bb499874c60986083489e17c93b48d003.camel@redhat.com>
- <YnGQyE60lHD7wusA@google.com>
- <42e9431ec2c716f1066fc282ebd97a7a24cbac72.camel@redhat.com>
+To:     Zeng Guang <guang.zeng@intel.com>, kvm@vger.kernel.org
+Cc:     Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>,
+        Chen Farrah <farrah.chen@intel.com>,
+        Wei Danmei <danmei.wei@intel.com>
+References: <20220504032102.15062-1-guang.zeng@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <42e9431ec2c716f1066fc282ebd97a7a24cbac72.camel@redhat.com>
+In-Reply-To: <20220504032102.15062-1-guang.zeng@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -97,14 +82,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/4/22 14:08, Maxim Levitsky wrote:
-> Nope, still reproduces.
+On 5/4/22 05:21, Zeng Guang wrote:
+> Change function claim to static.
+> Report warning: no previous prototype for 'vmx_get_pid_table_order'
+> [-Wmissing-prototypes].
 > 
-> I'll think on how to trace this, maybe that will give me some ideas.
-> Anything useful to dump from the mmu pages that are still not freed at that point?
+> Fixes: 101c99f6506d ("KVM: VMX: enable IPI virtualization")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+> ---
+> Paolo, could you please merge this fix into commit 101c99f6506d ("KVM:
+> VMX: enable IPI virtualization") in kvm/queue? Sorry for such mistake.
+> 
+>   arch/x86/kvm/vmx/vmx.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index bb09fc9a7e55..2065babb2c9c 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -4402,7 +4402,7 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
+>   	return exec_control;
+>   }
+>   
+> -int vmx_get_pid_table_order(struct kvm *kvm)
+> +static int vmx_get_pid_table_order(struct kvm *kvm)
+>   {
+>   	return get_order(kvm->arch.max_vcpu_ids * sizeof(*to_kvm_vmx(kvm)->pid_table));
+>   }
 
-Perhaps you can dump the gpa and TSC of the allocation, and also print 
-the TSC right before destroy_workqueue?
+Yup, done.
 
 Paolo
 
