@@ -2,78 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 974E451961D
-	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 05:39:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75677519736
+	for <lists+kvm@lfdr.de>; Wed,  4 May 2022 08:05:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239431AbiEDDn3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 May 2022 23:43:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45850 "EHLO
+        id S1344906AbiEDGIe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 May 2022 02:08:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236841AbiEDDnX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 May 2022 23:43:23 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C390428996
-        for <kvm@vger.kernel.org>; Tue,  3 May 2022 20:39:48 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id c125so308861iof.9
-        for <kvm@vger.kernel.org>; Tue, 03 May 2022 20:39:48 -0700 (PDT)
+        with ESMTP id S1344897AbiEDGI1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 May 2022 02:08:27 -0400
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFCBE2CCA1
+        for <kvm@vger.kernel.org>; Tue,  3 May 2022 23:04:01 -0700 (PDT)
+Received: by mail-il1-x133.google.com with SMTP id b5so301395ile.0
+        for <kvm@vger.kernel.org>; Tue, 03 May 2022 23:04:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=TKFkaOZkalvLFPXwyy85GYdezcn8X//pTVrKI0zHMyM=;
-        b=OKeMQH51cvKoQfQVe6saCkxUR73NoKar+XZu/9qav85QUB81nfSHCeoHN5ex2uOb//
-         kO1M3kU546nhzKG8drhWWWIUs2t14S730C1HbWkI98KwrAgY1/vgN9VpljYTWsTGpYMT
-         n40EgHXpIz0/SkKO51NFcsULQvGXL6ctkwg5DTTIAS2gYvCpejuSQQ4qph7SlokYXt9s
-         VUvf8WdkLPYjIyQeFT1pil2GnBWaBey1n1lhrl6pQgJvg7/UckiVZ1X7UNBDOqmR4njo
-         LBHY2e3LUD3qHU9CyE4PtJWxl3SB3/EAnWvg4FyKsiXUSQX++UDJY9f7JOtRyg/wBBgS
-         UVsA==
+        bh=XGV/yI/AH7Vq6Uc1ZUZIrrL18Dvg5tPD/cpS351hyzE=;
+        b=CjKN6xU0n0tYzujvDQXMqvW3nb/hGKs45BzPz6TPyYLsCLZIUngG1c1Ey7d0Wo1wsi
+         mvCfmDK6EN1wLVPnsAi0Ti26OWOqA5M91zmTRptAkK9Affrz1tyuaBwudacWpSiatA2X
+         N+OrWt35yK51LRzzSHCFvR0nEW3tlSDQ4y8dVYcHgxddJ9JP96ODCs9dLCZIsSJKD4HH
+         8Nj1mVLgJNre71TKdiDTmIwwzLuSJ576l9uJsCQRj8Nly8jddsI12Gep2+XRelQMWwKU
+         vmc3fUXGWAtJTZyxpMidi4CheYqbuCigwhoh5M9MlEJb+Kgmj+ooqcGHLxAmOsUTZVbg
+         3ykg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=TKFkaOZkalvLFPXwyy85GYdezcn8X//pTVrKI0zHMyM=;
-        b=SLnERfhrOdhJpD5qsFVwo5VVAY8w9qrrg7sEeQZRwpPmvl5azrEH7TkW8/hbmJ3TFq
-         F80NTvIlqdx8hmxtaNgIyEMsjjvycxCdBGzSLT1oELJ7KMpDcX1mIZhrxWe83w7+sdOj
-         XNiTnmYlR1+sZjrfgLzGeLjKemOvRIb6kdXDiFXKlAYP4rDifFganwTuiTqQF225sFMs
-         tpCVxfLbD2QSZQWQvk5EYXIDG6aZEp/SN5RvqTDOkLEpmjhZXeQ9DJsgSjjJUb5vrLWD
-         YHKAVEXyWfFvGBrok/TGjQE6GykG4Y38t/AvZRs/k5Q1IFSayHxUsw2TI1nl78y6AdYe
-         Oj6Q==
-X-Gm-Message-State: AOAM533Egk0yd5RCy/ZTR6HYLObHPXOD8fUD+Gd0aUOOb3cyQCaUWd87
-        7NbCS16ziTUEikfiG7xosWyHuQ==
-X-Google-Smtp-Source: ABdhPJwLTXJtAXiJwUCvEWggY3FV+wdRFZMRp+5BJmrk0AvQhZTFxdNQcILItIRCgxyMEkGbhuqhbA==
-X-Received: by 2002:a05:6602:2427:b0:657:b2ff:89c5 with SMTP id g7-20020a056602242700b00657b2ff89c5mr7163783iob.26.1651635587956;
-        Tue, 03 May 2022 20:39:47 -0700 (PDT)
+        bh=XGV/yI/AH7Vq6Uc1ZUZIrrL18Dvg5tPD/cpS351hyzE=;
+        b=PtnREx4wBKXYMV0b2ERAhdjKeGMXJy/LF+991uY66DYlxHxmcQo0EItds5YyZiem1y
+         pOurPsjC7TuyfRQbYLrgjd43ZfjIswvlIkqRu+NoIHIyXTYVQQ+BmLbN2tGsSRvHJKwB
+         YsHME4eSzB7LXiP+ei5VZfS7MOfw2SUSjOwwlccn5rQbghrdXUVr4FYdaRjdp4a9C7nj
+         sz9U4ETUuMf+9S9RI+niVdSUQaZEE6jcbORYKFJk/ksIpLDjdCi7gWSbcBYpunOLL4dq
+         +N04crHrlA0L5vxkPeXC1Awr6+S3sK8xFkOhGvltwa0ul9arRJNbYn9WMB+kExOFa5GQ
+         7pBQ==
+X-Gm-Message-State: AOAM532eCz4/eeNHd0ZaaUAZCQQVTazBfcr2erfVQyxXEZVQgGq7hJkA
+        12i085iNg1H54dAR+WBmG+Eypg==
+X-Google-Smtp-Source: ABdhPJybkO0VxMJI+H7Eka4Hn8SbRtzQKe9jcQSiZ5vFKE7B/fVOejbJ5BBtvUMDzEKu291q53LC7g==
+X-Received: by 2002:a92:dd86:0:b0:2bc:805c:23c7 with SMTP id g6-20020a92dd86000000b002bc805c23c7mr7513123iln.279.1651644241005;
+        Tue, 03 May 2022 23:04:01 -0700 (PDT)
 Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id x22-20020a029716000000b0032b3a781750sm4388413jai.20.2022.05.03.20.39.46
+        by smtp.gmail.com with ESMTPSA id m10-20020a6b7c0a000000b0065a47e16f4dsm3457342iok.31.2022.05.03.23.03.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 May 2022 20:39:47 -0700 (PDT)
-Date:   Wed, 4 May 2022 03:39:43 +0000
+        Tue, 03 May 2022 23:04:00 -0700 (PDT)
+Date:   Wed, 4 May 2022 06:03:56 +0000
 From:   Oliver Upton <oupton@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Raghavendra Rao Ananta <rananta@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+To:     Quentin Perret <qperret@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>, Ben Gardon <bgardon@google.com>,
+        Peter Shier <pshier@google.com>,
+        David Matlack <dmatlack@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v7 0/9] KVM: arm64: Add support for hypercall services
- selection
-Message-ID: <YnH1f2cXcpdKsA3q@google.com>
-References: <20220502233853.1233742-1-rananta@google.com>
- <878rri8r78.wl-maz@kernel.org>
- <CAJHc60xp=UQT_CX0zoiSjAmkS8JSe+NB5Gr+F5mmybjJAWkUtQ@mail.gmail.com>
- <878rriicez.wl-maz@kernel.org>
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [RFC PATCH 09/17] KVM: arm64: Tear down unlinked page tables in
+ parallel walk
+Message-ID: <YnIXTMDpucMxnpFg@google.com>
+References: <20220415215901.1737897-1-oupton@google.com>
+ <20220415215901.1737897-10-oupton@google.com>
+ <YmFactP0GnSp3vEv@google.com>
+ <YmGJGIrNVmdqYJj8@google.com>
+ <YmLRLf2GQSgA97Kr@google.com>
+ <YmMTC2f0DiAU5OtZ@google.com>
+ <YnE5dfaC3HpXli26@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <878rriicez.wl-maz@kernel.org>
+In-Reply-To: <YnE5dfaC3HpXli26@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -85,53 +81,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 03, 2022 at 09:33:40PM +0100, Marc Zyngier wrote:
-> On Tue, 03 May 2022 19:49:13 +0100,
-> Raghavendra Rao Ananta <rananta@google.com> wrote:
+On Tue, May 03, 2022 at 02:17:25PM +0000, Quentin Perret wrote:
+> On Friday 22 Apr 2022 at 20:41:47 (+0000), Oliver Upton wrote:
+> > On Fri, Apr 22, 2022 at 04:00:45PM +0000, Quentin Perret wrote:
+> > > On Thursday 21 Apr 2022 at 16:40:56 (+0000), Oliver Upton wrote:
+> > > > The other option would be to not touch the subtree at all until the rcu
+> > > > callback, as at that point software will not tweak the tables any more.
+> > > > No need for atomics/spinning and can just do a boring traversal.
+> > > 
+> > > Right that is sort of what I had in mind. Note that I'm still trying to
+> > > make my mind about the overall approach -- I can see how RCU protection
+> > > provides a rather elegant solution to this problem, but this makes the
+> > > whole thing inaccessible to e.g. pKVM where RCU is a non-starter.
 > > 
-> > Hi Marc,
+> > Heh, figuring out how to do this for pKVM seemed hard hence my lazy
+> > attempt :)
 > > 
-> > On Tue, May 3, 2022 at 10:24 AM Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > > On Tue, 03 May 2022 00:38:44 +0100,
-> > > Raghavendra Rao Ananta <rananta@google.com> wrote:
-> > > >
-> > > > Hello,
-> > > >
-> > > > Continuing the discussion from [1], the series tries to add support
-> > > > for the userspace to elect the hypercall services that it wishes
-> > > > to expose to the guest, rather than the guest discovering them
-> > > > unconditionally. The idea employed by the series was taken from
-> > > > [1] as suggested by Marc Z.
-> > >
-> > > As it took some time to get there, and that there was still a bunch of
-> > > things to address, I've taken the liberty to apply my own fixes to the
-> > > series.
-> > >
-> > > Please have a look at [1], and let me know if you're OK with the
-> > > result. If you are, I'll merge the series for 5.19.
-> > >
-> > > Thanks,
-> > >
-> > >         M.
-> > >
-> > Thank you for speeding up the process; appreciate it. However, the
-> > series's selftest patches have a dependency on Oliver's
-> > PSCI_SYSTEM_SUSPEND's selftest patches [1][2]. Can we pull them in
-> > too?
-
-Posted, BTW.
-
-http://lore.kernel.org/kvmarm/20220504032446.4133305-1-oupton@google.com
-
-> > 2. Patch-2/9, arm_hypercall.h, clear all the macros in this patch
-> > itself instead of doing it in increments (unless there's some reason
-> > that I'm missing)?
+> > > A
+> > > possible alternative that comes to mind would be to have all walkers
+> > > take references on the pages as they walk down, and release them on
+> > > their way back, but I'm still not sure how to make this race-safe. I'll
+> > > have a think ...
+> > 
+> > Does pKVM ever collapse tables into blocks? That is the only reason any
+> > of this mess ever gets roped in. If not I think it is possible to get
+> > away with a rwlock with unmap on the write side and everything else on
+> > the read side, right?
+> > 
+> > As far as regular KVM goes we get in this business when disabling dirty
+> > logging on a memslot. Guest faults will lazily collapse the tables back
+> > into blocks. An equally valid implementation would be just to unmap the
+> > whole memslot and have the guest build out the tables again, which could
+> > work with the aforementioned rwlock.
 > 
-> Ah, rebasing leftovers, now gone.
+> Apologies for the delay on this one, I was away for a while.
 > 
-> I've pushed an updated branch again, please have a look.
+> Yup, that all makes sense. FWIW the pKVM use-case I have in mind is
+> slightly different. Specifically, in the pKVM world the hypervisor
+> maintains a stage-2 for the host, that is all identity mapped. So we use
+> nice big block mappings as much as we can. But when a protected guest
+> starts, the hypervisor needs to break down the host stage-2 blocks to
+> unmap the 4K guest pages from the host (which is where the protection
+> comes from in pKVM). And when the guest is torn down, the host can
+> reclaim its pages, hence putting us in a position to coallesce its
+> stage-2 into nice big blocks again. Note that none of this coallescing
+> is currently implemented even in our pKVM prototype, so it's a bit
+> unfair to ask you to deal with this stuff now, but clearly it'd be cool
+> if there was a way we could make these things coexist and even ideally
+> share some code...
 
-Series looks good with your additions. For the pile:
+Oh, it certainly isn't unfair to make sure we've got good constructs
+landing for everyone to use :-)
 
-Reviewed-by: Oliver Upton <oupton@google.com>
+I'll need to chew on this a bit more to have a better answer. The reason
+I hesitate to do the giant unmap for non-pKVM is that I believe we'd be
+leaving some performance on the table for newer implementations of the
+architecture. Having said that, avoiding a tlbi vmalls12e1is on every
+collapsed table is highly desirable.
+
+FEAT_BBM=2 semantics in the MMU is also on the todo list. In this case
+we'd do a direct table->block transformation on the PTE and elide that
+nasty tlbi.
+
+Unless there's objections, I'll probably hobble this series along as-is
+for the time being. My hope is that other table walkers can join in on
+the parallel party later down the road.
+
+Thanks for getting back to me.
+
+--
+Best,
+Oliver
