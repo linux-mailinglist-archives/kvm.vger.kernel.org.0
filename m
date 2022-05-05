@@ -2,297 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 79E5D51BE98
-	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 13:55:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C393B51BEBE
+	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 14:02:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356327AbiEEL6h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 May 2022 07:58:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35368 "EHLO
+        id S1359369AbiEEMFx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 May 2022 08:05:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359013AbiEEL6b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 May 2022 07:58:31 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7875754BC3;
-        Thu,  5 May 2022 04:54:49 -0700 (PDT)
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 245Bbcie006057;
-        Thu, 5 May 2022 11:54:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=Hiw7G49DjTxgy3P8E2lnWkKmlXXuiYz/vuHKLR0cB/8=;
- b=JeGNIvqhjnzhObFItKn5mbJDsXysT3Cx1xu+CsjasFRkr058w3gfEcaKZurEAlAUMKYx
- c0taOPY1OwJ4bzF17KqAhe6PtRBaM+sL0B8qXIQ1aFI5YOuw7HgMsKq6A8Uxa7JknUGs
- L6hYX6FHOkiMWfEiIj1FDXHf+FjKEFwPov3cZQjoNF+E3ME1d+b80Qwhm+eFiNKy4zMF
- +xZ7i1CSQ7sDC3Lzxd3yE750AzMmu5tIjyUkztLilwsEpYibqeR207+W+2zD+X8AAp8c
- y0oSCO8cCz+syphYuFS37C2A+uvLlweIwBTFHKDxOy0fc8+GKOz/jKK3R6fjlW/N0HiM 5Q== 
+        with ESMTP id S1356598AbiEEMFv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 May 2022 08:05:51 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 081072AC7F;
+        Thu,  5 May 2022 05:02:11 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 245BMocf027199;
+        Thu, 5 May 2022 12:02:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=bGhF49dJcdnowlurpF2GARz1/RvjovKAcYVA6sREx8I=;
+ b=hLrXU31eC83oQ9DASyzXDZKzjsiQxJl+ExJNcw+bxpvZeYAxSIkrZr4aEi824cdCDOJp
+ 7emRvIEaSB3FqzrQVcyiQz/QYQeGpXULVZbV4a9HjifVTOPgRSFlO2mzil5kNRm36yX6
+ j7hGAeKxpRDdfsRwmjNVn9zzUieZKMK5ewhP3XLRX9PX7/7cqmgv9hcNtq7bE5EQBSHE
+ nzqt/CM/Zg4WzXZlFOwIgxsiTIn1D7Kr2yxjs+SecSFanH10wAW9EhtGx33WYrHTU9mN
+ 9Jst7ItAV+/pGjGB0WAZty4UwZwpiyFHxrrIJBd3eSAxyu2KUtvTYFzZwLO0TiW0XsYL Gw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fvbvntfre-1
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fvdngrq5r-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 May 2022 11:54:48 +0000
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 245BcRVI010345;
-        Thu, 5 May 2022 11:54:48 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fvbvntfr1-1
+        Thu, 05 May 2022 12:02:11 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 245Bk2lL028206;
+        Thu, 5 May 2022 12:02:10 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fvdngrq55-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 May 2022 11:54:48 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 245Bl5nj000689;
-        Thu, 5 May 2022 11:54:46 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma01fra.de.ibm.com with ESMTP id 3fuxwkrv6y-1
+        Thu, 05 May 2022 12:02:10 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 245BwL83009625;
+        Thu, 5 May 2022 12:02:08 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03fra.de.ibm.com with ESMTP id 3fscdk54rg-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 May 2022 11:54:46 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 245BsgZg40108384
+        Thu, 05 May 2022 12:02:08 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 245Bmh4V38994268
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 5 May 2022 11:54:42 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A3DA05204F;
-        Thu,  5 May 2022 11:54:42 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.15.58])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 4BDC35204E;
-        Thu,  5 May 2022 11:54:42 +0000 (GMT)
-Date:   Thu, 5 May 2022 13:54:39 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, thuth@redhat.com
+        Thu, 5 May 2022 11:48:43 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 678094203F;
+        Thu,  5 May 2022 12:02:05 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1D1CE42045;
+        Thu,  5 May 2022 12:02:05 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.61.5])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  5 May 2022 12:02:05 +0000 (GMT)
+Message-ID: <2a27308d38150336ad906cfee2adc7481442f1b0.camel@linux.ibm.com>
 Subject: Re: [kvm-unit-tests PATCH v1] s390x: migration: don't run tests
  when facilities are not there
-Message-ID: <20220505135439.33abf440@p-imbrenda>
-In-Reply-To: <20220505102705.3621584-1-nrb@linux.ibm.com>
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, thuth@redhat.com
+Date:   Thu, 05 May 2022 14:02:04 +0200
+In-Reply-To: <20220505135439.33abf440@p-imbrenda>
 References: <20220505102705.3621584-1-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+         <20220505135439.33abf440@p-imbrenda>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ltLPSp4OuErNGftdFbDyT-Jk4CouQLOC
-X-Proofpoint-ORIG-GUID: EJDi01y2OHfSo9j9ATMblGwOMqw_TkMo
+X-Proofpoint-GUID: Vktj-wOEmSuR9beREjmRW8bJbUetGN1O
+X-Proofpoint-ORIG-GUID: rxEmMe1UYK2YVDNjpv8cXpWK9-mZaM51
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-05-05_04,2022-05-05_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 phishscore=0 malwarescore=0 clxscore=1015 priorityscore=1501
- suspectscore=0 spamscore=0 mlxscore=0 mlxlogscore=999 adultscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 adultscore=0 mlxscore=0 suspectscore=0 lowpriorityscore=0
+ phishscore=0 impostorscore=0 clxscore=1015 bulkscore=0 spamscore=0
+ mlxlogscore=843 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2202240000 definitions=main-2205050083
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  5 May 2022 12:27:05 +0200
-Nico Boehr <nrb@linux.ibm.com> wrote:
+On Thu, 2022-05-05 at 13:54 +0200, Claudio Imbrenda wrote:
+> I think this patch should actually be folded in the previous one,
+> I'll
+> do that unless there are objections
 
-> In the new migration tests, there was no check whether guarded-storage and
-> vector facilities are there. This may lead to crashes, especially under TCG
-> where guarded-storage is not supported.
-> 
-> Add checks for the respective facilities. Since it is possible neither
-> guarded-storage nor vector are there, add an additional report_pass() such that
-> least one PASS is reported.
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-
-Ooops, we missed this when reviewing the other patch
-
-
-I think this patch should actually be folded in the previous one, I'll
-do that unless there are objections
-
-> ---
->  s390x/migration.c | 154 +++++++++++++++++++++++++++-------------------
->  1 file changed, 90 insertions(+), 64 deletions(-)
-> 
-> diff --git a/s390x/migration.c b/s390x/migration.c
-> index 2f31fc53bf68..a45296374cd8 100644
-> --- a/s390x/migration.c
-> +++ b/s390x/migration.c
-> @@ -11,6 +11,7 @@
->  #include <asm/arch_def.h>
->  #include <asm/vector.h>
->  #include <asm/barrier.h>
-> +#include <asm/facility.h>
->  #include <gs.h>
->  #include <bitops.h>
->  #include <smp.h>
-> @@ -50,6 +51,16 @@ static void check_gs_regs(void)
->  	report_prefix_pop();
->  }
->  
-> +static bool have_vector_facility(void)
-> +{
-> +	return test_facility(129);
-> +}
-> +
-> +static bool have_guarded_storage_facility(void)
-> +{
-> +	return test_facility(133);
-> +}
-> +
->  static void test_func(void)
->  {
->  	uint8_t expected_vec_contents[VEC_REGISTER_NUM][VEC_REGISTER_SIZE];
-> @@ -58,74 +69,89 @@ static void test_func(void)
->  	int i;
->  	int vec_result = 0;
->  
-> -	for (i = 0; i < VEC_REGISTER_NUM; i++) {
-> -		vec_reg = &expected_vec_contents[i][0];
-> -		/* i+1 to avoid zero content */
-> -		memset(vec_reg, i + 1, VEC_REGISTER_SIZE);
-> +	if (have_guarded_storage_facility()) {
-> +		ctl_set_bit(2, CTL2_GUARDED_STORAGE);
-> +
-> +		write_gs_regs();
->  	}
->  
-> -	ctl_set_bit(0, CTL0_VECTOR);
-> -	ctl_set_bit(2, CTL2_GUARDED_STORAGE);
-> -
-> -	write_gs_regs();
-> -
-> -	/*
-> -	 * It is important loading the vector/floating point registers and
-> -	 * comparing their contents occurs in the same inline assembly block.
-> -	 * Otherwise, the compiler is allowed to re-use the registers for
-> -	 * something else in between.
-> -	 * For this very reason, this also runs on a second CPU, so all the
-> -	 * complex console stuff can be done in C on the first CPU and here we
-> -	 * just need to wait for it to set the flag.
-> -	 */
-> -	asm inline(
-> -		"	.machine z13\n"
-> -		/* load vector registers: vlm handles at most 16 registers at a time */
-> -		"	vlm 0,15, 0(%[expected_vec_reg])\n"
-> -		"	vlm 16,31, 256(%[expected_vec_reg])\n"
-> -		/* inform CPU0 we are done, it will request migration */
-> -		"	mvhi %[flag_thread_complete], 1\n"
-> -		/* wait for migration to finish */
-> -		"0:	clfhsi %[flag_migration_complete], 1\n"
-> -		"	jnz 0b\n"
-> -		/*
-> -		 * store vector register contents in actual_vec_reg: vstm
-> -		 * handles at most 16 registers at a time
-> -		 */
-> -		"	vstm 0,15, 0(%[actual_vec_reg])\n"
-> -		"	vstm 16,31, 256(%[actual_vec_reg])\n"
-> +	if (have_vector_facility()) {
-> +		for (i = 0; i < VEC_REGISTER_NUM; i++) {
-> +			vec_reg = &expected_vec_contents[i][0];
-> +			/* i+1 to avoid zero content */
-> +			memset(vec_reg, i + 1, VEC_REGISTER_SIZE);
-> +		}
-> +
-> +		ctl_set_bit(0, CTL0_VECTOR);
-> +
->  		/*
-> -		 * compare the contents in expected_vec_reg with actual_vec_reg:
-> -		 * clc handles at most 256 bytes at a time
-> +		 * It is important loading the vector/floating point registers and
-> +		 * comparing their contents occurs in the same inline assembly block.
-> +		 * Otherwise, the compiler is allowed to re-use the registers for
-> +		 * something else in between.
-> +		 * For this very reason, this also runs on a second CPU, so all the
-> +		 * complex console stuff can be done in C on the first CPU and here we
-> +		 * just need to wait for it to set the flag.
->  		 */
-> -		"	clc 0(256, %[expected_vec_reg]), 0(%[actual_vec_reg])\n"
-> -		"	jnz 1f\n"
-> -		"	clc 256(256, %[expected_vec_reg]), 256(%[actual_vec_reg])\n"
-> -		"	jnz 1f\n"
-> -		/* success */
-> -		"	mvhi %[vec_result], 1\n"
-> -		"1:"
-> -		:
-> -		: [expected_vec_reg] "a"(expected_vec_contents),
-> -		  [actual_vec_reg] "a"(actual_vec_contents),
-> -		  [flag_thread_complete] "Q"(flag_thread_complete),
-> -		  [flag_migration_complete] "Q"(flag_migration_complete),
-> -		  [vec_result] "Q"(vec_result)
-> -		: "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9",
-> -		  "v10", "v11", "v12", "v13", "v14", "v15", "v16", "v17", "v18",
-> -		  "v19", "v20", "v21", "v22", "v23", "v24", "v25", "v26", "v27",
-> -		  "v28", "v29", "v30", "v31", "cc", "memory"
-> -	);
-> -
-> -	report(vec_result, "vector contents match");
-> -
-> -	check_gs_regs();
-> -
-> -	report(stctg(0) & BIT(CTL0_VECTOR), "ctl0 vector bit set");
-> -	report(stctg(2) & BIT(CTL2_GUARDED_STORAGE), "ctl2 guarded-storage bit set");
-> -
-> -	ctl_clear_bit(0, CTL0_VECTOR);
-> -	ctl_clear_bit(2, CTL2_GUARDED_STORAGE);
-> +		asm inline(
-> +			"	.machine z13\n"
-> +			/* load vector registers: vlm handles at most 16 registers at a time */
-> +			"	vlm 0,15, 0(%[expected_vec_reg])\n"
-> +			"	vlm 16,31, 256(%[expected_vec_reg])\n"
-> +			/* inform CPU0 we are done, it will request migration */
-> +			"	mvhi %[flag_thread_complete], 1\n"
-> +			/* wait for migration to finish */
-> +			"0:	clfhsi %[flag_migration_complete], 1\n"
-> +			"	jnz 0b\n"
-> +			/*
-> +			 * store vector register contents in actual_vec_reg: vstm
-> +			 * handles at most 16 registers at a time
-> +			 */
-> +			"	vstm 0,15, 0(%[actual_vec_reg])\n"
-> +			"	vstm 16,31, 256(%[actual_vec_reg])\n"
-> +			/*
-> +			 * compare the contents in expected_vec_reg with actual_vec_reg:
-> +			 * clc handles at most 256 bytes at a time
-> +			 */
-> +			"	clc 0(256, %[expected_vec_reg]), 0(%[actual_vec_reg])\n"
-> +			"	jnz 1f\n"
-> +			"	clc 256(256, %[expected_vec_reg]), 256(%[actual_vec_reg])\n"
-> +			"	jnz 1f\n"
-> +			/* success */
-> +			"	mvhi %[vec_result], 1\n"
-> +			"1:"
-> +			:
-> +			: [expected_vec_reg] "a"(expected_vec_contents),
-> +			  [actual_vec_reg] "a"(actual_vec_contents),
-> +			  [flag_thread_complete] "Q"(flag_thread_complete),
-> +			  [flag_migration_complete] "Q"(flag_migration_complete),
-> +			  [vec_result] "Q"(vec_result)
-> +			: "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9",
-> +			  "v10", "v11", "v12", "v13", "v14", "v15", "v16", "v17", "v18",
-> +			  "v19", "v20", "v21", "v22", "v23", "v24", "v25", "v26", "v27",
-> +			  "v28", "v29", "v30", "v31", "cc", "memory"
-> +		);
-> +
-> +		report(vec_result, "vector contents match");
-> +
-> +		report(stctg(0) & BIT(CTL0_VECTOR), "ctl0 vector bit set");
-> +
-> +		ctl_clear_bit(0, CTL0_VECTOR);
-> +	} else {
-> +		flag_thread_complete = 1;
-> +		while(!flag_migration_complete)
-> +			mb();
-> +	}
-> +
-> +	report_pass("Migrated");
-> +
-> +	if (have_guarded_storage_facility()) {
-> +		check_gs_regs();
-> +
-> +		report(stctg(2) & BIT(CTL2_GUARDED_STORAGE), "ctl2 guarded-storage bit set");
-> +
-> +		ctl_clear_bit(2, CTL2_GUARDED_STORAGE);
-> +	}
->  
->  	flag_thread_complete = 1;
->  }
-
+Thanks. Fine for me.
