@@ -2,172 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 968F351CBEC
-	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 00:10:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97C0151CBF6
+	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 00:14:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1386206AbiEEWOS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 May 2022 18:14:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33844 "EHLO
+        id S1386238AbiEEWSW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 May 2022 18:18:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1386210AbiEEWOP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 May 2022 18:14:15 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 676085E144
-        for <kvm@vger.kernel.org>; Thu,  5 May 2022 15:10:32 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id s14so5658090plk.8
-        for <kvm@vger.kernel.org>; Thu, 05 May 2022 15:10:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=4yANqmx2Ha2H5KKnZT4vayRpvNWYePsYuao7lny+AJM=;
-        b=WbQtNTmD+Ll3JRwpNhBd4c/qZ7ZhI3rJDChU04IDGWARrptUSht8lO2pyXKueUKszR
-         zxvkcbj4UNrrDCndk2TZ02kD+oFXEXd+YMm58AuZR/yxlohmpGUhM+5UKtK2plTMf4JP
-         2ud5uPhWODIRQy52Jy606FlgPkZii5ykeoLbqhaIQhU7zzlfVD9xFz19uBldHEUWxpPJ
-         Jr/VL/9fvFPsuu15nPzSXepo62Xn5V1fBuW2gof7fs1K332ekNk6WtgjH6NgWGkweqrS
-         HXl6ELl8SE6ge/fgDMMwYR1lwCldudc4HKLmkJtBeEDLEtgkViKqaNWxT/SZqtIa5TZS
-         aoww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=4yANqmx2Ha2H5KKnZT4vayRpvNWYePsYuao7lny+AJM=;
-        b=gq5caEYTwgk6/8WquAiK1GtxRHFbuJSF43NiXekJuAmjaWYxQuNr+Eq/vducDrRN0x
-         azxEX5gxgzh4uCuw2twOQOXkm0dPrDNfyUT9+al3AaCixeGtDmBmmDWd816lF0NptVMD
-         asl0ntdg9vphr8Vb5ixSODg+LI6qRz3M+Y7w5TbhvTjOLXQGWJeW5UrhN5HTa3czLLXy
-         IcJTk/46XLSWHzqISgWANs7AmjusfeIBN1AHipylXvcYMibpgFdgbtUwdbPTnDQU0NTm
-         66u77vUoUS8NRL5kBY2UmL8V/amm7EgRPKPXowGduE3DNvPuPqv3YST8Q/+FrUfDPqOT
-         dC0Q==
-X-Gm-Message-State: AOAM532bkq6QVdTV0NIKveojGdqxDN55sudw1FFH0oZ8K9pTgVs2wlEC
-        1HFqtOB36UzuFMHSRI7E2xYidg==
-X-Google-Smtp-Source: ABdhPJzheC8ozkQRQlg0u//bWzdNAJ7gKjw8V68pwITeoxj4Y3vaCAJqiTmLvoMgLTNgmx9kjJjymw==
-X-Received: by 2002:a17:90b:4c8a:b0:1dc:6ff1:e2e1 with SMTP id my10-20020a17090b4c8a00b001dc6ff1e2e1mr436607pjb.217.1651788632009;
-        Thu, 05 May 2022 15:10:32 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b12-20020a170902d50c00b0015e8d4eb21csm124933plg.102.2022.05.05.15.10.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 May 2022 15:10:31 -0700 (PDT)
-Date:   Thu, 5 May 2022 22:10:28 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        maciej.szmigiero@oracle.com,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
-Subject: Re: [PATCH v4 05/20] KVM: x86/mmu: Consolidate shadow page
- allocation and initialization
-Message-ID: <YnRLVB+t0bLBeu+/@google.com>
-References: <20220422210546.458943-1-dmatlack@google.com>
- <20220422210546.458943-6-dmatlack@google.com>
+        with ESMTP id S245603AbiEEWSU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 May 2022 18:18:20 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C3375EBCF;
+        Thu,  5 May 2022 15:14:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651788880; x=1683324880;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=mFfvP3xGWl8RnhECAgTN2Aa8cOCpiLLNtbGrinxJPVY=;
+  b=R9B52ncIlF/TlMJA6vMBuTnhlHWIvDVZsKyBVMYRbPqFI+H4G5mi/KJn
+   6YQWL/Q83rGzgzKXABqY+Rej3sMzk+gFKxfcABJlljX0qCP/4ZvyNVYGj
+   RcRyvg5/nOhGJkydZ6kwhXQ9zpIFr2abDUDitjoEHie3wSbgxC1iaevOk
+   oTucF8a8yBa7Fwm0XZWhlMufF3DNUy13vJtjv0/3nuBBlkgXU7LdBhC3R
+   g1gLeBWjCUMmEObj6WioSQ4ORFX4GvK9SvVikzdsj0bAYt9RoXWzhe0PF
+   V5jIE3oyk89ksx3CbbjLCY0vaB43s+JHR1HRulIuOqsj4A8vXva7090MG
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10338"; a="248175097"
+X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
+   d="scan'208";a="248175097"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2022 15:14:39 -0700
+X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
+   d="scan'208";a="694876695"
+Received: from anthienn-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.4.139])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2022 15:14:34 -0700
+Message-ID: <cbb2ea1343079aee546fb44cd59c82f66c875d76.camel@intel.com>
+Subject: Re: [PATCH v3 00/21] TDX host kernel support
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Mike Rapoport <rppt@kernel.org>
+Date:   Fri, 06 May 2022 10:14:28 +1200
+In-Reply-To: <CAPcyv4iP3hcNNDxNdPT+iB0E4aUazfqFWwaa_dtHpVf+qKPNcQ@mail.gmail.com>
+References: <cover.1649219184.git.kai.huang@intel.com>
+         <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
+         <ecf718abf864bbb2366209f00d4315ada090aedc.camel@intel.com>
+         <de24ac7e-349c-e49a-70bb-31b9bc867b10@intel.com>
+         <9b388f54f13b34fe684ef77603fc878952e48f87.camel@intel.com>
+         <d98ca73b-2d2d-757d-e937-acc83cfedfb0@intel.com>
+         <c90a10763969077826f42be6f492e3a3e062326b.camel@intel.com>
+         <fc1ca04d94ad45e79c0297719d5ef50a7c33c352.camel@intel.com>
+         <664f8adeb56ba61774f3c845041f016c54e0f96e.camel@intel.com>
+         <1b681365-ef98-ec78-96dc-04e28316cf0e@intel.com>
+         <8bf596b45f68363134f431bcc550e16a9a231b80.camel@intel.com>
+         <6bb89ca6e7346f4334f06ea293f29fd12df70fe4.camel@intel.com>
+         <CAPcyv4iP3hcNNDxNdPT+iB0E4aUazfqFWwaa_dtHpVf+qKPNcQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220422210546.458943-6-dmatlack@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 22, 2022, David Matlack wrote:
-> Consolidate kvm_mmu_alloc_page() and kvm_mmu_alloc_shadow_page() under
-> the latter so that all shadow page allocation and initialization happens
-> in one place.
+Thanks for feedback!
+
+On Thu, 2022-05-05 at 06:51 -0700, Dan Williams wrote:
+> [ add Mike ]
 > 
-> No functional change intended.
 > 
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 39 +++++++++++++++++----------------------
->  1 file changed, 17 insertions(+), 22 deletions(-)
+> On Thu, May 5, 2022 at 2:54 AM Kai Huang <kai.huang@intel.com> wrote:
+> [..]
+> > 
+> > Hi Dave,
+> > 
+> > Sorry to ping (trying to close this).
+> > 
+> > Given we don't need to consider kmem-hot-add legacy PMEM after TDX module
+> > initialization, I think for now it's totally fine to exclude legacy PMEMs from
+> > TDMRs.  The worst case is when someone tries to use them as TD guest backend
+> > directly, the TD will fail to create.  IMO it's acceptable, as it is supposedly
+> > that no one should just use some random backend to run TD.
 > 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 5582badf4947..7d03320f6e08 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -1703,27 +1703,6 @@ static void drop_parent_pte(struct kvm_mmu_page *sp,
->  	mmu_spte_clear_no_track(parent_pte);
->  }
->  
-> -static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, bool direct)
-> -{
-> -	struct kvm_mmu_page *sp;
-> -
-> -	sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
-> -	sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
-> -	if (!direct)
-> -		sp->gfns = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
-> -	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
-> -
-> -	/*
-> -	 * active_mmu_pages must be a FIFO list, as kvm_zap_obsolete_pages()
-> -	 * depends on valid pages being added to the head of the list.  See
-> -	 * comments in kvm_zap_obsolete_pages().
-> -	 */
-> -	sp->mmu_valid_gen = vcpu->kvm->arch.mmu_valid_gen;
-> -	list_add(&sp->link, &vcpu->kvm->arch.active_mmu_pages);
-> -	kvm_mod_used_mmu_pages(vcpu->kvm, +1);
-> -	return sp;
-> -}
-> -
->  static void mark_unsync(u64 *spte);
->  static void kvm_mmu_mark_parents_unsync(struct kvm_mmu_page *sp)
->  {
-> @@ -2100,7 +2079,23 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm_vcpu *vcpu,
->  						      struct hlist_head *sp_list,
->  						      union kvm_mmu_page_role role)
->  {
-> -	struct kvm_mmu_page *sp = kvm_mmu_alloc_page(vcpu, role.direct);
-> +	struct kvm_mmu_page *sp;
-> +
-> +	sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
-> +	sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
-> +	if (!role.direct)
-> +		sp->gfns = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
-> +
-> +	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
-> +
-> +	/*
-> +	 * active_mmu_pages must be a FIFO list, as kvm_zap_obsolete_pages()
-> +	 * depends on valid pages being added to the head of the list.  See
-> +	 * comments in kvm_zap_obsolete_pages().
-> +	 */
-> +	sp->mmu_valid_gen = vcpu->kvm->arch.mmu_valid_gen;
-> +	list_add(&sp->link, &vcpu->kvm->arch.active_mmu_pages);
-> +	kvm_mod_used_mmu_pages(vcpu->kvm, +1);
-
-To reduce churn later on, what about opportunistically grabbing vcpu->kvm in a
-local variable in this patch?
-
-Actually, at that point, it's a super trivial change, so you can probably just drop 
-
-	KVM: x86/mmu: Replace vcpu with kvm in kvm_mmu_alloc_shadow_page()
-
-and do the vcpu/kvm swap as part of
-
-	KVM: x86/mmu: Pass memory caches to allocate SPs separately
-
->  	sp->gfn = gfn;
->  	sp->role = role;
-> -- 
-> 2.36.0.rc2.479.g8af0fa9b8e-goog
+> The platform will already do this, right? 
 > 
+
+In the current v3 implementation, we don't have any code to handle memory
+hotplug, therefore nothing prevents people from adding legacy PMEMs as system
+RAM using kmem driver.  In order to guarantee all pages managed by page
+allocator are all TDX memory, the v3 implementation needs to always include
+legacy PMEMs as TDX memory so that even people truly add  legacy PMEMs as system
+RAM, we can still guarantee all pages in page allocator are TDX memory.
+
+Of course, a side benefit of always including legacy PMEMs is people
+theoretically can use them directly as TD guest backend, but this is just a
+bonus but not something that we need to guarantee.
+
+
+> I don't understand why this
+> is trying to take proactive action versus documenting the error
+> conditions and steps someone needs to take to avoid unconvertible
+> memory. There is already the CONFIG_HMEM_REPORTING that describes
+> relative performance properties between initiators and targets, it
+> seems fitting to also add security properties between initiators and
+> targets so someone can enumerate the numa-mempolicy that avoids
+> unconvertible memory.
+
+I don't think there's anything related to performance properties here.  The only
+goal here is to make sure all pages in page allocator are TDX memory pages.
+
+> 
+> No, special casing in hotplug code paths needed.
+> 
+> > 
+> > I think w/o needing to include legacy PMEM, it's better to get all TDX memory
+> > blocks based on memblock, but not e820.  The pages managed by page allocator are
+> > from memblock anyway (w/o those from memory hotplug).
+> > 
+> > And I also think it makes more sense to introduce 'tdx_memblock' and
+> > 'tdx_memory' data structures to gather all TDX memory blocks during boot when
+> > memblock is still alive.  When TDX module is initialized during runtime, TDMRs
+> > can be created based on the 'struct tdx_memory' which contains all TDX memory
+> > blocks we gathered based on memblock during boot.  This is also more flexible to
+> > support other TDX memory from other sources such as CLX memory in the future.
+> > 
+> > Please let me know if you have any objection?  Thanks!
+> 
+> It's already the case that x86 maintains sideband structures to
+> preserve memory after exiting the early memblock code. 
+> 
+
+May I ask what data structures are you referring to?
+
+Btw, the purpose of 'tdx_memblock' and 'tdx_memory' is not only just to preserve
+memblock info during boot.  It is also used to provide a common data structure
+that the "constructing TDMRs" code can work on.  If you look at patch 11-14, the
+logic (create TDMRs, allocate PAMTs, sets up reserved areas) around how to
+construct TDMRs doesn't have hard dependency on e820.  If we construct TDMRs
+based on a common 'tdx_memory' like below:
+
+	int construct_tdmrs(struct tdx_memory *tmem, ...);
+
+It would be much easier to support other TDX memory resources in the future.
+
+The thing I am not sure is Dave wants to keep the code minimal (as this series
+is already very big in terms of LoC) to make TDX running, and for now in
+practice there's only system RAM during boot is TDX capable, so I am not sure we
+should introduce those structures now.
+
+> Mike, correct
+> me if I am wrong, but adding more is less desirable than just keeping
+> the memblock around?
