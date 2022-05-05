@@ -2,63 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D52AB51C3F6
-	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 17:29:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89C6251C529
+	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 18:31:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381364AbiEEPcO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 May 2022 11:32:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56506 "EHLO
+        id S1382011AbiEEQel (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 May 2022 12:34:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381377AbiEEPcL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 May 2022 11:32:11 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1469A5C373
-        for <kvm@vger.kernel.org>; Thu,  5 May 2022 08:28:31 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id p6so4187810plr.12
-        for <kvm@vger.kernel.org>; Thu, 05 May 2022 08:28:31 -0700 (PDT)
+        with ESMTP id S244089AbiEEQek (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 May 2022 12:34:40 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C36F5419E
+        for <kvm@vger.kernel.org>; Thu,  5 May 2022 09:31:00 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id r9so4651047pjo.5
+        for <kvm@vger.kernel.org>; Thu, 05 May 2022 09:31:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=+KT4WFZLK+9bXvVvtvjzAWWyt9RTKX24CKgwZm5SlTA=;
-        b=OHKlp2KKRZGth2i4kv1eb9rroBYLx9Gf5s4NvkKCVcRu38TJalQPwZm2UPo6gJtN+/
-         DwuGi5+LxS5iDAypuHk84HSDX9LUmpdvL+ePJoxKGGbj2PP1mI13cDb20pNRwAHrxpWE
-         wcdRzc9/iJdKYDcX9fFxJlFLPj5TwROqAC4vLnoRrJ6HVI3l7novomHykGIFccXQUsL0
-         1nsE0JMQQATXaoka4CYGrRJaaffJsL0OUPPisaPypIgX+Qx6UmvQG+o9qjcYa8bkdDPy
-         3FNaO0sQQJfDZHgOPMhm6sXPsiZbTMHj/UNwn+X2HvMpxE24iof0ZgnvnimwI02XyNXW
-         M9PQ==
+        bh=v9OcuXb9vFCkW+RJjZNp2f7Wxc2CJq8/73BL58AUb1Y=;
+        b=CfQPl9zIqEqyrneW7slih37AsNDG3C4Yt86bIfhHoUSWlAqxd9VZsBq1tIr91BD3Gw
+         5lJ2J3XGN7F80FeT3tHzXA2z6BwDXmS+TQH9zQk+wp3ML8T3ce0Gb+dxsNvpBUkA/m25
+         oelaYhJku2SSImqmN86k0tnG9hRjJtLwGK4dNMUgFDQ/78ywrnk8B5FrIl7RFc6Ip0lp
+         RUMo8TbMUf+Zr7SRLJ4o5kd/xlnpgOAu4HAJjzeYQ/AQTbq5sUAiozxRq4ISYkMls5xe
+         00WUrAdDbdSNLPqmDK3R05epOuKaXbQMBnDn8/SZxx1+uOOJfRh3BLlNf9CXPfRgucVu
+         lFaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=+KT4WFZLK+9bXvVvtvjzAWWyt9RTKX24CKgwZm5SlTA=;
-        b=XjtfA11U2qnnycwVmxBjwEi/BxpoPqPvN+UUTpr6J2cwjk2RIlybOglqz/vGWjl3D1
-         JWdI8CGiPP4kCegujf9tG5sOehnQOqnW18ZBwAmP10BOE0KO+xV1WSm6kbR25XBrUxTg
-         T3TmoGcogfBbguvLMnn5A+1a6mGKPXyfyC73H26fMKe09E6UdII5lO3MqPJFD7LyS7DT
-         VLEbMgBHYP8FTl21kmgL21H8zzWKNro1ymRQ9el8jzq1YUazPNmsTgQYPAJa42pX8lAX
-         tVsWkYP42GXVbZqByEe5Avzckknb9FTYB2+hSpRG35FRdFA3F+vgMjPjU9Lw5yrfCJ6O
-         /E5Q==
-X-Gm-Message-State: AOAM533op6OGE0red1q+qWP/EuTAwZGLzByC0x4OtJcYJLkRZk8fIx84
-        a174DHzgX9Pze1DkNO73x3pVEkN+izbg8Q==
-X-Google-Smtp-Source: ABdhPJwX92N18CJ3+hdc658Ur1vLroE7M32KqfyijM8XQ/wZ8CpBZm8kUV4kq7odyU+dHSys5I/uHQ==
-X-Received: by 2002:a17:90a:ca89:b0:1d9:7d1a:c337 with SMTP id y9-20020a17090aca8900b001d97d1ac337mr6824386pjt.88.1651764510455;
-        Thu, 05 May 2022 08:28:30 -0700 (PDT)
+        bh=v9OcuXb9vFCkW+RJjZNp2f7Wxc2CJq8/73BL58AUb1Y=;
+        b=5GASW9VsfVLbTm/wBqGfPfThjMIUPuCj7c+93dqXeJ12vDnV4Cv1nKZ7TJCq2dwDQS
+         CYG04ZBSaI1qYCTH7ezwnaVNUEW7QrHrMdSfZKA9dyMdHxiLSNyDjzzO92b/ggJBrCdN
+         4EZK1ORF3KBCNqI+QW949N/z5MYG+1bOazkrP9EHxoFwRSOqsnsnH4nfAC+wo9+NBgEK
+         5TwnXYGVKJONpAyXGWLryDkPK1D9x/VJN1xS8J2cx8MXIF9R5hIXHbzkL1krTFambOwn
+         zESx7SXNK+UM4XFvDJeVVMQgzIPOxbvoI6ter7BOQ8O5MR0USchrlSEosAL2/L4x5vKI
+         NthA==
+X-Gm-Message-State: AOAM53329sN2HuL8y2NRu+edpvPyRcXesNzkVkM85FyJoTfFK0GSCk4N
+        lrp7jpVI8f1b0NxxQIMmAzj2fQ==
+X-Google-Smtp-Source: ABdhPJyPgmuNVn9/GTEDuPTE+EjZqvCDEfBpij2BKs2l/YSZJTlAJ5JUC4ICAf4B+LBTEGWM2diwtw==
+X-Received: by 2002:a17:90a:170c:b0:1dc:20c4:6354 with SMTP id z12-20020a17090a170c00b001dc20c46354mr7134882pjd.113.1651768259547;
+        Thu, 05 May 2022 09:30:59 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id t11-20020a65554b000000b003c14af5062csm1459302pgr.68.2022.05.05.08.28.29
+        by smtp.gmail.com with ESMTPSA id 6-20020a170902c14600b0015e8d4eb23bsm1750865plj.133.2022.05.05.09.30.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 May 2022 08:28:29 -0700 (PDT)
-Date:   Thu, 5 May 2022 15:28:26 +0000
+        Thu, 05 May 2022 09:30:58 -0700 (PDT)
+Date:   Thu, 5 May 2022 16:30:55 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
-        David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH] KVM: VMX: unify VMX instruction error reporting
-Message-ID: <YnPtGrXbef822v7U@google.com>
-References: <20220504231916.2883796-1-jmattson@google.com>
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     pbonzini@redhat.com, dmatlack@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        bgardon@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC] KVM: x86/mmu: Remove KVM memory shrinker
+Message-ID: <YnP7v0osIshCIPZH@google.com>
+References: <20220503221357.943536-1-vipinsh@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220504231916.2883796-1-jmattson@google.com>
+In-Reply-To: <20220503221357.943536-1-vipinsh@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -70,86 +72,136 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 04, 2022, Jim Mattson wrote:
-> From: David Matlack <dmatlack@google.com>
+On Tue, May 03, 2022, Vipin Sharma wrote:
+> KVM memory shrinker is only used in the shadow paging. Most of the L1
+> guests are backed by TDP (Two Dimensional Paging) which do not use the
+> shrinker, only L2 guests are backed by shadow paging.
+
+Nit, the TDP MMU doesn't use the shrinker, but legacy MMU, which supports TDP,
+does.
+
+> KVM memory shrinker can cause guests performance to degrade if any other
+> process (VM or non-VM) in the same or different cgroup in kernel causes
+> memory shrinker to run.
+
+Ah, but digging into this aspect reveals that per-memcg shrinkers were added in
+2015 by commit cb731d6c62bb ("vmscan: per memory cgroup slab shrinkers").  I
+haven't dug too deep, but presumably it wouldn't be all that difficult to support
+SHRINKER_MEMCG_AWARE in KVM.  That's quite tempting to support as it would/could
+guard against an unintentional DoS of sorts against L1 from L2, e.g. if L1 doesn't
+cap the number of TDP SPTEs it creates (*cough* TDP MMU *cough*) and ends up
+creating a large number of SPTEs for L2.  IIUC, that sort of scenario was the
+primary motivation for commit 2de4085cccea ("KVM: x86/MMU: Recursively zap nested
+TDP SPs when zapping last/only parent").
+
+> The KVM memory shrinker was introduced in 2008,
+> commit 3ee16c814511 ("KVM: MMU: allow the vm to shrink the kvm mmu
+> shadow caches"), each invocation of shrinker only released 1 shadow page
+> in 1 VM. This behavior was not effective until the batch zapping commit
+> was added in 2020, commit ebdb292dac79 ("KVM: x86/mmu: Batch zap MMU
+> pages when shrinking the slab"), which zaps multiple pages but still in
+> 1 VM for each shrink invocation. Overall, this feature existed for many
+> years without providing meaningful benefit.
 > 
-> Include the value of the "VM-instruction error" field from the current
-> VMCS (if any) in the error message whenever a VMX instruction (other
-> than VMREAD) fails. Previously, this field was only reported for
-> VMWRITE errors.
+> Signed-off-by: Vipin Sharma <vipinsh@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 99 ++----------------------------------------
+>  1 file changed, 3 insertions(+), 96 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 4e8d546431eb..80618c847ce2 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -178,7 +178,6 @@ struct kvm_shadow_walk_iterator {
+>  
+>  static struct kmem_cache *pte_list_desc_cache;
+>  struct kmem_cache *mmu_page_header_cache;
+> -static struct percpu_counter kvm_total_used_mmu_pages;
+>  
+>  static void mmu_spte_set(u64 *sptep, u64 spte);
+>  
+> @@ -1658,16 +1657,9 @@ static int is_empty_shadow_page(u64 *spt)
+>  }
+>  #endif
+>  
+> -/*
+> - * This value is the sum of all of the kvm instances's
+> - * kvm->arch.n_used_mmu_pages values.  We need a global,
+> - * aggregate version in order to make the slab shrinker
+> - * faster
+> - */
+> -static inline void kvm_mod_used_mmu_pages(struct kvm *kvm, long nr)
+> +static inline void kvm_used_mmu_pages(struct kvm *kvm, long nr)
 
-Eh, this is pointless for INVVPID and INVEPT, they both have a single error
-reason.  VMCLEAR is slightly less pointless, but printing the PA will most likely
-make the error reason superfluous.  Ditto for VMPTRLD.
+This rename is unnecessary, and I much prefer the existing name, kvm_used_mmu_pages()
+sounds like an accessor to get the number of used pages.
 
-I'm not strictly opposed to printing the error info, but it's not a clear cut win
-versus the added risk of blowing up the VMREAD (which is a tiny risk, but non-zero).
-And, if we want to do this for everything, then we might as well do it for VMREAD
-too.
+>  {
+>  	kvm->arch.n_used_mmu_pages += nr;
+> -	percpu_counter_add(&kvm_total_used_mmu_pages, nr);
+>  }
+>  
+>  static void kvm_mmu_free_page(struct kvm_mmu_page *sp)
 
-To reduce the risk of blowing up the host and play nice with VMREAD, what about
-adding a dedicated "safe" helper to read VM_INSTRUCTION_ERROR for the error
-handlers?  Then modify this patch to go on top...
+...
 
-Compile tested only (I can fully test later today).
+> -static bool kvm_has_zapped_obsolete_pages(struct kvm *kvm)
+> -{
+> -	return unlikely(!list_empty_careful(&kvm->arch.zapped_obsolete_pages));
+> -}
 
---
-From: Sean Christopherson <seanjc@google.com>
-Date: Thu, 5 May 2022 08:19:58 -0700
-Subject: [PATCH] KVM: VMX: Add a dedicated "safe" helper for
- VMREAD(VM_INSTRUCTION_ERROR)
+zapped_obsolete_pages can be dropped, its sole purposed was to expose those pages
+to the shrinker.
 
-Add a fully "safe" helper to do VMREAD(VM_INSTRUCTION_ERROR) so that VMX
-instruction error handlers, e.g. for VMPTRLD, VMREAD itself, etc..., can
-get and print the extra error information without the risk of triggering
-kvm_spurious_fault() or an infinite loop (in the VMREAD case).
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/vmx.c | 22 +++++++++++++++++++++-
- 1 file changed, 21 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 26ec9b814651..14ac7b8b0723 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -373,6 +373,26 @@ static u32 vmx_segment_access_rights(struct kvm_segment *var);
-
- void vmx_vmexit(void);
-
-+static u32 vmread_vm_instruction_error_safe(void)
-+{
-+	unsigned long value;
-+
-+	asm volatile("1: vmread %1, %0\n\t"
-+		     "ja 3f\n\t"
-+
-+		     /* VMREAD failed or faulted, clear the return value. */
-+		     "2:\n\t"
-+		     "xorl %k0, %k0\n\t"
-+		     "3:\n\t"
-+
-+		     _ASM_EXTABLE(1b, 2b)
-+
-+		     : "=&r"(value)
-+		     : "r"((unsigned long)VM_INSTRUCTION_ERROR)
-+		     : "cc");
-+	return value;
-+}
-+
- #define vmx_insn_failed(fmt...)		\
- do {					\
- 	WARN_ONCE(1, fmt);		\
-@@ -390,7 +410,7 @@ asmlinkage void vmread_error(unsigned long field, bool fault)
- noinline void vmwrite_error(unsigned long field, unsigned long value)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index c59fea4bdb6e..15b71de6f6fe 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1065,7 +1065,6 @@ struct kvm_arch {
+        u8 mmu_valid_gen;
+        struct hlist_head mmu_page_hash[KVM_NUM_MMU_PAGES];
+        struct list_head active_mmu_pages;
+-       struct list_head zapped_obsolete_pages;
+        struct list_head lpage_disallowed_mmu_pages;
+        struct kvm_page_track_notifier_node mmu_sp_tracker;
+        struct kvm_page_track_notifier_head track_notifier_head;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 51443a8e779a..299c9297418e 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5657,6 +5657,7 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
  {
- 	vmx_insn_failed("kvm: vmwrite failed: field=%lx val=%lx err=%d\n",
--			field, value, vmcs_read32(VM_INSTRUCTION_ERROR));
-+			field, value, vmread_vm_instruction_error_safe());
+        struct kvm_mmu_page *sp, *node;
+        int nr_zapped, batch = 0;
++       LIST_HEAD(zapped_pages);
+
+ restart:
+        list_for_each_entry_safe_reverse(sp, node,
+@@ -5688,8 +5689,7 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
+                        goto restart;
+                }
+
+-               if (__kvm_mmu_prepare_zap_page(kvm, sp,
+-                               &kvm->arch.zapped_obsolete_pages, &nr_zapped)) {
++               if (__kvm_mmu_prepare_zap_page(kvm, sp, &zapped_pages, &nr_zapped)) {
+                        batch += nr_zapped;
+                        goto restart;
+                }
+@@ -5704,7 +5704,7 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
+         * kvm_mmu_load()), and the reload in the caller ensure no vCPUs are
+         * running with an obsolete MMU.
+         */
+-       kvm_mmu_commit_zap_page(kvm, &kvm->arch.zapped_obsolete_pages);
++       kvm_mmu_commit_zap_page(kvm, &zapped_pages);
  }
 
- noinline void vmclear_error(struct vmcs *vmcs, u64 phys_addr)
+ /*
+@@ -5780,7 +5780,6 @@ int kvm_mmu_init_vm(struct kvm *kvm)
+        int r;
 
-base-commit: 68973d7fff6d23ae4d05708db429c56e50d377e5
---
+        INIT_LIST_HEAD(&kvm->arch.active_mmu_pages);
+-       INIT_LIST_HEAD(&kvm->arch.zapped_obsolete_pages);
+        INIT_LIST_HEAD(&kvm->arch.lpage_disallowed_mmu_pages);
+        spin_lock_init(&kvm->arch.mmu_unsync_pages_lock);
+
 
