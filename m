@@ -2,98 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 61A5D51C100
-	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 15:40:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1AEA51C177
+	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 15:53:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379924AbiEENoR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 May 2022 09:44:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55462 "EHLO
+        id S1380201AbiEEN4J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 May 2022 09:56:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379926AbiEENoB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 May 2022 09:44:01 -0400
-Received: from us-smtp-delivery-74.mimecast.com (us-smtp-delivery-74.mimecast.com [170.10.133.74])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9AC8ADF96
-        for <kvm@vger.kernel.org>; Thu,  5 May 2022 06:40:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651758019;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cqdrYW62uTnZvKa7HUn2Nv6tPwsemJAGd//mOeVF61A=;
-        b=ZPcLsevF29doU2+AxGy2OXrDZtUQ2A5YITJPwvYEqIPS79RK4kSozPiHZm3UnXo1ZMICBQ
-        Koe7ypr+zF4Fhj+qkP5mtY3ZjF7aZrKpIAKttuuwTnG66fhkpo0CojACWU/AUQEIPRKrQP
-        A1PhnX3nieaHf+DGa0LtaveC/BZzhy4=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-228-5E9FEH3FMSuyl3bV3m8MNQ-1; Thu, 05 May 2022 09:40:18 -0400
-X-MC-Unique: 5E9FEH3FMSuyl3bV3m8MNQ-1
-Received: by mail-ej1-f72.google.com with SMTP id dm7-20020a170907948700b006f3f999ed7dso2667100ejc.0
-        for <kvm@vger.kernel.org>; Thu, 05 May 2022 06:40:18 -0700 (PDT)
+        with ESMTP id S1380336AbiEENze (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 May 2022 09:55:34 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E21D58E7F
+        for <kvm@vger.kernel.org>; Thu,  5 May 2022 06:51:31 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id 204so907200pfx.3
+        for <kvm@vger.kernel.org>; Thu, 05 May 2022 06:51:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=oIH9/l+jKgs9B5DRYw7FbS58vVe4zVtylGwe2TjrN9M=;
+        b=iWb/KiI5Nh4F/zht1nOaD5nXxGZBVUw70MvhbB/MJ6c+5LPqpREBzsf6zsAQsrRDm8
+         rx/RYqOl+t8yV2aaX7MVFWaZvRX9f5nKsomJH2A+eg3KYprH4WqxwzJSyMckr3iJaKXk
+         JiCQBoCdirntvgQwkNUj81coh+byvO158gtCySbTKTu7QRCz3MZhlApdPH//ifXBchv0
+         UvitkHWl28bD8tdx70HEP8vaf9H3st3Uu54CmlDnMyBi7D2FUbHJQVrUAG71YMXAoyw8
+         GcDd05HWhgN9qLBr6esb2aJMpkMvKgXc/DFPVtmeJ6Fnr1DS5S6T0cBS3lXFfjEVmAnn
+         Zh/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=cqdrYW62uTnZvKa7HUn2Nv6tPwsemJAGd//mOeVF61A=;
-        b=NiaIp6Z0Q6rntc+GQdFpPQr+GUpet8zgTSdt9qpvgAvXOKFL2ThPUIeaRxwy5fkqJh
-         En+XSFpVo3pEjE/CDUKzKDgi0OINq/HzRFECBypJ4aDP6LJIkHkkCEHJ3rE08PSZTcBw
-         IHx5eQcvHmuN9vci+NQLq+BCZnyDp8f6jgBU8rI+/HegTTYsNqiq5DN1uEQdz9H3VWs2
-         4bVHPwW69Dzzd1PvA0qkeOX6085d3snMNv3y1E1MHMuOH1l3ekF/VR3dRLPS92n9wi0D
-         rbwKRBY4xZTl9I9hlyN+1E/4L3lYEofaQcO/259MnDWgD7VMl7MNfj9YxECza1Kt9VQm
-         TLOg==
-X-Gm-Message-State: AOAM531jYjvYNcroUeg1IwovZBTMEdlHBLQ1SseRSlAe+J6QUtyxzBTa
-        ruwlrse7lRcujnSXty8tlSmlOhQd67faYGqnthb6w49LOuVhIPSYJ7EIbf8KxSJRM+Oqdlmq7ON
-        fUkoKwhLQLURP
-X-Received: by 2002:a05:6402:1399:b0:410:9fa2:60d6 with SMTP id b25-20020a056402139900b004109fa260d6mr7209282edv.35.1651758017318;
-        Thu, 05 May 2022 06:40:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxPe6WJb7OIa3ESzr+aNmV7030frJYOWHSOZsepP3IUesecusunQPL4mGY5h9sKeBQVJyQf3Q==
-X-Received: by 2002:a05:6402:1399:b0:410:9fa2:60d6 with SMTP id b25-20020a056402139900b004109fa260d6mr7209258edv.35.1651758017072;
-        Thu, 05 May 2022 06:40:17 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id c24-20020aa7c758000000b0042617ba63b4sm824307eds.62.2022.05.05.06.40.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 May 2022 06:40:16 -0700 (PDT)
-Message-ID: <84920fc8-a966-25d2-9b3b-c7918c0b9cd4@redhat.com>
-Date:   Thu, 5 May 2022 15:40:15 +0200
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=oIH9/l+jKgs9B5DRYw7FbS58vVe4zVtylGwe2TjrN9M=;
+        b=PHjY1/MNtiJ6Vj+k+UvgCTLZPTevyhL+0elUx6scHJ3K/adU6ocSzXE/ZLaJZ/N8vT
+         0EFNph1IZZCvQirvP0nS0vuqfUTy/U7t781Kd11u8mrUCgOGfliv+LF1u13Y7yZdJwY7
+         pF5AdfMI2CuigOo1m2KkzLY0lGTv+W2yu/pUSiYyeE6zSQfWYsnMnz+QgrpPsaO48zrm
+         33jWarXm8vDDaJo7QZ25W27y3cs7njKMKkLPX7X1VFadVWRaV4hclLPNqio4MEuogasG
+         tcm2jOc/SUD6j1aYHUZIQdKyqjEjxOao+JLFsqNvfhkgdpQLHUG3bRgwcm/ceqtgN75h
+         DzTQ==
+X-Gm-Message-State: AOAM531/JwVrYNcalx1C4hCbS9aQS8Bxo+4eE4dPQFtMs16mQsLSGEWu
+        RivG7e6tgMxHcKcTLZzIH9YCjjn9gzq0cDXNEmU6Zg==
+X-Google-Smtp-Source: ABdhPJxpS0BcW8ju409ItQiIAiHo+aqD0i1wKv4dQJui6EWLaCpdb50z1BFUKtJYPkQggkeD3Blgh/QiSI1KJedl4Ug=
+X-Received: by 2002:a05:6a02:283:b0:342:703e:1434 with SMTP id
+ bk3-20020a056a02028300b00342703e1434mr21850337pgb.74.1651758691003; Thu, 05
+ May 2022 06:51:31 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH] x86: Function missing integer return value
-Content-Language: en-US
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
-        Juergen Gross <jgross@suse.com>, Li kunyu <kunyu@nfschina.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        seanjc@google.com
-References: <20220505113218.93520-1-kunyu@nfschina.com>
- <ba469ccc-f5c4-248a-4c26-1cbf487fd62e@suse.com>
- <fdd2d7e2-cf7c-4bfd-39d2-af5a3cf60b26@maciej.szmigiero.name>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <fdd2d7e2-cf7c-4bfd-39d2-af5a3cf60b26@maciej.szmigiero.name>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <cover.1649219184.git.kai.huang@intel.com> <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
+ <ecf718abf864bbb2366209f00d4315ada090aedc.camel@intel.com>
+ <de24ac7e-349c-e49a-70bb-31b9bc867b10@intel.com> <9b388f54f13b34fe684ef77603fc878952e48f87.camel@intel.com>
+ <d98ca73b-2d2d-757d-e937-acc83cfedfb0@intel.com> <c90a10763969077826f42be6f492e3a3e062326b.camel@intel.com>
+ <fc1ca04d94ad45e79c0297719d5ef50a7c33c352.camel@intel.com>
+ <664f8adeb56ba61774f3c845041f016c54e0f96e.camel@intel.com>
+ <1b681365-ef98-ec78-96dc-04e28316cf0e@intel.com> <8bf596b45f68363134f431bcc550e16a9a231b80.camel@intel.com>
+ <6bb89ca6e7346f4334f06ea293f29fd12df70fe4.camel@intel.com>
+In-Reply-To: <6bb89ca6e7346f4334f06ea293f29fd12df70fe4.camel@intel.com>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Thu, 5 May 2022 06:51:20 -0700
+Message-ID: <CAPcyv4iP3hcNNDxNdPT+iB0E4aUazfqFWwaa_dtHpVf+qKPNcQ@mail.gmail.com>
+Subject: Re: [PATCH v3 00/21] TDX host kernel support
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Mike Rapoport <rppt@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/5/22 15:37, Maciej S. Szmigiero wrote:
->> This statement is not reachable, so the patch is adding unneeded dead
->> code only.
-> 
-> Maybe some static checker isn't smart enough to figure this out.
+[ add Mike ]
 
-The static checker really should be improved.  This is a while(true), 
-not the halting problem. :)
 
-Paolo
+On Thu, May 5, 2022 at 2:54 AM Kai Huang <kai.huang@intel.com> wrote:
+[..]
+>
+> Hi Dave,
+>
+> Sorry to ping (trying to close this).
+>
+> Given we don't need to consider kmem-hot-add legacy PMEM after TDX module
+> initialization, I think for now it's totally fine to exclude legacy PMEMs from
+> TDMRs.  The worst case is when someone tries to use them as TD guest backend
+> directly, the TD will fail to create.  IMO it's acceptable, as it is supposedly
+> that no one should just use some random backend to run TD.
 
+The platform will already do this, right? I don't understand why this
+is trying to take proactive action versus documenting the error
+conditions and steps someone needs to take to avoid unconvertible
+memory. There is already the CONFIG_HMEM_REPORTING that describes
+relative performance properties between initiators and targets, it
+seems fitting to also add security properties between initiators and
+targets so someone can enumerate the numa-mempolicy that avoids
+unconvertible memory.
+
+No, special casing in hotplug code paths needed.
+
+>
+> I think w/o needing to include legacy PMEM, it's better to get all TDX memory
+> blocks based on memblock, but not e820.  The pages managed by page allocator are
+> from memblock anyway (w/o those from memory hotplug).
+>
+> And I also think it makes more sense to introduce 'tdx_memblock' and
+> 'tdx_memory' data structures to gather all TDX memory blocks during boot when
+> memblock is still alive.  When TDX module is initialized during runtime, TDMRs
+> can be created based on the 'struct tdx_memory' which contains all TDX memory
+> blocks we gathered based on memblock during boot.  This is also more flexible to
+> support other TDX memory from other sources such as CLX memory in the future.
+>
+> Please let me know if you have any objection?  Thanks!
+
+It's already the case that x86 maintains sideband structures to
+preserve memory after exiting the early memblock code. Mike, correct
+me if I am wrong, but adding more is less desirable than just keeping
+the memblock around?
