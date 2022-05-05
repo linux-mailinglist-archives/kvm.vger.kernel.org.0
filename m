@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0033B51C782
-	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 20:23:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 85ADF51C754
+	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 20:22:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1383252AbiEESWU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 May 2022 14:22:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36394 "EHLO
+        id S1355158AbiEESWJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 May 2022 14:22:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1383240AbiEESTm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 May 2022 14:19:42 -0400
+        with ESMTP id S1383262AbiEESTo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 May 2022 14:19:44 -0400
 Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CFFB5DA1E;
-        Thu,  5 May 2022 11:15:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CE571A3A4;
+        Thu,  5 May 2022 11:15:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651774555; x=1683310555;
+  t=1651774557; x=1683310557;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=YNoW9z1ClCT7swG5JfpwbF3FFn47leQenTkTt1akezE=;
-  b=MNUYsTUnOaywXuL/FpdO4Bn2jHnGuvSqymdOz/JYQ9VLPYWvk63ALnxf
-   geeShMjHVpeYX1EyNnj95yF/ouakGO5pbqf0c1Rm5DkWZomybvbsZgpgi
-   Z78OvA15MrZplPh39pOn5TDYquEgSnxf8GmWMcROTGmk9f9woBiFKp4AF
-   yxA+NpYS2Uzsm0++3Eqw9qZoeXWN6nBD6zMoGe42u0L1jkNbu/ghVvfrW
-   wrr6HAR3tA70kReH6/zKWhklphEOh0XGGWVRkDuRbo7OoCjtCieSG0rgn
-   whCsMQSGaR8kDFIxzZ8ElIl64t0BwHLEPSx+MrzKxr0Jk2Vw63yWsarDZ
+  bh=4lquZTTZV+C6DaVeZCPZttfWMjtz7WKuO5kSC5oLrCc=;
+  b=ncbbpo+iOMr9fnU4Pttlw7Kb3dZaXtZ7I6tJP1TnSvZvCSmxmLmDqjQC
+   yoiKAPKx2LTWiYoHP/GNO/kc4A3lTjRpsmKLdmfOs066B6Y+0HMQXZ8iP
+   8yamuRLJEpqBmlZRGYQEWp+SpD+6KF75lvmI2WvBLy86HfKfXJMa8ojP9
+   zs8hSk0voyeit+kuWp16CHTlypGV629Nnbjt+3FauDrKK11U/5HbEEfDY
+   jkl/am5mzZ7SH3UqyFRGG2VOVDluMFvhxoKqLLa/JJpDwNZVGn6n5jEkB
+   rYXNDDjNvorvcc8WS1yAa1x4vRRDVu/8+idGQGeGPEDe4x+FBUfZrU5la
    g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10338"; a="248742023"
+X-IronPort-AV: E=McAfee;i="6400,9594,10338"; a="248742025"
 X-IronPort-AV: E=Sophos;i="5.91,202,1647327600"; 
-   d="scan'208";a="248742023"
+   d="scan'208";a="248742025"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
   by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2022 11:15:45 -0700
 X-IronPort-AV: E=Sophos;i="5.91,202,1647327600"; 
-   d="scan'208";a="665083270"
+   d="scan'208";a="665083275"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2022 11:15:45 -0700
 From:   isaku.yamahata@intel.com
@@ -42,9 +42,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>
-Subject: [RFC PATCH v6 039/104] KVM: x86/mmu: Disallow fast page fault on private GPA
-Date:   Thu,  5 May 2022 11:14:33 -0700
-Message-Id: <7a8550ac1ed70fea901756f84b10960a07089140.1651774250.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v6 040/104] KVM: x86/mmu: Allow per-VM override of the TDP max page level
+Date:   Thu,  5 May 2022 11:14:34 -0700
+Message-Id: <83e129bcd111c4dec472c377c43926f338b80ac1.1651774250.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1651774250.git.isaku.yamahata@intel.com>
 References: <cover.1651774250.git.isaku.yamahata@intel.com>
@@ -60,49 +60,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-TDX requires TDX SEAMCALL to operate Secure EPT instead of direct memory
-access and TDX SEAMCALL is heavy operation.  Fast page fault on private GPA
-doesn't make sense.  Disallow fast page fault on private GPA.
+TODO: This is a transient workaround patch until the large page support for
+TDX is implemented.  Support large page for TDX and remove this patch.
 
+At this point, large page for TDX isn't supported, and need to allow guest
+TD to work only with 4K pages.  On the other hand, conventional VMX VMs
+should continue to work with large page.  Allow per-VM override of the TDP
+max page level.
+
+In the existing x86 KVM MMU code, there is already max_level member in
+struct kvm_page_fault with KVM_MAX_HUGEPAGE_LEVEL initial value.  The KVM
+page fault handler denies page size larger than max_level.
+
+Add per-VM member to indicate the allowed maximum page size with
+KVM_MAX_HUGEPAGE_LEVEL as default value and initialize max_level in struct
+kvm_page_fault with it.  For the guest TD, the set per-VM value for allows
+maximum page size to 4K page size.  Then only allowed page size is 4K.  It
+means large page is disabled.
+
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 1 +
+ arch/x86/kvm/mmu.h              | 2 +-
+ arch/x86/kvm/mmu/mmu.c          | 1 +
+ 3 files changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index c9c113316fd3..60223c21f16a 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1063,6 +1063,7 @@ struct kvm_arch {
+ 	unsigned long n_requested_mmu_pages;
+ 	unsigned long n_max_mmu_pages;
+ 	unsigned int indirect_shadow_pages;
++	int tdp_max_page_level;
+ 	u8 mmu_valid_gen;
+ 	struct hlist_head mmu_page_hash[KVM_NUM_MMU_PAGES];
+ 	struct list_head active_mmu_pages;
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index eecb5e27b6a5..a37b2efec4a8 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -239,7 +239,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 		.is_tdp = likely(vcpu->arch.mmu->page_fault == kvm_tdp_page_fault),
+ 		.nx_huge_page_workaround_enabled = is_nx_huge_page_enabled(),
+ 
+-		.max_level = KVM_MAX_HUGEPAGE_LEVEL,
++		.max_level = vcpu->kvm->arch.tdp_max_page_level,
+ 		.req_level = PG_LEVEL_4K,
+ 		.goal_level = PG_LEVEL_4K,
+ 	};
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index f4758b1b5202..8b26729cb9c4 100644
+index 8b26729cb9c4..8a684a7b1883 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3108,8 +3108,16 @@ static bool handle_abnormal_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
- 	return false;
- }
- 
--static bool page_fault_can_be_fast(struct kvm_page_fault *fault)
-+static bool page_fault_can_be_fast(struct kvm *kvm, struct kvm_page_fault *fault)
- {
-+	/*
-+	 * TDX private mapping doesn't support fast page fault because the EPT
-+	 * entry is read/written with TDX SEAMCALLs instead of direct memory
-+	 * access.
-+	 */
-+	if (kvm_is_private_gpa(kvm, fault->addr))
-+		return false;
-+
- 	/*
- 	 * Do not fix the mmio spte with invalid generation number which
- 	 * need to be updated by slow page fault path.
-@@ -3213,7 +3221,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	u64 *sptep = NULL;
- 	uint retry_count = 0;
- 
--	if (!page_fault_can_be_fast(fault))
-+	if (!page_fault_can_be_fast(vcpu->kvm, fault))
- 		return ret;
- 
- 	walk_shadow_page_lockless_begin(vcpu);
+@@ -5865,6 +5865,7 @@ int kvm_mmu_init_vm(struct kvm *kvm)
+ 	node->track_write = kvm_mmu_pte_write;
+ 	node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
+ 	kvm_page_track_register_notifier(kvm, node);
++	kvm->arch.tdp_max_page_level = KVM_MAX_HUGEPAGE_LEVEL;
+ 	kvm_mmu_set_mmio_spte_mask(kvm, shadow_default_mmio_mask,
+ 				   shadow_default_mmio_mask,
+ 				   ACC_WRITE_MASK | ACC_USER_MASK);
 -- 
 2.25.1
 
