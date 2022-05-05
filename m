@@ -2,99 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C393B51BEBE
-	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 14:02:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E1D1751BECB
+	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 14:04:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359369AbiEEMFx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 May 2022 08:05:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42984 "EHLO
+        id S1359455AbiEEMHy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 May 2022 08:07:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356598AbiEEMFv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 May 2022 08:05:51 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 081072AC7F;
-        Thu,  5 May 2022 05:02:11 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 245BMocf027199;
-        Thu, 5 May 2022 12:02:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=bGhF49dJcdnowlurpF2GARz1/RvjovKAcYVA6sREx8I=;
- b=hLrXU31eC83oQ9DASyzXDZKzjsiQxJl+ExJNcw+bxpvZeYAxSIkrZr4aEi824cdCDOJp
- 7emRvIEaSB3FqzrQVcyiQz/QYQeGpXULVZbV4a9HjifVTOPgRSFlO2mzil5kNRm36yX6
- j7hGAeKxpRDdfsRwmjNVn9zzUieZKMK5ewhP3XLRX9PX7/7cqmgv9hcNtq7bE5EQBSHE
- nzqt/CM/Zg4WzXZlFOwIgxsiTIn1D7Kr2yxjs+SecSFanH10wAW9EhtGx33WYrHTU9mN
- 9Jst7ItAV+/pGjGB0WAZty4UwZwpiyFHxrrIJBd3eSAxyu2KUtvTYFzZwLO0TiW0XsYL Gw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fvdngrq5r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 May 2022 12:02:11 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 245Bk2lL028206;
-        Thu, 5 May 2022 12:02:10 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fvdngrq55-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 May 2022 12:02:10 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 245BwL83009625;
-        Thu, 5 May 2022 12:02:08 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03fra.de.ibm.com with ESMTP id 3fscdk54rg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 May 2022 12:02:08 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 245Bmh4V38994268
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 5 May 2022 11:48:43 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 678094203F;
-        Thu,  5 May 2022 12:02:05 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1D1CE42045;
-        Thu,  5 May 2022 12:02:05 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.61.5])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  5 May 2022 12:02:05 +0000 (GMT)
-Message-ID: <2a27308d38150336ad906cfee2adc7481442f1b0.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v1] s390x: migration: don't run tests
- when facilities are not there
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, thuth@redhat.com
-Date:   Thu, 05 May 2022 14:02:04 +0200
-In-Reply-To: <20220505135439.33abf440@p-imbrenda>
-References: <20220505102705.3621584-1-nrb@linux.ibm.com>
-         <20220505135439.33abf440@p-imbrenda>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Vktj-wOEmSuR9beREjmRW8bJbUetGN1O
-X-Proofpoint-ORIG-GUID: rxEmMe1UYK2YVDNjpv8cXpWK9-mZaM51
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-05_04,2022-05-05_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 adultscore=0 mlxscore=0 suspectscore=0 lowpriorityscore=0
- phishscore=0 impostorscore=0 clxscore=1015 bulkscore=0 spamscore=0
- mlxlogscore=843 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205050083
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S244273AbiEEMHx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 May 2022 08:07:53 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDAC545527;
+        Thu,  5 May 2022 05:04:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id AE3B6B82C2B;
+        Thu,  5 May 2022 12:04:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EC45C385A4;
+        Thu,  5 May 2022 12:04:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1651752250;
+        bh=bkJvphN7syBYWRsUJY+LC4KlT+zXODM0ziWUwHCjA/0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=td/Txg+E2NK7U7QAjor3Z4L0qanKjWzlFWAGi8ipOLZ3Z10aa883FcQJL0K8w5RtT
+         j90NRbECApWwgMI097QJ5gDdRY5C2N6nOFLOPxbUPd3LXquIa0qM2dLXFkNOo0crAr
+         l08byEWOYbQamUUdh3FBGhHiyO9dNYPlyHlBy2UFhqkYdgVpMkMOoq/rG+fMccrIIa
+         WqM8yxtwsi8y6LfyPsseXcSlHCpHvxhYeIdqFCzXOE1cP2KPXAhbPRVVd7KqSxCjYa
+         J4Xm3pRGWPwW6p9PVmJbmOnqY8Nse8pls6fs0mNCwKhLTWMJF52M8/emhjuiPvN37B
+         z2ATW/zVAf+iw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nmaDH-009CAb-M4; Thu, 05 May 2022 13:04:07 +0100
+Date:   Thu, 05 May 2022 13:04:07 +0100
+Message-ID: <87zgjw6v9k.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     Raghavendra Rao Ananta <rananta@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH] selftests: KVM: aarch64: Let hypercalls use UAPI *_BIT_COUNT
+In-Reply-To: <YnLa8uH55/epyjlS@google.com>
+References: <20220504184415.1905224-1-rananta@google.com>
+        <YnLa8uH55/epyjlS@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, rananta@google.com, drjones@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, catalin.marinas@arm.com, will@kernel.org, pshier@google.com, ricarkol@google.com, reijiw@google.com, jingzhangos@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-05-05 at 13:54 +0200, Claudio Imbrenda wrote:
-> I think this patch should actually be folded in the previous one,
-> I'll
-> do that unless there are objections
+On Wed, 04 May 2022 20:58:42 +0100,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> Hi Raghavendra,
+> 
+> On Wed, May 04, 2022 at 06:44:15PM +0000, Raghavendra Rao Ananta wrote:
+> > The hypercalls test currently defines its own *_BMAP_BIT_MAX macros to
+> > define the last valid feature bit for each bitmap firmware register.
+> > However, since these definitions are already present in the uapi header,
+> > kvm.h, as *_BMAP_BIT_COUNT, and would help to keep the test updated as
+> > features grow, use these instead.
+> 
+> LOL, looks like I lost that one in the end! Still, the fact that you're
+> patching the selftest highlights the fact that there is a nonzero chance
+> of userspace using this value incorrectly expecting it to hold true
+> across all kernels.
+> 
+> Since this is the route going forward can we please consider documenting
+> the fact that _BIT_COUNT *will* change and is not stable between kernel
+> versions. Bad UAPI expectations could throw a wrench into this entire
+> plan we've hatched for preserving hypercall ABI.
+> 
+> Just a warning at the end of the register documentation would suffice.
 
-Thanks. Fine for me.
+Maybe something in the kvm.h file as well, as the includes are often
+distributed without the kernel documentation. Something like:
+
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index e523bb6eac67..3cde9f958eee 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -342,6 +342,10 @@ struct kvm_arm_copy_mte_tags {
+ 
+ enum {
+ 	KVM_REG_ARM_STD_BIT_TRNG_V1_0	= 0,
++	/*
++	 * KVM_REG_ARM_STD_BMAP_BIT_COUNT will vary as new services
++	 * are added, and is explicitely not part of the ABI.
++	 */
+ 	KVM_REG_ARM_STD_BMAP_BIT_COUNT,
+ };
+ 
+@@ -349,6 +353,10 @@ enum {
+ 
+ enum {
+ 	KVM_REG_ARM_STD_HYP_BIT_PV_TIME	= 0,
++	/*
++	 * KVM_REG_ARM_STD_HYP_BMAP_BIT_COUNT will vary as new
++	 * services are added, and is explicitely not part of the ABI.
++	 */
+ 	KVM_REG_ARM_STD_HYP_BMAP_BIT_COUNT,
+ };
+ 
+@@ -357,6 +365,10 @@ enum {
+ enum {
+ 	KVM_REG_ARM_VENDOR_HYP_BIT_FUNC_FEAT	= 0,
+ 	KVM_REG_ARM_VENDOR_HYP_BIT_PTP		= 1,
++	/*
++	 * KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_COUNT will vary as new
++	 * services are added, and is explicitely not part of the ABI.
++	 */
+ 	KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_COUNT,
+ };
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
