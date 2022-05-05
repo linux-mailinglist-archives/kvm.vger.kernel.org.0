@@ -2,180 +2,310 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DFB9E51C96A
-	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 21:45:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E50151CB9F
+	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 23:50:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1385235AbiEETsn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 May 2022 15:48:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59262 "EHLO
+        id S1352840AbiEEVyR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 May 2022 17:54:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1385209AbiEETsk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 May 2022 15:48:40 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2053.outbound.protection.outlook.com [40.107.237.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 087895E165
-        for <kvm@vger.kernel.org>; Thu,  5 May 2022 12:45:00 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KnyWKpjBD3KWpv6bvEDjFKrxfMrfgyoOFhvLCBXAnPLt7FJ3QuGBdl0WY7yIx7H+swWL3m84QxnanEJGYSDbaJCHLQ8SeydSxsRftLDa7Mh1vs2h8QoiH9lBT7R0szZ+cNscf+InSnjkHxvHcwHzavq0APZT5fHuTGgATB4bSMNtEZJ622+QSHukyM5x4GlbnHhvPQJyvvao/ldHeWqiUPKRljFKHyCjUw+EIqHVRgzDmPBvzKSnP4zx8z4rMBx6dta8hUBxtEcm+6NmpkIJBMHbSWT/F51Ax8w3WWBWA4phClIcm7xNkD7E4rztt+Xjeymar54pTXwAysJNA/3yNw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7CQ4mu+nuuzsue5+lyoAlF5XG4fLiZCggk13eS7Ce8k=;
- b=nyDL/PKmAxaBHRpJ1R2Hy0DmjaUVIrPaA4xRVIPTR8YEaTdnf4Sf7Nsr4rGeZ2hem62P8EDAvIA2SPDdIjMgseprThH3Cn5AiQJimfJiOLQCLbyaeEcev6N8+LvZtvQD/QjyaNpzzHta2Wfpd7wmQmn9MHJhzaESEVhreGZ4oeSW3LWodY5VF/deBoQT/eeSqrVC082AKzeRroKcne3sqefxDjP+sKcYSlgWT6zACdvYSyKmx1NnD+RDcTbjMKB/ApwuSC/MI57oEKJaBzPrR60QDK35WHDH/4hQs1b2+Fxwtm9WGTb38BtcM2ik9oTk032XBScMZZAIj4yBRclwlw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7CQ4mu+nuuzsue5+lyoAlF5XG4fLiZCggk13eS7Ce8k=;
- b=k/hbLsy+CAugyNFtynF6TeyyRyFFDmAnVUgyVw06dGd2MROtLdWMQCop1+wBjY4QkjH09++6nIzS4GRk/kbsGrrGoDyqfOjI9rc9AHOtQ0cagdcIfD+qghANMT3PcxBLWDMLHPGD4/ZBMjY/VPoIOpec+f64ou+zEZzQ7rpZNG7ChvgWTcdhDxTegV1Nf5q0QMgy6btDjEYRTvg/jfgZqQ92Mwv2jsXtoLWwCL2yTilYmCQn94aUZBKdJv/G94f14drm6lqPAF7IsobGgKVSkSPsg3pxFIrVoTo7HvAS9bDBH+RyKGjqTXTm9ybJ6dU5m7B3iKPGdrxSrks3DiJy+w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by BN9PR12MB5164.namprd12.prod.outlook.com (2603:10b6:408:11d::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5206.13; Thu, 5 May
- 2022 19:44:58 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2%6]) with mapi id 15.20.5206.027; Thu, 5 May 2022
- 19:44:58 +0000
-Date:   Thu, 5 May 2022 16:44:57 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Tony Krowiak <akrowiak@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Christoph Hellwig <hch@lst.de>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        "Jason J. Herne" <jjherne@linux.ibm.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        "Liu, Yi L" <yi.l.liu@intel.com>, zhenyuw@linux.intel.com,
-        zhi.a.wang@intel.com
-Subject: Re: [PATCH v3 0/7] Make the rest of the VFIO driver interface use
- vfio_device
-Message-ID: <20220505194457.GY49344@nvidia.com>
-References: <0-v3-e131a9b6b467+14b6-vfio_mdev_no_group_jgg@nvidia.com>
- <20220504174926.GA88353@nvidia.com>
- <20220505125614.0f927782.alex.williamson@redhat.com>
+        with ESMTP id S245484AbiEEVyO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 May 2022 17:54:14 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D5EE532E2
+        for <kvm@vger.kernel.org>; Thu,  5 May 2022 14:50:33 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id iq10so5386637pjb.0
+        for <kvm@vger.kernel.org>; Thu, 05 May 2022 14:50:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5X8TLlvge+LlB3alZPLbCxAz6Qe4vYldwHlV49dkSrM=;
+        b=r8TOD7zULp1YAmzdclvxd/BQo4hCWS743mscDf9VA3a5LGYWcHp8Z6o/3lyCM0ndFR
+         zdkOM/1GUpGXCslbckxlZXCC73zZZtGuBQ4VpCWkgcnp34jpf4u/rwj4w9sRIWAldLcT
+         I9Xg22FzOAjQwaOk2OPkWJK/TM/Tqrx2VQ7V8qx/YRikOLesgtu+1jWwD4XqSIogRxXu
+         cAAEjok7Wz6EwTStG758pdT83nrKy5IJ+oFgzHnXyZjhe4bIt5fmDWtClnd1PtpH+ld7
+         6GbQcg0yOqdvGBE3DpRFyUNyBZJTZ5g99gJpCVlLwrJPJLQ/L3Pvtpx8yQJTOeYI8qEh
+         SZQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5X8TLlvge+LlB3alZPLbCxAz6Qe4vYldwHlV49dkSrM=;
+        b=OOOjOdPTLheTWvdZH/g19LWZfsQD8JxAOjcI9n44sp3LftETSA+B5nG0tjUpAnMKgt
+         8oHwskc018aIaNa4L1n0GJrJzFq+u7sVm600TzzpfufiOYu09i9x9oKYACG30+OCVeOd
+         1JyMIIrTpgVRsOtOXLAT/aoW9v/ohUx3muK3N4ALbrHkmu6HHcCOzQz3AltPU1fIC3pm
+         VFcOUAv1AwZHYIfgq11yHqgMTQLou1TFLFk19eJP3lmdZbcUyHIz7ApJKsfpL0xNy1l0
+         ncP9Ji1bh3R11R7pd24fx3UOL71L8i2K5olfVQHucNS64Ojp1AMhet4zlgQPGyqAL77l
+         MV7Q==
+X-Gm-Message-State: AOAM530ub5f7UXXwSDXxG2ue3z0aDgCStXkcsjXp9YpL1ngL0O9HCqTI
+        T2ZniRePYPrD9pjHytBRaTCbAw==
+X-Google-Smtp-Source: ABdhPJwuRDiJVYHYkKhPttO59afzh31uDobhndG7CuDNtKzk9Wtkasqz2Nx2N6J5qXiiYr9Q7ipMyQ==
+X-Received: by 2002:a17:903:228d:b0:15e:a2aa:2c55 with SMTP id b13-20020a170903228d00b0015ea2aa2c55mr323986plh.121.1651787432627;
+        Thu, 05 May 2022 14:50:32 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id c17-20020a63ef51000000b003c2f9540127sm1782118pgk.93.2022.05.05.14.50.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 May 2022 14:50:32 -0700 (PDT)
+Date:   Thu, 5 May 2022 21:50:28 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        maciej.szmigiero@oracle.com,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
+Subject: Re: [PATCH v4 03/20] KVM: x86/mmu: Derive shadow MMU page role from
+ parent
+Message-ID: <YnRGpDa/kG+9h7Jd@google.com>
+References: <20220422210546.458943-1-dmatlack@google.com>
+ <20220422210546.458943-4-dmatlack@google.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220505125614.0f927782.alex.williamson@redhat.com>
-X-ClientProxiedBy: BL1P222CA0013.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:208:2c7::18) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 28554fdc-836c-44f7-0a7f-08da2ecfbc71
-X-MS-TrafficTypeDiagnostic: BN9PR12MB5164:EE_
-X-Microsoft-Antispam-PRVS: <BN9PR12MB516483C5B8693DB9D99EEEDAC2C29@BN9PR12MB5164.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: aWNQEwzlYyNmx8VJzcpvRp6aprc9ZW3h1OAQbswTZRYVzMxdPP1oGzN4BTBO35h3ho/ek4bCAifVdSOFSrl3A/Um1TvwJMjuOjeTDjrddUVNQsgbMfPY2tPssIbcq8sPMGdJRac31QagGKBtAM/nZ4U2wZJfagP0j2DifhdMKVeUgRIFibvi8CYRGqKiESbPio2BHzogyt6vrtSz1SnTEkiThA7QMJ44HMFBbJeRd0GvFIHFfMc43OwpxW/1m0OsEAaDH7bN7rP5OBy22tjddkHYKGApE9tjGbT8tz68AxI8ePld95ZprRLR+6u0TJ/qszUbkxcZoXV79HLjd1DH4HhN4o2crE5HQzlWY/QQVePv6fDfkkpw4XJGbnMTMpKWNsF6y5fTppMgfEThjyh4LbVEKL2uIOBNvQzfBTM9/mBfKLU7tt/ep04lYWrePqCkZX46dbv0FphWCYpzuZvaJSJapHmfrq9hbu5RM4iyhDpQcmeuKY4PM/L/+mn6BIbN32jbjJv/V9CkWjhbHEBemxtMo02tImtLoEgDgNqL/2ep78pXrNqY6X92M0uN4bFpkZUqyLRl8TZc5pjl5QAHgrrSSYfwIa0TqIk+byKG6tXJagEO7CTGI6kAIyOqZFNWXVZMirKyh0hIEG/4fjfDk06vmy3R/QXb+qOCBE/YzDfiPUVEshhbc2E5fHVmqJEyn+i0OgTn8W/b7PDT1EsSDJF6SGQ2FPHOlCO8SVx+mFJyaRjdIlRgolSddj1dJgFKOcbdqSWo5pcnkeryXXxT/g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(54906003)(86362001)(38100700002)(6916009)(2616005)(6512007)(33656002)(1076003)(26005)(4326008)(66946007)(66556008)(66476007)(8676002)(316002)(83380400001)(6506007)(5660300002)(186003)(508600001)(8936002)(2906002)(966005)(6486002)(36756003)(7416002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?kMQ/+2UGcWiclEcrukBpWupRFp6ueOHrjDMce8DLmjh7GnLd561t37kwUG26?=
- =?us-ascii?Q?eWeRUKckE4mSJESr9lcwskyehJFjwjDPl51/57jJXJhPivUqu2eP1UjH4mIY?=
- =?us-ascii?Q?LnJEfIyF6VOgh/kKf5OvSl5sq8FNe4Zhue9WG7sSC3HbJoh1AYmqw64cJFZC?=
- =?us-ascii?Q?Pgl0i9u1f0SwVEdki6y8LO2K6YCyekY50UQoYa1cZOc4bBMqOcd47slSnGaG?=
- =?us-ascii?Q?ps/JpTWMJ0pltfN0bUNm/gvYo/pUBB/FPaIQbMGJ74J1sTjEYEPKr7jgBNxf?=
- =?us-ascii?Q?OynSmIVkDNo9I5P0RWiK590HnvPmfn5CmjSzcyBwxOAyAJEyIjFSHsCVAUlO?=
- =?us-ascii?Q?4Fyth7qTrA98qQnD7W0LmnpkJFFJn52CepfEyUutYQFk5/roti81RY3VWbWf?=
- =?us-ascii?Q?XdGpdgc8xCZ4CCl7BQpc/5BKS5dK9M6ZW7P+uR3WzLg5LOzg3WiMHpbfZ28Z?=
- =?us-ascii?Q?z9Q/MbikB0CfbhaYE1AYdWzm7+Vvj3pD+gNLoyVdguh748ZH2oVD1Jr2jtPd?=
- =?us-ascii?Q?wO0crqHHZu66bwE3/sF4f4Mz2vPdQbtAh73vgl9d7EpgoUI5DGJAB2YByAUX?=
- =?us-ascii?Q?hmZVJ51tUjbkMeUQq/LQz3e1FKYhGKaCagvsGuOMYIeOB490iLo0zP1vEQ11?=
- =?us-ascii?Q?6+9FeETQIE7FuIl8QQg9EYDsXXZX3vku1WsCgmnsehF2IvWi9Qukea5rPS+S?=
- =?us-ascii?Q?bUeee0UAAB2OK4y/ZCg5ZJq0c+GBi81RAMCzbPlqZTsPoMvz1avBd8etI4e+?=
- =?us-ascii?Q?Fs8IDGjnbHewJHpit20LKwM17W4A/kYUkrvilENcjIbYMiOhFRFfwnbQGUBH?=
- =?us-ascii?Q?YWna8I5/AAjOl22t1ec3X+ElD4RchXcl7vDnOyURX8crzYhqWdsweYs1U3YS?=
- =?us-ascii?Q?aGLC1sraMg2bPDHGyARBnf2UTohcbxp+16dQi2CLrKvwiQYp464fAakrUOP/?=
- =?us-ascii?Q?nWPYLL4tHpHhlBQB6A6eT8OmN6uJqqYdh5thmCI+gxMj6DzjuxEBZ//37d8j?=
- =?us-ascii?Q?u3oCwBcaP4p4PLQ2VWp3dnicy+x+mrHmthMQJ8pwHkb0aFL3CtYfXk1i7/65?=
- =?us-ascii?Q?G4Ea31SFgIuB0HLI9dXsNQ91MTgRAU3UjuxUzE/yaXSI/vywmgW4zrXCoWfn?=
- =?us-ascii?Q?2h68cwljNS0w1Exe4xe0ryn9z3md9Ip3jl1kSU0dp2yLlrDLzC2bY4k3357z?=
- =?us-ascii?Q?MomCOrW6/67yvEismRYUr+5L6n1k/ryXNTCRiZtKULZo3Z0V3JcMpMxD03Sj?=
- =?us-ascii?Q?KN57VsFD9tW93bBNyBVViPoxnOI0ajKmc78vNCMR7L6uCN1NdLeliue30VXm?=
- =?us-ascii?Q?ulrXSAji+k5vtS6ZqaPr/GzRkzaj92Bgifvx44EibYT8sO1MshTQdzqOAzm4?=
- =?us-ascii?Q?Q+AlsB2wHFRIdL/C4j8TgIrzRvDnBbrbZ5KDi32ueFblUMEF4CJgIaWv/SWT?=
- =?us-ascii?Q?hjuwgMLHF+kQFe+DnnMMb9v8fqv32Z/WbJvAuvwYuQkA3/4UUbek1iPnLicy?=
- =?us-ascii?Q?2nDZyO///MbRIrJfFqtqHirSn0SMgS1aI3pwV9cdym4T52bHDvZERXXBo+gD?=
- =?us-ascii?Q?M/u4URDhO7urhsH4XyOG8JPjytiDNd/kHPxn9bqCR1FXuX4p3kNisCwaZtsb?=
- =?us-ascii?Q?80WCRWHpINTEATJQ1dpPgMKifCIqU9ThVV3urtdjvcTZdwbGs2iyPUPfSYh+?=
- =?us-ascii?Q?NpPrCGEwO/4qDB+2ShYEV+BpKih+9Z6eR+yM5IpzmgjJulecD/DjKui+QS5s?=
- =?us-ascii?Q?RQflRD9vRQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 28554fdc-836c-44f7-0a7f-08da2ecfbc71
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 May 2022 19:44:58.3166
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Ykf4zU114SRiAQy855O28Aq5B1KYAL+yQB9N6f0gOC/FNc6fIAQ31pIH6yx4A+S3
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5164
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20220422210546.458943-4-dmatlack@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 05, 2022 at 12:56:14PM -0600, Alex Williamson wrote:
-
-> I wasn't cc'd on that version.  It looks to me like we'd still prefer
-> to see acks from GVT-g maintainers, Zhenyu and Zhi.
-
-Somehow the entire To line got wiped out, still unclear why. Maybe
-get_maintainers had a bad time. I'm watching for this now
-
-> Also, I was thinking of posting the below cleanup patch unless you'd
-> prefer to roll it in.
-
-If it is the style, I will roll it in
-
-> Regarding your other outstanding patches, I think all of these depend
-> on the IOMMU changes, please correct if there are any that can be
-> queued with only the GVT-g topic branch dependency:
+On Fri, Apr 22, 2022, David Matlack wrote:
+> Instead of computing the shadow page role from scratch for every new
+> page, derive most of the information from the parent shadow page.  This
+> avoids redundant calculations and reduces the number of parameters to
+> kvm_mmu_get_page().
 > 
-> Subject: [PATCH v3 0/8] Remove vfio_group from the struct file facing VFIO API
-> Date: Wed,  4 May 2022 16:14:38 -0300
-> https://lore.kernel.org/all/0-v3-f7729924a7ea+25e33-vfio_kvm_no_group_jgg@nvidia.com/
-
-This one applies cleanly without the iommu series, I just confirmed it.
- 
-> Subject: [PATCH] vfio: Delete container_q
-> Date: Fri, 29 Apr 2022 15:46:17 -0300
-> https://lore.kernel.org/all/0-v1-a1e8791d795b+6b-vfio_container_q_jgg@nvidia.com/
-
-This one needs the iommu series
-
-> And I'm waiting for a respin based on comments for:
+> Preemptively split out the role calculation to a separate function for
+> use in a following commit.
 > 
-> Subject: [PATCH v3 0/2] Remove vfio_device_get_from_dev()
-> Date: Wed,  4 May 2022 16:01:46 -0300
-> https://lore.kernel.org/all/0-v3-4adf6c1b8e7c+170-vfio_get_from_dev_jgg@nvidia.com/
+> No functional change intended.
+> 
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c         | 96 +++++++++++++++++++++++-----------
+>  arch/x86/kvm/mmu/paging_tmpl.h |  9 ++--
+>  2 files changed, 71 insertions(+), 34 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index dc20eccd6a77..4249a771818b 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2021,31 +2021,15 @@ static void clear_sp_write_flooding_count(u64 *spte)
+>  	__clear_sp_write_flooding_count(sptep_to_sp(spte));
+>  }
+>  
+> -static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+> -					     gfn_t gfn,
+> -					     gva_t gaddr,
+> -					     unsigned level,
+> -					     bool direct,
+> -					     unsigned int access)
+> +static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu, gfn_t gfn,
+> +					     union kvm_mmu_page_role role)
+>  {
+> -	union kvm_mmu_page_role role;
+>  	struct hlist_head *sp_list;
+> -	unsigned quadrant;
+>  	struct kvm_mmu_page *sp;
+>  	int ret;
+>  	int collisions = 0;
+>  	LIST_HEAD(invalid_list);
+>  
+> -	role = vcpu->arch.mmu->root_role;
+> -	role.level = level;
+> -	role.direct = direct;
+> -	role.access = access;
+> -	if (role.has_4_byte_gpte) {
+> -		quadrant = gaddr >> (PAGE_SHIFT + (PT64_PT_BITS * level));
+> -		quadrant &= (1 << ((PT32_PT_BITS - PT64_PT_BITS) * level)) - 1;
+> -		role.quadrant = quadrant;
+> -	}
+> -
 
-I will do this in a few hours hopefully
+When you rebase to kvm/queue, the helper will need to deal with
 
-> If there are others I should be tracking, please let me know.  Thanks,
+	if (level <= vcpu->arch.mmu->cpu_role.base.level)
+		role.passthrough = 0;
 
-Nothing more for your tree, but FYI:
+KVM should never create a passthrough huge page, so I believe it's just a matter
+of adding yet another boolean param to kvm_mmu_child_role().
 
-The enforced coherent series is going through Joerg's tree
-https://lore.kernel.org/linux-iommu/0-v3-2cf356649677+a32-intel_no_snoop_jgg@nvidia.com/
 
-The bug fix for the iommu series is pending Joerg:
-https://lore.kernel.org/linux-iommu/0-v2-f62259511ac0+6-iommu_dma_block_jgg@nvidia.com/
+>  	sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
+>  	for_each_valid_sp(vcpu->kvm, sp, sp_list) {
+>  		if (sp->gfn != gfn) {
+> @@ -2063,7 +2047,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+>  			 * Unsync pages must not be left as is, because the new
+>  			 * upper-level page will be write-protected.
+>  			 */
+> -			if (level > PG_LEVEL_4K && sp->unsync)
+> +			if (role.level > PG_LEVEL_4K && sp->unsync)
+>  				kvm_mmu_prepare_zap_page(vcpu->kvm, sp,
+>  							 &invalid_list);
+>  			continue;
 
-I've got one more series to post which just needs a last pass over
-now, maybe today, but that is looking grim again.
+...
 
-It is alot of series, it is hard to keep all this organized, thanks.
+> @@ -3310,12 +3338,21 @@ static int mmu_check_root(struct kvm_vcpu *vcpu, gfn_t root_gfn)
+>  	return ret;
+>  }
+>  
+> -static hpa_t mmu_alloc_root(struct kvm_vcpu *vcpu, gfn_t gfn, gva_t gva,
+> +static hpa_t mmu_alloc_root(struct kvm_vcpu *vcpu, gfn_t gfn, int quadrant,
+>  			    u8 level, bool direct)
+>  {
+> +	union kvm_mmu_page_role role;
+>  	struct kvm_mmu_page *sp;
+>  
+> -	sp = kvm_mmu_get_page(vcpu, gfn, gva, level, direct, ACC_ALL);
+> +	role = vcpu->arch.mmu->root_role;
+> +	role.level = level;
+> +	role.direct = direct;
+> +	role.access = ACC_ALL;
+> +
+> +	if (role.has_4_byte_gpte)
+> +		role.quadrant = quadrant;
 
-Jason
+Maybe add a comment explaining the PAE and 32-bit paging paths share a call for
+allocating PDPTEs?  Otherwise it looks like passing a non-zero quadrant when the
+guest doesn't have 4-byte PTEs should be a bug.
+
+Hmm, even better, if the check is moved to the caller, then this can be:
+
+	role.level = level;
+	role.direct = direct;
+	role.access = ACC_ALL;
+	role.quadrant = quadrant;
+
+	WARN_ON_ONCE(quadrant && !role.has_4_byte_gpte));
+	WARN_ON_ONCE(direct && role.has_4_byte_gpte));
+
+and no comment is necessary.
+
+> +
+> +	sp = kvm_mmu_get_page(vcpu, gfn, role);
+>  	++sp->root_count;
+>  
+>  	return __pa(sp->spt);
+> @@ -3349,8 +3386,8 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
+>  		for (i = 0; i < 4; ++i) {
+>  			WARN_ON_ONCE(IS_VALID_PAE_ROOT(mmu->pae_root[i]));
+>  
+> -			root = mmu_alloc_root(vcpu, i << (30 - PAGE_SHIFT),
+> -					      i << 30, PT32_ROOT_LEVEL, true);
+> +			root = mmu_alloc_root(vcpu, i << (30 - PAGE_SHIFT), i,
+
+The @quadrant here can be hardcoded to '0', has_4_byte_gpte is guaranteed to be
+false if the MMU is direct.  And then in the indirect path, set gva (and then
+quadrant) based on 'i' iff the guest is using 32-bit paging.
+
+Probably worth making it a separate patch just in case I'm forgetting something.
+Lightly tested...
+
+--
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 5 May 2022 14:19:35 -0700
+Subject: [PATCH] KVM: x86/mmu: Pass '0' for @gva when allocating root with
+ 8-byte gpte
+
+Pass '0' instead of the "real" gva when allocating a direct PAE root,
+a.k.a. a direct PDPTE, and when allocating indirect roots that shadow
+64-bit / 8-byte GPTEs.
+
+Thee @gva is only needed if the root is shadowing 32-bit paging in the
+guest, in which case KVM needs to use different shadow pages for each of
+the two 4-byte GPTEs covered by KVM's 8-byte PAE SPTE.
+
+For direct MMUs, there's obviously no shadowing, and for indirect MMU
+
+In anticipation of moving the quadrant logic into mmu_alloc_root(), WARN
+if a non-zero @gva is passed for !4-byte GPTEs, and WARN if 4-byte GPTEs
+are ever combined with a direct root (there's no shadowing, so TDP roots
+should ignore the GPTE size).
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index dc20eccd6a77..6dfa3cfa8394 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3313,8 +3313,12 @@ static int mmu_check_root(struct kvm_vcpu *vcpu, gfn_t root_gfn)
+ static hpa_t mmu_alloc_root(struct kvm_vcpu *vcpu, gfn_t gfn, gva_t gva,
+ 			    u8 level, bool direct)
+ {
++	union kvm_mmu_page_role role = vcpu->arch.mmu->root_role;
+ 	struct kvm_mmu_page *sp;
+
++	WARN_ON_ONCE(gva && !role.has_4_byte_gpte);
++	WARN_ON_ONCE(direct && role.has_4_byte_gpte);
++
+ 	sp = kvm_mmu_get_page(vcpu, gfn, gva, level, direct, ACC_ALL);
+ 	++sp->root_count;
+
+@@ -3349,8 +3353,8 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
+ 		for (i = 0; i < 4; ++i) {
+ 			WARN_ON_ONCE(IS_VALID_PAE_ROOT(mmu->pae_root[i]));
+
+-			root = mmu_alloc_root(vcpu, i << (30 - PAGE_SHIFT),
+-					      i << 30, PT32_ROOT_LEVEL, true);
++			root = mmu_alloc_root(vcpu, i << (30 - PAGE_SHIFT), 0,
++					      PT32_ROOT_LEVEL, true);
+ 			mmu->pae_root[i] = root | PT_PRESENT_MASK |
+ 					   shadow_me_mask;
+ 		}
+@@ -3435,6 +3439,7 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+ 	u64 pdptrs[4], pm_mask;
+ 	gfn_t root_gfn, root_pgd;
+ 	hpa_t root;
++	gva_t gva;
+ 	unsigned i;
+ 	int r;
+
+@@ -3508,6 +3513,7 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+ 		}
+ 	}
+
++	gva = 0;
+ 	for (i = 0; i < 4; ++i) {
+ 		WARN_ON_ONCE(IS_VALID_PAE_ROOT(mmu->pae_root[i]));
+
+@@ -3517,9 +3523,11 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+ 				continue;
+ 			}
+ 			root_gfn = pdptrs[i] >> PAGE_SHIFT;
++		} else if (mmu->cpu_role.base.level == PT32_ROOT_LEVEL) {
++			gva = i << 30;
+ 		}
+
+-		root = mmu_alloc_root(vcpu, root_gfn, i << 30,
++		root = mmu_alloc_root(vcpu, root_gfn, gva,
+ 				      PT32_ROOT_LEVEL, false);
+ 		mmu->pae_root[i] = root | pm_mask;
+ 	}
+
+base-commit: 8bae380ad7dd3c31266d3685841ea4ce574d462d
+--
+
