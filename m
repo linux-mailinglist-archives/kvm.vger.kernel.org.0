@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E082B51C776
-	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 20:22:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8062351C748
+	for <lists+kvm@lfdr.de>; Thu,  5 May 2022 20:22:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236956AbiEESZp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 May 2022 14:25:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37306 "EHLO
+        id S1359337AbiEESVu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 May 2022 14:21:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1383534AbiEESUs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 May 2022 14:20:48 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DDB35DBDD;
-        Thu,  5 May 2022 11:16:24 -0700 (PDT)
+        with ESMTP id S1383273AbiEESTo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 May 2022 14:19:44 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAC605DA6D;
+        Thu,  5 May 2022 11:15:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651774584; x=1683310584;
+  t=1651774558; x=1683310558;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=pvd1gmJexYUlNNp6eiYlAPCc6di3vHS+fVQ39zW8Fms=;
-  b=AMpmChKn3jBpLw0pIjH6zMDy8uTBZDUVe4xDMIv9Cf4kjr9gvgIvjK5+
-   7ioYLaRvEemxZxYDwWFnohU3xwr055mpSKq7oyp4SxcWcLLrUKQy3xjMY
-   TZ3NHYzZRDb8eOCmtU2n0lCvyNQUFPXr9+/H6APHTyVOspvX2MNQGhs9W
-   IohXjQPHWBNCz6KUi+AmPSIPuGEa+UG8KY8iUIqYEto43BUsD6amb//8H
-   uJvP/CQZRSDP98cW7a/zNqZ1JEryh/ZrUL4YChxbuogGw+7AaWki4EGsO
-   X7doD1u8WXPCK4wth4ePVopiu+3TVNti84KlW2Ll63FWW8wMCny46RyU+
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10338"; a="268354891"
+  bh=5gKEBATWdi7brsOaUqd9Sxn2b02OlGwx2H6cEqgaWQU=;
+  b=Qe02oA3Hxdk5tamuLi064gGfQzUVVXL4ZArhXrF1I2/jaJNYw9WKJ24w
+   266q5VAO5suDwwIZYP0rfHa0QyzKEm5ati93odo8WwAXgnBC2zT6rY8+T
+   MHzuSakX0/wiCetypb+jQ7ruQY8ptR9b9KIRlSbYdg5u1t088uqrYbmS6
+   yAMrbdABgE/mEwBnn4nTyZ0kCBk7n77VyAjb8CDdS6rsTlNRqdOWkRY7k
+   RMIoTWXUkmQz6TTR3cb19RSYtCndnZEWZrwRgcl7h26E9W654dQe9J9Uu
+   kNs0RmhoCjydCc4P7igEp3+SBWvIVw+eujJpHXDGsjOdGnstrqikqlpDy
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10338"; a="268097119"
 X-IronPort-AV: E=Sophos;i="5.91,202,1647327600"; 
-   d="scan'208";a="268354891"
+   d="scan'208";a="268097119"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2022 11:15:55 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2022 11:15:55 -0700
 X-IronPort-AV: E=Sophos;i="5.91,202,1647327600"; 
-   d="scan'208";a="665083488"
+   d="scan'208";a="665083491"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2022 11:15:55 -0700
 From:   isaku.yamahata@intel.com
@@ -42,16 +42,16 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>
-Subject: [RFC PATCH v6 095/104] KVM: TDX: Handle TDX PV rdmsr/wrmsr hypercall
-Date:   Thu,  5 May 2022 11:15:29 -0700
-Message-Id: <9a45667060dd2f8634bf1ecba23b89567c7e46e7.1651774251.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v6 096/104] KVM: TDX: Handle TDX PV report fatal error hypercall
+Date:   Thu,  5 May 2022 11:15:30 -0700
+Message-Id: <6bb829189d8d94c64fb42db2d84f7519b7d29359.1651774251.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1651774250.git.isaku.yamahata@intel.com>
 References: <cover.1651774250.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -62,69 +62,66 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Wire up TDX PV rdmsr/wrmsr hypercall to the KVM backend function.
+Wire up TDX PV report fatal error hypercall to KVM_SYSTEM_EVENT_CRASH KVM
+exit event.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ arch/x86/kvm/vmx/tdx.c   | 21 +++++++++++++++++++++
+ include/uapi/linux/kvm.h |  1 +
+ 2 files changed, 22 insertions(+)
 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index f46825843a8b..1518a8c310d6 100644
+index 1518a8c310d6..ee83539d5228 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1169,6 +1169,39 @@ static int tdx_emulate_mmio(struct kvm_vcpu *vcpu)
+@@ -1202,6 +1202,25 @@ static int tdx_emulate_wrmsr(struct kvm_vcpu *vcpu)
  	return 1;
  }
  
-+static int tdx_emulate_rdmsr(struct kvm_vcpu *vcpu)
++static int tdx_report_fatal_error(struct kvm_vcpu *vcpu)
 +{
-+	u32 index = tdvmcall_a0_read(vcpu);
-+	u64 data;
++	/*
++	 * Exit to userspace device model for teardown.
++	 * Because guest TD is already panicing, returning an error to guerst TD
++	 * doesn't make sense.  No argument check is done.
++	 */
 +
-+	if (kvm_get_msr(vcpu, index, &data)) {
-+		trace_kvm_msr_read_ex(index);
-+		tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_INVALID_OPERAND);
-+		return 1;
-+	}
-+	trace_kvm_msr_read(index, data);
++	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
++	vcpu->run->system_event.type =
++		KVM_SYSTEM_EVENT_TDX | KVM_SYSTEM_EVENT_NDATA_VALID;
++	vcpu->run->system_event.ndata = 3;
++	vcpu->run->system_event.data[0] = TDG_VP_VMCALL_REPORT_FATAL_ERROR;
++	vcpu->run->system_event.data[1] = tdvmcall_a0_read(vcpu);
++	vcpu->run->system_event.data[2] = tdvmcall_a1_read(vcpu);
 +
-+	tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
-+	tdvmcall_set_return_val(vcpu, data);
-+	return 1;
-+}
-+
-+static int tdx_emulate_wrmsr(struct kvm_vcpu *vcpu)
-+{
-+	u32 index = tdvmcall_a0_read(vcpu);
-+	u64 data = tdvmcall_a1_read(vcpu);
-+
-+	if (kvm_set_msr(vcpu, index, data)) {
-+		trace_kvm_msr_write_ex(index, data);
-+		tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_INVALID_OPERAND);
-+		return 1;
-+	}
-+
-+	trace_kvm_msr_write(index, data);
-+	tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
-+	return 1;
++	return 0;
 +}
 +
  static int handle_tdvmcall(struct kvm_vcpu *vcpu)
  {
  	if (tdvmcall_exit_type(vcpu))
-@@ -1183,6 +1216,10 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
- 		return tdx_emulate_io(vcpu);
- 	case EXIT_REASON_EPT_VIOLATION:
- 		return tdx_emulate_mmio(vcpu);
-+	case EXIT_REASON_MSR_READ:
-+		return tdx_emulate_rdmsr(vcpu);
-+	case EXIT_REASON_MSR_WRITE:
-+		return tdx_emulate_wrmsr(vcpu);
+@@ -1220,6 +1239,8 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+ 		return tdx_emulate_rdmsr(vcpu);
+ 	case EXIT_REASON_MSR_WRITE:
+ 		return tdx_emulate_wrmsr(vcpu);
++	case TDG_VP_VMCALL_REPORT_FATAL_ERROR:
++		return tdx_report_fatal_error(vcpu);
  	default:
  		break;
  	}
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 9a3fd7b41fc5..df1b89ffdac6 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -445,6 +445,7 @@ struct kvm_run {
+ #define KVM_SYSTEM_EVENT_RESET          2
+ #define KVM_SYSTEM_EVENT_CRASH          3
+ #define KVM_SYSTEM_EVENT_SEV_TERM       4
++#define KVM_SYSTEM_EVENT_TDX            5
+ #define KVM_SYSTEM_EVENT_NDATA_VALID    (1u << 31)
+ 			__u32 type;
+ 			__u32 ndata;
 -- 
 2.25.1
 
