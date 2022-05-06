@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E694151CFA1
-	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 05:33:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 672D151CF9A
+	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 05:33:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1388624AbiEFDh1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 May 2022 23:37:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36884 "EHLO
+        id S1388696AbiEFDhX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 May 2022 23:37:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1388658AbiEFDhQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1388627AbiEFDhQ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 5 May 2022 23:37:16 -0400
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E3166470A;
-        Thu,  5 May 2022 20:33:33 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60BAF6470C;
+        Thu,  5 May 2022 20:33:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651808013; x=1683344013;
+  t=1651808014; x=1683344014;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=8JIFjwJl7uZ0J4Csugtm3GgvKSHuvJNOWDdlkAphcCw=;
-  b=epZyJJUjly+JDb8qYDHLC90AK2moAMnIs48OsWs8wOTUOU8453peNY/O
-   dIhCVgeUf4OiMUV3zavDk6uSW3kEiBFLloU9FD+9qBtmD6MYPhANfnt9v
-   OXkf0Xv2zw8aK/E3Y7Icdepq/48Qc72BHAa4XPmwcWoJXVyksP1usRTgy
-   FhGhzrkTrGLJa7hEY/kkvuvpcD6MZbPVxRTcSYCVo9Z38X59mom1HaJoI
-   1+8jNj3onrUosV3MzUijEJHjeGyw6pXVPaUFkL2Rf3L68sqPGVCzEG4iI
-   HTeLvF4ImF52/pnsY6cYxbX3Zd8Z5FeepSNCWRKIVUJTxP1A1T4c1J9n/
+  bh=vt3BBKEp56mUN7Y11885yIYLUEHAS6ADFvVoI4lg3Ag=;
+  b=a993lVci74GWtvN2aK/GPeH1G5pcl7SYtXquxc7g3xkWzNI3KJIkKKvR
+   EQwfnMDOXSQ9KFqk8lqfqdHuAmj/3xDur5T/oOJ9AuMldtVv/SgVhpIRW
+   C/nzWcCnWuZcalAQ+Vo5GkCDUUejDT4CNAVZTTxc3fEvq2TCk3rz8G1Jp
+   nWcES8x7cULpszNdwT7eNbXvLu54ttYrTU2sQ3uz3tR05swCACf91vy2d
+   /85BOiV20im0hErsRsrDhcxIOG9xSmIEIyDD94RdK0APqIexaz9W+WiSx
+   GEyZncZ+QPPIj+sj73A6f5xTTMvfuFbbYNZHkyIqawUUAzi3yO60xwBhI
    w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10338"; a="248241434"
+X-IronPort-AV: E=McAfee;i="6400,9594,10338"; a="248241438"
 X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
-   d="scan'208";a="248241434"
+   d="scan'208";a="248241438"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2022 20:33:33 -0700
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2022 20:33:34 -0700
 X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
-   d="scan'208";a="632745178"
+   d="scan'208";a="632745183"
 Received: from embargo.jf.intel.com ([10.165.9.183])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2022 20:33:32 -0700
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2022 20:33:33 -0700
 From:   Yang Weijiang <weijiang.yang@intel.com>
 To:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
         kan.liang@linux.intel.com, like.xu.linux@gmail.com,
         vkuznets@redhat.com, wei.w.wang@intel.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Cc:     Like Xu <like.xu@linux.intel.com>,
-        Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH v11 07/16] KVM: vmx/pmu: Emulate MSR_ARCH_LBR_CTL for guest Arch LBR
-Date:   Thu,  5 May 2022 23:32:56 -0400
-Message-Id: <20220506033305.5135-8-weijiang.yang@intel.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>,
+        Like Xu <like.xu@linux.intel.com>
+Subject: [PATCH v11 08/16] KVM: x86/pmu: Refactor code to support guest Arch LBR
+Date:   Thu,  5 May 2022 23:32:57 -0400
+Message-Id: <20220506033305.5135-9-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220506033305.5135-1-weijiang.yang@intel.com>
 References: <20220506033305.5135-1-weijiang.yang@intel.com>
@@ -61,204 +61,128 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <like.xu@linux.intel.com>
+Take account of Arch LBR when do sanity checks before program
+vPMU for guest. Pass through Arch LBR recording MSRs to guest
+to gain better performance. Note, Arch LBR and Legacy LBR support
+are mutually exclusive, i.e., they're not both available on one
+platform.
 
-Arch LBR is enabled by setting MSR_ARCH_LBR_CTL.LBREn to 1. A new guest
-state field named "Guest IA32_LBR_CTL" is added to enhance guest LBR usage.
-When guest Arch LBR is enabled, a guest LBR event will be created like the
-model-specific LBR does. Clear guest LBR enable bit on host PMI handling so
-guest can see expected config.
-
-On processors that support Arch LBR, MSR_IA32_DEBUGCTLMSR[bit 0] has no
-meaning. It can be written to 0 or 1, but reads will always return 0.
-Like IA32_DEBUGCTL, IA32_ARCH_LBR_CTL msr is also preserved on INIT.
-
-Regardless of the Arch LBR or legacy LBR, when the LBR_EN bit 0 of the
-corresponding control MSR is set to 1, LBR recording will be enabled.
-
+Co-developed-by: Like Xu <like.xu@linux.intel.com>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Co-developed-by: Yang Weijiang <weijiang.yang@intel.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 ---
- arch/x86/events/intel/lbr.c      |  2 --
- arch/x86/include/asm/msr-index.h |  1 +
- arch/x86/include/asm/vmx.h       |  2 ++
- arch/x86/kvm/vmx/pmu_intel.c     | 57 ++++++++++++++++++++++++++++----
- arch/x86/kvm/vmx/vmx.c           | 12 +++++++
- 5 files changed, 66 insertions(+), 8 deletions(-)
+ arch/x86/kvm/vmx/pmu_intel.c | 40 ++++++++++++++++++++++++++++--------
+ arch/x86/kvm/vmx/vmx.c       |  3 +++
+ 2 files changed, 35 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/events/intel/lbr.c b/arch/x86/events/intel/lbr.c
-index 4529ce448b2e..4fe6c3b50fc3 100644
---- a/arch/x86/events/intel/lbr.c
-+++ b/arch/x86/events/intel/lbr.c
-@@ -160,8 +160,6 @@ enum {
- 	 ARCH_LBR_RETURN		|\
- 	 ARCH_LBR_OTHER_BRANCH)
- 
--#define ARCH_LBR_CTL_MASK			0x7f000e
--
- static void intel_pmu_lbr_filter(struct cpu_hw_events *cpuc);
- 
- static __always_inline bool is_lbr_call_stack_bit_set(u64 config)
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index ee15311b6be1..fdf0e3097e0b 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -169,6 +169,7 @@
- #define LBR_INFO_BR_TYPE		(0xfull << LBR_INFO_BR_TYPE_OFFSET)
- 
- #define MSR_ARCH_LBR_CTL		0x000014ce
-+#define ARCH_LBR_CTL_MASK		0x7f000e
- #define ARCH_LBR_CTL_LBREN		BIT(0)
- #define ARCH_LBR_CTL_CPL_OFFSET		1
- #define ARCH_LBR_CTL_CPL		(0x3ull << ARCH_LBR_CTL_CPL_OFFSET)
-diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index 0ffaa3156a4e..ea3be961cc8e 100644
---- a/arch/x86/include/asm/vmx.h
-+++ b/arch/x86/include/asm/vmx.h
-@@ -245,6 +245,8 @@ enum vmcs_field {
- 	GUEST_BNDCFGS_HIGH              = 0x00002813,
- 	GUEST_IA32_RTIT_CTL		= 0x00002814,
- 	GUEST_IA32_RTIT_CTL_HIGH	= 0x00002815,
-+	GUEST_IA32_LBR_CTL		= 0x00002816,
-+	GUEST_IA32_LBR_CTL_HIGH		= 0x00002817,
- 	HOST_IA32_PAT			= 0x00002c00,
- 	HOST_IA32_PAT_HIGH		= 0x00002c01,
- 	HOST_IA32_EFER			= 0x00002c02,
 diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index e2b5fc1f4f1a..aa36d2072b91 100644
+index aa36d2072b91..bd4ddf63ba8f 100644
 --- a/arch/x86/kvm/vmx/pmu_intel.c
 +++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -19,6 +19,7 @@
- #include "pmu.h"
+@@ -170,12 +170,16 @@ static inline struct kvm_pmc *get_fw_gp_pmc(struct kvm_pmu *pmu, u32 msr)
  
- #define MSR_PMC_FULL_WIDTH_BIT      (MSR_IA32_PMC0 - MSR_IA32_PERFCTR0)
-+#define KVM_ARCH_LBR_CTL_MASK  (ARCH_LBR_CTL_MASK | ARCH_LBR_CTL_LBREN)
- 
- static struct kvm_event_hw_type_mapping intel_arch_events[] = {
- 	[0] = { 0x3c, 0x00, PERF_COUNT_HW_CPU_CYCLES },
-@@ -192,7 +193,7 @@ static bool intel_pmu_is_valid_lbr_msr(struct kvm_vcpu *vcpu, u32 index)
- 	if (!intel_pmu_lbr_is_enabled(vcpu))
- 		return ret;
- 
--	if (index == MSR_ARCH_LBR_DEPTH) {
-+	if (index == MSR_ARCH_LBR_DEPTH || index == MSR_ARCH_LBR_CTL) {
- 		if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
- 			ret = guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR);
- 		return ret;
-@@ -363,6 +364,33 @@ static bool arch_lbr_depth_is_valid(struct kvm_vcpu *vcpu, u64 depth)
- 	return (depth == pmu->kvm_arch_lbr_depth);
+ bool intel_pmu_lbr_is_compatible(struct kvm_vcpu *vcpu)
+ {
++	if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
++		return guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR);
++
+ 	/*
+ 	 * As a first step, a guest could only enable LBR feature if its
+ 	 * cpu model is the same as the host because the LBR registers
+ 	 * would be pass-through to the guest and they're model specific.
+ 	 */
+-	return boot_cpu_data.x86_model == guest_cpuid_model(vcpu);
++	return !boot_cpu_has(X86_FEATURE_ARCH_LBR) &&
++		boot_cpu_data.x86_model == guest_cpuid_model(vcpu);
  }
  
-+static bool arch_lbr_ctl_is_valid(struct kvm_vcpu *vcpu, u64 ctl)
-+{
-+	struct kvm_cpuid_entry2 *entry;
-+
-+	if (!kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
-+		return false;
-+
-+	if (ctl & ~KVM_ARCH_LBR_CTL_MASK)
-+		goto warn;
-+
-+	entry = kvm_find_cpuid_entry(vcpu, 0x1c, 0);
-+	if (!entry)
-+		return false;
-+
-+	if (!(entry->ebx & BIT(0)) && (ctl & ARCH_LBR_CTL_CPL))
-+		return false;
-+	if (!(entry->ebx & BIT(2)) && (ctl & ARCH_LBR_CTL_STACK))
-+		return false;
-+	if (!(entry->ebx & BIT(1)) && (ctl & ARCH_LBR_CTL_FILTER))
-+		return false;
-+	return true;
-+warn:
-+	pr_warn_ratelimited("kvm: vcpu-%d: invalid arch lbr ctl.\n",
-+			    vcpu->vcpu_id);
-+	return false;
-+}
-+
- static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-@@ -386,6 +414,9 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_ARCH_LBR_DEPTH:
- 		msr_info->data = lbr_desc->records.nr;
- 		return 0;
-+	case MSR_ARCH_LBR_CTL:
-+		msr_info->data = vmcs_read64(GUEST_IA32_LBR_CTL);
-+		return 0;
- 	default:
- 		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
- 		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
-@@ -457,6 +488,16 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		 */
- 		wrmsrl(MSR_ARCH_LBR_DEPTH, lbr_desc->records.nr);
- 		return 0;
-+	case MSR_ARCH_LBR_CTL:
-+		if (!arch_lbr_ctl_is_valid(vcpu, data))
-+			break;
-+
-+		vmcs_write64(GUEST_IA32_LBR_CTL, data);
-+
-+		if (intel_pmu_lbr_is_enabled(vcpu) && !lbr_desc->event &&
-+		    (data & ARCH_LBR_CTL_LBREN))
-+			intel_pmu_create_guest_lbr_event(vcpu);
-+		return 0;
- 	default:
- 		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
- 		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
-@@ -666,12 +707,16 @@ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
-  */
- static void intel_pmu_legacy_freezing_lbrs_on_pmi(struct kvm_vcpu *vcpu)
- {
--	u64 data = vmcs_read64(GUEST_IA32_DEBUGCTL);
-+	u32 lbr_ctl_field = GUEST_IA32_DEBUGCTL;
+ bool intel_pmu_lbr_is_enabled(struct kvm_vcpu *vcpu)
+@@ -199,12 +203,20 @@ static bool intel_pmu_is_valid_lbr_msr(struct kvm_vcpu *vcpu, u32 index)
+ 		return ret;
+ 	}
  
--	if (data & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI) {
--		data &= ~DEBUGCTLMSR_LBR;
--		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
--	}
-+	if (!(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI))
+-	ret = (index == MSR_LBR_SELECT) || (index == MSR_LBR_TOS) ||
+-		(index >= records->from && index < records->from + records->nr) ||
+-		(index >= records->to && index < records->to + records->nr);
++	if (!guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
++		ret = (index == MSR_LBR_SELECT) || (index == MSR_LBR_TOS);
++
++	if (!ret) {
++		ret = (index >= records->from &&
++		       index < records->from + records->nr) ||
++		      (index >= records->to &&
++		       index < records->to + records->nr);
++	}
+ 
+-	if (!ret && records->info)
+-		ret = (index >= records->info && index < records->info + records->nr);
++	if (!ret && records->info) {
++		ret = (index >= records->info &&
++		       index < records->info + records->nr);
++	}
+ 
+ 	return ret;
+ }
+@@ -742,6 +754,9 @@ static void vmx_update_intercept_for_lbr_msrs(struct kvm_vcpu *vcpu, bool set)
+ 			vmx_set_intercept_for_msr(vcpu, lbr->info + i, MSR_TYPE_RW, set);
+ 	}
+ 
++	if (guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
 +		return;
 +
-+	if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR) &&
-+	    guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
-+		lbr_ctl_field = GUEST_IA32_LBR_CTL;
-+
-+	vmcs_write64(lbr_ctl_field, vmcs_read64(lbr_ctl_field) & ~0x1ULL);
+ 	vmx_set_intercept_for_msr(vcpu, MSR_LBR_SELECT, MSR_TYPE_RW, set);
+ 	vmx_set_intercept_for_msr(vcpu, MSR_LBR_TOS, MSR_TYPE_RW, set);
+ }
+@@ -782,10 +797,13 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+ 	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
++	bool lbr_enable = guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR) ?
++		(vmcs_read64(GUEST_IA32_LBR_CTL) & ARCH_LBR_CTL_LBREN) :
++		(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR);
+ 
+ 	if (!lbr_desc->event) {
+ 		vmx_disable_lbr_msrs_passthrough(vcpu);
+-		if (vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR)
++		if (lbr_enable)
+ 			goto warn;
+ 		if (test_bit(INTEL_PMC_IDX_FIXED_VLBR, pmu->pmc_in_use))
+ 			goto warn;
+@@ -802,13 +820,19 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
+ 	return;
+ 
+ warn:
++	if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
++		wrmsrl(MSR_ARCH_LBR_DEPTH, lbr_desc->records.nr);
+ 	pr_warn_ratelimited("kvm: vcpu-%d: fail to passthrough LBR.\n",
+ 		vcpu->vcpu_id);
  }
  
- static void intel_pmu_deliver_pmi(struct kvm_vcpu *vcpu)
+ static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
+ {
+-	if (!(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR))
++	bool lbr_enable = guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR) ?
++		(vmcs_read64(GUEST_IA32_LBR_CTL) & ARCH_LBR_CTL_LBREN) :
++		(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR);
++
++	if (!lbr_enable)
+ 		intel_pmu_release_guest_lbr_event(vcpu);
+ }
+ 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index d58b763df855..b6bc7d97e4b4 100644
+index b6bc7d97e4b4..98e56a909c01 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2022,6 +2022,13 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 						VM_EXIT_SAVE_DEBUG_CONTROLS)
- 			get_vmcs12(vcpu)->guest_ia32_debugctl = data;
- 
-+		/*
-+		 * For Arch LBR, IA32_DEBUGCTL[bit 0] has no meaning.
-+		 * It can be written to 0 or 1, but reads will always return 0.
-+		 */
-+		if (guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
-+			data &= ~DEBUGCTLMSR_LBR;
-+
- 		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
- 		if (intel_pmu_lbr_is_enabled(vcpu) && !to_vmx(vcpu)->lbr_desc.event &&
- 		    (data & DEBUGCTLMSR_LBR))
-@@ -4553,6 +4560,11 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	kvm_make_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu);
- 
- 	vpid_sync_context(vmx->vpid);
-+
-+	if (!init_event) {
-+		if (static_cpu_has(X86_FEATURE_ARCH_LBR))
-+			vmcs_write64(GUEST_IA32_LBR_CTL, 0);
-+	}
- }
- 
- static void vmx_enable_irq_window(struct kvm_vcpu *vcpu)
+@@ -573,6 +573,9 @@ static bool is_valid_passthrough_msr(u32 msr)
+ 	case MSR_LBR_NHM_TO ... MSR_LBR_NHM_TO + 31:
+ 	case MSR_LBR_CORE_FROM ... MSR_LBR_CORE_FROM + 8:
+ 	case MSR_LBR_CORE_TO ... MSR_LBR_CORE_TO + 8:
++	case MSR_ARCH_LBR_FROM_0 ... MSR_ARCH_LBR_FROM_0 + 31:
++	case MSR_ARCH_LBR_TO_0 ... MSR_ARCH_LBR_TO_0 + 31:
++	case MSR_ARCH_LBR_INFO_0 ... MSR_ARCH_LBR_INFO_0 + 31:
+ 		/* LBR MSRs. These are handled in vmx_update_intercept_for_lbr_msrs() */
+ 		return true;
+ 	}
 -- 
 2.27.0
 
