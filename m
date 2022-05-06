@@ -2,275 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A0C751DADD
-	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 16:42:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F69251DAE5
+	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 16:43:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442337AbiEFOq0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 May 2022 10:46:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41336 "EHLO
+        id S1442352AbiEFOq7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 May 2022 10:46:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442336AbiEFOqY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 May 2022 10:46:24 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21B146AA5E;
-        Fri,  6 May 2022 07:42:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651848161; x=1683384161;
-  h=message-id:date:mime-version:subject:to:references:from:
-   in-reply-to:content-transfer-encoding;
-  bh=yz3Dxyfah2BWSEZ5E5WEVnMK0YAKT4foldmHAV7BYok=;
-  b=P9Li0QvT6/2SPYukE6KB8Mnfzmg6byOl1froiwB9SdVmG/HLFm55Tn/I
-   seYqiEbzh7t7NYQiuo8Pp+jeJ4tCIA94E5Bmf8npNEME01dx5vFdIknjU
-   9ninMsgQHKEprA+a7Fccp87axyFfmTIYonnwc8IIPb2J88j/o9UQuiJav
-   1GblWKsgc+JOTRgq14D8lmPZ8eCwwKh6Z71a+6Bufvvkg1FPeocblsgCt
-   QVLr10gblmLgp+T8IneDp//Y+DWLqajkNSH/AOmcTtdKVbLlq2/bMVfv3
-   UG4jKHwvkIYAJOiB83zIsqosS5G8sAkk8skjDoHtyCowYPQVS9C8wh6zG
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10339"; a="354916795"
-X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
-   d="scan'208";a="354916795"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2022 07:42:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
-   d="scan'208";a="537916186"
-Received: from linux.intel.com ([10.54.29.200])
-  by orsmga006.jf.intel.com with ESMTP; 06 May 2022 07:42:39 -0700
-Received: from [10.252.212.236] (kliang2-MOBL.ccr.corp.intel.com [10.252.212.236])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by linux.intel.com (Postfix) with ESMTPS id 0AF2158093E;
-        Fri,  6 May 2022 07:42:37 -0700 (PDT)
-Message-ID: <a98cd80a-f9dc-efcb-ba20-31e36499f1a0@linux.intel.com>
-Date:   Fri, 6 May 2022 10:42:36 -0400
+        with ESMTP id S232047AbiEFOqz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 May 2022 10:46:55 -0400
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4290A6AA43
+        for <kvm@vger.kernel.org>; Fri,  6 May 2022 07:43:10 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id v64-20020a1cac43000000b0038cfd1b3a6dso6948284wme.5
+        for <kvm@vger.kernel.org>; Fri, 06 May 2022 07:43:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=WiDxQKnEUh/Ftg98Qas+O/Qiia3OxJs8FJZz2Bh+GLM=;
+        b=QND3wVqZiv1XwMWWtENM7IVmfUB0q5Vu3nkxI7akG3jPT7bWFsHnn+RBkzCG+X5d5O
+         EiBKR3TH1/DpZy/laiuRk/7pu0e1ugADGrDtEIIomtWDRep8aRe/TXCUgtIougBvZgJL
+         y137WUxf/Oop9pE+D0QCIlz3nslqvsErxOAn5AzxFL29UVQ/FkhPvYbYq+rd/vxdircP
+         omP2hdeayELilhbMXsXxNo7gvRaNeCkNcYVjkgx466+aYJrQOTHDlllQSGKKi1HWMAsT
+         AUjEz5dxZSI3UPv0WXfyDkIxdw0s5HmIoQ+D6oE9xteVSvrVQsdDPign8gzOcBVUsM53
+         HW2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=WiDxQKnEUh/Ftg98Qas+O/Qiia3OxJs8FJZz2Bh+GLM=;
+        b=oOM2tso5czB3MXcr8Wouic1+eZh40l/4Heqzby2EzmFEFvaDo/hJOWNVYYnYmmYI9t
+         KnqDZteKo1SI28p1AJ0C+Cmv5/GpWgJYXBriMD8gjZeGZOrL0e55vhGIk77cxMC/MAY9
+         4a6SJvgLgEJRacEuoT/GKVkI0X+uAmAmmknXfjziHdRYRGmfW9EO8Uc4t9Vj1UrEea7P
+         pqQeX13sdUSWIGdcswGofq5G74jYNhOFk/NZjjcv9g1vSEubj4vvCgbtRHR1qMMwhFS8
+         jVcmEfnVoNSDwmSOevQZqKIZup3RGatCme10rSSDmXzacMmZkiyqxmNsvLNXg7I3XXNN
+         n9Zw==
+X-Gm-Message-State: AOAM533YZQYM6smbC2emIZvy8NX/QB4ekvVOHSfHcG3Mdk+d2MnU2hpq
+        edMsvEoTul8ZEe9gnr+8bis9M+KOyaNByL7TkSlRrQ==
+X-Google-Smtp-Source: ABdhPJz1hEYjvGYVylC+vM3SWmQNa7P5Eo5mqV9MS5aLosuwlv8LHE3FaNRFK82N5hrxdJAadOQuPP3Xg6GZgvxB9+A=
+X-Received: by 2002:a05:600c:1d08:b0:394:54ee:c994 with SMTP id
+ l8-20020a05600c1d0800b0039454eec994mr3615092wms.137.1651848188655; Fri, 06
+ May 2022 07:43:08 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: [PATCH v11 07/16] KVM: vmx/pmu: Emulate MSR_ARCH_LBR_CTL for
- guest Arch LBR
-Content-Language: en-US
-To:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
-        jmattson@google.com, seanjc@google.com, like.xu.linux@gmail.com,
-        vkuznets@redhat.com, wei.w.wang@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220506033305.5135-1-weijiang.yang@intel.com>
- <20220506033305.5135-8-weijiang.yang@intel.com>
-From:   "Liang, Kan" <kan.liang@linux.intel.com>
-In-Reply-To: <20220506033305.5135-8-weijiang.yang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-8.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220304101023.764631-1-atishp@rivosinc.com> <20220506125450.GB22892@willie-the-truck>
+In-Reply-To: <20220506125450.GB22892@willie-the-truck>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Fri, 6 May 2022 20:12:57 +0530
+Message-ID: <CAAhSdy3Okh8oFZWQYziNNXaxkmF1MsfVYz-nHr=0g4fsYBSbRg@mail.gmail.com>
+Subject: Re: [RFC PATCH kvmtool 0/3] Add Sstc extension support
+To:     Will Deacon <will@kernel.org>
+Cc:     Atish Patra <atishp@rivosinc.com>, julien.thierry.kdev@gmail.com,
+        Marc Zyngier <maz@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        KVM General <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, May 6, 2022 at 6:24 PM Will Deacon <will@kernel.org> wrote:
+>
+> On Fri, Mar 04, 2022 at 02:10:20AM -0800, Atish Patra wrote:
+> > This series adds Sstc extension which was ratified recently.
+> >
+> > The first two patches adds the ISA extension framework which allows
+> > to define and update the DT for any multi-letter ISA extensions.
+> >
+> > The last patch just enables Sstc extension specifically if the hardware
+> > supports it.
+> >
+> > The series can also be found at
+> > https://github.com/atishp04/kvmtool/tree/sstc_v1
+> >
+> > The kvm & Qemu patches can be found at
+> >
+> > KVM: https://github.com/atishp04/linux/tree/sstc_v2
+> > OpenSBI: https://github.com/atishp04/opensbi/tree/sstc_v1
+> > Qemu: https://github.com/atishp04/qemu/tree/sstc_v1
+> >
+> > [1] https://drive.google.com/file/d/1m84Re2yK8m_vbW7TspvevCDR82MOBaSX/view
+> >
+> > Atish Patra (3):
+> > riscv: Update the uapi header as per Linux kernel
+> > riscv: Append ISA extensions to the device tree
+> > riscv: Add Sstc extension support
+>
+> These look fine to me. What's the status of the kernel-side changes?
 
+The kernel-side of changes will be merged for 5.19 or 5.20.
 
-On 5/5/2022 11:32 PM, Yang Weijiang wrote:
-> From: Like Xu <like.xu@linux.intel.com>
-> 
-> Arch LBR is enabled by setting MSR_ARCH_LBR_CTL.LBREn to 1. A new guest
-> state field named "Guest IA32_LBR_CTL" is added to enhance guest LBR usage.
-> When guest Arch LBR is enabled, a guest LBR event will be created like the
-> model-specific LBR does. Clear guest LBR enable bit on host PMI handling so
-> guest can see expected config.
-> 
-> On processors that support Arch LBR, MSR_IA32_DEBUGCTLMSR[bit 0] has no
-> meaning. It can be written to 0 or 1, but reads will always return 0.
-> Like IA32_DEBUGCTL, IA32_ARCH_LBR_CTL msr is also preserved on INIT.
-> 
-> Regardless of the Arch LBR or legacy LBR, when the LBR_EN bit 0 of the
-> corresponding control MSR is set to 1, LBR recording will be enabled.
-> 
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> Co-developed-by: Yang Weijiang <weijiang.yang@intel.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+I will ping you once kernel-side changes are merged.
 
-Reviewed-by: Kan Liang <kan.liang@linux.intel.com>
+Thanks,
+Anup
 
-> ---
->   arch/x86/events/intel/lbr.c      |  2 --
->   arch/x86/include/asm/msr-index.h |  1 +
->   arch/x86/include/asm/vmx.h       |  2 ++
->   arch/x86/kvm/vmx/pmu_intel.c     | 57 ++++++++++++++++++++++++++++----
->   arch/x86/kvm/vmx/vmx.c           | 12 +++++++
->   5 files changed, 66 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/x86/events/intel/lbr.c b/arch/x86/events/intel/lbr.c
-> index 4529ce448b2e..4fe6c3b50fc3 100644
-> --- a/arch/x86/events/intel/lbr.c
-> +++ b/arch/x86/events/intel/lbr.c
-> @@ -160,8 +160,6 @@ enum {
->   	 ARCH_LBR_RETURN		|\
->   	 ARCH_LBR_OTHER_BRANCH)
->   
-> -#define ARCH_LBR_CTL_MASK			0x7f000e
-> -
->   static void intel_pmu_lbr_filter(struct cpu_hw_events *cpuc);
->   
->   static __always_inline bool is_lbr_call_stack_bit_set(u64 config)
-> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-> index ee15311b6be1..fdf0e3097e0b 100644
-> --- a/arch/x86/include/asm/msr-index.h
-> +++ b/arch/x86/include/asm/msr-index.h
-> @@ -169,6 +169,7 @@
->   #define LBR_INFO_BR_TYPE		(0xfull << LBR_INFO_BR_TYPE_OFFSET)
->   
->   #define MSR_ARCH_LBR_CTL		0x000014ce
-> +#define ARCH_LBR_CTL_MASK		0x7f000e
->   #define ARCH_LBR_CTL_LBREN		BIT(0)
->   #define ARCH_LBR_CTL_CPL_OFFSET		1
->   #define ARCH_LBR_CTL_CPL		(0x3ull << ARCH_LBR_CTL_CPL_OFFSET)
-> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-> index 0ffaa3156a4e..ea3be961cc8e 100644
-> --- a/arch/x86/include/asm/vmx.h
-> +++ b/arch/x86/include/asm/vmx.h
-> @@ -245,6 +245,8 @@ enum vmcs_field {
->   	GUEST_BNDCFGS_HIGH              = 0x00002813,
->   	GUEST_IA32_RTIT_CTL		= 0x00002814,
->   	GUEST_IA32_RTIT_CTL_HIGH	= 0x00002815,
-> +	GUEST_IA32_LBR_CTL		= 0x00002816,
-> +	GUEST_IA32_LBR_CTL_HIGH		= 0x00002817,
->   	HOST_IA32_PAT			= 0x00002c00,
->   	HOST_IA32_PAT_HIGH		= 0x00002c01,
->   	HOST_IA32_EFER			= 0x00002c02,
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index e2b5fc1f4f1a..aa36d2072b91 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -19,6 +19,7 @@
->   #include "pmu.h"
->   
->   #define MSR_PMC_FULL_WIDTH_BIT      (MSR_IA32_PMC0 - MSR_IA32_PERFCTR0)
-> +#define KVM_ARCH_LBR_CTL_MASK  (ARCH_LBR_CTL_MASK | ARCH_LBR_CTL_LBREN)
->   
->   static struct kvm_event_hw_type_mapping intel_arch_events[] = {
->   	[0] = { 0x3c, 0x00, PERF_COUNT_HW_CPU_CYCLES },
-> @@ -192,7 +193,7 @@ static bool intel_pmu_is_valid_lbr_msr(struct kvm_vcpu *vcpu, u32 index)
->   	if (!intel_pmu_lbr_is_enabled(vcpu))
->   		return ret;
->   
-> -	if (index == MSR_ARCH_LBR_DEPTH) {
-> +	if (index == MSR_ARCH_LBR_DEPTH || index == MSR_ARCH_LBR_CTL) {
->   		if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
->   			ret = guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR);
->   		return ret;
-> @@ -363,6 +364,33 @@ static bool arch_lbr_depth_is_valid(struct kvm_vcpu *vcpu, u64 depth)
->   	return (depth == pmu->kvm_arch_lbr_depth);
->   }
->   
-> +static bool arch_lbr_ctl_is_valid(struct kvm_vcpu *vcpu, u64 ctl)
-> +{
-> +	struct kvm_cpuid_entry2 *entry;
-> +
-> +	if (!kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
-> +		return false;
-> +
-> +	if (ctl & ~KVM_ARCH_LBR_CTL_MASK)
-> +		goto warn;
-> +
-> +	entry = kvm_find_cpuid_entry(vcpu, 0x1c, 0);
-> +	if (!entry)
-> +		return false;
-> +
-> +	if (!(entry->ebx & BIT(0)) && (ctl & ARCH_LBR_CTL_CPL))
-> +		return false;
-> +	if (!(entry->ebx & BIT(2)) && (ctl & ARCH_LBR_CTL_STACK))
-> +		return false;
-> +	if (!(entry->ebx & BIT(1)) && (ctl & ARCH_LBR_CTL_FILTER))
-> +		return false;
-> +	return true;
-> +warn:
-> +	pr_warn_ratelimited("kvm: vcpu-%d: invalid arch lbr ctl.\n",
-> +			    vcpu->vcpu_id);
-> +	return false;
-> +}
-> +
->   static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   {
->   	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> @@ -386,6 +414,9 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   	case MSR_ARCH_LBR_DEPTH:
->   		msr_info->data = lbr_desc->records.nr;
->   		return 0;
-> +	case MSR_ARCH_LBR_CTL:
-> +		msr_info->data = vmcs_read64(GUEST_IA32_LBR_CTL);
-> +		return 0;
->   	default:
->   		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
->   		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
-> @@ -457,6 +488,16 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   		 */
->   		wrmsrl(MSR_ARCH_LBR_DEPTH, lbr_desc->records.nr);
->   		return 0;
-> +	case MSR_ARCH_LBR_CTL:
-> +		if (!arch_lbr_ctl_is_valid(vcpu, data))
-> +			break;
-> +
-> +		vmcs_write64(GUEST_IA32_LBR_CTL, data);
-> +
-> +		if (intel_pmu_lbr_is_enabled(vcpu) && !lbr_desc->event &&
-> +		    (data & ARCH_LBR_CTL_LBREN))
-> +			intel_pmu_create_guest_lbr_event(vcpu);
-> +		return 0;
->   	default:
->   		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
->   		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
-> @@ -666,12 +707,16 @@ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
->    */
->   static void intel_pmu_legacy_freezing_lbrs_on_pmi(struct kvm_vcpu *vcpu)
->   {
-> -	u64 data = vmcs_read64(GUEST_IA32_DEBUGCTL);
-> +	u32 lbr_ctl_field = GUEST_IA32_DEBUGCTL;
->   
-> -	if (data & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI) {
-> -		data &= ~DEBUGCTLMSR_LBR;
-> -		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
-> -	}
-> +	if (!(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI))
-> +		return;
-> +
-> +	if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR) &&
-> +	    guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
-> +		lbr_ctl_field = GUEST_IA32_LBR_CTL;
-> +
-> +	vmcs_write64(lbr_ctl_field, vmcs_read64(lbr_ctl_field) & ~0x1ULL);
->   }
->   
->   static void intel_pmu_deliver_pmi(struct kvm_vcpu *vcpu)
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index d58b763df855..b6bc7d97e4b4 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2022,6 +2022,13 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   						VM_EXIT_SAVE_DEBUG_CONTROLS)
->   			get_vmcs12(vcpu)->guest_ia32_debugctl = data;
->   
-> +		/*
-> +		 * For Arch LBR, IA32_DEBUGCTL[bit 0] has no meaning.
-> +		 * It can be written to 0 or 1, but reads will always return 0.
-> +		 */
-> +		if (guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
-> +			data &= ~DEBUGCTLMSR_LBR;
-> +
->   		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
->   		if (intel_pmu_lbr_is_enabled(vcpu) && !to_vmx(vcpu)->lbr_desc.event &&
->   		    (data & DEBUGCTLMSR_LBR))
-> @@ -4553,6 +4560,11 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->   	kvm_make_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu);
->   
->   	vpid_sync_context(vmx->vpid);
-> +
-> +	if (!init_event) {
-> +		if (static_cpu_has(X86_FEATURE_ARCH_LBR))
-> +			vmcs_write64(GUEST_IA32_LBR_CTL, 0);
-> +	}
->   }
->   
->   static void vmx_enable_irq_window(struct kvm_vcpu *vcpu)
+>
+> Will
