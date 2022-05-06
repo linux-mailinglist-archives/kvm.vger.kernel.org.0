@@ -2,255 +2,276 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F2D8C51D5E0
-	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 12:42:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A9EE51D6BE
+	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 13:34:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1391050AbiEFKqR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 May 2022 06:46:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49768 "EHLO
+        id S1391411AbiEFLhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 May 2022 07:37:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231283AbiEFKqO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 May 2022 06:46:14 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C246765409
-        for <kvm@vger.kernel.org>; Fri,  6 May 2022 03:42:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651833751; x=1683369751;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=5ai2cPclVhWwzJ8KE+JdneVb0I12NxRc16n/qnVM+To=;
-  b=X5iPvNw5aqfoH+ogpAm3rXDkuT5hXSdyeAOxh90X1F1g2sWH4DeOAkqe
-   khcXKLR6hATT103gWUUM8fSorB7VxC3IvC58KdCt5hoCtlYCeO4zQdiEy
-   t2iNxdiqZH3V3QTKRN9ileEECCkHim/xh5KDulgRbWzcH6cwVwm1+0moo
-   qkgObYAbZeY/Bd0W2VmBxwf/Vus6REFLaaSgAgrwm2SgzqTDnF6o532gU
-   demGiACb2F0LpICkC1yYVJV8Zf58cj32nKgAAm7+RNk5QU/6QdLPPArOC
-   fpG8J9b+r2Ewjgr/R1hGATzxJc3+mChdHBgmd3OYxsjNFTlTdWpuWFqxw
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10338"; a="328979230"
-X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
-   d="scan'208";a="328979230"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2022 03:42:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
-   d="scan'208";a="695122589"
-Received: from fmsmsx606.amr.corp.intel.com ([10.18.126.86])
-  by orsmga004.jf.intel.com with ESMTP; 06 May 2022 03:42:30 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27; Fri, 6 May 2022 03:42:30 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27; Fri, 6 May 2022 03:42:29 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27 via Frontend Transport; Fri, 6 May 2022 03:42:29 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.176)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2308.27; Fri, 6 May 2022 03:42:29 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PCI1EcrYIc9XPclt3urE+GXQ7BB4mbWxW7DFTZnxPlZiN+YLtG5byMNUDxZeIfOFdoJk/Kfk9kasNOwrk5JHB0o7vY1eKXIM82KF9ZLGdo18tiXV60ECF5MKf780lzhlq4d1MFw8m82+RGExMWE9orolKfxPg8HyT0P28gz1zN3ritzOFopkODvgwOLBOb98t2wYHnabjlePVaRZe8/M5ieJSm3zKMXo5Rf1avGZWeJkg9FM57WnqOXMmnNaI1n4+8Amra56ydOJZcmT6IA39Bsb7UvXbCTSSmPsdiMz8loWPtHVYSyqogmVT9S8YOyI6dP47Kbb9VSZZSoxUg0q+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YR/KYDjB0CUDdOHEV/R95UYHnAdwddf+0HadNAkPmvo=;
- b=IFPIsTLBkPXf7qqve2hCMEYhirjDBF5NtYSA08Uzi7yvrq1CFzLEfj0simCAsxRI98EE7OOYt4bNPVMrXmjCwhzit2qyJtJyHOvhql0RfW3z30Oayu2YgY7xjVXVaKAhPJZ5PjLnQN6xcULNSTmifYtIaRexcQ2N9C1lfEOkmObS1RFsHIW2ehHxxw3MEt3bsB37TikaheGrC2tA00CX2odEfZQ5F3a55CElsSRFUAvVEhgsMqA3FPvK9dvHWLakUr6ETZp876YVDCeTctGyvsX1TS3+n4jsddpeQGX4q1XtwW/40YnNMw9j5BN4IIh5gf9G/l5oqzKrHhZ7r7V6jA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by BN6PR11MB2017.namprd11.prod.outlook.com (2603:10b6:404:46::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5206.13; Fri, 6 May
- 2022 10:42:21 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::24dd:37c2:3778:1adb]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::24dd:37c2:3778:1adb%2]) with mapi id 15.20.5227.020; Fri, 6 May 2022
- 10:42:21 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     David Gibson <david@gibson.dropbear.id.au>,
-        Jason Gunthorpe <jgg@nvidia.com>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "Jason Wang" <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Martins, Joao" <joao.m.martins@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        "Shameerali Kolothum Thodi" <shameerali.kolothum.thodi@huawei.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>
-Subject: RE: [PATCH RFC 11/12] iommufd: vfio container FD ioctl compatibility
-Thread-Topic: [PATCH RFC 11/12] iommufd: vfio container FD ioctl compatibility
-Thread-Index: AQHYOu2EhhTTZTsn5EqajxaIjlC6M6zNmzGAgAAclACAAWiFgIA2iT0AgAAE2ICAAP5AAIAAbGoAgARd/oCABXnXAIAArI2AgABQHYA=
-Date:   Fri, 6 May 2022 10:42:21 +0000
-Message-ID: <BN9PR11MB5276CACD8AB1EB092A333CC78CC59@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <11-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
- <20220323165125.5efd5976.alex.williamson@redhat.com>
- <20220324003342.GV11336@nvidia.com>
- <20220324160403.42131028.alex.williamson@redhat.com> <YmqqXHsCTxVb2/Oa@yekko>
- <20220428151037.GK8364@nvidia.com> <YmuDtPMksOj7NOEh@yekko>
- <20220429124838.GW8364@nvidia.com> <Ym+IfTvdD2zS6j4G@yekko>
- <20220505190728.GV49344@nvidia.com> <YnSxL5KxwJvQzd2Q@yekko>
-In-Reply-To: <YnSxL5KxwJvQzd2Q@yekko>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-version: 11.6.401.20
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c1092858-eb5a-44e7-5f2a-08da2f4d19c5
-x-ms-traffictypediagnostic: BN6PR11MB2017:EE_
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-microsoft-antispam-prvs: <BN6PR11MB2017431C9244D9D7704148AB8CC59@BN6PR11MB2017.namprd11.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 3l8iu8e3Aznivel/yeWmMjuipzNtrKsxKeESxTpBO9F2Xu9RY7aHDQIknSCX+yAxjHN/yZpNxWcm5moQB4aj8FzRKCOnCFKFbEwRRbA2/QM/t5iskXrR+1vuM6R/XSVnDBJAzmnyyTP9lousnup1cI5j7QSxZnb15dsegWiZrOGqKcDqxhGmSVaPcD1b2syAx17uI25uE5r1Zgjm7JPNDGp+JjvJtYQVuF/qg2fCncBnjWjSMktUPya2ntIpuBh0Aphb/V72IRWdyqIv0AzovtiJbYs4T3WFyLz7yTLcgQIANFXNmrudJrqLJrrQU3mqBNlj6WDOWdn2rq+voVGZxEcpAHHoci1PdTnPxnImI0ptIMOpuQZ3azxEw+5TGa/cMe7XRLI1JnYnZSemt14jexJOBmFC4nVR0MHRFU4uKwlycIEku7H3N+DdjvRfSqjWxVHv0lVC1PzofzBMtO/MitLBEVt5gmDwiccFwikzQeiBxDKP1ec50Vk/w9fgV1qLT2KruNJumhnBlh3sSeFVdYjBtckGUZqBhWXm4308UbRw8oLa+T/bzbXBNaPrkqHzNoZdGrfbBJu09hE1JtKoHEon5X9ZC/ndaWNK6iSqVHz5OFUITG7JVHNltO4cDbTCZ6ll4IvafR4lgS4zR+VqT3Op+Qlu88mIOmu4V4Dm7IPXeO4hF6k9GMWtlLM5y2qhkV2tlu+rCO5ZcmwDqrnx+w==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(8936002)(7416002)(52536014)(38070700005)(38100700002)(122000001)(76116006)(186003)(71200400001)(82960400001)(2906002)(4326008)(54906003)(66446008)(316002)(9686003)(110136005)(508600001)(26005)(66476007)(7696005)(55016003)(33656002)(5660300002)(83380400001)(8676002)(86362001)(6506007)(66946007)(66556008)(64756008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?RTN9VKyU5ZS8CXAbSQfVGDonZvE4hZpntL5ZORC2PAXkFS8iHarer399wyPi?=
- =?us-ascii?Q?aH7F2XGcEcGm3g861xi18VqyL92Z/OCMGj9OfnrEFzeDb+m/6pZYEBAjFgwk?=
- =?us-ascii?Q?N82D8rqgsOCs9wNR33oLtlOAtFUdkW0Yf6laH8V2sbBIcqoSG5/wRGdWLG/j?=
- =?us-ascii?Q?CeHedtLZeKscK2WkmBoovqevaI6nbI0PZxwfAw9FxNcad9GwZwWMWE8W+9fg?=
- =?us-ascii?Q?+aR2METITO3qQBrDvvvQOKmcTXVswWJdEtZk9CFg42LZbVxczqjogHkYMxbT?=
- =?us-ascii?Q?XRPuqW1fNObLfJbG3flwojyCc8UDVoR/hRXHIph1FdGda3eq6tOXvcb76Tp3?=
- =?us-ascii?Q?u872BBWK6nxEn7Xplfzjywzi+sMIGbcRufj10rwSi58+/OQaH252/NVjuagD?=
- =?us-ascii?Q?dWhQoKCYC3OvTcIBw2zKTysR6cOG7gmpepYam9SVuD6IDHYUppx1d5zObGGg?=
- =?us-ascii?Q?2+NNdx+utDUTcAaSKJEw1shK/vmOeC8rHivkKjxM6h525RddEjFVthgguxsr?=
- =?us-ascii?Q?/Qf46NPI5vwtOPB0pb2nglzlIZ5VnqTsG8dztTRsQCdG7YJJM5mIv9i5G1fg?=
- =?us-ascii?Q?MTAFWa6LQqpHob2LnjBBGQn0wJQcFmElG6cdYTFAtP5Mtg4IJ2sDKVsqWZfa?=
- =?us-ascii?Q?DasgL5obBqh94+D8/etI1+RUFFFSYjVUSPv2mVwM0Rl3nfhUmJ/eZcopkw7P?=
- =?us-ascii?Q?Jeiv2z2Io2zoBc2ITV+H1RrHtuQn6kMngJkAKbiZKfV8h5hTbvQj+oJpi6+n?=
- =?us-ascii?Q?hlHMeNguGsiaE57LcAa0mmss2gTh4xUrfyC1uKln4ms/9/yJP8/xyCxGl/nE?=
- =?us-ascii?Q?MoZLg0kZU0gHsrHDgULMTcRiJK+JZOiLWdD0tlYgfnwXfS83rJHRn5mkz/KD?=
- =?us-ascii?Q?k48wDmrq2jdSqQiE0NXjapJPb9sBDs359zk6Aol9PVHJXoFO84oKeLRA76Za?=
- =?us-ascii?Q?HXbVtblTheF4whgASReqcIWzLyXZqww4MQJ9aGIep3r01DnzL1lK1mZ8qExo?=
- =?us-ascii?Q?5WGKIyY5bB5dEq3gVY0Mc4kEEk9UWNWLwZl8J/rhSf4SkHrxmk2n4dxXqrY/?=
- =?us-ascii?Q?Z9ajpp8od8ea8o23UoU3zhFbqQybzfvIEy50+Ca99xsR0ZHqUgeiXYnLm8Y/?=
- =?us-ascii?Q?nrAuoPaFy6olSq2a4jL829qhC4XoF45TRXYiTDILoafYlDXTMYnqbJPyh1DH?=
- =?us-ascii?Q?h2yQlm5HDnTK218ryecdyE+RthVdqKv2d95OYk5g8lWk0pUcpVMcWyI4QUQU?=
- =?us-ascii?Q?b9LEDP2SoayMJMRXhJw0HAoit3T3r2PSa+hahCku7RNvGkYg759OFz0LFqmy?=
- =?us-ascii?Q?s8wc84A8h6nHtijXLJr/31w38+bGwB9Cp/m6xBySOQ6NDameYol0b/sOkYpm?=
- =?us-ascii?Q?puordOme3KssstvDkok+NK1w8HKaV/lzz5Or7yEkfkgbmhoovvNc1bGDYPmx?=
- =?us-ascii?Q?Y8Vw/jBVNWWEHJc+FV6mfqNJy7yhUJt+7dHYZFUwhgxOgrKuiWWAyS7Dl85+?=
- =?us-ascii?Q?1WwWsu9PWqGX9PjwSiKGwtz8+/cDec57Runb7vW7WOqc7ZHES475ubbnAG4a?=
- =?us-ascii?Q?rCyNZgHgGtLMSBFvushZofm+NsOnONTIjlvVtXtGC2nsMFKPSLB46rqW/KT6?=
- =?us-ascii?Q?uNIzg5RzSuAtyP7ym85zgTpQE+BMSnlR7RqYhW6RpZDCgHImXw4vTSFwbZqG?=
- =?us-ascii?Q?UYyKuyJ8QhYmxj8dTAWWaoufcxyTJVZaAI50Z0UEfPQ7MB8QSep3oneRQQOU?=
- =?us-ascii?Q?kJtbczsmYg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S1391400AbiEFLhd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 May 2022 07:37:33 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7C666832F;
+        Fri,  6 May 2022 04:33:42 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 246BDoBL027443;
+        Fri, 6 May 2022 11:33:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=I3LOhBMq302WzVno2bRgueu34Zp34rUClU5uKaOI1cY=;
+ b=oZ0U+UWu+I4zmyLbUJhuZFftoB4UVuHD2yKFfnKHPnfs4nOa29ofjfI6uIpLnPYk9CiS
+ mIuJnmCQiTmp8HZDSmiDMcvfJvVX844sB1uvAskHnc7s4G3VwxI9cysAfrwGT+2+oAot
+ SuO0fw6c+TqBsBpX2jFmR7WZ7G+6k1K2/SEtukbVUpV/HEw22I/tgcMtlxRoarTXo9c4
+ 3hpYqk3rgtwcS7hfUt9XcGTQC8N79S6XfLUJRBDtOPLbs9AZ6I2fnx2vUz2TrVPpBcy3
+ EkDvLcsQTiiCV1oaxNSmpfglVYYBZkIbaV2GwNv5IULx47vLanFGBB8pcHGIq+zKRMus yA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fw2m78a3a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 May 2022 11:33:41 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 246BI969009015;
+        Fri, 6 May 2022 11:33:41 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fw2m78a2u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 May 2022 11:33:41 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 246BSxns025972;
+        Fri, 6 May 2022 11:33:39 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma01fra.de.ibm.com with ESMTP id 3fvm08gqut-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 May 2022 11:33:39 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 246BXaGU57868726
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 6 May 2022 11:33:36 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5908B4C044;
+        Fri,  6 May 2022 11:33:36 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AE5324C040;
+        Fri,  6 May 2022 11:33:35 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.15.58])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  6 May 2022 11:33:35 +0000 (GMT)
+Date:   Fri, 6 May 2022 13:30:30 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
+        mimu@linux.ibm.com, nrb@linux.ibm.com
+Subject: Re: [PATCH v10 01/19] KVM: s390: pv: leak the topmost page table
+ when destroy fails
+Message-ID: <20220506133030.6b51e019@p-imbrenda>
+In-Reply-To: <08f78cc7-b34e-cdca-72b8-a0f9163f3ca7@redhat.com>
+References: <20220414080311.1084834-1-imbrenda@linux.ibm.com>
+        <20220414080311.1084834-2-imbrenda@linux.ibm.com>
+        <08f78cc7-b34e-cdca-72b8-a0f9163f3ca7@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c1092858-eb5a-44e7-5f2a-08da2f4d19c5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 May 2022 10:42:21.6918
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: v78GKNZmga3f+W0uq/834jXjSV4wvdrPQBVrfi/DJdg//Pyiu7Zsp3oNc7G6vwpccSsF4zz0rgtLoJyFxS1nzQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR11MB2017
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 3lUAbrIdoCp1ZFtq-KSKYH0w0qDcRcST
+X-Proofpoint-GUID: Y3dkZDtvUpBcPzuwHcIGWPRBf7ttbErd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-06_04,2022-05-06_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ priorityscore=1501 adultscore=0 clxscore=1015 mlxlogscore=999
+ impostorscore=0 mlxscore=0 lowpriorityscore=0 bulkscore=0 suspectscore=0
+ malwarescore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205060064
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: David Gibson <david@gibson.dropbear.id.au>
-> Sent: Friday, May 6, 2022 1:25 PM
->=20
-> >
-> > When the iommu_domain is created I want to have a
-> > iommu-driver-specific struct, so PPC can customize its iommu_domain
-> > however it likes.
->=20
-> This requires that the client be aware of the host side IOMMU model.
-> That's true in VFIO now, and it's nasty; I was really hoping we could
-> *stop* doing that.
+On Thu, 5 May 2022 16:45:13 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-that model is anyway inevitable when talking about user page table,
-i.e. when nesting is enabled.
+> On 14/04/2022 10.02, Claudio Imbrenda wrote:
+> > Each secure guest must have a unique ASCE (address space control
+> > element); we must avoid that new guests use the same page for their
+> > ASCE, to avoid errors.
+> > 
+> > Since the ASCE mostly consists of the address of the topmost page table
+> > (plus some flags), we must not return that memory to the pool unless
+> > the ASCE is no longer in use.
+> > 
+> > Only a successful Destroy Secure Configuration UVC will make the ASCE
+> > reusable again.
+> > 
+> > If the Destroy Configuration UVC fails, the ASCE cannot be reused for a
+> > secure guest (either for the ASCE or for other memory areas). To avoid
+> > a collision, it must not be used again. This is a permanent error and
+> > the page becomes in practice unusable, so we set it aside and leak it.
+> > On failure we already leak other memory that belongs to the ultravisor
+> > (i.e. the variable and base storage for a guest) and not leaking the
+> > topmost page table was an oversight.
+> > 
+> > This error (and thus the leakage) should not happen unless the hardware
+> > is broken or KVM has some unknown serious bug.
+> > 
+> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > Fixes: 29b40f105ec8d55 ("KVM: s390: protvirt: Add initial vm and cpu lifecycle handling")
+> > ---
+> >   arch/s390/include/asm/gmap.h |  2 +
+> >   arch/s390/kvm/pv.c           |  9 ++--
+> >   arch/s390/mm/gmap.c          | 80 ++++++++++++++++++++++++++++++++++++
+> >   3 files changed, 88 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/arch/s390/include/asm/gmap.h b/arch/s390/include/asm/gmap.h
+> > index 40264f60b0da..746e18bf8984 100644
+> > --- a/arch/s390/include/asm/gmap.h
+> > +++ b/arch/s390/include/asm/gmap.h
+> > @@ -148,4 +148,6 @@ void gmap_sync_dirty_log_pmd(struct gmap *gmap, unsigned long dirty_bitmap[4],
+> >   			     unsigned long gaddr, unsigned long vmaddr);
+> >   int gmap_mark_unmergeable(void);
+> >   void s390_reset_acc(struct mm_struct *mm);
+> > +void s390_remove_old_asce(struct gmap *gmap);
+> > +int s390_replace_asce(struct gmap *gmap);
+> >   #endif /* _ASM_S390_GMAP_H */
+> > diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+> > index 7f7c0d6af2ce..3c59ef763dde 100644
+> > --- a/arch/s390/kvm/pv.c
+> > +++ b/arch/s390/kvm/pv.c
+> > @@ -166,10 +166,13 @@ int kvm_s390_pv_deinit_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
+> >   	atomic_set(&kvm->mm->context.is_protected, 0);
+> >   	KVM_UV_EVENT(kvm, 3, "PROTVIRT DESTROY VM: rc %x rrc %x", *rc, *rrc);
+> >   	WARN_ONCE(cc, "protvirt destroy vm failed rc %x rrc %x", *rc, *rrc);
+> > -	/* Inteded memory leak on "impossible" error */
+> > -	if (!cc)
+> > +	/* Intended memory leak on "impossible" error */
+> > +	if (!cc) {
+> >   		kvm_s390_pv_dealloc_vm(kvm);
+> > -	return cc ? -EIO : 0;
+> > +		return 0;
+> > +	}
+> > +	s390_replace_asce(kvm->arch.gmap);
+> > +	return -EIO;
+> >   }
+> >   
+> >   int kvm_s390_pv_init_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
+> > diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+> > index af03cacf34ec..e8904cb9dc38 100644
+> > --- a/arch/s390/mm/gmap.c
+> > +++ b/arch/s390/mm/gmap.c
+> > @@ -2714,3 +2714,83 @@ void s390_reset_acc(struct mm_struct *mm)
+> >   	mmput(mm);
+> >   }
+> >   EXPORT_SYMBOL_GPL(s390_reset_acc);
+> > +
+> > +/**
+> > + * s390_remove_old_asce - Remove the topmost level of page tables from the
+> > + * list of page tables of the gmap.
+> > + * @gmap the gmap whose table is to be removed
+> > + *
+> > + * This means that it will not be freed when the VM is torn down, and needs
+> > + * to be handled separately by the caller, unless an intentional leak is
+> > + * intended. Notice that this function will only remove the page from the  
+> 
+> "intentional leak is intended" ... sounds redundant. Scratch the first 
+> "intentional" ?
+> 
+> > + * list, the page will still be used as a top level page table (and ASCE).
+> > + */
+> > +void s390_remove_old_asce(struct gmap *gmap)
+> > +{
+> > +	struct page *old;
+> > +
+> > +	old = virt_to_page(gmap->table);
+> > +	spin_lock(&gmap->guest_table_lock);
+> > +	list_del(&old->lru);
+> > +	/*
+> > +	 * In case the ASCE needs to be "removed" multiple times, for example
+> > +	 * if the VM is rebooted into secure mode several times
+> > +	 * concurrently, or if s390_replace_asce fails after calling
+> > +	 * s390_remove_old_asce and is attempted again later. In that case  
+> 
+> "In case the ASCE ... . In that case" - this should be either one big 
+> sentence, or better, scratch the first "In case" and use "Sometimes" or 
+> something similar to start the first sentence.
+> 
+> > +	 * the old asce has been removed from the list, and therefore it
+> > +	 * will not be freed when the VM terminates, but the ASCE is still
+> > +	 * in use and still pointed to.
+> > +	 * A subsequent call to replace_asce will follow the pointer and try
+> > +	 * to remove the same page from the list again.
+> > +	 * Therefore it's necessary that the page of the ASCE has valid
+> > +	 * pointers, so list_del can work (and do nothing) without
+> > +	 * dereferencing stale or invalid pointers.
+> > +	 */
+> > +	INIT_LIST_HEAD(&old->lru);
+> > +	spin_unlock(&gmap->guest_table_lock);
+> > +}
+> > +EXPORT_SYMBOL_GPL(s390_remove_old_asce);
+> > +
+> > +/**
+> > + * s390_replace_asce - Try to replace the current ASCE of a gmap with
+> > + * another equivalent one.
+> > + * @gmap the gmap  
+> 
+> "the gmap" is not a very helpful description for a parmeter that is already 
+> called gmap. Write at least "the guest map that should be replaced" ?
+> 
+> > + *
+> > + * If the allocation of the new top level page table fails, the ASCE is not
+> > + * replaced.
+> > + * In any case, the old ASCE is always removed from the list. Therefore the
+> > + * caller has to make sure to save a pointer to it beforehands, unless an  
+> 
+> s/beforehands/beforehand/
+> 
+> > + * intentional leak is intended.  
+> 
+> scratch "intentional".
+> 
+> > + */
+> > +int s390_replace_asce(struct gmap *gmap)
+> > +{
+> > +	unsigned long asce;
+> > +	struct page *page;
+> > +	void *table;
+> > +
+> > +	s390_remove_old_asce(gmap);
+> > +
+> > +	page = alloc_pages(GFP_KERNEL_ACCOUNT, CRST_ALLOC_ORDER);
+> > +	if (!page)
+> > +		return -ENOMEM;
+> > +	table = page_to_virt(page);
+> > +	memcpy(table, gmap->table, 1UL << (CRST_ALLOC_ORDER + PAGE_SHIFT));
+> > +
+> > +	/*
+> > +	 * The caller has to deal with the old ASCE, but here we make sure
+> > +	 * the new one is properly added to the list of page tables, so that
+> > +	 * it will be freed when the VM is torn down.
+> > +	 */
+> > +	spin_lock(&gmap->guest_table_lock);
+> > +	list_add(&page->lru, &gmap->crst_list);
+> > +	spin_unlock(&gmap->guest_table_lock);
+> > +
+> > +	/* Set new table origin while preserving existing ASCE control bits */
+> > +	asce = (gmap->asce & ~_ASCE_ORIGIN) | __pa(table);
+> > +	WRITE_ONCE(gmap->asce, asce);
+> > +	WRITE_ONCE(gmap->mm->context.gmap_asce, asce);
+> > +	WRITE_ONCE(gmap->table, table);
+> > +
+> > +	return 0;
+> > +}
+> > +EXPORT_SYMBOL_GPL(s390_replace_asce);  
+> 
+>   Thomas
+> 
 
->=20
-> Note that I'm talking here *purely* about the non-optimized case where
-> all updates to the host side IO pagetables are handled by IOAS_MAP /
-> IOAS_COPY, with no direct hardware access to user or guest managed IO
-> pagetables.  The optimized case obviously requires end-to-end
-> agreement on the pagetable format amongst other domain properties.
->=20
-> What I'm hoping is that qemu (or whatever) can use this non-optimized
-> as a fallback case where it does't need to know the properties of
-> whatever host side IOMMU models there are.  It just requests what it
-> needs based on the vIOMMU properties it needs to replicate and the
-> host kernel either can supply it or can't.
->=20
-> In many cases it should be perfectly possible to emulate a PPC style
-> vIOMMU on an x86 host, because the x86 IOMMU has such a colossal
-> aperture that it will encompass wherever the ppc apertures end
-> up. Similarly we could simulate an x86-style no-vIOMMU guest on a ppc
-> host (currently somewhere between awkward and impossible) by placing
-> the host apertures to cover guest memory.
->=20
-> Admittedly those are pretty niche cases, but allowing for them gives
-> us flexibility for the future.  Emulating an ARM SMMUv3 guest on an
-> ARM SMMU v4 or v5 or v.whatever host is likely to be a real case in
-> the future, and AFAICT, ARM are much less conservative that x86 about
-> maintaining similar hw interfaces over time.  That's why I think
-> considering these ppc cases will give a more robust interface for
-> other future possibilities as well.
+thanks, I will fix them all
 
-It's not niche cases. We already have virtio-iommu which can work
-on both ARM and x86 platforms, i.e. what current iommufd provides
-is already generic enough except on PPC.
-
-Then IMHO the key open here is:
-
-Can PPC adapt to the current iommufd proposal if it can be
-refactored to fit the standard iommu domain/group concepts?
-
-If not, what is the remaining gap after PPC becomes a normal
-citizen in the iommu layer and is it worth solving it in the general
-interface or via iommu-driver-specific domain (given this will
-exist anyway)?
-
-to close that open I'm with Jason:
-
-   "Fundamentally PPC has to fit into the iommu standard framework of
-   group and domains, we can talk about modifications, but drifting too
-   far away is a big problem."
-
-Directly jumping to the iommufd layer for what changes might be
-applied to all platforms sounds counter-intuitive if we haven't tried=20
-to solve the gap in the iommu layer in the first place, as even
-there is argument that certain changes in iommufd layer can find
-matching concept on other platforms it still sort of looks redundant
-since those platforms already work with the current model.
-
-My two cents.
-
-Thanks
-Kevin
