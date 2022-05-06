@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A7A351E113
-	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 23:29:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7151151E13C
+	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 23:36:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352550AbiEFVdS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 May 2022 17:33:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51210 "EHLO
+        id S1376497AbiEFVjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 May 2022 17:39:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1444464AbiEFVdQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 May 2022 17:33:16 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1F7D6F4AB;
-        Fri,  6 May 2022 14:29:32 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id c9so7930569plh.2;
-        Fri, 06 May 2022 14:29:32 -0700 (PDT)
+        with ESMTP id S1444570AbiEFVjG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 May 2022 17:39:06 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 372F1290;
+        Fri,  6 May 2022 14:35:20 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id z5-20020a17090a468500b001d2bc2743c4so7937216pjf.0;
+        Fri, 06 May 2022 14:35:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=6qT9B79QXkLWw17UF4jXkgLnzsIOvLk4zlsmk1fzfpA=;
-        b=GvND7ulvJ0NlO8EOj5vYXO3AtWWcVqs0iZMXTw0tKe5MktIsJXcjT9wDj+TMCSW9Li
-         RBPsDcKG4kR1+fAkhLTmfqFxdFFxxI/GywIqM3uqDHktjpW3N4l55OExoVNeu0vYDmy1
-         XUzIVOq+ghsC7rX3iE3RJTcmDbce9Lhb4vHntWS7Ty8WXzUtymUNgjdXBycqV2t7Qa1W
-         jk4wz36U1WMeXLLKjcJoz3kblEc1opFCk0ZtMxiX3KbvxDooJXRhb86ZCw4ovGBx5Y/a
-         iRKW2QJLnCLCUIN6CHzM3CUTtzgeQ1igX0UoYIMXbSXDUyY3QvqecA7WDNbLHS69r8Df
-         DuGw==
+        bh=i4ODuIClhs3mPszvinEDNPwzFTB2SCM7aKWWSn8J0uI=;
+        b=ZobUQTJx+NEoOz7HvidPGdMS7pGKQYEvaMWHSkM0LrrT6xvFzsqRlO8aabdUfk5mzA
+         WAA2gQ7JSMyXLNUMRob2kQl5ERwLxOJ2TkuCeceApSb8CPToTX5+rYaOc+1tcw5gg1Br
+         7SVE3oSloMmZlo6LHAFw4xmpUoIo3tI/ITUkxK5fr1rV84MGytDKKoGyceW6oPKJpYzu
+         /roz5hcWkLX7E2Wm1fgGGypKwUltKCTWHToCeXoq5qEMdzN1UN5eWqvyC1KKII/boOsN
+         9XxfX8biWIIfNEmkVv2/GQ0CM3ODhwDpG3bBlExPQabUZdRprNM2RcKRAcEsCwuNKBdJ
+         vnxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=6qT9B79QXkLWw17UF4jXkgLnzsIOvLk4zlsmk1fzfpA=;
-        b=2v5h8H02tB9Xmc4yMgMvFSsWLR4Yaf+khTw99HhVLMSjKtnHuXiFvUZvY0oaM3crjn
-         2OiXsDFbGa9O1nANZ92sKGoOJiDOM0dJWBOndsCjDAFmkMWwcdp2fpMC0iee1uxQliYl
-         ofJqhdHBjshgiX1U/sQGynqg2WxVOBT2DXMDBxTC1vF3LFDU4XXgJzussPDnZsup4PQq
-         oF3tBYKUuKoNSIhobYaUaZE8e1y4rF3TacPuSIGk6iaAsec6NqPTpCGUNPEnj3T0bxMQ
-         ZvQ/s3Jjcy72xKmoe5OH1OAB95w7tC8eW+fY5tcL8LyhvKHvDK3flqrTquAhoyVEubk2
-         M92g==
-X-Gm-Message-State: AOAM5312T5XyssIht7o4E54+3sXGHg3ktR68dxDOGM3SYBeILy9LijHG
-        9VWfhBLV331sAs+p+Yb8BDW9KfJb0n0=
-X-Google-Smtp-Source: ABdhPJycAKGNm73Ipl+cKSsvVHi+P4RQBndDHDv8gxThLv0xO+9931Wl1u2TGJ//LxrHRhAhoeR4PA==
-X-Received: by 2002:a17:902:7104:b0:15e:ddb8:199 with SMTP id a4-20020a170902710400b0015eddb80199mr5728782pll.80.1651872571978;
-        Fri, 06 May 2022 14:29:31 -0700 (PDT)
+        bh=i4ODuIClhs3mPszvinEDNPwzFTB2SCM7aKWWSn8J0uI=;
+        b=1CokWBJ4/UWZYRM7o7AbkoYHJqqb3kOQ/yhizM3BYvJuYi2Z/yt8XvkAkgEJovZZa/
+         MRtpVCzn9MWwc61abQ5nScsX64bvrkg2H1KQESu60/e451xYexv45+/365rMYraKrJ8j
+         rcknpiEEm01PddEpH+6fq4tUUxmN8fdUT6v9vCgTkhuTEohO+MVveUE6Np98g5XNz8MG
+         shCRg91GTqls8r5lHcY/GuZFPPUrlPAXziedYxzleDECdrrwYUqlW0jkyEUcsMYK6aAi
+         eIaVwlBw9XVIf3gwdReQwNBz6Aphh78cdNVy0HMYJZ6DNkpfqopFcu4lbG+IHMXV6LvM
+         1F9w==
+X-Gm-Message-State: AOAM533yzY4HsDvfPFULcwUmW34XgfU1ryVfetLJbcElxKWcrUGqmg3O
+        KkAWXQLbnzF5r5qMfvh8ODliwRjWlec=
+X-Google-Smtp-Source: ABdhPJxfE2Zwmmn+Pr9mn2jUdfULvWEfYj/0IErCyVgFBWuR1SqIzLe8Zj3cUVEiQ+lBKOLIVVylRQ==
+X-Received: by 2002:a17:90a:9ea:b0:1dc:1c48:eda with SMTP id 97-20020a17090a09ea00b001dc1c480edamr14473942pjo.38.1651872919617;
+        Fri, 06 May 2022 14:35:19 -0700 (PDT)
 Received: from localhost (c-107-3-154-88.hsd1.ca.comcast.net. [107.3.154.88])
-        by smtp.gmail.com with ESMTPSA id s66-20020a637745000000b003c25a7581d9sm3739161pgc.52.2022.05.06.14.29.30
+        by smtp.gmail.com with ESMTPSA id n3-20020a056a0007c300b0050e0dadb28dsm3846324pfu.205.2022.05.06.14.35.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 May 2022 14:29:31 -0700 (PDT)
-Date:   Fri, 6 May 2022 14:29:30 -0700
+        Fri, 06 May 2022 14:35:19 -0700 (PDT)
+Date:   Fri, 6 May 2022 14:35:18 -0700
 From:   Isaku Yamahata <isaku.yamahata@gmail.com>
 To:     Xiaoyao Li <xiaoyao.li@intel.com>
 Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
@@ -55,16 +55,16 @@ Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>
-Subject: Re: [RFC PATCH v6 011/104] KVM: TDX: Initialize TDX module when
- loading kvm_intel.ko
-Message-ID: <20220506212930.GA2145958@private.email.ne.jp>
+Subject: Re: [RFC PATCH v6 017/104] KVM: TDX: Add C wrapper functions for
+ SEAMCALLs to the TDX module
+Message-ID: <20220506213518.GB2145958@private.email.ne.jp>
 References: <cover.1651774250.git.isaku.yamahata@intel.com>
- <752bc449e13cb3e6874ba2d82f790f6f6018813c.1651774250.git.isaku.yamahata@intel.com>
- <c7c1f8d1-081a-d543-bdb4-6895292c7077@intel.com>
+ <b4cfd2e1b4daf91899a95ab3e2a4e2ea1d25773c.1651774250.git.isaku.yamahata@intel.com>
+ <16632b27-7a0d-887b-c86e-9e1673840f55@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c7c1f8d1-081a-d543-bdb4-6895292c7077@intel.com>
+In-Reply-To: <16632b27-7a0d-887b-c86e-9e1673840f55@intel.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
@@ -76,40 +76,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 06, 2022 at 09:57:09PM +0800,
+On Fri, May 06, 2022 at 04:56:52PM +0800,
 Xiaoyao Li <xiaoyao.li@intel.com> wrote:
 
 > On 5/6/2022 2:14 AM, isaku.yamahata@intel.com wrote:
-> > +int __init tdx_module_setup(void)
-> > +{
-> > +	const struct tdsysinfo_struct *tdsysinfo;
-> > +	int ret = 0;
-> > +
-> > +	BUILD_BUG_ON(sizeof(*tdsysinfo) != 1024);
-> > +	BUILD_BUG_ON(TDX_MAX_NR_CPUID_CONFIGS != 37);
-> > +
-> > +	ret = tdx_detect();
-> > +	if (ret) {
-> > +		pr_info("Failed to detect TDX module.\n");
-> > +		return ret;
-> > +	}
-> > +
-> > +	ret = tdx_init();
-> > +	if (ret) {
-> > +		pr_info("Failed to initialize TDX module.\n");
-> > +		return ret;
-> > +	}
-> > +
-> > +	tdsysinfo = tdx_get_sysinfo();
-> > +	if (tdx_caps.nr_cpuid_configs > TDX_MAX_NR_CPUID_CONFIGS)
-> > +		return -EIO;
+> > diff --git a/arch/x86/virt/vmx/tdx/seamcall.S b/arch/x86/virt/vmx/tdx/seamcall.S
+> > index 8df7a16f7685..b4fc8182e1cf 100644
+> > --- a/arch/x86/virt/vmx/tdx/seamcall.S
+> > +++ b/arch/x86/virt/vmx/tdx/seamcall.S
+> > @@ -50,3 +50,4 @@ SYM_FUNC_START(__seamcall)
+> >   	FRAME_END
+> >   	ret
+> >   SYM_FUNC_END(__seamcall)
+> > +EXPORT_SYMBOL_GPL(__seamcall)
 > 
-> It needs to check tdsysinfo->num_cpuid_config against
-> TDX_MAX_NR_CPUID_CONFIG
+> It cannot compile, we need
 > 
-> or move the check down after tdx_caps is initialized.
+> #include <asm/export.h>
 
-Thanks for catching it. I'll replace it with tdsysinfo->num_cpuid_config.
+Thanks, will fix it.
 
 -- 
 Isaku Yamahata <isaku.yamahata@gmail.com>
