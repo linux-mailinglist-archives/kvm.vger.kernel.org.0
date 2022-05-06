@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 78E5C51DA00
-	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 16:09:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86F7451DA03
+	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 16:09:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1391048AbiEFONA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 May 2022 10:13:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34576 "EHLO
+        id S1442017AbiEFONF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 May 2022 10:13:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442021AbiEFOMz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 May 2022 10:12:55 -0400
+        with ESMTP id S1442029AbiEFOM7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 May 2022 10:12:59 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 88EC368984
-        for <kvm@vger.kernel.org>; Fri,  6 May 2022 07:09:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 81748674D7
+        for <kvm@vger.kernel.org>; Fri,  6 May 2022 07:09:16 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6448B1570;
-        Fri,  6 May 2022 07:09:12 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 373A31595;
+        Fri,  6 May 2022 07:09:16 -0700 (PDT)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 74D4C3F885;
-        Fri,  6 May 2022 07:09:11 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 47BAC3F885;
+        Fri,  6 May 2022 07:09:15 -0700 (PDT)
 From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
 To:     Andrew Jones <drjones@redhat.com>
 Cc:     jade.alglave@arm.com, alexandru.elisei@arm.com,
         Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu
-Subject: [kvm-unit-tests PATCH 08/23] arm/arm64: Add support for cpu initialization through ACPI
-Date:   Fri,  6 May 2022 15:08:40 +0100
-Message-Id: <20220506140855.353337-9-nikos.nikoleris@arm.com>
+Subject: [kvm-unit-tests PATCH 12/23] arm/arm64: mmu_disable: Clean and invalidate before disabling
+Date:   Fri,  6 May 2022 15:08:44 +0100
+Message-Id: <20220506140855.353337-13-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220506140855.353337-1-nikos.nikoleris@arm.com>
 References: <20220506140855.353337-1-nikos.nikoleris@arm.com>
@@ -43,191 +43,127 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In systems with ACPI support and when a DT is not provided, we can use
-the MADTs to discover the number of CPUs and their corresponding MIDR.
-This change implements this but retains the default behavior; we check
-if a valid DT is provided, if not, we try to discover the cores in the
-system using ACPI.
+From: Andrew Jones <drjones@redhat.com>
 
+The commit message of commit 410b3bf09e76 ("arm/arm64: Perform dcache
+clean + invalidate after turning MMU off") justifies cleaning and
+invalidating the dcache after disabling the MMU by saying it's nice
+not to rely on the current page tables and that it should still work
+(per the spec), as long as there's an identity map in the current
+tables. Doing the invalidation after also somewhat helped with
+reenabling the MMU without seeing stale data, but the real problem
+with reenabling was because the cache needs to be disabled with
+the MMU, but it wasn't.
+
+Since we have to trust/validate that the current page tables have an
+identity map anyway, then there's no harm in doing the clean
+and invalidate first (it feels a little better to do so, anyway,
+considering the cache maintenance instructions take virtual
+addresses). Then, also disable the cache with the MMU to avoid
+problems when reenabling. We invalidate the Icache and disable
+that too for good measure. And, a final TLB invalidation ensures
+we're crystal clean when we return from asm_mmu_disable().
+
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 ---
- lib/acpi.h      | 64 +++++++++++++++++++++++++++++++++++++++++++++++++
- lib/acpi.c      | 21 ++++++++++++++++
- lib/arm/setup.c | 25 ++++++++++++++++---
- 3 files changed, 107 insertions(+), 3 deletions(-)
+ arm/cstart.S   | 28 +++++++++++++++++++++-------
+ arm/cstart64.S | 21 ++++++++++++++++-----
+ 2 files changed, 37 insertions(+), 12 deletions(-)
 
-diff --git a/lib/acpi.h b/lib/acpi.h
-index 47e56d2..296ad25 100644
---- a/lib/acpi.h
-+++ b/lib/acpi.h
-@@ -16,6 +16,7 @@
- #define XSDT_SIGNATURE ACPI_SIGNATURE('X','S','D','T')
- #define FACP_SIGNATURE ACPI_SIGNATURE('F','A','C','P')
- #define FACS_SIGNATURE ACPI_SIGNATURE('F','A','C','S')
-+#define MADT_SIGNATURE ACPI_SIGNATURE('A','P','I','C')
- #define SPCR_SIGNATURE ACPI_SIGNATURE('S','P','C','R')
- #define GTDT_SIGNATURE ACPI_SIGNATURE('G','T','D','T')
+diff --git a/arm/cstart.S b/arm/cstart.S
+index 7036e67..dc324c5 100644
+--- a/arm/cstart.S
++++ b/arm/cstart.S
+@@ -179,6 +179,7 @@ halt:
+ .globl asm_mmu_enable
+ asm_mmu_enable:
+ 	/* TLBIALL */
++	mov	r2, #0
+ 	mcr	p15, 0, r2, c8, c7, 0
+ 	dsb	nsh
  
-@@ -149,6 +150,67 @@ struct facs_descriptor_rev1
-     u8  reserved3 [40];         /* Reserved - must be zero */
- } __attribute__ ((packed));
+@@ -211,12 +212,7 @@ asm_mmu_enable:
  
-+struct acpi_table_madt {
-+    ACPI_TABLE_HEADER_DEF     /* ACPI common table header */
-+    u32 address;               /* Physical address of local APIC */
-+    u32 flags;
-+} __attribute__ ((packed));
-+
-+struct acpi_subtable_header {
-+    u8 type;
-+    u8 length;
-+}  __attribute__ ((packed));
-+
-+typedef int (*acpi_table_handler)(struct acpi_subtable_header *header);
-+
-+/* 11: Generic interrupt - GICC (ACPI 5.0 + ACPI 6.0 + ACPI 6.3 changes) */
-+
-+struct acpi_madt_generic_interrupt {
-+    u8 type;
-+    u8 length;
-+    u16 reserved;           /* reserved - must be zero */
-+    u32 cpu_interface_number;
-+    u32 uid;
-+    u32 flags;
-+    u32 parking_version;
-+    u32 performance_interrupt;
-+    u64 parked_address;
-+    u64 base_address;
-+    u64 gicv_base_address;
-+    u64 gich_base_address;
-+    u32 vgic_interrupt;
-+    u64 gicr_base_address;
-+    u64 arm_mpidr;
-+    u8 efficiency_class;
-+    u8 reserved2[1];
-+    u16 spe_interrupt;      /* ACPI 6.3 */
-+} __attribute__ ((packed));
-+
-+/* Values for MADT subtable type in struct acpi_subtable_header */
-+
-+enum acpi_madt_type {
-+    ACPI_MADT_TYPE_LOCAL_APIC = 0,
-+    ACPI_MADT_TYPE_IO_APIC = 1,
-+    ACPI_MADT_TYPE_INTERRUPT_OVERRIDE = 2,
-+    ACPI_MADT_TYPE_NMI_SOURCE = 3,
-+    ACPI_MADT_TYPE_LOCAL_APIC_NMI = 4,
-+    ACPI_MADT_TYPE_LOCAL_APIC_OVERRIDE = 5,
-+    ACPI_MADT_TYPE_IO_SAPIC = 6,
-+    ACPI_MADT_TYPE_LOCAL_SAPIC = 7,
-+    ACPI_MADT_TYPE_INTERRUPT_SOURCE = 8,
-+    ACPI_MADT_TYPE_LOCAL_X2APIC = 9,
-+    ACPI_MADT_TYPE_LOCAL_X2APIC_NMI = 10,
-+    ACPI_MADT_TYPE_GENERIC_INTERRUPT = 11,
-+    ACPI_MADT_TYPE_GENERIC_DISTRIBUTOR = 12,
-+    ACPI_MADT_TYPE_GENERIC_MSI_FRAME = 13,
-+    ACPI_MADT_TYPE_GENERIC_REDISTRIBUTOR = 14,
-+    ACPI_MADT_TYPE_GENERIC_TRANSLATOR = 15,
-+    ACPI_MADT_TYPE_RESERVED = 16    /* 16 and greater are reserved */
-+};
-+
-+/* MADT Local APIC flags */
-+#define ACPI_MADT_ENABLED           (1) /* 00: Processor is usable if set */
-+
- struct spcr_descriptor {
-     ACPI_TABLE_HEADER_DEF   /* ACPI common table header */
-     u8 interface_type;      /* 0=full 16550, 1=subset of 16550 */
-@@ -192,5 +254,7 @@ struct acpi_table_gtdt {
+ .globl asm_mmu_disable
+ asm_mmu_disable:
+-	/* SCTLR */
+-	mrc	p15, 0, r0, c1, c0, 0
+-	bic	r0, #CR_M
+-	mcr	p15, 0, r0, c1, c0, 0
+-	isb
+-
++	/* Clean + invalidate the entire memory */
+ 	ldr	r0, =__phys_offset
+ 	ldr	r0, [r0]
+ 	ldr	r1, =__phys_end
+@@ -224,7 +220,25 @@ asm_mmu_disable:
+ 	sub	r1, r1, r0
+ 	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
  
- void set_efi_rsdp(struct rsdp_descriptor *rsdp);
- void* find_acpi_table_addr(u32 sig);
-+void acpi_table_parse_madt(enum acpi_madt_type mtype,
-+			   acpi_table_handler handler);
+-	mov     pc, lr
++	/* Invalidate Icache */
++	mov	r0, #0
++	mcr	p15, 0, r0, c7, c5, 0
++	isb
++
++	/*  Disable cache, Icache and MMU */
++	mrc	p15, 0, r0, c1, c0, 0
++	bic	r0, #CR_C
++	bic	r0, #CR_I
++	bic	r0, #CR_M
++	mcr	p15, 0, r0, c1, c0, 0
++	isb
++
++	/* Invalidate TLB */
++	mov	r0, #0
++	mcr	p15, 0, r0, c8, c7, 0
++	dsb	nsh
++
++	mov	pc, lr
  
- #endif
-diff --git a/lib/acpi.c b/lib/acpi.c
-index 5e56dff..d76c762 100644
---- a/lib/acpi.c
-+++ b/lib/acpi.c
-@@ -102,3 +102,24 @@ void* find_acpi_table_addr(u32 sig)
+ /*
+  * Vectors
+diff --git a/arm/cstart64.S b/arm/cstart64.S
+index e4ab7d0..390feb9 100644
+--- a/arm/cstart64.S
++++ b/arm/cstart64.S
+@@ -246,11 +246,6 @@ asm_mmu_enable:
  
- 	return NULL;
- }
-+
-+void acpi_table_parse_madt(enum acpi_madt_type mtype,
-+			   acpi_table_handler handler)
-+{
-+	struct acpi_table_madt *madt;
-+	void *end;
-+
-+	madt = find_acpi_table_addr(MADT_SIGNATURE);
-+	assert(madt);
-+
-+	struct acpi_subtable_header *header =
-+		(void*)(ulong)madt + sizeof(struct acpi_table_madt);
-+	end = (void*)((ulong)madt + madt->length);
-+
-+	while ((void *)header < end) {
-+		if (header->type == mtype) {
-+			handler(header);
-+		}
-+		header = (void*)(ulong)header + header->length;
-+	}
-+}
-diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index 1572c64..3c24c75 100644
---- a/lib/arm/setup.c
-+++ b/lib/arm/setup.c
-@@ -13,6 +13,7 @@
- #include <libcflat.h>
- #include <libfdt/libfdt.h>
- #include <devicetree.h>
-+#include <acpi.h>
- #include <alloc.h>
- #include <alloc_phys.h>
- #include <alloc_page.h>
-@@ -55,7 +56,7 @@ int mpidr_to_cpu(uint64_t mpidr)
- 	return -1;
- }
+ .globl asm_mmu_disable
+ asm_mmu_disable:
+-	mrs	x0, sctlr_el1
+-	bic	x0, x0, SCTLR_EL1_M
+-	msr	sctlr_el1, x0
+-	isb
+-
+ 	/* Clean + invalidate the entire memory */
+ 	adrp	x0, __phys_offset
+ 	ldr	x0, [x0, :lo12:__phys_offset]
+@@ -259,6 +254,22 @@ asm_mmu_disable:
+ 	sub	x1, x1, x0
+ 	dcache_by_line_op civac, sy, x0, x1, x2, x3
  
--static void cpu_set(int fdtnode __unused, u64 regval, void *info __unused)
-+static void cpu_set_fdt(int fdtnode __unused, u64 regval, void *info __unused)
- {
- 	int cpu = nr_cpus++;
++	/* Invalidate Icache */
++	ic	iallu
++	isb
++
++	/* Disable cache, Icache and MMU */
++	mrs	x0, sctlr_el1
++	bic	x0, x0, SCTLR_EL1_C
++	bic	x0, x0, SCTLR_EL1_I
++	bic	x0, x0, SCTLR_EL1_M
++	msr	sctlr_el1, x0
++	isb
++
++	/* Invalidate TLB */
++	tlbi	vmalle1
++	dsb	nsh
++
+ 	ret
  
-@@ -65,13 +66,31 @@ static void cpu_set(int fdtnode __unused, u64 regval, void *info __unused)
- 	set_cpu_present(cpu, true);
- }
- 
-+static int cpu_set_acpi(struct acpi_subtable_header *header)
-+{
-+	int cpu = nr_cpus++;
-+	struct acpi_madt_generic_interrupt *gicc = (void *)header;
-+
-+	assert_msg(cpu < NR_CPUS, "Number cpus exceeds maximum supported (%d).", NR_CPUS);
-+
-+	cpus[cpu] = gicc->arm_mpidr;
-+	set_cpu_present(cpu, true);
-+
-+	return 0;
-+}
-+
- static void cpu_init(void)
- {
- 	int ret;
- 
- 	nr_cpus = 0;
--	ret = dt_for_each_cpu_node(cpu_set, NULL);
--	assert(ret == 0);
-+	if (dt_available()) {
-+		ret = dt_for_each_cpu_node(cpu_set_fdt, NULL);
-+		assert(ret == 0);
-+	} else
-+		acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_INTERRUPT,
-+				      cpu_set_acpi);
-+
- 	set_cpu_online(0, true);
- }
- 
+ /*
 -- 
 2.25.1
 
