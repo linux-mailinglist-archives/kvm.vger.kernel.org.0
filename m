@@ -2,68 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F58151DBB8
-	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 17:13:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AE6451DC3E
+	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 17:35:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442715AbiEFPRM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 May 2022 11:17:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43276 "EHLO
+        id S1442930AbiEFPi5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 May 2022 11:38:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347956AbiEFPRK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 May 2022 11:17:10 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABF8E6D1AA;
-        Fri,  6 May 2022 08:13:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651850007; x=1683386007;
-  h=message-id:date:mime-version:subject:to:references:from:
-   in-reply-to:content-transfer-encoding;
-  bh=puX4EKZE6D8sSmtW6hKpKI+ksKjdRXgah3n7yK57/TI=;
-  b=hm9J9MP235O+qAx6Cby7L2E3M7SDrYYzxOhGV1XVc413wRH5GSLZTHBz
-   uasArLZ6sjzfTfjvpDteWPYtKS4ji1kJbyEgDFgdHwHcZpw3qATW6WipR
-   LBpJwL2y7OxggjJMfSNupKOb5MkDRz2EwPItk82QMDzaWJ0RkvTcDjWpP
-   M6UspvVPB4IHGVCeha2806v1ObEcXjY43RJjhILpjyifaptmhXNW6wcyj
-   5dYNkaLDIifGwODKkFLzHRaV8Yg0QUR62/D5aLCP8Rm+dWttoVwDCnaeX
-   NG+9CDNFCiWKliXPFu8Dq8P+CnBjXPsWYL4GipmW9QgUjeGCfzb0HFgRT
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10339"; a="248396223"
-X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
-   d="scan'208";a="248396223"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2022 08:13:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
-   d="scan'208";a="563854822"
-Received: from linux.intel.com ([10.54.29.200])
-  by orsmga007.jf.intel.com with ESMTP; 06 May 2022 08:13:26 -0700
-Received: from [10.252.212.236] (kliang2-MOBL.ccr.corp.intel.com [10.252.212.236])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by linux.intel.com (Postfix) with ESMTPS id 7FF3E58093E;
-        Fri,  6 May 2022 08:13:25 -0700 (PDT)
-Message-ID: <5189de02-46bd-f315-fadb-4127e4fee412@linux.intel.com>
-Date:   Fri, 6 May 2022 11:13:24 -0400
+        with ESMTP id S231357AbiEFPiz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 May 2022 11:38:55 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F397F66;
+        Fri,  6 May 2022 08:35:12 -0700 (PDT)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 246Dmvbl019354;
+        Fri, 6 May 2022 15:35:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=blLD599xWM8TsoqnVdATsyQkk63uresPs9SegCqqIJ8=;
+ b=L/flva3qm311tXx/sh/kPxNxZSVMAyo8Shoq8uE+GtfAaIg2PRK2yTDmGRyIO+IygEa6
+ +Ds2Z1c8Zh5Ocrh+lFb0+t1hs3rymY/O8xlwEXmdnR1JMJBZhOj/S347NL1BE82hXzvz
+ 70md7lrOiuqjx/YsqzIOW/4mp2wcHTHW09uZkc7Sd1mITrw9M8RvB34kRVVOzlCwQnHG
+ OzeWAOO0hHyeCaEb8TrgyUKaftfO65wre7A3xUDUkkWXbjpNS+dr/Dh/HTeJ5x659jrf
+ tiJJurRAAMi8fykICZzoI7C6oFvs/BE0QMiWSY1c73xlhrJ6yZwy+A6CDKOCmNWVetCr hw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fw4w1jfm0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 May 2022 15:35:09 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 246FKSM1025004;
+        Fri, 6 May 2022 15:35:09 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fw4w1jfk3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 May 2022 15:35:09 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 246FHbY9032762;
+        Fri, 6 May 2022 15:35:06 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3ftp7fwpaj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 May 2022 15:35:06 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 246FYtpC32702734
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 6 May 2022 15:34:55 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 67D87A405B;
+        Fri,  6 May 2022 15:35:03 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 588FFA4060;
+        Fri,  6 May 2022 15:35:02 +0000 (GMT)
+Received: from [9.171.60.83] (unknown [9.171.60.83])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  6 May 2022 15:35:02 +0000 (GMT)
+Message-ID: <28395b98-3489-342a-970a-5358e4405f22@linux.ibm.com>
+Date:   Fri, 6 May 2022 17:35:01 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: [PATCH v11 16/16] KVM: x86/cpuid: Advertise Arch LBR feature in
- CPUID
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v6 14/21] KVM: s390: pci: provide routines for
+ enabling/disabling interrupt forwarding
 Content-Language: en-US
-To:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
-        jmattson@google.com, seanjc@google.com, like.xu.linux@gmail.com,
-        vkuznets@redhat.com, wei.w.wang@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220506033305.5135-1-weijiang.yang@intel.com>
- <20220506033305.5135-17-weijiang.yang@intel.com>
-From:   "Liang, Kan" <kan.liang@linux.intel.com>
-In-Reply-To: <20220506033305.5135-17-weijiang.yang@intel.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
+        jgg@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org
+References: <20220426200842.98655-1-mjrosato@linux.ibm.com>
+ <20220426200842.98655-15-mjrosato@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20220426200842.98655-15-mjrosato@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-8.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: NrU3OZfGBe5iOJbw7gkh1V-3ysVy0Ku8
+X-Proofpoint-GUID: SQ06wbn3n7KXqve90ckpJdnRS_Tu02T4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-06_04,2022-05-06_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
+ priorityscore=1501 adultscore=0 phishscore=0 malwarescore=0
+ mlxlogscore=950 lowpriorityscore=0 suspectscore=0 mlxscore=0 bulkscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205060082
+X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -72,76 +105,49 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 5/5/2022 11:33 PM, Yang Weijiang wrote:
-> Add Arch LBR feature bit in CPU cap-mask to expose the feature.
-> Only max LBR depth is supported for guest, and it's consistent
-> with host Arch LBR settings.
-> 
-> Co-developed-by: Like Xu <like.xu@linux.intel.com>
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+Am 26.04.22 um 22:08 schrieb Matthew Rosato:
+[...]
+> +static inline void unaccount_mem(unsigned long nr_pages)
+> +{
+> +	struct user_struct *user = get_uid(current_user());
+> +
+> +	if (user)
+> +		atomic_long_sub(nr_pages, &user->locked_vm);
+> +	if (current->mm)
+> +		atomic64_sub(nr_pages, &current->mm->pinned_vm);
+> +}
+> +
+> +static inline int account_mem(unsigned long nr_pages)
+> +{
+> +	struct user_struct *user = get_uid(current_user());
+> +	unsigned long page_limit, cur_pages, new_pages;
+> +
+> +	page_limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
+> +
+> +	do {
+> +		cur_pages = atomic_long_read(&user->locked_vm);
+> +		new_pages = cur_pages + nr_pages;
+> +		if (new_pages > page_limit)
+> +			return -ENOMEM;
+> +	} while (atomic_long_cmpxchg(&user->locked_vm, cur_pages,
+> +					new_pages) != cur_pages);
+> +
+> +	atomic64_add(nr_pages, &current->mm->pinned_vm);
+> +
+> +	return 0;
 
-Reviewed-by: Kan Liang <kan.liang@linux.intel.com>
+user->locked_vm is not available unconditionally. Shall we add
 
-> ---
->   arch/x86/kvm/cpuid.c | 33 ++++++++++++++++++++++++++++++++-
->   1 file changed, 32 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 63870f78ed16..be4eb4e5e1fc 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -102,6 +102,16 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
->   		if (vaddr_bits != 48 && vaddr_bits != 57 && vaddr_bits != 0)
->   			return -EINVAL;
->   	}
-> +	best = cpuid_entry2_find(entries, nent, 0x1c, 0);
-> +	if (best) {
-> +		unsigned int eax, ebx, ecx, edx;
-> +
-> +		/* Reject user-space CPUID if depth is different from host's.*/
-> +		cpuid_count(0x1c, 0, &eax, &ebx, &ecx, &edx);
-> +
-> +		if ((best->eax & 0xff) != BIT(fls(eax & 0xff) - 1))
-> +			return -EINVAL;
-> +	}
->   
->   	/*
->   	 * Exposing dynamic xfeatures to the guest requires additional
-> @@ -598,7 +608,7 @@ void kvm_set_cpu_caps(void)
->   		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
->   		F(MD_CLEAR) | F(AVX512_VP2INTERSECT) | F(FSRM) |
->   		F(SERIALIZE) | F(TSXLDTRK) | F(AVX512_FP16) |
-> -		F(AMX_TILE) | F(AMX_INT8) | F(AMX_BF16)
-> +		F(AMX_TILE) | F(AMX_INT8) | F(AMX_BF16) | F(ARCH_LBR)
->   	);
->   
->   	/* TSC_ADJUST and ARCH_CAPABILITIES are emulated in software. */
-> @@ -1044,6 +1054,27 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->   				goto out;
->   		}
->   		break;
-> +	/* Architectural LBR */
-> +	case 0x1c: {
-> +		u32 lbr_depth_mask = entry->eax & 0xff;
-> +
-> +		if (!lbr_depth_mask ||
-> +		    !kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR)) {
-> +			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
-> +			break;
-> +		}
-> +		/*
-> +		 * KVM only exposes the maximum supported depth, which is the
-> +		 * fixed value used on the host side.
-> +		 * KVM doesn't allow VMM userspace to adjust LBR depth because
-> +		 * guest LBR emulation depends on the configuration of host LBR
-> +		 * driver.
-> +		 */
-> +		lbr_depth_mask = BIT((fls(lbr_depth_mask) - 1));
-> +		entry->eax &= ~0xff;
-> +		entry->eax |= lbr_depth_mask;
-> +		break;
-> +	}
->   	/* Intel AMX TILE */
->   	case 0x1d:
->   		if (!kvm_cpu_cap_has(X86_FEATURE_AMX_TILE)) {
+CONFIG_S390 && CONFIG_KVM here?
+
+include/linux/sched/user.h
+#if defined(CONFIG_PERF_EVENTS) || defined(CONFIG_BPF_SYSCALL) || \
+     defined(CONFIG_NET) || defined(CONFIG_IO_URING)
+         atomic_long_t locked_vm;
+#endif
+Or we could get rid of the user memlock checking for now until this is more ubiquitous.
+
+
+Otherwise this looks sane
+
+Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
