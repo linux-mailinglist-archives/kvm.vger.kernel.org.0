@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 567BE51DA0F
-	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 16:09:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A89DC51DA10
+	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 16:09:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442077AbiEFON1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 May 2022 10:13:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35208 "EHLO
+        id S1442087AbiEFON2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 May 2022 10:13:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442058AbiEFONM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 May 2022 10:13:12 -0400
+        with ESMTP id S1388397AbiEFONO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 May 2022 10:13:14 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E2FD36899D
-        for <kvm@vger.kernel.org>; Fri,  6 May 2022 07:09:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 188F6689B6
+        for <kvm@vger.kernel.org>; Fri,  6 May 2022 07:09:29 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7F4D61570;
-        Fri,  6 May 2022 07:09:27 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A96E01596;
+        Fri,  6 May 2022 07:09:28 -0700 (PDT)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8FC793F885;
-        Fri,  6 May 2022 07:09:26 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B9E823F885;
+        Fri,  6 May 2022 07:09:27 -0700 (PDT)
 From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
 To:     Andrew Jones <drjones@redhat.com>
 Cc:     jade.alglave@arm.com, alexandru.elisei@arm.com,
         Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu
-Subject: [kvm-unit-tests PATCH 22/23] arm64: Add support for efi in Makefile
-Date:   Fri,  6 May 2022 15:08:54 +0100
-Message-Id: <20220506140855.353337-23-nikos.nikoleris@arm.com>
+Subject: [kvm-unit-tests PATCH 23/23] arm64: Add an efi/run script
+Date:   Fri,  6 May 2022 15:08:55 +0100
+Message-Id: <20220506140855.353337-24-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220506140855.353337-1-nikos.nikoleris@arm.com>
 References: <20220506140855.353337-1-nikos.nikoleris@arm.com>
@@ -43,195 +43,159 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Users can now build kvm-unit-tests as efi apps by supplying an extra
-argument when invoking configure:
+This change adds a efi/run script inspired by the one in x86. This
+script will setup a folder with the test compiled as an EFI app and a
+startup.nsh script. The script launches QEMU providing an image with
+EDKII and the path to the folder with the test which is executed
+automatically.
 
-$> ./configure --enable-efi
+For example:
 
-This patch is based on an earlier version by
-Andrew Jones <drjones@redhat.com>
+$> ./arm/efi/run ./arm/selftest.efi setup smp=2 mem=256
 
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 ---
- configure           | 15 ++++++++++++---
- arm/Makefile.arm    |  6 ++++++
- arm/Makefile.arm64  | 18 ++++++++++++++----
- arm/Makefile.common | 45 ++++++++++++++++++++++++++++++++++-----------
- 4 files changed, 66 insertions(+), 18 deletions(-)
+ scripts/runtime.bash | 14 +++++-----
+ arm/efi/run          | 61 ++++++++++++++++++++++++++++++++++++++++++++
+ arm/run              |  8 ++++--
+ arm/Makefile.common  |  1 +
+ arm/dummy.c          |  4 +++
+ 5 files changed, 78 insertions(+), 10 deletions(-)
+ create mode 100755 arm/efi/run
+ create mode 100644 arm/dummy.c
 
-diff --git a/configure b/configure
-index 86c3095..beef655 100755
---- a/configure
-+++ b/configure
-@@ -195,14 +195,19 @@ else
+diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+index 7d0180b..dc28f24 100644
+--- a/scripts/runtime.bash
++++ b/scripts/runtime.bash
+@@ -131,14 +131,12 @@ function run()
      fi
- fi
  
--if [ "$efi" ] && [ "$arch" != "x86_64" ]; then
-+if [ "$efi" ] && [ "$arch" != "x86_64" ] && [ "$arch" != "arm64" ]; then
-     echo "--[enable|disable]-efi is not supported for $arch"
-     usage
- fi
+     last_line=$(premature_failure > >(tail -1)) && {
+-        skip=true
+-        if [ "${CONFIG_EFI}" == "y" ] && [[ "${last_line}" =~ "enabling apic" ]]; then
+-            skip=false
+-        fi
+-        if [ ${skip} == true ]; then
+-            print_result "SKIP" $testname "" "$last_line"
+-            return 77
+-        fi
++        if [ "${CONFIG_EFI}" == "y" ] && [ "${ARCH}" = x86_64 ]; then
++		if ! [[ "${last_line}" =~ "enabling apic" ]]; then
++			print_result "SKIP" $testname "" "$last_line"
++			return 77
++		fi
++	fi
+     }
  
- if [ -z "$page_size" ]; then
--    [ "$arch" = "arm64" ] && page_size="65536"
--    [ "$arch" = "arm" ] && page_size="4096"
-+    if [ "$efi" = 'y' ] && [ "$arch" = "arm64" ]; then
-+        page_size="4096"
-+    elif [ "$arch" = "arm64" ]; then
-+        page_size="65536"
-+    elif [ "$arch" = "arm" ]; then
-+        page_size="4096"
-+    fi
- else
-     if [ "$arch" != "arm64" ]; then
-         echo "--page-size is not supported for $arch"
-@@ -217,6 +222,10 @@ else
-         echo "arm64 doesn't support page size of $page_size"
-         usage
-     fi
-+    if [ "$efi" = 'y' ] && [ "$page_size" != "4096" ]; then
-+        echo "efi must use 4K pages"
-+        exit 1
-+    fi
- fi
- 
- [ -z "$processor" ] && processor="$arch"
-diff --git a/arm/Makefile.arm b/arm/Makefile.arm
-index 01fd4c7..2ce00f5 100644
---- a/arm/Makefile.arm
-+++ b/arm/Makefile.arm
-@@ -7,6 +7,10 @@ bits = 32
- ldarch = elf32-littlearm
- machine = -marm -mfpu=vfp
- 
-+ifeq ($(CONFIG_EFI),y)
-+$(error Cannot build arm32 tests as EFI apps)
-+endif
+     cmdline=$(get_cmdline $kernel)
+diff --git a/arm/efi/run b/arm/efi/run
+new file mode 100755
+index 0000000..dfff717
+--- /dev/null
++++ b/arm/efi/run
+@@ -0,0 +1,61 @@
++#!/bin/bash
 +
- # stack.o relies on frame pointers.
- KEEP_FRAME_POINTER := y
- 
-@@ -32,6 +36,8 @@ cflatobjs += lib/arm/stack.o
- cflatobjs += lib/ldiv32.o
- cflatobjs += lib/arm/ldivmod.o
- 
-+exe = flat
++set -e
 +
- # arm specific tests
- tests =
- 
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index 6feac76..550e1b2 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -27,11 +27,21 @@ cflatobjs += lib/arm64/gic-v3-its.o lib/arm64/gic-v3-its-cmd.o
- 
- OBJDIRS += lib/arm64
- 
-+ifeq ($(CONFIG_EFI),y)
-+# avoid jump tables before all relocations have been processed
-+arm/efi/reloc_aarch64.o: CFLAGS += -fno-jump-tables
-+cflatobjs += arm/efi/reloc_aarch64.o
++if [ $# -eq 0 ]; then
++	echo "Usage $0 TEST_CASE [QEMU_ARGS]"
++	exit 2
++fi
 +
-+exe = efi
++if [ ! -f config.mak ]; then
++	echo "run './configure --enable-efi && make' first. See ./configure -h"
++	exit 2
++fi
++source config.mak
++source scripts/arch-run.bash
++source scripts/common.bash
++
++: "${EFI_SRC:=$(realpath "$(dirname "$0")/../")}"
++: "${EFI_UEFI:=/usr/share/qemu-efi-aarch64/QEMU_EFI.fd}"
++: "${EFI_TEST:=efi-tests}"
++: "${EFI_CASE:=$(basename $1 .efi)}"
++
++if [ ! -f "$EFI_UEFI" ]; then
++	echo "UEFI firmware not found: $EFI_UEFI"
++	echo "Please install the UEFI firmware to this path"
++	echo "Or specify the correct path with the env variable EFI_UEFI"
++	exit 2
++fi
++
++# Remove the TEST_CASE from $@
++shift 1
++
++# Fish out the arguments for the test, they should be the next string
++# after the "-append" option
++qemu_args=()
++cmd_args=()
++while (( "$#" )); do
++	if [ "$1" = "-append" ]; then
++		cmd_args=$2
++		shift 2
++	else
++		qemu_args+=("$1")
++		shift 1
++	fi
++done
++
++if [ "$EFI_CASE" = "_NO_FILE_4Uhere_" ]; then
++	EFI_CASE=dummy
++fi
++
++: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_CASE"}"
++mkdir -p "$EFI_CASE_DIR"
++
++cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
++echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
++echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_TEST/$EFI_CASE/startup.nsh"
++
++EFI_RUN=y $TEST_DIR/run \
++       -bios "$EFI_UEFI" \
++       -drive file.dir="$EFI_TEST/$EFI_CASE/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
++       "${qemu_args[@]}"
+diff --git a/arm/run b/arm/run
+index 28a0b4a..e96875e 100755
+--- a/arm/run
++++ b/arm/run
+@@ -67,7 +67,11 @@ fi
+ 
+ A="-accel $ACCEL"
+ command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
+-command+=" -display none -serial stdio -kernel"
++command+=" -display none -serial stdio"
+ command="$(migration_cmd) $(timeout_cmd) $command"
+ 
+-run_qemu $command "$@"
++if [ "$EFI_RUN" = "y" ]; then
++	ENVIRON_DEFAULT=n run_qemu $command "$@"
 +else
-+exe = flat
-+endif
-+
- # arm64 specific tests
--tests = $(TEST_DIR)/timer.flat
--tests += $(TEST_DIR)/micro-bench.flat
--tests += $(TEST_DIR)/cache.flat
--tests += $(TEST_DIR)/debug.flat
-+tests = $(TEST_DIR)/timer.$(exe)
-+tests += $(TEST_DIR)/micro-bench.$(exe)
-+tests += $(TEST_DIR)/cache.$(exe)
-+tests += $(TEST_DIR)/debug.$(exe)
- 
- include $(SRCDIR)/$(TEST_DIR)/Makefile.common
- 
++	run_qemu $command -kernel "$@"
++fi
 diff --git a/arm/Makefile.common b/arm/Makefile.common
-index 5be42c0..a8007f4 100644
+index a8007f4..aabd335 100644
 --- a/arm/Makefile.common
 +++ b/arm/Makefile.common
-@@ -4,14 +4,14 @@
- # Authors: Andrew Jones <drjones@redhat.com>
- #
- 
--tests-common  = $(TEST_DIR)/selftest.flat
--tests-common += $(TEST_DIR)/spinlock-test.flat
--tests-common += $(TEST_DIR)/pci-test.flat
--tests-common += $(TEST_DIR)/pmu.flat
--tests-common += $(TEST_DIR)/gic.flat
--tests-common += $(TEST_DIR)/psci.flat
--tests-common += $(TEST_DIR)/sieve.flat
--tests-common += $(TEST_DIR)/pl031.flat
-+tests-common  = $(TEST_DIR)/selftest.$(exe)
-+tests-common += $(TEST_DIR)/spinlock-test.$(exe)
-+tests-common += $(TEST_DIR)/pci-test.$(exe)
-+tests-common += $(TEST_DIR)/pmu.$(exe)
-+tests-common += $(TEST_DIR)/gic.$(exe)
-+tests-common += $(TEST_DIR)/psci.$(exe)
-+tests-common += $(TEST_DIR)/sieve.$(exe)
-+tests-common += $(TEST_DIR)/pl031.$(exe)
+@@ -12,6 +12,7 @@ tests-common += $(TEST_DIR)/gic.$(exe)
+ tests-common += $(TEST_DIR)/psci.$(exe)
+ tests-common += $(TEST_DIR)/sieve.$(exe)
+ tests-common += $(TEST_DIR)/pl031.$(exe)
++tests-common += $(TEST_DIR)/dummy.$(exe)
  
  tests-all = $(tests-common) $(tests)
  all: directories $(tests-all)
-@@ -54,6 +54,9 @@ cflatobjs += lib/arm/smp.o
- cflatobjs += lib/arm/delay.o
- cflatobjs += lib/arm/gic.o lib/arm/gic-v2.o lib/arm/gic-v3.o
- cflatobjs += lib/arm/timer.o
-+ifeq ($(CONFIG_EFI),y)
-+cflatobjs += lib/efi.o
-+endif
- 
- OBJDIRS += lib/arm
- 
-@@ -61,6 +64,25 @@ libeabi = lib/arm/libeabi.a
- eabiobjs = lib/arm/eabi_compat.o
- 
- FLATLIBS = $(libcflat) $(LIBFDT_archive) $(libeabi)
-+
-+ifeq ($(CONFIG_EFI),y)
-+%.so: EFI_LDFLAGS += -defsym=EFI_SUBSYSTEM=0xa --no-undefined
-+%.so: %.o $(FLATLIBS) $(SRCDIR)/arm/efi/elf_aarch64_efi.lds $(cstart.o)
-+	$(CC) $(CFLAGS) -c -o $(@:.so=.aux.o) $(SRCDIR)/lib/auxinfo.c \
-+		-DPROGNAME=\"$(@:.so=.efi)\" -DAUXFLAGS=$(AUXFLAGS)
-+	$(LD) $(EFI_LDFLAGS) -o $@ -T $(SRCDIR)/arm/efi/elf_aarch64_efi.lds \
-+		$(filter %.o, $^) $(FLATLIBS) $(@:.so=.aux.o) \
-+		$(EFI_LIBS)
-+	$(RM) $(@:.so=.aux.o)
-+
-+%.efi: %.so
-+	$(call arch_elf_check, $^)
-+	$(OBJCOPY) \
-+		-j .text -j .sdata -j .data -j .dynamic -j .dynsym \
-+		-j .rel -j .rela -j .rel.* -j .rela.* -j .rel* -j .rela* \
-+		-j .reloc \
-+		-O binary $^ $@
-+else
- %.elf: LDFLAGS = -nostdlib $(arch_LDFLAGS)
- %.elf: %.o $(FLATLIBS) $(SRCDIR)/arm/flat.lds $(cstart.o)
- 	$(CC) $(CFLAGS) -c -o $(@:.elf=.aux.o) $(SRCDIR)/lib/auxinfo.c \
-@@ -74,13 +96,14 @@ FLATLIBS = $(libcflat) $(LIBFDT_archive) $(libeabi)
- 	$(call arch_elf_check, $^)
- 	$(OBJCOPY) -O binary $^ $@
- 	@chmod a-x $@
-+endif
- 
- $(libeabi): $(eabiobjs)
- 	$(AR) rcs $@ $^
- 
- arm_clean: asm_offsets_clean
--	$(RM) $(TEST_DIR)/*.{o,flat,elf} $(libeabi) $(eabiobjs) \
--	      $(TEST_DIR)/.*.d lib/arm/.*.d
-+	$(RM) $(TEST_DIR)/*.{o,flat,elf,so,efi} $(libeabi) $(eabiobjs) \
-+	      $(TEST_DIR)/.*.d $(TEST_DIR)/efi/.*.d lib/arm/.*.d
- 
- generated-files = $(asm-offsets)
--$(tests-all:.flat=.o) $(cstart.o) $(cflatobjs): $(generated-files)
-+$(tests-all:.$(exe)=.o) $(cstart.o) $(cflatobjs): $(generated-files)
+diff --git a/arm/dummy.c b/arm/dummy.c
+new file mode 100644
+index 0000000..5019e79
+--- /dev/null
++++ b/arm/dummy.c
+@@ -0,0 +1,4 @@
++int main(int argc, char **argv)
++{
++	return 0;
++}
 -- 
 2.25.1
 
