@@ -2,31 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4949251DA02
+	by mail.lfdr.de (Postfix) with ESMTP id B232D51DA05
 	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 16:09:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442019AbiEFONE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 May 2022 10:13:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34558 "EHLO
+        id S1442032AbiEFONC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 May 2022 10:13:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442012AbiEFOMy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 May 2022 10:12:54 -0400
+        with ESMTP id S1442017AbiEFOMz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 May 2022 10:12:55 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E0CE9674F0
-        for <kvm@vger.kernel.org>; Fri,  6 May 2022 07:09:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1667166221
+        for <kvm@vger.kernel.org>; Fri,  6 May 2022 07:09:09 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B17A41576;
-        Fri,  6 May 2022 07:09:07 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DB8151596;
+        Fri,  6 May 2022 07:09:08 -0700 (PDT)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DCE8D3F885;
-        Fri,  6 May 2022 07:09:06 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EBD683F885;
+        Fri,  6 May 2022 07:09:07 -0700 (PDT)
 From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
+To:     Andrew Jones <drjones@redhat.com>
 Cc:     jade.alglave@arm.com, alexandru.elisei@arm.com,
-        Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH 04/23] lib: Extend the definition of the ACPI table FADT
-Date:   Fri,  6 May 2022 15:08:36 +0100
-Message-Id: <20220506140855.353337-5-nikos.nikoleris@arm.com>
+        Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Subject: [kvm-unit-tests PATCH 05/23] arm/arm64: Add support for setting up the PSCI conduit through ACPI
+Date:   Fri,  6 May 2022 15:08:37 +0100
+Message-Id: <20220506140855.353337-6-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220506140855.353337-1-nikos.nikoleris@arm.com>
 References: <20220506140855.353337-1-nikos.nikoleris@arm.com>
@@ -42,110 +43,106 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This change add more fields in the APCI table FADT to allow for the
-discovery of the PSCI conduit in arm64 systems. The definition for
-FADT is similar to the one in include/acpi/actbl.h in Linux.
+In systems with ACPI support and when a DT is not provided, we can use
+the FADT to discover whether PSCI calls need to use smc or hvc
+calls. This change implements this but retains the default behavior;
+we check if a valid DT is provided, if not, we try to setup the PSCI
+conduit using ACPI.
 
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 ---
- lib/acpi.h   | 35 ++++++++++++++++++++++++++++++-----
- lib/acpi.c   |  2 +-
- x86/s3.c     |  2 +-
- x86/vmexit.c |  2 +-
- 4 files changed, 33 insertions(+), 8 deletions(-)
+ arm/Makefile.common |  1 +
+ lib/acpi.h          |  5 +++++
+ lib/arm/psci.c      | 23 ++++++++++++++++++++++-
+ lib/devicetree.c    |  2 +-
+ 4 files changed, 29 insertions(+), 2 deletions(-)
 
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index 38385e0..8e9b3bb 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -38,6 +38,7 @@ cflatobjs += lib/alloc_page.o
+ cflatobjs += lib/vmalloc.o
+ cflatobjs += lib/alloc.o
+ cflatobjs += lib/devicetree.o
++cflatobjs += lib/acpi.o
+ cflatobjs += lib/pci.o
+ cflatobjs += lib/pci-host-generic.o
+ cflatobjs += lib/pci-testdev.o
 diff --git a/lib/acpi.h b/lib/acpi.h
-index b4ba587..657e868 100644
+index 657e868..40392e3 100644
 --- a/lib/acpi.h
 +++ b/lib/acpi.h
-@@ -62,7 +62,15 @@ struct acpi_table_xsdt {
-     u64 table_offset_entry[1];
- } __attribute__ ((packed));
+@@ -130,6 +130,11 @@ struct acpi_table_fadt
+     u64 hypervisor_id;      /* Hypervisor Vendor ID (ACPI 6.0) */
+ }  __attribute__ ((packed));
  
--struct fadt_descriptor_rev1
-+struct acpi_generic_address {
-+    u8 space_id;            /* Address space where struct or register exists */
-+    u8 bit_width;           /* Size in bits of given register */
-+    u8 bit_offset;          /* Bit offset within the register */
-+    u8 access_width;        /* Minimum Access size (ACPI 3.0) */
-+    u64 address;            /* 64-bit address of struct or register */
-+} __attribute__ ((packed));
++/* Masks for FADT ARM Boot Architecture Flags (arm_boot_flags) ACPI 5.1 */
 +
-+struct acpi_table_fadt
- {
-     ACPI_TABLE_HEADER_DEF     /* ACPI common table header */
-     u32 firmware_ctrl;          /* Physical address of FACS */
-@@ -100,10 +108,27 @@ struct fadt_descriptor_rev1
-     u8  day_alrm;               /* Index to day-of-month alarm in RTC CMOS RAM */
-     u8  mon_alrm;               /* Index to month-of-year alarm in RTC CMOS RAM */
-     u8  century;                /* Index to century in RTC CMOS RAM */
--    u8  reserved4;              /* Reserved */
--    u8  reserved4a;             /* Reserved */
--    u8  reserved4b;             /* Reserved */
--};
-+    u16 boot_flags;             /* IA-PC Boot Architecture Flags (see below for individual flags) */
-+    u8 reserved;                /* Reserved, must be zero */
-+    u32 flags;                  /* Miscellaneous flag bits (see below for individual flags) */
-+    struct acpi_generic_address reset_register;     /* 64-bit address of the Reset register */
-+    u8 reset_value;             /* Value to write to the reset_register port to reset the system */
-+    u16 arm_boot_flags;         /* ARM-Specific Boot Flags (see below for individual flags) (ACPI 5.1) */
-+    u8 minor_revision;          /* FADT Minor Revision (ACPI 5.1) */
-+    u64 Xfacs;                  /* 64-bit physical address of FACS */
-+    u64 Xdsdt;                  /* 64-bit physical address of DSDT */
-+    struct acpi_generic_address xpm1a_event_block;  /* 64-bit Extended Power Mgt 1a Event Reg Blk address */
-+    struct acpi_generic_address xpm1b_event_block;  /* 64-bit Extended Power Mgt 1b Event Reg Blk address */
-+    struct acpi_generic_address xpm1a_control_block;        /* 64-bit Extended Power Mgt 1a Control Reg Blk address */
-+    struct acpi_generic_address xpm1b_control_block;        /* 64-bit Extended Power Mgt 1b Control Reg Blk address */
-+    struct acpi_generic_address xpm2_control_block; /* 64-bit Extended Power Mgt 2 Control Reg Blk address */
-+    struct acpi_generic_address xpm_timer_block;    /* 64-bit Extended Power Mgt Timer Ctrl Reg Blk address */
-+    struct acpi_generic_address xgpe0_block;        /* 64-bit Extended General Purpose Event 0 Reg Blk address */
-+    struct acpi_generic_address xgpe1_block;        /* 64-bit Extended General Purpose Event 1 Reg Blk address */
-+    struct acpi_generic_address sleep_control;      /* 64-bit Sleep Control register (ACPI 5.0) */
-+    struct acpi_generic_address sleep_status;       /* 64-bit Sleep Status register (ACPI 5.0) */
-+    u64 hypervisor_id;      /* Hypervisor Vendor ID (ACPI 6.0) */
-+}  __attribute__ ((packed));
- 
++#define ACPI_FADT_PSCI_COMPLIANT    (1)         /* 00: [V5+] PSCI 0.2+ is implemented */
++#define ACPI_FADT_PSCI_USE_HVC      (1<<1)      /* 01: [V5+] HVC must be used instead of SMC as the PSCI conduit */
++
  struct facs_descriptor_rev1
  {
-diff --git a/lib/acpi.c b/lib/acpi.c
-index 63451b8..5e56dff 100644
---- a/lib/acpi.c
-+++ b/lib/acpi.c
-@@ -46,7 +46,7 @@ void* find_acpi_table_addr(u32 sig)
+     u32 signature;           /* ACPI Signature */
+diff --git a/lib/arm/psci.c b/lib/arm/psci.c
+index 9c031a1..0e96d19 100644
+--- a/lib/arm/psci.c
++++ b/lib/arm/psci.c
+@@ -6,6 +6,7 @@
+  *
+  * This work is licensed under the terms of the GNU LGPL, version 2.
+  */
++#include <acpi.h>
+ #include <devicetree.h>
+ #include <asm/psci.h>
+ #include <asm/setup.h>
+@@ -56,7 +57,7 @@ void psci_system_off(void)
+ 	printf("CPU%d unable to do system off (error = %d)\n", smp_processor_id(), err);
+ }
  
- 	/* FACS is special... */
- 	if (sig == FACS_SIGNATURE) {
--		struct fadt_descriptor_rev1 *fadt;
-+		struct acpi_table_fadt *fadt;
- 		fadt = find_acpi_table_addr(FACP_SIGNATURE);
- 		if (!fadt) {
- 			return NULL;
-diff --git a/x86/s3.c b/x86/s3.c
-index 89d69fc..16e79f8 100644
---- a/x86/s3.c
-+++ b/x86/s3.c
-@@ -30,7 +30,7 @@ extern char resume_start, resume_end;
- 
- int main(int argc, char **argv)
+-void psci_set_conduit(void)
++static void psci_set_conduit_fdt(void)
  {
--	struct fadt_descriptor_rev1 *fadt = find_acpi_table_addr(FACP_SIGNATURE);
+ 	const void *fdt = dt_fdt();
+ 	const struct fdt_property *method;
+@@ -75,3 +76,23 @@ void psci_set_conduit(void)
+ 	else
+ 		assert_msg(false, "Unknown PSCI conduit: %s", method->data);
+ }
++
++static void psci_set_conduit_acpi(void)
++{
 +	struct acpi_table_fadt *fadt = find_acpi_table_addr(FACP_SIGNATURE);
- 	struct facs_descriptor_rev1 *facs = find_acpi_table_addr(FACS_SIGNATURE);
- 	char *addr, *resume_vec = (void*)0x1000;
++	assert_msg(fadt, "Unable to find ACPI FADT");
++	assert_msg(fadt->arm_boot_flags & ACPI_FADT_PSCI_COMPLIANT,
++		   "PSCI is not supported in this platfrom");
++	if (fadt->arm_boot_flags & ACPI_FADT_PSCI_USE_HVC)
++		psci_invoke = psci_invoke_hvc;
++	else
++		psci_invoke = psci_invoke_smc;
++}
++
++void psci_set_conduit(void)
++{
++	if (dt_available())
++		psci_set_conduit_fdt();
++	else
++		psci_set_conduit_acpi();
++}
+diff --git a/lib/devicetree.c b/lib/devicetree.c
+index 78c1f6f..3ff9d16 100644
+--- a/lib/devicetree.c
++++ b/lib/devicetree.c
+@@ -16,7 +16,7 @@ const void *dt_fdt(void)
  
-diff --git a/x86/vmexit.c b/x86/vmexit.c
-index 2bac049..fcc0760 100644
---- a/x86/vmexit.c
-+++ b/x86/vmexit.c
-@@ -206,7 +206,7 @@ int pm_tmr_blk;
- static void inl_pmtimer(void)
+ bool dt_available(void)
  {
-     if (!pm_tmr_blk) {
--	struct fadt_descriptor_rev1 *fadt;
-+	struct acpi_table_fadt *fadt;
+-	return fdt_check_header(fdt) == 0;
++	return fdt && fdt_check_header(fdt) == 0;
+ }
  
- 	fadt = find_acpi_table_addr(FACP_SIGNATURE);
- 	pm_tmr_blk = fadt->pm_tmr_blk;
+ int dt_get_nr_cells(int fdtnode, u32 *nr_address_cells, u32 *nr_size_cells)
 -- 
 2.25.1
 
