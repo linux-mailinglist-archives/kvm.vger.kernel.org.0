@@ -2,97 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 957FE51E0CE
-	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 23:09:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A7A351E113
+	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 23:29:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1444344AbiEFVNd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 May 2022 17:13:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36082 "EHLO
+        id S1352550AbiEFVdS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 May 2022 17:33:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1444342AbiEFVNb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 May 2022 17:13:31 -0400
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28B356F4A3
-        for <kvm@vger.kernel.org>; Fri,  6 May 2022 14:09:47 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id c9so7890994plh.2
-        for <kvm@vger.kernel.org>; Fri, 06 May 2022 14:09:47 -0700 (PDT)
+        with ESMTP id S1444464AbiEFVdQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 May 2022 17:33:16 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1F7D6F4AB;
+        Fri,  6 May 2022 14:29:32 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id c9so7930569plh.2;
+        Fri, 06 May 2022 14:29:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:reply-to:in-reply-to:references:from:date:message-id
-         :subject:to;
-        bh=VSSUIwdzgxQxnEkB7+u7pnweyPajIQMP3nQqWYs8VX0=;
-        b=eiAQXuEKXp5T9ck7zmwrtRg7mfdJz+b5e/qLZGNQ+P0jlbkGGyLUR+k8OQGunYV4w4
-         eySbEB2zi6V5vmP5aMQ2aTjvhsXqeGeNCaXKDTmu3I7z4XL+pW4OvX3Z2jx3GwqegtS8
-         B/6pQqBJhtaS+I9tjFoKAuGDb0fWMi+x5hlAUgBfIf2lwRC3GbJ/LCvb0cslojJTiXv6
-         2QS4mYskP3yxkq5AQmzh0pubamLpiFgh3sSG6JGF7eC1+wjOyCOm6BXcKhHZRJyklGjh
-         VQ+VoFh6DWjvUS0ZfFB0B0XD1LN754vsNH9vipO0KfrDO8JBq+TS26TOQQ3tNQJ6214C
-         5a8g==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=6qT9B79QXkLWw17UF4jXkgLnzsIOvLk4zlsmk1fzfpA=;
+        b=GvND7ulvJ0NlO8EOj5vYXO3AtWWcVqs0iZMXTw0tKe5MktIsJXcjT9wDj+TMCSW9Li
+         RBPsDcKG4kR1+fAkhLTmfqFxdFFxxI/GywIqM3uqDHktjpW3N4l55OExoVNeu0vYDmy1
+         XUzIVOq+ghsC7rX3iE3RJTcmDbce9Lhb4vHntWS7Ty8WXzUtymUNgjdXBycqV2t7Qa1W
+         jk4wz36U1WMeXLLKjcJoz3kblEc1opFCk0ZtMxiX3KbvxDooJXRhb86ZCw4ovGBx5Y/a
+         iRKW2QJLnCLCUIN6CHzM3CUTtzgeQ1igX0UoYIMXbSXDUyY3QvqecA7WDNbLHS69r8Df
+         DuGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:in-reply-to:references
-         :from:date:message-id:subject:to;
-        bh=VSSUIwdzgxQxnEkB7+u7pnweyPajIQMP3nQqWYs8VX0=;
-        b=eOq1lew4MJBRvmVp7BpgDDe6nUT6KtlmRbOGZB9pV0Fo0g19D1cYITcZEMK+Pkb9Rz
-         5p7sBmJYJuR+jLGF31zR4nWAM3eKeVj78UeqP2DejXL9l7oFh2Mxl/oUlPXuqpY4QoN0
-         /wv3Ur+dCsD2mGUhGqSADtg7cwI+GJeXNrGr7xFuABX4SN6B41Bvvjx4FZhs1mdQZvuO
-         XcvPX6zoMNuAePiIoEa6gf1n0QYjxHRXPushmgHzGy7VOzXhJxNpuvJ0WjzHwxQgr67j
-         tYTlP0gV1FYp/5KMRX4WaZKsBlNi6UevtooO3XPKLk7OAqKbUUI5J6Rc3/OpykyX2AwG
-         nK5w==
-X-Gm-Message-State: AOAM532eU1KGcYeKZf8YR4Lhk+sg2D8xkQdm80oxDKcJ8qEuuQyvp65c
-        5rNljxeSn9Vu7cDhOj1rkxUPvq3nDdvJqEPPtw==
-X-Google-Smtp-Source: ABdhPJzg0WuA2nWsf5GfojxJwV1671Vg7LfyIkyz0YR1vlLhPfyCappL8fPY+P0VDolj1UnA1lJoJRDRGks4K5ixmyY=
-X-Received: by 2002:a17:90a:1944:b0:1d9:7cf8:5457 with SMTP id
- 4-20020a17090a194400b001d97cf85457mr14365809pjh.112.1651871386691; Fri, 06
- May 2022 14:09:46 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=6qT9B79QXkLWw17UF4jXkgLnzsIOvLk4zlsmk1fzfpA=;
+        b=2v5h8H02tB9Xmc4yMgMvFSsWLR4Yaf+khTw99HhVLMSjKtnHuXiFvUZvY0oaM3crjn
+         2OiXsDFbGa9O1nANZ92sKGoOJiDOM0dJWBOndsCjDAFmkMWwcdp2fpMC0iee1uxQliYl
+         ofJqhdHBjshgiX1U/sQGynqg2WxVOBT2DXMDBxTC1vF3LFDU4XXgJzussPDnZsup4PQq
+         oF3tBYKUuKoNSIhobYaUaZE8e1y4rF3TacPuSIGk6iaAsec6NqPTpCGUNPEnj3T0bxMQ
+         ZvQ/s3Jjcy72xKmoe5OH1OAB95w7tC8eW+fY5tcL8LyhvKHvDK3flqrTquAhoyVEubk2
+         M92g==
+X-Gm-Message-State: AOAM5312T5XyssIht7o4E54+3sXGHg3ktR68dxDOGM3SYBeILy9LijHG
+        9VWfhBLV331sAs+p+Yb8BDW9KfJb0n0=
+X-Google-Smtp-Source: ABdhPJycAKGNm73Ipl+cKSsvVHi+P4RQBndDHDv8gxThLv0xO+9931Wl1u2TGJ//LxrHRhAhoeR4PA==
+X-Received: by 2002:a17:902:7104:b0:15e:ddb8:199 with SMTP id a4-20020a170902710400b0015eddb80199mr5728782pll.80.1651872571978;
+        Fri, 06 May 2022 14:29:31 -0700 (PDT)
+Received: from localhost (c-107-3-154-88.hsd1.ca.comcast.net. [107.3.154.88])
+        by smtp.gmail.com with ESMTPSA id s66-20020a637745000000b003c25a7581d9sm3739161pgc.52.2022.05.06.14.29.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 May 2022 14:29:31 -0700 (PDT)
+Date:   Fri, 6 May 2022 14:29:30 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>
+Subject: Re: [RFC PATCH v6 011/104] KVM: TDX: Initialize TDX module when
+ loading kvm_intel.ko
+Message-ID: <20220506212930.GA2145958@private.email.ne.jp>
+References: <cover.1651774250.git.isaku.yamahata@intel.com>
+ <752bc449e13cb3e6874ba2d82f790f6f6018813c.1651774250.git.isaku.yamahata@intel.com>
+ <c7c1f8d1-081a-d543-bdb4-6895292c7077@intel.com>
 MIME-Version: 1.0
-Received: by 2002:ac4:9906:0:b0:4ba:807b:b8f3 with HTTP; Fri, 6 May 2022
- 14:09:44 -0700 (PDT)
-Reply-To: warren001buffett@gmail.com
-In-Reply-To: <CAD_xG_pvNZK6BFCW+28Xv4DE=_5rbDZXDok2BYNn9xw6Ma7iow@mail.gmail.com>
-References: <CAD_xG_pvNZK6BFCW+28Xv4DE=_5rbDZXDok2BYNn9xw6Ma7iow@mail.gmail.com>
-From:   Warren Buffett <guidayema@gmail.com>
-Date:   Fri, 6 May 2022 21:09:44 +0000
-Message-ID: <CAD_xG_odZ2a17vwQOtf_G_N8RGEpabLVcAoVxBDgubah5+QYJA@mail.gmail.com>
-Subject: Fwd: My name is Warren Buffett, an American businessman.
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: Yes, score=5.1 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,FREEMAIL_REPLYTO,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        UNDISC_FREEM autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2607:f8b0:4864:20:0:0:0:642 listed in]
-        [list.dnswl.org]
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.4845]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [guidayema[at]gmail.com]
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
-        *  3.5 UNDISC_FREEM Undisclosed recipients + freemail reply-to
-        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
-        *      different freemails
-X-Spam-Level: *****
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c7c1f8d1-081a-d543-bdb4-6895292c7077@intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-My name is Warren Buffett, an American businessman and investor I have
-something important to discuss with you.
+On Fri, May 06, 2022 at 09:57:09PM +0800,
+Xiaoyao Li <xiaoyao.li@intel.com> wrote:
 
-Mr. Warren Buffett
-warren001buffett@gmail.com
-Chief Executive Officer: Berkshire Hathaway
-aphy/Warren-Edward-Buffett
+> On 5/6/2022 2:14 AM, isaku.yamahata@intel.com wrote:
+> > +int __init tdx_module_setup(void)
+> > +{
+> > +	const struct tdsysinfo_struct *tdsysinfo;
+> > +	int ret = 0;
+> > +
+> > +	BUILD_BUG_ON(sizeof(*tdsysinfo) != 1024);
+> > +	BUILD_BUG_ON(TDX_MAX_NR_CPUID_CONFIGS != 37);
+> > +
+> > +	ret = tdx_detect();
+> > +	if (ret) {
+> > +		pr_info("Failed to detect TDX module.\n");
+> > +		return ret;
+> > +	}
+> > +
+> > +	ret = tdx_init();
+> > +	if (ret) {
+> > +		pr_info("Failed to initialize TDX module.\n");
+> > +		return ret;
+> > +	}
+> > +
+> > +	tdsysinfo = tdx_get_sysinfo();
+> > +	if (tdx_caps.nr_cpuid_configs > TDX_MAX_NR_CPUID_CONFIGS)
+> > +		return -EIO;
+> 
+> It needs to check tdsysinfo->num_cpuid_config against
+> TDX_MAX_NR_CPUID_CONFIG
+> 
+> or move the check down after tdx_caps is initialized.
+
+Thanks for catching it. I'll replace it with tdsysinfo->num_cpuid_config.
+
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
