@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BDE9051E07A
-	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 22:57:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53AF451E07F
+	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 22:57:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1444264AbiEFVAt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 May 2022 17:00:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52906 "EHLO
+        id S1444267AbiEFVAu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 May 2022 17:00:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1444259AbiEFVAr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1444260AbiEFVAr (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 6 May 2022 17:00:47 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E9D2E6A068
-        for <kvm@vger.kernel.org>; Fri,  6 May 2022 13:57:02 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C7A9C6EB07
+        for <kvm@vger.kernel.org>; Fri,  6 May 2022 13:57:03 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AA60F14BF;
-        Fri,  6 May 2022 13:57:02 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A2D1F152B;
+        Fri,  6 May 2022 13:57:03 -0700 (PDT)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D0B1B3F800;
-        Fri,  6 May 2022 13:57:01 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CD6DB3F800;
+        Fri,  6 May 2022 13:57:02 -0700 (PDT)
 From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
 To:     kvm@vger.kernel.org
 Cc:     drjones@redhat.com, pbonzini@redhat.com, jade.alglave@arm.com,
         alexandru.elisei@arm.com
-Subject: [kvm-unit-tests PATCH v2 08/23] arm/arm64: Add support for cpu initialization through ACPI
-Date:   Fri,  6 May 2022 21:55:50 +0100
-Message-Id: <20220506205605.359830-9-nikos.nikoleris@arm.com>
+Subject: [kvm-unit-tests PATCH v2 09/23] lib/printf: Support for precision modifier in printing strings
+Date:   Fri,  6 May 2022 21:55:51 +0100
+Message-Id: <20220506205605.359830-10-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220506205605.359830-1-nikos.nikoleris@arm.com>
 References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
@@ -42,191 +42,194 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In systems with ACPI support and when a DT is not provided, we can use
-the MADTs to discover the number of CPUs and their corresponding MIDR.
-This change implements this but retains the default behavior; we check
-if a valid DT is provided, if not, we try to discover the cores in the
-system using ACPI.
+This follows the typical format of:
+
+printf("%.Ns", *str);
+
+Where N might be a decimal digit string or '*'. This feature is used
+by a future change.
+
+See also: man 3 printf
 
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 ---
- lib/acpi.h      | 64 +++++++++++++++++++++++++++++++++++++++++++++++++
- lib/acpi.c      | 21 ++++++++++++++++
- lib/arm/setup.c | 25 ++++++++++++++++---
- 3 files changed, 107 insertions(+), 3 deletions(-)
+ lib/printf.c | 84 ++++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 71 insertions(+), 13 deletions(-)
 
-diff --git a/lib/acpi.h b/lib/acpi.h
-index 297ad87..55de54a 100644
---- a/lib/acpi.h
-+++ b/lib/acpi.h
-@@ -16,6 +16,7 @@
- #define XSDT_SIGNATURE ACPI_SIGNATURE('X','S','D','T')
- #define FACP_SIGNATURE ACPI_SIGNATURE('F','A','C','P')
- #define FACS_SIGNATURE ACPI_SIGNATURE('F','A','C','S')
-+#define MADT_SIGNATURE ACPI_SIGNATURE('A','P','I','C')
- #define SPCR_SIGNATURE ACPI_SIGNATURE('S','P','C','R')
- #define GTDT_SIGNATURE ACPI_SIGNATURE('G','T','D','T')
+diff --git a/lib/printf.c b/lib/printf.c
+index 1269723..724befa 100644
+--- a/lib/printf.c
++++ b/lib/printf.c
+@@ -19,6 +19,7 @@ typedef struct strprops {
+     char pad;
+     int npad;
+     bool alternate;
++    int precision;
+ } strprops_t;
  
-@@ -149,6 +150,67 @@ struct facs_descriptor_rev1
-     u8  reserved3 [40];         /* Reserved - must be zero */
- } __attribute__ ((packed));
+ static void addchar(pstream_t *p, char c)
+@@ -43,7 +44,7 @@ static void print_str(pstream_t *p, const char *s, strprops_t props)
+ 	}
+     }
  
-+struct acpi_table_madt {
-+    ACPI_TABLE_HEADER_DEF     /* ACPI common table header */
-+    u32 address;               /* Physical address of local APIC */
-+    u32 flags;
-+} __attribute__ ((packed));
-+
-+struct acpi_subtable_header {
-+    u8 type;
-+    u8 length;
-+}  __attribute__ ((packed));
-+
-+typedef int (*acpi_table_handler)(struct acpi_subtable_header *header);
-+
-+/* 11: Generic interrupt - GICC (ACPI 5.0 + ACPI 6.0 + ACPI 6.3 changes) */
-+
-+struct acpi_madt_generic_interrupt {
-+    u8 type;
-+    u8 length;
-+    u16 reserved;           /* reserved - must be zero */
-+    u32 cpu_interface_number;
-+    u32 uid;
-+    u32 flags;
-+    u32 parking_version;
-+    u32 performance_interrupt;
-+    u64 parked_address;
-+    u64 base_address;
-+    u64 gicv_base_address;
-+    u64 gich_base_address;
-+    u32 vgic_interrupt;
-+    u64 gicr_base_address;
-+    u64 arm_mpidr;
-+    u8 efficiency_class;
-+    u8 reserved2[1];
-+    u16 spe_interrupt;      /* ACPI 6.3 */
-+} __attribute__ ((packed));
-+
-+/* Values for MADT subtable type in struct acpi_subtable_header */
-+
-+enum acpi_madt_type {
-+    ACPI_MADT_TYPE_LOCAL_APIC = 0,
-+    ACPI_MADT_TYPE_IO_APIC = 1,
-+    ACPI_MADT_TYPE_INTERRUPT_OVERRIDE = 2,
-+    ACPI_MADT_TYPE_NMI_SOURCE = 3,
-+    ACPI_MADT_TYPE_LOCAL_APIC_NMI = 4,
-+    ACPI_MADT_TYPE_LOCAL_APIC_OVERRIDE = 5,
-+    ACPI_MADT_TYPE_IO_SAPIC = 6,
-+    ACPI_MADT_TYPE_LOCAL_SAPIC = 7,
-+    ACPI_MADT_TYPE_INTERRUPT_SOURCE = 8,
-+    ACPI_MADT_TYPE_LOCAL_X2APIC = 9,
-+    ACPI_MADT_TYPE_LOCAL_X2APIC_NMI = 10,
-+    ACPI_MADT_TYPE_GENERIC_INTERRUPT = 11,
-+    ACPI_MADT_TYPE_GENERIC_DISTRIBUTOR = 12,
-+    ACPI_MADT_TYPE_GENERIC_MSI_FRAME = 13,
-+    ACPI_MADT_TYPE_GENERIC_REDISTRIBUTOR = 14,
-+    ACPI_MADT_TYPE_GENERIC_TRANSLATOR = 15,
-+    ACPI_MADT_TYPE_RESERVED = 16    /* 16 and greater are reserved */
-+};
-+
-+/* MADT Local APIC flags */
-+#define ACPI_MADT_ENABLED           (1) /* 00: Processor is usable if set */
-+
- struct spcr_descriptor {
-     ACPI_TABLE_HEADER_DEF   /* ACPI common table header */
-     u8 interface_type;      /* 0=full 16550, 1=subset of 16550 */
-@@ -192,5 +254,7 @@ struct acpi_table_gtdt {
+-    while (*s)
++    while (*s && props.precision--)
+ 	addchar(p, *s++);
  
- void set_efi_rsdp(struct rsdp_descriptor *rsdp);
- void* find_acpi_table_addr(u32 sig);
-+void acpi_table_parse_madt(enum acpi_madt_type mtype,
-+			   acpi_table_handler handler);
- 
- #endif
-diff --git a/lib/acpi.c b/lib/acpi.c
-index e8440ae..ad3ae8d 100644
---- a/lib/acpi.c
-+++ b/lib/acpi.c
-@@ -101,3 +101,24 @@ void* find_acpi_table_addr(u32 sig)
- 
- 	return NULL;
+     if (npad < 0) {
+@@ -147,9 +148,61 @@ static int fmtnum(const char **fmt)
+     return num;
  }
-+
-+void acpi_table_parse_madt(enum acpi_madt_type mtype,
-+			   acpi_table_handler handler)
+ 
++static inline int isdigit(int c)
 +{
-+	struct acpi_table_madt *madt;
-+	void *end;
-+
-+	madt = find_acpi_table_addr(MADT_SIGNATURE);
-+	assert(madt);
-+
-+	struct acpi_subtable_header *header =
-+		(void *)(ulong)madt + sizeof(struct acpi_table_madt);
-+	end = (void *)((ulong)madt + madt->length);
-+
-+	while ((void *)header < end) {
-+		if (header->type == mtype)
-+			handler(header);
-+
-+		header = (void *)(ulong)header + header->length;
-+	}
-+}
-diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index 1572c64..3c24c75 100644
---- a/lib/arm/setup.c
-+++ b/lib/arm/setup.c
-@@ -13,6 +13,7 @@
- #include <libcflat.h>
- #include <libfdt/libfdt.h>
- #include <devicetree.h>
-+#include <acpi.h>
- #include <alloc.h>
- #include <alloc_phys.h>
- #include <alloc_page.h>
-@@ -55,7 +56,7 @@ int mpidr_to_cpu(uint64_t mpidr)
- 	return -1;
- }
- 
--static void cpu_set(int fdtnode __unused, u64 regval, void *info __unused)
-+static void cpu_set_fdt(int fdtnode __unused, u64 regval, void *info __unused)
- {
- 	int cpu = nr_cpus++;
- 
-@@ -65,13 +66,31 @@ static void cpu_set(int fdtnode __unused, u64 regval, void *info __unused)
- 	set_cpu_present(cpu, true);
- }
- 
-+static int cpu_set_acpi(struct acpi_subtable_header *header)
-+{
-+	int cpu = nr_cpus++;
-+	struct acpi_madt_generic_interrupt *gicc = (void *)header;
-+
-+	assert_msg(cpu < NR_CPUS, "Number cpus exceeds maximum supported (%d).", NR_CPUS);
-+
-+	cpus[cpu] = gicc->arm_mpidr;
-+	set_cpu_present(cpu, true);
-+
-+	return 0;
++    return '0' <= c && c <= '9';
 +}
 +
- static void cpu_init(void)
- {
- 	int ret;
- 
- 	nr_cpus = 0;
--	ret = dt_for_each_cpu_node(cpu_set, NULL);
--	assert(ret == 0);
-+	if (dt_available()) {
-+		ret = dt_for_each_cpu_node(cpu_set_fdt, NULL);
-+		assert(ret == 0);
-+	} else
-+		acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_INTERRUPT,
-+				      cpu_set_acpi);
++/*
++ * Adapted from drivers/firmware/efi/libstub/vsprintf.c
++ */
++static int skip_atoi(const char **s)
++{
++    int i = 0;
 +
- 	set_cpu_online(0, true);
- }
++    do {
++	i = i*10 + *((*s)++) - '0';
++    } while (isdigit(**s));
++
++    return i;
++}
++
++/*
++ * Adapted from drivers/firmware/efi/libstub/vsprintf.c
++ */
++static int get_int(const char **fmt, va_list *ap)
++{
++    if (isdigit(**fmt)) {
++	return skip_atoi(fmt);
++    }
++    if (**fmt == '*') {
++	++(*fmt);
++	/* it's the next argument */
++	return va_arg(*ap, int);
++    }
++    return 0;
++}
++
+ int vsnprintf(char *buf, int size, const char *fmt, va_list va)
+ {
+     pstream_t s;
++    va_list args;
++
++    /*
++     * We want to pass our input va_list to helper functions by reference,
++     * but there's an annoying edge case. If va_list was originally passed
++     * to us by value, we could just pass &ap down to the helpers. This is
++     * the case on, for example, X86_32.
++     * However, on X86_64 (and possibly others), va_list is actually a
++     * size-1 array containing a structure. Our function parameter ap has
++     * decayed from T[1] to T*, and &ap has type T** rather than T(*)[1],
++     * which is what will be expected by a function taking a va_list *
++     * parameter.
++     * One standard way to solve this mess is by creating a copy in a local
++     * variable of type va_list and then passing a pointer to that local
++     * copy instead, which is what we do here.
++     */
++    va_copy(args, va);
  
+     s.buffer = buf;
+     s.remain = size - 1;
+@@ -160,6 +213,7 @@ int vsnprintf(char *buf, int size, const char *fmt, va_list va)
+ 	strprops_t props;
+ 	memset(&props, 0, sizeof(props));
+ 	props.pad = ' ';
++	props.precision = -1;
+ 
+ 	if (f != '%') {
+ 	    addchar(&s, f);
+@@ -172,11 +226,14 @@ int vsnprintf(char *buf, int size, const char *fmt, va_list va)
+ 	    addchar(&s, '%');
+ 	    break;
+ 	case 'c':
+-            addchar(&s, va_arg(va, int));
++	    addchar(&s, va_arg(args, int));
+ 	    break;
+ 	case '\0':
+ 	    --fmt;
+ 	    break;
++	case '.':
++	    props.precision = get_int(&fmt, &args);
++	    goto morefmt;
+ 	case '#':
+ 	    props.alternate = true;
+ 	    goto morefmt;
+@@ -204,54 +261,55 @@ int vsnprintf(char *buf, int size, const char *fmt, va_list va)
+ 	case 'd':
+ 	    switch (nlong) {
+ 	    case 0:
+-		print_int(&s, va_arg(va, int), 10, props);
++		print_int(&s, va_arg(args, int), 10, props);
+ 		break;
+ 	    case 1:
+-		print_int(&s, va_arg(va, long), 10, props);
++		print_int(&s, va_arg(args, long), 10, props);
+ 		break;
+ 	    default:
+-		print_int(&s, va_arg(va, long long), 10, props);
++		print_int(&s, va_arg(args, long long), 10, props);
+ 		break;
+ 	    }
+ 	    break;
+ 	case 'u':
+ 	    switch (nlong) {
+ 	    case 0:
+-		print_unsigned(&s, va_arg(va, unsigned), 10, props);
++		print_unsigned(&s, va_arg(args, unsigned), 10, props);
+ 		break;
+ 	    case 1:
+-		print_unsigned(&s, va_arg(va, unsigned long), 10, props);
++		print_unsigned(&s, va_arg(args, unsigned long), 10, props);
+ 		break;
+ 	    default:
+-		print_unsigned(&s, va_arg(va, unsigned long long), 10, props);
++		print_unsigned(&s, va_arg(args, unsigned long long), 10, props);
+ 		break;
+ 	    }
+ 	    break;
+ 	case 'x':
+ 	    switch (nlong) {
+ 	    case 0:
+-		print_unsigned(&s, va_arg(va, unsigned), 16, props);
++		print_unsigned(&s, va_arg(args, unsigned), 16, props);
+ 		break;
+ 	    case 1:
+-		print_unsigned(&s, va_arg(va, unsigned long), 16, props);
++		print_unsigned(&s, va_arg(args, unsigned long), 16, props);
+ 		break;
+ 	    default:
+-		print_unsigned(&s, va_arg(va, unsigned long long), 16, props);
++		print_unsigned(&s, va_arg(args, unsigned long long), 16, props);
+ 		break;
+ 	    }
+ 	    break;
+ 	case 'p':
+ 	    props.alternate = true;
+-	    print_unsigned(&s, (unsigned long)va_arg(va, void *), 16, props);
++	    print_unsigned(&s, (unsigned long)va_arg(args, void *), 16, props);
+ 	    break;
+ 	case 's':
+-	    print_str(&s, va_arg(va, const char *), props);
++	    print_str(&s, va_arg(args, const char *), props);
+ 	    break;
+ 	default:
+ 	    addchar(&s, f);
+ 	    break;
+ 	}
+     }
++    va_end(args);
+     *s.buffer = 0;
+     return s.added;
+ }
 -- 
 2.25.1
 
