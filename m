@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32DAD51D9FD
-	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 16:09:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 292E851D9FE
+	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 16:09:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442023AbiEFOM4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1442013AbiEFOM4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Fri, 6 May 2022 10:12:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34416 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442006AbiEFOMr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 May 2022 10:12:47 -0400
+        with ESMTP id S1391048AbiEFOMt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 May 2022 10:12:49 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DEA505A2DF
-        for <kvm@vger.kernel.org>; Fri,  6 May 2022 07:09:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ECDA866F83
+        for <kvm@vger.kernel.org>; Fri,  6 May 2022 07:09:05 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B9345152B;
-        Fri,  6 May 2022 07:09:04 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C7AF314BF;
+        Fri,  6 May 2022 07:09:05 -0700 (PDT)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E08303F885;
-        Fri,  6 May 2022 07:09:03 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F32343F885;
+        Fri,  6 May 2022 07:09:04 -0700 (PDT)
 From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     jade.alglave@arm.com, alexandru.elisei@arm.com,
         Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH 01/23] lib: Move acpi header and implementation to lib
-Date:   Fri,  6 May 2022 15:08:33 +0100
-Message-Id: <20220506140855.353337-2-nikos.nikoleris@arm.com>
+Subject: [kvm-unit-tests PATCH 02/23] lib: Ensure all struct definition for ACPI tables are packed
+Date:   Fri,  6 May 2022 15:08:34 +0100
+Message-Id: <20220506140855.353337-3-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220506140855.353337-1-nikos.nikoleris@arm.com>
 References: <20220506140855.353337-1-nikos.nikoleris@arm.com>
@@ -42,99 +42,93 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This change is in preparation of using ACPI in arm64 systems booting
-with EFI.
+All ACPI table definitions are provided with precise definitions of
+field sizes and offsets, make sure that no compiler optimization can
+interfere with the memory layout of the corresponding structs.
 
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 ---
- x86/Makefile.common  | 2 +-
- lib/x86/asm/setup.h  | 2 +-
- lib/{x86 => }/acpi.h | 4 ++--
- lib/{x86 => }/acpi.c | 0
- x86/s3.c             | 2 +-
- x86/vmexit.c         | 2 +-
- 6 files changed, 6 insertions(+), 6 deletions(-)
- rename lib/{x86 => }/acpi.h (99%)
- rename lib/{x86 => }/acpi.c (100%)
+ lib/acpi.h | 11 ++++++++---
+ x86/s3.c   | 16 ++++------------
+ 2 files changed, 12 insertions(+), 15 deletions(-)
 
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index b903988..4cdba79 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -2,6 +2,7 @@
- 
- all: directories test_cases
- 
-+cflatobjs += lib/acpi.o
- cflatobjs += lib/pci.o
- cflatobjs += lib/pci-edu.o
- cflatobjs += lib/alloc.o
-@@ -18,7 +19,6 @@ cflatobjs += lib/x86/apic.o
- cflatobjs += lib/x86/atomic.o
- cflatobjs += lib/x86/desc.o
- cflatobjs += lib/x86/isr.o
--cflatobjs += lib/x86/acpi.o
- cflatobjs += lib/x86/stack.o
- cflatobjs += lib/x86/fault_test.o
- cflatobjs += lib/x86/delay.o
-diff --git a/lib/x86/asm/setup.h b/lib/x86/asm/setup.h
-index 24d4fa9..f46462c 100644
---- a/lib/x86/asm/setup.h
-+++ b/lib/x86/asm/setup.h
-@@ -4,7 +4,7 @@
- unsigned long setup_tss(u8 *stacktop);
- 
- #ifdef CONFIG_EFI
--#include "x86/acpi.h"
-+#include "acpi.h"
- #include "x86/apic.h"
- #include "x86/processor.h"
- #include "x86/smp.h"
-diff --git a/lib/x86/acpi.h b/lib/acpi.h
-similarity index 99%
-rename from lib/x86/acpi.h
-rename to lib/acpi.h
-index 67ba389..1e89840 100644
---- a/lib/x86/acpi.h
+diff --git a/lib/acpi.h b/lib/acpi.h
+index 1e89840..2a43cbf 100644
+--- a/lib/acpi.h
 +++ b/lib/acpi.h
-@@ -1,5 +1,5 @@
--#ifndef _X86_ACPI_H_
--#define _X86_ACPI_H_
-+#ifndef _ACPI_H_
-+#define _ACPI_H_
+@@ -3,6 +3,11 @@
  
  #include "libcflat.h"
  
-diff --git a/lib/x86/acpi.c b/lib/acpi.c
-similarity index 100%
-rename from lib/x86/acpi.c
-rename to lib/acpi.c
++/*
++ * All tables and structures must be byte-packed to match the ACPI
++ * specification, since the tables are provided by the system BIOS
++ */
++
+ #define ACPI_SIGNATURE(c1, c2, c3, c4) \
+ 	((c1) | ((c2) << 8) | ((c3) << 16) | ((c4) << 24))
+ 
+@@ -44,12 +49,12 @@ struct rsdp_descriptor {        /* Root System Descriptor Pointer */
+ struct acpi_table {
+     ACPI_TABLE_HEADER_DEF
+     char data[0];
+-};
++} __attribute__ ((packed));
+ 
+ struct rsdt_descriptor_rev1 {
+     ACPI_TABLE_HEADER_DEF
+     u32 table_offset_entry[0];
+-};
++} __attribute__ ((packed));;
+ 
+ struct fadt_descriptor_rev1
+ {
+@@ -104,7 +109,7 @@ struct facs_descriptor_rev1
+     u32 S4bios_f        : 1;    /* Indicates if S4BIOS support is present */
+     u32 reserved1       : 31;   /* Must be 0 */
+     u8  reserved3 [40];         /* Reserved - must be zero */
+-};
++} __attribute__ ((packed));
+ 
+ void set_efi_rsdp(struct rsdp_descriptor *rsdp);
+ void* find_acpi_table_addr(u32 sig);
 diff --git a/x86/s3.c b/x86/s3.c
-index 6e41d0c..378d37a 100644
+index 378d37a..89d69fc 100644
 --- a/x86/s3.c
 +++ b/x86/s3.c
-@@ -1,5 +1,5 @@
- #include "libcflat.h"
--#include "x86/acpi.h"
-+#include "acpi.h"
+@@ -2,15 +2,6 @@
+ #include "acpi.h"
  #include "asm/io.h"
  
- static u32* find_resume_vector_addr(void)
-diff --git a/x86/vmexit.c b/x86/vmexit.c
-index 4adec78..2bac049 100644
---- a/x86/vmexit.c
-+++ b/x86/vmexit.c
-@@ -1,9 +1,9 @@
-+#include "acpi.h"
- #include "libcflat.h"
- #include "smp.h"
- #include "pci.h"
- #include "x86/vm.h"
- #include "x86/desc.h"
--#include "x86/acpi.h"
- #include "x86/apic.h"
- #include "x86/isr.h"
+-static u32* find_resume_vector_addr(void)
+-{
+-    struct facs_descriptor_rev1 *facs = find_acpi_table_addr(FACS_SIGNATURE);
+-    if (!facs)
+-        return 0;
+-    printf("FACS is at %p\n", facs);
+-    return &facs->firmware_waking_vector;
+-}
+-
+ #define RTC_SECONDS_ALARM       1
+ #define RTC_MINUTES_ALARM       3
+ #define RTC_HOURS_ALARM         5
+@@ -40,12 +31,13 @@ extern char resume_start, resume_end;
+ int main(int argc, char **argv)
+ {
+ 	struct fadt_descriptor_rev1 *fadt = find_acpi_table_addr(FACP_SIGNATURE);
+-	volatile u32 *resume_vector_ptr = find_resume_vector_addr();
++	struct facs_descriptor_rev1 *facs = find_acpi_table_addr(FACS_SIGNATURE);
+ 	char *addr, *resume_vec = (void*)0x1000;
  
+-	*resume_vector_ptr = (u32)(ulong)resume_vec;
++	facs->firmware_waking_vector = (u32)(ulong)resume_vec;
+ 
+-	printf("resume vector addr is %p\n", resume_vector_ptr);
++	printf("FACS is at %p\n", facs);
++	printf("resume vector addr is %p\n", &facs->firmware_waking_vector);
+ 	for (addr = &resume_start; addr < &resume_end; addr++)
+ 		*resume_vec++ = *addr;
+ 	printf("copy resume code from %p\n", &resume_start);
 -- 
 2.25.1
 
