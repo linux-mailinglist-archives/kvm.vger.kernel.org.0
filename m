@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 71ABC51E078
-	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 22:57:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1625351E07B
+	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 22:57:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1444270AbiEFVAw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 May 2022 17:00:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52990 "EHLO
+        id S1444283AbiEFVAy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 May 2022 17:00:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1444272AbiEFVAv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1444273AbiEFVAv (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 6 May 2022 17:00:51 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 654626A068
-        for <kvm@vger.kernel.org>; Fri,  6 May 2022 13:57:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E0F5A6EB29
+        for <kvm@vger.kernel.org>; Fri,  6 May 2022 13:57:06 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C8AF152B;
-        Fri,  6 May 2022 13:57:05 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9965814BF;
+        Fri,  6 May 2022 13:57:06 -0700 (PDT)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C73F73F800;
-        Fri,  6 May 2022 13:57:04 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C437B3F800;
+        Fri,  6 May 2022 13:57:05 -0700 (PDT)
 From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
 To:     kvm@vger.kernel.org
 Cc:     drjones@redhat.com, pbonzini@redhat.com, jade.alglave@arm.com,
         alexandru.elisei@arm.com
-Subject: [kvm-unit-tests PATCH v2 11/23] lib/efi: Add support for getting the cmdline
-Date:   Fri,  6 May 2022 21:55:53 +0100
-Message-Id: <20220506205605.359830-12-nikos.nikoleris@arm.com>
+Subject: [kvm-unit-tests PATCH v2 12/23] arm/arm64: mmu_disable: Clean and invalidate before disabling
+Date:   Fri,  6 May 2022 21:55:54 +0100
+Message-Id: <20220506205605.359830-13-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220506205605.359830-1-nikos.nikoleris@arm.com>
 References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
@@ -42,248 +42,127 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This change adds support for discovering the command line arguments,
-as a string. Then, we parse this string to populate __argc and __argv
-for EFI tests.
+From: Andrew Jones <drjones@redhat.com>
 
+The commit message of commit 410b3bf09e76 ("arm/arm64: Perform dcache
+clean + invalidate after turning MMU off") justifies cleaning and
+invalidating the dcache after disabling the MMU by saying it's nice
+not to rely on the current page tables and that it should still work
+(per the spec), as long as there's an identity map in the current
+tables. Doing the invalidation after also somewhat helped with
+reenabling the MMU without seeing stale data, but the real problem
+with reenabling was because the cache needs to be disabled with
+the MMU, but it wasn't.
+
+Since we have to trust/validate that the current page tables have an
+identity map anyway, then there's no harm in doing the clean
+and invalidate first (it feels a little better to do so, anyway,
+considering the cache maintenance instructions take virtual
+addresses). Then, also disable the cache with the MMU to avoid
+problems when reenabling. We invalidate the Icache and disable
+that too for good measure. And, a final TLB invalidation ensures
+we're crystal clean when we return from asm_mmu_disable().
+
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 ---
- lib/linux/efi.h |  39 +++++++++++++++
- lib/stdlib.h    |   1 +
- lib/efi.c       | 123 ++++++++++++++++++++++++++++++++++++++++++++++++
- lib/string.c    |   2 +-
- 4 files changed, 164 insertions(+), 1 deletion(-)
+ arm/cstart.S   | 28 +++++++++++++++++++++-------
+ arm/cstart64.S | 21 ++++++++++++++++-----
+ 2 files changed, 37 insertions(+), 12 deletions(-)
 
-diff --git a/lib/linux/efi.h b/lib/linux/efi.h
-index 455625a..e3aba1d 100644
---- a/lib/linux/efi.h
-+++ b/lib/linux/efi.h
-@@ -60,6 +60,10 @@ typedef guid_t efi_guid_t;
+diff --git a/arm/cstart.S b/arm/cstart.S
+index 7036e67..dc324c5 100644
+--- a/arm/cstart.S
++++ b/arm/cstart.S
+@@ -179,6 +179,7 @@ halt:
+ .globl asm_mmu_enable
+ asm_mmu_enable:
+ 	/* TLBIALL */
++	mov	r2, #0
+ 	mcr	p15, 0, r2, c8, c7, 0
+ 	dsb	nsh
  
- #define ACPI_TABLE_GUID EFI_GUID(0xeb9d2d30, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d)
+@@ -211,12 +212,7 @@ asm_mmu_enable:
  
-+#define LOADED_IMAGE_PROTOCOL_GUID EFI_GUID(0x5b1b31a1, 0x9562, 0x11d2,  0x8e, 0x3f, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b)
-+
-+#define efi_table_attr(inst, attr) (inst->attr)
-+
- typedef struct {
- 	efi_guid_t guid;
- 	void *table;
-@@ -416,6 +420,41 @@ struct efi_boot_memmap {
- 	unsigned long           *buff_size;
- };
+ .globl asm_mmu_disable
+ asm_mmu_disable:
+-	/* SCTLR */
+-	mrc	p15, 0, r0, c1, c0, 0
+-	bic	r0, #CR_M
+-	mcr	p15, 0, r0, c1, c0, 0
+-	isb
+-
++	/* Clean + invalidate the entire memory */
+ 	ldr	r0, =__phys_offset
+ 	ldr	r0, [r0]
+ 	ldr	r1, =__phys_end
+@@ -224,7 +220,25 @@ asm_mmu_disable:
+ 	sub	r1, r1, r0
+ 	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
  
-+#define __aligned_u64 u64 __attribute__((aligned(8)))
+-	mov     pc, lr
++	/* Invalidate Icache */
++	mov	r0, #0
++	mcr	p15, 0, r0, c7, c5, 0
++	isb
 +
-+typedef union {
-+	struct {
-+		u32			revision;
-+		efi_handle_t		parent_handle;
-+		efi_system_table_t	*system_table;
-+		efi_handle_t		device_handle;
-+		void			*file_path;
-+		void			*reserved;
-+		u32			load_options_size;
-+		void			*load_options;
-+		void			*image_base;
-+		__aligned_u64		image_size;
-+		unsigned int		image_code_type;
-+		unsigned int		image_data_type;
-+		efi_status_t		(__efiapi *unload)(efi_handle_t image_handle);
-+	};
-+	struct {
-+		u32		revision;
-+		u32		parent_handle;
-+		u32		system_table;
-+		u32		device_handle;
-+		u32		file_path;
-+		u32		reserved;
-+		u32		load_options_size;
-+		u32		load_options;
-+		u32		image_base;
-+		__aligned_u64	image_size;
-+		u32		image_code_type;
-+		u32		image_data_type;
-+		u32		unload;
-+	} mixed_mode;
-+} efi_loaded_image_t;
++	/*  Disable cache, Icache and MMU */
++	mrc	p15, 0, r0, c1, c0, 0
++	bic	r0, #CR_C
++	bic	r0, #CR_I
++	bic	r0, #CR_M
++	mcr	p15, 0, r0, c1, c0, 0
++	isb
 +
- #define efi_bs_call(func, ...) efi_system_table->boottime->func(__VA_ARGS__)
- #define efi_rs_call(func, ...) efi_system_table->runtime->func(__VA_ARGS__)
++	/* Invalidate TLB */
++	mov	r0, #0
++	mcr	p15, 0, r0, c8, c7, 0
++	dsb	nsh
++
++	mov	pc, lr
  
-diff --git a/lib/stdlib.h b/lib/stdlib.h
-index 28496d7..2c524d7 100644
---- a/lib/stdlib.h
-+++ b/lib/stdlib.h
-@@ -7,6 +7,7 @@
- #ifndef _STDLIB_H_
- #define _STDLIB_H_
+ /*
+  * Vectors
+diff --git a/arm/cstart64.S b/arm/cstart64.S
+index e4ab7d0..390feb9 100644
+--- a/arm/cstart64.S
++++ b/arm/cstart64.S
+@@ -246,11 +246,6 @@ asm_mmu_enable:
  
-+int isspace(int c);
- long int strtol(const char *nptr, char **endptr, int base);
- unsigned long int strtoul(const char *nptr, char **endptr, int base);
- long long int strtoll(const char *nptr, char **endptr, int base);
-diff --git a/lib/efi.c b/lib/efi.c
-index 64cc978..5341942 100644
---- a/lib/efi.c
-+++ b/lib/efi.c
-@@ -8,6 +8,7 @@
-  */
+ .globl asm_mmu_disable
+ asm_mmu_disable:
+-	mrs	x0, sctlr_el1
+-	bic	x0, x0, SCTLR_EL1_M
+-	msr	sctlr_el1, x0
+-	isb
+-
+ 	/* Clean + invalidate the entire memory */
+ 	adrp	x0, __phys_offset
+ 	ldr	x0, [x0, :lo12:__phys_offset]
+@@ -259,6 +254,22 @@ asm_mmu_disable:
+ 	sub	x1, x1, x0
+ 	dcache_by_line_op civac, sy, x0, x1, x2, x3
  
- #include "efi.h"
-+#include <stdlib.h>
- #include <libcflat.h>
- #include <asm/setup.h>
++	/* Invalidate Icache */
++	ic	iallu
++	isb
++
++	/* Disable cache, Icache and MMU */
++	mrs	x0, sctlr_el1
++	bic	x0, x0, SCTLR_EL1_C
++	bic	x0, x0, SCTLR_EL1_I
++	bic	x0, x0, SCTLR_EL1_M
++	msr	sctlr_el1, x0
++	isb
++
++	/* Invalidate TLB */
++	tlbi	vmalle1
++	dsb	nsh
++
+ 	ret
  
-@@ -96,6 +97,97 @@ static void efi_exit(efi_status_t code)
- 	efi_rs_call(reset_system, EFI_RESET_SHUTDOWN, code, 0, NULL);
- }
- 
-+static void efi_cmdline_to_argv(char *cmdline_ptr)
-+{
-+	char *c = cmdline_ptr;
-+	bool narg = true;
-+	while (*c) {
-+		if (isspace(*c)) {
-+			*c = '\0';
-+			narg = true;
-+		} else if (narg) {
-+			__argv[__argc++] = c;
-+			narg = false;
-+		}
-+		c++;
-+	}
-+}
-+
-+static char *efi_convert_cmdline(efi_loaded_image_t *image, int *cmd_line_len)
-+{
-+	const u16 *s2;
-+	unsigned long cmdline_addr = 0;
-+	int options_chars = efi_table_attr(image, load_options_size) / 2;
-+	const u16 *options = efi_table_attr(image, load_options);
-+	int options_bytes = 0, safe_options_bytes = 0;  /* UTF-8 bytes */
-+	bool in_quote = false;
-+	efi_status_t status;
-+	const int COMMAND_LINE_SIZE = 2048;
-+
-+	if (options) {
-+		s2 = options;
-+		while (options_bytes < COMMAND_LINE_SIZE && options_chars--) {
-+			u16 c = *s2++;
-+
-+			if (c < 0x80) {
-+				if (c == L'\0' || c == L'\n')
-+					break;
-+				if (c == L'"')
-+					in_quote = !in_quote;
-+				else if (!in_quote && isspace((char)c))
-+					safe_options_bytes = options_bytes;
-+
-+				options_bytes++;
-+				continue;
-+			}
-+
-+			/*
-+			 * Get the number of UTF-8 bytes corresponding to a
-+			 * UTF-16 character.
-+			 * The first part handles everything in the BMP.
-+			 */
-+			options_bytes += 2 + (c >= 0x800);
-+			/*
-+			 * Add one more byte for valid surrogate pairs. Invalid
-+			 * surrogates will be replaced with 0xfffd and take up
-+			 * only 3 bytes.
-+			 */
-+			if ((c & 0xfc00) == 0xd800) {
-+				/*
-+				 * If the very last word is a high surrogate,
-+				 * we must ignore it since we can't access the
-+				 * low surrogate.
-+				 */
-+				if (!options_chars) {
-+					options_bytes -= 3;
-+				} else if ((*s2 & 0xfc00) == 0xdc00) {
-+					options_bytes++;
-+					options_chars--;
-+					s2++;
-+				}
-+			}
-+		}
-+		if (options_bytes >= COMMAND_LINE_SIZE) {
-+			options_bytes = safe_options_bytes;
-+			printf("Command line is too long: truncated to %d bytes\n",
-+			       options_bytes);
-+		}
-+        }
-+
-+	options_bytes++;        /* NUL termination */
-+
-+	status = efi_bs_call(allocate_pool, EFI_LOADER_DATA, options_bytes,
-+			     (void **)&cmdline_addr);
-+	if (status != EFI_SUCCESS)
-+		return NULL;
-+
-+	snprintf((char *)cmdline_addr, options_bytes, "%.*ls",
-+		 options_bytes - 1, options);
-+
-+	*cmd_line_len = options_bytes;
-+	return (char *)cmdline_addr;
-+}
-+
- efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
- {
- 	int ret;
-@@ -109,6 +201,37 @@ efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
- 	unsigned long map_size = 0, desc_size = 0, key = 0, buff_size = 0;
- 	u32 desc_ver;
- 
-+	/* Helper variables needed to get the cmdline */
-+	efi_loaded_image_t *image;
-+	efi_guid_t loaded_image_proto = LOADED_IMAGE_PROTOCOL_GUID;
-+	char *cmdline_ptr = NULL;
-+	int cmdline_size = 0;
-+
-+	/*
-+	 * Get a handle to the loaded image protocol.  This is used to get
-+	 * information about the running image, such as size and the command
-+	 * line.
-+	 */
-+	status = efi_bs_call(handle_protocol, handle, &loaded_image_proto,
-+			     (void *)&image);
-+	if (status != EFI_SUCCESS) {
-+		printf("Failed to get loaded image protocol\n");
-+		goto efi_main_error;
-+	}
-+
-+	/*
-+	 * Get the command line from EFI, using the LOADED_IMAGE
-+	 * protocol. We are going to copy the command line into the
-+	 * device tree, so this can be allocated anywhere.
-+	 */
-+	cmdline_ptr = efi_convert_cmdline(image, &cmdline_size);
-+	if (!cmdline_ptr) {
-+		printf("getting command line via LOADED_IMAGE_PROTOCOL\n");
-+		status = EFI_OUT_OF_RESOURCES;
-+		goto efi_main_error;
-+	}
-+	efi_cmdline_to_argv(cmdline_ptr);
-+
- 	/* Set up efi_bootinfo */
- 	efi_bootinfo.mem_map.map = &map;
- 	efi_bootinfo.mem_map.map_size = &map_size;
-diff --git a/lib/string.c b/lib/string.c
-index 27106da..b191ab1 100644
---- a/lib/string.c
-+++ b/lib/string.c
-@@ -163,7 +163,7 @@ void *memchr(const void *s, int c, size_t n)
-     return NULL;
- }
- 
--static int isspace(int c)
-+int isspace(int c)
- {
-     return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\v' || c == '\f';
- }
+ /*
 -- 
 2.25.1
 
