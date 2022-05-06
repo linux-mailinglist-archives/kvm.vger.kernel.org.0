@@ -2,139 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A8F9151D2BD
-	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 10:00:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 481AF51D3D4
+	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 10:57:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1389800AbiEFIDh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 May 2022 04:03:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51400 "EHLO
+        id S1390306AbiEFJAl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 May 2022 05:00:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380568AbiEFIDg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 May 2022 04:03:36 -0400
-Received: from us-smtp-delivery-74.mimecast.com (us-smtp-delivery-74.mimecast.com [170.10.133.74])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3690C67D0A
-        for <kvm@vger.kernel.org>; Fri,  6 May 2022 00:59:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651823993;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Bsgg9zj8toPMa6RKQ+ORrZfT23tgfI9A1Wk3qhWVRNA=;
-        b=XlCGUC4TTw76GR7BYhKQsJBmhurnFnr5FoMQr9T0OxMaSQQBMl6W/XHgJTC6XNYsBVS6Jb
-        WDDM8tvGy7+aisa+b/vLCd5ro8S73Go5+ZTf5AN5/JZqQNAJjnWA+huNFmhQXMMdSuA/Sq
-        0wUWaSrbA2H3UThp97R2mzuwrlqfAlk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-222-z5dk4ChDOAC6jWDHnz1o8A-1; Fri, 06 May 2022 03:59:52 -0400
-X-MC-Unique: z5dk4ChDOAC6jWDHnz1o8A-1
-Received: by mail-wm1-f69.google.com with SMTP id h65-20020a1c2144000000b0038e9ce3b29cso5773264wmh.2
-        for <kvm@vger.kernel.org>; Fri, 06 May 2022 00:59:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=Bsgg9zj8toPMa6RKQ+ORrZfT23tgfI9A1Wk3qhWVRNA=;
-        b=Psdp8Pchbrbh3lIcyGRAyZ8wiU5uG9t5zjKg9MQ7Aq9dDSvLMU3FEMd8MmANxexS3c
-         qlRf0ldt8NBfZm2gtTk/zX0R51H/Kops5beAWJW5lagWLzhspWUs4xT9ctflBtAcOPQW
-         HVTekuSBgRKIDf5SWAHk8o1S2NAr4d0MQyCuVi9gBYIM7KFmbRKoQnx0RYhqvQS13A+N
-         XaP4kyPTqXUrTSP4jIpfbM+5ck3/cl8sR2MrilHomyMxiLjpNeABX0lZccT99OnG/8XU
-         duzPrvYYXUtFrNSyBcg9QB/PkyDZNVhNxKF5jtJKxGxQoAsyKUEANpNhTJakBTDB8z5C
-         Zf2w==
-X-Gm-Message-State: AOAM533DNpQme3qDQBMnkL14KmXqZkPySW1v3XC5m+UW+mPk8k0+ShXU
-        K5MFDXbrfET8oGHMcpSdVKXo1zZz+0UCJT+iGWFXRDFj9WHVNJ6amR6k2hWucKa2u9RHg3/y3fo
-        3acgdZAkcrprJ
-X-Received: by 2002:a05:600c:3b24:b0:394:7b59:dfd9 with SMTP id m36-20020a05600c3b2400b003947b59dfd9mr1359819wms.129.1651823991021;
-        Fri, 06 May 2022 00:59:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwE1zgbkAlfK8+e30cJb3x2oDGpjUVAOHA5fFkoYMNd+DSJwuYDvkBAtVzD6ils1TWxuYqTZg==
-X-Received: by 2002:a05:600c:3b24:b0:394:7b59:dfd9 with SMTP id m36-20020a05600c3b2400b003947b59dfd9mr1359793wms.129.1651823990799;
-        Fri, 06 May 2022 00:59:50 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id w8-20020a1cf608000000b003942a244ed0sm3414488wmc.21.2022.05.06.00.59.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 May 2022 00:59:50 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Li kunyu <kunyu@nfschina.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Li kunyu <kunyu@nfschina.com>, pbonzini@redhat.com,
-        seanjc@google.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com
-Subject: Re: [PATCH] x86: The return type of the function could be void
-In-Reply-To: <20220506042105.6245-1-kunyu@nfschina.com>
-References: <20220506042105.6245-1-kunyu@nfschina.com>
-Date:   Fri, 06 May 2022 09:59:49 +0200
-Message-ID: <87v8ujytu2.fsf@redhat.com>
+        with ESMTP id S232541AbiEFJAj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 May 2022 05:00:39 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E5175DD02;
+        Fri,  6 May 2022 01:56:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651827418; x=1683363418;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=pzSCX+ORidCZk4+V2sVaV0IkzFQzmKkYiqwgGamCDd8=;
+  b=nCNPKcBAS2/SY7Sl4O0Na/GyAVqRUWVlK5933iVhMRsnJbvbK3KiBzmv
+   oRU7kUA0r4kUdlkq9XR6/jJk6DzE16SnJHJFMMprzWu9BUx2UtfL6FtWa
+   dY15M1ZU/Tnp4IBvaTtrskmQgqZjq0kNrCJPiaamtidRdvVI5HNqJyNcc
+   zfxdpWuBPZ+Vn5yuEWlxg7Bdch9PTvMCKrQSt7tLfFhwRJ3ooPGW/R7TH
+   w2fv7nkI7xVQ62W1ReVPd2iRVZNSdjsu7+CgyrLaDXn7rKFZQ/Nwxq1vg
+   nuAx+xPAOaNX/Ja1VFwA+rbTPs9Irc7sja5Gm2vlPj2IsB0zX4hkmR8H4
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10338"; a="293608062"
+X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
+   d="scan'208";a="293608062"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2022 01:56:57 -0700
+X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
+   d="scan'208";a="585868905"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.169.36]) ([10.249.169.36])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2022 01:56:55 -0700
+Message-ID: <16632b27-7a0d-887b-c86e-9e1673840f55@intel.com>
+Date:   Fri, 6 May 2022 16:56:52 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.8.1
+Subject: Re: [RFC PATCH v6 017/104] KVM: TDX: Add C wrapper functions for
+ SEAMCALLs to the TDX module
+Content-Language: en-US
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>
+References: <cover.1651774250.git.isaku.yamahata@intel.com>
+ <b4cfd2e1b4daf91899a95ab3e2a4e2ea1d25773c.1651774250.git.isaku.yamahata@intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <b4cfd2e1b4daf91899a95ab3e2a4e2ea1d25773c.1651774250.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-8.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Li kunyu <kunyu@nfschina.com> writes:
+On 5/6/2022 2:14 AM, isaku.yamahata@intel.com wrote:
+> diff --git a/arch/x86/virt/vmx/tdx/seamcall.S b/arch/x86/virt/vmx/tdx/seamcall.S
+> index 8df7a16f7685..b4fc8182e1cf 100644
+> --- a/arch/x86/virt/vmx/tdx/seamcall.S
+> +++ b/arch/x86/virt/vmx/tdx/seamcall.S
+> @@ -50,3 +50,4 @@ SYM_FUNC_START(__seamcall)
+>   	FRAME_END
+>   	ret
+>   SYM_FUNC_END(__seamcall)
+> +EXPORT_SYMBOL_GPL(__seamcall)
 
-> Perhaps the return value of the function is not used.
-> It may be possible to optimize the execution instructions.
->
-> Signed-off-by: Li kunyu <kunyu@nfschina.com>
-> ---
->  arch/x86/kvm/hyperv.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index 46f9dfb60469..64c0d1f54258 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -608,7 +608,7 @@ static enum hrtimer_restart stimer_timer_callback(struct hrtimer *timer)
->   * a) stimer->count is not equal to 0
->   * b) stimer->config has HV_STIMER_ENABLE flag
->   */
-> -static int stimer_start(struct kvm_vcpu_hv_stimer *stimer)
-> +static void stimer_start(struct kvm_vcpu_hv_stimer *stimer)
->  {
->  	u64 time_now;
->  	ktime_t ktime_now;
-> @@ -638,7 +638,7 @@ static int stimer_start(struct kvm_vcpu_hv_stimer *stimer)
->  			      ktime_add_ns(ktime_now,
->  					   100 * (stimer->exp_time - time_now)),
->  			      HRTIMER_MODE_ABS);
-> -		return 0;
-> +		return;
->  	}
->  	stimer->exp_time = stimer->count;
->  	if (time_now >= stimer->count) {
-> @@ -649,7 +649,7 @@ static int stimer_start(struct kvm_vcpu_hv_stimer *stimer)
->  		 * the past, it will expire immediately."
->  		 */
->  		stimer_mark_pending(stimer, false);
-> -		return 0;
-> +		return;
->  	}
->  
->  	trace_kvm_hv_stimer_start_one_shot(hv_stimer_to_vcpu(stimer)->vcpu_id,
-> @@ -659,7 +659,6 @@ static int stimer_start(struct kvm_vcpu_hv_stimer *stimer)
->  	hrtimer_start(&stimer->timer,
->  		      ktime_add_ns(ktime_now, 100 * (stimer->count - time_now)),
->  		      HRTIMER_MODE_ABS);
-> -	return 0;
->  }
->  
->  static int stimer_set_config(struct kvm_vcpu_hv_stimer *stimer, u64 config,
+It cannot compile, we need
 
-stimer_start() has only one user so it'll likely get inlined by the
-compiler which then will be able to figure out that the return value is
-not used and thus the assembley code will likely remain the same but
-this is a good cleanup nevertheless, so 
-
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
-
+#include <asm/export.h>
