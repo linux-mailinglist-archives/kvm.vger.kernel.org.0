@@ -2,246 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 90BFF51CDCF
-	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 02:25:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E71E51CE39
+	for <lists+kvm@lfdr.de>; Fri,  6 May 2022 04:16:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1387533AbiEFA3J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 May 2022 20:29:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59400 "EHLO
+        id S1387611AbiEFAtn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 May 2022 20:49:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243846AbiEFA2w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 May 2022 20:28:52 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2047.outbound.protection.outlook.com [40.107.220.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 203985DA71
-        for <kvm@vger.kernel.org>; Thu,  5 May 2022 17:25:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e2FdKgMQLiyCAtQBzNQxv6Ub3SQK8ffDKnAq4eWN7tnTmKj/2OgXQoeE6KGbcXDKOBz/mSQqMdjviUxGGfm7edojL/JvxthfguNY69QxoV5nMi/Jb82lBL7BzB+uSdanGVI5YynDybO0ATnh27FgtoOrq15lUxFSR/eZZuFy25N3VjcpFCcKA+3B5c3uSF2bMGeVZGV8/eQI0jlNPAwo9zDWd0zfgUqDcCH/vh35m0ddaFOd3JnDn4vWYedKmvzZuoJ6giacUjrX4cxMgVOYmEiyxQyQqTAibsKWVcQls7lsJAJwgxMkiHX9taCM/cUw8/xvhantabYRj9I866drzg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8TqFLzkyC0P1sVJfswMKrYuHWw3fxAmaQyEyMLkTrzw=;
- b=Yei2jE1AoA7hoEWUzm5vzcjxosnKhIQmhpaTk1ojjTBiotgpZZi7psc79bSZOFr/hlHlwn+sEznZddv1rLulwGcovLHwQdXw9uGS94tVplSRxXxFvorItMinNbRXjVgYfNeU6n7+1zQHm/U4R9r7Dqs/d2LxERcStMPry+daDc1gMeeY8Ql8CfGNiM2NW9axfZEVSSDsbHFtUcoP8xwFrKoz9nzvOwHFl5R1/0Jd7mc4RWvAKP46YCMAtW07s/1hEAXCyXFeO6cWJ8Zl2jlA6VhTOaCsoLyWCIVY7hEPE57DFgP4GbHdFwWGfDIsFqZS6GPmTy9A0dS+XyEEnxC4kA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8TqFLzkyC0P1sVJfswMKrYuHWw3fxAmaQyEyMLkTrzw=;
- b=T/nsM5TeO8O+ypub7pj7jRXmc+z3kkESx6AOVp3JJ3aZW2x7ofEjP9iwn1TLo75QbtSMOlzIG0DX1EC3DzxX24i4lNxdJldC3twG2tFRP1VW2XwSVvR+MmXomMH1KBUkj+QrcaFfjt3SFrqzo0r7ZchyoZq2s53DY2knDMXIZL0o/Uvswt/enW8xlU55EZgUR5/zdVD03HSOCsR5wkSqEDHdG43C5XbkMNxyvjaL+zB0eaal/QsQi5MbRgBg2j6+b1WVA6bKVB4tnlCD6V05WUtTfYkqQ3OTt4D8z4va/qvX+24RTluMSscpLGhb5LyYAIy1XkON8f41Ze6B9A3x/w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by CH0PR12MB5025.namprd12.prod.outlook.com (2603:10b6:610:d5::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5206.24; Fri, 6 May
- 2022 00:25:08 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2%6]) with mapi id 15.20.5206.027; Fri, 6 May 2022
- 00:25:08 +0000
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
-Cc:     Xiao Guangrong <guangrong.xiao@linux.intel.com>,
-        Jike Song <jike.song@intel.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 6/6] vfio: Change struct vfio_group::container_users to a non-atomic int
-Date:   Thu,  5 May 2022 21:25:06 -0300
-Message-Id: <6-v1-c1d14aae2e8f+2f4-vfio_group_locking_jgg@nvidia.com>
-In-Reply-To: <0-v1-c1d14aae2e8f+2f4-vfio_group_locking_jgg@nvidia.com>
-References: 
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MN2PR07CA0007.namprd07.prod.outlook.com
- (2603:10b6:208:1a0::17) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S234996AbiEFAtl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 May 2022 20:49:41 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DE5815A3F;
+        Thu,  5 May 2022 17:46:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651797960; x=1683333960;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=CEMQwyKyC2z3crG2gLQ2v/yWIWfTJd1sWTDPTFk+RlE=;
+  b=RAzjpYdxabP8OD8PwZDgtifc7MSIZ6QjxSgTswM7Gmh2rbfyt8cHa7bK
+   9f7OMVFGVFKiORijLIUskqr0m/2FaqYbysczMo2oBqurN4QOT/9loELeQ
+   hrjgUltM3iKv9u3sXbjhNK4yqww9wq5ENuHbUap6N/s7QikEfEWC+g1ce
+   4/51zFiCnmlf4HUibY6zJDJrndwsDN3BqgPC/gG5fhRzLNScJRKtR8AyZ
+   nV6a1MGKCHQrjG4JFjpJJcGxivG3hg9Wu3VmsscnQIk+4d9unnF3lZwvC
+   8A7CcnJU4+ySEdVwAyT7ljmzA28fJz5ljqILZMndQmHB1yC703Zj99GYJ
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10338"; a="354738487"
+X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
+   d="scan'208";a="354738487"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2022 17:46:00 -0700
+X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
+   d="scan'208";a="600317222"
+Received: from anthienn-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.4.139])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2022 17:45:56 -0700
+Message-ID: <b40b3658e1fc7ec15d2adafe7f9562d42bc256f3.camel@intel.com>
+Subject: Re: [PATCH v3 00/21] TDX host kernel support
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Mike Rapoport <rppt@kernel.org>
+Date:   Fri, 06 May 2022 12:45:54 +1200
+In-Reply-To: <CAPcyv4jNYqPA2HBaO+9a+ije4jnb6a3Sx_1knrmRF9HCCXQuqg@mail.gmail.com>
+References: <cover.1649219184.git.kai.huang@intel.com>
+         <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
+         <ecf718abf864bbb2366209f00d4315ada090aedc.camel@intel.com>
+         <de24ac7e-349c-e49a-70bb-31b9bc867b10@intel.com>
+         <9b388f54f13b34fe684ef77603fc878952e48f87.camel@intel.com>
+         <d98ca73b-2d2d-757d-e937-acc83cfedfb0@intel.com>
+         <c90a10763969077826f42be6f492e3a3e062326b.camel@intel.com>
+         <fc1ca04d94ad45e79c0297719d5ef50a7c33c352.camel@intel.com>
+         <664f8adeb56ba61774f3c845041f016c54e0f96e.camel@intel.com>
+         <1b681365-ef98-ec78-96dc-04e28316cf0e@intel.com>
+         <8bf596b45f68363134f431bcc550e16a9a231b80.camel@intel.com>
+         <6bb89ca6e7346f4334f06ea293f29fd12df70fe4.camel@intel.com>
+         <CAPcyv4iP3hcNNDxNdPT+iB0E4aUazfqFWwaa_dtHpVf+qKPNcQ@mail.gmail.com>
+         <cbb2ea1343079aee546fb44cd59c82f66c875d76.camel@intel.com>
+         <CAPcyv4jNYqPA2HBaO+9a+ije4jnb6a3Sx_1knrmRF9HCCXQuqg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 80c7b1c4-b998-43bb-bfb2-08da2ef6dfe7
-X-MS-TrafficTypeDiagnostic: CH0PR12MB5025:EE_
-X-Microsoft-Antispam-PRVS: <CH0PR12MB5025D723CFFFA895195EC176C2C59@CH0PR12MB5025.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: r5uEzhjPHCgVix14O9Ew9CyB8Mdsv0e5faKZLxMLt8hzjbZl2HqrxFPFcnR8i/97c/lLyDnQam1x5hX1R+Cp5EQ3pKISETNC8d15DkfWXJIad3SrCKit+brf6/JU7m6WldLx2OOvkOUyHYcs+0cRR98DW5QcXzolanAO8V9OnZsileuM7MDoJ1RYeqBwoNhcry5G6VhCH63TwjGId9fuGFNxevvSUQbT/fGsvrTFWyGU4iNpU0AULwFNtyQQ4N5lQw5JBGFRYvKhM9mKnx9lVp5xxqpC3vVsTWzsIMunL+NzoF2DafMZBI7ZnRIhqWuJh7tSycuwXSmxZnHzsyr7aHqSqARErRSKRCJGi2OSZpnHXVyCf991RjquoCIfcZUEVUMVjUa7iAuY6BatXTu74wKHjZsFaRvQWDJN+ENVc3o8VWqyzZPoRg+MQPs+36rEtwY7y4Kh2iefPRQiDTVuZ0TgpLimuRUqoaTErOuy8zJt/f3TwPeRk2ceINtZrjJXEq6tGw5EJ1BKtSAkwnNAd/I0LrCv0wq441lPEBQeKXppNbR40CqGscs83B/Ae7DzejjwpnMgz2s59glz+w9/nvQ2wSTph1UMl+wmyhGJ0WS9lGOhchx/SAc6CdDU/AhgfpArdo7IEzV+BxXou0F9YcFs79cL3cj1cUntU1t7XlO51saMKZJ85+8tOT4eJFF6
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(186003)(54906003)(110136005)(38100700002)(316002)(2616005)(6506007)(66476007)(66556008)(8676002)(4326008)(66946007)(8936002)(2906002)(83380400001)(508600001)(36756003)(86362001)(26005)(6512007)(6486002)(5660300002)(4216001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PYZXY0hyndjrgg9rNtGxT6pQPYyWdVewF1sz8MQElhqYYROh6o1xeHOMaM5T?=
- =?us-ascii?Q?t5BtmJxLVpX+opPfDp56oq0yQfsSI10XoZlq9gQBvtI98QGgA2BAXCDh/kcP?=
- =?us-ascii?Q?6Qs5yMn9UD1w8ImCM3TdhdvytVLJAK1QjcrQlyAes7aVIJmRuxN9eqk7sRIO?=
- =?us-ascii?Q?5/ptFFU04/tdU27puH0trp9ZF+X7k8qcdEcTUg7hFSjT6vSJqYv8OcYq6Ox4?=
- =?us-ascii?Q?8bWpubnOV3ODoHFEG+5nvfYDucWS3DyHtZD9kdUT7U1bfnj0Zg/z4JDCXSlq?=
- =?us-ascii?Q?+TuALT1ZOyvMWoiAvpyQ1Mm4zjShRsifTGu9alFzu6zGf+YU36oRn7h6vA+Y?=
- =?us-ascii?Q?QpuzNShM3ZB3AgvUxHFzPV6ejsNKcY3PpBBO8m+cbGwRu3O/Id2RpWJ8gaVH?=
- =?us-ascii?Q?0+rpk4JyEJYd6MQUW0/SI/2e+JABFRQkG6Od1DWYLSsVO4mNjUAB6PtKcC1u?=
- =?us-ascii?Q?NHATnxAILv+ANU+3bEAtQmE1MopuDdLc5jGIF9JA/RbQjQ8vvX2WezYNijTR?=
- =?us-ascii?Q?x/8xqtj25pz0fi/wY3wNXkrGWvhQ1Y6eWvRgb4c24DIm3OhW7uO6scVnGvRr?=
- =?us-ascii?Q?DnQwcy18NNfmNGtOaIBo8y46gO3tCKXdsp9N66PsbuA1e/V3j1HzPuoC4IQO?=
- =?us-ascii?Q?VcO8wNjtLMfB2+amoerEFv9wT92MlrG+ZBnrllwCwQQhX224DXxKxLjUSVZ5?=
- =?us-ascii?Q?d2fA2lttE02S/RIuuUdeppRNI4mwm0ws05Kh23gi6XwR4TszCfXcehkuMLj4?=
- =?us-ascii?Q?X09HkFhylcTSvD4NmCR7SJ8uNG+x0wBawQhNydi2f+iYZX692Yz3NzoFe5zL?=
- =?us-ascii?Q?WSdZ3xmLztCsaZYVoBDc7SI0rjFruI4zpyQQkz91dgRD08HyRycyPlk4JQzV?=
- =?us-ascii?Q?bzDgYI7smXTFC/YJdhayPFh/mF3cYjWjgTV2pn/UNew1V0E/IqdjEpX28d7d?=
- =?us-ascii?Q?QfEcGE2SEOrEtaKg03+gQmPokkzDEx+s3antQq1Uwdse6mkQ6Y38nICn1f0T?=
- =?us-ascii?Q?CMigSD3DRhAvvzvqBLNNvje9nNUc9AlPt8CxlIqv77DQ0qlsoWZrXmlvBZ7d?=
- =?us-ascii?Q?pi1rzQ3MmAqfRuIGdJS/q1/heTYs9PcPOKjiyO8OOWsxZudaeSkR7VrS0RCo?=
- =?us-ascii?Q?XWFCWkyjPbFxvXlWRxBAR/FQ8T1FPzPna6zL+U+6Wd5o8TdY7tZuaFK5i0PY?=
- =?us-ascii?Q?fyBkJup3KxbifxpOCLeyzt5QK152H3zFGg3MBxFJwybjcmIc0OvYHOpnKCfM?=
- =?us-ascii?Q?6Pqwis1wPV03kf5IYwzpbgrNeEBVtAGzMDViQ+EyoFKH/Td/BmV70hz2Muya?=
- =?us-ascii?Q?4MwOQSInPTfI7fMRIGVWLR93arRhGu2PBTt/pp9aWpa8MuD/n1u8p85N2WS0?=
- =?us-ascii?Q?wzIkwQKeKlVrdPKG0hy/u+AghPHaSZsHYS35/ijGk7i1L2aQ0tNAnMNLoKHv?=
- =?us-ascii?Q?8DYyoxg164oicogee+KSOdovr/jmMzaOpxY2wS00Sbd3cAAOXNs6M3aFMqbt?=
- =?us-ascii?Q?i/VtMBIhdtXMGcJ0mf2uY50EqWsQw/0Zi744bEW0STxCfClm7WGFFMkSqdcM?=
- =?us-ascii?Q?1m5g3mP31doISDDaAvrWEZMfRgmZiJqaXfsc0OKaxQcbbi+yzYSztFN3QjEL?=
- =?us-ascii?Q?WrKDvpwyD7dNQ98b4i8kkhmSxAO1WkR6y0KfY4efbqxfUITBEE9wW5lb2Y0X?=
- =?us-ascii?Q?8s0xtLMBE9VCAbxmofGkfWGpkmZ33lfGRaFceUY3gKt5BxCEX/AWE56O4ZLk?=
- =?us-ascii?Q?dyZUDPVMgQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 80c7b1c4-b998-43bb-bfb2-08da2ef6dfe7
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2022 00:25:08.0936
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: W2kYH6Lkja/Pe4xDcGSIOuUEpXrnC+/WeMPBP33LNDkUh3sqNyDlmxC+guzJ3mDd
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5025
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that everything is fully locked there is no need for container_users
-to remain as an atomic, change it to an unsigned int.
+On Thu, 2022-05-05 at 17:22 -0700, Dan Williams wrote:
+> On Thu, May 5, 2022 at 3:14 PM Kai Huang <kai.huang@intel.com> wrote:
+> > 
+> > Thanks for feedback!
+> > 
+> > On Thu, 2022-05-05 at 06:51 -0700, Dan Williams wrote:
+> > > [ add Mike ]
+> > > 
+> > > 
+> > > On Thu, May 5, 2022 at 2:54 AM Kai Huang <kai.huang@intel.com> wrote:
+> > > [..]
+> > > > 
+> > > > Hi Dave,
+> > > > 
+> > > > Sorry to ping (trying to close this).
+> > > > 
+> > > > Given we don't need to consider kmem-hot-add legacy PMEM after TDX module
+> > > > initialization, I think for now it's totally fine to exclude legacy PMEMs from
+> > > > TDMRs.  The worst case is when someone tries to use them as TD guest backend
+> > > > directly, the TD will fail to create.  IMO it's acceptable, as it is supposedly
+> > > > that no one should just use some random backend to run TD.
+> > > 
+> > > The platform will already do this, right?
+> > > 
+> > 
+> > In the current v3 implementation, we don't have any code to handle memory
+> > hotplug, therefore nothing prevents people from adding legacy PMEMs as system
+> > RAM using kmem driver.  In order to guarantee all pages managed by page
+> 
+> That's the fundamental question I am asking why is "guarantee all
+> pages managed by page allocator are TDX memory". That seems overkill
+> compared to indicating the incompatibility after the fact.
 
-Use 'if (group->container)' as the test to determine if the container is
-present or not instead of using container_users.
+As I explained, the reason is I don't want to modify page allocator to
+distinguish TDX and non-TDX allocation, for instance, having to have a ZONE_TDX
+and GFP_TDX.
 
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
----
- drivers/vfio/vfio.c | 28 +++++++++++++---------------
- 1 file changed, 13 insertions(+), 15 deletions(-)
+KVM depends on host's page fault handler to allocate the page.  In fact KVM only
+consumes PFN from host's page tables.  For now only RAM is TDX memory.  By
+guaranteeing all pages in page allocator is TDX memory, we can easily use
+anonymous pages as TD guest memory.  This also allows us to easily extend the
+shmem to support a new fd-based backend which doesn't require having to mmap()
+TD guest memory to host userspace:
 
-diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index 94ab415190011d..5c9f56d05f9dfa 100644
---- a/drivers/vfio/vfio.c
-+++ b/drivers/vfio/vfio.c
-@@ -66,7 +66,7 @@ struct vfio_group {
- 	struct device 			dev;
- 	struct cdev			cdev;
- 	refcount_t			users;
--	atomic_t			container_users;
-+	unsigned int			container_users;
- 	struct iommu_group		*iommu_group;
- 	struct vfio_container		*container;
- 	struct list_head		device_list;
-@@ -431,7 +431,7 @@ static void vfio_group_put(struct vfio_group *group)
- 	 * properly hold the group reference.
- 	 */
- 	WARN_ON(!list_empty(&group->device_list));
--	WARN_ON(atomic_read(&group->container_users));
-+	WARN_ON(group->container || group->container_users);
- 	WARN_ON(group->notifier.head);
- 
- 	list_del(&group->vfio_next);
-@@ -949,6 +949,7 @@ static void __vfio_group_unset_container(struct vfio_group *group)
- 	iommu_group_release_dma_owner(group->iommu_group);
- 
- 	group->container = NULL;
-+	group->container_users = 0;
- 	wake_up(&group->container_q);
- 	list_del(&group->container_next);
- 
-@@ -973,17 +974,13 @@ static void __vfio_group_unset_container(struct vfio_group *group)
-  */
- static int vfio_group_unset_container(struct vfio_group *group)
- {
--	int users = atomic_cmpxchg(&group->container_users, 1, 0);
--
- 	lockdep_assert_held_write(&group->group_rwsem);
- 
--	if (!users)
-+	if (!group->container)
- 		return -EINVAL;
--	if (users != 1)
-+	if (group->container_users != 1)
- 		return -EBUSY;
--
- 	__vfio_group_unset_container(group);
--
- 	return 0;
- }
- 
-@@ -996,7 +993,7 @@ static int vfio_group_set_container(struct vfio_group *group, int container_fd)
- 
- 	lockdep_assert_held_write(&group->group_rwsem);
- 
--	if (atomic_read(&group->container_users))
-+	if (group->container || WARN_ON(group->container_users))
- 		return -EINVAL;
- 
- 	if (group->type == VFIO_NO_IOMMU && !capable(CAP_SYS_RAWIO))
-@@ -1040,12 +1037,12 @@ static int vfio_group_set_container(struct vfio_group *group, int container_fd)
- 	}
- 
- 	group->container = container;
-+	group->container_users = 1;
- 	container->noiommu = (group->type == VFIO_NO_IOMMU);
- 	list_add(&group->container_next, &container->group_list);
- 
- 	/* Get a reference on the container and mark a user within the group */
- 	vfio_container_get(container);
--	atomic_inc(&group->container_users);
- 
- unlock_out:
- 	up_write(&container->group_lock);
-@@ -1067,8 +1064,8 @@ static int vfio_device_assign_container(struct vfio_device *device)
- 
- 	lockdep_assert_held_write(&group->group_rwsem);
- 
--	if (0 == atomic_read(&group->container_users) ||
--	    !group->container->iommu_driver)
-+	if (!group->container || !group->container->iommu_driver ||
-+	    WARN_ON(!group->container_users))
- 		return -EINVAL;
- 
- 	if (group->type == VFIO_NO_IOMMU) {
-@@ -1080,14 +1077,15 @@ static int vfio_device_assign_container(struct vfio_device *device)
- 	}
- 
- 	get_file(group->singleton_file);
--	atomic_inc(&group->container_users);
-+	group->container_users++;
- 	return 0;
- }
- 
- static void vfio_device_unassign_container(struct vfio_device *device)
- {
- 	down_write(&device->group->group_rwsem);
--	atomic_dec(&device->group->container_users);
-+	WARN_ON(device->group->container_users <= 1);
-+	device->group->container_users--;
- 	fput(device->group->singleton_file);
- 	up_write(&device->group->group_rwsem);
- }
-@@ -1308,7 +1306,7 @@ static int vfio_group_fops_release(struct inode *inode, struct file *filep)
- 	/* All device FDs must be released before the group fd releases. */
- 	WARN_ON(group->notifier.head);
- 	if (group->container) {
--		WARN_ON(atomic_read(&group->container_users) != 1);
-+		WARN_ON(group->container_users != 1);
- 		__vfio_group_unset_container(group);
- 	}
- 	group->singleton_file = NULL;
+https://lore.kernel.org/kvm/20220310140911.50924-1-chao.p.peng@linux.intel.com/
+
+Also, besides TD guest memory, there are some per-TD control data structures
+(which must be TDX memory too) need to be allocated for each TD.  Normal memory
+allocation APIs can be used for such allocation if we guarantee all pages in
+page allocator is TDX memory.
+
+> 
+> > allocator are all TDX memory, the v3 implementation needs to always include
+> > legacy PMEMs as TDX memory so that even people truly add  legacy PMEMs as system
+> > RAM, we can still guarantee all pages in page allocator are TDX memory.
+> 
+> Why?
+
+If we don't include legacy PMEMs as TDX memory, then after they are hot-added as
+system RAM using kmem driver, the assumption of "all pages in page allocator are
+TDX memory" is broken.  A TD can be killed during runtime.
+
+> 
+> > Of course, a side benefit of always including legacy PMEMs is people
+> > theoretically can use them directly as TD guest backend, but this is just a
+> > bonus but not something that we need to guarantee.
+> > 
+> > 
+> > > I don't understand why this
+> > > is trying to take proactive action versus documenting the error
+> > > conditions and steps someone needs to take to avoid unconvertible
+> > > memory. There is already the CONFIG_HMEM_REPORTING that describes
+> > > relative performance properties between initiators and targets, it
+> > > seems fitting to also add security properties between initiators and
+> > > targets so someone can enumerate the numa-mempolicy that avoids
+> > > unconvertible memory.
+> > 
+> > I don't think there's anything related to performance properties here.  The only
+> > goal here is to make sure all pages in page allocator are TDX memory pages.
+> 
+> Please reconsider or re-clarify that goal.
+> 
+> > 
+> > > 
+> > > No, special casing in hotplug code paths needed.
+> > > 
+> > > > 
+> > > > I think w/o needing to include legacy PMEM, it's better to get all TDX memory
+> > > > blocks based on memblock, but not e820.  The pages managed by page allocator are
+> > > > from memblock anyway (w/o those from memory hotplug).
+> > > > 
+> > > > And I also think it makes more sense to introduce 'tdx_memblock' and
+> > > > 'tdx_memory' data structures to gather all TDX memory blocks during boot when
+> > > > memblock is still alive.  When TDX module is initialized during runtime, TDMRs
+> > > > can be created based on the 'struct tdx_memory' which contains all TDX memory
+> > > > blocks we gathered based on memblock during boot.  This is also more flexible to
+> > > > support other TDX memory from other sources such as CLX memory in the future.
+> > > > 
+> > > > Please let me know if you have any objection?  Thanks!
+> > > 
+> > > It's already the case that x86 maintains sideband structures to
+> > > preserve memory after exiting the early memblock code.
+> > > 
+> > 
+> > May I ask what data structures are you referring to?
+> 
+> struct numa_meminfo.
+> 
+> > Btw, the purpose of 'tdx_memblock' and 'tdx_memory' is not only just to preserve
+> > memblock info during boot.  It is also used to provide a common data structure
+> > that the "constructing TDMRs" code can work on.  If you look at patch 11-14, the
+> > logic (create TDMRs, allocate PAMTs, sets up reserved areas) around how to
+> > construct TDMRs doesn't have hard dependency on e820.  If we construct TDMRs
+> > based on a common 'tdx_memory' like below:
+> > 
+> >         int construct_tdmrs(struct tdx_memory *tmem, ...);
+> > 
+> > It would be much easier to support other TDX memory resources in the future.
+> 
+> "in the future" is a prompt to ask "Why not wait until that future /
+> need arrives before adding new infrastructure?"
+
+Fine to me.
+
 -- 
-2.36.0
+Thanks,
+-Kai
+
 
