@@ -2,432 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D87351E66F
-	for <lists+kvm@lfdr.de>; Sat,  7 May 2022 12:24:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03DC251EAF3
+	for <lists+kvm@lfdr.de>; Sun,  8 May 2022 04:40:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384266AbiEGK2F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 7 May 2022 06:28:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43396 "EHLO
+        id S1387757AbiEHCnu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 7 May 2022 22:43:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243956AbiEGK2D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 7 May 2022 06:28:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3C966517FD
-        for <kvm@vger.kernel.org>; Sat,  7 May 2022 03:24:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651919055;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4PoBOISP8502+nd/TluX0Q/uA/xl55xp5kvTHh9E1rY=;
-        b=a5ljnaH0s24KegPP1Cg2WUH7D72K0DFf+jyRSjNoMgHzAKANQvGuFLhtcljyFMUOI99tbI
-        QcSIrneNGLUXUApvrQsDnTzLedsCftPsiEKZ69GEBL8llTCkYD3UtjK9UcnZ+md3xVgB7L
-        7yhipC6HtsMQK3LjNJ/wPwzmutHUCSI=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-515-zDFGwWLuNwuwofue0KzheA-1; Sat, 07 May 2022 06:24:14 -0400
-X-MC-Unique: zDFGwWLuNwuwofue0KzheA-1
-Received: by mail-lf1-f69.google.com with SMTP id e8-20020ac24e08000000b00473b1bae573so4314492lfr.3
-        for <kvm@vger.kernel.org>; Sat, 07 May 2022 03:24:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=4PoBOISP8502+nd/TluX0Q/uA/xl55xp5kvTHh9E1rY=;
-        b=rbbXyWNYwwKtFMRiVym6Up+vFh31f7DZg3FfRsZeynyhr881R4ysxgVFUq4uHAf0mT
-         p/L38KBu8wKdn4zfDfRDsV40sCwMNGzJ8lpvxmmSnbfG9JGbcOWAZASS/KIcEM1y8Ub+
-         Xmkwnq+9FHu831dorcBg2PijKQ6SyDPBTs8Zr26ZqnhUXF2G2Dx3Uu09rUjoVT4XO1AH
-         mainkrwehXrJe4xd9xGtYNOyQjr8l6dG9440vgKDdy+Fx/ddhFdaXZQVLFyztbhN3RI7
-         iRiT9rPAQA85Voy++44NxQDShDkxD/w23CLcsIqx9iipTOrCg5v6JhqWFQZas67/fr4k
-         Cujw==
-X-Gm-Message-State: AOAM533ZM8bgdrS3YzzKuFXiXG2uK4qFQBOpnjs2swr/yskr7iJYvnor
-        +9IFzSzJHnOsQlULymyrWTCPtadUhJ34gu8gdNb/8Y+0C8/EF8NY+Xe0tq5CPQc21msdhdUIzWj
-        fJOY6MpgS75sqy8f4eXbM2JTlmM4q
-X-Received: by 2002:a05:6512:1291:b0:473:b522:ef58 with SMTP id u17-20020a056512129100b00473b522ef58mr5750426lfs.190.1651919052508;
-        Sat, 07 May 2022 03:24:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwBkSADYnmPq4A3x/NWAvWkAeLc4ZsoI6A7WmoO/Lzfr8dbiNj97TIDdDmRpnVxVhewWo+zcjaeWglINT6o+6w=
-X-Received: by 2002:a05:6512:1291:b0:473:b522:ef58 with SMTP id
- u17-20020a056512129100b00473b522ef58mr5750394lfs.190.1651919052232; Sat, 07
- May 2022 03:24:12 -0700 (PDT)
+        with ESMTP id S229625AbiEHCnr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 7 May 2022 22:43:47 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2080.outbound.protection.outlook.com [40.107.244.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3CA6101DA;
+        Sat,  7 May 2022 19:39:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aIQI6ILxDlQgB43C9z/OhV4pV1lkf75B8fLTB3Z12jxXBu2mC4Rxs2jh+zWtTeSr9YcE+FrB+8QZPewR3IivLmV9uWRi66WlQdfOpM0O6T/r9Rck2SX1cgWVtOgnhdDaq8JoVHX12z6313L69TQr5FoepAICS7/s+56QI1XxWItUaGjoGiG6wV+3DlDAhdWqiqlVodeWnb2Y9Rkd3CbUu5/zrP1b8TAPVB7C0DG4DFtIZgvj1ndQ2GOM01UWTD2fd0HY2a1QrNE+o+z7eHtZ2l0MKtf/UXf7FI7RRoBMCRAdAgobB33B0cSRFEO3yrUiU9MxwgyMR1LqdWm8otE3kA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zrKLmin+Y3rg1ejF/unvYfSFsQeZY9vC3zcUGnbWEUk=;
+ b=khf3iuc49bnfnLaHL/rjw3ntTQecXnsXF9e8wu+2mO2XGD1xdQoxdjVtNBv/LUcCldo+A8nZ/j7vczBNJqiz/cINdAzo4sldWaX8c+imo5kET+nTcS62Vgs42Ez0rzZACcymodtVBGx4sLYgHQbRiQEwEBp1AXEF6rakt2RDGmZ5W4tKbz/2AdYaESP0Y3RI4RX+4QOIbCf3sncHpXg5dlWYd8OuKn/nSFWJYSnQy6RM4zrDNNPeUK9USjFhFObQpN8AfBUSFv3ITBaPR30G5TIRTFcKIJUSbK6ICzQs3QNsFPv2C/ddx4hnRUARhtZzu+o6qhaE4hgyDb3tzXlzoQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zrKLmin+Y3rg1ejF/unvYfSFsQeZY9vC3zcUGnbWEUk=;
+ b=4h4C/mKxIiTGghYieu5R6jq6Z8OHOzwDTRu+aoYEoltsiv+DHZ6OgNEnerjlcAtGjpbe3hptvgmzqi992dVl96VhVNVATwzoQO8P+F481IeSIDKu0jjlWKntMdWWOBmYj6YZae3b2plDoqtDriep5a4oCTvUwy6pCE/1zs1vD3Q=
+Received: from MW4P222CA0020.NAMP222.PROD.OUTLOOK.COM (2603:10b6:303:114::25)
+ by MWHPR12MB1775.namprd12.prod.outlook.com (2603:10b6:300:109::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5227.20; Sun, 8 May
+ 2022 02:39:48 +0000
+Received: from CO1NAM11FT010.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:114:cafe::a8) by MW4P222CA0020.outlook.office365.com
+ (2603:10b6:303:114::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5206.13 via Frontend
+ Transport; Sun, 8 May 2022 02:39:48 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT010.mail.protection.outlook.com (10.13.175.88) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5227.15 via Frontend Transport; Sun, 8 May 2022 02:39:48 +0000
+Received: from sp5-759chost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Sat, 7 May
+ 2022 21:39:46 -0500
+From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
+CC:     <pbonzini@redhat.com>, <mlevitsk@redhat.com>, <seanjc@google.com>,
+        <joro@8bytes.org>, <jon.grimm@amd.com>, <wei.huang2@amd.com>,
+        <terry.bowman@amd.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Subject: [PATCH v4 00/15] Introducing AMD x2AVIC and hybrid-AVIC modes
+Date:   Sat, 7 May 2022 21:39:15 -0500
+Message-ID: <20220508023930.12881-1-suravee.suthikulpanit@amd.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20220330180436.24644-1-gdawar@xilinx.com> <20220330180436.24644-16-gdawar@xilinx.com>
- <CACGkMEvL3rFaw9WP2ARmEkY4t-VppJ73NnapdUgwO=vCZ_Eg6A@mail.gmail.com> <BY5PR02MB698077E814EC867CEBAE2211B1FD9@BY5PR02MB6980.namprd02.prod.outlook.com>
-In-Reply-To: <BY5PR02MB698077E814EC867CEBAE2211B1FD9@BY5PR02MB6980.namprd02.prod.outlook.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Sat, 7 May 2022 18:24:01 +0800
-Message-ID: <CACGkMEtqDRrnJ9C2L32rW1YE=6_5yqDy-kCVMJLS5+CvmoA6WQ@mail.gmail.com>
-Subject: Re: [PATCH v2 15/19] vhost-vdpa: support ASID based IOTLB API
-To:     Gautam Dawar <gdawar@xilinx.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, kvm <kvm@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Martin Porter <martinpo@xilinx.com>,
-        Pablo Cascon Katchadourian <pabloc@xilinx.com>,
-        Dinan Gunawardena <dinang@xilinx.com>,
-        "tanuj.kamde@amd.com" <tanuj.kamde@amd.com>,
-        "habetsm.xilinx@gmail.com" <habetsm.xilinx@gmail.com>,
-        "ecree.xilinx@gmail.com" <ecree.xilinx@gmail.com>,
-        eperezma <eperezma@redhat.com>,
-        Wu Zongyong <wuzongyong@linux.alibaba.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Eli Cohen <elic@nvidia.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Longpeng <longpeng2@huawei.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Zhang Min <zhang.min9@zte.com.cn>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1be14f50-d55c-46ce-30ca-08da309c04f0
+X-MS-TrafficTypeDiagnostic: MWHPR12MB1775:EE_
+X-Microsoft-Antispam-PRVS: <MWHPR12MB1775CEB33DB4EC0C09A2CB13F3C79@MWHPR12MB1775.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6F8+YTmxB44/hQNxQpsODXGPNd+leEtkF3NqwGzSVTkPFrRsHzbX2yyHsarYqLyT8h+DOh4S9eTlrtvPIu82dKAOqcF7bOvDb1B+pTx2Pa+nCh6rRsoY+3826GD4RSCEPQVs7Xk9a/RZ9SXagUkPPKxuR03fDnKFHHKy2tYH5LhjKfq3UUbdMnE7kRd49SPXPGtsbWTH3HSGkIncWFnapZHfJzA0tP9eV3Q9JrL2Yfxh4shqhCjSnIMacf2hkBOiBBlnb5wLo9BaI32t1gf6D9mq0mJCeK1gcD8IuDomheP6rC7+v2l/UB8EsPKEmt5TUnHiUrpmCsKeU6D3S2g8/kWbO07bpg8Jtgvz0b5SE5SLIAcaVA/x0bbTc2CtN/Et1Bps94zs0s7L1/vCSLHhlFqEsWRJAU6RfW76iF98Zj9No30rVsnkMIC0naFO/8jqFyvmpWP/aLXfwP8tMI7n0cL1sjcz3m5mot7vrmlVOxwdGZoky1nCfh1ayKLNhgMwaGD6OTuWSXxXBT4e7VFALGof1sD14HH0wU8h0E1MnuqhYbwY/0mAA/ZvjwMyxWYrAVmTcEuFBlxhg+90hsZ7LijogrLeE3r2uvpgfj14VvQrBpqmx1y1Wjz4qOPEFqnyUCwrJpql5BZIcAJ1BBp+rZlaytNXRMpI9o7W/XaJAkZA411llwnA//t8/iLPro0zw8MvvNup3sggG2i/PP7EK/r4wlQj6J0fv71co5CH0a1kCVTf/fHUV351ZwiRAlcgZ8hAaao/Kz52IKfyeGJfQvn3efWEWll21msgNI10jn0=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(46966006)(40470700004)(36840700001)(83380400001)(8936002)(47076005)(2906002)(336012)(426003)(36860700001)(16526019)(356005)(44832011)(26005)(40460700003)(6666004)(36756003)(508600001)(81166007)(5660300002)(86362001)(2616005)(316002)(1076003)(54906003)(4326008)(110136005)(70586007)(70206006)(82310400005)(8676002)(186003)(7696005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2022 02:39:48.0353
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1be14f50-d55c-46ce-30ca-08da309c04f0
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT010.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR12MB1775
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 28, 2022 at 2:28 PM Gautam Dawar <gdawar@xilinx.com> wrote:
->
-> -----Original Message-----
-> From: Jason Wang <jasowang@redhat.com>
-> Sent: Friday, April 1, 2022 9:55 AM
-> To: Gautam Dawar <gdawar@xilinx.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>; kvm <kvm@vger.kernel.org>; virtu=
-alization <virtualization@lists.linux-foundation.org>; netdev <netdev@vger.=
-kernel.org>; linux-kernel <linux-kernel@vger.kernel.org>; Martin Petrus Hub=
-ertus Habets <martinh@xilinx.com>; Harpreet Singh Anand <hanand@xilinx.com>=
-; Martin Porter <martinpo@xilinx.com>; Pablo Cascon <pabloc@xilinx.com>; Di=
-nan Gunawardena <dinang@xilinx.com>; tanuj.kamde@amd.com; habetsm.xilinx@gm=
-ail.com; ecree.xilinx@gmail.com; eperezma <eperezma@redhat.com>; Gautam Daw=
-ar <gdawar@xilinx.com>; Wu Zongyong <wuzongyong@linux.alibaba.com>; Christo=
-phe JAILLET <christophe.jaillet@wanadoo.fr>; Eli Cohen <elic@nvidia.com>; Z=
-hu Lingshan <lingshan.zhu@intel.com>; Stefano Garzarella <sgarzare@redhat.c=
-om>; Xie Yongji <xieyongji@bytedance.com>; Si-Wei Liu <si-wei.liu@oracle.co=
-m>; Parav Pandit <parav@nvidia.com>; Longpeng <longpeng2@huawei.com>; Dan C=
-arpenter <dan.carpenter@oracle.com>; Zhang Min <zhang.min9@zte.com.cn>
-> Subject: Re: [PATCH v2 15/19] vhost-vdpa: support ASID based IOTLB API
->
-> On Thu, Mar 31, 2022 at 2:17 AM Gautam Dawar <gautam.dawar@xilinx.com> wr=
-ote:
-> >
-> > This patch extends the vhost-vdpa to support ASID based IOTLB API. The
-> > vhost-vdpa device will allocated multiple IOTLBs for vDPA device that
-> > supports multiple address spaces. The IOTLBs and vDPA device memory
-> > mappings is determined and maintained through ASID.
-> >
-> > Note that we still don't support vDPA device with more than one
-> > address spaces that depends on platform IOMMU. This work will be done
-> > by moving the IOMMU logic from vhost-vDPA to vDPA device driver.
-> >
-> > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > Signed-off-by: Gautam Dawar <gdawar@xilinx.com>
-> > ---
-> >  drivers/vhost/vdpa.c  | 109 ++++++++++++++++++++++++++++++++++--------
-> >  drivers/vhost/vhost.c |   2 +-
-> >  2 files changed, 91 insertions(+), 20 deletions(-)
-> >
-> > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c index
-> > 6c7ee0f18892..1f1d1c425573 100644
-> > --- a/drivers/vhost/vdpa.c
-> > +++ b/drivers/vhost/vdpa.c
-> > @@ -28,7 +28,8 @@
-> >  enum {
-> >         VHOST_VDPA_BACKEND_FEATURES =3D
-> >         (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2) |
-> > -       (1ULL << VHOST_BACKEND_F_IOTLB_BATCH),
-> > +       (1ULL << VHOST_BACKEND_F_IOTLB_BATCH) |
-> > +       (1ULL << VHOST_BACKEND_F_IOTLB_ASID),
-> >  };
-> >
-> >  #define VHOST_VDPA_DEV_MAX (1U << MINORBITS) @@ -57,12 +58,20 @@
-> > struct vhost_vdpa {
-> >         struct eventfd_ctx *config_ctx;
-> >         int in_batch;
-> >         struct vdpa_iova_range range;
-> > +       u32 batch_asid;
-> >  };
-> >
-> >  static DEFINE_IDA(vhost_vdpa_ida);
-> >
-> >  static dev_t vhost_vdpa_major;
-> >
-> > +static inline u32 iotlb_to_asid(struct vhost_iotlb *iotlb) {
-> > +       struct vhost_vdpa_as *as =3D container_of(iotlb, struct
-> > +                                               vhost_vdpa_as, iotlb);
-> > +       return as->id;
-> > +}
-> > +
-> >  static struct vhost_vdpa_as *asid_to_as(struct vhost_vdpa *v, u32
-> > asid)  {
-> >         struct hlist_head *head =3D &v->as[asid %
-> > VHOST_VDPA_IOTLB_BUCKETS]; @@ -75,6 +84,16 @@ static struct vhost_vdpa_=
-as *asid_to_as(struct vhost_vdpa *v, u32 asid)
-> >         return NULL;
-> >  }
-> >
-> > +static struct vhost_iotlb *asid_to_iotlb(struct vhost_vdpa *v, u32
-> > +asid) {
-> > +       struct vhost_vdpa_as *as =3D asid_to_as(v, asid);
-> > +
-> > +       if (!as)
-> > +               return NULL;
-> > +
-> > +       return &as->iotlb;
-> > +}
-> > +
-> >  static struct vhost_vdpa_as *vhost_vdpa_alloc_as(struct vhost_vdpa
-> > *v, u32 asid)  {
-> >         struct hlist_head *head =3D &v->as[asid %
-> > VHOST_VDPA_IOTLB_BUCKETS]; @@ -83,6 +102,9 @@ static struct vhost_vdpa_=
-as *vhost_vdpa_alloc_as(struct vhost_vdpa *v, u32 asid)
-> >         if (asid_to_as(v, asid))
-> >                 return NULL;
-> >
-> > +       if (asid >=3D v->vdpa->nas)
-> > +               return NULL;
-> > +
-> >         as =3D kmalloc(sizeof(*as), GFP_KERNEL);
-> >         if (!as)
-> >                 return NULL;
-> > @@ -94,6 +116,17 @@ static struct vhost_vdpa_as *vhost_vdpa_alloc_as(st=
-ruct vhost_vdpa *v, u32 asid)
-> >         return as;
-> >  }
-> >
-> > +static struct vhost_vdpa_as *vhost_vdpa_find_alloc_as(struct vhost_vdp=
-a *v,
-> > +                                                     u32 asid) {
-> > +       struct vhost_vdpa_as *as =3D asid_to_as(v, asid);
-> > +
-> > +       if (as)
-> > +               return as;
-> > +
-> > +       return vhost_vdpa_alloc_as(v, asid); }
-> > +
-> >  static int vhost_vdpa_remove_as(struct vhost_vdpa *v, u32 asid)  {
-> >         struct vhost_vdpa_as *as =3D asid_to_as(v, asid); @@ -692,6
-> > +725,7 @@ static int vhost_vdpa_map(struct vhost_vdpa *v, struct vhost_=
-iotlb *iotlb,
-> >         struct vhost_dev *dev =3D &v->vdev;
-> >         struct vdpa_device *vdpa =3D v->vdpa;
-> >         const struct vdpa_config_ops *ops =3D vdpa->config;
-> > +       u32 asid =3D iotlb_to_asid(iotlb);
-> >         int r =3D 0;
-> >
-> >         r =3D vhost_iotlb_add_range_ctx(iotlb, iova, iova + size - 1, @=
-@
-> > -700,10 +734,10 @@ static int vhost_vdpa_map(struct vhost_vdpa *v, stru=
-ct vhost_iotlb *iotlb,
-> >                 return r;
-> >
-> >         if (ops->dma_map) {
-> > -               r =3D ops->dma_map(vdpa, 0, iova, size, pa, perm, opaqu=
-e);
-> > +               r =3D ops->dma_map(vdpa, asid, iova, size, pa, perm,
-> > + opaque);
-> >         } else if (ops->set_map) {
-> >                 if (!v->in_batch)
-> > -                       r =3D ops->set_map(vdpa, 0, iotlb);
-> > +                       r =3D ops->set_map(vdpa, asid, iotlb);
-> >         } else {
-> >                 r =3D iommu_map(v->domain, iova, pa, size,
-> >                               perm_to_iommu_flags(perm)); @@ -725,17
-> > +759,24 @@ static void vhost_vdpa_unmap(struct vhost_vdpa *v,  {
-> >         struct vdpa_device *vdpa =3D v->vdpa;
-> >         const struct vdpa_config_ops *ops =3D vdpa->config;
-> > +       u32 asid =3D iotlb_to_asid(iotlb);
-> >
-> >         vhost_vdpa_iotlb_unmap(v, iotlb, iova, iova + size - 1);
-> >
-> >         if (ops->dma_map) {
-> > -               ops->dma_unmap(vdpa, 0, iova, size);
-> > +               ops->dma_unmap(vdpa, asid, iova, size);
-> >         } else if (ops->set_map) {
-> >                 if (!v->in_batch)
-> > -                       ops->set_map(vdpa, 0, iotlb);
-> > +                       ops->set_map(vdpa, asid, iotlb);
-> >         } else {
-> >                 iommu_unmap(v->domain, iova, size);
-> >         }
-> > +
-> > +       /* If we are in the middle of batch processing, delay the free
-> > +        * of AS until BATCH_END.
-> > +        */
-> > +       if (!v->in_batch && !iotlb->nmaps)
-> > +               vhost_vdpa_remove_as(v, asid);
-> >  }
-> >
-> >  static int vhost_vdpa_va_map(struct vhost_vdpa *v, @@ -943,19 +984,38
-> > @@ static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev, u32 a=
-sid,
-> >         struct vhost_vdpa *v =3D container_of(dev, struct vhost_vdpa, v=
-dev);
-> >         struct vdpa_device *vdpa =3D v->vdpa;
-> >         const struct vdpa_config_ops *ops =3D vdpa->config;
-> > -       struct vhost_vdpa_as *as =3D asid_to_as(v, 0);
-> > -       struct vhost_iotlb *iotlb =3D &as->iotlb;
-> > +       struct vhost_iotlb *iotlb =3D NULL;
-> > +       struct vhost_vdpa_as *as =3D NULL;
-> >         int r =3D 0;
-> >
-> > -       if (asid !=3D 0)
-> > -               return -EINVAL;
-> > -
-> >         mutex_lock(&dev->mutex);
-> >
-> >         r =3D vhost_dev_check_owner(dev);
-> >         if (r)
-> >                 goto unlock;
-> >
-> > +       if (msg->type =3D=3D VHOST_IOTLB_UPDATE ||
-> > +           msg->type =3D=3D VHOST_IOTLB_BATCH_BEGIN) {
-> > +               as =3D vhost_vdpa_find_alloc_as(v, asid);
->
-> I wonder if it's better to mandate the ASID to [0, dev->nas), otherwise u=
-ser space is free to use arbitrary IDs which may exceeds the #address space=
-s that is supported by the device.
-> [GD>>] Isn=E2=80=99t the following check in vhost_vdpa_alloc_as () suffic=
-ient to ensure ASID's value in the range [0, dev->nas):
->         if (asid >=3D v->vdpa->nas)
->                 return NULL;
+Introducing support for AMD x2APIC virtualization. This feature is
+indicated by the CPUID Fn8000_000A EDX[14], and it can be activated
+by setting bit 31 (enable AVIC) and bit 30 (x2APIC mode) of VMCB
+offset 60h.
 
-I think you're right.
+With x2AVIC support, the guest local APIC can be fully virtualized in
+both xAPIC and x2APIC modes, and the mode can be changed during runtime.
+For example, when AVIC is enabled, the hypervisor set VMCB bit 31
+to activate AVIC for each vCPU. Then, it keeps track of each vCPU's
+APIC mode, and updates VMCB bit 30 to enable/disable x2APIC
+virtualization mode accordingly.
 
-So we are fine.
+Besides setting bit VMCB bit 30 and 31, for x2AVIC, kvm_amd driver needs
+to disable interception for the x2APIC MSR range to allow AVIC hardware
+to virtualize register accesses.
 
-Thanks
+This series also introduce a partial APIC virtualization (hybrid-AVIC)
+mode, where APIC register accesses are trapped (i.e. not virtualized
+by hardware), but leverage AVIC doorbell for interrupt injection.
+This eliminates need to disable x2APIC in the guest on system without
+x2AVIC support. (Note: suggested by Maxim)
 
->
-> Thanks
->
-> > +               if (!as) {
-> > +                       dev_err(&v->dev, "can't find and alloc asid %d\=
-n",
-> > +                               asid);
-> > +                       return -EINVAL;
-> > +               }
-> > +               iotlb =3D &as->iotlb;
-> > +       } else
-> > +               iotlb =3D asid_to_iotlb(v, asid);
-> > +
-> > +       if ((v->in_batch && v->batch_asid !=3D asid) || !iotlb) {
-> > +               if (v->in_batch && v->batch_asid !=3D asid) {
-> > +                       dev_info(&v->dev, "batch id %d asid %d\n",
-> > +                                v->batch_asid, asid);
-> > +               }
-> > +               if (!iotlb)
-> > +                       dev_err(&v->dev, "no iotlb for asid %d\n", asid=
-);
-> > +               return -EINVAL;
-> > +       }
-> > +
-> >         switch (msg->type) {
-> >         case VHOST_IOTLB_UPDATE:
-> >                 r =3D vhost_vdpa_process_iotlb_update(v, iotlb, msg); @=
-@
-> > -964,12 +1024,15 @@ static int vhost_vdpa_process_iotlb_msg(struct vhos=
-t_dev *dev, u32 asid,
-> >                 vhost_vdpa_unmap(v, iotlb, msg->iova, msg->size);
-> >                 break;
-> >         case VHOST_IOTLB_BATCH_BEGIN:
-> > +               v->batch_asid =3D asid;
-> >                 v->in_batch =3D true;
-> >                 break;
-> >         case VHOST_IOTLB_BATCH_END:
-> >                 if (v->in_batch && ops->set_map)
-> > -                       ops->set_map(vdpa, 0, iotlb);
-> > +                       ops->set_map(vdpa, asid, iotlb);
-> >                 v->in_batch =3D false;
-> > +               if (!iotlb->nmaps)
-> > +                       vhost_vdpa_remove_as(v, asid);
-> >                 break;
-> >         default:
-> >                 r =3D -EINVAL;
-> > @@ -1057,9 +1120,17 @@ static void vhost_vdpa_set_iova_range(struct
-> > vhost_vdpa *v)
-> >
-> >  static void vhost_vdpa_cleanup(struct vhost_vdpa *v)  {
-> > +       struct vhost_vdpa_as *as;
-> > +       u32 asid;
-> > +
-> >         vhost_dev_cleanup(&v->vdev);
-> >         kfree(v->vdev.vqs);
-> > -       vhost_vdpa_remove_as(v, 0);
-> > +
-> > +       for (asid =3D 0; asid < v->vdpa->nas; asid++) {
-> > +               as =3D asid_to_as(v, asid);
-> > +               if (as)
-> > +                       vhost_vdpa_remove_as(v, asid);
-> > +       }
-> >  }
-> >
-> >  static int vhost_vdpa_open(struct inode *inode, struct file *filep)
-> > @@ -1095,12 +1166,9 @@ static int vhost_vdpa_open(struct inode *inode, =
-struct file *filep)
-> >         vhost_dev_init(dev, vqs, nvqs, 0, 0, 0, false,
-> >                        vhost_vdpa_process_iotlb_msg);
-> >
-> > -       if (!vhost_vdpa_alloc_as(v, 0))
-> > -               goto err_alloc_as;
-> > -
-> >         r =3D vhost_vdpa_alloc_domain(v);
-> >         if (r)
-> > -               goto err_alloc_as;
-> > +               goto err_alloc_domain;
-> >
-> >         vhost_vdpa_set_iova_range(v);
-> >
-> > @@ -1108,7 +1176,7 @@ static int vhost_vdpa_open(struct inode *inode,
-> > struct file *filep)
-> >
-> >         return 0;
-> >
-> > -err_alloc_as:
-> > +err_alloc_domain:
-> >         vhost_vdpa_cleanup(v);
-> >  err:
-> >         atomic_dec(&v->opened);
-> > @@ -1233,8 +1301,11 @@ static int vhost_vdpa_probe(struct vdpa_device *=
-vdpa)
-> >         int minor;
-> >         int i, r;
-> >
-> > -       /* Only support 1 address space and 1 groups */
-> > -       if (vdpa->ngroups !=3D 1 || vdpa->nas !=3D 1)
-> > +       /* We can't support platform IOMMU device with more than 1
-> > +        * group or as
-> > +        */
-> > +       if (!ops->set_map && !ops->dma_map &&
-> > +           (vdpa->ngroups > 1 || vdpa->nas > 1))
-> >                 return -EOPNOTSUPP;
-> >
-> >         v =3D kzalloc(sizeof(*v), GFP_KERNEL | __GFP_RETRY_MAYFAIL);
-> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c index
-> > d1e58f976f6e..5022c648d9c0 100644
-> > --- a/drivers/vhost/vhost.c
-> > +++ b/drivers/vhost/vhost.c
-> > @@ -1167,7 +1167,7 @@ ssize_t vhost_chr_write_iter(struct vhost_dev *de=
-v,
-> >                                 ret =3D -EINVAL;
-> >                                 goto done;
-> >                         }
-> > -                       offset =3D sizeof(__u16);
-> > +                       offset =3D 0;
-> >                 } else
-> >                         offset =3D sizeof(__u32);
-> >                 break;
-> > --
-> > 2.30.1
-> >
->
+Regards,
+Suravee
+
+Testing for v4:
+  * Tested booting a Linux VM with x2APIC physical and logical modes upto 512 vCPUs.
+  * Test enable AVIC in L0 with xAPIC and x2AVIC modes in L1 and launch L2 guest
+  * Test partial AVIC mode by launching a VM with x2APIC mode
+
+Changes from v3:
+(https://lore.kernel.org/lkml/ff67344c0efe06d1422aa84e56738a0812c69bfc.camel@redhat.com/T/)
+ * Patch  3 : Update logic force_avic
+ * Patch  8 : Move logic for handling APIC disable to common code (new)
+ * Patch  9 : Only call avic_refresh_apicv_exec_ctrl
+ * Patch 12 : Remove APICV_INHIBIT_REASON_X2APIC, and add more comment for hybrid-AVIC mode
+
+Suravee Suthikulpanit (15):
+  x86/cpufeatures: Introduce x2AVIC CPUID bit
+  KVM: x86: lapic: Rename [GET/SET]_APIC_DEST_FIELD to
+    [GET/SET]_XAPIC_DEST_FIELD
+  KVM: SVM: Detect X2APIC virtualization (x2AVIC) support
+  KVM: SVM: Update max number of vCPUs supported for x2AVIC mode
+  KVM: SVM: Update avic_kick_target_vcpus to support 32-bit APIC ID
+  KVM: SVM: Do not support updating APIC ID when in x2APIC mode
+  KVM: SVM: Adding support for configuring x2APIC MSRs interception
+  KVM: x86: Deactivate APICv on vCPU with APIC disabled
+  KVM: SVM: Refresh AVIC configuration when changing APIC mode
+  KVM: SVM: Introduce helper functions to (de)activate AVIC and x2AVIC
+  KVM: SVM: Do not throw warning when calling avic_vcpu_load on a
+    running vcpu
+  KVM: SVM: Introduce hybrid-AVIC mode
+  KVM: x86: Warning APICv inconsistency only when vcpu APIC mode is
+    valid
+  KVM: SVM: Use target APIC ID to complete x2AVIC IRQs when possible
+  KVM: SVM: Add AVIC doorbell tracepoint
+
+ arch/x86/hyperv/hv_apic.c          |   2 +-
+ arch/x86/include/asm/apicdef.h     |   4 +-
+ arch/x86/include/asm/cpufeatures.h |   1 +
+ arch/x86/include/asm/kvm_host.h    |   1 -
+ arch/x86/include/asm/svm.h         |  21 +++-
+ arch/x86/kernel/apic/apic.c        |   2 +-
+ arch/x86/kernel/apic/ipi.c         |   2 +-
+ arch/x86/kvm/lapic.c               |   6 +-
+ arch/x86/kvm/svm/avic.c            | 191 ++++++++++++++++++++++++++---
+ arch/x86/kvm/svm/svm.c             |  56 +++++----
+ arch/x86/kvm/svm/svm.h             |   6 +-
+ arch/x86/kvm/trace.h               |  18 +++
+ arch/x86/kvm/x86.c                 |   8 +-
+ 13 files changed, 262 insertions(+), 56 deletions(-)
+
+-- 
+2.25.1
 
