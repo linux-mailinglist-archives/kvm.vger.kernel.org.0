@@ -2,73 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3791651EC15
-	for <lists+kvm@lfdr.de>; Sun,  8 May 2022 09:50:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AC0B51ECC0
+	for <lists+kvm@lfdr.de>; Sun,  8 May 2022 12:00:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230414AbiEHHyH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 May 2022 03:54:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53788 "EHLO
+        id S229622AbiEHKEi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 May 2022 06:04:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229933AbiEHHxs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 May 2022 03:53:48 -0400
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C312ABE28
-        for <kvm@vger.kernel.org>; Sun,  8 May 2022 00:49:48 -0700 (PDT)
-Received: by mail-yb1-xb30.google.com with SMTP id g28so19787032ybj.10
-        for <kvm@vger.kernel.org>; Sun, 08 May 2022 00:49:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=atishpatra.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=dFexpI1CcAvP4bPrXFGudL7mJMKDkHsmR67F6Gffao8=;
-        b=dIFqpJll2mKM1G1VvfjcBJezQWJT0RtTazwLhhjeShGNWEsXzIk5BKA8/JaRtUmz5Y
-         kIscbuCsfwKfLDKsPHpc+2NY1/Q1hc6RpYZP8qf17f1Ec7LYruI/Ha6a1lNVqYzhI5Jv
-         47SKUNCi2wMrY38YAlKqYvfVUYiZIHvvhNyD0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=dFexpI1CcAvP4bPrXFGudL7mJMKDkHsmR67F6Gffao8=;
-        b=koqCNBqbTHQ51qMM6j6fpeYAIDOUxPsKpWwWwJDEEtKG5apQY/dHfHzi8akfhQXR7H
-         BWT6EkGJl8m5Kde12p9yPZnOwF2fDezNVw3mtTkpxsWtu0T6DujM0YTlGPV5Ba7sVyoi
-         EUGMH5NkSegNYeYv+Dmv6rQzVrnDNk5Co20sMT5l+tYRClgw9AiP8ct4rRD9yZQKiHmw
-         8DpAhWozohFmTMnNGx7+Onkg0hX7qjXuFyVzohqxAqsdsG3CY5ub1BxPSic6RGCRT0SB
-         T2sohrrqr1P9PX0H16uheOYUpQc9HfNrQ9e12ra8WeV0DkojgCFiFZcbRRKor/Dg5i0s
-         fgTw==
-X-Gm-Message-State: AOAM530/Q3cUp8vonH9i+D9ASwW7yJN9L1TZe4szAsO5riZHCHexgina
-        VR76U5NqVRMyVU138QsLcRnft7YbjdDq3877ubud
-X-Google-Smtp-Source: ABdhPJwPQ84lYi8rBRjQhhobqwrmIAHSMcPKzgiF39Kg5lVWpuCOypczW7YBFUmZ7DuiNrXcrZKIeGyH6wxVLH/3jCc=
-X-Received: by 2002:a25:32d3:0:b0:648:5929:845f with SMTP id
- y202-20020a2532d3000000b006485929845fmr8272185yby.53.1651996187869; Sun, 08
- May 2022 00:49:47 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220426185245.281182-1-atishp@rivosinc.com> <20220426185245.281182-5-atishp@rivosinc.com>
- <19F90AE1-68AD-4478-B5C3-8ABADD781198@jrtc27.com>
-In-Reply-To: <19F90AE1-68AD-4478-B5C3-8ABADD781198@jrtc27.com>
-From:   Atish Patra <atishp@atishpatra.org>
-Date:   Sun, 8 May 2022 00:49:37 -0700
-Message-ID: <CAOnJCUJQqe=T0x0ErVHX=Eod0Kd1m55VD=Q-GdPnbxav2VbN+g@mail.gmail.com>
-Subject: Re: [PATCH v3 4/4] RISC-V: KVM: Support sstc extension
-To:     Jessica Clarke <jrtc27@jrtc27.com>
-Cc:     Atish Patra <atishp@rivosinc.com>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        Anup Patel <anup@brainfault.org>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        devicetree <devicetree@vger.kernel.org>,
-        Jisheng Zhang <jszhang@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
-        KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Rob Herring <robh+dt@kernel.org>
+        with ESMTP id S229448AbiEHKEg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 May 2022 06:04:36 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5584DCC6;
+        Sun,  8 May 2022 03:00:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652004046; x=1683540046;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=+5ktdwTSEzdqIzt2WqQjlTFy9PC3XSm+8de1iAFuTPI=;
+  b=WrGVTYIIkudM4sNPi8bf4BDkwMyWNEx7rqQODMi3bbFY4AUQXs3uIwph
+   G69llKPJp1SzXjuf19Ue11cATKjExqCvp2oHO/B4fQT9UliXTPURAs0Ar
+   B7TVAiC+lDORYPTlk4NHGXXQsFCR22B08K9RmjD9p6xmpJwW3Qxs91uDy
+   f9fpVNWYcvkr6D6frHPBp5RrgXvUVNB5A7FXYqEhla+8v7kiKe0GqXXfB
+   Sk4Wc2bqQ+Sul7XAU8GFJDsljJIbH3N37ZQJvBjsLsyrle0JbEARvfwiz
+   7C1eoa2OdW0Gkvrfm4k57ofyTEdp0jkMg9P/Jp0kQn+6uZ4RrkjdRjX4k
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10340"; a="268724286"
+X-IronPort-AV: E=Sophos;i="5.91,208,1647327600"; 
+   d="scan'208";a="268724286"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2022 03:00:45 -0700
+X-IronPort-AV: E=Sophos;i="5.91,208,1647327600"; 
+   d="scan'208";a="813064753"
+Received: from prahgoza-mobl3.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.61.252])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2022 03:00:41 -0700
+Message-ID: <5c7196b517398e7697464fe997018e9031d15470.camel@intel.com>
+Subject: Re: [PATCH v3 00/21] TDX host kernel support
+From:   Kai Huang <kai.huang@intel.com>
+To:     Mike Rapoport <rppt@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>
+Date:   Sun, 08 May 2022 22:00:39 +1200
+In-Reply-To: <YnW4nTub1BYUF15W@kernel.org>
+References: <de24ac7e-349c-e49a-70bb-31b9bc867b10@intel.com>
+         <9b388f54f13b34fe684ef77603fc878952e48f87.camel@intel.com>
+         <d98ca73b-2d2d-757d-e937-acc83cfedfb0@intel.com>
+         <c90a10763969077826f42be6f492e3a3e062326b.camel@intel.com>
+         <fc1ca04d94ad45e79c0297719d5ef50a7c33c352.camel@intel.com>
+         <664f8adeb56ba61774f3c845041f016c54e0f96e.camel@intel.com>
+         <1b681365-ef98-ec78-96dc-04e28316cf0e@intel.com>
+         <8bf596b45f68363134f431bcc550e16a9a231b80.camel@intel.com>
+         <6bb89ca6e7346f4334f06ea293f29fd12df70fe4.camel@intel.com>
+         <CAPcyv4iP3hcNNDxNdPT+iB0E4aUazfqFWwaa_dtHpVf+qKPNcQ@mail.gmail.com>
+         <YnW4nTub1BYUF15W@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,388 +83,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 26, 2022 at 2:10 PM Jessica Clarke <jrtc27@jrtc27.com> wrote:
->
-> On 26 Apr 2022, at 19:52, Atish Patra <atishp@rivosinc.com> wrote:
-> >
-> > Sstc extension allows the guest to program the vstimecmp CSR directly
-> > instead of making an SBI call to the hypervisor to program the next
-> > event. The timer interrupt is also directly injected to the guest by
-> > the hardware in this case. To maintain backward compatibility, the
-> > hypervisors also update the vstimecmp in an SBI set_time call if
-> > the hardware supports it. Thus, the older kernels in guest also
-> > take advantage of the sstc extension.
->
-> This still violates the following part of the ratified SBI spec:
->
-> > =E2=80=A2 All registers except a0 & a1 must be preserved across an SBI =
-call by the callee.
->
-> The Set Timer legacy extension and non-legacy function state they clear
-> the pending timer bit but otherwise make no provision for other S-mode
-> state being clobbered. The stimecmp register is S-mode read/write
-> state. I don=E2=80=99t debate that this is a useful thing to allow, but a=
-s
-> things stand this is in direct violation of the letter of the ratified
-> SBI spec and so if you want to allow this you have to fix your spec
-> first and deal with the ratified spec compatibility issues that brings.
->
+On Fri, 2022-05-06 at 20:09 -0400, Mike Rapoport wrote:
+> On Thu, May 05, 2022 at 06:51:20AM -0700, Dan Williams wrote:
+> > [ add Mike ]
+> > 
+> > On Thu, May 5, 2022 at 2:54 AM Kai Huang <kai.huang@intel.com> wrote:
+> > [..]
+> > > 
+> > > Hi Dave,
+> > > 
+> > > Sorry to ping (trying to close this).
+> > > 
+> > > Given we don't need to consider kmem-hot-add legacy PMEM after TDX module
+> > > initialization, I think for now it's totally fine to exclude legacy PMEMs from
+> > > TDMRs.  The worst case is when someone tries to use them as TD guest backend
+> > > directly, the TD will fail to create.  IMO it's acceptable, as it is supposedly
+> > > that no one should just use some random backend to run TD.
+> > 
+> > The platform will already do this, right? I don't understand why this
+> > is trying to take proactive action versus documenting the error
+> > conditions and steps someone needs to take to avoid unconvertible
+> > memory. There is already the CONFIG_HMEM_REPORTING that describes
+> > relative performance properties between initiators and targets, it
+> > seems fitting to also add security properties between initiators and
+> > targets so someone can enumerate the numa-mempolicy that avoids
+> > unconvertible memory.
+> > 
+> > No, special casing in hotplug code paths needed.
+> > 
+> > > 
+> > > I think w/o needing to include legacy PMEM, it's better to get all TDX memory
+> > > blocks based on memblock, but not e820.  The pages managed by page allocator are
+> > > from memblock anyway (w/o those from memory hotplug).
+> > > 
+> > > And I also think it makes more sense to introduce 'tdx_memblock' and
+> > > 'tdx_memory' data structures to gather all TDX memory blocks during boot when
+> > > memblock is still alive.  When TDX module is initialized during runtime, TDMRs
+> > > can be created based on the 'struct tdx_memory' which contains all TDX memory
+> > > blocks we gathered based on memblock during boot.  This is also more flexible to
+> > > support other TDX memory from other sources such as CLX memory in the future.
+> > > 
+> > > Please let me know if you have any objection?  Thanks!
+> > 
+> > It's already the case that x86 maintains sideband structures to
+> > preserve memory after exiting the early memblock code. Mike, correct
+> > me if I am wrong, but adding more is less desirable than just keeping
+> > the memblock around?
+> 
+> TBH, I didn't read the entire thread yet, but at the first glance, keeping
+> memblock around is much more preferable that adding yet another { .start,
+> .end, .flags } data structure. To keep memblock after boot all is needed is
+> something like
+> 
+> 	select ARCH_KEEP_MEMBLOCK if INTEL_TDX_HOST
+> 
+> I'll take a closer look next week on the entire series, maybe I'm missing
+> some details.
+> 
 
-I tried the approach you suggested by keeping separate context for
-SBI path & vstimecmp but this results in in unreliable behavior for
-guest (which may use SBI call or stimecmp) because hardware will always
-trigger virtual timer interrupt whenever henvcfg.STCE=3D=3D1 and
-"vstimecmp < (time+ htimedelta)".
+Hi Mike,
 
-Further, the hypervisor has no idea if the guest wants Sstc extension
-or not unless the hypervisor management tool (QEMU/KVMTOOL)
-explicitly disables the Sstc extension for a specific Guest/VM. In
-general, the hypervisor management tools can't assume anything
-about the features supported by Guest OS so explicitly disabling
-Sstc extension for Guest/VM is not a practical approach.
+Thanks for feedback.
 
-Most hypervisors will always have Sstc extension enabled by default
-for Guest/VM by setting the henvcfg.STCE bit whenever hardware
-supports Sstc. Once this bit is set, hardware will actively compare
-vstimecmp value at every CPU clock cycle. vstimecmp value need to be
-saved/restored at vcpu_load/put path always. If the vstimecmp is not
-updated in the SBI path, it may contain stale value which will trigger
-spurious timer interrupts.
+Perhaps I haven't put a lot details of the new TDX data structures, so let me
+point out that the new two data structures 'struct tdx_memblock' and 'struct
+tdx_memory' that I am proposing are mostly supposed to be used by TDX code only,
+which is pretty standalone.  They are not supposed to be some basic
+infrastructure that can be widely used by other random kernel components. 
 
-Regards,
-Anup
+In fact, currently the only operation we need is to allow memblock to register
+all memory regions as TDX memory blocks when the memblock is still alive. 
+Therefore, in fact, the new data structures can even be completely invisible to
+other kernel components.  For instance, TDX code can provide below API w/o
+exposing any data structures to other kernel components:
 
-> Jess
->
-> > Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> > ---
-> > arch/riscv/include/asm/kvm_host.h       |   1 +
-> > arch/riscv/include/asm/kvm_vcpu_timer.h |   8 +-
-> > arch/riscv/include/uapi/asm/kvm.h       |   1 +
-> > arch/riscv/kvm/main.c                   |  12 ++-
-> > arch/riscv/kvm/vcpu.c                   |   5 +-
-> > arch/riscv/kvm/vcpu_timer.c             | 138 +++++++++++++++++++++++-
-> > 6 files changed, 159 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm=
-/kvm_host.h
-> > index 78da839657e5..50a97c821f83 100644
-> > --- a/arch/riscv/include/asm/kvm_host.h
-> > +++ b/arch/riscv/include/asm/kvm_host.h
-> > @@ -135,6 +135,7 @@ struct kvm_vcpu_csr {
-> >       unsigned long hvip;
-> >       unsigned long vsatp;
-> >       unsigned long scounteren;
-> > +     u64 vstimecmp;
-> > };
-> >
-> > struct kvm_vcpu_arch {
-> > diff --git a/arch/riscv/include/asm/kvm_vcpu_timer.h b/arch/riscv/inclu=
-de/asm/kvm_vcpu_timer.h
-> > index 375281eb49e0..a24a265f3ccb 100644
-> > --- a/arch/riscv/include/asm/kvm_vcpu_timer.h
-> > +++ b/arch/riscv/include/asm/kvm_vcpu_timer.h
-> > @@ -28,6 +28,11 @@ struct kvm_vcpu_timer {
-> >       u64 next_cycles;
-> >       /* Underlying hrtimer instance */
-> >       struct hrtimer hrt;
-> > +
-> > +     /* Flag to check if sstc is enabled or not */
-> > +     bool sstc_enabled;
-> > +     /* A function pointer to switch between stimecmp or hrtimer at ru=
-ntime */
-> > +     int (*timer_next_event)(struct kvm_vcpu *vcpu, u64 ncycles);
-> > };
-> >
-> > int kvm_riscv_vcpu_timer_next_event(struct kvm_vcpu *vcpu, u64 ncycles)=
-;
-> > @@ -39,6 +44,7 @@ int kvm_riscv_vcpu_timer_init(struct kvm_vcpu *vcpu);
-> > int kvm_riscv_vcpu_timer_deinit(struct kvm_vcpu *vcpu);
-> > int kvm_riscv_vcpu_timer_reset(struct kvm_vcpu *vcpu);
-> > void kvm_riscv_vcpu_timer_restore(struct kvm_vcpu *vcpu);
-> > +void kvm_riscv_vcpu_timer_save(struct kvm_vcpu *vcpu);
-> > int kvm_riscv_guest_timer_init(struct kvm *kvm);
-> > -
-> > +bool kvm_riscv_vcpu_timer_pending(struct kvm_vcpu *vcpu);
-> > #endif
-> > diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uap=
-i/asm/kvm.h
-> > index 92bd469e2ba6..d2f02ba1947a 100644
-> > --- a/arch/riscv/include/uapi/asm/kvm.h
-> > +++ b/arch/riscv/include/uapi/asm/kvm.h
-> > @@ -96,6 +96,7 @@ enum KVM_RISCV_ISA_EXT_ID {
-> >       KVM_RISCV_ISA_EXT_H,
-> >       KVM_RISCV_ISA_EXT_I,
-> >       KVM_RISCV_ISA_EXT_M,
-> > +     KVM_RISCV_ISA_EXT_SSTC,
-> >       KVM_RISCV_ISA_EXT_MAX,
-> > };
-> >
-> > diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
-> > index 2e5ca43c8c49..83c4db7fc35f 100644
-> > --- a/arch/riscv/kvm/main.c
-> > +++ b/arch/riscv/kvm/main.c
-> > @@ -32,7 +32,7 @@ int kvm_arch_hardware_setup(void *opaque)
-> >
-> > int kvm_arch_hardware_enable(void)
-> > {
-> > -     unsigned long hideleg, hedeleg;
-> > +     unsigned long hideleg, hedeleg, henvcfg;
-> >
-> >       hedeleg =3D 0;
-> >       hedeleg |=3D (1UL << EXC_INST_MISALIGNED);
-> > @@ -51,6 +51,16 @@ int kvm_arch_hardware_enable(void)
-> >
-> >       csr_write(CSR_HCOUNTEREN, -1UL);
-> >
-> > +     if (riscv_isa_extension_available(NULL, SSTC)) {
-> > +#ifdef CONFIG_64BIT
-> > +             henvcfg =3D csr_read(CSR_HENVCFG);
-> > +             csr_write(CSR_HENVCFG, henvcfg | 1UL<<HENVCFG_STCE);
-> > +#else
-> > +             henvcfg =3D csr_read(CSR_HENVCFGH);
-> > +             csr_write(CSR_HENVCFGH, henvcfg | 1UL<<HENVCFGH_STCE);
-> > +#endif
-> > +     }
-> > +
-> >       csr_write(CSR_HVIP, 0);
-> >
-> >       return 0;
-> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> > index 93492eb292fd..da1559725b03 100644
-> > --- a/arch/riscv/kvm/vcpu.c
-> > +++ b/arch/riscv/kvm/vcpu.c
-> > @@ -143,7 +143,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
-> >
-> > int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
-> > {
-> > -     return kvm_riscv_vcpu_has_interrupts(vcpu, 1UL << IRQ_VS_TIMER);
-> > +     return kvm_riscv_vcpu_timer_pending(vcpu);
-> > }
-> >
-> > void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
-> > @@ -374,6 +374,7 @@ static unsigned long kvm_isa_ext_arr[] =3D {
-> >       RISCV_ISA_EXT_h,
-> >       RISCV_ISA_EXT_i,
-> >       RISCV_ISA_EXT_m,
-> > +     RISCV_ISA_EXT_SSTC,
-> > };
-> >
-> > static int kvm_riscv_vcpu_get_reg_isa_ext(struct kvm_vcpu *vcpu,
-> > @@ -754,6 +755,8 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-> >                                    vcpu->arch.isa);
-> >       kvm_riscv_vcpu_host_fp_restore(&vcpu->arch.host_context);
-> >
-> > +     kvm_riscv_vcpu_timer_save(vcpu);
-> > +
-> >       csr->vsstatus =3D csr_read(CSR_VSSTATUS);
-> >       csr->vsie =3D csr_read(CSR_VSIE);
-> >       csr->vstvec =3D csr_read(CSR_VSTVEC);
-> > diff --git a/arch/riscv/kvm/vcpu_timer.c b/arch/riscv/kvm/vcpu_timer.c
-> > index 5c4c37ff2d48..d226a931de92 100644
-> > --- a/arch/riscv/kvm/vcpu_timer.c
-> > +++ b/arch/riscv/kvm/vcpu_timer.c
-> > @@ -69,7 +69,18 @@ static int kvm_riscv_vcpu_timer_cancel(struct kvm_vc=
-pu_timer *t)
-> >       return 0;
-> > }
-> >
-> > -int kvm_riscv_vcpu_timer_next_event(struct kvm_vcpu *vcpu, u64 ncycles=
-)
-> > +static int kvm_riscv_vcpu_update_vstimecmp(struct kvm_vcpu *vcpu, u64 =
-ncycles)
-> > +{
-> > +#if __riscv_xlen =3D=3D 32
-> > +             csr_write(CSR_VSTIMECMP, ncycles & 0xFFFFFFFF);
-> > +             csr_write(CSR_VSTIMECMPH, ncycles >> 32);
-> > +#else
-> > +             csr_write(CSR_VSTIMECMP, ncycles);
-> > +#endif
-> > +             return 0;
-> > +}
-> > +
-> > +static int kvm_riscv_vcpu_update_hrtimer(struct kvm_vcpu *vcpu, u64 nc=
-ycles)
-> > {
-> >       struct kvm_vcpu_timer *t =3D &vcpu->arch.timer;
-> >       struct kvm_guest_timer *gt =3D &vcpu->kvm->arch.timer;
-> > @@ -88,6 +99,68 @@ int kvm_riscv_vcpu_timer_next_event(struct kvm_vcpu =
-*vcpu, u64 ncycles)
-> >       return 0;
-> > }
-> >
-> > +int kvm_riscv_vcpu_timer_next_event(struct kvm_vcpu *vcpu, u64 ncycles=
-)
-> > +{
-> > +     struct kvm_vcpu_timer *t =3D &vcpu->arch.timer;
-> > +
-> > +     return t->timer_next_event(vcpu, ncycles);
-> > +}
-> > +
-> > +static enum hrtimer_restart kvm_riscv_vcpu_vstimer_expired(struct hrti=
-mer *h)
-> > +{
-> > +     u64 delta_ns;
-> > +     struct kvm_vcpu_timer *t =3D container_of(h, struct kvm_vcpu_time=
-r, hrt);
-> > +     struct kvm_vcpu *vcpu =3D container_of(t, struct kvm_vcpu, arch.t=
-imer);
-> > +     struct kvm_guest_timer *gt =3D &vcpu->kvm->arch.timer;
-> > +
-> > +     if (kvm_riscv_current_cycles(gt) < t->next_cycles) {
-> > +             delta_ns =3D kvm_riscv_delta_cycles2ns(t->next_cycles, gt=
-, t);
-> > +             hrtimer_forward_now(&t->hrt, ktime_set(0, delta_ns));
-> > +             return HRTIMER_RESTART;
-> > +     }
-> > +
-> > +     t->next_set =3D false;
-> > +     kvm_vcpu_kick(vcpu);
-> > +
-> > +     return HRTIMER_NORESTART;
-> > +}
-> > +
-> > +bool kvm_riscv_vcpu_timer_pending(struct kvm_vcpu *vcpu)
-> > +{
-> > +     struct kvm_vcpu_timer *t =3D &vcpu->arch.timer;
-> > +     struct kvm_guest_timer *gt =3D &vcpu->kvm->arch.timer;
-> > +     u64 vstimecmp_val =3D vcpu->arch.guest_csr.vstimecmp;
-> > +
-> > +     if (!kvm_riscv_delta_cycles2ns(vstimecmp_val, gt, t) ||
-> > +         kvm_riscv_vcpu_has_interrupts(vcpu, 1UL << IRQ_VS_TIMER))
-> > +             return true;
-> > +     else
-> > +             return false;
-> > +}
-> > +
-> > +static void kvm_riscv_vcpu_timer_blocking(struct kvm_vcpu *vcpu)
-> > +{
-> > +     struct kvm_vcpu_timer *t =3D &vcpu->arch.timer;
-> > +     struct kvm_guest_timer *gt =3D &vcpu->kvm->arch.timer;
-> > +     u64 delta_ns;
-> > +     u64 vstimecmp_val =3D vcpu->arch.guest_csr.vstimecmp;
-> > +
-> > +     if (!t->init_done)
-> > +             return;
-> > +
-> > +     delta_ns =3D kvm_riscv_delta_cycles2ns(vstimecmp_val, gt, t);
-> > +     if (delta_ns) {
-> > +             t->next_cycles =3D vstimecmp_val;
-> > +             hrtimer_start(&t->hrt, ktime_set(0, delta_ns), HRTIMER_MO=
-DE_REL);
-> > +             t->next_set =3D true;
-> > +     }
-> > +}
-> > +
-> > +static void kvm_riscv_vcpu_timer_unblocking(struct kvm_vcpu *vcpu)
-> > +{
-> > +     kvm_riscv_vcpu_timer_cancel(&vcpu->arch.timer);
-> > +}
-> > +
-> > int kvm_riscv_vcpu_get_reg_timer(struct kvm_vcpu *vcpu,
-> >                                const struct kvm_one_reg *reg)
-> > {
-> > @@ -180,10 +253,20 @@ int kvm_riscv_vcpu_timer_init(struct kvm_vcpu *vc=
-pu)
-> >               return -EINVAL;
-> >
-> >       hrtimer_init(&t->hrt, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-> > -     t->hrt.function =3D kvm_riscv_vcpu_hrtimer_expired;
-> >       t->init_done =3D true;
-> >       t->next_set =3D false;
-> >
-> > +     /* Enable sstc for every vcpu if available in hardware */
-> > +     if (riscv_isa_extension_available(NULL, SSTC)) {
-> > +             t->sstc_enabled =3D true;
-> > +             t->hrt.function =3D kvm_riscv_vcpu_vstimer_expired;
-> > +             t->timer_next_event =3D kvm_riscv_vcpu_update_vstimecmp;
-> > +     } else {
-> > +             t->sstc_enabled =3D false;
-> > +             t->hrt.function =3D kvm_riscv_vcpu_hrtimer_expired;
-> > +             t->timer_next_event =3D kvm_riscv_vcpu_update_hrtimer;
-> > +     }
-> > +
-> >       return 0;
-> > }
-> >
-> > @@ -202,7 +285,7 @@ int kvm_riscv_vcpu_timer_reset(struct kvm_vcpu *vcp=
-u)
-> >       return kvm_riscv_vcpu_timer_cancel(&vcpu->arch.timer);
-> > }
-> >
-> > -void kvm_riscv_vcpu_timer_restore(struct kvm_vcpu *vcpu)
-> > +static void kvm_riscv_vcpu_update_timedelta(struct kvm_vcpu *vcpu)
-> > {
-> >       struct kvm_guest_timer *gt =3D &vcpu->kvm->arch.timer;
-> >
-> > @@ -214,6 +297,55 @@ void kvm_riscv_vcpu_timer_restore(struct kvm_vcpu =
-*vcpu)
-> > #endif
-> > }
-> >
-> > +void kvm_riscv_vcpu_timer_restore(struct kvm_vcpu *vcpu)
-> > +{
-> > +     struct kvm_vcpu_csr *csr;
-> > +     struct kvm_vcpu_timer *t =3D &vcpu->arch.timer;
-> > +
-> > +     kvm_riscv_vcpu_update_timedelta(vcpu);
-> > +
-> > +     if (!t->sstc_enabled)
-> > +             return;
-> > +
-> > +     csr =3D &vcpu->arch.guest_csr;
-> > +#ifdef CONFIG_64BIT
-> > +     csr_write(CSR_VSTIMECMP, csr->vstimecmp);
-> > +#else
-> > +     csr_write(CSR_VSTIMECMP, (u32)csr->vstimecmp);
-> > +     csr_write(CSR_VSTIMECMPH, (u32)(csr->vstimecmp >> 32));
-> > +#endif
-> > +
-> > +     /* timer should be enabled for the remaining operations */
-> > +     if (unlikely(!t->init_done))
-> > +             return;
-> > +
-> > +     kvm_riscv_vcpu_timer_unblocking(vcpu);
-> > +}
-> > +
-> > +void kvm_riscv_vcpu_timer_save(struct kvm_vcpu *vcpu)
-> > +{
-> > +     struct kvm_vcpu_csr *csr;
-> > +     struct kvm_vcpu_timer *t =3D &vcpu->arch.timer;
-> > +
-> > +     if (!t->sstc_enabled)
-> > +             return;
-> > +
-> > +     csr =3D &vcpu->arch.guest_csr;
-> > +     t =3D &vcpu->arch.timer;
-> > +#ifdef CONFIG_64BIT
-> > +     csr->vstimecmp =3D csr_read(CSR_VSTIMECMP);
-> > +#else
-> > +     csr->vstimecmp =3D csr_read(CSR_VSTIMECMP);
-> > +     csr->vstimecmp |=3D (u64)csr_read(CSR_VSTIMECMPH) << 32;
-> > +#endif
-> > +     /* timer should be enabled for the remaining operations */
-> > +     if (unlikely(!t->init_done))
-> > +             return;
-> > +
-> > +     if (kvm_vcpu_is_blocking(vcpu))
-> > +             kvm_riscv_vcpu_timer_blocking(vcpu);
-> > +}
-> > +
-> > int kvm_riscv_guest_timer_init(struct kvm *kvm)
-> > {
-> >       struct kvm_guest_timer *gt =3D &kvm->arch.timer;
-> > --
-> > 2.25.1
-> >
-> >
-> > _______________________________________________
-> > linux-riscv mailing list
-> > linux-riscv@lists.infradead.org
-> > http://lists.infradead.org/mailman/listinfo/linux-riscv
->
+int tdx_add_memory_block(phys_addr_t start, phys_addr_t end, int nid);
+
+And we call above API for each memory region in memblock when it is alive.
+
+TDX code internally manages those memory regions via the new data structures
+that I mentioned above, so we don't need to keep memblock after boot.  The
+advantage of this approach is it is more flexible to support other potential TDX
+memory resources (such as CLX memory) in the future.
+
+Otherwise, we can do as you suggested to select ARCH_KEEP_MEMBLOCK when
+INTEL_TDX_HOST is on and TDX code internally uses memblock API directly.
+
+-- 
+Thanks,
+-Kai
 
 
---=20
-Regards,
-Atish
