@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 072BD51EEFE
-	for <lists+kvm@lfdr.de>; Sun,  8 May 2022 18:54:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD87D51EF50
+	for <lists+kvm@lfdr.de>; Sun,  8 May 2022 21:11:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235979AbiEHQ5f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 May 2022 12:57:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51902 "EHLO
+        id S235720AbiEHSG6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 May 2022 14:06:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235042AbiEHQ5e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 May 2022 12:57:34 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB796E012
-        for <kvm@vger.kernel.org>; Sun,  8 May 2022 09:53:41 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id gj17-20020a17090b109100b001d8b390f77bso15071578pjb.1
-        for <kvm@vger.kernel.org>; Sun, 08 May 2022 09:53:41 -0700 (PDT)
+        with ESMTP id S236036AbiEHQ61 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 May 2022 12:58:27 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16DDBE012
+        for <kvm@vger.kernel.org>; Sun,  8 May 2022 09:54:37 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id qe3-20020a17090b4f8300b001dc24e4da73so10731281pjb.1
+        for <kvm@vger.kernel.org>; Sun, 08 May 2022 09:54:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kylehuey.com; s=google;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=7QE3zifA2u69/igKADLUNBhsOvUuQy9vMIUwiMYU8bs=;
-        b=kYswZHMPQ2ixdwGtUPg8h5ZoD7/mX0/S2rhEMFCB4jryIrop0ttHr/g0d5iRxH0DU0
-         aUv1T5PjGfZiYUdytIaagfLYjlHXwC1zameF4j8/33uaOvr+czELyrOEnGHSclrzZp6m
-         cTj8jtTkYWEbjs15QT36BOahockaTdGfK4CVzpvHzbp3CR36Jtm3+moZmGHxd0rhEkck
-         Z18iIVgU9X2dWjJHMy/qDJez+qZNZBgluAm0VdXa88ChvNARUL7/qvDGxbxgIIbxk11b
-         H4D9KxU7+wacEvrbehL3yGGmt6uEaJU+GD8fpfYzGvNpQydAm7taXlSO6OUYYyiupyE/
-         g89A==
+        bh=FaypoxjtFMSM2gt1fFhanoHs2x7WcJ7SqgxjCER5mjQ=;
+        b=kL7AmVBf8sgfDvjYOeNUu6VJjUx+oMNBgyR14X6Fb2mpRzGN3ZfHUBw6Hywwtvcmz+
+         DPCvpFCmab1w8m95OC3CLWlFSebfDM69tOXdxztFrK1uhwVHFRNcnD6emVF4BvLlUfio
+         779EVkmb7xjwEuYKvB6siD7QhorK0Pac71nyGzBYD6nLU6GS63gV0Yid//uGG2oJWawt
+         v54PeDueVhw0MtoaC4YWTVH6CZugwXwDFTW0xTrsC3fWdSNdQhOuxHDWkUlfu+1tsnXx
+         9PD3VBrebTfuK5h7XOpikbtpB1eSyN896Auzu3+rCMCHEPOVEW3s6iPLOADJ3bnB1oxt
+         WnpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=7QE3zifA2u69/igKADLUNBhsOvUuQy9vMIUwiMYU8bs=;
-        b=eCTTFMff3ru3fweBxARdplIpUSrPlvSAI9JMRXnQJkvS75GKaHsKBXIp9Bt8TxMRps
-         UCJuHxEQWMUz34d8JSStx9MHAc6rUmdCerF2LK5gFHO7lksSc6HL05joezvmCpw8K1fY
-         03RYrZND0T2jkdWFFxAjB8geZ8rvl4NlWNl+9MMiO4UC5HH4yo8szAdlY+OMQ+eOBcSK
-         kagFsejffC7Uf5bqk8RcmhI6poiRoV6pytqwQQKRl9DFmPapCQbFSWJzidFUQjIbuCsE
-         NgMubclGdLRIjbzWE5+3mE7Hb+IxS1Rm21aZaYop9aSgMCEvzJ2y2hJDTx3SHQRO4QLJ
-         SwsQ==
-X-Gm-Message-State: AOAM531J2b1PZcl+STFCBHYZNK69f0kUwBUJrAnlQVT58ZR9G3v8n8qw
-        0p42KY/ASKnzu524U8G6u+ZqHw==
-X-Google-Smtp-Source: ABdhPJxcRAOEfJq30nRmAdHReeqvsScK+Bd5DrOMryoUg6DQ9DX342M0+ffYMmAz51i7lfqXdjY31Q==
-X-Received: by 2002:a17:902:ce8d:b0:15e:a95d:b4b0 with SMTP id f13-20020a170902ce8d00b0015ea95db4b0mr12926584plg.153.1652028821290;
-        Sun, 08 May 2022 09:53:41 -0700 (PDT)
+        bh=FaypoxjtFMSM2gt1fFhanoHs2x7WcJ7SqgxjCER5mjQ=;
+        b=qrIyjx6/NzUOmNn4XhQB0b5Y6s9Whb/Bxyz7T7UjlvtatDasnVg1OwGH7v2+30JdZe
+         +HB1FPobelFcHcajHArvOr5Ud++KP5yjaxSdJ8Eh9gCIs5XUtP6EIE18zUX18EQS5Q0X
+         eFX0OOyHaudEIcdQeCz8RKFpzKW+Kw6Si+HaMnchQ6h9Bxn4DeO5D4BzzejjeUaRZnKm
+         Rq5svP7NXZmXVsytmuET3RlowSaEukxEQrLHntgxwwrc9DVBnhigPLlc28PWnoAPyXps
+         X3rw8f+4/fWk7VJvbxtMSs+pbhZbbQrG/oi7b6nrURblIWm22Imqcgthc43drQJP71Oc
+         vCLA==
+X-Gm-Message-State: AOAM531XI1qKoOE9HNBjSVytcSwQKc/pXjyaFZj0PqI6I+bKCFBSfLve
+        tiCrznSK+prjrnJmyXo/nEmjG5O2o+DfTlG/
+X-Google-Smtp-Source: ABdhPJzxy35YNJDzBiw+i85/Vn8HdW2ttoMl53XOcXUSBUxihtIgI3O6QHXTRtIGzHdv0iku2IuILw==
+X-Received: by 2002:a17:90b:1e49:b0:1dc:81d9:2d97 with SMTP id pi9-20020a17090b1e4900b001dc81d92d97mr22536299pjb.221.1652028876557;
+        Sun, 08 May 2022 09:54:36 -0700 (PDT)
 Received: from minbar.home.kylehuey.com (c-71-198-251-229.hsd1.ca.comcast.net. [71.198.251.229])
-        by smtp.gmail.com with ESMTPSA id t15-20020a6549cf000000b003c14af50621sm6875167pgs.57.2022.05.08.09.53.39
+        by smtp.gmail.com with ESMTPSA id q27-20020a056a0002bb00b0050dc76281ebsm6838436pfs.197.2022.05.08.09.54.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 May 2022 09:53:40 -0700 (PDT)
+        Sun, 08 May 2022 09:54:35 -0700 (PDT)
 From:   Kyle Huey <me@kylehuey.com>
 X-Google-Original-From: Kyle Huey <khuey@kylehuey.com>
 To:     stable@vger.kernel.org
@@ -63,9 +63,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Robert O'Callahan <robert@ocallahan.org>,
         Keno Fischer <keno@juliacomputing.com>,
         Kyle Huey <me@kylehuey.com>
-Subject: [PATCH] KVM: x86/svm: Account for family 17h event renumberings in amd_pmc_perf_hw_id
-Date:   Sun,  8 May 2022 09:53:38 -0700
-Message-Id: <20220508165338.118886-1-khuey@kylehuey.com>
+Subject: [PATCH 5.4] KVM: x86/svm: Account for family 17h event renumberings in amd_pmc_perf_hw_id
+Date:   Sun,  8 May 2022 09:54:34 -0700
+Message-Id: <20220508165434.119000-1-khuey@kylehuey.com>
 X-Mailer: git-send-email 2.36.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -99,16 +99,16 @@ Message-Id: <20220503050136.86298-1-khuey@kylehuey.com>
 Cc: stable@vger.kernel.org
 [Check guest family, not host. - Paolo]
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-[Backport to 5.15: adjusted context]
+[Backport to 5.4: adjusted context]
 Signed-off-by: Kyle Huey <me@kylehuey.com>
 ---
- arch/x86/kvm/svm/pmu.c | 28 +++++++++++++++++++++++++---
+ arch/x86/kvm/pmu_amd.c | 28 +++++++++++++++++++++++++---
  1 file changed, 25 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index f337ce7e898e..d35c94e13afb 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
+diff --git a/arch/x86/kvm/pmu_amd.c b/arch/x86/kvm/pmu_amd.c
+index 6bc656abbe66..3ccfd1abcbad 100644
+--- a/arch/x86/kvm/pmu_amd.c
++++ b/arch/x86/kvm/pmu_amd.c
 @@ -44,6 +44,22 @@ static struct kvm_event_hw_type_mapping amd_event_mapping[] = {
  	[7] = { 0xd1, 0x00, PERF_COUNT_HW_STALLED_CYCLES_BACKEND },
  };
@@ -132,13 +132,11 @@ index f337ce7e898e..d35c94e13afb 100644
  static unsigned int get_msr_base(struct kvm_pmu *pmu, enum pmu_type type)
  {
  	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
-@@ -136,19 +152,25 @@ static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
- 
- static unsigned int amd_pmc_perf_hw_id(struct kvm_pmc *pmc)
+@@ -130,17 +146,23 @@ static unsigned amd_find_arch_event(struct kvm_pmu *pmu,
+ 				    u8 event_select,
+ 				    u8 unit_mask)
  {
 +	struct kvm_event_hw_type_mapping *event_mapping;
- 	u8 event_select = pmc->eventsel & ARCH_PERFMON_EVENTSEL_EVENT;
- 	u8 unit_mask = (pmc->eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
  	int i;
  
 +	if (guest_cpuid_family(pmc->vcpu) >= 0x17)
