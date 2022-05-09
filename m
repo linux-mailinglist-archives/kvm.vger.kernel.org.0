@@ -2,67 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6156C52025C
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 18:26:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E870E520279
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 18:32:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239055AbiEIQaQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 12:30:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36570 "EHLO
+        id S239004AbiEIQfr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 12:35:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239048AbiEIQaM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 12:30:12 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CE011FD1FD
-        for <kvm@vger.kernel.org>; Mon,  9 May 2022 09:26:17 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id v17-20020a056902029100b006484d85132eso12428378ybh.14
-        for <kvm@vger.kernel.org>; Mon, 09 May 2022 09:26:17 -0700 (PDT)
+        with ESMTP id S238152AbiEIQfq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 12:35:46 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 633811053D7
+        for <kvm@vger.kernel.org>; Mon,  9 May 2022 09:31:51 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id fv2so13623036pjb.4
+        for <kvm@vger.kernel.org>; Mon, 09 May 2022 09:31:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=xGoqp6X+CPpEHo725m8Wu+g1erF1chW9bMEShQucuQI=;
-        b=N0Zb4Gxa4HC1uAASPa5PNvN6IZjx7J7GkqJJxcHMPKOV18yjIl3pcEmceZOJesdcnG
-         QyYuP15OLQgQAzxZvOx9T/u4IcSod9jZabxpWQQRxegBDjAddti9A+I5FItlHEwguaJN
-         TpTsFWnpbz8e2DrUL88byAshOTHwqCzr3yK86hOE/LVy9b/KYkpySe/p+6GKXer9+ZsT
-         AJn8WeUun7zv6Aus63gh3Xr1mdIhrS9YxFDp64pMHUMFpR3ooGR2iVg+ijhT2AzXWlvC
-         0smRDvmncy7dBiwIBRAlq8Ds4xGlgiZR/k0QeJkvUFeyICFF+QBvChLD1FP9jVkilG9n
-         6zEQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5m6MbZqTR/K0ls/JbmsnhfS4t8Ut8ls1IozELXnIajI=;
+        b=s13iOT82pVhN2fLD51n/NkSFDJD8cuLjhPlrxBexcLZ+iCv7bxql+RQW5WZNA6fFA4
+         z5l+nLKe3RnRjm9mBUN+Nff6o7y8D4q/xHGhe2K9N4IqAqRDugEr/Md2q9u3/c5F/JeM
+         WrKAlaJvdQA05qhUztwbpvAVjRR+Klf10Dx7bfv4TjyzmvrwjiDZ7xthVIuwaa3gbA1g
+         H+JuabtImAJ4cKsXDDOmsdE/LAdlpMI8Yb6Dy91JJ0dh+3ELSh7wwaaHAoS+aTacs9DY
+         zdriLZJSyn2UsZueEqG5RS1L3NnSWos5SqYxdNX5gf2T6ZYpeD3PGG4H1BBc0gN5wHud
+         HzOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=xGoqp6X+CPpEHo725m8Wu+g1erF1chW9bMEShQucuQI=;
-        b=AdOQVS9SbxbKrubtvslRxWlDh8vtxBscdlzDg9tzeTSgjB0pZNeExKjcuqRwxpUNV3
-         rSUq7Yro5+NRiFtyndA2AN5LhwqBfPGFtbRtTP7Rb4Sk7YaOEhDowBLaWluaC4hrvCL8
-         3aCFXPNJGG1lzFhJpE7fKwqN+Lj+lp3bsIkT30DgULikyqAysPOGYNCw8uQQaQpKU5TL
-         A0YVrH+7nUzBfoNx1xYE+qSChCubyp675h9i25EJaSroh/ynZZ4gio65dt/vUNpXs/mI
-         1O0jCdMnKomVVspAd/cU9+P8tSfvJ+kldg4qwrpUBZcIMK633p8iWUHoqP0TszGgRnbh
-         Mjcw==
-X-Gm-Message-State: AOAM533CBxhg1KLojT6r201HFUvTaOZ/IcwIa8vryLiZs+aDde4oErsn
-        5AsDvCIR1fSlaoxld+PhT/edGd40Ac0=
-X-Google-Smtp-Source: ABdhPJwbEmmNk02jHZlxW+mCJH3BMBXB3kvXc9tx+Zc+AF6gVkBuuuHex37mMcuOHpy47pgj2Z6U4qDyQ2M=
-X-Received: from oupton3.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:21eb])
- (user=oupton job=sendgmr) by 2002:a25:3157:0:b0:649:b216:bb4e with SMTP id
- x84-20020a253157000000b00649b216bb4emr14278182ybx.387.1652113576747; Mon, 09
- May 2022 09:26:16 -0700 (PDT)
-Date:   Mon,  9 May 2022 16:25:59 +0000
-In-Reply-To: <20220509162559.2387784-1-oupton@google.com>
-Message-Id: <20220509162559.2387784-3-oupton@google.com>
-Mime-Version: 1.0
-References: <20220509162559.2387784-1-oupton@google.com>
-X-Mailer: git-send-email 2.36.0.512.ge40c2bad7a-goog
-Subject: [PATCH 2/2] KVM: arm64: pkvm: Don't mask already zeroed FEAT_SVE
-From:   Oliver Upton <oupton@google.com>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, maz@kernel.org, james.morse@arm.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com,
-        qperret@google.com, will@kernel.org,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5m6MbZqTR/K0ls/JbmsnhfS4t8Ut8ls1IozELXnIajI=;
+        b=X7lWZVFccDDWaPK4OsiWydxaunosPKP0PkOAhccvttkjejS2+7HVvE/tAN0JLLFZ2g
+         KTjBGknqyQGpbPj1WsYVLIi4tnm60MWIKptiej7QmdKkdpdJSCvG0qs7ODE2cVG+Bo1F
+         QgL4e4wcEzTkyRPYlLWaXgL9uSyp8nmXJm+7bWjNVuH3UQoPGcKvgALvGIG8vQbjtqOz
+         WyopXfvcFRrHM896QtLpeI9MYzB5G5SO3xRbgdDRqBbw3FofkweSvtgrdYBJf8ae2wLB
+         NWUgoMP4+scE3pjRExOv+k5CppF24Nb2uSNJsx4RD+4C7D8wPbZ2KlsRgVCXuAeSIOGA
+         ejFA==
+X-Gm-Message-State: AOAM531Sq7VNkpXoKvFg9iPW+ifkbnIUES2ARtQcvn72me52U0PVQwur
+        B3uoXBFRzJFKvkuhIogLSU21fw==
+X-Google-Smtp-Source: ABdhPJzGs1IwQJk/45XzTRSExCEERaP5PYcy1LzTQKkXOwouwsurcXkKRerTln5UGHN/bEbuxUUpMw==
+X-Received: by 2002:a17:902:cf05:b0:156:8445:ce0f with SMTP id i5-20020a170902cf0500b001568445ce0fmr16888729plg.99.1652113910711;
+        Mon, 09 May 2022 09:31:50 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id u21-20020a17090abb1500b001d95cdb62d4sm12797700pjr.33.2022.05.09.09.31.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 May 2022 09:31:50 -0700 (PDT)
+Date:   Mon, 9 May 2022 16:31:46 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        maciej.szmigiero@oracle.com,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
+Subject: Re: [PATCH v4 17/20] KVM: x86/mmu: Zap collapsible SPTEs at all
+ levels in the shadow MMU
+Message-ID: <YnlB8n8UMCuaCj1G@google.com>
+References: <20220422210546.458943-1-dmatlack@google.com>
+ <20220422210546.458943-18-dmatlack@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220422210546.458943-18-dmatlack@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,30 +88,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-FEAT_SVE is already masked by the fixed configuration for
-ID_AA64PFR0_EL1; don't try and mask it at runtime.
+Maybe a slight tweak to the shortlog?  "Zap collapsible SPTEs at all levels in
+the shadow MMU" left me wondering "when is KVM zapping at all levels?"
 
-No functional change intended.
+  KVM: x86/mmu: Zap all possible levels in shadow MMU when collapsing SPTEs
 
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- arch/arm64/kvm/hyp/nvhe/sys_regs.c | 3 ---
- 1 file changed, 3 deletions(-)
+On Fri, Apr 22, 2022, David Matlack wrote:
+> Currently KVM only zaps collapsible 4KiB SPTEs in the shadow MMU (i.e.
+> in the rmap). This is fine for now KVM never creates intermediate huge
+> pages during dirty logging, i.e. a 1GiB page is never partially split to
+> a 2MiB page.
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 33f5181af330..3f5d7bd171c5 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -90,9 +90,6 @@ static u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
- 	u64 set_mask = 0;
- 	u64 allow_mask = PVM_ID_AA64PFR0_ALLOW;
- 
--	if (!vcpu_has_sve(vcpu))
--		allow_mask &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
--
- 	set_mask |= get_restricted_features_unsigned(id_aa64pfr0_el1_sys_val,
- 		PVM_ID_AA64PFR0_RESTRICT_UNSIGNED);
- 
--- 
-2.36.0.512.ge40c2bad7a-goog
+"partially" is really confusing.  I think what you mean is that KVM can split a
+1gb to a 2mb page, and not split all the way down to 4kb.  But "partially" makes
+it sound like KVM ends up with a huge SPTE that is half split or something.  I
+think you can just avoid that altogether and be more explicit:
 
+  i.e. a 1GiB pager is never split to just 2MiB, dirty logging always splits
+  down to 4KiB pages.
+
+> However, this will stop being true once the shadow MMU participates in
+> eager page splitting, which can in fact leave behind partially split
+
+"partially" again.  Maybe
+
+  which can in fact leave behind 2MiB pages after splitting 1GiB huge pages.
+
+> huge pages. In preparation for that change, change the shadow MMU to
+> iterate over all necessary levels when zapping collapsible SPTEs.
+> 
+> No functional change intended.
+> 
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 21 ++++++++++++++-------
+>  1 file changed, 14 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index ed65899d15a2..479c581e8a96 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -6098,18 +6098,25 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+>  	return need_tlb_flush;
+>  }
+>  
+> +static void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
+> +					   const struct kvm_memory_slot *slot)
+> +{
+> +	/*
+> +	 * Note, use KVM_MAX_HUGEPAGE_LEVEL - 1 since there's no need to zap
+> +	 * pages that are already mapped at the maximum possible level.
+> +	 */
+> +	if (slot_handle_level(kvm, slot, kvm_mmu_zap_collapsible_spte,
+> +			      PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL - 1,
+> +			      true))
+> +		kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
+> +}
+> +
+>  void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
+>  				   const struct kvm_memory_slot *slot)
+>  {
+>  	if (kvm_memslots_have_rmaps(kvm)) {
+>  		write_lock(&kvm->mmu_lock);
+> -		/*
+> -		 * Zap only 4k SPTEs since the legacy MMU only supports dirty
+> -		 * logging at a 4k granularity and never creates collapsible
+> -		 * 2m SPTEs during dirty logging.
+> -		 */
+> -		if (slot_handle_level_4k(kvm, slot, kvm_mmu_zap_collapsible_spte, true))
+> -			kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
+> +		kvm_rmap_zap_collapsible_sptes(kvm, slot);
+>  		write_unlock(&kvm->mmu_lock);
+>  	}
+>  
+> -- 
+> 2.36.0.rc2.479.g8af0fa9b8e-goog
+> 
