@@ -2,239 +2,277 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4183151FFCA
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 16:36:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8022A51FFEC
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 16:37:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237300AbiEIOcB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 10:32:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39686 "EHLO
+        id S237346AbiEIOin (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 10:38:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237084AbiEIObt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 10:31:49 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2074.outbound.protection.outlook.com [40.107.244.74])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EC322BB2D3;
-        Mon,  9 May 2022 07:27:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Wxrg95NzYRt35UQY0ylk0MGTV7L+HfzL1Wc6ITIH07Irzz8y5+lG85S7ZO0UNKyd9+YH/4R2KJhGpAtZj+MU/qKRWEAS3G0SbPbrUZznCzlhvFvF8+MiH3a807cXVx3dOdZP3QzJRPdKfBJkrWEDvxyaTV1scqPBUa5AIFS0QaOkY82d1BPK47gC7BjguUYAy04oofHX77F3rG1KziR8TFFuPriNsoeUMMOiG6n75xu0nm0SK4mAPdnYomqMUo0QIhzfOocozFqJ5H8K3rHfTudYHKhYL01ALMPl3ScPlE/gW3/ThzibxMnW887BZqbgadOHh68TcC3m1YzvugDMiA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Hb6tSorB2A97SHyr4TvCGp5n47wSlHX4FSicRp/WL2I=;
- b=cqHlUxZBXbt7teq6ILYiPbpdjhZi7rohtmHnHonby4U035g8B432WUDriJMur8NrtdXOfG91ClG4MsuqfJ+GXJylosznsb4rGd/xc0WfmlGb2fiSMoGmQ7fHqAFiBmoBXIM/fnaJPaArmtc88dTyhhaIXsvrKv1M6GcYH4KXvqbwi9eK9hZFVdMgnFTxalaW7h5GRzTzcVhRPEu9kRuM3v2zUCgKc/ZH+JpdHbDuEWsYR5xw3xpfQ3woREDdsG6c/TD6nEeiNxomnLM2C2qHAjxeGmInDaiyhNIg3gxWXod1zYC2OaeFkeUkO+8yBJkFXeMhtXhHv7xKNP+JdsqNTg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Hb6tSorB2A97SHyr4TvCGp5n47wSlHX4FSicRp/WL2I=;
- b=03Gguh4tHQpap4iglP28Jg5ITyQsLp4hbzme5Sr1nhEjybJoWJFgOEx2gVCvsNe6NUMOr+8gcCix0kLKWotT0LQFPsKfSrrq1DqBQqmY6kCQeSnsfgpmE1HDAcSiAwqeJIubEXxMJ3XgwEVde4b6jwIZpigO8MLj2CdlVmpplHE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CY4PR1201MB0181.namprd12.prod.outlook.com
- (2603:10b6:910:1f::11) by BL1PR12MB5176.namprd12.prod.outlook.com
- (2603:10b6:208:311::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5227.21; Mon, 9 May
- 2022 14:27:52 +0000
-Received: from CY4PR1201MB0181.namprd12.prod.outlook.com
- ([fe80::5c1f:2ec0:4e86:7fad]) by CY4PR1201MB0181.namprd12.prod.outlook.com
- ([fe80::5c1f:2ec0:4e86:7fad%3]) with mapi id 15.20.5227.023; Mon, 9 May 2022
- 14:27:52 +0000
-Message-ID: <e02cff98-922f-7093-d674-5f81caf14a48@amd.com>
-Date:   Mon, 9 May 2022 16:27:44 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v4 02/15] KVM: x86: lapic: Rename
- [GET/SET]_APIC_DEST_FIELD to [GET/SET]_XAPIC_DEST_FIELD
+        with ESMTP id S237061AbiEIOil (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 10:38:41 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06EA863E4;
+        Mon,  9 May 2022 07:34:46 -0700 (PDT)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 249EUVGS017235;
+        Mon, 9 May 2022 14:34:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=pnhRrMiXi6MZKB6Y3bqNfJSU45lxP7wz6uqnrisn6oA=;
+ b=g/mPg3RJSPwVL/E7Md9ZRFVGLxMor1mjUtf62OPRLu30Wde961ys20MLcYnKEdHwrKB4
+ QkbT0AEKQdUl7eGJbt9wSc+FNzaVBZKpNZAYjYwQFpoSdH83hHgEVqFNQrC3/E+miSKJ
+ S4wAfksyL1tjU/6sRbERLG7EPy8PDi4KBfZ9+sSdVIDmiDdZKhqojrJWQskaQu1Vxf/y
+ xQeuMLEg2Xyh22AsnTrq28GYdLI1ednvHlZz/R/GbUorXOOH5PeULwsHp+jQqhcwJKSP
+ fwarP+vIzI0Ykas4xX8qM+/nUVHOg4JGU5KseNbfhEAbQo33oJd+XbK+kPC6TDty+0TN ag== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fy2fvbjwm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 May 2022 14:34:44 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 249ETR1E021949;
+        Mon, 9 May 2022 14:34:44 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fy2fvbjwd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 May 2022 14:34:44 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 249EWu5G016774;
+        Mon, 9 May 2022 14:34:43 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
+        by ppma01dal.us.ibm.com with ESMTP id 3fwgdaac09-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 May 2022 14:34:43 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
+        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 249EYgX821954878
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 9 May 2022 14:34:42 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1EF68112064;
+        Mon,  9 May 2022 14:34:42 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 61EC2112065;
+        Mon,  9 May 2022 14:34:41 +0000 (GMT)
+Received: from [9.65.254.31] (unknown [9.65.254.31])
+        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon,  9 May 2022 14:34:41 +0000 (GMT)
+Message-ID: <e560a670-d6b6-304b-68b4-cbf312c40ad9@linux.ibm.com>
+Date:   Mon, 9 May 2022 10:34:41 -0400
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v19 00/20] s390/vfio-ap: dynamic configuration support
 Content-Language: en-US
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, mlevitsk@redhat.com, seanjc@google.com,
-        joro@8bytes.org, jon.grimm@amd.com, wei.huang2@amd.com,
-        terry.bowman@amd.com
-References: <20220508023930.12881-1-suravee.suthikulpanit@amd.com>
- <20220508023930.12881-3-suravee.suthikulpanit@amd.com>
-From:   "Gupta, Pankaj" <pankaj.gupta@amd.com>
-In-Reply-To: <20220508023930.12881-3-suravee.suthikulpanit@amd.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     jjherne@linux.ibm.com, freude@linux.ibm.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
+        pasic@linux.ibm.com, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, fiuczy@linux.ibm.com
+References: <20220404221039.1272245-1-akrowiak@linux.ibm.com>
+In-Reply-To: <20220404221039.1272245-1-akrowiak@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM5PR1001CA0036.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:206:2::49) To CY4PR1201MB0181.namprd12.prod.outlook.com
- (2603:10b6:910:1f::11)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4c19a4c9-269b-4111-6e21-08da31c81955
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5176:EE_
-X-Microsoft-Antispam-PRVS: <BL1PR12MB51767BE960FD35C9CCEBA6619BC69@BL1PR12MB5176.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: q46pTB9179Zahr5j2ZWRtlX6bg0magMvziVYLZgEGVWQ64a2wQhZ9gs6KogqIpJcoEKafPfMT6TMWqN0U+9R/VoVxRCwzmRJLgCzulVko4/rd1GjHQiOj7/aHGYR9NGbIKpxC8BLMJkByoPjzMKXCxXsLKQIFHw76ViEGrlYViksn6Tr3fx6ICfSFkAVccG84mtqPLWMZRAgy4O02oyqfJZVUcRP/Yr+CLwfJWu1x4wrYO6/m1eBPQySzTQHaNBiAGMCAcqDwsiVolvhbaWeCERaV94l5zwlxDKPqMpmLIvg53zZiWc7WZriRQndqCy4skS91S4KKB+ntzzkO9H2i9vkrQ0OQqY2u37sukuzHeVk5r9/vf3dPuh7O0w1ZE7GlkDM80UdS7QoY5IjhDJGPlSTMb+hYN3GWwe0Ba/jCvVMbLTiEFSm4bCFZrllN3RN4m4jvhPn/WTPLAlBZ2PmEmi6ZUdj8FXU8RxxpmWNT5NsR+3/ur6JFuXa7WdPv6ibzKWaGHUCUUxjFJl7A0cVInUyJ3qQolMEtaS3ZQ0d3B0jflT8JP2E9jxS4mUagSU3HngVtdzYCy7IzRMJruM0FojxXZ+Ukljsagm0C3CrW/bAuiT5XzCJEXoF1/LO8p5dzU8hqVlCKBsSpUBd8BDWVkFo/+9FcfYKbKPvXB94MbQEtp7Md2Q+jlHLPBULCSlQ8JvubcQGFHDY+UzNHOESVDIxkSvc+VZNk5llI9kSEGMgFA7Bh/HLoRrFhncYClXH
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR1201MB0181.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(66476007)(66556008)(66946007)(6506007)(508600001)(2616005)(31686004)(8676002)(4326008)(26005)(83380400001)(6512007)(86362001)(8936002)(5660300002)(31696002)(2906002)(6486002)(38100700002)(6666004)(316002)(186003)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?U2JySmVLdjJad1dubXBwZVRPOXdISVcvMDVTdjY5K0d1RFRXYzN4S0hKYWd0?=
- =?utf-8?B?LytJODVsdDk3Nyt1TmZuMit6QWVDTXh4cnM4aHREY1M1MUIzRzRJNkNVUTFz?=
- =?utf-8?B?eVA3M3NCWDZFRS91bVZPNjFjKzh0cjRweGYvR2J4MkRsQUFyZkVPbDVreGZT?=
- =?utf-8?B?T0RLakZYSW5ya1lZUnREWVZwNWRqSDYrZ2U2ejM4aXRjNGplWDl2ZC91dmhw?=
- =?utf-8?B?dTIxQ0ZnNGZ5aEFZSGdWSHRJUEpQMXZjQXBHZlU3VjU1Zk1wa0ZNZzRnV1dm?=
- =?utf-8?B?cUVsazVwOElORkRJWS9PUEJpcXh6d0Y1Y2dlYlVROXJlOUNqS0dZbjNGWVhz?=
- =?utf-8?B?eHlRN3RlZmlwRTQwSlNBK01SWkk3Q242UkhFb1hpdXJEUEx0VkxtUXFaT3ZJ?=
- =?utf-8?B?UTdBUmR3QmROU1hNMy9KY01vY2NhQU5IbUpRY0lDdzhYcnUzMUdLWFcwN3c1?=
- =?utf-8?B?VDhLbHRIMUNpOFBDa3c1U0xIQzM5Tk1ocnNxbHBOODJBRGFXK1RRTk9vN3cw?=
- =?utf-8?B?UGV1RjB1WlBwd1RXdEh5UGZOZmhITDhJZ3N2KzBJTitPNFhHdFlYRjdnTXFR?=
- =?utf-8?B?L1JSdm1MV3pmelUyUGZBRlF4Zzd5a096VGFDOVVuL2R5VnBqYzlWWm0xbktO?=
- =?utf-8?B?TVg4dXpRRExZeTdTbjdqamdhaXhnZis3RnZkeWxJekJBNm9HbXlncURYTkpM?=
- =?utf-8?B?bHVtUzJNN1ZQSG5iS09wdXd4NzczcDA1RzJiM2VxdjYrODloZWpteUZubWNX?=
- =?utf-8?B?R1VDckI5WDc1VHJxbUJIUGwwQUMwbTlUMEFUK2dOMmZ2aUluMmpxSWhSM3dZ?=
- =?utf-8?B?bWtsOGJFVFZ4WmN0WUFOalllUnBPdFdaU01KZ29Rek5ka0R5TFNLeXBqTWpt?=
- =?utf-8?B?SzFpcGI5d1FNZDZOVFZsVW85OUpqbmdWTVg5Nk9rc3dqY3dFTlR5NWppUzJE?=
- =?utf-8?B?R1NCa0xUV1hJTC9HOFFKR0VnSTB1TSs5ZXYvYzZETzBQdmZnVWN4RGZxeXE1?=
- =?utf-8?B?MXE5YWFhWUg5T1BiK2c0czVXKzdVcldwYnJ0SUJoV2RPNmhiUmRmQVpnT3RT?=
- =?utf-8?B?N1lIV3k4MVhmRVVFd0JZcitoK1BIbEZJemJlcUZ1TWI0b1d4Tko4Zm1yWEJX?=
- =?utf-8?B?NGEwWlg2SHBla1BiMVZkNnBVWHV3bU1xL0ZpWWI2S1p5VjJJVVcwTzJBL2Y3?=
- =?utf-8?B?Q3lUM3hkenJyeVAyc0RpRFJkRThJZzZ6dFQ2OExEblJ6M0VLZzJMYVh5WEZl?=
- =?utf-8?B?SENPdjFGUDdQRyt2S2JSRU8xRlFwS1cyV2t1YW1PeXFJVldQak1aQUFFVjhh?=
- =?utf-8?B?YkxXY3dESWI3U3JFQXU0bWtoVXZtbVhIZXQ4N2I5cGFGeGl5WGxhK3MwN2to?=
- =?utf-8?B?bkFEQU1RdTBYbkNBMms3WEdyOUVLZGthMURSV1lEeXg3djVjWTljeGwwM2VC?=
- =?utf-8?B?cTBzN042YmU4VGJwTXpBc0xwY1lHUVovdTYrdFQ2eEpzTkk2a3g3dHNwaEtF?=
- =?utf-8?B?V0toYlZHY0dqWW5VTkFlb1hwQ2FnRHBkYTZFWDhaKzBRbXQzUFUyUmpaSjRw?=
- =?utf-8?B?WHYvaEpRVWRxZC9YcmdDbUhjeU5KODdEUzNzanB0eld1SkpFVkdMaTNqTVhK?=
- =?utf-8?B?ckN1TDFlMFZCMzlMTDQwa0lrdFRHRW5CYUhRbjVZREc3RUNGeWFBL2pwanU2?=
- =?utf-8?B?UUsyMmdYR01mME00KzhVdGwzSzNOTWxiSVVMMzhEeVIzejgzbG1pRTNZWUZ0?=
- =?utf-8?B?Ynd0TkErdFVyLzd0eEIvY0gzdUJqTnYrRWs1bnNqa3ErdWtiUGdqTE8xZDZk?=
- =?utf-8?B?K0J4QytvSjd5cEcrZWVyZFFod3hsSEg0WUFrKyt2eEdRc2U1RW1ROC9HTjFB?=
- =?utf-8?B?RE1od1hiTmprU1czV2N1d0JqSEZGZSthUEFrcXJxY3ErMC82WmtTNlZ2YzFt?=
- =?utf-8?B?eElmbXMyQkVGUjc1MFNNTm5jS3dhVWZ2Ly8yUWoxVGdRYzV3TUdxbkZtZ012?=
- =?utf-8?B?K0s3b0RDSzJ5U1pjTEwxR3BHT1NlMHhHdmpuY3U0NGJTaWRpTldFZlJ1YWxn?=
- =?utf-8?B?RlVQR0ZtMzJzMTlGNXoxVDd3czErQzRUZ1Bka1hpZUdPUFlwZStQbVY1SHky?=
- =?utf-8?B?cEhTZ002QWsxanpFMGpKNmVGMzY0RmVhV2hYOXU2UzdBMVAwZXZTQnorVGV5?=
- =?utf-8?B?dXJQVWprY0piOXFPR3ZscWg2VEFnQkUrR0t1OTh2M1U2S2I4REYyUmdTWER3?=
- =?utf-8?B?T0xQbnFjMWhWRU15dlhRZTl4RS9LajBzY0NXMTVhRHJtZ1QvZVg0M2JSdUMy?=
- =?utf-8?B?Nk1abTRIUTB1allCQ1Ryd3l0MXYwWnFSbkZUbkphUksvRWZMaHNZUT09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4c19a4c9-269b-4111-6e21-08da31c81955
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR1201MB0181.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 May 2022 14:27:51.8970
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8gRfUN6NRNnOGHMqeH6X1pAZwNcdZKxcrFxnz7DAbdxTnm0QjfzP4J/qYiq8R0PoYN5jxnc0DjgEsxKAm2bigA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5176
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: b7A_u8TZKvjYZSJ7J9YCRh604ZkcznG2
+X-Proofpoint-ORIG-GUID: YAmE5DXwUyqowAs1v1dDUPUS1sTxtdrj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-09_04,2022-05-09_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
+ lowpriorityscore=0 impostorscore=0 mlxlogscore=999 spamscore=0
+ suspectscore=0 adultscore=0 priorityscore=1501 bulkscore=0 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205090080
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+PING
 
-> To signify that the macros only support 8-bit xAPIC destination ID.
-> 
-> Suggested-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> ---
->   arch/x86/hyperv/hv_apic.c      | 2 +-
->   arch/x86/include/asm/apicdef.h | 4 ++--
->   arch/x86/kernel/apic/apic.c    | 2 +-
->   arch/x86/kernel/apic/ipi.c     | 2 +-
->   arch/x86/kvm/lapic.c           | 2 +-
->   arch/x86/kvm/svm/avic.c        | 4 ++--
->   6 files changed, 8 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/x86/hyperv/hv_apic.c b/arch/x86/hyperv/hv_apic.c
-> index db2d92fb44da..fb8b2c088681 100644
-> --- a/arch/x86/hyperv/hv_apic.c
-> +++ b/arch/x86/hyperv/hv_apic.c
-> @@ -46,7 +46,7 @@ static void hv_apic_icr_write(u32 low, u32 id)
->   {
->   	u64 reg_val;
->   
-> -	reg_val = SET_APIC_DEST_FIELD(id);
-> +	reg_val = SET_XAPIC_DEST_FIELD(id);
->   	reg_val = reg_val << 32;
->   	reg_val |= low;
->   
-> diff --git a/arch/x86/include/asm/apicdef.h b/arch/x86/include/asm/apicdef.h
-> index 5716f22f81ac..863c2cad5872 100644
-> --- a/arch/x86/include/asm/apicdef.h
-> +++ b/arch/x86/include/asm/apicdef.h
-> @@ -89,8 +89,8 @@
->   #define		APIC_DM_EXTINT		0x00700
->   #define		APIC_VECTOR_MASK	0x000FF
->   #define	APIC_ICR2	0x310
-> -#define		GET_APIC_DEST_FIELD(x)	(((x) >> 24) & 0xFF)
-> -#define		SET_APIC_DEST_FIELD(x)	((x) << 24)
-> +#define		GET_XAPIC_DEST_FIELD(x)	(((x) >> 24) & 0xFF)
-> +#define		SET_XAPIC_DEST_FIELD(x)	((x) << 24)
->   #define	APIC_LVTT	0x320
->   #define	APIC_LVTTHMR	0x330
->   #define	APIC_LVTPC	0x340
-> diff --git a/arch/x86/kernel/apic/apic.c b/arch/x86/kernel/apic/apic.c
-> index b70344bf6600..e6b754e43ed7 100644
-> --- a/arch/x86/kernel/apic/apic.c
-> +++ b/arch/x86/kernel/apic/apic.c
-> @@ -275,7 +275,7 @@ void native_apic_icr_write(u32 low, u32 id)
->   	unsigned long flags;
->   
->   	local_irq_save(flags);
-> -	apic_write(APIC_ICR2, SET_APIC_DEST_FIELD(id));
-> +	apic_write(APIC_ICR2, SET_XAPIC_DEST_FIELD(id));
->   	apic_write(APIC_ICR, low);
->   	local_irq_restore(flags);
->   }
-> diff --git a/arch/x86/kernel/apic/ipi.c b/arch/x86/kernel/apic/ipi.c
-> index d1fb874fbe64..2a6509e8c840 100644
-> --- a/arch/x86/kernel/apic/ipi.c
-> +++ b/arch/x86/kernel/apic/ipi.c
-> @@ -99,7 +99,7 @@ void native_send_call_func_ipi(const struct cpumask *mask)
->   
->   static inline int __prepare_ICR2(unsigned int mask)
->   {
-> -	return SET_APIC_DEST_FIELD(mask);
-> +	return SET_XAPIC_DEST_FIELD(mask);
->   }
->   
->   static inline void __xapic_wait_icr_idle(void)
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 137c3a2f5180..8b8c4a905976 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1326,7 +1326,7 @@ void kvm_apic_send_ipi(struct kvm_lapic *apic, u32 icr_low, u32 icr_high)
->   	if (apic_x2apic_mode(apic))
->   		irq.dest_id = icr_high;
->   	else
-> -		irq.dest_id = GET_APIC_DEST_FIELD(icr_high);
-> +		irq.dest_id = GET_XAPIC_DEST_FIELD(icr_high);
->   
->   	trace_kvm_apic_ipi(icr_low, irq.dest_id);
->   
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 54fe03714f8a..a8f514212b87 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -328,7 +328,7 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
->   	if (apic_x2apic_mode(vcpu->arch.apic))
->   		dest = icrh;
->   	else
-> -		dest = GET_APIC_DEST_FIELD(icrh);
-> +		dest = GET_XAPIC_DEST_FIELD(icrh);
->   
->   	/*
->   	 * Try matching the destination APIC ID with the vCPU.
-> @@ -364,7 +364,7 @@ static void avic_kick_target_vcpus(struct kvm *kvm, struct kvm_lapic *source,
->   	 */
->   	kvm_for_each_vcpu(i, vcpu, kvm) {
->   		if (kvm_apic_match_dest(vcpu, source, icrl & APIC_SHORT_MASK,
-> -					GET_APIC_DEST_FIELD(icrh),
-> +					GET_XAPIC_DEST_FIELD(icrh),
->   					icrl & APIC_DEST_MASK)) {
->   			vcpu->arch.apic->irr_pending = true;
->   			svm_complete_interrupt_delivery(vcpu,
-
-Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
+On 4/4/22 6:10 PM, Tony Krowiak wrote:
+> The current design for AP pass-through does not support making dynamic
+> changes to the AP matrix of a running guest resulting in a few
+> deficiencies this patch series is intended to mitigate:
+>
+> 1. Adapters, domains and control domains can not be added to or removed
+>      from a running guest. In order to modify a guest's AP configuration,
+>      the guest must be terminated; only then can AP resources be assigned
+>      to or unassigned from the guest's matrix mdev. The new AP
+>      configuration becomes available to the guest when it is subsequently
+>      restarted.
+>
+> 2. The AP bus's /sys/bus/ap/apmask and /sys/bus/ap/aqmask interfaces can
+>      be modified by a root user without any restrictions. A change to
+>      either mask can result in AP queue devices being unbound from the
+>      vfio_ap device driver and bound to a zcrypt device driver even if a
+>      guest is using the queues, thus giving the host access to the guest's
+>      private crypto data and vice versa.
+>
+> 3. The APQNs derived from the Cartesian product of the APIDs of the
+>      adapters and APQIs of the domains assigned to a matrix mdev must
+>      reference an AP queue device bound to the vfio_ap device driver. The
+>      AP architecture allows assignment of AP resources that are not
+>      available to the system, so this artificial restriction is not
+>      compliant with the architecture.
+>
+> 4. The AP configuration profile can be dynamically changed for the linux
+>      host after a KVM guest is started. For example, a new domain can be
+>      dynamically added to the configuration profile via the SE or an HMC
+>      connected to a DPM enabled lpar. Likewise, AP adapters can be
+>      dynamically configured (online state) and deconfigured (standby state)
+>      using the SE, an SCLP command or an HMC connected to a DPM enabled
+>      lpar. This can result in inadvertent sharing of AP queues between the
+>      guest and host.
+>
+> 5. A root user can manually unbind an AP queue device representing a
+>      queue in use by a KVM guest via the vfio_ap device driver's sysfs
+>      unbind attribute. In this case, the guest will be using a queue that
+>      is not bound to the driver which violates the device model.
+>
+> This patch series introduces the following changes to the current design
+> to alleviate the shortcomings described above as well as to implement
+> more of the AP architecture:
+>
+> 1. A root user will be prevented from making edits to the AP bus's
+>      /sys/bus/ap/apmask or /sys/bus/ap/aqmask if the change would transfer
+>      ownership of an APQN from the vfio_ap device driver to a zcrypt driver
+>      while the APQN is assigned to a matrix mdev.
+>
+> 2. Allow a root user to hot plug/unplug AP adapters, domains and control
+>      domains for a KVM guest using the matrix mdev via its sysfs
+>      assign/unassign attributes.
+>
+> 4. Allow assignment of an AP adapter or domain to a matrix mdev even if
+>      it results in assignment of an APQN that does not reference an AP
+>      queue device bound to the vfio_ap device driver, as long as the APQN
+>      is not reserved for use by the default zcrypt drivers (also known as
+>      over-provisioning of AP resources). Allowing over-provisioning of AP
+>      resources better models the architecture which does not preclude
+>      assigning AP resources that are not yet available in the system. Such
+>      APQNs, however, will not be assigned to the guest using the matrix
+>      mdev; only APQNs referencing AP queue devices bound to the vfio_ap
+>      device driver will actually get assigned to the guest.
+>
+> 5. Handle dynamic changes to the AP device model.
+>
+> 1. Rationale for changes to AP bus's apmask/aqmask interfaces:
+> ----------------------------------------------------------
+> Due to the extremely sensitive nature of cryptographic data, it is
+> imperative that great care be taken to ensure that such data is secured.
+> Allowing a root user, either inadvertently or maliciously, to configure
+> these masks such that a queue is shared between the host and a guest is
+> not only avoidable, it is advisable. It was suggested that this scenario
+> is better handled in user space with management software, but that does
+> not preclude a malicious administrator from using the sysfs interfaces
+> to gain access to a guest's crypto data. It was also suggested that this
+> scenario could be avoided by taking access to the adapter away from the
+> guest and zeroing out the queues prior to the vfio_ap driver releasing the
+> device; however, stealing an adapter in use from a guest as a by-product
+> of an operation is bad and will likely cause problems for the guest
+> unnecessarily. It was decided that the most effective solution with the
+> least number of negative side effects is to prevent the situation at the
+> source.
+>
+> 2. Rationale for hot plug/unplug using matrix mdev sysfs interfaces:
+> ----------------------------------------------------------------
+> Allowing a user to hot plug/unplug AP resources using the matrix mdev
+> sysfs interfaces circumvents the need to terminate the guest in order to
+> modify its AP configuration. Allowing dynamic configuration makes
+> reconfiguring a guest's AP matrix much less disruptive.
+>
+> 3. Rationale for allowing over-provisioning of AP resources:
+> -----------------------------------------------------------
+> Allowing assignment of AP resources to a matrix mdev and ultimately to a
+> guest better models the AP architecture. The architecture does not
+> preclude assignment of unavailable AP resources. If a queue subsequently
+> becomes available while a guest using the matrix mdev to which its APQN
+> is assigned, the guest will be given access to it. If an APQN
+> is dynamically unassigned from the underlying host system, it will
+> automatically become unavailable to the guest.
+>
+> Change log v18-v19:
+> ------------------
+> * Changed name of vfio_ap_mdev_hotplug_apcb (vfio_ap_ops.c) to
+>    vfio_ap_mdev_update_guest_apcb
+>    (Suggested by Jason: review of patch 10/18)
+>
+> * Replace call to kvm_arch_crypto_set_masks in vfio_ap_mdev_set_kvm with
+>    call to vfio_ap_mdev_update_guest_apcb
+>    (Suggested by Jason: review of patch 10/18)
+>
+> * Moved changes related to new locking scheme into its own set of
+>    patches (Suggested by Jason: review of patch 10/18)
+>
+> * Consolidated some of the lock acquisition code into macros called by the
+>    functions that update a KVM guest's APCB.
+>
+> * Refactored vfio_ap_mdev_unlink_adapter() and
+>    vfio_ap_unlink_apqn_fr_mdev() functions according to Jason's sample
+>    code. (Suggested by Jason: review of patch 12/18)
+>
+> * Require callers of the AP bus ap_apqn_in_matrix_owned_by_def_drv and
+>    ap_owned_by_def_drv - only called by the vfio_ap driver - to take the
+>    ap_perms_mutex lock. The adapter/domain assignment interfaces will take
+>    the ap_perms_mutex lock prior to other required locks to maintain a
+>    proper locking order and avoid circular locking dependencies when the
+>    vfio_ap device driver's in_use callback is invoked simultaneously with
+>    the adapter/domain assignment interfaces. (Suggested by Jason)
+>
+> * Refactored patch 15/18: handle config changed and scan complete
+>    notification (Suggested by Jason)
+>
+> * Refactored filtering of the matrix to reduce redundant processing of
+>    APQNs:
+>    - Inspect only the new APIDs or APQIs assigned to the matrix mdev or
+>      added to the host's AP configuration
+>    - Automatically removing APIDs or APQIs unassigned from the matrix mdev
+>      or removed from the host's AP configuration.
+>    (Suggested by Halil)
+>
+> Tony Krowiak (20):
+>    s390/vfio-ap: use new AP bus interface to search for queue devices
+>    s390/vfio-ap: move probe and remove callbacks to vfio_ap_ops.c
+>    s390/vfio-ap: manage link between queue struct and matrix mdev
+>    s390/vfio-ap: introduce shadow APCB
+>    s390/vfio-ap: refresh guest's APCB by filtering AP resources assigned
+>      to mdev
+>    s390/vfio-ap: allow assignment of unavailable AP queues to mdev device
+>    s390/vfio-ap: rename matrix_dev->lock mutex to matrix_dev->mdevs_lock
+>    s390/vfio-ap: introduce new mutex to control access to the KVM pointer
+>    s390/vfio-ap: use proper locking order when setting/clearing KVM
+>      pointer
+>    s390/vfio-ap: prepare for dynamic update of guest's APCB on
+>      assign/unassign
+>    s390/vfio-ap: prepare for dynamic update of guest's APCB on queue
+>      probe/remove
+>    s390/vfio-ap: allow hot plug/unplug of AP devices when
+>      assigned/unassigned
+>    s390/vfio-ap: hot plug/unplug of AP devices when probed/removed
+>    s390/vfio-ap: reset queues after adapter/domain unassignment
+>    s390/vfio-ap: implement in-use callback for vfio_ap driver
+>    s390/vfio-ap: sysfs attribute to display the guest's matrix
+>    s390/vfio-ap: handle config changed and scan complete notification
+>    s390/vfio-ap: update docs to include dynamic config support
+>    s390/Docs: new doc describing lock usage by the vfio_ap device driver
+>    MAINTAINERS: pick up all vfio_ap docs for VFIO AP maintainers
+>
+>   Documentation/s390/vfio-ap-locking.rst |  389 +++++++
+>   Documentation/s390/vfio-ap.rst         |  492 ++++++---
+>   MAINTAINERS                            |    6 +-
+>   drivers/s390/crypto/ap_bus.c           |   31 +-
+>   drivers/s390/crypto/vfio_ap_drv.c      |   69 +-
+>   drivers/s390/crypto/vfio_ap_ops.c      | 1321 ++++++++++++++++++------
+>   drivers/s390/crypto/vfio_ap_private.h  |   47 +-
+>   7 files changed, 1820 insertions(+), 535 deletions(-)
+>   create mode 100644 Documentation/s390/vfio-ap-locking.rst
+>
 
