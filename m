@@ -2,248 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E87651FF15
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 16:08:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E742651FF6E
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 16:25:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236952AbiEIOLl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 10:11:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33428 "EHLO
+        id S237178AbiEIO3I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 10:29:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236879AbiEIOL1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 10:11:27 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C756219F66;
-        Mon,  9 May 2022 07:07:33 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 249DOPEk014341;
-        Mon, 9 May 2022 14:07:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=KNV586YhxorVuL/oyck7CFaNNYyFVhABaxGh67qbDVg=;
- b=Pw52bvi/x7W0TFAZqvtdjJkG5vgmYgZftXxfBS8Fr++IoZ61HmzfvfQpec5VALf3UBuz
- P3KN9RAcuc8Og+aPtApjMjp5xmyAca+GCAHL+5IRScJpGD8iKDs4WwBf+gMC+vFgMu4m
- pJ4I+nzqX+bLHGoqQJh7MXsDgKidm3486+PGet4cBxYvwLtPgJa1BSrUPYdqYp+XgPa2
- uaj+9x80YHE4uAtf03J8IKwCCjs+HQv2jwJCu3sNrdwM1FlFEukf/kZGNK5xSG3WNFTk
- kLvHciWlziCdrqSoZ1d9XG/wINq9zQkjSYZv0jbFV0Yx9SgGENWVd41kJI7AHXrBVv1B Yg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fy3thgx3u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 May 2022 14:07:32 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 249DkR9T011447;
-        Mon, 9 May 2022 14:07:31 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fy3thgx39-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 May 2022 14:07:31 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 249E708I003315;
-        Mon, 9 May 2022 14:07:30 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04fra.de.ibm.com with ESMTP id 3fwgd8t1tj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 May 2022 14:07:30 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 249E7Qd229950348
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 9 May 2022 14:07:27 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DC72CA4060;
-        Mon,  9 May 2022 14:07:26 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 94C59A405C;
-        Mon,  9 May 2022 14:07:26 +0000 (GMT)
-Received: from [9.171.38.150] (unknown [9.171.38.150])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  9 May 2022 14:07:26 +0000 (GMT)
-Message-ID: <9635e559-5c2c-30f4-ab19-aef28ba24ac0@linux.ibm.com>
-Date:   Mon, 9 May 2022 16:07:26 +0200
+        with ESMTP id S237195AbiEIO3H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 10:29:07 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52CFF1EF0BD
+        for <kvm@vger.kernel.org>; Mon,  9 May 2022 07:25:09 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id n8so14004116plh.1
+        for <kvm@vger.kernel.org>; Mon, 09 May 2022 07:25:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=esr4tTyMGQYS9iZhHBLbSoF2JuPSqZeC4sOkMM2A0gU=;
+        b=GBkc//XR5ZlTYm1U7UCUDTWNnzNJiXHRObE2OWJ5/Rdc69/QwmOqNea0kRJAmxOvNp
+         jgHayw/G3C4FJrAaYWfynwfu9nc4sSK+/saNkAu7Hog80gKpX1XfcxxHg3jY1EdQRlOR
+         /MvavxkWBcMhZVzMNpFl9VyiPuro+Ws4gS55ewtaK9A9F1CKBe4DYQCpXRayiklUjYJD
+         Pv0yqmnP6w3i/CgYjvz2pJ+gI8TBEEcai+yUAKEUKtrNBOiptln2fHFBW5iu6NkkZPiF
+         qqMbKt/g8C0PDfmFGCIA7Z161X9xgo9fTfBNbShYCAdsYVh56UC/3TApmRrZnSvwai+/
+         gp0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=esr4tTyMGQYS9iZhHBLbSoF2JuPSqZeC4sOkMM2A0gU=;
+        b=XLUUTr51BfMg7r2xl4XT46lxNPXlDBl+q2Hm8rZwkZf1Srb/y2xlpM5CkE7nVGGB62
+         4JtWmbXx2X56ZBjoSUCNHYFr9EQJsyfvIaLCWRfqFkLyRkvsK41z6cxKJwd42xL+XZyw
+         2hv0VI+8Yn07X4j5cN/+0ICijAmhjb5VpvvxGbDhKyzjXkkwrE/icQjo/v5PAM5Dow0P
+         NPRUZ9MNkp1NNakwPJTbwzhmF0K6QgK+5mn9E53nsE9XtZZQkSsqHslWcJUb0Kyl7LIn
+         fkdSEIDsKcGK9Als9qAm09aL5Y9AsInA7wroGsZNfCHBZnyTiq6Rh0xyfM++ct6XELzg
+         yb2A==
+X-Gm-Message-State: AOAM530aGLASaU0g2nJcCguxA0q7B7hAz/SALCLogi1joELgigS2KR0O
+        Nsrr+NEahxlh/0g4PoR0TdBLYQ==
+X-Google-Smtp-Source: ABdhPJx5cRmEXIODkVbh8wLjurG7hSrmGJ2BAIYZLOKgk1e8+jWdAJUB/GrbHP0fCl9uB7fndMXQ8w==
+X-Received: by 2002:a17:90a:a385:b0:1cb:bfa8:ae01 with SMTP id x5-20020a17090aa38500b001cbbfa8ae01mr18227945pjp.116.1652106309105;
+        Mon, 09 May 2022 07:25:09 -0700 (PDT)
+Received: from [10.47.0.6] ([94.177.118.62])
+        by smtp.gmail.com with ESMTPSA id v21-20020a170902ca9500b0015e8d4eb2a8sm7071165pld.242.2022.05.09.07.25.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 May 2022 07:25:08 -0700 (PDT)
+Subject: Re: [RFC 00/18] vfio: Adopt iommufd
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>
+Cc:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        Yi Liu <yi.l.liu@intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "thuth@redhat.com" <thuth@redhat.com>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "chao.p.peng@intel.com" <chao.p.peng@intel.com>,
+        "yi.y.sun@intel.com" <yi.y.sun@intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>
+References: <20220414104710.28534-1-yi.l.liu@intel.com>
+ <4f920d463ebf414caa96419b625632d5@huawei.com>
+ <be8aa86a-25d1-d034-5e3b-6406aa7ff897@redhat.com>
+ <4ac4956cfe344326a805966535c1dc43@huawei.com>
+ <20220426103507.5693a0ca.alex.williamson@redhat.com>
+From:   Zhangfei Gao <zhangfei.gao@linaro.org>
+Message-ID: <66f4af24-b76e-9f9a-a86d-565c0453053d@linaro.org>
+Date:   Mon, 9 May 2022 22:24:58 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [kvm-unit-tests PATCH 3/3] s390x: Test effect of storage keys on
- some more instructions
+In-Reply-To: <20220426103507.5693a0ca.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20220505124656.1954092-1-scgl@linux.ibm.com>
- <20220505124656.1954092-4-scgl@linux.ibm.com>
- <20220506185227.165c7d86@p-imbrenda>
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-In-Reply-To: <20220506185227.165c7d86@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ajATeLVwAir5PQ--_fZUYwbvzTXwjfaK
-X-Proofpoint-ORIG-GUID: -u6wDI2bLbHO6_kkGsEE4DIwqeroX5wx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-09_03,2022-05-09_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- lowpriorityscore=0 bulkscore=0 phishscore=0 impostorscore=0 adultscore=0
- mlxlogscore=999 clxscore=1015 mlxscore=0 priorityscore=1501 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2205090077
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/6/22 18:52, Claudio Imbrenda wrote:
-> On Thu,  5 May 2022 14:46:56 +0200
-> Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
-> 
->> Test correctness of some instructions handled by user space instead of
->> KVM with regards to storage keys.
->> Test success and error conditions, including coverage of storage and
->> fetch protection override.
+Hi, Alex
+
+On 2022/4/27 上午12:35, Alex Williamson wrote:
+> On Tue, 26 Apr 2022 12:43:35 +0000
+> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+>
+>>> -----Original Message-----
+>>> From: Eric Auger [mailto:eric.auger@redhat.com]
+>>> Sent: 26 April 2022 12:45
+>>> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>; Yi
+>>> Liu <yi.l.liu@intel.com>; alex.williamson@redhat.com; cohuck@redhat.com;
+>>> qemu-devel@nongnu.org
+>>> Cc: david@gibson.dropbear.id.au; thuth@redhat.com; farman@linux.ibm.com;
+>>> mjrosato@linux.ibm.com; akrowiak@linux.ibm.com; pasic@linux.ibm.com;
+>>> jjherne@linux.ibm.com; jasowang@redhat.com; kvm@vger.kernel.org;
+>>> jgg@nvidia.com; nicolinc@nvidia.com; eric.auger.pro@gmail.com;
+>>> kevin.tian@intel.com; chao.p.peng@intel.com; yi.y.sun@intel.com;
+>>> peterx@redhat.com; Zhangfei Gao <zhangfei.gao@linaro.org>
+>>> Subject: Re: [RFC 00/18] vfio: Adopt iommufd
+>> [...]
+>>   
+>>>>>   
+>>> https://lore.kernel.org/kvm/0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com
+>>>>> /
+>>>>> [2] https://github.com/luxis1999/iommufd/tree/iommufd-v5.17-rc6
+>>>>> [3] https://github.com/luxis1999/qemu/tree/qemu-for-5.17-rc6-vm-rfcv1
+>>>> Hi,
+>>>>
+>>>> I had a go with the above branches on our ARM64 platform trying to
+>>> pass-through
+>>>> a VF dev, but Qemu reports an error as below,
+>>>>
+>>>> [    0.444728] hisi_sec2 0000:00:01.0: enabling device (0000 -> 0002)
+>>>> qemu-system-aarch64-iommufd: IOMMU_IOAS_MAP failed: Bad address
+>>>> qemu-system-aarch64-iommufd: vfio_container_dma_map(0xaaaafeb40ce0,
+>>> 0x8000000000, 0x10000, 0xffffb40ef000) = -14 (Bad address)
+>>>> I think this happens for the dev BAR addr range. I haven't debugged the
+>>> kernel
+>>>> yet to see where it actually reports that.
+>>> Does it prevent your assigned device from working? I have such errors
+>>> too but this is a known issue. This is due to the fact P2P DMA is not
+>>> supported yet.
+>>>    
+>> Yes, the basic tests all good so far. I am still not very clear how it works if
+>> the map() fails though. It looks like it fails in,
 >>
->> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
->> ---
->>  s390x/skey.c        | 277 ++++++++++++++++++++++++++++++++++++++++++++
->>  s390x/unittests.cfg |   1 +
->>  2 files changed, 278 insertions(+)
+>> iommufd_ioas_map()
+>>    iopt_map_user_pages()
+>>     iopt_map_pages()
+>>     ..
+>>       pfn_reader_pin_pages()
 >>
->> diff --git a/s390x/skey.c b/s390x/skey.c
->> index 56bf5f45..d50470a8 100644
->> --- a/s390x/skey.c
->> +++ b/s390x/skey.c
->> @@ -12,6 +12,7 @@
->>  #include <asm/asm-offsets.h>
->>  #include <asm/interrupt.h>
->>  #include <vmalloc.h>
->> +#include <css.h>
->>  #include <asm/page.h>
->>  #include <asm/facility.h>
->>  #include <asm/mem.h>
->> @@ -284,6 +285,114 @@ static void test_store_cpu_address(void)
->>  	report_prefix_pop();
->>  }
->>  
->> +/*
->> + * Perform CHANNEL SUBSYSTEM CALL (CHSC)  instruction while temporarily executing
->> + * with access key 1.
->> + */
->> +static unsigned int channel_subsystem_call_key_1(void *communication_block)
-> 
-> this function name is very long (maybe chsc_with_key_1 instead?)
+>> So does it mean it just works because the page is resident()?
+> No, it just means that you're not triggering any accesses that require
+> peer-to-peer DMA support.  Any sort of test where the device is only
+> performing DMA to guest RAM, which is by far the standard use case,
+> will work fine.  This also doesn't affect vCPU access to BAR space.
+> It's only a failure of the mappings of the BAR space into the IOAS,
+> which is only used when a device tries to directly target another
+> device's BAR space via DMA.  Thanks,
 
-It's because of consistency with set_prefix_key_1 where I spelled out the instruction
-name too. Granted the name of chsc is longer.
-When in doubt I go for what seems more readable/contains more information.
-> 
->> +{
->> +	uint32_t program_mask;
->> +
->> +	asm volatile (
->> +		"spka	0x10\n\t"
->> +		".insn	rre,0xb25f0000,%[communication_block],0\n\t"
->> +		"spka	0\n\t"
->> +		"ipm	%[program_mask]\n"
->> +		: [program_mask] "=d" (program_mask)
->> +		: [communication_block] "d" (communication_block)
->> +		: "memory"
->> +	);
->> +	return program_mask >> 28;
->> +}
->> +
->> +static void init_store_channel_subsystem_characteristics(uint16_t *communication_block)
-> 
-> same here (init_comm_block?)
+I also get this issue when trying adding prereg listenner
 
-Since we're only performing one kind of operation in this test, that is fine,
-but I'll add a comment saying how we initialize the communication block then.
-> 
->> +{
->> +	memset(communication_block, 0, PAGE_SIZE);
->> +	communication_block[0] = 0x10;
->> +	communication_block[1] = 0x10;
->> +	communication_block[9] = 0;
->> +}
->> +
->> +static void test_channel_subsystem_call(void)
->> +{
->> +	static const char request_name[] = "Store channel-subsystem-characteristics";
-> 
-> so this "request_name" is for when CHSC succeeds? why not just
-> "Success" then?
++    container->prereg_listener = vfio_memory_prereg_listener;
++    memory_listener_register(&container->prereg_listener,
++                            &address_space_memory);
 
-That's the operation being performed. So maybe I should change it to
-msg[] = "Performed store channel-subsystem-characteristics" ?
-> 
->> +	uint16_t *communication_block = (uint16_t *)&pagebuf;
-> 
-> long name (consider comm_block, or even cb)
-> 
->> +	unsigned int cc;
->> +
->> +	report_prefix_push("CHANNEL SUBSYSTEM CALL");
->> +
->> +	report_prefix_push("zero key");
->> +	init_store_channel_subsystem_characteristics(communication_block);
-> 
-> see what I mean when I say that the names are too long? ^
+host kernel log:
+iommufd_ioas_map 1 iova=8000000000, iova1=8000000000, 
+cmd->iova=8000000000, cmd->user_va=9c495000, cmd->length=10000
+iopt_alloc_area input area=859a2d00 iova=8000000000
+iopt_alloc_area area=859a2d00 iova=8000000000
+pin_user_pages_remote rc=-14
 
-Fits in 80 columns ;-)
-> 
->> +	set_storage_key(communication_block, 0x10, 0);
->> +	asm volatile (
->> +		".insn	rre,0xb25f0000,%[communication_block],0\n\t"
->> +		"ipm	%[cc]\n"
->> +		: [cc] "=d" (cc)
->> +		: [communication_block] "d" (communication_block)
->> +		: "memory"
->> +	);
->> +	cc = cc >> 28;
->> +	report(cc == 0 && communication_block[9], request_name);
->> +	report_prefix_pop();
->> +
->> +	report_prefix_push("matching key");
->> +	init_store_channel_subsystem_characteristics(communication_block);
->> +	set_storage_key(communication_block, 0x10, 0);
-> 
-> you just set the storage key in the previous test, and you did not set
-> it back to 0, why do you need to set it again?
+qemu log:
+vfio_prereg_listener_region_add
+iommufd_map iova=0x8000000000
+qemu-system-aarch64: IOMMU_IOAS_MAP failed: Bad address
+qemu-system-aarch64: vfio_dma_map(0xaaaafb96a930, 0x8000000000, 0x10000, 
+0xffff9c495000) = -14 (Bad address)
+qemu-system-aarch64: (null)
+double free or corruption (fasttop)
+Aborted (core dumped)
 
-It's not necessary, but I want the tests to be independent from each other,
-so you can remove/reorder/add ones without having to think.
-> 
->> +	cc = channel_subsystem_call_key_1(communication_block);
->> +	report(cc == 0 && communication_block[9], request_name);
->> +	report_prefix_pop();
->> +
+With hack of ignoring address 0x8000000000 in map and unmap, kernel can 
+boot.
 
-[...]
+Thanks
 
->> +
->> +	cc = stsch(test_device_sid, schib);
->> +	if (cc) {
->> +		report_fail("could not store SCHIB");
->> +		return;
->> +	}
->> +
->> +	report_prefix_push("zero key");
->> +	schib->pmcw.intparm = 100;
->> +	set_storage_key(schib, 0x28, 0);
->> +	cc = msch(test_device_sid, schib);
->> +	if (!cc) {
->> +		WRITE_ONCE(schib->pmcw.intparm, 0);
-> 
-> why are you using WRITE_ONCE here?
-
-It's a dead store because of the stsch below.
-That line is just for good measure so we know stsch really overwrote the value.
-> 
->> +		cc = stsch(test_device_sid, schib);
->> +		report(!cc && schib->pmcw.intparm == 100, "fetched from SCHIB");
-
-[...]
