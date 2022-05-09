@@ -2,99 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D1D245207A2
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 00:29:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C6605207A7
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 00:30:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231665AbiEIWdW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 18:33:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45330 "EHLO
+        id S231723AbiEIWeI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 18:34:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229875AbiEIWdU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 18:33:20 -0400
-Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7495526FA2E
-        for <kvm@vger.kernel.org>; Mon,  9 May 2022 15:29:25 -0700 (PDT)
-Received: by mail-vs1-xe36.google.com with SMTP id x8so15293084vsg.11
-        for <kvm@vger.kernel.org>; Mon, 09 May 2022 15:29:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:in-reply-to:references:from:date:message-id
-         :subject:to;
-        bh=VSSUIwdzgxQxnEkB7+u7pnweyPajIQMP3nQqWYs8VX0=;
-        b=oUhM6zs0oZht7dla3Q1UNCZ6yWM7pC2SIDervYNx2QasrUJQklXskeQFx5gtConc0i
-         o/fvzAHAKqsE4r6BBTqLjqaOKSMZ1cpZabelNgvNBIt1zKPp0pGpu96PSwgotkJKz8PF
-         zE1SLmdBF4b2w8EusJdYLSkYS9YHYr/a+9mtuVpuH1CgNP2omGCpf4jbwDAt7ZNiiBZ/
-         6vVn6u78ige61vX9RjE5FJ0ljOq3/mex7Yn+2SaxYQbz4YKuaSSnOczC0RbCsobGyY7p
-         bVAT742vKE3Wo6WNVSG6DGMqS5Z9S8tlh2GVtjXLcMVANlMpn4hk8ZKb2reCFNlq0g3c
-         POqQ==
+        with ESMTP id S231696AbiEIWeD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 18:34:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8EDC827E3EE
+        for <kvm@vger.kernel.org>; Mon,  9 May 2022 15:30:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652135406;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HZA6VNXAM5i4PcwO3aAoa6h2tMmE/5TqVCC2BscCJgw=;
+        b=igAGOjWq7e/eZKmQi1k9/H/cZu96i52zK2bAdWDbWwO8K3k8/qua7B3vQxoiovYTWm+LfF
+        bCyaOowzZ+6NZVCwl7YvDGwcRQkiXD3oj+Sh8TYeM+yILl7wb9xaQd12SYKdH1xanPk90v
+        mVmdFxKWau8tRoioPwScpvg1kcyPb4Y=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-574-a5SJMn9JNN-xRVSSgQXN2A-1; Mon, 09 May 2022 18:30:05 -0400
+X-MC-Unique: a5SJMn9JNN-xRVSSgQXN2A-1
+Received: by mail-il1-f197.google.com with SMTP id q6-20020a056e0215c600b002c2c4091914so8392863ilu.14
+        for <kvm@vger.kernel.org>; Mon, 09 May 2022 15:30:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:in-reply-to:references
-         :from:date:message-id:subject:to;
-        bh=VSSUIwdzgxQxnEkB7+u7pnweyPajIQMP3nQqWYs8VX0=;
-        b=0rFSOcJWnghciNkFeiUkozzmFf/v6SQ8Mddw59jmHRfAylHYm/mTdyndkv8mcR0c7u
-         SC9g4pVUlZHhgUe+a77czrw65AFmbz8IxRWBkECRIuZSQ7ryntqDcZWKz58/TZu7l5q/
-         QRTyOZ140BtpFbJ1rDzRV9xu0XY2+XGsYJVOUlimP5chb841gRm+ebaTyVnPFJYyCXHe
-         UAvMZ2JiMeaYaJUQQjpHlBK0emMnF6Yh3J8PWIv4Sm3B18P3eHegw1od93IJMYfWihNa
-         NUZpbTfpUzpvsF1QXwPa9I2eWdSvdjZ/ruXTxIYFMxstChjK+ZaTrwTAF1mFhdWtV4zm
-         tPyg==
-X-Gm-Message-State: AOAM532HaBVa7Ib0FsagLYMvgEk5CSnEvc7rlcQkDoHe30CUw7EHWk0x
-        g6s8cSXsGYSgj9baDYhyznYCDtkEpNEn7vgIxjw=
-X-Google-Smtp-Source: ABdhPJzuKUqZjdlzL6MwjzrsjJP0n/LD0gmTSFesDWJGlp/3HcjxhcHboW5vMV6rTrvX/nBsvtOF6OKthA/GP2qDZeY=
-X-Received: by 2002:a05:6102:c13:b0:32d:518f:feaf with SMTP id
- x19-20020a0561020c1300b0032d518ffeafmr10161206vss.84.1652135364199; Mon, 09
- May 2022 15:29:24 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=HZA6VNXAM5i4PcwO3aAoa6h2tMmE/5TqVCC2BscCJgw=;
+        b=uPwG+zsf3mhPjnM1hJnLxyDmga/BBTErd1axao/bvuwwgJjWzPd+enL445i3wh2er5
+         Y1fn3EnOpXx0tCFHxBpdb2ASNqRJLrQkR3k1rTo1kI/zZpF0PaX6+9bqaC0/BbJeLjUV
+         T3RYI/0miGQo5++/Hf6QqVHoka/y3WvD4TA0MM7OCbg3tYUJjNRTbGw/1sT3kQBrfnFu
+         QB0pPHiaHu9qDnxDAZCrQse6xjNsTBcDsZqxsnM3mSaWJf54qOAAWovR9/xzJS2M5aE7
+         pHWy6iPAnEiPtZYm6xMU8u3+HMfSr1M5i46/7YlHXesTdJNGJbRWb01xwWlzBR9uWyq+
+         MaLQ==
+X-Gm-Message-State: AOAM5325zX3+KxCq7MIJcpB7yXmq1BJdQabx5ZBOjdrcXCA4v7Ayo8CL
+        l9SZxIvc4A6SyC/uuMn4EESFIdxvps3gtbSNCWVE1aHTRfiF26aR8+v1L0k36fqzumeI/M0JT+X
+        4cA/h7l7ivQiA
+X-Received: by 2002:a05:6e02:1585:b0:2c2:5b2c:e3e5 with SMTP id m5-20020a056e02158500b002c25b2ce3e5mr8000882ilu.76.1652135404644;
+        Mon, 09 May 2022 15:30:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw/xDm0oeizzFs9OsjgHv5iN7DYQPBrPufu9Ukf8kxzdUFWsryqO/OP8BvcOcM21ir0kbx5eg==
+X-Received: by 2002:a05:6e02:1585:b0:2c2:5b2c:e3e5 with SMTP id m5-20020a056e02158500b002c25b2ce3e5mr8000867ilu.76.1652135404331;
+        Mon, 09 May 2022 15:30:04 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id q6-20020a056e02096600b002cde6e352ccsm3489431ilt.22.2022.05.09.15.30.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 May 2022 15:30:04 -0700 (PDT)
+Date:   Mon, 9 May 2022 16:30:02 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Abhishek Sahu <abhsahu@nvidia.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: Re: [PATCH v3 6/8] vfio: Invoke runtime PM API for IOCTL request
+Message-ID: <20220509163002.57fe44fa.alex.williamson@redhat.com>
+In-Reply-To: <0ba3d469-58af-64d3-514c-6d33c483f8fb@nvidia.com>
+References: <20220425092615.10133-1-abhsahu@nvidia.com>
+        <20220425092615.10133-7-abhsahu@nvidia.com>
+        <20220504134257.1ecb245b.alex.williamson@redhat.com>
+        <0ba3d469-58af-64d3-514c-6d33c483f8fb@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Received: by 2002:a05:612c:221e:b0:2a9:aa30:c488 with HTTP; Mon, 9 May 2022
- 15:29:23 -0700 (PDT)
-Reply-To: warren001buffett@gmail.com
-In-Reply-To: <CAGcnDd3WYU+d6hSM8_NtEcyVwVbg+X6rF8VQdbcqq5MgUOj74w@mail.gmail.com>
-References: <CAGcnDd28kPHzw1L4gL4a0Fe2Q854ALK6NHQYw-=htSkBmDPBTA@mail.gmail.com>
- <CAGcnDd1fkiaxCzKsGYj21JnoTVxWvFDBD7dEAneDp3FwV1akKA@mail.gmail.com>
- <CAGcnDd1KwaVY91kgvREMANyzhtVK+_oU=s1qYx7rKLWzb1GZMw@mail.gmail.com> <CAGcnDd3WYU+d6hSM8_NtEcyVwVbg+X6rF8VQdbcqq5MgUOj74w@mail.gmail.com>
-From:   Warren Buffett <koamididiera@gmail.com>
-Date:   Mon, 9 May 2022 22:29:23 +0000
-Message-ID: <CAGcnDd1KtcZwhvvmwT42yoAki7JfX+zmXVekC8T5Ay0mWYibcA@mail.gmail.com>
-Subject: Fwd: Mr. Warren Buffett from America USA
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: Yes, score=5.1 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,FREEMAIL_REPLYTO,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        UNDISC_FREEM autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2607:f8b0:4864:20:0:0:0:e36 listed in]
-        [list.dnswl.org]
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.5000]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [koamididiera[at]gmail.com]
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
-        *  3.5 UNDISC_FREEM Undisclosed recipients + freemail reply-to
-        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
-        *      different freemails
-X-Spam-Level: *****
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-My name is Warren Buffett, an American businessman and investor I have
-something important to discuss with you.
+On Thu, 5 May 2022 15:10:43 +0530
+Abhishek Sahu <abhsahu@nvidia.com> wrote:
 
-Mr. Warren Buffett
-warren001buffett@gmail.com
-Chief Executive Officer: Berkshire Hathaway
-aphy/Warren-Edward-Buffett
+> On 5/5/2022 1:12 AM, Alex Williamson wrote:
+> > On Mon, 25 Apr 2022 14:56:13 +0530
+> > Abhishek Sahu <abhsahu@nvidia.com> wrote:
+> >   
+> >> The vfio/pci driver will have runtime power management support where the
+> >> user can put the device low power state and then PCI devices can go into
+> >> the D3cold state. If the device is in low power state and user issues any
+> >> IOCTL, then the device should be moved out of low power state first. Once
+> >> the IOCTL is serviced, then it can go into low power state again. The
+> >> runtime PM framework manages this with help of usage count. One option
+> >> was to add the runtime PM related API's inside vfio/pci driver but some
+> >> IOCTL (like VFIO_DEVICE_FEATURE) can follow a different path and more
+> >> IOCTL can be added in the future. Also, the runtime PM will be
+> >> added for vfio/pci based drivers variant currently but the other vfio
+> >> based drivers can use the same in the future. So, this patch adds the
+> >> runtime calls runtime related API in the top level IOCTL function itself.
+> >>
+> >> For the vfio drivers which do not have runtime power management support
+> >> currently, the runtime PM API's won't be invoked. Only for vfio/pci
+> >> based drivers currently, the runtime PM API's will be invoked to increment
+> >> and decrement the usage count. Taking this usage count incremented while
+> >> servicing IOCTL will make sure that user won't put the device into low
+> >> power state when any other IOCTL is being serviced in parallel.
+> >>
+> >> Signed-off-by: Abhishek Sahu <abhsahu@nvidia.com>
+> >> ---
+> >>  drivers/vfio/vfio.c | 44 +++++++++++++++++++++++++++++++++++++++++---
+> >>  1 file changed, 41 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> >> index a4555014bd1e..4e65a127744e 100644
+> >> --- a/drivers/vfio/vfio.c
+> >> +++ b/drivers/vfio/vfio.c
+> >> @@ -32,6 +32,7 @@
+> >>  #include <linux/vfio.h>
+> >>  #include <linux/wait.h>
+> >>  #include <linux/sched/signal.h>
+> >> +#include <linux/pm_runtime.h>
+> >>  #include "vfio.h"
+> >>  
+> >>  #define DRIVER_VERSION	"0.3"
+> >> @@ -1536,6 +1537,30 @@ static const struct file_operations vfio_group_fops = {
+> >>  	.release	= vfio_group_fops_release,
+> >>  };
+> >>  
+> >> +/*
+> >> + * Wrapper around pm_runtime_resume_and_get().
+> >> + * Return 0, if driver power management callbacks are not present i.e. the driver is not  
+> > 
+> > Mind the gratuitous long comment line here.
+> >   
+>  
+>  Thanks Alex.
+>  
+>  That was a miss. I will fix this.
+>  
+> >> + * using runtime power management.
+> >> + * Return 1 upon success, otherwise -errno  
+> > 
+> > Changing semantics vs the thing we're wrapping, why not provide a
+> > wrapper for the `put` as well to avoid?  The only cases where we return
+> > zero are just as easy to detect on the other side.
+> >   
+> 
+>  Yes. Using wrapper function for put is better option.
+>  I will make the changes.
+> 
+> >> + */
+> >> +static inline int vfio_device_pm_runtime_get(struct device *dev)  
+> > 
+> > Given some of Jason's recent series, this should probably just accept a
+> > vfio_device.
+> >   
+> 
+>  Sorry. I didn't get this part.
+> 
+>  Do I need to change it to
+> 
+>  static inline int vfio_device_pm_runtime_get(struct vfio_device *device)
+>  {
+>     struct device *dev = device->dev;
+>     ...
+>  }
+
+Yes.
+
+> >> +{
+> >> +#ifdef CONFIG_PM
+> >> +	int ret;
+> >> +
+> >> +	if (!dev->driver || !dev->driver->pm)
+> >> +		return 0;
+
+I'm also wondering how we could ever get here with dev->driver == NULL.
+If that were actually possible, the above would at best be racy.  It
+also really seems like there ought to be a better test than the
+driver->pm pointer to check if runtime pm is enabled, but I haven't
+spotted it yet.
+
+> >> +
+> >> +	ret = pm_runtime_resume_and_get(dev);
+> >> +	if (ret < 0)
+> >> +		return ret;
+> >> +
+> >> +	return 1;
+> >> +#else
+> >> +	return 0;
+> >> +#endif
+> >> +}
+> >> +
+> >>  /*
+> >>   * VFIO Device fd
+> >>   */
+> >> @@ -1845,15 +1870,28 @@ static long vfio_device_fops_unl_ioctl(struct file *filep,
+> >>  				       unsigned int cmd, unsigned long arg)
+> >>  {
+> >>  	struct vfio_device *device = filep->private_data;
+> >> +	int pm_ret, ret = 0;
+> >> +
+> >> +	pm_ret = vfio_device_pm_runtime_get(device->dev);
+> >> +	if (pm_ret < 0)
+> >> +		return pm_ret;  
+> > 
+> > I wonder if we might simply want to mask pm errors behind -EIO, maybe
+> > with a rate limited dev_info().  My concern would be that we might mask
+> > errnos that userspace has come to expect for certain ioctls.  Thanks,
+> > 
+> > Alex
+> >   
+> 
+>   I need to do something like following. Correct ?
+> 
+>   ret = vfio_device_pm_runtime_get(device);
+>   if (ret < 0) {
+>      dev_info_ratelimited(device->dev, "vfio: runtime resume failed %d\n", ret);
+>      return -EIO;
+>   }
+
+Yeah, though I'd welcome other thoughts here.  I don't necessarily like
+the idea of squashing the errno, but at the same time, if
+pm_runtime_resume_and_get() returns -EINVAL on user ioctl, that's not
+really describing an invalid parameter relative to the ioctl itself.
+Thanks,
+
+Alex
+
