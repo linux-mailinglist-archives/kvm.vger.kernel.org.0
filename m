@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F12A52065E
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 23:04:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 82360520691
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 23:18:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229589AbiEIVIm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 17:08:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51562 "EHLO
+        id S229799AbiEIVWt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 17:22:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229968AbiEIVIh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 17:08:37 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 960CA2685D1
-        for <kvm@vger.kernel.org>; Mon,  9 May 2022 14:04:35 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id v4so18531799ljd.10
-        for <kvm@vger.kernel.org>; Mon, 09 May 2022 14:04:35 -0700 (PDT)
+        with ESMTP id S229603AbiEIVWr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 17:22:47 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EFDF27E3FE
+        for <kvm@vger.kernel.org>; Mon,  9 May 2022 14:18:48 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id h29so26039054lfj.2
+        for <kvm@vger.kernel.org>; Mon, 09 May 2022 14:18:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=c5LtGywQnrOXKM23KEYCQ2YGVv1HopC1il4VU9eUgxE=;
-        b=sV2YUesPkqRi/0p/HKaHURPtcySE3DJDHUAAMBQSxIzugMHDsHPkIq11Za+WFAu9bG
-         UFNluQRx+kZVfU1Vtrib+AkxMsIkIny3t4PMACdMOyXRiuQ3BV7xjp4iiFZLffs6uqze
-         Buf1chdttyPGbxT1R1vPzc8JbwWHscDRqxY6beEcpNXYfRjzEDZQgwrYjE1nWuW4kT3S
-         r7UDQP39oaM8dHixquIHqqJHb12gzWedDgD4NEt0oYk/gusriZ1/hMFoSsXvXhS3LLrE
-         I++TRCKQ2rchxMyGjDtWbFmQK9zTpViB+qmuOZzTe79sfGNcC5vqhazohhKu7W6GIYxU
-         eiIg==
+        bh=qchi2ovSlwKNdfNz60pRFkmAP/3ewU4lfp3vcRbEGlU=;
+        b=eGkU5zTgJUYc8R/bZEvWar9PD0laWJPybiJLqeTwEWYl2flllTcBFbyTo8+oUobAU0
+         tWqbrVzupUWUPQ/oEqKFrKkzApM/460q/sBtENEj+svMZC8kN83hBsoV4yIY3D0n+zEG
+         cZzlHhUBiUjcWD7ssehHMrg3q1WJTlyGGu0bJLZU2+398Xu4LmELv4nT0n4ltD2TkSar
+         l/2zfb86pt9JP3jHi4970ZSAqcirzMd5Dal58pESMXboHZQoPjOrYjod979tp2ffWSY9
+         0xKViGZqjX/ynl44ibcdsbVQhptbZe/DypzKucGQve8F4kKGLohzTEJey8jUFc95+8x2
+         iUSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=c5LtGywQnrOXKM23KEYCQ2YGVv1HopC1il4VU9eUgxE=;
-        b=B0ZwNZxsL048xGmtfcBif3aGSd3Do0W249gr2SvLY/tNMLiERLdjMlWQYBEEE6gVDN
-         p9l/A0KFGDfe4WVRKEHJyiAFdfSfgaMVuT4o9nTlvYvqaEmHkDeVLISdSKj05UJJzz2W
-         a39naH+ZxYR1Ah2cqJXwpXp/8PjXIisnJNpWK2W2WwSGnye6WCRi8vsNEVGEAwm6S5HU
-         69VX0Df+4Idr64dPK/X92IfE325DZCPeRPYA7x4wUCstoAzD1+rsPsO1W5WKORrc8VmJ
-         fEMr9HpEAi55H1nnB8kn/25n70E+4pKGuopqBsrim5vfrqAqTSY3OJjhnFGAesqKJ7Cj
-         qsUg==
-X-Gm-Message-State: AOAM5318pGgseCJMc/q46tYVn8KHodhsjRtgZWsXBa+Dcu6e5IUXxo3x
-        7+5AruTfW7TTRI7JpvG6ezQJjSVY9n9zewjvV0MJLQ==
-X-Google-Smtp-Source: ABdhPJxAE3oSM612W5GV7m6rV0MnBAiT424gFGbU3VxZpyNw2tWnKhf1N6nGVWDl2btu9ErypG2EOm1F3IUMYGBbQWk=
-X-Received: by 2002:a2e:9e54:0:b0:250:d6c8:c2a6 with SMTP id
- g20-20020a2e9e54000000b00250d6c8c2a6mr765147ljk.16.1652130273338; Mon, 09 May
- 2022 14:04:33 -0700 (PDT)
+        bh=qchi2ovSlwKNdfNz60pRFkmAP/3ewU4lfp3vcRbEGlU=;
+        b=bhmFQrXU75bGCg8JHGJuP4HbnTlbZ2Q0dSWClylIBFhpfGyKInHTYy3GoLSBfRZPDy
+         Eqpy21/4kzY+M1irCakmyrfsdc0EFQo8VxPtPl1PH8wUmk+XXUGM55YHw9FjvavBx8/k
+         8F2qi9m9NjiIOZieUqtPL1Ec00QRgTwZ75RtNpcTPrF5Xv1jue5ehRg70q4+SJv3+7fE
+         T2gXvTdfY6ZE1aIjPaq+zSj8EhvD3FHd2U7jgrE43mo5ojtizYKgLMaQi2KluNWGTHBE
+         XRntzzmz6BjBWOLshHblQ9cZ7HE0iGJ4uehlZeUM9b4cpYMOwIi+7lhMAMWvB1IISxqw
+         VBmw==
+X-Gm-Message-State: AOAM533jNbXMBDZuQbAZfflfROT5kxSMy5EnWmVYjW3ZbO0xEGeHEzFp
+        gbXX6Rg53K7nubF1zKC7ItFdEFZSR75AamGVN09yuUSDu8k=
+X-Google-Smtp-Source: ABdhPJyvz4bFX6ByxPxugEVcuzVcqYiTBrRxjECVFhA951epTBmdMiUFM07b6t6SQS/Z5WmLCW6hDwUciKFtbEvVsLk=
+X-Received: by 2002:ac2:4c54:0:b0:473:a414:1768 with SMTP id
+ o20-20020ac24c54000000b00473a4141768mr13933301lfk.537.1652131126435; Mon, 09
+ May 2022 14:18:46 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220422210546.458943-1-dmatlack@google.com> <20220422210546.458943-4-dmatlack@google.com>
- <75fbbcb6-d9bb-3d30-0bf4-fbf925517d09@gmail.com>
-In-Reply-To: <75fbbcb6-d9bb-3d30-0bf4-fbf925517d09@gmail.com>
+References: <20220422210546.458943-1-dmatlack@google.com> <20220422210546.458943-8-dmatlack@google.com>
+ <YnRU+zN9T8Zf91Ei@google.com>
+In-Reply-To: <YnRU+zN9T8Zf91Ei@google.com>
 From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 9 May 2022 14:04:06 -0700
-Message-ID: <CALzav=dmseUw6khErkiSV7T5K88QvaRvWvBpvrb6VNOQTE3bQQ@mail.gmail.com>
-Subject: Re: [PATCH v4 03/20] KVM: x86/mmu: Derive shadow MMU page role from parent
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Date:   Mon, 9 May 2022 14:18:20 -0700
+Message-ID: <CALzav=cU8dsXjZy2eUdQ-eA7BBsXU6PaPDepNmmF=sp=Z0xJ4A@mail.gmail.com>
+Subject: Re: [PATCH v4 07/20] KVM: x86/mmu: Move guest PT write-protection to account_shadowed()
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -60,7 +60,6 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Paul Walmsley <paul.walmsley@sifive.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
         Albert Ou <aou@eecs.berkeley.edu>,
-        Sean Christopherson <seanjc@google.com>,
         Andrew Jones <drjones@redhat.com>,
         Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
         "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
@@ -84,160 +83,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 7, 2022 at 1:28 AM Lai Jiangshan <jiangshanlai@gmail.com> wrote:
+On Thu, May 5, 2022 at 3:51 PM Sean Christopherson <seanjc@google.com> wrote:
 >
->
->
-> On 2022/4/23 05:05, David Matlack wrote:
-> > Instead of computing the shadow page role from scratch for every new
-> > page, derive most of the information from the parent shadow page.  This
-> > avoids redundant calculations and reduces the number of parameters to
-> > kvm_mmu_get_page().
+> On Fri, Apr 22, 2022, David Matlack wrote:
+> > Move the code that write-protects newly-shadowed guest page tables into
+> > account_shadowed(). This avoids a extra gfn-to-memslot lookup and is a
+> > more logical place for this code to live. But most importantly, this
+> > reduces kvm_mmu_alloc_shadow_page()'s reliance on having a struct
+> > kvm_vcpu pointer, which will be necessary when creating new shadow pages
+> > during VM ioctls for eager page splitting.
 > >
-> > Preemptively split out the role calculation to a separate function for
-> > use in a following commit.
+> > Note, it is safe to drop the role.level == PG_LEVEL_4K check since
+> > account_shadowed() returns early if role.level > PG_LEVEL_4K.
 > >
 > > No functional change intended.
 > >
-> > Reviewed-by: Peter Xu <peterx@redhat.com>
 > > Signed-off-by: David Matlack <dmatlack@google.com>
 > > ---
-> >   arch/x86/kvm/mmu/mmu.c         | 96 +++++++++++++++++++++++-----------
-> >   arch/x86/kvm/mmu/paging_tmpl.h |  9 ++--
-> >   2 files changed, 71 insertions(+), 34 deletions(-)
+>
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
+>
+> >  arch/x86/kvm/mmu/mmu.c | 9 +++++----
+> >  1 file changed, 5 insertions(+), 4 deletions(-)
 > >
 > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index dc20eccd6a77..4249a771818b 100644
+> > index fa7846760887..4f894db88bbf 100644
 > > --- a/arch/x86/kvm/mmu/mmu.c
 > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -2021,31 +2021,15 @@ static void clear_sp_write_flooding_count(u64 *spte)
-> >       __clear_sp_write_flooding_count(sptep_to_sp(spte));
-> >   }
+> > @@ -807,6 +807,9 @@ static void account_shadowed(struct kvm *kvm, struct kvm_mmu_page *sp)
+> >                                                   KVM_PAGE_TRACK_WRITE);
 > >
-> > -static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
-> > -                                          gfn_t gfn,
-> > -                                          gva_t gaddr,
-> > -                                          unsigned level,
-> > -                                          bool direct,
-> > -                                          unsigned int access)
-> > +static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu, gfn_t gfn,
-> > +                                          union kvm_mmu_page_role role)
-> >   {
-> > -     union kvm_mmu_page_role role;
-> >       struct hlist_head *sp_list;
-> > -     unsigned quadrant;
-> >       struct kvm_mmu_page *sp;
-> >       int ret;
-> >       int collisions = 0;
-> >       LIST_HEAD(invalid_list);
+> >       kvm_mmu_gfn_disallow_lpage(slot, gfn);
+> > +
+> > +     if (kvm_mmu_slot_gfn_write_protect(kvm, slot, gfn, PG_LEVEL_4K))
+> > +             kvm_flush_remote_tlbs_with_address(kvm, gfn, 1);
+> >  }
 > >
-> > -     role = vcpu->arch.mmu->root_role;
-> > -     role.level = level;
-> > -     role.direct = direct;
-> > -     role.access = access;
-> > -     if (role.has_4_byte_gpte) {
-> > -             quadrant = gaddr >> (PAGE_SHIFT + (PT64_PT_BITS * level));
-> > -             quadrant &= (1 << ((PT32_PT_BITS - PT64_PT_BITS) * level)) - 1;
-> > -             role.quadrant = quadrant;
-> > -     }
->
->
-> I don't think replacing it with kvm_mmu_child_role() can reduce any calculations.
->
-> role.level, role.direct, role.access and role.quadrant still need to be
-> calculated.  And the old code is still in mmu_alloc_root().
-
-You are correct. Instead of saying "less calculations" I should have
-said "eliminates the dependency on vcpu->arch.mmu->root_role".
-
->
-> I think kvm_mmu_get_shadow_page() can keep the those parameters and
-> kvm_mmu_child_role() is only introduced for nested_mmu_get_sp_for_split().
->
-> Both kvm_mmu_get_shadow_page() and nested_mmu_get_sp_for_split() call
-> __kvm_mmu_get_shadow_page() which uses role as a parameter.
-
-I agree this would work, but I think the end result would be more
-difficult to read.
-
-The way I've implemented it there are two ways the SP roles are calculated:
-
-1. For root SPs: Derive the role from vCPU root_role and caller-provided inputs.
-2. For child SPs: Derive the role from parent SP and caller-provided inputs.
-
-Your proposal would still have two ways to calculate the SP role, but
-split along a different dimension:
-
-1. For vCPUs creating SPs: Derive the role from vCPU root_role and
-caller-provided inputs.
-2. For Eager Page Splitting creating SPs: Derive the role from parent
-SP and caller-provided inputs.
-
-With your proposal, it is less obvious that eager page splitting is
-going to end up with the correct role. Whereas if we use the same
-calculation for all child SPs, it is immediately obvious.
-
->
->
->
-> > -
-> >       sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
-> >       for_each_valid_sp(vcpu->kvm, sp, sp_list) {
-> >               if (sp->gfn != gfn) {
-> > @@ -2063,7 +2047,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
-> >                        * Unsync pages must not be left as is, because the new
-> >                        * upper-level page will be write-protected.
-> >                        */
-> > -                     if (level > PG_LEVEL_4K && sp->unsync)
-> > +                     if (role.level > PG_LEVEL_4K && sp->unsync)
-> >                               kvm_mmu_prepare_zap_page(vcpu->kvm, sp,
-> >                                                        &invalid_list);
-> >                       continue;
-> > @@ -2104,14 +2088,14 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
-> >
-> >       ++vcpu->kvm->stat.mmu_cache_miss;
-> >
-> > -     sp = kvm_mmu_alloc_page(vcpu, direct);
-> > +     sp = kvm_mmu_alloc_page(vcpu, role.direct);
-> >
+> >  void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+> > @@ -2100,11 +2103,9 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm_vcpu *vcpu,
 > >       sp->gfn = gfn;
 > >       sp->role = role;
 > >       hlist_add_head(&sp->hash_link, sp_list);
-> > -     if (!direct) {
-> > +     if (!role.direct) {
+> > -     if (!role.direct) {
+> > +
+> > +     if (!role.direct)
 > >               account_shadowed(vcpu->kvm, sp);
-> > -             if (level == PG_LEVEL_4K && kvm_vcpu_write_protect_gfn(vcpu, gfn))
-> > +             if (role.level == PG_LEVEL_4K && kvm_vcpu_write_protect_gfn(vcpu, gfn))
-> >                       kvm_flush_remote_tlbs_with_address(vcpu->kvm, gfn, 1);
-> >       }
-> >       trace_kvm_mmu_get_page(sp, true);
-> > @@ -2123,6 +2107,51 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
-> >       return sp;
-> >   }
-> >
-> > +static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct, u32 access)
-> > +{
-> > +     struct kvm_mmu_page *parent_sp = sptep_to_sp(sptep);
-> > +     union kvm_mmu_page_role role;
-> > +
-> > +     role = parent_sp->role;
-> > +     role.level--;
-> > +     role.access = access;
-> > +     role.direct = direct;
-> > +
-> > +     /*
-> > +      * If the guest has 4-byte PTEs then that means it's using 32-bit,
-> > +      * 2-level, non-PAE paging. KVM shadows such guests using 4 PAE page
-> > +      * directories, each mapping 1/4 of the guest's linear address space
-> > +      * (1GiB). The shadow pages for those 4 page directories are
-> > +      * pre-allocated and assigned a separate quadrant in their role.
+> > -             if (role.level == PG_LEVEL_4K && kvm_vcpu_write_protect_gfn(vcpu, gfn))
 >
+> Huh.  Two thoughts.
 >
-> It is not going to be true in patchset:
-> [PATCH V2 0/7] KVM: X86/MMU: Use one-off special shadow page for special roots
+> 1. Can you add a patch to drop kvm_vcpu_write_protect_gfn() entirely, i.e. convert
+>    mmu_sync_children() to use kvm_mmu_slot_gfn_write_protect?  It's largely a moot
+>    point, but only because mmu_sync_children() only operates on shadow pages that
+>    are relevant to the current non-SMM/SMM role.  And _that_ holds true only because
+>    KVM does kvm_mmu_reset_context() and drops roots for the vCPU on SMM transitions.
 >
-> https://lore.kernel.org/lkml/20220503150735.32723-1-jiangshanlai@gmail.com/
+>    That'd be a good oppurtunity to move this pair into a helper:
 >
-> The shadow pages for those 4 page directories are also allocated on demand.
+>         slots = kvm_memslots_for_spte_role(kvm, sp->role);
+>         slot = __gfn_to_memslot(slots, gfn);
 
-Ack. I can even just drop this sentence in v5, it's just background information.
+Sounds reasonable but let's do that in a separate series since this is
+already on v4 and I wouldn't say it's obvious that using the role to
+get the memslot will give the same result as using the vCPU, although
+that does look to be true.
+
+>
+> 2. This got me thinking...  Write-protecting for shadow paging should NOT be
+>    associated with the vCPU or even the role.  The SMM memslots conceptually
+>    operate on the same guest physical memory, SMM is just given access to memory
+>    that is not present in the non-SMM memslots.
+>
+>    If KVM creates SPTEs for non-SMM, then it needs to write-protect _all_ memslots
+>    that contain the relevant gfn, e.g. if the guest takes an SMI and modifies the
+>    non-SMM page tables, then KVM needs trap and emulate (or unsync) those writes.
+>
+>    The mess "works" because no sane SMM handler (kind of a contradiction in terms)
+>    will modify non-SMM page tables, and vice versa.
+>
+>    The entire duplicate memslots approach is flawed.  Better would have been to
+>    make SMM a flag and hide SMM-only memslots, not duplicated everything...
+>
+> > -                     kvm_flush_remote_tlbs_with_address(vcpu->kvm, gfn, 1);
+> > -     }
+> >
+> >       return sp;
+> >  }
+> > --
+> > 2.36.0.rc2.479.g8af0fa9b8e-goog
+> >
