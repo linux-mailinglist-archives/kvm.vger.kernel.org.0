@@ -2,208 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AA8A51FC3A
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 14:10:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F2C751FC88
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 14:20:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233877AbiEIMMI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 08:12:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55036 "EHLO
+        id S234162AbiEIMXO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 08:23:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233847AbiEIMMG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 08:12:06 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EACE4A144B;
-        Mon,  9 May 2022 05:08:12 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 249AU1Uq014744;
-        Mon, 9 May 2022 12:08:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=Tp1p/8RChzinD57NApIZfYpuBcRyUDDntipozx75z6U=;
- b=PyU/CNCr4eDOvalTMW8RXWLci4ynar6oC0tP+lYjcbeS1PfSNa4ERIOQMN/YGYn3r6Ey
- coiKQubftWxMFuMoC1AYcLBATHojo7tYpVT9FBMUsLNTYNqUKrx/gnLQNW5GLGxoXLcE
- 0Chmq9l5/n2mSdXU8P/OGvVitdI75BxCqu/bzjZ6j3FObtx0fMXRtsXUCMpDA56aE1PQ
- cg42CCp7bfYTWH9gtS1SzD/IpihPrPM6X+aAJAkWLmdHHIlMXReXN5NbnC4m8vj4ySC7
- VeYnsEQoOQNGIZhQWFwNv1737NlVPv6k34A6pf9c4XmYSue6PGhxbUk+GIT8L1iQMw1y dg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fy18shu97-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 May 2022 12:08:12 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 249C8C7e020273;
-        Mon, 9 May 2022 12:08:12 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fy18shu88-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 May 2022 12:08:11 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 249C34Av015579;
-        Mon, 9 May 2022 12:08:09 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 3fwg1j2gcj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 May 2022 12:08:09 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 249C86AG26739142
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 9 May 2022 12:08:06 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7AF085204E;
-        Mon,  9 May 2022 12:08:06 +0000 (GMT)
-Received: from t46lp57.lnxne.boe (unknown [9.152.108.100])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 4D15152057;
-        Mon,  9 May 2022 12:08:06 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v1 2/2] s390x: add cmm migration test
-Date:   Mon,  9 May 2022 14:08:05 +0200
-Message-Id: <20220509120805.437660-3-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220509120805.437660-1-nrb@linux.ibm.com>
-References: <20220509120805.437660-1-nrb@linux.ibm.com>
+        with ESMTP id S234151AbiEIMXM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 08:23:12 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECBE718E3FD;
+        Mon,  9 May 2022 05:19:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652098754; x=1683634754;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=852D0WTiV+2Du4Tu2T0YU4FDc+Luix7a5hJXfT75Uas=;
+  b=erKgUhjGvneOxY4ZcHyD704wfwc5VBIt2LSAXviLKDelz7G7dHYiNHEx
+   uvV3PePpqw3uxmDk3V5opEXcObhTNNtHbahcOjpVj5ignHwRukheGEtvN
+   a7k/4pQrSBu4XfPtUs/uhZzizoO+ESvGgx//uQqQAhzMSafevGetKOIoU
+   o5V/fG327pUXMJrIhISY+2r6rtcLDCbpJmEtTj7bZCBbvWwOsCXMamhqF
+   S6o9bnQlV701nWe2RAz1wrAa5XY4ClIKZ+K8zqZxXRcdLBaIb+kyANmP1
+   J/6rEJ2VlX/OhbX0N1z0j5xBan4CVKnEkF4l/hCLzHnP9g9Lyr72W73/D
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10341"; a="329626206"
+X-IronPort-AV: E=Sophos;i="5.91,211,1647327600"; 
+   d="scan'208";a="329626206"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2022 05:19:13 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,211,1647327600"; 
+   d="scan'208";a="550997607"
+Received: from lkp-server01.sh.intel.com (HELO 5056e131ad90) ([10.239.97.150])
+  by orsmga002.jf.intel.com with ESMTP; 09 May 2022 05:19:10 -0700
+Received: from kbuild by 5056e131ad90 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1no2M2-000GUq-4h;
+        Mon, 09 May 2022 12:19:10 +0000
+Date:   Mon, 9 May 2022 20:18:26 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Cindy Lu <lulu@redhat.com>, jasowang@redhat.com, mst@redhat.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org
+Subject: Re: [PATCH v1] vdpa: Do not count the pages that were already pinned
+ in the vhost-vDPA
+Message-ID: <202205092017.ywsnJTzp-lkp@intel.com>
+References: <20220509071426.155941-1-lulu@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Wtx9nxtsaJglFSusq3Z0nCJ69hr9xkD3
-X-Proofpoint-GUID: y7edLRiLw0nBrFxH8iGRSmJRqPH87mRJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-09_03,2022-05-09_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- clxscore=1015 priorityscore=1501 malwarescore=0 impostorscore=0
- suspectscore=0 lowpriorityscore=0 mlxlogscore=933 spamscore=0 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205090069
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220509071426.155941-1-lulu@redhat.com>
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a VM is migrated, we expect the page states to be preserved. Add a test
-which checks for that.
+Hi Cindy,
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
----
- s390x/Makefile        |  1 +
- s390x/cmm-migration.c | 78 +++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg   |  4 +++
- 3 files changed, 83 insertions(+)
- create mode 100644 s390x/cmm-migration.c
+Thank you for the patch! Perhaps something to improve:
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index a8e04aa6fe4d..8ac0afdfd994 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -32,6 +32,7 @@ tests += $(TEST_DIR)/epsw.elf
- tests += $(TEST_DIR)/adtl-status.elf
- tests += $(TEST_DIR)/migration.elf
- tests += $(TEST_DIR)/pv-attest.elf
-+tests += $(TEST_DIR)/cmm-migration.elf
- 
- pv-tests += $(TEST_DIR)/pv-diags.elf
- 
-diff --git a/s390x/cmm-migration.c b/s390x/cmm-migration.c
-new file mode 100644
-index 000000000000..4a7b50e40fc6
---- /dev/null
-+++ b/s390x/cmm-migration.c
-@@ -0,0 +1,78 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * CMM migration tests (ESSA)
-+ *
-+ * Copyright IBM Corp. 2022
-+ *
-+ * Authors:
-+ *  Nico Boehr <nrb@linux.ibm.com>
-+ */
-+
-+#include <libcflat.h>
-+#include <asm/asm-offsets.h>
-+#include <asm/interrupt.h>
-+#include <asm/page.h>
-+#include <asm/cmm.h>
-+#include <bitops.h>
-+
-+#define NUM_PAGES 128
-+static uint8_t pagebuf[NUM_PAGES][PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
-+
-+static void test_migration(void)
-+{
-+	int i, state_mask, actual_state;
-+	/*
-+	 * Maps ESSA actions to states the page is allowed to be in after the
-+	 * respective action was executed.
-+	 */
-+	int allowed_essa_state_masks[4] = {
-+		BIT(ESSA_USAGE_STABLE),					/* ESSA_SET_STABLE */
-+		BIT(ESSA_USAGE_UNUSED),					/* ESSA_SET_UNUSED */
-+		BIT(ESSA_USAGE_VOLATILE),				/* ESSA_SET_VOLATILE */
-+		BIT(ESSA_USAGE_VOLATILE) | BIT(ESSA_USAGE_POT_VOLATILE) /* ESSA_SET_POT_VOLATILE */
-+	};
-+
-+	for (i = 0; i < NUM_PAGES; i++) {
-+		switch(i % 4) {
-+			case 0:
-+				essa(ESSA_SET_STABLE, (unsigned long)pagebuf[i]);
-+			break;
-+			case 1:
-+				essa(ESSA_SET_UNUSED, (unsigned long)pagebuf[i]);
-+			break;
-+			case 2:
-+				essa(ESSA_SET_VOLATILE, (unsigned long)pagebuf[i]);
-+			break;
-+			case 3:
-+				essa(ESSA_SET_POT_VOLATILE, (unsigned long)pagebuf[i]);
-+			break;
-+		}
-+	}
-+
-+	puts("Please migrate me, then press return\n");
-+	(void)getchar();
-+
-+	for (i = 0; i < NUM_PAGES; i++) {
-+		actual_state = essa(ESSA_GET_STATE, (unsigned long)pagebuf[i]);
-+		/* extract the usage state in bits 60 and 61 */
-+		actual_state = (actual_state >> 2) & 0x3;
-+		state_mask = allowed_essa_state_masks[i % ARRAY_SIZE(allowed_essa_state_masks)];
-+		report(BIT(actual_state) & state_mask, "page %d state: expected_mask=0x%x actual_mask=0x%lx", i, state_mask, BIT(actual_state));
-+	}
-+}
-+
-+int main(void)
-+{
-+	bool has_essa = check_essa_available();
-+
-+	report_prefix_push("cmm-migration");
-+	if (!has_essa) {
-+		report_skip("ESSA is not available");
-+		goto done;
-+	}
-+
-+	test_migration();
-+done:
-+	report_prefix_pop();
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index b456b2881448..625026d90e52 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -176,3 +176,7 @@ extra_params = -cpu qemu,gs=off,vx=off
- file = migration.elf
- groups = migration
- smp = 2
-+
-+[cmm-migration]
-+file = cmm-migration.elf
-+groups = migration
+[auto build test WARNING on mst-vhost/linux-next]
+[also build test WARNING on linux/master linus/master v5.18-rc6]
+[cannot apply to next-20220506]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Cindy-Lu/vdpa-Do-not-count-the-pages-that-were-already-pinned-in-the-vhost-vDPA/20220509-152644
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
+config: x86_64-randconfig-c007-20220509 (https://download.01.org/0day-ci/archive/20220509/202205092017.ywsnJTzp-lkp@intel.com/config)
+compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project a385645b470e2d3a1534aae618ea56b31177639f)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/4225cc2a756b75d1e0ff7ca2a593bada42def380
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Cindy-Lu/vdpa-Do-not-count-the-pages-that-were-already-pinned-in-the-vhost-vDPA/20220509-152644
+        git checkout 4225cc2a756b75d1e0ff7ca2a593bada42def380
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash drivers/vhost/
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/vhost/vdpa.c:542:5: warning: no previous prototype for function 'vhost_vdpa_add_range_ctx' [-Wmissing-prototypes]
+   int vhost_vdpa_add_range_ctx(struct rb_root_cached *root, u64 start, u64 last)
+       ^
+   drivers/vhost/vdpa.c:542:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   int vhost_vdpa_add_range_ctx(struct rb_root_cached *root, u64 start, u64 last)
+   ^
+   static 
+>> drivers/vhost/vdpa.c:571:6: warning: no previous prototype for function 'vhost_vdpa_del_range' [-Wmissing-prototypes]
+   void vhost_vdpa_del_range(struct rb_root_cached *root, u64 start, u64 last)
+        ^
+   drivers/vhost/vdpa.c:571:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   void vhost_vdpa_del_range(struct rb_root_cached *root, u64 start, u64 last)
+   ^
+   static 
+>> drivers/vhost/vdpa.c:581:28: warning: no previous prototype for function 'vhost_vdpa_search_range' [-Wmissing-prototypes]
+   struct interval_tree_node *vhost_vdpa_search_range(struct rb_root_cached *root,
+                              ^
+   drivers/vhost/vdpa.c:581:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   struct interval_tree_node *vhost_vdpa_search_range(struct rb_root_cached *root,
+   ^
+   static 
+   3 warnings generated.
+
+
+vim +/vhost_vdpa_add_range_ctx +542 drivers/vhost/vdpa.c
+
+   464	
+   465	static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+   466					      unsigned int cmd, unsigned long arg)
+   467	{
+   468		struct vhost_vdpa *v = filep->private_data;
+   469		struct vhost_dev *d = &v->vdev;
+   470		void __user *argp = (void __user *)arg;
+   471		u64 __user *featurep = argp;
+   472		u64 features;
+   473		long r = 0;
+   474	
+   475		if (cmd == VHOST_SET_BACKEND_FEATURES) {
+   476			if (copy_from_user(&features, featurep, sizeof(features)))
+   477				return -EFAULT;
+   478			if (features & ~VHOST_VDPA_BACKEND_FEATURES)
+   479				return -EOPNOTSUPP;
+   480			vhost_set_backend_features(&v->vdev, features);
+   481			return 0;
+   482		}
+   483	
+   484		mutex_lock(&d->mutex);
+   485	
+   486		switch (cmd) {
+   487		case VHOST_VDPA_GET_DEVICE_ID:
+   488			r = vhost_vdpa_get_device_id(v, argp);
+   489			break;
+   490		case VHOST_VDPA_GET_STATUS:
+   491			r = vhost_vdpa_get_status(v, argp);
+   492			break;
+   493		case VHOST_VDPA_SET_STATUS:
+   494			r = vhost_vdpa_set_status(v, argp);
+   495			break;
+   496		case VHOST_VDPA_GET_CONFIG:
+   497			r = vhost_vdpa_get_config(v, argp);
+   498			break;
+   499		case VHOST_VDPA_SET_CONFIG:
+   500			r = vhost_vdpa_set_config(v, argp);
+   501			break;
+   502		case VHOST_GET_FEATURES:
+   503			r = vhost_vdpa_get_features(v, argp);
+   504			break;
+   505		case VHOST_SET_FEATURES:
+   506			r = vhost_vdpa_set_features(v, argp);
+   507			break;
+   508		case VHOST_VDPA_GET_VRING_NUM:
+   509			r = vhost_vdpa_get_vring_num(v, argp);
+   510			break;
+   511		case VHOST_SET_LOG_BASE:
+   512		case VHOST_SET_LOG_FD:
+   513			r = -ENOIOCTLCMD;
+   514			break;
+   515		case VHOST_VDPA_SET_CONFIG_CALL:
+   516			r = vhost_vdpa_set_config_call(v, argp);
+   517			break;
+   518		case VHOST_GET_BACKEND_FEATURES:
+   519			features = VHOST_VDPA_BACKEND_FEATURES;
+   520			if (copy_to_user(featurep, &features, sizeof(features)))
+   521				r = -EFAULT;
+   522			break;
+   523		case VHOST_VDPA_GET_IOVA_RANGE:
+   524			r = vhost_vdpa_get_iova_range(v, argp);
+   525			break;
+   526		case VHOST_VDPA_GET_CONFIG_SIZE:
+   527			r = vhost_vdpa_get_config_size(v, argp);
+   528			break;
+   529		case VHOST_VDPA_GET_VQS_COUNT:
+   530			r = vhost_vdpa_get_vqs_count(v, argp);
+   531			break;
+   532		default:
+   533			r = vhost_dev_ioctl(&v->vdev, cmd, argp);
+   534			if (r == -ENOIOCTLCMD)
+   535				r = vhost_vdpa_vring_ioctl(v, cmd, argp);
+   536			break;
+   537		}
+   538	
+   539		mutex_unlock(&d->mutex);
+   540		return r;
+   541	}
+ > 542	int vhost_vdpa_add_range_ctx(struct rb_root_cached *root, u64 start, u64 last)
+   543	{
+   544		struct interval_tree_node *new_node;
+   545	
+   546		if (last < start)
+   547			return -EFAULT;
+   548	
+   549		/* If the range being mapped is [0, ULONG_MAX], split it into two entries
+   550		 * otherwise its size would overflow u64.
+   551		 */
+   552		if (start == 0 && last == ULONG_MAX) {
+   553			u64 mid = last / 2;
+   554	
+   555			vhost_vdpa_add_range_ctx(root, start, mid);
+   556			start = mid + 1;
+   557		}
+   558	
+   559		new_node = kmalloc(sizeof(struct interval_tree_node), GFP_ATOMIC);
+   560		if (!new_node)
+   561			return -ENOMEM;
+   562	
+   563		new_node->start = start;
+   564		new_node->last = last;
+   565	
+   566		interval_tree_insert(new_node, root);
+   567	
+   568		return 0;
+   569	}
+   570	
+ > 571	void vhost_vdpa_del_range(struct rb_root_cached *root, u64 start, u64 last)
+   572	{
+   573		struct interval_tree_node *new_node;
+   574	
+   575		while ((new_node = interval_tree_iter_first(root, start, last))) {
+   576			interval_tree_remove(new_node, root);
+   577			kfree(new_node);
+   578		}
+   579	}
+   580	
+ > 581	struct interval_tree_node *vhost_vdpa_search_range(struct rb_root_cached *root,
+   582							   u64 start, u64 last)
+   583	{
+   584		return interval_tree_iter_first(root, start, last);
+   585	}
+   586	
+
 -- 
-2.31.1
-
+0-DAY CI Kernel Test Service
+https://01.org/lkp
