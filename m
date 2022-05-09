@@ -2,148 +2,237 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F349F51FB41
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 13:25:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C30F51FB4C
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 13:27:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232717AbiEIL1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 07:27:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41740 "EHLO
+        id S232785AbiEILbR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 07:31:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232672AbiEIL1e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 07:27:34 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2082.outbound.protection.outlook.com [40.107.94.82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F06A31C9ADD;
-        Mon,  9 May 2022 04:23:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SIfTsHLfTuQbNcVw6L7eMYB/GL2H3IqOGF1w6Iu4HATNlxzxeVNrliEhmu8cHX7OisHE5vR8w1oKN0TTN14WZ4MqZJHAv1ldkYTSwsRtMPRInIhb4o5cWOUQwxhKvHVc4RUeK0wgQQyD8Rul7dnW28YiBxipqc30gq5Y8NvhIEld2SnVxHKFndPdKy2Fe+FJILkMrtN6VR/9dFCcz4RehE1gUoP1fleMzN2yVBVRmaeLxyG/cvI0uIi9a1ibKB5p7isRPobK5FpEJd6qjZKXqAdoSBytr2z6nrxLeTiKuUuHX28To3g0poUgbcNdOtZvsiDFwCJoeEWsfzrgM3hFpw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wi4E6kxwg9ySxgHbGXu88iFBWeV/Jw31UpZe45PtEk4=;
- b=CmBeld0eGbSqkUAv/bin/71p/DoQZayQ67eTXyeEJ6AyI8t/Od3vwe1EPmuiG0g6KsgoLgtQIIO/ciGq2pxJisir0tOmU4HxleeACem6TxsCiJ+VNPqzIZHJC58kGvEU3Eb0fzw0Nch+msHrX+OZ4OFcGu16z7kqgX2YLZHcP6KCMyoJDj/Si26ibicLGwePQ6825pevwYzyuJ+9YA9zZpwulwlZ6EBCMg+dRDGjNHqakObUABVdMV1Rr6PxNHYTB751Dm/4zjEG5nfDxQzyMvmr1w7RLYzhITmQv4cVuc0CbRSqRn94T2lqw1579MeQVuIcBE917hSu9/INIgSmcA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wi4E6kxwg9ySxgHbGXu88iFBWeV/Jw31UpZe45PtEk4=;
- b=G0gNZ1hYkMseJ68+z2gCo94JQST1h+Zb4NkwYmBZB/sSQ4ne7zFTNAOjwURvfcu2JQbAdzPrlEUG9S6ovQweccrUY8jOK0oufvjuUSyFUkL9eIWaHc5djb+80RxnAgfAR/uGZVRIPIRnQPL6Z9qtCapOyvglrBA6lBqBdsiO7zQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) by
- BYAPR12MB4629.namprd12.prod.outlook.com (2603:10b6:a03:111::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5227.22; Mon, 9 May
- 2022 11:23:29 +0000
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::9894:c8:c612:ba6b]) by DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::9894:c8:c612:ba6b%4]) with mapi id 15.20.5227.023; Mon, 9 May 2022
- 11:23:28 +0000
-Message-ID: <b3047d27-9681-6b9b-f747-c5428a250b02@amd.com>
-Date:   Mon, 9 May 2022 18:23:17 +0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v4 12/15] KVM: SVM: Introduce hybrid-AVIC mode
-Content-Language: en-US
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, mlevitsk@redhat.com, seanjc@google.com,
-        joro@8bytes.org, jon.grimm@amd.com, wei.huang2@amd.com,
-        terry.bowman@amd.com, Maxim Levitsky <mlevisk@redhat.com>
-References: <20220508023930.12881-1-suravee.suthikulpanit@amd.com>
- <20220508023930.12881-13-suravee.suthikulpanit@amd.com>
-From:   "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>
-In-Reply-To: <20220508023930.12881-13-suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN0PR01CA0051.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:49::10) To DM8PR12MB5445.namprd12.prod.outlook.com
- (2603:10b6:8:24::7)
+        with ESMTP id S232832AbiEILbH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 07:31:07 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02908DCF;
+        Mon,  9 May 2022 04:27:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652095633; x=1683631633;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Ya1pIm6vZbBNzSqJeY65qthxy/T3x9Rl6SrCFaTGnYo=;
+  b=KLzsPcKvLJumb91OkJg9jync2y2nIcLR20AGON05uMXeDGrkiz4nA7yo
+   SjXWDra0zZl50BmlZC2qk0zhC9shmG/JoeinDfuymQCgToZdqCNBAvArg
+   wKJgiDerKQwMbbiOqsxvRA96FKh9IhAlG2SRfLjNbhgRBzlc7207kpJEF
+   vkuzswAcZ2mFjDV+I66xPEiMjfqggLjdw1sC1YK0kc0bw9hAF59GGdnl4
+   hUPXmdbnT04r7D9hagxZ57btrp7qetbBBFVMJd1Q33+PhSM8v/toNWjis
+   YJs5wMlJVLNDd7OqZvQDpmnzbMzQXn6CKJW7uaRUe1u2W2IS45uextPmK
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10341"; a="268685193"
+X-IronPort-AV: E=Sophos;i="5.91,211,1647327600"; 
+   d="scan'208";a="268685193"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2022 04:27:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,211,1647327600"; 
+   d="scan'208";a="622923821"
+Received: from lkp-server01.sh.intel.com (HELO 5056e131ad90) ([10.239.97.150])
+  by fmsmga008.fm.intel.com with ESMTP; 09 May 2022 04:27:09 -0700
+Received: from kbuild by 5056e131ad90 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1no1Xg-000GTA-Fj;
+        Mon, 09 May 2022 11:27:08 +0000
+Date:   Mon, 9 May 2022 19:26:31 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Cindy Lu <lulu@redhat.com>, jasowang@redhat.com, mst@redhat.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Cc:     kbuild-all@lists.01.org
+Subject: Re: [PATCH v1] vdpa: Do not count the pages that were already pinned
+ in the vhost-vDPA
+Message-ID: <202205091928.dheTGNAt-lkp@intel.com>
+References: <20220509071426.155941-1-lulu@redhat.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 85b56901-562b-4276-7faf-08da31ae5749
-X-MS-TrafficTypeDiagnostic: BYAPR12MB4629:EE_
-X-Microsoft-Antispam-PRVS: <BYAPR12MB46292242BF6E32F4E29B36D6F3C69@BYAPR12MB4629.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: xy8B0Q6tvLJbDVhuqEtpMGVXFL8PX0XHcFG/7Nm2bw8aF073r/dZCJz0t9U+2zhKr7n7+58iJX7DBHqMBj8WM/MYB2Wt4w5s87ypxuL0ppzggcK/3IW1fQXd/o0ii2sf76xi6bQWDF1bo6V/qe8yIxIMOaHT1ulSFNFGiaXTMJtfcvnYUkN31tRIogQaJ6m3LtUdcU8g/G9otVHk/Q4JppstYquIEsipWsomLBhbuW6Yy45Cyjndv/o44pgEOr7F1oZkhha1rTpKh9u/sjSnvcEOMMxMcXARRFpSYIZXfwV73QgrnhuJsf+ZbF0RRi9na5kyGb94BFNfqfoYck4Lya+mB9zsr58Mv5YmeuUaxXwduR4KYdyn8A1qmTCg9U8YqGfvXKgLEwsojJHHMt1iq6IQqdFG2PEZ/ogZFGPvvDXooec3mZgGVaXqmaPOTVB9VZgkBpVcMSOxQP+5QH633QJGERk0CE+7HO70Pzupg3FukHAKFSlIxb2cx+OYO6c4VV0XryLrRbiBaZAIAFfwsJDgUP2r/C2JJd8EqKqnKWXYTWfA5eOrnbuVGQcMSAoicDs+THbFUHD6sAlyyG/G/E3PXRidVsmuVqAYgavxYE6gwf2NJYvcVZgrIIsL1ZJeT8JBfv2WQQknBCKk7f8COeDt6bbA/4g9WU1IqTo4LdLMTR9YmJ01PYGgmEG8KPnYcgxHiuKOk1FFYtXKBd0uPKJnCa/Rc0uXIbwWydKrxzNmQkIOybKDebIK/UV3hcxI
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(66556008)(2906002)(66476007)(66946007)(8676002)(31696002)(508600001)(6486002)(86362001)(38100700002)(316002)(83380400001)(8936002)(2616005)(5660300002)(4326008)(6512007)(4744005)(36756003)(26005)(186003)(31686004)(53546011)(6666004)(6506007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cG9Fbi9OMmorajRpLy9yZlVxZjVLRHo4UTVvTThtZkE4QXVnK3dYcTBUcDZN?=
- =?utf-8?B?aW9LdGluQjR0NFZnb09sQjBhaUlWdTdKWjQwck9RaUcxRnk5cWhEeTdkcHI1?=
- =?utf-8?B?M2JhTytJMVFXZ2xFSGpDRGVpbVNyWm1uQzkxR04zSkN6ZHNEcktaMFdCVHd1?=
- =?utf-8?B?MTBmQUJybmZSUFk2VkNUMTNrc3M2OWFlaS9nTTBKS1FoSmo5RTFobXh5aDB2?=
- =?utf-8?B?b3JUNkF3Wlh5akJxVVNadUxQcjZ3QnFqTXlQY2NVNCtYNzNQd0oxVG1TTk5j?=
- =?utf-8?B?L3MxejlDRkZLYTJpdXR6OHh3MTdrUExBREtxamJPU0VSZUt5YTQ2MVc4UWUx?=
- =?utf-8?B?dGdWZmdsakhSQzE1VGo3MGg2Q3k3WVMxVXc4Mjh4NE1MQVdEYkEvMmtLRVEw?=
- =?utf-8?B?dDk3Rm9VZ1U3K2d5WXVTMWxDeERmdlozVXU5U1R6L3JOazJCRzlBVDFYbWMr?=
- =?utf-8?B?MFo1cytSWDlFcjdxV2ZEcHE1V3p4d0dGN1JpUWtkZDYvaWhuUFFqakVoWlUy?=
- =?utf-8?B?RlUrYWNVZnBNYlBQT1pMMnNyUmlTSEYyTkRMNzlGdUdoMGk4NFExWFpxNnVu?=
- =?utf-8?B?S1JUQmhSUllZeU5LNW1RSDQ4V1VVWUFYNTdaS1J1NTFuTWhxN1VyZmlydS9W?=
- =?utf-8?B?SWVWbCtVOVVlOS9Gc3JDbFhSSmhTVkc3T3FmZGo4cy9IUFNyNGdkUGJOVTVP?=
- =?utf-8?B?anlqQlZEKzY3NkdZbllQNnFMQ2V3dGx5NEZzVGZ3emNjWmdWbXA2YmtWV29a?=
- =?utf-8?B?bVYvam5pZXIwN0NNTFJPakZ1Y2pTNnFoeXBwWGtOVHFhbTlrd3k3cE5KUUdV?=
- =?utf-8?B?bGtQdlRWNWRvV2VmV1FQRmY0MHNYaEt4ZGZjb2ZpRzFNSmxGdHEvL05nUHVo?=
- =?utf-8?B?MVhWQUhZb1lnVzJqMDg3aXpmRmp4ekRrTithcXcyOWFWUHpVUmVSNU9HT1o4?=
- =?utf-8?B?czdKNGFIdEZvY1J5Y3AzMmlKOVdHR0Rxdng3UjZnZzhTN1FVMVdOOEQyendl?=
- =?utf-8?B?R2I2N2dLL0VjbCttRkFXSEhxV3pHQ0pGL2hFQlpVSW14bmNWQS9ZSUhNYktB?=
- =?utf-8?B?TlNkcFBKNDNpL21qRmViVFV4Z29hMlFVczkxaDlESVpZMmUxeDlsenRRc3FQ?=
- =?utf-8?B?L0dSQ3BRcVlEZ0R5bHk5Yi9NSjZWeGtKTXI5RmdqdTdFNEV0OHhtT0puRHRt?=
- =?utf-8?B?NFRHb1o5YTUya0lCSnNpR2xjNDdRU0JFcldRdFNUU0tLTzNETUp2cGlnY2lU?=
- =?utf-8?B?MmNSSFgxY052RlJIcXQxMjVkOGJFRGpwNnY4czlxQUh2amR1Z0VBbzNMNUd0?=
- =?utf-8?B?T2tJNitnY0VrUDBrSjh6TDZwWFIrSXRIOXlsMTJLSW9kSStHQ0FlR3crMFRH?=
- =?utf-8?B?SWtBUW9JR1ZDZUxLVWFhS3YwR29GM1d2ZWhCeTdPWGVaWHVyRm42NS9rNlNy?=
- =?utf-8?B?ZnR2TXZyclBxSitTSWRMN2FUbWtYSzJaeDhneWpzZzJWdmZtZEVuYjZONnVn?=
- =?utf-8?B?d3ZVWUFtRW56U2RWemxpR3RyNDRVRzQvUnRhQWZTZ1BWUHllc2Z6RWRzVGpl?=
- =?utf-8?B?dmVueTkvS01IN0pRNU9UOXFiaHNPckF1djhCbi9JeVRURjVrc0lOcWRGeHJQ?=
- =?utf-8?B?NkNIcEZSb2FYWDZZbGpqUnZqbDFLNDRoMW92TFA5Z1hURVdzaVdpR3RNZ3JH?=
- =?utf-8?B?ZGZYU1RVZTB0QXk5cFZQbkM0eEhRT0ZPazhYRDFZalVDdEZnN2E5Y2lyZG5h?=
- =?utf-8?B?cVRFMElvdDRqVXE3WCtMcXMwTFlnY0NiVi8yN2VZWGtDejV2dnF0SS95VE5m?=
- =?utf-8?B?TGNMZzJ6MUEyZFAyQldCdldCNDBGTkJoaTdTL3JmOUhKWVRBMHRNVmJYVzlB?=
- =?utf-8?B?UWdaYjhyWE9zSE5GSUNERjR0Ym5XMVFiTVBieHdOc1dKYjF1NWcrd2NGUnBz?=
- =?utf-8?B?b2ZiM1Z0aFZ4dmZoQ3pJSmJzTlJMRlArRVBhQnF3d3dRbFh6SDFvb3o1MkJP?=
- =?utf-8?B?aEQ0Qnk0S1h0QXQ4cEtSQ04yMXhWR0txUXpJdklhOEZmaWdzUnUvZ2ZZZUdI?=
- =?utf-8?B?Z0UvbEQ0d1Z1SU1LSDExWmVkQjZxRXRseGNzUk5mNFVJY0tDbjRQSVpoTWdE?=
- =?utf-8?B?aVJhQjJFWjl3cnpjMXRzUFQ0c0VJYUg3eXBaZ2RXUTFablR0dEl5TjhubFpv?=
- =?utf-8?B?a2NnU21hdm1YSkdDOVRrWTRmUXpZWU9JRlJVRTh6cjhjRFJiTHNZSWlYRk5Y?=
- =?utf-8?B?WjVSNE9JRjAxUEd4b1dnYVpvakpkZlVHWWdjLy9GOE1KUUQxSElPWlpBMmVC?=
- =?utf-8?B?Nk0wdnA0QXlnMHJDNmk5dmtVSlA5dGlwUWU5QUtFM0xiRmZnZkI0Zz09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 85b56901-562b-4276-7faf-08da31ae5749
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR12MB5445.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 May 2022 11:23:28.9209
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xcQuwflQlmVzNjjoD7c9PRVHVfwHNagEhmH6u5ApCGgXjYrhGZniwA9gTGHKaBrHdw0zm8sLBDaWTbtGeayrWg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB4629
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220509071426.155941-1-lulu@redhat.com>
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Maxim / Paolo,
+Hi Cindy,
 
-On 5/8/2022 9:39 AM, Suravee Suthikulpanit wrote:
-> Currently, AVIC is inhibited when booting a VM w/ x2APIC support.
-> because AVIC cannot virtualize x2APIC MSR register accesses.
-> However, the AVIC doorbell can be used to accelerate interrupt
-> injection into a running vCPU, while all guest accesses to x2APIC MSRs
-> will be intercepted and emulated by KVM.
-> 
-> With hybrid-AVIC support, the APICV_INHIBIT_REASON_X2APIC is
-> no longer enforced.
-> 
-> Suggested-by: Maxim Levitsky<mlevitsk@redhat.com>
-> Reviewed-by: Maxim Levitsky<mlevisk@redhat.com>
+Thank you for the patch! Perhaps something to improve:
 
-Sorry for a typo here in the email of the "Reviewed-by" line.
+[auto build test WARNING on mst-vhost/linux-next]
+[also build test WARNING on linux/master linus/master v5.18-rc6]
+[cannot apply to next-20220506]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-Suravee
+url:    https://github.com/intel-lab-lkp/linux/commits/Cindy-Lu/vdpa-Do-not-count-the-pages-that-were-already-pinned-in-the-vhost-vDPA/20220509-152644
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
+config: s390-randconfig-r044-20220509 (https://download.01.org/0day-ci/archive/20220509/202205091928.dheTGNAt-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 11.3.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/4225cc2a756b75d1e0ff7ca2a593bada42def380
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Cindy-Lu/vdpa-Do-not-count-the-pages-that-were-already-pinned-in-the-vhost-vDPA/20220509-152644
+        git checkout 4225cc2a756b75d1e0ff7ca2a593bada42def380
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=s390 SHELL=/bin/bash drivers/vhost/
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/vhost/vdpa.c:542:5: warning: no previous prototype for 'vhost_vdpa_add_range_ctx' [-Wmissing-prototypes]
+     542 | int vhost_vdpa_add_range_ctx(struct rb_root_cached *root, u64 start, u64 last)
+         |     ^~~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/vhost/vdpa.c:571:6: warning: no previous prototype for 'vhost_vdpa_del_range' [-Wmissing-prototypes]
+     571 | void vhost_vdpa_del_range(struct rb_root_cached *root, u64 start, u64 last)
+         |      ^~~~~~~~~~~~~~~~~~~~
+>> drivers/vhost/vdpa.c:581:28: warning: no previous prototype for 'vhost_vdpa_search_range' [-Wmissing-prototypes]
+     581 | struct interval_tree_node *vhost_vdpa_search_range(struct rb_root_cached *root,
+         |                            ^~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +/vhost_vdpa_add_range_ctx +542 drivers/vhost/vdpa.c
+
+   464	
+   465	static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+   466					      unsigned int cmd, unsigned long arg)
+   467	{
+   468		struct vhost_vdpa *v = filep->private_data;
+   469		struct vhost_dev *d = &v->vdev;
+   470		void __user *argp = (void __user *)arg;
+   471		u64 __user *featurep = argp;
+   472		u64 features;
+   473		long r = 0;
+   474	
+   475		if (cmd == VHOST_SET_BACKEND_FEATURES) {
+   476			if (copy_from_user(&features, featurep, sizeof(features)))
+   477				return -EFAULT;
+   478			if (features & ~VHOST_VDPA_BACKEND_FEATURES)
+   479				return -EOPNOTSUPP;
+   480			vhost_set_backend_features(&v->vdev, features);
+   481			return 0;
+   482		}
+   483	
+   484		mutex_lock(&d->mutex);
+   485	
+   486		switch (cmd) {
+   487		case VHOST_VDPA_GET_DEVICE_ID:
+   488			r = vhost_vdpa_get_device_id(v, argp);
+   489			break;
+   490		case VHOST_VDPA_GET_STATUS:
+   491			r = vhost_vdpa_get_status(v, argp);
+   492			break;
+   493		case VHOST_VDPA_SET_STATUS:
+   494			r = vhost_vdpa_set_status(v, argp);
+   495			break;
+   496		case VHOST_VDPA_GET_CONFIG:
+   497			r = vhost_vdpa_get_config(v, argp);
+   498			break;
+   499		case VHOST_VDPA_SET_CONFIG:
+   500			r = vhost_vdpa_set_config(v, argp);
+   501			break;
+   502		case VHOST_GET_FEATURES:
+   503			r = vhost_vdpa_get_features(v, argp);
+   504			break;
+   505		case VHOST_SET_FEATURES:
+   506			r = vhost_vdpa_set_features(v, argp);
+   507			break;
+   508		case VHOST_VDPA_GET_VRING_NUM:
+   509			r = vhost_vdpa_get_vring_num(v, argp);
+   510			break;
+   511		case VHOST_SET_LOG_BASE:
+   512		case VHOST_SET_LOG_FD:
+   513			r = -ENOIOCTLCMD;
+   514			break;
+   515		case VHOST_VDPA_SET_CONFIG_CALL:
+   516			r = vhost_vdpa_set_config_call(v, argp);
+   517			break;
+   518		case VHOST_GET_BACKEND_FEATURES:
+   519			features = VHOST_VDPA_BACKEND_FEATURES;
+   520			if (copy_to_user(featurep, &features, sizeof(features)))
+   521				r = -EFAULT;
+   522			break;
+   523		case VHOST_VDPA_GET_IOVA_RANGE:
+   524			r = vhost_vdpa_get_iova_range(v, argp);
+   525			break;
+   526		case VHOST_VDPA_GET_CONFIG_SIZE:
+   527			r = vhost_vdpa_get_config_size(v, argp);
+   528			break;
+   529		case VHOST_VDPA_GET_VQS_COUNT:
+   530			r = vhost_vdpa_get_vqs_count(v, argp);
+   531			break;
+   532		default:
+   533			r = vhost_dev_ioctl(&v->vdev, cmd, argp);
+   534			if (r == -ENOIOCTLCMD)
+   535				r = vhost_vdpa_vring_ioctl(v, cmd, argp);
+   536			break;
+   537		}
+   538	
+   539		mutex_unlock(&d->mutex);
+   540		return r;
+   541	}
+ > 542	int vhost_vdpa_add_range_ctx(struct rb_root_cached *root, u64 start, u64 last)
+   543	{
+   544		struct interval_tree_node *new_node;
+   545	
+   546		if (last < start)
+   547			return -EFAULT;
+   548	
+   549		/* If the range being mapped is [0, ULONG_MAX], split it into two entries
+   550		 * otherwise its size would overflow u64.
+   551		 */
+   552		if (start == 0 && last == ULONG_MAX) {
+   553			u64 mid = last / 2;
+   554	
+   555			vhost_vdpa_add_range_ctx(root, start, mid);
+   556			start = mid + 1;
+   557		}
+   558	
+   559		new_node = kmalloc(sizeof(struct interval_tree_node), GFP_ATOMIC);
+   560		if (!new_node)
+   561			return -ENOMEM;
+   562	
+   563		new_node->start = start;
+   564		new_node->last = last;
+   565	
+   566		interval_tree_insert(new_node, root);
+   567	
+   568		return 0;
+   569	}
+   570	
+ > 571	void vhost_vdpa_del_range(struct rb_root_cached *root, u64 start, u64 last)
+   572	{
+   573		struct interval_tree_node *new_node;
+   574	
+   575		while ((new_node = interval_tree_iter_first(root, start, last))) {
+   576			interval_tree_remove(new_node, root);
+   577			kfree(new_node);
+   578		}
+   579	}
+   580	
+ > 581	struct interval_tree_node *vhost_vdpa_search_range(struct rb_root_cached *root,
+   582							   u64 start, u64 last)
+   583	{
+   584		return interval_tree_iter_first(root, start, last);
+   585	}
+   586	
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
