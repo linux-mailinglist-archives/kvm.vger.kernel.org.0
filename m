@@ -2,74 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D0F0351EF68
-	for <lists+kvm@lfdr.de>; Sun,  8 May 2022 21:12:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 704A751F2B2
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 04:49:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233717AbiEHSBf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 May 2022 14:01:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52768 "EHLO
+        id S230356AbiEICwc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 May 2022 22:52:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235994AbiEHQ7y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 May 2022 12:59:54 -0400
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EB7DE012
-        for <kvm@vger.kernel.org>; Sun,  8 May 2022 09:56:03 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id j6so22734223ejc.13
-        for <kvm@vger.kernel.org>; Sun, 08 May 2022 09:56:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kylehuey.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7883SHL1XfkG7K2AL53ND9UiM0Z9TCxShP/nnldpK1I=;
-        b=MHgxUxJnd4vzfieON7P7nSn19204+xxZCKOMCmwXWYAFYcUSUrPKQ3BAlvyb9S4ncr
-         gOA4ofKtlIfZJSJEU4W/REaaGYZPczm3ZTpV3gL+U1O6y+9Gl36SC4sG7gTV4N9SR4dS
-         jejt44hvBNn/MXRit+A1Q2s0R1QVaqaMHD64u8pzwI5+9cpVZle3Co8J3NU5qs8yKbRv
-         vvx3uJyuW4hK/SwssNVr4V84itM0Z6Sg85YsIC/x+BvH/Ora97i6JsZANb8CL9Pc+pCy
-         I19nfVcdudPuAdgObQJ26er9LPHfcHiYyJd9hS6ciqiTvo+Zm1B7bQ+z5XiwHRt2ESFR
-         YpHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7883SHL1XfkG7K2AL53ND9UiM0Z9TCxShP/nnldpK1I=;
-        b=18XRrxr3R/cIv9+eAdKAYic3ZnMrUJGK7x9/6H5/qHgGARTUro82aogL3OZgW4wGpQ
-         QOdpcI86jQ3Y6/Q6NjN6a+EbEm0iksmzBtwXWa8BU84o1Gp2JEs2NFqylxCA6yqd4qQh
-         qHSX0B3GVu/CdapYQ64t6ToSXfwsTECvjefWrJIF7Unv10qYIJ80EzH2zY8yWYmma8PU
-         1iW/p1SHP2kcxNNjkq634g+SwZYhEtz1Xh6ZwGrXMgBGeWx+LV0EUZE8FMrhmlBP1BZ9
-         BuR30jSZVp4Z7ATBz1G/E4YBX74HslETeDeIeWcXywPtDsz9dDzcBP7Y48j0cCWkyiCP
-         xqgw==
-X-Gm-Message-State: AOAM531LDDFYvGlNIm5JjjoLsn+LqsDJ41w2gFFwNWSQMGYILPHkQ9u8
-        GoQHIPRHTXPCSvRdup8bti0PuapQBPSp5CV7CknBNuqlRdIIxQ==
-X-Google-Smtp-Source: ABdhPJwCPeN6Zfcn0jnH9LQi8HPAYNML/2/PQAmeunXmRyLQ3xXoFfcdiphW3xcRmHHaSlf3pBT1kudRNmyLPCJCuX8=
-X-Received: by 2002:a17:906:cb09:b0:6f3:87ca:1351 with SMTP id
- lk9-20020a170906cb0900b006f387ca1351mr11304818ejb.674.1652028961398; Sun, 08
- May 2022 09:56:01 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220508165338.118886-1-khuey@kylehuey.com>
-In-Reply-To: <20220508165338.118886-1-khuey@kylehuey.com>
-From:   Kyle Huey <me@kylehuey.com>
-Date:   Sun, 8 May 2022 09:55:46 -0700
-Message-ID: <CAP045Ap9R3pL9ivwL5iSQB41KSKQ5Gwhh6SNTi_g+gA7z4RWDA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/svm: Account for family 17h event renumberings
- in amd_pmc_perf_hw_id
-To:     stable@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S229585AbiEICwY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 May 2022 22:52:24 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB627E59C;
+        Sun,  8 May 2022 19:48:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652064511; x=1683600511;
+  h=message-id:subject:from:to:cc:in-reply-to:references:
+   mime-version:date:content-transfer-encoding;
+  bh=2qZxXZotiXnvoQkee/sQJJx5RfpT6gE7TIR1ogCag6g=;
+  b=Vo0NlHZOAXfox1eMfo4/2QBDHRZ/WCp2TYNQRxJgRUCwv+IXhJ4XJPPO
+   7firb35bOzC9iaCTOEthIbInwS8ds8fbAG8LaC/y2X7RZkqZKn1O9Ne6y
+   Io1WDZ1n61bMs7DfmR+rbqluq8ItfhyKKgkoDO4iJGgA3IsSVdz0eFFNF
+   yl9djRYxVqZ4rxGH53EAbfIY8IdOSuC9RIjVG9zfqnNpoIFYAu/59Mva2
+   f00ciDGGa6UL3q9X3DhSXD93sEa6SDtrExB7IvjJAhyQ6JC6yOXp7i2Ek
+   heDiczFfsKSvoLdKjFuiKTwvuX5SoAkjUQACKs1yPP66OHgG10k1jX4cG
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10341"; a="331947014"
+X-IronPort-AV: E=Sophos;i="5.91,210,1647327600"; 
+   d="scan'208";a="331947014"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2022 19:47:22 -0700
+X-IronPort-AV: E=Sophos;i="5.91,210,1647327600"; 
+   d="scan'208";a="569947052"
+Received: from cbfoste1-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.62.77])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2022 19:47:19 -0700
+Message-ID: <c1105c62bcf8c9b9d2313d53982d1ae5d9a1cae8.camel@intel.com>
+Subject: Re: [PATCH v3 00/21] TDX host kernel support
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
         Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm list <kvm@vger.kernel.org>,
-        "Robert O'Callahan" <robert@ocallahan.org>,
-        Keno Fischer <keno@juliacomputing.com>
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Mike Rapoport <rppt@kernel.org>
+In-Reply-To: <CAPcyv4gfRFUdeSqQE51BKdunJvNMP_DkvthDLvX9v7=kOrN8uA@mail.gmail.com>
+References: <cover.1649219184.git.kai.huang@intel.com>
+         <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
+         <ecf718abf864bbb2366209f00d4315ada090aedc.camel@intel.com>
+         <de24ac7e-349c-e49a-70bb-31b9bc867b10@intel.com>
+         <9b388f54f13b34fe684ef77603fc878952e48f87.camel@intel.com>
+         <d98ca73b-2d2d-757d-e937-acc83cfedfb0@intel.com>
+         <c90a10763969077826f42be6f492e3a3e062326b.camel@intel.com>
+         <fc1ca04d94ad45e79c0297719d5ef50a7c33c352.camel@intel.com>
+         <664f8adeb56ba61774f3c845041f016c54e0f96e.camel@intel.com>
+         <1b681365-ef98-ec78-96dc-04e28316cf0e@intel.com>
+         <8bf596b45f68363134f431bcc550e16a9a231b80.camel@intel.com>
+         <6bb89ca6e7346f4334f06ea293f29fd12df70fe4.camel@intel.com>
+         <CAPcyv4iP3hcNNDxNdPT+iB0E4aUazfqFWwaa_dtHpVf+qKPNcQ@mail.gmail.com>
+         <cbb2ea1343079aee546fb44cd59c82f66c875d76.camel@intel.com>
+         <CAPcyv4jNYqPA2HBaO+9a+ije4jnb6a3Sx_1knrmRF9HCCXQuqg@mail.gmail.com>
+         <b40b3658e1fc7ec15d2adafe7f9562d42bc256f3.camel@intel.com>
+         <CAPcyv4hdM+0zntuTez9n1-dJ_ODsF_TxAct=VpTs-tWJzBPJqQ@mail.gmail.com>
+         <b0d1ed15d8bf99efe1c49182f4a98f4a23f61d0d.camel@intel.com>
+         <CAPcyv4gfRFUdeSqQE51BKdunJvNMP_DkvthDLvX9v7=kOrN8uA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+MIME-Version: 1.0
+Date:   Mon, 09 May 2022 14:46:35 +1200
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,95 +91,182 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This applies to 5.15 (and 5.10). I thought git send-email --subject
-would overwrite the subject line in the patch but I was wrong.
+On Fri, 2022-05-06 at 08:57 -0700, Dan Williams wrote:
+> On Thu, May 5, 2022 at 6:47 PM Kai Huang <kai.huang@intel.com> wrote:
+> > 
+> > On Thu, 2022-05-05 at 18:15 -0700, Dan Williams wrote:
+> > > On Thu, May 5, 2022 at 5:46 PM Kai Huang <kai.huang@intel.com> wrote:
+> > > > 
+> > > > On Thu, 2022-05-05 at 17:22 -0700, Dan Williams wrote:
+> > > > > On Thu, May 5, 2022 at 3:14 PM Kai Huang <kai.huang@intel.com> wrote:
+> > > > > > 
+> > > > > > Thanks for feedback!
+> > > > > > 
+> > > > > > On Thu, 2022-05-05 at 06:51 -0700, Dan Williams wrote:
+> > > > > > > [ add Mike ]
+> > > > > > > 
+> > > > > > > 
+> > > > > > > On Thu, May 5, 2022 at 2:54 AM Kai Huang <kai.huang@intel.com> wrote:
+> > > > > > > [..]
+> > > > > > > > 
+> > > > > > > > Hi Dave,
+> > > > > > > > 
+> > > > > > > > Sorry to ping (trying to close this).
+> > > > > > > > 
+> > > > > > > > Given we don't need to consider kmem-hot-add legacy PMEM after TDX module
+> > > > > > > > initialization, I think for now it's totally fine to exclude legacy PMEMs from
+> > > > > > > > TDMRs.  The worst case is when someone tries to use them as TD guest backend
+> > > > > > > > directly, the TD will fail to create.  IMO it's acceptable, as it is supposedly
+> > > > > > > > that no one should just use some random backend to run TD.
+> > > > > > > 
+> > > > > > > The platform will already do this, right?
+> > > > > > > 
+> > > > > > 
+> > > > > > In the current v3 implementation, we don't have any code to handle memory
+> > > > > > hotplug, therefore nothing prevents people from adding legacy PMEMs as system
+> > > > > > RAM using kmem driver.  In order to guarantee all pages managed by page
+> > > > > 
+> > > > > That's the fundamental question I am asking why is "guarantee all
+> > > > > pages managed by page allocator are TDX memory". That seems overkill
+> > > > > compared to indicating the incompatibility after the fact.
+> > > > 
+> > > > As I explained, the reason is I don't want to modify page allocator to
+> > > > distinguish TDX and non-TDX allocation, for instance, having to have a ZONE_TDX
+> > > > and GFP_TDX.
+> > > 
+> > > Right, TDX details do not belong at that level, but it will work
+> > > almost all the time if you do nothing to "guarantee" all TDX capable
+> > > pages all the time.
+> > 
+> > "almost all the time" do you mean?
+> > 
+> > > 
+> > > > KVM depends on host's page fault handler to allocate the page.  In fact KVM only
+> > > > consumes PFN from host's page tables.  For now only RAM is TDX memory.  By
+> > > > guaranteeing all pages in page allocator is TDX memory, we can easily use
+> > > > anonymous pages as TD guest memory.
+> > > 
+> > > Again, TDX capable pages will be the overwhelming default, why are you
+> > > worried about cluttering the memory hotplug path for nice corner
+> > > cases.
+> > 
+> > Firstly perhaps I forgot to mention there are two concepts about TDX memory, so
+> > let me clarify first:
+> > 
+> > 1) Convertible Memory Regions (CMRs).  This is reported by BIOS (thus static) to
+> > indicate which memory regions *can* be used as TDX memory.  This basically means
+> > all RAM during boot for now.
+> > 
+> > 2) TD Memory Regions (TDMRs).  Memory pages in CMRs are not automatically TDX
+> > usable memory.  The TDX module needs to be configured which (convertible) memory
+> > regions can be used as TDX memory.  Kernel is responsible for choosing the
+> > ranges, and configure to the TDX module.  If a convertible memory page is not
+> > included into TDMRs, the TDX module will report error when it is assigned to  a
+> > TD.
+> > 
+> > > 
+> > > Consider the fact that end users can break the kernel by specifying
+> > > invalid memmap= command line options. The memory hotplug code does not
+> > > take any steps to add safety in those cases because there are already
+> > > too many ways it can go wrong. TDX is just one more corner case where
+> > > the memmap= user needs to be careful. Otherwise, it is up to the
+> > > platform firmware to make sure everything in the base memory map is
+> > > TDX capable, and then all you need is documentation about the failure
+> > > mode when extending "System RAM" beyond that baseline.
+> > 
+> > So the fact is, if we don't include legacy PMEMs into TDMRs, and don't do
+> > anything in memory hotplug, then if user does kmem-hot-add legacy PMEMs as
+> > system RAM, a live TD may eventually be killed.
+> > 
+> > If such case is a corner case that we don't need to guarantee, then even better.
+> > And we have an additional reason that those legacy PMEMs don't need to be in
+> > TDMRs.  As you suggested,  we can add some documentation to point out.
+> > 
+> > But the point we want to do some code check and prevent memory hotplug is, as
+> > Dave said, we want this piece of code to work on *ANY* TDX capable machines,
+> > including future machines which may, i.e. supports NVDIMM/CLX memory as TDX
+> > memory.  If we don't do any code check in  memory hotplug in this series, then
+> > when this code runs in future platforms, user can plug NVDIMM or CLX memory as
+> > system RAM thus break the assumption "all pages in page allocator are TDX
+> > memory", which eventually leads to live TDs being killed potentially.
+> > 
+> > Dave said we need to guarantee this code can work on *ANY* TDX machines.  Some
+> > documentation saying it only works one some platforms and you shouldn't do
+> > things on other platforms are not good enough:
+> > 
+> > https://lore.kernel.org/lkml/cover.1649219184.git.kai.huang@intel.com/T/#m6df45b6e1702bb03dcb027044a0dabf30a86e471
+> 
+> Yes, the incompatible cases cannot be ignored, but I disagree that
+> they actively need to be prevented. One way to achieve that is to
+> explicitly enumerate TDX capable memory and document how mempolicy can
+> be used to avoid killing TDs.
 
-- Kyle
+Hi Dan,
 
-On Sun, May 8, 2022 at 9:53 AM Kyle Huey <me@kylehuey.com> wrote:
->
-> From: Kyle Huey <me@kylehuey.com>
->
-> commit 5eb849322d7f7ae9d5c587c7bc3b4f7c6872cd2f upstream
->
-> Zen renumbered some of the performance counters that correspond to the
-> well known events in perf_hw_id. This code in KVM was never updated for
-> that, so guest that attempt to use counters on Zen that correspond to the
-> pre-Zen perf_hw_id values will silently receive the wrong values.
->
-> This has been observed in the wild with rr[0] when running in Zen 3
-> guests. rr uses the retired conditional branch counter 00d1 which is
-> incorrectly recognized by KVM as PERF_COUNT_HW_STALLED_CYCLES_BACKEND.
->
-> [0] https://rr-project.org/
->
-> Signed-off-by: Kyle Huey <me@kylehuey.com>
-> Message-Id: <20220503050136.86298-1-khuey@kylehuey.com>
-> Cc: stable@vger.kernel.org
-> [Check guest family, not host. - Paolo]
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> [Backport to 5.15: adjusted context]
-> Signed-off-by: Kyle Huey <me@kylehuey.com>
-> ---
->  arch/x86/kvm/svm/pmu.c | 28 +++++++++++++++++++++++++---
->  1 file changed, 25 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-> index f337ce7e898e..d35c94e13afb 100644
-> --- a/arch/x86/kvm/svm/pmu.c
-> +++ b/arch/x86/kvm/svm/pmu.c
-> @@ -44,6 +44,22 @@ static struct kvm_event_hw_type_mapping amd_event_mapping[] = {
->         [7] = { 0xd1, 0x00, PERF_COUNT_HW_STALLED_CYCLES_BACKEND },
->  };
->
-> +/* duplicated from amd_f17h_perfmon_event_map. */
-> +static struct kvm_event_hw_type_mapping amd_f17h_event_mapping[] = {
-> +       [0] = { 0x76, 0x00, PERF_COUNT_HW_CPU_CYCLES },
-> +       [1] = { 0xc0, 0x00, PERF_COUNT_HW_INSTRUCTIONS },
-> +       [2] = { 0x60, 0xff, PERF_COUNT_HW_CACHE_REFERENCES },
-> +       [3] = { 0x64, 0x09, PERF_COUNT_HW_CACHE_MISSES },
-> +       [4] = { 0xc2, 0x00, PERF_COUNT_HW_BRANCH_INSTRUCTIONS },
-> +       [5] = { 0xc3, 0x00, PERF_COUNT_HW_BRANCH_MISSES },
-> +       [6] = { 0x87, 0x02, PERF_COUNT_HW_STALLED_CYCLES_FRONTEND },
-> +       [7] = { 0x87, 0x01, PERF_COUNT_HW_STALLED_CYCLES_BACKEND },
-> +};
-> +
-> +/* amd_pmc_perf_hw_id depends on these being the same size */
-> +static_assert(ARRAY_SIZE(amd_event_mapping) ==
-> +            ARRAY_SIZE(amd_f17h_event_mapping));
-> +
->  static unsigned int get_msr_base(struct kvm_pmu *pmu, enum pmu_type type)
->  {
->         struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
-> @@ -136,19 +152,25 @@ static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
->
->  static unsigned int amd_pmc_perf_hw_id(struct kvm_pmc *pmc)
->  {
-> +       struct kvm_event_hw_type_mapping *event_mapping;
->         u8 event_select = pmc->eventsel & ARCH_PERFMON_EVENTSEL_EVENT;
->         u8 unit_mask = (pmc->eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
->         int i;
->
-> +       if (guest_cpuid_family(pmc->vcpu) >= 0x17)
-> +               event_mapping = amd_f17h_event_mapping;
-> +       else
-> +               event_mapping = amd_event_mapping;
-> +
->         for (i = 0; i < ARRAY_SIZE(amd_event_mapping); i++)
-> -               if (amd_event_mapping[i].eventsel == event_select
-> -                   && amd_event_mapping[i].unit_mask == unit_mask)
-> +               if (event_mapping[i].eventsel == event_select
-> +                   && event_mapping[i].unit_mask == unit_mask)
->                         break;
->
->         if (i == ARRAY_SIZE(amd_event_mapping))
->                 return PERF_COUNT_HW_MAX;
->
-> -       return amd_event_mapping[i].event_type;
-> +       return event_mapping[i].event_type;
->  }
->
->  /* return PERF_COUNT_HW_MAX as AMD doesn't have fixed events */
-> --
-> 2.36.0
->
+Thanks for feedback.
+
+Could you elaborate what does "explicitly enumerate TDX capable memory" mean? 
+How to enumerate exactly?
+
+And for "document how mempolicy can be used to avoid killing TDs", what
+mempolicy (and error reporting you mentioned below) are you referring to?
+
+I skipped to reply your below your two replies as I think they are referring to
+the same "enumerate" and "mempolicy" that I am asking above.
+
+> 
+> > > > shmem to support a new fd-based backend which doesn't require having to mmap()
+> > > > TD guest memory to host userspace:
+> > > > 
+> > > > https://lore.kernel.org/kvm/20220310140911.50924-1-chao.p.peng@linux.intel.com/
+> > > > 
+> > > > Also, besides TD guest memory, there are some per-TD control data structures
+> > > > (which must be TDX memory too) need to be allocated for each TD.  Normal memory
+> > > > allocation APIs can be used for such allocation if we guarantee all pages in
+> > > > page allocator is TDX memory.
+> > > 
+> > > You don't need that guarantee, just check it after the fact and fail
+> > > if that assertion fails. It should almost always be the case that it
+> > > succeeds and if it doesn't then something special is happening with
+> > > that system and the end user has effectively opt-ed out of TDX
+> > > operation.
+> > 
+> > This doesn't guarantee consistent behaviour.  For instance, for one TD it can be
+> > created, while the second may fail.  We should provide a consistent service.
+> 
+> Yes, there needs to be enumeration and policy knobs to avoid failures,
+> hard coded "no memory hotplug" hacks do not seem the right enumeration
+> and policy knobs to me.
+> 
+> > The thing is anyway we need to configure some memory regions to the TDX module.
+> > To me there's no reason we don't want to guarantee all pages in page allocator
+> > are TDX memory.
+> > 
+> > > 
+> > > > > > allocator are all TDX memory, the v3 implementation needs to always include
+> > > > > > legacy PMEMs as TDX memory so that even people truly add  legacy PMEMs as system
+> > > > > > RAM, we can still guarantee all pages in page allocator are TDX memory.
+> > > > > 
+> > > > > Why?
+> > > > 
+> > > > If we don't include legacy PMEMs as TDX memory, then after they are hot-added as
+> > > > system RAM using kmem driver, the assumption of "all pages in page allocator are
+> > > > TDX memory" is broken.  A TD can be killed during runtime.
+> > > 
+> > > Yes, that is what the end user asked for. If they don't want that to
+> > > happen then the policy decision about using kmem needs to be updated
+> > > in userspace, not hard code that policy decision towards TDX inside
+> > > the kernel.
+> > 
+> > This is also fine to me.  But please also see above Dave's comment.
+> 
+> Dave is right, the implementation can not just ignore the conflict. To
+> me, enumeration plus error reporting allows for flexibility without
+> hard coding policy in the kernel.
+
+
+-- 
+Thanks,
+-Kai
+
+
