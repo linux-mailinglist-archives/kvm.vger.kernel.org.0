@@ -2,80 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08C0F520297
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 18:39:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A72065202AA
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 18:39:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239153AbiEIQlT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 12:41:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50240 "EHLO
+        id S239198AbiEIQmw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 12:42:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239147AbiEIQk5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 12:40:57 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB48318B97F
-        for <kvm@vger.kernel.org>; Mon,  9 May 2022 09:36:48 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id x18so14381613plg.6
-        for <kvm@vger.kernel.org>; Mon, 09 May 2022 09:36:48 -0700 (PDT)
+        with ESMTP id S239131AbiEIQmu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 12:42:50 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D53C81312B8
+        for <kvm@vger.kernel.org>; Mon,  9 May 2022 09:38:55 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id w4so20226615wrg.12
+        for <kvm@vger.kernel.org>; Mon, 09 May 2022 09:38:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=vcWBrXUV0qsOw9lQLNi+OhiEHQuaLCtwTh7HA5F6tIs=;
-        b=GQuDadAMhf8b7Fy/I8JaGOgRQOsWHOMhy0hcMvriphuVIDCLpL0PdaLuMbF3n56Nke
-         dZiKU5Jef5j11YpXBiBq70I2jRtKHo1vmB1cAh8/4Ff8ldw79/NB/gHKnpjQvMceq5+H
-         3qgkrnh9KKmaw7DH9R9uQgmGpUN1bWPoVqDKK8soMOBL/CE7D+C0wzwPs6cO+5D2o7i9
-         BUxS3PijLvpY1XWcQQ5OOyPIkC+UrL32CQw4fU5VdLpUvBKmussISGRTBF6qAwdnpemg
-         ji09qdkVslMmiKaiQZghkH/uEpByZli/lutMtfurjdn+YHWI2FuLLfHnwrACscaUBN8e
-         ydmw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zHCy33IfC5TyILOeQkmukBylQEbte8TBRw0A+aY3Nnw=;
+        b=H6nlUcikiCWMQ0NyQpEOvAX9YWAzxJVOMo8TCOD+MTF5x++KFtykM38ezcNgkrqf/k
+         HsEf3EJd5U1zetXK4vcQ2qXVxKjVLLmxk64eVHzC1lhLd+csiUOWanUBOMc0ehk+lL8Z
+         8kMOXwBH5hATNTPogQUXQIImHkrg03NEi/77hdTa1677HBxwaUfkv/QQ7yLseBE1HcJE
+         YPtPpea4ak7+T4Dqx7q3oWEasv5JJswYYW1+IlWiL+SM1CpjXzbyzq9KKAOv4Z51ZAoC
+         p4WvvEjdiEI05l2ZOHE80zU68Yi/ftR+9e3AoP2yMz5PBJyRJ0fD1vQ47PM6C0czbLOE
+         9nDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=vcWBrXUV0qsOw9lQLNi+OhiEHQuaLCtwTh7HA5F6tIs=;
-        b=MhpSAhtyexwlqJP4A/UPaUU9CqpK0FNHyOGK/6rRSwswC357T8o1JWyXs78Y11kzQ5
-         VrIMp4MT6PthLpOeDnSURQUuUMa07Q0lC7p19mZCqX1wwRQ0Q6JrZaP2P+nhZdt78PCs
-         3/qNLyBipE5k2/6mRNkzZRzdlgaVnGqIaN4TbRVCg+e4mZn+Bhqn3Ewi1dLELtAW/FPm
-         hvE6E02XpvY6clYdSCgFMvcjKjuiRMp59K7PJv6wi8gXtUUiM/2B2UQ9zMG+zwlEYv7m
-         ym3EXvy7N+ti5vfBCLT31/UgYBJCYgXH6bPTpnZ093oj68i8qcOvJFEQ13ycvSNa/Wyz
-         RIDQ==
-X-Gm-Message-State: AOAM530v3O0LVrasOU4hLrqIov/UJ791dvhpt907W5G+lqrk8y+36cse
-        TDBwRgbVvDqHLTGoJ6eKr6Ev9Q==
-X-Google-Smtp-Source: ABdhPJwEmR4hWs02XZuuAcqgDnjovgeoKc9HZE29HI/cH7wXAaf0/EHn99rc8bnyOXL0A+d9B+qwog==
-X-Received: by 2002:a17:902:9044:b0:15d:1c51:5bef with SMTP id w4-20020a170902904400b0015d1c515befmr16764065plz.170.1652114207747;
-        Mon, 09 May 2022 09:36:47 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id x71-20020a63864a000000b003c15f7f2914sm8650496pgd.24.2022.05.09.09.36.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 May 2022 09:36:47 -0700 (PDT)
-Date:   Mon, 9 May 2022 16:36:43 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        maciej.szmigiero@oracle.com,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
-Subject: Re: [PATCH v4 18/20] KVM: x86/mmu: Refactor drop_large_spte()
-Message-ID: <YnlDG/aRMB7js2Lc@google.com>
-References: <20220422210546.458943-1-dmatlack@google.com>
- <20220422210546.458943-19-dmatlack@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zHCy33IfC5TyILOeQkmukBylQEbte8TBRw0A+aY3Nnw=;
+        b=SieDKCQZMYf61IbJtaytg1wWghOgjaz6NZED/I/mDxuXwTltxX4/Wpp4pvlKT7w/sp
+         CqxvHzM+Gj/ITBN0X4nRaD1Q2SwZIjrTygASOU5gIdbtxGjczKJqiC8rrxiJyyKqmSIM
+         klagWyIfkMLMNmgzp16B1IQDFaNfrmo7bOOzGd/4r1G92KtcU5BN6E5rpWQn0ahKArnn
+         9Xm+DechgR/1xnIJMK/ksd8aTGQm6mU7RBWYN50wy2ZQ71oZpv1IaUN2dmEEnr9+eV6A
+         XmB9AFIhlMie/CIHF2/NGPSBGOsK/dmRTU+2V174CEH9TRTlv5CAH1vx1sSEa1m/sk/n
+         7LRg==
+X-Gm-Message-State: AOAM532kF/7EvSoEbaiS0a0d/W5HwO0FmcguSZQGehHsUsv0dv+UjXYb
+        qNZMJ2NsC2TrpvGJ8LeDtqmXyZDC49W0G/aIQrhyrA==
+X-Google-Smtp-Source: ABdhPJzFCb2Pw91KP2O7w1MuAK0a7BY2JKborW82eGXzK/VRCy5OZV3s+PnflU0xod+JItQXe5EJnWI4vMeydL7hgKY=
+X-Received: by 2002:a05:6000:230:b0:209:87ac:4cf5 with SMTP id
+ l16-20020a056000023000b0020987ac4cf5mr14646217wrz.80.1652114333976; Mon, 09
+ May 2022 09:38:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220422210546.458943-19-dmatlack@google.com>
+References: <20220429201131.3397875-1-yosryahmed@google.com>
+ <20220429201131.3397875-2-yosryahmed@google.com> <87ilqoi77b.wl-maz@kernel.org>
+ <CAJD7tkY7JF25XXUFq2mGroetMkfo-2zGOaQC94pjZE3D42+oaw@mail.gmail.com>
+In-Reply-To: <CAJD7tkY7JF25XXUFq2mGroetMkfo-2zGOaQC94pjZE3D42+oaw@mail.gmail.com>
+From:   Yosry Ahmed <yosryahmed@google.com>
+Date:   Mon, 9 May 2022 09:38:17 -0700
+Message-ID: <CAJD7tkbfT-FRs3LE2GPddqrQSWw_eC1R6k3z04x=z9Zvt5yLpg@mail.gmail.com>
+Subject: Re: [PATCH v4 1/4] mm: add NR_SECONDARY_PAGETABLE to count secondary
+ page table uses.
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Shakeel Butt <shakeelb@google.com>,
+        Oliver Upton <oupton@google.com>, cgroups@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Linux-MM <linux-mm@kvack.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -87,75 +86,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 22, 2022, David Matlack wrote:
-> drop_large_spte() drops a large SPTE if it exists and then flushes TLBs.
-> Its helper function, __drop_large_spte(), does the drop without the
-> flush.
-> 
-> In preparation for eager page splitting, which will need to sometimes
-> flush when dropping large SPTEs (and sometimes not), push the flushing
-> logic down into __drop_large_spte() and add a bool parameter to control
-> it.
-> 
-> No functional change intended.
-> 
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 29 +++++++++++++++--------------
->  1 file changed, 15 insertions(+), 14 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 479c581e8a96..a5961c17eb36 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -1183,28 +1183,29 @@ static void drop_spte(struct kvm *kvm, u64 *sptep)
->  		rmap_remove(kvm, sptep);
->  }
->  
-> -
-> -static bool __drop_large_spte(struct kvm *kvm, u64 *sptep)
-> +static void __drop_large_spte(struct kvm *kvm, u64 *sptep, bool flush)
->  {
-> -	if (is_large_pte(*sptep)) {
-> -		WARN_ON(sptep_to_sp(sptep)->role.level == PG_LEVEL_4K);
-> -		drop_spte(kvm, sptep);
-> -		return true;
-> -	}
-> +	struct kvm_mmu_page *sp;
->  
-> -	return false;
-> -}
-> +	if (!is_large_pte(*sptep))
-> +		return;
->  
-> -static void drop_large_spte(struct kvm_vcpu *vcpu, u64 *sptep)
-> -{
-> -	if (__drop_large_spte(vcpu->kvm, sptep)) {
-> -		struct kvm_mmu_page *sp = sptep_to_sp(sptep);
-> +	sp = sptep_to_sp(sptep);
-> +	WARN_ON(sp->role.level == PG_LEVEL_4K);
->  
-> -		kvm_flush_remote_tlbs_with_address(vcpu->kvm, sp->gfn,
-> +	drop_spte(kvm, sptep);
-> +
-> +	if (flush) {
+On Mon, May 2, 2022 at 11:46 AM Yosry Ahmed <yosryahmed@google.com> wrote:
+>
+> On Mon, May 2, 2022 at 3:01 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Fri, 29 Apr 2022 21:11:28 +0100,
+> > Yosry Ahmed <yosryahmed@google.com> wrote:
+> > >
+> > > Add NR_SECONDARY_PAGETABLE stat to count secondary page table uses, e.g.
+> > > KVM mmu. This provides more insights on the kernel memory used
+> > > by a workload.
+> > >
+> > > This stat will be used by subsequent patches to count KVM mmu
+> > > memory usage.
+> > >
+> > > Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+> > > ---
+> > >  Documentation/admin-guide/cgroup-v2.rst | 5 +++++
+> > >  Documentation/filesystems/proc.rst      | 4 ++++
+> > >  drivers/base/node.c                     | 2 ++
+> > >  fs/proc/meminfo.c                       | 2 ++
+> > >  include/linux/mmzone.h                  | 1 +
+> > >  mm/memcontrol.c                         | 1 +
+> > >  mm/page_alloc.c                         | 6 +++++-
+> > >  mm/vmstat.c                             | 1 +
+> > >  8 files changed, 21 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
+> > > index 69d7a6983f78..828cb6b6f918 100644
+> > > --- a/Documentation/admin-guide/cgroup-v2.rst
+> > > +++ b/Documentation/admin-guide/cgroup-v2.rst
+> > > @@ -1312,6 +1312,11 @@ PAGE_SIZE multiple when read back.
+> > >         pagetables
+> > >                  Amount of memory allocated for page tables.
+> > >
+> > > +       secondary_pagetables
+> > > +             Amount of memory allocated for secondary page tables,
+> > > +             this currently includes KVM mmu allocations on x86
+> > > +             and arm64.
+> >
+> > Can you please explain what the rationale is for this? We already
+> > account for the (arm64) S2 PTs as a userspace allocation (see
+>
+> This can be considered as continuation for that work. The mentioned
+> commit accounts S2 PTs to the VM process cgroup kernel memory. We have
+> stats for the total kernel memory, and some fine-grained categories of
+> that, like (pagetables, stack, slab, etc.).
+>
+> This patch just adds another category to give further insights into
+> what exactly is using kernel memory.
+>
+> > 115bae923ac8bb29ee635). You are saying that this is related to a
+> > 'workload', but given that the accounting is global, I fail to see how
+> > you can attribute these allocations on a particular VM.
+>
+> The main motivation is having the memcg stats, which give attribution
+> to workloads. If you think it's more appropriate, we can add it as a
+> memcg-only stat, like MEMCG_VMALLOC (see 4e5aa1f4c2b4 ("memcg: add
+> per-memcg vmalloc stat")). The only reason I made this as a global
+> stat too is to be consistent with NR_PAGETABLE.
+>
+> >
+> > What do you plan to do for IOMMU page tables? After all, they serve
+> > the exact same purpose, and I'd expect these to be handled the same
+> > way (i.e. why is this KVM specific?).
+>
+> The reason this was named NR_SECONDARY_PAGTABLE instead of
+> NR_KVM_PAGETABLE is exactly that. To leave room to incrementally
+> account other types of secondary page tables to this stat. It is just
+> that we are currently interested in the KVM MMU usage.
+>
 
-Unnecessary curly braces.
 
-> +		kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
->  			KVM_PAGES_PER_HPAGE(sp->role.level));
->  	}
->  }
->  
-> +static void drop_large_spte(struct kvm_vcpu *vcpu, u64 *sptep)
-> +{
-> +	return __drop_large_spte(vcpu->kvm, sptep, true);
-> +}
-> +
->  /*
->   * Write-protect on the specified @sptep, @pt_protect indicates whether
->   * spte write-protection is caused by protecting shadow page table.
-> -- 
-> 2.36.0.rc2.479.g8af0fa9b8e-goog
-> 
+Any thoughts on this? Do you think MEMCG_SECONDARY_PAGETABLE would be
+more appropriate here?
