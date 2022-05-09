@@ -2,167 +2,273 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3036451FE7B
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 15:40:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B471B51FEA7
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 15:46:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236110AbiEINmq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 09:42:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43756 "EHLO
+        id S236048AbiEINn4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 09:43:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236044AbiEINmp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 09:42:45 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2047.outbound.protection.outlook.com [40.107.92.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45AD81F8F02;
-        Mon,  9 May 2022 06:38:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FriSkLCuSDw75yuQkcdy8TLw2iuHrxISURmzoMmP3iyQvL1o7h50aBCKsvYAC5NIXIvllhwoWJrPIWjkh2m41VTNvH05bBvjiEYOGaLdeb7cSSlV/rxKcafc3yFVqYeNi5hAeUsbFkZ6FXaF/h+Cw3iDLvHwd0xSfzqfruMW8wq2sJaSxwhSrzV+spGxqmjy1Kar++fW9bjPK7hYvN+Usth/dJdUALZ4+sZ/p9FPSj4lAzNH4xTMQ3m2+dGS+kM7LhhzAil1zhhIXO5rBNug+xJajtfKdXqI0wMimLV11IP4VDsmiFnAMHd6dZ8wRQRSmkE9SFVhRwS+k2U7kTEZsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IUjhGEyd3e6Nt8JvuHsBjAuC3m/paRIRx4KS4eflAfA=;
- b=bkFAunVUv2xaiOQmhzps9YpIBGoSUfxed/hYt92rbSrOXAvKqJOqg8Wuu4dPkY+m94aVoK9bhMh4GVMPNZv/af6bB+FgOc6L42IHy8u3FdJpiWerh2Tr9noRPlv9m/oUdub4oaxtEYBGPq8VN+utxIYqphnqvNxUt9AencDQ89KlS7S32Iuf+ZrmjfZWVhIsHZ4PKMr7wUcXlt+3tOB8wS55PFXNtHrcyu++hNa/WZxKbGlL5rdLNP1LDeR0Bm6W+94435F9Ns+wrAz2MPcDHM2p4UrIpi8pewmluDNk2tjLGGGu/TVmtPc9Hwz3IBSHutaXSlK3v8AkTWQlhOTORg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IUjhGEyd3e6Nt8JvuHsBjAuC3m/paRIRx4KS4eflAfA=;
- b=Aoww3DPIi5xQzgGSDzTm5CtZOwuOBuJflk0hPoFcAxiUcBEkx7TAZ7ypwx2WBNHZyCwugB3ym4DS6KyXSS+ndCB71vpZz8u0XOKbkTMAtHdzOnN7oVtDtUCeSSOz7+CKhhQX2b44aXmQn5JWnDFvH6w0gll3/+YSM41wFq3+GSQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CY4PR1201MB0181.namprd12.prod.outlook.com
- (2603:10b6:910:1f::11) by MN0PR12MB6320.namprd12.prod.outlook.com
- (2603:10b6:208:3d3::5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5227.21; Mon, 9 May
- 2022 13:38:49 +0000
-Received: from CY4PR1201MB0181.namprd12.prod.outlook.com
- ([fe80::5c1f:2ec0:4e86:7fad]) by CY4PR1201MB0181.namprd12.prod.outlook.com
- ([fe80::5c1f:2ec0:4e86:7fad%3]) with mapi id 15.20.5227.023; Mon, 9 May 2022
- 13:38:49 +0000
-Message-ID: <2b4a1f92-e2ae-41d9-9489-a8873f16f9cb@amd.com>
-Date:   Mon, 9 May 2022 15:38:40 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v4 13/15] KVM: x86: Warning APICv inconsistency only when
- vcpu APIC mode is valid
-Content-Language: en-US
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, mlevitsk@redhat.com, seanjc@google.com,
-        joro@8bytes.org, jon.grimm@amd.com, wei.huang2@amd.com,
-        terry.bowman@amd.com
-References: <20220508023930.12881-1-suravee.suthikulpanit@amd.com>
- <20220508023930.12881-14-suravee.suthikulpanit@amd.com>
-From:   "Gupta, Pankaj" <pankaj.gupta@amd.com>
-In-Reply-To: <20220508023930.12881-14-suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AS8P189CA0004.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:20b:31f::6) To CY4PR1201MB0181.namprd12.prod.outlook.com
- (2603:10b6:910:1f::11)
+        with ESMTP id S235984AbiEINny (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 09:43:54 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 082E925F783;
+        Mon,  9 May 2022 06:40:01 -0700 (PDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 249Cnfqi010056;
+        Mon, 9 May 2022 13:40:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=KaM6NfPO229QO+fiaKS2LcD29LG5ybLesYObQGJaSO0=;
+ b=VFxN66Hm4wQWQQaSevdP1h794j1hxUnY4e1tBXmayHeoltBfAHCAdDVJRl0mpVA/yyAI
+ ih8tZOm5lKUbuHw4xvKs383el+68TUoYy62zVfMshdOgXGT9X2fwX5+mmw5qUqo8HMGb
+ /wLzYHHiLDATrxvTj6HSm/qPg+1haHUTEt4e+tArvW66NAI69SWwEuzeVmQvcatRIu1H
+ 1ROvVSa+7Y1EB9QHwF+M1e/eGgTpelhM4F0n8m/Qgtk1wmsmv4yWAeIgTunvTd/V3BHI
+ wkDximwTqVm8N1cY9E6kP7+Bcy0l1ye6dIYEm83NImIIncPPfkHoAp5S3qA2jIUQz45q 6g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fy3a792g1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 May 2022 13:40:00 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 249DV4fu015223;
+        Mon, 9 May 2022 13:40:00 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fy3a792f2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 May 2022 13:40:00 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 249Dd7Z1025516;
+        Mon, 9 May 2022 13:39:57 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 3fwg1j2m3v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 May 2022 13:39:57 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 249Ddsbm33882496
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 9 May 2022 13:39:54 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 43A54A405C;
+        Mon,  9 May 2022 13:39:54 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D14C3A4054;
+        Mon,  9 May 2022 13:39:53 +0000 (GMT)
+Received: from [9.171.38.150] (unknown [9.171.38.150])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  9 May 2022 13:39:53 +0000 (GMT)
+Message-ID: <47b31afb-f202-2ac1-f614-4eae867f534d@linux.ibm.com>
+Date:   Mon, 9 May 2022 15:39:53 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b9401d25-1a6a-4eb5-a730-08da31c13f85
-X-MS-TrafficTypeDiagnostic: MN0PR12MB6320:EE_
-X-Microsoft-Antispam-PRVS: <MN0PR12MB6320AFC0CBCCF08A7CE62EE29BC69@MN0PR12MB6320.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WIVr09C8Bs8AvavujB3rJPpkPNmQVZku7V4vWEGfmV2JSMOJmlsPBF4PCfAsmd8vhoNe9Lt4Jqhp2RMx+QwEWCpgHIGyACTDMo9BegU7/PRC3xMM6foeVTGV1OoqeFBmrCpDdibtKsI7/Z/90kk20fbA71sDUg13IirQIqNfGgnoG2r5u9vmW19GBE86vCF+xfQQ8yTS6HzLoi2sxxmzHo+te0PNqj06dgyba1Pia/d9bt1NhrjZj6tXQVGstqRG0EWct2DtS97c2z1HaWAjDdebkmePm87wbxDtJh8zSN0P/DLRho4jnCnBcd97UmGv4FptiIXxjklQSSyOLJVGBpf0j9u4HWkILZOGNXtSWZb3Zt+jbBztNGW1m3wlyZdObLAnml5WCKT8prRioKPmsRdsGdFtpsc6qPifK6NASTmzGNBqD3RyBJmhrLNvH9kYOfAzH3imfzqzHyX3XZ7H730K0G5m8/BwGpLTU+rdYEQR1A/kOJFECavXXXEVeC0Rdtju4F1WjBBv9s3LZ5dE90tce+f3POcW/4JIl++I/4JL5Ngb6nWDUnlPFwg0kzhqAGGINmDEOSZEOhU8QKWuOfsZn+BNoksIpkHsP5UdxBiNhjwuhNMvFUQwsLuKEHrgZWHh10UUWpxK919ghDAiFvQD35xkB3jKN3QkPNgc2eg+9iRG1qzNibgYaYVL/WTz3oz+Uune8tou07+X1i4GRFNw/2oRyVc4h/J5queHPSE=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR1201MB0181.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(86362001)(8936002)(6506007)(36756003)(2616005)(6666004)(38100700002)(66556008)(316002)(66476007)(66946007)(8676002)(4326008)(2906002)(31686004)(83380400001)(508600001)(6486002)(5660300002)(31696002)(6512007)(26005)(186003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eW9OZ2NUcVkxZ2NYaFIyd3Rza3ZrZEhOeGlQaTIybklWZUZDRXZNVnlTU1ZB?=
- =?utf-8?B?RTN0MFVyUUkwQ0pRS01uNFFhL0JOajhxeDN5MFdkK2Z4STZKejU5OG9lL2RJ?=
- =?utf-8?B?dWlESFovMW50eUJCeHNTL0xtRFhONjBQN2lZd1g0YWQ2L3h3NnlhSmNHMzgw?=
- =?utf-8?B?RHNxL2hYZ3BPRVN5NG1jclNQMU1QRFRGUzRlSWlTS0F6YWswRkRqTmUxMFNT?=
- =?utf-8?B?U1RLTi9jM1lpZnBHanpDb0ZNd1hncGJLSjRwY0lEWVZBY2lhSkJ1OEM2eDlR?=
- =?utf-8?B?dThWUXZzWVA2RVFURG9JQlRDRHZsYmFwYytaU25CS21iU2xKcUE5blJUTEpF?=
- =?utf-8?B?Q2pidlJEQ0Z4RTUrMUkzSk1za0x2MGFwNkhJbkNpQkRHNlFjTkJNV3UyVm1I?=
- =?utf-8?B?MnNCWTVBVk9raWlsOEVXOE1wTnM1VVZKZjNqZ2JKT1JsVmlDN0U0bzFCZ0Qv?=
- =?utf-8?B?UzNCd2JWYkFJOXZVR09CYkJmeXloRXNYU2xNSko0RzBHbmp5ZVpkU0xwYS80?=
- =?utf-8?B?emdKLzcrQ3cvOFRjRThHRWQyTTRSMjRhZlF1bVhhZmNMN1h2ZXVZb2Y2VVdG?=
- =?utf-8?B?Z1YvdjBrd0FDNVBTTG54Zmcxb3BCSjRyTlZ4bDM4R0VIK3N2aUR2UmZ6V2Js?=
- =?utf-8?B?RHI4YUVjSkJ5M2EyMDhSTzh2b2s5eXhPd00xYVc2bFA5VUFBYmllSlBRWW9N?=
- =?utf-8?B?RldZeGhRWHBqQmJscS83eWdlUWthdU52YjdDNVZOQUw1SEdIMi85SElqZ0pF?=
- =?utf-8?B?QmJsak84a05ONjdvdHJQRW9tV01mVWZ0TVlWV0paWGRHMk9IK2pQWGFhMnIv?=
- =?utf-8?B?YUpQWGZoVldlV2V3cG5WZ3V0RDdkOCtNVkFFT1dYaHBxdElZYiszbS9jVnht?=
- =?utf-8?B?YjlYSWJvYzVpaDRkUHJsTFV4NkVaNlp5UVY1RHIrVnNTS09UYXFtU2VGSTdO?=
- =?utf-8?B?bE0waW1FR0VRWDhhMm1hNU9SaUJBOFRHR0pyL3RqUFdDMU9iWnd5SjcxYkQy?=
- =?utf-8?B?Tmx1dEkvSkFTYnNaTHd1aFgwSkowbHpjNEd2QXNFejdIZnlnZ3E4d0VpQUVx?=
- =?utf-8?B?RXlkelVuY1hVamdWM3B2emR2TnVReGUrenVBNWpQT2FDYzN3Q1JvUUlVcDV3?=
- =?utf-8?B?UWc0aGFYcXgvSFRGVDdVWm9PY3JjVDdqOWR4UWh2NnBhL3VJRE1uSjhSTmZo?=
- =?utf-8?B?eEFBV2I3eWNrQWszZFlFS2hDS2Z0U1JiN0N4WXRwZjlzc0lBcFdvQzJDMGE4?=
- =?utf-8?B?VnRYWkloSnpITDRjUTNEdGIyc2pweU5sWEp0ZFBzdFZpanh2SDNLNzJNTmxE?=
- =?utf-8?B?SFYvMkV2b1JEQWJMNGZlVEh0b3JmZ1VJbUV1Wi8zblB4REFFQVhJZGFRNUpr?=
- =?utf-8?B?T00wQXplUGZZOU40Y3VvMG5sSUJHamRFb2lIZktlK1BZRlQrWGNpcWpBOWtj?=
- =?utf-8?B?WE5JUXJ0VkhSeERLR3JrK3o2VE5YcFJLNUtvR1FvaE45d1ZwRTNYc2M5Z1JJ?=
- =?utf-8?B?eDJOT2RuenRmUUl0SEhmZW9yemFaekFybHpOYXYvTEtxVFVNcFVYN3M1bDBC?=
- =?utf-8?B?bFA4cklLekhGQzhvUlB1RkR6TnFPd3Y3Y3VlSG5pQUJEcWVJT0g0bGFXcEdI?=
- =?utf-8?B?OVA4L0Irbm9QSTBTUERMb0dKeGdQbjBOUmhUdyt3VFZQTlJ5QitoOThrK2dN?=
- =?utf-8?B?aExNRUkvdTZ1aS9iMmFyZDNnbTMwVkcrUFpXRmVQbko3ZmZwb3VRbWFSdlpi?=
- =?utf-8?B?Q3Jad0RqRFo1dXdFa0tOZDJnOU02USsxZitMWUNiMys4czlCbE9zUExvK29t?=
- =?utf-8?B?aDQ4WGtTN3NndTA4dzU3Z0VoNHFMYnNGNTBGeFYxYU9CRlpSNDEzM1BVWE4z?=
- =?utf-8?B?VllQbnRSWmNUcVU1YU1JU1FrNWJoMDhXNnZadXAwV090NG1raUpXL2EzT0F3?=
- =?utf-8?B?Y2UvL0MzaFpPbUNCbURmL1Nyb1ZSSHdrdFViVEhuL0pTQTN3Q2dtYnZJS05U?=
- =?utf-8?B?SW1yN3UzUjNRVlJwYnQ5MkJCZlNGVkV4OVJ6ZVIrL1U5R1NyUDIvRjFKbkVR?=
- =?utf-8?B?MjNhMEI5WVp5d2JUMms5TWY1MVU0b1FldSs3d3NJTzVZZzdJbzVwOGl5elpq?=
- =?utf-8?B?ZVFRbjVnZkFScnFuY3FSVzlCSlQydzBUNkUzUDRlcU9reGo0WWN3WkExS0ZP?=
- =?utf-8?B?Y0c0aTFjYVZIcnEzTnFORFlsclYvYnRDOFhndmRHdVpGRGZuaVBiTjFpdnYx?=
- =?utf-8?B?TTllNC9Tb2loOHpxTW4yZjFMclNSR1ZuUjhqTjhuL2NIOXVjZjNHNEF2WkRI?=
- =?utf-8?B?elRLVndPcC9DRU1Nc3FIR2RzWmMxUVFmWCtvb3oyajhHT2ZJRWo2UT09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b9401d25-1a6a-4eb5-a730-08da31c13f85
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR1201MB0181.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 May 2022 13:38:49.2862
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 94aRUnStNWqnl/EgSu0rdOkGnUz30TKVBHjvlXKlLVN8HcSW96oOMrADwje3CGo3hchPYhcqLZNf7tWv1G6zoQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6320
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [kvm-unit-tests PATCH 2/3] s390x: Test TEID values in storage key
+ test
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20220505124656.1954092-1-scgl@linux.ibm.com>
+ <20220505124656.1954092-3-scgl@linux.ibm.com>
+ <20220506173705.78f223dd@p-imbrenda>
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+In-Reply-To: <20220506173705.78f223dd@p-imbrenda>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: nmbY523c_bsuZUtwRS10hDUxNMIqAEK_
+X-Proofpoint-ORIG-GUID: ZHUot8jpSVTCB_bEr4I_kYjoKqIrc79n
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-09_03,2022-05-09_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ mlxscore=0 lowpriorityscore=0 impostorscore=0 suspectscore=0
+ malwarescore=0 priorityscore=1501 mlxlogscore=999 spamscore=0 bulkscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205090077
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 5/6/22 17:37, Claudio Imbrenda wrote:
+> On Thu,  5 May 2022 14:46:55 +0200
+> Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
+> 
+>> On a protection exception, test that the Translation-Exception
+>> Identification (TEID) values are correct given the circumstances of the
+>> particular test.
+>> The meaning of the TEID values is dependent on the installed
+>> suppression-on-protection facility.
+>>
+>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>> ---
+>>  lib/s390x/asm/facility.h | 21 ++++++++++++++
+>>  lib/s390x/sclp.h         |  2 ++
+>>  lib/s390x/sclp.c         |  2 ++
+>>  s390x/skey.c             | 60 ++++++++++++++++++++++++++++++++++++----
+>>  4 files changed, 79 insertions(+), 6 deletions(-)
+>>
 
-> When launching a VM with x2APIC and specify more than 255 vCPUs,
-> the guest kernel can disable x2APIC (e.g. specify nox2apic kernel option).
-> The VM fallbacks to xAPIC mode, and disable the vCPU ID 255 and greater.
+[...]
+
+>>  
+>> +enum access {
+>> +	ACC_FETCH = 2,
+>> +	ACC_STORE = 1,
+>> +	ACC_UPDATE = 3,
+>> +};
 > 
-> In this case, APICV is deactivated for the disabled vCPUs.
-> However, the current APICv consistency warning does not account for
-> this case, which results in a warning.
+> why not in numerical order?
+
+The numbers are chosen such that the bit masking in the function below
+is nicer, but the ordering is basically arbitrary.
+Somehow fetch, store, update seems natural to me, but I can sort it.
+I had ACC_NONE for a bit, but as I don't need it, I removed it.
 > 
-> Therefore, modify warning logic to report only when vCPU APIC mode
-> is valid.
+>> +
+>> +enum protection {
+>> +	PROT_STORE = 1,
+>> +	PROT_FETCH_STORE = 3,
+>> +};
 > 
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> ---
->   arch/x86/kvm/x86.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+> what happened to 2?
+
+There is no such thing as fetch only protection, so that's a result
+of the choice of values for masking.
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 77e49892dea1..0febaca80feb 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10242,7 +10242,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->   		 * per-VM state, and responsing vCPUs must wait for the update
->   		 * to complete before servicing KVM_REQ_APICV_UPDATE.
->   		 */
-> -		WARN_ON_ONCE(kvm_vcpu_apicv_activated(vcpu) != kvm_vcpu_apicv_active(vcpu));
-> +		WARN_ON_ONCE((kvm_vcpu_apicv_activated(vcpu) != kvm_vcpu_apicv_active(vcpu)) &&
-> +			     (kvm_get_apic_mode(vcpu) != LAPIC_MODE_DISABLED));
->   
->   		exit_fastpath = static_call(kvm_x86_vcpu_run)(vcpu);
->   		if (likely(exit_fastpath != EXIT_FASTPATH_REENTER_GUEST))
-Looks good to me.
-Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
+>> +
+>> +static void check_key_prot_exc(enum access access, enum protection prot)
+>> +{
+>> +	struct lowcore *lc = 0;
+>> +	union teid teid;
+>> +
+>> +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
+>> +	report_prefix_push("TEID");
+>> +	teid.val = lc->trans_exc_id;
+>> +	switch (get_supp_on_prot_facility()) {
+>> +	case SOP_NONE:
+>> +	case SOP_BASIC:
+>> +		break;
+>> +	case SOP_ENHANCED_1:
+>> +		if ((teid.val & (BIT(63 - 61))) == 0)
+> 
+> why not teid.m?
+
+I considered using .m, but the name does not contain any more information
+on the meaning than just the number.
+The PoP talks of the bits by their numbers in the suppression on detection
+chapter, so this is the most straight forward translation into code.
+> 
+>> +			report_pass("key-controlled protection");
+>> +		break;
+>> +	case SOP_ENHANCED_2:
+>> +		if ((teid.val & (BIT(63 - 56) | BIT(63 - 61))) == 0) {
+> 
+> maybe here you need to expand struct teid a little to accomodate for
+> bit 56.
+
+I could not think of a good name.
+> 
+>> +			report_pass("key-controlled protection");
+>> +			if (teid.val & BIT(63 - 60)) {
+>> +				int access_code = teid.fetch << 1 | teid.store;
+>> +
+>> +				report_info("access code: %d", access_code);
+> 
+> I don't like an unconditional report_info (it's ok to aid debugging if
+> something fails)
+
+In the case of update references the value you get is unspecified, so I found
+it interesting to see what happens in LPAR.
+I could only print it for update references, but I'm also fine with just
+dropping it. What do you think?
+> 
+>> +				if (access_code == 2)
+>> +					report((access & 2) && (prot & 2),
+>> +					       "exception due to fetch");
+>> +				if (access_code == 1)
+>> +					report((access & 1) && (prot & 1),
+>> +					       "exception due to store");
+> 
+> what about cases 0 and 3?
+
+Case 0 is specified to not contain any information and 3 is reserved,
+so also no information.
+
+> if they should never happen, handle it properly
+> and if they can happen... handle it properly
+> 
+>> +			}
+>> +		}
+>> +		break;
+>> +	}
+>> +	report_prefix_pop();
+>> +}
+>> +
+>>  /*
+>>   * Perform STORE CPU ADDRESS (STAP) instruction while temporarily executing
+>>   * with access key 1.
+>> @@ -199,7 +247,7 @@ static void test_store_cpu_address(void)
+>>  	expect_pgm_int();
+>>  	*out = 0xbeef;
+>>  	store_cpu_address_key_1(out);
+>> -	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
+>> +	check_key_prot_exc(ACC_STORE, PROT_STORE);
+>>  	report(*out == 0xbeef, "no store occurred");
+>>  	report_prefix_pop();
+>>  
+>> @@ -210,7 +258,7 @@ static void test_store_cpu_address(void)
+>>  	expect_pgm_int();
+>>  	*out = 0xbeef;
+>>  	store_cpu_address_key_1(out);
+>> -	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
+>> +	check_key_prot_exc(ACC_STORE, PROT_STORE);
+>>  	report(*out == 0xbeef, "no store occurred");
+>>  	report_prefix_pop();
+>>  
+>> @@ -228,7 +276,7 @@ static void test_store_cpu_address(void)
+>>  	expect_pgm_int();
+>>  	*out = 0xbeef;
+>>  	store_cpu_address_key_1(out);
+>> -	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
+>> +	check_key_prot_exc(ACC_STORE, PROT_STORE);
+>>  	report(*out == 0xbeef, "no store occurred");
+>>  	report_prefix_pop();
+>>  
+>> @@ -314,7 +362,7 @@ static void test_set_prefix(void)
+>>  	set_storage_key(pagebuf, 0x28, 0);
+>>  	expect_pgm_int();
+>>  	set_prefix_key_1(prefix_ptr);
+>> -	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
+>> +	check_key_prot_exc(ACC_FETCH, PROT_FETCH_STORE);
+>>  	report(get_prefix() == old_prefix, "did not set prefix");
+>>  	report_prefix_pop();
+>>  
+>> @@ -327,7 +375,7 @@ static void test_set_prefix(void)
+>>  	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
+>>  	set_prefix_key_1((uint32_t *)0);
+>>  	install_page(root, 0, 0);
+>> -	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
+>> +	check_key_prot_exc(ACC_FETCH, PROT_FETCH_STORE);
+>>  	report(get_prefix() == old_prefix, "did not set prefix");
+>>  	report_prefix_pop();
+>>  
+>> @@ -351,7 +399,7 @@ static void test_set_prefix(void)
+>>  	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
+>>  	set_prefix_key_1((uint32_t *)2048);
+>>  	install_page(root, 0, 0);
+>> -	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
+>> +	check_key_prot_exc(ACC_FETCH, PROT_FETCH_STORE);
+>>  	report(get_prefix() == old_prefix, "did not set prefix");
+>>  	report_prefix_pop();
+>>  
+> 
 
