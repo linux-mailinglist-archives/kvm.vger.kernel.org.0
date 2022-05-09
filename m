@@ -2,71 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DA85520487
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 20:31:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E82852050D
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 21:14:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240213AbiEISeq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 14:34:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41690 "EHLO
+        id S240468AbiEITQs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 15:16:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240202AbiEISeh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 14:34:37 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D57918384
-        for <kvm@vger.kernel.org>; Mon,  9 May 2022 11:30:43 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id bu29so25361460lfb.0
-        for <kvm@vger.kernel.org>; Mon, 09 May 2022 11:30:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kTCI93KHbih05ABsOG0D6ylKWGIQnpf75AAZhBgyXJ4=;
-        b=Yb3Aw7/3HkcHxcJp6s9T2JzxBEPmAAXb7m4ayDSWQS2oi9mJXYaEZpmwb8qtsdyr3I
-         RXxwQElP0TlpznUW01tGNc4Oy6Fu07TN2O+hMDJGP4/cHP9z9nibfWFxP81RxjWamW1D
-         OkFpFkPzNQfMO/lo6E1JPHUJGO7eZ7SPV96W+P++ULU38c5ItSiJhVU9WGm6Vl5bD1jR
-         4ClQsSj6ytUu1otZFaD6fG8TO1ExpGhpDLZMd+ZFiKoqqqmqFDuylWHH/C4oEus0slQi
-         D1PRPAqYUCbI3r/VNF1pQPjaHxgMcBNdTXGfb7XLE3/de60QrSBfQjzUqx/Q3UXkcewP
-         g0XA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kTCI93KHbih05ABsOG0D6ylKWGIQnpf75AAZhBgyXJ4=;
-        b=SJdaXWwJ7vOMhzj0lJrdUnyzt489ZnMKvzmMIc++3/SofR4W+FhtPst+v5a2riSD/H
-         nHVt6IaukdrC9NmYyOTAW4ob2UjC0HL6HqOE5isfoeDKh8dfeyp10xg2QPqa9rxZDCoP
-         Rb0SlyD2Qq1D5SC02IGIhhZzAIUECwqPPwqeKes+Qk7SfLm/UfnnSY+B4e4MsLAxOG8h
-         bHyvAetytsMxJTpPyYp9Q+apyzDaO+y6XwvSZlGHt0IgufHpu09B8TK5JhPYYV66Yeqi
-         qyKqQPh/O0LJHLEf+GtW3toi/aTqd4nrSTBFqrVFbWlOsakv9Wwg8tOOS+Yy4Ra2+MCK
-         xwYg==
-X-Gm-Message-State: AOAM5317iyB5/xPV+IqxC8VMay/fJES2DBj0H5/0rwJ5hEeoUAVnYclV
-        aTLwirXu9DU5MmKkwMVSAeOB7Jm/+mXtiEeaqauDsw==
-X-Google-Smtp-Source: ABdhPJykdXxQ9r9qAgMi6on8h45axoaCtqXBnWNglJrr/4o8fcEmcMTu1H6pgAeeEaMie49S+6sZWZikBwoWPsi2tlQ=
-X-Received: by 2002:a05:6512:2090:b0:472:2764:1f0c with SMTP id
- t16-20020a056512209000b0047227641f0cmr14020475lfr.482.1652121041364; Mon, 09
- May 2022 11:30:41 -0700 (PDT)
+        with ESMTP id S240455AbiEITQr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 15:16:47 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E9DE4B435;
+        Mon,  9 May 2022 12:12:52 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 249J8p3a023191;
+        Mon, 9 May 2022 19:12:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=DZzbJiIk8wIAoTuwwMQq7KRXqh2P/xm57Dp1M/M0xs0=;
+ b=IvUL5tKMINtn2cb43bg1gLUvbBDBqoKQN8efrjBBHiUdwKrv4+fR82Z0nlqAVABrmffa
+ bltkm7qFfVQ0r0I1zsohL1SzUU+BErZaixjdPyhMbk/ecIDifwdWoBI7Em5FcX7CZwu0
+ t/iiW6BpGnR0RMAMf7GBUFRzGrBAaqGSNAOry54hK6zZsGsGXvyTvfHnPxx6Yfocyq/L
+ FPQLWUn6MtG/dqLPOF5K3Ffmzo7boaK4S+OQw6aYQYlLkssD7OzX3HxQ2UWhjp4/rucm
+ KjdmErh58canyJ4g1GBXvMq7BxUlNLwT07wD/DK7WTLiKHXxTNjKNuQZVnC/HqT7yjqx ZA== 
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fy7s4s7gs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 May 2022 19:12:51 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 249Iv8Yq028759;
+        Mon, 9 May 2022 19:12:49 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06ams.nl.ibm.com with ESMTP id 3fwg1j2xs6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 May 2022 19:12:49 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 249IxEjl48366030
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 9 May 2022 18:59:14 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3A74DAE04D;
+        Mon,  9 May 2022 19:12:46 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E7A0FAE045;
+        Mon,  9 May 2022 19:12:45 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.15.58])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  9 May 2022 19:12:45 +0000 (GMT)
+Date:   Mon, 9 May 2022 21:11:40 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        borntraeger@linux.ibm.com
+Subject: Re: [PATCH 7/9] kvm: s390: Add CPU dump functionality
+Message-ID: <20220509211140.38f49000@p-imbrenda>
+In-Reply-To: <20220428130102.230790-8-frankja@linux.ibm.com>
+References: <20220428130102.230790-1-frankja@linux.ibm.com>
+        <20220428130102.230790-8-frankja@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20220422150519.3818093-1-atishp@rivosinc.com> <CAAhSdy0QW7o9f0_Nqx7KwHtn2Kh4Z-zURZQ2qt--L7Dc8cYnTg@mail.gmail.com>
-In-Reply-To: <CAAhSdy0QW7o9f0_Nqx7KwHtn2Kh4Z-zURZQ2qt--L7Dc8cYnTg@mail.gmail.com>
-From:   Atish Kumar Patra <atishp@rivosinc.com>
-Date:   Mon, 9 May 2022 11:30:30 -0700
-Message-ID: <CAHBxVyFgjpxPWTWAD+eniUK4bvZpf53BFiNff5sybuz76b+siA@mail.gmail.com>
-Subject: Re: [v2 PATCH] RISC-V: KVM: Introduce ISA extension register
-To:     Anup Patel <anup@brainfault.org>
-Cc:     KVM General <kvm@vger.kernel.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        DTML <devicetree@vger.kernel.org>,
-        Jisheng Zhang <jszhang@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Ru6ROCiHgraWSlFUVpWgEdF43EuZAd7D
+X-Proofpoint-GUID: Ru6ROCiHgraWSlFUVpWgEdF43EuZAd7D
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-09_05,2022-05-09_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
+ mlxscore=0 bulkscore=0 clxscore=1015 priorityscore=1501 lowpriorityscore=0
+ adultscore=0 impostorscore=0 suspectscore=0 phishscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2205090100
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,215 +85,188 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, May 8, 2022 at 10:25 PM Anup Patel <anup@brainfault.org> wrote:
->
-> On Fri, Apr 22, 2022 at 8:38 PM Atish Patra <atishp@rivosinc.com> wrote:
-> >
-> > Currently, there is no provision for vmm (qemu-kvm or kvmtool) to
-> > query about multiple-letter ISA extensions. The config register
-> > is only used for base single letter ISA extensions.
-> >
-> > A new ISA extension register is added that will allow the vmm
-> > to query about any ISA extension one at a time. It is enabled for
-> > both single letter or multi-letter ISA extensions. The ISA extension
-> > register is useful to if the vmm requires to retrieve/set single
-> > extension while the config register should be used if all the base
-> > ISA extension required to retrieve or set.
-> >
-> > For any multi-letter ISA extensions, the new register interface
-> > must be used.
-> >
-> > Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> > ---
-> > Changes from v1->v2:
-> > 1. Sending the patch separate from sstc series as it is unrelated.
-> > 2. Removed few redundant lines.
-> >
-> > The kvm tool patches can be found here.
-> >
-> > https://github.com/atishp04/kvmtool/tree/sstc_v2
-> >
-> > ---
-> >  arch/riscv/include/uapi/asm/kvm.h | 20 +++++++
-> >  arch/riscv/kvm/vcpu.c             | 98 +++++++++++++++++++++++++++++++
-> >  2 files changed, 118 insertions(+)
-> >
-> > diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-> > index f808ad1ce500..92bd469e2ba6 100644
-> > --- a/arch/riscv/include/uapi/asm/kvm.h
-> > +++ b/arch/riscv/include/uapi/asm/kvm.h
-> > @@ -82,6 +82,23 @@ struct kvm_riscv_timer {
-> >         __u64 state;
-> >  };
-> >
-> > +/**
-> > + * ISA extension IDs specific to KVM. This is not the same as the host ISA
-> > + * extension IDs as that is internal to the host and should not be exposed
-> > + * to the guest. This should always be contiguous to keep the mapping simple
-> > + * in KVM implementation.
-> > + */
-> > +enum KVM_RISCV_ISA_EXT_ID {
-> > +       KVM_RISCV_ISA_EXT_A = 0,
-> > +       KVM_RISCV_ISA_EXT_C,
-> > +       KVM_RISCV_ISA_EXT_D,
-> > +       KVM_RISCV_ISA_EXT_F,
-> > +       KVM_RISCV_ISA_EXT_H,
-> > +       KVM_RISCV_ISA_EXT_I,
-> > +       KVM_RISCV_ISA_EXT_M,
-> > +       KVM_RISCV_ISA_EXT_MAX,
-> > +};
-> > +
-> >  /* Possible states for kvm_riscv_timer */
-> >  #define KVM_RISCV_TIMER_STATE_OFF      0
-> >  #define KVM_RISCV_TIMER_STATE_ON       1
-> > @@ -123,6 +140,9 @@ struct kvm_riscv_timer {
-> >  #define KVM_REG_RISCV_FP_D_REG(name)   \
-> >                 (offsetof(struct __riscv_d_ext_state, name) / sizeof(__u64))
-> >
-> > +/* ISA Extension registers are mapped as type 7 */
-> > +#define KVM_REG_RISCV_ISA_EXT          (0x07 << KVM_REG_RISCV_TYPE_SHIFT)
-> > +
-> >  #endif
-> >
-> >  #endif /* __LINUX_KVM_RISCV_H */
-> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> > index aad430668bb4..93492eb292fd 100644
-> > --- a/arch/riscv/kvm/vcpu.c
-> > +++ b/arch/riscv/kvm/vcpu.c
-> > @@ -365,6 +365,100 @@ static int kvm_riscv_vcpu_set_reg_csr(struct kvm_vcpu *vcpu,
-> >         return 0;
-> >  }
-> >
-> > +/* Mapping between KVM ISA Extension ID & Host ISA extension ID */
-> > +static unsigned long kvm_isa_ext_arr[] = {
-> > +       RISCV_ISA_EXT_a,
-> > +       RISCV_ISA_EXT_c,
-> > +       RISCV_ISA_EXT_d,
-> > +       RISCV_ISA_EXT_f,
-> > +       RISCV_ISA_EXT_h,
-> > +       RISCV_ISA_EXT_i,
-> > +       RISCV_ISA_EXT_m,
-> > +};
-> > +
-> > +static int kvm_riscv_vcpu_get_reg_isa_ext(struct kvm_vcpu *vcpu,
-> > +                                         const struct kvm_one_reg *reg)
-> > +{
-> > +       unsigned long __user *uaddr =
-> > +                       (unsigned long __user *)(unsigned long)reg->addr;
-> > +       unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
-> > +                                           KVM_REG_SIZE_MASK |
-> > +                                           KVM_REG_RISCV_ISA_EXT);
-> > +       unsigned long reg_val = 0;
-> > +       unsigned long host_isa_ext;
-> > +
-> > +       if (KVM_REG_SIZE(reg->id) != sizeof(unsigned long))
-> > +               return -EINVAL;
-> > +
-> > +       if (reg_num >= KVM_RISCV_ISA_EXT_MAX || reg_num >= ARRAY_SIZE(kvm_isa_ext_arr))
-> > +               return -EINVAL;
-> > +
-> > +       host_isa_ext = kvm_isa_ext_arr[reg_num];
-> > +       if (__riscv_isa_extension_available(NULL, host_isa_ext))
->
-> This should be "__riscv_isa_extension_available(vcpu->arch.isa, host_isa_ext)".
+On Thu, 28 Apr 2022 13:01:00 +0000
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-Ahh yes. Thanks for catching that.
+> The previous patch introduced the per-VM dump functions now let's
+> focus on dumping the VCPU state via the newly introduced
+> KVM_S390_PV_CPU_COMMAND ioctl which mirrors the VM UV ioctl and can be
+> extended with new commands later.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  arch/s390/kvm/kvm-s390.c | 73 ++++++++++++++++++++++++++++++++++++++++
+>  arch/s390/kvm/kvm-s390.h |  1 +
+>  arch/s390/kvm/pv.c       | 16 +++++++++
+>  include/uapi/linux/kvm.h |  5 +++
+>  4 files changed, 95 insertions(+)
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 8984e8db33b4..d15ce38bef14 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -5149,6 +5149,52 @@ long kvm_arch_vcpu_async_ioctl(struct file *filp,
+>  	return -ENOIOCTLCMD;
+>  }
+>  
+> +static int kvm_s390_handle_pv_vcpu_dump(struct kvm_vcpu *vcpu,
+> +					struct kvm_pv_cmd *cmd)
+> +{
+> +	struct kvm_s390_pv_dmp dmp;
+> +	void *data;
+> +	int ret;
+> +
+> +	/* Dump initialization is a prerequisite */
+> +	if (!vcpu->kvm->arch.pv.dumping)
+> +		return -EINVAL;
+> +
+> +	if (copy_from_user(&dmp, (__u8 __user *)cmd->data, sizeof(dmp)))
+> +		return -EFAULT;
+> +
+> +	/* We only handle this subcmd right now */
+> +	if (dmp.subcmd != KVM_PV_DUMP_CPU)
+> +		return -EINVAL;
+> +
+> +	/* CPU dump length is the same as create cpu storage donation. */
+> +	if (dmp.buff_len != uv_info.guest_cpu_stor_len)
+> +		return -EINVAL;
+> +
+> +	data = vzalloc(uv_info.guest_cpu_stor_len);
+> +	if (!data)
+> +		return -ENOMEM;
+> +
+> +	ret = kvm_s390_pv_dump_cpu(vcpu, data, &cmd->rc, &cmd->rrc);
+> +
+> +	VCPU_EVENT(vcpu, 3, "PROTVIRT DUMP CPU %d rc %x rrc %x",
+> +		   vcpu->vcpu_id, cmd->rc, cmd->rrc);
+> +
+> +	if (ret) {
+> +		vfree(data);
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* On success copy over the dump data */
+> +	if (copy_to_user((__u8 __user *)dmp.buff_addr, data, uv_info.guest_cpu_stor_len)) {
+> +		vfree(data);
+> +		return -EFAULT;
+> +	}
+> +
+> +	vfree(data);
+> +	return 0;
+> +}
+> +
+>  long kvm_arch_vcpu_ioctl(struct file *filp,
+>  			 unsigned int ioctl, unsigned long arg)
+>  {
+> @@ -5313,6 +5359,33 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  					   irq_state.len);
+>  		break;
+>  	}
+> +	case KVM_S390_PV_CPU_COMMAND: {
+> +		struct kvm_pv_cmd cmd;
+> +
+> +		r = -EINVAL;
+> +		if (!is_prot_virt_host())
+> +			break;
+> +
+> +		r = -EFAULT;
+> +		if (copy_from_user(&cmd, argp, sizeof(cmd)))
+> +			break;
+> +
+> +		r = -EINVAL;
+> +		if (cmd.flags)
+> +			break;
+> +
+> +		/* We only handle this cmd right now */
+> +		if (cmd.cmd != KVM_PV_DUMP)
+> +			break;
+> +
+> +		r = kvm_s390_handle_pv_vcpu_dump(vcpu, &cmd);
+> +
+> +		/* Always copy over UV rc / rrc data */
+> +		if (copy_to_user((__u8 __user *)argp, &cmd.rc,
+> +				 sizeof(cmd.rc) + sizeof(cmd.rrc)))
+> +			r = -EFAULT;
+> +		break;
+> +	}
+>  	default:
+>  		r = -ENOTTY;
+>  	}
+> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+> index 2868dd0bba25..a39815184350 100644
+> --- a/arch/s390/kvm/kvm-s390.h
+> +++ b/arch/s390/kvm/kvm-s390.h
+> @@ -250,6 +250,7 @@ int kvm_s390_pv_set_sec_parms(struct kvm *kvm, void *hdr, u64 length, u16 *rc,
+>  int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned long size,
+>  		       unsigned long tweak, u16 *rc, u16 *rrc);
+>  int kvm_s390_pv_set_cpu_state(struct kvm_vcpu *vcpu, u8 state);
+> +int kvm_s390_pv_dump_cpu(struct kvm_vcpu *vcpu, void *buff, u16 *rc, u16 *rrc);
+>  int kvm_s390_pv_dump_stor_state(struct kvm *kvm, void __user *buff_user,
+>  				u64 *gaddr, u64 buff_user_len, u16 *rc, u16 *rrc);
+>  
+> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+> index d1635ed50078..9ab8192b9b23 100644
+> --- a/arch/s390/kvm/pv.c
+> +++ b/arch/s390/kvm/pv.c
+> @@ -299,6 +299,22 @@ int kvm_s390_pv_set_cpu_state(struct kvm_vcpu *vcpu, u8 state)
+>  	return 0;
+>  }
+>  
+> +int kvm_s390_pv_dump_cpu(struct kvm_vcpu *vcpu, void *buff, u16 *rc, u16 *rrc)
+> +{
+> +	struct uv_cb_dump_cpu uvcb = {
+> +		.header.cmd = UVC_CMD_DUMP_CPU,
+> +		.header.len = sizeof(uvcb),
+> +		.cpu_handle = vcpu->arch.pv.handle,
+> +		.dump_area_origin = (u64)buff,
+> +	};
+> +	int cc;
+> +
+> +	cc = uv_call_sched(0, (u64)&uvcb);
 
->
-> > +               reg_val = 1; /* Mark the given extension as available */
-> > +
-> > +       if (copy_to_user(uaddr, &reg_val, KVM_REG_SIZE(reg->id)))
-> > +               return -EFAULT;
-> > +
-> > +       return 0;
-> > +}
-> > +
-> > +static int kvm_riscv_vcpu_set_reg_isa_ext(struct kvm_vcpu *vcpu,
-> > +                                         const struct kvm_one_reg *reg)
-> > +{
-> > +       unsigned long __user *uaddr =
-> > +                       (unsigned long __user *)(unsigned long)reg->addr;
-> > +       unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
-> > +                                           KVM_REG_SIZE_MASK |
-> > +                                           KVM_REG_RISCV_ISA_EXT);
-> > +       unsigned long reg_val;
-> > +       unsigned long host_isa_ext;
-> > +       unsigned long host_isa_ext_mask;
-> > +
-> > +       if (KVM_REG_SIZE(reg->id) != sizeof(unsigned long))
-> > +               return -EINVAL;
-> > +
-> > +       if (reg_num >= KVM_RISCV_ISA_EXT_MAX || reg_num >= ARRAY_SIZE(kvm_isa_ext_arr))
-> > +               return -EINVAL;
-> > +
-> > +       if (copy_from_user(&reg_val, uaddr, KVM_REG_SIZE(reg->id)))
-> > +               return -EFAULT;
-> > +
-> > +       host_isa_ext = kvm_isa_ext_arr[reg_num];
-> > +       if (!__riscv_isa_extension_available(NULL, host_isa_ext))
-> > +               return  -EOPNOTSUPP;
-> > +
-> > +       if (host_isa_ext >= RISCV_ISA_EXT_BASE &&
-> > +           host_isa_ext < RISCV_ISA_EXT_MAX) {
-> > +               /** Multi-letter ISA extension. Currently there is no provision
-> > +                * to enable/disable the multi-letter ISA extensions for guests.
-> > +                * Return success if the request is to enable any ISA extension
-> > +                * that is available in the hardware.
-> > +                * Return -EOPNOTSUPP otherwise.
-> > +                */
->
-> Use double-winged comment-block for multi-line comments.
+it's a small amount of data, but you use the _sched variant?
 
-Fixed.
+and, why aren't you using the _sched variant in the previous patch (for
+DUMP_COMPLETE)?
 
->
-> > +               if (!reg_val)
-> > +                       return -EOPNOTSUPP;
-> > +               else
-> > +                       return 0;
-> > +       }
-> > +
-> > +       /* Single letter base ISA extension */
-> > +       if (!vcpu->arch.ran_atleast_once) {
-> > +               host_isa_ext_mask = BIT_MASK(host_isa_ext);
-> > +               if (!reg_val && (host_isa_ext_mask & KVM_RISCV_ISA_DISABLE_ALLOWED))
-> > +                       vcpu->arch.isa &= ~host_isa_ext_mask;
-> > +               else
-> > +                       vcpu->arch.isa |= host_isa_ext_mask;
-> > +               vcpu->arch.isa &= riscv_isa_extension_base(NULL);
-> > +               vcpu->arch.isa &= KVM_RISCV_ISA_ALLOWED;
-> > +               kvm_riscv_vcpu_fp_reset(vcpu);
-> > +       } else {
-> > +               return -EOPNOTSUPP;
-> > +       }
-> > +
-> > +       return 0;
-> > +}
-> > +
-> >  static int kvm_riscv_vcpu_set_reg(struct kvm_vcpu *vcpu,
-> >                                   const struct kvm_one_reg *reg)
-> >  {
-> > @@ -382,6 +476,8 @@ static int kvm_riscv_vcpu_set_reg(struct kvm_vcpu *vcpu,
-> >         else if ((reg->id & KVM_REG_RISCV_TYPE_MASK) == KVM_REG_RISCV_FP_D)
-> >                 return kvm_riscv_vcpu_set_reg_fp(vcpu, reg,
-> >                                                  KVM_REG_RISCV_FP_D);
-> > +       else if ((reg->id & KVM_REG_RISCV_TYPE_MASK) == KVM_REG_RISCV_ISA_EXT)
-> > +               return kvm_riscv_vcpu_set_reg_isa_ext(vcpu, reg);
-> >
-> >         return -EINVAL;
-> >  }
-> > @@ -403,6 +499,8 @@ static int kvm_riscv_vcpu_get_reg(struct kvm_vcpu *vcpu,
-> >         else if ((reg->id & KVM_REG_RISCV_TYPE_MASK) == KVM_REG_RISCV_FP_D)
-> >                 return kvm_riscv_vcpu_get_reg_fp(vcpu, reg,
-> >                                                  KVM_REG_RISCV_FP_D);
-> > +       else if ((reg->id & KVM_REG_RISCV_TYPE_MASK) == KVM_REG_RISCV_ISA_EXT)
-> > +               return kvm_riscv_vcpu_get_reg_isa_ext(vcpu, reg);
-> >
-> >         return -EINVAL;
-> >  }
-> > --
-> > 2.25.1
-> >
->
-> Regards,
-> Anup
+to be clear: I think the right thing is to always use the _sched
+variant unless there is a good reason not to (so please fix the previous
+patch)
+
+> +	*rc = uvcb.header.rc;
+> +	*rrc = uvcb.header.rrc;
+> +	return cc;
+> +}
+> +
+>  /* Size of the cache for the storage state dump data. 1MB for now */
+>  #define DUMP_BUFF_LEN HPAGE_SIZE
+>  
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index b34850907291..108bc7b7a71b 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1144,6 +1144,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_S390_MEM_OP_EXTENSION 211
+>  #define KVM_CAP_PMU_CAPABILITY 212
+>  #define KVM_CAP_DISABLE_QUIRKS2 213
+> +#define KVM_CAP_S390_PROTECTED_DUMP 214
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+> @@ -1649,6 +1650,7 @@ enum pv_cmd_dmp_id {
+>  	KVM_PV_DUMP_INIT,
+>  	KVM_PV_DUMP_CONFIG_STOR_STATE,
+>  	KVM_PV_DUMP_COMPLETE,
+> +	KVM_PV_DUMP_CPU,
+>  };
+>  
+>  struct kvm_s390_pv_dmp {
+> @@ -2110,4 +2112,7 @@ struct kvm_stats_desc {
+>  /* Available with KVM_CAP_XSAVE2 */
+>  #define KVM_GET_XSAVE2		  _IOR(KVMIO,  0xcf, struct kvm_xsave)
+>  
+> +/* Available with KVM_CAP_S390_PROTECTED_DUMP */
+> +#define KVM_S390_PV_CPU_COMMAND	_IOWR(KVMIO, 0xd0, struct kvm_pv_cmd)
+> +
+>  #endif /* __LINUX_KVM_H */
+
