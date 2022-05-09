@@ -2,102 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 97D5551FCDA
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 14:31:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A3E251FD16
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 14:41:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234571AbiEIMdU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 08:33:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40526 "EHLO
+        id S234732AbiEIMoh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 08:44:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234532AbiEIMdO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 08:33:14 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6817F273F48;
-        Mon,  9 May 2022 05:29:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652099360; x=1683635360;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=qMvEPRtoB+d3/whBmM3c2zEnnc5nXdnRsTyVqxph14o=;
-  b=l8IF8etC+HnM3NycSrq2EyBFo0nnIvGjH1fmlyBsQclF4RUmeRDMc0Hh
-   JaatiTlRh3iOWZLvbBWT3DAoUzzq6/AC+nG6P7YOx8B1rLhWjpo6J5ufq
-   Kork1mcj3jjL9tMl1EueOnbEYt8mGReqTcaaMVv4bzwW8FkNPxC/2Qm+M
-   7RGw+sO/nv40UFfIiJ4WLYgrhUW3ro4OZjc8jDxz9NkIwypsJnCWic+It
-   tfdJdIakkP+4yt7QTjKhMCV72AfibfBmppE03BSTQVlymB8ngJZ5h6Pxe
-   fspPJ0ZuZe7rs3YU34S8QOTtcm6OBuIhbmPrDwhddRpLhhWZ9JZlh4C1N
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10341"; a="269172496"
-X-IronPort-AV: E=Sophos;i="5.91,211,1647327600"; 
-   d="scan'208";a="269172496"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2022 05:29:18 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,211,1647327600"; 
-   d="scan'208";a="738142548"
-Received: from lkp-server01.sh.intel.com (HELO 5056e131ad90) ([10.239.97.150])
-  by orsmga005.jf.intel.com with ESMTP; 09 May 2022 05:29:11 -0700
-Received: from kbuild by 5056e131ad90 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1no2Vi-000GVC-Dp;
-        Mon, 09 May 2022 12:29:10 +0000
-Date:   Mon, 9 May 2022 20:28:43 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Cindy Lu <lulu@redhat.com>, jasowang@redhat.com, mst@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Cc:     kbuild-all@lists.01.org
-Subject: Re: [PATCH v1] vdpa: Do not count the pages that were already pinned
- in the vhost-vDPA
-Message-ID: <202205092058.if9wModg-lkp@intel.com>
-References: <20220509071426.155941-1-lulu@redhat.com>
+        with ESMTP id S234744AbiEIMoe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 08:44:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 173F6630B
+        for <kvm@vger.kernel.org>; Mon,  9 May 2022 05:40:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652100039;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=SUadK35yMNXsZHcgs6kL1o+WcgWzTvpYsG0KVUtggWM=;
+        b=RpzW2ckxg2enpj0sYnQ6PBfwAEYP5USkLeM9y8Stmo5eJRahSavalzeXtSqO/6CBbrLSyw
+        XKRa6J8ClT+m+NAvSAn9pqu5N61lTFqNBI8iC3TOtIebFO+UlZcwi5DQv0STKko7Hhk5Zr
+        nEVY+vVFgNHIR/F3ncfk5DbI+vP87fA=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-660-cnA7PO4uNd2Xf7AIhxd-wQ-1; Mon, 09 May 2022 08:40:37 -0400
+X-MC-Unique: cnA7PO4uNd2Xf7AIhxd-wQ-1
+Received: by mail-wr1-f69.google.com with SMTP id s8-20020adf9788000000b0020adb01dc25so5733184wrb.20
+        for <kvm@vger.kernel.org>; Mon, 09 May 2022 05:40:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:reply-to
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=SUadK35yMNXsZHcgs6kL1o+WcgWzTvpYsG0KVUtggWM=;
+        b=kLDITFA1oVl9R8lPlWmVjLzBvcvDdBmxSSmYUTOmImrhMmmsgkx2++2kAnG1E9F+hn
+         Q23qP1ztHFEXh7i6J1Fi49/a3gDAbxRQX9xSjibl+qFTIHWrwsiZEUTmbsfjMWO5DUi7
+         RAYrEcKbTa1ZHQ9AmPGVf1Lz8ebkhOMR/mnpMST3GCVJyuzmFG7eb2e0yufVsvaWzEGA
+         2S3d2D5LuGNH2l590bvrza5Kn5yFO/qt/k7O+SofNmuAzUHq9npyZacwuLDoxH9pMR38
+         q0YEnc766Z7e4NFdOEwe9w59++Sz199PEKs9c6E9+y9+cs7C/Mb7jDujpS8s09GHacnT
+         ivrg==
+X-Gm-Message-State: AOAM531skihqRXTibWW7jdoPwBGcHIS3XceenW/VaKLngbtGryzLbXnM
+        mtoPxOMUa8eXslUXvUARzoVjWNXzd4VQKwxtLjs6S06lC2LKd8CMQ2iqCoW5cUPupULuTo6Ri1G
+        Ow0J27izWzU96
+X-Received: by 2002:a5d:47ca:0:b0:20c:72c9:d3be with SMTP id o10-20020a5d47ca000000b0020c72c9d3bemr13474738wrc.114.1652100036409;
+        Mon, 09 May 2022 05:40:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJysvm3jkrqazePjRtdEnYu3kQ2p9NT6qTIcb4srvAfJimbVAhgFFtMASqJqwQfcuURt7qkeXg==
+X-Received: by 2002:a5d:47ca:0:b0:20c:72c9:d3be with SMTP id o10-20020a5d47ca000000b0020c72c9d3bemr13474718wrc.114.1652100036144;
+        Mon, 09 May 2022 05:40:36 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id b15-20020a7bc24f000000b003942a244ecfsm12770414wmj.20.2022.05.09.05.40.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 May 2022 05:40:35 -0700 (PDT)
+Message-ID: <20a4ca70-0dd5-75eb-0d09-234e3dceea40@redhat.com>
+Date:   Mon, 9 May 2022 14:40:34 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220509071426.155941-1-lulu@redhat.com>
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v2 2/4] KVM: arm64: vgic: Add more checks when restoring
+ ITS tables
+Content-Language: en-US
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        pbonzini@redhat.com, maz@kernel.org, andre.przywara@arm.com,
+        drjones@redhat.com, alexandru.elisei@arm.com, oupton@google.com,
+        reijiw@google.com, pshier@google.com
+References: <20220427184814.2204513-1-ricarkol@google.com>
+ <20220427184814.2204513-3-ricarkol@google.com>
+ <b29fcba7-2599-bf1b-0720-26b05cc37fd4@redhat.com>
+ <YnKxbNuf4U1Zgjx5@google.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <YnKxbNuf4U1Zgjx5@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Cindy,
+Hi Ricardo,
 
-Thank you for the patch! Yet something to improve:
+On 5/4/22 19:01, Ricardo Koller wrote:
+> On Tue, May 03, 2022 at 07:14:19PM +0200, Eric Auger wrote:
+>> Hi Ricardo,
+>>
+>> On 4/27/22 20:48, Ricardo Koller wrote:
+>>> Try to improve the predictability of ITS save/restores (and debuggability
+>>> of failed ITS saves) by failing early on restore when trying to read
+>>> corrupted tables.
+>>>
+>>> Restoring the ITS tables does some checks for corrupted tables, but not as
+>>> many as in a save: an overflowing device ID will be detected on save but
+>>> not on restore.  The consequence is that restoring a corrupted table won't
+>>> be detected until the next save; including the ITS not working as expected
+>>> after the restore.  As an example, if the guest sets tables overlapping
+>>> each other, which would most likely result in some corrupted table, this is
+>>> what we would see from the host point of view:
+>>>
+>>> 	guest sets base addresses that overlap each other
+>>> 	save ioctl
+>>> 	restore ioctl
+>>> 	save ioctl (fails)
+>>>
+>>> Ideally, we would like the first save to fail, but overlapping tables could
+>>> actually be intended by the guest. So, let's at least fail on the restore
+>>> with some checks: like checking that device and event IDs don't overflow
+>>> their tables.
+>>>
+>>> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+>>> ---
+>>>  arch/arm64/kvm/vgic/vgic-its.c | 13 +++++++++++++
+>>>  1 file changed, 13 insertions(+)
+>>>
+>>> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+>>> index e14790750958..fb2d26a73880 100644
+>>> --- a/arch/arm64/kvm/vgic/vgic-its.c
+>>> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+>>> @@ -2198,6 +2198,12 @@ static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
+>>>  	if (!collection)
+>>>  		return -EINVAL;
+>>>  
+>>> +	if (find_ite(its, dev->device_id, event_id))
+>>> +		return -EINVAL;
+>> Unsure about that. Nothing in the arm-vgic-its.rst doc says that the
+>> KVM_DEV_ARM_ITS_RESTORE_TABLES ioctl cannot be called several times
+>> (although obviously useless)
+> In that case, maybe we could ignore the new repeated entry? or
+Maybe you can fail only in the case the ITE to be restored is different
+from the existing one? otherwise ignore.
 
-[auto build test ERROR on mst-vhost/linux-next]
-[also build test ERROR on linux/master linus/master v5.18-rc6]
-[cannot apply to next-20220506]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+Eric
+> overwrite the old one?  find_ite() only returns the first (device_id,
+> event_id) match. So, it's like the new one is ignored already.  The
+> arm arm says this about MAPI commands in this situation:
+>
+>     If there is an existing mapping for the EventID-DeviceID
+>     combination, behavior is UNPREDICTABLE.
+>
+> And, just in case, the main reason for adding this check was to avoid
+> failing the next ITS save. The idea is to try to fail as soon as
+> possible, not in possibly many days during the next migration attempt.
+>
+>>> +
+>>> +	if (!vgic_its_check_event_id(its, dev, event_id))
+>>> +		return -EINVAL;
+>>> +
+>>>  	ite = vgic_its_alloc_ite(dev, collection, event_id);
+>>>  	if (IS_ERR(ite))
+>>>  		return PTR_ERR(ite);
+>>> @@ -2319,6 +2325,7 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+>>>  				void *ptr, void *opaque)
+>>>  {
+>>>  	struct its_device *dev;
+>>> +	u64 baser = its->baser_device_table;
+>>>  	gpa_t itt_addr;
+>>>  	u8 num_eventid_bits;
+>>>  	u64 entry = *(u64 *)ptr;
+>>> @@ -2339,6 +2346,12 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+>>>  	/* dte entry is valid */
+>>>  	offset = (entry & KVM_ITS_DTE_NEXT_MASK) >> KVM_ITS_DTE_NEXT_SHIFT;
+>>>  
+>>> +	if (find_its_device(its, id))
+>>> +		return -EINVAL;
+>> same here.
+>>> +
+>>> +	if (!vgic_its_check_id(its, baser, id, NULL))
+>>> +		return -EINVAL;
+>>> +
+>>>  	dev = vgic_its_alloc_device(its, id, itt_addr, num_eventid_bits);
+>>>  	if (IS_ERR(dev))
+>>>  		return PTR_ERR(dev);
+>> Thanks
+>>
+>> Eric
+>>
+> Thanks,
+> Ricardo
+>
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Cindy-Lu/vdpa-Do-not-count-the-pages-that-were-already-pinned-in-the-vhost-vDPA/20220509-152644
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
-config: x86_64-randconfig-a014-20220509 (https://download.01.org/0day-ci/archive/20220509/202205092058.if9wModg-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.2.0-20) 11.2.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/4225cc2a756b75d1e0ff7ca2a593bada42def380
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Cindy-Lu/vdpa-Do-not-count-the-pages-that-were-already-pinned-in-the-vhost-vDPA/20220509-152644
-        git checkout 4225cc2a756b75d1e0ff7ca2a593bada42def380
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>, old ones prefixed by <<):
-
->> ERROR: modpost: "interval_tree_remove" [drivers/vhost/vhost_vdpa.ko] undefined!
->> ERROR: modpost: "interval_tree_insert" [drivers/vhost/vhost_vdpa.ko] undefined!
->> ERROR: modpost: "interval_tree_iter_first" [drivers/vhost/vhost_vdpa.ko] undefined!
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
