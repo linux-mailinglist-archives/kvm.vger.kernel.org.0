@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B1F5D51F9D1
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 12:26:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7F6551F9C6
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 12:26:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234324AbiEIK1X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 06:27:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44238 "EHLO
+        id S229896AbiEIK06 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 06:26:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232838AbiEIK1I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 06:27:08 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 739A028E4D3;
-        Mon,  9 May 2022 03:22:20 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id i1so13408249plg.7;
-        Mon, 09 May 2022 03:22:20 -0700 (PDT)
+        with ESMTP id S230495AbiEIK04 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 06:26:56 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B74661E82E6;
+        Mon,  9 May 2022 03:22:23 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id c1-20020a17090a558100b001dca2694f23so12260506pji.3;
+        Mon, 09 May 2022 03:22:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=/KscUgSu+DlH4SnTOHon3YcfRcvIy3eZGU1H9dQC07w=;
-        b=NuD79QXPiIDpamCnzpVgpF+Z/rwFjNUgkt28orvyyqiYCcOtiCjLll4jMZJR7GAu+F
-         Sig9HeJSUbTwYmIgdm6QeKXqgdERJF4zvuQO8QhwEILcdTR7HsN6GDN54FmUrUOfcxgA
-         8Gr6KSfVMOjg/UsrJ6zhu62iy2Ljkmz6zzBzM2IJKOdo6uNgtAqSOxSEtzxa3HaQxWjn
-         R2CGWN4rUKM6fxWIqMyhNJAtf7SoWme89hid/X0T/5xfIgtBNDJpgJ1CIhFvpXfmKa36
-         Kq0LHenY+FDdat1OVt5mALL/tHhJ4tO5mp05nCbGhlXYtDtYjYS2HhyHdM7vtHLHYCyU
-         Ll5A==
+        bh=GpexFT3cmOpZS03q8Gk3wk4dGtIN5IPvNZieqnqQxgE=;
+        b=fm6AP48k7Syr3gtiKAoNERuqbBnT2obwNYpuQpOJ8lE6VOL1uefilnWUStVkPOyX+8
+         SmNDcy/T6dMTpWFTT4AzFXGYDRM8mCzQEr4+dn1XSQD+/SqksIlqnevPSXgqtzqKhTON
+         +XLczgSnMIWgXbeBdh/JK1GkKmuKxtL4L80srpHQFceCHJuzdhG+6bi2aFm7qWNqU1Z5
+         REMMfIDbSzAKjQ1m/ealTfWS/O9slmj0xUHrj0f2clhnJF5XCksDY84kDtwMxvSYICk2
+         WGF9miG6Z88uX+G4FW2cTWSgJkaiRvZCHq1jFI/BILev1rzAyO4bljyAO2T1ad8OuwlD
+         6lVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=/KscUgSu+DlH4SnTOHon3YcfRcvIy3eZGU1H9dQC07w=;
-        b=eet9jghre2RhvvlLDiA+cpa/UVe1k1O0VKXwE6rFSBkIKMNO/d2Gn2GgVPw16HByxB
-         0+DvAyTVpazvFRd1LnFguCPsd1lRJ/sUtgwCIhenprzt0uZbt6AZXvf+KDToxvAVD/0Z
-         LqigS61MWV9rIpChIQnFRZAENHcxRZ2j8x55i63AaLhJMgHGWNI4w63yby0wgkm0LrM4
-         SDFmy+P6XjxYWqJLVrRq5WrAsc2XkGtP2hhTVFKa8PtDbVui8vRD6oDH9hdZhQmDAb//
-         4K9fIpC9ODpxvaFDL3TINm7KQeBMkR4Pw1366vt9TV7FT08zEdkS3MM+2OcbGp/YcDlQ
-         vpJg==
-X-Gm-Message-State: AOAM532TTn0t7PUWYoymouSGU61KNoMjIWmqOB1dwz5Cx8fkUKFglwYa
-        7GaH3rbpRW7AZn2S6hTGb+FyzLhnCft6SA==
-X-Google-Smtp-Source: ABdhPJzSGfIDAJMvWOYBIZ1DcN/yg1OCjsbigRe0bvdQ6wHdVcd+wSIQLa/BiuHdwyVRoKpaS1dTrQ==
-X-Received: by 2002:a17:90a:408f:b0:1d1:d1ba:2abb with SMTP id l15-20020a17090a408f00b001d1d1ba2abbmr25819382pjg.152.1652091739545;
-        Mon, 09 May 2022 03:22:19 -0700 (PDT)
+        bh=GpexFT3cmOpZS03q8Gk3wk4dGtIN5IPvNZieqnqQxgE=;
+        b=Umuv1P5sbVAEJehd+qo1Rj7g0PNIPIuB9S/mJ/w0Yyya9z04I+r9eIYQL/HNJM1X7T
+         nhQT6zUEnditWrb1sowEDTbKPCb+f1yUhFco2/zKDdF7q9yFvrUGCzT7A3b4xm9c8Lb0
+         lEUQBJOMFIDe42DtfTmx7WobBde6Le2bdmiWuSUQSc40Fo38iF6xFMl7XVt5cE+e6xzB
+         A6Os+Lnp2BN5MGdP7MDCu+FrsOyTGFxKd1OXa5jj1ncrUfut849WQrMX01I+DsFlskim
+         Jq7Pk1yIGOwhAypgp45llF/s4pXDerytLXzxnA7rZSBsDHat4gLk0bEztTZgieSZTdtw
+         1Ngw==
+X-Gm-Message-State: AOAM530g1Z789nkZIJMrFwqxYApFckcSJE27AN5wK0zAdbQvRmFA05DX
+        4Kr/Bp5EMMMUC49BEzpYbMk=
+X-Google-Smtp-Source: ABdhPJyGme3e7qug68sji3gWYynenUI6rZaZfqCl6PpR+bfc1b9x7PgiEsGIYzW5dxX8efgS7jL/7Q==
+X-Received: by 2002:a17:903:210:b0:15e:f139:f901 with SMTP id r16-20020a170903021000b0015ef139f901mr13948009plh.66.1652091741845;
+        Mon, 09 May 2022 03:22:21 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.83])
-        by smtp.gmail.com with ESMTPSA id p17-20020a170902b09100b0015ee985a54csm6688891plr.56.2022.05.09.03.22.17
+        by smtp.gmail.com with ESMTPSA id p17-20020a170902b09100b0015ee985a54csm6688891plr.56.2022.05.09.03.22.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 May 2022 03:22:19 -0700 (PDT)
+        Mon, 09 May 2022 03:22:21 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -56,9 +56,9 @@ Cc:     Jim Mattson <jmattson@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 2/3] KVM: x86/pmu: Don't pre-set the pmu->global_ctrl when refreshing
-Date:   Mon,  9 May 2022 18:22:03 +0800
-Message-Id: <20220509102204.62389-2-likexu@tencent.com>
+Subject: [PATCH 3/3] KVM: x86/pmu: Drop redundant-clumsy-asymmetric PERFCTR_CORE MSRs handling
+Date:   Mon,  9 May 2022 18:22:04 +0800
+Message-Id: <20220509102204.62389-3-likexu@tencent.com>
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <20220509102204.62389-1-likexu@tencent.com>
 References: <20220509102204.62389-1-likexu@tencent.com>
@@ -76,31 +76,42 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-Assigning a value to pmu->global_ctrl just to set the value of
-pmu->global_ctrl_mask in a more readable way leaves a side effect of
-not conforming to the specification. The global_ctrl is reset to zero on
-Power up and Reset but keeps unchanged on INIT, like an ordinary MSR.
+In commit c51eb52b8f98 ("KVM: x86: Add support for AMD Core Perf Extension
+in guest"), the entry "case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5 " is
+introduced asymmetrically into kvm_get_msr_common(), ignoring the set part.
+
+The missing guest PERFCTR_CORE cpuid check from the above commit leads to
+the commit c28fa560c5bb ("KVM: x86/vPMU: Forbid reading from MSR_F15H_PERF
+MSRs when guest doesn't have X86_FEATURE_PERFCTR_CORE"), but it simply
+duplicates the default entry at the end of the switch statement explicitly.
+
+Removing the PERFCTR_CORE MSRs entry in kvm_get_msr_common() thoroughly
+would be more maintainable, as we did for the same group of MSRs in the
+kvm_set_msr_common() at the very beginning when the feature was enabled.
 
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/kvm/vmx/pmu_intel.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ arch/x86/kvm/x86.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index cff03baf8921..4d6cc95bc770 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -525,9 +525,8 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 		setup_fixed_pmc_eventsel(pmu);
- 	}
- 
--	pmu->global_ctrl = ((1ull << pmu->nr_arch_gp_counters) - 1) |
-+	pmu->global_ctrl_mask = ~((1ull << pmu->nr_arch_gp_counters) - 1) |
- 		(((1ull << pmu->nr_arch_fixed_counters) - 1) << INTEL_PMC_IDX_FIXED);
--	pmu->global_ctrl_mask = ~pmu->global_ctrl;
- 	pmu->global_ovf_ctrl_mask = pmu->global_ctrl_mask
- 			& ~(MSR_CORE_PERF_GLOBAL_OVF_CTRL_OVF_BUF |
- 			    MSR_CORE_PERF_GLOBAL_OVF_CTRL_COND_CHGD);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4790f0d7d40b..2b9089701ef5 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3841,13 +3841,6 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_DRAM_ENERGY_STATUS:	/* DRAM controller */
+ 		msr_info->data = 0;
+ 		break;
+-	case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
+-		if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
+-			return kvm_pmu_get_msr(vcpu, msr_info);
+-		if (!msr_info->host_initiated)
+-			return 1;
+-		msr_info->data = 0;
+-		break;
+ 	case MSR_K7_EVNTSEL0 ... MSR_K7_EVNTSEL3:
+ 	case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR3:
+ 	case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR1:
 -- 
 2.36.1
 
