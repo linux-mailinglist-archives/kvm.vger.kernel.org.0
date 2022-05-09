@@ -2,61 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 29B5651F9D9
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 12:26:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3491051F9EF
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 12:33:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233234AbiEIK1D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 06:27:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43900 "EHLO
+        id S229539AbiEIKfQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 06:35:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230061AbiEIK1A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 06:27:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 527961B1876
-        for <kvm@vger.kernel.org>; Mon,  9 May 2022 03:22:30 -0700 (PDT)
+        with ESMTP id S231600AbiEIKei (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 06:34:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0B6512A4A06
+        for <kvm@vger.kernel.org>; Mon,  9 May 2022 03:29:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652091749;
+        s=mimecast20190719; t=1652092102;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=PsTBPUPQ0O3bhvSB3QVk8Bq0LJrPpwn+o+Q6zeFi2gM=;
-        b=B3UPtulVY5J8zpdSr1Hn0aSyALcpIgPJTFStQQJI3VJWWoSCVArx3sTBmgLYe1hXDB66L7
-        oKiQNkCWxaBAqUyONxUM6+TCyY/+rdtwRS6wsckskKajMDvSkeBSNt5i2tingUSk3yMPcl
-        zduuqQ/gV6hwegXXJ8uWeNmjZ8Ab3qQ=
+        bh=6H/6ecBRlSRkZDMv8ER1vowHrJ0f9/tbpgvVRebvDPM=;
+        b=UJPIUnrze52s7YC4EyRFMk7Y+36tS4tBSuzHgVqFErqn4RlVnfzZvKwO7AP55fUYStfOm3
+        W0ZN2D4TYP/85v4OxGoToiRGvjsd7Kyoss+mIljsoHX5L6HmgcViXf7myPEeP98N8aScV6
+        35XGyR1ElsXx3QsmTeqpyu7HaRoasIE=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-631-J8BWomqPO9KX5EAituMuWw-1; Mon, 09 May 2022 06:22:26 -0400
-X-MC-Unique: J8BWomqPO9KX5EAituMuWw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+ us-mta-646-JrX56wR3PXCIMLTqmToTCQ-1; Mon, 09 May 2022 06:28:19 -0400
+X-MC-Unique: JrX56wR3PXCIMLTqmToTCQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9D568803D7B;
-        Mon,  9 May 2022 10:22:25 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 49B48185A794;
+        Mon,  9 May 2022 10:28:19 +0000 (UTC)
 Received: from starship (unknown [10.40.192.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BD8542166B4A;
-        Mon,  9 May 2022 10:22:19 +0000 (UTC)
-Message-ID: <916f8d9c18d264d120d4ed7101583f4f22f66622.camel@redhat.com>
-Subject: Re: [PATCH v4 09/15] KVM: SVM: Refresh AVIC configuration when
- changing APIC mode
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 35B00C27EB6;
+        Mon,  9 May 2022 10:28:17 +0000 (UTC)
+Message-ID: <506fc55bd1001e0ffb4c5b20edd057fe7b8dcfb4.camel@redhat.com>
+Subject: Re: [PATCH v4 00/15] Introducing AMD x2AVIC and hybrid-AVIC modes
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
         jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
-Date:   Mon, 09 May 2022 13:22:17 +0300
-In-Reply-To: <20220508023930.12881-10-suravee.suthikulpanit@amd.com>
+Date:   Mon, 09 May 2022 13:28:16 +0300
+In-Reply-To: <20220508023930.12881-1-suravee.suthikulpanit@amd.com>
 References: <20220508023930.12881-1-suravee.suthikulpanit@amd.com>
-         <20220508023930.12881-10-suravee.suthikulpanit@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,65 +63,101 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Sat, 2022-05-07 at 21:39 -0500, Suravee Suthikulpanit wrote:
-> AMD AVIC can support xAPIC and x2APIC virtualization,
-> which requires changing x2APIC bit VMCB and MSR intercepton
-> for x2APIC MSRs. Therefore, call avic_refresh_apicv_exec_ctrl()
-> to refresh configuration accordingly.
+> Introducing support for AMD x2APIC virtualization. This feature is
+> indicated by the CPUID Fn8000_000A EDX[14], and it can be activated
+> by setting bit 31 (enable AVIC) and bit 30 (x2APIC mode) of VMCB
+> offset 60h.
 > 
-> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> ---
->  arch/x86/kvm/svm/avic.c | 12 ++++++++++++
->  arch/x86/kvm/svm/svm.c  |  1 +
->  2 files changed, 13 insertions(+)
+> With x2AVIC support, the guest local APIC can be fully virtualized in
+> both xAPIC and x2APIC modes, and the mode can be changed during runtime.
+> For example, when AVIC is enabled, the hypervisor set VMCB bit 31
+> to activate AVIC for each vCPU. Then, it keeps track of each vCPU's
+> APIC mode, and updates VMCB bit 30 to enable/disable x2APIC
+> virtualization mode accordingly.
 > 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 16ce2d50efac..a82981722018 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -691,6 +691,18 @@ void avic_apicv_post_state_restore(struct kvm_vcpu *vcpu)
->  	avic_handle_ldr_update(vcpu);
->  }
->  
-> +void avic_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
-> +{
-> +	if (!lapic_in_kernel(vcpu) || (avic_mode == AVIC_MODE_NONE))
-> +		return;
-> +
-> +	if (kvm_get_apic_mode(vcpu) == LAPIC_MODE_INVALID) {
-> +		WARN_ONCE(true, "Invalid local APIC state (vcpu_id=%d)", vcpu->vcpu_id);
-> +		return;
-> +	}
-> +	avic_refresh_apicv_exec_ctrl(vcpu);
-> +}
-> +
->  static int avic_set_pi_irte_mode(struct kvm_vcpu *vcpu, bool activate)
->  {
->  	int ret = 0;
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 314628b6bff4..9066568fd19d 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4692,6 +4692,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.enable_nmi_window = svm_enable_nmi_window,
->  	.enable_irq_window = svm_enable_irq_window,
->  	.update_cr8_intercept = svm_update_cr8_intercept,
-> +	.set_virtual_apic_mode = avic_set_virtual_apic_mode,
->  	.refresh_apicv_exec_ctrl = avic_refresh_apicv_exec_ctrl,
->  	.check_apicv_inhibit_reasons = avic_check_apicv_inhibit_reasons,
->  	.apicv_post_state_restore = avic_apicv_post_state_restore,
+> Besides setting bit VMCB bit 30 and 31, for x2AVIC, kvm_amd driver needs
+> to disable interception for the x2APIC MSR range to allow AVIC hardware
+> to virtualize register accesses.
+> 
+> This series also introduce a partial APIC virtualization (hybrid-AVIC)
+> mode, where APIC register accesses are trapped (i.e. not virtualized
+> by hardware), but leverage AVIC doorbell for interrupt injection.
+> This eliminates need to disable x2APIC in the guest on system without
+> x2AVIC support. (Note: suggested by Maxim)
+> 
+> Regards,
+> Suravee
+> 
+> Testing for v4:
+>   * Tested booting a Linux VM with x2APIC physical and logical modes upto 512 vCPUs.
+>   * Test enable AVIC in L0 with xAPIC and x2AVIC modes in L1 and launch L2 guest
+>   * Test partial AVIC mode by launching a VM with x2APIC mode
+> 
+> Changes from v3:
+> (https://lore.kernel.org/lkml/ff67344c0efe06d1422aa84e56738a0812c69bfc.camel@redhat.com/T/)
+>  * Patch  3 : Update logic force_avic
+>  * Patch  8 : Move logic for handling APIC disable to common code (new)
+>  * Patch  9 : Only call avic_refresh_apicv_exec_ctrl
+>  * Patch 12 : Remove APICV_INHIBIT_REASON_X2APIC, and add more comment for hybrid-AVIC mode
+> 
+> Suravee Suthikulpanit (15):
+>   x86/cpufeatures: Introduce x2AVIC CPUID bit
+>   KVM: x86: lapic: Rename [GET/SET]_APIC_DEST_FIELD to
+>     [GET/SET]_XAPIC_DEST_FIELD
+>   KVM: SVM: Detect X2APIC virtualization (x2AVIC) support
+>   KVM: SVM: Update max number of vCPUs supported for x2AVIC mode
+>   KVM: SVM: Update avic_kick_target_vcpus to support 32-bit APIC ID
+>   KVM: SVM: Do not support updating APIC ID when in x2APIC mode
+>   KVM: SVM: Adding support for configuring x2APIC MSRs interception
+>   KVM: x86: Deactivate APICv on vCPU with APIC disabled
+>   KVM: SVM: Refresh AVIC configuration when changing APIC mode
+>   KVM: SVM: Introduce helper functions to (de)activate AVIC and x2AVIC
+>   KVM: SVM: Do not throw warning when calling avic_vcpu_load on a
+>     running vcpu
+>   KVM: SVM: Introduce hybrid-AVIC mode
+>   KVM: x86: Warning APICv inconsistency only when vcpu APIC mode is
+>     valid
+>   KVM: SVM: Use target APIC ID to complete x2AVIC IRQs when possible
+>   KVM: SVM: Add AVIC doorbell tracepoint
+> 
+>  arch/x86/hyperv/hv_apic.c          |   2 +-
+>  arch/x86/include/asm/apicdef.h     |   4 +-
+>  arch/x86/include/asm/cpufeatures.h |   1 +
+>  arch/x86/include/asm/kvm_host.h    |   1 -
+>  arch/x86/include/asm/svm.h         |  21 +++-
+>  arch/x86/kernel/apic/apic.c        |   2 +-
+>  arch/x86/kernel/apic/ipi.c         |   2 +-
+>  arch/x86/kvm/lapic.c               |   6 +-
+>  arch/x86/kvm/svm/avic.c            | 191 ++++++++++++++++++++++++++---
+>  arch/x86/kvm/svm/svm.c             |  56 +++++----
+>  arch/x86/kvm/svm/svm.h             |   6 +-
+>  arch/x86/kvm/trace.h               |  18 +++
+>  arch/x86/kvm/x86.c                 |   8 +-
+>  13 files changed, 262 insertions(+), 56 deletions(-)
+> 
 
-Looks good as well!
+Patch series looks good.
 
-This code can also be removed in the future as optimization,a
-and do everything in avic_refresh_apicv_exec_ctrl instead.
-No need to do this now though.
+I will smoke test it today on my normal AVIC, just in case.
 
-I need to understand the APICv KVM's code better to understand if
-this is worth it.
+Did you had a chance to look at my comments on your report
+that nesting got broken by my nested PAUSE filtering patch?
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+I tried to reproduce it on my side, so far no luck.
 
+I tried to oversubscribe L1, by booting a VM with 16 vCPUs
+all pinned to single physical CPU, and then booting a nested guest 
+in it with about the same amount of vCPUs. Slow but it did work.
+
+
+Also did you had a chance to look for my comments about the AMD's manual
+asking the user to flush guest's TLB when changing apic backing page,
+regardless of ASID?
 
 Best regards,
 	Maxim Levitsky
+
+
+
+
 
