@@ -2,116 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A7F6551F9C6
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 12:26:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29B5651F9D9
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 12:26:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229896AbiEIK06 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 06:26:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43694 "EHLO
+        id S233234AbiEIK1D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 06:27:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230495AbiEIK04 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 06:26:56 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B74661E82E6;
-        Mon,  9 May 2022 03:22:23 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id c1-20020a17090a558100b001dca2694f23so12260506pji.3;
-        Mon, 09 May 2022 03:22:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=GpexFT3cmOpZS03q8Gk3wk4dGtIN5IPvNZieqnqQxgE=;
-        b=fm6AP48k7Syr3gtiKAoNERuqbBnT2obwNYpuQpOJ8lE6VOL1uefilnWUStVkPOyX+8
-         SmNDcy/T6dMTpWFTT4AzFXGYDRM8mCzQEr4+dn1XSQD+/SqksIlqnevPSXgqtzqKhTON
-         +XLczgSnMIWgXbeBdh/JK1GkKmuKxtL4L80srpHQFceCHJuzdhG+6bi2aFm7qWNqU1Z5
-         REMMfIDbSzAKjQ1m/ealTfWS/O9slmj0xUHrj0f2clhnJF5XCksDY84kDtwMxvSYICk2
-         WGF9miG6Z88uX+G4FW2cTWSgJkaiRvZCHq1jFI/BILev1rzAyO4bljyAO2T1ad8OuwlD
-         6lVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=GpexFT3cmOpZS03q8Gk3wk4dGtIN5IPvNZieqnqQxgE=;
-        b=Umuv1P5sbVAEJehd+qo1Rj7g0PNIPIuB9S/mJ/w0Yyya9z04I+r9eIYQL/HNJM1X7T
-         nhQT6zUEnditWrb1sowEDTbKPCb+f1yUhFco2/zKDdF7q9yFvrUGCzT7A3b4xm9c8Lb0
-         lEUQBJOMFIDe42DtfTmx7WobBde6Le2bdmiWuSUQSc40Fo38iF6xFMl7XVt5cE+e6xzB
-         A6Os+Lnp2BN5MGdP7MDCu+FrsOyTGFxKd1OXa5jj1ncrUfut849WQrMX01I+DsFlskim
-         Jq7Pk1yIGOwhAypgp45llF/s4pXDerytLXzxnA7rZSBsDHat4gLk0bEztTZgieSZTdtw
-         1Ngw==
-X-Gm-Message-State: AOAM530g1Z789nkZIJMrFwqxYApFckcSJE27AN5wK0zAdbQvRmFA05DX
-        4Kr/Bp5EMMMUC49BEzpYbMk=
-X-Google-Smtp-Source: ABdhPJyGme3e7qug68sji3gWYynenUI6rZaZfqCl6PpR+bfc1b9x7PgiEsGIYzW5dxX8efgS7jL/7Q==
-X-Received: by 2002:a17:903:210:b0:15e:f139:f901 with SMTP id r16-20020a170903021000b0015ef139f901mr13948009plh.66.1652091741845;
-        Mon, 09 May 2022 03:22:21 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.83])
-        by smtp.gmail.com with ESMTPSA id p17-20020a170902b09100b0015ee985a54csm6688891plr.56.2022.05.09.03.22.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 May 2022 03:22:21 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 3/3] KVM: x86/pmu: Drop redundant-clumsy-asymmetric PERFCTR_CORE MSRs handling
-Date:   Mon,  9 May 2022 18:22:04 +0800
-Message-Id: <20220509102204.62389-3-likexu@tencent.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220509102204.62389-1-likexu@tencent.com>
-References: <20220509102204.62389-1-likexu@tencent.com>
+        with ESMTP id S230061AbiEIK1A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 06:27:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 527961B1876
+        for <kvm@vger.kernel.org>; Mon,  9 May 2022 03:22:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652091749;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PsTBPUPQ0O3bhvSB3QVk8Bq0LJrPpwn+o+Q6zeFi2gM=;
+        b=B3UPtulVY5J8zpdSr1Hn0aSyALcpIgPJTFStQQJI3VJWWoSCVArx3sTBmgLYe1hXDB66L7
+        oKiQNkCWxaBAqUyONxUM6+TCyY/+rdtwRS6wsckskKajMDvSkeBSNt5i2tingUSk3yMPcl
+        zduuqQ/gV6hwegXXJ8uWeNmjZ8Ab3qQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-631-J8BWomqPO9KX5EAituMuWw-1; Mon, 09 May 2022 06:22:26 -0400
+X-MC-Unique: J8BWomqPO9KX5EAituMuWw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9D568803D7B;
+        Mon,  9 May 2022 10:22:25 +0000 (UTC)
+Received: from starship (unknown [10.40.192.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BD8542166B4A;
+        Mon,  9 May 2022 10:22:19 +0000 (UTC)
+Message-ID: <916f8d9c18d264d120d4ed7101583f4f22f66622.camel@redhat.com>
+Subject: Re: [PATCH v4 09/15] KVM: SVM: Refresh AVIC configuration when
+ changing APIC mode
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
+        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
+Date:   Mon, 09 May 2022 13:22:17 +0300
+In-Reply-To: <20220508023930.12881-10-suravee.suthikulpanit@amd.com>
+References: <20220508023930.12881-1-suravee.suthikulpanit@amd.com>
+         <20220508023930.12881-10-suravee.suthikulpanit@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On Sat, 2022-05-07 at 21:39 -0500, Suravee Suthikulpanit wrote:
+> AMD AVIC can support xAPIC and x2APIC virtualization,
+> which requires changing x2APIC bit VMCB and MSR intercepton
+> for x2APIC MSRs. Therefore, call avic_refresh_apicv_exec_ctrl()
+> to refresh configuration accordingly.
+> 
+> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> ---
+>  arch/x86/kvm/svm/avic.c | 12 ++++++++++++
+>  arch/x86/kvm/svm/svm.c  |  1 +
+>  2 files changed, 13 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 16ce2d50efac..a82981722018 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -691,6 +691,18 @@ void avic_apicv_post_state_restore(struct kvm_vcpu *vcpu)
+>  	avic_handle_ldr_update(vcpu);
+>  }
+>  
+> +void avic_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
+> +{
+> +	if (!lapic_in_kernel(vcpu) || (avic_mode == AVIC_MODE_NONE))
+> +		return;
+> +
+> +	if (kvm_get_apic_mode(vcpu) == LAPIC_MODE_INVALID) {
+> +		WARN_ONCE(true, "Invalid local APIC state (vcpu_id=%d)", vcpu->vcpu_id);
+> +		return;
+> +	}
+> +	avic_refresh_apicv_exec_ctrl(vcpu);
+> +}
+> +
+>  static int avic_set_pi_irte_mode(struct kvm_vcpu *vcpu, bool activate)
+>  {
+>  	int ret = 0;
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 314628b6bff4..9066568fd19d 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4692,6 +4692,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  	.enable_nmi_window = svm_enable_nmi_window,
+>  	.enable_irq_window = svm_enable_irq_window,
+>  	.update_cr8_intercept = svm_update_cr8_intercept,
+> +	.set_virtual_apic_mode = avic_set_virtual_apic_mode,
+>  	.refresh_apicv_exec_ctrl = avic_refresh_apicv_exec_ctrl,
+>  	.check_apicv_inhibit_reasons = avic_check_apicv_inhibit_reasons,
+>  	.apicv_post_state_restore = avic_apicv_post_state_restore,
 
-In commit c51eb52b8f98 ("KVM: x86: Add support for AMD Core Perf Extension
-in guest"), the entry "case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5 " is
-introduced asymmetrically into kvm_get_msr_common(), ignoring the set part.
+Looks good as well!
 
-The missing guest PERFCTR_CORE cpuid check from the above commit leads to
-the commit c28fa560c5bb ("KVM: x86/vPMU: Forbid reading from MSR_F15H_PERF
-MSRs when guest doesn't have X86_FEATURE_PERFCTR_CORE"), but it simply
-duplicates the default entry at the end of the switch statement explicitly.
+This code can also be removed in the future as optimization,a
+and do everything in avic_refresh_apicv_exec_ctrl instead.
+No need to do this now though.
 
-Removing the PERFCTR_CORE MSRs entry in kvm_get_msr_common() thoroughly
-would be more maintainable, as we did for the same group of MSRs in the
-kvm_set_msr_common() at the very beginning when the feature was enabled.
+I need to understand the APICv KVM's code better to understand if
+this is worth it.
 
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/kvm/x86.c | 7 -------
- 1 file changed, 7 deletions(-)
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 4790f0d7d40b..2b9089701ef5 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3841,13 +3841,6 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_DRAM_ENERGY_STATUS:	/* DRAM controller */
- 		msr_info->data = 0;
- 		break;
--	case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
--		if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
--			return kvm_pmu_get_msr(vcpu, msr_info);
--		if (!msr_info->host_initiated)
--			return 1;
--		msr_info->data = 0;
--		break;
- 	case MSR_K7_EVNTSEL0 ... MSR_K7_EVNTSEL3:
- 	case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR3:
- 	case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR1:
--- 
-2.36.1
+
+Best regards,
+	Maxim Levitsky
 
