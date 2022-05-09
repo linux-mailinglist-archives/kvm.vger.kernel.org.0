@@ -2,268 +2,224 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 76D9B51FE97
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 15:46:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B561851FEF4
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 16:01:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236584AbiEINrV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 09:47:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38340 "EHLO
+        id S236782AbiEIOEY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 10:04:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236479AbiEINrH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 09:47:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 22A852689D5
-        for <kvm@vger.kernel.org>; Mon,  9 May 2022 06:43:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652103788;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cFbwZW49pkw4yye95MvglQVhO0vrHkh9u5V8p01SIsk=;
-        b=AKxH8cioyOk1Uo/jhqGfJK65KL0dopEPmfXEKMPj4B/BJ7ip1LJrenDGY0GGAsOFtoCkOj
-        cOEJC857c8JezCcMybauMzgjwQnzhRzzcbl9jBqMHtyoaIIdbbbHm3dn4xklF4TrJ+neuP
-        1ye1A7E7JSrrDf+Cjelv7EfMvbjdSxs=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-643-gJZrXA4sNPqjqkKLdKWf8A-1; Mon, 09 May 2022 09:43:03 -0400
-X-MC-Unique: gJZrXA4sNPqjqkKLdKWf8A-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F37A01C161D6;
-        Mon,  9 May 2022 13:42:44 +0000 (UTC)
-Received: from starship (unknown [10.40.192.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2B72D463E15;
-        Mon,  9 May 2022 13:42:41 +0000 (UTC)
-Message-ID: <a60d885cf4b0b11aca730273ff317546362bff83.camel@redhat.com>
-Subject: Re: [PATCH v4 10/15] KVM: SVM: Introduce helper functions to
- (de)activate AVIC and x2AVIC
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
-        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com,
-        kernel test robot <lkp@intel.com>
-Date:   Mon, 09 May 2022 16:42:41 +0300
-In-Reply-To: <20220508023930.12881-11-suravee.suthikulpanit@amd.com>
-References: <20220508023930.12881-1-suravee.suthikulpanit@amd.com>
-         <20220508023930.12881-11-suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S236767AbiEIOEP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 10:04:15 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CD5425D111;
+        Mon,  9 May 2022 07:00:20 -0700 (PDT)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 249DIZ2l022847;
+        Mon, 9 May 2022 14:00:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=GCG2rlKVLr0r6VGT3WgTUZon/losVo5DYBG+7mGe84g=;
+ b=d+PBHCPvejhms6LMgCaMdRJt5veLyauwdnAqlj9A5idXs1NPmD4uVy7MKljE3wZBBPSc
+ +80YBdL5gYVJ/oG5p8FQRvzpXw0fxqwxAZ60sb+yrqloWVCLiHIneNsBjwoPYhdqhEdE
+ zKEzbKD2fXw0fZx987TaoapztJZZFWzpjwOVWttpLIymric7INcDfilt+jZXsTvS8il4
+ gDJo7A5EgmgBLLhPZ5Qa1rzbBjudaicNK0e/q2sOXp2o7ZBUQbIVJco1Dw7ka+wHMSWG
+ TVBuRc0Oc/J0LM1E7ByU1yjzCazlqjyDjklzfc3m3rH5d+2ddZ8yheKgEGH8gLiutuYO Ag== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fy3qsgwy8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 May 2022 14:00:20 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 249DpEaW021996;
+        Mon, 9 May 2022 14:00:19 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fy3qsgwwq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 May 2022 14:00:19 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 249DlIe6010322;
+        Mon, 9 May 2022 14:00:17 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma01fra.de.ibm.com with ESMTP id 3fwgd8j1np-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 May 2022 14:00:17 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 249E0FRd44761482
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 9 May 2022 14:00:15 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E72D242049;
+        Mon,  9 May 2022 14:00:14 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 970DB42041;
+        Mon,  9 May 2022 14:00:14 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.15.58])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  9 May 2022 14:00:14 +0000 (GMT)
+Date:   Mon, 9 May 2022 15:58:21 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v1 2/2] s390x: add cmm migration test
+Message-ID: <20220509155821.07279b39@p-imbrenda>
+In-Reply-To: <20220509120805.437660-3-nrb@linux.ibm.com>
+References: <20220509120805.437660-1-nrb@linux.ibm.com>
+        <20220509120805.437660-3-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: m_--h1WZ0740ChKYcwhWQzfApP3K9ats
+X-Proofpoint-ORIG-GUID: 8HHYBadBncQmpWS_pZ18Cs6FQvGBsyvf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-09_03,2022-05-09_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ mlxlogscore=999 priorityscore=1501 spamscore=0 suspectscore=0
+ clxscore=1015 bulkscore=0 phishscore=0 malwarescore=0 lowpriorityscore=0
+ mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205090077
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 2022-05-07 at 21:39 -0500, Suravee Suthikulpanit wrote:
-> Refactor the current logic for (de)activate AVIC into helper functions,
-> and also add logic for (de)activate x2AVIC. The helper function are used
-> when initializing AVIC and switching from AVIC to x2AVIC mode
-> (handled by svm_refresh_spicv_exec_ctrl()).
+On Mon,  9 May 2022 14:08:05 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
+
+> When a VM is migrated, we expect the page states to be preserved. Add a test
+> which checks for that.
 > 
-> When an AVIC-enabled guest switches from APIC to x2APIC mode during
-> runtime, the SVM driver needs to perform the following steps:
-> 
-> 1. Set the x2APIC mode bit for AVIC in VMCB along with the maximum
-> APIC ID support for each mode accodingly.
-> 
-> 2. Disable x2APIC MSRs interception in order to allow the hardware
-> to virtualize x2APIC MSRs accesses.
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 > ---
->  arch/x86/include/asm/svm.h |  6 +++++
->  arch/x86/kvm/svm/avic.c    | 54 ++++++++++++++++++++++++++++++++++----
->  arch/x86/kvm/svm/svm.c     |  6 ++---
->  arch/x86/kvm/svm/svm.h     |  1 +
->  4 files changed, 58 insertions(+), 9 deletions(-)
+>  s390x/Makefile        |  1 +
+>  s390x/cmm-migration.c | 78 +++++++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg   |  4 +++
+>  3 files changed, 83 insertions(+)
+>  create mode 100644 s390x/cmm-migration.c
 > 
-> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-> index 4c26b0d47d76..f5525c0e03f7 100644
-> --- a/arch/x86/include/asm/svm.h
-> +++ b/arch/x86/include/asm/svm.h
-> @@ -256,6 +256,7 @@ enum avic_ipi_failure_cause {
->  	AVIC_IPI_FAILURE_INVALID_BACKING_PAGE,
->  };
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index a8e04aa6fe4d..8ac0afdfd994 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -32,6 +32,7 @@ tests += $(TEST_DIR)/epsw.elf
+>  tests += $(TEST_DIR)/adtl-status.elf
+>  tests += $(TEST_DIR)/migration.elf
+>  tests += $(TEST_DIR)/pv-attest.elf
+> +tests += $(TEST_DIR)/cmm-migration.elf
 >  
-> +#define AVIC_PHYSICAL_MAX_INDEX_MASK	GENMASK_ULL(9, 0)
+>  pv-tests += $(TEST_DIR)/pv-diags.elf
 >  
->  /*
->   * For AVIC, the max index allowed for physical APIC ID
-> @@ -500,4 +501,9 @@ DEFINE_GHCB_ACCESSORS(sw_exit_info_2)
->  DEFINE_GHCB_ACCESSORS(sw_scratch)
->  DEFINE_GHCB_ACCESSORS(xcr0)
->  
-> +struct svm_direct_access_msrs {
-> +	u32 index;   /* Index of the MSR */
-> +	bool always; /* True if intercept is initially cleared */
-> +};
+> diff --git a/s390x/cmm-migration.c b/s390x/cmm-migration.c
+> new file mode 100644
+> index 000000000000..4a7b50e40fc6
+> --- /dev/null
+> +++ b/s390x/cmm-migration.c
+> @@ -0,0 +1,78 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * CMM migration tests (ESSA)
+> + *
+> + * Copyright IBM Corp. 2022
+> + *
+> + * Authors:
+> + *  Nico Boehr <nrb@linux.ibm.com>
+> + */
 > +
->  #endif
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index a82981722018..ad2ef6c00559 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -69,6 +69,51 @@ struct amd_svm_iommu_ir {
->  	void *data;		/* Storing pointer to struct amd_ir_data */
->  };
->  
-> +static inline void avic_set_x2apic_msr_interception(struct vcpu_svm *svm, bool disable)
+> +#include <libcflat.h>
+> +#include <asm/asm-offsets.h>
+> +#include <asm/interrupt.h>
+> +#include <asm/page.h>
+> +#include <asm/cmm.h>
+> +#include <bitops.h>
+> +
+> +#define NUM_PAGES 128
+> +static uint8_t pagebuf[NUM_PAGES][PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
+> +
+> +static void test_migration(void)
 > +{
-> +	int i;
+> +	int i, state_mask, actual_state;
+> +	/*
+> +	 * Maps ESSA actions to states the page is allowed to be in after the
+> +	 * respective action was executed.
+> +	 */
+> +	int allowed_essa_state_masks[4] = {
+> +		BIT(ESSA_USAGE_STABLE),					/* ESSA_SET_STABLE */
+> +		BIT(ESSA_USAGE_UNUSED),					/* ESSA_SET_UNUSED */
+> +		BIT(ESSA_USAGE_VOLATILE),				/* ESSA_SET_VOLATILE */
+> +		BIT(ESSA_USAGE_VOLATILE) | BIT(ESSA_USAGE_POT_VOLATILE) /* ESSA_SET_POT_VOLATILE */
+> +	};
 > +
-> +	for (i = 0; i < MAX_DIRECT_ACCESS_MSRS; i++) {
-> +		int index = direct_access_msrs[i].index;
+> +	for (i = 0; i < NUM_PAGES; i++) {
+> +		switch(i % 4) {
+> +			case 0:
+> +				essa(ESSA_SET_STABLE, (unsigned long)pagebuf[i]);
+> +			break;
+> +			case 1:
+> +				essa(ESSA_SET_UNUSED, (unsigned long)pagebuf[i]);
+> +			break;
+> +			case 2:
+> +				essa(ESSA_SET_VOLATILE, (unsigned long)pagebuf[i]);
+> +			break;
+> +			case 3:
+> +				essa(ESSA_SET_POT_VOLATILE, (unsigned long)pagebuf[i]);
+> +			break;
+
+const int essa_commands[4] = {ESSA_SET_STABLE, ESSA_SET_UNUSED, ...
+
+for (i = 0; i < NUM_PAGES; i++)
+	essa(essa_commands[i % 4], ...
+
+I think it would look more compact and more readable
+
+> +		}
+> +	}
 > +
-> +		if ((index < APIC_BASE_MSR) ||
-> +		    (index > APIC_BASE_MSR + 0xff))
-> +			continue;
-> +		set_msr_interception(&svm->vcpu, svm->msrpm, index,
-> +				     !disable, !disable);
+> +	puts("Please migrate me, then press return\n");
+> +	(void)getchar();
+> +
+> +	for (i = 0; i < NUM_PAGES; i++) {
+> +		actual_state = essa(ESSA_GET_STATE, (unsigned long)pagebuf[i]);
+> +		/* extract the usage state in bits 60 and 61 */
+> +		actual_state = (actual_state >> 2) & 0x3;
+> +		state_mask = allowed_essa_state_masks[i % ARRAY_SIZE(allowed_essa_state_masks)];
+> +		report(BIT(actual_state) & state_mask, "page %d state: expected_mask=0x%x actual_mask=0x%lx", i, state_mask, BIT(actual_state));
 > +	}
 > +}
 > +
-> +static void avic_activate_vmcb(struct vcpu_svm *svm)
+> +int main(void)
 > +{
-> +	struct vmcb *vmcb = svm->vmcb01.ptr;
+> +	bool has_essa = check_essa_available();
 > +
-> +	vmcb->control.int_ctl &= ~(AVIC_ENABLE_MASK | X2APIC_MODE_MASK);
-> +	vmcb->control.avic_physical_id &= ~AVIC_PHYSICAL_MAX_INDEX_MASK;
-> +
-> +	vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
-> +	if (apic_x2apic_mode(svm->vcpu.arch.apic)) {
-> +		vmcb->control.int_ctl |= X2APIC_MODE_MASK;
-> +		vmcb->control.avic_physical_id |= X2AVIC_MAX_PHYSICAL_ID;
-> +		/* Disabling MSR intercept for x2APIC registers */
-> +		avic_set_x2apic_msr_interception(svm, false);
-> +	} else {
-> +		vmcb->control.avic_physical_id |= AVIC_MAX_PHYSICAL_ID;
-> +		/* Enabling MSR intercept for x2APIC registers */
-> +		avic_set_x2apic_msr_interception(svm, true);
+> +	report_prefix_push("cmm-migration");
+> +	if (!has_essa) {
+> +		report_skip("ESSA is not available");
+> +		goto done;
 > +	}
+> +
+> +	test_migration();
+> +done:
+> +	report_prefix_pop();
+> +	return report_summary();
 > +}
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index b456b2881448..625026d90e52 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -176,3 +176,7 @@ extra_params = -cpu qemu,gs=off,vx=off
+>  file = migration.elf
+>  groups = migration
+>  smp = 2
 > +
-> +static void avic_deactivate_vmcb(struct vcpu_svm *svm)
-> +{
-> +	struct vmcb *vmcb = svm->vmcb01.ptr;
-> +
-> +	vmcb->control.int_ctl &= ~(AVIC_ENABLE_MASK | X2APIC_MODE_MASK);
-> +	vmcb->control.avic_physical_id &= ~AVIC_PHYSICAL_MAX_INDEX_MASK;
-> +
-> +	/* Enabling MSR intercept for x2APIC registers */
-> +	avic_set_x2apic_msr_interception(svm, true);
-> +}
->  
->  /* Note:
->   * This function is called from IOMMU driver to notify
-> @@ -185,13 +230,12 @@ void avic_init_vmcb(struct vcpu_svm *svm, struct vmcb *vmcb)
->  	vmcb->control.avic_backing_page = bpa & AVIC_HPA_MASK;
->  	vmcb->control.avic_logical_id = lpa & AVIC_HPA_MASK;
->  	vmcb->control.avic_physical_id = ppa & AVIC_HPA_MASK;
-> -	vmcb->control.avic_physical_id |= AVIC_MAX_PHYSICAL_ID;
->  	vmcb->control.avic_vapic_bar = APIC_DEFAULT_PHYS_BASE & VMCB_AVIC_APIC_BAR_MASK;
->  
->  	if (kvm_apicv_activated(svm->vcpu.kvm))
-> -		vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
-> +		avic_activate_vmcb(svm);
->  	else
-> -		vmcb->control.int_ctl &= ~AVIC_ENABLE_MASK;
-> +		avic_deactivate_vmcb(svm);
->  }
->  
->  static u64 *avic_get_physical_id_entry(struct kvm_vcpu *vcpu,
-> @@ -1082,9 +1126,9 @@ void avic_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
->  		 * accordingly before re-activating.
->  		 */
->  		avic_apicv_post_state_restore(vcpu);
-> -		vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
-> +		avic_activate_vmcb(svm);
->  	} else {
-> -		vmcb->control.int_ctl &= ~AVIC_ENABLE_MASK;
-> +		avic_deactivate_vmcb(svm);
->  	}
->  	vmcb_mark_dirty(vmcb, VMCB_AVIC);
->  
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 9066568fd19d..96a1fc1a1d1b 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -74,10 +74,8 @@ static uint64_t osvw_len = 4, osvw_status;
->  
->  static DEFINE_PER_CPU(u64, current_tsc_ratio);
->  
-> -static const struct svm_direct_access_msrs {
-> -	u32 index;   /* Index of the MSR */
-> -	bool always; /* True if intercept is initially cleared */
-> -} direct_access_msrs[MAX_DIRECT_ACCESS_MSRS] = {
-> +const struct svm_direct_access_msrs
-> +direct_access_msrs[MAX_DIRECT_ACCESS_MSRS] = {
->  	{ .index = MSR_STAR,				.always = true  },
->  	{ .index = MSR_IA32_SYSENTER_CS,		.always = true  },
->  	{ .index = MSR_IA32_SYSENTER_EIP,		.always = false },
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 5ed958863b81..bb5bf70de3b2 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -600,6 +600,7 @@ void nested_vmcb02_compute_g_pat(struct vcpu_svm *svm);
->  void svm_switch_vmcb(struct vcpu_svm *svm, struct kvm_vmcb_info *target_vmcb);
->  
->  extern struct kvm_x86_nested_ops svm_nested_ops;
-> +extern const struct svm_direct_access_msrs direct_access_msrs[];
->  
->  /* avic.c */
->  
-
-
-So I did some testing, and reviewed this code again with regard to nesting, 
-and now I see that it has CVE worthy bug, so have to revoke my Reviewed-By.
-
-This is what happens:
-
-On nested VM entry, *request to inhibit AVIC is done*, and then nested msr bitmap
-is calculated, still with all X2AVIC msrs open,
-
-1. nested_svm_vmrun -> enter_svm_guest_mode -> kvm_make_request(KVM_REQ_APICV_UPDATE, vcpu);
-2. nested_svm_vmrun -> nested_svm_vmrun_msrpm
-
-
-But the nested guest will be entered without AVIC active 
-(since we don't yet support nested avic and it is optional anyway), thus if the nested guest
-also doesn't intercept those msrs, it will gain access to the *host* x2apic msrs. Ooops.
-
-I think the easist way to fix this for now, is to make nested_svm_vmrun_msrpm
-never open access to x2apic msrs regardless of the host bitmap value, but in the long
-term the whole thing needs to be refactored.
-
-
-Another thing I noted is that avic_deactivate_vmcb should not touch avic msrs
-when avic_mode == AVIC_MODE_X1, it is just a waste of time.
-
-Also updating these msr intercepts is pointless if the guest doesn't use x2apic.
-
-Same it true while entering the nested guest - AVIC is inhibited, but there is
-no need to update the msr intercepts in L1 msr bitmap, since this bitmap isn't
-used by the CPU and vise versa while returing back to L1 from the nested guest.
-
-However optimizing all of this should also be done very carefully to 
-avoid issue like the above.
-
-I need to think on how to correctly fix/refactor all of this to be honest.
-
-Best regards,
-	Maxim levitsky
-
-
+> +[cmm-migration]
+> +file = cmm-migration.elf
+> +groups = migration
 
