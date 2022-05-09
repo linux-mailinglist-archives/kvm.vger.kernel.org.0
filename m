@@ -2,297 +2,248 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C306751FF21
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 16:08:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E87651FF15
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 16:08:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236710AbiEIOKG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 10:10:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54702 "EHLO
+        id S236952AbiEIOLl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 10:11:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236600AbiEIOKF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 10:10:05 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36D8C15FE0E;
-        Mon,  9 May 2022 07:06:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652105171; x=1683641171;
-  h=message-id:date:mime-version:subject:to:references:from:
-   in-reply-to:content-transfer-encoding;
-  bh=UkLhGz8IQfm7ReY4/G4McTKAELe6u5h1t8AUYe2t5BU=;
-  b=eFxMes57Aa9JFhMmzsynIQ/P4jdqp7U2t0uhdTbG4OWIWr0HxEzINUto
-   RxflbV8z4+d3/xjN18yRgJLU5CUpFhlOXISDsEe1yqeJlJywgWVuNx0ai
-   vyHV612s43yj66+6GYMQK+1UTz0dYlEw0RC225tT4Or0AQ9K+uacoEg0T
-   G1KNGQJlIlki+Vd+MuMi20Db9xCgwK3nuQB5kPY3A51aAl3pEP0hgeug8
-   C+nJ70BWcVFcRlYtkl5Hvg0plSnMk4kIKxrowIo49PRzcmigBdIhfQOCm
-   2bxoTjmtYw38qrJ67DgEDWakOEaZanGQwcAMiUkxRwUGKg+WrL5AVxFro
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10342"; a="256594106"
-X-IronPort-AV: E=Sophos;i="5.91,211,1647327600"; 
-   d="scan'208";a="256594106"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2022 07:06:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,211,1647327600"; 
-   d="scan'208";a="696561273"
-Received: from linux.intel.com ([10.54.29.200])
-  by orsmga004.jf.intel.com with ESMTP; 09 May 2022 07:06:10 -0700
-Received: from [10.252.208.70] (kliang2-MOBL.ccr.corp.intel.com [10.252.208.70])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by linux.intel.com (Postfix) with ESMTPS id 0F2A85807C8;
-        Mon,  9 May 2022 07:06:08 -0700 (PDT)
-Message-ID: <59e62b5b-beed-daef-971b-864a41928446@linux.intel.com>
-Date:   Mon, 9 May 2022 10:06:07 -0400
+        with ESMTP id S236879AbiEIOL1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 10:11:27 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C756219F66;
+        Mon,  9 May 2022 07:07:33 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 249DOPEk014341;
+        Mon, 9 May 2022 14:07:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=KNV586YhxorVuL/oyck7CFaNNYyFVhABaxGh67qbDVg=;
+ b=Pw52bvi/x7W0TFAZqvtdjJkG5vgmYgZftXxfBS8Fr++IoZ61HmzfvfQpec5VALf3UBuz
+ P3KN9RAcuc8Og+aPtApjMjp5xmyAca+GCAHL+5IRScJpGD8iKDs4WwBf+gMC+vFgMu4m
+ pJ4I+nzqX+bLHGoqQJh7MXsDgKidm3486+PGet4cBxYvwLtPgJa1BSrUPYdqYp+XgPa2
+ uaj+9x80YHE4uAtf03J8IKwCCjs+HQv2jwJCu3sNrdwM1FlFEukf/kZGNK5xSG3WNFTk
+ kLvHciWlziCdrqSoZ1d9XG/wINq9zQkjSYZv0jbFV0Yx9SgGENWVd41kJI7AHXrBVv1B Yg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fy3thgx3u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 May 2022 14:07:32 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 249DkR9T011447;
+        Mon, 9 May 2022 14:07:31 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fy3thgx39-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 May 2022 14:07:31 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 249E708I003315;
+        Mon, 9 May 2022 14:07:30 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04fra.de.ibm.com with ESMTP id 3fwgd8t1tj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 May 2022 14:07:30 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 249E7Qd229950348
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 9 May 2022 14:07:27 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DC72CA4060;
+        Mon,  9 May 2022 14:07:26 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 94C59A405C;
+        Mon,  9 May 2022 14:07:26 +0000 (GMT)
+Received: from [9.171.38.150] (unknown [9.171.38.150])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  9 May 2022 14:07:26 +0000 (GMT)
+Message-ID: <9635e559-5c2c-30f4-ab19-aef28ba24ac0@linux.ibm.com>
+Date:   Mon, 9 May 2022 16:07:26 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v11 08/16] KVM: x86/pmu: Refactor code to support guest
- Arch LBR
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [kvm-unit-tests PATCH 3/3] s390x: Test effect of storage keys on
+ some more instructions
 Content-Language: en-US
-To:     "Yang, Weijiang" <weijiang.yang@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "like.xu.linux@gmail.com" <like.xu.linux@gmail.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20220506033305.5135-1-weijiang.yang@intel.com>
- <20220506033305.5135-9-weijiang.yang@intel.com>
- <ce4fe0e1-357c-9e8d-67f7-f065ccbe3851@linux.intel.com>
- <d2e14530-f3c1-53c9-dd03-95ea2c1bf3f1@intel.com>
-From:   "Liang, Kan" <kan.liang@linux.intel.com>
-In-Reply-To: <d2e14530-f3c1-53c9-dd03-95ea2c1bf3f1@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20220505124656.1954092-1-scgl@linux.ibm.com>
+ <20220505124656.1954092-4-scgl@linux.ibm.com>
+ <20220506185227.165c7d86@p-imbrenda>
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+In-Reply-To: <20220506185227.165c7d86@p-imbrenda>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ajATeLVwAir5PQ--_fZUYwbvzTXwjfaK
+X-Proofpoint-ORIG-GUID: -u6wDI2bLbHO6_kkGsEE4DIwqeroX5wx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-09_03,2022-05-09_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ lowpriorityscore=0 bulkscore=0 phishscore=0 impostorscore=0 adultscore=0
+ mlxlogscore=999 clxscore=1015 mlxscore=0 priorityscore=1501 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2205090077
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 5/6/2022 10:32 PM, Yang, Weijiang wrote:
+On 5/6/22 18:52, Claudio Imbrenda wrote:
+> On Thu,  5 May 2022 14:46:56 +0200
+> Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
 > 
-> On 5/6/2022 11:03 PM, Liang, Kan wrote:
->> On 5/5/2022 11:32 PM, Yang Weijiang wrote:
+>> Test correctness of some instructions handled by user space instead of
+>> KVM with regards to storage keys.
+>> Test success and error conditions, including coverage of storage and
+>> fetch protection override.
 >>
->>    bool intel_pmu_lbr_is_enabled(struct kvm_vcpu *vcpu)
->> @@ -199,12 +203,20 @@ static bool intel_pmu_is_valid_lbr_msr(struct 
->> kvm_vcpu *vcpu, u32 index)
->>            return ret;
->>        }
->> -    ret = (index == MSR_LBR_SELECT) || (index == MSR_LBR_TOS) ||
->> -        (index >= records->from && index < records->from + 
->> records->nr) ||
->> -        (index >= records->to && index < records->to + records->nr);
->> +    if (!guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
->> +        ret = (index == MSR_LBR_SELECT) || (index == MSR_LBR_TOS);
+>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>> ---
+>>  s390x/skey.c        | 277 ++++++++++++++++++++++++++++++++++++++++++++
+>>  s390x/unittests.cfg |   1 +
+>>  2 files changed, 278 insertions(+)
+>>
+>> diff --git a/s390x/skey.c b/s390x/skey.c
+>> index 56bf5f45..d50470a8 100644
+>> --- a/s390x/skey.c
+>> +++ b/s390x/skey.c
+>> @@ -12,6 +12,7 @@
+>>  #include <asm/asm-offsets.h>
+>>  #include <asm/interrupt.h>
+>>  #include <vmalloc.h>
+>> +#include <css.h>
+>>  #include <asm/page.h>
+>>  #include <asm/facility.h>
+>>  #include <asm/mem.h>
+>> @@ -284,6 +285,114 @@ static void test_store_cpu_address(void)
+>>  	report_prefix_pop();
+>>  }
+>>  
+>> +/*
+>> + * Perform CHANNEL SUBSYSTEM CALL (CHSC)  instruction while temporarily executing
+>> + * with access key 1.
+>> + */
+>> +static unsigned int channel_subsystem_call_key_1(void *communication_block)
+> 
+> this function name is very long (maybe chsc_with_key_1 instead?)
+
+It's because of consistency with set_prefix_key_1 where I spelled out the instruction
+name too. Granted the name of chsc is longer.
+When in doubt I go for what seems more readable/contains more information.
+> 
+>> +{
+>> +	uint32_t program_mask;
 >> +
->> Shouldn't we return immediately if (ret == true)?
->> Keep checking if (!ret) looks uncommon.
->>
->> Actually we probably don't need the ret in this function.
->>
->>     if (!guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR) &&
->>         ((index == MSR_LBR_SELECT) || (index == MSR_LBR_TOS)))
->>         return true;
->>
->>> +    if (!ret) {
->>> +        ret = (index >= records->from &&
->>> +               index < records->from + records->nr) ||
->>> +              (index >= records->to &&
->>> +               index < records->to + records->nr);
->>> +    }
->>     if ((index >= records->from &&
->>         index < records->from + records->nr) ||
->>         (index >= records->to &&
->>         index < records->to + records->nr))
->>         return true;
->>
->>> -    if (!ret && records->info)
->>> -        ret = (index >= records->info && index < records->info + 
->>> records->nr);
->>> +    if (!ret && records->info) {
->>> +        ret = (index >= records->info &&
->>> +               index < records->info + records->nr);
->>> +    }
->>     if (records->info &&
->>         (index >= records->info && index < records->info + records->nr)
->>         return true;
->>
->>     return false;
->> Sorry, I didn't notice it in the previous review.
+>> +	asm volatile (
+>> +		"spka	0x10\n\t"
+>> +		".insn	rre,0xb25f0000,%[communication_block],0\n\t"
+>> +		"spka	0\n\t"
+>> +		"ipm	%[program_mask]\n"
+>> +		: [program_mask] "=d" (program_mask)
+>> +		: [communication_block] "d" (communication_block)
+>> +		: "memory"
+>> +	);
+>> +	return program_mask >> 28;
+>> +}
+>> +
+>> +static void init_store_channel_subsystem_characteristics(uint16_t *communication_block)
 > 
-> Thanks Kan, so I'll modify this function as below (keeping other part 
-> unchanged):
-> 
->  From 642d5e05e8a8578e75531632d714cec5976ab9ac Mon Sep 17 00:00:00 2001
-> From: Yang Weijiang <weijiang.yang@intel.com>
-> Date: Thu, 8 Jul 2021 23:51:02 +0800
-> Subject: [PATCH] KVM: x86/pmu: Refactor code to support guest Arch LBR
-> 
-> Take account of Arch LBR when do sanity checks before program
-> vPMU for guest. Pass through Arch LBR recording MSRs to guest
-> to gain better performance. Note, Arch LBR and Legacy LBR support
-> are mutually exclusive, i.e., they're not both available on one
-> platform.
-> 
-> Co-developed-by: Like Xu <like.xu@linux.intel.com>
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> ---
+> same here (init_comm_block?)
 
-This one looks good to me.
+Since we're only performing one kind of operation in this test, that is fine,
+but I'll add a comment saying how we initialize the communication block then.
+> 
+>> +{
+>> +	memset(communication_block, 0, PAGE_SIZE);
+>> +	communication_block[0] = 0x10;
+>> +	communication_block[1] = 0x10;
+>> +	communication_block[9] = 0;
+>> +}
+>> +
+>> +static void test_channel_subsystem_call(void)
+>> +{
+>> +	static const char request_name[] = "Store channel-subsystem-characteristics";
+> 
+> so this "request_name" is for when CHSC succeeds? why not just
+> "Success" then?
 
-Reviewed-by: Kan Liang <kan.liang@linux.intel.com>
+That's the operation being performed. So maybe I should change it to
+msg[] = "Performed store channel-subsystem-characteristics" ?
+> 
+>> +	uint16_t *communication_block = (uint16_t *)&pagebuf;
+> 
+> long name (consider comm_block, or even cb)
+> 
+>> +	unsigned int cc;
+>> +
+>> +	report_prefix_push("CHANNEL SUBSYSTEM CALL");
+>> +
+>> +	report_prefix_push("zero key");
+>> +	init_store_channel_subsystem_characteristics(communication_block);
+> 
+> see what I mean when I say that the names are too long? ^
 
-Thanks,
-Kan
->   arch/x86/kvm/vmx/pmu_intel.c | 47 +++++++++++++++++++++++++-----------
->   arch/x86/kvm/vmx/vmx.c       |  3 +++
->   2 files changed, 36 insertions(+), 14 deletions(-)
+Fits in 80 columns ;-)
 > 
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index aa36d2072b91..306ce7ac9934 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -170,12 +170,16 @@ static inline struct kvm_pmc *get_fw_gp_pmc(struct 
-> kvm_pmu *pmu, u32 msr)
+>> +	set_storage_key(communication_block, 0x10, 0);
+>> +	asm volatile (
+>> +		".insn	rre,0xb25f0000,%[communication_block],0\n\t"
+>> +		"ipm	%[cc]\n"
+>> +		: [cc] "=d" (cc)
+>> +		: [communication_block] "d" (communication_block)
+>> +		: "memory"
+>> +	);
+>> +	cc = cc >> 28;
+>> +	report(cc == 0 && communication_block[9], request_name);
+>> +	report_prefix_pop();
+>> +
+>> +	report_prefix_push("matching key");
+>> +	init_store_channel_subsystem_characteristics(communication_block);
+>> +	set_storage_key(communication_block, 0x10, 0);
 > 
->   bool intel_pmu_lbr_is_compatible(struct kvm_vcpu *vcpu)
->   {
-> +       if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
-> +               return guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR);
-> +
->          /*
->           * As a first step, a guest could only enable LBR feature if its
->           * cpu model is the same as the host because the LBR registers
->           * would be pass-through to the guest and they're model specific.
->           */
-> -       return boot_cpu_data.x86_model == guest_cpuid_model(vcpu);
-> +       return !boot_cpu_has(X86_FEATURE_ARCH_LBR) &&
-> +               boot_cpu_data.x86_model == guest_cpuid_model(vcpu);
->   }
+> you just set the storage key in the previous test, and you did not set
+> it back to 0, why do you need to set it again?
+
+It's not necessary, but I want the tests to be independent from each other,
+so you can remove/reorder/add ones without having to think.
 > 
->   bool intel_pmu_lbr_is_enabled(struct kvm_vcpu *vcpu)
-> @@ -188,25 +192,28 @@ bool intel_pmu_lbr_is_enabled(struct kvm_vcpu *vcpu)
->   static bool intel_pmu_is_valid_lbr_msr(struct kvm_vcpu *vcpu, u32 index)
->   {
->          struct x86_pmu_lbr *records = vcpu_to_lbr_records(vcpu);
-> -       bool ret = false;
+>> +	cc = channel_subsystem_call_key_1(communication_block);
+>> +	report(cc == 0 && communication_block[9], request_name);
+>> +	report_prefix_pop();
+>> +
+
+[...]
+
+>> +
+>> +	cc = stsch(test_device_sid, schib);
+>> +	if (cc) {
+>> +		report_fail("could not store SCHIB");
+>> +		return;
+>> +	}
+>> +
+>> +	report_prefix_push("zero key");
+>> +	schib->pmcw.intparm = 100;
+>> +	set_storage_key(schib, 0x28, 0);
+>> +	cc = msch(test_device_sid, schib);
+>> +	if (!cc) {
+>> +		WRITE_ONCE(schib->pmcw.intparm, 0);
 > 
->          if (!intel_pmu_lbr_is_enabled(vcpu))
-> -               return ret;
-> +               return false;
+> why are you using WRITE_ONCE here?
+
+It's a dead store because of the stsch below.
+That line is just for good measure so we know stsch really overwrote the value.
 > 
->          if (index == MSR_ARCH_LBR_DEPTH || index == MSR_ARCH_LBR_CTL) {
-> -               if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
-> -                       ret = guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR);
-> -               return ret;
-> +               return kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR) &&
-> +                      guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR);
->          }
-> 
-> -       ret = (index == MSR_LBR_SELECT) || (index == MSR_LBR_TOS) ||
-> -               (index >= records->from && index < records->from + 
-> records->nr) ||
-> -               (index >= records->to && index < records->to + 
-> records->nr);
-> +       if (!guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR) &&
-> +           (index == MSR_LBR_SELECT || index == MSR_LBR_TOS))
-> +               return true;
-> 
-> -       if (!ret && records->info)
-> -               ret = (index >= records->info && index < records->info + 
-> records->nr);
-> +       if ((index >= records->from && index < records->from + 
-> records->nr) ||
-> +           (index >= records->to && index < records->to + records->nr))
-> +               return true;
-> 
-> -       return ret;
-> +       if (records->info && index >= records->info &&
-> +           index < records->info + records->nr)
-> +               return true;
-> +
-> +       return false;
->   }
-> 
->   static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
-> @@ -742,6 +749,9 @@ static void vmx_update_intercept_for_lbr_msrs(struct 
-> kvm_vcpu *vcpu, bool set)
->                          vmx_set_intercept_for_msr(vcpu, lbr->info + i, 
-> MSR_TYPE_RW, set);
->          }
-> 
-> +       if (guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
-> +               return;
-> +
->          vmx_set_intercept_for_msr(vcpu, MSR_LBR_SELECT, MSR_TYPE_RW, set);
->          vmx_set_intercept_for_msr(vcpu, MSR_LBR_TOS, MSR_TYPE_RW, set);
->   }
-> @@ -782,10 +792,13 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
->   {
->          struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->          struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
-> +       bool lbr_enable = guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR) ?
-> +               (vmcs_read64(GUEST_IA32_LBR_CTL) & ARCH_LBR_CTL_LBREN) :
-> +               (vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR);
-> 
->          if (!lbr_desc->event) {
->                  vmx_disable_lbr_msrs_passthrough(vcpu);
-> -               if (vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR)
-> +               if (lbr_enable)
->                          goto warn;
->                  if (test_bit(INTEL_PMC_IDX_FIXED_VLBR, pmu->pmc_in_use))
->                          goto warn;
-> @@ -802,13 +815,19 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
->          return;
-> 
->   warn:
-> +       if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
-> +               wrmsrl(MSR_ARCH_LBR_DEPTH, lbr_desc->records.nr);
->          pr_warn_ratelimited("kvm: vcpu-%d: fail to passthrough LBR.\n",
->                  vcpu->vcpu_id);
->   }
-> 
->   static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
->   {
-> -       if (!(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR))
-> +       bool lbr_enable = guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR) ?
-> +               (vmcs_read64(GUEST_IA32_LBR_CTL) & ARCH_LBR_CTL_LBREN) :
-> +               (vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR);
-> +
-> +       if (!lbr_enable)
->                  intel_pmu_release_guest_lbr_event(vcpu);
->   }
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index b6bc7d97e4b4..98e56a909c01 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -573,6 +573,9 @@ static bool is_valid_passthrough_msr(u32 msr)
->          case MSR_LBR_NHM_TO ... MSR_LBR_NHM_TO + 31:
->          case MSR_LBR_CORE_FROM ... MSR_LBR_CORE_FROM + 8:
->          case MSR_LBR_CORE_TO ... MSR_LBR_CORE_TO + 8:
-> +       case MSR_ARCH_LBR_FROM_0 ... MSR_ARCH_LBR_FROM_0 + 31:
-> +       case MSR_ARCH_LBR_TO_0 ... MSR_ARCH_LBR_TO_0 + 31:
-> +       case MSR_ARCH_LBR_INFO_0 ... MSR_ARCH_LBR_INFO_0 + 31:
->                  /* LBR MSRs. These are handled in 
-> vmx_update_intercept_for_lbr_msrs() */
->                  return true;
->          }
-> -- 
-> 2.27.0
-> 
->> Thanks,
->> Kan
->>
+>> +		cc = stsch(test_device_sid, schib);
+>> +		report(!cc && schib->pmcw.intparm == 100, "fetched from SCHIB");
+
+[...]
