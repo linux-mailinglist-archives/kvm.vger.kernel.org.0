@@ -2,62 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA7BC5205E6
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 22:31:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11092520609
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 22:41:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229491AbiEIUeU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 16:34:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50266 "EHLO
+        id S229713AbiEIUoN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 16:44:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229655AbiEIUeD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 16:34:03 -0400
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9F362D2930;
-        Mon,  9 May 2022 13:24:22 -0700 (PDT)
+        with ESMTP id S229635AbiEIUoM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 16:44:12 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EB0A285AFD
+        for <kvm@vger.kernel.org>; Mon,  9 May 2022 13:40:16 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id i10so25837080lfg.13
+        for <kvm@vger.kernel.org>; Mon, 09 May 2022 13:40:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1652127863; x=1683663863;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=cbosptKrbMIe8k/Gv5F/V00Xlc9whGQqaQE8iFl+sCE=;
-  b=PdH5rjO+0Ys9wnB4tOQbrkXMxvKiUs/aDz17n7cW0eliuNgXVcPvvrw6
-   TIxyEwDu2iLACe4d+Z//HU4uHsaBAqZAHDBa96Q7mGD9OaS2N8eqR5dxc
-   3UzykavUtgyaRrn1ZR89Layhzb6aAbUdtFI99+IIK7MqBfQL2wY2xlt1W
-   Y=;
-X-IronPort-AV: E=Sophos;i="5.91,212,1647302400"; 
-   d="scan'208";a="193768546"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-2dbf0206.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP; 09 May 2022 20:24:06 +0000
-Received: from EX13MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2a-2dbf0206.us-west-2.amazon.com (Postfix) with ESMTPS id 39CADA2846;
-        Mon,  9 May 2022 20:24:05 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
- id 15.0.1497.32; Mon, 9 May 2022 20:24:04 +0000
-Received: from u79c5a0a55de558.ant.amazon.com (10.43.160.180) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.32; Mon, 9 May 2022 20:24:02 +0000
-From:   Alexander Graf <graf@amazon.com>
-To:     <kvm@vger.kernel.org>
-CC:     <linuxppc-dev@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Paul Mackerras <paulus@samba.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Matt Evans <matt@ozlabs.org>, <stable@vger.kernel.org>
-Subject: [PATCH] KVM: PPC: Book3S PR: Enable MSR_DR for switch_mmu_context()
-Date:   Mon, 9 May 2022 22:23:55 +0200
-Message-ID: <20220509202355.13985-1-graf@amazon.com>
-X-Mailer: git-send-email 2.28.0.394.ge197136389
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=BIXP48f9IFC0Hkj3azqmWJdeXSkX992GcZlhW28H8VI=;
+        b=ExBCG/Z9ylStbbWLSb630ukgspNNaZiMDKsIaOm9cXuMHaShSG/KuFCizJHOKUOBkb
+         hrsUyplPAjSLKoBSzTBRvovA9J9TJq/+fP4DT/Km6pOYaDSxCL9uWh0q/IzticNWrRSQ
+         wo96KGXBMrjB7MZlUjkQ5fnvtxN5HH/GEhNiu5y2YDyMkyjG5mDmN20IgUbcpekxfKZo
+         9XFh5ELEZgKTg8ftLN0k6uTCVIBXK8zdMjBdaUmLUH+Hd9Uqp8hEZmvXKg3gtpRT+0tq
+         nUGr2PG+KZy2AgUzn/l/ZtCexGjkGBwRKrXfrX0SrGxUNi9tTn2FqhGmGRK7dBvRw+Xt
+         oILQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=BIXP48f9IFC0Hkj3azqmWJdeXSkX992GcZlhW28H8VI=;
+        b=wc8X4SKFhUERycx1CZCItvAd1KXb3m9AAtiMNkjObURi6zRhoGVVsuz3u/NwiQ3+jE
+         Vv+4/FNB/JSMAiW9liAPBJEjPqzSsgG1TEn0tLfDX2UE0exEq1JP3F1HMPrQwdYPBhBL
+         +8R0eArBJVRsE4lUReUAJKWXwQWTO2eOy2qmm6C8itx2aEX1ze7K9olGKRs/sojenNyq
+         rpQoIaritv1oxHPW+P/m8DTR+U+wuZOR6wwkx9gRyZNxmIWHp0KMLXmcXXAgzhpQISvq
+         yemj4LpetubsU1d4pQR1VvCoJohYtJb/JIGuCO1njtvCNMswatUIAFmFfzWt4+lOLDAX
+         vTNQ==
+X-Gm-Message-State: AOAM530hRGbr3Cgp0T4bLrvn9yMPwFW2pW3qLscP2U/QcZVr2eUxZCWX
+        paG2Se4aBT1T3rSusPhzsNfLUM8xEwE=
+X-Google-Smtp-Source: ABdhPJzVCcKLfWr6G7EFGFFJvIjmpks60okM7ejP04II6B96+ISWXoAeAEmQU4v7dSmmet4Ipgxulg==
+X-Received: by 2002:a05:6512:2145:b0:472:82f:2520 with SMTP id s5-20020a056512214500b00472082f2520mr14286596lfr.325.1652128814354;
+        Mon, 09 May 2022 13:40:14 -0700 (PDT)
+Received: from localhost.localdomain (88-115-234-153.elisa-laajakaista.fi. [88.115.234.153])
+        by smtp.gmail.com with ESMTPSA id o25-20020ac24959000000b0047255d21121sm2051961lfi.80.2022.05.09.13.40.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 May 2022 13:40:13 -0700 (PDT)
+From:   Martin Radev <martin.b.radev@gmail.com>
+To:     kvm@vger.kernel.org
+Cc:     will@kernel.org, alexandru.elisei@arm.com,
+        Martin Radev <martin.b.radev@gmail.com>
+Subject: [PATCH v3 kvmtool 0/6] Fix few small issues in virtio code
+Date:   Mon,  9 May 2022 23:39:34 +0300
+Message-Id: <20220509203940.754644-1-martin.b.radev@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-Originating-IP: [10.43.160.180]
-X-ClientProxiedBy: EX13D01UWA002.ant.amazon.com (10.43.160.74) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,66 +67,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Commit 863771a28e27 ("powerpc/32s: Convert switch_mmu_context() to C")
-moved the switch_mmu_context() to C. While in principle a good idea, it
-meant that the function now uses the stack. The stack is not accessible
-from real mode though.
+Hello everyone,
 
-So to keep calling the function, let's turn on MSR_DR while we call it.
-That way, all pointer references to the stack are handled virtually.
+Thank you for the patience and for the reviews.
 
-Reported-by: Matt Evans <matt@ozlabs.org>
-Fixes: 863771a28e27 ("powerpc/32s: Convert switch_mmu_context() to C")
-Signed-off-by: Alexander Graf <graf@amazon.com>
-Cc: stable@vger.kernel.org
----
- arch/powerpc/kvm/book3s_32_sr.S | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+Here is the patchset with all of the changes.
 
-diff --git a/arch/powerpc/kvm/book3s_32_sr.S b/arch/powerpc/kvm/book3s_32_sr.S
-index e3ab9df6cf19..bd4f798f7a46 100644
---- a/arch/powerpc/kvm/book3s_32_sr.S
-+++ b/arch/powerpc/kvm/book3s_32_sr.S
-@@ -122,11 +122,21 @@
- 
- 	/* 0x0 - 0xb */
- 
--	/* 'current->mm' needs to be in r4 */
--	tophys(r4, r2)
--	lwz	r4, MM(r4)
--	tophys(r4, r4)
--	/* This only clobbers r0, r3, r4 and r5 */
-+	/* switch_mmu_context() needs paging, let's enable it */
-+	mfmsr   r9
-+	ori     r11, r9, MSR_DR
-+	mtmsr   r11
-+	sync
-+
-+	/* Calling switch_mmu_context(<inv>, current->mm, <inv>); */
-+	lwz	r4, MM(r2)
- 	bl	switch_mmu_context
- 
-+	/* Disable paging again */
-+	mfmsr   r9
-+	li      r6, MSR_DR
-+	andc    r9, r9, r6
-+	mtmsr	r9
-+	sync
-+
- .endm
+Kind regards,
+Martin
+
+Martin Radev (6):
+  kvmtool: Add WARN_ONCE macro
+  mmio: Sanitize addr and len
+  virtio: Use u32 instead of int in pci_data_in/out
+  virtio: Sanitize config accesses
+  virtio: Check for overflows in QUEUE_NOTIFY and QUEUE_SEL
+  kvmtool: Have stack be not executable on x86
+
+ include/kvm/util.h      | 10 ++++++++
+ include/kvm/virtio-9p.h |  1 +
+ include/kvm/virtio.h    |  3 ++-
+ mmio.c                  |  4 +++
+ virtio/9p.c             | 27 ++++++++++++++++-----
+ virtio/balloon.c        | 10 +++++++-
+ virtio/blk.c            | 10 +++++++-
+ virtio/console.c        | 10 +++++++-
+ virtio/mmio.c           | 40 ++++++++++++++++++++++++++----
+ virtio/net.c            | 10 +++++++-
+ virtio/pci.c            | 54 ++++++++++++++++++++++++++++++++++++-----
+ virtio/rng.c            |  8 +++++-
+ virtio/scsi.c           | 10 +++++++-
+ virtio/vsock.c          | 10 +++++++-
+ x86/bios/bios-rom.S     |  5 ++++
+ x86/bios/entry.S        |  5 ++++
+ 16 files changed, 192 insertions(+), 25 deletions(-)
+
 -- 
-2.28.0.394.ge197136389
-
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
+2.25.1
 
