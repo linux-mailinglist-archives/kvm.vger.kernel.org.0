@@ -2,123 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 720E251F9AD
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 12:21:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B66C651F9CA
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 12:26:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232936AbiEIKXs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 06:23:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58512 "EHLO
+        id S232801AbiEIK1A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 06:27:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232350AbiEIKXp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 06:23:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A423328492D
-        for <kvm@vger.kernel.org>; Mon,  9 May 2022 03:19:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652091591;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=K4RwiThG2sRs4P/BbLUo4a3tKiSU92o9YBsyxMIcY8M=;
-        b=Y+cUrU4oEVB1E2zr6Jzu7DC9EhiM/vfXXN0brgC8mO61sDpUiNZl6FiU7U8QnhTCTzXk9y
-        f3Sxf1KedsMSrpOSSlklU2BcwnF+pcAWajSf6XMa0Z+dzTWyU30hcHHhHa1EUQ9I6XJWNC
-        +c50jKyclRUW2unD5KFkkSm7BJehexA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-274-1M6qk7PCP8-9v-LJalAUTg-1; Mon, 09 May 2022 06:19:49 -0400
-X-MC-Unique: 1M6qk7PCP8-9v-LJalAUTg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DE516866DF1;
-        Mon,  9 May 2022 10:19:48 +0000 (UTC)
-Received: from starship (unknown [10.40.192.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C983114682F9;
-        Mon,  9 May 2022 10:19:46 +0000 (UTC)
-Message-ID: <0749750bfe2980036fb4bc730549f0749495ff99.camel@redhat.com>
-Subject: Re: [PATCH v4 08/15] KVM: x86: Deactivate APICv on vCPU with APIC
- disabled
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
-        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
-Date:   Mon, 09 May 2022 13:19:45 +0300
-In-Reply-To: <20220508023930.12881-9-suravee.suthikulpanit@amd.com>
-References: <20220508023930.12881-1-suravee.suthikulpanit@amd.com>
-         <20220508023930.12881-9-suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S229571AbiEIK06 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 06:26:58 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 372D228E4CD;
+        Mon,  9 May 2022 03:22:19 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id e24so12743308pjt.2;
+        Mon, 09 May 2022 03:22:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5dV2FPN7PIa/uNEp+Ct0krf8WyX1xQjO91HcqOH/26U=;
+        b=HaX8OjAyKk5UjP7m+w5IbTSKrKFgFl5+MMz9H6ScoXld7N6QmitNPAxf4G1Sv/9DPr
+         xFzl3L0OdQ+t/vJIz5PeYTnRVPpXjKLfV0QS2s3AiWHhpEfckyvd8al7Xl+FOSqyGSom
+         24cZZjEpM5FOq1yV24w2RvI8EtbjePfK6R8cpeVWNWvKQJxqPCGDKFH2KbrS7Pr4uEma
+         cFbBOCktn0aJif1PtIzAlCpH+QoIi5WeARPG5nmWCvV4oS6509GAoDKCIvuCuPH3B+Xu
+         U0LgruRSW1V53e0J1qmZJnC/zDpcPqljgQPo6n9uUEX5pJBov+8AFmdB3BAhisOQZhc0
+         ohEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5dV2FPN7PIa/uNEp+Ct0krf8WyX1xQjO91HcqOH/26U=;
+        b=Oxa9RyKC9ynDqzZ/vk0MdF1iR1ueNKFQoJkUg6CTDU9MMB8s0+JtFq+B+8xhxDXycE
+         whm5ip8VtysyXa+gY+YqU6KLKF4nzzVrVoJNGHSJaiyMmVAwDLquoXDwClutQgauhuq9
+         Qs7vVExuaywpoGNV3vcu1LnDlhncSswG3C9HE6uw9xqftrhzNI/iNEQMjEO7Ei46BsuN
+         3MdlAueEjdtvuYUGACC5rSJ0szjY97eFZSmrmKs5i89AQiSRKCisMmPL6d0EpDO/+G2Y
+         PjkcJg5DNPeqUXtnWGk46UlJ2mXavZpGiSWFcely9LjmrvuUsqjQPmbhP8YklECkfgtC
+         UYtg==
+X-Gm-Message-State: AOAM53177RkXAwAklvz6nbV3bUZv/a3opmKSnbo616cBf3Iofv188K+m
+        CQpI5gX4GBWIiarTpl74gEK4y2Xmyk5FOA==
+X-Google-Smtp-Source: ABdhPJx4nRwsvEWhM/JKnxCAdMzjTdkhTq77E7F0zcu7mP/+6VupUTNx+NoLFgzIPefHR16nV20P0g==
+X-Received: by 2002:a17:90b:3ecd:b0:1dc:945e:41b1 with SMTP id rm13-20020a17090b3ecd00b001dc945e41b1mr17222115pjb.208.1652091737152;
+        Mon, 09 May 2022 03:22:17 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.83])
+        by smtp.gmail.com with ESMTPSA id p17-20020a170902b09100b0015ee985a54csm6688891plr.56.2022.05.09.03.22.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 May 2022 03:22:16 -0700 (PDT)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 1/3] KVM: x86/pmu: Ignore pmu->global_ctrl check if vPMU doesn't support global_ctrl
+Date:   Mon,  9 May 2022 18:22:02 +0800
+Message-Id: <20220509102204.62389-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 2022-05-07 at 21:39 -0500, Suravee Suthikulpanit wrote:
-> APICv should be deactivated on vCPU that has APIC disabled.
-> Therefore, call kvm_vcpu_update_apicv() when changing
-> APIC mode, and add additional check for APIC disable mode
-> when determine APICV activation,
-> 
-> Suggested-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> ---
->  arch/x86/kvm/lapic.c | 4 +++-
->  arch/x86/kvm/x86.c   | 4 +++-
->  2 files changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 8b8c4a905976..680824d7aa0d 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -2346,8 +2346,10 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
->  	if (((old_value ^ value) & X2APIC_ENABLE) && (value & X2APIC_ENABLE))
->  		kvm_apic_set_x2apic_id(apic, vcpu->vcpu_id);
->  
-> -	if ((old_value ^ value) & (MSR_IA32_APICBASE_ENABLE | X2APIC_ENABLE))
-> +	if ((old_value ^ value) & (MSR_IA32_APICBASE_ENABLE | X2APIC_ENABLE)) {
-> +		kvm_vcpu_update_apicv(vcpu);
->  		static_call_cond(kvm_x86_set_virtual_apic_mode)(vcpu);
+From: Like Xu <likexu@tencent.com>
 
-As futher optimization, we might even get rid of .set_virtual_apic_mode
-and do all of this in kvm_vcpu_update_apicv.
-But no need to do this now.
+MSR_CORE_PERF_GLOBAL_CTRL is introduced as part of Architecture PMU V2,
+as indicated by Intel SDM 19.2.2 and the intel_is_valid_msr() function.
 
+So in the absence of global_ctrl support, all PMCs are enabled as AMD does.
 
-> +	}
->  
->  	apic->base_address = apic->vcpu->arch.apic_base &
->  			     MSR_IA32_APICBASE_BASE;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 8ee8c91fa762..77e49892dea1 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9836,7 +9836,9 @@ void kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
->  
->  	down_read(&vcpu->kvm->arch.apicv_update_lock);
->  
-> -	activate = kvm_vcpu_apicv_activated(vcpu);
-> +	/* Do not activate APICV when APIC is disabled */
-> +	activate = kvm_vcpu_apicv_activated(vcpu) &&
-> +		   (kvm_get_apic_mode(vcpu) != LAPIC_MODE_DISABLED);
->  
->  	if (vcpu->arch.apicv_active == activate)
->  		goto out;
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ arch/x86/kvm/vmx/pmu_intel.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Looks very good!
-
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-Best regards,
-	Maxim Levitsky
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index b82b6709d7a8..cff03baf8921 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -98,6 +98,9 @@ static bool intel_pmc_is_enabled(struct kvm_pmc *pmc)
+ {
+ 	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+ 
++	if (pmu->version < 2)
++		return true;
++
+ 	return test_bit(pmc->idx, (unsigned long *)&pmu->global_ctrl);
+ }
+ 
+-- 
+2.36.1
 
