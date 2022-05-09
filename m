@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 225375206A7
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 23:28:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A1AC5206A9
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 23:30:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229892AbiEIVcL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 17:32:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46490 "EHLO
+        id S229768AbiEIVeG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 17:34:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229799AbiEIVcJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 17:32:09 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1EFA285AC3
-        for <kvm@vger.kernel.org>; Mon,  9 May 2022 14:28:13 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id d15so17540559lfk.5
-        for <kvm@vger.kernel.org>; Mon, 09 May 2022 14:28:13 -0700 (PDT)
+        with ESMTP id S229487AbiEIVeD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 17:34:03 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93FFB2C13C3
+        for <kvm@vger.kernel.org>; Mon,  9 May 2022 14:30:07 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id l19so18585544ljb.7
+        for <kvm@vger.kernel.org>; Mon, 09 May 2022 14:30:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=lLXDpS9aIKv2BOfm7qGe20v7/h2Jmvrj+hyHCut5ohw=;
-        b=oyNullodeqUuuE421QfGbnwxO+DFaD2869iT7IedC61l5rZttPc/rSSzE78vqgW1qc
-         /yDSeSm/xObDW0SQYPjuLw/oabxydsD1u1pqk6iDs+C4RePn/EBKPD26MXSn/Bqau+vE
-         0vOQ0geMRnQRwNm4gtwQvXfhzE5wxzP2IR9rDPAfNyK+lM2iV9Bq1y9YKNHQPxElg7dK
-         HLSVmL0ZsXbI6xxQJD5n9kbgUSl73kAzVVOPO5r4rxxie5OCXNJsiaS4Mk11+iplA7nS
-         pCdRT/tZG9CzS1KAbQLLw6d11fWTcP/PbyYKjlJt8m4+EMQMD/pL6baQwgIfp/nZSGYH
-         OVEg==
+        bh=MvwsQDLTKMJTgQOuZM3iVmxfL3yQn70yj6MptUuzyQ4=;
+        b=KogQHf/McB9aIwAxL6BCyTJQgbxIayVYsDYOtKkeewIVQ3A710pUY39TcaMq8U+T88
+         gv5ruaQ8w1yni6W7HlnAW1N5dHfHt1WakHv8tKw4thLTmjxF5UXYrTav0m+YNbRZNcVT
+         +xVoGcPvGLNpEro0SP/zK6DkXhaiaFO9Y8/8D2b9GnaAOzzXtJ+VOxQ0//82acn4t0Vr
+         EyNaOMSqCvxhgna4lq3UZ1jUYA59iu4tqGmRv5m5PnsaV+jRbOkS28/53sy/KiAk4Ce5
+         91WjSvdmCd1bOkDfCR6jDhvHCuzTjEWGIYJ0Tf8aeQw5yq6MjnvQwk+dlbeoHl04Hrif
+         5Wzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=lLXDpS9aIKv2BOfm7qGe20v7/h2Jmvrj+hyHCut5ohw=;
-        b=T7WaqW2WSOljJux2Og07RkgvDj466t+vRgAHdlcfJQLBcOelE3L2rNTSF1CfKkRQda
-         vgRVrsMu7MSVdXPMxxGlB1+YswZrMAa75Py3xC21PepmVbj8LDDcNOrrhqpXiYlE1VgT
-         QssVPGHZOcW5I6+maBY6/um9qgfzycvmwAQt/FZeSQnV+TZ8c58L4yJqRKaKztH8vovq
-         j9UPxIBZ3MEU4hSnOWGnWWT1rIqmZVX7nqZ3mlVGq9fTwb0xAeABOH7ISLdqZ5u5TdMk
-         B/pGjc4obgmbb2+V+gLP90FdCfF5QkzDKliPNreg5HQP67cndhjB6lqQSwHfHiyKTAa6
-         Ebgw==
-X-Gm-Message-State: AOAM530ZfcIj9RwXZBKcq4zwXIVljQWyvEkiySRz3Z5iyGEtznOgWrOl
-        ubwiVuSsN/CHx53SrdekzVjnbcq0xFREoyqLB0mpcA==
-X-Google-Smtp-Source: ABdhPJw+OcXl75VxXUJHRSc/tzKR8oEQPG36TfGqgX3Q27P6+ehDBJMpPmSmVmU2xY3hI4g12NO5ncUZ1l7YDKxM7wo=
-X-Received: by 2002:ac2:4c54:0:b0:473:a414:1768 with SMTP id
- o20-20020ac24c54000000b00473a4141768mr13960522lfk.537.1652131692052; Mon, 09
- May 2022 14:28:12 -0700 (PDT)
+        bh=MvwsQDLTKMJTgQOuZM3iVmxfL3yQn70yj6MptUuzyQ4=;
+        b=BL2pxPP9M4djy71iNvj8wOQFep8Kcp5cxkpMtWCqSHW/GD+VllVF7e1Lbdv5M99PG0
+         b7e0l800aXT8l8oNwtUpc4w76jCJ/2za0Ld75MoDr4Af3E+OmCU/DhWaR32Kqmc/f8HV
+         bQRvTJLUJGmFDlFKjFNvA8O/XlX3WNViYMX4NAU+/RK0GaFAjRibRdnFkMLUVVEjr86D
+         tEflWwkl/fwWzWgf+rIxKHOUDd6BNuj1TuzFHS4fJ4Yop3yW36BOo4ZNWC6tTYU8m7dz
+         d7mUi2lzKPcIv+F4jAidOiyQ6o0iutFDqS/wVxUVJc029GXPAX8LqNXdpDD32FNlhjqc
+         y3kw==
+X-Gm-Message-State: AOAM532MFBV6ps78tp1R5iTxwHcDgXwdLhdibk4cjnAd7RUfnELU0wLt
+        ZvUgfdVT94AM1tlXlB34sk5vtI2c0y9zOkDjqng4Pw==
+X-Google-Smtp-Source: ABdhPJx+6UQM4mLeHjKTgMzcIwGXK2jygDZun4KACvit/KIbJo02fyOw9JvUPx0VkZs/cp8bQ8Ty95f5uyusbVuZ7zI=
+X-Received: by 2002:a2e:9e54:0:b0:250:d6c8:c2a6 with SMTP id
+ g20-20020a2e9e54000000b00250d6c8c2a6mr830767ljk.16.1652131805713; Mon, 09 May
+ 2022 14:30:05 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220422210546.458943-1-dmatlack@google.com> <20220422210546.458943-14-dmatlack@google.com>
- <YnRh6yyGQZ+U31U1@google.com>
-In-Reply-To: <YnRh6yyGQZ+U31U1@google.com>
+References: <20220422210546.458943-1-dmatlack@google.com> <20220422210546.458943-16-dmatlack@google.com>
+ <Ynk84xydEn4/3xkT@google.com>
+In-Reply-To: <Ynk84xydEn4/3xkT@google.com>
 From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 9 May 2022 14:27:45 -0700
-Message-ID: <CALzav=fSx2VdaLD=pz_wmESCSA8M0n1omLsy9UwSw1GHED7vgQ@mail.gmail.com>
-Subject: Re: [PATCH v4 13/20] KVM: x86/mmu: Decouple rmap_add() and
- link_shadow_page() from kvm_vcpu
+Date:   Mon, 9 May 2022 14:29:38 -0700
+Message-ID: <CALzav=daCnHcUV7ffwvpMGcpdvV5vqHg0JD7Wfs-F6jfaJnfSA@mail.gmail.com>
+Subject: Re: [PATCH v4 15/20] KVM: x86/mmu: Cache the access bits of shadowed translations
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Huacai Chen <chenhuacai@kernel.org>,
@@ -77,48 +76,70 @@ X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 5, 2022 at 4:46 PM Sean Christopherson <seanjc@google.com> wrote:
+On Mon, May 9, 2022 at 9:10 AM Sean Christopherson <seanjc@google.com> wrote:
 >
 > On Fri, Apr 22, 2022, David Matlack wrote:
-> > -static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
-> > -                          struct kvm_mmu_page *sp)
-> > +static void __link_shadow_page(struct kvm_mmu_memory_cache *cache, u64 *sptep,
-> > +                            struct kvm_mmu_page *sp)
-> >  {
-> >       u64 spte;
+> > @@ -2820,7 +2861,10 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
 > >
-> > @@ -2297,12 +2300,17 @@ static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
+> >       if (!was_rmapped) {
+> >               WARN_ON_ONCE(ret == RET_PF_SPURIOUS);
+> > -             rmap_add(vcpu, slot, sptep, gfn);
+> > +             rmap_add(vcpu, slot, sptep, gfn, pte_access);
+> > +     } else {
+> > +             /* Already rmapped but the pte_access bits may have changed. */
+> > +             kvm_mmu_page_set_access(sp, sptep - sp->spt, pte_access);
+> >       }
 > >
-> >       mmu_spte_set(sptep, spte);
-> >
-> > -     mmu_page_add_parent_pte(vcpu, sp, sptep);
-> > +     mmu_page_add_parent_pte(cache, sp, sptep);
-> >
-> >       if (sp->unsync_children || sp->unsync)
-> >               mark_unsync(sptep);
+> >       return ret;
+>
+> ...
+>
+> > diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> > index a8a755e1561d..97bf53b29b88 100644
+> > --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> > +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> > @@ -978,7 +978,8 @@ static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
 > >  }
 > >
-> > +static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep, struct kvm_mmu_page *sp)
+> >  /*
+> > - * Using the cached information from sp->gfns is safe because:
+> > + * Using the information in sp->shadowed_translation (kvm_mmu_page_get_gfn()
+> > + * and kvm_mmu_page_get_access()) is safe because:
+> >   * - The spte has a reference to the struct page, so the pfn for a given gfn
+> >   *   can't change unless all sptes pointing to it are nuked first.
+> >   *
+> > @@ -1052,12 +1053,15 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+> >               if (sync_mmio_spte(vcpu, &sp->spt[i], gfn, pte_access))
+> >                       continue;
+> >
+> > -             if (gfn != sp->gfns[i]) {
+> > +             if (gfn != kvm_mmu_page_get_gfn(sp, i)) {
+> >                       drop_spte(vcpu->kvm, &sp->spt[i]);
+> >                       flush = true;
+> >                       continue;
+> >               }
+> >
+> > +             if (pte_access != kvm_mmu_page_get_access(sp, i))
 >
-> Nit, would prefer to wrap here, especially since __link_shadow_page() wraps.
+> I think it makes sense to do this unconditionally, same as mmu_set_spte().  Or
+> make the mmu_set_spte() case conditional.  I don't have a strong preference either
+> way, but the two callers should be consistent with each other.
 
-Will do.
+I'll make them both unconditional.
 
 >
-> > +{
-> > +     __link_shadow_page(&vcpu->arch.mmu_pte_list_desc_cache, sptep, sp);
-> > +}
+> > +                     kvm_mmu_page_set_access(sp, i, pte_access);
 > > +
-> >  static void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
-> >                                  unsigned direct_access)
-> >  {
+> >               sptep = &sp->spt[i];
+> >               spte = *sptep;
+> >               host_writable = spte & shadow_host_writable_mask;
 > > --
 > > 2.36.0.rc2.479.g8af0fa9b8e-goog
 > >
