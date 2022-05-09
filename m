@@ -2,274 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 88B74520814
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 00:57:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E74DF52085E
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 01:27:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229532AbiEIXA7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 19:00:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55750 "EHLO
+        id S232435AbiEIXbb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 19:31:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232035AbiEIXA5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 19:00:57 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88CAE244F2F
-        for <kvm@vger.kernel.org>; Mon,  9 May 2022 15:57:02 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id c9so14520633plh.2
-        for <kvm@vger.kernel.org>; Mon, 09 May 2022 15:57:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=cyz9tulYjjoPlqL/KyMBr2cr526E/FbUGIe/SucGFmg=;
-        b=grLQrLP7ejbiRHexQT7PQYQ7lzWo6AkBKPhUCpNagMVYqHnAc+3s9EzWnczkci8U9T
-         x0CDMY8JYKuCbt1+SulS+AXwIWvH90zQPVSYGBwdV3dMyJmNQzZ1BveU220IQBuCLLzO
-         IjmdvKpP5ZXQHIeTShNvYcKExMHAF7QKL4ECgoUPWvNE19+YdjxPemP6m+8x79QmI2jn
-         ivkApIfUWLr/yCQkhuSvkYtjxYyLyAQ567smHX0zm4TcX4IhSEwwfENF9v7BVcee33Qb
-         2wCbZMj25Hxzb2WLAfYU0q8GJVDtcIrlsIda+iPeZ7soBfZexXpzYkuy7Px5UOuBDyzH
-         pBIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=cyz9tulYjjoPlqL/KyMBr2cr526E/FbUGIe/SucGFmg=;
-        b=696/lK+QJJk57KboP6ZXR/0qhU19SMgXyas5Zlo+HDQavqzYgczav3IvbVEGtciOyy
-         zqQjsjtAVW4SJEkxIMiUebrspPWMCtDV6v6u05oUYhvk7rDx/vlKJfPCnFpjhcaJ+2jX
-         m9eKc+55zx76IW9XQP9a8wg5+LwHtrVFP4tGf+N4yt1VRNdf7b5jam85Bby4wvWvHsid
-         mKzgQmQsSagffW6vrkKhlz2+rs+OgYqPqvsyhCsmEKO6rV9VHU/OhnC/7mhC6RZ5+Bj2
-         Da8i0eZXdH3PCUV7XXfU8SrXUK3vbVqz1ZEyCAfCs+jDC5utR+7ag5OKFLV76kVHSYnb
-         qBzA==
-X-Gm-Message-State: AOAM530buJpTAeLcqMCFxF4YHGfu3MYu2ckerFM/n3YLn/b4R3abIunT
-        f2kqjB6inCZ0I4EF9CADPoPVqA==
-X-Google-Smtp-Source: ABdhPJx05y8bnmEfbnKZzU7mDZxHDicGOkpEGJYcw60iVRQzZoyIVrNyM6mO9JBa501S5piekC0NJQ==
-X-Received: by 2002:a17:902:ccc1:b0:15a:24df:a7cc with SMTP id z1-20020a170902ccc100b0015a24dfa7ccmr18081599ple.42.1652137021345;
-        Mon, 09 May 2022 15:57:01 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id a25-20020aa780d9000000b0050dc7628182sm9392409pfn.92.2022.05.09.15.57.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 May 2022 15:57:00 -0700 (PDT)
-Date:   Mon, 9 May 2022 22:56:57 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
-Subject: Re: [PATCH v4 11/20] KVM: x86/mmu: Allow for NULL vcpu pointer in
- __kvm_mmu_get_shadow_page()
-Message-ID: <YnmcOdZILo2LqhAW@google.com>
-References: <20220422210546.458943-1-dmatlack@google.com>
- <20220422210546.458943-12-dmatlack@google.com>
- <YnRerE5+FpwkUdQE@google.com>
- <CALzav=de1=euis3WocTNBi+xNn1Ypo-GRROQNqmtAKk6q1NUqg@mail.gmail.com>
+        with ESMTP id S231748AbiEIXba (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 19:31:30 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A51478118C;
+        Mon,  9 May 2022 16:27:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652138855; x=1683674855;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=prhLNqLk3ZELQbOpJAUzmyZtueVk5G/zEzxvEY8r+ug=;
+  b=LzYVOa0I0zcsr7m68+iLi6HR1j5e7myiN5fmR9hncdMulu+lztsa2oRd
+   lWcXYrnBUdTLa0ZrzmdtCxOGwnU32qHDviHDhqhmxeORIseB95njpF1uP
+   TbCVjk1iCm/Nd7Fie3Mo+EyRX9zgpO6KLd2NG8CeRQiG7gt4Ru8YPm/f0
+   I235JQcWBE+i8z5bPkn77iAI12yBZBWOQWYLezPOs+b9yMIrKUcIadbrl
+   0WA/f4bhocGZLbiP117k1LrHrV5MDtGBScWpRKzCuxGOHks6VmLTxZMrw
+   k0E+QHxRCujcSVwhdmgxEeHqyBGhF43LgJ82SJ7r2njVAWBYuzkB76Lt0
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10342"; a="249731016"
+X-IronPort-AV: E=Sophos;i="5.91,212,1647327600"; 
+   d="scan'208";a="249731016"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2022 16:27:35 -0700
+X-IronPort-AV: E=Sophos;i="5.91,212,1647327600"; 
+   d="scan'208";a="602191441"
+Received: from abehrenx-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.1.104])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2022 16:27:31 -0700
+Message-ID: <7367cae9957dba0142a878531a71f9873e1d6316.camel@intel.com>
+Subject: Re: [PATCH v3 00/21] TDX host kernel support
+From:   Kai Huang <kai.huang@intel.com>
+To:     Mike Rapoport <rppt@kernel.org>
+Cc:     Dan Williams <dan.j.williams@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>
+Date:   Tue, 10 May 2022 11:27:29 +1200
+In-Reply-To: <YnjuFHvyGwa9yHat@kernel.org>
+References: <d98ca73b-2d2d-757d-e937-acc83cfedfb0@intel.com>
+         <c90a10763969077826f42be6f492e3a3e062326b.camel@intel.com>
+         <fc1ca04d94ad45e79c0297719d5ef50a7c33c352.camel@intel.com>
+         <664f8adeb56ba61774f3c845041f016c54e0f96e.camel@intel.com>
+         <1b681365-ef98-ec78-96dc-04e28316cf0e@intel.com>
+         <8bf596b45f68363134f431bcc550e16a9a231b80.camel@intel.com>
+         <6bb89ca6e7346f4334f06ea293f29fd12df70fe4.camel@intel.com>
+         <CAPcyv4iP3hcNNDxNdPT+iB0E4aUazfqFWwaa_dtHpVf+qKPNcQ@mail.gmail.com>
+         <YnW4nTub1BYUF15W@kernel.org>
+         <5c7196b517398e7697464fe997018e9031d15470.camel@intel.com>
+         <YnjuFHvyGwa9yHat@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALzav=de1=euis3WocTNBi+xNn1Ypo-GRROQNqmtAKk6q1NUqg@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 09, 2022, David Matlack wrote:
-> On Thu, May 5, 2022 at 4:33 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Fri, Apr 22, 2022, David Matlack wrote:
-> > > Allow the vcpu pointer in __kvm_mmu_get_shadow_page() to be NULL. Rename
-> > > it to vcpu_or_null to prevent future commits from accidentally taking
-> > > dependency on it without first considering the NULL case.
-> > >
-> > > The vcpu pointer is only used for syncing indirect shadow pages in
-> > > kvm_mmu_find_shadow_page(). A vcpu pointer it not required for
-> > > correctness since unsync pages can simply be zapped. But this should
-> > > never occur in practice, since the only use-case for passing a NULL vCPU
-> > > pointer is eager page splitting which will only request direct shadow
-> > > pages (which can never be unsync).
-> > >
-> > > Even though __kvm_mmu_get_shadow_page() can gracefully handle a NULL
-> > > vcpu, add a WARN() that will fire if __kvm_mmu_get_shadow_page() is ever
-> > > called to get an indirect shadow page with a NULL vCPU pointer, since
-> > > zapping unsync SPs is a performance overhead that should be considered.
-> > >
-> > > Signed-off-by: David Matlack <dmatlack@google.com>
-> > > ---
-> > >  arch/x86/kvm/mmu/mmu.c | 40 ++++++++++++++++++++++++++++++++--------
-> > >  1 file changed, 32 insertions(+), 8 deletions(-)
-> > >
-> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > index 04029c01aebd..21407bd4435a 100644
-> > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > @@ -1845,16 +1845,27 @@ static void kvm_mmu_commit_zap_page(struct kvm *kvm,
-> > >         &(_kvm)->arch.mmu_page_hash[kvm_page_table_hashfn(_gfn)])     \
-> > >               if ((_sp)->gfn != (_gfn) || (_sp)->role.direct) {} else
-> > >
-> > > -static int kvm_sync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
-> > > -                      struct list_head *invalid_list)
-> > > +static int __kvm_sync_page(struct kvm *kvm, struct kvm_vcpu *vcpu_or_null,
-> > > +                        struct kvm_mmu_page *sp,
-> > > +                        struct list_head *invalid_list)
-> > >  {
-> > > -     int ret = vcpu->arch.mmu->sync_page(vcpu, sp);
-> > > +     int ret = -1;
-> > > +
-> > > +     if (vcpu_or_null)
-> >
-> > This should never happen.  I like the idea of warning early, but I really don't
-> > like that the WARN is far removed from the code that actually depends on @vcpu
-> > being non-NULL. Case in point, KVM should have bailed on the WARN and never
-> > reached this point.  And the inner __kvm_sync_page() is completely unnecessary.
+> > 
+> > Hi Mike,
+> > 
+> > Thanks for feedback.
+> > 
+> > Perhaps I haven't put a lot details of the new TDX data structures, so let me
+> > point out that the new two data structures 'struct tdx_memblock' and 'struct
+> > tdx_memory' that I am proposing are mostly supposed to be used by TDX code only,
+> > which is pretty standalone.  They are not supposed to be some basic
+> > infrastructure that can be widely used by other random kernel components. 
 > 
-> Yeah that's fair.
+> We already have "pretty standalone" numa_meminfo that originally was used
+> to setup NUMA memory topology, but now it's used by other code as well.
+> And e820 tables also contain similar data and they are supposedly should be
+> used only at boot time, but in reality there are too much callbacks into
+> e820 way after the system is booted.
 > 
-> >
-> > I also don't love the vcpu_or_null terminology; I get the intent, but it doesn't
-> > really help because understand why/when it's NULL.
+> So any additional memory representation will only add to the overall
+> complexity and well have even more "eventually consistent" collections of 
+> { .start, .end, .flags } structures.
+>  
+> > In fact, currently the only operation we need is to allow memblock to register
+> > all memory regions as TDX memory blocks when the memblock is still alive. 
+> > Therefore, in fact, the new data structures can even be completely invisible to
+> > other kernel components.  For instance, TDX code can provide below API w/o
+> > exposing any data structures to other kernel components:
+> > 
+> > int tdx_add_memory_block(phys_addr_t start, phys_addr_t end, int nid);
+> > 
+> > And we call above API for each memory region in memblock when it is alive.
+> > 
+> > TDX code internally manages those memory regions via the new data structures
+> > that I mentioned above, so we don't need to keep memblock after boot.  The
+> > advantage of this approach is it is more flexible to support other potential TDX
+> > memory resources (such as CLX memory) in the future.
 > 
-> Eh, I don't think it needs to encode why or when. It just needs to
-> flag to the reader (and future code authors) that this vcpu pointer
-> (unlike all other vcpu pointers in KVM) is NULL in certain cases.
+> Please let keep things simple. If other TDX memory resources will need
+> different handling it can be implemented then. For now, just enable
+> ARCH_KEEP_MEMBLOCK and use memblock to track TDX memory.
+>  
 
-My objection is that without the why/when, developers that aren't familiar with
-this code won't know the rules for using vcpu_or_null.  E.g. I don't want to end
-up with
+Looks good to me.  Thanks for the feedback.
 
-	if (vcpu_or_null)
-		do x;
-	else
-		do y;
+-- 
+Thanks,
+-Kai
 
-because inevitably it'll become unclear whether or not that code is actually _correct_.
-It might not #GP on a NULL pointer, but it doesn't mean it's correct.
-
-> > I played around with casting, e.g. to/from an unsigned long or void *, to prevent
-> > usage, but that doesn't work very well because 'unsigned long' ends up being
-> > awkward/confusing, and 'void *' is easily lost on a function call.  And both
-> > lose type safety :-(
-> 
-> Yet another shortcoming of C :(
-
-And lack of closures, which would work very well here.
-
-> (The other being our other discussion about the RET_PF* return codes
-> getting easily misinterpreted as KVM's magic return-to-user /
-> continue-running-guest return codes.)
-> 
-> Makes me miss Rust!
-> 
-> >
-> > All in all, I think I'd prefer this patch to simply be a KVM_BUG_ON() if
-> > kvm_mmu_find_shadow_page() encounters an unsync page.  Less churn, and IMO there's
-> > no real loss in robustness, e.g. we'd really have to screw up code review and
-> > testing to introduce a null vCPU pointer dereference in this code.
-> 
-> Agreed about moving the check here and dropping __kvm_sync_page(). But
-> I would prefer to retain the vcpu_or_null name (or at least something
-> other than "vcpu" to indicate there's something non-standard about
-> this pointer).
-
-The least awful idea I've come up with is wrapping the vCPU in a struct, e.g.
-
-	struct sync_page_info {
-		void *vcpu;
-	}
-
-That provides the contextual information I want, and also provides the hint that
-something is odd about the vcpu, which you want.  It's like a very poor man's closure :-)
-	
-The struct could even be passed by value to avoid the miniscule overhead, and to
-make readers look extra hard because it's that much more wierd.
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 3d102522804a..068be77a4fff 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2003,8 +2003,13 @@ static void clear_sp_write_flooding_count(u64 *spte)
-        __clear_sp_write_flooding_count(sptep_to_sp(spte));
- }
-
-+/* Wrapper to make it difficult to dereference a potentially NULL @vcpu. */
-+struct sync_page_info {
-+       void *vcpu;
-+};
-+
- static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm *kvm,
--                                                    struct kvm_vcpu *vcpu,
-+                                                    struct sync_page_info spi,
-                                                     gfn_t gfn,
-                                                     struct hlist_head *sp_list,
-                                                     union kvm_mmu_page_role role)
-@@ -2041,6 +2046,13 @@ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm *kvm,
-                        goto out;
-
-                if (sp->unsync) {
-+                       /*
-+                        * Getting indirect shadow pages without a valid @spi
-+                        * is not supported, i.e. this should never happen.
-+                        */
-+                       if (KVM_BUG_ON(!spi.vcpu, kvm))
-+                               break;
-+
-                        /*
-                         * The page is good, but is stale.  kvm_sync_page does
-                         * get the latest guest state, but (unlike mmu_unsync_children)
-@@ -2053,7 +2065,7 @@ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm *kvm,
-                         * If the sync fails, the page is zapped.  If so, break
-                         * in order to rebuild it.
-                         */
--                       ret = kvm_sync_page(vcpu, sp, &invalid_list);
-+                       ret = kvm_sync_page(spi.vcpu, sp, &invalid_list);
-                        if (ret < 0)
-                                break;
-
-@@ -2120,7 +2132,7 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
- }
-
- static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm *kvm,
--                                                     struct kvm_vcpu *vcpu,
-+                                                     struct sync_page_info spi,
-                                                      struct shadow_page_caches *caches,
-                                                      gfn_t gfn,
-                                                      union kvm_mmu_page_role role)
-@@ -2131,7 +2143,7 @@ static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm *kvm,
-
-        sp_list = &kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
-
--       sp = kvm_mmu_find_shadow_page(kvm, vcpu, gfn, sp_list, role);
-+       sp = kvm_mmu_find_shadow_page(kvm, spi, gfn, sp_list, role);
-        if (!sp) {
-                created = true;
-                sp = kvm_mmu_alloc_shadow_page(kvm, caches, gfn, sp_list, role);
-@@ -2151,7 +2163,11 @@ static struct kvm_mmu_page *kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
-                .gfn_array_cache = &vcpu->arch.mmu_gfn_array_cache,
-        };
-
--       return __kvm_mmu_get_shadow_page(vcpu->kvm, vcpu, &caches, gfn, role);
-+       struct sync_page_info spi = {
-+               .vcpu = vcpu,
-+       };
-+
-+       return __kvm_mmu_get_shadow_page(vcpu->kvm, spi, &caches, gfn, role);
- }
-
- static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct, u32 access)
 
