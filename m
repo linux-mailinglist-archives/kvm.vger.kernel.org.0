@@ -2,188 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DEC451FA1A
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 12:39:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F349F51FB41
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 13:25:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229794AbiEIKmc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 06:42:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58958 "EHLO
+        id S232717AbiEIL1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 07:27:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229756AbiEIKmZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 06:42:25 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99DFC205D6;
-        Mon,  9 May 2022 03:38:26 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B250760FAD;
-        Mon,  9 May 2022 10:34:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8D94C385A8;
-        Mon,  9 May 2022 10:34:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652092447;
-        bh=NSHAgzSuzjtuD7Tjj9g99sthrjIGsxuDy6cZ0osNlgU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=KtSDi6ckvqgMOaHS+FfGqqXgAe/cl6zO47IvsmxQYfNan8YoA+cE5a3FOxZpbs0Uj
-         pV7P1D2rcTpBc5iYGdFIghkPSRctl/JvAmXEjuueqMF1kH+aY45wduQIBaCkp0dBC6
-         dSDExChHLMOXHczNDU6d22Yc1ttxZrUD4Fj1MFxr8xWrZhbK7DxnGwy291li+GhdQ8
-         41xOkBIwDDp6uTiGZEAC1XQxEneCVuF3i+O0DJIYgINkU2jICpMpSVcE/NIN312Dq/
-         HYBQz1yjC2WaMAjWQ5IZh6JHWrwmRwCZ9rPJm+n9YFUR4doi49RwB/A57IZXOMWGcV
-         wwJ+uKTyUgG8g==
-Date:   Mon, 9 May 2022 13:33:56 +0300
-From:   Mike Rapoport <rppt@kernel.org>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Kuppuswamy Sathyanarayanan 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>
-Subject: Re: [PATCH v3 00/21] TDX host kernel support
-Message-ID: <YnjuFHvyGwa9yHat@kernel.org>
-References: <d98ca73b-2d2d-757d-e937-acc83cfedfb0@intel.com>
- <c90a10763969077826f42be6f492e3a3e062326b.camel@intel.com>
- <fc1ca04d94ad45e79c0297719d5ef50a7c33c352.camel@intel.com>
- <664f8adeb56ba61774f3c845041f016c54e0f96e.camel@intel.com>
- <1b681365-ef98-ec78-96dc-04e28316cf0e@intel.com>
- <8bf596b45f68363134f431bcc550e16a9a231b80.camel@intel.com>
- <6bb89ca6e7346f4334f06ea293f29fd12df70fe4.camel@intel.com>
- <CAPcyv4iP3hcNNDxNdPT+iB0E4aUazfqFWwaa_dtHpVf+qKPNcQ@mail.gmail.com>
- <YnW4nTub1BYUF15W@kernel.org>
- <5c7196b517398e7697464fe997018e9031d15470.camel@intel.com>
+        with ESMTP id S232672AbiEIL1e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 07:27:34 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2082.outbound.protection.outlook.com [40.107.94.82])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F06A31C9ADD;
+        Mon,  9 May 2022 04:23:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SIfTsHLfTuQbNcVw6L7eMYB/GL2H3IqOGF1w6Iu4HATNlxzxeVNrliEhmu8cHX7OisHE5vR8w1oKN0TTN14WZ4MqZJHAv1ldkYTSwsRtMPRInIhb4o5cWOUQwxhKvHVc4RUeK0wgQQyD8Rul7dnW28YiBxipqc30gq5Y8NvhIEld2SnVxHKFndPdKy2Fe+FJILkMrtN6VR/9dFCcz4RehE1gUoP1fleMzN2yVBVRmaeLxyG/cvI0uIi9a1ibKB5p7isRPobK5FpEJd6qjZKXqAdoSBytr2z6nrxLeTiKuUuHX28To3g0poUgbcNdOtZvsiDFwCJoeEWsfzrgM3hFpw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wi4E6kxwg9ySxgHbGXu88iFBWeV/Jw31UpZe45PtEk4=;
+ b=CmBeld0eGbSqkUAv/bin/71p/DoQZayQ67eTXyeEJ6AyI8t/Od3vwe1EPmuiG0g6KsgoLgtQIIO/ciGq2pxJisir0tOmU4HxleeACem6TxsCiJ+VNPqzIZHJC58kGvEU3Eb0fzw0Nch+msHrX+OZ4OFcGu16z7kqgX2YLZHcP6KCMyoJDj/Si26ibicLGwePQ6825pevwYzyuJ+9YA9zZpwulwlZ6EBCMg+dRDGjNHqakObUABVdMV1Rr6PxNHYTB751Dm/4zjEG5nfDxQzyMvmr1w7RLYzhITmQv4cVuc0CbRSqRn94T2lqw1579MeQVuIcBE917hSu9/INIgSmcA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wi4E6kxwg9ySxgHbGXu88iFBWeV/Jw31UpZe45PtEk4=;
+ b=G0gNZ1hYkMseJ68+z2gCo94JQST1h+Zb4NkwYmBZB/sSQ4ne7zFTNAOjwURvfcu2JQbAdzPrlEUG9S6ovQweccrUY8jOK0oufvjuUSyFUkL9eIWaHc5djb+80RxnAgfAR/uGZVRIPIRnQPL6Z9qtCapOyvglrBA6lBqBdsiO7zQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) by
+ BYAPR12MB4629.namprd12.prod.outlook.com (2603:10b6:a03:111::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5227.22; Mon, 9 May
+ 2022 11:23:29 +0000
+Received: from DM8PR12MB5445.namprd12.prod.outlook.com
+ ([fe80::9894:c8:c612:ba6b]) by DM8PR12MB5445.namprd12.prod.outlook.com
+ ([fe80::9894:c8:c612:ba6b%4]) with mapi id 15.20.5227.023; Mon, 9 May 2022
+ 11:23:28 +0000
+Message-ID: <b3047d27-9681-6b9b-f747-c5428a250b02@amd.com>
+Date:   Mon, 9 May 2022 18:23:17 +0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v4 12/15] KVM: SVM: Introduce hybrid-AVIC mode
+Content-Language: en-US
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, mlevitsk@redhat.com, seanjc@google.com,
+        joro@8bytes.org, jon.grimm@amd.com, wei.huang2@amd.com,
+        terry.bowman@amd.com, Maxim Levitsky <mlevisk@redhat.com>
+References: <20220508023930.12881-1-suravee.suthikulpanit@amd.com>
+ <20220508023930.12881-13-suravee.suthikulpanit@amd.com>
+From:   "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>
+In-Reply-To: <20220508023930.12881-13-suravee.suthikulpanit@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN0PR01CA0051.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:49::10) To DM8PR12MB5445.namprd12.prod.outlook.com
+ (2603:10b6:8:24::7)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5c7196b517398e7697464fe997018e9031d15470.camel@intel.com>
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 85b56901-562b-4276-7faf-08da31ae5749
+X-MS-TrafficTypeDiagnostic: BYAPR12MB4629:EE_
+X-Microsoft-Antispam-PRVS: <BYAPR12MB46292242BF6E32F4E29B36D6F3C69@BYAPR12MB4629.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xy8B0Q6tvLJbDVhuqEtpMGVXFL8PX0XHcFG/7Nm2bw8aF073r/dZCJz0t9U+2zhKr7n7+58iJX7DBHqMBj8WM/MYB2Wt4w5s87ypxuL0ppzggcK/3IW1fQXd/o0ii2sf76xi6bQWDF1bo6V/qe8yIxIMOaHT1ulSFNFGiaXTMJtfcvnYUkN31tRIogQaJ6m3LtUdcU8g/G9otVHk/Q4JppstYquIEsipWsomLBhbuW6Yy45Cyjndv/o44pgEOr7F1oZkhha1rTpKh9u/sjSnvcEOMMxMcXARRFpSYIZXfwV73QgrnhuJsf+ZbF0RRi9na5kyGb94BFNfqfoYck4Lya+mB9zsr58Mv5YmeuUaxXwduR4KYdyn8A1qmTCg9U8YqGfvXKgLEwsojJHHMt1iq6IQqdFG2PEZ/ogZFGPvvDXooec3mZgGVaXqmaPOTVB9VZgkBpVcMSOxQP+5QH633QJGERk0CE+7HO70Pzupg3FukHAKFSlIxb2cx+OYO6c4VV0XryLrRbiBaZAIAFfwsJDgUP2r/C2JJd8EqKqnKWXYTWfA5eOrnbuVGQcMSAoicDs+THbFUHD6sAlyyG/G/E3PXRidVsmuVqAYgavxYE6gwf2NJYvcVZgrIIsL1ZJeT8JBfv2WQQknBCKk7f8COeDt6bbA/4g9WU1IqTo4LdLMTR9YmJ01PYGgmEG8KPnYcgxHiuKOk1FFYtXKBd0uPKJnCa/Rc0uXIbwWydKrxzNmQkIOybKDebIK/UV3hcxI
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(66556008)(2906002)(66476007)(66946007)(8676002)(31696002)(508600001)(6486002)(86362001)(38100700002)(316002)(83380400001)(8936002)(2616005)(5660300002)(4326008)(6512007)(4744005)(36756003)(26005)(186003)(31686004)(53546011)(6666004)(6506007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cG9Fbi9OMmorajRpLy9yZlVxZjVLRHo4UTVvTThtZkE4QXVnK3dYcTBUcDZN?=
+ =?utf-8?B?aW9LdGluQjR0NFZnb09sQjBhaUlWdTdKWjQwck9RaUcxRnk5cWhEeTdkcHI1?=
+ =?utf-8?B?M2JhTytJMVFXZ2xFSGpDRGVpbVNyWm1uQzkxR04zSkN6ZHNEcktaMFdCVHd1?=
+ =?utf-8?B?MTBmQUJybmZSUFk2VkNUMTNrc3M2OWFlaS9nTTBKS1FoSmo5RTFobXh5aDB2?=
+ =?utf-8?B?b3JUNkF3Wlh5akJxVVNadUxQcjZ3QnFqTXlQY2NVNCtYNzNQd0oxVG1TTk5j?=
+ =?utf-8?B?L3MxejlDRkZLYTJpdXR6OHh3MTdrUExBREtxamJPU0VSZUt5YTQ2MVc4UWUx?=
+ =?utf-8?B?dGdWZmdsakhSQzE1VGo3MGg2Q3k3WVMxVXc4Mjh4NE1MQVdEYkEvMmtLRVEw?=
+ =?utf-8?B?dDk3Rm9VZ1U3K2d5WXVTMWxDeERmdlozVXU5U1R6L3JOazJCRzlBVDFYbWMr?=
+ =?utf-8?B?MFo1cytSWDlFcjdxV2ZEcHE1V3p4d0dGN1JpUWtkZDYvaWhuUFFqakVoWlUy?=
+ =?utf-8?B?RlUrYWNVZnBNYlBQT1pMMnNyUmlTSEYyTkRMNzlGdUdoMGk4NFExWFpxNnVu?=
+ =?utf-8?B?S1JUQmhSUllZeU5LNW1RSDQ4V1VVWUFYNTdaS1J1NTFuTWhxN1VyZmlydS9W?=
+ =?utf-8?B?SWVWbCtVOVVlOS9Gc3JDbFhSSmhTVkc3T3FmZGo4cy9IUFNyNGdkUGJOVTVP?=
+ =?utf-8?B?anlqQlZEKzY3NkdZbllQNnFMQ2V3dGx5NEZzVGZ3emNjWmdWbXA2YmtWV29a?=
+ =?utf-8?B?bVYvam5pZXIwN0NNTFJPakZ1Y2pTNnFoeXBwWGtOVHFhbTlrd3k3cE5KUUdV?=
+ =?utf-8?B?bGtQdlRWNWRvV2VmV1FQRmY0MHNYaEt4ZGZjb2ZpRzFNSmxGdHEvL05nUHVo?=
+ =?utf-8?B?MVhWQUhZb1lnVzJqMDg3aXpmRmp4ekRrTithcXcyOWFWUHpVUmVSNU9HT1o4?=
+ =?utf-8?B?czdKNGFIdEZvY1J5Y3AzMmlKOVdHR0Rxdng3UjZnZzhTN1FVMVdOOEQyendl?=
+ =?utf-8?B?R2I2N2dLL0VjbCttRkFXSEhxV3pHQ0pGL2hFQlpVSW14bmNWQS9ZSUhNYktB?=
+ =?utf-8?B?TlNkcFBKNDNpL21qRmViVFV4Z29hMlFVczkxaDlESVpZMmUxeDlsenRRc3FQ?=
+ =?utf-8?B?L0dSQ3BRcVlEZ0R5bHk5Yi9NSjZWeGtKTXI5RmdqdTdFNEV0OHhtT0puRHRt?=
+ =?utf-8?B?NFRHb1o5YTUya0lCSnNpR2xjNDdRU0JFcldRdFNUU0tLTzNETUp2cGlnY2lU?=
+ =?utf-8?B?MmNSSFgxY052RlJIcXQxMjVkOGJFRGpwNnY4czlxQUh2amR1Z0VBbzNMNUd0?=
+ =?utf-8?B?T2tJNitnY0VrUDBrSjh6TDZwWFIrSXRIOXlsMTJLSW9kSStHQ0FlR3crMFRH?=
+ =?utf-8?B?SWtBUW9JR1ZDZUxLVWFhS3YwR29GM1d2ZWhCeTdPWGVaWHVyRm42NS9rNlNy?=
+ =?utf-8?B?ZnR2TXZyclBxSitTSWRMN2FUbWtYSzJaeDhneWpzZzJWdmZtZEVuYjZONnVn?=
+ =?utf-8?B?d3ZVWUFtRW56U2RWemxpR3RyNDRVRzQvUnRhQWZTZ1BWUHllc2Z6RWRzVGpl?=
+ =?utf-8?B?dmVueTkvS01IN0pRNU9UOXFiaHNPckF1djhCbi9JeVRURjVrc0lOcWRGeHJQ?=
+ =?utf-8?B?NkNIcEZSb2FYWDZZbGpqUnZqbDFLNDRoMW92TFA5Z1hURVdzaVdpR3RNZ3JH?=
+ =?utf-8?B?ZGZYU1RVZTB0QXk5cFZQbkM0eEhRT0ZPazhYRDFZalVDdEZnN2E5Y2lyZG5h?=
+ =?utf-8?B?cVRFMElvdDRqVXE3WCtMcXMwTFlnY0NiVi8yN2VZWGtDejV2dnF0SS95VE5m?=
+ =?utf-8?B?TGNMZzJ6MUEyZFAyQldCdldCNDBGTkJoaTdTL3JmOUhKWVRBMHRNVmJYVzlB?=
+ =?utf-8?B?UWdaYjhyWE9zSE5GSUNERjR0Ym5XMVFiTVBieHdOc1dKYjF1NWcrd2NGUnBz?=
+ =?utf-8?B?b2ZiM1Z0aFZ4dmZoQ3pJSmJzTlJMRlArRVBhQnF3d3dRbFh6SDFvb3o1MkJP?=
+ =?utf-8?B?aEQ0Qnk0S1h0QXQ4cEtSQ04yMXhWR0txUXpJdklhOEZmaWdzUnUvZ2ZZZUdI?=
+ =?utf-8?B?Z0UvbEQ0d1Z1SU1LSDExWmVkQjZxRXRseGNzUk5mNFVJY0tDbjRQSVpoTWdE?=
+ =?utf-8?B?aVJhQjJFWjl3cnpjMXRzUFQ0c0VJYUg3eXBaZ2RXUTFablR0dEl5TjhubFpv?=
+ =?utf-8?B?a2NnU21hdm1YSkdDOVRrWTRmUXpZWU9JRlJVRTh6cjhjRFJiTHNZSWlYRk5Y?=
+ =?utf-8?B?WjVSNE9JRjAxUEd4b1dnYVpvakpkZlVHWWdjLy9GOE1KUUQxSElPWlpBMmVC?=
+ =?utf-8?B?Nk0wdnA0QXlnMHJDNmk5dmtVSlA5dGlwUWU5QUtFM0xiRmZnZkI0Zz09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 85b56901-562b-4276-7faf-08da31ae5749
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR12MB5445.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 May 2022 11:23:28.9209
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xcQuwflQlmVzNjjoD7c9PRVHVfwHNagEhmH6u5ApCGgXjYrhGZniwA9gTGHKaBrHdw0zm8sLBDaWTbtGeayrWg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB4629
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, May 08, 2022 at 10:00:39PM +1200, Kai Huang wrote:
-> On Fri, 2022-05-06 at 20:09 -0400, Mike Rapoport wrote:
-> > On Thu, May 05, 2022 at 06:51:20AM -0700, Dan Williams wrote:
-> > > [ add Mike ]
-> > > 
-> > > On Thu, May 5, 2022 at 2:54 AM Kai Huang <kai.huang@intel.com> wrote:
-> > > [..]
-> > > > 
-> > > > Hi Dave,
-> > > > 
-> > > > Sorry to ping (trying to close this).
-> > > > 
-> > > > Given we don't need to consider kmem-hot-add legacy PMEM after TDX module
-> > > > initialization, I think for now it's totally fine to exclude legacy PMEMs from
-> > > > TDMRs.  The worst case is when someone tries to use them as TD guest backend
-> > > > directly, the TD will fail to create.  IMO it's acceptable, as it is supposedly
-> > > > that no one should just use some random backend to run TD.
-> > > 
-> > > The platform will already do this, right? I don't understand why this
-> > > is trying to take proactive action versus documenting the error
-> > > conditions and steps someone needs to take to avoid unconvertible
-> > > memory. There is already the CONFIG_HMEM_REPORTING that describes
-> > > relative performance properties between initiators and targets, it
-> > > seems fitting to also add security properties between initiators and
-> > > targets so someone can enumerate the numa-mempolicy that avoids
-> > > unconvertible memory.
-> > > 
-> > > No, special casing in hotplug code paths needed.
-> > > 
-> > > > 
-> > > > I think w/o needing to include legacy PMEM, it's better to get all TDX memory
-> > > > blocks based on memblock, but not e820.  The pages managed by page allocator are
-> > > > from memblock anyway (w/o those from memory hotplug).
-> > > > 
-> > > > And I also think it makes more sense to introduce 'tdx_memblock' and
-> > > > 'tdx_memory' data structures to gather all TDX memory blocks during boot when
-> > > > memblock is still alive.  When TDX module is initialized during runtime, TDMRs
-> > > > can be created based on the 'struct tdx_memory' which contains all TDX memory
-> > > > blocks we gathered based on memblock during boot.  This is also more flexible to
-> > > > support other TDX memory from other sources such as CLX memory in the future.
-> > > > 
-> > > > Please let me know if you have any objection?  Thanks!
-> > > 
-> > > It's already the case that x86 maintains sideband structures to
-> > > preserve memory after exiting the early memblock code. Mike, correct
-> > > me if I am wrong, but adding more is less desirable than just keeping
-> > > the memblock around?
-> > 
-> > TBH, I didn't read the entire thread yet, but at the first glance, keeping
-> > memblock around is much more preferable that adding yet another { .start,
-> > .end, .flags } data structure. To keep memblock after boot all is needed is
-> > something like
-> > 
-> > 	select ARCH_KEEP_MEMBLOCK if INTEL_TDX_HOST
-> > 
-> > I'll take a closer look next week on the entire series, maybe I'm missing
-> > some details.
-> > 
-> 
-> Hi Mike,
-> 
-> Thanks for feedback.
-> 
-> Perhaps I haven't put a lot details of the new TDX data structures, so let me
-> point out that the new two data structures 'struct tdx_memblock' and 'struct
-> tdx_memory' that I am proposing are mostly supposed to be used by TDX code only,
-> which is pretty standalone.  They are not supposed to be some basic
-> infrastructure that can be widely used by other random kernel components. 
+Maxim / Paolo,
 
-We already have "pretty standalone" numa_meminfo that originally was used
-to setup NUMA memory topology, but now it's used by other code as well.
-And e820 tables also contain similar data and they are supposedly should be
-used only at boot time, but in reality there are too much callbacks into
-e820 way after the system is booted.
+On 5/8/2022 9:39 AM, Suravee Suthikulpanit wrote:
+> Currently, AVIC is inhibited when booting a VM w/ x2APIC support.
+> because AVIC cannot virtualize x2APIC MSR register accesses.
+> However, the AVIC doorbell can be used to accelerate interrupt
+> injection into a running vCPU, while all guest accesses to x2APIC MSRs
+> will be intercepted and emulated by KVM.
+> 
+> With hybrid-AVIC support, the APICV_INHIBIT_REASON_X2APIC is
+> no longer enforced.
+> 
+> Suggested-by: Maxim Levitsky<mlevitsk@redhat.com>
+> Reviewed-by: Maxim Levitsky<mlevisk@redhat.com>
 
-So any additional memory representation will only add to the overall
-complexity and well have even more "eventually consistent" collections of 
-{ .start, .end, .flags } structures.
- 
-> In fact, currently the only operation we need is to allow memblock to register
-> all memory regions as TDX memory blocks when the memblock is still alive. 
-> Therefore, in fact, the new data structures can even be completely invisible to
-> other kernel components.  For instance, TDX code can provide below API w/o
-> exposing any data structures to other kernel components:
-> 
-> int tdx_add_memory_block(phys_addr_t start, phys_addr_t end, int nid);
-> 
-> And we call above API for each memory region in memblock when it is alive.
-> 
-> TDX code internally manages those memory regions via the new data structures
-> that I mentioned above, so we don't need to keep memblock after boot.  The
-> advantage of this approach is it is more flexible to support other potential TDX
-> memory resources (such as CLX memory) in the future.
+Sorry for a typo here in the email of the "Reviewed-by" line.
 
-Please let keep things simple. If other TDX memory resources will need
-different handling it can be implemented then. For now, just enable
-ARCH_KEEP_MEMBLOCK and use memblock to track TDX memory.
- 
-> Otherwise, we can do as you suggested to select ARCH_KEEP_MEMBLOCK when
-> INTEL_TDX_HOST is on and TDX code internally uses memblock API directly.
-> 
-> -- 
-> Thanks,
-> -Kai
-> 
-> 
-
--- 
-Sincerely yours,
-Mike.
+Suravee
