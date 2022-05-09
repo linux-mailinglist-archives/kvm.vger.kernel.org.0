@@ -2,237 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C30F51FB4C
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 13:27:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C400651FB8A
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 13:44:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232785AbiEILbR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 07:31:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52482 "EHLO
+        id S232619AbiEILpb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 07:45:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232832AbiEILbH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 07:31:07 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02908DCF;
-        Mon,  9 May 2022 04:27:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652095633; x=1683631633;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Ya1pIm6vZbBNzSqJeY65qthxy/T3x9Rl6SrCFaTGnYo=;
-  b=KLzsPcKvLJumb91OkJg9jync2y2nIcLR20AGON05uMXeDGrkiz4nA7yo
-   SjXWDra0zZl50BmlZC2qk0zhC9shmG/JoeinDfuymQCgToZdqCNBAvArg
-   wKJgiDerKQwMbbiOqsxvRA96FKh9IhAlG2SRfLjNbhgRBzlc7207kpJEF
-   vkuzswAcZ2mFjDV+I66xPEiMjfqggLjdw1sC1YK0kc0bw9hAF59GGdnl4
-   hUPXmdbnT04r7D9hagxZ57btrp7qetbBBFVMJd1Q33+PhSM8v/toNWjis
-   YJs5wMlJVLNDd7OqZvQDpmnzbMzQXn6CKJW7uaRUe1u2W2IS45uextPmK
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10341"; a="268685193"
-X-IronPort-AV: E=Sophos;i="5.91,211,1647327600"; 
-   d="scan'208";a="268685193"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2022 04:27:11 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,211,1647327600"; 
-   d="scan'208";a="622923821"
-Received: from lkp-server01.sh.intel.com (HELO 5056e131ad90) ([10.239.97.150])
-  by fmsmga008.fm.intel.com with ESMTP; 09 May 2022 04:27:09 -0700
-Received: from kbuild by 5056e131ad90 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1no1Xg-000GTA-Fj;
-        Mon, 09 May 2022 11:27:08 +0000
-Date:   Mon, 9 May 2022 19:26:31 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Cindy Lu <lulu@redhat.com>, jasowang@redhat.com, mst@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Cc:     kbuild-all@lists.01.org
-Subject: Re: [PATCH v1] vdpa: Do not count the pages that were already pinned
- in the vhost-vDPA
-Message-ID: <202205091928.dheTGNAt-lkp@intel.com>
-References: <20220509071426.155941-1-lulu@redhat.com>
+        with ESMTP id S232575AbiEILpX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 07:45:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 097B91BE124
+        for <kvm@vger.kernel.org>; Mon,  9 May 2022 04:41:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652096487;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Bf0d4LwdBszW2HoKqW0Csu48jPbD9xTwfA3gn01IV/A=;
+        b=cT5rBgHmN3MsDyh6Ny5G7joFKZDdAtc1NaTHsrLymI6fJIFS2xCRY3gKKJ6sF733qljOjv
+        9ANBySR59edC5LgSPCMj1nFo0XvPfJcRCFa7ebVlGHlv78haXzfANmnkR2rwa395jE7I1y
+        SRXaXJzAPmoobIcC9sY/qGcschSyWmY=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-417-ZkXiBlnHNV-7m7P7DtZZgA-1; Mon, 09 May 2022 07:41:26 -0400
+X-MC-Unique: ZkXiBlnHNV-7m7P7DtZZgA-1
+Received: by mail-ed1-f71.google.com with SMTP id r26-20020a50aada000000b00425afa72622so8102139edc.19
+        for <kvm@vger.kernel.org>; Mon, 09 May 2022 04:41:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:subject:in-reply-to
+         :content-transfer-encoding;
+        bh=Bf0d4LwdBszW2HoKqW0Csu48jPbD9xTwfA3gn01IV/A=;
+        b=mHF8Bj5VpPvsrf3jeQrLl/jTu8PzcLSY9qncJJbLO7Dn5aZ4RDXzR+Nz9CMzTG7jgC
+         9w28+QmNcIba7Uag7+/QKy0P1lcEwyZzPV5rNOyBtmGmDEkTM3ckvL8vEF356v3p5DQK
+         wJecvTxwkth+iW3KI6spG+4L3sz1tTrmYraMhT2++5HDZCJascx+uAxdLsZdtNV3YUe0
+         SVkLV0v1eZycfQZT7wCwutRL27MTrtVbDj+Pxz4GNDUmJM+6AUYTzXimxSV7hrr235m7
+         Fe/x84frayTZVRuT0ScPkaYnyeFsS2UtN7fUF35FtpubVTCaF/5f+BcXzO3xS8TN65sY
+         grAQ==
+X-Gm-Message-State: AOAM532MPV7Bi+jDStTxejmyDpHzLQY+cwQkuB84Kw83QHODhy5IN2Ib
+        gocmUsjYutiLGvusqZNhtuqDjM/UKj3o6/Ubv3gupB3OCOb8nA69me2ZbEN2xgCx/mE2nbkhwuq
+        0MA2iFIxNly7L
+X-Received: by 2002:a17:907:3e90:b0:6f7:f63:78b6 with SMTP id hs16-20020a1709073e9000b006f70f6378b6mr11022285ejc.3.1652096484922;
+        Mon, 09 May 2022 04:41:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwCkzxuX0xT0C1Tww5G/TqDm4C9Sb5c9/QTjuSai4noiho34YDCJ1QDxMazyXPzv1WpsX7aqA==
+X-Received: by 2002:a17:907:3e90:b0:6f7:f63:78b6 with SMTP id hs16-20020a1709073e9000b006f70f6378b6mr11022254ejc.3.1652096484626;
+        Mon, 09 May 2022 04:41:24 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id w5-20020a056402268500b0042617ba6389sm6291740edd.19.2022.05.09.04.41.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 May 2022 04:41:23 -0700 (PDT)
+Message-ID: <29767a7d-d887-1a0c-296e-5bed220f1c9e@redhat.com>
+Date:   Mon, 9 May 2022 13:41:20 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220509071426.155941-1-lulu@redhat.com>
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Content-Language: en-US
+To:     Kyle Huey <me@kylehuey.com>, stable@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        Robert O'Callahan <robert@ocallahan.org>,
+        Keno Fischer <keno@juliacomputing.com>
+References: <20220508165434.119000-1-khuey@kylehuey.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 5.4] KVM: x86/svm: Account for family 17h event
+ renumberings in amd_pmc_perf_hw_id
+In-Reply-To: <20220508165434.119000-1-khuey@kylehuey.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Cindy,
+On 5/8/22 18:54, Kyle Huey wrote:
+> From: Kyle Huey <me@kylehuey.com>
+> 
+> commit 5eb849322d7f7ae9d5c587c7bc3b4f7c6872cd2f upstream
+> 
+> Zen renumbered some of the performance counters that correspond to the
+> well known events in perf_hw_id. This code in KVM was never updated for
+> that, so guest that attempt to use counters on Zen that correspond to the
+> pre-Zen perf_hw_id values will silently receive the wrong values.
+> 
+> This has been observed in the wild with rr[0] when running in Zen 3
+> guests. rr uses the retired conditional branch counter 00d1 which is
+> incorrectly recognized by KVM as PERF_COUNT_HW_STALLED_CYCLES_BACKEND.
+> 
+> [0] https://rr-project.org/
+> 
+> Signed-off-by: Kyle Huey <me@kylehuey.com>
+> Message-Id: <20220503050136.86298-1-khuey@kylehuey.com>
+> Cc: stable@vger.kernel.org
+> [Check guest family, not host. - Paolo]
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> [Backport to 5.4: adjusted context]
+> Signed-off-by: Kyle Huey <me@kylehuey.com>
+> ---
+>   arch/x86/kvm/pmu_amd.c | 28 +++++++++++++++++++++++++---
+>   1 file changed, 25 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/pmu_amd.c b/arch/x86/kvm/pmu_amd.c
+> index 6bc656abbe66..3ccfd1abcbad 100644
+> --- a/arch/x86/kvm/pmu_amd.c
+> +++ b/arch/x86/kvm/pmu_amd.c
+> @@ -44,6 +44,22 @@ static struct kvm_event_hw_type_mapping amd_event_mapping[] = {
+>   	[7] = { 0xd1, 0x00, PERF_COUNT_HW_STALLED_CYCLES_BACKEND },
+>   };
+>   
+> +/* duplicated from amd_f17h_perfmon_event_map. */
+> +static struct kvm_event_hw_type_mapping amd_f17h_event_mapping[] = {
+> +	[0] = { 0x76, 0x00, PERF_COUNT_HW_CPU_CYCLES },
+> +	[1] = { 0xc0, 0x00, PERF_COUNT_HW_INSTRUCTIONS },
+> +	[2] = { 0x60, 0xff, PERF_COUNT_HW_CACHE_REFERENCES },
+> +	[3] = { 0x64, 0x09, PERF_COUNT_HW_CACHE_MISSES },
+> +	[4] = { 0xc2, 0x00, PERF_COUNT_HW_BRANCH_INSTRUCTIONS },
+> +	[5] = { 0xc3, 0x00, PERF_COUNT_HW_BRANCH_MISSES },
+> +	[6] = { 0x87, 0x02, PERF_COUNT_HW_STALLED_CYCLES_FRONTEND },
+> +	[7] = { 0x87, 0x01, PERF_COUNT_HW_STALLED_CYCLES_BACKEND },
+> +};
+> +
+> +/* amd_pmc_perf_hw_id depends on these being the same size */
+> +static_assert(ARRAY_SIZE(amd_event_mapping) ==
+> +	     ARRAY_SIZE(amd_f17h_event_mapping));
+> +
+>   static unsigned int get_msr_base(struct kvm_pmu *pmu, enum pmu_type type)
+>   {
+>   	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
+> @@ -130,17 +146,23 @@ static unsigned amd_find_arch_event(struct kvm_pmu *pmu,
+>   				    u8 event_select,
+>   				    u8 unit_mask)
+>   {
+> +	struct kvm_event_hw_type_mapping *event_mapping;
+>   	int i;
+>   
+> +	if (guest_cpuid_family(pmc->vcpu) >= 0x17)
+> +		event_mapping = amd_f17h_event_mapping;
+> +	else
+> +		event_mapping = amd_event_mapping;
+> +
+>   	for (i = 0; i < ARRAY_SIZE(amd_event_mapping); i++)
+> -		if (amd_event_mapping[i].eventsel == event_select
+> -		    && amd_event_mapping[i].unit_mask == unit_mask)
+> +		if (event_mapping[i].eventsel == event_select
+> +		    && event_mapping[i].unit_mask == unit_mask)
+>   			break;
+>   
+>   	if (i == ARRAY_SIZE(amd_event_mapping))
+>   		return PERF_COUNT_HW_MAX;
+>   
+> -	return amd_event_mapping[i].event_type;
+> +	return event_mapping[i].event_type;
+>   }
+>   
+>   /* return PERF_COUNT_HW_MAX as AMD doesn't have fixed events */
 
-Thank you for the patch! Perhaps something to improve:
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-[auto build test WARNING on mst-vhost/linux-next]
-[also build test WARNING on linux/master linus/master v5.18-rc6]
-[cannot apply to next-20220506]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+Thanks,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Cindy-Lu/vdpa-Do-not-count-the-pages-that-were-already-pinned-in-the-vhost-vDPA/20220509-152644
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
-config: s390-randconfig-r044-20220509 (https://download.01.org/0day-ci/archive/20220509/202205091928.dheTGNAt-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 11.3.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/4225cc2a756b75d1e0ff7ca2a593bada42def380
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Cindy-Lu/vdpa-Do-not-count-the-pages-that-were-already-pinned-in-the-vhost-vDPA/20220509-152644
-        git checkout 4225cc2a756b75d1e0ff7ca2a593bada42def380
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=s390 SHELL=/bin/bash drivers/vhost/
+Paolo
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All warnings (new ones prefixed by >>):
-
->> drivers/vhost/vdpa.c:542:5: warning: no previous prototype for 'vhost_vdpa_add_range_ctx' [-Wmissing-prototypes]
-     542 | int vhost_vdpa_add_range_ctx(struct rb_root_cached *root, u64 start, u64 last)
-         |     ^~~~~~~~~~~~~~~~~~~~~~~~
->> drivers/vhost/vdpa.c:571:6: warning: no previous prototype for 'vhost_vdpa_del_range' [-Wmissing-prototypes]
-     571 | void vhost_vdpa_del_range(struct rb_root_cached *root, u64 start, u64 last)
-         |      ^~~~~~~~~~~~~~~~~~~~
->> drivers/vhost/vdpa.c:581:28: warning: no previous prototype for 'vhost_vdpa_search_range' [-Wmissing-prototypes]
-     581 | struct interval_tree_node *vhost_vdpa_search_range(struct rb_root_cached *root,
-         |                            ^~~~~~~~~~~~~~~~~~~~~~~
-
-
-vim +/vhost_vdpa_add_range_ctx +542 drivers/vhost/vdpa.c
-
-   464	
-   465	static long vhost_vdpa_unlocked_ioctl(struct file *filep,
-   466					      unsigned int cmd, unsigned long arg)
-   467	{
-   468		struct vhost_vdpa *v = filep->private_data;
-   469		struct vhost_dev *d = &v->vdev;
-   470		void __user *argp = (void __user *)arg;
-   471		u64 __user *featurep = argp;
-   472		u64 features;
-   473		long r = 0;
-   474	
-   475		if (cmd == VHOST_SET_BACKEND_FEATURES) {
-   476			if (copy_from_user(&features, featurep, sizeof(features)))
-   477				return -EFAULT;
-   478			if (features & ~VHOST_VDPA_BACKEND_FEATURES)
-   479				return -EOPNOTSUPP;
-   480			vhost_set_backend_features(&v->vdev, features);
-   481			return 0;
-   482		}
-   483	
-   484		mutex_lock(&d->mutex);
-   485	
-   486		switch (cmd) {
-   487		case VHOST_VDPA_GET_DEVICE_ID:
-   488			r = vhost_vdpa_get_device_id(v, argp);
-   489			break;
-   490		case VHOST_VDPA_GET_STATUS:
-   491			r = vhost_vdpa_get_status(v, argp);
-   492			break;
-   493		case VHOST_VDPA_SET_STATUS:
-   494			r = vhost_vdpa_set_status(v, argp);
-   495			break;
-   496		case VHOST_VDPA_GET_CONFIG:
-   497			r = vhost_vdpa_get_config(v, argp);
-   498			break;
-   499		case VHOST_VDPA_SET_CONFIG:
-   500			r = vhost_vdpa_set_config(v, argp);
-   501			break;
-   502		case VHOST_GET_FEATURES:
-   503			r = vhost_vdpa_get_features(v, argp);
-   504			break;
-   505		case VHOST_SET_FEATURES:
-   506			r = vhost_vdpa_set_features(v, argp);
-   507			break;
-   508		case VHOST_VDPA_GET_VRING_NUM:
-   509			r = vhost_vdpa_get_vring_num(v, argp);
-   510			break;
-   511		case VHOST_SET_LOG_BASE:
-   512		case VHOST_SET_LOG_FD:
-   513			r = -ENOIOCTLCMD;
-   514			break;
-   515		case VHOST_VDPA_SET_CONFIG_CALL:
-   516			r = vhost_vdpa_set_config_call(v, argp);
-   517			break;
-   518		case VHOST_GET_BACKEND_FEATURES:
-   519			features = VHOST_VDPA_BACKEND_FEATURES;
-   520			if (copy_to_user(featurep, &features, sizeof(features)))
-   521				r = -EFAULT;
-   522			break;
-   523		case VHOST_VDPA_GET_IOVA_RANGE:
-   524			r = vhost_vdpa_get_iova_range(v, argp);
-   525			break;
-   526		case VHOST_VDPA_GET_CONFIG_SIZE:
-   527			r = vhost_vdpa_get_config_size(v, argp);
-   528			break;
-   529		case VHOST_VDPA_GET_VQS_COUNT:
-   530			r = vhost_vdpa_get_vqs_count(v, argp);
-   531			break;
-   532		default:
-   533			r = vhost_dev_ioctl(&v->vdev, cmd, argp);
-   534			if (r == -ENOIOCTLCMD)
-   535				r = vhost_vdpa_vring_ioctl(v, cmd, argp);
-   536			break;
-   537		}
-   538	
-   539		mutex_unlock(&d->mutex);
-   540		return r;
-   541	}
- > 542	int vhost_vdpa_add_range_ctx(struct rb_root_cached *root, u64 start, u64 last)
-   543	{
-   544		struct interval_tree_node *new_node;
-   545	
-   546		if (last < start)
-   547			return -EFAULT;
-   548	
-   549		/* If the range being mapped is [0, ULONG_MAX], split it into two entries
-   550		 * otherwise its size would overflow u64.
-   551		 */
-   552		if (start == 0 && last == ULONG_MAX) {
-   553			u64 mid = last / 2;
-   554	
-   555			vhost_vdpa_add_range_ctx(root, start, mid);
-   556			start = mid + 1;
-   557		}
-   558	
-   559		new_node = kmalloc(sizeof(struct interval_tree_node), GFP_ATOMIC);
-   560		if (!new_node)
-   561			return -ENOMEM;
-   562	
-   563		new_node->start = start;
-   564		new_node->last = last;
-   565	
-   566		interval_tree_insert(new_node, root);
-   567	
-   568		return 0;
-   569	}
-   570	
- > 571	void vhost_vdpa_del_range(struct rb_root_cached *root, u64 start, u64 last)
-   572	{
-   573		struct interval_tree_node *new_node;
-   574	
-   575		while ((new_node = interval_tree_iter_first(root, start, last))) {
-   576			interval_tree_remove(new_node, root);
-   577			kfree(new_node);
-   578		}
-   579	}
-   580	
- > 581	struct interval_tree_node *vhost_vdpa_search_range(struct rb_root_cached *root,
-   582							   u64 start, u64 last)
-   583	{
-   584		return interval_tree_iter_first(root, start, last);
-   585	}
-   586	
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
