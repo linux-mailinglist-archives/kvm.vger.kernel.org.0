@@ -2,87 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 704A751F2B2
-	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 04:49:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F009951F30E
+	for <lists+kvm@lfdr.de>; Mon,  9 May 2022 05:53:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230356AbiEICwc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 May 2022 22:52:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47060 "EHLO
+        id S233098AbiEIDxq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 May 2022 23:53:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229585AbiEICwY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 May 2022 22:52:24 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB627E59C;
-        Sun,  8 May 2022 19:48:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652064511; x=1683600511;
-  h=message-id:subject:from:to:cc:in-reply-to:references:
-   mime-version:date:content-transfer-encoding;
-  bh=2qZxXZotiXnvoQkee/sQJJx5RfpT6gE7TIR1ogCag6g=;
-  b=Vo0NlHZOAXfox1eMfo4/2QBDHRZ/WCp2TYNQRxJgRUCwv+IXhJ4XJPPO
-   7firb35bOzC9iaCTOEthIbInwS8ds8fbAG8LaC/y2X7RZkqZKn1O9Ne6y
-   Io1WDZ1n61bMs7DfmR+rbqluq8ItfhyKKgkoDO4iJGgA3IsSVdz0eFFNF
-   yl9djRYxVqZ4rxGH53EAbfIY8IdOSuC9RIjVG9zfqnNpoIFYAu/59Mva2
-   f00ciDGGa6UL3q9X3DhSXD93sEa6SDtrExB7IvjJAhyQ6JC6yOXp7i2Ek
-   heDiczFfsKSvoLdKjFuiKTwvuX5SoAkjUQACKs1yPP66OHgG10k1jX4cG
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10341"; a="331947014"
-X-IronPort-AV: E=Sophos;i="5.91,210,1647327600"; 
-   d="scan'208";a="331947014"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2022 19:47:22 -0700
-X-IronPort-AV: E=Sophos;i="5.91,210,1647327600"; 
-   d="scan'208";a="569947052"
-Received: from cbfoste1-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.62.77])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2022 19:47:19 -0700
-Message-ID: <c1105c62bcf8c9b9d2313d53982d1ae5d9a1cae8.camel@intel.com>
-Subject: Re: [PATCH v3 00/21] TDX host kernel support
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dan Williams <dan.j.williams@intel.com>
-Cc:     Dave Hansen <dave.hansen@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Kuppuswamy Sathyanarayanan 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Mike Rapoport <rppt@kernel.org>
-In-Reply-To: <CAPcyv4gfRFUdeSqQE51BKdunJvNMP_DkvthDLvX9v7=kOrN8uA@mail.gmail.com>
-References: <cover.1649219184.git.kai.huang@intel.com>
-         <522e37eb-68fc-35db-44d5-479d0088e43f@intel.com>
-         <ecf718abf864bbb2366209f00d4315ada090aedc.camel@intel.com>
-         <de24ac7e-349c-e49a-70bb-31b9bc867b10@intel.com>
-         <9b388f54f13b34fe684ef77603fc878952e48f87.camel@intel.com>
-         <d98ca73b-2d2d-757d-e937-acc83cfedfb0@intel.com>
-         <c90a10763969077826f42be6f492e3a3e062326b.camel@intel.com>
-         <fc1ca04d94ad45e79c0297719d5ef50a7c33c352.camel@intel.com>
-         <664f8adeb56ba61774f3c845041f016c54e0f96e.camel@intel.com>
-         <1b681365-ef98-ec78-96dc-04e28316cf0e@intel.com>
-         <8bf596b45f68363134f431bcc550e16a9a231b80.camel@intel.com>
-         <6bb89ca6e7346f4334f06ea293f29fd12df70fe4.camel@intel.com>
-         <CAPcyv4iP3hcNNDxNdPT+iB0E4aUazfqFWwaa_dtHpVf+qKPNcQ@mail.gmail.com>
-         <cbb2ea1343079aee546fb44cd59c82f66c875d76.camel@intel.com>
-         <CAPcyv4jNYqPA2HBaO+9a+ije4jnb6a3Sx_1knrmRF9HCCXQuqg@mail.gmail.com>
-         <b40b3658e1fc7ec15d2adafe7f9562d42bc256f3.camel@intel.com>
-         <CAPcyv4hdM+0zntuTez9n1-dJ_ODsF_TxAct=VpTs-tWJzBPJqQ@mail.gmail.com>
-         <b0d1ed15d8bf99efe1c49182f4a98f4a23f61d0d.camel@intel.com>
-         <CAPcyv4gfRFUdeSqQE51BKdunJvNMP_DkvthDLvX9v7=kOrN8uA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S232192AbiEIDqS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 May 2022 23:46:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B41E23F33C
+        for <kvm@vger.kernel.org>; Sun,  8 May 2022 20:42:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652067744;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=G97dy4AVAE1GL5QBc/XNOK50cRVojaBVv4PlJyXXKIE=;
+        b=SXxlbCqZnXaxaCGwkd+Smz/boD28pwtP5dgiU7lHsoKWZJIt5IsIWzWtn8lInS3lT3gn+G
+        +JmQuNBg4bLvLFp370jEH35WutwAAJugqUULhPSOlvKSjgDfWMYs1wAPRSYcuctJ6lfSQV
+        g47CKWDNpKzcCGTkBM6Ypky8DEnx6GA=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-381-HZBbkFYRN9mIcaWvJJ_B4g-1; Sun, 08 May 2022 23:42:23 -0400
+X-MC-Unique: HZBbkFYRN9mIcaWvJJ_B4g-1
+Received: by mail-lf1-f72.google.com with SMTP id i8-20020a0565123e0800b004725f87c5f2so5246954lfv.1
+        for <kvm@vger.kernel.org>; Sun, 08 May 2022 20:42:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=G97dy4AVAE1GL5QBc/XNOK50cRVojaBVv4PlJyXXKIE=;
+        b=30IyWFCiybEsyshmFxK0Z3EQMfuy2zZQxNMOr6uvFtMLENVI9TCa/+h9G88xCznQXC
+         pGmIoAKF25MRo+iPQbqr6jKPNuOlPgn+UYBvGiE6QyXpI43vKCkre+n7WWOQF6L7ECO4
+         IlyFSwdkLDRh/8Ry1gxbMsZ8LmReeYon97ZyG1xy+R90pCsKetNM0viHzK1O+1LdqlVn
+         pqqxsUNsf/8Lz3RCsVGWARajIY3t1IDl1e+IAvSozP/XgrsL2tuIbM/3tb3c1iJ7CPye
+         0tJsacvwGvMJIOC/dj3SdmNUxoerP9hkjNhLyV6JTd6XUrAUY+8+qIRA4h8B2DfRafUT
+         nOCw==
+X-Gm-Message-State: AOAM531T74wgAwZZbsqILWv3cNF3GhoCxPF5ppEPRe7qSeZx+3b7iFUN
+        bfk3/k44d/0i+XhVnm9D0C/0o7nEsOlj/N+bgaxljwGeS7xuX6AOhSiKCtoh09Y0c9rRslRA4WV
+        gZk8+kr9KU0gXfL3xAkeXCIcpPdVp
+X-Received: by 2002:a05:651c:89:b0:250:87c9:d4e6 with SMTP id 9-20020a05651c008900b0025087c9d4e6mr9454700ljq.315.1652067741601;
+        Sun, 08 May 2022 20:42:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw7GEcbSzWYNIjk9OQXsjM2c6stURHMd0ugWDlSfjCzX8HLToBBvCauutlmv9zmgZvEr/HPg4d/o9AZUH75zT4=
+X-Received: by 2002:a05:651c:89:b0:250:87c9:d4e6 with SMTP id
+ 9-20020a05651c008900b0025087c9d4e6mr9454689ljq.315.1652067741377; Sun, 08 May
+ 2022 20:42:21 -0700 (PDT)
 MIME-Version: 1.0
-Date:   Mon, 09 May 2022 14:46:35 +1200
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+References: <20220330180436.24644-1-gdawar@xilinx.com>
+In-Reply-To: <20220330180436.24644-1-gdawar@xilinx.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Mon, 9 May 2022 11:42:10 +0800
+Message-ID: <CACGkMEsPTui8XDLvvLCq4myx1gWh=W1=W_9tXe+Lps5ExdE4+g@mail.gmail.com>
+Subject: Re: [PATCH v2 00/19] Control VQ support in vDPA
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kvm <kvm@vger.kernel.org>, Gautam Dawar <gautam.dawar@xilinx.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Martin Porter <martinpo@xilinx.com>,
+        Pablo Cascon Katchadourian <pabloc@xilinx.com>,
+        Dinan Gunawardena <dinang@xilinx.com>, tanuj.kamde@amd.com,
+        habetsm.xilinx@gmail.com, ecree.xilinx@gmail.com,
+        eperezma <eperezma@redhat.com>, Gautam Dawar <gdawar@xilinx.com>,
+        Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Eli Cohen <elic@nvidia.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Longpeng <longpeng2@huawei.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Zhang Min <zhang.min9@zte.com.cn>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -91,182 +91,170 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-05-06 at 08:57 -0700, Dan Williams wrote:
-> On Thu, May 5, 2022 at 6:47 PM Kai Huang <kai.huang@intel.com> wrote:
-> > 
-> > On Thu, 2022-05-05 at 18:15 -0700, Dan Williams wrote:
-> > > On Thu, May 5, 2022 at 5:46 PM Kai Huang <kai.huang@intel.com> wrote:
-> > > > 
-> > > > On Thu, 2022-05-05 at 17:22 -0700, Dan Williams wrote:
-> > > > > On Thu, May 5, 2022 at 3:14 PM Kai Huang <kai.huang@intel.com> wrote:
-> > > > > > 
-> > > > > > Thanks for feedback!
-> > > > > > 
-> > > > > > On Thu, 2022-05-05 at 06:51 -0700, Dan Williams wrote:
-> > > > > > > [ add Mike ]
-> > > > > > > 
-> > > > > > > 
-> > > > > > > On Thu, May 5, 2022 at 2:54 AM Kai Huang <kai.huang@intel.com> wrote:
-> > > > > > > [..]
-> > > > > > > > 
-> > > > > > > > Hi Dave,
-> > > > > > > > 
-> > > > > > > > Sorry to ping (trying to close this).
-> > > > > > > > 
-> > > > > > > > Given we don't need to consider kmem-hot-add legacy PMEM after TDX module
-> > > > > > > > initialization, I think for now it's totally fine to exclude legacy PMEMs from
-> > > > > > > > TDMRs.  The worst case is when someone tries to use them as TD guest backend
-> > > > > > > > directly, the TD will fail to create.  IMO it's acceptable, as it is supposedly
-> > > > > > > > that no one should just use some random backend to run TD.
-> > > > > > > 
-> > > > > > > The platform will already do this, right?
-> > > > > > > 
-> > > > > > 
-> > > > > > In the current v3 implementation, we don't have any code to handle memory
-> > > > > > hotplug, therefore nothing prevents people from adding legacy PMEMs as system
-> > > > > > RAM using kmem driver.  In order to guarantee all pages managed by page
-> > > > > 
-> > > > > That's the fundamental question I am asking why is "guarantee all
-> > > > > pages managed by page allocator are TDX memory". That seems overkill
-> > > > > compared to indicating the incompatibility after the fact.
-> > > > 
-> > > > As I explained, the reason is I don't want to modify page allocator to
-> > > > distinguish TDX and non-TDX allocation, for instance, having to have a ZONE_TDX
-> > > > and GFP_TDX.
-> > > 
-> > > Right, TDX details do not belong at that level, but it will work
-> > > almost all the time if you do nothing to "guarantee" all TDX capable
-> > > pages all the time.
-> > 
-> > "almost all the time" do you mean?
-> > 
-> > > 
-> > > > KVM depends on host's page fault handler to allocate the page.  In fact KVM only
-> > > > consumes PFN from host's page tables.  For now only RAM is TDX memory.  By
-> > > > guaranteeing all pages in page allocator is TDX memory, we can easily use
-> > > > anonymous pages as TD guest memory.
-> > > 
-> > > Again, TDX capable pages will be the overwhelming default, why are you
-> > > worried about cluttering the memory hotplug path for nice corner
-> > > cases.
-> > 
-> > Firstly perhaps I forgot to mention there are two concepts about TDX memory, so
-> > let me clarify first:
-> > 
-> > 1) Convertible Memory Regions (CMRs).  This is reported by BIOS (thus static) to
-> > indicate which memory regions *can* be used as TDX memory.  This basically means
-> > all RAM during boot for now.
-> > 
-> > 2) TD Memory Regions (TDMRs).  Memory pages in CMRs are not automatically TDX
-> > usable memory.  The TDX module needs to be configured which (convertible) memory
-> > regions can be used as TDX memory.  Kernel is responsible for choosing the
-> > ranges, and configure to the TDX module.  If a convertible memory page is not
-> > included into TDMRs, the TDX module will report error when it is assigned to  a
-> > TD.
-> > 
-> > > 
-> > > Consider the fact that end users can break the kernel by specifying
-> > > invalid memmap= command line options. The memory hotplug code does not
-> > > take any steps to add safety in those cases because there are already
-> > > too many ways it can go wrong. TDX is just one more corner case where
-> > > the memmap= user needs to be careful. Otherwise, it is up to the
-> > > platform firmware to make sure everything in the base memory map is
-> > > TDX capable, and then all you need is documentation about the failure
-> > > mode when extending "System RAM" beyond that baseline.
-> > 
-> > So the fact is, if we don't include legacy PMEMs into TDMRs, and don't do
-> > anything in memory hotplug, then if user does kmem-hot-add legacy PMEMs as
-> > system RAM, a live TD may eventually be killed.
-> > 
-> > If such case is a corner case that we don't need to guarantee, then even better.
-> > And we have an additional reason that those legacy PMEMs don't need to be in
-> > TDMRs.  As you suggested,  we can add some documentation to point out.
-> > 
-> > But the point we want to do some code check and prevent memory hotplug is, as
-> > Dave said, we want this piece of code to work on *ANY* TDX capable machines,
-> > including future machines which may, i.e. supports NVDIMM/CLX memory as TDX
-> > memory.  If we don't do any code check in  memory hotplug in this series, then
-> > when this code runs in future platforms, user can plug NVDIMM or CLX memory as
-> > system RAM thus break the assumption "all pages in page allocator are TDX
-> > memory", which eventually leads to live TDs being killed potentially.
-> > 
-> > Dave said we need to guarantee this code can work on *ANY* TDX machines.  Some
-> > documentation saying it only works one some platforms and you shouldn't do
-> > things on other platforms are not good enough:
-> > 
-> > https://lore.kernel.org/lkml/cover.1649219184.git.kai.huang@intel.com/T/#m6df45b6e1702bb03dcb027044a0dabf30a86e471
-> 
-> Yes, the incompatible cases cannot be ignored, but I disagree that
-> they actively need to be prevented. One way to achieve that is to
-> explicitly enumerate TDX capable memory and document how mempolicy can
-> be used to avoid killing TDs.
+On Thu, Mar 31, 2022 at 2:05 AM Gautam Dawar <gautam.dawar@xilinx.com> wrote:
+>
+> Hi All:
+>
+> This series tries to add the support for control virtqueue in vDPA.
+>
+> Control virtqueue is used by networking device for accepting various
+> commands from the driver. It's a must to support multiqueue and other
+> configurations.
+>
+> When used by vhost-vDPA bus driver for VM, the control virtqueue
+> should be shadowed via userspace VMM (Qemu) instead of being assigned
+> directly to Guest. This is because Qemu needs to know the device state
+> in order to start and stop device correctly (e.g for Live Migration).
+>
+> This requies to isolate the memory mapping for control virtqueue
+> presented by vhost-vDPA to prevent guest from accessing it directly.
+>
+> To achieve this, vDPA introduce two new abstractions:
+>
+> - address space: identified through address space id (ASID) and a set
+>                  of memory mapping in maintained
+> - virtqueue group: the minimal set of virtqueues that must share an
+>                  address space
+>
+> Device needs to advertise the following attributes to vDPA:
+>
+> - the number of address spaces supported in the device
+> - the number of virtqueue groups supported in the device
+> - the mappings from a specific virtqueue to its virtqueue groups
+>
+> The mappings from virtqueue to virtqueue groups is fixed and defined
+> by vDPA device driver. E.g:
+>
+> - For the device that has hardware ASID support, it can simply
+>   advertise a per virtqueue group.
+> - For the device that does not have hardware ASID support, it can
+>   simply advertise a single virtqueue group that contains all
+>   virtqueues. Or if it wants a software emulated control virtqueue, it
+>   can advertise two virtqueue groups, one is for cvq, another is for
+>   the rest virtqueues.
+>
+> vDPA also allow to change the association between virtqueue group and
+> address space. So in the case of control virtqueue, userspace
+> VMM(Qemu) may use a dedicated address space for the control virtqueue
+> group to isolate the memory mapping.
+>
+> The vhost/vhost-vDPA is also extend for the userspace to:
+>
+> - query the number of virtqueue groups and address spaces supported by
+>   the device
+> - query the virtqueue group for a specific virtqueue
+> - assocaite a virtqueue group with an address space
+> - send ASID based IOTLB commands
+>
+> This will help userspace VMM(Qemu) to detect whether the control vq
+> could be supported and isolate memory mappings of control virtqueue
+> from the others.
+>
+> To demonstrate the usage, vDPA simulator is extended to support
+> setting MAC address via a emulated control virtqueue.
+>
+> Please review.
 
-Hi Dan,
+Michael, this looks good to me, do you have comments on this?
 
-Thanks for feedback.
+Thanks
 
-Could you elaborate what does "explicitly enumerate TDX capable memory" mean? 
-How to enumerate exactly?
-
-And for "document how mempolicy can be used to avoid killing TDs", what
-mempolicy (and error reporting you mentioned below) are you referring to?
-
-I skipped to reply your below your two replies as I think they are referring to
-the same "enumerate" and "mempolicy" that I am asking above.
-
-> 
-> > > > shmem to support a new fd-based backend which doesn't require having to mmap()
-> > > > TD guest memory to host userspace:
-> > > > 
-> > > > https://lore.kernel.org/kvm/20220310140911.50924-1-chao.p.peng@linux.intel.com/
-> > > > 
-> > > > Also, besides TD guest memory, there are some per-TD control data structures
-> > > > (which must be TDX memory too) need to be allocated for each TD.  Normal memory
-> > > > allocation APIs can be used for such allocation if we guarantee all pages in
-> > > > page allocator is TDX memory.
-> > > 
-> > > You don't need that guarantee, just check it after the fact and fail
-> > > if that assertion fails. It should almost always be the case that it
-> > > succeeds and if it doesn't then something special is happening with
-> > > that system and the end user has effectively opt-ed out of TDX
-> > > operation.
-> > 
-> > This doesn't guarantee consistent behaviour.  For instance, for one TD it can be
-> > created, while the second may fail.  We should provide a consistent service.
-> 
-> Yes, there needs to be enumeration and policy knobs to avoid failures,
-> hard coded "no memory hotplug" hacks do not seem the right enumeration
-> and policy knobs to me.
-> 
-> > The thing is anyway we need to configure some memory regions to the TDX module.
-> > To me there's no reason we don't want to guarantee all pages in page allocator
-> > are TDX memory.
-> > 
-> > > 
-> > > > > > allocator are all TDX memory, the v3 implementation needs to always include
-> > > > > > legacy PMEMs as TDX memory so that even people truly add  legacy PMEMs as system
-> > > > > > RAM, we can still guarantee all pages in page allocator are TDX memory.
-> > > > > 
-> > > > > Why?
-> > > > 
-> > > > If we don't include legacy PMEMs as TDX memory, then after they are hot-added as
-> > > > system RAM using kmem driver, the assumption of "all pages in page allocator are
-> > > > TDX memory" is broken.  A TD can be killed during runtime.
-> > > 
-> > > Yes, that is what the end user asked for. If they don't want that to
-> > > happen then the policy decision about using kmem needs to be updated
-> > > in userspace, not hard code that policy decision towards TDX inside
-> > > the kernel.
-> > 
-> > This is also fine to me.  But please also see above Dave's comment.
-> 
-> Dave is right, the implementation can not just ignore the conflict. To
-> me, enumeration plus error reporting allows for flexibility without
-> hard coding policy in the kernel.
-
-
--- 
-Thanks,
--Kai
-
+>
+> Changes since RFC v2:
+>
+> - Fixed memory leak for asid 0 in vhost_vdpa_remove_as()
+> - Removed unnecessary NULL check for iotlb in vhost_vdpa_unmap() and
+>   changed its return type to void.
+> - Removed insignificant used_as member field from struct vhost_vdpa.
+> - Corrected the iommu parameter in call to vringh_set_iotlb() from
+>   vdpasim_set_group_asid()
+> - Fixed build errors with vdpa_sim_net
+> - Updated alibaba, vdpa_user and virtio_pci vdpa parent drivers to
+>   call updated vDPA APIs and ensured successful build
+> - Tested control (MAC address configuration) and data-path using
+>   single virtqueue pair on Xilinx (now AMD) SN1022 SmartNIC device
+>   and vdpa_sim_net software device using QEMU release at [1]
+> - Removed two extra blank lines after set_group_asid() in
+>   include/linux/vdpa.h
+>
+> Changes since v1:
+>
+> - Rebased the v1 patch series on vhost branch of MST vhost git repo
+>   git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/log/?h=vhost
+> - Updates to accommodate vdpa_sim changes from monolithic module in
+>   kernel used v1 patch series to current modularized class (net, block)
+>   based approach.
+> - Added new attributes (ngroups and nas) to "vdpasim_dev_attr" and
+>   propagated them from vdpa_sim_net to vdpa_sim
+> - Widened the data-type for "asid" member of vhost_msg_v2 to __u32
+>   to accommodate PASID
+> - Fixed the buildbot warnings
+> - Resolved all checkpatch.pl errors and warnings
+> - Tested both control and datapath with Xilinx Smartnic SN1000 series
+>   device using QEMU implementing the Shadow virtqueue and support for
+>   VQ groups and ASID available at [1]
+>
+> Changes since RFC:
+>
+> - tweak vhost uAPI documentation
+> - switch to use device specific IOTLB really in patch 4
+> - tweak the commit log
+> - fix that ASID in vhost is claimed to be 32 actually but 16bit
+>   actually
+> - fix use after free when using ASID with IOTLB batching requests
+> - switch to use Stefano's patch for having separated iov
+> - remove unused "used_as" variable
+> - fix the iotlb/asid checking in vhost_vdpa_unmap()
+>
+> [1] Development QEMU release with support for SVQ, VQ groups and ASID:
+>   github.com/eugpermar/qemu/releases/tag/vdpa_sw_live_migration.d%2F
+>   asid_groups-v1.d%2F00
+>
+> Thanks
+>
+> Gautam Dawar (19):
+>   vhost: move the backend feature bits to vhost_types.h
+>   virtio-vdpa: don't set callback if virtio doesn't need it
+>   vhost-vdpa: passing iotlb to IOMMU mapping helpers
+>   vhost-vdpa: switch to use vhost-vdpa specific IOTLB
+>   vdpa: introduce virtqueue groups
+>   vdpa: multiple address spaces support
+>   vdpa: introduce config operations for associating ASID to a virtqueue
+>     group
+>   vhost_iotlb: split out IOTLB initialization
+>   vhost: support ASID in IOTLB API
+>   vhost-vdpa: introduce asid based IOTLB
+>   vhost-vdpa: introduce uAPI to get the number of virtqueue groups
+>   vhost-vdpa: introduce uAPI to get the number of address spaces
+>   vhost-vdpa: uAPI to get virtqueue group id
+>   vhost-vdpa: introduce uAPI to set group ASID
+>   vhost-vdpa: support ASID based IOTLB API
+>   vdpa_sim: advertise VIRTIO_NET_F_MTU
+>   vdpa_sim: factor out buffer completion logic
+>   vdpa_sim: filter destination mac address
+>   vdpasim: control virtqueue support
+>
+>  drivers/vdpa/alibaba/eni_vdpa.c      |   2 +-
+>  drivers/vdpa/ifcvf/ifcvf_main.c      |   8 +-
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c    |  11 +-
+>  drivers/vdpa/vdpa.c                  |   5 +
+>  drivers/vdpa/vdpa_sim/vdpa_sim.c     | 100 ++++++++--
+>  drivers/vdpa/vdpa_sim/vdpa_sim.h     |   3 +
+>  drivers/vdpa/vdpa_sim/vdpa_sim_net.c | 169 +++++++++++++----
+>  drivers/vdpa/vdpa_user/vduse_dev.c   |   3 +-
+>  drivers/vdpa/virtio_pci/vp_vdpa.c    |   2 +-
+>  drivers/vhost/iotlb.c                |  23 ++-
+>  drivers/vhost/vdpa.c                 | 267 +++++++++++++++++++++------
+>  drivers/vhost/vhost.c                |  23 ++-
+>  drivers/vhost/vhost.h                |   4 +-
+>  drivers/virtio/virtio_vdpa.c         |   2 +-
+>  include/linux/vdpa.h                 |  44 ++++-
+>  include/linux/vhost_iotlb.h          |   2 +
+>  include/uapi/linux/vhost.h           |  26 ++-
+>  include/uapi/linux/vhost_types.h     |  11 +-
+>  18 files changed, 563 insertions(+), 142 deletions(-)
+>
+> --
+> 2.30.1
+>
 
