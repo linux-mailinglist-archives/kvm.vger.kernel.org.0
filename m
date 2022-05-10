@@ -2,55 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 223295221D1
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 18:55:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 146055221DD
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 18:56:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346891AbiEJQ7X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 12:59:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37414 "EHLO
+        id S1347758AbiEJRAr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 13:00:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237624AbiEJQ7V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 12:59:21 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CABE27E3E6;
-        Tue, 10 May 2022 09:55:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=qChzNactocCEZRqMf2gnDNoVYP3f9TniXLt5wRF3A5Q=; b=JpKf5kA1OrSjASCjykVhJhnoup
-        z6QHOCgOPKn+Lk/lN0dJXLk0sGxFb9ItCORf0OnLglLfM9RNFrQqBSW+FQfgvC1p43UXmJsrQBmjD
-        ejXsiV47eCVyVERVxDgjni0lLqNZInRD+G9QYVsDq9KjTpU2Uq2/Wi3IkjHVMQykmevYzML6Ty3Ij
-        Enrsv1XwKy+tXEK8KkJ46v8vsOeeUNWPuIxbMP6uAb1ISV9pqCQnpK5amiDJJClzPG2pikHVzfEim
-        exb9hkcc5KOqT1M8koF9e4Fn7ZUWkMSaD4MKQt2k4XbYfEathUSewU3ZaKvkBeRQzz9DI/RaYqfPd
-        Gj72tyQw==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=worktop.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1noT8e-004dtT-Bl; Tue, 10 May 2022 16:55:08 +0000
-Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 46A7598100A; Tue, 10 May 2022 18:55:06 +0200 (CEST)
-Date:   Tue, 10 May 2022 18:55:06 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Uros Bizjak <ubizjak@gmail.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Will Deacon <will@kernel.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Marco Elver <elver@google.com>
-Subject: Re: [PATCH] locking/atomic/x86: Introduce try_cmpxchg64
-Message-ID: <20220510165506.GP76023@worktop.programming.kicks-ass.net>
-References: <20220510154217.5216-1-ubizjak@gmail.com>
+        with ESMTP id S1346572AbiEJRAl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 13:00:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DE03C28492A
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 09:56:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652201803;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9kg5B6ZyXTHSbDVCByrs97zs5DDN5Y0oVpgwrU2sIps=;
+        b=YIrX/SdvakKl5s4tJ1tZeB3f9VNPPuOOEvDTuesDetsfy+a/LBmawEdtAjdF61xBiPTZeb
+        dX4sIbFMlVn7DDHbkfphGgTPOXeuJ3JWCirz1tRcARWyUXlhen5KIiXSLv6PHndzXdDIIR
+        IP7Qpwa0Jer1Dm+U2CZhPF7He9slIWE=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-550-37XaK59MPAaFxVdMWMuHaQ-1; Tue, 10 May 2022 12:56:38 -0400
+X-MC-Unique: 37XaK59MPAaFxVdMWMuHaQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 572C31C06EDE;
+        Tue, 10 May 2022 16:56:37 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B34029D7E;
+        Tue, 10 May 2022 16:56:36 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH RESEND v12 00/17] KVM: x86/pmu: Add basic support to enable guest PEBS via DS
+Date:   Tue, 10 May 2022 12:55:06 -0400
+Message-Id: <20220510165505.217414-1-pbonzini@redhat.com>
+In-Reply-To: <20220411101946.20262-1-likexu@tencent.com>
+References: 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220510154217.5216-1-ubizjak@gmail.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -58,10 +64,11 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 10, 2022 at 05:42:17PM +0200, Uros Bizjak wrote:
-> This patch adds try_cmpxchg64 to improve code around cmpxchg8b.  While
-> the resulting code improvements on x86_64 are minor (a compare and a move saved),
-> the improvements on x86_32 are quite noticeable. The code improves from:
+Queued, thanks, but only because I have not done my job very well
+in handling this patch series (and LBR too) and I feel bad about
+it.  Sending such a large patch series with no kvm-unit-tests should
+not happen, and I'd be grateful if you wrote testcases after the fact.
 
-What user of cmpxchg64 is this?
+Paolo
+
 
