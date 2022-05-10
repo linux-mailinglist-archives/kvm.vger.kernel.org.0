@@ -2,107 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75832521CF9
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 16:50:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6F9F521D02
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 16:51:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241530AbiEJOxz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 10:53:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47806 "EHLO
+        id S1344961AbiEJOzP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 10:55:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345091AbiEJOwU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 10:52:20 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7831426CC6B;
-        Tue, 10 May 2022 07:13:26 -0700 (PDT)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24ADisAS018218;
-        Tue, 10 May 2022 14:13:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=Oor8ogHjkZpTqwQbjcKLw8UYnComIosQwnmrrso0yrQ=;
- b=MNupBJt8TPDODGMeh5oQef4oI2j4hZm9uJ7mNEaIZzCpzKc0721cviJm6eo6RUXJ7d3W
- cU5SN0e1nH98GK957oi2GZIOTBsKd+Gd4ctrc8ZSb1oXXTwnoGY1ZQlfx2Ije+dzvpsq
- 4NnzNluJfa7AnORxVxy/CLFHkSa9THS9xYuOwvQnGTRffbUyL462rvYSy8Al2kYWlU1S
- tVPN+exz50Ks/7V3I6N2dzNdggEZYAPGNeVaXHXtfCQOnx1dB+M5w9KAG6graurRJtjV
- R/V1LvneZuhKc4l+DeqPmtdz6mObtgYrinGTrTO9hbYXoMH78Zkyd1GowJpzxVm08spo 3Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fymyq6kpr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 May 2022 14:13:23 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24ADkkst026579;
-        Tue, 10 May 2022 14:13:22 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fymyq6kny-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 May 2022 14:13:22 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24AE9E3R019387;
-        Tue, 10 May 2022 14:13:21 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma01fra.de.ibm.com with ESMTP id 3fwgd8k84x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 May 2022 14:13:20 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24AEDHpm52429178
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 May 2022 14:13:17 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A724B11C04C;
-        Tue, 10 May 2022 14:13:17 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 59B1311C050;
-        Tue, 10 May 2022 14:13:17 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.29.124])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 10 May 2022 14:13:17 +0000 (GMT)
-Message-ID: <3c9561c190a61869ae55b7d762407379faed968c.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v1 2/2] s390x: add cmm migration test
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, thuth@redhat.com
-Date:   Tue, 10 May 2022 16:13:17 +0200
-In-Reply-To: <20220510154520.52274a76@p-imbrenda>
-References: <20220509120805.437660-1-nrb@linux.ibm.com>
-         <20220509120805.437660-3-nrb@linux.ibm.com>
-         <20220509155821.07279b39@p-imbrenda>
-         <d87472c1556d8503bdda9e1cec26b5d910468cbc.camel@linux.ibm.com>
-         <20220510154520.52274a76@p-imbrenda>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        with ESMTP id S1344835AbiEJOy7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 10:54:59 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F0B331665E
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 07:15:27 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id q18so3923923pln.12
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 07:15:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Gbt0dQE6hjicFcO+8NOWUYbo4+AYvhvISpo6fy0h7us=;
+        b=LXNxKGJlahyUgiXOfqkryAQyceDMXZBUHOBIu3YBuV3QCd4OuWyiEq2pUymYaclMxZ
+         zfRXd6qGjRH9H4o2hTAgj25+jyxhMOBGzgVi+kiCNRxq/cPNL4xoQ3bfipbbREYxBOBM
+         inOJ6pNhEtQ+BuBTbPMlMnttIbWOpFyyCWQRFoqBmgdp01P7eAqM9I2ORT9JLkXpc/Hl
+         piMgho7G226vixsWegnvNyvyEjrA5lCvdUJ3dut0LlMNS4ADHEgDzckpV8i8kobSje/1
+         2h4H7F5LIjWchywYmwhd/6UDUAUo/Qnw3GvKLe24L+yXrqy8Jxp4qf2Cjgk/953Mb7PM
+         6I+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Gbt0dQE6hjicFcO+8NOWUYbo4+AYvhvISpo6fy0h7us=;
+        b=J4eVSJrKYbNppICxGbB4SGYfXj9LZNWjRZKDTBIgF9K2KdsdoxaIuXJk4o6p1jhmnq
+         JP1ebIuD5QQPpLTpIxCpMRwDa0BAi/GXqJOfIWtU0LqzHc7eKvwYGwNgj/hBhcJ0g4Db
+         AssfAeaAEBuk3KVeWGg3li6zmUvVtt2P8w5jc921En2mucyqY4cUBSVV6XfcE+VaTukr
+         EZaj+exCpde/kuHQ311A7o5aHH/s5q2qXtuwoDWuNpHL7aLxa1nfKAS0AnmHRw0hFCFt
+         VNjmNbMtYmcesvaEUbE8M4lnBNmi0XqeJnfPTiOYOw5W20FeQVs1nPnGxczsCmkOyLla
+         Yvow==
+X-Gm-Message-State: AOAM5322DfWSmnHBs8Zt0y5CRUvqoPzApMrqeFd5aupELZE1fCgNLBks
+        7zF9i2a03yDqYguYwXVXqLxF9w==
+X-Google-Smtp-Source: ABdhPJwTCodcB53/XV23AXgSa9OttM/zTr3s+gLPrisR9kO/A3m/E1DWsrUQBNzepFatX0+LwZssAw==
+X-Received: by 2002:a17:90b:1b44:b0:1dc:315f:4510 with SMTP id nv4-20020a17090b1b4400b001dc315f4510mr250908pjb.28.1652192126871;
+        Tue, 10 May 2022 07:15:26 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id i6-20020a17090332c600b0015e8d4eb261sm2173135plr.171.2022.05.10.07.15.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 May 2022 07:15:25 -0700 (PDT)
+Date:   Tue, 10 May 2022 14:15:22 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH] KVM: LAPIC: Narrow down the timer fastpath to
+ tscdeadline timer
+Message-ID: <YnpzetR/B3nXVJxu@google.com>
+References: <1651830457-11284-1-git-send-email-wanpengli@tencent.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: dqCWNAzEHktYP53qebKoVZvfalOlnGc_
-X-Proofpoint-GUID: vcG4CgyDvtiU8kcHdm8YA8Fo8naGJft7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-10_03,2022-05-10_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- mlxlogscore=819 clxscore=1015 mlxscore=0 lowpriorityscore=0 spamscore=0
- malwarescore=0 adultscore=0 suspectscore=0 impostorscore=0 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205100065
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1651830457-11284-1-git-send-email-wanpengli@tencent.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-05-10 at 15:45 +0200, Claudio Imbrenda wrote:
-> ok, next less ugly thing: unroll the loop
+On Fri, May 06, 2022, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
 > 
-> for (i = 0; i < NUM_PAGES; i += 4) {
->         essa(ESSA_SET_STABLE, (unsigned long)pagebuf[i]);
->         essa(ESSA_SET_UNUSED, (unsigned long)pagebuf[i + 1]);
->         ... etc
-> }
-> 
-> maybe assert(NUM_PAGES % 4 == 0) before that, just for good measure
+> The original timer fastpath is developed for tscdeadline timer, however,
+> the apic timer periodic/oneshot mode which is emulated by vmx preemption
+> timer goes to preemption timer vmexit fastpath quietly, let's leave the 
+> complex recompute periodic timer's target expiration and restart apic 
+> timer to the slowpath vm-exit. Narrow down the timer fastpath to tscdeadline
+> timer mode.
 
-That's nicer, thanks, fixed.
+Why?  I get that the original intention was only to handle deadline mode, but
+that doesn't mean using it for other modes is inherently flawed/problematic.  KVM
+also uses a fastpath for starting the deadline timer on MSR write, i.e. KVM eats
+the cost of starting the timer in the fastpath no matter what, and
+advance_periodic_target_expiration() isn't _that_ complex.
+
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  arch/x86/kvm/lapic.c   |  6 ++++++
+>  arch/x86/kvm/lapic.h   |  1 +
+>  arch/x86/kvm/vmx/vmx.c | 14 +++++++++++---
+>  3 files changed, 18 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 137c3a2f5180..3e6cb2bf56dc 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2459,6 +2459,12 @@ static bool lapic_is_periodic(struct kvm_lapic *apic)
+>  	return apic_lvtt_period(apic);
+>  }
+>  
+> +bool lapic_is_tscdeadline(struct kvm_lapic *apic)
+> +{
+> +	return apic_lvtt_tscdeadline(apic);
+> +}
+> +EXPORT_SYMBOL_GPL(lapic_is_tscdeadline);
+> +
+>  int apic_has_pending_timer(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_lapic *apic = vcpu->arch.apic;
+> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+> index 4e4f8a22754f..6e1b2f349237 100644
+> --- a/arch/x86/kvm/lapic.h
+> +++ b/arch/x86/kvm/lapic.h
+> @@ -241,6 +241,7 @@ void kvm_lapic_expired_hv_timer(struct kvm_vcpu *vcpu);
+>  bool kvm_lapic_hv_timer_in_use(struct kvm_vcpu *vcpu);
+>  void kvm_lapic_restart_hv_timer(struct kvm_vcpu *vcpu);
+>  bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu);
+> +bool lapic_is_tscdeadline(struct kvm_lapic *apic);
+>  
+>  static inline enum lapic_mode kvm_apic_mode(u64 apic_base)
+>  {
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index bb09fc9a7e55..2a8f4253df35 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5713,22 +5713,30 @@ static int handle_pml_full(struct kvm_vcpu *vcpu)
+>  	return 1;
+>  }
+>  
+> -static fastpath_t handle_fastpath_preemption_timer(struct kvm_vcpu *vcpu)
+> +static bool __handle_preemption_timer(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>  
+>  	if (!vmx->req_immediate_exit &&
+>  	    !unlikely(vmx->loaded_vmcs->hv_timer_soft_disabled)) {
+>  		kvm_lapic_expired_hv_timer(vcpu);
+> -		return EXIT_FASTPATH_REENTER_GUEST;
+> +		return true;
+>  	}
+>  
+> +	return false;
+
+It's a bit odd for the non-fastpath case, but I'd prefer to return fastpath_t
+instead of a bool from the inner helper, e.g.
+
+static fastpath_t __handle_preemption_timer(struct kvm_vcpu *vcpu)
+{
+	struct vcpu_vmx *vmx = to_vmx(vcpu);
+
+	if (!vmx->req_immediate_exit &&
+	    !unlikely(vmx->loaded_vmcs->hv_timer_soft_disabled)) {
+		kvm_lapic_expired_hv_timer(vcpu);
+		return EXIT_FASTPATH_REENTER_GUEST;
+	}
+
+	return EXIT_FASTPATH_NONE;
+}
+
+static fastpath_t handle_fastpath_preemption_timer(struct kvm_vcpu *vcpu)
+{
+	if (lapic_is_tscdeadline(vcpu->arch.apic)
+		return __handle_preemption_timer(vcpu))
+
+	return EXIT_FASTPATH_NONE;
+}
