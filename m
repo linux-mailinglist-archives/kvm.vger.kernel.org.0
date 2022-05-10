@@ -2,163 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 42BE1521593
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 14:36:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 534C7521598
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 14:37:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241838AbiEJMkU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 08:40:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43486 "EHLO
+        id S241753AbiEJMlv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 08:41:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241563AbiEJMkR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 08:40:17 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E44031D7375;
-        Tue, 10 May 2022 05:36:20 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24AC6BY0033111;
-        Tue, 10 May 2022 12:36:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=T5Z22MTCRiUPWcFJJ/2U8ekxLY6TkTtRANd6EsIWawU=;
- b=lCLdNG9pSfRhsdiiM0ucvwzSG/EGkvmV3tnQN+kTSbmTJY72WQMnxn04bFKh1y3yvShr
- +7eQbAxi74R0GmaZeBBUivxHX3+Ip9/rfX46Favfa/VHz08lkXWN6mGC0wiwTm9K3c+M
- 1IKl5ED446sgDRQQF+X2vXBwu8asSZL6kasyLINgsUkXyQMxucB/9GdhWT7g8bWHTdis
- 6VXcSxkDX9uWXbih2p9DXfJYjSijCaqVdoClLnFsgaq56+wT3NgOYd9GqcS2fQrmFFF7
- FKB54Iz3+iMpp8Z8+daUT4kWKwQ83c5sIszgFvU/Yv2KZlxffR7qD/v/NiDIIDVkp1m9 xQ== 
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fyp3btqbx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 May 2022 12:36:20 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24ACXDin026315;
-        Tue, 10 May 2022 12:36:18 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06ams.nl.ibm.com with ESMTP id 3fwg1j432h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 May 2022 12:36:17 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24ACaEG357410004
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 May 2022 12:36:14 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BA156A405C;
-        Tue, 10 May 2022 12:36:14 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 84307A4054;
-        Tue, 10 May 2022 12:36:14 +0000 (GMT)
-Received: from [9.145.38.155] (unknown [9.145.38.155])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 10 May 2022 12:36:14 +0000 (GMT)
-Message-ID: <7f50d80f-2508-59f6-cb2d-cc6bc1f3b551@linux.ibm.com>
-Date:   Tue, 10 May 2022 14:36:14 +0200
+        with ESMTP id S241324AbiEJMlu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 08:41:50 -0400
+Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9DAD24D617;
+        Tue, 10 May 2022 05:37:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1652186272; x=1683722272;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=bE2GOy6zlpqOoRX6zYpnJAL0E/MfIkSIFEmV3eldp8g=;
+  b=eZbJJjnPf6mf8cQPPkSwCsrsHttF36WPxATA9Rgy4PKtFqz4DvZNjcrj
+   ZcF9W/w8xmnRx7JUbBopLe4/drCddYwdFFivNf1kM9h+2BhYlRhOf/MwZ
+   ycMfRQ7db25xPCphERUda9wL7i472SsiTXZjGtZNyVGuTe8uiIRg3JsoS
+   A=;
+X-IronPort-AV: E=Sophos;i="5.91,214,1647302400"; 
+   d="scan'208";a="1014326555"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-e6c05252.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9103.sea19.amazon.com with ESMTP; 10 May 2022 12:37:27 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-pdx-2a-e6c05252.us-west-2.amazon.com (Postfix) with ESMTPS id 0A4E441CEE;
+        Tue, 10 May 2022 12:37:27 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.32; Tue, 10 May 2022 12:37:26 +0000
+Received: from u79c5a0a55de558.ant.amazon.com (10.43.162.96) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.32; Tue, 10 May 2022 12:37:24 +0000
+From:   Alexander Graf <graf@amazon.com>
+To:     <kvm@vger.kernel.org>
+CC:     <linuxppc-dev@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Paul Mackerras <paulus@samba.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Matt Evans <matt@ozlabs.org>, <stable@vger.kernel.org>
+Subject: [PATCH v3] KVM: PPC: Book3S PR: Enable MSR_DR for switch_mmu_context()
+Date:   Tue, 10 May 2022 14:37:17 +0200
+Message-ID: <20220510123717.24508-1-graf@amazon.com>
+X-Mailer: git-send-email 2.28.0.394.ge197136389
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH 5/9] KVM: s390: pv: Add query dump information
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        borntraeger@linux.ibm.com
-References: <20220428130102.230790-1-frankja@linux.ibm.com>
- <20220428130102.230790-6-frankja@linux.ibm.com>
- <20220509172844.1195585b@p-imbrenda>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220509172844.1195585b@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+X-Originating-IP: [10.43.162.96]
+X-ClientProxiedBy: EX13D03UWC002.ant.amazon.com (10.43.162.160) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: lJnwN0jkA1zN4vYQ2xXzJ7tgVRsH6sya
-X-Proofpoint-GUID: lJnwN0jkA1zN4vYQ2xXzJ7tgVRsH6sya
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-10_01,2022-05-10_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 phishscore=0 mlxscore=0 suspectscore=0 mlxlogscore=999
- impostorscore=0 adultscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205100057
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/9/22 17:28, Claudio Imbrenda wrote:
-> On Thu, 28 Apr 2022 13:00:58 +0000
-> Janosch Frank <frankja@linux.ibm.com> wrote:
-> 
->> The dump API requires userspace to provide buffers into which we will
->> store data. The dump information added in this patch tells userspace
->> how big those buffers need to be.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>   arch/s390/kvm/kvm-s390.c | 11 +++++++++++
->>   include/uapi/linux/kvm.h | 12 +++++++++++-
->>   2 files changed, 22 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index 23352d45a386..e327a5b8ef78 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -2255,6 +2255,17 @@ static ssize_t kvm_s390_handle_pv_info(struct kvm_s390_pv_info *info)
->>   
->>   		return len_min;
->>   	}
->> +	case KVM_PV_INFO_DUMP: {
->> +		len_min =  sizeof(info->header) + sizeof(info->dump);
-> 
-> so the output will have some zero-padded stuff at the end?
+Commit 863771a28e27 ("powerpc/32s: Convert switch_mmu_context() to C")
+moved the switch_mmu_context() to C. While in principle a good idea, it
+meant that the function now uses the stack. The stack is not accessible
+from real mode though.
 
-In which situation?
+So to keep calling the function, let's turn on MSR_DR while we call it.
+That way, all pointer references to the stack are handled virtually.
 
-> 
->> +
->> +		if (info->header.len_max < len_min)
->> +			return -EINVAL;
->> +
->> +		info->dump.dump_cpu_buffer_len = uv_info.guest_cpu_stor_len;
->> +		info->dump.dump_config_mem_buffer_per_1m = uv_info.conf_dump_storage_state_len;
->> +		info->dump.dump_config_finalize_len = uv_info.conf_dump_finalize_len;
->> +		return len_min;
->> +	}
->>   	default:
->>   		return -EINVAL;
->>   	}
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index 59e4fb6c7a34..2eba89d7ec29 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -1647,6 +1647,13 @@ struct kvm_s390_pv_unp {
->>   
->>   enum pv_cmd_info_id {
->>   	KVM_PV_INFO_VM,
->> +	KVM_PV_INFO_DUMP,
->> +};
->> +
->> +struct kvm_s390_pv_info_dump {
->> +	__u64 dump_cpu_buffer_len;
->> +	__u64 dump_config_mem_buffer_per_1m;
->> +	__u64 dump_config_finalize_len;
->>   };
->>   
->>   struct kvm_s390_pv_info_vm {
->> @@ -1666,7 +1673,10 @@ struct kvm_s390_pv_info_header {
->>   
->>   struct kvm_s390_pv_info {
->>   	struct kvm_s390_pv_info_header header;
->> -	struct kvm_s390_pv_info_vm vm;
->> +	union {
->> +		struct kvm_s390_pv_info_dump dump;
->> +		struct kvm_s390_pv_info_vm vm;
->> +	};
->>   };
->>   
->>   enum pv_cmd_id {
-> 
+In addition, make sure to save/restore r12 on the stack, as it may get
+clobbered by the C function.
+
+Reported-by: Matt Evans <matt@ozlabs.org>
+Fixes: 863771a28e27 ("powerpc/32s: Convert switch_mmu_context() to C")
+Signed-off-by: Alexander Graf <graf@amazon.com>
+Cc: stable@vger.kernel.org # v5.14+
+
+---
+
+v1 -> v2:
+
+  - Save and restore R12, so that we don't touch volatile registers
+    while calling into C.
+
+v2 -> v3:
+
+  - Save and restore R12 on the stack. SPRGs may be clobbered by
+    page faults.
+---
+ arch/powerpc/kvm/book3s_32_sr.S | 26 +++++++++++++++++++++-----
+ 1 file changed, 21 insertions(+), 5 deletions(-)
+
+diff --git a/arch/powerpc/kvm/book3s_32_sr.S b/arch/powerpc/kvm/book3s_32_sr.S
+index e3ab9df6cf19..6cfcd20d4668 100644
+--- a/arch/powerpc/kvm/book3s_32_sr.S
++++ b/arch/powerpc/kvm/book3s_32_sr.S
+@@ -122,11 +122,27 @@
+ 
+ 	/* 0x0 - 0xb */
+ 
+-	/* 'current->mm' needs to be in r4 */
+-	tophys(r4, r2)
+-	lwz	r4, MM(r4)
+-	tophys(r4, r4)
+-	/* This only clobbers r0, r3, r4 and r5 */
++	/* switch_mmu_context() needs paging, let's enable it */
++	mfmsr   r9
++	ori     r11, r9, MSR_DR
++	mtmsr   r11
++	sync
++
++	/* switch_mmu_context() clobbers r12, rescue it */
++	SAVE_GPR(12, r1)
++
++	/* Calling switch_mmu_context(<inv>, current->mm, <inv>); */
++	lwz	r4, MM(r2)
+ 	bl	switch_mmu_context
+ 
++	/* restore r12 */
++	REST_GPR(12, r1)
++
++	/* Disable paging again */
++	mfmsr   r9
++	li      r6, MSR_DR
++	andc    r9, r9, r6
++	mtmsr	r9
++	sync
++
+ .endm
+-- 
+2.28.0.394.ge197136389
+
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
 
