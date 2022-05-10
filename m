@@ -2,148 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C4A5B521A38
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 15:50:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71CD9521AB3
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 15:59:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243854AbiEJNy0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 09:54:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47156 "EHLO
+        id S242770AbiEJODX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 10:03:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243940AbiEJNpn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 09:45:43 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1232412463B
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 06:31:27 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id m12so3009816plb.4
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 06:31:27 -0700 (PDT)
+        with ESMTP id S244344AbiEJNzB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 09:55:01 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5715F2AC6D5
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 06:38:34 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id iq10so15914948pjb.0
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 06:38:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=eAkpZobv3rZ1Hb3Ti+DnJgCEz5o6zS6z0CRMJI9AM3s=;
-        b=jBI/IJVRvrcXrn0dmybmF38aVhy0igFdbEZFkPme71/HQ9GvoJ+XAo/584Dy/1j/IA
-         eKmiNsg0QRnSUTK2r3JdsiSVecH2pp3BGQdPp8VUZP0AqAKfmpxphSqIYnjeLfeiFQPG
-         4Oyh1vHBKMAuToyEeJKAEgJwkwHU1mz4dTg0y1Ydho5V/mtT1ywbMxTJ9EVQ5RngOgK4
-         eRanlq+s+j1OL6oL8R7ETXaFshDMsAfkYQ7LzPnxpf6kZ6VCMXr3Kv9r4owShVPjEnc9
-         5kAIxQgrPSRtOygh+uwcCxIwjofUsWOOJSGJo5Md3peUgiztJejwvlLNLjWbLn4m1Njx
-         nmVQ==
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=GHOlPZuq9ezSbSi7QKV81AD3fWcig4ojEeTiiJu9rns=;
+        b=rXYMHlY+INKGyljb119od5zwZqKjLefZ7x5+V3gEcSuInoNu6s6rW9cAVJC2Expc5x
+         +wYJgNd5LpQkHFDb+RQR/wwG1MUXfj1czmjKvNIlx9rDZcKKXuwKDgnDB32MSseakwe2
+         tg7DeYMb5SYFqik3Kw32QxfY+FdzErxyUViEbwb92itcJqGAvQy/ayYwghlmSGmoE1hI
+         gampyv65bl4WMc3Y2FRkPdSGMEy36nK5/Nu+xXxC61XBokfPIVTeOiYwBG47hVpqR8+H
+         ShAMU+2m3uSumhh/xQXwd+6DumzgL23/qUmcrEtE6kgIOCjke5EECqJ5xcwunfAW7K6a
+         /efg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=eAkpZobv3rZ1Hb3Ti+DnJgCEz5o6zS6z0CRMJI9AM3s=;
-        b=U2iYdEhaIsNRRHrldSBdPCgtNg67li+QslcHy2DOeHAqzst7+4MSY45qP2PIKFj9H/
-         v+znrrWFYDI3vfuZTPvBMtEHtDml8s+i6UhDM13wfGMmCLkYvyC5CcKBMetb8FUq+2y5
-         ua5wO1mrPysLPoMuVbUQ6abPjgheBS52iFcfOWudwLf3V5E8q1z633mcK+RPX0h7oDP3
-         Moe4oyN2LrBefABC1kAXZIGZ+xIf/JmP18J7KpWaVlYkkZ37Xn+8UmTE1wqxVy5Nw7/m
-         Dl0fbsRKB9Igr9ZcLeHDFlXIOxYoMlsJH2lCBD0C0kvySiqIqbZGa0xlOdUZ7oJ1tvxo
-         8DHA==
-X-Gm-Message-State: AOAM531NlBHjM7oCvXoAli8PJqZ1yuwJP6xbYfCJcgxYYusAfwbT3ge0
-        i+9ag/BCySDPErFrx3vVe4kNiw==
-X-Google-Smtp-Source: ABdhPJy7im86kJAw08T88EHkeZvOY5JH1GuJc2LoV3L/ahvJpYDIzSXEONMZQ/5L8AsbQATcBcnd/Q==
-X-Received: by 2002:a17:902:d4ce:b0:15e:90f8:216c with SMTP id o14-20020a170902d4ce00b0015e90f8216cmr21440392plg.65.1652189485589;
-        Tue, 10 May 2022 06:31:25 -0700 (PDT)
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=GHOlPZuq9ezSbSi7QKV81AD3fWcig4ojEeTiiJu9rns=;
+        b=ilQUksVNuorEsdxhj+0obq0i4nWnPTIWNnE1SGKa/+FGSDA8WxB19byXzvd9rwFQ+u
+         PoQU4Sg3ndzMsB0wtIOlon1/yISZuKeMWoIGDxpGK30wWcuqrO03bViByE/ruyfa3g6b
+         iuhQx/+xJJ0expRcFnEnyovx26NMx40VPM3ijYjo1L2ljMS1Zk6Z6tVP3PPEJqmjxmh5
+         wi4e2J7aS496bpobMlTEoUpxRngcdzRY/DcdWfEDxo4y62pjA+pmlfWBF/EolPUvB6xO
+         yYaI4hitdE0OcnRyhjSbQj52YRal5mIe7WVIhsvw9dWTNd9Gl7oLCc4SXxewcu4+TMCW
+         whkA==
+X-Gm-Message-State: AOAM531mgNM+u/8kWltJSNc/ubjr9rIK7qRXfqHAGWNzfciaDMd4smKN
+        v9GhGU95PdokApaqf74RI+0HBg==
+X-Google-Smtp-Source: ABdhPJzSHtzkhje29zpON/VWlwmbFYZucRm3YdJ0qgj79xSC3Sv+5XXBWlRs5kNuv+4ZjznmbP3+xg==
+X-Received: by 2002:a17:90b:4f81:b0:1dc:681e:248 with SMTP id qe1-20020a17090b4f8100b001dc681e0248mr93436pjb.98.1652189913993;
+        Tue, 10 May 2022 06:38:33 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id r5-20020a170902ea4500b0015eddb8e450sm2048059plg.25.2022.05.10.06.31.25
+        by smtp.gmail.com with ESMTPSA id fs12-20020a17090af28c00b001cd4989fedesm1815747pjb.42.2022.05.10.06.38.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 May 2022 06:31:25 -0700 (PDT)
-Date:   Tue, 10 May 2022 13:31:21 +0000
+        Tue, 10 May 2022 06:38:33 -0700 (PDT)
+Date:   Tue, 10 May 2022 13:38:30 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     David Matlack <dmatlack@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
-Subject: Re: [PATCH v4 03/20] KVM: x86/mmu: Derive shadow MMU page role from
- parent
-Message-ID: <YnppKY8j78Z1E6bH@google.com>
-References: <20220422210546.458943-1-dmatlack@google.com>
- <20220422210546.458943-4-dmatlack@google.com>
- <75fbbcb6-d9bb-3d30-0bf4-fbf925517d09@gmail.com>
- <CALzav=dmseUw6khErkiSV7T5K88QvaRvWvBpvrb6VNOQTE3bQQ@mail.gmail.com>
- <CAJhGHyDQn=atFmn5o2TREW9cSY5Tv1F1vsSekzor6uYQxDgcfQ@mail.gmail.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Jon Kohler <jon@nutanix.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KVM: X86: correct trace_kvm_pv_tlb_flush stats
+Message-ID: <Ynpq1hmtO+Yu21J2@google.com>
+References: <20220504182707.680-1-jon@nutanix.com>
+ <YnL0gUcUq5MbWvdH@google.com>
+ <8E192C0D-512C-4030-9EBE-C0D6029111FE@nutanix.com>
+ <87h7641ju3.fsf@redhat.com>
+ <C8885C42-26FE-4BD3-80B1-2B8C7C413A21@nutanix.com>
+ <874k1xzuov.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAJhGHyDQn=atFmn5o2TREW9cSY5Tv1F1vsSekzor6uYQxDgcfQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <874k1xzuov.fsf@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 10, 2022, Lai Jiangshan wrote:
-> ()
+On Tue, May 10, 2022, Vitaly Kuznetsov wrote:
+> Jon Kohler <jon@nutanix.com> writes:
 > 
-> On Tue, May 10, 2022 at 5:04 AM David Matlack <dmatlack@google.com> wrote:
+> >> On May 5, 2022, at 4:09 AM, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+> >> 
+> >> Jon Kohler <jon@nutanix.com> writes:
+> >> 
+> >>>> On May 4, 2022, at 5:47 PM, Sean Christopherson <seanjc@google.com> wrote:
+> >>>> 
+> >> 
+> >> ...
+> >> 
+> >>> 
+> >>> The net problem here is really that the stat is likely incorrect; however,
+> >>> one other oddity I didn’t quite understand after looking into this is that
+> >>> the call site for all of this is in record_steal_time(), which is only called
+> >>> from vcpu_enter_guest(), and that is called *after*
+> >>> kvm_service_local_tlb_flush_requests(), which also calls
+> >>> kvm_vcpu_flush_tlb_guest() if request == KVM_REQ_TLB_FLUSH_GUEST
+> >>> 
+> >>> That request may be there set from a few different places. 
+> >>> 
+> >>> I don’t have any proof of this, but it seems to me like we might have a
+> >>> situation where we double flush?
+> >>> 
+> >>> Put another way, I wonder if there is any sense behind maybe hoisting
+> >>> if (kvm_check_request(KVM_REQ_STEAL_UPDATE, vcpu)) up before
+> >>> Other tlb flushes, and have it clear the FLUSH_GUEST if it was set?
+> >> 
+> >> Indeed, if we move KVM_REQ_STEAL_UPDATE check/record_steal_time() call
+> >> in vcpu_enter_guest() before kvm_service_local_tlb_flush_requests(), we
+> >> can probably get aways with kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST,
+> >> vcpu) in record_steal_time() which would help to avoid double flushing.
 > >
-> > On Sat, May 7, 2022 at 1:28 AM Lai Jiangshan <jiangshanlai@gmail.com> wrote:
-> > > > +static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct, u32 access)
-> > > > +{
-> > > > +     struct kvm_mmu_page *parent_sp = sptep_to_sp(sptep);
-> > > > +     union kvm_mmu_page_role role;
-> > > > +
-> > > > +     role = parent_sp->role;
-> > > > +     role.level--;
-> > > > +     role.access = access;
-> > > > +     role.direct = direct;
-> > > > +
-> > > > +     /*
-> > > > +      * If the guest has 4-byte PTEs then that means it's using 32-bit,
-> > > > +      * 2-level, non-PAE paging. KVM shadows such guests using 4 PAE page
-> > > > +      * directories, each mapping 1/4 of the guest's linear address space
-> > > > +      * (1GiB). The shadow pages for those 4 page directories are
-> > > > +      * pre-allocated and assigned a separate quadrant in their role.
-> > >
-> > >
-> > > It is not going to be true in patchset:
-> > > [PATCH V2 0/7] KVM: X86/MMU: Use one-off special shadow page for special roots
-> > >
-> > > https://lore.kernel.org/lkml/20220503150735.32723-1-jiangshanlai@gmail.com/
-> > >
-> > > The shadow pages for those 4 page directories are also allocated on demand.
+> > Thanks, Vitaly, I’ll rework this one and incorporate that. In the mean time, do you
+> > have any suggestions on Sean's concern about losing the trace in situations
+> > where pv tlb flushing isn’t happening?
 > >
-> > Ack. I can even just drop this sentence in v5, it's just background information.
 > 
-> No, if one-off special shadow pages are used.
-> 
-> kvm_mmu_child_role() should be:
-> 
-> +       if (role.has_4_byte_gpte) {
-> +               if (role.level == PG_LEVEL_4K)
-> +                       role.quadrant = (sptep - parent_sp->spt) % 2;
-> +               if (role.level == PG_LEVEL_2M)
+> No strong preference from my side but there are multiple places which
+> conditionally cause TLB flush but we don't have tracepoints saying
+> "flush could've been done but wasn't" there, right?
 
-If the code ends up looking anything like this, please use PT32_ROOT_LEVEL instead
-of PG_LEVEL_2M.  PSE paging has 4M huge pages, using PG_LEVEL_2M is confusing.
+IMO this one is different because it's an explicit request from the guest that is
+otherwise not traced, whereas e.g. INVLPG will show up in exits.
 
-Or even better might be to do:
+> Also,
+> kvm_vcpu_flush_tlb_all()/kvm_vcpu_flush_tlb_guest()/kvm_vcpu_flush_tlb_current()
+> don't seem to have tracepoints so we don't actually record when we
+> flush. Hyper-V TLB flush has its own tracepoints
+> (trace_kvm_hv_flush_tlb()/trace_kvm_hv_flush_tlb_ex()) though.
+> This probably deserves a cleanup if we want TLB flush to be debuggable
+> without code instrumentation.
 
-		if (role.level == PG_LEVEL_4k)
-			...
-		else
-			...
-
-Or arithmetic using role.level directly, a la the current code.
+I don't have a preference either way.  I'm not opposed to tracing flushes, but I'm
+also more than a bit skeptical that any non-trivial TLB bugs will be debuggable via
+tracepoints.
