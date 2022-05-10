@@ -2,37 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 157E15213DF
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 13:34:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2FC05213F4
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 13:37:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241096AbiEJLiO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 07:38:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40120 "EHLO
+        id S241185AbiEJLl0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 07:41:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241031AbiEJLhz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 07:37:55 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E201552B21;
-        Tue, 10 May 2022 04:33:55 -0700 (PDT)
+        with ESMTP id S241134AbiEJLlJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 07:41:09 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A88551E0138;
+        Tue, 10 May 2022 04:37:12 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6921FB81CDB;
-        Tue, 10 May 2022 11:33:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A281BC385A6;
-        Tue, 10 May 2022 11:33:52 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 329CB61919;
+        Tue, 10 May 2022 11:37:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2037C385A6;
+        Tue, 10 May 2022 11:37:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1652182433;
-        bh=4S94+mx6dVJLEG2BxGlKwrLKJDvYFLhBRg0uGGTZxLQ=;
+        s=korg; t=1652182631;
+        bh=Yj6ouDcGjaidRSIAT9DJ46QXtOOqTQvc/8T4ao11gnw=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=TKuXZ4Vij6fynBapIO/JqbWo2+ZCuYrRV19th1q98id7Pn2Az9AKQEADloVliY6NN
-         6cQLYO984vdEV+h+6bkNlRHxlz74UovwlXUixxypbt9/JHG8Ge3Zo9e4Q0FVNu0c49
-         Tz0VrzIDJ+yyS2T6OVHNFy7feDgMtB+1n9+ZfLF0=
-Date:   Tue, 10 May 2022 13:33:50 +0200
+        b=h6lq0lZ3JRCepnAaDmp6/yY6PBcVoa8nFuz9Kpb4Z3IS8z13+fuGmxzg64etup/fw
+         GUCs/lCwG7jqiZoh/K8YCM6jTOb8rw69H4iHrE3RrAdn+jhuL1DngWZkqu210VbilX
+         ENp4WD0gFVJ4icgwz5GPx/5FkDbfZcdllpYE+4C4=
+Date:   Tue, 10 May 2022 13:37:08 +0200
 From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Kyle Huey <me@kylehuey.com>, stable@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>, Kyle Huey <me@kylehuey.com>
+Cc:     stable@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -45,12 +44,13 @@ Cc:     Kyle Huey <me@kylehuey.com>, stable@vger.kernel.org,
         Keno Fischer <keno@juliacomputing.com>
 Subject: Re: [PATCH 5.4] KVM: x86/svm: Account for family 17h event
  renumberings in amd_pmc_perf_hw_id
-Message-ID: <YnpNnlxDTN/ir7ES@kroah.com>
+Message-ID: <YnpOZAfLdJ6cj5b9@kroah.com>
 References: <20220508165434.119000-1-khuey@kylehuey.com>
  <29767a7d-d887-1a0c-296e-5bed220f1c9e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 In-Reply-To: <29767a7d-d887-1a0c-296e-5bed220f1c9e@redhat.com>
 X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
@@ -141,7 +141,26 @@ On Mon, May 09, 2022 at 01:41:20PM +0200, Paolo Bonzini wrote:
 > >   /* return PERF_COUNT_HW_MAX as AMD doesn't have fixed events */
 > 
 > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> Thanks,
+> 
+> Paolo
+> 
 
-Now queued up, thanks.
+Wait, how was this tested?
+
+It breaks the build:
+
+arch/x86/kvm/pmu_amd.c: In function ‘amd_find_arch_event’:
+arch/x86/kvm/pmu_amd.c:152:32: error: ‘pmc’ undeclared (first use in this function); did you mean ‘pmu’?
+  152 |         if (guest_cpuid_family(pmc->vcpu) >= 0x17)
+      |                                ^~~
+      |                                pmu
+
+
+I'll do the obvious fixup, but this is odd.  Always at least test-build
+your changes...
+
+thanks,
 
 greg k-h
