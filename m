@@ -2,115 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 90F895212F6
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 12:58:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D91D0521378
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 13:18:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240455AbiEJLC1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 07:02:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47256 "EHLO
+        id S240394AbiEJLWm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 07:22:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240475AbiEJLCX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 07:02:23 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A92EF230201;
-        Tue, 10 May 2022 03:58:21 -0700 (PDT)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24A8ovKD002063;
-        Tue, 10 May 2022 10:58:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=Svvn9kdiwgi/wx/oDegVNwry4KcScA6NcYcUhnrao9s=;
- b=fqjPn4sLNM8PL0DK8srkS28wfa4OVRTDTJerSNDA4Vd1PxuuMb/oC+w8WWW+Qpa30sx2
- MVyW4pGecaK5KoU7ILDWgRnxZ36gGNRkuZ0tVKh7U48rHvTv0vay5vQUZx+b/wnNMfOh
- y41E/d19P+POcNMgq3WaC6zoFYMVET5PmlurDEeJ2jxR75XidUqOOja4fLN7M/gkmCQG
- 9Z7ihCGEU/Ur6Lo5Ppkwkrz7UoWEsujwzZTEG+C2GAQ8wReFtxjKRsB7HpWZMos40rYc
- Kk/yAPqVnPRzfy2+JmCIcafuOR+y6aSJxO4tSNjEBxtCP/QpPwRFOSnQxqCLMix3QEXn DA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fymwbje37-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 May 2022 10:58:21 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24AAfeYQ009561;
-        Tue, 10 May 2022 10:58:20 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fymwbje2n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 May 2022 10:58:20 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24AAvbAu001006;
-        Tue, 10 May 2022 10:58:18 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 3fwgd8uxbt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 May 2022 10:58:18 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24AAwFEf9765160
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 May 2022 10:58:15 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 55E1142047;
-        Tue, 10 May 2022 10:58:15 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0DB0142045;
-        Tue, 10 May 2022 10:58:15 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.91.115])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 10 May 2022 10:58:14 +0000 (GMT)
-Message-ID: <aaf93deff51ccac5d17d8a6d38c399745ecf30c1.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v1 0/2] s390x: add migration test for CMM
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, thuth@redhat.com
-Date:   Tue, 10 May 2022 12:58:14 +0200
-In-Reply-To: <20220509160009.3d90cbe4@p-imbrenda>
-References: <20220509120805.437660-1-nrb@linux.ibm.com>
-         <20220509160009.3d90cbe4@p-imbrenda>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        with ESMTP id S240833AbiEJLWa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 07:22:30 -0400
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B743C1868CB;
+        Tue, 10 May 2022 04:18:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1652181513; x=1683717513;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=X4Q7oI+5uOvx0zCxStXfcdou0TUG9aiiGSJ0KXdxXIc=;
+  b=lDGi//iFUUUiO81uAhwF6jt4bN6jD/M9ipmYBilk9saNf47gSZ7vHUjU
+   QaSLRfJfIvPEcVRMDuIbCPVXHoKK3tFT48DLvFZnVX3p27XpQYmzIbdZ2
+   BkLwRR0uz1J3Ak6AhX6wVwQcbdDLcGSCcuNjqPfhkZGMi8aLCZmwN9sBf
+   g=;
+X-IronPort-AV: E=Sophos;i="5.91,214,1647302400"; 
+   d="scan'208";a="196825572"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1d-54a073b7.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP; 10 May 2022 11:18:21 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1d-54a073b7.us-east-1.amazon.com (Postfix) with ESMTPS id 7186184C0F;
+        Tue, 10 May 2022 11:18:19 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.32; Tue, 10 May 2022 11:18:18 +0000
+Received: from u79c5a0a55de558.ant.amazon.com (10.43.160.178) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.32; Tue, 10 May 2022 11:18:16 +0000
+From:   Alexander Graf <graf@amazon.com>
+To:     <kvm@vger.kernel.org>
+CC:     <linuxppc-dev@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Paul Mackerras <paulus@samba.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Matt Evans <matt@ozlabs.org>, <stable@vger.kernel.org>
+Subject: [PATCH v2] KVM: PPC: Book3S PR: Enable MSR_DR for switch_mmu_context()
+Date:   Tue, 10 May 2022 13:18:09 +0200
+Message-ID: <20220510111809.15987-1-graf@amazon.com>
+X-Mailer: git-send-email 2.28.0.394.ge197136389
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: oycbTW7wK16bF0CE-zrKLLt2Dvx8Yc2s
-X-Proofpoint-ORIG-GUID: nTvq_2BfD0I5jErV0tvtFX58dd0XNNLy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-10_01,2022-05-10_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- spamscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=999 phishscore=0
- suspectscore=0 malwarescore=0 clxscore=1015 adultscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205100046
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [10.43.160.178]
+X-ClientProxiedBy: EX13D16UWC003.ant.amazon.com (10.43.162.15) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-05-09 at 16:00 +0200, Claudio Imbrenda wrote:
-> I wonder if we are going to have more of these "split" tests.
-> 
-> is there a way to make sure migration prerequisites are always
-> present?
+Commit 863771a28e27 ("powerpc/32s: Convert switch_mmu_context() to C")
+moved the switch_mmu_context() to C. While in principle a good idea, it
+meant that the function now uses the stack. The stack is not accessible
+from real mode though.
 
-We could not run _any_ tests if netcat is not installed, which seems
-like a bad idea. 
+So to keep calling the function, let's turn on MSR_DR while we call it.
+That way, all pointer references to the stack are handled virtually.
 
-> or rewrite things so that we don't need them?
+In addition, make sure to save/restore r12 in an SPRG, as it may get
+clobbered by the C function.
 
-We need ncat to communicate with the QEMU QMP over unix socket. I am
-not aware of a way to use unix sockets in Bash, but no expert either.
+Reported-by: Matt Evans <matt@ozlabs.org>
+Fixes: 863771a28e27 ("powerpc/32s: Convert switch_mmu_context() to C")
+Signed-off-by: Alexander Graf <graf@amazon.com>
+Cc: stable@vger.kernel.org # v5.14+
 
-We could ship our own version of netcat and build it for the host,
-which adds additional complexity and maintenance burden. 
+---
 
-I honestly can't think of a good way.
+v1 -> v2:
 
-Or we just put all cmm tests in a single file and accept the fact that
-if you don't have all the migration related requirements installed, you
-don't get all the tests - even some which are not at all related to
-migration. I did not like that so I went with the extra file.
+  - Save and restore R12, so that we don't touch volatile registers
+    while calling into C.
+---
+ arch/powerpc/kvm/book3s_32_sr.S | 26 +++++++++++++++++++++-----
+ 1 file changed, 21 insertions(+), 5 deletions(-)
+
+diff --git a/arch/powerpc/kvm/book3s_32_sr.S b/arch/powerpc/kvm/book3s_32_sr.S
+index e3ab9df6cf19..1ce13e3ab072 100644
+--- a/arch/powerpc/kvm/book3s_32_sr.S
++++ b/arch/powerpc/kvm/book3s_32_sr.S
+@@ -122,11 +122,27 @@
+ 
+ 	/* 0x0 - 0xb */
+ 
+-	/* 'current->mm' needs to be in r4 */
+-	tophys(r4, r2)
+-	lwz	r4, MM(r4)
+-	tophys(r4, r4)
+-	/* This only clobbers r0, r3, r4 and r5 */
++	/* switch_mmu_context() clobbers r12, rescue it */
++	SET_SCRATCH0(r12)
++
++	/* switch_mmu_context() needs paging, let's enable it */
++	mfmsr   r9
++	ori     r11, r9, MSR_DR
++	mtmsr   r11
++	sync
++
++	/* Calling switch_mmu_context(<inv>, current->mm, <inv>); */
++	lwz	r4, MM(r2)
+ 	bl	switch_mmu_context
+ 
++	/* Disable paging again */
++	mfmsr   r9
++	li      r6, MSR_DR
++	andc    r9, r9, r6
++	mtmsr	r9
++	sync
++
++	/* restore r12 */
++	GET_SCRATCH0(r12)
++
+ .endm
+-- 
+2.28.0.394.ge197136389
+
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
+
