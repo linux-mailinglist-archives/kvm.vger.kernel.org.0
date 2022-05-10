@@ -2,179 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FFDC522037
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 17:54:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 909FC52204B
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 17:56:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346724AbiEJP6m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 11:58:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50294 "EHLO
+        id S1346860AbiEJQAA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 12:00:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347614AbiEJP5y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 11:57:54 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 117092AF636
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 08:50:36 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id 137so340005pgb.5
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 08:50:36 -0700 (PDT)
+        with ESMTP id S1347915AbiEJP6V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 11:58:21 -0400
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D18746222B;
+        Tue, 10 May 2022 08:51:19 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id 129so10460923wmz.0;
+        Tue, 10 May 2022 08:51:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=gfpjV8IALC9FJVn33em1iNVzqEpeGBseY180FMbd8Ow=;
-        b=WiHjV1BmyyNgau3dtoPNO9BFYoSW3ODWrDGqHWLJzczmgkziq9lKDze3/+3u36SK4z
-         P7gSeY8DT4ugkQneFF+5GPFbUhUvCLLPB8Ywc8ahh7mq8JDL483utRzqZ2KbeC6CA63A
-         h9FdIysAawhAqcvTPyJEFK4ZAuGmLwpybu5jhDBZU8suS3Ku61+0o2SvSo+QYGv+MVEt
-         LnZu9nwvZYvUBXaV1VCx3mCMiWkmIVJynDySDY0v1ZOtLa2aQOZiDOxSox0zDEz0CgBm
-         vl+U2krr59IK9ZbN71JrixmQbyjiXmWVaw1SDaZEsa8HK51l8toG9cswPLXti+ti2/N7
-         mnKQ==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=U+dHyajQd3anp7nv4LUi4+uXP3c9J/d9icW+Cpa8Rx4=;
+        b=EEGksnPVQEfnXlXJ573PuMx7zIkoG9RPGI75mioecwCn0quJVydceHRLuVAPAglCDC
+         4m8XBMTqla3/duWHi1hoWgO7ryels3JZp1IUmSJRSIUW/Yc7WDbWYHp9IZlyjHWcKvtV
+         pT7XUIS3cMnbLZmq4gr0jiSri/LqRkauMyoiY6drqG+0kjSrBpoJ1VXn6QvJsPLJ2M77
+         yMvr2TPVoBgelPxURlLgtnr02zYEryA4d42mM0f59kzEQ3SVs1BcGMPiWR4j072nizW1
+         ELDOoVpHmmUEDTl4KB++D1QIA/AAcpZIa/w/CGHBOQJZN0/PSCT67OCAAkiN93xvvTqQ
+         lxYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gfpjV8IALC9FJVn33em1iNVzqEpeGBseY180FMbd8Ow=;
-        b=3qOtM/aOGYajAXm9GDevGIoEe6fd/SM1CNZX2gXHiP9xUiLz2rZ6eQXxdigwDca/+s
-         x/Xk8NzbyuYT7HofwlpeL1PAt7F6P0PoaYXluYisqaSbmhgy5wKMrCFJvZCGReGI3BYB
-         XvqbTlGB5bDFz4vJWdsSLMKFIJk/LSxsyp6Lt8DfYdkR+Yi4BbiFZiMkS7MCHvabiZ0Y
-         5B4HFsXJZx3P9XDD24v1P6YagOxvLXq+Gr6sWqm4iLto4nM6pCJt7hSEoxzmndx5Miiq
-         cfHpsiZ6KZ1ucj2prjil50QQK3HqdIX+Fne5VypLtket4rPUvrd0FN9xEYQdu3WuMcjW
-         m4KA==
-X-Gm-Message-State: AOAM5320u8SYO7+o/xAQ8mdOQuLhaKvTNd6Ajd+w8FImKEnAODcdD2on
-        jb46yQfe0SQ6hmXvsfmaTtiCOg==
-X-Google-Smtp-Source: ABdhPJwqe4OhHWIUrq0UdpkIgG435w9A+b/Kf1hvIdj4flh1vu16gW8WOO5oZvEuL7OEXjEC+cfpVg==
-X-Received: by 2002:a65:6aa3:0:b0:3ab:23fb:adae with SMTP id x3-20020a656aa3000000b003ab23fbadaemr17341359pgu.278.1652197835222;
-        Tue, 10 May 2022 08:50:35 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id x2-20020a623102000000b0050dc76281easm10879795pfx.196.2022.05.10.08.50.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 May 2022 08:50:34 -0700 (PDT)
-Date:   Tue, 10 May 2022 15:50:31 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jon Kohler <jon@nutanix.com>
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Balbir Singh <sblbir@amazon.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Waiman Long <longman@redhat.com>
-Subject: Re: [PATCH v3] x86/speculation, KVM: only IBPB for
- switch_mm_always_ibpb on vCPU load
-Message-ID: <YnqJx/5hos0lKqI9@google.com>
-References: <YmxKqpWFvdUv+GwJ@google.com>
- <YmxRnwSUBIkOIjLA@zn.tnic>
- <Ymxf2Jnmz5y4CHFN@google.com>
- <YmxlHBsxcIy8uYaB@zn.tnic>
- <YmxzdAbzJkvjXSAU@google.com>
- <Ym0GcKhPZxkcMCYp@zn.tnic>
- <4E46337F-79CB-4ADA-B8C0-009E7500EDF8@nutanix.com>
- <Ym1fGZIs6K7T6h3n@zn.tnic>
- <Ynp6ZoQUwtlWPI0Z@google.com>
- <520D7CBE-55FA-4EB9-BC41-9E8D695334D1@nutanix.com>
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=U+dHyajQd3anp7nv4LUi4+uXP3c9J/d9icW+Cpa8Rx4=;
+        b=pH1UAAqtlW/MGimuVlPeT/3JjIefzJTDZ9abplYLeqcCqPVO/sUqzt7T6O6cYjYfYF
+         c8uIvO2g2v+eRzGXYXoJGeMuwt7jn7fjLSXrRaZwi45lQK5BCXT9vTECF8kcZn305s7L
+         RF0EhJ1DApae9TyKmX1X7rDCf61PXIi7c9UK+S83iEfW2A+5+8PKl71o/d5bV41JZFaJ
+         OCMRyDHyZ8XJrRa61lvjb9EQQZypf2UflXR894l9MGZly71kjAvYpnDD/aio3nnIEaZU
+         6A9CBJ6M8z66OanS6ei37NJ+KuM2FgU21RTX97T2DGMndro5MMUaL5Ah449zOQZVqtLT
+         /5wA==
+X-Gm-Message-State: AOAM531wUdbfGiN8NxJZsKTmZnxXq4APr0SseX9fvkXZaE67h008t/mR
+        hxWMoB2yeiQXAIoGCBZl7QQ=
+X-Google-Smtp-Source: ABdhPJw5U56ogAboldiGwx8gv9uCorZH3h5VqTSJ4hH1zxOniYl+KRYnnfpeHCWmokLOV7neyZx2hw==
+X-Received: by 2002:a05:600c:4f15:b0:394:8ea0:bb45 with SMTP id l21-20020a05600c4f1500b003948ea0bb45mr634056wmq.206.1652197872914;
+        Tue, 10 May 2022 08:51:12 -0700 (PDT)
+Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
+        by smtp.googlemail.com with ESMTPSA id o6-20020adfe806000000b0020c5253d927sm13726740wrm.115.2022.05.10.08.51.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 May 2022 08:51:12 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <9f19a5eb-3eb0-58a2-e4ee-612f3298ba82@redhat.com>
+Date:   Tue, 10 May 2022 17:51:03 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <520D7CBE-55FA-4EB9-BC41-9E8D695334D1@nutanix.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v11 14/16] KVM: x86/vmx: Flip Arch LBREn bit on guest
+ state change
+Content-Language: en-US
+To:     Yang Weijiang <weijiang.yang@intel.com>, jmattson@google.com,
+        seanjc@google.com, kan.liang@linux.intel.com,
+        like.xu.linux@gmail.com, vkuznets@redhat.com, wei.w.wang@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220506033305.5135-1-weijiang.yang@intel.com>
+ <20220506033305.5135-15-weijiang.yang@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220506033305.5135-15-weijiang.yang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 10, 2022, Jon Kohler wrote:
+On 5/6/22 05:33, Yang Weijiang wrote:
+> Per spec:"IA32_LBR_CTL.LBREn is saved and cleared on #SMI, and restored
+> on RSM. On a warm reset, all LBR MSRs, including IA32_LBR_DEPTH, have their
+> values preserved. However, IA32_LBR_CTL.LBREn is cleared to 0, disabling
+> LBRs." So clear Arch LBREn bit on #SMI and restore it on RSM manully, also
+> clear the bit when guest does warm reset.
 > 
-> > On May 10, 2022, at 10:44 AM, Sean Christopherson <seanjc@google.com> wrote:
-> > 
-> > On Sat, Apr 30, 2022, Borislav Petkov wrote:
-> >> But I'm likely missing a virt aspect here so I'd let Sean explain what
-> >> the rules are...
-> > 
-> > I don't think you're missing anything.  I think the original 15d45071523d ("KVM/x86:
-> > Add IBPB support") was simply wrong.
-> > 
-> > As I see it:
-> > 
-> >  1. If the vCPUs belong to the same VM, they are in the same security domain and
-> >     do not need an IPBP.
-> > 
-> >  2. If the vCPUs belong to different VMs, and each VM is in its own mm_struct,
-> >     defer to switch_mm_irqs_off() to handle IBPB as an mm switch is guaranteed to
-> >     occur prior to loading a vCPU belonging to a different VMs.
-> > 
-> >  3. If the vCPUs belong to different VMs, but multiple VMs share an mm_struct,
-> >     then the security benefits of an IBPB when switching vCPUs are dubious, at best.
-> > 
-> > If we only consider #1 and #2, then KVM doesn't need an IBPB, period.
-> > 
-> > #3 is the only one that's a grey area.  I have no objection to omitting IBPB entirely
-> > even in that case, because none of us can identify any tangible value in doing so.
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>   arch/x86/kvm/vmx/vmx.c | 4 ++++
+>   1 file changed, 4 insertions(+)
 > 
-> Thanks, Sean. Our messages crossed in flight, I sent a reply to your earlier message
-> just a bit ago. This is super helpful to frame this up.
-> 
-> What would you think framing the patch like this:
-> 
->     x86/speculation, KVM: remove IBPB on vCPU load
-> 
->     Remove IBPB that is done on KVM vCPU load, as the guest-to-guest
->     attack surface is already covered by switch_mm_irqs_off() ->
->     cond_mitigation().
-> 
->     The original 15d45071523d ("KVM/x86: Add IBPB support") was simply wrong in
->     its guest-to-guest design intention. There are three scenarios at play
->     here:
-> 
->     1. If the vCPUs belong to the same VM, they are in the same security 
->     domain and do not need an IPBP.
->     2. If the vCPUs belong to different VMs, and each VM is in its own mm_struct,
->     switch_mm_irqs_off() will handle IBPB as an mm switch is guaranteed to
->     occur prior to loading a vCPU belonging to a different VMs.
->     3. If the vCPUs belong to different VMs, but multiple VMs share an mm_struct,
->     then the security benefits of an IBPB when switching vCPUs are dubious, 
->     at best.
-> 
->     Issuing IBPB from KVM vCPU load would only cover #3, but there are no
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 6d6ee9cf82f5..b38f58868905 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -4593,6 +4593,8 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>   	if (!init_event) {
+>   		if (static_cpu_has(X86_FEATURE_ARCH_LBR))
+>   			vmcs_write64(GUEST_IA32_LBR_CTL, 0);
+> +	} else {
+> +		flip_arch_lbr_ctl(vcpu, false);
+>   	}
+>   }
+>   
+> @@ -7704,6 +7706,7 @@ static int vmx_enter_smm(struct kvm_vcpu *vcpu, char *smstate)
+>   	vmx->nested.smm.vmxon = vmx->nested.vmxon;
+>   	vmx->nested.vmxon = false;
+>   	vmx_clear_hlt(vcpu);
+> +	flip_arch_lbr_ctl(vcpu, false);
+>   	return 0;
+>   }
+>   
+> @@ -7725,6 +7728,7 @@ static int vmx_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+>   		vmx->nested.nested_run_pending = 1;
+>   		vmx->nested.smm.guest_mode = false;
+>   	}
+> +	flip_arch_lbr_ctl(vcpu, true);
+>   	return 0;
+>   }
+>   
 
-Just to hedge, there are no _known_ use cases.
+This is incorrect, you hare not saving/restoring the actual value of 
+LBREn (which is "lbr_desc->event != NULL").  Therefore, a migration 
+while in SMM would lose the value of LBREn = true.
 
->     real world tangible use cases for such a configuration.
+Instead of using flip_arch_lbr_ctl, SMM should save the value of the MSR 
+in kvm_x86_ops->enter_smm, and restore it in kvm_x86_ops->leave_smm 
+(feel free to do it only if guest_cpuid_has(vcpu, X86_FEATURE_LM), i.e. 
+the 32-bit case can be ignored).
 
-and I would further qualify this with:
-
-      but there are no known real world, tangible use cases for running multiple
-      VMs belonging to different security domains in a shared address space.
-
-Running multiple VMs in a single address space is plausible and sane, _if_ they
-are all in the same security domain or security is not a concern.  That way the
-statement isn't invalidated if someone pops up with a use case for running multiple
-VMs but has no security story.
-
-Other than that, LGTM.
-
->     If multiple VMs
->     are sharing an mm_structs, prediction attacks are the least of their
->     security worries.
-> 
->     Fixes: 15d45071523d ("KVM/x86: Add IBPB support")
->     (Reviewedby/signed of by people here)
->     (Code change simply whacks IBPB in KVM vmx/svm and thats it)
-> 
-> 
-> 
+Paolo
