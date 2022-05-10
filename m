@@ -2,141 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F07F65215C8
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 14:46:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C12AB5215CE
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 14:47:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241978AbiEJMuB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 08:50:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52912 "EHLO
+        id S241957AbiEJMv3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 08:51:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241976AbiEJMt6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 08:49:58 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2084.outbound.protection.outlook.com [40.107.220.84])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD75C4EDD1
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 05:45:58 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ENBixDI/JdRfVDMnG7IVIHAV5ngS4FiqC3lgPBfm6POcvG9m9BEfqho3U7Dp32qwS/hFhqhXl3K2+p5y9BbSBMcNfnw/pdvTU55UuiOYSoAmHGAgLWSUmjTv3uEIxYQJ9JAzcDld08aW+79JwIvuwMmPVNQEHN4gsuL9Z4Zqjd/dWEohWmN6cnTtaBsIU709kSKgZ8TtRsdTmDvOD+tZNFL/moEoD3r+mR9lEC1t67ehv0fqukV++dwnFd6Ug9lZWoCXTRCXzP6J+OmstgeQZd3P5XGOAQKUsj5m0pkAsyiaJuLsUFh6+LNjbfHOcoeUq3r9D01UuOJrw2x52P8fuA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=J+lP4z1Hii8ueMEwyQnNxTWDBA3PE5uq9t3xtCm+hvs=;
- b=dstj7OJzXnuNNlDZ69UnPTWN5peIKeEHFvvVuxG8PyFytc1HD55SvD83Fc/xV3vrwkG5GBam1O9yQV1TA9sv1MRllLyTnTdCd+wWAEDOdxNVheBt1xK+6hMda7BqjE4XcLfNeMbaVkbyURL6/dc3VtlEaRnEHo21xlyFtrazmE/aqrTX/2ljGZuKWizYN5/uSxFg6TMa704CunD5d2Swvs2N7itBRUoMLHqlsBHQ8E38eqOHtExWttLrttOMIjdFMRWAbm/duNMS38zAljCzT6ge3QFLcHGUtgFPzYZcNSsKEbgZS4DKuuaIEmgdckeQ/GHVlUa4UZcyXSnItP//Pg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J+lP4z1Hii8ueMEwyQnNxTWDBA3PE5uq9t3xtCm+hvs=;
- b=DxcpLwfne1GnWXOo1qbWtWG6U+CP9qwOIw8onqFjEdCOR296lj4ghAmX6c4OURyDYF4TR4T+I0DHVesIH18GNz5iSHuHjUzi+ijE43sXsAwrzRtSeY7qutDp22ZOxF76OANXw7AaXakYub8c8iIHT17yOiUVVHVwazPs91z9XS1sMCLpNg864RZibwprvX3hWL8XIhzqL7tR5d8K097DQshxaKCbkNdLHLzVThfivMJDaAYK9ChvXVswoXIH4phoSZxJrfXAnt8gYp/k/W9P8U0LYsIvLy65oBoCdjl2iVftMVLjmOKTcZlixUzdW0N8/9I372cgJ7L+zd2ylq4Z4w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by CY4PR12MB1734.namprd12.prod.outlook.com (2603:10b6:903:121::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5227.23; Tue, 10 May
- 2022 12:45:56 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2%5]) with mapi id 15.20.5227.023; Tue, 10 May 2022
- 12:45:56 +0000
-Date:   Tue, 10 May 2022 09:45:54 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Zhangfei Gao <zhangfei.gao@linaro.org>
-Cc:     eric.auger@redhat.com, Yi Liu <yi.l.liu@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "thuth@redhat.com" <thuth@redhat.com>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "chao.p.peng@intel.com" <chao.p.peng@intel.com>,
-        "yi.y.sun@intel.com" <yi.y.sun@intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>
-Subject: Re: [RFC 00/18] vfio: Adopt iommufd
-Message-ID: <20220510124554.GY49344@nvidia.com>
-References: <20220414104710.28534-1-yi.l.liu@intel.com>
- <4f920d463ebf414caa96419b625632d5@huawei.com>
- <be8aa86a-25d1-d034-5e3b-6406aa7ff897@redhat.com>
- <4ac4956cfe344326a805966535c1dc43@huawei.com>
- <20220426103507.5693a0ca.alex.williamson@redhat.com>
- <66f4af24-b76e-9f9a-a86d-565c0453053d@linaro.org>
- <0d9bd05e-d82b-e390-5763-52995bfb0b16@intel.com>
- <720d56c8-da84-5e4d-f1f8-0e1878473b93@redhat.com>
- <29475423-33ad-bdd2-2d6a-dcd484d257a7@linaro.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <29475423-33ad-bdd2-2d6a-dcd484d257a7@linaro.org>
-X-ClientProxiedBy: MN2PR18CA0010.namprd18.prod.outlook.com
- (2603:10b6:208:23c::15) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S234305AbiEJMv2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 08:51:28 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72B5AE52AB;
+        Tue, 10 May 2022 05:47:31 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24AAqPc5000815;
+        Tue, 10 May 2022 12:47:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Lo2ncoSlpbd4n7h/Shl9pgvfqkip5AOvGgH7yPp6/I4=;
+ b=W/Oum3sXcinK5yf0wEKt91nnlW6Fozhw5P0lpaIrwvNXyFWQRqG290rtYKF9FX2suIYS
+ s9ohtHSfrRkm9JA2yblMm+IW2SVWI4KuFBUOTViwog16E1o7Rfa6Y6I7Bryt48PR/5Km
+ Cuya6Bq7pWgyYwYv6v/A3DMwKqp+RFWfBjDDXPv3HDs3VV80ji+VwmcyBIbUJQroUL1a
+ vpMkL2alz8GYyKAF7GaoHYA82CUPW6p2LJAYZPATBGvuIlDZztxNCAmPTvyKFnkYFNAQ
+ OEscUOARApuR8syfCV76HNl5vSShp65eD8u7ZHekGh4rO6dUz99LWPnvvd8Ngj/Up3DP dA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fypp0t808-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 May 2022 12:47:31 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24ACUCf1002580;
+        Tue, 10 May 2022 12:47:30 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fypp0t7yk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 May 2022 12:47:30 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24AChcET003878;
+        Tue, 10 May 2022 12:47:28 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06ams.nl.ibm.com with ESMTP id 3fwg1j43fn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 May 2022 12:47:28 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24AClPSA45482452
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 May 2022 12:47:25 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 494CFA405B;
+        Tue, 10 May 2022 12:47:25 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 039F9A4054;
+        Tue, 10 May 2022 12:47:25 +0000 (GMT)
+Received: from [9.145.38.155] (unknown [9.145.38.155])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 10 May 2022 12:47:24 +0000 (GMT)
+Message-ID: <9ab646da-c104-b7a1-70f8-fbd8a6e74150@linux.ibm.com>
+Date:   Tue, 10 May 2022 14:47:24 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d8d36cc1-65e6-42c8-ae7c-08da3283068f
-X-MS-TrafficTypeDiagnostic: CY4PR12MB1734:EE_
-X-Microsoft-Antispam-PRVS: <CY4PR12MB1734E375A907CDD87D3ABB99C2C99@CY4PR12MB1734.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MGK95Cxo1l7ppxeysPGjn68Q5FwbUxusvCxFbaOFrHfRLoPI4FBVNDYcZfH7yhfEDufY0Ts8OrwNNAiecvHxWA0raRpznHJQRAxFMHZb4neA9h/m32yJq5hgCigLhBZhWFJhhqh4/fFLJDCYyxSlEatACKpeVqi7/I983xItAwdnepP+Q4J4BmjA9HObZB1mzyfSOeYh0koGhHMsprSrX+yDj2MitEojMXIBMS/OtmbnmInq15NH4navBv4uZms9Jf2qoe8WKzIntXWY+GtPIrXq2nyMaSMxr0gzaIBooQsjknG3CiyIe/COqNNQ7WAwEmK0k66w6Jh+ygY7PpRESrw90B6FrExsKrbbeZ8ZuLca/FB69VBxQC7E+4ppVqiXWHdPYSqNJyc8B/skNWeZDUC+MJ5Zoeeey6ccoNzDOS001WrVVlA9F3hVhRKOx1sdeoWtwFLlVl3B28In0t3LEcPrxdDKVbb/PCIzZNqbb2amrnPePk139dt8rhJqL+YRfDvVwEoGgJJVA3N3fgxXy+jquuT9C58jmCwiNOZZEsxwkoylrySl4nlY2sefRza9IciPuOLnExBJKLvoPHZrT0gbmyBNHFr7F26k341JX56os6fxyirreOwcw1ckP5wmV1qdu8oJE9UeewCc+fwL3A==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(5660300002)(38100700002)(8936002)(7416002)(86362001)(508600001)(6486002)(316002)(6506007)(54906003)(66476007)(66556008)(6916009)(66946007)(8676002)(4326008)(33656002)(83380400001)(186003)(36756003)(26005)(2616005)(6512007)(2906002)(1076003)(4744005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?sGGuzSW6hLDeZowB0oXJ8Wv9hgv8wOhN7WdyBoZl98VMfSLUeNtiHZqkJ4VG?=
- =?us-ascii?Q?1V3sFDmNLenhCxyi74+fwgAtgThCgymHxgoye0eyQfS/SnTbf/J1ZnfVgnU2?=
- =?us-ascii?Q?LUKStxA06GDx558AUYL5XxU3NO/vSeavIDSJIbgaKOI4jrPOK+1NhUqYM4g7?=
- =?us-ascii?Q?9CspP230abyQXBzoNWj488+smbSTHrB/S6uVY/nkEgLOV3JNcxZ2qci8E2GU?=
- =?us-ascii?Q?bzRQRVu0d81XxF8fMAFJbFhSsZ8OfXTjin2c/0yYWskKTxm1mV4PLYITkGdR?=
- =?us-ascii?Q?K/R7U3oE8O+s/ZJw9BnIDtMB39tUxohLTfzXZkjaaWu8D3f8UoT3DESQxpxQ?=
- =?us-ascii?Q?5IqTSO9xHQgpg4ZcaifMz4O6FWOaPo/O02LnJQFY26hXxA3fB58RROfD1BJs?=
- =?us-ascii?Q?bPgegRvWF7W3DNOE6jhdenKaKGAV/+fm4c1l2OcpI0QFlgu7AaQRuGUEXNbi?=
- =?us-ascii?Q?JhbDIqCBvvoNMBknPfiL/+UfBKS4xpvMJuTD0WXnIL3r2+ID/sdTsE/dJjzz?=
- =?us-ascii?Q?6ZE5Q/JCI+0ENLN8vclKHyWUygPQwxKwCQAF/1FHuNMn18Zo0ahe/D229e/s?=
- =?us-ascii?Q?fPtGUYqMlgDkAJhth9Bf5UQT6RMQfaBXrpSZ9wcGhoms49uBAAcVSkZqMWqv?=
- =?us-ascii?Q?2AmOFH1YIpqUL+u6b9w9yt4jQuIIc7tRao11/SxPpC+0kYjwyIqF9kndVVuY?=
- =?us-ascii?Q?EnkhlKumbz1bJwcIaMjVUI69VmQoV3q04SE6TU5n0PhO9NmBfD8AgwwdnTOV?=
- =?us-ascii?Q?q9rQaKmkjfpws+rF5iSaxTtLrBM9Cfnr5vR73B5QYswRnIJX9+bLNkkMaXtr?=
- =?us-ascii?Q?2hUQXJJVa/+4r0n4KxPv/ThmdCTUMtH/4T5Pd7sUUghCVBA4wctap74jd/QP?=
- =?us-ascii?Q?bRnOKQ60W76ZBJJFR7wBJU480Xw3J4g0S/9r6lQeXUQY5rtoEqGK64c1cfCa?=
- =?us-ascii?Q?RdxmaHy5uAnoSRt04pO3X+zmOTZcomdoP2zFU4dxgdv7v0ua6tDa0e6xijb8?=
- =?us-ascii?Q?KVT0vGw7hIxgFI3ce6Mbrw5Z8fAkkRwV6O4KOtZ9iV4BR2LFBVsedhs4y5E7?=
- =?us-ascii?Q?PZic18lmNOSw3DC0RLvRuWSBlujAMKfkjcffhqHo7xT3ErDOWhenR2vqA2iu?=
- =?us-ascii?Q?BQZ09/KS4A3aLhsBnO8YE2kJYl2rTy0tzHVqN2XW8RG2RvIFsaJHkF/RKOvD?=
- =?us-ascii?Q?HjCf4noRqYEDUqBEIw7DfvgsQUKqolOBWHLY+2O8mkWXuPwLhfHOAvMboy28?=
- =?us-ascii?Q?e5TuxolomQhmhoZmxtRLSVWPkp5P4s4xK6ZBy6kXTS4MDLxR9cpwu0zax5dM?=
- =?us-ascii?Q?P/D6tTVDIpneKboGQapSZlU1XXmhQtJgJCCrC3sTLRhrEyVefKMXnHxzA+5E?=
- =?us-ascii?Q?WlAOBLqSwdGrvbCdIq19qUEJzJNSshXbipMJWpUPxGWGvSxRZ7liGzURbZNL?=
- =?us-ascii?Q?/+rfBFth4DLoy+RAzUV0psd/QvoubHrGRrxmM8ipXwH8qQZlEO0uHavrdv4p?=
- =?us-ascii?Q?DU6cPbbSeoaV3PZkqQ2vFAVTbZsC6jF1DpIWqWWpuEC6SNMrlPXEfBljJRL4?=
- =?us-ascii?Q?EpVkW6zj27Sg+yJysTcawoV5auUq5+6T90NLKQ9rmX1NEs3Fq4mXoC3gK1Kf?=
- =?us-ascii?Q?568wL5a35iYSUf8XAsbWciHlVpRj+pSyGzFPq4O9LLJEv3XTm3cohhbqb/x5?=
- =?us-ascii?Q?TLaZuT8dJd4KuPfBnC+uuepLABwqpugj/0lW4KFznFCK5g8Nhi3pbzLQ/q/M?=
- =?us-ascii?Q?nQKaBCApkg=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d8d36cc1-65e6-42c8-ae7c-08da3283068f
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2022 12:45:56.0575
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: c/Bj4y6UQvBv3086eTZE0jBPp+gOa8ysz/81h+q86mkkT7628JmxnDeSvdHFxOSc
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1734
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [kvm-unit-tests PATCH v1 0/2] s390x: add migration test for CMM
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com
+References: <20220509120805.437660-1-nrb@linux.ibm.com>
+ <20220509160009.3d90cbe4@p-imbrenda>
+ <aaf93deff51ccac5d17d8a6d38c399745ecf30c1.camel@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <aaf93deff51ccac5d17d8a6d38c399745ecf30c1.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: sa0gBqM_SyNmFflOgZ2SAGnOYwTKrL7g
+X-Proofpoint-ORIG-GUID: S-TkzC_7FIUT8RqClIkUHMIfVK05AGz9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-10_01,2022-05-10_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ spamscore=0 mlxscore=0 malwarescore=0 priorityscore=1501
+ lowpriorityscore=0 phishscore=0 mlxlogscore=999 clxscore=1015
+ impostorscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2202240000 definitions=main-2205100057
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -144,14 +95,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 10, 2022 at 08:35:00PM +0800, Zhangfei Gao wrote:
-> Thanks Yi and Eric,
-> Then will wait for the updated iommufd kernel for the PCI MMIO region.
+On 5/10/22 12:58, Nico Boehr wrote:
+> On Mon, 2022-05-09 at 16:00 +0200, Claudio Imbrenda wrote:
+>> I wonder if we are going to have more of these "split" tests.
+>>
+>> is there a way to make sure migration prerequisites are always
+>> present?
 > 
-> Another question,
-> How to get the iommu_domain in the ioctl.
+> We could not run _any_ tests if netcat is not installed, which seems
+> like a bad idea.
+> 
+>> or rewrite things so that we don't need them?
+> 
+> We need ncat to communicate with the QEMU QMP over unix socket. I am
+> not aware of a way to use unix sockets in Bash, but no expert either.
+> 
+> We could ship our own version of netcat and build it for the host,
+> which adds additional complexity and maintenance burden.
+> 
+> I honestly can't think of a good way.
+> 
+> Or we just put all cmm tests in a single file and accept the fact that
+> if you don't have all the migration related requirements installed, you
+> don't get all the tests - even some which are not at all related to
+> migration. I did not like that so I went with the extra file.
 
-The ID of the iommu_domain (called the hwpt) it should be returned by
-the vfio attach ioctl.
-
-Jason
+Having them separate is fine. I'd change the file name to 
+migration-cmm.elf though. We might also want to change the name of the 
+first migration test in the future to make the name more specific.
