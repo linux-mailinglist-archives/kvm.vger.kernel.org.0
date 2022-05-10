@@ -2,90 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3309E5227CF
-	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 01:50:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB6E35227D2
+	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 01:51:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234986AbiEJXur (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 19:50:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52534 "EHLO
+        id S238248AbiEJXvW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 19:51:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229526AbiEJXuq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 19:50:46 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3EE8DEA7
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 16:50:45 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id iq10so673835pjb.0
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 16:50:45 -0700 (PDT)
+        with ESMTP id S238659AbiEJXvI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 19:51:08 -0400
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D19137A22
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 16:51:07 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id l18so820031ejc.7
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 16:51:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=uXNW2Ma966gBaKmqxlxAmGf7PzWdvI/fxxV9fWVIL2E=;
-        b=BQ+/N4DMOhsJhN2doQjaoYb6RUpUK6UwyVtYJ4A/2vNmBD1O1F1sJYH6lF5G8SlHZq
-         CbLkZokQr2X2GeXxaoxF+0T86uQRJ7FyVAlima8comgq0Diyr59LRZh1b1g9PalgP1Tj
-         qdLvaLKb9sWGDGk3si+/72o0vxIxXrevZ1TZhOKEE8Xx6LtG+z27L4D99dVCyUy0GoBn
-         RA5UijI4ygx2981Rekh3mYBnfdylOw56qDI22VnNpOHG33XM5yc0UwxcgmfK3xCpXjCD
-         hV6cBqwurnYuSIIERD+NtnknLwj2HgtxY1Z/s1Uqt5+e1dtYsR8SNxA1foI1GzeGLXUT
-         90GQ==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=s7uQP88rm2fFVrAVhakdMnaytPLChwV+spwEqxpvxKE=;
+        b=Wvb2Yr5ntSMikIY6rsVTXCZINVsgnvf5OHdXaS5WophjI51WFvB8FsxEaYv1RdGkSy
+         ORGLa02GFQN4jWiwyp35UkGxqCVY8hbh1eV9xU7ToJNJzjVWjhEYOqjgamybrHXG8cWb
+         TwhAiglLuZCkojR6K6YA46HDyLB6G+PqIX51A=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=uXNW2Ma966gBaKmqxlxAmGf7PzWdvI/fxxV9fWVIL2E=;
-        b=3fP3yVqJ2c5tGn8ixZIK/sAKyHtWVLQTtMWJRqu+QiRTnHmYCTKaY4HIsCLQeuDWAP
-         dr0NxT+p0P1P01NBRWtyA45y+hihE5XYzyRS2VsnP/eSthTUrP0ykcnwpWpOgtFUDJrG
-         Ac9mLFYYpuiN6zhP6IR0ttLIanypYYECVJkfSpYZp948j5hzS0a7j7AqSQxAMNpTYUUx
-         25ctZzxMSD+BgSGTz8kza/aft1DbTjltN3JFrcXzvj0v6a0AAZjvXPwF20DfDN9NrD9X
-         MyDkU9XILQ3R9Tv1N+xcCATFJ88WhV+kBUtR8XVYmQXNMyTUgSeMCLf0vTciJb5tkf3N
-         gcOg==
-X-Gm-Message-State: AOAM532zbzNf9CcnMJmLIyDfjHKV8Sywvc//DlCmLffmePG6c0hpJTwm
-        DEupzVzSXyZJms3XDNA+cys0KqzNR21R3g==
-X-Google-Smtp-Source: ABdhPJxtO/2wbfb6zZ2sN48qDFm9HA/k40ExF6pRC+wsCyjRXq1MgvDwVa+bG/lsKNhRSmvDhfjEBw==
-X-Received: by 2002:a17:902:eb85:b0:15e:bf29:bd9f with SMTP id q5-20020a170902eb8500b0015ebf29bd9fmr22554705plg.135.1652226644991;
-        Tue, 10 May 2022 16:50:44 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v3-20020a62a503000000b0050dc7628146sm129410pfm.32.2022.05.10.16.50.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 May 2022 16:50:44 -0700 (PDT)
-Date:   Tue, 10 May 2022 23:50:41 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
-        David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v3 1/2] KVM: VMX: Print VM-instruction error when it may
- be helpful
-Message-ID: <Ynr6UeaXEYx58A+W@google.com>
-References: <20220510224035.1792952-1-jmattson@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=s7uQP88rm2fFVrAVhakdMnaytPLChwV+spwEqxpvxKE=;
+        b=r2nCvc+sHOTey9HvJOagHrUux4qMOcrWP2wqh+Td/K+3x/QdfMChc2cfGiHHtuHwYU
+         /JuEj61JJ2gpiEIo3UZ4HjSMRomBgZFHOtCaDZnP3XdotWpb+fw3p/728qEzqcDPGyAE
+         4e5FEu9Fekanpaj/AFmgSCWUHdZ3FCCPaj/vI24F6Rwg0QwbY3WItEqM1Us+mVExS15t
+         +NUJEX+zI+94it2CgjRsPNaNv+yOtdukmF+6nBSZEm6ckOY98A01vmN1g2ip5JifiFNN
+         H8uqmP7nDCkGOuGZLFYz7kJzV/nRxojYASPotg76jvXLJxgQ0a8Gxbc4ftZR4e6Cfgxv
+         3kAA==
+X-Gm-Message-State: AOAM533uI6tnnIkLSwrUrt3/5nbelFiVodFG6y2db90HvW+vM+c4KrV/
+        +0geMnwkmWYfPYZGGcpXdwocA8Z5a0zw/EhksJU=
+X-Google-Smtp-Source: ABdhPJxKDgwlEznF9GB4Ah1leNDyKRfkoLskLFc7ry3NDT3OS9mcYaAPo7fTL1PT0oE0NlRI+qbXQA==
+X-Received: by 2002:a17:906:8585:b0:6f3:99f0:d061 with SMTP id v5-20020a170906858500b006f399f0d061mr21738762ejx.436.1652226665393;
+        Tue, 10 May 2022 16:51:05 -0700 (PDT)
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com. [209.85.128.54])
+        by smtp.gmail.com with ESMTPSA id rq13-20020a17090788cd00b006f3ef214e66sm239759ejc.204.2022.05.10.16.51.03
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 May 2022 16:51:04 -0700 (PDT)
+Received: by mail-wm1-f54.google.com with SMTP id n126-20020a1c2784000000b0038e8af3e788so296102wmn.1
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 16:51:03 -0700 (PDT)
+X-Received: by 2002:a1c:4c06:0:b0:394:65c4:bd03 with SMTP id
+ z6-20020a1c4c06000000b0039465c4bd03mr2167400wmf.8.1652226663399; Tue, 10 May
+ 2022 16:51:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220510224035.1792952-1-jmattson@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20220510082351-mutt-send-email-mst@kernel.org>
+ <CAHk-=wjPR+bj7P1O=MAQWXp0Mx2hHuNQ1acn6gS+mRo_kbo5Lg@mail.gmail.com> <YnrxTMVRtDnGA/EK@dev-arch.thelio-3990X>
+In-Reply-To: <YnrxTMVRtDnGA/EK@dev-arch.thelio-3990X>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 10 May 2022 16:50:47 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgAk3NEJ2PHtb0jXzCUOGytiHLq=rzjkFKfpiuH-SROgA@mail.gmail.com>
+Message-ID: <CAHk-=wgAk3NEJ2PHtb0jXzCUOGytiHLq=rzjkFKfpiuH-SROgA@mail.gmail.com>
+Subject: Re: [GIT PULL] virtio: last minute fixup
+To:     Nathan Chancellor <nathan@kernel.org>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+        KVM list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        Netdev <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        mie@igel.co.jp
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 10, 2022, Jim Mattson wrote:
-> From: David Matlack <dmatlack@google.com>
-> 
-> Include the value of the "VM-instruction error" field from the current
-> VMCS (if any) in the error message for VMCLEAR and VMPTRLD, since each
-> of these instructions may result in more than one VM-instruction
-> error. Previously, this field was only reported for VMWRITE errors.
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> [Rebased and refactored code; dropped the error number for INVVPID and
-> INVEPT; reworded commit message.]
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> ---
+On Tue, May 10, 2022 at 4:12 PM Nathan Chancellor <nathan@kernel.org> wrote:
+>
+> For what it's worth, as someone who is frequently tracking down and
+> reporting issues, a link to the mailing list post in the commit message
+> makes it much easier to get these reports into the right hands, as the
+> original posting is going to have all relevant parties in one location
+> and it will usually have all the context necessary to triage the
+> problem.
 
-I do think it'd be worthwhile to add the safe VMREAD variant, but I don't care
-enough to hold this up.
+Honestly, I think such a thing would be trivial to automate with
+something like just a patch-id lookup, rather than a "Link:".
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+And such a lookup model ("where was this patch posted") would work for
+<i>any</i> patch (and often also find previous unmodified versions of
+it when it has been posted multiple times).
+
+I suspect that most of the building blocks of such automation
+effectively already exists, since I think the lore infrastructure
+already integrates with patchwork, and patchwork already has a "look
+up by patch id".
+
+Wouldn't it be cool if you had some webby interface to just go from
+commit SHA1 to patch ID to a lore.kernel.org lookup of where said
+patch was done?
+
+Of course, I personally tend to just search by the commit contents
+instead, which works just about as well. If the first line of the
+commit isn't very unique, add a "f:author" to the search.
+
+IOW, I really don't find much value in the "Link to original
+submission", because that thing is *already* trivial to find, and the
+lore search is actually better in many ways (it also tends to find
+people *reporting* that commit, which is often what you really want -
+the reason you're doing the search is that there's something going on
+with it).
+
+My argument here really is that "find where this commit was posted" is
+
+ (a) not generally the most interesting thing
+
+ (b) doesn't even need that "Link:" line.
+
+but what *is* interesting, and where the "Link:" line is very useful,
+is finding where the original problem that *caused* that patch to be
+posted in the first place.
+
+Yes, obviously you can find that original problem by searching too if
+the commit message has enough other information.
+
+For example, if there is an oops quoted in the commit message, I have
+personally searched for parts of that kind of information to find the
+original report and discussion.
+
+So that whole "searching is often an option" is true for pretty much
+_any_ Link:, but I think that for the whole "original submission" it's
+so mindless and can be automated that it really doesn't add much real
+value at all.
+
+                Linus
