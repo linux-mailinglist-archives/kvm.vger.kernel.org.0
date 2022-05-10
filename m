@@ -2,112 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D027521D32
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 16:54:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E266A521D41
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 16:56:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241526AbiEJO54 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 10:57:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40052 "EHLO
+        id S243242AbiEJPAq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 11:00:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345575AbiEJO4m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 10:56:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7F572253A99
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 07:18:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652192314;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QGYK88UZJWEVyRD6vfXo2WqFPdtVoF7sXPHaKmqNeAo=;
-        b=JB3/9BCquv1KrUA75KfxUcmSdSkc3jIHwKKk026gWeINwr2t6VcEbg4dJUaiPsXomWszzn
-        l/AIUXRioDDpPEp5hzaG30B3GiH2Bls3e5MLDD34fTypCjMqL7C6Y2EEIjkKlQ6oy/MqF7
-        33eTaOTLIgVOZfSeObCqIe9adMWBJqI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-433-1FHsbXqgOVWc-IUIPob2nQ-1; Tue, 10 May 2022 10:18:33 -0400
-X-MC-Unique: 1FHsbXqgOVWc-IUIPob2nQ-1
-Received: by mail-wm1-f71.google.com with SMTP id c62-20020a1c3541000000b0038ec265155fso1369637wma.6
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 07:18:33 -0700 (PDT)
+        with ESMTP id S1345194AbiEJPAf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 11:00:35 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF00E12816C
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 07:22:15 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d22so16857499plr.9
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 07:22:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=96fSaQwSEKdzhJug6s/ISEl8NYk3c2RDSas8DqlcA5w=;
+        b=g574joSyahf6XWUX/Lnob9ZLo6UrKXwHHmmJyn3M7gflnngYL0fXMZ1GNnLQlZNRnO
+         lk1H5/5/wVOIblC31ckvcokOutL/YExJkjcuVR3T2aK7vXTFv5WsT2sm9GnRnSlUwAJL
+         GIXZOHO5Rk8fbMXWLU/J8pwIFvck+ueAanIhtgjqHd90RDfeuHLW5zqqUefkfxGxXWdQ
+         Yr2E5nzKPeusenjIgtCSSq6YxaNo97VjySQmB21ZsX7DbJSOQynOuVzf49YfJJhkCQVS
+         7sh9FDYfv60HN0muf43DXOEQ7EI1i4Qkdr0Dq7qcDTmuP6SDwupLx+btugKqr0WD9g9p
+         1iwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=QGYK88UZJWEVyRD6vfXo2WqFPdtVoF7sXPHaKmqNeAo=;
-        b=QNkarRiTXtVuZw4WJ33qV4svNPoeIv+a1zz7vVs2RojLr7yEltrZiDADBlQYqofKJO
-         3nfQJ8JI6Jl5ZDVOjKOAM5vNfIiOyAAxZSTTIm5NlepBZLz+Z+3yYClDLKgcpjAHT2go
-         jTSYBq7Lvi4AKqbvrc1rJUsN2QC+gtdkW2Y8UlHC3asOD/7cK4GEtX3gxjI+Fkbp9akN
-         SHEgGKDrJ97M5fqp72OTX1y7fB4a4Zng2b3F1EADjRw/Z+wvZ+wkWFpAGSItxtw8obnG
-         IAhO/X9WXWL3II5D+uwof8EF9ivkQBQfFh+xO2LqJM0YPI/iULRhP0QRNhaA29NCx5dv
-         FcLg==
-X-Gm-Message-State: AOAM530EqXg3gG5PiUnIMXqk+ZaEKuQxy5sx3CeWnyBu6aYie6jllSD+
-        UYSj/p0zcECXJ2Hux8mX/Kaua4OqYWnesMtiNQqOfRruwJp4hc3zxGOExEgHuvBGFWvRKcJcNdR
-        HczlWD/lElTxR
-X-Received: by 2002:a1c:19c1:0:b0:393:a19f:8f95 with SMTP id 184-20020a1c19c1000000b00393a19f8f95mr231824wmz.149.1652192312108;
-        Tue, 10 May 2022 07:18:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzko/Pns2c5QC49wGZyq5NONIjEnLByjUJscWG/J/kkEjaVqsytoyWOTPsh3g7gNdNpRF39rw==
-X-Received: by 2002:a1c:19c1:0:b0:393:a19f:8f95 with SMTP id 184-20020a1c19c1000000b00393a19f8f95mr231809wmz.149.1652192311855;
-        Tue, 10 May 2022 07:18:31 -0700 (PDT)
-Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.googlemail.com with ESMTPSA id ba28-20020a0560001c1c00b0020c86a9f33bsm16161116wrb.18.2022.05.10.07.18.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 May 2022 07:18:31 -0700 (PDT)
-Message-ID: <80ddc8a2-41c6-4e12-62f9-7acd51cabdb7@redhat.com>
-Date:   Tue, 10 May 2022 16:18:26 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH] KVM: LAPIC: Narrow down the timer fastpath to tscdeadline
- timer
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <kernellwp@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=96fSaQwSEKdzhJug6s/ISEl8NYk3c2RDSas8DqlcA5w=;
+        b=m99BlnLeD9/282K6ALQnc0vQxp1d6WHKTTkAChfsrrpFjq9xCYF7DwgQkHExdgnsS4
+         iyLDS4idyn9YGQpxbClxGw22YSnexxFoeBa42DuQJgacW1WMobSsNmmyrmKEUeRt0WQ3
+         Gan6vY5zgsKaP4cqx5CU8M89GchGvQyvV9tTg5Ii8ZD5I+w9uS/H069vX0cT+4GABo73
+         YyutdIJ+7mgBEPkxEPfeG9WWncOYXBSaZ6h0/ughZUG4wibn0LmbsE2PyJcakUTm4mBR
+         CDacn9xk3xzZ0wCuKQ4dzjkLU8O+PqteoYIKi5+1VV3we2c18TxMtv4zsGEphtkHet2c
+         Ii9A==
+X-Gm-Message-State: AOAM533LkauR8DlAd7c9DGQFprNj7Txtb6QOMJ3JW6TG6exaOKLuT1QM
+        PXJTG7pWsqbpc7LVIFiNLOHNSw==
+X-Google-Smtp-Source: ABdhPJx7PsVQomRvckqYDAybqAGOiMLH95hlWgarTNYXO+eMC+95JlU0QlBLIWIa984tkMCt6p0LIg==
+X-Received: by 2002:a17:90b:3e84:b0:1dc:5942:af0e with SMTP id rj4-20020a17090b3e8400b001dc5942af0emr235327pjb.61.1652192535114;
+        Tue, 10 May 2022 07:22:15 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id p6-20020a170902bd0600b0015e8d4eb265sm2088260pls.175.2022.05.10.07.22.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 May 2022 07:22:14 -0700 (PDT)
+Date:   Tue, 10 May 2022 14:22:11 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jon Kohler <jon@nutanix.com>
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <1651830457-11284-1-git-send-email-wanpengli@tencent.com>
- <YnpzetR/B3nXVJxu@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YnpzetR/B3nXVJxu@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        Joerg Roedel <joro@8bytes.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Balbir Singh <sblbir@amazon.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Waiman Long <longman@redhat.com>
+Subject: Re: [PATCH v3] x86/speculation, KVM: only IBPB for
+ switch_mm_always_ibpb on vCPU load
+Message-ID: <Ynp1E73OZtXudLUH@google.com>
+References: <YmwZYEGtJn3qs0j4@zn.tnic>
+ <645E4ED5-F6EE-4F8F-A990-81F19ED82BFA@nutanix.com>
+ <Ymw9UZDpXym2vXJs@zn.tnic>
+ <YmxKqpWFvdUv+GwJ@google.com>
+ <YmxRnwSUBIkOIjLA@zn.tnic>
+ <Ymxf2Jnmz5y4CHFN@google.com>
+ <YmxlHBsxcIy8uYaB@zn.tnic>
+ <YmxzdAbzJkvjXSAU@google.com>
+ <Ym0GcKhPZxkcMCYp@zn.tnic>
+ <4E46337F-79CB-4ADA-B8C0-009E7500EDF8@nutanix.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4E46337F-79CB-4ADA-B8C0-009E7500EDF8@nutanix.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/10/22 16:15, Sean Christopherson wrote:
->>   
->> -static fastpath_t handle_fastpath_preemption_timer(struct kvm_vcpu *vcpu)
->> +static bool __handle_preemption_timer(struct kvm_vcpu *vcpu)
->>   {
->>   	struct vcpu_vmx *vmx = to_vmx(vcpu);
->>   
->>   	if (!vmx->req_immediate_exit &&
->>   	    !unlikely(vmx->loaded_vmcs->hv_timer_soft_disabled)) {
->>   		kvm_lapic_expired_hv_timer(vcpu);
->> -		return EXIT_FASTPATH_REENTER_GUEST;
->> +		return true;
->>   	}
->>   
->> +	return false;
-> It's a bit odd for the non-fastpath case, but I'd prefer to return fastpath_t
-> instead of a bool from the inner helper, e.g.
+On Sat, Apr 30, 2022, Jon Kohler wrote:
 > 
+> > On Apr 30, 2022, at 5:50 AM, Borislav Petkov <bp@alien8.de> wrote:
+> > So let me try to understand this use case: you have a guest and a bunch
+> > of vCPUs which belong to it. And that guest gets switched between those
+> > vCPUs and KVM does IBPB flushes between those vCPUs.
+> > 
+> > So either I'm missing something - which is possible - but if not, that
+> > "protection" doesn't make any sense - it is all within the same guest!
+> > So that existing behavior was silly to begin with so we might just as
+> > well kill it.
+> 
+> Close, its not 1 guest with a bunch of vCPU, its a bunch of guests with
+> a small amount of vCPUs, thats the small nuance here, which is one of 
+> the reasons why this was hard to see from the beginning. 
+> 
+> AFAIK, the KVM IBPB is avoided when switching in between vCPUs
+> belonging to the same vmcs/vmcb (i.e. the same guest), e.g. you could 
+> have one VM highly oversubscribed to the host and you wouldn’t see
+> either the KVM IBPB or the switch_mm IBPB. All good. 
 
-Yeah, enum > bool almost always (or negative errno).  But I also agree 
-that using the fast path for periodic or oneshot timers is not 
-inherently a bad idea.
-
-Paolo
-
+No, KVM does not avoid IBPB when switching between vCPUs in a single VM.  Every
+vCPU has a separate VMCS/VMCB, and so the scenario described above where a single
+VM has a bunch of vCPUs running on a limited set of logical CPUs will emit IBPB
+on every single switch.
