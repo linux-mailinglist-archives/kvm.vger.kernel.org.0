@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF6675209E5
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 02:16:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49BED5209E6
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 02:16:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233442AbiEJAUl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 20:20:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53650 "EHLO
+        id S232550AbiEJAUm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 20:20:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233436AbiEJAUh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 20:20:37 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A899E50B1C
-        for <kvm@vger.kernel.org>; Mon,  9 May 2022 17:16:38 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id cw22-20020a056a00451600b0050e09a0c53aso5401500pfb.2
-        for <kvm@vger.kernel.org>; Mon, 09 May 2022 17:16:38 -0700 (PDT)
+        with ESMTP id S233364AbiEJAUi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 20:20:38 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB851532C6
+        for <kvm@vger.kernel.org>; Mon,  9 May 2022 17:16:40 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id x4-20020a1709028ec400b0015e84d42eaaso9030347plo.7
+        for <kvm@vger.kernel.org>; Mon, 09 May 2022 17:16:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=J9SU8jSKgh6uBb3migUTzAXRu9j22K1MxFAJt62NpsI=;
-        b=MSKWPMWuXeOjKPRzEUOdQO7zLqBE+AKJCoK07GnCviMAvxRAyC9qNOMuPdFxMxQdKV
-         kskQHmTvrbZqWVGccgkaEzvI67c7QCq4lRe72ySYYD+HEIwDsUoHMOxv78uCtQwzPLrZ
-         nhNif7j/z5j67cdu/WE6+5gdEr1N6/0ockMOvI9vWPAoTjzkumGWLSZjV1lFnijesIY1
-         9yrgYpGj4/wnyx7MKWdloIIqSE8IV+pFVuFWYLAH7ltUY7CJ48dcflFDMp/NNTtjD9Of
-         Q5mCrGDHeDGrMVNFL6+UUVfr+KLi47llh7lira2uRO93QUlupiggN7n3B/nYlZCPb+Iq
-         HoZA==
+        bh=jtn+rVy5vFlg0k3tzksKYO7fwuFm1nz+SKgrvpccqO4=;
+        b=fUGRpBAoCkqT7n74Z675y3/12Wkx7hwCvOmct9eVuSEwE1WW3AzyvgJIVesu6rtn3U
+         XMmu3nIvouN5arf49cGMGlDIaM//Iua1rJiXyoo+s8MVOB5Q2HmRR8L4GWBINc3Md93G
+         ot9MzsJYBKbsw02lO1VvvMNbmeIOaP1rY8E1/9bed6ZDRFvSdvtEDI+buwpuJwXsezdX
+         A6gSAGwCNAMgoy9ZcsBE1p/5iX0Y1lhebLBMghyUfDWzc4MAUKDCq+nGg1BdGbqFHesI
+         ltD+zY4r6alW5mse5VZcjAKlTmwhYO5YbwH1ut+P6e9pccep3WKVRoQLNzTqFwyZ45yZ
+         OdAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=J9SU8jSKgh6uBb3migUTzAXRu9j22K1MxFAJt62NpsI=;
-        b=Oqu2+FXCV7UYMvHzxRSgYUp6h6L33sUQMhURJ6RFHzAdaNnCAAAcp2uzAyoPRZLBvN
-         bnkpvmiL3yi3McadOwUxPDhaEm3FLPooQnbbeq81k7EXXIGApBmsdsgf2Xl/tliAz/GT
-         9tTzqDe0lKYQMZcBjLIiXAxBceTXSF/K/+9szZ4ZgnkoZXOjJY2r77nxFxmfeg+4lxZa
-         2khuqM4h20qk4K4tu78lmaJ1lRnMyMzFC9dqmyZOK/8Vk3czCckDCe4qWLOK9miY3N8d
-         YfWbNsPWctqDrV5Jk6HkHsVKwOOOtnLj/O2rOoX9KtzEwtpDF1aW7e1/K7Qt1gcoJCo/
-         lxww==
-X-Gm-Message-State: AOAM532ajARmJC2Sg7P63BDZia3/GH116Uq03tb3ecvDx1IEOVKlRAkJ
-        aVMBWHc91dN1wT99BtoIvgkMdHKsDd98sPSYfa7sp1wxe0xMLQDMqphSwzhtsdwHemz/ucgpfF+
-        g48FpmDbB6OoVeql/2hWq0XaSTFDpf908t7PSKyYzlC8+bwCiAHjgawm82zmGKI4=
-X-Google-Smtp-Source: ABdhPJxxEKHMFVa84Sj8gQlhRu0hArTENa713cCw2C4bSqBV+TEx4yXBkkJ67jV31zsTabD2XsdMLidz9RDPKg==
+        bh=jtn+rVy5vFlg0k3tzksKYO7fwuFm1nz+SKgrvpccqO4=;
+        b=QK2rzOtQXTaau6yBBljLLS7pV5wYuUZN75ZytrTV4PJJ2f8gaWbiHTTQI3xuLXRlJc
+         +GGjLrHIA4YFkl7Zu/9ql6FDsvJe9D/y4aC2BOjRq5yIRLoil4re8qbydNbToSiHTNK+
+         Xt8I/KbUadir2aMLdedBMEhODsC9tr/Bp/LGmwS347l7+WdxTUT1MTge0csM+c1KdiVR
+         qFnvEIYm2mcB7bROAboqUa9IfIkRC1yh4q87riG4bajsgo+QCfROoBH1s1r0mzRYauHH
+         zpHmjc2R82D2jjmqem5ZpBQ6clDAJlBJFB2OEjkvSUsNN+ybT1O3CYDpgd2N+sCshRcB
+         lMOg==
+X-Gm-Message-State: AOAM5324Lylnl+1rDbHFcFqWUSZn4eF5g+xATC5+Sy58UAQirm02GqD1
+        87oHM+mOAkSHOrzz78KxrborFxMY8k+a8vyVN4Vua5LRskjMdVDUw4ivI8Yp0bWCOwoATGmD8vf
+        Y1JfWSR54pp0XYZ7ynNrCzcCt4kLM59xERGrrdrJbOJBUHiTpQJd7b4UC/v/FEv4=
+X-Google-Smtp-Source: ABdhPJw75WhU7x216GZ5pXYXnYnVOqapAJKG1SX2v5lk7tXXUt3ABvyI99lLinSyLV51ay6xX6wWq0nuPuuF0A==
 X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a05:6a00:1950:b0:510:739f:a32c with SMTP
- id s16-20020a056a00195000b00510739fa32cmr17950017pfk.77.1652141797773; Mon,
- 09 May 2022 17:16:37 -0700 (PDT)
-Date:   Mon,  9 May 2022 17:16:30 -0700
+ (user=ricarkol job=sendgmr) by 2002:a17:902:b418:b0:15f:713:c914 with SMTP id
+ x24-20020a170902b41800b0015f0713c914mr9990362plr.171.1652141799472; Mon, 09
+ May 2022 17:16:39 -0700 (PDT)
+Date:   Mon,  9 May 2022 17:16:31 -0700
 In-Reply-To: <20220510001633.552496-1-ricarkol@google.com>
-Message-Id: <20220510001633.552496-2-ricarkol@google.com>
+Message-Id: <20220510001633.552496-3-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20220510001633.552496-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.36.0.512.ge40c2bad7a-goog
-Subject: [PATCH v3 1/4] KVM: arm64: vgic: Check that new ITEs could be saved
- in guest memory
+Subject: [PATCH v3 2/4] KVM: arm64: vgic: Add more checks when restoring ITS tables
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     pbonzini@redhat.com, maz@kernel.org, andre.przywara@arm.com,
@@ -71,113 +70,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Try to improve the predictability of ITS save/restores by failing
-commands that would lead to failed saves. More specifically, fail any
-command that adds an entry into an ITS table that is not in guest
-memory, which would otherwise lead to a failed ITS save ioctl. There
-are already checks for collection and device entries, but not for
-ITEs.  Add the corresponding check for the ITT when adding ITEs.
+Try to improve the predictability of ITS save/restores (and debuggability
+of failed ITS saves) by failing early on restore when trying to read
+corrupted tables.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Restoring the ITS tables does some checks for corrupted tables, but not as
+many as in a save: an overflowing device ID will be detected on save but
+not on restore.  The consequence is that restoring a corrupted table won't
+be detected until the next save; including the ITS not working as expected
+after the restore.  As an example, if the guest sets tables overlapping
+each other, which would most likely result in some corrupted table, this is
+what we would see from the host point of view:
+
+	guest sets base addresses that overlap each other
+	save ioctl
+	restore ioctl
+	save ioctl (fails)
+
+Ideally, we would like the first save to fail, but overlapping tables could
+actually be intended by the guest. So, let's at least fail on the restore
+with some checks: like checking that device and event IDs don't overflow
+their tables.
+
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arch/arm64/kvm/vgic/vgic-its.c | 47 +++++++++++++++++++++++++---------
- 1 file changed, 35 insertions(+), 12 deletions(-)
+ arch/arm64/kvm/vgic/vgic-its.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 2e13402be3bd..93a5178374c9 100644
+index 93a5178374c9..8a7db839e3bf 100644
 --- a/arch/arm64/kvm/vgic/vgic-its.c
 +++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -894,6 +894,18 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
- 	return update_affinity(ite->irq, vcpu);
- }
+@@ -2198,6 +2198,9 @@ static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
+ 	if (!collection)
+ 		return -EINVAL;
  
-+static bool __is_visible_gfn_locked(struct vgic_its *its, gpa_t gpa)
-+{
-+	gfn_t gfn = gpa >> PAGE_SHIFT;
-+	int idx;
-+	bool ret;
++	if (!vgic_its_check_event_id(its, dev, event_id))
++		return -EINVAL;
 +
-+	idx = srcu_read_lock(&its->dev->kvm->srcu);
-+	ret = kvm_is_visible_gfn(its->dev->kvm, gfn);
-+	srcu_read_unlock(&its->dev->kvm->srcu, idx);
-+	return ret;
-+}
+ 	ite = vgic_its_alloc_ite(dev, collection, event_id);
+ 	if (IS_ERR(ite))
+ 		return PTR_ERR(ite);
+@@ -2319,6 +2322,7 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+ 				void *ptr, void *opaque)
+ {
+ 	struct its_device *dev;
++	u64 baser = its->baser_device_table;
+ 	gpa_t itt_addr;
+ 	u8 num_eventid_bits;
+ 	u64 entry = *(u64 *)ptr;
+@@ -2339,6 +2343,9 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+ 	/* dte entry is valid */
+ 	offset = (entry & KVM_ITS_DTE_NEXT_MASK) >> KVM_ITS_DTE_NEXT_SHIFT;
+ 
++	if (!vgic_its_check_id(its, baser, id, NULL))
++		return -EINVAL;
 +
- /*
-  * Check whether an ID can be stored into the corresponding guest table.
-  * For a direct table this is pretty easy, but gets a bit nasty for
-@@ -908,9 +920,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- 	u64 indirect_ptr, type = GITS_BASER_TYPE(baser);
- 	phys_addr_t base = GITS_BASER_ADDR_48_to_52(baser);
- 	int esz = GITS_BASER_ENTRY_SIZE(baser);
--	int index, idx;
--	gfn_t gfn;
--	bool ret;
-+	int index;
- 
- 	switch (type) {
- 	case GITS_BASER_TYPE_DEVICE:
-@@ -933,12 +943,11 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- 			return false;
- 
- 		addr = base + id * esz;
--		gfn = addr >> PAGE_SHIFT;
- 
- 		if (eaddr)
- 			*eaddr = addr;
- 
--		goto out;
-+		return __is_visible_gfn_locked(its, addr);
- 	}
- 
- 	/* calculate and check the index into the 1st level */
-@@ -964,16 +973,30 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- 	/* Find the address of the actual entry */
- 	index = id % (SZ_64K / esz);
- 	indirect_ptr += index * esz;
--	gfn = indirect_ptr >> PAGE_SHIFT;
- 
- 	if (eaddr)
- 		*eaddr = indirect_ptr;
- 
--out:
--	idx = srcu_read_lock(&its->dev->kvm->srcu);
--	ret = kvm_is_visible_gfn(its->dev->kvm, gfn);
--	srcu_read_unlock(&its->dev->kvm->srcu, idx);
--	return ret;
-+	return __is_visible_gfn_locked(its, indirect_ptr);
-+}
-+
-+/*
-+ * Check whether an event ID can be stored in the corresponding Interrupt
-+ * Translation Table, which starts at device->itt_addr.
-+ */
-+static bool vgic_its_check_event_id(struct vgic_its *its, struct its_device *device,
-+		u32 event_id)
-+{
-+	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
-+	int ite_esz = abi->ite_esz;
-+	gpa_t gpa;
-+
-+	/* max table size is: BIT_ULL(device->num_eventid_bits) * ite_esz */
-+	if (event_id >= BIT_ULL(device->num_eventid_bits))
-+		return false;
-+
-+	gpa = device->itt_addr + event_id * ite_esz;
-+	return __is_visible_gfn_locked(its, gpa);
- }
- 
- static int vgic_its_alloc_collection(struct vgic_its *its,
-@@ -1061,7 +1084,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 	if (!device)
- 		return E_ITS_MAPTI_UNMAPPED_DEVICE;
- 
--	if (event_id >= BIT_ULL(device->num_eventid_bits))
-+	if (!vgic_its_check_event_id(its, device, event_id))
- 		return E_ITS_MAPTI_ID_OOR;
- 
- 	if (its_cmd_get_command(its_cmd) == GITS_CMD_MAPTI)
+ 	dev = vgic_its_alloc_device(its, id, itt_addr, num_eventid_bits);
+ 	if (IS_ERR(dev))
+ 		return PTR_ERR(dev);
 -- 
 2.36.0.512.ge40c2bad7a-goog
 
