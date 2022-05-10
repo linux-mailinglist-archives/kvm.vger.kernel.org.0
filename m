@@ -2,81 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 44D775209C3
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 01:59:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E7A15209E9
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 02:16:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231280AbiEJADf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 20:03:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54610 "EHLO
+        id S233472AbiEJAUj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 20:20:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230423AbiEJADc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 20:03:32 -0400
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 290D32BAE7E
-        for <kvm@vger.kernel.org>; Mon,  9 May 2022 16:59:37 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id 16so18910060lju.13
-        for <kvm@vger.kernel.org>; Mon, 09 May 2022 16:59:37 -0700 (PDT)
+        with ESMTP id S233429AbiEJAUg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 20:20:36 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24B7C50054
+        for <kvm@vger.kernel.org>; Mon,  9 May 2022 17:16:37 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id c13-20020a170903234d00b0015eee4c8ca3so5799449plh.6
+        for <kvm@vger.kernel.org>; Mon, 09 May 2022 17:16:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=sv3pTpJTnWXaUyOjFBwaWrS/CLWAom11yfRsP9pioX8=;
-        b=VF6L1TPfm2H2grwGvQxjXB/rArUophBvKMYmM/4AEEpeIZrYdUdTkfOBkEk4BEbWI2
-         /BgJZ8DPOFsMFZ5/prlhmlOCXI7dMWlqrjCriPK4EOPMoBMidR/ccweduFs1gDKmRT2a
-         jSe0+YixmYg86Fdp+ChmxZ0pmebT4hiwVv3DgQ+7zzAAdiclAHaSsZx+fOvRaoxK4gQl
-         ntcTyXAntp2EDiFAzJWUKf/TOAG3zn5txtEp+PpXundea+M6c7weB3Tkwug4AMtjQHXw
-         PJuQq1IbklNK0Aix9p1bGOaT0nnOf65MjY4stPTNcj1Kn4OveQSBaQvqSlsF5pHRI33D
-         4PtQ==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=6oKSjCnrnaDJ0MjaoXbtw04iHzdq0yCq1lYPhCeQzvw=;
+        b=BMg0uyyPoG1R2H7dLqoVSs50fr5+oYtt/E+68BORI5NJcBRDJVFWvQ3XVgro9rnlrn
+         Kt97Wd64Hi/KrqXr/jXiBO9X2wkOW7QlNHSdz0CRoCs1STab9+grOz4Jh3vkrviWxe+Z
+         3m1FqSTcIiEXs2I/kbzFnnY/g188Bf3oGlhunltmQ95crEA+A2LuzG+8ue7SKBcWHdKh
+         3fpqwlNuh8y9SZvznMLH9iQkv4NQhFo551q8cHvUfEBewsnCp63qJzvN0OCM0XeX89uy
+         rVWrMy8S16izRtzCzZWNtpXX7L0fgq2iIDUSYMVqqQzVVih5qc9yCLIVl3mo2UnHS9pA
+         +cJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sv3pTpJTnWXaUyOjFBwaWrS/CLWAom11yfRsP9pioX8=;
-        b=xM+NkFSB+Hb6/Ggb44n0txFEHHPRcrvF0EdLHZeS1oM47aEyC+dKNrf7bmYGRq8ft3
-         XPmeYFACLFKkt4KNb5juwINPcFw0gFqyC7TCWX6fhbetxpdt9bl9/2RgoOf5bEF6nCbh
-         FC37xswgxQ4acaOLpVOzMlVTi5+TgmJFS9BI8Haafbka7Ywae2+6nfBHBbxfKY1hlccD
-         AoMDQX+80X+Kla40fSOU9Csn0JdejpOpatCmZ5MkmMgWWsB+wC4kK6qK0oOaMOR2AuQF
-         F0oOc7lbVH4FB2H+C57xPKBvVQ63xU7gX0qzSfx+2583D1kJonK2IQ+VJPtcqy3sSYNu
-         kO/A==
-X-Gm-Message-State: AOAM531tPpBeIpisENyxPAhwY4+VnwbPKMLoHNK9zlWSpNbWm+iva7EW
-        6bKlU7rr7t2hJ8yHa1N9egLS8t0DIOMz3GVtmPc45A==
-X-Google-Smtp-Source: ABdhPJzzfhA9KvrCN94ITvdKe/AlJljESk7ftI2Q4cbLmACU7hg6vyw4MuMeMX20juJBAyGaRDpk8iTGMDcKRMFMUho=
-X-Received: by 2002:a2e:9e54:0:b0:250:d6c8:c2a6 with SMTP id
- g20-20020a2e9e54000000b00250d6c8c2a6mr1219325ljk.16.1652140775207; Mon, 09
- May 2022 16:59:35 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220422210546.458943-1-dmatlack@google.com> <20220422210546.458943-12-dmatlack@google.com>
- <YnRerE5+FpwkUdQE@google.com> <CALzav=de1=euis3WocTNBi+xNn1Ypo-GRROQNqmtAKk6q1NUqg@mail.gmail.com>
- <YnmcOdZILo2LqhAW@google.com>
-In-Reply-To: <YnmcOdZILo2LqhAW@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 9 May 2022 16:59:08 -0700
-Message-ID: <CALzav=cPS82CyXD-90_K+pTaxBVDQicJ0er+LFdns5TqxA6ubA@mail.gmail.com>
-Subject: Re: [PATCH v4 11/20] KVM: x86/mmu: Allow for NULL vcpu pointer in __kvm_mmu_get_shadow_page()
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=6oKSjCnrnaDJ0MjaoXbtw04iHzdq0yCq1lYPhCeQzvw=;
+        b=Lwd5GjjjLmEJpD2gNv6wKOef6UD0mcKVP/jDxNyhlzbp7r1st0f1UWAtiIBiTXfKml
+         WtNA1D8EkmkrnWt/1wdQFNrdNa+uEH0hi8v1kfW12mr68DEvsTgMCvjO/fLbb74Wv7qG
+         Ms2tf5bE9jwFmMnl8yd4Zlm1TBWEpIAbM7e9SXr3hmGoJKCf4v6u4PZGMQbj1fWgmmy2
+         bT162ijOijaR5aktpRHZWnKjCH5al5+ivX381C4sORDaWtg3GAbo/qP2g95bxt7Nyshu
+         Qg0fzysh2f69P4mJcPs7aZRihDxQgCD96ADjf6tAGrcycPOtl6YYXIUQZ2RuZavpT6tM
+         MFxQ==
+X-Gm-Message-State: AOAM532qr+OUm3BBbDuPu7nmyCGEj0dFVT4J6QVbFpz4ktP2nm5TGaaG
+        MtIgo0a5UEPb6uO1A/GYf9ybdKX0MfFwKI1rVpiCQ6O6Uibkk1GBPOfJ68A/2VLtg/9PCP7VKji
+        4cEJRJwgqwD3UQ2uIN8q05fsSvfnxgpMsA9vUTJh+lxYA8zKFooW/7hQeNyhJ/Wc=
+X-Google-Smtp-Source: ABdhPJwC/rHmJWgon7TLj+TannUN3z+nd6cTOgZdagu7p9mijBEZ7uf+GPz7Ci2qlDQpatMnYPdV1Cdn4wo9Mw==
+X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
+ (user=ricarkol job=sendgmr) by 2002:a17:902:ea0f:b0:15e:afcf:d1a4 with SMTP
+ id s15-20020a170902ea0f00b0015eafcfd1a4mr18401436plg.96.1652141796314; Mon,
+ 09 May 2022 17:16:36 -0700 (PDT)
+Date:   Mon,  9 May 2022 17:16:29 -0700
+Message-Id: <20220510001633.552496-1-ricarkol@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.512.ge40c2bad7a-goog
+Subject: [PATCH v3 0/4] KVM: arm64: vgic: Misc ITS fixes
+From:   Ricardo Koller <ricarkol@google.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     pbonzini@redhat.com, maz@kernel.org, andre.przywara@arm.com,
+        drjones@redhat.com, alexandru.elisei@arm.com,
+        eric.auger@redhat.com, oupton@google.com, reijiw@google.com,
+        pshier@google.com, Ricardo Koller <ricarkol@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,199 +66,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 9, 2022 at 3:57 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, May 09, 2022, David Matlack wrote:
-> > On Thu, May 5, 2022 at 4:33 PM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > On Fri, Apr 22, 2022, David Matlack wrote:
-> > > > Allow the vcpu pointer in __kvm_mmu_get_shadow_page() to be NULL. Rename
-> > > > it to vcpu_or_null to prevent future commits from accidentally taking
-> > > > dependency on it without first considering the NULL case.
-> > > >
-> > > > The vcpu pointer is only used for syncing indirect shadow pages in
-> > > > kvm_mmu_find_shadow_page(). A vcpu pointer it not required for
-> > > > correctness since unsync pages can simply be zapped. But this should
-> > > > never occur in practice, since the only use-case for passing a NULL vCPU
-> > > > pointer is eager page splitting which will only request direct shadow
-> > > > pages (which can never be unsync).
-> > > >
-> > > > Even though __kvm_mmu_get_shadow_page() can gracefully handle a NULL
-> > > > vcpu, add a WARN() that will fire if __kvm_mmu_get_shadow_page() is ever
-> > > > called to get an indirect shadow page with a NULL vCPU pointer, since
-> > > > zapping unsync SPs is a performance overhead that should be considered.
-> > > >
-> > > > Signed-off-by: David Matlack <dmatlack@google.com>
-> > > > ---
-> > > >  arch/x86/kvm/mmu/mmu.c | 40 ++++++++++++++++++++++++++++++++--------
-> > > >  1 file changed, 32 insertions(+), 8 deletions(-)
-> > > >
-> > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > > index 04029c01aebd..21407bd4435a 100644
-> > > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > > @@ -1845,16 +1845,27 @@ static void kvm_mmu_commit_zap_page(struct kvm *kvm,
-> > > >         &(_kvm)->arch.mmu_page_hash[kvm_page_table_hashfn(_gfn)])     \
-> > > >               if ((_sp)->gfn != (_gfn) || (_sp)->role.direct) {} else
-> > > >
-> > > > -static int kvm_sync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
-> > > > -                      struct list_head *invalid_list)
-> > > > +static int __kvm_sync_page(struct kvm *kvm, struct kvm_vcpu *vcpu_or_null,
-> > > > +                        struct kvm_mmu_page *sp,
-> > > > +                        struct list_head *invalid_list)
-> > > >  {
-> > > > -     int ret = vcpu->arch.mmu->sync_page(vcpu, sp);
-> > > > +     int ret = -1;
-> > > > +
-> > > > +     if (vcpu_or_null)
-> > >
-> > > This should never happen.  I like the idea of warning early, but I really don't
-> > > like that the WARN is far removed from the code that actually depends on @vcpu
-> > > being non-NULL. Case in point, KVM should have bailed on the WARN and never
-> > > reached this point.  And the inner __kvm_sync_page() is completely unnecessary.
-> >
-> > Yeah that's fair.
-> >
-> > >
-> > > I also don't love the vcpu_or_null terminology; I get the intent, but it doesn't
-> > > really help because understand why/when it's NULL.
-> >
-> > Eh, I don't think it needs to encode why or when. It just needs to
-> > flag to the reader (and future code authors) that this vcpu pointer
-> > (unlike all other vcpu pointers in KVM) is NULL in certain cases.
->
-> My objection is that without the why/when, developers that aren't familiar with
-> this code won't know the rules for using vcpu_or_null.  E.g. I don't want to end
-> up with
->
->         if (vcpu_or_null)
->                 do x;
->         else
->                 do y;
->
-> because inevitably it'll become unclear whether or not that code is actually _correct_.
-> It might not #GP on a NULL pointer, but it doesn't mean it's correct.
+The purpose of this series is to help debugging failed ITS saves and
+restores.  Failures can be due to misconfiguration on the guest side:
+tables with bogus base addresses, or the guest overwriting L1 indirect
+tables. KVM can't do much in these cases, but one thing it can do to help
+is raising errors as soon as possible. Here are a couple of cases where
+KVM could do more:
 
-Ah, right. And that's actually why I put the big comment and WARN in
-__kvm_mmu_get_shadow_page(). Readers could easily jump to where
-vcpu_or_null is passed in and see the rules around it. But if we move
-the WARN to the kvm_sync_page() call, I agree it will be harder for
-readers to know the rules and "vcpu_or_null" starts to become a risky
-variable.
+- A command that adds an entry into an ITS table that is not in guest
+  memory should fail, as any command should be treated as if it was
+  actually saving entries in guest memory (KVM doesn't until saving).  KVM
+  does this check for collections and devices (using vgic_its_check_id),
+  but it doesn't for the ITT (Interrupt Translation Table). Commit #1 adds
+  the missing check.
 
->
-> > > I played around with casting, e.g. to/from an unsigned long or void *, to prevent
-> > > usage, but that doesn't work very well because 'unsigned long' ends up being
-> > > awkward/confusing, and 'void *' is easily lost on a function call.  And both
-> > > lose type safety :-(
-> >
-> > Yet another shortcoming of C :(
->
-> And lack of closures, which would work very well here.
->
-> > (The other being our other discussion about the RET_PF* return codes
-> > getting easily misinterpreted as KVM's magic return-to-user /
-> > continue-running-guest return codes.)
-> >
-> > Makes me miss Rust!
-> >
-> > >
-> > > All in all, I think I'd prefer this patch to simply be a KVM_BUG_ON() if
-> > > kvm_mmu_find_shadow_page() encounters an unsync page.  Less churn, and IMO there's
-> > > no real loss in robustness, e.g. we'd really have to screw up code review and
-> > > testing to introduce a null vCPU pointer dereference in this code.
-> >
-> > Agreed about moving the check here and dropping __kvm_sync_page(). But
-> > I would prefer to retain the vcpu_or_null name (or at least something
-> > other than "vcpu" to indicate there's something non-standard about
-> > this pointer).
->
-> The least awful idea I've come up with is wrapping the vCPU in a struct, e.g.
->
->         struct sync_page_info {
->                 void *vcpu;
->         }
->
-> That provides the contextual information I want, and also provides the hint that
-> something is odd about the vcpu, which you want.  It's like a very poor man's closure :-)
->
-> The struct could even be passed by value to avoid the miniscule overhead, and to
-> make readers look extra hard because it's that much more wierd.
+- Restoring the ITS tables does some checks for corrupted tables, but not
+  as many as in a save.  For example, a device ID overflowing the table
+  will be detected on save but not on restore.  The consequence is that
+  restoring a corrupted table won't be detected until the next save;
+  including the ITS not working as expected after the restore. As an
+  example, if the guest sets tables overlapping each other, this would most
+  likely result in some corrupted table; and this is what we would see from
+  the host point of view:
 
-Interesting idea. I'll give it a shot.
+	guest sets bogus baser addresses
+	save ioctl
+	restore ioctl
+	save ioctl (fails)
 
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 3d102522804a..068be77a4fff 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2003,8 +2003,13 @@ static void clear_sp_write_flooding_count(u64 *spte)
->         __clear_sp_write_flooding_count(sptep_to_sp(spte));
->  }
->
-> +/* Wrapper to make it difficult to dereference a potentially NULL @vcpu. */
-> +struct sync_page_info {
-> +       void *vcpu;
-> +};
-> +
->  static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm *kvm,
-> -                                                    struct kvm_vcpu *vcpu,
-> +                                                    struct sync_page_info spi,
->                                                      gfn_t gfn,
->                                                      struct hlist_head *sp_list,
->                                                      union kvm_mmu_page_role role)
-> @@ -2041,6 +2046,13 @@ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm *kvm,
->                         goto out;
->
->                 if (sp->unsync) {
-> +                       /*
-> +                        * Getting indirect shadow pages without a valid @spi
-> +                        * is not supported, i.e. this should never happen.
-> +                        */
-> +                       if (KVM_BUG_ON(!spi.vcpu, kvm))
-> +                               break;
-> +
->                         /*
->                          * The page is good, but is stale.  kvm_sync_page does
->                          * get the latest guest state, but (unlike mmu_unsync_children)
-> @@ -2053,7 +2065,7 @@ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm *kvm,
->                          * If the sync fails, the page is zapped.  If so, break
->                          * in order to rebuild it.
->                          */
-> -                       ret = kvm_sync_page(vcpu, sp, &invalid_list);
-> +                       ret = kvm_sync_page(spi.vcpu, sp, &invalid_list);
->                         if (ret < 0)
->                                 break;
->
-> @@ -2120,7 +2132,7 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
->  }
->
->  static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm *kvm,
-> -                                                     struct kvm_vcpu *vcpu,
-> +                                                     struct sync_page_info spi,
->                                                       struct shadow_page_caches *caches,
->                                                       gfn_t gfn,
->                                                       union kvm_mmu_page_role role)
-> @@ -2131,7 +2143,7 @@ static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm *kvm,
->
->         sp_list = &kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
->
-> -       sp = kvm_mmu_find_shadow_page(kvm, vcpu, gfn, sp_list, role);
-> +       sp = kvm_mmu_find_shadow_page(kvm, spi, gfn, sp_list, role);
->         if (!sp) {
->                 created = true;
->                 sp = kvm_mmu_alloc_shadow_page(kvm, caches, gfn, sp_list, role);
-> @@ -2151,7 +2163,11 @@ static struct kvm_mmu_page *kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
->                 .gfn_array_cache = &vcpu->arch.mmu_gfn_array_cache,
->         };
->
-> -       return __kvm_mmu_get_shadow_page(vcpu->kvm, vcpu, &caches, gfn, role);
-> +       struct sync_page_info spi = {
-> +               .vcpu = vcpu,
-> +       };
-> +
-> +       return __kvm_mmu_get_shadow_page(vcpu->kvm, spi, &caches, gfn, role);
->  }
->
->  static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct, u32 access)
->
+  This failed save could happen many days after the first operation, so it
+  would be hard to track down. Commit #2 adds some checks into restore:
+  like checking that the ITE entries are not repeated.
+
+- Restoring a corrupted collection entry is being ignored. Commit #3 fixes
+  this while trying to organize the code so to make the bug more obvious
+  next time.
+
+Finally, failed restores should clean up all intermediate state. Commit #4
+takes care of cleaning up everything created until the restore was deemed a
+failure.
+
+v2: https://lore.kernel.org/kvmarm/20220427184814.2204513-1-ricarkol@google.com/
+v2 -> v3:
+- collect RBs from Eric (Thanks!)
+- reorder check in vgic_its_cmd_handle_mapi (commit 1) [Eric]
+- removed some checks in vgic_its_restore_ite and vgic_its_restore_dte. [Eric]
+- not skipping dummy end elements when restoring collection tables. [Eric]
+
+v1: https://lore.kernel.org/kvmarm/20220425185534.57011-1-ricarkol@google.com/
+v1 -> v2:
+- moved alloc_collection comment to its respective commit. [marc]
+- refactored check_ite to reuse some code from check_id. [marc]
+- rewrote all commit messages. [marc]
+
+Tested with kvm-unit-tests ITS tests.
+
+Ricardo Koller (4):
+  KVM: arm64: vgic: Check that new ITEs could be saved in guest memory
+  KVM: arm64: vgic: Add more checks when restoring ITS tables
+  KVM: arm64: vgic: Do not ignore vgic_its_restore_cte failures
+  KVM: arm64: vgic: Undo work in failed ITS restores
+
+ arch/arm64/kvm/vgic/vgic-its.c | 96 +++++++++++++++++++++++++++-------
+ 1 file changed, 78 insertions(+), 18 deletions(-)
+
+-- 
+2.36.0.512.ge40c2bad7a-goog
+
