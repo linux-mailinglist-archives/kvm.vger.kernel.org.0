@@ -2,63 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 71E4C5226CF
-	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 00:24:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A04EC5226FA
+	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 00:40:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235892AbiEJWYV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 18:24:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60706 "EHLO
+        id S236976AbiEJWks (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 18:40:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235877AbiEJWYR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 18:24:17 -0400
-Received: from mail-oo1-xc33.google.com (mail-oo1-xc33.google.com [IPv6:2607:f8b0:4864:20::c33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEF7B28ED34
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 15:24:16 -0700 (PDT)
-Received: by mail-oo1-xc33.google.com with SMTP id bm18-20020a056820189200b0035f7e56a3dfso272517oob.8
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 15:24:16 -0700 (PDT)
+        with ESMTP id S236975AbiEJWkr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 18:40:47 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69C2422BD3
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 15:40:46 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id u1-20020a17090a2b8100b001d9325a862fso234509pjd.6
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 15:40:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aBb2Acx4ZQsS24OdCgBPUHO+9Y3VhgqXr7HO20qkXpk=;
-        b=qKikUQYzjr0La5+bezLa6p5PXSGp7DMTHsgzfyq9dM4lwwngClnXNieeszKwWPfxPT
-         mEYEQDHTvhNmluvw5t3ejmwqS4ecZfEsQOh7TktEuKMtvV7DiEvJ9/9ZJGAchjlgdoB3
-         mqj1r9Q5qnGD7aGs/c+puAZcaz52G/4FpjfnVQIFniPSORtns0MkWvCDKyOqgydABlUo
-         NgvUr4MnIQkYXneMh6H78+xBQYnRZoO+HaFF8ebd5UtOGOH/2kc6C+REnfRoIfksXsZQ
-         GRLbPO3SnIHMGZcXYXcBIQ6k/9Zaz55mWmXKgrOA8wFetEnkgd6IYd/z+gLbYeJf8sfn
-         Lb0g==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=GasP4zSpz0wP+Fxdc2/cSx85LEMPDIqCeAffi631kMw=;
+        b=CojvtVn+H1DP+OIBOULCieyIdvKK7oaBOVuwoF3G4Tvt48IpKfA6mRckqqofQof9QS
+         gSxFQbS378GbVKlwHRl92tM0vXOpECDVZKQAC/5mVG7O4Nl2Z/B7jgpS1oTEUAI2eBFe
+         AOWfHNT6krhPCDIutWK9mfb5EjwH+QXVPNeG+1N99uxfNpRuHj/qac00RlPg2Frtn+VK
+         p0p0aBMTzmSHvsHGIXiyzyhIJtsXlqEdf3Imd58me5/bBtj5W8/TWKHuWH0E+uDKZbrl
+         bZi6v71FjpDRGOXDriwTDf2X68WGrib3Uk5+F+Tw8rmq/shUl8KvffF0UfBinVBtzgZq
+         RRuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aBb2Acx4ZQsS24OdCgBPUHO+9Y3VhgqXr7HO20qkXpk=;
-        b=ePrVnCWPP888WW/gIgy0MZgUk55bJT6KzzIuLU80RvyvV8O3iZO+HiNtftjh1O3g01
-         LxW/lGuouW6K9NrwPf1m7e8GChiz88Su/8E69tZWHmRU+optZvqPjr6Pb5bs7s1HRtek
-         g+wTfv17KncA3G3yx3jmwz2a3dbUrclE7gH02gP3RqphOeephY8OeotNQW9HCET57uRM
-         Qi5miupi07m8HS29Blt5Neraz8yNkzXJuDH4pSySGVrRAxptuage1Ne2r62s7+4JFEiQ
-         XHAaVqlVbSJYzH/l/3F6M4w0CaugrlDUEvGcXnWoYNfqJmh6kpJlyZvnR3Ed4ClMFIJb
-         TxQQ==
-X-Gm-Message-State: AOAM531TQI7MvsPvyTsOJ/ZK9EUn1IX92+ypDGU05l7b1tfKm4zOPP2e
-        /dFwzKv1czCz5VFJ2gYngL95SvGbuUH3ugvOkrtYOIHucjg=
-X-Google-Smtp-Source: ABdhPJyoFY0Cy4B5DTZ3Hjej3ZFz0kT3mmmrnNFLarE8KLL5ntXlSptA25Rcq132HuPDPUtG8aogCuxFXGURUUwgzGg=
-X-Received: by 2002:a05:6830:1c65:b0:606:3cc:862 with SMTP id
- s5-20020a0568301c6500b0060603cc0862mr8582386otg.75.1652221455801; Tue, 10 May
- 2022 15:24:15 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220508040233.931710-1-jmattson@google.com> <YnqSecml2/Ooc0E/@google.com>
-In-Reply-To: <YnqSecml2/Ooc0E/@google.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=GasP4zSpz0wP+Fxdc2/cSx85LEMPDIqCeAffi631kMw=;
+        b=O+rPfLMkH1vWxiz6f+9O926ndiRi0IKuTx007ONrKtCmcupfGDwDiFv8VesEcLZAo3
+         k6j81GNKYJiqrTpHDoEvrrYoqKKGAc/9k7hcYI9cPgPzZqhbNkA4eJVCdw79hyjcwDVN
+         8i15ivjqSU/wef2qL363c791LAlXgSX88bDs4epq7QCS6bGs1LQT1Kwmg4gqHMfTSVub
+         BPdGEyJId3Wgiii9cmRyeH19pT6pq0sCFqC8QKeoCzviwwhUTFk/0Fp5r7kW3lJ3Zh3J
+         mcOhFX7IA3jRwpD0RLaRNU2OuINi95C46Du2eXGje4YetkMZAm/OemJnc7K5jBvbxqAg
+         WK5Q==
+X-Gm-Message-State: AOAM532iEyooKx1D1E2fffqxt77RNY5SyfD3YkEEFJs6vONy7cTNureK
+        pyGr5YLfhiM3Yw/HzXMVPLY5iB0+iwiKK/QP0POREFz/h7edxZPwmYamCLZkEuRnAMeHBB3usLc
+        0W8IC9dPuOvJufSBtN3YcNj6W+eQBQtU5DOEwBhxsb0OUQVrEP6Wsq/NiBMuZCZ4=
+X-Google-Smtp-Source: ABdhPJxxYWZcyeW//dWNNqL7i1joaNi4D/67a+mIVmdUJaKD8CwIqgkT5KaNii+nW7VQv89TuZ1k6ZU0nWpYOw==
+X-Received: from hawksbill.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:55dc])
+ (user=jmattson job=sendgmr) by 2002:a17:902:ce8b:b0:15e:c249:1bf0 with SMTP
+ id f11-20020a170902ce8b00b0015ec2491bf0mr22269935plg.125.1652222445684; Tue,
+ 10 May 2022 15:40:45 -0700 (PDT)
+Date:   Tue, 10 May 2022 15:40:34 -0700
+Message-Id: <20220510224035.1792952-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.512.ge40c2bad7a-goog
+Subject: [PATCH v3 1/2] KVM: VMX: Print VM-instruction error when it may be helpful
 From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 10 May 2022 22:24:05 +0000
-Message-ID: <CALMp9eQEaWxLTY3d8JRFWdGn6qLuOLTX3y-t+W-mkEzCe3n0hg@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: VMX: Print VM-instruction error when it may be helpful
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
-        David Matlack <dmatlack@google.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com
+Cc:     David Matlack <dmatlack@google.com>,
+        Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,16 +64,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 10, 2022 at 9:27 AM Sean Christopherson <seanjc@google.com> wrote:
+From: David Matlack <dmatlack@google.com>
 
-> >  noinline void vmclear_error(struct vmcs *vmcs, u64 phys_addr)
-> >  {
-> > -     vmx_insn_failed("kvm: vmclear failed: %p/%llx\n", vmcs, phys_addr);
-> > +     vmx_insn_failed("kvm: vmclear failed: %p/%llx err=%d\n",
->
-> I highly doubt it will ever matter, but arguably this should be %u, not %d.
->
+Include the value of the "VM-instruction error" field from the current
+VMCS (if any) in the error message for VMCLEAR and VMPTRLD, since each
+of these instructions may result in more than one VM-instruction
+error. Previously, this field was only reported for VMWRITE errors.
 
-:-@
+Signed-off-by: David Matlack <dmatlack@google.com>
+[Rebased and refactored code; dropped the error number for INVVPID and
+INVEPT; reworded commit message.]
+Signed-off-by: Jim Mattson <jmattson@google.com>
+---
+ v1 -> v2: Dropped changes to invvpid_error and invept_error.
+ v2 -> v3: Changed printf format character from 'd' to 'u'
 
-Okay; I will send out a V3, along with a separate patch to fix VMWRITE.
+ arch/x86/kvm/vmx/vmx.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 610355b9ccce..3a76730584cd 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -392,12 +392,14 @@ noinline void vmwrite_error(unsigned long field, unsigned long value)
+ 
+ noinline void vmclear_error(struct vmcs *vmcs, u64 phys_addr)
+ {
+-	vmx_insn_failed("kvm: vmclear failed: %p/%llx\n", vmcs, phys_addr);
++	vmx_insn_failed("kvm: vmclear failed: %p/%llx err=%u\n",
++			vmcs, phys_addr, vmcs_read32(VM_INSTRUCTION_ERROR));
+ }
+ 
+ noinline void vmptrld_error(struct vmcs *vmcs, u64 phys_addr)
+ {
+-	vmx_insn_failed("kvm: vmptrld failed: %p/%llx\n", vmcs, phys_addr);
++	vmx_insn_failed("kvm: vmptrld failed: %p/%llx err=%u\n",
++			vmcs, phys_addr, vmcs_read32(VM_INSTRUCTION_ERROR));
+ }
+ 
+ noinline void invvpid_error(unsigned long ext, u16 vpid, gva_t gva)
+-- 
+2.36.0.512.ge40c2bad7a-goog
+
