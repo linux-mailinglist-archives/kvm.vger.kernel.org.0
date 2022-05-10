@@ -2,102 +2,227 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 897A35220A9
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 18:05:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 631485220AC
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 18:05:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347052AbiEJQJG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 12:09:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54966 "EHLO
+        id S1347068AbiEJQJI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 12:09:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348510AbiEJQIb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 12:08:31 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 821FE9B181
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 09:01:15 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A08226172A
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 16:01:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 10BACC385C9
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 16:01:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652198474;
-        bh=gC2ZIxdyJv/FhQ1KzXbPDVwwmcd85AVBG1H86sXG1ho=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=m3VS1WheDkmJtsfGt/o3lh/IU7IPjO9k1um4SIklDVt2WF0HN9ewmce+hJiGcM3qf
-         jzI/kPRn8f/YXrNYoB6H4tHuvDRQQ3tSFY8WXMqeBQ8nZIX/BORdv01gR3gETUzqAU
-         T6AZ2cFohVPl9ocJfo0+xi8LUHPsIMZ1CX2TGf1Fzw+TCHaIuElpZdb+05WzHWrVUn
-         X20jTKNpWn1erYyK1DaGWlzyxghq45FkZH2V5F8zAjw3VOOQZ4+t+U9spD+hYhkcVx
-         SittFUHQl/sQePHs9YJ+er4rAKCe+4QKkWHyiwy3/LCJZM2nbfP8ze+mks9bEttb3h
-         3KeN8TlwOFP0g==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id EFDB8CC13B2; Tue, 10 May 2022 16:01:13 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 215964] nVMX: KVM(L0) does not perform a platform reboot when
- guest(L2) trigger a reboot event through IO-Port-0xCF9
-Date:   Tue, 10 May 2022 16:01:13 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: seanjc@google.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-215964-28872-8EZayedt6Z@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215964-28872@https.bugzilla.kernel.org/>
-References: <bug-215964-28872@https.bugzilla.kernel.org/>
+        with ESMTP id S1348607AbiEJQIf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 12:08:35 -0400
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12F561207CC
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 09:01:46 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id m20so33875782ejj.10
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 09:01:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kylehuey.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=IQqjDungLhNlsFUoBaDTydU3nXk77iomYOqP6PkQeXw=;
+        b=Tg2LyNtcAM1bY08NZJR7dqKq1dYW5SIp0LAd41gXn6znu2oBJJDpL4r85XaFKrWO5r
+         fmQLD7L8hj29Bw/zOX9NX83VKP60I52zt5r4aiFgbJpwg2Ni+IUmR8wfqKZ8sPefZJYu
+         jqEID3BfP3pHyDWRJro3VDpl6ljDoNxo2T76yfPbYiAyEA1ndLZak1aJpxhsVnZwXi8q
+         aTzNiyqspHBhvuVWJHF45Nck/eP5yOAHTpne4VXdXx/Ns3qhV8oQFMgX6HllklMw9bLb
+         pzvKjO0G1f7RwGdpiTLOiIDv0XPhqpgSvtwrniCdU91ja9a5Ppt2JBpuPuDQrekcH17F
+         Qhvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=IQqjDungLhNlsFUoBaDTydU3nXk77iomYOqP6PkQeXw=;
+        b=OQtyDwqoTh1gWKK4HLEQYE5nnOuxIB06IAkuxv+7fpwmPsB5uXfGs/fPwIZy+erHdT
+         fIsAnHXWC3IYT49sijN5WX5sxwdBOgcO8hTffKIuMuoc4zdzuCI7nujV9bXvK3iQQE9R
+         JuE/ZLg6c0ZNVHvJB3BhWuueBnRtf2PAHZmkN5NhtTYrz+ommN6MrS5ckACXE/0m+Cdy
+         4PW+jaOCV5QSOX4LcXhBXw1I++d2cDB6EJNDcYSRorPmKEv5/uLtWrPvir5NgeOCFT6N
+         RjFleWdaz2RuwP8ZS+EYqG506GxYFOCPOVZWxmvbhokPYbL6yO2V6hD/I4NXQ8jOdjay
+         BqjQ==
+X-Gm-Message-State: AOAM532aY9olcHZmuU+caY53TAijalWqnoF15d9XLAmdGW9w9DMmZyHF
+        vbuUWoh+MGgZ9K6GWH3Q8skjp7eiotKj8OaOgpWXeQ==
+X-Google-Smtp-Source: ABdhPJw5EKBIFbJyU1THB9L5DTwW/M90v33zumYcH827TEU3jJsgTRV23vVYhvZMnFOXd4MuE+BMlax77GBsJIkSVD4=
+X-Received: by 2002:a17:907:6094:b0:6f4:aa0b:9af0 with SMTP id
+ ht20-20020a170907609400b006f4aa0b9af0mr19335773ejc.432.1652198503526; Tue, 10
+ May 2022 09:01:43 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220508165434.119000-1-khuey@kylehuey.com> <29767a7d-d887-1a0c-296e-5bed220f1c9e@redhat.com>
+ <YnpOZAfLdJ6cj5b9@kroah.com> <YnpOsDgrwCBsMs35@kroah.com> <CAP045Aq6vJxMJaVFjAX7gqQkBbMRArZJhea3U6LJVQEQB9Ea4Q@mail.gmail.com>
+In-Reply-To: <CAP045Aq6vJxMJaVFjAX7gqQkBbMRArZJhea3U6LJVQEQB9Ea4Q@mail.gmail.com>
+From:   Kyle Huey <me@kylehuey.com>
+Date:   Tue, 10 May 2022 09:01:32 -0700
+Message-ID: <CAP045AoFcMeJBH7SWbLFJMYymqPJNKz9PDaYSwhSHYfbeByP8Q@mail.gmail.com>
+Subject: Re: [PATCH 5.4] KVM: x86/svm: Account for family 17h event
+ renumberings in amd_pmc_perf_hw_id
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, stable@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm list <kvm@vger.kernel.org>,
+        "Robert O'Callahan" <robert@ocallahan.org>,
+        Keno Fischer <keno@juliacomputing.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215964
+On Tue, May 10, 2022 at 6:11 AM Kyle Huey <me@kylehuey.com> wrote:
+>
+> On Tue, May 10, 2022 at 4:38 AM Greg KH <gregkh@linuxfoundation.org> wrot=
+e:
+> >
+> > On Tue, May 10, 2022 at 01:37:08PM +0200, Greg KH wrote:
+> > > On Mon, May 09, 2022 at 01:41:20PM +0200, Paolo Bonzini wrote:
+> > > > On 5/8/22 18:54, Kyle Huey wrote:
+> > > > > From: Kyle Huey <me@kylehuey.com>
+> > > > >
+> > > > > commit 5eb849322d7f7ae9d5c587c7bc3b4f7c6872cd2f upstream
+> > > > >
+> > > > > Zen renumbered some of the performance counters that correspond t=
+o the
+> > > > > well known events in perf_hw_id. This code in KVM was never updat=
+ed for
+> > > > > that, so guest that attempt to use counters on Zen that correspon=
+d to the
+> > > > > pre-Zen perf_hw_id values will silently receive the wrong values.
+> > > > >
+> > > > > This has been observed in the wild with rr[0] when running in Zen=
+ 3
+> > > > > guests. rr uses the retired conditional branch counter 00d1 which=
+ is
+> > > > > incorrectly recognized by KVM as PERF_COUNT_HW_STALLED_CYCLES_BAC=
+KEND.
+> > > > >
+> > > > > [0] https://rr-project.org/
+> > > > >
+> > > > > Signed-off-by: Kyle Huey <me@kylehuey.com>
+> > > > > Message-Id: <20220503050136.86298-1-khuey@kylehuey.com>
+> > > > > Cc: stable@vger.kernel.org
+> > > > > [Check guest family, not host. - Paolo]
+> > > > > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > > > [Backport to 5.4: adjusted context]
+> > > > > Signed-off-by: Kyle Huey <me@kylehuey.com>
+> > > > > ---
+> > > > >   arch/x86/kvm/pmu_amd.c | 28 +++++++++++++++++++++++++---
+> > > > >   1 file changed, 25 insertions(+), 3 deletions(-)
+> > > > >
+> > > > > diff --git a/arch/x86/kvm/pmu_amd.c b/arch/x86/kvm/pmu_amd.c
+> > > > > index 6bc656abbe66..3ccfd1abcbad 100644
+> > > > > --- a/arch/x86/kvm/pmu_amd.c
+> > > > > +++ b/arch/x86/kvm/pmu_amd.c
+> > > > > @@ -44,6 +44,22 @@ static struct kvm_event_hw_type_mapping amd_ev=
+ent_mapping[] =3D {
+> > > > >           [7] =3D { 0xd1, 0x00, PERF_COUNT_HW_STALLED_CYCLES_BACK=
+END },
+> > > > >   };
+> > > > > +/* duplicated from amd_f17h_perfmon_event_map. */
+> > > > > +static struct kvm_event_hw_type_mapping amd_f17h_event_mapping[]=
+ =3D {
+> > > > > + [0] =3D { 0x76, 0x00, PERF_COUNT_HW_CPU_CYCLES },
+> > > > > + [1] =3D { 0xc0, 0x00, PERF_COUNT_HW_INSTRUCTIONS },
+> > > > > + [2] =3D { 0x60, 0xff, PERF_COUNT_HW_CACHE_REFERENCES },
+> > > > > + [3] =3D { 0x64, 0x09, PERF_COUNT_HW_CACHE_MISSES },
+> > > > > + [4] =3D { 0xc2, 0x00, PERF_COUNT_HW_BRANCH_INSTRUCTIONS },
+> > > > > + [5] =3D { 0xc3, 0x00, PERF_COUNT_HW_BRANCH_MISSES },
+> > > > > + [6] =3D { 0x87, 0x02, PERF_COUNT_HW_STALLED_CYCLES_FRONTEND },
+> > > > > + [7] =3D { 0x87, 0x01, PERF_COUNT_HW_STALLED_CYCLES_BACKEND },
+> > > > > +};
+> > > > > +
+> > > > > +/* amd_pmc_perf_hw_id depends on these being the same size */
+> > > > > +static_assert(ARRAY_SIZE(amd_event_mapping) =3D=3D
+> > > > > +      ARRAY_SIZE(amd_f17h_event_mapping));
+> > > > > +
+> > > > >   static unsigned int get_msr_base(struct kvm_pmu *pmu, enum pmu_=
+type type)
+> > > > >   {
+> > > > >           struct kvm_vcpu *vcpu =3D pmu_to_vcpu(pmu);
+> > > > > @@ -130,17 +146,23 @@ static unsigned amd_find_arch_event(struct =
+kvm_pmu *pmu,
+> > > > >                                       u8 event_select,
+> > > > >                                       u8 unit_mask)
+> > > > >   {
+> > > > > + struct kvm_event_hw_type_mapping *event_mapping;
+> > > > >           int i;
+> > > > > + if (guest_cpuid_family(pmc->vcpu) >=3D 0x17)
+> > > > > +         event_mapping =3D amd_f17h_event_mapping;
+> > > > > + else
+> > > > > +         event_mapping =3D amd_event_mapping;
+> > > > > +
+> > > > >           for (i =3D 0; i < ARRAY_SIZE(amd_event_mapping); i++)
+> > > > > -         if (amd_event_mapping[i].eventsel =3D=3D event_select
+> > > > > -             && amd_event_mapping[i].unit_mask =3D=3D unit_mask)
+> > > > > +         if (event_mapping[i].eventsel =3D=3D event_select
+> > > > > +             && event_mapping[i].unit_mask =3D=3D unit_mask)
+> > > > >                           break;
+> > > > >           if (i =3D=3D ARRAY_SIZE(amd_event_mapping))
+> > > > >                   return PERF_COUNT_HW_MAX;
+> > > > > - return amd_event_mapping[i].event_type;
+> > > > > + return event_mapping[i].event_type;
+> > > > >   }
+> > > > >   /* return PERF_COUNT_HW_MAX as AMD doesn't have fixed events */
+> > > >
+> > > > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > >
+> > > > Thanks,
+> > > >
+> > > > Paolo
+> > > >
+> > >
+> > > Wait, how was this tested?
+> > >
+> > > It breaks the build:
+> > >
+> > > arch/x86/kvm/pmu_amd.c: In function =E2=80=98amd_find_arch_event=E2=
+=80=99:
+> > > arch/x86/kvm/pmu_amd.c:152:32: error: =E2=80=98pmc=E2=80=99 undeclare=
+d (first use in this function); did you mean =E2=80=98pmu=E2=80=99?
+> > >   152 |         if (guest_cpuid_family(pmc->vcpu) >=3D 0x17)
+> > >       |                                ^~~
+> > >       |                                pmu
+> > >
+> > >
+> > > I'll do the obvious fixup, but this is odd.  Always at least test-bui=
+ld
+> > > your changes...
+> >
+> > Hm, no, I don't know what the correct fix is here.  I'll wait for a
+> > fixed up (and tested) patch to be resubmited please.
+> >
+> > thanks,
+> >
+> > greg k-h
+>
+> Sorry, I tested an earlier version without the guest_cpuid_family fix
+> that Paolo made when he committed my patch, and of course that's the
+> hang up here. I'll get this fixed up for you.
+>
+> - Kyle
 
-Sean Christopherson (seanjc@google.com) changed:
+Hi Greg,
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |seanjc@google.com
+I've just sent a backport of Like Xu's "KVM: x86/pmu: Refactoring
+find_arch_event() to pmc_perf_hw_id()" for 5.4. It had to be trivially
+adjusted because kvm_x86_ops is a pointer on pre-5.7 kernels.
 
---- Comment #1 from Sean Christopherson (seanjc@google.com) ---
-Hmm, so KVM doesn't perform the RESET, that's handled by userspace.  KVM's
-responsibility is purely to determine whether the OUT 0xCF9 should be forwa=
-rded
-to L1 or bounced out to userspace.
+After you apply that, the patch that you applied here for 5.10 will
+apply to 5.4.
 
-Does the 0xCF9 I/O access get sent to userspace?  If not, can you provide L=
-1's
-VMCS configuration for L2?  Specifically, the settings for USE_IO_BITMAPS a=
-nd
-the relevant bitmap bits if in use, or UNCOND_IO_EXITING if not using bitma=
-ps.
+I have built and run these exact patches this time, and rr in KVM
+guests on AMD hardware is behaving as expected.
 
-If the I/O access does show up in userspace, then it's likely a userspace b=
-ug,
-e.g. userspace fails to clear nested state when emulating RESET.
+Thanks, and sorry for the earlier trouble.
 
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+- Kyle
