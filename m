@@ -2,247 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B834520E94
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 09:35:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DDBF520EF2
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 09:45:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237517AbiEJHh3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 03:37:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36406 "EHLO
+        id S237322AbiEJHtG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 03:49:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241396AbiEJHbb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 03:31:31 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6408C245C75;
-        Tue, 10 May 2022 00:27:35 -0700 (PDT)
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24A6LpSb010145;
-        Tue, 10 May 2022 07:27:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=H8ot/ZITUFNIDJf3I2n4t65J/KIdyi8iIys0d6X5Qcs=;
- b=PtPI0ILyTQr1KC6GKRJHA9EgtW/TJ7UG2LPrh7snSP4tJIPvxlrSRUUt0tRBW/MRMfW+
- uxNL5RVubtfHldLSECOQtp5Y+qExXPP36uwuSDDrJfNEt44GrSRgKWJVYWeHwHk+sv91
- qor6wy72SwK1U38y2rFWoqKMkSjY0M1lR4G7lSy4U6TM7WBMRsCzyZk+8ZTLzxT7KlAW
- aYEpBeW5fOZPpLT0mawBBUEUUMdiOplTpvbvU+SJgzqLGCwhAce+vIFAY4lwvto0p3Sz
- 2igqMOIkHS6JEpNSNTqxEsbR+Bbgh7grCP4FmH0kaFXcOZSPKHlJKedQQ5rfMYjbFbSn kA== 
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fyjqeh3hx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 May 2022 07:27:34 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24A7J7aA002741;
-        Tue, 10 May 2022 07:27:32 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 3fwg1j3mqb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 May 2022 07:27:32 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24A7RTrq48824606
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 May 2022 07:27:29 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7915EA4051;
-        Tue, 10 May 2022 07:27:29 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 30150A4053;
-        Tue, 10 May 2022 07:27:29 +0000 (GMT)
-Received: from [9.145.53.142] (unknown [9.145.53.142])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 10 May 2022 07:27:29 +0000 (GMT)
-Message-ID: <d41cf210-ff83-43a1-7332-b0f00a40686c@linux.ibm.com>
-Date:   Tue, 10 May 2022 09:27:28 +0200
+        with ESMTP id S233829AbiEJHso (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 03:48:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A210923F389
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 00:44:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652168651;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=BlIci0CNep+wUrkQW4AUVcPk7iMZk76yZupgc0VUTvc=;
+        b=aW9mywZaLC5/KN57zKmR75XHXaV+5SyjAly6eKBInAW4SmhZMYVclTFBu3Lnihz+A+qZFE
+        0RIqtv+7P+uyuKPsOtU+AsVwa3ZJTsU/aypXIkzX/6wLk6DjPLYuHhCn+Nn8Uhh2v46msP
+        wGkkkApZxWpMl20b7uDXH5jHqwtlYK8=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-588-8JVz-4_PN--TfHu0ucdw-w-1; Tue, 10 May 2022 03:44:10 -0400
+X-MC-Unique: 8JVz-4_PN--TfHu0ucdw-w-1
+Received: by mail-lf1-f69.google.com with SMTP id c15-20020a056512238f00b00473a118e7a7so6890120lfv.18
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 00:44:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=BlIci0CNep+wUrkQW4AUVcPk7iMZk76yZupgc0VUTvc=;
+        b=Mo0yGfr1XJ3cTJwu9WcUCFbMDwrLoB81njB9Z2rPrsQsv/YfttdcKPQLo/hMJJSZ6E
+         NXi2h390E5yoQDBV5gs6bIDudLy0BEqbfZP3oZuYE4yL2wRdCEpS+TqGJrQrBtWDrwCu
+         B2JkkHV3wqcfYuDUH5HetU6pVkc63ALDxMrOy2kz0QTS7su8RvOYYQq0LBmJ90IzFnih
+         efPNYPycnHt1mWvTPy4/Z2Fo3WLUp9QPyDjkDdAWCWSYi30KoUdirHX5AtC86TXmDOdx
+         X6qTmIxOtFkYl593JjXy5hduSIxXFIwbmyHPBkKYA8yx2sdON+EQ2RlzTwab/mupikQI
+         E+nA==
+X-Gm-Message-State: AOAM531I0OnFMWux4vMdHweV9YFx9kCeCIQTi1BNVfx+GxnlXLbRZPrK
+        N8svCPy/8BhIl7AhT42oUH7cdlMWjRy9FhxetEhVCCZoYFgtnb/+qe4GHpb0+uUXCD5/Ctz/Ep4
+        qBLMcetrn4/n88r86K4eYGvjlSrfA
+X-Received: by 2002:a2e:9698:0:b0:24f:14da:6a59 with SMTP id q24-20020a2e9698000000b0024f14da6a59mr13648646lji.73.1652168648517;
+        Tue, 10 May 2022 00:44:08 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJygBKTQ1tWgHWbzhGASQpmN3PyPzyFzMva5OVPLIN/NuPJga8PT9LebRImJkl5usaxcBpwgh5iqnPLxiNqYoO8=
+X-Received: by 2002:a2e:9698:0:b0:24f:14da:6a59 with SMTP id
+ q24-20020a2e9698000000b0024f14da6a59mr13648637lji.73.1652168648340; Tue, 10
+ May 2022 00:44:08 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH 3/9] KVM: s390: pv: Add query interface
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        borntraeger@linux.ibm.com
-References: <20220428130102.230790-1-frankja@linux.ibm.com>
- <20220428130102.230790-4-frankja@linux.ibm.com>
- <20220509172533.633a95ee@p-imbrenda>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220509172533.633a95ee@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: _qXXtK8hyL_CQpk52lnow9atNr3om-jY
-X-Proofpoint-ORIG-GUID: _qXXtK8hyL_CQpk52lnow9atNr3om-jY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-09_06,2022-05-09_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- lowpriorityscore=0 suspectscore=0 mlxscore=0 phishscore=0
- priorityscore=1501 bulkscore=0 clxscore=1015 impostorscore=0 spamscore=0
- malwarescore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2202240000 definitions=main-2205100028
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <20220505100910.137-1-xieyongji@bytedance.com>
+In-Reply-To: <20220505100910.137-1-xieyongji@bytedance.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 10 May 2022 15:43:57 +0800
+Message-ID: <CACGkMEv3Ofbu7OOTB9vN2Lt85TD44LipjoPm26KEq3RiKJU0Yw@mail.gmail.com>
+Subject: Re: [PATCH v2] vringh: Fix loop descriptors check in the indirect cases
+To:     Xie Yongji <xieyongji@bytedance.com>
+Cc:     mst <mst@redhat.com>, rusty <rusty@rustcorp.com.au>,
+        fam.zheng@bytedance.com, kvm <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/9/22 17:25, Claudio Imbrenda wrote:
-> On Thu, 28 Apr 2022 13:00:56 +0000
-> Janosch Frank <frankja@linux.ibm.com> wrote:
-> 
->> Some of the query information is already available via sysfs but
->> having a IOCTL makes the information easier to retrieve.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>   arch/s390/kvm/kvm-s390.c | 76 ++++++++++++++++++++++++++++++++++++++++
->>   include/uapi/linux/kvm.h | 25 +++++++++++++
->>   2 files changed, 101 insertions(+)
->>
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index 76ad6408cb2c..23352d45a386 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -2224,6 +2224,42 @@ static int kvm_s390_cpus_to_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
->>   	return r;
->>   }
->>   
->> +/*
->> + * Here we provide user space with a direct interface to query UV
->> + * related data like UV maxima and available features as well as
->> + * feature specific data.
->> + *
->> + * To facilitate future extension of the data structures we'll try to
->> + * write data up to the maximum requested length.
->> + */
->> +static ssize_t kvm_s390_handle_pv_info(struct kvm_s390_pv_info *info)
->> +{
->> +	ssize_t len_min;
->> +
->> +	switch (info->header.id) {
->> +	case KVM_PV_INFO_VM: {
->> +		len_min =  sizeof(info->header) + sizeof(info->vm);
->> +
->> +		if (info->header.len_max < len_min)
->> +			return -EINVAL;
->> +
->> +		memcpy(info->vm.inst_calls_list,
->> +		       uv_info.inst_calls_list,
->> +		       sizeof(uv_info.inst_calls_list));
->> +
->> +		/* It's max cpuidm not max cpus so it's off by one */
-> 
-> s/cpuidm/cpuid,/ ? (and then also s/cpus/cpus,/)
+On Thu, May 5, 2022 at 6:08 PM Xie Yongji <xieyongji@bytedance.com> wrote:
+>
+> We should use size of descriptor chain to test loop condition
+> in the indirect case. And another statistical count is also introduced
+> for indirect descriptors to avoid conflict with the statistical count
+> of direct descriptors.
+>
+> Fixes: f87d0fbb5798 ("vringh: host-side implementation of virtio rings.")
+> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> Signed-off-by: Fam Zheng <fam.zheng@bytedance.com>
+> ---
+>  drivers/vhost/vringh.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> index 14e2043d7685..eab55accf381 100644
+> --- a/drivers/vhost/vringh.c
+> +++ b/drivers/vhost/vringh.c
+> @@ -292,7 +292,7 @@ __vringh_iov(struct vringh *vrh, u16 i,
+>              int (*copy)(const struct vringh *vrh,
+>                          void *dst, const void *src, size_t len))
+>  {
+> -       int err, count = 0, up_next, desc_max;
+> +       int err, count = 0, indirect_count = 0, up_next, desc_max;
+>         struct vring_desc desc, *descs;
+>         struct vringh_range range = { -1ULL, 0 }, slowrange;
+>         bool slow = false;
+> @@ -349,7 +349,12 @@ __vringh_iov(struct vringh *vrh, u16 i,
+>                         continue;
+>                 }
+>
+> -               if (count++ == vrh->vring.num) {
+> +               if (up_next == -1)
+> +                       count++;
+> +               else
+> +                       indirect_count++;
+> +
+> +               if (count > vrh->vring.num || indirect_count > desc_max) {
+>                         vringh_bad("Descriptor loop in %p", descs);
+>                         err = -ELOOP;
+>                         goto fail;
+> @@ -411,6 +416,7 @@ __vringh_iov(struct vringh *vrh, u16 i,
+>                                 i = return_from_indirect(vrh, &up_next,
+>                                                          &descs, &desc_max);
+>                                 slow = false;
+> +                               indirect_count = 0;
 
-Sure, will fix
+Do we need to reset up_next to -1 here?
 
-> 
->> +		info->vm.max_cpus = uv_info.max_guest_cpu_id + 1;
->> +		info->vm.max_guests = uv_info.max_num_sec_conf;
->> +		info->vm.max_guest_addr = uv_info.max_sec_stor_addr;
->> +		info->vm.feature_indication = uv_info.uv_feature_indications;
->> +
->> +		return len_min;
->> +	}
->> +	default:
->> +		return -EINVAL;
->> +	}
->> +}
->> +
->>   static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->>   {
->>   	int r = 0;
->> @@ -2360,6 +2396,46 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->>   			     cmd->rc, cmd->rrc);
->>   		break;
->>   	}
->> +	case KVM_PV_INFO: {
->> +		struct kvm_s390_pv_info info = {};
->> +		ssize_t data_len;
->> +
->> +		/*
->> +		 * No need to check the VM protection here.
->> +		 *
->> +		 * Maybe user space wants to query some of the data
->> +		 * when the VM is still unprotected. If we see the
->> +		 * need to fence a new data command we can still
->> +		 * return an error in the info handler.
->> +		 */
->> +
->> +		r = -EFAULT;
->> +		if (copy_from_user(&info, argp, sizeof(info.header)))
->> +			break;
->> +
->> +		r = -EINVAL;
->> +		if (info.header.len_max < sizeof(info.header))
->> +			break;
->> +
->> +		data_len = kvm_s390_handle_pv_info(&info);
->> +		if (data_len < 0) {
->> +			r = data_len;
->> +			break;
->> +		}
->> +		/*
->> +		 * If a data command struct is extended (multiple
->> +		 * times) this can be used to determine how much of it
->> +		 * is valid.
->> +		 */
->> +		info.header.len_written = data_len;
->> +
->> +		r = -EFAULT;
->> +		if (copy_to_user(argp, &info, data_len))
->> +			break;
->> +
->> +		r = 0;
->> +		break;
->> +	}
->>   	default:
->>   		r = -ENOTTY;
->>   	}
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index 91a6fe4e02c0..59e4fb6c7a34 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -1645,6 +1645,30 @@ struct kvm_s390_pv_unp {
->>   	__u64 tweak;
->>   };
->>   
->> +enum pv_cmd_info_id {
->> +	KVM_PV_INFO_VM,
->> +};
->> +
->> +struct kvm_s390_pv_info_vm {
->> +	__u64 inst_calls_list[4];
->> +	__u64 max_cpus;
->> +	__u64 max_guests;
->> +	__u64 max_guest_addr;
->> +	__u64 feature_indication;
->> +};
->> +
->> +struct kvm_s390_pv_info_header {
->> +	__u32 id;
->> +	__u32 len_max;
->> +	__u32 len_written;
->> +	__u32 reserved;
->> +};
->> +
->> +struct kvm_s390_pv_info {
->> +	struct kvm_s390_pv_info_header header;
->> +	struct kvm_s390_pv_info_vm vm;
->> +};
->> +
->>   enum pv_cmd_id {
->>   	KVM_PV_ENABLE,
->>   	KVM_PV_DISABLE,
->> @@ -1653,6 +1677,7 @@ enum pv_cmd_id {
->>   	KVM_PV_VERIFY,
->>   	KVM_PV_PREP_RESET,
->>   	KVM_PV_UNSHARE_ALL,
->> +	KVM_PV_INFO,
->>   };
->>   
->>   struct kvm_pv_cmd {
-> 
+Thanks
+
+>                         } else
+>                                 break;
+>                 }
+> --
+> 2.20.1
+>
 
