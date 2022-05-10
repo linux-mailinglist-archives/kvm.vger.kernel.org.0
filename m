@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B854F522522
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 22:00:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57B89522521
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 22:00:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232136AbiEJUAN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 16:00:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35462 "EHLO
+        id S229824AbiEJUAK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 16:00:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229514AbiEJUAL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 16:00:11 -0400
+        with ESMTP id S229514AbiEJUAJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 16:00:09 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 807682983AE
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 13:00:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AD57A29839E
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 13:00:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652212807;
+        s=mimecast20190719; t=1652212806;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tjirfzysjY35qNF2viW2FllS9tA4vbKRLHE6+8/z6KM=;
-        b=L32nIM1vMRAAUDKTJU8qjUWsxuoR0+xvLloWToxqbb4PFND4zWyFHuQCG/YJPTEp6+0U6Z
-        WyHbsIymwOOlpw5nbI7nyvrFt7LoWG69Fl5YcPXyfqsWb8NfHAoPLdPqbgvyW4n9y8wNgt
-        tx3I5rhHJeUCSKZF+jR7SEK+fPujQP0=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=fu+8FpTNNNO8ze8f8Eh8Gm4vSBYGdQAvUH/n+NM4m7k=;
+        b=ODauK25ieqnZuEPX/ONUOe9L15r++PsgKHY1jNysyOP8NQP41v3DX07x7rutA2hHyVaOPm
+        2OyIhdsyyEX+wOGOyVR35OxL6JS7njBUlriS8LGimeE6W/aSRIQTIWSybhNetbr5GNx6WG
+        dQSXXhHkDpe2kn6yqoijB2S4Qt8t1tc=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-618-VfKG9T1sM2alm9OWQ-qGEg-1; Tue, 10 May 2022 15:59:59 -0400
-X-MC-Unique: VfKG9T1sM2alm9OWQ-qGEg-1
-Received: by mail-io1-f72.google.com with SMTP id ay38-20020a5d9da6000000b0065adc1f932bso5980897iob.11
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 12:59:58 -0700 (PDT)
+ us-mta-368-BzWrnZvDOEyqy4445A-Ovw-1; Tue, 10 May 2022 16:00:02 -0400
+X-MC-Unique: BzWrnZvDOEyqy4445A-Ovw-1
+Received: by mail-il1-f197.google.com with SMTP id q9-20020a056e02106900b002cbc8d479eeso63628ilj.1
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 13:00:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
          :references:organization:mime-version:content-transfer-encoding;
-        bh=tjirfzysjY35qNF2viW2FllS9tA4vbKRLHE6+8/z6KM=;
-        b=Kd2stiuocrAiv0S33DghhVl3/taVkzaU4xxusaAxczD5gFo8rTMsr6xygtHmSyFNhF
-         0wrvhwl7g8DLgh4mmFNHxFcGSxMVauhF63F/6YMNw9o/ZRNVpzJ61Xf0QdwpizCydwcU
-         VAAQtqEEt6vD+gn3qNbTD7TH/xrlWqYo6yqiYyxphy3LJr/+rOdJvETFKsablp6Pi6BM
-         LGm0/X4pb+Gmhd0D4Lcb/Qk0wO3cFcl6SB32Vz7edshLD7Rq+rTdz8ZbcdZQPyyqNGR/
-         uT7buCs9YVChiIOQrk5SEAdmQZMJBKTVG2kwsXwp7vwg7AGrqizuwB+vx+Av4PFFi4oS
-         MTjQ==
-X-Gm-Message-State: AOAM532MbJ8EPz+Pt6BBWulMl+vtL24jbCg/9pBXhhZjpEAoqDN3vMxr
-        ul+Jl+H3I4B5CpEKMLyaSp5UXforRXrSXstFWtB90Vxbvzgcbs+uRnDNgAQn/dlTcVwGr4742+u
-        ornnMDAWiu/Um
-X-Received: by 2002:a05:6638:3894:b0:32b:7ec7:9106 with SMTP id b20-20020a056638389400b0032b7ec79106mr10763638jav.255.1652212798162;
-        Tue, 10 May 2022 12:59:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzpPgFcfLsVkcGLaFh69eRGa4T42W5zvkNBdN60NDA7+iTUTka7ZJ3KqHV0hMomuE49GuQHNA==
-X-Received: by 2002:a05:6638:3894:b0:32b:7ec7:9106 with SMTP id b20-20020a056638389400b0032b7ec79106mr10763620jav.255.1652212797927;
-        Tue, 10 May 2022 12:59:57 -0700 (PDT)
+        bh=fu+8FpTNNNO8ze8f8Eh8Gm4vSBYGdQAvUH/n+NM4m7k=;
+        b=gEsqV+iV+AJFcTr58i+cRQsUOVYLTIkcsOHxaG368al/6fyMRGTDjTDV14IgQHol5W
+         K0F4CrMWKAkC3MnJxYSaw6+ralshsozwXfT7Pbkzj7e/8/TOrvg59KfHDTVLNhU8KJF9
+         feR61OwQInb/yO8FGOPW1eXpAd5bSG4SKj9ql5lb2tEDF7MuFBaEMpnItioO6u1LPgvH
+         CebZIKr1l1UkJZwp/7IjfiDoCbAhvcatChGxGG35oMpMnR8hhC4mxlbXX00T8TUfoqHM
+         TalTDrJ2O49Tc6IR/G5CKYB8bEMZRNI+56WRZ/8qFWx0JFtJV/uCmpggvmEToRhpKoMT
+         Cx5Q==
+X-Gm-Message-State: AOAM533o4ckS+4leVe3DQoENvTBHQmeo2MfqZ747iBCgMkIMe592+DDD
+        75seTgWY+HhOD0OC2fl972GNaFVlSgdk0MgiDH6DYIMU8LK5vuetww9Hr4hVNEMbzD0G9r/LpbT
+        wE8HA8SSLAPEz
+X-Received: by 2002:a05:6e02:1a0e:b0:2cf:66ae:aec0 with SMTP id s14-20020a056e021a0e00b002cf66aeaec0mr10204747ild.75.1652212800588;
+        Tue, 10 May 2022 13:00:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzV1o8BfomQ93UVVscM/lZFuHR2uzluzQ3UQnprzzXgkl+ogD44LQXTXDFspv2LrNBudbRS/A==
+X-Received: by 2002:a05:6e02:1a0e:b0:2cf:66ae:aec0 with SMTP id s14-20020a056e021a0e00b002cf66aeaec0mr10204733ild.75.1652212800333;
+        Tue, 10 May 2022 13:00:00 -0700 (PDT)
 Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id q8-20020a056e02096800b002cde6e352d9sm85964ilt.35.2022.05.10.12.59.57
+        by smtp.gmail.com with ESMTPSA id i20-20020a926d14000000b002cde6e352f4sm75084ilc.62.2022.05.10.12.59.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 May 2022 12:59:57 -0700 (PDT)
-Date:   Tue, 10 May 2022 13:59:56 -0600
+        Tue, 10 May 2022 12:59:59 -0700 (PDT)
+Date:   Tue, 10 May 2022 13:59:59 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Jason Gunthorpe <jgg@nvidia.com>
 Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
@@ -63,11 +63,11 @@ Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
         Kirti Wankhede <kwankhede@nvidia.com>,
         Nicolin Chen <nicolinc@nvidia.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 3/6] vfio: Split up vfio_group_get_device_fd()
-Message-ID: <20220510135956.7b894c27.alex.williamson@redhat.com>
-In-Reply-To: <3-v1-c1d14aae2e8f+2f4-vfio_group_locking_jgg@nvidia.com>
+Subject: Re: [PATCH 5/6] vfio: Simplify the life cycle of the group FD
+Message-ID: <20220510135959.20266cfd.alex.williamson@redhat.com>
+In-Reply-To: <5-v1-c1d14aae2e8f+2f4-vfio_group_locking_jgg@nvidia.com>
 References: <0-v1-c1d14aae2e8f+2f4-vfio_group_locking_jgg@nvidia.com>
-        <3-v1-c1d14aae2e8f+2f4-vfio_group_locking_jgg@nvidia.com>
+        <5-v1-c1d14aae2e8f+2f4-vfio_group_locking_jgg@nvidia.com>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -82,167 +82,178 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  5 May 2022 21:25:03 -0300
+On Thu,  5 May 2022 21:25:05 -0300
 Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-> The split follows the pairing with the destroy functions:
+> Once userspace opens a group FD it is prevented from opening another
+> instance of that same group FD until all the prior group FDs and users of
+> the container are done.
 > 
->  - vfio_group_get_device_fd() destroyed by close()
+> The first is done trivially by checking the group->owned during group FD
+> open.
 > 
->  - vfio_device_open() destroyed by vfio_device_fops_release()
+> However, things get a little weird if userspace creates a device FD and
+> then closes the group FD. The group FD still cannot be re-opened, but this
+> time it is because the group->container is still set and container_users
+> is elevated by the device FD.
 > 
->  - vfio_device_assign_container() destroyed by
->    vfio_group_try_dissolve_container()
+> Due to this mismatched lifecycle we have the
+> vfio_group_try_dissolve_container() which tries to auto-free a container
+> after the group FD is closed but the device FD remains open.
 > 
-> The next patch will put a lock around vfio_device_assign_container().
+> Instead have the device FD hold onto a reference to the single group
+> FD. This directly prevents vfio_group_fops_release() from being called
+> when any device FD exists and makes the lifecycle model more
+> understandable.
+> 
+> vfio_group_try_dissolve_container() is removed as the only place a
+> container is auto-deleted is during vfio_group_fops_release(). At this
+> point the container_users is either 1 or 0 since all device FDs must be
+> closed.
+> 
+> Change group->owner to group->singleton_filep which points to the single
+> struct file * that is open for the group. If the group->singleton_filep is
+> NULL then group->container == NULL.
+> 
+> If all device FDs have closed then the group's notifier list must be
+> empty.
 > 
 > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 > ---
->  drivers/vfio/vfio.c | 89 +++++++++++++++++++++++++++++++--------------
->  1 file changed, 62 insertions(+), 27 deletions(-)
+>  drivers/vfio/vfio.c | 49 +++++++++++++++++++--------------------------
+>  1 file changed, 21 insertions(+), 28 deletions(-)
 > 
 > diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> index a5584131648765..d8d14e528ab795 100644
+> index 63f7fa872eae60..94ab415190011d 100644
 > --- a/drivers/vfio/vfio.c
 > +++ b/drivers/vfio/vfio.c
-> @@ -1084,27 +1084,38 @@ static bool vfio_assert_device_open(struct vfio_device *device)
->  	return !WARN_ON_ONCE(!READ_ONCE(device->open_count));
+> @@ -73,12 +73,12 @@ struct vfio_group {
+>  	struct mutex			device_lock;
+>  	struct list_head		vfio_next;
+>  	struct list_head		container_next;
+> -	bool				opened;
+>  	wait_queue_head_t		container_q;
+>  	enum vfio_group_type		type;
+>  	unsigned int			dev_counter;
+>  	struct rw_semaphore		group_rwsem;
+>  	struct kvm			*kvm;
+> +	struct file			*singleton_file;
+
+I'm not really a fan of this name, if we have a single struct file
+pointer on the group, it's necessarily singleton.  Maybe just
+"opened_file"?
+
+>  	struct blocking_notifier_head	notifier;
+>  };
+>  
+> @@ -987,20 +987,6 @@ static int vfio_group_unset_container(struct vfio_group *group)
+>  	return 0;
 >  }
 >  
-> -static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
-> +static int vfio_device_assign_container(struct vfio_device *device)
+> -/*
+> - * When removing container users, anything that removes the last user
+> - * implicitly removes the group from the container.  That is, if the
+> - * group file descriptor is closed, as well as any device file descriptors,
+> - * the group is free.
+> - */
+> -static void vfio_group_try_dissolve_container(struct vfio_group *group)
+> -{
+> -	down_write(&group->group_rwsem);
+> -	if (0 == atomic_dec_if_positive(&group->container_users))
+> -		__vfio_group_unset_container(group);
+> -	up_write(&group->group_rwsem);
+> -}
+> -
+>  static int vfio_group_set_container(struct vfio_group *group, int container_fd)
 >  {
-> -	struct vfio_device *device;
-> -	struct file *filep;
-> -	int fdno;
-> -	int ret = 0;
-> +	struct vfio_group *group = device->group;
+>  	struct fd f;
+> @@ -1093,10 +1079,19 @@ static int vfio_device_assign_container(struct vfio_device *device)
+>  			 current->comm, task_pid_nr(current));
+>  	}
 >  
->  	if (0 == atomic_read(&group->container_users) ||
->  	    !group->container->iommu_driver)
->  		return -EINVAL;
+> +	get_file(group->singleton_file);
+>  	atomic_inc(&group->container_users);
+>  	return 0;
+>  }
 >  
-> -	if (group->type == VFIO_NO_IOMMU && !capable(CAP_SYS_RAWIO))
-> -		return -EPERM;
-> +	if (group->type == VFIO_NO_IOMMU) {
-> +		if (!capable(CAP_SYS_RAWIO))
-> +			return -EPERM;
-> +		dev_warn(device->dev,
-> +			 "vfio-noiommu device opened by user (%s:%d)\n",
-> +			 current->comm, task_pid_nr(current));
-
-I don't see why this was moved.  It was previously ordered such that we
-would not emit a warning unless the device is actually opened.  Now
-there are various error cases that could make this a false warning.
-Thanks,
-
-Alex
-
-> +	}
->  
-> -	device = vfio_device_get_from_name(group, buf);
-> -	if (IS_ERR(device))
-> -		return PTR_ERR(device);
-> +	atomic_inc(&group->container_users);
-> +	return 0;
+> +static void vfio_device_unassign_container(struct vfio_device *device)
+> +{
+> +	down_write(&device->group->group_rwsem);
+> +	atomic_dec(&device->group->container_users);
+> +	fput(device->group->singleton_file);
+> +	up_write(&device->group->group_rwsem);
 > +}
 > +
-> +static struct file *vfio_device_open(struct vfio_device *device)
-> +{
-> +	struct file *filep;
-> +	int ret;
-> +
-> +	ret = vfio_device_assign_container(device);
-> +	if (ret)
-> +		return ERR_PTR(ret);
->  
->  	if (!try_module_get(device->dev->driver->owner)) {
->  		ret = -ENODEV;
-> -		goto err_device_put;
-> +		goto err_unassign_container;
->  	}
->  
->  	mutex_lock(&device->dev_set->lock);
-> @@ -1120,15 +1131,11 @@ static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
->  	 * We can't use anon_inode_getfd() because we need to modify
->  	 * the f_mode flags directly to allow more than just ioctls
->  	 */
-> -	fdno = ret = get_unused_fd_flags(O_CLOEXEC);
-> -	if (ret < 0)
-> -		goto err_close_device;
-> -
->  	filep = anon_inode_getfile("[vfio-device]", &vfio_device_fops,
->  				   device, O_RDWR);
->  	if (IS_ERR(filep)) {
->  		ret = PTR_ERR(filep);
-> -		goto err_fd;
-> +		goto err_close_device;
->  	}
->  
->  	/*
-> @@ -1138,17 +1145,12 @@ static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
->  	 */
->  	filep->f_mode |= (FMODE_LSEEK | FMODE_PREAD | FMODE_PWRITE);
->  
-> -	atomic_inc(&group->container_users);
-> +	/*
-> +	 * On success the ref of device is moved to the file and
-> +	 * put in vfio_device_fops_release()
-> +	 */
-> +	return filep;
->  
-> -	fd_install(fdno, filep);
-> -
-> -	if (group->type == VFIO_NO_IOMMU)
-> -		dev_warn(device->dev, "vfio-noiommu device opened by user "
-> -			 "(%s:%d)\n", current->comm, task_pid_nr(current));
-> -	return fdno;
-> -
-> -err_fd:
-> -	put_unused_fd(fdno);
->  err_close_device:
->  	mutex_lock(&device->dev_set->lock);
->  	if (device->open_count == 1 && device->ops->close_device)
-> @@ -1157,7 +1159,40 @@ static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
->  	device->open_count--;
+>  static struct file *vfio_device_open(struct vfio_device *device)
+>  {
+>  	struct file *filep;
+> @@ -1155,7 +1150,7 @@ static struct file *vfio_device_open(struct vfio_device *device)
 >  	mutex_unlock(&device->dev_set->lock);
 >  	module_put(device->dev->driver->owner);
-> -err_device_put:
-> +err_unassign_container:
-> +	vfio_group_try_dissolve_container(device->group);
-> +	return ERR_PTR(ret);
-> +}
-> +
-> +static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
-> +{
-> +	struct vfio_device *device;
-> +	struct file *filep;
-> +	int fdno;
-> +	int ret;
-> +
-> +	device = vfio_device_get_from_name(group, buf);
-> +	if (IS_ERR(device))
-> +		return PTR_ERR(device);
-> +
-> +	fdno = get_unused_fd_flags(O_CLOEXEC);
-> +	if (fdno < 0) {
-> +		ret = fdno;
-> +		goto err_put_device;
-> +	}
-> +
-> +	filep = vfio_device_open(device);
-> +	if (IS_ERR(filep)) {
-> +		ret = PTR_ERR(filep);
-> +		goto err_put_fdno;
-> +	}
-> +
-> +	fd_install(fdno, filep);
-> +	return fdno;
-> +
-> +err_put_fdno:
-> +	put_unused_fd(fdno);
-> +err_put_device:
->  	vfio_device_put(device);
->  	return ret;
+>  err_unassign_container:
+> -	vfio_group_try_dissolve_container(device->group);
+> +	vfio_device_unassign_container(device);
+>  	return ERR_PTR(ret);
 >  }
+>  
+> @@ -1286,18 +1281,12 @@ static int vfio_group_fops_open(struct inode *inode, struct file *filep)
+>  
+>  	/*
+>  	 * Do we need multiple instances of the group open?  Seems not.
+> -	 * Is something still in use from a previous open?
+>  	 */
+> -	if (group->opened || group->container) {
+> +	if (group->singleton_file) {
+>  		ret = -EBUSY;
+>  		goto err_put;
+>  	}
+> -	group->opened = true;
+> -
+> -	/* Warn if previous user didn't cleanup and re-init to drop them */
+> -	if (WARN_ON(group->notifier.head))
+> -		BLOCKING_INIT_NOTIFIER_HEAD(&group->notifier);
+> -
+> +	group->singleton_file = filep;
+>  	filep->private_data = group;
+>  
+>  	up_write(&group->group_rwsem);
+> @@ -1315,10 +1304,14 @@ static int vfio_group_fops_release(struct inode *inode, struct file *filep)
+>  
+>  	filep->private_data = NULL;
+>  
+> -	vfio_group_try_dissolve_container(group);
+> -
+>  	down_write(&group->group_rwsem);
+> -	group->opened = false;
+> +	/* All device FDs must be released before the group fd releases. */
+
+This sounds more like a user directive as it's phrased, maybe something
+like:
+
+	/*
+	 * Device FDs hold a group file reference, therefore the group
+	 * release is only called when there are no open devices.
+	 */
+
+Thanks,
+Alex
+
+> +	WARN_ON(group->notifier.head);
+> +	if (group->container) {
+> +		WARN_ON(atomic_read(&group->container_users) != 1);
+> +		__vfio_group_unset_container(group);
+> +	}
+> +	group->singleton_file = NULL;
+>  	up_write(&group->group_rwsem);
+>  
+>  	vfio_group_put(group);
+> @@ -1350,7 +1343,7 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
+>  
+>  	module_put(device->dev->driver->owner);
+>  
+> -	vfio_group_try_dissolve_container(device->group);
+> +	vfio_device_unassign_container(device);
+>  
+>  	vfio_device_put(device);
+>  
 
