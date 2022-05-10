@@ -2,494 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A843521DBC
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 17:10:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2534521DD4
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 17:13:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345114AbiEJPOH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 11:14:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56844 "EHLO
+        id S1345278AbiEJPRM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 11:17:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345277AbiEJPNl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 11:13:41 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0460D606C8;
-        Tue, 10 May 2022 07:47:37 -0700 (PDT)
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24ADoZia012793;
-        Tue, 10 May 2022 14:47:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : subject :
- date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=J1YY+eeH/Cn+Un11hD9A+z9P1pkoTiE80D60ILE2xKo=;
- b=S4RbdNWzqrArQMUj+Lmr/bkBtGVoFMyY4xqHlp0Ko5nQkvzUmrX6pWppq8EUqVpogUST
- ie2v52//T9brCE2jUX9pOC8Ta12CzHVk8qtwwq9UJFLBb/aHVKxpIbdDyv8aYZsJT+Qr
- xHhlrHLX969+K1dPssQrYv++y8JmZ6DUGtWlMFYSLHPSiUJkMfAz+PU9Rlat6zj8qHCq
- J8vCkn2Lc6VrE13XBt1C1OX+nDIGZDXK4v38lalEbW5BRGhfB9KeS6PcFEbD3lFb5Pbf
- MZ7r8n0eh5Z0ocZDMoBV3FedEMMRapLVrASIW5pesA7gupjUoEC945aWbF958aLcal6W jQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fys9nscac-1
+        with ESMTP id S1345327AbiEJPP3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 11:15:29 -0400
+Received: from mx0a-002c1b01.pphosted.com (mx0a-002c1b01.pphosted.com [148.163.151.68])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 983F61E21A0;
+        Tue, 10 May 2022 07:50:28 -0700 (PDT)
+Received: from pps.filterd (m0127839.ppops.net [127.0.0.1])
+        by mx0a-002c1b01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24ABoSio001157;
+        Tue, 10 May 2022 07:49:17 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version;
+ s=proofpoint20171006; bh=PInWRIFfxBvOjjQis0SxufAyyGOPWIfFL1Eow32KP+s=;
+ b=R9Gt/SeYWVQThMe5vnGiiXqvRBlLVZtHQsA4/+Kysrpcaea+ZT61GfktzFuCZdqJyucc
+ H3GONcii3oQk+BjGYWYXFZ/o9el8fEGTc8APZRh9nmiWZNiDjHJXt5VvmDKWHeCrtrcB
+ K5/WK/vil+3Zy+pRxTVepiiXWc7zf6RIXnGLe5JgPyKF625j6ScDZk8qZsxcsuIyeCTZ
+ SFO11u0Y6QLR9T1aZGqSsIhy/Fhl6jJUtbmF0QqE/oDDouPuxYVLJJRX6OVQbIke2sEW
+ 9kqBDieqCLOTKGOqS5+/p/15yUK42MznffvtPu1ZS7sAG7Y5uAjKKVlWF60RXI8SUcGP xA== 
+Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2101.outbound.protection.outlook.com [104.47.55.101])
+        by mx0a-002c1b01.pphosted.com (PPS) with ESMTPS id 3fwqufnxeb-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 May 2022 14:47:31 +0000
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24AE6J9Q015665;
-        Tue, 10 May 2022 14:47:31 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fys9nsc9x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 May 2022 14:47:31 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24AEdJr9012538;
-        Tue, 10 May 2022 14:47:29 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06ams.nl.ibm.com with ESMTP id 3fyrkk0495-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 May 2022 14:47:29 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24AEXqdE47972646
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 May 2022 14:33:52 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5D12BA405B;
-        Tue, 10 May 2022 14:47:26 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EC32FA405F;
-        Tue, 10 May 2022 14:47:25 +0000 (GMT)
-Received: from t46lp73.. (unknown [9.152.108.100])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 10 May 2022 14:47:25 +0000 (GMT)
-From:   Steffen Eiden <seiden@linux.ibm.com>
-To:     Greg KH <greg@kroah.com>, Heiko Carstens <hca@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Nico Boehr <nrb@linux.ibm.com>, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH v4 2/2] selftests: drivers/s390x: Add uvdevice tests
-Date:   Tue, 10 May 2022 14:47:24 +0000
-Message-Id: <20220510144724.3321985-3-seiden@linux.ibm.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220510144724.3321985-1-seiden@linux.ibm.com>
-References: <20220510144724.3321985-1-seiden@linux.ibm.com>
+        Tue, 10 May 2022 07:49:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=A3xT4sc8aCf0yQXh4lWPRf1lTMVfk9juMq70qv06yAd7dAwIVNu83A9fKwVb8jKKiO1JOviT0w7PqZGy5dfd8eHbppA5e81UBtFVk6F4lbWrpt3PkBbBlf6AbJiiNbeDYPaKCWiWaEOWGS74D6zKEE/cB7NF8OcZXve1HDJb9B9GMVZwVzQp1kCwzmZUE1JCZjsSNpW23cckKK3T2UWlE91Z0TYVnkAT6X2C1PoyJQBiFWnxzEp89y3Ga1WtUuzfX/f3ZJ8QQkYLpoy7KbyqJHHSLHZLgws6y/uZV3CM0hDxB4afGh0g4ZWWcAL3lQo8D/DbW5Nc/gXv9i2Y1qxyFg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PInWRIFfxBvOjjQis0SxufAyyGOPWIfFL1Eow32KP+s=;
+ b=S7gw4Hm8AfKS+e/ICbBS1WT4PwR9qcbsyvT5+ppiKRvlEXwoQWJ1EdwyUCJCzVJqlEdfvnuZu/WWhs551RBnzE94SQHR+p7JCFuQR4ROWBbVnTEFNHxzQBAXRG6ToEquWaJfG3VbfIMPd9EFErPl+jN8L1MRrdw2CnZ/QK6KMVspDbIpbZO/9AWBD80S0RlTAhbZURThFRfUdKKZzOMCNc2eTD4Es5KRinG5U8NdJdHNlEgawD7kQ+GtFaagIRud5UxdqbVAsngztV7Zxv2GkIN1H1TSk8xoYX8yQACsPzD/0JeiA3V4h5baoZNi8O55/Q1N7ZxLDw7MpmNKM+by5g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from BL0PR02MB4579.namprd02.prod.outlook.com (2603:10b6:208:4b::10)
+ by BL0PR02MB4369.namprd02.prod.outlook.com (2603:10b6:208:4f::27) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5227.21; Tue, 10 May
+ 2022 14:49:15 +0000
+Received: from BL0PR02MB4579.namprd02.prod.outlook.com
+ ([fe80::fd14:ff80:d4d9:c81f]) by BL0PR02MB4579.namprd02.prod.outlook.com
+ ([fe80::fd14:ff80:d4d9:c81f%5]) with mapi id 15.20.5227.023; Tue, 10 May 2022
+ 14:49:15 +0000
+From:   Jon Kohler <jon@nutanix.com>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     Jon Kohler <jon@nutanix.com>, Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Balbir Singh <sblbir@amazon.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Waiman Long <longman@redhat.com>
+Subject: Re: [PATCH v3] x86/speculation, KVM: only IBPB for
+ switch_mm_always_ibpb on vCPU load
+Thread-Topic: [PATCH v3] x86/speculation, KVM: only IBPB for
+ switch_mm_always_ibpb on vCPU load
+Thread-Index: AQHYVmUALWKOwI7bhUetXwvEOXsG/a0HKBwAgAAI9ICAACHkgIAAD+oAgAAIS4CAABD0AIAABkcAgAARGQCAAK85AIAAU8oAgA+vYoCAAAePAA==
+Date:   Tue, 10 May 2022 14:49:15 +0000
+Message-ID: <DB45B96F-91F6-4A78-A00F-4E422075FF63@nutanix.com>
+References: <YmwZYEGtJn3qs0j4@zn.tnic>
+ <645E4ED5-F6EE-4F8F-A990-81F19ED82BFA@nutanix.com> <Ymw9UZDpXym2vXJs@zn.tnic>
+ <YmxKqpWFvdUv+GwJ@google.com> <YmxRnwSUBIkOIjLA@zn.tnic>
+ <Ymxf2Jnmz5y4CHFN@google.com> <YmxlHBsxcIy8uYaB@zn.tnic>
+ <YmxzdAbzJkvjXSAU@google.com> <Ym0GcKhPZxkcMCYp@zn.tnic>
+ <4E46337F-79CB-4ADA-B8C0-009E7500EDF8@nutanix.com>
+ <Ynp1E73OZtXudLUH@google.com>
+In-Reply-To: <Ynp1E73OZtXudLUH@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: Apple Mail (2.3693.40.0.1.81)
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 778bf276-b6f8-4de8-d3b4-08da3294411c
+x-ms-traffictypediagnostic: BL0PR02MB4369:EE_
+x-microsoft-antispam-prvs: <BL0PR02MB4369CA477FBD10E658511ED2AFC99@BL0PR02MB4369.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 9aW4n80HaRK4ni3lS7bA9+D8TgNQ78BiCfkwpT7dwXuk0bCHCSga02HOSddAhPV6Sz1YN3b+fAWCITQTADu5zeCxQ3L5xPlha/l4bROCjAWN24p59OnPqbMsoekUQp8BEEWNcxJwCzNgCPonpYKaKw34rA/PGTAwg7KaPBzKhU8g35jwIv7u8I61l4BHUC7wm8Krz8V7lifQKxwn21TFXQN6P5jLbB2ye22+YokOB80FCIvGdTv4MlwB1oI1sjhAHc5hypdldktlGXXXIPdrPEacyqFPmUhccZ4THZxu15R94zlf9CV6D0RJQbB/ip5NY0zeSbB1djOiaK4Um7MLh8ZFGQtNH96unGGPqL4gy5lnWLsz84VxIjxVQxGK96Z6cUgdNfl4XDrpwehuBKd0oHzP2yNom43kcJG+meaBmVdCyCI8hdPEKSyoNw0JExTl//DZBB6AEX8W4+/z/8lAHEedoi43Q2elQXmuHTlGQF4CFDFblB8ON094w4Fw6hnMc7622fcsisN90MxgFRXuDcwtcoVcA09RV3SnjbjYfQsSCSDaZkBFMRAyE72ofp+3D59LETZs4BrmZYwvtHXu5V1qCGHY9zfoXglc+r20hykpn+5+nAqDDKnVFXKbKfFFOSrNYFTnQ/On7/F0Pqe06BgMFM7RNZc0pUfkodxhf+SCZ9aW75RJmpZxcqsJJEWSAmxgiS8bNulxvFDjsExdm5233rYIyQdrysmahd4mhHEt3yFJNeb3dG2rk7/HM9Hm
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR02MB4579.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(91956017)(86362001)(64756008)(54906003)(76116006)(66476007)(66446008)(66946007)(6916009)(66556008)(6486002)(8936002)(316002)(2906002)(4326008)(8676002)(2616005)(6512007)(122000001)(53546011)(6506007)(508600001)(71200400001)(33656002)(38070700005)(36756003)(83380400001)(5660300002)(7416002)(186003)(38100700002)(45980500001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 2
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?NXowbDU5UC9HeG5ieG83bkdmKzREak12VXV2TnpkdzVjUlRPU01sUFRMbU9U?=
+ =?utf-8?B?YnNPTkVPVWpsQTBIczgzYiswZ1VkRXFqM2ZUYUZlb2JacndIUW1POUFjTVpm?=
+ =?utf-8?B?bU1sV3dmd3JQc3pvaE5VbXJ3T1Z6ZElvZ0FTcUJSanhRVXZPTzlYa01WWEI0?=
+ =?utf-8?B?NlJCd1N0RXVYU1JndDhDRTVWYi9wTHN1b2l4QXAxUFREWENzQUdsY0hhdW5N?=
+ =?utf-8?B?UWhpOUs4MWhvQTNEL05pcVVHcXBEajllVlVMVEE3VzZtNDY3Q3dGMlRZaFk1?=
+ =?utf-8?B?YjlDcFdvKzRnNThnNjFSUEZSWXkrWDlERXV5WmJMakoxOHUzSWQvQ1h5dHc1?=
+ =?utf-8?B?Z1JGb3JOaXFjQnRKM2E4b1poRHBIUGtnalVEVFg0ZmhhdmQwMkpEdnRDY0ww?=
+ =?utf-8?B?UjNOL0NPSjBoRWlBbmtqN1g5aHJ4a1ZoSnlCaldIL01SanM5U1NtbE5mSHYr?=
+ =?utf-8?B?WlcxeVVsR0sxOHBmdUVpMUxRMWw4UWdIelJrdGxQSHdMT1g0QUtUOUNjRWla?=
+ =?utf-8?B?MExNbGFaZkxCc0cxZmhHbUhCbDByQXBwL3NzWkZ1WVp4ZE9POUlPSDByeU9H?=
+ =?utf-8?B?TmV0U3h1cVRVMjJ1dUVlcWZCMlNRb05mRUpZUzBGM25HQWhxaFp2RDhZVFQ3?=
+ =?utf-8?B?UXhLdmxVbnRXakMvOWIxOTAyaUtSYisxQ1RGRTZPNXk0UzBIMVIralNZa3lj?=
+ =?utf-8?B?ZHhOaXU3M0QyOUFNUlZzMnJpMk5hd045SWNNdmYzeFBob3ZrN20ybW5KVVZ3?=
+ =?utf-8?B?TmpPblpsd2oxOCs5RWg4N2wvaDRQejIxcEVtdTUyK1JLU3VId1NpWHBweVlV?=
+ =?utf-8?B?ampRTFhDek9IRFZ4TmJNWGd2YnhITDVyTWhSL3lHKytnZXVFQm1BeUxzOFBI?=
+ =?utf-8?B?cndjOFNiOUVzYnVFeW5vNmpKSzluVFBoOUxBZ3IxWWEreG5OaFFkcXVmalZS?=
+ =?utf-8?B?eVZ4ZERxTTJzcWVGU1UzVVc2eXlQREFuQ0VPbEJkNEpsa2s1RzAxemtGQnEz?=
+ =?utf-8?B?ZWQ1SHk4THBvSStXbC9ld2tDeFF0Mm43Ylh5TDlRNzUvUndIVDVTWTY4c21p?=
+ =?utf-8?B?Q3dUTURCaXdXeEt2dnp4cmJmVjlIRzIxaHlYTko1alM2OVJaTU1OUi9PelJV?=
+ =?utf-8?B?eGhKZ01CNWVQM1JBTHRWSW1UcUI3eExzOHpYRTFoQnlZdVNZTGt5d0ZXek9v?=
+ =?utf-8?B?bnJnUlZzRHV4cUhzbFA0RVVPMU5VOFJJUlBxL1BkWWhRRDJBc1pnTVQ0ZnlV?=
+ =?utf-8?B?NG1qN2RxaXVCdy9zTzFzQVNiU3pDU1R6NHBmM2lMclg4b3MzSitpNEp0cWJh?=
+ =?utf-8?B?MkFoTXNxVi9icEJTTUlrWnc3djNSd0dTUHBMUGNmSVR6VWZ5Y0ZJTW1ad2kw?=
+ =?utf-8?B?NVNQWThmQys4WnJERyt1ZUNrVmFBNVRmMTFiS1RsUWxLSnBVZ0FscHkwYWo5?=
+ =?utf-8?B?SnZiMktOQ3hsRDZYeGJRclcxbmhOZHRSR213dUl2dXd4d2dVRzhSR0dscWV0?=
+ =?utf-8?B?S1JGVGNoL1NiVHUzL1dlR0dkV2ZnbjAxVVVzWUovQ3JlMHFjS1oycmU2VStS?=
+ =?utf-8?B?RGZoTGpZeitYYm9abUpOL20rcERxZzFzNWwrYWcrdDhXdFRHcVFkVVJ5NlE5?=
+ =?utf-8?B?Rkt4aERZdk9YUEJYbGlTSWszTVhPUkhDWTBkc0RFL01sYjRKY2tQZis1Yjla?=
+ =?utf-8?B?YXpsUTk0QkJDNk9pNVgzYjZQMVUxRzVpelM0S2ZTSVA0NmVKVTREMldIMks2?=
+ =?utf-8?B?VXpvdVBodEJNbGl4dUNJNjU0QmVBZW8rVXNGYVZXQ3VhVW03NmJhV2pCMm5N?=
+ =?utf-8?B?T2Vrd1dkSVo1M24wSXJnYmZKakZ3Wm9kVGYweHRwYkV5bTJXVlNuYWxHU0RL?=
+ =?utf-8?B?eHdGRm9vU0xIK1dEb3RqRjhZUGw1bndpNXp5TTV1cFpjTWxCMDFqODRSS1pk?=
+ =?utf-8?B?d0tqMmtHYklBRUxGd2Zwbk1PTDJubytZb2hzZkkzTC85ajZ1elNCZkF1VVY3?=
+ =?utf-8?B?T0s0VjRkSXFnc0lvMUVxUE96WWlkdmNRV3huU0FZUzZ5aVB0WnRRdm91REk3?=
+ =?utf-8?B?eE03NlJzQ2JLbHRTdTZDVGtqZStBRXI3Yk9DdXo2M3FQZVE5ZlYzVi9lWk1O?=
+ =?utf-8?B?U2c4WU1ERXllWFYrbXp1NFlZTlZRanlmTnNGeXhuNGNOT1JBK1Fudjh5Q3lq?=
+ =?utf-8?B?SGlEQVBTWWNrRUxQbEZWRFJJWkVwRXdjbzhpRkRYTVZlcjEwR0IydVNwdGNI?=
+ =?utf-8?B?QnN6bVRadUV6OVgrbHJqZzBNNmpEYlZldlhka0ZtdS9iVEp3aXY3dTVFS3ph?=
+ =?utf-8?B?aWwvenFneVIrZjRjSmVrbTZjQkJvMHkxeXlhd2NpdDBwbkFuRW9idDZjNGxG?=
+ =?utf-8?Q?mHmKc2T/HFL8+hyRCTPRgsouPxsMOEczR237ITlZQ9cuH?=
+x-ms-exchange-antispam-messagedata-1: N+5/wkiwLqk9fgkjor0INUd5g0MS4mvNzYDwF2RbObtkguBPPT6QOeDm
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <2ABD868E1EF9DD46BF83BFD79EF9C987@namprd02.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: q3_6BCBEDX1bwLD2J6sEjOGZM2vOmSPH
-X-Proofpoint-ORIG-GUID: 0_GCxnZvWr6hjanpg_fjO3Pdk17KYLc9
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR02MB4579.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 778bf276-b6f8-4de8-d3b4-08da3294411c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 May 2022 14:49:15.5147
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: bqNzGJO7Ir6GxsLOW6B4q2lhUSpXFBljFfev/XPz82QE+S+x+lS1KZ4KYOg8HwdD8ObdROiG80HPwdEsiNq1V86zo5q2t7K+hfeaTUiTQcs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR02MB4369
+X-Proofpoint-GUID: vqy7wBOHF-JqaTEjpVRztRo5g47oraAY
+X-Proofpoint-ORIG-GUID: vqy7wBOHF-JqaTEjpVRztRo5g47oraAY
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-05-10_03,2022-05-10_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
- lowpriorityscore=0 priorityscore=1501 impostorscore=0 suspectscore=0
- mlxlogscore=999 spamscore=0 adultscore=0 mlxscore=0 phishscore=0
- malwarescore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205100067
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Proofpoint-Spam-Reason: safe
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Adds some selftests to test ioctl error paths of the uv-uapi.
-The Kconfig S390_UV_UAPI must be selected and the Ultravisor facility
-must be available. The test can be executed by non-root, however, the
-uvdevice special file /dev/uv must be accessible for reading and
-writing which may imply root privileges.
-
-  ./test-uv-device
-  TAP version 13
-  1..6
-  # Starting 6 tests from 3 test cases.
-  #  RUN           uvio_fixture.att.fault_ioctl_arg ...
-  #            OK  uvio_fixture.att.fault_ioctl_arg
-  ok 1 uvio_fixture.att.fault_ioctl_arg
-  #  RUN           uvio_fixture.att.fault_uvio_arg ...
-  #            OK  uvio_fixture.att.fault_uvio_arg
-  ok 2 uvio_fixture.att.fault_uvio_arg
-  #  RUN           uvio_fixture.att.inval_ioctl_cb ...
-  #            OK  uvio_fixture.att.inval_ioctl_cb
-  ok 3 uvio_fixture.att.inval_ioctl_cb
-  #  RUN           uvio_fixture.att.inval_ioctl_cmd ...
-  #            OK  uvio_fixture.att.inval_ioctl_cmd
-  ok 4 uvio_fixture.att.inval_ioctl_cmd
-  #  RUN           attest_fixture.att_inval_request ...
-  #            OK  attest_fixture.att_inval_request
-  ok 5 attest_fixture.att_inval_request
-  #  RUN           attest_fixture.att_inval_addr ...
-  #            OK  attest_fixture.att_inval_addr
-  ok 6 attest_fixture.att_inval_addr
-  # PASSED: 6 / 6 tests passed.
-  # Totals: pass:6 fail:0 xfail:0 xpass:0 skip:0 error:0
-
-Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
----
- MAINTAINERS                                   |   1 +
- tools/testing/selftests/Makefile              |   1 +
- tools/testing/selftests/drivers/.gitignore    |   1 +
- .../selftests/drivers/s390x/uvdevice/Makefile |  22 ++
- .../selftests/drivers/s390x/uvdevice/config   |   1 +
- .../drivers/s390x/uvdevice/test_uvdevice.c    | 276 ++++++++++++++++++
- 6 files changed, 302 insertions(+)
- create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/Makefile
- create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/config
- create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b42ab4a35e18..46a9b1467380 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10786,6 +10786,7 @@ F:	arch/s390/kernel/uv.c
- F:	arch/s390/kvm/
- F:	arch/s390/mm/gmap.c
- F:	drivers/s390/char/uvdevice.c
-+F:	tools/testing/selftests/drivers/s390x/uvdevice/
- F:	tools/testing/selftests/kvm/*/s390x/
- F:	tools/testing/selftests/kvm/s390x/
- 
-diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
-index 2319ec87f53d..d6b307371ef7 100644
---- a/tools/testing/selftests/Makefile
-+++ b/tools/testing/selftests/Makefile
-@@ -10,6 +10,7 @@ TARGETS += core
- TARGETS += cpufreq
- TARGETS += cpu-hotplug
- TARGETS += drivers/dma-buf
-+TARGETS += drivers/s390x/uvdevice
- TARGETS += efivarfs
- TARGETS += exec
- TARGETS += filesystems
-diff --git a/tools/testing/selftests/drivers/.gitignore b/tools/testing/selftests/drivers/.gitignore
-index ca74f2e1c719..09e23b5afa96 100644
---- a/tools/testing/selftests/drivers/.gitignore
-+++ b/tools/testing/selftests/drivers/.gitignore
-@@ -1,2 +1,3 @@
- # SPDX-License-Identifier: GPL-2.0-only
- /dma-buf/udmabuf
-+/s390x/uvdevice/test_uvdevice
-diff --git a/tools/testing/selftests/drivers/s390x/uvdevice/Makefile b/tools/testing/selftests/drivers/s390x/uvdevice/Makefile
-new file mode 100644
-index 000000000000..5e701d2708d4
---- /dev/null
-+++ b/tools/testing/selftests/drivers/s390x/uvdevice/Makefile
-@@ -0,0 +1,22 @@
-+include ../../../../../build/Build.include
-+
-+UNAME_M := $(shell uname -m)
-+
-+ifneq ($(UNAME_M),s390x)
-+nothing:
-+.PHONY: all clean run_tests install
-+.SILENT:
-+else
-+
-+TEST_GEN_PROGS := test_uvdevice
-+
-+top_srcdir ?= ../../../../../..
-+KSFT_KHDR_INSTALL := 1
-+khdr_dir = $(top_srcdir)/usr/include
-+LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
-+
-+CFLAGS += -Wall -Werror -static -I$(khdr_dir) -I$(LINUX_TOOL_ARCH_INCLUDE)
-+
-+include ../../../lib.mk
-+
-+endif
-diff --git a/tools/testing/selftests/drivers/s390x/uvdevice/config b/tools/testing/selftests/drivers/s390x/uvdevice/config
-new file mode 100644
-index 000000000000..f28a04b99eff
---- /dev/null
-+++ b/tools/testing/selftests/drivers/s390x/uvdevice/config
-@@ -0,0 +1 @@
-+CONFIG_S390_UV_UAPI=y
-diff --git a/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c b/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
-new file mode 100644
-index 000000000000..ea0cdc37b44f
---- /dev/null
-+++ b/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
-@@ -0,0 +1,276 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ *  selftest for the Ultravisor UAPI device
-+ *
-+ *  Copyright IBM Corp. 2022
-+ *  Author(s): Steffen Eiden <seiden@linux.ibm.com>
-+ */
-+
-+#include <stdint.h>
-+#include <fcntl.h>
-+#include <errno.h>
-+#include <sys/ioctl.h>
-+#include <sys/mman.h>
-+
-+#include <asm/uvdevice.h>
-+
-+#include "../../../kselftest_harness.h"
-+
-+#define UV_PATH  "/dev/uv"
-+#define BUFFER_SIZE 0x200
-+FIXTURE(uvio_fixture) {
-+	int uv_fd;
-+	struct uvio_ioctl_cb uvio_ioctl;
-+	uint8_t buffer[BUFFER_SIZE];
-+	__u64 fault_page;
-+};
-+
-+FIXTURE_VARIANT(uvio_fixture) {
-+	unsigned long ioctl_cmd;
-+	uint32_t arg_size;
-+};
-+
-+FIXTURE_VARIANT_ADD(uvio_fixture, att) {
-+	.ioctl_cmd = UVIO_IOCTL_ATT,
-+	.arg_size = sizeof(struct uvio_attest),
-+};
-+
-+FIXTURE_SETUP(uvio_fixture)
-+{
-+	self->uv_fd = open(UV_PATH, O_ACCMODE);
-+
-+	self->uvio_ioctl.argument_addr = (__u64)self->buffer;
-+	self->uvio_ioctl.argument_len = variant->arg_size;
-+	self->fault_page =
-+		(__u64)mmap(NULL, (size_t)getpagesize(), PROT_NONE, MAP_ANONYMOUS, -1, 0);
-+}
-+
-+FIXTURE_TEARDOWN(uvio_fixture)
-+{
-+	if (self->uv_fd)
-+		close(self->uv_fd);
-+	munmap((void *)self->fault_page, (size_t)getpagesize());
-+}
-+
-+TEST_F(uvio_fixture, fault_ioctl_arg)
-+{
-+	int rc, errno_cache;
-+
-+	rc = ioctl(self->uv_fd, variant->ioctl_cmd, NULL);
-+	errno_cache = errno;
-+	ASSERT_EQ(rc, -1);
-+	ASSERT_EQ(errno_cache, EFAULT);
-+
-+	rc = ioctl(self->uv_fd, variant->ioctl_cmd, self->fault_page);
-+	errno_cache = errno;
-+	ASSERT_EQ(rc, -1);
-+	ASSERT_EQ(errno_cache, EFAULT);
-+}
-+
-+TEST_F(uvio_fixture, fault_uvio_arg)
-+{
-+	int rc, errno_cache;
-+
-+	self->uvio_ioctl.argument_addr = 0;
-+	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
-+	errno_cache = errno;
-+	ASSERT_EQ(rc, -1);
-+	ASSERT_EQ(errno_cache, EFAULT);
-+
-+	self->uvio_ioctl.argument_addr = self->fault_page;
-+	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
-+	errno_cache = errno;
-+	ASSERT_EQ(rc, -1);
-+	ASSERT_EQ(errno_cache, EFAULT);
-+}
-+
-+/*
-+ * Test to verify that IOCTLs with invalid values in the ioctl_control block
-+ * are rejected.
-+ */
-+TEST_F(uvio_fixture, inval_ioctl_cb)
-+{
-+	int rc, errno_cache;
-+
-+	self->uvio_ioctl.argument_len = 0;
-+	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
-+	errno_cache = errno;
-+	ASSERT_EQ(rc, -1);
-+	ASSERT_EQ(errno_cache, EINVAL);
-+
-+	self->uvio_ioctl.argument_len = (uint32_t)-1;
-+	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
-+	errno_cache = errno;
-+	ASSERT_EQ(rc, -1);
-+	ASSERT_EQ(errno_cache, EINVAL);
-+	self->uvio_ioctl.argument_len = variant->arg_size;
-+
-+	self->uvio_ioctl.flags = (uint32_t)-1;
-+	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
-+	errno_cache = errno;
-+	ASSERT_EQ(rc, -1);
-+	ASSERT_EQ(errno_cache, EINVAL);
-+	self->uvio_ioctl.flags = 0;
-+
-+	memset(self->uvio_ioctl.reserved14, 0xff, sizeof(self->uvio_ioctl.reserved14));
-+	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
-+	errno_cache = errno;
-+	ASSERT_EQ(rc, -1);
-+	ASSERT_EQ(errno_cache, EINVAL);
-+
-+	memset(&self->uvio_ioctl, 0x11, sizeof(self->uvio_ioctl));
-+	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
-+	ASSERT_EQ(rc, -1);
-+}
-+
-+TEST_F(uvio_fixture, inval_ioctl_cmd)
-+{
-+	int rc, errno_cache;
-+	uint8_t nr = _IOC_NR(variant->ioctl_cmd);
-+	unsigned long cmds[] = {
-+		_IOWR('a', nr, struct uvio_ioctl_cb),
-+		_IOWR(UVIO_TYPE_UVC, nr, int),
-+		_IO(UVIO_TYPE_UVC, nr),
-+		_IOR(UVIO_TYPE_UVC, nr, struct uvio_ioctl_cb),
-+		_IOW(UVIO_TYPE_UVC, nr, struct uvio_ioctl_cb),
-+	};
-+
-+	for (size_t i = 0; i < ARRAY_SIZE(cmds); i++) {
-+		rc = ioctl(self->uv_fd, cmds[i], &self->uvio_ioctl);
-+		errno_cache = errno;
-+		ASSERT_EQ(rc, -1);
-+		ASSERT_EQ(errno_cache, ENOTTY);
-+	}
-+}
-+
-+struct test_attest_buffer {
-+	uint8_t arcb[0x180];
-+	uint8_t meas[64];
-+	uint8_t add[32];
-+};
-+
-+FIXTURE(attest_fixture) {
-+	int uv_fd;
-+	struct uvio_ioctl_cb uvio_ioctl;
-+	struct uvio_attest uvio_attest;
-+	struct test_attest_buffer attest_buffer;
-+	__u64 fault_page;
-+};
-+
-+FIXTURE_SETUP(attest_fixture)
-+{
-+	self->uv_fd = open(UV_PATH, O_ACCMODE);
-+
-+	self->uvio_ioctl.argument_addr = (__u64)&self->uvio_attest;
-+	self->uvio_ioctl.argument_len = sizeof(self->uvio_attest);
-+
-+	self->uvio_attest.arcb_addr = (__u64)&self->attest_buffer.arcb;
-+	self->uvio_attest.arcb_len = sizeof(self->attest_buffer.arcb);
-+
-+	self->uvio_attest.meas_addr = (__u64)&self->attest_buffer.meas;
-+	self->uvio_attest.meas_len = sizeof(self->attest_buffer.meas);
-+
-+	self->uvio_attest.add_data_addr = (__u64)&self->attest_buffer.add;
-+	self->uvio_attest.add_data_len = sizeof(self->attest_buffer.add);
-+	self->fault_page =
-+		(__u64)mmap(NULL, (size_t)getpagesize(), PROT_NONE, MAP_ANONYMOUS, -1, 0);
-+}
-+
-+FIXTURE_TEARDOWN(attest_fixture)
-+{
-+	if (self->uv_fd)
-+		close(self->uv_fd);
-+	munmap((void *)self->fault_page, (size_t)getpagesize());
-+}
-+
-+static void att_inval_sizes_test(uint32_t *size, uint32_t max_size, bool test_zero,
-+				 struct __test_metadata *_metadata,
-+				 FIXTURE_DATA(attest_fixture) *self)
-+{
-+	int rc, errno_cache;
-+	uint32_t tmp = *size;
-+
-+	if (test_zero) {
-+		*size = 0;
-+		rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
-+		errno_cache = errno;
-+		ASSERT_EQ(rc, -1);
-+		ASSERT_EQ(errno_cache, EINVAL);
-+	}
-+	*size = max_size + 1;
-+	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
-+	errno_cache = errno;
-+	ASSERT_EQ(rc, -1);
-+	ASSERT_EQ(errno_cache, EINVAL);
-+	*size = tmp;
-+}
-+
-+/*
-+ * Test to verify that attestation IOCTLs with invalid values in the UVIO
-+ * attestation control block are rejected.
-+ */
-+TEST_F(attest_fixture, att_inval_request)
-+{
-+	int rc, errno_cache;
-+
-+	att_inval_sizes_test(&self->uvio_attest.add_data_len, UVIO_ATT_ADDITIONAL_MAX_LEN,
-+			     false, _metadata, self);
-+	att_inval_sizes_test(&self->uvio_attest.meas_len, UVIO_ATT_MEASUREMENT_MAX_LEN,
-+			     true, _metadata, self);
-+	att_inval_sizes_test(&self->uvio_attest.arcb_len, UVIO_ATT_ARCB_MAX_LEN,
-+			     true, _metadata, self);
-+
-+	self->uvio_attest.reserved136 = (uint16_t)-1;
-+	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
-+	errno_cache = errno;
-+	ASSERT_EQ(rc, -1);
-+	ASSERT_EQ(errno_cache, EINVAL);
-+
-+	memset(&self->uvio_attest, 0x11, sizeof(self->uvio_attest));
-+	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
-+	ASSERT_EQ(rc, -1);
-+}
-+
-+static void att_inval_addr_test(__u64 *addr, struct __test_metadata *_metadata,
-+				FIXTURE_DATA(attest_fixture) *self)
-+{
-+	int rc, errno_cache;
-+	__u64 tmp = *addr;
-+
-+	*addr = 0;
-+	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
-+	errno_cache = errno;
-+	ASSERT_EQ(rc, -1);
-+	ASSERT_EQ(errno_cache, EFAULT);
-+	*addr = self->fault_page;
-+	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
-+	errno_cache = errno;
-+	ASSERT_EQ(rc, -1);
-+	ASSERT_EQ(errno_cache, EFAULT);
-+	*addr = tmp;
-+}
-+
-+TEST_F(attest_fixture, att_inval_addr)
-+{
-+	att_inval_addr_test(&self->uvio_attest.arcb_addr, _metadata, self);
-+	att_inval_addr_test(&self->uvio_attest.add_data_addr, _metadata, self);
-+	att_inval_addr_test(&self->uvio_attest.meas_addr, _metadata, self);
-+}
-+
-+static void __attribute__((constructor)) __constructor_order_last(void)
-+{
-+	if (!__constructor_order)
-+		__constructor_order = _CONSTRUCTOR_ORDER_BACKWARD;
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	int fd = open(UV_PATH, O_ACCMODE);
-+
-+	if (fd < 0)
-+		ksft_exit_skip("No uv-device or cannot access " UV_PATH  "\n"
-+			       "Enable CONFIG_S390_UV_UAPI and check the access rights on "
-+			       UV_PATH ".\n");
-+	close(fd);
-+	return test_harness_run(argc, argv);
-+}
--- 
-2.30.2
-
+DQoNCj4gT24gTWF5IDEwLCAyMDIyLCBhdCAxMDoyMiBBTSwgU2VhbiBDaHJpc3RvcGhlcnNvbiA8
+c2VhbmpjQGdvb2dsZS5jb20+IHdyb3RlOg0KPiANCj4gT24gU2F0LCBBcHIgMzAsIDIwMjIsIEpv
+biBLb2hsZXIgd3JvdGU6DQo+PiANCj4+PiBPbiBBcHIgMzAsIDIwMjIsIGF0IDU6NTAgQU0sIEJv
+cmlzbGF2IFBldGtvdiA8YnBAYWxpZW44LmRlPiB3cm90ZToNCj4+PiBTbyBsZXQgbWUgdHJ5IHRv
+IHVuZGVyc3RhbmQgdGhpcyB1c2UgY2FzZTogeW91IGhhdmUgYSBndWVzdCBhbmQgYSBidW5jaA0K
+Pj4+IG9mIHZDUFVzIHdoaWNoIGJlbG9uZyB0byBpdC4gQW5kIHRoYXQgZ3Vlc3QgZ2V0cyBzd2l0
+Y2hlZCBiZXR3ZWVuIHRob3NlDQo+Pj4gdkNQVXMgYW5kIEtWTSBkb2VzIElCUEIgZmx1c2hlcyBi
+ZXR3ZWVuIHRob3NlIHZDUFVzLg0KPj4+IA0KPj4+IFNvIGVpdGhlciBJJ20gbWlzc2luZyBzb21l
+dGhpbmcgLSB3aGljaCBpcyBwb3NzaWJsZSAtIGJ1dCBpZiBub3QsIHRoYXQNCj4+PiAicHJvdGVj
+dGlvbiIgZG9lc24ndCBtYWtlIGFueSBzZW5zZSAtIGl0IGlzIGFsbCB3aXRoaW4gdGhlIHNhbWUg
+Z3Vlc3QhDQo+Pj4gU28gdGhhdCBleGlzdGluZyBiZWhhdmlvciB3YXMgc2lsbHkgdG8gYmVnaW4g
+d2l0aCBzbyB3ZSBtaWdodCBqdXN0IGFzDQo+Pj4gd2VsbCBraWxsIGl0Lg0KPj4gDQo+PiBDbG9z
+ZSwgaXRzIG5vdCAxIGd1ZXN0IHdpdGggYSBidW5jaCBvZiB2Q1BVLCBpdHMgYSBidW5jaCBvZiBn
+dWVzdHMgd2l0aA0KPj4gYSBzbWFsbCBhbW91bnQgb2YgdkNQVXMsIHRoYXRzIHRoZSBzbWFsbCBu
+dWFuY2UgaGVyZSwgd2hpY2ggaXMgb25lIG9mIA0KPj4gdGhlIHJlYXNvbnMgd2h5IHRoaXMgd2Fz
+IGhhcmQgdG8gc2VlIGZyb20gdGhlIGJlZ2lubmluZy4gDQo+PiANCj4+IEFGQUlLLCB0aGUgS1ZN
+IElCUEIgaXMgYXZvaWRlZCB3aGVuIHN3aXRjaGluZyBpbiBiZXR3ZWVuIHZDUFVzDQo+PiBiZWxv
+bmdpbmcgdG8gdGhlIHNhbWUgdm1jcy92bWNiIChpLmUuIHRoZSBzYW1lIGd1ZXN0KSwgZS5nLiB5
+b3UgY291bGQgDQo+PiBoYXZlIG9uZSBWTSBoaWdobHkgb3ZlcnN1YnNjcmliZWQgdG8gdGhlIGhv
+c3QgYW5kIHlvdSB3b3VsZG7igJl0IHNlZQ0KPj4gZWl0aGVyIHRoZSBLVk0gSUJQQiBvciB0aGUg
+c3dpdGNoX21tIElCUEIuIEFsbCBnb29kLiANCj4gDQo+IE5vLCBLVk0gZG9lcyBub3QgYXZvaWQg
+SUJQQiB3aGVuIHN3aXRjaGluZyBiZXR3ZWVuIHZDUFVzIGluIGEgc2luZ2xlIFZNLiAgRXZlcnkN
+Cj4gdkNQVSBoYXMgYSBzZXBhcmF0ZSBWTUNTL1ZNQ0IsIGFuZCBzbyB0aGUgc2NlbmFyaW8gZGVz
+Y3JpYmVkIGFib3ZlIHdoZXJlIGEgc2luZ2xlDQo+IFZNIGhhcyBhIGJ1bmNoIG9mIHZDUFVzIHJ1
+bm5pbmcgb24gYSBsaW1pdGVkIHNldCBvZiBsb2dpY2FsIENQVXMgd2lsbCBlbWl0IElCUEINCj4g
+b24gZXZlcnkgc2luZ2xlIHN3aXRjaC4NCg0KQWghIFJpZ2h0LCBvayB0aGFua3MgZm9yIGhlbHBp
+bmcgbWUgZ2V0IG15IHdpcmVzIHVuY3Jvc3NlZCB0aGVyZSwgSSB3YXMgZ2V0dGluZw0KY29uZnVz
+ZWQgZnJvbSB0aGUgbmVzdGVkIG9wdGltaXphdGlvbiBtYWRlIG9uDQo1YzkxMWJlZmYgS1ZNOiBu
+Vk1YOiBTa2lwIElCUEIgd2hlbiBzd2l0Y2hpbmcgYmV0d2VlbiB2bWNzMDEgYW5kIHZtY3MwMg0K
+DQpTbyB0aGUgb25seSB0aW1lIHdl4oCZZCAqbm90KiBpc3N1ZSBJQlBCIGlzIGlmIHRoZSBjdXJy
+ZW50IHBlci12Y3B1IHZtY3Mvdm1jYiBpcw0Kc3RpbGwgbG9hZGVkIGluIHRoZSBub24tbmVzdGVk
+IGNhc2UsIG9yIGJldHdlZW4gZ3Vlc3RzIGluIHRoZSBuZXN0ZWQgY2FzZS4NCg0KV2Fsa2luZyB0
+aHJvdWdoIG15IHRob3VnaHRzIGFnYWluIGhlcmUgd2l0aCB0aGlzIGZyZXNoIGluIG15IG1pbmQ6
+DQoNCkluIHRoYXQgZXhhbXBsZSwgc2F5IGd1ZXN0IEEgaGFzIHZDUFUwIGFuZCB2Q1BVMSBhbmQg
+aGFzIHRvIHN3aXRjaA0KaW4gYmV0d2VlbiB0aGUgdHdvIG9uIHRoZSBzYW1lIHBDUFUsIGl0IGlz
+buKAmXQgZG9pbmcgYSBzd2l0Y2hfbW0oKQ0KYmVjYXVzZSBpdHMgdGhlIHNhbWUgbW1fc3RydWN0
+OyBob3dldmVyLCBJ4oCZZCB3YWdlciB0byBzYXkgdGhhdCBpZiB5b3UNCmhhZCBhbiBhdHRhY2tl
+ciBvbiB0aGUgZ3Vlc3QgVk0sIGV4ZWN1dGluZyBhbiBhdHRhY2sgb24gdkNQVTAgd2l0aA0KdGhl
+IGludGVudCBvZiBhdHRhY2tpbmcgdkNQVTEgKHdoaWNoIGlzIHVwIHRvIHJ1biBuZXh0KSwgeW91
+IGhhdmUgZmFyDQpiaWdnZXIgcHJvYmxlbXMsIGFzIHRoYXQgd291bGQgaW1wbHkgdGhlIGd1ZXN0
+IGlzIGNvbXBsZXRlbHkNCmNvbXByb21pc2VkLCBzbyB3aHkgd291bGQgdGhleSBldmVuIHdhc3Rl
+IHRpbWUgb24gYSBjb21wbGV4DQpwcmVkaWN0aW9uIGF0dGFjayB3aGVuIHRoZXkgaGF2ZSB0aGF0
+IGxldmVsIG9mIHN5c3RlbSBhY2Nlc3MgaW4NCnRoZSBmaXJzdCBwbGFjZT8NCg0KR29pbmcgYmFj
+ayB0byB0aGUgb3JpZ2luYWwgY29tbWl0IGRvY3VtZW50YXRpb24gdGhhdCBCb3JpcyBjYWxsZWQg
+b3V0LCANCnRoYXQgc3BlY2lmaWNhbGx5IHNheXM6DQoNCiAgICogTWl0aWdhdGUgZ3Vlc3RzIGZy
+b20gYmVpbmcgYXR0YWNrZWQgYnkgb3RoZXIgZ3Vlc3RzLg0KICAgICAtIFRoaXMgaXMgYWRkcmVz
+c2VkIGJ5IGlzc2luZyBJQlBCIHdoZW4gd2UgZG8gYSBndWVzdCBzd2l0Y2guDQoNClNpbmNlIHlv
+dSBuZWVkIHRvIGdvIHRocm91Z2ggc3dpdGNoX21tKCkgdG8gY2hhbmdlIG1tX3N0cnVjdCBmcm9t
+DQpHdWVzdCBBIHRvIEd1ZXN0IEIsIGl0IG1ha2VzIG5vIHNlbnNlIHRvIGlzc3VlIHRoZSBiYXJy
+aWVyIGluIEtWTSwNCmFzIHRoZSBrZXJuZWwgaXMgYWxyZWFkeSBnaXZpbmcgdGhhdCDigJxmb3Ig
+ZnJlZeKAnSAoZnJvbSBLVk3igJlzIHBlcnNwZWN0aXZlKSBhcw0KdGhlIGd1ZXN0LXRvLWd1ZXN0
+IHRyYW5zaXRpb24gaXMgYWxyZWFkeSBjb3ZlcmVkIGJ5IGNvbmRfbWl0aWdhdGlvbigpLg0KDQpU
+aGF0IHdvdWxkIGFwcGx5IGVxdWFsbHkgZm9yIHN3aXRjaGVzIHdpdGhpbiBib3RoIG5lc3RlZCBh
+bmQgbm9uLW5lc3RlZA0KY2FzZXMsIGJlY2F1c2Ugc3dpdGNoX21tIG5lZWRzIHRvIGJlIGNhbGxl
+ZCBiZXR3ZWVuIGd1ZXN0cy4NCg0K
