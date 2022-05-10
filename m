@@ -2,137 +2,305 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EBD8521C89
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 16:34:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F9FD521CC4
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 16:45:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243066AbiEJOiv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 10:38:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51792 "EHLO
+        id S1345070AbiEJOtb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 10:49:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245587AbiEJOiM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 10:38:12 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA4212F3CA1
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 06:57:01 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id x52so15008975pfu.11
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 06:57:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=kiQACap0HlYOlp8ZH4NG5Zh8+trxbQX+sb2tMEraWN4=;
-        b=RCu2Xnv5xvPD3uE8m1QZj6iZlSYzlrTeqEM0k+enZcI7WKY/nNAnbfekUXtY0/2s6K
-         Dx6zuMSJpB5N6X0x2Y77xtbcXc7SkTZsfyWROM40guwJHSH3/ZlB1AwrGgjUaJvTGyCL
-         LQfRvdC/O/Fk+J0PEBcTaVsC2e0A21GuCYnlBZcxgx5acGuqQ2Ojq/J3oevzjYx2NY+O
-         QgujmBAwtcsd0/g22Ji7gm1v+VkfG7T8qxmsMVwS+c/e+q0A79JAckEmd7KP0OZufZwO
-         PNgC+7Vut8BhaWFYn2KkGoIXtLrxrFs5mfr2PK0uP3hO43FbBuJjPnQ+Y4OgiME1OPxy
-         XN8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=kiQACap0HlYOlp8ZH4NG5Zh8+trxbQX+sb2tMEraWN4=;
-        b=lB9p3mTBwlhPAn8vVNdslQ45m06an+tZlajm5HACSsbUzwHYf/EJXq7Jy+DNK/tifX
-         FTL6GRGQnQND1V9pQypEc+0/Nnux8IVw6o5/IjCmbg+3qRJ+IlpM1J9sBrIx4jXTjT6c
-         hwvOBblPMAm3lEwuNoTAfg4FpMeitZG90H0sPjkF46NNjN8Lg/e8q3NzK0WunDbaFowC
-         XF8NUWTtySiIpAbs1tFvlC+dE4tU8+c5BXSeVu0H6Yc2vU849rIEwbChbzffahr01vN1
-         1SsJgR0TQTTUMCZ9KvpBhjDvNmJEGYs0bG3i8fPNAruuyH95MuWacmorGQvQ0x4DKzpq
-         lDYw==
-X-Gm-Message-State: AOAM533MowjUOUWXlxFk0W0LK1bl3W4y78yFW4Xv/c+m55YczJ4QqzAo
-        9obimgMWFZqzc4gvkfT8fcg9KHydw0IJ+g==
-X-Google-Smtp-Source: ABdhPJz3PdtYrEyYVXbIkRhiFVppqHSDAtQoc9m5MtKlcGR6pLshSbBiS5E93aq0j5zsOaa3eIWG6g==
-X-Received: by 2002:a63:1c5:0:b0:39c:c779:b480 with SMTP id 188-20020a6301c5000000b0039cc779b480mr16810679pgb.311.1652191015329;
-        Tue, 10 May 2022 06:56:55 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id c6-20020aa79526000000b0050dc7628155sm10836976pfp.47.2022.05.10.06.56.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 May 2022 06:56:54 -0700 (PDT)
-Date:   Tue, 10 May 2022 13:56:51 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     syzbot <syzbot+0c6da80218456f1edc36@syzkaller.appspotmail.com>,
-        akpm@linux-foundation.org, davem@davemloft.net, jhs@mojatatu.com,
-        jiri@resnulli.us, kvm@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@elte.hu, mlevitsk@redhat.com, netdev@vger.kernel.org,
-        peterz@infradead.org, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, vinicius.gomes@intel.com,
-        viro@zeniv.linux.org.uk, xiyou.wangcong@gmail.com
-Subject: Re: [syzbot] INFO: task hung in synchronize_rcu (3)
-Message-ID: <YnpvI4tgbrEtHBG2@google.com>
-References: <000000000000402c5305ab0bd2a2@google.com>
- <0000000000004f3c0d05dea46dac@google.com>
- <Ynpsc7dRs8tZugpl@google.com>
- <8f24d358-1fbd-4598-1f2d-959b4f8d75fd@redhat.com>
+        with ESMTP id S243699AbiEJOtW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 10:49:22 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 120CC6BFC6;
+        Tue, 10 May 2022 07:07:54 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24ADi9Dj029294;
+        Tue, 10 May 2022 14:07:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=XgdopWWo5YH8scmeOxinCb9Puoey9qeUs3YtaLtjB5k=;
+ b=dBfb5mnTNJb6M1zZPDxctuwuNk7lpRGGhIoC69iqaHpbKUpdUkWSikv8AxARngfU1jeC
+ LaRTOB4Q0bG5yYhlPOU+VNNLbl2sFHoG0BVBCb28pztcPu4i7TshTPMlF9D0uji7PnMN
+ okxwiKSwCNZhjOc65DEjgWTK3C14Mcgvb1RDkFbTw3f0E0+lGhzuF8x26dmE2QPwDB1t
+ wwuB1r5ZarMUOqHQ+1rqbTz8jbgVazoOFI4eWfp3XcpK53Jsoswz7bWoVjdmfjsGOohP
+ pOlYEewk5zrJh8ndK+H1gb16z+GpgkBMwDVNkcVb5my/uQmS/HKwodvYB2R/biA0z/Pw rw== 
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fyqhq37rj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 May 2022 14:07:53 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24AE03w0004312;
+        Tue, 10 May 2022 14:07:51 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03fra.de.ibm.com with ESMTP id 3fwgd8u8g8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 May 2022 14:07:51 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24AE7lUd42992102
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 May 2022 14:07:47 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C513BA4060;
+        Tue, 10 May 2022 14:07:47 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8C795A405B;
+        Tue, 10 May 2022 14:07:47 +0000 (GMT)
+Received: from [9.145.38.155] (unknown [9.145.38.155])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 10 May 2022 14:07:47 +0000 (GMT)
+Message-ID: <0d503ca0-689b-3779-4708-c06fec3ccd44@linux.ibm.com>
+Date:   Tue, 10 May 2022 16:07:47 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8f24d358-1fbd-4598-1f2d-959b4f8d75fd@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        borntraeger@linux.ibm.com
+References: <20220428130102.230790-1-frankja@linux.ibm.com>
+ <20220428130102.230790-7-frankja@linux.ibm.com>
+ <20220509195135.3f04343f@p-imbrenda>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH 6/9] kvm: s390: Add configuration dump functionality
+In-Reply-To: <20220509195135.3f04343f@p-imbrenda>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Cyk5PQONA_Bm5Zx5nJOrv3WGUFWBhPWM
+X-Proofpoint-ORIG-GUID: Cyk5PQONA_Bm5Zx5nJOrv3WGUFWBhPWM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-10_03,2022-05-10_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
+ phishscore=0 spamscore=0 clxscore=1015 lowpriorityscore=0 mlxlogscore=999
+ suspectscore=0 priorityscore=1501 impostorscore=0 bulkscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2205100065
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 10, 2022, Paolo Bonzini wrote:
-> On 5/10/22 15:45, Sean Christopherson wrote:
-> > > 
-> > >      KVM: x86: Don't re-acquire SRCU lock in complete_emulated_io()
-> > > 
-> > > bisection log:https://syzkaller.appspot.com/x/bisect.txt?x=16dc2e49f00000
-> > > start commit:   ea4424be1688 Merge tag 'mtd/fixes-for-5.17-rc8' of git://g..
-> > > git tree:       upstream
-> > > kernel config:https://syzkaller.appspot.com/x/.config?x=442f8ac61e60a75e
-> > > dashboard link:https://syzkaller.appspot.com/bug?extid=0c6da80218456f1edc36
-> > > syz repro:https://syzkaller.appspot.com/x/repro.syz?x=1685af9e700000
-> > > C reproducer:https://syzkaller.appspot.com/x/repro.c?x=11b09df1700000
-> > > 
-> > > If the result looks correct, please mark the issue as fixed by replying with:
-> > > 
-> > > #syz fix: KVM: x86: Don't re-acquire SRCU lock in complete_emulated_io()
-> > > 
-> > > For information about bisection process see:https://goo.gl/tpsmEJ#bisection
-> > #syz fix: KVM: x86: Don't re-acquire SRCU lock in complete_emulated_io()
-> > 
+On 5/9/22 19:51, Claudio Imbrenda wrote:
+> On Thu, 28 Apr 2022 13:00:59 +0000
+> Janosch Frank <frankja@linux.ibm.com> wrote:
 > 
-> Are you sure? The hang is in synchronize_*rcu* and the testcase is unrelated
-> to KVM.  It seems like the testcase is not 100% reproducible.
+>> Sometimes dumping inside of a VM fails, is unavailable or doesn't
+>> yield the required data. For these occasions we dump the VM from the
+>> outside, writing memory and cpu data to a file.
+>>
+>> Up to now PV guests only supported dumping from the inside of the
+>> guest through dumpers like KDUMP. A PV guest can be dumped from the
+>> hypervisor but the data will be stale and / or encrypted.
+>>
+>> To get the actual state of the PV VM we need the help of the
+>> Ultravisor who safeguards the VM state. New UV calls have been added
+>> to initialize the dump, dump storage state data, dump cpu data and
+>> complete the dump process. We expose these calls in this patch via a
+>> new UV ioctl command.
+>>
+>> The sensitive parts of the dump data are encrypted, the dump key is
+>> derived from the Customer Communication Key (CCK). This ensures that
+>> only the owner of the VM who has the CCK can decrypt the dump data.
+>>
+>> The memory is dumped / read via a normal export call and a re-import
+>> after the dump initialization is not needed (no re-encryption with a
+>> dump key).
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+[...]
+>> +/*
+>> + * kvm_s390_pv_dump_stor_state
+>> + *
+>> + * @kvm: pointer to the guest's KVM struct
+>> + * @buff_user: Userspace pointer where we will write the results to
+>> + * @gaddr: Starting absolute guest address for which the storage
+>> state
+>> + *         is requested. This value will be updated with the last
+>> + *         address for which data was written when returning to
+>> + *         userspace.
+>> + * @buff_user_len: Length of the buff_user buffer
+>> + * @rc: Pointer to where the uvcb return code is stored
+>> + * @rrc: Pointer to where the uvcb return reason code is stored
+>> + *
+>> + * Return:
+>> + *  0 on success
+>> + *  -ENOMEM if allocating the cache fails
+>> + *  -EINVAL if gaddr is not aligned to 1MB
+>> + *  -EINVAL if buff_user_len is not aligned to
+>> uv_info.conf_dump_storage_state_len
+>> + *  -EINVAL if the UV call fails, rc and rrc will be set in this case
+>> + *  -EFAULT if copying the result to buff_user failed
+>> + */
+>> +int kvm_s390_pv_dump_stor_state(struct kvm *kvm, void __user
+>> *buff_user,
+>> +				u64 *gaddr, u64 buff_user_len, u16
+>> *rc, u16 *rrc) +{
+>> +	struct uv_cb_dump_stor_state uvcb = {
+>> +		.header.cmd = UVC_CMD_DUMP_CONF_STOR_STATE,
+>> +		.header.len = sizeof(uvcb),
+>> +		.config_handle = kvm->arch.pv.handle,
+>> +		.gaddr = *gaddr,
+>> +		.dump_area_origin = 0,
+>> +	};
+>> +	size_t buff_kvm_size;
+>> +	size_t size_done = 0;
+>> +	u8 *buff_kvm = NULL;
+>> +	int cc, ret;
+>> +
+>> +	ret = -EINVAL;
+>> +	/* UV call processes 1MB guest storage chunks at a time */
+>> +	if (*gaddr & ~HPAGE_MASK)
+>> +		goto out;
+>> +
+>> +	/*
+>> +	 * We provide the storage state for 1MB chunks of guest
+>> +	 * storage. The buffer will need to be aligned to
+>> +	 * conf_dump_storage_state_len so we don't end on a partial
+>> +	 * chunk.
+>> +	 */
+>> +	if (!buff_user_len ||
+>> +	    buff_user_len & (uv_info.conf_dump_storage_state_len -
+>> 1))
+> 
+> why not use the IS_ALIGNED macro?
 
-Ugh, syzbot seems to have bundled multiple unrelated errors together.  The splat
-that comes up first on the dashboard is definitely the KVM bug:
+Habits.
+I'll fix this one and the one above.
 
-  INFO: task syz-executor500:19706 blocked for more than 143 seconds.
-        Not tainted 5.17.0-rc7-syzkaller-00020-gea4424be1688 #0
-  "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-  task:syz-executor500 state:D stack:27048 pid:19706 ppid:  3644 flags:0x00000004
-  Call Trace:
-   <TASK>
-   context_switch kernel/sched/core.c:4995 [inline]
-   __schedule+0xa94/0x4910 kernel/sched/core.c:6304
-   schedule+0xd2/0x260 kernel/sched/core.c:6377
-   schedule_timeout+0x1db/0x2a0 kernel/time/timer.c:1857
-   do_wait_for_common kernel/sched/completion.c:85 [inline]
-   __wait_for_common+0x2af/0x360 kernel/sched/completion.c:106
-   __synchronize_srcu+0x1f2/0x290 kernel/rcu/srcutree.c:930
-   kvm_swap_active_memslots+0x410/0x800 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1473
-   kvm_activate_memslot arch/x86/kvm/../../../virt/kvm/kvm_main.c:1595 [inline]
-   kvm_create_memslot arch/x86/kvm/../../../virt/kvm/kvm_main.c:1660 [inline]
-   kvm_set_memslot+0xa67/0x1010 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1772
-   __kvm_set_memory_region+0xf02/0x11f0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1914
-   kvm_set_memory_region arch/x86/kvm/../../../virt/kvm/kvm_main.c:1927 [inline]
-   kvm_vm_ioctl_set_memory_region arch/x86/kvm/../../../virt/kvm/kvm_main.c:1939 [inline]
-   kvm_vm_ioctl+0x51a/0x22c0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4492
-   vfs_ioctl fs/ioctl.c:51 [inline]
-   __do_sys_ioctl fs/ioctl.c:874 [inline]
-   __se_sys_ioctl fs/ioctl.c:860 [inline]
-   __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
-   do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-   do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-   entry_SYSCALL_64_after_hwframe+0x44/0xae
+> 
+>> +		goto out;
+>> +
+>> +	/*
+>> +	 * Allocate a buffer from which we will later copy to the user process.
+>> +	 *
+>> +	 * We don't want userspace to dictate our buffer size so we limit it to DUMP_BUFF_LEN.
+>> +	 */
+>> +	ret = -ENOMEM;
+>> +	buff_kvm_size = buff_user_len <= DUMP_BUFF_LEN ? buff_user_len : DUMP_BUFF_LEN;
 
-But there are multiple other errors that are indeed not the KVM bug.
+This will be converted to min() to make it more readable.
+
+>> +	buff_kvm = vzalloc(buff_kvm_size);
+>> +	if (!buff_kvm)
+>> +		goto out;
+>> +
+>> +	ret = 0;
+>> +	uvcb.dump_area_origin = (u64)buff_kvm;
+>> +	/* We will loop until the user buffer is filled or an error occurs */
+>> +	do {
+>> +		/* Get a page of data */
+> 
+> are you getting a page or a block of size conf_dump_storage_state_len ?
+
+Will be changed to:
+/* Get 1MB worth of guest storage state data */
+
+
+I think that comment has historical reasons, we once discussed to always 
+write one page instead of the "one 1MB worth of guest storage state".
+
+> 
+>> +		cc = uv_call_sched(0, (u64)&uvcb);
+>> +
+>> +		/* All or nothing */
+>> +		if (cc) {
+>> +			ret = -EINVAL;
+>> +			break;
+>> +		}
+>> +
+>> +		size_done += uv_info.conf_dump_storage_state_len;
+>> +		uvcb.dump_area_origin +=
+>> uv_info.conf_dump_storage_state_len;
+>> +		uvcb.gaddr += HPAGE_SIZE;
+>> +		buff_user_len -= PAGE_SIZE;
+> 
+> same here ^ (should it be -= uv_info.conf_dump_storage_state_len ?)
+
+Yes
+
+> 
+>> +
+>> +		/* KVM Buffer full, time to copy to the process */
+>> +		if (!buff_user_len ||
+>> +		    uvcb.dump_area_origin == (uintptr_t)buff_kvm +
+>> buff_kvm_size) { +
+> 
+> why not  ... || size_done == DUMP_BUFF_LEN ?
+> 
+>> +			if (copy_to_user(buff_user, buff_kvm,
+>> +					 uvcb.dump_area_origin -
+>> (uintptr_t)buff_kvm)) {
+> 
+> aren't you trying to copy size_done bytes?
+> 
+>> +				ret = -EFAULT;
+>> +				break;
+>> +			}
+>> +
+>> +			buff_user += size_done;
+>> +			size_done = 0;
+>> +			uvcb.dump_area_origin = (u64)buff_kvm;
+>> +		}
+>> +	} while (buff_user_len);
+>> +
+>> +	/* Report back where we ended dumping */
+>> +	*gaddr = uvcb.gaddr;
+>> +
+>> +	/* Lets only log errors, we don't want to spam */
+>> +out:
+>> +	if (ret)
+>> +		KVM_UV_EVENT(kvm, 3,
+>> +			     "PROTVIRT DUMP STORAGE STATE: addr %llx
+>> ret %d, uvcb rc %x rrc %x",
+>> +			     uvcb.gaddr, ret, uvcb.header.rc,
+>> uvcb.header.rrc);
+>> +	*rc = uvcb.header.rc;
+>> +	*rrc = uvcb.header.rrc;
+>> +	vfree(buff_kvm);
+>> +
+>> +	return ret;
+>> +}
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index 2eba89d7ec29..b34850907291 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -1645,6 +1645,20 @@ struct kvm_s390_pv_unp {
+>>   	__u64 tweak;
+>>   };
+>>   
+>> +enum pv_cmd_dmp_id {
+>> +	KVM_PV_DUMP_INIT,
+>> +	KVM_PV_DUMP_CONFIG_STOR_STATE,
+>> +	KVM_PV_DUMP_COMPLETE,
+>> +};
+>> +
+>> +struct kvm_s390_pv_dmp {
+>> +	__u64 subcmd;
+>> +	__u64 buff_addr;
+>> +	__u64 buff_len;
+>> +	__u64 gaddr;		/* For dump storage state */
+>> +	__u64 reserved[4];
+>> +};
+>> +
+>>   enum pv_cmd_info_id {
+>>   	KVM_PV_INFO_VM,
+>>   	KVM_PV_INFO_DUMP,
+>> @@ -1688,6 +1702,7 @@ enum pv_cmd_id {
+>>   	KVM_PV_PREP_RESET,
+>>   	KVM_PV_UNSHARE_ALL,
+>>   	KVM_PV_INFO,
+>> +	KVM_PV_DUMP,
+>>   };
+>>   
+>>   struct kvm_pv_cmd {
+> 
+
