@@ -2,80 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1009E520B9B
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 04:58:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F2A7520BE2
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 05:17:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235033AbiEJDCb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 23:02:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58602 "EHLO
+        id S235321AbiEJDVt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 May 2022 23:21:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234940AbiEJDC3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 23:02:29 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C62E0286FC0;
-        Mon,  9 May 2022 19:58:33 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id e12so28313793ybc.11;
-        Mon, 09 May 2022 19:58:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=H8vraaQ5DcI+D+0VuVsldMnCsgIP6A3AxiIuSgPst5A=;
-        b=JOPZlXRgydWmpz8uA0xOm6wWnl9Z7zRiSI0SVu2npoaABUbsdaXM+wylhI7nYW7Jeo
-         57tp6eb0kioeoSnR1ZtAZKPQkvR6S0wR2iInhkH2sQ/janeJmmc1swUVLQGX7VquVkSR
-         UXQ0TrhDT6nL1Rf4hL37fMI4cFvZpimbDkTLcO695MZojQ/NjmZpMs2THG4gNeKuxIKg
-         T2QD5oTBr/3M6oXr06jdo2BrUWfZdVMxkG2uQnPQ5Gq9XoXr54rKccgp0BIG/qEUkQWZ
-         S5gue3ZYJAucMw1UNFtI8IxxV2oCBKWisTMPPquxzR5cL859C9Yw/aoWu5D2PII1H4mE
-         RmLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=H8vraaQ5DcI+D+0VuVsldMnCsgIP6A3AxiIuSgPst5A=;
-        b=f0XgfBBjuFkIYUW0JNH1DE8GuuKNY3qEbcHN6S67ZqoWx3vg85Es1xI+lL2+2snb3/
-         H/RZgIiwSvN9NQiw5mXc2mdWinsgk109xbmW6u2cqQAot6sxdRSBdRmzqGtAUzFxUMw2
-         J16tsleU+VCXARp0DU5Lkn6anAVWnZZ+iYvPJRZmr9DUXl5qA+zpWTb/2Od2Vc3MpbVo
-         GnJT4b+O3nlpgmjbqsRYraEDIvHG9ixeDLC4s1HCBOT39ET3UM65Nxpf93VNbxC0gSPd
-         32jiSfy+BO53ioim8uQ38EDtRkD0aNKkWXwRGX2pep+g83yiDWH7jxkMIXys2v31goVh
-         PMyw==
-X-Gm-Message-State: AOAM531lN8ObpNr34gQKY9smJDNKP2dnBSd/ybq9AGXct76FG/vb7ZoZ
-        KJrtV5JynlrCy0AciafJ6M+eYQ+AYL3t9QmX8JI=
-X-Google-Smtp-Source: ABdhPJydqtRDCx7YVD91pCtY2A1j8buOSkHSwNAiYxv+11DpIiZ1RPo0iEDLLhyzzPzAxWfqFKDtVaJ1lPhnNJMV2bc=
-X-Received: by 2002:a25:2082:0:b0:649:f60b:112a with SMTP id
- g124-20020a252082000000b00649f60b112amr14983003ybg.428.1652151512922; Mon, 09
- May 2022 19:58:32 -0700 (PDT)
+        with ESMTP id S235324AbiEJDVm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 May 2022 23:21:42 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F3E41581D
+        for <kvm@vger.kernel.org>; Mon,  9 May 2022 20:17:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652152659; x=1683688659;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=+qLf3Hn6aP9OPTul5x+vsTYlXXHQAnG1RiYJ2QE6wRQ=;
+  b=SeFYcLCCaKJjcPOLYnU8nBVogv3dRAmI734gsR2/1HSAmCfSvwzlaK4g
+   EEXNcMyLIr5kRV8tPTg9/rGbKwqSXH9nC5n5tRQ5VQMeKmDiO3AeNy434
+   FYPFtP6Gi2wRHfOd0rWbEvQC82WbGgRCe0Yi1W4L2NfuWBifgK0ayAqzI
+   Z3ThZJJY4cDJrq9ywFrgMxb2gH80qMniDL+2nQGjY6BKYqEVDq/a1fHgd
+   KJKJNY6B0dGHHSQmHdD8Hw9LKsE8JXzSdcIfJhknJ4NfzdKKAEBtj8TYM
+   OtugUBYaUT80frtFalrAHx9AgVSPBEhEQgD6SAv+qy2NpO1tCyDJQ6dYp
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10342"; a="329839757"
+X-IronPort-AV: E=Sophos;i="5.91,213,1647327600"; 
+   d="scan'208";a="329839757"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2022 20:17:38 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,213,1647327600"; 
+   d="scan'208";a="602261993"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga001.jf.intel.com with ESMTP; 09 May 2022 20:17:37 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Mon, 9 May 2022 20:17:37 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27 via Frontend Transport; Mon, 9 May 2022 20:17:37 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.102)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.27; Mon, 9 May 2022 20:17:37 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RwyFMO5dzy+xtshCCVG703jTsTSEtCa/ffwlm1tdGh4Cj31chS53Dmq4rVj+BN6oI4v/Sh6Qud2SnND6HjYiSapPV2G+lDJesIypGnuZxkTt5Mg8gCxQfrbhpbqF12jTZ3FR9B3JS7Ecn1LMve8XNUSLF49WGLxK2gNNUa1DH2AgY0S1/sS89gWVritIZsj3PdvFLB96Cy0maFNpgq/CnfIJoG87buBVv19S+6JAQPx6yqiLLGAQ2tHlmHAgG4pqBc841GDB3qQa5sue5rxkgF4BLowgRVj574SNYZDqjAlN/yVW3iXzzgU/ZYTHSvdy9HatgGxqIcADZWNN3tFThA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=88TKNyMSXE9WBc3w4q8EZgQ9U5kijYaC3OUaBE+wTtQ=;
+ b=UgfcWIZUWpI+UG9kJo01S0PJ11p3CIgXAv6Uxl2GZty6/f8D1S8wDl4ieOYKDAXPSTsIUr1P4fRc+5NWDW61RKfx7qG2vHAeh5At/4e07IA2DkXU/MTNGcqMZoZ8cncb5+I6yMd8XQ4xUD5D3HJ7fWIPNRt0Vl75MQ80RePBltROFfH0HZcb7ObX0nP8bywnK0JC6xuLm0SL7Y9W8DLnYpNGTNpeaw09eT+WyLWjU/kqkLVt83gXpV4qfEjjMuOQhvE8ctv4bAOTIC6Tmf5hMlHuenbaCPJWTaPOYseOSYTf8yj7fz7mKml/Si0EGpjpQ1vzB1Ey3PIj3sHhfLaaUw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB5658.namprd11.prod.outlook.com (2603:10b6:510:e2::23)
+ by MWHPR1101MB2141.namprd11.prod.outlook.com (2603:10b6:301:50::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5227.21; Tue, 10 May
+ 2022 03:17:35 +0000
+Received: from PH0PR11MB5658.namprd11.prod.outlook.com
+ ([fe80::21cf:c26f:8d40:6b5f]) by PH0PR11MB5658.namprd11.prod.outlook.com
+ ([fe80::21cf:c26f:8d40:6b5f%4]) with mapi id 15.20.5227.023; Tue, 10 May 2022
+ 03:17:35 +0000
+Message-ID: <0d9bd05e-d82b-e390-5763-52995bfb0b16@intel.com>
+Date:   Tue, 10 May 2022 11:17:17 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.7.0
+Subject: Re: [RFC 00/18] vfio: Adopt iommufd
+Content-Language: en-US
+To:     Zhangfei Gao <zhangfei.gao@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>
+CC:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "thuth@redhat.com" <thuth@redhat.com>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "chao.p.peng@intel.com" <chao.p.peng@intel.com>,
+        "yi.y.sun@intel.com" <yi.y.sun@intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>
+References: <20220414104710.28534-1-yi.l.liu@intel.com>
+ <4f920d463ebf414caa96419b625632d5@huawei.com>
+ <be8aa86a-25d1-d034-5e3b-6406aa7ff897@redhat.com>
+ <4ac4956cfe344326a805966535c1dc43@huawei.com>
+ <20220426103507.5693a0ca.alex.williamson@redhat.com>
+ <66f4af24-b76e-9f9a-a86d-565c0453053d@linaro.org>
+From:   Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <66f4af24-b76e-9f9a-a86d-565c0453053d@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: HK0PR01CA0060.apcprd01.prod.exchangelabs.com
+ (2603:1096:203:a6::24) To PH0PR11MB5658.namprd11.prod.outlook.com
+ (2603:10b6:510:e2::23)
 MIME-Version: 1.0
-References: <20220422210546.458943-1-dmatlack@google.com> <20220422210546.458943-4-dmatlack@google.com>
- <75fbbcb6-d9bb-3d30-0bf4-fbf925517d09@gmail.com> <CALzav=dmseUw6khErkiSV7T5K88QvaRvWvBpvrb6VNOQTE3bQQ@mail.gmail.com>
-In-Reply-To: <CALzav=dmseUw6khErkiSV7T5K88QvaRvWvBpvrb6VNOQTE3bQQ@mail.gmail.com>
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Tue, 10 May 2022 10:58:21 +0800
-Message-ID: <CAJhGHyDQn=atFmn5o2TREW9cSY5Tv1F1vsSekzor6uYQxDgcfQ@mail.gmail.com>
-Subject: Re: [PATCH v4 03/20] KVM: x86/mmu: Derive shadow MMU page role from parent
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 7a87a079-3620-4b0e-66d8-08da3233a0e6
+X-MS-TrafficTypeDiagnostic: MWHPR1101MB2141:EE_
+X-Microsoft-Antispam-PRVS: <MWHPR1101MB21417F14812B07ED0788DB5AC3C99@MWHPR1101MB2141.namprd11.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 7vzV+cmmdMvUtJJciKugRTQXZgZUp/xnB5mgNmJ65UyXdeA5/vJ7U+T1KqVV6rLUBY7CHGTrnD42uG6Z64k/Vlpef9Mi1u5XbdAI+MuF+qRXkihObM7IoOh+OIoQ6nK3hQuTyjoyLGg+MKUa6SWcACg+GcVuJ/KofZKwzafAsKiMmZObHn7nk17n4O6PKErZLOqashL4fyfktdUfvGkr/tGISfOlhbU+ElbjfeCE4M3Z9Sc3LOPw+N2qVQhwdWJIUcjFuose+eWLXEanVv1V+Lqj3tFr7QdFShWnz2gnV+jS57TifisSjkBE4KYsh4N6vxs+yQR5nwBTQHf2Of/bboNYFTY6kZ5IW3CsSpwKY7AfO3VCHJ6YKb4qieT6bkCASFdYWnNhMq17v//Bmd+5yju2VZlnlhE8AoQ+dyVkCIQBpfCY6V3d0O+VSsaVlmAKTrB5u8VPXXm6QDbmqrOIeIN3qmkwr70jz5EJLrmzHVAVa6Q7Ucr85BOBJgLqhsyyq8MpPRyzaBXEbv1i6y43wRFBaojOZOfNGHMlFmcFAPgEB+C4nrKChflf55yijurQNosD3C8+A/IJzjmCePL47/4+7I+huuUd0jx9TsvfW0ARMIQFRAfIWVUNHAzLOpqQtoagrhf9rbMveYFvnXruJYUa7of0QqY/gPVKaaCHzAPv8qbTZVbsAnnLFtr/ibSPgo4TyLIyVpykgBmSMinjgpR3fyzZhnop7SDnSqaIRaLI+QbYIFzlPIZIulK/aK7u5O4oYNRkE8L+sqONGh+13cWLQ5hwKWyeZdUVA1ql1qQXS3Pt6HpnIqQmp6Wls0E3/y8YLFTfk/T86GxHPYFWIXj2N7RvKBC3AJRrdSxeQIU=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5658.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(6486002)(66556008)(66476007)(316002)(26005)(6512007)(966005)(66946007)(508600001)(6666004)(2906002)(86362001)(186003)(4326008)(54906003)(8676002)(31696002)(38100700002)(2616005)(6506007)(83380400001)(8936002)(31686004)(7416002)(53546011)(36756003)(5660300002)(82960400001)(110136005)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?d3ZaYzlBQitTaklSNUJmRzJsYjdCRW1tQ0tvcGhlUDZGQ0NmREZFcCtQcXpS?=
+ =?utf-8?B?WG90WGRjQ3NtT1VHWEU1RW5tQWdHMDcwTG1raVZIU2NuY0hlNTBsUmFtWjRw?=
+ =?utf-8?B?T2lMN1BPUVdyODJuZEdmZ1lnemJsM09EaDFaWXd1eHpXaHZZMHRwNzN6ZWxL?=
+ =?utf-8?B?WURBQ3RrWHdNY05idEJ1V0JmNFo5ZUJPUHRWU0JJdlE5Ri94MDNza2tPWnFL?=
+ =?utf-8?B?V3BLWE5vM3ZYMVNBLzlmbmtPL2xQN0RkM2RkRSt1Z0tzZy8vcVB2ekJJSnJI?=
+ =?utf-8?B?SVZsU2ExRjZ3VXpoVlk4R0FJMHBMOVNOOXl6OHJxNXh0YlJWUzV0Y2VLcFcz?=
+ =?utf-8?B?UTVWOTBZT1d1N1FzYkNpVXByT0RoclNPTG9DRjBUQkZrQkU4UlBqK1JWSnRE?=
+ =?utf-8?B?M3hCbkwzU0tWMGlQWUpUa1k0QWVtaUFpZWZtZWpzblRJZXVSUTN4aWhYRmdJ?=
+ =?utf-8?B?ZG9MR2lwamdKMDErTVRFZVBoYmVVa2J3Y3ZFckhnNFlSQ1RDdXRKMmUyK0Vo?=
+ =?utf-8?B?a3pEc1lCQUYrVytRVFNkUk5jZkF6NkVVR1FSZ0o2Q2lITUd3bUNhRW8zdjAx?=
+ =?utf-8?B?c0FPUWd2TFgxUFZkUVFDQUJ2K2ZDd2xnK0U0T0FnL2pVLzVocjRIYzB5ZXVx?=
+ =?utf-8?B?QTgvQXh4dTlacjAydVlqV3Q1UmlGUytLQ2puUnBsQzE1aURiblBjYlFVbWxS?=
+ =?utf-8?B?WWtIaldMUElLdzJMRlBtbGlKL0N6RkNtVDNQVDI2T3J2ZnNGM2ZxYVIxM2J6?=
+ =?utf-8?B?UG9FZDZBZWJ0MUpjeVM2QmdHRFRCRmxqR0ZFMVVvRWk3T0VzVjZ2RWtaSGRl?=
+ =?utf-8?B?VXZISDFLVEMrUHRTS05Ba044SHdKcTFBcTQ3RFFPQTIyYzRwWkdabTRtdFFy?=
+ =?utf-8?B?OURId3lGMWxIdHZkZmt4YnpLZXN1amJQcnFVVE4rTGpLalFPQTZLUXRnVEtu?=
+ =?utf-8?B?UU40QS96Q1EyWHZMYTFHajZ3WjB3ZTB5dEdGaWFBVThVcU1TMjMvb1lRdzNM?=
+ =?utf-8?B?TWVQMElOL243ZlNaTEpQajdKTXFMQkJPRDYzRjNHOTZnNzZwMkM4bnVpNmFU?=
+ =?utf-8?B?Ym9zWTk2RkZQeGtVWGZzaEtyQ0NlNGxwT3BFMzd2V0xTempFbFE3N20yWUUv?=
+ =?utf-8?B?WllOY1hHR1htVkFpUDc0eEh4MzlKNUl2RlY5RGp0RjZmaWVEUzlKRzUrejNq?=
+ =?utf-8?B?bGg0dEpLL2hFZjhvbU9tcUFHY3ZqL3V1TGxJU3FEMWxSYUtGRzJlSDEvNHBU?=
+ =?utf-8?B?N2Q0REJ2N1NuQk9KVDJJYTc0anVvWXBscXNxSUJha3FHdUFUN09mbWdKZHFo?=
+ =?utf-8?B?UVJnMFpIOUNodkZhRnh6eld5bXBYZVRjNHkzcXJ2R1BSdG9kbDdITFJPc0xE?=
+ =?utf-8?B?QzRMVEpLY093V2ZIZ0ZJZllhZndvV2F0RzIwaERWVld5UDAzZWUzRTl5bGpQ?=
+ =?utf-8?B?MGgwdTdnbkdaOThTU1BUWUdJYVN4b0RXZ2tFNUNiZzZWUllKZXE1T1E0MWdN?=
+ =?utf-8?B?clVTSXY5RHNub2NLbmg4UXlNcldySDNNclp6Rk1seGlBUnRXcTV5dW1zcUJW?=
+ =?utf-8?B?VGk2Mm0zQUtVV1lSbGlXNThsdkRwUlBHVUNndllMSWpYc3BiMUtvVjd5ODMy?=
+ =?utf-8?B?bGpONEdEZk40dmN3ZnVFUHJhQ0dwVm5vSVRmamNBZUhtWHc2M3dCU2JaSm1k?=
+ =?utf-8?B?Tm91V21xQU5qR0g3R0VjalVoaGhjMThyWDJ2aG5hTHhhZm93d0NaejNrYllF?=
+ =?utf-8?B?dEJ1WmQ1TTlicUZ3K3ZwOXRsODFrRjhLMEtLQUZRTWMxNndJSmQ3M0dualcr?=
+ =?utf-8?B?WUF0S2xDMy9kcUtOaVdNdU4zZFZhV0FRWnlBc1V0Q0VQa1gvWVp0SEgxNmt2?=
+ =?utf-8?B?NVludCtXTDN2TzdOY0xlVDJJUnNMMnQ2WU9oTmM2L3kvRWlOaStMTWxqNkt6?=
+ =?utf-8?B?MDVEOFhFdXhOVlVCYU8vZGJqT3hDWWlEQ1YySWdZSkczdEFneFR6Zzk1a0s4?=
+ =?utf-8?B?V2wyRGNxSzg1ZWpKbHVsRUZKdGRXYjgwWE5xVjdvK0VUQVFhMURFdGY1dHdw?=
+ =?utf-8?B?Nm56QWlWVmZwcTZzWFc4UmlhN1FsZ0RpU1ZNNHpTVTNOUUxKT0x3R2hqVUtO?=
+ =?utf-8?B?MFNsdkRkbytid2NjQ0pRdWRXbkFKZHRRN2crVG1oUnBpbUdYb2p2NTV1Z3lR?=
+ =?utf-8?B?V0pNZUJFcGV4cDkzUHk3dE1Wd1Q2a0xuOW83ZzBFRHlDbHc0Q1U2cEI5NWNE?=
+ =?utf-8?B?elRYWFRiNFFJQ21UWjFwM0krdUpMTWxyU2gveVhkaHNueUVqUE11L0xjbGM3?=
+ =?utf-8?B?QkRYZ25TbXNJY2pvdGtraEtER2tweVBibmw2ZndCdTMzQUpvYkEzUT09?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7a87a079-3620-4b0e-66d8-08da3233a0e6
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5658.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2022 03:17:35.3177
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4fCr2ScUQzFzd+tTYXbwu+gHp7+pDY8rp4BKVH8xdivKc2rnEyTzMi7xxFlAq4qRPcc0M/YI+vmmTL9+xcYI2w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1101MB2141
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-6.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
         URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,196 +183,96 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-()
+Hi Zhangfei,
 
-On Tue, May 10, 2022 at 5:04 AM David Matlack <dmatlack@google.com> wrote:
->
-> On Sat, May 7, 2022 at 1:28 AM Lai Jiangshan <jiangshanlai@gmail.com> wrote:
-> >
-> >
-> >
-> > On 2022/4/23 05:05, David Matlack wrote:
-> > > Instead of computing the shadow page role from scratch for every new
-> > > page, derive most of the information from the parent shadow page.  This
-> > > avoids redundant calculations and reduces the number of parameters to
-> > > kvm_mmu_get_page().
-> > >
-> > > Preemptively split out the role calculation to a separate function for
-> > > use in a following commit.
-> > >
-> > > No functional change intended.
-> > >
-> > > Reviewed-by: Peter Xu <peterx@redhat.com>
-> > > Signed-off-by: David Matlack <dmatlack@google.com>
-> > > ---
-> > >   arch/x86/kvm/mmu/mmu.c         | 96 +++++++++++++++++++++++-----------
-> > >   arch/x86/kvm/mmu/paging_tmpl.h |  9 ++--
-> > >   2 files changed, 71 insertions(+), 34 deletions(-)
-> > >
-> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > index dc20eccd6a77..4249a771818b 100644
-> > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > @@ -2021,31 +2021,15 @@ static void clear_sp_write_flooding_count(u64 *spte)
-> > >       __clear_sp_write_flooding_count(sptep_to_sp(spte));
-> > >   }
-> > >
-> > > -static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
-> > > -                                          gfn_t gfn,
-> > > -                                          gva_t gaddr,
-> > > -                                          unsigned level,
-> > > -                                          bool direct,
-> > > -                                          unsigned int access)
-> > > +static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu, gfn_t gfn,
-> > > +                                          union kvm_mmu_page_role role)
-> > >   {
-> > > -     union kvm_mmu_page_role role;
-> > >       struct hlist_head *sp_list;
-> > > -     unsigned quadrant;
-> > >       struct kvm_mmu_page *sp;
-> > >       int ret;
-> > >       int collisions = 0;
-> > >       LIST_HEAD(invalid_list);
-> > >
-> > > -     role = vcpu->arch.mmu->root_role;
-> > > -     role.level = level;
-> > > -     role.direct = direct;
-> > > -     role.access = access;
-> > > -     if (role.has_4_byte_gpte) {
-> > > -             quadrant = gaddr >> (PAGE_SHIFT + (PT64_PT_BITS * level));
-> > > -             quadrant &= (1 << ((PT32_PT_BITS - PT64_PT_BITS) * level)) - 1;
-> > > -             role.quadrant = quadrant;
-> > > -     }
-> >
-> >
-> > I don't think replacing it with kvm_mmu_child_role() can reduce any calculations.
-> >
-> > role.level, role.direct, role.access and role.quadrant still need to be
-> > calculated.  And the old code is still in mmu_alloc_root().
->
-> You are correct. Instead of saying "less calculations" I should have
-> said "eliminates the dependency on vcpu->arch.mmu->root_role".
->
-> >
-> > I think kvm_mmu_get_shadow_page() can keep the those parameters and
-> > kvm_mmu_child_role() is only introduced for nested_mmu_get_sp_for_split().
-> >
-> > Both kvm_mmu_get_shadow_page() and nested_mmu_get_sp_for_split() call
-> > __kvm_mmu_get_shadow_page() which uses role as a parameter.
->
-> I agree this would work, but I think the end result would be more
-> difficult to read.
->
-> The way I've implemented it there are two ways the SP roles are calculated:
->
-> 1. For root SPs: Derive the role from vCPU root_role and caller-provided inputs.
-> 2. For child SPs: Derive the role from parent SP and caller-provided inputs.
->
-> Your proposal would still have two ways to calculate the SP role, but
-> split along a different dimension:
->
-> 1. For vCPUs creating SPs: Derive the role from vCPU root_role and
-> caller-provided inputs.
-> 2. For Eager Page Splitting creating SPs: Derive the role from parent
-> SP and caller-provided inputs.
->
-> With your proposal, it is less obvious that eager page splitting is
-> going to end up with the correct role. Whereas if we use the same
-> calculation for all child SPs, it is immediately obvious.
+On 2022/5/9 22:24, Zhangfei Gao wrote:
+> Hi, Alex
+> 
+> On 2022/4/27 上午12:35, Alex Williamson wrote:
+>> On Tue, 26 Apr 2022 12:43:35 +0000
+>> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+>>
+>>>> -----Original Message-----
+>>>> From: Eric Auger [mailto:eric.auger@redhat.com]
+>>>> Sent: 26 April 2022 12:45
+>>>> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>; Yi
+>>>> Liu <yi.l.liu@intel.com>; alex.williamson@redhat.com; cohuck@redhat.com;
+>>>> qemu-devel@nongnu.org
+>>>> Cc: david@gibson.dropbear.id.au; thuth@redhat.com; farman@linux.ibm.com;
+>>>> mjrosato@linux.ibm.com; akrowiak@linux.ibm.com; pasic@linux.ibm.com;
+>>>> jjherne@linux.ibm.com; jasowang@redhat.com; kvm@vger.kernel.org;
+>>>> jgg@nvidia.com; nicolinc@nvidia.com; eric.auger.pro@gmail.com;
+>>>> kevin.tian@intel.com; chao.p.peng@intel.com; yi.y.sun@intel.com;
+>>>> peterx@redhat.com; Zhangfei Gao <zhangfei.gao@linaro.org>
+>>>> Subject: Re: [RFC 00/18] vfio: Adopt iommufd
+>>> [...]
+>>>> https://lore.kernel.org/kvm/0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com
+>>>>>> /
+>>>>>> [2] https://github.com/luxis1999/iommufd/tree/iommufd-v5.17-rc6
+>>>>>> [3] https://github.com/luxis1999/qemu/tree/qemu-for-5.17-rc6-vm-rfcv1
+>>>>> Hi,
+>>>>>
+>>>>> I had a go with the above branches on our ARM64 platform trying to
+>>>> pass-through
+>>>>> a VF dev, but Qemu reports an error as below,
+>>>>>
+>>>>> [    0.444728] hisi_sec2 0000:00:01.0: enabling device (0000 -> 0002)
+>>>>> qemu-system-aarch64-iommufd: IOMMU_IOAS_MAP failed: Bad address
+>>>>> qemu-system-aarch64-iommufd: vfio_container_dma_map(0xaaaafeb40ce0,
+>>>> 0x8000000000, 0x10000, 0xffffb40ef000) = -14 (Bad address)
+>>>>> I think this happens for the dev BAR addr range. I haven't debugged the
+>>>> kernel
+>>>>> yet to see where it actually reports that.
+>>>> Does it prevent your assigned device from working? I have such errors
+>>>> too but this is a known issue. This is due to the fact P2P DMA is not
+>>>> supported yet.
+>>> Yes, the basic tests all good so far. I am still not very clear how it 
+>>> works if
+>>> the map() fails though. It looks like it fails in,
+>>>
+>>> iommufd_ioas_map()
+>>>    iopt_map_user_pages()
+>>>     iopt_map_pages()
+>>>     ..
+>>>       pfn_reader_pin_pages()
+>>>
+>>> So does it mean it just works because the page is resident()?
+>> No, it just means that you're not triggering any accesses that require
+>> peer-to-peer DMA support.  Any sort of test where the device is only
+>> performing DMA to guest RAM, which is by far the standard use case,
+>> will work fine.  This also doesn't affect vCPU access to BAR space.
+>> It's only a failure of the mappings of the BAR space into the IOAS,
+>> which is only used when a device tries to directly target another
+>> device's BAR space via DMA.  Thanks,
+> 
+> I also get this issue when trying adding prereg listenner
+> 
+> +    container->prereg_listener = vfio_memory_prereg_listener;
+> +    memory_listener_register(&container->prereg_listener,
+> +                            &address_space_memory);
+> 
+> host kernel log:
+> iommufd_ioas_map 1 iova=8000000000, iova1=8000000000, cmd->iova=8000000000, 
+> cmd->user_va=9c495000, cmd->length=10000
+> iopt_alloc_area input area=859a2d00 iova=8000000000
+> iopt_alloc_area area=859a2d00 iova=8000000000
+> pin_user_pages_remote rc=-14
+> 
+> qemu log:
+> vfio_prereg_listener_region_add
+> iommufd_map iova=0x8000000000
+> qemu-system-aarch64: IOMMU_IOAS_MAP failed: Bad address
+> qemu-system-aarch64: vfio_dma_map(0xaaaafb96a930, 0x8000000000, 0x10000, 
+> 0xffff9c495000) = -14 (Bad address)
+> qemu-system-aarch64: (null)
+> double free or corruption (fasttop)
+> Aborted (core dumped)
+> 
+> With hack of ignoring address 0x8000000000 in map and unmap, kernel can boot.
 
+do you know if the iova 0x8000000000 guest RAM or MMIO? Currently, iommufd 
+kernel part doesn't support mapping device BAR MMIO. This is a known gap.
 
-In this patchset, there are still two ways to calculate the SP role
-including the one in mmu_alloc_root() which I dislike.
-
-The old code is just moved into mmu_alloc_root() even kvm_mmu_child_role()
-is introduced.
-
->
-> >
-> >
-> >
-> > > -
-> > >       sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
-> > >       for_each_valid_sp(vcpu->kvm, sp, sp_list) {
-> > >               if (sp->gfn != gfn) {
-> > > @@ -2063,7 +2047,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
-> > >                        * Unsync pages must not be left as is, because the new
-> > >                        * upper-level page will be write-protected.
-> > >                        */
-> > > -                     if (level > PG_LEVEL_4K && sp->unsync)
-> > > +                     if (role.level > PG_LEVEL_4K && sp->unsync)
-> > >                               kvm_mmu_prepare_zap_page(vcpu->kvm, sp,
-> > >                                                        &invalid_list);
-> > >                       continue;
-> > > @@ -2104,14 +2088,14 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
-> > >
-> > >       ++vcpu->kvm->stat.mmu_cache_miss;
-> > >
-> > > -     sp = kvm_mmu_alloc_page(vcpu, direct);
-> > > +     sp = kvm_mmu_alloc_page(vcpu, role.direct);
-> > >
-> > >       sp->gfn = gfn;
-> > >       sp->role = role;
-> > >       hlist_add_head(&sp->hash_link, sp_list);
-> > > -     if (!direct) {
-> > > +     if (!role.direct) {
-> > >               account_shadowed(vcpu->kvm, sp);
-> > > -             if (level == PG_LEVEL_4K && kvm_vcpu_write_protect_gfn(vcpu, gfn))
-> > > +             if (role.level == PG_LEVEL_4K && kvm_vcpu_write_protect_gfn(vcpu, gfn))
-> > >                       kvm_flush_remote_tlbs_with_address(vcpu->kvm, gfn, 1);
-> > >       }
-> > >       trace_kvm_mmu_get_page(sp, true);
-> > > @@ -2123,6 +2107,51 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
-> > >       return sp;
-> > >   }
-> > >
-> > > +static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct, u32 access)
-> > > +{
-> > > +     struct kvm_mmu_page *parent_sp = sptep_to_sp(sptep);
-> > > +     union kvm_mmu_page_role role;
-> > > +
-> > > +     role = parent_sp->role;
-> > > +     role.level--;
-> > > +     role.access = access;
-> > > +     role.direct = direct;
-> > > +
-> > > +     /*
-> > > +      * If the guest has 4-byte PTEs then that means it's using 32-bit,
-> > > +      * 2-level, non-PAE paging. KVM shadows such guests using 4 PAE page
-> > > +      * directories, each mapping 1/4 of the guest's linear address space
-> > > +      * (1GiB). The shadow pages for those 4 page directories are
-> > > +      * pre-allocated and assigned a separate quadrant in their role.
-> >
-> >
-> > It is not going to be true in patchset:
-> > [PATCH V2 0/7] KVM: X86/MMU: Use one-off special shadow page for special roots
-> >
-> > https://lore.kernel.org/lkml/20220503150735.32723-1-jiangshanlai@gmail.com/
-> >
-> > The shadow pages for those 4 page directories are also allocated on demand.
->
-> Ack. I can even just drop this sentence in v5, it's just background information.
-
-No, if one-off special shadow pages are used.
-
-kvm_mmu_child_role() should be:
-
-+       if (role.has_4_byte_gpte) {
-+               if (role.level == PG_LEVEL_4K)
-+                       role.quadrant = (sptep - parent_sp->spt) % 2;
-+               if (role.level == PG_LEVEL_2M)
-+                       role.quadrant = (sptep - parent_sp->spt) % 4;
-+       }
-
-
-And if one-off special shadow pages are merged first.  You don't
-need any calculation in mmu_alloc_root(), you can just directly use
-    sp = kvm_mmu_get_page(vcpu, gfn, vcpu->arch.mmu->root_role);
-because vcpu->arch.mmu->root_role is always the real role of the root
-sp no matter if it is a normall root sp or an one-off special sp.
-
-I hope you will pardon me for my touting my patchset and asking
-people to review them in your threads.
-
-Thanks
-Lai
+-- 
+Regards,
+Yi Liu
