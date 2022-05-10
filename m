@@ -2,76 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 631485220AC
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 18:05:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ECA6E522131
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 18:27:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347068AbiEJQJI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 12:09:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40230 "EHLO
+        id S244207AbiEJQbl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 12:31:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348607AbiEJQIf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 12:08:35 -0400
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12F561207CC
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 09:01:46 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id m20so33875782ejj.10
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 09:01:45 -0700 (PDT)
+        with ESMTP id S243079AbiEJQbk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 12:31:40 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A38E6D850
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 09:27:43 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id iq10so16341329pjb.0
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 09:27:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kylehuey.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=IQqjDungLhNlsFUoBaDTydU3nXk77iomYOqP6PkQeXw=;
-        b=Tg2LyNtcAM1bY08NZJR7dqKq1dYW5SIp0LAd41gXn6znu2oBJJDpL4r85XaFKrWO5r
-         fmQLD7L8hj29Bw/zOX9NX83VKP60I52zt5r4aiFgbJpwg2Ni+IUmR8wfqKZ8sPefZJYu
-         jqEID3BfP3pHyDWRJro3VDpl6ljDoNxo2T76yfPbYiAyEA1ndLZak1aJpxhsVnZwXi8q
-         aTzNiyqspHBhvuVWJHF45Nck/eP5yOAHTpne4VXdXx/Ns3qhV8oQFMgX6HllklMw9bLb
-         pzvKjO0G1f7RwGdpiTLOiIDv0XPhqpgSvtwrniCdU91ja9a5Ppt2JBpuPuDQrekcH17F
-         Qhvg==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=TfyQ8rd/ifrFtLR+waM5D238nm+9pLY5UxeloRmvRYA=;
+        b=JAxKGdOfLCJthR84IwJJIAqVVhFlZDrf8jQbPIgbLEh5Rqm218Jq3TQXleOZtE4UwS
+         4HKavY0Xl9AJwgsGp6PmErZb0ydVokS9SPrLOxLNlfqPzmnMj2TKba/aHgSrtoautZh1
+         hXmaWH5mfirZ1c0F/7FpVe9bJZLjkay5o8h66qddf4mPvTscCT/rXBiSqJKCT7G4FjVG
+         L7sVevSU+hpvLZyjtOWEeHHGY07WPrOknSLXl5+fhkEkCmzwYXYNVfEqYLxrKoVUmHLR
+         ruucKBkJv36oUDAGCz3jCd2eAHJlxauTnaGX46hS8MIK9a1CGy6O+IIQSq2yMLilKblY
+         RVHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=IQqjDungLhNlsFUoBaDTydU3nXk77iomYOqP6PkQeXw=;
-        b=OQtyDwqoTh1gWKK4HLEQYE5nnOuxIB06IAkuxv+7fpwmPsB5uXfGs/fPwIZy+erHdT
-         fIsAnHXWC3IYT49sijN5WX5sxwdBOgcO8hTffKIuMuoc4zdzuCI7nujV9bXvK3iQQE9R
-         JuE/ZLg6c0ZNVHvJB3BhWuueBnRtf2PAHZmkN5NhtTYrz+ommN6MrS5ckACXE/0m+Cdy
-         4PW+jaOCV5QSOX4LcXhBXw1I++d2cDB6EJNDcYSRorPmKEv5/uLtWrPvir5NgeOCFT6N
-         RjFleWdaz2RuwP8ZS+EYqG506GxYFOCPOVZWxmvbhokPYbL6yO2V6hD/I4NXQ8jOdjay
-         BqjQ==
-X-Gm-Message-State: AOAM532aY9olcHZmuU+caY53TAijalWqnoF15d9XLAmdGW9w9DMmZyHF
-        vbuUWoh+MGgZ9K6GWH3Q8skjp7eiotKj8OaOgpWXeQ==
-X-Google-Smtp-Source: ABdhPJw5EKBIFbJyU1THB9L5DTwW/M90v33zumYcH827TEU3jJsgTRV23vVYhvZMnFOXd4MuE+BMlax77GBsJIkSVD4=
-X-Received: by 2002:a17:907:6094:b0:6f4:aa0b:9af0 with SMTP id
- ht20-20020a170907609400b006f4aa0b9af0mr19335773ejc.432.1652198503526; Tue, 10
- May 2022 09:01:43 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=TfyQ8rd/ifrFtLR+waM5D238nm+9pLY5UxeloRmvRYA=;
+        b=ktevoPHGKKFnkdAUnIcEqQVt0wO9a44eow9WWcL2foYn2lcY0F+ohs5f5zJofl5x6T
+         mB6PvuMsvyZh4lTbItRtv4x4SHW03BUJ4Eu634Npe+3n1aqF9mSBvK6lzEV0a4EuqaLg
+         4Zv5aq2Q2c439jUHdTXOfse8Man+IoiiKWkppWTyJchCxOq1i2wPhWjeqN8NqBYkshg/
+         6hrdgvp1+eWm3wPkhyF83fcjtsVjsmQYcX0XnR9FrGmlwVlSXikcV3O+boU81A6aClt4
+         QAP5A0LUGs/0NBiHt6Eud4vPQklTheYe+FQnqBp4QtIYRUjgKoha1UK2ZW8sTVxZRyJS
+         lWhQ==
+X-Gm-Message-State: AOAM5337N0M6nqydJZEnvW6DAXdTJN9h/uKuNW8LA6+AAiO6luwiShwj
+        9kRsilIAp7RfRui1sDVkTMDP6Q==
+X-Google-Smtp-Source: ABdhPJzPVpP6j/JteVuLXbzmUYmevxlTiKLmm5V3xJuvhRcWWn6EqfCDZVZUvMGEXUAXxtqP8PkQng==
+X-Received: by 2002:a17:902:bb02:b0:15e:d294:8d0f with SMTP id im2-20020a170902bb0200b0015ed2948d0fmr21684334plb.35.1652200062599;
+        Tue, 10 May 2022 09:27:42 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id u7-20020a170902e80700b0015e8d4eb2d0sm2299720plg.282.2022.05.10.09.27.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 May 2022 09:27:41 -0700 (PDT)
+Date:   Tue, 10 May 2022 16:27:37 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
+        David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v2] KVM: VMX: Print VM-instruction error when it may be
+ helpful
+Message-ID: <YnqSecml2/Ooc0E/@google.com>
+References: <20220508040233.931710-1-jmattson@google.com>
 MIME-Version: 1.0
-References: <20220508165434.119000-1-khuey@kylehuey.com> <29767a7d-d887-1a0c-296e-5bed220f1c9e@redhat.com>
- <YnpOZAfLdJ6cj5b9@kroah.com> <YnpOsDgrwCBsMs35@kroah.com> <CAP045Aq6vJxMJaVFjAX7gqQkBbMRArZJhea3U6LJVQEQB9Ea4Q@mail.gmail.com>
-In-Reply-To: <CAP045Aq6vJxMJaVFjAX7gqQkBbMRArZJhea3U6LJVQEQB9Ea4Q@mail.gmail.com>
-From:   Kyle Huey <me@kylehuey.com>
-Date:   Tue, 10 May 2022 09:01:32 -0700
-Message-ID: <CAP045AoFcMeJBH7SWbLFJMYymqPJNKz9PDaYSwhSHYfbeByP8Q@mail.gmail.com>
-Subject: Re: [PATCH 5.4] KVM: x86/svm: Account for family 17h event
- renumberings in amd_pmc_perf_hw_id
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, stable@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm list <kvm@vger.kernel.org>,
-        "Robert O'Callahan" <robert@ocallahan.org>,
-        Keno Fischer <keno@juliacomputing.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220508040233.931710-1-jmattson@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,150 +71,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 10, 2022 at 6:11 AM Kyle Huey <me@kylehuey.com> wrote:
->
-> On Tue, May 10, 2022 at 4:38 AM Greg KH <gregkh@linuxfoundation.org> wrot=
-e:
-> >
-> > On Tue, May 10, 2022 at 01:37:08PM +0200, Greg KH wrote:
-> > > On Mon, May 09, 2022 at 01:41:20PM +0200, Paolo Bonzini wrote:
-> > > > On 5/8/22 18:54, Kyle Huey wrote:
-> > > > > From: Kyle Huey <me@kylehuey.com>
-> > > > >
-> > > > > commit 5eb849322d7f7ae9d5c587c7bc3b4f7c6872cd2f upstream
-> > > > >
-> > > > > Zen renumbered some of the performance counters that correspond t=
-o the
-> > > > > well known events in perf_hw_id. This code in KVM was never updat=
-ed for
-> > > > > that, so guest that attempt to use counters on Zen that correspon=
-d to the
-> > > > > pre-Zen perf_hw_id values will silently receive the wrong values.
-> > > > >
-> > > > > This has been observed in the wild with rr[0] when running in Zen=
- 3
-> > > > > guests. rr uses the retired conditional branch counter 00d1 which=
- is
-> > > > > incorrectly recognized by KVM as PERF_COUNT_HW_STALLED_CYCLES_BAC=
-KEND.
-> > > > >
-> > > > > [0] https://rr-project.org/
-> > > > >
-> > > > > Signed-off-by: Kyle Huey <me@kylehuey.com>
-> > > > > Message-Id: <20220503050136.86298-1-khuey@kylehuey.com>
-> > > > > Cc: stable@vger.kernel.org
-> > > > > [Check guest family, not host. - Paolo]
-> > > > > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > > > > [Backport to 5.4: adjusted context]
-> > > > > Signed-off-by: Kyle Huey <me@kylehuey.com>
-> > > > > ---
-> > > > >   arch/x86/kvm/pmu_amd.c | 28 +++++++++++++++++++++++++---
-> > > > >   1 file changed, 25 insertions(+), 3 deletions(-)
-> > > > >
-> > > > > diff --git a/arch/x86/kvm/pmu_amd.c b/arch/x86/kvm/pmu_amd.c
-> > > > > index 6bc656abbe66..3ccfd1abcbad 100644
-> > > > > --- a/arch/x86/kvm/pmu_amd.c
-> > > > > +++ b/arch/x86/kvm/pmu_amd.c
-> > > > > @@ -44,6 +44,22 @@ static struct kvm_event_hw_type_mapping amd_ev=
-ent_mapping[] =3D {
-> > > > >           [7] =3D { 0xd1, 0x00, PERF_COUNT_HW_STALLED_CYCLES_BACK=
-END },
-> > > > >   };
-> > > > > +/* duplicated from amd_f17h_perfmon_event_map. */
-> > > > > +static struct kvm_event_hw_type_mapping amd_f17h_event_mapping[]=
- =3D {
-> > > > > + [0] =3D { 0x76, 0x00, PERF_COUNT_HW_CPU_CYCLES },
-> > > > > + [1] =3D { 0xc0, 0x00, PERF_COUNT_HW_INSTRUCTIONS },
-> > > > > + [2] =3D { 0x60, 0xff, PERF_COUNT_HW_CACHE_REFERENCES },
-> > > > > + [3] =3D { 0x64, 0x09, PERF_COUNT_HW_CACHE_MISSES },
-> > > > > + [4] =3D { 0xc2, 0x00, PERF_COUNT_HW_BRANCH_INSTRUCTIONS },
-> > > > > + [5] =3D { 0xc3, 0x00, PERF_COUNT_HW_BRANCH_MISSES },
-> > > > > + [6] =3D { 0x87, 0x02, PERF_COUNT_HW_STALLED_CYCLES_FRONTEND },
-> > > > > + [7] =3D { 0x87, 0x01, PERF_COUNT_HW_STALLED_CYCLES_BACKEND },
-> > > > > +};
-> > > > > +
-> > > > > +/* amd_pmc_perf_hw_id depends on these being the same size */
-> > > > > +static_assert(ARRAY_SIZE(amd_event_mapping) =3D=3D
-> > > > > +      ARRAY_SIZE(amd_f17h_event_mapping));
-> > > > > +
-> > > > >   static unsigned int get_msr_base(struct kvm_pmu *pmu, enum pmu_=
-type type)
-> > > > >   {
-> > > > >           struct kvm_vcpu *vcpu =3D pmu_to_vcpu(pmu);
-> > > > > @@ -130,17 +146,23 @@ static unsigned amd_find_arch_event(struct =
-kvm_pmu *pmu,
-> > > > >                                       u8 event_select,
-> > > > >                                       u8 unit_mask)
-> > > > >   {
-> > > > > + struct kvm_event_hw_type_mapping *event_mapping;
-> > > > >           int i;
-> > > > > + if (guest_cpuid_family(pmc->vcpu) >=3D 0x17)
-> > > > > +         event_mapping =3D amd_f17h_event_mapping;
-> > > > > + else
-> > > > > +         event_mapping =3D amd_event_mapping;
-> > > > > +
-> > > > >           for (i =3D 0; i < ARRAY_SIZE(amd_event_mapping); i++)
-> > > > > -         if (amd_event_mapping[i].eventsel =3D=3D event_select
-> > > > > -             && amd_event_mapping[i].unit_mask =3D=3D unit_mask)
-> > > > > +         if (event_mapping[i].eventsel =3D=3D event_select
-> > > > > +             && event_mapping[i].unit_mask =3D=3D unit_mask)
-> > > > >                           break;
-> > > > >           if (i =3D=3D ARRAY_SIZE(amd_event_mapping))
-> > > > >                   return PERF_COUNT_HW_MAX;
-> > > > > - return amd_event_mapping[i].event_type;
-> > > > > + return event_mapping[i].event_type;
-> > > > >   }
-> > > > >   /* return PERF_COUNT_HW_MAX as AMD doesn't have fixed events */
-> > > >
-> > > > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> > > >
-> > > > Thanks,
-> > > >
-> > > > Paolo
-> > > >
-> > >
-> > > Wait, how was this tested?
-> > >
-> > > It breaks the build:
-> > >
-> > > arch/x86/kvm/pmu_amd.c: In function =E2=80=98amd_find_arch_event=E2=
-=80=99:
-> > > arch/x86/kvm/pmu_amd.c:152:32: error: =E2=80=98pmc=E2=80=99 undeclare=
-d (first use in this function); did you mean =E2=80=98pmu=E2=80=99?
-> > >   152 |         if (guest_cpuid_family(pmc->vcpu) >=3D 0x17)
-> > >       |                                ^~~
-> > >       |                                pmu
-> > >
-> > >
-> > > I'll do the obvious fixup, but this is odd.  Always at least test-bui=
-ld
-> > > your changes...
-> >
-> > Hm, no, I don't know what the correct fix is here.  I'll wait for a
-> > fixed up (and tested) patch to be resubmited please.
-> >
-> > thanks,
-> >
-> > greg k-h
->
-> Sorry, I tested an earlier version without the guest_cpuid_family fix
-> that Paolo made when he committed my patch, and of course that's the
-> hang up here. I'll get this fixed up for you.
->
-> - Kyle
+On Sat, May 07, 2022, Jim Mattson wrote:
+> From: David Matlack <dmatlack@google.com>
+> 
+> Include the value of the "VM-instruction error" field from the current
+> VMCS (if any) in the error message for VMCLEAR and VMPTRLD, since each
+> of these instructions may result in more than one VM-instruction
+> error. Previously, this field was only reported for VMWRITE errors.
+> 
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> [Rebased and refactored code; dropped the error number for INVVPID and
+> INVEPT; reworded commit message.]
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index d58b763df855..a25da991da07 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -392,12 +392,14 @@ noinline void vmwrite_error(unsigned long field, unsigned long value)
+>  
+>  noinline void vmclear_error(struct vmcs *vmcs, u64 phys_addr)
+>  {
+> -	vmx_insn_failed("kvm: vmclear failed: %p/%llx\n", vmcs, phys_addr);
+> +	vmx_insn_failed("kvm: vmclear failed: %p/%llx err=%d\n",
 
-Hi Greg,
+I highly doubt it will ever matter, but arguably this should be %u, not %d.
 
-I've just sent a backport of Like Xu's "KVM: x86/pmu: Refactoring
-find_arch_event() to pmc_perf_hw_id()" for 5.4. It had to be trivially
-adjusted because kvm_x86_ops is a pointer on pre-5.7 kernels.
-
-After you apply that, the patch that you applied here for 5.10 will
-apply to 5.4.
-
-I have built and run these exact patches this time, and rr in KVM
-guests on AMD hardware is behaving as expected.
-
-Thanks, and sorry for the earlier trouble.
-
-- Kyle
+> +			vmcs, phys_addr, vmcs_read32(VM_INSTRUCTION_ERROR));
+>  }
+>  
+>  noinline void vmptrld_error(struct vmcs *vmcs, u64 phys_addr)
+>  {
+> -	vmx_insn_failed("kvm: vmptrld failed: %p/%llx\n", vmcs, phys_addr);
+> +	vmx_insn_failed("kvm: vmptrld failed: %p/%llx err=%d\n",
+> +			vmcs, phys_addr, vmcs_read32(VM_INSTRUCTION_ERROR));
+>  }
+>  
+>  noinline void invvpid_error(unsigned long ext, u16 vpid, gva_t gva)
+> -- 
+> 2.36.0.512.ge40c2bad7a-goog
+> 
