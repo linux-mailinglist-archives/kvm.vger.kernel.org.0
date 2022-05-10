@@ -2,153 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D3D1522215
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 19:14:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4DFE522329
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 19:52:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347052AbiEJRSA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 13:18:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49598 "EHLO
+        id S1347907AbiEJR4Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 13:56:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239349AbiEJRR6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 13:17:58 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D067B2BF30A;
-        Tue, 10 May 2022 10:14:00 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24AGQHCI009350;
-        Tue, 10 May 2022 17:14:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=B8JUa8Gkq6B8oFoZ0huHyIRt5JmUqk4NH/1EQMXEK2c=;
- b=cEM2ezvSUZ0+O0LN6DCv/d3SfunWwDMKaSAmOfAE8fK+xo2s1D8rAAlSDVM+vx9aWugo
- ynP5TcKDORhq5S7t9scqRAJpEG5WIGeHQRLlK+W8CRBbwSj6zFUAw63PdB1AAvbfpVG3
- ShP652Pn2GVaF78BCLImwOjcfo++R618zkGe46BRYAAePEJnMRZqwNqMKC6IP3G2QZcw
- 2RWaLLT81VlYF4qT/QQU3CXWSJdHPFUdY1uoKcgejTN0/9qPvqOU8cr9rpRRNWeP4UiK
- 1L9KXMM7Z3tH1OO6mlCvFhtzBrOuC+qaskTkgVy3HWYV6IbQ+uqQhJ5fMNGq9Qbwhw0G kw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fyujs93f6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 May 2022 17:14:00 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24AHDxP2027820;
-        Tue, 10 May 2022 17:13:59 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fyujs93ep-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 May 2022 17:13:59 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24AHDfhi030977;
-        Tue, 10 May 2022 17:13:57 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma01fra.de.ibm.com with ESMTP id 3fwgd8kcyf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 May 2022 17:13:57 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24AHDs4L34472264
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 May 2022 17:13:54 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 183E7A405B;
-        Tue, 10 May 2022 17:13:54 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AD320A4054;
-        Tue, 10 May 2022 17:13:53 +0000 (GMT)
-Received: from [9.145.38.155] (unknown [9.145.38.155])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 10 May 2022 17:13:53 +0000 (GMT)
-Message-ID: <cd228e1a-3c38-544d-1968-e99458998f71@linux.ibm.com>
-Date:   Tue, 10 May 2022 19:13:53 +0200
+        with ESMTP id S1348452AbiEJR4M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 13:56:12 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E31D123BF9
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 10:52:13 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA78C12FC;
+        Tue, 10 May 2022 10:52:13 -0700 (PDT)
+Received: from [10.57.80.111] (unknown [10.57.80.111])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 16F243F66F;
+        Tue, 10 May 2022 10:52:11 -0700 (PDT)
+Message-ID: <0e2f7cb8-f0d9-8209-6bc2-ca87fff57f1f@arm.com>
+Date:   Tue, 10 May 2022 18:52:06 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [kvm-unit-tests PATCH 1/3] s390x: Fix sclp facility bit numbers
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20220505124656.1954092-1-scgl@linux.ibm.com>
- <20220505124656.1954092-2-scgl@linux.ibm.com>
- <20220506173121.667ef671@p-imbrenda>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220506173121.667ef671@p-imbrenda>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH] vfio: Remove VFIO_TYPE1_NESTING_IOMMU
+Content-Language: en-GB
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Cc:     Will Deacon <will@kernel.org>, Eric Auger <eric.auger@redhat.com>,
+        Vivek Kumar Gautam <Vivek.Gautam@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>
+References: <0-v1-0093c9b0e345+19-vfio_no_nesting_jgg@nvidia.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <0-v1-0093c9b0e345+19-vfio_no_nesting_jgg@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 9sKYU3DfbW7bNZZgxkfm25Y1oKTpGB2c
-X-Proofpoint-GUID: YBcCGc4_oKsCBa8iHU4tGNxYZIVZKlnh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-10_05,2022-05-10_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 phishscore=0 adultscore=0 mlxscore=0 priorityscore=1501
- bulkscore=0 malwarescore=0 mlxlogscore=999 clxscore=1015
- lowpriorityscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2202240000 definitions=main-2205100074
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/6/22 17:31, Claudio Imbrenda wrote:
-> On Thu,  5 May 2022 14:46:54 +0200
-> Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
+On 2022-05-10 17:55, Jason Gunthorpe via iommu wrote:
+> This control causes the ARM SMMU drivers to choose a stage 2
+> implementation for the IO pagetable (vs the stage 1 usual default),
+> however this choice has no visible impact to the VFIO user. Further qemu
+> never implemented this and no other userspace user is known.
 > 
->> sclp_feat_check takes care of adjusting the bit numbering such that they
->> can be defined as they are in the documentation.
+> The original description in commit f5c9ecebaf2a ("vfio/iommu_type1: add
+> new VFIO_TYPE1_NESTING_IOMMU IOMMU type") suggested this was to "provide
+> SMMU translation services to the guest operating system" however the rest
+> of the API to set the guest table pointer for the stage 1 was never
+> completed, or at least never upstreamed, rendering this part useless dead
+> code.
 > 
-> this means we had it wrong all along and we somehow never noticed
+> Since the current patches to enable nested translation, aka userspace page
+> tables, rely on iommufd and will not use the enable_nesting()
+> iommu_domain_op, remove this infrastructure. However, don't cut too deep
+> into the SMMU drivers for now expecting the iommufd work to pick it up -
+> we still need to create S2 IO page tables.
+> 
+> Remove VFIO_TYPE1_NESTING_IOMMU and everything under it including the
+> enable_nesting iommu_domain_op.
+> 
+> Just in-case there is some userspace using this continue to treat
+> requesting it as a NOP, but do not advertise support any more.
 
-That tends to happen when you add definitions and never actually use 
-them. :)
+I assume the nested translation/guest SVA patches that Eric and Vivek 
+were working on pre-IOMMUFD made use of this, and given that they got 
+quite far along, I wouldn't be too surprised if some eager cloud vendors 
+might have even deployed something based on the patches off the list. I 
+can't help feeling a little wary about removing this until IOMMUFD can 
+actually offer a functional replacement - is it in the way of anything 
+upcoming?
 
-> 
-> ooops!
-> 
-> anyway:
-> 
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> 
->>
->> Fixes: 4dd649c8 ("lib: s390x: sclp: Extend feature probing")
->> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
->> ---
->>   lib/s390x/sclp.h | 16 +++++++++-------
->>   1 file changed, 9 insertions(+), 7 deletions(-)
->>
->> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
->> index fead007a..4ce2209f 100644
->> --- a/lib/s390x/sclp.h
->> +++ b/lib/s390x/sclp.h
->> @@ -134,13 +134,15 @@ struct sclp_facilities {
->>   };
->>   
->>   /* bit number within a certain byte */
->> -#define SCLP_FEAT_85_BIT_GSLS		7
->> -#define SCLP_FEAT_98_BIT_KSS		0
->> -#define SCLP_FEAT_116_BIT_64BSCAO	7
->> -#define SCLP_FEAT_116_BIT_CMMA		6
->> -#define SCLP_FEAT_116_BIT_ESCA		3
->> -#define SCLP_FEAT_117_BIT_PFMFI		6
->> -#define SCLP_FEAT_117_BIT_IBS		5
->> +#define SCLP_FEAT_80_BIT_SOP		2
->> +#define SCLP_FEAT_85_BIT_GSLS		0
->> +#define SCLP_FEAT_85_BIT_ESOP		6
->> +#define SCLP_FEAT_98_BIT_KSS		7
->> +#define SCLP_FEAT_116_BIT_64BSCAO	0
->> +#define SCLP_FEAT_116_BIT_CMMA		1
->> +#define SCLP_FEAT_116_BIT_ESCA		4
->> +#define SCLP_FEAT_117_BIT_PFMFI		1
->> +#define SCLP_FEAT_117_BIT_IBS		2
->>   
->>   typedef struct ReadInfo {
->>   	SCCBHeader h;
-> 
+Robin.
 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 16 ----------------
+>   drivers/iommu/arm/arm-smmu/arm-smmu.c       | 16 ----------------
+>   drivers/iommu/iommu.c                       | 10 ----------
+>   drivers/vfio/vfio_iommu_type1.c             | 12 +-----------
+>   include/linux/iommu.h                       |  3 ---
+>   include/uapi/linux/vfio.h                   |  2 +-
+>   6 files changed, 2 insertions(+), 57 deletions(-)
+> 
+> It would probably make sense for this to go through the VFIO tree with Robin's
+> ack for the SMMU changes.
+> 
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> index 627a3ed5ee8fd1..b901e8973bb4ea 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> @@ -2724,21 +2724,6 @@ static struct iommu_group *arm_smmu_device_group(struct device *dev)
+>   	return group;
+>   }
+>   
+> -static int arm_smmu_enable_nesting(struct iommu_domain *domain)
+> -{
+> -	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+> -	int ret = 0;
+> -
+> -	mutex_lock(&smmu_domain->init_mutex);
+> -	if (smmu_domain->smmu)
+> -		ret = -EPERM;
+> -	else
+> -		smmu_domain->stage = ARM_SMMU_DOMAIN_NESTED;
+> -	mutex_unlock(&smmu_domain->init_mutex);
+> -
+> -	return ret;
+> -}
+> -
+>   static int arm_smmu_of_xlate(struct device *dev, struct of_phandle_args *args)
+>   {
+>   	return iommu_fwspec_add_ids(dev, args->args, 1);
+> @@ -2865,7 +2850,6 @@ static struct iommu_ops arm_smmu_ops = {
+>   		.flush_iotlb_all	= arm_smmu_flush_iotlb_all,
+>   		.iotlb_sync		= arm_smmu_iotlb_sync,
+>   		.iova_to_phys		= arm_smmu_iova_to_phys,
+> -		.enable_nesting		= arm_smmu_enable_nesting,
+>   		.free			= arm_smmu_domain_free,
+>   	}
+>   };
+> diff --git a/drivers/iommu/arm/arm-smmu/arm-smmu.c b/drivers/iommu/arm/arm-smmu/arm-smmu.c
+> index 568cce590ccc13..239e6f6585b48d 100644
+> --- a/drivers/iommu/arm/arm-smmu/arm-smmu.c
+> +++ b/drivers/iommu/arm/arm-smmu/arm-smmu.c
+> @@ -1507,21 +1507,6 @@ static struct iommu_group *arm_smmu_device_group(struct device *dev)
+>   	return group;
+>   }
+>   
+> -static int arm_smmu_enable_nesting(struct iommu_domain *domain)
+> -{
+> -	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+> -	int ret = 0;
+> -
+> -	mutex_lock(&smmu_domain->init_mutex);
+> -	if (smmu_domain->smmu)
+> -		ret = -EPERM;
+> -	else
+> -		smmu_domain->stage = ARM_SMMU_DOMAIN_NESTED;
+> -	mutex_unlock(&smmu_domain->init_mutex);
+> -
+> -	return ret;
+> -}
+> -
+>   static int arm_smmu_set_pgtable_quirks(struct iommu_domain *domain,
+>   		unsigned long quirks)
+>   {
+> @@ -1600,7 +1585,6 @@ static struct iommu_ops arm_smmu_ops = {
+>   		.flush_iotlb_all	= arm_smmu_flush_iotlb_all,
+>   		.iotlb_sync		= arm_smmu_iotlb_sync,
+>   		.iova_to_phys		= arm_smmu_iova_to_phys,
+> -		.enable_nesting		= arm_smmu_enable_nesting,
+>   		.set_pgtable_quirks	= arm_smmu_set_pgtable_quirks,
+>   		.free			= arm_smmu_domain_free,
+>   	}
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 857d4c2fd1a206..f33c0d569a5d03 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -2561,16 +2561,6 @@ static int __init iommu_init(void)
+>   }
+>   core_initcall(iommu_init);
+>   
+> -int iommu_enable_nesting(struct iommu_domain *domain)
+> -{
+> -	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
+> -		return -EINVAL;
+> -	if (!domain->ops->enable_nesting)
+> -		return -EINVAL;
+> -	return domain->ops->enable_nesting(domain);
+> -}
+> -EXPORT_SYMBOL_GPL(iommu_enable_nesting);
+> -
+>   int iommu_set_pgtable_quirks(struct iommu_domain *domain,
+>   		unsigned long quirk)
+>   {
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 9394aa9444c10c..ff669723b0488f 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -74,7 +74,6 @@ struct vfio_iommu {
+>   	uint64_t		num_non_pinned_groups;
+>   	wait_queue_head_t	vaddr_wait;
+>   	bool			v2;
+> -	bool			nesting;
+>   	bool			dirty_page_tracking;
+>   	bool			container_open;
+>   	struct list_head	emulated_iommu_groups;
+> @@ -2207,12 +2206,6 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>   	if (!domain->domain)
+>   		goto out_free_domain;
+>   
+> -	if (iommu->nesting) {
+> -		ret = iommu_enable_nesting(domain->domain);
+> -		if (ret)
+> -			goto out_domain;
+> -	}
+> -
+>   	ret = iommu_attach_group(domain->domain, group->iommu_group);
+>   	if (ret)
+>   		goto out_domain;
+> @@ -2546,9 +2539,7 @@ static void *vfio_iommu_type1_open(unsigned long arg)
+>   	switch (arg) {
+>   	case VFIO_TYPE1_IOMMU:
+>   		break;
+> -	case VFIO_TYPE1_NESTING_IOMMU:
+> -		iommu->nesting = true;
+> -		fallthrough;
+> +	case __VFIO_RESERVED_TYPE1_NESTING_IOMMU:
+>   	case VFIO_TYPE1v2_IOMMU:
+>   		iommu->v2 = true;
+>   		break;
+> @@ -2634,7 +2625,6 @@ static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
+>   	switch (arg) {
+>   	case VFIO_TYPE1_IOMMU:
+>   	case VFIO_TYPE1v2_IOMMU:
+> -	case VFIO_TYPE1_NESTING_IOMMU:
+>   	case VFIO_UNMAP_ALL:
+>   	case VFIO_UPDATE_VADDR:
+>   		return 1;
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 9208eca4b0d1ac..51cb4d3eb0d391 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -272,7 +272,6 @@ struct iommu_ops {
+>    * @iotlb_sync: Flush all queued ranges from the hardware TLBs and empty flush
+>    *            queue
+>    * @iova_to_phys: translate iova to physical address
+> - * @enable_nesting: Enable nesting
+>    * @set_pgtable_quirks: Set io page table quirks (IO_PGTABLE_QUIRK_*)
+>    * @free: Release the domain after use.
+>    */
+> @@ -300,7 +299,6 @@ struct iommu_domain_ops {
+>   	phys_addr_t (*iova_to_phys)(struct iommu_domain *domain,
+>   				    dma_addr_t iova);
+>   
+> -	int (*enable_nesting)(struct iommu_domain *domain);
+>   	int (*set_pgtable_quirks)(struct iommu_domain *domain,
+>   				  unsigned long quirks);
+>   
+> @@ -496,7 +494,6 @@ extern int iommu_page_response(struct device *dev,
+>   extern int iommu_group_id(struct iommu_group *group);
+>   extern struct iommu_domain *iommu_group_default_domain(struct iommu_group *);
+>   
+> -int iommu_enable_nesting(struct iommu_domain *domain);
+>   int iommu_set_pgtable_quirks(struct iommu_domain *domain,
+>   		unsigned long quirks);
+>   
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index fea86061b44e65..6e0640f0a4cad7 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -35,7 +35,7 @@
+>   #define VFIO_EEH			5
+>   
+>   /* Two-stage IOMMU */
+> -#define VFIO_TYPE1_NESTING_IOMMU	6	/* Implies v2 */
+> +#define __VFIO_RESERVED_TYPE1_NESTING_IOMMU	6	/* Implies v2 */
+>   
+>   #define VFIO_SPAPR_TCE_v2_IOMMU		7
+>   
+> 
+> base-commit: c5eb0a61238dd6faf37f58c9ce61c9980aaffd7a
