@@ -2,53 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 05802520C71
-	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 05:51:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E73F520D02
+	for <lists+kvm@lfdr.de>; Tue, 10 May 2022 06:38:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234254AbiEJDyv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 May 2022 23:54:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34062 "EHLO
+        id S236218AbiEJEl4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 00:41:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231679AbiEJDyu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 May 2022 23:54:50 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67C1825EE;
-        Mon,  9 May 2022 20:50:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652154649; x=1683690649;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=nbv7UmfdXbcrW16GgE7aK/oiYQcXbQEJkwqMj9eP0Gk=;
-  b=VN66fcUAuPw9/X30HQc+PRR5L9T5PszsN4qaW3da7zwQSGb/mRJCwDbH
-   1S7kuTEbKa5ynqqt4eEjIALDqO33K8I+oBHgPQrmajVCyV5jpfVqXNR44
-   AY/jAVx/IPJuOgarMjxZpJguUVUgznfJI+c2yVK+ghHIWw/ketP7neKVS
-   zvlBZrfpoAlq4Niua/fSrLSKC+wBjsAN6lmaM1VYllS1Q8wGZUqWoZA99
-   Z0zf16LOWYE3azd8lGtUfR8ybfNJNoSdyn/GPEGXuCbRGGss26WEjPSr5
-   WXeJzQWl+8gOaIT5sc912Idq4lim2GcD2VfDSn8SVZ53b56F//mCl+xqY
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10342"; a="266837547"
-X-IronPort-AV: E=Sophos;i="5.91,213,1647327600"; 
-   d="scan'208";a="266837547"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2022 20:50:49 -0700
-X-IronPort-AV: E=Sophos;i="5.91,213,1647327600"; 
-   d="scan'208";a="602270857"
-Received: from embargo.jf.intel.com ([10.165.9.183])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2022 20:50:48 -0700
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     pbonzini@redhat.com
-Cc:     likexu@tencent.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH] KVM: selftests: x86: Skip unsupported test when Arch LBR is available
-Date:   Mon,  9 May 2022 23:50:28 -0400
-Message-Id: <20220510035028.21042-1-weijiang.yang@intel.com>
-X-Mailer: git-send-email 2.27.0
+        with ESMTP id S232590AbiEJEly (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 00:41:54 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF8A975214;
+        Mon,  9 May 2022 21:37:58 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id v10so13672436pgl.11;
+        Mon, 09 May 2022 21:37:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language
+         :from:to:cc:references:in-reply-to:content-transfer-encoding;
+        bh=sKl5pNCwJXU7WqvT/LDmg67nZYMXHrw3gGTNE00KDiM=;
+        b=YePOexK84CQ26EIabu9A5b/dbFhTTZfpTaQ9ubxq1XtqEoLg3vJG5MoS27rmCWDTos
+         QdVx/dA4Gn6rzw8xAYF+fnnaO2t00OFrbbLXBrEVi5toVKZ0x8MFvY8LMcKaeOjy+LlY
+         txxRSWSM/8MSlK4nm2MEXKXNESUA7m9BiT7HbEzuKSA5m4YEUvGIS+QeBI50gKpaP33d
+         9SLIk8stQK7Gu2mytwvcrQY4TrI8je+YG+dXa0CL0YRwg92qBJu43lC2Mc6Gbs5o+WMe
+         Jv+wl1g0+xdRzyFJZcUpjhNH2bv9IdKSj872B0vVOF4t0pc6WAl5JmaM3MliwGo5uGqw
+         f0SQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:from:to:cc:references:in-reply-to
+         :content-transfer-encoding;
+        bh=sKl5pNCwJXU7WqvT/LDmg67nZYMXHrw3gGTNE00KDiM=;
+        b=uIi5Fjb8wAP6TX2cpsstYm4DyYAe0ZMJ+HRJkP/eMegGBzK1Kh+OhDjaI8Jt+8MsnD
+         Cw+hextevFtn7gNz/6HlXGGfeJIhUymyfq2QLfeyLlgjKYEKhw90pQsfLneMPTVsnoq3
+         1qUS0Maya1gtMZ/glgU8UkJMJCylSnDdQum2tRAaT82VACJwhHZ58TaAlKU9eNh95XRP
+         526G6x+RbineqAvJ3YRm9Rnj7EfVoLatb+PgLeT5LXiPVztzrFaJrHThcH8w6fIy71dz
+         FQrsmJQt5K3J/bMjo+OhvcBm+zgTx09SJubZlP265C5RerBpNHuqFYTQ6NI0JyATnLad
+         tVvQ==
+X-Gm-Message-State: AOAM531eyalcVEIuRmSDUJvZkEsNQ3crCChCDpH4gahUMfDiyM77uudT
+        NDzvLVmKaaEbjurdKH/cOWg=
+X-Google-Smtp-Source: ABdhPJxf8HyqGkQnaloAnkZ5hnwQl0PRFEqFWflgOFMeNq7L2seaOFZiS7nRWqVRztzEuTFZ5gcFBw==
+X-Received: by 2002:a63:3e44:0:b0:3c3:dabd:eb03 with SMTP id l65-20020a633e44000000b003c3dabdeb03mr15260729pga.15.1652157478224;
+        Mon, 09 May 2022 21:37:58 -0700 (PDT)
+Received: from [192.168.255.10] ([203.205.141.83])
+        by smtp.gmail.com with ESMTPSA id 67-20020a621946000000b0050dc7628190sm9570550pfz.106.2022.05.09.21.37.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 May 2022 21:37:57 -0700 (PDT)
+Message-ID: <f3a7fc7c-959e-9f7f-b6f7-25f51b4caed6@gmail.com>
+Date:   Tue, 10 May 2022 12:37:53 +0800
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.0
+Subject: Re: [PATCH V2 2/3] KVM: x86/pmu: Don't pre-set the pmu->global_ctrl
+ when refreshing
+Content-Language: en-US
+From:   Like Xu <like.xu.linux@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220509102204.62389-1-likexu@tencent.com>
+ <20220509102204.62389-2-likexu@tencent.com>
+In-Reply-To: <20220509102204.62389-2-likexu@tencent.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -56,54 +79,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Arch LBR capable platforms, LBR_FMT in perf capability msr is 0x3f,
-so skip invalid format test if it's running on these platforms.
-Opportunistically change the file name to reflect the tests actually
-carried out.
+From: Like Xu <likexu@tencent.com>
 
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+Assigning a value to pmu->global_ctrl just to set the value of
+pmu->global_ctrl_mask in a more readable way leaves a side effect of
+not conforming to the specification. The value is reset to zero on
+Power up and Reset but keeps unchanged on INIT, like an ordinary MSR.
+
+Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- tools/testing/selftests/kvm/Makefile                     | 2 +-
- .../x86_64/{vmx_pmu_msrs_test.c => vmx_pmu_caps_test.c}  | 9 +++++++--
- 2 files changed, 8 insertions(+), 3 deletions(-)
- rename tools/testing/selftests/kvm/x86_64/{vmx_pmu_msrs_test.c => vmx_pmu_caps_test.c} (88%)
+v1 -> v2 Changelog:
+- Explicitly add parentheses around;
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 681b173aa87c..9a1a84803b01 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -81,7 +81,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/xapic_state_test
- TEST_GEN_PROGS_x86_64 += x86_64/xss_msr_test
- TEST_GEN_PROGS_x86_64 += x86_64/debug_regs
- TEST_GEN_PROGS_x86_64 += x86_64/tsc_msrs_test
--TEST_GEN_PROGS_x86_64 += x86_64/vmx_pmu_msrs_test
-+TEST_GEN_PROGS_x86_64 += x86_64/vmx_pmu_caps_test
- TEST_GEN_PROGS_x86_64 += x86_64/xen_shinfo_test
- TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
- TEST_GEN_PROGS_x86_64 += x86_64/sev_migrate_tests
-diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-similarity index 88%
-rename from tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c
-rename to tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-index 2454a1f2ca0c..977c268a6ad4 100644
---- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-@@ -107,8 +107,13 @@ int main(int argc, char *argv[])
- 	ASSERT_EQ(vcpu_get_msr(vm, VCPU_ID, MSR_IA32_PERF_CAPABILITIES), (u64)host_cap.lbr_format);
- 
- 	/* testcase 3, check invalid LBR format is rejected */
--	ret = _vcpu_set_msr(vm, 0, MSR_IA32_PERF_CAPABILITIES, PMU_CAP_LBR_FMT);
--	TEST_ASSERT(ret == 0, "Bad PERF_CAPABILITIES didn't fail.");
-+	/* Note, on Arch LBR capable platforms, LBR_FMT in perf capability msr is 0x3f,
-+	 * so skip below test if running on these platforms. */
-+	if (host_cap.lbr_format != PMU_CAP_LBR_FMT) {
-+		ret = _vcpu_set_msr(vm, 0, MSR_IA32_PERF_CAPABILITIES, PMU_CAP_LBR_FMT);
-+		TEST_ASSERT(ret == 0, "Bad PERF_CAPABILITIES didn't fail.");
-+	}
- 
-+	printf("Completed pmu capability tests successfully.\n");
- 	kvm_vm_free(vm);
- }
+  arch/x86/kvm/vmx/pmu_intel.c | 5 ++---
+  1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index cff03baf8921..7945e97db0af 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -525,9 +525,8 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+          setup_fixed_pmc_eventsel(pmu);
+      }
+
+-    pmu->global_ctrl = ((1ull << pmu->nr_arch_gp_counters) - 1) |
+-        (((1ull << pmu->nr_arch_fixed_counters) - 1) << INTEL_PMC_IDX_FIXED);
+-    pmu->global_ctrl_mask = ~pmu->global_ctrl;
++    pmu->global_ctrl_mask = ~(((1ull << pmu->nr_arch_gp_counters) - 1) |
++        (((1ull << pmu->nr_arch_fixed_counters) - 1) << INTEL_PMC_IDX_FIXED));
+      pmu->global_ovf_ctrl_mask = pmu->global_ctrl_mask
+              & ~(MSR_CORE_PERF_GLOBAL_OVF_CTRL_OVF_BUF |
+                  MSR_CORE_PERF_GLOBAL_OVF_CTRL_COND_CHGD);
 -- 
-2.27.0
+2.36.1
+
+
 
