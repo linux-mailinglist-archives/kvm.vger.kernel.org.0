@@ -2,102 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 117075235B8
-	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 16:38:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1837C523630
+	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 16:51:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244864AbiEKOiV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 May 2022 10:38:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45490 "EHLO
+        id S245105AbiEKOva (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 May 2022 10:51:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244850AbiEKOiQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 May 2022 10:38:16 -0400
-Received: from mail-oa1-x29.google.com (mail-oa1-x29.google.com [IPv6:2001:4860:4864:20::29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DDFF994E6
-        for <kvm@vger.kernel.org>; Wed, 11 May 2022 07:38:14 -0700 (PDT)
-Received: by mail-oa1-x29.google.com with SMTP id 586e51a60fabf-e5e433d66dso3049414fac.5
-        for <kvm@vger.kernel.org>; Wed, 11 May 2022 07:38:14 -0700 (PDT)
+        with ESMTP id S241067AbiEKOv2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 May 2022 10:51:28 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9B48D8083
+        for <kvm@vger.kernel.org>; Wed, 11 May 2022 07:51:27 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id cn13-20020a056a00340d00b0050e0f04e467so1236458pfb.21
+        for <kvm@vger.kernel.org>; Wed, 11 May 2022 07:51:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=stonybrook.edu; s=sbu-gmail;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ziYE0NkVrBjDXTGbPV1+2QDWsD4aVv6jXZDQq95ad9w=;
-        b=junsLANyDStr+Kt8Qq2tXaSgowjJ7dSU/AKT/2LxWU8sCdeMzZBLfXjZMjsoV7aao/
-         0iNWjJR2S7QTnYjJkEFmkj1yQoVwn6WFkUW+60qcK0RGVbG3RuO4ekCxNxMiw+WyNlDA
-         iJWQ3Tv2lIbbXMVjAeQ9DBi2A9OEyDxTJ5Ezk=
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=h9AY4Q2GsOxacDvqFN4YTojc7TEqJHbfnq0d8zy0AUI=;
+        b=hWZVPP8lhK4N0Mg6bmSbEhxF+gTB9MnL6ots52Urd2t0/BbHCNlxwcd2S2G9HVpmZq
+         WmD2LolLlgxmVrCerQpCgU2RyoXFU1cnXXKL1/ze0GW3SwsPVU9p4BMCz9YZjRPSu1Gq
+         LpZPXrCle99UgoCrYsg8ziEgsdZG3s9z6BCs0zXngM96DOAUY1OfwxQcnMOUAy3je8Ng
+         Hn9U7LT6RXjR/aL9JuxTmTHHaUX8k3W8UFszC98BIPak2Mf3ZIHsM90lozNIQG8dqZeM
+         QNUJGagLQlGtMLj4FUewa4YXht/Q+BRa1AC0fHSf1jil2ipAA9/lI2RIT/goUp2fIwl4
+         niJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ziYE0NkVrBjDXTGbPV1+2QDWsD4aVv6jXZDQq95ad9w=;
-        b=NL96ZUKUADF7wPsJ5hottq84+y38iEXgvk+QmBJRszm72m0e3ZxoBqyOS+hMF4thfq
-         9xitIYrLuqFKGAMgEq2ABoWe8HqwD7+O4gH14pwUkwo+vOYwwX4hOW1SPT2cjn18aUyW
-         ND79R13Q1AcJRe8WxwTLncs7QtVIXuwo0VjsFp8yAsQd9/Fj0nbGyKd1sGFqD00CZwIL
-         OFeQwq5X/O97ql8ql3W/kB1srYz8zmcr8boIVSk0IINShlYtmVc1Er1GmkdnialyoUVx
-         ygT5OK5jYbRN9RTZjrSe96usU390j3WyGr+vb47V2VTpMUBhR2J40jR8s6KxO/Z/NVBz
-         8pbg==
-X-Gm-Message-State: AOAM533mru3cse2jxx/MG8HwERGouLld1Z5DcKwU3+ECxHX5Wwsvuthk
-        V5udFPSMX2wchErvVyQKnVbFjHWNEdBFzhMlcNtWYw==
-X-Google-Smtp-Source: ABdhPJxNpNNIj4irIneC5fqKELT9Id1HxzpdjxSqhgtyCCRCm9G+y6nqFIXA9mpOScyXbLbJU4uCSNwKXmNkJJzdojI=
-X-Received: by 2002:a05:6870:5818:b0:ee:e90:46cc with SMTP id
- r24-20020a056870581800b000ee0e9046ccmr2887037oap.37.1652279893906; Wed, 11
- May 2022 07:38:13 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAJGDS+GM9Aw6Yvhv+F6wMGvrkz421kfq0j_PZa9F0AKyp5cEQA@mail.gmail.com>
- <YnGUazEgCJWgB6Yw@google.com> <CAJGDS+F0hB=0bj8spt9sophJyhdXTkYXK8LXUrt=7mov4s2JJA@mail.gmail.com>
- <CAJGDS+E5f2Xo68dsEkOfchZybU1uTSb=BgcTgQMLe0tW32m5xg@mail.gmail.com>
- <CALMp9eT3FeDa735Mo_9sZVPfovGQbcqXAygLnz61-acHV-L7+w@mail.gmail.com>
- <YnvBMnD6fuh+pAQ6@google.com> <CAJGDS+GMxG1gXMS1cW1+sS1V67h65iUpMGwQ=+-MVTE6DTOBjg@mail.gmail.com>
- <YnvFN7nT9DzfR8fq@google.com>
-In-Reply-To: <YnvFN7nT9DzfR8fq@google.com>
-From:   Arnabjyoti Kalita <akalita@cs.stonybrook.edu>
-Date:   Wed, 11 May 2022 20:08:02 +0530
-Message-ID: <CAJGDS+G+z9S6QDEGRatR5u+q-5X_MAiWqnTsjf4L=4+PrThdsQ@mail.gmail.com>
-Subject: Re: Causing VMEXITs when kprobes are hit in the guest VM
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=h9AY4Q2GsOxacDvqFN4YTojc7TEqJHbfnq0d8zy0AUI=;
+        b=mi/sYuXf78YualHaiSQu8GQ03v2E0KfQr5TfQZnUgI8U9uggKnIwtx91W6N2HrnCpa
+         r0D5Zn2MNKoJ9/1VjiI244ntmrJNdjz+RXoxpXX+Iema4kgUT8wPBynYMLbxuLdjMlbu
+         nFintYEbneD7vQyYD7fUBzR9aolv201vZCor/LMv8wBlalakUCYKm1I64CStEGxiMS0h
+         Mzj/HnXZC5eVC8FNlx/7MxwQT1FGailxylCWJev4y/GK0E/UyOfG1SdJLJlpASssgnaW
+         LSectDBkWL6qrseQnC/sazxNg+AHa7eTL/8cDxNlMdY++w4H4QiK+PEHtHNG+FNdYrtL
+         WXyA==
+X-Gm-Message-State: AOAM531RgjJ9TWGHRViVbKwIiR4NdrP9Izydw23B53qFPeUAkD0ItVjG
+        lPMbyPwCaX9a/AFcp4RYk+c/WDU+rnE=
+X-Google-Smtp-Source: ABdhPJz0W4ie8Ct1S+dUr/07VAZls1XaOK8YaewpQK6DMZLh8ZJFn1XA7xpKaUkkvdiTRxdXAG4dIYHi6l4=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a63:5752:0:b0:3c2:1c59:666f with SMTP id
+ h18-20020a635752000000b003c21c59666fmr20961499pgm.59.1652280687130; Wed, 11
+ May 2022 07:51:27 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed, 11 May 2022 14:51:22 +0000
+Message-Id: <20220511145122.3133334-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.512.ge40c2bad7a-goog
+Subject: [PATCH v3] KVM: x86/mmu: Update number of zapped pages even if page
+ list is stable
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Sean,
+When zapping obsolete pages, update the running count of zapped pages
+regardless of whether or not the list has become unstable due to zapping
+a shadow page with its own child shadow pages.  If the VM is backed by
+mostly 4kb pages, KVM can zap an absurd number of SPTEs without bumping
+the batch count and thus without yielding.  In the worst case scenario,
+this can cause a soft lokcup.
 
-Thank you for your answer. It might be easier and my code might be
-more "portable" if I allow the guest to handle the #BP themselves.
+ watchdog: BUG: soft lockup - CPU#12 stuck for 22s! [dirty_log_perf_:13020]
+   RIP: 0010:workingset_activation+0x19/0x130
+   mark_page_accessed+0x266/0x2e0
+   kvm_set_pfn_accessed+0x31/0x40
+   mmu_spte_clear_track_bits+0x136/0x1c0
+   drop_spte+0x1a/0xc0
+   mmu_page_zap_pte+0xef/0x120
+   __kvm_mmu_prepare_zap_page+0x205/0x5e0
+   kvm_mmu_zap_all_fast+0xd7/0x190
+   kvm_mmu_invalidate_zap_pages_in_memslot+0xe/0x10
+   kvm_page_track_flush_slot+0x5c/0x80
+   kvm_arch_flush_shadow_memslot+0xe/0x10
+   kvm_set_memslot+0x1a8/0x5d0
+   __kvm_set_memory_region+0x337/0x590
+   kvm_vm_ioctl+0xb08/0x1040
 
-When a VMEXIT happens, if I allow KVM to inject the #BP, cause a
-VMEXIT to userspace, do what I want when that happens and then, allow
-KVM to restart the guest via KVM_VCPU_RUN, I understand that the guest
-will handle the #BP and continue execution.
+Fixes: fbb158cb88b6 ("KVM: x86/mmu: Revert "Revert "KVM: MMU: zap pages in batch""")
+Reported-by: David Matlack <dmatlack@google.com>
+Reviewed-by: Ben Gardon <bgardon@google.com>
+Reviewed-by: David Matlack <dmatlack@google.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
 
-What could be the various ways a guest could handle #BP? Can we "make"
-the guest skip the instruction that caused the #BP ?
+v3:
+ - Collect David's review.
+ - "Rebase".  The v2 patch still applies cleanly, but Paolo apparently has
+   a filter configured to ignore all emails related to the v2 submission.
 
-Best Regards,
-Arnabjyoti Kalita
+v2:
+ - https://lore.kernel.org/all/20211129235233.1277558-1-seanjc@google.com
+ - Rebase to kvm/master, commit 30d7c5d60a88 ("KVM: SEV: expose...")
+ - Collect Ben's review, modulo bad splat.
+ - Copy+paste the correct splat and symptom. [David].
 
+ arch/x86/kvm/mmu/mmu.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-On Wed, May 11, 2022 at 7:46 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, May 11, 2022, Arnabjyoti Kalita wrote:
-> > Hello Jim and Sean,
-> >
-> > Thank you for your answers.
-> >
-> > If I re-inject the #BP back into the guest, does it automatically take
-> > care of updating the RIP and continuing execution?
->
-> Yes, the guest "automatically" handles the #BP.  What the appropriate handling may
-> be is up to the guest, i.e. skipping an instruction may or may not be the correct
-> thing to do.  Injecting the #BP after VM-Exit is simply emulating what would happen
-> from the guest's perspective if KVM had never intercepted the #BP in the first place.
->
-> Note, KVM doesn't have to initiate the injection, you can handle that from userspace
-> via KVM_SET_VCPU_EVENTS.  But if it's just as easy to hack KVM, that's totally fine
-> too, so long as userspace doesn't double inject.
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 909372762363..7429ae1784af 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5665,6 +5665,7 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
+ {
+ 	struct kvm_mmu_page *sp, *node;
+ 	int nr_zapped, batch = 0;
++	bool unstable;
+ 
+ restart:
+ 	list_for_each_entry_safe_reverse(sp, node,
+@@ -5696,11 +5697,12 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
+ 			goto restart;
+ 		}
+ 
+-		if (__kvm_mmu_prepare_zap_page(kvm, sp,
+-				&kvm->arch.zapped_obsolete_pages, &nr_zapped)) {
+-			batch += nr_zapped;
++		unstable = __kvm_mmu_prepare_zap_page(kvm, sp,
++				&kvm->arch.zapped_obsolete_pages, &nr_zapped);
++		batch += nr_zapped;
++
++		if (unstable)
+ 			goto restart;
+-		}
+ 	}
+ 
+ 	/*
+
+base-commit: 2764011106d0436cb44702cfb0981339d68c3509
+-- 
+2.36.0.512.ge40c2bad7a-goog
+
