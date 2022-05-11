@@ -2,222 +2,843 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 725C75232B4
-	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 14:09:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EF715232C5
+	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 14:17:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242303AbiEKMJk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 May 2022 08:09:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49774 "EHLO
+        id S237383AbiEKMRa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 May 2022 08:17:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242526AbiEKMJZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 May 2022 08:09:25 -0400
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2102.outbound.protection.outlook.com [40.107.255.102])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A013313D156;
-        Wed, 11 May 2022 05:08:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HiSyKOHwsDu/YmdOVsNGKeXrPVWsbMPxsyvF251GaoJdn/PZg7Cxe40ULxayFAA8gB6F5tUF9v8dhM8r/hODkxVPrdns+mKnlr1GIwhWO5+IAxLJtxWqDvnkAUF+cEaPybKpSkgVAoFYfpdWhKJzsZJkACyU2c2qeX00wDWMp4/5spwoabB+3t8TjHHHm3Mdms7grt8zV/vwTYxM+G/qU7IEb6ojoQSPIGy+cGBT5ZOSFyyE+qUY5kTQhn4i/Lue2JtQKKAtz6YSvhrD3PQBv7Avk6Ar4QTW8PrjJAkqj59Io4Llaoj0yRJQKRto+kWrfg0b+aCE+WXqCSlkrv3K5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/1N/uXk7AEHS2GWXVVt4QbwD+RFIo6K0QOFlm16GZYk=;
- b=YDqWFVAnvWE7OG2HO3HpOXI6HlZuHHCKRkdpRSm8sN8vo5zrE44GkMmGxq8Qs66AXZ+UecWqU3a0Vc9IFHfVlfYe7bwKevooFxkmLHo/zcsSXhR1rH5Axyx6aj0wkviwcd/UcBnbtkEbDO9ugXA9XFCb2kVIGRspgvLMwR01+Z+hnMf26Xo92Hk2Xj4H//r2wox7gezlvOOsi/bb7ZdijoIuOi5LctWsn7PRzZvvtSotMjQ6fGVsccgirmJ05g+Dvv9oJmim5UZn0JXaB1pfEHqX5c3Lwb3/qhm6dlwaNEBgB+AgT+pkRoNaSM/61qcIdxupoSXaXV8VilI9LS4Yfw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo0.onmicrosoft.com;
- s=selector2-vivo0-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/1N/uXk7AEHS2GWXVVt4QbwD+RFIo6K0QOFlm16GZYk=;
- b=nCrabNMoNUSglMUikYkpPnafJWOc1HFGKTAlhogDg9tk7x3ubmrBo4G/AtejkfqLv5bIJOHzoXtYnvSV/oJOhViDSNTOCInRWZEHDTwYDzY5YT/FRPEdusyXsbBOpgE9GuhlTEUbDwJeYZQyrD2UylIYhzWjKV3aBxe/lBfef+k=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from HK2PR06MB3492.apcprd06.prod.outlook.com (2603:1096:202:2f::10)
- by TY0PR06MB4942.apcprd06.prod.outlook.com (2603:1096:400:14f::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5250.13; Wed, 11 May
- 2022 12:08:31 +0000
-Received: from HK2PR06MB3492.apcprd06.prod.outlook.com
- ([fe80::88e1:dc04:6851:ad08]) by HK2PR06MB3492.apcprd06.prod.outlook.com
- ([fe80::88e1:dc04:6851:ad08%7]) with mapi id 15.20.5227.023; Wed, 11 May 2022
- 12:08:30 +0000
-From:   Guo Zhengkui <guozhengkui@vivo.com>
-To:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Guo Zhengkui <guozhengkui@vivo.com>,
-        Anup Patel <anup@brainfault.org>,
-        linux-arm-kernel@lists.infradead.org (moderated list:KERNEL VIRTUAL
-        MACHINE FOR ARM64 (KVM/arm64)),
-        kvmarm@lists.cs.columbia.edu (moderated list:KERNEL VIRTUAL MACHINE FOR
-        ARM64 (KVM/arm64)),
-        kvm@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE (KVM)),
-        linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
-        linux-kernel@vger.kernel.org (open list),
-        linux-riscv@lists.infradead.org (open list:RISC-V ARCHITECTURE)
-Cc:     zhengkui_guo@outlook.com
-Subject: [PATCH] selftests: kvm: replace ternary operator with min()
-Date:   Wed, 11 May 2022 20:05:55 +0800
-Message-Id: <20220511120621.36956-1-guozhengkui@vivo.com>
-X-Mailer: git-send-email 2.20.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: HK2PR02CA0181.apcprd02.prod.outlook.com
- (2603:1096:201:21::17) To HK2PR06MB3492.apcprd06.prod.outlook.com
- (2603:1096:202:2f::10)
+        with ESMTP id S234141AbiEKMRT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 May 2022 08:17:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 95A3945523
+        for <kvm@vger.kernel.org>; Wed, 11 May 2022 05:17:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652271435;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=U2Fiyg3dLOfcRHnVihb6T3YG51gyrTAXADZT1yCe1SU=;
+        b=hrtIxR989Iii+wjbYr3MSfOJVSrxAInkHcZ46bs/YDK+yfRqKmKIyrHke2iNI++NrHJW2c
+        NM/oEs1pF4KO7lccfU8tNfChAkkadmT5GPvg7LsYrnWF1CQBeUJXKKoc40of5VrS7wdn0P
+        cj5hqKt2eI61GBmNPCELROV3MTR6NX0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-278-Ie3IecJWNpSG49fLHh_RMQ-1; Wed, 11 May 2022 08:17:14 -0400
+X-MC-Unique: Ie3IecJWNpSG49fLHh_RMQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EDAA1185A794;
+        Wed, 11 May 2022 12:17:13 +0000 (UTC)
+Received: from starship (unknown [10.40.192.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0FAE6416385;
+        Wed, 11 May 2022 12:17:10 +0000 (UTC)
+Message-ID: <fd38937d4305bf606e0da687fc11b4866f575275.camel@redhat.com>
+Subject: Re: [PATCH v3 26/34] KVM: selftests: Hyper-V PV TLB flush selftest
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Wed, 11 May 2022 15:17:09 +0300
+In-Reply-To: <20220414132013.1588929-27-vkuznets@redhat.com>
+References: <20220414132013.1588929-1-vkuznets@redhat.com>
+         <20220414132013.1588929-27-vkuznets@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4e341fa3-6220-4e4c-4860-08da3346f60e
-X-MS-TrafficTypeDiagnostic: TY0PR06MB4942:EE_
-X-Microsoft-Antispam-PRVS: <TY0PR06MB4942264913223A426B17C610C7C89@TY0PR06MB4942.apcprd06.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: xG3L7x0pBsoGkOdwpEn4exJkEIkwyHELIclP7pQwCZKtAI6DTh86EdnZtN3d3iMFbiD688Gd9w+7WHYiNCCqoY/nQhrKp9xo5+fNfJ9vCWGkXkNcJBaYRSWg+yBo1EdeD6mh3VkAb0Ps4csUfhCp0DiU2czJ+WHawpmeXbZLM/f6z3shmf2KwDv24h5T1zO5kVPJn0Qro8GmlZQzccnzDx6tVD4sqGmk21UctTCUjhm540D5GC9ALT1FB8UO1GWnaeHXi7johYkXRCXtAFZt+RQZAooWtiQVQUWZnVbfeQiP17MeVj6DWBOx1ZKpbvqIhzvvCkyC4zaPD4cHsAg7NyFp/OlYWU3lRDzZaVxH5c8aqzgHlUFakg+YS3GoruBHwI6DyxwxNPq8DoVL14H9DNhEfv+0NPKD45zbQdfs6TB02Gw+k/zWMWI0VQxWsuDT//dMQMjiKBRpPf7gyrCYoH1N3KD4eX6XlN2B7Z4WYPcn8aCXaszusJeetO4LFmudlVN5DED5WhRKyhq19vo0vxjMUQ44ygiexjpFBngxRIFkAE/YvbDCiQmJ6eKobBYAnJbnlDG/ZvHiwyTfDBai5kdCC2EmRSmGczB0Fges1CHxBKBoPNT6QHY+/aKfCWtKZpP9TgkGsIGfo/1kX1jtlicoccouLgIdl4/xSIRuBGOYYN2R1BnIVzVEUteWGh4FjKME8vn1CnIrvsivecC1m/soIUsOCfakuWWCbO7Tzdw=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HK2PR06MB3492.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(4326008)(66946007)(66476007)(8936002)(66556008)(8676002)(2906002)(1076003)(86362001)(186003)(26005)(6512007)(7416002)(5660300002)(52116002)(6506007)(38350700002)(83380400001)(508600001)(6486002)(36756003)(316002)(110136005)(921005)(38100700002)(2616005)(6666004);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2/sh6i/2gTxewd+/4kmfbcsxr2TEorVPFqLXss9J20Qvmy0QT7jzcVu6deSY?=
- =?us-ascii?Q?nTUHJi2vkhvX+PSsOa8IuTbbo+9LVXiksYfUEiCWf/ZBf6hhLL8x2Qmzf5sg?=
- =?us-ascii?Q?qdCXbUCB2thxnmya1IgQtul6eEF6H6L2pRogOdlxz2hmVTJBIlwB84KeMBhJ?=
- =?us-ascii?Q?GT1ty0bO4AOOzn2zSsq+zKtfyWqAPVgQ0Kc2Bh47205LvXdJ/ULO474d7NT2?=
- =?us-ascii?Q?eEjWsG6+64UkFFuqz/hHNRdrK1MOQfHzG8RfhTRgwaPdRddC9/s6rL+WpY9+?=
- =?us-ascii?Q?YE7z23lBiw9Fp4PukSuwDvt20+eSBmfO8YGXXM7laLuSYwhohMWJQQXHDE1v?=
- =?us-ascii?Q?KprNP6HDirYnQm1E5uk8Dx5C0p4Vtopee1ZBk1vetG2pm+GbKa5ah965clmV?=
- =?us-ascii?Q?DQbKBVmUy/HwGEZ/pvklWMIyK5LYRJxZjg9exAXEWZCv5+upsmyb4hfA8Gg5?=
- =?us-ascii?Q?5MG8wC5diwUxP3qXsx9/c5LXjTmuyrW7lqpij5Ha+ph8to5a2FcbojgbkJ2r?=
- =?us-ascii?Q?jRgWCFkZDRmzhoAnO/Af/RitmN8/UVDrTE6wtzgjPt9mWVHrq7C1HMRziUue?=
- =?us-ascii?Q?rs8t2gNpl/mkGNxZVZx9dqVXI5KLow2pDGY4Fk9WUYVe3izwxT7O8arhc4Gd?=
- =?us-ascii?Q?WeLBbR7Y23jwL6BmwlLgOTHhI8Z9Vmu881YDOWGy+V6SHrmhdDwsRSafF4YF?=
- =?us-ascii?Q?Spf4QBWaaWZmB1ORz/CMm6W5tWRFe6HkbI0KwluULsa5n2IUhXaKNoLw1nOZ?=
- =?us-ascii?Q?fJs+wLNHvuPOtS6TnB/hxk/oRcINShNZ2KOtbCWY3J6C1Ok4l4CdbxG6UDbX?=
- =?us-ascii?Q?YhDoF8wEGtSo+4BA9PmW3/gEcaT9bCDSu6CYxaWjOYu+a6dstceGUaFxylzn?=
- =?us-ascii?Q?RL0tOL9pxo9oT3XbkasMISjZjWFeGbE5MxAZlU7PJk8VclSLdxy+dhjOQ0Kd?=
- =?us-ascii?Q?hQvehfiTO0jbVCR3kCHyL48sCujXe1YECkmnEvqOY8WSJ/eam2sdFr25Ia7I?=
- =?us-ascii?Q?o90OCRKfiKXvo1LWCD/8zeS7aluNha3dB/yCbHTrwOeXIPkG/PVLtjzYwXP0?=
- =?us-ascii?Q?108rp+nMu7GXiZ9eraygk0q7uCZUem1XZ5dFxXGuHVPz0GBOQBFFUwAWxIZU?=
- =?us-ascii?Q?OqPAkQXLotugGNsXX61Gh4Wif+zeK/YJn7lWC2PK2SJsm3RNxtd/07RLvgJi?=
- =?us-ascii?Q?CyG63YVJ3JheUKnSaRnTmnU+wSZ8yfPeE20UUV5I1tUmG7egBOz+aG7rtNQC?=
- =?us-ascii?Q?E5s9sNYAxiA3l9+JABfwJhQI7WLArEzMdjWb7IC2EeDpWA96HOtKZl5yOxlX?=
- =?us-ascii?Q?7P77jgCD7cyq1pp6BTvs+1P4y/4hyI1XElVwiUBTkvtf2HLFz6ow8ankzQUx?=
- =?us-ascii?Q?jv5V40wyaex1IEvwiLNGtXOwyXmYBRxXxdAQfQpRLbXba9ouRkj2058oBU3V?=
- =?us-ascii?Q?wTuWUf4rBCpPYjSGNornluf/PU6Cq0C2JMkUuWNtbzbrCO3tf+JDIRogI7X7?=
- =?us-ascii?Q?gXWXJx3olmNm6NDYDaubp3NxoAYfThggmeMWTb4oQLncB9Cce3x7eQ/yFtXy?=
- =?us-ascii?Q?CqBGKJP5CqsVgn4h/9lbRdy9GeZh5FRQEHbtQasiHI5N3Pkey/UpOWz9uaC4?=
- =?us-ascii?Q?WqOW82HRFXo6RSNC/5OczB2NQcGxeHNMmEjE00lKYGmbD8ZtltzJeiIloo4C?=
- =?us-ascii?Q?eIpm+Dt1JYTKzs14rCb5nDb7avribrCxpdnSGPlcXOuFSYCAAtGe+fL2rdNu?=
- =?us-ascii?Q?JFjVsoT44g=3D=3D?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4e341fa3-6220-4e4c-4860-08da3346f60e
-X-MS-Exchange-CrossTenant-AuthSource: HK2PR06MB3492.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2022 12:08:30.4423
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: acYqY5f6uV2LeEyaDbvbRBe7ZyQ7xyRtMJaYPHvBkN2qUIwz12q4BER0gCBMDagwsrL/Y01r3G2ZMZrzsS52BQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY0PR06MB4942
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix the following coccicheck warnings:
+On Thu, 2022-04-14 at 15:20 +0200, Vitaly Kuznetsov wrote:
+> Introduce a selftest for Hyper-V PV TLB flush hypercalls
+> (HvFlushVirtualAddressSpace/HvFlushVirtualAddressSpaceEx,
+> HvFlushVirtualAddressList/HvFlushVirtualAddressListEx).
+> 
+> The test creates one 'sender' vCPU and two 'worker' vCPU which do busy
+> loop reading from a certain GVA checking the observed value. Sender
+> vCPU drops to the host to swap the data page with another page filled
+> with a different value. The expectation for workers is also
+> altered. Without TLB flush on worker vCPUs, they may continue to
+> observe old value. To guard against accidental TLB flushes for worker
+> vCPUs the test is repeated 100 times.
+> 
+> Hyper-V TLB flush hypercalls are tested in both 'normal' and 'XMM
+> fast' modes.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/.gitignore        |   1 +
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../selftests/kvm/include/x86_64/hyperv.h     |   1 +
+>  .../selftests/kvm/x86_64/hyperv_tlb_flush.c   | 647 ++++++++++++++++++
+>  4 files changed, 650 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
+> 
+> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> index 5d5fbb161d56..1a1d09e414d5 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -25,6 +25,7 @@
+>  /x86_64/hyperv_features
+>  /x86_64/hyperv_ipi
+>  /x86_64/hyperv_svm_test
+> +/x86_64/hyperv_tlb_flush
+>  /x86_64/mmio_warning_test
+>  /x86_64/mmu_role_test
+>  /x86_64/platform_info_test
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index 44889f897fe7..8b83abc09a1a 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -54,6 +54,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
+>  TEST_GEN_PROGS_x86_64 += x86_64/hyperv_features
+>  TEST_GEN_PROGS_x86_64 += x86_64/hyperv_ipi
+>  TEST_GEN_PROGS_x86_64 += x86_64/hyperv_svm_test
+> +TEST_GEN_PROGS_x86_64 += x86_64/hyperv_tlb_flush
+>  TEST_GEN_PROGS_x86_64 += x86_64/kvm_clock_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/kvm_pv_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/mmio_warning_test
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/hyperv.h b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
+> index f51d6fab8e93..1e34dd7c5075 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/hyperv.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
+> @@ -185,6 +185,7 @@
+>  /* hypercall options */
+>  #define HV_HYPERCALL_FAST_BIT		BIT(16)
+>  #define HV_HYPERCALL_VARHEAD_OFFSET	17
+> +#define HV_HYPERCALL_REP_COMP_OFFSET	32
+>  
+>  #define HYPERV_LINUX_OS_ID ((u64)0x8100 << 48)
+>  
+> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c b/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
+> new file mode 100644
+> index 000000000000..00bcae45ddd2
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
+> @@ -0,0 +1,647 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Hyper-V HvFlushVirtualAddress{List,Space}{,Ex} tests
+> + *
+> + * Copyright (C) 2022, Red Hat, Inc.
+> + *
+> + */
+> +
+> +#define _GNU_SOURCE /* for program_invocation_short_name */
+> +#include <pthread.h>
+> +#include <inttypes.h>
+> +
+> +#include "kvm_util.h"
+> +#include "hyperv.h"
+> +#include "processor.h"
+> +#include "test_util.h"
+> +#include "vmx.h"
+> +
+> +#define SENDER_VCPU_ID   1
+> +#define WORKER_VCPU_ID_1 2
+> +#define WORKER_VCPU_ID_2 65
+> +
+> +#define NTRY 100
+> +
+> +struct thread_params {
+> +	struct kvm_vm *vm;
+> +	uint32_t vcpu_id;
+> +};
+> +
+> +struct hv_vpset {
+> +	u64 format;
+> +	u64 valid_bank_mask;
+> +	u64 bank_contents[];
+> +};
+> +
+> +enum HV_GENERIC_SET_FORMAT {
+> +	HV_GENERIC_SET_SPARSE_4K,
+> +	HV_GENERIC_SET_ALL,
+> +};
+> +
+> +#define HV_FLUSH_ALL_PROCESSORS			BIT(0)
+> +#define HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES	BIT(1)
+> +#define HV_FLUSH_NON_GLOBAL_MAPPINGS_ONLY	BIT(2)
+> +#define HV_FLUSH_USE_EXTENDED_RANGE_FORMAT	BIT(3)
+> +
+> +/* HvFlushVirtualAddressSpace, HvFlushVirtualAddressList hypercalls */
+> +struct hv_tlb_flush {
+> +	u64 address_space;
+> +	u64 flags;
+> +	u64 processor_mask;
+> +	u64 gva_list[];
+> +} __packed;
+> +
+> +/* HvFlushVirtualAddressSpaceEx, HvFlushVirtualAddressListEx hypercalls */
+> +struct hv_tlb_flush_ex {
+> +	u64 address_space;
+> +	u64 flags;
+> +	struct hv_vpset hv_vp_set;
+> +	u64 gva_list[];
+> +} __packed;
+> +
+> +static inline void hv_init(vm_vaddr_t pgs_gpa)
+> +{
+> +	wrmsr(HV_X64_MSR_GUEST_OS_ID, HYPERV_LINUX_OS_ID);
+> +	wrmsr(HV_X64_MSR_HYPERCALL, pgs_gpa);
+> +}
+> +
+> +static void worker_code(void *test_pages, vm_vaddr_t pgs_gpa)
+> +{
+> +	u32 vcpu_id = rdmsr(HV_X64_MSR_VP_INDEX);
+> +	unsigned char chr;
+> +
+> +	x2apic_enable();
+> +	hv_init(pgs_gpa);
+> +
+> +	for (;;) {
+> +		chr = READ_ONCE(*(unsigned char *)(test_pages + 4096 * 2 + vcpu_id));
+It would be nice to wrap this into a function, like set_expected_char does for ease
+of code understanding.
 
-tools/testing/selftests/kvm/lib/s390x/ucall.c:25:15-17: WARNING
-opportunity for min()
-tools/testing/selftests/kvm/lib/x86_64/ucall.c:27:15-17: WARNING
-opportunity for min()
-tools/testing/selftests/kvm/lib/riscv/ucall.c:56:15-17: WARNING
-opportunity for min()
-tools/testing/selftests/kvm/lib/aarch64/ucall.c:82:15-17: WARNING
-opportunity for min()
-tools/testing/selftests/kvm/lib/aarch64/ucall.c:55:20-21: WARNING
-opportunity for min()
+> +		if (chr)
+> +			GUEST_ASSERT(*(unsigned char *)test_pages == chr);
+> +		asm volatile("nop");
+> +	}
+> +}
+> +
+> +static inline u64 hypercall(u64 control, vm_vaddr_t arg1, vm_vaddr_t arg2)
+> +{
+> +	u64 hv_status;
+> +
+> +	asm volatile("mov %3, %%r8\n"
+> +		     "vmcall"
+> +		     : "=a" (hv_status),
+> +		       "+c" (control), "+d" (arg1)
+> +		     :  "r" (arg2)
+> +		     : "cc", "memory", "r8", "r9", "r10", "r11");
+> +
+> +	return hv_status;
+> +}
+> +
+> +static inline void nop_loop(void)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < 10000000; i++)
+> +		asm volatile("nop");
+> +}
+> +
+> +static inline void sync_to_xmm(void *data)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < 8; i++)
+> +		write_sse_reg(i, (sse128_t *)(data + sizeof(sse128_t) * i));
+> +}
 
-min() is defined in tools/include/linux/kernel.h.
+Nitpick: I see duplicated code, I complain ;-) - maybe put the above to some common file?
 
-Signed-off-by: Guo Zhengkui <guozhengkui@vivo.com>
----
- tools/testing/selftests/kvm/lib/aarch64/ucall.c | 4 ++--
- tools/testing/selftests/kvm/lib/riscv/ucall.c   | 2 +-
- tools/testing/selftests/kvm/lib/s390x/ucall.c   | 2 +-
- tools/testing/selftests/kvm/lib/x86_64/ucall.c  | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
+> +
+> +static void set_expected_char(void *addr, unsigned char chr, int vcpu_id)
+> +{
+> +	asm volatile("mfence");
 
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/ucall.c b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-index e0b0164e9af8..00be3ef195ca 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-@@ -52,7 +52,7 @@ void ucall_init(struct kvm_vm *vm, void *arg)
- 	 * lower and won't match physical addresses.
- 	 */
- 	bits = vm->va_bits - 1;
--	bits = vm->pa_bits < bits ? vm->pa_bits : bits;
-+	bits = min(vm->pa_bits, bits);
- 	end = 1ul << bits;
- 	start = end * 5 / 8;
- 	step = end / 16;
-@@ -79,7 +79,7 @@ void ucall(uint64_t cmd, int nargs, ...)
- 	va_list va;
- 	int i;
- 
--	nargs = nargs <= UCALL_MAX_ARGS ? nargs : UCALL_MAX_ARGS;
-+	nargs = min(nargs, UCALL_MAX_ARGS);
- 
- 	va_start(va, nargs);
- 	for (i = 0; i < nargs; ++i)
-diff --git a/tools/testing/selftests/kvm/lib/riscv/ucall.c b/tools/testing/selftests/kvm/lib/riscv/ucall.c
-index 9e42d8248fa6..34f16fe70ce8 100644
---- a/tools/testing/selftests/kvm/lib/riscv/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/riscv/ucall.c
-@@ -53,7 +53,7 @@ void ucall(uint64_t cmd, int nargs, ...)
- 	va_list va;
- 	int i;
- 
--	nargs = nargs <= UCALL_MAX_ARGS ? nargs : UCALL_MAX_ARGS;
-+	nargs = min(nargs, UCALL_MAX_ARGS);
- 
- 	va_start(va, nargs);
- 	for (i = 0; i < nargs; ++i)
-diff --git a/tools/testing/selftests/kvm/lib/s390x/ucall.c b/tools/testing/selftests/kvm/lib/s390x/ucall.c
-index 9d3b0f15249a..665267c1135d 100644
---- a/tools/testing/selftests/kvm/lib/s390x/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/s390x/ucall.c
-@@ -22,7 +22,7 @@ void ucall(uint64_t cmd, int nargs, ...)
- 	va_list va;
- 	int i;
- 
--	nargs = nargs <= UCALL_MAX_ARGS ? nargs : UCALL_MAX_ARGS;
-+	nargs = min(nargs, UCALL_MAX_ARGS);
- 
- 	va_start(va, nargs);
- 	for (i = 0; i < nargs; ++i)
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/ucall.c b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-index a3489973e290..2ea31a0ebe30 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-@@ -24,7 +24,7 @@ void ucall(uint64_t cmd, int nargs, ...)
- 	va_list va;
- 	int i;
- 
--	nargs = nargs <= UCALL_MAX_ARGS ? nargs : UCALL_MAX_ARGS;
-+	nargs = min(nargs, UCALL_MAX_ARGS);
- 
- 	va_start(va, nargs);
- 	for (i = 0; i < nargs; ++i)
--- 
-2.20.1
+I remember that Paolo once told me (I might not remember that correctly though),
+that on x86 the actual hardware barriers like mfence are not really
+needed, because hardware already does memory accesses in order,
+unless fancy (e.g non WB) memory types are used.
+
+> +	*(unsigned char *)(addr + 2 * 4096 + vcpu_id) = chr;
+> +}
+> +
+> +static void sender_guest_code(void *hcall_page, void *test_pages, vm_vaddr_t pgs_gpa)
+> +{
+> +	struct hv_tlb_flush *flush = (struct hv_tlb_flush *)hcall_page;
+> +	struct hv_tlb_flush_ex *flush_ex = (struct hv_tlb_flush_ex *)hcall_page;
+> +	int stage = 1, i;
+> +	u64 res;
+> +
+> +	hv_init(pgs_gpa);
+> +
+> +	/* "Slow" hypercalls */
+
+I hopefully understand it correctly, see my comments below,
+but it might be worthy to add something similar to my comments
+to the code to make it easier for someone reading the code to understand it.
+
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE for WORKER_VCPU_ID_1 */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+
+Here we set expected char to 0, meaning that now workers will not assert
+if there is mismatch.
+
+> +		GUEST_SYNC(stage++);
+Now there is a mismatch, the host swapped pages for us.
+
+> +		flush->flags = HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES;
+> +		flush->processor_mask = BIT(WORKER_VCPU_ID_1);
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE, pgs_gpa, pgs_gpa + 4096);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+
+Now we flushed the TLB, the guest should see correct value.
+
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_1);
+
+Now we force the workers to check it.
+
+Btw, an idea: it might be nice to use more that two test pages,
+like say 100 test pages each filled with different value,
+memory is cheap, and this way there will be no way for something
+to cause 'double error' which could hide the bug by a chance.
+
+
+Another thing, it might be nice to wrap this into a macro/function
+to avoid *that* much duplication.
+
+
+> +		nop_loop();
+> +	}
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST for WORKER_VCPU_ID_1 */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		flush->flags = HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES;
+> +		flush->processor_mask = BIT(WORKER_VCPU_ID_1);
+> +		flush->gva_list[0] = (u64)test_pages;
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST |
+> +				(1UL << HV_HYPERCALL_REP_COMP_OFFSET),
+> +				pgs_gpa, pgs_gpa + 4096);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_1);
+> +		nop_loop();
+> +	}
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE for HV_FLUSH_ALL_PROCESSORS */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		flush->flags = HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES | HV_FLUSH_ALL_PROCESSORS;
+> +		flush->processor_mask = 0;
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE, pgs_gpa, pgs_gpa + 4096);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_2);
+> +		nop_loop();
+> +	}
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST for HV_FLUSH_ALL_PROCESSORS */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		flush->flags = HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES | HV_FLUSH_ALL_PROCESSORS;
+> +		flush->gva_list[0] = (u64)test_pages;
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST |
+> +				(1UL << HV_HYPERCALL_REP_COMP_OFFSET),
+> +				pgs_gpa, pgs_gpa + 4096);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_2);
+> +		nop_loop();
+> +	}
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX for WORKER_VCPU_ID_2 */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		flush_ex->flags = HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES;
+> +		flush_ex->hv_vp_set.format = HV_GENERIC_SET_SPARSE_4K;
+> +		flush_ex->hv_vp_set.valid_bank_mask = BIT_ULL(WORKER_VCPU_ID_2 / 64);
+> +		flush_ex->hv_vp_set.bank_contents[0] = BIT_ULL(WORKER_VCPU_ID_2 % 64);
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX |
+> +				(1 << HV_HYPERCALL_VARHEAD_OFFSET),
+> +				pgs_gpa, pgs_gpa + 4096);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_2);
+> +		nop_loop();
+> +	}
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX for WORKER_VCPU_ID_2 */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		flush_ex->flags = HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES;
+> +		flush_ex->hv_vp_set.format = HV_GENERIC_SET_SPARSE_4K;
+> +		flush_ex->hv_vp_set.valid_bank_mask = BIT_ULL(WORKER_VCPU_ID_2 / 64);
+> +		flush_ex->hv_vp_set.bank_contents[0] = BIT_ULL(WORKER_VCPU_ID_2 % 64);
+> +		/* bank_contents and gva_list occupy the same space, thus [1] */
+> +		flush_ex->gva_list[1] = (u64)test_pages;
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX |
+> +				(1 << HV_HYPERCALL_VARHEAD_OFFSET) |
+> +				(1UL << HV_HYPERCALL_REP_COMP_OFFSET),
+> +				pgs_gpa, pgs_gpa + 4096);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_2);
+> +		nop_loop();
+> +	}
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX for both vCPUs */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		flush_ex->flags = HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES;
+> +		flush_ex->hv_vp_set.format = HV_GENERIC_SET_SPARSE_4K;
+> +		flush_ex->hv_vp_set.valid_bank_mask = BIT_ULL(WORKER_VCPU_ID_2 / 64) |
+> +			BIT_ULL(WORKER_VCPU_ID_1 / 64);
+> +		flush_ex->hv_vp_set.bank_contents[0] = BIT_ULL(WORKER_VCPU_ID_1 % 64);
+> +		flush_ex->hv_vp_set.bank_contents[1] = BIT_ULL(WORKER_VCPU_ID_2 % 64);
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX |
+> +				(2 << HV_HYPERCALL_VARHEAD_OFFSET),
+> +				pgs_gpa, pgs_gpa + 4096);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_2);
+> +		nop_loop();
+> +	}
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX for both vCPUs */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		flush_ex->flags = HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES;
+> +		flush_ex->hv_vp_set.format = HV_GENERIC_SET_SPARSE_4K;
+> +		flush_ex->hv_vp_set.valid_bank_mask = BIT_ULL(WORKER_VCPU_ID_1 / 64) |
+> +			BIT_ULL(WORKER_VCPU_ID_2 / 64);
+> +		flush_ex->hv_vp_set.bank_contents[0] = BIT_ULL(WORKER_VCPU_ID_1 % 64);
+> +		flush_ex->hv_vp_set.bank_contents[1] = BIT_ULL(WORKER_VCPU_ID_2 % 64);
+> +		/* bank_contents and gva_list occupy the same space, thus [2] */
+> +		flush_ex->gva_list[2] = (u64)test_pages;
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX |
+> +				(2 << HV_HYPERCALL_VARHEAD_OFFSET) |
+> +				(1UL << HV_HYPERCALL_REP_COMP_OFFSET),
+> +				pgs_gpa, pgs_gpa + 4096);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_2);
+> +		nop_loop();
+> +	}
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX for HV_GENERIC_SET_ALL */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		flush_ex->flags = HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES;
+> +		flush_ex->hv_vp_set.format = HV_GENERIC_SET_ALL;
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX,
+> +				pgs_gpa, pgs_gpa + 4096);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_2);
+> +		nop_loop();
+> +	}
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX for HV_GENERIC_SET_ALL */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		flush_ex->flags = HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES;
+> +		flush_ex->hv_vp_set.format = HV_GENERIC_SET_ALL;
+> +		flush_ex->gva_list[0] = (u64)test_pages;
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX |
+> +				(1UL << HV_HYPERCALL_REP_COMP_OFFSET),
+> +				pgs_gpa, pgs_gpa + 4096);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_2);
+> +		nop_loop();
+> +	}
+> +
+> +	/* "Fast" hypercalls */
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE for WORKER_VCPU_ID_1 */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		flush->processor_mask = BIT(WORKER_VCPU_ID_1);
+> +		sync_to_xmm(&flush->processor_mask);
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE |
+> +				HV_HYPERCALL_FAST_BIT, 0x0, HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_1);
+> +		nop_loop();
+> +	}
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST for WORKER_VCPU_ID_1 */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		flush->processor_mask = BIT(WORKER_VCPU_ID_1);
+> +		flush->gva_list[0] = (u64)test_pages;
+> +		sync_to_xmm(&flush->processor_mask);
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST | HV_HYPERCALL_FAST_BIT |
+> +				(1UL << HV_HYPERCALL_REP_COMP_OFFSET),
+> +				0x0, HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_1);
+> +		nop_loop();
+> +	}
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE for HV_FLUSH_ALL_PROCESSORS */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		sync_to_xmm(&flush->processor_mask);
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE | HV_HYPERCALL_FAST_BIT, 0x0,
+> +				HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES | HV_FLUSH_ALL_PROCESSORS);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_2);
+> +		nop_loop();
+> +	}
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST for HV_FLUSH_ALL_PROCESSORS */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		flush->gva_list[0] = (u64)test_pages;
+> +		sync_to_xmm(&flush->processor_mask);
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST | HV_HYPERCALL_FAST_BIT |
+> +				(1UL << HV_HYPERCALL_REP_COMP_OFFSET), 0x0,
+> +				HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES | HV_FLUSH_ALL_PROCESSORS);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_2);
+> +		nop_loop();
+> +	}
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX for WORKER_VCPU_ID_2 */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		flush_ex->hv_vp_set.format = HV_GENERIC_SET_SPARSE_4K;
+> +		flush_ex->hv_vp_set.valid_bank_mask = BIT_ULL(WORKER_VCPU_ID_2 / 64);
+> +		flush_ex->hv_vp_set.bank_contents[0] = BIT_ULL(WORKER_VCPU_ID_2 % 64);
+> +		sync_to_xmm(&flush_ex->hv_vp_set);
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX | HV_HYPERCALL_FAST_BIT |
+> +				(1 << HV_HYPERCALL_VARHEAD_OFFSET),
+> +				0x0, HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_2);
+> +		nop_loop();
+> +	}
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX for WORKER_VCPU_ID_2 */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		flush_ex->hv_vp_set.format = HV_GENERIC_SET_SPARSE_4K;
+> +		flush_ex->hv_vp_set.valid_bank_mask = BIT_ULL(WORKER_VCPU_ID_2 / 64);
+> +		flush_ex->hv_vp_set.bank_contents[0] = BIT_ULL(WORKER_VCPU_ID_2 % 64);
+> +		/* bank_contents and gva_list occupy the same space, thus [1] */
+> +		flush_ex->gva_list[1] = (u64)test_pages;
+> +		sync_to_xmm(&flush_ex->hv_vp_set);
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX | HV_HYPERCALL_FAST_BIT |
+> +				(1 << HV_HYPERCALL_VARHEAD_OFFSET) |
+> +				(1UL << HV_HYPERCALL_REP_COMP_OFFSET),
+> +				0x0, HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_2);
+> +		nop_loop();
+> +	}
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX for both vCPUs */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		flush_ex->hv_vp_set.format = HV_GENERIC_SET_SPARSE_4K;
+> +		flush_ex->hv_vp_set.valid_bank_mask = BIT_ULL(WORKER_VCPU_ID_2 / 64) |
+> +			BIT_ULL(WORKER_VCPU_ID_1 / 64);
+> +		flush_ex->hv_vp_set.bank_contents[0] = BIT_ULL(WORKER_VCPU_ID_1 % 64);
+> +		flush_ex->hv_vp_set.bank_contents[1] = BIT_ULL(WORKER_VCPU_ID_2 % 64);
+> +		sync_to_xmm(&flush_ex->hv_vp_set);
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX | HV_HYPERCALL_FAST_BIT |
+> +				(2 << HV_HYPERCALL_VARHEAD_OFFSET),
+> +				0x0, HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_2);
+> +		nop_loop();
+> +	}
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX for both vCPUs */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		flush_ex->hv_vp_set.format = HV_GENERIC_SET_SPARSE_4K;
+> +		flush_ex->hv_vp_set.valid_bank_mask = BIT_ULL(WORKER_VCPU_ID_1 / 64) |
+> +			BIT_ULL(WORKER_VCPU_ID_2 / 64);
+> +		flush_ex->hv_vp_set.bank_contents[0] = BIT_ULL(WORKER_VCPU_ID_1 % 64);
+> +		flush_ex->hv_vp_set.bank_contents[1] = BIT_ULL(WORKER_VCPU_ID_2 % 64);
+> +		/* bank_contents and gva_list occupy the same space, thus [2] */
+> +		flush_ex->gva_list[2] = (u64)test_pages;
+> +		sync_to_xmm(&flush_ex->hv_vp_set);
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX | HV_HYPERCALL_FAST_BIT |
+> +				(2 << HV_HYPERCALL_VARHEAD_OFFSET) |
+> +				(1UL << HV_HYPERCALL_REP_COMP_OFFSET),
+> +				0x0, HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_2);
+> +		nop_loop();
+> +	}
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX for HV_GENERIC_SET_ALL */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		flush_ex->flags = HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES;
+> +		flush_ex->hv_vp_set.format = HV_GENERIC_SET_ALL;
+> +		sync_to_xmm(&flush_ex->hv_vp_set);
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX | HV_HYPERCALL_FAST_BIT,
+> +				0x0, HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_2);
+> +		nop_loop();
+> +	}
+> +
+> +	/* HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX for HV_GENERIC_SET_ALL */
+> +	for (i = 0; i < NTRY; i++) {
+> +		memset(hcall_page, 0, 4096);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, 0x0, WORKER_VCPU_ID_2);
+> +		GUEST_SYNC(stage++);
+> +		flush_ex->flags = HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES;
+> +		flush_ex->hv_vp_set.format = HV_GENERIC_SET_ALL;
+> +		flush_ex->gva_list[0] = (u64)test_pages;
+> +		sync_to_xmm(&flush_ex->hv_vp_set);
+> +		res = hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX | HV_HYPERCALL_FAST_BIT |
+> +				(1UL << HV_HYPERCALL_REP_COMP_OFFSET),
+> +				0x0, HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES);
+> +		GUEST_ASSERT((res & 0xffff) == 0);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_1);
+> +		set_expected_char(test_pages, i % 2 ? 0x1 : 0x2, WORKER_VCPU_ID_2);
+> +		nop_loop();
+> +	}
+> +
+> +	GUEST_DONE();
+> +}
+> +
+> +static void *vcpu_thread(void *arg)
+> +{
+> +	struct thread_params *params = (struct thread_params *)arg;
+> +	struct ucall uc;
+> +	int old;
+> +	int r;
+> +	unsigned int exit_reason;
+> +
+> +	r = pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &old);
+> +	TEST_ASSERT(r == 0,
+> +		    "pthread_setcanceltype failed on vcpu_id=%u with errno=%d",
+> +		    params->vcpu_id, r);
+> +
+> +	vcpu_run(params->vm, params->vcpu_id);
+> +	exit_reason = vcpu_state(params->vm, params->vcpu_id)->exit_reason;
+> +
+> +	TEST_ASSERT(exit_reason == KVM_EXIT_IO,
+> +		    "vCPU %u exited with unexpected exit reason %u-%s, expected KVM_EXIT_IO",
+> +		    params->vcpu_id, exit_reason, exit_reason_str(exit_reason));
+> +
+> +	if (get_ucall(params->vm, params->vcpu_id, &uc) == UCALL_ABORT) {
+> +		TEST_ASSERT(false,
+> +			    "vCPU %u exited with error: %s.\n",
+> +			    params->vcpu_id, (const char *)uc.args[0]);
+> +	}
+> +
+> +	return NULL;
+> +}
+> +
+> +static void cancel_join_vcpu_thread(pthread_t thread, uint32_t vcpu_id)
+> +{
+> +	void *retval;
+> +	int r;
+> +
+> +	r = pthread_cancel(thread);
+> +	TEST_ASSERT(r == 0,
+> +		    "pthread_cancel on vcpu_id=%d failed with errno=%d",
+> +		    vcpu_id, r);
+> +
+> +	r = pthread_join(thread, &retval);
+> +	TEST_ASSERT(r == 0,
+> +		    "pthread_join on vcpu_id=%d failed with errno=%d",
+> +		    vcpu_id, r);
+> +	TEST_ASSERT(retval == PTHREAD_CANCELED,
+> +		    "expected retval=%p, got %p", PTHREAD_CANCELED,
+> +		    retval);
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	int r;
+> +	pthread_t threads[2];
+> +	struct thread_params params[2];
+> +	struct kvm_vm *vm;
+> +	struct kvm_run *run;
+> +	vm_vaddr_t hcall_page, test_pages;
+> +	struct ucall uc;
+> +	int stage = 1;
+> +
+> +	vm = vm_create_default(SENDER_VCPU_ID, 0, sender_guest_code);
+> +	params[0].vm = vm;
+> +	params[1].vm = vm;
+> +
+> +	/* Hypercall input/output */
+> +	hcall_page = vm_vaddr_alloc_pages(vm, 2);
+> +	memset(addr_gva2hva(vm, hcall_page), 0x0, 2 * getpagesize());
+> +
+> +	/*
+> +	 * Test pages: the first one is filled with '0x1's, the second with '0x2's
+> +	 * and the test will swap their mappings. The third page keeps the indication
+> +	 * about the current state of mappings.
+> +	 */
+> +	test_pages = vm_vaddr_alloc_pages(vm, 3);
+> +	memset(addr_gva2hva(vm, test_pages), 0x1, 4096);
+> +	memset(addr_gva2hva(vm, test_pages) + 4096, 0x2, 4096);
+> +	set_expected_char(addr_gva2hva(vm, test_pages), 0x0, WORKER_VCPU_ID_1);
+> +	set_expected_char(addr_gva2hva(vm, test_pages), 0x0, WORKER_VCPU_ID_2);
+> +
+> +	vm_vcpu_add_default(vm, WORKER_VCPU_ID_1, worker_code);
+> +	vcpu_args_set(vm, WORKER_VCPU_ID_1, 2, test_pages, addr_gva2gpa(vm, hcall_page));
+> +	vcpu_set_msr(vm, WORKER_VCPU_ID_1, HV_X64_MSR_VP_INDEX, WORKER_VCPU_ID_1);
+> +	vcpu_set_hv_cpuid(vm, WORKER_VCPU_ID_1);
+> +
+> +	vm_vcpu_add_default(vm, WORKER_VCPU_ID_2, worker_code);
+> +	vcpu_args_set(vm, WORKER_VCPU_ID_2, 2, test_pages, addr_gva2gpa(vm, hcall_page));
+> +	vcpu_set_msr(vm, WORKER_VCPU_ID_2, HV_X64_MSR_VP_INDEX, WORKER_VCPU_ID_2);
+> +	vcpu_set_hv_cpuid(vm, WORKER_VCPU_ID_2);
+> +
+> +	vcpu_args_set(vm, SENDER_VCPU_ID, 3, hcall_page, test_pages,
+> +		      addr_gva2gpa(vm, hcall_page));
+
+It seems that all worker vCPUs get pointer to the hypercall page,
+which they don't need and if used will create a race.
+
+
+> +	vcpu_set_hv_cpuid(vm, SENDER_VCPU_ID);
+> +
+> +	params[0].vcpu_id = WORKER_VCPU_ID_1;
+> +	r = pthread_create(&threads[0], NULL, vcpu_thread, &params[0]);
+> +	TEST_ASSERT(r == 0,
+> +		    "pthread_create halter failed errno=%d", errno);
+> +
+> +	params[1].vcpu_id = WORKER_VCPU_ID_2;
+> +	r = pthread_create(&threads[1], NULL, vcpu_thread, &params[1]);
+> +	TEST_ASSERT(r == 0,
+> +		    "pthread_create halter failed errno=%d", errno);
+
+Also here worker threads don't halt, the message was not updated I think.
+
+
+> +
+> +	run = vcpu_state(vm, SENDER_VCPU_ID);
+> +
+> +	while (true) {
+> +		r = _vcpu_run(vm, SENDER_VCPU_ID);
+> +		TEST_ASSERT(!r, "vcpu_run failed: %d\n", r);
+> +		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
+> +			    "unexpected exit reason: %u (%s)",
+> +			    run->exit_reason, exit_reason_str(run->exit_reason));
+> +
+> +		switch (get_ucall(vm, SENDER_VCPU_ID, &uc)) {
+> +		case UCALL_SYNC:
+> +			TEST_ASSERT(uc.args[1] == stage,
+> +				    "Unexpected stage: %ld (%d expected)\n",
+> +				    uc.args[1], stage);
+> +			break;
+> +		case UCALL_ABORT:
+> +			TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0],
+> +				  __FILE__, uc.args[1]);
+> +			return 1;
+> +		case UCALL_DONE:
+> +			return 0;
+> +		}
+> +
+> +		/* Swap test pages */
+> +		if (stage % 2) {
+> +			__virt_pg_map(vm, test_pages, addr_gva2gpa(vm, test_pages) + 4096,
+> +				      X86_PAGE_SIZE_4K, true);
+> +			__virt_pg_map(vm, test_pages + 4096, addr_gva2gpa(vm, test_pages) - 4096,
+> +				      X86_PAGE_SIZE_4K, true);
+> +		} else {
+> +			__virt_pg_map(vm, test_pages, addr_gva2gpa(vm, test_pages) - 4096,
+> +				      X86_PAGE_SIZE_4K, true);
+> +			__virt_pg_map(vm, test_pages + 4096, addr_gva2gpa(vm, test_pages) + 4096,
+> +				      X86_PAGE_SIZE_4K, true);
+> +		}
+
+Another question: why the host doing the swapping of the pages? Since !EPT/!NPT is not the goal of this test,
+
+no doubt, why not let the guest vCPU (the sender) do the swapping, which should eliminate the VM exits
+to the host (which can interfere with TLB flush even) and make it closer to the real world usage.
+
+
+> +
+> +		stage++;
+> +	}
+> +
+> +	cancel_join_vcpu_thread(threads[0], WORKER_VCPU_ID_1);
+> +	cancel_join_vcpu_thread(threads[1], WORKER_VCPU_ID_2);
+> +	kvm_vm_free(vm);
+> +
+> +	return 0;
+> +}
+
+
+Best regards,
+	Maxim Levitsky
+
 
