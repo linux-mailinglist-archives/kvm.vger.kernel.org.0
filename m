@@ -2,104 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FAE8523B10
-	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 19:02:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7497523B76
+	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 19:26:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345280AbiEKRCh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 May 2022 13:02:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58944 "EHLO
+        id S1345514AbiEKR0P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 May 2022 13:26:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345276AbiEKRCg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 May 2022 13:02:36 -0400
-Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DAD464701
-        for <kvm@vger.kernel.org>; Wed, 11 May 2022 10:02:34 -0700 (PDT)
-Received: by mail-oi1-x230.google.com with SMTP id q8so3399446oif.13
-        for <kvm@vger.kernel.org>; Wed, 11 May 2022 10:02:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=stonybrook.edu; s=sbu-gmail;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=92HACkAtpm+S9HD4vacJRmdSPxUsLtz6krm6JrWPD9o=;
-        b=HYZRgYUy9T4am+mfv7XpCglNJT74NqxKeZPy8VHjrmtUofesPAsFtwwgw09QKLbyKE
-         GJFFEdWRprZTppoKAXI2AV5hvt1SJIWsgyhgtZdTYKdC3dgu3zJhxoCad9YRHpzqRDpn
-         EBWUmyfKRI6VeXgjKx5QWMGesV0rE4JmgjHAA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=92HACkAtpm+S9HD4vacJRmdSPxUsLtz6krm6JrWPD9o=;
-        b=awIWyJpsLucj+G+OfqW3AVKIaXvadeKgrKgPhVlEjXZ7pb7M6tj4MThoid3Gvnz9Jk
-         DwdtcCatsTTRa/peC/NWEC4rfG7TZnZT6JVItiA/r9MpKzs1m6wJdHCXvQWaDwaRDLLN
-         oj1BI54N2v/pe5oTmH5JMO4XbXZmFYV7nIW7Z9ZNLsFnLrfgmSu3zmZLRNbGSQUWQi9C
-         SXUCangY0UufHayFJU+Bz3hULmuATr1NwjWd6/r4gxeuscJcG4M0+G/amfuL03VUnaZr
-         KpSv0YdGfB7JWJmvIyh/wzrgEXf1JCjNMVlSSgiYxIF3zrFqiWOK8wDQ2KN4b7BL6Rbk
-         72Zw==
-X-Gm-Message-State: AOAM530slahrJVwu9Zu1+oSCaFKfSQs6kuVqXEzux9y/BQ36jz+FEE3W
-        3mudXS41ebd2KrDhg4qlseR2gHE7HKAPSWXtLxKV8g==
-X-Google-Smtp-Source: ABdhPJzPaIDWkMKk2eTHgzHAQPLfUDaMyVAsRWhWm8nlkmWw8wBpL7aq4Q7/u4/QvEx/2tVxf4UKT5D2CHFn8lXSYhA=
-X-Received: by 2002:a05:6808:199c:b0:326:a498:b638 with SMTP id
- bj28-20020a056808199c00b00326a498b638mr3132791oib.186.1652288553486; Wed, 11
- May 2022 10:02:33 -0700 (PDT)
+        with ESMTP id S1345524AbiEKR0D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 May 2022 13:26:03 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 167AC15A12
+        for <kvm@vger.kernel.org>; Wed, 11 May 2022 10:26:01 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E601B1042;
+        Wed, 11 May 2022 10:26:00 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2B9B03F73D;
+        Wed, 11 May 2022 10:26:00 -0700 (PDT)
+Date:   Wed, 11 May 2022 18:26:05 +0100
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Martin Radev <martin.b.radev@gmail.com>
+Cc:     kvm@vger.kernel.org, will@kernel.org
+Subject: Re: [PATCH v3 kvmtool 2/6] mmio: Sanitize addr and len
+Message-ID: <YnvxXqWASRcrOoMZ@monolith.localdoman>
+References: <20220509203940.754644-1-martin.b.radev@gmail.com>
+ <20220509203940.754644-3-martin.b.radev@gmail.com>
 MIME-Version: 1.0
-References: <CAJGDS+GM9Aw6Yvhv+F6wMGvrkz421kfq0j_PZa9F0AKyp5cEQA@mail.gmail.com>
- <YnGUazEgCJWgB6Yw@google.com> <CAJGDS+F0hB=0bj8spt9sophJyhdXTkYXK8LXUrt=7mov4s2JJA@mail.gmail.com>
- <CAJGDS+E5f2Xo68dsEkOfchZybU1uTSb=BgcTgQMLe0tW32m5xg@mail.gmail.com>
- <CALMp9eT3FeDa735Mo_9sZVPfovGQbcqXAygLnz61-acHV-L7+w@mail.gmail.com>
- <YnvBMnD6fuh+pAQ6@google.com> <CAJGDS+GMxG1gXMS1cW1+sS1V67h65iUpMGwQ=+-MVTE6DTOBjg@mail.gmail.com>
- <YnvFN7nT9DzfR8fq@google.com> <CAJGDS+G+z9S6QDEGRatR5u+q-5X_MAiWqnTsjf4L=4+PrThdsQ@mail.gmail.com>
- <YnvQd5zvDlop7oRK@google.com>
-In-Reply-To: <YnvQd5zvDlop7oRK@google.com>
-From:   Arnabjyoti Kalita <akalita@cs.stonybrook.edu>
-Date:   Wed, 11 May 2022 22:32:22 +0530
-Message-ID: <CAJGDS+HRzTTSy4SuVtt-dzTzWXHZ0n1TJdDxKO+jOtGdcrX0Yg@mail.gmail.com>
-Subject: Re: Causing VMEXITs when kprobes are hit in the guest VM
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220509203940.754644-3-martin.b.radev@gmail.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thank you for your answer, Sean.
+Hi Martin,
 
-I think I now have a fair idea on how to proceed. I will re-inject the
-#BP into the guest from KVM and see what happens. I'm hoping the guest
-will handle the #BP and continue execution without me needing to make
-any more changes.
+On Mon, May 09, 2022 at 11:39:36PM +0300, Martin Radev wrote:
+> This patch verifies that adding the addr and length arguments
+> from an MMIO op do not overflow. This is necessary because the
+> arguments are controlled by the VM. The length may be set to
+> an arbitrary value by using the rep prefix.
+> 
+> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> Signed-off-by: Martin Radev <martin.b.radev@gmail.com>
+> ---
+>  mmio.c        | 4 ++++
+>  virtio/mmio.c | 6 ++++++
+>  2 files changed, 10 insertions(+)
+> 
+> diff --git a/mmio.c b/mmio.c
+> index a6dd3aa..5a114e9 100644
+> --- a/mmio.c
+> +++ b/mmio.c
+> @@ -32,6 +32,10 @@ static struct mmio_mapping *mmio_search(struct rb_root *root, u64 addr, u64 len)
+>  {
+>  	struct rb_int_node *node;
+>  
+> +	/* If len is zero or if there's an overflow, the MMIO op is invalid. */
+> +	if (addr + len <= addr)
+> +		return NULL;
+> +
+>  	node = rb_int_search_range(root, addr, addr + len);
+>  	if (node == NULL)
+>  		return NULL;
+> diff --git a/virtio/mmio.c b/virtio/mmio.c
+> index 875a288..979fa8c 100644
+> --- a/virtio/mmio.c
+> +++ b/virtio/mmio.c
+> @@ -105,6 +105,12 @@ static void virtio_mmio_device_specific(struct kvm_cpu *vcpu,
+>  	struct virtio_mmio *vmmio = vdev->virtio;
+>  	u32 i;
+>  
+> +	/* Check for wrap-around and zero length. */
+> +	if (addr + len <= addr) {
+> +		WARN_ONCE(1, "addr (%llu) + length (%u) wraps-around.\n", addr, len);
+> +		return;
+> +	}
 
-Best Regards,
-Arnabjyoti Kalita
+This is _NOT_ needed.
 
-On Wed, May 11, 2022 at 8:34 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, May 11, 2022, Arnabjyoti Kalita wrote:
-> > What could be the various ways a guest could handle #BP?
->
-> The kernel uses INT3 to patch instructions/flows, e.g. for alternatives.  For those,
-> the INT3 handler will unwind to the original RIP and retry.  The #BP will keep
-> occurring until the patching completes.  See text_poke_bp_batch(), poke_int3_handler(),
-> etc...
->
-> Userspace debuggers will do something similar; after catching the #BP, the original
-> instruction is restored and restarted.
->
-> The reason INT3 is a single byte is so that software can "atomically" trap/patch an
-> instruction without having to worry about cache line splits.  CPUs are guaranteed
-> to either see the INT3 or the original instruction in its entirety, i.e. other CPUs
-> will never decode a half-baked instruction.
->
-> The kernel has even fancier uses for things like static_call(), e.g. emulating
-> CALL, RET, and JMP from the #BP handler.
->
-> > Can we "make" the guest skip the instruction that caused the #BP ?
->
-> Well, technically yes, that's effectively what would happen if the host skips the
-> INT3 and doesn't inject the #BP.  Can you do that and expect the guest not to
-> crash?  Nope.
+When a VCPU exits with exit_reason set to KVM_EXIT_MMIO, kvmtool searches
+for the virtio-mmio callback (which ends up calling
+virtio_mmio_device_specific) in kvm_cpu__emulate_mmio() ->
+kvm__emulate_mmio() -> mmio_search(), which already contains the overflow
+check. The virtio_mmio_device_specific() checks above is redundant.
+
+Please remove the above 5 lines of code.
+
+Thanks,
+Alex
+
+> +
+>  	for (i = 0; i < len; i++) {
+>  		if (is_write)
+>  			vdev->ops->get_config(vmmio->kvm, vmmio->dev)[addr + i] =
+> -- 
+> 2.25.1
+> 
