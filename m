@@ -2,106 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B7497523B76
-	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 19:26:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF1D8523BAD
+	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 19:36:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345514AbiEKR0P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 May 2022 13:26:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54318 "EHLO
+        id S1345661AbiEKRgP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 May 2022 13:36:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345524AbiEKR0D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 May 2022 13:26:03 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 167AC15A12
-        for <kvm@vger.kernel.org>; Wed, 11 May 2022 10:26:01 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E601B1042;
-        Wed, 11 May 2022 10:26:00 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2B9B03F73D;
-        Wed, 11 May 2022 10:26:00 -0700 (PDT)
-Date:   Wed, 11 May 2022 18:26:05 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Martin Radev <martin.b.radev@gmail.com>
-Cc:     kvm@vger.kernel.org, will@kernel.org
-Subject: Re: [PATCH v3 kvmtool 2/6] mmio: Sanitize addr and len
-Message-ID: <YnvxXqWASRcrOoMZ@monolith.localdoman>
-References: <20220509203940.754644-1-martin.b.radev@gmail.com>
- <20220509203940.754644-3-martin.b.radev@gmail.com>
+        with ESMTP id S234003AbiEKRgM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 May 2022 13:36:12 -0400
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAFDF65D0B;
+        Wed, 11 May 2022 10:36:10 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id t5so3364037edw.11;
+        Wed, 11 May 2022 10:36:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Q+sQrzaE7q/wJ6M9e4FJHPDLoako2RAr16Pq76NbOZk=;
+        b=WvBgvMgu4OutIFewhlEQT4/Q1Bd3fS5amVCGjf6MOewd1YKvZd9ahbz3Vz6ArX8QA4
+         kq6RbKI9Cv601VnSFjDtyxN/3KNItwU+PIyC39fNYw1kY5C+LXLieFFGY1mTiTR84pcJ
+         phP0/eGMn7+mmI3gV1MJZo+c+4SJ1ibDZ5gwTQCD4/iOU9RzpTV8tgwitTMkcLtKRlmG
+         BqZDyL0F1tz3pn3wzobYa8bD+wPh5A1EiLg3zPE4VbV4vHZo2Xp35BGbHq7ux2/1IN+Z
+         lDPrbBuMk4xpqyKwDFAbJFvwlVazPXVyRlSBvX/zR2HC3ed4hJq1fgRW9Rs7tym46Eov
+         uGkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Q+sQrzaE7q/wJ6M9e4FJHPDLoako2RAr16Pq76NbOZk=;
+        b=mMsDVJwCo7+DqZqRhzP8RBhdsIVz4Zyinuk5q8Ic6FgehXdljZcvxLfcjgpoHfgc3A
+         g4Gadu3HpfOee80mJGrl2SGDLhdJVwKd/Kg/INzneLOja9tQCYJP6qOdewUuwin7hBqc
+         iSWiIcOkd81+vQdqfiaAZzEnpgwMwucBYkfufNLCXTuy5dhq/mXubThZ+hs15TptGZq7
+         4CNzt/zqZBZdxGaPpq0Qbe7z7LQGkIiF4iDR3e8TW0kEdseQUu2eVUc+04T4LUcwq/tp
+         5H7Rjka0O5LDMGsz7lG/I7bK8FfsGc31xKJ1995gmAbmPq7xBevpcTOsbfi36pej9lFe
+         DZ9w==
+X-Gm-Message-State: AOAM533EQZch2F7ioAtBXGS2N3308xhpz7m/H7RjCD8T2Ns9TR7F1oSd
+        1lrN0Ie+16d2V/tAVSyvLaLCMJYOE59Wa6YoJz8=
+X-Google-Smtp-Source: ABdhPJynENfmraW6oQiF/P+GETWKUOT7bj4NNo/dDUhDEXz+AGnRCKll2vkap09kaqq+rGv0ZOJjPDHohINe34Ie+RE=
+X-Received: by 2002:a05:6402:51d2:b0:428:48d0:5d05 with SMTP id
+ r18-20020a05640251d200b0042848d05d05mr30732830edd.28.1652290569273; Wed, 11
+ May 2022 10:36:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220509203940.754644-3-martin.b.radev@gmail.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220510082351-mutt-send-email-mst@kernel.org>
+ <CAHk-=wjPR+bj7P1O=MAQWXp0Mx2hHuNQ1acn6gS+mRo_kbo5Lg@mail.gmail.com>
+ <YnrxTMVRtDnGA/EK@dev-arch.thelio-3990X> <CAHk-=wgAk3NEJ2PHtb0jXzCUOGytiHLq=rzjkFKfpiuH-SROgA@mail.gmail.com>
+In-Reply-To: <CAHk-=wgAk3NEJ2PHtb0jXzCUOGytiHLq=rzjkFKfpiuH-SROgA@mail.gmail.com>
+From:   Dave Taht <dave.taht@gmail.com>
+Date:   Wed, 11 May 2022 10:35:54 -0700
+Message-ID: <CAA93jw50TyLohZRQNkGf+LKSfzPykh9XcbYb8FCN5hmEd4Pc4g@mail.gmail.com>
+Subject: Re: [GIT PULL] virtio: last minute fixup
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Nathan Chancellor <nathan@kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+        KVM list <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        Netdev <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        mie@igel.co.jp
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Martin,
+On Wed, May 11, 2022 at 2:54 AM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 
-On Mon, May 09, 2022 at 11:39:36PM +0300, Martin Radev wrote:
-> This patch verifies that adding the addr and length arguments
-> from an MMIO op do not overflow. This is necessary because the
-> arguments are controlled by the VM. The length may be set to
-> an arbitrary value by using the rep prefix.
-> 
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Signed-off-by: Martin Radev <martin.b.radev@gmail.com>
-> ---
->  mmio.c        | 4 ++++
->  virtio/mmio.c | 6 ++++++
->  2 files changed, 10 insertions(+)
-> 
-> diff --git a/mmio.c b/mmio.c
-> index a6dd3aa..5a114e9 100644
-> --- a/mmio.c
-> +++ b/mmio.c
-> @@ -32,6 +32,10 @@ static struct mmio_mapping *mmio_search(struct rb_root *root, u64 addr, u64 len)
->  {
->  	struct rb_int_node *node;
->  
-> +	/* If len is zero or if there's an overflow, the MMIO op is invalid. */
-> +	if (addr + len <= addr)
-> +		return NULL;
-> +
->  	node = rb_int_search_range(root, addr, addr + len);
->  	if (node == NULL)
->  		return NULL;
-> diff --git a/virtio/mmio.c b/virtio/mmio.c
-> index 875a288..979fa8c 100644
-> --- a/virtio/mmio.c
-> +++ b/virtio/mmio.c
-> @@ -105,6 +105,12 @@ static void virtio_mmio_device_specific(struct kvm_cpu *vcpu,
->  	struct virtio_mmio *vmmio = vdev->virtio;
->  	u32 i;
->  
-> +	/* Check for wrap-around and zero length. */
-> +	if (addr + len <= addr) {
-> +		WARN_ONCE(1, "addr (%llu) + length (%u) wraps-around.\n", addr, len);
-> +		return;
-> +	}
+> but what *is* interesting, and where the "Link:" line is very useful,
+> is finding where the original problem that *caused* that patch to be
+> posted in the first place.
 
-This is _NOT_ needed.
+More generally, inside and outside the linux universe, a search engine
+that searched for all the *closed bugs* and their symptoms, in the
+world would often be helpful. There is such a long deployment tail and
+in modern bug trackers the closed bugs tend to vanish, even though the
+problem might still exist in the field for another decade or more.
 
-When a VCPU exits with exit_reason set to KVM_EXIT_MMIO, kvmtool searches
-for the virtio-mmio callback (which ends up calling
-virtio_mmio_device_specific) in kvm_cpu__emulate_mmio() ->
-kvm__emulate_mmio() -> mmio_search(), which already contains the overflow
-check. The virtio_mmio_device_specific() checks above is redundant.
 
-Please remove the above 5 lines of code.
-
-Thanks,
-Alex
-
-> +
->  	for (i = 0; i < len; i++) {
->  		if (is_write)
->  			vdev->ops->get_config(vmmio->kvm, vmmio->dev)[addr + i] =
-> -- 
-> 2.25.1
-> 
+--=20
+FQ World Domination pending: https://blog.cerowrt.org/post/state_of_fq_code=
+l/
+Dave T=C3=A4ht CEO, TekLibre, LLC
