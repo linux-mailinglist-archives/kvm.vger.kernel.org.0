@@ -2,112 +2,316 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F0A6523811
-	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 18:05:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2187C52382E
+	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 18:10:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344330AbiEKQFF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 May 2022 12:05:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47454 "EHLO
+        id S1344349AbiEKQKA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 May 2022 12:10:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344395AbiEKQEz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 May 2022 12:04:55 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 020D11D3D49
-        for <kvm@vger.kernel.org>; Wed, 11 May 2022 09:04:51 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id x18so2317955plg.6
-        for <kvm@vger.kernel.org>; Wed, 11 May 2022 09:04:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=TRKmAr5NAdQKEYAx0dVLgEebSdJiqCRTYjBrDYpiOp0=;
-        b=qC7AesSwyMDnyGl33oJbOlVtzDDtrNyv/UI9YPmCNFCb32MV8ZWDQZuurnWgehEVKQ
-         pAJnAKGfgm5aJWrYYA98SQ4SfRf9cl7yY9zD8XSDe5z/1FIS3Jr9abC4tLZ6HSV6uUGU
-         g/Z4eLQnc8NDYkRWUOSKnl/StkCs8VDm87+thHuE34uRCjxYdcgNSSf5oBQh0jri+1YA
-         gsU65s4kn6qbOGKB6D7VXGlbuJkbDB8IwT5W4XOgFhrEAQEdVKrZ0kCwQq9U7PNKW8Rc
-         rW3wLcjptzHpgJfSU9l0ScBmNKKn3JQ7KXpFE0CyWdnDszsC2buG9tzEvAopnrddQrAN
-         Iyjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=TRKmAr5NAdQKEYAx0dVLgEebSdJiqCRTYjBrDYpiOp0=;
-        b=xdZ5vB9dLYD1bdfVxMQtP85ixiJL9r8c4NcMwBHtLNjhh1xDJNpubcSPnflkkZnQL3
-         R0SvKSfVEMLnWZlY8NH1X3vHy1fwAizf0nKE6p0Tnk0QZGkE8K1c1kaDj2SgIeR8mKz+
-         2KVClw+vUsdO5Us+3wvLweklmDBpu6iJaJjA1IMkqdeTH6Iq48QIi0u32OOUYnnW2F2g
-         3uTZGcTXl12b3/4FH2+i5gNYhYW0bjF+59/Ba8fNCoL3qpJf5BvFOtjYxQTSNDtVstDj
-         EwRCFAO5VHUSoWhMUC0QT9Q7eWVe3FLhY3NKv0mAjeL95T9ehkGwtBfN7oJOMIuO60wZ
-         Bazg==
-X-Gm-Message-State: AOAM533u4rxgo57WrZ1Sy3oJVWh8ZI5UoBiT00HUd7RVCpAVf59gSQp8
-        ywH1IoVQY5JpbhWS6AULK1myFA==
-X-Google-Smtp-Source: ABdhPJyigL7p2FbwrSbjxQ0qIW43a/IDZNnz9751M7J7aEmUDws/iTZzN0VGmnDSyHgYIZhW4iM6zg==
-X-Received: by 2002:a17:90a:bc8a:b0:1db:382d:6fb5 with SMTP id x10-20020a17090abc8a00b001db382d6fb5mr6112062pjr.100.1652285091145;
-        Wed, 11 May 2022 09:04:51 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id z12-20020a170902708c00b0015e8d4eb1desm2063112plk.40.2022.05.11.09.04.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 May 2022 09:04:50 -0700 (PDT)
-Date:   Wed, 11 May 2022 16:04:47 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Uros Bizjak <ubizjak@gmail.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>, X86 ML <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Will Deacon <will@kernel.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Marco Elver <elver@google.com>
-Subject: Re: [PATCH] locking/atomic/x86: Introduce try_cmpxchg64
-Message-ID: <Ynven5y2u9WNfwK+@google.com>
-References: <20220510154217.5216-1-ubizjak@gmail.com>
- <20220510165506.GP76023@worktop.programming.kicks-ass.net>
- <CAFULd4aNME5s2zGOO0A11kdjfHekH=ceSH7jUfAhmZaJWHv9cQ@mail.gmail.com>
- <20220511075409.GX76023@worktop.programming.kicks-ass.net>
- <CAFULd4aXpt_pnCR5OK5B1m5sErfB3uj_ez=-KW7=0qQheEdVzA@mail.gmail.com>
+        with ESMTP id S1344388AbiEKQJK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 May 2022 12:09:10 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E11C721AABD;
+        Wed, 11 May 2022 09:09:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652285349; x=1683821349;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=jJYut7hrb1wo1/mcdhkxI1lsONfk94q6Na77nTZTqxo=;
+  b=iUeX6a3RywCGVAGOD2UmZrNwXHaVxyy3qKOiidc7ruH/FoQiG4qkcU1w
+   QEX8srSKrzaogVx7Jj0zmnU66SFXv96gTtcbYHi92ZcTacQn6PxmtEYRX
+   JA8wX077kphehLOhQRy3XKNletdKP2KInnQl851O9FVL7TCOKZp3I9zIb
+   ZVMOBXxDQy9hVtTfviZZ0Z0mpmhLGJR/AXKvudfqqzcIwOiKTdzGs73pY
+   j8dWhUFO+D1ZQkenAE3D+H4Z0WYh6c0JX+tymUX1ppwq+q4yKr+Xl8lxt
+   De0gKGrPFzMQ/GEBuxVNidhYmtvzeLj12OQ+np4YSzcQPMnxIovcW7sFb
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10344"; a="294983873"
+X-IronPort-AV: E=Sophos;i="5.91,217,1647327600"; 
+   d="scan'208";a="294983873"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2022 09:09:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,217,1647327600"; 
+   d="scan'208";a="697638152"
+Received: from fmsmsx606.amr.corp.intel.com ([10.18.126.86])
+  by orsmga004.jf.intel.com with ESMTP; 11 May 2022 09:09:08 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Wed, 11 May 2022 09:09:08 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Wed, 11 May 2022 09:09:07 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27 via Frontend Transport; Wed, 11 May 2022 09:09:07 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.173)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.27; Wed, 11 May 2022 09:09:07 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Y1BCH/xXd5zJuxjKSkAY+Ea8/1DR0xtU6frjbefExYYCaE7AV5UF8CTnPQsfezYHWoVbqkY9mYV6w2JA4df/H97xsrKqq7M7Ela7RJLuvAU30iTVlpjeaEPGo80T3Vkc5xQAyFcMJpRDzRx4RwE4U/fsW+Ky46m+8fZg1JyfTqCTbA5jlYyrF13KD1IzieexB3CAicWbdahsGuamtnciz42h7X9a1q+XXriyvNXSC6Gu9wDX2LQ7Y93lAynqyPg/O7GQFLUeUgfl0kVU7Y8eZNncISEsHIdGKQeiNFhhik3jvj05tKKRwKseFBPt9lUrnN0EVm3W5LdLCgx7krUGOw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ORODlmO+5Nx6qYLjLlPnRnakc6Eh41HfiNjwnBL8sss=;
+ b=bOxUjiv65pcKjJpdWZrKBGbRdHB/+vSI7ZtLiau//1cvimJpTYD9LBLQxP75VqxVTfhd8msi4LlzUy5eZkB1Vd4cSzf0LbjmEdDWT9N40sY8j5cXa/S9OlpUYfXYZqIma8hPvzD+BQjWa617QDlODh0549NoW8GOcJjehAtLrIOoX0hndVgBJgox6N9gDAzqeD1+Xam9V776oZlZVjd5IwX7517zWiFQH1uZ29uEJZyr4h8DcITuf6tke0coLa2dEceg1XqGed+K+XMFrjuzaKXrWEuEMcTXwLRwWsyTbSHCPQg3dEAny4naK7b7/o51lCLUXHRJ6hwvFdKDJ7aYEA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM4PR11MB5549.namprd11.prod.outlook.com (2603:10b6:5:388::7) by
+ CY4PR11MB1351.namprd11.prod.outlook.com (2603:10b6:903:26::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5227.23; Wed, 11 May 2022 16:09:05 +0000
+Received: from DM4PR11MB5549.namprd11.prod.outlook.com
+ ([fe80::748e:ed0c:39b5:fe99]) by DM4PR11MB5549.namprd11.prod.outlook.com
+ ([fe80::748e:ed0c:39b5:fe99%6]) with mapi id 15.20.5250.013; Wed, 11 May 2022
+ 16:09:05 +0000
+From:   "Wang, Zhi A" <zhi.a.wang@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "Jonathan Corbet" <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "Harald Freudenberger" <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        "Joonas Lahtinen" <joonas.lahtinen@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        "Halil Pasic" <pasic@linux.ibm.com>,
+        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
+        "Sven Schnelle" <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>
+CC:     Tony Krowiak <akrowiak@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v4 5/7] drm/i915/gvt: Change from vfio_group_(un)pin_pages
+ to vfio_(un)pin_pages
+Thread-Topic: [PATCH v4 5/7] drm/i915/gvt: Change from
+ vfio_group_(un)pin_pages to vfio_(un)pin_pages
+Thread-Index: AQHYYN1+FhwmIsgoC0ix4OMMkjK73a0Z4SMA
+Date:   Wed, 11 May 2022 16:09:05 +0000
+Message-ID: <07c413d5-14d3-da9b-28be-29409ed0ce1f@intel.com>
+References: <5-v4-8045e76bf00b+13d-vfio_mdev_no_group_jgg@nvidia.com>
+In-Reply-To: <5-v4-8045e76bf00b+13d-vfio_mdev_no_group_jgg@nvidia.com>
+Accept-Language: en-FI, en-US
+Content-Language: aa
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 8189c335-235a-4eed-bacb-08da336892a3
+x-ms-traffictypediagnostic: CY4PR11MB1351:EE_
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-microsoft-antispam-prvs: <CY4PR11MB1351D14EA5405725511E9035CAC89@CY4PR11MB1351.namprd11.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: v1/r5M3IjJFOHpZ2STc7PbvLYp8QScnumlg3vt4cBEaBmlMeniFeF4DB63AoQ6pqFFE3dH9F06L5NyfyJMRYRs7HY3o43bFF7GzefU3OFNtQC02ZkypgXEGUGwhgIFrkP26Fd/pu5YXjWknVz7Q/AUOXCwU1uYXgQk0QJNlAYQgUSYdfhFdMV4xahhIpJtapK7b4bP6lPZ6hlCsEEQ5Sk387APVJ9ECYBtSytdeGi22MmobUoZg0/+FXQluCsOxRR21Hqo1s1QJkPF/BJjg66OAHOy3+hwtB3IIUh0skIBrXQhMLxvXvFaWWBZ2a2TGf3hocStk3hpp3X2FIqMtysnm7eBsPXXTWj+N9jTYIK4E8YSYNn4TnfqgR3qJWeuHa+mNwYn+Oy0c+F15N1miBesAeT4giXJtVupkGLQXb99DVyYc3OI2wxrKuCj+bWkGckEtJAPMEv7eZbx7v0TyT0fd9ZdWp1eLWEWBF9imrBoWG+y+w2E7+JQUaSgN13B/bkUh+GFaiEE3K21d8QIjRKcQfYneSn1stMI17UiID8UrIqC2HOXbNJiEHUz4hKdyxudE2nUYh+JZpi87hZcevk+EKMK7Oedx+XH+YqIcyUWIAkrC/5UWmhd/kNx0B8bTfRpVyPoB9QvTU73LAJLXZyyONF/k5Okb823l0oaek198jMcee0rNSdRA4liVJeTA/6PyqODNBfNhRtorrYG/8kQ6qIvWD0RE9DusSmw0Da4w2DxT2va+oA8IvrfsT7BIvsRn/yoAjpssQuhGf746Ymk55Wbh9qCMjucp87CizTzw=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5549.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(508600001)(122000001)(82960400001)(6486002)(38100700002)(7406005)(7416002)(31696002)(5660300002)(71200400001)(8936002)(38070700005)(86362001)(53546011)(6506007)(316002)(921005)(66476007)(64756008)(54906003)(91956017)(66946007)(66446008)(76116006)(66556008)(4326008)(8676002)(110136005)(83380400001)(31686004)(186003)(36756003)(2616005)(6512007)(26005)(2906002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?Windows-1252?Q?sFiwEYQ2U287NdXnoMCQvHoV/sSBeSmEYGq0e0aDpiDTAKXZWl24kvlJ?=
+ =?Windows-1252?Q?Id+5tjMQb6nzMgUuQrm5D99hb95dfOBXZ6NY42cH1485v7qsJZ7+gxg1?=
+ =?Windows-1252?Q?HDaxVNlPixdBTOshJVSb7WA9EDwhDVHadg6RtSYnrAb4W79BfvEnuCBK?=
+ =?Windows-1252?Q?RCSyXEJQs0HtYrxOY9EtVnpEZ8x1bQCl4LLfgjzGT6oE0LnGLAlxbAYI?=
+ =?Windows-1252?Q?I3bdR+XndXHBjisS690wZ4eOPCQYWMlwbXtwra49pgEl69b3qqoOvL2l?=
+ =?Windows-1252?Q?QZdDY5Qy6fU6KIqzolRjFbs2P9Z2TAZrY65di5N/UlZs92zFvYt09UnW?=
+ =?Windows-1252?Q?n0Oxxqp/9e29vDRforubsUuRg9Y79c11iCA7PXqpR2cL1pWAfsLDrIwk?=
+ =?Windows-1252?Q?/Q7W54qnraUYSVx1lnBBcjwnDHR0ncrpQXeGx5hhWFTqtloxg3Legjcd?=
+ =?Windows-1252?Q?S6j+zEUurp6rGq5lvGltOpdl+z+QWumkAtaFOQd7/zo6yq9withHOjJF?=
+ =?Windows-1252?Q?DXojwd7cr7LVW8h67hQZeD+hL2nhRrYxUV5jtj6gRFlI4vybG8nQcpDt?=
+ =?Windows-1252?Q?S+HkbaFNYuOQ7lJfDa0+KVmeUyDjZsqSmisHsLXNqH78iUTI63Ws8Dil?=
+ =?Windows-1252?Q?XkcEAQf1E96LtqZSd+K+OJusKmKEqYVibWsO5vuwW4zun8kaS5+rD6Xo?=
+ =?Windows-1252?Q?u0fiqVWhGIA9jqxoM2v9pbswz347JrFEHKoaX3+T8khQF9+IXWW88sJW?=
+ =?Windows-1252?Q?toaed9ad3T9wShgFJx9gtyI2DmJN49uYHC1CZYq/DbMkhwLxmLwRg2ny?=
+ =?Windows-1252?Q?CKHe7BdvB+rhNd6ZCZT0njmbFtOGn7VwBrnAwJFXi66QT0hz5P5HEazV?=
+ =?Windows-1252?Q?ZQMsWA1f2QERoAOpeZWXDg1pcYTeEQcrI8GfKr7m/+0Ae1Tb1gaf7dO6?=
+ =?Windows-1252?Q?4U/VPaVYUonhE50lP2utGfvJzMnEBW1xyTs/6KpNIWFSPr3iDLo2kchL?=
+ =?Windows-1252?Q?bfAeTkIBUoZw0gnrmZdRZX1T4XzqHL1OALcR2YDltEiOI1z+dH2Wu88P?=
+ =?Windows-1252?Q?a/+wv3iuqVeutC2jmSyoRZMz+n2uzEkMfx7yBpSWLgNl4pQq4TKpXfzC?=
+ =?Windows-1252?Q?t7txNJT0+bfRbYCBQaSXzVtI4nrcDZPeZYt20DNeNIJ/cN+642baU7AW?=
+ =?Windows-1252?Q?0iARxicOwt+Z1nmQdMISIZB1sYX8Or6B4h+fWjsqul1OxAFu9aXEzFIN?=
+ =?Windows-1252?Q?lt4CElxlCziUWeM/MarTRZdMytd8wU7TI+k7AH+1uUW+wuyBtaXJ0zKG?=
+ =?Windows-1252?Q?M1yg5tcmztvgg8q/T4Ng5lCXPEWSs4szz4f21+Iii4fK2aiSmO85nmeH?=
+ =?Windows-1252?Q?ybALUFNah8kwnQ3xPE6b2xTusOSQAT+JT2ZeLpR2UOINd9SZUxvgKIKl?=
+ =?Windows-1252?Q?Ycb0OBIpzy6aFl2DbvU1J87IfZn77Q6P66HC6H8khc2PMCED8tc46pok?=
+ =?Windows-1252?Q?5TqrwO1qajNPiRoDQq4xOaXYqJ9w4sw1mujc9/BQ44tWh9bMkPyedxsS?=
+ =?Windows-1252?Q?BVnwSZ3C/hqkB43uve0OEkH/mwXx9EKGa6GDvRbewPQ8ielKpK+fSChy?=
+ =?Windows-1252?Q?MONZQFELWTZfMnBfG3FE52F2WsGWbLyZNTjQlPzwEhoK7zr1vlF9s4d5?=
+ =?Windows-1252?Q?PCBZomtkfEgNIFItFVj2TzC+QTFZUEjgLVLil0OIo4yGpB7/iXkrcffr?=
+ =?Windows-1252?Q?06WzBxi8TQgFsIvrzFetlxKy5yQ8npdXdl24fIT41qMJ/b1o2C8pQIoj?=
+ =?Windows-1252?Q?tMx6cqMyjA04NKUL8/Bhod/8ztyRL1fpzEqqmz7k7janbCFboOKZfNpQ?=
+ =?Windows-1252?Q?MV5xugO8QGonIg=3D=3D?=
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <89D90BEEC5C4B945BA074C28D3BB8914@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFULd4aXpt_pnCR5OK5B1m5sErfB3uj_ez=-KW7=0qQheEdVzA@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5549.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8189c335-235a-4eed-bacb-08da336892a3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 May 2022 16:09:05.5853
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: FnDijik8P5PSHouhsF27ktxMCgxUxk828sWSBrUaiJQLd474VAzOiMqOnfgx3eZ7ZoifjUdODpf88P73QUXrjg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR11MB1351
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-8.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 11, 2022, Uros Bizjak wrote:
-> On Wed, May 11, 2022 at 9:54 AM Peter Zijlstra <peterz@infradead.org> wrote:
-> > Still, does 32bit actually support that stuff?
-> 
-> Unfortunately, it does:
-> 
-> kvm-intel-y        += vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
->                vmx/evmcs.o vmx/nested.o vmx/posted_intr.o
-> 
-> And when existing cmpxchg64 is substituted with cmpxchg, the
-> compilation dies for 32bits with:
-
-...
-
-> > Anyway, your patch looks about right, but I find it *really* hard to
-> > care about 32bit code these days.
-> 
-> Thanks, this is also my sentiment, but I hope the patch will enable
-> better code and perhaps ease similar situation I have had elsewhere.
-
-IMO, if we merge this it should be solely on the benefits to 64-bit code.  Yes,
-KVM still supports 32-bit kernels, but I'm fairly certain the only people that
-run 32-bit KVM are KVM developers.  32-bit KVM has been completely broken for
-multiple releases at least once, maybe twice, and no one ever complained.
-
-32-bit KVM is mostly useful for testing the mess that is nested NPT; an L1
-hypervsior can use 32-bit paging for NPT, so KVM needs to at least make sure it
-doesn't blow up if such a hypervisor is encountered.  But in terms of the performance
-of 32-bit KVM, I doubt there is a person in the world that cares.
+On 5/6/22 12:08 AM, Jason Gunthorpe wrote:
+> Use the existing vfio_device versions of vfio_(un)pin_pages(). There is n=
+o
+> reason to use a group interface here, kvmgt has easy access to a
+> vfio_device.
+>=20
+> Delete kvmgt_vdev::vfio_group since these calls were the last users.
+>=20
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/gpu/drm/i915/gvt/gvt.h   |  1 -
+>  drivers/gpu/drm/i915/gvt/kvmgt.c | 27 ++++++---------------------
+>  2 files changed, 6 insertions(+), 22 deletions(-)
+>=20
+> diff --git a/drivers/gpu/drm/i915/gvt/gvt.h b/drivers/gpu/drm/i915/gvt/gv=
+t.h
+> index 5a28ee965b7f3e..2af4c83e733c6c 100644
+> --- a/drivers/gpu/drm/i915/gvt/gvt.h
+> +++ b/drivers/gpu/drm/i915/gvt/gvt.h
+> @@ -231,7 +231,6 @@ struct intel_vgpu {
+>  	struct kvm *kvm;
+>  	struct work_struct release_work;
+>  	atomic_t released;
+> -	struct vfio_group *vfio_group;
+> =20
+>  	struct kvm_page_track_notifier_node track_node;
+>  #define NR_BKT (1 << 18)
+> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/=
+kvmgt.c
+> index 1cec4f1fdfaced..7655ffa97d5116 100644
+> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> @@ -243,7 +243,7 @@ static void gvt_unpin_guest_page(struct intel_vgpu *v=
+gpu, unsigned long gfn,
+>  	for (npage =3D 0; npage < total_pages; npage++) {
+>  		unsigned long cur_gfn =3D gfn + npage;
+> =20
+> -		ret =3D vfio_group_unpin_pages(vgpu->vfio_group, &cur_gfn, 1);
+> +		ret =3D vfio_unpin_pages(&vgpu->vfio_device, &cur_gfn, 1);
+>  		drm_WARN_ON(&i915->drm, ret !=3D 1);
+>  	}
+>  }
+> @@ -266,8 +266,8 @@ static int gvt_pin_guest_page(struct intel_vgpu *vgpu=
+, unsigned long gfn,
+>  		unsigned long cur_gfn =3D gfn + npage;
+>  		unsigned long pfn;
+> =20
+> -		ret =3D vfio_group_pin_pages(vgpu->vfio_group, &cur_gfn, 1,
+> -					   IOMMU_READ | IOMMU_WRITE, &pfn);
+> +		ret =3D vfio_pin_pages(&vgpu->vfio_device, &cur_gfn, 1,
+> +				     IOMMU_READ | IOMMU_WRITE, &pfn);
+>  		if (ret !=3D 1) {
+>  			gvt_vgpu_err("vfio_pin_pages failed for gfn 0x%lx, ret %d\n",
+>  				     cur_gfn, ret);
+> @@ -804,7 +804,6 @@ static int intel_vgpu_open_device(struct vfio_device =
+*vfio_dev)
+>  	struct intel_vgpu *vgpu =3D vfio_dev_to_vgpu(vfio_dev);
+>  	unsigned long events;
+>  	int ret;
+> -	struct vfio_group *vfio_group;
+> =20
+>  	vgpu->iommu_notifier.notifier_call =3D intel_vgpu_iommu_notifier;
+>  	vgpu->group_notifier.notifier_call =3D intel_vgpu_group_notifier;
+> @@ -827,28 +826,19 @@ static int intel_vgpu_open_device(struct vfio_devic=
+e *vfio_dev)
+>  		goto undo_iommu;
+>  	}
+> =20
+> -	vfio_group =3D
+> -		vfio_group_get_external_user_from_dev(vgpu->vfio_device.dev);
+> -	if (IS_ERR_OR_NULL(vfio_group)) {
+> -		ret =3D !vfio_group ? -EFAULT : PTR_ERR(vfio_group);
+> -		gvt_vgpu_err("vfio_group_get_external_user_from_dev failed\n");
+> -		goto undo_register;
+> -	}
+> -	vgpu->vfio_group =3D vfio_group;
+> -
+>  	ret =3D -EEXIST;
+>  	if (vgpu->attached)
+> -		goto undo_group;
+> +		goto undo_register;
+> =20
+>  	ret =3D -ESRCH;
+>  	if (!vgpu->kvm || vgpu->kvm->mm !=3D current->mm) {
+>  		gvt_vgpu_err("KVM is required to use Intel vGPU\n");
+> -		goto undo_group;
+> +		goto undo_register;
+>  	}
+> =20
+>  	ret =3D -EEXIST;
+>  	if (__kvmgt_vgpu_exist(vgpu))
+> -		goto undo_group;
+> +		goto undo_register;
+> =20
+>  	vgpu->attached =3D true;
+>  	kvm_get_kvm(vgpu->kvm);
+> @@ -868,10 +858,6 @@ static int intel_vgpu_open_device(struct vfio_device=
+ *vfio_dev)
+>  	atomic_set(&vgpu->released, 0);
+>  	return 0;
+> =20
+> -undo_group:
+> -	vfio_group_put_external_user(vgpu->vfio_group);
+> -	vgpu->vfio_group =3D NULL;
+> -
+>  undo_register:
+>  	vfio_unregister_notifier(vfio_dev, VFIO_GROUP_NOTIFY,
+>  				 &vgpu->group_notifier);
+> @@ -925,7 +911,6 @@ static void __intel_vgpu_release(struct intel_vgpu *v=
+gpu)
+>  	gvt_cache_destroy(vgpu);
+> =20
+>  	intel_vgpu_release_msi_eventfd_ctx(vgpu);
+> -	vfio_group_put_external_user(vgpu->vfio_group);
+> =20
+>  	vgpu->kvm =3D NULL;
+>  	vgpu->attached =3D false;
+>=20
+Acked-by: Zhi Wang <zhi.a.wang@intel.com>
