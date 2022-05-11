@@ -2,73 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD35F523E0B
-	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 21:55:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F240523EFA
+	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 22:34:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347312AbiEKTy5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 May 2022 15:54:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36470 "EHLO
+        id S1347821AbiEKUea (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 May 2022 16:34:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347302AbiEKTys (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 May 2022 15:54:48 -0400
-Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2995B980AD;
-        Wed, 11 May 2022 12:54:47 -0700 (PDT)
-Received: by mail-qv1-xf34.google.com with SMTP id jt15so2866079qvb.8;
-        Wed, 11 May 2022 12:54:47 -0700 (PDT)
+        with ESMTP id S230383AbiEKUe1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 May 2022 16:34:27 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20DFA98092
+        for <kvm@vger.kernel.org>; Wed, 11 May 2022 13:34:26 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id bj12-20020a056a02018c00b003a9eebaad34so1526523pgb.10
+        for <kvm@vger.kernel.org>; Wed, 11 May 2022 13:34:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5t8Oxec4sElz4YLe4jTh7Rv3M6RvFFCEE4KbIo6pKL8=;
-        b=MBXjSVHkzVZt6JxWZaoB+pZZIqWUPtJJosEoEdlK0MyDi/NBw0KxmTp8xgmFOqwz/M
-         DyN4Qvcr3xd8zXnIGAvuR62r1gZBpAy8HUsyUpfKnbRaQKFpBM6NXAH9lmkpLTT2Loik
-         2b4vnbSnd6OQSM/V4bNuffNLQ1S9s5n/N41bUbW5H3eB5LBselEDuHZmKRgM9cHxP3zF
-         SACIvZEm3VsAf2ltSKPaw7GCoNIbOdoDUYKbfU42G8/Xq0u6d2FCOtb1VjX/FDo+Vun9
-         GQFV90co5X+hXQaYSwx1R0abkFxZBj1s1pyJHSuJh+Nt1FxAQUFYLe2rw8CmZhO5gfCV
-         uEmQ==
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=zE2XEkp4B9K0dDNGPYDUEidf+D6l4wjVA+kP1Xd1v40=;
+        b=WwIurN4tWoXFU2hoMQSI8OmYw8RWtjZBli2InX37gKIT/LH8aIEfsA3I8JGf4HSS09
+         aGHV9O5NJXzpPZEdWxVwUpg2PHYHepiaSbDWzP5Nen1zYJIDxUSIwGIo0uxDxcNRcM5/
+         rpJ5K19OcHip7lC3oRSRYztNVM2VCUpSZjM6C4AhhRN8TqtXB7mi2Gf16d/1GqbxcOyt
+         sjJvZXj5WAcYdhu7BfJCsqF/AaQv7AUlWOAEmOGS+17gDNkdZl4eSQ0c5DTuHWFh0G0c
+         ynO5OW74D3x3cvyQocCbSIBVf7HMRoe+X04LAqqvt9Xiq8194oy/Mi2V7RnWLCRHqlaG
+         Zr2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5t8Oxec4sElz4YLe4jTh7Rv3M6RvFFCEE4KbIo6pKL8=;
-        b=EObN2b5tQkxXaF6pItzC4Eo96rifvRgriZ8t2M2FWQSdr/QTX4dQqE4drJXuQ6EDMc
-         orz4pDFmw3swBFIKZ67vJ1sd2gh6r4OyxuG+TXQW5oKK1kQPGWyrUwSzOzTwMT0KjcTD
-         L323CDrJEVHnGpDS+iFhJZegatLTpHkuDp+npUPJX+ucAD90sIHO5YlCza8lmlS5TmW4
-         XYMUHn4EzvafpRcO7UxAg1RrKb4AFEyNrDdAsJaQv0keS5y0Cyv+O+bjXrcjbb42lFbl
-         lXxvEuAM9+dtnoe0BwkgTTY0V8CUtjyokNEqyuaN2ipV4Y2+Lnz4+nikw4an6rSY/YyG
-         lC9w==
-X-Gm-Message-State: AOAM533RFucBVUrpGDf95RLbQtc/U32Y5BhlChUKgLe6RjXAVTHtS3hL
-        UUaoZ2D/eSocG8elUkkfE+t8FAVIE5EVhJL+qM4=
-X-Google-Smtp-Source: ABdhPJwZxJL36r3TJEuSALSFJHzcqX99I0ShUQCLsGNhbCLGwMem1HTY0+ljd7jJEvA+Kt+XjlQyyIUsqDAEdJZ4Ut4=
-X-Received: by 2002:a05:6214:5189:b0:45d:d051:ea06 with SMTP id
- kl9-20020a056214518900b0045dd051ea06mr5929790qvb.2.1652298886196; Wed, 11 May
- 2022 12:54:46 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220510154217.5216-1-ubizjak@gmail.com> <20220510165506.GP76023@worktop.programming.kicks-ass.net>
- <CAFULd4aNME5s2zGOO0A11kdjfHekH=ceSH7jUfAhmZaJWHv9cQ@mail.gmail.com>
- <20220511075409.GX76023@worktop.programming.kicks-ass.net>
- <CAFULd4aXpt_pnCR5OK5B1m5sErfB3uj_ez=-KW7=0qQheEdVzA@mail.gmail.com> <Ynven5y2u9WNfwK+@google.com>
-In-Reply-To: <Ynven5y2u9WNfwK+@google.com>
-From:   Uros Bizjak <ubizjak@gmail.com>
-Date:   Wed, 11 May 2022 21:54:34 +0200
-Message-ID: <CAFULd4bZDO5-3T4q9fanHFrRTDj8v6fypiTc=dFPO9Rp61g9eQ@mail.gmail.com>
-Subject: Re: [PATCH] locking/atomic/x86: Introduce try_cmpxchg64
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>, X86 ML <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Will Deacon <will@kernel.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Marco Elver <elver@google.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=zE2XEkp4B9K0dDNGPYDUEidf+D6l4wjVA+kP1Xd1v40=;
+        b=xA2JlQqRHMEFn9knUtfDiusFBayyO/ZuY2qLxcnZ7xAZEWFugvGzfAxC+/6T1TrzAw
+         Jq5sEtp3+dyjIRHrYabvYJQHMh8K3isYk8dEGzvGEI3bZIud3Fq1RcMcOr34n4K9N9bs
+         YhBITWB5AVSDntu7lY2hhqCPzFbFeh/42SMoibybn/cpJ3Yubn/d4ii/FeOiDQlL9Nyw
+         XtIsvfLzHz6wOXe1tI3R4ZJEHNUW4695FFxlghytqCEIy/jjynEW9VRvifxbtf+IrS6r
+         007BDPDGA9Gd/Wwf9v8SP5e154mOW6mppEnCs9rqh23nMjZAET7cQUMMGzvdiBZX2mkD
+         L3Iw==
+X-Gm-Message-State: AOAM532aEHGfCXuc42UJnJlMg1ICr5HNJWA/Yb4XEo2sWGPcyGsDx7eU
+        JWpO74NNf/7maR8QlVPMNz/LxyynKJvL4MAn0IfUk10vdqoLNtDHBK1YwN7WDZ9ophioB+qEyCq
+        pN2aDpoWrM9LhafYYBofBMrC2QUSXv2DYoyWVMvRhx4jcSBZTTU14mEJ6ZpEM37E=
+X-Google-Smtp-Source: ABdhPJymTcbl3i7fse56ivA+sAMIdpD/Lwy4o3VfjQSqthpwCY6CRY2uNW8jstivWOduQzRUDt10IWfSWMMFBA==
+X-Received: from romanton.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:43ef])
+ (user=romanton job=sendgmr) by 2002:a17:902:6a83:b0:15f:28b9:ea6 with SMTP id
+ n3-20020a1709026a8300b0015f28b90ea6mr8237614plk.156.1652301265442; Wed, 11
+ May 2022 13:34:25 -0700 (PDT)
+Date:   Wed, 11 May 2022 20:29:33 +0000
+Message-Id: <20220511202932.3266607-1-romanton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.550.gb090851708-goog
+Subject: [PATCH v5] KVM: x86: Use current rather than snapshotted TSC
+ frequency if it is constant
+From:   Anton Romanov <romanton@google.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Cc:     seanjc@google.com, vkuznets@redhat.com, mlevitsk@redhat.com,
+        Anton Romanov <romanton@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,36 +65,152 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 11, 2022 at 6:04 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, May 11, 2022, Uros Bizjak wrote:
-> > On Wed, May 11, 2022 at 9:54 AM Peter Zijlstra <peterz@infradead.org> wrote:
-> > > Still, does 32bit actually support that stuff?
-> >
-> > Unfortunately, it does:
-> >
-> > kvm-intel-y        += vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
-> >                vmx/evmcs.o vmx/nested.o vmx/posted_intr.o
-> >
-> > And when existing cmpxchg64 is substituted with cmpxchg, the
-> > compilation dies for 32bits with:
->
-> ...
->
-> > > Anyway, your patch looks about right, but I find it *really* hard to
-> > > care about 32bit code these days.
-> >
-> > Thanks, this is also my sentiment, but I hope the patch will enable
-> > better code and perhaps ease similar situation I have had elsewhere.
->
-> IMO, if we merge this it should be solely on the benefits to 64-bit code.  Yes,
-> KVM still supports 32-bit kernels, but I'm fairly certain the only people that
-> run 32-bit KVM are KVM developers.  32-bit KVM has been completely broken for
-> multiple releases at least once, maybe twice, and no one ever complained.
+Don't snapshot tsc_khz into per-cpu cpu_tsc_khz if the host TSC is
+constant, in which case the actual TSC frequency will never change and thus
+capturing TSC during initialization is unnecessary, KVM can simply use
+tsc_khz.  This value is snapshotted from
+kvm_timer_init->kvmclock_cpu_online->tsc_khz_changed(NULL)
 
-Yes, the idea was to improve cmpxchg64 with the implementation of
-try_cmpxchg64 for 64bit targets. However, the issue with 32bit targets
-stood in the way, so the effort with 32-bit implementation was mainly
-to unblock progression for 64-bit targets.
+On CPUs with constant TSC, but not a hardware-specified TSC frequency,
+snapshotting cpu_tsc_khz and using that to set a VM's target TSC frequency
+can lead to VM to think its TSC frequency is not what it actually is if
+refining the TSC completes after KVM snapshots tsc_khz.  The actual
+frequency never changes, only the kernel's calculation of what that
+frequency is changes.
 
-Uros.
+Ideally, KVM would not be able to race with TSC refinement, or would have
+a hook into tsc_refine_calibration_work() to get an alert when refinement
+is complete.  Avoiding the race altogether isn't practical as refinement
+takes a relative eternity; it's deliberately put on a work queue outside of
+the normal boot sequence to avoid unnecessarily delaying boot.
+
+Adding a hook is doable, but somewhat gross due to KVM's ability to be
+built as a module.  And if the TSC is constant, which is likely the case
+for every VMX/SVM-capable CPU produced in the last decade, the race can be
+hit if and only if userspace is able to create a VM before TSC refinement
+completes; refinement is slow, but not that slow.
+
+For now, punt on a proper fix, as not taking a snapshot can help some uses
+cases and not taking a snapshot is arguably correct irrespective of the
+race with refinement.
+
+Signed-off-by: Anton Romanov <romanton@google.com>
+---
+v5:
+    * do not setup kvmclock_cpu_online at all with X86_FEATURE_CONSTANT_TSC
+
+ arch/x86/kvm/x86.c | 44 +++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 33 insertions(+), 11 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4790f0d7d40b..9295e2af8e81 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2907,6 +2907,22 @@ static void kvm_update_masterclock(struct kvm *kvm)
+ 	kvm_end_pvclock_update(kvm);
+ }
+ 
++/*
++ * Use the kernel's tsc_khz directly if the TSC is constant, otherwise use KVM's
++ * per-CPU value (which may be zero if a CPU is going offline).  Note, tsc_khz
++ * can change during boot even if the TSC is constant, as it's possible for KVM
++ * to be loaded before TSC calibration completes.  Ideally, KVM would get a
++ * notification when calibration completes, but practically speaking calibration
++ * will complete before userspace is alive enough to create VMs.
++ */
++static unsigned long get_cpu_tsc_khz(void)
++{
++	if (static_cpu_has(X86_FEATURE_CONSTANT_TSC))
++		return tsc_khz;
++	else
++		return __this_cpu_read(cpu_tsc_khz);
++}
++
+ /* Called within read_seqcount_begin/retry for kvm->pvclock_sc.  */
+ static void __get_kvmclock(struct kvm *kvm, struct kvm_clock_data *data)
+ {
+@@ -2917,7 +2933,8 @@ static void __get_kvmclock(struct kvm *kvm, struct kvm_clock_data *data)
+ 	get_cpu();
+ 
+ 	data->flags = 0;
+-	if (ka->use_master_clock && __this_cpu_read(cpu_tsc_khz)) {
++	if (ka->use_master_clock &&
++	    (static_cpu_has(X86_FEATURE_CONSTANT_TSC) || __this_cpu_read(cpu_tsc_khz))) {
+ #ifdef CONFIG_X86_64
+ 		struct timespec64 ts;
+ 
+@@ -2931,7 +2948,7 @@ static void __get_kvmclock(struct kvm *kvm, struct kvm_clock_data *data)
+ 		data->flags |= KVM_CLOCK_TSC_STABLE;
+ 		hv_clock.tsc_timestamp = ka->master_cycle_now;
+ 		hv_clock.system_time = ka->master_kernel_ns + ka->kvmclock_offset;
+-		kvm_get_time_scale(NSEC_PER_SEC, __this_cpu_read(cpu_tsc_khz) * 1000LL,
++		kvm_get_time_scale(NSEC_PER_SEC, get_cpu_tsc_khz() * 1000LL,
+ 				   &hv_clock.tsc_shift,
+ 				   &hv_clock.tsc_to_system_mul);
+ 		data->clock = __pvclock_read_cycles(&hv_clock, data->host_tsc);
+@@ -3049,7 +3066,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+ 
+ 	/* Keep irq disabled to prevent changes to the clock */
+ 	local_irq_save(flags);
+-	tgt_tsc_khz = __this_cpu_read(cpu_tsc_khz);
++	tgt_tsc_khz = get_cpu_tsc_khz();
+ 	if (unlikely(tgt_tsc_khz == 0)) {
+ 		local_irq_restore(flags);
+ 		kvm_make_request(KVM_REQ_CLOCK_UPDATE, v);
+@@ -8646,9 +8663,11 @@ static void tsc_khz_changed(void *data)
+ 	struct cpufreq_freqs *freq = data;
+ 	unsigned long khz = 0;
+ 
++	WARN_ON_ONCE(boot_cpu_has(X86_FEATURE_CONSTANT_TSC));
++
+ 	if (data)
+ 		khz = freq->new;
+-	else if (!boot_cpu_has(X86_FEATURE_CONSTANT_TSC))
++	else
+ 		khz = cpufreq_quick_get(raw_smp_processor_id());
+ 	if (!khz)
+ 		khz = tsc_khz;
+@@ -8669,8 +8688,10 @@ static void kvm_hyperv_tsc_notifier(void)
+ 	hyperv_stop_tsc_emulation();
+ 
+ 	/* TSC frequency always matches when on Hyper-V */
+-	for_each_present_cpu(cpu)
+-		per_cpu(cpu_tsc_khz, cpu) = tsc_khz;
++	if (!boot_cpu_has(X86_FEATURE_CONSTANT_TSC)) {
++		for_each_present_cpu(cpu)
++			per_cpu(cpu_tsc_khz, cpu) = tsc_khz;
++	}
+ 	kvm_max_guest_tsc_khz = tsc_khz;
+ 
+ 	list_for_each_entry(kvm, &vm_list, vm_list) {
+@@ -8807,10 +8828,10 @@ static void kvm_timer_init(void)
+ #endif
+ 		cpufreq_register_notifier(&kvmclock_cpufreq_notifier_block,
+ 					  CPUFREQ_TRANSITION_NOTIFIER);
+-	}
+ 
+-	cpuhp_setup_state(CPUHP_AP_X86_KVM_CLK_ONLINE, "x86/kvm/clk:online",
+-			  kvmclock_cpu_online, kvmclock_cpu_down_prep);
++		cpuhp_setup_state(CPUHP_AP_X86_KVM_CLK_ONLINE, "x86/kvm/clk:online",
++				  kvmclock_cpu_online, kvmclock_cpu_down_prep);
++	}
+ }
+ 
+ #ifdef CONFIG_X86_64
+@@ -8963,10 +8984,11 @@ void kvm_arch_exit(void)
+ #endif
+ 	kvm_lapic_exit();
+ 
+-	if (!boot_cpu_has(X86_FEATURE_CONSTANT_TSC))
++	if (!boot_cpu_has(X86_FEATURE_CONSTANT_TSC)) {
+ 		cpufreq_unregister_notifier(&kvmclock_cpufreq_notifier_block,
+ 					    CPUFREQ_TRANSITION_NOTIFIER);
+-	cpuhp_remove_state_nocalls(CPUHP_AP_X86_KVM_CLK_ONLINE);
++		cpuhp_remove_state_nocalls(CPUHP_AP_X86_KVM_CLK_ONLINE);
++	}
+ #ifdef CONFIG_X86_64
+ 	pvclock_gtod_unregister_notifier(&pvclock_gtod_notifier);
+ 	irq_work_sync(&pvclock_irq_work);
+-- 
+2.36.0.550.gb090851708-goog
+
