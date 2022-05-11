@@ -2,103 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D676D5231BC
-	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 13:32:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D76D5231C8
+	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 13:33:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236196AbiEKLcU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 May 2022 07:32:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54866 "EHLO
+        id S238650AbiEKLdJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 May 2022 07:33:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239460AbiEKLcO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 May 2022 07:32:14 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC5175A08C;
-        Wed, 11 May 2022 04:32:11 -0700 (PDT)
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24BAbQr9016936;
-        Wed, 11 May 2022 11:32:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=Ke0W5Kae+F0Ex4s0W9qA6BLgMeuZPg9PC+xRVT4arIM=;
- b=RzNvsVmeCl3HDt8dgTe/WNbaUj2J4rEDTkzM0AfEolXSqEE1zPeKTPGSY5q4Xgf+68EI
- eQIUbkMD97AurPcN+wOkud2f5tiqzEbew135fOEAz5Mu33uRg9+X/YlG2zFDZvkjScx5
- K5AS+TLSVf+wuQEKLmaHegXoHJdXmzveA4KHHtMpparP12pQ2ZkYWyWtt5+eH9uPs1Mq
- f4J+/JksXF/TBVnOxP5NwMH2FNXs6F8odkma1iCDVYC8BxwSnGGFtx43JS4rrpJHnV2R
- 9TqDXdRV7ToO3mZHWtJYx+boYFhY89emxNoZJ31morm/OxOtNQko5/wtnbjAcOYNcSo5 Og== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g0a6ytb0r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 11 May 2022 11:32:10 +0000
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24BBWAJ2027787;
-        Wed, 11 May 2022 11:32:10 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g0a6ytb0b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 11 May 2022 11:32:10 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24BBDPIx025946;
-        Wed, 11 May 2022 11:32:08 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 3fwgd8wcja-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 11 May 2022 11:32:08 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24BBVkVZ23789896
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 11 May 2022 11:31:46 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6A625A405B;
-        Wed, 11 May 2022 11:32:05 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2D360A4054;
-        Wed, 11 May 2022 11:32:05 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.152.224.44])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 11 May 2022 11:32:05 +0000 (GMT)
-Message-ID: <fda492b4645a343ef612320f3694b45ea4875f20.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v2 2/2] s390x: add cmm migration test
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, thuth@redhat.com
-Date:   Wed, 11 May 2022 13:32:05 +0200
-In-Reply-To: <20220511131414.63edc473@p-imbrenda>
-References: <20220511085652.823371-1-nrb@linux.ibm.com>
-         <20220511085652.823371-3-nrb@linux.ibm.com>
-         <20220511131414.63edc473@p-imbrenda>
+        with ESMTP id S233527AbiEKLdF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 May 2022 07:33:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 89E2263BF4
+        for <kvm@vger.kernel.org>; Wed, 11 May 2022 04:33:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652268781;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tcSSPfl7VNm7diA5M0A+FZU0bpKbq549H5tEvNoL3ko=;
+        b=FHwdTUpe3NMSxWuqlUXv8o+oVnLfsi4PReGYb4voY+FMSya4UTs3L12Q36Cp3+Jv2WGbaz
+        vDhubBCXYADCsnr3V7XK5R+1UtVciWAa82AstvatGRbMeDfBEh2Jq9AAgHRLkxqyrGlTVO
+        jw7vSjjUhC4Hi0b6HMZXsspWfsOi77Y=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-614-JnL40nmCPZKCIMF0yrK4uQ-1; Wed, 11 May 2022 07:32:56 -0400
+X-MC-Unique: JnL40nmCPZKCIMF0yrK4uQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6C9B780B91A;
+        Wed, 11 May 2022 11:32:55 +0000 (UTC)
+Received: from starship (unknown [10.40.192.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 28AE640CF8E4;
+        Wed, 11 May 2022 11:32:52 +0000 (UTC)
+Message-ID: <deae695da02d7f22dcfa4635eec53ab61baf9026.camel@redhat.com>
+Subject: Re: [PATCH v3 14/34] KVM: x86: Introduce .post_hv_l2_tlb_flush()
+ nested hook
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Wed, 11 May 2022 14:32:52 +0300
+In-Reply-To: <20220414132013.1588929-15-vkuznets@redhat.com>
+References: <20220414132013.1588929-1-vkuznets@redhat.com>
+         <20220414132013.1588929-15-vkuznets@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: cLmivH95e3cvzNwFhy4dHnqZ2XrP14hy
-X-Proofpoint-GUID: H94I9I2SBFXbhQjej_Or_Hdjq7AAw7vq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-11_03,2022-05-11_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- clxscore=1015 impostorscore=0 malwarescore=0 suspectscore=0
- lowpriorityscore=0 mlxlogscore=818 adultscore=0 mlxscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205110051
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-05-11 at 13:14 +0200, Claudio Imbrenda wrote:
-> do we actually need this include?
+On Thu, 2022-04-14 at 15:19 +0200, Vitaly Kuznetsov wrote:
+> Hyper-V supports injecting synthetic L2->L1 exit after performing
+> L2 TLB flush operation but the procedure is vendor specific.
+> Introduce .post_hv_l2_tlb_flush() nested hook for it.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  1 +
+>  arch/x86/kvm/Makefile           |  3 ++-
+>  arch/x86/kvm/svm/hyperv.c       | 11 +++++++++++
+>  arch/x86/kvm/svm/hyperv.h       |  2 ++
+>  arch/x86/kvm/svm/nested.c       |  1 +
+>  arch/x86/kvm/vmx/evmcs.c        |  4 ++++
+>  arch/x86/kvm/vmx/evmcs.h        |  1 +
+>  arch/x86/kvm/vmx/nested.c       |  1 +
+>  8 files changed, 23 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/x86/kvm/svm/hyperv.c
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 8b2a52bf26c0..ce62fde5f4ff 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1558,6 +1558,7 @@ struct kvm_x86_nested_ops {
+>  	int (*enable_evmcs)(struct kvm_vcpu *vcpu,
+>  			    uint16_t *vmcs_version);
+>  	uint16_t (*get_evmcs_version)(struct kvm_vcpu *vcpu);
+> +	void (*post_hv_l2_tlb_flush)(struct kvm_vcpu *vcpu);
+>  };
+>  
+>  struct kvm_x86_init_ops {
+> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+> index 30f244b64523..b6d53b045692 100644
+> --- a/arch/x86/kvm/Makefile
+> +++ b/arch/x86/kvm/Makefile
+> @@ -25,7 +25,8 @@ kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+>  			   vmx/evmcs.o vmx/nested.o vmx/posted_intr.o
+>  kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
+>  
+> -kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o svm/sev.o
+> +kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o \
+> +			   svm/sev.o svm/hyperv.o
+>  
+>  ifdef CONFIG_HYPERV
+>  kvm-amd-y		+= svm/svm_onhyperv.o
+> diff --git a/arch/x86/kvm/svm/hyperv.c b/arch/x86/kvm/svm/hyperv.c
+> new file mode 100644
+> index 000000000000..c0749fc282fe
+> --- /dev/null
+> +++ b/arch/x86/kvm/svm/hyperv.c
+> @@ -0,0 +1,11 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * AMD SVM specific code for Hyper-V on KVM.
+> + *
+> + * Copyright 2022 Red Hat, Inc. and/or its affiliates.
+> + */
+> +#include "hyperv.h"
+> +
+> +void svm_post_hv_l2_tlb_flush(struct kvm_vcpu *vcpu)
+> +{
+> +}
+> diff --git a/arch/x86/kvm/svm/hyperv.h b/arch/x86/kvm/svm/hyperv.h
+> index 8cf702fed7e5..a2b0d7580b0d 100644
+> --- a/arch/x86/kvm/svm/hyperv.h
+> +++ b/arch/x86/kvm/svm/hyperv.h
+> @@ -48,4 +48,6 @@ static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu)
+>  	hv_vcpu->nested.vp_id = hve->hv_vp_id;
+>  }
+>  
+> +void svm_post_hv_l2_tlb_flush(struct kvm_vcpu *vcpu);
+> +
+>  #endif /* __ARCH_X86_KVM_SVM_HYPERV_H__ */
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index 2d1a76343404..de3f27301b5c 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -1665,4 +1665,5 @@ struct kvm_x86_nested_ops svm_nested_ops = {
+>  	.get_nested_state_pages = svm_get_nested_state_pages,
+>  	.get_state = svm_get_nested_state,
+>  	.set_state = svm_set_nested_state,
+> +	.post_hv_l2_tlb_flush = svm_post_hv_l2_tlb_flush,
+>  };
+> diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
+> index 87e3dc10edf4..e390e67496df 100644
+> --- a/arch/x86/kvm/vmx/evmcs.c
+> +++ b/arch/x86/kvm/vmx/evmcs.c
+> @@ -437,3 +437,7 @@ int nested_enable_evmcs(struct kvm_vcpu *vcpu,
+>  
+>  	return 0;
+>  }
+> +
+> +void vmx_post_hv_l2_tlb_flush(struct kvm_vcpu *vcpu)
+> +{
+> +}
+> diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
+> index 8d70f9aea94b..b120b0ead4f3 100644
+> --- a/arch/x86/kvm/vmx/evmcs.h
+> +++ b/arch/x86/kvm/vmx/evmcs.h
+> @@ -244,5 +244,6 @@ int nested_enable_evmcs(struct kvm_vcpu *vcpu,
+>  			uint16_t *vmcs_version);
+>  void nested_evmcs_filter_control_msr(u32 msr_index, u64 *pdata);
+>  int nested_evmcs_check_controls(struct vmcs12 *vmcs12);
+> +void vmx_post_hv_l2_tlb_flush(struct kvm_vcpu *vcpu);
+>  
+>  #endif /* __KVM_X86_VMX_EVMCS_H */
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index ee88921c6156..cc6c944b5815 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -6850,4 +6850,5 @@ struct kvm_x86_nested_ops vmx_nested_ops = {
+>  	.write_log_dirty = nested_vmx_write_pml_buffer,
+>  	.enable_evmcs = nested_enable_evmcs,
+>  	.get_evmcs_version = nested_get_evmcs_version,
+> +	.post_hv_l2_tlb_flush = vmx_post_hv_l2_tlb_flush,
+>  };
 
 
-It is not needed, removed.
+I think that the name of the function is misleading, since it is not called
+after each L2 HV tlb flush, but only after a flush which needs to inject
+that synthetic VM exit.
 
-> if not, remove it, then you can add:
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+I think something like 'inject_synthetic_l2_hv_tlb_flush_vmexit' 
+(not a good name IMHO, but you get the idea) would be better.
 
-Thanks.
+Best regards,
+	Maxim Levitsky
+
+
+
