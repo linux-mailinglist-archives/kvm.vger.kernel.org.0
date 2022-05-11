@@ -2,197 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2185F522E4A
-	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 10:24:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25F88522ECD
+	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 10:57:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243610AbiEKIYc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 May 2022 04:24:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59514 "EHLO
+        id S238767AbiEKI5D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 May 2022 04:57:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243621AbiEKIYP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 May 2022 04:24:15 -0400
-Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F6DC6BFC4;
-        Wed, 11 May 2022 01:24:14 -0700 (PDT)
-Received: by mail-qt1-x831.google.com with SMTP id p4so1429651qtq.12;
-        Wed, 11 May 2022 01:24:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=2UJ8TdG/ZXkqli01Tzw/46lE+X6BSAjmpr/x155Uyss=;
-        b=i37TjzU3Q0df21D/YSmpH4Cczrmk/TIUCBWZVXfvj5f/11h9d7E4AKQvb019JQAoRA
-         OLg0ePSg0Bwrwnse+0UP/BV7VPDlkmOf+gRE1+fOJoc80xn2EI2lAK9pTDPTTsMIFQeS
-         evcTy6e6VDdeTmKAQWp/7vg6kXy9TjgWZi3slqEyS3L2Ng29DnIKLADDKCr4aQUbGfNV
-         rKSzrCusuhjpmNDXlP86oDKTFkpb6FT78AHnorHZDPSWSWwdeG/7Qi8GmRogVyg7SbUD
-         AOWlUDXeyrOaKLZeo+QJaiTGq45/oRcJowsJJpEzAFHsA3QNd0ggX2YqFYIsgi1nqGlG
-         54yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=2UJ8TdG/ZXkqli01Tzw/46lE+X6BSAjmpr/x155Uyss=;
-        b=Eik1Rv04SlWxi8eRWgh1amzE7q4P4P5X9BKf3GH8SmXsiDQr91xcGuECzZytZbEoI7
-         H1c+Vp/TND2SvIbFLDQ/zrz5xi/QTODeHLLchIe6fM9RYm0i3u50AGVTwR0Jt4jECSUV
-         jLfiupwhrbD084HzwjDde/D8WLYF21M59QDv1Tq0r1Es5uZMrmuQqGhPDYHpPqLz0Phv
-         y/B/d3nfGaDIgLX2dzHseDwSfN6F0bl+ZovMWnKq1uFyj6JBBltMDVmrFSRkWpbSCgcw
-         tK9AvY1bXWa0tlrTCe7askZPZ/XX1bE/fycBOkK3AMVj2ErWuuJ7sq6UcWPhwaLqUP43
-         +Eqw==
-X-Gm-Message-State: AOAM530Ldh6sjz813C14cMpxwrmLcVCKl2lrmwHZiJk7xQWzVZah3Mgy
-        ieRdV7ew85BeY1NSUZfhuKAxF9wcnV3BgDxpGXY=
-X-Google-Smtp-Source: ABdhPJw4ywOeI32gajTbIkB0BZZFunlxMOAeg9x8fyw2kMFA6AF0u5HdvgUXY7k1gDEZblvj8mGuCkqdXldSq4SpvkQ=
-X-Received: by 2002:ac8:7e81:0:b0:2f3:d195:ace0 with SMTP id
- w1-20020ac87e81000000b002f3d195ace0mr17510587qtj.5.1652257453406; Wed, 11 May
- 2022 01:24:13 -0700 (PDT)
+        with ESMTP id S235801AbiEKI5B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 May 2022 04:57:01 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7E1539694;
+        Wed, 11 May 2022 01:57:00 -0700 (PDT)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24B7TGte016135;
+        Wed, 11 May 2022 08:57:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=4btaQcojH/jz8+L4hJdo0dGgg2nq1Decsu48xk0KvxU=;
+ b=PQeeAhJeKWagBqRHtBXOnlMavH+MR3RAw7avW05opbNmsJRR7aoZoTGHaOo8nfjpmVum
+ JoSeF7i/Hp/+lpJjOygFjWFVspBmourbK95UbSI67xSsvXWeHf1vVq3VW+G//WzWzlsw
+ EiVZANLom1DxovDkkUCpCbk7YLrrkcSBq+lR1COmsx7N39Iy962smCf5EWpmVFC1FjLG
+ NRSroGJYtDJEXtIXkJ+Y9wHdQIL3rWbYuS7koSPjScxEYhPLW2lyCp6DADiDstCiVNzy
+ /wteujt+Vc5FHGeyLS0mDq+cS7vkJ+AVKr303LKQoWF5b2pF7VwL/AZ7UojGVlDNveDV aA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g08t21ea9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 May 2022 08:56:59 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24B8NY7w004423;
+        Wed, 11 May 2022 08:56:59 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g08t21e9j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 May 2022 08:56:59 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24B8r1n6021557;
+        Wed, 11 May 2022 08:56:56 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03ams.nl.ibm.com with ESMTP id 3fwgd8w6tj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 May 2022 08:56:56 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24B8ur7a21168612
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 11 May 2022 08:56:53 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3EB4852050;
+        Wed, 11 May 2022 08:56:53 +0000 (GMT)
+Received: from t46lp57.lnxne.boe (unknown [9.152.108.100])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id F17625204F;
+        Wed, 11 May 2022 08:56:52 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Subject: [kvm-unit-tests PATCH v2 0/2] s390x: add migration test for CMM
+Date:   Wed, 11 May 2022 10:56:50 +0200
+Message-Id: <20220511085652.823371-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-References: <20220510154217.5216-1-ubizjak@gmail.com> <20220510165506.GP76023@worktop.programming.kicks-ass.net>
- <CAFULd4aNME5s2zGOO0A11kdjfHekH=ceSH7jUfAhmZaJWHv9cQ@mail.gmail.com> <20220511075409.GX76023@worktop.programming.kicks-ass.net>
-In-Reply-To: <20220511075409.GX76023@worktop.programming.kicks-ass.net>
-From:   Uros Bizjak <ubizjak@gmail.com>
-Date:   Wed, 11 May 2022 10:24:02 +0200
-Message-ID: <CAFULd4aXpt_pnCR5OK5B1m5sErfB3uj_ez=-KW7=0qQheEdVzA@mail.gmail.com>
-Subject: Re: [PATCH] locking/atomic/x86: Introduce try_cmpxchg64
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-        kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Will Deacon <will@kernel.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Marco Elver <elver@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: u7Ij_hnE6ueg4JgwJk4Dy2B2l_yRkXRm
+X-Proofpoint-GUID: Qads6pcP70b98IuhozsYzLGblOcAQ_gR
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-11_02,2022-05-10_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 adultscore=0 spamscore=0 impostorscore=0
+ mlxlogscore=776 mlxscore=0 phishscore=0 malwarescore=0 priorityscore=1501
+ suspectscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205110037
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 11, 2022 at 9:54 AM Peter Zijlstra <peterz@infradead.org> wrote=
-:
->
-> On Tue, May 10, 2022 at 07:07:25PM +0200, Uros Bizjak wrote:
-> > On Tue, May 10, 2022 at 6:55 PM Peter Zijlstra <peterz@infradead.org> w=
-rote:
-> > >
-> > > On Tue, May 10, 2022 at 05:42:17PM +0200, Uros Bizjak wrote:
-> > > > This patch adds try_cmpxchg64 to improve code around cmpxchg8b.  Wh=
-ile
-> > > > the resulting code improvements on x86_64 are minor (a compare and =
-a move saved),
-> > > > the improvements on x86_32 are quite noticeable. The code improves =
-from:
-> > >
-> > > What user of cmpxchg64 is this?
-> >
-> > This is cmpxchg64 in pi_try_set_control from
-> > arch/x86/kvm/vmx/posted_intr.c, as shown in a RFC patch [1].
->
-> I can't read that code, my brain is hard wired to read pi as priority
-> inheritance/inversion.
->
-> Still, does 32bit actually support that stuff?
+v1->v2:
+---
+* Rename cmm-migration.c to migration-cmm.c (Thanks Janosch)
+* Replace switch-case with unrolled loop (Thanks Claudio)
+* Migrate even when ESSA is not available so we don't hang forever
 
-Unfortunately, it does:
+Upon migration, we expect the CMM page states to be preserved. Add a test which
+checks for that.
 
-kvm-intel-y        +=3D vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.=
-o \
-               vmx/evmcs.o vmx/nested.o vmx/posted_intr.o
+The new test gets a new file so the existing cmm test can still run when the
+prerequisites for running migration tests aren't given (netcat). Therefore, move
+some definitions to a common header to be able to re-use them.
 
-And when existing cmpxchg64 is substituted with cmpxchg, the
-compilation dies for 32bits with:
+Nico Boehr (2):
+  lib: s390x: add header for CMM related defines
+  s390x: add cmm migration test
 
-error: call to =E2=80=98__cmpxchg_wrong_size=E2=80=99 declared with attribu=
-te error:
-Bad argument size for cmpxchg
+ lib/s390x/asm/cmm.h   | 50 +++++++++++++++++++++++++++
+ s390x/Makefile        |  1 +
+ s390x/cmm.c           | 25 ++------------
+ s390x/migration-cmm.c | 78 +++++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg   |  4 +++
+ 5 files changed, 136 insertions(+), 22 deletions(-)
+ create mode 100644 lib/s390x/asm/cmm.h
+ create mode 100644 s390x/migration-cmm.c
 
-So, the majority of the patch deals with 32bits and tries to implement
-the inlined insn correctly for all cases. The 64bit part is simply a
-call to arch_try_cmpxchg, and the rest is auto-generated from scripts.
+-- 
+2.31.1
 
->
-> > There are some more opportunities for try_cmpxchg64 in KVM, namely
-> > fast_pf_fix_direct_spte in arch/x86/kvm/mmu/mmu.c and
-> > tdp_mmu_set_spte_atomic in arch/x86/kvm/mmu/tdp_mmu.c
->
-> tdp_mmu is definitely 64bit only and as such shouldn't need to use
-> cmpxchg64.
-
-Indeed.
-
->
-> Anyway, your patch looks about right, but I find it *really* hard to
-> care about 32bit code these days.
-
-Thanks, this is also my sentiment, but I hope the patch will enable
-better code and perhaps ease similar situation I have had elsewhere.
-
-Uros.
-
-On Wed, May 11, 2022 at 9:54 AM Peter Zijlstra <peterz@infradead.org> wrote=
-:
->
-> On Tue, May 10, 2022 at 07:07:25PM +0200, Uros Bizjak wrote:
-> > On Tue, May 10, 2022 at 6:55 PM Peter Zijlstra <peterz@infradead.org> w=
-rote:
-> > >
-> > > On Tue, May 10, 2022 at 05:42:17PM +0200, Uros Bizjak wrote:
-> > > > This patch adds try_cmpxchg64 to improve code around cmpxchg8b.  Wh=
-ile
-> > > > the resulting code improvements on x86_64 are minor (a compare and =
-a move saved),
-> > > > the improvements on x86_32 are quite noticeable. The code improves =
-from:
-> > >
-> > > What user of cmpxchg64 is this?
-> >
-> > This is cmpxchg64 in pi_try_set_control from
-> > arch/x86/kvm/vmx/posted_intr.c, as shown in a RFC patch [1].
->
-> I can't read that code, my brain is hard wired to read pi as priority
-> inheritance/inversion.
->
-> Still, does 32bit actually support that stuff?
-
-Unfortunately, it does:
-
-kvm-intel-y        +=3D vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.=
-o \
-               vmx/evmcs.o vmx/nested.o vmx/posted_intr.o
-
-And when cmpxchg64 is substituted with cmpxchg, the compilation dies
-for 32bits with:
-
-error: call to =E2=80=98__cmpxchg_wrong_size=E2=80=99 declared with attribu=
-te error:
-Bad argument size for cmpxchg
-
-So, the majority of the patch deals with 32bits and tries to implement
-the inlined insn correctly for all cases. The 64bit part is simply a
-call to arch_try_cmpxchg, and the rest is auto-generated from scripts.
-
->
-> > There are some more opportunities for try_cmpxchg64 in KVM, namely
-> > fast_pf_fix_direct_spte in arch/x86/kvm/mmu/mmu.c and
-> > tdp_mmu_set_spte_atomic in arch/x86/kvm/mmu/tdp_mmu.c
->
-> tdp_mmu is definitely 64bit only and as such shouldn't need to use
-> cmpxchg64.
-
-Indeed.
-
->
-> Anyway, your patch looks about right, but I find it *really* hard to
-> care about 32bit code these days.
-
-Thanks, this is also my sentiment, but I hope the patch will enable
-better code and perhaps ease a similar situation elsewhere in the
-sources.
-
-Uros.
