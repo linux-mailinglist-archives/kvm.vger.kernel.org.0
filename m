@@ -2,136 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B1DCB523537
-	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 16:17:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 117075235B8
+	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 16:38:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244491AbiEKORo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 May 2022 10:17:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59578 "EHLO
+        id S244864AbiEKOiV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 May 2022 10:38:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244494AbiEKORm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 May 2022 10:17:42 -0400
-Received: from out203-205-221-209.mail.qq.com (out203-205-221-209.mail.qq.com [203.205.221.209])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74EEB33882
-        for <kvm@vger.kernel.org>; Wed, 11 May 2022 07:17:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-        s=s201512; t=1652278652;
-        bh=3dGbCjRMMBQ8WLUNgpRIiVU3kth7lEoIoVt35TYKqTk=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To;
-        b=aO3sW0jBZ0GS+ziW5ZrowvghB/VpIjCncMnrg4NBfrBB/M28V5zTMjesI+cC1PZ8v
-         Q6n3zm0a6yX2ObNANDDA330HXJONRSQxfwGvew5fq1nHkgMhEnZ/kmaqrgAKbT2zBG
-         nr880/e3pg5p5hpRROFZgOFTc/xo7nChcbSYgg50=
-Received: from [192.168.0.110] ([36.57.146.152])
-        by newxmesmtplogicsvrszc9.qq.com (NewEsmtp) with SMTP
-        id 45A84473; Wed, 11 May 2022 22:17:26 +0800
-X-QQ-mid: xmsmtpt1652278646tlzr6o12x
-Message-ID: <tencent_5823CCB7CFD4C49A90D3CC1A183AB406EB09@qq.com>
-X-QQ-XMAILINFO: MB5+LsFw85NovK/3PTYxdH/8J3wzLu+3W6hr/G58qBaisv0jWL7fhMZ8qauMHf
-         rVRC3FPwBRm2s4pLpE5zj6huIUsPRSP5V6deupIeIetreA3RR/mAC/2vveLnFsEWWQAZXhc3e9LI
-         5Qg3mPoIiy2xNh1Ar/T4hFiydT5faLN+WZJHi0pCfee3IV6USjCs6WGeLaV8U6Qun95oKpHOe3dq
-         f2KZw7ftMLpa948hkyt+vMJE6KbAUhHuZj+fqP2vfegW7KvTjZye6ucR0cvI7b+bg44UX3NhaO5E
-         Bx1VBVmZ4gCejpkv4l1s5zSOtW+W56m90CxjdrEeCciusxKyMKZZyY1zIPN3P0+FbPb5AXUI8U/2
-         zdd6wPZ5e0ijQZH6C2PCKEKcyPzk0WJvRIvOe+9eMsk3L2u0yk6E5W1gLroASYNOR+OARJyfWIpQ
-         f1tdsZzmmH7E28CiiODCg2c8lFLPqbdDHLpWPzF4w+xfVABCPJ+wOwu0PPcrWqB98VUz8geXeqUK
-         jtkjFCUuqzWRModPW4LEuJBG68zAi7BOhDSoT5oZ4e9gFR9pNhXNoawntxEAjBftp3lfbXoLCWxu
-         b7PMnGojlzQC8LVG6QmJAo5cjxngNIezbwPOF8BBPTOISx05iP+6sLXxMD879/p7+Pag+eI9udqK
-         c1tkb9bF5+mQllAJZqUZZa8EpixiywGBip7/Cf3JgqbFBVMU5Qh3RCMnfPhhCxCI3E9dcpDLQyn5
-         zUlYk+yztVicEsY0PIdv//13W4hY8v3YS3Zpd7t+9cwg2dvs8PQPt1SG1qcOUDFLmk25QWiHEhez
-         DBYRbXEUf8hsydSSjVXVuZ1fJ0/fmKGCMUEXKjUWPs7AvXIEQzdZJt55sTvaPq25RLifXqDzIqn0
-         dtTwM1Urtfz+3jlb2J8YAF1wcINPLhQogH8M4Cu0UIJWy9mFsOZbARVne4Clyfq5O/fjaMvrtEFy
-         zAEc7yTmM=
-Subject: Re: [RFC 00/18] vfio: Adopt iommufd
-To:     Yi Liu <yi.l.liu@intel.com>, Jason Gunthorpe <jgg@nvidia.com>,
-        Zhangfei Gao <zhangfei.gao@linaro.org>
-Cc:     eric.auger@redhat.com,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "thuth@redhat.com" <thuth@redhat.com>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "chao.p.peng@intel.com" <chao.p.peng@intel.com>,
-        "yi.y.sun@intel.com" <yi.y.sun@intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>
-References: <20220414104710.28534-1-yi.l.liu@intel.com>
- <4f920d463ebf414caa96419b625632d5@huawei.com>
- <be8aa86a-25d1-d034-5e3b-6406aa7ff897@redhat.com>
- <4ac4956cfe344326a805966535c1dc43@huawei.com>
- <20220426103507.5693a0ca.alex.williamson@redhat.com>
- <66f4af24-b76e-9f9a-a86d-565c0453053d@linaro.org>
- <0d9bd05e-d82b-e390-5763-52995bfb0b16@intel.com>
- <720d56c8-da84-5e4d-f1f8-0e1878473b93@redhat.com>
- <29475423-33ad-bdd2-2d6a-dcd484d257a7@linaro.org>
- <20220510124554.GY49344@nvidia.com>
- <637b3992-45d9-f472-b160-208849d3d27a@intel.com>
-From:   "zhangfei.gao@foxmail.com" <zhangfei.gao@foxmail.com>
-X-OQ-MSGID: <9b1c5e94-ddbe-e36d-0aa1-1ab6c7bab418@foxmail.com>
-Date:   Wed, 11 May 2022 22:17:25 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        with ESMTP id S244850AbiEKOiQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 May 2022 10:38:16 -0400
+Received: from mail-oa1-x29.google.com (mail-oa1-x29.google.com [IPv6:2001:4860:4864:20::29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DDFF994E6
+        for <kvm@vger.kernel.org>; Wed, 11 May 2022 07:38:14 -0700 (PDT)
+Received: by mail-oa1-x29.google.com with SMTP id 586e51a60fabf-e5e433d66dso3049414fac.5
+        for <kvm@vger.kernel.org>; Wed, 11 May 2022 07:38:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=stonybrook.edu; s=sbu-gmail;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ziYE0NkVrBjDXTGbPV1+2QDWsD4aVv6jXZDQq95ad9w=;
+        b=junsLANyDStr+Kt8Qq2tXaSgowjJ7dSU/AKT/2LxWU8sCdeMzZBLfXjZMjsoV7aao/
+         0iNWjJR2S7QTnYjJkEFmkj1yQoVwn6WFkUW+60qcK0RGVbG3RuO4ekCxNxMiw+WyNlDA
+         iJWQ3Tv2lIbbXMVjAeQ9DBi2A9OEyDxTJ5Ezk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ziYE0NkVrBjDXTGbPV1+2QDWsD4aVv6jXZDQq95ad9w=;
+        b=NL96ZUKUADF7wPsJ5hottq84+y38iEXgvk+QmBJRszm72m0e3ZxoBqyOS+hMF4thfq
+         9xitIYrLuqFKGAMgEq2ABoWe8HqwD7+O4gH14pwUkwo+vOYwwX4hOW1SPT2cjn18aUyW
+         ND79R13Q1AcJRe8WxwTLncs7QtVIXuwo0VjsFp8yAsQd9/Fj0nbGyKd1sGFqD00CZwIL
+         OFeQwq5X/O97ql8ql3W/kB1srYz8zmcr8boIVSk0IINShlYtmVc1Er1GmkdnialyoUVx
+         ygT5OK5jYbRN9RTZjrSe96usU390j3WyGr+vb47V2VTpMUBhR2J40jR8s6KxO/Z/NVBz
+         8pbg==
+X-Gm-Message-State: AOAM533mru3cse2jxx/MG8HwERGouLld1Z5DcKwU3+ECxHX5Wwsvuthk
+        V5udFPSMX2wchErvVyQKnVbFjHWNEdBFzhMlcNtWYw==
+X-Google-Smtp-Source: ABdhPJxNpNNIj4irIneC5fqKELT9Id1HxzpdjxSqhgtyCCRCm9G+y6nqFIXA9mpOScyXbLbJU4uCSNwKXmNkJJzdojI=
+X-Received: by 2002:a05:6870:5818:b0:ee:e90:46cc with SMTP id
+ r24-20020a056870581800b000ee0e9046ccmr2887037oap.37.1652279893906; Wed, 11
+ May 2022 07:38:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <637b3992-45d9-f472-b160-208849d3d27a@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Spam-Status: No, score=2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_MUA_MOZILLA,
-        FREEMAIL_FROM,HELO_DYNAMIC_IPADDR,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RDNS_DYNAMIC,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: **
+References: <CAJGDS+GM9Aw6Yvhv+F6wMGvrkz421kfq0j_PZa9F0AKyp5cEQA@mail.gmail.com>
+ <YnGUazEgCJWgB6Yw@google.com> <CAJGDS+F0hB=0bj8spt9sophJyhdXTkYXK8LXUrt=7mov4s2JJA@mail.gmail.com>
+ <CAJGDS+E5f2Xo68dsEkOfchZybU1uTSb=BgcTgQMLe0tW32m5xg@mail.gmail.com>
+ <CALMp9eT3FeDa735Mo_9sZVPfovGQbcqXAygLnz61-acHV-L7+w@mail.gmail.com>
+ <YnvBMnD6fuh+pAQ6@google.com> <CAJGDS+GMxG1gXMS1cW1+sS1V67h65iUpMGwQ=+-MVTE6DTOBjg@mail.gmail.com>
+ <YnvFN7nT9DzfR8fq@google.com>
+In-Reply-To: <YnvFN7nT9DzfR8fq@google.com>
+From:   Arnabjyoti Kalita <akalita@cs.stonybrook.edu>
+Date:   Wed, 11 May 2022 20:08:02 +0530
+Message-ID: <CAJGDS+G+z9S6QDEGRatR5u+q-5X_MAiWqnTsjf4L=4+PrThdsQ@mail.gmail.com>
+Subject: Re: Causing VMEXITs when kprobes are hit in the guest VM
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hello Sean,
+
+Thank you for your answer. It might be easier and my code might be
+more "portable" if I allow the guest to handle the #BP themselves.
+
+When a VMEXIT happens, if I allow KVM to inject the #BP, cause a
+VMEXIT to userspace, do what I want when that happens and then, allow
+KVM to restart the guest via KVM_VCPU_RUN, I understand that the guest
+will handle the #BP and continue execution.
+
+What could be the various ways a guest could handle #BP? Can we "make"
+the guest skip the instruction that caused the #BP ?
+
+Best Regards,
+Arnabjyoti Kalita
 
 
-On 2022/5/10 下午10:08, Yi Liu wrote:
-> On 2022/5/10 20:45, Jason Gunthorpe wrote:
->> On Tue, May 10, 2022 at 08:35:00PM +0800, Zhangfei Gao wrote:
->>> Thanks Yi and Eric,
->>> Then will wait for the updated iommufd kernel for the PCI MMIO region.
->>>
->>> Another question,
->>> How to get the iommu_domain in the ioctl.
->>
->> The ID of the iommu_domain (called the hwpt) it should be returned by
->> the vfio attach ioctl.
+On Wed, May 11, 2022 at 7:46 PM Sean Christopherson <seanjc@google.com> wrote:
 >
-> yes, hwpt_id is returned by the vfio attach ioctl and recorded in
-> qemu. You can query page table related capabilities with this id.
+> On Wed, May 11, 2022, Arnabjyoti Kalita wrote:
+> > Hello Jim and Sean,
+> >
+> > Thank you for your answers.
+> >
+> > If I re-inject the #BP back into the guest, does it automatically take
+> > care of updating the RIP and continuing execution?
 >
-> https://lore.kernel.org/kvm/20220414104710.28534-16-yi.l.liu@intel.com/
+> Yes, the guest "automatically" handles the #BP.  What the appropriate handling may
+> be is up to the guest, i.e. skipping an instruction may or may not be the correct
+> thing to do.  Injecting the #BP after VM-Exit is simply emulating what would happen
+> from the guest's perspective if KVM had never intercepted the #BP in the first place.
 >
-Thanks Yi,
-
-Do we use iommufd_hw_pagetable_from_id in kernel?
-
-The qemu send hwpt_id via ioctl.
-Currently VFIOIOMMUFDContainer has hwpt_list,
-Which member is good to save hwpt_id, IOMMUTLBEntry?
-
-In kernel ioctl: iommufd_vfio_ioctl
-@dev: Device to get an iommu_domain for
-iommufd_hw_pagetable_from_id(struct iommufd_ctx *ictx, u32 pt_id, struct 
-device *dev)
-But iommufd_vfio_ioctl seems no para dev?
-
-Thanks
-
-
-
-
+> Note, KVM doesn't have to initiate the injection, you can handle that from userspace
+> via KVM_SET_VCPU_EVENTS.  But if it's just as easy to hack KVM, that's totally fine
+> too, so long as userspace doesn't double inject.
