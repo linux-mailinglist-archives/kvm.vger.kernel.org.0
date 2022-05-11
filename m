@@ -2,61 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD3FD523506
-	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 16:08:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EC5D52351F
+	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 16:12:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244379AbiEKOIx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 May 2022 10:08:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57138 "EHLO
+        id S244464AbiEKOMu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 May 2022 10:12:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244372AbiEKOIw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 May 2022 10:08:52 -0400
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE0EF69B44
-        for <kvm@vger.kernel.org>; Wed, 11 May 2022 07:08:50 -0700 (PDT)
-Received: by mail-oi1-x233.google.com with SMTP id v65so2798342oig.10
-        for <kvm@vger.kernel.org>; Wed, 11 May 2022 07:08:50 -0700 (PDT)
+        with ESMTP id S244452AbiEKOMm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 May 2022 10:12:42 -0400
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEA776B034
+        for <kvm@vger.kernel.org>; Wed, 11 May 2022 07:12:40 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id n126-20020a1c2784000000b0038e8af3e788so1322833wmn.1
+        for <kvm@vger.kernel.org>; Wed, 11 May 2022 07:12:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=stonybrook.edu; s=sbu-gmail;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=jbZi7aD7HF5d+cYrJ2gTsbZ+g97ak3Jgaq79GRl++zQ=;
-        b=sqcisbmPoXayTwTEmdEN8L2/Fnh2yGozJM478qj99EiB32SHbtOahaEyOafgJ71uxf
-         so8C9gl3bgWMHr4V2T1C32SjXrLeIT7SK7bDwhmFqY27FMzS4TYvxUz4sHukJt3ZqShA
-         xcEPWxvULhcKC76iQVT4FWzXTfuyqN5JOEtLc=
+        bh=RSGHn1F0BncOfTcKYhrKyIk0Nc9jRJLzLB3ecNcIZy4=;
+        b=jW12ZwQnnCztcNwkigLKzLeyKxuLaypSdNh5RLphYPfrxCmn7JNKcAFQyhsDExQ715
+         wJwjtZki4XfUaxqAYliizclV7JqcbjMJZH3O294nmneM4g9jdOzsk+Y7dwWTdMhJNmFr
+         luTgFG70VKGd5rBsQuYZFTUjRfEcJ0/y7nPhAyW1ERcls1P51FqhBYBEYo8vF1V2mXNd
+         8SRsu7Z8MrurgPTYpBt1TQjav+1DEREjLXAbJ0D6pm6Q+pDArYfJ2vpNCWaWnM02wpn/
+         0SNSQoIcK+vj+GrpRIllI9L4jtsan3nrlQwi8mHwvPTLx1sPHdv/4t0fc5sKaLD/XZ2s
+         9LPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=jbZi7aD7HF5d+cYrJ2gTsbZ+g97ak3Jgaq79GRl++zQ=;
-        b=owgVdrHbPGVYybeGYSu4tf4qqwr+IkFoMHh6QkUIuHtNkqvpBhaLEwUO0yuDhs2ZgQ
-         e2+4m42PYlzBDu6OfxluZ/AHU4iRc34XLhfG/bCxEFMl4I6Ry4b4fB/Ib5H98IDLz7OT
-         OWt+rDPp9oyeczTI4jVFab+EeV23yw+n+h/i8n/ooHTeiPJsQ8a4xr39vmOkzpZ2Jnwq
-         528TXGV7gPhCXmeaZoXgeAjWc1PIzUFDwa3+TM4Fxkl/N+ikmst3UIiZdk1vJXEhBYs1
-         cimj/EKxvYPJk4Tnt91yUrstvvqb7vonJXefagl/sxz4i/XbX4DCXoxHci9Q7SCuQ1Va
-         HGIQ==
-X-Gm-Message-State: AOAM533SJfL9PBv5CrQjXFgyjXC1kEIBzIPuToa8E2efm6okJ1iyYwbW
-        f3A58NWQW+5TYfO9neTrapWqKz21fF/nYWQiiOB9ZA==
-X-Google-Smtp-Source: ABdhPJzJK0McCFXYnWPs4hNAYlc6rqskS1kcny5wteDXCAegY/XjPtjP55SAJ2efbmDTeyfZJE1FVurfTl2wHNiqhcU=
-X-Received: by 2002:a05:6808:199c:b0:326:a498:b638 with SMTP id
- bj28-20020a056808199c00b00326a498b638mr2665422oib.186.1652278130080; Wed, 11
- May 2022 07:08:50 -0700 (PDT)
+        bh=RSGHn1F0BncOfTcKYhrKyIk0Nc9jRJLzLB3ecNcIZy4=;
+        b=KSO783f3A0KYRhHllnJFI2BLnbWA1U8qBavqFdzjceroQlZD/YCn/lGLIzNrPk810/
+         u7znrU+TZ838O5PZ3TstSGoC+b7zWulgRihztOYxMy55Y0hq727sxW95Kg1T/XwliM5Q
+         YC+gqZiGbJUrUqnXAlBOOzxrNNST3eBO5+FV9NoWoDivZktqe3SNeDbIxynQUcAJ868F
+         CxFyXHDTcbYCQZzJW1oTErc/FVHDqkfdDpPvh+xDwEGtAOunubPPUuPbNVaOqSowTXHR
+         syMu8I9Ob2apddKQNRQFpgRcsyeLVdqZkuZhMT/AZL5ES1moRYqOs7Heq8u/BxH6FrIQ
+         wCtg==
+X-Gm-Message-State: AOAM533pZCDuiOl/v/7edezZMBe5Ynxm1NVyDHJpNgB7wCnY6mwgcLgm
+        am4y80YH//4HORFiaAwUVuqGBFSP5cHE4ddIu/SYbw==
+X-Google-Smtp-Source: ABdhPJx0EgilpXqO9xhDBZma49ZiZYBQW1CYQalIbu7JvciYQUGx6pSOeqXv1MQtlngcxiEp7hb87+4QPXM1UtmgtzY=
+X-Received: by 2002:a05:600c:1d08:b0:394:54ee:c994 with SMTP id
+ l8-20020a05600c1d0800b0039454eec994mr5072481wms.137.1652278359083; Wed, 11
+ May 2022 07:12:39 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAJGDS+GM9Aw6Yvhv+F6wMGvrkz421kfq0j_PZa9F0AKyp5cEQA@mail.gmail.com>
- <YnGUazEgCJWgB6Yw@google.com> <CAJGDS+F0hB=0bj8spt9sophJyhdXTkYXK8LXUrt=7mov4s2JJA@mail.gmail.com>
- <CAJGDS+E5f2Xo68dsEkOfchZybU1uTSb=BgcTgQMLe0tW32m5xg@mail.gmail.com>
- <CALMp9eT3FeDa735Mo_9sZVPfovGQbcqXAygLnz61-acHV-L7+w@mail.gmail.com> <YnvBMnD6fuh+pAQ6@google.com>
-In-Reply-To: <YnvBMnD6fuh+pAQ6@google.com>
-From:   Arnabjyoti Kalita <akalita@cs.stonybrook.edu>
-Date:   Wed, 11 May 2022 19:38:38 +0530
-Message-ID: <CAJGDS+GMxG1gXMS1cW1+sS1V67h65iUpMGwQ=+-MVTE6DTOBjg@mail.gmail.com>
-Subject: Re: Causing VMEXITs when kprobes are hit in the guest VM
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
+References: <20220511120621.36956-1-guozhengkui@vivo.com>
+In-Reply-To: <20220511120621.36956-1-guozhengkui@vivo.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Wed, 11 May 2022 19:42:27 +0530
+Message-ID: <CAAhSdy3Ynx-8DgDEE6huye2nA_21CV6cN=keopaCJOK2b00k5g@mail.gmail.com>
+Subject: Re: [PATCH] selftests: kvm: replace ternary operator with min()
+To:     Guo Zhengkui <guozhengkui@vivo.com>
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:RISC-V ARCHITECTURE" <linux-riscv@lists.infradead.org>,
+        zhengkui_guo@outlook.com
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -64,70 +85,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Jim and Sean,
-
-Thank you for your answers.
-
-If I re-inject the #BP back into the guest, does it automatically take
-care of updating the RIP and continuing execution?
-
-I have seen that advancing RIP is unpredictable, works for some
-instructions, not for others, so ideally I wouldn't want to go that
-route.
-
-Regards,
-Arnabjyoti Kalita
-
-On Wed, May 11, 2022 at 7:29 PM Sean Christopherson <seanjc@google.com> wrote:
+On Wed, May 11, 2022 at 5:38 PM Guo Zhengkui <guozhengkui@vivo.com> wrote:
 >
-> On Wed, May 11, 2022, Jim Mattson wrote:
-> > On Fri, May 6, 2022 at 11:31 PM Arnabjyoti Kalita
-> > <akalita@cs.stonybrook.edu> wrote:
-> > >
-> > > Dear Sean and all,
-> > >
-> > > When a VMEXIT happens of type "KVM_EXIT_DEBUG" because a hardware
-> > > breakpoint was triggered when an instruction was about to be executed,
-> > > does the instruction where the breakpoint was placed actually execute
-> > > before the VMEXIT happens?
-> > >
-> > > I am attempting to record the occurrence of the debug exception in
-> > > userspace. I do not want to do anything extra with the debug
-> > > exception. I have modified the kernel code (handle_exception_nmi) to
-> > > do something like this -
-> > >
-> > > case BP_VECTOR:
-> > >     /*
-> > >      * Update instruction length as we may reinject #BP from
-> > >      * user space while in guest debugging mode. Reading it for
-> > >      * #DB as well causes no harm, it is not used in that case.
-> > >      */
-> > >       vmx->vcpu.arch.event_exit_inst_len = vmcs_read32(VM_EXIT_INSTRUCTION_LEN);
-> > >       kvm_run->exit_reason = KVM_EXIT_DEBUG;
-> > >       ......
-> > >       kvm_run->debug.arch.pc = vmcs_readl(GUEST_CS_BASE) + rip;
-> > >       kvm_run->debug.arch.exception = ex_no;
-> > >       kvm_rip_write(vcpu, rip + vmcs_read32(VM_EXIT_INSTRUCTION_LEN));
-> > >    <---Change : update RIP here
-> > >       break;
-> > >
-> > > This allows the guest to proceed after the hardware breakpoint
-> > > exception was triggered. However, the guest kernel keeps running into
-> > > page fault at arbitrary points in time. So, I'm not sure if I need to
-> > > handle something else too.
-> > >
-> > > I have modified the userspace code to not trigger any exception, it
-> > > just records the occurence of this VMEXIT and lets the guest continue.
-> > >
-> > > Is this the right approach?
-> >
-> > Probably not. I'm not sure how kprobes work, but the tracepoint hooks
-> > at function entry are multi-byte nopl instructions. The int3
-> > instruction that raises a #BP fault is only one byte. If you advance
-> > past that byte, you will try to execute the remaining bytes of the
-> > original nopl. You want to skip past the entire nopl.
+> Fix the following coccicheck warnings:
 >
-> And kprobes aren't the only thing that will generate #BP, e.g. the kernel uses
-> INT3 for patching, userspace debuggers in the guest can insert INT3, etc...  The
-> correct thing to do is to re-inject the #BP back into the guest without touching
-> RIP.
+> tools/testing/selftests/kvm/lib/s390x/ucall.c:25:15-17: WARNING
+> opportunity for min()
+> tools/testing/selftests/kvm/lib/x86_64/ucall.c:27:15-17: WARNING
+> opportunity for min()
+> tools/testing/selftests/kvm/lib/riscv/ucall.c:56:15-17: WARNING
+> opportunity for min()
+> tools/testing/selftests/kvm/lib/aarch64/ucall.c:82:15-17: WARNING
+> opportunity for min()
+> tools/testing/selftests/kvm/lib/aarch64/ucall.c:55:20-21: WARNING
+> opportunity for min()
+>
+> min() is defined in tools/include/linux/kernel.h.
+>
+> Signed-off-by: Guo Zhengkui <guozhengkui@vivo.com>
+
+For KVM RISC-V:
+Acked-by: Anup Patel <anup@brainfault.org>
+
+Thanks,
+Anup
+
+> ---
+>  tools/testing/selftests/kvm/lib/aarch64/ucall.c | 4 ++--
+>  tools/testing/selftests/kvm/lib/riscv/ucall.c   | 2 +-
+>  tools/testing/selftests/kvm/lib/s390x/ucall.c   | 2 +-
+>  tools/testing/selftests/kvm/lib/x86_64/ucall.c  | 2 +-
+>  4 files changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/ucall.c b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
+> index e0b0164e9af8..00be3ef195ca 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/ucall.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
+> @@ -52,7 +52,7 @@ void ucall_init(struct kvm_vm *vm, void *arg)
+>          * lower and won't match physical addresses.
+>          */
+>         bits = vm->va_bits - 1;
+> -       bits = vm->pa_bits < bits ? vm->pa_bits : bits;
+> +       bits = min(vm->pa_bits, bits);
+>         end = 1ul << bits;
+>         start = end * 5 / 8;
+>         step = end / 16;
+> @@ -79,7 +79,7 @@ void ucall(uint64_t cmd, int nargs, ...)
+>         va_list va;
+>         int i;
+>
+> -       nargs = nargs <= UCALL_MAX_ARGS ? nargs : UCALL_MAX_ARGS;
+> +       nargs = min(nargs, UCALL_MAX_ARGS);
+>
+>         va_start(va, nargs);
+>         for (i = 0; i < nargs; ++i)
+> diff --git a/tools/testing/selftests/kvm/lib/riscv/ucall.c b/tools/testing/selftests/kvm/lib/riscv/ucall.c
+> index 9e42d8248fa6..34f16fe70ce8 100644
+> --- a/tools/testing/selftests/kvm/lib/riscv/ucall.c
+> +++ b/tools/testing/selftests/kvm/lib/riscv/ucall.c
+> @@ -53,7 +53,7 @@ void ucall(uint64_t cmd, int nargs, ...)
+>         va_list va;
+>         int i;
+>
+> -       nargs = nargs <= UCALL_MAX_ARGS ? nargs : UCALL_MAX_ARGS;
+> +       nargs = min(nargs, UCALL_MAX_ARGS);
+>
+>         va_start(va, nargs);
+>         for (i = 0; i < nargs; ++i)
+> diff --git a/tools/testing/selftests/kvm/lib/s390x/ucall.c b/tools/testing/selftests/kvm/lib/s390x/ucall.c
+> index 9d3b0f15249a..665267c1135d 100644
+> --- a/tools/testing/selftests/kvm/lib/s390x/ucall.c
+> +++ b/tools/testing/selftests/kvm/lib/s390x/ucall.c
+> @@ -22,7 +22,7 @@ void ucall(uint64_t cmd, int nargs, ...)
+>         va_list va;
+>         int i;
+>
+> -       nargs = nargs <= UCALL_MAX_ARGS ? nargs : UCALL_MAX_ARGS;
+> +       nargs = min(nargs, UCALL_MAX_ARGS);
+>
+>         va_start(va, nargs);
+>         for (i = 0; i < nargs; ++i)
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/ucall.c b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
+> index a3489973e290..2ea31a0ebe30 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/ucall.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
+> @@ -24,7 +24,7 @@ void ucall(uint64_t cmd, int nargs, ...)
+>         va_list va;
+>         int i;
+>
+> -       nargs = nargs <= UCALL_MAX_ARGS ? nargs : UCALL_MAX_ARGS;
+> +       nargs = min(nargs, UCALL_MAX_ARGS);
+>
+>         va_start(va, nargs);
+>         for (i = 0; i < nargs; ++i)
+> --
+> 2.20.1
+>
