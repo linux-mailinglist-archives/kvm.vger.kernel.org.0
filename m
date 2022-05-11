@@ -2,67 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF14A5227D3
-	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 01:51:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41147522827
+	for <lists+kvm@lfdr.de>; Wed, 11 May 2022 02:08:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234903AbiEJXvY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 May 2022 19:51:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53924 "EHLO
+        id S239219AbiEKAIY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 May 2022 20:08:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238706AbiEJXvJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 May 2022 19:51:09 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7363037BE0
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 16:51:07 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id d17so304528plg.0
-        for <kvm@vger.kernel.org>; Tue, 10 May 2022 16:51:07 -0700 (PDT)
+        with ESMTP id S239159AbiEKAIW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 May 2022 20:08:22 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C853629821
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 17:08:21 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id h23-20020a17090adb9700b001dcce3bb2d4so2022104pjv.7
+        for <kvm@vger.kernel.org>; Tue, 10 May 2022 17:08:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=SDv9/M1BzA7VTMmYsFak6lTY7tudu1zj7RLfwJHZ20Q=;
-        b=OdISotBqCU3W7m19xnBLQg9gZlCsFFBJyrlefGBeCCCkWIzWnICkeo3PynTBBJIx0U
-         dHiSvu83sfthKeG1XsQcpB8GmIWu8A70Ss1ldtXvk9rCeGxBzaaAvoCAbAVA5h5GGYQm
-         ipjeio4ovfo0lK9aML+vlcXzsD2yJ80+M/GzmJpm5f7GIfI6azuTKSN6ROHgB0hxJxJj
-         d0eorAafB/MB4CoP8TW4nxMrxZh4nK/cMk9ybksYPflqgjQ5aZodJJuNGGMHvJTVwuuw
-         xXXqng9CpSHH4y3NVsHH1mGs14ZgGG5CeNpXRClfYjpFzUOPfLRdXCn6KmlpIYtOMGGN
-         qAJQ==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=dNbuTkyCU7vGFCoTsA664uRiY2J5liUoITH0qkWIFzA=;
+        b=UnseLFLzO9W0l5JlYK+1pZQ6JC+DosIx+0fntsgSeA0m3izeVHHQFC90U1vn8Jk/DQ
+         B1CsUwqVqGZB26akMlbFTPJiv40VFo8/7Yu+nx+k++gC1z/dfsdOWogC/LBsKml0Gs4a
+         eo7bS1PVA3oUB4f8Rg1KR+9xoN/I7+UVhR1chUV765VUhChynWt3VHWlw0r3R1coIf5p
+         mOwQiMF2ZcqdTYvdP/pNU2CKCnCVpiWWfjLucUJwCkAcebr6qKMZ7qnQCdiFfuxWFIMq
+         kZ89TKd8QzQ98UH+HWxLk9p1AiyRJtXF1iS5Yo0Y4GFDIfuPxXDX0ZvEPfoLO6G0dmYd
+         iDvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=SDv9/M1BzA7VTMmYsFak6lTY7tudu1zj7RLfwJHZ20Q=;
-        b=JY3oOaCAWdiAM8vg2b0heEOLnOMUARAe3ClDXE2Iwy5yQ96nXgoYWNEN8e5nRZD/Pq
-         uMIuf82seAUNd4OItxFGNIweWUkynsSikSr2pbdSlHoDOyJEdrwiE7dFRfXR5/2x8fHF
-         fsXTQAoQFa/FIKAWEvAU7uuV7Uh+1j4YEarZV1ahvPhGCNEnAc3lBw32s8jJW2u1RkI8
-         zbX0vbyUi48WrZpA4/zPc8rPBv3fRZRGkXGDI+YTv5uvR22uJkk2TnVrsVU+bh2cCs/6
-         5nqZ5tryp6r27WkqenfBL71++u2IiktPIfim+l7sCtlVl3O7pDmU5qP6wtSr4rG83QlB
-         rslw==
-X-Gm-Message-State: AOAM5301mesksZ3FJy4hapXjawvZAMZV5YWQADYc4gL3xsCPbYbP3pW/
-        0WEqu5eSduq4oGAQA1L23tk+cQ==
-X-Google-Smtp-Source: ABdhPJyPi2wtKKPIJpmLpb6G+aWIT4Vl+bTW8c+eiyIynAnb1Ix7wKcPg+tOXp5ni4pKtI3owYFMdQ==
-X-Received: by 2002:a17:902:b703:b0:15e:ea16:2c6e with SMTP id d3-20020a170902b70300b0015eea162c6emr22759979pls.100.1652226666848;
-        Tue, 10 May 2022 16:51:06 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id i64-20020a628743000000b0051008603b66sm101004pfe.219.2022.05.10.16.51.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 May 2022 16:51:06 -0700 (PDT)
-Date:   Tue, 10 May 2022 23:51:03 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
-Subject: Re: [PATCH v3 2/2] KVM: VMX: Print VM-instruction error as unsigned
-Message-ID: <Ynr6Z1G3efTmt3mr@google.com>
-References: <20220510224035.1792952-1-jmattson@google.com>
- <20220510224035.1792952-2-jmattson@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220510224035.1792952-2-jmattson@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=dNbuTkyCU7vGFCoTsA664uRiY2J5liUoITH0qkWIFzA=;
+        b=aUWhKBk2jynsFR5BkVa6Y84+LMpyyEompI6dz7RGOoW65g8h1J6fhsKgn/sbWL7Fps
+         IAXQDZhucKtnsfaFjYw1LkST27BE9kZIk62qoS0Qg93HWX3eEcC8T05EGp1KKWTrv4VE
+         ytN5r9jzqx7zX18QHbES1qegG1bhLqxCeObJBIJDLzkMq5hzfW/d5/9wqTLBzhzQhGta
+         bV5z+cHzOEZ6sNZ1Z9wFjyk66+nm3s2XvI2mIo2YN2VXg+8eP/rFl8Vdb/uHY0J6HwUx
+         xCjJzCABN2wem93PbNh5ZGm3JOr4z5aYZTMqwN4ocE6D1PJfpjHwaelWb2tfpvrz33DN
+         e0Zg==
+X-Gm-Message-State: AOAM533ABgS38fQ2TGBfXUchABWRW1aLqDOUQYsKeYO2l4JPRq1aCMrg
+        9xSA/ZBZOFFrT/JkrSJOgqtohIpN8dyah8b7
+X-Google-Smtp-Source: ABdhPJw3owLfgfZAtsGQO5jBYr1h8XAIQ4b1CvTrkLICgc6kV0PqhJkSCXusqz878VEn6FCZQ/2+GaJT1BOXVRec
+X-Received: from vannapurve2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:41f8])
+ (user=vannapurve job=sendgmr) by 2002:a17:90a:e510:b0:1d9:ee23:9fa1 with SMTP
+ id t16-20020a17090ae51000b001d9ee239fa1mr55515pjy.0.1652227700562; Tue, 10
+ May 2022 17:08:20 -0700 (PDT)
+Date:   Wed, 11 May 2022 00:08:02 +0000
+Message-Id: <20220511000811.384766-1-vannapurve@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.550.gb090851708-goog
+Subject: [RFC V2 PATCH 0/8] selftests: KVM: selftests for fd-based approach of
+ supporting private memory
+From:   Vishal Annapurve <vannapurve@google.com>
+To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, shauh@kernel.org, yang.zhong@intel.com,
+        drjones@redhat.com, ricarkol@google.com, aaronlewis@google.com,
+        wei.w.wang@intel.com, kirill.shutemov@linux.intel.com,
+        corbet@lwn.net, hughd@google.com, jlayton@kernel.org,
+        bfields@fieldses.org, akpm@linux-foundation.org,
+        chao.p.peng@linux.intel.com, yu.c.zhang@linux.intel.com,
+        jun.nakajima@intel.com, dave.hansen@intel.com,
+        michael.roth@amd.com, qperret@google.com, steven.price@arm.com,
+        ak@linux.intel.com, david@redhat.com, luto@kernel.org,
+        vbabka@suse.cz, marcorr@google.com, erdemaktas@google.com,
+        pgonda@google.com, nikunj@amd.com, seanjc@google.com,
+        diviness@google.com, Vishal Annapurve <vannapurve@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,13 +78,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 10, 2022, Jim Mattson wrote:
-> Change the printf format character from 'd' to 'u' for the
-> VM-instruction error in vmwrite_error().
-> 
-> Fixes: 6aa8b732ca01 ("[PATCH] kvm: userspace interface")
-> Reported-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> ---
+This v2 series implements selftests targeting the feature floated by Chao
+via:
+https://lore.kernel.org/linux-mm/20220310140911.50924-1-chao.p.peng@linux.intel.com/
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Below changes aim to test the fd based approach for guest private memory
+in context of normal (non-confidential) VMs executing on non-confidential
+platforms.
+
+priv_memfd_test.c file adds a suite of selftests to access private memory
+from the guest via private/shared accesses and checking if the contents
+can be leaked to/accessed by vmm via shared memory view.
+
+Updates in V2:
+1) Tests are added to exercise implicit/explicit memory conversion paths.
+2) Test is added to exercise UPM feature without double memory allocation.
+
+This series has dependency on following patches:
+1) V5 series patches from Chao mentioned above.
+2) https://github.com/vishals4gh/linux/commit/b9adedf777ad84af39042e9c19899600a4add68a
+  - Fixes host kernel crash with current implementation
+3) https://github.com/vishals4gh/linux/commit/0577e351ee36d52c1f6cdcb1b8de7aa6b5f760fe
+  - Confidential platforms along with the confidentiality aware software stack
+    support a notion of private/shared accesses from the confidential VMs.
+    Generally, a bit in the GPA conveys the shared/private-ness of the access.
+
+    Non-confidential platforms don't have a notion of private or shared accesses
+    from the guest VMs. To support this notion, KVM_HC_MAP_GPA_RANGE is modified
+    to allow marking an access from a VM within a GPA range as always shared or
+    private. There is an ongoing discussion about adding support for
+    software-only confidential VMs, which should replace this patch.
+4) https://github.com/vishals4gh/linux/commit/8d46aea9a7d72e4b1b998066ce0dde085fb963a7
+  - Temporary placeholder to be able to test memory conversion paths
+    till the memory conversion exit error code is finalized.
+5) https://github.com/vishals4gh/linux/commit/4c36706477c62d9416d635fa6ac4ef6484014dfc
+  - Fixes GFN calculation during memory conversion path.
+
+Github link for the patches posted as part of this series:
+https://github.com/vishals4gh/linux/commits/priv_memfd_selftests_rfc_v2
+
+Austin Diviness (1):
+  selftests: kvm: Add hugepage support to priv_memfd_test suite.
+
+Vishal Annapurve (7):
+  selftests: kvm: Fix inline assembly for hypercall
+  selftests: kvm: Add a basic selftest to test private memory
+  selftests: kvm: priv_memfd_test: Add support for memory conversion
+  selftests: kvm: priv_memfd_test: Add shared access test
+  selftests: kvm: Add implicit memory conversion tests
+  selftests: kvm: Add KVM_HC_MAP_GPA_RANGE hypercall test
+  selftests: kvm: priv_memfd: Add test avoiding double allocation
+
+ tools/testing/selftests/kvm/Makefile          |    1 +
+ .../selftests/kvm/lib/x86_64/processor.c      |    2 +-
+ tools/testing/selftests/kvm/priv_memfd_test.c | 1359 +++++++++++++++++
+ 3 files changed, 1361 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/kvm/priv_memfd_test.c
+
+-- 
+2.36.0.512.ge40c2bad7a-goog
+
