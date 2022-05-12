@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5692952540C
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 19:48:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58EA6525422
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 19:51:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357265AbiELRs2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 13:48:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42546 "EHLO
+        id S1357315AbiELRvX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 13:51:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357248AbiELRs1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 13:48:27 -0400
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A211773545
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:48:26 -0700 (PDT)
-Received: by mail-oi1-x232.google.com with SMTP id v65so7270403oig.10
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:48:26 -0700 (PDT)
+        with ESMTP id S1357329AbiELRvB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 13:51:01 -0400
+Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A98CC1AF3A
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:50:59 -0700 (PDT)
+Received: by mail-io1-xd30.google.com with SMTP id i20so6240415ion.0
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:50:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linuxfoundation.org; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Cf74R0Wz1/uilLfLOdYpCYhNdODuzdJOYPzmmj2JrkQ=;
-        b=BomaR2ZB3It89qJzF/He6WjK6nzpMOXZbPnnKGIPFtclbTuI5Geun6Ys29DJd8oC7A
-         zFwMvbCb7UapaQRDnTNyYJx0Bht3w9fFxXs9CNDU4w+Z5Yaw8iRhHYxkKo6Of2gmaNUn
-         SfFKXx+q+g2q6wlMpqgLG2j3rDPCFkU0xdugk=
+        bh=dY1IAHPX3orLKxhoM3AAhhrVw5eY9f1RMzZRsDjtfNY=;
+        b=ErRS5OUJQ/C/vnqdC79lB42yI67+v0Xc6J+TbM9l4ENEPLivTv7C3YS/w2wHJoXiU5
+         cUrI1o4sOMTFAsTuIOt5xh4X5UUXgfMTZ/HE9zDF9wUzYKeaTrYWJnP+6KTJjrejByv0
+         Fcc1vAwixzCr6CkZ17cn5DjgUbZQTNp5NbJFc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Cf74R0Wz1/uilLfLOdYpCYhNdODuzdJOYPzmmj2JrkQ=;
-        b=Eotwb/gRLpN6mncJocuGNWFXS2iDheU6naT28//xgDWnEuGu2tR9g+2tXWA+8dWfPY
-         3/+5mCXMnCk3HeSygXOApRUijHzNoarYgmdAq9RbmQP//1xaom+lsrCmUy21LMzo3aP0
-         ThdxuVdfAYu8y2rh7ZrfETy1LSBC48QaH3DflDZeI6eQ99Qjby1c74tJ5DaqVAJNwLhw
-         JBKk4vpOziz56kldheWjdR6Q6VjJi/SvVlCZzYvLMDKEUvHoWA/TmzPkS7y4geAus44W
-         6DUyu7LRC5duSzdY+TO+D0AnklHkPJGl4aulSUihrgmm8Dle4fEXJRQDJSrlC1+si1Sx
-         8xcg==
-X-Gm-Message-State: AOAM53391mUoYRjo+wRe+7gU+3vTnj5/nFGlEMcz0mPUKlGW8ZGwJ/FH
-        cyCmPBHP7lSWw4KmNJSRc7ybTA==
-X-Google-Smtp-Source: ABdhPJzihOYlXGwyw98+yvXr9su5BZdWeXWub3QGrmwoxYV3oIEofuRBckm809RDKkXYO9zEgp7kOg==
-X-Received: by 2002:a05:6808:16a1:b0:2f9:bfea:e5f3 with SMTP id bb33-20020a05680816a100b002f9bfeae5f3mr564892oib.28.1652377705871;
-        Thu, 12 May 2022 10:48:25 -0700 (PDT)
+        bh=dY1IAHPX3orLKxhoM3AAhhrVw5eY9f1RMzZRsDjtfNY=;
+        b=DY2Ev1z5rVrolQijXKiIUkE40eZN85bIQom9NtlJAbPgJXWcNQim9EXIj9A+utDkcT
+         J5ikBCqSnGKGjf3Px5QIa4FLB+gAgRs/4wilNrFu7RM+qFX25eBTOeEzB28tcBFpWU5+
+         cDPnv4A81le/rRS1W+mBqEnQW5aq+w8cs429M/nKEQ1yrARynY+c7sFxgSeVLIVG77UA
+         n8VnaaukxjznTaJQURo4fG42wF91UOUSnvVyXLDlRNcIOT85Rr2+IUVvw5VfdMAmtbQU
+         tFkRGqNK/t5bKPNX/w5Cn5hYQWqYf9HsIf4fNV1yyl12BWXeoTTsrDQjUQ2Xg1KFlGAW
+         RRxg==
+X-Gm-Message-State: AOAM533MaZSKO8gwLkbfak0/lcahKT4btdeB48z5DzWh1g9GqTnDz3RG
+        oxhh1t16Rz/xYdIyvcN4x5EXyQ==
+X-Google-Smtp-Source: ABdhPJwEoXRvKQIN8vE2739qPEYGWAEmkTG5rQoLxtgYV8mD8Q1+9IvS2Cc/+n2TVfVyCI58o8abIw==
+X-Received: by 2002:a05:6602:54:b0:65b:15c3:5bb7 with SMTP id z20-20020a056602005400b0065b15c35bb7mr550921ioz.135.1652377858326;
+        Thu, 12 May 2022 10:50:58 -0700 (PDT)
 Received: from [192.168.1.128] ([38.15.45.1])
-        by smtp.gmail.com with ESMTPSA id s124-20020aca5e82000000b00325cda1ffb8sm148096oib.55.2022.05.12.10.48.23
+        by smtp.gmail.com with ESMTPSA id b1-20020a02c981000000b0032b66cb59bfsm31276jap.179.2022.05.12.10.50.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 May 2022 10:48:25 -0700 (PDT)
-Subject: Re: [RFC V2 PATCH 5/8] selftests: kvm: Add implicit memory conversion
- tests
+        Thu, 12 May 2022 10:50:57 -0700 (PDT)
+Subject: Re: [RFC V2 PATCH 6/8] selftests: kvm: Add KVM_HC_MAP_GPA_RANGE
+ hypercall test
 To:     Vishal Annapurve <vannapurve@google.com>, x86@kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-kselftest@vger.kernel.org
@@ -66,14 +66,14 @@ Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
         pgonda@google.com, nikunj@amd.com, seanjc@google.com,
         diviness@google.com, Shuah Khan <skhan@linuxfoundation.org>
 References: <20220511000811.384766-1-vannapurve@google.com>
- <20220511000811.384766-6-vannapurve@google.com>
+ <20220511000811.384766-7-vannapurve@google.com>
 From:   Shuah Khan <skhan@linuxfoundation.org>
-Message-ID: <a68283e4-f3a5-077c-95a9-c3a8f0ea3b60@linuxfoundation.org>
-Date:   Thu, 12 May 2022 11:48:23 -0600
+Message-ID: <81c56e24-af33-bbc5-662e-2478699dcc81@linuxfoundation.org>
+Date:   Thu, 12 May 2022 11:50:56 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <20220511000811.384766-6-vannapurve@google.com>
+In-Reply-To: <20220511000811.384766-7-vannapurve@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -88,12 +88,13 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 5/10/22 6:08 PM, Vishal Annapurve wrote:
-> Add tests to exercise implicit memory conversion path.
+> Add test to exercise explicit memory conversion path using
+> KVM_HC_MAP_GPA_RANGE hypercall.
 > 
 
-Too cryptic. Add more information on what kind of tests it runs
-and inlcude test example test output with how to run examples.
-   
+Add details on what this test does and sample output. patch 7/8
+in this series is a good example of what I am looking for.
+
 > Signed-off-by: Vishal Annapurve <vannapurve@google.com>
 > ---
 
@@ -102,4 +103,3 @@ patches in this series.
 
 thanks,
 -- Shuah
-
