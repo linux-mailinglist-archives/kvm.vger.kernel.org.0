@@ -2,163 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F0DAC524F87
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 16:11:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C9F6524FCC
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 16:18:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355064AbiELOLt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 10:11:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53470 "EHLO
+        id S1355175AbiELOSi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 10:18:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355060AbiELOLr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 10:11:47 -0400
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4929A62113;
-        Thu, 12 May 2022 07:11:46 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id g6so10550838ejw.1;
-        Thu, 12 May 2022 07:11:46 -0700 (PDT)
+        with ESMTP id S1355181AbiELOSg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 10:18:36 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECFDD8D6A2
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 07:18:34 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id x18so5006186plg.6
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 07:18:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=vDfWle9etWMCmQNVGzMruoXlBGLrPBNQ0jQnmtdNAT4=;
-        b=lbH/a60vTfH0YMoCYxaNMx4khmhaEAiJpnijLbVIse7l464HPTBpnDgXMA3JP0r5Zt
-         wosR3ndq5qim2RZCTPu15TxZ5hOjBgq2gI+dbLdqRNPJFrNBbNDZ1GDDkXaJZC8ZkFyg
-         h085ul/kM5bnupa0Vp1/NjiqfAykEL8jTgvW1M2lep43rtLzaH+edEFfPes6jgt1rzhb
-         /JIbNkYBko57rbX8wxKrIjTF8NLorE6v8/iwHl1/1fFP/LmB33ed7DIedW1PHl60rXvm
-         M07TS+SjmrfIWG7Qpcxb+Hsbko/YzMQs3XMGN53QPKWe1IFwIj6OnjZOsXq1cAocONFN
-         S46A==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=EJCIgLlmlrEBfCKZGVMMjM7XE4hdH7cPIpVtr4puXbg=;
+        b=sqGrRKuvRsGAT9Rvn7s3ecBx0cKJzFT9HRKTHjDSNkBKrH1SCsytVym5adDqxG4sFX
+         EN7HgnWHrznI/Ozg3Bad4LKo99IXblGh8CPUNipHWL4II4TUMScLxYkJ7L3LxXSQZVDi
+         8+eo6lZTNL+9jEazz5mjHxjqfre/rBsSSoct2aXc2jKbir0L1kH0epOiVPONQqf+XGkf
+         6b/FIa5fJs7kbhl82w0oxEcREJCq+uzH4YWT9Sgv41b6nMEV0OCxlknML6OKACriWfAr
+         A05EnBaFxZni+961eBEWEePSwwke4lgomSmL+UFtgg1EnoHUpzFJBLq1Y13g+YkFlV/u
+         Is2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=vDfWle9etWMCmQNVGzMruoXlBGLrPBNQ0jQnmtdNAT4=;
-        b=EPf3Z0NG7KrGIprZkKT9Lf4gE7z5RIpJjJ4Gstyz7WjNNerlVGJYi5APUNhb95kHoc
-         /FxY1Jb0EMFct3ihj6bM9HzL0/oj57Q1wDgJTh8aEk72CEa9K14egzVllsme6bmUgMTG
-         eQ39TG1RUU04k1COM44obYv1Qx9GYeFDqK3AQNH3vhg+v89+iReayakGXcHLH9KkQlka
-         sGC810qYrdyJrV8CcIavNSTIS2A3OHjnOAYDW41KakYUkXPwpGXzq5fvWIAaoOTZfaL4
-         ur/2zO1945Bx3Jds3mFn2SdfujPHWPXQ4o/3mil2GGWt8HqlhycsgbeuNW3DxS4N3pKt
-         56cQ==
-X-Gm-Message-State: AOAM531I2Y07T2UTbdZoVexOxBziUI7LG0qyVOcyJDMEEU1GMArMYY5s
-        4WJWOnBabehAxiiz8CAE+DI=
-X-Google-Smtp-Source: ABdhPJy4SV46Fw946eFm0yov5HwLW2Bb91us5NM7wZC9tAYmquJgB+/RwuH491Qkvgkl0aY1W35C5Q==
-X-Received: by 2002:a17:906:1b1b:b0:6f3:9044:5fb4 with SMTP id o27-20020a1709061b1b00b006f390445fb4mr50087ejg.763.1652364704686;
-        Thu, 12 May 2022 07:11:44 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id y18-20020aa7ccd2000000b0042617ba6394sm2565060edt.30.2022.05.12.07.11.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 May 2022 07:11:44 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <c21a5891-06fa-1d0b-360f-54b8711fd23b@redhat.com>
-Date:   Thu, 12 May 2022 16:11:40 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=EJCIgLlmlrEBfCKZGVMMjM7XE4hdH7cPIpVtr4puXbg=;
+        b=m04DMyj9xhm/CewOIGmwltHmV6HcY203xTW0mp82ckjrLg8RDerqYv5gJ6JtTV4pRt
+         0daT91XyaV6bPE9NhkjAkGSzMOzMFOdU6nkVMqsOdAvqDp/tc8cryv8ShUe5l6wKeVOP
+         QbKFMuUXbwaYdLAftO6CSzTN0x6bL5nNWOxM7VLii1hDR4pRQ/+HkzTgiuONWdrj0XOR
+         0U0AcgDyvqNHecVz1ItLZD/fYT09X2O7G1VokMFfNCHtn6bkHE0ue2uUcWa2B1vCMiaX
+         3zHpHrzoPkMz9ARVUHq4c8NQFr4okElhkSGreZI5P99e8zDAznI8fRJUJwZV6cou2BGI
+         MfZA==
+X-Gm-Message-State: AOAM533miK3sQZkL3kxKkc1pVqpqrF/5ui3Hum7slpvFAYuKZ11IE7NY
+        Y8rxdoAKwZ+0NgRQBiZEGsB2JQ==
+X-Google-Smtp-Source: ABdhPJylEBGBm3thCxu5K66iXnEOJwEUQ8EAE3QfRKkImsymqDHIZiGiux8MWND7ylRxta3E27DKxQ==
+X-Received: by 2002:a17:903:182:b0:15e:8de0:2859 with SMTP id z2-20020a170903018200b0015e8de02859mr201551plg.124.1652365114298;
+        Thu, 12 May 2022 07:18:34 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id t67-20020a628146000000b0050dc762814asm3903647pfd.36.2022.05.12.07.18.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 May 2022 07:18:33 -0700 (PDT)
+Date:   Thu, 12 May 2022 14:18:30 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 16/22] KVM: x86/mmu: remove redundant bits from extended
+ role
+Message-ID: <Yn0XNnqnbstGSiEl@google.com>
+References: <20220414074000.31438-1-pbonzini@redhat.com>
+ <20220414074000.31438-17-pbonzini@redhat.com>
+ <Ynmv2X5eLz2OQDMB@google.com>
+ <e1fc28b6-996f-a436-2664-d6b044d07c82@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v3] KVM: x86/mmu: Update number of zapped pages even if
- page list is stable
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>
-References: <20220511145122.3133334-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220511145122.3133334-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e1fc28b6-996f-a436-2664-d6b044d07c82@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/11/22 16:51, Sean Christopherson wrote:
-> When zapping obsolete pages, update the running count of zapped pages
-> regardless of whether or not the list has become unstable due to zapping
-> a shadow page with its own child shadow pages.  If the VM is backed by
-> mostly 4kb pages, KVM can zap an absurd number of SPTEs without bumping
-> the batch count and thus without yielding.  In the worst case scenario,
-> this can cause a soft lokcup.
+On Thu, May 12, 2022, Paolo Bonzini wrote:
+> On 5/10/22 02:20, Sean Christopherson wrote:
+> > --
+> > From: Sean Christopherson<seanjc@google.com>
+> > Date: Mon, 9 May 2022 17:13:39 -0700
+> > Subject: [PATCH] KVM: x86/mmu: Return true from is_cr4_pae() iff CR0.PG is set
+> > 
+> > Condition is_cr4_pae() on is_cr0_pg() in addition to the !4-byte gPTE
+> > check.  From the MMU's perspective, PAE is disabling if paging is
+> > disabled.  The current code works because all callers check is_cr0_pg()
+> > before invoking is_cr4_pae(), but relying on callers to maintain that
+> > behavior is unnecessarily risky.
+> > 
+> > Fixes: faf729621c96 ("KVM: x86/mmu: remove redundant bits from extended role")
+> > Signed-off-by: Sean Christopherson<seanjc@google.com>
+> > ---
+> >   arch/x86/kvm/mmu/mmu.c | 2 +-
+> >   1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 909372762363..d1c20170a553 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -240,7 +240,7 @@ static inline bool is_cr0_pg(struct kvm_mmu *mmu)
+> > 
+> >   static inline bool is_cr4_pae(struct kvm_mmu *mmu)
+> >   {
+> > -        return !mmu->cpu_role.base.has_4_byte_gpte;
+> > +        return is_cr0_pg(mmu) && !mmu->cpu_role.base.has_4_byte_gpte;
+> >   }
+> > 
+> >   static struct kvm_mmu_role_regs vcpu_to_role_regs(struct kvm_vcpu *vcpu)
 > 
->   watchdog: BUG: soft lockup - CPU#12 stuck for 22s! [dirty_log_perf_:13020]
->     RIP: 0010:workingset_activation+0x19/0x130
->     mark_page_accessed+0x266/0x2e0
->     kvm_set_pfn_accessed+0x31/0x40
->     mmu_spte_clear_track_bits+0x136/0x1c0
->     drop_spte+0x1a/0xc0
->     mmu_page_zap_pte+0xef/0x120
->     __kvm_mmu_prepare_zap_page+0x205/0x5e0
->     kvm_mmu_zap_all_fast+0xd7/0x190
->     kvm_mmu_invalidate_zap_pages_in_memslot+0xe/0x10
->     kvm_page_track_flush_slot+0x5c/0x80
->     kvm_arch_flush_shadow_memslot+0xe/0x10
->     kvm_set_memslot+0x1a8/0x5d0
->     __kvm_set_memory_region+0x337/0x590
->     kvm_vm_ioctl+0xb08/0x1040
+> Hmm, thinking more about it this is not needed for two kind of opposite
+> reasons:
 > 
-> Fixes: fbb158cb88b6 ("KVM: x86/mmu: Revert "Revert "KVM: MMU: zap pages in batch""")
-> Reported-by: David Matlack <dmatlack@google.com>
-> Reviewed-by: Ben Gardon <bgardon@google.com>
-> Reviewed-by: David Matlack <dmatlack@google.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
+> * if is_cr4_pae() really were to represent the raw CR4.PAE value, this is
+> incorrect and it should be up to the callers to check is_cr0_pg()
 > 
-> v3:
->   - Collect David's review.
->   - "Rebase".  The v2 patch still applies cleanly, but Paolo apparently has
->     a filter configured to ignore all emails related to the v2 submission.
+> * if is_cr4_pae() instead represents 8-byte page table entries, then it does
+> even before this patch, because of the following logic in
+> kvm_calc_cpu_role():
 > 
-> v2:
->   - https://lore.kernel.org/all/20211129235233.1277558-1-seanjc@google.com
->   - Rebase to kvm/master, commit 30d7c5d60a88 ("KVM: SEV: expose...")
->   - Collect Ben's review, modulo bad splat.
->   - Copy+paste the correct splat and symptom. [David].
+>         if (!____is_cr0_pg(regs)) {
+>                 role.base.direct = 1;
+>                 return role;
+>         }
+> 	...
+>         role.base.has_4_byte_gpte = !____is_cr4_pae(regs);
 > 
->   arch/x86/kvm/mmu/mmu.c | 10 ++++++----
->   1 file changed, 6 insertions(+), 4 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 909372762363..7429ae1784af 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -5665,6 +5665,7 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
->   {
->   	struct kvm_mmu_page *sp, *node;
->   	int nr_zapped, batch = 0;
-> +	bool unstable;
->   
->   restart:
->   	list_for_each_entry_safe_reverse(sp, node,
-> @@ -5696,11 +5697,12 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
->   			goto restart;
->   		}
->   
-> -		if (__kvm_mmu_prepare_zap_page(kvm, sp,
-> -				&kvm->arch.zapped_obsolete_pages, &nr_zapped)) {
-> -			batch += nr_zapped;
-> +		unstable = __kvm_mmu_prepare_zap_page(kvm, sp,
-> +				&kvm->arch.zapped_obsolete_pages, &nr_zapped);
-> +		batch += nr_zapped;
-> +
-> +		if (unstable)
->   			goto restart;
-> -		}
->   	}
->   
->   	/*
-> 
-> base-commit: 2764011106d0436cb44702cfb0981339d68c3509
+> So whatever meaning we give to is_cr4_pae(), there is no need for the
+> adjustment.
 
-Queued, thanks.
-
-Paolo
+I disagree, because is_cr4_pae() doesn't represent either of those things.  It
+represents the effective (not raw) CR4.PAE from the MMU's perspective.  If you
+want it to represent 8-byte gPTEs, that's fine, but then please name the helper
+accordingly, because is_cr4_pae() is flat out wrong if CR0.PG=0 && CR4.PAE=0.
