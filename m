@@ -2,227 +2,255 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67982525441
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 19:58:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCA03525440
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 19:57:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357388AbiELR6J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 13:58:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52876 "EHLO
+        id S1357265AbiELR5j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 13:57:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357380AbiELR6G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 13:58:06 -0400
-Received: from mx0b-002c1b01.pphosted.com (mx0b-002c1b01.pphosted.com [148.163.155.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0442313325A;
-        Thu, 12 May 2022 10:58:05 -0700 (PDT)
-Received: from pps.filterd (m0127842.ppops.net [127.0.0.1])
-        by mx0b-002c1b01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24CF4tSv023467;
-        Thu, 12 May 2022 10:56:59 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version;
- s=proofpoint20171006; bh=am1n7mgaQ/nNaMTn6t1yergl2WoJEq+FrHs4kMTPK5E=;
- b=w6oiIjyw63yeeeyeJNOJHRiWqqgsLBbOpPiy3Ah1O7Ykt27n7OHoISYj2NixtFxGa5+h
- n4fJGQBMs0yBdU+J0C92wLOIvY6j6uvuw/FdBViE+DAn8m3XuUfx2IpInpFVZ3aEJSrC
- 8Ku6Adgqm8iHpZ6Q7NNwEvRsW+B1c/XCvKyEFl74+S4+agMe+FX8KBspkffe0Yx7NTkt
- 2IGqwOIgWqn7LljLiS/TTPwoyr8Faew+pza7AVBCTFXreVQtjqv7fhxleLZifeZIaKkx
- roni2VuYFEZcKKyPYu4dhAqGj7iMST76k/763gxbEpFOlL4/iqcMRbcvvb368bHew7Xv 2w== 
-Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2107.outbound.protection.outlook.com [104.47.58.107])
-        by mx0b-002c1b01.pphosted.com (PPS) with ESMTPS id 3fwr3fujay-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 May 2022 10:56:59 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iEi2u4BcWAY3u/Wup4xWii6cQ8NddtMnkiWbSxKqs2VUr4oHzoN02rOIEKmQO21IrpmMNKk3vk35pzLliTr1Kn7Oqj8s7LmyqUOgdRPckjRtew5UL1tqe5D5aPyYYhocmozjz+lSMSrEVQNgtAGDTH9es0zznDlEWWdDkh/ygbJ3ZYc9B9+76KJH2aiSjZxNBrZLUS0gAhKj+WCCvpk9w0ipQL2RuuQfL3Dl4GfdLoPO/H7Z69l1lWdoJSNlPrAs2mUhwWD4sOailZEoBz4PxeNpvO+v4xi+QMV0bXpP+sYyEGeFlzDlBTHzyQtwAMdQL5xyKaAKMlnBAzSMI2EC3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=am1n7mgaQ/nNaMTn6t1yergl2WoJEq+FrHs4kMTPK5E=;
- b=hpaHlMHqpCUTjPymTrzKbwl3IHd3B1yPwEKtt6Ndm6C9p817Tpxxc64s+y1b3hx0vPN3URQQltgGgWtkwCfkGGJG2ILBKowilfJmKSyltIx9jM00aS9/CSonVYwHi7fYs6sb3YPuEFpQQSjdJstaY6FDewLMGH6tymjb5hUqDG69YRfzc3YmcKgc0uipZOmnCHq8IhDnnWZnGGZWZPcmwCkM4ln9u9j38nng10VNWAllaAd9QsQyh+VAByMooggEDWFrxQe6U0b2wW0xKjWn3LtTj2x0gwhVBe+Q7d+zMVWo/7kJtXOK+DDvv4+tM8sYBngtfljYr73cJgtRwRQmyw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from BL0PR02MB4579.namprd02.prod.outlook.com (2603:10b6:208:4b::10)
- by SA2PR02MB7577.namprd02.prod.outlook.com (2603:10b6:806:134::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5227.23; Thu, 12 May
- 2022 17:56:57 +0000
-Received: from BL0PR02MB4579.namprd02.prod.outlook.com
- ([fe80::fd14:ff80:d4d9:c81f]) by BL0PR02MB4579.namprd02.prod.outlook.com
- ([fe80::fd14:ff80:d4d9:c81f%5]) with mapi id 15.20.5227.023; Thu, 12 May 2022
- 17:56:56 +0000
-From:   Jon Kohler <jon@nutanix.com>
-To:     Borislav Petkov <bp@alien8.de>
-CC:     Sean Christopherson <seanjc@google.com>,
-        Jon Kohler <jon@nutanix.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S1357066AbiELR5h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 13:57:37 -0400
+Received: from mail-vk1-xa2d.google.com (mail-vk1-xa2d.google.com [IPv6:2607:f8b0:4864:20::a2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAB1CC5E51
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:57:36 -0700 (PDT)
+Received: by mail-vk1-xa2d.google.com with SMTP id e144so3057973vke.9
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:57:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=tJtXcuM3V9enKbs0nCaiFIJtH7Y2DfmKCe9XfC0hyFE=;
+        b=YAOAWptAh0bkbtmnNRA1UH3C57/gBrHU3l3D3iqYy4/HNuwDRRN6wf6crvIgDD598S
+         +61X466pM5bWqKiV5Tf4zsc0LYwKuUXjVddvIssCDGYjAUWdPiY2A8wqsTK5Hv5aH1bN
+         9DeFnpy2O7N5K8JqcJXgC73uHNLnlMnfsowa52KzBnnJ9H2eP2lrSVZD1nJ5XGxbzuTD
+         r7Uft8TkQvIukP8PUeI75G4H1ge3lqM57YfvxTVjhp+eDBsCWACZjbqUu6k4LnU52i1x
+         Cgi0s995IKEmGNn6QraMedSAEWMf5qHwumZR/h6T27t3/ThO0WOPWzDi61Qc9WLJb/GK
+         QLXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=tJtXcuM3V9enKbs0nCaiFIJtH7Y2DfmKCe9XfC0hyFE=;
+        b=CmW3PNtFOHj92691ls0mZ0QNYNid1tDUZhPOIKxfO1tQE5uJa5x9KqIBr9PetHjrpV
+         wNCh4iuaWba61mqFaByiZUTWTP4+dpjDpfYjLIIpQJ1R8JLb2IfWjjDJPmx1vCscG/1U
+         6GBWTy+w7Vn4R2FI6QupfKPJCIUiNw3LmVCkCcik7r18rKi4FZ6+B/eCCo2jSKVHAMAw
+         ZMUD+AFDVJLQ2K50OsYXJuQZ1rH3Ev6y8GAgJ3UE5MbnVJpX7d3nQoQwisl4UUavLQ2N
+         OC5mHJGBNhymkEXFtAIwEyiua8gUDeb5kzB/5yUXwzjhQNPU7xpn74SW1d47ScEBZ+fp
+         7OOw==
+X-Gm-Message-State: AOAM530gMLpMqRMVjtz5XsThugbvIZr6x3zzty8E9rWoFPfMN5D3uyxs
+        LM8si9moBx+CLSduWatabuk97GdEsh/QVov27QPgVA==
+X-Google-Smtp-Source: ABdhPJzZo8j5Wr79OB9mvq3+/k46mqbTy9urd0DfILR0Wk0c23nubwdm4eLvnFphVpssrOjjTMGJBNgIhc4+OrpieXE=
+X-Received: by 2002:a1f:3451:0:b0:352:8b1f:5d11 with SMTP id
+ b78-20020a1f3451000000b003528b1f5d11mr740692vka.20.1652378255627; Thu, 12 May
+ 2022 10:57:35 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220412223134.1736547-1-juew@google.com> <20220412223134.1736547-2-juew@google.com>
+ <Ynv0h9r8F+oRQ76y@google.com>
+In-Reply-To: <Ynv0h9r8F+oRQ76y@google.com>
+From:   Jue Wang <juew@google.com>
+Date:   Thu, 12 May 2022 10:57:24 -0700
+Message-ID: <CAPcxDJ6nmj3_5ugjONDz85byY6PmcQ03CtCn+4fWAh_f9A9vOQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] KVM: x86: Clean up KVM APIC LVT logic.
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Balbir Singh <sblbir@amazon.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Waiman Long <longman@redhat.com>
-Subject: Re: [PATCH v3] x86/speculation, KVM: only IBPB for
- switch_mm_always_ibpb on vCPU load
-Thread-Topic: [PATCH v3] x86/speculation, KVM: only IBPB for
- switch_mm_always_ibpb on vCPU load
-Thread-Index: AQHYVmUALWKOwI7bhUetXwvEOXsG/a0HKBwAgAAI9ICAACHkgIAAD+oAgAAIS4CAABD0AIAABkcAgAARGQCAAK85AIAAU8oAgAAV5oCAD5/VAIAABTSAgAANIYCAAwF4gIAARoQA
-Date:   Thu, 12 May 2022 17:56:56 +0000
-Message-ID: <0E8D003F-BA2A-4310-91FF-677D26105E6A@nutanix.com>
-References: <YmxRnwSUBIkOIjLA@zn.tnic> <Ymxf2Jnmz5y4CHFN@google.com>
- <YmxlHBsxcIy8uYaB@zn.tnic> <YmxzdAbzJkvjXSAU@google.com>
- <Ym0GcKhPZxkcMCYp@zn.tnic> <4E46337F-79CB-4ADA-B8C0-009E7500EDF8@nutanix.com>
- <Ym1fGZIs6K7T6h3n@zn.tnic> <Ynp6ZoQUwtlWPI0Z@google.com>
- <520D7CBE-55FA-4EB9-BC41-9E8D695334D1@nutanix.com>
- <YnqJx/5hos0lKqI9@google.com> <Yn0PQe48qczUMZoL@zn.tnic>
-In-Reply-To: <Yn0PQe48qczUMZoL@zn.tnic>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: Apple Mail (2.3693.40.0.1.81)
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b8d2a4b2-5e2e-4c43-59a3-08da3440ce3d
-x-ms-traffictypediagnostic: SA2PR02MB7577:EE_
-x-microsoft-antispam-prvs: <SA2PR02MB75774703F29B88278969CA06AFCB9@SA2PR02MB7577.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: KGe5589p/E+/2S7LW1Zek4xlSC+Q0yUP3BLRj3wh/MFzB4Jap05knuRgmxVXWVsjrNRKAVhR0rhRI08LUG4IQtiNrhzn/H1IYCgnNNijo86UbQ/9PwtA2IpZVTwBw7DYw0QGd9wY/E8eNCIxCGFxd++9HbqgFPKaaqfJzJEN1Pvax+WlWv6x++0wDZzHb7WOCediTfjZz3XW8yCAkkeI+12EpHQiL4sR4FlehiZRJ917W7lXs+Jh1Ao8ECS9HjKaNAuNAEy4eA18qCOGFMaHBr0QjEwGfnvYjb/YIvq1IOPdXwC18L73EEe9N6ouvZA0VGWrvYcEagtxNyUxlApH+ods0fa+u2ZePasqsbypZ8yVAm4I7E4vvI/EfYKFpCmWNVxL0JurAfAwukxRVF6hZnfpGxmbXc7Jt3s1PU+7k4sgqf47p/3LvEtQ834X/Pg2fPqgsgxyr7DqxQ8Z4rtx3SuuBfV4saot+x4FTs+uDFpcpIiaJ/RMwB8zmPKfQr1Zcmf5EOO4LhiRc0HrmlEIJ/h0UxBczUXKu0wBWmEMCQegTyq1+q9NxksDBRofeN5UOiiw3UKvtut7fTe5Pm2DKgHNRLM2TrNZq/Ka7PPk1gThBmUE0QtadmlP8FWNKicp46gq6bamJE2LJaXBtZlAgVntv3Jx4I6JRiXrwGixmnFChr++2gq5upn2OFjjAbJyDIoJIqlHdPWv+mMyr5dHN5VgqLBdt1Gtm3Ph0cEGas+6XsttZmIq3wMii/elkZOnZ6RFv4tQsc5vUxEsJ1hwR67S8COFxcNUdA++krFfuQwH29jsr1bQEA7fDbOG4j5G5Py4AqB1FAK9TI8xJ1S1jw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR02MB4579.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(66446008)(8676002)(91956017)(36756003)(8936002)(316002)(66946007)(76116006)(4326008)(66556008)(64756008)(33656002)(66476007)(6486002)(966005)(6916009)(71200400001)(54906003)(6506007)(5660300002)(7416002)(508600001)(2906002)(38100700002)(38070700005)(86362001)(122000001)(53546011)(2616005)(186003)(83380400001)(6512007)(45980500001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 2
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZGlDVW1HMzBIUTVxZEpIbXZpNTFBTzVYVk4yZzNIWmNVSlAveUExeXBpSzdP?=
- =?utf-8?B?RC9JazBBN1l2bEZuZjVpOVFmMkpKSi9KVWV4RGpsNHBPRHhNZy9aQmZKRm92?=
- =?utf-8?B?NXowYXhUYURKYUJEZWtwdkswOW5ZNGQwVGkyb1hwQTJRNjBNMS9uaE5HTWsw?=
- =?utf-8?B?dXRYUHgwTFVtMXc0NUJkZlRCSjB3U3hPWkQ3cXcvV1Vuait0dUhFeW1PZnZa?=
- =?utf-8?B?SURFUTArZDVsWXIrbG53bVlZYWNTODJhNU5oL3VQUk8xeHprazBJRXdhM2xK?=
- =?utf-8?B?S1cwd2lzTTQ0ZDJGaTJHWHVRc1RISXlYc3JkK3FjeU90Z05xVUNxSE1XM1hX?=
- =?utf-8?B?ZTN1Mmw5YWNiUGVIaEw5QjZRaDlZMW1ja2h2OGdHa29nVGxhWThRVEVCL0Jy?=
- =?utf-8?B?MGFUQ1lWQUFvTGJkZGlNd2ZCWGtaaHJHYk9zYWlXOU8zbmxmYXg2OVRQTTY4?=
- =?utf-8?B?SW52ZDYxQXVvZVQ2QjU4cmQxY3lpOTczcjlsVmM5V3JoeXQrRFBPUHNZWlIw?=
- =?utf-8?B?bkpBQWR6eWN3c3dEQmpmbS82UVZwZnlqQ2NNZ1F4QjR2bzJZazJVb3RhbjRU?=
- =?utf-8?B?QTE2NTVKcXp4UnN3QzNtcG5qWEpUUnlKOTZraWNxNUxNd3U2WkFRc2s1MGwy?=
- =?utf-8?B?cGlrWitTY2pGN0lMeDh3a1NMaXFGYlBIS2REY0lyejZlNmVsTXQzZVU3R1FG?=
- =?utf-8?B?eDdpUjRENE5jYnZTVXJwQ0RMV2NSZHlzVWRyaDgxRXZ3VkpuZW1iazZUUXBM?=
- =?utf-8?B?TlNCaUlIYkg0MzVhYnVLay9CN3dMM0VITFA3WCtzNWN1VHE0QlRaTjZIbElS?=
- =?utf-8?B?Z0FJcmVUS3hkcHMyTDZoSmdpeVc2cXR6dG40SmtqSlZvWHBIWXVYUE82WHM5?=
- =?utf-8?B?UmFUL1E3TGYwLy9XcHArQXhMRml4TlVzZGp2bG9MU2QyWGRtZi9RendrU3ZE?=
- =?utf-8?B?c1h4Z1JRVlpnZ0FDeVUzVlM5djYzOW5pYlhianp6VndNUFViUE52WkF1bHh1?=
- =?utf-8?B?NG5XcmNhN2QrNVk4RkNXZGJ5eCtyclVQNzRnb3NPWWlsSXNHQ3R0QlZtM3R0?=
- =?utf-8?B?QkgyVEJPYzFJL1Y4Mnk3V09pZi84OVhqL014QWhoajB1ek93MmR6cVlXRkI5?=
- =?utf-8?B?cDRBT2pJTC9xNEtPYUdHQ2lwRnBXQTN0OEpiN2JuWXRkUEs5OTk1OWFWdkVL?=
- =?utf-8?B?TVB5cXNRdGwva2lpYzdmdzU0OXlLRm0wemc0bko2Q2JtTEhXc1ZHQ3B6MlJz?=
- =?utf-8?B?MzFNZ2RkRnFDaGRkc2pnZ2ZNNEdtazMvNWFLQUtxaHM0VktoZnpsM21vSmNu?=
- =?utf-8?B?MThOK3RwYzFFa3NRcFFEK2tZaWJubjQvTXloeGVkWForUXo3ejUxUlFKSkpK?=
- =?utf-8?B?RzBZSzVMeDJFWEFBbXc3TmpxS1pFVVR5M1NJWENQY21GeHUyb2QwVm1GczNC?=
- =?utf-8?B?TVNkdldvZlNCM2lucm5mZ1NXMkNheWhwRHJVSnVCQngycVM2eVpiOWM2ZVVJ?=
- =?utf-8?B?WHU1NDlOWWZTZHMrd2dVN1plKzJiSDZneXR6UzhLdmswYWJZdW82SjZBVWpR?=
- =?utf-8?B?OVZBcE9ZSVNXS25jSXB5Y3J2eHU4d2NiZG9sVmIwSzZMb2d1b1EzN2JaWlRC?=
- =?utf-8?B?cFVhSXRCMkZobXRRclYwMVRSZzBaM0NxU0hSRzIvb3FmTnJHT0pYaFAvdll3?=
- =?utf-8?B?Zlgza29saWU3VWZUVjNCZmVlMnFXMWJzd3J4eEJGSnFKZDRlVFdWSVlVWTVn?=
- =?utf-8?B?TmN1NlFmWGNkbjFoc2I4ZW12eHgvZEFaNWdBY3QrMjNmeDg0ejdSZHcvL3JL?=
- =?utf-8?B?RVRZZDF3TXNuMXh4VCthWVZKVW5xNDEyRDJtdy90NlQxeStudk5iTzJwN0tW?=
- =?utf-8?B?TDhqRVRXaGs3SGpidE5tWlJUQ1lmRDNidktCR3JBcmVZV3RpZUNYMnRnYWxB?=
- =?utf-8?B?MmtBYmRLclJTWm42ejlMZTNaU1R0VDcvUGdvaTlxYmF2MVMvQnZWKzY5ZUNG?=
- =?utf-8?B?OUdobXBEclM0RVJtTllPVmFKVDYrbkdXY3RHQkhTeWdadDFZRExDeFVaNkhm?=
- =?utf-8?B?YjRDUUEyQitQKzdDTmVLekdGQkpIWGtxOC9jRFMySmRyaGZjT3lvOTA1U3Rn?=
- =?utf-8?B?T2RUUCtzY3pYNXl2eVhNRjVZS1lOVXVRa1pDQjZkaUM0b1l3ZmJ5amh6UEpL?=
- =?utf-8?B?RU5OMUtnL1A1QXJpaUZGYVdFaVJEZlVIR21lYlYrZ0lCZnVzM2hEMzJpVktv?=
- =?utf-8?B?VzJ5WFFVUldRdHk0emw1ZGdyNUhLb2pFL3NURHVqQTROUEJhd2g1QTJkdVZO?=
- =?utf-8?B?dFZoZkNvTlhucUlrdXNYOEpudjZoaUt4NmhNdmt0YnpITVNadDY0aHpuQkFY?=
- =?utf-8?Q?lCNxVzqRiUHzQXLOok6tWjNRcm5hpi9TEOyvYi9jcVyRH?=
-x-ms-exchange-antispam-messagedata-1: dv0UHN+yVU0TS3A49dnBEfgs9NbkzlaszMNZ8Lqsiae3sToyT8IiLToG
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0716550EC11FD141B311F8B3B537CBE8@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR02MB4579.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b8d2a4b2-5e2e-4c43-59a3-08da3440ce3d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 May 2022 17:56:56.8712
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: L+16w3DZBQ/3vC3tOVAtUMM2N7Ct7nOJI7fPbEeG7CtSc/5WorkgGQ3U7ECCPcADfcz1yWq+FA9RDifgO7nIDQ291l/Zuxq7QdvX3QHc/oY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR02MB7577
-X-Proofpoint-GUID: 4vTuNH3xhxSKr-0tPUdjCf5_3wKciXUn
-X-Proofpoint-ORIG-GUID: 4vTuNH3xhxSKr-0tPUdjCf5_3wKciXUn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-12_15,2022-05-12_01,2022-02-23_01
-X-Proofpoint-Spam-Reason: safe
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        Tony Luck <tony.luck@intel.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gT24gTWF5IDEyLCAyMDIyLCBhdCA5OjQ0IEFNLCBCb3Jpc2xhdiBQZXRrb3YgPGJwQGFs
-aWVuOC5kZT4gd3JvdGU6DQo+IA0KPiBPbiBUdWUsIE1heSAxMCwgMjAyMiBhdCAwMzo1MDozMVBN
-ICswMDAwLCBTZWFuIENocmlzdG9waGVyc29uIHdyb3RlOg0KPj4+ICAgIHg4Ni9zcGVjdWxhdGlv
-biwgS1ZNOiByZW1vdmUgSUJQQiBvbiB2Q1BVIGxvYWQNCj4+PiANCj4+PiAgICBSZW1vdmUgSUJQ
-QiB0aGF0IGlzIGRvbmUgb24gS1ZNIHZDUFUgbG9hZCwgYXMgdGhlIGd1ZXN0LXRvLWd1ZXN0DQo+
-Pj4gICAgYXR0YWNrIHN1cmZhY2UgaXMgYWxyZWFkeSBjb3ZlcmVkIGJ5IHN3aXRjaF9tbV9pcnFz
-X29mZigpIC0+DQo+Pj4gICAgY29uZF9taXRpZ2F0aW9uKCkuDQo+Pj4gDQo+Pj4gICAgVGhlIG9y
-aWdpbmFsIDE1ZDQ1MDcxNTIzZCAoIktWTS94ODY6IEFkZCBJQlBCIHN1cHBvcnQiKSB3YXMgc2lt
-cGx5IHdyb25nIGluDQo+Pj4gICAgaXRzIGd1ZXN0LXRvLWd1ZXN0IGRlc2lnbiBpbnRlbnRpb24u
-IFRoZXJlIGFyZSB0aHJlZSBzY2VuYXJpb3MgYXQgcGxheQ0KPj4+ICAgIGhlcmU6DQo+Pj4gDQo+
-Pj4gICAgMS4gSWYgdGhlIHZDUFVzIGJlbG9uZyB0byB0aGUgc2FtZSBWTSwgdGhleSBhcmUgaW4g
-dGhlIHNhbWUgc2VjdXJpdHkgDQo+Pj4gICAgZG9tYWluIGFuZCBkbyBub3QgbmVlZCBhbiBJUEJQ
-Lg0KPj4+ICAgIDIuIElmIHRoZSB2Q1BVcyBiZWxvbmcgdG8gZGlmZmVyZW50IFZNcywgYW5kIGVh
-Y2ggVk0gaXMgaW4gaXRzIG93biBtbV9zdHJ1Y3QsDQo+Pj4gICAgc3dpdGNoX21tX2lycXNfb2Zm
-KCkgd2lsbCBoYW5kbGUgSUJQQiBhcyBhbiBtbSBzd2l0Y2ggaXMgZ3VhcmFudGVlZCB0bw0KPj4+
-ICAgIG9jY3VyIHByaW9yIHRvIGxvYWRpbmcgYSB2Q1BVIGJlbG9uZ2luZyB0byBhIGRpZmZlcmVu
-dCBWTXMuDQo+Pj4gICAgMy4gSWYgdGhlIHZDUFVzIGJlbG9uZyB0byBkaWZmZXJlbnQgVk1zLCBi
-dXQgbXVsdGlwbGUgVk1zIHNoYXJlIGFuIG1tX3N0cnVjdCwNCj4+PiAgICB0aGVuIHRoZSBzZWN1
-cml0eSBiZW5lZml0cyBvZiBhbiBJQlBCIHdoZW4gc3dpdGNoaW5nIHZDUFVzIGFyZSBkdWJpb3Vz
-LCANCj4+PiAgICBhdCBiZXN0Lg0KPj4+IA0KPj4+ICAgIElzc3VpbmcgSUJQQiBmcm9tIEtWTSB2
-Q1BVIGxvYWQgd291bGQgb25seSBjb3ZlciAjMywgYnV0IHRoZXJlIGFyZSBubw0KPj4gDQo+PiBK
-dXN0IHRvIGhlZGdlLCB0aGVyZSBhcmUgbm8gX2tub3duXyB1c2UgY2FzZXMuDQo+PiANCj4+PiAg
-ICByZWFsIHdvcmxkIHRhbmdpYmxlIHVzZSBjYXNlcyBmb3Igc3VjaCBhIGNvbmZpZ3VyYXRpb24u
-DQo+PiANCj4+IGFuZCBJIHdvdWxkIGZ1cnRoZXIgcXVhbGlmeSB0aGlzIHdpdGg6DQo+PiANCj4+
-ICAgICAgYnV0IHRoZXJlIGFyZSBubyBrbm93biByZWFsIHdvcmxkLCB0YW5naWJsZSB1c2UgY2Fz
-ZXMgZm9yIHJ1bm5pbmcgbXVsdGlwbGUNCj4+ICAgICAgVk1zIGJlbG9uZ2luZyB0byBkaWZmZXJl
-bnQgc2VjdXJpdHkgZG9tYWlucyBpbiBhIHNoYXJlZCBhZGRyZXNzIHNwYWNlLg0KPj4gDQo+PiBS
-dW5uaW5nIG11bHRpcGxlIFZNcyBpbiBhIHNpbmdsZSBhZGRyZXNzIHNwYWNlIGlzIHBsYXVzaWJs
-ZSBhbmQgc2FuZSwgX2lmXyB0aGV5DQo+PiBhcmUgYWxsIGluIHRoZSBzYW1lIHNlY3VyaXR5IGRv
-bWFpbiBvciBzZWN1cml0eSBpcyBub3QgYSBjb25jZXJuLiAgVGhhdCB3YXkgdGhlDQo+PiBzdGF0
-ZW1lbnQgaXNuJ3QgaW52YWxpZGF0ZWQgaWYgc29tZW9uZSBwb3BzIHVwIHdpdGggYSB1c2UgY2Fz
-ZSBmb3IgcnVubmluZyBtdWx0aXBsZQ0KPj4gVk1zIGJ1dCBoYXMgbm8gc2VjdXJpdHkgc3Rvcnku
-DQo+PiANCj4+IE90aGVyIHRoYW4gdGhhdCwgTEdUTS4NCj4+IA0KPj4+ICAgIElmIG11bHRpcGxl
-IFZNcw0KPj4+ICAgIGFyZSBzaGFyaW5nIGFuIG1tX3N0cnVjdHMsIHByZWRpY3Rpb24gYXR0YWNr
-cyBhcmUgdGhlIGxlYXN0IG9mIHRoZWlyDQo+Pj4gICAgc2VjdXJpdHkgd29ycmllcy4NCj4+PiAN
-Cj4+PiAgICBGaXhlczogMTVkNDUwNzE1MjNkICgiS1ZNL3g4NjogQWRkIElCUEIgc3VwcG9ydCIp
-DQo+Pj4gICAgKFJldmlld2VkYnkvc2lnbmVkIG9mIGJ5IHBlb3BsZSBoZXJlKQ0KPj4+ICAgIChD
-b2RlIGNoYW5nZSBzaW1wbHkgd2hhY2tzIElCUEIgaW4gS1ZNIHZteC9zdm0gYW5kIHRoYXRzIGl0
-KQ0KPiANCj4gSSBhZ3JlZSB3aXRoIGFsbCB0aGF0IEkndmUgcmVhZCBzbyBmYXIgLSB0aGUgb25s
-eSB0aGluZyB0aGF0J3MgbWlzc2luZyBpczoNCj4gDQo+IAkoRG9jdW1lbnRhdGlvbiBpbiBEb2N1
-bWVudGF0aW9uL2FkbWluLWd1aWRlL2h3LXZ1bG4vc3BlY3RyZS5yc3QgYWJvdXQgd2hhdCB0aGUg
-dXNlDQo+IAkgY2FzZXMgYXJlIGFuZCB3aGF0IHdlJ3JlIHByb3RlY3RpbmcgYWdhaW5zdCBhbmQg
-d2hhdCB3ZSdyZSAqbm90KiBwcm90ZWN0aW5nDQo+IAkgYWdhaW5zdCBiZWNhdXNlIDxyYWlzaW5z
-PikuDQo+IA0KPiBUaHguDQoNCk9rIFRoYW5rcywgQm9yaXMuIEnigJlsbCByZXZpZXcgdGhhdCBk
-b2MgYW5kIG1ha2UgbW9kaWZpY2F0aW9ucyBvbiB2NCwgYW5kIG1ha2Ugc3VyZQ0KdGhhdCB5b3Ug
-YXJlIGNj4oCZZC4NCg0KVGhhbmtzIGFnYWluLA0KSm9uDQoNCj4gDQo+IC0tIA0KPiBSZWdhcmRz
-L0dydXNzLA0KPiAgICBCb3Jpcy4NCj4gDQo+IGh0dHBzOi8vdXJsZGVmZW5zZS5wcm9vZnBvaW50
-LmNvbS92Mi91cmw/dT1odHRwcy0zQV9fcGVvcGxlLmtlcm5lbC5vcmdfdGdseF9ub3Rlcy0yRGFi
-b3V0LTJEbmV0aXF1ZXR0ZSZkPUR3SUJhUSZjPXM4ODNHcFVDT0NoS09IaW9jWXRHY2cmcj1OR1BS
-R0dvMzdtUWlTWGdIS201ckNRJm09NTVJRFNwRkU3TjFkMGVPWUlMLVVoZ3hvRmc1SlQ3SEZDRXgx
-N3JOZm84WERBb0pnajR4SGpUenZxS2VjNlppNiZzPTRpanJwZWlMZkdKUml5T3BZWTBQbi1CeHZH
-RXF2TzJUN3hhTnlDMExtTWsmZT0gDQoNCg==
+Thanks a lot, Sean!
+
+
+On Wed, May 11, 2022 at 10:38 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Tue, Apr 12, 2022, Jue Wang wrote:
+> > This is in preparation to add APIC_LVTCMCI support.
+>
+> There is not nearly enough information in this changelog.  Same goes for all other
+> patches in the series.  And when you start writing changelogs to explain what is
+> being done and why, I suspect you'll find that this should be further broken up
+> into multiple patches.
+I realized the general lack of enough information and background in
+the changelog and I am working to rewrite it with necessary
+background.
+
+>
+>  1. Make APIC_VERSION capture only the magic 0x14UL
+>  2. Fill apic_lvt_mask with enums / explicit entries.
+>  3. Add APIC_LVTx() macro
+>
+> And proper upstream etiquette would be to add
+>
+>   Suggested-by: Sean Christopherson <seanjc@google.com>
+>
+> for #2 and #3.  I don't care much about the attribution (though that's nice too),
+> but more importantly it provides a bit of context for others that get involved
+> later in the series (sometimes unwillingly).  E.g. if someone encounters a bug
+> with a patch, the Suggested-by gives them one more person to loop into the
+> discussion.  Ditto for other reviewers, e.g. if someone starts reviewing the
+> series at v3 or whatever, it provides some background on how the series got to
+> v3 without them having to actually look at v1 or v2.
+
+Thanks, for walking me through this process and practices. I am
+breaking this patch into 3 and adding "Suggested-by: Sean
+Christopherson ...." to them. Is it OK that I add you as
+"Suggested-by" to the later patches in this series?
+
+
+>
+> > Signed-off-by: Jue Wang <juew@google.com>
+> > ---
+> >  arch/x86/kvm/lapic.c | 33 +++++++++++++++++++--------------
+> >  arch/x86/kvm/lapic.h | 19 ++++++++++++++++++-
+> >  2 files changed, 37 insertions(+), 15 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > index 9322e6340a74..2c770e4c0e6c 100644
+> > --- a/arch/x86/kvm/lapic.c
+> > +++ b/arch/x86/kvm/lapic.c
+> > @@ -54,7 +54,7 @@
+> >  #define PRIo64 "o"
+> >
+> >  /* 14 is the version for Xeon and Pentium 8.4.8*/
+> > -#define APIC_VERSION                 (0x14UL | ((KVM_APIC_LVT_NUM - 1) << 16))
+> > +#define APIC_VERSION                 0x14UL
+> >  #define LAPIC_MMIO_LENGTH            (1 << 12)
+> >  /* followed define is not in apicdef.h */
+> >  #define MAX_APIC_VECTOR                      256
+> > @@ -364,10 +364,15 @@ static inline int apic_lvt_nmi_mode(u32 lvt_val)
+> >       return (lvt_val & (APIC_MODE_MASK | APIC_LVT_MASKED)) == APIC_DM_NMI;
+> >  }
+> >
+> > +static inline int kvm_apic_get_nr_lvt_entries(struct kvm_vcpu *vcpu)
+> > +{
+> > +     return KVM_APIC_MAX_NR_LVT_ENTRIES;
+> > +}
+>
+> I think it makes sense to introduce this helper with the CMCI patch.  Until then,
+> requiring @vcpu to get the max number of entries is misleading and unnecessary.
+>
+> Case in point, this patch is broken in that the APIC_SPIV path in kvm_lapic_reg_write()
+> uses the #define directly, which necessitates fixup in the CMCI patch to use this
+> helper.
+>
+Ack, will incorporate this and comment below into V3.
+> > +
+> >  void kvm_apic_set_version(struct kvm_vcpu *vcpu)
+> >  {
+> >       struct kvm_lapic *apic = vcpu->arch.apic;
+> > -     u32 v = APIC_VERSION;
+> > +     u32 v = APIC_VERSION | ((kvm_apic_get_nr_lvt_entries(vcpu) - 1) << 16);
+> >
+> >       if (!lapic_in_kernel(vcpu))
+> >               return;
+> > @@ -385,12 +390,13 @@ void kvm_apic_set_version(struct kvm_vcpu *vcpu)
+> >       kvm_lapic_set_reg(apic, APIC_LVR, v);
+> >  }
+> >
+> > -static const unsigned int apic_lvt_mask[KVM_APIC_LVT_NUM] = {
+> > -     LVT_MASK ,      /* part LVTT mask, timer mode mask added at runtime */
+> > -     LVT_MASK | APIC_MODE_MASK,      /* LVTTHMR */
+> > -     LVT_MASK | APIC_MODE_MASK,      /* LVTPC */
+> > -     LINT_MASK, LINT_MASK,   /* LVT0-1 */
+> > -     LVT_MASK                /* LVTERR */
+> > +static const unsigned int apic_lvt_mask[KVM_APIC_MAX_NR_LVT_ENTRIES] = {
+> > +     [LVT_TIMER] = LVT_MASK,      /* timer mode mask added at runtime */
+> > +     [LVT_THERMAL_MONITOR] = LVT_MASK | APIC_MODE_MASK,
+> > +     [LVT_PERFORMANCE_COUNTER] = LVT_MASK | APIC_MODE_MASK,
+> > +     [LVT_LINT0] = LINT_MASK,
+> > +     [LVT_LINT1] = LINT_MASK,
+> > +     [LVT_ERROR] = LVT_MASK
+> >  };
+> >
+> >  static int find_highest_vector(void *bitmap)
+> > @@ -2039,10 +2045,9 @@ int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+> >                       int i;
+> >                       u32 lvt_val;
+> >
+> > -                     for (i = 0; i < KVM_APIC_LVT_NUM; i++) {
+> > -                             lvt_val = kvm_lapic_get_reg(apic,
+> > -                                                    APIC_LVTT + 0x10 * i);
+> > -                             kvm_lapic_set_reg(apic, APIC_LVTT + 0x10 * i,
+> > +                     for (i = 0; i < KVM_APIC_MAX_NR_LVT_ENTRIES; i++) {
+> > +                             lvt_val = kvm_lapic_get_reg(apic, APIC_LVTx(i));
+> > +                             kvm_lapic_set_reg(apic, APIC_LVTx(i),
+> >                                            lvt_val | APIC_LVT_MASKED);
+> >                       }
+> >                       apic_update_lvtt(apic);
+> > @@ -2341,8 +2346,8 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
+> >               kvm_apic_set_xapic_id(apic, vcpu->vcpu_id);
+> >       kvm_apic_set_version(apic->vcpu);
+> >
+> > -     for (i = 0; i < KVM_APIC_LVT_NUM; i++)
+> > -             kvm_lapic_set_reg(apic, APIC_LVTT + 0x10 * i, APIC_LVT_MASKED);
+> > +     for (i = 0; i < KVM_APIC_MAX_NR_LVT_ENTRIES; i++)
+> > +             kvm_lapic_set_reg(apic, APIC_LVTx(i), APIC_LVT_MASKED);
+> >       apic_update_lvtt(apic);
+> >       if (kvm_vcpu_is_reset_bsp(vcpu) &&
+> >           kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_LINT0_REENABLED))
+> > diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+> > index 2b44e533fc8d..5666441d5d1b 100644
+> > --- a/arch/x86/kvm/lapic.h
+> > +++ b/arch/x86/kvm/lapic.h
+> > @@ -10,7 +10,6 @@
+> >
+> >  #define KVM_APIC_INIT                0
+> >  #define KVM_APIC_SIPI                1
+> > -#define KVM_APIC_LVT_NUM     6
+> >
+> >  #define APIC_SHORT_MASK                      0xc0000
+> >  #define APIC_DEST_NOSHORT            0x0
+> > @@ -29,6 +28,24 @@ enum lapic_mode {
+> >       LAPIC_MODE_X2APIC = MSR_IA32_APICBASE_ENABLE | X2APIC_ENABLE,
+> >  };
+> >
+> > +enum lapic_lvt_entry {
+> > +     LVT_TIMER,
+> > +     LVT_THERMAL_MONITOR,
+> > +     LVT_PERFORMANCE_COUNTER,
+> > +     LVT_LINT0,
+> > +     LVT_LINT1,
+> > +     LVT_ERROR,
+> > +
+> > +     KVM_APIC_MAX_NR_LVT_ENTRIES,
+> > +};
+> > +
+> > +
+> > +#define APIC_LVTx(x)                                                    \
+> > +({                                                                      \
+> > +     int __apic_reg = APIC_LVTT + 0x10 * (x);                        \
+>
+> An intermediate variable is completely unnecessary.  This should do just fine.
+>
+>   #define APIC_LVTx(x) (APIC_LVTT + 0x10 * (x))
+>
+> Yes, the macro _may_ eventually becomes a multi-line beast with a variable when
+> CMCI support is added, but again that belongs in the CMCI patch.  That way this
+> patch doesn't need to change if we decide that even the CMCI-aware version can
+> just be:
+>
+>   #define APIC_LVTx(x) ((x) == LVT_CMCI ? APIC_LVTCMCI : APIC_LVTT + 0x10 * (x))
+>
+>
+> > +     __apic_reg;                                                     \
+> > +})
+> > +
+> >  struct kvm_timer {
+> >       struct hrtimer timer;
+> >       s64 period;                             /* unit: ns */
+> > --
+> > 2.35.1.1178.g4f1659d476-goog
+> >
