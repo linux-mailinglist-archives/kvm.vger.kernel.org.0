@@ -2,205 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ABD5E524EA6
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 15:48:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1708F524EA9
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 15:48:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354623AbiELNs0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 09:48:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48418 "EHLO
+        id S1354483AbiELNse (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 09:48:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354483AbiELNsZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 09:48:25 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4197C644D3;
-        Thu, 12 May 2022 06:48:23 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CF32A612EA;
-        Thu, 12 May 2022 13:48:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA0A8C34116;
-        Thu, 12 May 2022 13:48:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1652363302;
-        bh=RNeaVXiU7WpdwCw8TVWzuw/Ov38t5FEYq7iQzFgfSj8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Iv5xFPgzWaFn63Q703NSPzIfDaEkJM/dLkoS7ECqK5ta/vPfG2LXhhiV15rm5xgUL
-         kJ4rknF48hDWcDN/6O4Xd4dU2xaGMsegoo4s8Tw92vO+i9KcHnDSHadNKx2KzemO26
-         bxPFiH+t0+j27eF8QxuNYBySvp8wW1bNzR6E+HkY=
-Date:   Thu, 12 May 2022 15:48:19 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Kyle Huey <me@kylehuey.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, stable@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        with ESMTP id S1354630AbiELNsa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 09:48:30 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B621365419
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 06:48:29 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id l11-20020a17090a49cb00b001d923a9ca99so4960207pjm.1
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 06:48:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=XTqMxjhIn1jUYYr1ALo/DlLRk85oazw41UC3366CUb8=;
+        b=GvsJmFSDZ8o6LCBH9Mh693vukltHnjMOfIqFhUvMvJ5uCsr9QEwSealT+7LMhnD9Re
+         J3nZi/kBiWke6QhoZkiRj665ZZFvNmN2BNpvPl7/3Nq/sgyCtVZ0UOh2+18vGbb/Gto+
+         llEpMW2tvaZDtDYDIJLU3Rp0EmU5QZn+s38sNfkhrLzyp5eB1k9lJWYkNTDOI0EmsVWp
+         14R5tyC6LiV1ac+rplvCkfUtvlvH969p7HYEzf/tFi46OfGMs0vAkfiyGAItVIjYnd5d
+         1DDHTsnnGLE+f4friRNmecLMqyIxXjDstrQ8suLfYU2J9zaZyBtYdB/QTn/CpMzdr0Dw
+         3nBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=XTqMxjhIn1jUYYr1ALo/DlLRk85oazw41UC3366CUb8=;
+        b=moGjSWnIOqe1FyuxGbvCnzo+KewNQ4Smb8BJi30IzImJYIijPBNQme5PdIlJPQoSL8
+         UkEhwlhJYczHCLSlSJ1wd7TRTmTMOL2vDKsgsPl8jCavzMkfsxhTAcTHXJoiTIExG6OZ
+         FmApskR7Ak3f4McP4OpuLXRPFHu1NaK0QXBvVP2a6E1yApcVOl0EEeSEW4A7mkNIJ9jR
+         08UvLLKD2aVg69cbM3GPLzBfray8tjQ9GaZYMXqgfTGOfc/7KGL8A9msklQBI/1o8LfV
+         whPBe32FieiDuYpYNxO6Ole7LxVl6HqAl/PFHP5Wcn9l8InsBe/WEY/sqHkyD1YIfn7O
+         Rpwg==
+X-Gm-Message-State: AOAM531Tj2mZadgIwHyqi1vgO7VFUim4DADZiOen5wRF/dF5eUz1z7n2
+        EGDbTbPWCAncOb5HUvNv9M78Qg==
+X-Google-Smtp-Source: ABdhPJzDUqaIXEhvnG8IhUWq92AKD62nGUZqhCw5quZuMX5Qj+KxHqlevZNiH9NM06UtEv2FfmTeBw==
+X-Received: by 2002:a17:90b:4a12:b0:1de:c82d:7cda with SMTP id kk18-20020a17090b4a1200b001dec82d7cdamr8082711pjb.9.1652363308844;
+        Thu, 12 May 2022 06:48:28 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id x189-20020a6286c6000000b0050dc762815dsm3780751pfd.55.2022.05.12.06.48.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 May 2022 06:48:28 -0700 (PDT)
+Date:   Thu, 12 May 2022 13:48:24 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm list <kvm@vger.kernel.org>,
-        Robert O'Callahan <robert@ocallahan.org>,
-        Keno Fischer <keno@juliacomputing.com>
-Subject: Re: [PATCH 5.4] KVM: x86/svm: Account for family 17h event
- renumberings in amd_pmc_perf_hw_id
-Message-ID: <Yn0QIxxeHFc8BIw6@kroah.com>
-References: <20220508165434.119000-1-khuey@kylehuey.com>
- <29767a7d-d887-1a0c-296e-5bed220f1c9e@redhat.com>
- <YnpOZAfLdJ6cj5b9@kroah.com>
- <YnpOsDgrwCBsMs35@kroah.com>
- <CAP045Aq6vJxMJaVFjAX7gqQkBbMRArZJhea3U6LJVQEQB9Ea4Q@mail.gmail.com>
- <CAP045AoFcMeJBH7SWbLFJMYymqPJNKz9PDaYSwhSHYfbeByP8Q@mail.gmail.com>
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>, x86@kernel.org,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH] KVM: x86: fix a typo in __try_cmpxchg_user that caused
+ cmpxchg to be not atomic
+Message-ID: <Yn0QKHKKibBP2V0F@google.com>
+References: <20220202004945.2540433-5-seanjc@google.com>
+ <20220512101420.306759-1-mlevitsk@redhat.com>
+ <875ymayl55.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAP045AoFcMeJBH7SWbLFJMYymqPJNKz9PDaYSwhSHYfbeByP8Q@mail.gmail.com>
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <875ymayl55.fsf@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 10, 2022 at 09:01:32AM -0700, Kyle Huey wrote:
-> On Tue, May 10, 2022 at 6:11 AM Kyle Huey <me@kylehuey.com> wrote:
-> >
-> > On Tue, May 10, 2022 at 4:38 AM Greg KH <gregkh@linuxfoundation.org> wrote:
-> > >
-> > > On Tue, May 10, 2022 at 01:37:08PM +0200, Greg KH wrote:
-> > > > On Mon, May 09, 2022 at 01:41:20PM +0200, Paolo Bonzini wrote:
-> > > > > On 5/8/22 18:54, Kyle Huey wrote:
-> > > > > > From: Kyle Huey <me@kylehuey.com>
-> > > > > >
-> > > > > > commit 5eb849322d7f7ae9d5c587c7bc3b4f7c6872cd2f upstream
-> > > > > >
-> > > > > > Zen renumbered some of the performance counters that correspond to the
-> > > > > > well known events in perf_hw_id. This code in KVM was never updated for
-> > > > > > that, so guest that attempt to use counters on Zen that correspond to the
-> > > > > > pre-Zen perf_hw_id values will silently receive the wrong values.
-> > > > > >
-> > > > > > This has been observed in the wild with rr[0] when running in Zen 3
-> > > > > > guests. rr uses the retired conditional branch counter 00d1 which is
-> > > > > > incorrectly recognized by KVM as PERF_COUNT_HW_STALLED_CYCLES_BACKEND.
-> > > > > >
-> > > > > > [0] https://rr-project.org/
-> > > > > >
-> > > > > > Signed-off-by: Kyle Huey <me@kylehuey.com>
-> > > > > > Message-Id: <20220503050136.86298-1-khuey@kylehuey.com>
-> > > > > > Cc: stable@vger.kernel.org
-> > > > > > [Check guest family, not host. - Paolo]
-> > > > > > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > > > > > [Backport to 5.4: adjusted context]
-> > > > > > Signed-off-by: Kyle Huey <me@kylehuey.com>
-> > > > > > ---
-> > > > > >   arch/x86/kvm/pmu_amd.c | 28 +++++++++++++++++++++++++---
-> > > > > >   1 file changed, 25 insertions(+), 3 deletions(-)
-> > > > > >
-> > > > > > diff --git a/arch/x86/kvm/pmu_amd.c b/arch/x86/kvm/pmu_amd.c
-> > > > > > index 6bc656abbe66..3ccfd1abcbad 100644
-> > > > > > --- a/arch/x86/kvm/pmu_amd.c
-> > > > > > +++ b/arch/x86/kvm/pmu_amd.c
-> > > > > > @@ -44,6 +44,22 @@ static struct kvm_event_hw_type_mapping amd_event_mapping[] = {
-> > > > > >           [7] = { 0xd1, 0x00, PERF_COUNT_HW_STALLED_CYCLES_BACKEND },
-> > > > > >   };
-> > > > > > +/* duplicated from amd_f17h_perfmon_event_map. */
-> > > > > > +static struct kvm_event_hw_type_mapping amd_f17h_event_mapping[] = {
-> > > > > > + [0] = { 0x76, 0x00, PERF_COUNT_HW_CPU_CYCLES },
-> > > > > > + [1] = { 0xc0, 0x00, PERF_COUNT_HW_INSTRUCTIONS },
-> > > > > > + [2] = { 0x60, 0xff, PERF_COUNT_HW_CACHE_REFERENCES },
-> > > > > > + [3] = { 0x64, 0x09, PERF_COUNT_HW_CACHE_MISSES },
-> > > > > > + [4] = { 0xc2, 0x00, PERF_COUNT_HW_BRANCH_INSTRUCTIONS },
-> > > > > > + [5] = { 0xc3, 0x00, PERF_COUNT_HW_BRANCH_MISSES },
-> > > > > > + [6] = { 0x87, 0x02, PERF_COUNT_HW_STALLED_CYCLES_FRONTEND },
-> > > > > > + [7] = { 0x87, 0x01, PERF_COUNT_HW_STALLED_CYCLES_BACKEND },
-> > > > > > +};
-> > > > > > +
-> > > > > > +/* amd_pmc_perf_hw_id depends on these being the same size */
-> > > > > > +static_assert(ARRAY_SIZE(amd_event_mapping) ==
-> > > > > > +      ARRAY_SIZE(amd_f17h_event_mapping));
-> > > > > > +
-> > > > > >   static unsigned int get_msr_base(struct kvm_pmu *pmu, enum pmu_type type)
-> > > > > >   {
-> > > > > >           struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
-> > > > > > @@ -130,17 +146,23 @@ static unsigned amd_find_arch_event(struct kvm_pmu *pmu,
-> > > > > >                                       u8 event_select,
-> > > > > >                                       u8 unit_mask)
-> > > > > >   {
-> > > > > > + struct kvm_event_hw_type_mapping *event_mapping;
-> > > > > >           int i;
-> > > > > > + if (guest_cpuid_family(pmc->vcpu) >= 0x17)
-> > > > > > +         event_mapping = amd_f17h_event_mapping;
-> > > > > > + else
-> > > > > > +         event_mapping = amd_event_mapping;
-> > > > > > +
-> > > > > >           for (i = 0; i < ARRAY_SIZE(amd_event_mapping); i++)
-> > > > > > -         if (amd_event_mapping[i].eventsel == event_select
-> > > > > > -             && amd_event_mapping[i].unit_mask == unit_mask)
-> > > > > > +         if (event_mapping[i].eventsel == event_select
-> > > > > > +             && event_mapping[i].unit_mask == unit_mask)
-> > > > > >                           break;
-> > > > > >           if (i == ARRAY_SIZE(amd_event_mapping))
-> > > > > >                   return PERF_COUNT_HW_MAX;
-> > > > > > - return amd_event_mapping[i].event_type;
-> > > > > > + return event_mapping[i].event_type;
-> > > > > >   }
-> > > > > >   /* return PERF_COUNT_HW_MAX as AMD doesn't have fixed events */
-> > > > >
-> > > > > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> > > > >
-> > > > > Thanks,
-> > > > >
-> > > > > Paolo
-> > > > >
-> > > >
-> > > > Wait, how was this tested?
-> > > >
-> > > > It breaks the build:
-> > > >
-> > > > arch/x86/kvm/pmu_amd.c: In function ‘amd_find_arch_event’:
-> > > > arch/x86/kvm/pmu_amd.c:152:32: error: ‘pmc’ undeclared (first use in this function); did you mean ‘pmu’?
-> > > >   152 |         if (guest_cpuid_family(pmc->vcpu) >= 0x17)
-> > > >       |                                ^~~
-> > > >       |                                pmu
-> > > >
-> > > >
-> > > > I'll do the obvious fixup, but this is odd.  Always at least test-build
-> > > > your changes...
-> > >
-> > > Hm, no, I don't know what the correct fix is here.  I'll wait for a
-> > > fixed up (and tested) patch to be resubmited please.
-> > >
-> > > thanks,
-> > >
-> > > greg k-h
-> >
-> > Sorry, I tested an earlier version without the guest_cpuid_family fix
-> > that Paolo made when he committed my patch, and of course that's the
-> > hang up here. I'll get this fixed up for you.
-> >
-> > - Kyle
+On Thu, May 12, 2022, Vitaly Kuznetsov wrote:
+> Maxim Levitsky <mlevitsk@redhat.com> writes:
 > 
-> Hi Greg,
+> > Fixes: 1c2361f667f36 ("KVM: x86: Use __try_cmpxchg_user() to emulate atomic accesses")
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  arch/x86/kvm/x86.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > Yes, this is the root cause of the TDP mmu leak I was doing debug of in the last week.
+> > Non working cmpxchg on which TDP mmu relies makes it install two differnt shadow pages
+> > under same spte.
+
+Ewww, as in running a buggy L0 resulted in a CMPXCHG going sideways in L1?  That's
+awful.  My apologies :-(
+
+> In case the fix is not squashed with 1c2361f667f36, the above should
+> really go before '---'.
 > 
-> I've just sent a backport of Like Xu's "KVM: x86/pmu: Refactoring
-> find_arch_event() to pmc_perf_hw_id()" for 5.4. It had to be trivially
-> adjusted because kvm_x86_ops is a pointer on pre-5.7 kernels.
+> >
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 8ee8c91fa7625..79cabd3d97d22 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -7329,7 +7329,7 @@ static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
+> >  		goto emul_write;
+> >  
+> >  	hva = kvm_vcpu_gfn_to_hva(vcpu, gpa_to_gfn(gpa));
+> > -	if (kvm_is_error_hva(addr))
+> > +	if (kvm_is_error_hva(hva))
 > 
-> After you apply that, the patch that you applied here for 5.10 will
-> apply to 5.4.
+> Looks like a typo indeed, so
+> 
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-I do not know what I "applied here" at all, sorry.  Please realize we
-deal with hundreds of stable patches a week.
+Yep, if this doesn't get squashed
 
-Please send me a patch series of what I needs to be applied and I will
-be glad to queue them up.
-
-thanks,
-
-greg k-h
+Reviewed-by: Sean Christopherson <seanjc@google.com>
