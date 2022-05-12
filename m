@@ -2,246 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A5D7C525067
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 16:40:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F9A2525077
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 16:43:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355485AbiELOkj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 10:40:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48588 "EHLO
+        id S1355532AbiELOnY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 10:43:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355481AbiELOk3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 10:40:29 -0400
-Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52AEE253A9F
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 07:40:28 -0700 (PDT)
-Received: by mail-io1-xd2f.google.com with SMTP id z18so5547542iob.5
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 07:40:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kylehuey.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=tsPOjGZkV1TRXRSZHVdMkg4WSWe9S/brR44ecalBW+Y=;
-        b=A0esQkq9PHwmQSISlQbpNaX5qgKu73+heQ3oCIbowIY9dgZmOqSX7N55l0ncpfh4CV
-         xKyEy46M9CJgE+mIN4M04NHOu/ErbReQwc9IQGoYnU/7+SC4vlDkEIuCy4X6xN1/eeEV
-         cFuHk618dZNLO91IRCELZoBer/LE/Bcsii2GNr0nyriwf8BdP/EFyFnYQAbpFTp9jpx7
-         ICttUv651EnD5OLy6eCNl6etkGvEutLh228oT27gWiI7GDAPt7dGDLY2gsiyAaQjdonf
-         m8HjNYZC9ossttYOWs6ZAMITHXF9C+qkq3lrfJUcRMEdhxyC7I34Q/W10C3YpR/JAVlz
-         J/fQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=tsPOjGZkV1TRXRSZHVdMkg4WSWe9S/brR44ecalBW+Y=;
-        b=Cz6DxjazN9dyvaUKLrC9mJUHEB7reDDPSEdlB8N0KuNEylJ1ffmBCCv2hKAPpCDdtg
-         /DQMFeCZZviJAzI1wiUPw2rDaR4SlPyqFURsQLZvv01dk/9WSUZGmvK5YCGITYumkZJY
-         AOZ6DeHiLPihJrc/5Yt9LRQPM5sMHn+xtP5CR5PO6a0vD4bzIpQ7wbu8g3HLl4wUkAGv
-         D6s8wkFc0S9OYTLp00iu6DoFg2feBVVf9uk76ZzMv/OonRU6Pv2Ebz5/GsQKm8isHDEp
-         q2tPiiK2wRCxuyKYNOC5kpX0jfvMqzRuN5ZVXeF0kR0hcq7ARddnsoSvGE/iwfUVdx22
-         NFRA==
-X-Gm-Message-State: AOAM533i0W39UmSeAGwGbEnE5jss6YqkH4uZcx4AZT2LrbUY8fOdsZf5
-        2XFQGfBmL46/p8bMY8MTfT09yYyUl3wykQQAHETb0A==
-X-Google-Smtp-Source: ABdhPJwmPP2LZSKrgUfRxTEvzrEVkaP3cD7YWuanlJpIU3C/Pbc2U7VtOGJeSH9MVC2CBT33UdedT5BUu9sGwkTEnYk=
-X-Received: by 2002:a05:6638:1515:b0:32b:eb62:97c8 with SMTP id
- b21-20020a056638151500b0032beb6297c8mr147705jat.61.1652366427691; Thu, 12 May
- 2022 07:40:27 -0700 (PDT)
+        with ESMTP id S1347679AbiELOnL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 10:43:11 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1558A140866;
+        Thu, 12 May 2022 07:43:10 -0700 (PDT)
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24CETeuN014305;
+        Thu, 12 May 2022 14:43:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=bCYntmLBv7zIwpeXThdfmgPfVSJZtndBYOzUoNeGOlE=;
+ b=dk6vuL4kEOoXGCLHqIwg11Qc4NVlkRjAWDSKzBEDLLcxmW2y5Y0mgGLpVcW3tX5IBPNk
+ kSSmNSk31c1YAmFA6bbVj1J15upT9GFRTBP89X6aiLorJmgKCXxqiObW0YO50h4twYt0
+ 9Hc+oE5TyroU0xeulsQUvqq6m5sZFocEPjXF5gXV0vRw5UNzsK0hjw7GV5+qFN935BIc
+ fAeSZ1KU9vTchu7eAbRf32U61ggA9hCMs04JmQQrN7F+82m62FJ0WjpqERONvq4AaDep
+ esPQ8L9ECsD7DRfhJdHCI7vEt/ImTyPS5sS3iujxdQSiv702QrqzKG+SiCFaxnEAeJAw og== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g14238d07-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 May 2022 14:43:09 +0000
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24CEX6Xf028186;
+        Thu, 12 May 2022 14:43:08 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g14238cy5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 May 2022 14:43:08 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24CEg5KF004047;
+        Thu, 12 May 2022 14:43:06 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma05fra.de.ibm.com with ESMTP id 3fwgd8wmx5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 May 2022 14:43:06 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24CEh2Zi37945748
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 May 2022 14:43:02 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BCE73A4057;
+        Thu, 12 May 2022 14:43:02 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6D608A4040;
+        Thu, 12 May 2022 14:43:02 +0000 (GMT)
+Received: from [9.145.2.10] (unknown [9.145.2.10])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 12 May 2022 14:43:02 +0000 (GMT)
+Message-ID: <60462048-c661-1af2-e55f-24bf4d636e63@linux.ibm.com>
+Date:   Thu, 12 May 2022 16:43:01 +0200
 MIME-Version: 1.0
-References: <20220508165434.119000-1-khuey@kylehuey.com> <29767a7d-d887-1a0c-296e-5bed220f1c9e@redhat.com>
- <YnpOZAfLdJ6cj5b9@kroah.com> <YnpOsDgrwCBsMs35@kroah.com> <CAP045Aq6vJxMJaVFjAX7gqQkBbMRArZJhea3U6LJVQEQB9Ea4Q@mail.gmail.com>
- <CAP045AoFcMeJBH7SWbLFJMYymqPJNKz9PDaYSwhSHYfbeByP8Q@mail.gmail.com> <Yn0QIxxeHFc8BIw6@kroah.com>
-In-Reply-To: <Yn0QIxxeHFc8BIw6@kroah.com>
-From:   Kyle Huey <me@kylehuey.com>
-Date:   Thu, 12 May 2022 07:40:15 -0700
-Message-ID: <CAP045Ap-N6pCP3vo-Ar5wSDnFUkKnfhnL+W9TKCfwYnQbhobZA@mail.gmail.com>
-Subject: Re: [PATCH 5.4] KVM: x86/svm: Account for family 17h event
- renumberings in amd_pmc_perf_hw_id
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, stable@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm list <kvm@vger.kernel.org>,
-        "Robert O'Callahan" <robert@ocallahan.org>,
-        Keno Fischer <keno@juliacomputing.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [kvm-unit-tests PATCH v1 2/2] s390x: add migration test for
+ storage keys
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc:     imbrenda@linux.ibm.com, thuth@redhat.com, scgl@linux.ibm.com
+References: <20220512140107.1432019-1-nrb@linux.ibm.com>
+ <20220512140107.1432019-3-nrb@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20220512140107.1432019-3-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: F5sAPNy7dQfTX9uRWx17Zi3WzVklIo2M
+X-Proofpoint-GUID: GkROzabkxP_-kD5yxpW-I3G7qnhD3j6u
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-12_11,2022-05-12_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 malwarescore=0 clxscore=1015 phishscore=0 suspectscore=0
+ lowpriorityscore=0 spamscore=0 mlxlogscore=990 adultscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205120069
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 12, 2022 at 6:48 AM Greg KH <gregkh@linuxfoundation.org> wrote:
->
-> On Tue, May 10, 2022 at 09:01:32AM -0700, Kyle Huey wrote:
-> > On Tue, May 10, 2022 at 6:11 AM Kyle Huey <me@kylehuey.com> wrote:
-> > >
-> > > On Tue, May 10, 2022 at 4:38 AM Greg KH <gregkh@linuxfoundation.org> =
-wrote:
-> > > >
-> > > > On Tue, May 10, 2022 at 01:37:08PM +0200, Greg KH wrote:
-> > > > > On Mon, May 09, 2022 at 01:41:20PM +0200, Paolo Bonzini wrote:
-> > > > > > On 5/8/22 18:54, Kyle Huey wrote:
-> > > > > > > From: Kyle Huey <me@kylehuey.com>
-> > > > > > >
-> > > > > > > commit 5eb849322d7f7ae9d5c587c7bc3b4f7c6872cd2f upstream
-> > > > > > >
-> > > > > > > Zen renumbered some of the performance counters that correspo=
-nd to the
-> > > > > > > well known events in perf_hw_id. This code in KVM was never u=
-pdated for
-> > > > > > > that, so guest that attempt to use counters on Zen that corre=
-spond to the
-> > > > > > > pre-Zen perf_hw_id values will silently receive the wrong val=
-ues.
-> > > > > > >
-> > > > > > > This has been observed in the wild with rr[0] when running in=
- Zen 3
-> > > > > > > guests. rr uses the retired conditional branch counter 00d1 w=
-hich is
-> > > > > > > incorrectly recognized by KVM as PERF_COUNT_HW_STALLED_CYCLES=
-_BACKEND.
-> > > > > > >
-> > > > > > > [0] https://rr-project.org/
-> > > > > > >
-> > > > > > > Signed-off-by: Kyle Huey <me@kylehuey.com>
-> > > > > > > Message-Id: <20220503050136.86298-1-khuey@kylehuey.com>
-> > > > > > > Cc: stable@vger.kernel.org
-> > > > > > > [Check guest family, not host. - Paolo]
-> > > > > > > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > > > > > > [Backport to 5.4: adjusted context]
-> > > > > > > Signed-off-by: Kyle Huey <me@kylehuey.com>
-> > > > > > > ---
-> > > > > > >   arch/x86/kvm/pmu_amd.c | 28 +++++++++++++++++++++++++---
-> > > > > > >   1 file changed, 25 insertions(+), 3 deletions(-)
-> > > > > > >
-> > > > > > > diff --git a/arch/x86/kvm/pmu_amd.c b/arch/x86/kvm/pmu_amd.c
-> > > > > > > index 6bc656abbe66..3ccfd1abcbad 100644
-> > > > > > > --- a/arch/x86/kvm/pmu_amd.c
-> > > > > > > +++ b/arch/x86/kvm/pmu_amd.c
-> > > > > > > @@ -44,6 +44,22 @@ static struct kvm_event_hw_type_mapping am=
-d_event_mapping[] =3D {
-> > > > > > >           [7] =3D { 0xd1, 0x00, PERF_COUNT_HW_STALLED_CYCLES_=
-BACKEND },
-> > > > > > >   };
-> > > > > > > +/* duplicated from amd_f17h_perfmon_event_map. */
-> > > > > > > +static struct kvm_event_hw_type_mapping amd_f17h_event_mappi=
-ng[] =3D {
-> > > > > > > + [0] =3D { 0x76, 0x00, PERF_COUNT_HW_CPU_CYCLES },
-> > > > > > > + [1] =3D { 0xc0, 0x00, PERF_COUNT_HW_INSTRUCTIONS },
-> > > > > > > + [2] =3D { 0x60, 0xff, PERF_COUNT_HW_CACHE_REFERENCES },
-> > > > > > > + [3] =3D { 0x64, 0x09, PERF_COUNT_HW_CACHE_MISSES },
-> > > > > > > + [4] =3D { 0xc2, 0x00, PERF_COUNT_HW_BRANCH_INSTRUCTIONS },
-> > > > > > > + [5] =3D { 0xc3, 0x00, PERF_COUNT_HW_BRANCH_MISSES },
-> > > > > > > + [6] =3D { 0x87, 0x02, PERF_COUNT_HW_STALLED_CYCLES_FRONTEND=
- },
-> > > > > > > + [7] =3D { 0x87, 0x01, PERF_COUNT_HW_STALLED_CYCLES_BACKEND =
-},
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +/* amd_pmc_perf_hw_id depends on these being the same size *=
-/
-> > > > > > > +static_assert(ARRAY_SIZE(amd_event_mapping) =3D=3D
-> > > > > > > +      ARRAY_SIZE(amd_f17h_event_mapping));
-> > > > > > > +
-> > > > > > >   static unsigned int get_msr_base(struct kvm_pmu *pmu, enum =
-pmu_type type)
-> > > > > > >   {
-> > > > > > >           struct kvm_vcpu *vcpu =3D pmu_to_vcpu(pmu);
-> > > > > > > @@ -130,17 +146,23 @@ static unsigned amd_find_arch_event(str=
-uct kvm_pmu *pmu,
-> > > > > > >                                       u8 event_select,
-> > > > > > >                                       u8 unit_mask)
-> > > > > > >   {
-> > > > > > > + struct kvm_event_hw_type_mapping *event_mapping;
-> > > > > > >           int i;
-> > > > > > > + if (guest_cpuid_family(pmc->vcpu) >=3D 0x17)
-> > > > > > > +         event_mapping =3D amd_f17h_event_mapping;
-> > > > > > > + else
-> > > > > > > +         event_mapping =3D amd_event_mapping;
-> > > > > > > +
-> > > > > > >           for (i =3D 0; i < ARRAY_SIZE(amd_event_mapping); i+=
-+)
-> > > > > > > -         if (amd_event_mapping[i].eventsel =3D=3D event_sele=
-ct
-> > > > > > > -             && amd_event_mapping[i].unit_mask =3D=3D unit_m=
-ask)
-> > > > > > > +         if (event_mapping[i].eventsel =3D=3D event_select
-> > > > > > > +             && event_mapping[i].unit_mask =3D=3D unit_mask)
-> > > > > > >                           break;
-> > > > > > >           if (i =3D=3D ARRAY_SIZE(amd_event_mapping))
-> > > > > > >                   return PERF_COUNT_HW_MAX;
-> > > > > > > - return amd_event_mapping[i].event_type;
-> > > > > > > + return event_mapping[i].event_type;
-> > > > > > >   }
-> > > > > > >   /* return PERF_COUNT_HW_MAX as AMD doesn't have fixed event=
-s */
-> > > > > >
-> > > > > > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> > > > > >
-> > > > > > Thanks,
-> > > > > >
-> > > > > > Paolo
-> > > > > >
-> > > > >
-> > > > > Wait, how was this tested?
-> > > > >
-> > > > > It breaks the build:
-> > > > >
-> > > > > arch/x86/kvm/pmu_amd.c: In function =E2=80=98amd_find_arch_event=
-=E2=80=99:
-> > > > > arch/x86/kvm/pmu_amd.c:152:32: error: =E2=80=98pmc=E2=80=99 undec=
-lared (first use in this function); did you mean =E2=80=98pmu=E2=80=99?
-> > > > >   152 |         if (guest_cpuid_family(pmc->vcpu) >=3D 0x17)
-> > > > >       |                                ^~~
-> > > > >       |                                pmu
-> > > > >
-> > > > >
-> > > > > I'll do the obvious fixup, but this is odd.  Always at least test=
--build
-> > > > > your changes...
-> > > >
-> > > > Hm, no, I don't know what the correct fix is here.  I'll wait for a
-> > > > fixed up (and tested) patch to be resubmited please.
-> > > >
-> > > > thanks,
-> > > >
-> > > > greg k-h
-> > >
-> > > Sorry, I tested an earlier version without the guest_cpuid_family fix
-> > > that Paolo made when he committed my patch, and of course that's the
-> > > hang up here. I'll get this fixed up for you.
-> > >
-> > > - Kyle
-> >
-> > Hi Greg,
-> >
-> > I've just sent a backport of Like Xu's "KVM: x86/pmu: Refactoring
-> > find_arch_event() to pmc_perf_hw_id()" for 5.4. It had to be trivially
-> > adjusted because kvm_x86_ops is a pointer on pre-5.7 kernels.
-> >
-> > After you apply that, the patch that you applied here for 5.10 will
-> > apply to 5.4.
->
-> I do not know what I "applied here" at all, sorry.  Please realize we
-> deal with hundreds of stable patches a week.
->
-> Please send me a patch series of what I needs to be applied and I will
-> be glad to queue them up.
+On 5/12/22 16:01, Nico Boehr wrote:
+> Upon migration, we expect storage keys being set by the guest to be preserved,
+> so add a test for it.
+> 
+> We keep 128 pages and set predictable storage keys. Then, we migrate and check
+> they can be read back and the respective access restrictions are in place when
+> the access key in the PSW doesn't match.
+> 
+> TCG currently doesn't implement key-controlled protection, see
+> target/s390x/mmu_helper.c, function mmu_handle_skey(), hence add the relevant
+> tests as xfails.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>   s390x/Makefile         |  1 +
+>   s390x/migration-skey.c | 98 ++++++++++++++++++++++++++++++++++++++++++
+>   s390x/unittests.cfg    |  4 ++
+>   3 files changed, 103 insertions(+)
+>   create mode 100644 s390x/migration-skey.c
+> 
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index a8e04aa6fe4d..f8ea594b641d 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -32,6 +32,7 @@ tests += $(TEST_DIR)/epsw.elf
+>   tests += $(TEST_DIR)/adtl-status.elf
+>   tests += $(TEST_DIR)/migration.elf
+>   tests += $(TEST_DIR)/pv-attest.elf
+> +tests += $(TEST_DIR)/migration-skey.elf
+>   
+>   pv-tests += $(TEST_DIR)/pv-diags.elf
+>   
+> diff --git a/s390x/migration-skey.c b/s390x/migration-skey.c
+> new file mode 100644
+> index 000000000000..6f3053d8ab40
+> --- /dev/null
+> +++ b/s390x/migration-skey.c
+> @@ -0,0 +1,98 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Storage Key migration tests
+> + *
+> + * Copyright IBM Corp. 2022
+> + *
+> + * Authors:
+> + *  Nico Boehr <nrb@linux.ibm.com>
+> + */
+> +
+> +#include <libcflat.h>
+> +#include <asm/facility.h>
+> +#include <asm/page.h>
+> +#include <asm/mem.h>
+> +#include <asm/interrupt.h>
+> +#include <hardware.h>
+> +
+> +#define NUM_PAGES 128
+> +static uint8_t pagebuf[NUM_PAGES][PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
+> +
+> +static void test_migration(void)
+> +{
+> +	int i, key_to_set;
+> +	uint8_t *page;
+> +	union skey expected_key, actual_key, mismatching_key;
+> +
+> +	for (i = 0; i < NUM_PAGES; i++) {
+> +		/*
+> +		 * Storage keys are 7 bit, lowest bit is always returned as zero
+> +		 * by iske
+> +		 */
+> +		key_to_set = i * 2;
+> +		set_storage_key(pagebuf + i, key_to_set, 1);
+> +	}
+> +
+> +	puts("Please migrate me, then press return\n");
+> +	(void)getchar();
+> +
+> +	for (i = 0; i < NUM_PAGES; i++) {
+> +		report_prefix_pushf("page %d", i);
+> +
+> +		page = &pagebuf[i][0];
+> +		actual_key.val = get_storage_key(page);
+> +		expected_key.val = i * 2;
+> +
+> +		/* ignore reference bit */
+> +		actual_key.str.rf = 0;
+> +		expected_key.str.rf = 0;
+> +
+> +		report(actual_key.val == expected_key.val, "expected_key=0x%x actual_key=0x%x", expected_key.val, actual_key.val);
+> +
+> +		/* ensure access key doesn't match storage key and is never zero */
+> +		mismatching_key.str.acc = expected_key.str.acc < 15 ? expected_key.str.acc + 1 : 1;
+> +		*page = 0xff;
+> +
+> +		expect_pgm_int();
+> +		asm volatile (
+> +			/* set access key */
+> +			"spka 0(%[mismatching_key])\n"
+> +			/* try to write page */
+> +			"mvi 0(%[page]), 42\n"
+> +			/* reset access key */
+> +			"spka 0\n"
+> +			:
+> +			: [mismatching_key] "a"(mismatching_key.val),
+> +			  [page] "a"(page)
+> +			: "memory"
+> +		);
+> +		check_pgm_int_code_xfail(host_is_tcg(), PGM_INT_CODE_PROTECTION);
 
-Alright, I sent you the one remaining patch for 5.4 in a separate thread.
-
-- Kyle
-
-> thanks,
->
-> greg k-h
+What's the expected pgm code?
+Is it 0 because no pgm was injected?
