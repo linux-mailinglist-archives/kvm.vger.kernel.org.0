@@ -2,135 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EDBCB525264
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 18:21:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E1D7452526C
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 18:22:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356408AbiELQVi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 12:21:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52798 "EHLO
+        id S1356424AbiELQW1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 12:22:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356510AbiELQVc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 12:21:32 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77C9251331;
-        Thu, 12 May 2022 09:21:30 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9862B61F9C;
-        Thu, 12 May 2022 16:21:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73140C385B8;
-        Thu, 12 May 2022 16:21:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1652372489;
-        bh=NDeYtJoOTyZCZ7rH4NHOQS1V70YxoweEBSxhUWIM/zE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=GEZzmykw70nosMdq2UT7qg8LKHXmRTyvKi2MNKMtZZ2CwyO6035MToY/A+CtoWVMY
-         oeSXpYZuUcqissIoGJ61njBawHIw+QDkKvnMrIZZylSUEPuDQKvY08371yKuyZbajk
-         RIXLkYKVZRAfckK8MXp2I3O8tCFEYOIRx+Ti6yrs=
-Date:   Thu, 12 May 2022 18:21:26 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Maximilian Heyne <mheyne@amazon.de>
-Cc:     stable@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 0/4] x86: decode Xen/KVM emulate prefixes
-Message-ID: <Yn00BsSx060gS94o@kroah.com>
-References: <20220512135654.119791-1-mheyne@amazon.de>
+        with ESMTP id S1356434AbiELQWW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 12:22:22 -0400
+Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A78BF1EE0B7;
+        Thu, 12 May 2022 09:22:20 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailout.west.internal (Postfix) with ESMTP id 2D5C632008C0;
+        Thu, 12 May 2022 12:22:18 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute4.internal (MEProxy); Thu, 12 May 2022 12:22:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to; s=fm1; t=1652372537; x=1652458937; bh=cpMJqs2BPo
+        uThgcWTZqhODB+0SLfKgwqdJV/jowmtjE=; b=OQi7CuJ4Quxmrh6Igu5bPVn94D
+        r6Q1n3lQuyMvgJp1Wus4vJFuyQS/4e4hc/AKlZPbqRs3VV78b3Fit/l1gH5mZrea
+        pw8E8BnWjyUaIGlBNg6UawHFu7VdeCCc+Fh+pjZZ+7aSsjLMXyQUZOjWjpf1mojQ
+        ElZzK5VJ06W0r3CR95L3aUQNYFZBZnzcmiU+ZSTSLKsf/S2PTrwnxnJ81jcOFpmr
+        00ANz+5K5j28u+MIApCugalXK/O1LxBG0we9vXalfEuuLZGgWAqm68qvRE0/2T56
+        Sjh5K7bDTQVvxUaeSpv6+akTxsRJxZ0nQT5Zi3tLRcWUpPv0nXokwHGjo59w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1652372537; x=
+        1652458937; bh=cpMJqs2BPouThgcWTZqhODB+0SLfKgwqdJV/jowmtjE=; b=X
+        gfUrRUARFIdakEMpkSWJl+D0ZAsUo4BI7UzPhkPyXMaehkGGagAkYHUo/Q8EGuIP
+        QToTB9T8oNzXs8CRGyvjN1FJmLL6quuB6759Xn6+OAIpJmf/Z/6nQpy+JtHlg4rJ
+        8iq1iXIMJ1iCoXh6ZipOEABLZ8jGNm0vcXBzk31TwLfHm0QDAlSRXq8XzRt8P1Xt
+        IAB43nKcn+D4n42N2enc91S2qtaEeWxOAXy3PXed0ovKlbbme1V/r9pLyEq1twVO
+        3raYlzr1Qh/7gP6PTntC1wn/KstmLFBBDI7dPrmvp784sgZg6AWHel8d4tkvDRa0
+        QrBtkDw3Qv50gbX7h3XyA==
+X-ME-Sender: <xms:ODR9YrDN2d9UBQQXwmmKafjVuRJejZtAXWXWaz3MKZfpE32MQ1whng>
+    <xme:ODR9YhjQvoTBEdB3JGg4mrCeODm_ODQVKtFWJb3uAqaWtgnz8VYaXA1k4QyFzlplx
+    3h5i17u5nuM3Q>
+X-ME-Received: <xmr:ODR9YmmCtJHinAfc2_RFO4YuBRlMk5ZUlp3ZgCxtJEHtD9eBioUeY4ulo59JUgAQB3dG0o1wWsTYsMMbWwT4mkiFDcODl0oM>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrgeejgdeliecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcu
+    mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpedtheeige
+    egueejffejleefkeevjeegiedtgfeigeetudeghfekjeelieelffefjeenucffohhmrghi
+    nheprhhrqdhprhhojhgvtghtrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepghhrvghgsehkrhhorghhrdgtohhm
+X-ME-Proxy: <xmx:ODR9YtxItcJMGtOdRYx51kKNfdr0x-70BK4z6nf1x5TkE-t-jdx6Fg>
+    <xmx:ODR9YgRyufX6mgUX6kTINajd6josu9QVCIQTfQTN4xjcmFk85mSFSA>
+    <xmx:ODR9YgbA-1CpEJNRtmodMtqgitMQTWxDcMeSBQ5nAUp5ByjtlAS4cw>
+    <xmx:OTR9YnLl9RObvQZC8RkT_r-1Bbb-I-_D2AOpR6p1DFamwZ8Kc_czcg>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 12 May 2022 12:22:16 -0400 (EDT)
+Date:   Thu, 12 May 2022 18:22:13 +0200
+From:   Greg KH <greg@kroah.com>
+To:     Kyle Huey <me@kylehuey.com>
+Cc:     stable@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        Robert O'Callahan <robert@ocallahan.org>,
+        Keno Fischer <keno@juliacomputing.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 5.4] KVM: x86/svm: Account for family 17h event
+ renumberings in amd_pmc_perf_hw_id
+Message-ID: <Yn00NbPVMOUF9yM/@kroah.com>
+References: <20220512143852.90281-1-khuey@kylehuey.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220512135654.119791-1-mheyne@amazon.de>
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220512143852.90281-1-khuey@kylehuey.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 12, 2022 at 01:56:47PM +0000, Maximilian Heyne wrote:
-> This is a backport of a patch series for 5.4.x.
+On Thu, May 12, 2022 at 07:38:52AM -0700, Kyle Huey wrote:
+> From: Kyle Huey <me@kylehuey.com>
 > 
-> The patch series allows the x86 decoder to decode the Xen and KVM emulate
-> prefixes.
+> commit 5eb849322d7f7ae9d5c587c7bc3b4f7c6872cd2f upstream
 > 
-> In particular this solves the following issue that appeared when commit
-> db6c6a0df840 ("objtool: Fix noreturn detection for ignored functions") was
-> backported to 5.4.69:
+> Zen renumbered some of the performance counters that correspond to the
+> well known events in perf_hw_id. This code in KVM was never updated for
+> that, so guest that attempt to use counters on Zen that correspond to the
+> pre-Zen perf_hw_id values will silently receive the wrong values.
 > 
->   arch/x86/xen/enlighten_pv.o: warning: objtool: xen_cpuid()+0x25: can't find jump dest instruction at .text+0x9c
+> This has been observed in the wild with rr[0] when running in Zen 3
+> guests. rr uses the retired conditional branch counter 00d1 which is
+> incorrectly recognized by KVM as PERF_COUNT_HW_STALLED_CYCLES_BACKEND.
 > 
-> Also now that this decoding is possible, also backport the commit which prevents
-> kprobes on probing such prefixed instructions. This was also part of the
-> original series.
+> [0] https://rr-project.org/
 > 
-> The series applied mostly cleanly on 5.4.192 except for a contextual problem in
-> the 3rd patch ("x86: xen: insn: Decode Xen and KVM emulate-prefix signature").
+> Signed-off-by: Kyle Huey <me@kylehuey.com>
+> Message-Id: <20220503050136.86298-1-khuey@kylehuey.com>
+> Cc: stable@vger.kernel.org
+> [Check guest family, not host. - Paolo]
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> [Backport to 5.15: adjusted context]
+> Signed-off-by: Kyle Huey <me@kylehuey.com>
+> ---
+>  arch/x86/kvm/pmu_amd.c | 28 +++++++++++++++++++++++++---
+>  1 file changed, 25 insertions(+), 3 deletions(-)
 > 
-> Masami Hiramatsu (4):
->   x86/asm: Allow to pass macros to __ASM_FORM()
->   x86: xen: kvm: Gather the definition of emulate prefixes
->   x86: xen: insn: Decode Xen and KVM emulate-prefix signature
->   x86: kprobes: Prohibit probing on instruction which has emulate prefix
-> 
->  arch/x86/include/asm/asm.h                  |  8 +++--
->  arch/x86/include/asm/emulate_prefix.h       | 14 +++++++++
->  arch/x86/include/asm/insn.h                 |  6 ++++
->  arch/x86/include/asm/xen/interface.h        | 11 +++----
->  arch/x86/kernel/kprobes/core.c              |  4 +++
->  arch/x86/kvm/x86.c                          |  4 ++-
->  arch/x86/lib/insn.c                         | 34 +++++++++++++++++++++
->  tools/arch/x86/include/asm/emulate_prefix.h | 14 +++++++++
->  tools/arch/x86/include/asm/insn.h           |  6 ++++
->  tools/arch/x86/lib/insn.c                   | 34 +++++++++++++++++++++
->  tools/objtool/sync-check.sh                 |  3 +-
->  tools/perf/check-headers.sh                 |  3 +-
->  12 files changed, 128 insertions(+), 13 deletions(-)
->  create mode 100644 arch/x86/include/asm/emulate_prefix.h
->  create mode 100644 tools/arch/x86/include/asm/emulate_prefix.h
-> 
-> 
-> base-commit: 1d72b776f6dc973211f5d153453cf8955fb3d70a
+> diff --git a/arch/x86/kvm/pmu_amd.c b/arch/x86/kvm/pmu_amd.c
+> index f843c6bbcd31..799b9a3144e3 100644
+> --- a/arch/x86/kvm/pmu_amd.c
+> +++ b/arch/x86/kvm/pmu_amd.c
+> @@ -44,6 +44,22 @@ static struct kvm_event_hw_type_mapping amd_event_mapping[] = {
+>  	[7] = { 0xd1, 0x00, PERF_COUNT_HW_STALLED_CYCLES_BACKEND },
+>  };
+>  
+> +/* duplicated from amd_f17h_perfmon_event_map. */
+> +static struct kvm_event_hw_type_mapping amd_f17h_event_mapping[] = {
+> +	[0] = { 0x76, 0x00, PERF_COUNT_HW_CPU_CYCLES },
+> +	[1] = { 0xc0, 0x00, PERF_COUNT_HW_INSTRUCTIONS },
+> +	[2] = { 0x60, 0xff, PERF_COUNT_HW_CACHE_REFERENCES },
+> +	[3] = { 0x64, 0x09, PERF_COUNT_HW_CACHE_MISSES },
+> +	[4] = { 0xc2, 0x00, PERF_COUNT_HW_BRANCH_INSTRUCTIONS },
+> +	[5] = { 0xc3, 0x00, PERF_COUNT_HW_BRANCH_MISSES },
+> +	[6] = { 0x87, 0x02, PERF_COUNT_HW_STALLED_CYCLES_FRONTEND },
+> +	[7] = { 0x87, 0x01, PERF_COUNT_HW_STALLED_CYCLES_BACKEND },
+> +};
+> +
+> +/* amd_pmc_perf_hw_id depends on these being the same size */
+> +static_assert(ARRAY_SIZE(amd_event_mapping) ==
+> +	     ARRAY_SIZE(amd_f17h_event_mapping));
+> +
+>  static unsigned int get_msr_base(struct kvm_pmu *pmu, enum pmu_type type)
+>  {
+>  	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
+> @@ -128,19 +144,25 @@ static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
+>  
+>  static unsigned int amd_pmc_perf_hw_id(struct kvm_pmc *pmc)
+>  {
+> +	struct kvm_event_hw_type_mapping *event_mapping;
+>  	u8 event_select = pmc->eventsel & ARCH_PERFMON_EVENTSEL_EVENT;
+>  	u8 unit_mask = (pmc->eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
+>  	int i;
+>  
+> +	if (guest_cpuid_family(pmc->vcpu) >= 0x17)
+> +		event_mapping = amd_f17h_event_mapping;
+> +	else
+> +		event_mapping = amd_event_mapping;
+> +
+>  	for (i = 0; i < ARRAY_SIZE(amd_event_mapping); i++)
+> -		if (amd_event_mapping[i].eventsel == event_select
+> -		    && amd_event_mapping[i].unit_mask == unit_mask)
+> +		if (event_mapping[i].eventsel == event_select
+> +		    && event_mapping[i].unit_mask == unit_mask)
+>  			break;
+>  
+>  	if (i == ARRAY_SIZE(amd_event_mapping))
+>  		return PERF_COUNT_HW_MAX;
+>  
+> -	return amd_event_mapping[i].event_type;
+> +	return event_mapping[i].event_type;
+>  }
+>  
+>  /* return PERF_COUNT_HW_MAX as AMD doesn't have fixed events */
 > -- 
-> 2.32.0
-> 
-> 
-> 
-> 
-> Amazon Development Center Germany GmbH
-> Krausenstr. 38
-> 10117 Berlin
-> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-> Sitz: Berlin
-> Ust-ID: DE 289 237 879
-> 
-> 
+> 2.36.0
 > 
 
-All now queued up, thanks.
+Now queued up, thanks.
 
 greg k-h
