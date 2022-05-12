@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F181552432A
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 05:18:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E34652433F
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 05:22:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245499AbiELDSj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 May 2022 23:18:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55882 "EHLO
+        id S1343673AbiELDS5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 May 2022 23:18:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343553AbiELDSf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 May 2022 23:18:35 -0400
+        with ESMTP id S245697AbiELDSm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 May 2022 23:18:42 -0400
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61AB721331D
-        for <kvm@vger.kernel.org>; Wed, 11 May 2022 20:18:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36BB56D39A
+        for <kvm@vger.kernel.org>; Wed, 11 May 2022 20:18:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652325513; x=1683861513;
+  t=1652325518; x=1683861518;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=13oKdudyn3OtFlvHP52LX9jc6TvQaEwqOOc3JtOS3+Y=;
-  b=BAtSEhRwTeOMBwcVsPZkng8vEt0zXzLnnytrZbJdZctiEJhcqfRPxyYZ
-   gR9HnFDWe73ezny1mD+9QKlTi4GuxvYWN2TBQz/A9Hva/s3AGFjhi7OTc
-   /2tDPnT5rzxRqyENrQK4eHAWiJuLLBEJh4u24dZ/iPqo6ZbKzGcsL6HtT
-   Gb4D0HehcSdL90mRrRZH6xsIJvT0yvUdXDkhV8TQQUbgKUiz3qmXHk1Q0
-   bUEF8f7HG7MhG2WqHXX+qtpFQLiSpEPPGf0Dn3JpRXtkISCEG6Ly+UYtE
-   2FKIvDUja9+8crWdkQM49Y5k+cn+0NS/yi3Mx5/c2p8t1CBFS9n+DmNEs
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10344"; a="257424045"
+  bh=my0QV5ZFuAy12zRKZ3VQ+CVRpN2ljFqiVkJVh+RWdF4=;
+  b=itgZ8gNQA1ckyxHk2JWrp0I2WEw0pQPdu5cNdLOS4yH8TklwTd3WiGRt
+   lAXgyv3QTHzzCZr57KK/UPqipJUGkLYzEc8hf47yw+Y5vVNhDf05Rjg+z
+   lkQqht2RXSq8lKKkF9SoYGS60EnR4MhQMDAZkyvjvcZL8ECxZhTEDrX1I
+   TN9vq7CnkfOhUDKmp/xjLa0YgUJt4O0bbn6zITV2MGhlCN4aBvaswZ9xn
+   Sll+HkxHPypPcC011AzOIF8Y2rYOC+Pc0T1p2ozY+WQNauRuL5Y6GHN4t
+   e0PTQu7eak+qd44XV9RgJIuXeBPP0LseWTXSWQya77hcl+rScQGbEApRe
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10344"; a="257424084"
 X-IronPort-AV: E=Sophos;i="5.91,218,1647327600"; 
-   d="scan'208";a="257424045"
+   d="scan'208";a="257424084"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2022 20:18:32 -0700
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2022 20:18:37 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.91,218,1647327600"; 
-   d="scan'208";a="594455481"
+   d="scan'208";a="594455498"
 Received: from lxy-dell.sh.intel.com ([10.239.159.55])
-  by orsmga008.jf.intel.com with ESMTP; 11 May 2022 20:18:28 -0700
+  by orsmga008.jf.intel.com with ESMTP; 11 May 2022 20:18:32 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Isaku Yamahata <isaku.yamahata@gmail.com>,
@@ -53,9 +53,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
 Cc:     Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
         kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com,
         xiaoyao.li@intel.com
-Subject: [RFC PATCH v4 05/36] i386/tdx: Implement tdx_kvm_init() to initialize TDX VM context
-Date:   Thu, 12 May 2022 11:17:32 +0800
-Message-Id: <20220512031803.3315890-6-xiaoyao.li@intel.com>
+Subject: [RFC PATCH v4 06/36] i386/tdx: Get tdx_capabilities via KVM_TDX_CAPABILITIES
+Date:   Thu, 12 May 2022 11:17:33 +0800
+Message-Id: <20220512031803.3315890-7-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220512031803.3315890-1-xiaoyao.li@intel.com>
 References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
@@ -72,121 +72,120 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce tdx_kvm_init() and invoke it in kvm_confidential_guest_init()
-if it's a TDX VM. More initialization will be added later.
+KVM provides TDX capabilities via sub command KVM_TDX_CAPABILITIES of
+IOCTL(KVM_MEMORY_ENCRYPT_OP). Get the capabilities when initializing
+TDX context. It will be used to validate user's setting later.
+
+Besides, introduce the interfaces to invoke TDX "ioctls" at different
+scope (KVM, VM and VCPU) in preparation.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- target/i386/kvm/kvm.c       | 15 ++++++---------
- target/i386/kvm/meson.build |  2 +-
- target/i386/kvm/tdx-stub.c  |  9 +++++++++
- target/i386/kvm/tdx.c       |  7 +++++++
- target/i386/kvm/tdx.h       |  2 ++
- 5 files changed, 25 insertions(+), 10 deletions(-)
- create mode 100644 target/i386/kvm/tdx-stub.c
+ target/i386/kvm/tdx.c | 85 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 85 insertions(+)
 
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index f657518616f1..f257ffda259d 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -54,6 +54,7 @@
- #include "migration/blocker.h"
- #include "exec/memattrs.h"
- #include "trace.h"
-+#include "tdx.h"
- 
- #include CONFIG_DEVICES
- 
-@@ -2430,6 +2431,8 @@ static int kvm_confidential_guest_init(MachineState *ms, Error **errp)
- {
-     if (object_dynamic_cast(OBJECT(ms->cgs), TYPE_SEV_GUEST)) {
-         return sev_kvm_init(ms->cgs, errp);
-+    } else if (object_dynamic_cast(OBJECT(ms->cgs), TYPE_TDX_GUEST)) {
-+        return tdx_kvm_init(ms, errp);
-     }
- 
-     return 0;
-@@ -2444,16 +2447,10 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     Error *local_err = NULL;
- 
-     /*
--     * Initialize SEV context, if required
-+     * Initialize confidential guest (SEV/TDX) context, if required
-      *
--     * If no memory encryption is requested (ms->cgs == NULL) this is
--     * a no-op.
--     *
--     * It's also a no-op if a non-SEV confidential guest support
--     * mechanism is selected.  SEV is the only mechanism available to
--     * select on x86 at present, so this doesn't arise, but if new
--     * mechanisms are supported in future (e.g. TDX), they'll need
--     * their own initialization either here or elsewhere.
-+     * It's a no-op if a non-SEV/non-tdx confidential guest support
-+     * mechanism is selected, i.e., ms->cgs == NULL
-      */
-     ret = kvm_confidential_guest_init(ms, &local_err);
-     if (ret < 0) {
-diff --git a/target/i386/kvm/meson.build b/target/i386/kvm/meson.build
-index b2d7d41acde2..fd30b93ecec9 100644
---- a/target/i386/kvm/meson.build
-+++ b/target/i386/kvm/meson.build
-@@ -9,7 +9,7 @@ i386_softmmu_kvm_ss.add(files(
- 
- i386_softmmu_kvm_ss.add(when: 'CONFIG_SEV', if_false: files('sev-stub.c'))
- 
--i386_softmmu_kvm_ss.add(when: 'CONFIG_TDX', if_true: files('tdx.c'))
-+i386_softmmu_kvm_ss.add(when: 'CONFIG_TDX', if_true: files('tdx.c'), if_false: files('tdx-stub.c'))
- 
- i386_softmmu_ss.add(when: 'CONFIG_HYPERV', if_true: files('hyperv.c'), if_false: files('hyperv-stub.c'))
- 
-diff --git a/target/i386/kvm/tdx-stub.c b/target/i386/kvm/tdx-stub.c
-new file mode 100644
-index 000000000000..1df24735201e
---- /dev/null
-+++ b/target/i386/kvm/tdx-stub.c
-@@ -0,0 +1,9 @@
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+
-+#include "tdx.h"
-+
-+int tdx_kvm_init(MachineState *ms, Error **errp)
-+{
-+    return -EINVAL;
-+}
 diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index d3792d4a3d56..77e33ae01147 100644
+index 77e33ae01147..68bedbad0ebe 100644
 --- a/target/i386/kvm/tdx.c
 +++ b/target/i386/kvm/tdx.c
-@@ -12,10 +12,17 @@
-  */
- 
+@@ -14,12 +14,97 @@
  #include "qemu/osdep.h"
-+#include "qapi/error.h"
+ #include "qapi/error.h"
  #include "qom/object_interfaces.h"
++#include "sysemu/kvm.h"
  
-+#include "hw/i386/x86.h"
+ #include "hw/i386/x86.h"
  #include "tdx.h"
  
-+int tdx_kvm_init(MachineState *ms, Error **errp)
++enum tdx_ioctl_level{
++    TDX_PLATFORM_IOCTL,
++    TDX_VM_IOCTL,
++    TDX_VCPU_IOCTL,
++};
++
++static int __tdx_ioctl(void *state, enum tdx_ioctl_level level, int cmd_id,
++                        __u32 flags, void *data)
 +{
-+    return 0;
++    struct kvm_tdx_cmd tdx_cmd;
++    int r;
++
++    memset(&tdx_cmd, 0x0, sizeof(tdx_cmd));
++
++    tdx_cmd.id = cmd_id;
++    tdx_cmd.flags = flags;
++    tdx_cmd.data = (__u64)(unsigned long)data;
++
++    switch (level) {
++    case TDX_PLATFORM_IOCTL:
++        r = kvm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_OP, &tdx_cmd);
++        break;
++    case TDX_VM_IOCTL:
++        r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_OP, &tdx_cmd);
++        break;
++    case TDX_VCPU_IOCTL:
++        r = kvm_vcpu_ioctl(state, KVM_MEMORY_ENCRYPT_OP, &tdx_cmd);
++        break;
++    default:
++        error_report("Invalid tdx_ioctl_level %d", level);
++        exit(1);
++    }
++
++    return r;
 +}
 +
- /* tdx guest */
- OBJECT_DEFINE_TYPE_WITH_INTERFACES(TdxGuest,
-                                    tdx_guest,
-diff --git a/target/i386/kvm/tdx.h b/target/i386/kvm/tdx.h
-index 415aeb5af746..c8a23d95258d 100644
---- a/target/i386/kvm/tdx.h
-+++ b/target/i386/kvm/tdx.h
-@@ -16,4 +16,6 @@ typedef struct TdxGuest {
-     uint64_t attributes;    /* TD attributes */
- } TdxGuest;
- 
-+int tdx_kvm_init(MachineState *ms, Error **errp);
++static inline int tdx_platform_ioctl(int cmd_id, __u32 metadata, void *data)
++{
++    return __tdx_ioctl(NULL, TDX_PLATFORM_IOCTL, cmd_id, metadata, data);
++}
 +
- #endif /* QEMU_I386_TDX_H */
++static inline int tdx_vm_ioctl(int cmd_id, __u32 metadata, void *data)
++{
++    return __tdx_ioctl(NULL, TDX_VM_IOCTL, cmd_id, metadata, data);
++}
++
++static inline int tdx_vcpu_ioctl(void *vcpu_fd, int cmd_id, __u32 metadata,
++                                 void *data)
++{
++    return  __tdx_ioctl(vcpu_fd, TDX_VCPU_IOCTL, cmd_id, metadata, data);
++}
++
++static struct kvm_tdx_capabilities *tdx_caps;
++
++static void get_tdx_capabilities(void)
++{
++    struct kvm_tdx_capabilities *caps;
++    int max_ent = 1;
++    int r, size;
++
++    do {
++        size = sizeof(struct kvm_tdx_capabilities) +
++               max_ent * sizeof(struct kvm_tdx_cpuid_config);
++        caps = g_malloc0(size);
++        caps->nr_cpuid_configs = max_ent;
++
++        r = tdx_platform_ioctl(KVM_TDX_CAPABILITIES, 0, caps);
++        if (r == -E2BIG) {
++            g_free(caps);
++            max_ent *= 2;
++        } else if (r < 0) {
++            error_report("KVM_TDX_CAPABILITIES failed: %s\n", strerror(-r));
++            exit(1);
++        }
++    }
++    while (r == -E2BIG);
++
++    tdx_caps = caps;
++}
++
+ int tdx_kvm_init(MachineState *ms, Error **errp)
+ {
++    if (!tdx_caps) {
++        get_tdx_capabilities();
++    }
++
+     return 0;
+ }
+ 
 -- 
 2.27.0
 
