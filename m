@@ -2,240 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 69EA5524F25
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 16:01:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B06D8524F61
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 16:04:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354893AbiELOBW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 10:01:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40484 "EHLO
+        id S1354982AbiELOEa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 10:04:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354889AbiELOBQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 10:01:16 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3D6D3C72A;
-        Thu, 12 May 2022 07:01:14 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24CDwpaK030465;
-        Thu, 12 May 2022 14:01:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=zhMAomLD7ZFQHiwB21YPc15gmR+KxPWimjeAkGgbfsM=;
- b=anBUTtFEZa6Wlsfi6qJKjeG2QE/og0uqO72Fric2wmIrODG0dTS5aCh5/QqhubA2D1uN
- 2LsyPrUg1SostqTX5uR5UAw8nUfAxa3vkLEWtvfL+X4KLKZOrFIWuKEfFKwlRqSshDww
- PqK//T5wxtwkE+W11XqprDqDsoM5AUQmd/SemaNQXEAiYUa+QJcKHRz6mDG8CI8o0C+I
- ehCujwLfl7ZJv8Q3F98DipPIRYk9UoaVUtfdEzuElu5i5HeKCJpxThF6SogEtNLSL5zU
- 1gsmu+YMD/8G3vye4Y95fA6qm6igXjBH8kEsAgAH0Xj2cPt6i32zNSXA0wnj6eGpUhbP Hw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g13kp82pv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 May 2022 14:01:14 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24CDx9I7031083;
-        Thu, 12 May 2022 14:01:14 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g13kp82mu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 May 2022 14:01:13 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24CDwgvI014305;
-        Thu, 12 May 2022 14:01:11 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3fwgd8y571-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 May 2022 14:01:11 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24CE0lSk30147024
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 May 2022 14:00:47 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6EF4AA4054;
-        Thu, 12 May 2022 14:01:08 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2D62DA405B;
-        Thu, 12 May 2022 14:01:08 +0000 (GMT)
-Received: from t46lp57.lnxne.boe (unknown [9.152.108.100])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 12 May 2022 14:01:08 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
-        scgl@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v1 2/2] s390x: add migration test for storage keys
-Date:   Thu, 12 May 2022 16:01:07 +0200
-Message-Id: <20220512140107.1432019-3-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220512140107.1432019-1-nrb@linux.ibm.com>
-References: <20220512140107.1432019-1-nrb@linux.ibm.com>
+        with ESMTP id S1354972AbiELOE3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 10:04:29 -0400
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11BC11EEE1B;
+        Thu, 12 May 2022 07:04:26 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id dk23so10450019ejb.8;
+        Thu, 12 May 2022 07:04:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=fs8s4x4j/+asSW1i8f2Pukqgr0Ir/tJgvdWyY3yoq3U=;
+        b=SUG5R4mvQVZygGuRddCDO8dZQacyk07/cAZawwDbBHFiIcz+Eh01oOdFt+8NMsiteQ
+         s8AlWxu2/skdBIc9am1jSyRtORyb1BuvlFo2plpzUHEsxv9da1HNExENjJ/0t+nOi9bO
+         k6oU2HkXL/cV0mXaW/mfigdUplLND8VcIPAZZRcd10cHVVgLxpSC20yq2GqMhOEn4o3v
+         BX8j64LjIRumUuIVBipI3tL8S6DVa+sbn4U3DSEKiGesq+9Htf13sK9idkEcXbPWJtoW
+         pmum4BbxGst/QvpAJs+YLlKzd9hKoO2n+ygfnHiEf87Cm4zp15vme9Bvbc6JHtHUcLB8
+         yScg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=fs8s4x4j/+asSW1i8f2Pukqgr0Ir/tJgvdWyY3yoq3U=;
+        b=v4B3HHwlk9jnnCSMeZzI1PxJB6prSWalTvvucWTXhx+NZ1PbGCi41eDOQWYYEH0O+3
+         muOEYrZEVquXOOjvDXr+YsfSAaqZQJRZaxePEZHel8j4i8tA6aO4IkFHyXIaHj0cJ9W4
+         28be8uzT1XAahhlfBeARCdaypq7rl6NKnXK2vAvT6p4tNhQkA/St14A7NR5hGRh9uYHB
+         SabIQYkJz30ql5GC917Acr3flgypcku2CDRsX173gT7kGQRqn6/LthrojbCCsbiRG/yE
+         DrdNaI/2DBJBPvqv8aDmTlh6yK6Wfvt4BAIga4uV5t4jWiawAb0tIIiOCusVsAyq0Pyp
+         ArjA==
+X-Gm-Message-State: AOAM531Z2Pg69vJsy5zCPsP3LGyejYQK8occa6UXxI3e3xO1VdLvgfM8
+        le6fTlZM6RoH0xjheWHlQ9U=
+X-Google-Smtp-Source: ABdhPJyt50qyYPCyD03r3/AJ3OUGuB2lb9Kyp65SglIgNSyfP293qaN/xBFVKFZfLgIbEagAjedBOw==
+X-Received: by 2002:a17:907:3e86:b0:6f5:917:10cc with SMTP id hs6-20020a1709073e8600b006f5091710ccmr63430ejc.53.1652364264897;
+        Thu, 12 May 2022 07:04:24 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id r10-20020a508d8a000000b00428bb4c952bsm2609603edh.31.2022.05.12.07.04.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 May 2022 07:04:24 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <0d4e0b40-a2b3-789f-3adb-9da30c61403f@redhat.com>
+Date:   Thu, 12 May 2022 16:04:20 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 1MFFJouMPZx1PeTsS9BZ53P7m2LWsTth
-X-Proofpoint-GUID: RrU1IxcOkzMvVf0JaJOMKjEM5bRg--tF
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-12_10,2022-05-12_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- suspectscore=0 bulkscore=0 adultscore=0 priorityscore=1501 spamscore=0
- lowpriorityscore=0 mlxscore=0 phishscore=0 mlxlogscore=884 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2205120067
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH] selftests: kvm: replace ternary operator with min()
+Content-Language: en-US
+To:     Guo Zhengkui <guozhengkui@vivo.com>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Anup Patel <anup@brainfault.org>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:RISC-V ARCHITECTURE" <linux-riscv@lists.infradead.org>
+Cc:     zhengkui_guo@outlook.com
+References: <20220511120621.36956-1-guozhengkui@vivo.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220511120621.36956-1-guozhengkui@vivo.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Upon migration, we expect storage keys being set by the guest to be preserved,
-so add a test for it.
+On 5/11/22 14:05, Guo Zhengkui wrote:
+> Fix the following coccicheck warnings:
+> 
+> tools/testing/selftests/kvm/lib/s390x/ucall.c:25:15-17: WARNING
+> opportunity for min()
+> tools/testing/selftests/kvm/lib/x86_64/ucall.c:27:15-17: WARNING
+> opportunity for min()
+> tools/testing/selftests/kvm/lib/riscv/ucall.c:56:15-17: WARNING
+> opportunity for min()
+> tools/testing/selftests/kvm/lib/aarch64/ucall.c:82:15-17: WARNING
+> opportunity for min()
+> tools/testing/selftests/kvm/lib/aarch64/ucall.c:55:20-21: WARNING
+> opportunity for min()
+> 
+> min() is defined in tools/include/linux/kernel.h.
+> 
+> Signed-off-by: Guo Zhengkui <guozhengkui@vivo.com>
+> ---
+>   tools/testing/selftests/kvm/lib/aarch64/ucall.c | 4 ++--
+>   tools/testing/selftests/kvm/lib/riscv/ucall.c   | 2 +-
+>   tools/testing/selftests/kvm/lib/s390x/ucall.c   | 2 +-
+>   tools/testing/selftests/kvm/lib/x86_64/ucall.c  | 2 +-
+>   4 files changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/ucall.c b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
+> index e0b0164e9af8..00be3ef195ca 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/ucall.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
+> @@ -52,7 +52,7 @@ void ucall_init(struct kvm_vm *vm, void *arg)
+>   	 * lower and won't match physical addresses.
+>   	 */
+>   	bits = vm->va_bits - 1;
+> -	bits = vm->pa_bits < bits ? vm->pa_bits : bits;
+> +	bits = min(vm->pa_bits, bits);
+>   	end = 1ul << bits;
+>   	start = end * 5 / 8;
+>   	step = end / 16;
+> @@ -79,7 +79,7 @@ void ucall(uint64_t cmd, int nargs, ...)
+>   	va_list va;
+>   	int i;
+>   
+> -	nargs = nargs <= UCALL_MAX_ARGS ? nargs : UCALL_MAX_ARGS;
+> +	nargs = min(nargs, UCALL_MAX_ARGS);
+>   
+>   	va_start(va, nargs);
+>   	for (i = 0; i < nargs; ++i)
+> diff --git a/tools/testing/selftests/kvm/lib/riscv/ucall.c b/tools/testing/selftests/kvm/lib/riscv/ucall.c
+> index 9e42d8248fa6..34f16fe70ce8 100644
+> --- a/tools/testing/selftests/kvm/lib/riscv/ucall.c
+> +++ b/tools/testing/selftests/kvm/lib/riscv/ucall.c
+> @@ -53,7 +53,7 @@ void ucall(uint64_t cmd, int nargs, ...)
+>   	va_list va;
+>   	int i;
+>   
+> -	nargs = nargs <= UCALL_MAX_ARGS ? nargs : UCALL_MAX_ARGS;
+> +	nargs = min(nargs, UCALL_MAX_ARGS);
+>   
+>   	va_start(va, nargs);
+>   	for (i = 0; i < nargs; ++i)
+> diff --git a/tools/testing/selftests/kvm/lib/s390x/ucall.c b/tools/testing/selftests/kvm/lib/s390x/ucall.c
+> index 9d3b0f15249a..665267c1135d 100644
+> --- a/tools/testing/selftests/kvm/lib/s390x/ucall.c
+> +++ b/tools/testing/selftests/kvm/lib/s390x/ucall.c
+> @@ -22,7 +22,7 @@ void ucall(uint64_t cmd, int nargs, ...)
+>   	va_list va;
+>   	int i;
+>   
+> -	nargs = nargs <= UCALL_MAX_ARGS ? nargs : UCALL_MAX_ARGS;
+> +	nargs = min(nargs, UCALL_MAX_ARGS);
+>   
+>   	va_start(va, nargs);
+>   	for (i = 0; i < nargs; ++i)
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/ucall.c b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
+> index a3489973e290..2ea31a0ebe30 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/ucall.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
+> @@ -24,7 +24,7 @@ void ucall(uint64_t cmd, int nargs, ...)
+>   	va_list va;
+>   	int i;
+>   
+> -	nargs = nargs <= UCALL_MAX_ARGS ? nargs : UCALL_MAX_ARGS;
+> +	nargs = min(nargs, UCALL_MAX_ARGS);
+>   
+>   	va_start(va, nargs);
+>   	for (i = 0; i < nargs; ++i)
 
-We keep 128 pages and set predictable storage keys. Then, we migrate and check
-they can be read back and the respective access restrictions are in place when
-the access key in the PSW doesn't match.
+Queued, thanks.
 
-TCG currently doesn't implement key-controlled protection, see
-target/s390x/mmu_helper.c, function mmu_handle_skey(), hence add the relevant
-tests as xfails.
-
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
----
- s390x/Makefile         |  1 +
- s390x/migration-skey.c | 98 ++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg    |  4 ++
- 3 files changed, 103 insertions(+)
- create mode 100644 s390x/migration-skey.c
-
-diff --git a/s390x/Makefile b/s390x/Makefile
-index a8e04aa6fe4d..f8ea594b641d 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -32,6 +32,7 @@ tests += $(TEST_DIR)/epsw.elf
- tests += $(TEST_DIR)/adtl-status.elf
- tests += $(TEST_DIR)/migration.elf
- tests += $(TEST_DIR)/pv-attest.elf
-+tests += $(TEST_DIR)/migration-skey.elf
- 
- pv-tests += $(TEST_DIR)/pv-diags.elf
- 
-diff --git a/s390x/migration-skey.c b/s390x/migration-skey.c
-new file mode 100644
-index 000000000000..6f3053d8ab40
---- /dev/null
-+++ b/s390x/migration-skey.c
-@@ -0,0 +1,98 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Storage Key migration tests
-+ *
-+ * Copyright IBM Corp. 2022
-+ *
-+ * Authors:
-+ *  Nico Boehr <nrb@linux.ibm.com>
-+ */
-+
-+#include <libcflat.h>
-+#include <asm/facility.h>
-+#include <asm/page.h>
-+#include <asm/mem.h>
-+#include <asm/interrupt.h>
-+#include <hardware.h>
-+
-+#define NUM_PAGES 128
-+static uint8_t pagebuf[NUM_PAGES][PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
-+
-+static void test_migration(void)
-+{
-+	int i, key_to_set;
-+	uint8_t *page;
-+	union skey expected_key, actual_key, mismatching_key;
-+
-+	for (i = 0; i < NUM_PAGES; i++) {
-+		/*
-+		 * Storage keys are 7 bit, lowest bit is always returned as zero
-+		 * by iske
-+		 */
-+		key_to_set = i * 2;
-+		set_storage_key(pagebuf + i, key_to_set, 1);
-+	}
-+
-+	puts("Please migrate me, then press return\n");
-+	(void)getchar();
-+
-+	for (i = 0; i < NUM_PAGES; i++) {
-+		report_prefix_pushf("page %d", i);
-+
-+		page = &pagebuf[i][0];
-+		actual_key.val = get_storage_key(page);
-+		expected_key.val = i * 2;
-+
-+		/* ignore reference bit */
-+		actual_key.str.rf = 0;
-+		expected_key.str.rf = 0;
-+
-+		report(actual_key.val == expected_key.val, "expected_key=0x%x actual_key=0x%x", expected_key.val, actual_key.val);
-+
-+		/* ensure access key doesn't match storage key and is never zero */
-+		mismatching_key.str.acc = expected_key.str.acc < 15 ? expected_key.str.acc + 1 : 1;
-+		*page = 0xff;
-+
-+		expect_pgm_int();
-+		asm volatile (
-+			/* set access key */
-+			"spka 0(%[mismatching_key])\n"
-+			/* try to write page */
-+			"mvi 0(%[page]), 42\n"
-+			/* reset access key */
-+			"spka 0\n"
-+			:
-+			: [mismatching_key] "a"(mismatching_key.val),
-+			  [page] "a"(page)
-+			: "memory"
-+		);
-+		check_pgm_int_code_xfail(host_is_tcg(), PGM_INT_CODE_PROTECTION);
-+		report_xfail(host_is_tcg(), *page == 0xff, "no store occured");
-+
-+		report_prefix_pop();
-+	}
-+}
-+
-+int main(void)
-+{
-+	report_prefix_push("migration-skey");
-+	if (test_facility(169)) {
-+		report_skip("storage key removal facility is active");
-+
-+		/*
-+		 * If we just exit and don't ask migrate_cmd to migrate us, it
-+		 * will just hang forever. Hence, also ask for migration when we
-+		 * skip this test alltogether.
-+		 */
-+		puts("Please migrate me, then press return\n");
-+		(void)getchar();
-+
-+		goto done;
-+	}
-+
-+	test_migration();
-+
-+done:
-+	report_prefix_pop();
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index b456b2881448..1e851d8e3dd8 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -176,3 +176,7 @@ extra_params = -cpu qemu,gs=off,vx=off
- file = migration.elf
- groups = migration
- smp = 2
-+
-+[migration-skey]
-+file = migration-skey.elf
-+groups = migration
--- 
-2.31.1
-
+Paolo
