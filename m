@@ -2,82 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA949524920
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 11:36:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0208B524921
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 11:36:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352107AbiELJg0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 05:36:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54342 "EHLO
+        id S1352131AbiELJg1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 05:36:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352083AbiELJfr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1352092AbiELJfr (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 12 May 2022 05:35:47 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E1D41CFEE
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 02:35:42 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24C9LO59008325
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 09:35:41 GMT
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C94821260
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 02:35:43 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24C8pT1H030577
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 09:35:42 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=hWDhDe5h0HzkCk3klfCR1lFAZ07m8kpKVuIJJjysHIU=;
- b=YhxH1EcEgPet7jqIIvuTNtppVMNoIu5732dqeY9k3k33M3avU71MU5EjWYO09NlbsrNG
- rmh8V9ZkWikuUgL1AGNgYQTRZXpe2/uGguGNEZeNHWJturmTxqKG6PbbjVM70MQURWEQ
- q5TXDCpnnQISqOyyau+I63WAN2kNCcHrJ4/n5SPFTpc/OI7GtLxDyWLaxlWk2ruyEYAA
- FUXWjfazaaOQZ4NfSBRStW6RKJh2DcIqUwVUvIAW4t51Q+I3WxHWQRo8KLTqvMJvnCqd
- 9Eplx42E38ufsHglJcMOz3tevA5Li9aL9jIpOO9HD5PEoM4jpZIidOIl+w7Re9DNCvUm 8g== 
+ bh=s5OOIJLPaqiWzPJBzXiF04VKqQzACmsxIroRAPG62Po=;
+ b=LTyq6Qf5lTMNq6hsd1ann7ZRmv8Xeuc1CDiej7p6xpulO+iRdpt0T0aCFG9EnwgMGHHM
+ M7xVwibyKXXzpX+KAu2NUp0fyV8SAnAu+bPXlME8bKsZFFYnlFrs8rP7bQS5WVmpi+pp
+ l38os9SOBFjnRNZyQ271Hd/VKtlsriJfhqQIcBbVchE1z4yAViJZtfZq9DPMSss46FJV
+ CbGCkLMXQ9irRt1RFN3ziy+6+oPgfDaNDWXEnQErw6qwi7qhdv++O7oUlZOZEIJc2SmY
+ 6Xm9o1QkiAMafBgLt2+ZzGgBFUfCsv1yuM56lw43OuWc8KkiW62cT9yhtQ3fIAZ8fLM/ GQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g0yhh87xe-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g0y3kh0d8-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 09:35:41 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24C9ZefT019536
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 09:35:40 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g0yhh87wv-1
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 09:35:42 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24C8re9M037384
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 09:35:42 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g0y3kh0ck-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 May 2022 09:35:40 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24C9XMrl011803;
+        Thu, 12 May 2022 09:35:41 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24C9WeD2001628;
         Thu, 12 May 2022 09:35:39 GMT
 Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06ams.nl.ibm.com with ESMTP id 3fyrkk2n8x-1
+        by ppma02fra.de.ibm.com with ESMTP id 3fwgd8w8xd-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 12 May 2022 09:35:39 +0000
 Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24C9Lvdl49414522
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24C9LvT453936532
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Thu, 12 May 2022 09:21:57 GMT
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 32CE611C052;
+        by IMSVA (Postfix) with ESMTP id 8C69711C05B;
         Thu, 12 May 2022 09:35:35 +0000 (GMT)
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D5AFC11C04C;
-        Thu, 12 May 2022 09:35:34 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 452DE11C04A;
+        Thu, 12 May 2022 09:35:35 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.10.145])
         by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 12 May 2022 09:35:34 +0000 (GMT)
+        Thu, 12 May 2022 09:35:35 +0000 (GMT)
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     pbonzini@redhat.com
 Cc:     kvm@vger.kernel.org, thuth@redhat.com, frankja@linux.ibm.com,
         Nico Boehr <nrb@linux.ibm.com>
-Subject: [kvm-unit-tests GIT PULL 17/28] s390x: add support for migration tests
-Date:   Thu, 12 May 2022 11:35:12 +0200
-Message-Id: <20220512093523.36132-18-imbrenda@linux.ibm.com>
+Subject: [kvm-unit-tests GIT PULL 18/28] s390x: don't run migration tests under PV
+Date:   Thu, 12 May 2022 11:35:13 +0200
+Message-Id: <20220512093523.36132-19-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <20220512093523.36132-1-imbrenda@linux.ibm.com>
 References: <20220512093523.36132-1-imbrenda@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: G_k2qzHAOKHEwBzUeQSA3R6ZjAuXeKsh
-X-Proofpoint-ORIG-GUID: A6vqJX6b_lskiGuVxTl-qJXMsblliXSr
+X-Proofpoint-ORIG-GUID: TAQQwnQTjBdZtfAD15zNjaYnqzvtUbFm
+X-Proofpoint-GUID: LrJXhI023hWOLUFKQFqJoXBmrrFDwzri
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-05-12_02,2022-05-12_01,2022-02-23_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- lowpriorityscore=0 spamscore=0 mlxlogscore=999 adultscore=0 malwarescore=0
- bulkscore=0 priorityscore=1501 suspectscore=0 clxscore=1015 mlxscore=0
+ mlxlogscore=999 lowpriorityscore=0 spamscore=0 adultscore=0 suspectscore=0
+ clxscore=1015 priorityscore=1501 mlxscore=0 bulkscore=0 malwarescore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
  definitions=main-2205120044
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -91,30 +91,46 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Nico Boehr <nrb@linux.ibm.com>
 
-Now that we have SCLP console read support, run our tests with migration_cmd, so
-we can get migration support on s390x.
+PV doesn't support migration, so don't run the migration tests there.
 
 Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 ---
- s390x/run | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/s390x/func.bash | 2 +-
+ s390x/run               | 5 +++++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
+diff --git a/scripts/s390x/func.bash b/scripts/s390x/func.bash
+index bf799a56..2a941bbb 100644
+--- a/scripts/s390x/func.bash
++++ b/scripts/s390x/func.bash
+@@ -21,7 +21,7 @@ function arch_cmd_s390x()
+ 	"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
+ 
+ 	# run PV test case
+-	if [ "$ACCEL" = 'tcg' ]; then
++	if [ "$ACCEL" = 'tcg' ] || find_word "migration" "$groups"; then
+ 		return
+ 	fi
+ 	kernel=${kernel%.elf}.pv.bin
 diff --git a/s390x/run b/s390x/run
-index 064ecd1b..2bcdabba 100755
+index 2bcdabba..24138f68 100755
 --- a/s390x/run
 +++ b/s390x/run
-@@ -25,7 +25,7 @@ M+=",accel=$ACCEL"
- command="$qemu -nodefaults -nographic $M"
- command+=" -chardev stdio,id=con0 -device sclpconsole,chardev=con0"
- command+=" -kernel"
--command="$(timeout_cmd) $command"
-+command="$(migration_cmd) $(timeout_cmd) $command"
+@@ -20,6 +20,11 @@ if [ "${1: -7}" = ".pv.bin" ] || [ "${TESTNAME: -3}" = "_PV" ] && [ "$ACCEL" = "
+ 	exit 2
+ fi
  
- # We return the exit code via stdout, not via the QEMU return code
- run_qemu_status $command "$@"
++if [ "${1: -7}" = ".pv.bin" ] || [ "${TESTNAME: -3}" = "_PV" ] && [ "$MIGRATION" = "yes" ]; then
++	echo "Migration isn't supported under Protected Virtualization"
++	exit 2
++fi
++
+ M='-machine s390-ccw-virtio'
+ M+=",accel=$ACCEL"
+ command="$qemu -nodefaults -nographic $M"
 -- 
 2.36.1
 
