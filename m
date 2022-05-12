@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 69166524339
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 05:22:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D27F0524334
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 05:22:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343493AbiELDTL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 May 2022 23:19:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57572 "EHLO
+        id S245183AbiELDTo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 May 2022 23:19:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245593AbiELDTB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 May 2022 23:19:01 -0400
+        with ESMTP id S1343817AbiELDTi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 May 2022 23:19:38 -0400
 Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05EF86D39A
-        for <kvm@vger.kernel.org>; Wed, 11 May 2022 20:18:59 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 697A7216840
+        for <kvm@vger.kernel.org>; Wed, 11 May 2022 20:19:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652325540; x=1683861540;
+  t=1652325571; x=1683861571;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=xXOpZyf6vx7tJv/hV11QMvvy3TYUd0GngrfsQ4GYerg=;
-  b=CCc5sEswHNMdnd+XTC4wW+xmBu0leTpArlOpP1p/V9ul4FidAla7fnNK
-   joW99KiGcNF7oN81hCohB9Smha1iMBIQk/mX5b2D5Z01zZS1RW2GlJN/C
-   jjAYTPyo7xv3fzBfSq/ArBWe0Q9+cdiTta+z6/fFV/d9XC1mHdYogYmpC
-   qzcyF2XbeAzkz2SA7o3TfzGuNSu2oY5UiPYCVJPOSFDFxwOWpoTWdxJtd
-   3HpRHTC4QBxU7FcfkcZ3BwAlpbUD8EM7gAD4O0fr8IYXDDuaA3vrvpG8s
-   jYEL5/hYShAv0GWiA+37zc8fXy41a3+0QWBaQ463DTZtwd60ptYN4CRDY
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10344"; a="332914808"
+  bh=R9h4w0pCPp14sIEtG3F0VIeqzIAbZClYZpCxsNGADFA=;
+  b=HSkPkRvST5hl4GdVupvj9Uq0aSAKUDolwcFD8IDE5gnsEAl2jHiPNh6C
+   hzMBRtzjXXHINmO2KTOU3OLB70YrY/vzIvQfK+IikUTLYfMZYXXv9TPBx
+   fkFyaUjqRQOzp4bajBgVBJ9UxzlEEgCMEJo3iMFH8IJWj7xPFpyljWk+i
+   guOjd5aFxAwm47dOru0uagOicOhMYjPixys46a42F3okXr4wUVsWEhEw3
+   y9fwn1MxTKnpT5wKflSFNNRlcwm/bTHf06MA80tP0sMWzi3Vnht1apSPI
+   uJjWY+4AaD7OEnC93NDd9sWH+Y8DpJwQMJcUKa8Cep5tE3+jDlINk6Ufi
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10344"; a="332914855"
 X-IronPort-AV: E=Sophos;i="5.91,218,1647327600"; 
-   d="scan'208";a="332914808"
+   d="scan'208";a="332914855"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2022 20:18:57 -0700
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2022 20:19:02 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.91,218,1647327600"; 
-   d="scan'208";a="594455614"
+   d="scan'208";a="594455640"
 Received: from lxy-dell.sh.intel.com ([10.239.159.55])
-  by orsmga008.jf.intel.com with ESMTP; 11 May 2022 20:18:52 -0700
+  by orsmga008.jf.intel.com with ESMTP; 11 May 2022 20:18:57 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Isaku Yamahata <isaku.yamahata@gmail.com>,
@@ -53,9 +53,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
 Cc:     Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
         kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com,
         xiaoyao.li@intel.com
-Subject: [RFC PATCH v4 10/36] i386/kvm: Move architectural CPUID leaf generation to separate helper
-Date:   Thu, 12 May 2022 11:17:37 +0800
-Message-Id: <20220512031803.3315890-11-xiaoyao.li@intel.com>
+Subject: [RFC PATCH v4 11/36] i386/tdx: Initialize TDX before creating TD vcpus
+Date:   Thu, 12 May 2022 11:17:38 +0800
+Message-Id: <20220512031803.3315890-12-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220512031803.3315890-1-xiaoyao.li@intel.com>
 References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
@@ -71,341 +71,174 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+Invoke KVM_TDX_INIT in kvm_arch_pre_create_vcpu() that KVM_TDX_INIT
+configures global TD state, e.g. the canonical CPUID config, and must
+be executed prior to creating vCPUs.
 
-Move the architectural (for lack of a better term) CPUID leaf generation
-to a separate helper so that the generation code can be reused by TDX,
-which needs to generate a canonical VM-scoped configuration.
+Use kvm_x86_arch_cpuid() to setup the CPUID settings for TDX VM and
+tie x86cpu->enable_pmu with TD's attributes.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Note, this doesn't address the fact that QEMU may change the CPUID
+configuration when creating vCPUs, i.e. punts on refactoring QEMU to
+provide a stable CPUID config prior to kvm_arch_init().
+
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- target/i386/kvm/kvm.c      | 222 +++++++++++++++++++------------------
- target/i386/kvm/kvm_i386.h |   4 +
- 2 files changed, 119 insertions(+), 107 deletions(-)
+ accel/kvm/kvm-all.c        |  9 ++++++++-
+ target/i386/kvm/kvm.c      |  8 ++++++++
+ target/i386/kvm/tdx-stub.c |  5 +++++
+ target/i386/kvm/tdx.c      | 35 +++++++++++++++++++++++++++++++++++
+ target/i386/kvm/tdx.h      |  4 ++++
+ 5 files changed, 60 insertions(+), 1 deletion(-)
 
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 0751e6e102cc..5be151e6499b 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -1686,8 +1686,6 @@ static int hyperv_init_vcpu(X86CPU *cpu)
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index e6fa9d23207a..88468878d181 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -470,10 +470,17 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
  
- static Error *invtsc_mig_blocker;
+     trace_kvm_init_vcpu(cpu->cpu_index, kvm_arch_vcpu_id(cpu));
  
--#define KVM_MAX_CPUID_ENTRIES  100
--
- static void kvm_init_xsave(CPUX86State *env)
- {
-     if (has_xsave2) {
-@@ -1708,115 +1706,21 @@ static void kvm_init_xsave(CPUX86State *env)
-            env->xsave_buf_len);
- }
- 
--int kvm_arch_init_vcpu(CPUState *cs)
-+uint32_t kvm_x86_arch_cpuid(CPUX86State *env, struct kvm_cpuid_entry2 *entries,
-+                            uint32_t cpuid_i)
- {
--    struct {
--        struct kvm_cpuid2 cpuid;
--        struct kvm_cpuid_entry2 entries[KVM_MAX_CPUID_ENTRIES];
--    } cpuid_data;
--    /*
--     * The kernel defines these structs with padding fields so there
--     * should be no extra padding in our cpuid_data struct.
--     */
--    QEMU_BUILD_BUG_ON(sizeof(cpuid_data) !=
--                      sizeof(struct kvm_cpuid2) +
--                      sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES);
--
--    X86CPU *cpu = X86_CPU(cs);
--    CPUX86State *env = &cpu->env;
--    uint32_t limit, i, j, cpuid_i;
-+    uint32_t limit, i, j;
-     uint32_t unused;
-     struct kvm_cpuid_entry2 *c;
--    uint32_t signature[3];
--    int kvm_base = KVM_CPUID_SIGNATURE;
--    int max_nested_state_len;
--    int r;
--    Error *local_err = NULL;
--
--    memset(&cpuid_data, 0, sizeof(cpuid_data));
--
--    cpuid_i = 0;
--
--    has_xsave2 = kvm_check_extension(cs->kvm_state, KVM_CAP_XSAVE2);
--
--    r = kvm_arch_set_tsc_khz(cs);
--    if (r < 0) {
--        return r;
--    }
--
--    /* vcpu's TSC frequency is either specified by user, or following
--     * the value used by KVM if the former is not present. In the
--     * latter case, we query it from KVM and record in env->tsc_khz,
--     * so that vcpu's TSC frequency can be migrated later via this field.
--     */
--    if (!env->tsc_khz) {
--        r = kvm_check_extension(cs->kvm_state, KVM_CAP_GET_TSC_KHZ) ?
--            kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) :
--            -ENOTSUP;
--        if (r > 0) {
--            env->tsc_khz = r;
--        }
--    }
--
--    env->apic_bus_freq = KVM_APIC_BUS_FREQUENCY;
--
--    /*
--     * kvm_hyperv_expand_features() is called here for the second time in case
--     * KVM_CAP_SYS_HYPERV_CPUID is not supported. While we can't possibly handle
--     * 'query-cpu-model-expansion' in this case as we don't have a KVM vCPU to
--     * check which Hyper-V enlightenments are supported and which are not, we
--     * can still proceed and check/expand Hyper-V enlightenments here so legacy
--     * behavior is preserved.
--     */
--    if (!kvm_hyperv_expand_features(cpu, &local_err)) {
--        error_report_err(local_err);
--        return -ENOSYS;
--    }
--
--    if (hyperv_enabled(cpu)) {
--        r = hyperv_init_vcpu(cpu);
--        if (r) {
--            return r;
--        }
--
--        cpuid_i = hyperv_fill_cpuids(cs, cpuid_data.entries);
--        kvm_base = KVM_CPUID_SIGNATURE_NEXT;
--        has_msr_hv_hypercall = true;
--    }
--
--    if (cpu->expose_kvm) {
--        memcpy(signature, "KVMKVMKVM\0\0\0", 12);
--        c = &cpuid_data.entries[cpuid_i++];
--        c->function = KVM_CPUID_SIGNATURE | kvm_base;
--        c->eax = KVM_CPUID_FEATURES | kvm_base;
--        c->ebx = signature[0];
--        c->ecx = signature[1];
--        c->edx = signature[2];
--
--        c = &cpuid_data.entries[cpuid_i++];
--        c->function = KVM_CPUID_FEATURES | kvm_base;
--        c->eax = env->features[FEAT_KVM];
--        c->edx = env->features[FEAT_KVM_HINTS];
--    }
- 
-     cpu_x86_cpuid(env, 0, 0, &limit, &unused, &unused, &unused);
- 
--    if (cpu->kvm_pv_enforce_cpuid) {
--        r = kvm_vcpu_enable_cap(cs, KVM_CAP_ENFORCE_PV_FEATURE_CPUID, 0, 1);
--        if (r < 0) {
--            fprintf(stderr,
--                    "failed to enable KVM_CAP_ENFORCE_PV_FEATURE_CPUID: %s",
--                    strerror(-r));
--            abort();
--        }
--    }
--
-     for (i = 0; i <= limit; i++) {
-         if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
-             fprintf(stderr, "unsupported level value: 0x%x\n", limit);
-             abort();
-         }
--        c = &cpuid_data.entries[cpuid_i++];
-+        c = &entries[cpuid_i++];
- 
-         switch (i) {
-         case 2: {
-@@ -1835,7 +1739,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-                             "cpuid(eax:2):eax & 0xf = 0x%x\n", times);
-                     abort();
-                 }
--                c = &cpuid_data.entries[cpuid_i++];
-+                c = &entries[cpuid_i++];
-                 c->function = i;
-                 c->flags = KVM_CPUID_FLAG_STATEFUL_FUNC;
-                 cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
-@@ -1881,7 +1785,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-                             "cpuid(eax:0x%x,ecx:0x%x)\n", i, j);
-                     abort();
-                 }
--                c = &cpuid_data.entries[cpuid_i++];
-+                c = &entries[cpuid_i++];
-             }
-             break;
-         case 0x7:
-@@ -1901,7 +1805,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-                                 "cpuid(eax:0x12,ecx:0x%x)\n", j);
-                     abort();
-                 }
--                c = &cpuid_data.entries[cpuid_i++];
-+                c = &entries[cpuid_i++];
-             }
-             break;
-         case 0x14:
-@@ -1921,7 +1825,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-                                 "cpuid(eax:0x%x,ecx:0x%x)\n", i, j);
-                     abort();
-                 }
--                c = &cpuid_data.entries[cpuid_i++];
-+                c = &entries[cpuid_i++];
-                 c->function = i;
-                 c->index = j;
-                 c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
-@@ -1978,7 +1882,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-             fprintf(stderr, "unsupported xlevel value: 0x%x\n", limit);
-             abort();
-         }
--        c = &cpuid_data.entries[cpuid_i++];
-+        c = &entries[cpuid_i++];
- 
-         switch (i) {
-         case 0x8000001d:
-@@ -1997,7 +1901,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-                             "cpuid(eax:0x%x,ecx:0x%x)\n", i, j);
-                     abort();
-                 }
--                c = &cpuid_data.entries[cpuid_i++];
-+                c = &entries[cpuid_i++];
-             }
-             break;
-         default:
-@@ -2024,7 +1928,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-                 fprintf(stderr, "unsupported xlevel2 value: 0x%x\n", limit);
-                 abort();
-             }
--            c = &cpuid_data.entries[cpuid_i++];
-+            c = &entries[cpuid_i++];
- 
-             c->function = i;
-             c->flags = 0;
-@@ -2032,6 +1936,110 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         }
++    /*
++     * tdx_pre_create_vcpu() may call cpu_x86_cpuid(). It in turn may call
++     * kvm_vm_ioctl(). Set cpu->kvm_state in advance to avoid NULL pointer
++     * dereference.
++     */
++    cpu->kvm_state = s;
+     ret = kvm_arch_pre_create_vcpu(cpu);
+     if (ret < 0) {
+         error_setg_errno(errp, -ret,
+                          "kvm_init_vcpu: kvm_arch_pre_create_vcpu() failed");
++        cpu->kvm_state = NULL;
+         goto err;
      }
  
-+    return cpuid_i;
+@@ -481,11 +488,11 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
+     if (ret < 0) {
+         error_setg_errno(errp, -ret, "kvm_init_vcpu: kvm_get_vcpu failed (%lu)",
+                          kvm_arch_vcpu_id(cpu));
++        cpu->kvm_state = NULL;
+         goto err;
+     }
+ 
+     cpu->kvm_fd = ret;
+-    cpu->kvm_state = s;
+     cpu->vcpu_dirty = true;
+     cpu->dirty_pages = 0;
+ 
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 5be151e6499b..f2d7c3cf59ac 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -2175,6 +2175,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     return r;
+ }
+ 
++int kvm_arch_pre_create_vcpu(CPUState *cpu)
++{
++    if (is_tdx_vm())
++        return tdx_pre_create_vcpu(cpu);
++
++    return 0;
 +}
 +
-+int kvm_arch_init_vcpu(CPUState *cs)
+ int kvm_arch_destroy_vcpu(CPUState *cs)
+ {
+     X86CPU *cpu = X86_CPU(cs);
+diff --git a/target/i386/kvm/tdx-stub.c b/target/i386/kvm/tdx-stub.c
+index 1df24735201e..2871de9d7b56 100644
+--- a/target/i386/kvm/tdx-stub.c
++++ b/target/i386/kvm/tdx-stub.c
+@@ -7,3 +7,8 @@ int tdx_kvm_init(MachineState *ms, Error **errp)
+ {
+     return -EINVAL;
+ }
++
++int tdx_pre_create_vcpu(CPUState *cpu)
 +{
-+    struct {
-+        struct kvm_cpuid2 cpuid;
-+        struct kvm_cpuid_entry2 entries[KVM_MAX_CPUID_ENTRIES];
-+    } cpuid_data;
-+    /*
-+     * The kernel defines these structs with padding fields so there
-+     * should be no extra padding in our cpuid_data struct.
-+     */
-+    QEMU_BUILD_BUG_ON(sizeof(cpuid_data) !=
-+                      sizeof(struct kvm_cpuid2) +
-+                      sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES);
++    return -EINVAL;
++}
+diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+index 6e3b15ba8a4a..3472b59c2dbb 100644
+--- a/target/i386/kvm/tdx.c
++++ b/target/i386/kvm/tdx.c
+@@ -18,6 +18,7 @@
+ #include "sysemu/kvm.h"
+ 
+ #include "hw/i386/x86.h"
++#include "kvm_i386.h"
+ #include "tdx.h"
+ 
+ #define TDX_SUPPORTED_KVM_FEATURES  ((1ULL << KVM_FEATURE_NOP_IO_DELAY) | \
+@@ -165,6 +166,38 @@ void tdx_get_supported_cpuid(uint32_t function, uint32_t index, int reg,
+     }
+ }
+ 
++int tdx_pre_create_vcpu(CPUState *cpu)
++{
++    MachineState *ms = MACHINE(qdev_get_machine());
++    X86CPU *x86cpu = X86_CPU(cpu);
++    CPUX86State *env = &x86cpu->env;
++    struct kvm_tdx_init_vm init_vm;
++    int r = 0;
 +
-+    X86CPU *cpu = X86_CPU(cs);
-+    CPUX86State *env = &cpu->env;
-+    uint32_t cpuid_i;
-+    struct kvm_cpuid_entry2 *c;
-+    uint32_t signature[3];
-+    int kvm_base = KVM_CPUID_SIGNATURE;
-+    int max_nested_state_len;
-+    int r;
-+    Error *local_err = NULL;
++    qemu_mutex_lock(&tdx_guest->lock);
++    if (tdx_guest->initialized) {
++        goto out;
++    }
 +
-+    memset(&cpuid_data, 0, sizeof(cpuid_data));
++    memset(&init_vm, 0, sizeof(init_vm));
++    init_vm.cpuid.nent = kvm_x86_arch_cpuid(env, init_vm.entries, 0);
 +
-+    cpuid_i = 0;
++    init_vm.attributes = tdx_guest->attributes;
++    init_vm.max_vcpus = ms->smp.cpus;
 +
-+    has_xsave2 = kvm_check_extension(cs->kvm_state, KVM_CAP_XSAVE2);
-+
-+    r = kvm_arch_set_tsc_khz(cs);
++    r = tdx_vm_ioctl(KVM_TDX_INIT_VM, 0, &init_vm);
 +    if (r < 0) {
-+        return r;
++        error_report("KVM_TDX_INIT_VM failed %s", strerror(-r));
++        goto out;
 +    }
 +
-+    /* vcpu's TSC frequency is either specified by user, or following
-+     * the value used by KVM if the former is not present. In the
-+     * latter case, we query it from KVM and record in env->tsc_khz,
-+     * so that vcpu's TSC frequency can be migrated later via this field.
-+     */
-+    if (!env->tsc_khz) {
-+        r = kvm_check_extension(cs->kvm_state, KVM_CAP_GET_TSC_KHZ) ?
-+            kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) :
-+            -ENOTSUP;
-+        if (r > 0) {
-+            env->tsc_khz = r;
-+        }
-+    }
++    tdx_guest->initialized = true;
 +
-+    env->apic_bus_freq = KVM_APIC_BUS_FREQUENCY;
++out:
++    qemu_mutex_unlock(&tdx_guest->lock);
++    return r;
++}
 +
-+    /*
-+     * kvm_hyperv_expand_features() is called here for the second time in case
-+     * KVM_CAP_SYS_HYPERV_CPUID is not supported. While we can't possibly handle
-+     * 'query-cpu-model-expansion' in this case as we don't have a KVM vCPU to
-+     * check which Hyper-V enlightenments are supported and which are not, we
-+     * can still proceed and check/expand Hyper-V enlightenments here so legacy
-+     * behavior is preserved.
-+     */
-+    if (!kvm_hyperv_expand_features(cpu, &local_err)) {
-+        error_report_err(local_err);
-+        return -ENOSYS;
-+    }
-+
-+    if (hyperv_enabled(cpu)) {
-+        r = hyperv_init_vcpu(cpu);
-+        if (r) {
-+            return r;
-+        }
-+
-+        cpuid_i = hyperv_fill_cpuids(cs, cpuid_data.entries);
-+        kvm_base = KVM_CPUID_SIGNATURE_NEXT;
-+        has_msr_hv_hypercall = true;
-+    }
-+
-+    if (cpu->expose_kvm) {
-+        memcpy(signature, "KVMKVMKVM\0\0\0", 12);
-+        c = &cpuid_data.entries[cpuid_i++];
-+        c->function = KVM_CPUID_SIGNATURE | kvm_base;
-+        c->eax = KVM_CPUID_FEATURES | kvm_base;
-+        c->ebx = signature[0];
-+        c->ecx = signature[1];
-+        c->edx = signature[2];
-+
-+        c = &cpuid_data.entries[cpuid_i++];
-+        c->function = KVM_CPUID_FEATURES | kvm_base;
-+        c->eax = env->features[FEAT_KVM];
-+        c->edx = env->features[FEAT_KVM_HINTS];
-+    }
-+
-+    if (cpu->kvm_pv_enforce_cpuid) {
-+        r = kvm_vcpu_enable_cap(cs, KVM_CAP_ENFORCE_PV_FEATURE_CPUID, 0, 1);
-+        if (r < 0) {
-+            fprintf(stderr,
-+                    "failed to enable KVM_CAP_ENFORCE_PV_FEATURE_CPUID: %s",
-+                    strerror(-r));
-+            abort();
-+        }
-+    }
-+
-+    cpuid_i = kvm_x86_arch_cpuid(env, cpuid_data.entries, cpuid_i);
-     cpuid_data.cpuid.nent = cpuid_i;
+ /* tdx guest */
+ OBJECT_DEFINE_TYPE_WITH_INTERFACES(TdxGuest,
+                                    tdx_guest,
+@@ -177,6 +210,8 @@ static void tdx_guest_init(Object *obj)
+ {
+     TdxGuest *tdx = TDX_GUEST(obj);
  
-     if (((env->cpuid_version >> 8)&0xF) >= 6
-diff --git a/target/i386/kvm/kvm_i386.h b/target/i386/kvm/kvm_i386.h
-index b434feaa6b1d..5c7972f617e8 100644
---- a/target/i386/kvm/kvm_i386.h
-+++ b/target/i386/kvm/kvm_i386.h
-@@ -24,6 +24,10 @@
- #define kvm_ioapic_in_kernel() \
-     (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
- 
-+#define KVM_MAX_CPUID_ENTRIES  100
-+uint32_t kvm_x86_arch_cpuid(CPUX86State *env, struct kvm_cpuid_entry2 *entries,
-+                            uint32_t cpuid_i);
++    qemu_mutex_init(&tdx->lock);
 +
- #else
+     tdx->attributes = 0;
+ }
  
- #define kvm_pit_in_kernel()      0
+diff --git a/target/i386/kvm/tdx.h b/target/i386/kvm/tdx.h
+index 06599b65b827..46a24ee8c7cc 100644
+--- a/target/i386/kvm/tdx.h
++++ b/target/i386/kvm/tdx.h
+@@ -17,6 +17,9 @@ typedef struct TdxGuestClass {
+ typedef struct TdxGuest {
+     ConfidentialGuestSupport parent_obj;
+ 
++    QemuMutex lock;
++
++    bool initialized;
+     uint64_t attributes;    /* TD attributes */
+ } TdxGuest;
+ 
+@@ -29,5 +32,6 @@ bool is_tdx_vm(void);
+ int tdx_kvm_init(MachineState *ms, Error **errp);
+ void tdx_get_supported_cpuid(uint32_t function, uint32_t index, int reg,
+                              uint32_t *ret);
++int tdx_pre_create_vcpu(CPUState *cpu);
+ 
+ #endif /* QEMU_I386_TDX_H */
 -- 
 2.27.0
 
