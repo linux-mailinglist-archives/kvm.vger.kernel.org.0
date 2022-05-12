@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08A015254EA
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 20:34:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C62D525512
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 20:42:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357705AbiELSe1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 14:34:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39936 "EHLO
+        id S1357782AbiELSmr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 14:42:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357681AbiELSe0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 14:34:26 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ADBA66C9E
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 11:34:25 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id iq10so6030149pjb.0
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 11:34:25 -0700 (PDT)
+        with ESMTP id S1357696AbiELSmq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 14:42:46 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3299D16D4BC
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 11:42:45 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id t11-20020a17090ad50b00b001d95bf21996so8645288pju.2
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 11:42:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=BUcwfda8/NN2DT0blrNG+sqcRTMirbYkw3Wm3k5URm0=;
-        b=Q6/f5WOYKWwEL6cs7cDcBAHrNIeTRYQ7qV7MCDi/RQVJpIiZvIvr7erb7Bm9JcIP5E
-         2SSIrkD/WbxBMUAvcZlHa5ooyVt9hjlYmmR7xmqQKwfvPG/DWJ8elh23nyG9/qbBsHwG
-         OaL0KRfPFSLjCN4VvF8f0xszrKT5+r/gyZzPoLc4tRh2pU9fIKj7F7eLwpC2UY3I0QNX
-         KWZgmCm4ZFDyUZQ0RfPhQjxVgMSKCvbRQ6MpAglTm1wNxh4m2RPi/bC75Mn4cBVDBsXB
-         tM5pb71VxnJssBH//gIDO0JCqYZQXhmC/eq3hx3utULUdJ3R5IzcWhx9HHKQ4tMk9Wo5
-         9UkQ==
+        bh=CsdZ4lF67CixQDU+lvg63qvqiE5/zMHvgOJEqPfS9Nc=;
+        b=XmWlNyzG6WgNJqB+96QJizkPaejYmjLU+CWCFmwyYo18FV9CJDSeWEONuQGOiJbWaF
+         UAngLI2XbbeLeffuDIGCJlyILPDoLj25LCMbK4Azgqyq9MGireMP+81gWSNP1dOWxMKw
+         9uPzJjuV9MHfXwTEPtdm5JI0p5pj7V3K85VOvMKWSpGiimXuD4RdKXTcqrinGe1Il3h8
+         dTuYc99+CB8zGJBXMOnnEx5R1sVsvYEHbU+/bMCaGEp2tRTux8AZatYDOdy0S7keF4TM
+         v1KkQ+Q5pwlZduqMoOOc9MPqoSzCQo4GY5UEHN/M+DhM/jpf5Q1VpfohMO4rcI/MgrQC
+         hFEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=BUcwfda8/NN2DT0blrNG+sqcRTMirbYkw3Wm3k5URm0=;
-        b=D6iRVJkIuecR2GyoUXxai3g+xeTwubxCdaD33Y7yPQ1ud8HOXvgHQerzd9eLkiZlT6
-         g5XxN3hwnWBSDFDlETVDi3jhgGyX6mO36KSy9F2qHDVcFeI8jSNdG2Ho3LltdMJFIQ86
-         KqenDrm8uZ0js25ZqQfZ18Ip05uOi7G+zlaEigM8ulf3VJeoJ0TUMKTlIkZ1t86o/tKY
-         jghPi+WkIG2RTkQlNLp0OA7cxIoZkZ6YY3TmECS40qUfSFe9J1heYpabJWGgiJseH36R
-         6lsaQgQjoVsxm2QCR2O48K9EbEWE5bsUbHpBm3aKPN4kLf31NBYpHlLZXJg4xNHD0Smx
-         y9nQ==
-X-Gm-Message-State: AOAM5312i1H7FZ/TvZUy0uU2ALI2QEbkFjeOMVV0NULlAvE8YpOjAqJP
-        ZQ2VQylyBh7qep+beG2woZg=
-X-Google-Smtp-Source: ABdhPJw1R1ibRkcltlohms3DOMAhrRgBYz5yllUvkivQK+M/jfahmJAFriIVG0ehe2vFlAHDci+84A==
-X-Received: by 2002:a17:90b:4f45:b0:1dc:4f85:6ad4 with SMTP id pj5-20020a17090b4f4500b001dc4f856ad4mr893520pjb.40.1652380464851;
-        Thu, 12 May 2022 11:34:24 -0700 (PDT)
+        bh=CsdZ4lF67CixQDU+lvg63qvqiE5/zMHvgOJEqPfS9Nc=;
+        b=EzpPgRGk7dLXtfaW+YlPZy2C6UEBC+QbXh2RtYo/vnsRpH6geq8QCXO8bJoHLw8g59
+         2w8yJ12gE0Mz9ZiSvZgumCzYh91q2z6sSI2ZgSC1S5gYGKaPrqeYKtMY9nXlNogGpAhh
+         172Mn4PbkmKq4xvVOLwlQgGKYGvL9H23s9z9TywEi1EUeZrcXhwiMq+71HLukeRAxnMc
+         gL4s68k9ra1Go9HTlnse4DdFAjIQj9YprtyKIa4qbYieBRXK0LGnpMTMSQLgY79WzcxL
+         kjmYu7fbVoMberRoy2Q2BHxSJm8gghmwHHP6VlyREQk/lUaLXuVQQ986lzjV8waTQfNv
+         K0tw==
+X-Gm-Message-State: AOAM532I2sw8g1FibnrmaoCnu2QbTx8PFTE/p9x81lijOmbrwmvwGiwq
+        G0y6MO3RmkJgN247ARAJNJcW06eRCDj5sg==
+X-Google-Smtp-Source: ABdhPJzTjx64m3fBiHtMyB5sdJZZlfw0vBcVwY5sHq4qNmRCGx/AkQhYsCb24CrQk8ncDbQEnM61yg==
+X-Received: by 2002:a17:903:41cb:b0:15e:b1f4:352f with SMTP id u11-20020a17090341cb00b0015eb1f4352fmr1022659ple.56.1652380964566;
+        Thu, 12 May 2022 11:42:44 -0700 (PDT)
 Received: from localhost ([192.55.54.48])
-        by smtp.gmail.com with ESMTPSA id e10-20020a170902784a00b0015e8d4eb20fsm241986pln.89.2022.05.12.11.34.24
+        by smtp.gmail.com with ESMTPSA id a18-20020aa79712000000b0050dc76281e5sm136704pfg.191.2022.05.12.11.42.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 May 2022 11:34:24 -0700 (PDT)
-Date:   Thu, 12 May 2022 11:34:23 -0700
+        Thu, 12 May 2022 11:42:44 -0700 (PDT)
+Date:   Thu, 12 May 2022 11:42:42 -0700
 From:   Isaku Yamahata <isaku.yamahata@gmail.com>
 To:     Xiaoyao Li <xiaoyao.li@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -64,15 +64,14 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Eric Blake <eblake@redhat.com>,
         Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
         kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
-Subject: Re: [RFC PATCH v4 24/36] i386/tdx: Add TDVF memory via
- KVM_TDX_INIT_MEM_REGION
-Message-ID: <20220512183423.GI2789321@ls.amr.corp.intel.com>
+Subject: Re: [RFC PATCH v4 36/36] docs: Add TDX documentation
+Message-ID: <20220512184242.GJ2789321@ls.amr.corp.intel.com>
 References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
- <20220512031803.3315890-25-xiaoyao.li@intel.com>
+ <20220512031803.3315890-37-xiaoyao.li@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220512031803.3315890-25-xiaoyao.li@intel.com>
+In-Reply-To: <20220512031803.3315890-37-xiaoyao.li@intel.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -83,65 +82,159 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 12, 2022 at 11:17:51AM +0800,
+On Thu, May 12, 2022 at 11:18:03AM +0800,
 Xiaoyao Li <xiaoyao.li@intel.com> wrote:
 
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> Add docs/system/i386/tdx.rst for TDX support, and add tdx in
+> confidential-guest-support.rst
 > 
-> TDVF firmware (CODE and VARS) needs to be added/copied to TD's private
-> memory via KVM_TDX_INIT_MEM_REGION, as well as TD HOB and TEMP memory.
-> 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > ---
->  target/i386/kvm/tdx.c | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
+>  docs/system/confidential-guest-support.rst |   1 +
+>  docs/system/i386/tdx.rst                   | 103 +++++++++++++++++++++
+>  docs/system/target-i386.rst                |   1 +
+>  3 files changed, 105 insertions(+)
+>  create mode 100644 docs/system/i386/tdx.rst
 > 
-> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-> index 3e18ace90bf7..567ee12e88f0 100644
-> --- a/target/i386/kvm/tdx.c
-> +++ b/target/i386/kvm/tdx.c
-> @@ -240,6 +240,7 @@ static void tdx_finalize_vm(Notifier *notifier, void *unused)
->  {
->      TdxFirmware *tdvf = &tdx_guest->tdvf;
->      TdxFirmwareEntry *entry;
-> +    int r;
+> diff --git a/docs/system/confidential-guest-support.rst b/docs/system/confidential-guest-support.rst
+> index 0c490dbda2b7..66129fbab64c 100644
+> --- a/docs/system/confidential-guest-support.rst
+> +++ b/docs/system/confidential-guest-support.rst
+> @@ -38,6 +38,7 @@ Supported mechanisms
+>  Currently supported confidential guest mechanisms are:
 >  
->      tdx_init_ram_entries();
+>  * AMD Secure Encrypted Virtualization (SEV) (see :doc:`i386/amd-memory-encryption`)
+> +* Intel Trust Domain Extension (TDX) (see :doc:`i386/tdx`)
+>  * POWER Protected Execution Facility (PEF) (see :ref:`power-papr-protected-execution-facility-pef`)
+>  * s390x Protected Virtualization (PV) (see :doc:`s390x/protvirt`)
 >  
-> @@ -265,6 +266,29 @@ static void tdx_finalize_vm(Notifier *notifier, void *unused)
->            sizeof(TdxRamEntry), &tdx_ram_entry_compare);
->  
->      tdvf_hob_create(tdx_guest, tdx_get_hob_entry(tdx_guest));
+> diff --git a/docs/system/i386/tdx.rst b/docs/system/i386/tdx.rst
+> new file mode 100644
+> index 000000000000..96d91fea5516
+> --- /dev/null
+> +++ b/docs/system/i386/tdx.rst
+> @@ -0,0 +1,103 @@
+> +Intel Trusted Domain eXtension (TDX)
+> +====================================
 > +
-> +    for_each_tdx_fw_entry(tdvf, entry) {
-> +        struct kvm_tdx_init_mem_region mem_region = {
-> +            .source_addr = (__u64)entry->mem_ptr,
-> +            .gpa = entry->address,
-> +            .nr_pages = entry->size / 4096,
-> +        };
+> +Intel Trusted Domain eXtensions (TDX) refers to an Intel technology that extends
+> +Virtual Machine Extensions (VMX) and Multi-Key Total Memory Encryption (MKTME)
+> +with a new kind of virtual machine guest called a Trust Domain (TD). A TD runs
+> +in a CPU mode that is designed to protect the confidentiality of its memory
+> +contents and its CPU state from any other software, including the hosting
+> +Virtual Machine Monitor (VMM), unless explicitly shared by the TD itself.
 > +
-> +        __u32 metadata = entry->attributes & TDVF_SECTION_ATTRIBUTES_MR_EXTEND ?
-> +                         KVM_TDX_MEASURE_MEMORY_REGION : 0;
-
-Please use flags instead of metadata.
-
-
-> +        r = tdx_vm_ioctl(KVM_TDX_INIT_MEM_REGION, metadata, &mem_region);
-> +        if (r < 0) {
-> +             error_report("KVM_TDX_INIT_MEM_REGION failed %s", strerror(-r));
-> +             exit(1);
-> +        }
+> +Prerequisites
+> +-------------
 > +
-> +        if (entry->type == TDVF_SECTION_TYPE_TD_HOB ||
-> +            entry->type == TDVF_SECTION_TYPE_TEMP_MEM) {
-> +            qemu_ram_munmap(-1, entry->mem_ptr, entry->size);
-> +            entry->mem_ptr = NULL;
-> +        }
-> +    }
->  }
+> +To run TD, the physical machine needs to have TDX module loaded and initialized
+> +while KVM hypervisor has TDX support and has TDX enabled. If those requirements
+> +are met, the ``KVM_CAP_VM_TYPES`` will report the support of ``KVM_X86_TDX_VM``.
+> +
+> +Trust Domain Virtual Firmware (TDVF)
+> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> +
+> +Trust Domain Virtual Firmware (TDVF) is required to provide TD services to boot
+> +TD Guest OS. TDVF needs to be copied to guest private memory and measured before
+> +a TD boots.
+> +
+> +The VM scope ``MEMORY_ENCRYPT_OP`` ioctl provides command ``KVM_TDX_INIT_MEM_REGION``
+> +to copy the TDVF image to TD's private memory space.
+> +
+> +Since TDX doesn't support readonly memslot, TDVF cannot be mapped as pflash
+> +device and it actually works as RAM. "-bios" option is chosen to load TDVF.
+> +
+> +OVMF is the opensource firmware that implements the TDVF support. Thus the
+> +command line to specify and load TDVF is `-bios OVMF.fd`
+> +
+> +Feature Control
+> +---------------
+> +
+> +Unlike non-TDX VM, the CPU features (enumerated by CPU or MSR) of a TD is not
+> +under full control of VMM. VMM can only configure part of features of a TD on
+> +``KVM_TDX_INIT_VM`` command of VM scope ``MEMORY_ENCRYPT_OP`` ioctl.
+> +
+> +The configurable features have three types:
+> +
+> +- Attributes:
+> +  - PKS (bit 30) controls whether Supervisor Protection Keys is exposed to TD,
+> +  which determines related CPUID bit and CR4 bit;
+> +  - PERFMON (bit 63) controls whether PMU is exposed to TD.
+> +
+> +- XSAVE related features (XFAM):
+> +  XFAM is a 64b mask, which has the same format as XCR0 or IA32_XSS MSR. It
+> +  determines the set of extended features available for use by the guest TD.
+> +
+> +- CPUID features:
+> +  Only some bits of some CPUID leaves are directly configurable by VMM.
+> +
+> +What features can be configured is reported via TDX capabilities.
+> +
+> +TDX capabilities
+> +~~~~~~~~~~~~~~~~
+> +
+> +The VM scope ``MEMORY_ENCRYPT_OP`` ioctl provides command ``KVM_TDX_CAPABILITIES``
+> +to get the TDX capabilities from KVM. It returns a data structure of
+> +``struct kvm_tdx_capabilites``, which tells the supported configuration of
+> +attributes, XFAM and CPUIDs.
+> +
+> +Launching a TD (TDX VM)
+> +-----------------------
+> +
+> +To launch a TDX guest:
+> +
+> +.. parsed-literal::
+> +
+> +    |qemu_system_x86| \\
+> +        -machine ...,confidential-guest-support=tdx0 \\
+> +        -object tdx-guest,id=tdx0 \\
+> +        -bios OVMF.fd \\
+
+Don't we need kernel-irqchip=split?
+Or this patch series set it automatically?
+
+Thanks,
+
+> +
+> +Debugging
+> +---------
+> +
+> +Bit 0 of TD attributes, is DEBUG bit, which decides if the TD runs in off-TD
+> +debug mode. When in off-TD debug mode, TD's VCPU state and private memory are
+> +accessible via given SEAMCALLs. This requires KVM to expose APIs to invoke those
+> +SEAMCALLs and resonponding QEMU change.
+> +
+> +It's targeted as future work.
+> +
+> +restrictions
+> +------------
+> +
+> + - No readonly support for private memory;
+> +
+> + - No SMM support: SMM support requires manipulating the guset register states
+> +   which is not allowed;
+> +
+> +Live Migration
+> +--------------
+> +
+> +TODO
+> +
+> +References
+> +----------
+> +
+> +- `TDX Homepage <https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html>`__
+> diff --git a/docs/system/target-i386.rst b/docs/system/target-i386.rst
+> index 96bf54889a82..16dd4f1a8c80 100644
+> --- a/docs/system/target-i386.rst
+> +++ b/docs/system/target-i386.rst
+> @@ -29,6 +29,7 @@ Architectural features
+>     i386/kvm-pv
+>     i386/sgx
+>     i386/amd-memory-encryption
+> +   i386/tdx
 >  
->  static Notifier tdx_machine_done_notify = {
+>  .. _pcsys_005freq:
+>  
 > -- 
 > 2.27.0
 > 
