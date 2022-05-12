@@ -2,106 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38D0A524BE1
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 13:42:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC4B4524C36
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 13:57:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353371AbiELLmH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 07:42:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33460 "EHLO
+        id S1353472AbiELL5m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 07:57:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351802AbiELLmE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 07:42:04 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03ECC37BFD;
-        Thu, 12 May 2022 04:42:04 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24CBLhTV024029;
-        Thu, 12 May 2022 11:42:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=2HThL5e0p57DZEmje+L+wRf4APcvYg3CjZSZeahaRoQ=;
- b=GQxUeXmGnb/gCcx0NEMR9SQXxyP/3X5NUmZQtfKEEUXtUYnZbwpUJ5PjeevYXTk/xfeE
- 1AH+WKpASyhZpDgOL0KViO/3pZ7EFa13UmbfgUCLguV1bKNcbWE6aOWZsCnzKvANn96b
- 6+M+WM3glgYhsxQ2FqR4KVdRAnoc3wWDIOB2T6KoxeMk+4Fn+qA/jwfVycdsBbmKRTdp
- zcDSSVKBM5IyxRPg44NozM/w21Uc+6GzzGDNaOBfpoaR31IhQkaE98a6yhRnfuk1CW3w
- lOnmM5Y2Z6Zz+IYBUtrrZt4o/ifBGvOvolfUN7PC0iH5BjOAeYzdr9qD+zOP2gAYtY1w zQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g119xgavr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 May 2022 11:42:03 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24CBQZxB010065;
-        Thu, 12 May 2022 11:42:02 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g119xgaus-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 May 2022 11:42:02 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24CBc2jH002228;
-        Thu, 12 May 2022 11:42:00 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 3fyrkk2uds-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 May 2022 11:42:00 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24CBfvNZ56230220
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 May 2022 11:41:57 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5626FA4040;
-        Thu, 12 May 2022 11:41:57 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EAE5EA404D;
-        Thu, 12 May 2022 11:41:56 +0000 (GMT)
-Received: from [9.152.224.243] (unknown [9.152.224.243])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 12 May 2022 11:41:56 +0000 (GMT)
-Message-ID: <ecf827ee-4b07-c999-064d-96d77607cf1c@linux.ibm.com>
-Date:   Thu, 12 May 2022 13:41:56 +0200
+        with ESMTP id S1344488AbiELL5h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 07:57:37 -0400
+Received: from out203-205-221-239.mail.qq.com (out203-205-221-239.mail.qq.com [203.205.221.239])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 622A96C569
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 04:57:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+        s=s201512; t=1652356651;
+        bh=iY2yJcOLbtsYvLDgfwb1awyh7iPMEY/G3mZOTKxuvSo=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To;
+        b=h5YTEOcUp/cSeBcfW5vICGhwBpZ8fQWphC8O8CNtbO6yCuBJ1TBmABfyA9bfaDlNO
+         cskk+Ind6Zj+EED2dxH38Foe6ykWMiAp5rbv9CD2aBmrI/Zo6RcxppLcP59K3TdheD
+         mD+Jn+oV3m6hJR70qm6ZHTkO1XMbthvgidLV4dHc=
+Received: from [192.168.0.110] ([36.57.146.152])
+        by newxmesmtplogicsvrszc8.qq.com (NewEsmtp) with SMTP
+        id E5B18659; Thu, 12 May 2022 19:57:27 +0800
+X-QQ-mid: xmsmtpt1652356647tckuvhfck
+Message-ID: <tencent_64CD1D42838611CFDB6E6A224DF469C10D08@qq.com>
+X-QQ-XMAILINFO: N7h1OCCDntujtdw9xm6YqEJCpuOaHp7geMFL7LuaYCdhh86xQ58E5X0S1COleI
+         g6J2yMjukbzR7JdZZ6k88mMftRMWnk0gNotf4G9j+N74QRTYmvn4aiiu91evfDmELV2wtPr7IXqd
+         Rn6M0R34PwYUxJELpiqjxc1hUot8ADAMJKK5sNSyFWrN33Q33MbSSsUL9zOtVPddDSX3+vrjttoI
+         I/fvLzR1puBh5l24yT72z4GvroL1LNrNj3ylsuJp7R6RrPdhvDlexxyoGL5kZb/vgq+n25O/BJn3
+         TdES50w336OX53XHuIr89wNpX0gJlv4A4vI8z5Wq8z4SfLaB6WX2siyKI+4RdTmsxcP0P6qTsYxF
+         uj/zShH4mLFDxwRc5zI4dXvhxUkB9+SEBdZ2XTkVEGeopZRFwiSpc2wMT+mudDbAgigFD/gbKMhr
+         F1n0zENLia7unuI9lC58b9fbEAN9PjtlWKObcIF4FVVAKPwkc5Nz8FwJvsyWaOtcao8dFoEMKeMo
+         7FsmA+6JodrlKGxQRixF8evrN30lbm3aNHb2n+6Kbk106J3QRybFlRcMsWaC3nMrj4+ROfwbTRhl
+         ObNlAzR2RSm42de5O0zL52a58Z+Gk7zif3KalKCR05GmCIw8oO//SzpHuv+cSGHvJfUPWJBO1hRo
+         QMWAxbYot9O8LG0JjO/b+n5sQS/N0WsJINq93VT6EeX0+hP9mPchs22cjH8wEakkKFeXSbDtNKXi
+         hB+CPqa9FjGmHezgb3AD3U7Z4xDBRVBfmqyMSrvOESg4mCFdRyIxYf2Pp4aGx3A/MLfGDEuD6ELY
+         vPZQNbwmknt7373yOoVGtRPuVkYu3PbWISa8vNSNTecBUiKNts1q4NdUoTdUSHPL0fEjml42DWgf
+         Gi4TguWS5OzOmkvPGMivPNVShZxwaNNtFUfdXRjcuTFPw1MoX3czmflR+hq1h/12O8+eq6vy2XZo
+         /NE/4UcMFQ6e2dpm8l1Q==
+Subject: Re: [PATCH] vfio: Remove VFIO_TYPE1_NESTING_IOMMU
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Zhangfei Gao <zhangfei.gao@linaro.org>
+Cc:     Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Vivek Kumar Gautam <Vivek.Gautam@arm.com>,
+        iommu@lists.linux-foundation.org,
+        Robin Murphy <robin.murphy@arm.com>,
+        linux-arm-kernel@lists.infradead.org
+References: <0-v1-0093c9b0e345+19-vfio_no_nesting_jgg@nvidia.com>
+ <0e2f7cb8-f0d9-8209-6bc2-ca87fff57f1f@arm.com>
+ <20220510181327.GM49344@nvidia.com>
+ <6c6f3ecb-6339-4093-a15a-fcf95a7c61fb@linaro.org>
+ <20220512113241.GQ49344@nvidia.com>
+From:   "zhangfei.gao@foxmail.com" <zhangfei.gao@foxmail.com>
+X-OQ-MSGID: <95041b28-c676-4063-9a85-838f1b971b98@foxmail.com>
+Date:   Thu, 12 May 2022 19:57:26 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
+In-Reply-To: <20220512113241.GQ49344@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, wintera@linux.ibm.com, seiden@linux.ibm.com,
-        nrb@linux.ibm.com
-References: <20220506092403.47406-1-pmorel@linux.ibm.com>
- <20220506092403.47406-3-pmorel@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v9 2/3] s390x: KVM: guest support for topology function
-In-Reply-To: <20220506092403.47406-3-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 4W7oIOnb_eCQykAqfrgFBO8sFj4xES6F
-X-Proofpoint-ORIG-GUID: WZNU0cAi9OojDenHDJIpNKFJkW1pCIuG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-12_02,2022-05-12_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- spamscore=0 mlxscore=0 clxscore=1015 phishscore=0 impostorscore=0
- suspectscore=0 adultscore=0 mlxlogscore=999 malwarescore=0
- priorityscore=1501 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2202240000 definitions=main-2205120052
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=0.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_MUA_MOZILLA,
+        FREEMAIL_FROM,HELO_DYNAMIC_IPADDR,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RDNS_DYNAMIC,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/6/22 11:24, Pierre Morel wrote:
-> We let the userland hypervisor know if the machine support the CPU
-> topology facility using a new KVM capability: KVM_CAP_S390_CPU_TOPOLOGY.
 
-Nope, we indicate KVM's support which is based on the machine's support.
 
-On the same note: Shouldn't the CAP indication be part of the last 
-patch? The resets are needed for a full support of this feature, no?
+On 2022/5/12 下午7:32, Jason Gunthorpe via iommu wrote:
+> On Thu, May 12, 2022 at 03:07:09PM +0800, Zhangfei Gao wrote:
+>>>> I can't help feeling a little wary about removing this until IOMMUFD
+>>>> can actually offer a functional replacement - is it in the way of
+>>>> anything upcoming?
+>>>   From an upstream perspective if someone has a patched kernel to
+>>> complete the feature, then they can patch this part in as well, we
+>>> should not carry dead code like this in the kernel and in the uapi.
+>>>
+>>> It is not directly in the way, but this needs to get done at some
+>>> point, I'd rather just get it out of the way.
+>> We are using this interface for nested mode.
+> How are you using it? It doesn't do anything. Do you have out of tree
+> patches as well?
+
+Yes, there are some patches out of tree, since they are pending for 
+almost one year.
+
+By the way, I am trying to test nesting mode based on iommufd, still 
+requires iommu_enable_nesting,
+which is removed in this patch as well.
+
+So can we wait for alternative patch then remove them?
+
+Thanks
+
+
