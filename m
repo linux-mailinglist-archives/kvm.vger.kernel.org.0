@@ -2,124 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 743C2525369
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 19:19:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B8C0252538F
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 19:28:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356956AbiELRTu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 13:19:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34940 "EHLO
+        id S1357030AbiELR2B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 13:28:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356939AbiELRTq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 13:19:46 -0400
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C73AA26AD89
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:19:44 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id s11so3268694edy.6
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:19:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=jDHOqKOOly/u6UGesDlSvrOYIRtvk+Gi75eJQoAcvU8=;
-        b=ajie93GkyM3bMzgPSyr9+zDuLO8qmNsBGOmDLDAYe2chL7Y1Dex40FgP7wpA+YsFVS
-         PbCwBPFRrhD1wKMyrktSA2hu4sY+A8Snezdkh2Pl31GtbbWKUVs17izWFz1kX+D2q2GT
-         3Kh1nj3RjFExJpH9SEac2MgWbeFHQCaqrxqgg=
+        with ESMTP id S1357028AbiELR2A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 13:28:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ADE2A994C8
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:27:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652376478;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tCD+8lP+xu7DSPBX9O/+vBKxjmnHI/OPG8q73tAYrnQ=;
+        b=TvN+aQBLFLfxLPR8eW2oWY6hztnqgAGQknqw0kIw3ImybpEbqAaeRInqJgEczVV7nFZX9D
+        a1NeWE+9pkdT823YSOnIJTixzmrBLIvTmtkFmu7/Sutbe26V01KzRpro+KNuIypadHyX4c
+        +LswKhVrAWI3h0A66Q5l6CaxPBzxPZE=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-425-kPMfk2IuN-e0Fj_skP7TdQ-1; Thu, 12 May 2022 13:27:52 -0400
+X-MC-Unique: kPMfk2IuN-e0Fj_skP7TdQ-1
+Received: by mail-wm1-f71.google.com with SMTP id c125-20020a1c3583000000b0038e3f6e871aso1887766wma.8
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:27:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=jDHOqKOOly/u6UGesDlSvrOYIRtvk+Gi75eJQoAcvU8=;
-        b=mDEhqo7LBVO9dWzzJ/A1flTGje7LHS2PUKR92tQA2W38Xez4SdaCX+NKyFbSElD1O0
-         TCTs/XGDelYva3+IkYVLQ0bLOauSqVBE21rMTG2IwIdxb9RJ0rvZVQT3jQ9ukdHOLEmL
-         2CBY5JUcOANFJJSgKVPpyd9sZD2XDutPFVjDKrXeeuU/Ys1r0leguTt1vnIM+WfRp3ld
-         xttduu7AvSHRxdo38BFpWpRfopfqFb7v3YA25SlDObZLcpyKDmXj4z5Md/WBaZv2BfdY
-         SbkhpZ+eQeZ3OH88KhpdZPMTPVTjSCTro3wpFeWC9y5kbRHSEDKDDCdSlWPB+8s8SU2L
-         ZoJw==
-X-Gm-Message-State: AOAM532gRDSMAe05LrZYRwzwEITR1sxFaQxS9WdOXvJofExfAMsH0oNc
-        1eu7JBW28PTbG5C5ZfZLAcVYWop0HA5qq+y2UwQ=
-X-Google-Smtp-Source: ABdhPJy99/1KRzF0y4EwfNaAgRo5awB+ChJLZFyz8KJGUizlicYG4Xk8oTMVxaXDo2UchnaiHDz11w==
-X-Received: by 2002:a05:6402:3687:b0:428:aafb:23c9 with SMTP id ej7-20020a056402368700b00428aafb23c9mr19440633edb.388.1652375982872;
-        Thu, 12 May 2022 10:19:42 -0700 (PDT)
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com. [209.85.221.44])
-        by smtp.gmail.com with ESMTPSA id m15-20020a170906258f00b006f3ef214e2bsm2281661ejb.145.2022.05.12.10.19.41
-        for <kvm@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:reply-to
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=tCD+8lP+xu7DSPBX9O/+vBKxjmnHI/OPG8q73tAYrnQ=;
+        b=OQhqoN+gGp2YWd07WDqzk8IVVL0EEq1Sb/bAMnoMHkDiCuLKKZLw/kVr9XOHe2GhcN
+         Vk+6eXNAuhX6DtLAE8Z6NUiMewlX68Vhh93pEvJ2wBeXFvG37jh2ESUk63vDEtP4clVP
+         tIXT2N1HCyOj8ZauF9bfziBrJwMh+L5FgpqbUfeBMXvJwYZ3/JOO9/vHpNpVQcQbmaCK
+         otD8Ayqa89FXWRph8K5I1ko4aRl36wry5k8GDfedz79IiL4C8Jq0on7P5IpQx3NB0F4w
+         jONuzlLWcpM3kaQr2wrkpYFGH55IfGSNdtOUP7YUru4TG28VmkLMlR1QCSoGzgRmGexp
+         aFcw==
+X-Gm-Message-State: AOAM533CGrgy0jN2CnikTJCDYzMPRD+nVXvjXUyOCRZn1A5bAAytcA1e
+        aeQMdADAUEvyLILfk1vi3iJu4fdHWMC5bYiktL57QuVwnWs7W+lpWRUCWMrxnofusKLpKV/AofJ
+        524mJQHOkjqO+
+X-Received: by 2002:a5d:47a7:0:b0:20c:5b3e:ff7 with SMTP id 7-20020a5d47a7000000b0020c5b3e0ff7mr683062wrb.362.1652376470552;
+        Thu, 12 May 2022 10:27:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz3srJE4qB6x11g/cGuO/5n+uGKjdPkkRDRS6CiXRIBa/uR33ZYaYztU6Mw7Uixet5KfvEsQQ==
+X-Received: by 2002:a5d:47a7:0:b0:20c:5b3e:ff7 with SMTP id 7-20020a5d47a7000000b0020c5b3e0ff7mr683049wrb.362.1652376470345;
+        Thu, 12 May 2022 10:27:50 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id l7-20020a1ced07000000b0038eba413181sm3361695wmh.1.2022.05.12.10.27.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 May 2022 10:19:41 -0700 (PDT)
-Received: by mail-wr1-f44.google.com with SMTP id w4so8155164wrg.12
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:19:41 -0700 (PDT)
-X-Received: by 2002:a5d:6dad:0:b0:20c:4dc1:e247 with SMTP id
- u13-20020a5d6dad000000b0020c4dc1e247mr629061wrs.274.1652375980629; Thu, 12
- May 2022 10:19:40 -0700 (PDT)
+        Thu, 12 May 2022 10:27:49 -0700 (PDT)
+Message-ID: <5cdb2ddb-eef1-e522-d41d-7ba0facf6dd7@redhat.com>
+Date:   Thu, 12 May 2022 19:27:48 +0200
 MIME-Version: 1.0
-References: <20220510082351-mutt-send-email-mst@kernel.org>
- <CAHk-=wjPR+bj7P1O=MAQWXp0Mx2hHuNQ1acn6gS+mRo_kbo5Lg@mail.gmail.com>
- <87czgk8jjo.fsf@mpe.ellerman.id.au> <CAHk-=wj9zKJGA_6SJOMPiQEoYke6cKX-FV3X_5zNXOcFJX1kOQ@mail.gmail.com>
- <87mtfm7uag.fsf@mpe.ellerman.id.au> <CAHk-=wgnYGY=10sRDzXCC2bmappjBTRNNbr8owvGLEW-xuV7Vw@mail.gmail.com>
-In-Reply-To: <CAHk-=wgnYGY=10sRDzXCC2bmappjBTRNNbr8owvGLEW-xuV7Vw@mail.gmail.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Thu, 12 May 2022 10:19:24 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wg=jfhgTkYBtY3LPPcUP=8A2bqH_iFezwOCDivuovE41w@mail.gmail.com>
-Message-ID: <CAHk-=wg=jfhgTkYBtY3LPPcUP=8A2bqH_iFezwOCDivuovE41w@mail.gmail.com>
-Subject: Re: [GIT PULL] virtio: last minute fixup
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
-        KVM list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        Netdev <netdev@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        mie@igel.co.jp
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH] vfio: Remove VFIO_TYPE1_NESTING_IOMMU
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Robin Murphy <robin.murphy@arm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Will Deacon <will@kernel.org>,
+        Vivek Kumar Gautam <Vivek.Gautam@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>
+References: <0-v1-0093c9b0e345+19-vfio_no_nesting_jgg@nvidia.com>
+ <0e2f7cb8-f0d9-8209-6bc2-ca87fff57f1f@arm.com>
+ <20220510181327.GM49344@nvidia.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20220510181327.GM49344@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 12, 2022 at 10:10 AM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
+Hi,
+
+On 5/10/22 20:13, Jason Gunthorpe wrote:
+> On Tue, May 10, 2022 at 06:52:06PM +0100, Robin Murphy wrote:
+>> On 2022-05-10 17:55, Jason Gunthorpe via iommu wrote:
+>>> This control causes the ARM SMMU drivers to choose a stage 2
+>>> implementation for the IO pagetable (vs the stage 1 usual default),
+>>> however this choice has no visible impact to the VFIO user. Further qemu
+>>> never implemented this and no other userspace user is known.
+>>>
+>>> The original description in commit f5c9ecebaf2a ("vfio/iommu_type1: add
+>>> new VFIO_TYPE1_NESTING_IOMMU IOMMU type") suggested this was to "provide
+>>> SMMU translation services to the guest operating system" however the rest
+>>> of the API to set the guest table pointer for the stage 1 was never
+>>> completed, or at least never upstreamed, rendering this part useless dead
+>>> code.
+>>>
+>>> Since the current patches to enable nested translation, aka userspace page
+>>> tables, rely on iommufd and will not use the enable_nesting()
+>>> iommu_domain_op, remove this infrastructure. However, don't cut too deep
+>>> into the SMMU drivers for now expecting the iommufd work to pick it up -
+>>> we still need to create S2 IO page tables.
+>>>
+>>> Remove VFIO_TYPE1_NESTING_IOMMU and everything under it including the
+>>> enable_nesting iommu_domain_op.
+>>>
+>>> Just in-case there is some userspace using this continue to treat
+>>> requesting it as a NOP, but do not advertise support any more.
+>> I assume the nested translation/guest SVA patches that Eric and Vivek were
+>> working on pre-IOMMUFD made use of this, and given that they got quite far
+>> along, I wouldn't be too surprised if some eager cloud vendors might have
+>> even deployed something based on the patches off the list. 
+
+thank you Robin for the heads up.
+> With upstream there is no way to make use of this flag, if someone is
+> using it they have other out of tree kernel, vfio, kvm and qemu
+> patches to make it all work.
 >
-> And most definitely not just random data that can be trivially
-> auto-generated after-the-fact.
+> You can see how much is still needed in Eric's tree:
+>
+> https://github.com/eauger/linux/commits/v5.15-rc7-nested-v16
+>
+>> I can't help feeling a little wary about removing this until IOMMUFD
+>> can actually offer a functional replacement - is it in the way of
+>> anything upcoming?
+> From an upstream perspective if someone has a patched kernel to
+> complete the feature, then they can patch this part in as well, we
+> should not carry dead code like this in the kernel and in the uapi.
 
-Put another way: when people asked for change ID's and I said "we have
-links", I by no means meant that "you can just add random worthless
-links to commits".
+On the other end the code is in the kernel for 8 years now, I think we
+could wait for some additional weeks/months until the iommufd nested
+integration arises and gets tested.
 
-For example, if you have a (public-facing) Gerrit system that tracks a
-patch before it gets committed, BY ALL MEANS add a link to that as the
-"change ID" that you tracked in Gerrit.
+Thanks
 
-That's a Link: that actually adds *information*. It shows some real
-history to the commit, and shows who approved it and when, and gives
-you all the Gerrit background.
+Eric
+>
+> It is not directly in the way, but this needs to get done at some
+> point, I'd rather just get it out of the way.
+>
+> Thanks,
+> Jason
+>
 
-But a link to the email on lkml that just contains the patch and the
-same commentary that was introduced into the commit? Useless garbage.
-It adds no actual information.
-
-THAT is my argument. Why do people think I'm arguing against the Link:
-tag? No. I'm arguing against adding links with no relevant new
-information behind them.
-
-I don't argue against links to lore. Not at all. If those links are
-about the background that caused the patch, they are great. Maybe they
-are to a long thread about the original problem and how to solve it.
-Thats WONDERFUL.
-
-But here's the deal: when I look at a commit that I wonder "why is it
-doing this, it seems wrong" (possibly after there's been a bug report
-about it, but possibly just because I'm reviewing it as part of doing
-the pull), and I see a "Link:" tag, and it just points back to the
-SAME DAMN DATA that I already have in the commit, then that Link: tag
-not only wasn't helpful, it was ACTIVELY DETRIMENTAL and made me waste
-time and just get irritated.
-
-And if you waste my time with useless links, why would you expect me
-to be supportive of that behavior?
-
-                      Linus
