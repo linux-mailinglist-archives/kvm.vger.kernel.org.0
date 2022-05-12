@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EE1D52434B
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 05:22:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B9E8F524340
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 05:22:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344228AbiELDVi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 May 2022 23:21:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37516 "EHLO
+        id S1344462AbiELDVm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 May 2022 23:21:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344758AbiELDVB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 May 2022 23:21:01 -0400
+        with ESMTP id S1344854AbiELDVF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 May 2022 23:21:05 -0400
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EFB3DF0B
-        for <kvm@vger.kernel.org>; Wed, 11 May 2022 20:20:59 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0EB51C129
+        for <kvm@vger.kernel.org>; Wed, 11 May 2022 20:21:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652325659; x=1683861659;
+  t=1652325663; x=1683861663;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=J8wfNdwz1HDEu6qHVMyEy9TFq8BIL0W8plK9acH8mCo=;
-  b=E70j0pUm/KVIk1cGqy/LiOcV0SWW1i5GLXXCYBHRqWIlxybHUDkCjs6b
-   fClqkz4ZgorkRhwiEAmb31jF+RmWCb1ViRNAgaQBQHasJ1I8uW+0Y8cGo
-   sxGk2LGdC4/0/sx0wZg49PNmUXBb8Wl3EA8hS0Th5Tn2d/SdT5BF6YtnQ
-   lQwtY60lXz4FtPrL6tPBENyUrzfv3QaeXf94ONnGtWKpj8MvtqV+Vydo1
-   yc4NX5xK6JIfVv4dVG21imgzRERxX1HTIiBokS9pDpAqkUfugQsKX+j2s
-   EX959fXc6ZEj1OTnKTnbqnjES6p1L/bP0F8sxa33EWNNRFQv88jv2Pg2K
+  bh=nRZA5P70nyMxFhff5ZnG3wRzOCbk4DRzVZQge2635HU=;
+  b=RiKktFFXxpzQbVZ4vMjpoYtHbYkA/FolvZpopW31GztSJjKR0zK+8j/8
+   CfJVd8ZIoxDV75oB2TqCfGB1XcC8yqqnB/ItDVTm8060uveuoLT9rp4c/
+   PSQQhZpYbisfFrrUdDaIqoh5tIkyw2hXqmRuMfJeC3BlEBzMue9N6j6Hg
+   ZsRbZS+vr88FVvJpfnSfreqP76f3otcqa471WQH7OaVYgun7AxcZRoRoD
+   PMYRL3wpcuye+9SrZaGjo52RId/ZKWahUBMqslPSg259MbO7PZ7YdkVGd
+   4BW0EB0eWADrP0OMu2HonrIb16MKIDkqn88dee9BwEUXL/DV67JD3icEM
    w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10344"; a="269815706"
+X-IronPort-AV: E=McAfee;i="6400,9594,10344"; a="269815720"
 X-IronPort-AV: E=Sophos;i="5.91,218,1647327600"; 
-   d="scan'208";a="269815706"
+   d="scan'208";a="269815720"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2022 20:20:58 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2022 20:21:03 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.91,218,1647327600"; 
-   d="scan'208";a="594456757"
+   d="scan'208";a="594456771"
 Received: from lxy-dell.sh.intel.com ([10.239.159.55])
-  by orsmga008.jf.intel.com with ESMTP; 11 May 2022 20:20:54 -0700
+  by orsmga008.jf.intel.com with ESMTP; 11 May 2022 20:20:58 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Isaku Yamahata <isaku.yamahata@gmail.com>,
@@ -53,9 +53,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
 Cc:     Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
         kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com,
         xiaoyao.li@intel.com
-Subject: [RFC PATCH v4 35/36] i386/tdx: Don't get/put guest state for TDX VMs
-Date:   Thu, 12 May 2022 11:18:02 +0800
-Message-Id: <20220512031803.3315890-36-xiaoyao.li@intel.com>
+Subject: [RFC PATCH v4 36/36] docs: Add TDX documentation
+Date:   Thu, 12 May 2022 11:18:03 +0800
+Message-Id: <20220512031803.3315890-37-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220512031803.3315890-1-xiaoyao.li@intel.com>
 References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
@@ -71,49 +71,150 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+Add docs/system/i386/tdx.rst for TDX support, and add tdx in
+confidential-guest-support.rst
 
-Don't get/put state of TDX VMs since accessing/mutating guest state of
-production TDs is not supported.
-
-Note, it will be allowed for a debug TD. Corresponding support will be
-introduced when debug TD support is implemented in the future.
-
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- target/i386/kvm/kvm.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ docs/system/confidential-guest-support.rst |   1 +
+ docs/system/i386/tdx.rst                   | 103 +++++++++++++++++++++
+ docs/system/target-i386.rst                |   1 +
+ 3 files changed, 105 insertions(+)
+ create mode 100644 docs/system/i386/tdx.rst
 
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 4d520d0e34bd..3e26dacf7807 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -4478,6 +4478,11 @@ int kvm_arch_put_registers(CPUState *cpu, int level)
+diff --git a/docs/system/confidential-guest-support.rst b/docs/system/confidential-guest-support.rst
+index 0c490dbda2b7..66129fbab64c 100644
+--- a/docs/system/confidential-guest-support.rst
++++ b/docs/system/confidential-guest-support.rst
+@@ -38,6 +38,7 @@ Supported mechanisms
+ Currently supported confidential guest mechanisms are:
  
-     assert(cpu_is_stopped(cpu) || qemu_cpu_is_self(cpu));
+ * AMD Secure Encrypted Virtualization (SEV) (see :doc:`i386/amd-memory-encryption`)
++* Intel Trust Domain Extension (TDX) (see :doc:`i386/tdx`)
+ * POWER Protected Execution Facility (PEF) (see :ref:`power-papr-protected-execution-facility-pef`)
+ * s390x Protected Virtualization (PV) (see :doc:`s390x/protvirt`)
  
-+    /* TODO: Allow accessing guest state for debug TDs. */
-+    if (is_tdx_vm()) {
-+        return 0;
-+    }
+diff --git a/docs/system/i386/tdx.rst b/docs/system/i386/tdx.rst
+new file mode 100644
+index 000000000000..96d91fea5516
+--- /dev/null
++++ b/docs/system/i386/tdx.rst
+@@ -0,0 +1,103 @@
++Intel Trusted Domain eXtension (TDX)
++====================================
 +
-     /* must be before kvm_put_nested_state so that EFER.SVME is set */
-     ret = has_sregs2 ? kvm_put_sregs2(x86_cpu) : kvm_put_sregs(x86_cpu);
-     if (ret < 0) {
-@@ -4572,6 +4577,12 @@ int kvm_arch_get_registers(CPUState *cs)
-     if (ret < 0) {
-         goto out;
-     }
++Intel Trusted Domain eXtensions (TDX) refers to an Intel technology that extends
++Virtual Machine Extensions (VMX) and Multi-Key Total Memory Encryption (MKTME)
++with a new kind of virtual machine guest called a Trust Domain (TD). A TD runs
++in a CPU mode that is designed to protect the confidentiality of its memory
++contents and its CPU state from any other software, including the hosting
++Virtual Machine Monitor (VMM), unless explicitly shared by the TD itself.
 +
-+    /* TODO: Allow accessing guest state for debug TDs. */
-+    if (is_tdx_vm()) {
-+        return 0;
-+    }
++Prerequisites
++-------------
 +
-     ret = kvm_getput_regs(cpu, 0);
-     if (ret < 0) {
-         goto out;
++To run TD, the physical machine needs to have TDX module loaded and initialized
++while KVM hypervisor has TDX support and has TDX enabled. If those requirements
++are met, the ``KVM_CAP_VM_TYPES`` will report the support of ``KVM_X86_TDX_VM``.
++
++Trust Domain Virtual Firmware (TDVF)
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++Trust Domain Virtual Firmware (TDVF) is required to provide TD services to boot
++TD Guest OS. TDVF needs to be copied to guest private memory and measured before
++a TD boots.
++
++The VM scope ``MEMORY_ENCRYPT_OP`` ioctl provides command ``KVM_TDX_INIT_MEM_REGION``
++to copy the TDVF image to TD's private memory space.
++
++Since TDX doesn't support readonly memslot, TDVF cannot be mapped as pflash
++device and it actually works as RAM. "-bios" option is chosen to load TDVF.
++
++OVMF is the opensource firmware that implements the TDVF support. Thus the
++command line to specify and load TDVF is `-bios OVMF.fd`
++
++Feature Control
++---------------
++
++Unlike non-TDX VM, the CPU features (enumerated by CPU or MSR) of a TD is not
++under full control of VMM. VMM can only configure part of features of a TD on
++``KVM_TDX_INIT_VM`` command of VM scope ``MEMORY_ENCRYPT_OP`` ioctl.
++
++The configurable features have three types:
++
++- Attributes:
++  - PKS (bit 30) controls whether Supervisor Protection Keys is exposed to TD,
++  which determines related CPUID bit and CR4 bit;
++  - PERFMON (bit 63) controls whether PMU is exposed to TD.
++
++- XSAVE related features (XFAM):
++  XFAM is a 64b mask, which has the same format as XCR0 or IA32_XSS MSR. It
++  determines the set of extended features available for use by the guest TD.
++
++- CPUID features:
++  Only some bits of some CPUID leaves are directly configurable by VMM.
++
++What features can be configured is reported via TDX capabilities.
++
++TDX capabilities
++~~~~~~~~~~~~~~~~
++
++The VM scope ``MEMORY_ENCRYPT_OP`` ioctl provides command ``KVM_TDX_CAPABILITIES``
++to get the TDX capabilities from KVM. It returns a data structure of
++``struct kvm_tdx_capabilites``, which tells the supported configuration of
++attributes, XFAM and CPUIDs.
++
++Launching a TD (TDX VM)
++-----------------------
++
++To launch a TDX guest:
++
++.. parsed-literal::
++
++    |qemu_system_x86| \\
++        -machine ...,confidential-guest-support=tdx0 \\
++        -object tdx-guest,id=tdx0 \\
++        -bios OVMF.fd \\
++
++Debugging
++---------
++
++Bit 0 of TD attributes, is DEBUG bit, which decides if the TD runs in off-TD
++debug mode. When in off-TD debug mode, TD's VCPU state and private memory are
++accessible via given SEAMCALLs. This requires KVM to expose APIs to invoke those
++SEAMCALLs and resonponding QEMU change.
++
++It's targeted as future work.
++
++restrictions
++------------
++
++ - No readonly support for private memory;
++
++ - No SMM support: SMM support requires manipulating the guset register states
++   which is not allowed;
++
++Live Migration
++--------------
++
++TODO
++
++References
++----------
++
++- `TDX Homepage <https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html>`__
+diff --git a/docs/system/target-i386.rst b/docs/system/target-i386.rst
+index 96bf54889a82..16dd4f1a8c80 100644
+--- a/docs/system/target-i386.rst
++++ b/docs/system/target-i386.rst
+@@ -29,6 +29,7 @@ Architectural features
+    i386/kvm-pv
+    i386/sgx
+    i386/amd-memory-encryption
++   i386/tdx
+ 
+ .. _pcsys_005freq:
+ 
 -- 
 2.27.0
 
