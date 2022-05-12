@@ -2,117 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 794B9524E0F
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 15:18:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ABC58524E22
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 15:22:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354273AbiELNSs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 09:18:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36686 "EHLO
+        id S1354317AbiELNW0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 09:22:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354268AbiELNSr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 09:18:47 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AF49250E8E;
-        Thu, 12 May 2022 06:18:46 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id be20so6151421edb.12;
-        Thu, 12 May 2022 06:18:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=V2JNCP+HsfCN+EYLETrCl+Q2QImYlR/SvAjA8iddPzo=;
-        b=evK7+Zcvz2xVuylTV6weOBTX9rOxmYedGbk9SMQuehhsEWlXsR1jHtd4FcUGAj47WB
-         Hzk7jbG3PmoXiy3L9SfBDVuVXBNLP/g6qViO8Ixjbz5q/sv8pcILCK3e1AZWf/KcvFHo
-         jOHXn8w61z1bnQbZW0IWXfaRYjUT62sKTUuxQ2qAQ7U1gk4G0yVAzD/0flUAbSo8p7O6
-         58JlQTZhiNsIGmYDPDUWAT1OLZOL+1tGvocVtmLFSPILQXSPADQmzpERboQtrZczyAod
-         zhFR7j6njZvfmCOS4FXdA7OwKw/yKgYVimcIwhk/2yYjB2nQ10Cqi2HOBVG9u9pBNNBT
-         Y7Bg==
+        with ESMTP id S1354318AbiELNWY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 09:22:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7BCD75D658
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 06:22:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652361741;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=iGoOIUCJGa4SaOfudTG7yQQEUS0BOq99bUpZYAujLo0=;
+        b=WOjP8MdPqu3LOsfahT82zc8xugEfFIT7nCLCVDa+gNXt75X+itV3ea4MPbXhUbiGFqNn1R
+        gopb+V303EGReu1GRKgJA866a/gKyvlz3Iaduty4afXgHptcI2kUeRUl/c+y6typ1h2tzH
+        ac7lB01acVU5UNs6HuDLMrlR6EY+rR8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-126-j1hwBr07PTCkIhHr6jXPGA-1; Thu, 12 May 2022 09:22:20 -0400
+X-MC-Unique: j1hwBr07PTCkIhHr6jXPGA-1
+Received: by mail-wr1-f69.google.com with SMTP id u17-20020a056000161100b0020cda98f292so2049677wrb.21
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 06:22:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=V2JNCP+HsfCN+EYLETrCl+Q2QImYlR/SvAjA8iddPzo=;
-        b=6M2hhIIh6eQqNMZ6nEIdboStbZvLIk1kXDiRRtonT+y4FgS7srW22bb6OAdAgaArxn
-         eQmZZmlmzS7EYR+AT5NwNsUIfGFnN9obZVluZyKvVJhwGGilaztVrkmrq9er69WxcF+u
-         2lehEZ94UL3SALETA6aMYHCGkL4Ifkyj4saXxJmm2IHRNlI1VNAMflxNJAqYWdUUQ+lF
-         HwV04hguC7W4DOsqiAg+uiPpnu309s8fRiL9k4TAQZWiovfSy83NDdPbWcUGiUTdydkx
-         u50X0ramdJMdK0yCPxZL7V4Y/ZdnGUbtQjDZwP2yPxGPFH6OMt1vGziKWm6+y26xw/Ai
-         iSyQ==
-X-Gm-Message-State: AOAM53210QyLb3R56dQELU5lQtIINfN4mQbEhg7SyjKUjUnuq8Bfb1qU
-        /uPqPk+r6d6YI52W1IMwovU=
-X-Google-Smtp-Source: ABdhPJxOpJ1Ehy5Z/UEMu9MD6Lq5Gh2Lb+BAQDVB8F7/0zk71rTur/33E6WTKe2v8JQLR/F+W+OlZQ==
-X-Received: by 2002:a05:6402:4301:b0:427:c8e4:4acd with SMTP id m1-20020a056402430100b00427c8e44acdmr35297088edc.230.1652361524776;
-        Thu, 12 May 2022 06:18:44 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id r2-20020a056402234200b0042617ba63besm2538718eda.72.2022.05.12.06.18.41
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:organization:subject
+         :in-reply-to:content-transfer-encoding;
+        bh=iGoOIUCJGa4SaOfudTG7yQQEUS0BOq99bUpZYAujLo0=;
+        b=mUPf3Hvgv5abqvSJsr3//fEBdLbTYW5LtVb1mFls0MRHobJ3naqW3U0YDLlufaXzo9
+         MVGcIOjUibZxZRFb8nz2/FQOKeyQ1gNjeyMERBOijE8v30WiqlSTG6PaGKTpMH5ugitq
+         3QrxJR62pCOQkUmAzzS1nte40ZoSZb4WOWsMve8XuKL3hkQ6ADtHGdkwujB7Xb4YxTmf
+         k66lU5+o1uKdFUSSnLDET3ryhEePTrqHWKsbrdIQZFmbuQfrHMucEb6hKcbIs/RhSq1n
+         OFoz7gb15GClQtDPCUTuuWn5IuBEQRN/cUiTyHwKooXX3XRvPmZ/6AmaVez86ymKB4U3
+         nX/w==
+X-Gm-Message-State: AOAM531JKEQXqKYyrXqt1HR8No5RcmkJSn0VXrEsROymoG5lvEYEHqmP
+        Tq2DQtnF0nKx+CpGvTu4WnvmcAxNpr8QsF4BQYR2cSMVew8WTBWy8eztC7Xud/TFBEs7kB8N5e9
+        P12vZMSuuFNCv
+X-Received: by 2002:a5d:5746:0:b0:20c:dbc2:397d with SMTP id q6-20020a5d5746000000b0020cdbc2397dmr7981051wrw.658.1652361739078;
+        Thu, 12 May 2022 06:22:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx+hXYu6vzpLOJq39B+H7C8rDVvQP/gQANCQfbt9DiMWxcg2qD5+fl3H5Fdy+4EFw8qj6gfWw==
+X-Received: by 2002:a5d:5746:0:b0:20c:dbc2:397d with SMTP id q6-20020a5d5746000000b0020cdbc2397dmr7981034wrw.658.1652361738823;
+        Thu, 12 May 2022 06:22:18 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c701:d200:ee5d:1275:f171:136d? (p200300cbc701d200ee5d1275f171136d.dip0.t-ipconnect.de. [2003:cb:c701:d200:ee5d:1275:f171:136d])
+        by smtp.gmail.com with ESMTPSA id o11-20020a5d408b000000b0020c9520a940sm4946313wrp.54.2022.05.12.06.22.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 May 2022 06:18:44 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <8a15c4b4-cabe-7bc3-bd98-bd669d586616@redhat.com>
-Date:   Thu, 12 May 2022 15:18:40 +0200
+        Thu, 12 May 2022 06:22:18 -0700 (PDT)
+Message-ID: <77f6f5e7-5945-c478-0e41-affed62252eb@redhat.com>
+Date:   Thu, 12 May 2022 15:22:17 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.8.0
-Subject: Re: [PATCH v11 14/16] KVM: x86/vmx: Flip Arch LBREn bit on guest
- state change
 Content-Language: en-US
-To:     "Yang, Weijiang" <weijiang.yang@intel.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "kan.liang@linux.intel.com" <kan.liang@linux.intel.com>,
-        "like.xu.linux@gmail.com" <like.xu.linux@gmail.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20220506033305.5135-1-weijiang.yang@intel.com>
- <20220506033305.5135-15-weijiang.yang@intel.com>
- <9f19a5eb-3eb0-58a2-e4ee-612f3298ba82@redhat.com>
- <9e2b5e9f-25a2-b724-c6d7-282dc987aa99@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <9e2b5e9f-25a2-b724-c6d7-282dc987aa99@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20220512131019.2594948-1-scgl@linux.ibm.com>
+ <20220512131019.2594948-2-scgl@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [PATCH v3 1/2] KVM: s390: Don't indicate suppression on dirtying,
+ failing memop
+In-Reply-To: <20220512131019.2594948-2-scgl@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/11/22 09:43, Yang, Weijiang wrote:
->>
->> Instead of using flip_arch_lbr_ctl, SMM should save the value of the MSR
->> in kvm_x86_ops->enter_smm, and restore it in kvm_x86_ops->leave_smm
->> (feel free to do it only if guest_cpuid_has(vcpu, X86_FEATURE_LM), i.e.
->> the 32-bit case can be ignored).
-> 
-> In the case of migration in SMM, I assume kvm_x86_ops->enter_smm() 
-> called in source side
-> 
-> and kvm_x86_ops->leave_smm() is called at destination, then should the 
-> saved LBREn be transferred
-> 
-> to destination too? The destination can rely on the bit to defer setting 
-> LBREn bit in
+On 12.05.22 15:10, Janis Schoetterl-Glausch wrote:
+> If user space uses a memop to emulate an instruction and that
+> memop fails, the execution of the instruction ends.
+> Instruction execution can end in different ways, one of which is
+> suppression, which requires that the instruction execute like a no-op.
+> A writing memop that spans multiple pages and fails due to key
+> protection may have modified guest memory, as a result, the likely
+> correct ending is termination. Therefore, do not indicate a
+> suppressing instruction ending in this case.
 
-Hi, it's transferred automatically if the MSR is saved in the SMM save 
-state area.  Both enter_smm and leave_smm can access the save state area.
+I think that is possibly problematic handling.
 
-The enter_smm callback is called after saving "normal" state, and it has 
-to save the state + clear the bit; likewise, the leave_smm callback is 
-called before saving "normal" state and will restore the old value of 
-the MSR.
+In TCG we stumbled in similar issues in the past for MVC when crossing
+page boundaries. Failing after modifying the first page already
+seriously broke some user space, because the guest would retry the
+instruction after fixing up the fault reason on the second page: if
+source and destination operands overlap, you'll be in trouble because
+the input parameters already changed.
 
+For this reason, in TCG we make sure that all accesses are valid before
+starting modifications.
+
+See target/s390x/tcg/mem_helper.c:do_helper_mvc with access_prepare()
+and friends as an example.
+
+Now, I don't know how to tackle that for KVM, I just wanted to raise
+awareness that injecting an interrupt after modifying page content is
+possible dodgy and dangerous.
+
+-- 
 Thanks,
 
-Paolo
-
-> VMCS until kvm_x86_ops->leave_smm() is called. is it good? thanks!
+David / dhildenb
 
