@@ -2,85 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F0BF3524F0C
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 15:58:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F657524F13
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 15:59:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354852AbiELN6i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 09:58:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60742 "EHLO
+        id S1354841AbiELN70 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 09:59:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354833AbiELN6d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 09:58:33 -0400
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C62881EEE1B;
-        Thu, 12 May 2022 06:58:30 -0700 (PDT)
+        with ESMTP id S1354836AbiELN7Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 09:59:24 -0400
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 792B91E21B1;
+        Thu, 12 May 2022 06:59:22 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id be20so6300408edb.12;
+        Thu, 12 May 2022 06:59:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1652363911; x=1683899911;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=fXdsCza0w8qNDoFrKMYkMnUAwI+hskYjRxqBpTNbyyY=;
-  b=T1LDzVLXLuacWaHxogaYGICrW1r2tquL/p/GrpOGRpHF89nGsI+Sg7fm
-   RLytGpFR1FKfC2gxRe4WJLjMThdpnhQ1uLcN5Iu6p4aiN4h829IHUvpE7
-   PH7pkWUdw3729vE+kW8/XTp5VMDT3UDuQXOcl/9I82iXLS6cZJL0OjTu4
-   s=;
-X-IronPort-AV: E=Sophos;i="5.91,220,1647302400"; 
-   d="scan'208";a="202425735"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-ff3df2fe.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP; 12 May 2022 13:58:15 +0000
-Received: from EX13D08EUC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2a-ff3df2fe.us-west-2.amazon.com (Postfix) with ESMTPS id BF6FC41E0E;
-        Thu, 12 May 2022 13:58:06 +0000 (UTC)
-Received: from EX13MTAUEB002.ant.amazon.com (10.43.60.12) by
- EX13D08EUC002.ant.amazon.com (10.43.164.124) with Microsoft SMTP Server (TLS)
- id 15.0.1497.32; Thu, 12 May 2022 13:58:04 +0000
-Received: from dev-dsk-mheyne-1b-c1524648.eu-west-1.amazon.com (10.15.60.66)
- by mail-relay.amazon.com (10.43.60.234) with Microsoft SMTP Server id
- 15.0.1497.32 via Frontend Transport; Thu, 12 May 2022 13:58:04 +0000
-Received: by dev-dsk-mheyne-1b-c1524648.eu-west-1.amazon.com (Postfix, from userid 5466572)
-        id E90A841131; Thu, 12 May 2022 13:58:03 +0000 (UTC)
-From:   Maximilian Heyne <mheyne@amazon.de>
-To:     <stable@vger.kernel.org>
-CC:     Masami Hiramatsu <mhiramat@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Juergen Gross <jgross@suse.com>, <x86@kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Ingo Molnar <mingo@kernel.org>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Andrew Cooper <andrew.cooper3@citrix.com>,
-        Borislav Petkov <bp@alien8.de>,
-        <xen-devel@lists.xenproject.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Maximilian Heyne <mheyne@amazon.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Sasha Levin <sashal@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
-Subject: [PATCH 4/4] x86: kprobes: Prohibit probing on instruction which has emulate prefix
-Date:   Thu, 12 May 2022 13:56:51 +0000
-Message-ID: <20220512135654.119791-5-mheyne@amazon.de>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220512135654.119791-1-mheyne@amazon.de>
-References: <20220512135654.119791-1-mheyne@amazon.de>
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=g/Qg+1AZg6aTBJtpO/aq9xOI91f+bSFV81BXjqwHGko=;
+        b=GzBUlMuf69Ac0C7m/kaNVndV6Br0xiShvNqxUeOtw0juwWg14tpjtIRYebJbMQnycZ
+         gfsbrtjvbB198B/98w558vukOCoVUdS4/T5UrB7bGiHdWbfn56tqO9iKrbphRYbSsQUO
+         /Bip1JrTlw/Xs5cs4JtbClv1JRpR4YOzdebdBpfbcudpz2YrG5l5AwU1Uw8QJ0qmWBys
+         1tDUVkL99PTMiG7dUcrldXVcWZazAmRggiPt+16TFwqSq0NFTGlSo7qHwlkQ9v7lWZ+c
+         af+8hAUiy8qSER3xsYxNg1BOMPKLk+bJMQyWJkb0b1V6mBQ9pn99UxqCRrR8If9bBVLo
+         UtbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=g/Qg+1AZg6aTBJtpO/aq9xOI91f+bSFV81BXjqwHGko=;
+        b=KfrVUMd7A4KlmGOYziAIQueQwJ2TdH7zgSpzWmRAQHGnAXUNt2Zj9UTvDiJ0IV5O2g
+         As20+SjaJSketS0gJsSbS2yXCFiyQoVFsI59LGUxcike0Ao5xXM4c5Rz0hfjX33QhwtU
+         CCxjG+jSjqjDH0lI05EjuZCwB4xDItkacGCZbfvCwdtamGVmEB0YpOHo+bXdwU+rnbYx
+         oEpz/3QGMkxbJLrlRGUUqgjq3jTcNY4TO9WO5tx1KclXIs/7m6x9oy4Tiaz8T82pQ7/K
+         uyNPfsO5CoTIIp7+rtOjbw+XxX3qle/QTuDCmNcdTRKBKCHDOUiTD8udrWSeABiyU9FY
+         VtoQ==
+X-Gm-Message-State: AOAM532c7th8JiC8Q1011h1PuecmgXKtj++6TTD8450TCwRS5IUA0fmJ
+        PpDNJSwjL84ggzq2kQKJaDI=
+X-Google-Smtp-Source: ABdhPJxN9Fo7H7WahKOcrH15At67L2t0c/BFv/7iczdzwo4PhNstc9jrR++vhZVYhx07TuYHak7d1g==
+X-Received: by 2002:a05:6402:747:b0:428:1f98:d17 with SMTP id p7-20020a056402074700b004281f980d17mr35536640edy.57.1652363961067;
+        Thu, 12 May 2022 06:59:21 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id dx18-20020a170906a85200b006f3a8b81ff7sm2195937ejb.3.2022.05.12.06.59.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 May 2022 06:59:20 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <e1fc28b6-996f-a436-2664-d6b044d07c82@redhat.com>
+Date:   Thu, 12 May 2022 15:59:19 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH 16/22] KVM: x86/mmu: remove redundant bits from extended
+ role
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20220414074000.31438-1-pbonzini@redhat.com>
+ <20220414074000.31438-17-pbonzini@redhat.com> <Ynmv2X5eLz2OQDMB@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Ynmv2X5eLz2OQDMB@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -89,62 +77,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Masami Hiramatsu <mhiramat@kernel.org>
+On 5/10/22 02:20, Sean Christopherson wrote:
+> --
+> From: Sean Christopherson<seanjc@google.com>
+> Date: Mon, 9 May 2022 17:13:39 -0700
+> Subject: [PATCH] KVM: x86/mmu: Return true from is_cr4_pae() iff CR0.PG is set
+> 
+> Condition is_cr4_pae() on is_cr0_pg() in addition to the !4-byte gPTE
+> check.  From the MMU's perspective, PAE is disabling if paging is
+> disabled.  The current code works because all callers check is_cr0_pg()
+> before invoking is_cr4_pae(), but relying on callers to maintain that
+> behavior is unnecessarily risky.
+> 
+> Fixes: faf729621c96 ("KVM: x86/mmu: remove redundant bits from extended role")
+> Signed-off-by: Sean Christopherson<seanjc@google.com>
+> ---
+>   arch/x86/kvm/mmu/mmu.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 909372762363..d1c20170a553 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -240,7 +240,7 @@ static inline bool is_cr0_pg(struct kvm_mmu *mmu)
+> 
+>   static inline bool is_cr4_pae(struct kvm_mmu *mmu)
+>   {
+> -        return !mmu->cpu_role.base.has_4_byte_gpte;
+> +        return is_cr0_pg(mmu) && !mmu->cpu_role.base.has_4_byte_gpte;
+>   }
+> 
+>   static struct kvm_mmu_role_regs vcpu_to_role_regs(struct kvm_vcpu *vcpu)
 
-commit 004e8dce9c5595697951f7cd0e9f66b35c92265e upstream
+Hmm, thinking more about it this is not needed for two kind of opposite 
+reasons:
 
-Prohibit probing on instruction which has XEN_EMULATE_PREFIX
-or KVM's emulate prefix. Since that prefix is a marker for Xen
-and KVM, if we modify the marker by kprobe's int3, that doesn't
-work as expected.
+* if is_cr4_pae() really were to represent the raw CR4.PAE value, this 
+is incorrect and it should be up to the callers to check is_cr0_pg()
 
-Signed-off-by: Masami Hiramatsu <mhiramat@kernel.org>
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-Cc: Juergen Gross <jgross@suse.com>
-Cc: x86@kernel.org
-Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Cc: Ingo Molnar <mingo@kernel.org>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Andrew Cooper <andrew.cooper3@citrix.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: xen-devel@lists.xenproject.org
-Cc: Randy Dunlap <rdunlap@infradead.org>
-Cc: Josh Poimboeuf <jpoimboe@redhat.com>
-Link: https://lkml.kernel.org/r/156777566048.25081.6296162369492175325.stgit@devnote2
-Signed-off-by: Maximilian Heyne <mheyne@amazon.de>
-Cc: stable@vger.kernel.org # 5.4.x
----
- arch/x86/kernel/kprobes/core.c | 4 ++++
- 1 file changed, 4 insertions(+)
+* if is_cr4_pae() instead represents 8-byte page table entries, then it 
+does even before this patch, because of the following logic in 
+kvm_calc_cpu_role():
 
-diff --git a/arch/x86/kernel/kprobes/core.c b/arch/x86/kernel/kprobes/core.c
-index c205d77d57da..3700dc94847c 100644
---- a/arch/x86/kernel/kprobes/core.c
-+++ b/arch/x86/kernel/kprobes/core.c
-@@ -358,6 +358,10 @@ int __copy_instruction(u8 *dest, u8 *src, u8 *real, struct insn *insn)
- 	kernel_insn_init(insn, dest, MAX_INSN_SIZE);
- 	insn_get_length(insn);
- 
-+	/* We can not probe force emulate prefixed instruction */
-+	if (insn_has_emulate_prefix(insn))
-+		return 0;
-+
- 	/* Another subsystem puts a breakpoint, failed to recover */
- 	if (insn->opcode.bytes[0] == BREAKPOINT_INSTRUCTION)
- 		return 0;
--- 
-2.32.0
-
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
+         if (!____is_cr0_pg(regs)) {
+                 role.base.direct = 1;
+                 return role;
+         }
+	...
+         role.base.has_4_byte_gpte = !____is_cr4_pae(regs);
 
 
+So whatever meaning we give to is_cr4_pae(), there is no need for the 
+adjustment.
 
+Paolo
