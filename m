@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EDC752434E
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 05:22:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A8F8524332
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 05:22:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344087AbiELDUw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 May 2022 23:20:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36718 "EHLO
+        id S1343821AbiELDVP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 May 2022 23:21:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344306AbiELDUk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1344423AbiELDUk (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 11 May 2022 23:20:40 -0400
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69495219377
-        for <kvm@vger.kernel.org>; Wed, 11 May 2022 20:20:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B096219C10
+        for <kvm@vger.kernel.org>; Wed, 11 May 2022 20:20:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652325617; x=1683861617;
+  t=1652325622; x=1683861622;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=NjarXFOxqHXwXtnjn08zXNwsmuxAFJqWAQBqjWFQ+AE=;
-  b=KtsgG7+X6p7oqpRi5IGUxaftpHePUyF6cV6XYjy3orpJeJ7vsVgWTyX5
-   wK1tb5wt8HAhclE0QPmf73PNDqOjsjnNStHuTh1WWjnKTFOf7P/1Gbn0m
-   eZBvZGsOo5tPU5cLPnr40YKGpH5WdPSxEIkAeioR5SXtuUMa43S4+aDRN
-   sXA2H2vg0H6Ns4/io+XsWctaNv9IJKjM2TY879l6VafgYhnTC/txtKZQu
-   dSfIYqzCn09NPREqaZMtRMbs0WRh35WpB/CgD00vuxQcVPoB2Y6R0Deu/
-   6INEzcTyaLGR38iiMSsRJZusyog1e5ERMA6Qi/n2jQvrGs4UCwAb7qKZk
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10344"; a="269815599"
+  bh=zA4+vO3ZlL6FDdVOOW5n4kWKuIMD1g8bw35TxLB01wM=;
+  b=TGyCBnrohGEB5R9QNI/sMhwdhbLOsdm9YXNAoJGA47c4lYDK+RDUfsg8
+   z61BBByPT6wuw8Ngx1gavWL8Apsw0zykMBbIJxz/Y+rwWsQnyZCnLhPXr
+   1ZF1P1w9MuoZaCrG/b+LC4cowklNOFqQ/hYnZ4Gl4p9FeKitmNoS6zOZ/
+   wh78P7Dn5T+nRrOmoOBYXokUJNwW1o0UfhjSBfol/mhc4hObIUgGrPh1C
+   WnZSdc5WFYoCa/pZgjKtfx0c4mHzYYMcLh05FlSk92f8Mp4DDVUNmxqhs
+   Wu/fRE7LQHEfPQ85eHCLRZi0z1Kt8dYKuPyYatZ5C5j0VpGF2XMxl+YQf
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10344"; a="269815614"
 X-IronPort-AV: E=Sophos;i="5.91,218,1647327600"; 
-   d="scan'208";a="269815599"
+   d="scan'208";a="269815614"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2022 20:20:17 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2022 20:20:21 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.91,218,1647327600"; 
-   d="scan'208";a="594456567"
+   d="scan'208";a="594456595"
 Received: from lxy-dell.sh.intel.com ([10.239.159.55])
-  by orsmga008.jf.intel.com with ESMTP; 11 May 2022 20:20:12 -0700
+  by orsmga008.jf.intel.com with ESMTP; 11 May 2022 20:20:17 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Isaku Yamahata <isaku.yamahata@gmail.com>,
@@ -53,9 +53,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
 Cc:     Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
         kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com,
         xiaoyao.li@intel.com
-Subject: [RFC PATCH v4 26/36] i386/tdx: Finalize TDX VM
-Date:   Thu, 12 May 2022 11:17:53 +0800
-Message-Id: <20220512031803.3315890-27-xiaoyao.li@intel.com>
+Subject: [RFC PATCH v4 27/36] i386/tdx: Disable SMM for TDX VMs
+Date:   Thu, 12 May 2022 11:17:54 +0800
+Message-Id: <20220512031803.3315890-28-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220512031803.3315890-1-xiaoyao.li@intel.com>
 References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
@@ -71,32 +71,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Invoke KVM_TDX_FINALIZE_VM to finalize the TD's measurement and make
-the TD vCPUs runnable once machine initialization is complete.
+TDX doesn't support SMM and VMM cannot emulate SMM for TDX VMs because
+VMM cannot manipulate TDX VM's memory.
+
+Disable SMM for TDX VMs and error out if user requests to enable SMM.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- target/i386/kvm/tdx.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ target/i386/kvm/tdx.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index d8b05b7749f7..4a7c149f895c 100644
+index 4a7c149f895c..7ff4c6a9a7ca 100644
 --- a/target/i386/kvm/tdx.c
 +++ b/target/i386/kvm/tdx.c
-@@ -307,6 +307,13 @@ static void tdx_finalize_vm(Notifier *notifier, void *unused)
-             entry->mem_ptr = NULL;
-         }
-     }
-+
-+    r = tdx_vm_ioctl(KVM_TDX_FINALIZE_VM, 0, NULL);
-+    if (r < 0) {
-+        error_report("KVM_TDX_FINALIZE_VM failed %s", strerror(-r));
-+        exit(0);
-+    }
-+    tdx_guest->parent_obj.ready = true;
- }
+@@ -322,9 +322,17 @@ static Notifier tdx_machine_done_notify = {
  
- static Notifier tdx_machine_done_notify = {
+ int tdx_kvm_init(MachineState *ms, Error **errp)
+ {
++    X86MachineState *x86ms = X86_MACHINE(ms);
+     TdxGuest *tdx = (TdxGuest *)object_dynamic_cast(OBJECT(ms->cgs),
+                                                     TYPE_TDX_GUEST);
+ 
++    if (x86ms->smm == ON_OFF_AUTO_AUTO) {
++        x86ms->smm = ON_OFF_AUTO_OFF;
++    } else if (x86ms->smm == ON_OFF_AUTO_ON) {
++        error_setg(errp, "TDX VM doesn't support SMM");
++        return -EINVAL;
++    }
++
+     if (!tdx_caps) {
+         get_tdx_capabilities();
+     }
 -- 
 2.27.0
 
