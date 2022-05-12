@@ -2,79 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 11F135253D0
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 19:39:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 097FA5253E3
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 19:41:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357124AbiELRjB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 13:39:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37986 "EHLO
+        id S1357182AbiELRlN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 13:41:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357126AbiELRjA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 13:39:00 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31CB15DBED
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:38:59 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id c1-20020a17090a558100b001dca2694f23so5527467pji.3
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:38:59 -0700 (PDT)
+        with ESMTP id S1357203AbiELRlC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 13:41:02 -0400
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A7CE37A06
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:41:00 -0700 (PDT)
+Received: by mail-il1-x130.google.com with SMTP id s12so1427733iln.11
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:41:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=bqZDswKO+uKOqiFNxu6bdQVfPx50iX/8NdeZL1KzfWg=;
-        b=nVBZJ+JbXqDEc2yXMf5WXyTFHdDlNSWeLN/j1wcSeXokYE8j54VxOjeb+q1WMzjnFH
-         gfc1KYqjD+e1pmcvz87XArJtjONoIG9QBOtFkPWhaFpc/BBxV43PQ327PpQesAZno3RV
-         Za15on2Wp1/ja2Dy96WhhQms3y9RlD0E7DQlkaG6FpF26U2cbI7ePdYA+fp/R5EKLdgp
-         6Yn2HTw9kjbl1s6CQuq12GNVJbmUGF9IRtbKjKiVhIobi9ROcHM59353gOVsXWm0Lm66
-         ajDJK2c+54NKHtt8BlMeCJUA6A+VGerLfBou89BVJqdFRbj0t/adz2iopM8XBEPelM0h
-         hYKg==
+        d=linuxfoundation.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Ir1zw0OZe5UU2KiBzSYOwuHmCrXrkYEC7RGqZNVaeEM=;
+        b=IvE6/JS9OoyiNcMDOiJ6ONy7E+AnfyES5kY3vljwcFFCH5EJ2w4OWI0JhOekQErXdD
+         jV+1Rw5uvDB61t4c1HIlfmHGaZKUKuG/KQbyC3kVZ3bAjrq/5ZCPz/4kVyLIszDiFvwX
+         7ym2TWAqgaTUCfGwgC/P+uk4t8jRoUwtK3Yfg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=bqZDswKO+uKOqiFNxu6bdQVfPx50iX/8NdeZL1KzfWg=;
-        b=Nls/UGknlm6KiHi+3bwhrWcF/QhLtNJ+mdTbyxswvUgDRA77eMamfv1wMuzw5S/YF0
-         1THT+411NK5o00MhusJK8z4KAkWzpTvPr10qqHatieWU/TMsFBw7tUq/UPaUrapHgMqw
-         XrO6VsjoXhE8Dossh/qoxByP/5nQRBeAHpDwW/m45OraXb7AMmS8s5HHZOj3STtQj8K5
-         r7icf9KKeqwzTHbgIGiMggk2Cg/yAM2uCne86J146o9tgTuDzW5grdkla4+QxS9/NnIG
-         FyOep8wbnVcEpcOESxWgKutxftpUmMW3mQk5auO47sBHmz/JBVPcu1ISzZQX8pcPGyfs
-         v5oA==
-X-Gm-Message-State: AOAM531pwYmDEaMUTd0qYXwfgBa3cipez26Ini86jSGk53tWTtkJX6XH
-        g6PvhgSWwgunjwNnRtsABX0=
-X-Google-Smtp-Source: ABdhPJwClBBDDgemPJ7T1eNmlRYn6KMSeFuTSyaX/cTNjfWJ8GwO83NjExKNPc7CBxWAg/ZyqDPGyQ==
-X-Received: by 2002:a17:90b:30c4:b0:1d8:3395:a158 with SMTP id hi4-20020a17090b30c400b001d83395a158mr651456pjb.184.1652377138340;
-        Thu, 12 May 2022 10:38:58 -0700 (PDT)
-Received: from localhost ([192.55.54.48])
-        by smtp.gmail.com with ESMTPSA id 123-20020a630581000000b003c14af5062esm2471pgf.70.2022.05.12.10.38.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 May 2022 10:38:57 -0700 (PDT)
-Date:   Thu, 12 May 2022 10:38:56 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        isaku.yamahata@intel.com, Gerd Hoffmann <kraxel@redhat.com>,
-        Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
-Subject: Re: [RFC PATCH v4 06/36] i386/tdx: Get tdx_capabilities via
- KVM_TDX_CAPABILITIES
-Message-ID: <20220512173856.GD2789321@ls.amr.corp.intel.com>
-References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
- <20220512031803.3315890-7-xiaoyao.li@intel.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Ir1zw0OZe5UU2KiBzSYOwuHmCrXrkYEC7RGqZNVaeEM=;
+        b=Ti+xz7ORB9+jx9SLxJfaEoolg+HLCZaJRyjA+q8ZxnY2iIK01iIkRXrdPg1lSwdqJB
+         InY2S7NOGEgy5HI9XktSTkioGjrDKkf6/Pcc2dQq2wKJUWmvw4shPRZF+kD6lziKfqda
+         clOSkffTk14vWo+GvB2ytiiuh/RQKeKFyq21ncbhquFFvTB9rYexeYnWX1NF6zM8GrxU
+         4p8EGYubPUotJDadTHhcuSplyWFAa+xvs7zDa5yO1P8ijkXCeA6RDyx3RKWnhQppd1h3
+         bZAfOkuI39UK3VLkAorkVleCnkVBJPFXOVif7p4kQBMMgR6lUjsSxYRC1K1m/MWugXYu
+         BVsQ==
+X-Gm-Message-State: AOAM533myQkLMgUya3fpK+AZbgf+z2ygKdekQTegd5tPwi3bhMXCNZGL
+        pluK5Elg8MPN8BQ5EMGz5iUJKg==
+X-Google-Smtp-Source: ABdhPJyCHrPg6BOwQEl56IJ7j6yjJ11xRJ3CgQk/iWhLk7WlvMrIYE5O/ICKVuQLfymYoHOQW9912Q==
+X-Received: by 2002:a92:6e0b:0:b0:2c9:a276:58cc with SMTP id j11-20020a926e0b000000b002c9a27658ccmr576228ilc.199.1652377259680;
+        Thu, 12 May 2022 10:40:59 -0700 (PDT)
+Received: from [192.168.1.128] ([38.15.45.1])
+        by smtp.gmail.com with ESMTPSA id i3-20020a02ca03000000b0032bf978122asm41450jak.59.2022.05.12.10.40.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 May 2022 10:40:59 -0700 (PDT)
+Subject: Re: [RFC V2 PATCH 3/8] selftests: kvm: priv_memfd_test: Add support
+ for memory conversion
+To:     Vishal Annapurve <vannapurve@google.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, shauh@kernel.org, yang.zhong@intel.com,
+        drjones@redhat.com, ricarkol@google.com, aaronlewis@google.com,
+        wei.w.wang@intel.com, kirill.shutemov@linux.intel.com,
+        corbet@lwn.net, hughd@google.com, jlayton@kernel.org,
+        bfields@fieldses.org, akpm@linux-foundation.org,
+        chao.p.peng@linux.intel.com, yu.c.zhang@linux.intel.com,
+        jun.nakajima@intel.com, dave.hansen@intel.com,
+        michael.roth@amd.com, qperret@google.com, steven.price@arm.com,
+        ak@linux.intel.com, david@redhat.com, luto@kernel.org,
+        vbabka@suse.cz, marcorr@google.com, erdemaktas@google.com,
+        pgonda@google.com, nikunj@amd.com, seanjc@google.com,
+        diviness@google.com, Shuah Khan <skhan@linuxfoundation.org>
+References: <20220511000811.384766-1-vannapurve@google.com>
+ <20220511000811.384766-4-vannapurve@google.com>
+From:   Shuah Khan <skhan@linuxfoundation.org>
+Message-ID: <934a07be-ce72-7916-5614-e78af8293b5c@linuxfoundation.org>
+Date:   Thu, 12 May 2022 11:40:57 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220512031803.3315890-7-xiaoyao.li@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+In-Reply-To: <20220511000811.384766-4-vannapurve@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -83,136 +87,141 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 12, 2022 at 11:17:33AM +0800,
-Xiaoyao Li <xiaoyao.li@intel.com> wrote:
-
-> KVM provides TDX capabilities via sub command KVM_TDX_CAPABILITIES of
-> IOCTL(KVM_MEMORY_ENCRYPT_OP). Get the capabilities when initializing
-> TDX context. It will be used to validate user's setting later.
+On 5/10/22 6:08 PM, Vishal Annapurve wrote:
+> Add handling of explicit private/shared memory conversion using
+> KVM_HC_MAP_GPA_RANGE and implicit memory conversion by handling
+> KVM_EXIT_MEMORY_ERROR.
 > 
-> Besides, introduce the interfaces to invoke TDX "ioctls" at different
-> scope (KVM, VM and VCPU) in preparation.
-> 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
 > ---
->  target/i386/kvm/tdx.c | 85 +++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 85 insertions(+)
+>   tools/testing/selftests/kvm/priv_memfd_test.c | 87 +++++++++++++++++++
+>   1 file changed, 87 insertions(+)
 > 
-> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-> index 77e33ae01147..68bedbad0ebe 100644
-> --- a/target/i386/kvm/tdx.c
-> +++ b/target/i386/kvm/tdx.c
-> @@ -14,12 +14,97 @@
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
->  #include "qom/object_interfaces.h"
-> +#include "sysemu/kvm.h"
->  
->  #include "hw/i386/x86.h"
->  #include "tdx.h"
->  
-> +enum tdx_ioctl_level{
-> +    TDX_PLATFORM_IOCTL,
-> +    TDX_VM_IOCTL,
-> +    TDX_VCPU_IOCTL,
-> +};
-> +
-> +static int __tdx_ioctl(void *state, enum tdx_ioctl_level level, int cmd_id,
-> +                        __u32 flags, void *data)
+> diff --git a/tools/testing/selftests/kvm/priv_memfd_test.c b/tools/testing/selftests/kvm/priv_memfd_test.c
+> index bbb58c62e186..55e24c893b07 100644
+> --- a/tools/testing/selftests/kvm/priv_memfd_test.c
+> +++ b/tools/testing/selftests/kvm/priv_memfd_test.c
+> @@ -155,6 +155,83 @@ static struct test_run_helper priv_memfd_testsuite[] = {
+>   	},
+>   };
+>   
+> +static void handle_vm_exit_hypercall(struct kvm_run *run,
+> +	uint32_t test_id)
 > +{
-> +    struct kvm_tdx_cmd tdx_cmd;
-> +    int r;
+> +	uint64_t gpa, npages, attrs;
+> +	int priv_memfd =
+> +		priv_memfd_testsuite[test_id].priv_memfd;
+
+Do you need this on a separate line? Doesn't looks like it will exceed
+the limit with the tab?
+
+> +	int ret;
+> +	int fallocate_mode;
 > +
-> +    memset(&tdx_cmd, 0x0, sizeof(tdx_cmd));
+> +	if (run->hypercall.nr != KVM_HC_MAP_GPA_RANGE) {
+> +		TEST_FAIL("Unhandled Hypercall %lld\n",
+> +					run->hypercall.nr);
+
+Is this considered test fail or skip because of unmet dependency?
+Also do you need run->hypercall.nr os a separate line?
+
+> +	}
 > +
-> +    tdx_cmd.id = cmd_id;
-> +    tdx_cmd.flags = flags;
-> +    tdx_cmd.data = (__u64)(unsigned long)data;
+> +	gpa = run->hypercall.args[0];
+> +	npages = run->hypercall.args[1];
+> +	attrs = run->hypercall.args[2];
 > +
-> +    switch (level) {
-> +    case TDX_PLATFORM_IOCTL:
-> +        r = kvm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_OP, &tdx_cmd);
-> +        break;
-> +    case TDX_VM_IOCTL:
-> +        r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_OP, &tdx_cmd);
-> +        break;
-> +    case TDX_VCPU_IOCTL:
-> +        r = kvm_vcpu_ioctl(state, KVM_MEMORY_ENCRYPT_OP, &tdx_cmd);
-> +        break;
-> +    default:
-> +        error_report("Invalid tdx_ioctl_level %d", level);
-> +        exit(1);
-> +    }
+> +	if ((gpa < TEST_MEM_GPA) || ((gpa +
+> +		(npages << MIN_PAGE_SHIFT)) > TEST_MEM_END)) {
+> +		TEST_FAIL("Unhandled gpa 0x%lx npages %ld\n",
+> +			gpa, npages);
+
+Same question here about gpa, npages on a separate line? Also
+align it with the previous line for readability.
+
+TEST_FAIL("Unhandled gpa 0x%lx npages %ld\n",
+	  gpa, npages);
+  
+> +	}
 > +
-> +    return r;
+> +	if (attrs & KVM_MAP_GPA_RANGE_ENCRYPTED)
+> +		fallocate_mode = 0;
+> +	else {
+> +		fallocate_mode = (FALLOC_FL_PUNCH_HOLE |
+> +			FALLOC_FL_KEEP_SIZE);
+> +	}
+> +	pr_info("Converting off 0x%lx pages 0x%lx to %s\n",
+> +		(gpa - TEST_MEM_GPA), npages,
+> +		fallocate_mode ?
+> +			"shared" : "private");
+> +	ret = fallocate(priv_memfd, fallocate_mode,
+> +		(gpa - TEST_MEM_GPA),
+> +		npages << MIN_PAGE_SHIFT);
+> +	TEST_ASSERT(ret != -1,
+> +		"fallocate failed in hc handling");
+> +	run->hypercall.ret = 0;
 > +}
 > +
-> +static inline int tdx_platform_ioctl(int cmd_id, __u32 metadata, void *data)
-
-nitpick:  Because metadata was renamed to flags for clarity, please update
-those.
-
+> +static void handle_vm_exit_memory_error(struct kvm_run *run,
+> +	uint32_t test_id)
 > +{
-> +    return __tdx_ioctl(NULL, TDX_PLATFORM_IOCTL, cmd_id, metadata, data);
+> +	uint64_t gpa, size, flags;
+> +	int ret;
+> +	int priv_memfd =
+> +		priv_memfd_testsuite[test_id].priv_memfd;
+> +	int fallocate_mode;
+> +
+> +	gpa = run->memory.gpa;
+> +	size = run->memory.size;
+> +	flags = run->memory.flags;
+> +
+> +	if ((gpa < TEST_MEM_GPA) || ((gpa + size)
+> +					> TEST_MEM_END)) {
+> +		TEST_FAIL("Unhandled gpa 0x%lx size 0x%lx\n",
+> +			gpa, size);
+> +	}
+> +
+> +	if (flags & KVM_MEMORY_EXIT_FLAG_PRIVATE)
+> +		fallocate_mode = 0;
+> +	else {
+> +		fallocate_mode = (FALLOC_FL_PUNCH_HOLE |
+> +				FALLOC_FL_KEEP_SIZE);
+> +	}
+> +	pr_info("Converting off 0x%lx size 0x%lx to %s\n",
+> +		(gpa - TEST_MEM_GPA), size,
+> +		fallocate_mode ?
+> +			"shared" : "private");
+> +	ret = fallocate(priv_memfd, fallocate_mode,
+> +		(gpa - TEST_MEM_GPA), size);
+> +	TEST_ASSERT(ret != -1,
+> +		"fallocate failed in memory error handling");
 > +}
 > +
-> +static inline int tdx_vm_ioctl(int cmd_id, __u32 metadata, void *data)
-> +{
-> +    return __tdx_ioctl(NULL, TDX_VM_IOCTL, cmd_id, metadata, data);
-> +}
+>   static void vcpu_work(struct kvm_vm *vm, uint32_t test_id)
+>   {
+>   	struct kvm_run *run;
+> @@ -181,6 +258,16 @@ static void vcpu_work(struct kvm_vm *vm, uint32_t test_id)
+>   			continue;
+>   		}
+>   
+> +		if (run->exit_reason == KVM_EXIT_HYPERCALL) {
+> +			handle_vm_exit_hypercall(run, test_id);
+> +			continue;
+> +		}
 > +
-> +static inline int tdx_vcpu_ioctl(void *vcpu_fd, int cmd_id, __u32 metadata,
-> +                                 void *data)
-> +{
-> +    return  __tdx_ioctl(vcpu_fd, TDX_VCPU_IOCTL, cmd_id, metadata, data);
-> +}
+> +		if (run->exit_reason == KVM_EXIT_MEMORY_ERROR) {
+> +			handle_vm_exit_memory_error(run, test_id);
+> +			continue;
+> +		}
 > +
-> +static struct kvm_tdx_capabilities *tdx_caps;
-> +
-> +static void get_tdx_capabilities(void)
-> +{
-> +    struct kvm_tdx_capabilities *caps;
-> +    int max_ent = 1;
-
-Because we know the number of entries for TDX 1.0. We can start with better
-value with comment on it.
-
-
-> +    int r, size;
-> +
-> +    do {
-> +        size = sizeof(struct kvm_tdx_capabilities) +
-> +               max_ent * sizeof(struct kvm_tdx_cpuid_config);
-> +        caps = g_malloc0(size);
-> +        caps->nr_cpuid_configs = max_ent;
-> +
-> +        r = tdx_platform_ioctl(KVM_TDX_CAPABILITIES, 0, caps);
-> +        if (r == -E2BIG) {
-> +            g_free(caps);
-> +            max_ent *= 2;
-> +        } else if (r < 0) {
-> +            error_report("KVM_TDX_CAPABILITIES failed: %s\n", strerror(-r));
-> +            exit(1);
-> +        }
-> +    }
-> +    while (r == -E2BIG);
-> +
-> +    tdx_caps = caps;
-> +}
-> +
->  int tdx_kvm_init(MachineState *ms, Error **errp)
->  {
-> +    if (!tdx_caps) {
-> +        get_tdx_capabilities();
-> +    }
-> +
->      return 0;
->  }
->  
-> -- 
-> 2.27.0
+>   		TEST_FAIL("Unhandled VCPU exit reason %d\n", run->exit_reason);
+>   		break;
+>   	}
 > 
-> 
 
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+Looks like you can easily combine lines without running into # chars limit
+for several lines of code in this patch. If you haven't already, run
+checkpatch to make sure coding guidelines are honored.
+
+thanks,
+-- Shuah
