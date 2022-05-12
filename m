@@ -2,121 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE89C5244AD
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 07:07:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFD675244AC
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 07:07:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349085AbiELFHp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 01:07:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46248 "EHLO
+        id S1348979AbiELFH2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 01:07:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348960AbiELFHk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 01:07:40 -0400
-Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC0A63916D;
-        Wed, 11 May 2022 22:07:38 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mail.sberdevices.ru (Postfix) with ESMTP id 457255FD07;
-        Thu, 12 May 2022 08:07:36 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1652332056;
-        bh=uWyeWhV+o14znQk2Sqg83unLL60ICf31MFs9KoLPASs=;
-        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
-        b=pGLINxJ/56ycahbSatBg9ZCY4q8VwMiaMCH2kC7QP7n6A4woJNffqyiqyLSmGedMh
-         R7MgKWCcHi3x6cHqr2IB/mZ2j82Benqnq1N48czy6pN/rRjzVlH3huWEWzup9vBnfr
-         aztnighBWkjJ/x3QfrLjXnsV/scazcNHBAnAzNEyEkQe26SiEOFG4NIZZxeXQjDJk8
-         MiH50Roq/+evLRhZR2ruhJ1tCMSq+g5KooNdUP5Nz3YB5STiiqI1X1egbZ9sXI/ZT9
-         N5uMENn7xq6B9UPRboMqrASZr0wSzi+6gWtQY38Fnz1OcKqPwt6YCMMkA26HMCA7O2
-         E2pFB71B8do9w==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mail.sberdevices.ru (Postfix) with ESMTP;
-        Thu, 12 May 2022 08:07:35 +0300 (MSK)
-From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Jakub Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>
-Subject: [RFC PATCH v1 1/8] virtio/vsock: rework packet allocation logic
-Thread-Topic: [RFC PATCH v1 1/8] virtio/vsock: rework packet allocation logic
-Thread-Index: AQHYZb4YktEgwRFewE2DI8rAWLS0Dw==
-Date:   Thu, 12 May 2022 05:06:52 +0000
-Message-ID: <3a8d9936-fc88-62ce-8c35-060b7d09b1bc@sberdevices.ru>
-In-Reply-To: <7cdcb1e1-7c97-c054-19cf-5caeacae981d@sberdevices.ru>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.16.1.12]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4A4315244458694AA50C5403D95B603F@sberdevices.ru>
-Content-Transfer-Encoding: base64
+        with ESMTP id S1348960AbiELFHR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 01:07:17 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDDCE26AED
+        for <kvm@vger.kernel.org>; Wed, 11 May 2022 22:07:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 70AC361BF2
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 05:07:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 99492C385B8
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 05:07:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1652332034;
+        bh=QCQNXcLkRPPsMwtMHrR0fXkJd+ztRMqxE4Xag6oVJrE=;
+        h=From:To:Subject:Date:From;
+        b=ief4Zjs40sZLzwMVHJomg4E5zjIU/agI1jUz09F2egfKX0XTcgfqjHmJq1KVd2/64
+         K4HgBJVrWSsIAB0gfAp/VHcmZ4I+vsCRuojcVTvXiPXQRFZNjwaLy6Ms2SZ+aw4SZ/
+         VDNPgpjN+Yxm3b42/BBrYFgpgcKWjR+3uvM/vx2GNs4EmhWwWx+3BGyYEBPpwl5M+g
+         7b8tOZh4PoMYEqPiBPe82SO6yFPJu5JOqeO6BXEO2KaK4T572Iza8KKAqsBLwlmC9o
+         3+Li9CvXOws6RAXtei/0I7MwT4Qg2hFU7w81vb0bP/LqMGiGsYxAg1JPcjAUBmk+nL
+         oZn1ah6GoruEA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 82DD0CAC6E2; Thu, 12 May 2022 05:07:14 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 215969] New: Guest deploying TAA mitigation on (not affected)
+ ICX host
+Date:   Thu, 12 May 2022 05:07:14 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: pawan.kumar.gupta@linux.intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-215969-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/05/12 02:55:00 #19424207
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-VG8gc3VwcG9ydCB6ZXJvY29weSByZWNlaXZlLCBwYWNrZXQncyBidWZmZXIgYWxsb2NhdGlvbg0K
-aXMgY2hhbmdlZDogZm9yIGJ1ZmZlcnMgd2hpY2ggY291bGQgYmUgbWFwcGVkIHRvIHVzZXIncw0K
-dm1hIHdlIGNhbid0IHVzZSAna21hbGxvYygpJyhhcyBrZXJuZWwgcmVzdHJpY3RzIHRvIG1hcA0K
-c2xhYiBwYWdlcyB0byB1c2VyJ3Mgdm1hKSBhbmQgcmF3IGJ1ZGR5IGFsbG9jYXRvciBub3cNCmNh
-bGxlZC4gQnV0LCBmb3IgdHggcGFja2V0cyhzdWNoIHBhY2tldHMgd29uJ3QgYmUgbWFwcGVkDQp0
-byB1c2VyKSwgcHJldmlvdXMgJ2ttYWxsb2MoKScgd2F5IGlzIHVzZWQsIGJ1dCB3aXRoIHNwZWNp
-YWwNCmZsYWcgaW4gcGFja2V0J3Mgc3RydWN0dXJlIHdoaWNoIGFsbG93cyB0byBkaXN0aW5ndWlz
-aA0KYmV0d2VlbiAna21hbGxvYygpJyBhbmQgcmF3IHBhZ2VzIGJ1ZmZlcnMuDQoNClNpZ25lZC1v
-ZmYtYnk6IEFyc2VuaXkgS3Jhc25vdiA8QVZLcmFzbm92QHNiZXJkZXZpY2VzLnJ1Pg0KLS0tDQog
-aW5jbHVkZS9saW51eC92aXJ0aW9fdnNvY2suaCAgICAgICAgICAgIHwgMSArDQogbmV0L3Ztd192
-c29jay92aXJ0aW9fdHJhbnNwb3J0LmMgICAgICAgIHwgOCArKysrKystLQ0KIG5ldC92bXdfdnNv
-Y2svdmlydGlvX3RyYW5zcG9ydF9jb21tb24uYyB8IDkgKysrKysrKystDQogMyBmaWxlcyBjaGFu
-Z2VkLCAxNSBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0IGEvaW5j
-bHVkZS9saW51eC92aXJ0aW9fdnNvY2suaCBiL2luY2x1ZGUvbGludXgvdmlydGlvX3Zzb2NrLmgN
-CmluZGV4IDM1ZDdlZWRiNWU4ZS4uZDAyY2I3YWE5MjJmIDEwMDY0NA0KLS0tIGEvaW5jbHVkZS9s
-aW51eC92aXJ0aW9fdnNvY2suaA0KKysrIGIvaW5jbHVkZS9saW51eC92aXJ0aW9fdnNvY2suaA0K
-QEAgLTUwLDYgKzUwLDcgQEAgc3RydWN0IHZpcnRpb192c29ja19wa3Qgew0KIAl1MzIgb2ZmOw0K
-IAlib29sIHJlcGx5Ow0KIAlib29sIHRhcF9kZWxpdmVyZWQ7DQorCWJvb2wgc2xhYl9idWY7DQog
-fTsNCiANCiBzdHJ1Y3QgdmlydGlvX3Zzb2NrX3BrdF9pbmZvIHsNCmRpZmYgLS1naXQgYS9uZXQv
-dm13X3Zzb2NrL3ZpcnRpb190cmFuc3BvcnQuYyBiL25ldC92bXdfdnNvY2svdmlydGlvX3RyYW5z
-cG9ydC5jDQppbmRleCBmYjMzMDJmZmY2MjcuLjQzYjdiMDliNGEwYSAxMDA2NDQNCi0tLSBhL25l
-dC92bXdfdnNvY2svdmlydGlvX3RyYW5zcG9ydC5jDQorKysgYi9uZXQvdm13X3Zzb2NrL3ZpcnRp
-b190cmFuc3BvcnQuYw0KQEAgLTI1NCwxNiArMjU0LDIwIEBAIHN0YXRpYyB2b2lkIHZpcnRpb192
-c29ja19yeF9maWxsKHN0cnVjdCB2aXJ0aW9fdnNvY2sgKnZzb2NrKQ0KIAl2cSA9IHZzb2NrLT52
-cXNbVlNPQ0tfVlFfUlhdOw0KIA0KIAlkbyB7DQorCQlzdHJ1Y3QgcGFnZSAqYnVmX3BhZ2U7DQor
-DQogCQlwa3QgPSBremFsbG9jKHNpemVvZigqcGt0KSwgR0ZQX0tFUk5FTCk7DQogCQlpZiAoIXBr
-dCkNCiAJCQlicmVhazsNCiANCi0JCXBrdC0+YnVmID0ga21hbGxvYyhidWZfbGVuLCBHRlBfS0VS
-TkVMKTsNCi0JCWlmICghcGt0LT5idWYpIHsNCisJCWJ1Zl9wYWdlID0gYWxsb2NfcGFnZShHRlBf
-S0VSTkVMKTsNCisNCisJCWlmICghYnVmX3BhZ2UpIHsNCiAJCQl2aXJ0aW9fdHJhbnNwb3J0X2Zy
-ZWVfcGt0KHBrdCk7DQogCQkJYnJlYWs7DQogCQl9DQogDQorCQlwa3QtPmJ1ZiA9IHBhZ2VfdG9f
-dmlydChidWZfcGFnZSk7DQogCQlwa3QtPmJ1Zl9sZW4gPSBidWZfbGVuOw0KIAkJcGt0LT5sZW4g
-PSBidWZfbGVuOw0KIA0KZGlmZiAtLWdpdCBhL25ldC92bXdfdnNvY2svdmlydGlvX3RyYW5zcG9y
-dF9jb21tb24uYyBiL25ldC92bXdfdnNvY2svdmlydGlvX3RyYW5zcG9ydF9jb21tb24uYw0KaW5k
-ZXggZWMyYzJhZmJmMGQwLi4yNzg1NjdmNzQ4ZjIgMTAwNjQ0DQotLS0gYS9uZXQvdm13X3Zzb2Nr
-L3ZpcnRpb190cmFuc3BvcnRfY29tbW9uLmMNCisrKyBiL25ldC92bXdfdnNvY2svdmlydGlvX3Ry
-YW5zcG9ydF9jb21tb24uYw0KQEAgLTY5LDYgKzY5LDcgQEAgdmlydGlvX3RyYW5zcG9ydF9hbGxv
-Y19wa3Qoc3RydWN0IHZpcnRpb192c29ja19wa3RfaW5mbyAqaW5mbywNCiAJCWlmICghcGt0LT5i
-dWYpDQogCQkJZ290byBvdXRfcGt0Ow0KIA0KKwkJcGt0LT5zbGFiX2J1ZiA9IHRydWU7DQogCQlw
-a3QtPmJ1Zl9sZW4gPSBsZW47DQogDQogCQllcnIgPSBtZW1jcHlfZnJvbV9tc2cocGt0LT5idWYs
-IGluZm8tPm1zZywgbGVuKTsNCkBAIC0xMzQyLDcgKzEzNDMsMTMgQEAgRVhQT1JUX1NZTUJPTF9H
-UEwodmlydGlvX3RyYW5zcG9ydF9yZWN2X3BrdCk7DQogDQogdm9pZCB2aXJ0aW9fdHJhbnNwb3J0
-X2ZyZWVfcGt0KHN0cnVjdCB2aXJ0aW9fdnNvY2tfcGt0ICpwa3QpDQogew0KLQlrZnJlZShwa3Qt
-PmJ1Zik7DQorCWlmIChwa3QtPmJ1Zl9sZW4pIHsNCisJCWlmIChwa3QtPnNsYWJfYnVmKQ0KKwkJ
-CWtmcmVlKHBrdC0+YnVmKTsNCisJCWVsc2UNCisJCQlmcmVlX3BhZ2VzKGJ1ZiwgZ2V0X29yZGVy
-KHBrdC0+YnVmX2xlbikpOw0KKwl9DQorDQogCWtmcmVlKHBrdCk7DQogfQ0KIEVYUE9SVF9TWU1C
-T0xfR1BMKHZpcnRpb190cmFuc3BvcnRfZnJlZV9wa3QpOw0KLS0gDQoyLjI1LjENCg==
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215969
+
+            Bug ID: 215969
+           Summary: Guest deploying TAA mitigation on (not affected) ICX
+                    host
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: v5.18-rc3
+          Hardware: Intel
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: high
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: pawan.kumar.gupta@linux.intel.com
+        Regression: No
+
+On a hardware that enumerates TAA_NO (i.e. not affected by TSX Async Abort
+(TAA)), a certain guest/host configuration can result in guest enumerating =
+TAA
+vulnerability and unnecessarily deploying MD_CLEAR(CPU buffer clear)
+mitigation.=20
+
+Icelake Server has TAA_NO and supports MSR TSX_CTRL, and by default linux
+disables TSX feature, resetting CPUID.RTM at host bootup.
+
+Currently KVM hides TAA_NO from guests when host has CPUID.RTM=3D0. Because=
+ KVM
+also exports MSR TSX_CTRL to guests, a guest with "tsx=3Don" cmdline parame=
+ter
+would enable TSX feature, setting X86_FEATURE_RTM.
+
+taa_select_mitigation() with X86_FEATURE_RTM=3D1 and TAA_NO=3D0, deploys Cl=
+ear CPU
+buffers mitigation.
+
+A probable fix is to export TAA_NO to guests. Alternately, KVM can choose n=
+ot
+to export MSR TSX_CTRL.
+
+Guests anyways can't use MSR TSX_CTRL to enable TSX, but I think it was
+exported to guest to support some migration scenarios:
+
+  https://lore.kernel.org/lkml/20210129101912.1857809-1-pbonzini@redhat.com/
+
+---
+Setup info:
+
+ICX HOST configuration:
+
+Vendor ID:                       GenuineIntel
+CPU family:                      6
+Model:                           106
+Model name:                      Intel(R) Xeon(R) Platinum 8360Y CPU @ 2.40=
+GHz
+Stepping:                        6
+
+Vulnerability Mds:               Not affected
+Vulnerability Tsx async abort:   Not affected
+
+//TSX feature flag not present on host
+$ grep rtm /proc/cpuinfo
+$
+
+
+GUEST info:
+
+Launch kvm/qemu guest with "-cpu host" and guest kernel parameter "tsx=3Don"
+
+"rtm" shows up in /proc/cpuinfo
+
+# rdmsr -a 0x122
+0
+0
+0
+0
+
+// Guest sysfs shows mitigation being deployed.
+[root@vm-fedora-35 ~]# grep .
+/sys/devices/system/cpu/vulnerabilities/tsx_async_abort
+Mitigation: Clear CPU buffers; SMT Host state unknown
+
+Thanks,
+Pawan
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
