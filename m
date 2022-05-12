@@ -2,156 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD5635252D1
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 18:40:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67D0C52534F
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 19:12:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356603AbiELQks (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 12:40:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36752 "EHLO
+        id S1356898AbiELRL4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 13:11:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356634AbiELQkk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 12:40:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A8B9026865A
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 09:40:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652373625;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NsJep5oCvE52cG8IYLZ5lNH1MW8yFZhmyzXX66loBtY=;
-        b=HADkcbsWH+1DDwFbjAiSLifuwAZtlc0rS4RpXUl7xVs56V0LoCFRyMgWTW89WR5FZD5h2w
-        fKrVQB38XLGUqEGGsALEZ/CSAeksKR8svShNDjDpLNMtLUQmzQvCHOuvawoP/Dy4cQ3Ilo
-        M4aVwcYWqpFcb7/B5sqFzNinC7I53sc=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-145-ekAxnnDoNIqyihS3iOSQAw-1; Thu, 12 May 2022 12:40:16 -0400
-X-MC-Unique: ekAxnnDoNIqyihS3iOSQAw-1
-Received: by mail-wm1-f72.google.com with SMTP id p24-20020a1c5458000000b003945d2ffc6eso1844302wmi.5
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 09:40:16 -0700 (PDT)
+        with ESMTP id S1356924AbiELRLA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 13:11:00 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F068A27CE7
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:10:55 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id n10so11539297ejk.5
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:10:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=loonHWmCtVeGx4aWVVUzPzapZ1t+QIqGsKXmCgmw6z8=;
+        b=WD5qjD3n7PQ6Q1+OHYaSBYIXZyE3MSnd14hOsae1gMnqzXVow2TJFjREwN777Ig52q
+         V4qfULfCcQ86ni9aAhSi7LjMQHCPkFJi+glv65R1S+sQR6oFUNEhVyq5JADGgBm6h1kT
+         2hznSR7F9VZ12haH7nWz1Ev8hTm8abuX+I6D4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=NsJep5oCvE52cG8IYLZ5lNH1MW8yFZhmyzXX66loBtY=;
-        b=OlE9Izn2nQ0bBISZeSej0GAr+/WUCwcISoyVkmtzlTBKBY0YzZHxOVg1ZUviJWpXVD
-         pt5ZA3IZXUIyrOzegjkUZQ8Y4bjkRymHdf4XIEbhP/2DXRXE/chefDvLBv7nqTp/p6pT
-         pcWRhKQp7Sa76ms7uS6Oz+MZxkgfFZppWc/J+Z8CPiE9z63yqdRtScz3Dw7f4ecSTIer
-         e2alsrHlnxBAJ7m4vjDElno4XPp6wB6bCLvTKCoxv79tLhl2fixb8SIzuG/QrvyCi0Kc
-         WYRvQG2UJL0XZi4V/gSohmcVz4Ea3BcCDSi5G1tA9aV2FjfwVNOPVgoeLZeTvMEM+bJT
-         wNeA==
-X-Gm-Message-State: AOAM532sCzOA7J5Nsi8JRib7nXBCeKmtQGjpySO9nOCVX+PpPcFFvc35
-        5wH1lZCnfoLf3gW453BnAojm4+ZTB9yqmKL/EOXF9K04ILgAXDy7sms2Hbq1thbDuCVlKmyfKZG
-        1yQ1Kv1dFl84f
-X-Received: by 2002:adf:e812:0:b0:20c:dd44:b06c with SMTP id o18-20020adfe812000000b0020cdd44b06cmr468981wrm.714.1652373615740;
-        Thu, 12 May 2022 09:40:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwWKc+W5dfrOdOxweNVXdTz6oJYOENyjVQGLe4xiMAybfEgwkqqsd4IYjrdjYIX8sxGYcz+PA==
-X-Received: by 2002:adf:e812:0:b0:20c:dd44:b06c with SMTP id o18-20020adfe812000000b0020cdd44b06cmr468956wrm.714.1652373615462;
-        Thu, 12 May 2022 09:40:15 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c701:d200:ee5d:1275:f171:136d? (p200300cbc701d200ee5d1275f171136d.dip0.t-ipconnect.de. [2003:cb:c701:d200:ee5d:1275:f171:136d])
-        by smtp.gmail.com with ESMTPSA id d11-20020adfa34b000000b0020c86a9f33bsm65751wrb.18.2022.05.12.09.40.14
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=loonHWmCtVeGx4aWVVUzPzapZ1t+QIqGsKXmCgmw6z8=;
+        b=FUVBwkskT9rhDSdZA3C2o/KStICY6TH2CbPGV5LofG5xsBYgcM1yW2GUxHT1WNE692
+         TXjn2WVjQ9+uSL4e6l26U1SeT74cxHNJZxFuhpZ5szgQDS6y/DCIo1/NfY5HDSjfZ8oV
+         W4Op9Jis0LJxnt+s/Bl1WyOx3KGXdyIED1TxpktzBVD0j4Qv/lPnTYOKYi3wwf1MQEiD
+         KRJpnMwmtyGovbIRbN5FSokAw2DF0zrltFCSLHT9Kupbr/hyxvYjAI++2oCDlq8kHyl0
+         E03IYyTHLn626Kq1jWtG1PSIIT3gJOHGHMvUj5+lqhfpLLdb5gkhU8gz2ptd8F1fu7Bp
+         mrbw==
+X-Gm-Message-State: AOAM530TnE9ncNeNvF0ERBPbExQDkxglaPRYeQHF57Rv3RfkcF+xo3Lp
+        yQPoTziWHkHgfqHPpzYeFDboz5T+jEDWJfMJwqE=
+X-Google-Smtp-Source: ABdhPJwaaLSPCzvW580VqFIG9WcUJKXv3LB/aQXcXhd/URhgNMRrE3VsLkCe4gx3t1+95BhO6FxNag==
+X-Received: by 2002:a17:907:6297:b0:6da:6388:dc58 with SMTP id nd23-20020a170907629700b006da6388dc58mr830224ejc.472.1652375453361;
+        Thu, 12 May 2022 10:10:53 -0700 (PDT)
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com. [209.85.221.41])
+        by smtp.gmail.com with ESMTPSA id dx18-20020a170906a85200b006f3a8b81ff7sm2341252ejb.3.2022.05.12.10.10.51
+        for <kvm@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 May 2022 09:40:14 -0700 (PDT)
-Message-ID: <089a4ded-636f-b0c6-0645-8220c5a785d9@redhat.com>
-Date:   Thu, 12 May 2022 18:40:13 +0200
+        Thu, 12 May 2022 10:10:51 -0700 (PDT)
+Received: by mail-wr1-f41.google.com with SMTP id k2so8180007wrd.5
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:10:51 -0700 (PDT)
+X-Received: by 2002:a05:6000:2c2:b0:20c:7329:7c10 with SMTP id
+ o2-20020a05600002c200b0020c73297c10mr557896wry.193.1652375451235; Thu, 12 May
+ 2022 10:10:51 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v3 1/2] KVM: s390: Don't indicate suppression on dirtying,
- failing memop
-Content-Language: en-US
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc:     Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20220512131019.2594948-1-scgl@linux.ibm.com>
- <20220512131019.2594948-2-scgl@linux.ibm.com>
- <77f6f5e7-5945-c478-0e41-affed62252eb@redhat.com>
- <4a06e3e8-4453-9204-eb66-d435860c5714@linux.ibm.com>
- <701033df-49c5-987e-b316-40835ad83d16@redhat.com>
- <9ad7acb4-2729-15bb-7b25-eb95c4a12f09@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <9ad7acb4-2729-15bb-7b25-eb95c4a12f09@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20220510082351-mutt-send-email-mst@kernel.org>
+ <CAHk-=wjPR+bj7P1O=MAQWXp0Mx2hHuNQ1acn6gS+mRo_kbo5Lg@mail.gmail.com>
+ <87czgk8jjo.fsf@mpe.ellerman.id.au> <CAHk-=wj9zKJGA_6SJOMPiQEoYke6cKX-FV3X_5zNXOcFJX1kOQ@mail.gmail.com>
+ <87mtfm7uag.fsf@mpe.ellerman.id.au>
+In-Reply-To: <87mtfm7uag.fsf@mpe.ellerman.id.au>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Thu, 12 May 2022 10:10:34 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgnYGY=10sRDzXCC2bmappjBTRNNbr8owvGLEW-xuV7Vw@mail.gmail.com>
+Message-ID: <CAHk-=wgnYGY=10sRDzXCC2bmappjBTRNNbr8owvGLEW-xuV7Vw@mail.gmail.com>
+Subject: Re: [GIT PULL] virtio: last minute fixup
+To:     Michael Ellerman <mpe@ellerman.id.au>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+        KVM list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        Netdev <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        mie@igel.co.jp
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12.05.22 18:26, Christian Borntraeger wrote:
-> 
-> 
-> Am 12.05.22 um 17:50 schrieb David Hildenbrand:
->> On 12.05.22 15:51, Christian Borntraeger wrote:
->>>
->>>
->>> Am 12.05.22 um 15:22 schrieb David Hildenbrand:
->>>> On 12.05.22 15:10, Janis Schoetterl-Glausch wrote:
->>>>> If user space uses a memop to emulate an instruction and that
->>>>> memop fails, the execution of the instruction ends.
->>>>> Instruction execution can end in different ways, one of which is
->>>>> suppression, which requires that the instruction execute like a no-op.
->>>>> A writing memop that spans multiple pages and fails due to key
->>>>> protection may have modified guest memory, as a result, the likely
->>>>> correct ending is termination. Therefore, do not indicate a
->>>>> suppressing instruction ending in this case.
->>>>
->>>> I think that is possibly problematic handling.
->>>>
->>>> In TCG we stumbled in similar issues in the past for MVC when crossing
->>>> page boundaries. Failing after modifying the first page already
->>>> seriously broke some user space, because the guest would retry the
->>>> instruction after fixing up the fault reason on the second page: if
->>>> source and destination operands overlap, you'll be in trouble because
->>>> the input parameters already changed.
->>>>
->>>> For this reason, in TCG we make sure that all accesses are valid before
->>>> starting modifications.
->>>>
->>>> See target/s390x/tcg/mem_helper.c:do_helper_mvc with access_prepare()
->>>> and friends as an example.
->>>>
->>>> Now, I don't know how to tackle that for KVM, I just wanted to raise
->>>> awareness that injecting an interrupt after modifying page content is
->>>> possible dodgy and dangerous.
->>>
->>> this is really special and only for key protection crossing pages.
->>> Its been done since the 70ies in that way on z/VM. The architecture
->>> is and was always written in a way to allow termination for this
->>> case for hypervisors.
->>
->> Just so I understand correctly: all instructions that a hypervisor with
->> hardware virtualization is supposed to emulate are "written in a way to
->> allow termination", correct? That makes things a lot easier.
-> 
-> Only for key protection. Key protection can always be terminating no matter
-> what the instruction says. This is historical baggage - key protection was
-> resulting in abends - killing the process. So it does not matter if we
-> provide the extra info as in enhanced suppression on protection as nobody
-> is making use of that (apart from debuggers maybe).
+On Thu, May 12, 2022 at 6:30 AM Michael Ellerman <mpe@ellerman.id.au> wrote:
+>
+> Links to other random places don't serve that function.
 
-Got it, makes sense then. Thanks for clarifying!
+What "function"?
 
--- 
-Thanks,
+This is my argument. Those Link: things need to have a *reason*.
 
-David / dhildenb
+Saying "they are a change ID" is not a reason. That's just a random
+word-salad. You need to have an active reason that you can explain,
+not just say "look, I want to add a message ID to every commit".
 
+Here's the thing. There's a difference between "data" and "information".
+
+We should add information to the commits, not random data.
+
+And most definitely not just random data that can be trivially
+auto-generated after-the-fact.
+
+                Linus
