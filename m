@@ -2,81 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 45D5B524914
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 11:36:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD5AC524913
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 11:36:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352134AbiELJgD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 05:36:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53962 "EHLO
+        id S1352114AbiELJf6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 05:35:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352021AbiELJfi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1352033AbiELJfi (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 12 May 2022 05:35:38 -0400
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B15F69B6F
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B301B69B6B
         for <kvm@vger.kernel.org>; Thu, 12 May 2022 02:35:37 -0700 (PDT)
 Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24C9ExM2019410
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24C9F2KI019795
         for <kvm@vger.kernel.org>; Thu, 12 May 2022 09:35:37 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=xVJIVy3QaU4L3MX6L22atdB87JuPOHgA71UqFhj3OwQ=;
- b=tQ4y6TW+CX0NWBPBxgQzkbJ3DH5fS58VoL5cgUhGVUsROYBrKOsKoLX8I+XdRQMGa8Oj
- mQaHwCXyvTxjmqSknX1wbxnJaVwQT3dea4+Pj8he1TIDjGQP+XXCpjCsYkofm2ZyidA9
- 9va9RDZw88UvS9kC5Tl3+DlM/2hA0/kvm5bDWs1WZgnNUybCOPCBwDpB6yCTMba6CZrb
- lh0IpDKaPzYTe1EqCAfITsryKXb6SF+ssw6pGv3x0KeJk2bEIdJf/GVXFlwDQrfFxvmg
- r5/sh4LgdW4aMJY6EQki8Ce3zGNTuLgPDcewuYWMKeghUY4zocKFThWeLsu5CXxmWdJy 7Q== 
+ bh=8GQGZKGi2PDG6U8D8O87WfWDQLL0dH1qvMo2T9sjxYY=;
+ b=GKF0FxDMetHogxsrqKkE+IkVoOlTCTyOQv6YWx0niN2fHigkSyfgji4PVGFqq8nWQgS6
+ OMZdHdBkwh0YY14Vh548qaZtChaAewNP0/svdIyXkPE94+HSVef7fj7y81BzjnX2P/2s
+ tGiYqKsltuV7PtiCtpbJ8uq9YV/4uwfzcu9BDQgv9PcTMx2EexknoC0HAdOfsg7QKUZF
+ rjPSRnuy3vGvRlpxh2s0Kxk6Qw5I7tw3yeaTflIX7ajOH7bVXsOEKzwDS8RZp/Iv71Gy
+ PvITCkE9gnh7bzUCImyfJCeP04TjpVx73q0O+z318anWW53QvUh5KiAHLHosbFHmFk8U 9w== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g0yefrbbv-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g0yefrbc4-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 09:35:36 +0000
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 09:35:37 +0000
 Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24C9GUK1027531
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 09:35:36 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g0yefrbb5-1
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24C9VvjR032151
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 09:35:37 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g0yefrbba-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 12 May 2022 09:35:36 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24C9Xd5V007560;
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24C9XPBm008182;
         Thu, 12 May 2022 09:35:34 GMT
 Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma01fra.de.ibm.com with ESMTP id 3fwgd8n98e-1
+        by ppma05fra.de.ibm.com with ESMTP id 3fwgd8wa00-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 12 May 2022 09:35:34 +0000
 Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24C9ZVqY38994298
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24C9ZVQE58327408
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Thu, 12 May 2022 09:35:31 GMT
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 04A8511C04C;
+        by IMSVA (Postfix) with ESMTP id 6597A11C04A;
         Thu, 12 May 2022 09:35:31 +0000 (GMT)
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A9E0911C058;
-        Thu, 12 May 2022 09:35:30 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 15CA111C050;
+        Thu, 12 May 2022 09:35:31 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.10.145])
         by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 12 May 2022 09:35:30 +0000 (GMT)
+        Thu, 12 May 2022 09:35:31 +0000 (GMT)
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     pbonzini@redhat.com
 Cc:     kvm@vger.kernel.org, thuth@redhat.com, frankja@linux.ibm.com,
         Nico Boehr <nrb@linux.ibm.com>
-Subject: [kvm-unit-tests GIT PULL 06/28] lib: s390x: hardware: Add host_is_qemu() function
-Date:   Thu, 12 May 2022 11:35:01 +0200
-Message-Id: <20220512093523.36132-7-imbrenda@linux.ibm.com>
+Subject: [kvm-unit-tests GIT PULL 07/28] s390x: css: Skip if we're not run by qemu
+Date:   Thu, 12 May 2022 11:35:02 +0200
+Message-Id: <20220512093523.36132-8-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <20220512093523.36132-1-imbrenda@linux.ibm.com>
 References: <20220512093523.36132-1-imbrenda@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: kGNiYYWJS30Ul11aTNDkqn6tdk2z28UH
-X-Proofpoint-GUID: XhBwPH2_Y54PtnwM0zAqTt7L-Ub2WCh6
+X-Proofpoint-ORIG-GUID: v0iWtfmDNCcCGyS9SQ3C0MeMs-8kso9Z
+X-Proofpoint-GUID: ZHnsAdLw95Cw1UHfdKjsTvfVIv7Mk1hD
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-05-12_02,2022-05-12_01,2022-02-23_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
- spamscore=0 lowpriorityscore=0 malwarescore=0 phishscore=0 mlxlogscore=999
+ spamscore=0 lowpriorityscore=0 malwarescore=0 phishscore=0 mlxlogscore=844
  adultscore=0 bulkscore=0 priorityscore=1501 mlxscore=0 suspectscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
  definitions=main-2205120044
@@ -91,33 +91,52 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Janosch Frank <frankja@linux.ibm.com>
 
-In the future we'll likely need to check if we're hosted on QEMU so
-let's make this as easy as possible by providing a dedicated function.
+There's no guarantee that we even find a device at the address we're
+testing for if we're not running under QEMU.
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 ---
- lib/s390x/hardware.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ s390x/css.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/lib/s390x/hardware.h b/lib/s390x/hardware.h
-index 01eeb261..86fe873c 100644
---- a/lib/s390x/hardware.h
-+++ b/lib/s390x/hardware.h
-@@ -45,6 +45,11 @@ static inline bool host_is_lpar(void)
- 	return detect_host() == HOST_IS_LPAR;
- }
+diff --git a/s390x/css.c b/s390x/css.c
+index a333e55a..13a1509f 100644
+--- a/s390x/css.c
++++ b/s390x/css.c
+@@ -15,6 +15,7 @@
+ #include <interrupt.h>
+ #include <asm/arch_def.h>
+ #include <alloc_page.h>
++#include <hardware.h>
  
-+static inline bool host_is_qemu(void)
-+{
-+	return host_is_tcg() || host_is_kvm();
-+}
+ #include <malloc_io.h>
+ #include <css.h>
+@@ -642,13 +643,21 @@ int main(int argc, char *argv[])
+ 	int i;
+ 
+ 	report_prefix_push("Channel Subsystem");
 +
- static inline bool machine_is_z15(void)
- {
- 	uint16_t machine = get_machine_id();
++	/* There's no guarantee where our devices are without qemu */
++	if (!host_is_qemu()) {
++		report_skip("Not running under QEMU");
++		goto done;
++	}
++
+ 	enable_io_isc(0x80 >> IO_SCH_ISC);
+ 	for (i = 0; tests[i].name; i++) {
+ 		report_prefix_push(tests[i].name);
+ 		tests[i].func();
+ 		report_prefix_pop();
+ 	}
+-	report_prefix_pop();
+ 
++done:
++	report_prefix_pop();
+ 	return report_summary();
+ }
 -- 
 2.36.1
 
