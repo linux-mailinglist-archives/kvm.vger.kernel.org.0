@@ -2,66 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 93BCB52578A
-	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 00:05:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 695AC5257BE
+	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 00:27:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359009AbiELWFj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 18:05:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34188 "EHLO
+        id S1359141AbiELW1W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 18:27:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348898AbiELWFh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 18:05:37 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ACB02802E1
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 15:05:37 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id t11-20020a17090ad50b00b001d95bf21996so9079385pju.2
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 15:05:37 -0700 (PDT)
+        with ESMTP id S1359127AbiELW1U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 18:27:20 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C0A06898C
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 15:27:19 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id d125-20020a636883000000b003db5e24db27so1760700pgc.13
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 15:27:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=r4f4Qz7xX8gRZBfTk40SjTw373QQSQu10XV6WGcrATQ=;
-        b=P/5NZTVtqOELXari+dFJFBDdMEidgOYlAeBAgRiya2oGPZGdLR07NHy/XtzkHUiMxG
-         vLsrdGiLaIDQlNSosniZDsH5/CrNk2gkOyijCZtJ/Od4X+TZTYU8hd13FbKj1p0oNxHy
-         ntzExQAgJv1x9pbcdehns34MSpO4PFMJfPN7Pd/v08nXlu/jGp7x++ryYpT7dUpmdFQ0
-         DKAEIslfTQ/oBuDA2NWZ72rDXGAnjrsbpeZlRhACFqXIsI9Jk4/sENLyX6UQogk0SqZN
-         r+MT4H3iRFPuwOEz/bkAiWtKJQH0Y9mRa2q7s2TGue0x90PCiRsXr1pCCdFYtsRaA38V
-         f/QA==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=CrGCN5hRJnxUm62pjm+0PSN0YfT03Pp0nPuxePlcuw4=;
+        b=MAGgCVYbJbmTsUUkI04sS6wT4yI/vXAHYumXdYwQEPtPH3iOreL73vIeL1vS8CyaHs
+         JR0mKpqbMETPdtOA+m/8H6q1G60wjrAv/hJ0ACZI+VpoCYnV+rTBXmoMSpWsk6TX0NhP
+         Fl2OVJBMFGEKjvCl4085AUi0R2t7hbMxPTn9sOZSPBVwbrTkDIL8kqel05LFc+ro1fiy
+         quntsRhh8JnuQlXnVrtbup64U9e8jmraf6JoUd7esjMO//YCkiBjjCmvMc4dHsw7gSmD
+         yONXWUYGQib7sPoQxAS6EsfT/R5opTukg4PzVlhY1emTrym/iyC2pUEnzLy5pfc0BeHr
+         G2jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=r4f4Qz7xX8gRZBfTk40SjTw373QQSQu10XV6WGcrATQ=;
-        b=JWhghva9bB2u4OPyQ14RQL89mqtb/Hrx1PJYNSV97FX7xEX5KqlCreyfKNDzx0li0+
-         oFM5yaky4EWsuye39/lxb3wysTbMc/MmjqTisRkdEWGzaD1T9Z79x7gZ0IVIt4e7c8wz
-         2EBArh89wxIiUQ9Z2T5byY9BHcTr5XkGnCcX1YVQTRazmLjzmXjbCMPzbdntcuY7RtAB
-         M29sBe9d4S2/qS3QWiJFqVGHx/siwUBqlIMmSLkKlCpgt9kmeFVqCbykpU15a+RdXrLx
-         vmpbFcAD9VAsfHEAyFXBFZT+ocSK/0+EdQbKRtLbfjgl3DfcbocOD/RJGqN382b8t8wJ
-         8lAQ==
-X-Gm-Message-State: AOAM531JZEQimsSO8adyOk+HQ6apZ0l42fzr7OVKdjAzmKjhWQ0/MjYG
-        Ig9+iQg0OdRurAEZF52yZ7ZfIRBTq4F67g==
-X-Google-Smtp-Source: ABdhPJzqeF/if9LP6yi22NFH7hZXG1e3pVolv5AAdrIUqsaFM/UZGySRXkrJXn67yMp/8u4xv38+KA==
-X-Received: by 2002:a17:90b:1c0e:b0:1dc:45b6:6392 with SMTP id oc14-20020a17090b1c0e00b001dc45b66392mr1555378pjb.236.1652393136636;
-        Thu, 12 May 2022 15:05:36 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b24-20020a6567d8000000b003c14af50643sm174909pgs.91.2022.05.12.15.05.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 May 2022 15:05:36 -0700 (PDT)
-Date:   Thu, 12 May 2022 22:05:32 +0000
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=CrGCN5hRJnxUm62pjm+0PSN0YfT03Pp0nPuxePlcuw4=;
+        b=ETdMI8xJGABkdD9xKIMKzSDLp13sIZ1HoEEXU3YK+KSgJxsYhu4wVD8loHsg+hr+8D
+         XYyo+pDVi/cMlE0bl21A+u04hGuImoDn0btCgc6cRx9MTNLSoG2YIZAjhfadYyaOAVjT
+         Z5r6Yro6VLONHl3Ipv4WW2PzDFBIom29EyHxflBenkn/5pV7s7vjeAKRBTnXG9umTLKc
+         6gUQrqVGb0f7f+DQD2YPj3tId63/50ZgzpG47hAwrO/tK2/vE7zf8suyIMNvx1IPNFIb
+         2Ta7zkvkNCgCTb/kwejEqKXPjk6IsQAHmGt09X85QpaxrgpxiqhMghsDuj9G2pRXfd58
+         S73A==
+X-Gm-Message-State: AOAM532nmk1VDC/JLFs7JChCUKrzTlHH5yNyc+5OW53SHgBv8oqUAPgM
+        qWdUg9tOdZEtqiEDtOeSc2omVT5QTCk=
+X-Google-Smtp-Source: ABdhPJxysQ+f8JO9eJpsr+WBwomg/Q2eFPxh5nGPZwJdh+D3jwr+jPeE90E/ROgn+BZfD26jiLeWJqUm4xw=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a62:e819:0:b0:510:693e:b20c with SMTP id
+ c25-20020a62e819000000b00510693eb20cmr1667809pfi.60.1652394438872; Thu, 12
+ May 2022 15:27:18 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu, 12 May 2022 22:27:13 +0000
+Message-Id: <20220512222716.4112548-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.550.gb090851708-goog
+Subject: [PATCH 0/3] KVM: x86: WRMSR MCi_CTL/STATUS bug fix and cleanups
 From:   Sean Christopherson <seanjc@google.com>
-To:     Dan Cross <cross@oxidecomputer.com>
-Cc:     kvm@vger.kernel.org
-Subject: Re: [PATCH] kvm-unit-tests: Build changes for illumos.
-Message-ID: <Yn2ErGvi4XKJuQjI@google.com>
-References: <20220512204459.2692060-1-cross@oxidecomputer.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220512204459.2692060-1-cross@oxidecomputer.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jue Wang <juew@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,56 +69,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 12, 2022, Dan Cross wrote:
-> We have begun using kvm-unit-tests to test Bhyve under
-> illumos.  We started by cross-compiling the tests on Linux
-> and transfering the binary artifacts to illumos machines,
-> but it proved more convenient to build them directly on
-> illumos.
-> 
-> This change modifies the build infrastructure to allow
-> building on illumos; I have also tested it on Linux.  The
-> required changes were pretty minimal: the most invasive
-> was switching from using the C compiler as a linker driver
-> to simply invoking the linker directly in two places.
-> This allows us to easily use gold instead of the Solaris
-> linker.
+Fix bugs in set_msr_mce() where KVM returns '-1' instead of '1' when
+rejecting a WRMSR, which results in -EPERM getting returned to userspace.
 
-Can you please split this into two patches?  One for the $(CC) => $(LD) change,
-and one for the getopt thing.  The switch to $(LD) in particular could be valuable
-irrespective of using a non-Linux OS.
+Patches 2 and 3 are cleanups to make {g,s}et_msr_mce a bit less wierd
+(especially with respect to Jue's CMCI series) and a bit less magical.
 
-> Signed-off-by: Dan Cross <cross@oxidecomputer.com>
-> ---
->  configure           | 5 +++--
->  x86/Makefile.common | 6 +++---
->  2 files changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index 86c3095..7193811 100755
-> --- a/configure
-> +++ b/configure
-> @@ -15,6 +15,7 @@ objdump=objdump
->  ar=ar
->  addr2line=addr2line
->  arch=$(uname -m | sed -e 's/i.86/i386/;s/arm64/aarch64/;s/arm.*/arm/;s/ppc64.*/ppc64/')
-> +os=$(uname -s)
->  host=$arch
->  cross_prefix=
->  endian=""
-> @@ -317,9 +318,9 @@ EOF
->    rm -f lib-test.{o,S}
->  fi
->  
-> -# require enhanced getopt
-> +# require enhanced getopt everywhere except illumos
->  getopt -T > /dev/null
-> -if [ $? -ne 4 ]; then
-> +if [ $? -ne 4 ] && [ "$os" != "SunOS" ]; then
+Sean Christopherson (3):
+  KVM: x86: Signal #GP, not -EPERM, on bad WRMSR(MCi_CTL/STATUS)
+  KVM: x86: Use explicit case-statements for MCx banks in
+    {g,s}et_msr_mce()
+  KVM: x86: Add helpers to identify CTL and STATUS MCi MSRs
 
-Presumably whatever "enhanced" features are being used are supported by illumos,
-so rather than check the OS, why not improve the probing?
+ arch/x86/kvm/x86.c | 84 +++++++++++++++++++++++++++-------------------
+ 1 file changed, 50 insertions(+), 34 deletions(-)
 
->      echo "Enhanced getopt is not available, add it to your PATH?"
->      exit 1
->  fi
+
+base-commit: 2764011106d0436cb44702cfb0981339d68c3509
+-- 
+2.36.0.550.gb090851708-goog
+
