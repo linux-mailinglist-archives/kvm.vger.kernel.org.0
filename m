@@ -2,127 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ABC58524E22
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 15:22:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C53B9524E25
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 15:23:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354317AbiELNW0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 09:22:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44992 "EHLO
+        id S1354338AbiELNXR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 09:23:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354318AbiELNWY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 09:22:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7BCD75D658
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 06:22:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652361741;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iGoOIUCJGa4SaOfudTG7yQQEUS0BOq99bUpZYAujLo0=;
-        b=WOjP8MdPqu3LOsfahT82zc8xugEfFIT7nCLCVDa+gNXt75X+itV3ea4MPbXhUbiGFqNn1R
-        gopb+V303EGReu1GRKgJA866a/gKyvlz3Iaduty4afXgHptcI2kUeRUl/c+y6typ1h2tzH
-        ac7lB01acVU5UNs6HuDLMrlR6EY+rR8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-126-j1hwBr07PTCkIhHr6jXPGA-1; Thu, 12 May 2022 09:22:20 -0400
-X-MC-Unique: j1hwBr07PTCkIhHr6jXPGA-1
-Received: by mail-wr1-f69.google.com with SMTP id u17-20020a056000161100b0020cda98f292so2049677wrb.21
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 06:22:20 -0700 (PDT)
+        with ESMTP id S1354330AbiELNXN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 09:23:13 -0400
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 729F73ED02;
+        Thu, 12 May 2022 06:23:11 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id j6so10170269ejc.13;
+        Thu, 12 May 2022 06:23:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=e9ocOaHM7NzC9WL8c37Nt0EVrS6kz1Qeth3UE0DXESU=;
+        b=fCjsNIdwutruyyknbrtXf0lmf900l6JTWX2V/5XTllWIugjWaY4PWv3tC1Py4im6ms
+         ItAtTrsENesp/D6fXRLQ2/Garq2KIEx/iY7+zxUeKpipA7dEaKE8w7ulHxeJzqoHWeli
+         LvLRtLYZD7bYJHeFotoBU7izdKP2hZToYP6DfqLdCJ9Xtyhdmg9hzr4UYRlDpj5E5gQc
+         moDAIrGebiNQkC6GJiJFEvqcPiQgt1fykvRj8luVYIttOqT5obUjrJUqTSJYzncWrXY2
+         08+F7hMSEvU1/mctyk5wOZNIhms7KvEspxgtvBUAr/iOnhheEGzAzP+CePOIB0hezDuR
+         K/DQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:organization:subject
-         :in-reply-to:content-transfer-encoding;
-        bh=iGoOIUCJGa4SaOfudTG7yQQEUS0BOq99bUpZYAujLo0=;
-        b=mUPf3Hvgv5abqvSJsr3//fEBdLbTYW5LtVb1mFls0MRHobJ3naqW3U0YDLlufaXzo9
-         MVGcIOjUibZxZRFb8nz2/FQOKeyQ1gNjeyMERBOijE8v30WiqlSTG6PaGKTpMH5ugitq
-         3QrxJR62pCOQkUmAzzS1nte40ZoSZb4WOWsMve8XuKL3hkQ6ADtHGdkwujB7Xb4YxTmf
-         k66lU5+o1uKdFUSSnLDET3ryhEePTrqHWKsbrdIQZFmbuQfrHMucEb6hKcbIs/RhSq1n
-         OFoz7gb15GClQtDPCUTuuWn5IuBEQRN/cUiTyHwKooXX3XRvPmZ/6AmaVez86ymKB4U3
-         nX/w==
-X-Gm-Message-State: AOAM531JKEQXqKYyrXqt1HR8No5RcmkJSn0VXrEsROymoG5lvEYEHqmP
-        Tq2DQtnF0nKx+CpGvTu4WnvmcAxNpr8QsF4BQYR2cSMVew8WTBWy8eztC7Xud/TFBEs7kB8N5e9
-        P12vZMSuuFNCv
-X-Received: by 2002:a5d:5746:0:b0:20c:dbc2:397d with SMTP id q6-20020a5d5746000000b0020cdbc2397dmr7981051wrw.658.1652361739078;
-        Thu, 12 May 2022 06:22:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx+hXYu6vzpLOJq39B+H7C8rDVvQP/gQANCQfbt9DiMWxcg2qD5+fl3H5Fdy+4EFw8qj6gfWw==
-X-Received: by 2002:a5d:5746:0:b0:20c:dbc2:397d with SMTP id q6-20020a5d5746000000b0020cdbc2397dmr7981034wrw.658.1652361738823;
-        Thu, 12 May 2022 06:22:18 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c701:d200:ee5d:1275:f171:136d? (p200300cbc701d200ee5d1275f171136d.dip0.t-ipconnect.de. [2003:cb:c701:d200:ee5d:1275:f171:136d])
-        by smtp.gmail.com with ESMTPSA id o11-20020a5d408b000000b0020c9520a940sm4946313wrp.54.2022.05.12.06.22.17
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=e9ocOaHM7NzC9WL8c37Nt0EVrS6kz1Qeth3UE0DXESU=;
+        b=BWWfKeHTZ81TCdsQjtSQ3IGz6C7JV6yaMxz05hw5eF69OxM9p69J3rgk0sT0Ot6SCc
+         nJp0KoeIISvueweiAMZ7tj776P72nS4HHySiRxiPZaMN9MyX4HjDvt3E4E5Wo0zuOTNV
+         QUOpBA+X9IP+VLleMuZn/UKhCXS+klOw4lQ5lGzyFBekxBeudpaOoqFVK1Oix7JFY1XO
+         x7nFZVT53IcwJLEt9+HdGiKDCohD2ZvQ1K8mcC0R/E40KU62oaOZDRo97R4dEFVBR31u
+         wz89+cNTNoVBpPY2Pm1+15avNUHLrFEE18ks5IbdNKvYfSzzT1QeHibwnU2oeBPYBk6J
+         VRSg==
+X-Gm-Message-State: AOAM532hx+Ho83CEJKxdjLsnypJkI93RULhmORDdICg5JLhU/uMiDIu+
+        gLoEGLg30Odhvp+a8L3ROs4=
+X-Google-Smtp-Source: ABdhPJwzpQ/WRKfZDWnhC8Gde7XZvuWi85xslBncrqbc/NjkAjzkbyTJM/KYcNQ6EgMHjesG51di3Q==
+X-Received: by 2002:a17:907:728d:b0:6f4:5a83:a616 with SMTP id dt13-20020a170907728d00b006f45a83a616mr30074958ejc.297.1652361790027;
+        Thu, 12 May 2022 06:23:10 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id rq13-20020a17090788cd00b006f3ef214e66sm1892550ejc.204.2022.05.12.06.23.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 May 2022 06:22:18 -0700 (PDT)
-Message-ID: <77f6f5e7-5945-c478-0e41-affed62252eb@redhat.com>
-Date:   Thu, 12 May 2022 15:22:17 +0200
+        Thu, 12 May 2022 06:23:09 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <347c00f0-c1b0-55fc-5a1c-53b44f018abd@redhat.com>
+Date:   Thu, 12 May 2022 15:23:08 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.8.0
+Subject: Re: [PATCH v2] KVM: selftests: x86: Fix test failure on arch lbr
+ capable platforms
 Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc:     Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20220512131019.2594948-1-scgl@linux.ibm.com>
- <20220512131019.2594948-2-scgl@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: [PATCH v3 1/2] KVM: s390: Don't indicate suppression on dirtying,
- failing memop
-In-Reply-To: <20220512131019.2594948-2-scgl@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
+To:     Yang Weijiang <weijiang.yang@intel.com>, likexu@tencent.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20220512084046.105479-1-weijiang.yang@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220512084046.105479-1-weijiang.yang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12.05.22 15:10, Janis Schoetterl-Glausch wrote:
-> If user space uses a memop to emulate an instruction and that
-> memop fails, the execution of the instruction ends.
-> Instruction execution can end in different ways, one of which is
-> suppression, which requires that the instruction execute like a no-op.
-> A writing memop that spans multiple pages and fails due to key
-> protection may have modified guest memory, as a result, the likely
-> correct ending is termination. Therefore, do not indicate a
-> suppressing instruction ending in this case.
+On 5/12/22 10:40, Yang Weijiang wrote:
+> On Arch LBR capable platforms, LBR_FMT in perf capability msr is 0x3f,
+> so the last format test will fail. Use a true invalid format(0x30) for
+> the test if it's running on these platforms. Opportunistically change
+> the file name to reflect the tests actually carried out.
+> 
+> v2:
+> Select a true invalid format instead of skipping the test on arch lbr
+> capable platforms.
+> 
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>   tools/testing/selftests/kvm/Makefile           |  2 +-
+>   ...vmx_pmu_msrs_test.c => vmx_pmu_caps_test.c} | 18 ++++++++++--------
+>   2 files changed, 11 insertions(+), 9 deletions(-)
+>   rename tools/testing/selftests/kvm/x86_64/{vmx_pmu_msrs_test.c => vmx_pmu_caps_test.c} (83%)
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index 681b173aa87c..9a1a84803b01 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -81,7 +81,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/xapic_state_test
+>   TEST_GEN_PROGS_x86_64 += x86_64/xss_msr_test
+>   TEST_GEN_PROGS_x86_64 += x86_64/debug_regs
+>   TEST_GEN_PROGS_x86_64 += x86_64/tsc_msrs_test
+> -TEST_GEN_PROGS_x86_64 += x86_64/vmx_pmu_msrs_test
+> +TEST_GEN_PROGS_x86_64 += x86_64/vmx_pmu_caps_test
+>   TEST_GEN_PROGS_x86_64 += x86_64/xen_shinfo_test
+>   TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
+>   TEST_GEN_PROGS_x86_64 += x86_64/sev_migrate_tests
+> diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+> similarity index 83%
+> rename from tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c
+> rename to tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+> index 2454a1f2ca0c..97b7fd4a9a3d 100644
+> --- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+> @@ -1,15 +1,14 @@
+>   // SPDX-License-Identifier: GPL-2.0
+>   /*
+> - * VMX-pmu related msrs test
+> + * Test for VMX-pmu perf capability msr
+>    *
+>    * Copyright (C) 2021 Intel Corporation
+>    *
+> - * Test to check the effect of various CPUID settings
+> - * on the MSR_IA32_PERF_CAPABILITIES MSR, and check that
+> - * whatever we write with KVM_SET_MSR is _not_ modified
+> - * in the guest and test it can be retrieved with KVM_GET_MSR.
+> - *
+> - * Test to check that invalid LBR formats are rejected.
+> + * Test to check the effect of various CPUID settings on
+> + * MSR_IA32_PERF_CAPABILITIES MSR, and check that what
+> + * we write with KVM_SET_MSR is _not_ modified by the guest
+> + * and check it can be retrieved with KVM_GET_MSR, also test
+> + * the invalid LBR formats are rejected.
+>    */
+>   
+>   #define _GNU_SOURCE /* for program_invocation_short_name */
+> @@ -107,8 +106,11 @@ int main(int argc, char *argv[])
+>   	ASSERT_EQ(vcpu_get_msr(vm, VCPU_ID, MSR_IA32_PERF_CAPABILITIES), (u64)host_cap.lbr_format);
+>   
+>   	/* testcase 3, check invalid LBR format is rejected */
+> -	ret = _vcpu_set_msr(vm, 0, MSR_IA32_PERF_CAPABILITIES, PMU_CAP_LBR_FMT);
+> +	/* Note, on Arch LBR capable platforms, LBR_FMT in perf capability msr is 0x3f,
+> +	 * to avoid the failure, use a true invalid format 0x30 for the test. */
+> +	ret = _vcpu_set_msr(vm, 0, MSR_IA32_PERF_CAPABILITIES, 0x30);
+>   	TEST_ASSERT(ret == 0, "Bad PERF_CAPABILITIES didn't fail.");
+>   
+> +	printf("Completed perf capability tests.\n");
+>   	kvm_vm_free(vm);
+>   }
+> 
+> base-commit: 672c0c5173427e6b3e2a9bbb7be51ceeec78093a
 
-I think that is possibly problematic handling.
+Applied, thanks.
 
-In TCG we stumbled in similar issues in the past for MVC when crossing
-page boundaries. Failing after modifying the first page already
-seriously broke some user space, because the guest would retry the
-instruction after fixing up the fault reason on the second page: if
-source and destination operands overlap, you'll be in trouble because
-the input parameters already changed.
-
-For this reason, in TCG we make sure that all accesses are valid before
-starting modifications.
-
-See target/s390x/tcg/mem_helper.c:do_helper_mvc with access_prepare()
-and friends as an example.
-
-Now, I don't know how to tackle that for KVM, I just wanted to raise
-awareness that injecting an interrupt after modifying page content is
-possible dodgy and dangerous.
-
--- 
-Thanks,
-
-David / dhildenb
-
+Paolo
