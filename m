@@ -2,166 +2,293 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B783E524D54
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 14:47:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D3C1524DE4
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 15:10:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352118AbiELMrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 08:47:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58078 "EHLO
+        id S1354207AbiELNKi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 09:10:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353877AbiELMrb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 08:47:31 -0400
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam08on2047.outbound.protection.outlook.com [40.107.101.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25DB01CE61C;
-        Thu, 12 May 2022 05:47:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lzzmg2kbGd775lLtLPRi5KWX8QUeP9NaSwLnJebPjsonnGO3pW3vrQ/45S3NHlf0ZcNkAgnS/gdRQagy+7cKZxdQa8Do9j92Q4elsvG4sIQn0y3wb9NZFcyHpTzpAQ0sFT0XpR6vvNCcFB2eGIp/0htL8ekdc2r+bQNoybumSSvPflAvwhf+JO9/EZgFVRfzY7+h3lL3LDvlxFZdyYVJ9UyUuCVuGyfsRZUQfcAX4wEnVoDNMfIz5oIoDog/CX2QpgFya2yG/zeumJnjUPLJAmZozFnHJ/ksC1PNhf5BG0JrpIQWNb3007aFRjqwuM2JOG44xYCrm5ivYuLtHnfL7A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vXjAZ1pHcEeVbisSpg6yafzfdOLD9QFuN+Op1WWkhXA=;
- b=Ur8Oti+srKKGaeW/u7KWCinhQe6EnO8w5uok8EFc3TnttlKPLJnul5SxLlt9ZnRSd29Uz4D/9e4vfVUJkH596B/RVBnhAkrLZ5N0YGak4cYHPCg/iStcyElsKdDBbzbYiA/yW3h9WodETPiO1FGwNL8XAFuj5WTjSjIq8b0qhkU1Z47MhLa1i7IWGwVtbw0MNDiUuKOzlfGm1+FBWRTvxGNy2KKbYHk/8xi9y0Hy+S1c4JJaIxJvdtLb9xUJztjL+HBNpx8iVLAvnKyTi7agedgjROV07ssAOZwN+Py8HWv+THhnw0C3md86e9hLSV11lmPD5I51Q0dZnoR6RqijAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vXjAZ1pHcEeVbisSpg6yafzfdOLD9QFuN+Op1WWkhXA=;
- b=HeFngArXKthD1FEIiGAzzOSXmEIP1C/P3f1C1WRrPvf1owgATSi0jGqaeNnCiHWRkfkwnz2PLi08/n61jZo7HVn+igcj/BIZASOaQ5o7sdguUpc6077dmpMJbU7pnEOULWP/gL4bGTCGxGRo75JwmW7uZw26d0hTzwUmPUa+viLaYLyTwBxI6Qq6KqcW97q0HiHJ/VvOMywCO6XnD1Q2iughIBVnGe75WpgA6a+ZNbiudKFqSQTBKQ+ZP6NVs2it2lYHsw7VeM1XQjSrX+6abdW/WWvnPn6/olQ2s2htVs3YI/T0+HvmU54IDXDR0tR7KSynqIUfaPm9ldjMDTbcpA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by DM6PR12MB4619.namprd12.prod.outlook.com (2603:10b6:5:7c::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5250.14; Thu, 12 May
- 2022 12:47:28 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2%5]) with mapi id 15.20.5250.013; Thu, 12 May 2022
- 12:47:28 +0000
-Date:   Thu, 12 May 2022 09:47:26 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Abhishek Sahu <abhsahu@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-pci@vger.kernel.org
-Subject: Re: [PATCH v3 8/8] vfio/pci: Add the support for PCI D3cold state
-Message-ID: <20220512124726.GZ49344@nvidia.com>
-References: <20220425092615.10133-1-abhsahu@nvidia.com>
- <20220425092615.10133-9-abhsahu@nvidia.com>
- <20220504134551.70d71bf0.alex.williamson@redhat.com>
- <9e44e9cc-a500-ab0d-4785-5ae26874b3eb@nvidia.com>
- <20220509154844.79e4915b.alex.williamson@redhat.com>
- <68463d9b-98ee-b9ec-1a3e-1375e50a2ad2@nvidia.com>
- <20220510133041.GA49344@nvidia.com>
- <fdba8dd2-4db8-81f3-d9d8-4742c88e99d9@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fdba8dd2-4db8-81f3-d9d8-4742c88e99d9@nvidia.com>
-X-ClientProxiedBy: BLAPR03CA0010.namprd03.prod.outlook.com
- (2603:10b6:208:32b::15) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S1354187AbiELNKf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 09:10:35 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C73F824FD93;
+        Thu, 12 May 2022 06:10:33 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24CD0g8O003891;
+        Thu, 12 May 2022 13:10:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=N1hnXC0FDq9INFuYz/hT5L4up8mN+Cq1XmVswpFragA=;
+ b=jNu5zJi/77qrcV+6VrYSl+fwzsSSKNMjctAbngNgktSG+eYOBzTZ7oVbszGX9AbCH71T
+ 8indnpyH8p24HB7r5FBJ8OPpB7Mw4Rh+IrKw2vLdliTGi8awNs8aKCr2LPl0h/NAMDqh
+ N42pJXnSS8adgW3xaqHlbreyTWpHZykTw2tJe75EJAJIvBi5ijfellVgZ+3bR9J7h72l
+ FjmL6X4OM1Ny0aDx9BtuEdUKk9DytcvQ+1yvajLoiWiHXE0HTN1wHd6ET8QHjXh8iRvG
+ 4DQ8qvptLgDLsvwEuJqLQz3aU6p0FkTPrTtJjEY7+u/E9DjDzD+LV7TlCQKHkeFvFdgY 5A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g12rdrb4y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 May 2022 13:10:31 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24CD0n2Q004306;
+        Thu, 12 May 2022 13:10:31 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g12rdrb3n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 May 2022 13:10:30 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24CD2qCw026819;
+        Thu, 12 May 2022 13:10:28 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 3fwgd8y33a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 May 2022 13:10:28 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24CDAPAO33685900
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 May 2022 13:10:25 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EC9A6AE04D;
+        Thu, 12 May 2022 13:10:24 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 76FCEAE045;
+        Thu, 12 May 2022 13:10:24 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 12 May 2022 13:10:24 +0000 (GMT)
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [PATCH v3 0/2] Dirtying, failing memop: don't indicate suppression
+Date:   Thu, 12 May 2022 15:10:16 +0200
+Message-Id: <20220512131019.2594948-1-scgl@linux.ibm.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: bcec5307-3100-46a0-ba6c-08da34159256
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4619:EE_
-X-Microsoft-Antispam-PRVS: <DM6PR12MB461901559C263AE9A9F16DE6C2CB9@DM6PR12MB4619.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5yv1tyTxqAJeOkzQWY5gKjNtCyP7pqnvad4Eb62eIBugyiU9EdG34qYHiyf9TOY0BuV4CKo5WBjcy4nheXv3KgKF/AiENbt7U1gqDtlj5RJ0erMgCJpAwRoR6wPkFGNcKD5V9a2vVKuFow7UF8KFrBVXHbriqHbv0ipPSQqDP++nAQGpDfJvwWbePaK8Mu/qJIrrGSkqXrDxIUUovLnXQiKq1Mte4Qx0/aEiYoIGoLD3knMoOlPhJLA1TZbE5f6W4DTa/DI4ieyHXZ6IE6o3DNixZRKOiLYtD5VnlEbmrHT7l6x2zoODMy+X+H08+0CxgqQKlI0akIgwr3nYAIuM1bAVCMIydei7RVEnAtI5DZgPvHa3x/QV+9vGfRbQkAvHaJBOq9I7hxHBtY9Gus4x0leqIkGgy0ccjS3zGVIwb+UFkrMfttmdm91HLGp6gdA9EM5nC2uBBTDu6ROeh6IJPAVIIxRXC/bIcy2swJ/WH1LvURvgOJDaZxHY0LqB/1IBTT0Pog68+ckQ/j0Md06+RsDnewHEF8aSO0e7koNSUabdG/hXePFNlC5F2Ew7LuddmjuvirUCJLrVEtcUBMwlNLbc/WCol8dIXrkQQi7RpzgNFkgYEcgSBGmB++uBsMEIxNpg032cBz5UrZx681BTLzHnGFyzwY+ul12/vRix1gRdRE4AfFicBd5xPiuvB+uW
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(7416002)(186003)(508600001)(4744005)(5660300002)(8936002)(33656002)(2906002)(6486002)(38100700002)(26005)(6512007)(316002)(2616005)(54906003)(37006003)(6636002)(66556008)(66476007)(66946007)(53546011)(6506007)(86362001)(8676002)(6862004)(36756003)(1076003)(4326008)(32563001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Ly3SbTCHR6f18aPMLgCFkn9/VuIHm5PFzWnZAfeVYzbi3OjXxHj1e1FdXyFl?=
- =?us-ascii?Q?26mk+8DE/KxFVidATfWXFoJLOm793/JdEyR01gOikaNTV2bmYAmuPqDGV1gc?=
- =?us-ascii?Q?ke+UguK1DnpviYzW6pZpOLhW+dsUmcolhrqKsnFDoB2S1h9rKx7G6YD2JP40?=
- =?us-ascii?Q?z9z3++FDQWEeFUKCn3KcdIVwSLcom0kLJKC1vHZUtMN1ui/zyR3JQVySHM/C?=
- =?us-ascii?Q?hF9ENSAx+wuZdcsoe2ZF46oor+qEwTrCAc3CZMUigi7kXFTaDXvHqPeVwdLG?=
- =?us-ascii?Q?nQWWg1GFhwRuM6HFwh/7ImQO5wLl+TFMus5G1qF8IbBSoKEjBtfS3aD8LEz/?=
- =?us-ascii?Q?6I54RDtOK+6n/HsrRWDCWVNJxeuVdEWPhNVnkDl+IlfcgrpsCyaUv565XkKt?=
- =?us-ascii?Q?RBxsetJb5sDQG7HzQM3ZYO1sxQ/2ZVCU4VboL3T34NDzLltG+iVEmhJELDik?=
- =?us-ascii?Q?HxlymsGOq8Qg5SmEXCZrgin98wH883znqFcHLW9IxVTOWfnWxsaoxQPFQh7k?=
- =?us-ascii?Q?HkDbEIwErIfRYD5v42OC8dDOrtERBBLPVyoKJle8z1K1k13eztz+NnqLzkOh?=
- =?us-ascii?Q?wFD2li/XrOkkFVoHBw3ZGXWjDM4Qo66IIaw3RVLCEyO5cZxbA1j9Em6Acc6/?=
- =?us-ascii?Q?vm8spVY8AxPJqq5o5QY78rwiGYAFUzBa/5Mbw14Gs73NdswMVoWXLg4zgzot?=
- =?us-ascii?Q?kDJVmTseoRjr7x+1VfjY786sWaasUDsZUOzgxX3jMDGKAkr9/sOEwDqoj9Y2?=
- =?us-ascii?Q?r+dQ0lAtvZhMDHrTTQrbhEqDSQAXbl0YkD2Zm2EDQXNVtrMH9iYYK6HMf7dy?=
- =?us-ascii?Q?ASI0RmcN/IYg69JvCfRNyVt+qA6fzBe2WKXBUNvk55HGZHQKpIAOZUKuDSR3?=
- =?us-ascii?Q?HMLEsjHqJzzkmKbZpMdsHtAdEij3DCefMpJJI7YvIKVp3w4db+KJ5c2jp+b2?=
- =?us-ascii?Q?l5EHcNQFn91Ios+bSVYmrbsJqo1agHqObuzZvIYyDn5cBwUMsUSI/f/42PI2?=
- =?us-ascii?Q?/s45iPh79iyS0SJTzyDitEcOyrgDhLgzS7eTLZAESEqjHfEeFxIV4lzhc2VD?=
- =?us-ascii?Q?hC4HheEBZycXK0TY/LAYcMX3Ob+cNGAhH98UIIY9b9fgcm//J7MrK099C3pr?=
- =?us-ascii?Q?HM27bWFTmZQoGmbczyU3YB0jepgbf9aSfPHGil/30jfG8h7O5K3yeTKb2EX7?=
- =?us-ascii?Q?yAhqVAU0BzCjrqeTHGTUN0vNI9t26EBMRnojPjMXvEYrefXES8t6Vp0R7K6k?=
- =?us-ascii?Q?9sEV1oTZOhvw+M+eS6oM1ysMfq+XbPLohhw5JijtvP+9inR05zxym2NWiOB5?=
- =?us-ascii?Q?EIbwuMO0nQGuaywDwcQA9Egacrf31Fz6W3AxhV6JyShi5zTaZmQ9+UM/lqMY?=
- =?us-ascii?Q?9ahSBOixO4S54ltKqu/3D/W6/HvsGfov+gZO/o6KvrWmzX7CqKs2eh+3o7YL?=
- =?us-ascii?Q?zP5hW+S3ZjpzdzoqGTuMhk/9G646uBlmrh22Dq0Pd3iJ90T9CW1b0ITBpfnB?=
- =?us-ascii?Q?zBU3Kdppo9vr6dx2B4YKFiIsZzKs/Ru8XeeCsMUK+RozsDmacWpTvU1nGj9i?=
- =?us-ascii?Q?tVuu9M/21x+vyEUMiH/pKNk0SRybv2/sxYMdM7K3SWU0W29jhghkNB0SBRm0?=
- =?us-ascii?Q?IclD4xoyT9/ALf5eI9nN2pUG5TUBAUgK+5CRNThZbxCdbHIB2FoClcZrGrpq?=
- =?us-ascii?Q?2hoJQE+Odq5UzCk6ovUkyGmL2e8D1p5Q4bvtkaJOoPjW8FGMP6j4n6poyAL6?=
- =?us-ascii?Q?8AQgzLIhFg=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bcec5307-3100-46a0-ba6c-08da34159256
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2022 12:47:28.2348
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mqS0HdFU71EO0xJl1vDtd5AlxWHrJxMoIu9CHYRXkX41wXvkJsISovoDIqVxCbft
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4619
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 9yhOQYqblkC69cqD1vqIkRacHso7oemc
+X-Proofpoint-GUID: c-J2io2kLwAAFIWBDCYgjb6GHrVjv0Pm
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-12_10,2022-05-12_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ impostorscore=0 spamscore=0 adultscore=0 lowpriorityscore=0 malwarescore=0
+ bulkscore=0 clxscore=1011 priorityscore=1501 mlxscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2205120061
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 12, 2022 at 05:57:05PM +0530, Abhishek Sahu wrote:
-> On 5/10/2022 7:00 PM, Jason Gunthorpe wrote:
-> > On Tue, May 10, 2022 at 06:56:02PM +0530, Abhishek Sahu wrote:
-> >>> We can add a directive to enforce an alignment regardless of the field
-> >>> size.  I believe the feature ioctl header is already going to be eight
-> >>> byte aligned, so it's probably not strictly necessary, but Jason seems
-> >>> to be adding more of these directives elsewhere, so probably a good
-> >>> idea regardless.  Thanks,
-> > 
-> >> So, should I change it like
-> >>
-> >> __u8    low_power_state __attribute__((aligned(8)));
-> >>
-> >>  Or
-> >>
-> >> __aligned_u64 low_power_state
-> > 
-> > You should be explicit about padding, add a reserved to cover the gap.
-> > 
-> > Jasno
-> 
-> 
->  Thanks Jason.
-> 
->  So, I need to make it like following. Correct ?
-> 
->  __u8 low_power_state;
->  __u8 reserved[7];
-> 
->  It seems, then this aligned attribute should not be required.
+If a memop fails due to key checked protection, after already having
+written to the guest, don't indicate suppression to the guest, as that
+would imply that memory wasn't modified.
 
-Yes
+This could be considered a fix to the code introducing storage key
+support, however this is a bug in KVM only if we emulate an
+instructions writing to an operand spanning multiple pages, which I
+don't believe we do.
 
-Jason
+v2 -> v3
+ * tweak commit message
+ * explicitly reset the protection code to 0 on termination
+ * use variable to pass termination arg
+ * add documentation
+ * fix magic constant in selftest
+
+Given the changes I did not pick up the r-b's.
+
+v1 -> v2
+ * Reword commit message of patch 1
+
+Janis Schoetterl-Glausch (2):
+  KVM: s390: Don't indicate suppression on dirtying, failing memop
+  KVM: s390: selftest: Test suppression indication on key prot exception
+
+ Documentation/virt/kvm/api.rst            |  6 +++
+ arch/s390/kvm/gaccess.c                   | 22 +++++++++--
+ tools/testing/selftests/kvm/s390x/memop.c | 46 ++++++++++++++++++++++-
+ 3 files changed, 69 insertions(+), 5 deletions(-)
+
+Range-diff against v2:
+1:  b5725a836f1a ! 1:  e1dae6522b22 KVM: s390: Don't indicate suppression on dirtying, failing memop
+    @@ Commit message
+         Instruction execution can end in different ways, one of which is
+         suppression, which requires that the instruction execute like a no-op.
+         A writing memop that spans multiple pages and fails due to key
+    -    protection can modified guest memory, as a result, the likely
+    -    correct ending is termination. Therefore do not indicate a
+    +    protection may have modified guest memory, as a result, the likely
+    +    correct ending is termination. Therefore, do not indicate a
+         suppressing instruction ending in this case.
+     
+         Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+     
+    + ## Documentation/virt/kvm/api.rst ##
+    +@@ Documentation/virt/kvm/api.rst: in case of KVM_S390_MEMOP_F_CHECK_ONLY), the ioctl returns a positive
+    + error number indicating the type of exception. This exception is also
+    + raised directly at the corresponding VCPU if the flag
+    + KVM_S390_MEMOP_F_INJECT_EXCEPTION is set.
+    ++On protection exceptions, unless specified otherwise, the injected
+    ++translation-exception identifier (TEID) indicates suppression.
+    + 
+    + If the KVM_S390_MEMOP_F_SKEY_PROTECTION flag is set, storage key
+    + protection is also in effect and may cause exceptions if accesses are
+    + prohibited given the access key designated by "key"; the valid range is 0..15.
+    + KVM_S390_MEMOP_F_SKEY_PROTECTION is available if KVM_CAP_S390_MEM_OP_EXTENSION
+    + is > 0.
+    ++Since the accessed memory may span multiple pages and those pages might have
+    ++different storage keys, it is possible that a protection exception occurs
+    ++after memory has been modified. In this case, if the exception is injected,
+    ++the TEID does not indicate suppression.
+    + 
+    + Absolute read/write:
+    + ^^^^^^^^^^^^^^^^^^^^
+    +
+      ## arch/s390/kvm/gaccess.c ##
+     @@ arch/s390/kvm/gaccess.c: enum prot_type {
+      	PROT_TYPE_IEP  = 4,
+    @@ arch/s390/kvm/gaccess.c: enum prot_type {
+     -static int trans_exc(struct kvm_vcpu *vcpu, int code, unsigned long gva,
+     -		     u8 ar, enum gacc_mode mode, enum prot_type prot)
+     +static int trans_exc_ending(struct kvm_vcpu *vcpu, int code, unsigned long gva, u8 ar,
+    -+			    enum gacc_mode mode, enum prot_type prot, bool suppress)
+    ++			    enum gacc_mode mode, enum prot_type prot, bool terminate)
+      {
+      	struct kvm_s390_pgm_info *pgm = &vcpu->arch.pgm;
+      	struct trans_exc_code_bits *tec;
+     @@ arch/s390/kvm/gaccess.c: static int trans_exc(struct kvm_vcpu *vcpu, int code, unsigned long gva,
+    - 
+    - 	switch (code) {
+    - 	case PGM_PROTECTION:
+    --		switch (prot) {
+    --		case PROT_TYPE_IEP:
+    --			tec->b61 = 1;
+    --			fallthrough;
+    --		case PROT_TYPE_LA:
+    --			tec->b56 = 1;
+    --			break;
+    --		case PROT_TYPE_KEYC:
+    --			tec->b60 = 1;
+    --			break;
+    --		case PROT_TYPE_ALC:
+    --			tec->b60 = 1;
+    --			fallthrough;
+    --		case PROT_TYPE_DAT:
+    --			tec->b61 = 1;
+    --			break;
+    -+		if (suppress) {
+    -+			switch (prot) {
+    -+			case PROT_TYPE_IEP:
+    -+				tec->b61 = 1;
+    -+				fallthrough;
+    -+			case PROT_TYPE_LA:
+    -+				tec->b56 = 1;
+    -+				break;
+    -+			case PROT_TYPE_KEYC:
+    -+				tec->b60 = 1;
+    -+				break;
+    -+			case PROT_TYPE_ALC:
+    -+				tec->b60 = 1;
+    -+				fallthrough;
+    -+			case PROT_TYPE_DAT:
+    -+				tec->b61 = 1;
+    -+				break;
+    -+			}
+    + 			tec->b61 = 1;
+    + 			break;
+      		}
+    ++		if (terminate) {
+    ++			tec->b56 = 0;
+    ++			tec->b60 = 0;
+    ++			tec->b61 = 0;
+    ++		}
+      		fallthrough;
+      	case PGM_ASCE_TYPE:
+    + 	case PGM_PAGE_TRANSLATION:
+     @@ arch/s390/kvm/gaccess.c: static int trans_exc(struct kvm_vcpu *vcpu, int code, unsigned long gva,
+      	return code;
+      }
+    @@ arch/s390/kvm/gaccess.c: static int trans_exc(struct kvm_vcpu *vcpu, int code, u
+     +static int trans_exc(struct kvm_vcpu *vcpu, int code, unsigned long gva, u8 ar,
+     +		     enum gacc_mode mode, enum prot_type prot)
+     +{
+    -+	return trans_exc_ending(vcpu, code, gva, ar, mode, prot, true);
+    ++	return trans_exc_ending(vcpu, code, gva, ar, mode, prot, false);
+     +}
+     +
+      static int get_vcpu_asce(struct kvm_vcpu *vcpu, union asce *asce,
+      			 unsigned long ga, u8 ar, enum gacc_mode mode)
+      {
+     @@ arch/s390/kvm/gaccess.c: int access_guest_with_key(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
+    + 		data += fragment_len;
+      		ga = kvm_s390_logical_to_effective(vcpu, ga + fragment_len);
+      	}
+    - 	if (rc > 0)
+    +-	if (rc > 0)
+     -		rc = trans_exc(vcpu, rc, ga, ar, mode, prot);
+    -+		rc = trans_exc_ending(vcpu, rc, ga, ar, mode, prot,
+    -+				      (mode != GACC_STORE) || (idx == 0));
+    ++	if (rc > 0) {
+    ++		bool terminate = (mode == GACC_STORE) && (idx > 0);
+    ++
+    ++		rc = trans_exc_ending(vcpu, rc, ga, ar, mode, prot, terminate);
+    ++	}
+      out_unlock:
+      	if (need_ipte_lock)
+      		ipte_unlock(vcpu);
+2:  434d96c63cb5 ! 2:  d3a152fe6aec KVM: s390: selftest: Test suppression indication on key prot exception
+    @@ Commit message
+         Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+     
+      ## tools/testing/selftests/kvm/s390x/memop.c ##
+    +@@
+    + #include <string.h>
+    + #include <sys/ioctl.h>
+    + 
+    ++#include <linux/bits.h>
+    ++
+    + #include "test_util.h"
+    + #include "kvm_util.h"
+    + 
+     @@ tools/testing/selftests/kvm/s390x/memop.c: static int err_memop_ioctl(struct test_vcpu vcpu, struct kvm_s390_mem_op *ksmo)
+      #define SIDA_OFFSET(o) ._sida_offset = 1, .sida_offset = (o)
+      #define AR(a) ._ar = 1, .ar = (a)
+    @@ tools/testing/selftests/kvm/s390x/memop.c: static void test_errors_key(void)
+     +	struct test_default t = test_default_init(guest_error_key);
+     +	uint64_t prefix;
+     +	uint64_t teid;
+    ++	uint64_t teid_mask = BIT(63 - 56) | BIT(63 - 60) | BIT(63 - 61);
+     +	uint64_t psw[2];
+     +
+     +	HOST_SYNC(t.vcpu, STAGE_INITED);
+    @@ tools/testing/selftests/kvm/s390x/memop.c: static void test_errors_key(void)
+     +	HOST_SYNC(t.vcpu, STAGE_IDLED);
+     +	MOP(t.vm, ABSOLUTE, READ, &teid, sizeof(teid), GADDR(prefix + 168));
+     +	/* Bits 56, 60, 61 form a code, 0 being the only one allowing for termination */
+    -+	ASSERT_EQ(teid & 0x4c, 0);
+    ++	ASSERT_EQ(teid & teid_mask, 0);
+     +
+     +	kvm_vm_free(t.kvm_vm);
+     +}
+
+base-commit: c5eb0a61238dd6faf37f58c9ce61c9980aaffd7a
+-- 
+2.32.0
+
