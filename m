@@ -2,132 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F657524F13
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 15:59:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66199524F28
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 16:01:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354841AbiELN70 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 09:59:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37166 "EHLO
+        id S1354920AbiELOBY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 10:01:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354836AbiELN7Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 09:59:24 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 792B91E21B1;
-        Thu, 12 May 2022 06:59:22 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id be20so6300408edb.12;
-        Thu, 12 May 2022 06:59:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=g/Qg+1AZg6aTBJtpO/aq9xOI91f+bSFV81BXjqwHGko=;
-        b=GzBUlMuf69Ac0C7m/kaNVndV6Br0xiShvNqxUeOtw0juwWg14tpjtIRYebJbMQnycZ
-         gfsbrtjvbB198B/98w558vukOCoVUdS4/T5UrB7bGiHdWbfn56tqO9iKrbphRYbSsQUO
-         /Bip1JrTlw/Xs5cs4JtbClv1JRpR4YOzdebdBpfbcudpz2YrG5l5AwU1Uw8QJ0qmWBys
-         1tDUVkL99PTMiG7dUcrldXVcWZazAmRggiPt+16TFwqSq0NFTGlSo7qHwlkQ9v7lWZ+c
-         af+8hAUiy8qSER3xsYxNg1BOMPKLk+bJMQyWJkb0b1V6mBQ9pn99UxqCRrR8If9bBVLo
-         UtbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=g/Qg+1AZg6aTBJtpO/aq9xOI91f+bSFV81BXjqwHGko=;
-        b=KfrVUMd7A4KlmGOYziAIQueQwJ2TdH7zgSpzWmRAQHGnAXUNt2Zj9UTvDiJ0IV5O2g
-         As20+SjaJSketS0gJsSbS2yXCFiyQoVFsI59LGUxcike0Ao5xXM4c5Rz0hfjX33QhwtU
-         CCxjG+jSjqjDH0lI05EjuZCwB4xDItkacGCZbfvCwdtamGVmEB0YpOHo+bXdwU+rnbYx
-         oEpz/3QGMkxbJLrlRGUUqgjq3jTcNY4TO9WO5tx1KclXIs/7m6x9oy4Tiaz8T82pQ7/K
-         uyNPfsO5CoTIIp7+rtOjbw+XxX3qle/QTuDCmNcdTRKBKCHDOUiTD8udrWSeABiyU9FY
-         VtoQ==
-X-Gm-Message-State: AOAM532c7th8JiC8Q1011h1PuecmgXKtj++6TTD8450TCwRS5IUA0fmJ
-        PpDNJSwjL84ggzq2kQKJaDI=
-X-Google-Smtp-Source: ABdhPJxN9Fo7H7WahKOcrH15At67L2t0c/BFv/7iczdzwo4PhNstc9jrR++vhZVYhx07TuYHak7d1g==
-X-Received: by 2002:a05:6402:747:b0:428:1f98:d17 with SMTP id p7-20020a056402074700b004281f980d17mr35536640edy.57.1652363961067;
-        Thu, 12 May 2022 06:59:21 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id dx18-20020a170906a85200b006f3a8b81ff7sm2195937ejb.3.2022.05.12.06.59.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 May 2022 06:59:20 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <e1fc28b6-996f-a436-2664-d6b044d07c82@redhat.com>
-Date:   Thu, 12 May 2022 15:59:19 +0200
+        with ESMTP id S1354891AbiELOBQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 10:01:16 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 890033DDD8;
+        Thu, 12 May 2022 07:01:15 -0700 (PDT)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24CDBlAj020236;
+        Thu, 12 May 2022 14:01:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=4ohBjU0YdSFHrqWbp3z8Begh0IDivFt3spk1KvQBnsg=;
+ b=jIKMymZVKWltgEJUPOSu9wdZiO9+6nGiC8W+httSTRMr9sV0kWBegUlIHLCr7kwWpzdi
+ J4GCZJXp8biAXb3AS9+q/qBHdxZ4yeXffcODRS+QCp70kgl8GhywiVVpGfpL17Dx2ksP
+ Gc7TEpylYpHbfgyrmk0qWZaI7yKa7fOyfgrBOpc+U8Gl7Cb5DbJlTTH240Tf8xmfhBdW
+ qgYTBJqdKDTweW89/08pHcLn8Yo/cw8wyhDb3wb3eZfX1CSHfIf05R4C8TAWIgYdPDGa
+ W1bnSTDtSE03iba/SDIUNWBH2RKiLltFLot3sgFNAUjWer8roNwgR7w5StYK4NanN4t7 Jg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g12wj1buc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 May 2022 14:01:15 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24CDDBGv024194;
+        Thu, 12 May 2022 14:01:14 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g12wj1brb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 May 2022 14:01:14 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24CDx3oI014757;
+        Thu, 12 May 2022 14:01:11 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 3fwgd8y570-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 May 2022 14:01:10 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24CE17Um50069910
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 May 2022 14:01:07 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C7A2FA4062;
+        Thu, 12 May 2022 14:01:07 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7AA8FA405F;
+        Thu, 12 May 2022 14:01:07 +0000 (GMT)
+Received: from t46lp57.lnxne.boe (unknown [9.152.108.100])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 12 May 2022 14:01:07 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
+        scgl@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v1 0/2] s390x: add migration test for storage keys
+Date:   Thu, 12 May 2022 16:01:05 +0200
+Message-Id: <20220512140107.1432019-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH 16/22] KVM: x86/mmu: remove redundant bits from extended
- role
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20220414074000.31438-1-pbonzini@redhat.com>
- <20220414074000.31438-17-pbonzini@redhat.com> <Ynmv2X5eLz2OQDMB@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Ynmv2X5eLz2OQDMB@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: z7lBr2QVcwp-c9sr_u6cTeFj9nvWhEmC
+X-Proofpoint-GUID: OUTHt1a3uClQnuUV1ntvBujyPMfbJiQ4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-12_10,2022-05-12_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
+ adultscore=0 suspectscore=0 bulkscore=0 priorityscore=1501 clxscore=1015
+ lowpriorityscore=0 phishscore=0 mlxlogscore=503 impostorscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205120067
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/10/22 02:20, Sean Christopherson wrote:
-> --
-> From: Sean Christopherson<seanjc@google.com>
-> Date: Mon, 9 May 2022 17:13:39 -0700
-> Subject: [PATCH] KVM: x86/mmu: Return true from is_cr4_pae() iff CR0.PG is set
-> 
-> Condition is_cr4_pae() on is_cr0_pg() in addition to the !4-byte gPTE
-> check.  From the MMU's perspective, PAE is disabling if paging is
-> disabled.  The current code works because all callers check is_cr0_pg()
-> before invoking is_cr4_pae(), but relying on callers to maintain that
-> behavior is unnecessarily risky.
-> 
-> Fixes: faf729621c96 ("KVM: x86/mmu: remove redundant bits from extended role")
-> Signed-off-by: Sean Christopherson<seanjc@google.com>
-> ---
->   arch/x86/kvm/mmu/mmu.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 909372762363..d1c20170a553 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -240,7 +240,7 @@ static inline bool is_cr0_pg(struct kvm_mmu *mmu)
-> 
->   static inline bool is_cr4_pae(struct kvm_mmu *mmu)
->   {
-> -        return !mmu->cpu_role.base.has_4_byte_gpte;
-> +        return is_cr0_pg(mmu) && !mmu->cpu_role.base.has_4_byte_gpte;
->   }
-> 
->   static struct kvm_mmu_role_regs vcpu_to_role_regs(struct kvm_vcpu *vcpu)
+Upon migration, we expect storage keys being set by the guest to be preserved,
+so add a test for it.
 
-Hmm, thinking more about it this is not needed for two kind of opposite 
-reasons:
+We keep 128 pages and set predictable storage keys. Then, we migrate and check
+they can be read back and the respective access restrictions are in place when
+the access key in the PSW doesn't match.
 
-* if is_cr4_pae() really were to represent the raw CR4.PAE value, this 
-is incorrect and it should be up to the callers to check is_cr0_pg()
+TCG currently doesn't implement key-controlled protection, hence add the
+relevant tests as xfails. To this end, a check_pgm_int_xfail() is useful, which
+is also added in this series.
 
-* if is_cr4_pae() instead represents 8-byte page table entries, then it 
-does even before this patch, because of the following logic in 
-kvm_calc_cpu_role():
+Nico Boehr (2):
+  lib: s390x: introduce check_pgm_int_code_xfail()
+  s390x: add migration test for storage keys
 
-         if (!____is_cr0_pg(regs)) {
-                 role.base.direct = 1;
-                 return role;
-         }
-	...
-         role.base.has_4_byte_gpte = !____is_cr4_pae(regs);
+ lib/s390x/asm/interrupt.h |  1 +
+ lib/s390x/interrupt.c     |  9 +++-
+ s390x/Makefile            |  1 +
+ s390x/migration-skey.c    | 98 +++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg       |  4 ++
+ 5 files changed, 111 insertions(+), 2 deletions(-)
+ create mode 100644 s390x/migration-skey.c
 
+-- 
+2.31.1
 
-So whatever meaning we give to is_cr4_pae(), there is no need for the 
-adjustment.
-
-Paolo
