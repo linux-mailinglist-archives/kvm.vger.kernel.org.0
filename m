@@ -2,85 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E6775257ED
-	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 00:43:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79C8252581B
+	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 01:07:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359262AbiELWnw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 18:43:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43278 "EHLO
+        id S1359377AbiELXHJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 19:07:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356984AbiELWnv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 18:43:51 -0400
-Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A226128245A
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 15:43:50 -0700 (PDT)
-Received: by mail-ot1-x32e.google.com with SMTP id s18-20020a056830149200b006063fef3e17so3748292otq.12
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 15:43:50 -0700 (PDT)
+        with ESMTP id S1359368AbiELXHI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 19:07:08 -0400
+Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97DA15EDF6
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 16:07:06 -0700 (PDT)
+Received: by mail-qk1-x72e.google.com with SMTP id w3so5932198qkb.3
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 16:07:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1t970B0fJHlEuyIXUobZJRtdZ+neS/qyKKJxNpMTOxg=;
-        b=jS0cP6aQeTYuJhFXvnLlQ+p5gdFQUNk4IZuAln/UMY8iT0rGeTreJ6hilp0syiuyVb
-         pbwQol8xkHcGnHNptEVqx6GpVQ0saHx/X0aXVRDVXjPXmPd7Y9HDUo0bfv8evYBbiAup
-         bVHNFJZjkz47YxvA54L95gGRuqm/J7udeWeTUmT2i+zGNYGR8awOzW8ViwG7GxWGa2pB
-         SVpsKhe+h/wdxFPoQ+LDcYPM0jQLH+z1BmzFenKmKpzeomolN1xm7NgcZRXJWA/1Kutv
-         X1ujJOcUIM9CIvDGQ8foE4gKd71NemiU90d51zP1vJ1PjtZlLwmtoYXmqWdPP+gSNbvH
-         41wg==
+        d=cmpxchg-org.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=cUck+cVE4Zxuay2oogDnSAcnKGvRjnTdnpV0Wo1py44=;
+        b=Dj1JULLJRgmUJGyzT66YmWR2bXmVOPWjKovt19K15mjhXg3HwFYBwEJuzTGwKaAq9s
+         UlYZ0/IUYcAg2aRR26LgYG0/HAiOUXbRTrjNR+Wc4SxPVT5MXbauCdL2/WDBI7QN0Gh0
+         c2v6RoCDtzZcEzCwRaxfIkuXKgKFQmfp7WteHFGn9yxB7UXbRpwFXrmu9mN6KLIniXYn
+         E6Ng4kcGK1aHvRPzZUSVA18lIbBd/twXGFM4i7KmkNJcxCIrUG0eta5gQ+Zhk4sMsbTs
+         bfvIMBQOMEqF/RWs5LYTgoZiIZ4OfdOx64M8r+ZkVp/WNmWSvYEJZ9cPVzcTwYawUn43
+         j07A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1t970B0fJHlEuyIXUobZJRtdZ+neS/qyKKJxNpMTOxg=;
-        b=LbceszPleg4C4m8lV5q0vo7V6u1quWTdHl2AyvDT7xY2Vf6mLded2lSyELX2uXEpkv
-         YHG6sBOAvY7hvBMhnmgvtZB8DF8h0woEwzbmaINSc6crv28lQZ5NMMNLy3pqJym8qtse
-         ykU2c3r+qcJTW6CCJ3aFVE2CafQZ2DIoz7cupkV21vSN0zr7jMeCk3x+PKOvcJCmxYp7
-         GoIQGoNajbr/kh3C4XbuD/HhWcW8uyyXumk+wFvUkFSHD13m2yOSOD6r9PjHktmIZLrj
-         lUS/SeXEchMFWzv8vTMUMyZvneRcL/CZaHRWUQ/xwHlZVHtltqUFfdnETYJSN33lJkBo
-         FMYw==
-X-Gm-Message-State: AOAM530TMWEXuCXhAjNxHjFfNA8O1MzeNPR6dsYm7U/hNFavFKYZfgp3
-        J3sm8J4ulaiPTGd7K697XtkLEHL8u7jS3Enc8J2Oeg==
-X-Google-Smtp-Source: ABdhPJx7ZsFAXwdLg9qDgIdSwjaW2ZGxSuROUTaCnIssPEdTzTozEAQCGpFfehKDAZJpy9Jb+A01B3nYcORcUVnCKUE=
-X-Received: by 2002:a05:6830:280e:b0:606:ae45:6110 with SMTP id
- w14-20020a056830280e00b00606ae456110mr851166otu.14.1652395429826; Thu, 12 May
- 2022 15:43:49 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220512222716.4112548-1-seanjc@google.com> <20220512222716.4112548-2-seanjc@google.com>
-In-Reply-To: <20220512222716.4112548-2-seanjc@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 12 May 2022 15:43:38 -0700
-Message-ID: <CALMp9eSzx6SEa+rrBR2DpizuwqUzYvU7GNQrW=AOToeTp9mC8Q@mail.gmail.com>
-Subject: Re: [PATCH 1/3] KVM: x86: Signal #GP, not -EPERM, on bad WRMSR(MCi_CTL/STATUS)
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=cUck+cVE4Zxuay2oogDnSAcnKGvRjnTdnpV0Wo1py44=;
+        b=lw5RCeiCJwBLN2X2PH6e3MuU4lYSRCfPyZjcPBBSr3YNjAd4ETDQ4f5sS4JkEwZPbj
+         sUseH5l6098IwKdwSPUI/1BFu1L2RYpWsVpk+51Fq/EbMqaSDr98Cbn6KcHgtLOYL6hM
+         KQjV0FLwg205tIEqlV3wdlYoS26FG+etCP9VptLR7g9i1mFDwFhLBfMY3biLJFXqoS7P
+         u74hGEYRqOe5l7xBRDrxn4EdWnGq7WUekhq7Y5Ga1j3apEkfIGYcEnKm3nIQPG6ZVODg
+         sWXH3k6enW8z7rNPokZYT6f0x8/nLwCHqIWkJ65X6tjk4bKQlCa8j5w7LoZqqsvL03Gz
+         7a8A==
+X-Gm-Message-State: AOAM531J1EZbOaj31H0NElh5p9xEumnJZcFZGmujulSyO+wRgET4pfwf
+        C1EKjW4xItYrgf53thRCBNFYUw==
+X-Google-Smtp-Source: ABdhPJzPe/f2XnvNR7HBy1hfb2wAJ55PWzG5ke4OAfKWdYulxV6DryUEgezu1lF0L4l4p+1B2aoJOQ==
+X-Received: by 2002:a05:620a:4553:b0:6a0:5280:defd with SMTP id u19-20020a05620a455300b006a05280defdmr1763977qkp.165.1652396825764;
+        Thu, 12 May 2022 16:07:05 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::1:14fe])
+        by smtp.gmail.com with ESMTPSA id w13-20020ac86b0d000000b002f39b99f677sm545833qts.17.2022.05.12.16.07.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 May 2022 16:07:05 -0700 (PDT)
+Date:   Thu, 12 May 2022 19:07:04 -0400
+From:   Johannes Weiner <hannes@cmpxchg.org>
+To:     Yosry Ahmed <yosryahmed@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Tejun Heo <tj@kernel.org>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jue Wang <juew@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Shakeel Butt <shakeelb@google.com>,
+        Oliver Upton <oupton@google.com>, cgroups@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Linux-MM <linux-mm@kvack.org>
+Subject: Re: [PATCH v4 1/4] mm: add NR_SECONDARY_PAGETABLE to count secondary
+ page table uses.
+Message-ID: <Yn2TGJ4vZ/fst+CY@cmpxchg.org>
+References: <20220429201131.3397875-1-yosryahmed@google.com>
+ <20220429201131.3397875-2-yosryahmed@google.com>
+ <87ilqoi77b.wl-maz@kernel.org>
+ <CAJD7tkY7JF25XXUFq2mGroetMkfo-2zGOaQC94pjZE3D42+oaw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJD7tkY7JF25XXUFq2mGroetMkfo-2zGOaQC94pjZE3D42+oaw@mail.gmail.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 12, 2022 at 3:27 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> Return '1', not '-1', when handling an illegal WRMSR to a MCi_CTL or
-> MCi_STATUS MSR.  The behavior of "all zeros' or "all ones" for CTL MSRs
-> is architectural, as is the "only zeros" behavior for STATUS MSRs.  I.e.
-> the intent is to inject a #GP, not exit to userspace due to an unhandled
-> emulation case.  Returning '-1' gets interpreted as -EPERM up the stack
-> and effecitvely kills the guest.
->
-> Fixes: 890ca9aefa78 ("KVM: Add MCE support")
-> Fixes: 9ffd986c6e4e ("KVM: X86: #GP when guest attempts to write MCi_STATUS register w/o 0")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
-Reviewed-by: Jim Mattson <jmattson@google.com>
+Hey Yosry,
+
+On Mon, May 02, 2022 at 11:46:26AM -0700, Yosry Ahmed wrote:
+> On Mon, May 2, 2022 at 3:01 AM Marc Zyngier <maz@kernel.org> wrote:
+> > 115bae923ac8bb29ee635). You are saying that this is related to a
+> > 'workload', but given that the accounting is global, I fail to see how
+> > you can attribute these allocations on a particular VM.
+> 
+> The main motivation is having the memcg stats, which give attribution
+> to workloads. If you think it's more appropriate, we can add it as a
+> memcg-only stat, like MEMCG_VMALLOC (see 4e5aa1f4c2b4 ("memcg: add
+> per-memcg vmalloc stat")). The only reason I made this as a global
+> stat too is to be consistent with NR_PAGETABLE.
+
+Please no memcg-specific stats if a regular vmstat item is possible
+and useful at the system level as well, like in this case. It's extra
+memcg code, extra callbacks, and it doesn't have NUMA node awareness.
+
+> > What do you plan to do for IOMMU page tables? After all, they serve
+> > the exact same purpose, and I'd expect these to be handled the same
+> > way (i.e. why is this KVM specific?).
+> 
+> The reason this was named NR_SECONDARY_PAGTABLE instead of
+> NR_KVM_PAGETABLE is exactly that. To leave room to incrementally
+> account other types of secondary page tables to this stat. It is just
+> that we are currently interested in the KVM MMU usage.
+
+Do you actually care at the supervisor level that this memory is used
+for guest page tables?
+
+It seems to me you primarily care that it is reported *somewhere*
+(hence the piggybacking off of NR_PAGETABLE at first). And whether
+it's page tables or iommu tables or whatever else allocated for the
+purpose of virtualization, it doesn't make much of a difference to the
+host/cgroup that is tracking it, right?
+
+(The proximity to nr_pagetable could also be confusing. A high page
+table count can be a hint to userspace to enable THP. It seems
+actionable in a different way than a high number of kvm page tables or
+iommu page tables.)
+
+How about NR_VIRT? It's shorter, seems descriptive enough, less room
+for confusion, and is more easily extensible in the future.
