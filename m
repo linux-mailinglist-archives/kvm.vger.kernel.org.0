@@ -2,97 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BA7F525653
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 22:23:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6787252565B
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 22:27:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358340AbiELUXq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 16:23:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55726 "EHLO
+        id S1358361AbiELU1j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 16:27:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358350AbiELUXp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 16:23:45 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2058.outbound.protection.outlook.com [40.107.237.58])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC23E25BA47;
-        Thu, 12 May 2022 13:23:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YMvGtyTdy9WpMdK9bysnNdVx8uwf88+ydhMHutxHuGOrImvgXMAQMAoJ3opLEGNjdbvpIiARcyja5ftv9Y78uDyl8RSGg6XgRW4DZMOY3+n3LSJUDP/nLQFVajq8qt0Zx+dcQSBsqNfTwMx6dwak3m16l5c0N3UEQR93iWzbtb5rkbiP2XGwq+NTxUwazmZQ2+6DgtQJvWTQhe+14n1rAMBWit/Je86/1vN+se3ZECFdFFHnzOsyqyEhePNtNzk8O9R4izT0Q76E7QAGmwlMGnpJNU7FWLIX6biX+d/IHHiKomYMCCSdqN4Iy69zLsKPlM0HQuGFxC4LtfGF4J9Dvw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=URb+jR8YpSJVIBqtQbIswBfHt/MxDCivTm9mMVgYpG8=;
- b=Zi5fJMhbq35k0YcS8LeAOFEoYJ0Og+jEaTPJ8ETX8tscFIaJG+HqnpFgbvn9qE1skjVHurNknt6PClPAXRIW6FO9XcYEt5IZW4y/1+l9O9p1ZN3S0hZfOYD2CBTDoxISdhq1jRhzyJoGr45Uev2+EKvXXkwcEZwXv9Zrcr5qUCyKcv/8yCkxOlIfVSaMHZJVa44NNXuEQFTcRjmrTsxGdoC5YjU0RlEigy5dNbUE3c296enRKv/u2lhNkNyCNVcfy1dYhoM7l7mnnfAnt8zDiuN6zyxppOft/eS+3q4NAV2RnNZ4kxVeH5bX0FJIcJnvua4Gofx8ViqXpXksaQW9/A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=URb+jR8YpSJVIBqtQbIswBfHt/MxDCivTm9mMVgYpG8=;
- b=dV5rGdkYo1z56CoGlBB9vHNALOdIBLDSQJHm20G0EbpUnUqqsUeXJk3WxcCnI4MHXqSxWkVNhH/gULYlA8tKjdbAeSb067IrK4HHh7HC+b1r89BcftdlTeWhQK+mAIIEmWuapTUwNeo8PhiPJbXKpvAeoRgCAZL8kgTl0ot6Gsg=
-Received: from MW4PR03CA0247.namprd03.prod.outlook.com (2603:10b6:303:b4::12)
- by BN6PR1201MB0020.namprd12.prod.outlook.com (2603:10b6:405:56::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5227.22; Thu, 12 May
- 2022 20:23:39 +0000
-Received: from CO1NAM11FT026.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:b4:cafe::72) by MW4PR03CA0247.outlook.office365.com
- (2603:10b6:303:b4::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5227.23 via Frontend
- Transport; Thu, 12 May 2022 20:23:39 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT026.mail.protection.outlook.com (10.13.175.67) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5250.13 via Frontend Transport; Thu, 12 May 2022 20:23:39 +0000
-Received: from ashkalraubuntuserver.amd.com (10.180.168.240) by
- SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 12 May 2022 15:23:36 -0500
-From:   Ashish Kalra <Ashish.Kalra@amd.com>
-To:     <pbonzini@redhat.com>
-CC:     <seanjc@google.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
-        <hpa@zytor.com>, <joro@8bytes.org>, <Thomas.Lendacky@amd.com>,
-        <bp@alien8.de>, <x86@kernel.org>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <theflow@google.com>,
-        <rientjes@google.com>, <pgonda@google.com>, <john.allen@amd.com>
-Subject: [PATCH] KVM: SVM: Use kzalloc for sev ioctl interfaces to prevent kernel memory leak.
-Date:   Thu, 12 May 2022 20:23:28 +0000
-Message-ID: <20220512202328.2453895-1-Ashish.Kalra@amd.com>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S1345771AbiELU1h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 16:27:37 -0400
+Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C81A25131F
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 13:27:35 -0700 (PDT)
+Received: by mail-oi1-x233.google.com with SMTP id m25so7830758oih.2
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 13:27:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=sGoOKvntmctjnTFpu4Xea6mgPsfoHZFHEqN6iO1ZtLc=;
+        b=JMDSojiExZcn87ffWKkeqGVQmX/krfAFVjMPpYkk7+FfjLTnA88RVyvcURfoPkpBRe
+         A6RclZi5OpkvLf8wo5kX68mOlDJYyTgsxNTGb4bPJpUy1kvmmuvdJxXr2ktjN5vBIlUP
+         uZ0IWS/Z3K7N4HafatfJ9/2In2VUmbgt5j6THdq/VvUfUiaHq+OC6rsufuhjRhuu1yDQ
+         UTj9uhobz63kSEvJEfF4yt/1wNDHO5bsknkSBs+QnRy9HGH2VaP9wUT7G6/6dzrqgvs2
+         DVuEKtSm0b+AuwVnHfmb8RXk1KEUBVkUIgF/LzZ4oTIB+QMbDU++6dylbTPaG/2Qg5y5
+         KARw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=sGoOKvntmctjnTFpu4Xea6mgPsfoHZFHEqN6iO1ZtLc=;
+        b=sAJLpf759GPWtPhcFFe55Z3azr/D1N/cOg+U7vX6ryap254l+1zP1SOyenrFTYax1S
+         EgkbdlDaXMvqIzL0TLBbbLMyPLPaedST9BR8D57nbpKCvJ69IzXUCohOci/sYRtFwE8s
+         18dyH978OmaQinRfmbvIsSwIFEcG1Gm3C70J2G8f8Uts9fUIIK7Brh89Fepr+lnn9Juj
+         CzY69kEjsMnKT7bLcnXVRZ/LJC38BnBQeQCHtn+qMYc5aYxZoEV6KKnLmcZbncaFBCm2
+         wgSWH2px3Cfv+PxKldDg4cMlkMwmOWiuc6+WkTH4HvV414R9mDxc3cgERSsGOHklVWbT
+         gtgA==
+X-Gm-Message-State: AOAM531aQvfV4Fr3ejcN+Ecz8rkGD7ausKdFdP+zHHCYsDVLvHdvUX5D
+        m39mzs3k1RH677hxucFZj2j/F7pvEEtUo7tV7Md/9A==
+X-Google-Smtp-Source: ABdhPJzaXe0zNI37ouf0sN/+AvQlv6XXL4SayhKj2e7OKECO2cALUCPTzlEMUrAL2lWS+pZ8WPHClq2RqQwkm65lbxw=
+X-Received: by 2002:a05:6808:c2:b0:325:eb71:7266 with SMTP id
+ t2-20020a05680800c200b00325eb717266mr6342516oic.269.1652387254885; Thu, 12
+ May 2022 13:27:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 06114310-6f7f-47f2-27a9-08da34554d09
-X-MS-TrafficTypeDiagnostic: BN6PR1201MB0020:EE_
-X-Microsoft-Antispam-PRVS: <BN6PR1201MB002074DBB6058E08230C598C8ECB9@BN6PR1201MB0020.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mXBdkxjUByu26dcvWzAjwZJyo/C57S4hVSRpXkaX2Qq8TcnAqGpy2srmwukxSB577KezUoyCN/LM0teERZ5BVJPbtSwhFXryPdAOeupvfL0AoaYqxjFHGfDAN+jDLnb1/FFb0tSkv1DEaEaQfxoPHkvYjtvIqyaqlTaqSfKzSdvDr820UFsGAX67EuGVEoT7tXnqJgu/UyWGsdaEm5ah03jYIx0nP9yjDW44OD9LM/KT8jNuRQurSRzjh2flQMw4bHWWPBswcNZBJiSpvLsiQPzPLzbkONY7yT7EWZ6PkuclI+/WvQl+VlN5SkW0tWgUnqliDC5fCZnhk4zBWjIJBTqNiT5eJY/S96e/6kplgjhQ4uLzm6jSU8sFATzOKCuEP0Lcj49vf4oRrBddSuwp+LWtyGoD9to14RVIXqD9c6KWTVWzux8MKApAs3PwCl8X/XKyk6CXvNLfp8buByVMtJuejKP6lSbqJABzb5omdtM8Yr4eJt5ktvhdnCQovFx0jlzAKbBTGyKQUgTcSWW/NLvo9g4qTjfDZffV3HpvCWtWzDbAc7yKG0ixTtx5bxx/RmdC7Hfr77tXJFym8wHzxQBXizdA7+/WvUjE6BLIMWg+fA62rdoANjdfZQMMfNzd1ZDj+ANL0UJJyqgVCkWn2/Xi1ZtqGLYgo+C7jElX5ckmoG/q0MLYg3wwwyEXdeDDQZp8KjRQCQsDz4oENcUWig==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(40470700004)(46966006)(36840700001)(2616005)(54906003)(336012)(36860700001)(82310400005)(1076003)(6916009)(70206006)(40460700003)(70586007)(8936002)(426003)(508600001)(7696005)(47076005)(8676002)(36756003)(186003)(4326008)(16526019)(6666004)(316002)(5660300002)(86362001)(26005)(2906002)(7416002)(356005)(83380400001)(81166007)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2022 20:23:39.3938
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 06114310-6f7f-47f2-27a9-08da34554d09
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT026.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR1201MB0020
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+References: <20220512184514.15742-1-jon@nutanix.com> <Yn1fjAqFoszWz500@google.com>
+ <Yn1hdHgMVuni/GEx@google.com> <07BEC8B1-469C-4E36-AE92-90BFDF93B2C4@nutanix.com>
+ <Yn1o9ZfsQutXXdQS@google.com>
+In-Reply-To: <Yn1o9ZfsQutXXdQS@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 12 May 2022 13:27:23 -0700
+Message-ID: <CALMp9eRQv6owjfyf+UO=96Q1dkeSrJWy0i4O-=RPSaQwz0bjTQ@mail.gmail.com>
+Subject: Re: [PATCH v4] x86/speculation, KVM: remove IBPB on vCPU load
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Jon Kohler <jon@nutanix.com>, Jonathan Corbet <corbet@lwn.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        Kees Cook <keescook@chromium.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ashok Raj <ashok.raj@intel.com>,
+        KarimAllah Ahmed <karahmed@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "kvm @ vger . kernel . org" <kvm@vger.kernel.org>,
+        Waiman Long <longman@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -100,56 +89,97 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+On Thu, May 12, 2022 at 1:07 PM Sean Christopherson <seanjc@google.com> wro=
+te:
+>
+> On Thu, May 12, 2022, Jon Kohler wrote:
+> >
+> >
+> > > On May 12, 2022, at 3:35 PM, Sean Christopherson <seanjc@google.com> =
+wrote:
+> > >
+> > > On Thu, May 12, 2022, Sean Christopherson wrote:
+> > >> On Thu, May 12, 2022, Jon Kohler wrote:
+> > >>> Remove IBPB that is done on KVM vCPU load, as the guest-to-guest
+> > >>> attack surface is already covered by switch_mm_irqs_off() ->
+> > >>> cond_mitigation().
+> > >>>
+> > >>> The original commit 15d45071523d ("KVM/x86: Add IBPB support") was =
+simply
+> > >>> wrong in its guest-to-guest design intention. There are three scena=
+rios
+> > >>> at play here:
+> > >>
+> > >> Jim pointed offline that there's a case we didn't consider.  When sw=
+itching between
+> > >> vCPUs in the same VM, an IBPB may be warranted as the tasks in the V=
+M may be in
+> > >> different security domains.  E.g. the guest will not get a notificat=
+ion that vCPU0 is
+> > >> being swapped out for vCPU1 on a single pCPU.
+> > >>
+> > >> So, sadly, after all that, I think the IBPB needs to stay.  But the =
+documentation
+> > >> most definitely needs to be updated.
+> > >>
+> > >> A per-VM capability to skip the IBPB may be warranted, e.g. for cont=
+ainer-like
+> > >> use cases where a single VM is running a single workload.
+> > >
+> > > Ah, actually, the IBPB can be skipped if the vCPUs have different mm_=
+structs,
+> > > because then the IBPB is fully redundant with respect to any IBPB per=
+formed by
+> > > switch_mm_irqs_off().  Hrm, though it might need a KVM or per-VM knob=
+, e.g. just
+> > > because the VMM doesn't want IBPB doesn't mean the guest doesn't want=
+ IBPB.
+> > >
+> > > That would also sidestep the largely theoretical question of whether =
+vCPUs from
+> > > different VMs but the same address space are in the same security dom=
+ain.  It doesn't
+> > > matter, because even if they are in the same domain, KVM still needs =
+to do IBPB.
+> >
+> > So should we go back to the earlier approach where we have it be only
+> > IBPB on always_ibpb? Or what?
+> >
+> > At minimum, we need to fix the unilateral-ness of all of this :) since =
+we=E2=80=99re
+> > IBPB=E2=80=99ing even when the user did not explicitly tell us to.
+>
+> I think we need separate controls for the guest.  E.g. if the userspace V=
+MM is
+> sufficiently hardened then it can run without "do IBPB" flag, but that do=
+esn't
+> mean that the entire guest it's running is sufficiently hardened.
+>
+> > That said, since I just re-read the documentation today, it does specif=
+ically
+> > suggest that if the guest wants to protect *itself* it should turn on I=
+BPB or
+> > STIBP (or other mitigations galore), so I think we end up having to thi=
+nk
+> > about what our =E2=80=9Ccontract=E2=80=9D is with users who host their =
+workloads on
+> > KVM - are they expecting us to protect them in any/all cases?
+> >
+> > Said another way, the internal guest areas of concern aren=E2=80=99t so=
+mething
+> > the kernel would always be able to A) identify far in advance and B)
+> > always solve on the users behalf. There is an argument to be made
+> > that the guest needs to deal with its own house, yea?
+>
+> The issue is that the guest won't get a notification if vCPU0 is replaced=
+ with
+> vCPU1 on the same physical CPU, thus the guest doesn't get an opportunity=
+ to emit
+> IBPB.  Since the host doesn't know whether or not the guest wants IBPB, u=
+nless the
+> owner of the host is also the owner of the guest workload, the safe appro=
+ach is to
+> assume the guest is vulnerable.
 
-For some sev ioctl interfaces, the length parameter that is passed maybe
-less than or equal to SEV_FW_BLOB_MAX_SIZE, but larger than the data
-that PSP firmware returns. In this case, kmalloc will allocate memory
-that is the size of the input rather than the size of the data.
-Since PSP firmware doesn't fully overwrite the allocated buffer, these
-sev ioctl interface may return uninitialized kernel slab memory.
-
-Reported-by: Andy Nguyen <theflow@google.com>
-Suggested-by: David Rientjes <rientjes@google.com>
-Suggested-by: Peter Gonda <pgonda@google.com>
-Cc: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
----
- arch/x86/kvm/svm/sev.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 7c392873626f..d93dab5c9ce1 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -688,7 +688,7 @@ static int sev_launch_measure(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 		if (params.len > SEV_FW_BLOB_MAX_SIZE)
- 			return -EINVAL;
- 
--		blob = kmalloc(params.len, GFP_KERNEL_ACCOUNT);
-+		blob = kzalloc(params.len, GFP_KERNEL_ACCOUNT);
- 		if (!blob)
- 			return -ENOMEM;
- 
-@@ -808,7 +808,7 @@ static int __sev_dbg_decrypt_user(struct kvm *kvm, unsigned long paddr,
- 	if (!IS_ALIGNED(dst_paddr, 16) ||
- 	    !IS_ALIGNED(paddr,     16) ||
- 	    !IS_ALIGNED(size,      16)) {
--		tpage = (void *)alloc_page(GFP_KERNEL);
-+		tpage = (void *)alloc_page(GFP_KERNEL | __GFP_ZERO);
- 		if (!tpage)
- 			return -ENOMEM;
- 
-@@ -1094,7 +1094,7 @@ static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 		if (params.len > SEV_FW_BLOB_MAX_SIZE)
- 			return -EINVAL;
- 
--		blob = kmalloc(params.len, GFP_KERNEL_ACCOUNT);
-+		blob = kzalloc(params.len, GFP_KERNEL_ACCOUNT);
- 		if (!blob)
- 			return -ENOMEM;
- 
--- 
-2.25.1
-
+Exactly. And if the guest has used taskset as its mitigation strategy,
+how is the host to know?
