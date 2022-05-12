@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B1D315257C4
+	by mail.lfdr.de (Postfix) with ESMTP id 6548F5257C3
 	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 00:27:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359168AbiELW1Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 18:27:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45288 "EHLO
+        id S1359172AbiELW1a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 18:27:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359151AbiELW1X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 18:27:23 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C18A66948A
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 15:27:22 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id h23-20020a17090adb9700b001dcce3bb2d4so5196270pjv.7
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 15:27:22 -0700 (PDT)
+        with ESMTP id S1359166AbiELW1Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 18:27:25 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94B016971E
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 15:27:24 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id x23-20020a170902b41700b0015ea144789fso3351782plr.13
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 15:27:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=bSUiUXGuiZeZXDy6szRyl5Pb0BlIGgSml446k/D2EYc=;
-        b=L4h+SAkPbx0grNeYQbaXxmVWIV5Ls1B38Oy26hddUO821qYdicU61uy4E2aQvj+5HO
-         oNfcDCOz1Wbb/+FaJe+Ha0DZNYA10qc5mJbH5eesdxw6zZFIa7Nm43GG0Es5gefL4vmj
-         3xoVEkQC7ji8RztiX7tBFxdj/E7NM9WfLqdtIfHTfCKAc1Cq7ccAIOQSS4TIHRRHeGQX
-         KNWDY3TnfbQe0bLKrp5v/EWqNv3Uge1TI71goS9hgYf0tY2A0hT0IF0QGcswXN/x8mEG
-         +XvoddC26T1aWtOmbw3JYMwh6Lbfj335+oXaXNXQ3DkNRKpwsEgFV81U/rviK+pIVNzy
-         sc5g==
+        bh=y6gb0U2+lLyl/JLfdo770ZdpJj+aiCLx3/RH8sebC6g=;
+        b=kEP9p9p6ty8/Cn8cm6dGGrIzXSWlTeD922G12T3rUIRfkqyIxLiFDIdV6tNBMqYigy
+         9ouHWupdaewZjaLRmHYZ/JL4yB/ZAV7O17Z0fwvGj2/iIt+gRZvfAaRfkSUACbXVm29k
+         lgjMnz8qoEKLSuKPDHiHfWHk+dnEbQLea8ksKSyZW4K0tocXBIh9PsAk3+4m0AMkKjQE
+         tpLyygojrv2nLbMp4P4mahrE/sVfFdu+EaCt+/4VO2Ni3+WkuVrweTmq8GhcAansyS1I
+         eByUUhClwyruTFsBBVTnF24SrSjgX8S4AAer3b+8hAZf/xzxFRMqwMnVFpYYGpGfilNz
+         82PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=bSUiUXGuiZeZXDy6szRyl5Pb0BlIGgSml446k/D2EYc=;
-        b=D+B/0kivE2UGy9IlC/qIJ9m+Hf8QgtrvG9iiORw7uw11ORKvQrFCQizDk3Rsyam6UC
-         bDHrgtNey4aWRxZRctrNkS8uqu03SHUfDOnSyU6WYbD9r3nNiNfZvGBqQsn52MkNhKV1
-         yfUbIWOGIjGaJWEms5ZEuQ4Qa8UJxPVd91PJKyN5AjM7tGWXtEz1BI64LlqFzkG6rnYg
-         vfq+hBbwMlu2Dh91t1rYUbmbUZ3T838wxsDTj5qlWVClmBUJFW3jJDrvwnoE0MRu8IPa
-         85hr2bPPIPGvKLXFdQZ/pPeyzpeyDUTjNg3hNAwGn4OAxtpwKww6tSyBk4U9O03tB6I5
-         /Vsw==
-X-Gm-Message-State: AOAM532xMIrO7UPYGcr08skLO4RQ5YSgfFybVsDEsUnzLvpVAKfZjYGZ
-        sJR8Z/e0WlxLKG4mR/9O4YFeVEp3cc0=
-X-Google-Smtp-Source: ABdhPJy78pw9H01EQxvilUuvJI5YT+rh2PXQQ9qGJcQZE39wAkzjFRmskOhAGvnaE0zX4hrAicRF44HQIeo=
+        bh=y6gb0U2+lLyl/JLfdo770ZdpJj+aiCLx3/RH8sebC6g=;
+        b=tuFGS7+rmFmvbIg1uo0vQ0x7YrxbrKOmfioK3jPRLeaXsbpz19HeOuUhuhPoVIE3ZQ
+         7RMiwhhzEWEXtmTnYNxT3Iv0w/inbWtNTLohYocsKG/1blY9mU7ZrSTE99wnJki9baTq
+         V1BpQJqWpUuAnpxy8JIAOjbcDvdvzVFr8UoEqC0FvEK1DVCcs8P6oIhYBOu+HaeYl/h2
+         zdCWJlpdwRIe8mVO2J5TI+VvND2/doZKTMLCdvHKF8WmJU4ktj6W2Qw2mOvSBRSnFHT1
+         cWUmojR0hi3mvc4HTt3+ApBSaWsVUoT7EHsqs5cX0D7FlR1Y7gqrE96cjZ29FMs+zCEr
+         5WpA==
+X-Gm-Message-State: AOAM531q2jpBqJ+QMi3Hq8iNflJwdD1WTV/XxfxU5mjVC9N01dbgLmXC
+        b1SIzUE2tqmMzEo0T2+Jn2GDZVyf+sE=
+X-Google-Smtp-Source: ABdhPJw1WLaJt1wz9itOgfj7pPjBlw2xXYrT6jt9xeyZPyALNNRSlFuN+TayMfobCW23vb/d4MMU2OIBnl0=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:903:41c9:b0:15e:ae15:294f with SMTP id
- u9-20020a17090341c900b0015eae15294fmr1914969ple.44.1652394442293; Thu, 12 May
- 2022 15:27:22 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:76cb:b0:15e:f795:bf5e with SMTP id
+ j11-20020a17090276cb00b0015ef795bf5emr1930290plt.39.1652394444060; Thu, 12
+ May 2022 15:27:24 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 12 May 2022 22:27:15 +0000
+Date:   Thu, 12 May 2022 22:27:16 +0000
 In-Reply-To: <20220512222716.4112548-1-seanjc@google.com>
-Message-Id: <20220512222716.4112548-3-seanjc@google.com>
+Message-Id: <20220512222716.4112548-4-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220512222716.4112548-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.0.550.gb090851708-goog
-Subject: [PATCH 2/3] KVM: x86: Use explicit case-statements for MCx banks in {g,s}et_msr_mce()
+Subject: [PATCH 3/3] KVM: x86: Add helpers to identify CTL and STATUS MCi MSRs
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -65,138 +65,84 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use an explicit case statement to grab the full range of MCx bank MSRs
-in {g,s}et_msr_mce(), and manually check only the "end" (the number of
-banks configured by userspace may be less than the max).  The "default"
-trick works, but is a bit odd now, and will be quite odd if/when support
-for accessing MCx_CTL2 MSRs is added, which has near identical logic.
+Add helpers to identify CTL (control) and STATUS MCi MSR types instead of
+open coding the checks using the offset.  Using the offset is perfectly
+safe, but unintuitive, as understanding what the code does requires
+knowing that the offset calcuation will not affect the lower three bits.
 
-Hoist "offset" to function scope so as to avoid curly braces for the case
-statement, and because MCx_CTL2 support will need the same variables.
-
-Opportunstically clean up the comment about allowing bit 10 to be cleared
-from bank 4.
+Opportunistically comment the STATUS logic to save readers a trip to
+Intel's SDM or AMD's APM to understand the "data != 0" check.
 
 No functional change intended.
 
-Cc: Jue Wang <juew@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 71 ++++++++++++++++++++++++----------------------
- 1 file changed, 37 insertions(+), 34 deletions(-)
+ arch/x86/kvm/x86.c | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index bc6db58975dc..7e685ea9882b 100644
+index 7e685ea9882b..b61c5def0bfc 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -3206,6 +3206,7 @@ static int set_msr_mce(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	unsigned bank_num = mcg_cap & 0xff;
- 	u32 msr = msr_info->index;
- 	u64 data = msr_info->data;
-+	u32 offset, last_msr;
+@@ -3188,6 +3188,16 @@ static void kvmclock_sync_fn(struct work_struct *work)
+ 					KVMCLOCK_SYNC_PERIOD);
+ }
  
- 	switch (msr) {
- 	case MSR_IA32_MCG_STATUS:
-@@ -3219,32 +3220,33 @@ static int set_msr_mce(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
++/* These helpers are safe iff @msr is known to be an MCx bank MSR. */
++static bool is_mci_control_msr(u32 msr)
++{
++	return (msr & 3) == 0;
++}
++static bool is_mci_status_msr(u32 msr)
++{
++	return (msr & 3) == 1;
++}
++
+ /*
+  * On AMD, HWCR[McStatusWrEn] controls whether setting MCi_STATUS results in #GP.
+  */
+@@ -3225,9 +3235,6 @@ static int set_msr_mce(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		if (msr > last_msr)
  			return 1;
- 		vcpu->arch.mcg_ctl = data;
- 		break;
-+	case MSR_IA32_MC0_CTL ... MSR_IA32_MCx_CTL(KVM_MAX_MCE_BANKS) - 1:
-+		last_msr = MSR_IA32_MCx_CTL(bank_num) - 1;
-+		if (msr > last_msr)
-+			return 1;
-+
-+		offset = array_index_nospec(msr - MSR_IA32_MC0_CTL,
-+					    last_msr + 1 - MSR_IA32_MC0_CTL);
-+
+ 
+-		offset = array_index_nospec(msr - MSR_IA32_MC0_CTL,
+-					    last_msr + 1 - MSR_IA32_MC0_CTL);
+-
+ 		/*
+ 		 * Only 0 or all 1s can be written to IA32_MCi_CTL, all other
+ 		 * values are architecturally undefined.  But, some Linux
+@@ -3235,15 +3242,21 @@ static int set_msr_mce(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		 * issue on AMD K8s, allow bit 10 to be clear when setting all
+ 		 * other bits in order to avoid an uncaught #GP in the guest.
+ 		 */
+-		if ((offset & 0x3) == 0 &&
++		if (is_mci_control_msr(msr) &&
+ 		    data != 0 && (data | (1 << 10)) != ~(u64)0)
+ 			return 1;
+ 
+-		/* MCi_STATUS */
+-		if (!msr_info->host_initiated && (offset & 0x3) == 1 &&
 +		/*
-+		 * Only 0 or all 1s can be written to IA32_MCi_CTL, all other
-+		 * values are architecturally undefined.  But, some Linux
-+		 * kernels clear bit 10 in bank 4 to workaround a BIOS/GART TLB
-+		 * issue on AMD K8s, allow bit 10 to be clear when setting all
-+		 * other bits in order to avoid an uncaught #GP in the guest.
++		 * All CPUs allow writing 0 to MCi_STATUS MSRs to clear the MSR.
++		 * AMD-based CPUs allow non-zero values, but if and only if
++		 * HWCR[McStatusWrEn] is set.
 +		 */
-+		if ((offset & 0x3) == 0 &&
-+		    data != 0 && (data | (1 << 10)) != ~(u64)0)
-+			return 1;
-+
-+		/* MCi_STATUS */
-+		if (!msr_info->host_initiated && (offset & 0x3) == 1 &&
-+		    data != 0 && !can_set_mci_status(vcpu))
-+			return 1;
-+
-+		vcpu->arch.mce_banks[offset] = data;
-+		break;
- 	default:
--		if (msr >= MSR_IA32_MC0_CTL &&
--		    msr < MSR_IA32_MCx_CTL(bank_num)) {
--			u32 offset = array_index_nospec(
--				msr - MSR_IA32_MC0_CTL,
--				MSR_IA32_MCx_CTL(bank_num) - MSR_IA32_MC0_CTL);
--
--			/* only 0 or all 1s can be written to IA32_MCi_CTL
--			 * some Linux kernels though clear bit 10 in bank 4 to
--			 * workaround a BIOS/GART TBL issue on AMD K8s, ignore
--			 * this to avoid an uncatched #GP in the guest
--			 */
--			if ((offset & 0x3) == 0 &&
--			    data != 0 && (data | (1 << 10)) != ~(u64)0)
--				return 1;
--
--			/* MCi_STATUS */
--			if (!msr_info->host_initiated &&
--			    (offset & 0x3) == 1 && data != 0) {
--				if (!can_set_mci_status(vcpu))
--					return 1;
--			}
--
--			vcpu->arch.mce_banks[offset] = data;
--			break;
--		}
- 		return 1;
- 	}
- 	return 0;
-@@ -3789,6 +3791,7 @@ static int get_msr_mce(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata, bool host)
- 	u64 data;
- 	u64 mcg_cap = vcpu->arch.mcg_cap;
- 	unsigned bank_num = mcg_cap & 0xff;
-+	u32 offset, last_msr;
++		if (!msr_info->host_initiated && is_mci_status_msr(msr) &&
+ 		    data != 0 && !can_set_mci_status(vcpu))
+ 			return 1;
  
- 	switch (msr) {
- 	case MSR_IA32_P5_MC_ADDR:
-@@ -3806,16 +3809,16 @@ static int get_msr_mce(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata, bool host)
- 	case MSR_IA32_MCG_STATUS:
- 		data = vcpu->arch.mcg_status;
- 		break;
--	default:
--		if (msr >= MSR_IA32_MC0_CTL &&
--		    msr < MSR_IA32_MCx_CTL(bank_num)) {
--			u32 offset = array_index_nospec(
--				msr - MSR_IA32_MC0_CTL,
--				MSR_IA32_MCx_CTL(bank_num) - MSR_IA32_MC0_CTL);
-+	case MSR_IA32_MC0_CTL ... MSR_IA32_MCx_CTL(KVM_MAX_MCE_BANKS) - 1:
-+		last_msr = MSR_IA32_MCx_CTL(bank_num) - 1;
-+		if (msr > last_msr)
-+			return 1;
- 
--			data = vcpu->arch.mce_banks[offset];
--			break;
--		}
 +		offset = array_index_nospec(msr - MSR_IA32_MC0_CTL,
 +					    last_msr + 1 - MSR_IA32_MC0_CTL);
-+		data = vcpu->arch.mce_banks[offset];
-+		break;
-+	default:
- 		return 1;
- 	}
- 	*pdata = data;
+ 		vcpu->arch.mce_banks[offset] = data;
+ 		break;
+ 	default:
 -- 
 2.36.0.550.gb090851708-goog
 
