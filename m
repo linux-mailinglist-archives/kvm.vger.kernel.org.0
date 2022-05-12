@@ -2,143 +2,388 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 20877524BAA
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 13:32:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A480A524BAC
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 13:33:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353174AbiELLcr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 07:32:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57544 "EHLO
+        id S1353180AbiELLdH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 07:33:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231782AbiELLcp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 07:32:45 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2056.outbound.protection.outlook.com [40.107.236.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EE966C0FE
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 04:32:44 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FSXXauvj0KSUwvLFVyGvcKxU643PRs44S7Wg1Wbm3+1UizY6zQzVI6oL00dGf9yFCfeSxXC/uEfhHvVxUMrcyqjJHpcoXyi2Xj6FPvNetz8IRzhz4swJM3tmFfzScKdW3X19kAXEDko8vTsdKQyYe4eZU6JTx/TCYKlQ6LHMI44txt0UVdg8TEMUGr04BEWRN445VPekC0XgUQ6L0RzXwWkCeJrEUDiK1ApAE53NjPEj9CIkY2bC9BcLi93bvibKDIOon+d0s/o/qpQ1rf0FDEIJ2CoC7sz7+sfo1VJcNdzDOfb3rq0uPwQriCerzjraLhL7KIO7dGI7M/x5kcWlCg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dgbdBMWPSdmx9DAErRlLz9zRsK6iiDJx1WjycVtHyNE=;
- b=kqx9WlWZCXIqxmnWliGonnz72EcqlpPJbW/bjNIl9ababmyVuN8YAKFgicJpWDvDEDyXyOjgVvrn6ntPM84Pdq9baCIusuiVTLko6szfDoieFagem3chTl+s49SnpooR95BWCV5G/FsEQhqAP9z+2fYqzI+ytRZ2lJTekJP+QVeZMl4PiCwPInPM8Qu2e5ymfaMCjc8KF5FH7LHfife6R7lyU/cKKNzKk+Z+1mnmtcRQmD/aTlnGiZZSZsY4GWN/YAg0XAeZm7CSO9NL9BYcCsrn1MZa0pix/CS38dQVPnF6V+9bre7sdSJiP+psKH1fXYukLjkCRWr25JglkWxU+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dgbdBMWPSdmx9DAErRlLz9zRsK6iiDJx1WjycVtHyNE=;
- b=SiJer5D66sWayeBm6RyG11Pg+1V0jqz8GzBsfFgqirKNSDIKg5cPqTsKB40vSmvXXTOUZulgcYV1xenc0HCg1DGmYTd7E7/6zmaTAyA1Gun5zt/YFk/oP9c1GgU/abk8Nm/XUgfx+pvVN2oGrBf6+3UORNlhfohmPhAOOemeptHAO0u5RkzHr0vvPDztq2Dzf1e+dkjPpciqziPY6XAC5Mm582AUZJoyTzdTzNomUnrD6tV/vR8YIyRGhgFmFKryCT9q1fI2eq0/7XsGln62TtbFERXEeVb6BEbYsTx6EMWY0iUmLlHD7RV/5FCk0AonitBf5W6o3QePfr+SBjKpsg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by CY4PR12MB1925.namprd12.prod.outlook.com (2603:10b6:903:120::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5250.13; Thu, 12 May
- 2022 11:32:42 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2%5]) with mapi id 15.20.5250.013; Thu, 12 May 2022
- 11:32:42 +0000
-Date:   Thu, 12 May 2022 08:32:41 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Zhangfei Gao <zhangfei.gao@linaro.org>
-Cc:     Robin Murphy <robin.murphy@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        kvm@vger.kernel.org, Vivek Kumar Gautam <Vivek.Gautam@arm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        iommu@lists.linux-foundation.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH] vfio: Remove VFIO_TYPE1_NESTING_IOMMU
-Message-ID: <20220512113241.GQ49344@nvidia.com>
-References: <0-v1-0093c9b0e345+19-vfio_no_nesting_jgg@nvidia.com>
- <0e2f7cb8-f0d9-8209-6bc2-ca87fff57f1f@arm.com>
- <20220510181327.GM49344@nvidia.com>
- <6c6f3ecb-6339-4093-a15a-fcf95a7c61fb@linaro.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6c6f3ecb-6339-4093-a15a-fcf95a7c61fb@linaro.org>
-X-ClientProxiedBy: MN2PR05CA0056.namprd05.prod.outlook.com
- (2603:10b6:208:236::25) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S1353177AbiELLdA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 07:33:00 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3171A1C12F3;
+        Thu, 12 May 2022 04:32:59 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24CAtskh025514;
+        Thu, 12 May 2022 11:32:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=+7uwlUJ4A0W2LPUzGEPPWVobDKCbAM9yM0smG4U1DdI=;
+ b=M2Nyoaxi+tM/W1lfdSLQa2FDVEOxwEp2UH8RpMmbwhIFNHwFoh9qkacXA3pEFjMl2xT5
+ j6LjHXFxijQ0DhbAg4Ylp6dyy0eLmg/GK6v5++XKgSLYb8TkiNmtdTxSIIZuiYdHigA6
+ gCzSTv+a7Mo4JJjenv6wBqRMZ17hr7HzSu4U80cvVx3SEsb/BL2Ok+h7MO45Wz5WRuH0
+ 2/cfJsU5AjYB7b1Bxde6hVCg67Pv5te+jYrNq2ENttKU/SPMNR2ywJWx097R31AjLAtA
+ cuRn8ISzEdGDUL/eB9xxKvP+X/Cf2X6n+GMimfbraCnD0b3Y/XpgiQnaQZbGbba+braN NA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g10wr0nxt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 May 2022 11:32:58 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24CBTHtN017994;
+        Thu, 12 May 2022 11:32:58 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g10wr0nx4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 May 2022 11:32:58 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24CBIhU7024069;
+        Thu, 12 May 2022 11:32:55 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3fwgd8xxee-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 May 2022 11:32:55 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24CBWqeg22741362
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 May 2022 11:32:52 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3F7ACA4040;
+        Thu, 12 May 2022 11:32:52 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BD38DA404D;
+        Thu, 12 May 2022 11:32:51 +0000 (GMT)
+Received: from [9.152.224.243] (unknown [9.152.224.243])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 12 May 2022 11:32:51 +0000 (GMT)
+Message-ID: <0936ad4b-3a30-5be5-3fc5-7339d86cf56a@linux.ibm.com>
+Date:   Thu, 12 May 2022 13:32:51 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b79170cf-843d-472a-8d8c-08da340b2097
-X-MS-TrafficTypeDiagnostic: CY4PR12MB1925:EE_
-X-Microsoft-Antispam-PRVS: <CY4PR12MB192510C1818830E3A50435E3C2CB9@CY4PR12MB1925.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5Oc7Ope0fYkSnuLEG9nJzcab3cCX0KleRRitQN+efYAEbVUQxHKi02bB7L8PalGTJYzw2bmH7wNtWetzh6LSbnknPDt6phosLtTqEv46AAQgtwou+p1MyUaO95fRUlMgLkYG4scKchiR6Kc/SEH3x4gDmScwHLs6q1czBZsAcUsu+GpCaqjwjjjFffqO8DdxXgevU8XN0+MTlJNBJaUtDDGXniezCtGgzU9EU0QsJ8nmr6u0W2VrcOZDasob0f/zfu8jXNcv6mfG/c5BvDFmfVKuHf+6YF67GCNlHEnjHwg3Qj4thU5dCFhm0IutpY1RJJ9lzWFJSzYsckp4Lbj+9ryggvk+zC55Qh21Ix4L7k8sGdt7EpGGHQRpMpkGa95BXOZVZFuNkEyXBf5URNagvIp9eCC6UQU9isXUDTtRMrr6gG6SztZMVnGeUFOqV5wDXL93GJATV9BkGW7388oMyCpbeberED93vtML6rsdt8eo1ZaqoQFc/xitXGbpM4b5AFwdzWPkvnYN4YqNbGYqAHF7sNs246Ym1NaL1JT8PLS73Sc9cVuALZImm6i5moG8XPrbbx76Jydnt2+8ON+YEJU5JPMFX5TQS+xRu/ARxeAZ/uTto105bwz5liqXedz5OwMTwaWSXG3jQtHnoBn+Kw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(66946007)(36756003)(66556008)(4744005)(4326008)(8676002)(1076003)(2906002)(6512007)(83380400001)(6506007)(186003)(26005)(66476007)(6486002)(2616005)(86362001)(6916009)(33656002)(54906003)(8936002)(7416002)(5660300002)(38100700002)(508600001)(316002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GmeK9+ighCsEWDcwfVHotTvkVmCP56hW9yGLbywgKcwCtLwvnhX+7lPQ1Yqw?=
- =?us-ascii?Q?z6bC98C17gZ2gPOkDdEo0A0j4CP9hKkhXAoGPJs2vhQdfIBJRiCwS0UXQk+g?=
- =?us-ascii?Q?ExUA0DwmWczGGbu+V2hFpexJe1nPxzCj3CkJEIP6i/xsQ4/3O0MHMtrHAJgG?=
- =?us-ascii?Q?07fxDKODDyS0M/kGLvFfx1OVB62RcC9LRSbEssoSlTqoluGLhTdo8jhUPQvM?=
- =?us-ascii?Q?GAK+BuK6STwnsCL5TqniyVwtWr9Bgsn8k5i27+CmXPW9FcbSrR96DfX/8DTL?=
- =?us-ascii?Q?qQC3PkDWnI3ZcrDDUcBO/705czLjy6SvbL695pugooJtJP1aMpQ7kh0Ylnoa?=
- =?us-ascii?Q?C0vTmLPRUTTMc5Xu3tJsc1m9uJYT8/g2ALjgiCykbEInD5RjGOeFjW5rKzy2?=
- =?us-ascii?Q?IlJXbFbTVisYFR0hJtXsIY+9iCSWaQUES6SVEvkIrOL7MzsXR+vHKuC2W7is?=
- =?us-ascii?Q?JdfJpCP2OR+QQPiZ/w4FZlOQ7aSBUJN70MFXnMvxiPwC1vDBbWL3NQ5KS6hi?=
- =?us-ascii?Q?ho5nRdGNoUZb/EZws6ZyDKkiCx9m2CCgETnOf+NMdNmuypPtL9Zyak0M+4le?=
- =?us-ascii?Q?r9eUiOYimCUtFI1eHhQCepK+ruQFTU4PVgpL5w2SpB0uvoTtDNPhNqH9a5NC?=
- =?us-ascii?Q?N980rQLNlnuU/SYThq3CFfDlejitisUM2queynIoyQ/sn87IIoS+c324r15g?=
- =?us-ascii?Q?IO7BTE1a7IYCpH16+U5sLPhRWDrXbU92eQi0ouXk0lPyrZLxcPP2elhKfy6a?=
- =?us-ascii?Q?Coe0jjLNq1IfX4iom1DT1tAu0AOoJl/rXGaUKPxcVxN/RgigZRoju75dMsw8?=
- =?us-ascii?Q?pW4XOQ6O692CODy8HoKYCRWtEsqyWwSlRmE0uyq6JfJeQoKkWL8gwoOnJTNR?=
- =?us-ascii?Q?JHkJ6O1Kn29J4zJDQh/NbpivhagdH9ARJFDSnDmWlM3A4ghzGennGHAkPFXu?=
- =?us-ascii?Q?t+ASBgahp56svhp8uB7JwOgwhjvE0zEbkfcKJcbMzO9P6l/MFq3hXOAQE7KP?=
- =?us-ascii?Q?16dqnP3Ns0AOnmWYJdNTe105Ns8B9HxU9n1psGH228HnuU21KArjxbBZHzEi?=
- =?us-ascii?Q?3vgJ9ympjvG6FJVdcB8+Y5T9Q2Vr9WekGRqoX4mSJuNna8fagk6XuQgwjc1X?=
- =?us-ascii?Q?CF2JKS9SH7GbA12FN23Mo5EXYiFVzzrKjb/BD6DPL0M3ZC7ytX9/Z7rso/Qc?=
- =?us-ascii?Q?P/WmJmS0A4ygUpa1vYxwB9pPbO6W3XpdQz95VxjtcBT1hD3tI9OjfDj1bf1f?=
- =?us-ascii?Q?uHqwkDwVTWLxPQG2YzKlRm0Z35Bft4DfxcC/1ZiOymwus5Ov9LnsA2Pt4B4S?=
- =?us-ascii?Q?8LZFX86P+ksiQgORfroh8/d/zyimjKuaoacrFYKIDa5i3jJFj+/DQLydpqVu?=
- =?us-ascii?Q?hxH9gGZQ3y0/Upgn+WCLd0QzfkYVYjKsdh3Ppg/9ijm2Hda8xEqli2zLrVcv?=
- =?us-ascii?Q?fRveS9n8CqAxwCRGrFUYe9OloORoq2NrH7UrncBvxu5K1S7rp+MJNJ2tDmuv?=
- =?us-ascii?Q?RUikxJmvWEZ6P9UrRsqmdFPjaASju1QAgdUTtWu5tu1WtkWyMjSPuei2xDjK?=
- =?us-ascii?Q?Y8yoekonV4vCi29tQARqeYdXMmWJPNZJRXYH33/YwIIWS9+aSJCBGvR//Wfs?=
- =?us-ascii?Q?PQE/STWFEWzb+dUiZwTXFWG6QnylNSCFM4Hy4n2IPS5Efj5M6NF/BJrogHyy?=
- =?us-ascii?Q?u9ek99sQCIsh/U8KrJypslOX1c6JX09dym9o0+DqPXs7tpN3nTzHhYvnX81I?=
- =?us-ascii?Q?ntgaxwW39A=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b79170cf-843d-472a-8d8c-08da340b2097
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2022 11:32:42.3840
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: A35e2bKqrJ3ZN2l70TKREXdofRhxxAVhZr+DbNXI3RsEEhyLrSEsQdPb51mgGDkj
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1925
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v9 1/3] s390x: KVM: ipte lock for SCA access should be
+ contained in KVM
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, wintera@linux.ibm.com, seiden@linux.ibm.com,
+        nrb@linux.ibm.com
+References: <20220506092403.47406-1-pmorel@linux.ibm.com>
+ <20220506092403.47406-2-pmorel@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20220506092403.47406-2-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 6tZ-hyUPRiyalysNCHIfWdWbM0fuH8No
+X-Proofpoint-ORIG-GUID: dW7QprcKj2A0aIQos8-liN34OZ4r3mx5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-12_02,2022-05-12_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ adultscore=0 impostorscore=0 malwarescore=0 phishscore=0 spamscore=0
+ lowpriorityscore=0 mlxlogscore=999 priorityscore=1501 bulkscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205120052
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 12, 2022 at 03:07:09PM +0800, Zhangfei Gao wrote:
-> > > I can't help feeling a little wary about removing this until IOMMUFD
-> > > can actually offer a functional replacement - is it in the way of
-> > > anything upcoming?
-> >  From an upstream perspective if someone has a patched kernel to
-> > complete the feature, then they can patch this part in as well, we
-> > should not carry dead code like this in the kernel and in the uapi.
-> > 
-> > It is not directly in the way, but this needs to get done at some
-> > point, I'd rather just get it out of the way.
+On 5/6/22 11:24, Pierre Morel wrote:
+> The former check to chose between SIIF or not SIIF can be done
+> using the sclp.has_siif instead of accessing per vCPU structures
+
+Maybe replace this paragraph with:
+We can check if SIIF is enabled by testing the sclp_info struct instead 
+of testing the sie control block eca variable. sclp.has_ssif is the only 
+requirement to set ECA_SII anyway so we can go straight to the source 
+for that.
+
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+
 > 
-> We are using this interface for nested mode.
+> When accessing the SCA, ipte lock and ipte_unlock do not need
+> to access any vcpu structures but only the KVM structure.
+> 
+> Let's simplify the ipte handling.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>   arch/s390/kvm/gaccess.c | 96 ++++++++++++++++++++---------------------
+>   arch/s390/kvm/gaccess.h |  6 +--
+>   arch/s390/kvm/priv.c    |  6 +--
+>   3 files changed, 54 insertions(+), 54 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
+> index d53a183c2005..0e1f6dd31882 100644
+> --- a/arch/s390/kvm/gaccess.c
+> +++ b/arch/s390/kvm/gaccess.c
+> @@ -262,77 +262,77 @@ struct aste {
+>   	/* .. more fields there */
+>   };
+>   
+> -int ipte_lock_held(struct kvm_vcpu *vcpu)
+> +int ipte_lock_held(struct kvm *kvm)
+>   {
+> -	if (vcpu->arch.sie_block->eca & ECA_SII) {
+> +	if (sclp.has_siif) {
+>   		int rc;
+>   
+> -		read_lock(&vcpu->kvm->arch.sca_lock);
+> -		rc = kvm_s390_get_ipte_control(vcpu->kvm)->kh != 0;
+> -		read_unlock(&vcpu->kvm->arch.sca_lock);
+> +		read_lock(&kvm->arch.sca_lock);
+> +		rc = kvm_s390_get_ipte_control(kvm)->kh != 0;
+> +		read_unlock(&kvm->arch.sca_lock);
+>   		return rc;
+>   	}
+> -	return vcpu->kvm->arch.ipte_lock_count != 0;
+> +	return kvm->arch.ipte_lock_count != 0;
+>   }
+>   
+> -static void ipte_lock_simple(struct kvm_vcpu *vcpu)
+> +static void ipte_lock_simple(struct kvm *kvm)
+>   {
+>   	union ipte_control old, new, *ic;
+>   
+> -	mutex_lock(&vcpu->kvm->arch.ipte_mutex);
+> -	vcpu->kvm->arch.ipte_lock_count++;
+> -	if (vcpu->kvm->arch.ipte_lock_count > 1)
+> +	mutex_lock(&kvm->arch.ipte_mutex);
+> +	kvm->arch.ipte_lock_count++;
+> +	if (kvm->arch.ipte_lock_count > 1)
+>   		goto out;
+>   retry:
+> -	read_lock(&vcpu->kvm->arch.sca_lock);
+> -	ic = kvm_s390_get_ipte_control(vcpu->kvm);
+> +	read_lock(&kvm->arch.sca_lock);
+> +	ic = kvm_s390_get_ipte_control(kvm);
+>   	do {
+>   		old = READ_ONCE(*ic);
+>   		if (old.k) {
+> -			read_unlock(&vcpu->kvm->arch.sca_lock);
+> +			read_unlock(&kvm->arch.sca_lock);
+>   			cond_resched();
+>   			goto retry;
+>   		}
+>   		new = old;
+>   		new.k = 1;
+>   	} while (cmpxchg(&ic->val, old.val, new.val) != old.val);
+> -	read_unlock(&vcpu->kvm->arch.sca_lock);
+> +	read_unlock(&kvm->arch.sca_lock);
+>   out:
+> -	mutex_unlock(&vcpu->kvm->arch.ipte_mutex);
+> +	mutex_unlock(&kvm->arch.ipte_mutex);
+>   }
+>   
+> -static void ipte_unlock_simple(struct kvm_vcpu *vcpu)
+> +static void ipte_unlock_simple(struct kvm *kvm)
+>   {
+>   	union ipte_control old, new, *ic;
+>   
+> -	mutex_lock(&vcpu->kvm->arch.ipte_mutex);
+> -	vcpu->kvm->arch.ipte_lock_count--;
+> -	if (vcpu->kvm->arch.ipte_lock_count)
+> +	mutex_lock(&kvm->arch.ipte_mutex);
+> +	kvm->arch.ipte_lock_count--;
+> +	if (kvm->arch.ipte_lock_count)
+>   		goto out;
+> -	read_lock(&vcpu->kvm->arch.sca_lock);
+> -	ic = kvm_s390_get_ipte_control(vcpu->kvm);
+> +	read_lock(&kvm->arch.sca_lock);
+> +	ic = kvm_s390_get_ipte_control(kvm);
+>   	do {
+>   		old = READ_ONCE(*ic);
+>   		new = old;
+>   		new.k = 0;
+>   	} while (cmpxchg(&ic->val, old.val, new.val) != old.val);
+> -	read_unlock(&vcpu->kvm->arch.sca_lock);
+> -	wake_up(&vcpu->kvm->arch.ipte_wq);
+> +	read_unlock(&kvm->arch.sca_lock);
+> +	wake_up(&kvm->arch.ipte_wq);
+>   out:
+> -	mutex_unlock(&vcpu->kvm->arch.ipte_mutex);
+> +	mutex_unlock(&kvm->arch.ipte_mutex);
+>   }
+>   
+> -static void ipte_lock_siif(struct kvm_vcpu *vcpu)
+> +static void ipte_lock_siif(struct kvm *kvm)
+>   {
+>   	union ipte_control old, new, *ic;
+>   
+>   retry:
+> -	read_lock(&vcpu->kvm->arch.sca_lock);
+> -	ic = kvm_s390_get_ipte_control(vcpu->kvm);
+> +	read_lock(&kvm->arch.sca_lock);
+> +	ic = kvm_s390_get_ipte_control(kvm);
+>   	do {
+>   		old = READ_ONCE(*ic);
+>   		if (old.kg) {
+> -			read_unlock(&vcpu->kvm->arch.sca_lock);
+> +			read_unlock(&kvm->arch.sca_lock);
+>   			cond_resched();
+>   			goto retry;
+>   		}
+> @@ -340,15 +340,15 @@ static void ipte_lock_siif(struct kvm_vcpu *vcpu)
+>   		new.k = 1;
+>   		new.kh++;
+>   	} while (cmpxchg(&ic->val, old.val, new.val) != old.val);
+> -	read_unlock(&vcpu->kvm->arch.sca_lock);
+> +	read_unlock(&kvm->arch.sca_lock);
+>   }
+>   
+> -static void ipte_unlock_siif(struct kvm_vcpu *vcpu)
+> +static void ipte_unlock_siif(struct kvm *kvm)
+>   {
+>   	union ipte_control old, new, *ic;
+>   
+> -	read_lock(&vcpu->kvm->arch.sca_lock);
+> -	ic = kvm_s390_get_ipte_control(vcpu->kvm);
+> +	read_lock(&kvm->arch.sca_lock);
+> +	ic = kvm_s390_get_ipte_control(kvm);
+>   	do {
+>   		old = READ_ONCE(*ic);
+>   		new = old;
+> @@ -356,25 +356,25 @@ static void ipte_unlock_siif(struct kvm_vcpu *vcpu)
+>   		if (!new.kh)
+>   			new.k = 0;
+>   	} while (cmpxchg(&ic->val, old.val, new.val) != old.val);
+> -	read_unlock(&vcpu->kvm->arch.sca_lock);
+> +	read_unlock(&kvm->arch.sca_lock);
+>   	if (!new.kh)
+> -		wake_up(&vcpu->kvm->arch.ipte_wq);
+> +		wake_up(&kvm->arch.ipte_wq);
+>   }
+>   
+> -void ipte_lock(struct kvm_vcpu *vcpu)
+> +void ipte_lock(struct kvm *kvm)
+>   {
+> -	if (vcpu->arch.sie_block->eca & ECA_SII)
+> -		ipte_lock_siif(vcpu);
+> +	if (sclp.has_siif)
+> +		ipte_lock_siif(kvm);
+>   	else
+> -		ipte_lock_simple(vcpu);
+> +		ipte_lock_simple(kvm);
+>   }
+>   
+> -void ipte_unlock(struct kvm_vcpu *vcpu)
+> +void ipte_unlock(struct kvm *kvm)
+>   {
+> -	if (vcpu->arch.sie_block->eca & ECA_SII)
+> -		ipte_unlock_siif(vcpu);
+> +	if (sclp.has_siif)
+> +		ipte_unlock_siif(kvm);
+>   	else
+> -		ipte_unlock_simple(vcpu);
+> +		ipte_unlock_simple(kvm);
+>   }
+>   
+>   static int ar_translation(struct kvm_vcpu *vcpu, union asce *asce, u8 ar,
+> @@ -1075,7 +1075,7 @@ int access_guest_with_key(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
+>   	try_storage_prot_override = storage_prot_override_applicable(vcpu);
+>   	need_ipte_lock = psw_bits(*psw).dat && !asce.r;
+>   	if (need_ipte_lock)
+> -		ipte_lock(vcpu);
+> +		ipte_lock(vcpu->kvm);
+>   	/*
+>   	 * Since we do the access further down ultimately via a move instruction
+>   	 * that does key checking and returns an error in case of a protection
+> @@ -1113,7 +1113,7 @@ int access_guest_with_key(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
+>   		rc = trans_exc(vcpu, rc, ga, ar, mode, prot);
+>   out_unlock:
+>   	if (need_ipte_lock)
+> -		ipte_unlock(vcpu);
+> +		ipte_unlock(vcpu->kvm);
+>   	if (nr_pages > ARRAY_SIZE(gpa_array))
+>   		vfree(gpas);
+>   	return rc;
+> @@ -1185,10 +1185,10 @@ int check_gva_range(struct kvm_vcpu *vcpu, unsigned long gva, u8 ar,
+>   	rc = get_vcpu_asce(vcpu, &asce, gva, ar, mode);
+>   	if (rc)
+>   		return rc;
+> -	ipte_lock(vcpu);
+> +	ipte_lock(vcpu->kvm);
+>   	rc = guest_range_to_gpas(vcpu, gva, ar, NULL, length, asce, mode,
+>   				 access_key);
+> -	ipte_unlock(vcpu);
+> +	ipte_unlock(vcpu->kvm);
+>   
+>   	return rc;
+>   }
+> @@ -1451,7 +1451,7 @@ int kvm_s390_shadow_fault(struct kvm_vcpu *vcpu, struct gmap *sg,
+>   	 * tables/pointers we read stay valid - unshadowing is however
+>   	 * always possible - only guest_table_lock protects us.
+>   	 */
+> -	ipte_lock(vcpu);
+> +	ipte_lock(vcpu->kvm);
+>   
+>   	rc = gmap_shadow_pgt_lookup(sg, saddr, &pgt, &dat_protection, &fake);
+>   	if (rc)
+> @@ -1485,7 +1485,7 @@ int kvm_s390_shadow_fault(struct kvm_vcpu *vcpu, struct gmap *sg,
+>   	pte.p |= dat_protection;
+>   	if (!rc)
+>   		rc = gmap_shadow_page(sg, saddr, __pte(pte.val));
+> -	ipte_unlock(vcpu);
+> +	ipte_unlock(vcpu->kvm);
+>   	mmap_read_unlock(sg->mm);
+>   	return rc;
+>   }
+> diff --git a/arch/s390/kvm/gaccess.h b/arch/s390/kvm/gaccess.h
+> index 1124ff282012..9408d6cc8e2c 100644
+> --- a/arch/s390/kvm/gaccess.h
+> +++ b/arch/s390/kvm/gaccess.h
+> @@ -440,9 +440,9 @@ int read_guest_real(struct kvm_vcpu *vcpu, unsigned long gra, void *data,
+>   	return access_guest_real(vcpu, gra, data, len, 0);
+>   }
+>   
+> -void ipte_lock(struct kvm_vcpu *vcpu);
+> -void ipte_unlock(struct kvm_vcpu *vcpu);
+> -int ipte_lock_held(struct kvm_vcpu *vcpu);
+> +void ipte_lock(struct kvm *kvm);
+> +void ipte_unlock(struct kvm *kvm);
+> +int ipte_lock_held(struct kvm *kvm);
+>   int kvm_s390_check_low_addr_prot_real(struct kvm_vcpu *vcpu, unsigned long gra);
+>   
+>   /* MVPG PEI indication bits */
+> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+> index 5beb7a4a11b3..0e8603acc105 100644
+> --- a/arch/s390/kvm/priv.c
+> +++ b/arch/s390/kvm/priv.c
+> @@ -443,7 +443,7 @@ static int handle_ipte_interlock(struct kvm_vcpu *vcpu)
+>   	vcpu->stat.instruction_ipte_interlock++;
+>   	if (psw_bits(vcpu->arch.sie_block->gpsw).pstate)
+>   		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
+> -	wait_event(vcpu->kvm->arch.ipte_wq, !ipte_lock_held(vcpu));
+> +	wait_event(vcpu->kvm->arch.ipte_wq, !ipte_lock_held(vcpu->kvm));
+>   	kvm_s390_retry_instr(vcpu);
+>   	VCPU_EVENT(vcpu, 4, "%s", "retrying ipte interlock operation");
+>   	return 0;
+> @@ -1472,7 +1472,7 @@ static int handle_tprot(struct kvm_vcpu *vcpu)
+>   	access_key = (operand2 & 0xf0) >> 4;
+>   
+>   	if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_DAT)
+> -		ipte_lock(vcpu);
+> +		ipte_lock(vcpu->kvm);
+>   
+>   	ret = guest_translate_address_with_key(vcpu, address, ar, &gpa,
+>   					       GACC_STORE, access_key);
+> @@ -1509,7 +1509,7 @@ static int handle_tprot(struct kvm_vcpu *vcpu)
+>   	}
+>   
+>   	if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_DAT)
+> -		ipte_unlock(vcpu);
+> +		ipte_unlock(vcpu->kvm);
+>   	return ret;
+>   }
+>   
 
-How are you using it? It doesn't do anything. Do you have out of tree
-patches as well?
-
-Jason
