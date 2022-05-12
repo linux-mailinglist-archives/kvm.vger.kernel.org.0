@@ -2,138 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A086525682
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 22:45:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58892525701
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 23:27:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358426AbiELUpm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 16:45:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46078 "EHLO
+        id S1358673AbiELV1a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 17:27:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355122AbiELUpj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 16:45:39 -0400
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D38622EA4C
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 13:45:38 -0700 (PDT)
-Received: by mail-qt1-x834.google.com with SMTP id i20so5389582qti.11
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 13:45:38 -0700 (PDT)
+        with ESMTP id S231402AbiELV11 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 17:27:27 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C1B91A15FD
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 14:27:26 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id iq2-20020a17090afb4200b001d93cf33ae9so8992285pjb.5
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 14:27:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oxidecomputer.com; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=KP0IkqliWF7IJ2Jb+iCy0BgntD4ovxiVj1cA0S86+bE=;
-        b=LDtaR+pPrCSvdhBsy7kpdY2otl/VPai2Lx4ahg0/fHjlNgzUXucQ92MFlfI+dujFwP
-         sZ3/JDAr4BgaJCwBoHUCbO1FOyL0nr91B+9You+11TMt3lNjg2vHVtZhbQbJp0YGLk4c
-         7h80/Tc8yRP348/m+zqOW9hgjXbZ98tqz/wl1LPWDlgoSeiyu9F7p8voaJOsq39BnfOp
-         lLH+VsgebmhR4sLhGg8OpnajCtyYwRrTmJWXPQXssXIF2Od2xPy4J7FajTwdI+5u4an9
-         zkIlHGnaZ6eOqnVGLx9vokoI0nrf98cZoIXqHpRFGbcQS9/gsTJ2QBcYIrJF+bqbgH/7
-         FfZg==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Z42I6VdLgJQWCimw9jq3ML6062lMxaAz0l305lNu6lY=;
+        b=sf6rGnUno4L6TvnRk2gpBC24KcJtsUZzN6I4vcfDuOiZfZRQ+3UJG2NNvdA53QBRPT
+         Y7zMBoxCnnZUBdlUyuRF92JRQJdOBvmaEgu4/AR2JuoEEIDA1RhKdKl5f6iXmvl/kBQh
+         +xOva8WNjZAQnXo3BURvlZ6ZywZ1sQHPJnrDAnTaO0dB/x+g64ljQ3VvV4H0Ow0bdzX/
+         yQsANAdKTv8L011Wk0C1pDbSCLuFY8LqNjwjlcyAGtjBKNAYN+Xi2s2SPi1g+JEhBFOS
+         AjnRs3tpZv9Zri8bo/SARsW0OjnX9ePob5VARvUr1q0PQHDMII641v4VqjmyVxie5rtM
+         nPfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=KP0IkqliWF7IJ2Jb+iCy0BgntD4ovxiVj1cA0S86+bE=;
-        b=KzYVZWzCyvZAfTpAgHC6rkOf6vzgyXvWrhMIOfjaP65qQjfGVq54bR3VLCzl5YH4Ds
-         l6B9oGpvNiueZMSIT6GhEQWe2Qs6PaIRSRpU/h+dwAivvmV56i+fBkwRqkPzvJuWuBlw
-         fQqvvtCk/0uesloFkk7IaJOVWoM/0n6wX059a3gfdy6YWMzMViQcGxEjBNuRGg83cbDE
-         N9fgxRob6MNsoUBI8gnE+TI1m3RrXEIFeE8BzlhLzDaQohz5MKY3Cw/XntdKzTlnoEWR
-         x/ys6wOvo++NLtyk9iyG5aLhWRe9rSjdDF3vTpC+4cfNM37nsQJ6NdoCAe8BdpLZRU70
-         C5tQ==
-X-Gm-Message-State: AOAM5314g2ID5ghEAL5884qG7j7IbxnFExIPc9BWxnR+joSRUlTEVlGc
-        VKWJqjfsIfRJ6NnfA5eibtzrcjvDE90izQ==
-X-Google-Smtp-Source: ABdhPJyYeIRpvQHPGv8ChNTsbF516O98qijbseqvO1shEWzsx43Wj1PkPhc7ye5NJhGd4wHzf3ZvRA==
-X-Received: by 2002:ac8:7f89:0:b0:2f3:b83d:c4e9 with SMTP id z9-20020ac87f89000000b002f3b83dc4e9mr1638206qtj.673.1652388336810;
-        Thu, 12 May 2022 13:45:36 -0700 (PDT)
-Received: from prithvi.gajendra.net ([2603:3005:b04:8100:f692:bfff:fe8b:cf8e])
-        by smtp.gmail.com with ESMTPSA id s42-20020a05622a1aaa00b002f39b99f687sm402451qtc.33.2022.05.12.13.45.35
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Z42I6VdLgJQWCimw9jq3ML6062lMxaAz0l305lNu6lY=;
+        b=28GRxtabLuozkQBTFRHymR9TuwcTBLlGAo2AuXAFUpHTi82a7uVeFrFSOeAT8VYPqo
+         suovLG8RMliCuIwbMirkI0S9QncWgEGvbznp24bvjy3N9lLNiIErIa+/76xBE+p0Lfm1
+         9hoIB8sO/hS8eCTcjxdC65MTM/0ntYyAIRghHMZu1JRH4W1kljUjUTjuUso3LTsPPteY
+         2rp1dgGxaAgdBKrnCvsUUeCEW0RCGpafECkr9BevhgSLQFYIUBPfeFJue43IU0Yx3Dru
+         snL83IZWR3MY7e0GdvESp1Rr0ZNRYtwvu/ZUNPxZrMVgcB2S8GIKI0soDaQqEJ9E3Vcl
+         Un/w==
+X-Gm-Message-State: AOAM532iX1FHCSobSxDy0ViVncP4+363ktXBq4jHPcVCi5XlsymQWys2
+        MdJ/MfG3WMEUdqONcACTBr8GbA==
+X-Google-Smtp-Source: ABdhPJz9xsKhnwOtZsyp6CbgXOmfSkTHnZIHbC6HPulm4VT8eFiPZMXgDH6mwCOF1OeFg6Na0OCkHw==
+X-Received: by 2002:a17:902:e804:b0:15e:a5cf:676 with SMTP id u4-20020a170902e80400b0015ea5cf0676mr1411413plg.144.1652390845912;
+        Thu, 12 May 2022 14:27:25 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id c24-20020a170902c2d800b0015e8d4eb2ebsm304335pla.309.2022.05.12.14.27.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 May 2022 13:45:36 -0700 (PDT)
-From:   Dan Cross <cross@oxidecomputer.com>
-To:     kvm@vger.kernel.org
-Cc:     Dan Cross <cross@oxidecomputer.com>
-Subject: [PATCH] kvm-unit-tests: Build changes for illumos.
-Date:   Thu, 12 May 2022 20:45:00 +0000
-Message-Id: <20220512204459.2692060-1-cross@oxidecomputer.com>
-X-Mailer: git-send-email 2.36.1
+        Thu, 12 May 2022 14:27:25 -0700 (PDT)
+Date:   Thu, 12 May 2022 21:27:22 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Jim Mattson <jmattson@google.com>, x86@kernel.org,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH] KVM: x86: fix a typo in __try_cmpxchg_user that caused
+ cmpxchg to be not atomic
+Message-ID: <Yn17urxf7vprODed@google.com>
+References: <20220202004945.2540433-5-seanjc@google.com>
+ <20220512101420.306759-1-mlevitsk@redhat.com>
+ <87e16c11-d57b-92cd-c10b-21d855f475ef@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87e16c11-d57b-92cd-c10b-21d855f475ef@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We have begun using kvm-unit-tests to test Bhyve under
-illumos.  We started by cross-compiling the tests on Linux
-and transfering the binary artifacts to illumos machines,
-but it proved more convenient to build them directly on
-illumos.
+On Thu, May 12, 2022, Paolo Bonzini wrote:
+> On 5/12/22 12:14, Maxim Levitsky wrote:
+> > Yes, this is the root cause of the TDP mmu leak I was doing debug of in the last week.
+> > Non working cmpxchg on which TDP mmu relies makes it install two differnt shadow pages
+> > under same spte.
+> 
+> Awesome!  And queued, thanks.
 
-This change modifies the build infrastructure to allow
-building on illumos; I have also tested it on Linux.  The
-required changes were pretty minimal: the most invasive
-was switching from using the C compiler as a linker driver
-to simply invoking the linker directly in two places.
-This allows us to easily use gold instead of the Solaris
-linker.
+If you haven't done so already, can you add 
 
-Signed-off-by: Dan Cross <cross@oxidecomputer.com>
----
- configure           | 5 +++--
- x86/Makefile.common | 6 +++---
- 2 files changed, 6 insertions(+), 5 deletions(-)
+  Cc: stable@vger.kernel.org
 
-diff --git a/configure b/configure
-index 86c3095..7193811 100755
---- a/configure
-+++ b/configure
-@@ -15,6 +15,7 @@ objdump=objdump
- ar=ar
- addr2line=addr2line
- arch=$(uname -m | sed -e 's/i.86/i386/;s/arm64/aarch64/;s/arm.*/arm/;s/ppc64.*/ppc64/')
-+os=$(uname -s)
- host=$arch
- cross_prefix=
- endian=""
-@@ -317,9 +318,9 @@ EOF
-   rm -f lib-test.{o,S}
- fi
- 
--# require enhanced getopt
-+# require enhanced getopt everywhere except illumos
- getopt -T > /dev/null
--if [ $? -ne 4 ]; then
-+if [ $? -ne 4 ] && [ "$os" != "SunOS" ]; then
-     echo "Enhanced getopt is not available, add it to your PATH?"
-     exit 1
- fi
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index b903988..0a0f7b9 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -62,7 +62,7 @@ else
- .PRECIOUS: %.elf %.o
- 
- %.elf: %.o $(FLATLIBS) $(SRCDIR)/x86/flat.lds $(cstart.o)
--	$(CC) $(CFLAGS) -nostdlib -o $@ -Wl,-T,$(SRCDIR)/x86/flat.lds \
-+	$(LD) -T $(SRCDIR)/x86/flat.lds -nostdlib -o $@ \
- 		$(filter %.o, $^) $(FLATLIBS)
- 	@chmod a-x $@
- 
-@@ -98,8 +98,8 @@ test_cases: $(tests-common) $(tests)
- $(TEST_DIR)/%.o: CFLAGS += -std=gnu99 -ffreestanding -I $(SRCDIR)/lib -I $(SRCDIR)/lib/x86 -I lib
- 
- $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
--	$(CC) -m32 -nostdlib -o $@ -Wl,-m,elf_i386 \
--	      -Wl,-T,$(SRCDIR)/$(TEST_DIR)/realmode.lds $^
-+	$(LD) -m elf_i386 -nostdlib -o $@ \
-+	      -T $(SRCDIR)/$(TEST_DIR)/realmode.lds $^
- 
- $(TEST_DIR)/realmode.o: bits = $(if $(call cc-option,-m16,""),16,32)
- 
--- 
-2.36.1
-
+Also, given that we have concrete proof that not honoring atomic accesses can have
+dire consequences for the guest, what about adding a capability to turn the emul_write
+path into an emulation error?
