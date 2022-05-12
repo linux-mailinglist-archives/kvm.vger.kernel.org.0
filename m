@@ -2,104 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58EA6525422
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 19:51:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A664552541D
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 19:51:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357315AbiELRvX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 13:51:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53138 "EHLO
+        id S1357330AbiELRv0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 13:51:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357329AbiELRvB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 13:51:01 -0400
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A98CC1AF3A
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:50:59 -0700 (PDT)
-Received: by mail-io1-xd30.google.com with SMTP id i20so6240415ion.0
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:50:59 -0700 (PDT)
+        with ESMTP id S1357342AbiELRvD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 13:51:03 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00ED1186D8
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:51:01 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id w17-20020a17090a529100b001db302efed6so5547462pjh.4
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 10:51:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=dY1IAHPX3orLKxhoM3AAhhrVw5eY9f1RMzZRsDjtfNY=;
-        b=ErRS5OUJQ/C/vnqdC79lB42yI67+v0Xc6J+TbM9l4ENEPLivTv7C3YS/w2wHJoXiU5
-         cUrI1o4sOMTFAsTuIOt5xh4X5UUXgfMTZ/HE9zDF9wUzYKeaTrYWJnP+6KTJjrejByv0
-         Fcc1vAwixzCr6CkZ17cn5DjgUbZQTNp5NbJFc=
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=fNBBVy+Cxc1RMi9VEsz9pCMNiJoDsT/4/B0gBmZ9Iao=;
+        b=aXMWW7/HCY8ibQ+vQ0lMGfk12i2XCTThPLGxSFkgo8ViKNH3nkmwfZR66od8DZlGXF
+         Lx0xKUBmIzdJAAZBKTStHI2J1lEtcykxafxfWTVIzhg2NACSkMPaHOLsEY6eNa8kBhhC
+         8X01uZat4shaMo0rFqR2HqGsAbK75dlcuB7E7UiYniVYFffN6nQ6FU+XKoMEYaFT3ygQ
+         0vnLt1sdKeLdv4JeyggUv3maZLNvPc42uizGMfsyssWXb2fDKZWHA/llN+0uSjrJ+nV9
+         VDpUge0lqnCi78nc5H3HsJQkAUhdNi3+U7bVX0O7ur3DEHyowpp5hxcUXceuxgOboRYx
+         S0ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dY1IAHPX3orLKxhoM3AAhhrVw5eY9f1RMzZRsDjtfNY=;
-        b=DY2Ev1z5rVrolQijXKiIUkE40eZN85bIQom9NtlJAbPgJXWcNQim9EXIj9A+utDkcT
-         J5ikBCqSnGKGjf3Px5QIa4FLB+gAgRs/4wilNrFu7RM+qFX25eBTOeEzB28tcBFpWU5+
-         cDPnv4A81le/rRS1W+mBqEnQW5aq+w8cs429M/nKEQ1yrARynY+c7sFxgSeVLIVG77UA
-         n8VnaaukxjznTaJQURo4fG42wF91UOUSnvVyXLDlRNcIOT85Rr2+IUVvw5VfdMAmtbQU
-         tFkRGqNK/t5bKPNX/w5Cn5hYQWqYf9HsIf4fNV1yyl12BWXeoTTsrDQjUQ2Xg1KFlGAW
-         RRxg==
-X-Gm-Message-State: AOAM533MaZSKO8gwLkbfak0/lcahKT4btdeB48z5DzWh1g9GqTnDz3RG
-        oxhh1t16Rz/xYdIyvcN4x5EXyQ==
-X-Google-Smtp-Source: ABdhPJwEoXRvKQIN8vE2739qPEYGWAEmkTG5rQoLxtgYV8mD8Q1+9IvS2Cc/+n2TVfVyCI58o8abIw==
-X-Received: by 2002:a05:6602:54:b0:65b:15c3:5bb7 with SMTP id z20-20020a056602005400b0065b15c35bb7mr550921ioz.135.1652377858326;
-        Thu, 12 May 2022 10:50:58 -0700 (PDT)
-Received: from [192.168.1.128] ([38.15.45.1])
-        by smtp.gmail.com with ESMTPSA id b1-20020a02c981000000b0032b66cb59bfsm31276jap.179.2022.05.12.10.50.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 May 2022 10:50:57 -0700 (PDT)
-Subject: Re: [RFC V2 PATCH 6/8] selftests: kvm: Add KVM_HC_MAP_GPA_RANGE
- hypercall test
-To:     Vishal Annapurve <vannapurve@google.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, shauh@kernel.org, yang.zhong@intel.com,
-        drjones@redhat.com, ricarkol@google.com, aaronlewis@google.com,
-        wei.w.wang@intel.com, kirill.shutemov@linux.intel.com,
-        corbet@lwn.net, hughd@google.com, jlayton@kernel.org,
-        bfields@fieldses.org, akpm@linux-foundation.org,
-        chao.p.peng@linux.intel.com, yu.c.zhang@linux.intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com,
-        michael.roth@amd.com, qperret@google.com, steven.price@arm.com,
-        ak@linux.intel.com, david@redhat.com, luto@kernel.org,
-        vbabka@suse.cz, marcorr@google.com, erdemaktas@google.com,
-        pgonda@google.com, nikunj@amd.com, seanjc@google.com,
-        diviness@google.com, Shuah Khan <skhan@linuxfoundation.org>
-References: <20220511000811.384766-1-vannapurve@google.com>
- <20220511000811.384766-7-vannapurve@google.com>
-From:   Shuah Khan <skhan@linuxfoundation.org>
-Message-ID: <81c56e24-af33-bbc5-662e-2478699dcc81@linuxfoundation.org>
-Date:   Thu, 12 May 2022 11:50:56 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=fNBBVy+Cxc1RMi9VEsz9pCMNiJoDsT/4/B0gBmZ9Iao=;
+        b=QXzHFgKs2+rT1BlPHu1fn/ZJ43Tsr2tchqg5Sop5LIfFNdxl5ZU2/dmLYMiGOApWXw
+         qSxLiAKS1j+mQjT5u86jA91jYKXmMjdmGVIJa8eH7FFpkPl9IVd2zEBnqEaf2uVnd6Mw
+         wjrQT6XGfGuoQIX69JZJidILrIj/4GcN/mSmwpv92hUVac/y8PtSlb6KKuD6IeKlTsXL
+         Px3cU1kTUIud0wzvlBPSY8+z8/vNWYN68noMIt/LuFHeAycrrklEFKkbLDtda4tCvQxv
+         kJFXt1mBS6LvGisUx0m7zdLuP6So7T5ROz17gtRyWem+JyLfaPy/gYtnoFMW74GSW5BJ
+         EmpA==
+X-Gm-Message-State: AOAM530fxyhXash0jXhVrB7T/fuZjO3b3z1I4Q+25x0uDslPtekOxxza
+        VX+5/FuX+vzrDphOxtrtjqs=
+X-Google-Smtp-Source: ABdhPJxHzvDtaxGj2a+/AOqMRNdWD4bA+szSZvINcMPxmsyjCwgWd/qfA32pcDton1e/S9c5P2r5dw==
+X-Received: by 2002:a17:90b:502:b0:1d9:a907:d845 with SMTP id r2-20020a17090b050200b001d9a907d845mr713856pjz.162.1652377861345;
+        Thu, 12 May 2022 10:51:01 -0700 (PDT)
+Received: from localhost ([192.55.54.48])
+        by smtp.gmail.com with ESMTPSA id f8-20020aa78b08000000b0050dc7628202sm92778pfd.220.2022.05.12.10.51.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 May 2022 10:51:00 -0700 (PDT)
+Date:   Thu, 12 May 2022 10:50:59 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>, g@ls.amr.corp.intel.com
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        isaku.yamahata@intel.com, Gerd Hoffmann <kraxel@redhat.com>,
+        Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
+Subject: Re: [RFC PATCH v4 09/36] KVM: Introduce kvm_arch_pre_create_vcpu()
+Message-ID: <20220512175059.GF2789321@ls.amr.corp.intel.com>
+References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
+ <20220512031803.3315890-10-xiaoyao.li@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20220511000811.384766-7-vannapurve@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220512031803.3315890-10-xiaoyao.li@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/10/22 6:08 PM, Vishal Annapurve wrote:
-> Add test to exercise explicit memory conversion path using
-> KVM_HC_MAP_GPA_RANGE hypercall.
+On Thu, May 12, 2022 at 11:17:36AM +0800,
+Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+
+> Introduce kvm_arch_pre_create_vcpu(), to perform arch-dependent
+> work prior to create any vcpu. This is for i386 TDX because it needs
+> call TDX_INIT_VM before creating any vcpu.
+
+Because "11/36 i386/tdx: Initialize TDX before creating TD vcpus" uses
+kvm_arch_pre_create_vcpu() (and 10/36 doesn't use it), please move this patch
+right before 11/36. (swap 09/36 and 10/36).
+
+Thanks,
+
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+>  accel/kvm/kvm-all.c  | 12 ++++++++++++
+>  include/sysemu/kvm.h |  1 +
+>  2 files changed, 13 insertions(+)
+> 
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 32e177bd26b4..e6fa9d23207a 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -457,6 +457,11 @@ static int kvm_get_vcpu(KVMState *s, unsigned long vcpu_id)
+>      return kvm_vm_ioctl(s, KVM_CREATE_VCPU, (void *)vcpu_id);
+>  }
+>  
+> +int __attribute__ ((weak)) kvm_arch_pre_create_vcpu(CPUState *cpu)
+> +{
+> +    return 0;
+> +}
+> +
+>  int kvm_init_vcpu(CPUState *cpu, Error **errp)
+>  {
+>      KVMState *s = kvm_state;
+> @@ -465,6 +470,13 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
+>  
+>      trace_kvm_init_vcpu(cpu->cpu_index, kvm_arch_vcpu_id(cpu));
+>  
+> +    ret = kvm_arch_pre_create_vcpu(cpu);
+> +    if (ret < 0) {
+> +        error_setg_errno(errp, -ret,
+> +                         "kvm_init_vcpu: kvm_arch_pre_create_vcpu() failed");
+> +        goto err;
+> +    }
+> +
+>      ret = kvm_get_vcpu(s, kvm_arch_vcpu_id(cpu));
+>      if (ret < 0) {
+>          error_setg_errno(errp, -ret, "kvm_init_vcpu: kvm_get_vcpu failed (%lu)",
+> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> index a783c7886811..0e94031ab7c7 100644
+> --- a/include/sysemu/kvm.h
+> +++ b/include/sysemu/kvm.h
+> @@ -373,6 +373,7 @@ int kvm_arch_put_registers(CPUState *cpu, int level);
+>  
+>  int kvm_arch_init(MachineState *ms, KVMState *s);
+>  
+> +int kvm_arch_pre_create_vcpu(CPUState *cpu);
+>  int kvm_arch_init_vcpu(CPUState *cpu);
+>  int kvm_arch_destroy_vcpu(CPUState *cpu);
+>  
+> -- 
+> 2.27.0
+> 
 > 
 
-Add details on what this test does and sample output. patch 7/8
-in this series is a good example of what I am looking for.
-
-> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
-> ---
-
-Please see comments about coding style related comments on other
-patches in this series.
-
-thanks,
--- Shuah
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
