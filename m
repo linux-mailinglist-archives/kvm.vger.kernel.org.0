@@ -2,220 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D7C8152585F
-	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 01:36:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C0D85258CB
+	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 01:57:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359529AbiELXgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 19:36:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48346 "EHLO
+        id S1359651AbiELX5j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 19:57:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359530AbiELXgH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 19:36:07 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2055.outbound.protection.outlook.com [40.107.236.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DD641FCED
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 16:36:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=T4W+/9SLEvAec59RKH9dHJr6um7tnX9bJDTONJgGdWXNPyJbXx/Ijc6kAQ0om6ZRThFthnMGLvZ2ENvk0HzcmC6NUqpgQ9NM3inocNqH+bb6S93YpjfJ7lQGPjgtz27/om+a1yHv5nueOLKrFY5FK5dENH9paz9h30mV1/ywmCIJ9KTowcPozR8rqGVVYIjYvvF6Jh2SfbhcgwVeG+LT9AUPcFM8AfiOm1n3SGYz8GuPv77LC5rnPwsr6WMgBfFmVb+xzwg5ayzzli9iSGdiZcXpnVpgjhxzKukLiScaudb2TGS2qJlMcWdt+P0APeyV11sPwzQeESvPW06zHczDjg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3RZl+z0FC5pDrbNEzJUtj4NYwHBtPl/NxKbQhHs+mUQ=;
- b=HIeV8ipD73yxZzcDjgUgkjrLWfe3vxmG9AzIjLPzq+Se4ThTM6vhIrkGb8r25kV1HCpgr8baKYRjshBMkgXM4vMJTUtY6mXVxHI4LCymBM1cKF0p0CNqjTdhND2X6IAD+dFcK2km5xMldeaBmRglRLPz2tMt38ZuT2syGFj/n5e/DKxZ2BXo+gYQJvdK7MIuEEDMLi/wNT626HR8Cb8itjlQe8fzMuUzMZIg8TWteypFq1L9gppsNkih/2GDeHfcmjHzF8omBA28QevQYVgiF1jeA+4MRfbY7JqyYv5ziYbl7ajTig+M7V1N0iFIRnswQyol2R4LPYiBXQO14YurWA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3RZl+z0FC5pDrbNEzJUtj4NYwHBtPl/NxKbQhHs+mUQ=;
- b=r/EeaSAg7adGQvShxPOIsI+daFJdGKx0GrvHOBsHog5q4yrq37GPThfc/REC+PSEt+uqr8gDmSDMsqVXYKDQO60+yUFydxIEQYOu0q1Gxt5IrQRppbwX07rYDdNHnwiKlremLYp6ow2s6jCtCiu7mJtFervoA56n3icE7lh7vZpSLCRJXPE9hKn2QkqDHjDZ2mexEqlvqnWQ1Ficpjdp8etTWEns/yFJRq7DlSa5GUrHTTxLo7EWsUEgYF+qfwQvidUTFfZXlf/WEV4w/UUK8Vab3e7s8BCPh1J4CjHHTzWsFXXfX7XPhcAgUqIzuSa82ABaDyQv1F20O/lbvPsuNQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by CY4PR1201MB2549.namprd12.prod.outlook.com (2603:10b6:903:da::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5227.22; Thu, 12 May
- 2022 23:36:00 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2%5]) with mapi id 15.20.5250.013; Thu, 12 May 2022
- 23:36:00 +0000
-Date:   Thu, 12 May 2022 20:35:59 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Xiao Guangrong <guangrong.xiao@linux.intel.com>,
-        Jike Song <jike.song@intel.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 5/6] vfio: Simplify the life cycle of the group FD
-Message-ID: <20220512233559.GI1343366@nvidia.com>
-References: <0-v1-c1d14aae2e8f+2f4-vfio_group_locking_jgg@nvidia.com>
- <5-v1-c1d14aae2e8f+2f4-vfio_group_locking_jgg@nvidia.com>
- <20220510135959.20266cfd.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220510135959.20266cfd.alex.williamson@redhat.com>
-X-ClientProxiedBy: BL0PR02CA0112.namprd02.prod.outlook.com
- (2603:10b6:208:35::17) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S1350405AbiELX5h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 19:57:37 -0400
+Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4435A554AE
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 16:57:36 -0700 (PDT)
+Received: by mail-oi1-x231.google.com with SMTP id w123so8351624oiw.5
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 16:57:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=7qvuAI/LbHot+Z3zgvkne2FOb1LdGua9+c4HxvF2hBM=;
+        b=eFd/xCYa6a0vzCzsVHnwJRF3FcWjsKpaBwxGVr+x8Kljpbk1guwoVq/BIW1TmRrCTS
+         olJB7RCMwpzv8ljkm8YSQgiP/n9IIyVjyXUqfIJKB1MoZns6czGr/qBXwEt73KzEqZAJ
+         KD/QrHtZiEM8I/AS2WZAMjPXv2Dcz5MNOJMEe/CiJWMrdE1z0a4a7NBs1uB22beLr/I/
+         R5AylckCoPqjFPhax1zG3QtKqJkq8dj8xwYX0yf1e2fEmRLH63JG8f+PtAO7h30OEaxj
+         s6Li+r6vbJaqiPaJCOukutWCXWpU7q4b2zBp10r7kxFCneFhFHvMdnoaj0GqyXU3J3ol
+         igrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=7qvuAI/LbHot+Z3zgvkne2FOb1LdGua9+c4HxvF2hBM=;
+        b=gpECg61DvevZRwPwFHPKC7w4Evzx8stfRwYqd156zGK5sMKxcUzhefTy30d7ncsDeT
+         RPI/eNFwQycG4m3bCBk+1JcGLfSQTXdhFy4YDUteKv6B0AfYeLKBoKuhjIWHHKpFk8mo
+         NKWTFJWgJeh/zAcWe8umfFcqAh8eBcnZDxy40QIX0NO5ZsuQOsglz6DGt+pdt9LQakjy
+         9ivUlfM97ZTBrdsU03v/E/NpSu12olONe/zjguRFfQdZCHp/ApV2gJVRnIl8AusT2izY
+         WjHsG4g8BvUkjWTGPQF28k+ltFc1moNxoW1vuxgBCWD5/NtNzG66m/X2rw5UwH865+ci
+         9jEg==
+X-Gm-Message-State: AOAM531fQn+M+fCSV5Bu1kwkmIuAyfaStVNLSFWjvqJr6Jqvoe9ZDUqS
+        FFhGb7SsLu3v5idzYnRwWjt+CYxolALUE1IpKg8mQQ==
+X-Google-Smtp-Source: ABdhPJwx3bfbhZoV/hTg74ZJlzP3iMqS5eo2UO8VN2XkVLechBYYqd+yQx3tj+myeofa5RDIl9HFskNnjHJm3tnrPHw=
+X-Received: by 2002:a05:6808:c2:b0:325:eb71:7266 with SMTP id
+ t2-20020a05680800c200b00325eb717266mr6676460oic.269.1652399855370; Thu, 12
+ May 2022 16:57:35 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4f076809-620d-452f-c2bb-08da34702bfa
-X-MS-TrafficTypeDiagnostic: CY4PR1201MB2549:EE_
-X-Microsoft-Antispam-PRVS: <CY4PR1201MB254935D482B48E1269374E98C2CB9@CY4PR1201MB2549.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1SrupbRDUn6NJG2W5hrGNd4qVPDLb0Unt0os9acK64ZtwRWhrFX3pDMsle6HxzFhWXl0AKfJx2IfmoCTc5UpXid4sZBGe7daeSpc8d+lx6sQxvPrBwETw9r5SW3QrFK9dA80C7iKiDp/mrGVdYARDfR/jKVrom3zTZr8GMB/HxaPushKElvnbAyz1UlvQjYYCWEaezJdk1hhzONVveHgN8KOxb0YMEXevrYFcfjxcnoUm36x+kXAa/cJzlAjrLV7PD0ath+apyczyMhxAssfnVyQcwjU+mPKbjUgS/pSzCVBJDa9EjbBiaNqliCSJjTDO706+APMeCYI+JYKPbe2QrEnXjOsQ69guEsw+jBKVZQEPw6Y8mgLcWpNoiR3r2QVIjADJYrMNoVOJwcPNzSppsLKiU7eoaI01ArKC0RdmKsEpYCMqvBJBn7keIccHqF8XtdA4n9N/AgzH7n7Wmj73ETC2J0Oj9/tIOLGeVIIEC910fOL+8OOTo80pmbl1l9XiQWGlDqAj82jH/1l9PN2o2KfyCfjv31dfym3WcqzArD+JQCyf4h0Q0gfaGe3/LT2Na1DoPrsWsvDWwUA08dfrD0dgyDeiygQqqz7kA34SfVnLGMAqLnULfx1jde0BzCWQZkK2PXsOZSdcI4xz7t+2Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6512007)(66476007)(26005)(66556008)(316002)(66946007)(8676002)(5660300002)(8936002)(2906002)(4326008)(38100700002)(1076003)(2616005)(86362001)(186003)(6506007)(83380400001)(54906003)(6916009)(508600001)(36756003)(33656002)(6486002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tz+efI3nO3gMKy4cP8uhCR8J8r0BvNMPscH6YpvdogsBnxyzvHgPFJMNKgEt?=
- =?us-ascii?Q?oIEyidXgJNM+zp8HOQWM3f0jEtzcpbI9HGDvp6FdhEu/Ee04r0+OV3Eom3Xo?=
- =?us-ascii?Q?mACbD9dWSOYJ3LAWt6KryvHHqGcWLZKsiRFVwRXuvQH8rys0068g55kZ2lU/?=
- =?us-ascii?Q?SA5yltfkhA7cqNlXeOxaeH7nTXygC6EvA6FStX+d9we87h/PaLEYBQlU2R1x?=
- =?us-ascii?Q?OQ/HfWFycf9QVKnL6lRmLU2NuTFm/BOT3FW87miG9kn2xoQHgHeeViqfJkl9?=
- =?us-ascii?Q?//tWk6Q+kVs+EGPIv7UWHDySnoQynRQCdOQsuULYy0V5HZYTI2YkpMuCRKRi?=
- =?us-ascii?Q?Spq9e01Ep6xSaZ96LuK9+kKlhIOoffowuJVGXKFuDM7us3x8eHRW5L/lUJVy?=
- =?us-ascii?Q?3itGECqZ9ZLYQym5s3t5zXXtCpswPBgXUXlPaFq0INRBR5rFMvgCpodCghyY?=
- =?us-ascii?Q?cCBDpnwYuoiqxhKKmlYnsuPtrjTzGB7jRXACvWcBxDbrpR/l+sdvrBzk9tOp?=
- =?us-ascii?Q?kF0OeoYGXuXDNN1B86AQXEBFXwDSLX474kIutuOHAIEjIAjwmSrX1xB0dS+Z?=
- =?us-ascii?Q?WGWhrZY01JfsJRJ/XPEN3qSKqQ1xY1UHHTPO9xN+UoGOE4t/U9UIP2FyNawM?=
- =?us-ascii?Q?fenWfyckIkkJJtJqIRJfzjPs6xmF8Z0XIQ97RmUmBQAFRpfw/3vghN0ESE01?=
- =?us-ascii?Q?q9eYSM7CBQ8f4l9lXMvNZPKOIW9zyrwsoF3MiNwPUHcbiK7puRY/7bUz+f9R?=
- =?us-ascii?Q?DDzHt1b3W6iJjW+7JmkRY7tq1FQg/oBo16/XYCHUhwjW/tcteJDsx7EMX2z9?=
- =?us-ascii?Q?GePC0w6LFB66TDbgdFjrbRyamHqub8f5QTF+gPEG9zqBPH6C/ZTyr7xAA7k9?=
- =?us-ascii?Q?ykXE4NJT2e7h1NzAaMBAR7GZT8jau1WidsTb+lp5qiqgTHdkAGp2uxk420AE?=
- =?us-ascii?Q?ey1fJkifnH6NLmBKALvQ8K2uy8rS3fMK4jzktEJn4ACPSk954hGbXOPe1lej?=
- =?us-ascii?Q?m5WBwJQKhlk/+FiY7BYuvB4wsHo0utGmseDQ+b/pRMXLZdiNnYJVXFqwvzkM?=
- =?us-ascii?Q?bdVGUnC4NphDI+uKawCR60Zg16kJHPMd/luyncCXC5WnoDpqdiOTkZLWyfEe?=
- =?us-ascii?Q?n/7QewhYT38Y3e971X4YtCX8D6AcO1yt82lbIPuPWoJNxCxDU0hjzG+K3NK9?=
- =?us-ascii?Q?D9tdJ/GaiADak5TbuRA98crrDolk3cBWz3MG3PdMD81OqdkkJ4iBYKObUqlD?=
- =?us-ascii?Q?I/JbHskbboHirdqHYavUcXmOrDQLmBmkjGhzDzWLCzZX7cygX/jN+z7+RJHx?=
- =?us-ascii?Q?rEaNU2wwdzrUuUa/+BI43v+5GWzv28M1L2ADLx5lwNX4Xh9gjisddZT7adld?=
- =?us-ascii?Q?HNQvsVJv/QKje+eVNxNkUJSIdDOrmcp1gqi2L/0RxEKYWNJn/fDM4QWCmp2d?=
- =?us-ascii?Q?hqOkjJDxQjjxZ7wfUwzCzxS8qnr6aZ8i1evCwParwDdLnQw/R4D2dM6NWCwm?=
- =?us-ascii?Q?UhxRyHjKmz5uzC/7BJ95z3ep0W6pEiBjOuiYBTDz+Cnqlk7GBJKwKQIlKAPI?=
- =?us-ascii?Q?A0Uu50ldU4Qi0vSo8OhJTHQ0jK58OvY2KW1dVvSJhynELcj9NaugvbKTxDlP?=
- =?us-ascii?Q?VB5mXafgvGy7sp6q2D0xruowMpBVvEMMGWTGIeoZmYewua0+cXGJfYIKfxuA?=
- =?us-ascii?Q?FHl2t6caDRJhN3t0y1hy5Y2veJYzNl91+aYWSyzTeF8sevQFrUvN1qB+VRYN?=
- =?us-ascii?Q?JEoHWMXEVQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4f076809-620d-452f-c2bb-08da34702bfa
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2022 23:36:00.6275
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vby5FWEIFvlpGyAxauAM8j6FiJkxEyzHzn3Roaq2/WXzXdWWgKbbaa6zt1S9pMY1
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1201MB2549
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+References: <20220512184514.15742-1-jon@nutanix.com> <Yn1fjAqFoszWz500@google.com>
+ <Yn1hdHgMVuni/GEx@google.com> <07BEC8B1-469C-4E36-AE92-90BFDF93B2C4@nutanix.com>
+ <Yn1o9ZfsQutXXdQS@google.com> <CALMp9eRQv6owjfyf+UO=96Q1dkeSrJWy0i4O-=RPSaQwz0bjTQ@mail.gmail.com>
+ <C39CD5E4-3705-4D1A-A67D-43CBB7D1950B@nutanix.com>
+In-Reply-To: <C39CD5E4-3705-4D1A-A67D-43CBB7D1950B@nutanix.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 12 May 2022 16:57:24 -0700
+Message-ID: <CALMp9eRXmWvrQ1i0V3G738ndZOZ4YezQ=BqXe-BF2b4GNo1m3Q@mail.gmail.com>
+Subject: Re: [PATCH v4] x86/speculation, KVM: remove IBPB on vCPU load
+To:     Jon Kohler <jon@nutanix.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        Kees Cook <keescook@chromium.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ashok Raj <ashok.raj@intel.com>,
+        KarimAllah Ahmed <karahmed@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "kvm @ vger . kernel . org" <kvm@vger.kernel.org>,
+        Waiman Long <longman@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 10, 2022 at 01:59:59PM -0600, Alex Williamson wrote:
-> On Thu,  5 May 2022 21:25:05 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > Once userspace opens a group FD it is prevented from opening another
-> > instance of that same group FD until all the prior group FDs and users of
-> > the container are done.
-> > 
-> > The first is done trivially by checking the group->owned during group FD
-> > open.
-> > 
-> > However, things get a little weird if userspace creates a device FD and
-> > then closes the group FD. The group FD still cannot be re-opened, but this
-> > time it is because the group->container is still set and container_users
-> > is elevated by the device FD.
-> > 
-> > Due to this mismatched lifecycle we have the
-> > vfio_group_try_dissolve_container() which tries to auto-free a container
-> > after the group FD is closed but the device FD remains open.
-> > 
-> > Instead have the device FD hold onto a reference to the single group
-> > FD. This directly prevents vfio_group_fops_release() from being called
-> > when any device FD exists and makes the lifecycle model more
-> > understandable.
-> > 
-> > vfio_group_try_dissolve_container() is removed as the only place a
-> > container is auto-deleted is during vfio_group_fops_release(). At this
-> > point the container_users is either 1 or 0 since all device FDs must be
-> > closed.
-> > 
-> > Change group->owner to group->singleton_filep which points to the single
-> > struct file * that is open for the group. If the group->singleton_filep is
-> > NULL then group->container == NULL.
-> > 
-> > If all device FDs have closed then the group's notifier list must be
-> > empty.
-> > 
-> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> >  drivers/vfio/vfio.c | 49 +++++++++++++++++++--------------------------
-> >  1 file changed, 21 insertions(+), 28 deletions(-)
-> > 
-> > diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> > index 63f7fa872eae60..94ab415190011d 100644
-> > +++ b/drivers/vfio/vfio.c
-> > @@ -73,12 +73,12 @@ struct vfio_group {
-> >  	struct mutex			device_lock;
-> >  	struct list_head		vfio_next;
-> >  	struct list_head		container_next;
-> > -	bool				opened;
-> >  	wait_queue_head_t		container_q;
-> >  	enum vfio_group_type		type;
-> >  	unsigned int			dev_counter;
-> >  	struct rw_semaphore		group_rwsem;
-> >  	struct kvm			*kvm;
-> > +	struct file			*singleton_file;
-> 
-> I'm not really a fan of this name, if we have a single struct file
-> pointer on the group, it's necessarily singleton.  Maybe just
-> "opened_file"?
+On Thu, May 12, 2022 at 1:34 PM Jon Kohler <jon@nutanix.com> wrote:
+>
+>
+>
+> > On May 12, 2022, at 4:27 PM, Jim Mattson <jmattson@google.com> wrote:
+> >
+> > On Thu, May 12, 2022 at 1:07 PM Sean Christopherson <seanjc@google.com>=
+ wrote:
+> >>
+> >> On Thu, May 12, 2022, Jon Kohler wrote:
+> >>>
+> >>>
+> >>>> On May 12, 2022, at 3:35 PM, Sean Christopherson <seanjc@google.com>=
+ wrote:
+> >>>>
+> >>>> On Thu, May 12, 2022, Sean Christopherson wrote:
+> >>>>> On Thu, May 12, 2022, Jon Kohler wrote:
+> >>>>>> Remove IBPB that is done on KVM vCPU load, as the guest-to-guest
+> >>>>>> attack surface is already covered by switch_mm_irqs_off() ->
+> >>>>>> cond_mitigation().
+> >>>>>>
+> >>>>>> The original commit 15d45071523d ("KVM/x86: Add IBPB support") was=
+ simply
+> >>>>>> wrong in its guest-to-guest design intention. There are three scen=
+arios
+> >>>>>> at play here:
+> >>>>>
+> >>>>> Jim pointed offline that there's a case we didn't consider.  When s=
+witching between
+> >>>>> vCPUs in the same VM, an IBPB may be warranted as the tasks in the =
+VM may be in
+> >>>>> different security domains.  E.g. the guest will not get a notifica=
+tion that vCPU0 is
+> >>>>> being swapped out for vCPU1 on a single pCPU.
+> >>>>>
+> >>>>> So, sadly, after all that, I think the IBPB needs to stay.  But the=
+ documentation
+> >>>>> most definitely needs to be updated.
+> >>>>>
+> >>>>> A per-VM capability to skip the IBPB may be warranted, e.g. for con=
+tainer-like
+> >>>>> use cases where a single VM is running a single workload.
+> >>>>
+> >>>> Ah, actually, the IBPB can be skipped if the vCPUs have different mm=
+_structs,
+> >>>> because then the IBPB is fully redundant with respect to any IBPB pe=
+rformed by
+> >>>> switch_mm_irqs_off().  Hrm, though it might need a KVM or per-VM kno=
+b, e.g. just
+> >>>> because the VMM doesn't want IBPB doesn't mean the guest doesn't wan=
+t IBPB.
+> >>>>
+> >>>> That would also sidestep the largely theoretical question of whether=
+ vCPUs from
+> >>>> different VMs but the same address space are in the same security do=
+main.  It doesn't
+> >>>> matter, because even if they are in the same domain, KVM still needs=
+ to do IBPB.
+> >>>
+> >>> So should we go back to the earlier approach where we have it be only
+> >>> IBPB on always_ibpb? Or what?
+> >>>
+> >>> At minimum, we need to fix the unilateral-ness of all of this :) sinc=
+e we=E2=80=99re
+> >>> IBPB=E2=80=99ing even when the user did not explicitly tell us to.
+> >>
+> >> I think we need separate controls for the guest.  E.g. if the userspac=
+e VMM is
+> >> sufficiently hardened then it can run without "do IBPB" flag, but that=
+ doesn't
+> >> mean that the entire guest it's running is sufficiently hardened.
+> >>
+> >>> That said, since I just re-read the documentation today, it does spec=
+ifically
+> >>> suggest that if the guest wants to protect *itself* it should turn on=
+ IBPB or
+> >>> STIBP (or other mitigations galore), so I think we end up having to t=
+hink
+> >>> about what our =E2=80=9Ccontract=E2=80=9D is with users who host thei=
+r workloads on
+> >>> KVM - are they expecting us to protect them in any/all cases?
+> >>>
+> >>> Said another way, the internal guest areas of concern aren=E2=80=99t =
+something
+> >>> the kernel would always be able to A) identify far in advance and B)
+> >>> always solve on the users behalf. There is an argument to be made
+> >>> that the guest needs to deal with its own house, yea?
+> >>
+> >> The issue is that the guest won't get a notification if vCPU0 is repla=
+ced with
+> >> vCPU1 on the same physical CPU, thus the guest doesn't get an opportun=
+ity to emit
+> >> IBPB.  Since the host doesn't know whether or not the guest wants )IBP=
+B, unless the
+> >> owner of the host is also the owner of the guest workload, the safe ap=
+proach is to
+> >> assume the guest is vulnerable.
+> >
+> > Exactly. And if the guest has used taskset as its mitigation strategy,
+> > how is the host to know?
+>
+> Yea thats fair enough. I posed a solution on Sean=E2=80=99s response just=
+ as this email
+> came in, would love to know your thoughts (keying off MSR bitmap).
+>
 
-Sure
-
-> > @@ -1315,10 +1304,14 @@ static int vfio_group_fops_release(struct inode *inode, struct file *filep)
-> >  
-> >  	filep->private_data = NULL;
-> >  
-> > -	vfio_group_try_dissolve_container(group);
-> > -
-> >  	down_write(&group->group_rwsem);
-> > -	group->opened = false;
-> > +	/* All device FDs must be released before the group fd releases. */
-> 
-> This sounds more like a user directive as it's phrased, maybe something
-> like:
-> 
-> 	/*
-> 	 * Device FDs hold a group file reference, therefore the group
-> 	 * release is only called when there are no open devices.
-> 	 */
-
-OK
-
-What do you want to do with this series?
-
-As-posted it requires the iommu series, and Joerg has vanished again
-so I don't know what will happen there.
-
-However, it doesn't require it, there are just some textual conflicts.
-
-It does need the KVM series though, which I expect we will just go
-ahead with unacked. Oh well.
-
-Do you want to still try to get it in, or just give up for this cycle?
-If yes, which base should I use :)
-
-Thanks,
-Jason
+I don't believe this works. The IBPBs in cond_mitigation (static in
+arch/x86/mm/tlb.c) won't be triggered if the guest has given its
+sensitive tasks exclusive use of their cores. And, if performance is a
+concern, that is exactly what someone would do.
