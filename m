@@ -2,220 +2,298 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D8C9B5244D6
-	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 07:23:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04ACF52460F
+	for <lists+kvm@lfdr.de>; Thu, 12 May 2022 08:44:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349800AbiELFX2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 01:23:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42982 "EHLO
+        id S1350465AbiELGo0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 02:44:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238423AbiELFX1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 01:23:27 -0400
-Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 037B166AF4;
-        Wed, 11 May 2022 22:23:24 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mail.sberdevices.ru (Postfix) with ESMTP id 1DB655FD06;
-        Thu, 12 May 2022 08:23:22 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1652333002;
-        bh=PmEc4Pwi+Le/+bdbdUbiEIApLyKor2XoQjIS3kLu5ng=;
-        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
-        b=hFHdhWAaQIf7R+kXW9+l9b9fFJkMqZoOSu9F8GRdQ2ihhhapKFdIK18nxtpMDzAua
-         scoiixfteCuiuUSOHUfvDXeFpzvFn8kqbz+MtcAcuH6JTfkd0XzYzPiFi5pGX+D4CC
-         B0H8OI923CoUL+z1yUOqCEQey2Xl60JC0Yb743bKNnsRIIkko4wJ43dZseaUPjzh/o
-         ve6B1BQCXpoOu1w/CaIE0130yYaBeEE1rDM4pde303xisYFYPY3tFLZsMNNlKo5oh7
-         9zwvOY1WwsBx64qYZKeKhlE/d2Srnngn/R95/jWesIQ/RABtMt/Cp7wCI39tCF3hOK
-         067hqTyuldu6Q==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mail.sberdevices.ru (Postfix) with ESMTP;
-        Thu, 12 May 2022 08:23:21 +0300 (MSK)
-From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Jakub Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>,
-        Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
-        Krasnov Arseniy <oxffffaa@gmail.com>
-Subject: [RFC PATCH v1 8/8] test/vsock: vsock rx zerocopy utility
-Thread-Topic: [RFC PATCH v1 8/8] test/vsock: vsock rx zerocopy utility
-Thread-Index: AQHYZcBLyUYWHYMAWk+cQqC3/CFMhg==
-Date:   Thu, 12 May 2022 05:22:38 +0000
-Message-ID: <e63b9d7f-e43b-cbef-7594-3e389a60906e@sberdevices.ru>
-In-Reply-To: <7cdcb1e1-7c97-c054-19cf-5caeacae981d@sberdevices.ru>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.16.1.12]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F8171740D3B85140A9857D6CF6129316@sberdevices.ru>
-Content-Transfer-Encoding: base64
+        with ESMTP id S240920AbiELGoZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 02:44:25 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6712F1EEE16;
+        Wed, 11 May 2022 23:44:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652337864; x=1683873864;
+  h=message-id:date:mime-version:subject:to:references:from:
+   in-reply-to:content-transfer-encoding;
+  bh=kKwgAreJSdfHAkuA2uaxBda68QBsFTbWvbSU3ueTaFY=;
+  b=B8EzTfuqeKEzBCxVOr/RhpQleOEBsaEW46fTJ29qZBAnXYsPkK8JvI3s
+   2cUCZVpsCWoHI3Vq0uGcOeRTiYV0Pep4C+88KOIPgX5+qnAAjgiId+K71
+   f8ZIxU44JZcINWQIJwNU8wapMPc7jjzLY3sqxB3E80/dPaiGI53i0aXQF
+   JwQ9DN6IeTQfqUscEmPZFMAghyCYrg0BfVavjO4bZ95FcrHZa4E/RCEEQ
+   e8FDmZ0HLbJx8u4eFnhy/dsd6WXOQQz3NMU1VvrrMLuLshnWwr84fXGao
+   JyahyX7deDRh2MnCpO8MCi+4Kj6adt9ggXnL7+/MCchANkaYAxmo8IvMj
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10344"; a="257457140"
+X-IronPort-AV: E=Sophos;i="5.91,218,1647327600"; 
+   d="scan'208";a="257457140"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2022 23:44:23 -0700
+X-IronPort-AV: E=Sophos;i="5.91,218,1647327600"; 
+   d="scan'208";a="594523203"
+Received: from yangweij-mobl.ccr.corp.intel.com (HELO [10.255.28.40]) ([10.255.28.40])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2022 23:44:20 -0700
+Message-ID: <d2e55a12-02d8-8c7c-24de-f049c6e0e445@intel.com>
+Date:   Thu, 12 May 2022 14:44:10 +0800
 MIME-Version: 1.0
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/05/12 02:55:00 #19424207
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH v11 14/16] KVM: x86/vmx: Flip Arch LBREn bit on guest
+ state change
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "kan.liang@linux.intel.com" <kan.liang@linux.intel.com>,
+        "like.xu.linux@gmail.com" <like.xu.linux@gmail.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20220506033305.5135-1-weijiang.yang@intel.com>
+ <20220506033305.5135-15-weijiang.yang@intel.com>
+ <9f19a5eb-3eb0-58a2-e4ee-612f3298ba82@redhat.com>
+From:   "Yang, Weijiang" <weijiang.yang@intel.com>
+In-Reply-To: <9f19a5eb-3eb0-58a2-e4ee-612f3298ba82@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-VGhpcyBhZGRzIHNpbXBsZSB1dGlsIGZvciB6ZXJvY29weSBiZW5jaG1hcmtpbmcuDQoNClNpZ25l
-ZC1vZmYtYnk6IEFyc2VuaXkgS3Jhc25vdiA8QVZLcmFzbm92QHNiZXJkZXZpY2VzLnJ1Pg0KLS0t
-DQogdG9vbHMvdGVzdGluZy92c29jay9NYWtlZmlsZSAgICAgIHwgICAxICsNCiB0b29scy90ZXN0
-aW5nL3Zzb2NrL3J4X3plcm9jb3B5LmMgfCAzNTYgKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrDQogMiBmaWxlcyBjaGFuZ2VkLCAzNTcgaW5zZXJ0aW9ucygrKQ0KIGNyZWF0ZSBtb2RlIDEw
-MDY0NCB0b29scy90ZXN0aW5nL3Zzb2NrL3J4X3plcm9jb3B5LmMNCg0KZGlmZiAtLWdpdCBhL3Rv
-b2xzL3Rlc3RpbmcvdnNvY2svTWFrZWZpbGUgYi90b29scy90ZXN0aW5nL3Zzb2NrL01ha2VmaWxl
-DQppbmRleCBmODI5M2M2OTEwYzkuLjJjYjU4MjBjYTJmMyAxMDA2NDQNCi0tLSBhL3Rvb2xzL3Rl
-c3RpbmcvdnNvY2svTWFrZWZpbGUNCisrKyBiL3Rvb2xzL3Rlc3RpbmcvdnNvY2svTWFrZWZpbGUN
-CkBAIC0zLDYgKzMsNyBAQCBhbGw6IHRlc3QNCiB0ZXN0OiB2c29ja190ZXN0IHZzb2NrX2RpYWdf
-dGVzdA0KIHZzb2NrX3Rlc3Q6IHZzb2NrX3Rlc3QubyB0aW1lb3V0Lm8gY29udHJvbC5vIHV0aWwu
-bw0KIHZzb2NrX2RpYWdfdGVzdDogdnNvY2tfZGlhZ190ZXN0Lm8gdGltZW91dC5vIGNvbnRyb2wu
-byB1dGlsLm8NCityeF96ZXJvY29weTogcnhfemVyb2NvcHkubyB0aW1lb3V0Lm8gY29udHJvbC5v
-IHV0aWwubw0KIA0KIENGTEFHUyArPSAtZyAtTzIgLVdlcnJvciAtV2FsbCAtSS4gLUkuLi8uLi9p
-bmNsdWRlIC1JLi4vLi4vLi4vdXNyL2luY2x1ZGUgLVduby1wb2ludGVyLXNpZ24gLWZuby1zdHJp
-Y3Qtb3ZlcmZsb3cgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1jb21tb24gLU1NRCAtVV9GT1JU
-SUZZX1NPVVJDRSAtRF9HTlVfU09VUkNFDQogLlBIT05ZOiBhbGwgdGVzdCBjbGVhbg0KZGlmZiAt
-LWdpdCBhL3Rvb2xzL3Rlc3RpbmcvdnNvY2svcnhfemVyb2NvcHkuYyBiL3Rvb2xzL3Rlc3Rpbmcv
-dnNvY2svcnhfemVyb2NvcHkuYw0KbmV3IGZpbGUgbW9kZSAxMDA2NDQNCmluZGV4IDAwMDAwMDAw
-MDAwMC4uNGRiMWE3ZjNhMWFmDQotLS0gL2Rldi9udWxsDQorKysgYi90b29scy90ZXN0aW5nL3Zz
-b2NrL3J4X3plcm9jb3B5LmMNCkBAIC0wLDAgKzEsMzU2IEBADQorLy8gU1BEWC1MaWNlbnNlLUlk
-ZW50aWZpZXI6IEdQTC0yLjAtb25seQ0KKy8qDQorICogcnhfemVyb2NvcHkgLSBiZW5jaG1hcmsg
-dXRpbGl0eSBmb3IgemVyb2NvcHkNCisgKiByZWNlaXZlLg0KKyAqDQorICogQ29weXJpZ2h0IChD
-KSAyMDIyIFNiZXJEZXZpY2VzLg0KKyAqDQorICogQXV0aG9yOiBBcnNlbml5IEtyYXNub3YgPEFW
-S3Jhc25vdkBzYmVyZGV2aWNlcy5ydT4NCisgKi8NCisjaW5jbHVkZSA8Z2V0b3B0Lmg+DQorI2lu
-Y2x1ZGUgPHN0ZGlvLmg+DQorI2luY2x1ZGUgPHN0ZGxpYi5oPg0KKyNpbmNsdWRlIDxzdGRib29s
-Lmg+DQorI2luY2x1ZGUgPHN0cmluZy5oPg0KKyNpbmNsdWRlIDxlcnJuby5oPg0KKyNpbmNsdWRl
-IDx1bmlzdGQuaD4NCisjaW5jbHVkZSA8dGltZS5oPg0KKyNpbmNsdWRlIDxzeXMvbW1hbi5oPg0K
-KyNpbmNsdWRlIDxzdGRpbnQuaD4NCisjaW5jbHVkZSA8cG9sbC5oPg0KKyNpbmNsdWRlIDx1YXBp
-L2xpbnV4L3ZpcnRpb192c29jay5oPg0KKyNpbmNsdWRlIDx1YXBpL2xpbnV4L3ZtX3NvY2tldHMu
-aD4NCisNCisjaW5jbHVkZSAidXRpbC5oIg0KKw0KKyNkZWZpbmUgUEFHRV9TSVpFCQk0MDk2DQor
-DQorI2RlZmluZSBERUZBVUxUX1RYX1NJWkUJCTEyOA0KKyNkZWZpbmUgREVGQVVMVF9SWF9TSVpF
-CQkxMjgNCisjZGVmaW5lIERFRkFVTFRfUE9SVAkJMTIzNA0KKw0KK3N0YXRpYyBpbnQgY2xpZW50
-X21vZGUgPSAxOw0KK3N0YXRpYyBpbnQgcGVlcl9jaWQgPSAtMTsNCitzdGF0aWMgaW50IHBvcnQg
-PSBERUZBVUxUX1BPUlQ7DQorc3RhdGljIHVuc2lnbmVkIGxvbmcgdHhfYnVmX3NpemU7DQorc3Rh
-dGljIHVuc2lnbmVkIGxvbmcgcnhfYnVmX3NpemU7DQorc3RhdGljIHVuc2lnbmVkIGxvbmcgbWJf
-dG9fc2VuZCA9IDQwOw0KKw0KK3N0YXRpYyB0aW1lX3QgY3VycmVudF9uc2VjKHZvaWQpDQorew0K
-KwlzdHJ1Y3QgdGltZXNwZWMgdHM7DQorDQorCWlmIChjbG9ja19nZXR0aW1lKENMT0NLX1JFQUxU
-SU1FLCAmdHMpKSB7DQorCQlwZXJyb3IoImNsb2NrX2dldHRpbWUiKTsNCisJCWV4aXQoRVhJVF9G
-QUlMVVJFKTsNCisJfQ0KKw0KKwlyZXR1cm4gKHRzLnR2X3NlYyAqIDEwMDAwMDAwMDBVTEwpICsg
-dHMudHZfbnNlYzsNCit9DQorDQorLyogU2VydmVyIGFjY2VwdHMgY29ubmVjdGlvbiBhbmQgKi8N
-CitzdGF0aWMgdm9pZCBydW5fc2VydmVyKHZvaWQpDQorew0KKwlpbnQgZmQ7DQorCWNoYXIgKmRh
-dGE7DQorCWludCBjbGllbnRfZmQ7DQorCXVuaW9uIHsNCisJCXN0cnVjdCBzb2NrYWRkciBzYTsN
-CisJCXN0cnVjdCBzb2NrYWRkcl92bSBzdm07DQorCX0gYWRkciA9IHsNCisJCS5zdm0gPSB7DQor
-CQkJLnN2bV9mYW1pbHkgPSBBRl9WU09DSywNCisJCQkuc3ZtX3BvcnQgPSBwb3J0LA0KKwkJCS5z
-dm1fY2lkID0gVk1BRERSX0NJRF9BTlksDQorCQl9LA0KKwl9Ow0KKwl1bmlvbiB7DQorCQlzdHJ1
-Y3Qgc29ja2FkZHIgc2E7DQorCQlzdHJ1Y3Qgc29ja2FkZHJfdm0gc3ZtOw0KKwl9IGNsaWVudGFk
-ZHI7DQorDQorCXNvY2tsZW5fdCBjbGllbnRhZGRyX2xlbiA9IHNpemVvZihjbGllbnRhZGRyLnN2
-bSk7DQorCXRpbWVfdCB0eF9iZWdpbl9uczsNCisJc3NpemVfdCB0b3RhbF9zZW5kID0gMDsNCisJ
-dW5zaWduZWQgbG9uZyBzdW07DQorDQorCWZwcmludGYoc3RkZXJyLCAiUnVubmluZyBzZXJ2ZXIs
-IGxpc3RlbiAlaSwgbWIgJWx1IHR4IGJ1ZiAlbHVcbiIsDQorCQkJcG9ydCwgbWJfdG9fc2VuZCwg
-dHhfYnVmX3NpemUpOw0KKw0KKwlmZCA9IHNvY2tldChBRl9WU09DSywgU09DS19TVFJFQU0sIDAp
-Ow0KKw0KKwlpZiAoZmQgPCAwKSB7DQorCQlwZXJyb3IoInNvY2tldCIpOw0KKwkJZXhpdChFWElU
-X0ZBSUxVUkUpOw0KKwl9DQorDQorCWlmIChiaW5kKGZkLCAmYWRkci5zYSwgc2l6ZW9mKGFkZHIu
-c3ZtKSkgPCAwKSB7DQorCQlwZXJyb3IoImJpbmQiKTsNCisJCWV4aXQoRVhJVF9GQUlMVVJFKTsN
-CisJfQ0KKw0KKwlpZiAobGlzdGVuKGZkLCAxKSA8IDApIHsNCisJCXBlcnJvcigibGlzdGVuIik7
-DQorCQlleGl0KEVYSVRfRkFJTFVSRSk7DQorCX0NCisNCisJY2xpZW50X2ZkID0gYWNjZXB0KGZk
-LCAmY2xpZW50YWRkci5zYSwgJmNsaWVudGFkZHJfbGVuKTsNCisNCisJaWYgKGNsaWVudF9mZCA8
-IDApIHsNCisJCXBlcnJvcigiYWNjZXB0Iik7DQorCQlleGl0KEVYSVRfRkFJTFVSRSk7DQorCX0N
-CisNCisJZGF0YSA9IG1hbGxvYyh0eF9idWZfc2l6ZSk7DQorDQorCWlmIChkYXRhID09IE5VTEwp
-IHsNCisJCWZwcmludGYoc3RkZXJyLCAibWFsbG9jIGZhaWxlZFxuIik7DQorCQlleGl0KEVYSVRf
-RkFJTFVSRSk7DQorCX0NCisNCisJc3VtID0gMDsNCisJdHhfYmVnaW5fbnMgPSBjdXJyZW50X25z
-ZWMoKTsNCisNCisJd2hpbGUgKDEpIHsNCisJCWludCBpOw0KKwkJc3NpemVfdCBzZW50Ow0KKw0K
-KwkJaWYgKHRvdGFsX3NlbmQgPiBtYl90b19zZW5kICogMTAyNCAqIDEwMjRVTEwpDQorCQkJYnJl
-YWs7DQorDQorCQlmb3IgKGkgPSAwOyBpIDwgdHhfYnVmX3NpemU7IGkrKykgew0KKwkJCWRhdGFb
-aV0gPSByYW5kKCkgJSAweGZmOw0KKwkJCXN1bSArPSBkYXRhW2ldOw0KKwkJfQ0KKw0KKwkJc2Vu
-dCA9IHdyaXRlKGNsaWVudF9mZCwgZGF0YSwgdHhfYnVmX3NpemUpOw0KKw0KKwkJaWYgKHNlbnQg
-PD0gMCkgew0KKwkJCXBlcnJvcigid3JpdGUiKTsNCisJCQlleGl0KEVYSVRfRkFJTFVSRSk7DQor
-CQl9DQorDQorCQl0b3RhbF9zZW5kICs9IHNlbnQ7DQorCX0NCisNCisJZnJlZShkYXRhKTsNCisN
-CisJZnByaW50ZihzdGRlcnIsICJUb3RhbCAlemkgTUIsIHRpbWUgJWZcbiIsIG1iX3RvX3NlbmQs
-DQorCQkJKGZsb2F0KShjdXJyZW50X25zZWMoKSAtIHR4X2JlZ2luX25zKS8xMDAwLjAvMTAwMC4w
-LzEwMDAuMCk7DQorDQorCWNsb3NlKGZkKTsNCisJY2xvc2UoY2xpZW50X2ZkKTsNCit9DQorDQor
-c3RhdGljIHZvaWQgcnVuX2NsaWVudChpbnQgemVyb2NvcHkpDQorew0KKwlpbnQgZmQ7DQorCXVu
-aW9uIHsNCisJCXN0cnVjdCBzb2NrYWRkciBzYTsNCisJCXN0cnVjdCBzb2NrYWRkcl92bSBzdm07
-DQorCX0gYWRkciA9IHsNCisJCS5zdm0gPSB7DQorCQkJLnN2bV9mYW1pbHkgPSBBRl9WU09DSywN
-CisJCQkuc3ZtX3BvcnQgPSBwb3J0LA0KKwkJCS5zdm1fY2lkID0gcGVlcl9jaWQsDQorCQl9LA0K
-Kwl9Ow0KKwl1bnNpZ25lZCBsb25nIHN1bSA9IDA7DQorCXZvaWQgKnJ4X3ZhID0gTlVMTDsNCisN
-CisJcHJpbnRmKCJSdW5uaW5nIGNsaWVudCwgJXMgbW9kZSwgcGVlciAlaTolaSwgcnggYnVmICVs
-dVxuIiwNCisJCXplcm9jb3B5ID8gInplcm9jb3B5IiA6ICJjb3B5IiwgcGVlcl9jaWQsIHBvcnQs
-DQorCQlyeF9idWZfc2l6ZSk7DQorDQorCWZkID0gc29ja2V0KEFGX1ZTT0NLLCBTT0NLX1NUUkVB
-TSwgMCk7DQorDQorCWlmIChmZCA8IDApIHsNCisJCXBlcnJvcigic29ja2V0Iik7DQorCQlleGl0
-KEVYSVRfRkFJTFVSRSk7DQorCX0NCisNCisJaWYgKGNvbm5lY3QoZmQsICZhZGRyLnNhLCBzaXpl
-b2YoYWRkci5zdm0pKSkgew0KKwkJcGVycm9yKCJjb25uZWN0Iik7DQorCQlleGl0KEVYSVRfRkFJ
-TFVSRSk7DQorCX0NCisNCisJaWYgKHplcm9jb3B5KSB7DQorCQlyeF92YSA9IG1tYXAoTlVMTCwg
-cnhfYnVmX3NpemUsDQorCQkJCVBST1RfUkVBRCwgTUFQX1NIQVJFRCwgZmQsIDApOw0KKw0KKwkJ
-aWYgKHJ4X3ZhID09IE1BUF9GQUlMRUQpIHsNCisJCQlwZXJyb3IoIm1tYXAiKTsNCisJCQlleGl0
-KEVYSVRfRkFJTFVSRSk7DQorCQl9DQorCX0NCisNCisJd2hpbGUgKDEpIHsNCisJCXN0cnVjdCBw
-b2xsZmQgZmRzID0geyAwIH07DQorCQlpbnQgZG9uZSA9IDA7DQorDQorCQlmZHMuZmQgPSBmZDsN
-CisJCWZkcy5ldmVudHMgPSBQT0xMSU4gfCBQT0xMRVJSIHwgUE9MTEhVUCB8DQorCQkJICAgICBQ
-T0xMUkRIVVAgfCBQT0xMTlZBTDsNCisNCisJCWlmIChwb2xsKCZmZHMsIDEsIC0xKSA8IDApIHsN
-CisJCQlwZXJyb3IoInBvbGwiKTsNCisJCQlleGl0KEVYSVRfRkFJTFVSRSk7DQorCQl9DQorDQor
-CQlpZiAoZmRzLnJldmVudHMgJiAoUE9MTEhVUCB8IFBPTExSREhVUCkpDQorCQkJZG9uZSA9IDE7
-DQorDQorCQlpZiAoZmRzLnJldmVudHMgJiBQT0xMRVJSKSB7DQorCQkJZnByaW50ZihzdGRlcnIs
-ICJEb25lIGVycm9yXG4iKTsNCisJCQlicmVhazsNCisJCX0NCisNCisJCWlmIChmZHMucmV2ZW50
-cyAmIFBPTExJTikgew0KKwkJCWlmICh6ZXJvY29weSkgew0KKwkJCQlzdHJ1Y3QgdmlydGlvX3Zz
-b2NrX3Vzcl9oZHIgKmhkcjsNCisJCQkJdWludHB0cl90IHRtcF9yeF92YSA9ICh1aW50cHRyX3Qp
-cnhfdmE7DQorCQkJCXNvY2tsZW5fdCBsZW4gPSBzaXplb2YodG1wX3J4X3ZhKTsNCisNCisJCQkJ
-aWYgKGdldHNvY2tvcHQoZmQsIEFGX1ZTT0NLLCBTT19WTV9TT0NLRVRTX1pFUk9DT1BZLA0KKwkJ
-CQkJCSZ0bXBfcnhfdmEsICZsZW4pIDwgMCkgew0KKwkJCQkJcGVycm9yKCJnZXRzb2Nrb3B0Iik7
-DQorCQkJCQlleGl0KEVYSVRfRkFJTFVSRSk7DQorCQkJCX0NCisNCisJCQkJaGRyID0gKHN0cnVj
-dCB2aXJ0aW9fdnNvY2tfdXNyX2hkciAqKXRtcF9yeF92YTsNCisNCisJCQkJaWYgKCFoZHItPmxl
-bikgew0KKwkJCQkJaWYgKGRvbmUpIHsNCisJCQkJCQlmcHJpbnRmKHN0ZGVyciwgIkRvbmUsIHN1
-bSAlbHVcbiIsIHN1bSk7DQorCQkJCQkJYnJlYWs7DQorCQkJCQl9DQorCQkJCX0NCisNCisJCQkJ
-dG1wX3J4X3ZhICs9IFBBR0VfU0laRTsNCisNCisJCQkJaWYgKG1hZHZpc2UoKHZvaWQgKilyeF92
-YSwgcnhfYnVmX3NpemUsDQorCQkJCQkJTUFEVl9ET05UTkVFRCkpIHsNCisJCQkJCXBlcnJvcigi
-bWFkdmlzZSIpOw0KKwkJCQkJZXhpdChFWElUX0ZBSUxVUkUpOw0KKwkJCQl9DQorCQkJfSBlbHNl
-IHsNCisJCQkJY2hhciBkYXRhW3J4X2J1Zl9zaXplIC0gUEFHRV9TSVpFXTsNCisJCQkJc3NpemVf
-dCBieXRlc19yZWFkOw0KKw0KKwkJCQlieXRlc19yZWFkID0gcmVhZChmZCwgZGF0YSwgc2l6ZW9m
-KGRhdGEpKTsNCisNCisJCQkJaWYgKGJ5dGVzX3JlYWQgPD0gMCkNCisJCQkJCWJyZWFrOw0KKwkJ
-CX0NCisJCX0NCisJfQ0KK30NCisNCitzdGF0aWMgY29uc3QgY2hhciBvcHRzdHJpbmdbXSA9ICIi
-Ow0KK3N0YXRpYyBjb25zdCBzdHJ1Y3Qgb3B0aW9uIGxvbmdvcHRzW10gPSB7DQorCXsNCisJCS5u
-YW1lID0gIm1vZGUiLA0KKwkJLmhhc19hcmcgPSByZXF1aXJlZF9hcmd1bWVudCwNCisJCS52YWwg
-PSAnbScsDQorCX0sDQorCXsNCisJCS5uYW1lID0gInplcm9jb3B5IiwNCisJCS5oYXNfYXJnID0g
-bm9fYXJndW1lbnQsDQorCQkudmFsID0gJ3onLA0KKwl9LA0KKwl7DQorCQkubmFtZSA9ICJjaWQi
-LA0KKwkJLmhhc19hcmcgPSByZXF1aXJlZF9hcmd1bWVudCwNCisJCS52YWwgPSAnYycsDQorCX0s
-DQorCXsNCisJCS5uYW1lID0gInBvcnQiLA0KKwkJLmhhc19hcmcgPSByZXF1aXJlZF9hcmd1bWVu
-dCwNCisJCS52YWwgPSAncCcsDQorCX0sDQorCXsNCisJCS5uYW1lID0gIm1iIiwNCisJCS5oYXNf
-YXJnID0gcmVxdWlyZWRfYXJndW1lbnQsDQorCQkudmFsID0gJ3MnLA0KKwl9LA0KKwl7DQorCQku
-bmFtZSA9ICJ0eCIsDQorCQkuaGFzX2FyZyA9IHJlcXVpcmVkX2FyZ3VtZW50LA0KKwkJLnZhbCA9
-ICd0JywNCisJfSwNCisJew0KKwkJLm5hbWUgPSAicngiLA0KKwkJLmhhc19hcmcgPSByZXF1aXJl
-ZF9hcmd1bWVudCwNCisJCS52YWwgPSAncicsDQorCX0sDQorCXsNCisJCS5uYW1lID0gImhlbHAi
-LA0KKwkJLmhhc19hcmcgPSBub19hcmd1bWVudCwNCisJCS52YWwgPSAnPycsDQorCX0sDQorCXt9
-LA0KK307DQorDQoraW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KQ0KK3sNCisJaW50IHpl
-cm9jb3B5ID0gMDsNCisNCisJZm9yICg7Oykgew0KKwkJaW50IG9wdCA9IGdldG9wdF9sb25nKGFy
-Z2MsIGFyZ3YsIG9wdHN0cmluZywgbG9uZ29wdHMsIE5VTEwpOw0KKw0KKwkJaWYgKG9wdCA9PSAt
-MSkNCisJCQlicmVhazsNCisNCisJCXN3aXRjaCAob3B0KSB7DQorCQljYXNlICdzJzoNCisJCQlt
-Yl90b19zZW5kID0gYXRvaShvcHRhcmcpOw0KKwkJCWJyZWFrOw0KKwkJY2FzZSAnYyc6DQorCQkJ
-cGVlcl9jaWQgPSBhdG9pKG9wdGFyZyk7DQorCQkJYnJlYWs7DQorCQljYXNlICdwJzoNCisJCQlw
-b3J0ID0gYXRvaShvcHRhcmcpOw0KKwkJCWJyZWFrOw0KKwkJY2FzZSAncic6DQorCQkJcnhfYnVm
-X3NpemUgPSBhdG9pKG9wdGFyZyk7DQorCQkJYnJlYWs7DQorCQljYXNlICd0JzoNCisJCQl0eF9i
-dWZfc2l6ZSA9IGF0b2kob3B0YXJnKTsNCisJCQlicmVhazsNCisJCWNhc2UgJ20nOg0KKwkJCWlm
-IChzdHJjbXAob3B0YXJnLCAiY2xpZW50IikgPT0gMCkNCisJCQkJY2xpZW50X21vZGUgPSAxOw0K
-KwkJCWVsc2UgaWYgKHN0cmNtcChvcHRhcmcsICJzZXJ2ZXIiKSA9PSAwKQ0KKwkJCQljbGllbnRf
-bW9kZSA9IDA7DQorCQkJZWxzZSB7DQorCQkJCWZwcmludGYoc3RkZXJyLCAiLS1tb2RlIG11c3Qg
-YmUgXCJjbGllbnRcIiBvciBcInNlcnZlclwiXG4iKTsNCisJCQkJcmV0dXJuIEVYSVRfRkFJTFVS
-RTsNCisJCQl9DQorCQkJYnJlYWs7DQorCQljYXNlICd6JzoNCisJCQl6ZXJvY29weSA9IDE7DQor
-CQkJYnJlYWs7DQorCQlkZWZhdWx0Og0KKwkJCWJyZWFrOw0KKwkJfQ0KKw0KKwl9DQorDQorCWlm
-ICghdHhfYnVmX3NpemUpDQorCQl0eF9idWZfc2l6ZSA9IERFRkFVTFRfVFhfU0laRTsNCisNCisJ
-aWYgKCFyeF9idWZfc2l6ZSkNCisJCXJ4X2J1Zl9zaXplID0gREVGQVVMVF9SWF9TSVpFOw0KKw0K
-Kwl0eF9idWZfc2l6ZSAqPSBQQUdFX1NJWkU7DQorCXJ4X2J1Zl9zaXplICo9IFBBR0VfU0laRTsN
-CisNCisJc3JhbmQodGltZShOVUxMKSk7DQorDQorCWlmIChjbGllbnRfbW9kZSkNCisJCXJ1bl9j
-bGllbnQoemVyb2NvcHkpOw0KKwllbHNlDQorCQlydW5fc2VydmVyKCk7DQorDQorCXJldHVybiAw
-Ow0KK30NCi0tIA0KMi4yNS4xDQo=
+
+On 5/10/2022 11:51 PM, Paolo Bonzini wrote:
+> On 5/6/22 05:33, Yang Weijiang wrote:
+>> Per spec:"IA32_LBR_CTL.LBREn is saved and cleared on #SMI, and restored
+>> on RSM. On a warm reset, all LBR MSRs, including IA32_LBR_DEPTH, have their
+>> values preserved. However, IA32_LBR_CTL.LBREn is cleared to 0, disabling
+>> LBRs." So clear Arch LBREn bit on #SMI and restore it on RSM manully, also
+>> clear the bit when guest does warm reset.
+>>
+>> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+>> ---
+>>    arch/x86/kvm/vmx/vmx.c | 4 ++++
+>>    1 file changed, 4 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 6d6ee9cf82f5..b38f58868905 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -4593,6 +4593,8 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>>    	if (!init_event) {
+>>    		if (static_cpu_has(X86_FEATURE_ARCH_LBR))
+>>    			vmcs_write64(GUEST_IA32_LBR_CTL, 0);
+>> +	} else {
+>> +		flip_arch_lbr_ctl(vcpu, false);
+>>    	}
+>>    }
+>>    
+>> @@ -7704,6 +7706,7 @@ static int vmx_enter_smm(struct kvm_vcpu *vcpu, char *smstate)
+>>    	vmx->nested.smm.vmxon = vmx->nested.vmxon;
+>>    	vmx->nested.vmxon = false;
+>>    	vmx_clear_hlt(vcpu);
+>> +	flip_arch_lbr_ctl(vcpu, false);
+>>    	return 0;
+>>    }
+>>    
+>> @@ -7725,6 +7728,7 @@ static int vmx_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+>>    		vmx->nested.nested_run_pending = 1;
+>>    		vmx->nested.smm.guest_mode = false;
+>>    	}
+>> +	flip_arch_lbr_ctl(vcpu, true);
+>>    	return 0;
+>>    }
+>>    
+> This is incorrect, you hare not saving/restoring the actual value of
+> LBREn (which is "lbr_desc->event != NULL").  Therefore, a migration
+> while in SMM would lose the value of LBREn = true.
+>
+> Instead of using flip_arch_lbr_ctl, SMM should save the value of the MSR
+> in kvm_x86_ops->enter_smm, and restore it in kvm_x86_ops->leave_smm
+> (feel free to do it only if guest_cpuid_has(vcpu, X86_FEATURE_LM), i.e.
+> the 32-bit case can be ignored).
+
+Hi, Paolo,
+
+I re-factored this patch as below to enclose your above suggestion, 
+could you
+
+kindly check? If it's OK then I'll refresh this series with v12, thanks!
+
+======================================================================
+
+ From dad3abc7fe96022dd3dcee8f958960bbd4f68b95 Mon Sep 17 00:00:00 2001
+From: Yang Weijiang <weijiang.yang@intel.com>
+Date: Thu, 5 Aug 2021 20:48:39 +0800
+Subject: [PATCH] KVM: x86/vmx: Flip Arch LBREn bit on guest state change
+
+Per spec:"IA32_LBR_CTL.LBREn is saved and cleared on #SMI, and restored
+on RSM. On a warm reset, all LBR MSRs, including IA32_LBR_DEPTH, have their
+values preserved. However, IA32_LBR_CTL.LBREn is cleared to 0, disabling
+LBRs." Use a reserved bit(63) of the MSR to hide LBREn bit on #SMI and
+restore it to LBREn on RSM manully, also clear the bit when guest does
+warm reset.
+
+Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+---
+  arch/x86/kvm/vmx/pmu_intel.c | 16 +++++++++++++---
+  arch/x86/kvm/vmx/vmx.c       | 24 ++++++++++++++++++++++++
+  arch/x86/kvm/vmx/vmx.h       |  1 +
+  3 files changed, 38 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 038fdb788ccd..652601ad99ea 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -373,6 +373,8 @@ static bool arch_lbr_depth_is_valid(struct kvm_vcpu 
+*vcpu, u64 depth)
+      return (depth == pmu->kvm_arch_lbr_depth);
+  }
+
++#define ARCH_LBR_IN_SMM    BIT(63)
++
+  static bool arch_lbr_ctl_is_valid(struct kvm_vcpu *vcpu, u64 ctl)
+  {
+      struct kvm_cpuid_entry2 *entry;
+@@ -380,7 +382,7 @@ static bool arch_lbr_ctl_is_valid(struct kvm_vcpu 
+*vcpu, u64 ctl)
+      if (!kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
+          return false;
+
+-    if (ctl & ~KVM_ARCH_LBR_CTL_MASK)
++    if (ctl & ~(KVM_ARCH_LBR_CTL_MASK | ARCH_LBR_IN_SMM))
+          goto warn;
+
+      entry = kvm_find_cpuid_entry(vcpu, 0x1c, 0);
+@@ -425,6 +427,10 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, 
+struct msr_data *msr_info)
+          return 0;
+      case MSR_ARCH_LBR_CTL:
+          msr_info->data = vmcs_read64(GUEST_IA32_LBR_CTL);
++        if (to_vmx(vcpu)->lbr_in_smm) {
++            msr_info->data |= ARCH_LBR_CTL_LBREN;
++            msr_info->data |= ARCH_LBR_IN_SMM;
++        }
+          return 0;
+      default:
+          if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
+@@ -501,11 +507,15 @@ static int intel_pmu_set_msr(struct kvm_vcpu 
+*vcpu, struct msr_data *msr_info)
+          if (!arch_lbr_ctl_is_valid(vcpu, data))
+              break;
+
+-        vmcs_write64(GUEST_IA32_LBR_CTL, data);
+-
+          if (intel_pmu_lbr_is_enabled(vcpu) && !lbr_desc->event &&
+              (data & ARCH_LBR_CTL_LBREN))
+              intel_pmu_create_guest_lbr_event(vcpu);
++
++        if (data & ARCH_LBR_IN_SMM) {
++            data &= ~ARCH_LBR_CTL_LBREN;
++            data &= ~ARCH_LBR_IN_SMM;
++        }
++        vmcs_write64(GUEST_IA32_LBR_CTL, data);
+          return 0;
+      default:
+          if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 6d6ee9cf82f5..eadad24a68e6 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4543,6 +4543,7 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, 
+bool init_event)
+
+      vmx->rmode.vm86_active = 0;
+      vmx->spec_ctrl = 0;
++    vmx->lbr_in_smm = false;
+
+      vmx->msr_ia32_umwait_control = 0;
+
+@@ -4593,6 +4594,8 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, 
+bool init_event)
+      if (!init_event) {
+          if (static_cpu_has(X86_FEATURE_ARCH_LBR))
+              vmcs_write64(GUEST_IA32_LBR_CTL, 0);
++    } else {
++        flip_arch_lbr_ctl(vcpu, false);
+      }
+  }
+
+@@ -7695,6 +7698,8 @@ static int vmx_smi_allowed(struct kvm_vcpu *vcpu, 
+bool for_injection)
+
+  static int vmx_enter_smm(struct kvm_vcpu *vcpu, char *smstate)
+  {
++    struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
++    struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+      struct vcpu_vmx *vmx = to_vmx(vcpu);
+
+      vmx->nested.smm.guest_mode = is_guest_mode(vcpu);
+@@ -7704,12 +7709,21 @@ static int vmx_enter_smm(struct kvm_vcpu *vcpu, 
+char *smstate)
+      vmx->nested.smm.vmxon = vmx->nested.vmxon;
+      vmx->nested.vmxon = false;
+      vmx_clear_hlt(vcpu);
++
++    if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR) &&
++        test_bit(INTEL_PMC_IDX_FIXED_VLBR, pmu->pmc_in_use) &&
++        lbr_desc->event)
++        vmx->lbr_in_smm = true;
++
+      return 0;
+  }
+
+  static int vmx_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+  {
++    struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
++    struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+      struct vcpu_vmx *vmx = to_vmx(vcpu);
++
+      int ret;
+
+      if (vmx->nested.smm.vmxon) {
+@@ -7725,6 +7739,16 @@ static int vmx_leave_smm(struct kvm_vcpu *vcpu, 
+const char *smstate)
+          vmx->nested.nested_run_pending = 1;
+          vmx->nested.smm.guest_mode = false;
+      }
++
++    if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR) &&
++        test_bit(INTEL_PMC_IDX_FIXED_VLBR, pmu->pmc_in_use) &&
++        lbr_desc->event && vmx->lbr_in_smm) {
++        u64 ctl = vmcs_read64(GUEST_IA32_LBR_CTL);
++
++        vmcs_write64(GUEST_IA32_LBR_CTL, ctl | ARCH_LBR_CTL_LBREN);
++        vmx->lbr_in_smm = false;
++    }
++
+      return 0;
+  }
+
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index b98c7e96697a..a227fe8bf288 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -351,6 +351,7 @@ struct vcpu_vmx {
+
+      struct pt_desc pt_desc;
+      struct lbr_desc lbr_desc;
++    bool lbr_in_smm;
+
+      /* Save desired MSR intercept (read: pass-through) state */
+  #define MAX_POSSIBLE_PASSTHROUGH_MSRS    15
+-- 
+2.27.0
+
+>
+> Paolo
