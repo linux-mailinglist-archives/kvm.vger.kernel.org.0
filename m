@@ -2,69 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DAEFA525AEE
-	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 07:07:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AAFD525B5C
+	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 08:18:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377018AbiEMEys (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 May 2022 00:54:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53074 "EHLO
+        id S1377321AbiEMGQb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 May 2022 02:16:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354401AbiEMEyl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 May 2022 00:54:41 -0400
-Received: from mail-ua1-x930.google.com (mail-ua1-x930.google.com [IPv6:2607:f8b0:4864:20::930])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB09150465
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 21:54:38 -0700 (PDT)
-Received: by mail-ua1-x930.google.com with SMTP id x11so2797408uao.2
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 21:54:38 -0700 (PDT)
+        with ESMTP id S1377404AbiEMGQC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 May 2022 02:16:02 -0400
+Received: from mail-vs1-xe2a.google.com (mail-vs1-xe2a.google.com [IPv6:2607:f8b0:4864:20::e2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 200852734DA
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 23:15:18 -0700 (PDT)
+Received: by mail-vs1-xe2a.google.com with SMTP id c62so7387294vsc.10
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 23:15:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PiRxr/t7wNKOjvRMER4B0Jh2KHLCS5zJmY50mG+94I8=;
-        b=QEaAQd137V/0qcQwcimjbOQFJVE+JF1QCTSI8ieoeDleE87EyaM38TEnRBAp8VWt09
-         BZVxYBgCXlhIhZNxuKoz5vDK+YdGoBy06DiUL9WSxghvyg+E2jel5EHkTzjjMzFuos79
-         rX/l4FM6t2BmUolQ8z/fIccXKaMGzvQiWiJ/egnx/KQl579OjS5QX2UNpZ+/3rGH3LAI
-         T0t4HfELVFp3+JaYkZVF4uLQEsgAYislhB2apLqeK2Uv8O9CIQc1oR8Vo5hpS5guLK86
-         FB2W6EIMT00pZXFCWtkz1CRb/D7O2yr+Rv+8czPqx+JfEOK9BlO9h3P5fVuJlRkDVuz3
-         d5Rg==
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=4pVDn2OJ7GUsmOCrQu105M1wbXVuykBRE38Q67/5bgM=;
+        b=esftJ4JpTM8g5IYslBctTjq6KqHkG78O4yzVMkGpCJ0SS26+aWuylllPqNa/VS8xW1
+         onlhHEmoTkL7V2JJEu1Zmd3cYcE/stccmNjRHXn7phKjfZfCwQBh5o24mEtUA3sB7FjI
+         R1cqZQnIGZBkO+qZXuq/sth76iEZgBqw3a8LbGul0BcQcddpFP0fLKCRLT68RLpdx5iz
+         R0n22rqIBCLG46R4ZLp51dbdHfWPJlwN/jxNlkNdhX7ynZ+BU/3vS4254ME0pM+j/0Dh
+         I5jW5/X0Y6ZPkcdNUXp4ZlXUZVJZCzmxCAPwps6Al2qGSq5zCRYN2RW0Cjl8A6/lXJqH
+         V/hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PiRxr/t7wNKOjvRMER4B0Jh2KHLCS5zJmY50mG+94I8=;
-        b=KM1h9391hvG6Wm0opo9MsF039punCezoDyFG82eiX89uc7AAG9pOoFwO3KiPmSepSr
-         jv7WfEuAzYA3vSlFtRUkFw9Hqf7J4xuZYmUr332JhMS8oQypqr6QDhw7nb7OY9prWe15
-         SwCQ79qTEBgRWES8Ksw8SG16XVDhkoQwThm/G0+/mG+v45DlKbH/DZ1dr6DdSIFS8SOa
-         gQ2+TVEzoj/dXuLrGz1GlHyLURP+m9KeEIwpipOo8/DEOgJYx+4aAnV2h7DhGda6/gyl
-         oMoyh0MBiXI5+mgIr7O6CSprFBvd09DlrqDXc9mDZiD9xPZNhbyyndoFaVSEfMsbUwX2
-         lt8Q==
-X-Gm-Message-State: AOAM533FlQ91p7hrZAHR0j9P9mpe13LQJaQmu5KZSM8inMhqf9NoIU66
-        xIOU4QoTFjrnZadNCN+z/7ABi9L2QJ6JRvKkKkUF3Q==
-X-Google-Smtp-Source: ABdhPJxXBDV3z6IjLcRqOGQmY7t7cOUYOxde4FYdXv9b+rpdPyyEdI0r/pURz/ckZDQqmrKEtg8PDnML8OEbZZQ+dIE=
-X-Received: by 2002:a05:6130:32a:b0:365:88b6:fd2 with SMTP id
- ay42-20020a056130032a00b0036588b60fd2mr1779913uab.97.1652417677888; Thu, 12
- May 2022 21:54:37 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=4pVDn2OJ7GUsmOCrQu105M1wbXVuykBRE38Q67/5bgM=;
+        b=jfK4LhJA5Or8mMGQo/JMLKjmRQbzv9cT+1MMhR9VWjaW7+MRTPoozGwz1aOCam7mpI
+         MIxxwHbRDbz9Ac2++WR+VtFn08E1bY30m/1kEFQmVGgJWLkx2276o0EI7Jc60MyZ1NGS
+         kxfqxEKGWitemvptqC3jGkbT0t3mQk8FGtgs8MrJTEUZZO0DQd6pHO5CZ+GyQd9YOcj+
+         jbmKxwHHhJZsTkuxBk1zced9Sx/ntg8TK7q4bLoDi20G6fYy9XHRd2fWPDqphzS2a8Do
+         qOmPgEKQjTZ5JW9ObpQpm6MWqbPyrEuEQpTUJcBH3StD3V3l4CSR1pnUt06KRODlVAFZ
+         UiAA==
+X-Gm-Message-State: AOAM530flmZfo0OxcS+8FiySVtET2IiqG71bGblVzgGg6fZxUaTf4+KL
+        1HQqzviHqyEVuFv3QtF6NbyGzSzpG3qQdiioOCOJZTe2XIM=
+X-Google-Smtp-Source: ABdhPJz9caTbGJBLr1BXTXa8+QebGqP+bzrM0Qc4QOMbiuNH1fWJh/BP3KiIpEKVJPy5KvxuLXhakavHmlLeNHBfItY=
+X-Received: by 2002:a67:e899:0:b0:32c:db20:e21b with SMTP id
+ x25-20020a67e899000000b0032cdb20e21bmr1811281vsn.36.1652422517185; Thu, 12
+ May 2022 23:15:17 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220412223134.1736547-1-juew@google.com> <20220412223134.1736547-5-juew@google.com>
- <YnwMlFmAL8lRxX7x@google.com>
-In-Reply-To: <YnwMlFmAL8lRxX7x@google.com>
-From:   Jue Wang <juew@google.com>
-Date:   Thu, 12 May 2022 21:54:26 -0700
-Message-ID: <CAPcxDJ50Fk5GBtNFA6OqTKYSn+es9ASs5KoMZF5NYvn0vRkprA@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] KVM: x86: Add support for MCG_CMCI_P and handling
- of injected UCNAs.
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>, kvm@vger.kernel.org
+From:   Florent Carli <fcarli@gmail.com>
+Date:   Fri, 13 May 2022 08:15:06 +0200
+Message-ID: <CAJuRqcC0Z-wbAhb39ofKPstgbg+ZmsT8eFivWEr-hZY64_A1xA@mail.gmail.com>
+Subject: Cyclictest with small interval in guest makes host cpu go very high
+To:     kvm@vger.kernel.org
+Cc:     nsaenzju@redhat.com
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,161 +60,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 11, 2022 at 12:20 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Tue, Apr 12, 2022, Jue Wang wrote:
-> > Note prior to this patch, the UCNA type of signaling can already be
-> > processed by kvm_vcpu_ioctl_x86_set_mce and does not result in correct
-> > CMCI signaling semantic.
->
-> Same as before...
->
-> UCNA should be spelled out at least once.
+Hello,
 
-Rewrote the change log to include full context of this change and full
-text definition of UCNA and CMCI.
+When I run a cyclictest with a small interval in a guest, even though
+the guest's cpu load is small (2-3%) the host qemu-system thread is
+showing 100% cpu utilization, almost all of it being "system/kernel".
+There seems to be a threshold effect:
+- on my system an interval of 220us creates no problem (host
+qemu-system thread is 4% user and 1% system)
+- an interval of 210us shows the host qemu-system thread at 4% user
+and 50% system)
+- an interval of 200us makes the host qemu-system thread at 4% user
+and 95% system
 
->
-> >
-> > Signed-off-by: Jue Wang <juew@google.com>
-> > ---
-> >  arch/x86/kvm/vmx/vmx.c |  1 +
-> >  arch/x86/kvm/x86.c     | 48 ++++++++++++++++++++++++++++++++++++++++++
-> >  2 files changed, 49 insertions(+)
-> >
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index b730d799c26e..63aa2b3d30ca 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -8035,6 +8035,7 @@ static __init int hardware_setup(void)
-> >       }
-> >
-> >       kvm_mce_cap_supported |= MCG_LMCE_P;
-> > +     kvm_mce_cap_supported |= MCG_CMCI_P;
->
-> Is there really no hardware dependency on CMCI?  Honest question  If not, that
-> should be explicitly called out in the changelog.
+Those threshold values are probably not universal...
 
-CMCI emulation does not depend on hardware, it only depends on vcpu's
-lapic being available.
+I'm using kvm with qemu on x86-64, and this issue seems easily
+reproducible (yocto with a 5.15rt kernel, debian stable with a 5.10rt
+kernel, or a non-rt 5.10 or a backported 5.16rt kernel, etc.). I
+reproduced this issue on a debian stable non-RT kernel to be sure the
+problem was not due to preempt-rt.
+My cmdlines for host and guest are very basic: ipv6.disable=1 efi=runtime
+Vcpupinning does not change the outcome.
 
-Updated the change log.
->
-> >       if (pt_mode != PT_MODE_SYSTEM && pt_mode != PT_MODE_HOST_GUEST)
-> >               return -EINVAL;
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 73c64d2b9e60..eb6058ca1e70 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -4775,6 +4775,50 @@ static int kvm_vcpu_ioctl_x86_setup_mce(struct kvm_vcpu *vcpu,
-> >       return r;
-> >  }
-> >
-> > +static bool is_ucna(u64 mcg_status, u64 mci_status)
->
-> Any reason not to take 'struct kvm_x86_mce *mce'?
+I'd love to understand the cause of this behavior and if there's
+something to be done to solve this.
+Thanks a lot.
 
-Updated.
-
->
-> > +{
-> > +     return !mcg_status &&
-> > +             !(mci_status & (MCI_STATUS_PCC | MCI_STATUS_S | MCI_STATUS_AR));
->
-> As someone who knows nothing about MCI encoding, can you add a function comment
-> explaing, in detail, what's going on here?
->
-> Also, my preference is to align the indentation on multi-line returns.  Paolo scoffs
-> at this nit of mine, but he's obviously wrong ;-)
-
-Added function comments in V3 and updated alignment.
->
->         return !mcg_status &&
->                !(mci_status & (MCI_STATUS_PCC | MCI_STATUS_S | MCI_STATUS_AR));
->
-> > +}
-> > +
-> > +static int kvm_vcpu_x86_set_ucna(struct kvm_vcpu *vcpu,
-> > +             struct kvm_x86_mce *mce)
->
-> Please align the params.  Actually, just let it run over, it's a single char.
-
-Done.
->
-> static int kvm_vcpu_x86_set_ucna(struct kvm_vcpu *vcpu, struct kvm_x86_mce *mce)
->
-> > +{
-> > +     u64 mcg_cap = vcpu->arch.mcg_cap;
-> > +     unsigned int bank_num = mcg_cap & 0xff;
-> > +     u64 *banks = vcpu->arch.mce_banks;
-> > +
-> > +     /* Check for legal bank number in guest */
->
-> Eh, don't think this warrants a comment.
-
-Removed.
->
-> > +     if (mce->bank >= bank_num)
-> > +             return -EINVAL;
-> > +
-> > +     /*
-> > +      * UCNA signals should not set bits that are only used for machine check
-> > +      * exceptions.
-> > +      */
-> > +     if (mce->mcg_status ||
-> > +             (mce->status & (MCI_STATUS_PCC | MCI_STATUS_S | MCI_STATUS_AR)))
->
-> Unless mine eyes deceive me, this is the same as:
->
->         if (!is_ucna(mce->mcg_status, mce->status))
->
-
-Good catch, also folded the MCI_STATUS_VAL and MCI_STATUS_UC checks
-into is_ucna.
-> > +             return -EINVAL;
-> > +
-> > +     /* UCNA must have VAL and UC bits set */
-> > +     if (!(mce->status & MCI_STATUS_VAL) || !(mce->status & MCI_STATUS_UC))
-> > +             return -EINVAL;
-> > +
-> > +     banks += 4 * mce->bank;
-> > +     banks[1] = mce->status;
-> > +     banks[2] = mce->addr;
-> > +     banks[3] = mce->misc;
-> > +     vcpu->arch.mcg_status = mce->mcg_status;
-> > +
-> > +     if (!(mcg_cap & MCG_CMCI_P) || !(vcpu->arch.mci_ctl2_banks[mce->bank] & MCI_CTL2_CMCI_EN))
->
-> This one's worth wrapping, that's quite a long line, and there's a natural split point:
->
->         if (!(mcg_cap & MCG_CMCI_P) ||
->             !(vcpu->arch.mci_ctl2_banks[mce->bank] & MCI_CTL2_CMCI_EN))
->                 return 0;
->
->
-Done.
-> > +             return 0;
-> > +
-> > +     if (lapic_in_kernel(vcpu))
-> > +             kvm_apic_local_deliver(vcpu->arch.apic, APIC_LVTCMCI);
-> > +
-> > +     return 0;
-> > +}
-> > +
-> >  static int kvm_vcpu_ioctl_x86_set_mce(struct kvm_vcpu *vcpu,
-> >                                     struct kvm_x86_mce *mce)
-> >  {
-> > @@ -4784,6 +4828,10 @@ static int kvm_vcpu_ioctl_x86_set_mce(struct kvm_vcpu *vcpu,
-> >
-> >       if (mce->bank >= bank_num || !(mce->status & MCI_STATUS_VAL))
-> >               return -EINVAL;
-> > +
-> > +     if (is_ucna(mce->mcg_status, mce->status))
-> > +             return kvm_vcpu_x86_set_ucna(vcpu, mce);
-> > +
-> >       /*
-> >        * if IA32_MCG_CTL is not all 1s, the uncorrected error
-> >        * reporting is disabled
-> > --
-> > 2.35.1.1178.g4f1659d476-goog
-> >
+Florent.
