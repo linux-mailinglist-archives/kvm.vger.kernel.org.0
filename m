@@ -2,121 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1378E526623
-	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 17:30:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BB0952663D
+	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 17:36:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381378AbiEMPa1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 May 2022 11:30:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35260 "EHLO
+        id S1382170AbiEMPgh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 May 2022 11:36:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357004AbiEMPa0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 May 2022 11:30:26 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ADC36E8D4;
-        Fri, 13 May 2022 08:30:25 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24DEg1kM020341;
-        Fri, 13 May 2022 15:30:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=bFIScBYNd5Na3X5AcQC22WFhxVXl5cCc033p2h4SCWM=;
- b=CidQrDxTep1GHa7eqzVfjvvfzTXtcEMZJzSF6pREoeqrFl09k1N4/M86D4PXuM6WjGcd
- fNBTOxZZnYuPcFhISHa/tJ9iOcKhGzZeUoOTLmC27ZwvFHGv8HfXrpfDNkw21yTZUq6m
- b9Y9PAS9qsS/sFDrMxdJ0p5qEOW2at4GXnvq0w718eSfxsa37Tfnxdr3fGDhQWppgXv6
- NcSnxGebxlCrIEKAmb2RGkCYTRC8qcfm8jMk9vgUhjDpAlHZGb/DCmUt7WgYSeeWxNrq
- JQXd/6b3jkwQ4L3zsDxweyIwrzQqWJYtfrLBkar2IGODaVbXfvIXYc09IMOTtPs56ISb vw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g1mbgyskf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 May 2022 15:30:24 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24DFS6px004244;
-        Fri, 13 May 2022 15:30:23 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g1mbgysjm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 May 2022 15:30:23 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24DFQ0PD023823;
-        Fri, 13 May 2022 15:30:22 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03ams.nl.ibm.com with ESMTP id 3fwgd90vrp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 May 2022 15:30:21 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24DFUI5e40304900
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 May 2022 15:30:18 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B0CB2AE055;
-        Fri, 13 May 2022 15:30:18 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5E910AE04D;
-        Fri, 13 May 2022 15:30:18 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.40])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 13 May 2022 15:30:18 +0000 (GMT)
-Date:   Fri, 13 May 2022 17:30:16 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm390 mailing list <kvm390-list@tuxmaker.boeblingen.de.ibm.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH 6/6] s390x: uv-host: Remove duplicated +
-Message-ID: <20220513173016.7c608b87@p-imbrenda>
-In-Reply-To: <20220513095017.16301-7-frankja@linux.ibm.com>
-References: <20220513095017.16301-1-frankja@linux.ibm.com>
-        <20220513095017.16301-7-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.31; x86_64-redhat-linux-gnu)
+        with ESMTP id S1382104AbiEMPgd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 May 2022 11:36:33 -0400
+Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B4A511171;
+        Fri, 13 May 2022 08:36:32 -0700 (PDT)
+Received: by mail-qv1-xf2b.google.com with SMTP id kl21so6913811qvb.9;
+        Fri, 13 May 2022 08:36:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8h0LmcWAQXb8u9qfucjMgM7lVOGBOAPZEtMIypr4huE=;
+        b=V21K7h6gxr/frfJzGoJpY9QlYPLnqhsegSYLRssEC7uQa/RjRMWeTQ+4WUjJcHX232
+         h/56lswNcxpH6Vj57Os3FdYFI0z7IvVqw+R+x33nbdUR+V/N5zCn4yIOLirOmom9qNgq
+         mMTu36wIUNzYR83MbFr+OBWJmQxUDgemetQKbCOZBp6WKV9WDJDlg5VG7/dDk1vrvJBM
+         uc1OJlwSVtRTMAvlGgf4XDcL25fcAsXHieUREzKgfarztWq935EzYNBFpDLztThMgMAe
+         3U9evL22QIVjxLN2ucQJkCEjR8+1JzzpcSHu6Wpj0+c65oj7Znhdz1B79tMvIiOiu0Up
+         Ei8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8h0LmcWAQXb8u9qfucjMgM7lVOGBOAPZEtMIypr4huE=;
+        b=Q1aBtbzC31HiRtpbKFSlepZvEKb5WeQSNQv1fd7Qr07qIbohZGmR2IXjAv/ND/iGYm
+         S0FR6C+LMVxvEKd2UEGvAkbRe6GeqJD4Ro/+vUklgCmAJ9sdbf++R0ODG/h/7YmAw7ID
+         eXea5RGfHXTWDs4Ibsx/6hubnM+fxW9Dn09fJ5M65XjBOXZBJ3JnIdElEEx7rt6y4t1H
+         pRoW1VevKDglCpd4Co/IlhFCso09lVwGvauvjB1cTR+duazWJ5Zhi/GQJqzqmeAMHb4D
+         konFnwyc2PEw/HxLsX4ZKZ6xWq7CnJMkoUjFvpIc8CnaOkwse8CxAT2Chd/RfEJgK3nb
+         +HsA==
+X-Gm-Message-State: AOAM532htkgrfSK2Ggvzk8p7Sd2+L5gDdIZ8+0342EE0mjAnJttjWgJG
+        7CCpqHSF/r0nW3OjvSXfSTk6tUwTZFjGBawMpto=
+X-Google-Smtp-Source: ABdhPJwqjL1gPdVknYoT/U+0XIneQoJHsxyMbPk309eeSytAsXbtzwplMHbPzQRvE7nw/MpGgYJi4UquFNUEKZc73VA=
+X-Received: by 2002:a05:6214:20e6:b0:45d:403f:7a90 with SMTP id
+ 6-20020a05621420e600b0045d403f7a90mr4745600qvk.1.1652456191435; Fri, 13 May
+ 2022 08:36:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3Yep4FS5rgw1mNqGj_RetuYTcnu2wtCv
-X-Proofpoint-ORIG-GUID: 9uaxkqSs644qjacZz-NGF6Qw_7ZNGKJ3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-13_04,2022-05-13_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- bulkscore=0 suspectscore=0 malwarescore=0 adultscore=0 clxscore=1015
- mlxlogscore=999 spamscore=0 lowpriorityscore=0 priorityscore=1501
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205130067
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220510154217.5216-1-ubizjak@gmail.com> <20220513091034.GH76023@worktop.programming.kicks-ass.net>
+ <CAFULd4bAAKc=wo6vFkN6xQqBjaSJhF3L+WmuymSsC6-ec6TuvA@mail.gmail.com>
+In-Reply-To: <CAFULd4bAAKc=wo6vFkN6xQqBjaSJhF3L+WmuymSsC6-ec6TuvA@mail.gmail.com>
+From:   Uros Bizjak <ubizjak@gmail.com>
+Date:   Fri, 13 May 2022 17:36:19 +0200
+Message-ID: <CAFULd4Zck5YRfhoXsg_aPKpFbnkkr_xZ6ejDpmp=ysZemwoQAg@mail.gmail.com>
+Subject: Re: [PATCH] locking/atomic/x86: Introduce try_cmpxchg64
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Will Deacon <will@kernel.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Marco Elver <elver@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 13 May 2022 09:50:17 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Fri, May 13, 2022 at 12:20 PM Uros Bizjak <ubizjak@gmail.com> wrote:
 
-> One + is definitely enough here.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> > > +#define arch_try_cmpxchg64(ptr, po, n)                               \
+> > > +({                                                           \
+> > > +     bool success;                                           \
+> > > +     __typeof__(*(ptr)) __prev;                              \
+> > > +     __typeof__(ptr) _old = (__typeof__(ptr))(po);           \
+> > > +     __typeof__(*(ptr)) __old = *_old;                       \
+> > > +     __typeof__(*(ptr)) __new = (n);                         \
+> > > +     alternative_io(LOCK_PREFIX_HERE                         \
+> > > +                     "call cmpxchg8b_emu",                   \
+> > > +                     "lock; cmpxchg8b (%%esi)" ,             \
+> > > +                    X86_FEATURE_CX8,                         \
+> > > +                    "=A" (__prev),                           \
+> > > +                    "S" ((ptr)), "0" (__old),                \
+> > > +                    "b" ((unsigned int)__new),               \
+> > > +                    "c" ((unsigned int)(__new>>32))          \
+> > > +                    : "memory");                             \
+> > > +     success = (__prev == __old);                            \
+> > > +     if (unlikely(!success))                                 \
+> > > +             *_old = __prev;                                 \
+> > > +     likely(success);                                        \
+> > > +})
+> >
+> > Wouldn't this be better written like the normal fallback wrapper?
+> >
+> > static __always_inline bool
+> > arch_try_cmpxchg64(u64 *v, u64 *old, u64 new)
+> > {
+> >         u64 r, o = *old;
+> >         r = arch_cmpxchg64(v, o, new);
+> >         if (unlikely(r != o))
+> >                 *old = r;
+> >         return likely(r == o);
+> > }
+> >
+> > Less magical, same exact code.
+>
+> Also, I tried to follow up the existing #defines. Will improve the
+> code according to your suggestion here.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+In the v2 patch, generic fallbacks were introduced, so that
+arch_try_cmpxchg64 can be used when only arch_cmpxchg64 is defined.
 
-> ---
->  s390x/uv-host.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/s390x/uv-host.c b/s390x/uv-host.c
-> index 20d805b8..ed16f850 100644
-> --- a/s390x/uv-host.c
-> +++ b/s390x/uv-host.c
-> @@ -433,7 +433,7 @@ static void test_config_create(void)
->  	uvcb_cgc.guest_sca = tmp;
->  
->  	tmp = uvcb_cgc.guest_sca;
-> -	uvcb_cgc.guest_sca = get_max_ram_size() + + PAGE_SIZE * 4;
-> +	uvcb_cgc.guest_sca = get_max_ram_size() + PAGE_SIZE * 4;
->  	rc = uv_call(0, (uint64_t)&uvcb_cgc);
->  	report(uvcb_cgc.header.rc == 0x10d && rc == 1,
->  	       "sca inaccessible");
-
+Uros.
