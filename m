@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F14C525E5D
-	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 11:19:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0876E525DF9
+	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 11:19:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378846AbiEMJDK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 May 2022 05:03:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40314 "EHLO
+        id S1378863AbiEMJDV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 May 2022 05:03:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378828AbiEMJDG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 May 2022 05:03:06 -0400
+        with ESMTP id S1378864AbiEMJDI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 May 2022 05:03:08 -0400
 Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C315994E9;
-        Fri, 13 May 2022 02:03:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ECFE9B1BA;
+        Fri, 13 May 2022 02:03:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652432584; x=1683968584;
+  t=1652432587; x=1683968587;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=4u7kPxkI+qIYW7/lB1AUNG4A0JsQhATwJmmL079dvs4=;
-  b=B9N4j/68B6/aArFPSvwQlqTRgPbQ4qgpuhJU8fj1Dy/YI2VUIEZlBz7h
-   UkO1+izhodQddLhvlYMWg6a1yffrnVBPWpmpRuCc3haPmXS1U/hUF39u2
-   QpgpoqfXgNNH0p2rMDONWlKLRR5oEAd+oz+TkbYMhoY6E27aMwf8zBNAv
-   s1XKAbfhPuYuqK7jscSjv/Oee25VQ7xHDQIQtogYemc/DQfvgcoToDHPY
-   o9dQDli9/8SNafjKEK8ZyjaB7C0AuiyUqIDZ+4xmai4abD+Wu+/7UVxba
-   plLv95LN4tQbjhKN956xVSZpoZAJpAXFY3lGw23wuXpZQhaLmDtoFqDKa
+  bh=UGgiD+lsZ3LQDZgfT13E23wHzHRHsuBkOFD7vqgyL6k=;
+  b=L5ZLJTC4e5jqTJZp2HvkQBm3RxlcHlWRsnR4kBndHehoh4YqPZW+Fpqg
+   CDNiyW2mM+4+WGxvXoP72g+XocQvQHBw/e1Rhvktb2ZWoJi1l4YtrAYW4
+   abauoCU1XIx6TYkGQByOyAf7JzKxlL0uc1/5HTFqCRvf9xawAYxTj2DJP
+   8qYrqlHmvekyeZltMuWOGvBeYZRzTejbrbfSWMkGtWJYLqiPXd805h0jk
+   RRHemmlmOkpXY8nnO3gepYLb45f4EVgAxjSMlNNf4M9PE0QVufO2FpL6/
+   g9b8JBSOpUfzwyNAnoet537DK3ONfy6Y/Da62OtCLnm1sqBCURIm0p1rT
    A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10345"; a="330856492"
+X-IronPort-AV: E=McAfee;i="6400,9594,10345"; a="330856516"
 X-IronPort-AV: E=Sophos;i="5.91,221,1647327600"; 
-   d="scan'208";a="330856492"
+   d="scan'208";a="330856516"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2022 02:03:04 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2022 02:03:06 -0700
 X-IronPort-AV: E=Sophos;i="5.91,221,1647327600"; 
-   d="scan'208";a="595129665"
+   d="scan'208";a="595129699"
 Received: from ahunter6-mobl1.ger.corp.intel.com (HELO ahunter-VirtualBox.home\044ger.corp.intel.com) ([10.252.36.190])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2022 02:03:01 -0700
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2022 02:03:04 -0700
 From:   Adrian Hunter <adrian.hunter@intel.com>
 To:     Arnaldo Carvalho de Melo <acme@kernel.org>
 Cc:     Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
         Ian Rogers <irogers@google.com>, Leo Yan <leo.yan@linaro.org>,
         linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: [PATCH 4/6] perf script: Add guest_code support
-Date:   Fri, 13 May 2022 12:02:35 +0300
-Message-Id: <20220513090237.10444-5-adrian.hunter@intel.com>
+Subject: [PATCH 5/6] perf kvm report: Add guest_code support
+Date:   Fri, 13 May 2022 12:02:36 +0300
+Message-Id: <20220513090237.10444-6-adrian.hunter@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220513090237.10444-1-adrian.hunter@intel.com>
 References: <20220513090237.10444-1-adrian.hunter@intel.com>
@@ -66,48 +66,37 @@ process.
 
 Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- tools/perf/Documentation/perf-script.txt | 4 ++++
- tools/perf/builtin-script.c              | 5 ++++-
- 2 files changed, 8 insertions(+), 1 deletion(-)
+ tools/perf/Documentation/perf-kvm.txt | 3 +++
+ tools/perf/builtin-kvm.c              | 2 ++
+ 2 files changed, 5 insertions(+)
 
-diff --git a/tools/perf/Documentation/perf-script.txt b/tools/perf/Documentation/perf-script.txt
-index 2012a8e6c90b..1a557ff8f210 100644
---- a/tools/perf/Documentation/perf-script.txt
-+++ b/tools/perf/Documentation/perf-script.txt
-@@ -499,6 +499,10 @@ include::itrace.txt[]
- 	The known limitations include exception handing such as
- 	setjmp/longjmp will have calls/returns not match.
- 
+diff --git a/tools/perf/Documentation/perf-kvm.txt b/tools/perf/Documentation/perf-kvm.txt
+index cf95baef7b61..83c742adf86e 100644
+--- a/tools/perf/Documentation/perf-kvm.txt
++++ b/tools/perf/Documentation/perf-kvm.txt
+@@ -94,6 +94,9 @@ OPTIONS
+ 	kernel module information. Users copy it out from guest os.
+ --guestvmlinux=<path>::
+ 	Guest os kernel vmlinux.
 +--guest-code::
 +	Indicate that guest code can be found in the hypervisor process,
 +	which is a common case for KVM test programs.
-+
- SEE ALSO
- --------
- linkperf:perf-record[1], linkperf:perf-script-perl[1],
-diff --git a/tools/perf/builtin-script.c b/tools/perf/builtin-script.c
-index cf5eab5431b4..96a2106a3dac 100644
---- a/tools/perf/builtin-script.c
-+++ b/tools/perf/builtin-script.c
-@@ -3884,6 +3884,8 @@ int cmd_script(int argc, const char **argv)
- 		   "file", "file saving guest os /proc/kallsyms"),
- 	OPT_STRING(0, "guestmodules", &symbol_conf.default_guest_modules,
- 		   "file", "file saving guest os /proc/modules"),
-+	OPT_BOOLEAN(0, "guest-code", &symbol_conf.guest_code,
-+		    "Guest code can be found in hypervisor process"),
- 	OPT_BOOLEAN('\0', "stitch-lbr", &script.stitch_lbr,
- 		    "Enable LBR callgraph stitching approach"),
- 	OPTS_EVSWITCH(&script.evswitch),
-@@ -3909,7 +3911,8 @@ int cmd_script(int argc, const char **argv)
- 	if (symbol_conf.guestmount ||
- 	    symbol_conf.default_guest_vmlinux_name ||
- 	    symbol_conf.default_guest_kallsyms ||
--	    symbol_conf.default_guest_modules) {
-+	    symbol_conf.default_guest_modules ||
-+	    symbol_conf.guest_code) {
- 		/*
- 		 * Enable guest sample processing.
- 		 */
+ -v::
+ --verbose::
+ 	Be more verbose (show counter open errors, etc).
+diff --git a/tools/perf/builtin-kvm.c b/tools/perf/builtin-kvm.c
+index 2fa687f73e5e..3696ae97f149 100644
+--- a/tools/perf/builtin-kvm.c
++++ b/tools/perf/builtin-kvm.c
+@@ -1603,6 +1603,8 @@ int cmd_kvm(int argc, const char **argv)
+ 			   "file", "file saving guest os /proc/kallsyms"),
+ 		OPT_STRING(0, "guestmodules", &symbol_conf.default_guest_modules,
+ 			   "file", "file saving guest os /proc/modules"),
++		OPT_BOOLEAN(0, "guest-code", &symbol_conf.guest_code,
++			    "Guest code can be found in hypervisor process"),
+ 		OPT_INCR('v', "verbose", &verbose,
+ 			    "be more verbose (show counter open errors, etc)"),
+ 		OPT_END()
 -- 
 2.25.1
 
