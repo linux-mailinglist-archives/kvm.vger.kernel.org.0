@@ -2,145 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A8C7352628F
-	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 15:04:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA00D5262B7
+	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 15:15:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380517AbiEMNEQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 May 2022 09:04:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58674 "EHLO
+        id S1380606AbiEMNPW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 May 2022 09:15:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380558AbiEMNEO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 May 2022 09:04:14 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 742644707D;
-        Fri, 13 May 2022 06:04:13 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24DCINlI022119;
-        Fri, 13 May 2022 13:04:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=jqqlVn4O0isxX1DTalqWZZH0+BQqMmr8CCXYIDS65Y4=;
- b=j+7NpdicpZOMFw6vtztZ5JCPat2LJUs52MVUneu0KQhJSFXYRP90CX9gCu9/nh9BBOhZ
- VfqW7QXpqaAObvQQA4hB0o0PROfED/MoWvlonOEgqSgFjuD5CmMgYlR5TPGxi420T+Hu
- l2QhZa8CK62Ird/5R7J9GPCRW6Lb4G9sqy9vXJummKTylnV00IPu1HFMAc4YRQ6lJYrq
- bg+mXHTeqS+XsXVO3l78gVVoV/mpu2DV9TqZrwWfOWKHDHOrMGKHUBgoqPSuy3DZLeDZ
- XmZaGnESH+ITgsVGReJmZ4Sg7WnLRB799Ggnus7QmGm74YrljLSVh2797cAqBuKtlyHM JQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g1q7agwa4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 May 2022 13:04:12 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24DCwIsX012730;
-        Fri, 13 May 2022 13:04:12 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g1q7agw9b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 May 2022 13:04:12 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24DCx0b8007351;
-        Fri, 13 May 2022 13:04:09 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3fwgd90q41-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 May 2022 13:04:09 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24DD46dO50069850
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 May 2022 13:04:06 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 95B88AE051;
-        Fri, 13 May 2022 13:04:06 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5D949AE045;
-        Fri, 13 May 2022 13:04:06 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.40])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 13 May 2022 13:04:06 +0000 (GMT)
-Date:   Fri, 13 May 2022 15:04:04 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Cc:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v1 2/2] s390x: add migration test for
- storage keys
-Message-ID: <20220513150404.6d64ae9e@p-imbrenda>
-In-Reply-To: <a2e497b3-7d86-280c-f483-9ba20707294b@linux.ibm.com>
-References: <20220512140107.1432019-1-nrb@linux.ibm.com>
-        <20220512140107.1432019-3-nrb@linux.ibm.com>
-        <5781a3a7-c76c-710d-4236-b82f6e821c48@linux.ibm.com>
-        <20220513143323.25ca256a@p-imbrenda>
-        <a2e497b3-7d86-280c-f483-9ba20707294b@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.31; x86_64-redhat-linux-gnu)
+        with ESMTP id S232625AbiEMNPU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 May 2022 09:15:20 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0D4A260DBC
+        for <kvm@vger.kernel.org>; Fri, 13 May 2022 06:15:18 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 78E07143D;
+        Fri, 13 May 2022 06:15:18 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7039A3F5A1;
+        Fri, 13 May 2022 06:15:17 -0700 (PDT)
+Date:   Fri, 13 May 2022 14:15:20 +0100
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     kvm@vger.kernel.org, drjones@redhat.com, pbonzini@redhat.com,
+        jade.alglave@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 12/23] arm/arm64: mmu_disable: Clean
+ and invalidate before disabling
+Message-ID: <Yn5Z6Kyj62cUNgRN@monolith.localdoman>
+References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
+ <20220506205605.359830-13-nikos.nikoleris@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: jd6aVUh8aZtNa2wTTXGSTPVIrEgGPaIm
-X-Proofpoint-ORIG-GUID: BGbW2Aw0JrJ5oUlAN2bj6z8k4xYZFnct
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-13_04,2022-05-13_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- spamscore=0 phishscore=0 priorityscore=1501 lowpriorityscore=0 bulkscore=0
- impostorscore=0 clxscore=1015 mlxlogscore=999 adultscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2205130057
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220506205605.359830-13-nikos.nikoleris@arm.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 13 May 2022 14:46:04 +0200
-Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
+Hi,
 
-> On 5/13/22 14:33, Claudio Imbrenda wrote:
-> > On Fri, 13 May 2022 13:04:34 +0200
-> > Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
-> >   
-> >> On 5/12/22 16:01, Nico Boehr wrote:  
-> >>> Upon migration, we expect storage keys being set by the guest to be preserved,
-> >>> so add a test for it.
-> >>>
-> >>> We keep 128 pages and set predictable storage keys. Then, we migrate and check
-> >>> they can be read back and the respective access restrictions are in place when
-> >>> the access key in the PSW doesn't match.
-> >>>
-> >>> TCG currently doesn't implement key-controlled protection, see
-> >>> target/s390x/mmu_helper.c, function mmu_handle_skey(), hence add the relevant
-> >>> tests as xfails.
-> >>>
-> >>> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> >>> ---
-> >>>  s390x/Makefile         |  1 +
-> >>>  s390x/migration-skey.c | 98 ++++++++++++++++++++++++++++++++++++++++++
-> >>>  s390x/unittests.cfg    |  4 ++
-> >>>  3 files changed, 103 insertions(+)
-> >>>  create mode 100644 s390x/migration-skey.c
-> >>>  
-
-[...]
-
-> Not at all with regards to skeys. But neither is checking the keys on access.
-> And for kvm, both TPROT and checking is handled by SIE.
-
-fair enough
-
-> > 
-> > to be fair, this test is only about checking that storage keys are
-> > correctly migrated, maybe the check for actual protection is out of
-> > scope
-> >   
+On Fri, May 06, 2022 at 09:55:54PM +0100, Nikos Nikoleris wrote:
+> From: Andrew Jones <drjones@redhat.com>
 > 
-> Having more tests does no harm and might uncover things nobody thought of,
-> but I'd also be fine with keeping it short and sweet.
-> [...]
+> The commit message of commit 410b3bf09e76 ("arm/arm64: Perform dcache
+> clean + invalidate after turning MMU off") justifies cleaning and
+> invalidating the dcache after disabling the MMU by saying it's nice
+> not to rely on the current page tables and that it should still work
+> (per the spec), as long as there's an identity map in the current
+> tables. Doing the invalidation after also somewhat helped with
 
-I think this migration test should be kept more on focus about migration
+That's not what the commit says (well, that's now what I wanted to say in
+the commit, it might be that I haven't been clear enough):
 
-we can always have a storage keys "torture test" separately
+"Data caches are PIPT and the VAs are translated using the current
+translation tables, or an identity mapping (what Arm calls a "flat
+mapping") when the MMU is off".
+
+That "flat mapping" does not rely on the TTBRx_EL1 tables, it means that
+the output address (the physical address) is the same as the input address
+(the virtual address). No actual translation is taking place.
+
+> reenabling the MMU without seeing stale data, but the real problem
+> with reenabling was because the cache needs to be disabled with
+> the MMU, but it wasn't.
+
+That's not what ARM DDI 0487H.a says on page D5-4826 when HCR_EL2.DC == 0
+(which is how KVM configures HCR_EL2):
+
+"For all other accesses, when stage 1 address translation is disabled, the
+assigned attributes depend on whether the access is a data access or an
+instruction access, as follows:
+Data access
+The stage 1 translation assigns the Device-nGnRnE memory type."
+
+When the MMU is off, data accesses are non-cacheable.
+
+> 
+> Since we have to trust/validate that the current page tables have an
+> identity map anyway, then there's no harm in doing the clean
+> and invalidate first (it feels a little better to do so, anyway,
+> considering the cache maintenance instructions take virtual
+> addresses). Then, also disable the cache with the MMU to avoid
+
+That's questionable, CPU can speculate reads which allocate a new dcache
+entry after clean + invalidate and before the MMU is turned off, thus
+making the clean + invalidate rather useless.
+
+> problems when reenabling. We invalidate the Icache and disable
+
+ARM DDI 0487H.a is pretty clear when icache maintainance is required on
+page D5-4933:
+
+"Any permitted instruction cache implementation can be described as
+implementing the IVIPT Extension to the Arm architecture.
+
+The formal definition of the Arm IVIPT Extension is that it reduces the
+instruction cache maintenance requirement to the following condition:
+
+- Instruction cache maintenance is required only after writing new data to
+  a PA that holds an instruction."
+
+If you are seeing issues that are solved by doing an icache invalidation, I
+would look first at what the EFI spec guarantees regarding icache
+maintenance, because kvm-unit-tests doesn't modify its instructions.
+
+> that too for good measure. And, a final TLB invalidation ensures
+> we're crystal clean when we return from asm_mmu_disable().
+
+If I were to guess, any issues that you are seeing are caused by the fact
+that EFI apps start with the MMU enabled, and kvm-unit-tests so far has
+assumed that the tests start with the MMU disabled.
+
+Thanks,
+Alex
+
+> 
+> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> ---
+>  arm/cstart.S   | 28 +++++++++++++++++++++-------
+>  arm/cstart64.S | 21 ++++++++++++++++-----
+>  2 files changed, 37 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arm/cstart.S b/arm/cstart.S
+> index 7036e67..dc324c5 100644
+> --- a/arm/cstart.S
+> +++ b/arm/cstart.S
+> @@ -179,6 +179,7 @@ halt:
+>  .globl asm_mmu_enable
+>  asm_mmu_enable:
+>  	/* TLBIALL */
+> +	mov	r2, #0
+>  	mcr	p15, 0, r2, c8, c7, 0
+>  	dsb	nsh
+>  
+> @@ -211,12 +212,7 @@ asm_mmu_enable:
+>  
+>  .globl asm_mmu_disable
+>  asm_mmu_disable:
+> -	/* SCTLR */
+> -	mrc	p15, 0, r0, c1, c0, 0
+> -	bic	r0, #CR_M
+> -	mcr	p15, 0, r0, c1, c0, 0
+> -	isb
+> -
+> +	/* Clean + invalidate the entire memory */
+>  	ldr	r0, =__phys_offset
+>  	ldr	r0, [r0]
+>  	ldr	r1, =__phys_end
+> @@ -224,7 +220,25 @@ asm_mmu_disable:
+>  	sub	r1, r1, r0
+>  	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
+>  
+> -	mov     pc, lr
+> +	/* Invalidate Icache */
+> +	mov	r0, #0
+> +	mcr	p15, 0, r0, c7, c5, 0
+> +	isb
+> +
+> +	/*  Disable cache, Icache and MMU */
+> +	mrc	p15, 0, r0, c1, c0, 0
+> +	bic	r0, #CR_C
+> +	bic	r0, #CR_I
+> +	bic	r0, #CR_M
+> +	mcr	p15, 0, r0, c1, c0, 0
+> +	isb
+> +
+> +	/* Invalidate TLB */
+> +	mov	r0, #0
+> +	mcr	p15, 0, r0, c8, c7, 0
+> +	dsb	nsh
+> +
+> +	mov	pc, lr
+>  
+>  /*
+>   * Vectors
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index e4ab7d0..390feb9 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -246,11 +246,6 @@ asm_mmu_enable:
+>  
+>  .globl asm_mmu_disable
+>  asm_mmu_disable:
+> -	mrs	x0, sctlr_el1
+> -	bic	x0, x0, SCTLR_EL1_M
+> -	msr	sctlr_el1, x0
+> -	isb
+> -
+>  	/* Clean + invalidate the entire memory */
+>  	adrp	x0, __phys_offset
+>  	ldr	x0, [x0, :lo12:__phys_offset]
+> @@ -259,6 +254,22 @@ asm_mmu_disable:
+>  	sub	x1, x1, x0
+>  	dcache_by_line_op civac, sy, x0, x1, x2, x3
+>  
+> +	/* Invalidate Icache */
+> +	ic	iallu
+> +	isb
+> +
+> +	/* Disable cache, Icache and MMU */
+> +	mrs	x0, sctlr_el1
+> +	bic	x0, x0, SCTLR_EL1_C
+> +	bic	x0, x0, SCTLR_EL1_I
+> +	bic	x0, x0, SCTLR_EL1_M
+> +	msr	sctlr_el1, x0
+> +	isb
+> +
+> +	/* Invalidate TLB */
+> +	tlbi	vmalle1
+> +	dsb	nsh
+> +
+>  	ret
+>  
+>  /*
+> -- 
+> 2.25.1
+> 
