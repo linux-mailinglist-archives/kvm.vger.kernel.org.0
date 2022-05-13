@@ -2,129 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4597F526217
+	by mail.lfdr.de (Postfix) with ESMTP id 91D8D526218
 	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 14:35:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380394AbiEMMfL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 May 2022 08:35:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56090 "EHLO
+        id S1380392AbiEMMfU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 May 2022 08:35:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380386AbiEMMfB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 May 2022 08:35:01 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04F9469498;
-        Fri, 13 May 2022 05:35:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652445301; x=1683981301;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Zv7Qi86HPneMHTnZpf40yaE9hmnJYLH+m3BORrPBcec=;
-  b=RoWmQ6iwVOTB8MQ+8HMUo1kgPbBvVVKr0rrJbk6oskwi7rIaCAksbgZQ
-   azZqXoVSy7gU1bkLlXUymZoRnIFOO01bLUT2wmiUMSsZ8ylLKhL8rgDmq
-   kZoss0zZnSia9fiKra2UlkpFNTf50VFbbyq5a5ue7D93rNJdAo8cXpmRg
-   x/V7umKa6WSL5mBXVRspY93Er4LYY30iSxGC2OAS1xFVXz98C/quJex/t
-   umpgMyNB8B+StndAG3z0Vm7qEfPMGWKBh+weKbOVWyRP9QT199Gr+btyx
-   KdXBlc5JuCdMN83sDRY+X+0ASwp8s642UxNrMGmLNhXqBpucbn5HDvPPN
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10345"; a="356721676"
-X-IronPort-AV: E=Sophos;i="5.91,221,1647327600"; 
-   d="scan'208";a="356721676"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2022 05:35:00 -0700
-X-IronPort-AV: E=Sophos;i="5.91,221,1647327600"; 
-   d="scan'208";a="521405157"
-Received: from apamu-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.33.218])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2022 05:34:58 -0700
-Message-ID: <a125cfc58ef09367dc4557fd8a854ed9f21c1675.camel@intel.com>
-Subject: Re: [RFC PATCH v6 025/104] KVM: TDX: initialize VM with TDX
- specific parameters
-From:   Kai Huang <kai.huang@intel.com>
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>
-Date:   Sat, 14 May 2022 00:34:55 +1200
-In-Reply-To: <20220509151829.GC2789321@ls.amr.corp.intel.com>
-References: <cover.1651774250.git.isaku.yamahata@intel.com>
-         <fbc23565f7556e7b33227bcad95441195bb4758d.1651774250.git.isaku.yamahata@intel.com>
-         <b3d587fd-1bf2-411c-96a9-6750e9aeefa2@intel.com>
-         <20220509151829.GC2789321@ls.amr.corp.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        with ESMTP id S1380421AbiEMMfN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 May 2022 08:35:13 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3661F68FAB;
+        Fri, 13 May 2022 05:35:12 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24DABgZr016716;
+        Fri, 13 May 2022 12:35:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=gmS+Ius9bVpzAeKtBw6cRfpCwfOcAkz4Sl8pe/HmEzY=;
+ b=V8N4Jxk3YLYCPI77TY9hO2yyW64qG69XlRnoxSbuZwZ6XVA4h41VfQJuRhGVhTPgBz3j
+ E2KkMusH++GTSUZgR0jK90h2erykgblWol9T0mOugKoF8OJTUs+TW6IePA7/PcuxkUST
+ YolMb3bCNAIPwOUm319O0mS9QEvPH+UOPjubBIi5vBUuY/si/YC8UkhIz8RMson11HbJ
+ puMAl2fHEeb1+LgJlLPFkXkN3KppkywT2k80LLltaLl+fNxJdhhcJrJ+lCEJTdyDaoz1
+ km3LYE9PvBhbbjAYWMZFDzq5r3qs7Yk6Kg4C7uBbD42sQBkmCbl817k9qMYuGzJVTtnw kQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g1mxr31gq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 May 2022 12:35:07 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24DCEmjm018706;
+        Fri, 13 May 2022 12:35:06 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g1mxr31fx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 May 2022 12:35:06 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24DCWNvH005938;
+        Fri, 13 May 2022 12:35:04 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06ams.nl.ibm.com with ESMTP id 3fyrkk4hgh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 May 2022 12:35:04 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24DCZ1ON24576452
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 13 May 2022 12:35:01 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5A665A405F;
+        Fri, 13 May 2022 12:35:01 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E2EA3A4054;
+        Fri, 13 May 2022 12:35:00 +0000 (GMT)
+Received: from [9.145.187.154] (unknown [9.145.187.154])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 13 May 2022 12:35:00 +0000 (GMT)
+Message-ID: <5674a855-456f-d9b8-661f-49908aad2025@linux.ibm.com>
+Date:   Fri, 13 May 2022 14:35:00 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v4 1/2] drivers/s390/char: Add Ultravisor io device
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Greg KH <greg@kroah.com>, Heiko Carstens <hca@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Nico Boehr <nrb@linux.ibm.com>, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org
+References: <20220510144724.3321985-1-seiden@linux.ibm.com>
+ <20220510144724.3321985-2-seiden@linux.ibm.com>
+ <20220512163327.2c86cab1@p-imbrenda>
+ <80afde93-b9cf-f6c4-da40-3385d7f6741b@linux.ibm.com>
+ <20220513103758.5a4baf7c@p-imbrenda>
+From:   Steffen Eiden <seiden@linux.ibm.com>
+Organization: IBM
+In-Reply-To: <20220513103758.5a4baf7c@p-imbrenda>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 1Ps0IppIsUVJPjeL2BzjY9q0C5X9STDY
+X-Proofpoint-ORIG-GUID: ab9qKxzQRR1a_i9e-MIGdEuf_P1BVu95
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-13_04,2022-05-13_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 mlxscore=0
+ suspectscore=0 spamscore=0 bulkscore=0 impostorscore=0 clxscore=1015
+ adultscore=0 malwarescore=0 lowpriorityscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205130055
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-05-09 at 08:18 -0700, Isaku Yamahata wrote:
-> > > +struct kvm_tdx_init_vm {
-> > > +	__u64 attributes;
-> > > +	__u32 max_vcpus;
-> > > +	__u32 tsc_khz;
-> > > +	__u64 mrconfigid[6];	/* sha384 digest */
-> > > +	__u64 mrowner[6];	/* sha384 digest */
-> > > +	__u64 mrownerconfig[6];	/* sha348 digest */
-> > > +	union {
-> > > +		/*
-> > > +		 * KVM_TDX_INIT_VM is called before vcpu creation, thus
-> > > before
-> > > +		 * KVM_SET_CPUID2.  CPUID configurations needs to be
-> > > passed.
-> > > +		 *
-> > > +		 * This configuration supersedes KVM_SET_CPUID{,2}.
-> > > +		 * The user space VMM, e.g. qemu, should make them
-> > > consistent
-> > > +		 * with this values.
-> > > +		 * sizeof(struct kvm_cpuid_entry2) *
-> > > KVM_MAX_CPUID_ENTRIES(256)
-> > > +		 * = 8KB.
-> > > +		 */
-> > > +		struct {
-> > > +			struct kvm_cpuid2 cpuid;
-> > > +			/* 8KB with KVM_MAX_CPUID_ENTRIES. */
-> > > +			struct kvm_cpuid_entry2 entries[];
-> > > +		};
-> > > +		/*
-> > > +		 * For future extensibility.
-> > > +		 * The size(struct kvm_tdx_init_vm) = 16KB.
-> > > +		 * This should be enough given sizeof(TD_PARAMS) = 1024
-> > > +		 */
-> > > +		__u64 reserved[2028];
-> > 
-> > I don't think it's a good idea to put the CPUID configs at the end of this
-> > structure and put it into a union.
-> > 
-> > 1. The union makes the Array of Length zero entries[] pointless.
-> > 2. It wastes memory that when new field to be added in the future, it has to
-> > be put after union instead of inside union.
+
+
+On 5/13/22 10:37, Claudio Imbrenda wrote:
+> On Fri, 13 May 2022 09:45:39 +0200
+> Steffen Eiden <seiden@linux.ibm.com> wrote:
 > 
-> Hmm, I checked this as there was a suggestion to do so.
-> I have to admit that it's ugly for future reserved area.  The options I can
-> think of are
+>> On 5/12/22 16:33, Claudio Imbrenda wrote:
+>>
+>> [snip]
+>>
+>>>> +/*
+>>>> + * IOCTL entry point for the Ultravisor device.
+>>>> + */
+>>>> +static long uvio_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+>>>> +{
+>>>> +	void __user *argp = (void __user *)arg;
+>>>> +	struct uvio_ioctl_cb *uv_ioctl;
+>>>> +	long ret;
+>>>> +
+>>>> +	ret = -ENOMEM;
+>>>> +	uv_ioctl = vzalloc(sizeof(*uv_ioctl));
+>>> struct uvio_ioctl_cb is rather small, couldn't you just allocate it on
+>>> the stack?
+>>>    
+>> IIRC it was on stack in some previous version. We then had a discussion
+>> earlier about this triggered by the inverse comment and decided to not
+>> use the stack.
 > 
-> A. add a pointer to struct kvm_cpuid2 (previous v5 patch)
-> B. this patch.
+> ok fair enough
+> 
+> but what's the reason for a vzalloc instead of a kzalloc, when the
+> allocation is surely going to be small?
+> 
+We had no strong reasons against or for vzalloc/kzalloc.
+If you want me to change it to kzalloc I can do it. I still
+have no strong opinion on that.
 
-Why can't we just use kvm_cpuid2 here to replace the union?  We can add
-additional reserved space before kvm_cpuid2 for future extension.  Is there any
-problem?
-
-I don't see there's fundamental difference between putting kvm_cpuid2 directly
-here vs putting a 'cpuid' pointer here.  My personal feeling is the former is
-clearer than the latter.
-
--- 
-Thanks,
--Kai
-
-
+>> [snip]
