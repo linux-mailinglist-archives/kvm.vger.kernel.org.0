@@ -2,275 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 85CE4526200
-	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 14:34:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4597F526217
+	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 14:35:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379952AbiEMMdm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 May 2022 08:33:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51888 "EHLO
+        id S1380394AbiEMMfL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 May 2022 08:35:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380293AbiEMMdj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 May 2022 08:33:39 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74C7266FB6;
-        Fri, 13 May 2022 05:33:32 -0700 (PDT)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24DAU5Cb011649;
-        Fri, 13 May 2022 12:33:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=WhG4yz5Z/QrVltPYX+swCE87IQuQLsEPCzyQQPyCQGo=;
- b=pUBQjIhXnxrPkfcZ9XG6tFjE09VDdkXx9WJRKV+4+8WSw9QOQsyc+KQsg5HR5qL/yMYD
- x+DLUkY38VJNpIR+Nd92VwUQNxqkZIXYoUb4fGHTx+xoT3V5sxgbRovlckyFf2Dvfnc+
- sVP4iZJpe+a5ov42CkEKsBUPiFAOwXWiEX4TWvTaEBLvaswxIHGi6Tot0tX9zZJ4beMS
- 8qQk3jaPOQTJleIs0Rgqo/pcM8rQSVUSJh4AhsYc+IJL232wmiywHv5hduavJa1XkzFh
- rUv9YoncjC4Ws/F+KSDQ+acZKufs+gXN4T/GAwGU6gFCeizUzLOma4i9uq1rmSo8Luo5 lQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g1nmttb25-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 May 2022 12:33:31 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24DC7Hos016635;
-        Fri, 13 May 2022 12:33:31 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g1nmttb1c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 May 2022 12:33:31 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24DCU8qK004045;
-        Fri, 13 May 2022 12:33:29 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04fra.de.ibm.com with ESMTP id 3g0ma1j3r1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 May 2022 12:33:28 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24DCJjf353412160
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 May 2022 12:19:45 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D83AFA405B;
-        Fri, 13 May 2022 12:33:25 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A1EA7A4054;
-        Fri, 13 May 2022 12:33:25 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.40])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 13 May 2022 12:33:25 +0000 (GMT)
-Date:   Fri, 13 May 2022 14:33:23 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Cc:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v1 2/2] s390x: add migration test for
- storage keys
-Message-ID: <20220513143323.25ca256a@p-imbrenda>
-In-Reply-To: <5781a3a7-c76c-710d-4236-b82f6e821c48@linux.ibm.com>
-References: <20220512140107.1432019-1-nrb@linux.ibm.com>
-        <20220512140107.1432019-3-nrb@linux.ibm.com>
-        <5781a3a7-c76c-710d-4236-b82f6e821c48@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.31; x86_64-redhat-linux-gnu)
+        with ESMTP id S1380386AbiEMMfB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 May 2022 08:35:01 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04F9469498;
+        Fri, 13 May 2022 05:35:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652445301; x=1683981301;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Zv7Qi86HPneMHTnZpf40yaE9hmnJYLH+m3BORrPBcec=;
+  b=RoWmQ6iwVOTB8MQ+8HMUo1kgPbBvVVKr0rrJbk6oskwi7rIaCAksbgZQ
+   azZqXoVSy7gU1bkLlXUymZoRnIFOO01bLUT2wmiUMSsZ8ylLKhL8rgDmq
+   kZoss0zZnSia9fiKra2UlkpFNTf50VFbbyq5a5ue7D93rNJdAo8cXpmRg
+   x/V7umKa6WSL5mBXVRspY93Er4LYY30iSxGC2OAS1xFVXz98C/quJex/t
+   umpgMyNB8B+StndAG3z0Vm7qEfPMGWKBh+weKbOVWyRP9QT199Gr+btyx
+   KdXBlc5JuCdMN83sDRY+X+0ASwp8s642UxNrMGmLNhXqBpucbn5HDvPPN
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10345"; a="356721676"
+X-IronPort-AV: E=Sophos;i="5.91,221,1647327600"; 
+   d="scan'208";a="356721676"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2022 05:35:00 -0700
+X-IronPort-AV: E=Sophos;i="5.91,221,1647327600"; 
+   d="scan'208";a="521405157"
+Received: from apamu-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.33.218])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2022 05:34:58 -0700
+Message-ID: <a125cfc58ef09367dc4557fd8a854ed9f21c1675.camel@intel.com>
+Subject: Re: [RFC PATCH v6 025/104] KVM: TDX: initialize VM with TDX
+ specific parameters
+From:   Kai Huang <kai.huang@intel.com>
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>
+Date:   Sat, 14 May 2022 00:34:55 +1200
+In-Reply-To: <20220509151829.GC2789321@ls.amr.corp.intel.com>
+References: <cover.1651774250.git.isaku.yamahata@intel.com>
+         <fbc23565f7556e7b33227bcad95441195bb4758d.1651774250.git.isaku.yamahata@intel.com>
+         <b3d587fd-1bf2-411c-96a9-6750e9aeefa2@intel.com>
+         <20220509151829.GC2789321@ls.amr.corp.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: jxrAIucR5S5CRYMOBWVE5HEMlR8cIcdu
-X-Proofpoint-GUID: 00fCtgkxeGyK5loQVimsK0RY7h6yAh4m
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-13_04,2022-05-13_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
- mlxlogscore=999 adultscore=0 priorityscore=1501 bulkscore=0 clxscore=1015
- mlxscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2205130055
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 13 May 2022 13:04:34 +0200
-Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
-
-> On 5/12/22 16:01, Nico Boehr wrote:
-> > Upon migration, we expect storage keys being set by the guest to be preserved,
-> > so add a test for it.
+On Mon, 2022-05-09 at 08:18 -0700, Isaku Yamahata wrote:
+> > > +struct kvm_tdx_init_vm {
+> > > +	__u64 attributes;
+> > > +	__u32 max_vcpus;
+> > > +	__u32 tsc_khz;
+> > > +	__u64 mrconfigid[6];	/* sha384 digest */
+> > > +	__u64 mrowner[6];	/* sha384 digest */
+> > > +	__u64 mrownerconfig[6];	/* sha348 digest */
+> > > +	union {
+> > > +		/*
+> > > +		 * KVM_TDX_INIT_VM is called before vcpu creation, thus
+> > > before
+> > > +		 * KVM_SET_CPUID2.  CPUID configurations needs to be
+> > > passed.
+> > > +		 *
+> > > +		 * This configuration supersedes KVM_SET_CPUID{,2}.
+> > > +		 * The user space VMM, e.g. qemu, should make them
+> > > consistent
+> > > +		 * with this values.
+> > > +		 * sizeof(struct kvm_cpuid_entry2) *
+> > > KVM_MAX_CPUID_ENTRIES(256)
+> > > +		 * = 8KB.
+> > > +		 */
+> > > +		struct {
+> > > +			struct kvm_cpuid2 cpuid;
+> > > +			/* 8KB with KVM_MAX_CPUID_ENTRIES. */
+> > > +			struct kvm_cpuid_entry2 entries[];
+> > > +		};
+> > > +		/*
+> > > +		 * For future extensibility.
+> > > +		 * The size(struct kvm_tdx_init_vm) = 16KB.
+> > > +		 * This should be enough given sizeof(TD_PARAMS) = 1024
+> > > +		 */
+> > > +		__u64 reserved[2028];
 > > 
-> > We keep 128 pages and set predictable storage keys. Then, we migrate and check
-> > they can be read back and the respective access restrictions are in place when
-> > the access key in the PSW doesn't match.
+> > I don't think it's a good idea to put the CPUID configs at the end of this
+> > structure and put it into a union.
 > > 
-> > TCG currently doesn't implement key-controlled protection, see
-> > target/s390x/mmu_helper.c, function mmu_handle_skey(), hence add the relevant
-> > tests as xfails.
-> > 
-> > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> > ---
-> >  s390x/Makefile         |  1 +
-> >  s390x/migration-skey.c | 98 ++++++++++++++++++++++++++++++++++++++++++
-> >  s390x/unittests.cfg    |  4 ++
-> >  3 files changed, 103 insertions(+)
-> >  create mode 100644 s390x/migration-skey.c
-> > 
-> > diff --git a/s390x/Makefile b/s390x/Makefile
-> > index a8e04aa6fe4d..f8ea594b641d 100644
-> > --- a/s390x/Makefile
-> > +++ b/s390x/Makefile
-> > @@ -32,6 +32,7 @@ tests += $(TEST_DIR)/epsw.elf
-> >  tests += $(TEST_DIR)/adtl-status.elf
-> >  tests += $(TEST_DIR)/migration.elf
-> >  tests += $(TEST_DIR)/pv-attest.elf
-> > +tests += $(TEST_DIR)/migration-skey.elf
-> >  
-> >  pv-tests += $(TEST_DIR)/pv-diags.elf
-> >  
-> > diff --git a/s390x/migration-skey.c b/s390x/migration-skey.c
-> > new file mode 100644
-> > index 000000000000..6f3053d8ab40
-> > --- /dev/null
-> > +++ b/s390x/migration-skey.c
-> > @@ -0,0 +1,98 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > +/*
-> > + * Storage Key migration tests
-> > + *
-> > + * Copyright IBM Corp. 2022
-> > + *
-> > + * Authors:
-> > + *  Nico Boehr <nrb@linux.ibm.com>
-> > + */
-> > +
-> > +#include <libcflat.h>
-> > +#include <asm/facility.h>
-> > +#include <asm/page.h>
-> > +#include <asm/mem.h>
-> > +#include <asm/interrupt.h>
-> > +#include <hardware.h>
-> > +
-> > +#define NUM_PAGES 128
-> > +static uint8_t pagebuf[NUM_PAGES][PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
-> > +
-> > +static void test_migration(void)
-> > +{
-> > +	int i, key_to_set;
-> > +	uint8_t *page;
-> > +	union skey expected_key, actual_key, mismatching_key;  
+> > 1. The union makes the Array of Length zero entries[] pointless.
+> > 2. It wastes memory that when new field to be added in the future, it has to
+> > be put after union instead of inside union.
 > 
-> I would tend to scope those to the bodies of the respective loop,
-> but I don't know if that's in accordance with the coding style.
+> Hmm, I checked this as there was a suggestion to do so.
+> I have to admit that it's ugly for future reserved area.  The options I can
+> think of are
+> 
+> A. add a pointer to struct kvm_cpuid2 (previous v5 patch)
+> B. this patch.
 
-I don't think this is specified explicitly; personally I have a light
-preference for declaring everything upfront (like here), but again,
-this is not a big deal for me (and maybe Janosch and Thomas should
-also chime in and tell what their preference is)
+Why can't we just use kvm_cpuid2 here to replace the union?  We can add
+additional reserved space before kvm_cpuid2 for future extension.  Is there any
+problem?
 
-> > +
-> > +	for (i = 0; i < NUM_PAGES; i++) {
-> > +		/*
-> > +		 * Storage keys are 7 bit, lowest bit is always returned as zero
-> > +		 * by iske
-> > +		 */
-> > +		key_to_set = i * 2;
-> > +		set_storage_key(pagebuf + i, key_to_set, 1);  
-> 
-> Why not just pagebuf[i]?
-> > +	}
-> > +
-> > +	puts("Please migrate me, then press return\n");
-> > +	(void)getchar();
-> > +
-> > +	for (i = 0; i < NUM_PAGES; i++) {
-> > +		report_prefix_pushf("page %d", i);
-> > +
-> > +		page = &pagebuf[i][0];
-> > +		actual_key.val = get_storage_key(page);
-> > +		expected_key.val = i * 2;
-> > +
-> > +		/* ignore reference bit */
-> > +		actual_key.str.rf = 0;
-> > +		expected_key.str.rf = 0;
-> > +
-> > +		report(actual_key.val == expected_key.val, "expected_key=0x%x actual_key=0x%x", expected_key.val, actual_key.val);
-> > +
-> > +		/* ensure access key doesn't match storage key and is never zero */
-> > +		mismatching_key.str.acc = expected_key.str.acc < 15 ? expected_key.str.acc + 1 : 1;
-> > +		*page = 0xff;
-> > +
-> > +		expect_pgm_int();
-> > +		asm volatile (
-> > +			/* set access key */
-> > +			"spka 0(%[mismatching_key])\n"
-> > +			/* try to write page */
-> > +			"mvi 0(%[page]), 42\n"
-> > +			/* reset access key */
-> > +			"spka 0\n"
-> > +			:
-> > +			: [mismatching_key] "a"(mismatching_key.val),
-> > +			  [page] "a"(page)
-> > +			: "memory"
-> > +		);
-> > +		check_pgm_int_code_xfail(host_is_tcg(), PGM_INT_CODE_PROTECTION);
-> > +		report_xfail(host_is_tcg(), *page == 0xff, "no store occured");  
-> 
-> What are you testing with this bit? If storage keys are really effective after the migration?
-> I'm wondering if using tprot would not be better, it should simplify the code a lot.
-> Plus you'd easily test for fetch protection, too.
+I don't see there's fundamental difference between putting kvm_cpuid2 directly
+here vs putting a 'cpuid' pointer here.  My personal feeling is the former is
+clearer than the latter.
 
-on the other hand you could have tprot successful, but then not honour
-the protection it indicates (I don't know how TPROT is implemented in
-TCG)
+-- 
+Thanks,
+-Kai
 
-to be fair, this test is only about checking that storage keys are
-correctly migrated, maybe the check for actual protection is out of
-scope
-
-> > +
-> > +		report_prefix_pop();
-> > +	}
-> > +}
-> > +
-> > +int main(void)
-> > +{
-> > +	report_prefix_push("migration-skey");
-> > +	if (test_facility(169)) {
-> > +		report_skip("storage key removal facility is active");
-> > +
-> > +		/*
-> > +		 * If we just exit and don't ask migrate_cmd to migrate us, it
-> > +		 * will just hang forever. Hence, also ask for migration when we
-> > +		 * skip this test alltogether.  
-> 
-> s/alltogether/altogether/
-> 
-> > +		 */
-> > +		puts("Please migrate me, then press return\n");
-> > +		(void)getchar();
-> > +
-> > +		goto done;
-> > +	}
-> > +
-> > +	test_migration();
-> > +
-> > +done:
-> > +	report_prefix_pop();
-> > +	return report_summary();
-> > +}
-> > diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-> > index b456b2881448..1e851d8e3dd8 100644
-> > --- a/s390x/unittests.cfg
-> > +++ b/s390x/unittests.cfg
-> > @@ -176,3 +176,7 @@ extra_params = -cpu qemu,gs=off,vx=off
-> >  file = migration.elf
-> >  groups = migration
-> >  smp = 2
-> > +
-> > +[migration-skey]
-> > +file = migration-skey.elf
-> > +groups = migration  
-> 
 
