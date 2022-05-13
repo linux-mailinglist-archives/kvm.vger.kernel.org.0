@@ -2,292 +2,321 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 05CCD525AE4
-	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 06:54:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C6BD525AD8
+	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 06:53:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376935AbiEMEiS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 May 2022 00:38:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33842 "EHLO
+        id S1351159AbiEMEqQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 May 2022 00:46:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352463AbiEMEiM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 May 2022 00:38:12 -0400
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD48A5E76B
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 21:38:07 -0700 (PDT)
-Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
-        id 4Kzwqv0TPlz4xXS; Fri, 13 May 2022 14:38:03 +1000 (AEST)
+        with ESMTP id S244160AbiEMEqP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 May 2022 00:46:15 -0400
+Received: from mail-vk1-xa2d.google.com (mail-vk1-xa2d.google.com [IPv6:2607:f8b0:4864:20::a2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8462F21268
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 21:46:12 -0700 (PDT)
+Received: by mail-vk1-xa2d.google.com with SMTP id y27so3670968vkl.8
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 21:46:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gibson.dropbear.id.au; s=201602; t=1652416683;
-        bh=Dide6YGka/WEbbI7qkCikEDumjdcUQqTdjc8o2b9uDE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=H1kI0XQLM/Sb4ihByK8TZMXnmimBQ+jx+hgehQpnCus1Tf3RvX5bfOEL1Z1dYIFiU
-         2NoeFTEdMFEmKSP5ns3mFibv3WWXV9rYmsfqwMCOTCs8cXfaGlFpr+H/mktDYpK5Du
-         oSU/FRiPAZAdDOUyOWzSATiaZM6OIiHRx+fVs8I0=
-Date:   Fri, 13 May 2022 14:35:46 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Martins, Joao" <joao.m.martins@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH RFC 11/12] iommufd: vfio container FD ioctl compatibility
-Message-ID: <Yn3gIiGLyHB/5kN4@yekko>
-References: <20220429124838.GW8364@nvidia.com>
- <Ym+IfTvdD2zS6j4G@yekko>
- <20220505190728.GV49344@nvidia.com>
- <YnSxL5KxwJvQzd2Q@yekko>
- <20220506124837.GB49344@nvidia.com>
- <YniuUMCBjy0BaJC6@yekko>
- <20220509140041.GK49344@nvidia.com>
- <YnoQREfceIoLATDA@yekko>
- <20220510190009.GO49344@nvidia.com>
- <BN9PR11MB52765D95C6172ABE43E236A38CC89@BN9PR11MB5276.namprd11.prod.outlook.com>
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=NHYy548ygylCuSAwDXQbq+d6KNJ8BFi2EPzpzjEEpMs=;
+        b=puz7BD39x/FySjnOJA9lE3jNfcaG+F5YcpOmvXfhuJi1B7huCPAOb2vis8wn5Dn4jQ
+         upa8u3dzSsoCnlFBylrDajNEkkNaNv/bTFkMpQ84AgPH4mc4wwb7nmzm+17Mv1k68Qzs
+         fddd3UovmTTB8JaSmvrbSN8ipZ4d/gPpJGF59gg0F/5oJWr1u0xGXE8m7MyaovhtQCmW
+         uI1LYZcAB4/zXrQOCZJOatOInkjAOGQ6f3K/jM/DknXhb2q815ag9T+LANYbSjxoaeE3
+         psEkZN/uBeRjygH3uBVxRo6PfLXYmuPzcyjjxtnGjJOtEG69OeFd1jMZUBCeTs+HM3My
+         IG9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NHYy548ygylCuSAwDXQbq+d6KNJ8BFi2EPzpzjEEpMs=;
+        b=Uh58q8yjudOk9qv72QxvWsgh8gtEeGfsNWrO6G7xyXBsAf2uvHsGCcVacSFANqj1pC
+         FOj8vBOOgktJNDiTaEhwIte5/aGXgA/0Bci3IM4Q5nfr0XxpruSF99Wh75Bu6XVAPHbp
+         2+a17rTlqSDjgojhoh2ItRwoHvzvKN1JQZ2z4EKYVuuFUOwg8yJtjb4PKfeRkFop4Dlq
+         6TOB9QRsOH5SXwK8049YRHfrtBABwH40l0c2e6QKPJwnOrIKsIKo4YJd/pcYDZSndfpI
+         A4+EYolvq7jWwWczr830zOevCQMzsDmvY5bDhxE6AIFAyy3Z3yBmtsljtq+R7grWi8tM
+         Enig==
+X-Gm-Message-State: AOAM531oZveHdmzbGc1FxTyr8Ux5NBI/Bfbz592vrrszd0u2YrPOM79l
+        aEJ1V9dfN0j+bi2ZctZNOvTpWhlJevuezPhCaSm1gA==
+X-Google-Smtp-Source: ABdhPJwZSdpd5l3svuUA38xYh/sMlur//ikhaNPZ0sq3a0Al8XoMVWXk8YRHOwzJtU7/T0PrjPhTGa/8PVdbxhJ/Okc=
+X-Received: by 2002:a1f:4188:0:b0:349:54be:cc27 with SMTP id
+ o130-20020a1f4188000000b0034954becc27mr1454248vka.33.1652417171306; Thu, 12
+ May 2022 21:46:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="idTOIBXnjRvzu8WC"
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB52765D95C6172ABE43E236A38CC89@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-        version=3.4.6
+References: <20220412223134.1736547-1-juew@google.com> <20220412223134.1736547-4-juew@google.com>
+ <YnwH2zRlGvwkjCAC@google.com>
+In-Reply-To: <YnwH2zRlGvwkjCAC@google.com>
+From:   Jue Wang <juew@google.com>
+Date:   Thu, 12 May 2022 21:45:59 -0700
+Message-ID: <CAPcxDJ74+8s7s0sqpb-tib1fwRVupUGZwRv0jhJ57rDA4acLEw@mail.gmail.com>
+Subject: Re: [PATCH v2 3/4] KVM: x86: Add support for MSR_IA32_MCx_CTL2 MSRs.
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tony Luck <tony.luck@intel.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Thanks a lot, Sean.
 
---idTOIBXnjRvzu8WC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Wed, May 11, 2022 at 12:00 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Tue, Apr 12, 2022, Jue Wang wrote:
+> > Note the support of CMCI (MCG_CMCI_P) is not enabled in
+> > kvm_mce_cap_supported yet.
+>
+> You can probably guess what I would say here :-)  A reader should not have to go
+> wade through Intel's SDM to understand the relationship between CTL2 and CMCI.
 
-On Wed, May 11, 2022 at 03:15:22AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Wednesday, May 11, 2022 3:00 AM
-> >=20
-> > On Tue, May 10, 2022 at 05:12:04PM +1000, David Gibson wrote:
-> > > Ok... here's a revised version of my proposal which I think addresses
-> > > your concerns and simplfies things.
-> > >
-> > > - No new operations, but IOAS_MAP gets some new flags (and IOAS_COPY
-> > >   will probably need matching changes)
-> > >
-> > > - By default the IOVA given to IOAS_MAP is a hint only, and the IOVA
-> > >   is chosen by the kernel within the aperture(s).  This is closer to
-> > >   how mmap() operates, and DPDK and similar shouldn't care about
-> > >   having specific IOVAs, even at the individual mapping level.
-> > >
-> > > - IOAS_MAP gets an IOMAP_FIXED flag, analagous to mmap()'s MAP_FIXED,
-> > >   for when you really do want to control the IOVA (qemu, maybe some
-> > >   special userspace driver cases)
-> >=20
-> > We already did both of these, the flag is called
-> > IOMMU_IOAS_MAP_FIXED_IOVA - if it is not specified then kernel will
-> > select the IOVA internally.
-> >=20
-> > > - ATTACH will fail if the new device would shrink the aperture to
-> > >   exclude any already established mappings (I assume this is already
-> > >   the case)
-> >=20
-> > Yes
-> >=20
-> > > - IOAS_MAP gets an IOMAP_RESERVE flag, which operates a bit like a
-> > >   PROT_NONE mmap().  It reserves that IOVA space, so other (non-FIXED)
-> > >   MAPs won't use it, but doesn't actually put anything into the IO
-> > >   pagetables.
-> > >     - Like a regular mapping, ATTACHes that are incompatible with an
-> > >       IOMAP_RESERVEed region will fail
-> > >     - An IOMAP_RESERVEed area can be overmapped with an IOMAP_FIXED
-> > >       mapping
-> >=20
-> > Yeah, this seems OK, I'm thinking a new API might make sense because
-> > you don't really want mmap replacement semantics but a permanent
-> > record of what IOVA must always be valid.
-> >=20
-> > IOMMU_IOA_REQUIRE_IOVA perhaps, similar signature to
-> > IOMMUFD_CMD_IOAS_IOVA_RANGES:
-> >=20
-> > struct iommu_ioas_require_iova {
-> >         __u32 size;
-> >         __u32 ioas_id;
-> >         __u32 num_iovas;
-> >         __u32 __reserved;
-> >         struct iommu_required_iovas {
-> >                 __aligned_u64 start;
-> >                 __aligned_u64 last;
-> >         } required_iovas[];
-> > };
->=20
-> As a permanent record do we want to enforce that once the required
-> range list is set all FIXED and non-FIXED allocations must be within the
-> list of ranges?
+Included details in the change log for V3 about CTL2 and CMCI_P
+register / bits. Also rewrote the change log so they contain full text
+form of UCNA and CMCI, and a complete context of this patch series.
 
-No, I don't think so.  In fact the way I was envisaging this,
-non-FIXED mappings will *never* go into the reserved ranges.  This is
-for the benefit of any use cases that need both mappings where they
-don't care about the IOVA and those which do.
 
-Essentially, reserving a region here is saying to the kernel "I want
-to manage this IOVA space; make sure nothing else touches it".  That
-means both that the kernel must disallow any hw associated changes
-(like ATTACH) which would impinge on the reserved region, and also any
-IOVA allocations that would take parts away from that space.
+>
+> > Signed-off-by: Jue Wang <juew@google.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h |  1 +
+> >  arch/x86/kvm/x86.c              | 50 +++++++++++++++++++++++++--------
+> >  2 files changed, 40 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index ec9830d2aabf..639ef92d01d1 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -800,6 +800,7 @@ struct kvm_vcpu_arch {
+> >       u64 mcg_ctl;
+> >       u64 mcg_ext_ctl;
+> >       u64 *mce_banks;
+> > +     u64 *mci_ctl2_banks;
+> >
+> >       /* Cache MMIO info */
+> >       u64 mmio_gva;
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index eb4029660bd9..73c64d2b9e60 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -3167,6 +3167,7 @@ static int set_msr_mce(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> >       unsigned bank_num = mcg_cap & 0xff;
+> >       u32 msr = msr_info->index;
+> >       u64 data = msr_info->data;
+> > +     u32 offset;
+> >
+> >       switch (msr) {
+> >       case MSR_IA32_MCG_STATUS:
+> > @@ -3180,10 +3181,22 @@ static int set_msr_mce(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> >                       return 1;
+> >               vcpu->arch.mcg_ctl = data;
+> >               break;
+> > +     case MSR_IA32_MC0_CTL2 ... MSR_IA32_MCx_CTL2(KVM_MAX_MCE_BANKS) - 1:
+>
+> This is wrong.  Well, incomplete.  It will allow writes to MSRs that do not exist,
+> i.e. if bank_num >= offset < KVM_MAX_MCE_BANKS.
+>
+> I believe this will suffice and is also the simplest?
+>
+>                 if (msr >= MSR_IA32_MCx_CTL2(bank_num))
+>                         return 1;
+>
+> Actually, tying in with the array_index_nopsec() comments below, if this captures
+> the last MSR in a variable, then the overrun is much more reasonable (sample idea
+> at the bottom).
+>
+> > +             if (!(mcg_cap & MCG_CMCI_P) &&
+> > +                             (data || !msr_info->host_initiated))
+>
+> Funky indentation.  Should be:
+>
+>                 if (!(mcg_cap & MCG_CMCI_P) &&
+>                     (data || !msr_info->host_initiated))
+>                         return 1;
 
-Whether we want to restrict FIXED mappings to the reserved regions is
-an interesting question.  I wasn't thinking that would be necessary
-(just as you can use mmap() MAP_FIXED anywhere).  However.. much as
-MAP_FIXED is very dangerous to use if you don't previously reserve
-address space, I think IOMAP_FIXED is dangerous if you haven't
-previously reserved space.  So maybe it would make sense to only allow
-FIXED mappings within reserved regions.
+Updated, I need to further fix my VIM configs.
 
-Strictly dividing the IOVA space into kernel managed and user managed
-regions does make a certain amount of sense.
+>
+> > +                     return 1;
+> > +             /* An attempt to write a 1 to a reserved bit raises #GP */
+> > +             if (data & ~(MCI_CTL2_CMCI_EN | MCI_CTL2_CMCI_THRESHOLD_MASK))
+> > +                     return 1;
+> > +             offset = array_index_nospec(
+> > +                             msr - MSR_IA32_MC0_CTL2,
+> > +                             MSR_IA32_MCx_CTL2(bank_num) - MSR_IA32_MC0_CTL2);
+>
+> My preference would be to let this run over (by a fair amount)
+>
+>                 offset = array_index_nospec(msr - MSR_IA32_MC0_CTL2,
+>                                             MSR_IA32_MCx_CTL2(bank_num) - MSR_IA32_MC0_CTL2);
+>
+> But if we use a local variable, there's no overrun:
+>
+>         case MSR_IA32_MC0_CTL2 ... MSR_IA32_MCx_CTL2(KVM_MAX_MCE_BANKS) - 1:
+>                 last_msr = MSR_IA32_MCx_CTL2(bank_num) - 1;
+>                 if (msr > last_msr)
+>                         return 1;
+>
+>                 if (!(mcg_cap & MCG_CMCI_P) && (data || !msr_info->host_initiated))
+>                         return 1;
+>                 /* An attempt to write a 1 to a reserved bit raises #GP */
+>                 if (data & ~(MCI_CTL2_CMCI_EN | MCI_CTL2_CMCI_THRESHOLD_MASK))
+>                         return 1;
+>                 offset = array_index_nospec(msr - MSR_IA32_MC0_CTL2,
+>                                             last_msr + 1 - MSR_IA32_MC0_CTL2);
+>                 vcpu->arch.mci_ctl2_banks[offset] = data;
+>                 break;
+>
+Updated to use this version.
+>
+> And if we go that route, in a follow-up patch at the end of the series, clean up
+> the "default" path to hoist the if-statement into a proper case statement (unless
+> I've misread the code), e.g. with some opportunstic cleanup:
+>
+>         case MSR_IA32_MC0_CTL ... MSR_IA32_MCx_CTL(KVM_MAX_MCE_BANKS) - 1:
+>                 last_msr = MSR_IA32_MCx_CTL(bank_num) - 1;
+>                 if (msr > last_msr)
+>                         return 1;
+>
+>                 offset = array_index_nospec(msr - MSR_IA32_MC0_CTL,
+>                                             last_msr + 1 - MSR_IA32_MC0_CTL);
+>
+>                 /*
+>                  * Only 0 or all 1s can be written to IA32_MCi_CTL, though some
+>                  * Linux kernels clear bit 10 in bank 4 to workaround a BIOS/GART
+>                  * TLB issue on AMD K8s, ignore this to avoid an uncatched #GP in
+>                  * the guest.
+>                  */
+>                 if ((offset & 0x3) == 0 &&
+>                     data != 0 && (data | (1 << 10)) != ~(u64)0)
+>                         return -1;
+>
+>                 /* MCi_STATUS */
+>                 if (!msr_info->host_initiated && (offset & 0x3) == 1 &&
+>                     data != 0 && !can_set_mci_status(vcpu))
+>                         return -1;
+>
+>                 vcpu->arch.mce_banks[offset] = data;
+>                 break;
+>
+> Actually, rereading that, isn't "return -1" wrong?  That will cause kvm_emulate_wrmsr()
+> to exit to userspace, not inject a #GP.
+>
+> *sigh*  Yep, indeed, the -1 gets interpreted as -EPERM and kills the guest.
+>
+> Scratch the idea of doing the above on top, I'll send separate patches and a KUT
+> testcase.  I'll Cc you on the patches, it'd save Paolo a merge conflict (or you a
+> rebase) if this series is based on top of that bugfix + cleanup.
 
-> If yes we can take the end of the last range as the max size of the iova
-> address space to optimize the page table layout.
->=20
-> otherwise we may need another dedicated hint for that optimization.
+I will base this series on top of the bugfix + cleanup series.
 
-Right.  With the revised model where reserving windows is optional,
-not required, I don't think we can quite re-use this for optimization
-hints.  Which is a bit unfortunate.
+>
+> > +             vcpu->arch.mci_ctl2_banks[offset] = data;
+> > +             break;
+> >       default:
+> >               if (msr >= MSR_IA32_MC0_CTL &&
+> >                   msr < MSR_IA32_MCx_CTL(bank_num)) {
+> > -                     u32 offset = array_index_nospec(
+> > +                     offset = array_index_nospec(
+> >                               msr - MSR_IA32_MC0_CTL,
+> >                               MSR_IA32_MCx_CTL(bank_num) - MSR_IA32_MC0_CTL);
+> >
+> > @@ -3489,7 +3502,8 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> >                       return 1;
+> >               }
+> >               break;
+> > -     case 0x200 ... 0x2ff:
+> > +     case 0x200 ... MSR_IA32_MC0_CTL2 - 1:
+> > +     case MSR_IA32_MCx_CTL2(KVM_MAX_MCE_BANKS) ... 0x2ff:
+> >               return kvm_mtrr_set_msr(vcpu, msr, data);
+> >       case MSR_IA32_APICBASE:
+> >               return kvm_set_apic_base(vcpu, msr_info);
+> > @@ -3646,6 +3660,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> >       case MSR_IA32_MCG_CTL:
+> >       case MSR_IA32_MCG_STATUS:
+> >       case MSR_IA32_MC0_CTL ... MSR_IA32_MCx_CTL(KVM_MAX_MCE_BANKS) - 1:
+> > +     case MSR_IA32_MC0_CTL2 ... MSR_IA32_MCx_CTL2(KVM_MAX_MCE_BANKS) - 1:
+> >               return set_msr_mce(vcpu, msr_info);
+> >
+> >       case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR3:
+> > @@ -3750,6 +3765,7 @@ static int get_msr_mce(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata, bool host)
+> >       u64 data;
+> >       u64 mcg_cap = vcpu->arch.mcg_cap;
+> >       unsigned bank_num = mcg_cap & 0xff;
+> > +     u32 offset;
+> >
+> >       switch (msr) {
+> >       case MSR_IA32_P5_MC_ADDR:
+> > @@ -3767,10 +3783,18 @@ static int get_msr_mce(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata, bool host)
+> >       case MSR_IA32_MCG_STATUS:
+> >               data = vcpu->arch.mcg_status;
+> >               break;
+> > +     case MSR_IA32_MC0_CTL2 ... MSR_IA32_MCx_CTL2(KVM_MAX_MCE_BANKS) - 1:
+>
 
-I can't immediately see a way to tweak this which handles both more
-neatly, but I like the idea if we can figure out a way.
+> Same comments as the WRMSR path.  I'll also handle the "default" case in my cleanup.
 
-> > > So, for DPDK the sequence would be:
-> > >
-> > > 1. Create IOAS
-> > > 2. ATTACH devices
-> > > 3. IOAS_MAP some stuff
-> > > 4. Do DMA with the IOVAs that IOAS_MAP returned
-> > >
-> > > (Note, not even any need for QUERY in simple cases)
-> >=20
-> > Yes, this is done already
-> >=20
-> > > For (unoptimized) qemu it would be:
-> > >
-> > > 1. Create IOAS
-> > > 2. IOAS_MAP(IOMAP_FIXED|IOMAP_RESERVE) the valid IOVA regions of
-> > the
-> > >    guest platform
-> > > 3. ATTACH devices (this will fail if they're not compatible with the
-> > >    reserved IOVA regions)
-> > > 4. Boot the guest
->=20
-> I suppose above is only the sample flow for PPC vIOMMU. For non-PPC
-> vIOMMUs regular mappings are required before booting the guest and
-> reservation might be done but not mandatory (at least not what current
-> Qemu vfio can afford as it simply replays valid ranges in the CPU address
-> space).
+Updated similarly as the WRMSR path. Thanks again, I will base V3 on
+the cleanup + fix series.
 
-That was a somewhat simplified description.  When we look in more
-detail, I think the ppc and x86 models become more similar.  So, in
-more detail, I think it would look like this:
+>
+> > +             if (!(mcg_cap & MCG_CMCI_P) && !host)
+> > +                     return 1;
+> > +             offset = array_index_nospec(
+> > +                             msr - MSR_IA32_MC0_CTL2,
+> > +                             MSR_IA32_MCx_CTL2(bank_num) - MSR_IA32_MC0_CTL2);
+> > +             data = vcpu->arch.mci_ctl2_banks[offset];
+> > +             break;
+> >       default:
+> >               if (msr >= MSR_IA32_MC0_CTL &&
+> >                   msr < MSR_IA32_MCx_CTL(bank_num)) {
+> > -                     u32 offset = array_index_nospec(
+> > +                     offset = array_index_nospec(
+> >                               msr - MSR_IA32_MC0_CTL,
+> >                               MSR_IA32_MCx_CTL(bank_num) - MSR_IA32_MC0_CTL);
+> >
+>
+> ...
+>
+> > @@ -11126,9 +11152,11 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+> >               goto fail_free_lapic;
+> >       vcpu->arch.pio_data = page_address(page);
+> >
+> > -     vcpu->arch.mce_banks = kzalloc(KVM_MAX_MCE_BANKS * sizeof(u64) * 4,
+> > +     vcpu->arch.mce_banks = kcalloc(KVM_MAX_MCE_BANKS * 4, sizeof(u64),
+> > +                                    GFP_KERNEL_ACCOUNT);
+>
+> Switching to kcalloc() should be a separate patch.
 
-1. Create base IOAS
-2. Map guest memory into base IOAS so that IOVA=3D=3DGPA
-3. Create IOASes for each vIOMMU domain
-4. Reserve windows in domain IOASes where the vIOMMU will allow
-   mappings by default
-5. ATTACH devices to appropriate IOASes (***)
-6. Boot the guest
+Done.
 
-  On guest map/invalidate:
-        Use IOAS_COPY to take mappings from base IOAS and put them
-	into the domain IOAS
-  On memory hotplug:
-        IOAS_MAP new memory block into base IOAS
-  On dev hotplug: (***)
-        ATTACH devices to appropriate IOAS
-  On guest reconfiguration of vIOMMU domains (x86 only):
-        DETACH device from base IOAS, attach to vIOMMU domain IOAS
-  On guest reconfiguration of vIOMMU apertures (ppc only):
-        Alter reserved regions to match vIOMMU
+>
+> > +     vcpu->arch.mci_ctl2_banks = kcalloc(KVM_MAX_MCE_BANKS, sizeof(u64),
+> >                                      GFP_KERNEL_ACCOUNT);
+> > -     if (!vcpu->arch.mce_banks)
+> > +     if (!vcpu->arch.mce_banks | !vcpu->arch.mci_ctl2_banks)
+>
+> This wants to be a logical-OR, not a bitwise-OR.
+>
+> Oh, and vcpu->arch.mci_ctl2_banks needs to be freed if a later step fails.
 
-The difference between ppc and x86 is at the places marked (***):
-which IOAS each device gets attached to and when. For x86 all devices
-live in the base IOAS by default, and only get moved to domain IOASes
-when those domains are set up in the vIOMMU.  For POWER each device
-starts in a domain IOAS based on its guest PE, and never moves.
+Thanks for the catch, fixed in V3.
 
-[This is still a bit simplified.  In practice, I imagine you'd
- optimize to only create the domain IOASes at the point
- they're needed - on boot for ppc, but only when the vIOMMU is
- configured for x86.  I don't think that really changes the model,
- though.]
-
-A few aspects of the model interact quite nicely here.  Mapping a
-large memory guest with IOVA=3D=3DGPA would probably fail on a ppc host
-IOMMU.  But if both guest and host are ppc, then no devices get
-attached to that base IOAS, so its apertures don't get restricted by
-the host hardware.  That way we get a common model, and the benefits
-of GUP sharing via IOAS_COPY, without it failing in the ppc-on-ppc
-case.
-
-x86-on-ppc and ppc-on-x86 will probably only work in limited cases
-where the various sizes and windows line up, but the possibility isn't
-precluded by the model or interfaces.
-
-> > >   (on guest map/invalidate) -> IOAS_MAP(IOMAP_FIXED) to overmap part
-> > of
-> > >                                the reserved regions
-> > >   (on dev hotplug) -> ATTACH (which might fail, if it conflicts with =
-the
-> > >                       reserved regions)
-> > >   (on vIOMMU reconfiguration) -> UNMAP/MAP reserved regions as
-> > >                                  necessary (which might fail)
-> >=20
-> > OK, I will take care of it
-> >=20
-> > Thanks,
-> > Jason
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---idTOIBXnjRvzu8WC
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEoULxWu4/Ws0dB+XtgypY4gEwYSIFAmJ94BsACgkQgypY4gEw
-YSLK1hAAuRtE44lGB/3a85CJaQgS6UYt1HgVR941flEFi3XvsVP4yrxTYgy6gKrC
-/BHwoAptrle09axXsaLGlaUOA4C/MaI5c6SdDV86NMGQYAdi2UtZieewDrDAHv8F
-lxU8OtI6AMvuBFclkupUsYYJZSb7MXZoCLHsdc9FbWMWHQqXNCrcE1AF69+vOaNB
-rBWmYtZ05+VGp8Qv0MgcHPY3JVToPUxyy53pbJ39jn9nLuDRzRmeP1fkbXhxB7Xr
-+KdT08+TR/xN83fjUOSQcGejTAoCNH9oRdfrax42Y56VibiUkwjcaTpI4ViVv6nc
-W3Mt16MwGKI6rq8a3f1M3RywofSowvgpSTgCDeD6gcNhns09Sr178aj6Rx2U7QYF
-MITCzU0gSDI4zqAXrmAblmXmWy8GXg9Cng7NKczklafMwnTlS7eCJso4E983HNwT
-FTtMFOJXiG/b09MuFeqrz3mtfNXBGAdMSktzZhTRWaJxdoPRaRdtl9bCImvIWrHm
-7rkP7eB16UF+M4YjZdS827tSQmrOES0dn2h6IaJGdBPLTNOYruhTEEJt9jPd79j9
-myRbQQUUloTnp0AGb7gcOunZZM/cxSqSPt+Jf1WoBMQvSC6rLtdXYGjcY4bUXLxs
-TVTurHRMI7EmTWWCC0AwA9j+bbOP35Xu/TMfUZH3GSXZLrqsp+0=
-=/Uho
------END PGP SIGNATURE-----
-
---idTOIBXnjRvzu8WC--
+>
+> >               goto fail_free_pio_data;
+> >       vcpu->arch.mcg_cap = KVM_MAX_MCE_BANKS;
+> >
+> > --
+> > 2.35.1.1178.g4f1659d476-goog
+> >
