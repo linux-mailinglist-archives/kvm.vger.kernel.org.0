@@ -2,209 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 89C4B526ACD
-	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 22:04:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D70F8526AF8
+	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 22:09:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1383929AbiEMUEh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 May 2022 16:04:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36436 "EHLO
+        id S1377434AbiEMUJt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 May 2022 16:09:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346904AbiEMUEe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 May 2022 16:04:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9388C13D46
-        for <kvm@vger.kernel.org>; Fri, 13 May 2022 13:04:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652472271;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KmdRIFdtBy3MI+hhfWLtmDXgW2B1LXYFkIjwZPtA7Lc=;
-        b=PPG5LU6FUxZEh37GL4cS/az4xKTFx3V+JZCosZFHf9tAL70ATefiwcGHVu6ZqLhxr2tkHa
-        YFCG5vPLpZqST+8LlkJEF2JB6J1aEs7FQg24xaI/TBflbOAuSS4ScZswX1y7TPrQzAexic
-        hkFadSbKonD9yJxPI1XQsjJuPXwtuOo=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-605-8os0sDupNciTLo_VgGQ_iw-1; Fri, 13 May 2022 16:04:30 -0400
-X-MC-Unique: 8os0sDupNciTLo_VgGQ_iw-1
-Received: by mail-io1-f72.google.com with SMTP id c25-20020a5d9399000000b00652e2b23358so5381277iol.6
-        for <kvm@vger.kernel.org>; Fri, 13 May 2022 13:04:30 -0700 (PDT)
+        with ESMTP id S1344872AbiEMUJs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 May 2022 16:09:48 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8F8C5A2ED
+        for <kvm@vger.kernel.org>; Fri, 13 May 2022 13:09:46 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id 4so11491861ljw.11
+        for <kvm@vger.kernel.org>; Fri, 13 May 2022 13:09:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=pjCREFqJlKd2e4ScgAkDgjCbWBN7JS6DRPvPR2eYjk4=;
+        b=KwRkUDm8dsv90HT32n7Ztq64gzcZF/kbB6tGx1fdQXDKGZjG+GBVpWD5AOzmGAWnd/
+         rerMc/t+Kt10xdfBUlOCSActjob6KhPB4oKiXD392qk8MZ0VHkJPsrHoE62OIQs8WWPS
+         /woEZdsfOwomyd9Fj4W/PAgH+rT6NJIIckIrUocjf2DpBUF59s+U5V1ibDFxwg2y6ov9
+         OeGsICg7lU+vGRU1tPMWBOEoNc1ZjfELi8R4AHlvwpLGgFLOkbyeGW1/JLSvi+nNgZEN
+         /8aIvf0iAOF4sFr9xIkbwN/NITqEFAGVxG54VyVFuxs8n57P2CDyO5IBDUhTTRY2P6aB
+         5vAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=KmdRIFdtBy3MI+hhfWLtmDXgW2B1LXYFkIjwZPtA7Lc=;
-        b=SxpCE5+eLwJsBUTfUxgYwNg604nIdx73hHIWKN58Cumj/u6C3LjYJwFr1lfF96OS9D
-         WeGS8Ke5diV79W1NYAS5Iad6xKUsqeJOR//kwWw62fQwn7gazebBzWfKqlgoLG53zpKt
-         l+DQQNBIwpSWenFvnmXjjVegQKBfkO8jTC3soyoJXNEVmkx4rcLFvxNjU5JWg46HHXTb
-         nmyjj/EsQQnlWN7B/yHIuLlpSD29hxuv9HHcJOw2aTU5qqy4W9ghmpTuuvu6HlctKeJd
-         vpx+7ANF57l3xx2wMD7SPtQvaHlVG0bT23J1wfpKp9zjIoRlsvTLXY3OfxJWw1xTSOjs
-         I/Lg==
-X-Gm-Message-State: AOAM533InkOeuvymyxZlBAKdY022b3w+1gtAAqNcNHTln7hfUcTcaJ/F
-        BvPdQ0uyQpS9jmTPvrFuIs4QSVzNI164JGMItheKv4pGz1oN+sAmxAUXlD6dUUuhSd4fna04oB4
-        /Q0b2aIsCT9rS
-X-Received: by 2002:a02:2124:0:b0:32d:beca:e5ab with SMTP id e36-20020a022124000000b0032dbecae5abmr3458383jaa.119.1652472269413;
-        Fri, 13 May 2022 13:04:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyAteW2lMcPDUgF04zQzjEA5jFdq4H3xiZkIfyc1FiG1FsqqXu1qd5EZKPEqP97SNU6Kd1c+A==
-X-Received: by 2002:a02:2124:0:b0:32d:beca:e5ab with SMTP id e36-20020a022124000000b0032dbecae5abmr3458369jaa.119.1652472269097;
-        Fri, 13 May 2022 13:04:29 -0700 (PDT)
-Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id b17-20020a923411000000b002cde6e352f8sm823295ila.66.2022.05.13.13.04.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 May 2022 13:04:28 -0700 (PDT)
-Date:   Fri, 13 May 2022 16:04:26 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>
-Subject: Re: [PATCH 1/9] KVM: selftests: Replace x86_page_size with raw levels
-Message-ID: <Yn65yvxPIJwgiuxj@xz-m1.local>
-References: <20220429183935.1094599-1-dmatlack@google.com>
- <20220429183935.1094599-2-dmatlack@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=pjCREFqJlKd2e4ScgAkDgjCbWBN7JS6DRPvPR2eYjk4=;
+        b=ngUeH0X36ybkmdV1sEpee7JbPU2PCqjvcqiinicjQFUjJk0IKBOG9lvlexXSjvSuGX
+         Ff3QVWn5hQUlJ32iQeld56aetV8yw7SqcLv/p61fgbXCbQJ1yBUP4BeA4UZQGd0QvoOe
+         RNyMUv51G3kzg64Srhb4DWKOtFAiPGAF0sHF7ze1gDPx3PIo8fPziJY8SUeTkPihWntH
+         ejC8VV3zIhCflp6yAYQSB+IjYqkGwMwqMrlvVyG40ETERpJhOWMwbNARNwEW5DnKCun9
+         voxBuMOk7L3OoQN59aYBlu4yoXG4CW5ejgHMtJTRTVP4L4OxTd7iZZokrudugLkhBMyn
+         PLhA==
+X-Gm-Message-State: AOAM531lphZihr4fpKzl1VRqfIHpDcz+jesONRr+VtphsY8RSIm3H1Zc
+        gCFtsOpymAOskk/X0pWvQViE7SgWwze8qia7/UYFiw==
+X-Google-Smtp-Source: ABdhPJyIQ/Fq8kEYsZT3oQ8B+jEEuHoR3rsMsbWkyrcVV8WZYv4O+PyJUttYpqpiFYm2/bU3XvQ8sVx8UJPsHb8eaQ8=
+X-Received: by 2002:a05:651c:1508:b0:250:5b32:55d5 with SMTP id
+ e8-20020a05651c150800b002505b3255d5mr4018224ljf.278.1652472584716; Fri, 13
+ May 2022 13:09:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220429183935.1094599-2-dmatlack@google.com>
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220512202328.2453895-1-Ashish.Kalra@amd.com>
+ <CAMkAt6ogEpWf7J-OhXrPNw8KojwuLxUwfP6B+A7zrRHpNeX3uA@mail.gmail.com>
+ <Yn5wDPPbVUysR4SF@google.com> <51219031-935d-8da4-7d8f-80073a79f794@amd.com>
+In-Reply-To: <51219031-935d-8da4-7d8f-80073a79f794@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Fri, 13 May 2022 16:09:33 -0400
+Message-ID: <CAMkAt6rSXdFzVg6-tk8Yv9uQJEJaHtcvBHTBmWyjMVCs4uq1uw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: SVM: Use kzalloc for sev ioctl interfaces to prevent
+ kernel memory leak.
+To:     Ashish Kalra <ashkalra@amd.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Andy Nguyen <theflow@google.com>,
+        David Rientjes <rientjes@google.com>,
+        John Allen <john.allen@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 29, 2022 at 06:39:27PM +0000, David Matlack wrote:
-> x86_page_size is an enum used to communicate the desired page size with
-> which to map a range of memory. Under the hood they just encode the
-> desired level at which to map the page. This ends up being clunky in a
-> few ways:
-> 
->  - The name suggests it encodes the size of the page rather than the
->    level.
->  - In other places in x86_64/processor.c we just use a raw int to encode
->    the level.
-> 
-> Simplify this by just admitting that x86_page_size is just the level and
-> using an int and some more obviously named macros (e.g. PG_LEVEL_1G).
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
->  .../selftests/kvm/include/x86_64/processor.h  | 14 +++++-----
->  .../selftests/kvm/lib/x86_64/processor.c      | 27 +++++++++----------
->  .../selftests/kvm/max_guest_memory_test.c     |  2 +-
->  .../selftests/kvm/x86_64/mmu_role_test.c      |  2 +-
->  4 files changed, 22 insertions(+), 23 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> index 37db341d4cc5..b512f9f508ae 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> @@ -465,13 +465,13 @@ void vcpu_set_hv_cpuid(struct kvm_vm *vm, uint32_t vcpuid);
->  struct kvm_cpuid2 *vcpu_get_supported_hv_cpuid(struct kvm_vm *vm, uint32_t vcpuid);
->  void vm_xsave_req_perm(int bit);
->  
-> -enum x86_page_size {
-> -	X86_PAGE_SIZE_4K = 0,
-> -	X86_PAGE_SIZE_2M,
-> -	X86_PAGE_SIZE_1G,
-> -};
-> -void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
-> -		   enum x86_page_size page_size);
-> +#define PG_LEVEL_4K 0
-> +#define PG_LEVEL_2M 1
-> +#define PG_LEVEL_1G 2
+On Fri, May 13, 2022 at 2:11 PM Ashish Kalra <ashkalra@amd.com> wrote:
+>
+> Hello Sean & Peter,
+>
+> On 5/13/22 14:49, Sean Christopherson wrote:
+> > On Fri, May 13, 2022, Peter Gonda wrote:
+> >> On Thu, May 12, 2022 at 4:23 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+> >>> From: Ashish Kalra <ashish.kalra@amd.com>
+> >>>
+> >>> For some sev ioctl interfaces, the length parameter that is passed maybe
+> >>> less than or equal to SEV_FW_BLOB_MAX_SIZE, but larger than the data
+> >>> that PSP firmware returns. In this case, kmalloc will allocate memory
+> >>> that is the size of the input rather than the size of the data.
+> >>> Since PSP firmware doesn't fully overwrite the allocated buffer, these
+> >>> sev ioctl interface may return uninitialized kernel slab memory.
+> >>>
+> >>> Reported-by: Andy Nguyen <theflow@google.com>
+> >>> Suggested-by: David Rientjes <rientjes@google.com>
+> >>> Suggested-by: Peter Gonda <pgonda@google.com>
+> >>> Cc: kvm@vger.kernel.org
+> >>> Cc: linux-kernel@vger.kernel.org
+> >>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> >>> ---
+> >>>   arch/x86/kvm/svm/sev.c | 6 +++---
+> >>>   1 file changed, 3 insertions(+), 3 deletions(-)
+> >>>
+> >> Can we just update all the kmalloc()s that buffers get given to the
+> >> PSP? For instance doesn't sev_send_update_data() have an issue?
+> >> Reading the PSP spec it seems like a user can call this ioctl with a
+> >> large hdr_len and the PSP will only fill out what's actually required
+> >> like in these fixed up cases? This is assuming the PSP is written to
+> >> spec (and just the current version). I'd rather have all of these
+> >> instances updated.
+>
+> Yes, this function is also vulnerable as it allocates the return buffer
+> using kmalloc() and copies back to user the buffer sized as per the user
+> provided length (and not the FW returned length), so it surely needs fixup.
+>
+> I will update all these instances to use kzalloc() instead of kmalloc().
 
-A nitpick is: we could have named those as PG_LEVEL_[PTE|PMD|PUD|PGD..]
-rather than 4K|2M|..., then...
+Do we need the alloc_page() in __sev_dbg_encrypt_user() to have __GFP_ZERO too?
 
-> +
-> +#define PG_LEVEL_SIZE(_level) (1ull << (((_level) * 9) + 12))
-> +
-> +void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level);
->  
->  /*
->   * Basic CPU control in CR0
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index 9f000dfb5594..1a7de69e2495 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -199,15 +199,15 @@ static struct pageUpperEntry *virt_create_upper_pte(struct kvm_vm *vm,
->  						    uint64_t pt_pfn,
->  						    uint64_t vaddr,
->  						    uint64_t paddr,
-> -						    int level,
-> -						    enum x86_page_size page_size)
-> +						    int current_level,
-> +						    int target_level)
->  {
-> -	struct pageUpperEntry *pte = virt_get_pte(vm, pt_pfn, vaddr, level);
-> +	struct pageUpperEntry *pte = virt_get_pte(vm, pt_pfn, vaddr, current_level);
->  
->  	if (!pte->present) {
->  		pte->writable = true;
->  		pte->present = true;
-> -		pte->page_size = (level == page_size);
-> +		pte->page_size = (current_level == target_level);
->  		if (pte->page_size)
->  			pte->pfn = paddr >> vm->page_shift;
->  		else
-> @@ -218,20 +218,19 @@ static struct pageUpperEntry *virt_create_upper_pte(struct kvm_vm *vm,
->  		 * a hugepage at this level, and that there isn't a hugepage at
->  		 * this level.
->  		 */
-> -		TEST_ASSERT(level != page_size,
-> +		TEST_ASSERT(current_level != target_level,
->  			    "Cannot create hugepage at level: %u, vaddr: 0x%lx\n",
-> -			    page_size, vaddr);
-> +			    current_level, vaddr);
->  		TEST_ASSERT(!pte->page_size,
->  			    "Cannot create page table at level: %u, vaddr: 0x%lx\n",
-> -			    level, vaddr);
-> +			    current_level, vaddr);
->  	}
->  	return pte;
->  }
->  
-> -void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
-> -		   enum x86_page_size page_size)
-> +void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
->  {
-> -	const uint64_t pg_size = 1ull << ((page_size * 9) + 12);
-> +	const uint64_t pg_size = PG_LEVEL_SIZE(level);
->  	struct pageUpperEntry *pml4e, *pdpe, *pde;
->  	struct pageTableEntry *pte;
->  
-> @@ -256,15 +255,15 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
->  	 * early if a hugepage was created.
->  	 */
->  	pml4e = virt_create_upper_pte(vm, vm->pgd >> vm->page_shift,
-> -				      vaddr, paddr, 3, page_size);
-> +				      vaddr, paddr, 3, level);
->  	if (pml4e->page_size)
->  		return;
->  
-> -	pdpe = virt_create_upper_pte(vm, pml4e->pfn, vaddr, paddr, 2, page_size);
-> +	pdpe = virt_create_upper_pte(vm, pml4e->pfn, vaddr, paddr, 2, level);
->  	if (pdpe->page_size)
->  		return;
->  
-> -	pde = virt_create_upper_pte(vm, pdpe->pfn, vaddr, paddr, 1, page_size);
-> +	pde = virt_create_upper_pte(vm, pdpe->pfn, vaddr, paddr, 1, level);
 
-... here we could also potentially replace the 3/2/1s with the new macro
-(or with existing naming number 3 will be missing a macro)?
-
->  	if (pde->page_size)
->  		return;
-
--- 
-Peter Xu
-
+>
+> > Agreed, the kernel should explicitly initialize any copy_to_user() to source and
+> > never rely on the PSP to fill the entire blob unless there's an ironclad guarantee
+> > the entire struct/blob will be written.  E.g. it's probably ok to skip zeroing
+> > "data" in sev_ioctl_do_platform_status(), but even then it might be wortwhile as
+> > defense-in-depth.
+> >
+> > Looking through other copy_to_user() calls:
+> >
+> >    - "blob" in sev_ioctl_do_pek_csr()
+> >    - "id_blob" in sev_ioctl_do_get_id2()
+> >    - "pdh_blob" and "cert_blob" in sev_ioctl_do_pdh_export()
+>
+> These functions are part of the ccp driver and a fix for them has
+> already been sent upstream to linux-crypto@vger.kernel.org and
+> linux-kernel@vger.kernel.org:
+>
+> [PATCH] crypto: ccp - Use kzalloc for sev ioctl interfaces to prevent
+> kernel memory leak
+>
+> Thanks,
+>
+> Ashish
+>
+> >
+> > The last one is probably fine since the copy length comes from the PSP, but it's
+> > not like these ioctls are performance critical...
+> >
+> >       /* If we query the length, FW responded with expected data. */
+> >       input.cert_chain_len = data.cert_chain_len;
+> >       input.pdh_cert_len = data.pdh_cert_len;
