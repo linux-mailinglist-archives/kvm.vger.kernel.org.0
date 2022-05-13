@@ -2,64 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 89BE3526BF4
-	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 22:54:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B6DF8526D30
+	for <lists+kvm@lfdr.de>; Sat, 14 May 2022 00:53:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384575AbiEMUyv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 May 2022 16:54:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59454 "EHLO
+        id S1384886AbiEMWxM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 May 2022 18:53:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233055AbiEMUyt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 May 2022 16:54:49 -0400
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F018426EA
-        for <kvm@vger.kernel.org>; Fri, 13 May 2022 13:54:47 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id bx33so11601555ljb.12
-        for <kvm@vger.kernel.org>; Fri, 13 May 2022 13:54:47 -0700 (PDT)
+        with ESMTP id S1351143AbiEMWxL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 May 2022 18:53:11 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06AE61756B7
+        for <kvm@vger.kernel.org>; Fri, 13 May 2022 15:53:11 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d22so9262367plr.9
+        for <kvm@vger.kernel.org>; Fri, 13 May 2022 15:53:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=y+/wjN2hthJC17ySiU4gVRZzaMAdl4cqYaPna/HTq9c=;
-        b=WEjf2vk0jU+IvGj5zt678lWoxJ0tMqIjyfMopMo8H+50y+jmTe1YdKjv4Jx3laaaHW
-         BfUdYOat6avRaXmJreSaxYhP0vLs+fKDBTBUJawKVF75KUDXEnZkIchuAjwHBYeT1cy4
-         zxMdEiYq8hYbnvuk8urLbmUsNngDlTMZuucIRqIw+aiiNNP63ARTAIvpSTXRTj4bqFFr
-         X/vIKGugG0JuJipPJFQnMCkwBNkTp81ufXbwl5aE8LQuGSUxFcdljju+0XvkundGFOCK
-         IUCM4UruWadxkX5O5xOtYDxaWfk0bA8OKgvpMcm20c71z96N5n4pqaDhMIB+Sya5jLUo
-         04+A==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=GQcrUD+iS10OWB2IhvHVYLyHQumXXSUypBIwcEyZKqA=;
+        b=hmGpvhMrmjZTe82jZGMH34s8ZMK8DhjPEZsAWOIQX9kjLF/JR9LLibbajKK2uSWBAV
+         k7MAl1nQC1idFIml998Iqf/rm2g6m3cQEgWR5E+KPYi2/g0ady2z994cjhEJpIx1iGPR
+         QpLYejtbBl7CTS1JQ0bl8F9YrlzAuGqHis3QNjm7uvX+78r1dB2QgxAxASqWX0gyfQLa
+         qID4GVM+faLlv94xLNqQwFa20TwYQT2zjodjB00qnsZqgczQHzdNKQzpY96X/w4VEOQI
+         hgxRO+mMyd9/kFJmj55nYOkqvt2QpcTsJ77Hyw8yOBRTdD0kKorFtKGmmtnbZD4NW2kc
+         12wQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=y+/wjN2hthJC17ySiU4gVRZzaMAdl4cqYaPna/HTq9c=;
-        b=I3jNt1pVwuRfzP8g5ZikvjLicqqYMbDaCoJ7tZzYeb5XoVx9bAyBm1Ypb01KPEj7XN
-         9MMdjyCcxC7oS2CXsB0rSAdj3q4NZjwgCIx62Ou3xfTvwTEAL6JLkRWkrdMJdb5PobQE
-         /oCkrpenf3zROmpvX7DQMxOO6vA8eXP3Y4V6aGxiG8jMsTM0NmRRQ6TxlfwBurnU9O5d
-         CDjnuYXP0ezWhjRHPNtXsrTsm5DB4jWr/6p1zBHV4XN1n+wl8tufmjUBJzkBGXuD3JNO
-         LR2Z+5jHRL+dv6vftH0DcQnJoezAJKMENRyaojlTSea2awG+gILNCqKdlG03Bn5+Y607
-         eRYQ==
-X-Gm-Message-State: AOAM5317QNMM8AWks5FLrCnc+DODu27i3pcrWlyltj5ya1RKVcaS8l4n
-        AtX/vZC5fPUHJm+8iZHNefkpSQ1SDIWWQeGOLdCdnA==
-X-Google-Smtp-Source: ABdhPJz9o8gLlEco5hGoxJ1+k/s1sqVYBkSWyf4sELwYQQfWTnGIOzxqn+5UR5G9thjEBel+QJAFI6BK1/+s+jGZmz0=
-X-Received: by 2002:a2e:b98b:0:b0:24f:1b64:a7b7 with SMTP id
- p11-20020a2eb98b000000b0024f1b64a7b7mr4049491ljp.331.1652475286071; Fri, 13
- May 2022 13:54:46 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220513195000.99371-1-seanjc@google.com> <20220513195000.99371-2-seanjc@google.com>
-In-Reply-To: <20220513195000.99371-2-seanjc@google.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=GQcrUD+iS10OWB2IhvHVYLyHQumXXSUypBIwcEyZKqA=;
+        b=gRLFNn72I7jmBELbzglHpUz26rWsMyfy+1z0pOVUN8i30ftoM5IvaJR6qcT3c8QPQU
+         eCjrifSQGacn8bxn8cmHxRfL36RRio94VqaqZOXflo4Knad/MyW6kaPkUheohG68uc2W
+         tx15O++20LIwSSfMHqrvqiprl+bmItE2C/lrOfNBStGFdIzyGM/agbetf+0/FI+D/vVt
+         yBafYnI4XkLRjVt5z3815nfrS8jV1z2151njMiw92v6nyqhFmYFT/fr3OYjgzhv5aExY
+         PFR1wYDZW4NfqteghYewDDR2MgDUeZEcIX4DS4aK73ntUeqU0p4R6SCYVi94S2v3NXm9
+         hEsA==
+X-Gm-Message-State: AOAM533eurhjQFIUg0w0fKfTT7B/tsdT+0t+Hm66NNd6TdcFrOd8KRuB
+        7v2zh8XGs9+0xjKCnuLIMcoGxg==
+X-Google-Smtp-Source: ABdhPJxJVbTMNcQuqiRTOOsbpuFUv31e2qxiTCyjhM4qde2iDexBVBq/3c+M5f5uikLi6Un4GqFQvQ==
+X-Received: by 2002:a17:90b:3445:b0:1d6:91a5:29fe with SMTP id lj5-20020a17090b344500b001d691a529femr18230208pjb.138.1652482390246;
+        Fri, 13 May 2022 15:53:10 -0700 (PDT)
+Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
+        by smtp.gmail.com with ESMTPSA id b10-20020a170902650a00b0015e8d4eb269sm2289156plk.179.2022.05.13.15.53.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 May 2022 15:53:09 -0700 (PDT)
+Date:   Fri, 13 May 2022 22:53:05 +0000
 From:   David Matlack <dmatlack@google.com>
-Date:   Fri, 13 May 2022 13:54:19 -0700
-Message-ID: <CALzav=d36gccJv345Phdr0AJx9=6=TP=iZ60dscgQr64Rq4Kew@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: x86/mmu: Drop RWX=0 SPTEs during ept_sync_page()
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH V2 1/7] KVM: X86/MMU: Add using_special_root_page()
+Message-ID: <Yn7hUe9nyey/CS3J@google.com>
+References: <20220503150735.32723-1-jiangshanlai@gmail.com>
+ <20220503150735.32723-2-jiangshanlai@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220503150735.32723-2-jiangshanlai@gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -71,83 +81,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 13, 2022 at 12:50 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> Drop SPTEs whose new protections will yield a RWX=0 SPTE, i.e. a SPTE
-> that is marked shadow-present but is not-present in the page tables.  If
-> EPT with execute-only support is in use by L1, KVM can create a RWX=0
-> SPTE can be created for an EPTE if the upper level combined permissions
-> are R (or RW) and the leaf EPTE is changed from R (or RW) to X.
-
-For some reason I found this sentence hard to read. What about this:
-
-  When shadowing EPT and NX HugePages is enabled, if the guest changes
-the permissions on a huge page in the EPT12 to be execute-only, KVM
-will end shadowing it with an RWX=0 SPTE in the EPT02 when it picks up
-the change in FNAME(sync_page). Note that the guest can't induce KVM
-to create a RWX=0 during FNAME(fetch), since the only valid way for
-the guest to fault in an execute-only huge page is with an instruction
-fetch, which KVM will handle by mapping the page as an executable 4KiB
-page.
-
-> Because
-> the EPTE is considered present when viewed in isolation, and no reserved
-> bits are set, FNAME(prefetch_invalid_gpte) will consider the GPTE valid.
->
-> Creating a not-present SPTE isn't fatal as the SPTE is "correct" in the
-> sense that the guest translation is inaccesible (the combined protections
-> of all levels yield RWX=0), i.e. the guest won't get stuck in an infinite
-> loop.  If EPT A/D bits are disabled, KVM can mistake the SPTE for an
-> access-tracked SPTE.  But again, such confusion isn't fatal as the "saved"
-> protections are also RWX=0.
->
-> Add a WARN in make_spte() to detect creation of SPTEs that will result in
-> RWX=0 protections, which is the real motivation for fixing ept_sync_page().
-> Creating a useless SPTE means KVM messed up _something_, even if whatever
-> goof occurred doesn't manifest as a functional bug.
->
-> Fixes: d95c55687e11 ("kvm: mmu: track read permission explicitly for shadow EPT page tables")
-> Cc: David Matlack <dmatlack@google.com>
-> Cc: Ben Gardon <bgardon@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Tue, May 03, 2022 at 11:07:29PM +0800, Lai Jiangshan wrote:
+> From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+> 
+> In some case, special roots are used in mmu.  It is often using
+> to_shadow_page(mmu->root.hpa) to check if special roots are used.
+> 
+> Add using_special_root_page() to directly check if special roots are
+> used or needed to be used even mmu->root.hpa is not set.
+> 
+> Prepare for making to_shadow_page(mmu->root.hpa) return non-NULL via
+> using special shadow pages.
+> 
+> Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 > ---
->  arch/x86/kvm/mmu/paging_tmpl.h | 9 ++++++++-
->  arch/x86/kvm/mmu/spte.c        | 2 ++
->  2 files changed, 10 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index b025decf610d..d9f98f9ed4a0 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -1052,7 +1052,14 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
->                 if (sync_mmio_spte(vcpu, &sp->spt[i], gfn, pte_access))
->                         continue;
->
-> -               if (gfn != sp->gfns[i]) {
-> +               /*
-> +                * Drop the SPTE if the new protections would result in a RWX=0
-> +                * SPTE or if the gfn is changing.  The RWX=0 case only affects
-> +                * EPT with execute-only support, i.e. EPT without an effective
-> +                * "present" bit, as all other paging modes will create a
-> +                * read-only SPTE if pte_access is zero.
-> +                */
-> +               if ((!pte_access && !shadow_present_mask) || gfn != sp->gfns[i]) {
->                         drop_spte(vcpu->kvm, &sp->spt[i]);
->                         flush = true;
->                         continue;
-> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-> index 75c9e87d446a..9ad60662beac 100644
-> --- a/arch/x86/kvm/mmu/spte.c
-> +++ b/arch/x86/kvm/mmu/spte.c
-> @@ -101,6 +101,8 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
->         u64 spte = SPTE_MMU_PRESENT_MASK;
->         bool wrprot = false;
->
-> +       WARN_ON_ONCE(!pte_access && !shadow_present_mask);
+>  arch/x86/kvm/mmu/mmu.c | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 909372762363..7f20796af351 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -1711,6 +1711,14 @@ static void drop_parent_pte(struct kvm_mmu_page *sp,
+>  	mmu_spte_clear_no_track(parent_pte);
+>  }
+>  
+> +static bool using_special_root_page(struct kvm_mmu *mmu)
+
+Could you enumerate all the scenarios that use special roots and which
+roots are the special ones? I think that would help a lot with reviewing
+this series and would be useful to encode in a comment, probably above
+this function here, for future readers.
+
+Also the term "special" is really vague. Maybe once you enumerate all
+the scenarios a common theme will arise and we can pick a better name,
+unless you have any ideas off the top of your head.
+
+> +{
+> +	if (mmu->root_role.direct)
+> +		return mmu->root_role.level == PT32E_ROOT_LEVEL;
+> +	else
+> +		return mmu->cpu_role.base.level <= PT32E_ROOT_LEVEL;
+> +}
 > +
->         if (sp->role.ad_disabled)
->                 spte |= SPTE_TDP_AD_DISABLED_MASK;
->         else if (kvm_mmu_page_ad_need_write_protect(sp))
-> --
-> 2.36.0.550.gb090851708-goog
->
+>  static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct)
+>  {
+>  	struct kvm_mmu_page *sp;
+> @@ -4241,10 +4249,10 @@ static bool fast_pgd_switch(struct kvm *kvm, struct kvm_mmu *mmu,
+>  {
+>  	/*
+>  	 * For now, limit the caching to 64-bit hosts+VMs in order to avoid
+> -	 * having to deal with PDPTEs. We may add support for 32-bit hosts/VMs
+> -	 * later if necessary.
+> +	 * having to deal with PDPTEs.  Special roots can not be put into
+> +	 * mmu->prev_roots[].
+>  	 */
+> -	if (VALID_PAGE(mmu->root.hpa) && !to_shadow_page(mmu->root.hpa))
+> +	if (VALID_PAGE(mmu->root.hpa) && using_special_root_page(mmu))
+>  		kvm_mmu_free_roots(kvm, mmu, KVM_MMU_ROOT_CURRENT);
+>  
+>  	if (VALID_PAGE(mmu->root.hpa))
+> -- 
+> 2.19.1.6.gb485710b
+> 
