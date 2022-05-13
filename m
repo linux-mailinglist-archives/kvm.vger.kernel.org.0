@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B1E952590E
-	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 02:46:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 85EE8525914
+	for <lists+kvm@lfdr.de>; Fri, 13 May 2022 02:47:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359777AbiEMAqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 May 2022 20:46:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50324 "EHLO
+        id S1359806AbiEMArJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 May 2022 20:47:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243156AbiEMAqM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 May 2022 20:46:12 -0400
+        with ESMTP id S1359812AbiEMArD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 May 2022 20:47:03 -0400
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1383035876
-        for <kvm@vger.kernel.org>; Thu, 12 May 2022 17:46:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB0D066680
+        for <kvm@vger.kernel.org>; Thu, 12 May 2022 17:46:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652402771; x=1683938771;
+  t=1652402813; x=1683938813;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=9fnPH0v8cZtL48+Hc//a1Dvk1egsHCzu2d3Fh4K7vq8=;
-  b=K4ywWxsPLZuLhQcbxE5qw1yMAxz8ig4EMlDQIU5uyqM/uDvcfLWo1PMw
-   RoGqFKkqoJTqfQawoaND+rYBzuEogSq2/zZawXy5OeinqAjoe3Wer/2dG
-   oeXImAJ1LEsoW9u3eqCbdMjqJvoLCZOeW/AlD2nuJcCX4ohZ0seu6t+sN
-   WOuCRM38Sf+MdIVG5OLCtLurNvmCTyuEK7/v+o5Ph381YooexyG87+BO/
-   tsF0QjvWxP0PYXjDVH5fLYHqZvLvmxAtw/lYJiuMS9rOUnBB0kn//R6hs
-   QAj3+1xh2fFVlN271XCuMRjXHoiU1y57zo91QTPlf11yy8tFHDGVB/1CT
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10345"; a="252223179"
+  bh=5c2e/TArcdBeEGS+Y2rMq8nx3fXkMZ3M8isdb3HBWSg=;
+  b=JN2RKz9rCORproE/aPcs4LDiE3BrLkdeBXwOnA+6BOiuTiIXvNIUkv+7
+   Ek+HP8lZWyB6vu7xJDha31Tpn40GhT7hqVXdI9itnKW3Y4yPTasBJgamP
+   rs7viWj4JOKPBJ/v0NQZRftozPUNF9Mp4r2/gYEkWHEqAPZhqYwG0wsiT
+   uBRX0MxxQ9KtCYSq2nymFAnTBW8SlTT01r39TplzKj1Tfq7lnlo7he9FS
+   JGRTy4qaX2uMsddByS0USGpXmIY33XXGVJbgk58GdfUl2tYOJPYmp9HlQ
+   m3VFJzOlWrGrhTfnR90RLGjF/YnmQZRwWazDP9MHvcES/DZ5qsXVG0Dx3
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10345"; a="252223269"
 X-IronPort-AV: E=Sophos;i="5.91,221,1647327600"; 
-   d="scan'208";a="252223179"
+   d="scan'208";a="252223269"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2022 17:46:08 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2022 17:46:53 -0700
 X-IronPort-AV: E=Sophos;i="5.91,221,1647327600"; 
-   d="scan'208";a="594955647"
+   d="scan'208";a="594955799"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.175.214]) ([10.249.175.214])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2022 17:46:03 -0700
-Message-ID: <73349f35-f9ba-36da-7741-3de0da249009@intel.com>
-Date:   Fri, 13 May 2022 08:46:01 +0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2022 17:46:47 -0700
+Message-ID: <5c5d9722-6880-4b8e-3293-ff4a8c295b53@intel.com>
+Date:   Fri, 13 May 2022 08:46:45 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
  Firefox/91.0 Thunderbird/91.8.1
-Subject: Re: [RFC PATCH v4 14/36] i386/tdx: Implement user specified tsc
- frequency
+Subject: Re: [RFC PATCH v4 24/36] i386/tdx: Add TDVF memory via
+ KVM_TDX_INIT_MEM_REGION
 Content-Language: en-US
 To:     Isaku Yamahata <isaku.yamahata@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, isaku.yamahata@intel.com,
@@ -59,10 +59,10 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, isaku.yamahata@intel.com,
         Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
         kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
 References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
- <20220512031803.3315890-15-xiaoyao.li@intel.com>
- <20220512180412.GG2789321@ls.amr.corp.intel.com>
+ <20220512031803.3315890-25-xiaoyao.li@intel.com>
+ <20220512183423.GI2789321@ls.amr.corp.intel.com>
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20220512180412.GG2789321@ls.amr.corp.intel.com>
+In-Reply-To: <20220512183423.GI2789321@ls.amr.corp.intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -75,101 +75,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/13/2022 2:04 AM, Isaku Yamahata wrote:
-> On Thu, May 12, 2022 at 11:17:41AM +0800,
+On 5/13/2022 2:34 AM, Isaku Yamahata wrote:
+> On Thu, May 12, 2022 at 11:17:51AM +0800,
 > Xiaoyao Li <xiaoyao.li@intel.com> wrote:
 > 
->> Reuse "-cpu,tsc-frequency=" to get user wanted tsc frequency and pass it
->> to KVM_TDX_INIT_VM.
+>> From: Isaku Yamahata <isaku.yamahata@intel.com>
 >>
->> Besides, sanity check the tsc frequency to be in the legal range and
->> legal granularity (required by TDX module).
-> 
-> Just to make it sure.
-> You didn't use VM-scoped KVM_SET_TSC_KHZ because KVM side patch is still in
-> kvm/queue?  Once the patch lands, we should use it.
-
-I didn't use VM-scoped KVM_SET_TSC_KHZ is because
-
-1) corresponding TDX KVM v6 series still provides tsc_khz in
-    struct kvm_tdx_init_vm
-
-2) Use KVM_SET_TSC_KHZ to set VM-scoped TSC seems possible to be applied 
-to all VMs, not limited to TDs. It doesn't look like a small task.
-
-I need more time to evaluate the efforts.
-
-> Thanks,
-> 
+>> TDVF firmware (CODE and VARS) needs to be added/copied to TD's private
+>> memory via KVM_TDX_INIT_MEM_REGION, as well as TD HOB and TEMP memory.
 >>
+>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 >> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 >> ---
->>   target/i386/kvm/kvm.c |  8 ++++++++
->>   target/i386/kvm/tdx.c | 18 ++++++++++++++++++
->>   2 files changed, 26 insertions(+)
+>>   target/i386/kvm/tdx.c | 24 ++++++++++++++++++++++++
+>>   1 file changed, 24 insertions(+)
 >>
->> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
->> index f2d7c3cf59ac..c51125ab200f 100644
->> --- a/target/i386/kvm/kvm.c
->> +++ b/target/i386/kvm/kvm.c
->> @@ -818,6 +818,14 @@ static int kvm_arch_set_tsc_khz(CPUState *cs)
->>       int r, cur_freq;
->>       bool set_ioctl = false;
->>   
->> +    /*
->> +     * TD guest's TSC is immutable, it cannot be set/changed via
->> +     * KVM_SET_TSC_KHZ, but only be initialized via KVM_TDX_INIT_VM
->> +     */
->> +    if (is_tdx_vm()) {
->> +        return 0;
->> +    }
->> +
->>       if (!env->tsc_khz) {
->>           return 0;
->>       }
 >> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
->> index 9f2cdf640b5c..622efc409438 100644
+>> index 3e18ace90bf7..567ee12e88f0 100644
 >> --- a/target/i386/kvm/tdx.c
 >> +++ b/target/i386/kvm/tdx.c
->> @@ -35,6 +35,9 @@
->>   #define TDX_TD_ATTRIBUTES_PKS               BIT_ULL(30)
->>   #define TDX_TD_ATTRIBUTES_PERFMON           BIT_ULL(63)
+>> @@ -240,6 +240,7 @@ static void tdx_finalize_vm(Notifier *notifier, void *unused)
+>>   {
+>>       TdxFirmware *tdvf = &tdx_guest->tdvf;
+>>       TdxFirmwareEntry *entry;
+>> +    int r;
 >>   
->> +#define TDX_MIN_TSC_FREQUENCY_KHZ   (100 * 1000)
->> +#define TDX_MAX_TSC_FREQUENCY_KHZ   (10 * 1000 * 1000)
+>>       tdx_init_ram_entries();
+>>   
+>> @@ -265,6 +266,29 @@ static void tdx_finalize_vm(Notifier *notifier, void *unused)
+>>             sizeof(TdxRamEntry), &tdx_ram_entry_compare);
+>>   
+>>       tdvf_hob_create(tdx_guest, tdx_get_hob_entry(tdx_guest));
 >> +
->>   static TdxGuest *tdx_guest;
->>   
->>   /* It's valid after kvm_confidential_guest_init()->kvm_tdx_init() */
->> @@ -211,6 +214,20 @@ int tdx_pre_create_vcpu(CPUState *cpu)
->>           goto out;
->>       }
->>   
->> +    r = -EINVAL;
->> +    if (env->tsc_khz && (env->tsc_khz < TDX_MIN_TSC_FREQUENCY_KHZ ||
->> +                         env->tsc_khz > TDX_MAX_TSC_FREQUENCY_KHZ)) {
->> +        error_report("Invalid TSC %ld KHz, must specify cpu_frequency between [%d, %d] kHz",
->> +                      env->tsc_khz, TDX_MIN_TSC_FREQUENCY_KHZ,
->> +                      TDX_MAX_TSC_FREQUENCY_KHZ);
->> +        goto out;
+>> +    for_each_tdx_fw_entry(tdvf, entry) {
+>> +        struct kvm_tdx_init_mem_region mem_region = {
+>> +            .source_addr = (__u64)entry->mem_ptr,
+>> +            .gpa = entry->address,
+>> +            .nr_pages = entry->size / 4096,
+>> +        };
+>> +
+>> +        __u32 metadata = entry->attributes & TDVF_SECTION_ATTRIBUTES_MR_EXTEND ?
+>> +                         KVM_TDX_MEASURE_MEMORY_REGION : 0;
+> 
+> Please use flags instead of metadata.
+
+Sure. Will change it.
+
+> 
+>> +        r = tdx_vm_ioctl(KVM_TDX_INIT_MEM_REGION, metadata, &mem_region);
+>> +        if (r < 0) {
+>> +             error_report("KVM_TDX_INIT_MEM_REGION failed %s", strerror(-r));
+>> +             exit(1);
+>> +        }
+>> +
+>> +        if (entry->type == TDVF_SECTION_TYPE_TD_HOB ||
+>> +            entry->type == TDVF_SECTION_TYPE_TEMP_MEM) {
+>> +            qemu_ram_munmap(-1, entry->mem_ptr, entry->size);
+>> +            entry->mem_ptr = NULL;
+>> +        }
 >> +    }
->> +
->> +    if (env->tsc_khz % (25 * 1000)) {
->> +        error_report("Invalid TSC %ld KHz, it must be multiple of 25MHz", env->tsc_khz);
->> +        goto out;
->> +    }
->> +
->>       r = setup_td_guest_attributes(x86cpu);
->>       if (r) {
->>           goto out;
->> @@ -221,6 +238,7 @@ int tdx_pre_create_vcpu(CPUState *cpu)
+>>   }
 >>   
->>       init_vm.attributes = tdx_guest->attributes;
->>       init_vm.max_vcpus = ms->smp.cpus;
->> +    init_vm.tsc_khz = env->tsc_khz;
->>   
->>       r = tdx_vm_ioctl(KVM_TDX_INIT_VM, 0, &init_vm);
->>       if (r < 0) {
+>>   static Notifier tdx_machine_done_notify = {
 >> -- 
 >> 2.27.0
 >>
