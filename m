@@ -2,162 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E8419527E76
-	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 09:21:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BBCB3527E7F
+	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 09:22:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241023AbiEPHUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 03:20:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57164 "EHLO
+        id S240888AbiEPHWW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 03:22:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241015AbiEPHUy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 03:20:54 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27A0DBE0F;
-        Mon, 16 May 2022 00:20:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652685653; x=1684221653;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=5Bmrym4ZBrZuWxcL4DbvzKLGJFYIJDTX69S3vd8Egxg=;
-  b=HHdhJkt4Uy0JAko18zXwuDaZT6xuJolbnr3XuUNobk5SBtZHx5oSomxI
-   XPh+IL6jTkA9xnJgtJ/6QPqup/R/NiprPlXLbKz93josntWePfubuPAUS
-   Mo4tSUAkiBGd02ZKRsiJXrI5U/fBU6ZlK2/c0RGo06kGo+HkN4e3OLUcH
-   K0glFQ9b0q07Ww1FpsPbgJhIe9H5FUUzb0xy4ir3LBQ0g5Qcj3IuBqJD2
-   ARpttl5x9MFpWuZnCQTOKCJZaqXgDVy6li27nHuvEZPuNJXZETEk4fx02
-   a7Iz4jdQqjK4fyCriIFhL5dqTY2qIDubCCEEcwFMP908t5vr+BI5HWvqt
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10348"; a="269579094"
-X-IronPort-AV: E=Sophos;i="5.91,229,1647327600"; 
-   d="scan'208";a="269579094"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2022 00:20:52 -0700
-X-IronPort-AV: E=Sophos;i="5.91,229,1647327600"; 
-   d="scan'208";a="596388661"
-Received: from rhudecze-mobl.ger.corp.intel.com (HELO [10.0.2.15]) ([10.252.36.15])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2022 00:20:46 -0700
-Message-ID: <dd53c419-efc4-5b2f-9fdc-e23e7145dbd1@intel.com>
-Date:   Mon, 16 May 2022 10:20:42 +0300
+        with ESMTP id S241072AbiEPHWR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 03:22:17 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1696B17E2D;
+        Mon, 16 May 2022 00:22:17 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24G706BE028147;
+        Mon, 16 May 2022 07:22:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=JuifCVkDQVVjp5OiuUeBAJSqFCJKTFUDHWj8OJinmXY=;
+ b=BvhKjElgYoixjN4+jK1B9Xv0b7e781SmVCBZn6db3XUxcvkA1VVW08xOPh9tYlWBKpBn
+ I9gl48FD+C9tU0tVBp0UQKtZAtUAlNrwzTzVkg1iUy+jlA6HVMK7O/2a3g0b4Z7rk0HY
+ YJz83rU4d/yiZ7N2AGdHOKi4dik0DT+XWDFgDDdViGyMB8t2o1UonxikAfGt9PdcmLyI
+ mi7Y5nssECjujsTdnyzd/PmvyfR8+WJIr8IMnwvEaFRL2Rw6+C203Ekrzym4IF6lFfYc
+ z5mCxsJd8DjDv73IpkZhl0buk0qp4AlDVuNlx+1Tk+2SYlUGLLUl38YfMiePTZBh7rsQ 9A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g3hub8ejt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 May 2022 07:22:16 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24G7KW4A016681;
+        Mon, 16 May 2022 07:22:15 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g3hub8ejh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 May 2022 07:22:15 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24G7IeDh009659;
+        Mon, 16 May 2022 07:22:13 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma02fra.de.ibm.com with ESMTP id 3g2428hqc9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 May 2022 07:22:13 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24G7MAmC42271212
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 16 May 2022 07:22:10 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 568E04C040;
+        Mon, 16 May 2022 07:22:10 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DC2454C046;
+        Mon, 16 May 2022 07:22:09 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.50.122])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 16 May 2022 07:22:09 +0000 (GMT)
+Message-ID: <560068a1e89c2ceec0d544fcc62fa3f95d390182.camel@linux.ibm.com>
+Subject: Re: [PATCH v10 01/19] KVM: s390: pv: leak the topmost page table
+ when destroy fails
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
+        mimu@linux.ibm.com
+Date:   Mon, 16 May 2022 09:22:09 +0200
+In-Reply-To: <20220414080311.1084834-2-imbrenda@linux.ibm.com>
+References: <20220414080311.1084834-1-imbrenda@linux.ibm.com>
+         <20220414080311.1084834-2-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.1 (3.44.1-1.fc36) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.8.1
-Subject: Re: [PATCH V2 03/11] perf/x86: Add support for TSC in nanoseconds as
- a perf event clock
-Content-Language: en-US
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Jiri Olsa <jolsa@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        H Peter Anvin <hpa@zytor.com>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Leo Yan <leo.yan@linaro.org>,
-        "jgross@suse.com" <jgross@suse.com>,
-        "sdeep@vmware.com" <sdeep@vmware.com>,
-        "pv-drivers@vmware.com" <pv-drivers@vmware.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "kys@microsoft.com" <kys@microsoft.com>,
-        "sthemmin@microsoft.com" <sthemmin@microsoft.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "Andrew.Cooper3@citrix.com" <Andrew.Cooper3@citrix.com>,
-        "Hall, Christopher S" <christopher.s.hall@intel.com>
-References: <20220214110914.268126-1-adrian.hunter@intel.com>
- <20220214110914.268126-4-adrian.hunter@intel.com>
- <YiIXFmA4vpcTSk2L@hirez.programming.kicks-ass.net>
- <853ce127-25f0-d0fe-1d8f-0b0dd4f3ce71@intel.com>
- <YiXVgEk/1UClkygX@hirez.programming.kicks-ass.net>
- <30383f92-59cb-2875-1e1b-ff1a0eacd235@intel.com>
- <YiYZv+LOmjzi5wcm@hirez.programming.kicks-ass.net>
- <013b5425-2a60-e4d4-b846-444a576f2b28@intel.com>
- <6f07a7d4e1ad4440bf6c502c8cb6c2ed@intel.com>
- <c3e1842b-79c3-634a-3121-938b5160ca4c@intel.com>
- <50fd2671-6070-0eba-ea68-9df9b79ccac3@intel.com> <87ilqx33vk.ffs@tglx>
- <ff1e190a-95e6-e2a6-dc01-a46f7ffd2162@intel.com> <87fsm114ax.ffs@tglx>
- <c8033229-97a0-3e4c-66d5-74c0d1d4e15c@intel.com> <87ee1iw2ao.ffs@tglx>
-From:   Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <87ee1iw2ao.ffs@tglx>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: d8qLD7uyqhbqj5ReGRJQ2wqDuSMOFLRJ
+X-Proofpoint-GUID: 2_6L4MdguNWF1gvqBaY5Vy4ZAXzAMDb_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-16_03,2022-05-13_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ suspectscore=0 spamscore=0 lowpriorityscore=0 impostorscore=0 bulkscore=0
+ mlxscore=0 clxscore=1011 priorityscore=1501 adultscore=0 phishscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205160036
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/04/22 02:10, Thomas Gleixner wrote:
-> On Tue, Apr 26 2022 at 09:51, Adrian Hunter wrote:
->> On 25/04/22 20:05, Thomas Gleixner wrote:
->>> On Mon, Apr 25 2022 at 16:15, Adrian Hunter wrote:
->>>> On 25/04/22 12:32, Thomas Gleixner wrote:
->>>>> It's hillarious, that we still cling to this pvclock abomination, while
->>>>> we happily expose TSC deadline timer to the guest. TSC virt scaling was
->>>>> implemented in hardware for a reason.
->>>>
->>>> So you are talking about changing VMX TCS Offset on every VM-Entry to try to hide
->>>> the time jumps when the VM is scheduled out?  Or neglect that and just let the time
->>>> jumps happen?
->>>>
->>>> If changing VMX TCS Offset, how can TSC be kept consistent between each VCPU i.e.
->>>> wouldn't that mean each VCPU has to have the same VMX TSC Offset?
->>>
->>> Obviously so. That's the only thing which makes sense, no?
->>
->> [ Sending this again, because I notice I messed up the email "From" ]
->>
->> But wouldn't that mean changing all the VCPUs VMX TSC Offset at the same time,
->> which means when none are currently executing?  How could that be done?
-> 
-> Why would you change TSC offset after the point where a VM is started
-> and why would it be different per vCPU?
-> 
-> Time is global and time moves on when a vCPU is scheduled out. Anything
-> else is bonkers, really. If the hypervisor tries to screw with that then
-> how does the guest do timekeeping in a consistent way?
-> 
->     CLOCK_REALTIME = CLOCK_MONOTONIC + offset
-> 
-> That offset changes when something sets the clock, i.e. clock_settime(),
-> settimeofday() or adjtimex() in case that NTP cannot compensate or for
-> the beloved leap seconds adjustment. At any other time the offset is
-> constant.
-> 
-> CLOCK_MONOTONIC is derived from the underlying clocksource which is
-> expected to increment with constant frequency and that has to be
-> consistent accross _all_ vCPUs of a particular VM.
-> 
-> So how would a hypervisor 'hide' scheduled out time w/o screwing up
-> timekeeping completely?
-> 
-> The guest TSC which is based on the host TSC is:
-> 
->     guestTSC = offset + hostTSC * factor;
-> 
-> If you make offset different between guest vCPUs then timekeeping in the
-> guest is screwed.
-> 
-> The whole point of that paravirt clock was to handle migration between
-> hosts which did not have the VMCS TSC scaling/offset mechanism. The CPUs
-> which did not have that went EOL at least 10 years ago.
-> 
-> So what are you concerned about?
+On Thu, 2022-04-14 at 10:02 +0200, Claudio Imbrenda wrote:
 
-Thanks for the explanation.
+[...]
+> +/**
+> + * s390_replace_asce - Try to replace the current ASCE of a gmap
+> with
+> + * another equivalent one.
+> + * @gmap the gmap
+> + *
+> + * If the allocation of the new top level page table fails, the ASCE
+> is not
+> + * replaced.
+> + * In any case, the old ASCE is always removed from the list.
+> Therefore the
+> + * caller has to make sure to save a pointer to it beforehands,
+> unless an
+> + * intentional leak is intended.
+> + */
+> +int s390_replace_asce(struct gmap *gmap)
+> +{
+>=20
+[...]
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Set new table origin while =
+preserving existing ASCE
+> control bits */
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0asce =3D (gmap->asce & ~_ASCE_=
+ORIGIN) | __pa(table);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0WRITE_ONCE(gmap->asce, asce);
 
-Changing TSC offset / scaling makes it much harder for Intel PT on
-the host to use, so there is no sense in my pushing for that at this
-time when there is anyway kernel option no-kvmclock.
+Can someone concurrently touch the control bits?
 
