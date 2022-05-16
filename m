@@ -2,134 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 16E1E527FD0
-	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 10:37:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA5CB527FE6
+	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 10:43:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241796AbiEPIh5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 04:37:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35628 "EHLO
+        id S230264AbiEPImj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 04:42:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238562AbiEPIh4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 04:37:56 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04965E0B1;
-        Mon, 16 May 2022 01:37:54 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24G5prom034894;
-        Mon, 16 May 2022 08:37:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=/WFldQY47xtP9mdd9eNlQrzE0SUcOZLQILC4gROquFM=;
- b=ni0zT9V09fdOxaOnzIA07quBOz/g+DdKaXlcVvzhfD38F0BY1IRaJhCOLv/gBfYhzZIO
- zOX5ejeHYQEmFIuiXhkFZYx37YFfp+tggATCr8CWGI39pgM4cKs1EaQVol8zTRy+Udto
- rIg9kajppUFsaQhsdMWLRT9QUD+nuyyVmKqgdchAhoO3xCuB8H/fPelge9CnI0z7OUCY
- ub210DhdJi6rFnoImMvi+2G4o0TKYES5feLPh0UsvGq8PR7kdOvkFxGfk30VJFdBMNn7
- MerXjSEkgMw1iFQlAngfwmz4WDqgaC6lNOmnmoox2r+7oIPGjSFQQ19OSAH55MeJOQGz 1w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g3gudjyqk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 May 2022 08:37:53 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24G8Qkf8027858;
-        Mon, 16 May 2022 08:37:53 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g3gudjyqb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 May 2022 08:37:53 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24G8bpse013613;
-        Mon, 16 May 2022 08:37:51 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04fra.de.ibm.com with ESMTP id 3g2428ssp5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 May 2022 08:37:51 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24G8bIKF23593286
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 16 May 2022 08:37:18 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4B1974C046;
-        Mon, 16 May 2022 08:37:48 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EE7924C044;
-        Mon, 16 May 2022 08:37:47 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.50.122])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 16 May 2022 08:37:47 +0000 (GMT)
-Message-ID: <86d8269b1ebab3aeb0fb1c569d4a32d2f5b69f02.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH 2/6] s390x: uv-host: Add uninitialized UV
- tests
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        imbrenda@linux.ibm.com, thuth@redhat.com, seiden@linux.ibm.com,
-        scgl@linux.ibm.com
-Date:   Mon, 16 May 2022 10:37:47 +0200
-In-Reply-To: <20220513095017.16301-3-frankja@linux.ibm.com>
-References: <20220513095017.16301-1-frankja@linux.ibm.com>
-         <20220513095017.16301-3-frankja@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.1 (3.44.1-1.fc36) 
+        with ESMTP id S241857AbiEPImd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 04:42:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E46E4BC34
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 01:42:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652690547;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=zsjSQ0E4x4apOOovvgvIeCzdF5L3Muj7tY5Ce1u0fFA=;
+        b=HiMCBmcefGwx78a3Rgmxr8Jrj342i6wwNlIx8JWF50z4Yj0vNwEWiRy7NfOYaRkKhnqmEC
+        sSMw3naw4qT9wFzSGCtKn1Kr8Ln/PGqolRkLRGONrnCclXvq2uxjwHMbtbg0EVQUX0zA4v
+        ydE7nT6/Nu1boypEAzjNeWIPmzeiMyg=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-644-hrKwPFoVP6as52qPJiqDgw-1; Mon, 16 May 2022 04:42:20 -0400
+X-MC-Unique: hrKwPFoVP6as52qPJiqDgw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4A4BF29AB44D;
+        Mon, 16 May 2022 08:42:20 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-13-125.pek2.redhat.com [10.72.13.125])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6111A7C52;
+        Mon, 16 May 2022 08:42:16 +0000 (UTC)
+From:   Jason Wang <jasowang@redhat.com>
+To:     viro@zeniv.linux.org.uk, mst@redhat.com, jasowang@redhat.com,
+        kvm@vger.kernel.org
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        ebiggers@kernel.org, davem@davemloft.net
+Subject: [PATCH] vhost_net: fix double fget()
+Date:   Mon, 16 May 2022 16:42:13 +0800
+Message-Id: <20220516084213.26854-1-jasowang@redhat.com>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Kus2ErU0Tzd-e7cFLPLxC59SAoznOi3q
-X-Proofpoint-ORIG-GUID: ks9PLwxI2I-VxklsrK4RX0W6P_zMTOlF
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-16_03,2022-05-13_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
- mlxlogscore=999 priorityscore=1501 impostorscore=0 suspectscore=0
- malwarescore=0 bulkscore=0 spamscore=0 phishscore=0 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205160049
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-05-13 at 09:50 +0000, Janosch Frank wrote:
-> Let's also test for rc 0x3
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+From: Al Viro <viro@zeniv.linux.org.uk>
 
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
-if you fix the nit below.
+Here's another piece of code assuming that repeated fget() will yield the
+same opened file: in vhost_net_set_backend() we have
 
-> ---
-> =C2=A0s390x/uv-host.c | 78
-> +++++++++++++++++++++++++++++++++++++++++++++++--
-> =C2=A01 file changed, 76 insertions(+), 2 deletions(-)
->=20
-> diff --git a/s390x/uv-host.c b/s390x/uv-host.c
-> index 0f0b18a1..f846fc42 100644
-> --- a/s390x/uv-host.c
-> +++ b/s390x/uv-host.c
-> @@ -83,6 +83,24 @@ static void test_priv(void)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0report_prefix_pop();
-> =C2=A0}
-> =C2=A0
-> +static void test_uv_uninitialized(void)
-> +{
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct uv_cb_header uvcb =3D {=
-};
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int i;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0report_prefix_push("uninitiali=
-zed");
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* i =3D 1 to skip over initia=
-lize */
+        sock = get_socket(fd);
+        if (IS_ERR(sock)) {
+                r = PTR_ERR(sock);
+                goto err_vq;
+        }
 
-Just say
+        /* start polling new socket */
+        oldsock = vhost_vq_get_backend(vq);
+        if (sock != oldsock) {
+...
+                vhost_vq_set_backend(vq, sock);
+...
+                if (index == VHOST_NET_VQ_RX)
+                        nvq->rx_ring = get_tap_ptr_ring(fd);
 
-if (cmds[i].cmd =3D=3D UVC_CMD_INIT_UV)
-  continue;
+with
+static struct socket *get_socket(int fd)
+{
+        struct socket *sock;
 
-inside the loop.
+        /* special case to disable backend */
+        if (fd == -1)
+                return NULL;
+        sock = get_raw_socket(fd);
+        if (!IS_ERR(sock))
+                return sock;
+        sock = get_tap_socket(fd);
+        if (!IS_ERR(sock))
+                return sock;
+        return ERR_PTR(-ENOTSOCK);
+}
+and
+static struct ptr_ring *get_tap_ptr_ring(int fd)
+{
+        struct ptr_ring *ring;
+        struct file *file = fget(fd);
+
+        if (!file)
+                return NULL;
+        ring = tun_get_tx_ring(file);
+        if (!IS_ERR(ring))
+                goto out;
+        ring = tap_get_ptr_ring(file);
+        if (!IS_ERR(ring))
+                goto out;
+        ring = NULL;
+out:
+        fput(file);
+        return ring;
+}
+
+Again, there is no promise that fd will resolve to the same thing for
+lookups in get_socket() and in get_tap_ptr_ring().  I'm not familiar
+enough with the guts of drivers/vhost to tell how easy it is to turn
+into attack, but it looks like trouble.  If nothing else, the pointer
+returned by tun_get_tx_ring() is not guaranteed to be pinned down by
+anything - the reference to sock will _usually_ suffice, but that
+doesn't help any if we get a different socket on that second fget().
+
+One possible way to fix it would be the patch below; objections?
+
+Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ drivers/vhost/net.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index 28ef323882fb..0bd7d91de792 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -1449,13 +1449,9 @@ static struct socket *get_raw_socket(int fd)
+ 	return ERR_PTR(r);
+ }
+ 
+-static struct ptr_ring *get_tap_ptr_ring(int fd)
++static struct ptr_ring *get_tap_ptr_ring(struct file *file)
+ {
+ 	struct ptr_ring *ring;
+-	struct file *file = fget(fd);
+-
+-	if (!file)
+-		return NULL;
+ 	ring = tun_get_tx_ring(file);
+ 	if (!IS_ERR(ring))
+ 		goto out;
+@@ -1464,7 +1460,6 @@ static struct ptr_ring *get_tap_ptr_ring(int fd)
+ 		goto out;
+ 	ring = NULL;
+ out:
+-	fput(file);
+ 	return ring;
+ }
+ 
+@@ -1551,8 +1546,12 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
+ 		r = vhost_net_enable_vq(n, vq);
+ 		if (r)
+ 			goto err_used;
+-		if (index == VHOST_NET_VQ_RX)
+-			nvq->rx_ring = get_tap_ptr_ring(fd);
++		if (index == VHOST_NET_VQ_RX) {
++			if (sock)
++				nvq->rx_ring = get_tap_ptr_ring(sock->file);
++			else
++				nvq->rx_ring = NULL;
++		}
+ 
+ 		oldubufs = nvq->ubufs;
+ 		nvq->ubufs = ubufs;
+-- 
+2.25.1
 
