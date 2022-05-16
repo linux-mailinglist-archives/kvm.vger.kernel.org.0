@@ -2,161 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 49502528776
-	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 16:49:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49D8C528779
+	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 16:50:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244679AbiEPOt1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 10:49:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37966 "EHLO
+        id S244699AbiEPOtu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 10:49:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244670AbiEPOtZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 10:49:25 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B1E12EA22
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 07:49:24 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id qe3-20020a17090b4f8300b001dc24e4da73so123298pjb.1
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 07:49:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=JQA1CAM9EcNlBvTilQjyrtgzNtDUyC6fSOZfEYDNvqw=;
-        b=Ofiyf21IY/JWacyt2sm4b5JqGuuC4xCXQfaviI0AIJLTpd/Oflx9mf4AgU0jPq/he9
-         P8q38uagOiSBPUbhhVCO3xI8wFi0ws+7XMFVjOWAvczYAZ33OeUVSPMA8IVoEmfTxavH
-         +Jh+8dMsZkVLYRmnNIWBfjKQFw8nAEdqSzfrse3j8qFBus5uBYj6xSSRx79YbRUTr+10
-         8B536NcDWQLKPoDEy+LDdo2lk4qv4nAC0OGBKT90rawf8LvkqU6R1Si7o1p8XjJnsjqN
-         GT9r+zrdlv0EmZI6VxVd3V7k7fmzQe0uepCQluN6+sScjYoFjch6hclfAYUVyNMTtadf
-         qwxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=JQA1CAM9EcNlBvTilQjyrtgzNtDUyC6fSOZfEYDNvqw=;
-        b=M2EkviKZ05OdNWohzzsHm/iva20Ic1NiLFtikAvvm+c8/8XMOvxzYDwtpaHycb5fxi
-         uJzOEsUfAqa8HrRAtgfojz9ZB9Sk5sFKFBViXtPw7ZltWDzkHDJOWUWsWK9BXbZDBNJt
-         jU/DrKkntyAIP6mSB+iTqY61BoEpT8jPMg2LggRMmeJZMH6+UMi+r92D/6+3q1JHi5XP
-         g1S90/0GL1fGwoMHU2fnhvZ0yGIrFUwfshB/vgu/oTFrVmvsYU7JISoZbmVBZ3/ArxPf
-         +ntNvmNOaCfyKiGWVvmCVsYr05SgHEDLv3Ro87hLw5Bsk4TrsBZ7nbf7c/H+O/QRKQrO
-         REAw==
-X-Gm-Message-State: AOAM533iMbsxMryd2D3w5itNmONQGX/yuJpupDvF4gL2uexvTiW83CU7
-        4PL+PW0utOHntNGv9fYJDSuIkQ==
-X-Google-Smtp-Source: ABdhPJzWW2D4IvLQy4A8frhcp8tSvPwynf61rQPofCvBwMRNuG9eI1HYcmZ1MomMsjCVF1GmR1hHDA==
-X-Received: by 2002:a17:903:2d0:b0:14d:8a8d:cb1 with SMTP id s16-20020a17090302d000b0014d8a8d0cb1mr17896959plk.50.1652712563657;
-        Mon, 16 May 2022 07:49:23 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id jc13-20020a17090325cd00b001618b4d86b3sm1609217plb.180.2022.05.16.07.49.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 May 2022 07:49:23 -0700 (PDT)
-Date:   Mon, 16 May 2022 14:49:19 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        maciej.szmigiero@oracle.com,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>
-Subject: Re: [PATCH v5 20/21] KVM: Allow for different capacities in
- kvm_mmu_memory_cache structs
-Message-ID: <YoJkb7oMEz0v1dnp@google.com>
-References: <20220513202819.829591-1-dmatlack@google.com>
- <20220513202819.829591-21-dmatlack@google.com>
+        with ESMTP id S244687AbiEPOtq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 10:49:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 88AB22EA22
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 07:49:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652712584;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2F5yzzwLJL4gm8RAlP4L9GJYeiZR3Q+rkmeOt6UXeew=;
+        b=PpKPG2sL9702u3m6t1V1MNsZavUIUc5pWVcFYHbjEedFyLeurqVG4fAyFqrkynl/gVcmIP
+        J5KRYp37NkKDtvKb5xmnWfWMfUzY7UdlbADCnLIrph/6L8KlC7ZyITBPyo9UzNc9wnyFrZ
+        llWF1R3uxLhkuuMcVfukpIj9yU+8c48=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-479-M86AaTXkNBmZQgwiWJiKzg-1; Mon, 16 May 2022 10:49:41 -0400
+X-MC-Unique: M86AaTXkNBmZQgwiWJiKzg-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9EBC4804196;
+        Mon, 16 May 2022 14:49:40 +0000 (UTC)
+Received: from starship (unknown [10.40.192.55])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1C20E492C14;
+        Mon, 16 May 2022 14:49:36 +0000 (UTC)
+Message-ID: <9ed2fc294bf2c21b41b22605ff8039bb71903712.camel@redhat.com>
+Subject: Re: [PATCH] locking/atomic/x86: Introduce try_cmpxchg64
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Uros Bizjak <ubizjak@gmail.com>,
+        Peter Zijlstra <peterz@infradead.org>, X86 ML <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Will Deacon <will@kernel.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Marco Elver <elver@google.com>
+Date:   Mon, 16 May 2022 17:49:36 +0300
+In-Reply-To: <YoJayBWZF3mUnYS6@google.com>
+References: <20220510154217.5216-1-ubizjak@gmail.com>
+         <20220510165506.GP76023@worktop.programming.kicks-ass.net>
+         <CAFULd4aNME5s2zGOO0A11kdjfHekH=ceSH7jUfAhmZaJWHv9cQ@mail.gmail.com>
+         <20220511075409.GX76023@worktop.programming.kicks-ass.net>
+         <CAFULd4aXpt_pnCR5OK5B1m5sErfB3uj_ez=-KW7=0qQheEdVzA@mail.gmail.com>
+         <Ynven5y2u9WNfwK+@google.com>
+         <CAFULd4bZDO5-3T4q9fanHFrRTDj8v6fypiTc=dFPO9Rp61g9eQ@mail.gmail.com>
+         <fcf55234cfb95600d412322fba4dc9d0c9a1d7f4.camel@redhat.com>
+         <YoJayBWZF3mUnYS6@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220513202819.829591-21-dmatlack@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 13, 2022, David Matlack wrote:
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 53ae2c0640bc..2f2ef6b60ff4 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -764,7 +764,10 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
->  {
->  	phys_addr_t addr;
->  	int ret = 0;
-> -	struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
-> +	struct kvm_mmu_memory_cache cache = {
-> +		.capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE,
-> +		.gfp_zero = __GFP_ZERO,
+On Mon, 2022-05-16 at 14:08 +0000, Sean Christopherson wrote:
+> On Mon, May 16, 2022, Maxim Levitsky wrote:
+> > On Wed, 2022-05-11 at 21:54 +0200, Uros Bizjak wrote:
+> > > On Wed, May 11, 2022 at 6:04 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > > On Wed, May 11, 2022, Uros Bizjak wrote:
+> > > > > On Wed, May 11, 2022 at 9:54 AM Peter Zijlstra <peterz@infradead.org> wrote:
+> > > > > > Still, does 32bit actually support that stuff?
+> > > > > 
+> > > > > Unfortunately, it does:
+> > > > > 
+> > > > > kvm-intel-y        += vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+> > > > >                vmx/evmcs.o vmx/nested.o vmx/posted_intr.o
+> > > > > 
+> > > > > And when existing cmpxchg64 is substituted with cmpxchg, the
+> > > > > compilation dies for 32bits with:
+> > > > 
+> > > > ...
+> > > > 
+> > > > > > Anyway, your patch looks about right, but I find it *really* hard to
+> > > > > > care about 32bit code these days.
+> > > > > 
+> > > > > Thanks, this is also my sentiment, but I hope the patch will enable
+> > > > > better code and perhaps ease similar situation I have had elsewhere.
+> > > > 
+> > > > IMO, if we merge this it should be solely on the benefits to 64-bit code.  Yes,
+> > > > KVM still supports 32-bit kernels, but I'm fairly certain the only people that
+> > > > run 32-bit KVM are KVM developers.  32-bit KVM has been completely broken for
+> > > > multiple releases at least once, maybe twice, and no one ever complained.
+> > > 
+> > > Yes, the idea was to improve cmpxchg64 with the implementation of
+> > > try_cmpxchg64 for 64bit targets. However, the issue with 32bit targets
+> > > stood in the way, so the effort with 32-bit implementation was mainly
+> > > to unblock progression for 64-bit targets.
+> > 
+> > Would that allow tdp mmu to work on 32 bit?
+> 
+> From a purely technical perspective, there's nothing that prevents enabling the
+> TDP MMU on 32-bit kernels.  The TDP MMU is 64-bit only to simplify the implementation
+> and to reduce the maintenance and validation costs.
+> 
 
-I dislike requiring all users to specificy the capacity.  It largely defeats the
-purpose of KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE, and bleeds details into code that
-really doesn't care all that much about the details.
+I understand exactly that, so the question, will this patch help make the tdp mmu work transparently
+on 32 bit kernels? I  heard that 64 bit cmpxchg was one of the main reasons that it is 64 bit only.
 
-Rather than force the capacity to be set before topup, what about adding a custom
-capacity topup helper?  That allows keeping a default capacity, better documents
-the caches that are special, and provides an opportunity to sanity check that the
-capacity isn't incorrectly changed by the user.  
+I am asking because there was some talk to eliminate the direct mode from the legacy non tdp mmu,
+which would simplify its code by a lot, but then it will make 32 bit kernel fail back to shadowing mmu.
 
-And then I believe this code becomes:
+I know that nobody needs 32 bit KVM host support, but it is useful to be sure that nesting still works, and
+doesn't crash the host and such.
 
-	struct kvm_mmu_memory_cache cache = { .gfp_zero = __GFP_ZERO };
-
-E.g. (completely untested)
-
-static int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc,
-					int capacity, int min)
-{
-	gfp_t gfp = GFP_KERNEL_ACCOUNT;
-	void *obj;
-
-	if (mc->nobjs >= min)
-		return 0;
-
-	if (likely(mc->capacity)) {
-		if (WARN_ON_ONCE(mc->capacity != capacity || !mc->objects))
-			return -EIO;
-	} else {
-		mc->objects = kvmalloc_array(sizeof(void *), capacity, gfp);
-		if (!mc->objects)
-			return -ENOMEM;
-
-		mc->capacity = capacity;
-	}
-
-	while (mc->nobjs < mc->capacity) {
-		obj = mmu_memory_cache_alloc_obj(mc, gfp);
-		if (!obj)
-			return mc->nobjs >= min ? 0 : -ENOMEM;
-		mc->objects[mc->nobjs++] = obj;
-	}
-	return 0;
-}
-
-int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
-{
-	const int capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-
-	return __kvm_mmu_topup_memory_cache(mc, capacity, min);
-}
-
-int kvm_mmu_topup_custom_memory_cache(struct kvm_mmu_memory_cache *mc,
-				      int capacity)
-{
-	return __kvm_mmu_topup_memory_cache(mc, capacity, capacity);
-}
+Best regards,
+	Maxim Levitsky
 
