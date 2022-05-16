@@ -2,125 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52FFF528E21
-	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 21:43:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E27B528E61
+	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 21:43:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345665AbiEPTjb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 15:39:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44768 "EHLO
+        id S1345970AbiEPTnM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 15:43:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345660AbiEPTi4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 15:38:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A6CAA3F889
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 12:38:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652729923;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+tK7o+o7Kj2BQK1w3k57mXkaPLoN/4QFNnxgOKxEuBU=;
-        b=LfTk844feNuMvpixAdumjrUNDcHZdcpR2OOLbwIT6WZkwqyRUUUSo14HjfSQmi5O+qx0uF
-        GVY5iJrG+oTUNovTVw91mVu849UNw6zx5KTMSEQzuUyYFleWYIsDAMKJuH9c5BasnkoBXF
-        eZMNUm3iNy3Yy0DceMnkWUketa94lPM=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-25-IWdMusKfNTarytnrwsvqHQ-1; Mon, 16 May 2022 15:38:42 -0400
-X-MC-Unique: IWdMusKfNTarytnrwsvqHQ-1
-Received: by mail-il1-f199.google.com with SMTP id r5-20020a924405000000b002cf9a5b9080so8220789ila.16
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 12:38:42 -0700 (PDT)
+        with ESMTP id S1346061AbiEPTmt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 15:42:49 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9742F3F329
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 12:41:12 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id l7-20020a17090aaa8700b001dd1a5b9965so283021pjq.2
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 12:41:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=NkuNZUIBL8MZdXmO1J6bie/4FoMF9dlGbvJ/EnJshUg=;
+        b=YSYkkeSYlazR/KnZ9A3FW/RivmtBBtfwOD590Y2/k8rYpyPkbUuOO+rwGs2/8RHYhV
+         jvz06DdSkgy4vQhhjr/YXryV5B9qyTetWcD0yxlDdQKdQD6xsBfjHe6w35CK+ecaogDy
+         t8NbscOxGVlR++e0P74FmdEVrpyZPXXKOWEko8abAtjkWwU5ME5mPT5c/rvp4azYvIga
+         QBkUI8VqyqQ0723yj0rYnoB9KlDwuBoqWUzd7kALSg45s1LqvYiDqdwAVytXc3sTyQFy
+         LYY/6iAlFXwrmbY1qhWCKl4EbDHptbmMarKlWiRWblBkCUhKixRRpXbfjJ636mxb9x8G
+         tgPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=+tK7o+o7Kj2BQK1w3k57mXkaPLoN/4QFNnxgOKxEuBU=;
-        b=70CfL+5OBYH/1T0aag1ab3DYGTom7q/p136X46r7B1WCrXuX15R9Rtrx6WsKSDTV6t
-         D6P0RxNDN6xNNyjxQv7IKpIdfVAsfHUIs1feCBcyRHLLALyQCggToIA481RJfQcvmCSi
-         sVD9Wn2jwh7ybVDICs0LTJ+63yggeKCXh+MIdGD3ecNR6xowPd6mdxHBv83Q20dAwvop
-         LE99GDHqAgMMUDHdgBzP5CDbmyVKf5/XzK9mCUgsd0qGuLBRUsYpyYMyY2aRkab9iSJS
-         Lk0DnOveaf19Xgr/kSCAZ+IGRAdpo2SU31LLzuyuCaokY8h4DYrqrxdKLAD3HsZJrHSB
-         HqdA==
-X-Gm-Message-State: AOAM530AuXSI/CQmaLGtHGo4x26LxJr6IgZyZWf8kE8IhijBGXvAT2/u
-        biGX0nq0ZoG55+efOVl0ktDp5xIdP+DZkA/wXfoZ7i/xayWpPDEGBaMMKaR2pod7uQV+R/P0+mX
-        A/DoFWCMLIrVe
-X-Received: by 2002:a05:6638:41a9:b0:32e:415a:a8a9 with SMTP id az41-20020a05663841a900b0032e415aa8a9mr2168800jab.101.1652729921717;
-        Mon, 16 May 2022 12:38:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy1ASRKUsHnS3u0hy5oNZdsYdaQJ/MYozulGQvgUeh7FSJ+d//YDvBT7RymfdniEX5hlCY/9Q==
-X-Received: by 2002:a05:6638:41a9:b0:32e:415a:a8a9 with SMTP id az41-20020a05663841a900b0032e415aa8a9mr2168777jab.101.1652729921515;
-        Mon, 16 May 2022 12:38:41 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id v20-20020a02b914000000b0032e049b2949sm2803562jan.101.2022.05.16.12.38.40
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=NkuNZUIBL8MZdXmO1J6bie/4FoMF9dlGbvJ/EnJshUg=;
+        b=wlqzbA/DldOsP3u504inncsZ9585gzwIlf10upkZq1lFhQktt1ggiM9r9XdZSc7MFL
+         1ICrpXJbFJ1RzBTji1268UKG8Q77m+KsrZufxmLTX+FctBmFiIhvf0OFXihQvNXvkpzQ
+         qmF61T8KoR2EB8l8HHQShsp/maPbGHTBY4KiN59nU2bhHRT46H5ha68ODET2t+DsQOt6
+         Np2th1U3srNCgkmzuZQMdCwQs/1UErr3rFNZw0pf7A0vH3BwVBS+DTpGRWqSediyheRj
+         cl82z23yN62p93QfYdKNy7zwHPCFlTPEtZCoxYLb4chHtICuZ2uLG+/Z8nHQ5Rf8QWtt
+         An6Q==
+X-Gm-Message-State: AOAM533yV54E0ToOtovFeYEQ5XmU6rDJuv1v3zwzoJBYLpo63kAGK6DK
+        0ivOTIZipdpDtkjxolgTUODm++69uJjQPg==
+X-Google-Smtp-Source: ABdhPJzhqjOIS7ooa6ljXBdDLvsM/Pulyqi/qmAlcWfUFcQwQ8Rv2LI1aAxACX8ZVtfXOR3acBcAow==
+X-Received: by 2002:a17:90b:33c6:b0:1dc:ba92:41bb with SMTP id lk6-20020a17090b33c600b001dcba9241bbmr20912338pjb.26.1652730071981;
+        Mon, 16 May 2022 12:41:11 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id e13-20020a170902ed8d00b0015e8d4eb1fcsm7467421plj.70.2022.05.16.12.41.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 May 2022 12:38:41 -0700 (PDT)
-Date:   Mon, 16 May 2022 13:38:39 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        linux-s390@vger.kernel.org, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Subject: Re: [PATCH v7 17/22] vfio-pci/zdev: add open/close device hooks
-Message-ID: <20220516133839.7e116489.alex.williamson@redhat.com>
-In-Reply-To: <20220516183558.GN1343366@nvidia.com>
-References: <20220513191509.272897-1-mjrosato@linux.ibm.com>
-        <20220513191509.272897-18-mjrosato@linux.ibm.com>
-        <20220516172734.GE1343366@nvidia.com>
-        <7a31ec36-ceaf-dcef-8bd0-2b4732050aed@linux.ibm.com>
-        <20220516183558.GN1343366@nvidia.com>
-Organization: Red Hat
+        Mon, 16 May 2022 12:41:11 -0700 (PDT)
+Date:   Mon, 16 May 2022 19:41:08 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 04/34] KVM: x86: hyper-v: Handle
+ HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} calls gently
+Message-ID: <YoKo1An5t7+owfzR@google.com>
+References: <20220414132013.1588929-1-vkuznets@redhat.com>
+ <20220414132013.1588929-5-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220414132013.1588929-5-vkuznets@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 16 May 2022 15:35:58 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Thu, Apr 14, 2022, Vitaly Kuznetsov wrote:
+> @@ -1862,15 +1890,58 @@ void kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_vcpu_hv_tlb_flush_ring *tlb_flush_ring;
+>  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+> +	struct kvm_vcpu_hv_tlb_flush_entry *entry;
+> +	int read_idx, write_idx;
+> +	u64 address;
+> +	u32 count;
+> +	int i, j;
+>  
+> -	kvm_vcpu_flush_tlb_guest(vcpu);
+> -
+> -	if (!hv_vcpu)
+> +	if (!tdp_enabled || !hv_vcpu) {
+> +		kvm_vcpu_flush_tlb_guest(vcpu);
+>  		return;
+> +	}
+>  
+>  	tlb_flush_ring = &hv_vcpu->tlb_flush_ring;
+>  
+> -	tlb_flush_ring->read_idx = tlb_flush_ring->write_idx;
+> +	/*
+> +	 * TLB flush must be performed on the target vCPU so 'read_idx'
+> +	 * (AKA 'tail') cannot change underneath, the compiler is free
+> +	 * to re-read it.
+> +	 */
+> +	read_idx = tlb_flush_ring->read_idx;
+> +
+> +	/*
+> +	 * 'write_idx' (AKA 'head') can be concurently updated by a different
+> +	 * vCPU so we must be sure it's read once.
+> +	 */
+> +	write_idx = READ_ONCE(tlb_flush_ring->write_idx);
+> +
+> +	/* Pairs with smp_wmb() in hv_tlb_flush_ring_enqueue() */
+> +	smp_rmb();
+> +
+> +	for (i = read_idx; i != write_idx; i = (i + 1) % KVM_HV_TLB_FLUSH_RING_SIZE) {
+> +		entry = &tlb_flush_ring->entries[i];
+> +
+> +		if (entry->flush_all)
+> +			goto out_flush_all;
+> +
+> +		/*
+> +		 * Lower 12 bits of 'address' encode the number of additional
+> +		 * pages to flush.
+> +		 */
+> +		address = entry->addr & PAGE_MASK;
+> +		count = (entry->addr & ~PAGE_MASK) + 1;
+> +		for (j = 0; j < count; j++)
+> +			static_call(kvm_x86_flush_tlb_gva)(vcpu, address + j * PAGE_SIZE);
+> +	}
+> +	++vcpu->stat.tlb_flush;
 
-> On Mon, May 16, 2022 at 02:30:46PM -0400, Matthew Rosato wrote:
-> 
-> > Conceptually I think this would work for QEMU anyway (it always sets the kvm
-> > before we open the device).  I tried to test the idea quickly but couldn't
-> > get the following to apply on vfio-next or your vfio_group_locking -- but I
-> > understand what you're trying to do so I'll re-work and try it out.  
-> 
-> I created it on 8c9350e9bf43de1ebab3cc8a80703671e6495ab4 which is the
-> vfio_group_locking.. I can send you a github if it helps
-> https://github.com/jgunthorpe/linux/commits/vfio_group_lockin
-> 
-> > @Alex can you think of any usecase/reason why we would need to be able to
-> > set the KVM sometime after the device was opened?  Doing something like
-> > below would break that, as this introduces the assumption that the group is
-> > associated with the KVM before the device is opened (and if it's not, the
-> > device open fails).  
-> 
-> Keep in mind that GVT already hard requires this ordering to even
-> allow open_device to work - so it already sets a floor for what
-> userspace can do..
+Bumping tlb_flush is inconsistent with how KVM handles INVLPG, and could be wrong
+if the ring is empty (might be impossible without a bug?).  And if my math is right,
+or at least in the ballpark, tlb_flush will be incremented once regardless of whether
+the loop flushed 1 page or 64k pages (completely full ring, full count on every one).
 
-How is this going to work when vfio devices are exposed directly?  We
-currently have a strict ordering through the group to get to the
-device, and it's therefore a reasonable requirement for userspace to
-register the group with kvm before opening the device.  Is the notifier
-and async KVM registration necessary to support this dependency with
-direct device access?  I don't have as clear a picture of the ordering
-with with direct access.  Thanks,
+I'd prefer to either drop the stat adjustment entirely, or bump invlpg in the loop, e.g.
 
-Alex
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 56f06cf85282..5654c9d56289 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -1945,10 +1945,11 @@ void kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu)
+        for (i = read_idx; i != write_idx; i = (i + 1) % KVM_HV_TLB_FLUSH_RING_SIZE) {
+                address = tlb_flush_ring->entries[i] & PAGE_MASK;
+                count = (tlb_flush_ring->entries[i] & ~PAGE_MASK) + 1;
+-               for (j = 0; j < count; j++)
++               for (j = 0; j < count; j++) {
+                        static_call(kvm_x86_flush_tlb_gva)(vcpu, address + j * PAGE_SIZE);
++                       ++vcpu->stat.invlpg;
++               }
+        }
+-       ++vcpu->stat.tlb_flush;
 
+ out_empty_ring:
+        tlb_flush_ring->read_idx = write_idx;
+
+
+> +	goto out_empty_ring;
+> +
+> +out_flush_all:
+> +	kvm_vcpu_flush_tlb_guest(vcpu);
+> +
+> +out_empty_ring:
+> +	tlb_flush_ring->read_idx = write_idx;
+>  }
+>  
