@@ -2,178 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DE5B052823E
-	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 12:38:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E805A528239
+	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 12:37:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233014AbiEPKii (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 06:38:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40372 "EHLO
+        id S242174AbiEPKhm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 06:37:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229569AbiEPKie (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 06:38:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A42F822BDA
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 03:38:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652697511;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Jj+1GdC5ed9RjG2w4YTgAyI/dqT/LcafZe1Q5l3sISU=;
-        b=FJGGyhhM72HKuchvDIiMHYnSSKf0cOy2VQG+CPGQU3VCanQIyeanYI1pL94aM37MeMvYsf
-        kZKa5rIZLZcQYH0JssJ44FP3uMy6gMDl/f6uQelGB/K3VH5CGLmzkUmnmIjdINs5jF8qd9
-        PX+OPsiesybY++nZds5vy8uUxY9pkGY=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-410-01a7nTQBMU6tF5O7kRRXhA-1; Mon, 16 May 2022 06:38:30 -0400
-X-MC-Unique: 01a7nTQBMU6tF5O7kRRXhA-1
-Received: by mail-wm1-f72.google.com with SMTP id r127-20020a1c4485000000b003970bec7fd9so76747wma.9
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 03:38:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Jj+1GdC5ed9RjG2w4YTgAyI/dqT/LcafZe1Q5l3sISU=;
-        b=ykJQb8ZIjCt6Q2n8gVAL0n0Zisq1THKHhAJseisB5+p+2Cr96EKupzFvYfoUvfIWBC
-         S5VLZPfXr/+rkaF+aAG6WVZqKucoU0DaS7llyckE9FGqqwGpGcmRRVtkB/x4+qHhPUre
-         XeZsJKtlcs7jIB4I3S2PL8X0qjkua0aE9b3murFRBVsWWDpx1g8kqGgTESV64U7F3Cwb
-         737X+59EhSv7CrYfMSQrtcHlXUkBwL6bTUAfFOuQsVEUq/N2Ug3qxCiJbhuSyHdNlctT
-         NG89Jk46Npgj43PEKYiDSwrwi66rrASX2cTuMYhl65P/CftmeAgfKFQ3Y6zaqMIQjRcL
-         Cv3Q==
-X-Gm-Message-State: AOAM532jbGbJuJPSx2kMF+n41b7BoR2QRl3UtXep0DreZ88nlPVI1JxF
-        vGSS/KTRloDY8NRhT+JZNkY8NkxoSJK5MqAHt6wskvb8WLLy5rAvG19Xcc6hDuRacZgyDcQbljD
-        UXG51pQU7s01h
-X-Received: by 2002:a5d:55cd:0:b0:20d:743:6078 with SMTP id i13-20020a5d55cd000000b0020d07436078mr4512158wrw.240.1652697509333;
-        Mon, 16 May 2022 03:38:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwuLIC5azL1kewoTfpBvgMX057eM6Y2+fItaWzmV/QKn2K7lZmZOohxOfmDTBkOuxEGXGLOtQ==
-X-Received: by 2002:a5d:55cd:0:b0:20d:743:6078 with SMTP id i13-20020a5d55cd000000b0020d07436078mr4512145wrw.240.1652697509132;
-        Mon, 16 May 2022 03:38:29 -0700 (PDT)
-Received: from redhat.com ([2.55.141.66])
-        by smtp.gmail.com with ESMTPSA id k20-20020a05600c1c9400b003942a244f38sm13893788wms.17.2022.05.16.03.38.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 May 2022 03:38:28 -0700 (PDT)
-Date:   Mon, 16 May 2022 06:38:25 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Peter Maydell <peter.maydell@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Claudio Fontana <cfontana@suse.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
-Subject: [PULL 49/91] target/i386: Fix sanity check on max APIC ID / X2APIC
- enablement
-Message-ID: <20220516095448.507876-50-mst@redhat.com>
-References: <20220516095448.507876-1-mst@redhat.com>
+        with ESMTP id S229569AbiEPKhk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 06:37:40 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52E1322BD9;
+        Mon, 16 May 2022 03:37:40 -0700 (PDT)
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24GA1ZUm024127;
+        Mon, 16 May 2022 10:37:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=rFTakGOzsoG3Zd7IuRk7SId/Z4//vNBTvFgJnoCDjIk=;
+ b=KSMzNf0fjobFZjzTlN3iIvlClqeyEaud/Pw3HJu0TTj8ttrO+uMR+Id6kMBMR3N0+/iK
+ HKTzdKVdqI5hhYpD6g8D17O+lGAyE9rqVSEPhHAoNKzShi3z37b0xLCvqW8vxSBzUqWi
+ 7A07QMUUUwR1QXbV2CelBNVMl/IRPeaOMRr3GweaBfwUrAQXoQ+ty1z1DzxHlo5DlL/m
+ hiNZa7H1Vr1w8C2ZzF0U4Kzfnqx4dUdboVf/BS/LWnnIDqpYa5b9FS+G2fuWHSwWlIlE
+ tzDyw2fALq1ynTYx1uZuEDtIuDEOXKUJMSgOinn66LYxVPxu4EjEyPdK0XNOMzWhNX3e TQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g3mgdrmrd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 May 2022 10:37:39 +0000
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24GAMNld001989;
+        Mon, 16 May 2022 10:37:39 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g3mgdrmqu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 May 2022 10:37:39 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24GAKeKR013724;
+        Mon, 16 May 2022 10:37:37 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma02fra.de.ibm.com with ESMTP id 3g2428hx5e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 May 2022 10:37:36 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24GAbXgc29622754
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 16 May 2022 10:37:33 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AC527A4057;
+        Mon, 16 May 2022 10:37:33 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0811FA4055;
+        Mon, 16 May 2022 10:37:33 +0000 (GMT)
+Received: from [9.171.15.172] (unknown [9.171.15.172])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 16 May 2022 10:37:32 +0000 (GMT)
+Message-ID: <9aa8db91-a9f5-2b9a-7333-b87b826fdb81@linux.ibm.com>
+Date:   Mon, 16 May 2022 12:41:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220516095448.507876-1-mst@redhat.com>
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v9 2/3] s390x: KVM: guest support for topology function
+Content-Language: en-US
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, wintera@linux.ibm.com, seiden@linux.ibm.com,
+        nrb@linux.ibm.com
+References: <20220506092403.47406-1-pmorel@linux.ibm.com>
+ <20220506092403.47406-3-pmorel@linux.ibm.com>
+ <ecf827ee-4b07-c999-064d-96d77607cf1c@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <ecf827ee-4b07-c999-064d-96d77607cf1c@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: nXkv0dJfz28-U7HtPUFyJzkgGKEpw7lW
+X-Proofpoint-ORIG-GUID: Z5aJkiufopv32RNqFF4fL4dLhkqHKpjL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-16_06,2022-05-16_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=999
+ adultscore=0 spamscore=0 phishscore=0 priorityscore=1501 mlxscore=0
+ lowpriorityscore=0 bulkscore=0 suspectscore=0 impostorscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205160062
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Woodhouse <dwmw2@infradead.org>
 
-The check on x86ms->apic_id_limit in pc_machine_done() had two problems.
 
-Firstly, we need KVM to support the X2APIC API in order to allow IRQ
-delivery to APICs >= 255. So we need to call/check kvm_enable_x2apic(),
-which was done elsewhere in *some* cases but not all.
+On 5/12/22 13:41, Janosch Frank wrote:
+> On 5/6/22 11:24, Pierre Morel wrote:
+>> We let the userland hypervisor know if the machine support the CPU
+>> topology facility using a new KVM capability: KVM_CAP_S390_CPU_TOPOLOGY.
+> 
+> Nope, we indicate KVM's support which is based on the machine's support.
 
-Secondly, microvm needs the same check. So move it from pc_machine_done()
-to x86_cpus_init() where it will work for both.
+OK I reword.
 
-The check in kvm_cpu_instance_init() is now redundant and can be dropped.
+> 
+> On the same note: Shouldn't the CAP indication be part of the last 
+> patch? The resets are needed for a full support of this feature, no?
 
-Signed-off-by: David Woodhouse <dwmw2@infradead.org>
-Acked-by: Claudio Fontana <cfontana@suse.de>
-Message-Id: <20220314142544.150555-1-dwmw2@infradead.org>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/i386/pc.c              |  8 --------
- hw/i386/x86.c             | 16 ++++++++++++++++
- target/i386/kvm/kvm-cpu.c |  2 +-
- 3 files changed, 17 insertions(+), 9 deletions(-)
+Looks right, I will move it last.
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 312eb9e400..15f37d8dc6 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -744,14 +744,6 @@ void pc_machine_done(Notifier *notifier, void *data)
-         /* update FW_CFG_NB_CPUS to account for -device added CPUs */
-         fw_cfg_modify_i16(x86ms->fw_cfg, FW_CFG_NB_CPUS, x86ms->boot_cpus);
-     }
--
--
--    if (x86ms->apic_id_limit > 255 && !xen_enabled() &&
--        !kvm_irqchip_in_kernel()) {
--        error_report("current -smp configuration requires kernel "
--                     "irqchip support.");
--        exit(EXIT_FAILURE);
--    }
- }
- 
- void pc_guest_info_init(PCMachineState *pcms)
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index 79ebdface6..f79e720cc2 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -38,6 +38,7 @@
- #include "sysemu/replay.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/cpu-timers.h"
-+#include "sysemu/xen.h"
- #include "trace.h"
- 
- #include "hw/i386/x86.h"
-@@ -122,6 +123,21 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
-      */
-     x86ms->apic_id_limit = x86_cpu_apic_id_from_index(x86ms,
-                                                       ms->smp.max_cpus - 1) + 1;
-+
-+    /*
-+     * Can we support APIC ID 255 or higher?
-+     *
-+     * Under Xen: yes.
-+     * With userspace emulated lapic: no
-+     * With KVM's in-kernel lapic: only if X2APIC API is enabled.
-+     */
-+    if (x86ms->apic_id_limit > 255 && !xen_enabled() &&
-+        (!kvm_irqchip_in_kernel() || !kvm_enable_x2apic())) {
-+        error_report("current -smp configuration requires kernel "
-+                     "irqchip and X2APIC API support.");
-+        exit(EXIT_FAILURE);
-+    }
-+
-     possible_cpus = mc->possible_cpu_arch_ids(ms);
-     for (i = 0; i < ms->smp.cpus; i++) {
-         x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id, &error_fatal);
-diff --git a/target/i386/kvm/kvm-cpu.c b/target/i386/kvm/kvm-cpu.c
-index 5eb955ce9a..7237378a7d 100644
---- a/target/i386/kvm/kvm-cpu.c
-+++ b/target/i386/kvm/kvm-cpu.c
-@@ -171,7 +171,7 @@ static void kvm_cpu_instance_init(CPUState *cs)
-         /* only applies to builtin_x86_defs cpus */
-         if (!kvm_irqchip_in_kernel()) {
-             x86_cpu_change_kvm_default("x2apic", "off");
--        } else if (kvm_irqchip_is_split() && kvm_enable_x2apic()) {
-+        } else if (kvm_irqchip_is_split()) {
-             x86_cpu_change_kvm_default("kvm-msi-ext-dest-id", "on");
-         }
- 
 -- 
-MST
-
+Pierre Morel
+IBM Lab Boeblingen
