@@ -2,152 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 54410529385
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 00:19:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A16D529386
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 00:22:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349638AbiEPWTf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 18:19:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53140 "EHLO
+        id S244787AbiEPWWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 18:22:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347825AbiEPWTe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 18:19:34 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B75844741
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 15:19:33 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id n10so15755403pjh.5
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 15:19:33 -0700 (PDT)
+        with ESMTP id S230395AbiEPWWp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 18:22:45 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89F1C9FDD
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 15:22:44 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id u23so28245407lfc.1
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 15:22:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=bGJGZqlMLWsgZLmLkpOZQTitKuhIIikTc7afzPIoFNM=;
-        b=ClZPTs0qNNgPM++8Opal5DzOkn2IGGkp8Ksxo6fc7IOsb8UThtSqdjfbM1BbAwQyQP
-         5cvFOPMzaOgJkb0BtSk6YhYsjeSU9AqmRB1o8JY5Vsg5w31uQP4RJGubKyoeX9INosLf
-         5ozyISi8HRTam917LtIUXxWrTBnKhNYNrZGFR4fSuQnkaoD3MJpmSGdvn90ZBHea0H6M
-         4/1E7+z5NVd4p+nTd96XQ1mFPZPlFnbc5idbLdzFT2FC53hHzDFb0HwNCdxp9HE1Z3cC
-         y6drIlJj1krktmHg8WXvHcU/e1PpLYFv4PXWIS2800Bwy1RbKF6dXsVoGJ77aDPDb/rV
-         KohA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=03UU3dtb/aAVI5OTh+Y/mwCGeJsGO4jPPM5PKj+jLd0=;
+        b=rb8Bqc1IyRn8dSyx6QQ9Osrf/hemhX6w8rbznkJTIRfCLQ2uh8G4YEHlHYc0JO8W32
+         +WwfRWVHjgmxz0RzD8E1l5Fd7ZTjIZb91osaefyGs8L8B5+ZlW0tE6X2H3RKnGW+zifk
+         Ji5Yv2gf07NHQPltz0+JhWdd8c25LWuR7avEuGHZEiL8DnOPaVGbKkpEWr5NVs/ZNIJ/
+         hJ6qi2TZvAxReUe2f9e+kk0uNubUswgxa0p5M93KTIBMZXB/ca9JTOqakFt5ob57Wz12
+         HboGS2/hxnTS3eq8D9O7ZEqlKhPalwZjpIraQ6Tesy7Fvfpzhim83cE1EkpQP+clSyJd
+         6KxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=bGJGZqlMLWsgZLmLkpOZQTitKuhIIikTc7afzPIoFNM=;
-        b=pbkBSAS8UCPHsFUAJEJNDL94Hepwn448mtoAUVG+XQKbPdGAmhrYGU2uNpahoL5NnB
-         4mVo88go3OHNlzHlKKUUfG7okCDo56MgMUhe6BEIL7gf0SyngUl5d1NXxGvZrDXYFTOX
-         yRmpO06YhKjtLxcXbtBJIZa61gXuBGQgarjpVUThQ/oqJvWAORoL8R8o2twNVfigNt4e
-         +bQrZ7EOvdbcttrZTmRNh6r2bVivFO7FfsVNutTT4LCnO9Qc9hyvtDt0fi4jfHKzNtgL
-         kvDJdzBVyOU7wsDqIzMZ8uHfuh9b2fFcaGAD9OF7YTUW6drYlSRrn0UGMMFtiXuOg+kN
-         vayA==
-X-Gm-Message-State: AOAM531ol7bjW+aPfV4g634dloFl73Xloi7rZc4tIjco6500TPmMzPZh
-        6kX7N2no8XhuyDumtiB8Yjp/sk/vofIjoQ==
-X-Google-Smtp-Source: ABdhPJwb2HEIZfznhH3rseGV+mKXznmoD72gc3IKrN+cL0Mo519vdrE7pQhVWDjt6nNb3HcoPS/vjw==
-X-Received: by 2002:a17:902:f0cb:b0:161:7747:63b0 with SMTP id v11-20020a170902f0cb00b00161774763b0mr7646307pla.116.1652739572720;
-        Mon, 16 May 2022 15:19:32 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id l3-20020a17090ad10300b001d26f134e43sm165614pju.51.2022.05.16.15.19.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 May 2022 15:19:31 -0700 (PDT)
-Date:   Mon, 16 May 2022 22:19:28 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
-        kvmarm@vger.kernel.org
-Subject: Re: [PATCH 4/5] KVM: Actually create debugfs in kvm_create_vm()
-Message-ID: <YoLN8M9I0bAnO3Nu@google.com>
-References: <20220415201542.1496582-1-oupton@google.com>
- <20220415201542.1496582-5-oupton@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=03UU3dtb/aAVI5OTh+Y/mwCGeJsGO4jPPM5PKj+jLd0=;
+        b=UIy09DJSnuPXCdlIYO/ACDh49ult5TjlsqyJj1wcnfYr0eZdHJAPGvafLZMQYRCIY5
+         URjFdpzWwp/ymE2Ajz0n1e3LUaIqhgoLwWOXWvHNKJQ/9rcp7bTG98T+FDYTpYbyvyTr
+         J6/73YY/gm0TkvoLnZHxWncfF/3xB7tTwPUZ4K+7a7IF9OTxlUFgwyu736IWi7LDD16E
+         7KpSJr0xYR2+O/iFjNu473njXfIdYxwnpyT8pCY2c/qJ5nBQLFuiJX4ib1CJSesj9rRV
+         RZbnI8PcgCntivWHdLgLfxo2cvCRFvQC0B0G/0izbh0y2YlqDv0VOrp0SiAoHBmBsB8Z
+         5J8Q==
+X-Gm-Message-State: AOAM532wvOClrm7wr68UPya9cVOWecesoacZJyUsXjZOE4bKtMfyWD1C
+        yKaglhNTZpwaCI+PSS6tc87zXiGfKDEKWt4+yu3ZtQ==
+X-Google-Smtp-Source: ABdhPJwgTI2LCnjKiQvn9b5D7N8cz+mbDNNin18TMKvQB5KG8qkyrbOlBbZDDiPqsqsrxw49lfppc6PCZ004srPb7fI=
+X-Received: by 2002:a19:8c1a:0:b0:472:315:48db with SMTP id
+ o26-20020a198c1a000000b00472031548dbmr14366639lfd.235.1652739762737; Mon, 16
+ May 2022 15:22:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220415201542.1496582-5-oupton@google.com>
+References: <20220513195000.99371-1-seanjc@google.com> <20220513195000.99371-2-seanjc@google.com>
+ <CALzav=d36gccJv345Phdr0AJx9=6=TP=iZ60dscgQr64Rq4Kew@mail.gmail.com> <Yn7+HrYbXhror09V@google.com>
+In-Reply-To: <Yn7+HrYbXhror09V@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Mon, 16 May 2022 15:22:16 -0700
+Message-ID: <CALzav=eogd=sNaPOSW3_9hLSZ6pXe5eakHLr5vm8bUiwQrmA6Q@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: x86/mmu: Drop RWX=0 SPTEs during ept_sync_page()
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 15, 2022, Oliver Upton wrote:
-> @@ -1049,7 +1050,7 @@ int __weak kvm_arch_create_vm_debugfs(struct kvm *kvm)
->  	return 0;
->  }
->  
-> -static struct kvm *kvm_create_vm(unsigned long type)
-> +static struct kvm *kvm_create_vm(unsigned long type, int fd)
+On Fri, May 13, 2022 at 5:56 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Fri, May 13, 2022, David Matlack wrote:
+> > On Fri, May 13, 2022 at 12:50 PM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > Drop SPTEs whose new protections will yield a RWX=0 SPTE, i.e. a SPTE
+> > > that is marked shadow-present but is not-present in the page tables.  If
+> > > EPT with execute-only support is in use by L1, KVM can create a RWX=0
+> > > SPTE can be created for an EPTE if the upper level combined permissions
+> > > are R (or RW) and the leaf EPTE is changed from R (or RW) to X.
+> >
+> > For some reason I found this sentence hard to read.
+>
+> Heh, probably because "KVM can create a RWX=0 SPTE can be created" is nonsensical.
+> I botched a late edit to the changelog...
+>
+> > What about this:
+> >
+> >   When shadowing EPT and NX HugePages is enabled, if the guest changes
+>
+> This doesn' thave anything to do with NX HugePages, it's an execute-only specific
+> bug where L1 can create a gPTE that is !READABLE but is considered PRESENT because
+> it is EXECUTABLE.  If the upper level protections are R or RW, the resulting
+> protections for the entire translation are RWX=0.  All of sync_page()'s existing
+> checks filter out only !PRESENT gPTE, because without execute-only, all upper
+> levels are guaranteed to be at least READABLE.
 
-I don't love passing in @fd, because actually doing anything but printing the
-@fd in a string is doomed to fail.
+I see what you mean, thanks.
 
-Rather than pass the raw fd, what about passing in just its name?
-
----
- virt/kvm/kvm_main.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index d94c1d9ecaa9..ac76fc7f2e4d 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -964,7 +964,7 @@ static void kvm_destroy_vm_debugfs(struct kvm *kvm)
- 	}
- }
-
--static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
-+static int kvm_create_vm_debugfs(struct kvm *kvm, const char *fdname)
- {
- 	static DEFINE_MUTEX(kvm_debugfs_lock);
- 	struct dentry *dent;
-@@ -987,7 +987,7 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
- 	if (!debugfs_initialized())
- 		return 0;
-
--	snprintf(dir_name, sizeof(dir_name), "%d-%d", task_pid_nr(current), fd);
-+	snprintf(dir_name, sizeof(dir_name), "%d-%s", task_pid_nr(current), fdname);
- 	mutex_lock(&kvm_debugfs_lock);
- 	dent = debugfs_lookup(dir_name, kvm_debugfs_dir);
- 	if (dent) {
-@@ -1076,7 +1076,7 @@ int __weak kvm_arch_create_vm_debugfs(struct kvm *kvm)
- 	return 0;
- }
-
--static struct kvm *kvm_create_vm(unsigned long type, int fd)
-+static struct kvm *kvm_create_vm(unsigned long type, const char * fdname)
- {
- 	struct kvm *kvm = kvm_arch_alloc_vm();
- 	struct kvm_memslots *slots;
-@@ -1174,7 +1174,7 @@ static struct kvm *kvm_create_vm(unsigned long type, int fd)
- 		goto out_err_mmu_notifier;
- 	}
-
--	r = kvm_create_vm_debugfs(kvm, fd);
-+	r = kvm_create_vm_debugfs(kvm, fdname);
- 	if (r)
- 		goto out_err;
-
-@@ -4781,6 +4781,7 @@ EXPORT_SYMBOL_GPL(file_is_kvm);
-
- static int kvm_dev_ioctl_create_vm(unsigned long type)
- {
-+	char fdname[ITOA_MAX_LEN + 1];
- 	int r, fd;
- 	struct kvm *kvm;
- 	struct file *file;
-@@ -4789,7 +4790,9 @@ static int kvm_dev_ioctl_create_vm(unsigned long type)
- 	if (fd < 0)
- 		return fd;
-
--	kvm = kvm_create_vm(type, fd);
-+	snprintf(fdname, sizeof(fdname), "%d", fd);
-+
-+	kvm = kvm_create_vm(type, fdname);
- 	if (IS_ERR(kvm)) {
- 		r = PTR_ERR(kvm);
- 		goto put_fd;
-
-base-commit: 3d7c3ff77a78f103c2cf1104157a4132f56fd6d1
---
-
+And I also recall now you mentioned (off-list) that the NX HugePage
+scenario isn't possible because KVM does not let huge pages go unsync.
