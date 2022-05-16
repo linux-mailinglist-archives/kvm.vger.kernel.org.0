@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 277485293A7
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 00:35:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A35A15293B0
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 00:38:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346500AbiEPWfB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 18:35:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52742 "EHLO
+        id S1349695AbiEPWie (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 18:38:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231251AbiEPWe7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 18:34:59 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47009369FF
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 15:34:56 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id y19so19814277ljd.4
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 15:34:56 -0700 (PDT)
+        with ESMTP id S229522AbiEPWic (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 18:38:32 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 700A33E0F5
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 15:38:30 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id f4so15464461lfu.12
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 15:38:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Oa1ie+jbSRcbYGvT1r4itWrw5osHCRmNPKudkUqGsQ8=;
-        b=XHiOeuz7/nPDQ+OzKWQbijjgHdmanKyPN6lCXReGTE7Ht4QCFlqOdS9VLDCb6fsV/v
-         9NhKhk50jmjeVx0xWVLzFs1Xa81+zlL43ub9L8WnYcifc4HGJIh6/aqY9gI5PcCe5inH
-         g7eu5kEvtk83lEayPmiLYN+w08zQVoaWCTdNR75Zx97RYpJiNZQ7CC1KtdMARhJhABSc
-         TOgfUpLNDU++2CKf1VUeCgVxUPpw22E+fFLeBQdyimOBKP18CGQ9veb2mcHN5roLqSls
-         2qamGoCKdan6j3ZEOASTP7UpCDsmA17c9t6Jhm754ZNQ8ubqs7seHppWDWFKTY4F4v6w
-         8jiw==
+        bh=TdiD7dsVgR3FBrAXSNMPHodeyhLmfprzqOe6s/swopQ=;
+        b=fL0lHMFnX/AAhhPQHOIy8IRUdEWFWSgKutye5AzrWvOUyqVkulwARMTZhRqvFu2vdO
+         kVZJLC0kt7Y+uihrER8vRQA7064F8cSc+o+Lq6BU1d+j6+ywa2wBOWMRzI1VudYMnTX6
+         dy1khjzaQw+qQIjc+aX1zpMoReWBEeC0qTi37Bf+cHNFyj7+pEEWoXYPBevvivSVPl5o
+         ftLnuBXRY+oO1Yv5VYkzh0X8LTBUN6FoHAJx8J40yyMLEcbd6ihiaOp3T2r4Pkhtqwzk
+         LkiubU7ATRGUPrUy8uPSvUDF1KF0TAiBKO7IjIZuNS8paf+mgh5OckrwgFYynK0IHzKy
+         W9BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Oa1ie+jbSRcbYGvT1r4itWrw5osHCRmNPKudkUqGsQ8=;
-        b=ByyXPXhALaax1It27z7Wrv9lAjG8w1ipXCbIqRG+yzmVeYFobTvQLtGZg0a0fD2uKQ
-         ThsjVguwJzMlT+UlPw2b5VeY3Dy7SekOBgKfn5F1y+yPAwbKK2TZxycl+VziMvvPYJfL
-         3n5ovLyPktR7D8CNVBCSZwQE8Z4ds1+osFgJPitWgAjEgTMuMZwTa9xjHm0Rxz7MKy1X
-         xVKtUxVP1pobt/enfFfsxYoLFvAHYHCUqqMy3Rfu2m2tC25vOQ61aD/tPldk+edwvZUJ
-         BQAs1Xy6Fbv89AXdEWGGu7VQPfLEOuoW+3hS8va8CqC9gqHOMSImhAB0HaP5unUy7Ryq
-         ye/A==
-X-Gm-Message-State: AOAM530wbj6M8Ae0AUAJw3+dQw3kJDm9Ik5xpuYMBbIZaSJoV9UE6RiK
-        7GOdbDgp+LMbo5k63xcXuvClzsouMtKsm1MNPZNxdg==
-X-Google-Smtp-Source: ABdhPJzPtv9uTfIG8svv5WhXvMye9wfMeP1NmA7/SEeF5i8/uSERJ+c4G5Nisvm56UHW3AoJ9TMvEtndGiAe0GOIR9U=
-X-Received: by 2002:a05:651c:b24:b0:250:6414:c91a with SMTP id
- b36-20020a05651c0b2400b002506414c91amr12241861ljr.198.1652740494496; Mon, 16
- May 2022 15:34:54 -0700 (PDT)
+        bh=TdiD7dsVgR3FBrAXSNMPHodeyhLmfprzqOe6s/swopQ=;
+        b=hvOwP0S1nYi16bvkDk4dNNBOiyCS3QT8wV1JZNbftXd0cLwrNHd8ARihZzQO209yjN
+         4wbwvPIen8pVgzhMbhTiQzxzgverDPbcT8+jLXSS9mPpVYXBaYl8biuA005mVMk+Qyi3
+         05CETQXlmPoM3UTBRGIelZBTrrnrSX6bCo19PHJKuxRovOYO1sRCva/K27x4tmxs5+lS
+         I40glBaO5ztJrzAhYSdpgOODH+pTcSfAbC/oE4TlMOqDlbLJODjMflJ2lixL3myiT6fr
+         TuFPwfZFvN7YXjQU58mgtIxzKhclTaOrJwYDmNq4Oo/PTkp5QIpA3kaoflz3yaYYeX3I
+         3H1A==
+X-Gm-Message-State: AOAM531/qpSEB3XXTTHM9J26/pIR+rjTYPr65tDbWpwmw/7+XN9OylbM
+        V669/J5di4BkQYWW5zee5TQkVNyohW1+yVhdbwFgtw==
+X-Google-Smtp-Source: ABdhPJz2v+QP/ZNwOlcdcC6F1d3GubjpjpeEcZRMO/XWKMGCLSNgcqoQayWwNuqeQcnSUSQ2MYUUMBuJ67nvb+P5UVw=
+X-Received: by 2002:a05:6512:398d:b0:473:a597:540a with SMTP id
+ j13-20020a056512398d00b00473a597540amr14924018lfu.64.1652740708621; Mon, 16
+ May 2022 15:38:28 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220429183935.1094599-1-dmatlack@google.com> <20220429183935.1094599-10-dmatlack@google.com>
- <YoLNcd1SQMSNdSMb@xz-m1.local>
-In-Reply-To: <YoLNcd1SQMSNdSMb@xz-m1.local>
+References: <20220429183935.1094599-1-dmatlack@google.com> <20220429183935.1094599-2-dmatlack@google.com>
+ <Yn65yvxPIJwgiuxj@xz-m1.local>
+In-Reply-To: <Yn65yvxPIJwgiuxj@xz-m1.local>
 From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 16 May 2022 15:34:28 -0700
-Message-ID: <CALzav=dwEJx=HrPDBxVyTJU-JkjX3c0hx-4JvJ2bY+BW7FL5dQ@mail.gmail.com>
-Subject: Re: [PATCH 9/9] KVM: selftests: Add option to run dirty_log_perf_test
- vCPUs in L2
+Date:   Mon, 16 May 2022 15:38:02 -0700
+Message-ID: <CALzav=eo5Du2kitLm_2q2ns9GRN455P086qQnQnPX2vsua5R0Q@mail.gmail.com>
+Subject: Re: [PATCH 1/9] KVM: selftests: Replace x86_page_size with raw levels
 To:     Peter Xu <peterx@redhat.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Ben Gardon <bgardon@google.com>,
@@ -73,57 +72,138 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 16, 2022 at 3:17 PM Peter Xu <peterx@redhat.com> wrote:
+On Fri, May 13, 2022 at 1:04 PM Peter Xu <peterx@redhat.com> wrote:
 >
-> On Fri, Apr 29, 2022 at 06:39:35PM +0000, David Matlack wrote:
-> > +static void perf_test_l1_guest_code(struct vmx_pages *vmx, uint64_t vcpu_id)
-> > +{
-> > +#define L2_GUEST_STACK_SIZE 64
-> > +     unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-> > +     unsigned long *rsp;
+> On Fri, Apr 29, 2022 at 06:39:27PM +0000, David Matlack wrote:
+> > x86_page_size is an enum used to communicate the desired page size with
+> > which to map a range of memory. Under the hood they just encode the
+> > desired level at which to map the page. This ends up being clunky in a
+> > few ways:
+> >
+> >  - The name suggests it encodes the size of the page rather than the
+> >    level.
+> >  - In other places in x86_64/processor.c we just use a raw int to encode
+> >    the level.
+> >
+> > Simplify this by just admitting that x86_page_size is just the level and
+> > using an int and some more obviously named macros (e.g. PG_LEVEL_1G).
+> >
+> > Signed-off-by: David Matlack <dmatlack@google.com>
+> > ---
+> >  .../selftests/kvm/include/x86_64/processor.h  | 14 +++++-----
+> >  .../selftests/kvm/lib/x86_64/processor.c      | 27 +++++++++----------
+> >  .../selftests/kvm/max_guest_memory_test.c     |  2 +-
+> >  .../selftests/kvm/x86_64/mmu_role_test.c      |  2 +-
+> >  4 files changed, 22 insertions(+), 23 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> > index 37db341d4cc5..b512f9f508ae 100644
+> > --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> > +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> > @@ -465,13 +465,13 @@ void vcpu_set_hv_cpuid(struct kvm_vm *vm, uint32_t vcpuid);
+> >  struct kvm_cpuid2 *vcpu_get_supported_hv_cpuid(struct kvm_vm *vm, uint32_t vcpuid);
+> >  void vm_xsave_req_perm(int bit);
+> >
+> > -enum x86_page_size {
+> > -     X86_PAGE_SIZE_4K = 0,
+> > -     X86_PAGE_SIZE_2M,
+> > -     X86_PAGE_SIZE_1G,
+> > -};
+> > -void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+> > -                enum x86_page_size page_size);
+> > +#define PG_LEVEL_4K 0
+> > +#define PG_LEVEL_2M 1
+> > +#define PG_LEVEL_1G 2
+>
+> A nitpick is: we could have named those as PG_LEVEL_[PTE|PMD|PUD|PGD..]
+> rather than 4K|2M|..., then...
+
+I went with these names to match the KVM code (although the level
+numbers themselves are off by 1).
+
+>
 > > +
-> > +     GUEST_ASSERT(vmx->vmcs_gpa);
-> > +     GUEST_ASSERT(prepare_for_vmx_operation(vmx));
-> > +     GUEST_ASSERT(load_vmcs(vmx));
-> > +     GUEST_ASSERT(ept_1g_pages_supported());
+> > +#define PG_LEVEL_SIZE(_level) (1ull << (((_level) * 9) + 12))
 > > +
-> > +     rsp = &l2_guest_stack[L2_GUEST_STACK_SIZE - 1];
-> > +     *rsp = vcpu_id;
-> > +     prepare_vmcs(vmx, perf_test_l2_guest_entry, rsp);
+> > +void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level);
+> >
+> >  /*
+> >   * Basic CPU control in CR0
+> > diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> > index 9f000dfb5594..1a7de69e2495 100644
+> > --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> > +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> > @@ -199,15 +199,15 @@ static struct pageUpperEntry *virt_create_upper_pte(struct kvm_vm *vm,
+> >                                                   uint64_t pt_pfn,
+> >                                                   uint64_t vaddr,
+> >                                                   uint64_t paddr,
+> > -                                                 int level,
+> > -                                                 enum x86_page_size page_size)
+> > +                                                 int current_level,
+> > +                                                 int target_level)
+> >  {
+> > -     struct pageUpperEntry *pte = virt_get_pte(vm, pt_pfn, vaddr, level);
+> > +     struct pageUpperEntry *pte = virt_get_pte(vm, pt_pfn, vaddr, current_level);
+> >
+> >       if (!pte->present) {
+> >               pte->writable = true;
+> >               pte->present = true;
+> > -             pte->page_size = (level == page_size);
+> > +             pte->page_size = (current_level == target_level);
+> >               if (pte->page_size)
+> >                       pte->pfn = paddr >> vm->page_shift;
+> >               else
+> > @@ -218,20 +218,19 @@ static struct pageUpperEntry *virt_create_upper_pte(struct kvm_vm *vm,
+> >                * a hugepage at this level, and that there isn't a hugepage at
+> >                * this level.
+> >                */
+> > -             TEST_ASSERT(level != page_size,
+> > +             TEST_ASSERT(current_level != target_level,
+> >                           "Cannot create hugepage at level: %u, vaddr: 0x%lx\n",
+> > -                         page_size, vaddr);
+> > +                         current_level, vaddr);
+> >               TEST_ASSERT(!pte->page_size,
+> >                           "Cannot create page table at level: %u, vaddr: 0x%lx\n",
+> > -                         level, vaddr);
+> > +                         current_level, vaddr);
+> >       }
+> >       return pte;
+> >  }
+> >
+> > -void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+> > -                enum x86_page_size page_size)
+> > +void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
+> >  {
+> > -     const uint64_t pg_size = 1ull << ((page_size * 9) + 12);
+> > +     const uint64_t pg_size = PG_LEVEL_SIZE(level);
+> >       struct pageUpperEntry *pml4e, *pdpe, *pde;
+> >       struct pageTableEntry *pte;
+> >
+> > @@ -256,15 +255,15 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+> >        * early if a hugepage was created.
+> >        */
+> >       pml4e = virt_create_upper_pte(vm, vm->pgd >> vm->page_shift,
+> > -                                   vaddr, paddr, 3, page_size);
+> > +                                   vaddr, paddr, 3, level);
+> >       if (pml4e->page_size)
+> >               return;
+> >
+> > -     pdpe = virt_create_upper_pte(vm, pml4e->pfn, vaddr, paddr, 2, page_size);
+> > +     pdpe = virt_create_upper_pte(vm, pml4e->pfn, vaddr, paddr, 2, level);
+> >       if (pdpe->page_size)
+> >               return;
+> >
+> > -     pde = virt_create_upper_pte(vm, pdpe->pfn, vaddr, paddr, 1, page_size);
+> > +     pde = virt_create_upper_pte(vm, pdpe->pfn, vaddr, paddr, 1, level);
 >
-> Just to purely ask: is this setting the same stack pointer to all the
-> vcpus?
+> ... here we could also potentially replace the 3/2/1s with the new macro
+> (or with existing naming number 3 will be missing a macro)?
 
-No, but I understand the confusion since typically selftests use
-symbols like "l2_guest_code" that are global. But "l2_guest_stack" is
-actually a local variable so it will be allocated on the stack. Each
-vCPU runs on a separate stack, so they will each run with their own
-"l2_guest_stack".
+Good point. Will do.
 
 >
-> > +
-> > +     GUEST_ASSERT(!vmlaunch());
-> > +     GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_VMCALL);
-> > +     GUEST_DONE();
-> > +}
->
-> [...]
->
-> > +/* Identity map the entire guest physical address space with 1GiB Pages. */
-> > +void nested_map_all_1g(struct vmx_pages *vmx, struct kvm_vm *vm)
-> > +{
-> > +     __nested_map(vmx, vm, 0, 0, vm->max_gfn << vm->page_shift, PG_LEVEL_1G);
-> > +}
->
-> Could max_gfn be large?  Could it consumes a bunch of pages even if mapping
-> 1G only?
-
-Since the selftests only support 4-level EPT, this will use at most
-513 pages. If we add support for 5-level EPT we may need to revisit
-this approach.
-
->
-> Thanks,
+> >       if (pde->page_size)
+> >               return;
 >
 > --
 > Peter Xu
