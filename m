@@ -2,103 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 27522528DAF
-	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 21:06:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EBE76528DED
+	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 21:30:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345271AbiEPTG0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 15:06:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44634 "EHLO
+        id S1345410AbiEPTaq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 15:30:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345325AbiEPTGK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 15:06:10 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F31920BD8;
-        Mon, 16 May 2022 12:06:08 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DBB50614CB;
-        Mon, 16 May 2022 19:06:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83024C385AA;
-        Mon, 16 May 2022 19:06:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652727967;
-        bh=2Resw6p+2SXUmxtcyRn6SOdYMRyAbxOVblDDKJZfhuk=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=BSfKI3ipMdkFD4rYZrdaySQegpDAWsCAylzId9ynBGOuOqecfeWt14fH5AoEc7BHS
-         V8gAZ8FUYAWZ7+5K/4PIDrD6pGIIdrV0O2Jn6D6ulUbwttrVFEhG/G9b0Md4pdqADY
-         53Xfp2wtiTvaziCmhPIFbYVTjPjsMkMemaBd4jPHGp7NQtU+tEhOGlW+KsaU0+Uy//
-         GqydFI+z4tPURPZqkSW3aoa95B2I32CoYGYQEgbbShn5S4SKud+VDFCFP1PSKk/hrU
-         wBLkQLJ+Vw6ANisqhMcgiJZpjptSCT72a9hpW4OU0IhEEp1d+2ZA0FAxOElhbv5Pqe
-         BtFm85iRWxmGA==
-Date:   Mon, 16 May 2022 12:06:05 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     kernel test robot <lkp@intel.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>, netdev@vger.kernel.org,
-        linux-staging@lists.linux.dev, linux-sh@vger.kernel.org,
-        linux-omap@vger.kernel.org, linux-mm@kvack.org,
-        linux-mips@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kunit-dev@googlegroups.com, intel-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, bpf@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org
-Subject: Re: [linux-next:master] BUILD REGRESSION
- 1e1b28b936aed946122b4e0991e7144fdbbfd77e
-Message-ID: <20220516120605.7a6bb562@kernel.org>
-In-Reply-To: <6280f965.kTCPpIEVY9TwoNre%lkp@intel.com>
-References: <6280f965.kTCPpIEVY9TwoNre%lkp@intel.com>
+        with ESMTP id S233560AbiEPTal (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 15:30:41 -0400
+Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 446992B1A9
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 12:30:40 -0700 (PDT)
+Received: by mail-ot1-x32b.google.com with SMTP id s18-20020a056830149200b006063fef3e17so10749638otq.12
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 12:30:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=YCWtu0aA9CxSyLGzITwZE2RFoiQ9ONEqkxjQ2xXJpA8=;
+        b=N1DvjCOaQM6sCQEEes2mVcUTdjUIrlF10i/geaVSLrHdW9DHYM9RSOwUNdSe7sw5ML
+         iI3+X/2W5j8/acTRzANF1jt2JabJjE9l79gK36u0DlbQpjUQmO+2vvqMqvrd8/hCtNxN
+         h3GpKGPOdbbBsUh+4HGkoE9XTVtn8oJ6wJDYGY6w1Wl1O1sP7dtZAJAbloyhxxl9R4kJ
+         r/lqjcKKIuaM1mV77JcWxk6aaIAec1SVa5DDVsoV9KwfHA28PP5JzR1Hn97cZceOoQF8
+         /yuJWqUkk8aq21QpukmMZWeXguHH0Vk1JAmGo80S4cRvkDK/djzob22EKoiPPQn3x5Vd
+         XlSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=YCWtu0aA9CxSyLGzITwZE2RFoiQ9ONEqkxjQ2xXJpA8=;
+        b=TaBUeTWO/TWVd7+OoS6NsMCoLcPWNcOnRn0cuABuyMBkWkL1nhv4W7kPBSuG1Mm152
+         UoHzr61KJOt8wWiSaWHO35RSpXNyCJ9SNI35HS+S9lQsEiQyY5byeH8ix9UtOA/BSqJd
+         s0cLV1WI5T8QXT80VfC/ZRaq4AnbLmlZJu4ezRodd2zl7fek4bhm5pWK57Y0ALFRgdDq
+         IN8kto2Gb0jMcFCfdb38/oXqCtW7RVo+tNQ8732QlQOKexHvQNgYKMUJjlGSLJ5b2Eha
+         wTHSvYHQrw3BasFs1DsKu+gVr3bhlyQjXgNjOt2AmTq0hRLo5cFV3KLiV6f7PefvyyFq
+         /M+Q==
+X-Gm-Message-State: AOAM531I3aFpuQX6O5UdP4Ef2KEnjcdKmjV86jMmidbJZ0JlUMG2bDO3
+        H1BNbGCbqcIIyMnuyWLePrfowo3yszQrsnv62L9VDA==
+X-Google-Smtp-Source: ABdhPJz23KWYvAC+Yv7AxHe5ZYX+hLIjlHHyYF2clYPjWK/Y+R+Tix4W90Th4qCk0Q61fhRXkvUaf+iddyNwXNkW368=
+X-Received: by 2002:a9d:6e83:0:b0:605:4a01:1d8c with SMTP id
+ a3-20020a9d6e83000000b006054a011d8cmr6598748otr.174.1652729439301; Mon, 16
+ May 2022 12:30:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220412195846.3692374-1-zhanwei@google.com> <YnmqgFkhqWklrQIw@google.com>
+ <CAN86XOYNpzEUN0aL9g=_GQFz5zdXX9Pvcs_TDmBVyJZDTfXREg@mail.gmail.com> <YnwRld0aH8489+XQ@google.com>
+In-Reply-To: <YnwRld0aH8489+XQ@google.com>
+From:   Wei Zhang <zhanwei@google.com>
+Date:   Mon, 16 May 2022 21:30:00 +0200
+Message-ID: <CAN86XOZdW7aZXhSU2=gP5TrRQc8wLmtTQui0J2kwhchp2pnbeQ@mail.gmail.com>
+Subject: Re: [PATCH 0/2] KVM: x86: Fix incorrect VM-exit profiling
+To:     Sean Christopherson <seanjc@google.com>,
+        Suleiman Souhlal <suleiman@google.com>
+Cc:     Sangwhan Moon <sxm@google.com>, Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jing Zhang <jingzhangos@google.com>,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 15 May 2022 21:00:21 +0800 kernel test robot wrote:
-> tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-> branch HEAD: 1e1b28b936aed946122b4e0991e7144fdbbfd77e  Add linux-next specific files for 20220513
-> 
-> Error/Warning reports:
-> 
-> https://lore.kernel.org/linux-mm/202204181931.klAC6fWo-lkp@intel.com
-> https://lore.kernel.org/linux-mm/202204291924.vTGZmerI-lkp@intel.com
-> https://lore.kernel.org/linux-mm/202205031017.4TwMan3l-lkp@intel.com
-> https://lore.kernel.org/linux-mm/202205041248.WgCwPcEV-lkp@intel.com
-> https://lore.kernel.org/linux-mm/202205122113.uLKzd3SZ-lkp@intel.com
-> https://lore.kernel.org/linux-mm/202205150051.3RzuooAG-lkp@intel.com
-> https://lore.kernel.org/linux-mm/202205150117.sd6HzBVm-lkp@intel.com
-> https://lore.kernel.org/lkml/202205100617.5UUm3Uet-lkp@intel.com
-> https://lore.kernel.org/llvm/202204210555.DNvfHvIb-lkp@intel.com
-> https://lore.kernel.org/llvm/202205060132.uhqyUx1l-lkp@intel.com
-> https://lore.kernel.org/llvm/202205120010.zWBednzM-lkp@intel.com
-> https://lore.kernel.org/llvm/202205141122.qihFGUem-lkp@intel.com
-> 
-> Error/Warning: (recently discovered and may have been fixed)
-> 
-> <command-line>: fatal error: ./include/generated/utsrelease.h: No such file or directory
-> arch/arm/mach-versatile/versatile.c:56:14: warning: no previous prototype for function 'mmc_status' [-Wmissing-prototypes]
-> arch/x86/kvm/pmu.h:20:32: warning: 'vmx_icl_pebs_cpu' defined but not used [-Wunused-const-variable=]
-> drivers/gpu/drm/amd/amdgpu/../display/dc/core/dc_link_dp.c:5102:7: warning: variable 'allow_lttpr_non_transparent_mode' set but not used [-Wunused-but-set-variable]
-> drivers/gpu/drm/amd/amdgpu/../display/dc/core/dc_link_dp.c:5147:6: warning: no previous prototype for function 'dp_parse_lttpr_mode' [-Wmissing-prototypes]
-> drivers/gpu/drm/amd/amdgpu/amdgpu_discovery.c:1364:5: warning: no previous prototype for 'amdgpu_discovery_get_mall_info' [-Wmissing-prototypes]
-> drivers/gpu/drm/amd/amdgpu/gfx_v11_0.c:1983:6: warning: no previous prototype for function 'gfx_v11_0_rlc_stop' [-Wmissing-prototypes]
-> drivers/gpu/drm/amd/amdgpu/soc21.c:171:6: warning: no previous prototype for 'soc21_grbm_select' [-Wmissing-prototypes]
-> drivers/gpu/drm/solomon/ssd130x-spi.c:154:35: warning: 'ssd130x_spi_table' defined but not used [-Wunused-const-variable=]
-> drivers/hwmon/nct6775-platform.c:199:9: sparse:    unsigned char
-> drivers/hwmon/nct6775-platform.c:199:9: sparse:    void
-> drivers/video/fbdev/omap/hwa742.c:492:5: warning: no previous prototype for 'hwa742_update_window_async' [-Wmissing-prototypes]
-> fs/buffer.c:2254:5: warning: stack frame size (2144) exceeds limit (1024) in 'block_read_full_folio' [-Wframe-larger-than]
-> fs/ntfs/aops.c:378:12: warning: stack frame size (2224) exceeds limit (1024) in 'ntfs_read_folio' [-Wframe-larger-than]
-> kernel/trace/fgraph.c:37:12: warning: no previous prototype for 'ftrace_enable_ftrace_graph_caller' [-Wmissing-prototypes]
-> kernel/trace/fgraph.c:46:12: warning: no previous prototype for 'ftrace_disable_ftrace_graph_caller' [-Wmissing-prototypes]
+> Please don't top-post.  From https://people.kernel.org/tglx/notes-about-netiquette:
 
-Is this report CCed everywhere or there's a reason why netdev@ is CCed?
-I'm trying to figure out we need to care and it's not obvious..
+Ah, I didn't know this should be avoided. Thanks for the info!
+
+> My preference would be to find a more complete, KVM-specific solution.  The
+> profiling stuff seems like it's a dead end, i.e. will always be flawed in some
+> way.  If this cleanup didn't require a new hypercall then I wouldn't care, but
+> I don't love having to extend KVM's guest/host ABI for something that ideally
+> will become obsolete sooner than later.
+
+I also feel that adding a new hypercall is too much here. A
+KVM-specific solution is definitely better, and the eBPF based
+approach you mentioned sounds like the ultimate solution (at least for
+inspecting exit reasons).
+
++Suleiman What do you think? The on-going work Sean described sounds
+promising, perhaps we should put this patch aside for the time being.
