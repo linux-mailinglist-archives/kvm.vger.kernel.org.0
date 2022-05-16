@@ -2,103 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A7540528928
-	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 17:48:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 619E252894B
+	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 17:55:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245443AbiEPPsk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 11:48:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40580 "EHLO
+        id S245475AbiEPPzs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 11:55:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237736AbiEPPsi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 11:48:38 -0400
-Received: from mail-vk1-xa2b.google.com (mail-vk1-xa2b.google.com [IPv6:2607:f8b0:4864:20::a2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 889CD2B24C
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 08:48:37 -0700 (PDT)
-Received: by mail-vk1-xa2b.google.com with SMTP id e7so7725605vkh.2
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 08:48:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=diJg0wsVl1OWpdDgnDDlhxkTY3wZ6x6sG5tmUGIDOpg=;
-        b=l7fydfyRhQbVlMeCGUoKObkVxljBUnQy/2rgTZ8OuH9oiOaxqNy0rz3Rg5lEb5+0t8
-         +3ymsFsGSFOuPM7juBDSMG5ZJgOLIjTVRdTJCbIKRW9XLNIv81EjKAXJnMfRBGRf2pgz
-         t3/xZRX5uHwMzj92nxSx1dkTJhnjvlDKWj+lDWbdG3HFT79r/QEXTBbmTFgmGJGIKMOm
-         1u6MObI85lUp8IgZi/jAIVdL4VJ8p9KwjOlsARupyD+36EKM1MSX5B/d2VxUhd6lmfpe
-         0J35HhwZq/rTQVuI1IJMgYHHHmowohkeUGO3STLHem/ndoeS0lMqR0TI1h0MvFWBo0I5
-         /NuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=diJg0wsVl1OWpdDgnDDlhxkTY3wZ6x6sG5tmUGIDOpg=;
-        b=t2yN326FP3i2yNw90ooGB2ab3A311NQ1WshbkIuat4PNtR1N9TUBYxDBRjbui78uOQ
-         yNe7XB1KH+RWpBtGuZCXT68uzcB8pEXCQuCkf0pjMQqF3yoqHSsgO6P+aFZF3NbEvtdY
-         EajvW31W90rEsRIw/DLo9UaeN8at1lI05QYp3ihAk1VF4aFOOeJ7/0HIzoAGN9KM6AnA
-         5emr1oncY73ulw9OugErvoaOR7YL6kw57qBa+EFZ6TbFr/zg4cUjAbo0xYBkA/K/qtg0
-         njguwbyzdcFe/Kuq+U0wfGlHa6DgikQv4rI3LSupsMnSgj1KuHzxCiRnzixniDxHEl/P
-         ZXNg==
-X-Gm-Message-State: AOAM533Nptthkb/cJQ3O+CbDY4ptJdRGsMSYdUYFNJASdXBgTqbgqj/u
-        e5HADiq+i/WXCQwELR5gmLyErJHMR45FuomdQuc=
-X-Google-Smtp-Source: ABdhPJzL/sxe9YBw9HkEJdYitTOAbzx2z0BCZs8BI+BRX05BcdD2E8VVIxGfE0wzoJbLXfE2X8yJgSbLzhYW5qglFxQ=
-X-Received: by 2002:ac5:cc4e:0:b0:352:cbc0:5d0f with SMTP id
- l14-20020ac5cc4e000000b00352cbc05d0fmr6807855vkm.22.1652716116559; Mon, 16
- May 2022 08:48:36 -0700 (PDT)
+        with ESMTP id S229691AbiEPPzq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 11:55:46 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8FA7BC9;
+        Mon, 16 May 2022 08:55:42 -0700 (PDT)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24GFJq6Y005103;
+        Mon, 16 May 2022 15:55:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=t0ClClYMkC/iTWfan5duQAMMKjqUnZwjHAs7zWUBZSk=;
+ b=eZlhNt/9v+LWvA6VpAUqGC1tq+Kucbn7n5VPqMPOHKThUwExB1023+JORnvbJ8KcuIls
+ 17aZoBY9yHzMx3jOprrEEISMKN6rii2d6CF89EHWxHgrocZF32Q4pZtVfLXJWmXXXr57
+ Rr8D3C13Tm6al8oyxGqtBwIYm165ztRwhEVLrBt/kzyl6c/VeYg8bRBj/Cu86EsHF015
+ NtYPbg9H6wDOzfn0b/Xff4qqP9qyYcxJUx45UTDBhqOL2gXElITFrzOM4kYG0r/vTMyI
+ 10Jt/9NtHyy1cwz8dHq6wTBiPnPuc4kesusS7nbVbAQhAZu9Pwfvy+Kq8KHZ76F1TSge Qw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g3s5arq7r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 May 2022 15:55:41 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24GFNf9p017257;
+        Mon, 16 May 2022 15:55:41 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g3s5arq76-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 May 2022 15:55:41 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24GFcHP1011961;
+        Mon, 16 May 2022 15:55:39 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03ams.nl.ibm.com with ESMTP id 3g2429axtn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 May 2022 15:55:39 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24GFta1036962736
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 16 May 2022 15:55:36 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6D1914C050;
+        Mon, 16 May 2022 15:55:36 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C1C904C040;
+        Mon, 16 May 2022 15:55:35 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.0.224])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 16 May 2022 15:55:35 +0000 (GMT)
+Date:   Mon, 16 May 2022 17:55:33 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, david@redhat.com,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        scgl@linux.ibm.com, mimu@linux.ibm.com
+Subject: Re: [PATCH v10 01/19] KVM: s390: pv: leak the topmost page table
+ when destroy fails
+Message-ID: <20220516175533.4bf3dd93@p-imbrenda>
+In-Reply-To: <560068a1e89c2ceec0d544fcc62fa3f95d390182.camel@linux.ibm.com>
+References: <20220414080311.1084834-1-imbrenda@linux.ibm.com>
+        <20220414080311.1084834-2-imbrenda@linux.ibm.com>
+        <560068a1e89c2ceec0d544fcc62fa3f95d390182.camel@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <CAJuRqcC0Z-wbAhb39ofKPstgbg+ZmsT8eFivWEr-hZY64_A1xA@mail.gmail.com>
- <4D910AFF-1C6A-4732-BAC6-16064B981949@redhat.com>
-In-Reply-To: <4D910AFF-1C6A-4732-BAC6-16064B981949@redhat.com>
-From:   Florent Carli <fcarli@gmail.com>
-Date:   Mon, 16 May 2022 17:48:25 +0200
-Message-ID: <CAJuRqcCR1dZryWxOOUtUwtpOJXZF5Ww6wfC3Q0Po_5wJD_+DBw@mail.gmail.com>
-Subject: Re: Cyclictest with small interval in guest makes host cpu go very high
-To:     Christophe de Dinechin <dinechin@redhat.com>
-Cc:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: NdHOyIzm-ngimXbtZNM6EmZZ8_2dNMtF
+X-Proofpoint-GUID: xFKmkhYpDwSeRdCE-aPd4fPxVtAFBupF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-16_14,2022-05-16_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 clxscore=1015 adultscore=0 mlxlogscore=999 phishscore=0
+ mlxscore=0 priorityscore=1501 malwarescore=0 spamscore=0 impostorscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205160090
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thank you Christophe for your idea, it led me in the right direction.
+On Mon, 16 May 2022 09:22:09 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-I found that the root cause is actually the default value of
-halt_pool_ns (200000ns --> 200us).
+> On Thu, 2022-04-14 at 10:02 +0200, Claudio Imbrenda wrote:
+>=20
+> [...]
+> > +/**
+> > + * s390_replace_asce - Try to replace the current ASCE of a gmap
+> > with
+> > + * another equivalent one.
+> > + * @gmap the gmap
+> > + *
+> > + * If the allocation of the new top level page table fails, the ASCE
+> > is not
+> > + * replaced.
+> > + * In any case, the old ASCE is always removed from the list.
+> > Therefore the
+> > + * caller has to make sure to save a pointer to it beforehands,
+> > unless an
+> > + * intentional leak is intended.
+> > + */
+> > +int s390_replace_asce(struct gmap *gmap)
+> > +{
+> >  =20
+> [...]
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Set new table origin whil=
+e preserving existing ASCE
+> > control bits */
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0asce =3D (gmap->asce & ~_ASC=
+E_ORIGIN) | __pa(table);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0WRITE_ONCE(gmap->asce, asce)=
+; =20
+>=20
+> Can someone concurrently touch the control bits?
 
-"The KVM halt polling system provides a feature within KVM whereby the
-latency of a guest can, under some circumstances, be reduced by
-polling in the host for some time period after the guest has elected
-to no longer run by cedeing."
+should not happen, nobody is using the ASCE while we replace it
 
-When the cyclictest interval is larger than halt_poll_ns, then the
-polling does not help (it's never interrupted) and the
-growing/shrinking algorithm makes the interval go to 0 ("In the event
-that the total block time was greater than the global max polling
-interval then the host will never poll for long enough (limited by the
-global max) to wakeup during the polling interval so it may as well be
-shrunk in order to avoid pointless polling.").
-
-But when the cyclictest interval starts becoming smaller than
-halt_poll_ns, then a wakeup source is received within polling...
-"During polling if a wakeup source is received within the halt polling
-interval, the interval is left unchanged.", and so polling continues
-with the same value, again and again, which puts us is this known
-situation:
-
-"Care should be taken when setting the halt_poll_ns module parameter
-as a large value has the potential to drive the cpu usage to 100% on a
-machine which would be almost entirely idle otherwise. This is because
-even if a guest has wakeups during which very little work is done and
-which are quite far apart, if the period is shorter than the global
-max polling interval (halt_poll_ns) then the host will always poll for
-the entire block time and thus cpu utilisation will go to 100%."
-
-It just to me a while to realize that halt_poll_ns = 200000ns = 200us
-= my problematic cyclictest interval threshold...
-if I set halt_poll_ns to 100000 (and restart the vm, that's
-important), then the 200us cyclictest interval works fine...
+moreover, all callers of s390_replace_asce hold kvm->lock, as do all
+functions changing the ASCE
