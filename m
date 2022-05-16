@@ -2,172 +2,409 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 72D4D5294BC
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 01:11:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5F74529517
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 01:21:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348978AbiEPXLT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 19:11:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33854 "EHLO
+        id S1350283AbiEPXVu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 19:21:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350232AbiEPXLJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 19:11:09 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2084.outbound.protection.outlook.com [40.107.220.84])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E84A72C116;
-        Mon, 16 May 2022 16:11:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iM3cjPMlzvXXV+7Ar24ZAdx0n2X37bl7foqjJCnyEkD9s+S5QHycdNXKxTtshd94vPzTY0AHzw3gqcnuAzdcaYIPyj0sXGORTvYsr7U+KEPx/EYgwCEBAqX4rH559FpX0fTIocbQniVZHJVb4qyfVlyauaqsdsrrrYz7VQklKZVirqLpDAGLf6M/iiZhYHBypCS7qeul8K2PhyrH5CyQhBDzNkdEjqWHLDqiuTTE3VS/J9HoUOapJpniePrIocb8/G1qgbPNOXqDUBflMGXdRYiaDQcInmTicdOjiJblbt3SANFraEs/piyhCLz2d4IWb2Kqjuw2Ffp5KRALYmSvOA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hIQexNaTLuI1z9JTOao/JdZKEw2dmcKtSbiB7VgGabY=;
- b=JL/OqHQB9fffYgsrJGUu+FVxD/epQxpSIpPv39PWbgy04+q+pW1w9zvFa8tAgc85wtlwhpvrlX94CBzfNQH9195n+IdqjoosGgtk/dIpr/9h4BWqlx+1DgVtXZ8u8zo6rwdjbMLXri0oQWo0clWAkkXvHKn0MxZUM7oEvyhWqHY+IwkUEbDPpuiNhOAeFHZg2Auc6cyu9XWGDuK/cpW8N+uoP/+67ns7y+2hvwbpd0/tPsNcFMvylbSi+rtnKTfQ84+ZzbgqJDKy+woFwhE8cZcSD75kvqACyORISeZM64YTVPxQqg4iS3MbcVAZBu7rEZ7C51NdjdEzNE8JnxR5qw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hIQexNaTLuI1z9JTOao/JdZKEw2dmcKtSbiB7VgGabY=;
- b=D+9Xvl22MZy7GKNIALAHW8lE4AMdF0JlVUJv7Frx3a6wpugjy0EX/du9nhtNNDXrkgaHIsMkzMEH7hWFi59rFR62xrWGPVkPDu4u+SAAAyu9OOfgZ6x1E1EmbtOC6NMylDdCp8FiJxe+KvRYLBvjjpYXCbb0+wltgViBZkugJx14/uZIFRDGb2GYsclsNrQC3EbDxG2QzTGsrgO4X/2D4AjTMuZU+EdDs57jEfU2333QVD7dyhYxbC0mjwNkkFabeOlhoRjErTkmc0ihz7RE0qDUxVEB2/Ys3uhEVT/dBQoyeJ8IGBuGy3+9S0xPnxZ/U5UP0VUM+9u9VJpdb32NEA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by BL1PR12MB5948.namprd12.prod.outlook.com (2603:10b6:208:39b::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5250.18; Mon, 16 May
- 2022 23:11:07 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ec2d:9167:1b47:2db2%5]) with mapi id 15.20.5250.018; Mon, 16 May 2022
- 23:11:07 +0000
-Date:   Mon, 16 May 2022 20:11:06 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        linux-s390@vger.kernel.org, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Subject: Re: [PATCH v7 17/22] vfio-pci/zdev: add open/close device hooks
-Message-ID: <20220516231106.GQ1343366@nvidia.com>
-References: <20220513191509.272897-1-mjrosato@linux.ibm.com>
- <20220513191509.272897-18-mjrosato@linux.ibm.com>
- <20220516172734.GE1343366@nvidia.com>
- <7a31ec36-ceaf-dcef-8bd0-2b4732050aed@linux.ibm.com>
- <20220516183558.GN1343366@nvidia.com>
- <20220516133839.7e116489.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220516133839.7e116489.alex.williamson@redhat.com>
-X-ClientProxiedBy: MN2PR04CA0028.namprd04.prod.outlook.com
- (2603:10b6:208:d4::41) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ed4726cd-f740-4899-f5ee-08da37915bc4
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5948:EE_
-X-Microsoft-Antispam-PRVS: <BL1PR12MB59486B172D61B925CA6E2B82C2CF9@BL1PR12MB5948.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: LmnZLxx9IqvVA/4XGZXwmCJE+ECz8OwJdAOJPC4dp7hvcQlofugS9pFWIW6a3nHdLCrU5OFohgT7hoUPpWHNpFunU3mQkFj3zDojzQ+jM8i3QTu4ox0qvmvRXPA/dEzfjKblZ1d8hBvbegGR67VUpYm5FGwbNTQgSYUJYHPsdZz4Q/HBm7gEN43YGD32F9+ITd0iBsC0lm/IrW2oeTLy02YszCFr96ToIIACCMKN3iiTQuCLFyFR7RXUyOJ+emnBYysOWGWOncOKHt6e+BUMsHuAnpUFaZs/A3EiyQQmX2Wcq8KnCMPHYWxom/lso+2Pcp9b3RsgbzU6NLDMWq+6FYAe9fW5fxz/bhayS3Gt8xGyLmxh3O/FsSyefvqq+uME30E3q+k4PlMNEke9W/lAWHlbB94jI5J+C82jsr444xRZYgQiO46FPtXgEXI6YJKUgV5T6Zr/Nd/te8FHY5n+rTwHTdi3cwb8vCHFUAni0kFPmn0I37RiSNJcDQWKl2bKnE4WwZXwg/r+M1IaqqZ0C2SAF1aM1lZCsL0JE9n1jUIfGM594bQEr+thdRjHkT+ATjFPvVdP5akxd6W9Ud4h7hGYaPgLhV87rIoSexkDZuWqp8BRvpyQD6Mmc6BnWctlPFxD+noPnbB05SHklya6d39brMDCQDg0a9hTKp6rc1pGgGjPRQGWso/CN6smDBpOyYj8Yyms5EGIvRxG2tPK+Vux/bbAlo9+WT0caMID6Vg=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(8936002)(1076003)(6486002)(5660300002)(83380400001)(508600001)(26005)(8676002)(38100700002)(66946007)(316002)(66476007)(36756003)(2906002)(186003)(6506007)(66556008)(4326008)(86362001)(7416002)(966005)(33656002)(2616005)(6916009)(6512007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?BKPAzHcLCP0NSizlKu6eRB/a9D1wCDxeVgchrHQud+/RcoLG0kYhhVZCJhiV?=
- =?us-ascii?Q?LjSIozloLEIhNiTN/xSI/2wF/n2jrRR3Z0JZbVMiUYtmMi5TzzMCBcYJnjvm?=
- =?us-ascii?Q?tQc0E6LlRwWq72Uq33V51YOID6JxVm/jkfem7ls2ze9W10Mi4xIfnBQ1W0Q+?=
- =?us-ascii?Q?otv5uobI1PI+0VjDIMa98bctqz7rVn9OYG97FRNIRotz9JHIsyE6RkD7j+in?=
- =?us-ascii?Q?rZ+di915Mb9k0tQnSXFzKlR234K45AWVuWy9NQa1zfeRsdfiraaDO4VFbNS/?=
- =?us-ascii?Q?7lyyWONR+bQAfRA2QQi55qaHFiIruwu6ZZGKac0ZhtARSajQdYbrkGNhKKQo?=
- =?us-ascii?Q?F99OrUQqHhHU/03R+ZSye7P5cBAtm/fNBG1HMhYd2lN3ahcqziGdgRS+Zrxj?=
- =?us-ascii?Q?96Z4Z4GV1mIEsZjFrlheCkuSO9W0F/PL7nS63OFKUFn+0zVa4TofRDeXiL/x?=
- =?us-ascii?Q?T6NtbWYmz0hYzhQRuat4Qp52WPbzzA645PhidZ8tcParn3mJR4T03FnSEe9v?=
- =?us-ascii?Q?bW0nHheJW+qS82vhkRQjwofKeGMJ/4sxcqOILx/tVEfUsGUOfR8L9ciXZylS?=
- =?us-ascii?Q?IDdR6SyzwvWQosb1z5ZpY94Q5zHfTTDwlVm+b4MSNiBfu4Q1K/DsYokZZMZR?=
- =?us-ascii?Q?kRqtFa86NFDeGKIy3YbPVEmzM4W+KjDGkz9CsYI5aF7gumHCxfkOLPBz84he?=
- =?us-ascii?Q?yVjTc4329EYtrPKsQR4Xv4WKeQgLxE3J0BE5RChCvuXiEf0T2Ke9RQBu4bOa?=
- =?us-ascii?Q?FPFTmLQp7Rukhb/5TXxwfAds66KLElsN5lkFfZSYyIlPe/rQhBxSzl2i1o1U?=
- =?us-ascii?Q?ZryYROk0uRmllSpbBbEyo8z2KMvIbnR7QXg5ChJSyq767nIqmaSUmceos6cj?=
- =?us-ascii?Q?tnxTkgFPChPfEkpGcLWbAILqpvLgjHd3kY4k0yLurfJjgnJ8yEdEbtXbq0VD?=
- =?us-ascii?Q?tb74Ey0CEc82YkDyw1ZxcZsGlHk267ecFj0i49By9OfEMDpwrRqiNon+DDfe?=
- =?us-ascii?Q?S2kIsrAFkXl7U7vB26FhJq1W1ws5pTGhnVhM8d/iigdVy3tymEqoUrrKh3yo?=
- =?us-ascii?Q?rgCRYBDKpA4DwIA0AEcJWF9wZ2v4mzA1IkcXD2eOu4/3OhLatf0t97ffezhv?=
- =?us-ascii?Q?6XmpPmMSBnc2WwMZzMEH14tDx3S9ptiKZzrNfpOLtTMlrENenLtKOEaD9x9D?=
- =?us-ascii?Q?67NAa1PZLR96SS8Y59RJUd63W1Kt5asBfHDruF7oTqKecF/HVovTYqV67ASj?=
- =?us-ascii?Q?CUGFGXZ2aj8qVVAkhpxc9tirtcY5n7hiByp5aSN0CT14Ntkap3HdmVD9/GVQ?=
- =?us-ascii?Q?vBbyroIoUXP3hsx2C7L1bkZWZjIZyZgDrK7an+nRHkx03ITUL+kWxFtJhkN9?=
- =?us-ascii?Q?D0vApRL79p1mU/dr9gg5uNxS3vDc8fQSjlgqz8ElLcas45ZvwtjGtKCJdIXW?=
- =?us-ascii?Q?pTle4ubBp3UNtIHwxOpGWahxZcppPRzVNiekKtO9riyBRMuh/oEZ5Lgme+r7?=
- =?us-ascii?Q?+h7wxXLRGcoBphh+vZPTMU6Z8KkQWi/VGVAJRYNi+u2LprRwcfaQFRIIG4iD?=
- =?us-ascii?Q?uPmBdLUuiXP72fmVymMwJ8mef9mJcIn8hlTxQgntrD65lOeo7aCwBmQpeLIO?=
- =?us-ascii?Q?VVmpDK79TLPvpIbKvGJnZ/Q75VEMqYCrref+hBp7mLxsDswZgvXwwdbP63+T?=
- =?us-ascii?Q?vqvIzF35oKcXAKFw2+hhPV3Hv8b/ieU2cnTtTKpUraakyMWrzTuOnd1hYeP2?=
- =?us-ascii?Q?3amA4t/eIg=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ed4726cd-f740-4899-f5ee-08da37915bc4
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 May 2022 23:11:07.7016
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OR7DCa3+3G/v6/ZquAMcSosEgnl/1v2ucpZu1cwRy2ml+B9f09sriGoNOZoTqNGF
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5948
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S237243AbiEPXVo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 19:21:44 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9006C2C116
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 16:21:42 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id m11-20020a170902f64b00b0015820f8038fso8663502plg.23
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 16:21:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=0YkApNghgF4TC4tIp8JnO0EsQZRvA0pJP1NXImtKD4U=;
+        b=X8vcSqJ5QNIaNMmMzYnqmXchM3rqClM84FhI1GsLT8KtFRsTCiZmHkDbWjdXE1SAjp
+         cH6IjaOTYXXole9wOsXv36WRjk2zWPwm1ygpWn5cLXvLgrev6sKuQ1lpV87mCod9WbJe
+         EN3/y19PVPK9aVQDI+7gVXB0k3HiaJ5ahSLxixMzzpOc7r0CuYCuI6sgefnJHWVx3q+Y
+         H9KghKIyr6/5idhu2NvkR/YMFTsZ4tqWFwXw1vOrk80NU0blIfGvVJHRj8XhJESxz3N0
+         +Ox1h8UjfYc1gKE4o/uiDMTFwn8c8M1hjgZ+lNy8hGHhcrBP4kWQG8k4u2TS8D0AwfBa
+         eAXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=0YkApNghgF4TC4tIp8JnO0EsQZRvA0pJP1NXImtKD4U=;
+        b=xZHm9QdNhOVXOHHddWz6CbjcEZa7ECnwQoQbo0KqVC213/p1lM4b39gfv9TzGuJUMw
+         V1NL8NgdnsakaQrv2YQ8NjtlymjYsTsloo4bJLuGpHxJv20kIZ9EbamNjUYhNMMWo2D7
+         H3rDM9w3HiRpualQF6ObT0FZBTANewCRH8OaLBMD9n3sZo6eoeud/TD6AyMJId+8FdEV
+         6XxXq9BwQ8Chcfv+PKtXKPccr6gaIqonwFLbJP0QRLnahSkphcn8l6JL5nGGUg+/Qebi
+         kqWfzFHJzyYJVxulF93fn7dbTs4UdsI3D2xWxMzRERRJWR2l7IxsRnSdUM8fR6zHGHCd
+         rKNg==
+X-Gm-Message-State: AOAM532g9dIAOBxFLgm4ZgeXfFS9D8ijmeW06ab9OObt11Jgm3BOzVbk
+        D6/QMbCkRzH+NR5qjDsUJGgDhn0h6O/GhQ==
+X-Google-Smtp-Source: ABdhPJzVsPkihjdJKyDB4IlWilw/aIIVKfVJV6U2SckzeNt6+CAN/61F3LEIkq/JhYnjb3GbY1/ZuGRCIfxZFw==
+X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
+ (user=dmatlack job=sendgmr) by 2002:a05:6a00:10cc:b0:4fe:3f1c:2d1 with SMTP
+ id d12-20020a056a0010cc00b004fe3f1c02d1mr19559137pfu.0.1652743302062; Mon, 16
+ May 2022 16:21:42 -0700 (PDT)
+Date:   Mon, 16 May 2022 23:21:16 +0000
+Message-Id: <20220516232138.1783324-1-dmatlack@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.550.gb090851708-goog
+Subject: [PATCH v6 00/22] KVM: Extend Eager Page Splitting to the shadow MMU
+From:   David Matlack <dmatlack@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Sean Christopherson <seanjc@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        maciej.szmigiero@oracle.com,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 16, 2022 at 01:38:39PM -0600, Alex Williamson wrote:
-> On Mon, 16 May 2022 15:35:58 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > On Mon, May 16, 2022 at 02:30:46PM -0400, Matthew Rosato wrote:
-> > 
-> > > Conceptually I think this would work for QEMU anyway (it always sets the kvm
-> > > before we open the device).  I tried to test the idea quickly but couldn't
-> > > get the following to apply on vfio-next or your vfio_group_locking -- but I
-> > > understand what you're trying to do so I'll re-work and try it out.  
-> > 
-> > I created it on 8c9350e9bf43de1ebab3cc8a80703671e6495ab4 which is the
-> > vfio_group_locking.. I can send you a github if it helps
-> > https://github.com/jgunthorpe/linux/commits/vfio_group_lockin
-> > 
-> > > @Alex can you think of any usecase/reason why we would need to be able to
-> > > set the KVM sometime after the device was opened?  Doing something like
-> > > below would break that, as this introduces the assumption that the group is
-> > > associated with the KVM before the device is opened (and if it's not, the
-> > > device open fails).  
-> > 
-> > Keep in mind that GVT already hard requires this ordering to even
-> > allow open_device to work - so it already sets a floor for what
-> > userspace can do..
-> 
-> How is this going to work when vfio devices are exposed directly?  We
-> currently have a strict ordering through the group to get to the
-> device, and it's therefore a reasonable requirement for userspace to
-> register the group with kvm before opening the device.  Is the notifier
-> and async KVM registration necessary to support this dependency with
-> direct device access?  I don't have as clear a picture of the ordering
-> with with direct access.  Thanks,
+[ This is a small incremental revision on top of v5. I'm sending this now
+  rather than waiting longer, as I would typically do, since the 5.19 merge
+  window is fast approaching. ]
 
-With the device FD there is already a zombie state after open("/dev/...") but
-before the internal open_device op is called. This state ends after
-the iommufd is assigned, then we can go to open_device.
+This series extends KVM's Eager Page Splitting to also split huge pages
+mapped by the shadow MMU, specifically **nested MMUs**.
 
-It is reasonable that the KVM would have to be setup before assigning
-the iommfd to the device fd.
+For background on Eager Page Splitting, see:
+ - Proposal: https://lore.kernel.org/kvm/CALzav=dV_U4r1K9oDq4esb4mpBQDQ2ROQ5zH5wV3KpOaZrRW-A@mail.gmail.com/
+ - TDP MMU support: https://lore.kernel.org/kvm/20220119230739.2234394-1-dmatlack@google.com/
 
-Jason
+Splitting huge pages mapped by the shadow MMU is more complicated than
+the TDP MMU, but it is also more important for performance as the shadow
+MMU handles huge page write-protection faults under the write lock.  See
+the Performance section for more details.
+
+The extra complexity of splitting huge pages mapped by the shadow MMU
+comes from a few places:
+
+(1) The shadow MMU has a limit on the number of shadow pages that are
+    allowed to be allocated. So, as a policy, Eager Page Splitting
+    refuses to split if there are KVM_MIN_FREE_MMU_PAGES or fewer
+    pages available.
+
+(2) Huge pages may be mapped by indirect shadow pages which may have access
+    permission constraints from the guest (unlike the TDP MMU which is
+    ACC_ALL by default).
+
+(3) Splitting a huge page may end up re-using an existing lower level
+    shadow page tables. This is unlike the TDP MMU which always allocates
+    new shadow page tables when splitting.
+
+(4) When installing the lower level SPTEs, they must be added to the
+    rmap which may require allocating additional pte_list_desc structs.
+
+In Google's internal implementation of Eager Page Splitting, we do not
+handle cases (3) and (4), and intstead opts to skip splitting entirely
+(case 3) or only partially splitting (case 4). This series handles the
+additional cases, which requires an additional 4KiB of memory per VM to
+store the extra pte_list_desc cache. However it does also avoids the need
+for TLB flushes in most cases and allows KVM to split more pages mapped
+by shadow paging.
+
+The bulk of this series is just refactoring the existing MMU code in
+preparation for splitting, specifically to make it possible to operate
+on the MMU outside of a vCPU context.
+
+Motivation
+----------
+
+During dirty logging, VMs using the shadow MMU suffer from:
+
+(1) Write-protection faults on huge pages that take the MMU lock to
+    unmap the huge page, map a 4KiB page, and update the dirty log.
+
+(2) Non-present faults caused by (1) that take the MMU lock to map in
+    the missing page.
+
+(3) Write-protection faults on 4KiB pages that take the MMU lock to
+    make the page writable and update the dirty log. [Note: These faults
+    only take the MMU lock during shadow paging.]
+
+The lock contention from (1), (2) and (3) can severely degrade
+application performance to the point of failure.  Eager page splitting
+eliminates (1) by moving the splitting of huge pages off the vCPU
+threads onto the thread invoking VM-ioctls to configure dirty logging,
+and eliminates (2) by fully splitting each huge page into its
+constituent small pages. (3) is still a concern for shadow paging
+workloads (e.g. nested virtualization) but is not addressed by this
+series.
+
+Splitting in the VM-ioctl thread is useful because it can run in the
+background without interrupting vCPU execution. However, it does take
+the MMU lock so it may introduce some extra contention if vCPUs are
+hammering the MMU lock. This is offset by the fact that eager page
+splitting drops the MMU lock after splitting each SPTE if there is any
+contention, and the fact that eager page splitting is reducing the MMU
+lock contention from (1) and (2) above. Even workloads that only write
+to 5% of their memory see massive MMU lock contention reduction during
+dirty logging thanks to Eager Page Splitting (see Performance data
+below).
+
+A downside of Eager Page Splitting is that it splits all huge pages,
+which may include ranges of memory that are never written to by the
+guest and thus could theoretically stay huge. Workloads that write to
+only a fraction of their memory may see higher TLB miss costs with Eager
+Page Splitting enabled. However, that is secondary to the application
+failure that otherwise may occur without Eager Page Splitting.
+
+Further work is necessary to improve the TLB miss performance for
+read-heavy workoads, such as dirty logging at 2M instead of 4K.
+
+Performance
+-----------
+
+To measure the performance impact of Eager Page Splitting I ran
+dirty_log_perf_test with support for a new flag, -n, that causes each vCPU
+thread to run in L2 instead of L1. This support will be sent out in a
+separate series.
+
+To measure the imapct of customer performance, we can look at the time
+it takes all vCPUs to dirty memory after dirty logging has been enabled.
+Without Eager Page Splitting enabled, such dirtying must take faults to
+split huge pages and bottleneck on the MMU lock.
+
+For write-heavy workloads, there is not as much benefit since nested MMUs
+still have to take the write-lock when resolving 4K write-protection
+faults (case (3) in the Motivation section). But ready-heavy workloads
+greatly benefit.
+
+             | Config: tdp_mmu=Y, nested, 100% writes                  |
+             | Iteration 1 dirty memory time                           |
+             | ------------------------------------------------------- |
+vCPU Count   | eager_page_split=N         | eager_page_split=Y         |
+------------ | -------------------------- | -------------------------- |
+2            | 0.367445635s               | 0.359880160s               |
+4            | 0.503976497s               | 0.418760595s               |
+8            | 1.328792652s               | 1.442455382s               |
+16           | 4.609457301s               | 3.649754574s               |
+32           | 8.751328485s               | 7.659014140s               |
+64           | 20.438482174s              | 17.890019577s              |
+
+             | Config: tdp_mmu=Y, nested, 50% writes                   |
+             | Iteration 1 dirty memory time                           |
+             | ------------------------------------------------------- |
+vCPU Count   | eager_page_split=N         | eager_page_split=Y         |
+------------ | -------------------------- | -------------------------- |
+2            | 0.374082549s               | 0.189881327s               |
+4            | 0.498175012s               | 0.216221200s               |
+8            | 1.848155856s               | 0.525316794s               |
+16           | 4.387725630s               | 1.844867390s               |
+32           | 9.153260046s               | 4.061645844s               |
+64           | 20.077600588s              | 8.825413269s               |
+
+             | Config: tdp_mmu=Y, nested, 5% writes                    |
+             | Iteration 1 dirty memory time                           |
+             | ------------------------------------------------------- |
+vCPU Count   | eager_page_split=N         | eager_page_split=Y         |
+------------ | -------------------------- | -------------------------- |
+2            | 0.386395635s               | 0.023315599s               |
+4            | 0.495352933s               | 0.024971794s               |
+8            | 1.568730321s               | 0.052010563s               |
+16           | 4.258323166s               | 0.174402708s               |
+32           | 9.260176347s               | 0.377929203s               |
+64           | 19.861473882s              | 0.905998574s               |
+
+Eager Page Splitting does increase the time it takes to enable dirty
+logging when not using initially-all-set, since that's when KVM splits
+huge pages. However, this runs in parallel with vCPU execution and drops
+the MMU lock whenever there is contention.
+
+             | Config: tdp_mmu=Y, nested, 100% writes                  |
+             | Enabling dirty logging time                             |
+             | ------------------------------------------------------- |
+vCPU Count   | eager_page_split=N         | eager_page_split=Y         |
+------------ | -------------------------- | -------------------------- |
+2            | 0.001330088s               | 0.018624938s               |
+4            | 0.002763111s               | 0.037247815s               |
+8            | 0.005220762s               | 0.074637543s               |
+16           | 0.010381925s               | 0.149096917s               |
+32           | 0.022109466s               | 0.307983859s               |
+64           | 0.085547182s               | 0.854228170s               |
+
+Similarly, Eager Page Splitting increases the time it takes to clear the
+dirty log for when using initially-all-set. The first time userspace
+clears the dirty log, KVM will split huge pages:
+
+             | Config: tdp_mmu=Y, nested, 100% writes initially-all-set |
+             | Iteration 1 clear dirty log time                        |
+             | ------------------------------------------------------- |
+vCPU Count   | eager_page_split=N         | eager_page_split=Y         |
+------------ | -------------------------- | -------------------------- |
+2            | 0.001947098s               | 0.019836052s               |
+4            | 0.003817996s               | 0.039574178s               |
+8            | 0.007673616s               | 0.079118964s               |
+16           | 0.015733003s               | 0.158006697s               |
+32           | 0.031728367s               | 0.330793049s               |
+64           | 0.108699714s               | 0.891762988s               |
+
+Subsequent calls to clear the dirty log incur almost no additional cost
+since KVM can very quickly determine there are no more huge pages to
+split via the RMAP. This is unlike the TDP MMU which must re-traverse
+the entire page table to check for huge pages.
+
+             | Config: tdp_mmu=Y, nested, 100% writes initially-all-set |
+             | Iteration 2 clear dirty log time                        |
+             | ------------------------------------------------------- |
+vCPU Count   | eager_page_split=N         | eager_page_split=Y         |
+------------ | -------------------------- | -------------------------- |
+2            | 0.009585296s               | 0.009931437s               |
+4            | 0.019188984s               | 0.019842738s               |
+8            | 0.038568630s               | 0.039951832s               |
+16           | 0.077188525s               | 0.079536780s               |
+32           | 0.156728329s               | 0.163612725s               |
+64           | 0.418679324s               | 0.337336844s               |
+
+Testing
+-------
+
+ - Ran all kvm-unit-tests and KVM selftests.
+
+ - Booted a 32-bit non-PAE kernel with shadow paging to verify the
+   quadrant change.
+
+ - Ran dirty_log_perf_test with support for a new flag, -n, that causes
+   each vCPU thread to run in L2 instead of L1. This support will be
+   sent out in a separate series.
+
+ - Tested VM live migration with nested MMUs and huge pages. The live
+   migration setup consisted of an 8 vCPU 8 GiB VM running on an Intel
+   Cascade Lake host and backed by 1GiB HugeTLBFS memory.  The VM was
+   running Debian 10.  Inside a VM was a 6 vCPU 4Gib nested VM also
+   Debian 10 and backed by 2M HugeTLBFS. Inside the nested VM ran a
+   workload that aggressively accessed memory across 6 threads.
+   Tracepoints during the migration confirmes eager page splitting
+   occurred, both for the direct TDP MMU mappings, and the nested MMU
+   mappings.
+
+Version Log
+-----------
+
+v6:
+ - Collect R-b tag from Marc.
+ - Initialize memory cache capacity during top-up [Sean]
+ - Eliminate redundant role overrides in mmu_alloc_root() [Lai]
+
+v5: https://lore.kernel.org/kvm/20220513202819.829591-1-dmatlack@google.com/
+ - Rebase on top of latest kvm/queue.
+ - Collected R-b tags from Sean and Lai.
+ - Add another patch to stop passing non-zero quadrant [Sean]
+ - Drop vcpu_or_null and __kvm_sync_page() [Sean]
+ - Formatting and wording changes [Sean]
+ - Pass role instead of sp when making huge split SPTEs [Sean]
+ - Fix riscv compilation error [kernel test robot]
+ - Document split caches protected by slots_lock [Lai]
+
+v4: https://lore.kernel.org/kvm/20220422210546.458943-1-dmatlack@google.com/
+ - Limit eager page splitting to nested MMUs [Sean]
+ - Use memory caches for SP allocation [Sean]
+ - Use kvm_mmu_get_page() with NULL vCPU for EPS [Sean]
+ - Use u64 instead of bit field for shadow translation entry [Sean]
+ - Add Sean's R-b to "Use a bool" patch.
+ - Fix printf warning in "Cache access bits" patch.
+ - Fix asymmentrical pr_err_ratelimit() + WARN() [Sean]
+ - Drop unnecessary unsync check for huge pages [Sean]
+ - Eliminate use of we in comments and change logs [Sean]
+ - Allocate objects arrays dynamically [Ben]
+
+v3: https://lore.kernel.org/kvm/20220401175554.1931568-1-dmatlack@google.com/
+ - Add R-b tags from Peter.
+ - Explain direct SPs in indirect MMUs in commit message [Peter]
+ - Change BUG_ON() to WARN_ON_ONCE() in quadrant calculation [me]
+ - Eliminate unnecessary gotos [Peter]
+ - Drop mmu_alloc_pte_list_desc() [Peter]
+ - Also update access cache in mmu_set_spte() if was_rmapped [Peter]
+ - Fix number of gfn bits in shadowed_translation cache [Peter]
+ - Pass sp to make_huge_page_split_spte() to derive level and exec [me]
+ - Eliminate flush var in kvm_rmap_zap_collapsible_sptes() [Peter]
+ - Drop NULL pte_list_desc cache fallback [Peter]
+ - Fix get_access to return sp->role.access. [me]
+ - Re-use split cache across calls to CLEAR_DIRTY_LOG for better perf [me]
+ - Top-up the split cache outside of the MMU lock when possible [me]
+ - Refactor prepare_to_split_huge_page() into try_split_huge_page() [me]
+ - Collapse PATCH 20, 23, and 24 avoid intermediate complexity [Peter]
+ - Update the RISC-V function stage2_ioremap() [Anup]
+
+v2: https://lore.kernel.org/kvm/20220311002528.2230172-1-dmatlack@google.com/
+ - Add performance data for workloads that mix reads and writes [Peter]
+ - Collect R-b tags from Ben and Sean.
+ - Fix quadrant calculation when deriving role from parent [Sean]
+ - Tweak new shadow page function names [Sean]
+ - Move set_page_private() to allocation functions [Ben]
+ - Only zap collapsible SPTEs up to MAX_LEVEL-1 [Ben]
+ - Always top-up pte_list_desc cache to reduce complexity [Ben]
+ - Require mmu cache capacity field to be initialized and add WARN()
+   to reduce chance of programmer error [Marc]
+ - Fix up kvm_mmu_memory_cache struct initialization in arm64 [Marc]
+
+v1: https://lore.kernel.org/kvm/20220203010051.2813563-1-dmatlack@google.com/
+
+David Matlack (22):
+  KVM: x86/mmu: Optimize MMU page cache lookup for all direct SPs
+  KVM: x86/mmu: Use a bool for direct
+  KVM: x86/mmu: Stop passing @direct to mmu_alloc_root()
+  KVM: x86/mmu: Derive shadow MMU page role from parent
+  KVM: x86/mmu: Always pass 0 for @quadrant when gptes are 8 bytes
+  KVM: x86/mmu: Decompose kvm_mmu_get_page() into separate functions
+  KVM: x86/mmu: Consolidate shadow page allocation and initialization
+  KVM: x86/mmu: Rename shadow MMU functions that deal with shadow pages
+  KVM: x86/mmu: Move guest PT write-protection to account_shadowed()
+  KVM: x86/mmu: Pass memory caches to allocate SPs separately
+  KVM: x86/mmu: Replace vcpu with kvm in kvm_mmu_alloc_shadow_page()
+  KVM: x86/mmu: Pass kvm pointer separately from vcpu to
+    kvm_mmu_find_shadow_page()
+  KVM: x86/mmu: Allow NULL @vcpu in kvm_mmu_find_shadow_page()
+  KVM: x86/mmu: Pass const memslot to rmap_add()
+  KVM: x86/mmu: Decouple rmap_add() and link_shadow_page() from kvm_vcpu
+  KVM: x86/mmu: Update page stats in __rmap_add()
+  KVM: x86/mmu: Cache the access bits of shadowed translations
+  KVM: x86/mmu: Extend make_huge_page_split_spte() for the shadow MMU
+  KVM: x86/mmu: Zap collapsible SPTEs in shadow MMU at all possible
+    levels
+  KVM: x86/mmu: Refactor drop_large_spte()
+  KVM: Allow for different capacities in kvm_mmu_memory_cache structs
+  KVM: x86/mmu: Extend Eager Page Splitting to nested MMUs
+
+ .../admin-guide/kernel-parameters.txt         |   3 +-
+ arch/arm64/kvm/mmu.c                          |   2 +-
+ arch/riscv/kvm/mmu.c                          |   5 +-
+ arch/x86/include/asm/kvm_host.h               |  26 +-
+ arch/x86/kvm/mmu/mmu.c                        | 693 ++++++++++++++----
+ arch/x86/kvm/mmu/mmu_internal.h               |  17 +-
+ arch/x86/kvm/mmu/paging_tmpl.h                |  17 +-
+ arch/x86/kvm/mmu/spte.c                       |  16 +-
+ arch/x86/kvm/mmu/spte.h                       |   2 +-
+ arch/x86/kvm/mmu/tdp_mmu.c                    |   2 +-
+ arch/x86/kvm/x86.c                            |   6 +
+ include/linux/kvm_host.h                      |   1 +
+ include/linux/kvm_types.h                     |   6 +-
+ virt/kvm/kvm_main.c                           |  33 +-
+ 14 files changed, 658 insertions(+), 171 deletions(-)
+
+
+base-commit: a3808d88461270c71d3fece5e51cc486ecdac7d0
+-- 
+2.36.0.550.gb090851708-goog
+
