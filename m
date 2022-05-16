@@ -2,201 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C2E26527FF7
-	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 10:46:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B3C9528003
+	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 10:46:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241928AbiEPIpG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 04:45:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44410 "EHLO
+        id S240524AbiEPIqj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 04:46:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241923AbiEPIoj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 04:44:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 93361F59B
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 01:44:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652690666;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sIh/SA6Lh64JUzXDkOFTJ2gpJyP3Qx/KaUYhX+otn9k=;
-        b=hOMitaAJh+pjpEL0/UVbNK1eAbyEJ67uxU70dpdHnMFHujW8se3Icf417F5N65fRNU4TPB
-        mCUi6/cS7zmY9BlEVd2T+qXIby+uXT3BfpfN14FEz9HXYFOqUIdwmHSvrBzus5PbF9c+SL
-        ttM+J/dfgc4Sav7l/bBqndUw+8PX5q4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-201-tGdXptwSNIGZ_-Wa_0w6Cw-1; Mon, 16 May 2022 04:44:24 -0400
-X-MC-Unique: tGdXptwSNIGZ_-Wa_0w6Cw-1
-Received: by mail-wr1-f69.google.com with SMTP id l14-20020a05600012ce00b0020d06e7152cso313943wrx.11
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 01:44:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=sIh/SA6Lh64JUzXDkOFTJ2gpJyP3Qx/KaUYhX+otn9k=;
-        b=8DStp5zCEOAQ/4kgkbVgvwAguzXwGA9r19//LEOoNrz27WlO4ddIiqmfXeyAIlhuqG
-         LxXJEaSVKCO82bFRHk8s8nMcKCNSRBv4JtBatdnJO1WtobOUrXQfSTnzmC/eyG3bdSrD
-         /CK2L6yAsskzfoAoTPFzV2FIvPqOXgVzU5nfPI+a2hLmHXOabFkHfxxJKDAAeQLqD805
-         fCkVS8VTiJ8JzReXfyfGkXrhydTkU8A6umm9rO1fxtmsU7ON9uvHooSgNLCLpfjOvsAo
-         /wnJww8jX43uNcoNkTNNlV5hvoo/yF/fxEOWdzamKZJ3DTfz5nlTvp1SU6ZPIqnH1T8u
-         YIXw==
-X-Gm-Message-State: AOAM532o9rORhKD8gfCILpd9ksCuBu5Ks3wlSTjjm/a2IwXNHnIUzQCN
-        1JmQFLUMFZq4KIeoBhFyib2vsIoyX9+t7hod6H56QRFrq5gz7Fe3YmgMw5SjAUDEifdoStZOsP0
-        50cbAVvOVpGN/
-X-Received: by 2002:adf:d1e7:0:b0:20c:61a7:de2a with SMTP id g7-20020adfd1e7000000b0020c61a7de2amr13269779wrd.332.1652690663748;
-        Mon, 16 May 2022 01:44:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxbBG8LK3Kh/lhJrrOS7oQF11zBcMwtWlGcaXVik8WHSHfaxvjP441ee8zh05lWN6MkOd+W8g==
-X-Received: by 2002:adf:d1e7:0:b0:20c:61a7:de2a with SMTP id g7-20020adfd1e7000000b0020c61a7de2amr13269770wrd.332.1652690663494;
-        Mon, 16 May 2022 01:44:23 -0700 (PDT)
-Received: from redhat.com ([2.55.141.66])
-        by smtp.gmail.com with ESMTPSA id d3-20020a1c7303000000b003942a244ee6sm9682633wmb.43.2022.05.16.01.44.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 May 2022 01:44:23 -0700 (PDT)
-Date:   Mon, 16 May 2022 04:44:19 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     viro@zeniv.linux.org.uk, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        ebiggers@kernel.org, davem@davemloft.net
-Subject: Re: [PATCH] vhost_net: fix double fget()
-Message-ID: <20220516044400-mutt-send-email-mst@kernel.org>
-References: <20220516084213.26854-1-jasowang@redhat.com>
+        with ESMTP id S242114AbiEPIqC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 04:46:02 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 596D833C;
+        Mon, 16 May 2022 01:46:00 -0700 (PDT)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24G8jdYR024834;
+        Mon, 16 May 2022 08:45:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=eMLNwQHNsg2P/SQX0B8htA1tBS0CZJTjRzbyeJk74/s=;
+ b=FEGw02aSe4qUEGjHXkcCt7ZN9VGQMoZqT4wfo8y3Q5dOs8YllkZ84Du6JSKw0B2okMio
+ zVJDewzRIFguJmax4FK5JQFbMzVAsuIeIBFBUGV7LBpH++gpVCuS8eoTkouUWXpRKQp4
+ 2MDBxfqEJrI8OVODwXlsW2uATgCTLQslMdkLBxK//1JktH1PuU2whKoSSypj54wqtJf2
+ H10x0fLF5KxQdVVSg2nvWqRILU+7ckmhBmMv+sMNly2V6SbtiaC0ZN3DR5whQ6D/vCeK
+ 8rt49empJepxSpgQ7Cd437rVBBRSiTvj5vW/O74Cr0MdySXAHT5RO7AelteaRe5mRtpe CA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g3kcv0080-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 May 2022 08:45:59 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24G8jwLY025653;
+        Mon, 16 May 2022 08:45:58 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g3kcv007m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 May 2022 08:45:58 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24G8gd0P019994;
+        Mon, 16 May 2022 08:45:57 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma05fra.de.ibm.com with ESMTP id 3g24291sus-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 May 2022 08:45:56 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24G8jr4q41484684
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 16 May 2022 08:45:53 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D07DBA405C;
+        Mon, 16 May 2022 08:45:53 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7469BA4054;
+        Mon, 16 May 2022 08:45:53 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.50.122])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 16 May 2022 08:45:53 +0000 (GMT)
+Message-ID: <231dfe7a6e30a25d8790177b868934d5502a0966.camel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v1 2/2] s390x: add migration test for
+ storage keys
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, thuth@redhat.com
+Date:   Mon, 16 May 2022 10:45:53 +0200
+In-Reply-To: <20220513150404.6d64ae9e@p-imbrenda>
+References: <20220512140107.1432019-1-nrb@linux.ibm.com>
+         <20220512140107.1432019-3-nrb@linux.ibm.com>
+         <5781a3a7-c76c-710d-4236-b82f6e821c48@linux.ibm.com>
+         <20220513143323.25ca256a@p-imbrenda>
+         <a2e497b3-7d86-280c-f483-9ba20707294b@linux.ibm.com>
+         <20220513150404.6d64ae9e@p-imbrenda>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.1 (3.44.1-1.fc36) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220516084213.26854-1-jasowang@redhat.com>
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: z4jKKn1nHcXKKTq08i3gKzNHmNDrjzPl
+X-Proofpoint-GUID: P7IR2QWM_Ry4w7lCprWxXvXvW2vbAmcV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-16_03,2022-05-13_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
+ suspectscore=0 mlxlogscore=999 phishscore=0 priorityscore=1501
+ lowpriorityscore=0 spamscore=0 bulkscore=0 impostorscore=0 mlxscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205160049
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 16, 2022 at 04:42:13PM +0800, Jason Wang wrote:
-> From: Al Viro <viro@zeniv.linux.org.uk>
-> 
-> Here's another piece of code assuming that repeated fget() will yield the
-> same opened file: in vhost_net_set_backend() we have
-> 
->         sock = get_socket(fd);
->         if (IS_ERR(sock)) {
->                 r = PTR_ERR(sock);
->                 goto err_vq;
->         }
-> 
->         /* start polling new socket */
->         oldsock = vhost_vq_get_backend(vq);
->         if (sock != oldsock) {
-> ...
->                 vhost_vq_set_backend(vq, sock);
-> ...
->                 if (index == VHOST_NET_VQ_RX)
->                         nvq->rx_ring = get_tap_ptr_ring(fd);
-> 
-> with
-> static struct socket *get_socket(int fd)
-> {
->         struct socket *sock;
-> 
->         /* special case to disable backend */
->         if (fd == -1)
->                 return NULL;
->         sock = get_raw_socket(fd);
->         if (!IS_ERR(sock))
->                 return sock;
->         sock = get_tap_socket(fd);
->         if (!IS_ERR(sock))
->                 return sock;
->         return ERR_PTR(-ENOTSOCK);
-> }
-> and
-> static struct ptr_ring *get_tap_ptr_ring(int fd)
-> {
->         struct ptr_ring *ring;
->         struct file *file = fget(fd);
-> 
->         if (!file)
->                 return NULL;
->         ring = tun_get_tx_ring(file);
->         if (!IS_ERR(ring))
->                 goto out;
->         ring = tap_get_ptr_ring(file);
->         if (!IS_ERR(ring))
->                 goto out;
->         ring = NULL;
-> out:
->         fput(file);
->         return ring;
-> }
-> 
-> Again, there is no promise that fd will resolve to the same thing for
-> lookups in get_socket() and in get_tap_ptr_ring().  I'm not familiar
-> enough with the guts of drivers/vhost to tell how easy it is to turn
-> into attack, but it looks like trouble.  If nothing else, the pointer
-> returned by tun_get_tx_ring() is not guaranteed to be pinned down by
-> anything - the reference to sock will _usually_ suffice, but that
-> doesn't help any if we get a different socket on that second fget().
-> 
-> One possible way to fix it would be the patch below; objections?
-> 
-> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
+On Fri, 2022-05-13 at 15:04 +0200, Claudio Imbrenda wrote:
+> I think this migration test should be kept more on focus about
+> migration
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-and this is stable material I guess.
-
-> ---
->  drivers/vhost/net.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index 28ef323882fb..0bd7d91de792 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -1449,13 +1449,9 @@ static struct socket *get_raw_socket(int fd)
->  	return ERR_PTR(r);
->  }
->  
-> -static struct ptr_ring *get_tap_ptr_ring(int fd)
-> +static struct ptr_ring *get_tap_ptr_ring(struct file *file)
->  {
->  	struct ptr_ring *ring;
-> -	struct file *file = fget(fd);
-> -
-> -	if (!file)
-> -		return NULL;
->  	ring = tun_get_tx_ring(file);
->  	if (!IS_ERR(ring))
->  		goto out;
-> @@ -1464,7 +1460,6 @@ static struct ptr_ring *get_tap_ptr_ring(int fd)
->  		goto out;
->  	ring = NULL;
->  out:
-> -	fput(file);
->  	return ring;
->  }
->  
-> @@ -1551,8 +1546,12 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
->  		r = vhost_net_enable_vq(n, vq);
->  		if (r)
->  			goto err_used;
-> -		if (index == VHOST_NET_VQ_RX)
-> -			nvq->rx_ring = get_tap_ptr_ring(fd);
-> +		if (index == VHOST_NET_VQ_RX) {
-> +			if (sock)
-> +				nvq->rx_ring = get_tap_ptr_ring(sock->file);
-> +			else
-> +				nvq->rx_ring = NULL;
-> +		}
->  
->  		oldubufs = nvq->ubufs;
->  		nvq->ubufs = ubufs;
-> -- 
-> 2.25.1
-
+Makes sense to me. In my next version, I will remove this check.
+Thanks.
