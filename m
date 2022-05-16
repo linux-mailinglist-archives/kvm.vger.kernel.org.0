@@ -2,169 +2,239 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AE746528AB9
-	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 18:39:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F8C2528AC8
+	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 18:44:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343763AbiEPQji (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 12:39:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46660 "EHLO
+        id S1343815AbiEPQoh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 12:44:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233538AbiEPQjh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 12:39:37 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0C6F3BA58
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 09:39:34 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id i10so26780677lfg.13
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 09:39:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=hYHwEAjXNX75VWbUllN/Gour8BQtThd5ZVwkANp9gRY=;
-        b=bK0X0UtuI4068ycqprV0lsvDAI+AHR1gGA9C4RAXNgLVkgt0X/SKAKqpBUz8VqsXpj
-         VrQIu3E5HBAJkaSLXxA5SSd32mibLdUgvSTv7KRsOl12irVDXAei24CduxHIFEmELpOP
-         Akpk1TKatgOUWNo6GH97f41Rgt6dC5o53iE1TXInCkHY+5KU2UCKYICVz0nTiaETdOa2
-         CUC3ubVPJqahOO59ugDHhBeZXWtViC++Mw6XCSkemHHGmBDpjehgL/B1CmV7dpUkYOpZ
-         84aGJCq612yfSOXz1WDxqr+HCHIKSkf5IFdZCgpMrXHap1xZ012QF/CF92C9hAXvs7rX
-         +KlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=hYHwEAjXNX75VWbUllN/Gour8BQtThd5ZVwkANp9gRY=;
-        b=DQbtNFjfMyRESApVNkIHTfoBO40ZpFgPkoBd7JHtjcGKYj25XyTTdwkBYac8uakIU7
-         lVpYiZrl1CWoxRg2ja/aYIn5cza/Pu6km4oYE4H+JPw9xkitXnOBM22RhufdEMVZFj7G
-         5LRj6aDQan+sQ1sCCQqMG2kb+ghp5Dk8rZ/IQPc1v4qTYfeTK//CvOAH9nqX4zUBVyTa
-         dR43KW88zLtItmEeEbWu+zJfhFlGxDOLrxisOytfSbKH5I0G1XbyhVXvikaq8NMT02sK
-         18N8T+f3rQHz49OcYVKwMiRuxsYQTEYZob9APqpiG4T/4zn/Rhbm//HYSue+nKMuOfAv
-         PdTg==
-X-Gm-Message-State: AOAM533s3ZepIS3X1Zyw78qcoj/r7Vwn2UC4GXHN2hZdouYJYMOOVqww
-        YXnoRatkhSURz3QpsXwvq+Q443SfQD516zHxHoP0Mg==
-X-Google-Smtp-Source: ABdhPJxDcLtX1NQ8HJRWY2uXCXca5YQCMMosdKfmnprtNa9msTSkc4SzO4QNTM90AWokT5c92TgN1ZwszC5RaDsSBUI=
-X-Received: by 2002:a19:674c:0:b0:448:3f49:e6d5 with SMTP id
- e12-20020a19674c000000b004483f49e6d5mr13821457lfj.518.1652719173041; Mon, 16
- May 2022 09:39:33 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220513202819.829591-1-dmatlack@google.com> <20220513202819.829591-21-dmatlack@google.com>
- <YoJkb7oMEz0v1dnp@google.com>
-In-Reply-To: <YoJkb7oMEz0v1dnp@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 16 May 2022 09:39:07 -0700
-Message-ID: <CALzav=d-O5KWDC356cdpoJAUvKSSNOMtn_n7G6Yc342-VQFJNQ@mail.gmail.com>
-Subject: Re: [PATCH v5 20/21] KVM: Allow for different capacities in
- kvm_mmu_memory_cache structs
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        maciej.szmigiero@oracle.com,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S244534AbiEPQog (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 12:44:36 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B78763C4B1;
+        Mon, 16 May 2022 09:44:34 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 603BAB81263;
+        Mon, 16 May 2022 16:44:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4206C385AA;
+        Mon, 16 May 2022 16:44:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1652719472;
+        bh=CYEvraFOukMkXu6WJZExhFsNqffzBStRQaubVucF2VE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=hQ3raqWSwFK4Im/gQu5BrQ4j5EyxbLqHUz+Thyw+Air6BDVAOJuI4kc6nzyOZ25OU
+         b1AY5WRVxEfX6D07dcOBR9dytT7129POMhLMkPhRECoHIpow/eHniKQmN8v6TxqUJV
+         tJixyVk71SO7PdcAHVfTeXZiyZVkkd5CwEajyv+QDZqiavEnxLHiwL/2xdBqhdWSmN
+         4A3s5b1Svfd80b2zJy//vKyhJqZOMOaPIwhpcG+FpUJYzDEkcVA7zm4loAzpNzjGFT
+         Dleu4A7zeI1r9OS5GBL1rbamw5P5i4i0d7rnznuEpn/KsRQ8jpMJhqvFRfO1ZSnsZQ
+         1f1tFAW7qheOA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nqdpc-00Bfyr-Tm; Mon, 16 May 2022 17:44:29 +0100
+Date:   Mon, 16 May 2022 17:44:28 +0100
+Message-ID: <87ilq55swj.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v7 0/9] KVM: arm64: Add support for hypercall services selection
+In-Reply-To: <CAJHc60w1F7RAgJkv5PRuJtKjTw1gUaYmZk885AVhPLF2h6YbkQ@mail.gmail.com>
+References: <20220502233853.1233742-1-rananta@google.com>
+        <878rri8r78.wl-maz@kernel.org>
+        <CAJHc60xp=UQT_CX0zoiSjAmkS8JSe+NB5Gr+F5mmybjJAWkUtQ@mail.gmail.com>
+        <878rriicez.wl-maz@kernel.org>
+        <CAJHc60w1F7RAgJkv5PRuJtKjTw1gUaYmZk885AVhPLF2h6YbkQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, drjones@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, catalin.marinas@arm.com, will@kernel.org, pshier@google.com, ricarkol@google.com, oupton@google.com, reijiw@google.com, jingzhangos@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 16, 2022 at 7:49 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, May 13, 2022, David Matlack wrote:
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 53ae2c0640bc..2f2ef6b60ff4 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -764,7 +764,10 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
-> >  {
-> >       phys_addr_t addr;
-> >       int ret = 0;
-> > -     struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
-> > +     struct kvm_mmu_memory_cache cache = {
-> > +             .capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE,
-> > +             .gfp_zero = __GFP_ZERO,
->
-> I dislike requiring all users to specificy the capacity.  It largely defeats the
-> purpose of KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE, and bleeds details into code that
-> really doesn't care all that much about the details.
->
-> Rather than force the capacity to be set before topup, what about adding a custom
-> capacity topup helper?  That allows keeping a default capacity, better documents
-> the caches that are special, and provides an opportunity to sanity check that the
-> capacity isn't incorrectly changed by the user.
+On Tue, 03 May 2022 22:09:29 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
+>=20
+> On Tue, May 3, 2022 at 1:33 PM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Tue, 03 May 2022 19:49:13 +0100,
+> > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > >
+> > > Hi Marc,
+> > >
+> > > On Tue, May 3, 2022 at 10:24 AM Marc Zyngier <maz@kernel.org> wrote:
+> > > >
+> > > > On Tue, 03 May 2022 00:38:44 +0100,
+> > > > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > > > >
+> > > > > Hello,
+> > > > >
+> > > > > Continuing the discussion from [1], the series tries to add suppo=
+rt
+> > > > > for the userspace to elect the hypercall services that it wishes
+> > > > > to expose to the guest, rather than the guest discovering them
+> > > > > unconditionally. The idea employed by the series was taken from
+> > > > > [1] as suggested by Marc Z.
+> > > >
+> > > > As it took some time to get there, and that there was still a bunch=
+ of
+> > > > things to address, I've taken the liberty to apply my own fixes to =
+the
+> > > > series.
+> > > >
+> > > > Please have a look at [1], and let me know if you're OK with the
+> > > > result. If you are, I'll merge the series for 5.19.
+> > > >
+> > > > Thanks,
+> > > >
+> > > >         M.
+> > > >
+> > > Thank you for speeding up the process; appreciate it. However, the
+> > > series's selftest patches have a dependency on Oliver's
+> > > PSCI_SYSTEM_SUSPEND's selftest patches [1][2]. Can we pull them in
+> > > too?
+> >
+> > Urgh... I guess this is the time to set some ground rules:
+> >
+> > - Please don't introduce dependencies between series, that's
+> >   unmanageable. I really need to see each series independently, and if
+> >   there is a merge conflict, that's my job to fix (and I don't really
+> >   mind).
+> >
+> > - If there is a dependency between series, please post a version of
+> >   the required patches as a prefix to your series, assuming this
+> >   prefix is itself standalone. If it isn't, then something really is
+> >   wrong, and the series should be resplit.
+> >
+> > - You also should be basing your series on an *official* tag from
+> >   Linus' tree (preferably -rc1, -rc2 or -rc3), and not something
+> >   random like any odd commit from the KVM tree (I had conflicts while
+> >   applying this on -rc3, probably due to the non-advertised dependency
+> >   on Oliver's series).
+> >
+> Thanks for picking the dependency patches. I'll keep these mind the
+> next time I push changes.
+>=20
+> > >
+> > > aarch64/hypercalls.c: In function =E2=80=98guest_test_hvc=E2=80=99:
+> > > aarch64/hypercalls.c:95:30: error: storage size of =E2=80=98res=E2=80=
+=99 isn=E2=80=99t known
+> > >    95 |         struct arm_smccc_res res;
+> > >       |                              ^~~
+> > > aarch64/hypercalls.c:103:17: warning: implicit declaration of function
+> > > =E2=80=98smccc_hvc=E2=80=99 [-Wimplicit-function-declaration]
+> > >   103 |                 smccc_hvc(hc_info->func_id, hc_info->arg1, 0,
+> > > 0, 0, 0, 0, 0, &res);
+> > >       |                 ^~~~~~~~~
+> > >
+> >
+> > I've picked the two patches, which means they will most likely appear
+> > twice in the history. In the future, please reach out so that we can
+> > organise this better.
+> >
+> > > Also, just a couple of readability nits in the fixed version:
+> > >
+> > > 1. Patch-2/9, hypercall.c:kvm_hvc_call_default_allowed(), in the
+> > > 'default' case, do you think we should probably add a small comment
+> > > that mentions we are checking for func_id in the PSCI range?
+> >
+> > Dumped a one-liner there.
+> >
+> > > 2. Patch-2/9, arm_hypercall.h, clear all the macros in this patch
+> > > itself instead of doing it in increments (unless there's some reason
+> > > that I'm missing)?
+> >
+> > Ah, rebasing leftovers, now gone.
+> >
+> > I've pushed an updated branch again, please have a look.
+> >
+> Thanks for addressing these. The series looks good now.
 
-Even simpler: If mc->capacity is 0 in topup, set it to
-KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE.
+Except it doesn't.
 
-This is what I had before when I was laying out the storage for
-objects in a separate array. It was risky then because it was too easy
-for someone to accidentally corrupt memory (call topup with
-capacity==0 but without allocating the objects array). Now that topup
-takes care of allocation automatically, that risk is gone.
+I introduced a bug by overly simplifying kvm_arm_set_fw_reg_bmap(), as
+we have to allow userspace writing the *same* value. As it turns out,
+QEMU restores all the registers on each reboot. Which as the vcpus
+have all run. This in turns triggers another issue in QEMU, which
+instead of taking the hint ans stopping there, sends all the vcpus
+into the guest in one go with random states... Crap happens.
 
->
-> And then I believe this code becomes:
->
->         struct kvm_mmu_memory_cache cache = { .gfp_zero = __GFP_ZERO };
->
-> E.g. (completely untested)
->
-> static int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc,
->                                         int capacity, int min)
-> {
->         gfp_t gfp = GFP_KERNEL_ACCOUNT;
->         void *obj;
->
->         if (mc->nobjs >= min)
->                 return 0;
->
->         if (likely(mc->capacity)) {
->                 if (WARN_ON_ONCE(mc->capacity != capacity || !mc->objects))
->                         return -EIO;
->         } else {
->                 mc->objects = kvmalloc_array(sizeof(void *), capacity, gfp);
->                 if (!mc->objects)
->                         return -ENOMEM;
->
->                 mc->capacity = capacity;
->         }
->
->         while (mc->nobjs < mc->capacity) {
->                 obj = mmu_memory_cache_alloc_obj(mc, gfp);
->                 if (!obj)
->                         return mc->nobjs >= min ? 0 : -ENOMEM;
->                 mc->objects[mc->nobjs++] = obj;
->         }
->         return 0;
-> }
->
-> int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
-> {
->         const int capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
->
->         return __kvm_mmu_topup_memory_cache(mc, capacity, min);
-> }
->
-> int kvm_mmu_topup_custom_memory_cache(struct kvm_mmu_memory_cache *mc,
->                                       int capacity)
-> {
->         return __kvm_mmu_topup_memory_cache(mc, capacity, capacity);
-> }
->
+I'll wear a brown paper bag for the rest of the day and add the
+following patch to the branch.
+
+Thanks,
+
+	M.
+
+=46rom 528ada2811ba0bb2b2db5bf0f829b48c50f3c13c Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Mon, 16 May 2022 17:32:54 +0100
+Subject: [PATCH] KVM: arm64: Fix hypercall bitmap writeback when vcpus have
+ already run
+
+We generally want to disallow hypercall bitmaps being changed
+once vcpus have already run. But we must allow the write if
+the written value is unchanged so that userspace can rewrite
+the register file on reboot, for example.
+
+Without this, a QEMU-based VM will fail to reboot correctly.
+
+The original code was correct, and it is me that introduced
+the regression.
+
+Fixes: 05714cab7d63 ("KVM: arm64: Setup a framework for hypercall bitmap fi=
+rmware registers")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/hypercalls.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index ccbd3cefb91a..c9f401fa01a9 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -379,7 +379,8 @@ static int kvm_arm_set_fw_reg_bmap(struct kvm_vcpu *vcp=
+u, u64 reg_id, u64 val)
+=20
+ 	mutex_lock(&kvm->lock);
+=20
+-	if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags)) {
++	if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags) &&
++	    val !=3D *fw_reg_bmap) {
+ 		ret =3D -EBUSY;
+ 		goto out;
+ 	}
+--=20
+2.34.1
+
+
+--=20
+Without deviation from the norm, progress is not possible.
