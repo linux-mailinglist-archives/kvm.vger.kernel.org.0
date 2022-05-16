@@ -2,318 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C34BB528D12
-	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 20:31:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 839B5528D2D
+	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 20:36:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344840AbiEPSbg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 14:31:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56106 "EHLO
+        id S1344972AbiEPSg1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 14:36:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344941AbiEPSbU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 14:31:20 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 153083E0FE
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 11:31:02 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id 31so14860429pgp.8
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 11:31:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=9C8bpp6d21XdJaEwrvELDm0aYiNE+NJR0NE35SfqoPw=;
-        b=JOhFs1aNvRIY7bmGE74VDs+kZuh4q3JIlp+QrRMyFp/PLiOT8r/3UwgXQt6bqHPI65
-         NNYmecm+jORBOX+gKz9WJLCJGXE8LtJQC5YL5L0PG2VmJTEBS8s7+BEqGJwsS/8+CAYW
-         nVtpgMTT9AXF2n5UP9Os5QjiIR9UeLBr/gS7D8XWO4BYz4RxM7rWHE32W8yus+feXD/Q
-         6c9Ngj5rWTW8OVkRdB4rlL0vYTmsqa2mDT/HwyIbkm1tp/SHRbUR9Gaw11RKuYsiNckv
-         aWfNEoZFgG65UKfiNR9mOJwX/KkL4MaqZDcAOWzWPHerMRs6yhZwBq+5tbLfJvRRz/ie
-         gAKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=9C8bpp6d21XdJaEwrvELDm0aYiNE+NJR0NE35SfqoPw=;
-        b=MnNcAfneCYAE2Maetq0lOoDiRAbt4lo1gvuPp5kKAUsnJA5n5tAu3liEqJj13xOmqm
-         l5EjgeZJy7U5ylgEADeVfIjT6Zy1tRdrtPAm8EE8D7oWOAz7RwXhPYw7b4E97nhAW1iB
-         2cS5vhTGY8GqziL7wg0KwYx9lBzGvUbiWaUhk5taDZvQacoZbWNOs/N/mgnG/9aoRD+U
-         ImxZ4UZ3aMR8++xXc7Mce+s6tqJmrTDNCjhwc8Y7lstTwLppGKPtoDpn/QHXahW62/mb
-         qjn7ya4yP5aIhOXRvdiQmrcU/kcpgFkhgcIWa3NlaJwXkxo2sKKwEHIx9PePbS+cA4p3
-         vDZA==
-X-Gm-Message-State: AOAM532J5q795FbGPsL+pjjAJWdHG7Wg6TKdjDWSQxvK8vacF9SVwDHZ
-        BoeohbUGNUjKcfUhxwWzGrvo0TgvwSz7zJLfv/WLeA==
-X-Google-Smtp-Source: ABdhPJyjaFJSIeFl9j5CO5O2cLnzJAk/+sTu7/7S9nAUSuITSTyO47ux8geJ/ybnqIcWYwvzYkotmXgpj/i/8Woz0+g=
-X-Received: by 2002:a65:4581:0:b0:3f2:638f:6f76 with SMTP id
- o1-20020a654581000000b003f2638f6f76mr6735655pgq.324.1652725861290; Mon, 16
- May 2022 11:31:01 -0700 (PDT)
+        with ESMTP id S1344966AbiEPSgB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 14:36:01 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2081.outbound.protection.outlook.com [40.107.244.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA40139E;
+        Mon, 16 May 2022 11:36:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mBmuFoa6OAQRXJRvkN3rCCM9fYorcVXD5TAGcftEuXJoGW8HBOjVBIyWbs5nornagIpTEVVrxOt3tFqm7PJvhzla1ZfW33GllMIuE8y7QmWIqRzwXHqUSugmYIzxTWFfmWUNq1vfFj1Q2bfzEk/Em0HVHlm2aTwa6cy3M758Js9nBgG1YIvBdfhLDEhmGgGI1jnlyRdLjMe70ECHXx2Rs9tU2USsP2RHceQAzsEdxcUZGtUggDtRzmmKWeRU8TKiCtoXbOHlfMsPdQ0OAH/2Jywo4+Gi45lTSjZVbgbFX5LuDq+GcyLOvi1f4FEzcXKEVqzoZVslnUDsYTbEK08mIw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=o8iVmwjGyF6zhpgj5KLlxn77wF3SUe+MUC08qBN1KYM=;
+ b=KV59LgvA27P1Tg7K+9ghqaBFuT/urydHUSSWVJAxXSue6ttXGHMqYTCTnLZDLEXniCJ5+ucLU4DU99yEiTEFIeaoM1MtTmvfuymRS1Oyv5fm8Mn9pZyfzj7+2qvDMK4hbadLS9HASorx7RD05lF+6E4scRgO7eYHTnXLyi8TNL2M3sImgdrJ6ckuNUhOa6oFGiJv47eRs+5ItfbCpQdD10V9AVBPqRwG4VhKYb2qopYnBA44+sDRyCVOMPhSn7hzt3DGKp34vo6JkHlJzoe/bTAlgitChjb5pC6wEdz8uMfI4YeOeZcu0HK5Qsmmufl847RbG82d50oO9yWiuaEOtA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=o8iVmwjGyF6zhpgj5KLlxn77wF3SUe+MUC08qBN1KYM=;
+ b=ddD/6sDW/gIhOa71URs1NgoPTv0RWxNFrGMKLhns9Rjrx4M+6hvTlE2REXqWUt2p0FXW0yC7Su6RUplYVi48xxQAfzQsmo5xzda/rNoJQF59Ren5B7HeP8i5wgdI9yLl4A7PcAdYOxAXwQGUkia4Q17PYgRKfenhnPca3ZfF3aMCjaH0J8py9SNBX6JLhqPxHItt6jmoAh4OLxDcYeyNjra/+8JYU4Y+0VDvdsHOq8ALWy1EcY1xgvBZExyJGM58DrLuuq0Aj0uezDsnSv3e0n+EWqrIZj8MQaachbeurxaG/z0d78E4YNfDbOmTTLW7iIsj/HpVEBH4wjJDFgGCRA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by DM6PR12MB3275.namprd12.prod.outlook.com (2603:10b6:5:185::29) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5250.14; Mon, 16 May
+ 2022 18:35:59 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2%5]) with mapi id 15.20.5250.018; Mon, 16 May 2022
+ 18:35:59 +0000
+Date:   Mon, 16 May 2022 15:35:58 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     alex.williamson@redhat.com, linux-s390@vger.kernel.org,
+        cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        agordeev@linux.ibm.com, svens@linux.ibm.com, frankja@linux.ibm.com,
+        david@redhat.com, imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org
+Subject: Re: [PATCH v7 17/22] vfio-pci/zdev: add open/close device hooks
+Message-ID: <20220516183558.GN1343366@nvidia.com>
+References: <20220513191509.272897-1-mjrosato@linux.ibm.com>
+ <20220513191509.272897-18-mjrosato@linux.ibm.com>
+ <20220516172734.GE1343366@nvidia.com>
+ <7a31ec36-ceaf-dcef-8bd0-2b4732050aed@linux.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7a31ec36-ceaf-dcef-8bd0-2b4732050aed@linux.ibm.com>
+X-ClientProxiedBy: MN2PR05CA0022.namprd05.prod.outlook.com
+ (2603:10b6:208:c0::35) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-References: <20220502233853.1233742-1-rananta@google.com> <878rri8r78.wl-maz@kernel.org>
- <CAJHc60xp=UQT_CX0zoiSjAmkS8JSe+NB5Gr+F5mmybjJAWkUtQ@mail.gmail.com>
- <878rriicez.wl-maz@kernel.org> <CAJHc60w1F7RAgJkv5PRuJtKjTw1gUaYmZk885AVhPLF2h6YbkQ@mail.gmail.com>
- <87ilq55swj.wl-maz@kernel.org>
-In-Reply-To: <87ilq55swj.wl-maz@kernel.org>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Mon, 16 May 2022 11:30:48 -0700
-Message-ID: <CAJHc60zLt2ZtCR2=DgtS3XK8e7vQrocEO2rinW_hMb4o4-WhTg@mail.gmail.com>
-Subject: Re: [PATCH v7 0/9] KVM: arm64: Add support for hypercall services selection
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 235b7883-4e06-44ed-f263-08da376aec14
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3275:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR12MB32754A40164CD889EA5160D8C2CF9@DM6PR12MB3275.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: K/o4rNwvGe0jp0MCzMmcry3Kw/nkxqYSKKpQUVmP4MVpNPjiZGnLtRCBAy0LyrQEG/z/wM+kkIrs+zS+JrWOgxynu7vFXH8hO3DUCYeIbwl9MjH5EM3CJ2DqxMKsu6Mo6Sv6BUH/d8iGoEC+UIEd7mTBTyutDTaRiX+AsQJ3hjoKIyCCnsuFYcgQdUZ9f0hsYoaoJxxTQlqIfC5JKSec9GNfWKvy5ZjnZU4Vu1aA0Cp4Zmrs16lTwynunXutOs0Q73G2tz3RkapwZ0zbrlXtfPV9T7H4JjS7jAjOTxfutvFa8/cH5A8qYZEBiqK3GqZSF30eUFiqna/uhFSCGGOBKWYX2tb5aYWOjE96OwDYpcBkFaNiGK2nDiK7rngdDdO6Xegz3Yjm29p77DWn/ZI4GFB7ipLG/4E2NymI19fjgwGCEqoluzyo7lVbEqPhhvOhJHMFrwz3YqQsowtqD6cqcct4PdwQ3H4rsDPt0+5T2WkQ+wQxC5jXdD1rdfjLd5m4IUGOEkmxl6wEL1wHFM9o6rzzTW3rtn9WjKY9Oy/l9W3A41N5nVcvWA7H+rJC761YW9AqxDR8J1K664/mET2E89i/NWHIVenAYPRRNgw3XPo0UWhSbRaWMo59l2nAzC78rZV/2SR36wL+DW/TnXiBVSVuLKmJqlxtgkvKXr1/a9OVsnWd8YpABOfs7dw6SSAoqoDifosVNVtX2yc+XpS6jFROMJpQpqwAAzfos66IP9Y=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(2906002)(83380400001)(36756003)(186003)(7416002)(86362001)(5660300002)(2616005)(1076003)(966005)(38100700002)(33656002)(508600001)(26005)(6506007)(6512007)(8936002)(66476007)(8676002)(4326008)(316002)(66556008)(66946007)(6486002)(6916009);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?pKl0JzoeP7NQ9Ks5YKtslzPhbPnmqGQiP/Zt0ptrT0xGDV8tjkQLlSMHH8hA?=
+ =?us-ascii?Q?bV/mfNT4vM5pJIN2L/g5WD5Z2NIl2aQ1Av13y17GhWxHcmj+k1q3eMNwcWJQ?=
+ =?us-ascii?Q?QuKUP2PmfEoLgBQGcl+jioAgBOIvTBI7V54JIgp1aKWOiL5GK+QlaruRpGLf?=
+ =?us-ascii?Q?O50aPGR8ai5rXRj7wp789N0zsBRi2L73SeZZry6byVr++sOTDPnfSgryMtS/?=
+ =?us-ascii?Q?FHTGyHB1eth8xL8BB5YIQN7QI/HP9DMk+rH6Ney0E/usifCeZiWIaYinxMg8?=
+ =?us-ascii?Q?P1sJWf65ZrasfcSC9pc2Sl0lQYaWsffrpLRQQqdOIUTFLqsZ5AepEMJXfgZ0?=
+ =?us-ascii?Q?u7uUB9x6e8XNCAR/1glHzFgt3D/aZt7GVEypvJJ1hLM04v1bG7M1zpJ6GgZm?=
+ =?us-ascii?Q?keHcWG2sX2s0KfDp5ArvbrccAJFDS9wWIYXGWYux9TX94RcpADB3bP/1+x2n?=
+ =?us-ascii?Q?q7dDn179j7PybR3yawzaygk/VmaBoP1Q65IwBK1F8qo6pTGLhVfwqHX3Ky8s?=
+ =?us-ascii?Q?GmpTWmhB9XZDBR6lNzReqaA9WQPFGg1gF8ts6GKQDnGyk3OTCW1rh4UAKmmR?=
+ =?us-ascii?Q?RzqbzegGCAaI65HK9TXCJTMKth9M4Iu8k8K5cb5T43qs8qCiVNmK9JZldE5l?=
+ =?us-ascii?Q?lU3Y0ZuTu0pWKCsCriMYJMnN9oKkG9Hz3IAgBmXwXd+0WwDW11+gjDBPORBN?=
+ =?us-ascii?Q?joIhDZ4uw+YEtR7v7nXSNitD0qtj0plbxnqMnh7tZg6zFHwoAIJL6iRI7JdB?=
+ =?us-ascii?Q?RD6j4NkaWkH8eo5u6LSeM5RudvXPg4pjzFZ1C6m+GsOXZo+MwT3Yuju9qbFF?=
+ =?us-ascii?Q?CvXl/S2hDRUHgSIixa6i65Vddd7IFF0Jk9GAZIdAlT4ARsSvpDTuumCoPj2M?=
+ =?us-ascii?Q?2Z5+9ulLh+UewP9+DRMl7638Y0/WSf2HkJYKjfhOKr/HTm1aldZB2lEhSTYt?=
+ =?us-ascii?Q?7vPgV70o6209VnKaF7PmcqnopAxvy+oIqXl1LfAS6tr4ItaejQga4h3IXuFk?=
+ =?us-ascii?Q?loDAowI08BungmwtaosyLQWGhN63HzOGhqPB720nH0+jt+3SlEF/RL+OKsbG?=
+ =?us-ascii?Q?m34uyFD13/ilCfA/WkXSXo/Vl6Dytq+9j1m0UEw+DsJ5d1W7k8X8eBe6xd3J?=
+ =?us-ascii?Q?72PMk3GgdvrzB+wIZWt4VBPEKRqXYIccA7uyahrAecvRkoKI59UQJAhZI8ut?=
+ =?us-ascii?Q?qAnV4GWSDlQ+ZiZowj0R//ZlwVrEFaEuomB6M1RwVM6OU8lh2Zho+qo/otAF?=
+ =?us-ascii?Q?cPJPaK4SgpT8jYVQzhha85lY3rkjaBomOwJr7PVJKd3a0QCbf/ayb5In1zOV?=
+ =?us-ascii?Q?GSkYMHho6FJua1blUrxFR0WpNDAdVORwigaTlnw4Ks8gIuknTR9Cs8BzOw91?=
+ =?us-ascii?Q?mnrwtgLq0Mz7IT7tYRjBcu3XV5Ek2nCmDI5nrgkFEVoemfnw6ZFZF+G1LvbC?=
+ =?us-ascii?Q?G1ZSOzk+K+G0KvbKwKOzmn0Vd62vRMi4tbORneJOvujEuU4NHfhORfXVfsSW?=
+ =?us-ascii?Q?7lQZ/c1oZTkGid+zWS7f7lHaCJpW/aPsiM1FLMJhhqLGnLxGJ1lPa7klotdP?=
+ =?us-ascii?Q?oAb5rmFxZvnKTwo3OimhKAaWvbxauyk3hnSLrTINZFffJ6+gnewp2ixpgaju?=
+ =?us-ascii?Q?gy0rer7B9BnFC81A4JN4uDeytjdPFHRcFpMygfV8/+ZaITl2CKbeN8/rQ9Ho?=
+ =?us-ascii?Q?D908FpKwc1BUdj/5VEuchHlVOCRQc0/jJy0Z73+GbDcUnwBGptsMAiguCdJy?=
+ =?us-ascii?Q?iBuarBciFQ=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 235b7883-4e06-44ed-f263-08da376aec14
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 May 2022 18:35:59.5546
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 57XHv/Kb2WaM09eoyGik7ssfRuhi6c8eQHPFtweM8LK4I1QwIL8xuA+hAhuzYtz1
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3275
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 16, 2022 at 9:44 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Tue, 03 May 2022 22:09:29 +0100,
-> Raghavendra Rao Ananta <rananta@google.com> wrote:
-> >
-> > On Tue, May 3, 2022 at 1:33 PM Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > > On Tue, 03 May 2022 19:49:13 +0100,
-> > > Raghavendra Rao Ananta <rananta@google.com> wrote:
-> > > >
-> > > > Hi Marc,
-> > > >
-> > > > On Tue, May 3, 2022 at 10:24 AM Marc Zyngier <maz@kernel.org> wrote=
-:
-> > > > >
-> > > > > On Tue, 03 May 2022 00:38:44 +0100,
-> > > > > Raghavendra Rao Ananta <rananta@google.com> wrote:
-> > > > > >
-> > > > > > Hello,
-> > > > > >
-> > > > > > Continuing the discussion from [1], the series tries to add sup=
-port
-> > > > > > for the userspace to elect the hypercall services that it wishe=
-s
-> > > > > > to expose to the guest, rather than the guest discovering them
-> > > > > > unconditionally. The idea employed by the series was taken from
-> > > > > > [1] as suggested by Marc Z.
-> > > > >
-> > > > > As it took some time to get there, and that there was still a bun=
-ch of
-> > > > > things to address, I've taken the liberty to apply my own fixes t=
-o the
-> > > > > series.
-> > > > >
-> > > > > Please have a look at [1], and let me know if you're OK with the
-> > > > > result. If you are, I'll merge the series for 5.19.
-> > > > >
-> > > > > Thanks,
-> > > > >
-> > > > >         M.
-> > > > >
-> > > > Thank you for speeding up the process; appreciate it. However, the
-> > > > series's selftest patches have a dependency on Oliver's
-> > > > PSCI_SYSTEM_SUSPEND's selftest patches [1][2]. Can we pull them in
-> > > > too?
-> > >
-> > > Urgh... I guess this is the time to set some ground rules:
-> > >
-> > > - Please don't introduce dependencies between series, that's
-> > >   unmanageable. I really need to see each series independently, and i=
-f
-> > >   there is a merge conflict, that's my job to fix (and I don't really
-> > >   mind).
-> > >
-> > > - If there is a dependency between series, please post a version of
-> > >   the required patches as a prefix to your series, assuming this
-> > >   prefix is itself standalone. If it isn't, then something really is
-> > >   wrong, and the series should be resplit.
-> > >
-> > > - You also should be basing your series on an *official* tag from
-> > >   Linus' tree (preferably -rc1, -rc2 or -rc3), and not something
-> > >   random like any odd commit from the KVM tree (I had conflicts while
-> > >   applying this on -rc3, probably due to the non-advertised dependenc=
-y
-> > >   on Oliver's series).
-> > >
-> > Thanks for picking the dependency patches. I'll keep these mind the
-> > next time I push changes.
-> >
-> > > >
-> > > > aarch64/hypercalls.c: In function =E2=80=98guest_test_hvc=E2=80=99:
-> > > > aarch64/hypercalls.c:95:30: error: storage size of =E2=80=98res=E2=
-=80=99 isn=E2=80=99t known
-> > > >    95 |         struct arm_smccc_res res;
-> > > >       |                              ^~~
-> > > > aarch64/hypercalls.c:103:17: warning: implicit declaration of funct=
-ion
-> > > > =E2=80=98smccc_hvc=E2=80=99 [-Wimplicit-function-declaration]
-> > > >   103 |                 smccc_hvc(hc_info->func_id, hc_info->arg1, =
-0,
-> > > > 0, 0, 0, 0, 0, &res);
-> > > >       |                 ^~~~~~~~~
-> > > >
-> > >
-> > > I've picked the two patches, which means they will most likely appear
-> > > twice in the history. In the future, please reach out so that we can
-> > > organise this better.
-> > >
-> > > > Also, just a couple of readability nits in the fixed version:
-> > > >
-> > > > 1. Patch-2/9, hypercall.c:kvm_hvc_call_default_allowed(), in the
-> > > > 'default' case, do you think we should probably add a small comment
-> > > > that mentions we are checking for func_id in the PSCI range?
-> > >
-> > > Dumped a one-liner there.
-> > >
-> > > > 2. Patch-2/9, arm_hypercall.h, clear all the macros in this patch
-> > > > itself instead of doing it in increments (unless there's some reaso=
-n
-> > > > that I'm missing)?
-> > >
-> > > Ah, rebasing leftovers, now gone.
-> > >
-> > > I've pushed an updated branch again, please have a look.
-> > >
-> > Thanks for addressing these. The series looks good now.
->
-> Except it doesn't.
->
-> I introduced a bug by overly simplifying kvm_arm_set_fw_reg_bmap(), as
-> we have to allow userspace writing the *same* value. As it turns out,
-> QEMU restores all the registers on each reboot. Which as the vcpus
-> have all run. This in turns triggers another issue in QEMU, which
-> instead of taking the hint ans stopping there, sends all the vcpus
-> into the guest in one go with random states... Crap happens.
->
-> I'll wear a brown paper bag for the rest of the day and add the
-> following patch to the branch.
->
-> Thanks,
->
->         M.
->
-> From 528ada2811ba0bb2b2db5bf0f829b48c50f3c13c Mon Sep 17 00:00:00 2001
-> From: Marc Zyngier <maz@kernel.org>
-> Date: Mon, 16 May 2022 17:32:54 +0100
-> Subject: [PATCH] KVM: arm64: Fix hypercall bitmap writeback when vcpus ha=
-ve
->  already run
->
-> We generally want to disallow hypercall bitmaps being changed
-> once vcpus have already run. But we must allow the write if
-> the written value is unchanged so that userspace can rewrite
-> the register file on reboot, for example.
->
-> Without this, a QEMU-based VM will fail to reboot correctly.
->
-> The original code was correct, and it is me that introduced
-> the regression.
->
-> Fixes: 05714cab7d63 ("KVM: arm64: Setup a framework for hypercall bitmap =
-firmware registers")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hypercalls.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-> index ccbd3cefb91a..c9f401fa01a9 100644
-> --- a/arch/arm64/kvm/hypercalls.c
-> +++ b/arch/arm64/kvm/hypercalls.c
-> @@ -379,7 +379,8 @@ static int kvm_arm_set_fw_reg_bmap(struct kvm_vcpu *v=
-cpu, u64 reg_id, u64 val)
->
->         mutex_lock(&kvm->lock);
->
-> -       if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags)) {
-> +       if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags) &&
-> +           val !=3D *fw_reg_bmap) {
->                 ret =3D -EBUSY;
->                 goto out;
->         }
-Ha, not your fault. We have been going back and forth on this aspect
-of the design. Thanks for correcting this.
-However, since this changes the API behavior, I think we may have to
-amend the documentation as well:
+On Mon, May 16, 2022 at 02:30:46PM -0400, Matthew Rosato wrote:
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rs=
-t
-index b5ccec4572d7..ab04979bf104 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -2615,7 +2615,8 @@ KVM_SET_ONE_REG.
+> Conceptually I think this would work for QEMU anyway (it always sets the kvm
+> before we open the device).  I tried to test the idea quickly but couldn't
+> get the following to apply on vfio-next or your vfio_group_locking -- but I
+> understand what you're trying to do so I'll re-work and try it out.
 
- Note: These registers are immutable once any of the vCPUs of the VM has
- run at least once. A KVM_SET_ONE_REG in such a scenario will return
--a -EBUSY to userspace.
-+a -EBUSY to userspace if there's an update in the bitmap. If there's no
-+change in the value, it'll simply return a 0.
+I created it on 8c9350e9bf43de1ebab3cc8a80703671e6495ab4 which is the
+vfio_group_locking.. I can send you a github if it helps
+https://github.com/jgunthorpe/linux/commits/vfio_group_lockin
 
- (See Documentation/virt/kvm/arm/hypercalls.rst for more details.)
+> @Alex can you think of any usecase/reason why we would need to be able to
+> set the KVM sometime after the device was opened?  Doing something like
+> below would break that, as this introduces the assumption that the group is
+> associated with the KVM before the device is opened (and if it's not, the
+> device open fails).
 
-diff --git a/Documentation/virt/kvm/arm/hypercalls.rst
-b/Documentation/virt/kvm/arm/hypercalls.rst
-index 3e23084644ba..275f4dbe5792 100644
---- a/Documentation/virt/kvm/arm/hypercalls.rst
-+++ b/Documentation/virt/kvm/arm/hypercalls.rst
-@@ -91,9 +91,10 @@ desired bitmap back via SET_ONE_REG. The features
-for the registers that
- are untouched, probably because userspace isn't aware of them, will be
- exposed as is to the guest.
+Keep in mind that GVT already hard requires this ordering to even
+allow open_device to work - so it already sets a floor for what
+userspace can do..
 
--Note that KVM will not allow the userspace to configure the registers
--anymore once any of the vCPUs has run at least once. Instead, it will
--return a -EBUSY.
-+Note that KVM will not allow the userspace to update the registers
-+with a new value anymore once any of the vCPUs has run at least once,
-+and will return a -EBUSY. However, a 'write' of the previously configured
-+value is allowed and returns a 0.
-
- The pseudo-firmware bitmap register are as follows:
-
-@@ -129,10 +130,10 @@ The pseudo-firmware bitmap register are as follows:
-
- Errors:
-
--    =3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+    =3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-     -ENOENT   Unknown register accessed.
--    -EBUSY    Attempt a 'write' to the register after the VM has started.
-+    -EBUSY    Attempt to update the register bitmap after the VM has start=
-ed.
-     -EINVAL   Invalid bitmap written to the register.
--    =3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+    =3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
- .. [1] https://developer.arm.com/-/media/developer/pdf/ARM_DEN_0070A_Firmw=
-are_interfaces_for_mitigating_CVE-2017-5715.pdf
-
-
-Thank you.
-Raghavendra
-> --
-> 2.34.1
->
->
-> --
-> Without deviation from the norm, progress is not possible.
+Jason
