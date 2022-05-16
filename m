@@ -2,109 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4469552928E
+	by mail.lfdr.de (Postfix) with ESMTP id DFA6E529290
 	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 23:19:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348937AbiEPVJF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 17:09:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54660 "EHLO
+        id S229824AbiEPVKS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 17:10:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349207AbiEPVIN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 17:08:13 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF67F4A3E8
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 13:49:56 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id i17so15557008pla.10
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 13:49:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=KrZd1d7ZW1bFcikModx6EkxPFI/wL98ky5uKMz/aH5s=;
-        b=MONmx06zlMIYc3wCFtScWn/8i4RuJ7ZboFJ76kZhENs65e+45QZ9TJiv8sWMkWiH3i
-         oMf04Udsv5xFLVu8pZE6Oi957vt5/1YMSwrOFXbdWqCnWjD3OiHE+stQXPhVfLhrNtUD
-         YTr/FlydzldOfEek6k+R0YmmIbjNWSeIWc99Arc2CAig9n+ZY1W3JXsqnHmHZaOU+rce
-         sCdtaAQuzebqWxJEffXBMZkzQ+FIg8wmEWPNFp/6+5tC0BpkpszO707w1tYwG2vRUQHs
-         4XzCsZAs3Lm+5PtNS0cv7POMWbi8quYX8ck/U6lsOwQ8TanCa4cAzne213tIRV4+xwlF
-         Ntwg==
+        with ESMTP id S1349266AbiEPVJx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 17:09:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4598443ED3
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 13:53:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652734416;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Jj+1GdC5ed9RjG2w4YTgAyI/dqT/LcafZe1Q5l3sISU=;
+        b=aOk/sl2mjhIhgAroI5m7xmaJJNgxyx8nnpNUu+mP9aWHsRAkz69n1QcLIBJVqvmvmUatLx
+        4Vt+g8lRtrTAuQD/P8v46Ya6YOxFjk8WWA1HXjqwnZqP5mqe9a5lLdfKR91IHVlbELd1lH
+        BpYPgaDoXJZH1ba+/w80RpsiM0ANOf0=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-649-rLlTUfQWPZybssLda8uPbQ-1; Mon, 16 May 2022 16:53:35 -0400
+X-MC-Unique: rLlTUfQWPZybssLda8uPbQ-1
+Received: by mail-ej1-f69.google.com with SMTP id gn26-20020a1709070d1a00b006f453043956so6339785ejc.15
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 13:53:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=KrZd1d7ZW1bFcikModx6EkxPFI/wL98ky5uKMz/aH5s=;
-        b=R69Vvxnucwl2bLIQF1k/ojCEqtOFnRn1oMOK53Jlany2omtpy9sodAkon4EyHiCT86
-         Z10iawNid5wfo81GVlTxCrSeTYnLsh4Gffdj/a1zSA1eCK6wJcFnYjHNKx+/f7EA4Mjf
-         /DRD5BoVUmMeVad8nIQ1QztoOhwrJJLCVJZ15JSdF6FiBvveHzaLrfpdbxb61hE/SLV8
-         wuLLBny5vG2FRoOStsUw/aYyxfm69TsjuQsfW8s4ks77lpeImFL+AxhRUzF7LpfQMHFZ
-         EV8GRg302Pbu9WfyvL2XmeAj949XRm6XjJ/PKJVisYI2XTjQbs+cedfZLlSdrNVTcNYS
-         Z25g==
-X-Gm-Message-State: AOAM530p2KtYpMgSqBCpPpYoHx1wSI1UVIs7lo2GYXAhFY7XtIEujuyi
-        Bb1z4JKSWyR1SqVv13FpPVfe8g==
-X-Google-Smtp-Source: ABdhPJyfN+D2uao0MqY3oPEXUKmvH4qWuWl1YZgKcJeE6F9PV+VJP4kEuxpIbb6adk0PONfl+dMizw==
-X-Received: by 2002:a17:902:e94e:b0:15b:22a7:f593 with SMTP id b14-20020a170902e94e00b0015b22a7f593mr19047116pll.148.1652734196312;
-        Mon, 16 May 2022 13:49:56 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id n12-20020a1709026a8c00b0015ea9aabd19sm7372503plk.241.2022.05.16.13.49.55
+        bh=Jj+1GdC5ed9RjG2w4YTgAyI/dqT/LcafZe1Q5l3sISU=;
+        b=XXNdFj4uR3y7Cp7Sz3eI7LPx8cl1Ba1hyISKPwDEWLds1Q2+YD7oNlZcM5bGuUWre6
+         sBrTi+3FZ1Txlc7wDQJrOQ+r9bt9rxZPJYzWu2KrNOZMhqGjhwnjO2/x94SWZPMCYZBJ
+         CmFZUU/8UxFo3gTdzGxbLBKiR1j9H63MI67jpWiAYWoyTIeTVUH79abIynCaBiMC7RZ/
+         vSXAhDEi7uOHS/69Sh/d+OiNrkSiL4Yy3eo+C29H1a7d+PyAzP+Fnjl4Qx1519rQm7yP
+         8Pb/VlpbN6adjTz9iAbPdgxwIfNtiIuSGGPOXGa0qc4Iye85Sd/X9fk8yXry2qtZz/bX
+         kpxw==
+X-Gm-Message-State: AOAM531OA/qYuAZXWZUjm+SG6dWUibn72YoeknWAd88mMPi1eMn7DZDn
+        PNYSdnkODOY6OlQQ1tpQV8Txpq/NW6pmelVyIlLNlzYD4YnC4RK4VPKkGOif/3+rp0cJm0yi1Sn
+        pE2WqWvFTCKgH
+X-Received: by 2002:a50:ea8b:0:b0:428:7d05:eb7e with SMTP id d11-20020a50ea8b000000b004287d05eb7emr14878210edo.185.1652734413854;
+        Mon, 16 May 2022 13:53:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw2KCqWfRikajj4wIQWOtpCghzr69gRHuvpcIhTWpWoTu9HLy2ox3hPwr0mjBMz5Umcz1ed7Q==
+X-Received: by 2002:a50:ea8b:0:b0:428:7d05:eb7e with SMTP id d11-20020a50ea8b000000b004287d05eb7emr14878187edo.185.1652734413670;
+        Mon, 16 May 2022 13:53:33 -0700 (PDT)
+Received: from redhat.com ([2.55.131.38])
+        by smtp.gmail.com with ESMTPSA id g26-20020a056402181a00b0042617ba638esm5627992edy.24.2022.05.16.13.53.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 May 2022 13:49:55 -0700 (PDT)
-Date:   Mon, 16 May 2022 20:49:52 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Zeng Guang <guang.zeng@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Hu, Robert" <robert.hu@intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>
-Subject: Re: [PATCH v9 0/9] IPI virtualization support for VM
-Message-ID: <YoK48P2UrrjxaRrJ@google.com>
-References: <20220419153155.11504-1-guang.zeng@intel.com>
- <2d33b71a-13e5-d377-abc2-c20958526497@redhat.com>
- <cf178428-8c98-e7b3-4317-8282938976fd@intel.com>
- <f0e633b3-38ea-f288-c74d-487387cefddc@redhat.com>
+        Mon, 16 May 2022 13:53:33 -0700 (PDT)
+Date:   Mon, 16 May 2022 16:53:29 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Peter Maydell <peter.maydell@linaro.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Claudio Fontana <cfontana@suse.de>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
+Subject: [PULL v2 49/86] target/i386: Fix sanity check on max APIC ID /
+ X2APIC enablement
+Message-ID: <20220516204913.542894-50-mst@redhat.com>
+References: <20220516204913.542894-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f0e633b3-38ea-f288-c74d-487387cefddc@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <20220516204913.542894-1-mst@redhat.com>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 03, 2022, Paolo Bonzini wrote:
-> On 5/3/22 09:32, Zeng Guang wrote:
-> > 
-> > I don't see "[PATCH v9 4/9] KVM: VMX: Report tertiary_exec_control field in
-> > dump_vmcs()" in kvm/queue. Does it not need ?
-> 
-> Added now (somehow the patches were not threaded, so I had to catch them one
-> by one from lore).
-> 
-> > Selftests for KVM_CAP_MAX_VCPU_ID is posted in V2 which is revised on top of
-> > kvm/queue.
-> > ([PATCH v2] kvm: selftests: Add KVM_CAP_MAX_VCPU_ID cap test - Zeng
-> > Guang (kernel.org) <https://lore.kernel.org/lkml/20220503064037.10822-1-guang.zeng@intel.com/>)
-> 
-> Queued, thanks.
+From: David Woodhouse <dwmw2@infradead.org>
 
-Shouldn't we have a solution for the read-only APIC_ID mess before this is merged?
+The check on x86ms->apic_id_limit in pc_machine_done() had two problems.
+
+Firstly, we need KVM to support the X2APIC API in order to allow IRQ
+delivery to APICs >= 255. So we need to call/check kvm_enable_x2apic(),
+which was done elsewhere in *some* cases but not all.
+
+Secondly, microvm needs the same check. So move it from pc_machine_done()
+to x86_cpus_init() where it will work for both.
+
+The check in kvm_cpu_instance_init() is now redundant and can be dropped.
+
+Signed-off-by: David Woodhouse <dwmw2@infradead.org>
+Acked-by: Claudio Fontana <cfontana@suse.de>
+Message-Id: <20220314142544.150555-1-dwmw2@infradead.org>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/i386/pc.c              |  8 --------
+ hw/i386/x86.c             | 16 ++++++++++++++++
+ target/i386/kvm/kvm-cpu.c |  2 +-
+ 3 files changed, 17 insertions(+), 9 deletions(-)
+
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 312eb9e400..15f37d8dc6 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -744,14 +744,6 @@ void pc_machine_done(Notifier *notifier, void *data)
+         /* update FW_CFG_NB_CPUS to account for -device added CPUs */
+         fw_cfg_modify_i16(x86ms->fw_cfg, FW_CFG_NB_CPUS, x86ms->boot_cpus);
+     }
+-
+-
+-    if (x86ms->apic_id_limit > 255 && !xen_enabled() &&
+-        !kvm_irqchip_in_kernel()) {
+-        error_report("current -smp configuration requires kernel "
+-                     "irqchip support.");
+-        exit(EXIT_FAILURE);
+-    }
+ }
+ 
+ void pc_guest_info_init(PCMachineState *pcms)
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index 79ebdface6..f79e720cc2 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -38,6 +38,7 @@
+ #include "sysemu/replay.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/cpu-timers.h"
++#include "sysemu/xen.h"
+ #include "trace.h"
+ 
+ #include "hw/i386/x86.h"
+@@ -122,6 +123,21 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
+      */
+     x86ms->apic_id_limit = x86_cpu_apic_id_from_index(x86ms,
+                                                       ms->smp.max_cpus - 1) + 1;
++
++    /*
++     * Can we support APIC ID 255 or higher?
++     *
++     * Under Xen: yes.
++     * With userspace emulated lapic: no
++     * With KVM's in-kernel lapic: only if X2APIC API is enabled.
++     */
++    if (x86ms->apic_id_limit > 255 && !xen_enabled() &&
++        (!kvm_irqchip_in_kernel() || !kvm_enable_x2apic())) {
++        error_report("current -smp configuration requires kernel "
++                     "irqchip and X2APIC API support.");
++        exit(EXIT_FAILURE);
++    }
++
+     possible_cpus = mc->possible_cpu_arch_ids(ms);
+     for (i = 0; i < ms->smp.cpus; i++) {
+         x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id, &error_fatal);
+diff --git a/target/i386/kvm/kvm-cpu.c b/target/i386/kvm/kvm-cpu.c
+index 5eb955ce9a..7237378a7d 100644
+--- a/target/i386/kvm/kvm-cpu.c
++++ b/target/i386/kvm/kvm-cpu.c
+@@ -171,7 +171,7 @@ static void kvm_cpu_instance_init(CPUState *cs)
+         /* only applies to builtin_x86_defs cpus */
+         if (!kvm_irqchip_in_kernel()) {
+             x86_cpu_change_kvm_default("x2apic", "off");
+-        } else if (kvm_irqchip_is_split() && kvm_enable_x2apic()) {
++        } else if (kvm_irqchip_is_split()) {
+             x86_cpu_change_kvm_default("kvm-msi-ext-dest-id", "on");
+         }
+ 
+-- 
+MST
+
