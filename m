@@ -2,227 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 975785287D8
-	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 17:02:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 299E752883A
+	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 17:14:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244658AbiEPPCa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 11:02:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47950 "EHLO
+        id S244819AbiEPPOq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 11:14:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232587AbiEPPC2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 11:02:28 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C690614D;
-        Mon, 16 May 2022 08:02:27 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24GEVQQ7028008;
-        Mon, 16 May 2022 15:02:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=QkMVbFtwZD1tLwGNk/dD7Wk+74tSw+UJgVhrzJFNTl8=;
- b=erjO93In25RVpIsXk+gYIn4tt6aXZPH+MD+uJ47Be+UNe8Rldm199nktnsuBTPVsP1pt
- oSfmzxeGyDfG/XaAO0EHRDKD1OyPSexUg/3uokOS6rtS9yls9Gzfd5sEo3RSWasf6Pbq
- qupWVLk+bWjK0xlVOFXTC11EG0K4j57UvBZlsMqfoJcLu+d9OB0Btgl2mQrN191+CCWU
- GhmtCj408xjLGAJqZw3HdNGt3JKvyfRnMbNuZIhGkx5XwiVeRO36TDpDUCjr0YIqETha
- ufvhwcLR5QZKfqSnWO3fH9uHB0OYHJcSOMVhF67CBKZPkmX0SuKsokvVFCmW11RdRjj1 TQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g3rey0ske-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 May 2022 15:02:26 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24GEWWBP031064;
-        Mon, 16 May 2022 15:02:26 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g3rey0sjq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 May 2022 15:02:26 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24GF2LlA013520;
-        Mon, 16 May 2022 15:02:23 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03fra.de.ibm.com with ESMTP id 3g2428t8cf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 May 2022 15:02:23 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24GF1nUI35258826
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 16 May 2022 15:01:49 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 41A27A4055;
-        Mon, 16 May 2022 15:02:20 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E256DA404D;
-        Mon, 16 May 2022 15:02:19 +0000 (GMT)
-Received: from [9.145.28.156] (unknown [9.145.28.156])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 16 May 2022 15:02:19 +0000 (GMT)
-Message-ID: <a78d4b62-87a9-3095-b7bb-0d333a4657b2@linux.ibm.com>
-Date:   Mon, 16 May 2022 17:02:19 +0200
+        with ESMTP id S230372AbiEPPOo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 11:14:44 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 624E93BA6B
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 08:14:43 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id q7so3311376plx.3
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 08:14:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=18f9yUH1/w73tmifgqC4XWy7DHTtV6nZ9pn9JLOs8G4=;
+        b=BMoeDTwmiLVu4Yp7Hb0ZS2ktRN19j8if9lN2p7YpJuwfvZMETAPUAdeU+YJo8AMPlg
+         MCmCHbU/CKD+LiJ4Pjfxlbhvfk/1AnBjSBNX8oqKjnw2ya2zf2vVny5Md7+vJt+qJmrb
+         BUOkJ4YyEHH5sBZGFEGxEMDm4W4V9BG0n98a8oqKwLXaVlrIeEkMuA2dKL21KgzGM9Az
+         4SxA5msjI+ifRYKYSZrH/gue3IMkfqclFB9pBj2pz1khU112i/89GzVXLgdUDbOb4R1b
+         46QRgkkcE/HkoH2njsKRysihh3Y2ZFmA78C3nh8fkKStwO/MW/69ph4fWii92pqlgvno
+         b92A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=18f9yUH1/w73tmifgqC4XWy7DHTtV6nZ9pn9JLOs8G4=;
+        b=QID+IFmOGzGGeIHUmRwSHvhJGzvCV7nUbma8BQatpk4NBaC77CJmJKOWgy4uq0Qfj5
+         U36b1xoIm6XRm1aeGWoDQHxW+rRByQaWVUujVtYZvdqX7dlrrKBM9mUhs9j/yKQQibXj
+         CLKwHjVZxfsW3ofhBdL5dvqQevbShea2rboo+8cKp0O84pF4ff4v75hVwocf4dfvzbUg
+         dLhFmxMjrAyQFQD6sQcJR8KaeRLw9FuC3J0k6qW/Fc1Oi6Qec3MmmXfujwBQXjnpkIpM
+         9U0xA3lIsFhmIWXSdm3RjCI6O/c4ebiC092+2IbWpozsuwLr9rdwBdTRpKvFyuYs8W4N
+         PTcA==
+X-Gm-Message-State: AOAM531L1LJIITh8A1HNZzPr5zTqaCVDTzj1RWQWJlNEl0968uvxoFhp
+        lU7ZBGXL0I0Ezs4kMCYUYP/wPQ==
+X-Google-Smtp-Source: ABdhPJyl+1yfgFUS4YuuskID0E4r3jxMJV3EP+gpOW8qxwgxQr3JeLBasBIfZBXK57mOkF0wiRRWBg==
+X-Received: by 2002:a17:903:288:b0:15f:4cc6:3195 with SMTP id j8-20020a170903028800b0015f4cc63195mr17620427plr.45.1652714082615;
+        Mon, 16 May 2022 08:14:42 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id b12-20020a17090a5a0c00b001ded49491basm198821pjd.2.2022.05.16.08.14.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 May 2022 08:14:41 -0700 (PDT)
+Date:   Mon, 16 May 2022 15:14:36 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Uros Bizjak <ubizjak@gmail.com>,
+        Peter Zijlstra <peterz@infradead.org>, X86 ML <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Will Deacon <will@kernel.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Marco Elver <elver@google.com>
+Subject: Re: [PATCH] locking/atomic/x86: Introduce try_cmpxchg64
+Message-ID: <YoJqXMN38b8dYwyY@google.com>
+References: <20220510154217.5216-1-ubizjak@gmail.com>
+ <20220510165506.GP76023@worktop.programming.kicks-ass.net>
+ <CAFULd4aNME5s2zGOO0A11kdjfHekH=ceSH7jUfAhmZaJWHv9cQ@mail.gmail.com>
+ <20220511075409.GX76023@worktop.programming.kicks-ass.net>
+ <CAFULd4aXpt_pnCR5OK5B1m5sErfB3uj_ez=-KW7=0qQheEdVzA@mail.gmail.com>
+ <Ynven5y2u9WNfwK+@google.com>
+ <CAFULd4bZDO5-3T4q9fanHFrRTDj8v6fypiTc=dFPO9Rp61g9eQ@mail.gmail.com>
+ <fcf55234cfb95600d412322fba4dc9d0c9a1d7f4.camel@redhat.com>
+ <YoJayBWZF3mUnYS6@google.com>
+ <9ed2fc294bf2c21b41b22605ff8039bb71903712.camel@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [kvm-unit-tests PATCH 2/6] s390x: uv-host: Add uninitialized UV
- tests
-Content-Language: en-US
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        kvm390 mailing list 
-        <kvm390-list@tuxmaker.boeblingen.de.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        imbrenda@linux.ibm.com, thuth@redhat.com, nrb@linux.ibm.com,
-        scgl@linux.ibm.com
-References: <20220513095017.16301-1-frankja@linux.ibm.com>
- <20220513095017.16301-3-frankja@linux.ibm.com>
-From:   Steffen Eiden <seiden@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <20220513095017.16301-3-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Rwu05y3Vpjd0EcJMrYKYFyi3ADEmGFUE
-X-Proofpoint-ORIG-GUID: 6cep35YawpwIowQtxfnuBgH9rqP_d4N1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-16_14,2022-05-16_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 mlxscore=0 impostorscore=0 lowpriorityscore=0
- phishscore=0 adultscore=0 suspectscore=0 mlxlogscore=999 spamscore=0
- clxscore=1015 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205160086
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9ed2fc294bf2c21b41b22605ff8039bb71903712.camel@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 5/13/22 11:50, Janosch Frank wrote:
-> Let's also test for rc 0x3
+On Mon, May 16, 2022, Maxim Levitsky wrote:
+> On Mon, 2022-05-16 at 14:08 +0000, Sean Christopherson wrote:
+> > On Mon, May 16, 2022, Maxim Levitsky wrote:
+> > > On Wed, 2022-05-11 at 21:54 +0200, Uros Bizjak wrote:
+> > > > On Wed, May 11, 2022 at 6:04 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > > > On Wed, May 11, 2022, Uros Bizjak wrote:
+> > > > > > On Wed, May 11, 2022 at 9:54 AM Peter Zijlstra <peterz@infradead.org> wrote:
+> > > > > > > Still, does 32bit actually support that stuff?
+> > > > > > 
+> > > > > > Unfortunately, it does:
+> > > > > > 
+> > > > > > kvm-intel-y        += vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+> > > > > >                vmx/evmcs.o vmx/nested.o vmx/posted_intr.o
+> > > > > > 
+> > > > > > And when existing cmpxchg64 is substituted with cmpxchg, the
+> > > > > > compilation dies for 32bits with:
+> > > > > 
+> > > > > ...
+> > > > > 
+> > > > > > > Anyway, your patch looks about right, but I find it *really* hard to
+> > > > > > > care about 32bit code these days.
+> > > > > > 
+> > > > > > Thanks, this is also my sentiment, but I hope the patch will enable
+> > > > > > better code and perhaps ease similar situation I have had elsewhere.
+> > > > > 
+> > > > > IMO, if we merge this it should be solely on the benefits to 64-bit code.  Yes,
+> > > > > KVM still supports 32-bit kernels, but I'm fairly certain the only people that
+> > > > > run 32-bit KVM are KVM developers.  32-bit KVM has been completely broken for
+> > > > > multiple releases at least once, maybe twice, and no one ever complained.
+> > > > 
+> > > > Yes, the idea was to improve cmpxchg64 with the implementation of
+> > > > try_cmpxchg64 for 64bit targets. However, the issue with 32bit targets
+> > > > stood in the way, so the effort with 32-bit implementation was mainly
+> > > > to unblock progression for 64-bit targets.
+> > > 
+> > > Would that allow tdp mmu to work on 32 bit?
+> > 
+> > From a purely technical perspective, there's nothing that prevents enabling the
+> > TDP MMU on 32-bit kernels.  The TDP MMU is 64-bit only to simplify the implementation
+> > and to reduce the maintenance and validation costs.
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
-I, however, have some nits below.
+> I understand exactly that, so the question, will this patch help make the tdp
+> mmu work transparently on 32 bit kernels? I  heard that 64 bit cmpxchg was
+> one of the main reasons that it is 64 bit only.
 
-> ---
->   s390x/uv-host.c | 78 +++++++++++++++++++++++++++++++++++++++++++++++--
->   1 file changed, 76 insertions(+), 2 deletions(-)
-> 
-> diff --git a/s390x/uv-host.c b/s390x/uv-host.c
-> index 0f0b18a1..f846fc42 100644
-> --- a/s390x/uv-host.c
-> +++ b/s390x/uv-host.c
-> @@ -83,6 +83,24 @@ static void test_priv(void)
->   	report_prefix_pop();
->   }
->   
-> +static void test_uv_uninitialized(void)
-> +{
-> +	struct uv_cb_header uvcb = {};
-> +	int i;
-> +
-> +	report_prefix_push("uninitialized");
-> +
-> +	/* i = 1 to skip over initialize */
-> +	for (i = 1; cmds[i].name; i++) {
-> +		expect_pgm_int();
-> +		uvcb.cmd = cmds[i].cmd;
-> +		uvcb.len = cmds[i].len;
-> +		uv_call_once(0, (uint64_t)&uvcb);
-> +		report(uvcb.rc == UVC_RC_INV_STATE, "%s", cmds[i].name);
-> +	}
-> +	report_prefix_pop();
-> +}
-> +
->   static void test_config_destroy(void)
->   {
->   	int rc;
-> @@ -477,13 +495,68 @@ static void test_invalid(void)
->   	report_prefix_pop();
->   }
->   
-> +static void test_clear_setup(void)
-maybe rename this to setup_test_clear(void)
-I initially mistook this function as a test and not a setup function for
-a test
+I don't think it moves the needled much, e.g. non-atomic 64-bit accesses are still
+problematic, and we'd have to update the TDP MMU to deal with PAE paging (thanks
+NPT).  All those problems are solvable, it's purely a matter of the ongoing costs
+to solve them.
 
-> +{
-> +	unsigned long vsize;
-> +	int rc;
-> +
-> +	uvcb_cgc.header.cmd = UVC_CMD_CREATE_SEC_CONF;
-> +	uvcb_cgc.header.len = sizeof(uvcb_cgc);
-> +
-> +	uvcb_cgc.guest_stor_origin = 0;
-> +	uvcb_cgc.guest_stor_len = 42 * (1UL << 20);
-> +	vsize = uvcb_qui.conf_base_virt_stor_len +
-> +		((uvcb_cgc.guest_stor_len / (1UL << 20)) * uvcb_qui.conf_virt_var_stor_len);
-> +
-> +	uvcb_cgc.conf_base_stor_origin = (uint64_t)memalign(PAGE_SIZE * 4, uvcb_qui.conf_base_phys_stor_len);
-> +	uvcb_cgc.conf_var_stor_origin = (uint64_t)memalign(PAGE_SIZE, vsize);
-> +	uvcb_cgc.guest_asce = (uint64_t)memalign(PAGE_SIZE, 4 * PAGE_SIZE) | ASCE_DT_SEGMENT | REGION_TABLE_LENGTH | ASCE_P;
-> +	uvcb_cgc.guest_sca = (uint64_t)memalign(PAGE_SIZE * 4, PAGE_SIZE * 4);
-> +
-> +	rc = uv_call(0, (uint64_t)&uvcb_cgc);
-> +	assert(rc == 0);
-> +
-> +	uvcb_csc.header.len = sizeof(uvcb_csc);
-> +	uvcb_csc.header.cmd = UVC_CMD_CREATE_SEC_CPU;
-> +	uvcb_csc.guest_handle = uvcb_cgc.guest_handle;
-> +	uvcb_csc.stor_origin = (unsigned long)memalign(PAGE_SIZE, uvcb_qui.cpu_stor_len);
-> +	uvcb_csc.state_origin = (unsigned long)memalign(PAGE_SIZE, PAGE_SIZE);
-> +
-> +	rc = uv_call(0, (uint64_t)&uvcb_csc);
-> +	assert(rc == 0);
-> +}
-> +
->   static void test_clear(void)
->   {
-> -	uint64_t *tmp = (void *)uvcb_init.stor_origin;
-> +	uint64_t *tmp;
-> +
-> +	report_prefix_push("load normal reset");
-> +
-> +	/*
-> +	 * Setup a config and a cpu so we can check if a diag308 reset
-> +	 * clears the donated memory and makes the pages unsecure.
-> +	 */
-> +	test_clear_setup();
->   
->   	diag308_load_reset(1);
->   	sclp_console_setup();
-> -	report(!*tmp, "memory cleared after reset 1");
-> +
-> +	tmp = (void *)uvcb_init.stor_origin;
-> +	report(!*tmp, "uv init donated memory cleared");
-> +
-> +	tmp = (void *)uvcb_cgc.conf_base_stor_origin;
-> +	report(!*tmp, "config base donated memory cleared");
-> +
-> +	tmp = (void *)uvcb_cgc.conf_base_stor_origin;
-> +	report(!*tmp, "config variable donated memory cleared");
-> +
-> +	tmp = (void *)uvcb_csc.stor_origin;
-> +	report(!*tmp, "cpu donated memory cleared after reset 1");
-> +
-> +	/* Check if uninitialized after reset */
-> +	test_uv_uninitialized();
-> +
-> +	report_prefix_pop();
->   }
->   
->   static void setup_vmem(void)
-> @@ -514,6 +587,7 @@ int main(void)
->   
->   	test_priv();
->   	test_invalid();
-> +	test_uv_uninitialized();
->   	test_query();
->   	test_init();
-IIRC this test must be done last, as a following test has an 
-uninitialized UV. Maybe add a short comment for that here.
->   
+> I am asking because there was some talk to eliminate the direct mode from the
+> legacy non tdp mmu, which would simplify its code by a lot, but then it will
+> make 32 bit kernel fail back to shadowing mmu.
 
+Simplify which code?  Between the nonpaging code and direct shadow pages in
+indirect MMUs, the vast majority of the "direct" support in the legacy MMU needs
+to be kept even if TDP support is dropped.  And the really nasty stuff, e.g. PAE
+roots, would need to be carried over to the TDP MMU.
