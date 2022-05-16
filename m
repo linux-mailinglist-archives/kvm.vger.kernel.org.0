@@ -2,119 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C28E52865A
+	by mail.lfdr.de (Postfix) with ESMTP id DEB0652865B
 	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 16:04:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243210AbiEPODf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 10:03:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45848 "EHLO
+        id S244187AbiEPOET (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 10:04:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229873AbiEPODd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 10:03:33 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B00543915C
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 07:03:32 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id c14so14136948pfn.2
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 07:03:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Z2ZfS+9I/wy5JN0Sq7cHmJHxuA7sRrJdvs6Dlp91gDo=;
-        b=gBL9REUt+JUXaQa8pxDv1sRIJQFSQTUfql9JI+c9aQj6dJqthI27vp5ESB4Ck90e4n
-         sAAaCcF/IW8soholXn8GLNigLp7AoHvBksA/pIkTX6b8CxuSaU7Hvk2TPSS4hprgic5m
-         2dew7nuz4aXhZ9HbqUgiT6Np2s6BfB2z5dH7aBAIh2vk3d3QYuFDcbWqpEAqmvQjC4LM
-         o5xOOaOLKz4A2OwLYMcUmR9A8s+sWYNbBRDDjELF0WFnubC4o8gb4kga9LnoJZ5R9YK4
-         X6mZWixuwrNdiGn6VvpkjmVhmCnctpWe+Ed+7oTq8ywN1CkqEormhLpjn1N0YL2mawZ8
-         mYUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Z2ZfS+9I/wy5JN0Sq7cHmJHxuA7sRrJdvs6Dlp91gDo=;
-        b=XsodPKF4o+7JQRLNCslgYzdlfsqTCrvSOCXaP9oYeySgkAty32JCZL++ETMX8LwA8X
-         gM91S47mUO8qRMC8UGOXhAOj5ZaFYwnimMUAnvr+fMy6L8pJMkt9TcAPmsiR8hof04H1
-         L+b8GKK0F7a9esQdOMz/3WvoRArAzx4pDwIzFY2eIaYCdZuui+q35twUl4BHsiSxyjed
-         UCXwpkDz5xkjR9IUW2pVFS8soIO/dahpUTqX9aZp8VPPZnL1zqycPj6X25X6GNSaPb4F
-         k66Eor7QVoRZeKhOuXAApv/eMMUCmVq/8Ms9yjZEPbd26abS7uWUXaICUTfw8fPAOl7Y
-         xafQ==
-X-Gm-Message-State: AOAM533wu8LQrmbFx9X/CnBd3qsks98L/QemwS/2mMcxCARoT1rga+IU
-        elzzW3HhqlLxCl7Obcd//AT9Bw==
-X-Google-Smtp-Source: ABdhPJy2NKfocT0FlvBFbTqqn7/P9nwZ7had2nn7lhxLdZ4ljNIiqZN3BfYR70FMmWIwNiXkahbCbg==
-X-Received: by 2002:a63:534b:0:b0:3db:aa8f:ff1e with SMTP id t11-20020a63534b000000b003dbaa8fff1emr12358168pgl.570.1652709811941;
-        Mon, 16 May 2022 07:03:31 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b1-20020a056a000a8100b0050dc76281c1sm6929535pfl.155.2022.05.16.07.03.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 May 2022 07:03:31 -0700 (PDT)
-Date:   Mon, 16 May 2022 14:03:28 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Jim Mattson <jmattson@google.com>, x86@kernel.org,
+        with ESMTP id S233234AbiEPOEO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 10:04:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3BA3039B9F
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 07:04:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652709853;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=msH0fbWMB2FjlFoGW4LyhQTRlos1WPFFFL4WveZKmPQ=;
+        b=CL2VQK7dvCcVHwRyBR86Ni+0Xawuzz7dsINmJ+beYEOnH+Kt2t13UAQ/02nPP58VU9R6tR
+        wvkRV4YHszrwBQVJpwfIj4owhI9KW1XZkUKYNqY0uGtqgwEVpypEjRYPKrTDp0RC9HQ/rK
+        +mZ/pAeu4gYX7uJRbAOpBU0vY/ahU4o=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-558-HFWdWCckNxiAyEOTdL7HQw-1; Mon, 16 May 2022 10:04:09 -0400
+X-MC-Unique: HFWdWCckNxiAyEOTdL7HQw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4037D89B841;
+        Mon, 16 May 2022 14:04:08 +0000 (UTC)
+Received: from starship (unknown [10.40.192.55])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CC86D2026D64;
+        Mon, 16 May 2022 14:04:04 +0000 (UTC)
+Message-ID: <fcf55234cfb95600d412322fba4dc9d0c9a1d7f4.camel@redhat.com>
+Subject: Re: [PATCH] locking/atomic/x86: Introduce try_cmpxchg64
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Uros Bizjak <ubizjak@gmail.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>, X86 ML <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH] KVM: x86: fix a typo in __try_cmpxchg_user that caused
- cmpxchg to be not atomic
-Message-ID: <YoJZsJvq3YQ4xTWN@google.com>
-References: <20220202004945.2540433-5-seanjc@google.com>
- <20220512101420.306759-1-mlevitsk@redhat.com>
- <87e16c11-d57b-92cd-c10b-21d855f475ef@redhat.com>
- <Yn17urxf7vprODed@google.com>
- <f05dcf66ed2bfb7d113ce0d9a261569959265c68.camel@redhat.com>
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Will Deacon <will@kernel.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Marco Elver <elver@google.com>
+Date:   Mon, 16 May 2022 17:04:03 +0300
+In-Reply-To: <CAFULd4bZDO5-3T4q9fanHFrRTDj8v6fypiTc=dFPO9Rp61g9eQ@mail.gmail.com>
+References: <20220510154217.5216-1-ubizjak@gmail.com>
+         <20220510165506.GP76023@worktop.programming.kicks-ass.net>
+         <CAFULd4aNME5s2zGOO0A11kdjfHekH=ceSH7jUfAhmZaJWHv9cQ@mail.gmail.com>
+         <20220511075409.GX76023@worktop.programming.kicks-ass.net>
+         <CAFULd4aXpt_pnCR5OK5B1m5sErfB3uj_ez=-KW7=0qQheEdVzA@mail.gmail.com>
+         <Ynven5y2u9WNfwK+@google.com>
+         <CAFULd4bZDO5-3T4q9fanHFrRTDj8v6fypiTc=dFPO9Rp61g9eQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f05dcf66ed2bfb7d113ce0d9a261569959265c68.camel@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 16, 2022, Maxim Levitsky wrote:
-> On Thu, 2022-05-12 at 21:27 +0000, Sean Christopherson wrote:
-> > On Thu, May 12, 2022, Paolo Bonzini wrote:
-> > > On 5/12/22 12:14, Maxim Levitsky wrote:
-> > > > Yes, this is the root cause of the TDP mmu leak I was doing debug of in the last week.
-> > > > Non working cmpxchg on which TDP mmu relies makes it install two differnt shadow pages
-> > > > under same spte.
+On Wed, 2022-05-11 at 21:54 +0200, Uros Bizjak wrote:
+> On Wed, May 11, 2022 at 6:04 PM Sean Christopherson <seanjc@google.com> wrote:
+> > On Wed, May 11, 2022, Uros Bizjak wrote:
+> > > On Wed, May 11, 2022 at 9:54 AM Peter Zijlstra <peterz@infradead.org> wrote:
+> > > > Still, does 32bit actually support that stuff?
 > > > 
-> > > Awesome!  And queued, thanks.
+> > > Unfortunately, it does:
+> > > 
+> > > kvm-intel-y        += vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+> > >                vmx/evmcs.o vmx/nested.o vmx/posted_intr.o
+> > > 
+> > > And when existing cmpxchg64 is substituted with cmpxchg, the
+> > > compilation dies for 32bits with:
 > > 
-> > If you haven't done so already, can you add 
+> > ...
 > > 
-> >   Cc: stable@vger.kernel.org
-> 
-> When I posted my patch, I checked that the patch didn't reach mainline yet,
-> so I assumed that it won't be in -stable either yet, although it was CCed there.
-
-Yeah, it should hit stable trees because of the explicit stable@.  The Fixes: on
-this patch is likely enough, but no harm in being paranoid.
-
-> > Also, given that we have concrete proof that not honoring atomic accesses can have
-> > dire consequences for the guest, what about adding a capability to turn the emul_write
-> > path into an emulation error?
+> > > > Anyway, your patch looks about right, but I find it *really* hard to
+> > > > care about 32bit code these days.
+> > > 
+> > > Thanks, this is also my sentiment, but I hope the patch will enable
+> > > better code and perhaps ease similar situation I have had elsewhere.
 > > 
+> > IMO, if we merge this it should be solely on the benefits to 64-bit code.  Yes,
+> > KVM still supports 32-bit kernels, but I'm fairly certain the only people that
+> > run 32-bit KVM are KVM developers.  32-bit KVM has been completely broken for
+> > multiple releases at least once, maybe twice, and no one ever complained.
 > 
-> 
-> This is a good idea. It might though break some guests - I did see that
-> warning few times, that is why I wasn't alert by the fact that it started
-> showing up more often.
+> Yes, the idea was to improve cmpxchg64 with the implementation of
+> try_cmpxchg64 for 64bit targets. However, the issue with 32bit targets
+> stood in the way, so the effort with 32-bit implementation was mainly
+> to unblock progression for 64-bit targets.
 
-It mostly shows up in KUT, one of the tests deliberately triggers the scenario.
-But yeah, there's definitely potential for breakage.  Not sure if a capability or
-debug oriented module param would be best.  In theory, userspace could do a better
-job of emulating the atomic access than KVM, which makes me lean toward a capability,
-but practically speaking I doubt a userspace will ever do anything besides
-terminate the guest.
+Would that allow tdp mmu to work on 32 bit?
+
+Best regards,
+	Maxim Levitsky
+
+> 
+> Uros.
+> 
+
+
