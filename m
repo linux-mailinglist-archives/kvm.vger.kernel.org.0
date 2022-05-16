@@ -2,178 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DFA6E529290
-	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 23:19:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DEE152929E
+	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 23:19:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229824AbiEPVKS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 17:10:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36324 "EHLO
+        id S1349291AbiEPVMy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 17:12:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349266AbiEPVJx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 17:09:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4598443ED3
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 13:53:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652734416;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Jj+1GdC5ed9RjG2w4YTgAyI/dqT/LcafZe1Q5l3sISU=;
-        b=aOk/sl2mjhIhgAroI5m7xmaJJNgxyx8nnpNUu+mP9aWHsRAkz69n1QcLIBJVqvmvmUatLx
-        4Vt+g8lRtrTAuQD/P8v46Ya6YOxFjk8WWA1HXjqwnZqP5mqe9a5lLdfKR91IHVlbELd1lH
-        BpYPgaDoXJZH1ba+/w80RpsiM0ANOf0=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-649-rLlTUfQWPZybssLda8uPbQ-1; Mon, 16 May 2022 16:53:35 -0400
-X-MC-Unique: rLlTUfQWPZybssLda8uPbQ-1
-Received: by mail-ej1-f69.google.com with SMTP id gn26-20020a1709070d1a00b006f453043956so6339785ejc.15
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 13:53:34 -0700 (PDT)
+        with ESMTP id S1349694AbiEPVLn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 17:11:43 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9693C12ACD
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 13:58:33 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id i8so1664423plr.13
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 13:58:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ZBW5f9oNJuWH7Pl2cXxscrmibJPAHN6AmSJQMK5Jit8=;
+        b=KxhFeNW3NvvojTiw/RbAmyXO79f4GzKGFKyKZrWOnH81/3ots14Ppt6qyDxqaW6rps
+         Eg2Uhe79ig5ierEOr6PamgwA3X9ppGxJs4/dbxFwVfHTOltDkdODSJ5jaFTncu1hHR15
+         8vvK/K60zQ3zT8U7KZK68EZ8ftfvki5CP42MCy1y6uczqI0YHQVSA4QkADr4ughycF6q
+         g+O/tAkpxwviDmK4kYrL/gfIhB30m8Pj6WZ3QC7v5FutAOemz6XuGQFUVHCGI+oEtZMY
+         Q2LmkYsPFwkkkaK/Bvpe72pR5ZQ9cYyXA8iOUehIzYF2O54N+gNQSZMOSxTP5VHBcybS
+         2vlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=Jj+1GdC5ed9RjG2w4YTgAyI/dqT/LcafZe1Q5l3sISU=;
-        b=XXNdFj4uR3y7Cp7Sz3eI7LPx8cl1Ba1hyISKPwDEWLds1Q2+YD7oNlZcM5bGuUWre6
-         sBrTi+3FZ1Txlc7wDQJrOQ+r9bt9rxZPJYzWu2KrNOZMhqGjhwnjO2/x94SWZPMCYZBJ
-         CmFZUU/8UxFo3gTdzGxbLBKiR1j9H63MI67jpWiAYWoyTIeTVUH79abIynCaBiMC7RZ/
-         vSXAhDEi7uOHS/69Sh/d+OiNrkSiL4Yy3eo+C29H1a7d+PyAzP+Fnjl4Qx1519rQm7yP
-         8Pb/VlpbN6adjTz9iAbPdgxwIfNtiIuSGGPOXGa0qc4Iye85Sd/X9fk8yXry2qtZz/bX
-         kpxw==
-X-Gm-Message-State: AOAM531OA/qYuAZXWZUjm+SG6dWUibn72YoeknWAd88mMPi1eMn7DZDn
-        PNYSdnkODOY6OlQQ1tpQV8Txpq/NW6pmelVyIlLNlzYD4YnC4RK4VPKkGOif/3+rp0cJm0yi1Sn
-        pE2WqWvFTCKgH
-X-Received: by 2002:a50:ea8b:0:b0:428:7d05:eb7e with SMTP id d11-20020a50ea8b000000b004287d05eb7emr14878210edo.185.1652734413854;
-        Mon, 16 May 2022 13:53:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw2KCqWfRikajj4wIQWOtpCghzr69gRHuvpcIhTWpWoTu9HLy2ox3hPwr0mjBMz5Umcz1ed7Q==
-X-Received: by 2002:a50:ea8b:0:b0:428:7d05:eb7e with SMTP id d11-20020a50ea8b000000b004287d05eb7emr14878187edo.185.1652734413670;
-        Mon, 16 May 2022 13:53:33 -0700 (PDT)
-Received: from redhat.com ([2.55.131.38])
-        by smtp.gmail.com with ESMTPSA id g26-20020a056402181a00b0042617ba638esm5627992edy.24.2022.05.16.13.53.30
+        bh=ZBW5f9oNJuWH7Pl2cXxscrmibJPAHN6AmSJQMK5Jit8=;
+        b=Gq7repCvjoRjUF0scNZOczxOmkUOxQNGI8+GCRrSTQzWp5mfq1zOh7OFZ3mWEiUwb8
+         inI15Q17hSU1Y+V/eht9RFqSL8RHG131bX6cmUAwWRqCcntwY/R19wdvRC/7Nnw2HWGh
+         lB5HiV9j3OyhH1zF/wgOZVqlOyAoWWBIBVVCmQf/BxU0E1O8SyST2+QNy7kvDVbjqihw
+         0w0+HYx484WsJc+0qjYWD4J4VgZ2QSuS7qj8nEh/lBobEJoXv7D3CHHAL7UA25DRzgz3
+         KJdDXwymckpWmX7hVSETxOCHDSTdTZLyJuyv0Xzw76vDO9D6IBpD9fehze/Ff3wzqYrx
+         vPBA==
+X-Gm-Message-State: AOAM533GBy3Vh+r/m/cR7Udnmh1Ileqq3ip1rQshtRyUId4+AGJ4h8nQ
+        BcOhR3xYej+Yrzlk7vrjKkdX6A==
+X-Google-Smtp-Source: ABdhPJxRQwGCNO0hflWvXv7RtPZp3F4Rxnm+jrmINmmFGcQx90QTYHXzd4Izu1KEOamoad5n5xd8LQ==
+X-Received: by 2002:a17:90b:3901:b0:1dc:5a24:691 with SMTP id ob1-20020a17090b390100b001dc5a240691mr32815900pjb.40.1652734712911;
+        Mon, 16 May 2022 13:58:32 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id ja1-20020a170902efc100b001617e18e253sm2538839plb.143.2022.05.16.13.58.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 May 2022 13:53:33 -0700 (PDT)
-Date:   Mon, 16 May 2022 16:53:29 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Peter Maydell <peter.maydell@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Claudio Fontana <cfontana@suse.de>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
-Subject: [PULL v2 49/86] target/i386: Fix sanity check on max APIC ID /
- X2APIC enablement
-Message-ID: <20220516204913.542894-50-mst@redhat.com>
-References: <20220516204913.542894-1-mst@redhat.com>
+        Mon, 16 May 2022 13:58:32 -0700 (PDT)
+Date:   Mon, 16 May 2022 20:58:29 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        kvmarm@vger.kernel.org
+Subject: Re: [PATCH 1/5] KVM: Shove vm stats_id init into
+ kvm_create_vm_debugfs()
+Message-ID: <YoK69aQ6kVmzdrVu@google.com>
+References: <20220415201542.1496582-1-oupton@google.com>
+ <20220415201542.1496582-2-oupton@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220516204913.542894-1-mst@redhat.com>
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220415201542.1496582-2-oupton@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Woodhouse <dwmw2@infradead.org>
+On Fri, Apr 15, 2022, Oliver Upton wrote:
+> The field is only ever used for debugfs; put the initialization where
+> it belongs.
 
-The check on x86ms->apic_id_limit in pc_machine_done() had two problems.
+No?
 
-Firstly, we need KVM to support the X2APIC API in order to allow IRQ
-delivery to APICs >= 255. So we need to call/check kvm_enable_x2apic(),
-which was done elsewhere in *some* cases but not all.
+static ssize_t kvm_vm_stats_read(struct file *file, char __user *user_buffer,
+			      size_t size, loff_t *offset)
+{
+	struct kvm *kvm = file->private_data;
 
-Secondly, microvm needs the same check. So move it from pc_machine_done()
-to x86_cpus_init() where it will work for both.
+	return kvm_stats_read(kvm->stats_id, &kvm_vm_stats_header,
+				&kvm_vm_stats_desc[0], &kvm->stat,
+				sizeof(kvm->stat), user_buffer, size, offset);
+}
 
-The check in kvm_cpu_instance_init() is now redundant and can be dropped.
+static const struct file_operations kvm_vm_stats_fops = {
+	.read = kvm_vm_stats_read,
+	.llseek = noop_llseek,
+};
 
-Signed-off-by: David Woodhouse <dwmw2@infradead.org>
-Acked-by: Claudio Fontana <cfontana@suse.de>
-Message-Id: <20220314142544.150555-1-dwmw2@infradead.org>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/i386/pc.c              |  8 --------
- hw/i386/x86.c             | 16 ++++++++++++++++
- target/i386/kvm/kvm-cpu.c |  2 +-
- 3 files changed, 17 insertions(+), 9 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 312eb9e400..15f37d8dc6 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -744,14 +744,6 @@ void pc_machine_done(Notifier *notifier, void *data)
-         /* update FW_CFG_NB_CPUS to account for -device added CPUs */
-         fw_cfg_modify_i16(x86ms->fw_cfg, FW_CFG_NB_CPUS, x86ms->boot_cpus);
-     }
--
--
--    if (x86ms->apic_id_limit > 255 && !xen_enabled() &&
--        !kvm_irqchip_in_kernel()) {
--        error_report("current -smp configuration requires kernel "
--                     "irqchip support.");
--        exit(EXIT_FAILURE);
--    }
- }
- 
- void pc_guest_info_init(PCMachineState *pcms)
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index 79ebdface6..f79e720cc2 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -38,6 +38,7 @@
- #include "sysemu/replay.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/cpu-timers.h"
-+#include "sysemu/xen.h"
- #include "trace.h"
- 
- #include "hw/i386/x86.h"
-@@ -122,6 +123,21 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
-      */
-     x86ms->apic_id_limit = x86_cpu_apic_id_from_index(x86ms,
-                                                       ms->smp.max_cpus - 1) + 1;
-+
-+    /*
-+     * Can we support APIC ID 255 or higher?
-+     *
-+     * Under Xen: yes.
-+     * With userspace emulated lapic: no
-+     * With KVM's in-kernel lapic: only if X2APIC API is enabled.
-+     */
-+    if (x86ms->apic_id_limit > 255 && !xen_enabled() &&
-+        (!kvm_irqchip_in_kernel() || !kvm_enable_x2apic())) {
-+        error_report("current -smp configuration requires kernel "
-+                     "irqchip and X2APIC API support.");
-+        exit(EXIT_FAILURE);
-+    }
-+
-     possible_cpus = mc->possible_cpu_arch_ids(ms);
-     for (i = 0; i < ms->smp.cpus; i++) {
-         x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id, &error_fatal);
-diff --git a/target/i386/kvm/kvm-cpu.c b/target/i386/kvm/kvm-cpu.c
-index 5eb955ce9a..7237378a7d 100644
---- a/target/i386/kvm/kvm-cpu.c
-+++ b/target/i386/kvm/kvm-cpu.c
-@@ -171,7 +171,7 @@ static void kvm_cpu_instance_init(CPUState *cs)
-         /* only applies to builtin_x86_defs cpus */
-         if (!kvm_irqchip_in_kernel()) {
-             x86_cpu_change_kvm_default("x2apic", "off");
--        } else if (kvm_irqchip_is_split() && kvm_enable_x2apic()) {
-+        } else if (kvm_irqchip_is_split()) {
-             x86_cpu_change_kvm_default("kvm-msi-ext-dest-id", "on");
-         }
- 
--- 
-MST
-
+And with a name like kvm->stats_id, debugfs seems like it's piggbacking stats,
+not the other way 'round.
