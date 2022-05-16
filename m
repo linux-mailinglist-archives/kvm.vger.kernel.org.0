@@ -2,241 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BA38528221
-	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 12:32:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DE5B052823E
+	for <lists+kvm@lfdr.de>; Mon, 16 May 2022 12:38:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236110AbiEPKcX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 06:32:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56760 "EHLO
+        id S233014AbiEPKii (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 06:38:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234217AbiEPKcV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 06:32:21 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A44419C2C;
-        Mon, 16 May 2022 03:32:20 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24G9GC45022936;
-        Mon, 16 May 2022 10:32:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=akLgE8JmtI978ECDEba7uWKzQivTvZxU+oj4apcHYgU=;
- b=Q41Fg0DUFTDDN+oa4GGQ3caABT4ovWd4zf90XaiwTE2LS9TR5sVTvZyq5z9gGwCusjMA
- Ddvj2GGVNqge0ZgluefcFlaXY6/UZ0E06V2OAlEa5SZ2BMo21ncRi/bsW1Pd2U+w1G53
- o+ZfVj7g85ay0pinzR1SvuHSHLGAuZTmn7rCni/JLtgSInWWxx2x8JU1z8uQNtGtsaPA
- /ahY29L8cvkdUVkguyYAUJbrVRqY9xpCHmT21CB3C8WCZT2oWo5558FfsxKupih7omvC
- SGExt7Jve8H4bYilg8ThdO2UgvuMO/PFED/paB4M4u8zxhkDDxMBDB6nvkh6suHXkpdt 3Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g3ku5hd1g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 May 2022 10:32:19 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24GATXCs001083;
-        Mon, 16 May 2022 10:32:19 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g3ku5hd0q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 May 2022 10:32:19 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24GAJlHr010951;
-        Mon, 16 May 2022 10:32:16 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04fra.de.ibm.com with ESMTP id 3g2428swth-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 May 2022 10:32:16 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24GAWDGG49873180
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 16 May 2022 10:32:13 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 82598A4057;
-        Mon, 16 May 2022 10:32:13 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AD22AA4055;
-        Mon, 16 May 2022 10:32:12 +0000 (GMT)
-Received: from [9.171.15.172] (unknown [9.171.15.172])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 16 May 2022 10:32:12 +0000 (GMT)
-Message-ID: <adb213f6-728f-65c1-8afd-3afd0c9a40c9@linux.ibm.com>
-Date:   Mon, 16 May 2022 12:36:01 +0200
+        with ESMTP id S229569AbiEPKie (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 06:38:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A42F822BDA
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 03:38:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652697511;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Jj+1GdC5ed9RjG2w4YTgAyI/dqT/LcafZe1Q5l3sISU=;
+        b=FJGGyhhM72HKuchvDIiMHYnSSKf0cOy2VQG+CPGQU3VCanQIyeanYI1pL94aM37MeMvYsf
+        kZKa5rIZLZcQYH0JssJ44FP3uMy6gMDl/f6uQelGB/K3VH5CGLmzkUmnmIjdINs5jF8qd9
+        PX+OPsiesybY++nZds5vy8uUxY9pkGY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-410-01a7nTQBMU6tF5O7kRRXhA-1; Mon, 16 May 2022 06:38:30 -0400
+X-MC-Unique: 01a7nTQBMU6tF5O7kRRXhA-1
+Received: by mail-wm1-f72.google.com with SMTP id r127-20020a1c4485000000b003970bec7fd9so76747wma.9
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 03:38:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Jj+1GdC5ed9RjG2w4YTgAyI/dqT/LcafZe1Q5l3sISU=;
+        b=ykJQb8ZIjCt6Q2n8gVAL0n0Zisq1THKHhAJseisB5+p+2Cr96EKupzFvYfoUvfIWBC
+         S5VLZPfXr/+rkaF+aAG6WVZqKucoU0DaS7llyckE9FGqqwGpGcmRRVtkB/x4+qHhPUre
+         XeZsJKtlcs7jIB4I3S2PL8X0qjkua0aE9b3murFRBVsWWDpx1g8kqGgTESV64U7F3Cwb
+         737X+59EhSv7CrYfMSQrtcHlXUkBwL6bTUAfFOuQsVEUq/N2Ug3qxCiJbhuSyHdNlctT
+         NG89Jk46Npgj43PEKYiDSwrwi66rrASX2cTuMYhl65P/CftmeAgfKFQ3Y6zaqMIQjRcL
+         Cv3Q==
+X-Gm-Message-State: AOAM532jbGbJuJPSx2kMF+n41b7BoR2QRl3UtXep0DreZ88nlPVI1JxF
+        vGSS/KTRloDY8NRhT+JZNkY8NkxoSJK5MqAHt6wskvb8WLLy5rAvG19Xcc6hDuRacZgyDcQbljD
+        UXG51pQU7s01h
+X-Received: by 2002:a5d:55cd:0:b0:20d:743:6078 with SMTP id i13-20020a5d55cd000000b0020d07436078mr4512158wrw.240.1652697509333;
+        Mon, 16 May 2022 03:38:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwuLIC5azL1kewoTfpBvgMX057eM6Y2+fItaWzmV/QKn2K7lZmZOohxOfmDTBkOuxEGXGLOtQ==
+X-Received: by 2002:a5d:55cd:0:b0:20d:743:6078 with SMTP id i13-20020a5d55cd000000b0020d07436078mr4512145wrw.240.1652697509132;
+        Mon, 16 May 2022 03:38:29 -0700 (PDT)
+Received: from redhat.com ([2.55.141.66])
+        by smtp.gmail.com with ESMTPSA id k20-20020a05600c1c9400b003942a244f38sm13893788wms.17.2022.05.16.03.38.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 May 2022 03:38:28 -0700 (PDT)
+Date:   Mon, 16 May 2022 06:38:25 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Peter Maydell <peter.maydell@linaro.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Claudio Fontana <cfontana@suse.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
+Subject: [PULL 49/91] target/i386: Fix sanity check on max APIC ID / X2APIC
+ enablement
+Message-ID: <20220516095448.507876-50-mst@redhat.com>
+References: <20220516095448.507876-1-mst@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v9 3/3] s390x: KVM: resetting the Topology-Change-Report
-Content-Language: en-US
-To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, wintera@linux.ibm.com, seiden@linux.ibm.com,
-        nrb@linux.ibm.com
-References: <20220506092403.47406-1-pmorel@linux.ibm.com>
- <20220506092403.47406-4-pmorel@linux.ibm.com>
- <76fd0c11-5b9b-0032-183b-54db650f13b1@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <76fd0c11-5b9b-0032-183b-54db650f13b1@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: IA1QXhJbV6JHVF0uUDIt9rHCLDO5bPWE
-X-Proofpoint-GUID: crkt81Jk07ExuRTOKhjmCa7G-XYl234c
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-16_06,2022-05-16_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 spamscore=0 adultscore=0 clxscore=1015 bulkscore=0
- impostorscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0
- priorityscore=1501 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2202240000 definitions=main-2205160062
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220516095448.507876-1-mst@redhat.com>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: David Woodhouse <dwmw2@infradead.org>
 
+The check on x86ms->apic_id_limit in pc_machine_done() had two problems.
 
-On 5/12/22 11:31, David Hildenbrand wrote:
-> On 06.05.22 11:24, Pierre Morel wrote:
->> During a subsystem reset the Topology-Change-Report is cleared.
->> Let's give userland the possibility to clear the MTCR in the case
->> of a subsystem reset.
->>
->> To migrate the MTCR, let's give userland the possibility to
->> query the MTCR state.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   arch/s390/include/uapi/asm/kvm.h |  5 ++
->>   arch/s390/kvm/kvm-s390.c         | 79 ++++++++++++++++++++++++++++++++
->>   2 files changed, 84 insertions(+)
->>
->> diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
->> index 7a6b14874d65..abdcf4069343 100644
->> --- a/arch/s390/include/uapi/asm/kvm.h
->> +++ b/arch/s390/include/uapi/asm/kvm.h
->> @@ -74,6 +74,7 @@ struct kvm_s390_io_adapter_req {
->>   #define KVM_S390_VM_CRYPTO		2
->>   #define KVM_S390_VM_CPU_MODEL		3
->>   #define KVM_S390_VM_MIGRATION		4
->> +#define KVM_S390_VM_CPU_TOPOLOGY	5
->>   
->>   /* kvm attributes for mem_ctrl */
->>   #define KVM_S390_VM_MEM_ENABLE_CMMA	0
->> @@ -171,6 +172,10 @@ struct kvm_s390_vm_cpu_subfunc {
->>   #define KVM_S390_VM_MIGRATION_START	1
->>   #define KVM_S390_VM_MIGRATION_STATUS	2
->>   
->> +/* kvm attributes for cpu topology */
->> +#define KVM_S390_VM_CPU_TOPO_MTR_CLEAR	0
->> +#define KVM_S390_VM_CPU_TOPO_MTR_SET	1
->> +
->>   /* for KVM_GET_REGS and KVM_SET_REGS */
->>   struct kvm_regs {
->>   	/* general purpose regs for s390 */
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index c8bdce31464f..80a1244f0ead 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -1731,6 +1731,76 @@ static void kvm_s390_sca_set_mtcr(struct kvm *kvm)
->>   	ipte_unlock(kvm);
->>   }
->>   
->> +/**
->> + * kvm_s390_sca_clear_mtcr
->> + * @kvm: guest KVM description
->> + *
->> + * Is only relevant if the topology facility is present,
->> + * the caller should check KVM facility 11
->> + *
->> + * Updates the Multiprocessor Topology-Change-Report to signal
->> + * the guest with a topology change.
->> + */
->> +static void kvm_s390_sca_clear_mtcr(struct kvm *kvm)
->> +{
->> +	struct bsca_block *sca = kvm->arch.sca; /* SCA version doesn't matter */
->> +
->> +	ipte_lock(kvm);
->> +	sca->utility  &= ~SCA_UTILITY_MTCR;
-> 
-> 
-> One space too much.
-> 
-> sca->utility &= ~SCA_UTILITY_MTCR;
-> 
->> +	ipte_unlock(kvm);
->> +}
->> +
->> +static int kvm_s390_set_topology(struct kvm *kvm, struct kvm_device_attr *attr)
->> +{
->> +	if (!test_kvm_facility(kvm, 11))
->> +		return -ENXIO;
->> +
->> +	switch (attr->attr) {
->> +	case KVM_S390_VM_CPU_TOPO_MTR_SET:
->> +		kvm_s390_sca_set_mtcr(kvm);
->> +		break;
->> +	case KVM_S390_VM_CPU_TOPO_MTR_CLEAR:
->> +		kvm_s390_sca_clear_mtcr(kvm);
->> +		break;
->> +	}
->> +	return 0;
->> +}
->> +
->> +/**
->> + * kvm_s390_sca_get_mtcr
->> + * @kvm: guest KVM description
->> + *
->> + * Is only relevant if the topology facility is present,
->> + * the caller should check KVM facility 11
->> + *
->> + * reports to QEMU the Multiprocessor Topology-Change-Report.
->> + */
->> +static int kvm_s390_sca_get_mtcr(struct kvm *kvm)
->> +{
->> +	struct bsca_block *sca = kvm->arch.sca; /* SCA version doesn't matter */
->> +	int val;
->> +
->> +	ipte_lock(kvm);
->> +	val = !!(sca->utility & SCA_UTILITY_MTCR);
->> +	ipte_unlock(kvm);
->> +
->> +	return val;
->> +}
->> +
->> +static int kvm_s390_get_topology(struct kvm *kvm, struct kvm_device_attr *attr)
->> +{
->> +	int mtcr;
-> 
-> I think we prefer something like u16 when copying to user space.
+Firstly, we need KVM to support the X2APIC API in order to allow IRQ
+delivery to APICs >= 255. So we need to call/check kvm_enable_x2apic(),
+which was done elsewhere in *some* cases but not all.
 
-If you prefer.
-The original idea was to have something like a bool but then I should 
-have change get_mtcr to has_mtcr.
+Secondly, microvm needs the same check. So move it from pc_machine_done()
+to x86_cpus_init() where it will work for both.
 
+The check in kvm_cpu_instance_init() is now redundant and can be dropped.
 
-> 
->> +
->> +	if (!test_kvm_facility(kvm, 11))
->> +		return -ENXIO;
->> +
->> +	mtcr = kvm_s390_sca_get_mtcr(kvm);
->> +	if (copy_to_user((void __user *)attr->addr, &mtcr, sizeof(mtcr)))
->> +		return -EFAULT;
->> +
->> +	return 0;
->> +}
-> 
-> You should probably add documentation, and document that only the last
-> bit (0x1) has a meaning.
-> 
-> Apart from that LGTM.
-> 
+Signed-off-by: David Woodhouse <dwmw2@infradead.org>
+Acked-by: Claudio Fontana <cfontana@suse.de>
+Message-Id: <20220314142544.150555-1-dwmw2@infradead.org>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/i386/pc.c              |  8 --------
+ hw/i386/x86.c             | 16 ++++++++++++++++
+ target/i386/kvm/kvm-cpu.c |  2 +-
+ 3 files changed, 17 insertions(+), 9 deletions(-)
 
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 312eb9e400..15f37d8dc6 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -744,14 +744,6 @@ void pc_machine_done(Notifier *notifier, void *data)
+         /* update FW_CFG_NB_CPUS to account for -device added CPUs */
+         fw_cfg_modify_i16(x86ms->fw_cfg, FW_CFG_NB_CPUS, x86ms->boot_cpus);
+     }
+-
+-
+-    if (x86ms->apic_id_limit > 255 && !xen_enabled() &&
+-        !kvm_irqchip_in_kernel()) {
+-        error_report("current -smp configuration requires kernel "
+-                     "irqchip support.");
+-        exit(EXIT_FAILURE);
+-    }
+ }
+ 
+ void pc_guest_info_init(PCMachineState *pcms)
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index 79ebdface6..f79e720cc2 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -38,6 +38,7 @@
+ #include "sysemu/replay.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/cpu-timers.h"
++#include "sysemu/xen.h"
+ #include "trace.h"
+ 
+ #include "hw/i386/x86.h"
+@@ -122,6 +123,21 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
+      */
+     x86ms->apic_id_limit = x86_cpu_apic_id_from_index(x86ms,
+                                                       ms->smp.max_cpus - 1) + 1;
++
++    /*
++     * Can we support APIC ID 255 or higher?
++     *
++     * Under Xen: yes.
++     * With userspace emulated lapic: no
++     * With KVM's in-kernel lapic: only if X2APIC API is enabled.
++     */
++    if (x86ms->apic_id_limit > 255 && !xen_enabled() &&
++        (!kvm_irqchip_in_kernel() || !kvm_enable_x2apic())) {
++        error_report("current -smp configuration requires kernel "
++                     "irqchip and X2APIC API support.");
++        exit(EXIT_FAILURE);
++    }
++
+     possible_cpus = mc->possible_cpu_arch_ids(ms);
+     for (i = 0; i < ms->smp.cpus; i++) {
+         x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id, &error_fatal);
+diff --git a/target/i386/kvm/kvm-cpu.c b/target/i386/kvm/kvm-cpu.c
+index 5eb955ce9a..7237378a7d 100644
+--- a/target/i386/kvm/kvm-cpu.c
++++ b/target/i386/kvm/kvm-cpu.c
+@@ -171,7 +171,7 @@ static void kvm_cpu_instance_init(CPUState *cs)
+         /* only applies to builtin_x86_defs cpus */
+         if (!kvm_irqchip_in_kernel()) {
+             x86_cpu_change_kvm_default("x2apic", "off");
+-        } else if (kvm_irqchip_is_split() && kvm_enable_x2apic()) {
++        } else if (kvm_irqchip_is_split()) {
+             x86_cpu_change_kvm_default("kvm-msi-ext-dest-id", "on");
+         }
+ 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+MST
+
