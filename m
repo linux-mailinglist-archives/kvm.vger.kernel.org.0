@@ -2,295 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC90A52A10E
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 14:02:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2A0E52A10B
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 14:02:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345744AbiEQMBo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 08:01:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52396 "EHLO
+        id S1345698AbiEQMBk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 08:01:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346327AbiEQMBX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1346352AbiEQMBX (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 17 May 2022 08:01:23 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B8A93FBD3;
-        Tue, 17 May 2022 05:01:13 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24HBgN25015231;
-        Tue, 17 May 2022 12:01:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=8tKu96eV7gkYdRtal6CZsdy9L/PGLnBnCjiKVQiWxr0=;
- b=omKlmnw8L59buMZ/vtr4T+iEHI/NmjvpSsSsNcWgUBfygqQJhEuHUz7cD1tllH6hvU45
- tJjHTK+LyN72EcchDReDIPpesHvT7Lrwdfx8+hAckGCS8RJeAnWpgOkpEfp2Iea5nwMT
- zioIBOS6SjY/2N5sVhO/ABwQ7owsHQcQtJ4F701rjGDJD0XToYGHSKv6f/FFPiPSDl1/
- GjhHvVOjlVNjba8wH2n5toadSz1RqEgPLhDcP80GgCr3zKB8d4bFlMdgKRqUbK3EBLWB
- n3SOYmN4RDxVjXEqEQcyF1GydKrO6NHuzzn5VakaPTsUBOn8GmfeB3s+HaEHUekPv7b3 jg== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4b2jrbxb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 12:01:12 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24HBIJMO025053;
-        Tue, 17 May 2022 11:37:16 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03ams.nl.ibm.com with ESMTP id 3g2429c4ck-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 11:37:16 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24HBbDq521365078
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 May 2022 11:37:13 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 44463A405B;
-        Tue, 17 May 2022 11:37:13 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 144E9A4054;
-        Tue, 17 May 2022 11:37:13 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.40])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 17 May 2022 11:37:13 +0000 (GMT)
-Date:   Tue, 17 May 2022 13:13:31 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        borntraeger@linux.ibm.com
-Subject: Re: [PATCH v5 10/10] Documentation/virt/kvm/api.rst: Add protvirt
- dump/info api descriptions
-Message-ID: <20220517131331.42e18ed5@p-imbrenda>
-In-Reply-To: <20220516090817.1110090-11-frankja@linux.ibm.com>
-References: <20220516090817.1110090-1-frankja@linux.ibm.com>
-        <20220516090817.1110090-11-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-redhat-linux-gnu)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2062.outbound.protection.outlook.com [40.107.236.62])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7272403DE;
+        Tue, 17 May 2022 05:01:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=epX0ArgfEn8Jv3DapfO6lzXI1W9Omq7e7704YZ/zXRxN5De5l4iZyBXL2mG/Zl7Kcwpljdp3DUXR07avCsC+CjAK445heylYzzMg2cou45AcXHfTFov2xhHSGTSo+15JmBoUML3lrwruw96NFKvt4dAp2N30vbc4iFcUOLdeOG6cXkLV6xfewaylwptv9wdKpbGtT19vD8iWR2OOqYUdrvgoSAHr2cbyBjVpD99yZJsRns87k1RNkurXF6nB2eb4gxJgBNbZLVCU3iBLEMElMQ92xHofB+gQrBSfdOOg41FXtQMkdCW05QDxEfI2tXdbU6O0sGjABMtEKXcv097TIw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=e15/Vfv+/l+o17HK9zvaOr7RLLrFBjxHQSAXcpN6JjQ=;
+ b=VfRf3PU7OpXl3bl8qZwO36xcY4U8fCqpVqPgwp8hKtDzOhvl6wAfsXtvcmP9U+WaDKu7O38aOBWHPZNIyM+RnV4edG1nDO/R2IsRjZM5rhBkP4O739UvIfUVW2yugJ9f66np3xADlByzqtyhxGxzioEIOPUmSrxip6u8O09mzxJteQl4TKR2R7UxoaMcBF7Cgu/C9jbpFbqrkHoWsCCtVt3w3CqC9KGI+w18FFRjz018vMFlvnpNnogbFnW+XrgQ2zKZ+vxxKBRo7IxRrcknZQ+v98c17A2ZBfFk7wYKbZPyVueOWZ2GBXJFshH5nAm4uTeCKN9NLcT/oUs/tZ4zRw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=e15/Vfv+/l+o17HK9zvaOr7RLLrFBjxHQSAXcpN6JjQ=;
+ b=OMZ4s6VMoIp6SrzqYAk490sSYC8BGpykiz4hX8dOTB2FBC9KU4kxkWZTRNudqPC7EmHMnboO/c6vzR7OcxewjcE4O3aXUfBj5ejldya8kcBF686SX402TesNwjnZWemxnEbPQ4vXJBGZMoSXiek4k39rBUX48KOf59qO/PgStOCOUl4TuHAm6llQ8DwQ5U/OFxOSsc3R+BmassQGsTQNxwHD2NpY+DWJjcanOZubCoAS7W3qmSCaTmrN/jLbitxRIaZQTTA6APkOjgw+Ou3LkxqSSY7LfX/mu3jVbEG1p2dK7nCXfan8BgxsSpO64HaGNngUwvag81T66sCjqjPz2Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by BYAPR12MB2693.namprd12.prod.outlook.com (2603:10b6:a03:6a::33) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5250.14; Tue, 17 May
+ 2022 12:01:12 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ec2d:9167:1b47:2db2%5]) with mapi id 15.20.5250.018; Tue, 17 May 2022
+ 12:01:12 +0000
+Date:   Tue, 17 May 2022 09:01:10 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        linux-s390@vger.kernel.org, alex.williamson@redhat.com,
+        cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        agordeev@linux.ibm.com, svens@linux.ibm.com, frankja@linux.ibm.com,
+        david@redhat.com, imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org
+Subject: Re: [PATCH v7 17/22] vfio-pci/zdev: add open/close device hooks
+Message-ID: <20220517120110.GS1343366@nvidia.com>
+References: <20220513191509.272897-1-mjrosato@linux.ibm.com>
+ <20220513191509.272897-18-mjrosato@linux.ibm.com>
+ <20220516172734.GE1343366@nvidia.com>
+ <YoM+3z6+9yMeLMJn@infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YoM+3z6+9yMeLMJn@infradead.org>
+X-ClientProxiedBy: BL1P223CA0007.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:208:2c4::12) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 837cRDG7-6l958ImpH9JiYXBoXgonp12
-X-Proofpoint-GUID: 837cRDG7-6l958ImpH9JiYXBoXgonp12
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-17_02,2022-05-17_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
- impostorscore=0 mlxlogscore=999 suspectscore=0 adultscore=0
- priorityscore=1501 spamscore=0 mlxscore=0 bulkscore=0 lowpriorityscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205170073
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5d4c7c51-988e-4b7e-3e08-08da37fcefdc
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2693:EE_
+X-Microsoft-Antispam-PRVS: <BYAPR12MB26937098EBEBCFA0EC689E0BC2CE9@BYAPR12MB2693.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: yzQ2a8wvRTgH79hRB/lClggrVlDuhnYQZuxmeWsNebFUyN/GEWIyI8lJV01rKarR8V5QmLaYs/PE5P8ScGwzeHcmnkpHBiUaHcjiccIVr3wGiJh9tyohjIDiAIzvATfaD8yIuZ/CcPceuJZdJcB3Wi4I7WLzby7TvACZtSyakKlpaHXNUKDl7ITL/fq88ddiOvWXIXP0YKbD0OsfZow6XQDnXXbXuFpjdplvxI+B8W0unUajSCbD0aAQO6JT6hVG0aFHbqJeYyGRVJi9lLJkV8OypMYzoKuMc0WAQC3lMbP+cVfExm+RIjEIZfLL1j4I5EgXxn+uIGM/HdlbJ3FtvlWoTO0KCO4yYvPsNwHaizs0yXO+4GZNDoXPzY09bR6pmXriTZV2U7cycoSlfZI4s8aUL0HWrBo1lcLs/2GMtEKOvE/S2BTk8wAOKXKjtrt+Zb29qoB8xrg/XsWbxeUzPvvsBmd82qE6N8x1aSBd71GSkTmh64MnsFPOdOOzl1Itj99AThRNPaeSbnYh42Enhh4f4xFwqGbsu/MQZUBLfzLwMC1R8AkPRgSxwtLNNPMbw1kuZpjAQvC2DgWb1XaHvJAztUNgYwdt605nRRtq/iDSTEOBHYMMsmjyicclafwyJWe261O1RYWyCsAH78dPUdPosURhiKbdIYEwPCfITgEkZvVpxBJYlIjKG+gWkWau0Mh1wwYOD5oXcDxTv2c8gHtoO/W1YG1FMjV+T2GzcUs=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(8676002)(66556008)(66476007)(6506007)(66946007)(4326008)(2906002)(38100700002)(33656002)(2616005)(83380400001)(7416002)(508600001)(6486002)(966005)(5660300002)(6916009)(6512007)(26005)(186003)(1076003)(36756003)(86362001)(316002)(8936002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?XbniLP5N1UU3Csb/HcpxhcCaC+BCdIzQGQ/b9iG/LStXoDD6Ws8CBzgzJZVr?=
+ =?us-ascii?Q?MF6xEqKbULiDPp2lp6m3NA1UaQf5PcP1XbNFbG8YDZMj6ewQstyIOx9CLObY?=
+ =?us-ascii?Q?BHHdcTMQkg1NbbSz2Th7uY523SFGP8CYAxAvIuRHW9Aw9WMz2hn9tbBIYQHQ?=
+ =?us-ascii?Q?p7M72kgIV8UqjkK3K3rSBCjn/gYkJV3WKh0RxCOeNiOQjS4jhJPgECr1UJuz?=
+ =?us-ascii?Q?o7GmiEZ7VpCp1o3/E8amfng4cdlE/+FyH5y+uAjdh8K5qwr/w6shUNmGyDFr?=
+ =?us-ascii?Q?1R/PzENSXlNljNRn7Yuyy5FgqeqbBg82ESG96qvcUJplSAv9+Vras+UEWVBX?=
+ =?us-ascii?Q?vx+rPmgKjuJaZQHLcvHkMlRalh3thjacXr7C4hzZxVQaiqyeSpVh3VmRT50C?=
+ =?us-ascii?Q?5NvG+JTHSDRpwu2tAVKMRoV15QRQ6OvHkBNEDKxD4SPiTNcJxpAtvNeY19iJ?=
+ =?us-ascii?Q?EXXJvTKc0CkVXcxczkHKOP6hoJ5iuLlUHp9aTheyxtJxFEqkNaWo0mIywiDN?=
+ =?us-ascii?Q?1KboflvwrmYS3i4lnGuNXtzrvYt6pxVY1W/sYjNUp0ScbaiuuEc8ppcu8vog?=
+ =?us-ascii?Q?as3aQXSNbjxn+H/lFVxpZPCvJWwOuuOoXa9gnSCIXtrko/cP6T7EOp7XPjMm?=
+ =?us-ascii?Q?Z31A49h6xQw+g9KWi+M2WZVuXp0ZQuz2QJQC91p1ye7iYE6AuYqydWXEz1SH?=
+ =?us-ascii?Q?GXTuP6CMWspKf48nt/nEbhUYs4o+4mq/RXwMLLvBmNSweIyfp9ef7YS45xLt?=
+ =?us-ascii?Q?XJ9Wf66+IryauGoslc2u3FoYRd9sNG8hqxVZBymrNy2Z+tlFvnvui+MM0Ffs?=
+ =?us-ascii?Q?AtDRV8JBqeFSE+Tm7sJ8jRtCUHh0XO9AM3BzCdqWCpaCzmXKGKwioHOZQjxR?=
+ =?us-ascii?Q?NMJgMzZJDoXfmrqHSUQgHqouoOGrLsb5jf4pjCwcBIyAmviTjKFrTsfiEFIh?=
+ =?us-ascii?Q?zk3PjmZnZQk3n9NQ20FJ+u4QFrVgGmmelhZRqTRdOM6y3rzBsG5PNUUQINl5?=
+ =?us-ascii?Q?kRj8RVOU/ocdiWZczsK7MFUfqLx7KNX/ydYoFvkWo6Xc78K3+iUYK0UasHiB?=
+ =?us-ascii?Q?TTMWX2deTzvuTxFrnJkkFvZn78ffbK2lyKHdAKLGGjRB9nZX+fRu7MCIyghX?=
+ =?us-ascii?Q?gL65nS3qatjSBJ1h1dJn9R3YvxS+lHRckuIdHECYfCY7zptPPC1gCjgbr7YF?=
+ =?us-ascii?Q?eu7aJSssl33KMztACjJw6vn4DsVOMOkVZ69MBK8eesYFlBPY248N48+K1tiH?=
+ =?us-ascii?Q?guOZcm2A9UH3/o6dKx2EQbjBTtyYmZdab1F5YfJkP2Bj/ePxU00rY+u+019P?=
+ =?us-ascii?Q?S98igaeCABqjGzsVjKwYl1cMhzlKB1ggOymxkp7g6IAjLfgYYg39cVK36jHc?=
+ =?us-ascii?Q?vcUe/K12wJVGG7+aNY/9YgTXEitz+ws7x5aFhjsWKqCJ/QFfw+oqEHPAtitI?=
+ =?us-ascii?Q?h/lhQF30pSV4XWtEaaqIODnW/N13TTcgnFyosu3d2S8gfdO63GA5JRpXMF/E?=
+ =?us-ascii?Q?FQiivsSfeeY0TUxL/3EJkCk30J64YBrzOVtgBLXUCmXQIC0Yu0gDmBlJK0fX?=
+ =?us-ascii?Q?US2kvobWnBvdqsfo7n0QlUYZhmegWV77a4anwXbdA6u/P1t/1km32icYaYEU?=
+ =?us-ascii?Q?Og91UKwY/kJMB+qf6caOko13A9FrxUY3UsHnBzus1tzcdc5Q2YDXFuJy8eu8?=
+ =?us-ascii?Q?BYj4exzHGrOwy8IWuZM3BS8/ZLuWiODDjBzRQ6n3eBVWAyhe5dzRCZ7EZztQ?=
+ =?us-ascii?Q?sM05PkuZpA=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5d4c7c51-988e-4b7e-3e08-08da37fcefdc
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 May 2022 12:01:12.3551
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zlAH+dQ6v1nACd9T4mjuZs9sM9FZd910ygUETfYTPxVftOX/FOvOeWzuORQjY9th
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB2693
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 16 May 2022 09:08:17 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> Time to add the dump API changes to the api documentation file.
-> Also some minor cleanup.
+On Mon, May 16, 2022 at 11:21:19PM -0700, Christoph Hellwig wrote:
+> On Mon, May 16, 2022 at 02:27:34PM -0300, Jason Gunthorpe wrote:
+> > Normally you'd want to do what is kvm_s390_pci_register_kvm() here,
+> > where a failure can be propogated but then you have a race condition
+> > with the kvm.
+> > 
+> > Blech, maybe it is time to just fix this race condition permanently,
+> > what do you think? (I didn't even compile it)
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  Documentation/virt/kvm/api.rst | 153 ++++++++++++++++++++++++++++++++-
->  1 file changed, 151 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 4a900cdbc62e..c7c964887f5f 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -5061,7 +5061,7 @@ into ESA mode. This reset is a superset of the initial reset.
->  	__u32 reserved[3];
->    };
->  
-> -cmd values:
-> +**cmd values:**
->  
->  KVM_PV_ENABLE
->    Allocate memory and register the VM with the Ultravisor, thereby
-> @@ -5077,7 +5077,6 @@ KVM_PV_ENABLE
->    =====      =============================
->  
->  KVM_PV_DISABLE
-> -
->    Deregister the VM from the Ultravisor and reclaim the memory that
->    had been donated to the Ultravisor, making it usable by the kernel
->    again.  All registered VCPUs are converted back to non-protected
-> @@ -5094,6 +5093,115 @@ KVM_PV_VM_VERIFY
->    Verify the integrity of the unpacked image. Only if this succeeds,
->    KVM is allowed to start protected VCPUs.
->  
-> +KVM_PV_INFO
-> +  :Capability: KVM_CAP_S390_PROTECTED_DUMP
-> +
-> +  Presents an API that provides Ultravisor related data to userspace
-> +  via subcommands. len_max is the size of the user space buffer,
-> +  len_written is KVM's indication of how much bytes of that buffer
-> +  were actually written to. len_written can be used to determine the
-> +  valid fields if more response fields are added in the future.
-> +
-> +  ::
-> +
-> +     enum pv_cmd_info_id {
-> +        KVM_PV_INFO_VM,
-> +        KVM_PV_INFO_DUMP,
-> +     };
-> +
-> +     struct kvm_s390_pv_info_header {
-> +        __u32 id;
-> +        __u32 len_max;
-> +        __u32 len_written;
-> +        __u32 reserved;
-> +     };
-> +
-> +     struct kvm_s390_pv_info {
-> +        struct kvm_s390_pv_info_header header;
-> +        struct kvm_s390_pv_info_dump dump;
-> +	struct kvm_s390_pv_info_vm vm;
-> +     };
-> +
-> +**subcommands:**
-> +
-> +  KVM_PV_INFO_VM
-> +    This subcommand provides basic Ultravisor information for PV
-> +    hosts. These values are likely also exported as files in the sysfs
-> +    firmware UV query interface but they are more easily available to
-> +    programs in this API.
-> +
-> +    The installed calls and feature_indication members provide the
-> +    installed UV calls and the UV's other feature indications.
-> +
-> +    The max_* members provide information about the maximum number of PV
-> +    vcpus, PV guests and PV guest memory size.
-> +
-> +    ::
-> +
-> +      struct kvm_s390_pv_info_vm {
-> +        __u64 inst_calls_list[4];
-> +        __u64 max_cpus;
-> +        __u64 max_guests;
-> +        __u64 max_guest_addr;
-> +        __u64 feature_indication;
-> +      };
-> +
-> +
-> +  KVM_PV_INFO_DUMP
-> +    This subcommand provides information related to dumping PV guests.
-> +
-> +    ::
-> +
-> +      struct kvm_s390_pv_info_dump {
-> +        __u64 dump_cpu_buffer_len;
-> +        __u64 dump_config_mem_buffer_per_1m;
-> +        __u64 dump_config_finalize_len;
-> +      };
-> +
-> +KVM_PV_DUMP
-> +  :Capability: KVM_CAP_S390_PROTECTED_DUMP
-> +
-> +  Presents an API that provides calls which facilitate dumping a
-> +  protected VM.
-> +
-> +  ::
-> +
-> +    struct kvm_s390_pv_dmp {
-> +      __u64 subcmd;
-> +      __u64 buff_addr;
-> +      __u64 buff_len;
-> +      __u64 gaddr;		/* For dump storage state */
-> +    };
-> +
-> +  **subcommands:**
-> +
-> +  KVM_PV_DUMP_INIT
-> +    Initializes the dump process of a protected VM. If this call does
-> +    not succeed all other subcommands will fail with -EINVAL. This
-> +    subcommand will return -EINVAL if a dump process has not yet been
-> +    completed.
-> +
-> +    Not all PV vms can be dumped, the owner needs to set `dump
-> +    allowed` PCF bit 34 in the SE header to allow dumping.
-> +
-> +  KVM_PV_DUMP_CONFIG_STOR_STATE
-> +    Stores `buff_len` bytes of tweak component values starting with
-> +    the 1MB block specified by the absolute guest address
-> +    (`gaddr`). `buff_len` needs to be `conf_dump_storage_state_len`
-> +    aligned and at least >= the `conf_dump_storage_state_len` value
-> +    provided by the dump uv_info data.
+> This is roughly were I was planning to get to, with one difference:
+> I don't think we need or even want the VFIO_DEVICE_NEEDS_KVM flag.
+> Instead just propagation ->kvm to the device whenever it is set and
+> let drivers that have a hard requirements on it like gvt fail if it
+> isn't there.
 
-please explain that the output buffer might be written to (even
-partially) even when the IOCTL fails
+I did it so we didn't uselessly hold a ref on the kvm object, but
+maybe that is not relevant.
 
-> +
-> +  KVM_PV_DUMP_COMPLETE
-> +    If the subcommand succeeds it completes the dump process and lets
-> +    KVM_PV_DUMP_INIT be called again.
-> +
-> +    On success `conf_dump_finalize_len` bytes of completion data will be
-> +    stored to the `buff_addr`. The completion data contains a key
-> +    derivation seed, IV, tweak nonce and encryption keys as well as an
-> +    authentication tag all of which are needed to decrypt the dump at a
-> +    later time.
-> +
-> +
->  4.126 KVM_X86_SET_MSR_FILTER
->  ----------------------------
->  
-> @@ -5646,6 +5754,32 @@ The offsets of the state save areas in struct kvm_xsave follow the contents
->  of CPUID leaf 0xD on the host.
->  
->  
-> +4.135 KVM_S390_PV_CPU_COMMAND
-> +-----------------------------
-> +
-> +:Capability: KVM_CAP_S390_PROTECTED_DUMP
-> +:Architectures: s390
-> +:Type: vcpu ioctl
-> +:Parameters: none
-> +:Returns: 0 on success, < 0 on error
-> +
-> +This ioctl closely mirrors `KVM_S390_PV_COMMAND` but handles requests
-> +for vcpus. It re-uses the kvm_s390_pv_dmp struct and hence also shares
-> +the command ids.
-> +
-> +**command:**
-> +
-> +KVM_PV_DUMP
-> +  Presents an API that provides calls which facilitate dumping a vcpu
-> +  of a protected VM.
-> +
-> +**subcommand:**
-> +
-> +KVM_PV_DUMP_CPU
-> +  Provides encrypted dump data like register values.
-> +  The length of the returned data is provided by uv_info.guest_cpu_stor_len.
-> +
-> +
->  5. The kvm_run structure
->  ========================
->  
-> @@ -7734,6 +7868,21 @@ At this time, KVM_PMU_CAP_DISABLE is the only capability.  Setting
->  this capability will disable PMU virtualization for that VM.  Usermode
->  should adjust CPUID leaf 0xA to reflect that the PMU is disabled.
->  
-> +
-> +8.36 KVM_CAP_S390_PROTECTED_DUMP
-> +--------------------------------
-> +
-> +:Capability: KVM_CAP_S390_PROTECTED_DUMP
-> +:Architectures: s390
-> +:Type: vm
-> +
-> +This capability indicates that KVM and the Ultravisor support dumping
-> +PV guests. The `KVM_PV_DUMP` command is available for the
-> +`KVM_S390_PV_COMMAND` ioctl and the `KVM_PV_INFO` command provides
-> +dump related UV data. Also the vcpu ioctl `KVM_S390_PV_CPU_COMMAND` is
-> +available and supports the `KVM_PV_DUMP_CPU` subcommand.
-> +
-> +
->  9. Known KVM API problems
->  =========================
->  
+> The other question is if we even need an extra reference per device,
+> can't we hold the group reference until all devices are gone
+> anyway?  That would remove the need to include kvm_host.h in the
+> vfio code.
 
+The device does now hold a reference on the group fd after this patch
+series:
+
+https://lore.kernel.org/r/0-v2-d035a1842d81+1bf-vfio_group_locking_jgg@nvidia.com
+
+However the group does not hold a reference on the KVM, it has a
+set/remove interface toward KVM and can have its group->kvm pointer
+NULL'd via an ioctl at any time.
+
+So, the semantic here is that the KVM is captured when the device FD
+opens and then is immutable for the lifetime of that device FD even if
+the group FD's KVM is reassigned or removed.
+
+And I realize that it is all botched, this needs to check and respect
+the open_count which requires nesting the locks..
+
+Jason
