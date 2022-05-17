@@ -2,93 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BCCB52AB5B
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 20:59:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BD5152AB73
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 21:05:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352446AbiEQS65 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 14:58:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57168 "EHLO
+        id S1352457AbiEQTFa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 15:05:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352449AbiEQS6w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 14:58:52 -0400
-Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F19250E1F
-        for <kvm@vger.kernel.org>; Tue, 17 May 2022 11:58:48 -0700 (PDT)
-Received: by mail-qv1-xf34.google.com with SMTP id e17so15026317qvj.11
-        for <kvm@vger.kernel.org>; Tue, 17 May 2022 11:58:48 -0700 (PDT)
+        with ESMTP id S237339AbiEQTF1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 15:05:27 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C42393F30C
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 12:05:26 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id d10-20020a17090a7bca00b001df1d7dd8cfso4840729pjl.8
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 12:05:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=5OEZwf1a6NBQqaSeB1PoXjAnNB9RAFDi45J9mVUY6Mc=;
-        b=QBzP1DKPQbqGKOwIfmhQEGqpBNec/goHk3M1uethuYOR4H4TVy1TNG+78Yg/EfeA1p
-         O+QpBBWuxfJOO+9alDPgCh5Wk9mjLu3Lbb8GCkY7c4qN8WlXwMU0bFf/egc3hRMqfjE+
-         EqGiD6xZ/1RHdO8SzKC36Pf9IQqc8EFp5KZQYk+z2Um4RaWmAU2y2Y4r4Mlz/khF4X+Z
-         hay1CaKtA7G71htZGUjME3MNwvc90lKl8CGYiub7BwFlRXjiz3qFqFF7MgMpwpN6tHi9
-         4GdIvK/cJD17qDjaEhk+0wX+rdctJcJ9XKT12PLSxgUkl+jl5APFbAv2TRNCxKzqzF06
-         qorA==
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=p8KKOJFXLr8CtV9CTtnEv6qLeWwnDBwtgr7/IWFEgXc=;
+        b=eWkox+WnCzDS+gw6bl7DgpEI60pgNXGNX46p/hU/gJ7v18+iWnmJLBIEkjAbFVBSNv
+         u+cp/j/7mh4SO5V79jII2I8uRulErHgt0G9fU0aLX0SDJjqcyqKK+NnR7fzE8xYl9Phd
+         Gbg5YlN8VxFqMQ/e1gPSkHxJB1VsqymYg95ZMVpH1dcfchRSLKSyLDHPs5JH/sIE+V1a
+         lvP9hxaRYoX62ARi+nQc0k4A5Q/9TyjEoCrPLpWy1Sxim80ZM7YZ9Rz/oHZyp+0U71aR
+         GjRIdFrRfDq0pwJ+4a9ZHSDD3O2p2M8O1Lw4fYdyZlBKf/QQwPF2xHNv2UoVfm+W+c0h
+         vmMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=5OEZwf1a6NBQqaSeB1PoXjAnNB9RAFDi45J9mVUY6Mc=;
-        b=UwfSU3lhdOAZkAb9vKajA3tuDDbXUSdAHubZXKl3kqmVR4fh0h6Ho+/9VyaBxG1Q+F
-         VLPhsfztPTIZbuEEsFc60fCYlR9HsVpDuKuhrc08/HaTzbQpZkDI3pVAylb6SzxgMzx7
-         /OI8puJpav/wnISZJ9xuIRxuWHDsS8MxoFAxIIzf0B6Im5VSoVgTiq44I8FEO+vRgZxI
-         QsaRlv5YDq1n0ppGrH0JaFjzYXQIMBs2Kq8nh3OeNKqtv5935EpWTVJoQ5Kv5jpu23Dg
-         f6RRwQ4vBLLd5OHViCuNA1/mcI9yv2bJxibEv/fGYqImkR/Xw1Ce5ZfF516Ec5rXsGdJ
-         f0HA==
-X-Gm-Message-State: AOAM530JdPPJAF4mgv8oBP70wMMjdqzZvIQQkprwKwBM1DYAobLehutF
-        DZDK8dO4FBlXSPST9gI+Fb0C8g==
-X-Google-Smtp-Source: ABdhPJxr5Ef+82N/c8d7IbPg/4dPHISlmDsbtldITmrHL2THC7jy03ei/LC/QmSZlidmIpqFFDc9SQ==
-X-Received: by 2002:ad4:5aa1:0:b0:45a:af34:4dee with SMTP id u1-20020ad45aa1000000b0045aaf344deemr21321686qvg.115.1652813927373;
-        Tue, 17 May 2022 11:58:47 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id l18-20020a37f912000000b0069fc13ce20asm8575857qkj.59.2022.05.17.11.58.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 May 2022 11:58:46 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1nr2P7-0089GX-Qd; Tue, 17 May 2022 15:58:45 -0300
-Date:   Tue, 17 May 2022 15:58:45 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Wan Jiabing <wanjiabing@vivo.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Yi Liu <yi.l.liu@intel.com>, Kevin Tian <kevin.tian@intel.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] kvm/vfio: Fix potential deadlock problem in vfio
-Message-ID: <20220517185845.GL63055@ziepe.ca>
-References: <20220517023441.4258-1-wanjiabing@vivo.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220517023441.4258-1-wanjiabing@vivo.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=p8KKOJFXLr8CtV9CTtnEv6qLeWwnDBwtgr7/IWFEgXc=;
+        b=c1Ep95QKuSS37CVjP96HXf9ape7jF6rbf5noOKdFP3WyTzfIvmW7zT2l+d4wYbXhC1
+         B3TP+1CZ8N+9RiNimFHYwo+RLd/2Fz5YDQRHVm7XicGmD6GPU0bas5PRSmAPgNU7Izkn
+         Xrq2w+fCPKbOGAQ4VdJxZEusfvi566hCtHtW/VFEFhOhz8yRfC4affmo6Sywxsr2wx+j
+         ULLseXlFxAc3k47thbLkfyUnNFnWEq4XXZk2J9eU2gg8W85GWbLKbrqS9feic6eELiNB
+         D0FN6LJeTy1zLD1el9vwnaT4XoOtBjwL4/bF33vApgd2uypaOuSC74Dr2lWJIfs3/gH9
+         WKPQ==
+X-Gm-Message-State: AOAM5327VvH3NBo9oqRPet7s21+mlOmoq0RYySOIiF05r5Gm/IYeNVxN
+        nyiKkOdzT5X/BpaSHG+fyrXIT6YMia5HUw==
+X-Google-Smtp-Source: ABdhPJx8hNSsiWE3KeGso3OzIi/Yz4WmXsZorss1FYzDIko3oReRWWaPeKDZI8EB4VbjR7Sggyuh7aVyvdHrcg==
+X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
+ (user=dmatlack job=sendgmr) by 2002:a05:6a00:b47:b0:50e:141a:f01a with SMTP
+ id p7-20020a056a000b4700b0050e141af01amr23884542pfo.22.1652814326232; Tue, 17
+ May 2022 12:05:26 -0700 (PDT)
+Date:   Tue, 17 May 2022 19:05:14 +0000
+Message-Id: <20220517190524.2202762-1-dmatlack@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.550.gb090851708-goog
+Subject: [PATCH v2 00/10] KVM: selftests: Add nested support to dirty_log_perf_test
+From:   David Matlack <dmatlack@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Ben Gardon <bgardon@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Oliver Upton <oupton@google.com>, Peter Xu <peterx@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 17, 2022 at 10:34:41AM +0800, Wan Jiabing wrote:
-> Fix following coccicheck warning:
-> ./virt/kvm/vfio.c:258:1-7: preceding lock on line 236
-> 
-> If kvm_vfio_file_iommu_group() failed, code would goto err_fdput with
-> mutex_lock acquired and then return ret. It might cause potential
-> deadlock. Move mutex_unlock bellow err_fdput tag to fix it. 
-> 
-> Fixes: d55d9e7a45721 ("kvm/vfio: Store the struct file in the kvm_vfio_group")
-> Signed-off-by: Wan Jiabing <wanjiabing@vivo.com>
-> ---
->  virt/kvm/vfio.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+This series adds support for taking any perf_test_util-based test and
+configuring it to run vCPUs in L2 instead of L1, and adds an option to
+dirty_log_perf_test to enable it.
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+This series was used to collect the performance data for eager page
+spliting for nested MMUs [1].
 
-Thanks,
-Jason
+[1] https://lore.kernel.org/kvm/20220422210546.458943-1-dmatlack@google.com/
+
+v2:
+ - Collect R-b tags from Peter.
+ - Use level macros instead of raw numbers [Peter]
+ - Remove "upper" from function name [Peter]
+ - Bring back setting the A/D bits on EPT PTEs [Peter]
+ - Drop "all" rule from Makefile [Peter]
+ - Reserve memory for EPT pages [Peter]
+ - Fix off-by-one error in nested_map_all_1g() [me]
+
+v1: https://lore.kernel.org/kvm/20220429183935.1094599-1-dmatlack@google.com/
+
+David Matlack (10):
+  KVM: selftests: Replace x86_page_size with PG_LEVEL_XX
+  KVM: selftests: Add option to create 2M and 1G EPT mappings
+  KVM: selftests: Drop stale function parameter comment for nested_map()
+  KVM: selftests: Refactor nested_map() to specify target level
+  KVM: selftests: Move VMX_EPT_VPID_CAP_AD_BITS to vmx.h
+  KVM: selftests: Add a helper to check EPT/VPID capabilities
+  KVM: selftests: Link selftests directly with lib object files
+  KVM: selftests: Drop unnecessary rule for $(LIBKVM_OBJS)
+  KVM: selftests: Clean up LIBKVM files in Makefile
+  KVM: selftests: Add option to run dirty_log_perf_test vCPUs in L2
+
+ tools/testing/selftests/kvm/Makefile          |  49 ++++--
+ .../selftests/kvm/dirty_log_perf_test.c       |  10 +-
+ .../selftests/kvm/include/perf_test_util.h    |   7 +
+ .../selftests/kvm/include/x86_64/processor.h  |  21 +--
+ .../selftests/kvm/include/x86_64/vmx.h        |   5 +
+ .../selftests/kvm/lib/perf_test_util.c        |  29 +++-
+ .../selftests/kvm/lib/x86_64/perf_test_util.c |  98 ++++++++++++
+ .../selftests/kvm/lib/x86_64/processor.c      |  33 ++--
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c  | 147 +++++++++++-------
+ .../selftests/kvm/max_guest_memory_test.c     |   2 +-
+ .../selftests/kvm/x86_64/mmu_role_test.c      |   2 +-
+ 11 files changed, 300 insertions(+), 103 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/perf_test_util.c
+
+
+base-commit: a3808d88461270c71d3fece5e51cc486ecdac7d0
+-- 
+2.36.0.550.gb090851708-goog
+
