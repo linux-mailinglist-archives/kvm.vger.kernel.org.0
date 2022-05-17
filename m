@@ -2,131 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 544435298FC
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 07:13:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 848C552996E
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 08:21:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235918AbiEQFMv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 01:12:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36190 "EHLO
+        id S239263AbiEQGVZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 02:21:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230027AbiEQFMt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 01:12:49 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D639275CB
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 22:12:48 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id f2-20020a17090274c200b0016158e7c490so3754996plt.9
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 22:12:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=EJNs5SvJLs6HPsmYgdWi7V4fczZNjIN6G6RaPYy3W5Q=;
-        b=Vc5H0oQqZvib9pXn9UPrBkm8Q0WD7T9SbaOxX/7Zc5NipbdZD0djFJxF50o3WXhBRG
-         UVtTg1kwVi12VESss4yFXWohlI1sJiPRvjqklLMxfa1NTq7jbf/6Cj1UR/cXGfRtbBsF
-         ZYME2oTDTGBh8xGEqgzTEEStqZ6h3CloKMdWqRHHXzKX7iAUYlcheHdZoOWhQ/3+yIoW
-         UUL3Ow18FxjTHHERpWzJdB5ros0HO6EFIWUndjbnYxtKavcKSuYf8EtMoKsxgpA7kYpz
-         kDx19SE4A4tTyXqLBvlFVaUWzRf0TUaaNpPFs4g71MZtjO6Wrpv9ZnnaKvDvhOD9iK4i
-         0zwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=EJNs5SvJLs6HPsmYgdWi7V4fczZNjIN6G6RaPYy3W5Q=;
-        b=aiPSVActn/i5LBJW0nYeHHpgaRgXRHpl0P0qWSzJF7awBXR4XeMJlIKwEeFHHYRGv8
-         BzgoqMiolJub0qgEWBzFThSqFFeFuJjQnGdJXA+yq3XBxOoth5c5z2dfV6XFBzKF2knN
-         5nza0OBHppf28femFn+o3fC4kUF2/NToNQbphggnBDVXTHrUDUAgaj9SPp9FU/ivVOpX
-         dwNWREYuiHfYbJ6B+HtdxCb89LSGDpIVT9qUJTjqTWG7EL/+C/MG1QsBDPpxQ0fXnfui
-         1oukkZnqh0igZ3jL54a7azXfxwd04BqYDuSxuWOdAgkHDfF2vcmd2McqarLboDhXj0KQ
-         rzlQ==
-X-Gm-Message-State: AOAM531JtACNabDre8Y+KokKabJe/KerKWd3gKbBqCcD3J9BzEPqfHlo
-        4r6g00YfKrjREFnlU4qtNSLmh8AahcmCwpd9UFulrQXHaWKUn1wv8mRgRcntzfvwy8xmsirH+fZ
-        vocVmMqCR1/eCOgIIj6oo+83NyKxcm+3KAp+XHSXlLWYGxc7ExOnllIgTewzMaTtiu5xl
-X-Google-Smtp-Source: ABdhPJzzWxpws8dN0zFYQVzajOzfuNFZ4HjVb0X5DbtbFmOLkHt+/guao4zC2IASO/QWTzSJdCD6ObWTSfryOG1K
-X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
- (user=aaronlewis job=sendgmr) by 2002:a17:90b:4ac9:b0:1df:6944:b1e4 with SMTP
- id mh9-20020a17090b4ac900b001df6944b1e4mr6641402pjb.207.1652764367990; Mon,
- 16 May 2022 22:12:47 -0700 (PDT)
-Date:   Tue, 17 May 2022 05:12:38 +0000
-In-Reply-To: <20220517051238.2566934-1-aaronlewis@google.com>
-Message-Id: <20220517051238.2566934-3-aaronlewis@google.com>
-Mime-Version: 1.0
-References: <20220517051238.2566934-1-aaronlewis@google.com>
-X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
-Subject: [PATCH 3/3] selftests: kvm/x86: Verify the pmu event filter matches
- the correct event
-From:   Aaron Lewis <aaronlewis@google.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
-        Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S234922AbiEQGVY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 02:21:24 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4642F3EAB8;
+        Mon, 16 May 2022 23:21:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=CFELpoLm/T5bCWScTqAlgx1Rhso0AgfMtDUILvVD5Tg=; b=Ert0PJDqria2bGBH515+4RdK3V
+        k+JtKPX5RybqvZ0ZJOosCf6K+4egaua0MGLR7MNJVRO4S7soYpMJdvWzd/s6wTCSGwNqZoiCTv30i
+        /ONPxsQHJp8tLb9VFvfmDuqk9s5o1NBLa+16Mfmlgec+N0xyWoM0Jb4ir3xTDfHt6zlm2Ot22sRf7
+        RXl1GD7L0D8ucd3+LorFuGrXa9JqDOv8TGZ0lbLLBX9FKck83HgYmCPO0fveeh6LbYt+eCxBg+UfD
+        lee/RAdY/nKAnsxLM7GmKNUf9wIjaKXZkuSS9A+/uz630QxRVDdXsmY3qWnCiTaIGi0R68673bDVN
+        ZeFyfamw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nqqa7-00Bn0U-T9; Tue, 17 May 2022 06:21:19 +0000
+Date:   Mon, 16 May 2022 23:21:19 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        linux-s390@vger.kernel.org, alex.williamson@redhat.com,
+        cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        agordeev@linux.ibm.com, svens@linux.ibm.com, frankja@linux.ibm.com,
+        david@redhat.com, imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org
+Subject: Re: [PATCH v7 17/22] vfio-pci/zdev: add open/close device hooks
+Message-ID: <YoM+3z6+9yMeLMJn@infradead.org>
+References: <20220513191509.272897-1-mjrosato@linux.ibm.com>
+ <20220513191509.272897-18-mjrosato@linux.ibm.com>
+ <20220516172734.GE1343366@nvidia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220516172734.GE1343366@nvidia.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a test to demonstrate that when the guest programs an event select
-it is matched correctly in the pmu event filter and not inadvertently
-filtered.  This could happen on AMD if the high nybble[1] in the event
-select gets truncated away only leaving the bottom byte[2] left for
-matching.
+On Mon, May 16, 2022 at 02:27:34PM -0300, Jason Gunthorpe wrote:
+> Normally you'd want to do what is kvm_s390_pci_register_kvm() here,
+> where a failure can be propogated but then you have a race condition
+> with the kvm.
+> 
+> Blech, maybe it is time to just fix this race condition permanently,
+> what do you think? (I didn't even compile it)
 
-This is a contrived example used for the convenience of demonstrating
-this issue, however, this can be applied to event selects 0x28A (OC
-Mode Switch) and 0x08A (L1 BTB Correction), where 0x08A could end up
-being denied when the event select was only set up to deny 0x28A.
+This is roughly were I was planning to get to, with one difference:
+I don't think we need or even want the VFIO_DEVICE_NEEDS_KVM flag.
+Instead just propagation ->kvm to the device whenever it is set and
+let drivers that have a hard requirements on it like gvt fail if it
+isn't there.  This could still allow using vfio for userspace PCI
+drivers on s390 for example or in general allow expressing a soft
+requirement, just without the whole notifier mess.
 
-[1] bits 35:32 in the event select register and bits 11:8 in the event
-    select.
-[2] bits 7:0 in the event select register and bits 7:0 in the event
-    select.
-
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
----
- .../kvm/x86_64/pmu_event_filter_test.c        | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-index 30c1a5804210..93d77574b255 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-@@ -281,6 +281,22 @@ static uint64_t test_with_filter(struct kvm_vm *vm,
- 	return run_vm_to_sync(vm);
- }
- 
-+static void test_amd_deny_list(struct kvm_vm *vm)
-+{
-+	uint64_t event = EVENT(0x1C2, 0);
-+	struct kvm_pmu_event_filter *f;
-+	uint64_t count;
-+
-+	f = create_pmu_event_filter(&event, 1, KVM_PMU_EVENT_DENY);
-+	count = test_with_filter(vm, f);
-+
-+	free(f);
-+	if (count != NUM_BRANCHES)
-+		pr_info("%s: Branch instructions retired = %lu (expected %u)\n",
-+			__func__, count, NUM_BRANCHES);
-+	TEST_ASSERT(count, "Allowed PMU event is not counting");
-+}
-+
- static void test_member_deny_list(struct kvm_vm *vm)
- {
- 	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_DENY);
-@@ -463,6 +479,9 @@ int main(int argc, char *argv[])
- 		exit(KSFT_SKIP);
- 	}
- 
-+	if (use_amd_pmu())
-+		test_amd_deny_list(vm);
-+
- 	test_without_filter(vm);
- 	test_member_deny_list(vm);
- 	test_member_allow_list(vm);
--- 
-2.36.1.124.g0e6072fb45-goog
-
+The other question is if we even need an extra reference per device,
+can't we hold the group reference until all devices are gone
+anyway?  That would remove the need to include kvm_host.h in the
+vfio code.
