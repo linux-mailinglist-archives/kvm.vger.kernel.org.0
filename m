@@ -2,293 +2,305 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D0C5A52A372
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 15:32:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9259152A39F
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 15:39:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347035AbiEQNcL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 09:32:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49328 "EHLO
+        id S244348AbiEQNjZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 09:39:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231514AbiEQNcI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 09:32:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2E3DF419B2
-        for <kvm@vger.kernel.org>; Tue, 17 May 2022 06:32:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652794323;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=YPrrrGrtPJ0UPVeEiIe+RRjxIITOoG2J++Tlpsjpjrg=;
-        b=g5r46tvsZXWdNp4do3RFAegcdk4kMXqHVve2KcdE1cB01qUv/rW8LLPuTZdW8p+KxtF/Mh
-        RM/s86RhfpMBQpxsypV/+RRU9PjXbx2Fy/Wdv+KKEqo9Z5Gr4vuJiknnCktC4zJ/wDCEM1
-        4qcziH5w9Z5vrf0nxJB8Oo/mpYylS8M=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-9-SKStzi6lOuC_Mi4AX8wYxA-1; Tue, 17 May 2022 09:32:02 -0400
-X-MC-Unique: SKStzi6lOuC_Mi4AX8wYxA-1
-Received: by mail-wr1-f72.google.com with SMTP id u17-20020a056000161100b0020cda98f292so4670639wrb.21
-        for <kvm@vger.kernel.org>; Tue, 17 May 2022 06:32:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=YPrrrGrtPJ0UPVeEiIe+RRjxIITOoG2J++Tlpsjpjrg=;
-        b=swNowISN8qWqmQ/bTlMVOOT+VSxnQo2uFKPIZXYP45R3qfoi9ioQBBcBsVV0ihUCfs
-         qpW7ggGCiIXwPhVmGdTnf1Znr92dqupKzTTUDhRTchLzmBEbAq+eps7EpMtc/34G/KMD
-         Q3aZbvioLILhrHnizcD10Lu83unRXIiltkrjWEGHyOyUgDzWXi45oaxkywHXvQ1GmN6Q
-         kzDC5YG4svP+vOeHidhdN5T2yT9Sy4OqQ5nSngbkhQ+Gjj7g9H550G6SCFGI2OGVXpFd
-         fu2L+L5jJBK9Gax2ohQzrdyBdC3hrwNzEDJta7doL48GsyfHXFHpVA4XaMs7Xdy9DRfE
-         DVBg==
-X-Gm-Message-State: AOAM533yKK2cSCfclyB6CDh/2tdIx+lgQ2tMnohdI6DpX3V+ZBGA8xQp
-        TrCPc1ZptQX7WbHSwsKGjmlFjp1DlNc8+4h48AqdOyuK05wwcJboMbNRj926aybtETdSE5LVg1X
-        oMwrIsP4Fy6Lz
-X-Received: by 2002:adf:ebc7:0:b0:20c:d65d:3f19 with SMTP id v7-20020adfebc7000000b0020cd65d3f19mr18628882wrn.613.1652794320339;
-        Tue, 17 May 2022 06:32:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzVmQD/MUnZFDRT5bU85jS2BMM9lXxe1L7hniFLhaNb6tRdo5rfdhJyWG2PMCMsIvPkjWmDVQ==
-X-Received: by 2002:adf:ebc7:0:b0:20c:d65d:3f19 with SMTP id v7-20020adfebc7000000b0020cd65d3f19mr18628856wrn.613.1652794319991;
-        Tue, 17 May 2022 06:31:59 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id x16-20020adfbb50000000b0020d11ee1bcesm3432180wrg.82.2022.05.17.06.31.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 May 2022 06:31:59 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 02/34] KVM: x86: hyper-v: Introduce TLB flush ring
-In-Reply-To: <YoKnOqR68SaaPCdT@google.com>
-References: <20220414132013.1588929-1-vkuznets@redhat.com>
- <20220414132013.1588929-3-vkuznets@redhat.com>
- <YoKnOqR68SaaPCdT@google.com>
-Date:   Tue, 17 May 2022 15:31:58 +0200
-Message-ID: <87pmkcuvxt.fsf@redhat.com>
+        with ESMTP id S240590AbiEQNjW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 09:39:22 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C43D4CD68;
+        Tue, 17 May 2022 06:39:21 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24HDCfnC009438;
+        Tue, 17 May 2022 13:39:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=380nLtz/2FKaZAkJ9R6yKII2gnhuoG3AUjP83YB/ihg=;
+ b=EbiknmA/nX9lpXEISZwsgl5Y9nXkGXWqlx3f93pgYdVpLxclNeJa+jc+S8SKNauJBv+v
+ 4fGH0BcKuPzGcUGewzW8gTCN8tbMMx/o4L5GPrc0YAeIyUEDK3i30N1NKYcFV1DqrXgJ
+ W5kXY5KzycZh7oz+uTq05rYCK4WVMF+R+CgHxO7S3utKUbGFzZhqvMhoukoj+z6iYnI+
+ nUOigYrdZJvj/iF2TXUcYMRQamHkGSb1c1nTJQpHTQrlGAZ760jXXixbiHMtRQzo1kHp
+ 7ATnz++3sv7RBvF+7hbbpxc0p/YWNkAjfnfy8PVfERiTxZZbWT2GRE5z3pBD/Ca83S7Y zQ== 
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4cd18p96-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 May 2022 13:39:21 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24HDWsxQ005114;
+        Tue, 17 May 2022 13:39:18 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma01fra.de.ibm.com with ESMTP id 3g2428uepv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 May 2022 13:39:18 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24HDdFoi55247294
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 May 2022 13:39:15 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8321DA404D;
+        Tue, 17 May 2022 13:39:15 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 508C3A4051;
+        Tue, 17 May 2022 13:39:15 +0000 (GMT)
+Received: from [9.145.157.61] (unknown [9.145.157.61])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 17 May 2022 13:39:15 +0000 (GMT)
+Message-ID: <f8132cf7-9249-75b8-059d-fa1031973beb@linux.ibm.com>
+Date:   Tue, 17 May 2022 15:39:14 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        borntraeger@linux.ibm.com
+References: <20220516090817.1110090-1-frankja@linux.ibm.com>
+ <20220516090817.1110090-7-frankja@linux.ibm.com>
+ <20220517125907.685ffe44@p-imbrenda>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v5 06/10] kvm: s390: Add configuration dump functionality
+In-Reply-To: <20220517125907.685ffe44@p-imbrenda>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: T_dguJIhtsGATM8UmLIe_lCd3ocEmkOW
+X-Proofpoint-GUID: T_dguJIhtsGATM8UmLIe_lCd3ocEmkOW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-17_03,2022-05-17_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 clxscore=1015 malwarescore=0 adultscore=0 mlxlogscore=999
+ spamscore=0 mlxscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205170083
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On 5/17/22 12:59, Claudio Imbrenda wrote:
+> On Mon, 16 May 2022 09:08:13 +0000
+> Janosch Frank <frankja@linux.ibm.com> wrote:
+> 
+>> Sometimes dumping inside of a VM fails, is unavailable or doesn't
+>> yield the required data. For these occasions we dump the VM from the
+>> outside, writing memory and cpu data to a file.
+>>
+>> Up to now PV guests only supported dumping from the inside of the
+>> guest through dumpers like KDUMP. A PV guest can be dumped from the
+>> hypervisor but the data will be stale and / or encrypted.
+>>
+>> To get the actual state of the PV VM we need the help of the
+>> Ultravisor who safeguards the VM state. New UV calls have been added
+>> to initialize the dump, dump storage state data, dump cpu data and
+>> complete the dump process. We expose these calls in this patch via a
+>> new UV ioctl command.
+>>
+>> The sensitive parts of the dump data are encrypted, the dump key is
+>> derived from the Customer Communication Key (CCK). This ensures that
+>> only the owner of the VM who has the CCK can decrypt the dump data.
+>>
+>> The memory is dumped / read via a normal export call and a re-import
+>> after the dump initialization is not needed (no re-encryption with a
+>> dump key).
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 
-> On Thu, Apr 14, 2022, Vitaly Kuznetsov wrote:
->> To allow flushing individual GVAs instead of always flushing the whole
->> VPID a per-vCPU structure to pass the requests is needed. Introduce a
->> simple ring write-locked structure to hold two types of entries:
->> individual GVA (GFN + up to 4095 following GFNs in the lower 12 bits)
->> and 'flush all'.
->> 
->> The queuing rule is: if there's not enough space on the ring to put
->> the request and leave at least 1 entry for 'flush all' - put 'flush
->> all' entry.
->> 
->> The size of the ring is arbitrary set to '16'.
->> 
->> Note, kvm_hv_flush_tlb() only queues 'flush all' entries for now so
->> there's very small functional change but the infrastructure is
->> prepared to handle individual GVA flush requests.
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>  arch/x86/include/asm/kvm_host.h | 16 +++++++
->>  arch/x86/kvm/hyperv.c           | 83 +++++++++++++++++++++++++++++++++
->>  arch/x86/kvm/hyperv.h           | 13 ++++++
->>  arch/x86/kvm/x86.c              |  5 +-
->>  arch/x86/kvm/x86.h              |  1 +
->>  5 files changed, 116 insertions(+), 2 deletions(-)
->> 
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index 1de3ad9308d8..b4dd2ff61658 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -578,6 +578,20 @@ struct kvm_vcpu_hv_synic {
->>  	bool dont_zero_synic_pages;
->>  };
->>  
->> +#define KVM_HV_TLB_FLUSH_RING_SIZE (16)
+The cut code will be fixed according to your requests.
+
+[...]
+>> +/*
+>> + * kvm_s390_pv_dump_stor_state
+>> + *
+>> + * @kvm: pointer to the guest's KVM struct
+>> + * @buff_user: Userspace pointer where we will write the results to
+>> + * @gaddr: Starting absolute guest address for which the storage state
+>> + *         is requested. This value will be updated with the last
+>> + *         address for which data was written when returning to
+>> + *         userspace.
+>> + * @buff_user_len: Length of the buff_user buffer
+>> + * @rc: Pointer to where the uvcb return code is stored
+>> + * @rrc: Pointer to where the uvcb return reason code is stored
+>> + *
+> 
+> please add:
+> 	Context: kvm->lock needs to be held
+
+Sure
+
+> 
+> also explain that part of the user buffer might be written to even in
+> case of failure (this also needs to go in the documentation)
+
+Ok
+
+> 
+>> + * Return:
+>> + *  0 on success
+> 
+> rc and rrc will also be set in case of success
+
+But that's different from the return code of this function and would 
+belong to the function description above, no?
+
+> 
+>> + *  -ENOMEM if allocating the cache fails
+>> + *  -EINVAL if gaddr is not aligned to 1MB
+>> + *  -EINVAL if buff_user_len is not aligned to uv_info.conf_dump_storage_state_len
+>> + *  -EINVAL if the UV call fails, rc and rrc will be set in this case
+> 
+> have you considered a different code for UVC failure?
+> so the caller can know that rc and rrc are meaningful
+> 
+> or just explain that rc and rrc will always be set; if the UVC is not
+> performed, rc and rrc will be 0
+
+If the UVC is not performed the rcs will not be *changed*, so it's 
+advisable to set them to 0 to recognize a change.
+
+
+Also:
+While I generally like commenting as much as possible, this is starting 
+to get out of hand, the comment header is now taking up a lot of space. 
+I'll put the rc/rrc comment into the api documentation and I'm 
+considering putting the partial write comment into there too.
+
+> 
+>> + *  -EFAULT if copying the result to buff_user failed
+>> + */
+>> +int kvm_s390_pv_dump_stor_state(struct kvm *kvm, void __user *buff_user,
+>> +				u64 *gaddr, u64 buff_user_len, u16 *rc, u16 *rrc)
+>> +{
+>> +	struct uv_cb_dump_stor_state uvcb = {
+>> +		.header.cmd = UVC_CMD_DUMP_CONF_STOR_STATE,
+>> +		.header.len = sizeof(uvcb),
+>> +		.config_handle = kvm->arch.pv.handle,
+>> +		.gaddr = *gaddr,
+>> +		.dump_area_origin = 0,
+>> +	};
+>> +	size_t buff_kvm_size;
+>> +	size_t size_done = 0;
+>> +	u8 *buff_kvm = NULL;
+>> +	int cc, ret;
 >> +
->> +struct kvm_vcpu_hv_tlb_flush_entry {
->> +	u64 addr;
->
-> "addr" misleading, this is overloaded to be both the virtual address and the count.
-> I think we make it a moot point, but it led me astray in thinkin we could use the
-> lower 12 bits for flags... until I realized those bits are already in use.
->
->> +	u64 flush_all:1;
->> +	u64 pad:63;
->
-> This is rather odd, why not just use a bool?  
-
-My initial plan was to eventually put more flags here, i.e. there are
-two additional flags which we don't currently handle:
-
-HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES (as we don't actually look at
- HV_ADDRESS_SPACE_ID)
-HV_FLUSH_NON_GLOBAL_MAPPINGS_ONLY
-
-> But why even have a "flush_all" field, can't we just use a magic value
-> for write_idx to indicate "flush_all"? E.g. either an explicit #define
-> or -1.
-
-Sure, a magic value would do too and will allow us to make 'struct
-kvm_vcpu_hv_tlb_flush_entry' 8 bytes instead of 16 (for the time being
-as if we are to add HV_ADDRESS_SPACE_ID/additional flags the net win is
-going to be zero).
-
->
-> Writers set write_idx to -1 to indicate "flush all", vCPU/reader goes straight
-> to "flush all" if write_idx is -1/invalid.  That way, future writes can simply do
-> nothing until read_idx == write_idx, and the vCPU/reader avoids unnecessary flushes
-> if there's a "flush all" pending and other valid entries in the ring.
->
-> And it allows deferring the "flush all" until the ring is truly full (unless there's
-> an off-by-one / wraparound edge case I'm missing, which is likely...).
-
-Thanks for the patch! I am, however, going to look at Maxim's suggestion
-to use 'kfifo' to avoid all these uncertainties, funky locking etc. At
-first glance it has everything I need here.
-
->
-> ---
->  arch/x86/include/asm/kvm_host.h |  8 +-----
->  arch/x86/kvm/hyperv.c           | 47 +++++++++++++--------------------
->  2 files changed, 19 insertions(+), 36 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index b6b9a71a4591..bb45cc383ce4 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -605,16 +605,10 @@ enum hv_tlb_flush_rings {
->  	HV_NR_TLB_FLUSH_RINGS,
->  };
->
-> -struct kvm_vcpu_hv_tlb_flush_entry {
-> -	u64 addr;
-> -	u64 flush_all:1;
-> -	u64 pad:63;
-> -};
-> -
->  struct kvm_vcpu_hv_tlb_flush_ring {
->  	int read_idx, write_idx;
->  	spinlock_t write_lock;
-> -	struct kvm_vcpu_hv_tlb_flush_entry entries[KVM_HV_TLB_FLUSH_RING_SIZE];
-> +	u64 entries[KVM_HV_TLB_FLUSH_RING_SIZE];
->  };
->
->  /* Hyper-V per vcpu emulation context */
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index 1d6927538bc7..56f06cf85282 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -1837,10 +1837,13 @@ static int kvm_hv_get_tlb_flush_entries(struct kvm *kvm, struct kvm_hv_hcall *hc
->  static inline int hv_tlb_flush_ring_free(struct kvm_vcpu_hv *hv_vcpu,
->  					 int read_idx, int write_idx)
->  {
-> +	if (write_idx < 0)
-> +		return 0;
-> +
->  	if (write_idx >= read_idx)
-> -		return KVM_HV_TLB_FLUSH_RING_SIZE - (write_idx - read_idx) - 1;
-> +		return KVM_HV_TLB_FLUSH_RING_SIZE - (write_idx - read_idx);
->
-> -	return read_idx - write_idx - 1;
-> +	return read_idx - write_idx;
->  }
->
->  static void hv_tlb_flush_ring_enqueue(struct kvm_vcpu *vcpu,
-> @@ -1869,6 +1872,9 @@ static void hv_tlb_flush_ring_enqueue(struct kvm_vcpu *vcpu,
->  	 */
->  	write_idx = tlb_flush_ring->write_idx;
->
-> +	if (write_idx < 0 && read_idx == write_idx)
-> +		read_idx = write_idx = 0;
-> +
->  	ring_free = hv_tlb_flush_ring_free(hv_vcpu, read_idx, write_idx);
->  	/* Full ring always contains 'flush all' entry */
->  	if (!ring_free)
-> @@ -1879,21 +1885,13 @@ static void hv_tlb_flush_ring_enqueue(struct kvm_vcpu *vcpu,
->  	 * entry in case another request comes in. In case there's not enough
->  	 * space, just put 'flush all' entry there.
->  	 */
-> -	if (!count || count >= ring_free - 1 || !entries) {
-> -		tlb_flush_ring->entries[write_idx].addr = 0;
-> -		tlb_flush_ring->entries[write_idx].flush_all = 1;
-> -		/*
-> -		 * Advance write index only after filling in the entry to
-> -		 * synchronize with lockless reader.
-> -		 */
-> -		smp_wmb();
-> -		tlb_flush_ring->write_idx = (write_idx + 1) % KVM_HV_TLB_FLUSH_RING_SIZE;
-> +	if (!count || count > ring_free - 1 || !entries) {
-> +		tlb_flush_ring->write_idx = -1;
->  		goto out_unlock;
->  	}
->
->  	for (i = 0; i < count; i++) {
-> -		tlb_flush_ring->entries[write_idx].addr = entries[i];
-> -		tlb_flush_ring->entries[write_idx].flush_all = 0;
-> +		tlb_flush_ring->entries[write_idx] = entries[i];
->  		write_idx = (write_idx + 1) % KVM_HV_TLB_FLUSH_RING_SIZE;
->  	}
->  	/*
-> @@ -1911,7 +1909,6 @@ void kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_vcpu_hv_tlb_flush_ring *tlb_flush_ring;
->  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
-> -	struct kvm_vcpu_hv_tlb_flush_entry *entry;
->  	int read_idx, write_idx;
->  	u64 address;
->  	u32 count;
-> @@ -1940,26 +1937,18 @@ void kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu)
->  	/* Pairs with smp_wmb() in hv_tlb_flush_ring_enqueue() */
->  	smp_rmb();
->
-> +	if (write_idx < 0) {
-> +		kvm_vcpu_flush_tlb_guest(vcpu);
-> +		goto out_empty_ring;
-> +	}
-> +
->  	for (i = read_idx; i != write_idx; i = (i + 1) % KVM_HV_TLB_FLUSH_RING_SIZE) {
-> -		entry = &tlb_flush_ring->entries[i];
-> -
-> -		if (entry->flush_all)
-> -			goto out_flush_all;
-> -
-> -		/*
-> -		 * Lower 12 bits of 'address' encode the number of additional
-> -		 * pages to flush.
-> -		 */
-> -		address = entry->addr & PAGE_MASK;
-> -		count = (entry->addr & ~PAGE_MASK) + 1;
-> +		address = tlb_flush_ring->entries[i] & PAGE_MASK;
-> +		count = (tlb_flush_ring->entries[i] & ~PAGE_MASK) + 1;
->  		for (j = 0; j < count; j++)
->  			static_call(kvm_x86_flush_tlb_gva)(vcpu, address + j * PAGE_SIZE);
->  	}
->  	++vcpu->stat.tlb_flush;
-> -	goto out_empty_ring;
-> -
-> -out_flush_all:
-> -	kvm_vcpu_flush_tlb_guest(vcpu);
->
->  out_empty_ring:
->  	tlb_flush_ring->read_idx = write_idx;
->
-> base-commit: 62592c7c742ae78eb1f1005a63965ece19e6effe
-> --
->
-
--- 
-Vitaly
+>> +	ret = -EINVAL;
+>> +	/* UV call processes 1MB guest storage chunks at a time */
+>> +	if (!IS_ALIGNED(*gaddr, HPAGE_SIZE))
+>> +		goto out;
+>> +
+>> +	/*
+>> +	 * We provide the storage state for 1MB chunks of guest
+>> +	 * storage. The buffer will need to be aligned to
+>> +	 * conf_dump_storage_state_len so we don't end on a partial
+>> +	 * chunk.
+>> +	 */
+>> +	if (!buff_user_len ||
+>> +	    !IS_ALIGNED(buff_user_len, uv_info.conf_dump_storage_state_len))
+>> +		goto out;
+>> +
+>> +	/*
+>> +	 * Allocate a buffer from which we will later copy to the user
+>> +	 * process. We don't want userspace to dictate our buffer size
+>> +	 * so we limit it to DUMP_BUFF_LEN.
+>> +	 */
+>> +	ret = -ENOMEM;
+>> +	buff_kvm_size = min_t(u64, buff_user_len, DUMP_BUFF_LEN);
+>> +	buff_kvm = vzalloc(buff_kvm_size);
+>> +	if (!buff_kvm)
+>> +		goto out;
+>> +
+>> +	ret = 0;
+>> +	uvcb.dump_area_origin = (u64)buff_kvm;
+>> +	/* We will loop until the user buffer is filled or an error occurs */
+>> +	do {
+>> +		/* Get 1MB worth of guest storage state data */
+>> +		cc = uv_call_sched(0, (u64)&uvcb);
+>> +
+>> +		/* All or nothing */
+>> +		if (cc) {
+>> +			ret = -EINVAL;
+>> +			break;
+>> +		}
+>> +
+>> +		size_done += uv_info.conf_dump_storage_state_len;
+> 
+> maybe save this in a local const variable with a shorter name? would be
+> more readable? const u64 dump_len = uv_info.conf_dump_storage_state_len;
+> 
+>> +		uvcb.dump_area_origin += uv_info.conf_dump_storage_state_len;
+>> +		buff_user_len -= uv_info.conf_dump_storage_state_len;
+>> +		uvcb.gaddr += HPAGE_SIZE;
+>> +
+>> +		/* KVM Buffer full, time to copy to the process */
+>> +		if (!buff_user_len || size_done == DUMP_BUFF_LEN) {
+>> +			if (copy_to_user(buff_user, buff_kvm, size_done)) {
+>> +				ret = -EFAULT;
+>> +				break;
+>> +			}
+>> +
+>> +			buff_user += size_done;
+>> +			size_done = 0;
+>> +			uvcb.dump_area_origin = (u64)buff_kvm;
+>> +		}
+>> +	} while (buff_user_len);
+>> +
+>> +	/* Report back where we ended dumping */
+>> +	*gaddr = uvcb.gaddr;
+>> +
+>> +	/* Lets only log errors, we don't want to spam */
+>> +out:
+>> +	if (ret)
+>> +		KVM_UV_EVENT(kvm, 3,
+>> +			     "PROTVIRT DUMP STORAGE STATE: addr %llx ret %d, uvcb rc %x rrc %x",
+>> +			     uvcb.gaddr, ret, uvcb.header.rc, uvcb.header.rrc);
+>> +	*rc = uvcb.header.rc;
+>> +	*rrc = uvcb.header.rrc;
+>> +	vfree(buff_kvm);
+>> +
+>> +	return ret;
+>> +}
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index bb2f91bc2305..1c60c2d314ba 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -1653,6 +1653,20 @@ struct kvm_s390_pv_unp {
+>>   	__u64 tweak;
+>>   };
+>>   
+>> +enum pv_cmd_dmp_id {
+>> +	KVM_PV_DUMP_INIT,
+>> +	KVM_PV_DUMP_CONFIG_STOR_STATE,
+>> +	KVM_PV_DUMP_COMPLETE,
+>> +};
+>> +
+>> +struct kvm_s390_pv_dmp {
+>> +	__u64 subcmd;
+>> +	__u64 buff_addr;
+>> +	__u64 buff_len;
+>> +	__u64 gaddr;		/* For dump storage state */
+>> +	__u64 reserved[4];
+>> +};
+>> +
+>>   enum pv_cmd_info_id {
+>>   	KVM_PV_INFO_VM,
+>>   	KVM_PV_INFO_DUMP,
+>> @@ -1696,6 +1710,7 @@ enum pv_cmd_id {
+>>   	KVM_PV_PREP_RESET,
+>>   	KVM_PV_UNSHARE_ALL,
+>>   	KVM_PV_INFO,
+>> +	KVM_PV_DUMP,
+>>   };
+>>   
+>>   struct kvm_pv_cmd {
+> 
 
