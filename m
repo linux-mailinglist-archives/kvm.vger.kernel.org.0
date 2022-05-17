@@ -2,508 +2,276 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 136C252A8A6
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 18:54:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7556252A8B0
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 18:57:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351245AbiEQQyy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 12:54:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57322 "EHLO
+        id S1351264AbiEQQ5X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 12:57:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351225AbiEQQyv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 12:54:51 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01C96403C7;
-        Tue, 17 May 2022 09:54:49 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24HFxFpw025902;
-        Tue, 17 May 2022 16:54:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=hfoZ8gZhmUJILLkQWzZTweBX6WWebovqwXfOBTeRDU0=;
- b=krbX24BnVGrZ+UgH7ir9+/ejWdnAq2DkNt0TwJ4L6gq3PlZsmuGArhwiI8OEJTVj5NgO
- BJYDasCUZTuWaIjJvAVKm4KD61MAxidOL9C/nk7Yh6tUz6qlCf3jDs22gNvvjuMTTDJT
- 75ArYB2+g+H+rb9Ri4TX48hDdhZrhwIq4mwZRUmhC63P8OSZUxzH0DvrDOEaCTYqjrcw
- wLAmEcMNCUWGZFxtSAVcI1UuBhWqzjzNvvVxRGiZHFF/HATQ/voJGe6JEmMWrRdQ3Ia7
- 1K6rPxxPU66/fyR3uOevwVwyM0auR80Y/Yl8DYXaiBXuoBHaJUmIFikZuo7no5kIqHE+ 1A== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4etvhetw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 16:54:48 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24HGn3Bn017375;
-        Tue, 17 May 2022 16:54:47 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3g2429chsm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 16:54:46 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24HGsAWn34668916
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 May 2022 16:54:10 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 09F21AE04D;
-        Tue, 17 May 2022 16:54:44 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CA004AE045;
-        Tue, 17 May 2022 16:54:43 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.40])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 17 May 2022 16:54:43 +0000 (GMT)
-Date:   Tue, 17 May 2022 18:54:30 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        borntraeger@linux.ibm.com
-Subject: Re: [PATCH v6 06/11] kvm: s390: Add configuration dump
- functionality
-Message-ID: <20220517185430.318a62eb@p-imbrenda>
-In-Reply-To: <20220517163629.3443-7-frankja@linux.ibm.com>
-References: <20220517163629.3443-1-frankja@linux.ibm.com>
-        <20220517163629.3443-7-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-redhat-linux-gnu)
+        with ESMTP id S1344714AbiEQQ5V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 12:57:21 -0400
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AE274F9F6
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 09:57:20 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id c22so693850pgu.2
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 09:57:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ZrkN+YgQcy8TmBn9IQj258ckKwGL6KgYMAMdpFCzl+0=;
+        b=Z0W6Fesmppi/k/m0+l3fvjlzx5G0H6gVZ2f07+JAuuTTeO8m8XLKP2G4bvCdR4dshd
+         oxnaIOLfzq6QRhRPG81rI5zqY7jSD9YM2LBq3QOcTjY0VHXuOngQiif1S5TCwBDxysoh
+         h0AjbNgPsSqPSwxx8oHr6i7jDH0j2OqWACyL+wN/ouZNo22OZiQDYFxaRZUY2QwsZ3xW
+         mcVqrIxTzRpSucPGRzuSVseoBxdg6sRhV8Q3S5WsxEloHQXn/6jPnnLECkDP0k0v7XSy
+         mr6KKhu8xhvceslqQ2zU98fQkxEHsOKLCQawz1a5xxLIiwNxN0+dzNgZRRhn1fndgvCT
+         1G6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ZrkN+YgQcy8TmBn9IQj258ckKwGL6KgYMAMdpFCzl+0=;
+        b=j36OZfkTSVo1bZSuGJoCYCRcjRruGRPFsqLcKtCyJd9+bS3yptHa04yj+SzwCeorsa
+         hHr7vKMl45Vsip+59TAFWzTIAFstguY5d4KY4KeQNtPCy9nyPbVyY6fXhOBF4WYouGFD
+         SWQG9/+PfNRRAIR246pwmqYgB7zcFEKiwi1zr3aM7U92WmNnDZTYQ3nUM4vNHv8ptmir
+         9+MjAediSF4n9QlX/Kv1EXhxea1z0FvVJl3VQAtvBerdzZ8JXBgfI3InWtrZhW+HNFTY
+         H4YuDDzG3/F6dmNszya4M0whReLAeo6oy/oucn64LlZ3wUb36jH+/jl1SHDTcOWj9fm5
+         xSBw==
+X-Gm-Message-State: AOAM531PbCEfNuqWK9SOwO5/HBBljguGG2rgje6lHHoJlg1N6eOeXUM9
+        16mnOHVsNgfUBVdyAdFlXkmO1A==
+X-Google-Smtp-Source: ABdhPJzWpE20upem7cs6BX2VWWBhtrwf10SFgIkk8EyDuL9wYbTgCsRbrxH8glHRNtY+fLSZh/J0rw==
+X-Received: by 2002:a62:a209:0:b0:510:3c47:7888 with SMTP id m9-20020a62a209000000b005103c477888mr23212920pff.14.1652806639519;
+        Tue, 17 May 2022 09:57:19 -0700 (PDT)
+Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
+        by smtp.gmail.com with ESMTPSA id cs20-20020a17090af51400b001df5dea7d4bsm1912045pjb.43.2022.05.17.09.57.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 May 2022 09:57:18 -0700 (PDT)
+Date:   Tue, 17 May 2022 16:57:14 +0000
+From:   David Matlack <dmatlack@google.com>
+To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH V2 6/7] KVM: X86/MMU: Allocate mmu->pae_root for PAE
+ paging on-demand
+Message-ID: <YoPT6petoQUnF4vB@google.com>
+References: <20220503150735.32723-1-jiangshanlai@gmail.com>
+ <20220503150735.32723-7-jiangshanlai@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: dnXRyuHmfTlOAdXoXwoszWwXQCY7L-DS
-X-Proofpoint-ORIG-GUID: dnXRyuHmfTlOAdXoXwoszWwXQCY7L-DS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-17_03,2022-05-17_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 spamscore=0 lowpriorityscore=0 clxscore=1015 adultscore=0
- mlxlogscore=999 bulkscore=0 malwarescore=0 priorityscore=1501 phishscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205170101
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220503150735.32723-7-jiangshanlai@gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 17 May 2022 16:36:24 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> Sometimes dumping inside of a VM fails, is unavailable or doesn't
-> yield the required data. For these occasions we dump the VM from the
-> outside, writing memory and cpu data to a file.
+On Tue, May 03, 2022 at 11:07:34PM +0800, Lai Jiangshan wrote:
+> From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 > 
-> Up to now PV guests only supported dumping from the inside of the
-> guest through dumpers like KDUMP. A PV guest can be dumped from the
-> hypervisor but the data will be stale and / or encrypted.
+> mmu->pae_root for non-PAE paging is allocated on-demand, but
+> mmu->pae_root for PAE paging is allocated early when struct kvm_mmu is
+> being created.
 > 
-> To get the actual state of the PV VM we need the help of the
-> Ultravisor who safeguards the VM state. New UV calls have been added
-> to initialize the dump, dump storage state data, dump cpu data and
-> complete the dump process. We expose these calls in this patch via a
-> new UV ioctl command.
+> Simplify the code to allocate mmu->pae_root for PAE paging and make
+> it on-demand.
 > 
-> The sensitive parts of the dump data are encrypted, the dump key is
-> derived from the Customer Communication Key (CCK). This ensures that
-> only the owner of the VM who has the CCK can decrypt the dump data.
-> 
-> The memory is dumped / read via a normal export call and a re-import
-> after the dump initialization is not needed (no re-encryption with a
-> dump key).
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 > ---
->  arch/s390/include/asm/kvm_host.h |   1 +
->  arch/s390/kvm/kvm-s390.c         |  93 ++++++++++++++++
->  arch/s390/kvm/kvm-s390.h         |   4 +
->  arch/s390/kvm/pv.c               | 183 +++++++++++++++++++++++++++++++
->  include/uapi/linux/kvm.h         |  15 +++
->  5 files changed, 296 insertions(+)
+>  arch/x86/kvm/mmu/mmu.c          | 99 ++++++++++++++-------------------
+>  arch/x86/kvm/mmu/mmu_internal.h | 10 ----
+>  2 files changed, 42 insertions(+), 67 deletions(-)
 > 
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index 766028d54a3e..a0fbe4820e0a 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -923,6 +923,7 @@ struct kvm_s390_pv {
->  	u64 guest_len;
->  	unsigned long stor_base;
->  	void *stor_var;
-> +	bool dumping;
->  };
->  
->  struct kvm_arch{
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 3cfaaa5994e1..24b8ac61efff 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2271,6 +2271,68 @@ static ssize_t kvm_s390_handle_pv_info(struct kvm_s390_pv_info *info)
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index bcb3e2730277..c97f830c5f8c 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -691,6 +691,41 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
 >  	}
 >  }
 >  
-> +static int kvm_s390_pv_dmp(struct kvm *kvm, struct kvm_pv_cmd *cmd,
-> +			   struct kvm_s390_pv_dmp dmp)
+> +static int mmu_alloc_pae_root(struct kvm_vcpu *vcpu)
 > +{
-> +	int r = -EINVAL;
-> +	void __user *result_buff = (void __user *)dmp.buff_addr;
+> +	struct page *page;
 > +
-> +	switch (dmp.subcmd) {
-> +	case KVM_PV_DUMP_INIT: {
-> +		if (kvm->arch.pv.dumping)
-> +			break;
+> +	if (vcpu->arch.mmu->root_role.level != PT32E_ROOT_LEVEL)
+> +		return 0;
+> +	if (vcpu->arch.mmu->pae_root)
+> +		return 0;
 > +
-> +		/*
-> +		 * Block SIE entry as concurrent dump UVCs could lead
-> +		 * to validities.
-> +		 */
-> +		kvm_s390_vcpu_block_all(kvm);
+> +	/*
+> +	 * Allocate a page to hold the four PDPTEs for PAE paging when emulating
+> +	 * 32-bit mode.  CR3 is only 32 bits even on x86_64 in this case.
+> +	 * Therefore we need to allocate the PDP table in the first 4GB of
+> +	 * memory, which happens to fit the DMA32 zone.
+> +	 */
+> +	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO | __GFP_DMA32);
+> +	if (!page)
+> +		return -ENOMEM;
+> +	vcpu->arch.mmu->pae_root = page_address(page);
 > +
-> +		r = uv_cmd_nodata(kvm_s390_pv_get_handle(kvm),
-> +				  UVC_CMD_DUMP_INIT, &cmd->rc, &cmd->rrc);
-> +		KVM_UV_EVENT(kvm, 3, "PROTVIRT DUMP INIT: rc %x rrc %x",
-> +			     cmd->rc, cmd->rrc);
-> +		if (!r) {
-> +			kvm->arch.pv.dumping = true;
-> +		} else {
-> +			kvm_s390_vcpu_unblock_all(kvm);
-> +			r = -EINVAL;
-> +		}
-> +		break;
-> +	}
-> +	case KVM_PV_DUMP_CONFIG_STOR_STATE: {
-> +		if (!kvm->arch.pv.dumping)
-> +			break;
-> +
-> +		/*
-> +		 * gaddr is an output parameter since we might stop
-> +		 * early. As dmp will be copied back in our caller, we
-> +		 * don't need to do it ourselves.
-> +		 */
-> +		r = kvm_s390_pv_dump_stor_state(kvm, result_buff, &dmp.gaddr, dmp.buff_len,
-> +						&cmd->rc, &cmd->rrc);
-> +		break;
-> +	}
-> +	case KVM_PV_DUMP_COMPLETE: {
-> +		if (!kvm->arch.pv.dumping)
-> +			break;
-> +
-> +		r = -EINVAL;
-> +		if (dmp.buff_len < uv_info.conf_dump_finalize_len)
-> +			break;
-> +
-> +		r = kvm_s390_pv_dump_complete(kvm, result_buff,
-> +					      &cmd->rc, &cmd->rrc);
-> +		break;
-> +	}
-> +	default:
-> +		r = -ENOTTY;
-> +		break;
-> +	}
-> +
-> +	return r;
+> +	/*
+> +	 * CR3 is only 32 bits when PAE paging is used, thus it's impossible to
+> +	 * get the CPU to treat the PDPTEs as encrypted.  Decrypt the page so
+> +	 * that KVM's writes and the CPU's reads get along.  Note, this is
+> +	 * only necessary when using shadow paging, as 64-bit NPT can get at
+> +	 * the C-bit even when shadowing 32-bit NPT, and SME isn't supported
+> +	 * by 32-bit kernels (when KVM itself uses 32-bit NPT).
+> +	 */
+> +	if (!tdp_enabled)
+> +		set_memory_decrypted((unsigned long)vcpu->arch.mmu->pae_root, 1);
+> +	else
+> +		WARN_ON_ONCE(shadow_me_value);
+> +	return 0;
 > +}
 > +
->  static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+>  static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
 >  {
->  	int r = 0;
-> @@ -2447,6 +2509,28 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->  		r = 0;
->  		break;
->  	}
-> +	case KVM_PV_DUMP: {
-> +		struct kvm_s390_pv_dmp dmp;
-> +
-> +		r = -EINVAL;
-> +		if (!kvm_s390_pv_is_protected(kvm))
-> +			break;
-> +
-> +		r = -EFAULT;
-> +		if (copy_from_user(&dmp, argp, sizeof(dmp)))
-> +			break;
-> +
-> +		r = kvm_s390_pv_dmp(kvm, cmd, dmp);
-> +		if (r)
-> +			break;
-> +
-> +		if (copy_to_user(argp, &dmp, sizeof(dmp))) {
-> +			r = -EFAULT;
-> +			break;
-> +		}
-> +
-> +		break;
-> +	}
->  	default:
->  		r = -ENOTTY;
->  	}
-> @@ -4555,6 +4639,15 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  	struct kvm_run *kvm_run = vcpu->run;
->  	int rc;
->  
-> +	/*
-> +	 * Running a VM while dumping always has the potential to
-> +	 * produce inconsistent dump data. But for PV vcpus a SIE
-> +	 * entry while dumping could also lead to a fatal validity
-> +	 * intercept which we absolutely want to avoid.
-> +	 */
-> +	if (vcpu->kvm->arch.pv.dumping)
-> +		return -EINVAL;
-> +
->  	if (kvm_run->immediate_exit)
->  		return -EINTR;
->  
-> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-> index 497d52a83c78..2c11eb5ba3ef 100644
-> --- a/arch/s390/kvm/kvm-s390.h
-> +++ b/arch/s390/kvm/kvm-s390.h
-> @@ -250,6 +250,10 @@ int kvm_s390_pv_set_sec_parms(struct kvm *kvm, void *hdr, u64 length, u16 *rc,
->  int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned long size,
->  		       unsigned long tweak, u16 *rc, u16 *rrc);
->  int kvm_s390_pv_set_cpu_state(struct kvm_vcpu *vcpu, u8 state);
-> +int kvm_s390_pv_dump_stor_state(struct kvm *kvm, void __user *buff_user,
-> +				u64 *gaddr, u64 buff_user_len, u16 *rc, u16 *rrc);
-> +int kvm_s390_pv_dump_complete(struct kvm *kvm, void __user *buff_user,
-> +			      u16 *rc, u16 *rrc);
->  
->  static inline u64 kvm_s390_pv_get_handle(struct kvm *kvm)
->  {
-> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-> index 7f7c0d6af2ce..52a67e2aaadd 100644
-> --- a/arch/s390/kvm/pv.c
-> +++ b/arch/s390/kvm/pv.c
-> @@ -7,6 +7,7 @@
->   */
->  #include <linux/kvm.h>
->  #include <linux/kvm_host.h>
-> +#include <linux/minmax.h>
->  #include <linux/pagemap.h>
->  #include <linux/sched/signal.h>
->  #include <asm/gmap.h>
-> @@ -303,3 +304,185 @@ int kvm_s390_pv_set_cpu_state(struct kvm_vcpu *vcpu, u8 state)
->  		return -EINVAL;
->  	return 0;
+>  	int r;
+> @@ -5031,6 +5066,9 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
+>  	r = mmu_topup_memory_caches(vcpu, !vcpu->arch.mmu->root_role.direct);
+>  	if (r)
+>  		goto out;
+> +	r = mmu_alloc_pae_root(vcpu);
+> +	if (r)
+> +		return r;
+>  	r = mmu_alloc_special_roots(vcpu);
+>  	if (r)
+>  		goto out;
+> @@ -5495,63 +5533,18 @@ static void free_mmu_pages(struct kvm_mmu *mmu)
+>  	free_page((unsigned long)mmu->pml5_root);
 >  }
-> +
-> +/* Size of the cache for the storage state dump data. 1MB for now */
-> +#define DUMP_BUFF_LEN HPAGE_SIZE
-> +
-> +/**
-> + * kvm_s390_pv_dump_stor_state
-> + *
-> + * @kvm: pointer to the guest's KVM struct
-> + * @buff_user: Userspace pointer where we will write the results to
-> + * @gaddr: Starting absolute guest address for which the storage state
-> + *         is requested.
-> + * @buff_user_len: Length of the buff_user buffer
-> + * @rc: Pointer to where the uvcb return code is stored
-> + * @rrc: Pointer to where the uvcb return reason code is stored
-> + *
-> + * Stores buff_len bytes of tweak component values to buff_user
-> + * starting with the 1MB block specified by the absolute guest address
-> + * (gaddr). The gaddr pointer will be updated with the last address
-> + * for which data was written when returning to userspace. buff_user
-> + * might be written to even if an error rc is returned. For instance
-> + * if we encounter a fault after writing the first page of data.
-> + *
-> + * Context: kvm->lock needs to be held
-> + *
-> + * Return:
-> + *  0 on success
-> + *  -ENOMEM if allocating the cache fails
-> + *  -EINVAL if gaddr is not aligned to 1MB
-> + *  -EINVAL if buff_user_len is not aligned to uv_info.conf_dump_storage_state_len
-> + *  -EINVAL if the UV call fails, rc and rrc will be set in this case
-> + *  -EFAULT if copying the result to buff_user failed
-> + */
-> +int kvm_s390_pv_dump_stor_state(struct kvm *kvm, void __user *buff_user,
-> +				u64 *gaddr, u64 buff_user_len, u16 *rc, u16 *rrc)
-> +{
-> +	struct uv_cb_dump_stor_state uvcb = {
-> +		.header.cmd = UVC_CMD_DUMP_CONF_STOR_STATE,
-> +		.header.len = sizeof(uvcb),
-> +		.config_handle = kvm->arch.pv.handle,
-> +		.gaddr = *gaddr,
-> +		.dump_area_origin = 0,
-> +	};
-> +	const u64 increment_len = uv_info.conf_dump_storage_state_len;
-> +	size_t buff_kvm_size;
-> +	size_t size_done = 0;
-> +	u8 *buff_kvm = NULL;
-> +	int cc, ret;
-> +
-> +	ret = -EINVAL;
-> +	/* UV call processes 1MB guest storage chunks at a time */
-> +	if (!IS_ALIGNED(*gaddr, HPAGE_SIZE))
-> +		goto out;
-> +
-> +	/*
-> +	 * We provide the storage state for 1MB chunks of guest
-> +	 * storage. The buffer will need to be aligned to
-> +	 * conf_dump_storage_state_len so we don't end on a partial
-> +	 * chunk.
-> +	 */
-> +	if (!buff_user_len ||
-> +	    !IS_ALIGNED(buff_user_len, increment_len))
-> +		goto out;
-> +
-> +	/*
-> +	 * Allocate a buffer from which we will later copy to the user
-> +	 * process. We don't want userspace to dictate our buffer size
-> +	 * so we limit it to DUMP_BUFF_LEN.
-> +	 */
-> +	ret = -ENOMEM;
-> +	buff_kvm_size = min_t(u64, buff_user_len, DUMP_BUFF_LEN);
-> +	buff_kvm = vzalloc(buff_kvm_size);
-> +	if (!buff_kvm)
-> +		goto out;
-> +
-> +	ret = 0;
-> +	uvcb.dump_area_origin = (u64)buff_kvm;
-> +	/* We will loop until the user buffer is filled or an error occurs */
-> +	do {
-> +		/* Get 1MB worth of guest storage state data */
-> +		cc = uv_call_sched(0, (u64)&uvcb);
-> +
-> +		/* All or nothing */
-> +		if (cc) {
-> +			ret = -EINVAL;
-> +			break;
-> +		}
-> +
-> +		size_done += increment_len;
-> +		uvcb.dump_area_origin += increment_len;
-> +		buff_user_len -= increment_len;
-> +		uvcb.gaddr += HPAGE_SIZE;
-> +
-> +		/* KVM Buffer full, time to copy to the process */
-> +		if (!buff_user_len || size_done == DUMP_BUFF_LEN) {
-> +			if (copy_to_user(buff_user, buff_kvm, size_done)) {
-> +				ret = -EFAULT;
-> +				break;
-> +			}
-> +
-> +			buff_user += size_done;
-> +			size_done = 0;
-> +			uvcb.dump_area_origin = (u64)buff_kvm;
-> +		}
-> +	} while (buff_user_len);
-> +
-> +	/* Report back where we ended dumping */
-> +	*gaddr = uvcb.gaddr;
-> +
-> +	/* Lets only log errors, we don't want to spam */
-> +out:
-> +	if (ret)
-> +		KVM_UV_EVENT(kvm, 3,
-> +			     "PROTVIRT DUMP STORAGE STATE: addr %llx ret %d, uvcb rc %x rrc %x",
-> +			     uvcb.gaddr, ret, uvcb.header.rc, uvcb.header.rrc);
-> +	*rc = uvcb.header.rc;
-> +	*rrc = uvcb.header.rrc;
-> +	vfree(buff_kvm);
-> +
-> +	return ret;
-> +}
-> +
-> +/**
-> + * kvm_s390_pv_dump_complete
-> + *
-> + * @kvm: pointer to the guest's KVM struct
-> + * @buff_user: Userspace pointer where we will write the results to
-> + * @rc: Pointer to where the uvcb return code is stored
-> + * @rrc: Pointer to where the uvcb return reason code is stored
-> + *
-> + * Completes the dumping operation and writes the completion data to
-> + * user space.
-> + *
-> + * Context: kvm->lock needs to be held
-> + *
-> + * Return:
-> + *  0 on success
-> + *  -ENOMEM if allocating the completion buffer fails
-> + *  -EINVAL if the UV call fails, rc and rrc will be set in this case
-> + *  -EFAULT if copying the result to buff_user failed
-> + */
-> +int kvm_s390_pv_dump_complete(struct kvm *kvm, void __user *buff_user,
-> +			      u16 *rc, u16 *rrc)
-> +{
-> +	struct uv_cb_dump_complete complete = {
-> +		.header.len = sizeof(complete),
-> +		.header.cmd = UVC_CMD_DUMP_COMPLETE,
-> +		.config_handle = kvm_s390_pv_get_handle(kvm),
-> +	};
-> +	u64 *compl_data;
-> +	int ret;
-> +
-> +	/* Allocate dump area */
-> +	ret = -ENOMEM;
-
-you can remove this ^
-
-> +	compl_data = vzalloc(uv_info.conf_dump_finalize_len);
-> +	if (!compl_data)
-> +		return ret;
-
-and just return -ENOMEM here ^
-
-with that fixed:
-
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
-> +	complete.dump_area_origin = (u64)compl_data;
-> +
-> +	ret = uv_call_sched(0, (u64)&complete);
-> +	*rc = complete.header.rc;
-> +	*rrc = complete.header.rrc;
-> +	KVM_UV_EVENT(kvm, 3, "PROTVIRT DUMP COMPLETE: rc %x rrc %x",
-> +		     complete.header.rc, complete.header.rrc);
-> +
-> +	if (!ret) {
-> +		/*
-> +		 * kvm_s390_pv_dealloc_vm() will also (mem)set
-> +		 * this to false on a reboot or other destroy
-> +		 * operation for this vm.
-> +		 */
-> +		kvm->arch.pv.dumping = false;
-> +		kvm_s390_vcpu_unblock_all(kvm);
-> +		ret = copy_to_user(buff_user, compl_data, uv_info.conf_dump_finalize_len);
-> +		if (ret)
-> +			ret = -EFAULT;
-> +	}
-> +	vfree(compl_data);
-> +	/* If the UVC returned an error, translate it to -EINVAL */
-> +	if (ret > 0)
-> +		ret = -EINVAL;
-> +	return ret;
-> +}
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 2eba89d7ec29..b34850907291 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1645,6 +1645,20 @@ struct kvm_s390_pv_unp {
->  	__u64 tweak;
->  };
 >  
-> +enum pv_cmd_dmp_id {
-> +	KVM_PV_DUMP_INIT,
-> +	KVM_PV_DUMP_CONFIG_STOR_STATE,
-> +	KVM_PV_DUMP_COMPLETE,
-> +};
-> +
-> +struct kvm_s390_pv_dmp {
-> +	__u64 subcmd;
-> +	__u64 buff_addr;
-> +	__u64 buff_len;
-> +	__u64 gaddr;		/* For dump storage state */
-> +	__u64 reserved[4];
-> +};
-> +
->  enum pv_cmd_info_id {
->  	KVM_PV_INFO_VM,
->  	KVM_PV_INFO_DUMP,
-> @@ -1688,6 +1702,7 @@ enum pv_cmd_id {
->  	KVM_PV_PREP_RESET,
->  	KVM_PV_UNSHARE_ALL,
->  	KVM_PV_INFO,
-> +	KVM_PV_DUMP,
->  };
->  
->  struct kvm_pv_cmd {
+> -static int __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
+> +static void __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
 
+vcpu is now unused.
+
+>  {
+> -	struct page *page;
+>  	int i;
+>  
+>  	mmu->root.hpa = INVALID_PAGE;
+>  	mmu->root.pgd = 0;
+>  	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+>  		mmu->prev_roots[i] = KVM_MMU_ROOT_INFO_INVALID;
+
+optional: Consider open-coding this directly in kvm_mmu_create() and
+drop __kvm_mmu_create().
+
+> -
+> -	/* vcpu->arch.guest_mmu isn't used when !tdp_enabled. */
+> -	if (!tdp_enabled && mmu == &vcpu->arch.guest_mmu)
+> -		return 0;
+> -
+> -	/*
+> -	 * When using PAE paging, the four PDPTEs are treated as 'root' pages,
+> -	 * while the PDP table is a per-vCPU construct that's allocated at MMU
+> -	 * creation.  When emulating 32-bit mode, cr3 is only 32 bits even on
+> -	 * x86_64.  Therefore we need to allocate the PDP table in the first
+> -	 * 4GB of memory, which happens to fit the DMA32 zone.  TDP paging
+> -	 * generally doesn't use PAE paging and can skip allocating the PDP
+> -	 * table.  The main exception, handled here, is SVM's 32-bit NPT.  The
+> -	 * other exception is for shadowing L1's 32-bit or PAE NPT on 64-bit
+> -	 * KVM; that horror is handled on-demand by mmu_alloc_special_roots().
+> -	 */
+> -	if (tdp_enabled && kvm_mmu_get_tdp_level(vcpu) > PT32E_ROOT_LEVEL)
+> -		return 0;
+> -
+> -	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_DMA32);
+> -	if (!page)
+> -		return -ENOMEM;
+> -
+> -	mmu->pae_root = page_address(page);
+> -
+> -	/*
+> -	 * CR3 is only 32 bits when PAE paging is used, thus it's impossible to
+> -	 * get the CPU to treat the PDPTEs as encrypted.  Decrypt the page so
+> -	 * that KVM's writes and the CPU's reads get along.  Note, this is
+> -	 * only necessary when using shadow paging, as 64-bit NPT can get at
+> -	 * the C-bit even when shadowing 32-bit NPT, and SME isn't supported
+> -	 * by 32-bit kernels (when KVM itself uses 32-bit NPT).
+> -	 */
+> -	if (!tdp_enabled)
+> -		set_memory_decrypted((unsigned long)mmu->pae_root, 1);
+> -	else
+> -		WARN_ON_ONCE(shadow_me_value);
+> -
+> -	for (i = 0; i < 4; ++i)
+> -		mmu->pae_root[i] = INVALID_PAE_ROOT;
+> -
+> -	return 0;
+>  }
+>  
+>  int kvm_mmu_create(struct kvm_vcpu *vcpu)
+
+kvm_mmu_create() could return void now too.
+
+>  {
+> -	int ret;
+> -
+>  	vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
+>  	vcpu->arch.mmu_pte_list_desc_cache.gfp_zero = __GFP_ZERO;
+>  
+> @@ -5563,18 +5556,10 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.mmu = &vcpu->arch.root_mmu;
+>  	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
+>  
+> -	ret = __kvm_mmu_create(vcpu, &vcpu->arch.guest_mmu);
+> -	if (ret)
+> -		return ret;
+> -
+> -	ret = __kvm_mmu_create(vcpu, &vcpu->arch.root_mmu);
+> -	if (ret)
+> -		goto fail_allocate_root;
+> +	__kvm_mmu_create(vcpu, &vcpu->arch.guest_mmu);
+> +	__kvm_mmu_create(vcpu, &vcpu->arch.root_mmu);
+>  
+> -	return ret;
+> - fail_allocate_root:
+> -	free_mmu_pages(&vcpu->arch.guest_mmu);
+> -	return ret;
+> +	return 0;
+>  }
+>  
+>  #define BATCH_ZAP_PAGES	10
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index 1bff453f7cbe..d5673a42680f 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -20,16 +20,6 @@ extern bool dbg;
+>  #define MMU_WARN_ON(x) do { } while (0)
+>  #endif
+>  
+> -/*
+> - * Unlike regular MMU roots, PAE "roots", a.k.a. PDPTEs/PDPTRs, have a PRESENT
+> - * bit, and thus are guaranteed to be non-zero when valid.  And, when a guest
+> - * PDPTR is !PRESENT, its corresponding PAE root cannot be set to INVALID_PAGE,
+> - * as the CPU would treat that as PRESENT PDPTR with reserved bits set.  Use
+> - * '0' instead of INVALID_PAGE to indicate an invalid PAE root.
+> - */
+> -#define INVALID_PAE_ROOT	0
+> -#define IS_VALID_PAE_ROOT(x)	(!!(x))
+> -
+>  typedef u64 __rcu *tdp_ptep_t;
+>  
+>  struct kvm_mmu_page {
+> -- 
+> 2.19.1.6.gb485710b
+> 
