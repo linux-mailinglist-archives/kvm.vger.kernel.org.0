@@ -2,138 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 211BE52A4B0
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 16:22:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 667B352A519
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 16:42:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348835AbiEQOWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 10:22:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59356 "EHLO
+        id S1344944AbiEQOmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 10:42:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348833AbiEQOWJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 10:22:09 -0400
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08A7F43EDF
-        for <kvm@vger.kernel.org>; Tue, 17 May 2022 07:22:08 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id t25so31620990lfg.7
-        for <kvm@vger.kernel.org>; Tue, 17 May 2022 07:22:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=T2Ql4EilVhMbhFlF9rltYRS/JSSzR/pII+0Y623bIJQ=;
-        b=Gk7YNidWLYatOf/aKLBaHhTec33dNpoEgdTOL+ILdTijNAA/GmJXqS5ytyb2YAxiIa
-         hfgnMSB0rDR4qjdAxJnKRsCQ674xfm1WRgqBIXiIpQ7HtDIE9+9R3RZjqJIraOm4UdxI
-         XQL7jNju9ScDasP1z69lUrQ18ZLPPKVNsyqKZ7fYExj+WHBawJINoI+9uR0VF0SNScj4
-         dlPrKzU9s+b8Edo50PvS3RYDBoMZIl+5FX+am1mg7V9FcUiICtgnooAIj2I+o2tPXve+
-         SSbQSATukFRZtBFM2aeI36o+M4SQHp0p7l8eF1hmotZrvOWBDoCAf1k/3UUQ6cnggpm2
-         kpTQ==
+        with ESMTP id S236258AbiEQOmT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 10:42:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 70B872E0BC
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 07:42:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652798537;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hTjqsV1Fp+r+noPld4SG87IVv2bHAbFunBtzqB6+vis=;
+        b=fDsStp5R1XB4esuQD0Qn9m6Vv/X4EshP/nM+iyMsHexqiUKGwhf23a2nrtDaMzLpNEPqdx
+        IJcUbIfeV+wdjtyeNGEGKjP1f9CaqBXsQuW5ItsnL8GpDstnxHM/ih1Bf++INGCiIExqu7
+        0StW/Ek+nLEncWEpC0ZSw9vBoZBH7YU=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-101-U91L9dPVOjeFsgG-79Smow-1; Tue, 17 May 2022 10:42:14 -0400
+X-MC-Unique: U91L9dPVOjeFsgG-79Smow-1
+Received: by mail-ej1-f70.google.com with SMTP id v13-20020a170906b00d00b006f51e289f7cso7408450ejy.19
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 07:42:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=T2Ql4EilVhMbhFlF9rltYRS/JSSzR/pII+0Y623bIJQ=;
-        b=m1m4obgr+3bD9GbfNIvLEHgTk9YFko4yFUmUS/X5bDZAO5AczOixBWJWUQNjqoe5SY
-         36RacoiiRcXsh+6jjZcwwNTivBACZZ5f/tADyQVE4DxQmjj/MeXXFuz8YzOt8mpDBgLA
-         kmRxhUngfAJAMyLCuJElQd0GYkP8jJM/RXonFPKppSYwqimszju9Tmx4dGKRwpNVk1kd
-         8KfdXA/F7nsTpqRzE3BQfKSanUDMdeIl1IiNCe0hziNa0bJGZ4MK5TKju72rd5Ug9pZn
-         3Q94PtYPg5j+rghNDKFN2YAD3XqHCX/pK/uf71O+FgSS8C4H1rv8iev4omrFlx6sPsD8
-         yCKw==
-X-Gm-Message-State: AOAM5335VwD3DrfsuxrkM1aGucBgSg64NnJd93KKb4CJD3k9WbbLCZVn
-        TvUryC0HOIKPMIgwCInTLnLErFiTM1uAmsEhFsn0lABRIb1lLQ==
-X-Google-Smtp-Source: ABdhPJxU70twrYvV99BRKE7BN7aWUXU/yX8gl5Q+SHWUUrCOyVCx1gwVZN4u/j/zYTKMl192esKzFhVbCtswbHnaW9M=
-X-Received: by 2002:ac2:4c54:0:b0:473:a414:1768 with SMTP id
- o20-20020ac24c54000000b00473a4141768mr16880377lfk.537.1652797326336; Tue, 17
- May 2022 07:22:06 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hTjqsV1Fp+r+noPld4SG87IVv2bHAbFunBtzqB6+vis=;
+        b=eSDrmfSYzTIyio/Jay3zi8MKivsgRU8LhIGuYJqsjEgSyefkIRPJ7eIGShQnr64wtU
+         VUyUfzM1aexdZUZQsjgczOlOUIuOCDsSrjQUe6FiTQ7hKsY0FQKLmcubA19NQ8y1RHuE
+         KvudnLM8KVjk71hwj4UPD1pAL5VPFWOBwgjMavoHJi7EHcukfHpElgS8WRtA/Qdbnchx
+         6184vCLenRWWFGumaViYX5/ofJav2I7UqaJsK/5f9t0RDMhFSquFpGjyXSY1S7Fslp7m
+         xjXMuQXuRFboVEeVOG/giBdE3w8SEPIE+CNY1k9tYzEUdw6bYox7CFxGUP7ed2h0e9Jy
+         0HCg==
+X-Gm-Message-State: AOAM532rmnJ/Z5DKnH1f0msszWntv0I1wUCYO8eRdsIqZQkyehnlBIs/
+        IAGW0s51dQAz9Jdjts1JQFebOTm6w/ovQ48WR+fXLFzxjoIPq7BR2BTotCZcS3v2uNRIWEKKw49
+        3Ul86gBT5E3ib
+X-Received: by 2002:a05:6402:238f:b0:42a:98d8:ae1b with SMTP id j15-20020a056402238f00b0042a98d8ae1bmr17423848eda.168.1652798530562;
+        Tue, 17 May 2022 07:42:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJye0bbFmMONyTqmP3It4fL7QuUCBzVF03Vy8Tp5rLhkr7l+Xsej5oxl8SSRjnzPPSKeMkbGMg==
+X-Received: by 2002:a05:6402:238f:b0:42a:98d8:ae1b with SMTP id j15-20020a056402238f00b0042a98d8ae1bmr17423824eda.168.1652798530348;
+        Tue, 17 May 2022 07:42:10 -0700 (PDT)
+Received: from gator (cst2-173-79.cust.vodafone.cz. [31.30.173.79])
+        by smtp.gmail.com with ESMTPSA id e9-20020a056402104900b0042ac0e79bb6sm1853112edu.45.2022.05.17.07.42.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 May 2022 07:42:09 -0700 (PDT)
+Date:   Tue, 17 May 2022 16:42:07 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Bill Wendling <morbo@google.com>
+Cc:     kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Nikos Nikoleris <nikos.nikoleris@arm.com>,
+        Zixuan Wang <zixuanwang@google.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvmarm@lists.cs.columbia.edu
+Subject: Re: [kvm-unit-tests PATCH] arm64: Check for dynamic relocs with
+ readelf
+Message-ID: <20220517144207.662hyp276g3syzf2@gator>
+References: <20220504230446.2253109-1-morbo@google.com>
 MIME-Version: 1.0
-From:   Gernot Poerner <gernot.poerner@gmail.com>
-Date:   Tue, 17 May 2022 16:21:55 +0200
-Message-ID: <CAKkmiEn2kWRWHcJv2j0Vh_VCugdKvGkApXWF3_mfBe9R++7YNg@mail.gmail.com>
-Subject: Possible virtio bug, ideas needed
-To:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220504230446.2253109-1-morbo@google.com>
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi list,
+On Wed, May 04, 2022 at 04:04:46PM -0700, Bill Wendling wrote:
+> Clang's version of objdump doesn't recognize "setftest.elf" as a dynamic
+> object and produces an error stating such.
+> 
+> 	$ llvm-objdump -R ./arm/selftest.elf
+> 	arm/selftest.elf:	file format elf64-littleaarch64
+> 	llvm-objdump: error: './arm/selftest.elf': not a dynamic object
+> 
+> This causes the ARM64 "arch_elf_check" check to fail. Using "readelf
+> -rW" is a better option way to get the same information and produces the
+> same information in both binutils and LLVM.
+> 
+> Signed-off-by: Bill Wendling <morbo@google.com>
+> ---
+>  arm/Makefile.arm64 | 6 +++---
+>  configure          | 2 ++
+>  2 files changed, 5 insertions(+), 3 deletions(-)
 
-I hope this is the right place to ask - if not please show me a better
-place to submit this.
+Merged to https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git master
 
-I am facing a problem with the virtio network driver which we were not
-able to resolve yet
-so I'm now pretty convinced now that this is really a bug.
+Thanks,
+drew
 
-Thing is - I cannot "make it fail" in a reproducable way in our
-environment but it happens pretty
-regularly, always with the same effect. Also, since it happens on
-production Vms the need to
-get them working again is pretty high.
-I have set up a new cluster lately where it happens more often then in
-the "standard"
-environment so I was at least able to dig a bit deeper into it and do
-some more tests.
 
-The environment is a ganeti cluster running qemu-kvm as the
-hypervisor. The underlying
-Hardware is 64Bit X86 Intel with Mellanox network adapters (Connect-X
-4 & 5). The vms are
-connected via tap interfaces to a linux brige on the host nodes. I am
-using both regular vlans
-and vxlan (happens in both environments.)
-The host and guest OS is Debian 10 Buster, running the same kernel
-from backports (currently 5.10.0-0.bpo.12-amd64)
 
-After a seemingly random time, Vms suddenly get inaccessible over the
-network. A reboot
-fixes it (soft or hard, doesn't matter), also a Vm migration fixes it.
+> 
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index 6feac76f895f..42e18e771b3b 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -14,9 +14,9 @@ mno_outline_atomics := $(call cc-option, -mno-outline-atomics, "")
+>  CFLAGS += $(mno_outline_atomics)
+>  
+>  define arch_elf_check =
+> -	$(if $(shell ! $(OBJDUMP) -R $(1) >&/dev/null && echo "nok"),
+> -		$(error $(shell $(OBJDUMP) -R $(1) 2>&1)))
+> -	$(if $(shell $(OBJDUMP) -R $(1) | grep R_ | grep -v R_AARCH64_RELATIVE),
+> +	$(if $(shell ! $(READELF) -rW $(1) >&/dev/null && echo "nok"),
+> +		$(error $(shell $(READELF) -rW $(1) 2>&1)))
+> +	$(if $(shell $(READELF) -rW $(1) | grep R_ | grep -v R_AARCH64_RELATIVE),
+>  		$(error $(1) has unsupported reloc types))
+>  endef
+>  
+> diff --git a/configure b/configure
+> index 86c3095a245a..23085da7dcc5 100755
+> --- a/configure
+> +++ b/configure
+> @@ -12,6 +12,7 @@ cflags=
+>  ld=ld
+>  objcopy=objcopy
+>  objdump=objdump
+> +readelf=readelf
+>  ar=ar
+>  addr2line=addr2line
+>  arch=$(uname -m | sed -e 's/i.86/i386/;s/arm64/aarch64/;s/arm.*/arm/;s/ppc64.*/ppc64/')
+> @@ -372,6 +373,7 @@ CFLAGS=$cflags
+>  LD=$cross_prefix$ld
+>  OBJCOPY=$cross_prefix$objcopy
+>  OBJDUMP=$cross_prefix$objdump
+> +READELF=$cross_prefix$readelf
+>  AR=$cross_prefix$ar
+>  ADDR2LINE=$cross_prefix$addr2line
+>  TEST_DIR=$testdir
+> -- 
+> 2.36.0.464.gb9c8b46e94-goog
+> 
 
-When looking at the traffic with tcpdump, the problem seems to be the incoming
-queue of the eth0 adapter inside the VM doesn't recieve any packets anymore.
-
-All other hops see all the packets, including request (arp) of the
-broken VM. The answers
-reach the tap interface but get dropped on their way to eth0.
-Since even arp doesn't work anymore, the VM is then dead in the water.
-The interface
-still has a link, there are no log entires or anything useful in dmesg.
-
-Things I already veriefied and tried:
-
-- made sure it's not any kind of mac address conflict
-- there are no iptables/ebtables involved anywhere
-- ifdown/ifup eth0 inside the VM has no effect
-- there is no qos/traffic control involved on the host node
-- we upgraded the kernel on the host nodes and vms (from Debian 10s
-4.19 standard to the current 5.10) - no change
-- we upgraded qemu-kvm from 5.4 to 7.0 - no change
-- we tested self compiled kernel 5.15 and even 5.18 rc 7 on the VMs - no change
-- we upgraded the firmware on the Mellanox adapters - no change
-- we disabled any offloads on the virtual interface - no change
-- I even thought about a very far fetched idea regarding pause frames
-but am pretty sure that is not the case here
-- in addition to a reboot or migration, what fixes it is to do ifdown
-eth0, rmmod virtio_net, modprobe virtio_net, ifup eth0
-- this finally convinced me that it probably is something with the virtio driver
-- it seems to happen only on high traffic Vms, although it's possible
-it would happen on others too if they reached some kind of
-uptime/amount of network traffic
-- the amount of traffic passed on the eth interface seems pretty
-different between similar vms which got hit
-
-I am now at some kind of dead end and have no real idea what I could
-further do, besides asking and maybe
-creating a bug report.
-I would be especially interested in any kind of idea or tip on which
-counters or proc entries I could watch
-or what could be done to do even deeper debugging when the issue
-occurs. I can give many more details if needed
-too.
-
-Any hints or help would be greatly appreciated.
-
-G
