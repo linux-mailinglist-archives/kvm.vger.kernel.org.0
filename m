@@ -2,61 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B568529690
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 03:11:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DDB9529694
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 03:14:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235121AbiEQBL2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 21:11:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41298 "EHLO
+        id S235166AbiEQBOK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 21:14:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236996AbiEQBLH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 21:11:07 -0400
-Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEB65765F;
-        Mon, 16 May 2022 18:11:02 -0700 (PDT)
-Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-2fefb051547so43903597b3.5;
-        Mon, 16 May 2022 18:11:02 -0700 (PDT)
+        with ESMTP id S229561AbiEQBOH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 21:14:07 -0400
+Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DFAC40928;
+        Mon, 16 May 2022 18:14:06 -0700 (PDT)
+Received: by mail-yb1-xb2f.google.com with SMTP id r1so29963762ybo.7;
+        Mon, 16 May 2022 18:14:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=tK+bP9vo0Ukbos70BXEqWIcCtWqGVN373k0TKiHr/AU=;
-        b=WQpneyzBu2DwklQKiFWEpiHu9SfX4DPeZo4vixgqjEmC+97QmkJZ09ZQ3HGrEwyt/f
-         E2zLyIC1HGW/cKocnRjovrLcvXqXeoq3B6ZuEBLGSmHbBT+u6LMt3hMowgm0sRGA4ESf
-         84Cq5l3apQw8RDdVJiL7V9A5Bm0spDEuaKQQhfEKvJu7Wwf9f6MyGRJmxPzYxij2LycU
-         qUhLC8QTAYMOwc+oFQXfqcCvXAJEHdgcNMX7vKskCuDgi1PWc1TXaiHcM+iklvSbN/9/
-         G09UjC9vgpjvmDSZgTxlHRItUyyga59jzlMv00m5T4z2K3D78LSPgxJjPv6nxz7miJaa
-         3GCg==
+        bh=Krh36ViT/EwDdvnp42Kcg/9QiROI+wYenJfQpSBh8DQ=;
+        b=dZ0jQ9xFO9MEBQYlRmAuN309bWDTIKOAEWzH10mbYlxK3A92D3O0rHe3NMpGuuQRQ0
+         82bXfjvfZbU8U3eVvx/0QD4KI+iKYr756RlYNR6+VTLCwjM+kkGTBPSXnaMWH3stcIhY
+         vHxweQPMbfB2eifacLq1uvr8DRxV1oFRo9vlvfHhreO9osahVcApnPBYPyvDlMUbCsV8
+         G+F3cLdAzLnhtRB7IAt8X+y9WfkVbQLtMU5rMFylehhZezTHqvuiNzVGAyB86G4/qMCe
+         172JNlMOqmXe+aSUG0Ti93KH8Ky0IOH8nJ7VpS0nsgyOJUT6597M2MIhN1IUXsI4fyy3
+         f2Vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=tK+bP9vo0Ukbos70BXEqWIcCtWqGVN373k0TKiHr/AU=;
-        b=UiK/n8UN8rPCscRdS5iXlA5CsArpeb+DOP4vRgNaqEQgNuGMdwewryNRnDWtcXACJC
-         P3IPtl7N1WqEH+0F0vnUbgusb0W8wD5hYF1rl4Dlr5bNfRdX/GTzAsygQNFf/mJh/HPh
-         EEBD6J+6O+aInfh8WDB3EwAB5CtkQ67HdaKPTwjZ/zEQvTkIDAjx28R5puHctbFvy/oz
-         1TMSBMLiCri2sN/uNE65QmgS5I++jyfSYFX5kPyfqmV4aOeVx8Eyz/oPJ+zuvIFnmb4C
-         ciIfdGUaq0bRDrnJZkEDxogBKqWlo6Me10meV61YBlb8KewsFIbucshIBod8Ive2a2dF
-         3+hg==
-X-Gm-Message-State: AOAM533PLPXi7CoRegETAsHL41R2eJqXpZgxxW4RlWJv6ZzlRKtYLk6p
-        8qYRBHMt7id1gbE+93gOZJ+N8FdqS8OdDWl8tmyiiXHZI6I=
-X-Google-Smtp-Source: ABdhPJw0E8PKT+O1LNyMWkFHjdYNmN9Cra8Po7n5nCRisZtxOpftiYbruJcBdHIM9mU4m7LNoUv/0bku/2gcx1Uw6s8=
-X-Received: by 2002:a0d:da87:0:b0:2fb:994f:7bc4 with SMTP id
- c129-20020a0dda87000000b002fb994f7bc4mr23996906ywe.369.1652749861989; Mon, 16
- May 2022 18:11:01 -0700 (PDT)
+        bh=Krh36ViT/EwDdvnp42Kcg/9QiROI+wYenJfQpSBh8DQ=;
+        b=bo7hlcxO/eO/rssHf5vIysaLWaAFBRy/6KoCbsdLMEFHb7bop2fQdeUEmkHt9qiZOM
+         +/WaRRaPXbPeKPTqLcgr4o3slT83dvxn+LtkuttkuRdTnbLDbs3WHk6RhIkTuJ7t+br7
+         bmBNbMeBMGFYf8q7o+lav3/bK7Nll/C4wKHi6vCnxsPJakiZpQYn/P6WsSrISTQP5qTT
+         4YhGLP8Gw0MvYPhikhbTaFeIF7UoRyAlLKYdTluKZlDKGUlFJi7NENYxvnUeCb3ixgxU
+         ixJ7zop8Tcb88rPE2RMngDLuWuCdgjmcu0SXI9khGDc/bVxz3keKc0PyMcJCVz1cuNQz
+         RRdQ==
+X-Gm-Message-State: AOAM532+ZUXA7fy11IatRMAglrjJxsw2wmhZBfBvwGGmp8zUyomjyz5v
+        uuoA/ThIjkSYYNjfqtVuj/LjLv+FXtoT5EV4kkA=
+X-Google-Smtp-Source: ABdhPJyFdaX9VMqmdftxmEICDY2lizLH2P+RWV4/NuazfAIT5DH3J4F0SfPEA0zhjUDb0Rx58XTM5r2HrA5UMLS+7TQ=
+X-Received: by 2002:a25:7694:0:b0:64d:b38b:40ec with SMTP id
+ r142-20020a257694000000b0064db38b40ecmr6827973ybc.526.1652750045900; Mon, 16
+ May 2022 18:14:05 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220415103414.86555-1-jiangshanlai@gmail.com>
- <YoK3zEVj+DuIBEs7@google.com> <CAJhGHyBYaASEkB7FqGQ3FThgNDkOzvHmC5KFw9y0SEu3we8s3A@mail.gmail.com>
-In-Reply-To: <CAJhGHyBYaASEkB7FqGQ3FThgNDkOzvHmC5KFw9y0SEu3we8s3A@mail.gmail.com>
+References: <20220503150735.32723-1-jiangshanlai@gmail.com>
+ <20220503150735.32723-4-jiangshanlai@gmail.com> <YoLlzcejEDh8VpoB@google.com>
+In-Reply-To: <YoLlzcejEDh8VpoB@google.com>
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Tue, 17 May 2022 09:10:50 +0800
-Message-ID: <CAJhGHyAH-QozJhEwRbkww0ObjQK8-g7qKb0+hiD2+tKXvOf=0w@mail.gmail.com>
-Subject: Re: [PATCH] kvm: x86/svm/nested: Cache PDPTEs for nested NPT in PAE
- paging mode
-To:     Sean Christopherson <seanjc@google.com>
+Date:   Tue, 17 May 2022 09:13:54 +0800
+Message-ID: <CAJhGHyCKdxti0gDjDP27MDd=bK+0BecXqzExo5t-WAOQLO5WwA@mail.gmail.com>
+Subject: Re: [PATCH V2 3/7] KVM: X86/MMU: Link PAE root pagetable with its children
+To:     David Matlack <dmatlack@google.com>
 Cc:     LKML <linux-kernel@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -64,11 +65,7 @@ Cc:     LKML <linux-kernel@vger.kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Avi Kivity <avi@redhat.com>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
@@ -80,74 +77,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 17, 2022 at 9:02 AM Lai Jiangshan <jiangshanlai@gmail.com> wrote:
+On Tue, May 17, 2022 at 8:01 AM David Matlack <dmatlack@google.com> wrote:
 >
-> On Tue, May 17, 2022 at 4:45 AM Sean Christopherson <seanjc@google.com> wrote:
+> On Tue, May 03, 2022 at 11:07:31PM +0800, Lai Jiangshan wrote:
+> > From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 > >
-> > On Fri, Apr 15, 2022, Lai Jiangshan wrote:
-> > > From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
-> > >
-> > > When NPT enabled L1 is PAE paging, vcpu->arch.mmu->get_pdptrs() which
-> > > is nested_svm_get_tdp_pdptr() reads the guest NPT's PDPTE from memroy
-> > > unconditionally for each call.
-> > >
-> > > The guest PAE root page is not write-protected.
-> > >
-> > > The mmu->get_pdptrs() in FNAME(walk_addr_generic) might get different
-> > > values every time or it is different from the return value of
-> > > mmu->get_pdptrs() in mmu_alloc_shadow_roots().
-> > >
-> > > And it will cause FNAME(fetch) installs the spte in a wrong sp
-> > > or links a sp to a wrong parent since FNAME(gpte_changed) can't
-> > > check these kind of changes.
-> > >
-> > > Cache the PDPTEs and the problem is resolved.  The guest is responsible
-> > > to info the host if its PAE root page is updated which will cause
-> > > nested vmexit and the host updates the cache when next nested run.
+> > When special shadow pages are activated, link_shadow_page() might link
+> > a special shadow pages which is the PAE root for PAE paging with its
+> > children.
 > >
-> > Hmm, no, the guest is responsible for invalidating translations that can be
-> > cached in the TLB, but the guest is not responsible for a full reload of PDPTEs.
-> > Per the APM, the PDPTEs can be cached like regular PTEs:
+> > Add make_pae_pdpte() to handle it.
 > >
-> >   Under SVM, however, when the processor is in guest mode with PAE enabled, the
-> >   guest PDPT entries are not cached or validated at this point, but instead are
-> >   loaded and checked on demand in the normal course of address translation, just
-> >   like page directory and page table entries. Any reserved bit violations ared
-> >   etected at the point of use, and result in a page-fault (#PF) exception rather
-> >   than a general-protection (#GP) exception.
+> > The code is not activated since special shadow pages are not activated
+> > yet.
 > >
-> > So if L1 modifies a PDPTE from !PRESENT (or RESERVED) to PRESENT (and valid), then
-> > any active L2 vCPUs should recognize the new PDPTE without a nested VM-Exit because
-> > the old entry can't have been cached in the TLB.
+> > Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c  | 6 +++++-
+> >  arch/x86/kvm/mmu/spte.c | 7 +++++++
+> >  arch/x86/kvm/mmu/spte.h | 1 +
+> >  3 files changed, 13 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 126f0cd07f98..3fe70ad3bda2 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -2277,7 +2277,11 @@ static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
+> >
+> >       BUILD_BUG_ON(VMX_EPT_WRITABLE_MASK != PT_WRITABLE_MASK);
+> >
+> > -     spte = make_nonleaf_spte(sp->spt, sp_ad_disabled(sp));
+> > +     if (unlikely(sp->role.level == PT32_ROOT_LEVEL &&
+> > +                  vcpu->arch.mmu->root_role.level == PT32E_ROOT_LEVEL))
+> > +             spte = make_pae_pdpte(sp->spt);
+> > +     else
+> > +             spte = make_nonleaf_spte(sp->spt, sp_ad_disabled(sp));
+> >
+> >       mmu_spte_set(sptep, spte);
+> >
+> > diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+> > index 75c9e87d446a..ccd9267a58ca 100644
+> > --- a/arch/x86/kvm/mmu/spte.c
+> > +++ b/arch/x86/kvm/mmu/spte.c
+> > @@ -251,6 +251,13 @@ u64 make_huge_page_split_spte(u64 huge_spte, int huge_level, int index)
+> >       return child_spte;
+> >  }
+> >
+> > +u64 make_pae_pdpte(u64 *child_pt)
+> > +{
+> > +     /* The only ignore bits in PDPTE are 11:9. */
+> > +     BUILD_BUG_ON(!(GENMASK(11,9) & SPTE_MMU_PRESENT_MASK));
+> > +     return __pa(child_pt) | PT_PRESENT_MASK | SPTE_MMU_PRESENT_MASK |
+> > +             shadow_me_value;
 >
-> In this case, it is still !PRESENT in the shadow page, and it will cause
-> a vmexit when L2 tries to use the translation.  I can't see anything wrong
-> in TLB or vTLB(shadow pages).
->
-> But I think some code is needed to reload the cached PDPTEs
-> when guest_mmu->get_pdptrs() returns !PRESENT and reload mmu if
-> the cache is changed. (and add code to avoid infinite loop)
->
-> The patch fails to reload mmu if the cache is changed which
-> leaves the problem described in the changelog partial resolved
-> only.
->
-> Maybe we need to add mmu parameter back in load_pdptrs() for it.
->
+> If I'm reading mmu_alloc_{direct,shadow}_roots() correctly, PAE page
+> directories just get: root | PT_PRESENT_MASK | shadow_me_value. Is there
+> a reason to add SPTE_MMU_PRESENT_MASK or am I misreading the code?
 
-It is still too complicated, I will try to do a direct check
-in FNAME(fetch) instead of (re-)using the cache.
+Because it has a struct kvm_mmu_page associated with it now.
 
-> >
-> > In practice, snapshotting at nested VMRUN would likely work, but architecturally
-> > it's wrong and could cause problems if L1+L2 are engange in paravirt shenanigans,
-> > e.g. async #PF comes to mind.
-> >
-> > I believe the correct way to fix this is to write-protect nNPT PDPTEs like all other
-> > shadow pages, which shouldn't be too awful to do as part of your series to route
-> > PDPTEs through kvm_mmu_get_page().
+sp->spt[i] requires SPTE_MMU_PRESENT_MASK if it is present.
+
 >
-> In the one-off special shadow page (will be renamed to one-off local
-> shadow page)
-> patchsets, PAE PDPTEs is not write-protected.  Wirte-protecting it causing nasty
-> code.
+> > +}
+> >
+> >  u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled)
+> >  {
+> > diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+> > index fbbab180395e..09a7e4ba017a 100644
+> > --- a/arch/x86/kvm/mmu/spte.h
+> > +++ b/arch/x86/kvm/mmu/spte.h
+> > @@ -413,6 +413,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+> >              u64 old_spte, bool prefetch, bool can_unsync,
+> >              bool host_writable, u64 *new_spte);
+> >  u64 make_huge_page_split_spte(u64 huge_spte, int huge_level, int index);
+> > +u64 make_pae_pdpte(u64 *child_pt);
+> >  u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled);
+> >  u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access);
+> >  u64 mark_spte_for_access_track(u64 spte);
+> > --
+> > 2.19.1.6.gb485710b
+> >
