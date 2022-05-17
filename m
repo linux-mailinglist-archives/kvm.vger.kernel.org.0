@@ -2,76 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 667B352A519
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 16:42:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FC5C52A51E
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 16:43:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344944AbiEQOmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 10:42:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51054 "EHLO
+        id S1349164AbiEQOn0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 10:43:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236258AbiEQOmT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 10:42:19 -0400
+        with ESMTP id S1347404AbiEQOnY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 10:43:24 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 70B872E0BC
-        for <kvm@vger.kernel.org>; Tue, 17 May 2022 07:42:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B643E2E0BC
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 07:43:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652798537;
+        s=mimecast20190719; t=1652798602;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=hTjqsV1Fp+r+noPld4SG87IVv2bHAbFunBtzqB6+vis=;
-        b=fDsStp5R1XB4esuQD0Qn9m6Vv/X4EshP/nM+iyMsHexqiUKGwhf23a2nrtDaMzLpNEPqdx
-        IJcUbIfeV+wdjtyeNGEGKjP1f9CaqBXsQuW5ItsnL8GpDstnxHM/ih1Bf++INGCiIExqu7
-        0StW/Ek+nLEncWEpC0ZSw9vBoZBH7YU=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=EUOebm1848nquUkzsfc+CUVVZX634BgGKga1hmkbgcs=;
+        b=JYr0zcYASDkdzm4e4hSQyyQpoTusPSIrikhLHVE/FfVSqu7ivP5aVZg9ZgeXT4BSnXeLNr
+        kdqibrUEjjlC9j87HLDwNB5qcMOjHvPzORHU48l8HzejER5WtZAPb/hA0mID6vIOc+6iIb
+        QevMTL6h3W5r4Irl+ArtRz3jgiMAjbM=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-101-U91L9dPVOjeFsgG-79Smow-1; Tue, 17 May 2022 10:42:14 -0400
-X-MC-Unique: U91L9dPVOjeFsgG-79Smow-1
-Received: by mail-ej1-f70.google.com with SMTP id v13-20020a170906b00d00b006f51e289f7cso7408450ejy.19
-        for <kvm@vger.kernel.org>; Tue, 17 May 2022 07:42:11 -0700 (PDT)
+ us-mta-491-hGe1Zt3kNJi_Xa8kR3S5zg-1; Tue, 17 May 2022 10:43:21 -0400
+X-MC-Unique: hGe1Zt3kNJi_Xa8kR3S5zg-1
+Received: by mail-ej1-f69.google.com with SMTP id gn26-20020a1709070d1a00b006f453043956so7477847ejc.15
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 07:43:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=hTjqsV1Fp+r+noPld4SG87IVv2bHAbFunBtzqB6+vis=;
-        b=eSDrmfSYzTIyio/Jay3zi8MKivsgRU8LhIGuYJqsjEgSyefkIRPJ7eIGShQnr64wtU
-         VUyUfzM1aexdZUZQsjgczOlOUIuOCDsSrjQUe6FiTQ7hKsY0FQKLmcubA19NQ8y1RHuE
-         KvudnLM8KVjk71hwj4UPD1pAL5VPFWOBwgjMavoHJi7EHcukfHpElgS8WRtA/Qdbnchx
-         6184vCLenRWWFGumaViYX5/ofJav2I7UqaJsK/5f9t0RDMhFSquFpGjyXSY1S7Fslp7m
-         xjXMuQXuRFboVEeVOG/giBdE3w8SEPIE+CNY1k9tYzEUdw6bYox7CFxGUP7ed2h0e9Jy
-         0HCg==
-X-Gm-Message-State: AOAM532rmnJ/Z5DKnH1f0msszWntv0I1wUCYO8eRdsIqZQkyehnlBIs/
-        IAGW0s51dQAz9Jdjts1JQFebOTm6w/ovQ48WR+fXLFzxjoIPq7BR2BTotCZcS3v2uNRIWEKKw49
-        3Ul86gBT5E3ib
-X-Received: by 2002:a05:6402:238f:b0:42a:98d8:ae1b with SMTP id j15-20020a056402238f00b0042a98d8ae1bmr17423848eda.168.1652798530562;
-        Tue, 17 May 2022 07:42:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJye0bbFmMONyTqmP3It4fL7QuUCBzVF03Vy8Tp5rLhkr7l+Xsej5oxl8SSRjnzPPSKeMkbGMg==
-X-Received: by 2002:a05:6402:238f:b0:42a:98d8:ae1b with SMTP id j15-20020a056402238f00b0042a98d8ae1bmr17423824eda.168.1652798530348;
-        Tue, 17 May 2022 07:42:10 -0700 (PDT)
+        bh=EUOebm1848nquUkzsfc+CUVVZX634BgGKga1hmkbgcs=;
+        b=JwlL8ki98Iwo6FGE/bNNnDI4LbpVfWvwcsPwO3F69mHmhElq9EZQcDJqFfEBs1fD1F
+         0GLDmVVAuzRrPwyDLYNF6kddyAfpYAYIZz4bR6JG1Bulptc9CgSFIjzrYkId4i785ub5
+         8QVetB1OkqoNo9HL6ECiUdK2zhhDuM8pYT9hl0GEPxSuMoHQSTYpnnwu2RvpOOBunrzT
+         +TscnYv5MtWJzCcCEwNmBL9xsaSmNYt2+jaDcTlYcNgmNY+8PW9Cb5OLNtSgMFptdxuy
+         XgAxEb7Lo+YKwtor13AK7Eho9EDwL0fQEVNGReazjby+nkdMIfpeeQs9z7LVq55W6fLv
+         ikTA==
+X-Gm-Message-State: AOAM5334Edigy4kezSGAqHKwdlEkF3Ly49XLz7nHlgjjr3GQ/xAXbfrD
+        RErFyxtAHEQcwCuVYxjh7rmsQgEbXM+VhCw3ux1hPzuglWIpjmrPQXMweJg0hx6K++1ToNp/zD6
+        TeIPKxnTZhz93
+X-Received: by 2002:a17:907:7e84:b0:6fe:2a21:1467 with SMTP id qb4-20020a1709077e8400b006fe2a211467mr10719927ejc.673.1652798599929;
+        Tue, 17 May 2022 07:43:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzlnoJM/lXQ64XKdKCEL4Apv61bFcxyV3tHdLZlG0EczC2ChtveMzId+2dKEbYOZdkVKaMbrw==
+X-Received: by 2002:a17:907:7e84:b0:6fe:2a21:1467 with SMTP id qb4-20020a1709077e8400b006fe2a211467mr10719913ejc.673.1652798599759;
+        Tue, 17 May 2022 07:43:19 -0700 (PDT)
 Received: from gator (cst2-173-79.cust.vodafone.cz. [31.30.173.79])
-        by smtp.gmail.com with ESMTPSA id e9-20020a056402104900b0042ac0e79bb6sm1853112edu.45.2022.05.17.07.42.09
+        by smtp.gmail.com with ESMTPSA id t23-20020aa7d717000000b0042ac7b34b4asm1153428edq.81.2022.05.17.07.43.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 May 2022 07:42:09 -0700 (PDT)
-Date:   Tue, 17 May 2022 16:42:07 +0200
+        Tue, 17 May 2022 07:43:19 -0700 (PDT)
+Date:   Tue, 17 May 2022 16:43:17 +0200
 From:   Andrew Jones <drjones@redhat.com>
-To:     Bill Wendling <morbo@google.com>
-Cc:     kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Nikos Nikoleris <nikos.nikoleris@arm.com>,
-        Zixuan Wang <zixuanwang@google.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvmarm@lists.cs.columbia.edu
-Subject: Re: [kvm-unit-tests PATCH] arm64: Check for dynamic relocs with
- readelf
-Message-ID: <20220517144207.662hyp276g3syzf2@gator>
-References: <20220504230446.2253109-1-morbo@google.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Subject: Re: [kvm-unit-tests PATCH] arm/run: Use TCG with qemu-system-arm on
+ arm64 systems
+Message-ID: <20220517144317.ggdesc23xgxq6pnh@gator>
+References: <20220317165601.356466-1-alexandru.elisei@arm.com>
+ <20220317174507.jt2rattmtetddvsq@gator>
+ <YjN3xyfiLU2RUdGr@monolith.localdoman>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220504230446.2253109-1-morbo@google.com>
+In-Reply-To: <YjN3xyfiLU2RUdGr@monolith.localdoman>
 X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -82,70 +77,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 04, 2022 at 04:04:46PM -0700, Bill Wendling wrote:
-> Clang's version of objdump doesn't recognize "setftest.elf" as a dynamic
-> object and produces an error stating such.
+On Thu, Mar 17, 2022 at 06:03:07PM +0000, Alexandru Elisei wrote:
+> Hi,
 > 
-> 	$ llvm-objdump -R ./arm/selftest.elf
-> 	arm/selftest.elf:	file format elf64-littleaarch64
-> 	llvm-objdump: error: './arm/selftest.elf': not a dynamic object
+> On Thu, Mar 17, 2022 at 06:45:07PM +0100, Andrew Jones wrote:
+> > On Thu, Mar 17, 2022 at 04:56:01PM +0000, Alexandru Elisei wrote:
+> > > From: Andrew Jones <drjones@redhat.com>
+> > > 
+> > > If the user sets QEMU=qemu-system-arm on arm64 systems, the tests can only
+> > > be run by using the TCG accelerator. In this case use TCG instead of KVM.
+> > > 
+> > > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > > [ Alex E: Added commit message ]
+> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > > ---
+> > >  arm/run | 12 ++++++++++--
+> > >  1 file changed, 10 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/arm/run b/arm/run
+> > > index 28a0b4ad2729..128489125dcb 100755
+> > > --- a/arm/run
+> > > +++ b/arm/run
+> > > @@ -10,16 +10,24 @@ if [ -z "$KUT_STANDALONE" ]; then
+> > >  fi
+> > >  processor="$PROCESSOR"
+> > >  
+> > > -ACCEL=$(get_qemu_accelerator) ||
+> > > +accel=$(get_qemu_accelerator) ||
+> > >  	exit $?
+> > >  
+> > > -if [ "$ACCEL" = "kvm" ]; then
+> > > +if [ "$accel" = "kvm" ]; then
+> > >  	QEMU_ARCH=$HOST
+> > >  fi
+> > >  
+> > >  qemu=$(search_qemu_binary) ||
+> > >  	exit $?
+> > >  
+> > > +if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
+> > > +   [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
+> > > +   [ "$(basename $QEMU)" = "qemu-system-arm" ]; then
+> > > +	accel=tcg
+> > > +fi
+> > > +
+> > > +ACCEL=$accel
+> > > +
+> > >  if ! $qemu -machine '?' 2>&1 | grep 'ARM Virtual Machine' > /dev/null; then
+> > >  	echo "$qemu doesn't support mach-virt ('-machine virt'). Exiting."
+> > >  	exit 2
+> > > -- 
+> > > 2.35.1
+> > >
+> > 
+> > Ha, OK, I guess you posting this is a strong vote in favor of this
+> > behavior. I've queued it
 > 
-> This causes the ARM64 "arch_elf_check" check to fail. Using "readelf
-> -rW" is a better option way to get the same information and produces the
-> same information in both binutils and LLVM.
+> Ah, yes, maybe I should've been more clear about it. I think this is more
+> intuitive for the new users who might not be very familiar with
+> run_tests.sh internals, and like you've said it won't break existing users
+> who had to set ACCEL=tcg to get the desired behaviour anyway.
 > 
-> Signed-off-by: Bill Wendling <morbo@google.com>
-> ---
->  arm/Makefile.arm64 | 6 +++---
->  configure          | 2 ++
->  2 files changed, 5 insertions(+), 3 deletions(-)
+> Thanks you for queueing it so fast! Should probably have also mentioned
+> this as a comment in the commit, but I take full responsibility for
+> breaking stuff.
+> 
+> Alex
+> 
+> > 
+> > https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue
 
-Merged to https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git master
+I finally merged this.
 
 Thanks,
 drew
-
-
-
-> 
-> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-> index 6feac76f895f..42e18e771b3b 100644
-> --- a/arm/Makefile.arm64
-> +++ b/arm/Makefile.arm64
-> @@ -14,9 +14,9 @@ mno_outline_atomics := $(call cc-option, -mno-outline-atomics, "")
->  CFLAGS += $(mno_outline_atomics)
->  
->  define arch_elf_check =
-> -	$(if $(shell ! $(OBJDUMP) -R $(1) >&/dev/null && echo "nok"),
-> -		$(error $(shell $(OBJDUMP) -R $(1) 2>&1)))
-> -	$(if $(shell $(OBJDUMP) -R $(1) | grep R_ | grep -v R_AARCH64_RELATIVE),
-> +	$(if $(shell ! $(READELF) -rW $(1) >&/dev/null && echo "nok"),
-> +		$(error $(shell $(READELF) -rW $(1) 2>&1)))
-> +	$(if $(shell $(READELF) -rW $(1) | grep R_ | grep -v R_AARCH64_RELATIVE),
->  		$(error $(1) has unsupported reloc types))
->  endef
->  
-> diff --git a/configure b/configure
-> index 86c3095a245a..23085da7dcc5 100755
-> --- a/configure
-> +++ b/configure
-> @@ -12,6 +12,7 @@ cflags=
->  ld=ld
->  objcopy=objcopy
->  objdump=objdump
-> +readelf=readelf
->  ar=ar
->  addr2line=addr2line
->  arch=$(uname -m | sed -e 's/i.86/i386/;s/arm64/aarch64/;s/arm.*/arm/;s/ppc64.*/ppc64/')
-> @@ -372,6 +373,7 @@ CFLAGS=$cflags
->  LD=$cross_prefix$ld
->  OBJCOPY=$cross_prefix$objcopy
->  OBJDUMP=$cross_prefix$objdump
-> +READELF=$cross_prefix$readelf
->  AR=$cross_prefix$ar
->  ADDR2LINE=$cross_prefix$addr2line
->  TEST_DIR=$testdir
-> -- 
-> 2.36.0.464.gb9c8b46e94-goog
-> 
 
