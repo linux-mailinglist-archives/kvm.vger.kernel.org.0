@@ -2,60 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 90AF352959A
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 01:56:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AD5A5295A9
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 02:01:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349378AbiEPX4X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 May 2022 19:56:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42778 "EHLO
+        id S1348885AbiEQABZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 May 2022 20:01:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350577AbiEPX4K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 May 2022 19:56:10 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 075DC1EAD0
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 16:56:07 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id t25so28496070lfg.7
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 16:56:07 -0700 (PDT)
+        with ESMTP id S238851AbiEQABX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 May 2022 20:01:23 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B6C03F33A
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 17:01:22 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id x23so15448066pff.9
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 17:01:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nkFg79ppLu0KAsHU9QQTviwky+keI6o4Hb3RH32jsEg=;
-        b=Z1OihB3qvMNBzjMGT9ZUDLnld3pQ0QyM11yTntmrTrxcCJ2gUQWxjtZsJus6dvn2G+
-         Z5f0kdOJeIHApqxaAcf0WD7yW8lHiJIdvrKtMQV1LK7YoRtExUxHvh+7jVGoIpx4hmCI
-         YE87KRRFL+HeJ4R0UWb/HemJ9oivoKPWYfSRx1A7CnHjzTYPJEy1Hf6DdumnXlX8MT4I
-         afJ7rMCMhdm7WGUvYQ1IFFU1qfJA19IMe2I+qSpf4P+XS/UjiXQdG0vAPZ/0Fin6GceG
-         Q7ZbyDvotnOt2C6lqGM07L70ag9Utfs+n2xbrOuD+kwRjcQMU27dnBamsuUPlJPdAl8w
-         DESQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=IX2wmwvaDyZMh7ib5ZKuwhVkKDHyhdCDkN7AoejMd14=;
+        b=QO4M1yV2IkKeIohfCfSn9H3sUzERCQ1hJGTky+xBqF2Rgc4HUQud/A0HZ5mhCRjOC9
+         X9PJy3n49zrIzWH5CF1gyUvkBMCgbhctRGm/yJl1gIn2Z9Nib3jcV5NaP4iSz9XhATB/
+         lUnlNNq5VqtrQ7JBDpM9kerEriKcO1fQSh6nNcaNjZaFoKMG0/4d1q6sPxPy6MqgLGFp
+         K/xv4+vuwxaUGTBLDO3AjcPw0k5uMJxmdbA40w0uaCdxttoP35ebrshjn4E7LQPGsJ8I
+         uqkXOlz+jnD1NMvb95PKCI0MDx/uY/+LaOTkepYltMJWWdcD7FOj6IeB14TRA0Bs9m6i
+         NUZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nkFg79ppLu0KAsHU9QQTviwky+keI6o4Hb3RH32jsEg=;
-        b=yds6rLWjEp6sS3VFRypP1Fzl80XLTDX/ex02z1PjOCCs88Bq8lHPPsClMljPNgxgKW
-         DNeErDdbD96soMwBAKQOhKxJWSWTezbN1Ccb3iIUK+qQN9TWppxaiijf9V5jHvnyTZt4
-         84dQXqiTJ/IEzCPiYdawnh8iPxjQM34iATT1+4QlqOelOsZepSlQxXDP8clkBCx5MBNC
-         978zOEKDpHl0KXSThPn/darxDFVjXrCIV3dJK/A1Tbigd7iXgClFxx5CzxKU0+2sSoHY
-         qvOj8sPxnd3F8hKYieoYmTtJjnusEE0R3sqlspKb9CT/ftwfZ652Huk0QJNVj2DQUcxa
-         xwog==
-X-Gm-Message-State: AOAM533nen+vXzd04UXkIbP7T2Q2DkVlzeu4LDLOzjCk2ElJzUFXJKy2
-        3lGyCVvbeX0FLRh5/fBjN9gxwi98S3djmo+Pbpki0g==
-X-Google-Smtp-Source: ABdhPJzmTnLBmX4qt79x53sXCEJtEEX1VKElsiaozKir1uMpRaMazVQdgHpVa0h21MNIMv+oM18Lm+Zf2r0FESqxGuc=
-X-Received: by 2002:a05:6512:3f26:b0:473:edee:7250 with SMTP id
- y38-20020a0565123f2600b00473edee7250mr14601201lfa.685.1652745365989; Mon, 16
- May 2022 16:56:05 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=IX2wmwvaDyZMh7ib5ZKuwhVkKDHyhdCDkN7AoejMd14=;
+        b=ZACM0y53gQdGX0K0teWRBE8oVqAW56P6Gnm1LeYq1t304pXc90xgkQm8SLWAHhLDIM
+         bckdL/gNSMy4crIKMjq3RPtVShZl0qlxadX9JTSsZaFEOifa121ZdBjsN5RsZeTwAqDo
+         9OihKFGr94LJW4V5TjVPN8A84v9iO4SFA7JdsBXWCSJUQVIx52Fr4l7i1xDomjH3Cnt/
+         OZiC9/St2GaofJh2VP/6NPP/gtsXYMRLIjm/FC2XQT8TDSamFWwRN/Zs06cGOT0VdKPe
+         QMhDTUi5+SFc4735YM/nsiVYp9OwqPiNf3LhQlbUuUcmNG+DOriU4xpoNEFaj7SPsNF5
+         EClA==
+X-Gm-Message-State: AOAM532gduUJOXEgRnngo8Wk2+smHRxZ9HEzzlWckYEqg2LGz8aknqly
+        bD6ZKIZdIiR6GI0eVHqC3jm0Tw==
+X-Google-Smtp-Source: ABdhPJzkLlYlwYRPn9ndHoCIDmiWHid04iZptb+cvXrjdGCNaUQpOU5WDN40xqZ+9PaRB0vWiHaVdA==
+X-Received: by 2002:a05:6a00:23c6:b0:50f:f570:7ea7 with SMTP id g6-20020a056a0023c600b0050ff5707ea7mr19962149pfc.76.1652745681364;
+        Mon, 16 May 2022 17:01:21 -0700 (PDT)
+Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
+        by smtp.gmail.com with ESMTPSA id i13-20020a170902eb4d00b0015e8d4eb1b9sm7781773pli.3.2022.05.16.17.01.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 May 2022 17:01:20 -0700 (PDT)
+Date:   Tue, 17 May 2022 00:01:17 +0000
+From:   David Matlack <dmatlack@google.com>
+To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH V2 3/7] KVM: X86/MMU: Link PAE root pagetable with its
+ children
+Message-ID: <YoLlzcejEDh8VpoB@google.com>
+References: <20220503150735.32723-1-jiangshanlai@gmail.com>
+ <20220503150735.32723-4-jiangshanlai@gmail.com>
 MIME-Version: 1.0
-References: <20220415201542.1496582-1-oupton@google.com> <20220415201542.1496582-5-oupton@google.com>
- <YoLN8M9I0bAnO3Nu@google.com>
-In-Reply-To: <YoLN8M9I0bAnO3Nu@google.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Mon, 16 May 2022 16:55:54 -0700
-Message-ID: <CAOQ_Qsi=31PxbDj=kyfgyapvR-FQ8wzSVvruEo1O1fCcof7ESw@mail.gmail.com>
-Subject: Re: [PATCH 4/5] KVM: Actually create debugfs in kvm_create_vm()
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
-        kvmarm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220503150735.32723-4-jiangshanlai@gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -67,23 +82,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 16, 2022 at 3:19 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Apr 15, 2022, Oliver Upton wrote:
-> > @@ -1049,7 +1050,7 @@ int __weak kvm_arch_create_vm_debugfs(struct kvm *kvm)
-> >       return 0;
-> >  }
-> >
-> > -static struct kvm *kvm_create_vm(unsigned long type)
-> > +static struct kvm *kvm_create_vm(unsigned long type, int fd)
->
-> I don't love passing in @fd, because actually doing anything but printing the
-> @fd in a string is doomed to fail.
->
-> Rather than pass the raw fd, what about passing in just its name?
+On Tue, May 03, 2022 at 11:07:31PM +0800, Lai Jiangshan wrote:
+> From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+> 
+> When special shadow pages are activated, link_shadow_page() might link
+> a special shadow pages which is the PAE root for PAE paging with its
+> children.
+> 
+> Add make_pae_pdpte() to handle it.
+> 
+> The code is not activated since special shadow pages are not activated
+> yet.
+> 
+> Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c  | 6 +++++-
+>  arch/x86/kvm/mmu/spte.c | 7 +++++++
+>  arch/x86/kvm/mmu/spte.h | 1 +
+>  3 files changed, 13 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 126f0cd07f98..3fe70ad3bda2 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2277,7 +2277,11 @@ static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
+>  
+>  	BUILD_BUG_ON(VMX_EPT_WRITABLE_MASK != PT_WRITABLE_MASK);
+>  
+> -	spte = make_nonleaf_spte(sp->spt, sp_ad_disabled(sp));
+> +	if (unlikely(sp->role.level == PT32_ROOT_LEVEL &&
+> +		     vcpu->arch.mmu->root_role.level == PT32E_ROOT_LEVEL))
+> +		spte = make_pae_pdpte(sp->spt);
+> +	else
+> +		spte = make_nonleaf_spte(sp->spt, sp_ad_disabled(sp));
+>  
+>  	mmu_spte_set(sptep, spte);
+>  
+> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+> index 75c9e87d446a..ccd9267a58ca 100644
+> --- a/arch/x86/kvm/mmu/spte.c
+> +++ b/arch/x86/kvm/mmu/spte.c
+> @@ -251,6 +251,13 @@ u64 make_huge_page_split_spte(u64 huge_spte, int huge_level, int index)
+>  	return child_spte;
+>  }
+>  
+> +u64 make_pae_pdpte(u64 *child_pt)
+> +{
+> +	/* The only ignore bits in PDPTE are 11:9. */
+> +	BUILD_BUG_ON(!(GENMASK(11,9) & SPTE_MMU_PRESENT_MASK));
+> +	return __pa(child_pt) | PT_PRESENT_MASK | SPTE_MMU_PRESENT_MASK |
+> +		shadow_me_value;
 
-Urgh. Yeah, that's fine by me. I'll squash this and resend.
+If I'm reading mmu_alloc_{direct,shadow}_roots() correctly, PAE page
+directories just get: root | PT_PRESENT_MASK | shadow_me_value. Is there
+a reason to add SPTE_MMU_PRESENT_MASK or am I misreading the code?
 
---
-Thanks,
-Oliver
+> +}
+>  
+>  u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled)
+>  {
+> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+> index fbbab180395e..09a7e4ba017a 100644
+> --- a/arch/x86/kvm/mmu/spte.h
+> +++ b/arch/x86/kvm/mmu/spte.h
+> @@ -413,6 +413,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+>  	       u64 old_spte, bool prefetch, bool can_unsync,
+>  	       bool host_writable, u64 *new_spte);
+>  u64 make_huge_page_split_spte(u64 huge_spte, int huge_level, int index);
+> +u64 make_pae_pdpte(u64 *child_pt);
+>  u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled);
+>  u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access);
+>  u64 mark_spte_for_access_track(u64 spte);
+> -- 
+> 2.19.1.6.gb485710b
+> 
