@@ -2,144 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 60F1B52A49B
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 16:20:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 211BE52A4B0
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 16:22:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348704AbiEQOUD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 10:20:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54236 "EHLO
+        id S1348835AbiEQOWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 10:22:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240601AbiEQOUB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 10:20:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D92A93465B
-        for <kvm@vger.kernel.org>; Tue, 17 May 2022 07:20:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652797199;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WYXjJfd1pESNYbrTTSqKIx0/7SN9768efdFnzL3MuFI=;
-        b=DmFjK4klVehTes5C0TPXL5SKTYXBSaZkZR/0LJjvn7fzlBW9TFeRQRAXsXpwoH8zcoRvMX
-        badhBPWSVhBLg3ncS3Xed3fXWPAG98FDix06swKHsm1xthn9frtGGoCZ2qQMZXQ7HSoJYj
-        VFAm0vsA7VQKJK+dH/XoYc9vzbgX0O8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-201-d_XqUpfeOsGFcdGEZJf25Q-1; Tue, 17 May 2022 10:19:58 -0400
-X-MC-Unique: d_XqUpfeOsGFcdGEZJf25Q-1
-Received: by mail-wm1-f72.google.com with SMTP id q128-20020a1c4386000000b003942fe15835so8246863wma.6
-        for <kvm@vger.kernel.org>; Tue, 17 May 2022 07:19:57 -0700 (PDT)
+        with ESMTP id S1348833AbiEQOWJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 10:22:09 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08A7F43EDF
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 07:22:08 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id t25so31620990lfg.7
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 07:22:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=T2Ql4EilVhMbhFlF9rltYRS/JSSzR/pII+0Y623bIJQ=;
+        b=Gk7YNidWLYatOf/aKLBaHhTec33dNpoEgdTOL+ILdTijNAA/GmJXqS5ytyb2YAxiIa
+         hfgnMSB0rDR4qjdAxJnKRsCQ674xfm1WRgqBIXiIpQ7HtDIE9+9R3RZjqJIraOm4UdxI
+         XQL7jNju9ScDasP1z69lUrQ18ZLPPKVNsyqKZ7fYExj+WHBawJINoI+9uR0VF0SNScj4
+         dlPrKzU9s+b8Edo50PvS3RYDBoMZIl+5FX+am1mg7V9FcUiICtgnooAIj2I+o2tPXve+
+         SSbQSATukFRZtBFM2aeI36o+M4SQHp0p7l8eF1hmotZrvOWBDoCAf1k/3UUQ6cnggpm2
+         kpTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=WYXjJfd1pESNYbrTTSqKIx0/7SN9768efdFnzL3MuFI=;
-        b=SRf70jd6OdBdFdvuRkdKzuPLnhxCVTfHuVkSN3qYI/C17y9zS0buirXCLdGHc0omkJ
-         VGVdXp9HK2qe3kJBH/2HStpd4lSISKIJIseS/7ZH5yqokV7wZ/LWZnbnyZk5qVwGmE3P
-         r7B9sCBc6eZ1t89kfUWyQCTxFgGogFfWiS6e+06v4aCxHLiRCYuX9H6HUhtsa794+elt
-         qyxUzIhbpHSdUPhY+SdP+JAMrJfqtfQOl7FsOK7IhsK2as9LhVUIODnqCerXReNqm6Xm
-         h6HfSpvNa/XSI4sp3CJ+l+CtYWPAQchKLzadplWlLeag7kzfBgzQi7suERb+QjTSAtgH
-         S22A==
-X-Gm-Message-State: AOAM5325VIbYEXmbCbpFSuvJ+IQ+AvpM7oW2LJkCvEC8XF9gyKO80QJY
-        kKf4WjonsAFZz8K3wRvIDpa5eYKwse/pL3za/QPNlGtVUXSXQsTSNom8+DB8+SzcOJnzsw9c8ux
-        pjCwp18jVE3sn
-X-Received: by 2002:adf:dbce:0:b0:20c:f507:8ef9 with SMTP id e14-20020adfdbce000000b0020cf5078ef9mr15547846wrj.29.1652797196158;
-        Tue, 17 May 2022 07:19:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwm14vhveID3bnS4gZAuVd6DkGKO0v6KagNzfJE1Coe3sRC7u5JOMFT94nzhjZXGCVG8ILlNw==
-X-Received: by 2002:adf:dbce:0:b0:20c:f507:8ef9 with SMTP id e14-20020adfdbce000000b0020cf5078ef9mr15547827wrj.29.1652797195922;
-        Tue, 17 May 2022 07:19:55 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id c22-20020a05600c0a5600b003944821105esm2061670wmq.2.2022.05.17.07.19.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 May 2022 07:19:55 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 11/34] KVM: x86: hyper-v: Use preallocated buffer in
- 'struct kvm_vcpu_hv' instead of on-stack 'sparse_banks'
-In-Reply-To: <YoOrc2hPF/QpJNeo@google.com>
-References: <20220414132013.1588929-1-vkuznets@redhat.com>
- <20220414132013.1588929-12-vkuznets@redhat.com>
- <YoKunaNKDjYx7C21@google.com> <87k0akuv1o.fsf@redhat.com>
- <YoOrc2hPF/QpJNeo@google.com>
-Date:   Tue, 17 May 2022 16:19:54 +0200
-Message-ID: <87h75outpx.fsf@redhat.com>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=T2Ql4EilVhMbhFlF9rltYRS/JSSzR/pII+0Y623bIJQ=;
+        b=m1m4obgr+3bD9GbfNIvLEHgTk9YFko4yFUmUS/X5bDZAO5AczOixBWJWUQNjqoe5SY
+         36RacoiiRcXsh+6jjZcwwNTivBACZZ5f/tADyQVE4DxQmjj/MeXXFuz8YzOt8mpDBgLA
+         kmRxhUngfAJAMyLCuJElQd0GYkP8jJM/RXonFPKppSYwqimszju9Tmx4dGKRwpNVk1kd
+         8KfdXA/F7nsTpqRzE3BQfKSanUDMdeIl1IiNCe0hziNa0bJGZ4MK5TKju72rd5Ug9pZn
+         3Q94PtYPg5j+rghNDKFN2YAD3XqHCX/pK/uf71O+FgSS8C4H1rv8iev4omrFlx6sPsD8
+         yCKw==
+X-Gm-Message-State: AOAM5335VwD3DrfsuxrkM1aGucBgSg64NnJd93KKb4CJD3k9WbbLCZVn
+        TvUryC0HOIKPMIgwCInTLnLErFiTM1uAmsEhFsn0lABRIb1lLQ==
+X-Google-Smtp-Source: ABdhPJxU70twrYvV99BRKE7BN7aWUXU/yX8gl5Q+SHWUUrCOyVCx1gwVZN4u/j/zYTKMl192esKzFhVbCtswbHnaW9M=
+X-Received: by 2002:ac2:4c54:0:b0:473:a414:1768 with SMTP id
+ o20-20020ac24c54000000b00473a4141768mr16880377lfk.537.1652797326336; Tue, 17
+ May 2022 07:22:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+From:   Gernot Poerner <gernot.poerner@gmail.com>
+Date:   Tue, 17 May 2022 16:21:55 +0200
+Message-ID: <CAKkmiEn2kWRWHcJv2j0Vh_VCugdKvGkApXWF3_mfBe9R++7YNg@mail.gmail.com>
+Subject: Possible virtio bug, ideas needed
+To:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+Hi list,
 
-> On Tue, May 17, 2022, Vitaly Kuznetsov wrote:
->> Sean Christopherson <seanjc@google.com> writes:
->> 
->> > On Thu, Apr 14, 2022, Vitaly Kuznetsov wrote:
->> >> To make kvm_hv_flush_tlb() ready to handle L2 TLB flush requests, KVM needs
->> >> to allow for all 64 sparse vCPU banks regardless of KVM_MAX_VCPUs as L1
->> >> may use vCPU overcommit for L2. To avoid growing on-stack allocation, make
->> >> 'sparse_banks' part of per-vCPU 'struct kvm_vcpu_hv' which is allocated
->> >> dynamically.
->> >> 
->> >> Note: sparse_set_to_vcpu_mask() keeps using on-stack allocation as it
->> >> won't be used to handle L2 TLB flush requests.
->> >
->> > I think it's worth using stronger language; handling TLB flushes for L2 _can't_
->> > use sparse_set_to_vcpu_mask() because KVM has no idea how to translate an L2
->> > vCPU index to an L1 vCPU.  I found the above mildly confusing because it didn't
->> > call out "vp_bitmap" and so I assumed the note referred to yet another sparse_banks
->> > "allocation".  And while vp_bitmap is related to sparse_banks, it tracks something
->> > entirely different.
->> >
->> > Something like?
->> >
->> > Note: sparse_set_to_vcpu_mask() can never be used to handle L2 requests as
->> > KVM can't translate L2 vCPU indices to L1 vCPUs, i.e. its vp_bitmap array
->> > is still bounded by the number of L1 vCPUs and so can remain an on-stack
->> > allocation.
->> 
->> My brain is probably tainted by looking at all this for some time so I
->> really appreciate such improvements, thanks :)
->> 
->> I wouldn't, however, say "never" ('never say never' :-)): KVM could've
->> kept 2-level reverse mapping up-to-date:
->> 
->> KVM -> L2 VM list -> L2 vCPU ids -> L1 vCPUs which run them
->> 
->> making it possible for KVM to quickly translate between L2 VP IDs and L1
->> vCPUs. I don't do this in the series and just record L2 VM_ID/VP_ID for
->> each L1 vCPU so I have to go over them all for each request. The
->> optimization is, however, possible and we may get to it if really big
->> Windows VMs become a reality.
->
-> Out of curiosity, is L1 "required" to provides the L2 => L1 translation/map?
->
+I hope this is the right place to ask - if not please show me a better
+place to submit this.
 
-To make this "Direct Virtual Flush" feature work? Yes, it is:
+I am facing a problem with the virtio network driver which we were not
+able to resolve yet
+so I'm now pretty convinced now that this is really a bug.
 
-...
-"
-Before enabling it, the L1 hypervisor must configure the following
-additional fields of the enlightened VMCS:
-- VpId: ID of the virtual processor that the enlightened VMCS controls.
-- VmId: ID of the virtual machine that the enlightened VMCS belongs to.
-- PartitionAssistPage: Guest physical address of the partition assist
-page.
-"
+Thing is - I cannot "make it fail" in a reproducable way in our
+environment but it happens pretty
+regularly, always with the same effect. Also, since it happens on
+production Vms the need to
+get them working again is pretty high.
+I have set up a new cluster lately where it happens more often then in
+the "standard"
+environment so I was at least able to dig a bit deeper into it and do
+some more tests.
 
--- 
-Vitaly
+The environment is a ganeti cluster running qemu-kvm as the
+hypervisor. The underlying
+Hardware is 64Bit X86 Intel with Mellanox network adapters (Connect-X
+4 & 5). The vms are
+connected via tap interfaces to a linux brige on the host nodes. I am
+using both regular vlans
+and vxlan (happens in both environments.)
+The host and guest OS is Debian 10 Buster, running the same kernel
+from backports (currently 5.10.0-0.bpo.12-amd64)
 
+After a seemingly random time, Vms suddenly get inaccessible over the
+network. A reboot
+fixes it (soft or hard, doesn't matter), also a Vm migration fixes it.
+
+When looking at the traffic with tcpdump, the problem seems to be the incoming
+queue of the eth0 adapter inside the VM doesn't recieve any packets anymore.
+
+All other hops see all the packets, including request (arp) of the
+broken VM. The answers
+reach the tap interface but get dropped on their way to eth0.
+Since even arp doesn't work anymore, the VM is then dead in the water.
+The interface
+still has a link, there are no log entires or anything useful in dmesg.
+
+Things I already veriefied and tried:
+
+- made sure it's not any kind of mac address conflict
+- there are no iptables/ebtables involved anywhere
+- ifdown/ifup eth0 inside the VM has no effect
+- there is no qos/traffic control involved on the host node
+- we upgraded the kernel on the host nodes and vms (from Debian 10s
+4.19 standard to the current 5.10) - no change
+- we upgraded qemu-kvm from 5.4 to 7.0 - no change
+- we tested self compiled kernel 5.15 and even 5.18 rc 7 on the VMs - no change
+- we upgraded the firmware on the Mellanox adapters - no change
+- we disabled any offloads on the virtual interface - no change
+- I even thought about a very far fetched idea regarding pause frames
+but am pretty sure that is not the case here
+- in addition to a reboot or migration, what fixes it is to do ifdown
+eth0, rmmod virtio_net, modprobe virtio_net, ifup eth0
+- this finally convinced me that it probably is something with the virtio driver
+- it seems to happen only on high traffic Vms, although it's possible
+it would happen on others too if they reached some kind of
+uptime/amount of network traffic
+- the amount of traffic passed on the eth interface seems pretty
+different between similar vms which got hit
+
+I am now at some kind of dead end and have no real idea what I could
+further do, besides asking and maybe
+creating a bug report.
+I would be especially interested in any kind of idea or tip on which
+counters or proc entries I could watch
+or what could be done to do even deeper debugging when the issue
+occurs. I can give many more details if needed
+too.
+
+Any hints or help would be greatly appreciated.
+
+G
