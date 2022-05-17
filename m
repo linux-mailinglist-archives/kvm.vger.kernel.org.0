@@ -2,77 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E1F9F52ACAD
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 22:27:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD3B852ACB0
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 22:27:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347382AbiEQU1H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 16:27:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49616 "EHLO
+        id S1349725AbiEQU1X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 16:27:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343619AbiEQU1F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 16:27:05 -0400
+        with ESMTP id S1346758AbiEQU1W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 16:27:22 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 43430527F3
-        for <kvm@vger.kernel.org>; Tue, 17 May 2022 13:27:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D1F005253D
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 13:27:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652819221;
+        s=mimecast20190719; t=1652819241;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=RX9upDrgl+JlhubOZECKMiNUlSGALkg7zYaH+YeMTbs=;
-        b=azQNIK+azywAg00boRt0qruoX7s2s07b46i1VIZJ48AiKn5xma/Zm0VQDghPnb/T29v5+S
-        UfZEiwItpb1bc2/EC/YbOAI3iSfaOzzoldxYKtPi7ThO8K0sgaxwW1MuSB/eDarvYzK1i/
-        EBmngRbrkDwV1N3ucw1aJL952Bx3jdo=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=H9Gp+dDSwtJppHQmYp9g4XPZwV0qyZ021lD469dqbsw=;
+        b=YE+MT+syGVX5pMBD0leSisz3CoqBqT1YhQ1Re9BVt0uS+rEiHjFB7dYI1McjAcgkjd3hTq
+        ByB37wd5NWOAdMIe3GYixlqG+7qlzStYStur4mRQUegcqu4P2LoUQb1ZUFJUqyBBjjhbgE
+        6NoMeulIwuplQlL/Zq84nggAAq8obr8=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-661-BzniTu3IN-unUh0yZGsEFg-1; Tue, 17 May 2022 16:26:59 -0400
-X-MC-Unique: BzniTu3IN-unUh0yZGsEFg-1
-Received: by mail-io1-f69.google.com with SMTP id k2-20020a0566022d8200b0065ad142f8c1so13128761iow.12
-        for <kvm@vger.kernel.org>; Tue, 17 May 2022 13:26:59 -0700 (PDT)
+ us-mta-589-xgau_vJpPQ6sPovCAYk9kw-1; Tue, 17 May 2022 16:27:19 -0400
+X-MC-Unique: xgau_vJpPQ6sPovCAYk9kw-1
+Received: by mail-io1-f70.google.com with SMTP id q12-20020a0566022f0c00b0065af7776ee7so13121912iow.17
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 13:27:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=RX9upDrgl+JlhubOZECKMiNUlSGALkg7zYaH+YeMTbs=;
-        b=szGEstr3BaYgtAuOom19Iv0mp/VA91VU2I1HwljFoS3bz8TV0c5BcF1f31sWvaooNT
-         YTDTeT7wmVSvkK1u3GrhiXKC8HxtBxx+r3YXpowBKEiOo3Ft7UyqXcCh47yn5GNfiZxM
-         yVdV3tBhgEaTfmvnFz3TdPQBBqfyBM0nKAN7n45DYqpG06f2REc4X8LnNTXcPaeG2Y5n
-         vmluU0FrsqROUkXLmbl7hKd8jGHUb4obfg8WNaHaHjefiZiISuSFpcLlVdvybmjYv7hX
-         vqDYOKH/O2m3294QIXP1x1RdrIr0VuRu/q5KIqhtUVJMfhRXrrUlmZZy2znPOPtmRV3Y
-         ik9Q==
-X-Gm-Message-State: AOAM530Y7eEMlGmpht9/HPVW1lGj84eM4qkAkyC/oFXD3n2MmoSuXFX2
-        g/MuFsbv0iYH+p/EpMTUTqcZNcvt/cadWCCaxr1hD/IAww08vGlx4Hh8nLeqVEx3dLLMtniQ244
-        aaPB43s370yLN
-X-Received: by 2002:a92:cac4:0:b0:2c8:1095:b352 with SMTP id m4-20020a92cac4000000b002c81095b352mr11988155ilq.103.1652819218956;
-        Tue, 17 May 2022 13:26:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxeEI0mf6y/nWlK0I2cVK0c81aFILPDB/atAD9zcPbSBdqjQTCdzs8m0yRuQ4ofsMRcU9qzYw==
-X-Received: by 2002:a92:cac4:0:b0:2c8:1095:b352 with SMTP id m4-20020a92cac4000000b002c81095b352mr11988133ilq.103.1652819218343;
-        Tue, 17 May 2022 13:26:58 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id j12-20020a02cc6c000000b0032e0720e2ffsm19301jaq.86.2022.05.17.13.26.57
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=H9Gp+dDSwtJppHQmYp9g4XPZwV0qyZ021lD469dqbsw=;
+        b=y2k3MyfvBsQi3mPfq0PI5PFWvsJCCqop0ngrNtzquUwgfZnuYPO9fadPVuBWjSvY8v
+         xrRE17DWWp4xDEly1IESF+fpPQYVjoAdVZ6FusrZWzXDF0778fKk4P2LOTat8dWAIRbk
+         940+sr5evm0ptJN7nQyM239hDmz4ueCNf+BrHOyLoeHj8HFwictBKWxjiTj+CKQnwOAY
+         HFTaLEGmF/Wou38PeBHuC6nh2SFRacuCD/gnGnJrnp+EFNodeIj6IsWzONV/zog9gS4E
+         jqZCxJd4CkSuJtF97/ZBwaLpSpXyAT0DcQQNzn1AnL+t0gjqmzOjuRphOrWf0RW2vaQf
+         aXWw==
+X-Gm-Message-State: AOAM531xcqCt9Y4iYDlSW9rD+Oc9lqAx+0DV8au5Y7tAjA5YUnqzujvg
+        QBBU2x1fEWAcQKSnYyk1usBKN43FcFd9zIzpc+pviZTwnRDU4vrsiHtb+NIkCQcKc7KhYcQNa9Q
+        wusFfJxQ3XECk
+X-Received: by 2002:a6b:b755:0:b0:657:b849:dbaa with SMTP id h82-20020a6bb755000000b00657b849dbaamr10916625iof.84.1652819239119;
+        Tue, 17 May 2022 13:27:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwPqFKvChYUimSMo0Nk7767ZWGf04/7uYezFZD+CeU/gk9puYnZRGWL3T/L3E3JMaR42ldx8w==
+X-Received: by 2002:a6b:b755:0:b0:657:b849:dbaa with SMTP id h82-20020a6bb755000000b00657b849dbaamr10916614iof.84.1652819238922;
+        Tue, 17 May 2022 13:27:18 -0700 (PDT)
+Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
+        by smtp.gmail.com with ESMTPSA id a66-20020a029448000000b0032e3c89558asm19461jai.94.2022.05.17.13.27.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 May 2022 13:26:57 -0700 (PDT)
-Date:   Tue, 17 May 2022 14:26:56 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Robin Murphy <robin.murphy@arm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Will Deacon <will@kernel.org>,
-        Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH] vfio: Remove VFIO_TYPE1_NESTING_IOMMU
-Message-ID: <20220517142656.140deb10.alex.williamson@redhat.com>
-In-Reply-To: <0-v1-0093c9b0e345+19-vfio_no_nesting_jgg@nvidia.com>
-References: <0-v1-0093c9b0e345+19-vfio_no_nesting_jgg@nvidia.com>
-Organization: Red Hat
+        Tue, 17 May 2022 13:27:18 -0700 (PDT)
+Date:   Tue, 17 May 2022 16:27:16 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v2 02/10] KVM: selftests: Add option to create 2M and 1G
+ EPT mappings
+Message-ID: <YoQFJPVnO2F9ZN9g@xz-m1.local>
+References: <20220517190524.2202762-1-dmatlack@google.com>
+ <20220517190524.2202762-3-dmatlack@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220517190524.2202762-3-dmatlack@google.com>
 X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -83,49 +82,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 10 May 2022 13:55:24 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Tue, May 17, 2022 at 07:05:16PM +0000, David Matlack wrote:
+> The current EPT mapping code in the selftests only supports mapping 4K
+> pages. This commit extends that support with an option to map at 2M or
+> 1G. This will be used in a future commit to create large page mappings
+> to test eager page splitting.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: David Matlack <dmatlack@google.com>
 
-> This control causes the ARM SMMU drivers to choose a stage 2
-> implementation for the IO pagetable (vs the stage 1 usual default),
-> however this choice has no visible impact to the VFIO user. Further qemu
-> never implemented this and no other userspace user is known.
-> 
-> The original description in commit f5c9ecebaf2a ("vfio/iommu_type1: add
-> new VFIO_TYPE1_NESTING_IOMMU IOMMU type") suggested this was to "provide
-> SMMU translation services to the guest operating system" however the rest
-> of the API to set the guest table pointer for the stage 1 was never
-> completed, or at least never upstreamed, rendering this part useless dead
-> code.
-> 
-> Since the current patches to enable nested translation, aka userspace page
-> tables, rely on iommufd and will not use the enable_nesting()
-> iommu_domain_op, remove this infrastructure. However, don't cut too deep
-> into the SMMU drivers for now expecting the iommufd work to pick it up -
-> we still need to create S2 IO page tables.
-> 
-> Remove VFIO_TYPE1_NESTING_IOMMU and everything under it including the
-> enable_nesting iommu_domain_op.
-> 
-> Just in-case there is some userspace using this continue to treat
-> requesting it as a NOP, but do not advertise support any more.
-> 
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 16 ----------------
->  drivers/iommu/arm/arm-smmu/arm-smmu.c       | 16 ----------------
->  drivers/iommu/iommu.c                       | 10 ----------
->  drivers/vfio/vfio_iommu_type1.c             | 12 +-----------
->  include/linux/iommu.h                       |  3 ---
->  include/uapi/linux/vfio.h                   |  2 +-
->  6 files changed, 2 insertions(+), 57 deletions(-)
-> 
-> It would probably make sense for this to go through the VFIO tree with Robin's
-> ack for the SMMU changes.
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-I'd be in favor of applying this, but it seems Robin and Eric are
-looking for a stay of execution and I'd also be looking for an ack from
-Joerg.  Thanks,
-
-Alex
+-- 
+Peter Xu
 
