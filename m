@@ -2,349 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5221C52A3E5
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 15:54:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E656E52A3D9
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 15:51:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347614AbiEQNy2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 09:54:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41498 "EHLO
+        id S1347324AbiEQNv1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 09:51:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236006AbiEQNyY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 09:54:24 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BD9B3DDCE;
-        Tue, 17 May 2022 06:54:23 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24HD7pEI029293;
-        Tue, 17 May 2022 13:54:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=sAVcwv11zFJ0ULrjyeFoon8Ei4jyzeJj7N+HdztIVvY=;
- b=PSd/2++p+BcrcEQAp8ROllIivqQw5KE9uL5KIXOTsK+9Rtx6NsdQ7PeFHEKWTnz9U/N/
- KQs6F2QfPGVPMlKpjEu8JPXyW7jHmNxF2MEmrUPogIBP2OPpuPoPkAi8Z2iJFtQk7saY
- 1KR5oCgGdkwGgkShdxq/xCxt/bfQB+FeWlgX1xewt0cwg1aC3gw7kXBzWhXsIeEKDkLq
- 9iKaqbsCu4boCbltxZYaorr1w3momQwwOZPoJK/3OocwfV1EpR8SFiBaIjyRMf2QB2Fu
- /z70a+HNphfXBucrrCLYm6w03Ieq6xDpW9SHLs/idBROADMUa5OxzfhMUdfpgRrMLZ6m aQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4cafh5as-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 13:54:22 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24HDBGJp007022;
-        Tue, 17 May 2022 13:54:22 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4cafh5a5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 13:54:21 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24HDmX8v007183;
-        Tue, 17 May 2022 13:54:20 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03ams.nl.ibm.com with ESMTP id 3g2429ca7x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 13:54:20 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24HDeRb455247246
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 May 2022 13:40:27 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 34464A4053;
-        Tue, 17 May 2022 13:54:17 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EE2A1A4040;
-        Tue, 17 May 2022 13:54:16 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.40])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 17 May 2022 13:54:16 +0000 (GMT)
-Date:   Tue, 17 May 2022 15:46:03 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2 2/4] s390x: Test TEID values in
- storage key test
-Message-ID: <20220517154603.6c7b9af5@p-imbrenda>
-In-Reply-To: <20220517115607.3252157-3-scgl@linux.ibm.com>
-References: <20220517115607.3252157-1-scgl@linux.ibm.com>
-        <20220517115607.3252157-3-scgl@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-redhat-linux-gnu)
+        with ESMTP id S1348275AbiEQNvW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 09:51:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C064B26105
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 06:51:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652795479;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DI+2TLyotaAB4m8Wk/Jy92LMvHUEqA+a9jwjfCWo8vE=;
+        b=Lemx0RyDzmFfXbMk/JGU6L5UDgmCjXE1RmwbyHwHV5HKLjq2U6JH+8J0W1tfvU8QT47NjC
+        T5Rj3aFSLE1t6y0zyaI5nrIFFKdiOetiL53PUsetVA5vRi+B1gt2RS3y6zcfYKi/KGtpoH
+        AnZDlm8vQZxFZ9/mgiNdsXUB1dQJfTU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-658-lqEJwAHdOhW61sSqG-YujA-1; Tue, 17 May 2022 09:51:18 -0400
+X-MC-Unique: lqEJwAHdOhW61sSqG-YujA-1
+Received: by mail-wm1-f70.google.com with SMTP id o24-20020a05600c379800b003943412e81dso976211wmr.6
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 06:51:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=DI+2TLyotaAB4m8Wk/Jy92LMvHUEqA+a9jwjfCWo8vE=;
+        b=kwRXMYTNEwhFuCEtyT9x1AkfCISIDfAArQP0TfEWrLOJsB/Ru03ZR6dTaWSXGl2VzA
+         i2s17u45nEUN7Dp8SP9kFgD7Bupdeg9sB3AUqimVmBh9l68lbtY9Ygo/x9vSBMuAqbrc
+         VXDCvdE8XSm7InyifsD9KeG48RULLSvJIBDhekTzcRTOpFdzDN9Ko87ZirSxlXK33qWS
+         yuT3Jcp4gUpdU8T21tbu6ZSFVAmbjBRlHq12NfVeuzRBh4WqwyNWG89g69+sOjusbXVj
+         RQKnAGJ3bwEmQD67YQMC0VorSl3HrgIhoHzgGfk45VuoWPb7M9NJlJYWBNHdRDqjn75q
+         LRZw==
+X-Gm-Message-State: AOAM531i94PXP0PRGjvrymbcfJCjxcyU1OM99C9gYxStBQhIYZ2AN00s
+        CFQ1OZUyJLe0MSydwR0DFSIt9wVb8vIHcyaGN9AIUTwPNtfhtk3KPWDdcYfOj1PSsXPJzxhSKej
+        T2PiB7ZbrQJeC
+X-Received: by 2002:a5d:595f:0:b0:20d:97d:4d14 with SMTP id e31-20020a5d595f000000b0020d097d4d14mr8262063wri.549.1652795477332;
+        Tue, 17 May 2022 06:51:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxGzb/41GwD8L8W8DX4aDq6yMVVszSErv2Y5yTV9eLtgY7MvadoakIwpfSvObshosUucUtTEA==
+X-Received: by 2002:a5d:595f:0:b0:20d:97d:4d14 with SMTP id e31-20020a5d595f000000b0020d097d4d14mr8262048wri.549.1652795477119;
+        Tue, 17 May 2022 06:51:17 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id o16-20020adf8b90000000b0020c5253d8e0sm12819325wra.44.2022.05.17.06.51.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 May 2022 06:51:16 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 11/34] KVM: x86: hyper-v: Use preallocated buffer in
+ 'struct kvm_vcpu_hv' instead of on-stack 'sparse_banks'
+In-Reply-To: <YoKunaNKDjYx7C21@google.com>
+References: <20220414132013.1588929-1-vkuznets@redhat.com>
+ <20220414132013.1588929-12-vkuznets@redhat.com>
+ <YoKunaNKDjYx7C21@google.com>
+Date:   Tue, 17 May 2022 15:51:15 +0200
+Message-ID: <87k0akuv1o.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: mbkIMTa2ayDryYp_xeMtZfPwxV8VeFOM
-X-Proofpoint-GUID: ZYEusxkFTDS3PiOW6B-2E7kqvHCFJFNZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-17_03,2022-05-17_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
- lowpriorityscore=0 bulkscore=0 spamscore=0 impostorscore=0 suspectscore=0
- mlxscore=0 priorityscore=1501 mlxlogscore=999 adultscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2205170083
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 17 May 2022 13:56:05 +0200
-Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
+Sean Christopherson <seanjc@google.com> writes:
 
-> On a protection exception, test that the Translation-Exception
-> Identification (TEID) values are correct given the circumstances of the
-> particular test.
-> The meaning of the TEID values is dependent on the installed
-> suppression-on-protection facility.
-> 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> ---
->  lib/s390x/asm/facility.h | 21 ++++++++++++++
->  lib/s390x/sclp.h         |  4 +++
->  lib/s390x/sclp.c         |  2 ++
->  s390x/skey.c             | 60 ++++++++++++++++++++++++++++++++++++----
->  4 files changed, 81 insertions(+), 6 deletions(-)
-> 
-> diff --git a/lib/s390x/asm/facility.h b/lib/s390x/asm/facility.h
-> index ef0fd037..f21bb9d7 100644
-> --- a/lib/s390x/asm/facility.h
-> +++ b/lib/s390x/asm/facility.h
-> @@ -12,6 +12,7 @@
->  #include <asm/facility.h>
->  #include <asm/arch_def.h>
->  #include <bitops.h>
-> +#include <sclp.h>
->  
->  #define NB_STFL_DOUBLEWORDS 32
->  extern uint64_t stfl_doublewords[];
-> @@ -44,4 +45,24 @@ static inline void setup_facilities(void)
->  		stfle(stfl_doublewords, NB_STFL_DOUBLEWORDS);
->  }
->  
-> +enum supp_on_prot_facility {
-> +	SOP_NONE,
-> +	SOP_BASIC,
-> +	SOP_ENHANCED_1,
-> +	SOP_ENHANCED_2,
-> +};
-> +
-> +static inline enum supp_on_prot_facility get_supp_on_prot_facility(void)
-> +{
-> +	if (sclp_facilities.has_esop) {
-> +		if (test_facility(131)) /* side-effect-access facility */
-> +			return SOP_ENHANCED_2;
-> +		else
-> +			return SOP_ENHANCED_1;
-> +	}
-> +	if (sclp_facilities.has_sop)
-> +		return SOP_BASIC;
-> +	return SOP_NONE;
-> +}
-> +
->  #endif
-> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
-> index 3488f4d2..853529bf 100644
-> --- a/lib/s390x/sclp.h
-> +++ b/lib/s390x/sclp.h
-> @@ -123,7 +123,9 @@ struct sclp_facilities {
->  	uint64_t has_cei : 1;
->  
->  	uint64_t has_diag318 : 1;
-> +	uint64_t has_sop : 1;
->  	uint64_t has_gsls : 1;
-> +	uint64_t has_esop : 1;
->  	uint64_t has_cmma : 1;
->  	uint64_t has_64bscao : 1;
->  	uint64_t has_esca : 1;
-> @@ -134,7 +136,9 @@ struct sclp_facilities {
->  };
->  
->  /* bit number within a certain byte */
-> +#define SCLP_FEAT_80_BIT_SOP		2
->  #define SCLP_FEAT_85_BIT_GSLS		0
-> +#define SCLP_FEAT_85_BIT_ESOP		6
->  #define SCLP_FEAT_98_BIT_KSS		7
->  #define SCLP_FEAT_116_BIT_64BSCAO	0
->  #define SCLP_FEAT_116_BIT_CMMA		1
-> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
-> index b8204c5f..e6017f64 100644
-> --- a/lib/s390x/sclp.c
-> +++ b/lib/s390x/sclp.c
-> @@ -152,7 +152,9 @@ void sclp_facilities_setup(void)
->  	cpu = sclp_get_cpu_entries();
->  	if (read_info->offset_cpu > 134)
->  		sclp_facilities.has_diag318 = read_info->byte_134_diag318;
-> +	sclp_facilities.has_sop = sclp_feat_check(80, SCLP_FEAT_80_BIT_SOP);
->  	sclp_facilities.has_gsls = sclp_feat_check(85, SCLP_FEAT_85_BIT_GSLS);
-> +	sclp_facilities.has_esop = sclp_feat_check(85, SCLP_FEAT_85_BIT_ESOP);
->  	sclp_facilities.has_kss = sclp_feat_check(98, SCLP_FEAT_98_BIT_KSS);
->  	sclp_facilities.has_cmma = sclp_feat_check(116, SCLP_FEAT_116_BIT_CMMA);
->  	sclp_facilities.has_64bscao = sclp_feat_check(116, SCLP_FEAT_116_BIT_64BSCAO);
-> diff --git a/s390x/skey.c b/s390x/skey.c
-> index 7aa91d19..19fa5721 100644
-> --- a/s390x/skey.c
-> +++ b/s390x/skey.c
-> @@ -8,6 +8,7 @@
->   *  Janosch Frank <frankja@linux.vnet.ibm.com>
->   */
->  #include <libcflat.h>
-> +#include <bitops.h>
->  #include <asm/asm-offsets.h>
->  #include <asm/interrupt.h>
->  #include <vmalloc.h>
-> @@ -158,6 +159,53 @@ static void test_test_protection(void)
->  	report_prefix_pop();
->  }
->  
-> +enum access {
-> +	ACC_STORE = 1,
-> +	ACC_FETCH = 2,
-> +	ACC_UPDATE = 3,
-> +};
-> +
-> +enum protection {
-> +	PROT_STORE = 1,
-> +	PROT_FETCH_STORE = 3,
-> +};
-> +
-> +static void check_key_prot_exc(enum access access, enum protection prot)
-> +{
-> +	struct lowcore *lc = 0;
-> +	union teid teid;
-> +
-> +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-> +	report_prefix_push("TEID");
-> +	teid.val = lc->trans_exc_id;
-> +	switch (get_supp_on_prot_facility()) {
-> +	case SOP_NONE:
-> +	case SOP_BASIC:
-> +		break;
-> +	case SOP_ENHANCED_1:
-> +		if ((teid.val & (BIT(63 - 61))) == 0)
+> On Thu, Apr 14, 2022, Vitaly Kuznetsov wrote:
+>> To make kvm_hv_flush_tlb() ready to handle L2 TLB flush requests, KVM needs
+>> to allow for all 64 sparse vCPU banks regardless of KVM_MAX_VCPUs as L1
+>> may use vCPU overcommit for L2. To avoid growing on-stack allocation, make
+>> 'sparse_banks' part of per-vCPU 'struct kvm_vcpu_hv' which is allocated
+>> dynamically.
+>> 
+>> Note: sparse_set_to_vcpu_mask() keeps using on-stack allocation as it
+>> won't be used to handle L2 TLB flush requests.
+>
+> I think it's worth using stronger language; handling TLB flushes for L2 _can't_
+> use sparse_set_to_vcpu_mask() because KVM has no idea how to translate an L2
+> vCPU index to an L1 vCPU.  I found the above mildly confusing because it didn't
+> call out "vp_bitmap" and so I assumed the note referred to yet another sparse_banks
+> "allocation".  And while vp_bitmap is related to sparse_banks, it tracks something
+> entirely different.
+>
+> Something like?
+>
+> Note: sparse_set_to_vcpu_mask() can never be used to handle L2 requests as
+> KVM can't translate L2 vCPU indices to L1 vCPUs, i.e. its vp_bitmap array
+> is still bounded by the number of L1 vCPUs and so can remain an on-stack
+> allocation.
 
-can you at least replace the hardcoded values with a macro or a const
-variable?
+My brain is probably tainted by looking at all this for some time so I
+really appreciate such improvements, thanks :)
 
-like:
+I wouldn't, however, say "never" ('never say never' :-)): KVM could've
+kept 2-level reverse mapping up-to-date:
 
-	const unsigned long esop_bit = BIT(63 - 61);
+KVM -> L2 VM list -> L2 vCPU ids -> L1 vCPUs which run them
 
-	...
+making it possible for KVM to quickly translate between L2 VP IDs and L1
+vCPUs. I don't do this in the series and just record L2 VM_ID/VP_ID for
+each L1 vCPU so I have to go over them all for each request. The
+optimization is, however, possible and we may get to it if really big
+Windows VMs become a reality.
 
-		if (!(teid.val & esop_bit))
+>
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  arch/x86/include/asm/kvm_host.h | 3 +++
+>>  arch/x86/kvm/hyperv.c           | 6 ++++--
+>>  2 files changed, 7 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>> index 058061621872..837c07e213de 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -619,6 +619,9 @@ struct kvm_vcpu_hv {
+>>  	} cpuid_cache;
+>>  
+>>  	struct kvm_vcpu_hv_tlb_flush_ring tlb_flush_ring[HV_NR_TLB_FLUSH_RINGS];
+>> +
+>> +	/* Preallocated buffer for handling hypercalls passing sparse vCPU set */
+>> +	u64 sparse_banks[64];
+>
+> Shouldn't this be HV_MAX_SPARSE_VCPU_BANKS?
+>
 
-> +			report_pass("key-controlled protection");
+It certainly should, thanks!
 
-actually, now that I think of it, aren't we expecting the bit to be
-zero? should that not be like this?
-
-report (!(teid.val & esop_bit), ...);
-
-> +		break;
-> +	case SOP_ENHANCED_2:
-> +		if ((teid.val & (BIT(63 - 56) | BIT(63 - 61))) == 0) {
-
-const unsigned long esop2_bits = 0x8C;	/* bits 56, 60, and 61 */
-const unsigned long esop2_key_prot = BIT(63 - 60);
-
-if ((teid.val & esop2_bits) == 0) {
-	report_pass(...);
-
-> +			report_pass("key-controlled protection");
-> +			if (teid.val & BIT(63 - 60)) {
-
-} else if ((teid.val & esop2_bits) == esop_key_prot) {
-
-> +				int access_code = teid.fetch << 1 | teid.store;
-> +
-> +				if (access_code == 2)
-> +					report((access & 2) && (prot & 2),
-> +					       "exception due to fetch");
-> +				if (access_code == 1)
-> +					report((access & 1) && (prot & 1),
-> +					       "exception due to store");
-> +				/* no relevant information if code is 0 or 3 */
-
-here you should check for the access-exception-fetch/store-indi-
-cation facility, then you can check the access code
-
-and at this point you should check for 0 explicitly (always pass) and 3
-(always fail)
-
-> +			}
-> +		}
-
-} else {
-	/* not key protection */
-	report_fail(...);
-}
-> +		break;
-> +	}
-> +	report_prefix_pop();
-> +}
-> +
->  /*
->   * Perform STORE CPU ADDRESS (STAP) instruction while temporarily executing
->   * with access key 1.
-> @@ -199,7 +247,7 @@ static void test_store_cpu_address(void)
->  	expect_pgm_int();
->  	*out = 0xbeef;
->  	store_cpu_address_key_1(out);
-> -	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-> +	check_key_prot_exc(ACC_STORE, PROT_STORE);
->  	report(*out == 0xbeef, "no store occurred");
->  	report_prefix_pop();
->  
-> @@ -210,7 +258,7 @@ static void test_store_cpu_address(void)
->  	expect_pgm_int();
->  	*out = 0xbeef;
->  	store_cpu_address_key_1(out);
-> -	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-> +	check_key_prot_exc(ACC_STORE, PROT_STORE);
->  	report(*out == 0xbeef, "no store occurred");
->  	report_prefix_pop();
->  
-> @@ -228,7 +276,7 @@ static void test_store_cpu_address(void)
->  	expect_pgm_int();
->  	*out = 0xbeef;
->  	store_cpu_address_key_1(out);
-> -	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-> +	check_key_prot_exc(ACC_STORE, PROT_STORE);
->  	report(*out == 0xbeef, "no store occurred");
->  	report_prefix_pop();
->  
-> @@ -321,7 +369,7 @@ static void test_set_prefix(void)
->  	set_storage_key(pagebuf, 0x28, 0);
->  	expect_pgm_int();
->  	set_prefix_key_1(prefix_ptr);
-> -	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-> +	check_key_prot_exc(ACC_FETCH, PROT_FETCH_STORE);
->  	report(get_prefix() == old_prefix, "did not set prefix");
->  	report_prefix_pop();
->  
-> @@ -334,7 +382,7 @@ static void test_set_prefix(void)
->  	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
->  	set_prefix_key_1((uint32_t *)0);
->  	install_page(root, 0, 0);
-> -	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-> +	check_key_prot_exc(ACC_FETCH, PROT_FETCH_STORE);
->  	report(get_prefix() == old_prefix, "did not set prefix");
->  	report_prefix_pop();
->  
-> @@ -358,7 +406,7 @@ static void test_set_prefix(void)
->  	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
->  	set_prefix_key_1((uint32_t *)2048);
->  	install_page(root, 0, 0);
-> -	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-> +	check_key_prot_exc(ACC_FETCH, PROT_FETCH_STORE);
->  	report(get_prefix() == old_prefix, "did not set prefix");
->  	report_prefix_pop();
->  
+-- 
+Vitaly
 
