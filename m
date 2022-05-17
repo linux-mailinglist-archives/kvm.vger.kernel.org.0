@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A0B6B5298FD
+	by mail.lfdr.de (Postfix) with ESMTP id 544435298FC
 	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 07:13:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235347AbiEQFMt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 01:12:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36182 "EHLO
+        id S235918AbiEQFMv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 01:12:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234863AbiEQFMr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 01:12:47 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCB4A275CB
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 22:12:45 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id oa7-20020a17090b1bc700b001df2567933eso830473pjb.4
-        for <kvm@vger.kernel.org>; Mon, 16 May 2022 22:12:45 -0700 (PDT)
+        with ESMTP id S230027AbiEQFMt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 01:12:49 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D639275CB
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 22:12:48 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id f2-20020a17090274c200b0016158e7c490so3754996plt.9
+        for <kvm@vger.kernel.org>; Mon, 16 May 2022 22:12:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=R36IoqSA3bTnOPJSIj3DsiTgEbLUYpqJ32CuuasMrcg=;
-        b=cXWdf8MLXcFdqeqPzf8n2yhaHkyDuIm5x2tVPerG2JjF3hGIT4i423dis+Z34+yH20
-         mkeFUfqW9hR3SVXkbMoFVB6g7yE5w8DOcq9gJNzAtJJysElbMXrQcyFu8snTmSzgWAc6
-         jbSQlhA5Z4uZCI93zdrc8Y/JEhticOYZZMyk9dgvE/yGPom9ZVB0cn5NdCRM5vbRD3BE
-         ZO+2N6ysgwkpQZbMYCZHTtMlIZgygN1+VrlKeg01w0n9ZHcqgN63lcxmuu9bF1Ce1ZC9
-         qUWSz/75AK6IobIVBsW3fNzf3zI8VbvmJI9gJdyinKnHsHDHxTuCfufS1FPwryxhcU5p
-         SFNg==
+        bh=EJNs5SvJLs6HPsmYgdWi7V4fczZNjIN6G6RaPYy3W5Q=;
+        b=Vc5H0oQqZvib9pXn9UPrBkm8Q0WD7T9SbaOxX/7Zc5NipbdZD0djFJxF50o3WXhBRG
+         UVtTg1kwVi12VESss4yFXWohlI1sJiPRvjqklLMxfa1NTq7jbf/6Cj1UR/cXGfRtbBsF
+         ZYME2oTDTGBh8xGEqgzTEEStqZ6h3CloKMdWqRHHXzKX7iAUYlcheHdZoOWhQ/3+yIoW
+         UUL3Ow18FxjTHHERpWzJdB5ros0HO6EFIWUndjbnYxtKavcKSuYf8EtMoKsxgpA7kYpz
+         kDx19SE4A4tTyXqLBvlFVaUWzRf0TUaaNpPFs4g71MZtjO6Wrpv9ZnnaKvDvhOD9iK4i
+         0zwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=R36IoqSA3bTnOPJSIj3DsiTgEbLUYpqJ32CuuasMrcg=;
-        b=6d8n9iJgirqmSb/pKr6cqA+YK+6mgzlNgg5WkgWfDzSgFVuxxW+RCrxQwmW479qaR4
-         sR9l3DyvkvVR/Jyz9ABmccV1WZQhBcaEf2ta/NynPnV1KcsC+L2blqkDY4vahtlGzns2
-         bWN++03fsp44DcblIljgDQlTLzxQjNB9VtfFpRvc4j2WbS/RGRec5YE/cAll4/AWT6Ol
-         8lGDz4clcPoJblhlXw/Hpp7BPQrwdd1fnl84zvw33WKgVPSJu/ENocXoND8KHWUW6DzO
-         cqW3gj0rK/dpHWLcy7Wy92YwHKGL99lZXsuWS5WezBFMUF7dukKmw7h81zTZWa236xb3
-         3E+w==
-X-Gm-Message-State: AOAM530gj846ZknkttbXlMO6IFnDnT3GVrgosnnloS4G/J3KaubNmBSR
-        31FJ1yWZWfibs1dn4+zH/tn4u75KqRyAq0X0iS0tc4fEQ5GuD7ZAfACl1m3K75NvpdqZUBs1gY6
-        y4YHh18NYV/tJx+GBnQb89ge+hslDQzUvjnPMd13japEk2CH7NIvSVYwpNpP18uz0ECym
-X-Google-Smtp-Source: ABdhPJy+O9W4KSwVw1b2UCMp98AuWm3r3ZRo/EOwHy8xgEmmsNY+Lbv/Jhqj+NQtDVj2+ziCdE9hovDYjn+6+T5r
+        bh=EJNs5SvJLs6HPsmYgdWi7V4fczZNjIN6G6RaPYy3W5Q=;
+        b=aiPSVActn/i5LBJW0nYeHHpgaRgXRHpl0P0qWSzJF7awBXR4XeMJlIKwEeFHHYRGv8
+         BzgoqMiolJub0qgEWBzFThSqFFeFuJjQnGdJXA+yq3XBxOoth5c5z2dfV6XFBzKF2knN
+         5nza0OBHppf28femFn+o3fC4kUF2/NToNQbphggnBDVXTHrUDUAgaj9SPp9FU/ivVOpX
+         dwNWREYuiHfYbJ6B+HtdxCb89LSGDpIVT9qUJTjqTWG7EL/+C/MG1QsBDPpxQ0fXnfui
+         1oukkZnqh0igZ3jL54a7azXfxwd04BqYDuSxuWOdAgkHDfF2vcmd2McqarLboDhXj0KQ
+         rzlQ==
+X-Gm-Message-State: AOAM531JtACNabDre8Y+KokKabJe/KerKWd3gKbBqCcD3J9BzEPqfHlo
+        4r6g00YfKrjREFnlU4qtNSLmh8AahcmCwpd9UFulrQXHaWKUn1wv8mRgRcntzfvwy8xmsirH+fZ
+        vocVmMqCR1/eCOgIIj6oo+83NyKxcm+3KAp+XHSXlLWYGxc7ExOnllIgTewzMaTtiu5xl
+X-Google-Smtp-Source: ABdhPJzzWxpws8dN0zFYQVzajOzfuNFZ4HjVb0X5DbtbFmOLkHt+/guao4zC2IASO/QWTzSJdCD6ObWTSfryOG1K
 X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
- (user=aaronlewis job=sendgmr) by 2002:a62:f20d:0:b0:50d:6961:7b75 with SMTP
- id m13-20020a62f20d000000b0050d69617b75mr20604098pfh.19.1652764365223; Mon,
- 16 May 2022 22:12:45 -0700 (PDT)
-Date:   Tue, 17 May 2022 05:12:37 +0000
+ (user=aaronlewis job=sendgmr) by 2002:a17:90b:4ac9:b0:1df:6944:b1e4 with SMTP
+ id mh9-20020a17090b4ac900b001df6944b1e4mr6641402pjb.207.1652764367990; Mon,
+ 16 May 2022 22:12:47 -0700 (PDT)
+Date:   Tue, 17 May 2022 05:12:38 +0000
 In-Reply-To: <20220517051238.2566934-1-aaronlewis@google.com>
-Message-Id: <20220517051238.2566934-2-aaronlewis@google.com>
+Message-Id: <20220517051238.2566934-3-aaronlewis@google.com>
 Mime-Version: 1.0
 References: <20220517051238.2566934-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
-Subject: [PATCH 2/3] selftests: kvm/x86: Add the helper function create_pmu_event_filter
+Subject: [PATCH 3/3] selftests: kvm/x86: Verify the pmu event filter matches
+ the correct event
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
@@ -68,67 +69,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a helper function that creates a pmu event filter given an event
-list.  Currently, a pmu event filter can only be created with the same
-hard coded event list.  Add a way to create one given a different event
-list.
+Add a test to demonstrate that when the guest programs an event select
+it is matched correctly in the pmu event filter and not inadvertently
+filtered.  This could happen on AMD if the high nybble[1] in the event
+select gets truncated away only leaving the bottom byte[2] left for
+matching.
 
-Also, rename make_pmu_event_filter to alloc_pmu_event_filter to clarify
-it's purpose given the introduction of create_pmu_event_filter.
+This is a contrived example used for the convenience of demonstrating
+this issue, however, this can be applied to event selects 0x28A (OC
+Mode Switch) and 0x08A (L1 BTB Correction), where 0x08A could end up
+being denied when the event select was only set up to deny 0x28A.
 
-No functional changes intended.
+[1] bits 35:32 in the event select register and bits 11:8 in the event
+    select.
+[2] bits 7:0 in the event select register and bits 7:0 in the event
+    select.
 
 Signed-off-by: Aaron Lewis <aaronlewis@google.com>
 ---
- .../kvm/x86_64/pmu_event_filter_test.c         | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ .../kvm/x86_64/pmu_event_filter_test.c        | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
 diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-index 0d06ffa95d9d..30c1a5804210 100644
+index 30c1a5804210..93d77574b255 100644
 --- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-@@ -208,7 +208,7 @@ static bool sanity_check_pmu(struct kvm_vm *vm)
- 	return success;
+@@ -281,6 +281,22 @@ static uint64_t test_with_filter(struct kvm_vm *vm,
+ 	return run_vm_to_sync(vm);
  }
  
--static struct kvm_pmu_event_filter *make_pmu_event_filter(uint32_t nevents)
-+static struct kvm_pmu_event_filter *alloc_pmu_event_filter(uint32_t nevents)
- {
- 	struct kvm_pmu_event_filter *f;
- 	int size = sizeof(*f) + nevents * sizeof(f->events[0]);
-@@ -220,19 +220,29 @@ static struct kvm_pmu_event_filter *make_pmu_event_filter(uint32_t nevents)
- 	return f;
- }
- 
--static struct kvm_pmu_event_filter *event_filter(uint32_t action)
-+
-+static struct kvm_pmu_event_filter *
-+create_pmu_event_filter(const uint64_t event_list[],
-+			int nevents, uint32_t action)
- {
- 	struct kvm_pmu_event_filter *f;
- 	int i;
- 
--	f = make_pmu_event_filter(ARRAY_SIZE(event_list));
-+	f = alloc_pmu_event_filter(nevents);
- 	f->action = action;
--	for (i = 0; i < ARRAY_SIZE(event_list); i++)
-+	for (i = 0; i < nevents; i++)
- 		f->events[i] = event_list[i];
- 
- 	return f;
- }
- 
-+static struct kvm_pmu_event_filter *event_filter(uint32_t action)
++static void test_amd_deny_list(struct kvm_vm *vm)
 +{
-+	return create_pmu_event_filter(event_list,
-+				       ARRAY_SIZE(event_list),
-+				       action);
++	uint64_t event = EVENT(0x1C2, 0);
++	struct kvm_pmu_event_filter *f;
++	uint64_t count;
++
++	f = create_pmu_event_filter(&event, 1, KVM_PMU_EVENT_DENY);
++	count = test_with_filter(vm, f);
++
++	free(f);
++	if (count != NUM_BRANCHES)
++		pr_info("%s: Branch instructions retired = %lu (expected %u)\n",
++			__func__, count, NUM_BRANCHES);
++	TEST_ASSERT(count, "Allowed PMU event is not counting");
 +}
 +
- /*
-  * Remove the first occurrence of 'event' (if any) from the filter's
-  * event list.
+ static void test_member_deny_list(struct kvm_vm *vm)
+ {
+ 	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_DENY);
+@@ -463,6 +479,9 @@ int main(int argc, char *argv[])
+ 		exit(KSFT_SKIP);
+ 	}
+ 
++	if (use_amd_pmu())
++		test_amd_deny_list(vm);
++
+ 	test_without_filter(vm);
+ 	test_member_deny_list(vm);
+ 	test_member_allow_list(vm);
 -- 
 2.36.1.124.g0e6072fb45-goog
 
