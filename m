@@ -2,53 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3958052A75E
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 17:51:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A489252A7BB
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 18:18:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344994AbiEQPvw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 11:51:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51526 "EHLO
+        id S1350822AbiEQQSf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 12:18:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350799AbiEQPvb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 11:51:31 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E70CF227
-        for <kvm@vger.kernel.org>; Tue, 17 May 2022 08:51:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652802689; x=1684338689;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=cHiPt+XcZXdU5PMPxLMx8JlJCddH7PwTNkDv1IBDh/g=;
-  b=Q9PCK7JSlOGxfLzAPwuPdFTjYcZfMDZhPkbBz/7jWwT5jquLr0qLLRhH
-   3mUU98KoXkfL7hfb1wJatapsBNQHw8dAe6tqWmwa8fIO2i+cQ9WFgUb+U
-   rZX+jyWJ7Wq8H70REbv0n7TuwHpll4lZmjCbJhLN6GZOX1bBxwKWGGM+a
-   afq3Nvgmj2yhToMxaQi5koP1olMk9XBrEF2gO4+dLmjtFfje55VpU7IuV
-   repGd3gQPSQr64prRdGhHe168uHLm5qLRM5LHYfQWvy1LEfE87KMdV0p+
-   QeWjGyodG6PFYmBcKWHhGlNRVswKoFjeg6wbCLLG07LHLrLGIxMIuq9Im
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10350"; a="258788665"
-X-IronPort-AV: E=Sophos;i="5.91,233,1647327600"; 
-   d="scan'208";a="258788665"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2022 08:51:08 -0700
-X-IronPort-AV: E=Sophos;i="5.91,233,1647327600"; 
-   d="scan'208";a="597199913"
-Received: from embargo.jf.intel.com ([10.165.9.183])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2022 08:51:08 -0700
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     pbonzini@redhat.com, richard.henderson@linaro.org,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-Cc:     Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH] target/i386: Remove LBREn bit check when access Arch LBR MSRs
-Date:   Tue, 17 May 2022 11:50:24 -0400
-Message-Id: <20220517155024.33270-1-weijiang.yang@intel.com>
-X-Mailer: git-send-email 2.27.0
+        with ESMTP id S1348365AbiEQQSd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 12:18:33 -0400
+X-Greylist: delayed 2264 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 17 May 2022 09:18:32 PDT
+Received: from mail.neweas.com (mail.neweas.com [162.19.155.127])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E8C33A5FC
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 09:18:32 -0700 (PDT)
+Received: by mail.neweas.com (Postfix, from userid 1002)
+        id 56B5622BA7; Tue, 17 May 2022 15:40:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=neweas.com; s=mail;
+        t=1652802047; bh=qQhd+6rcOH+OhrNQ6A9OWLCE/79cwvyTtb6LUe1aYuU=;
+        h=Date:From:To:Subject:From;
+        b=AhM+bDE4dq8nAHEtMMElJpnqHy4tVb+bB+qcVQVYCgtOvr0gzaamwRI8bPdf5/8lz
+         qJEgEORJUF6AHTxOFDbjCHnJ2RHRc4MKYECcNP53B08q/UKSfN6GxPUmMSYkLOy0zu
+         hgUkDkvoWprPnDHC6tjjIc/0BvLs7DlP3s1rGOb3eJBZOMIuCqZccpVeWAAUBaZeNC
+         nmzGoRg8Ebh+yhLzC+XT7KJDf5YrpZ+6Ps+m0SrDDqeq8OzrIKifO8V8PiWMjtONPm
+         W9vo1oxyWabgIa+HvRNWMCyj73oCmhron+PPDvx0A65T0G2Z/QF6RHtSfElvAWFcNP
+         8ExiIJJRCskUQ==
+Received: by mail.neweas.com for <kvm@vger.kernel.org>; Tue, 17 May 2022 15:40:42 GMT
+Message-ID: <20220517141500-0.1.f.yp8.0.8dptw3ho5n@neweas.com>
+Date:   Tue, 17 May 2022 15:40:42 GMT
+From:   "Luca Gauthier" <luca.gauthier@neweas.com>
+To:     <kvm@vger.kernel.org>
+Subject: New collaboration
+X-Mailer: mail.neweas.com
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=0.6 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -56,60 +45,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Live migration can happen when Arch LBR LBREn bit is cleared,
-e.g., when migration happens after guest entered SMM mode.
-In this case, we still need to migrate Arch LBR MSRs.
+Hello,
 
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
----
- target/i386/kvm/kvm.c | 21 +++++++++------------
- 1 file changed, 9 insertions(+), 12 deletions(-)
+are you looking for more business clients?
 
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index a9ee8eebd7..e2d675115b 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -3373,15 +3373,14 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-             int i, ret;
- 
-             /*
--             * Only migrate Arch LBR states when: 1) Arch LBR is enabled
--             * for migrated vcpu. 2) the host Arch LBR depth equals that
--             * of source guest's, this is to avoid mismatch of guest/host
--             * config for the msr hence avoid unexpected misbehavior.
-+             * Only migrate Arch LBR states when the host Arch LBR depth
-+             * equals that of source guest's, this is to avoid mismatch
-+             * of guest/host config for the msr hence avoid unexpected
-+             * misbehavior.
-              */
-             ret = kvm_get_one_msr(cpu, MSR_ARCH_LBR_DEPTH, &depth);
- 
--            if (ret == 1 && (env->msr_lbr_ctl & 0x1) && !!depth &&
--                depth == env->msr_lbr_depth) {
-+            if (ret == 1 && !!depth && depth == env->msr_lbr_depth) {
-                 kvm_msr_entry_add(cpu, MSR_ARCH_LBR_CTL, env->msr_lbr_ctl);
-                 kvm_msr_entry_add(cpu, MSR_ARCH_LBR_DEPTH, env->msr_lbr_depth);
- 
-@@ -3801,13 +3800,11 @@ static int kvm_get_msrs(X86CPU *cpu)
- 
-     if (kvm_enabled() && cpu->enable_pmu &&
-         (env->features[FEAT_7_0_EDX] & CPUID_7_0_EDX_ARCH_LBR)) {
--        uint64_t ctl, depth;
--        int i, ret2;
-+        uint64_t depth;
-+        int i, ret;
- 
--        ret = kvm_get_one_msr(cpu, MSR_ARCH_LBR_CTL, &ctl);
--        ret2 = kvm_get_one_msr(cpu, MSR_ARCH_LBR_DEPTH, &depth);
--        if (ret == 1 && ret2 == 1 && (ctl & 0x1) &&
--            depth == ARCH_LBR_NR_ENTRIES) {
-+        ret = kvm_get_one_msr(cpu, MSR_ARCH_LBR_DEPTH, &depth);
-+        if (ret == 1 && depth == ARCH_LBR_NR_ENTRIES) {
-             kvm_msr_entry_add(cpu, MSR_ARCH_LBR_CTL, 0);
-             kvm_msr_entry_add(cpu, MSR_ARCH_LBR_DEPTH, 0);
- 
+We would like to start working with you as a partner in acquiring or exch=
+anging leads, which directly translates into mutual benefits in the form =
+of an increased client portfolio.
 
-base-commit: 8eccdb9eb84615291faef1257d5779ebfef7a0d0
--- 
-2.27.0
+We work in the sector of internet marketing and as one of the first in Eu=
+rope SEO Agencies we=E2=80=99ve introduced the SEO 360 service which allo=
+ws your clients to gain the access to original SEO consultations.
 
+By choosing to work with us you receive support in achieving your busines=
+s goals, and help in handling Digital Marketing for your clients.
+
+We support over 237 partner companies. We have one of the biggest executi=
+ve departments in Europe at our disposal, we=E2=80=99ve prepared over 200=
+0 campaigns in Europe and 200 in the USA and Canada.
+
+Are you interested in the details of our partnership programme?
+
+Yours sincerely,
+Luca Gauthier
