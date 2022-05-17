@@ -2,64 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3290D529EB0
+	by mail.lfdr.de (Postfix) with ESMTP id 7E0F9529EB1
 	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 12:03:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231372AbiEQKC5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 06:02:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59508 "EHLO
+        id S245569AbiEQKDB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 06:03:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229792AbiEQKCs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S244799AbiEQKCs (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 17 May 2022 06:02:48 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2053.outbound.protection.outlook.com [40.107.243.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F03472CDE8;
-        Tue, 17 May 2022 03:02:46 -0700 (PDT)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2041.outbound.protection.outlook.com [40.107.93.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A1615F53;
+        Tue, 17 May 2022 03:02:47 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JLaTZIgPYGPqOxeaOb+l7ofMDrtEmXqEq/DAq7MxMaUDJ7ta6nLsPfAklziMALJzhTiIKz1aa3ul7Il2cMd7pdvgbdqBd8kk0GqwvEvyLK00bcIObIe5Cv6LKOaCaBKsGyGoC+F+MZZAZwxAZq2myaBOrFyQXW5q21RCsPWzDFHATBQNEwQzstzeXfeK6Wm+zCcCnx/iY33Pdg9XdTMDq32C2S4VtXuvuy/yQ6y7XiT7AQHHO1rRzXOY32pPjC6jXtzuXZlrqh+OfSQAihidMr1DLbUx0zpL9lu06DZNPN6ijEQTl08mFfcBfNcl3mQsjrE05xraRa3Gm5IS2HIfiw==
+ b=LI+Z3nLuzwUTBl35IRUId/q3CLSTmNhlhxyBHZMrPcnmbY2aeCpogFO7fdI9rxMJU2WrcaNAlDYeKPV6jtUq05okmbGDw3j0RVoQ2CafEEmngXYLU/iMRt0d3bGIBGHDVrFp81e6ilotZyJFOYHvxllVF4wWI6Ceytk+gvLB92AXMCUpF06nd4yNteBlH/o3wAwTnbK5wTFpCiiiZM02g38R/pi3oZ96yE6G7uJPDFSrx7vE8rQCoGbZcOja5i4XTS1+1j0ySe2LU4oY5cG9rKSMDdwmGyqGaHQypA87DoJBTWanGMUNbX2gY+QAcfLZPgfuc2SWlReRfnEyEc6ybw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ftJwlz+hNN8i20Tovb9/C+Z9VCP6pdxowx/RRmpe7nU=;
- b=hr3mv/21ukNPGc1Jaz6DBeWWZKDePBtVsdZ0gtMCGeNwAe2xDsMr9XQBi5mRBmxij9i2mamMxpEh9xQZ0SZpegjLwGE1b+sWQTLJwl6KS79RkcKxub/joj0BAt0JjYw7V4cITkHIvATNyIDwAmZq2OQlynKGPc2zaoh0r03W/QgCKGwGT5Gc/xFJ4M1SylorGD7Z32Ya1vnform8SnERfAON+1Zxm+G+ssYGj/B0WVB4KMJpOwQ9XqQ2FDfPp/uOlHMZIgGPuPpszNPmVE3e58dBxP/pcaKHPSMkZbEHdGqEuE0qD1qezsaCcrlYjYieK0xVfsqqJ0CA2cPLDW5dHA==
+ bh=sSKtSlcRiVZebQuVJ8RbTzpvApWwBXW65adVqf5/JdI=;
+ b=Psed6ZWME5DPS2Bi4TlBIbRe8i40Ad7NCdI/bn3y2cdJ+ZeT1smRPEpeL5w2jxg1jLLm36BxNvFIWw58tAQjA6oleVJTWNjaW+m4Ktv0vlAme58mvk5zgdMTdXxlT8sMiyoseewlPf/WakdZL0Codx7mF6Mm3dJbeeiGaXmiiB7exyrPulQw2hnH2upFoOrYccMkUAgZK25cLOhkYMV2kt89K6qWdq9qmAUoteuwtAb6sj9y6IGXGxnxWVWUjEbneXB7EAmNIzQMSQEo9bmzo9VPN92btYTLxQlGqaWJ10TN1pqJ6O6w0YsCCZX3zECK52It5mAvrfj/mLSdvMrxTw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.236) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 12.22.5.238) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ftJwlz+hNN8i20Tovb9/C+Z9VCP6pdxowx/RRmpe7nU=;
- b=pZqw+S6XMbUATUdar2j9bRVflL2WjWjTlXYPw3QbYeXYoAYW/Gh4kYXkfLznz5v+QzhgvN2nKzk6eFV+qrfpI38NOr1/KB43hj58Vd8qnbzi0hsP1QAmOalFK0pv4/gfgPqcMiizGTC2yVboOHwKHKZUmscqaraT/EPaKvE4phjz1vvKTMfmbjZQwWBh9Wu0xqrnvTT9oJ+UrRH9Nd3j31wjpIofRfCEmnBmenygbBeSGZIcNhvd/jHrdfBvuVoYuEeBJqXmjFMouIpeFL6BuUn4hXwuo312esRz0mCvL7hmnEkZ6sy4C4LpnjZ48LYyEtjpi9zOa87Lg02OFCoB8g==
-Received: from MW4PR04CA0274.namprd04.prod.outlook.com (2603:10b6:303:89::9)
- by MN2PR12MB3375.namprd12.prod.outlook.com (2603:10b6:208:cc::12) with
+ bh=sSKtSlcRiVZebQuVJ8RbTzpvApWwBXW65adVqf5/JdI=;
+ b=AfAcgrfBOaxu+dH9gXhVOzGkDjl9iQdFW6ENaoarXIPNi3k3jMv30fZ03NeRYaiv4qJzFV1YLcDsuZIkU6lRlGkaM7pm0NmmYCMFwBB35nb4oegtzDu4pxyzymypIUx9t59CHSP/4F+RQWmoWlKKpB8tFv021iw844m/gFClFyyDTtjdvGk8+WqKsvBBZzul1CwJldGeM9mlCOwgnLlzzjPns5Flm39i12pYnTP5ECv+lFLrHVyyc55TIlzVUWTivVGKxiBNBgNDht1Gg0ABP5qyt9Bw62qACeM9Q01mgsErashXr6DzDnmZU5+usTsGT5bpHIdsY1Kxu8huz3zpZw==
+Received: from BN9PR03CA0228.namprd03.prod.outlook.com (2603:10b6:408:f8::23)
+ by MN2PR12MB4565.namprd12.prod.outlook.com (2603:10b6:208:26b::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5250.17; Tue, 17 May
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5250.13; Tue, 17 May
  2022 10:02:45 +0000
-Received: from CO1NAM11FT041.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:89:cafe::23) by MW4PR04CA0274.outlook.office365.com
- (2603:10b6:303:89::9) with Microsoft SMTP Server (version=TLS1_2,
+Received: from BN8NAM11FT040.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:f8:cafe::47) by BN9PR03CA0228.outlook.office365.com
+ (2603:10b6:408:f8::23) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5250.14 via Frontend
  Transport; Tue, 17 May 2022 10:02:45 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.236)
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.238)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.236 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.236; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (12.22.5.236) by
- CO1NAM11FT041.mail.protection.outlook.com (10.13.174.217) with Microsoft SMTP
+ 12.22.5.238 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.238; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (12.22.5.238) by
+ BN8NAM11FT040.mail.protection.outlook.com (10.13.177.166) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
  15.20.5250.13 via Frontend Transport; Tue, 17 May 2022 10:02:45 +0000
 Received: from drhqmail203.nvidia.com (10.126.190.182) by
- DRHQMAIL109.nvidia.com (10.27.9.19) with Microsoft SMTP Server (TLS) id
- 15.0.1497.32; Tue, 17 May 2022 10:02:39 +0000
+ DRHQMAIL105.nvidia.com (10.27.9.14) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.32; Tue, 17 May 2022 10:02:44 +0000
 Received: from drhqmail203.nvidia.com (10.126.190.182) by
  drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.22; Tue, 17 May 2022 03:02:38 -0700
+ 15.2.986.22; Tue, 17 May 2022 03:02:44 -0700
 Received: from nvidia-abhsahu-1.nvidia.com (10.127.8.9) by mail.nvidia.com
  (10.126.190.182) with Microsoft SMTP Server id 15.2.986.22 via Frontend
- Transport; Tue, 17 May 2022 03:02:33 -0700
+ Transport; Tue, 17 May 2022 03:02:39 -0700
 From:   Abhishek Sahu <abhsahu@nvidia.com>
 To:     Alex Williamson <alex.williamson@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
@@ -73,9 +73,9 @@ CC:     Max Gurtovoy <mgurtovoy@nvidia.com>,
         <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
         <linux-pm@vger.kernel.org>, <linux-pci@vger.kernel.org>,
         Abhishek Sahu <abhsahu@nvidia.com>
-Subject: [PATCH v4 1/4] vfio/pci: Invalidate mmaps and block the access in D3hot power state
-Date:   Tue, 17 May 2022 15:32:16 +0530
-Message-ID: <20220517100219.15146-2-abhsahu@nvidia.com>
+Subject: [PATCH v4 2/4] vfio/pci: Change the PF power state to D0 before enabling VFs
+Date:   Tue, 17 May 2022 15:32:17 +0530
+Message-ID: <20220517100219.15146-3-abhsahu@nvidia.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20220517100219.15146-1-abhsahu@nvidia.com>
 References: <20220517100219.15146-1-abhsahu@nvidia.com>
@@ -84,24 +84,24 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: dd361098-0c30-4ac9-ffa4-08da37ec63d6
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3375:EE_
-X-Microsoft-Antispam-PRVS: <MN2PR12MB337561191AB66DEC67F756A9CCCE9@MN2PR12MB3375.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 9bae0ea0-88b5-4b94-35de-08da37ec6414
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4565:EE_
+X-Microsoft-Antispam-PRVS: <MN2PR12MB4565F93D5620E156A1EE5B6ECCCE9@MN2PR12MB4565.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Z8mCICEDaOF5Nvx+rsybOi+4dZ4sr6qnFCcJXCgMsEo6uSc5/uqcJ0HkKHa2Zvbvw4KxoQjnZ0ctgInMpPh6ZFO2+srr0oZLYQVNJ3ozjRjJov25/ZHs5xCk+CwzEKVbnj9TPvPJSJJtyJHZiWwt1UG0LiYY5+WaFfV59yO9fiOri+/fR6fEkqUCSCPc6hchO1ub72YuHGpPCf+6k51XjP8BCAl/2Q7lomu6FjLhZDdbILwYs+F+hQ6CK9CGweFCNkjiYaSvxY1VIslnhV0NxJQPUCrtUMwnrzH3ocnl1Fmo+woeB1v2soP3zaQ/35SvNK+ZvDMigQnQ1Gpj2ImOnbT2CboklU6Ez4lNN//zRP7j7uh5P1UMHbid/0NOBU66XRNF8IX1da27SnK8yu3hV62Lq5JL3y7tlDJsuKpcCoWFgd8Q24+u/62hJ46kKGiSOETSBGoZrjBXAKu1lBNz9cXDKWOKGmSE4754pMD96aG4vtyQN4F2DTYbPW4c+HS5CJbYQkclA5tltUbJqMajkGSW0NB1Knh/SCIriTLO+zF0azH56IksLAN0+BPxZ+XotX0lgBuyLpvxYk5fFxf1Q/Rmn2dtzSKrV6c+wuGrhIM3RHr6O9YUJnMJBoRNbLwQUaUV6tw3UuAoO970UfQlOFbDAOiUQJTsfW6+fPwPLlLrMtCD79Kb2E84wduzRW1mMbndVw/019+ZnXXPlwIj88Lg7Ljf76zAoEzkgc0guk4=
-X-Forefront-Antispam-Report: CIP:12.22.5.236;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(40470700004)(46966006)(316002)(7696005)(82310400005)(110136005)(186003)(1076003)(8676002)(83380400001)(2616005)(336012)(426003)(86362001)(6666004)(70206006)(107886003)(47076005)(81166007)(26005)(7416002)(5660300002)(40460700003)(8936002)(70586007)(54906003)(36756003)(36860700001)(4326008)(356005)(508600001)(2906002)(32563001)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 38rjHNhaaYgzQwYaUu6flh0gnaHygsaJkPBAFUSNmqVDi7Q8ML9YWZEPDfahZE6Vr1Pe0Hro70sFboDCsscyca5hRoVJhy83oqhWxSdO/0vxVo4HsSGVGX/0kcIc+rPqLQ8CR3tl2GLM7s8gvmWXdP7sTcn9iZqmQpXX6CkMHrr7XplwSmviNq8bldStaIbVYvphr/OXe/DMpi3xby8W8g+XYfPagSLM8n8C755g9fRmMwndJd1dEm0BgxMmNWzqF9WCbArQM+YtSgLYw5xuj/shtGpronRywveBA1n5G/DmMyaz8VaFwWGh7jXgFcc8M51ZYKTTXr9GxZDwMT4hFgv1I8k3fYaRt5+W6I5NdDUdwrSMKkvWgsUvmRnH2BaAyBakJrHMfpW8mBeg8uOh8s92Ho5cT+9TddOrmvcebGtbCOmMT4cQulJirKJGb+7QEyifCeOF39BDhRXddeZKG3z647pFeKzlYNVxGlX7zj+1SEPEkJv9iZ3Jm8g18NlUV8wMMsv+dHDrcDRFt+rTN4PaNycxrezPtl5NVyW/E8YTQ1+IidBK11JCJW1VK9dOmY/4CT64jDwU51G7pp1ynarTV8Oo0fYsJRLkBI6CSx3vpQ3DBGxN2aX2lwLiuuH6qhUvZzdWkpLckAt653ezzxrNa2iVVUsGNh3NkDQIXQjxB27BsmdTIYPSLzidW4Kv6lYgPVxOVOvXZb6MaMlH8Q==
+X-Forefront-Antispam-Report: CIP:12.22.5.238;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230001)(4636009)(46966006)(36840700001)(40470700004)(36756003)(81166007)(8936002)(316002)(1076003)(2616005)(82310400005)(107886003)(26005)(2906002)(356005)(7696005)(6666004)(7416002)(110136005)(5660300002)(83380400001)(54906003)(86362001)(70586007)(36860700001)(336012)(47076005)(426003)(70206006)(40460700003)(4326008)(186003)(508600001)(8676002)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 May 2022 10:02:45.1784
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 May 2022 10:02:45.5483
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: dd361098-0c30-4ac9-ffa4-08da37ec63d6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9bae0ea0-88b5-4b94-35de-08da37ec6414
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.236];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT041.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.238];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT040.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3375
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4565
 X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -112,110 +112,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-According to [PCIe v5 5.3.1.4.1] for D3hot state
+According to [PCIe v5 9.6.2] for PF Device Power Management States
 
- "Configuration and Message requests are the only TLPs accepted by a
-  Function in the D3Hot state. All other received Requests must be
-  handled as Unsupported Requests, and all received Completions may
-  optionally be handled as Unexpected Completions."
+ "The PF's power management state (D-state) has global impact on its
+  associated VFs. If a VF does not implement the Power Management
+  Capability, then it behaves as if it is in an equivalent
+  power state of its associated PF.
 
-Currently, if the vfio PCI device has been put into D3hot state and if
-user makes non-config related read/write request in D3hot state, these
-requests will be forwarded to the host and this access may cause
-issues on a few systems.
+  If a VF implements the Power Management Capability, the Device behavior
+  is undefined if the PF is placed in a lower power state than the VF.
+  Software should avoid this situation by placing all VFs in lower power
+  state before lowering their associated PF's power state."
 
-This patch leverages the memory-disable support added in commit
-'abafbc551fdd ("vfio-pci: Invalidate mmaps and block MMIO access on
-disabled memory")' to generate page fault on mmap access and
-return error for the direct read/write. If the device is D3hot state,
-then the error will be returned for MMIO access. The IO access generally
-does not make the system unresponsive so the IO access can still happen
-in D3hot state. The default value should be returned in this case
-without bringing down the complete system.
+From the vfio driver side, user can enable SR-IOV when the PF is in D3hot
+state. If VF does not implement the Power Management Capability, then
+the VF will be actually in D3hot state and then the VF BAR access will
+fail. If VF implements the Power Management Capability, then VF will
+assume that its current power state is D0 when the PF is D3hot and
+in this case, the behavior is undefined.
 
-Also, the power related structure fields need to be protected so
-we can use the same 'memory_lock' to protect these fields also.
-This protection is mainly needed when user changes the PCI
-power state by writing into PCI_PM_CTRL register.
-vfio_pci_lock_and_set_power_state() wrapper function will take the
-required locks and then it will invoke the vfio_pci_set_power_state().
+To support PF power management, we need to create power management
+dependency between PF and its VF's. The runtime power management support
+may help with this where power management dependencies are supported
+through device links. But till we have such support in place, we can
+disallow the PF to go into low power state, if PF has VF enabled.
+There can be a case, where user first enables the VF's and then
+disables the VF's. If there is no user of PF, then the PF can put into
+D3hot state again. But with this patch, the PF will still be in D0
+state after disabling VF's since detecting this case inside
+vfio_pci_core_sriov_configure() requires access to
+struct vfio_device::open_count along with its locks. But the subsequent
+patches related to runtime PM will handle this case since runtime PM
+maintains its own usage count.
+
+Also, vfio_pci_core_sriov_configure() can be called at any time
+(with and without vfio pci device user), so the power state change
+needs to be protected with the required locks.
 
 Signed-off-by: Abhishek Sahu <abhsahu@nvidia.com>
 ---
- drivers/vfio/pci/vfio_pci_config.c |  7 +++++--
- drivers/vfio/pci/vfio_pci_core.c   | 16 ++++++++++++++++
- include/linux/vfio_pci_core.h      |  2 ++
- 3 files changed, 23 insertions(+), 2 deletions(-)
+ drivers/vfio/pci/vfio_pci_core.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-index 6e58b4bf7a60..d9077627117f 100644
---- a/drivers/vfio/pci/vfio_pci_config.c
-+++ b/drivers/vfio/pci/vfio_pci_config.c
-@@ -402,11 +402,14 @@ bool __vfio_pci_memory_enabled(struct vfio_pci_core_device *vdev)
- 	u16 cmd = le16_to_cpu(*(__le16 *)&vdev->vconfig[PCI_COMMAND]);
- 
- 	/*
-+	 * Memory region cannot be accessed if device power state is D3.
-+	 *
- 	 * SR-IOV VF memory enable is handled by the MSE bit in the
- 	 * PF SR-IOV capability, there's therefore no need to trigger
- 	 * faults based on the virtual value.
- 	 */
--	return pdev->no_command_memory || (cmd & PCI_COMMAND_MEMORY);
-+	return pdev->current_state < PCI_D3hot &&
-+	       (pdev->no_command_memory || (cmd & PCI_COMMAND_MEMORY));
- }
- 
- /*
-@@ -718,7 +721,7 @@ static int vfio_pm_config_write(struct vfio_pci_core_device *vdev, int pos,
- 			break;
- 		}
- 
--		vfio_pci_set_power_state(vdev, state);
-+		vfio_pci_lock_and_set_power_state(vdev, state);
- 	}
- 
- 	return count;
 diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 05a3aa95ba52..b9f222ca48cf 100644
+index b9f222ca48cf..4fe9a4efc751 100644
 --- a/drivers/vfio/pci/vfio_pci_core.c
 +++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -255,6 +255,22 @@ int vfio_pci_set_power_state(struct vfio_pci_core_device *vdev, pci_power_t stat
- 	return ret;
- }
+@@ -217,6 +217,10 @@ int vfio_pci_set_power_state(struct vfio_pci_core_device *vdev, pci_power_t stat
+ 	bool needs_restore = false, needs_save = false;
+ 	int ret;
  
-+/*
-+ * It takes all the required locks to protect the access of power related
-+ * variables and then invokes vfio_pci_set_power_state().
-+ */
-+void vfio_pci_lock_and_set_power_state(struct vfio_pci_core_device *vdev,
-+				       pci_power_t state)
-+{
-+	if (state >= PCI_D3hot)
-+		vfio_pci_zap_and_down_write_memory_lock(vdev);
-+	else
-+		down_write(&vdev->memory_lock);
++	/* Prevent changing power state for PFs with VFs enabled */
++	if (pci_num_vf(pdev) && state > PCI_D0)
++		return -EBUSY;
 +
-+	vfio_pci_set_power_state(vdev, state);
-+	up_write(&vdev->memory_lock);
-+}
+ 	if (vdev->needs_pm_restore) {
+ 		if (pdev->current_state < PCI_D3hot && state >= PCI_D3hot) {
+ 			pci_save_state(pdev);
+@@ -1960,6 +1964,13 @@ int vfio_pci_core_sriov_configure(struct vfio_pci_core_device *vdev,
+ 		}
+ 		list_add_tail(&vdev->sriov_pfs_item, &vfio_pci_sriov_pfs);
+ 		mutex_unlock(&vfio_pci_sriov_pfs_mutex);
 +
- int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
- {
- 	struct pci_dev *pdev = vdev->pdev;
-diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-index 23c176d4b073..8f20056e0b8d 100644
---- a/include/linux/vfio_pci_core.h
-+++ b/include/linux/vfio_pci_core.h
-@@ -189,6 +189,8 @@ extern int vfio_pci_register_dev_region(struct vfio_pci_core_device *vdev,
- 
- extern int vfio_pci_set_power_state(struct vfio_pci_core_device *vdev,
- 				    pci_power_t state);
-+extern void vfio_pci_lock_and_set_power_state(struct vfio_pci_core_device *vdev,
-+					      pci_power_t state);
- 
- extern bool __vfio_pci_memory_enabled(struct vfio_pci_core_device *vdev);
- extern void vfio_pci_zap_and_down_write_memory_lock(struct vfio_pci_core_device
++		/*
++		 * The PF power state should always be higher than the VF power
++		 * state. If PF is in the low power state, then change the
++		 * power state to D0 first before enabling SR-IOV.
++		 */
++		vfio_pci_lock_and_set_power_state(vdev, PCI_D0);
+ 		ret = pci_enable_sriov(pdev, nr_virtfn);
+ 		if (ret)
+ 			goto out_del;
 -- 
 2.17.1
 
