@@ -2,94 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 644B952AD6A
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 23:18:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ECA2252ADC1
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 00:00:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343695AbiEQVSN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 17:18:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49178 "EHLO
+        id S229903AbiEQWAI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 18:00:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231875AbiEQVSJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 17:18:09 -0400
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62FA153730;
-        Tue, 17 May 2022 14:18:07 -0700 (PDT)
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1nr4Zj-0003Xu-Tz; Tue, 17 May 2022 23:17:51 +0200
-Message-ID: <b7195bf8-566c-8b6f-2f94-5ff9b89b83a7@maciej.szmigiero.name>
-Date:   Tue, 17 May 2022 23:17:45 +0200
+        with ESMTP id S229850AbiEQWAH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 18:00:07 -0400
+Received: from zeniv-ca.linux.org.uk (zeniv-ca.linux.org.uk [IPv6:2607:5300:60:148a::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACB435133B;
+        Tue, 17 May 2022 15:00:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ibGwroDx09LXcS70EId5UHxTm6Oqg5cS0xsZINUY8tQ=; b=X4E04QpuQIJtMamOPaVopY9r2w
+        JOpVM995u3wjGau8dpV2dU9Swn7Ae0BIwm/GgQSodLAvwswzX5QT3lQt7WJk6xKY5mGpNl7fRC0GF
+        D5Ly1Y5zwssdjxTyHtllO9NCGuvmfjH2pqedB2A3RXNX3BULb8n0wDUdawDlfs6K/6YKw5CS0kInQ
+        Wf88wo29mqRBL1xCRIAxDCMGru1U3aEp+OK7/qgXcx+1S0ahVX9akTQdQU2O8G6kSKwfxrk35GnO9
+        YOOeHtqKfmIdh5+biiP/h0Y7d0/cILsDvNyX6te9TUYUQgor+VcNZ0LwS0+7ddvFfhxZL401jjqUl
+        B0tbPnFQ==;
+Received: from viro by zeniv-ca.linux.org.uk with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nr5EZ-00FqYE-7Q; Tue, 17 May 2022 22:00:03 +0000
+Date:   Tue, 17 May 2022 22:00:03 +0000
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        ebiggers@kernel.org, davem@davemloft.net
+Subject: Re: [PATCH] vhost_net: fix double fget()
+Message-ID: <YoQa4wzy9jSwDY7E@zeniv-ca.linux.org.uk>
+References: <20220516084213.26854-1-jasowang@redhat.com>
+ <20220516044400-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>
-References: <cover.1651440202.git.maciej.szmigiero@oracle.com>
- <952cdf59-6abd-f67f-46c6-67d394b98380@maciej.szmigiero.name>
- <4a7ff020-fe50-be46-0077-3ff3168a303b@redhat.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH v3 00/12] KVM: SVM: Fix soft int/ex re-injection
-In-Reply-To: <4a7ff020-fe50-be46-0077-3ff3168a303b@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220516044400-mutt-send-email-mst@kernel.org>
+Sender: Al Viro <viro@ftp.linux.org.uk>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17.05.2022 18:46, Paolo Bonzini wrote:
-> On 5/17/22 14:28, Maciej S. Szmigiero wrote:
->> On 2.05.2022 00:07, Maciej S. Szmigiero wrote:
->>> This series is an updated version of Sean's SVM soft interrupt/exception
->>> re-injection fixes patch set, which in turn extended and generalized my
->>> nSVM L1 -> L2 event injection fixes series.
->>
->> @Paolo:
->> Can't see this series in kvm/queue, do you plan to merge it for 5.19?
+On Mon, May 16, 2022 at 04:44:19AM -0400, Michael S. Tsirkin wrote:
+> > Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+> > Signed-off-by: Jason Wang <jasowang@redhat.com>
 > 
-> Yes, FWIW my list right now is (from most likely to less likely but still doable):
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
 > 
-> * deadlock (5.18)
-> 
-> * PMU filter patches from alewis (5.18?)
-> 
-> * architectural LBR
-> 
-> * Like's perf HW_EVENT series
-> 
-> * cache refresh
-> 
-> * this one
-> 
-> * nested dirty-log selftest
-> 
-> * x2AVIC
-> 
-> * dirty quota
-> 
-> * CMCI
-> 
-> * pfn functions
-> 
-> * Vitaly's Hyper-V TLB
-> 
+> and this is stable material I guess.
 
-Ugh, that's a long TODO list...
+It is, except that commit message ought to be cleaned up.  Something
+along the lines of
 
-Thanks for the update - waiting patiently then.
+----
+Fix double fget() in vhost_net_set_backend()
 
-Thanks,
-Maciej
+Descriptor table is a shared resource; two fget() on the same descriptor
+may return different struct file references.  get_tap_ptr_ring() is
+called after we'd found (and pinned) the socket we'll be using and it
+tries to find the private tun/tap data structures associated with it.
+Redoing the lookup by the same file descriptor we'd used to get the
+socket is racy - we need to same struct file.
+
+Thanks to Jason for spotting a braino in the original variant of patch -
+I'd missed the use of fd == -1 for disabling backend, and in that case
+we can end up with sock == NULL and sock != oldsock.
+----
+
+Does the above sound sane for commit message?  And which tree would you
+prefer it to go through?  I can take it in vfs.git#fixes, or you could
+take it into your tree...
