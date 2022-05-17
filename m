@@ -2,528 +2,490 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A74E529EBA
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 12:03:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A149D52A087
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 13:37:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245597AbiEQKDF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 06:03:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60382 "EHLO
+        id S1345314AbiEQLh0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 07:37:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245556AbiEQKDB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 06:03:01 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2058.outbound.protection.outlook.com [40.107.92.58])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41D8331343;
-        Tue, 17 May 2022 03:02:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MlKgMPBYADOyCu2XJEQyAEDdPsro0TB5zmz4OpACAZmBj3Cj0+2jL6OFxzSDi1ygJqnzoxmQu4hPa4S/y2qiIH6lYL6uG+WuI7X2W1XJDzLh+HnXBn7Ntl0mrKX9sK/pAreMoyI+7gvNtVa9W3oRYYHXnOh30NegAJn75xs7BBI+4OwTr/bYTKyGgEbAcOZBoqUlRaNVjRmVTsQQPqufrHcGhVDSAb0rR8a+ikgaJ/4bKQfNE3ayTWAsUaAJDuBBTXWQt073UGsXZgTSm8Djelrlmn0fFbyujiFFHycB42uDjp3Ooaq7TLHp9IbgTl3ijJx8WId7k0XP6GooNgiE8w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UzxqugbF7Z3UqrAB5Yl8UAXFcrLwGvNARDZ7fg9dcC0=;
- b=PM3lfi128/KBZElbeus3DK6QmcLdGKqh/38vMnhrvwp316nbFGLwdWyai+OHd1fuU+Q+LzH5bDNgecXo9haUg2udo33wtWXR21IdKDqcrmQOt4KDfhZP80MpSBBdCGjEMwSUrdeH0dGyGUWn477qEgp2BJbfgSQuduvY/vyNYyy42XHntfxYJPzU443dThSDohyEq6XodsVZTxxbl2T6VujbwrFWGBDtfILWdCpaz59FNbu7A/eP1DaN9bDCr8g4VKEeV8RrtnCcjTbHh5t9crkCMxoGjK8+VUMnPY32NVrDUKxPqj+UfCoCzdUSO6BLz8ln4T7e5pUHaWiqmboGuA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.238) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UzxqugbF7Z3UqrAB5Yl8UAXFcrLwGvNARDZ7fg9dcC0=;
- b=tuifrO3Kf4IKa+B5QcwUIfN67dbv8SiMdMDBVRBV4dvVW88cOvhkFc2jjfhybdu4Aq4ACrhx8Q1woooj+HDfTsyad8f8GlJYCkOlfYt87m9lty0rT1VeOtwC+dYjkCNQhxhWXNTAtE/GzK4HsgYeXmglynvX+cCvh7nofJzyUIdb90Q8pbUJLIgPXr6gCS94rO7lPxfEot2WtbDhdpEZr2uHOF05IJULJ7h40PLJX2kMdXLhzremlzVGpkuuJDxL3KDoYmhbcWtFs0spCDwlGYnckoC5N0DMOKDiUkiXWL8QBMmzOS73/qT7L+EBkX1uHk8ai7omt7XbySd4p6IdVw==
-Received: from BN9PR03CA0871.namprd03.prod.outlook.com (2603:10b6:408:13c::6)
- by BY5PR12MB4642.namprd12.prod.outlook.com (2603:10b6:a03:1f6::29) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5250.14; Tue, 17 May
- 2022 10:02:56 +0000
-Received: from BN8NAM11FT062.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:13c:cafe::79) by BN9PR03CA0871.outlook.office365.com
- (2603:10b6:408:13c::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5273.13 via Frontend
- Transport; Tue, 17 May 2022 10:02:56 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.238)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.238 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.238; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (12.22.5.238) by
- BN8NAM11FT062.mail.protection.outlook.com (10.13.177.34) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.5250.13 via Frontend Transport; Tue, 17 May 2022 10:02:56 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- DRHQMAIL105.nvidia.com (10.27.9.14) with Microsoft SMTP Server (TLS) id
- 15.0.1497.32; Tue, 17 May 2022 10:02:55 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by
- drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.22; Tue, 17 May 2022 03:02:55 -0700
-Received: from nvidia-abhsahu-1.nvidia.com (10.127.8.9) by mail.nvidia.com
- (10.126.190.182) with Microsoft SMTP Server id 15.2.986.22 via Frontend
- Transport; Tue, 17 May 2022 03:02:50 -0700
-From:   Abhishek Sahu <abhsahu@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        "Rafael J . Wysocki" <rafael@kernel.org>
-CC:     Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linux-pm@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-        Abhishek Sahu <abhsahu@nvidia.com>
-Subject: [PATCH v4 4/4] vfio/pci: Move the unused device into low power state with runtime PM
-Date:   Tue, 17 May 2022 15:32:19 +0530
-Message-ID: <20220517100219.15146-5-abhsahu@nvidia.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20220517100219.15146-1-abhsahu@nvidia.com>
-References: <20220517100219.15146-1-abhsahu@nvidia.com>
-X-NVConfidentiality: public
+        with ESMTP id S1345304AbiEQLhY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 07:37:24 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65A303C723;
+        Tue, 17 May 2022 04:37:22 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24HBW1s5002787;
+        Tue, 17 May 2022 11:37:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=XpysPg6yZhFOxbmRBd2Lk8ktR35HAMG3D1tp2feim1o=;
+ b=ZfIZD3GfqAVeHOYpen5fyQ/I7f1B2Lv6W/qD2JWL+DmW75zw5lmoZNpN+cXFCgNxxY3N
+ E8MH9AzLKxpb0bO5BJoBzCedfYHvOvQG/mlPFUFtHC5DGJt0DJCb//R5gtc+ByOhpNiS
+ 9dQYVR+/k29C3fVgKUAn/ZhpTfQaM7QfNuN1Bn1s97mxuMIYe5NwbbzL0CXQUYJncGDr
+ Jg+iWJKRgC1v3b+ioPp6WQg4JNyKowDTC8VMLtaYIvxj62fto5i7qErfzw5mMcazAVAN
+ amPvBMzG6n3smGH0TSEMRbgTZCcP7akdxToO/kKnYo2cJa7Nwbb3FvJ06rg192Pd8nHj Tg== 
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4awv039f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 May 2022 11:37:21 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24HBIK0I025060;
+        Tue, 17 May 2022 11:37:19 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3g2429c4cq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 May 2022 11:37:19 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24HBahfG29950432
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 May 2022 11:36:43 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6B9E6A4060;
+        Tue, 17 May 2022 11:37:16 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 389E8A405C;
+        Tue, 17 May 2022 11:37:16 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.40])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 17 May 2022 11:37:16 +0000 (GMT)
+Date:   Tue, 17 May 2022 12:59:07 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        borntraeger@linux.ibm.com
+Subject: Re: [PATCH v5 06/10] kvm: s390: Add configuration dump
+ functionality
+Message-ID: <20220517125907.685ffe44@p-imbrenda>
+In-Reply-To: <20220516090817.1110090-7-frankja@linux.ibm.com>
+References: <20220516090817.1110090-1-frankja@linux.ibm.com>
+ <20220516090817.1110090-7-frankja@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f5cfa318-4374-45a1-4a7b-08da37ec6aa3
-X-MS-TrafficTypeDiagnostic: BY5PR12MB4642:EE_
-X-Microsoft-Antispam-PRVS: <BY5PR12MB4642550D8FF7ACB9517D5CEDCCCE9@BY5PR12MB4642.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tFu4MuJE4inOVwwuBGkLVDvcBjSztiqru+Nsr9raG3MRcvAukNJGqwdNJaeVzO2vQ4ZQRfNDKeAsaxPBtuvlC5Kn2d/gJ/ghFq54Z/06vP+EpSw/oy5DnTtFbrd8dscBU+zKSixaL7eCcISJfRN08LkFhVOp+0HbmMKFmnpejLDXoi3rx2I+aL+dnno/C9k+LaP/OjT+OGKoeEICmJsnICeRqhWytAsz1bUki7/zhiYWLPERDw7EDZM0YK3GpgYA/4qGpBYKoBfh+3q7jTOEFlFPse+Y96JtLiOmLdmyH6J7LmTfu028k8Vyheg7UyNvkGbOHBwaiYbI6Lz+v5Bv0cpjWPnBmSvHbLS4eiaXk5NRuztjPRpq0sWlepzaO8O0QFLxk7FHFmTIZpE3gceJtkdNhfEgWQWC93hdth8x3yKLwGzk+DrrRb9JfRKGBYiLkFaTYRKNtnMrYHURrGxCm27B03KQg8cWPbwTZxOd49zYj1Crvy+u0t9HWRU+vV7ZP7Tr1G/JlJMkQHFzG79QARmM0eih5sPeXY5g9+dodNEo/KHV9zuXwUioaagfOpm1BiLx2WncHSryr21hAnEcmDX5YqKmOALLr7MFxpCVEDGcSz1uqnBBqA8FrZoX19EloEo+4150GlmXQ0Z5HQCEVDZyoyXXhfdq2BMwFZl3nZHUVtO5yRPJbE1lU5Vpnk2h7AT+8p1+5ecUxZdpVUQliQ==
-X-Forefront-Antispam-Report: CIP:12.22.5.238;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230001)(4636009)(40470700004)(46966006)(36840700001)(107886003)(4326008)(2616005)(81166007)(8676002)(5660300002)(426003)(186003)(82310400005)(336012)(70206006)(70586007)(1076003)(2906002)(36756003)(40460700003)(7696005)(508600001)(86362001)(316002)(7416002)(356005)(54906003)(36860700001)(47076005)(110136005)(83380400001)(30864003)(6666004)(8936002)(26005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 May 2022 10:02:56.4742
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f5cfa318-4374-45a1-4a7b-08da37ec6aa3
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.238];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT062.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4642
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 1SHBfAhEq7t9bDCwXRzTfa9402GMw91X
+X-Proofpoint-ORIG-GUID: 1SHBfAhEq7t9bDCwXRzTfa9402GMw91X
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-17_02,2022-05-17_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ suspectscore=0 phishscore=0 malwarescore=0 bulkscore=0 mlxscore=0
+ clxscore=1015 priorityscore=1501 impostorscore=0 adultscore=0
+ lowpriorityscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2202240000 definitions=main-2205170068
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, there is very limited power management support
-available in the upstream vfio_pci_core based drivers. If there
-are no users of the device, then the PCI device will be moved into
-D3hot state by writing directly into PCI PM registers. This D3hot
-state help in saving power but we can achieve zero power consumption
-if we go into the D3cold state. The D3cold state cannot be possible
-with native PCI PM. It requires interaction with platform firmware
-which is system-specific. To go into low power states (including D3cold),
-the runtime PM framework can be used which internally interacts with PCI
-and platform firmware and puts the device into the lowest possible
-D-States.
+On Mon, 16 May 2022 09:08:13 +0000
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-This patch registers vfio_pci_core based drivers with the
-runtime PM framework.
+> Sometimes dumping inside of a VM fails, is unavailable or doesn't
+> yield the required data. For these occasions we dump the VM from the
+> outside, writing memory and cpu data to a file.
+> 
+> Up to now PV guests only supported dumping from the inside of the
+> guest through dumpers like KDUMP. A PV guest can be dumped from the
+> hypervisor but the data will be stale and / or encrypted.
+> 
+> To get the actual state of the PV VM we need the help of the
+> Ultravisor who safeguards the VM state. New UV calls have been added
+> to initialize the dump, dump storage state data, dump cpu data and
+> complete the dump process. We expose these calls in this patch via a
+> new UV ioctl command.
+> 
+> The sensitive parts of the dump data are encrypted, the dump key is
+> derived from the Customer Communication Key (CCK). This ensures that
+> only the owner of the VM who has the CCK can decrypt the dump data.
+> 
+> The memory is dumped / read via a normal export call and a re-import
+> after the dump initialization is not needed (no re-encryption with a
+> dump key).
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  arch/s390/include/asm/kvm_host.h |   1 +
+>  arch/s390/kvm/kvm-s390.c         | 126 +++++++++++++++++++++++++++++++
+>  arch/s390/kvm/kvm-s390.h         |   2 +
+>  arch/s390/kvm/pv.c               | 113 +++++++++++++++++++++++++++
+>  include/uapi/linux/kvm.h         |  15 ++++
+>  5 files changed, 257 insertions(+)
+> 
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index 766028d54a3e..a0fbe4820e0a 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -923,6 +923,7 @@ struct kvm_s390_pv {
+>  	u64 guest_len;
+>  	unsigned long stor_base;
+>  	void *stor_var;
+> +	bool dumping;
+>  };
+>  
+>  struct kvm_arch{
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index de54f14e081e..6bf9dd85d50f 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2271,6 +2271,101 @@ static ssize_t kvm_s390_handle_pv_info(struct kvm_s390_pv_info *info)
+>  	}
+>  }
+>  
+> +static int kvm_s390_pv_dmp(struct kvm *kvm, struct kvm_pv_cmd *cmd,
+> +			   struct kvm_s390_pv_dmp dmp)
+> +{
+> +	int r = -EINVAL;
+> +	void __user *result_buff = (void __user *)dmp.buff_addr;
+> +
+> +	switch (dmp.subcmd) {
+> +	case KVM_PV_DUMP_INIT: {
+> +		if (kvm->arch.pv.dumping)
+> +			break;
+> +
+> +		/*
+> +		 * Block SIE entry as concurrent dump UVCs could lead
+> +		 * to validities.
 
-1. The PCI core framework takes care of most of the runtime PM
-   related things. For enabling the runtime PM, the PCI driver needs to
-   decrement the usage count and needs to provide 'struct dev_pm_ops'
-   at least. The runtime suspend/resume callbacks are optional and needed
-   only if we need to do any extra handling. Now there are multiple
-   vfio_pci_core based drivers. Instead of assigning the
-   'struct dev_pm_ops' in individual parent driver, the vfio_pci_core
-   itself assigns the 'struct dev_pm_ops'. There are other drivers where
-   the 'struct dev_pm_ops' is being assigned inside core layer
-   (For example, wlcore_probe() and some sound based driver, etc.).
+to fatal validity intercepts
 
-2. This patch provides the stub implementation of 'struct dev_pm_ops'.
-   The subsequent patch will provide the runtime suspend/resume
-   callbacks. All the config state saving, and PCI power management
-   related things will be done by PCI core framework itself inside its
-   runtime suspend/resume callbacks (pci_pm_runtime_suspend() and
-   pci_pm_runtime_resume()).
+> +		 */
+> +		kvm_s390_vcpu_block_all(kvm);
+> +
+> +		r = uv_cmd_nodata(kvm_s390_pv_get_handle(kvm),
+> +				  UVC_CMD_DUMP_INIT, &cmd->rc, &cmd->rrc);
+> +		KVM_UV_EVENT(kvm, 3, "PROTVIRT DUMP INIT: rc %x rrc %x",
+> +			     cmd->rc, cmd->rrc);
+> +		if (!r) {
+> +			kvm->arch.pv.dumping = true;
+> +		} else {
+> +			kvm_s390_vcpu_unblock_all(kvm);
+> +			r = -EINVAL;
+> +		}
+> +		break;
+> +	}
+> +	case KVM_PV_DUMP_CONFIG_STOR_STATE: {
+> +		if (!kvm->arch.pv.dumping)
+> +			break;
+> +
+> +		/*
+> +		 * gaddr is an output parameter since we might stop
+> +		 * early. As dmp will be copied back in our caller, we
+> +		 * don't need to do it ourselves.
+> +		 */
+> +		r = kvm_s390_pv_dump_stor_state(kvm, result_buff, &dmp.gaddr, dmp.buff_len,
+> +						&cmd->rc, &cmd->rrc);
+> +		break;
+> +	}
+> +	case KVM_PV_DUMP_COMPLETE: {
 
-3. Inside pci_reset_bus(), all the devices in dev_set needs to be
-   runtime resumed. vfio_pci_dev_set_pm_runtime_get() will take
-   care of the runtime resume and its error handling.
+this starts to be quite complex, maybe push it into a separate function
+as well, like you did for KVM_PV_DUMP_CONFIG_STOR_STATE
 
-4. Inside vfio_pci_core_disable(), the device usage count always needs
-   to be decremented which was incremented in vfio_pci_core_enable().
+> +		struct uv_cb_dump_complete complete = {
+> +			.header.len = sizeof(complete),
+> +			.header.cmd = UVC_CMD_DUMP_COMPLETE,
+> +			.config_handle = kvm_s390_pv_get_handle(kvm),
+> +		};
+> +		u64 *compl_data;
+> +
+> +		r = -EINVAL;
+> +		if (!kvm->arch.pv.dumping)
+> +			break;
+> +
+> +		if (dmp.buff_len < uv_info.conf_dump_finalize_len)
+> +			break;
+> +
+> +		/* Allocate dump area */
+> +		r = -ENOMEM;
+> +		compl_data = vzalloc(uv_info.conf_dump_finalize_len);
+> +		if (!compl_data)
+> +			break;
+> +		complete.dump_area_origin = (u64)compl_data;
+> +
+> +		r = uv_call_sched(0, (u64)&complete);
+> +		cmd->rc = complete.header.rc;
+> +		cmd->rrc = complete.header.rrc;
+> +		KVM_UV_EVENT(kvm, 3, "PROTVIRT DUMP COMPLETE: rc %x rrc %x",
+> +			     complete.header.rc, complete.header.rrc);
+> +
+> +		if (!r) {
+> +			/*
+> +			 * kvm_s390_pv_dealloc_vm() will also (mem)set
+> +			 * this to false on a reboot or other destroy
+> +			 * operation for this vm.
+> +			 */
+> +			kvm->arch.pv.dumping = false;
+> +			kvm_s390_vcpu_unblock_all(kvm);
+> +			r = copy_to_user(result_buff, compl_data, uv_info.conf_dump_finalize_len);
+> +			if (r)
+> +				r = -EFAULT;
+> +		}
+> +		vfree(compl_data);
+> +		if (r > 0)
+> +			r = -EINVAL;
+> +		break;
+> +	}
+> +	default:
+> +		r = -ENOTTY;
+> +		break;
+> +	}
+> +
+> +	return r;
+> +}
+> +
+>  static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+>  {
+>  	int r = 0;
+> @@ -2447,6 +2542,28 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+>  		r = 0;
+>  		break;
+>  	}
+> +	case KVM_PV_DUMP: {
+> +		struct kvm_s390_pv_dmp dmp;
+> +
+> +		r = -EINVAL;
+> +		if (!kvm_s390_pv_is_protected(kvm))
+> +			break;
+> +
+> +		r = -EFAULT;
+> +		if (copy_from_user(&dmp, argp, sizeof(dmp)))
+> +			break;
+> +
+> +		r = kvm_s390_pv_dmp(kvm, cmd, dmp);
+> +		if (r)
+> +			break;
+> +
+> +		if (copy_to_user(argp, &dmp, sizeof(dmp))) {
+> +			r = -EFAULT;
+> +			break;
+> +		}
+> +
+> +		break;
+> +	}
+>  	default:
+>  		r = -ENOTTY;
+>  	}
+> @@ -4564,6 +4681,15 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  	struct kvm_run *kvm_run = vcpu->run;
+>  	int rc;
+>  
+> +	/*
+> +	 * Running a VM while dumping always has the potential to
+> +	 * produce inconsistent dump data. But for PV vcpus a SIE
+> +	 * entry while dumping could also lead to a validity which we
 
-5. Since the runtime PM framework will provide the same functionality,
-   so directly writing into PCI PM config register can be replaced with
-   the use of runtime PM routines. Also, the use of runtime PM can help
-   us in more power saving.
+"a fatal validity intercept"
 
-   In the systems which do not support D3cold,
+> +	 * absolutely want to avoid.
+> +	 */
+> +	if (vcpu->kvm->arch.pv.dumping)
+> +		return -EINVAL;
+> +
+>  	if (kvm_run->immediate_exit)
+>  		return -EINTR;
+>  
+> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+> index 497d52a83c78..2868dd0bba25 100644
+> --- a/arch/s390/kvm/kvm-s390.h
+> +++ b/arch/s390/kvm/kvm-s390.h
+> @@ -250,6 +250,8 @@ int kvm_s390_pv_set_sec_parms(struct kvm *kvm, void *hdr, u64 length, u16 *rc,
+>  int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned long size,
+>  		       unsigned long tweak, u16 *rc, u16 *rrc);
+>  int kvm_s390_pv_set_cpu_state(struct kvm_vcpu *vcpu, u8 state);
+> +int kvm_s390_pv_dump_stor_state(struct kvm *kvm, void __user *buff_user,
+> +				u64 *gaddr, u64 buff_user_len, u16 *rc, u16 *rrc);
+>  
+>  static inline u64 kvm_s390_pv_get_handle(struct kvm *kvm)
+>  {
+> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+> index cc7c9599f43e..fd261667d2c2 100644
+> --- a/arch/s390/kvm/pv.c
+> +++ b/arch/s390/kvm/pv.c
+> @@ -7,6 +7,7 @@
+>   */
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_host.h>
+> +#include <linux/minmax.h>
+>  #include <linux/pagemap.h>
+>  #include <linux/sched/signal.h>
+>  #include <asm/gmap.h>
+> @@ -298,3 +299,115 @@ int kvm_s390_pv_set_cpu_state(struct kvm_vcpu *vcpu, u8 state)
+>  		return -EINVAL;
+>  	return 0;
+>  }
+> +
+> +/* Size of the cache for the storage state dump data. 1MB for now */
+> +#define DUMP_BUFF_LEN HPAGE_SIZE
+> +
+> +/*
+> + * kvm_s390_pv_dump_stor_state
+> + *
+> + * @kvm: pointer to the guest's KVM struct
+> + * @buff_user: Userspace pointer where we will write the results to
+> + * @gaddr: Starting absolute guest address for which the storage state
+> + *         is requested. This value will be updated with the last
+> + *         address for which data was written when returning to
+> + *         userspace.
+> + * @buff_user_len: Length of the buff_user buffer
+> + * @rc: Pointer to where the uvcb return code is stored
+> + * @rrc: Pointer to where the uvcb return reason code is stored
+> + *
 
-   With the existing implementation:
+please add:
+	Context: kvm->lock needs to be held
 
-   // PCI device
-   # cat /sys/bus/pci/devices/0000\:01\:00.0/power_state
-   D3hot
-   // upstream bridge
-   # cat /sys/bus/pci/devices/0000\:00\:01.0/power_state
-   D0
+also explain that part of the user buffer might be written to even in
+case of failure (this also needs to go in the documentation)
 
-   With runtime PM:
+> + * Return:
+> + *  0 on success
 
-   // PCI device
-   # cat /sys/bus/pci/devices/0000\:01\:00.0/power_state
-   D3hot
-   // upstream bridge
-   # cat /sys/bus/pci/devices/0000\:00\:01.0/power_state
-   D3hot
+rc and rrc will also be set in case of success
 
-   So, with runtime PM, the upstream bridge or root port will also go
-   into lower power state which is not possible with existing
-   implementation.
+> + *  -ENOMEM if allocating the cache fails
+> + *  -EINVAL if gaddr is not aligned to 1MB
+> + *  -EINVAL if buff_user_len is not aligned to uv_info.conf_dump_storage_state_len
+> + *  -EINVAL if the UV call fails, rc and rrc will be set in this case
 
-   In the systems which support D3cold,
+have you considered a different code for UVC failure?
+so the caller can know that rc and rrc are meaningful
 
-   // PCI device
-   # cat /sys/bus/pci/devices/0000\:01\:00.0/power_state
-   D3hot
-   // upstream bridge
-   # cat /sys/bus/pci/devices/0000\:00\:01.0/power_state
-   D0
+or just explain that rc and rrc will always be set; if the UVC is not
+performed, rc and rrc will be 0
 
-   With runtime PM:
+> + *  -EFAULT if copying the result to buff_user failed
+> + */
+> +int kvm_s390_pv_dump_stor_state(struct kvm *kvm, void __user *buff_user,
+> +				u64 *gaddr, u64 buff_user_len, u16 *rc, u16 *rrc)
+> +{
+> +	struct uv_cb_dump_stor_state uvcb = {
+> +		.header.cmd = UVC_CMD_DUMP_CONF_STOR_STATE,
+> +		.header.len = sizeof(uvcb),
+> +		.config_handle = kvm->arch.pv.handle,
+> +		.gaddr = *gaddr,
+> +		.dump_area_origin = 0,
+> +	};
+> +	size_t buff_kvm_size;
+> +	size_t size_done = 0;
+> +	u8 *buff_kvm = NULL;
+> +	int cc, ret;
+> +
+> +	ret = -EINVAL;
+> +	/* UV call processes 1MB guest storage chunks at a time */
+> +	if (!IS_ALIGNED(*gaddr, HPAGE_SIZE))
+> +		goto out;
+> +
+> +	/*
+> +	 * We provide the storage state for 1MB chunks of guest
+> +	 * storage. The buffer will need to be aligned to
+> +	 * conf_dump_storage_state_len so we don't end on a partial
+> +	 * chunk.
+> +	 */
+> +	if (!buff_user_len ||
+> +	    !IS_ALIGNED(buff_user_len, uv_info.conf_dump_storage_state_len))
+> +		goto out;
+> +
+> +	/*
+> +	 * Allocate a buffer from which we will later copy to the user
+> +	 * process. We don't want userspace to dictate our buffer size
+> +	 * so we limit it to DUMP_BUFF_LEN.
+> +	 */
+> +	ret = -ENOMEM;
+> +	buff_kvm_size = min_t(u64, buff_user_len, DUMP_BUFF_LEN);
+> +	buff_kvm = vzalloc(buff_kvm_size);
+> +	if (!buff_kvm)
+> +		goto out;
+> +
+> +	ret = 0;
+> +	uvcb.dump_area_origin = (u64)buff_kvm;
+> +	/* We will loop until the user buffer is filled or an error occurs */
+> +	do {
+> +		/* Get 1MB worth of guest storage state data */
+> +		cc = uv_call_sched(0, (u64)&uvcb);
+> +
+> +		/* All or nothing */
+> +		if (cc) {
+> +			ret = -EINVAL;
+> +			break;
+> +		}
+> +
+> +		size_done += uv_info.conf_dump_storage_state_len;
 
-   // PCI device
-   # cat /sys/bus/pci/devices/0000\:01\:00.0/power_state
-   D3cold
-   // upstream bridge
-   # cat /sys/bus/pci/devices/0000\:00\:01.0/power_state
-   D3cold
+maybe save this in a local const variable with a shorter name? would be
+more readable? const u64 dump_len = uv_info.conf_dump_storage_state_len;
 
-   So, with runtime PM, both the PCI device and upstream bridge will
-   go into D3cold state.
-
-6. If 'disable_idle_d3' module parameter is set, then also the runtime
-   PM will be enabled, but in this case, the usage count should not be
-   decremented.
-
-7. vfio_pci_dev_set_try_reset() return value is unused now, so this
-   function return type can be changed to void.
-
-8. Use the runtime PM API's in vfio_pci_core_sriov_configure().
-   The device can be in low power state either with runtime
-   power management (when there is no user) or PCI_PM_CTRL register
-   write by the user. In both the cases, the PF should be moved to
-   D0 state. For preventing any runtime usage mismatch, pci_num_vf()
-   has been called explicitly during disable.
-
-Signed-off-by: Abhishek Sahu <abhsahu@nvidia.com>
----
- drivers/vfio/pci/vfio_pci_core.c | 172 +++++++++++++++++++++----------
- 1 file changed, 117 insertions(+), 55 deletions(-)
-
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 4fe9a4efc751..5ea1b3099036 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -156,7 +156,7 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_core_device *vdev)
- }
- 
- struct vfio_pci_group_info;
--static bool vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set);
-+static void vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set);
- static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
- 				      struct vfio_pci_group_info *groups);
- 
-@@ -275,6 +275,19 @@ void vfio_pci_lock_and_set_power_state(struct vfio_pci_core_device *vdev,
- 	up_write(&vdev->memory_lock);
- }
- 
-+#ifdef CONFIG_PM
-+/*
-+ * The dev_pm_ops needs to be provided to make pci-driver runtime PM working,
-+ * so use structure without any callbacks.
-+ *
-+ * The pci-driver core runtime PM routines always save the device state
-+ * before going into suspended state. If the device is going into low power
-+ * state with only with runtime PM ops, then no explicit handling is needed
-+ * for the devices which have NoSoftRst-.
-+ */
-+static const struct dev_pm_ops vfio_pci_core_pm_ops = { };
-+#endif
-+
- int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
- {
- 	struct pci_dev *pdev = vdev->pdev;
-@@ -282,21 +295,23 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
- 	u16 cmd;
- 	u8 msix_pos;
- 
--	vfio_pci_set_power_state(vdev, PCI_D0);
-+	if (!disable_idle_d3) {
-+		ret = pm_runtime_resume_and_get(&pdev->dev);
-+		if (ret < 0)
-+			return ret;
-+	}
- 
- 	/* Don't allow our initial saved state to include busmaster */
- 	pci_clear_master(pdev);
- 
- 	ret = pci_enable_device(pdev);
- 	if (ret)
--		return ret;
-+		goto out_power;
- 
- 	/* If reset fails because of the device lock, fail this path entirely */
- 	ret = pci_try_reset_function(pdev);
--	if (ret == -EAGAIN) {
--		pci_disable_device(pdev);
--		return ret;
--	}
-+	if (ret == -EAGAIN)
-+		goto out_disable_device;
- 
- 	vdev->reset_works = !ret;
- 	pci_save_state(pdev);
-@@ -320,12 +335,8 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
- 	}
- 
- 	ret = vfio_config_init(vdev);
--	if (ret) {
--		kfree(vdev->pci_saved_state);
--		vdev->pci_saved_state = NULL;
--		pci_disable_device(pdev);
--		return ret;
--	}
-+	if (ret)
-+		goto out_free_state;
- 
- 	msix_pos = pdev->msix_cap;
- 	if (msix_pos) {
-@@ -346,6 +357,16 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
- 
- 
- 	return 0;
-+
-+out_free_state:
-+	kfree(vdev->pci_saved_state);
-+	vdev->pci_saved_state = NULL;
-+out_disable_device:
-+	pci_disable_device(pdev);
-+out_power:
-+	if (!disable_idle_d3)
-+		pm_runtime_put(&pdev->dev);
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(vfio_pci_core_enable);
- 
-@@ -453,8 +474,11 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
- out:
- 	pci_disable_device(pdev);
- 
--	if (!vfio_pci_dev_set_try_reset(vdev->vdev.dev_set) && !disable_idle_d3)
--		vfio_pci_set_power_state(vdev, PCI_D3hot);
-+	vfio_pci_dev_set_try_reset(vdev->vdev.dev_set);
-+
-+	/* Put the pm-runtime usage counter acquired during enable */
-+	if (!disable_idle_d3)
-+		pm_runtime_put(&pdev->dev);
- }
- EXPORT_SYMBOL_GPL(vfio_pci_core_disable);
- 
-@@ -1839,10 +1863,11 @@ EXPORT_SYMBOL_GPL(vfio_pci_core_uninit_device);
- int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
- {
- 	struct pci_dev *pdev = vdev->pdev;
-+	struct device *dev = &pdev->dev;
- 	int ret;
- 
- 	/* Drivers must set the vfio_pci_core_device to their drvdata */
--	if (WARN_ON(vdev != dev_get_drvdata(&vdev->pdev->dev)))
-+	if (WARN_ON(vdev != dev_get_drvdata(dev)))
- 		return -EINVAL;
- 
- 	if (pdev->hdr_type != PCI_HEADER_TYPE_NORMAL)
-@@ -1884,19 +1909,24 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
- 
- 	vfio_pci_probe_power_state(vdev);
- 
--	if (!disable_idle_d3) {
--		/*
--		 * pci-core sets the device power state to an unknown value at
--		 * bootup and after being removed from a driver.  The only
--		 * transition it allows from this unknown state is to D0, which
--		 * typically happens when a driver calls pci_enable_device().
--		 * We're not ready to enable the device yet, but we do want to
--		 * be able to get to D3.  Therefore first do a D0 transition
--		 * before going to D3.
--		 */
--		vfio_pci_set_power_state(vdev, PCI_D0);
--		vfio_pci_set_power_state(vdev, PCI_D3hot);
--	}
-+	/*
-+	 * pci-core sets the device power state to an unknown value at
-+	 * bootup and after being removed from a driver.  The only
-+	 * transition it allows from this unknown state is to D0, which
-+	 * typically happens when a driver calls pci_enable_device().
-+	 * We're not ready to enable the device yet, but we do want to
-+	 * be able to get to D3.  Therefore first do a D0 transition
-+	 * before enabling runtime PM.
-+	 */
-+	vfio_pci_set_power_state(vdev, PCI_D0);
-+
-+#if defined(CONFIG_PM)
-+	dev->driver->pm = &vfio_pci_core_pm_ops,
-+#endif
-+
-+	pm_runtime_allow(dev);
-+	if (!disable_idle_d3)
-+		pm_runtime_put(dev);
- 
- 	ret = vfio_register_group_dev(&vdev->vdev);
- 	if (ret)
-@@ -1905,7 +1935,9 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
- 
- out_power:
- 	if (!disable_idle_d3)
--		vfio_pci_set_power_state(vdev, PCI_D0);
-+		pm_runtime_get_noresume(dev);
-+
-+	pm_runtime_forbid(dev);
- out_vf:
- 	vfio_pci_vf_uninit(vdev);
- 	return ret;
-@@ -1922,7 +1954,9 @@ void vfio_pci_core_unregister_device(struct vfio_pci_core_device *vdev)
- 	vfio_pci_vga_uninit(vdev);
- 
- 	if (!disable_idle_d3)
--		vfio_pci_set_power_state(vdev, PCI_D0);
-+		pm_runtime_get_noresume(&vdev->pdev->dev);
-+
-+	pm_runtime_forbid(&vdev->pdev->dev);
- }
- EXPORT_SYMBOL_GPL(vfio_pci_core_unregister_device);
- 
-@@ -1967,17 +2001,29 @@ int vfio_pci_core_sriov_configure(struct vfio_pci_core_device *vdev,
- 
- 		/*
- 		 * The PF power state should always be higher than the VF power
--		 * state. If PF is in the low power state, then change the
--		 * power state to D0 first before enabling SR-IOV.
-+		 * state. The PF can be in low power state either with runtime
-+		 * power management (when there is no user) or PCI_PM_CTRL
-+		 * register write by the user. If PF is in the low power state,
-+		 * then change the power state to D0 first before enabling
-+		 * SR-IOV.
- 		 */
-+		ret = pm_runtime_resume_and_get(&pdev->dev);
-+		if (ret)
-+			goto out_del;
-+
- 		vfio_pci_lock_and_set_power_state(vdev, PCI_D0);
- 		ret = pci_enable_sriov(pdev, nr_virtfn);
--		if (ret)
-+		if (ret) {
-+			pm_runtime_put(&pdev->dev);
- 			goto out_del;
-+		}
- 		return nr_virtfn;
- 	}
- 
--	pci_disable_sriov(pdev);
-+	if (pci_num_vf(pdev)) {
-+		pci_disable_sriov(pdev);
-+		pm_runtime_put(&pdev->dev);
-+	}
- 
- out_del:
- 	mutex_lock(&vfio_pci_sriov_pfs_mutex);
-@@ -2052,6 +2098,27 @@ vfio_pci_dev_set_resettable(struct vfio_device_set *dev_set)
- 	return pdev;
- }
- 
-+static int vfio_pci_dev_set_pm_runtime_get(struct vfio_device_set *dev_set)
-+{
-+	struct vfio_pci_core_device *cur;
-+	int ret;
-+
-+	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list) {
-+		ret = pm_runtime_resume_and_get(&cur->pdev->dev);
-+		if (ret)
-+			goto unwind;
-+	}
-+
-+	return 0;
-+
-+unwind:
-+	list_for_each_entry_continue_reverse(cur, &dev_set->device_list,
-+					     vdev.dev_set_list)
-+		pm_runtime_put(&cur->pdev->dev);
-+
-+	return ret;
-+}
-+
- /*
-  * We need to get memory_lock for each device, but devices can share mmap_lock,
-  * therefore we need to zap and hold the vma_lock for each device, and only then
-@@ -2158,43 +2225,38 @@ static bool vfio_pci_dev_set_needs_reset(struct vfio_device_set *dev_set)
-  *  - At least one of the affected devices is marked dirty via
-  *    needs_reset (such as by lack of FLR support)
-  * Then attempt to perform that bus or slot reset.
-- * Returns true if the dev_set was reset.
-  */
--static bool vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set)
-+static void vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set)
- {
- 	struct vfio_pci_core_device *cur;
- 	struct pci_dev *pdev;
--	int ret;
-+	bool reset_done = false;
- 
- 	if (!vfio_pci_dev_set_needs_reset(dev_set))
--		return false;
-+		return;
- 
- 	pdev = vfio_pci_dev_set_resettable(dev_set);
- 	if (!pdev)
--		return false;
-+		return;
- 
- 	/*
--	 * The pci_reset_bus() will reset all the devices in the bus.
--	 * The power state can be non-D0 for some of the devices in the bus.
--	 * For these devices, the pci_reset_bus() will internally set
--	 * the power state to D0 without vfio driver involvement.
--	 * For the devices which have NoSoftRst-, the reset function can
--	 * cause the PCI config space reset without restoring the original
--	 * state (saved locally in 'vdev->pm_save').
-+	 * Some of the devices in the bus can be in the runtime suspended
-+	 * state. Increment the usage count for all the devices in the dev_set
-+	 * before reset and decrement the same after reset.
- 	 */
--	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list)
--		vfio_pci_set_power_state(cur, PCI_D0);
-+	if (!disable_idle_d3 && vfio_pci_dev_set_pm_runtime_get(dev_set))
-+		return;
- 
--	ret = pci_reset_bus(pdev);
--	if (ret)
--		return false;
-+	if (!pci_reset_bus(pdev))
-+		reset_done = true;
- 
- 	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list) {
--		cur->needs_reset = false;
-+		if (reset_done)
-+			cur->needs_reset = false;
-+
- 		if (!disable_idle_d3)
--			vfio_pci_set_power_state(cur, PCI_D3hot);
-+			pm_runtime_put(&cur->pdev->dev);
- 	}
--	return true;
- }
- 
- void vfio_pci_core_set_params(bool is_nointxmask, bool is_disable_vga,
--- 
-2.17.1
+> +		uvcb.dump_area_origin += uv_info.conf_dump_storage_state_len;
+> +		buff_user_len -= uv_info.conf_dump_storage_state_len;
+> +		uvcb.gaddr += HPAGE_SIZE;
+> +
+> +		/* KVM Buffer full, time to copy to the process */
+> +		if (!buff_user_len || size_done == DUMP_BUFF_LEN) {
+> +			if (copy_to_user(buff_user, buff_kvm, size_done)) {
+> +				ret = -EFAULT;
+> +				break;
+> +			}
+> +
+> +			buff_user += size_done;
+> +			size_done = 0;
+> +			uvcb.dump_area_origin = (u64)buff_kvm;
+> +		}
+> +	} while (buff_user_len);
+> +
+> +	/* Report back where we ended dumping */
+> +	*gaddr = uvcb.gaddr;
+> +
+> +	/* Lets only log errors, we don't want to spam */
+> +out:
+> +	if (ret)
+> +		KVM_UV_EVENT(kvm, 3,
+> +			     "PROTVIRT DUMP STORAGE STATE: addr %llx ret %d, uvcb rc %x rrc %x",
+> +			     uvcb.gaddr, ret, uvcb.header.rc, uvcb.header.rrc);
+> +	*rc = uvcb.header.rc;
+> +	*rrc = uvcb.header.rrc;
+> +	vfree(buff_kvm);
+> +
+> +	return ret;
+> +}
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index bb2f91bc2305..1c60c2d314ba 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1653,6 +1653,20 @@ struct kvm_s390_pv_unp {
+>  	__u64 tweak;
+>  };
+>  
+> +enum pv_cmd_dmp_id {
+> +	KVM_PV_DUMP_INIT,
+> +	KVM_PV_DUMP_CONFIG_STOR_STATE,
+> +	KVM_PV_DUMP_COMPLETE,
+> +};
+> +
+> +struct kvm_s390_pv_dmp {
+> +	__u64 subcmd;
+> +	__u64 buff_addr;
+> +	__u64 buff_len;
+> +	__u64 gaddr;		/* For dump storage state */
+> +	__u64 reserved[4];
+> +};
+> +
+>  enum pv_cmd_info_id {
+>  	KVM_PV_INFO_VM,
+>  	KVM_PV_INFO_DUMP,
+> @@ -1696,6 +1710,7 @@ enum pv_cmd_id {
+>  	KVM_PV_PREP_RESET,
+>  	KVM_PV_UNSHARE_ALL,
+>  	KVM_PV_INFO,
+> +	KVM_PV_DUMP,
+>  };
+>  
+>  struct kvm_pv_cmd {
 
