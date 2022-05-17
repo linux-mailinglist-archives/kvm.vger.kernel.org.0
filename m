@@ -2,89 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CDF5B52A3E6
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 15:54:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 064E752A418
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 16:02:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347677AbiEQNya (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 09:54:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41496 "EHLO
+        id S1348220AbiEQOCO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 10:02:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347688AbiEQNyY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 09:54:24 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FFBC3D1D6;
-        Tue, 17 May 2022 06:54:23 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24HDg2Vv021327;
-        Tue, 17 May 2022 13:54:23 GMT
+        with ESMTP id S243926AbiEQOCN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 10:02:13 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D785535846;
+        Tue, 17 May 2022 07:02:11 -0700 (PDT)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24HDs3D0027686;
+        Tue, 17 May 2022 14:02:11 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
  subject : message-id : in-reply-to : references : mime-version :
  content-type : content-transfer-encoding; s=pp1;
- bh=UGkx5eXq4wqS41BZXjenYgdWa7b1qnJ20WrzN3j1QBo=;
- b=BkM4dJ35ME1IYQ/OARXGLsf8XPVtcy0/5hmMXnIRBQWn7vfDzlxJkx73V3f7NRY102l4
- UJtr6zLtkMCXmFqM/YJQH9pcQ2/usVMi/6ifUh4eYMAVKn9JFwt1L7ILcmT7CYZ07AuP
- hMtLlQZ9dou75yX3/XjdLWAcwQcJtgA+uW03ZGOuIQMtmnRnN1WVgSBkJyGRvqMvJnng
- xbzFD1fHTj5qEfceqKlwxHqHWkKBgmrN89MSIvbWXg/DYuwUvHkvnMI77ZFufpOBrtlb
- 8YBjUF8XiVcnxHKzW+gFw0k8rrLLKjbJEtri3uA01V2ezgI6G3XBxaOvg5KngUm0IapC 3A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4ctm8a68-1
+ bh=VHxeDu7C4s1ScjOUw2ak878irClVRvC9FAs7n2oF/0s=;
+ b=emTB6f7p7XHqwkYos8gwaVeEMEK3bIW4Ck4zVtwakgCqzjmmx2pKW+4diVIXRkhzVVsn
+ u/zhrDiRuAnhOK0yf4tCto4m+FzjFDGvxbEgqyS8MGE/+Ef6Ox+plH57XkiPkGYwTzlE
+ sGamZa1Gb4h5QxIIbqw/sBYSCTnPB5z3yXxHEC/BiEASFxAw/I1CaNVP6ZznSZpbAeH9
+ 17jUMeP+UGOOTx2Kkqg9Jt9n2sS0dnM+NFnYnluNGCQ6rqQ4cz35oTmwumqkiyCMu/FB
+ xp3VnHRs/7njpgum3UEq6JVUQhKEep1jK/t2uxW/y3siB/C45a9NO5gAEA2TqQ27nwDH Bg== 
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4d0e869e-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 13:54:22 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24HDgAHc021587;
-        Tue, 17 May 2022 13:54:22 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4ctm8a52-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 13:54:22 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24HDnWJV020590;
-        Tue, 17 May 2022 13:54:19 GMT
+        Tue, 17 May 2022 14:02:10 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24HDwiKv023143;
+        Tue, 17 May 2022 14:02:08 GMT
 Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma01fra.de.ibm.com with ESMTP id 3g2428uf7h-1
+        by ppma05fra.de.ibm.com with ESMTP id 3g24293epa-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 13:54:18 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24HDsFO653608818
+        Tue, 17 May 2022 14:02:08 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24HE258W58130810
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 May 2022 13:54:15 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8BEEDA4053;
-        Tue, 17 May 2022 13:54:15 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 518FEA404D;
-        Tue, 17 May 2022 13:54:15 +0000 (GMT)
+        Tue, 17 May 2022 14:02:05 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 85ED911C052;
+        Tue, 17 May 2022 14:02:05 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5717E11C058;
+        Tue, 17 May 2022 14:02:05 +0000 (GMT)
 Received: from p-imbrenda (unknown [9.152.224.40])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 17 May 2022 13:54:15 +0000 (GMT)
-Date:   Tue, 17 May 2022 15:54:07 +0200
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 17 May 2022 14:02:05 +0000 (GMT)
+Date:   Tue, 17 May 2022 16:02:03 +0200
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2 3/4] s390x: Test effect of storage
- keys on some more instructions
-Message-ID: <20220517155407.693c600f@p-imbrenda>
-In-Reply-To: <20220517115607.3252157-4-scgl@linux.ibm.com>
-References: <20220517115607.3252157-1-scgl@linux.ibm.com>
-        <20220517115607.3252157-4-scgl@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        borntraeger@linux.ibm.com
+Subject: Re: [PATCH v5 06/10] kvm: s390: Add configuration dump
+ functionality
+Message-ID: <20220517160203.1b907246@p-imbrenda>
+In-Reply-To: <f8132cf7-9249-75b8-059d-fa1031973beb@linux.ibm.com>
+References: <20220516090817.1110090-1-frankja@linux.ibm.com>
+        <20220516090817.1110090-7-frankja@linux.ibm.com>
+        <20220517125907.685ffe44@p-imbrenda>
+        <f8132cf7-9249-75b8-059d-fa1031973beb@linux.ibm.com>
 Organization: IBM
 X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 5R-OKvX1DlHhcQSkNV4h5hbYzZxbNJu7
-X-Proofpoint-GUID: ZqAAwg8o_o9jvM8s8ujWOqdsDrQo2Hp5
+X-Proofpoint-GUID: YIxAMWgiagAkdqJslgjyYVvrnTkg6gL-
+X-Proofpoint-ORIG-GUID: YIxAMWgiagAkdqJslgjyYVvrnTkg6gL-
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-05-17_03,2022-05-17_02,2022-02-23_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 malwarescore=0 adultscore=0 clxscore=1015
- impostorscore=0 mlxlogscore=999 bulkscore=0 suspectscore=0 mlxscore=0
- spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ phishscore=0 clxscore=1015 impostorscore=0 adultscore=0 suspectscore=0
+ bulkscore=0 mlxscore=0 mlxlogscore=999 malwarescore=0 priorityscore=1501
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2202240000 definitions=main-2205170083
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
@@ -95,365 +88,247 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 17 May 2022 13:56:06 +0200
-Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
+On Tue, 17 May 2022 15:39:14 +0200
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> Test correctness of some instructions handled by user space instead of
-> KVM with regards to storage keys.
-> Test success and error conditions, including coverage of storage and
-> fetch protection override.
+> On 5/17/22 12:59, Claudio Imbrenda wrote:
+> > On Mon, 16 May 2022 09:08:13 +0000
+> > Janosch Frank <frankja@linux.ibm.com> wrote:
+> >   
+> >> Sometimes dumping inside of a VM fails, is unavailable or doesn't
+> >> yield the required data. For these occasions we dump the VM from the
+> >> outside, writing memory and cpu data to a file.
+> >>
+> >> Up to now PV guests only supported dumping from the inside of the
+> >> guest through dumpers like KDUMP. A PV guest can be dumped from the
+> >> hypervisor but the data will be stale and / or encrypted.
+> >>
+> >> To get the actual state of the PV VM we need the help of the
+> >> Ultravisor who safeguards the VM state. New UV calls have been added
+> >> to initialize the dump, dump storage state data, dump cpu data and
+> >> complete the dump process. We expose these calls in this patch via a
+> >> new UV ioctl command.
+> >>
+> >> The sensitive parts of the dump data are encrypted, the dump key is
+> >> derived from the Customer Communication Key (CCK). This ensures that
+> >> only the owner of the VM who has the CCK can decrypt the dump data.
+> >>
+> >> The memory is dumped / read via a normal export call and a re-import
+> >> after the dump initialization is not needed (no re-encryption with a
+> >> dump key).
+> >>
+> >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>  
 > 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> ---
->  s390x/skey.c        | 285 ++++++++++++++++++++++++++++++++++++++++++++
->  s390x/unittests.cfg |   1 +
->  2 files changed, 286 insertions(+)
+> The cut code will be fixed according to your requests.
 > 
-> diff --git a/s390x/skey.c b/s390x/skey.c
-> index 19fa5721..60ae8158 100644
-> --- a/s390x/skey.c
-> +++ b/s390x/skey.c
-> @@ -12,6 +12,7 @@
->  #include <asm/asm-offsets.h>
->  #include <asm/interrupt.h>
->  #include <vmalloc.h>
-> +#include <css.h>
->  #include <asm/page.h>
->  #include <asm/facility.h>
->  #include <asm/mem.h>
-> @@ -284,6 +285,115 @@ static void test_store_cpu_address(void)
->  	report_prefix_pop();
->  }
->  
-> +/*
-> + * Perform CHANNEL SUBSYSTEM CALL (CHSC)  instruction while temporarily executing
-> + * with access key 1.
-> + */
-> +static unsigned int chsc_key_1(void *comm_block)
-> +{
-> +	uint32_t program_mask;
-> +
-> +	asm volatile (
-> +		"spka	0x10\n\t"
-> +		".insn	rre,0xb25f0000,%[comm_block],0\n\t"
-> +		"spka	0\n\t"
-> +		"ipm	%[program_mask]\n"
-> +		: [program_mask] "=d" (program_mask)
-> +		: [comm_block] "d" (comm_block)
-> +		: "memory"
-> +	);
-> +	return program_mask >> 28;
-> +}
-> +
-> +static const char chsc_msg[] = "Performed store-channel-subsystem-characteristics";
-> +static void init_comm_block(uint16_t *comm_block)
-> +{
-> +	memset(comm_block, 0, PAGE_SIZE);
-> +	/* store-channel-subsystem-characteristics command */
-> +	comm_block[0] = 0x10;
-> +	comm_block[1] = 0x10;
-> +	comm_block[9] = 0;
-> +}
-> +
-> +static void test_channel_subsystem_call(void)
-> +{
-> +	uint16_t *comm_block = (uint16_t *)&pagebuf;
-> +	unsigned int cc;
-> +
-> +	report_prefix_push("CHANNEL SUBSYSTEM CALL");
-> +
-> +	report_prefix_push("zero key");
-> +	init_comm_block(comm_block);
-> +	set_storage_key(comm_block, 0x10, 0);
-> +	asm volatile (
-> +		".insn	rre,0xb25f0000,%[comm_block],0\n\t"
-> +		"ipm	%[cc]\n"
-> +		: [cc] "=d" (cc)
-> +		: [comm_block] "d" (comm_block)
-> +		: "memory"
-> +	);
-> +	cc = cc >> 28;
-> +	report(cc == 0 && comm_block[9], chsc_msg);
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("matching key");
-> +	init_comm_block(comm_block);
-> +	set_storage_key(comm_block, 0x10, 0);
-> +	cc = chsc_key_1(comm_block);
-> +	report(cc == 0 && comm_block[9], chsc_msg);
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("mismatching key");
-> +
-> +	report_prefix_push("no fetch protection");
-> +	init_comm_block(comm_block);
-> +	set_storage_key(comm_block, 0x20, 0);
-> +	expect_pgm_int();
-> +	chsc_key_1(comm_block);
-> +	check_key_prot_exc(ACC_UPDATE, PROT_STORE);
+> [...]
+> >> +/*
 
-I wonder if ACC_UPDATE is really needed here? you should clearly never
-get a read error, right?
+/**
 
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("fetch protection");
-> +	init_comm_block(comm_block);
-> +	set_storage_key(comm_block, 0x28, 0);
-> +	expect_pgm_int();
-> +	chsc_key_1(comm_block);
-> +	check_key_prot_exc(ACC_UPDATE, PROT_FETCH_STORE);
+> >> + * kvm_s390_pv_dump_stor_state
+> >> + *
+> >> + * @kvm: pointer to the guest's KVM struct
+> >> + * @buff_user: Userspace pointer where we will write the results to
+> >> + * @gaddr: Starting absolute guest address for which the storage state
+> >> + *         is requested. This value will be updated with the last
+> >> + *         address for which data was written when returning to
+> >> + *         userspace.
+> >> + * @buff_user_len: Length of the buff_user buffer
+> >> + * @rc: Pointer to where the uvcb return code is stored
+> >> + * @rrc: Pointer to where the uvcb return reason code is stored
+> >> + *  
+> > 
+> > please add:
+> > 	Context: kvm->lock needs to be held  
+> 
+> Sure
+> 
+> > 
+> > also explain that part of the user buffer might be written to even in
+> > case of failure (this also needs to go in the documentation)  
+> 
+> Ok
+> 
+> >   
+> >> + * Return:
+> >> + *  0 on success  
+> > 
+> > rc and rrc will also be set in case of success  
+> 
+> But that's different from the return code of this function and would 
+> belong to the function description above, no?
 
-and here, I guess you would wait for a read error? or is it actually
-defined as unpredictable?
+yes
 
-(same for all ACC_UPDATE below)
+> 
+> >   
+> >> + *  -ENOMEM if allocating the cache fails
+> >> + *  -EINVAL if gaddr is not aligned to 1MB
+> >> + *  -EINVAL if buff_user_len is not aligned to uv_info.conf_dump_storage_state_len
+> >> + *  -EINVAL if the UV call fails, rc and rrc will be set in this case  
+> > 
+> > have you considered a different code for UVC failure?
+> > so the caller can know that rc and rrc are meaningful
+> > 
+> > or just explain that rc and rrc will always be set; if the UVC is not
+> > performed, rc and rrc will be 0  
+> 
+> If the UVC is not performed the rcs will not be *changed*, so it's 
+> advisable to set them to 0 to recognize a change.
 
-> +	report_prefix_pop();
-> +
-> +	ctl_set_bit(0, CTL0_STORAGE_PROTECTION_OVERRIDE);
-> +
-> +	report_prefix_push("storage-protection override, invalid key");
-> +	set_storage_key(comm_block, 0x20, 0);
-> +	init_comm_block(comm_block);
-> +	expect_pgm_int();
-> +	chsc_key_1(comm_block);
-> +	check_key_prot_exc(ACC_UPDATE, PROT_STORE);
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("storage-protection override, override key");
-> +	init_comm_block(comm_block);
-> +	set_storage_key(comm_block, 0x90, 0);
-> +	cc = chsc_key_1(comm_block);
-> +	report(cc == 0 && comm_block[9], chsc_msg);
-> +	report_prefix_pop();
-> +
-> +	ctl_clear_bit(0, CTL0_STORAGE_PROTECTION_OVERRIDE);
-> +
-> +	report_prefix_push("storage-protection override disabled, override key");
-> +	init_comm_block(comm_block);
-> +	set_storage_key(comm_block, 0x90, 0);
-> +	expect_pgm_int();
-> +	chsc_key_1(comm_block);
-> +	check_key_prot_exc(ACC_UPDATE, PROT_STORE);
-> +	report_prefix_pop();
-> +
-> +	report_prefix_pop();
-> +
-> +	set_storage_key(comm_block, 0x00, 0);
-> +	report_prefix_pop();
-> +}
-> +
->  /*
->   * Perform SET PREFIX (SPX) instruction while temporarily executing
->   * with access key 1.
-> @@ -417,6 +527,179 @@ static void test_set_prefix(void)
->  	report_prefix_pop();
->  }
->  
-> +/*
-> + * Perform MODIFY SUBCHANNEL (MSCH) instruction while temporarily executing
-> + * with access key 1.
-> + */
-> +static uint32_t modify_subchannel_key_1(uint32_t sid, struct schib *schib)
-> +{
-> +	uint32_t program_mask;
-> +
-> +/*
-> + * gcc 12.0.1 warns if schib is < 4k.
-> + * We need such addresses to test fetch protection override.
-> + */
-> +#pragma GCC diagnostic push
-> +#pragma GCC diagnostic ignored "-Warray-bounds"
+ah, right, you jump to out only for errors after the allocation
 
-I really dislike these pragmas
+> 
+> 
+> Also:
+> While I generally like commenting as much as possible, this is starting 
+> to get out of hand, the comment header is now taking up a lot of space. 
+> I'll put the rc/rrc comment into the api documentation and I'm 
+> considering putting the partial write comment into there too.
 
-can we find a nicer way?
+I don't know, the comments are also used to generate documentation
+automatically, so I think they should contain all the information in
+one way or the other.
 
-> +	asm volatile (
-> +		"lr %%r1,%[sid]\n\t"
-> +		"spka	0x10\n\t"
-> +		"msch	%[schib]\n\t"
-> +		"spka	0\n\t"
-> +		"ipm	%[program_mask]\n"
-> +		: [program_mask] "=d" (program_mask)
-> +		: [sid] "d" (sid),
-> +		  [schib] "Q" (*schib)
-> +		: "%r1"
-> +	);
-> +#pragma GCC diagnostic pop
-> +	return program_mask >> 28;
-> +}
-> +
-> +static void test_msch(void)
-> +{
-> +	struct schib *schib = (struct schib *)pagebuf;
-> +	struct schib *no_override_schib;
-> +	int test_device_sid;
-> +	pgd_t *root;
-> +	int cc;
-> +
-> +	report_prefix_push("MSCH");
-> +	root = (pgd_t *)(stctg(1) & PAGE_MASK);
-> +	test_device_sid = css_enumerate();
-> +
-> +	if (!(test_device_sid & SCHID_ONE)) {
-> +		report_fail("no I/O device found");
-> +		return;
-> +	}
-> +
-> +	cc = stsch(test_device_sid, schib);
-> +	if (cc) {
-> +		report_fail("could not store SCHIB");
-> +		return;
-> +	}
-> +
-> +	report_prefix_push("zero key");
-> +	schib->pmcw.intparm = 100;
-> +	set_storage_key(schib, 0x28, 0);
-> +	cc = msch(test_device_sid, schib);
-> +	if (!cc) {
-> +		WRITE_ONCE(schib->pmcw.intparm, 0);
-> +		cc = stsch(test_device_sid, schib);
-> +		report(!cc && schib->pmcw.intparm == 100, "fetched from SCHIB");
-> +	} else {
-> +		report_fail("MSCH cc != 0");
-> +	}
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("matching key");
-> +	schib->pmcw.intparm = 200;
-> +	set_storage_key(schib, 0x18, 0);
-> +	cc = modify_subchannel_key_1(test_device_sid, schib);
-> +	if (!cc) {
-> +		WRITE_ONCE(schib->pmcw.intparm, 0);
-> +		cc = stsch(test_device_sid, schib);
-> +		report(!cc && schib->pmcw.intparm == 200, "fetched from SCHIB");
-> +	} else {
-> +		report_fail("MSCH cc != 0");
-> +	}
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("mismatching key");
-> +
-> +	report_prefix_push("no fetch protection");
-> +	schib->pmcw.intparm = 300;
-> +	set_storage_key(schib, 0x20, 0);
-> +	cc = modify_subchannel_key_1(test_device_sid, schib);
-> +	if (!cc) {
-> +		WRITE_ONCE(schib->pmcw.intparm, 0);
-> +		cc = stsch(test_device_sid, schib);
-> +		report(!cc && schib->pmcw.intparm == 300, "fetched from SCHIB");
-> +	} else {
-> +		report_fail("MSCH cc != 0");
-> +	}
-> +	report_prefix_pop();
-> +
-> +	schib->pmcw.intparm = 0;
-> +	if (!msch(test_device_sid, schib)) {
-> +		report_prefix_push("fetch protection");
-> +		schib->pmcw.intparm = 400;
-> +		set_storage_key(schib, 0x28, 0);
-> +		expect_pgm_int();
-> +		modify_subchannel_key_1(test_device_sid, schib);
-> +		check_key_prot_exc(ACC_FETCH, PROT_FETCH_STORE);
-> +		WRITE_ONCE(schib->pmcw.intparm, 0);
-> +		cc = stsch(test_device_sid, schib);
-> +		report(!cc && schib->pmcw.intparm == 0, "did not modify subchannel");
-> +		report_prefix_pop();
-> +	} else {
-> +		report_fail("could not reset SCHIB");
-> +	}
-> +
-> +	register_pgm_cleanup_func(dat_fixup_pgm_int);
-> +
-> +	schib->pmcw.intparm = 0;
-> +	if (!msch(test_device_sid, schib)) {
-> +		report_prefix_push("remapped page, fetch protection");
-> +		schib->pmcw.intparm = 500;
-> +		set_storage_key(pagebuf, 0x28, 0);
-> +		expect_pgm_int();
-> +		install_page(root, virt_to_pte_phys(root, pagebuf), 0);
-> +		modify_subchannel_key_1(test_device_sid, (struct schib *)0);
-> +		install_page(root, 0, 0);
-> +		check_key_prot_exc(ACC_FETCH, PROT_FETCH_STORE);
-> +		WRITE_ONCE(schib->pmcw.intparm, 0);
-> +		cc = stsch(test_device_sid, schib);
-> +		report(!cc && schib->pmcw.intparm == 0, "did not modify subchannel");
-> +		report_prefix_pop();
-> +	} else {
-> +		report_fail("could not reset SCHIB");
-> +	}
-> +
-> +	ctl_set_bit(0, CTL0_FETCH_PROTECTION_OVERRIDE);
-> +
-> +	report_prefix_push("fetch-protection override applies");
-> +	schib->pmcw.intparm = 600;
-> +	set_storage_key(pagebuf, 0x28, 0);
-> +	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
-> +	cc = modify_subchannel_key_1(test_device_sid, (struct schib *)0);
-> +	install_page(root, 0, 0);
-> +	if (!cc) {
-> +		WRITE_ONCE(schib->pmcw.intparm, 0);
-> +		cc = stsch(test_device_sid, schib);
-> +		report(!cc && schib->pmcw.intparm == 600, "fetched from SCHIB");
-> +	} else {
-> +		report_fail("MSCH cc != 0");
-> +	}
-> +	report_prefix_pop();
-> +
-> +	schib->pmcw.intparm = 0;
-> +	if (!msch(test_device_sid, schib)) {
-> +		report_prefix_push("fetch-protection override does not apply");
-> +		schib->pmcw.intparm = 700;
-> +		no_override_schib = (struct schib *)(pagebuf + 2048);
-> +		memcpy(no_override_schib, schib, sizeof(struct schib));
-> +		set_storage_key(pagebuf, 0x28, 0);
-> +		expect_pgm_int();
-> +		install_page(root, virt_to_pte_phys(root, pagebuf), 0);
-> +		modify_subchannel_key_1(test_device_sid, (struct schib *)2048);
-> +		install_page(root, 0, 0);
-> +		check_key_prot_exc(ACC_FETCH, PROT_FETCH_STORE);
-> +		WRITE_ONCE(schib->pmcw.intparm, 0);
-> +		cc = stsch(test_device_sid, schib);
-> +		report(!cc && schib->pmcw.intparm == 0, "did not modify subchannel");
-> +		report_prefix_pop();
-> +	} else {
-> +		report_fail("could not reset SCHIB");
-> +	}
-> +
-> +	ctl_clear_bit(0, CTL0_FETCH_PROTECTION_OVERRIDE);
-> +	register_pgm_cleanup_func(NULL);
-> +	report_prefix_pop();
-> +	set_storage_key(schib, 0x00, 0);
-> +	report_prefix_pop();
-> +}
-> +
->  int main(void)
->  {
->  	report_prefix_push("skey");
-> @@ -431,9 +714,11 @@ int main(void)
->  	test_chg();
->  	test_test_protection();
->  	test_store_cpu_address();
-> +	test_channel_subsystem_call();
->  
->  	setup_vm();
->  	test_set_prefix();
-> +	test_msch();
->  done:
->  	report_prefix_pop();
->  	return report_summary();
-> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-> index b456b288..1280ff0f 100644
-> --- a/s390x/unittests.cfg
-> +++ b/s390x/unittests.cfg
-> @@ -41,6 +41,7 @@ file = sthyi.elf
->  
->  [skey]
->  file = skey.elf
-> +extra_params = -device virtio-net-ccw
->  
->  [diag10]
->  file = diag10.elf
+I don't see issues with huge comments, if the function is complex and
+has lots of parameters and possible return values.
+
+as much as it bothers you, the whole comment block has 0 lines of actual
+description of what the function does, so I don't think this is getting
+out of hand :)
+
+> 
+> >   
+> >> + *  -EFAULT if copying the result to buff_user failed
+> >> + */
+> >> +int kvm_s390_pv_dump_stor_state(struct kvm *kvm, void __user *buff_user,
+> >> +				u64 *gaddr, u64 buff_user_len, u16 *rc, u16 *rrc)
+> >> +{
+> >> +	struct uv_cb_dump_stor_state uvcb = {
+> >> +		.header.cmd = UVC_CMD_DUMP_CONF_STOR_STATE,
+> >> +		.header.len = sizeof(uvcb),
+> >> +		.config_handle = kvm->arch.pv.handle,
+> >> +		.gaddr = *gaddr,
+> >> +		.dump_area_origin = 0,
+> >> +	};
+> >> +	size_t buff_kvm_size;
+> >> +	size_t size_done = 0;
+> >> +	u8 *buff_kvm = NULL;
+> >> +	int cc, ret;
+> >> +
+> >> +	ret = -EINVAL;
+> >> +	/* UV call processes 1MB guest storage chunks at a time */
+> >> +	if (!IS_ALIGNED(*gaddr, HPAGE_SIZE))
+> >> +		goto out;
+> >> +
+> >> +	/*
+> >> +	 * We provide the storage state for 1MB chunks of guest
+> >> +	 * storage. The buffer will need to be aligned to
+> >> +	 * conf_dump_storage_state_len so we don't end on a partial
+> >> +	 * chunk.
+> >> +	 */
+> >> +	if (!buff_user_len ||
+> >> +	    !IS_ALIGNED(buff_user_len, uv_info.conf_dump_storage_state_len))
+> >> +		goto out;
+> >> +
+> >> +	/*
+> >> +	 * Allocate a buffer from which we will later copy to the user
+> >> +	 * process. We don't want userspace to dictate our buffer size
+> >> +	 * so we limit it to DUMP_BUFF_LEN.
+> >> +	 */
+> >> +	ret = -ENOMEM;
+> >> +	buff_kvm_size = min_t(u64, buff_user_len, DUMP_BUFF_LEN);
+> >> +	buff_kvm = vzalloc(buff_kvm_size);
+> >> +	if (!buff_kvm)
+> >> +		goto out;
+> >> +
+> >> +	ret = 0;
+> >> +	uvcb.dump_area_origin = (u64)buff_kvm;
+> >> +	/* We will loop until the user buffer is filled or an error occurs */
+> >> +	do {
+> >> +		/* Get 1MB worth of guest storage state data */
+> >> +		cc = uv_call_sched(0, (u64)&uvcb);
+> >> +
+> >> +		/* All or nothing */
+> >> +		if (cc) {
+> >> +			ret = -EINVAL;
+> >> +			break;
+> >> +		}
+> >> +
+> >> +		size_done += uv_info.conf_dump_storage_state_len;  
+> > 
+> > maybe save this in a local const variable with a shorter name? would be
+> > more readable? const u64 dump_len = uv_info.conf_dump_storage_state_len;
+> >   
+
+did you see this one ^ ?
+
+> >> +		uvcb.dump_area_origin += uv_info.conf_dump_storage_state_len;
+> >> +		buff_user_len -= uv_info.conf_dump_storage_state_len;
+> >> +		uvcb.gaddr += HPAGE_SIZE;
+> >> +
+> >> +		/* KVM Buffer full, time to copy to the process */
+> >> +		if (!buff_user_len || size_done == DUMP_BUFF_LEN) {
+> >> +			if (copy_to_user(buff_user, buff_kvm, size_done)) {
+> >> +				ret = -EFAULT;
+> >> +				break;
+> >> +			}
+> >> +
+> >> +			buff_user += size_done;
+> >> +			size_done = 0;
+> >> +			uvcb.dump_area_origin = (u64)buff_kvm;
+> >> +		}
+> >> +	} while (buff_user_len);
+> >> +
+> >> +	/* Report back where we ended dumping */
+> >> +	*gaddr = uvcb.gaddr;
+> >> +
+> >> +	/* Lets only log errors, we don't want to spam */
+> >> +out:
+> >> +	if (ret)
+> >> +		KVM_UV_EVENT(kvm, 3,
+> >> +			     "PROTVIRT DUMP STORAGE STATE: addr %llx ret %d, uvcb rc %x rrc %x",
+> >> +			     uvcb.gaddr, ret, uvcb.header.rc, uvcb.header.rrc);
+> >> +	*rc = uvcb.header.rc;
+> >> +	*rrc = uvcb.header.rrc;
+> >> +	vfree(buff_kvm);
+> >> +
+> >> +	return ret;
+> >> +}
+> >> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> >> index bb2f91bc2305..1c60c2d314ba 100644
+> >> --- a/include/uapi/linux/kvm.h
+> >> +++ b/include/uapi/linux/kvm.h
+> >> @@ -1653,6 +1653,20 @@ struct kvm_s390_pv_unp {
+> >>   	__u64 tweak;
+> >>   };
+> >>   
+> >> +enum pv_cmd_dmp_id {
+> >> +	KVM_PV_DUMP_INIT,
+> >> +	KVM_PV_DUMP_CONFIG_STOR_STATE,
+> >> +	KVM_PV_DUMP_COMPLETE,
+> >> +};
+> >> +
+> >> +struct kvm_s390_pv_dmp {
+> >> +	__u64 subcmd;
+> >> +	__u64 buff_addr;
+> >> +	__u64 buff_len;
+> >> +	__u64 gaddr;		/* For dump storage state */
+> >> +	__u64 reserved[4];
+> >> +};
+> >> +
+> >>   enum pv_cmd_info_id {
+> >>   	KVM_PV_INFO_VM,
+> >>   	KVM_PV_INFO_DUMP,
+> >> @@ -1696,6 +1710,7 @@ enum pv_cmd_id {
+> >>   	KVM_PV_PREP_RESET,
+> >>   	KVM_PV_UNSHARE_ALL,
+> >>   	KVM_PV_INFO,
+> >> +	KVM_PV_DUMP,
+> >>   };
+> >>   
+> >>   struct kvm_pv_cmd {  
+> >   
+> 
 
