@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2957B52AB7B
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 21:05:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE07C52AB7E
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 21:06:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352501AbiEQTFl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 15:05:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42054 "EHLO
+        id S1352517AbiEQTFp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 15:05:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352500AbiEQTFk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 15:05:40 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CFA04ECC3
-        for <kvm@vger.kernel.org>; Tue, 17 May 2022 12:05:39 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id q17-20020a656851000000b003c66b4c5d54so36365pgt.6
-        for <kvm@vger.kernel.org>; Tue, 17 May 2022 12:05:39 -0700 (PDT)
+        with ESMTP id S1346834AbiEQTFm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 15:05:42 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 350FD107
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 12:05:41 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id z16-20020a17090a015000b001dbc8da29a1so1810367pje.7
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 12:05:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=6YlkJV/T5mcjduBBp9QBuhMyd/oE9TQS23+/anwwZk0=;
-        b=j6dZh6yLsqom/8TT5Agx6SRA7Tj1asUR9CBz6vxv1aVEOIeac0DWO0oqSe75lT1a0l
-         jl2cSfuhBg2Z4U1npHh99sKD4Q8avpn68nhZ4xfmdy5U3LomUwn/hNE4JxmGoGYe6bE4
-         A6iFDyvZldT1RISoJ/kiZEuOXwNtV4uPQJaUl/rncFdtRdUa6CAZtLuur5m9ldYzre1c
-         IKRgBKCKIuXX1bEbFkxLuwGcECvYaOIpYLRbu82Rp/HSUj9h88Ky1Bl7ANhvGYdbyLJh
-         un3kLLDi3JN8pvsHqAogOPfpEnkA9RldAvv8WjiQQjQxT5eWgv7JY1uqznLz14pCZNmh
-         Tghg==
+        bh=BbT3qIQqY75tltcSOWTXutdvIAEglFmPYbpzXMtd0+s=;
+        b=FMcPD/W1tVzarYM9qnqX9+feK+EwoKvnZrBfUOxTHC1V+2iZiB6x2A48vClUhD1r7E
+         HXy62gg5Fz7aZPe/wWBkAzFB6yu9VdLKcOihsH7SFEWYJwqt9Ms72ZRtRPJuALhGycPj
+         QOWS7b+bArHO2R2BQY2Zp+9hg2Ts0Fmb+0cdEuNjmRYYQbmLtYKsyrTWYnjWVQExv5V8
+         muyZtOK9R5WOHrHWXJ9OHdr466u6xcj97mxxLZGNACrVeEWxGp+QPnt1Z3RKeGDpmNmH
+         agssaQqahj47w07HCVkubK6K7Pcmpullh24hORGJAV6zXTW/KHIF9g2Ns1jqmBDnbvWS
+         fc7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=6YlkJV/T5mcjduBBp9QBuhMyd/oE9TQS23+/anwwZk0=;
-        b=fedYBUQNx4yL4uNwM7y+dQrQxHKV90ITDGhunBvTZQvC5uoEFsa8NNLYMMLZT6kWBG
-         obQO7OMPbCLUsiVC/3idmofTH95+hXxJh5rJpHhMgaoovFnrQQPY1nQ19kBuya/SCF9L
-         4SEM2hLEn6+S97gf3mwWgLybYqQtg/Nhac5B7IvOMsytKdZYKopwTcRfpwg0Z7vs94TQ
-         5zlXm+2ENY7N6ZV0D8xVF8bM0iJXp5XGPjGDDnpe6PEDw6DyqxyYlKhTMK0FtZlnPWsD
-         6NH58pCEchFitMP+RTx6Qxo/i/7ttyIGsL3VfsBA3vj4pFEjDc7sNZ8l25utnnQvxb/v
-         vhpw==
-X-Gm-Message-State: AOAM531+EFGCmVth9zn9ow5+UJTmfF+TMOSjFk34azKobk8o1clMkSNQ
-        S1yCUvvdk40znisB0sqOsEPtABpfMv+fxQ==
-X-Google-Smtp-Source: ABdhPJwd+cSZ5X7CiNRk7yEjyGl9P5mm4DO6RCuJqcaFfrQkvhZOEgb36BoGpCSrWDwBsS2cdXarclyqpRHMdw==
+        bh=BbT3qIQqY75tltcSOWTXutdvIAEglFmPYbpzXMtd0+s=;
+        b=jbaMxNtZOdcdx/u03aPHRgRayl3je5xeKFyc5BPfSmMaXc9UWq6DP5WKn6dv2jaV+j
+         BiOsr2IDAmc1Y8Pdz9IBX7ypjTQ9F56pm/8/9iivBk4j2bj7833UgEINgXxGHYB9h3cK
+         ETvjTzZxucNcRgW6Cecc2vd0JvFJGk+hmwe6CQCqrVgsbyrJQ9WnywAbIUQOFIpWiVAG
+         0z6lsvQc6vwHMrikx5TczF87LzaeOLNY8gHL75pxuu/7Z74R1VFH/Y0yTkKsF2nxUBqR
+         Da0qC9JAlmGSFkqTafbN78wsErsKhJo+7nOxQ45QXm1FhCYe6FdQUQ5v7inLD5whus3e
+         XHBg==
+X-Gm-Message-State: AOAM531Ce0yaqQh4EPtmGq3EQ0gz/QShYL5OHxduDybbNtT7fLgYYIwY
+        NcEEkKvex0c2FZBGZWsSKAcAJgEZ8Gu3gg==
+X-Google-Smtp-Source: ABdhPJxDo4a3LXUH6qD+1SS7Ok+dJTJ3GE/vu2EpBYI8HUJS9b+b8QHX9dnpaNq3CiK5ZmXbBECKX6+c4YYrQw==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:aa7:82d9:0:b0:4fa:2c7f:41e with SMTP id
- f25-20020aa782d9000000b004fa2c7f041emr24156849pfn.1.1652814338775; Tue, 17
- May 2022 12:05:38 -0700 (PDT)
-Date:   Tue, 17 May 2022 19:05:22 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:902:e808:b0:161:946c:d2a5 with SMTP
+ id u8-20020a170902e80800b00161946cd2a5mr7988639plg.93.1652814340415; Tue, 17
+ May 2022 12:05:40 -0700 (PDT)
+Date:   Tue, 17 May 2022 19:05:23 +0000
 In-Reply-To: <20220517190524.2202762-1-dmatlack@google.com>
-Message-Id: <20220517190524.2202762-9-dmatlack@google.com>
+Message-Id: <20220517190524.2202762-10-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220517190524.2202762-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.36.0.550.gb090851708-goog
-Subject: [PATCH v2 08/10] KVM: selftests: Drop unnecessary rule for $(LIBKVM_OBJS)
+Subject: [PATCH v2 09/10] KVM: selftests: Clean up LIBKVM files in Makefile
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Ben Gardon <bgardon@google.com>,
@@ -72,27 +72,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop the "all: $(LIBKVM_OBJS)" rule. The KVM selftests already depend
-on $(LIBKVM_OBJS), so there is no reason to have this rule.
+Break up the long lines for LIBKVM and alphabetize each architecture.
+This makes reading the Makefile easier, and will make reading diffs to
+LIBKVM easier.
 
-Suggested-by: Peter Xu <peterx@redhat.com>
+No functional change intended.
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- tools/testing/selftests/kvm/Makefile | 1 -
- 1 file changed, 1 deletion(-)
+ tools/testing/selftests/kvm/Makefile | 36 ++++++++++++++++++++++++----
+ 1 file changed, 31 insertions(+), 5 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index cd7a9df4ad6d..0889fc17baa5 100644
+index 0889fc17baa5..83b9ffa456ea 100644
 --- a/tools/testing/selftests/kvm/Makefile
 +++ b/tools/testing/selftests/kvm/Makefile
-@@ -189,7 +189,6 @@ $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S
- 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+@@ -37,11 +37,37 @@ ifeq ($(ARCH),riscv)
+ 	UNAME_M := riscv
+ endif
  
- x := $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
--all: $(LIBKVM_OBJS)
- $(TEST_GEN_PROGS): $(LIBKVM_OBJS)
+-LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/rbtree.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
+-LIBKVM_x86_64 = lib/x86_64/apic.c lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
+-LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c lib/aarch64/gic.c lib/aarch64/gic_v3.c lib/aarch64/vgic.c
+-LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
+-LIBKVM_riscv = lib/riscv/processor.c lib/riscv/ucall.c
++LIBKVM += lib/assert.c
++LIBKVM += lib/elf.c
++LIBKVM += lib/guest_modes.c
++LIBKVM += lib/io.c
++LIBKVM += lib/kvm_util.c
++LIBKVM += lib/perf_test_util.c
++LIBKVM += lib/rbtree.c
++LIBKVM += lib/sparsebit.c
++LIBKVM += lib/test_util.c
++
++LIBKVM_x86_64 += lib/x86_64/apic.c
++LIBKVM_x86_64 += lib/x86_64/handlers.S
++LIBKVM_x86_64 += lib/x86_64/processor.c
++LIBKVM_x86_64 += lib/x86_64/svm.c
++LIBKVM_x86_64 += lib/x86_64/ucall.c
++LIBKVM_x86_64 += lib/x86_64/vmx.c
++
++LIBKVM_aarch64 += lib/aarch64/gic.c
++LIBKVM_aarch64 += lib/aarch64/gic_v3.c
++LIBKVM_aarch64 += lib/aarch64/handlers.S
++LIBKVM_aarch64 += lib/aarch64/processor.c
++LIBKVM_aarch64 += lib/aarch64/spinlock.c
++LIBKVM_aarch64 += lib/aarch64/ucall.c
++LIBKVM_aarch64 += lib/aarch64/vgic.c
++
++LIBKVM_s390x += lib/s390x/diag318_test_handler.c
++LIBKVM_s390x += lib/s390x/processor.c
++LIBKVM_s390x += lib/s390x/ucall.c
++
++LIBKVM_riscv += lib/riscv/processor.c
++LIBKVM_riscv += lib/riscv/ucall.c
  
- cscope: include_paths = $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include lib ..
+ TEST_GEN_PROGS_x86_64 = x86_64/cpuid_test
+ TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
 -- 
 2.36.0.550.gb090851708-goog
 
