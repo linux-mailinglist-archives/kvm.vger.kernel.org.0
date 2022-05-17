@@ -2,167 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8DD6529D38
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 11:05:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29D4A529E1F
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 11:35:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244131AbiEQJFA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 05:05:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52568 "EHLO
+        id S243315AbiEQJfI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 05:35:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243998AbiEQJEw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 05:04:52 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9EF53F889;
-        Tue, 17 May 2022 02:04:45 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24H8cxGM032682;
-        Tue, 17 May 2022 09:04:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=ICKLJGaM1VvTpfQYzA/JpJ+aToE0/fQmHfd7Tob/YX8=;
- b=JAZyRGtloq8IJfau9sm0rW6nHIbqiVYUUfk5Vmoprn1c5UepLq68nXLWPPe3rpOBjpKd
- GtzEhTMBSs4WTF1nerBSQzLym4dV2Qa5pV+FnvVr+mJjIJCTG13Fy/eysdKvVUj9wnvz
- vfENarXAOjRAkdj98eTXYXHugSSK5cKD3/eayJPHOO8ygROfrdWcLQJw5g2NkS1UuCmH
- Z2qcAv1/ezSoqRD+3NzphC76FCznZ5OWFEGryRVrTwxNrBMqMU+6oDO1lQfU5Ci4fyy9
- ATYHXjVwmGYS58xQ5dSMs+9j4j81Aizp3a5zAdMbZjfpzjd21HFJg/0MWSJ0lFM6/jbl 0g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g47tv1872-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 09:04:44 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24H8vRWV013967;
-        Tue, 17 May 2022 09:04:44 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g47tv186d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 09:04:44 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24H91sNx020003;
-        Tue, 17 May 2022 09:04:42 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 3g23pjbx2k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 09:04:42 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24H94c7K13762894
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 May 2022 09:04:38 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 91734A4051;
-        Tue, 17 May 2022 09:04:38 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4AB54A404D;
-        Tue, 17 May 2022 09:04:38 +0000 (GMT)
-Received: from [9.152.224.153] (unknown [9.152.224.153])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 17 May 2022 09:04:38 +0000 (GMT)
-Message-ID: <26b55ac4-2acc-b9c7-a999-50a79d56a2de@linux.ibm.com>
-Date:   Tue, 17 May 2022 11:04:37 +0200
+        with ESMTP id S233890AbiEQJfH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 05:35:07 -0400
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE8A03BF85
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 02:35:06 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id z126so14133731qkb.2
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 02:35:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=PLPmlGGL/gTvueqKEBdKiHKfa75D3rcCxU1z3taEYt8=;
+        b=jqebeasaAh/puxs6wrntMo4IiE08jwbp+s19usrIJFnPFwIklwuX0j513WvBJwz6qp
+         QSbrYRcARE+uuyDHtELRaGkI2l3aYyVQ9zECMOpi3QiElZVK+pY/OCgwdNjfbzbEIYXf
+         URwD88jSQeZzD2XFeU05XdI5UoywQsDxNp9ev+CiU9VBOxcTYw9nVahr4gK7eaU1f5KU
+         TgkkSx29Wq+Oqs27p1RMdffkJG0Nao68rcahKrTTeGsTzlSgeXxSX68m0omi0iPuvkG1
+         eMKHIhzsJmb1VCehkaKW6Q3qiYQ0Q0gygGHlOIPLFQrRJQpjbF060lKhEPQMGNQCvk/i
+         AM3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=PLPmlGGL/gTvueqKEBdKiHKfa75D3rcCxU1z3taEYt8=;
+        b=gomlTkIffWPk+V7Mf8GUU7yE3VPaX0EDK8EwrIHuOWE7bYezMxHoSQ5YCoV5IriuYH
+         +mZdOUYNmqNfnliHpxir35E3wnYNGTbS0HRd5XEA8pn1a8maj0xFN7KjB3OXhyJgK7uh
+         HeDtdCzHQwLYWF1DhsoPcUDQXtACPe39PRX1ZTvNyit+tDtW/SBKWbJrEE7fD+PG0l19
+         Y3IgzI/DMrPXHsq6f8uIs1CpBgmrWxny4AUq9pWESuu/TovNASTpKrhlC2oHGohdUTGR
+         F6uxgGHUrKK8RW3UlijxGPNvXun+TNhKN7che/kMumJmckYK27pE1NQ4W6ZRrKb8hLGW
+         7WWQ==
+X-Gm-Message-State: AOAM531bLudAp5yUG3t3koocFahywo+sxXgYWYtdZNmpklMb3Ny4T88j
+        5n+W84xYQj6S9GzKWhS4mMZ3GzNi8B0L2ILiFiQ=
+X-Google-Smtp-Source: ABdhPJzKY09Z/T1GpoFUeIPqTJ9giLc5K4puU1AFn29gHEL8kQNlRmUCaxBr27abo8nMqEWyQJB9zFnnzTIAL0xiPbk=
+X-Received: by 2002:a37:aa87:0:b0:6a0:6596:a367 with SMTP id
+ t129-20020a37aa87000000b006a06596a367mr14979308qke.507.1652780105886; Tue, 17
+ May 2022 02:35:05 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [kvm-unit-tests PATCH 3/6] s390x: uv-host: Test uv immediate
- parameter
-Content-Language: en-US
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        kvm390 mailing list 
-        <kvm390-list@tuxmaker.boeblingen.de.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        imbrenda@linux.ibm.com, thuth@redhat.com, nrb@linux.ibm.com,
-        scgl@linux.ibm.com
-References: <20220513095017.16301-1-frankja@linux.ibm.com>
- <20220513095017.16301-4-frankja@linux.ibm.com>
- <8c852bcd-6b42-4b54-d3ff-5d63a389b05d@linux.ibm.com>
- <719224db-3a24-d38f-6678-2d3f08963ac0@linux.ibm.com>
-From:   Steffen Eiden <seiden@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <719224db-3a24-d38f-6678-2d3f08963ac0@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7MmfdQRU73iKIqFMdQbEH5kGNLZwwxpq
-X-Proofpoint-ORIG-GUID: jK8lc0OTA-hnVrQOh-N6IKYDpv3S5TpZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-17_01,2022-05-16_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- priorityscore=1501 impostorscore=0 spamscore=0 phishscore=0 bulkscore=0
- lowpriorityscore=0 clxscore=1015 suspectscore=0 mlxlogscore=999
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205170055
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Received: by 2002:a05:6214:20a9:0:0:0:0 with HTTP; Tue, 17 May 2022 02:35:05
+ -0700 (PDT)
+Reply-To: richardwilson19091@gmail.com
+From:   Richard Wilson <mckayokey77@gmail.com>
+Date:   Tue, 17 May 2022 09:35:05 +0000
+Message-ID: <CALnAWWNOpmhMqSNCAN=_dB+KxYLEu_8WgTJ+PtDihYxOLNmk+A@mail.gmail.com>
+Subject: Hello
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: Yes, score=5.5 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        UNDISC_FREEM autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
+        *      https://www.dnswl.org/, no trust
+        *      [2607:f8b0:4864:20:0:0:0:72a listed in]
+        [list.dnswl.org]
+        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.5241]
+        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
+        *      provider
+        *      [mckayokey77[at]gmail.com]
+        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
+        *       in digit
+        *      [mckayokey77[at]gmail.com]
+        *  0.2 FREEMAIL_REPLYTO_END_DIGIT Reply-To freemail username ends in
+        *      digit
+        *      [richardwilson19091[at]gmail.com]
+        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
+        *      author's domain
+        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
+        *      envelope-from domain
+        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
+        *       valid
+        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
+        *  3.4 UNDISC_FREEM Undisclosed recipients + freemail reply-to
+        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
+        *      different freemails
+X-Spam-Level: *****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Dear,
+I am contacting you to assist retrieve his huge deposit Mr. Alexander
+left in the bank before its get confiscated by the bank. Get back to
+me for more detail's
 
-
-On 5/17/22 11:03, Janosch Frank wrote:
-> On 5/17/22 10:29, Steffen Eiden wrote:
->> Hey Janosch,
->>
->> On 5/13/22 11:50, Janosch Frank wrote:
->>> Let's check if we get a specification PGM exception if we set a
->>> non-zero i3 when doing a UV call.
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> ---
->>>    s390x/uv-host.c | 23 +++++++++++++++++++++++
->>>    1 file changed, 23 insertions(+)
->>>
->>> diff --git a/s390x/uv-host.c b/s390x/uv-host.c
->>> index f846fc42..fcb82d24 100644
->>> --- a/s390x/uv-host.c
->>> +++ b/s390x/uv-host.c
->>> @@ -64,6 +64,28 @@ static struct cmd_list cmds[] = {
->>>        { NULL, 0, 0 },
->>>    };
->>> +static void test_i3(void)
->>> +{
->>> +    struct uv_cb_header uvcb = {
->>> +        .cmd = UVC_CMD_INIT_UV,
->>> +        .len = sizeof(struct uv_cb_init),
->>> +    };
->>> +    unsigned long r1 = 0;
->> Did you forgot 'r2' or is it missing for a reason?
-> 
-> The uvcb is the r2, have a look at the clobbers below
-
-Oh right, my bad; Sorry.
-> 
->>
->>> +    int cc;
->>> +
->>> +    report_prefix_push("i3");
->>> +    expect_pgm_int();
->>> +    asm volatile(
->>> +        "0:    .insn rrf,0xB9A40000,%[r1],%[r2],4,2\n"
->>> +        "        ipm    %[cc]\n"
->>> +        "        srl    %[cc],28\n"
->>> +        : [cc] "=d" (cc)
->>> +        : [r1] "a" (r1), [r2] "a" (&uvcb)
->>> +        : "memory", "cc");
->>> +    check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
->>> +    report_prefix_pop();
->>> +}
->>> +
->>>    static void test_priv(void)
->>>    {
->>>        struct uv_cb_header uvcb = {};
->>> @@ -585,6 +607,7 @@ int main(void)
->>>            goto done;
->>>        }
->>> +    test_i3();
->>>        test_priv();
->>>        test_invalid();
->>>        test_uv_uninitialized();
-> 
-
--- 
-Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+Barr. Richard Wilson
