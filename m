@@ -2,273 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9598352A089
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 13:37:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C63252A076
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 13:33:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345308AbiEQLhY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 07:37:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51460 "EHLO
+        id S1343904AbiEQLdF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 07:33:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344467AbiEQLhW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 07:37:22 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AFA53BBFA;
-        Tue, 17 May 2022 04:37:21 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24HBFONg031599;
-        Tue, 17 May 2022 11:37:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
+        with ESMTP id S235046AbiEQLc5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 07:32:57 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2B6327FFE;
+        Tue, 17 May 2022 04:32:56 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24HArhKS032447;
+        Tue, 17 May 2022 11:32:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=iSq/SKgfYodwTIgzB+QbSNUjeU2JUJiau+TnECfMnGQ=;
- b=r8UA60VKrSmMnmlED8BxL0nkavR0dv2ANYuXo7k63Vq/VqfX85wbcCieye9zc8Izf8YZ
- yJq7N6vWOzod+AGrS//QddrQOU0M6wf8S09ZwgY3BmpRS/TbUa9A8JOwUaBGjR3pDf9R
- VRuOuZ/TRDmbmtV/LyT/ZEfCRy15L6f3dqiFL2NZsr7XrKnlobsrrnjHWdjnaPrQNSBf
- n1VdvRVWlSKNIfLKvAy6UPHZUet0p7CYNTuMZb+svR5ZB9IIGDcD4zsJOqLH7YuPiQQE
- LTQhsjvfd+KQykXrM9sCSYK/rV/op3at84Conop76Dx1VDJXNVXJShxCkdEvPzaBrEHL AQ== 
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4ap28ey3-1
+ bh=7S/qEovX+DzagnVagYpY+qWBXeYZapNmr+C+3jCrtm8=;
+ b=b29XQzG9OdK0+bSamtc4UcSc+T6OzjxIOlFlefPYrFEUXIfkA3PITHiEPA5Pn2enDBVG
+ FSx0tnuOzHTUbNhx+Glr78OOM9ZrQUBHDh03sLO4kNmzVBq3H+hnFpCEn6fmGoFxr4X8
+ C/ruKtG72/Kn8AHCHQv4QAk00gnBxl5zGtUQFyvP6+PZDNCC7UhQSpqUn44U6nX7DbO8
+ 2Pcdr/CDHy6Fl44aCQg9CbuIc3PVVjZojXbRmnxuRP5VcWUisUXOktnjDfDKvH37f3Xa
+ 8ziTZGw2OUzzGFMfmOan7HAmphb2Lf2Is6gxWdGljm41Cm68Z8pzFqaF2Rro8fPDd3ky SQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4abw8s3t-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 11:37:20 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24HBaldV025740;
-        Tue, 17 May 2022 11:37:18 GMT
+        Tue, 17 May 2022 11:32:55 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24HBWtr3011516;
+        Tue, 17 May 2022 11:32:55 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4abw8s34-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 May 2022 11:32:55 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24HBIMxH025084;
+        Tue, 17 May 2022 11:32:53 GMT
 Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3g2428uab1-1
+        by ppma03ams.nl.ibm.com with ESMTP id 3g2429c3st-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 11:37:17 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24HBbERr46858608
+        Tue, 17 May 2022 11:32:53 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24HBWnCw29819274
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 May 2022 11:37:14 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D011AA4060;
-        Tue, 17 May 2022 11:37:14 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A0FD6A405B;
-        Tue, 17 May 2022 11:37:14 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.40])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 17 May 2022 11:37:14 +0000 (GMT)
-Date:   Tue, 17 May 2022 13:32:40 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        borntraeger@linux.ibm.com
-Subject: Re: [PATCH v5 07/10] kvm: s390: Add CPU dump functionality
-Message-ID: <20220517133240.28f188c0@p-imbrenda>
-In-Reply-To: <20220516090817.1110090-8-frankja@linux.ibm.com>
-References: <20220516090817.1110090-1-frankja@linux.ibm.com>
-        <20220516090817.1110090-8-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-redhat-linux-gnu)
+        Tue, 17 May 2022 11:32:49 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A0D57A404D;
+        Tue, 17 May 2022 11:32:49 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 35CDAA4051;
+        Tue, 17 May 2022 11:32:49 +0000 (GMT)
+Received: from [9.152.224.153] (unknown [9.152.224.153])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 17 May 2022 11:32:49 +0000 (GMT)
+Message-ID: <fca64c54-b612-eabf-d460-5b200b581112@linux.ibm.com>
+Date:   Tue, 17 May 2022 13:32:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [kvm-unit-tests PATCH 5/6] s390x: uv-host: Add a set secure
+ config parameters test function
+Content-Language: en-US
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        kvm390 mailing list 
+        <kvm390-list@tuxmaker.boeblingen.de.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        imbrenda@linux.ibm.com, thuth@redhat.com, nrb@linux.ibm.com,
+        scgl@linux.ibm.com
+References: <20220513095017.16301-1-frankja@linux.ibm.com>
+ <20220513095017.16301-6-frankja@linux.ibm.com>
+From:   Steffen Eiden <seiden@linux.ibm.com>
+Organization: IBM
+In-Reply-To: <20220513095017.16301-6-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: DBmonJQ4iqxxY99_Az-TbTX-ykw5YLqA
-X-Proofpoint-ORIG-GUID: DBmonJQ4iqxxY99_Az-TbTX-ykw5YLqA
+X-Proofpoint-ORIG-GUID: ch58R9RMWd9MoWSYaRobu2ybXsAr0nb9
+X-Proofpoint-GUID: SbCOMFEkD7srnaSdhr2UYJ9iV0TI4v_r
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-17_02,2022-05-17_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- adultscore=0 mlxscore=0 lowpriorityscore=0 spamscore=0 bulkscore=0
- suspectscore=0 malwarescore=0 mlxlogscore=999 impostorscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205170069
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+ definitions=2022-05-17_02,2022-05-17_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
+ bulkscore=0 phishscore=0 mlxlogscore=999 spamscore=0 mlxscore=0
+ priorityscore=1501 malwarescore=0 clxscore=1015 lowpriorityscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205170068
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 16 May 2022 09:08:14 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
+Hey Janosch,
 
-> The previous patch introduced the per-VM dump functions now let's
-> focus on dumping the VCPU state via the newly introduced
-> KVM_S390_PV_CPU_COMMAND ioctl which mirrors the VM UV ioctl and can be
-> extended with new commands later.
+On 5/13/22 11:50, Janosch Frank wrote:
+> Time for more tests.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+
+Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+If you free 'pages'
+
 > ---
->  arch/s390/kvm/kvm-s390.c | 73 ++++++++++++++++++++++++++++++++++++++++
->  arch/s390/kvm/kvm-s390.h |  1 +
->  arch/s390/kvm/pv.c       | 16 +++++++++
->  include/uapi/linux/kvm.h |  4 +++
->  4 files changed, 94 insertions(+)
+>   s390x/uv-host.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 47 insertions(+)
 > 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 6bf9dd85d50f..c0c848c84552 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -5129,6 +5129,52 @@ long kvm_arch_vcpu_async_ioctl(struct file *filp,
->  	return -ENOIOCTLCMD;
->  }
->  
-> +static int kvm_s390_handle_pv_vcpu_dump(struct kvm_vcpu *vcpu,
-> +					struct kvm_pv_cmd *cmd)
+> diff --git a/s390x/uv-host.c b/s390x/uv-host.c
+> index 153a94e1..20d805b8 100644
+> --- a/s390x/uv-host.c
+> +++ b/s390x/uv-host.c
+> @@ -229,6 +229,52 @@ static void test_cpu_destroy(void)
+>   	report_prefix_pop();
+>   }
+>   
+> +static void test_set_se_header(void)
 > +{
-> +	struct kvm_s390_pv_dmp dmp;
-> +	void *data;
-> +	int ret;
-> +
-> +	/* Dump initialization is a prerequisite */
-> +	if (!vcpu->kvm->arch.pv.dumping)
-> +		return -EINVAL;
-> +
-> +	if (copy_from_user(&dmp, (__u8 __user *)cmd->data, sizeof(dmp)))
-> +		return -EFAULT;
-> +
-> +	/* We only handle this subcmd right now */
-> +	if (dmp.subcmd != KVM_PV_DUMP_CPU)
-> +		return -EINVAL;
-> +
-> +	/* CPU dump length is the same as create cpu storage donation. */
-> +	if (dmp.buff_len != uv_info.guest_cpu_stor_len)
-> +		return -EINVAL;
-> +
-> +	data = vzalloc(uv_info.guest_cpu_stor_len);
-
-is it really so big that you need to do a virtual allocation?
-(I thought it was at most a few pages)
-
-can you at least use kvzalloc?
-
-> +	if (!data)
-> +		return -ENOMEM;
-> +
-> +	ret = kvm_s390_pv_dump_cpu(vcpu, data, &cmd->rc, &cmd->rrc);
-> +
-> +	VCPU_EVENT(vcpu, 3, "PROTVIRT DUMP CPU %d rc %x rrc %x",
-> +		   vcpu->vcpu_id, cmd->rc, cmd->rrc);
-> +
-> +	if (ret) {
-> +		vfree(data);
-> +		return -EINVAL;
-
-if (ret)
-	ret = -EINVAL;
-
-> +	}
-> +
-> +	/* On success copy over the dump data */
-> +	if (copy_to_user((__u8 __user *)dmp.buff_addr, data, uv_info.guest_cpu_stor_len)) {
-
-if (!ret && ...)
-	ret = -EFAULT;
-
-> +		vfree(data);
-> +		return -EFAULT;
-> +	}
-> +
-> +	vfree(data);
-> +	return 0;
-
-return ret;
-
-
-this way you have only one free and one return, should be more readable
-
-> +}
-> +
->  long kvm_arch_vcpu_ioctl(struct file *filp,
->  			 unsigned int ioctl, unsigned long arg)
->  {
-> @@ -5293,6 +5339,33 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->  					   irq_state.len);
->  		break;
->  	}
-> +	case KVM_S390_PV_CPU_COMMAND: {
-> +		struct kvm_pv_cmd cmd;
-> +
-> +		r = -EINVAL;
-> +		if (!is_prot_virt_host())
-> +			break;
-> +
-> +		r = -EFAULT;
-> +		if (copy_from_user(&cmd, argp, sizeof(cmd)))
-> +			break;
-> +
-> +		r = -EINVAL;
-> +		if (cmd.flags)
-> +			break;
-> +
-> +		/* We only handle this cmd right now */
-> +		if (cmd.cmd != KVM_PV_DUMP)
-> +			break;
-> +
-> +		r = kvm_s390_handle_pv_vcpu_dump(vcpu, &cmd);
-> +
-> +		/* Always copy over UV rc / rrc data */
-> +		if (copy_to_user((__u8 __user *)argp, &cmd.rc,
-> +				 sizeof(cmd.rc) + sizeof(cmd.rrc)))
-> +			r = -EFAULT;
-> +		break;
-> +	}
->  	default:
->  		r = -ENOTTY;
->  	}
-> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-> index 2868dd0bba25..a39815184350 100644
-> --- a/arch/s390/kvm/kvm-s390.h
-> +++ b/arch/s390/kvm/kvm-s390.h
-> @@ -250,6 +250,7 @@ int kvm_s390_pv_set_sec_parms(struct kvm *kvm, void *hdr, u64 length, u16 *rc,
->  int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned long size,
->  		       unsigned long tweak, u16 *rc, u16 *rrc);
->  int kvm_s390_pv_set_cpu_state(struct kvm_vcpu *vcpu, u8 state);
-> +int kvm_s390_pv_dump_cpu(struct kvm_vcpu *vcpu, void *buff, u16 *rc, u16 *rrc);
->  int kvm_s390_pv_dump_stor_state(struct kvm *kvm, void __user *buff_user,
->  				u64 *gaddr, u64 buff_user_len, u16 *rc, u16 *rrc);
->  
-> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-> index fd261667d2c2..8c72330efc0e 100644
-> --- a/arch/s390/kvm/pv.c
-> +++ b/arch/s390/kvm/pv.c
-> @@ -300,6 +300,22 @@ int kvm_s390_pv_set_cpu_state(struct kvm_vcpu *vcpu, u8 state)
->  	return 0;
->  }
->  
-> +int kvm_s390_pv_dump_cpu(struct kvm_vcpu *vcpu, void *buff, u16 *rc, u16 *rrc)
-> +{
-> +	struct uv_cb_dump_cpu uvcb = {
-> +		.header.cmd = UVC_CMD_DUMP_CPU,
+> +	struct uv_cb_ssc uvcb = {
+> +		.header.cmd = UVC_CMD_SET_SEC_CONF_PARAMS,
 > +		.header.len = sizeof(uvcb),
-> +		.cpu_handle = vcpu->arch.pv.handle,
-> +		.dump_area_origin = (u64)buff,
+> +		.guest_handle = uvcb_cgc.guest_handle,
+> +		.sec_header_origin = 0,
+> +		.sec_header_len = 0x1000,
 > +	};
-> +	int cc;
+> +	void *pages =  alloc_pages(1);
+> +	void *inv;
+> +	int rc;
 > +
-> +	cc = uv_call_sched(0, (u64)&uvcb);
-> +	*rc = uvcb.header.rc;
-> +	*rrc = uvcb.header.rrc;
-> +	return cc;
+> +	report_prefix_push("sscp");
+> +
+> +	uvcb.header.len -= 8;
+> +	rc = uv_call(0, (uint64_t)&uvcb);
+> +	report(rc == 1 && uvcb.header.rc == UVC_RC_INV_LEN,
+> +	       "hdr invalid length");
+> +	uvcb.header.len += 8;
+> +
+> +	uvcb.guest_handle += 1;
+> +	rc = uv_call(0, (uint64_t)&uvcb);
+> +	report(rc == 1 && uvcb.header.rc == UVC_RC_INV_GHANDLE, "invalid handle");
+> +	uvcb.guest_handle -= 1;
+> +
+> +	inv = pages + PAGE_SIZE;
+> +	uvcb.sec_header_origin = (uint64_t)inv;
+> +	protect_page(inv, PAGE_ENTRY_I);
+> +	rc = uv_call(0, (uint64_t)&uvcb);
+> +	report(rc == 1 && uvcb.header.rc == 0x103,
+> +	       "se hdr access exception");
+> +
+> +	/*
+> +	 * Shift the ptr so the first few DWORDs are accessible but
+> +	 * the following are on an invalid page.
+> +	 */
+> +	uvcb.sec_header_origin -= 0x20;
+> +	rc = uv_call(0, (uint64_t)&uvcb);
+> +	report(rc == 1 && uvcb.header.rc == 0x103,
+> +	       "se hdr access exception crossing");
+> +	unprotect_page(inv, PAGE_ENTRY_I);
+
+please free 'pages'.
+
+> +
+> +	report_prefix_pop();
 > +}
 > +
->  /* Size of the cache for the storage state dump data. 1MB for now */
->  #define DUMP_BUFF_LEN HPAGE_SIZE
->  
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 1c60c2d314ba..0a8b57654ea7 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1657,6 +1657,7 @@ enum pv_cmd_dmp_id {
->  	KVM_PV_DUMP_INIT,
->  	KVM_PV_DUMP_CONFIG_STOR_STATE,
->  	KVM_PV_DUMP_COMPLETE,
-> +	KVM_PV_DUMP_CPU,
->  };
->  
->  struct kvm_s390_pv_dmp {
-> @@ -2118,4 +2119,7 @@ struct kvm_stats_desc {
->  /* Available with KVM_CAP_XSAVE2 */
->  #define KVM_GET_XSAVE2		  _IOR(KVMIO,  0xcf, struct kvm_xsave)
->  
-> +/* Available with KVM_CAP_S390_PROTECTED_DUMP */
-> +#define KVM_S390_PV_CPU_COMMAND	_IOWR(KVMIO, 0xd0, struct kvm_pv_cmd)
-> +
->  #endif /* __LINUX_KVM_H */
+>   static void test_cpu_create(void)
+>   {
+>   	int rc;
+> @@ -669,6 +715,7 @@ int main(void)
+>   
+>   	test_config_create();
+>   	test_cpu_create();
+> +	test_set_se_header();
+>   	test_cpu_destroy();
+>   	test_config_destroy();
+>   	test_clear();
 
+Steffen
