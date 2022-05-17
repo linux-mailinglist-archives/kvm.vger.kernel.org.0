@@ -2,261 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D22FC52A6C9
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 17:34:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B30DD52A70F
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 17:39:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348307AbiEQPec (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 11:34:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35744 "EHLO
+        id S1345008AbiEQPi4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 11:38:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232929AbiEQPea (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 11:34:30 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3856440E7D;
-        Tue, 17 May 2022 08:34:29 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24HFHiHO029950;
-        Tue, 17 May 2022 15:34:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=3N4OHjCBLTRes+QUFJLrXFM0igqq5oNDfD1rOss6h1M=;
- b=CmkUan5NR6mW3LZZ3lvS5ctY90b1IXf6cpgQ7YXe8gO2aWRJ2Y//yuJ86uQoQei7jLuk
- tckMrbbJfWmIZufYnVvklHebCwmy5gHNzlLyFGIOFRR7wMFRTqiJTBsxfSL9id350lhr
- /Na13zyYVJYoG8cPt9gjixNGzqMAtSzQsHzpqayByAKrm4XhDHr8jwQR3rg9r7rn+xzV
- OqRTDVUFAyeZpaDeL17YIY/YHKHbJvz1+ZsZ1NK5y5wtit+ds/1N0XwjjddPZut6t8Tu
- f+Ui7E8OGqvqYEObBHg9AEsx6xScmySg6UEkYyaO/N2SazbNDQlMnY0jKshHCJr3mAuC kQ== 
+        with ESMTP id S1350265AbiEQPiW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 11:38:22 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2768517EB
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 08:37:29 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24HFGo2D038560;
+        Tue, 17 May 2022 15:37:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=DsjSUDujk04Y8wGlsOF5Uhcwas+nD6D2HeSNEj6f3kQ=;
+ b=BugM1qpzdrOHbc0pk6x+ExMlw7w21ThH0R9B7YZTzgmi260cGhWNGqYwxCgwPEHzXGV3
+ Y7/Ek7ScKzRLla/gHL8wI4PEYbvulvA00fYXrDPB2Uy6lW7Nv6LdmBHGiWo21bgWlLr2
+ Q3J51hVkvrqJaWC8gW7N1SrVlmq+xjk2uTcsaCKLiWH/+k0OLMso8d628RY2YIRbrpBH
+ tFOcTF5QCyvQxon3vi52h18TlvvWpVXe5eUyGjUta9i+PhvzPQf7l9WOj1Rzwyom/iRD
+ 2obMZwD8/1l2SMvXe3lezjY80C6kL6U1nQJqgoRDS4pNWMBxrgx32L47vrQyCtYI8sNM 5Q== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4e7k0k37-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4dtx945n-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 15:34:28 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24HFIdbB032524;
-        Tue, 17 May 2022 15:34:28 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4e7k0k1m-1
+        Tue, 17 May 2022 15:37:22 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24HFH4Is039606;
+        Tue, 17 May 2022 15:37:22 GMT
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4dtx944x-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 15:34:27 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24HFRu9m031127;
-        Tue, 17 May 2022 15:34:25 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06ams.nl.ibm.com with ESMTP id 3g23pjcek5-1
+        Tue, 17 May 2022 15:37:21 +0000
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24HFSm05019031;
+        Tue, 17 May 2022 15:37:21 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma04dal.us.ibm.com with ESMTP id 3g3r2esk8n-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 15:34:25 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24HFKWnF54002078
+        Tue, 17 May 2022 15:37:21 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24HFbKnZ21299568
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 May 2022 15:20:32 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 91D50A405B;
-        Tue, 17 May 2022 15:34:22 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 43914A4054;
-        Tue, 17 May 2022 15:34:22 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.56.72])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 17 May 2022 15:34:22 +0000 (GMT)
-Message-ID: <64bc74c9170418c3b7c93834cbb425e0612ac4ad.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v2 3/4] s390x: Test effect of storage
- keys on some more instructions
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Date:   Tue, 17 May 2022 17:34:21 +0200
-In-Reply-To: <20220517155407.693c600f@p-imbrenda>
-References: <20220517115607.3252157-1-scgl@linux.ibm.com>
-         <20220517115607.3252157-4-scgl@linux.ibm.com>
-         <20220517155407.693c600f@p-imbrenda>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Tue, 17 May 2022 15:37:20 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1C7B8BE056;
+        Tue, 17 May 2022 15:37:20 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4395DBE04F;
+        Tue, 17 May 2022 15:37:19 +0000 (GMT)
+Received: from [9.211.37.97] (unknown [9.211.37.97])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue, 17 May 2022 15:37:19 +0000 (GMT)
+Message-ID: <2363ba6d-0e71-da6a-f8e5-e90c2305f1fe@linux.ibm.com>
+Date:   Tue, 17 May 2022 11:37:18 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH v2 0/6] Fully lock the container members of struct
+ vfio_group
+Content-Language: en-US
+To:     Nicolin Chen <nicolinc@nvidia.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Xiao Guangrong <guangrong.xiao@linux.intel.com>,
+        Jike Song <jike.song@intel.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>
+References: <0-v2-d035a1842d81+1bf-vfio_group_locking_jgg@nvidia.com>
+ <YoMunTOPFRrGASWq@Asurada-Nvidia>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <YoMunTOPFRrGASWq@Asurada-Nvidia>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: oLXpRRnMELiQwsnou6PlA3iQZto88ecD
-X-Proofpoint-ORIG-GUID: H2H6FUodyz7Gahxp5Hz2gXBexSZ1DbUz
+X-Proofpoint-ORIG-GUID: 1dNl7q7xc0OWBHMjo5JwJQx8KsVzkFa0
+X-Proofpoint-GUID: vHju8oAHqssQ4FqbR9u1UPrJ1potSVEB
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-05-17_03,2022-05-17_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 bulkscore=0 phishscore=0 spamscore=0 adultscore=0
- clxscore=1015 suspectscore=0 mlxlogscore=999 mlxscore=0 impostorscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ clxscore=1011 phishscore=0 malwarescore=0 bulkscore=0 spamscore=0
+ mlxscore=0 suspectscore=0 lowpriorityscore=0 priorityscore=1501
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2202240000 definitions=main-2205170095
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-05-17 at 15:54 +0200, Claudio Imbrenda wrote:
-> On Tue, 17 May 2022 13:56:06 +0200
-> Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
+On 5/17/22 1:11 AM, Nicolin Chen wrote:
+> On Mon, May 16, 2022 at 08:41:16PM -0300, Jason Gunthorpe wrote:
+>> The atomic based scheme for tracking the group->container and group->kvm
+>> has two race conditions, simplify it by adding a rwsem to protect those
+>> values and related and remove the atomics.
+>>
+>> This is on github: https://github.com/jgunthorpe/linux/commits/vfio_group_locking
+>>
+>> v2:
+>>   - Updated comments and commit messages
+>>   - Rebased on vfio next
+>>   - Left the dev_warn in place, will adjust it later
+>>   - s/singleton_file/opened_file/
+>> v1: https://lore.kernel.org/r/0-v1-c1d14aae2e8f+2f4-vfio_group_locking_jgg@nvidia.com
+>>
+>> Cc: Nicolin Chen <nicolinc@nvidia.com>
 > 
-> > Test correctness of some instructions handled by user space instead of
-> > KVM with regards to storage keys.
-> > Test success and error conditions, including coverage of storage and
-> > fetch protection override.
-> > 
-> > Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> > ---
-> >  s390x/skey.c        | 285 ++++++++++++++++++++++++++++++++++++++++++++
-> >  s390x/unittests.cfg |   1 +
-> >  2 files changed, 286 insertions(+)
-> > 
-> > diff --git a/s390x/skey.c b/s390x/skey.c
-> > index 19fa5721..60ae8158 100644
-> > --- a/s390x/skey.c
-> > +++ b/s390x/skey.c
-> > @@ -12,6 +12,7 @@
-> >  #include <asm/asm-offsets.h>
-> >  #include <asm/interrupt.h>
-> >  #include <vmalloc.h>
-> > +#include <css.h>
-> >  #include <asm/page.h>
-> >  #include <asm/facility.h>
-> >  #include <asm/mem.h>
-> > @@ -284,6 +285,115 @@ static void test_store_cpu_address(void)
-> >  	report_prefix_pop();
-> >  }
-> >  
-> > +/*
-> > + * Perform CHANNEL SUBSYSTEM CALL (CHSC)  instruction while temporarily executing
-> > + * with access key 1.
-> > + */
-> > +static unsigned int chsc_key_1(void *comm_block)
-> > +{
-> > +	uint32_t program_mask;
-> > +
-> > +	asm volatile (
-> > +		"spka	0x10\n\t"
-> > +		".insn	rre,0xb25f0000,%[comm_block],0\n\t"
-> > +		"spka	0\n\t"
-> > +		"ipm	%[program_mask]\n"
-> > +		: [program_mask] "=d" (program_mask)
-> > +		: [comm_block] "d" (comm_block)
-> > +		: "memory"
-> > +	);
-> > +	return program_mask >> 28;
-> > +}
-> > +
-> > +static const char chsc_msg[] = "Performed store-channel-subsystem-characteristics";
-> > +static void init_comm_block(uint16_t *comm_block)
-> > +{
-> > +	memset(comm_block, 0, PAGE_SIZE);
-> > +	/* store-channel-subsystem-characteristics command */
-> > +	comm_block[0] = 0x10;
-> > +	comm_block[1] = 0x10;
-> > +	comm_block[9] = 0;
-> > +}
-> > +
-> > +static void test_channel_subsystem_call(void)
-> > +{
-> > +	uint16_t *comm_block = (uint16_t *)&pagebuf;
-> > +	unsigned int cc;
-> > +
-> > +	report_prefix_push("CHANNEL SUBSYSTEM CALL");
-> > +
-> > +	report_prefix_push("zero key");
-> > +	init_comm_block(comm_block);
-> > +	set_storage_key(comm_block, 0x10, 0);
-> > +	asm volatile (
-> > +		".insn	rre,0xb25f0000,%[comm_block],0\n\t"
-> > +		"ipm	%[cc]\n"
-> > +		: [cc] "=d" (cc)
-> > +		: [comm_block] "d" (comm_block)
-> > +		: "memory"
-> > +	);
-> > +	cc = cc >> 28;
-> > +	report(cc == 0 && comm_block[9], chsc_msg);
-> > +	report_prefix_pop();
-> > +
-> > +	report_prefix_push("matching key");
-> > +	init_comm_block(comm_block);
-> > +	set_storage_key(comm_block, 0x10, 0);
-> > +	cc = chsc_key_1(comm_block);
-> > +	report(cc == 0 && comm_block[9], chsc_msg);
-> > +	report_prefix_pop();
-> > +
-> > +	report_prefix_push("mismatching key");
-> > +
-> > +	report_prefix_push("no fetch protection");
-> > +	init_comm_block(comm_block);
-> > +	set_storage_key(comm_block, 0x20, 0);
-> > +	expect_pgm_int();
-> > +	chsc_key_1(comm_block);
-> > +	check_key_prot_exc(ACC_UPDATE, PROT_STORE);
+> Sanity tested on x86_64 and ARM64.
 > 
-> I wonder if ACC_UPDATE is really needed here? you should clearly never
-> get a read error, right?
+> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
 
-Maybe the naming isn't great, the first argument specifies the access
-if it weren't for protection, not the access actually taking place.
-If a read is indicated, that will cause a test failure.
-You could use ACC_STORE, but that would be misleading, because it does
-do a fetch.
-> 
-> > +	report_prefix_pop();
-> > +
-> > +	report_prefix_push("fetch protection");
-> > +	init_comm_block(comm_block);
-> > +	set_storage_key(comm_block, 0x28, 0);
-> > +	expect_pgm_int();
-> > +	chsc_key_1(comm_block);
-> > +	check_key_prot_exc(ACC_UPDATE, PROT_FETCH_STORE);
-> 
-> and here, I guess you would wait for a read error? or is it actually
-> defined as unpredictable?
+Also sanity tested this series on s390x (vfio-pci and vfio-ap)
 
-Unpredictable, kvm and LPAR do different things IIRC, that's why I had
-the report_info.
-> 
-> (same for all ACC_UPDATE below)
-
-[...]
-> >  
-> > +/*
-> > + * Perform MODIFY SUBCHANNEL (MSCH) instruction while temporarily executing
-> > + * with access key 1.
-> > + */
-> > +static uint32_t modify_subchannel_key_1(uint32_t sid, struct schib *schib)
-> > +{
-> > +	uint32_t program_mask;
-> > +
-> > +/*
-> > + * gcc 12.0.1 warns if schib is < 4k.
-> > + * We need such addresses to test fetch protection override.
-> > + */
-> > +#pragma GCC diagnostic push
-> > +#pragma GCC diagnostic ignored "-Warray-bounds"
-> 
-> I really dislike these pragmas
-> 
-> can we find a nicer way?
-
-I'll do what ever we decide on in the other patch series.
-> 
-> > +	asm volatile (
-> > +		"lr %%r1,%[sid]\n\t"
-> > +		"spka	0x10\n\t"
-> > +		"msch	%[schib]\n\t"
-> > +		"spka	0\n\t"
-> > +		"ipm	%[program_mask]\n"
-> > +		: [program_mask] "=d" (program_mask)
-> > +		: [sid] "d" (sid),
-> > +		  [schib] "Q" (*schib)
-> > +		: "%r1"
-> > +	);
-> > +#pragma GCC diagnostic pop
-> > +	return program_mask >> 28;
-> > +}
-> > +
-[...]
-
-Thanks for the review, also for the other patch.
+Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
