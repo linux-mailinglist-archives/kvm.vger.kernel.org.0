@@ -2,96 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D06952A528
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 16:46:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75D8B52A55E
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 16:53:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349218AbiEQOqL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 10:46:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56730 "EHLO
+        id S1349422AbiEQOxe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 10:53:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349198AbiEQOqK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 10:46:10 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D5012702;
-        Tue, 17 May 2022 07:46:06 -0700 (PDT)
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24HDMgZY012974;
-        Tue, 17 May 2022 14:46:06 GMT
+        with ESMTP id S1349425AbiEQOxX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 10:53:23 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAF9C5007C;
+        Tue, 17 May 2022 07:53:02 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24HEJcWm026044;
+        Tue, 17 May 2022 14:53:01 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
  subject : message-id : in-reply-to : references : mime-version :
  content-type : content-transfer-encoding; s=pp1;
- bh=Pg0JKpH3PTn0fxBzUzc8UVJpX89sXpgMQsaZNUqAzdI=;
- b=Wyf19AlxorY8I9QlXPDy5p36MGbDYk+Rj7/gVBZT0+gsoy93T2G5J7j/uhyuioL6QnRR
- YltrBuS83qA2+kLR1dCV1XObDonQM4puBGF3QwwVmPi5hR+m7hGsCf0ohs+qYYvUPdwP
- b1eMWd0P2VbQsCZHtK3tNlRKfmQiU+6v9RXQz0FHYgIlcjxCFYfPMhi8u5rSwaj4VBrj
- t29A1sZnQPOvkpQxfvIU/Gd+ehxXK6+VxGKFwDtNQpZH3c74eQ7dQAYcmmFEh5qZFVFN
- m5WnwWX3wUL3i9rpGtFf121+Uo20rzocCIuiQjWN4c6WVFMFNB7+43BMqvqXoDXGOEKe ow== 
+ bh=6H/FBRfBZN80h5ovzXpTVaodLe/u85knV9Mzl/ezOKs=;
+ b=dumlG0KgEt0qi/kOBsiOgbS6fW1OqrEGxugdflf4eC8lmO2fRasSJqO2YXlBWmBEHXnI
+ DKV538dGsUb1vMlDqz/UQkHlFwdyz+nU5fysr1hIllnPAPQVOHJPzfV7/cNF3CNmTHB7
+ HZYTawO68OYQsK4K5q7qbGsw9RFc7lQxdgPsr8Asy85+QQqxmZR+Hn9IHNkVG8ZWRj9z
+ vbnZQouaudy5FQ+qmXQF0VUbxO5g/L7kc///srSItm3vPQwkuuCo6pasnjodQ4Pz15Dv
+ 7TwFt8ATOZGBO3Gpi5TYc3UmCf+Oo3jHovN6orNp3Kw+3che7KhpamzPCc2lKAQzGRYF yw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4chqtfjx-1
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4dcdrtsd-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 14:46:05 +0000
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24HDU1NB005728;
-        Tue, 17 May 2022 14:46:05 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4chqtfj2-1
+        Tue, 17 May 2022 14:53:01 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24HEKUl6028854;
+        Tue, 17 May 2022 14:53:01 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4dcdrtrw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 14:46:05 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24HEf2U2031405;
-        Tue, 17 May 2022 14:46:01 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma02fra.de.ibm.com with ESMTP id 3g2428kh4n-1
+        Tue, 17 May 2022 14:53:01 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24HEnm2A029377;
+        Tue, 17 May 2022 14:52:59 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 3g2429cda3-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 14:46:01 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24HEjwCn36962722
+        Tue, 17 May 2022 14:52:59 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24HEquuT49807850
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 May 2022 14:45:58 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9617211C04A;
-        Tue, 17 May 2022 14:45:58 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 37E0511C050;
-        Tue, 17 May 2022 14:45:58 +0000 (GMT)
+        Tue, 17 May 2022 14:52:56 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EBD9852050;
+        Tue, 17 May 2022 14:52:55 +0000 (GMT)
 Received: from p-imbrenda (unknown [9.152.224.40])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 17 May 2022 14:45:58 +0000 (GMT)
-Date:   Tue, 17 May 2022 16:45:56 +0200
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id B23975204F;
+        Tue, 17 May 2022 14:52:55 +0000 (GMT)
+Date:   Tue, 17 May 2022 16:52:53 +0200
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
+Cc:     Thomas Huth <thuth@redhat.com>,
         Janosch Frank <frankja@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] KVM: s390: Don't indicate suppression on
- dirtying, failing memop
-Message-ID: <20220517164556.43fc22bb@p-imbrenda>
-In-Reply-To: <20220512131019.2594948-2-scgl@linux.ibm.com>
-References: <20220512131019.2594948-1-scgl@linux.ibm.com>
-        <20220512131019.2594948-2-scgl@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v2 4/4] s390x: Test effect of storage
+ keys on diag 308
+Message-ID: <20220517165253.46799a10@p-imbrenda>
+In-Reply-To: <20220517115607.3252157-5-scgl@linux.ibm.com>
+References: <20220517115607.3252157-1-scgl@linux.ibm.com>
+        <20220517115607.3252157-5-scgl@linux.ibm.com>
 Organization: IBM
 X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Gzzh7hEK1GB0wbc7qsfQakJnZ2FSX55v
-X-Proofpoint-ORIG-GUID: LZiRXfUWm9-1Ry0gYocYVICla4OZ2VCS
+X-Proofpoint-GUID: T4OnAvUGXCr_lKT0mOiaq4Q3s1lSJn49
+X-Proofpoint-ORIG-GUID: -iFjp2mLaR6VD6f412aPeDptKJayr3Ka
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-05-17_03,2022-05-17_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
- bulkscore=0 mlxscore=0 malwarescore=0 clxscore=1011 phishscore=0
- suspectscore=0 adultscore=0 priorityscore=1501 impostorscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
+ phishscore=0 mlxscore=0 suspectscore=0 bulkscore=0 lowpriorityscore=0
+ adultscore=0 spamscore=0 impostorscore=0 mlxlogscore=999
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2202240000 definitions=main-2205170089
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
@@ -102,102 +92,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 12 May 2022 15:10:17 +0200
+On Tue, 17 May 2022 13:56:07 +0200
 Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
 
-> If user space uses a memop to emulate an instruction and that
-> memop fails, the execution of the instruction ends.
-> Instruction execution can end in different ways, one of which is
-> suppression, which requires that the instruction execute like a no-op.
-> A writing memop that spans multiple pages and fails due to key
-> protection may have modified guest memory, as a result, the likely
-> correct ending is termination. Therefore, do not indicate a
-> suppressing instruction ending in this case.
+> Test that key-controlled protection does not apply to diag 308.
 > 
 > Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
 > ---
->  Documentation/virt/kvm/api.rst |  6 ++++++
->  arch/s390/kvm/gaccess.c        | 22 ++++++++++++++++++----
->  2 files changed, 24 insertions(+), 4 deletions(-)
+>  s390x/skey.c | 26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 4a900cdbc62e..b6aba4f50db7 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -3754,12 +3754,18 @@ in case of KVM_S390_MEMOP_F_CHECK_ONLY), the ioctl returns a positive
->  error number indicating the type of exception. This exception is also
->  raised directly at the corresponding VCPU if the flag
->  KVM_S390_MEMOP_F_INJECT_EXCEPTION is set.
-> +On protection exceptions, unless specified otherwise, the injected
-> +translation-exception identifier (TEID) indicates suppression.
->  
->  If the KVM_S390_MEMOP_F_SKEY_PROTECTION flag is set, storage key
->  protection is also in effect and may cause exceptions if accesses are
->  prohibited given the access key designated by "key"; the valid range is 0..15.
->  KVM_S390_MEMOP_F_SKEY_PROTECTION is available if KVM_CAP_S390_MEM_OP_EXTENSION
->  is > 0.
-> +Since the accessed memory may span multiple pages and those pages might have
-> +different storage keys, it is possible that a protection exception occurs
-> +after memory has been modified. In this case, if the exception is injected,
-> +the TEID does not indicate suppression.
->  
->  Absolute read/write:
->  ^^^^^^^^^^^^^^^^^^^^
-> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-> index d53a183c2005..227ed0009354 100644
-> --- a/arch/s390/kvm/gaccess.c
-> +++ b/arch/s390/kvm/gaccess.c
-> @@ -491,8 +491,8 @@ enum prot_type {
->  	PROT_TYPE_IEP  = 4,
->  };
->  
-> -static int trans_exc(struct kvm_vcpu *vcpu, int code, unsigned long gva,
-> -		     u8 ar, enum gacc_mode mode, enum prot_type prot)
-> +static int trans_exc_ending(struct kvm_vcpu *vcpu, int code, unsigned long gva, u8 ar,
-> +			    enum gacc_mode mode, enum prot_type prot, bool terminate)
->  {
->  	struct kvm_s390_pgm_info *pgm = &vcpu->arch.pgm;
->  	struct trans_exc_code_bits *tec;
-> @@ -520,6 +520,11 @@ static int trans_exc(struct kvm_vcpu *vcpu, int code, unsigned long gva,
->  			tec->b61 = 1;
->  			break;
->  		}
-> +		if (terminate) {
-> +			tec->b56 = 0;
-> +			tec->b60 = 0;
-> +			tec->b61 = 0;
-> +		}
->  		fallthrough;
->  	case PGM_ASCE_TYPE:
->  	case PGM_PAGE_TRANSLATION:
-> @@ -552,6 +557,12 @@ static int trans_exc(struct kvm_vcpu *vcpu, int code, unsigned long gva,
->  	return code;
+> diff --git a/s390x/skey.c b/s390x/skey.c
+> index 60ae8158..c2d28ffd 100644
+> --- a/s390x/skey.c
+> +++ b/s390x/skey.c
+> @@ -285,6 +285,31 @@ static void test_store_cpu_address(void)
+>  	report_prefix_pop();
 >  }
 >  
-> +static int trans_exc(struct kvm_vcpu *vcpu, int code, unsigned long gva, u8 ar,
-> +		     enum gacc_mode mode, enum prot_type prot)
+> +static void test_diag_308(void)
 > +{
-> +	return trans_exc_ending(vcpu, code, gva, ar, mode, prot, false);
+> +	uint16_t response;
+> +	uint32_t (*ipib)[1024] = (void *)pagebuf;
+
+why not just uint32_t *ipib = (void *)pagebuf; ?
+
+> +
+> +	report_prefix_push("DIAG 308");
+> +	(*ipib)[0] = 0; /* Invalid length */
+
+then you can simply do:
+
+ipib[0] = 0;
+
+> +	set_storage_key(ipib, 0x28, 0);
+> +	/* key-controlled protection does not apply */
+> +	asm volatile (
+> +		"lr	%%r2,%[ipib]\n\t"
+> +		"spka	0x10\n\t"
+> +		"diag	%%r2,%[code],0x308\n\t"
+> +		"spka	0\n\t"
+> +		"lr	%[response],%%r3\n"
+> +		: [response] "=d" (response)
+> +		: [ipib] "d" (ipib),
+> +		  [code] "d" (5)
+> +		: "%r2", "%r3"
+> +	);
+> +	report(response == 0x402, "no exception on fetch, response: invalid IPIB");
+> +	set_storage_key(ipib, 0x00, 0);
+> +	report_prefix_pop();
 > +}
 > +
->  static int get_vcpu_asce(struct kvm_vcpu *vcpu, union asce *asce,
->  			 unsigned long ga, u8 ar, enum gacc_mode mode)
->  {
-> @@ -1109,8 +1120,11 @@ int access_guest_with_key(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
->  		data += fragment_len;
->  		ga = kvm_s390_logical_to_effective(vcpu, ga + fragment_len);
->  	}
-> -	if (rc > 0)
-> -		rc = trans_exc(vcpu, rc, ga, ar, mode, prot);
-> +	if (rc > 0) {
-> +		bool terminate = (mode == GACC_STORE) && (idx > 0);
-> +
-> +		rc = trans_exc_ending(vcpu, rc, ga, ar, mode, prot, terminate);
-> +	}
->  out_unlock:
->  	if (need_ipte_lock)
->  		ipte_unlock(vcpu);
+>  /*
+>   * Perform CHANNEL SUBSYSTEM CALL (CHSC)  instruction while temporarily executing
+>   * with access key 1.
+> @@ -714,6 +739,7 @@ int main(void)
+>  	test_chg();
+>  	test_test_protection();
+>  	test_store_cpu_address();
+> +	test_diag_308();
+>  	test_channel_subsystem_call();
+>  
+>  	setup_vm();
 
