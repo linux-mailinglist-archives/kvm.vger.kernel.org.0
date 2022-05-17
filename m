@@ -2,213 +2,252 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A4F452A5BA
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 17:11:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8090952A5C6
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 17:14:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349729AbiEQPLs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 11:11:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57884 "EHLO
+        id S1349717AbiEQPOV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 11:14:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349708AbiEQPLp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 11:11:45 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C67D83BF83;
-        Tue, 17 May 2022 08:11:44 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24HF7KkR016543;
-        Tue, 17 May 2022 15:11:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=Cu1bSHxpXmEYAuVuMDHUzrs2lNTuKf3OPQkm7p7CTX8=;
- b=ErFK0gn2oXKepMPam1jXXyvsNusO9mQYnbNGBij/f+fyi5whoohbHDEPetJlt2pqdeZ/
- t3r4Hq1Go9ejTIxxFOd4R/cmKtARgd3TRZz8UPTNB77D887bR2MclxaQzOWwqTTilkeB
- gHNEc7v+/damGY1e29IS9uG+QnKoYYCn7iY0s47dwUxeOHyg76ZcuMRufL5N/J5wSf9L
- vqweoSMaERp4t98Q34mGBSISByI8osGVxtQx25KanVqoQaNQn2feYj5laBc6ikxQtlpE
- rtL0Xlps3AOvepN6m6jVZjY8a5+Mnp6zQyMB4m4JMSckjGO3i1eASrvNd44eQVMGI3fi rA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4dpmh33q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 15:11:44 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24HF9h1O006562;
-        Tue, 17 May 2022 15:11:43 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4dpmh327-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 15:11:43 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24HF4MLc009351;
-        Tue, 17 May 2022 15:11:41 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06ams.nl.ibm.com with ESMTP id 3g23pjcdu8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 15:11:41 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24HEvm9247317452
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 May 2022 14:57:48 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 64855A404D;
-        Tue, 17 May 2022 15:11:38 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 14C3FA4040;
-        Tue, 17 May 2022 15:11:38 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.56.72])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 17 May 2022 15:11:38 +0000 (GMT)
-Message-ID: <5a0a7d03e11c8c4e379ac1a7198a8d965812fd63.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v2 2/4] s390x: Test TEID values in
- storage key test
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Date:   Tue, 17 May 2022 17:11:37 +0200
-In-Reply-To: <20220517154603.6c7b9af5@p-imbrenda>
-References: <20220517115607.3252157-1-scgl@linux.ibm.com>
-         <20220517115607.3252157-3-scgl@linux.ibm.com>
-         <20220517154603.6c7b9af5@p-imbrenda>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        with ESMTP id S234012AbiEQPOS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 11:14:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 93F6943491
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 08:14:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652800456;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zDg6wjmfUwF9ifzpSYYO2kPnU8cCr2A246HnYdWDqzY=;
+        b=QS205yLe0fDlM0CE9B7kpakdjwqWxoWBb/kc6BAfZbGiNfocNyptoxII6sr/+/Yz/rhNc0
+        GzTaFwIQVbLb/vYcaXyYoN/IOaeA/yY+WGsJzfB1G+AjbQttOSyOnVupdvoZyfLVlNiSoh
+        W+eMi4u5PESKHpSFId2AzdDHK0M0nx0=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-623-ttOiYiRcONqojDVSa2MEGw-1; Tue, 17 May 2022 11:14:15 -0400
+X-MC-Unique: ttOiYiRcONqojDVSa2MEGw-1
+Received: by mail-qv1-f70.google.com with SMTP id q36-20020a0c9127000000b00461e3828064so692686qvq.12
+        for <kvm@vger.kernel.org>; Tue, 17 May 2022 08:14:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=zDg6wjmfUwF9ifzpSYYO2kPnU8cCr2A246HnYdWDqzY=;
+        b=rphdVLMTMVAUmzjy/SGl2dI5iKNXCa8XGlqJoFOU1Xmtv/eF92A+q3ugJKEbhAsMqh
+         z8Yv5NUr9WQyjeg8jX+NkcuFbKn2VaR4JYrINp9FipPQR+HjeaPz3aXkNuEPIdy/YzsT
+         x0Jk+s2Z4xRTTtWdy7eRcqMXr9WXSC3c5wqozMBcdVPGBvWfArx8EgIrtc3Tw6modeBw
+         NKa4KJ2LjwevKNmtM9WL//yaRenngc6j7tiBQIdPP5H1CQgA0+oinY+oarYaXK1BI2H1
+         DXQC6Ll97ZWr8TvGwzOU+LXyjAPhhsPm/VtLuHFB5aRyg0YBtad06AmG0ILvHzcEh/Go
+         g1MQ==
+X-Gm-Message-State: AOAM5311DHaQNs5S28G+iTGbPhrsBLkM087l8nhRI/nvRds/omzpAyrK
+        ao2II12mth/wi2WejtOn+H7ijHPPSAEmAdZQyyGTQHBNS7dJY0ABuWtcR2FT/s/GkP8Ekfi/U/2
+        kZKxfExTO7wkY
+X-Received: by 2002:a05:6214:2aa6:b0:45b:474:f9d7 with SMTP id js6-20020a0562142aa600b0045b0474f9d7mr20456629qvb.75.1652800454674;
+        Tue, 17 May 2022 08:14:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw/BKkbx8m7APmdAwXMw6SgVlGa68Jz3O00qhGKjVlF/OOrYsrrU0GaJ2fqzzjTz3cD1U+3rg==
+X-Received: by 2002:a05:6214:2aa6:b0:45b:474:f9d7 with SMTP id js6-20020a0562142aa600b0045b0474f9d7mr20456598qvb.75.1652800454354;
+        Tue, 17 May 2022 08:14:14 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-12-25-16.business.telecomitalia.it. [87.12.25.16])
+        by smtp.gmail.com with ESMTPSA id b21-20020ac85415000000b002f39b99f68asm7817273qtq.36.2022.05.17.08.14.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 May 2022 08:14:13 -0700 (PDT)
+Date:   Tue, 17 May 2022 17:14:04 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        kernel <kernel@sberdevices.ru>
+Subject: Re: [RFC PATCH v1 0/8] virtio/vsock: experimental zerocopy receive
+Message-ID: <20220517151404.vqse5tampdsaaeji@sgarzare-redhat>
+References: <7cdcb1e1-7c97-c054-19cf-5caeacae981d@sberdevices.ru>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: LoDX32w-QyTfbMXI3sqXPX9N_yEGr27E
-X-Proofpoint-ORIG-GUID: zj8A451-0p9TE1GYAAx9m4xQmq51u2CA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-17_03,2022-05-17_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
- adultscore=0 malwarescore=0 mlxlogscore=999 bulkscore=0 phishscore=0
- clxscore=1015 priorityscore=1501 mlxscore=0 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205170092
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <7cdcb1e1-7c97-c054-19cf-5caeacae981d@sberdevices.ru>
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-05-17 at 15:46 +0200, Claudio Imbrenda wrote:
-> On Tue, 17 May 2022 13:56:05 +0200
-> Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
-> 
-> > On a protection exception, test that the Translation-Exception
-> > Identification (TEID) values are correct given the circumstances of the
-> > particular test.
-> > The meaning of the TEID values is dependent on the installed
-> > suppression-on-protection facility.
-> > 
-> > Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> > ---
-> >  lib/s390x/asm/facility.h | 21 ++++++++++++++
-> >  lib/s390x/sclp.h         |  4 +++
-> >  lib/s390x/sclp.c         |  2 ++
-> >  s390x/skey.c             | 60 ++++++++++++++++++++++++++++++++++++----
-> >  4 files changed, 81 insertions(+), 6 deletions(-)
-> > 
-[...]
+Hi Arseniy,
 
-> > +static void check_key_prot_exc(enum access access, enum protection prot)
-> > +{
-> > +	struct lowcore *lc = 0;
-> > +	union teid teid;
-> > +
-> > +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-> > +	report_prefix_push("TEID");
-> > +	teid.val = lc->trans_exc_id;
-> > +	switch (get_supp_on_prot_facility()) {
-> > +	case SOP_NONE:
-> > +	case SOP_BASIC:
-> > +		break;
-> > +	case SOP_ENHANCED_1:
-> > +		if ((teid.val & (BIT(63 - 61))) == 0)
-> 
-> can you at least replace the hardcoded values with a macro or a const
-> variable?
+On Thu, May 12, 2022 at 05:04:11AM +0000, Arseniy Krasnov wrote:
+>                              INTRODUCTION
+>
+>	Hello, this is experimental implementation of virtio vsock zerocopy
+>receive. It was inspired by TCP zerocopy receive by Eric Dumazet. This API uses
+>same idea: call 'mmap()' on socket's descriptor, then every 'getsockopt()' will
+>fill provided vma area with pages of virtio RX buffers. After received data was
+>processed by user, pages must be freed by 'madvise()'  call with MADV_DONTNEED
+>flag set(if user won't call 'madvise()', next 'getsockopt()' will fail).
 
-I'll see if maybe I can come up with a nice way to extend the teid, but
-I'll use a const if not.
-> 
-> like:
-> 
-> 	const unsigned long esop_bit = BIT(63 - 61);
-> 
-> 	...
-> 
-> 		if (!(teid.val & esop_bit))
-> 
-> > +			report_pass("key-controlled protection");
-> 
-> actually, now that I think of it, aren't we expecting the bit to be
-> zero? should that not be like this?
-> 
-> report (!(teid.val & esop_bit), ...);
+Sounds cool, but maybe we would need some socket/net experts here for 
+review.
 
-Indeed.
-> 
-> > +		break;
-> > +	case SOP_ENHANCED_2:
-> > +		if ((teid.val & (BIT(63 - 56) | BIT(63 - 61))) == 0) {
-> 
-> const unsigned long esop2_bits = 0x8C;	/* bits 56, 60, and 61 */
-> const unsigned long esop2_key_prot = BIT(63 - 60);
-> 
-> if ((teid.val & esop2_bits) == 0) {
-> 	report_pass(...);
-> 
-> > +			report_pass("key-controlled protection");
-> > +			if (teid.val & BIT(63 - 60)) {
-> 
-> } else if ((teid.val & esop2_bits) == esop_key_prot) {
+Could we do something similar for the sending path as well?
 
-010 binary also means key protection, so we should pass that test here,
-too. The access code checking is an additional test, IMO.
-> 
-> > +				int access_code = teid.fetch << 1 | teid.store;
-> > +
-> > +				if (access_code == 2)
-> > +					report((access & 2) && (prot & 2),
-> > +					       "exception due to fetch");
-> > +				if (access_code == 1)
-> > +					report((access & 1) && (prot & 1),
-> > +					       "exception due to store");
-> > +				/* no relevant information if code is 0 or 3 */
-> 
-> here you should check for the access-exception-fetch/store-indi-
-> cation facility, then you can check the access code
+>
+>                                 DETAILS
+>
+>	Here is how mapping with mapped pages looks exactly: first page mapping
+>contains array of trimmed virtio vsock packet headers (in contains only length
+>of data on the corresponding page and 'flags' field):
+>
+>	struct virtio_vsock_usr_hdr {
+>		uint32_t length;
+>		uint32_t flags;
+>	};
+>
+>Field  'length' allows user to know exact size of payload within each sequence
+>of pages and 'flags' allows user to handle SOCK_SEQPACKET flags(such as message
+>bounds or record bounds). All other pages are data pages from RX queue.
+>
+>             Page 0      Page 1      Page N
+>
+>	[ hdr1 .. hdrN ][ data ] .. [ data ]
+>           |        |       ^           ^
+>           |        |       |           |
+>           |        *-------------------*
+>           |                |
+>           |                |
+>           *----------------*
+>
+>	Of course, single header could represent array of pages (when packet's
+>buffer is bigger than one page).So here is example of detailed mapping layout
+>for some set of packages. Lets consider that we have the following sequence  of
+>packages: 56 bytes, 4096 bytes and 8200 bytes. All pages: 0,1,2,3,4 and 5 will
+>be inserted to user's vma(vma is large enough).
+>
+>	Page 0: [[ hdr0 ][ hdr 1 ][ hdr 2 ][ hdr 3 ] ... ]
+>	Page 1: [ 56 ]
+>	Page 2: [ 4096 ]
+>	Page 3: [ 4096 ]
+>	Page 4: [ 4096 ]
+>	Page 5: [ 8 ]
+>
+>	Page 0 contains only array of headers:
+>	'hdr0' has 56 in length field.
+>	'hdr1' has 4096 in length field.
+>	'hdr2' has 8200 in length field.
+>	'hdr3' has 0 in length field(this is end of data marker).
+>
+>	Page 1 corresponds to 'hdr0' and has only 56 bytes of data.
+>	Page 2 corresponds to 'hdr1' and filled with data.
+>	Page 3 corresponds to 'hdr2' and filled with data.
+>	Page 4 corresponds to 'hdr2' and filled with data.
+>	Page 5 corresponds to 'hdr2' and has only 8 bytes of data.
+>
+>	This patchset also changes packets allocation way: today implementation
+>uses only 'kmalloc()' to create data buffer. Problem happens when we try to map
+>such buffers to user's vma - kernel forbids to map slab pages to user's vma(as
+>pages of "not large" 'kmalloc()' allocations are marked with PageSlab flag and
+>"not large" could be bigger than one page). So to avoid this, data buffers now
+>allocated using 'alloc_pages()' call.
+>
+>                                   TESTS
+>
+>	This patchset updates 'vsock_test' utility: two tests for new feature
+>were added. First test covers invalid cases. Second checks valid transmission
+>case.
 
-Oh, yes. By the way, can we get rid of magic numbers for facility
-checking? Just defining an enum in lib/asm/facility.h and doing
-test_facility(FCLTY_ACCESS_EXC_FETCH_STORE_INDICATION) would be an
-improvement.
-Well, I guess you'd end up with quite horribly long names, but at least
-you have to review the values only once and not for every patch that
-tests a facility. 
-> 
-> and at this point you should check for 0 explicitly (always pass) and 3
-> (always fail)
+Thanks for adding the test!
 
-I'm fine with passing 0, but I'm not so sure about 3.
-The value is reserved, so the correct thing to do is to not attribute
-*any* meaning to it. But kvm currently really should not set it either.
-> > +			}
-> > +		}
-> 
-> } else {
-> 	/* not key protection */
-> 	report_fail(...);
-> }
-> > +		break;
-> > +	}
-> > +	report_prefix_pop();
-> > +}
-> > +
-[...]
+>
+>                                BENCHMARKING
+>
+>	For benchmakring I've added small utility 'rx_zerocopy'. It works in
+>client/server mode. When client connects to server, server starts sending exact
+>amount of data to client(amount is set as input argument).Client reads data and
+>waits for next portion of it. Client works in two modes: copy and zero-copy. In
+>copy mode client uses 'read()' call while in zerocopy mode sequence of 'mmap()'
+>/'getsockopt()'/'madvise()' are used. Smaller amount of time for transmission
+>is better. For server, we can set size of tx buffer and for client we can set
+>size of rx buffer or rx mapping size(in zerocopy mode). Usage of this utility
+>is quiet simple:
+>
+>For client mode:
+>
+>./rx_zerocopy --mode client [--zerocopy] [--rx]
+>
+>For server mode:
+>
+>./rx_zerocopy --mode server [--mb] [--tx]
+>
+>[--mb] sets number of megabytes to transfer.
+>[--rx] sets size of receive buffer/mapping in pages.
+>[--tx] sets size of transmit buffer in pages.
+>
+>I checked for transmission of 4000mb of data. Here are some results:
+>
+>                           size of rx/tx buffers in pages
+>               *---------------------------------------------------*
+>               |    8   |    32    |    64   |   256    |   512    |
+>*--------------*--------*----------*---------*----------*----------*
+>|   zerocopy   |   24   |   10.6   |  12.2   |   23.6   |    21    | secs to
+>*--------------*---------------------------------------------------- process
+>| non-zerocopy |   13   |   16.4   |  24.7   |   27.2   |   23.9   | 4000 mb
+>*--------------*----------------------------------------------------
+>
+>I think, that results are not so impressive, but at least it is not worse than
+>copy mode and there is no need to allocate memory for processing date.
+
+Why is it twice as slow in the first column?
+
+>
+>                                 PROBLEMS
+>
+>	Updated packet's allocation logic creates some problem: when host gets
+>data from guest(in vhost-vsock), it allocates at least one page for each packet
+>(even if packet has 1 byte payload). I think this could be resolved in several
+>ways:
+
+Can we somehow copy the incoming packets into the payload of the already 
+queued packet?
+
+This reminds me that we have yet to fix a similar problem with kmalloc() 
+as well...
+
+https://bugzilla.kernel.org/show_bug.cgi?id=215329
+
+>	1) Make zerocopy rx mode disabled by default, so if user didn't enable
+>it, current 'kmalloc()' way will be used.
+
+That sounds reasonable to me, I guess also TCP needs a setsockopt() call 
+to enable the feature, right?
+
+>	2) Use 'kmalloc()' for "small" packets, else call page allocator. But
+>in this case, we have mix of packets, allocated in two different ways thus
+>during zerocopying to user(e.g. mapping pages to vma), such small packets will
+>be handled in some stupid way: we need to allocate one page for user, copy data
+>to it and then insert page to user's vma.
+
+It seems more difficult to me, but at the same time doable. I would go 
+more on option 1, though.
+
+>
+>P.S: of course this is experimental RFC, so what do You think guys?
+
+It seems cool :-)
+
+But I would like some feedback from the net guys to have some TCP-like 
+things.
+
+Thanks,
+Stefano
 
