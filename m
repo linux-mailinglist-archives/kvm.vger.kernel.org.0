@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A31A52A731
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 17:42:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9507C52A720
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 17:42:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231422AbiEQPmi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 11:42:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57712 "EHLO
+        id S1350374AbiEQPmK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 11:42:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350547AbiEQPlm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1350545AbiEQPlm (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 17 May 2022 11:41:42 -0400
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F0843F898;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F22F40E7C;
         Tue, 17 May 2022 08:41:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1652802101; x=1684338101;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=njriNDWkJo/CGBBG2fgNO9CifzSr6dDblusxyiMLf2k=;
-  b=hJDGAVfrUjB+wHSGg8w9wB3GWcjt9z/BGZb0bjqNT+o5gIl+gZnfJ6zV
-   UwMYi8O2DmDpdfWErxkaE18idypLoJmQTBY6Qt9brxLoJbEauxqq0C6mF
-   ce4i4I33s/RPvV1fQzjGd96Bs9MPebzsV+ffCSw4q/r0TLrOlEIyHucdc
-   YiKuBwHpOXwa1JIWk29Y43Zcg5LhqjbhbaAGRZcd1SI/cWzCjyDmYVrZ3
-   gXVYmLn1C4VCwVYbMbfUYySnZGeNzoyp0o4KIJb5niJ+YRew4ceGonRW6
-   hCBk5cxsb504h4wrD+1sFnre6oZKE/Q6OGrZxZHTDDw0zZPmTmSJc2nsB
+  bh=FYcsQ3yBA55TzunpKA1JkgwmQnJRWTNGqxFrZwfAGHg=;
+  b=YGfYu0skA9Xwc3MFkt+fDBGl0T/xkDkn8yBxgBb6vxyvEMMJUDhIxrlW
+   w62Yzx5/dhKhr4Gnhs0rmlerSiVfzv1S1Xp2eHNKvqPrq3L/GPfz87n0W
+   +NubFSAjH9qzeqzj+mKbIsr4OfojbR/lUrMjdzpuqexpLuBXD9ayUC6sw
+   qoRpV33QoJTSn5lu6txNKSn842Qqfoyv5f6iuvApXWFn6ic2yzoLrzdE7
+   m+YpWidQkd68qxRFcUbG6UGYAgBR1E2wSgNa32P5j46rnXTxzirD/tKND
+   VcuonhfQSINuWZg1G3Kau4ZPMdAa3CZeereSr4EZ2vPnPYHMiIfHHo9tk
    A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10350"; a="357632117"
+X-IronPort-AV: E=McAfee;i="6400,9594,10350"; a="357632118"
 X-IronPort-AV: E=Sophos;i="5.91,233,1647327600"; 
-   d="scan'208";a="357632117"
+   d="scan'208";a="357632118"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
   by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2022 08:41:36 -0700
 X-IronPort-AV: E=Sophos;i="5.91,233,1647327600"; 
-   d="scan'208";a="626533610"
+   d="scan'208";a="626533614"
 Received: from embargo.jf.intel.com ([10.165.9.183])
   by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2022 08:41:36 -0700
 From:   Yang Weijiang <weijiang.yang@intel.com>
@@ -41,10 +41,11 @@ To:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
         like.xu.linux@gmail.com, vkuznets@redhat.com,
         kan.liang@linux.intel.com, wei.w.wang@intel.com,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH v12 15/16] KVM: x86: Add Arch LBR data MSR access interface
-Date:   Tue, 17 May 2022 11:40:59 -0400
-Message-Id: <20220517154100.29983-16-weijiang.yang@intel.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>,
+        Like Xu <like.xu@linux.intel.com>
+Subject: [PATCH v12 16/16] KVM: x86/cpuid: Advertise Arch LBR feature in CPUID
+Date:   Tue, 17 May 2022 11:41:00 -0400
+Message-Id: <20220517154100.29983-17-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220517154100.29983-1-weijiang.yang@intel.com>
 References: <20220517154100.29983-1-weijiang.yang@intel.com>
@@ -60,47 +61,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Arch LBR MSRs are xsave-supported, but they're operated as "independent"
-xsave feature by PMU code, i.e., during thread/process context switch,
-the MSRs are saved/restored with perf_event_task_sched_{in|out} instead
-of generic kernel fpu switch code, i.e.,save_fpregs_to_fpstate() and
-restore_fpregs_from_fpstate(). When vcpu guest/host fpu state swap happens,
-Arch LBR MSRs are retained so they can be accessed directly.
+Add Arch LBR feature bit in CPU cap-mask to expose the feature.
+Only max LBR depth is supported for guest, and it's consistent
+with host Arch LBR settings.
 
+Co-developed-by: Like Xu <like.xu@linux.intel.com>
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 Reviewed-by: Kan Liang <kan.liang@linux.intel.com>
 ---
- arch/x86/kvm/vmx/pmu_intel.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ arch/x86/kvm/cpuid.c | 33 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 32 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index f5499f391a8b..c7466ba2918e 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -432,6 +432,11 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_ARCH_LBR_CTL:
- 		msr_info->data = vmcs_read64(GUEST_IA32_LBR_CTL);
- 		return 0;
-+	case MSR_ARCH_LBR_FROM_0 ... MSR_ARCH_LBR_FROM_0 + 31:
-+	case MSR_ARCH_LBR_TO_0 ... MSR_ARCH_LBR_TO_0 + 31:
-+	case MSR_ARCH_LBR_INFO_0 ... MSR_ARCH_LBR_INFO_0 + 31:
-+		rdmsrl(msr_info->index, msr_info->data);
-+		return 0;
- 	default:
- 		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
- 		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
-@@ -534,6 +539,11 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		    (data & ARCH_LBR_CTL_LBREN))
- 			intel_pmu_create_guest_lbr_event(vcpu);
- 		return 0;
-+	case MSR_ARCH_LBR_FROM_0 ... MSR_ARCH_LBR_FROM_0 + 31:
-+	case MSR_ARCH_LBR_TO_0 ... MSR_ARCH_LBR_TO_0 + 31:
-+	case MSR_ARCH_LBR_INFO_0 ... MSR_ARCH_LBR_INFO_0 + 31:
-+		wrmsrl(msr_info->index, msr_info->data);
-+		return 0;
- 	default:
- 		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
- 		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index b88609847188..1a2fb9a8c0d5 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -102,6 +102,16 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
+ 		if (vaddr_bits != 48 && vaddr_bits != 57 && vaddr_bits != 0)
+ 			return -EINVAL;
+ 	}
++	best = cpuid_entry2_find(entries, nent, 0x1c, 0);
++	if (best) {
++		unsigned int eax, ebx, ecx, edx;
++
++		/* Reject user-space CPUID if depth is different from host's.*/
++		cpuid_count(0x1c, 0, &eax, &ebx, &ecx, &edx);
++
++		if ((best->eax & 0xff) != BIT(fls(eax & 0xff) - 1))
++			return -EINVAL;
++	}
+ 
+ 	/*
+ 	 * Exposing dynamic xfeatures to the guest requires additional
+@@ -598,7 +608,7 @@ void kvm_set_cpu_caps(void)
+ 		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
+ 		F(MD_CLEAR) | F(AVX512_VP2INTERSECT) | F(FSRM) |
+ 		F(SERIALIZE) | F(TSXLDTRK) | F(AVX512_FP16) |
+-		F(AMX_TILE) | F(AMX_INT8) | F(AMX_BF16)
++		F(AMX_TILE) | F(AMX_INT8) | F(AMX_BF16) | F(ARCH_LBR)
+ 	);
+ 
+ 	/* TSC_ADJUST and ARCH_CAPABILITIES are emulated in software. */
+@@ -1038,6 +1048,27 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 				goto out;
+ 		}
+ 		break;
++	/* Architectural LBR */
++	case 0x1c: {
++		u32 lbr_depth_mask = entry->eax & 0xff;
++
++		if (!lbr_depth_mask ||
++		    !kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR)) {
++			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
++			break;
++		}
++		/*
++		 * KVM only exposes the maximum supported depth, which is the
++		 * fixed value used on the host side.
++		 * KVM doesn't allow VMM userspace to adjust LBR depth because
++		 * guest LBR emulation depends on the configuration of host LBR
++		 * driver.
++		 */
++		lbr_depth_mask = BIT((fls(lbr_depth_mask) - 1));
++		entry->eax &= ~0xff;
++		entry->eax |= lbr_depth_mask;
++		break;
++	}
+ 	/* Intel AMX TILE */
+ 	case 0x1d:
+ 		if (!kvm_cpu_cap_has(X86_FEATURE_AMX_TILE)) {
 -- 
 2.27.0
 
