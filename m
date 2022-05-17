@@ -2,115 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8145D52A41A
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 16:02:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 33BD252A421
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 16:02:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348235AbiEQOC1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 10:02:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59628 "EHLO
+        id S1348322AbiEQOCs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 10:02:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346587AbiEQOCZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 10:02:25 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C2E437BF9;
-        Tue, 17 May 2022 07:02:24 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24HD7lP9029190;
-        Tue, 17 May 2022 14:02:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : reply-to : subject : to : cc : references : from :
- in-reply-to : content-type : content-transfer-encoding; s=pp1;
- bh=DrVpZigRu9u6n68/um6cr9ohlOVQVmzfH2/MDHip6dU=;
- b=BG+/C+xm5xQcNT8GUiK1gvuDulbqj4JsCV4Jzt0BPSkj2zhN4B8N24FoTIr1Bav4Bs2l
- 0WuzlIWfclrZZQt8zZSPNmQiybTYRk/xGCMGdTxZgsMSV4fUP9zrF2AT4jyFGuIlPqeO
- Dq+5nB3Zr2Rye0KW6Ed1fLuAat+nVoTrE4YWINLqUm8wQg4fOKuEyLe1k7PjrPOmLddi
- f6eMGpAxVCrtg2CR284cKPMRgms/TiM33gC2jwwIZkm3Mdb78vixMD35mRPmrFnJQyy7
- 4O8ajnonIHwEUDvsVecQGBXg2FQ+ZAYf/3kQQWSCUV55UZK0lzTwvcK4700hn517/Nmj NQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4cafhc9k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 14:02:14 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24HDksrx022419;
-        Tue, 17 May 2022 14:02:14 GMT
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4cafhc98-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 14:02:14 +0000
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24HDvjEZ022166;
-        Tue, 17 May 2022 14:02:13 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma03dal.us.ibm.com with ESMTP id 3g242ab3p1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 14:02:13 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24HE2C1p28443014
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 May 2022 14:02:12 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4D9DE2805A;
-        Tue, 17 May 2022 14:02:12 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7232128059;
-        Tue, 17 May 2022 14:02:11 +0000 (GMT)
-Received: from [9.65.94.178] (unknown [9.65.94.178])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 17 May 2022 14:02:11 +0000 (GMT)
-Message-ID: <a26ce34d-0ed8-5479-805b-d863ff056848@linux.ibm.com>
-Date:   Tue, 17 May 2022 10:02:11 -0400
+        with ESMTP id S1348265AbiEQOCk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 10:02:40 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4948E3DDCE;
+        Tue, 17 May 2022 07:02:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652796159; x=1684332159;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=faeEMQ7OyUUptQglXkgamVq5rsrzWsmKaeH4VwE3gNU=;
+  b=Wltjw9gTX/Mey9tS9nQS5iv15tymLLm12keeV+qLVPf3famUPFAbOtXO
+   HKudZlpGqrr0c1havLPzpxiPKUBFVKMV2crXFpFGET68vqvBRnWDnTZGa
+   GuN7bXeDtY1T4fOcGZzIAn4Esoq47NnsFeKSJI8zTd0joEpoqmvSdpLQk
+   2ZGAuTLgB3hevW5gjoX/PnWnN4yC14KgBb88IvoMDeJXCJHDhJcEHVrnV
+   YValSHRh74aDQPTF+MQKT6WnpNsCTnbMoLHxO+TybzdeWIlHPezPzg2q7
+   aF0CAEa5oK1gPSq5fsAO6oaDpX6tncGVjUi3Tt179AX8p/3y0ny1WNkl8
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10349"; a="357602592"
+X-IronPort-AV: E=Sophos;i="5.91,233,1647327600"; 
+   d="scan'208";a="357602592"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2022 07:02:38 -0700
+X-IronPort-AV: E=Sophos;i="5.91,233,1647327600"; 
+   d="scan'208";a="568907519"
+Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.23])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2022 07:02:32 -0700
+Date:   Tue, 17 May 2022 22:02:23 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Zeng Guang <guang.zeng@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        "Huang, Kai" <kai.huang@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Hu, Robert" <robert.hu@intel.com>
+Subject: Re: [PATCH v9 0/9] IPI virtualization support for VM
+Message-ID: <20220517140218.GA569@gao-cwp>
+References: <20220419153155.11504-1-guang.zeng@intel.com>
+ <2d33b71a-13e5-d377-abc2-c20958526497@redhat.com>
+ <cf178428-8c98-e7b3-4317-8282938976fd@intel.com>
+ <f0e633b3-38ea-f288-c74d-487387cefddc@redhat.com>
+ <YoK48P2UrrjxaRrJ@google.com>
+ <20220517135321.GA31556@gao-cwp>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Reply-To: jjherne@linux.ibm.com
-Subject: Re: [PATCH v19 07/20] s390/vfio-ap: rename matrix_dev->lock mutex to
- matrix_dev->mdevs_lock
-Content-Language: en-US
-To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com
-References: <20220404221039.1272245-1-akrowiak@linux.ibm.com>
- <20220404221039.1272245-8-akrowiak@linux.ibm.com>
-From:   "Jason J. Herne" <jjherne@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <20220404221039.1272245-8-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 1S2X6TnasrcIRhSuV07yWaDP2llsHoxk
-X-Proofpoint-GUID: SoYli1w7L62sEgmMRmMImVUu3KZ19Pfl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-17_03,2022-05-17_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- bulkscore=0 lowpriorityscore=0 suspectscore=0 mlxscore=0 mlxlogscore=999
- phishscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205170083
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220517135321.GA31556@gao-cwp>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/4/22 18:10, Tony Krowiak wrote:
-> The matrix_dev->lock mutex is being renamed to matrix_dev->mdevs_lock to
-> better reflect its purpose, which is to control access to the state of the
-> mediated devices under the control of the vfio_ap device driver.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->   drivers/s390/crypto/vfio_ap_drv.c     |  6 +--
->   drivers/s390/crypto/vfio_ap_ops.c     | 72 ++++++++++++++-------------
->   drivers/s390/crypto/vfio_ap_private.h |  4 +-
->   3 files changed, 42 insertions(+), 40 deletions(-)
-Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
++ Maxim
 
--- 
--- Jason J. Herne (jjherne@linux.ibm.com)
+On Tue, May 17, 2022 at 09:53:26PM +0800, Chao Gao wrote:
+>On Mon, May 16, 2022 at 08:49:52PM +0000, Sean Christopherson wrote:
+>>On Tue, May 03, 2022, Paolo Bonzini wrote:
+>>> On 5/3/22 09:32, Zeng Guang wrote:
+>>> > 
+>>> > I don't see "[PATCH v9 4/9] KVM: VMX: Report tertiary_exec_control field in
+>>> > dump_vmcs()" in kvm/queue. Does it not need ?
+>>> 
+>>> Added now (somehow the patches were not threaded, so I had to catch them one
+>>> by one from lore).
+>>> 
+>>> > Selftests for KVM_CAP_MAX_VCPU_ID is posted in V2 which is revised on top of
+>>> > kvm/queue.
+>>> > ([PATCH v2] kvm: selftests: Add KVM_CAP_MAX_VCPU_ID cap test - Zeng
+>>> > Guang (kernel.org) <https://lore.kernel.org/lkml/20220503064037.10822-1-guang.zeng@intel.com/>)
+>>> 
+>>> Queued, thanks.
+>>
+>>Shouldn't we have a solution for the read-only APIC_ID mess before this is merged?
+>
+>We can add a new inhibit to disable APICv if guest attempts to change APIC
+>ID when IPIv (or AVIC) is enabled. Maxim also thinks using a new inhibit is
+>the right direction [1].
+>
+>If no objection to this approach and Maxim doesn't have the patch, we can post
+>one. But we will rely on Maxim to fix APIC ID mess for nested AVIC.
+>
+>[1] https://lore.kernel.org/all/6475522c58aec5db3ee0a5ccd3230c63a2f013a9.camel@redhat.com/
