@@ -2,126 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B30DD52A70F
-	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 17:39:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 15FFC52A717
+	for <lists+kvm@lfdr.de>; Tue, 17 May 2022 17:41:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345008AbiEQPi4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 May 2022 11:38:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46236 "EHLO
+        id S1350333AbiEQPlu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 May 2022 11:41:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350265AbiEQPiW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 May 2022 11:38:22 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2768517EB
-        for <kvm@vger.kernel.org>; Tue, 17 May 2022 08:37:29 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24HFGo2D038560;
-        Tue, 17 May 2022 15:37:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=DsjSUDujk04Y8wGlsOF5Uhcwas+nD6D2HeSNEj6f3kQ=;
- b=BugM1qpzdrOHbc0pk6x+ExMlw7w21ThH0R9B7YZTzgmi260cGhWNGqYwxCgwPEHzXGV3
- Y7/Ek7ScKzRLla/gHL8wI4PEYbvulvA00fYXrDPB2Uy6lW7Nv6LdmBHGiWo21bgWlLr2
- Q3J51hVkvrqJaWC8gW7N1SrVlmq+xjk2uTcsaCKLiWH/+k0OLMso8d628RY2YIRbrpBH
- tFOcTF5QCyvQxon3vi52h18TlvvWpVXe5eUyGjUta9i+PhvzPQf7l9WOj1Rzwyom/iRD
- 2obMZwD8/1l2SMvXe3lezjY80C6kL6U1nQJqgoRDS4pNWMBxrgx32L47vrQyCtYI8sNM 5Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4dtx945n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 15:37:22 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24HFH4Is039606;
-        Tue, 17 May 2022 15:37:22 GMT
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4dtx944x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 15:37:21 +0000
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24HFSm05019031;
-        Tue, 17 May 2022 15:37:21 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma04dal.us.ibm.com with ESMTP id 3g3r2esk8n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 May 2022 15:37:21 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24HFbKnZ21299568
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 May 2022 15:37:20 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1C7B8BE056;
-        Tue, 17 May 2022 15:37:20 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4395DBE04F;
-        Tue, 17 May 2022 15:37:19 +0000 (GMT)
-Received: from [9.211.37.97] (unknown [9.211.37.97])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 17 May 2022 15:37:19 +0000 (GMT)
-Message-ID: <2363ba6d-0e71-da6a-f8e5-e90c2305f1fe@linux.ibm.com>
-Date:   Tue, 17 May 2022 11:37:18 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v2 0/6] Fully lock the container members of struct
- vfio_group
-Content-Language: en-US
-To:     Nicolin Chen <nicolinc@nvidia.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Xiao Guangrong <guangrong.xiao@linux.intel.com>,
-        Jike Song <jike.song@intel.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>
-References: <0-v2-d035a1842d81+1bf-vfio_group_locking_jgg@nvidia.com>
- <YoMunTOPFRrGASWq@Asurada-Nvidia>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <YoMunTOPFRrGASWq@Asurada-Nvidia>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 1dNl7q7xc0OWBHMjo5JwJQx8KsVzkFa0
-X-Proofpoint-GUID: vHju8oAHqssQ4FqbR9u1UPrJ1potSVEB
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S1350456AbiEQPle (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 May 2022 11:41:34 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A9413F898;
+        Tue, 17 May 2022 08:41:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652802092; x=1684338092;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=AL1CgEZfBbODxmUN2AmdfWa/0K92wYSqZfBF5CVzg18=;
+  b=kESLOephBJbVe8t9o3SqKaEv3gSFgJOn7vRPH0Kms1RwvhL3j+9rLHMC
+   QttMKo4ZkiEHhLFhWre04L6riX+vfqabnHntafrx1ePJ55P0U37Xj0xFh
+   e+9KxqsNDfPmmRyT0W+peisUsJ6T+5W2toz05wGkzM2zT45+in+7qQ+At
+   pflb2h9M7g96JwGEu72C71ksijHJBE4JqGSn7ofp811YptXdKkotsYIIx
+   OQ4O3IwegDjnBta9mPu2HefeXx06wMU3OUv0U9xTv/s9PP2R4jFt60sxa
+   UVOxKz+mVhMp5O1gNgdRx50gMov/LPz5HkIqqEhCw2F1PHByzG+CVjrSJ
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10350"; a="357632090"
+X-IronPort-AV: E=Sophos;i="5.91,233,1647327600"; 
+   d="scan'208";a="357632090"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2022 08:41:32 -0700
+X-IronPort-AV: E=Sophos;i="5.91,233,1647327600"; 
+   d="scan'208";a="626533540"
+Received: from embargo.jf.intel.com ([10.165.9.183])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2022 08:41:32 -0700
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
+        like.xu.linux@gmail.com, vkuznets@redhat.com,
+        kan.liang@linux.intel.com, wei.w.wang@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH v12 00/16] Introduce Architectural LBR for vPMU
+Date:   Tue, 17 May 2022 11:40:44 -0400
+Message-Id: <20220517154100.29983-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-17_03,2022-05-17_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
- clxscore=1011 phishscore=0 malwarescore=0 bulkscore=0 spamscore=0
- mlxscore=0 suspectscore=0 lowpriorityscore=0 priorityscore=1501
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205170095
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/17/22 1:11 AM, Nicolin Chen wrote:
-> On Mon, May 16, 2022 at 08:41:16PM -0300, Jason Gunthorpe wrote:
->> The atomic based scheme for tracking the group->container and group->kvm
->> has two race conditions, simplify it by adding a rwsem to protect those
->> values and related and remove the atomics.
->>
->> This is on github: https://github.com/jgunthorpe/linux/commits/vfio_group_locking
->>
->> v2:
->>   - Updated comments and commit messages
->>   - Rebased on vfio next
->>   - Left the dev_warn in place, will adjust it later
->>   - s/singleton_file/opened_file/
->> v1: https://lore.kernel.org/r/0-v1-c1d14aae2e8f+2f4-vfio_group_locking_jgg@nvidia.com
->>
->> Cc: Nicolin Chen <nicolinc@nvidia.com>
-> 
-> Sanity tested on x86_64 and ARM64.
-> 
-> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
+Intel CPU model-specific LBR(Legacy LBR) evolved into Architectural
+LBR(Arch LBR[0]), it's the replacement of legacy LBR on new platforms.
+The native support patches were merged into 5.9 kernel tree, and this
+patch series is to enable Arch LBR in vPMU so that guest can benefit
+from the merits of the feature.
 
-Also sanity tested this series on s390x (vfio-pci and vfio-ap)
+The main advantages of Arch LBR are [1]:
+- Faster context switching due to XSAVES support and faster reset of
+  LBR MSRs via the new DEPTH MSR
+- Faster LBR read for a non-PEBS event due to XSAVES support, which
+  lowers the overhead of the NMI handler.
+- Linux kernel can support the LBR features without knowing the model
+  number of the current CPU.
 
-Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
+From end user's point of view, the usage of Arch LBR is the same as
+the Legacy LBR that has been merged in the mainline.
+
+Note, in this series, we impose one restriction for guest Arch LBR:
+Guest can only set the same LBR record depth as host, this is due to
+the special behavior of MSR_ARCH_LBR_DEPTH: 1) On write to the MSR,
+it'll reset all Arch LBR recording MSRs to 0s. 2) XRSTORS resets all
+record MSRs to 0s if the saved depth mismatches MSR_ARCH_LBR_DEPTH.
+Enforcing the restriction keeps the KVM enabling patch simple and
+straightforward.
+
+[0] https://software.intel.com/sites/default/files/managed/c5/15/architecture-instruction-set-extensions-programming-reference.pdf
+[1] https://lore.kernel.org/lkml/1593780569-62993-1-git-send-email-kan.liang@linux.intel.com/
+
+Qemu patch:
+https://patchwork.ozlabs.org/project/qemu-devel/cover/20220215195258.29149-1-weijiang.yang@intel.com/
+
+Previous version:
+v11: https://lore.kernel.org/all/20220506033305.5135-1-weijiang.yang@intel.com/
+
+Changes in v12:
+1. Refactor KVM pmu helpers and fixed some commit messages. (Kan)
+2. Use SMRAM to save/restore MSR_ARCH_LBR_CTL at SMM entry/exit. (Paolo)
+3. Add Kan's reviewed-by in commit messages.
+4. Rebased to queue:kvm/kvm.git
+
+
+Like Xu (6):
+  perf/x86/intel: Fix the comment about guest LBR support on KVM
+  perf/x86/lbr: Simplify the exposure check for the LBR_INFO registers
+  KVM: vmx/pmu: Emulate MSR_ARCH_LBR_DEPTH for guest Arch LBR
+  KVM: vmx/pmu: Emulate MSR_ARCH_LBR_CTL for guest Arch LBR
+  KVM: x86: Refine the matching and clearing logic for supported_xss
+  KVM: x86: Add XSAVE Support for Architectural LBR
+
+Sean Christopherson (1):
+  KVM: x86: Report XSS as an MSR to be saved if there are supported
+    features
+
+Yang Weijiang (9):
+  KVM: x86: Refresh CPUID on writes to MSR_IA32_XSS
+  KVM: x86: Add Arch LBR MSRs to msrs_to_save_all list
+  KVM: x86/pmu: Refactor code to support guest Arch LBR
+  KVM: x86/vmx: Check Arch LBR config when return perf capabilities
+  KVM: nVMX: Add necessary Arch LBR settings for nested VM
+  KVM: x86/vmx: Clear Arch LBREn bit before inject #DB to guest
+  KVM: x86/vmx: Flip Arch LBREn bit on guest state change
+  KVM: x86: Add Arch LBR data MSR access interface
+  KVM: x86/cpuid: Advertise Arch LBR feature in CPUID
+
+ arch/x86/events/intel/core.c     |   3 +-
+ arch/x86/events/intel/lbr.c      |   6 +-
+ arch/x86/include/asm/kvm_host.h  |   3 +
+ arch/x86/include/asm/msr-index.h |   1 +
+ arch/x86/include/asm/vmx.h       |   4 +
+ arch/x86/kvm/cpuid.c             |  49 +++++++++-
+ arch/x86/kvm/vmx/capabilities.h  |   9 ++
+ arch/x86/kvm/vmx/nested.c        |   7 +-
+ arch/x86/kvm/vmx/pmu_intel.c     | 159 +++++++++++++++++++++++++++----
+ arch/x86/kvm/vmx/vmcs12.c        |   1 +
+ arch/x86/kvm/vmx/vmcs12.h        |   3 +-
+ arch/x86/kvm/vmx/vmx.c           |  80 +++++++++++++++-
+ arch/x86/kvm/x86.c               |  23 ++++-
+ 13 files changed, 310 insertions(+), 38 deletions(-)
+
+
+base-commit: a3808d88461270c71d3fece5e51cc486ecdac7d0
+-- 
+2.27.0
+
