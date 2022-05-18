@@ -2,150 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D3BF52C049
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 19:09:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F415852BFEF
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 19:09:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240577AbiERQvq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 12:51:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47946 "EHLO
+        id S240605AbiERRB0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 13:01:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240551AbiERQvp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 12:51:45 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FCEF9E9F2;
-        Wed, 18 May 2022 09:51:44 -0700 (PDT)
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24IGO5D7019721;
-        Wed, 18 May 2022 16:51:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=kZmuOQk3nB0k0QQUHtuVyv6VXcOPkjCgoM1V8L0+TvY=;
- b=PrksPn0W3hOiWQTtNYA6q3tuCzNvWy5D0jfh5fXMu7Lw3RdQI5p8BxL5W8Xq7isn0B5O
- 8xWPymE9J0ZU81db+pokLEG6ZLRSoep41GmDsvD0eGHw3DVdzLt7ukj+YKMRlhh5EqJ7
- 7hGjOrhH8mE3oc1OzuJB+M5URxLWSt/GwA2fuS/jRbnYCFtn5zxYFG9PHlZd3XsZxhqH
- qS1Pp7hQOTuyXXqv6RGQ3v1rd3dbI2RbATgPVTDksouB2k2zotnr0q3I1pR9X7PNxHwg
- 43QUrXe9LcfbDE2lpDJCQfbd/ShyPIPRGxROmU2tVMFJWrYY1+47+otEO4sEnJF8xUXq xw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g549rrrxt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 May 2022 16:51:43 +0000
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24IGSPfm008382;
-        Wed, 18 May 2022 16:51:43 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g549rrrx9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 May 2022 16:51:43 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24IGXFdl022179;
-        Wed, 18 May 2022 16:51:41 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03fra.de.ibm.com with ESMTP id 3g2428vv5n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 May 2022 16:51:41 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24IGpbSS46858650
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 May 2022 16:51:38 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E476542041;
-        Wed, 18 May 2022 16:51:37 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 30A314203F;
-        Wed, 18 May 2022 16:51:37 +0000 (GMT)
-Received: from [9.171.6.188] (unknown [9.171.6.188])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 18 May 2022 16:51:37 +0000 (GMT)
-Message-ID: <5de8d8c2-100d-f935-667c-1090ee31277d@linux.ibm.com>
-Date:   Wed, 18 May 2022 18:55:26 +0200
+        with ESMTP id S240578AbiERRBZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 13:01:25 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 284CE3151F;
+        Wed, 18 May 2022 10:01:24 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id v11so2705586pff.6;
+        Wed, 18 May 2022 10:01:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=H6B54qfKCxnxSHyEfUNX3YrSNC1uK+oUERUpX17h73k=;
+        b=PKnYJIwTCogXke3WtxPoGPZGLj9YYbN0qFiRuMIC0YahXtBUy/XGcy9hTDkKgwYvir
+         WbtRdZhB35Tx8CbMYgTxE9UTwlej9AURpMNOfBgiRKTGbgjafX/frnR2wGKu96kzkop0
+         qAyTmuKyQWM0hOJcuQf5f7MRRULJYs+wYBZD4TnTahRaK/PwvfT1sfuxmNrcLE/JXj4n
+         qJWHF2bOPkZhTVUSII1vH8FCmCOFqQa0uFGHnPJ7GWgAY2GWFPg+8vFCjqJhXktTrSr0
+         pkPTpPQWz3DOfuIlZOnOgt1FZu60kgGXEKNliMk8BPtpzRTyyhXzlk8QGBerLdUITlmC
+         4qbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=H6B54qfKCxnxSHyEfUNX3YrSNC1uK+oUERUpX17h73k=;
+        b=WYJgVMPhFI5xG72iGpxB1xxUpGK6XSYtIElVBv4bmFkcYlhvJ1An/MxwArVZqZGuRp
+         iKympo+faXPx86SdJ/g2qvcArLJbLVgizQEMGg2R/9jGOROuroUJga/k96HoXZ9KruGd
+         X3zd66RPejw/5MCbDJDmG3FjAvEJ+tByGivODp9OvfhkgQwgEvdscCLCrrAHkV+2BOmu
+         OSEmZuozWfxZ4mwn7nuvxwembmQhPExDb9i8SNU2NFesLA0GeFuouCpM06RvQUTlSTmD
+         J8jR2PhU3cjutUF9eY/E7nC6i8ApVd8tWjM2XFc5GsO5I/l9aWdMYZzvz6hlp0qHvOZT
+         P64g==
+X-Gm-Message-State: AOAM533hHR8BN3jPgCO3HmtFmKKXI8+WmAZHky5N/8zeuXl6QEoqKrp4
+        mGzpSYH/kI3u/2TZctOoGco=
+X-Google-Smtp-Source: ABdhPJxuCvanawtwr+FNXTDXWGpcC9yYYw57LRkbaVIQBC8sFwXm27u7kfda4Tw4uzBQj7EPfF7Bvg==
+X-Received: by 2002:a63:f1e:0:b0:3c1:d54f:fc47 with SMTP id e30-20020a630f1e000000b003c1d54ffc47mr343979pgl.51.1652893283621;
+        Wed, 18 May 2022 10:01:23 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.117])
+        by smtp.gmail.com with ESMTPSA id p42-20020a056a0026ea00b0050dc762818dsm2283240pfw.103.2022.05.18.10.01.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 May 2022 10:01:23 -0700 (PDT)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 1/3] KVM: x86/pmu: Move the vmx_icl_pebs_cpu[] definition out of the header file
+Date:   Thu, 19 May 2022 01:01:16 +0800
+Message-Id: <20220518170118.66263-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v9 3/3] s390x: KVM: resetting the Topology-Change-Report
-Content-Language: en-US
-To:     David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, cohuck@redhat.com, thuth@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, wintera@linux.ibm.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com
-References: <20220506092403.47406-1-pmorel@linux.ibm.com>
- <20220506092403.47406-4-pmorel@linux.ibm.com>
- <76fd0c11-5b9b-0032-183b-54db650f13b1@redhat.com>
- <20220512115250.2e20bfdf@p-imbrenda>
- <70a7d93c-c1b1-fa72-0eb4-02e3e2235f94@redhat.com>
- <bae4e416-b0e9-31c6-c9d0-df6b5a5fd46f@linux.ibm.com>
- <cfe448f7-0b4e-680d-46a7-33ad25a4c09b@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <cfe448f7-0b4e-680d-46a7-33ad25a4c09b@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: W5fS3N71cLrX1I_e6-quxj7Z0L_xZDmt
-X-Proofpoint-GUID: uu-AwpmzG2aQew89jZnaju95wJ-pORKx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-18_06,2022-05-17_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 malwarescore=0 phishscore=0 suspectscore=0 spamscore=0
- mlxscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=792 adultscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205180099
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Like Xu <likexu@tencent.com>
 
+Defining a static const array in a header file would introduce redundant
+definitions to the point of confusing semantics, and such a use case would
+only bring complaints from the compiler:
 
-On 5/18/22 16:33, David Hildenbrand wrote:
-> On 16.05.22 16:21, Pierre Morel wrote:
->>
->>
->> On 5/12/22 12:01, David Hildenbrand wrote:
->>>>>
->>>>> I think we prefer something like u16 when copying to user space.
->>>>
->>>> but then userspace also has to expect a u16, right?
->>>
->>> Yep.
->>>
->>
->> Yes but in fact, inspired by previous discussion I had on the VFIO
->> interface, that is the reason why I did prefer an int.
->> It is much simpler than a u16 and the definition of a bit.
->>
->> Despite a bit in a u16 is what the s3990 achitecture proposes I thought
->> we could make it easier on the KVM/QEMU interface.
->>
->> But if the discussion stops here, I will do as you both propose change
->> to u16 in KVM and userland and add the documentation for the interface.
-> 
-> In general, we pass via the ABI fixed-sized values -- u8, u16, u32, u64
-> ... instead of int. Simply because sizeof(int) is in theory variable
-> (e.g., 32bit vs 64bit).
-> 
-> Take a look at arch/s390/include/uapi/asm/kvm.h and you won't find any
-> usage of int or bool.
-> 
-> Having that said, I'll let the maintainers decide. Using e.g., u8 is
-> just the natural thing to do on a Linux ABI, but we don't really support
-> 32 bit ... maybe we'll support 128bit at one point? ;)
-> 
+arch/x86/kvm/pmu.h:20:32: warning: ‘vmx_icl_pebs_cpu’ defined but not used [-Wunused-const-variable=]
+   20 | static const struct x86_cpu_id vmx_icl_pebs_cpu[] = {
+      |                                ^~~~~~~~~~~~~~~~
 
-OK then I use u16 with a flag in case we get something in the utilities 
-which is related to the topology in the future.
+Fixes: a095df2c5f48 ("KVM: x86/pmu: Adjust precise_ip to emulate Ice Lake guest PDIR counter")
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ arch/x86/kvm/pmu.c | 7 +++++++
+ arch/x86/kvm/pmu.h | 8 --------
+ 2 files changed, 7 insertions(+), 8 deletions(-)
 
-Thanks,
-Pierre
-
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index b5d0c36b869b..a2eaae85d97b 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -16,6 +16,7 @@
+ #include <linux/bsearch.h>
+ #include <linux/sort.h>
+ #include <asm/perf_event.h>
++#include <asm/cpu_device_id.h>
+ #include "x86.h"
+ #include "cpuid.h"
+ #include "lapic.h"
+@@ -27,6 +28,12 @@
+ struct x86_pmu_capability __read_mostly kvm_pmu_cap;
+ EXPORT_SYMBOL_GPL(kvm_pmu_cap);
+ 
++static const struct x86_cpu_id vmx_icl_pebs_cpu[] = {
++	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_D, NULL),
++	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_X, NULL),
++	{}
++};
++
+ /* NOTE:
+  * - Each perf counter is defined as "struct kvm_pmc";
+  * - There are two types of perf counters: general purpose (gp) and fixed.
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index dbf4c83519a4..ecf2962510e4 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -4,8 +4,6 @@
+ 
+ #include <linux/nospec.h>
+ 
+-#include <asm/cpu_device_id.h>
+-
+ #define vcpu_to_pmu(vcpu) (&(vcpu)->arch.pmu)
+ #define pmu_to_vcpu(pmu)  (container_of((pmu), struct kvm_vcpu, arch.pmu))
+ #define pmc_to_pmu(pmc)   (&(pmc)->vcpu->arch.pmu)
+@@ -17,12 +15,6 @@
+ #define VMWARE_BACKDOOR_PMC_REAL_TIME		0x10001
+ #define VMWARE_BACKDOOR_PMC_APPARENT_TIME	0x10002
+ 
+-static const struct x86_cpu_id vmx_icl_pebs_cpu[] = {
+-	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_D, NULL),
+-	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_X, NULL),
+-	{}
+-};
+-
+ struct kvm_event_hw_type_mapping {
+ 	u8 eventsel;
+ 	u8 unit_mask;
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.36.1
+
