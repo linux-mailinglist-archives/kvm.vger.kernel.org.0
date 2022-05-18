@@ -2,53 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D99E52C1C0
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 20:08:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0B2952C1E2
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 20:09:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241167AbiERR7N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 13:59:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37584 "EHLO
+        id S241267AbiERR7S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 13:59:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231132AbiERR7K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 13:59:10 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 650EF8BD29
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:59:09 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id o7-20020a256b47000000b0064ddc3bea70so2363771ybm.4
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:59:09 -0700 (PDT)
+        with ESMTP id S231783AbiERR7L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 13:59:11 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E50B08CB0D
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:59:10 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id j13-20020a170902da8d00b00161d78a9e3eso76353plx.17
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:59:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=6El377MID7rCecykOPvAUGyvktASztEGQkNHsDo4H6Q=;
-        b=JTvJ+pKPh0OV0kWy/CMIAehzpxr1kPLAluvEkkiTGTqb1w3iky98vPxfy4JpyAv15m
-         hpxjGgsQiB3GvVjAm2TgBwam4CVhDSrwQ83XeJZEsIaezBOop/ufsUEHi3MUstSEowXA
-         nlIp6Q9DzIKMYFWsUvAHwXZAVSfh4ZSyiSCf0SO774QCnOv3HzA+hprAWYzNDIRkl2VI
-         LDJIZS2zYibH6SEjLL+5kqd2ZlG+yUswJ9ouj3uz5Vhn8rDaGN1bUgUyr84KmL3tVD1s
-         Wu4qOkO54Wa27tIlq61/c86VJrQ83vfObBXPz/M2gfi+URn+b/Uaj/Mss7uq9WlLTpS4
-         tJaQ==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=fMGKhekV0sa/YRSHAxxD4jBJX+Cxj4sGMKO6wGVMLLU=;
+        b=rDo4lZZNt9Jya8MiZXgjYNXvz5J37fb6AuEUs8DN3vWndBXOI1tlgJDwCnvUKvBPc6
+         TnxRUc2etnh7q3vcNtEJshhc10uQivQXWKv6a8RKBrOUXLNW3i9tz5EGrsvAcVoADMiL
+         PvNIKKOQMpui5nbSexy36l2tOwTHjFolG+IARW9zKt9E0WsklNY44NvY7EeSIM1LAImr
+         Qdh1TwS91bwJhJQCqcCHxjySJSl0uXy2thSsDiVRnnjlIcxwEEC5/N6c0tEtDCClsxFr
+         WAgaQSTqdu1IYn2f/p7uzC4BPyx+3E9A3cU+HE2HUs8/0d37lyEl4oXbbkNUg4GBWFXk
+         XEXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=6El377MID7rCecykOPvAUGyvktASztEGQkNHsDo4H6Q=;
-        b=pdzy3hJyiTz1fHBEpHCwIy/wHWg8MA/2XgubsOfan+rZYsp/P8WTeB7D6A2djEcGDY
-         5RzTAjYoTONn9uVg7e6gs/5blM6SQ0ByZXuDB/+kSCnHoD64D4BfugSPMspql+Hd2kzm
-         2xjQyBEk8Y0FcKJ4K2XOIF8S3nYzW1SKthFMXptjDfFEsso6PGWlXS1qdd+vE2VYwFap
-         YI+W8jZ7/z29oTjRKszok5xbuYKMZACPKYueIZPivgeJjmpoDiYIbnQ9yLg62dxYpbrC
-         amLRgsFGVpYKGh8kP6ReRNJHmpseYAcIUXQruFw4WJUiqa+AzRqLcRQiAGGUd95MwEDC
-         ezhg==
-X-Gm-Message-State: AOAM532WcF6MGibFqgUhMDdV4Czp0ysucqT8CfJCkoBUk14lprU8E2Yh
-        W5kYwIqusCLeGbY21+W+bqevnltukYkrdAl0jbvxrbOX8ifrld3X85YbQxk7SgrXd7mk9NQfbP0
-        IKPgE50quGeKbfl5kz7D895WHSviz1hOKm7f+zL7gpGeFCyP1FcnDqeEAXg==
-X-Google-Smtp-Source: ABdhPJzd/VIgYtDzCdo352e3DSjBzZ/3yJ+2/AXyM2iOJppq/zMlcRJgTF3VMNpFU0YSI03GqRoyktT5vNs=
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=fMGKhekV0sa/YRSHAxxD4jBJX+Cxj4sGMKO6wGVMLLU=;
+        b=tGwUxXZ/t41aX8PS6MIh//sU+N8UImlbdZMljSx/TaoMrjckWsftVpL8E2RKxZV/bS
+         1f+lFgVwSUG9T81No+euCLb4LeRZnlKQnNyflyT3yAMw9UkKlPQTAen0GNSzRSQ66YXg
+         fRSUmkkiMU4bx3/8BtQ0pFwUulNgkoZbRaf/iI70U6HhNCUx7hqGHFZ7xONARwVwwheo
+         Ax2c0+fShGefpSkv5vwE4lRq09rLt1GRG5bV2vBu3lGfpXpW7RL3I9tbL/eb+UXahJ41
+         +Njbuwnzb9EChf8ER5jbHhNrVzCG7nRmp986LcQilDP8Tn5Wgu3qg0oxgQ3/k5ffYyZZ
+         DTXQ==
+X-Gm-Message-State: AOAM5302yeg4421bh54QBqxycW/SaKKup/HG7V8tWj/0w4SxjmchjlEt
+        0ogwrTirauCyIqoNZeNHnq6TBhhKwegLMS8L1hUKWuNKbL7E+h7vf+SRhqMWPXsyUTFTuZ5/2K0
+        B1cd7LjJxFIiiwOYnqjUB0QrQOp4UyDt57xQTENH5o9zCBoag/oQX6yn0dA==
+X-Google-Smtp-Source: ABdhPJyZ+5KTCDASJ2VzQHVK+2cDZhp3NrE9g00eRb9QNAZGfGNos3Q7HEHF07BETonFHNlM4Zm3P3D3UZ0=
 X-Received: from oupton3.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:21eb])
- (user=oupton job=sendgmr) by 2002:a25:8387:0:b0:64d:ddc8:b481 with SMTP id
- t7-20020a258387000000b0064dddc8b481mr847547ybk.644.1652896748601; Wed, 18 May
- 2022 10:59:08 -0700 (PDT)
-Date:   Wed, 18 May 2022 17:58:06 +0000
-Message-Id: <20220518175811.2758661-1-oupton@google.com>
+ (user=oupton job=sendgmr) by 2002:a05:6a00:24c1:b0:50d:33cf:811f with SMTP id
+ d1-20020a056a0024c100b0050d33cf811fmr827317pfv.78.1652896749987; Wed, 18 May
+ 2022 10:59:09 -0700 (PDT)
+Date:   Wed, 18 May 2022 17:58:07 +0000
+In-Reply-To: <20220518175811.2758661-1-oupton@google.com>
+Message-Id: <20220518175811.2758661-2-oupton@google.com>
 Mime-Version: 1.0
+References: <20220518175811.2758661-1-oupton@google.com>
 X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
-Subject: [PATCH v2 0/5] KVM: Clean up debugfs+stats init/destroy
+Subject: [PATCH v2 1/5] KVM: Shove vm stats_id init into kvm_create_vm()
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, seanjc@google.com, maz@kernel.org,
@@ -64,49 +68,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The way that KVM handles debugfs init/destroy is somewhat sloppy. Even
-though debugfs is stood up after kvm_create_vm(), it is torn down from
-kvm_destroy_vm(). There exists a window where we need to tear down a VM
-before debugfs is created, requiring delicate handling.
+Initialize the field alongside the other struct kvm fields. No
+functional change intended.
 
-This series cleans up the debugfs lifecycle by fully tying it to the
-VM's init/destroy pattern.
+Signed-off-by: Oliver Upton <oupton@google.com>
+---
+ virt/kvm/kvm_main.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-First two patches hoist some unrelated stats initialization to a more
-appropriate place for kvm and kvm_vcpu.
-
-Second two patches are the meat of the series, changing around the
-initialization order to get an FD early and wiring in debugfs
-initialization to kvm_create_vm().
-
-Lastly, patch 5 is essentially a revert of Sean's fix [1] for a NULL deref
-in debugfs, though I stopped short of an outright revert since that one
-went to stable and is still entirely correct.
-
-Applies cleanly to v5.18-rc5, since [1] is currently missing from
-kvm/queue or kvm/next. Tested with KVM selftests and the reproducer
-mentioned in [1] on an Intel Skylake machine.
-
-[1] 5c697c367a66 ("KVM: Initialize debugfs_dentry when a VM is created to avoid NULL deref")
-
-v1: http://lore.kernel.org/r/20220415201542.1496582-1-oupton@google.com
-
-v1 -> v2:
- - Don't conflate debugfs+stats. Initialize stats_id outside of the
-   context of debugfs (Sean)
- - Pass around the FD as a string to avoid subsequent KVM changes
-   inappropriately using the FD (Sean)
-
-Oliver Upton (5):
-  KVM: Shove vm stats_id init into kvm_create_vm()
-  KVM: Shove vcpu stats_id init into kvm_vcpu_init()
-  KVM: Get an fd before creating the VM
-  KVM: Actually create debugfs in kvm_create_vm()
-  KVM: Hoist debugfs_dentry init to kvm_create_vm_debugfs() (again)
-
- virt/kvm/kvm_main.c | 96 +++++++++++++++++++++++----------------------
- 1 file changed, 49 insertions(+), 47 deletions(-)
-
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 6d971fb1b08d..36dc9271d039 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1101,6 +1101,9 @@ static struct kvm *kvm_create_vm(unsigned long type)
+ 	 */
+ 	kvm->debugfs_dentry = ERR_PTR(-ENOENT);
+ 
++	snprintf(kvm->stats_id, sizeof(kvm->stats_id),
++			"kvm-%d", task_pid_nr(current));
++
+ 	if (init_srcu_struct(&kvm->srcu))
+ 		goto out_err_no_srcu;
+ 	if (init_srcu_struct(&kvm->irq_srcu))
+@@ -4787,9 +4790,6 @@ static int kvm_dev_ioctl_create_vm(unsigned long type)
+ 	if (r < 0)
+ 		goto put_kvm;
+ 
+-	snprintf(kvm->stats_id, sizeof(kvm->stats_id),
+-			"kvm-%d", task_pid_nr(current));
+-
+ 	file = anon_inode_getfile("kvm-vm", &kvm_vm_fops, kvm, O_RDWR);
+ 	if (IS_ERR(file)) {
+ 		put_unused_fd(r);
 -- 
 2.36.1.124.g0e6072fb45-goog
 
