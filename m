@@ -2,122 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CC3A152BE36
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 17:26:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A66EA52BF8F
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 18:14:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239331AbiERPYo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 11:24:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42290 "EHLO
+        id S239275AbiERP1K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 11:27:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239271AbiERPYm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 11:24:42 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D10B19FB38
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 08:24:41 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id pq9-20020a17090b3d8900b001df622bf81dso2391229pjb.3
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 08:24:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=szkro6fdISr4qcgc9lEyo/uFlclALo3erp2QzJxCikU=;
-        b=WEn/B+5uszz55r/PKscG7F+y/s63g6EhqVQOMb7gTzDGxqnsIsRkQUdRllj86Je5Qa
-         R5FTIyo0p0XwKkd0yRVza3nOIGrmwQ9OAV3U+qCRkeEgV8TD9pzLv1vhkeKcGAV6mmRG
-         Da1mDNow5BezEd5KGkDL8PQ8nSTKSKNuG67qgf/VALKpj65B1gLstbA9dXRqquvPXqFo
-         aEmZtVjkOj+veHssXhLgcQCM4zzDcfwT3cwlCM/ljOEoe+TSXQTmZhfjmrPvBGu1yspX
-         XA/t/Wy1QYxI8SY5QI/SmYf1/DPsdjBMiGUnR/zMxJblNghmG8yT0PbuV7x4VqKVWn26
-         Ezmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=szkro6fdISr4qcgc9lEyo/uFlclALo3erp2QzJxCikU=;
-        b=gL+iy702AHELAt5NoY86OndScH+CjvsN0YZ0H9FZLuAXPoDMVzeDolSxLEfUWTofDo
-         +Y8LkWfoXjLqQn9cB1OXzNXcit69VXa/CgMnRaaDqR+8ukn5yYXQk4EPgdm2BTX6sOxP
-         +giL/aQE1fGoTmocTzvdwkgLH2Pk9EsvGFkHBMG0j4+KVyO8b0sBXZeer4Ueb185g0bx
-         hUWsHy0UsQDUx3xsA//BkeJP+akYSFZ8e/GFTOrN5AmNjl96usCcXY00OK1MXttRJKOp
-         w09TAeCSbyzPf1Q6yFrJa9qIX5LipJy22oWa85iWqWLaz0FaCbU82BxqlxlRIYVcEzSa
-         du5Q==
-X-Gm-Message-State: AOAM531UZlgsfXVUNQ5bzy9zctWyN7R1HLvp7P4pTxxoYNeS2Nx760Ec
-        LRrFbSC3N55UTv2CWUI2s80VDg==
-X-Google-Smtp-Source: ABdhPJyy/X6OLFD75Kv+/AZvSZEz9mmRwSPAJr+OnVxPO+dnjQiE2gXn1ULCI8XWU0fEMi3sdAf7kA==
-X-Received: by 2002:a17:903:244f:b0:15e:bb9a:3aa9 with SMTP id l15-20020a170903244f00b0015ebb9a3aa9mr237765pls.78.1652887480366;
-        Wed, 18 May 2022 08:24:40 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id x6-20020a17090a530600b001df54d74adbsm1732004pjh.25.2022.05.18.08.24.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 May 2022 08:24:39 -0700 (PDT)
-Date:   Wed, 18 May 2022 15:24:36 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     David Matlack <dmatlack@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v2 10/10] KVM: selftests: Add option to run
- dirty_log_perf_test vCPUs in L2
-Message-ID: <YoUPtB0KtRuWl4p7@google.com>
-References: <20220517190524.2202762-1-dmatlack@google.com>
- <20220517190524.2202762-11-dmatlack@google.com>
- <YoQDjx242f0AAUDS@xz-m1.local>
- <YoT5/TRyA/QKTsqL@xz-m1.local>
+        with ESMTP id S229496AbiERP1I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 11:27:08 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CFB11A15ED;
+        Wed, 18 May 2022 08:27:07 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24IFJ5HU000585;
+        Wed, 18 May 2022 15:27:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=wE2LYh2sEtLSMPKhd0EVOuSmjypjOjypIy29tD6qvvs=;
+ b=OCPBHgwaeK62t/LHciVUuUxZAjhkKijLkLvAIK5CwW7F6EJCrx1OhfqLTJfhdx96LmSH
+ 0vO5MCuir7QNUQYjJEgxWCTiTiTEbXmRJgzyPCp70VvzZ0Rqem70Go9z5jiEvgR5eVS7
+ 7tXXVGMpbQ+BH1KzgV8cnhUdVmb+41a33yjwu+TmXHp00cGeJLZDNaDF5lMAgjhWjETv
+ wgoUVptVy40AsZYAKXksBxb2gUO1sPj0xnwvRdJgZOSOcfDjpyQzDn1Nz5CgRxODHiMH
+ 3fsGjDmhA3yspYOC40EgYwudTYoNRyYAiuMBcTLC1ewB/X/7cOtvezpZo01fPIorxThc MA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g53b984ss-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 May 2022 15:27:06 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24IFKLkC009110;
+        Wed, 18 May 2022 15:27:05 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g53b984s8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 May 2022 15:27:05 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24IFIYIm001392;
+        Wed, 18 May 2022 15:27:04 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma02fra.de.ibm.com with ESMTP id 3g2428mst2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 May 2022 15:27:03 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24IFR0cS49545522
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 18 May 2022 15:27:00 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7C7FC52051;
+        Wed, 18 May 2022 15:27:00 +0000 (GMT)
+Received: from [9.171.79.88] (unknown [9.171.79.88])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id DF19C5204E;
+        Wed, 18 May 2022 15:26:59 +0000 (GMT)
+Message-ID: <f9cb28d5-2aa5-f902-53ab-592b08672c62@de.ibm.com>
+Date:   Wed, 18 May 2022 17:26:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YoT5/TRyA/QKTsqL@xz-m1.local>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v9 0/3] s390x: KVM: CPU Topology
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        frankja@linux.ibm.com, cohuck@redhat.com, david@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, wintera@linux.ibm.com, seiden@linux.ibm.com,
+        nrb@linux.ibm.com
+References: <20220506092403.47406-1-pmorel@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+In-Reply-To: <20220506092403.47406-1-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: fjdry2CXO57rowDGk2wdqOGCIiF4aZV3
+X-Proofpoint-ORIG-GUID: sXt_FmLSgnLPexwHI_l9YDVRtXlDwL80
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-18_05,2022-05-17_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
+ suspectscore=0 priorityscore=1501 phishscore=0 lowpriorityscore=0
+ mlxlogscore=645 spamscore=0 clxscore=1011 impostorscore=0 bulkscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205180089
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 18, 2022, Peter Xu wrote:
-> On Tue, May 17, 2022 at 04:20:31PM -0400, Peter Xu wrote:
-> > On Tue, May 17, 2022 at 07:05:24PM +0000, David Matlack wrote:
-> > > +uint64_t perf_test_nested_pages(int nr_vcpus)
-> > > +{
-> > > +	/*
-> > > +	 * 513 page tables to identity-map the L2 with 1G pages, plus a few
-> > > +	 * pages per-vCPU for data structures such as the VMCS.
-> > > +	 */
-> > > +	return 513 + 10 * nr_vcpus;
-> > 
-> > Shouldn't that 513 magic value be related to vm->max_gfn instead (rather
-> > than assuming all hosts have 39 bits PA)?
-> > 
-> > If my math is correct, it'll require 1GB here just for the l2->l1 pgtables
-> > on a 5-level host to run this test nested. So I had a feeling we'd better
-> > still consider >4 level hosts some day very soon..  No strong opinion, as
-> > long as this test is not run by default.
-> 
-> I had a feeling that when I said N level I actually meant N-1 level in all
-> above, since 39 bits are for 3 level not 4 level?..
-> 
-> Then it's ~512GB pgtables on 5 level?  If so I do think we'd better have a
-> nicer way to do this identity mapping..
+Pierre,
 
-Agreed, mapping all theoretically possible gfns into L2 is doomed to fail for
-larger MAXPHYADDR systems.
-
-Page table allocations are currently hardcoded to come from memslot0.  memslot0
-is required to be in lower DRAM, and thus tops out at ~3gb for all intents and
-purposes because we need to leave room for the xAPIC.
-
-And I would strongly prefer not to plumb back the ability to specificy an alternative
-memslot for page table allocations, because except for truly pathological tests that
-functionality is unnecessary and pointless complexity.
-
-> I don't think it's very hard - walk the mem regions in kvm_vm.regions
-> should work for us?
-
-Yeah.  Alternatively, The test can identity map all of memory <4gb and then also
-map "guest_test_phys_mem - guest_num_pages".  I don't think there's any other memory
-to deal with, is there?
+please use "KVM: s390x:" and not "s390x: KVM:" for future series.
