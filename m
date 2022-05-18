@@ -2,270 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32AD052BC36
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 16:16:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7141252BD21
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 16:17:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237920AbiERNZ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 09:25:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48766 "EHLO
+        id S238141AbiERNpl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 09:45:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237825AbiERNZw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 09:25:52 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A6EFAFB09;
-        Wed, 18 May 2022 06:25:50 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id i8so1735503plr.13;
-        Wed, 18 May 2022 06:25:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=InECIgSZ0QPmtYHzj1Juv9iX30hqeOQtFiR8TnwIpkk=;
-        b=MMa7UcDqe3NztEgAoWKoc79WYsyZyGuVhIY8+mgRs3qZyGi62S3JQ1PMMVKSUiVlfn
-         nN4n9WWVCDrJjzVsjua3/EkFIxdITSfZNpVAZMNBaH08diQenCWunfQMF9Q32uiwFYw2
-         yQTecdH1DOsZbnO3spGNb2nYi3Bl9yk2VVQ4bDA9HOBLvAV4zZBnqG0krx9waDr8+nJY
-         +xwpN/Bz/ATVOmSsDV07rpshwA6Vo+z0TScDVj13ckjEfWEITkddWe06VYQV9TUo3YI+
-         IOUYau13DOxeTz4/cjVDTB/NXUuOjyRYNBsofnKU7SwGJhRrgMQr8eGdTaM/7H5LDZL2
-         wtaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=InECIgSZ0QPmtYHzj1Juv9iX30hqeOQtFiR8TnwIpkk=;
-        b=W9Gk02DS/VsDPcP4l7CFppZBSGLq3DZx611surMoGQnyPE1Jt8RdmZ+y79kv9uGh95
-         wRqNLICUfz+mDQ37BGQ7OdawWcRj2C0KsZr5GaYnjkSW+Rq81Bwd+J2kwWYjlw08nU+Z
-         j268ZEfQzquSom7QkH3VS7JfJW2bFc2jyk+2z7PYYmZrn0Vsp51d4ckMySfM81knmc3I
-         nM/IWpju6CdNOPp7e41ZMCYLVjj4XqWTs01itvJqsuIACMauD0laeNa3/9NsNeYu19Eg
-         ImjQvzYxCFU071Rt7iAm0RaLLkbh5I9ohOLf0gO3uTtwvJ9dEbd8TmNXjrYS/AV/1Ygq
-         fpOw==
-X-Gm-Message-State: AOAM530RMBQnx0ne7PH1+CURLa0kAKGLE2fasus0uoy/DqQZM11voZEN
-        2bxaBKsn4lmT/bYfI8nq+wE=
-X-Google-Smtp-Source: ABdhPJyGausP/HaR90eiCTKx/g3tX1H76STHGVBFl5nIC+S+CYDhEiOTlENLOVOTdPzQ9kvcoIaucA==
-X-Received: by 2002:a17:90a:9a8b:b0:1df:6b7a:8a40 with SMTP id e11-20020a17090a9a8b00b001df6b7a8a40mr14059230pjp.213.1652880349751;
-        Wed, 18 May 2022 06:25:49 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.117])
-        by smtp.gmail.com with ESMTPSA id s13-20020a17090302cd00b0015e8d4eb244sm1625549plk.142.2022.05.18.06.25.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 May 2022 06:25:49 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: [PATCH RESEND v3 11/11] KVM: x86/pmu: Drop amd_event_mapping[] in the KVM context
-Date:   Wed, 18 May 2022 21:25:12 +0800
-Message-Id: <20220518132512.37864-12-likexu@tencent.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220518132512.37864-1-likexu@tencent.com>
-References: <20220518132512.37864-1-likexu@tencent.com>
+        with ESMTP id S238078AbiERNpk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 09:45:40 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 641751C0F02;
+        Wed, 18 May 2022 06:45:39 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24IDcSwp005627;
+        Wed, 18 May 2022 13:45:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=V6PGtDK1VCCS96hbIhyakpbQcaCZx/fTqzri3oe+JKI=;
+ b=kMAspi2IHP4PdXm14UB/q8Oh0CEKby673X28I8+pRD3XDtgYT+akcttNbiICLWkcssnV
+ j8g/1n4zSFvGAX2CUou+xRMdWL7QT0WvaG2s+L2ifbXhenLgOzFpdEZtW9w4HvwAG8WV
+ PIkUyHtSSo4cN/6HdvveakU0mQmaucpbICMA7YeSP/xij5KKlpslOBkoAi1qLKCJMLii
+ VDup58mwW5+M1LLpw7IJA5Lavx61w43zSuIXuJHi3j1AXup6jhWNBGIBf7uTvqO6mRwK
+ jvW+n3zLqczW1utgrHd45u5NmxaFg1/uiVDa9mTi2n6nQGY31T2SClurcKuzcvtBghy/ jA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g51uxr5kw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 May 2022 13:45:34 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24IDclbG006083;
+        Wed, 18 May 2022 13:45:34 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g51uxr5jw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 May 2022 13:45:34 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24IDgsxJ016007;
+        Wed, 18 May 2022 13:45:32 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma01fra.de.ibm.com with ESMTP id 3g2428vq26-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 May 2022 13:45:31 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24IDiq8729884682
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 18 May 2022 13:44:52 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1FE45A4054;
+        Wed, 18 May 2022 13:45:28 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A775EA405F;
+        Wed, 18 May 2022 13:45:27 +0000 (GMT)
+Received: from [9.145.45.168] (unknown [9.145.45.168])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 18 May 2022 13:45:27 +0000 (GMT)
+Message-ID: <48550162-0f8c-4b23-dea4-b9060b24eed9@linux.ibm.com>
+Date:   Wed, 18 May 2022 15:45:27 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Content-Language: en-US
+To:     Heiko Carstens <hca@linux.ibm.com>,
+        Steffen Eiden <seiden@linux.ibm.com>
+Cc:     Greg KH <greg@kroah.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Nico Boehr <nrb@linux.ibm.com>, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org
+References: <20220510144724.3321985-1-seiden@linux.ibm.com>
+ <20220510144724.3321985-2-seiden@linux.ibm.com> <YoTcxhulemnqiUbC@osiris>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v4 1/2] drivers/s390/char: Add Ultravisor io device
+In-Reply-To: <YoTcxhulemnqiUbC@osiris>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: aHzQbWoMDfk-vwBiUB2ssxDIqzQxyXtN
+X-Proofpoint-GUID: uEfrS6DjIVrYZO9ueDhA5bJYYpaJRZ3b
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-18_05,2022-05-17_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 mlxscore=0 priorityscore=1501 lowpriorityscore=0
+ adultscore=0 malwarescore=0 mlxlogscore=999 bulkscore=0 clxscore=1015
+ phishscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205180079
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On 5/18/22 13:47, Heiko Carstens wrote:
+> On Tue, May 10, 2022 at 02:47:23PM +0000, Steffen Eiden wrote:
+>> diff --git a/drivers/s390/char/Kconfig b/drivers/s390/char/Kconfig
+>> index 6cc4b19acf85..e9b9902abbaf 100644
+>> --- a/drivers/s390/char/Kconfig
+>> +++ b/drivers/s390/char/Kconfig
+>> @@ -100,6 +100,16 @@ config SCLP_OFB
+>>   	  This option enables the Open-for-Business interface to the s390
+>>   	  Service Element.
+>>   
+>> +config S390_UV_UAPI
+>> +	def_tristate y
+>> +	prompt "Ultravisor userspace API"
+>> +	help
+>> +	  Selecting exposes parts of the UV interface to userspace
+>> +	  by providing a misc character device at /dev/uv.
+>> +	  Using IOCTLs one can interact with the UV.
+>> +	  The device is only available if the Ultravisor
+>> +	  Facility (158) is present.
+> 
+> Is there a reason why this is default "y"? If you think this should be
+> compiled into the kernel if used, then why allow to make it a module
+> at all?
+> Instead you could get rid of a couple if lines of code.
 
-All gp or fixed counters have been reprogrammed using PERF_TYPE_RAW,
-which means that the table that maps perf_hw_id to event select values is
-no longer useful, at least for AMD.
+There was a lot of discussion around this already and the "Y" was chosen 
+as auto-loading this is a pain and therefore the SCLP and CHSC-Misc set 
+it to Y and we took that as an example (Steffen spoke to Peter to get 
+guidance).
 
-For Intel, the logic to check if the pmu event reported by Intel cpuid is
-not available is still required, in which case pmc_perf_hw_id() could be
-renamed to hw_event_is_unavail() and a bool value is returned to replace
-the semantics of "PERF_COUNT_HW_MAX+1".
-
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/include/asm/kvm-x86-pmu-ops.h |  2 +-
- arch/x86/kvm/pmu.c                     |  6 +--
- arch/x86/kvm/pmu.h                     |  2 +-
- arch/x86/kvm/svm/pmu.c                 | 56 ++------------------------
- arch/x86/kvm/vmx/pmu_intel.c           | 11 ++---
- 5 files changed, 12 insertions(+), 65 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm-x86-pmu-ops.h b/arch/x86/include/asm/kvm-x86-pmu-ops.h
-index fdfd8e06fee6..227317bafb22 100644
---- a/arch/x86/include/asm/kvm-x86-pmu-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-pmu-ops.h
-@@ -12,7 +12,7 @@ BUILD_BUG_ON(1)
-  * a NULL definition, for example if "static_call_cond()" will be used
-  * at the call sites.
-  */
--KVM_X86_PMU_OP(pmc_perf_hw_id)
-+KVM_X86_PMU_OP(hw_event_is_unavail)
- KVM_X86_PMU_OP(pmc_is_enabled)
- KVM_X86_PMU_OP(pmc_idx_to_pmc)
- KVM_X86_PMU_OP(rdpmc_ecx_to_pmc)
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 7dc949f6a92c..c01d66d237bb 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -151,9 +151,6 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
- 	};
- 	bool pebs = test_bit(pmc->idx, (unsigned long *)&pmu->pebs_enable);
- 
--	if (type == PERF_TYPE_HARDWARE && config >= PERF_COUNT_HW_MAX)
--		return;
--
- 	attr.sample_period = get_sample_period(pmc, pmc->counter);
- 
- 	if ((attr.config & HSW_IN_TX_CHECKPOINTED) &&
-@@ -248,6 +245,9 @@ static bool check_pmu_event_filter(struct kvm_pmc *pmc)
- 	__u64 key;
- 	int idx, srcu_idx;
- 
-+	if (static_call(kvm_x86_pmu_hw_event_is_unavail)(pmc))
-+		return false;
-+
- 	srcu_idx = srcu_read_lock(&kvm->srcu);
- 	filter = srcu_dereference(kvm->arch.pmu_event_filter, &kvm->srcu);
- 	if (!filter)
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 8d7912978249..1ad19c1949ad 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -30,7 +30,7 @@ struct kvm_event_hw_type_mapping {
- };
- 
- struct kvm_pmu_ops {
--	unsigned int (*pmc_perf_hw_id)(struct kvm_pmc *pmc);
-+	bool (*hw_event_is_unavail)(struct kvm_pmc *pmc);
- 	bool (*pmc_is_enabled)(struct kvm_pmc *pmc);
- 	struct kvm_pmc *(*pmc_idx_to_pmc)(struct kvm_pmu *pmu, int pmc_idx);
- 	struct kvm_pmc *(*rdpmc_ecx_to_pmc)(struct kvm_vcpu *vcpu,
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index b5ba846fee88..0c9f2e4b7b6b 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -33,34 +33,6 @@ enum index {
- 	INDEX_ERROR,
- };
- 
--/* duplicated from amd_perfmon_event_map, K7 and above should work. */
--static struct kvm_event_hw_type_mapping amd_event_mapping[] = {
--	[0] = { 0x76, 0x00, PERF_COUNT_HW_CPU_CYCLES },
--	[1] = { 0xc0, 0x00, PERF_COUNT_HW_INSTRUCTIONS },
--	[2] = { 0x7d, 0x07, PERF_COUNT_HW_CACHE_REFERENCES },
--	[3] = { 0x7e, 0x07, PERF_COUNT_HW_CACHE_MISSES },
--	[4] = { 0xc2, 0x00, PERF_COUNT_HW_BRANCH_INSTRUCTIONS },
--	[5] = { 0xc3, 0x00, PERF_COUNT_HW_BRANCH_MISSES },
--	[6] = { 0xd0, 0x00, PERF_COUNT_HW_STALLED_CYCLES_FRONTEND },
--	[7] = { 0xd1, 0x00, PERF_COUNT_HW_STALLED_CYCLES_BACKEND },
--};
--
--/* duplicated from amd_f17h_perfmon_event_map. */
--static struct kvm_event_hw_type_mapping amd_f17h_event_mapping[] = {
--	[0] = { 0x76, 0x00, PERF_COUNT_HW_CPU_CYCLES },
--	[1] = { 0xc0, 0x00, PERF_COUNT_HW_INSTRUCTIONS },
--	[2] = { 0x60, 0xff, PERF_COUNT_HW_CACHE_REFERENCES },
--	[3] = { 0x64, 0x09, PERF_COUNT_HW_CACHE_MISSES },
--	[4] = { 0xc2, 0x00, PERF_COUNT_HW_BRANCH_INSTRUCTIONS },
--	[5] = { 0xc3, 0x00, PERF_COUNT_HW_BRANCH_MISSES },
--	[6] = { 0x87, 0x02, PERF_COUNT_HW_STALLED_CYCLES_FRONTEND },
--	[7] = { 0x87, 0x01, PERF_COUNT_HW_STALLED_CYCLES_BACKEND },
--};
--
--/* amd_pmc_perf_hw_id depends on these being the same size */
--static_assert(ARRAY_SIZE(amd_event_mapping) ==
--	     ARRAY_SIZE(amd_f17h_event_mapping));
--
- static unsigned int get_msr_base(struct kvm_pmu *pmu, enum pmu_type type)
- {
- 	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
-@@ -154,31 +126,9 @@ static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
- 	return &pmu->gp_counters[msr_to_index(msr)];
- }
- 
--static unsigned int amd_pmc_perf_hw_id(struct kvm_pmc *pmc)
-+static bool amd_hw_event_is_unavail(struct kvm_pmc *pmc)
- {
--	struct kvm_event_hw_type_mapping *event_mapping;
--	u8 event_select = pmc->eventsel & ARCH_PERFMON_EVENTSEL_EVENT;
--	u8 unit_mask = (pmc->eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
--	int i;
--
--	/* return PERF_COUNT_HW_MAX as AMD doesn't have fixed events */
--	if (WARN_ON(pmc_is_fixed(pmc)))
--		return PERF_COUNT_HW_MAX;
--
--	if (guest_cpuid_family(pmc->vcpu) >= 0x17)
--		event_mapping = amd_f17h_event_mapping;
--	else
--		event_mapping = amd_event_mapping;
--
--	for (i = 0; i < ARRAY_SIZE(amd_event_mapping); i++)
--		if (event_mapping[i].eventsel == event_select
--		    && event_mapping[i].unit_mask == unit_mask)
--			break;
--
--	if (i == ARRAY_SIZE(amd_event_mapping))
--		return PERF_COUNT_HW_MAX;
--
--	return event_mapping[i].event_type;
-+	return false;
- }
- 
- /* check if a PMC is enabled by comparing it against global_ctrl bits. Because
-@@ -344,7 +294,7 @@ static void amd_pmu_reset(struct kvm_vcpu *vcpu)
- }
- 
- struct kvm_pmu_ops amd_pmu_ops __initdata = {
--	.pmc_perf_hw_id = amd_pmc_perf_hw_id,
-+	.hw_event_is_unavail = amd_hw_event_is_unavail,
- 	.pmc_is_enabled = amd_pmc_is_enabled,
- 	.pmc_idx_to_pmc = amd_pmc_idx_to_pmc,
- 	.rdpmc_ecx_to_pmc = amd_rdpmc_ecx_to_pmc,
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 75aa2282ae93..6d24db41d8e0 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -84,7 +84,7 @@ static void global_ctrl_changed(struct kvm_pmu *pmu, u64 data)
- 	}
- }
- 
--static unsigned int intel_pmc_perf_hw_id(struct kvm_pmc *pmc)
-+static bool intel_hw_event_is_unavail(struct kvm_pmc *pmc)
- {
- 	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
- 	u8 event_select = pmc->eventsel & ARCH_PERFMON_EVENTSEL_EVENT;
-@@ -98,15 +98,12 @@ static unsigned int intel_pmc_perf_hw_id(struct kvm_pmc *pmc)
- 
- 		/* disable event that reported as not present by cpuid */
- 		if ((i < 7) && !(pmu->available_event_types & (1 << i)))
--			return PERF_COUNT_HW_MAX + 1;
-+			return true;
- 
- 		break;
- 	}
- 
--	if (i == ARRAY_SIZE(intel_arch_events))
--		return PERF_COUNT_HW_MAX;
--
--	return intel_arch_events[i].event_type;
-+	return false;
- }
- 
- /* check if a PMC is enabled by comparing it with globl_ctrl bits. */
-@@ -805,7 +802,7 @@ void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu)
- }
- 
- struct kvm_pmu_ops intel_pmu_ops __initdata = {
--	.pmc_perf_hw_id = intel_pmc_perf_hw_id,
-+	.hw_event_is_unavail = intel_hw_event_is_unavail,
- 	.pmc_is_enabled = intel_pmc_is_enabled,
- 	.pmc_idx_to_pmc = intel_pmc_idx_to_pmc,
- 	.rdpmc_ecx_to_pmc = intel_rdpmc_ecx_to_pmc,
--- 
-2.36.1
-
+I'm sure that we want the possibility to have this as a module. 
+Personally I'd choose "m" over "y" since the module is only useful for a 
+very small amount of users.
