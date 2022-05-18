@@ -2,144 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A21E452BC72
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 16:16:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8939652BD3F
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 16:18:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238327AbiERNuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 09:50:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36058 "EHLO
+        id S238234AbiERNvZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 09:51:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238296AbiERNuL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 09:50:11 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC3941A6AFE;
-        Wed, 18 May 2022 06:50:09 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24IDPqYx030026;
-        Wed, 18 May 2022 13:50:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=dWMpcf1fFhGeG5K+GHkTA+8dPHcZ8xFCl+mlQGZSnSc=;
- b=KopzyziubJGRRHKGUQaUgJ7L4nuVh6heou5PGcXgCKj5tDd7phRfaxaZVKU/L0feY1LK
- QVrPi0KN4W0EJ53nPiY7WIH0fBOxp+ndYEhA6jOPBuJJRL+/YKgJGySLNPZqrvDuaZBB
- uISQ+Hb8Mshu4aKhgpp/m/1SjNEIDcp+p4gwSodAcrDCewVGA2Y0T8xHQjGAXFI0Ouwn
- V3G7zMq2TwP/hjoafT3kgBTPFLVNqA1xSZo8iW6nyvcjb/k64HLkX0mTuAe6OoSD45Tw
- 1D5PP+9F0VjWagfVrpaciqPTYwm4UEeJAq1XavzsSoAkpJqXUHHR0OnD2hjRYD7IR2Rq mw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g51p6gk26-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 May 2022 13:50:03 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24IDbxVh027515;
-        Wed, 18 May 2022 13:50:03 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g51p6gk11-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 May 2022 13:50:03 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24IDmA7h008671;
-        Wed, 18 May 2022 13:50:01 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04fra.de.ibm.com with ESMTP id 3g2428vp8p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 May 2022 13:50:01 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24IDnw3459179384
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 May 2022 13:49:58 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0ED0311C04A;
-        Wed, 18 May 2022 13:49:58 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A01C911C04C;
-        Wed, 18 May 2022 13:49:57 +0000 (GMT)
-Received: from [9.152.224.153] (unknown [9.152.224.153])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 18 May 2022 13:49:57 +0000 (GMT)
-Message-ID: <7d87d5c9-2d16-7574-3c08-04dbfb58d943@linux.ibm.com>
-Date:   Wed, 18 May 2022 15:49:57 +0200
+        with ESMTP id S238196AbiERNvY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 09:51:24 -0400
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CF2215F6F7;
+        Wed, 18 May 2022 06:51:23 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id dk23so3949859ejb.8;
+        Wed, 18 May 2022 06:51:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=6N1o2ROy8DgIOyd4uQrp3YPg4pjfgpNZnUXJgAERhvc=;
+        b=fbkmQ6rcduAwy3HwnfR4oHDS2kOAY4sHRo3/F50ru+ctsL44MeKzZzP7J7ziUmhVZF
+         IkzS1XI0L06c6MXPA5ooF+ahzboXFR7W+LnqwYC3T5WFv2MkPAJVu5bHEnbUN1eHM5KK
+         kzkjTAKS2Gfp9bnG49zDw4K6Vqhdt9M/y6C2S8Jo0zztEyFmMqbDSemkfhyUuq41g/8J
+         MzA+9NjDJ1edLBqA6ynULHoqMTZwxaMRKiAGFveVJzvPBvKGNEYkzv5/+RCzxoF4E8CU
+         fYP4jWsAQcX/kYwxP4xVvItlkW/nRWtgK2e2duG0YSIvvmHIF9edVjBC52P9l8NdaCpu
+         RSSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=6N1o2ROy8DgIOyd4uQrp3YPg4pjfgpNZnUXJgAERhvc=;
+        b=YUjQzucZ+HTFLX7+U+WZiZE1ga0QtYladsQkrUpxYuUr3UuPxdnmN8dJPwMsamNnDX
+         rKwCzi0o/pv5hZMp0MBo1OHWGLcsXS+QDz948s2kqCU0mkGxMe0wspBY2zIhlH0Mhz8l
+         Qw4Eit2HvC2En1bqG0L5CzGHG+VUZRS+oeW6M/U16UgIgyRwr7PwgpMCvD/VQ1JdCFFw
+         qPekdTD/16sAZncDalD3qOVPYNp2pEQpN0iQucRAqPibYbAWwEKRpT+B2aTHj00KYmqe
+         4k9NOOlSKh771+6wbFZ97u4e+RQRe/GmMwk19Ru351rAU1vYmRPR+Ij8SQgHVjYKwqml
+         aZ6g==
+X-Gm-Message-State: AOAM530b50VB3ga2bVtLI8dZAmjtNbeb6Zmd/4sYq5byiW01TbrkjGjC
+        nIDq7axPxHsrTp/is84kc63xQjY6Bk0=
+X-Google-Smtp-Source: ABdhPJxmxjiHo36vZ5Wg1LlY8idS8PDR045ppaLOd13tw6XWfqrJzu64BDS9/ebNgZX+o2gCC9DHzg==
+X-Received: by 2002:a17:907:160c:b0:6f4:4b2c:8e53 with SMTP id hb12-20020a170907160c00b006f44b2c8e53mr24484678ejc.10.1652881881433;
+        Wed, 18 May 2022 06:51:21 -0700 (PDT)
+Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
+        by smtp.gmail.com with ESMTPSA id j11-20020aa7c34b000000b0042ac6410ca1sm1369642edr.16.2022.05.18.06.51.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 May 2022 06:51:21 -0700 (PDT)
+From:   Uros Bizjak <ubizjak@gmail.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Uros Bizjak <ubizjak@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: [PATCH] KVM: x86/mmu: Use try_cmpxchg64 in tdp_mmu_set_spte_atomic
+Date:   Wed, 18 May 2022 15:51:11 +0200
+Message-Id: <20220518135111.3535-1-ubizjak@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v4 1/2] drivers/s390/char: Add Ultravisor io device
-Content-Language: en-US
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>
-Cc:     Greg KH <greg@kroah.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Nico Boehr <nrb@linux.ibm.com>, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org
-References: <20220510144724.3321985-1-seiden@linux.ibm.com>
- <20220510144724.3321985-2-seiden@linux.ibm.com> <YoTcxhulemnqiUbC@osiris>
- <48550162-0f8c-4b23-dea4-b9060b24eed9@linux.ibm.com>
-From:   Steffen Eiden <seiden@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <48550162-0f8c-4b23-dea4-b9060b24eed9@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 4PXw9WdJfBOhROzPURaz9QOHPsUWR84b
-X-Proofpoint-ORIG-GUID: R9WD7trTZ3m1yyULm_c3UQfDCYvGFXQ5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-18_04,2022-05-17_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
- suspectscore=0 phishscore=0 clxscore=1015 mlxlogscore=999
- priorityscore=1501 lowpriorityscore=0 adultscore=0 mlxscore=0
- impostorscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2202240000 definitions=main-2205180079
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Use try_cmpxchg64 instead of cmpxchg64 (*ptr, old, new) != old in
+tdp_mmu_set_spte_atomic.  cmpxchg returns success in ZF flag, so this
+change saves a compare after cmpxchg (and related move instruction
+in front of cmpxchg). Also, remove explicit assignment to iter->old_spte
+when cmpxchg fails, this is what try_cmpxchg does implicitly.
 
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+---
+Patch requires commits 0aa7be05d83cc584da0782405e8007e351dfb6cc
+and c2df0a6af177b6c06a859806a876f92b072dc624 from tip.git
+---
+ arch/x86/kvm/mmu/tdp_mmu.c | 12 +-----------
+ 1 file changed, 1 insertion(+), 11 deletions(-)
 
-On 5/18/22 15:45, Janosch Frank wrote:
-> On 5/18/22 13:47, Heiko Carstens wrote:
->> On Tue, May 10, 2022 at 02:47:23PM +0000, Steffen Eiden wrote:
->>> diff --git a/drivers/s390/char/Kconfig b/drivers/s390/char/Kconfig
->>> index 6cc4b19acf85..e9b9902abbaf 100644
->>> --- a/drivers/s390/char/Kconfig
->>> +++ b/drivers/s390/char/Kconfig
->>> @@ -100,6 +100,16 @@ config SCLP_OFB
->>>         This option enables the Open-for-Business interface to the s390
->>>         Service Element.
->>> +config S390_UV_UAPI
->>> +    def_tristate y
->>> +    prompt "Ultravisor userspace API"
->>> +    help
->>> +      Selecting exposes parts of the UV interface to userspace
->>> +      by providing a misc character device at /dev/uv.
->>> +      Using IOCTLs one can interact with the UV.
->>> +      The device is only available if the Ultravisor
->>> +      Facility (158) is present.
->>
->> Is there a reason why this is default "y"? If you think this should be
->> compiled into the kernel if used, then why allow to make it a module
->> at all?
->> Instead you could get rid of a couple if lines of code.
-> 
-> There was a lot of discussion around this already and the "Y" was chosen 
-> as auto-loading this is a pain and therefore the SCLP and CHSC-Misc set 
-> it to Y and we took that as an example (Steffen spoke to Peter to get 
-> guidance).
-> 
-> I'm sure that we want the possibility to have this as a module. 
-> Personally I'd choose "m" over "y" since the module is only useful for a 
-> very small amount of users.
-
-I am fine with changing "y" to "m".
-
-Steffen
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 922b06bf4b94..1ccc1a0f8123 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -633,7 +633,6 @@ static inline int tdp_mmu_set_spte_atomic(struct kvm *kvm,
+ 					  u64 new_spte)
+ {
+ 	u64 *sptep = rcu_dereference(iter->sptep);
+-	u64 old_spte;
+ 
+ 	/*
+ 	 * The caller is responsible for ensuring the old SPTE is not a REMOVED
+@@ -649,17 +648,8 @@ static inline int tdp_mmu_set_spte_atomic(struct kvm *kvm,
+ 	 * Note, fast_pf_fix_direct_spte() can also modify TDP MMU SPTEs and
+ 	 * does not hold the mmu_lock.
+ 	 */
+-	old_spte = cmpxchg64(sptep, iter->old_spte, new_spte);
+-	if (old_spte != iter->old_spte) {
+-		/*
+-		 * The page table entry was modified by a different logical
+-		 * CPU. Refresh iter->old_spte with the current value so the
+-		 * caller operates on fresh data, e.g. if it retries
+-		 * tdp_mmu_set_spte_atomic().
+-		 */
+-		iter->old_spte = old_spte;
++	if (!try_cmpxchg64(sptep, &iter->old_spte, new_spte))
+ 		return -EBUSY;
+-	}
+ 
+ 	__handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
+ 			      new_spte, iter->level, true);
+-- 
+2.35.1
 
