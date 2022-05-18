@@ -2,66 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 11B5E52C056
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 19:09:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3180A52C087
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 19:10:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239997AbiERQQo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 12:16:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34968 "EHLO
+        id S240028AbiERQT5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 12:19:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239971AbiERQQn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 12:16:43 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08E89A76D1
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 09:16:41 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id w17-20020a17090a529100b001db302efed6so2539422pjh.4
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 09:16:41 -0700 (PDT)
+        with ESMTP id S239911AbiERQT4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 12:19:56 -0400
+Received: from mail-yw1-x112a.google.com (mail-yw1-x112a.google.com [IPv6:2607:f8b0:4864:20::112a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BEB21EEE26
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 09:19:55 -0700 (PDT)
+Received: by mail-yw1-x112a.google.com with SMTP id 00721157ae682-2fefb051547so30152287b3.5
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 09:19:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=27J+LsUtyeeYy/GvJkk2tphV2jBbsCOsrmpZjooJvdA=;
-        b=WsFMsQRAqPFYtDRXv1eq/d16y4WXmvGrQzz4CAO9ARgrPBnZudm/BdIonig9LJyFcm
-         x6L1zSSnkCAOWz2YA0yASGUB+S/LnV93goRZsCwFI/c0oM6Wt6HovjUhwpPIhHwnAmgf
-         0UULa2rgpV/0NpYuJBZ1n9Y7Z3J0NyCqw3cQu4ZP70oCUpqlb8b8MsNZ0F22EDY2ZbA3
-         5E1hyQWNsllEe7cLvGs3pzHDGEMwvrxA4n0ilcZn7OsnEXZa9Xik24fr3nohv7oQ4WX1
-         CW6+uDBt2U+dmO+Q5ct+H8Au3VCnLrnBY51f3Z4vRidqf2HwVg5OVps7L3et5gtGQ2aA
-         EKFQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=BNQ1Sa8MZ2F954WTku5lIs6bezzi8M4d/JzexPqTkEI=;
+        b=fuukVjSGGYTWbJMh/yBcEw8dHvuu4PEx3FHNDRLqR7NKu60rnIJx02YBO5994skMbT
+         u5xPEzDUd+jLjKMcPAyYpjdJ7oOFgiSjLCpsH6FdqQ1NaqpIDjHibGpdFkG5G7ybeSEJ
+         f+mN3GRJE4fjEtXo0Hzuy4124GXXpHdNyK6kAtQvU70tn2XhvZDhxIHSlPWs0RNnXlak
+         fgS9fmVNq/HLync824wEwPuv3SjrdXf8eTYlN/0yc4QrIBvN8pMswFBJ4mYXwdnhRw09
+         3/VqgxmtgO7os7Ul7xsUUzTHpCGCicou+eR8KC4WNU9SCe8H1gpfdV4v8dWDGabiM3rG
+         v9kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=27J+LsUtyeeYy/GvJkk2tphV2jBbsCOsrmpZjooJvdA=;
-        b=qmgVK+8DaV6GEnWVnh/8TJZzVDqQ/5fCJjfEXJN3wg1AHru1iqrXGKGbbrhl5Vs9Xb
-         eqIKFyIFUBQw0Q7+Kq4cNUe0YmO8QG3mWilN0jCMRynqqLZCGM/dmLMt5mPNwc5pRiws
-         KYigDihyj2KX88ip2j++Zab9xhcz2KnUxZohu0tx6z1OQWyO/B3dLlTm5S4YqPj4HYJx
-         Y0w0mebQr387Jx4f8/X7HikER0VgkXRe4VUHwY5xbVL+xPDzIonDgkju0GRLxnxrIBmR
-         ceGA1EAsUz+z4ckDI6yF+rqcav+hsTD4cpp9RSO0kDOh0OfrbeJ3JQp4ln6BB08QX+Xo
-         OhOg==
-X-Gm-Message-State: AOAM533/VidAfBjnPUfQt2TiXyRt1DlIFhkxUfSiw46Y4X/EL3IcNE0J
-        HH6U64q2H42METT38iTBgH80hQ==
-X-Google-Smtp-Source: ABdhPJzlMzaxzyxYIp0EtYqROS3OrIc3ty0dMgOLbrexh3oQF/2zOIfjp3/5KS2qx0kdvnbCWlOOjg==
-X-Received: by 2002:a17:90a:7441:b0:1df:5f54:502c with SMTP id o1-20020a17090a744100b001df5f54502cmr770638pjk.129.1652890600319;
-        Wed, 18 May 2022 09:16:40 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id 4-20020a170902e9c400b0015e8d4eb264sm1893016plk.174.2022.05.18.09.16.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 May 2022 09:16:39 -0700 (PDT)
-Date:   Wed, 18 May 2022 16:16:35 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     John Allen <john.allen@amd.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
-        jmattson@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yu.c.zhang@linux.intel.com
-Subject: Re: [PATCH v15 07/14] KVM: VMX: Emulate reads and writes to CET MSRs
-Message-ID: <YoUb4/iP+X+xgsfQ@google.com>
-References: <20210203113421.5759-1-weijiang.yang@intel.com>
- <20210203113421.5759-8-weijiang.yang@intel.com>
- <YoUW4Oh0eRL9um5m@dell9853host>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=BNQ1Sa8MZ2F954WTku5lIs6bezzi8M4d/JzexPqTkEI=;
+        b=SThU46jkbXoMOtGJ6/SndHbO26xtRhQoL6mcFU/L1aqzCkPt04p/LKwvkpUlltX4xs
+         su/W41a9idirSneuEvWPxzQSKzH9+SOHZQQ+3zgYzNKGxKWpd86gnX1JcN0Ma0d9HcWr
+         FBAwMDfH5gLQubYxYu78+stluUe6i9PzI1+7P5CEF0cLyLgRJ6zcVBph9doq+nIJNY6A
+         +yE+e5hJjA1XCTixTS1+T+dVz+hxunBEiCEiEv2X7VbLi52WTwTgeUZXpaLUKZz762EY
+         HD43q51N2bdK/R8b1vq/gAE8IPeX/fLMovHFBAcwpbDKfG0JGPR+nUvN351qowj3L1tR
+         9pYQ==
+X-Gm-Message-State: AOAM530j8UKKKP8T6otXzEmCmsSXjVE8Ryaa15Su4qTbM5vAusvaS54c
+        ZZwLBTPKKeYUTqPvj8F1/lwTjg3CFYClM0wjrRUSEw==
+X-Google-Smtp-Source: ABdhPJxqzMdIcOL87yz5TF1jKPIrr4XeCqmKaldQ0Y4MMtbT5EEsngoSDAW4iYMlsjmCFhHVDfSS1Qr4vlYQCUgc+VQ=
+X-Received: by 2002:a81:d54d:0:b0:2fe:e1c2:eb35 with SMTP id
+ l13-20020a81d54d000000b002fee1c2eb35mr151712ywj.285.1652890794100; Wed, 18
+ May 2022 09:19:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YoUW4Oh0eRL9um5m@dell9853host>
+References: <cover.1649219184.git.kai.huang@intel.com> <3f19ac995d184e52107e7117a82376cb7ecb35e7.1649219184.git.kai.huang@intel.com>
+ <b3c81b7f-3016-8f4e-3ac5-bff1fc52a879@intel.com> <345753e50e4c113b1dfb71bba1ed841eee55aed3.camel@intel.com>
+In-Reply-To: <345753e50e4c113b1dfb71bba1ed841eee55aed3.camel@intel.com>
+From:   Sagi Shahar <sagis@google.com>
+Date:   Wed, 18 May 2022 09:19:43 -0700
+Message-ID: <CAAhR5DFFGTHAG9U74v9YXZkjfgfQ9vD4B76ky-MtM5fkjTgRFQ@mail.gmail.com>
+Subject: Re: [PATCH v3 06/21] x86/virt/tdx: Shut down TDX module in case of error
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,28 +74,79 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 18, 2022, John Allen wrote:
-> On Wed, Feb 03, 2021 at 07:34:14PM +0800, Yang Weijiang wrote:
-> > +	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
-> > +		if (!cet_is_ssp_msr_accessible(vcpu, msr_info))
-> > +			return 1;
-> > +		if ((data & GENMASK(2, 0)) || is_noncanonical_address(data, vcpu))
-> 
-> Sorry to revive this old thread. I'm working on the corresponding SVM
-> bits for shadow stack and I noticed the above check. Why isn't this
-> GENMASK(1, 0)? The *SSP MSRs should be a 4-byte aligned canonical
-> address meaning that just bits 1 and 0 should always be zero. I was
-> looking through the previous versions of the set and found that this
-> changed between versions 11 and 12, but I don't see any discussion
-> related to this on the list.
+On Tue, Apr 26, 2022 at 5:06 PM Kai Huang <kai.huang@intel.com> wrote:
+>
+> On Tue, 2022-04-26 at 13:59 -0700, Dave Hansen wrote:
+> > On 4/5/22 21:49, Kai Huang wrote:
+> > > TDX supports shutting down the TDX module at any time during its
+> > > lifetime.  After TDX module is shut down, no further SEAMCALL can be
+> > > made on any logical cpu.
+> >
+> > Is this strictly true?
+> >
+> > I thought SEAMCALLs were used for the P-SEAMLDR too.
+>
+> Sorry will change to no TDX module SEAMCALL can be made on any logical cpu.
+>
+> [...]
+>
+> > >
+> > > +/* Data structure to make SEAMCALL on multiple CPUs concurrently */
+> > > +struct seamcall_ctx {
+> > > +   u64 fn;
+> > > +   u64 rcx;
+> > > +   u64 rdx;
+> > > +   u64 r8;
+> > > +   u64 r9;
+> > > +   atomic_t err;
+> > > +   u64 seamcall_ret;
+> > > +   struct tdx_module_output out;
+> > > +};
+> > > +
+> > > +static void seamcall_smp_call_function(void *data)
+> > > +{
+> > > +   struct seamcall_ctx *sc = data;
+> > > +   int ret;
+> > > +
+> > > +   ret = seamcall(sc->fn, sc->rcx, sc->rdx, sc->r8, sc->r9,
+> > > +                   &sc->seamcall_ret, &sc->out);
 
-Huh.  I'm not entirely sure what to make of the SDM's wording:
+Are the seamcall_ret and out fields in seamcall_ctx going to be used?
+Right now it looks like no one is going to read them.
+If they are going to be used then this is going to cause a race since
+the different CPUs are going to write concurrently to the same address
+inside seamcall().
+We should either use local memory and write using atomic_set like the
+case for the err field or hard code NULL at the call site if they are
+not going to be used.
 
-  The linear address written must be aligned to 8 bytes and bits 2:0 must be 0
-  (hardware requires bits 1:0 to be 0).
+> > > +   if (ret)
+> > > +           atomic_set(&sc->err, ret);
+> > > +}
+> > > +
+> > > +/*
+> > > + * Call the SEAMCALL on all online cpus concurrently.
+> > > + * Return error if SEAMCALL fails on any cpu.
+> > > + */
+> > > +static int seamcall_on_each_cpu(struct seamcall_ctx *sc)
+> > > +{
+> > > +   on_each_cpu(seamcall_smp_call_function, sc, true);
+> > > +   return atomic_read(&sc->err);
+> > > +}
+> >
+> > Why bother returning something that's not read?
+>
+> It's not needed.  I'll make it void.
+>
+> Caller can check seamcall_ctx::err directly if they want to know whether any
+> error happened.
+>
+>
+>
+> --
+> Thanks,
+> -Kai
+>
+>
 
-Looking at the rest of the CET stuff, I believe requiring 8-byte alignment is
-correct, and that the "hardware requires" blurb is trying to call out that the
-SSP stored in hardware will always be 4-byte aligned but not necessarily 8-byte
-aligned in order to play nice with 32-bit/compatibility mode.  But "base" addresses
-that come from software, e.g. via MSRs and whatnot, must always be 8-byte aligned.
+Sagi
