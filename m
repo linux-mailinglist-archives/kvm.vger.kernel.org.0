@@ -2,129 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FE0B52BDC3
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 17:25:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCCFE52BDEB
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 17:25:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238672AbiEROeA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 10:34:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46070 "EHLO
+        id S238974AbiERPAm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 11:00:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238656AbiEROd6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 10:33:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5415A1AEC4E
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 07:33:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652884436;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=S0qz9PSvGbMs60yKx28nBLXwqA08nBMklYt7Mvsb4Pk=;
-        b=JlJOFk8Utvno2ggT67gfHhqEvb6f0WOyEhs4ylgtyaii8xWhbZ+jixQxcFdUsMKubP3X9G
-        1uvBbsZtcTA+7Y4ZxNjTgz00mO7c4aFRhlPPX2RnheHNryeEyq3lLHhO1XdRpHV3R6qQVJ
-        LQJ74Ngxy27lvFZfIOpcb9OSxQjzrLA=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-302-wbzepTBYMAaGcwa582-DTA-1; Wed, 18 May 2022 10:33:55 -0400
-X-MC-Unique: wbzepTBYMAaGcwa582-DTA-1
-Received: by mail-ed1-f72.google.com with SMTP id r8-20020a056402018800b00428b43999feso1762938edv.5
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 07:33:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=S0qz9PSvGbMs60yKx28nBLXwqA08nBMklYt7Mvsb4Pk=;
-        b=OZGqg0SjQxw3jgvystve2WEzEHMUCwzVe3om3uZe8Pm/PmkXXn2xl1L9CFSE0tHQLp
-         M5AnBnBddT6XEJ+GrxMcFeT6nUF0nktgfAlM+w3BYo7MBESY7MHFj8xs/v5LyRuUAlQ0
-         e0gGsz9NvxeZosJsBXo/Q6HNUdTexe8GbbOIpBFiwEMYSB7/2O9r6hJrz2Z0QYsTul/H
-         YEC/Rr/zCvwr30eveSdwmpZOQCMprtu8jCix4bRfVHKFYNIMsIyVAdyCvHnVNvi3HuC6
-         SlUChS44wlSQk4PW6546fcOindgqqPJmio1oWJhOBeFcFFCJUbsUWBE3bCcACwXb9vYx
-         bpIA==
-X-Gm-Message-State: AOAM533FuHlt4gx+Q12m65+6D8EfwUV4dlA4y4YTUPh+bfj6KGCwsmoW
-        N/rPJMbHBr9XntAPwz6h2ElQvML96Ym29u9jCX243/OUxowhuZdxg3Z41fqKX82NLn4un93UMkJ
-        GTmhPu4YeqM4K
-X-Received: by 2002:a05:6402:348c:b0:42a:e4e5:c63a with SMTP id v12-20020a056402348c00b0042ae4e5c63amr4607334edc.419.1652884433862;
-        Wed, 18 May 2022 07:33:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx5Uure55BHoOkTp7UVKFreQZ5rHKj7fvnOcH/AKP9Y2Tq1lVxIdQXxgxNVGpBLQ6V8bwpceQ==
-X-Received: by 2002:a05:6402:348c:b0:42a:e4e5:c63a with SMTP id v12-20020a056402348c00b0042ae4e5c63amr4607302edc.419.1652884433583;
-        Wed, 18 May 2022 07:33:53 -0700 (PDT)
-Received: from [172.29.4.249] ([45.90.93.190])
-        by smtp.gmail.com with ESMTPSA id k23-20020aa7d8d7000000b0042aa153e73esm1440476eds.12.2022.05.18.07.33.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 May 2022 07:33:53 -0700 (PDT)
-Message-ID: <cfe448f7-0b4e-680d-46a7-33ad25a4c09b@redhat.com>
-Date:   Wed, 18 May 2022 16:33:48 +0200
+        with ESMTP id S238862AbiERPAk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 11:00:40 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A9031A0AFE;
+        Wed, 18 May 2022 08:00:39 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24IEgr6V017549;
+        Wed, 18 May 2022 15:00:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=xW1COiFlwf0PL00R4GkXtkJN3M/L1hWKr4zjOB9Yp9M=;
+ b=pPZD/yxVLcy5VnDo5Jgh0tk0ovOcQbNqZ4LsoKnycLW3vfseSiMBUPwbrdCh3XYkBa3S
+ DgyFVqTWd5g0nrN7qw+VokS94G2YSTFqMANSmq4yIjq1wEGkkD8sZLyluuqf7Ue2Xuqe
+ kl/D3aV8yyOWgd3vWln/+e2hE53zPIedtzRhfg2lEgfHFpFKZh2LY1i0XqGLs4ob+dA/
+ O1lZb3Q649ODOCRETCAXcpb58oExMIG07klJQSGFLiRy+BUse1iyqnDV0953MQyCAFpS
+ PMU+PZ2Aw5ieGsVXdW+8SymNrZTZJVCbzoUDPNxTcZf19HekuYV1phtJXQKnAnxjtPnf Ng== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g52t70e0r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 May 2022 15:00:21 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24IEhUDl019538;
+        Wed, 18 May 2022 15:00:19 GMT
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g52t70dwk-3
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 May 2022 15:00:19 +0000
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24IEbXS0011511;
+        Wed, 18 May 2022 14:37:53 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma02wdc.us.ibm.com with ESMTP id 3g2429w3t2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 May 2022 14:37:53 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24IEbrW721561800
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 18 May 2022 14:37:53 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 172B3124058;
+        Wed, 18 May 2022 14:37:53 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7D0B0124052;
+        Wed, 18 May 2022 14:37:49 +0000 (GMT)
+Received: from [9.211.37.97] (unknown [9.211.37.97])
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed, 18 May 2022 14:37:49 +0000 (GMT)
+Message-ID: <2e51b388-48d0-4689-07f4-65f607dbce59@linux.ibm.com>
+Date:   Wed, 18 May 2022 10:37:48 -0400
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v9 3/3] s390x: KVM: resetting the Topology-Change-Report
+ Thunderbird/91.9.0
+Subject: Re: [PATCH 1/1] vfio: remove VFIO_GROUP_NOTIFY_SET_KVM
 Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, cohuck@redhat.com, thuth@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, wintera@linux.ibm.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com
-References: <20220506092403.47406-1-pmorel@linux.ibm.com>
- <20220506092403.47406-4-pmorel@linux.ibm.com>
- <76fd0c11-5b9b-0032-183b-54db650f13b1@redhat.com>
- <20220512115250.2e20bfdf@p-imbrenda>
- <70a7d93c-c1b1-fa72-0eb4-02e3e2235f94@redhat.com>
- <bae4e416-b0e9-31c6-c9d0-df6b5a5fd46f@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <bae4e416-b0e9-31c6-c9d0-df6b5a5fd46f@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+To:     jgg@nvidia.com, alex.williamson@redhat.com
+Cc:     cohuck@redhat.com, borntraeger@linux.ibm.com,
+        jjherne@linux.ibm.com, akrowiak@linux.ibm.com, pasic@linux.ibm.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com, hch@infradead.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220517180851.166538-1-mjrosato@linux.ibm.com>
+ <20220517180851.166538-2-mjrosato@linux.ibm.com>
+In-Reply-To: <20220517180851.166538-2-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: XQrM_ApcMDR7ZDvn9Jz1fR-tTzTwQMqx
+X-Proofpoint-ORIG-GUID: OXJa_RJ2BtWJbsJAxvOQSjAKl28F0lCB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-18_05,2022-05-17_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ lowpriorityscore=0 clxscore=1015 priorityscore=1501 spamscore=0
+ suspectscore=0 mlxscore=0 malwarescore=0 phishscore=0 bulkscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205180087
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16.05.22 16:21, Pierre Morel wrote:
+On 5/17/22 2:08 PM, Matthew Rosato wrote:
+> Rather than relying on a notifier for associating the KVM with
+> the group, let's assume that the association has already been
+> made prior to device_open.  The first time a device is opened
+> associate the group KVM with the device.
 > 
-> 
-> On 5/12/22 12:01, David Hildenbrand wrote:
->>>>
->>>> I think we prefer something like u16 when copying to user space.
->>>
->>> but then userspace also has to expect a u16, right?
->>
->> Yep.
->>
-> 
-> Yes but in fact, inspired by previous discussion I had on the VFIO 
-> interface, that is the reason why I did prefer an int.
-> It is much simpler than a u16 and the definition of a bit.
-> 
-> Despite a bit in a u16 is what the s3990 achitecture proposes I thought 
-> we could make it easier on the KVM/QEMU interface.
-> 
-> But if the discussion stops here, I will do as you both propose change 
-> to u16 in KVM and userland and add the documentation for the interface.
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 
-In general, we pass via the ABI fixed-sized values -- u8, u16, u32, u64
-... instead of int. Simply because sizeof(int) is in theory variable
-(e.g., 32bit vs 64bit).
+...
 
-Take a look at arch/s390/include/uapi/asm/kvm.h and you won't find any
-usage of int or bool.
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index cfcff7764403..c5d421eda275 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -10,6 +10,7 @@
+>    * Author: Tom Lyon, pugs@cisco.com
+>    */
+>   
+> +#include "linux/kvm_host.h"
+>   #include <linux/cdev.h>
+>   #include <linux/compat.h>
+>   #include <linux/device.h>
+> @@ -1083,6 +1084,13 @@ static struct file *vfio_device_open(struct vfio_device *device)
+>   
+>   	mutex_lock(&device->dev_set->lock);
+>   	device->open_count++;
+> +	down_write(&device->group->group_rwsem);
+> +	if (device->open_count == 1 && device->group->kvm) {
+> +		device->kvm = device->group->kvm;
+> +		kvm_get_kvm(device->kvm);
 
-Having that said, I'll let the maintainers decide. Using e.g., u8 is
-just the natural thing to do on a Linux ABI, but we don't really support
-32 bit ... maybe we'll support 128bit at one point? ;)
-
--- 
-Thanks,
-
-David / dhildenb
-
+Did some more compile testing, since vfio has no hard kvm dependency, 
+kvm_get_kvm and kvm_put_kvm are an issue if KVM is a module while vfio 
+is built-in...
