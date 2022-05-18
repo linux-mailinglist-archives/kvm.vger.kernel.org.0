@@ -2,173 +2,296 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A5D2952BF62
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 18:13:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CFDF52BF97
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 18:14:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239685AbiERP4P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 11:56:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39276 "EHLO
+        id S239832AbiERQKl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 12:10:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239855AbiERP4M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 11:56:12 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68D573D1F8
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 08:56:11 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id w8so357497pga.9
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 08:56:11 -0700 (PDT)
+        with ESMTP id S239847AbiERQKe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 12:10:34 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44C941DB5BB
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 09:10:32 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id q4so2205599plr.11
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 09:10:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=qWXKTxpMjmn1u6F63OBGUz8tILVO6jaTHdWT2R8iYlg=;
-        b=eBaghM2dqTUIVv/7a2pxqIjSQL1Ktx2k9P6YqlUuVPZm2g5J8JNomOwqnfQufns4XX
-         EkbC6Ht6q3Fl76dyOSK61FlnvJDZJJyMXoICbSld7XnACBvxHAd3sZqXbyrOAUx8VxZV
-         Wxp0k/pkWhPgpQTw3Nufa/nCelbz5bgxvtzTtcWYrNcyVbYiXUkjh++XNiw8AUHfJgqx
-         uxRfBFqLeQoJxXExhfJpce/LhRiPIjwXFrlPOJlXMFRHFvXmwSoBfUWcNk0BQLh9litq
-         S0uKGx7PYGr6wsD5SrY4WHHMRNu7wiTpqLvuKvgBGptl3Qve+CjsXQnx11zkp8MuBFMA
-         NpMQ==
+        bh=03plgJS7936PL3sSEzNXKGbAi9Hc+JkyewXYalh3t/Q=;
+        b=BwfTVH+i4WiQaXvQ0b+3TT85/Pwh01BlCWec9mzmPXhMIDyDDoDI/pSPyhFCpcH2+h
+         Ky5bMXRMHj/h1gYyQuWhgHgrCahoLjKq+u2qYqZPQtpKOJ5sraSwgymZFbJaQ64DbezR
+         9f8woeDYOj6dw8yb4PNP7u1A9JpLLpeUdwy+xTQbXh2LvuHrZtVIdlLmmpV/lIRX44wz
+         WloAHP3oYxjHqq/jRtzNOfDVFNKNRlFKS+BXhxP7SEudR5RTQaSR1Qebv1k520vrQSeL
+         1MZtFEKhe/VxNfdenbke1sks0SkgU2BNdlmW2KWhcCNnd9vEpw7gErb0d2UpLYg+ncqY
+         4mhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=qWXKTxpMjmn1u6F63OBGUz8tILVO6jaTHdWT2R8iYlg=;
-        b=r0lR+7drTwsFO2T1qH/GqCwD+PGpvk0gTQM2TcyPRyZZECg25kCp6rgbzX4aMlO/Hc
-         nm3OgRX3JUTm4EbsmYH7DO3mE3q9QQ2Bygn2CfuGJp8clfdpi6NsTaAMWHOu4XYW0FGh
-         pXEIuPFIw1XQIXglZPUSmlB/Tqd0gdAEzjqJrFCVFKGWIr84jTWReDvEb+kIaayfSMSu
-         Hqu28BHjAq4oqzGBuBQl16/JvtJtVAeOZJWvwdPTyIUCaHPLoTqqGOmlSO/o+irilDbv
-         ObiyCqAo/jtqflyga2lYc0qF+8NlIQ6JiUEiNie6J5hwccJNYfHEQ96Q7tPEQcmFoxP0
-         iM8w==
-X-Gm-Message-State: AOAM530IW2gGOHYpgAZB406YMHDX1QqBIrDUn9rOcujD29T8bVXVl4cm
-        PU12QjysTnVqvFGPE34fDemKs0CiHPNAhQ==
-X-Google-Smtp-Source: ABdhPJxSEJX/gDr7F2yeujTeOEbh2dCd+3p9S2SawsVfH6UMPR5YU1kkRbp4HL/UBle/+eRE4D2uKA==
-X-Received: by 2002:a05:6a00:2444:b0:4fd:db81:cbdd with SMTP id d4-20020a056a00244400b004fddb81cbddmr381800pfj.32.1652889370308;
-        Wed, 18 May 2022 08:56:10 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h8-20020a654688000000b003f60df4a5d5sm1449792pgr.54.2022.05.18.08.56.09
+        bh=03plgJS7936PL3sSEzNXKGbAi9Hc+JkyewXYalh3t/Q=;
+        b=7g3dIMTlRA0RZkCYFjYtpPTWom3cDepOEFbQtai0u1S+QMtprwhc1tlRUTcOrXgLaW
+         bHnhDppz0QDjS5yhTwdQGwM6Q/MhEBH4gJpB073+tlQie4j/c4OlrqGMhJ9gKe6tV4Wm
+         +vNM3aog27O5HxEb+vshXbxGC2rh8O8CJDiB9r8K+wAF/JjC6X7XUKVqx5m5e7lc+PQG
+         0DTlICjJ2k6hfjUq24ALPnBqg/vKpi/j0xTaaygE2j2G58zMTYZYS2QiHUakUe8RKMEs
+         MUaDYtqPhp+S3supzGd1EQDKI4mSs3arcgucUi8JQ81qp2wwcD+wuxO2YnS7Ifv+DevD
+         BmnQ==
+X-Gm-Message-State: AOAM531x1RApcE4SPITfKQ7sM+eanaWhl1/UzovHPw0IioIvHI8Qu7b4
+        VUL0E+x+bYZ8llwCqthgANSBvA==
+X-Google-Smtp-Source: ABdhPJwOKlBtvCcPGJhXpuH1ix0JO+C70F4tllEt/OhN4o/nspCZKG2OeOe09QI9rJ4eHDewyGBxAQ==
+X-Received: by 2002:a17:90a:690c:b0:1df:3b6f:d073 with SMTP id r12-20020a17090a690c00b001df3b6fd073mr784208pjj.18.1652890231314;
+        Wed, 18 May 2022 09:10:31 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id v24-20020a170902e8d800b0015f086e4aa5sm1904580plg.291.2022.05.18.09.10.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 May 2022 08:56:09 -0700 (PDT)
-Date:   Wed, 18 May 2022 15:56:06 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        David Airlie <airlied@linux.ie>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        intel-gfx@lists.freedesktop.org, Daniel Vetter <daniel@ffwll.ch>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org
-Subject: Re: [RFC PATCH v3 01/19] KVM: x86: document AVIC/APICv inhibit
- reasons
-Message-ID: <YoUXFmh9vef4CC+8@google.com>
-References: <20220427200314.276673-1-mlevitsk@redhat.com>
- <20220427200314.276673-2-mlevitsk@redhat.com>
+        Wed, 18 May 2022 09:10:30 -0700 (PDT)
+Date:   Wed, 18 May 2022 09:10:27 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     kvm@vger.kernel.org, drjones@redhat.com, pbonzini@redhat.com,
+        jade.alglave@arm.com, alexandru.elisei@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 00/23] EFI and ACPI support for arm64
+Message-ID: <YoUacwFnWpL6Hk7S@google.com>
+References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
+ <YoPhyyz+l3NkcAb5@google.com>
+ <3376d2b0-7eec-212b-aedf-c4aa34be254c@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220427200314.276673-2-mlevitsk@redhat.com>
+In-Reply-To: <3376d2b0-7eec-212b-aedf-c4aa34be254c@arm.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 27, 2022, Maxim Levitsky wrote:
-> These days there are too many AVIC/APICv inhibit
-> reasons, and it doesn't hurt to have some documentation
-> for them.
+Hi Nikos,
 
-Please wrap at ~75 chars.
-
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
+On Wed, May 18, 2022 at 01:44:20PM +0100, Nikos Nikoleris wrote:
+> Hi Ricardo,
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index f164c6c1514a4..63eae00625bda 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1046,14 +1046,29 @@ struct kvm_x86_msr_filter {
->  };
->  
->  enum kvm_apicv_inhibit {
-> +	/* APICv/AVIC is disabled by module param and/or not supported in hardware */
-
-Rather than tag every one as APICv vs. AVIC, what about reorganizing the enums so
-that the common vs. AVIC flags are bundled together?  And then the redundant info
-in the comments about "XYZ is inhibited" can go away too, i.e. the individual
-comments can focus on explaining what triggers the inhibit (and for some, why that
-action is incompatible with APIC virtualization).
-
-E.g.
-	/***************************************************************/
-	/* INHIBITs are relevant to both Intel's APICv and AMD's AVIC. */
-	/***************************************************************/
-
-	/* APIC/AVIC is unsupported and/or disabled via module param. */
-	APICV_INHIBIT_REASON_DISABLE,
-
-	/* The local APIC is not in-kernel.  See KVM_CREATE_IRQCHIP. */
-	APICV_INHIBIT_REASON_ABSENT,
-
-	/*
-	 * At least one IRQ vector is configured for HyperV's AutoEOI, which
-	 * requires manually injecting the IRQ to do EOI on behalf of the guest.
-	 */
-	APICV_INHIBIT_REASON_HYPERV,
-	
-
-	/**********************************************/
-	/* INHIBITs relevant only to AMD's AVIC. */
-	/**********************************************/
-
->  	APICV_INHIBIT_REASON_DISABLE,
-> +	/* APICv/AVIC is inhibited because AutoEOI feature is being used by a HyperV guest*/
->  	APICV_INHIBIT_REASON_HYPERV,
-> +	/* AVIC is inhibited on a CPU because it runs a nested guest */
->  	APICV_INHIBIT_REASON_NESTED,
-> +	/* AVIC is inhibited due to wait for an irq window (AVIC doesn't support this) */
->  	APICV_INHIBIT_REASON_IRQWIN,
-> +	/*
-> +	 * AVIC is inhibited because i8254 're-inject' mode is used
-> +	 * which needs EOI intercept which AVIC doesn't support
-> +	 */
->  	APICV_INHIBIT_REASON_PIT_REINJ,
-> +	/* AVIC is inhibited because the guest has x2apic in its CPUID*/
->  	APICV_INHIBIT_REASON_X2APIC,
-> +	/* AVIC/APICv is inhibited because KVM_GUESTDBG_BLOCKIRQ was enabled */
->  	APICV_INHIBIT_REASON_BLOCKIRQ,
-> +	/*
-> +	 * AVIC/APICv is inhibited because the guest didn't yet
-
-s/guest/userspace
-
-> +	 * enable kernel/split irqchip
-> +	 */
->  	APICV_INHIBIT_REASON_ABSENT,
-> +	/* AVIC is disabled because SEV doesn't support it */
->  	APICV_INHIBIT_REASON_SEV,
->  };
->  
-> -- 
-> 2.26.3
+> On 17/05/2022 18:56, Ricardo Koller wrote:
+> > Hi Nikos,
+> > 
+> > On Fri, May 06, 2022 at 09:55:42PM +0100, Nikos Nikoleris wrote:
+> > > Hello,
+> > > 
+> > > This patch series adds initial support for building arm64 tests as EFI
+> > > tests and running them under QEMU. Much like x86_64 we import external
+> > > dependencies from gnu-efi and adopt them to work with types and other
+> > > assumptions from kvm-unit-tests. In addition, this series adds support
+> > > for discovering parts of the machine using ACPI.
+> > > 
+> > > The first set of patches moves the existing ACPI code to the common
+> > > lib path. Then, it extends definitions and functions to allow for more
+> > > robust discovery of ACPI tables. In arm64, we add support for setting
+> > > up the PSCI conduit, discovering the UART, timers and cpus via
+> > > ACPI. The code retains existing behavior and gives priority to
+> > > discovery through DT when one has been provided.
+> > > 
+> > > In the second set of patches, we add support for getting the command
+> > > line from the EFI shell. This is a requirement for many of the
+> > > existing arm64 tests.
+> > > 
+> > > In the third set of patches, we import code from gnu-efi, make minor
+> > > changes and add an alternative setup sequence from arm64 systems that
+> > > boot through EFI. Finally, we add support in the build system and a
+> > > run script which is used to run an EFI app.
+> > > 
+> > > After this set of patches one can build arm64 EFI tests:
+> > > 
+> > > $> ./configure --enable-efi
+> > > $> make
+> > > 
+> > > And use the run script to run an EFI tests:
+> > > 
+> > > $> ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
+> > > 
+> > 
+> > Thanks very much for this!
+> > 
+> > I'm having some issues with the other tests. I'm cross-compiling with
+> > gcc-11. But then "selftest setup" passes and others, like the timer
+> > test, fail:
+> > 
+> > 	$ ./configure --arch=arm64 --cross-prefix=aarch64-linux-gnu- \
+> > 		--processor=max --enable-efi
+> > 	$ make
+> > 
+> > 	passes:
+> > 	$ ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 \
+> > 		-append "setup smp=2 mem=256"
+> > 
+> > 	fails:
+> > 	$ ./arm/efi/run ./arm/timer.efi -smp 1 -m 256
+> > 
+> > 	Load address: 5833e000
+> > 	PC: 5834ad20 PC offset: cd20
+> > 	Unhandled exception ec=0x25 (DABT_EL1)
+> > 	Vector: 4 (el1h_sync)
+> > 	ESR_EL1:         96000006, ec=0x25 (DABT_EL1)
+> > 	FAR_EL1: 0000000000000004 (valid)
+> > 	Exception frame registers:
+> > 	pc : [<000000005834ad20>] lr : [<000000005834cadc>] pstate: 600003c5
+> > 	sp : 000000005f70fd80
+> > 	x29: 000000005f70ffe0 x28: 0000000000000000
+> > 	x27: 000000005835dc50 x26: 000000005834eb80
+> > 	x25: 000000000000d800 x24: 000000005f70fe50
+> > 	x23: 0000000000000000 x22: 000000005835f000
+> > 	x21: 000000005834eb80 x20: 0000000000000000
+> > 	x19: 00000000ffffffff x18: 0000000000000000
+> > 	x17: 0000000000000009 x16: 000000005bae8c38
+> > 	x15: 0000000000000002 x14: 0000000000000001
+> > 	x13: 0000000058350000 x12: 0000000058350000
+> > 	x11: 000000005833e000 x10: 000000000005833d
+> > 	x9 : 0000000000000000 x8 : 0000000000000000
+> > 	x7 : 0000000000000000 x6 : 0000000000000001
+> > 	x5 : 00000000000000c9 x4 : 000000005f70fe68
+> > 	x3 : 000000005f70fe68 x2 : 000000005834eb80
+> > 	x1 : 00000000ffffffff x0 : 0000000000000000
+> > 
 > 
+> Thank you for having a look!
+> 
+> Apologies, I should have been more explicit about this. At this point, not
+> all tests run successfully. There are bits and pieces missing, some of which
+> I tried to list in this TODO list and more that I missed. For example, to
+> get the timer tests to pass we have to add support for GIC initialization
+> through ACPI.
+> 
+> I've continued working on this series, and I will be ironing some of these
+> issues out and, in the meantime, I wanted some early feedback on whether
+
+Sounds good, will take a look as well. Thanks!
+
+> some of these features are even desirable upstream (e.g., ACPI support for
+> arm64).
+
+It's highly desirable for us. This is great.
+
+Thanks,
+Ricardo
+
+> 
+> I don't want to spam the list too much and I will wait for comments before I
+> send a v3 but I already have a couple of fixes and one more patch [1]. With
+> these applied both the timer and most gicv3 tests pass.
+> 
+> [1]: https://github.com/relokin/kvm-unit-tests/tree/target-efi-upstream
+> 
+> Thanks,
+> 
+> Nikos
+> 
+> > Thanks!
+> > Ricardo
+> > 
+> > > Or all tests:
+> > > 
+> > > $> ./run_tests.sh
+> > > 
+> > > There are a few items that this series does not address but they would
+> > > be useful to have:
+> > > 
+> > > * Support for booting the system from EL2. Currently, we assume that a
+> > > tests starts running at EL1. This the case when we run with EFI, it's
+> > > not always the case in hardware.
+> > > 
+> > > * Support for reading environment variables and populating __envp.
+> > > 
+> > > * Support for discovering the chr-testdev through ACPI.
+> > > 
+> > > PS: Apologies for the mess with v1. Due to a mistake in my git
+> > > send-email configuration some patches didn't make it to the list and
+> > > the right recipients.
+> > > 
+> > > Thanks,
+> > > 
+> > > Nikos
+> > > 
+> > > Andrew Jones (3):
+> > >    arm/arm64: mmu_disable: Clean and invalidate before disabling
+> > >    arm/arm64: Rename etext to _etext
+> > >    arm64: Add a new type of memory type flag MR_F_RESERVED
+> > > 
+> > > Nikos Nikoleris (20):
+> > >    lib: Move acpi header and implementation to lib
+> > >    lib: Ensure all struct definition for ACPI tables are packed
+> > >    lib: Add support for the XSDT ACPI table
+> > >    lib: Extend the definition of the ACPI table FADT
+> > >    arm/arm64: Add support for setting up the PSCI conduit through ACPI
+> > >    arm/arm64: Add support for discovering the UART through ACPI
+> > >    arm/arm64: Add support for timer initialization through ACPI
+> > >    arm/arm64: Add support for cpu initialization through ACPI
+> > >    lib/printf: Support for precision modifier in printing strings
+> > >    lib/printf: Add support for printing wide strings
+> > >    lib/efi: Add support for getting the cmdline
+> > >    lib: Avoid ms_abi for calls related to EFI on arm64
+> > >    arm/arm64: Add a setup sequence for systems that boot through EFI
+> > >    arm64: Copy code from GNU-EFI
+> > >    arm64: Change GNU-EFI imported file to use defined types
+> > >    arm64: Use code from the gnu-efi when booting with EFI
+> > >    lib: Avoid external dependency in libelf
+> > >    x86: Move x86_64-specific EFI CFLAGS to x86_64 Makefile
+> > >    arm64: Add support for efi in Makefile
+> > >    arm64: Add an efi/run script
+> > > 
+> > >   scripts/runtime.bash        |  14 +-
+> > >   arm/efi/run                 |  61 +++++++++
+> > >   arm/run                     |   8 +-
+> > >   configure                   |  15 ++-
+> > >   Makefile                    |   4 -
+> > >   arm/Makefile.arm            |   6 +
+> > >   arm/Makefile.arm64          |  18 ++-
+> > >   arm/Makefile.common         |  48 +++++--
+> > >   x86/Makefile.common         |   2 +-
+> > >   x86/Makefile.x86_64         |   4 +
+> > >   lib/linux/efi.h             |  44 ++++++
+> > >   lib/arm/asm/setup.h         |   3 +
+> > >   lib/arm/asm/timer.h         |   2 +
+> > >   lib/x86/asm/setup.h         |   2 +-
+> > >   lib/acpi.h                  | 260 ++++++++++++++++++++++++++++++++++++
+> > >   lib/stdlib.h                |   1 +
+> > >   lib/x86/acpi.h              | 112 ----------------
+> > >   lib/acpi.c                  | 124 +++++++++++++++++
+> > >   lib/arm/io.c                |  21 ++-
+> > >   lib/arm/mmu.c               |   4 +
+> > >   lib/arm/psci.c              |  25 +++-
+> > >   lib/arm/setup.c             | 247 +++++++++++++++++++++++++++-------
+> > >   lib/arm/timer.c             |  73 ++++++++++
+> > >   lib/devicetree.c            |   2 +-
+> > >   lib/efi.c                   | 123 +++++++++++++++++
+> > >   lib/printf.c                | 183 +++++++++++++++++++++++--
+> > >   lib/string.c                |   2 +-
+> > >   lib/x86/acpi.c              |  82 ------------
+> > >   arm/efi/elf_aarch64_efi.lds |  63 +++++++++
+> > >   arm/flat.lds                |   2 +-
+> > >   arm/cstart.S                |  29 +++-
+> > >   arm/cstart64.S              |  28 +++-
+> > >   arm/efi/crt0-efi-aarch64.S  | 143 ++++++++++++++++++++
+> > >   arm/dummy.c                 |   4 +
+> > >   arm/efi/reloc_aarch64.c     |  93 +++++++++++++
+> > >   x86/s3.c                    |  20 +--
+> > >   x86/vmexit.c                |   4 +-
+> > >   37 files changed, 1556 insertions(+), 320 deletions(-)
+> > >   create mode 100755 arm/efi/run
+> > >   create mode 100644 lib/acpi.h
+> > >   delete mode 100644 lib/x86/acpi.h
+> > >   create mode 100644 lib/acpi.c
+> > >   create mode 100644 lib/arm/timer.c
+> > >   delete mode 100644 lib/x86/acpi.c
+> > >   create mode 100644 arm/efi/elf_aarch64_efi.lds
+> > >   create mode 100644 arm/efi/crt0-efi-aarch64.S
+> > >   create mode 100644 arm/dummy.c
+> > >   create mode 100644 arm/efi/reloc_aarch64.c
+> > > 
+> > > -- 
+> > > 2.25.1
+> > > 
