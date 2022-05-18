@@ -2,257 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A7AD952BBEA
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 16:15:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0029F52BD61
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 16:18:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237502AbiERMrb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 08:47:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56530 "EHLO
+        id S237287AbiERMrp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 08:47:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238281AbiERMrC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 08:47:02 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0D7B61BB117
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 05:45:03 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5D27E1042;
-        Wed, 18 May 2022 05:44:22 -0700 (PDT)
-Received: from [10.2.13.43] (Q2TWYV475D.cambridge.arm.com [10.2.13.43])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8AC993F73D;
-        Wed, 18 May 2022 05:44:21 -0700 (PDT)
-Message-ID: <3376d2b0-7eec-212b-aedf-c4aa34be254c@arm.com>
-Date:   Wed, 18 May 2022 13:44:20 +0100
+        with ESMTP id S238493AbiERMrQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 08:47:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 54F221BDADB
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 05:45:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652877931;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Q7e2eynh2lki6aaMuNiuQ3yDCBpivZWLlTQmPRG6dxE=;
+        b=RffSnrpAkoT3RDMNovoGaSPCyEst4bv1oEV79VAX4xI8Y6+4saznV36/jhQM+lf57AEwJY
+        KdBSynuK1LDaO5do94qRlu0VKnwQfMQT/Xp/nM0pVzTyh1qxEgPkjL4ARCAxGGGOeGrWZI
+        tZ9VI0BWEtQ2xREIV9AWFVYpHj0CRWw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-656-cnRowkt-PIydbbyHKJWn5A-1; Wed, 18 May 2022 08:45:24 -0400
+X-MC-Unique: cnRowkt-PIydbbyHKJWn5A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 996B9100DDF4;
+        Wed, 18 May 2022 12:45:23 +0000 (UTC)
+Received: from starship (unknown [10.40.192.55])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 609EA4010E4E;
+        Wed, 18 May 2022 12:45:21 +0000 (UTC)
+Message-ID: <aabc24621b95f627d3f8a8875074c06097f4ec8e.camel@redhat.com>
+Subject: Re: [PATCH v3 13/34] KVM: nSVM: Keep track of Hyper-V
+ hv_vm_id/hv_vp_id
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Wed, 18 May 2022 15:45:20 +0300
+In-Reply-To: <874k1nuiw8.fsf@redhat.com>
+References: <20220414132013.1588929-1-vkuznets@redhat.com>
+         <20220414132013.1588929-14-vkuznets@redhat.com>
+         <30b0e63c0a2d3c3c40edb47af6d80e452f1e69fa.camel@redhat.com>
+         <874k1nuiw8.fsf@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.9.0
-Subject: Re: [kvm-unit-tests PATCH v2 00/23] EFI and ACPI support for arm64
-Content-Language: en-GB
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, drjones@redhat.com, pbonzini@redhat.com,
-        jade.alglave@arm.com, alexandru.elisei@arm.com
-References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
- <YoPhyyz+l3NkcAb5@google.com>
-From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <YoPhyyz+l3NkcAb5@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-9.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ricardo,
+On Wed, 2022-05-18 at 14:25 +0200, Vitaly Kuznetsov wrote:
+> Maxim Levitsky <mlevitsk@redhat.com> writes:
+> 
+> > On Thu, 2022-04-14 at 15:19 +0200, Vitaly Kuznetsov wrote:
+> > > Similar to nSVM, KVM needs to know L2's VM_ID/VP_ID and Partition
+> > > assist page address to handle L2 TLB flush requests.
+> > > 
+> > > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> > > ---
+> > >  arch/x86/kvm/svm/hyperv.h | 16 ++++++++++++++++
+> > >  arch/x86/kvm/svm/nested.c |  2 ++
+> > >  2 files changed, 18 insertions(+)
+> > > 
+> > > diff --git a/arch/x86/kvm/svm/hyperv.h b/arch/x86/kvm/svm/hyperv.h
+> > > index 7d6d97968fb9..8cf702fed7e5 100644
+> > > --- a/arch/x86/kvm/svm/hyperv.h
+> > > +++ b/arch/x86/kvm/svm/hyperv.h
+> > > @@ -9,6 +9,7 @@
+> > >  #include <asm/mshyperv.h>
+> > >  
+> > >  #include "../hyperv.h"
+> > > +#include "svm.h"
+> > >  
+> > >  /*
+> > >   * Hyper-V uses the software reserved 32 bytes in VMCB
+> > > @@ -32,4 +33,19 @@ struct hv_enlightenments {
+> > >   */
+> > >  #define VMCB_HV_NESTED_ENLIGHTENMENTS VMCB_SW
+> > >  
+> > > +static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +	struct vcpu_svm *svm = to_svm(vcpu);
+> > > +	struct hv_enlightenments *hve =
+> > > +		(struct hv_enlightenments *)svm->nested.ctl.reserved_sw;
+> > 
+> > Small nitpick:
+> > 
+> > Can we use this as an opportunity to rename the 'reserved_sw' to \
+> > 'hv_enlightenments' or something, because that is what it is?
+> > 
+> > Also the reserved_sw is an array, which is confusing, since from first look,
+> > it looks like we have a pointer dereference here.
+> > 
+> 
+> Well, that's what it is in Hyper-V world and so far we didn't give it
+> another meaning in KVM but in theory it is not impossible, e.g. we can
+> use this area to speed up nested KVM on KVM.
+> 
+> AMD calls this "Reserved for Host usage" so we can probably rename it to 
+> 'reserved_host' but I'm not sure it's worth the hassle...
 
-On 17/05/2022 18:56, Ricardo Koller wrote:
-> Hi Nikos,
-> 
-> On Fri, May 06, 2022 at 09:55:42PM +0100, Nikos Nikoleris wrote:
->> Hello,
->>
->> This patch series adds initial support for building arm64 tests as EFI
->> tests and running them under QEMU. Much like x86_64 we import external
->> dependencies from gnu-efi and adopt them to work with types and other
->> assumptions from kvm-unit-tests. In addition, this series adds support
->> for discovering parts of the machine using ACPI.
->>
->> The first set of patches moves the existing ACPI code to the common
->> lib path. Then, it extends definitions and functions to allow for more
->> robust discovery of ACPI tables. In arm64, we add support for setting
->> up the PSCI conduit, discovering the UART, timers and cpus via
->> ACPI. The code retains existing behavior and gives priority to
->> discovery through DT when one has been provided.
->>
->> In the second set of patches, we add support for getting the command
->> line from the EFI shell. This is a requirement for many of the
->> existing arm64 tests.
->>
->> In the third set of patches, we import code from gnu-efi, make minor
->> changes and add an alternative setup sequence from arm64 systems that
->> boot through EFI. Finally, we add support in the build system and a
->> run script which is used to run an EFI app.
->>
->> After this set of patches one can build arm64 EFI tests:
->>
->> $> ./configure --enable-efi
->> $> make
->>
->> And use the run script to run an EFI tests:
->>
->> $> ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
->>
-> 
-> Thanks very much for this!
-> 
-> I'm having some issues with the other tests. I'm cross-compiling with
-> gcc-11. But then "selftest setup" passes and others, like the timer
-> test, fail:
-> 
-> 	$ ./configure --arch=arm64 --cross-prefix=aarch64-linux-gnu- \
-> 		--processor=max --enable-efi
-> 	$ make
-> 
-> 	passes:
-> 	$ ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 \
-> 		-append "setup smp=2 mem=256"
-> 
-> 	fails:
-> 	$ ./arm/efi/run ./arm/timer.efi -smp 1 -m 256
-> 
-> 	Load address: 5833e000
-> 	PC: 5834ad20 PC offset: cd20
-> 	Unhandled exception ec=0x25 (DABT_EL1)
-> 	Vector: 4 (el1h_sync)
-> 	ESR_EL1:         96000006, ec=0x25 (DABT_EL1)
-> 	FAR_EL1: 0000000000000004 (valid)
-> 	Exception frame registers:
-> 	pc : [<000000005834ad20>] lr : [<000000005834cadc>] pstate: 600003c5
-> 	sp : 000000005f70fd80
-> 	x29: 000000005f70ffe0 x28: 0000000000000000
-> 	x27: 000000005835dc50 x26: 000000005834eb80
-> 	x25: 000000000000d800 x24: 000000005f70fe50
-> 	x23: 0000000000000000 x22: 000000005835f000
-> 	x21: 000000005834eb80 x20: 0000000000000000
-> 	x19: 00000000ffffffff x18: 0000000000000000
-> 	x17: 0000000000000009 x16: 000000005bae8c38
-> 	x15: 0000000000000002 x14: 0000000000000001
-> 	x13: 0000000058350000 x12: 0000000058350000
-> 	x11: 000000005833e000 x10: 000000000005833d
-> 	x9 : 0000000000000000 x8 : 0000000000000000
-> 	x7 : 0000000000000000 x6 : 0000000000000001
-> 	x5 : 00000000000000c9 x4 : 000000005f70fe68
-> 	x3 : 000000005f70fe68 x2 : 000000005834eb80
-> 	x1 : 00000000ffffffff x0 : 0000000000000000
-> 
+This is a very good piece of information. If AMD calls it like that,
+than let it be.
 
-Thank you for having a look!
+It is probably not worth it to rename the field then, but I think it
+is might be worth it to add this info as a comment to the KVM.
 
-Apologies, I should have been more explicit about this. At this point, 
-not all tests run successfully. There are bits and pieces missing, some 
-of which I tried to list in this TODO list and more that I missed. For 
-example, to get the timer tests to pass we have to add support for GIC 
-initialization through ACPI.
+Also it might be worth it to add some wrapper function for
+'struct hv_enlightenments *hve = (struct hv_enlightenments *)svm->nested.ctl.reserved_sw;'
+(+ check if this area is valid - currently it is copied only when 'kvm_hv_hypercall_enabled == true').
 
-I've continued working on this series, and I will be ironing some of 
-these issues out and, in the meantime, I wanted some early feedback on 
-whether some of these features are even desirable upstream (e.g., ACPI 
-support for arm64).
-
-I don't want to spam the list too much and I will wait for comments 
-before I send a v3 but I already have a couple of fixes and one more 
-patch [1]. With these applied both the timer and most gicv3 tests pass.
-
-[1]: https://github.com/relokin/kvm-unit-tests/tree/target-efi-upstream
+Both would be a very low priority items to be honest.
 
 Thanks,
+Best regards,
+	MaxiMm Levitsky
 
-Nikos
 
-> Thanks!
-> Ricardo
 > 
->> Or all tests:
->>
->> $> ./run_tests.sh
->>
->> There are a few items that this series does not address but they would
->> be useful to have:
->>
->> * Support for booting the system from EL2. Currently, we assume that a
->> tests starts running at EL1. This the case when we run with EFI, it's
->> not always the case in hardware.
->>
->> * Support for reading environment variables and populating __envp.
->>
->> * Support for discovering the chr-testdev through ACPI.
->>
->> PS: Apologies for the mess with v1. Due to a mistake in my git
->> send-email configuration some patches didn't make it to the list and
->> the right recipients.
->>
->> Thanks,
->>
->> Nikos
->>
->> Andrew Jones (3):
->>    arm/arm64: mmu_disable: Clean and invalidate before disabling
->>    arm/arm64: Rename etext to _etext
->>    arm64: Add a new type of memory type flag MR_F_RESERVED
->>
->> Nikos Nikoleris (20):
->>    lib: Move acpi header and implementation to lib
->>    lib: Ensure all struct definition for ACPI tables are packed
->>    lib: Add support for the XSDT ACPI table
->>    lib: Extend the definition of the ACPI table FADT
->>    arm/arm64: Add support for setting up the PSCI conduit through ACPI
->>    arm/arm64: Add support for discovering the UART through ACPI
->>    arm/arm64: Add support for timer initialization through ACPI
->>    arm/arm64: Add support for cpu initialization through ACPI
->>    lib/printf: Support for precision modifier in printing strings
->>    lib/printf: Add support for printing wide strings
->>    lib/efi: Add support for getting the cmdline
->>    lib: Avoid ms_abi for calls related to EFI on arm64
->>    arm/arm64: Add a setup sequence for systems that boot through EFI
->>    arm64: Copy code from GNU-EFI
->>    arm64: Change GNU-EFI imported file to use defined types
->>    arm64: Use code from the gnu-efi when booting with EFI
->>    lib: Avoid external dependency in libelf
->>    x86: Move x86_64-specific EFI CFLAGS to x86_64 Makefile
->>    arm64: Add support for efi in Makefile
->>    arm64: Add an efi/run script
->>
->>   scripts/runtime.bash        |  14 +-
->>   arm/efi/run                 |  61 +++++++++
->>   arm/run                     |   8 +-
->>   configure                   |  15 ++-
->>   Makefile                    |   4 -
->>   arm/Makefile.arm            |   6 +
->>   arm/Makefile.arm64          |  18 ++-
->>   arm/Makefile.common         |  48 +++++--
->>   x86/Makefile.common         |   2 +-
->>   x86/Makefile.x86_64         |   4 +
->>   lib/linux/efi.h             |  44 ++++++
->>   lib/arm/asm/setup.h         |   3 +
->>   lib/arm/asm/timer.h         |   2 +
->>   lib/x86/asm/setup.h         |   2 +-
->>   lib/acpi.h                  | 260 ++++++++++++++++++++++++++++++++++++
->>   lib/stdlib.h                |   1 +
->>   lib/x86/acpi.h              | 112 ----------------
->>   lib/acpi.c                  | 124 +++++++++++++++++
->>   lib/arm/io.c                |  21 ++-
->>   lib/arm/mmu.c               |   4 +
->>   lib/arm/psci.c              |  25 +++-
->>   lib/arm/setup.c             | 247 +++++++++++++++++++++++++++-------
->>   lib/arm/timer.c             |  73 ++++++++++
->>   lib/devicetree.c            |   2 +-
->>   lib/efi.c                   | 123 +++++++++++++++++
->>   lib/printf.c                | 183 +++++++++++++++++++++++--
->>   lib/string.c                |   2 +-
->>   lib/x86/acpi.c              |  82 ------------
->>   arm/efi/elf_aarch64_efi.lds |  63 +++++++++
->>   arm/flat.lds                |   2 +-
->>   arm/cstart.S                |  29 +++-
->>   arm/cstart64.S              |  28 +++-
->>   arm/efi/crt0-efi-aarch64.S  | 143 ++++++++++++++++++++
->>   arm/dummy.c                 |   4 +
->>   arm/efi/reloc_aarch64.c     |  93 +++++++++++++
->>   x86/s3.c                    |  20 +--
->>   x86/vmexit.c                |   4 +-
->>   37 files changed, 1556 insertions(+), 320 deletions(-)
->>   create mode 100755 arm/efi/run
->>   create mode 100644 lib/acpi.h
->>   delete mode 100644 lib/x86/acpi.h
->>   create mode 100644 lib/acpi.c
->>   create mode 100644 lib/arm/timer.c
->>   delete mode 100644 lib/x86/acpi.c
->>   create mode 100644 arm/efi/elf_aarch64_efi.lds
->>   create mode 100644 arm/efi/crt0-efi-aarch64.S
->>   create mode 100644 arm/dummy.c
->>   create mode 100644 arm/efi/reloc_aarch64.c
->>
->> -- 
->> 2.25.1
->>
+> > 
+> > > +	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+> > > +
+> > > +	if (!hv_vcpu)
+> > > +		return;
+> > > +
+> > > +	hv_vcpu->nested.pa_page_gpa = hve->partition_assist_page;
+> > > +	hv_vcpu->nested.vm_id = hve->hv_vm_id;
+> > > +	hv_vcpu->nested.vp_id = hve->hv_vp_id;
+> > > +}
+> > > +
+> > >  #endif /* __ARCH_X86_KVM_SVM_HYPERV_H__ */
+> > > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > > index bed5e1692cef..2d1a76343404 100644
+> > > --- a/arch/x86/kvm/svm/nested.c
+> > > +++ b/arch/x86/kvm/svm/nested.c
+> > > @@ -826,6 +826,8 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
+> > >  
+> > >  	svm->nested.nested_run_pending = 1;
+> > >  
+> > > +	nested_svm_hv_update_vm_vp_ids(vcpu);
+> > > +
+> > >  	if (enter_svm_guest_mode(vcpu, vmcb12_gpa, vmcb12, true))
+> > >  		goto out_exit_err;
+> > >  
+> > 
+> > That won't work after migration, since this won't be called
+> > if we migrate with nested guest running.
+> > 
+> > 
+> > I think that nested_svm_hv_update_vm_vp_ids should be called 
+> > from enter_svm_guest_mode.
+> > 
+> 
+> Oh that's a good one, thanks! This could've been a hard to debug issue.
+> 
+
+
